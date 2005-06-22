@@ -131,9 +131,8 @@ public class GuiseServlet extends BasicHTTPServlet
 		{
 			throw new HTTPNotFoundException("Not found: "+request.getRequestURL());
 		}
-		final Controller<TextGuiseContext, Frame> renderStrategy=guiseContext.getRenderStrategy(frame);
-		renderStrategy.updateModel(guiseContext, frame);
-		renderStrategy.updateView(guiseContext, frame);
+		frame.updateModel(guiseContext);
+		frame.updateView(guiseContext);
 	}
 
 }
