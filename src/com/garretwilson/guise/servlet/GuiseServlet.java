@@ -98,41 +98,42 @@ public class GuiseServlet extends BasicHTTPServlet
 		final DefaultHTTPServletGuiseContext guiseContext=new DefaultHTTPServletGuiseContext(getGuise(), request, response);	//create a new Guise context
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 		Debug.trace("raw path info", rawPathInfo);
+		final Frame frame;
 		final Class<? extends Frame> frameClass=getBoundFrameClass(rawPathInfo);	//see which frame we should show for this path
 		if(frameClass!=null)	//if we found a frame class for this address
 		{
-			final Frame frame;
 			try
 			{
 				frame = frameClass.getConstructor(String.class).newInstance("testFrame");
-				final RenderStrategy<TextGuiseContext, Frame> renderStrategy=guiseContext.getRenderStrategy(frame);				
-				renderStrategy.render(guiseContext, frame);
 			}
 			catch (NoSuchMethodException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Debug.error(e);
+				throw new ServletException(e);
 			}
 			catch (InvocationTargetException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Debug.error(e);
+				throw new ServletException(e);
 			}
 			catch (InstantiationException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Debug.error(e);
+				throw new ServletException(e);
 			}
 			catch (IllegalAccessException e)
 			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Debug.error(e);
+				throw new ServletException(e);
 			}
 		}
 		else	//if we have no frame type for this address
 		{
 			throw new HTTPNotFoundException("Not found: "+request.getRequestURL());
 		}
+		final RenderStrategy<TextGuiseContext, Frame> renderStrategy=guiseContext.getRenderStrategy(frame);
+		renderStrategy.updateModel(guiseContext, frame);
+		renderStrategy.updateView(guiseContext, frame);
 	}
 
 }

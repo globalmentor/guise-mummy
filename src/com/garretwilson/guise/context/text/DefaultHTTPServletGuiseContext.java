@@ -1,10 +1,13 @@
 package com.garretwilson.guise.context.text;
 
 import java.io.*;
+import java.util.*;
+import static java.util.Arrays.*;
 
 import javax.servlet.http.*;
 
 import com.garretwilson.guise.Guise;
+import com.garretwilson.util.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
@@ -37,7 +40,15 @@ public class DefaultHTTPServletGuiseContext extends AbstractTextGuiseContext
 		super(guise);	//construct the parent class
 		this.request=checkNull(request, "Request cannot be null.");
 		this.response=checkNull(response, "Response cannot be null.");		
+			//populate our parameter map
+		final ListMap<Object, Object> parameterListMap=getParameterListMap();	//get the map of parameter lists
+		final Map<String, Object[]> parameterMap=(Map<String, Object[]>)request.getParameterMap();	//get the request parameter map, casting it to a generic type for ease of use
+		for(final Map.Entry<String, Object[]> parameterMapEntry:parameterMap.entrySet())	//for each entry in the map of parameters
+		{
+			parameterListMap.put(parameterMapEntry.getKey(), asList(parameterMapEntry.getValue()));	//store the the array of values as a list, keyed to the value			
+		}
 	}
+
 	/**@return A writer for rendering text content.
 	@exception IOException if there is an error getting the writer.
 	*/
