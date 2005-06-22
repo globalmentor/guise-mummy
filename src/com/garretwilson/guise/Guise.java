@@ -2,7 +2,7 @@ package com.garretwilson.guise;
 
 import com.garretwilson.guise.component.Component;
 import com.garretwilson.guise.context.GuiseContext;
-import com.garretwilson.guise.render.RenderStrategy;
+import com.garretwilson.guise.controller.RenderStrategy;
 
 /**An interface for a Guise instance.
 @author Garret Wilson

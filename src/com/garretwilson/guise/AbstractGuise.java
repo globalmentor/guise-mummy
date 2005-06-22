@@ -3,11 +3,8 @@ package com.garretwilson.guise;
 import java.util.*;
 
 import com.garretwilson.guise.component.Component;
-import com.garretwilson.guise.component.Label;
 import com.garretwilson.guise.context.GuiseContext;
-import com.garretwilson.guise.context.text.TextGuiseContext;
-import com.garretwilson.guise.render.RenderStrategy;
-import com.garretwilson.guise.render.text.xml.xhtml.LabelRenderStrategy;
+import com.garretwilson.guise.controller.RenderStrategy;
 
 /**An abstract base class for a Guise instance.
 @author Garret Wilson
