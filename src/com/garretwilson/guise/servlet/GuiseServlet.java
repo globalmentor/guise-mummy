@@ -11,7 +11,7 @@ import com.garretwilson.guise.*;
 import com.garretwilson.guise.component.*;
 import com.garretwilson.guise.context.*;
 import com.garretwilson.guise.context.text.*;
-import com.garretwilson.guise.controller.RenderStrategy;
+import com.garretwilson.guise.controller.Controller;
 import com.garretwilson.guise.controller.text.xml.xhtml.*;
 import com.garretwilson.guise.test.HomeFrame;
 import com.garretwilson.net.http.*;
@@ -69,9 +69,9 @@ public class GuiseServlet extends BasicHTTPServlet
 	public void init(final ServletConfig servletConfig) throws ServletException
 	{
 		super.init(servletConfig);	//do the default initialization
-		getGuise().registerRenderStrategy(Button.class, ButtonRenderStrategy.class);
-		getGuise().registerRenderStrategy(Label.class, LabelRenderStrategy.class);
-		getGuise().registerRenderStrategy(Frame.class, FrameRenderStrategy.class);
+		getGuise().registerRenderStrategy(Button.class, XHTMLButtonController.class);
+		getGuise().registerRenderStrategy(Label.class, XHTMLLabelController.class);
+		getGuise().registerRenderStrategy(Frame.class, XHTMLFrameController.class);
 	}
 
 	/**Services the POST method.
@@ -131,7 +131,7 @@ public class GuiseServlet extends BasicHTTPServlet
 		{
 			throw new HTTPNotFoundException("Not found: "+request.getRequestURL());
 		}
-		final RenderStrategy<TextGuiseContext, Frame> renderStrategy=guiseContext.getRenderStrategy(frame);
+		final Controller<TextGuiseContext, Frame> renderStrategy=guiseContext.getRenderStrategy(frame);
 		renderStrategy.updateModel(guiseContext, frame);
 		renderStrategy.updateView(guiseContext, frame);
 	}
