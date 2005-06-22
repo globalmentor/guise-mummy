@@ -15,6 +15,12 @@ import com.garretwilson.util.BoundPropertyObject;
 public class AbstractComponent extends BoundPropertyObject implements Component
 {
 
+	/**The object managing event listeners.*/
+	private final EventListenerManager eventListenerManager=new EventListenerManager();
+
+		/**@return The object managing event listeners.*/
+		protected EventListenerManager getEventListenerManager() {return eventListenerManager;}
+
 	/**The controller installed in this component, or <code>null</code> if no controller is installed.*/
 	private Controller<? extends GuiseContext, ? extends Component> controller=null;
 
@@ -37,17 +43,72 @@ public class AbstractComponent extends BoundPropertyObject implements Component
 			}
 		}
 	
-	/**The object managing event listeners.*/
-	private final EventListenerManager eventListenerManager=new EventListenerManager();
-
-		/**@return The object managing event listeners.*/
-		protected EventListenerManager getEventListenerManager() {return eventListenerManager;}
-
 	/**The component identifier*/
 	private final String id;
 
 		/**@return The component identifier.*/
 		public String getID() {return id;}
+
+	/**The container parent of this component, or <code>null</code> if this component is not embedded in any container.*/
+	private Container parent=null;
+
+		/**@return The container parent of this component, or <code>null</code> if this component is not embedded in any container.*/
+		public Container getParent() {return parent;}
+
+		/**Retrieves the first ancestor of the given type.
+		@param <C> The type of ancestor container requested.
+		@param ancestorClass The class of ancestor container requested.
+		@return The first ancestor container of the given type, or <code>null</code> if this component has no such ancestor.
+		*/
+		@SuppressWarnings("unchecked")
+		public <C extends Container> C getAncestor(final Class<C> ancestorClass)
+		{
+			final Container parent=getParent();	//get this component's parent
+			if(parent!=null)	//if there is a parent
+			{
+				return ancestorClass.isInstance(parent) ? (C)parent : parent.getAncestor(ancestorClass);	//if the parent is of the correct type, return it; otherwise, ask it to search its own ancestors
+			}
+			else	//if there is no parent
+			{
+				return null;	//there is no such ancestor
+			}		
+		}
+
+		/**Sets the parent of this component.
+		This method is managed by containers, and should usually never be called my other classes.
+		In order to hinder inadvertent incorrect use, the parent must only be set after the component is added to the container, and only be unset after the component is removed from the container.
+		If a component is given the same parent it already has, no action occurs.
+		@param newParent The new parent for this component, or <code>null</code> if this component is being removed from a container.
+		@exception IllegalStateException if a parent is provided and this component already has a parent.
+		@exception IllegalStateException if no parent is provided and this component's old parent still recognizes this component as its child.
+		@exception IllegalArgumentException if a parent is provided and the given parent does not already recognize this component as its child.
+		*/
+		public void setParent(final Container newParent)
+		{
+			final Container oldParent=parent;	//get the old parent
+			if(oldParent!=newParent)	//if the parent is really changing
+			{
+				if(newParent!=null)	//if a parent is provided
+				{
+					if(oldParent!=null)	//if we already have a parent
+					{
+						throw new IllegalStateException("Component "+this+" already has parent: "+oldParent);
+					}
+					if(!newParent.contains(this))	//if the container is not really our parent
+					{
+						throw new IllegalArgumentException("Provided parent "+newParent+" is not really parent of component "+this);
+					}
+				}
+				else	//if no parent is provided
+				{
+					if(oldParent!=null && oldParent.contains(this))	//if we had a parent before, and that parent still thinks this component is its child
+					{
+						throw new IllegalStateException("Old parent "+oldParent+" still thinks this component, "+this+", is a child."); 
+					}
+				}
+				parent=newParent;	//this is really our parent; make a note of it
+			}
+		}
 
 	/**The style identifier, or <code>null</code> if there is no style ID.*/
 	private String styleID=null;

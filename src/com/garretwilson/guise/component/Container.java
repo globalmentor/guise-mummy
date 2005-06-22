@@ -11,4 +11,11 @@ public interface Container extends Component, Iterable<Component>
 	@param component The component to add.
 	*/
 	public void add(final Component component);
+
+	/**Determines whether this container contains the given component.
+	@param component The component to check.
+	@return <code>true</code> if this container contains the given component.
+	*/
+	public boolean contains(final Component component);
+
 }

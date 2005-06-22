@@ -25,7 +25,7 @@ public class HomeFrame extends DefaultFrame
 		final Button testButton2=new DefaultButton("testButton2");
 		add(testButton2);	//add a new button
 		final Label buttonLabel2=new Label("buttonLabel2");
-		testButton2.add(buttonLabel);	//add a new label
+		testButton2.add(buttonLabel2);	//add a new label
 	}
 
 }
