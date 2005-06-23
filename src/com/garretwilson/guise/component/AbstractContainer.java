@@ -2,6 +2,8 @@ package com.garretwilson.guise.component;
 
 import java.util.*;
 
+import com.garretwilson.guise.component.layout.Layout;
+import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.util.EmptyIterator;
 
 /**Abstract implementation of a container component.
@@ -53,13 +55,21 @@ public class AbstractContainer extends AbstractComponent implements Container
 		return componentList!=null ? componentList.contains(component) : false;	//if we have a component list, ask it whether it contains this component
 	}
 
+	/**The layout definition for the container.*/
+	private final Layout layout;
+
+		/**@return The layout definition for the container.*/
+		public Layout getLayout() {return layout;}
+
 	/**ID constructor.
 	@param id The component identifier.
-	@exception NullPointerException if the given identifier is <code>null</code>.
+	@param layout The layout definition for the container.
+	@exception NullPointerException if the given identifier or layout is <code>null</code>.
 	*/
-	public AbstractContainer(final String id)
+	public AbstractContainer(final String id, final Layout layout)
 	{
 		super(id);	//construct the parent class
+		this.layout=checkNull(layout, "Layout cannot be null.");	//save the layout
 	}
 
 }

@@ -14,6 +14,8 @@ import com.garretwilson.guise.context.text.*;
 import com.garretwilson.guise.controller.Controller;
 import com.garretwilson.guise.controller.text.xml.xhtml.*;
 import com.garretwilson.guise.test.HomeFrame;
+import com.garretwilson.io.InputStreamUtilities;
+import com.garretwilson.io.OutputStreamUtilities;
 import com.garretwilson.net.http.*;
 import com.garretwilson.util.Debug;
 
@@ -72,6 +74,7 @@ public class GuiseServlet extends BasicHTTPServlet
 		getGuise().registerRenderStrategy(ActionControl.class, XHTMLButtonController.class);
 		getGuise().registerRenderStrategy(Label.class, XHTMLLabelController.class);
 		getGuise().registerRenderStrategy(Frame.class, XHTMLFrameController.class);
+		getGuise().registerRenderStrategy(Panel.class, XHTMLPanelController.class);
 		getGuise().registerRenderStrategy(ValueControl.class, XHTMLInputController.class);
 	}
 
@@ -98,6 +101,21 @@ public class GuiseServlet extends BasicHTTPServlet
 	{
 		final DefaultHTTPServletGuiseContext guiseContext=new DefaultHTTPServletGuiseContext(getGuise(), request, response);	//create a new Guise context
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
+		if(rawPathInfo.endsWith(".css"))	//TODO fix
+		{
+			response.setContentType("text/css");
+			final File file=new File(getServletContext().getRealPath(rawPathInfo));	//TODO fix all this; temporary hack
+			final InputStream inputStream=new BufferedInputStream(new FileInputStream(file));
+			try
+			{
+				OutputStreamUtilities.write(inputStream, response.getOutputStream());	//TODO fix
+			}
+			finally
+			{
+				inputStream.close();
+			}
+			return;
+		}
 		Debug.trace("raw path info", rawPathInfo);
 		final Frame frame;
 		final Class<? extends Frame> frameClass=getBoundFrameClass(rawPathInfo);	//see which frame we should show for this path
