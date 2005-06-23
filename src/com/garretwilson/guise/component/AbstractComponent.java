@@ -4,10 +4,10 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 
 import java.io.IOException;
 
+import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.event.EventListenerManager;
 import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.Controller;
-import com.garretwilson.util.BoundPropertyObject;
 
 /**An abstract implementation of a component.
 @author Garret Wilson

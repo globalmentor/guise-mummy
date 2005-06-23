@@ -1,9 +1,13 @@
 package com.garretwilson.guise.test;
 
+import com.garretwilson.beans.AbstractPropertyValueChangeListener;
+import com.garretwilson.beans.PropertyValueChangeEvent;
+import com.garretwilson.beans.PropertyValueChangeListener;
 import com.garretwilson.guise.component.*;
 import com.garretwilson.guise.event.ActionEvent;
 import com.garretwilson.guise.event.ActionListener;
 import com.garretwilson.guise.model.ActionModel;
+import com.garretwilson.guise.model.ValueModel;
 
 /**Test frame for a home page.
 @author Garret Wilson
@@ -35,6 +39,15 @@ public class HomeFrame extends DefaultFrame
 					}
 				});
 		add(testButton2);	//add a new button
+		final ValueControl<String> textInput=new ValueControl<String>("textInput", String.class);	//create a text input control
+		add(textInput);
+		textInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<String>()
+				{
+					public void propertyValueChange(PropertyValueChangeEvent<String> propertyValueChangeEvent)
+					{
+						testLabel.getModel().setText(propertyValueChangeEvent.getNewValue());
+					}
+				});
 	}
 
 }

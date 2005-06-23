@@ -72,6 +72,7 @@ public class GuiseServlet extends BasicHTTPServlet
 		getGuise().registerRenderStrategy(ActionControl.class, XHTMLButtonController.class);
 		getGuise().registerRenderStrategy(Label.class, XHTMLLabelController.class);
 		getGuise().registerRenderStrategy(Frame.class, XHTMLFrameController.class);
+		getGuise().registerRenderStrategy(ValueControl.class, XHTMLInputController.class);
 	}
 
 	/**Services the POST method.

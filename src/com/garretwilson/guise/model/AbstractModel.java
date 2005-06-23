@@ -1,7 +1,7 @@
 package com.garretwilson.guise.model;
 
+import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.event.EventListenerManager;
-import com.garretwilson.util.BoundPropertyObject;
 
 /**A base class implementing helpful functionality for models.
 @author Garret Wilson
