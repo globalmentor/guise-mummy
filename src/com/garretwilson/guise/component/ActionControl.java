@@ -1,20 +1,21 @@
 package com.garretwilson.guise.component;
 
-import com.garretwilson.guise.model.*;
+import com.garretwilson.guise.model.ActionModel;
+import com.garretwilson.guise.model.DefaultActionModel;
 
-/**A label component.
+/**Action control such as a button.
 @author Garret Wilson
 */
-public class Label extends AbstractModelComponent<MessageModel>
+public class ActionControl extends AbstractControl<ActionModel>
 {
-
+	
 	/**ID constructor with a default data model.
 	@param id The component identifier.
 	@exception NullPointerException if the given identifier is <code>null</code>.
 	*/
-	public Label(final String id)
+	public ActionControl(final String id)
 	{
-		this(id, new DefaultMessageModel());	//construct the class with a default model
+		this(id, new DefaultActionModel());	//construct the class with a default model
 	}
 
 	/**ID and model constructor.
@@ -22,8 +23,9 @@ public class Label extends AbstractModelComponent<MessageModel>
 	@param model The component data model.
 	@exception NullPointerException if the given identifier or model is <code>null</code>.
 	*/
-	public Label(final String id, final MessageModel model)
+	public ActionControl(final String id, final ActionModel model)
 	{
 		super(id, model);	//construct the parent class
 	}
+
 }

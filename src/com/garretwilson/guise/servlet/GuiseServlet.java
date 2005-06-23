@@ -69,7 +69,7 @@ public class GuiseServlet extends BasicHTTPServlet
 	public void init(final ServletConfig servletConfig) throws ServletException
 	{
 		super.init(servletConfig);	//do the default initialization
-		getGuise().registerRenderStrategy(Button.class, XHTMLButtonController.class);
+		getGuise().registerRenderStrategy(ActionControl.class, XHTMLButtonController.class);
 		getGuise().registerRenderStrategy(Label.class, XHTMLLabelController.class);
 		getGuise().registerRenderStrategy(Frame.class, XHTMLFrameController.class);
 	}
