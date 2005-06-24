@@ -8,9 +8,10 @@ import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.Controller;
 
 /**Base interface for all Guise components.
+Each component must provide a single ID string constructor.
 @author Garret Wilson
 */
-public interface Component
+public interface Component<C extends Component<C>>
 {
 
 	/**The bound property of the controller.*/
@@ -21,14 +22,14 @@ public interface Component
 	public final static String VISIBLE_PROPERTY=getPropertyName(Component.class, "visible");
 
 	/**@return The model used by this component.*/
-	public <GC extends GuiseContext, C extends Component> Controller<GC, C> getController();
+	public Controller<? extends GuiseContext, C> getController();
 
 	/**Sets the controller used by this component.
 	This is a bound property.
 	@param newController The new controller to use.
 	@see Component#CONTROLLER_PROPERTY
 	*/
-	public <GC extends GuiseContext, C extends Component> void setController(final Controller<GC, C> newController);
+	public void setController(final Controller<? extends GuiseContext, C> newController);
 
 	/**@return The component identifier.*/
 	public String getID();
@@ -37,11 +38,11 @@ public interface Component
 	public Container getParent();
 
 	/**Retrieves the first ancestor of the given type.
-	@param <C> The type of ancestor container requested.
+	@param <A> The type of ancestor container requested.
 	@param ancestorClass The class of ancestor container requested.
 	@return The first ancestor container of the given type, or <code>null</code> if this component has no such ancestor.
 	*/
-	public <C extends Container> C getAncestor(final Class<C> ancestorClass);
+	public <A extends Container> A getAncestor(final Class<A> ancestorClass);
 
 	/**Sets the parent of this component.
 	This method is managed by containers, and should usually never be called my other classes.

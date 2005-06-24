@@ -1,8 +1,9 @@
-package com.garretwilson.guise.servlet;
+package com.garretwilson.guise.servlet.http;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
+import static java.util.Collections.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -13,6 +14,7 @@ import com.garretwilson.guise.context.*;
 import com.garretwilson.guise.context.text.*;
 import com.garretwilson.guise.controller.Controller;
 import com.garretwilson.guise.controller.text.xml.xhtml.*;
+import com.garretwilson.guise.session.GuiseSession;
 import com.garretwilson.guise.test.HomeFrame;
 import com.garretwilson.io.InputStreamUtilities;
 import com.garretwilson.io.OutputStreamUtilities;
@@ -25,43 +27,41 @@ import static com.garretwilson.servlet.http.HttpServletUtilities.getRawPathInfo;
 /**The servlet that controls a Guise web applications. 
 @author Garret Wilson
 */
-public class GuiseServlet extends BasicHTTPServlet
+public class GuiseHTTPServlet extends BasicHTTPServlet
 {
 
 	/**@return The servlet's Guise context.*/
-	private final Guise<DefaultHTTPServletGuiseContext> guise;
+	private final HTTPServletGuise guise;
 
 		/**@return The servlet's Guise context.*/
-		protected Guise<DefaultHTTPServletGuiseContext> getGuise() {return guise;}
-	
-	/**The map binding frame types to context-relative paths.*/
-	private final Map<String, Class<? extends Frame>> pathFrameBindingMap=new HashMap<String, Class<? extends Frame>>();
+		protected HTTPServletGuise getGuise() {return guise;}
 
-		/**Binds a frame type to a particular context-relative path.
-		Any existing binding for the given context-relative path is replaced.
-		@param path The context-relative path to which the frame should be bound.
-		@param frameClass The class of frame to render for this particular context-relative path.
-		@return The frame previously bound to the given context-relative path, or <code>null</code> if no frame was previously bound to the path.
-		@exception NullPointerException if the path and/or the frame is null.
-		*/
-		protected Class<? extends Frame> bindFrame(final String path, final Class<? extends Frame> frameClass)
-		{
-			return pathFrameBindingMap.put(checkNull(path, "Path cannot be null."), checkNull(frameClass, "Type cannot be null."));	//store the binding
-		}
+	/**The synchronized map of Guise sessions weakly keyed to HTTP sessions.*/
+	private final Map<HttpSession, HTTPGuiseSession> guiseSessionMap=synchronizedMap(new WeakHashMap<HttpSession, HTTPGuiseSession>());
 
-		/**Determines the class of frame bound to the given context-relative path.
-		@param path The address for which a frame should be retrieved.
-		@return The type of frame bound to the given address. 
-		 */
-		protected Class<? extends Frame> getBoundFrameClass(final String path)
+	/**Retrieves a session for the given HTTP session.
+	If there is currently no Guise session for this HTTP session, one will be created.
+	@param httpSession The HTTP session for which a Guise session should be retrieved. 
+	@return The Guise session associated with the provided HTTP session.
+	*/
+	protected HTTPGuiseSession getGuiseSession(final HttpSession httpSession)
+	{
+		synchronized(guiseSessionMap)	//don't allow others to access the session map while we access it
 		{
-			return pathFrameBindingMap.get(path);	//return the bound frame type, if any
+			HTTPGuiseSession guiseSession=guiseSessionMap.get(httpSession);	//get the Guise session associated with the HTTP session
+			if(guiseSession==null)	//if there is no Guise session associated with this HTTP session
+			{
+				guiseSession=new HTTPGuiseSession(getGuise(), httpSession);	//create a new Guise session
+				guiseSessionMap.put(httpSession, guiseSession);	//store the Guise session in the map, keyed to the HTTP session
+			}
+			return guiseSession;	//return the Guise session we found or created
 		}
+	}
 
 	/**Default constructor.*/
-	public GuiseServlet()
+	public GuiseHTTPServlet()
 	{
-		guise=new AbstractGuise<DefaultHTTPServletGuiseContext>(){};	//TODO fix
+		guise=new HTTPServletGuise();	//create a new Guise instance
 	}
 		
 	/**Initializes the servlet.
@@ -99,7 +99,9 @@ public class GuiseServlet extends BasicHTTPServlet
   */
 	public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
 	{
-		final DefaultHTTPServletGuiseContext guiseContext=new DefaultHTTPServletGuiseContext(getGuise(), request, response);	//create a new Guise context
+		final HTTPServletGuise guise=getGuise();	//get the Guise instance
+		final HTTPGuiseSession guiseSession=getGuiseSession(request.getSession());	//gets the current HTTP session and retrieves the corresponding Guise session
+		final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, request, response);	//create a new Guise context
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 		if(rawPathInfo.endsWith(".css"))	//TODO fix
 		{
@@ -117,41 +119,35 @@ public class GuiseServlet extends BasicHTTPServlet
 			return;
 		}
 		Debug.trace("raw path info", rawPathInfo);
-		final Frame frame;
-		final Class<? extends Frame> frameClass=getBoundFrameClass(rawPathInfo);	//see which frame we should show for this path
-		if(frameClass!=null)	//if we found a frame class for this address
+		try
 		{
-			try
+			final Frame frame=guiseSession.getBoundFrame(rawPathInfo);	//get the frame bound to the requested path
+			if(frame!=null)	//if we found a frame class for this address
 			{
-				frame = frameClass.getConstructor(String.class).newInstance("testFrame");
+				frame.updateModel(guiseContext);	//tell the frame to update its model
+				frame.updateView(guiseContext);		//tell the frame to update its view
 			}
-			catch (NoSuchMethodException e)
+			else	//if we have no frame type for this address
 			{
-				Debug.error(e);
-				throw new ServletException(e);
-			}
-			catch (InvocationTargetException e)
-			{
-				Debug.error(e);
-				throw new ServletException(e);
-			}
-			catch (InstantiationException e)
-			{
-				Debug.error(e);
-				throw new ServletException(e);
-			}
-			catch (IllegalAccessException e)
-			{
-				Debug.error(e);
-				throw new ServletException(e);
+				throw new HTTPNotFoundException("Not found: "+request.getRequestURL());
 			}
 		}
-		else	//if we have no frame type for this address
+		catch(final NoSuchMethodException noSuchMethodException)	//catch and rethrow instantiation errors from retrieving/creating the frame
 		{
-			throw new HTTPNotFoundException("Not found: "+request.getRequestURL());
+			throw new ServletException(noSuchMethodException);
 		}
-		frame.updateModel(guiseContext);
-		frame.updateView(guiseContext);
+		catch(final InvocationTargetException invocationTargetException)
+		{
+			throw new ServletException(invocationTargetException);
+		}
+		catch(final InstantiationException instantiationException)
+		{
+			throw new ServletException(instantiationException);
+		}
+		catch(final IllegalAccessException illegalAccessException)
+		{
+			throw new ServletException(illegalAccessException);
+		}
 	}
 
 }

@@ -12,7 +12,7 @@ import com.garretwilson.guise.controller.Controller;
 /**An abstract implementation of a component.
 @author Garret Wilson
 */
-public class AbstractComponent extends BoundPropertyObject implements Component
+public class AbstractComponent<C extends Component<C>> extends BoundPropertyObject implements Component<C>
 {
 
 	/**The object managing event listeners.*/
@@ -22,22 +22,21 @@ public class AbstractComponent extends BoundPropertyObject implements Component
 		protected EventListenerManager getEventListenerManager() {return eventListenerManager;}
 
 	/**The controller installed in this component, or <code>null</code> if no controller is installed.*/
-	private Controller<? extends GuiseContext, ? extends Component> controller=null;
+	private Controller<? extends GuiseContext, C> controller=null;
 
 		/**@return The model used by this component.*/
-		@SuppressWarnings("unchecked")	//we'll assume a correct controller was installed, and wait until later for class cast problems to arise
-		public <GC extends GuiseContext, C extends Component> Controller<GC, C> getController() {return (Controller<GC, C>)controller;}
+		public Controller<? extends GuiseContext, C> getController() {return controller;}
 
 		/**Sets the controller used by this component.
 		This is a bound property.
 		@param newController The new controller to use.
 		@see Component#CONTROLLER_PROPERTY
 		*/
-		public <GC extends GuiseContext, C extends Component> void setController(final Controller<GC, C> newController)
+		public void setController(final Controller<? extends GuiseContext, C> newController)
 		{
 			if(newController!=controller)	//if the value is really changing
 			{
-				final Controller<? extends GuiseContext, ? extends Component> oldController=controller;	//get a reference to the old value
+				final Controller<? extends GuiseContext, C> oldController=controller;	//get a reference to the old value
 				controller=newController;	//actually change values
 				firePropertyChange(CONTROLLER_PROPERTY, oldController, newController);	//indicate that the value changed				
 			}
@@ -61,12 +60,12 @@ public class AbstractComponent extends BoundPropertyObject implements Component
 		@return The first ancestor container of the given type, or <code>null</code> if this component has no such ancestor.
 		*/
 		@SuppressWarnings("unchecked")
-		public <C extends Container> C getAncestor(final Class<C> ancestorClass)
+		public <A extends Container> A getAncestor(final Class<A> ancestorClass)
 		{
 			final Container parent=getParent();	//get this component's parent
 			if(parent!=null)	//if there is a parent
 			{
-				return ancestorClass.isInstance(parent) ? (C)parent : parent.getAncestor(ancestorClass);	//if the parent is of the correct type, return it; otherwise, ask it to search its own ancestors
+				return (A)(ancestorClass.isInstance(parent) ? parent : parent.getAncestor(ancestorClass));	//if the parent is of the correct type, return it; otherwise, ask it to search its own ancestors
 			}
 			else	//if there is no parent
 			{
@@ -170,8 +169,8 @@ public class AbstractComponent extends BoundPropertyObject implements Component
 	*/
 	public <GC extends GuiseContext> void updateView(final GC context) throws IOException
 	{
-		final Controller<GC, AbstractComponent> controller=getController(context);	//get the controller
-		controller.updateView(context, this);	//tell the controller to update the view TODO testing; probably not correct, but works
+		final Controller<GC, C> controller=getController(context);	//get the controller
+		controller.updateView(context, (C)this);	//tell the controller to update the view TODO testing; probably not correct, but works
 	}
 
 	/**Updates the model of this component.
@@ -180,8 +179,8 @@ public class AbstractComponent extends BoundPropertyObject implements Component
 	*/
 	public <GC extends GuiseContext> void updateModel(final GC context) throws IOException
 	{
-		final Controller<GC, AbstractComponent> controller=getController(context);	//get the controller
-		controller.updateModel(context, this);	//tell the controller to update the model
+		final Controller<GC, C> controller=getController(context);	//get the controller
+		controller.updateModel(context, (C)this);	//tell the controller to update the model
 	}
 
 	/**Determines the controller of this. If no controller is installed, one is created and installed.
@@ -189,12 +188,13 @@ public class AbstractComponent extends BoundPropertyObject implements Component
 	@param component The component for which a controller should be retrieved.
 	@exception NullPointerException if there is no controller installed and no appropriate controller registered with the Guise context.
 	*/
-	protected <GC extends GuiseContext> Controller<GC, AbstractComponent> getController(final GC context)
+	@SuppressWarnings("unchecked")
+	protected <GC extends GuiseContext> Controller<GC, C> getController(final GC context)
 	{
-		Controller<GC, AbstractComponent> controller=getController();	//get the installed controller
+		Controller<GC, C> controller=(Controller<GC, C>)getController();	//get the installed controller TODO check
 		if(controller==null)	//if no controller is installed
 		{
-			controller=(Controller<GC, AbstractComponent>)context.getRenderStrategy(this);	//ask the context for a controller TODO check; overall generics needs to be improved
+			controller=context.getController(this);	//ask the context for a controller
 			if(controller!=null)	//if we found a controller
 			{
 				setController(controller);	//install the new controller

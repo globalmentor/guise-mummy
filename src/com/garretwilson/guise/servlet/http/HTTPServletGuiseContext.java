@@ -1,22 +1,23 @@
-package com.garretwilson.guise.context.text;
+package com.garretwilson.guise.servlet.http;
 
 import java.io.*;
 import java.util.*;
-
-import static java.util.Arrays.*;
+import static java.util.Collections.*;
 
 import javax.mail.internet.ContentType;
 import javax.servlet.http.*;
 
-import com.garretwilson.guise.Guise;
+import com.garretwilson.guise.context.text.AbstractTextGuiseContext;
+import com.garretwilson.guise.session.GuiseSession;
+
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 import com.garretwilson.util.*;
 
-/**The default implementation for providing the context of an HTTP servlet.
+/**The Guise context of an HTTP servlet.
 @author Garret Wilson
 */
-public class DefaultHTTPServletGuiseContext extends AbstractTextGuiseContext
+public class HTTPServletGuiseContext extends AbstractTextGuiseContext<HTTPServletGuiseContext>
 {
 
 	/**The HTTP servlet request.*/
@@ -32,22 +33,27 @@ public class DefaultHTTPServletGuiseContext extends AbstractTextGuiseContext
 		protected HttpServletResponse getResponse() {return response;}
 
 	/**Constructor.
-	@param guise The instance of Guise of which this context is a part.
+	@param session The Guise user session of which this context is a part.
 	@param request The HTTP servlet request.
 	@param response The HTTP servlet response.
 	@exception NullPointerException if either request or response is <code>null</code>.
 	*/
-	public DefaultHTTPServletGuiseContext(final Guise<? extends AbstractTextGuiseContext> guise, final HttpServletRequest request, final HttpServletResponse response)
+	public HTTPServletGuiseContext(final GuiseSession<HTTPServletGuiseContext> session, final HttpServletRequest request, final HttpServletResponse response)
 	{
-		super(guise);	//construct the parent class
+		super(session);	//construct the parent class
 		this.request=checkNull(request, "Request cannot be null.");
 		this.response=checkNull(response, "Response cannot be null.");		
 			//populate our parameter map
 		final ListMap<Object, Object> parameterListMap=getParameterListMap();	//get the map of parameter lists
-		final Map<String, Object[]> parameterMap=(Map<String, Object[]>)request.getParameterMap();	//get the request parameter map, casting it to a generic type for ease of use
-		for(final Map.Entry<String, Object[]> parameterMapEntry:parameterMap.entrySet())	//for each entry in the map of parameters
+		final Iterator parameterEntryIterator=request.getParameterMap().entrySet().iterator();	//get an iterator to the parameter entries
+		while(parameterEntryIterator.hasNext())	//while there are more parameter entries
 		{
-			parameterListMap.put(parameterMapEntry.getKey(), asList(parameterMapEntry.getValue()));	//store the the array of values as a list, keyed to the value			
+			final Map.Entry parameterEntry=(Map.Entry)parameterEntryIterator.next();	//get the next parameter entry
+			final String parameterKey=(String)parameterEntry.getKey();	//get the parameter key
+			final String[] parameterValues=(String[])parameterEntry.getValue();	//get the parameter values
+			final List<Object> parameterValueList=new ArrayList<Object>(parameterValues.length);	//create a list to hold the parameters
+			addAll(parameterValueList, parameterValues);	//add all the parameter values to our list
+			parameterListMap.put(parameterKey, parameterValueList);	//store the the array of values as a list, keyed to the value
 		}
 	}
 

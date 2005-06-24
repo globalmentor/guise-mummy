@@ -10,7 +10,7 @@ import com.garretwilson.util.EmptyIterator;
 This implementation uses a lazily-created list of child components, making empty containers lightweight.
 @author Garret Wilson
 */
-public class AbstractContainer extends AbstractComponent implements Container
+public class AbstractContainer extends AbstractComponent<Container> implements Container
 {
 
 	/**The lazily-created list of child components.*/ 
@@ -36,7 +36,7 @@ public class AbstractContainer extends AbstractComponent implements Container
 	@param component The component to add.
 	@exception IllegalArgumentException if the component is already a member of a container.
 	*/
-	public void add(final Component component)
+	public void add(final Component<?> component)
 	{
 		if(component.getParent()!=null)	//if this component has already been added to container
 		{
