@@ -30,38 +30,18 @@ import static com.garretwilson.servlet.http.HttpServletUtilities.getRawPathInfo;
 public class GuiseHTTPServlet extends BasicHTTPServlet
 {
 
-	/**@return The servlet's Guise context.*/
-	private final HTTPServletGuise guise;
-
-		/**@return The servlet's Guise context.*/
-		protected HTTPServletGuise getGuise() {return guise;}
-
-	/**The synchronized map of Guise sessions weakly keyed to HTTP sessions.*/
-	private final Map<HttpSession, HTTPGuiseSession> guiseSessionMap=synchronizedMap(new WeakHashMap<HttpSession, HTTPGuiseSession>());
-
-	/**Retrieves a session for the given HTTP session.
-	If there is currently no Guise session for this HTTP session, one will be created.
-	@param httpSession The HTTP session for which a Guise session should be retrieved. 
-	@return The Guise session associated with the provided HTTP session.
+	/**@return The global HTTP servlet Guise instance.
+	This is a convenience method.
+	@see HTTPServletGuise#getInstance()
 	*/
-	protected HTTPGuiseSession getGuiseSession(final HttpSession httpSession)
+	protected HTTPServletGuise getGuise()
 	{
-		synchronized(guiseSessionMap)	//don't allow others to access the session map while we access it
-		{
-			HTTPGuiseSession guiseSession=guiseSessionMap.get(httpSession);	//get the Guise session associated with the HTTP session
-			if(guiseSession==null)	//if there is no Guise session associated with this HTTP session
-			{
-				guiseSession=new HTTPGuiseSession(getGuise(), httpSession);	//create a new Guise session
-				guiseSessionMap.put(httpSession, guiseSession);	//store the Guise session in the map, keyed to the HTTP session
-			}
-			return guiseSession;	//return the Guise session we found or created
-		}
+		return HTTPServletGuise.getInstance();	//return the global HTTP servlet Guise instance
 	}
 
 	/**Default constructor.*/
 	public GuiseHTTPServlet()
 	{
-		guise=new HTTPServletGuise();	//create a new Guise instance
 	}
 		
 	/**Initializes the servlet.
@@ -71,11 +51,12 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 	public void init(final ServletConfig servletConfig) throws ServletException
 	{
 		super.init(servletConfig);	//do the default initialization
-		getGuise().registerRenderStrategy(ActionControl.class, XHTMLButtonController.class);
-		getGuise().registerRenderStrategy(Label.class, XHTMLLabelController.class);
-		getGuise().registerRenderStrategy(Frame.class, XHTMLFrameController.class);
-		getGuise().registerRenderStrategy(Panel.class, XHTMLPanelController.class);
-		getGuise().registerRenderStrategy(ValueControl.class, XHTMLInputController.class);
+		HTTPServletGuise guise=getGuise();	//get the Guise instance
+		guise.registerRenderStrategy(ActionControl.class, XHTMLButtonController.class);
+		guise.registerRenderStrategy(Label.class, XHTMLLabelController.class);
+		guise.registerRenderStrategy(Frame.class, XHTMLFrameController.class);
+		guise.registerRenderStrategy(Panel.class, XHTMLPanelController.class);
+		guise.registerRenderStrategy(ValueControl.class, XHTMLInputController.class);
 	}
 
 	/**Services the POST method.
@@ -100,7 +81,7 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 	public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
 	{
 		final HTTPServletGuise guise=getGuise();	//get the Guise instance
-		final HTTPGuiseSession guiseSession=getGuiseSession(request.getSession());	//gets the current HTTP session and retrieves the corresponding Guise session
+		final HTTPGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(request.getSession());	//gets the current HTTP session and retrieves the corresponding Guise session
 		final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, request, response);	//create a new Guise context
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 		if(rawPathInfo.endsWith(".css"))	//TODO fix
