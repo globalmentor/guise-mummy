@@ -2,22 +2,17 @@ package com.garretwilson.guise.servlet.http;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import static java.util.Collections.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import com.garretwilson.guise.*;
 import com.garretwilson.guise.application.AbstractGuiseApplication;
 import com.garretwilson.guise.component.*;
-import com.garretwilson.guise.context.*;
-import com.garretwilson.guise.context.text.*;
-import com.garretwilson.guise.controller.Controller;
 import com.garretwilson.guise.controller.text.xml.xhtml.*;
-import com.garretwilson.guise.session.GuiseSession;
-import com.garretwilson.guise.test.HomeFrame;
-import com.garretwilson.io.InputStreamUtilities;
 import com.garretwilson.io.OutputStreamUtilities;
 import com.garretwilson.net.http.*;
 import com.garretwilson.util.Debug;
@@ -26,10 +21,14 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 
 /**The servlet that controls a Guise web applications. 
+Frame bindings for paths can be set in initialization parameters named <code>pathFrameClass.<var>name</var></code>, with values in the form <code>/<var>contextRelativePath</var>?<var>com.example.Frame</var></code>.
 @author Garret Wilson
 */
 public class GuiseHTTPServlet extends BasicHTTPServlet
 {
+
+	/**The prefix, "pathFrameClass.", used to identify path/frame bindings in the web application's init parameters.*/
+	public final static String PATH_FRAME_CLASS_INIT_PARAMETER_PREFIX="pathFrameClass.";
 
 	/**@return The global HTTP servlet Guise instance.
 	This is a convenience method.
@@ -76,6 +75,51 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 	public void init(final ServletConfig servletConfig) throws ServletException
 	{
 		super.init(servletConfig);	//do the default initialization
+		Debug.setDebug(true);	//turn on debug
+		Debug.setMinimumReportLevel(Debug.ReportLevel.TRACE);	//set the level of reporting
+		initFrameBindings(servletConfig);	//initialize the frame bindings
+	}
+
+	/**Initializes bindings between paths and associated frame classes.
+	This implementation reads the initialization parameters named <code>pathFrameClass.<var>name</var></code>, expecting values in the form <code>/<var>contextRelativePath</var>?<var>com.example.Frame</var></code>.
+	@param servletConfig The servlet configuration. 
+	@exception IllegalArgumentException if the one of the frame bindings is not expressed in correct format.
+	@exception IllegalArgumentException if the one of the classes specified as a frame binding could not be found.
+	@exception ClassCastException if the one of the classes specified as a frame binding does not represent a subclass of a frame component.
+	@exception ServletException if there is a problem initializing the frame bindings.
+	@see com.garretwilson.guise.component.Frame
+	*/
+	protected void initFrameBindings(final ServletConfig servletConfig) throws ServletException
+	{
+		final Enumeration initParameterNames=servletConfig.getInitParameterNames();	//get the names of all init parameters
+		while(initParameterNames.hasMoreElements())	//while there are more initialization parameters
+		{
+			final String initParameterName=(String)initParameterNames.nextElement();	//get the next initialization parameter name
+			if(initParameterName.startsWith(PATH_FRAME_CLASS_INIT_PARAMETER_PREFIX))	//if this is a path/frame binding
+			{
+				final String initParameterValue=servletConfig.getInitParameter(initParameterName);	//get this init parameter value
+				try
+				{
+					final URI pathFrameBindingURI=new URI(initParameterValue);	//create a URI from the frame binding expression
+					final String path=pathFrameBindingURI.getRawPath();	//extract the path from the URI
+					final String className=pathFrameBindingURI.getQuery();	//get the decoded query (using the decoded form will allow users to express values that might be legal class names but not legal URI characters)
+					try
+					{
+						final Class<?> specifiedClass=Class.forName(className);	//load the class for the specified name
+						final Class<? extends Frame> frameClass=specifiedClass.asSubclass(Frame.class);	//cast the specified class to a frame class just to make sure it's the correct type
+						getGuiseApplication().bindFrame(path, frameClass);	//cast the class to a frame class and bind it to the path in the Guise application
+					}
+					catch(final ClassNotFoundException classNotFoundException)
+					{
+						throw new IllegalArgumentException("The initialization parameter specified class "+className+" for path "+path+" could not be found.", classNotFoundException);						
+					}					
+				}
+				catch(final URISyntaxException uriSyntaxException)	//if the parameter value was not in the correct format
+				{
+					throw new IllegalArgumentException("Incorrect initialization parameter path/frame class binding URI "+initParameterValue+" for "+initParameterName, uriSyntaxException);
+				}
+			}
+		}
 	}
 
 	/**Services the POST method.
