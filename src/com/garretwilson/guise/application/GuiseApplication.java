@@ -47,4 +47,11 @@ public interface GuiseApplication<GC extends GuiseContext>
 	*/
 	public Class<? extends Frame> getBoundFrameClass(final String path);
 
+	/**Reports the context path of the application.
+	The context path is either the empty string (""), or a path beginning with a slash ('/') indicating the application's context relative to its frames.
+	The context path does not end with a slash ('/').
+	@return The path representing the context of the Guise application.
+	*/
+	public String getContextPath();
+
 }

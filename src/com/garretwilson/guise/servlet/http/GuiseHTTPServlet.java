@@ -21,7 +21,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 
 /**The servlet that controls a Guise web applications. 
-Frame bindings for paths can be set in initialization parameters named <code>pathFrameClass.<var>name</var></code>, with values in the form <code>/<var>contextRelativePath</var>?<var>com.example.Frame</var></code>.
+Frame bindings for paths can be set in initialization parameters named <code>pathFrameClass.<var>frameID</var></code>, with values in the form <code>/<var>contextRelativePath</var>?<var>com.example.Frame</var></code>.
 @author Garret Wilson
 */
 public class GuiseHTTPServlet extends BasicHTTPServlet
@@ -46,6 +46,12 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 
 		/**The Guise application controlled by this servlet.*/
 		protected HTTPServletGuiseApplication getGuiseApplication() {return guiseApplication;}
+
+	/**The context path of the servlet, and thereby of the Guise application.
+	Because this servlet's context path is only available via the request object, we must wait until the first request to update it.
+	@see HTTPServletGuiseApplication#getContextPath()
+	*/
+	private String contextPath=null;
 
 	/**The factory method to create a Guise application.
 	This implementation creates a default Guise application and registers an XHTML controller kit.
@@ -81,7 +87,7 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 	}
 
 	/**Initializes bindings between paths and associated frame classes.
-	This implementation reads the initialization parameters named <code>pathFrameClass.<var>name</var></code>, expecting values in the form <code>/<var>contextRelativePath</var>?<var>com.example.Frame</var></code>.
+	This implementation reads the initialization parameters named <code>pathFrameClass.<var>frameID</var></code>, expecting values in the form <code>/<var>contextRelativePath</var>?<var>com.example.Frame</var></code>.
 	@param servletConfig The servlet configuration. 
 	@exception IllegalArgumentException if the one of the frame bindings is not expressed in correct format.
 	@exception IllegalArgumentException if the one of the classes specified as a frame binding could not be found.
@@ -102,17 +108,31 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 				{
 					final URI pathFrameBindingURI=new URI(initParameterValue);	//create a URI from the frame binding expression
 					final String path=pathFrameBindingURI.getRawPath();	//extract the path from the URI
-					final String className=pathFrameBindingURI.getQuery();	//get the decoded query (using the decoded form will allow users to express values that might be legal class names but not legal URI characters)
-					try
+					if(path!=null)	//if a path was specified
 					{
-						final Class<?> specifiedClass=Class.forName(className);	//load the class for the specified name
-						final Class<? extends Frame> frameClass=specifiedClass.asSubclass(Frame.class);	//cast the specified class to a frame class just to make sure it's the correct type
-						getGuiseApplication().bindFrame(path, frameClass);	//cast the class to a frame class and bind it to the path in the Guise application
+						final String className=pathFrameBindingURI.getQuery();	//get the decoded query (using the decoded form will allow users to express values that might be legal class names but not legal URI characters)
+						if(className!=null)	//if a class name was specified
+						{
+							try
+							{
+								final Class<?> specifiedClass=Class.forName(className);	//load the class for the specified name
+								final Class<? extends Frame> frameClass=specifiedClass.asSubclass(Frame.class);	//cast the specified class to a frame class just to make sure it's the correct type
+								getGuiseApplication().bindFrame(path, frameClass);	//cast the class to a frame class and bind it to the path in the Guise application
+							}
+							catch(final ClassNotFoundException classNotFoundException)
+							{
+								throw new IllegalArgumentException("The initialization parameter specified class "+className+" for path "+path+" could not be found.", classNotFoundException);						
+							}
+						}
+						else	//if no class name was specified
+						{
+							throw new IllegalArgumentException("The initialization parameter path/frame binding "+pathFrameBindingURI+" for "+initParameterName+" did not specify a class name.");												
+						}
 					}
-					catch(final ClassNotFoundException classNotFoundException)
+					else	//if no path was specified
 					{
-						throw new IllegalArgumentException("The initialization parameter specified class "+className+" for path "+path+" could not be found.", classNotFoundException);						
-					}					
+						throw new IllegalArgumentException("The initialization parameter path/frame binding "+pathFrameBindingURI+" for "+initParameterName+" did not specify a path.");												
+					}
 				}
 				catch(final URISyntaxException uriSyntaxException)	//if the parameter value was not in the correct format
 				{
@@ -143,6 +163,12 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
   */
 	public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
 	{
+		if(contextPath==null)	//if we haven't updated our context path for this servlet instance (the context path should always be the same, but it's not available until the first request arrives)
+		{
+			contextPath=request.getContextPath();	//set the context path from the servlet request
+		}
+		assert contextPath.equals(request.getContextPath()) : "Guise HTTP servlet context path changed unexpectedly.";
+
 		final HTTPServletGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
 		final HTTPGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseApplication, request);	//retrieves the Guise session for this application and request
 		final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, request, response);	//create a new Guise context
@@ -244,6 +270,21 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 		{
 			return new HTTPGuiseSession(this, httpSession);	//create a default HTTP guise session
 		}
-	
+
+		/**Reports the context path of the application.
+		The context path is either the empty string (""), or a path beginning with a slash ('/') indicating the application's context relative to its frames.
+		The context path does not end with a slash ('/').
+		@return The path representing the context of the Guise application.
+		@exception IllegalStateException if this method is called before this Guise servlet services its first request.
+		*/
+		public String getContextPath()
+		{
+			if(contextPath==null)	//if there is no context path
+			{
+				throw new IllegalStateException("The Guise HTTP servlet's Guise application getContextPath() method cannot be called before the servlet services its first request.");
+			}
+			return contextPath;	//return the context path, always updated by the 
+		}
+
 	}
 }

@@ -157,5 +157,4 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext>	implemen
 		{
 			return pathFrameBindingMap.get(path);	//return the bound frame type, if any
 		}
-
 }

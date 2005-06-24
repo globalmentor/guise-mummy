@@ -1,6 +1,7 @@
 package com.garretwilson.guise.servlet.http;
 
 import java.io.*;
+import java.net.URI;
 import java.util.*;
 import static java.util.Collections.*;
 
@@ -32,17 +33,24 @@ public class HTTPServletGuiseContext extends AbstractTextGuiseContext<HTTPServle
 		/**@return The HTTP servlet response.*/
 		protected HttpServletResponse getResponse() {return response;}
 
+	/**The current absolute navigation URI for this context.*/
+	private final URI navigationURI;
+
+		/**@return The current absolute navigation URI for this context.*/
+		public URI getNavigationURI() {return navigationURI;}
+
 	/**Constructor.
 	@param session The Guise user session of which this context is a part.
 	@param request The HTTP servlet request.
 	@param response The HTTP servlet response.
-	@exception NullPointerException if either request or response is <code>null</code>.
+	@exception NullPointerException if the session, request or response is <code>null</code>.
 	*/
 	public HTTPServletGuiseContext(final GuiseSession<HTTPServletGuiseContext> session, final HttpServletRequest request, final HttpServletResponse response)
 	{
 		super(session);	//construct the parent class
 		this.request=checkNull(request, "Request cannot be null.");
-		this.response=checkNull(response, "Response cannot be null.");		
+		this.response=checkNull(response, "Response cannot be null.");
+		this.navigationURI=URI.create(request.getRequestURL().toString());	//create the absolute navigation URI from the HTTP requested URL
 			//populate our parameter map
 		final ListMap<Object, Object> parameterListMap=getParameterListMap();	//get the map of parameter lists
 		final Iterator parameterEntryIterator=request.getParameterMap().entrySet().iterator();	//get an iterator to the parameter entries
