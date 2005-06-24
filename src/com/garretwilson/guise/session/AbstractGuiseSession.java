@@ -4,7 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.garretwilson.guise.Guise;
+import com.garretwilson.guise.application.GuiseApplication;
 import com.garretwilson.guise.component.Frame;
 import com.garretwilson.guise.context.GuiseContext;
 
@@ -17,11 +17,11 @@ import static com.garretwilson.text.xml.XMLUtilities.*;
 public class AbstractGuiseSession<GC extends GuiseContext> implements GuiseSession<GC>
 {
 
-	/**@return The instance of Guise to which this session belongs.*/
-	private final Guise<GC> guise;
+	/**@return The Guise application to which this session belongs.*/
+	private final GuiseApplication<GC> application;
 
-		/**@return The instance of Guise to which this session belongs.*/
-		public Guise<GC> getGuise() {return guise;}
+		/**@return The Guise application to which this session belongs.*/
+		public GuiseApplication<GC> getApplication() {return application;}
 
 	/**The map binding frame types to context-relative paths.*/
 	private final Map<String, Frame> pathFrameBindingMap=new HashMap<String, Frame>();
@@ -39,11 +39,11 @@ public class AbstractGuiseSession<GC extends GuiseContext> implements GuiseSessi
 		}
 		
 	/**Guise constructor.
-	@param guise The instance of Guise to which this session belongs.
+	@param application The Guise application to which this session belongs.
 	*/
-	public AbstractGuiseSession(final Guise<GC> guise)
+	public AbstractGuiseSession(final GuiseApplication<GC> application)
 	{
-		this.guise=guise;	//save the Guise instance
+		this.application=application;	//save the Guise instance
 	}
 
 	/**Retrieves the frame bound to the given path.
@@ -61,7 +61,7 @@ public class AbstractGuiseSession<GC extends GuiseContext> implements GuiseSessi
 		Frame frame=pathFrameBindingMap.get(path);	//get the bound frame type, if any
 		if(frame==null)	//if no frame is cached
 		{
-			final Class<? extends Frame> frameClass=getGuise().getBoundFrameClass(path);	//see which frame we should show for this path
+			final Class<? extends Frame> frameClass=getApplication().getBoundFrameClass(path);	//see which frame we should show for this path
 			if(frameClass!=null)	//if we found a frame class for this path
 			{
 				final String frameID=createName(path);	//convert the path to a valid ID TODO use a Guise-specific routine

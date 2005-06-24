@@ -2,19 +2,19 @@ package com.garretwilson.guise.session;
 
 import java.lang.reflect.InvocationTargetException;
 
-import com.garretwilson.guise.Guise;
+import com.garretwilson.guise.application.GuiseApplication;
 import com.garretwilson.guise.component.Frame;
 import com.garretwilson.guise.context.GuiseContext;
 
 /**Represents a session with a user.
-A client application may only have one session, while a web server will likely have multiple sessions.
+A client application may only have one session, while a web server application will likely have multiple sessions.
 @author Garret Wilson
 */
 public interface GuiseSession<GC extends GuiseContext>
 {
 
-	/**@return The instance of Guise to which this session belongs.*/
-	public Guise<GC> getGuise();
+	/**@return The Guise application to which this session belongs.*/
+	public GuiseApplication<GC> getApplication();
 
 	/**Retrieves the frame bound to the given path.
 	If a frame has already been created and cached, it will be be returned; otherwise, one will be created and cached. 

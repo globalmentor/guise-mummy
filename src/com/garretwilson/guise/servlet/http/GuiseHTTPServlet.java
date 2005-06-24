@@ -9,6 +9,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 
 import com.garretwilson.guise.*;
+import com.garretwilson.guise.application.AbstractGuiseApplication;
 import com.garretwilson.guise.component.*;
 import com.garretwilson.guise.context.*;
 import com.garretwilson.guise.context.text.*;
@@ -22,7 +23,7 @@ import com.garretwilson.net.http.*;
 import com.garretwilson.util.Debug;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.servlet.http.HttpServletUtilities.getRawPathInfo;
+import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 
 /**The servlet that controls a Guise web applications. 
 @author Garret Wilson
@@ -34,14 +35,35 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 	This is a convenience method.
 	@see HTTPServletGuise#getInstance()
 	*/
+/*TODO fix
 	protected HTTPServletGuise getGuise()
 	{
 		return HTTPServletGuise.getInstance();	//return the global HTTP servlet Guise instance
 	}
+*/
 
-	/**Default constructor.*/
+	/**@return The Guise application controlled by this servlet.*/
+	private final HTTPServletGuiseApplication guiseApplication;
+
+		/**The Guise application controlled by this servlet.*/
+		protected HTTPServletGuiseApplication getGuiseApplication() {return guiseApplication;}
+
+	/**The factory method to create a Guise application.
+	Subclasses can override this method to create a specialized application type. 
+	@return A new Guise application object.
+	*/
+	protected HTTPServletGuiseApplication createGuiseApplication()
+	{
+		return new HTTPServletGuiseApplication();
+	}
+
+	/**Default constructor.
+	Creates a single Guise application.
+	@see #createGuiseApplication()
+	*/
 	public GuiseHTTPServlet()
 	{
+		guiseApplication=createGuiseApplication();	//create a store a Guise application
 	}
 		
 	/**Initializes the servlet.
@@ -51,12 +73,12 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 	public void init(final ServletConfig servletConfig) throws ServletException
 	{
 		super.init(servletConfig);	//do the default initialization
-		HTTPServletGuise guise=getGuise();	//get the Guise instance
-		guise.registerRenderStrategy(ActionControl.class, XHTMLButtonController.class);
-		guise.registerRenderStrategy(Label.class, XHTMLLabelController.class);
-		guise.registerRenderStrategy(Frame.class, XHTMLFrameController.class);
-		guise.registerRenderStrategy(Panel.class, XHTMLPanelController.class);
-		guise.registerRenderStrategy(ValueControl.class, XHTMLInputController.class);
+		HTTPServletGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
+		guiseApplication.registerRenderStrategy(ActionControl.class, XHTMLButtonController.class);
+		guiseApplication.registerRenderStrategy(Label.class, XHTMLLabelController.class);
+		guiseApplication.registerRenderStrategy(Frame.class, XHTMLFrameController.class);
+		guiseApplication.registerRenderStrategy(Panel.class, XHTMLPanelController.class);
+		guiseApplication.registerRenderStrategy(ValueControl.class, XHTMLInputController.class);
 	}
 
 	/**Services the POST method.
@@ -80,8 +102,8 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
   */
 	public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
 	{
-		final HTTPServletGuise guise=getGuise();	//get the Guise instance
-		final HTTPGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(request.getSession());	//gets the current HTTP session and retrieves the corresponding Guise session
+		final HTTPServletGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
+		final HTTPGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseApplication, request);	//retrieves the Guise session for this application and request
 		final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, request, response);	//create a new Guise context
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 		if(rawPathInfo.endsWith(".css"))	//TODO fix
@@ -131,4 +153,56 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 		}
 	}
 
+	/**A Guise application for Guise HTTP servlets.
+	@author Garret Wilson
+	*/
+	protected class HTTPServletGuiseApplication extends AbstractGuiseApplication<HTTPServletGuiseContext>
+	{
+		/**The synchronized map of Guise sessions keyed to HTTP sessions.*/
+		private final Map<HttpSession, HTTPGuiseSession> guiseSessionMap=synchronizedMap(new HashMap<HttpSession, HTTPGuiseSession>());
+
+		/**Retrieves a Guise session for the given HTTP session.
+		A Guise session will be created if none is currently associated with the given HTTP session.
+		This method can only be accessed by classes in the same package.
+		This method should only be called by HTTP Guise session manager.
+		@param httpSession The HTTP session for which a Guise session should be retrieved. 
+		@return The Guise session associated with the provided HTTP session.
+		@see HTTPGuiseSessionManager
+		*/
+		HTTPGuiseSession getGuiseSession(final HttpSession httpSession)
+		{
+			synchronized(guiseSessionMap)	//don't allow anyone to modify the map of sessions while we access it
+			{
+				HTTPGuiseSession guiseSession=guiseSessionMap.get(httpSession);	//get the Guise session associated with the HTTP session
+				if(guiseSession==null)	//if no Guise session is associated with the given HTTP session
+				{
+					guiseSession=createGuiseSession(httpSession);	//create a new Guise session
+					guiseSessionMap.put(httpSession, guiseSession);	//associate the Guise session with the HTTP session
+				}
+				return guiseSession;	//return the Guise session
+			}
+		}
+
+		/**Removes the Guise session for the given HTTP session.
+		This method can only be accessed by classes in the same package.
+		This method should only be called by HTTP Guise session manager.
+		@param httpSession The HTTP session which should be removed along with its corresponding Guise session. 
+		@return The Guise session previously associated with the provided HTTP session, or <code>null</code> if no Guise session was associated with the given HTTP session.
+		@see HTTPGuiseSessionManager
+		*/
+		HTTPGuiseSession removeGuiseSession(final HttpSession httpSession)
+		{
+			return guiseSessionMap.remove(httpSession);	//remove the HTTP session and Guise session association
+		}
+
+		/**Factory method to create a Guise session from an HTTP session.
+		@param httpSession The HTTP session for which a Guise session should be created.
+		@return A new Guise session corresponding to the given HTTP session.
+		*/ 
+		protected HTTPGuiseSession createGuiseSession(final HttpSession httpSession)
+		{
+			return new HTTPGuiseSession(this, httpSession);	//create a default HTTP guise session
+		}
+	
+	}
 }
