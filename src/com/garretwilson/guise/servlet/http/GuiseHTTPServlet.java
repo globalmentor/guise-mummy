@@ -49,12 +49,15 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 		protected HTTPServletGuiseApplication getGuiseApplication() {return guiseApplication;}
 
 	/**The factory method to create a Guise application.
+	This implementation creates a default Guise application and registers an XHTML controller kit.
 	Subclasses can override this method to create a specialized application type. 
 	@return A new Guise application object.
 	*/
 	protected HTTPServletGuiseApplication createGuiseApplication()
 	{
-		return new HTTPServletGuiseApplication();
+		final HTTPServletGuiseApplication guiseApplication=new HTTPServletGuiseApplication();	//create a default application
+		guiseApplication.installControllerKit(new XHTMLControllerKit<HTTPServletGuiseContext>());	//create and install an XHTML controller kit
+		return guiseApplication;	//return the created Guise application
 	}
 
 	/**Default constructor.
@@ -73,12 +76,6 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 	public void init(final ServletConfig servletConfig) throws ServletException
 	{
 		super.init(servletConfig);	//do the default initialization
-		HTTPServletGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-		guiseApplication.registerRenderStrategy(ActionControl.class, XHTMLButtonController.class);
-		guiseApplication.registerRenderStrategy(Label.class, XHTMLLabelController.class);
-		guiseApplication.registerRenderStrategy(Frame.class, XHTMLFrameController.class);
-		guiseApplication.registerRenderStrategy(Panel.class, XHTMLPanelController.class);
-		guiseApplication.registerRenderStrategy(ValueControl.class, XHTMLInputController.class);
 	}
 
 	/**Services the POST method.

@@ -59,13 +59,13 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 		@param ancestorClass The class of ancestor container requested.
 		@return The first ancestor container of the given type, or <code>null</code> if this component has no such ancestor.
 		*/
-		@SuppressWarnings("unchecked")
+		@SuppressWarnings("unchecked")	//we check to see if the ancestor is of the correct type before casting, so the cast is logically checked, though not syntactically checked
 		public <A extends Container> A getAncestor(final Class<A> ancestorClass)
 		{
 			final Container parent=getParent();	//get this component's parent
 			if(parent!=null)	//if there is a parent
 			{
-				return (A)(ancestorClass.isInstance(parent) ? parent : parent.getAncestor(ancestorClass));	//if the parent is of the correct type, return it; otherwise, ask it to search its own ancestors
+				return ancestorClass.isInstance(parent) ? (A)parent : parent.getAncestor(ancestorClass);	//if the parent is of the correct type, return it; otherwise, ask it to search its own ancestors
 			}
 			else	//if there is no parent
 			{
@@ -194,7 +194,7 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 		Controller<GC, C> controller=(Controller<GC, C>)getController();	//get the installed controller TODO check
 		if(controller==null)	//if no controller is installed
 		{
-			controller=context.getController(this);	//ask the context for a controller
+			controller=context.getSession().getApplication().getController(this);	//ask the application for a controller
 			if(controller!=null)	//if we found a controller
 			{
 				setController(controller);	//install the new controller

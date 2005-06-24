@@ -4,12 +4,33 @@ import com.garretwilson.guise.component.Component;
 import com.garretwilson.guise.component.Frame;
 import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.Controller;
+import com.garretwilson.guise.controller.ControllerKit;
 
 /**An application running Guise.
 @author Garret Wilson
 */
 public interface GuiseApplication<GC extends GuiseContext>
 {
+
+	/**Installs a controller kit.
+	Later controller kits take precedence over earlier-installed controller kits.
+	If the controller kit is already installed, no action occurs.
+	@param controllerKit The controller kit to install.
+	*/
+	public void installControllerKit(final ControllerKit<GC> controllerKit);
+
+	/**Uninstalls a controller kit.
+	If the controller kit is not installed, no action occurs.
+	@param controllerKit The controller kit to uninstall.
+	*/
+	public void uninstallControllerKit(final ControllerKit<GC> controllerKit);
+
+	/**Determines the controller appropriate for the given component.
+	A controller class is located by individually looking up the component class hiearchy for registered render strategies, at each checking all installed controller kits.
+	@param component The component for which a controller should be returned.
+	@return A controller to render the given component, or <code>null</code> if no controller is registered.
+	*/
+	public <C extends Component> Controller<GC, C> getController(final C component);
 
 	/**Binds a frame type to a particular context-relative path.
 	Any existing binding for the given context-relative path is replaced.
@@ -25,25 +46,5 @@ public interface GuiseApplication<GC extends GuiseContext>
 	@return The type of frame bound to the given address. 
 	*/
 	public Class<? extends Frame> getBoundFrameClass(final String path);
-
-	/**Registers a controller to render a component of the given class (and by default subclasses).
-	@param componentClass The class of the component for which the render strategy should be registered.
-	@param renderStrategyClass The class of render strategy to use for rendering the components. 
-	@return The render strategy class previously registered with the given component class, or <code>null</code> if there was no previous registration.
-	*/
-	public <C extends Component> Class<? extends Controller<? extends GC, C>> registerRenderStrategy(final Class<C> componentClass, Class<? extends Controller> renderStrategyClass);
-//TODO last to work	public <C extends Component> Class<? extends Controller<GC, C>> registerRenderStrategy(Class<C> componentClass, Class<? extends Controller> renderStrategyClass);
-//TODO fix; seems correct	public <C extends Component> Class<? extends RenderStrategy<? super GC, ? extends C>> registerRenderStrategy(Class<C> componentClass, Class<? extends RenderStrategy> renderStrategyClass);
-//TODO del; works	public void registerRenderStrategy(Class<? extends RenderStrategy> renderStrategyClass);
-//TODO fix	public <C extends Component> Class<? extends RenderStrategy<? super GC, ? extends C>> registerRenderStrategy(Class<C> componentClass, Class<? extends RenderStrategy<? super GC, ? extends C>> renderStrategyClass);
-
-	/**Determines the controller class registered for the given component class.
-	@param context The Guise context interested in retrieving a controller. 
-	@param componentClass The class of component that may be registered.
-	@return A class of render strategy registered to render component of the specific class, or <code>null</code> if no render strategy is registered.
-	*/
-	public <C extends Component> Class<? extends Controller<GC, C>> getRegisteredRenderStrategyClass(final Class<C> componentClass);
-//TODO last to work	public <C extends Component> Class<? extends Controller<GC, C>> getRegisteredRenderStrategyClass(final Class<C> componentClass);
-//TODO fix	public <C extends Component> Class<? extends RenderStrategy<? super GC, ? extends C>> getRegisteredRenderStrategyClass(final Class<C> componentClass);
 
 }
