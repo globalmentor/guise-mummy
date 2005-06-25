@@ -13,6 +13,7 @@ import javax.servlet.http.*;
 import com.garretwilson.guise.application.AbstractGuiseApplication;
 import com.garretwilson.guise.component.*;
 import com.garretwilson.guise.controller.text.xml.xhtml.*;
+import com.garretwilson.guise.validator.ValidationException;
 import com.garretwilson.io.OutputStreamUtilities;
 import com.garretwilson.net.http.*;
 import com.garretwilson.util.Debug;
@@ -195,7 +196,15 @@ Debug.trace("raw path info: ", rawPathInfo);
 			final Frame frame=guiseSession.getBoundFrame(rawPathInfo);	//get the frame bound to the requested path
 			if(frame!=null)	//if we found a frame class for this address
 			{
-				frame.updateModel(guiseContext);	//tell the frame to update its model
+				try
+				{
+					frame.validateView(guiseContext);		//tell the frame to validate its view
+					frame.updateModel(guiseContext);	//tell the frame to update its model
+				}
+				catch(final ValidationException validationException)	//if there were any validation errors
+				{
+					frame.setError(validationException);	//store the validation error(s) so that the frame can report them to the user
+				}
 				frame.updateView(guiseContext);		//tell the frame to update its view
 			}
 			else	//if we have no frame type for this address

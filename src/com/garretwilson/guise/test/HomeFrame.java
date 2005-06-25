@@ -8,6 +8,7 @@ import com.garretwilson.guise.event.ActionEvent;
 import com.garretwilson.guise.event.ActionListener;
 import com.garretwilson.guise.model.ActionModel;
 import com.garretwilson.guise.model.ValueModel;
+import com.garretwilson.guise.validator.RegularExpressionStringValidator;
 
 /**Test frame for a home page.
 @author Garret Wilson
@@ -58,6 +59,7 @@ public class HomeFrame extends DefaultFrame
 						testLabel.getModel().setText(propertyValueChangeEvent.getNewValue());
 					}
 				});
+		textInput.getModel().setValidator(new RegularExpressionStringValidator("[a-z]*"));
 		add(textInput);
 	}
 

@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.Controller;
+import com.garretwilson.guise.validator.ValidationException;
 
 /**Base interface for all Guise components.
 @author Garret Wilson
@@ -15,6 +16,8 @@ public interface Component<C extends Component<C>>
 
 	/**The bound property of the controller.*/
 	public final static String CONTROLLER_PROPERTY=getPropertyName(Component.class, "controller");
+	/**The bound property of the current error condition.*/
+	public final static String ERROR_PROPERTY=getPropertyName(Component.class, "error");
 	/**The bound property of the component style ID.*/
 	public final static String STYLE_ID_PROPERTY=getPropertyName(Component.class, "styleID");
 	/**The bound property of whether the component is visible.*/
@@ -29,6 +32,16 @@ public interface Component<C extends Component<C>>
 	@see Component#CONTROLLER_PROPERTY
 	*/
 	public void setController(final Controller<? extends GuiseContext, C> newController);
+
+	/**@return The error currently associated with this component, or <code>null</code> if there is no error.*/
+	public Throwable getError();
+
+	/**Sets the component error status.
+	This is a bound property.
+	@param newError The error currently associated with this component, or <code>null</code> if there is no error.
+	@see ERROR_PROPERTY
+	*/
+	public void setError(final Throwable newError);
 
 	/**@return The component identifier.*/
 	public String getID();
@@ -80,8 +93,18 @@ public interface Component<C extends Component<C>>
 	*/
 	public void setVisible(final boolean newVisible);
 
+	/**Validates the view of this component.
+	This method delegates to the installed controller, and if no controller is installed one is created and installed.
+	@param context Guise context information.
+	@param component The component being rendered.
+	@exception IOException if there is an error validating the view.
+	@exception ValidationException if the view information is not valid to store in the model.
+	@see #getController(GC, C)
+	*/
+	public <GC extends GuiseContext> void validateView(final GC context) throws IOException, ValidationException;
+
 	/**Updates the view of this component.
-	This method delegates to the isntalled controller, and if no controller is installed one is created.
+	This method delegates to the installed controller, and if no controller is installed one is created and installed.
 	@param context Guise context information.
 	@param component The component being rendered.
 	@exception IOException if there is an error updating the view.
@@ -89,8 +112,10 @@ public interface Component<C extends Component<C>>
 	public <GC extends GuiseContext> void updateView(final GC context) throws IOException;
 
 	/**Updates the model of this component.
+	This method delegates to the installed controller, and if no controller is installed one is created and installed.
 	@param context Guise context information.
 	@exception IOException if there is an error updating the model.
+	@exception ValidationException if the view information is not valid to store in the model.
 	*/
-	public <GC extends GuiseContext> void updateModel(final GC context) throws IOException;
+	public <GC extends GuiseContext> void updateModel(final GC context) throws IOException, ValidationException;
 }

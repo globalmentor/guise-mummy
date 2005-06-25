@@ -1,7 +1,6 @@
 package com.garretwilson.guise.component;
 
-import com.garretwilson.guise.model.DefaultValueModel;
-import com.garretwilson.guise.model.ValueModel;
+import com.garretwilson.guise.model.*;
 
 /**Control to accept input from the user.
 @author Garret Wilson

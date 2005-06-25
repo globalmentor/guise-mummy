@@ -9,6 +9,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 import com.garretwilson.event.EventListenerManager;
 import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.Controller;
+import com.garretwilson.guise.validator.ValidationException;
 
 /**An abstract implementation of a component.
 @author Garret Wilson
@@ -45,7 +46,28 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 				firePropertyChange(CONTROLLER_PROPERTY, oldController, newController);	//indicate that the value changed				
 			}
 		}
-	
+
+	/**The error currently associated with this component, or <code>null</code> if there is no error.*/
+	private Throwable error=null;
+
+		/**@return The error currently associated with this component, or <code>null</code> if there is no error.*/
+		public Throwable getError() {return error;}
+
+		/**Sets the component error status.
+		This is a bound property.
+		@param newError The error currently associated with this component, or <code>null</code> if there is no error.
+		@see Component#ERROR_PROPERTY
+		*/
+		public void setError(final Throwable newError)
+		{
+			if(error!=newError)	//if the value is really changing
+			{
+				final Throwable oldError=error;	//get the current value
+				error=newError;	//update the value
+				firePropertyChange(ERROR_PROPERTY, oldError, newError);
+			}			
+		}
+
 	/**The component identifier*/
 	private final String id;
 
@@ -229,8 +251,22 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 		}
 	}
 
+	/**Validates the view of this component.
+	This method delegates to the installed controller, and if no controller is installed one is created and installed.
+	@param context Guise context information.
+	@param component The component being rendered.
+	@exception IOException if there is an error validating the view.
+	@exception ValidationException if the view information is not valid to store in the model.
+	@see #getController(GC, C)
+	*/
+	public <GC extends GuiseContext> void validateView(final GC context) throws IOException, ValidationException
+	{
+		final Controller<GC, C> controller=getController(context);	//get the controller
+		controller.validateView(context, (C)this);	//tell the controller to update the view TODO testing; probably not correct, but works
+	}
+
 	/**Updates the view of this component.
-	This method delegates to the isntalled controller, and if no controller is installed one is created.
+	This method delegates to the installed controller, and if no controller is installed one is created and installed.
 	@param context Guise context information.
 	@param component The component being rendered.
 	@exception IOException if there is an error updating the view.
@@ -243,10 +279,12 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	}
 
 	/**Updates the model of this component.
+	This method delegates to the installed controller, and if no controller is installed one is created and installed.
 	@param context Guise context information.
 	@exception IOException if there is an error updating the model.
+	@exception ValidationException if the view information is not valid to store in the model.
 	*/
-	public <GC extends GuiseContext> void updateModel(final GC context) throws IOException
+	public <GC extends GuiseContext> void updateModel(final GC context) throws IOException, ValidationException
 	{
 		final Controller<GC, C> controller=getController(context);	//get the controller
 		controller.updateModel(context, (C)this);	//tell the controller to update the model
