@@ -21,14 +21,14 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 
 /**The servlet that controls a Guise web applications. 
-Frame bindings for paths can be set in initialization parameters named <code>pathFrameClass.<var>frameID</var></code>, with values in the form <code>/<var>contextRelativePath</var>?<var>com.example.Frame</var></code>.
+Frame bindings for paths can be set in initialization parameters named <code>navigationPathFrameClass.<var>frameID</var></code>, with values in the form <code>/<var>contextRelativePath</var>?<var>com.example.Frame</var></code>.
 @author Garret Wilson
 */
 public class GuiseHTTPServlet extends BasicHTTPServlet
 {
 
-	/**The prefix, "pathFrameClass.", used to identify path/frame bindings in the web application's init parameters.*/
-	public final static String PATH_FRAME_CLASS_INIT_PARAMETER_PREFIX="pathFrameClass.";
+	/**The prefix, "navigationPathFrameClass.", used to identify path/frame bindings in the web application's init parameters.*/
+	public final static String NAVIGATION_PATH_FRAME_CLASS_INIT_PARAMETER_PREFIX="navigationPathFrameClass.";
 
 	/**@return The global HTTP servlet Guise instance.
 	This is a convenience method.
@@ -51,7 +51,7 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 	Because this servlet's context path is only available via the request object, we must wait until the first request to update it.
 	@see HTTPServletGuiseApplication#getContextPath()
 	*/
-	private String contextPath=null;
+	private String guiseApplicationContextPath=null;
 
 	/**The factory method to create a Guise application.
 	This implementation creates a default Guise application and registers an XHTML controller kit.
@@ -87,7 +87,7 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 	}
 
 	/**Initializes bindings between paths and associated frame classes.
-	This implementation reads the initialization parameters named <code>pathFrameClass.<var>frameID</var></code>, expecting values in the form <code>/<var>contextRelativePath</var>?<var>com.example.Frame</var></code>.
+	This implementation reads the initialization parameters named <code>navigationPathFrameClass.<var>frameID</var></code>, expecting values in the form <code>/<var>contextRelativePath</var>?<var>com.example.Frame</var></code>.
 	@param servletConfig The servlet configuration. 
 	@exception IllegalArgumentException if the one of the frame bindings is not expressed in correct format.
 	@exception IllegalArgumentException if the one of the classes specified as a frame binding could not be found.
@@ -101,7 +101,7 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 		while(initParameterNames.hasMoreElements())	//while there are more initialization parameters
 		{
 			final String initParameterName=(String)initParameterNames.nextElement();	//get the next initialization parameter name
-			if(initParameterName.startsWith(PATH_FRAME_CLASS_INIT_PARAMETER_PREFIX))	//if this is a path/frame binding
+			if(initParameterName.startsWith(NAVIGATION_PATH_FRAME_CLASS_INIT_PARAMETER_PREFIX))	//if this is a path/frame binding
 			{
 				final String initParameterValue=servletConfig.getInitParameter(initParameterName);	//get this init parameter value
 				try
@@ -163,16 +163,17 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
   */
 	public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
 	{
-		if(contextPath==null)	//if we haven't updated our context path for this servlet instance (the context path should always be the same, but it's not available until the first request arrives)
+		if(guiseApplicationContextPath==null)	//if we haven't updated our context path for this servlet instance (the context path should always be the same, but it's not available until the first request arrives)
 		{
-			contextPath=request.getContextPath();	//set the context path from the servlet request
+			guiseApplicationContextPath=request.getContextPath()+request.getServletPath();	//set the application context path from the servlet request, which is the concatenation of the web application path and the servlet's path
 		}
-		assert contextPath.equals(request.getContextPath()) : "Guise HTTP servlet context path changed unexpectedly.";
+		assert guiseApplicationContextPath.equals(request.getContextPath()+request.getServletPath()) : "Guise HTTP servlet context path changed unexpectedly.";
 
 		final HTTPServletGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
 		final HTTPGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseApplication, request);	//retrieves the Guise session for this application and request
 		final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, request, response);	//create a new Guise context
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
+Debug.trace("raw path info: ", rawPathInfo);
 		if(rawPathInfo.endsWith(".css"))	//TODO fix
 		{
 			response.setContentType("text/css");
@@ -279,11 +280,11 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 		*/
 		public String getContextPath()
 		{
-			if(contextPath==null)	//if there is no context path
+			if(guiseApplicationContextPath==null)	//if there is no context path
 			{
 				throw new IllegalStateException("The Guise HTTP servlet's Guise application getContextPath() method cannot be called before the servlet services its first request.");
 			}
-			return contextPath;	//return the context path, always updated by the 
+			return guiseApplicationContextPath;	//return the context path, always updated by the 
 		}
 
 	}
