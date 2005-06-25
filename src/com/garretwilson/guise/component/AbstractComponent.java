@@ -1,10 +1,11 @@
 package com.garretwilson.guise.component;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
-
 import java.io.IOException;
 
 import com.garretwilson.beans.BoundPropertyObject;
+
+import static com.garretwilson.lang.CharSequenceUtilities.*;
+import static com.garretwilson.lang.ClassUtilities.*;
 import com.garretwilson.event.EventListenerManager;
 import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.Controller;
@@ -14,6 +15,9 @@ import com.garretwilson.guise.controller.Controller;
 */
 public class AbstractComponent<C extends Component<C>> extends BoundPropertyObject implements Component<C>
 {
+
+	/**Extra characters allowed in the ID, verified for URI safeness.*/
+	protected final static String ID_EXTRA_CHARACTERS="-_";
 
 	/**The object managing event listeners.*/
 	private final EventListenerManager eventListenerManager=new EventListenerManager();
@@ -47,6 +51,58 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 
 		/**@return The component identifier.*/
 		public String getID() {return id;}
+
+		/**@return An identifier unique within this component's parent container, if any.*/
+		public String getUniqueID()
+		{
+			final Container parent=getParent();	//get this component's parent
+			return parent!=null ? parent.getUniqueID(this) : getID();	//if we have a parent, ask it for our unique ID; otherwise, our ID is already unique
+		}
+
+		/**@return An identifier unique up this component's hierarchy.*/
+		public String getAbsoluteUniqueID()
+		{
+			final Container parent=getParent();	//get this component's parent
+			return parent!=null ? parent.getAbsoluteUniqueID(this) : getUniqueID();	//if we have a parent container, ask it for our absolute ID; otherwise, return our local unique ID
+		}
+
+		/**Determines if the given string is a valid component ID.
+		A valid component ID begins with a letter and is composed only of letters, digits, and/or the characters '-' and '_'.
+		@param string The string to check for component identifier compliance.
+		@return <code>true</code> if the string is a valid component ID, else <code>false</code>.
+		@exception NullPointerException if the given string is <code>null</code>.
+		*/ 		
+		public static boolean isValidComponentID(final String string)
+		{
+			return string.length()>0 && Character.isLetter(string.charAt(0)) && isLettersDigitsCharacters(string, ID_EXTRA_CHARACTERS);	//make sure the string has characters; that the first character is a letter; and that the remaining characters are letters, digits, and/or the extra ID characters
+		}
+
+		/**Checks to ensure that the given string is a valid component identifier, throwing an exception if not.
+		@param string The string to check for component identifier compliance.
+		@return The component identifier after being checked for compliance.
+		@exception IllegalArgumentException if the given string is not a valid component ID.
+		@exception NullPointerException if the given string is <code>null</code>.
+		@see #isValidComponentID(String)
+		*/
+		public static String checkValidComponentID(final String string)
+		{
+			if(!isValidComponentID(string))	//if the string is not a valid component ID
+			{
+				throw new IllegalArgumentException("Invalid component ID: \""+string+"\".");
+			}
+			return string;	//return the string; it passed the test
+		}
+
+		/**Creates a default identifier for this component.
+		This implementation creates an identifier by transforming the simple class name to a variable name.
+		@return A default identifier for this component.
+		*/
+/*TODO del if not needed
+		protected String getDefaultID()
+		{
+			return getVariableName(getClass());	//create an ID by transforming the simple class name to a variable name
+		}
+*/
 
 	/**The container parent of this component, or <code>null</code> if this component is not embedded in any container.*/
 	private Container parent=null;
@@ -151,13 +207,26 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 			}
 		}
 
+	/**Default constructor.*/
+	public AbstractComponent()
+	{
+		this(null);	//construct the component, indicating that a default ID should be used
+	}
+
 	/**ID constructor.
-	@param id The component identifier.
-	@exception NullPointerException if the given identifier is <code>null</code>.
+	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
 	public AbstractComponent(final String id)
 	{
-		this.id=checkNull(id, "Component identifier cannot be null.");	//save the ID
+		if(id!=null)	//if an ID was provided
+		{
+			this.id=checkValidComponentID(id);	//save the ID, checking for compliance
+		}
+		else	//if an ID was not provided
+		{
+			this.id=getVariableName(getClass());	//create an ID by transforming the simple class name to a variable name
+		}
 	}
 
 	/**Updates the view of this component.

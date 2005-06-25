@@ -8,9 +8,14 @@ import com.garretwilson.guise.model.*;
 public class Label extends AbstractModelComponent<MessageModel>
 {
 
+	/**Default constructor with a default identifier and default model.*/
+	public Label()
+	{
+		this(null);	//construct the component, indicating that a default ID should be used
+	}
+
 	/**ID constructor with a default data model.
 	@param id The component identifier.
-	@exception NullPointerException if the given identifier is <code>null</code>.
 	*/
 	public Label(final String id)
 	{
@@ -20,7 +25,7 @@ public class Label extends AbstractModelComponent<MessageModel>
 	/**ID and model constructor.
 	@param id The component identifier.
 	@param model The component data model.
-	@exception NullPointerException if the given identifier or model is <code>null</code>.
+	@exception NullPointerException if the given model is <code>null</code>.
 	*/
 	public Label(final String id, final MessageModel model)
 	{

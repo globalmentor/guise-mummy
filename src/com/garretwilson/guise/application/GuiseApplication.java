@@ -32,18 +32,18 @@ public interface GuiseApplication<GC extends GuiseContext>
 	*/
 	public <C extends Component> Controller<GC, C> getController(final C component);
 
-	/**Binds a frame type to a particular context-relative path.
+	/**Binds a frame type to a particular appplication context-relative absolute path.
 	Any existing binding for the given context-relative path is replaced.
-	@param path The context-relative path to which the frame should be bound.
-	@param frameClass The class of frame to render for this particular context-relative path.
-	@return The frame previously bound to the given context-relative path, or <code>null</code> if no frame was previously bound to the path.
+	@param path The appplication context-relative absolute path to which the frame should be bound.
+	@param frameClass The class of frame to render for this particular appplication context-relative absolute path.
+	@return The frame previously bound to the given appplication context-relative absolute path, or <code>null</code> if no frame was previously bound to the path.
 	@exception NullPointerException if the path and/or the frame is null.
 	*/
 	public Class<? extends Frame> bindFrame(final String path, final Class<? extends Frame> frameClass);
 
-	/**Determines the class of frame bound to the given context-relative path.
+	/**Determines the class of frame bound to the given appplication context-relative absolute path.
 	@param path The address for which a frame should be retrieved.
-	@return The type of frame bound to the given address. 
+	@return The type of frame bound to the given path, or <code>null</code> if no frame is bound to the path. 
 	*/
 	public Class<? extends Frame> getBoundFrameClass(final String path);
 

@@ -134,14 +134,14 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext>	implemen
 
 //TODO how do we keep the general public from changing the frame bindings?
 
-	/**The synchronized map binding frame types to context-relative paths.*/
+	/**The synchronized map binding frame types to appplication context-relative absolute paths.*/
 	private final Map<String, Class<? extends Frame>> pathFrameBindingMap=synchronizedMap(new HashMap<String, Class<? extends Frame>>());
 
-		/**Binds a frame type to a particular context-relative path.
+		/**Binds a frame type to a particular appplication context-relative absolute path.
 		Any existing binding for the given context-relative path is replaced.
-		@param path The context-relative path to which the frame should be bound.
-		@param frameClass The class of frame to render for this particular context-relative path.
-		@return The frame previously bound to the given context-relative path, or <code>null</code> if no frame was previously bound to the path.
+		@param path The appplication context-relative absolute path to which the frame should be bound.
+		@param frameClass The class of frame to render for this particular appplication context-relative absolute path.
+		@return The frame previously bound to the given appplication context-relative absolute path, or <code>null</code> if no frame was previously bound to the path.
 		@exception NullPointerException if the path and/or the frame is null.
 		*/
 		public Class<? extends Frame> bindFrame(final String path, final Class<? extends Frame> frameClass)
@@ -149,9 +149,9 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext>	implemen
 			return pathFrameBindingMap.put(checkNull(path, "Path cannot be null."), checkNull(frameClass, "Type cannot be null."));	//store the binding
 		}
 
-		/**Determines the class of frame bound to the given context-relative path.
+		/**Determines the class of frame bound to the given appplication context-relative absolute path.
 		@param path The address for which a frame should be retrieved.
-		@return The type of frame bound to the given address. 
+		@return The type of frame bound to the given path, or <code>null</code> if no frame is bound to the path. 
 		*/
 		public Class<? extends Frame> getBoundFrameClass(final String path)
 		{

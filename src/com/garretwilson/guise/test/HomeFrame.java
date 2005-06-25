@@ -15,13 +15,18 @@ import com.garretwilson.guise.model.ValueModel;
 public class HomeFrame extends DefaultFrame
 {
 
+	/**Default constructor.*/
+	public HomeFrame()
+	{
+		this(null);	//construct the component, indicating that a default ID should be used
+	}
+
 	/**ID constructor.
-	@param id The component identifier.
-	@exception NullPointerException if the given identifier is <code>null</code>.
+	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	*/
 	public HomeFrame(final String id)
 	{
-		super(id, new FlowLayout(Axis.Y));	//construct the parent class, flowing vertical
+		super(id, new FlowLayout(Axis.Y));	//construct the parent class, flowing verticallly
 		setTitle("Home Frame Test");	//set the frame label
 		
 		final Label testLabel=new Label("testLabel");

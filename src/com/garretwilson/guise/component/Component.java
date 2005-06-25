@@ -8,7 +8,6 @@ import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.Controller;
 
 /**Base interface for all Guise components.
-Each component must provide a single ID string constructor.
 @author Garret Wilson
 */
 public interface Component<C extends Component<C>>
@@ -33,6 +32,12 @@ public interface Component<C extends Component<C>>
 
 	/**@return The component identifier.*/
 	public String getID();
+
+	/**@return An identifier unique within this component's parent container, if any.*/
+	public String getUniqueID();
+
+	/**@return An identifier unique up this component's hierarchy.*/
+	public String getAbsoluteUniqueID();
 
 	/**@return The container parent of this component, or <code>null</code> if this component is not embedded in any container.*/
 	public Container getParent();

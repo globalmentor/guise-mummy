@@ -11,7 +11,7 @@ public class AbstractControl<M extends Model> extends AbstractModelComponent<M> 
 	/**ID and model constructor.
 	@param id The component identifier.
 	@param model The component data model.
-	@exception NullPointerException if the given identifier or model is <code>null</code>.
+	@exception NullPointerException if the given model is <code>null</code>.
 	*/
 	public AbstractControl(final String id, final M model)
 	{
