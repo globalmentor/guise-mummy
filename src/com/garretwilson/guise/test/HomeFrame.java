@@ -8,26 +8,30 @@ import com.garretwilson.guise.event.ActionEvent;
 import com.garretwilson.guise.event.ActionListener;
 import com.garretwilson.guise.model.ActionModel;
 import com.garretwilson.guise.model.ValueModel;
+import com.garretwilson.guise.session.GuiseSession;
 import com.garretwilson.guise.validator.RegularExpressionStringValidator;
 
 /**Test frame for a home page.
 @author Garret Wilson
 */
-public class HomeFrame extends DefaultFrame
+public class HomeFrame extends NavigationFrame
 {
 
-	/**Default constructor.*/
-	public HomeFrame()
+	/**Guise session constructor.
+	@param session The Guise session that owns this frame.
+	*/
+	public HomeFrame(final GuiseSession<?> session)
 	{
-		this(null);	//construct the component, indicating that a default ID should be used
+		this(session, null);	//construct the component, indicating that a default ID should be used
 	}
 
 	/**ID constructor.
+	@param session The Guise session that owns this frame.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	*/
-	public HomeFrame(final String id)
+	public HomeFrame(final GuiseSession<?> session, final String id)
 	{
-		super(id, new FlowLayout(Axis.Y));	//construct the parent class, flowing verticallly
+		super(session, id, new FlowLayout(Axis.Y));	//construct the parent class, flowing verticallly
 		setTitle("Home Frame Test");	//set the frame label
 		
 		final Label testLabel=new Label("testLabel");
@@ -38,7 +42,14 @@ public class HomeFrame extends DefaultFrame
 		final Panel buttonPanel=new Panel("testButtonPanel", new FlowLayout(Axis.X));	//create a panel flowing horizontally
 
 		final ActionControl testButton=new ActionControl("testButton");
-		testButton.getModel().setText("First Test Button");
+		testButton.getModel().setText("Click here to go to the 'Hello World' demo.");
+		testButton.getModel().addActionListener(new ActionListener<ActionModel>()
+				{
+					public void onAction(ActionEvent<ActionModel> actionEvent)
+					{
+						getSession().setNavigationPath("/helloworld");
+					}
+				});
 		buttonPanel.add(testButton);	//add a new button
 		final ActionControl testButton2=new ActionControl("testButton2");
 		testButton2.getModel().setText("Click this button to change the text.");

@@ -22,7 +22,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 
 /**The servlet that controls a Guise web applications. 
-Frame bindings for paths can be set in initialization parameters named <code>navigationPathFrameClass.<var>frameID</var></code>, with values in the form <code>/<var>contextRelativePath</var>?<var>com.example.Frame</var></code>.
+Navigation frame bindings for paths can be set in initialization parameters named <code>navigationPathFrameClass.<var>frameID</var></code>, with values in the form <code>/<var>contextRelativePath</var>?<var>com.example.Frame</var></code>.
 @author Garret Wilson
 */
 public class GuiseHTTPServlet extends BasicHTTPServlet
@@ -84,19 +84,19 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 		super.init(servletConfig);	//do the default initialization
 		Debug.setDebug(true);	//turn on debug
 		Debug.setMinimumReportLevel(Debug.ReportLevel.TRACE);	//set the level of reporting
-		initFrameBindings(servletConfig);	//initialize the frame bindings
+		initNavigationFrameBindings(servletConfig);	//initialize the frame bindings
 	}
 
-	/**Initializes bindings between paths and associated frame classes.
+	/**Initializes bindings between paths and associated navigation frame classes.
 	This implementation reads the initialization parameters named <code>navigationPathFrameClass.<var>frameID</var></code>, expecting values in the form <code>/<var>contextRelativePath</var>?<var>com.example.Frame</var></code>.
 	@param servletConfig The servlet configuration. 
 	@exception IllegalArgumentException if the one of the frame bindings is not expressed in correct format.
 	@exception IllegalArgumentException if the one of the classes specified as a frame binding could not be found.
 	@exception ClassCastException if the one of the classes specified as a frame binding does not represent a subclass of a frame component.
 	@exception ServletException if there is a problem initializing the frame bindings.
-	@see com.garretwilson.guise.component.Frame
+	@see com.garretwilson.guise.component.NavigationFrame
 	*/
-	protected void initFrameBindings(final ServletConfig servletConfig) throws ServletException
+	protected void initNavigationFrameBindings(final ServletConfig servletConfig) throws ServletException
 	{
 		final Enumeration initParameterNames=servletConfig.getInitParameterNames();	//get the names of all init parameters
 		while(initParameterNames.hasMoreElements())	//while there are more initialization parameters
@@ -117,8 +117,8 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 							try
 							{
 								final Class<?> specifiedClass=Class.forName(className);	//load the class for the specified name
-								final Class<? extends Frame> frameClass=specifiedClass.asSubclass(Frame.class);	//cast the specified class to a frame class just to make sure it's the correct type
-								getGuiseApplication().bindFrame(path, frameClass);	//cast the class to a frame class and bind it to the path in the Guise application
+								final Class<? extends NavigationFrame> navigationFrameClass=specifiedClass.asSubclass(NavigationFrame.class);	//cast the specified class to a frame class just to make sure it's the correct type
+								getGuiseApplication().bindNavigationFrame(path, navigationFrameClass);	//cast the class to a frame class and bind it to the path in the Guise application
 							}
 							catch(final ClassNotFoundException classNotFoundException)
 							{
@@ -193,19 +193,24 @@ Debug.trace("raw path info: ", rawPathInfo);
 		Debug.trace("raw path info", rawPathInfo);
 		try
 		{
-			final Frame frame=guiseSession.getBoundFrame(rawPathInfo);	//get the frame bound to the requested path
-			if(frame!=null)	//if we found a frame class for this address
+			final NavigationFrame navigationFrame=guiseSession.getBoundNavigationFrame(rawPathInfo);	//get the frame bound to the requested path
+			if(navigationFrame!=null)	//if we found a frame class for this address
 			{
+				guiseSession.setNavigationPath(rawPathInfo);	//make sure the Guise session has the correct navigation path
 				try
 				{
-					frame.validateView(guiseContext);		//tell the frame to validate its view
-					frame.updateModel(guiseContext);	//tell the frame to update its model
+					navigationFrame.validateView(guiseContext);		//tell the frame to validate its view
+					navigationFrame.updateModel(guiseContext);	//tell the frame to update its model
 				}
 				catch(final ValidationException validationException)	//if there were any validation errors
 				{
-					frame.setError(validationException);	//store the validation error(s) so that the frame can report them to the user
+					navigationFrame.setError(validationException);	//store the validation error(s) so that the frame can report them to the user
 				}
-				frame.updateView(guiseContext);		//tell the frame to update its view
+				if(!guiseSession.getNavigationPath().equals(rawPathInfo))	//if the navigation path has changed
+				{
+					throw new HTTPMovedTemporarilyException(URI.create(getGuiseApplication().getContextPath()+guiseSession.getNavigationPath()));	//redirect to the new navigation location within the application
+				}
+				navigationFrame.updateView(guiseContext);		//tell the frame to update its view
 			}
 			else	//if we have no frame type for this address
 			{

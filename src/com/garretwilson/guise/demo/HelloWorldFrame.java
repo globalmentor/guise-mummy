@@ -2,19 +2,22 @@ package com.garretwilson.guise.demo;
 
 import com.garretwilson.guise.component.*;
 import com.garretwilson.guise.component.layout.*;
+import com.garretwilson.guise.session.GuiseSession;
 
 /**Hello World Guise demonstration frame.
 Copyright © 2005 GlobalMentor, Inc.
 Demonstrates frames and labels.
 @author Garret Wilson
 */
-public class HelloWorldFrame extends DefaultFrame
+public class HelloWorldFrame extends NavigationFrame
 {
 
-	/**Default constructor.*/
-	public HelloWorldFrame()
+	/**Guise session constructor.
+	@param session The Guise session that owns this frame.
+	*/
+	public HelloWorldFrame(final GuiseSession<?> session)
 	{
-		super(new FlowLayout(Axis.Y));	//construct the parent class, flowing vertically
+		super(session, new FlowLayout(Axis.Y));	//construct the parent class, flowing vertically
 		setTitle("Hello World Guise Demonstration");	//set the frame label
 		
 		final Label helloWorldLabel=new Label();	//create a label

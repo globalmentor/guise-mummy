@@ -1,7 +1,7 @@
 package com.garretwilson.guise.application;
 
 import com.garretwilson.guise.component.Component;
-import com.garretwilson.guise.component.Frame;
+import com.garretwilson.guise.component.NavigationFrame;
 import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.Controller;
 import com.garretwilson.guise.controller.ControllerKit;
@@ -35,17 +35,17 @@ public interface GuiseApplication<GC extends GuiseContext>
 	/**Binds a frame type to a particular appplication context-relative absolute path.
 	Any existing binding for the given context-relative path is replaced.
 	@param path The appplication context-relative absolute path to which the frame should be bound.
-	@param frameClass The class of frame to render for this particular appplication context-relative absolute path.
+	@param navigationFrameClass The class of frame to render for this particular appplication context-relative absolute path.
 	@return The frame previously bound to the given appplication context-relative absolute path, or <code>null</code> if no frame was previously bound to the path.
 	@exception NullPointerException if the path and/or the frame is null.
 	*/
-	public Class<? extends Frame> bindFrame(final String path, final Class<? extends Frame> frameClass);
+	public Class<? extends NavigationFrame> bindNavigationFrame(final String path, final Class<? extends NavigationFrame> navigationFrameClass);
 
 	/**Determines the class of frame bound to the given appplication context-relative absolute path.
 	@param path The address for which a frame should be retrieved.
 	@return The type of frame bound to the given path, or <code>null</code> if no frame is bound to the path. 
 	*/
-	public Class<? extends Frame> getBoundFrameClass(final String path);
+	public Class<? extends NavigationFrame> getBoundNavigationFrameClass(final String path);
 
 	/**Reports the context path of the application.
 	The context path is either the empty string (""), or a path beginning with a slash ('/') indicating the application's context relative to its frames.

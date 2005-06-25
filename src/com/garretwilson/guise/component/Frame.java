@@ -3,7 +3,6 @@ package com.garretwilson.guise.component;
 import static com.garretwilson.lang.ClassUtilities.*;
 
 /**A root-level container such as a window or an HTML page.
-Each frame must provide either a default constructor or a single ID string constructor.
 @author Garret Wilson
 */
 public interface Frame extends Box

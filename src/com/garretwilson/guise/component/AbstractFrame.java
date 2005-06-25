@@ -5,7 +5,7 @@ import com.garretwilson.guise.component.layout.*;
 /**Default implementation of a frame.
 @author Garret Wilson
 */
-public class DefaultFrame extends AbstractBox implements Frame
+public abstract class AbstractFrame extends AbstractBox implements Frame
 {
 
 	/**The frame title, or <code>null</code> if there is no title.*/
@@ -30,7 +30,7 @@ public class DefaultFrame extends AbstractBox implements Frame
 		}
 
 	/**Default constructor with a default vertical flow layout.*/
-	public DefaultFrame()
+	public AbstractFrame()
 	{
 		this((String)null);	//construct the component, indicating that a default ID should be used
 	}
@@ -38,7 +38,7 @@ public class DefaultFrame extends AbstractBox implements Frame
 	/**ID constructor with a default vertical flow layout.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	*/
-	public DefaultFrame(final String id)
+	public AbstractFrame(final String id)
 	{
 		this(id, new FlowLayout(Axis.Y));	//default to flowing vertically
 	}
@@ -47,7 +47,7 @@ public class DefaultFrame extends AbstractBox implements Frame
 	@param layout The layout definition for the container.
 	@exception NullPointerException if the given layout is <code>null</code>.
 	*/
-	public DefaultFrame(final Layout layout)
+	public AbstractFrame(final Layout layout)
 	{
 		this(null, layout);	//construct the component with the layout, indicating that a default ID should be used
 	}
@@ -57,7 +57,7 @@ public class DefaultFrame extends AbstractBox implements Frame
 	@param layout The layout definition for the container.
 	@exception NullPointerException if the given layout is <code>null</code>.
 	*/
-	public DefaultFrame(final String id, final Layout layout)
+	public AbstractFrame(final String id, final Layout layout)
 	{
 		super(id, layout);	//construct the parent class
 	}
