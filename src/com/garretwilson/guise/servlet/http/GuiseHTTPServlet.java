@@ -15,6 +15,7 @@ import com.garretwilson.guise.component.*;
 import com.garretwilson.guise.controller.text.xml.xhtml.*;
 import com.garretwilson.guise.validator.ValidationException;
 import com.garretwilson.io.OutputStreamUtilities;
+import static com.garretwilson.net.URIConstants.*;
 import com.garretwilson.net.http.*;
 import com.garretwilson.util.Debug;
 
@@ -88,7 +89,7 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 	}
 
 	/**Initializes bindings between paths and associated navigation frame classes.
-	This implementation reads the initialization parameters named <code>navigationPathFrameClass.<var>frameID</var></code>, expecting values in the form <code>/<var>contextRelativePath</var>?<var>com.example.Frame</var></code>.
+	This implementation reads the initialization parameters named <code>navigationPathFrameClass.<var>frameID</var></code>, expecting values in the form <code><var>contextRelativePath</var>?<var>com.example.Frame</var></code>.
 	@param servletConfig The servlet configuration. 
 	@exception IllegalArgumentException if the one of the frame bindings is not expressed in correct format.
 	@exception IllegalArgumentException if the one of the classes specified as a frame binding could not be found.
@@ -166,7 +167,7 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 	{
 		if(guiseApplicationContextPath==null)	//if we haven't updated our context path for this servlet instance (the context path should always be the same, but it's not available until the first request arrives)
 		{
-			guiseApplicationContextPath=request.getContextPath()+request.getServletPath();	//set the application context path from the servlet request, which is the concatenation of the web application path and the servlet's path
+			guiseApplicationContextPath=request.getContextPath()+request.getServletPath()+PATH_SEPARATOR;	//set the application context path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash
 		}
 		assert guiseApplicationContextPath.equals(request.getContextPath()+request.getServletPath()) : "Guise HTTP servlet context path changed unexpectedly.";
 
@@ -193,10 +194,15 @@ Debug.trace("raw path info: ", rawPathInfo);
 		Debug.trace("raw path info", rawPathInfo);
 		try
 		{
-			final NavigationFrame navigationFrame=guiseSession.getBoundNavigationFrame(rawPathInfo);	//get the frame bound to the requested path
+			if(!rawPathInfo.startsWith(ROOT_PATH))	//the Java servlet specification says that the path into will start with a '/'
+			{
+				throw new IllegalArgumentException("Expected absolute path info, received "+rawPathInfo);
+			}
+			final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
+			final NavigationFrame navigationFrame=guiseSession.getBoundNavigationFrame(navigationPath);	//get the frame bound to the requested path
 			if(navigationFrame!=null)	//if we found a frame class for this address
 			{
-				guiseSession.setNavigationPath(rawPathInfo);	//make sure the Guise session has the correct navigation path
+				guiseSession.updateNavigationPath(navigationPath);	//make sure the Guise session has the correct navigation path
 				try
 				{
 					navigationFrame.validateView(guiseContext);		//tell the frame to validate its view
@@ -206,9 +212,11 @@ Debug.trace("raw path info: ", rawPathInfo);
 				{
 					navigationFrame.setError(validationException);	//store the validation error(s) so that the frame can report them to the user
 				}
-				if(!guiseSession.getNavigationPath().equals(rawPathInfo))	//if the navigation path has changed
+				final URI requestedNavigationURI=guiseSession.getRequestedNavigationURI();	//get the requested navigation URI
+				if(requestedNavigationURI!=null)	//if navigation is requested
 				{
-					throw new HTTPMovedTemporarilyException(URI.create(getGuiseApplication().getContextPath()+guiseSession.getNavigationPath()));	//redirect to the new navigation location within the application
+					guiseSession.clearRequestedNavigationURI();	//remove any navigation requests
+					throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
 				}
 				navigationFrame.updateView(guiseContext);		//tell the frame to update its view
 			}
@@ -287,8 +295,7 @@ Debug.trace("raw path info: ", rawPathInfo);
 		}
 
 		/**Reports the context path of the application.
-		The context path is either the empty string (""), or a path beginning with a slash ('/') indicating the application's context relative to its frames.
-		The context path does not end with a slash ('/').
+		The context path is an absolute path that ends with a slash ('/'), indicating the application's context relative to its navigation frames.
 		@return The path representing the context of the Guise application.
 		@exception IllegalStateException if this method is called before this Guise servlet services its first request.
 		*/

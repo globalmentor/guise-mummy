@@ -11,7 +11,6 @@ public interface ValueModel<V> extends Model
 
 	/**The value bound property.*/
 	public final static String VALUE_PROPERTY=getPropertyName(ValueModel.class, "value");
-
 	/**The validator bound property.*/
 	public final static String VALIDATOR_PROPERTY=getPropertyName(ValueModel.class, "validator");
 

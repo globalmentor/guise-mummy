@@ -47,7 +47,7 @@ public class HomeFrame extends NavigationFrame
 				{
 					public void onAction(ActionEvent<ActionModel> actionEvent)
 					{
-						getSession().setNavigationPath("/helloworld");
+						getSession().navigate("helloworld");
 					}
 				});
 		buttonPanel.add(testButton);	//add a new button
