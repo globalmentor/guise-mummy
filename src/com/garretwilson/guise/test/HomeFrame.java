@@ -47,7 +47,7 @@ public class HomeFrame extends NavigationFrame
 				{
 					public void onAction(ActionEvent<ActionModel> actionEvent)
 					{
-						getSession().navigate("helloworld");
+						getSession().navigate("/guise/guisedemo/hellouser");
 					}
 				});
 		buttonPanel.add(testButton);	//add a new button
