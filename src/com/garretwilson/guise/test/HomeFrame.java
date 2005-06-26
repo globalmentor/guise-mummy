@@ -6,6 +6,7 @@ import com.garretwilson.guise.component.*;
 import com.garretwilson.guise.component.layout.*;
 import com.garretwilson.guise.event.ActionEvent;
 import com.garretwilson.guise.event.ActionListener;
+import com.garretwilson.guise.event.NavigateActionListener;
 import com.garretwilson.guise.model.ActionModel;
 import com.garretwilson.guise.model.ValueModel;
 import com.garretwilson.guise.session.GuiseSession;
@@ -34,24 +35,18 @@ public class HomeFrame extends NavigationFrame
 		super(session, id, new FlowLayout(Axis.Y));	//construct the parent class, flowing verticallly
 		setTitle("Home Frame Test");	//set the frame label
 		
-		final Label testLabel=new Label("testLabel");
+		final Label testLabel=new Label(session, "testLabel");
 		testLabel.setStyleID("title");
 		testLabel.getModel().setText("This is label text from the model.");
 		add(testLabel);	//add a new label
 		
-		final Panel buttonPanel=new Panel("testButtonPanel", new FlowLayout(Axis.X));	//create a panel flowing horizontally
+		final Panel buttonPanel=new Panel(session, "testButtonPanel", new FlowLayout(Axis.X));	//create a panel flowing horizontally
 
-		final ActionControl testButton=new ActionControl("testButton");
+		final ActionControl testButton=new ActionControl(session, "testButton");
 		testButton.getModel().setText("Click here to go to the 'Hello World' demo.");
-		testButton.getModel().addActionListener(new ActionListener<ActionModel>()
-				{
-					public void onAction(ActionEvent<ActionModel> actionEvent)
-					{
-						getSession().navigate("/guise/guisedemo/hellouser");
-					}
-				});
+		testButton.getModel().addActionListener(new NavigateActionListener<ActionModel>("helloworld"));
 		buttonPanel.add(testButton);	//add a new button
-		final ActionControl testButton2=new ActionControl("testButton2");
+		final ActionControl testButton2=new ActionControl(session, "testButton2");
 		testButton2.getModel().setText("Click this button to change the text.");
 		testButton2.getModel().addActionListener(new ActionListener<ActionModel>()
 				{
@@ -62,7 +57,7 @@ public class HomeFrame extends NavigationFrame
 				});
 		buttonPanel.add(testButton2);	//add a new button
 		add(buttonPanel);	//add the button panel to the frame
-		final ValueControl<String> textInput=new ValueControl<String>("textInput", String.class);	//create a text input control
+		final ValueControl<String> textInput=new ValueControl<String>(session, "textInput", String.class);	//create a text input control
 		textInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<String>()
 				{
 					public void propertyValueChange(PropertyValueChangeEvent<String> propertyValueChangeEvent)

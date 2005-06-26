@@ -20,7 +20,7 @@ public class HelloWorldFrame extends NavigationFrame
 		super(session, new FlowLayout(Axis.Y));	//construct the parent class, flowing vertically
 		setTitle("Hello World Guise Demonstration");	//set the frame label
 		
-		final Label helloWorldLabel=new Label();	//create a label
+		final Label helloWorldLabel=new Label(session);	//create a label
 		helloWorldLabel.getModel().setText("Hello World!");	//set the text of the label, using its model
 		add(helloWorldLabel);	//add the label to the frame
 	}

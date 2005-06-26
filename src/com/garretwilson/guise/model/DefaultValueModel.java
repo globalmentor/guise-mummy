@@ -1,5 +1,6 @@
 package com.garretwilson.guise.model;
 
+import com.garretwilson.guise.session.GuiseSession;
 import com.garretwilson.guise.validator.*;
 import com.garretwilson.lang.ObjectUtilities;
 import static com.garretwilson.lang.ObjectUtilities.*;
@@ -67,11 +68,13 @@ public class DefaultValueModel<V> extends AbstractModel implements ValueModel<V>
 		public Class<V> getValueClass() {return valueClass;}
 
 	/**Constructs an input model indicating the type of value it can hold.
+	@param session The Guise session that owns this model.
 	@param valueClass The class indicating the type of value held in the model.
-	@exception NullPointerException if the given class object is <code>null</code>.
+	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	*/
-	public DefaultValueModel(final Class<V> valueClass)
+	public DefaultValueModel(final GuiseSession<?> session, final Class<V> valueClass)
 	{
+		super(session);	//construct the parent class
 		this.valueClass=checkNull(valueClass);	//store the value class
 	}
 }

@@ -22,11 +22,11 @@ public class HelloUserFrame extends NavigationFrame
 		super(session, new FlowLayout(Axis.Y));	//construct the parent class, flowing vertically
 		setTitle("Hello User Guise Demonstration");	//set the frame label	
 
-		final Label helloUserLabel=new Label();	//create a label
+		final Label helloUserLabel=new Label(session);	//create a label
 		helloUserLabel.setVisible(false);	//don't show the label initially
 		add(helloUserLabel);	//add the label to the frame
 		
-		final ValueControl<String> userInput=new ValueControl<String>(String.class);	//create a text input control
+		final ValueControl<String> userInput=new ValueControl<String>(session, String.class);	//create a text input control
 		userInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<String>()
 				{
 					public void propertyValueChange(PropertyValueChangeEvent<String> propertyValueChangeEvent)

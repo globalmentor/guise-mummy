@@ -1,6 +1,7 @@
 package com.garretwilson.guise.event;
 
 /**An object that listens for action events.
+@param <S> The type of the event source.
 @author Garret Wilson
 */
 public interface ActionListener<S> extends GuiseEventListener<S>

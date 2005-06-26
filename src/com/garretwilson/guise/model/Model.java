@@ -3,11 +3,16 @@ package com.garretwilson.guise.model;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import com.garretwilson.guise.session.GuiseSession;
+
 /**Base interface for all component models.
 @author Garret Wilson
 */
 public interface Model
 {
+
+	/**@return The Guise session that owns this model.*/
+	public GuiseSession<?> getSession();
 
 	/**Adds a property change listener to the listener list.
 		The listener is registered for all properties.

@@ -1,6 +1,7 @@
 package com.garretwilson.guise.component;
 
 import com.garretwilson.guise.model.*;
+import com.garretwilson.guise.session.GuiseSession;
 
 /**A label component.
 @author Garret Wilson
@@ -8,27 +9,35 @@ import com.garretwilson.guise.model.*;
 public class Label extends AbstractModelComponent<MessageModel>
 {
 
-	/**Default constructor with a default identifier and default model.*/
-	public Label()
-	{
-		this(null);	//construct the component, indicating that a default ID should be used
-	}
-
-	/**ID constructor with a default data model.
-	@param id The component identifier.
+	/**Session constructor with a default model.
+	@param session The Guise session that owns this component.
+	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public Label(final String id)
+	public Label(final GuiseSession<?> session)
 	{
-		this(id, new DefaultMessageModel());	//construct the class with a default model
+		this(session, null);	//construct the component, indicating that a default ID should be used
 	}
 
-	/**ID and model constructor.
-	@param id The component identifier.
+	/**Session and ID constructor with a default data model.
+	@param session The Guise session that owns this component.
+	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	@exception NullPointerException if the given session is <code>null</code>.
+	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	*/
+	public Label(final GuiseSession<?> session, final String id)
+	{
+		this(session, id, new DefaultMessageModel(session));	//construct the class with a default model
+	}
+
+	/**Session, ID, and model constructor.
+	@param session The Guise session that owns this component.
+	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@param model The component data model.
-	@exception NullPointerException if the given model is <code>null</code>.
+	@exception NullPointerException if the given session and/or model is <code>null</code>.
+	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public Label(final String id, final MessageModel model)
+	public Label(final GuiseSession<?> session, final String id, final MessageModel model)
 	{
-		super(id, model);	//construct the parent class
+		super(session, id, model);	//construct the parent class
 	}
 }

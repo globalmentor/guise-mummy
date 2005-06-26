@@ -137,9 +137,9 @@ public class AbstractGuiseSession<GC extends GuiseContext> implements GuiseSessi
 		/**Requests navigation to the specified path.
 		The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
 		Later requested navigation before navigation occurs will override this request.
-		@param path A path that is either relative to the application context path or absolute.
+		@param path A path that is either relative to the application context path or is absolute.
 		@exception NullPointerException if the given path is <code>null</code>.
-		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case <code>navigateURI()</code> should be used instead).
+		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 		@see #navigate(URI)
 		*/
 		public void navigate(final String path)

@@ -177,7 +177,7 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext>	implemen
 	@param path The path to be resolved.
 	@return The path resolved against the application context path.
 	@exception NullPointerException if the given path is <code>null</code>.
-	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case <code>resolveURI()</code> should be used instead).
+	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #resolveURI(URI)} should be used instead).
 	@see #resolveURI(URI)
 	*/
 	public String resolvePath(final String path)

@@ -4,7 +4,7 @@ import com.garretwilson.guise.component.layout.*;
 import com.garretwilson.guise.session.GuiseSession;
 
 /**Application frame that represents a point of navigation.
-Each navigation frame must provide either a Guise session constructor; or a Guise session constructor and single ID string constructor.
+Each navigation frame subclass must provide either a Guise session constructor; or a Guise session and string ID constructor.
 @author Garret Wilson
 @see #NavigationFrame(GuiseSession)
 @see #NavigationFrame(GuiseSession, String)
@@ -12,51 +12,46 @@ Each navigation frame must provide either a Guise session constructor; or a Guis
 public class NavigationFrame extends AbstractFrame
 {
 
-	/**The Guise session that owns this frame.*/
-	private final GuiseSession<?> session;
-
-		/**@return The Guise session that owns this frame.*/
-		public GuiseSession<?> getSession() {return session;}
-
 	/**Session constructor with a default vertical flow layout.
-	@param session The Guise session that owns this frame.
-	@exception NullPointerException if the provided session is null.
+	@param session The Guise session that owns this component.
+	@exception NullPointerException if the given session is <code>null</code>.
 	*/
 	public NavigationFrame(final GuiseSession<?> session)
 	{
 		this(session, (String)null);	//construct the component, indicating that a default ID should be used
 	}
 
-	/**ID constructor with a default vertical flow layout.
-	@param session The Guise session that owns this frame.
+	/**Session and ID constructor with a default vertical flow layout.
+	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the provided session is null.
+	@exception NullPointerException if the given session is <code>null</code>.
+	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
 	public NavigationFrame(final GuiseSession<?> session, final String id)
 	{
 		this(session, id, new FlowLayout(Axis.Y));	//default to flowing vertically
 	}
 
-	/**Layout constructor.
-	@param session The Guise session that owns this frame.
+	/**Session and layout constructor.
+	@param session The Guise session that owns this component.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given session or layout is <code>null</code>.
+	@exception NullPointerException if the given session and/or layout is <code>null</code>.
 	*/
 	public NavigationFrame(final GuiseSession<?> session, final Layout layout)
 	{
 		this(session, null, layout);	//construct the component with the layout, indicating that a default ID should be used
 	}
 
-	/**ID and layout constructor.
-	@param session The Guise session that owns this frame.
+	/**Session, ID, and layout constructor.
+	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given session or layout is <code>null</code>.
+	@exception NullPointerException if the given session and/or layout is <code>null</code>.
+	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
 	public NavigationFrame(final GuiseSession<?> session, final String id, final Layout layout)
 	{
-		super(id, layout);	//construct the parent class
-		this.session=session;	//store the session
+		super(session, id, layout);	//construct the parent class
 	}
 
 }

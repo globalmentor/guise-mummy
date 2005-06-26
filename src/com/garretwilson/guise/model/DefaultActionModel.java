@@ -3,6 +3,7 @@ package com.garretwilson.guise.model;
 import java.util.Set;
 
 import com.garretwilson.guise.event.*;
+import com.garretwilson.guise.session.GuiseSession;
 
 /**A default implementation of a button model.
 @author Garret Wilson
@@ -47,11 +48,21 @@ public class DefaultActionModel extends DefaultMessageModel implements ActionMod
 		final Set<ActionListener<ActionModel>> listeners=(Set<ActionListener<ActionModel>>)getEventListenerManager().getListeners(ActionListener.class);
 		if(!listeners.isEmpty())	//if there are listeners
 		{
-			final ActionEvent<ActionModel> actionEvent=new ActionEvent<ActionModel>(this);	//create a new event
+			final ActionEvent<ActionModel> actionEvent=new ActionEvent<ActionModel>(getSession(), this);	//create a new event
 			for(final ActionListener<ActionModel> actionListener:listeners)	//for each action listener
 			{
 				actionListener.onAction(actionEvent);	//dispatch the action
 			}
 		}		
 	}
+
+	/**Session constructor.
+	@param session The Guise session that owns this model.
+	@exception NullPointerException if the given session is <code>null</code>.
+	*/
+	public DefaultActionModel(final GuiseSession<?> session)
+	{
+		super(session);	//construct the parent class
+	}
+
 }

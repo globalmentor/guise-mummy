@@ -3,13 +3,14 @@ package com.garretwilson.guise.component;
 import java.io.IOException;
 
 import com.garretwilson.beans.BoundPropertyObject;
-
-import static com.garretwilson.lang.CharSequenceUtilities.*;
-import static com.garretwilson.lang.ClassUtilities.*;
 import com.garretwilson.event.EventListenerManager;
 import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.Controller;
+import com.garretwilson.guise.session.GuiseSession;
 import com.garretwilson.guise.validator.ValidationException;
+import static com.garretwilson.lang.CharSequenceUtilities.*;
+import static com.garretwilson.lang.ClassUtilities.*;
+import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**An abstract implementation of a component.
 @author Garret Wilson
@@ -187,6 +188,12 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 			}
 		}
 
+	/**The Guise session that owns this component.*/
+	private final GuiseSession<?> session;
+
+		/**@return The Guise session that owns this component.*/
+		public GuiseSession<?> getSession() {return session;}
+
 	/**The style identifier, or <code>null</code> if there is no style ID.*/
 	private String styleID=null;
 
@@ -229,18 +236,24 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 			}
 		}
 
-	/**Default constructor.*/
-	public AbstractComponent()
+	/**Session constructor.
+	@param session The Guise session that owns this component.
+	@exception NullPointerException if the given session is <code>null</code>.
+	*/
+	public AbstractComponent(final GuiseSession<?> session)
 	{
-		this(null);	//construct the component, indicating that a default ID should be used
+		this(session, null);	//construct the component, indicating that a default ID should be used
 	}
 
-	/**ID constructor.
+	/**Session and ID constructor.
+	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractComponent(final String id)
+	public AbstractComponent(final GuiseSession<?> session, final String id)
 	{
+		this.session=checkNull(session, "Session cannot be null");	//save the session
 		if(id!=null)	//if an ID was provided
 		{
 			this.id=checkValidComponentID(id);	//save the ID, checking for compliance

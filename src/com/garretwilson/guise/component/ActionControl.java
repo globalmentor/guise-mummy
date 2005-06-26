@@ -2,6 +2,7 @@ package com.garretwilson.guise.component;
 
 import com.garretwilson.guise.model.ActionModel;
 import com.garretwilson.guise.model.DefaultActionModel;
+import com.garretwilson.guise.session.GuiseSession;
 
 /**Action control such as a button.
 @author Garret Wilson
@@ -9,29 +10,36 @@ import com.garretwilson.guise.model.DefaultActionModel;
 public class ActionControl extends AbstractControl<ActionModel>
 {
 
-	/**Default constructor with a default identifier and default data model.*/
-	public ActionControl()
-	{
-		this(null);	//construct the component, indicating that a default ID should be used
-	}
-
-	/**ID constructor with a default data model.
-	@param id The component identifier.
-	@exception NullPointerException if the given identifier is <code>null</code>.
+	/**Session constructor with a default data model.
+	@param session The Guise session that owns this component.
+	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public ActionControl(final String id)
+	public ActionControl(final GuiseSession<?> session)
 	{
-		this(id, new DefaultActionModel());	//construct the class with a default model
+		this(session, null);	//construct the component, indicating that a default ID should be used
 	}
 
-	/**ID and model constructor.
-	@param id The component identifier.
+	/**Session and ID constructor with a default data model.
+	@param session The Guise session that owns this component.
+	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	@exception NullPointerException if the given session is <code>null</code>.
+	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	*/
+	public ActionControl(final GuiseSession<?> session, final String id)
+	{
+		this(session, id, new DefaultActionModel(session));	//construct the class with a default model
+	}
+
+	/**Session, ID, and model constructor.
+	@param session The Guise session that owns this component.
+	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@param model The component data model.
-	@exception NullPointerException if the given model is <code>null</code>.
+	@exception NullPointerException if the given session and/or model is <code>null</code>.
+	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public ActionControl(final String id, final ActionModel model)
+	public ActionControl(final GuiseSession<?> session, final String id, final ActionModel model)
 	{
-		super(id, model);	//construct the parent class
+		super(session, id, model);	//construct the parent class
 	}
 
 }

@@ -2,11 +2,20 @@ package com.garretwilson.guise.event;
 
 import java.util.EventObject;
 
+import com.garretwilson.guise.session.GuiseSession;
+import static com.garretwilson.lang.ObjectUtilities.*;
+
 /**The base class for all Guise events.
 @author Garret Wilson
 */
 public class GuiseEvent<S> extends EventObject
 {
+
+	/**The Guise session in which this event was generated.*/
+	private final GuiseSession<?> session;
+
+		/**@return The Guise session in which this event was generated.*/
+		public GuiseSession<?> getSession() {return session;}
 
 	/**@return The source of the event.*/
 	@SuppressWarnings("unchecked")
@@ -15,13 +24,15 @@ public class GuiseEvent<S> extends EventObject
 		return (S)super.getSource();	//cast the event to the appropriate type
 	}
 
-	/**Source constructor.
+	/**Session and source constructor.
+	@param session The Guise session in which this event was generated.
 	@param source The object on which the event initially occurred.
-	@exception IllegalArgumentException if source is <code>null</code>.
+	@exception NullPointerException if the given session and/or source is <code>null</code>.
 	*/
-	public GuiseEvent(final S source)
+	public GuiseEvent(final GuiseSession<?> session, final S source)
 	{
-		super(source);	//construct the parent class
+		super(checkNull(source, "Event source object cannot be null"));	//construct the parent class
+		this.session=checkNull(session, "Session cannot be null");	//save the session
 	}
 
 }

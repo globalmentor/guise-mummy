@@ -6,9 +6,11 @@ import java.io.IOException;
 
 import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.Controller;
+import com.garretwilson.guise.session.GuiseSession;
 import com.garretwilson.guise.validator.ValidationException;
 
 /**Base interface for all Guise components.
+Each component must provide either a Guise session constructor; or a Guise session and string ID constructor.
 @author Garret Wilson
 */
 public interface Component<C extends Component<C>>
@@ -72,6 +74,9 @@ public interface Component<C extends Component<C>>
 	@exception IllegalArgumentException if a parent is provided and the given parent does not already recognize this component as its child.
 	*/
 	public void setParent(final Container newParent);
+
+	/**@return The Guise session that owns this component.*/
+	public GuiseSession<?> getSession();
 
 	/**@return The style identifier, or <code>null</code> if there is no style ID.*/
 	public String getStyleID();
