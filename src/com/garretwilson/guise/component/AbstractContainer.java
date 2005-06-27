@@ -15,6 +15,8 @@ This implementation uses a lazily-created list of child components, making empty
 public class AbstractContainer extends AbstractComponent<Container> implements Container
 {
 
+//TODO synchronize the child component list
+
 	/**The character used when building absolute IDs.*/
 	protected final static char ABSOLUTE_ID_SEGMENT_DELIMITER=':';
 
@@ -37,7 +39,7 @@ public class AbstractContainer extends AbstractComponent<Container> implements C
 		return componentList!=null ? componentList.iterator() : new EmptyIterator<Component<?>>();	//return an iterator to the components, returning an empty iterator if the component list has not been created
 	}
 
-	/**Adds a component to the container
+	/**Adds a component to the container.
 	@param component The component to add.
 	@exception IllegalArgumentException if the component is already a member of a container.
 	*/
@@ -163,7 +165,16 @@ public class AbstractContainer extends AbstractComponent<Container> implements C
 	*/
 	public String getAbsoluteUniqueID(final Component<?> childComponent)
 	{
-		return getAbsoluteUniqueID()+getAbsoluteIDSegmentDelimiter()+getUniqueID(childComponent);	//concatenate our own absolute unique ID and the local unique ID of the child, separated by the correct delimiter character
+		return getAbsoluteUniqueID(getUniqueID(childComponent));	//return the absolute form of the unique ID of the child component
 	}
 
+	/**Determines the absolute unique ID up the component's hierarchy for the given local unique ID.
+	This method is useful for generating radio button group identifiers, for example.
+	@param uniqueID An identifier unique within this container.
+	@return An absolute form of the given identifier unique up the component's hierarchy.
+	*/
+	protected String getAbsoluteUniqueID(final String uniqueID)
+	{
+		return getAbsoluteUniqueID()+getAbsoluteIDSegmentDelimiter()+uniqueID;	//concatenate our own absolute unique ID and the local unique ID of the child, separated by the correct delimiter character		
+	}
 }

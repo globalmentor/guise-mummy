@@ -14,6 +14,17 @@ public class CSSStyleConstants
 	/**The URI of the Guise XHTML CSS stylesheet.*/
 	public final static URI GUISE_XHTML_CSS_STYLESHEET_URI=URI.create(addExtension("guise", CSS_EXTENSION));
 
+	/**The CSS class for a standalone label component.*/
+	public final static String LABEL_CLASS="label";
+	/**The CSS class for the label part of a component.*/
+	public final static String COMPONENT_LABEL_CLASS="component-label";
+	/**The CSS class for the component part of a component.*/
+	public final static String COMPONENT_COMPONENT_CLASS="component-component";
+	/**The CSS class for the error part of a component.*/
+	public final static String COMPONENT_ERROR_CLASS="component-error";
+	
+	//layout
+	
 	/**The CSS class for horizontal flow layout children.*/
 	public final static String LAYOUT_FLOW_X_CHILD_CLASS="layout-flow-x-child";
 

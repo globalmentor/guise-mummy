@@ -6,9 +6,10 @@ import com.garretwilson.lang.ObjectUtilities;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**A default implementation of a model for user input.
+@param <V> The type of value contained in the model.
 @author Garret Wilson
 */
-public class DefaultValueModel<V> extends AbstractModel implements ValueModel<V>
+public class DefaultValueModel<V> extends DefaultMessageModel implements ValueModel<V>
 {
 
 	/**The input value, or <code>null</code> if there is no value.*/

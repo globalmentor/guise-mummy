@@ -78,30 +78,30 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext>	implemen
 //TODO fix	@SuppressWarnings("unchecked")
 	protected <C extends Component> Class<? extends Controller<GC, C>> getControllerClass(final Class<C> componentClass)
 	{
-		Class<? extends Controller> renderStrategyClass=getRegisteredControllerClass(componentClass);	//see if there is a controller class registered for this component type
-		if(renderStrategyClass==null)	//if we didn't find a render strategy for this class, check the super class
+		Class<? extends Controller> controllerClass=getRegisteredControllerClass(componentClass);	//see if there is a controller class registered for this component type
+		if(controllerClass==null)	//if we didn't find a render strategy for this class, check the super class
 		{
 			final Class<?> superClass=componentClass.getSuperclass();	//get the super class of the component
 			if(superClass!=null && Component.class.isAssignableFrom(superClass))	//if the super class is a component
 			{
-				renderStrategyClass=getControllerClass((Class<? extends C>)superClass);	//check the super class
+				controllerClass=getControllerClass((Class<? extends C>)superClass);	//check the super class
 			}
 		}
-		if(renderStrategyClass==null)	//if we still couldn't find a render strategy for this class, check the interfaces
+		if(controllerClass==null)	//if we still couldn't find a render strategy for this class, check the interfaces
 		{
 			for(final Class<?> classInterface:componentClass.getInterfaces())	//look at each implemented interface
 			{
 				if(Component.class.isAssignableFrom(classInterface))	//if the class interface is a component
 				{
-					renderStrategyClass=getControllerClass((Class<? extends C>)classInterface);	//check the interface
-					if(renderStrategyClass!=null)	//if we found a render strategy class
+					controllerClass=getControllerClass((Class<? extends C>)classInterface);	//check the interface
+					if(controllerClass!=null)	//if we found a render strategy class
 					{
 						break;	//stop looking at the interfaces
 					}
 				}					
 			}
 		}
-		return renderStrategyClass;	//show which if any render strategy class we found
+		return controllerClass;	//show which if any render strategy class we found
 	}
 
 	/**Determines the controller appropriate for the given component.

@@ -39,6 +39,7 @@ public interface Container extends Component<Container>, Iterable<Component<?>>
 	@param childComponent A component within this container.
 	@return An absolute identifier of the given component unique up the component's hierarchy.
 	@exception IllegalArgumentException if the given component is not a child of this container.
+	@see #getAbsoluteUniqueID(String)
 	*/
 	public String getAbsoluteUniqueID(final Component<?> childComponent);
 

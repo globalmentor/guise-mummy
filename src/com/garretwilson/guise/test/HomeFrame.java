@@ -1,5 +1,7 @@
 package com.garretwilson.guise.test;
 
+import java.net.URI;
+
 import com.garretwilson.beans.AbstractPropertyValueChangeListener;
 import com.garretwilson.beans.PropertyValueChangeEvent;
 import com.garretwilson.guise.component.*;
@@ -7,10 +9,14 @@ import com.garretwilson.guise.component.layout.*;
 import com.garretwilson.guise.event.ActionEvent;
 import com.garretwilson.guise.event.ActionListener;
 import com.garretwilson.guise.event.NavigateActionListener;
+import com.garretwilson.guise.model.AbstractModelGroup;
 import com.garretwilson.guise.model.ActionModel;
+import com.garretwilson.guise.model.ModelGroup;
+import com.garretwilson.guise.model.MutualExclusionBooleanModelGroup;
 import com.garretwilson.guise.model.ValueModel;
 import com.garretwilson.guise.session.GuiseSession;
 import com.garretwilson.guise.validator.RegularExpressionStringValidator;
+import com.garretwilson.util.Debug;
 
 /**Test frame for a home page.
 @author Garret Wilson
@@ -67,6 +73,23 @@ public class HomeFrame extends NavigationFrame
 				});
 		textInput.getModel().setValidator(new RegularExpressionStringValidator("[a-z]*"));
 		add(textInput);
+	
+	
+	
+	
+	
+		final Panel booleanPanel=new Panel(session, new FlowLayout(Axis.Y));	//create a panel flowing vertically
+		final CheckControl check1=new CheckControl(session, "check1");
+		check1.setCheckType(CheckControl.CheckType.ELLIPSE);
+		booleanPanel.add(check1);	
+		final CheckControl check2=new CheckControl(session, "check2");	
+		check2.setCheckType(CheckControl.CheckType.ELLIPSE);
+		booleanPanel.add(check2);	
+		final ModelGroup<ValueModel<Boolean>> booleanGroup=new MutualExclusionBooleanModelGroup();
+		booleanGroup.add(check1.getModel());
+		booleanGroup.add(check2.getModel());
+		
+		add(booleanPanel);
 	}
 
 }

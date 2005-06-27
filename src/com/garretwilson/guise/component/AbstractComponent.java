@@ -154,7 +154,7 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 
 		/**Sets the parent of this component.
 		This method is managed by containers, and should usually never be called my other classes.
-		In order to hinder inadvertent incorrect use, the parent must only be set after the component is added to the container, and only be unset after the component is removed from the container.
+		In order to guard against inadvertent incorrect use, the parent must only be set after the component is added to the container, and only be unset after the component is removed from the container.
 		If a component is given the same parent it already has, no action occurs.
 		@param newParent The new parent for this component, or <code>null</code> if this component is being removed from a container.
 		@exception IllegalStateException if a parent is provided and this component already has a parent.
