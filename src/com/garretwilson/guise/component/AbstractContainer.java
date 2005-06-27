@@ -1,6 +1,7 @@
 package com.garretwilson.guise.component;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.garretwilson.guise.component.layout.*;
 import com.garretwilson.guise.session.GuiseSession;
@@ -10,34 +11,23 @@ import com.garretwilson.util.EmptyIterator;
 
 /**Abstract implementation of a container component.
 This implementation uses a lazily-created list of child components, making empty containers lightweight.
+Iterating over child components is thread safe.
 @author Garret Wilson
 */
 public class AbstractContainer extends AbstractComponent<Container> implements Container
 {
 
-//TODO synchronize the child component list
-
 	/**The character used when building absolute IDs.*/
 	protected final static char ABSOLUTE_ID_SEGMENT_DELIMITER=':';
 
-	/**The lazily-created list of child components.*/ 
-	private List<Component<?>> componentList=null;
+	/**The list of child components.*/ 
+	private final List<Component<?>> componentList=new CopyOnWriteArrayList<Component<?>>();	//create a new component list, using a thread-safe array that takes into consideration that adding or removing children usually takes place up-front, and most later access will be only reads
 
-	/**@return The lazily-created list of child components.*/ 
-	private List<Component<?>> getComponentList()
-	{
-		if(componentList==null)	//if there is no component list
-		{
-			componentList=new ArrayList<Component<?>>();	//create a new component list
-		}
-		return componentList;	//return the list of components
-	}
+		/**@return The list of child components.*/ 
+		protected List<Component<?>> getComponentList() {return componentList;}
 
 	/**@return An iterator to contained components.*/
-	public Iterator<Component<?>> iterator()
-	{
-		return componentList!=null ? componentList.iterator() : new EmptyIterator<Component<?>>();	//return an iterator to the components, returning an empty iterator if the component list has not been created
-	}
+	public Iterator<Component<?>> iterator() {return componentList.iterator();}
 
 	/**Adds a component to the container.
 	@param component The component to add.
@@ -49,7 +39,7 @@ public class AbstractContainer extends AbstractComponent<Container> implements C
 		{
 			throw new IllegalArgumentException("Component "+component+" is already a member of a container, "+component.getParent()+".");
 		}
-		getComponentList().add(component);	//add the component to the list
+		componentList.add(component);	//add the component to the list
 		component.setParent(this);	//tell the component who its parent is
 	}
 
@@ -57,10 +47,7 @@ public class AbstractContainer extends AbstractComponent<Container> implements C
 	@param component The component to check.
 	@return <code>true</code> if this container contains the given component.
 	*/
-	public boolean contains(final Component<?> component)
-	{
-		return componentList!=null ? componentList.contains(component) : false;	//if we have a component list, ask it whether it contains this component
-	}
+	public boolean contains(final Component<?> component) {return componentList.contains(component);}
 
 	/**The layout definition for the container.*/
 	private final Layout layout;
