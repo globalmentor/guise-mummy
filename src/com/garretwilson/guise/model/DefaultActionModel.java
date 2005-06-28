@@ -1,5 +1,6 @@
 package com.garretwilson.guise.model;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import com.garretwilson.guise.event.*;
@@ -45,13 +46,13 @@ public class DefaultActionModel extends DefaultMessageModel implements ActionMod
 	@SuppressWarnings("unchecked")
 	public void fireAction()
 	{
-		final Set<ActionListener<ActionModel>> listeners=(Set<ActionListener<ActionModel>>)getEventListenerManager().getListeners(ActionListener.class);
-		if(!listeners.isEmpty())	//if there are listeners
+		final Iterator<ActionListener<ActionModel>> listeners=(Iterator<ActionListener<ActionModel>>)getEventListenerManager().getListeners(ActionListener.class);	//get an iterator to the listeners
+		if(listeners.hasNext())	//if there are listeners
 		{
 			final ActionEvent<ActionModel> actionEvent=new ActionEvent<ActionModel>(getSession(), this);	//create a new event
-			for(final ActionListener<ActionModel> actionListener:listeners)	//for each action listener
+			while(listeners.hasNext())	//for each action listener
 			{
-				actionListener.onAction(actionEvent);	//dispatch the action
+				listeners.next().onAction(actionEvent);	//dispatch the action
 			}
 		}		
 	}

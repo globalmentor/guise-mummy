@@ -2,6 +2,7 @@ package com.garretwilson.guise.component;
 
 import java.io.IOException;
 
+import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.Controller;
 import static com.garretwilson.lang.ClassUtilities.*;
@@ -12,7 +13,7 @@ import com.garretwilson.guise.validator.ValidationException;
 Each component must provide either a Guise session constructor; or a Guise session and string ID constructor.
 @author Garret Wilson
 */
-public interface Component<C extends Component<C>>
+public interface Component<C extends Component<C>> extends PropertyBindable
 {
 
 	/**The bound property of the controller.*/

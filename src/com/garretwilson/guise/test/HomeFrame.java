@@ -12,7 +12,7 @@ import com.garretwilson.guise.event.NavigateActionListener;
 import com.garretwilson.guise.model.AbstractModelGroup;
 import com.garretwilson.guise.model.ActionModel;
 import com.garretwilson.guise.model.ModelGroup;
-import com.garretwilson.guise.model.MutualExclusionBooleanModelGroup;
+import com.garretwilson.guise.model.MutualExclusionModelGroup;
 import com.garretwilson.guise.model.ValueModel;
 import com.garretwilson.guise.session.GuiseSession;
 import com.garretwilson.guise.validator.RegularExpressionStringValidator;
@@ -85,7 +85,7 @@ public class HomeFrame extends NavigationFrame
 		final CheckControl check2=new CheckControl(session, "check2");	
 		check2.setCheckType(CheckControl.CheckType.ELLIPSE);
 		booleanPanel.add(check2);	
-		final ModelGroup<ValueModel<Boolean>> booleanGroup=new MutualExclusionBooleanModelGroup();
+		final ModelGroup<ValueModel<Boolean>> booleanGroup=new MutualExclusionModelGroup();
 		booleanGroup.add(check1.getModel());
 		booleanGroup.add(check2.getModel());
 		
