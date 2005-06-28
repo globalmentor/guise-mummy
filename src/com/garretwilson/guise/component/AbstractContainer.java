@@ -14,7 +14,7 @@ This implementation uses a lazily-created list of child components, making empty
 Iterating over child components is thread safe.
 @author Garret Wilson
 */
-public class AbstractContainer extends AbstractComponent<Container> implements Container
+public abstract class AbstractContainer<C extends Container<C>> extends AbstractComponent<C> implements Container<C>
 {
 
 	/**The character used when building absolute IDs.*/

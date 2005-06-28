@@ -7,7 +7,7 @@ import com.garretwilson.guise.session.GuiseSession;
 /**Action control such as a button.
 @author Garret Wilson
 */
-public class ActionControl extends AbstractControl<ActionModel>
+public class ActionControl extends AbstractControl<ActionModel, ActionControl>
 {
 
 	/**Session constructor with a default data model.

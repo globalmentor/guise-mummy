@@ -7,7 +7,7 @@ import com.garretwilson.guise.validator.*;
 @param <V> The type of value contained in the model.
 @author Garret Wilson
 */
-public interface ValueModel<V> extends MessageModel
+public interface ValueModel<V> extends LabelModel
 {
 
 	/**The value bound property.*/

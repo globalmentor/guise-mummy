@@ -1,7 +1,6 @@
 package com.garretwilson.guise.model;
 
 import java.util.Iterator;
-import java.util.Set;
 
 import com.garretwilson.guise.event.*;
 import com.garretwilson.guise.session.GuiseSession;
@@ -9,7 +8,7 @@ import com.garretwilson.guise.session.GuiseSession;
 /**A default implementation of a button model.
 @author Garret Wilson
 */
-public class DefaultActionModel extends DefaultMessageModel implements ActionModel
+public class DefaultActionModel extends DefaultLabelModel implements ActionModel
 {
 
 	/**Whether the button is pressed.*/

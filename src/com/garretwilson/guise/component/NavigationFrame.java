@@ -9,7 +9,7 @@ Each navigation frame subclass must provide either a Guise session constructor; 
 @see #NavigationFrame(GuiseSession)
 @see #NavigationFrame(GuiseSession, String)
 */
-public class NavigationFrame extends AbstractFrame
+public class NavigationFrame extends AbstractFrame<NavigationFrame>
 {
 
 	/**Session constructor with a default vertical flow layout.

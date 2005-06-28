@@ -139,9 +139,9 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 		@return The first ancestor container of the given type, or <code>null</code> if this component has no such ancestor.
 		*/
 		@SuppressWarnings("unchecked")	//we check to see if the ancestor is of the correct type before casting, so the cast is logically checked, though not syntactically checked
-		public <A extends Container> A getAncestor(final Class<A> ancestorClass)
+		public <A extends Container<?>> A getAncestor(final Class<A> ancestorClass)
 		{
-			final Container parent=getParent();	//get this component's parent
+			final Container<?> parent=getParent();	//get this component's parent
 			if(parent!=null)	//if there is a parent
 			{
 				return ancestorClass.isInstance(parent) ? (A)parent : parent.getAncestor(ancestorClass);	//if the parent is of the correct type, return it; otherwise, ask it to search its own ancestors

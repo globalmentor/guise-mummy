@@ -6,7 +6,7 @@ import com.garretwilson.guise.session.GuiseSession;
 /**A label component.
 @author Garret Wilson
 */
-public class Label extends AbstractModelComponent<MessageModel>
+public class Label extends AbstractModelComponent<LabelModel, Label>
 {
 
 	/**Session constructor with a default model.
@@ -26,7 +26,7 @@ public class Label extends AbstractModelComponent<MessageModel>
 	*/
 	public Label(final GuiseSession<?> session, final String id)
 	{
-		this(session, id, new DefaultMessageModel(session));	//construct the class with a default model
+		this(session, id, new DefaultLabelModel(session));	//construct the class with a default model
 	}
 
 	/**Session, ID, and model constructor.
@@ -36,7 +36,7 @@ public class Label extends AbstractModelComponent<MessageModel>
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public Label(final GuiseSession<?> session, final String id, final MessageModel model)
+	public Label(final GuiseSession<?> session, final String id, final LabelModel model)
 	{
 		super(session, id, model);	//construct the parent class
 	}

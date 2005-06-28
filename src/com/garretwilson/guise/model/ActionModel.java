@@ -5,7 +5,7 @@ import com.garretwilson.guise.event.ActionListener;
 /**A model for a potential action.
 @author Garret Wilson
 */
-public interface ActionModel extends MessageModel
+public interface ActionModel extends LabelModel
 {
 
 	/**@return Whether the button is pressed.*/

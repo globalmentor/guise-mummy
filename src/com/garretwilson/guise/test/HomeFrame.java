@@ -39,36 +39,37 @@ public class HomeFrame extends NavigationFrame
 	public HomeFrame(final GuiseSession<?> session, final String id)
 	{
 		super(session, id, new FlowLayout(Axis.Y));	//construct the parent class, flowing verticallly
-		setTitle("Home Frame Test");	//set the frame label
+		getModel().setLabel("Home Frame Test");	//set the frame label
 		
 		final Label testLabel=new Label(session, "testLabel");
 		testLabel.setStyleID("title");
-		testLabel.getModel().setText("This is label text from the model.");
+		testLabel.getModel().setLabel("This is label text from the model.");
 		add(testLabel);	//add a new label
 		
 		final Panel buttonPanel=new Panel(session, "testButtonPanel", new FlowLayout(Axis.X));	//create a panel flowing horizontally
 
 		final ActionControl testButton=new ActionControl(session, "testButton");
-		testButton.getModel().setText("Click here to go to the 'Hello World' demo.");
+		testButton.getModel().setLabel("Click here to go to the 'Hello World' demo.");
 		testButton.getModel().addActionListener(new NavigateActionListener<ActionModel>("helloworld"));
 		buttonPanel.add(testButton);	//add a new button
 		final ActionControl testButton2=new ActionControl(session, "testButton2");
-		testButton2.getModel().setText("Click this button to change the text.");
+		testButton2.getModel().setLabel("Click this button to change the text.");
 		testButton2.getModel().addActionListener(new ActionListener<ActionModel>()
 				{
 					public void onAction(ActionEvent<ActionModel> actionEvent)
 					{
-						testLabel.getModel().setText("You pressed the button!");
+						testLabel.getModel().setLabel("You pressed the button!");
 					}
 				});
 		buttonPanel.add(testButton2);	//add a new button
 		add(buttonPanel);	//add the button panel to the frame
 		final ValueControl<String> textInput=new ValueControl<String>(session, "textInput", String.class);	//create a text input control
+		textInput.getModel().setLabel("This is the text input label.");
 		textInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<String>()
 				{
 					public void propertyValueChange(PropertyValueChangeEvent<String> propertyValueChangeEvent)
 					{
-						testLabel.getModel().setText(propertyValueChangeEvent.getNewValue());
+						testLabel.getModel().setLabel(propertyValueChangeEvent.getNewValue());
 					}
 				});
 		textInput.getModel().setValidator(new RegularExpressionStringValidator("[a-z]*"));
@@ -81,9 +82,11 @@ public class HomeFrame extends NavigationFrame
 		final Panel booleanPanel=new Panel(session, new FlowLayout(Axis.Y));	//create a panel flowing vertically
 		final CheckControl check1=new CheckControl(session, "check1");
 		check1.setCheckType(CheckControl.CheckType.ELLIPSE);
+		check1.getModel().setLabel("First check");
 		booleanPanel.add(check1);	
 		final CheckControl check2=new CheckControl(session, "check2");	
 		check2.setCheckType(CheckControl.CheckType.ELLIPSE);
+		check2.getModel().setLabel("Second check");
 		booleanPanel.add(check2);	
 		final ModelGroup<ValueModel<Boolean>> booleanGroup=new MutualExclusionModelGroup();
 		booleanGroup.add(check1.getModel());

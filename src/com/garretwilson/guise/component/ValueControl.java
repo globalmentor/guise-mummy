@@ -7,7 +7,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 /**Control to accept input from the user.
 @author Garret Wilson
 */
-public class ValueControl<V> extends AbstractControl<ValueModel<V>>
+public class ValueControl<V> extends AbstractControl<ValueModel<V>, ValueControl<V>>
 {
 
 	/**Session constructor with a default data model to represent a given type.

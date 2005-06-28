@@ -6,7 +6,7 @@ import com.garretwilson.guise.session.GuiseSession;
 /**An abstract base class for boxes.
 @author Garret Wilson
 */
-public class AbstractBox extends AbstractContainer implements Box
+public abstract class AbstractBox<C extends Box<C>> extends AbstractContainer<C> implements Box<C>
 {
 
 	/**Session constructor with a default vertical flow layout.

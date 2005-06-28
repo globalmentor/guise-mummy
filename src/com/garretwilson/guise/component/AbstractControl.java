@@ -6,7 +6,7 @@ import com.garretwilson.guise.session.GuiseSession;
 /**An abstract implementation of a model component that allows user interaction to modify the model.
 @author Garret Wilson
 */
-public class AbstractControl<M extends Model> extends AbstractModelComponent<M> implements Control<M>
+public abstract class AbstractControl<M extends Model, C extends Control<M, C>> extends AbstractModelComponent<M, C> implements Control<M, C>
 {
 
 	/**Session, ID, and model constructor.

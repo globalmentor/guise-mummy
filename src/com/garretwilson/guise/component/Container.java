@@ -6,7 +6,7 @@ import com.garretwilson.guise.component.layout.Layout;
 A container is iterable, and can be used in short <code>for(:)</code> form. 
 @author Garret Wilson
 */
-public interface Container extends Component<Container>, Iterable<Component<?>>
+public interface Container<C extends Container<C>> extends Component<C>, Iterable<Component<?>>
 {
 
 	/**Adds a component to the container

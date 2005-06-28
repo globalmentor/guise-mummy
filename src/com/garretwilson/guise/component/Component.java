@@ -62,7 +62,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@param ancestorClass The class of ancestor container requested.
 	@return The first ancestor container of the given type, or <code>null</code> if this component has no such ancestor.
 	*/
-	public <A extends Container> A getAncestor(final Class<A> ancestorClass);
+	public <A extends Container<?>> A getAncestor(final Class<A> ancestorClass);
 
 	/**Sets the parent of this component.
 	This method is managed by containers, and should usually never be called my other classes.

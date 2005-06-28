@@ -20,20 +20,20 @@ public class HelloUserFrame extends NavigationFrame
 	public HelloUserFrame(final GuiseSession<?> session)
 	{
 		super(session, new FlowLayout(Axis.Y));	//construct the parent class, flowing vertically
-		setTitle("Hello User Guise Demonstration");	//set the frame title	
+		getModel().setLabel("Hello User Guise Demonstration");	//set the frame title	
 
 		final Label helloUserLabel=new Label(session);	//create a label
 		helloUserLabel.setVisible(false);	//don't show the label initially
 		add(helloUserLabel);	//add the label to the frame
 		
 		final ValueControl<String> userInput=new ValueControl<String>(session, String.class);	//create a text input control
-		userInput.getModel().setText("What's your name?");	//add a label to the text input control
+		userInput.getModel().setLabel("What's your name?");	//add a label to the text input control
 		userInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<String>()
 				{
 					public void propertyValueChange(PropertyValueChangeEvent<String> propertyValueChangeEvent)
 					{
 						final String user=propertyValueChangeEvent.getNewValue();	//get the name the user entered
-						helloUserLabel.getModel().setText("Hello, "+user+"!");	//update the label
+						helloUserLabel.getModel().setLabel("Hello, "+user+"!");	//update the label
 						helloUserLabel.setVisible(true);	//make the label visible
 					}
 				});
