@@ -3,6 +3,8 @@ package com.garretwilson.guise.model;
 import com.garretwilson.guise.session.GuiseSession;
 import com.garretwilson.guise.validator.*;
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.util.Debug;
+
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**A default implementation of a model for user input.
@@ -76,6 +78,6 @@ public class DefaultValueModel<V> extends DefaultLabelModel implements ValueMode
 	public DefaultValueModel(final GuiseSession<?> session, final Class<V> valueClass)
 	{
 		super(session);	//construct the parent class
-		this.valueClass=checkNull(valueClass);	//store the value class
+		this.valueClass=checkNull(valueClass, "Value class cannot be null.");	//store the value class
 	}
 }

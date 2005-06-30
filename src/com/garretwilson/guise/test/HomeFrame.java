@@ -63,7 +63,7 @@ public class HomeFrame extends NavigationFrame
 				});
 		buttonPanel.add(testButton2);	//add a new button
 		add(buttonPanel);	//add the button panel to the frame
-		final ValueControl<String> textInput=new ValueControl<String>(session, "textInput", String.class);	//create a text input control
+		final TextControl<String> textInput=new TextControl<String>(session, "textInput", String.class);	//create a text input control
 		textInput.getModel().setLabel("This is the text input label.");
 		textInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<String>()
 				{
@@ -72,14 +72,16 @@ public class HomeFrame extends NavigationFrame
 						testLabel.getModel().setLabel(propertyValueChangeEvent.getNewValue());
 					}
 				});
-		textInput.getModel().setValidator(new RegularExpressionStringValidator("[a-z]*"));
+//TODO del		textInput.getModel().setValidator(new RegularExpressionStringValidator("[a-z]*"));
 		add(textInput);
 	
 	
 	
+		final Panel horizontalPanel=new Panel(session, new FlowLayout(Axis.X));	//create a panel flowing horizontally
 	
 	
 		final Panel booleanPanel=new Panel(session, new FlowLayout(Axis.Y));	//create a panel flowing vertically
+		booleanPanel.getModel().setLabel("Check one of these");
 		final CheckControl check1=new CheckControl(session, "check1");
 		check1.setCheckType(CheckControl.CheckType.ELLIPSE);
 		check1.getModel().setLabel("First check");
@@ -91,8 +93,30 @@ public class HomeFrame extends NavigationFrame
 		final ModelGroup<ValueModel<Boolean>> booleanGroup=new MutualExclusionModelGroup();
 		booleanGroup.add(check1.getModel());
 		booleanGroup.add(check2.getModel());
-		
-		add(booleanPanel);
+	
+		horizontalPanel.add(booleanPanel);
+
+		final ActionControl testButtona=new ActionControl(session, "testButton");
+		testButtona.getModel().setLabel("Nuther button.");
+		horizontalPanel.add(testButtona);	//add a new button
+/*TODO fix		
+		final Panel booleanPanela=new Panel(session, new FlowLayout(Axis.Y));	//create a panel flowing vertically
+		booleanPanela.getModel().setLabel("Check one of these");
+		final CheckControl check1a=new CheckControl(session, "check1");
+		check1a.setCheckType(CheckControl.CheckType.ELLIPSE);
+		check1a.getModel().setLabel("First check");
+		booleanPanela.add(check1a);	
+		final CheckControl check2a=new CheckControl(session, "check2");	
+		check2a.setCheckType(CheckControl.CheckType.ELLIPSE);
+		check2a.getModel().setLabel("Second check");
+		booleanPanela.add(check2a);	
+		final ModelGroup<ValueModel<Boolean>> booleanGroupa=new MutualExclusionModelGroup();
+		booleanGroupa.add(check1a.getModel());
+		booleanGroupa.add(check2a.getModel());
+
+		horizontalPanel.add(booleanPanela);
+*/
+		add(horizontalPanel);
 	}
 
 }

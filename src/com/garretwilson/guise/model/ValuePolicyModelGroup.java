@@ -44,4 +44,14 @@ public abstract class ValuePolicyModelGroup<V> extends AbstractModelGroup<ValueM
 	{
 		propertyValueChange((PropertyValueChangeEvent<V>)AbstractPropertyValueChangeListener.getPropertyValueChangeEvent(propertyChangeEvent));	//call the generic version of the method with the genericized event object
 	}
+
+	/**Model constructor.
+	@param models Zero or more models with which to initially place in the group.
+	@exception NullPointerException if one of the models is <code>null</code>.
+	*/
+	public ValuePolicyModelGroup(final ValueModel<V>... models)
+	{
+		super(models);	//construct the parent class
+	}
+
 }

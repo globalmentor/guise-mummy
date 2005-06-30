@@ -13,6 +13,15 @@ This allows controllers to make assumptions about models with only this listener
 public final class MutualExclusionModelGroup extends ValuePolicyModelGroup<Boolean>
 {
 
+	/**Model constructor.
+	@param models Zero or more models with which to initially place in the group.
+	@exception NullPointerException if one of the models is <code>null</code>.
+	*/
+	public MutualExclusionModelGroup(final ValueModel<Boolean>... models)
+	{
+		super(models);	//construct the parent class
+	}
+
 	/**Called when the boolean model value is changed.
 	@param propertyValueChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
 	*/

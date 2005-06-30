@@ -26,7 +26,7 @@ public class HelloUserFrame extends NavigationFrame
 		helloUserLabel.setVisible(false);	//don't show the label initially
 		add(helloUserLabel);	//add the label to the frame
 		
-		final ValueControl<String> userInput=new ValueControl<String>(session, String.class);	//create a text input control
+		final TextControl<String> userInput=new TextControl<String>(session, String.class);	//create a text input control to retrieve a string
 		userInput.getModel().setLabel("What's your name?");	//add a label to the text input control
 		userInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<String>()
 				{
