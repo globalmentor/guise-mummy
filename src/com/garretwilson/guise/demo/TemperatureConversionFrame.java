@@ -14,7 +14,8 @@ import com.garretwilson.guise.validator.ValueRequiredValidator;
 
 /**Temperature Conversion Guise demonstration frame.
 Copyright © 2005 GlobalMentor, Inc.
-Demonstrates integer input controls, integer input validation, radio button controls, required value validation, style IDs, validation.
+Demonstrates float input controls, float input validation, radio button controls,
+	required value validation, disabled controls, and style IDs.
 @author Garret Wilson
 */
 public class TemperatureConversionFrame extends NavigationFrame
@@ -29,7 +30,23 @@ public class TemperatureConversionFrame extends NavigationFrame
 		getModel().setLabel("Temperature Conversion Guise Demonstration");	//set the frame title	
 
 		final Panel temperaturePanel=new Panel(session, new FlowLayout(Axis.X));	//create the root panel flowing horizontally
-				
+
+			//input panel
+		final Panel inputPanel=new Panel(session, new FlowLayout(Axis.Y));	//create the input panel flowing vertically
+		final TextControl<Float> temperatureInput=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
+		temperatureInput.getModel().setLabel("Input Temperature");	//add a label to the text input control
+		temperatureInput.getModel().setValidator(new ValueRequiredValidator<Float>());	//install a validator requiring a value
+		inputPanel.add(temperatureInput);	//add the input control to the input panel
+		final TextControl<Float> temperatureOutput=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
+		temperatureOutput.getModel().setLabel("Output Temperature");	//add a label to the text output control
+		temperatureOutput.setEnabled(false);	//disable the text output control so that the user cannot modify it
+		inputPanel.add(temperatureOutput);	//add the output control to the input panel
+
+		temperaturePanel.add(inputPanel);	//add the input panel to the temperature panel
+
+		final Panel conversionPanel=new Panel(session, new FlowLayout(Axis.Y));	//create the right-hand panel flowing vertically
+			
+			//scale panel
 		final Panel scalePanel=new Panel(session, new FlowLayout(Axis.Y));	//create the scale panel flowing vertically
 		scalePanel.setStyleID(GROUP_PANEL_CLASS);	//show that we want to style the scale panel as one that visually groups components
 		scalePanel.getModel().setLabel("Input Scale");	//set the panel label
@@ -49,40 +66,22 @@ public class TemperatureConversionFrame extends NavigationFrame
 		scalePanel.add(farenheitCheckControl);	//add the Farenheit check control to the panel	
 			//create a mutual exclusion group and add the Celsius and Farenheit check box boolean value models to get radio button functionality
 		final ModelGroup<ValueModel<Boolean>> radioButtonModelGroup=new MutualExclusionModelGroup(celsiusCheckControl.getModel(), farenheitCheckControl.getModel());
-		temperaturePanel.add(scalePanel);	//add the scale panel to the temperature panel
-		
-		final Panel conversionPanel=new Panel(session, new FlowLayout(Axis.Y));	//create the right-hand panel flowing vertically
-		
-		final Panel inputPanel=new Panel(session, new FlowLayout(Axis.X));	//create the input panel flowing horizontally
-		final TextControl<Integer> temperatureInput=new TextControl<Integer>(session, "temperatureInput", Integer.class);	//create a text input control to receive an integer
-		temperatureInput.getModel().setLabel("Input Temperature");	//add a label to the text input control
-		temperatureInput.getModel().setValidator(new ValueRequiredValidator<Integer>());	//install a validator requiring a value
-		inputPanel.add(temperatureInput);	//add the input control to the input panel
+		conversionPanel.add(scalePanel);	//add the scale panel to the conversion panel			
+			//conversion button
 		final ActionControl convertButton=new ActionControl(session);	//create a button for initiating the conversion
 		convertButton.getModel().setLabel("Convert");	//set the button label
-		inputPanel.add(convertButton);	//add the button to the input panel
-		conversionPanel.add(inputPanel);	//add the input panel to the conversion panel
-
-		final TextControl<Integer> temperatureOutput=new TextControl<Integer>(session, "temperatureOutput", Integer.class);	//create a text input control to display the result
-		temperatureOutput.getModel().setLabel("Output Temperature");	//add a label to the text output control
-		conversionPanel.add(temperatureOutput);	//add the output control to the conversion panel
-		
-		temperaturePanel.add(conversionPanel);	//add the conversion panel to the temperature panel
-		
-		add(temperaturePanel);	//add the entire temperature panel to the navigation frame
-
 		convertButton.getModel().addActionListener(new ActionListener<ActionModel>()	//when the convert button is pressed
 				{
 					public void onAction(ActionEvent<ActionModel> actionEvent)
 					{
-						final int convertedValue;	//we'll convert the value and store it here
+						final float convertedValue;	//we'll convert the value and store it here
 						if(celsiusCheckControl.getModel().getValue())	//if the Celsius radio button is selected
 						{
-							convertedValue=(temperatureInput.getModel().getValue().intValue()*9)/5+32;	//convert: (9c/5)+32
+							convertedValue=(temperatureInput.getModel().getValue().floatValue()*9)/5+32;	//convert: (9c/5)+32
 						}
 						else if(farenheitCheckControl.getModel().getValue())	//if the Farenheit radio button is selected
 						{
-							convertedValue=((temperatureInput.getModel().getValue().intValue()-32)*5)/9;	//convert: 5(f-32)/9							
+							convertedValue=((temperatureInput.getModel().getValue().floatValue()-32)*5)/9;	//convert: 5(f-32)/9							
 						}
 						else	//if neither check control is selected (which should never happen, because we set one to begin with and they are both using a mutual exclusion model group)
 						{
@@ -90,7 +89,7 @@ public class TemperatureConversionFrame extends NavigationFrame
 						}
 						try
 						{
-							temperatureOutput.getModel().setValue(new Integer(convertedValue));	//store the conversion result in the temperature output
+							temperatureOutput.getModel().setValue(new Float(convertedValue));	//store the conversion result in the temperature output
 						}
 						catch(final ValidationException validationException)	//we have no validator installed in the temperature output text control, so we don't expect changing its value ever to cause any problems
 						{
@@ -98,6 +97,11 @@ public class TemperatureConversionFrame extends NavigationFrame
 						}						
 					}
 				});
+		conversionPanel.add(convertButton);	//add the button to the conversion panel
+		
+		temperaturePanel.add(conversionPanel);	//add the conversion panel to the temperature panel
+		
+		add(temperaturePanel);	//add the entire temperature panel to the navigation frame
 	}
 
 }

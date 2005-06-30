@@ -39,9 +39,13 @@ public class CSSStyleConstants
 	
 	//layout
 	
+	/**The CSS class for any enclosing element needed for horizontal flow layout.*/
+	public final static String LAYOUT_FLOW_X_CLASS="layout-flow-x";
 	/**The CSS class for horizontal flow layout children.*/
 	public final static String LAYOUT_FLOW_X_CHILD_CLASS="layout-flow-x-child";
 
+	/**The CSS class for any enclosing element needed for vertical flow layout.*/
+	public final static String LAYOUT_FLOW_Y_CLASS="layout-flow-y";
 	/**The CSS class for vertical flow layout children.*/
 	public final static String LAYOUT_FLOW_Y_CHILD_CLASS="layout-flow-y-child";
 }
