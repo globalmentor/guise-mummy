@@ -1,5 +1,7 @@
 package com.garretwilson.guise.model;
 
+import java.beans.PropertyChangeEvent;
+
 import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.event.EventListenerManager;
 import com.garretwilson.guise.session.GuiseSession;
@@ -31,4 +33,15 @@ public class AbstractModel extends BoundPropertyObject implements Model
 	{
 		this.session=checkNull(session, "Session cannot be null");	//save the session
 	}
+
+	/**Reports that a bound property has changed.
+	This implementation delegates to the Guise session to fire or postpone the property change event.
+	@param propertyChangeEvent The event to fire.
+	@see GuiseSession#queueModelEvent(com.garretwilson.event.PostponedEvent)
+	*/
+	protected void firePropertyChange(final PropertyChangeEvent propertyChangeEvent)
+	{
+		getSession().queueModelEvent(createPostponedPropertyChangeEvent(propertyChangeEvent));	//create and queue a postponed property change event
+	}
+
 }

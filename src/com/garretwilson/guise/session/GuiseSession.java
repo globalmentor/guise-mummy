@@ -2,7 +2,9 @@ package com.garretwilson.guise.session;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.util.Set;
 
+import com.garretwilson.event.PostponedEvent;
 import com.garretwilson.guise.application.GuiseApplication;
 import com.garretwilson.guise.component.NavigationFrame;
 import com.garretwilson.guise.context.GuiseContext;
@@ -11,11 +13,22 @@ import com.garretwilson.guise.context.GuiseContext;
 A client application may only have one session, while a web server application will likely have multiple sessions.
 @author Garret Wilson
 */
-public interface GuiseSession<GC extends GuiseContext>
+public interface GuiseSession<GC extends GuiseContext<GC>>
 {
 
 	/**@return The Guise application to which this session belongs.*/
 	public GuiseApplication<GC> getApplication();
+
+	/**@return The unmodifiable set of all states of available Guise contexts.*/
+	public Set<GuiseContext.State> getContextStates();
+
+	/**Queues a postponed model event to be fired after all contexts have finished updating the model.
+	If a Guise context is currently updating the model, the event will be queued for later.
+	If no Guise context is currently updating the model, the event will be fired immediately.
+	@param postponedModelEvent The event to fire at a later time.
+	@see GuiseContext.State#UPDATE_MODEL
+	*/
+	public void queueModelEvent(final PostponedEvent<?> postponedModelEvent);
 
 	/**Retrieves the frame bound to the given appplication context-relateive path.
 	If a frame has already been created and cached, it will be be returned; otherwise, one will be created and cached. 

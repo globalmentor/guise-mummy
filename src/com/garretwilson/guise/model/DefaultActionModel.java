@@ -1,7 +1,5 @@
 package com.garretwilson.guise.model;
 
-import java.util.Iterator;
-
 import com.garretwilson.guise.event.*;
 import com.garretwilson.guise.session.GuiseSession;
 
@@ -42,18 +40,10 @@ public class DefaultActionModel extends DefaultLabelModel implements ActionModel
 	@see com.garretwilson.guise.event.ActionListener
 	@see com.garretwilson.guise.event.ActionEvent
 	*/
-	@SuppressWarnings("unchecked")
 	public void fireAction()
 	{
-		final Iterator<ActionListener<ActionModel>> listeners=(Iterator<ActionListener<ActionModel>>)getEventListenerManager().getListeners(ActionListener.class);	//get an iterator to the listeners
-		if(listeners.hasNext())	//if there are listeners
-		{
-			final ActionEvent<ActionModel> actionEvent=new ActionEvent<ActionModel>(getSession(), this);	//create a new event
-			while(listeners.hasNext())	//for each action listener
-			{
-				listeners.next().onAction(actionEvent);	//dispatch the action
-			}
-		}		
+		final ActionEvent<ActionModel> actionEvent=new ActionEvent<ActionModel>(getSession(), this);	//create a new action event
+		getSession().queueModelEvent(new PostponedActionEvent<ActionModel>(getEventListenerManager(), actionEvent));	//tell the Guise session to queue the event
 	}
 
 	/**Session constructor.

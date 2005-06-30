@@ -18,7 +18,7 @@ import com.garretwilson.util.*;
 /**The Guise context of an HTTP servlet.
 @author Garret Wilson
 */
-public class HTTPServletGuiseContext extends AbstractTextGuiseContext<HTTPServletGuiseContext>
+public abstract class AbstractHTTPServletGuiseContext extends AbstractTextGuiseContext<AbstractHTTPServletGuiseContext>
 {
 
 	/**The HTTP servlet request.*/
@@ -45,7 +45,7 @@ public class HTTPServletGuiseContext extends AbstractTextGuiseContext<HTTPServle
 	@param response The HTTP servlet response.
 	@exception NullPointerException if the session, request or response is <code>null</code>.
 	*/
-	public HTTPServletGuiseContext(final GuiseSession<HTTPServletGuiseContext> session, final HttpServletRequest request, final HttpServletResponse response)
+	public AbstractHTTPServletGuiseContext(final GuiseSession<AbstractHTTPServletGuiseContext> session, final HttpServletRequest request, final HttpServletResponse response)
 	{
 		super(session);	//construct the parent class
 		this.request=checkNull(request, "Request cannot be null.");

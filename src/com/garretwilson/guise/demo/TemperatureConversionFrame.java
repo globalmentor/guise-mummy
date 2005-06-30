@@ -1,7 +1,5 @@
 package com.garretwilson.guise.demo;
 
-import com.garretwilson.beans.AbstractPropertyValueChangeListener;
-import com.garretwilson.beans.PropertyValueChangeEvent;
 import com.garretwilson.guise.component.*;
 import com.garretwilson.guise.component.layout.*;
 import com.garretwilson.guise.event.ActionEvent;
@@ -13,7 +11,6 @@ import com.garretwilson.guise.model.*;
 import com.garretwilson.guise.session.GuiseSession;
 import com.garretwilson.guise.validator.ValidationException;
 import com.garretwilson.guise.validator.ValueRequiredValidator;
-import com.garretwilson.util.Debug;
 
 /**Temperature Conversion Guise demonstration frame.
 Copyright © 2005 GlobalMentor, Inc.
@@ -78,7 +75,6 @@ public class TemperatureConversionFrame extends NavigationFrame
 				{
 					public void onAction(ActionEvent<ActionModel> actionEvent)
 					{
-Debug.trace("heard convert button action");
 						final int convertedValue;	//we'll convert the value and store it here
 						if(celsiusCheckControl.getModel().getValue())	//if the Celsius radio button is selected
 						{
@@ -94,9 +90,7 @@ Debug.trace("heard convert button action");
 						}
 						try
 						{
-Debug.trace("new value:", convertedValue);
 							temperatureOutput.getModel().setValue(new Integer(convertedValue));	//store the conversion result in the temperature output
-Debug.trace("after setting, temperature output has value:", temperatureOutput.getModel().getValue());
 						}
 						catch(final ValidationException validationException)	//we have no validator installed in the temperature output text control, so we don't expect changing its value ever to cause any problems
 						{

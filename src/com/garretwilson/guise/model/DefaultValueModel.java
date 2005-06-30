@@ -3,7 +3,6 @@ package com.garretwilson.guise.model;
 import com.garretwilson.guise.session.GuiseSession;
 import com.garretwilson.guise.validator.*;
 import com.garretwilson.lang.ObjectUtilities;
-import com.garretwilson.util.Debug;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 

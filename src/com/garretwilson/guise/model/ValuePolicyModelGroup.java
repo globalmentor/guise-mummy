@@ -36,7 +36,7 @@ public abstract class ValuePolicyModelGroup<V> extends AbstractModelGroup<ValueM
 	/**Called when a bound property is changed.
 	This not-generics version calls the generic version, creating a new event if necessary.
 	No checks are made at compile time to ensure the given event actually supports the given generic type.
-	@param propertyValueChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
+	@param propertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
 	@see PropertyValueChangeListener#propertyValueChange(PropertyValueChangeEvent)
 	*/
 	@SuppressWarnings("unchecked")

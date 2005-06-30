@@ -9,7 +9,7 @@ import javax.servlet.http.*;
 Guise sessions are created and released in conjunction with associated HTTP servlet sessions.
 There may be multiple Guise applications within one web application.
 @author Garret Wilson
-@see ServletGuise
+@see HTTPServletGuise
 */
 public class HTTPGuiseSessionManager implements HttpSessionListener
 {
@@ -19,11 +19,12 @@ public class HTTPGuiseSessionManager implements HttpSessionListener
 
 	/**Retrieves a session for the given HTTP session.
 	This method can only be accessed by classes in the same package.
-	@param httpSession The HTTP session for which a Guise session should be retrieved. 
+	@param guiseApplication The Guise application HTTP session to own the retrieved Guise session. 
+	@param httpRequest The HTTP request with which the Guise session is to be associated. 
 	@return The Guise session associated with the provided HTTP session.
 	@exception IllegalArgumentException if the provided HTTP session is not a session from this web application or the HTTP session has been invalidated, and there is therefore no corresponding Guise session.
 	*/
-	static HTTPGuiseSession getGuiseSession(final GuiseHTTPServlet.HTTPServletGuiseApplication guiseApplication, final HttpServletRequest httpRequest)
+	static GuiseHTTPServlet.HTTPServletGuiseSession getGuiseSession(final GuiseHTTPServlet.HTTPServletGuiseApplication guiseApplication, final HttpServletRequest httpRequest)
 	{
 		final HttpSession httpSession=httpRequest.getSession();	//get the current HTTP session from the HTTP request
 		guiseApplicationMap.put(httpSession, guiseApplication);	//store our Guise application so we'll know with which application this session is associated (this servlet may serve many Guise applications in the web application)
@@ -86,7 +87,7 @@ public class HTTPGuiseSessionManager implements HttpSessionListener
 			if(guiseApplication!=null)	//if we know the Guise application associated with this HTTP request
 			{
 				guiseApplicationMap.remove(httpSession);	//remove the association between this HTTP session and the application
-				final HTTPGuiseSession guiseSession=guiseApplication.removeGuiseSession(httpSession);	//remove the Guise session associated with the HTTP session in the application
+				final AbstractHTTPGuiseSession guiseSession=guiseApplication.removeGuiseSession(httpSession);	//remove the Guise session associated with the HTTP session in the application
 				assert guiseSession!=null : "Guise application associated with HTTP session unexpectedly did not have an associated Guise session.";
 			}
 		}

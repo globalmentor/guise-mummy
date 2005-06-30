@@ -3,7 +3,10 @@ package com.garretwilson.guise.session;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.*;
+import static java.util.Collections.*;
 
+import com.garretwilson.beans.*;
+import com.garretwilson.event.PostponedEvent;
 import com.garretwilson.guise.application.GuiseApplication;
 import com.garretwilson.guise.component.NavigationFrame;
 import com.garretwilson.guise.context.GuiseContext;
@@ -16,10 +19,10 @@ import static com.garretwilson.text.xml.XMLUtilities.*;
 /**An abstract implementation that keeps track of the components of a user session.
 @author Garret Wilson
 */
-public class AbstractGuiseSession<GC extends GuiseContext> implements GuiseSession<GC>
+public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> implements GuiseSession<GC>
 {
 
-	/**@return The Guise application to which this session belongs.*/
+	/**The Guise application to which this session belongs.*/
 	private final GuiseApplication<GC> application;
 
 		/**@return The Guise application to which this session belongs.*/
@@ -157,4 +160,111 @@ public class AbstractGuiseSession<GC extends GuiseContext> implements GuiseSessi
 		{
 			requestedNavigation=getApplication().resolveURI(checkNull(uri, "URI cannot be null."));	//resolve the URI against the application context path
 		}
+
+	/**The object that listenes for context state changes and updates the set of context states in response.*/
+	private final ContextStateListener contextStateListener=new ContextStateListener();
+
+		/**@return The object that listenes for context state changes and updates the set of context states in response.*/
+		protected ContextStateListener getContextStateListener() {return contextStateListener;}
+
+	/**The unmodifiable set of all states of available Guise contexts.*/
+	private Set<GuiseContext.State> contextStateSet=emptySet();
+
+		/**@return The unmodifiable set of all states of available Guise contexts.*/
+		public Set<GuiseContext.State> getContextStates() {return contextStateSet;}
+
+	/**The set of registered contexts. A synchronized set is used so that updating the set of states can be based upon the very latest data when used by multiple threads.*/
+	private final Set<GC> contextSet=synchronizedSet(new HashSet<GC>());
+
+		/**Adds a context to this session and registers a listener for context state changes.
+		@param context The context to add to this session.
+		*/
+		protected void addContext(final GC context)
+		{
+			contextSet.add(context);	//add this context to the set
+			context.addPropertyChangeListener(GuiseContext.STATE_PROPERTY, getContextStateListener());	//listen for context state changes and update the set of context states in response
+			updateContextStates();	//make sure the record of context states is up to date
+		}
+	
+		/**Removes a context from this session and unregisters the listener for context state changes.
+		@param context The context to remove from this session.
+		*/
+		protected void removeContext(final GC context)
+		{
+			context.removePropertyChangeListener(GuiseContext.STATE_PROPERTY, getContextStateListener());	//stop listening for context state changes
+			contextSet.remove(context);	//remove this context from the set
+			updateContextStates();	//make sure the record of context states is up to date
+		}
+
+		/**Updates the record of current states of available contexts.
+		If any model change events are pending and no context is in an update model state, the model change events are processed.
+		@see #fireQueuedModelEvents()
+		*/
+		protected void updateContextStates()
+		{
+			final EnumSet<GuiseContext.State> updatedContextStateSet=EnumSet.noneOf(GuiseContext.State.class);	//create an empty enum set
+			synchronized(contextSet)	//don't allow anyone to add or remove context sets while we read them, and ensure we have the latest data
+			{
+				for(final GC context:contextSet)	//for each context
+				{
+					updatedContextStateSet.add(context.getState());	//add this state to our enumeration
+				}
+				contextStateSet=unmodifiableSet(updatedContextStateSet);	//update the set of context states
+				if(!contextStateSet.contains(GuiseContext.State.UPDATE_MODEL))	//if no contexts are updating the model
+				{
+					fireQueuedModelEvents();	//fire any queued events
+				}
+			}
+		}
+
+	/**The synchronized list of postponed model events.*/
+	private final List<PostponedEvent<?>> queuedModelEventList=synchronizedList(new ArrayList<PostponedEvent<?>>());
+
+		/**Queues a postponed model event to be fired after all contexts have finished updating the model.
+		If a Guise context is currently updating the model, the event will be queued for later.
+		If no Guise context is currently updating the model, the event will be fired immediately.
+		@param postponedModelEvent The event to fire at a later time.
+		@see GuiseContext.State#UPDATE_MODEL
+		*/
+		public void queueModelEvent(final PostponedEvent<?> postponedModelEvent)
+		{
+			synchronized(contextSet)	//don't let the state of context states change while we check the states (the method updating context states synchronizes on the same value)
+			{
+				if(contextStateSet.contains(GuiseContext.State.UPDATE_MODEL))	//if at least one context is changing the model
+				{
+					queuedModelEventList.add(postponedModelEvent);	//add the postponed event to our list of postponed events					
+				}
+				else	//if no context is changing the model
+				{
+					postponedModelEvent.fireEvent();	//go ahead and fire the event immediately
+				}
+			}
+		}
+
+		/**Fires any postponed model events that are queued.*/
+		protected void fireQueuedModelEvents()
+		{
+			synchronized(queuedModelEventList)	//don't allow any changes to the postponed model event list while we access it
+			{
+				for(final PostponedEvent<?> postponedModelEvent:queuedModelEventList)	//for each postponed model event
+				{
+					postponedModelEvent.fireEvent();	//fire the event
+				}
+				queuedModelEventList.clear();	//remove all pending model events
+			}
+		}
+
+	/**The class that listens for context state changes and updates the context state set in response.
+	@author Garret Wilson
+	*/
+	protected class ContextStateListener extends AbstractPropertyValueChangeListener<GuiseContext.State>
+	{
+		/**Called when a bound property is changed.
+		@param propertyValueChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
+		*/
+		public void propertyValueChange(final PropertyValueChangeEvent<GuiseContext.State> propertyValueChangeEvent)
+		{
+			updateContextStates();	//update the context states when a context state changes
+		}
+	}
 }
