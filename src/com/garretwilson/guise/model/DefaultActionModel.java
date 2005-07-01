@@ -42,8 +42,11 @@ public class DefaultActionModel extends DefaultLabelModel implements ActionModel
 	*/
 	public void fireAction()
 	{
-		final ActionEvent<ActionModel> actionEvent=new ActionEvent<ActionModel>(getSession(), this);	//create a new action event
-		getSession().queueModelEvent(new PostponedActionEvent<ActionModel>(getEventListenerManager(), actionEvent));	//tell the Guise session to queue the event
+		if(getEventListenerManager().hasListeners(ActionListener.class))	//if there are action listeners registered
+		{
+			final ActionEvent<ActionModel> actionEvent=new ActionEvent<ActionModel>(getSession(), this);	//create a new action event
+			getSession().queueModelEvent(new PostponedActionEvent<ActionModel>(getEventListenerManager(), actionEvent));	//tell the Guise session to queue the event
+		}
 	}
 
 	/**Session constructor.

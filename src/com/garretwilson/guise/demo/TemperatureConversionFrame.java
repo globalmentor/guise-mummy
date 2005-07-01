@@ -72,16 +72,17 @@ public class TemperatureConversionFrame extends NavigationFrame
 		convertButton.getModel().setLabel("Convert");	//set the button label
 		convertButton.getModel().addActionListener(new ActionListener<ActionModel>()	//when the convert button is pressed
 				{
-					public void onAction(ActionEvent<ActionModel> actionEvent)
+					public void onAction(ActionEvent<ActionModel> actionEvent)	//convert the temperature in the input field and place the result in the output field
 					{
-						final float convertedValue;	//we'll convert the value and store it here
+						final float inputValue=temperatureInput.getModel().getValue().floatValue();	//get the input value from the control
+						final float outputValue;	//we'll convert the value and store it here
 						if(celsiusCheckControl.getModel().getValue())	//if the Celsius radio button is selected
 						{
-							convertedValue=(temperatureInput.getModel().getValue().floatValue()*9)/5+32;	//convert: (9c/5)+32
+							outputValue=(inputValue*9)/5+32;	//convert: (9c/5)+32
 						}
 						else if(farenheitCheckControl.getModel().getValue())	//if the Farenheit radio button is selected
 						{
-							convertedValue=((temperatureInput.getModel().getValue().floatValue()-32)*5)/9;	//convert: 5(f-32)/9							
+							outputValue=((inputValue-32)*5)/9;	//convert: 5(f-32)/9							
 						}
 						else	//if neither check control is selected (which should never happen, because we set one to begin with and they are both using a mutual exclusion model group)
 						{
@@ -89,7 +90,7 @@ public class TemperatureConversionFrame extends NavigationFrame
 						}
 						try
 						{
-							temperatureOutput.getModel().setValue(new Float(convertedValue));	//store the conversion result in the temperature output
+							temperatureOutput.getModel().setValue(new Float(outputValue));	//store the conversion result in the temperature output control
 						}
 						catch(final ValidationException validationException)	//we have no validator installed in the temperature output text control, so we don't expect changing its value ever to cause any problems
 						{

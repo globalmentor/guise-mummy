@@ -1,6 +1,10 @@
 package com.garretwilson.guise.component;
 
 import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import static java.util.Collections.*;
 
 import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.event.EventListenerManager;
@@ -8,6 +12,8 @@ import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.Controller;
 import com.garretwilson.guise.session.GuiseSession;
 import com.garretwilson.guise.validator.ValidationException;
+import com.garretwilson.guise.validator.ValidationsException;
+
 import static com.garretwilson.lang.CharSequenceUtilities.*;
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
@@ -48,17 +54,45 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 			}
 		}
 
+	/**The thread-safe list of errors.*/
+	private final List<Throwable> errorList=new CopyOnWriteArrayList<Throwable>();
+
+		/**@return An iterable interface to all errors associated with this component.*/
+		public Iterable<Throwable> getErrors() {return errorList;}
+
+		/**@return <code>true</code> if there is at least one error associated with this component.*/
+		public boolean hasErrors() {return !errorList.isEmpty();}
+
+		/**Adds an error to the component.
+		@param error The error to add.
+		*/
+		public void addError(final Throwable error) {errorList.add(error);}
+
+		/**Adds errors to the component.
+		@param errors The errors to add.
+		*/
+		public void addErrors(final Collection<? extends Throwable> errors) {errorList.addAll(errors);}
+
+		/**Removes a specific error from this component.
+		@param error The error to remove.
+		*/
+		public void removeError(final Throwable error) {errorList.remove(error);}
+
+		/**Clears all errors associated with this component.*/
+		public void clearErrors() {errorList.clear();}
+
 	/**The error currently associated with this component, or <code>null</code> if there is no error.*/
-	private Throwable error=null;
+//TODO del if not needed	private Throwable error=null;
 
 		/**@return The error currently associated with this component, or <code>null</code> if there is no error.*/
-		public Throwable getError() {return error;}
+//TODO del if not needed		public Throwable getError() {return error;}
 
 		/**Sets the component error status.
 		This is a bound property.
 		@param newError The error currently associated with this component, or <code>null</code> if there is no error.
 		@see Component#ERROR_PROPERTY
 		*/
+/*TODO del if not needed
 		public void setError(final Throwable newError)
 		{
 			if(error!=newError)	//if the value is really changing
@@ -68,6 +102,7 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 				firePropertyChange(ERROR_PROPERTY, oldError, newError);
 			}			
 		}
+*/
 
 	/**The component identifier*/
 	private final String id;
@@ -78,14 +113,14 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 		/**@return An identifier unique within this component's parent container, if any.*/
 		public String getUniqueID()
 		{
-			final Container parent=getParent();	//get this component's parent
+			final Container<?> parent=getParent();	//get this component's parent
 			return parent!=null ? parent.getUniqueID(this) : getID();	//if we have a parent, ask it for our unique ID; otherwise, our ID is already unique
 		}
 
 		/**@return An identifier unique up this component's hierarchy.*/
 		public String getAbsoluteUniqueID()
 		{
-			final Container parent=getParent();	//get this component's parent
+			final Container<?> parent=getParent();	//get this component's parent
 			return parent!=null ? parent.getAbsoluteUniqueID(this) : getUniqueID();	//if we have a parent container, ask it for our absolute ID; otherwise, return our local unique ID
 		}
 
@@ -161,9 +196,9 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 		@exception IllegalStateException if no parent is provided and this component's old parent still recognizes this component as its child.
 		@exception IllegalArgumentException if a parent is provided and the given parent does not already recognize this component as its child.
 		*/
-		public void setParent(final Container newParent)
+		public void setParent(final Container<?> newParent)
 		{
-			final Container oldParent=parent;	//get the old parent
+			final Container<?> oldParent=parent;	//get the old parent
 			if(oldParent!=newParent)	//if the parent is really changing
 			{
 				if(newParent!=null)	//if a parent is provided
@@ -267,12 +302,11 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	/**Validates the view of this component.
 	This method delegates to the installed controller, and if no controller is installed one is created and installed.
 	@param context Guise context information.
-	@param component The component being rendered.
 	@exception IOException if there is an error validating the view.
-	@exception ValidationException if the view information is not valid to store in the model.
+	@exception ValidationsException if the view information is not valid to store in the model.
 	@see #getController(GC, C)
 	*/
-	public <GC extends GuiseContext> void validateView(final GC context) throws IOException, ValidationException
+	public <GC extends GuiseContext> void validateView(final GC context) throws IOException, ValidationsException
 	{
 		final Controller<GC, C> controller=getController(context);	//get the controller
 		controller.validateView(context, (C)this);	//tell the controller to update the view TODO testing; probably not correct, but works
@@ -281,7 +315,6 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	/**Updates the view of this component.
 	This method delegates to the installed controller, and if no controller is installed one is created and installed.
 	@param context Guise context information.
-	@param component The component being rendered.
 	@exception IOException if there is an error updating the view.
 	@see #getController(GC, C)
 	*/
@@ -305,7 +338,6 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 
 	/**Determines the controller of this. If no controller is installed, one is created and installed.
 	@param context Guise context information.
-	@param component The component for which a controller should be retrieved.
 	@exception NullPointerException if there is no controller installed and no appropriate controller registered with the Guise context.
 	*/
 	@SuppressWarnings("unchecked")

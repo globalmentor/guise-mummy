@@ -19,6 +19,7 @@ import com.garretwilson.guise.controller.text.xml.xhtml.*;
 import com.garretwilson.guise.session.AbstractGuiseSession;
 import com.garretwilson.guise.session.GuiseSession;
 import com.garretwilson.guise.validator.ValidationException;
+import com.garretwilson.guise.validator.ValidationsException;
 import com.garretwilson.io.OutputStreamUtilities;
 import static com.garretwilson.net.URIConstants.*;
 import com.garretwilson.net.http.*;
@@ -216,9 +217,13 @@ Debug.trace("raw path info: ", rawPathInfo);
 					guiseContext.setState(GuiseContext.State.UPDATE_MODEL);	//update the context state for updating the model
 					navigationFrame.updateModel(guiseContext);	//tell the frame to update its model
 				}
-				catch(final ValidationException validationException)	//if there were any validation errors
+				catch(final ValidationsException validationsException)	//if there were any validation errors during validation
 				{
-					navigationFrame.setError(validationException);	//store the validation error(s) so that the frame can report them to the user
+					navigationFrame.addErrors(validationsException);	//store the validation error(s) so that the frame can report them to the user
+				}
+				catch(final ValidationException validationException)	//if there were any validation errors while updating the model
+				{
+					navigationFrame.addError(validationException);	//store the validation error so that the frame can report it to the user
 				}
 				final URI requestedNavigationURI=guiseSession.getRequestedNavigation();	//get the requested navigation URI
 				if(requestedNavigationURI!=null)	//if navigation is requested

@@ -1,6 +1,7 @@
 package com.garretwilson.guise.component;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.guise.context.GuiseContext;
@@ -8,6 +9,7 @@ import com.garretwilson.guise.controller.Controller;
 import static com.garretwilson.lang.ClassUtilities.*;
 import com.garretwilson.guise.session.GuiseSession;
 import com.garretwilson.guise.validator.ValidationException;
+import com.garretwilson.guise.validator.ValidationsException;
 
 /**Base interface for all Guise components.
 Each component must provide either a Guise session constructor; or a Guise session and string ID constructor.
@@ -19,7 +21,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	/**The bound property of the controller.*/
 	public final static String CONTROLLER_PROPERTY=getPropertyName(Component.class, "controller");
 	/**The bound property of the current error condition.*/
-	public final static String ERROR_PROPERTY=getPropertyName(Component.class, "error");
+//TODO del if not needed	public final static String ERROR_PROPERTY=getPropertyName(Component.class, "error");
 	/**The bound property of the component style ID.*/
 	public final static String STYLE_ID_PROPERTY=getPropertyName(Component.class, "styleID");
 	/**The bound property of whether the component is visible.*/
@@ -31,19 +33,43 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	/**Sets the controller used by this component.
 	This is a bound property.
 	@param newController The new controller to use.
-	@see Component#CONTROLLER_PROPERTY
+	@see #CONTROLLER_PROPERTY
 	*/
 	public void setController(final Controller<? extends GuiseContext, C> newController);
 
 	/**@return The error currently associated with this component, or <code>null</code> if there is no error.*/
-	public Throwable getError();
+//TODO del if not needed	public Throwable getError();
 
 	/**Sets the component error status.
 	This is a bound property.
 	@param newError The error currently associated with this component, or <code>null</code> if there is no error.
-	@see ERROR_PROPERTY
+	@see #ERROR_PROPERTY
 	*/
-	public void setError(final Throwable newError);
+//TODO del if not needed	public void setError(final Throwable newError);
+
+	/**@return An iterable interface to all errors associated with this component.*/
+	public Iterable<Throwable> getErrors();
+
+	/**@return <code>true</code> if there is at least one error associated with this component.*/
+	public boolean hasErrors();
+
+	/**Adds an error to the component.
+	@param error The error to add.
+	*/
+	public void addError(final Throwable error);
+
+	/**Adds errors to the component.
+	@param errors The errors to add.
+	*/
+	public void addErrors(final Collection<? extends Throwable> errors);
+
+	/**Removes a specific error from this component.
+	@param error The error to remove.
+	*/
+	public void removeError(final Throwable error);
+
+	/**Clears all errors associated with this component.*/
+	public void clearErrors();
 
 	/**@return The component identifier.*/
 	public String getID();
@@ -73,7 +99,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@exception IllegalStateException if no parent is provided and this component's old parent still recognizes this component as its child.
 	@exception IllegalArgumentException if a parent is provided and the given parent does not already recognize this component as its child.
 	*/
-	public void setParent(final Container newParent);
+	public void setParent(final Container<?> newParent);
 
 	/**@return The Guise session that owns this component.*/
 	public GuiseSession<?> getSession();
@@ -84,7 +110,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	/**Identifies the style for the component.
 	This is a bound property.
 	@param newStyleID The style identifier, or <code>null</code> if there is no style ID.
-	@see STYLE_ID_PROPERTY
+	@see #STYLE_ID_PROPERTY
 	*/
 	public void setStyleID(final String newStyleID);
 
@@ -94,24 +120,22 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	/**Sets whether the component is visible.
 	This is a bound property of type <code>Boolean</code>.
 	@param newVisible <code>true</code> if the component should be visible, else <code>false</code>.
-	@see VISIBLE_PROPERTY
+	@see #VISIBLE_PROPERTY
 	*/
 	public void setVisible(final boolean newVisible);
 
 	/**Validates the view of this component.
 	This method delegates to the installed controller, and if no controller is installed one is created and installed.
 	@param context Guise context information.
-	@param component The component being rendered.
 	@exception IOException if there is an error validating the view.
-	@exception ValidationException if the view information is not valid to store in the model.
+	@exception ValidationsException if the view information is not valid to store in the model.
 	@see #getController(GC, C)
 	*/
-	public <GC extends GuiseContext> void validateView(final GC context) throws IOException, ValidationException;
+	public <GC extends GuiseContext> void validateView(final GC context) throws IOException, ValidationsException;
 
 	/**Updates the view of this component.
 	This method delegates to the installed controller, and if no controller is installed one is created and installed.
 	@param context Guise context information.
-	@param component The component being rendered.
 	@exception IOException if there is an error updating the view.
 	*/
 	public <GC extends GuiseContext> void updateView(final GC context) throws IOException;
