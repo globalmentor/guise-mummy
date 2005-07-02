@@ -53,13 +53,14 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext>	implemen
 	@param componentClass The class of component that may be registered.
 	@return A class of controller registered to render component of the specific class, or <code>null</code> if no controller is registered.
 	*/
-	protected <C extends Component> Class<? extends Controller<GC, C>> getRegisteredControllerClass(final Class<C> componentClass)
+	protected <C extends Component> Class<? extends Controller<GC, ? super C>> getRegisteredControllerClass(final Class<C> componentClass)
 	{
 		synchronized(controllerKitList)	//don't allow anyone to access the list of controller kits while we access it
 		{
 			for(final ControllerKit<GC> controllerKit:controllerKitList)	//for each controller kit in our list
 			{
-				final Class<? extends Controller<GC, C>> controllerKitClass=controllerKit.getRegisteredControllerClass(componentClass);	//ask the controller kit for a registered controller class for this component
+				final Class<? extends Controller<GC, ? super C>> controllerKitClass=controllerKit.getRegisteredControllerClass(componentClass);	//ask the controller kit for a registered controller class for this component
+//TODO fix				final Class<? extends Controller<GC, C>> controllerKitClass=(Class<? extends Controller<GC, C>>)controllerKit.getRegisteredControllerClass(componentClass);	//ask the controller kit for a registered controller class for this component
 				if(controllerKitClass!=null)	//if this controller kit gave us a controller class
 				{
 					return controllerKitClass;	//return the class
@@ -71,7 +72,6 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext>	implemen
 
 	/**Determines the controller class appropriate for the given component class.
 	A controller class is located by individually looking up the component class hiearchy for registered controllers.
-	@param context The Guise context interested in retrieving a controller for the given component.
 	@param componentClass The class of component for which a render strategy should be returned.
 	@return A class of render strategy to render the given component class, or <code>null</code> if no render strategy is registered.
 	*/
@@ -101,7 +101,7 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext>	implemen
 				}					
 			}
 		}
-		return controllerClass;	//show which if any render strategy class we found
+		return (Class<? extends Controller<GC, C>>)controllerClass;	//show which if any render strategy class we found
 	}
 
 	/**Determines the controller appropriate for the given component.
@@ -110,7 +110,7 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext>	implemen
 	@return A controller to render the given component, or <code>null</code> if no controller is registered.
 	*/
 //TODO fix	@SuppressWarnings("unchecked")
-	public <C extends Component> Controller<GC, C> getController(final C component)
+	public <C extends Component<?>> Controller<GC, C> getController(final C component)
 	{
 		Class<C> componentClass=(Class<C>)component.getClass();	//get the component class
 		final Class<? extends Controller<GC, C>> renderStrategyClass=getControllerClass(componentClass);	//walk the hierarchy to see if there is a render strategy class registered for this component type

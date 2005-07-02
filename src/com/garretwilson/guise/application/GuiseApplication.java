@@ -30,7 +30,7 @@ public interface GuiseApplication<GC extends GuiseContext>
 	@param component The component for which a controller should be returned.
 	@return A controller to render the given component, or <code>null</code> if no controller is registered.
 	*/
-	public <C extends Component> Controller<GC, C> getController(final C component);
+	public <C extends Component<?>> Controller<GC, C> getController(final C component);
 
 	/**Binds a frame type to a particular application context-relative path.
 	Any existing binding for the given context-relative path is replaced.
