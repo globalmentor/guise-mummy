@@ -2,7 +2,7 @@ package com.garretwilson.guise.model;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
-/**A model for an identifier such as a label and/or an icon.
+/**A model for an identifier such as text and/or an icon.
 @author Garret Wilson
 */
 public interface LabelModel extends Model

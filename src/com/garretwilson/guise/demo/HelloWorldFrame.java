@@ -6,7 +6,7 @@ import com.garretwilson.guise.session.GuiseSession;
 
 /**Hello World Guise demonstration frame.
 Copyright © 2005 GlobalMentor, Inc.
-Demonstrates frames and labels.
+Demonstrates frames and headings.
 @author Garret Wilson
 */
 public class HelloWorldFrame extends NavigationFrame
@@ -18,11 +18,11 @@ public class HelloWorldFrame extends NavigationFrame
 	public HelloWorldFrame(final GuiseSession<?> session)
 	{
 		super(session, new FlowLayout(Axis.Y));	//construct the parent class, flowing vertically
-		getModel().setLabel("Hello World Guise Demonstration");	//set the frame title
+		getModel().setLabel("Hello World Guise\u2122 Demonstration");	//set the frame title
 		
-		final Label helloWorldLabel=new Label(session);	//create a label
-		helloWorldLabel.getModel().setLabel("Hello World!");	//set the text of the label, using its model
-		add(helloWorldLabel);	//add the label to the frame
+		final Heading helloWorldHeading=new Heading(session, 0);	//create a top-level heading
+		helloWorldHeading.getModel().setLabel("Hello World!");	//set the text of the heading, using its model
+		add(helloWorldHeading);	//add the heading to the frame
 	}
 
 }

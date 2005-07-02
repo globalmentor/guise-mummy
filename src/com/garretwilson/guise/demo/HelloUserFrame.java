@@ -8,7 +8,7 @@ import com.garretwilson.guise.session.GuiseSession;
 
 /**Hello User Guise demonstration frame.
 Copyright © 2005 GlobalMentor, Inc.
-Demonstrates hidden components, input controls, buttons, and listeners.
+Demonstrates hidden components, text controls, control labels, buttons, and listeners.
 @author Garret Wilson
 */
 public class HelloUserFrame extends NavigationFrame
@@ -20,7 +20,7 @@ public class HelloUserFrame extends NavigationFrame
 	public HelloUserFrame(final GuiseSession<?> session)
 	{
 		super(session, new FlowLayout(Axis.Y));	//construct the parent class, flowing vertically
-		getModel().setLabel("Hello User Guise Demonstration");	//set the frame title	
+		getModel().setLabel("Hello User Guise\u2122 Demonstration");	//set the frame title	
 
 		final Label helloUserLabel=new Label(session);	//create a label
 		helloUserLabel.setVisible(false);	//don't show the label initially

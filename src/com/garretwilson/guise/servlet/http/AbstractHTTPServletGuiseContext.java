@@ -10,12 +10,18 @@ import javax.servlet.http.*;
 
 import com.garretwilson.guise.context.text.AbstractTextGuiseContext;
 import com.garretwilson.guise.session.GuiseSession;
+import static com.garretwilson.io.ContentTypeConstants.*;
+import static com.garretwilson.io.ContentTypeUtilities.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
+
+import com.garretwilson.text.CharacterEncoding;
+import static com.garretwilson.text.CharacterEncodingConstants.*;
 import com.garretwilson.util.*;
 
 /**The Guise context of an HTTP servlet.
+The output stream defaults to <code>text/plain</code> encoded in <code>UTF-8</code>.
 @author Garret Wilson
 */
 public abstract class AbstractHTTPServletGuiseContext extends AbstractTextGuiseContext<AbstractHTTPServletGuiseContext>
@@ -38,6 +44,9 @@ public abstract class AbstractHTTPServletGuiseContext extends AbstractTextGuiseC
 
 		/**@return The current absolute navigation URI for this context.*/
 		public URI getNavigationURI() {return navigationURI;}
+
+	/**The current content type of the output.*/
+	private ContentType outputContentType=createContentType(TEXT, PLAIN_SUBTYPE);	//default to text/plain
 
 	/**Constructor.
 	@param session The Guise user session of which this context is a part.
@@ -63,6 +72,8 @@ public abstract class AbstractHTTPServletGuiseContext extends AbstractTextGuiseC
 			addAll(parameterValueList, parameterValues);	//add all the parameter values to our list
 			parameterListMap.put(parameterKey, parameterValueList);	//store the the array of values as a list, keyed to the value
 		}
+		final ContentType defaultContentType=createContentType(outputContentType.getPrimaryType(), outputContentType.getSubType(), new NameValuePair<String, String>(CHARSET_PARAMETER, UTF_8));	//default to text/plain encoded in UTF-8
+		response.setContentType(defaultContentType.toString());	//initialize the default content type and encoding
 	}
 
 	/**@return A writer for rendering text content.
@@ -73,14 +84,26 @@ public abstract class AbstractHTTPServletGuiseContext extends AbstractTextGuiseC
 		return getResponse().getWriter();	//get the writer to the response
 	}
 
+	/**@return The character encoding currently used for the text output.*/
+	public CharacterEncoding getOutputCharacterEncoding()
+	{
+		return new CharacterEncoding(getResponse().getCharacterEncoding(), NO_BOM);	//return the current output character encoding
+	}
+
+	/**@return The current content type of the text output.*/
+	public ContentType getOutputContentType() {return outputContentType;}
+
 	/**Sets the content type of the text output.
+	This implementation removes all parameters and adds a character set parameter of the current encoding.
 	@param contentType The content type of the text output.
 	*/
-	public void setOutputContentType(final ContentType contentType)	//TODO allow a way to retrieve this value later
+	public void setOutputContentType(final ContentType contentType)
 	{
-		getResponse().setContentType(contentType.toString());	//set the content type of the response
+			//default to text/plain encoded in UTF-8 replace the charset parameter with the currently set character set TODO change to really just replace one parameter, instead of removing all others
+		this.outputContentType=createContentType(contentType.getPrimaryType(), contentType.getSubType(), new NameValuePair<String, String>(CHARSET_PARAMETER, getOutputCharacterEncoding().getEncoding()));
+		getResponse().setContentType(this.outputContentType.toString());	//set the content type of the response, including the current character set
 	}
-	
+
 	/**Returns a list of content types accepted by the client.
 	@return An array of content types accepted by the client.
 	*/

@@ -2,7 +2,7 @@ package com.garretwilson.guise.model;
 
 import com.garretwilson.guise.session.GuiseSession;
 
-/**A model for an identifier such as text and/or an icon.
+/**A default implementation of a model for an identifier such as text and/or an icon.
 @author Garret Wilson
 */
 public class DefaultLabelModel extends AbstractModel implements LabelModel
