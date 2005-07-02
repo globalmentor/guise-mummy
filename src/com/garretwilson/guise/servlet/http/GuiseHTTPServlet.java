@@ -5,7 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-
+import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
 import javax.servlet.*;
@@ -15,29 +15,33 @@ import com.garretwilson.guise.application.AbstractGuiseApplication;
 import com.garretwilson.guise.application.GuiseApplication;
 import com.garretwilson.guise.component.*;
 import com.garretwilson.guise.context.GuiseContext;
-import com.garretwilson.guise.context.GuiseContext.State;
 import com.garretwilson.guise.controller.text.xml.xhtml.*;
-import com.garretwilson.guise.session.AbstractGuiseSession;
 import com.garretwilson.guise.session.GuiseSession;
-import com.garretwilson.guise.validator.ValidationException;
-import com.garretwilson.guise.validator.ValidationsException;
+import com.garretwilson.guise.validator.*;
 import com.garretwilson.io.OutputStreamUtilities;
 import static com.garretwilson.net.URIConstants.*;
+import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.net.http.*;
-import com.garretwilson.util.Debug;
-
-import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
+import static com.garretwilson.text.CharacterConstants.*;
+import com.garretwilson.util.*;
+import static com.garretwilson.util.LocaleUtilities.*;
 
 /**The servlet that controls a Guise web applications. 
-Navigation frame bindings for paths can be set in initialization parameters named <code>navigationPathFrameClass.<var>frameID</var></code>, with values in the form <code>/<var>contextRelativePath</var>?<var>com.example.Frame</var></code>.
+Navigation frame bindings for paths can be set in initialization parameters named <code>navigation.<var>frameID</var></code>, with values in the form <code><var>contextRelativePath</var>?class=<var>com.example.Frame</var></code>.
 @author Garret Wilson
 */
 public class GuiseHTTPServlet extends BasicHTTPServlet
 {
 
-	/**The prefix, "navigationPathFrameClass.", used to identify path/frame bindings in the web application's init parameters.*/
-	public final static String NAVIGATION_PATH_FRAME_CLASS_INIT_PARAMETER_PREFIX="navigationPathFrameClass.";
+	/**The init parameter, "defaultLocale", used to specify the default locale.*/
+	public final static String DEFAULT_LOCALE_INIT_PARAMETER_PREFIX="defaultLocale";
+	/**The init parameter, "supportedLocales", used to specify the supported locales.*/
+	public final static String SUPPORTED_LOCALES_INIT_PARAMETER_PREFIX="supportedLocales";
+	/**The prefix, "navigation.", used to identify navigation definitions in the web application's init parameters.*/
+	public final static String NAVIGATION_INIT_PARAMETER_PREFIX="navigation.";
+	/**The parameter, "class", used to identify the navigation frame class in the web application's init parameters.*/
+	public final static String NAVIGATION_CLASS_PARAMETER="class";
 
 	/**@return The global HTTP servlet Guise instance.
 	This is a convenience method.
@@ -92,11 +96,19 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 		super.init(servletConfig);	//do the default initialization
 		Debug.setDebug(true);	//turn on debug
 		Debug.setMinimumReportLevel(Debug.ReportLevel.TRACE);	//set the level of reporting
-		initNavigationFrameBindings(servletConfig);	//initialize the frame bindings
+		try
+		{
+			initGuiseApplication(getGuiseApplication(), servletConfig);	//initialize the frame bindings
+		}
+		catch(final Exception exception)	//if there is any problem initializing the Guise application
+		{
+			throw new ServletException("Error initializing Guise application: "+exception.getMessage(), exception);
+		}
 	}
 
 	/**Initializes bindings between paths and associated navigation frame classes.
-	This implementation reads the initialization parameters named <code>navigationPathFrameClass.<var>frameID</var></code>, expecting values in the form <code><var>contextRelativePath</var>?<var>com.example.Frame</var></code>.
+	This implementation reads the initialization parameters named <code>navigation.<var>frameID</var></code>, expecting values in the form <code><var>contextRelativePath</var>?class=<var>com.example.Frame</var></code>.
+	@param guiseApplication The Guise application to initialize.
 	@param servletConfig The servlet configuration. 
 	@exception IllegalArgumentException if the one of the frame bindings is not expressed in correct format.
 	@exception IllegalArgumentException if the one of the classes specified as a frame binding could not be found.
@@ -104,13 +116,33 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 	@exception ServletException if there is a problem initializing the frame bindings.
 	@see com.garretwilson.guise.component.NavigationFrame
 	*/
-	protected void initNavigationFrameBindings(final ServletConfig servletConfig) throws ServletException
+	protected void initGuiseApplication(final HTTPServletGuiseApplication guiseApplication, final ServletConfig servletConfig) throws ServletException
 	{
+			//initialize the supported locales
+		final String supportedLocalesString=servletConfig.getInitParameter(SUPPORTED_LOCALES_INIT_PARAMETER_PREFIX);	//get the supported locales init parameter
+		if(supportedLocalesString!=null)	//if supported locales are specified
+		{
+			final String[] supportedLocaleStrings=supportedLocalesString.split(String.valueOf(COMMA_CHAR));	//split the string into separate locale strings
+			final Locale[] supportedLocales=new Locale[supportedLocaleStrings.length];	//create an array to hold the locales
+			for(int i=supportedLocaleStrings.length-1; i>=0; --i)	//for each supported locale string
+			{
+				supportedLocales[i]=createLocale(supportedLocaleStrings[i].trim());	//create a locale for this specified locale (trimming whitespace just to be extra helpful)
+			}
+			guiseApplication.getSupportedLocales().clear();	//remove the application's currently supported locales
+			addAll(guiseApplication.getSupportedLocales(), supportedLocales);	//add all supported locales to the application 
+		}
+			//initialize the default locale
+		final String defaultLocaleString=servletConfig.getInitParameter(DEFAULT_LOCALE_INIT_PARAMETER_PREFIX);	//get the default locale init parameter
+		if(defaultLocaleString!=null)	//if a default locale is specified
+		{
+			guiseApplication.setDefaultLocale(createLocale(defaultLocaleString.trim()));	//create a locale from the default locale string and store it in the application (trimming whitespace just to be extra helpful)
+		}
+			//initialize navigation path/frame bindings
 		final Enumeration initParameterNames=servletConfig.getInitParameterNames();	//get the names of all init parameters
 		while(initParameterNames.hasMoreElements())	//while there are more initialization parameters
 		{
 			final String initParameterName=(String)initParameterNames.nextElement();	//get the next initialization parameter name
-			if(initParameterName.startsWith(NAVIGATION_PATH_FRAME_CLASS_INIT_PARAMETER_PREFIX))	//if this is a path/frame binding
+			if(initParameterName.startsWith(NAVIGATION_INIT_PARAMETER_PREFIX))	//if this is a path/frame binding
 			{
 				final String initParameterValue=servletConfig.getInitParameter(initParameterName);	//get this init parameter value
 				try
@@ -119,14 +151,15 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 					final String path=pathFrameBindingURI.getRawPath();	//extract the path from the URI
 					if(path!=null)	//if a path was specified
 					{
-						final String className=pathFrameBindingURI.getQuery();	//get the decoded query (using the decoded form will allow users to express values that might be legal class names but not legal URI characters)
+						final ListMap<String, String> parameterListMap=getParameters(pathFrameBindingURI);	//get the URI parameters
+						final String className=parameterListMap.getItem(NAVIGATION_CLASS_PARAMETER);	//get the class parameter
 						if(className!=null)	//if a class name was specified
 						{
 							try
 							{
 								final Class<?> specifiedClass=Class.forName(className);	//load the class for the specified name
 								final Class<? extends NavigationFrame> navigationFrameClass=specifiedClass.asSubclass(NavigationFrame.class);	//cast the specified class to a frame class just to make sure it's the correct type
-								getGuiseApplication().bindNavigationFrame(path, navigationFrameClass);	//cast the class to a frame class and bind it to the path in the Guise application
+								guiseApplication.bindNavigationFrame(path, navigationFrameClass);	//cast the class to a frame class and bind it to the path in the Guise application
 							}
 							catch(final ClassNotFoundException classNotFoundException)
 							{
@@ -290,10 +323,7 @@ Debug.trace("raw path info: ", rawPathInfo);
 				{
 					guiseSession=createGuiseSession(httpSession);	//create a new Guise session
 					final Locale[] clientAcceptedLanguages=getAcceptedLanguages(httpRequest);	//get all languages accepted by the client
-					if(clientAcceptedLanguages.length>0)	//if the client indicates at least one accepted language
-					{
-						guiseSession.setLocale(clientAcceptedLanguages[0]);	//update the new session with the first language accepted by the client
-					}
+					guiseSession.requestLocale(asList(clientAcceptedLanguages));	//ask the Guise session to change to one of the accepted locales, if the application supports one
 					guiseSessionMap.put(httpSession, guiseSession);	//associate the Guise session with the HTTP session
 				}
 				return guiseSession;	//return the Guise session

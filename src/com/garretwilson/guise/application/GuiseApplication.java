@@ -2,6 +2,7 @@ package com.garretwilson.guise.application;
 
 import java.net.URI;
 import java.util.Locale;
+import java.util.Set;
 
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.guise.component.*;
@@ -17,19 +18,22 @@ public interface GuiseApplication<GC extends GuiseContext> extends PropertyBinda
 {
 
 	/**The locale bound property.*/
-	public final static String LOCALE_PROPERTY=getPropertyName(GuiseApplication.class, "locale");
+	public final static String DEFAULT_LOCALE_PROPERTY=getPropertyName(GuiseApplication.class, "defaultLocale");
 	/**The resource bundle base name bound property.*/
 	public final static String RESOURCE_BUNDLE_BASE_NAME_PROPERTY=getPropertyName(GuiseApplication.class, "resourceBundleBaseName");
 
 	/**@return The application locale used by default if a new session cannot determine the users's preferred locale.*/
-	public Locale getLocale();
+	public Locale getDefaultLocale();
 
 	/**Sets the application locale used by default if a new session cannot determine the users's preferred locale.
 	This is a bound property.
-	@param newLocale The new default application locale.
-	@see #LOCALE_PROPERTY
+	@param newDefaultLocale The new default application locale.
+	@see #DEFAULT_LOCALE_PROPERTY
 	*/
-	public void setLocale(final Locale newLocale);
+	public void setDefaultLocale(final Locale newDefaultLocale);
+
+	/**@return The thread-safe set of locales supported by this application.*/
+	public Set<Locale> getSupportedLocales();
 
 	/**@return The base name of the resource bundle to use for this application.*/
 	public String getResourceBundleBaseName();

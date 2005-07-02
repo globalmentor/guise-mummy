@@ -72,6 +72,49 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 			}
 		}
 
+		/**Requests that the locale be changed to one of the given locales.
+		Each of the locales in the list are examined in order, and the first one supported by the application is used.
+		A requested locale is accepted if a more general locale is supported. (i.e. <code>en-US</code> is accepted if <code>en</code> is supported.)
+		@param requestedLocales The locales requested, in order of preference.
+		@return The accepted locale (which may be a variation of this locale), or <code>null</code> if none of the given locales are supported by the application.
+		@see GuiseApplication#getSupportedLocales()
+		@see #setLocale(Locale)
+		*/
+		public Locale requestLocale(final List<Locale> requestedLocales)
+		{
+			final Set<Locale> supportedLocales=getApplication().getSupportedLocales();	//get the application's supported locales	TODO maybe don't expose the whole set
+			for(final Locale requestedLocale:requestedLocales)	//for each requested locale
+			{
+				Locale acceptedLocale=null;	//we'll determine if any variations of the requested locale is supported
+				if(supportedLocales.contains(requestedLocale))	//if the application supports this local 
+				{
+					acceptedLocale=requestedLocale;	//accept this locale as-is
+				}
+				if(acceptedLocale==null && requestedLocale.getVariant().length()>0)	//if the requested locale specifies a variant, see if there is a more general supported locale
+				{
+					final Locale languageCountryLocale=new Locale(requestedLocale.getLanguage(), requestedLocale.getCountry());	//create a more general locale with just the language and country
+					if(supportedLocales.contains(languageCountryLocale))	//if the application supports this locale 
+					{
+						acceptedLocale=languageCountryLocale;	//accept this more general locale
+					}
+				}
+				if(acceptedLocale==null && requestedLocale.getCountry().length()>0)	//if the requested locale specifies a country, see if there is an even more general supported locale
+				{
+					final Locale languageLocale=new Locale(requestedLocale.getLanguage());	//create a more general locale with just the language
+					if(supportedLocales.contains(languageLocale))	//if the application supports this locale 
+					{
+						acceptedLocale=languageLocale;	//accept this more general locale
+					}
+				}
+				if(acceptedLocale!=null)	//if we were able to find a supported locale
+				{
+					setLocale(acceptedLocale);	//change to this locale
+					return acceptedLocale;	//indicate which locale was accepted
+				}
+			}
+			return null;	//indicate that the application supports none of the requested locales and none of their more general variations
+		}
+
 	/**The lazily-created resource bundle used by this session.*/
 	private ResourceBundle resourceBundle=null;
 
@@ -121,7 +164,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 	public AbstractGuiseSession(final GuiseApplication<GC> application)
 	{
 		this.application=application;	//save the Guise instance
-		this.locale=application.getLocale();	//default to the application locale
+		this.locale=application.getDefaultLocale();	//default to the application locale
 		application.addPropertyChangeListener(GuiseApplication.RESOURCE_BUNDLE_BASE_NAME_PROPERTY, resourceBundleReleasePropertyValueChangeListener);	//when the application changes its resource bundle base name, release the resource bundle		
 	}
 

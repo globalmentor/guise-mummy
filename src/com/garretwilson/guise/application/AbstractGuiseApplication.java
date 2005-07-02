@@ -2,6 +2,8 @@ package com.garretwilson.guise.application;
 
 import java.net.URI;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArraySet;
+
 import static java.util.Collections.*;
 
 import com.garretwilson.beans.BoundPropertyObject;
@@ -24,26 +26,32 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext>	extends 
 {
 
 	/**The application locale used by default if a new session cannot determine the users's preferred locale.*/
-	private Locale locale;
+	private Locale defaultLocale;
 
 		/**@return The application locale used by default if a new session cannot determine the users's preferred locale.*/
-		public Locale getLocale() {return locale;}
+		public Locale getDefaultLocale() {return defaultLocale;}
 
 		/**Sets the application locale used by default if a new session cannot determine the users's preferred locale.
 		This is a bound property.
-		@param newLocale The new default application locale.
+		@param newDefaultLocale The new default application locale.
 		@exception NullPointerException if the given locale is <code>null</code>.
-		@see GuiseApplication#LOCALE_PROPERTY
+		@see GuiseApplication#DEFAULT_LOCALE_PROPERTY
 		*/
-		public void setLocale(final Locale newLocale)
+		public void setDefaultLocale(final Locale newDefaultLocale)
 		{
-			if(!ObjectUtilities.equals(locale, newLocale))	//if the value is really changing (compare their values, rather than identity)
+			if(!ObjectUtilities.equals(defaultLocale, newDefaultLocale))	//if the value is really changing (compare their values, rather than identity)
 			{
-				final Locale oldLocale=locale;	//get the old value
-				locale=checkNull(newLocale, "Guise application locale cannot be null.");	//actually change the value
-				firePropertyChange(LOCALE_PROPERTY, oldLocale, newLocale);	//indicate that the value changed
+				final Locale oldLocale=defaultLocale;	//get the old value
+				defaultLocale=checkNull(newDefaultLocale, "Guise application default locale cannot be null.");	//actually change the value
+				firePropertyChange(DEFAULT_LOCALE_PROPERTY, oldLocale, newDefaultLocale);	//indicate that the value changed
 			}
 		}
+
+	/**The thread-safe set of locales supported by this application.*/
+	private final Set<Locale> supportedLocales=new CopyOnWriteArraySet<Locale>();
+
+		/**@return The thread-safe set of locales supported by this application.*/
+		public Set<Locale> getSupportedLocales() {return supportedLocales;}
 
 	/**The base name of the resource bundle to use for this application.*/
 	private String resourceBundleBaseName=DEFAULT_RESOURCE_BUNDLE_BASE_NAME;
@@ -79,7 +87,7 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext>	extends 
 	*/
 	public AbstractGuiseApplication(final Locale locale)
 	{
-		this.locale=locale;	//set the default locale
+		this.defaultLocale=locale;	//set the default locale
 	}
 
 	/**The synchronized list of installed controller kits, with later registrations taking precedence*/

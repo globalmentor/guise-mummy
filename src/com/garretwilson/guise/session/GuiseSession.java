@@ -35,6 +35,16 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	*/
 	public void setLocale(final Locale newLocale);
 
+	/**Requests that the locale be changed to one of the given locales.
+	Each of the locales in the list are examined in order, and the first one supported by the application is used.
+	A requested locale is accepted if a more general locale is supported. (i.e. <code>en-US</code> is accepted if <code>en</code> is supported.)
+	@param requestedLocales The locales requested, in order of preference.
+	@return The accepted locale (which may be a variation of this locale), or <code>null</code> if none of the given locales are supported by the application.
+	@see GuiseApplication#getSupportedLocales()
+	@see #setLocale(Locale)
+	*/
+	public Locale requestLocale(final List<Locale> requestedLocales);
+
 	/**Retrieves a resource bundle to be used by this session.
 	If this session does not yet have a resource bundle, one will be created based upon the current locale.
 	The returned resource bundle should only be used temporarily and should not be saved,
