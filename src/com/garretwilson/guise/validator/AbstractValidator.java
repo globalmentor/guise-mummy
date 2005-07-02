@@ -54,11 +54,11 @@ public abstract class AbstractValidator<V> implements Validator<V>
 		{
 			if(value==null && isValueRequired())	//if the value is invalid because it didn't mean the required requirement
 			{
-				throw new ValidationException(getSession().getResourceBundle().getString(VALIDATOR_VALUE_REQUIRED_MESSAGE_RESOURCE), value);				
+				throw new ValidationException(getSession().getStringResource(VALIDATOR_VALUE_REQUIRED_MESSAGE_RESOURCE), value);				
 			}
 			else	//for all other invalid values
 			{
-				throw new ValidationException(format(getSession().getResourceBundle().getString(VALIDATOR_VALUE_REQUIRED_MESSAGE_RESOURCE), value), value);
+				throw new ValidationException(format(getSession().getStringResource(VALIDATOR_VALUE_REQUIRED_MESSAGE_RESOURCE), value), value);
 			}
 		}
 	}

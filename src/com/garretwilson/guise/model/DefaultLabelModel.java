@@ -1,6 +1,7 @@
 package com.garretwilson.guise.model;
 
 import com.garretwilson.guise.session.GuiseSession;
+import com.garretwilson.lang.ObjectUtilities;
 
 /**A default implementation of a model for an identifier such as text and/or an icon.
 @author Garret Wilson
@@ -11,8 +12,16 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 	/**The label text, or <code>null</code> if there is no label text.*/
 	private String label=null;
 
-		/**@return The label text, or <code>null</code> if there is no label text.*/
-		public String getLabel() {return label;}
+		/**Determines the text of the label.
+		If a label is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
+		@return The label text, or <code>null</code> if there is no label text.
+		@exception java.util.MissingResourceException if there was an error loading the value from the resources.
+		@see #getLabelResourceKey()
+		*/
+		public String getLabel()
+		{
+			return getString(label, getLabelResourceKey());	//get the value or the resource, if available
+		}
 
 		/**Sets the text of the label.
 		This is a bound property.
@@ -21,12 +30,33 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 		*/
 		public void setLabel(final String newLabel)
 		{
-			if(label!=newLabel)	//if the value is really changing
+			if(!ObjectUtilities.equals(label, newLabel))	//if the value is really changing
 			{
-				final String oldText=label;	//get the old value
+				final String oldLabel=label;	//get the old value
 				label=newLabel;	//actually change the value
-				firePropertyChange(LABEL_PROPERTY, oldText, newLabel);	//indicate that the value changed
+				firePropertyChange(LABEL_PROPERTY, oldLabel, newLabel);	//indicate that the value changed
 			}			
+		}
+
+	/**The label text resource key, or <code>null</code> if there is no label text resource specified.*/
+	private String labelResourceKey=null;
+
+		/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
+		public String getLabelResourceKey() {return labelResourceKey;}
+
+		/**Sets the key identifying the text of the label in the resources.
+		This is a bound property.
+		@param newLabelResourceKey The new label text resource key.
+		@see LabelModel#LABEL_RESOURCE_KEY_PROPERTY
+		*/
+		public void setLabelResourceKey(final String newLabelResourceKey)
+		{
+			if(!ObjectUtilities.equals(labelResourceKey, newLabelResourceKey))	//if the value is really changing
+			{
+				final String oldLabelResourceKey=labelResourceKey;	//get the old value
+				labelResourceKey=newLabelResourceKey;	//actually change the value
+				firePropertyChange(LABEL_RESOURCE_KEY_PROPERTY, oldLabelResourceKey, newLabelResourceKey);	//indicate that the value changed
+			}
 		}
 
 	/**Session constructor.

@@ -117,6 +117,13 @@ public class HomeFrame extends NavigationFrame
 		horizontalPanel.add(booleanPanela);
 */
 		add(horizontalPanel);
+		
+/*TODO del		
+		final Heading resourceHeading=new Heading(session, 2);
+		resourceHeading.getModel().setLabelResourceKey("test.resource");
+		add(resourceHeading);
+*/
+
 	}
 
 }

@@ -119,6 +119,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 	private ResourceBundle resourceBundle=null;
 
 		/**Retrieves a resource bundle to be used by this session.
+		One of the <code>getXXXResource()</code> should be used in preference to using this method directly.
 		If this session does not yet have a resource bundle, one will be created based upon the current locale.
 		The returned resource bundle should only be used temporarily and should not be saved,
 		as the resource bundle may change if the session locale or the application resource bundle base name changes.
@@ -126,6 +127,10 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		@exception MissingResourceException if no resource bundle for the application's specified base name can be found.
 		@see GuiseApplication#getResourceBundleBaseName()
 		@see #getLocale()
+		@see #getStringResource(String)
+		@see #getStringResource(String, String)
+		@see #getBooleanResource(String)
+		@see #getBooleanResource(String, Boolean)
 		*/
 		public ResourceBundle getResourceBundle()
 		{
@@ -155,7 +160,91 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 					releaseResourceBundle();	//release the resource bundle, as the new locale may indicate that new resources should be used					
 				}
 			};
-		
+
+		/**Retrieves a string resource from the resource bundle.
+		This is a preferred convenience method for accessing the resources in the session's resource bundle.
+		@param resourceKey The key of the resource to retrieve.
+		@return The resource associated with the specified resource key.
+		@exception NullPointerException if the provided resource key is <code>null</code>.
+		@exception MissingResourceException if no resource could be found associated with the given key.
+		@exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code>.
+		@see #getResourceBundle()
+		@see #getStringResource(String, String)
+		*/
+		public String getStringResource(final String resourceKey)
+		{
+			return getResourceBundle().getString(resourceKey);	//retrieve a string from the resource bundle
+		}
+
+		/**Retrieves a string resource from the resource bundle, using a specified default if no such resource is available.
+		This is a preferred convenience method for accessing the resources in the session's resource bundle.
+		@param resourceKey The key of the resource to retrieve.
+		@param defaultValue The default value to use if there is no resource associated with the given key.
+		@return The resource associated with the specified resource key or the default if none is available.
+		@exception NullPointerException if the provided resource key is <code>null</code>.
+		@exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code>.
+		@see #getResourceBundle()
+		@see #getStringResource(String)
+		*/
+		public String getStringResource(final String resourceKey, final String defaultValue)
+		{
+			try
+			{
+				return getStringResource(resourceKey);	//try to load the string from the resources
+			}
+			catch(final MissingResourceException missingResourceException)	//if no such resource is available
+			{
+				return defaultValue;	//return the specified default value
+			}
+		}
+
+		/**Retrieves a <code>Boolean</code> resource from the resource bundle.
+		If the given resource is a string, it will be interpreted according to the {@link Boolean#valueOf(java.lang.String)} rules.
+		This is a preferred convenience method for accessing the resources in the session's resource bundle.
+		@param resourceKey The key of the resource to retrieve.
+		@return The resource associated with the specified resource key.
+		@exception NullPointerException if the provided resource key is <code>null</code>.
+		@exception MissingResourceException if no resource could be found associated with the given key.
+		@exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>Boolean</code> object.
+		@see #getResourceBundle()
+		@see #getBooleanResource(String, Boolean)
+		*/
+		public Boolean getBooleanResource(final String resourceKey)
+		{
+			final Object resource=getResourceBundle().getObject(resourceKey);	//retrieve a key from the resource bundle
+			if(resource instanceof String)	//if the resource is a string
+			{
+				return Boolean.valueOf((String)resource);	//get the Boolean value of the resource string
+			}
+			else	//if the resource is not a string, assume it is a Boolean
+			{
+				return (Boolean)resource;	//return the resource as a Boolean object, throwing a ClassCastException if it isn't an instance of Boolean
+			}
+		}
+
+		/**Retrieves a <code>Boolean</codeL resource from the resource bundle, using a specified default if no such resource is available.
+		If the given resource is a string, it will be interpreted according to the {@link Boolean#valueOf(java.lang.String)} rules.
+		This is a preferred convenience method for accessing the resources in the session's resource bundle.
+		@param resourceKey The key of the resource to retrieve.
+		@param defaultValue The default value to use if there is no resource associated with the given key.
+		@return The resource associated with the specified resource key or the default if none is available.
+		@exception NullPointerException if the provided resource key is <code>null</code>.
+		@exception ClassCastException if the resource associated with the given key is not an instance of <code>Boolean</code>.
+		@see #getResourceBundle()
+		@see #getBooleanResource(String)
+		*/
+		public Boolean getBooleanResource(final String resourceKey, final Boolean defaultValue)
+		{
+			try
+			{
+				return getBooleanResource(resourceKey);	//try to load the Boolean from the resources
+			}
+			catch(final MissingResourceException missingResourceException)	//if no such resource is available
+			{
+				return defaultValue;	//return the specified default value
+			}
+		}
+
 	/**Guise application constructor.
 	The session local will initially be set to the locale of the associated Guise application.
 	@param application The Guise application to which this session belongs.
