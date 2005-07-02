@@ -4,10 +4,14 @@ import java.net.URI;
 import java.util.*;
 import static java.util.Collections.*;
 
+import com.garretwilson.beans.BoundPropertyObject;
+import static com.garretwilson.guise.GuiseResourceConstants.*;
 import com.garretwilson.guise.component.Component;
 import com.garretwilson.guise.component.NavigationFrame;
 import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.*;
+import com.garretwilson.lang.ObjectUtilities;
+
 import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.util.Debug;
 
@@ -16,8 +20,67 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 /**An abstract base class for a Guise application.
 @author Garret Wilson
 */
-public abstract class AbstractGuiseApplication<GC extends GuiseContext>	implements GuiseApplication<GC>
+public abstract class AbstractGuiseApplication<GC extends GuiseContext>	extends BoundPropertyObject implements GuiseApplication<GC>
 {
+
+	/**The application locale used by default if a new session cannot determine the users's preferred locale.*/
+	private Locale locale;
+
+		/**@return The application locale used by default if a new session cannot determine the users's preferred locale.*/
+		public Locale getLocale() {return locale;}
+
+		/**Sets the application locale used by default if a new session cannot determine the users's preferred locale.
+		This is a bound property.
+		@param newLocale The new default application locale.
+		@exception NullPointerException if the given locale is <code>null</code>.
+		@see GuiseApplication#LOCALE_PROPERTY
+		*/
+		public void setLocale(final Locale newLocale)
+		{
+			if(!ObjectUtilities.equals(locale, newLocale))	//if the value is really changing (compare their values, rather than identity)
+			{
+				final Locale oldLocale=locale;	//get the old value
+				locale=checkNull(newLocale, "Guise application locale cannot be null.");	//actually change the value
+				firePropertyChange(LOCALE_PROPERTY, oldLocale, newLocale);	//indicate that the value changed
+			}
+		}
+
+	/**The base name of the resource bundle to use for this application.*/
+	private String resourceBundleBaseName=DEFAULT_RESOURCE_BUNDLE_BASE_NAME;
+
+		/**@return The base name of the resource bundle to use for this application.*/
+		public String getResourceBundleBaseName() {return resourceBundleBaseName;}
+
+		/**Changes the resource bundle base name.
+		This is a bound property.
+		@param newResourceBundleBaseName The new base name of the resource bundle.
+		@see GuiseApplication#RESOURCE_BUNDLE_BASE_NAME_PROPERTY
+		*/
+		public void setResourceBundleBaseName(final String newResourceBundleBaseName)
+		{
+			if(!ObjectUtilities.equals(resourceBundleBaseName, newResourceBundleBaseName))	//if the value is really changing
+			{
+				final String oldResourceBundleBaseName=resourceBundleBaseName;	//get the old value
+				resourceBundleBaseName=checkNull(newResourceBundleBaseName, "Resource bundle base name cannot be null.");	//actually change the value
+				firePropertyChange(RESOURCE_BUNDLE_BASE_NAME_PROPERTY, oldResourceBundleBaseName, newResourceBundleBaseName);	//indicate that the value changed
+			}			
+		}
+
+	/**Default constructor.
+	This implemetation sets the locale to the JVM default.
+	*/
+	public AbstractGuiseApplication()
+	{
+		this(Locale.getDefault());	//construct the class with the JVM default locale
+	}
+
+	/**Locale constructor.
+	@param locale The default application locale.
+	*/
+	public AbstractGuiseApplication(final Locale locale)
+	{
+		this.locale=locale;	//set the default locale
+	}
 
 	/**The synchronized list of installed controller kits, with later registrations taking precedence*/
 	private final List<ControllerKit<GC>> controllerKitList=synchronizedList(new ArrayList<ControllerKit<GC>>());
@@ -49,7 +112,6 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext>	implemen
 
 	/**Determines the controller class registered for the given component class.
 	This request is delegated to each controller kit, with later-installed controller kits taking precedence. 
-	@param context The Guise context interested in retrieving a controller. 
 	@param componentClass The class of component that may be registered.
 	@return A class of controller registered to render component of the specific class, or <code>null</code> if no controller is registered.
 	*/
@@ -60,7 +122,6 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext>	implemen
 			for(final ControllerKit<GC> controllerKit:controllerKitList)	//for each controller kit in our list
 			{
 				final Class<? extends Controller<GC, ? super C>> controllerKitClass=controllerKit.getRegisteredControllerClass(componentClass);	//ask the controller kit for a registered controller class for this component
-//TODO fix				final Class<? extends Controller<GC, C>> controllerKitClass=(Class<? extends Controller<GC, C>>)controllerKit.getRegisteredControllerClass(componentClass);	//ask the controller kit for a registered controller class for this component
 				if(controllerKitClass!=null)	//if this controller kit gave us a controller class
 				{
 					return controllerKitClass;	//return the class
@@ -76,7 +137,7 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext>	implemen
 	@return A class of render strategy to render the given component class, or <code>null</code> if no render strategy is registered.
 	*/
 //TODO fix	@SuppressWarnings("unchecked")
-	protected <C extends Component> Class<? extends Controller<GC, C>> getControllerClass(final Class<C> componentClass)
+	protected <C extends Component> Class<? extends Controller<GC, ? super C>> getControllerClass(final Class<C> componentClass)
 	{
 		Class<? extends Controller> controllerClass=getRegisteredControllerClass(componentClass);	//see if there is a controller class registered for this component type
 		if(controllerClass==null)	//if we didn't find a render strategy for this class, check the super class
@@ -101,7 +162,7 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext>	implemen
 				}					
 			}
 		}
-		return (Class<? extends Controller<GC, C>>)controllerClass;	//show which if any render strategy class we found
+		return (Class<? extends Controller<GC, ? super C>>)controllerClass;	//show which if any render strategy class we found
 	}
 
 	/**Determines the controller appropriate for the given component.
@@ -110,10 +171,10 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext>	implemen
 	@return A controller to render the given component, or <code>null</code> if no controller is registered.
 	*/
 //TODO fix	@SuppressWarnings("unchecked")
-	public <C extends Component<?>> Controller<GC, C> getController(final C component)
+	public <C extends Component<?>> Controller<GC, ? super C> getController(final C component)
 	{
 		Class<C> componentClass=(Class<C>)component.getClass();	//get the component class
-		final Class<? extends Controller<GC, C>> renderStrategyClass=getControllerClass(componentClass);	//walk the hierarchy to see if there is a render strategy class registered for this component type
+		final Class<? extends Controller<GC, ? super C>> renderStrategyClass=getControllerClass(componentClass);	//walk the hierarchy to see if there is a render strategy class registered for this component type
 		if(renderStrategyClass!=null)	//if we found a render strategy class
 		{
 			try

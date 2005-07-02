@@ -3,6 +3,7 @@ package com.garretwilson.guise.servlet.http;
 import java.io.*;
 import java.net.URI;
 import java.util.*;
+
 import static java.util.Collections.*;
 
 import javax.mail.internet.ContentType;
@@ -109,7 +110,7 @@ public abstract class AbstractHTTPServletGuiseContext extends AbstractTextGuiseC
 	*/
 	public ContentType[] getClientAcceptedContentTypes()
 	{
-		return getAcceptedContentTypes(getRequest());	//return the accepted content types in the request
+		return getAcceptedContentTypes(getRequest());	//return the accepted content types from the request
 	}
 
 	/**Determines if the client accepts the given content type.
@@ -130,5 +131,13 @@ public abstract class AbstractHTTPServletGuiseContext extends AbstractTextGuiseC
 	public boolean isClientAcceptedContentType(final ContentType contentType, final boolean matchWildcards)
 	{
 		return isAcceptedContentType(getRequest(), contentType, matchWildcards);	//see if the client accepts the content type, matching wildcards if so requested
+	}
+
+	/**Returns a list of languages accepted by the client.
+	@return An array of languages accepted by the client.
+	*/
+	public Locale[] getClientAcceptedLanguages()
+	{
+		return getAcceptedLanguages(getRequest());	//return the accepted languages from the request
 	}
 }

@@ -2,22 +2,49 @@ package com.garretwilson.guise.session;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
-import java.util.Set;
+import java.util.*;
 
+import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.event.PostponedEvent;
 import com.garretwilson.guise.application.GuiseApplication;
 import com.garretwilson.guise.component.NavigationFrame;
 import com.garretwilson.guise.context.GuiseContext;
+import static com.garretwilson.lang.ClassUtilities.*;
 
 /**Represents a session with a user.
 A client application may only have one session, while a web server application will likely have multiple sessions.
 @author Garret Wilson
 */
-public interface GuiseSession<GC extends GuiseContext<GC>>
+public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBindable
 {
+
+	/**The locale bound property.*/
+	public final static String LOCALE_PROPERTY=getPropertyName(GuiseSession.class, "locale");
 
 	/**@return The Guise application to which this session belongs.*/
 	public GuiseApplication<GC> getApplication();
+
+	/**@return The current session locale.*/
+	public Locale getLocale();
+
+	/**Sets the current session locale.
+	This is a bound property.
+	@param newLocale The new session locale.
+	@exception NullPointerException if the given locale is <code>null</code>.
+	@see #LOCALE_PROPERTY
+	*/
+	public void setLocale(final Locale newLocale);
+
+	/**Retrieves a resource bundle to be used by this session.
+	If this session does not yet have a resource bundle, one will be created based upon the current locale.
+	The returned resource bundle should only be used temporarily and should not be saved,
+	as the resource bundle may change if the session locale or the application resource bundle base name changes.
+	@return The resource bundle containing the resources for this session, based upon the locale.
+	@exception MissingResourceException if no resource bundle for the application's specified base name can be found.
+	@see GuiseApplication#getResourceBundleBaseName()
+	@see #getLocale()
+	*/
+	public ResourceBundle getResourceBundle();
 
 	/**@return The unmodifiable set of all states of available Guise contexts.*/
 	public Set<GuiseContext.State> getContextStates();

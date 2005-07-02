@@ -1,16 +1,19 @@
 package com.garretwilson.guise.validator;
 
+import com.garretwilson.guise.session.GuiseSession;
+
 /**An abstract implementation of an object that can determine whether a value is valid.
 @author Garret Wilson
 */
 public class ValueRequiredValidator<V> extends AbstractValidator<V>
 {
-	/**Determines whether the provided value is not <code>null</code>.
-	@param value The value to validate.
-	@return <code>true</code> if the value is not <code>null</code>.
+
+	/**Session constructor.
+	@param session The Guise session that owns this validator.
+	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public boolean isValid(final V value)
+	public ValueRequiredValidator(final GuiseSession<?> session)
 	{
-		return value!=null;	//a required value is invalid if it is null
+		super(session, true);	//construct the parent class, indicating that values are required
 	}
 }

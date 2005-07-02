@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
+
 import static java.util.Collections.*;
 
 import javax.servlet.*;
@@ -272,13 +273,15 @@ Debug.trace("raw path info: ", rawPathInfo);
 
 		/**Retrieves a Guise session for the given HTTP session.
 		A Guise session will be created if none is currently associated with the given HTTP session.
+		When a Guise session is first created, its locale will be updated to match the language, if any, accepted by the HTTP request.
 		This method can only be accessed by classes in the same package.
 		This method should only be called by HTTP Guise session manager.
+		@param httpRequest The HTTP request with which the Guise session is associated. 
 		@param httpSession The HTTP session for which a Guise session should be retrieved. 
 		@return The Guise session associated with the provided HTTP session.
 		@see HTTPGuiseSessionManager
 		*/
-		protected HTTPServletGuiseSession getGuiseSession(final HttpSession httpSession)
+		protected HTTPServletGuiseSession getGuiseSession(final HttpServletRequest httpRequest, final HttpSession httpSession)
 		{
 			synchronized(guiseSessionMap)	//don't allow anyone to modify the map of sessions while we access it
 			{
@@ -286,6 +289,11 @@ Debug.trace("raw path info: ", rawPathInfo);
 				if(guiseSession==null)	//if no Guise session is associated with the given HTTP session
 				{
 					guiseSession=createGuiseSession(httpSession);	//create a new Guise session
+					final Locale[] clientAcceptedLanguages=getAcceptedLanguages(httpRequest);	//get all languages accepted by the client
+					if(clientAcceptedLanguages.length>0)	//if the client indicates at least one accepted language
+					{
+						guiseSession.setLocale(clientAcceptedLanguages[0]);	//update the new session with the first language accepted by the client
+					}
 					guiseSessionMap.put(httpSession, guiseSession);	//associate the Guise session with the HTTP session
 				}
 				return guiseSession;	//return the Guise session
@@ -299,9 +307,14 @@ Debug.trace("raw path info: ", rawPathInfo);
 		@return The Guise session previously associated with the provided HTTP session, or <code>null</code> if no Guise session was associated with the given HTTP session.
 		@see HTTPGuiseSessionManager
 		*/
-		protected AbstractHTTPGuiseSession removeGuiseSession(final HttpSession httpSession)
+		protected HTTPServletGuiseSession removeGuiseSession(final HttpSession httpSession)
 		{
-			return guiseSessionMap.remove(httpSession);	//remove the HTTP session and Guise session association
+			HTTPServletGuiseSession guiseSession=guiseSessionMap.remove(httpSession);	//remove the HTTP session and Guise session association
+			if(guiseSession!=null)	//if there is a Guise session associated with the HTTP session
+			{
+				guiseSession.onDestroy();	//let the Guise session know it's being destroyed so that it can clean up and release references to the application
+			}
+			return guiseSession;	//return the associated Guise session
 		}
 
 		/**Factory method to create a Guise session from an HTTP session.
@@ -389,6 +402,13 @@ Debug.trace("raw path info: ", rawPathInfo);
 			super.removeContext(context);	//remove this context normally
 		}
 
+		/**Called when the session is destroyed.
+		This implementation exposes the method to the servlet.
+		*/
+		protected void onDestroy()
+		{
+			super.onDestroy();	//do the default destroying
+		}
 	}
 
 	/**An implementation of an HTTP servlet Guise context that allows the servlet to update the state of the context.

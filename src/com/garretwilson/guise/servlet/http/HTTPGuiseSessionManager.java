@@ -28,7 +28,7 @@ public class HTTPGuiseSessionManager implements HttpSessionListener
 	{
 		final HttpSession httpSession=httpRequest.getSession();	//get the current HTTP session from the HTTP request
 		guiseApplicationMap.put(httpSession, guiseApplication);	//store our Guise application so we'll know with which application this session is associated (this servlet may serve many Guise applications in the web application)
-		return guiseApplication.getGuiseSession(httpSession);	//ask the Guise application for a Guise session corresponding to the HTTP session
+		return guiseApplication.getGuiseSession(httpRequest, httpSession);	//ask the Guise application for a Guise session corresponding to the HTTP session
 	}
 	
 	

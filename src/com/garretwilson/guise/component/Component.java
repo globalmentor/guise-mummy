@@ -28,14 +28,14 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	public final static String VISIBLE_PROPERTY=getPropertyName(Component.class, "visible");
 
 	/**@return The model used by this component.*/
-	public Controller<? extends GuiseContext, C> getController();
+	public Controller<? extends GuiseContext, ? super C> getController();
 
 	/**Sets the controller used by this component.
 	This is a bound property.
 	@param newController The new controller to use.
 	@see #CONTROLLER_PROPERTY
 	*/
-	public void setController(final Controller<? extends GuiseContext, C> newController);
+	public void setController(final Controller<? extends GuiseContext, ? super C> newController);
 
 	/**@return The error currently associated with this component, or <code>null</code> if there is no error.*/
 //TODO del if not needed	public Throwable getError();

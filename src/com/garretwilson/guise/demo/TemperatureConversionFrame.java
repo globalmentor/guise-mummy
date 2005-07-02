@@ -35,7 +35,7 @@ public class TemperatureConversionFrame extends NavigationFrame
 		final Panel inputPanel=new Panel(session, new FlowLayout(Axis.Y));	//create the input panel flowing vertically
 		final TextControl<Float> temperatureInput=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
 		temperatureInput.getModel().setLabel("Input Temperature");	//add a label to the text input control
-		temperatureInput.getModel().setValidator(new ValueRequiredValidator<Float>());	//install a validator requiring a value
+		temperatureInput.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
 		inputPanel.add(temperatureInput);	//add the input control to the input panel
 		final TextControl<Float> temperatureOutput=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
 		temperatureOutput.getModel().setLabel("Output Temperature");	//add a label to the text output control

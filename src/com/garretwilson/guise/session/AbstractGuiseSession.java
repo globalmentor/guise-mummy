@@ -3,6 +3,7 @@ package com.garretwilson.guise.session;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.*;
+
 import static java.util.Collections.*;
 
 import com.garretwilson.beans.*;
@@ -19,7 +20,7 @@ import static com.garretwilson.text.xml.XMLUtilities.*;
 /**An abstract implementation that keeps track of the components of a user session.
 @author Garret Wilson
 */
-public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> implements GuiseSession<GC>
+public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends BoundPropertyObject implements GuiseSession<GC>
 {
 
 	/**The Guise application to which this session belongs.*/
@@ -47,13 +48,81 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> implemen
 			}
 			return navigationPathFrameBindingMap.put(checkNull(path, "Path cannot be null."), checkNull(frame, "Bound frame cannot be null."));	//store the binding
 		}
+
+	/**The current session locale.*/
+	private Locale locale;
+
+		/**@return The current session locale.*/
+		public Locale getLocale() {return locale;}
+
+		/**Sets the current session locale.
+		This is a bound property.
+		@param newLocale The new session locale.
+		@exception NullPointerException if the given locale is <code>null</code>.
+		@see GuiseSession#LOCALE_PROPERTY
+		*/
+		public void setLocale(final Locale newLocale)
+		{
+			if(!ObjectUtilities.equals(locale, newLocale))	//if the value is really changing (compare their values, rather than identity)
+			{
+				final Locale oldLocale=locale;	//get the old value
+				locale=checkNull(newLocale, "Guise session locale cannot be null.");	//actually change the value
+				releaseResourceBundle();	//release the resource bundle, as the new locale may indicate that new resources should be used
+				firePropertyChange(LOCALE_PROPERTY, oldLocale, newLocale);	//indicate that the value changed
+			}
+		}
+
+	/**The lazily-created resource bundle used by this session.*/
+	private ResourceBundle resourceBundle=null;
+
+		/**Retrieves a resource bundle to be used by this session.
+		If this session does not yet have a resource bundle, one will be created based upon the current locale.
+		The returned resource bundle should only be used temporarily and should not be saved,
+		as the resource bundle may change if the session locale or the application resource bundle base name changes.
+		@return The resource bundle containing the resources for this session, based upon the locale.
+		@exception MissingResourceException if no resource bundle for the application's specified base name can be found.
+		@see GuiseApplication#getResourceBundleBaseName()
+		@see #getLocale()
+		*/
+		public ResourceBundle getResourceBundle()
+		{
+			if(resourceBundle==null)	//if the resource bundle has not yet been loaded
+			{
+				resourceBundle=ResourceBundle.getBundle(getApplication().getResourceBundleBaseName(), getLocale());	//load a resource bundle appropriate for the locale
+			}
+			return resourceBundle;	//return the resource bundle
+		}
+
+		/**Unloads the current resource bundle so that the next call to {@link #getResourceBundle()} will load the resource bundle anew.*/
+		protected void releaseResourceBundle()
+		{
+			resourceBundle=null;	//release our reference to the resource bundle
+		}
+
+		/**The property value change listener that, in response to a change in value, releases the resource bundle.
+		@see #releaseResourceBundle()
+		*/
+		private final PropertyValueChangeListener<String> resourceBundleReleasePropertyValueChangeListener=new AbstractPropertyValueChangeListener<String>()
+			{
+				/**Called when a bound property is changed.
+				@param propertyValueChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
+				*/
+				public void propertyValueChange(final PropertyValueChangeEvent<String> propertyValueChangeEvent)
+				{
+					releaseResourceBundle();	//release the resource bundle, as the new locale may indicate that new resources should be used					
+				}
+			};
 		
-	/**Guise constructor.
+	/**Guise application constructor.
+	The session local will initially be set to the locale of the associated Guise application.
 	@param application The Guise application to which this session belongs.
+	@see #onDestroy()
 	*/
 	public AbstractGuiseSession(final GuiseApplication<GC> application)
 	{
 		this.application=application;	//save the Guise instance
+		this.locale=application.getLocale();	//default to the application locale
+		application.addPropertyChangeListener(GuiseApplication.RESOURCE_BUNDLE_BASE_NAME_PROPERTY, resourceBundleReleasePropertyValueChangeListener);	//when the application changes its resource bundle base name, release the resource bundle		
 	}
 
 	/**Retrieves the frame bound to the given appplication context-relateive path.
@@ -253,6 +322,13 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> implemen
 				queuedModelEventList.clear();	//remove all pending model events
 			}
 		}
+
+
+	/**Called when the session is destroyed.*/
+	protected void onDestroy()
+	{
+		application.removePropertyChangeListener(GuiseApplication.RESOURCE_BUNDLE_BASE_NAME_PROPERTY, resourceBundleReleasePropertyValueChangeListener);	//stop listening for the application to change its resource bundle base name				
+	}
 
 	/**The class that listens for context state changes and updates the context state set in response.
 	@author Garret Wilson

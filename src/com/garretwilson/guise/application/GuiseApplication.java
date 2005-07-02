@@ -1,16 +1,45 @@
 package com.garretwilson.guise.application;
 
 import java.net.URI;
+import java.util.Locale;
 
+import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.guise.component.*;
 import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.*;
 
+import static com.garretwilson.lang.ClassUtilities.*;
+
 /**An application running Guise.
 @author Garret Wilson
 */
-public interface GuiseApplication<GC extends GuiseContext>
+public interface GuiseApplication<GC extends GuiseContext> extends PropertyBindable
 {
+
+	/**The locale bound property.*/
+	public final static String LOCALE_PROPERTY=getPropertyName(GuiseApplication.class, "locale");
+	/**The resource bundle base name bound property.*/
+	public final static String RESOURCE_BUNDLE_BASE_NAME_PROPERTY=getPropertyName(GuiseApplication.class, "resourceBundleBaseName");
+
+	/**@return The application locale used by default if a new session cannot determine the users's preferred locale.*/
+	public Locale getLocale();
+
+	/**Sets the application locale used by default if a new session cannot determine the users's preferred locale.
+	This is a bound property.
+	@param newLocale The new default application locale.
+	@see #LOCALE_PROPERTY
+	*/
+	public void setLocale(final Locale newLocale);
+
+	/**@return The base name of the resource bundle to use for this application.*/
+	public String getResourceBundleBaseName();
+
+	/**Changes the resource bundle base name.
+	This is a bound property.
+	@param newResourceBundleBaseName The new base name of the resource bundle.
+	@see #RESOURCE_BUNDLE_BASE_NAME_PROPERTY
+	*/
+	public void setResourceBundleBaseName(final String newResourceBundleBaseName);
 
 	/**Installs a controller kit.
 	Later controller kits take precedence over earlier-installed controller kits.
@@ -30,7 +59,7 @@ public interface GuiseApplication<GC extends GuiseContext>
 	@param component The component for which a controller should be returned.
 	@return A controller to render the given component, or <code>null</code> if no controller is registered.
 	*/
-	public <C extends Component<?>> Controller<GC, C> getController(final C component);
+	public <C extends Component<?>> Controller<GC, ? super C> getController(final C component);
 
 	/**Binds a frame type to a particular application context-relative path.
 	Any existing binding for the given context-relative path is replaced.

@@ -34,21 +34,21 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 		protected EventListenerManager getEventListenerManager() {return eventListenerManager;}
 
 	/**The controller installed in this component, or <code>null</code> if no controller is installed.*/
-	private Controller<? extends GuiseContext, C> controller=null;
+	private Controller<? extends GuiseContext, ? super C> controller=null;
 
 		/**@return The model used by this component.*/
-		public Controller<? extends GuiseContext, C> getController() {return controller;}
+		public Controller<? extends GuiseContext, ? super C> getController() {return controller;}
 
 		/**Sets the controller used by this component.
 		This is a bound property.
 		@param newController The new controller to use.
 		@see Component#CONTROLLER_PROPERTY
 		*/
-		public void setController(final Controller<? extends GuiseContext, C> newController)
+		public void setController(final Controller<? extends GuiseContext, ? super C> newController)
 		{
 			if(newController!=controller)	//if the value is really changing
 			{
-				final Controller<? extends GuiseContext, C> oldController=controller;	//get a reference to the old value
+				final Controller<? extends GuiseContext, ? super C> oldController=controller;	//get a reference to the old value
 				controller=newController;	//actually change values
 				firePropertyChange(CONTROLLER_PROPERTY, oldController, newController);	//indicate that the value changed				
 			}
@@ -308,7 +308,7 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	*/
 	public <GC extends GuiseContext> void validateView(final GC context) throws IOException, ValidationsException
 	{
-		final Controller<GC, C> controller=getController(context);	//get the controller
+		final Controller<GC, ? super C> controller=getController(context);	//get the controller
 		controller.validateView(context, (C)this);	//tell the controller to update the view TODO testing; probably not correct, but works
 	}
 
@@ -320,7 +320,7 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	*/
 	public <GC extends GuiseContext> void updateView(final GC context) throws IOException
 	{
-		final Controller<GC, C> controller=getController(context);	//get the controller
+		final Controller<GC, ? super C> controller=getController(context);	//get the controller
 		controller.updateView(context, (C)this);	//tell the controller to update the view TODO testing; probably not correct, but works
 	}
 
@@ -332,7 +332,7 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	*/
 	public <GC extends GuiseContext> void updateModel(final GC context) throws IOException, ValidationException
 	{
-		final Controller<GC, C> controller=getController(context);	//get the controller
+		final Controller<GC, ? super C> controller=getController(context);	//get the controller
 		controller.updateModel(context, (C)this);	//tell the controller to update the model
 	}
 
@@ -340,10 +340,10 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	@param context Guise context information.
 	@exception NullPointerException if there is no controller installed and no appropriate controller registered with the Guise context.
 	*/
-	@SuppressWarnings("unchecked")
-	protected <GC extends GuiseContext> Controller<GC, C> getController(final GC context)
+//TODO fix	@SuppressWarnings("unchecked")
+	protected <GC extends GuiseContext> Controller<GC, ? super C> getController(final GC context)
 	{
-		Controller<GC, C> controller=(Controller<GC, C>)getController();	//get the installed controller TODO check
+		Controller<GC, ? super C> controller=(Controller<GC, ? super C>)getController();	//get the installed controller TODO check
 		if(controller==null)	//if no controller is installed
 		{
 			controller=context.getSession().getApplication().getController(this);	//ask the application for a controller
