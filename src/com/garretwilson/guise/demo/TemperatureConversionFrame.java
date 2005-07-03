@@ -68,7 +68,7 @@ public class TemperatureConversionFrame extends NavigationFrame
 		final ModelGroup<ValueModel<Boolean>> radioButtonModelGroup=new MutualExclusionModelGroup(celsiusCheckControl.getModel(), farenheitCheckControl.getModel());
 		conversionPanel.add(scalePanel);	//add the scale panel to the conversion panel			
 			//conversion button
-		final ActionControl convertButton=new ActionControl(session);	//create a button for initiating the conversion
+		final Button convertButton=new Button(session);	//create a button for initiating the conversion
 		convertButton.getModel().setLabel("Convert");	//set the button label
 		convertButton.getModel().addActionListener(new ActionListener<ActionModel>()	//when the convert button is pressed
 				{

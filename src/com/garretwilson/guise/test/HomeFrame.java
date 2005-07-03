@@ -48,11 +48,11 @@ public class HomeFrame extends NavigationFrame
 		
 		final Panel buttonPanel=new Panel(session, "testButtonPanel", new FlowLayout(Axis.X));	//create a panel flowing horizontally
 
-		final ActionControl testButton=new ActionControl(session, "testButton");
+		final Button testButton=new Button(session, "testButton");
 		testButton.getModel().setLabel("Click here to go to the 'Hello World' demo.");
 		testButton.getModel().addActionListener(new NavigateActionListener<ActionModel>("helloworld"));
 		buttonPanel.add(testButton);	//add a new button
-		final ActionControl testButton2=new ActionControl(session, "testButton2");
+		final Button testButton2=new Button(session, "testButton2");
 		testButton2.getModel().setLabel("Click this button to change the text.");
 		testButton2.getModel().addActionListener(new ActionListener<ActionModel>()
 				{
@@ -62,6 +62,16 @@ public class HomeFrame extends NavigationFrame
 					}
 				});
 		buttonPanel.add(testButton2);	//add a new button
+		final Link testLink=new Link(session);
+		testLink.getModel().setLabel("This is a link.");
+		testLink.getModel().addActionListener(new ActionListener<ActionModel>()
+				{
+					public void onAction(ActionEvent<ActionModel> actionEvent)
+					{
+						testLabel.getModel().setLabel("The link works.");
+					}
+				});
+		buttonPanel.add(testLink);	//add a new button
 		add(buttonPanel);	//add the button panel to the frame
 		final TextControl<String> textInput=new TextControl<String>(session, "textInput", String.class);	//create a text input control
 		textInput.getModel().setLabel("This is the text input label.");
@@ -96,7 +106,7 @@ public class HomeFrame extends NavigationFrame
 	
 		horizontalPanel.add(booleanPanel);
 
-		final ActionControl testButtona=new ActionControl(session, "testButton");
+		final Button testButtona=new Button(session, "testButton");
 		testButtona.getModel().setLabel("Nuther button.");
 		horizontalPanel.add(testButtona);	//add a new button
 /*TODO fix		
@@ -116,6 +126,14 @@ public class HomeFrame extends NavigationFrame
 
 		horizontalPanel.add(booleanPanela);
 */
+		
+		final Image image=new Image(session);
+		image.getModel().setImage(URI.create("http://www.garretwilson.com/photos/2000/february/cowcalf.jpg"));
+		image.getModel().setLabel("Cow and Calf");
+		image.getModel().setMessage("A cow and her minutes-old calf.");
+		horizontalPanel.add(image);
+		
+		
 		add(horizontalPanel);
 		
 /*TODO del		
@@ -124,14 +142,8 @@ public class HomeFrame extends NavigationFrame
 		add(resourceHeading);
 */
 
-		final Image image=new Image(session);
-		image.getModel().setImage(URI.create("http://www.garretwilson.com/photos/2000/february/cowcalf.jpg"));
-		image.getModel().setLabel("Cow and Calf");
-		image.getModel().setMessage("A cow and her minutes-old calf.");
-		add(image);
-	
 		final Label afterImageLabel=new Label(session);
-		afterImageLabel.getModel().setLabel("This is a lot of test. ;alsjfd ;lkjas ;ljag ;lkjas g;lkajg; laksgj akjlshf lkjashd flkjsdhlksahlsadkhj asldkhjf ;sgdh a;lgkh a;glkha s;dglh asgd;");
+		afterImageLabel.getModel().setLabel("This is a lot of text. ;alsjfd ;lkjas ;ljag ;lkjas g;lkajg; laksgj akjlshf lkjashd flkjsdhlksahlsadkhj asldkhjf ;sgdh a;lgkh a;glkha s;dglh asgd;");
 		add(afterImageLabel);
 		
 	}

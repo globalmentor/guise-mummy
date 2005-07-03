@@ -4,17 +4,17 @@ import com.garretwilson.guise.model.ActionModel;
 import com.garretwilson.guise.model.DefaultActionModel;
 import com.garretwilson.guise.session.GuiseSession;
 
-/**Action control such as a button.
+/**Control with an action model rendered as a link.
 @author Garret Wilson
 */
-public class ActionControl extends AbstractControl<ActionModel, ActionControl>
+public class Link extends AbstractControl<ActionModel, Link>
 {
 
 	/**Session constructor with a default data model.
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public ActionControl(final GuiseSession<?> session)
+	public Link(final GuiseSession<?> session)
 	{
 		this(session, null);	//construct the component, indicating that a default ID should be used
 	}
@@ -25,7 +25,7 @@ public class ActionControl extends AbstractControl<ActionModel, ActionControl>
 	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public ActionControl(final GuiseSession<?> session, final String id)
+	public Link(final GuiseSession<?> session, final String id)
 	{
 		this(session, id, new DefaultActionModel(session));	//construct the class with a default model
 	}
@@ -37,7 +37,7 @@ public class ActionControl extends AbstractControl<ActionModel, ActionControl>
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public ActionControl(final GuiseSession<?> session, final String id, final ActionModel model)
+	public Link(final GuiseSession<?> session, final String id, final ActionModel model)
 	{
 		super(session, id, model);	//construct the parent class
 	}
