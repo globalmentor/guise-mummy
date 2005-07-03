@@ -99,6 +99,7 @@ public class HomeFrame extends NavigationFrame
 		final CheckControl check2=new CheckControl(session, "check2");	
 		check2.setCheckType(CheckControl.CheckType.ELLIPSE);
 		check2.getModel().setLabel("Second check");
+		check2.setEnabled(false);	//TODO fix
 		booleanPanel.add(check2);	
 		final ModelGroup<ValueModel<Boolean>> booleanGroup=new MutualExclusionModelGroup();
 		booleanGroup.add(check1.getModel());
