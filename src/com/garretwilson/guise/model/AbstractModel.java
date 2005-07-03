@@ -1,6 +1,7 @@
 package com.garretwilson.guise.model;
 
 import java.beans.PropertyChangeEvent;
+import java.net.URI;
 
 import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.event.EventListenerManager;
@@ -44,7 +45,7 @@ public class AbstractModel extends BoundPropertyObject implements Model
 		getSession().queueModelEvent(createPostponedPropertyChangeEvent(propertyChangeEvent));	//create and queue a postponed property change event
 	}
 
-	/**Determines a string value either explicitly set or stored from the resources.
+	/**Determines a string value either explicitly set or stored in the resources.
 	If a value is explicitly specified, it will be used; otherwise, a value will be loaded from the resources if possible.
 	@param value The value explicitly set, which will override any resource.
 	@param resourceKey The key for looking up a resource if no value is explicitly set.
@@ -60,6 +61,29 @@ public class AbstractModel extends BoundPropertyObject implements Model
 		else if(resourceKey!=null)	//if no value is provided, but if a resource key is provided
 		{
 			return getSession().getStringResource(resourceKey);	//lookup the value from the resources 
+		}
+		else	//if neither a value nor a resource key are provided
+		{
+			return null;	//there is no value available
+		}
+	}
+
+	/**Determines a URI value either explicitly set or stored in the resources.
+	If a value is explicitly specified, it will be used; otherwise, a value will be loaded from the resources if possible.
+	@param value The value explicitly set, which will override any resource.
+	@param resourceKey The key for looking up a resource if no value is explicitly set.
+	@return The URI value, or <code>null</code> if there is no value available, neither explicitly set nor in the resources.
+	@exception java.util.MissingResourceException if there was an error loading the value from the resources.
+	*/
+	protected URI getURI(final URI value, final String resourceKey)
+	{
+		if(value!=null)	//if a value is provided
+		{
+			return value;	//return the specified value
+		}
+		else if(resourceKey!=null)	//if no value is provided, but if a resource key is provided
+		{
+			return getSession().getURIResource(resourceKey);	//lookup the value from the resources 
 		}
 		else	//if neither a value nor a resource key are provided
 		{

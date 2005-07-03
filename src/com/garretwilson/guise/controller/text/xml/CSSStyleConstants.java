@@ -22,20 +22,16 @@ public class CSSStyleConstants
 	
 	//components
 	
-	/**The CSS class for a check decorator wrapper.*/
-	public final static String CHECK_CONTROL_DECORATOR_CLASS="check-control-decorator";
-	/**The CSS class for a check control label.*/
-	public final static String CHECK_CONTROL_LABEL_CLASS="check-control-label";
-	/**The CSS class for the check of a check control.*/
-	public final static String CHECK_CONTROL_BODY_CLASS="check-control-body";
-	/**The CSS class for the decorator wrapper of a component.*/
-	public final static String COMPONENT_DECORATOR_CLASS="component-decorator";
-	/**The CSS class for the label part of a component.*/
-	public final static String COMPONENT_LABEL_CLASS="component-label";
-	/**The CSS class for the component part of a component.*/
-	public final static String COMPONENT_BODY_CLASS="component-body";
-	/**The CSS class for the error part of a component.*/
-	public final static String COMPONENT_ERROR_CLASS="component-error";
+	/**The CSS class postfix for the decorator wrapper of a component.*/
+	public final static String COMPONENT_DECORATOR_CLASS_POSTFIX="-decorator";
+	/**The CSS class postfix for the label part of a component.*/
+	public final static String COMPONENT_LABEL_CLASS_POSTFIX="-label";
+	/**The CSS class postfix for the message part of a component.*/
+	public final static String COMPONENT_MESSAGE_CLASS_POSTFIX="-message";
+	/**The CSS class postfix for the component part of a component.*/
+	public final static String COMPONENT_BODY_CLASS_POSTFIX="-body";
+	/**The CSS class postfix for the error part of a component.*/
+	public final static String COMPONENT_ERROR_CLASS_POSTFIX="-error";
 	
 	//layout
 	

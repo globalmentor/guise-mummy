@@ -124,6 +124,16 @@ public class HomeFrame extends NavigationFrame
 		add(resourceHeading);
 */
 
+		final Image image=new Image(session);
+		image.getModel().setImage(URI.create("http://www.garretwilson.com/photos/2000/february/cowcalf.jpg"));
+		image.getModel().setLabel("Cow and Calf");
+		image.getModel().setMessage("A cow and her minutes-old calf.");
+		add(image);
+	
+		final Label afterImageLabel=new Label(session);
+		afterImageLabel.getModel().setLabel("This is a lot of test. ;alsjfd ;lkjas ;ljag ;lkjas g;lkajg; laksgj akjlshf lkjashd flkjsdhlksahlsadkhj asldkhjf ;sgdh a;lgkh a;glkha s;dglh asgd;");
+		add(afterImageLabel);
+		
 	}
 
 }
