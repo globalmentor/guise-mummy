@@ -13,6 +13,7 @@ import com.garretwilson.guise.validator.ValidationsException;
 
 /**Base interface for all Guise components.
 Each component must provide either a Guise session constructor; or a Guise session and string ID constructor.
+Any component may contain other components, but only a {@link Container} allows for custom addition and removal of child components.
 @author Garret Wilson
 */
 public interface Component<C extends Component<C>> extends PropertyBindable
@@ -20,12 +21,16 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 
 	/**The bound property of the controller.*/
 	public final static String CONTROLLER_PROPERTY=getPropertyName(Component.class, "controller");
-	/**The bound property of the current error condition.*/
-//TODO del if not needed	public final static String ERROR_PROPERTY=getPropertyName(Component.class, "error");
 	/**The bound property of the component style ID.*/
 	public final static String STYLE_ID_PROPERTY=getPropertyName(Component.class, "styleID");
 	/**The bound property of whether the component is visible.*/
 	public final static String VISIBLE_PROPERTY=getPropertyName(Component.class, "visible");
+
+	/**@return Whether this component has children.*/
+	public boolean hasChildren();
+
+	/**@return The child components of this component.*/
+	public Iterable<Component<?>> getChildren();
 
 	/**@return The model used by this component.*/
 	public Controller<? extends GuiseContext, ? super C> getController();
@@ -36,16 +41,6 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@see #CONTROLLER_PROPERTY
 	*/
 	public void setController(final Controller<? extends GuiseContext, ? super C> newController);
-
-	/**@return The error currently associated with this component, or <code>null</code> if there is no error.*/
-//TODO del if not needed	public Throwable getError();
-
-	/**Sets the component error status.
-	This is a bound property.
-	@param newError The error currently associated with this component, or <code>null</code> if there is no error.
-	@see #ERROR_PROPERTY
-	*/
-//TODO del if not needed	public void setError(final Throwable newError);
 
 	/**@return An iterable interface to all errors associated with this component.*/
 	public Iterable<Throwable> getErrors();
@@ -124,27 +119,76 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	*/
 	public void setVisible(final boolean newVisible);
 
+	/**Collects the current data from the view of this component.
+	This method should not normally be called directly by applications.
+	This method delegates to the installed controller, and if no controller is installed one is created and installed.
+	@param context Guise context information.
+	@exception IOException if there is an error querying the view.
+	@see GuiseContext.State#QUERY_VIEW
+	@see #getController(GC, C)
+	*/
+	public <GC extends GuiseContext> void queryView(final GC context) throws IOException;
+
+	/**Decodes the data of the view of this component.
+	This method should not normally be called directly by applications.
+	This method delegates to the installed controller, and if no controller is installed one is created and installed.
+	@param context Guise context information.
+	@exception IOException if there is an error decoding the view.
+	@exception ValidationsException if the view information is in an invalid format and cannot be decoded.
+	@see #getController(GC, C)
+	@see GuiseContext.State#DECODE_VIEW
+	*/
+	public <GC extends GuiseContext> void decodeView(final GC context) throws IOException, ValidationsException;
+
 	/**Validates the view of this component.
+	This method should not normally be called directly by applications.
 	This method delegates to the installed controller, and if no controller is installed one is created and installed.
 	@param context Guise context information.
 	@exception IOException if there is an error validating the view.
 	@exception ValidationsException if the view information is not valid to store in the model.
 	@see #getController(GC, C)
+	@see GuiseContext.State#VALIDATE_VIEW
 	*/
 	public <GC extends GuiseContext> void validateView(final GC context) throws IOException, ValidationsException;
 
-	/**Updates the view of this component.
-	This method delegates to the installed controller, and if no controller is installed one is created and installed.
-	@param context Guise context information.
-	@exception IOException if there is an error updating the view.
-	*/
-	public <GC extends GuiseContext> void updateView(final GC context) throws IOException;
-
 	/**Updates the model of this component.
+	This method should not normally be called directly by applications.
 	This method delegates to the installed controller, and if no controller is installed one is created and installed.
 	@param context Guise context information.
 	@exception IOException if there is an error updating the model.
 	@exception ValidationException if the view information is not valid to store in the model.
+	@see #getController(GC, C)
+	@see GuiseContext.State#UPDATE_MODEL
 	*/
 	public <GC extends GuiseContext> void updateModel(final GC context) throws IOException, ValidationException;
+
+	/**Collects the current data from the model of this component.
+	This method should not normally be called directly by applications.
+	This method delegates to the installed controller, and if no controller is installed one is created and installed.
+	@param context Guise context information.
+	@exception IOException if there is an error querying the model.
+	@see #getController(GC, C)
+	@see GuiseContext.State#QUERY_MODEL
+	*/
+	public <GC extends GuiseContext> void queryModel(final GC context) throws IOException;
+
+	/**Encodes the data of the model of this component.
+	This method should not normally be called directly by applications.
+	This method delegates to the installed controller, and if no controller is installed one is created and installed.
+	@param context Guise context information.
+	@exception IOException if there is an error encoding the model.
+	@see #getController(GC, C)
+	@see GuiseContext.State#ENCODE_MODEL
+	*/
+	public <GC extends GuiseContext> void encodeModel(final GC context) throws IOException;
+
+	/**Updates the view of this component.
+	This method should not normally be called directly by applications.
+	This method delegates to the installed controller, and if no controller is installed one is created and installed.
+	@param context Guise context information.
+	@exception IOException if there is an error updating the view.
+	@see #getController(GC, C)
+	@see GuiseContext.State#UPDATE_VIEW
+	*/
+	public <GC extends GuiseContext> void updateView(final GC context) throws IOException;
 }

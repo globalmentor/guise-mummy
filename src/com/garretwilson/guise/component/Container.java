@@ -2,7 +2,7 @@ package com.garretwilson.guise.component;
 
 import com.garretwilson.guise.component.layout.Layout;
 
-/**Component that can contain other components.
+/**Component that allows for addition and removal of child components.
 A container is iterable, and can be used in short <code>for(:)</code> form. 
 @author Garret Wilson
 */

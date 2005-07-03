@@ -7,7 +7,6 @@ import com.garretwilson.guise.component.layout.*;
 import com.garretwilson.guise.session.GuiseSession;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
-import com.garretwilson.util.EmptyIterator;
 
 /**Abstract implementation of a container component.
 This implementation uses a lazily-created list of child components, making empty containers lightweight.
@@ -48,6 +47,12 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@return <code>true</code> if this container contains the given component.
 	*/
 	public boolean contains(final Component<?> component) {return componentList.contains(component);}
+
+	/**@return Whether this component has children. This implementation delegates to the component list.*/
+	public boolean hasChildren() {return !componentList.isEmpty();}
+
+	/**@return The child components of this component. This implementation returns this instance.*/
+	public Iterable<Component<?>> getChildren() {return this;}
 
 	/**The layout definition for the container.*/
 	private final Layout layout;

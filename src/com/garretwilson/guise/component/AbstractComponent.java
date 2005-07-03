@@ -33,6 +33,16 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 		/**@return The object managing event listeners.*/
 		protected EventListenerManager getEventListenerManager() {return eventListenerManager;}
 
+	/**@return A reference to this instance, cast to the generic self type.*/
+	@SuppressWarnings("unchecked")
+	protected final C getThis() {return (C)this;}
+		
+	/**@return Whether this component has children. This implementation returns <code>false</code>.*/
+	public boolean hasChildren() {return false;}
+
+	/**@return The child components of this component. This implementation returns an empty list.*/
+	public Iterable<Component<?>> getChildren() {return emptyList();}
+
 	/**The controller installed in this component, or <code>null</code> if no controller is installed.*/
 	private Controller<? extends GuiseContext, ? super C> controller=null;
 
@@ -80,29 +90,6 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 
 		/**Clears all errors associated with this component.*/
 		public void clearErrors() {errorList.clear();}
-
-	/**The error currently associated with this component, or <code>null</code> if there is no error.*/
-//TODO del if not needed	private Throwable error=null;
-
-		/**@return The error currently associated with this component, or <code>null</code> if there is no error.*/
-//TODO del if not needed		public Throwable getError() {return error;}
-
-		/**Sets the component error status.
-		This is a bound property.
-		@param newError The error currently associated with this component, or <code>null</code> if there is no error.
-		@see Component#ERROR_PROPERTY
-		*/
-/*TODO del if not needed
-		public void setError(final Throwable newError)
-		{
-			if(error!=newError)	//if the value is really changing
-			{
-				final Throwable oldError=error;	//get the current value
-				error=newError;	//update the value
-				firePropertyChange(ERROR_PROPERTY, oldError, newError);
-			}			
-		}
-*/
 
 	/**The component identifier*/
 	private final String id;
@@ -299,41 +286,105 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 		}
 	}
 
+	/**Collects the current data from the view of this component.
+	This method should not normally be called directly by applications.
+	This method delegates to the installed controller, and if no controller is installed one is created and installed.
+	@param context Guise context information.
+	@exception IOException if there is an error querying the view.
+	@see GuiseContext.State#QUERY_VIEW
+	@see #getController(GC, C)
+	*/
+	public <GC extends GuiseContext> void queryView(final GC context) throws IOException
+	{
+		final Controller<GC, ? super C> controller=getController(context);	//get the controller
+		controller.queryView(context, getThis());	//tell the controller to query the view
+	}
+
+	/**Decodes the data of the view of this component.
+	This method should not normally be called directly by applications.
+	This method delegates to the installed controller, and if no controller is installed one is created and installed.
+	@param context Guise context information.
+	@exception IOException if there is an error decoding the view.
+	@exception ValidationsException if the view information is in an invalid format and cannot be decoded.
+	@see #getController(GC, C)
+	@see GuiseContext.State#DECODE_VIEW
+	*/
+	public <GC extends GuiseContext> void decodeView(final GC context) throws IOException, ValidationsException
+	{
+		final Controller<GC, ? super C> controller=getController(context);	//get the controller
+		controller.decodeView(context, getThis());	//tell the controller to decode the view
+	}
+
 	/**Validates the view of this component.
+	This method should not normally be called directly by applications.
 	This method delegates to the installed controller, and if no controller is installed one is created and installed.
 	@param context Guise context information.
 	@exception IOException if there is an error validating the view.
 	@exception ValidationsException if the view information is not valid to store in the model.
 	@see #getController(GC, C)
+	@see GuiseContext.State#VALIDATE_VIEW
 	*/
 	public <GC extends GuiseContext> void validateView(final GC context) throws IOException, ValidationsException
 	{
 		final Controller<GC, ? super C> controller=getController(context);	//get the controller
-		controller.validateView(context, (C)this);	//tell the controller to update the view TODO testing; probably not correct, but works
-	}
-
-	/**Updates the view of this component.
-	This method delegates to the installed controller, and if no controller is installed one is created and installed.
-	@param context Guise context information.
-	@exception IOException if there is an error updating the view.
-	@see #getController(GC, C)
-	*/
-	public <GC extends GuiseContext> void updateView(final GC context) throws IOException
-	{
-		final Controller<GC, ? super C> controller=getController(context);	//get the controller
-		controller.updateView(context, (C)this);	//tell the controller to update the view TODO testing; probably not correct, but works
+		controller.validateView(context, getThis());	//tell the controller to update the view
 	}
 
 	/**Updates the model of this component.
+	This method should not normally be called directly by applications.
 	This method delegates to the installed controller, and if no controller is installed one is created and installed.
 	@param context Guise context information.
 	@exception IOException if there is an error updating the model.
 	@exception ValidationException if the view information is not valid to store in the model.
+	@see #getController(GC, C)
+	@see GuiseContext.State#UPDATE_MODEL
 	*/
 	public <GC extends GuiseContext> void updateModel(final GC context) throws IOException, ValidationException
 	{
 		final Controller<GC, ? super C> controller=getController(context);	//get the controller
-		controller.updateModel(context, (C)this);	//tell the controller to update the model
+		controller.updateModel(context, getThis());	//tell the controller to update the model
+	}
+
+	/**Collects the current data from the model of this component.
+	This method should not normally be called directly by applications.
+	This method delegates to the installed controller, and if no controller is installed one is created and installed.
+	@param context Guise context information.
+	@exception IOException if there is an error querying the model.
+	@see #getController(GC, C)
+	@see GuiseContext.State#QUERY_MODEL
+	*/
+	public <GC extends GuiseContext> void queryModel(final GC context) throws IOException
+	{
+		final Controller<GC, ? super C> controller=getController(context);	//get the controller
+		controller.queryModel(context, getThis());	//tell the controller to query the model
+	}
+
+	/**Encodes the data of the model of this component.
+	This method should not normally be called directly by applications.
+	This method delegates to the installed controller, and if no controller is installed one is created and installed.
+	@param context Guise context information.
+	@exception IOException if there is an error encoding the model.
+	@see #getController(GC, C)
+	@see GuiseContext.State#ENCODE_MODEL
+	*/
+	public <GC extends GuiseContext> void encodeModel(final GC context) throws IOException
+	{
+		final Controller<GC, ? super C> controller=getController(context);	//get the controller
+		controller.encodeModel(context, getThis());	//tell the controller to encode the model
+	}
+
+	/**Updates the view of this component.
+	This method should not normally be called directly by applications.
+	This method delegates to the installed controller, and if no controller is installed one is created and installed.
+	@param context Guise context information.
+	@exception IOException if there is an error updating the view.
+	@see #getController(GC, C)
+	@see GuiseContext.State#UPDATE_VIEW
+	*/
+	public <GC extends GuiseContext> void updateView(final GC context) throws IOException
+	{
+		final Controller<GC, ? super C> controller=getController(context);	//get the controller
+		controller.updateView(context, getThis());	//tell the controller to update the view
 	}
 
 	/**Determines the controller of this. If no controller is installed, one is created and installed.
@@ -351,7 +402,7 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 			{
 				setController(controller);	//install the new controller
 			}
-			else	//if we don't have a render strategy
+			else	//if we don't have a controller
 			{
 				throw new NullPointerException("No registered controller for "+getClass().getName());	//TODO use a better error
 			}
