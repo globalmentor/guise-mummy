@@ -31,7 +31,7 @@ import static com.garretwilson.util.LocaleUtilities.*;
 Navigation frame bindings for paths can be set in initialization parameters named <code>navigation.<var>frameID</var></code>, with values in the form <code><var>contextRelativePath</var>?class=<var>com.example.Frame</var></code>.
 @author Garret Wilson
 */
-public class GuiseHTTPServlet extends BasicHTTPServlet
+public class GuiseHTTPServlet extends DefaultHTTPServlet
 {
 
 	/**The init parameter, "defaultLocale", used to specify the default locale.*/
@@ -96,6 +96,8 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 		super.init(servletConfig);	//do the default initialization
 		Debug.setDebug(true);	//turn on debug
 		Debug.setMinimumReportLevel(Debug.ReportLevel.TRACE);	//set the level of reporting
+		setReadOnly(true);	//make this servlet read-only
+		//TODO turn off directory listings, and/or fix them
 		try
 		{
 			initGuiseApplication(getGuiseApplication(), servletConfig);	//initialize the frame bindings
@@ -184,18 +186,7 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 		}
 	}
 
-	/**Services the POST method.
-	This version delegates to <code>doGet()</code>.
-  @param request The HTTP request.
-  @param response The HTTP response.
-  @exception ServletException if there is a problem servicing the request.
-  @exception IOException if there is an error reading or writing data.
-  @see #doGet(HttpServletRequest, HttpServletResponse)
-  */
-	public void doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
-	{
-		doGet(request, response);	//delegate to the GET method servicing
-	}
+//TODO fix HEAD method servicing, probably by overriding serveResource()
 
 	/**Services the GET method.
   @param request The HTTP request.
@@ -216,23 +207,7 @@ public class GuiseHTTPServlet extends BasicHTTPServlet
 		final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, request, response);	//create a new Guise context
 		guiseSession.addContext(guiseContext);	//add this context to the session
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
-Debug.trace("raw path info: ", rawPathInfo);
-		if(rawPathInfo.endsWith(".css"))	//TODO fix
-		{
-			response.setContentType("text/css");
-			final File file=new File(getServletContext().getRealPath(rawPathInfo));	//TODO fix all this; temporary hack
-			final InputStream inputStream=new BufferedInputStream(new FileInputStream(file));
-			try
-			{
-				OutputStreamUtilities.write(inputStream, response.getOutputStream());	//TODO fix
-			}
-			finally
-			{
-				inputStream.close();
-			}
-			return;
-		}
-		Debug.trace("raw path info", rawPathInfo);
+Debug.trace("raw path info", rawPathInfo);
 		try
 		{
 			if(!rawPathInfo.startsWith(ROOT_PATH))	//the Java servlet specification says that the path info will start with a '/'
@@ -278,7 +253,7 @@ Debug.trace("raw path info: ", rawPathInfo);
 			}
 			else	//if we have no frame type for this address
 			{
-				throw new HTTPNotFoundException("Not found: "+request.getRequestURL());
+				super.doGet(request, response);	//let the default functionality take over
 			}
 		}
 		catch(final NoSuchMethodException noSuchMethodException)	//catch and rethrow instantiation errors from retrieving/creating the frame
@@ -369,7 +344,7 @@ Debug.trace("raw path info: ", rawPathInfo);
 		@return The path representing the context of the Guise application.
 		@exception IllegalStateException if this method is called before this Guise servlet services its first request.
 		*/
-		public String getContextPath()
+		public String getContextPath()	//update method now that new servlet-level getContextPath() method is available
 		{
 			if(guiseApplicationContextPath==null)	//if there is no context path
 			{
