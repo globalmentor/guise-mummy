@@ -1,12 +1,12 @@
 package com.garretwilson.guise.component;
 
-import com.garretwilson.guise.model.Model;
+import com.garretwilson.guise.model.ActionModel;
 import com.garretwilson.guise.session.GuiseSession;
 
-/**An abstract implementation of a model component that allows user interaction to modify the model.
+/**Abstract control with an action model.
 @author Garret Wilson
 */
-public abstract class AbstractControl<M extends Model, C extends Control<M, C>> extends AbstractModelComponent<M, C> implements Control<M, C>
+public abstract class AbstractActionControl<C extends AbstractActionControl<C>> extends AbstractControl<ActionModel, C> implements ActionControl<C>
 {
 
 	/**Session, ID, and model constructor.
@@ -16,9 +16,8 @@ public abstract class AbstractControl<M extends Model, C extends Control<M, C>> 
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractControl(final GuiseSession<?> session, final String id, final M model)
+	public AbstractActionControl(final GuiseSession<?> session, final String id, final ActionModel model)
 	{
 		super(session, id, model);	//construct the parent class
 	}
-
 }

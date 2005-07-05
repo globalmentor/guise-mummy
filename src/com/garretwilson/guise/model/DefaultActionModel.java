@@ -6,7 +6,7 @@ import com.garretwilson.guise.session.GuiseSession;
 /**A default implementation of a button model.
 @author Garret Wilson
 */
-public class DefaultActionModel extends DefaultLabelModel implements ActionModel
+public class DefaultActionModel extends DefaultControlModel implements ActionModel
 {
 
 	/**Whether the button is pressed.*/
@@ -37,8 +37,8 @@ public class DefaultActionModel extends DefaultLabelModel implements ActionModel
 	}
 
 	/**Fires an action to all registered action listeners.
-	@see com.garretwilson.guise.event.ActionListener
-	@see com.garretwilson.guise.event.ActionEvent
+	@see ActionListener
+	@see ActionEvent
 	*/
 	public void fireAction()
 	{

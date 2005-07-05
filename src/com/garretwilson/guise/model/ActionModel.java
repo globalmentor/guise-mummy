@@ -1,11 +1,11 @@
 package com.garretwilson.guise.model;
 
-import com.garretwilson.guise.event.ActionListener;
+import com.garretwilson.guise.event.*;
 
 /**A model for a potential action.
 @author Garret Wilson
 */
-public interface ActionModel extends LabelModel
+public interface ActionModel extends ControlModel
 {
 
 	/**@return Whether the button is pressed.*/
@@ -27,8 +27,8 @@ public interface ActionModel extends LabelModel
 	public void removeActionListener(final ActionListener<ActionModel> actionListener);
 
 	/**Fires an action to all registered action listeners.
-	@see com.garretwilson.guise.event.ActionListener
-	@see com.garretwilson.guise.event.ActionEvent
+	@see ActionListener
+	@see ActionEvent
 	*/
 	public void fireAction();
 

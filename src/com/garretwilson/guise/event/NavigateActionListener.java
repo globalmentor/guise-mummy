@@ -41,7 +41,7 @@ public class NavigateActionListener<S> implements ActionListener<S>
 	This implementation requests navigation from the session.
 	@param actionEvent The event indicating the source of the action.
 	*/
-	public void onAction(final ActionEvent<S> actionEvent)
+	public void actionPerformed(final ActionEvent<S> actionEvent)
 	{
 		actionEvent.getSession().navigate(getNavigationURI());	//request that the session navigate to the configured URI
 	}

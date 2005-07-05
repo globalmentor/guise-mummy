@@ -65,6 +65,17 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 	*/
 	public DefaultLabelModel(final GuiseSession<?> session)
 	{
+		this(session, null);	//construct the class with no label
+	}
+
+	/**Session and label constructor.
+	@param session The Guise session that owns this model.
+	@param label The text of the label.
+	@exception NullPointerException if the given session is <code>null</code>.
+	*/
+	public DefaultLabelModel(final GuiseSession<?> session, final String label)
+	{
 		super(session);	//construct the parent class
+		this.label=label;	//save the label
 	}
 }

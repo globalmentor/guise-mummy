@@ -13,6 +13,7 @@ import com.garretwilson.guise.model.AbstractModelGroup;
 import com.garretwilson.guise.model.ActionModel;
 import com.garretwilson.guise.model.ModelGroup;
 import com.garretwilson.guise.model.MutualExclusionModelGroup;
+import com.garretwilson.guise.model.SingleSelectionStrategy;
 import com.garretwilson.guise.model.ValueModel;
 import com.garretwilson.guise.session.GuiseSession;
 import com.garretwilson.guise.validator.RegularExpressionStringValidator;
@@ -56,7 +57,7 @@ public class HomeFrame extends NavigationFrame
 		testButton2.getModel().setLabel("Click this button to change the text.");
 		testButton2.getModel().addActionListener(new ActionListener<ActionModel>()
 				{
-					public void onAction(ActionEvent<ActionModel> actionEvent)
+					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
 					{
 						testLabel.getModel().setLabel("You pressed the button!");
 					}
@@ -66,7 +67,7 @@ public class HomeFrame extends NavigationFrame
 		testLink.getModel().setLabel("This is a link.");
 		testLink.getModel().addActionListener(new ActionListener<ActionModel>()
 				{
-					public void onAction(ActionEvent<ActionModel> actionEvent)
+					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
 					{
 						testLabel.getModel().setLabel("The link works.");
 					}
@@ -99,7 +100,7 @@ public class HomeFrame extends NavigationFrame
 		final CheckControl check2=new CheckControl(session, "check2");	
 		check2.setCheckType(CheckControl.CheckType.ELLIPSE);
 		check2.getModel().setLabel("Second check");
-		check2.setEnabled(false);	//TODO fix
+		check2.getModel().setEnabled(false);	//TODO fix
 		booleanPanel.add(check2);	
 		final ModelGroup<ValueModel<Boolean>> booleanGroup=new MutualExclusionModelGroup();
 		booleanGroup.add(check1.getModel());
@@ -146,7 +147,14 @@ public class HomeFrame extends NavigationFrame
 		final Label afterImageLabel=new Label(session);
 		afterImageLabel.getModel().setLabel("This is a lot of text. ;alsjfd ;lkjas ;ljag ;lkjas g;lkajg; laksgj akjlshf lkjashd flkjsdhlksahlsadkhj asldkhjf ;sgdh a;lgkh a;glkha s;dglh asgd;");
 		add(afterImageLabel);
-		
+
+		final ListControl<String> listSelectControl=new ListControl<String>(session, String.class, new SingleSelectionStrategy<String>());
+		listSelectControl.getModel().setLabel("Choose an option.");
+		listSelectControl.getModel().add("The first option");
+		listSelectControl.getModel().add("The second option");
+		listSelectControl.getModel().add("The third option");
+		listSelectControl.getModel().add("The fourth option");
+		add(listSelectControl);
 	}
 
 }

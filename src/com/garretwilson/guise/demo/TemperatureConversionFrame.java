@@ -39,7 +39,7 @@ public class TemperatureConversionFrame extends NavigationFrame
 		inputPanel.add(temperatureInput);	//add the input control to the input panel
 		final TextControl<Float> temperatureOutput=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
 		temperatureOutput.getModel().setLabel("Output Temperature");	//add a label to the text output control
-		temperatureOutput.setEnabled(false);	//disable the text output control so that the user cannot modify it
+		temperatureOutput.getModel().setEnabled(false);	//disable the text output control so that the user cannot modify it
 		inputPanel.add(temperatureOutput);	//add the output control to the input panel
 
 		temperaturePanel.add(inputPanel);	//add the input panel to the temperature panel
@@ -72,7 +72,7 @@ public class TemperatureConversionFrame extends NavigationFrame
 		convertButton.getModel().setLabel("Convert");	//set the button label
 		convertButton.getModel().addActionListener(new ActionListener<ActionModel>()	//when the convert button is pressed
 				{
-					public void onAction(ActionEvent<ActionModel> actionEvent)	//convert the temperature in the input field and place the result in the output field
+					public void actionPerformed(ActionEvent<ActionModel> actionEvent)	//convert the temperature in the input field and place the result in the output field
 					{
 						final float inputValue=temperatureInput.getModel().getValue().floatValue();	//get the input value from the control
 						final float outputValue;	//we'll convert the value and store it here

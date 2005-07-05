@@ -6,11 +6,11 @@ import com.garretwilson.lang.ObjectUtilities;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-/**A default implementation of a model for user input.
+/**A default implementation of a model for user input of a value.
 @param <V> The type of value contained in the model.
 @author Garret Wilson
 */
-public class DefaultValueModel<V> extends DefaultLabelModel implements ValueModel<V>
+public class DefaultValueModel<V> extends DefaultControlModel implements ValueModel<V>
 {
 
 	/**The input value, or <code>null</code> if there is no value.*/
@@ -69,7 +69,7 @@ public class DefaultValueModel<V> extends DefaultLabelModel implements ValueMode
 		/**@return The class representing the type of value this model can hold.*/
 		public Class<V> getValueClass() {return valueClass;}
 
-	/**Constructs an input model indicating the type of value it can hold.
+	/**Constructs a value model indicating the type of value it can hold.
 	@param session The Guise session that owns this model.
 	@param valueClass The class indicating the type of value held in the model.
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
