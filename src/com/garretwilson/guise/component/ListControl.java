@@ -109,15 +109,20 @@ public class ListControl<V> extends AbstractSelectControl<V, ModelComponent<? ex
 		*/
 		public Label createComponent(final V value)
 		{
-			if(value!=null)	//if a value is given
-			{
-				final String id="hash"+Integer.toHexString(value.hashCode());	//generate an ID for the value
-				return new Label(getSession(), id, new DefaultLabelModel(getSession(), value.toString()));	//generate a label containing the value's string value 
-			}
-			else	//if a value is not given
-			{
-				return null;	//there is no label to return
-			}
+			return value!=null	//if there is a value
+					? new Label(getSession(), getID(value), new DefaultLabelModel(getSession(), value.toString()))	//generate a label containing the value's string value
+					: null;	//otherwise return null
+		}
+
+		/**Determines an identier for the given object.
+		This implementation returns the hexadecimal representation of the object's hash code appended to the word "hash".
+		@param value The value for which an identifier should be returned.
+		@return A string identifying the value, or <code>null</code> if the provided value is <code>null</code>.
+		@see Component#getID()
+		*/
+		public String getID(final V value)
+		{
+			return value!=null ? "hash"+Integer.toHexString(value.hashCode()) : null;	//if a value is given return the word "hash" followed by a hexadecimal representation of the value's hash code
 		}
 	}
 }

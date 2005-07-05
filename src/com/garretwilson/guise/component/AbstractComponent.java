@@ -391,7 +391,7 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	@param context Guise context information.
 	@exception NullPointerException if there is no controller installed and no appropriate controller registered with the Guise context.
 	*/
-//TODO fix	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	protected <GC extends GuiseContext> Controller<GC, ? super C> getController(final GC context)
 	{
 		Controller<GC, ? super C> controller=(Controller<GC, ? super C>)getController();	//get the installed controller TODO check

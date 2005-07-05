@@ -123,7 +123,7 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext>	extends 
 	@param componentClass The class of component that may be registered.
 	@return A class of controller registered to render component of the specific class, or <code>null</code> if no controller is registered.
 	*/
-	protected <C extends Component> Class<? extends Controller<GC, ? super C>> getRegisteredControllerClass(final Class<C> componentClass)
+	protected <C extends Component<?>> Class<? extends Controller<GC, ? super C>> getRegisteredControllerClass(final Class<C> componentClass)
 	{
 		synchronized(controllerKitList)	//don't allow anyone to access the list of controller kits while we access it
 		{
@@ -144,8 +144,8 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext>	extends 
 	@param componentClass The class of component for which a render strategy should be returned.
 	@return A class of render strategy to render the given component class, or <code>null</code> if no render strategy is registered.
 	*/
-//TODO fix	@SuppressWarnings("unchecked")
-	protected <C extends Component> Class<? extends Controller<GC, ? super C>> getControllerClass(final Class<C> componentClass)
+	@SuppressWarnings("unchecked")
+	protected <C extends Component<?>> Class<? extends Controller<GC, ? super C>> getControllerClass(final Class<C> componentClass)
 	{
 		Class<? extends Controller> controllerClass=getRegisteredControllerClass(componentClass);	//see if there is a controller class registered for this component type
 		if(controllerClass==null)	//if we didn't find a render strategy for this class, check the super class
@@ -178,7 +178,7 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext>	extends 
 	@param component The component for which a controller should be returned.
 	@return A controller to render the given component, or <code>null</code> if no controller is registered.
 	*/
-//TODO fix	@SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	public <C extends Component<?>> Controller<GC, ? super C> getController(final C component)
 	{
 		Class<C> componentClass=(Class<C>)component.getClass();	//get the component class

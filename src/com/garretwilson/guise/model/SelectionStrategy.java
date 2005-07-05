@@ -1,6 +1,7 @@
 package com.garretwilson.guise.model;
 
 import com.garretwilson.guise.event.ListListener;
+import com.garretwilson.guise.event.SelectionListener;
 
 /**A selection strategy for a select model.
 @param <V> The type of values contained in the select model.
@@ -58,4 +59,13 @@ public interface SelectionStrategy<V> extends ListListener<SelectModel<V>, V>
 	*/
 	public void removeSelectedIndex(final SelectModel<V> selectModel, final int index);
 
+	/**Adds a selection listener.
+	@param selectionListener The selection listener to add.
+	*/
+	public void addSelectionListener(final SelectionListener<V> selectionListener);
+
+	/**Removes a selection listener.
+	@param selectionListener The selection listener to remove.
+	*/
+	public void removeSelectionListener(final SelectionListener<V> selectionListener);
 }

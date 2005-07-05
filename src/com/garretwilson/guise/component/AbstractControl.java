@@ -1,12 +1,12 @@
 package com.garretwilson.guise.component;
 
-import com.garretwilson.guise.model.Model;
+import com.garretwilson.guise.model.LabelModel;
 import com.garretwilson.guise.session.GuiseSession;
 
 /**An abstract implementation of a model component that allows user interaction to modify the model.
 @author Garret Wilson
 */
-public abstract class AbstractControl<M extends Model, C extends Control<M, C>> extends AbstractModelComponent<M, C> implements Control<M, C>
+public abstract class AbstractControl<M extends LabelModel, C extends Control<M, C>> extends AbstractModelComponent<M, C> implements Control<M, C>
 {
 
 	/**Session, ID, and model constructor.

@@ -32,5 +32,12 @@ public interface SelectControl<V, R extends Component<?>, C extends SelectContro
 	*/
 	public interface ValueRepresentationStrategy<VV, RR extends Component<?>> extends ComponentFactory<VV, RR>
 	{
+		/**Determines an identier for the given object.
+		This value must be equal to the ID of the component returned by the {@link ComponentFactory#createComponent(VV)} method.
+		@param value The value for which an identifier should be returned.
+		@return A string identifying the value, or <code>null</code> if the provided value is <code>null</code>.
+		@see Component#getID()
+		*/
+		public String getID(final VV value);
 	}
 }

@@ -2,7 +2,13 @@ package com.garretwilson.guise.model;
 
 import java.util.*;
 
+import com.garretwilson.event.EventListenerManager;
 import com.garretwilson.guise.event.ListEvent;
+import com.garretwilson.guise.event.ListListener;
+import com.garretwilson.guise.event.PostponedListEvent;
+import com.garretwilson.guise.event.PostponedSelectionEvent;
+import com.garretwilson.guise.event.SelectionEvent;
+import com.garretwilson.guise.event.SelectionListener;
 
 import static java.util.Collections.*;
 import static com.garretwilson.util.ArrayUtilities.*;
@@ -13,8 +19,14 @@ This class is thread-safe, and assumes that the corresponding select model is th
 @author Garret Wilson
 @see SelectModel
 */
-public class AbstractSelectionStrategy<V> implements SelectionStrategy<V>
+public abstract class AbstractSelectionStrategy<V> implements SelectionStrategy<V>
 {
+
+	/**The object managing event listeners.*/
+	private final EventListenerManager eventListenerManager=new EventListenerManager();
+
+		/**@return The object managing event listeners.*/
+		protected EventListenerManager getEventListenerManager() {return eventListenerManager;}
 
 	/**The thread-safe sorted set of selected indices on which synchronization can be performed.*/
 	private final Set<Integer> selectedIndices=synchronizedSortedSet(new TreeSet<Integer>());
@@ -82,6 +94,7 @@ public class AbstractSelectionStrategy<V> implements SelectionStrategy<V>
 				}
 			}
 		}
+		fireSelectionChanged(selectModel, null, null);	//indicate that a complex selection change occurred
 	}
 
 	/**Sets the selected values.
@@ -165,6 +178,37 @@ public class AbstractSelectionStrategy<V> implements SelectionStrategy<V>
 		else if(index<0 || (addedElement==null && removedElement==null))	//if we don't have enough information about what exactly happened
 		{
 			setSelectedIndices(selectModel);	//clear all selections, as we don't know which values were added or removed
+		}
+	}
+
+	/**Adds a selection listener.
+	@param selectionListener The selection listener to add.
+	*/
+	public void addSelectionListener(final SelectionListener<V> selectionListener)
+	{
+		getEventListenerManager().add(SelectionListener.class, selectionListener);	//add the listener
+	}
+
+	/**Removes a selection listener.
+	@param selectionListener The selection listener to remove.
+	*/
+	public void removeSelectionListener(final SelectionListener<V> selectionListener)
+	{
+		getEventListenerManager().remove(SelectionListener.class, selectionListener);	//remove the listener
+	}
+
+	/**Fires an event to all registered selection listeners indicating the selection changed.
+	@param addedIndex The index that was added to the selection, or <code>null</code> if no index was added or it is unknown whether or which indices were added.
+	@param removedIndex The index that was removed from the list, or <code>null</code> if no index was removed or it is unknown whether or which indices were removed.
+	@see SelectionListener
+	@see SelectionEvent
+	*/
+	protected void fireSelectionChanged(final SelectModel<V> selectModel, final Integer addedIndex, final Integer removedIndex)
+	{
+		if(getEventListenerManager().hasListeners(SelectionListener.class))	//if there are appropriate listeners registered
+		{
+			final SelectionEvent<V> selectionEvent=new SelectionEvent<V>(selectModel.getSession(), selectModel, addedIndex, removedIndex);	//create a new event
+			selectModel.getSession().queueModelEvent(new PostponedSelectionEvent<V>(getEventListenerManager(), selectionEvent));	//tell the Guise session to queue the event
 		}
 	}
 

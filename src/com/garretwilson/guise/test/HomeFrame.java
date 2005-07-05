@@ -151,6 +151,7 @@ public class HomeFrame extends NavigationFrame
 		final ListControl<String> listSelectControl=new ListControl<String>(session, String.class, new SingleSelectionStrategy<String>());
 		listSelectControl.getModel().setLabel("Choose an option.");
 		listSelectControl.getModel().add("The first option");
+		listSelectControl.getModel().add(null);
 		listSelectControl.getModel().add("The second option");
 		listSelectControl.getModel().add("The third option");
 		listSelectControl.getModel().add("The fourth option");

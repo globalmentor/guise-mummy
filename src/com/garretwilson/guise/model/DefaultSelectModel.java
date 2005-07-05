@@ -312,7 +312,7 @@ public class DefaultSelectModel<V> extends DefaultControlModel implements Select
 		getEventListenerManager().remove(ListListener.class, listListener);	//remove the listener
 	}
 
-	/**Fires an action to all registered list listeners indicating the list was modified.
+	/**Fires an event to all registered list listeners indicating the list was modified.
 	@param index The index at which an element was added and/or removed, or -1 if the index is unknown.
 	@param addedElement The element that was added to the list, or <code>null</code> if no element was added or it is unknown whether or which elements were added.
 	@param removedElement The element that was removed from the list, or <code>null</code> if no element was removed or it is unknown whether or which elements were removed.

@@ -9,7 +9,7 @@ If neither an added nor a removed element are provided, the event represents a g
 @param <E> The type of elements contained in the list.
 @author Garret Wilson
 */
-public class ListEvent<S, E> extends GuiseEvent<S>
+public class ListEvent<S, E> extends SetEvent<S, E>
 {
 
 	/**The index at which an element was added and/or removed, or -1 if the index is unknown.*/
@@ -17,18 +17,6 @@ public class ListEvent<S, E> extends GuiseEvent<S>
 
 		/**@return The index at which an element was added and/or removed, or -1 if the index is unknown.*/
 		public int getIndex() {return index;}
-
-	/**The element that was added to the list, or <code>null</code> if no element was added or it is unknown whether or which elements were added.*/
-	private E addedElement;
-
-		/**@return The element that was added to the list, or <code>null</code> if no element was added or it is unknown whether or which elements were added.*/
-		public E getAddedElement() {return addedElement;}
-
-	/**The element that was removed from the list, or <code>null</code> if no element was removed or it is unknown whether or which elements were removed.*/
-	private E removedElement;
-
-		/**@return The element that was removed from the list, or <code>null</code> if no element was added or it is unknown whether or which elements were removed.*/
-		public E getRemovedElement() {return removedElement;}
 
 	/**Session and source constructor for general list modification.
 	@param session The Guise session in which this event was generated.
@@ -50,9 +38,7 @@ public class ListEvent<S, E> extends GuiseEvent<S>
 	*/
 	public ListEvent(final GuiseSession<?> session, final S source, final int index, final E addedElement, final E removedElement)
 	{
-		super(session, source);	//construct the parent class
-		this.index=index;
-		this.addedElement=addedElement;
-		this.removedElement=removedElement;
+		super(session, source, addedElement, removedElement);	//construct the parent class
+		this.index=index;	//save the index
 	}
 }
