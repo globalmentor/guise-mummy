@@ -28,7 +28,7 @@ public class CheckControl extends AbstractValueControl<Boolean, CheckControl>
 	/**The type of check area presented to the user; the default is a rectangle.*/
 	private CheckType checkType=CheckType.RECTANGLE;
 
-		/**@return The type of check area presented to the user; the default is a rectangle..*/
+		/**@return The type of check area presented to the user; the default is a rectangle.*/
 		public CheckType getCheckType() {return checkType;}
 
 		/**Sets the type of check area to present to the user.

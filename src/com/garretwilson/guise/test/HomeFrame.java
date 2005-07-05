@@ -17,6 +17,7 @@ import com.garretwilson.guise.model.SingleSelectionStrategy;
 import com.garretwilson.guise.model.ValueModel;
 import com.garretwilson.guise.session.GuiseSession;
 import com.garretwilson.guise.validator.RegularExpressionStringValidator;
+import com.garretwilson.guise.validator.ValidationException;
 import com.garretwilson.util.Debug;
 
 /**Test frame for a home page.
@@ -156,6 +157,18 @@ public class HomeFrame extends NavigationFrame
 		listSelectControl.getModel().add("The third option");
 		listSelectControl.getModel().add("The fourth option");
 		add(listSelectControl);
+
+		final TextAreaControl textAreaControl=new TextAreaControl(session, 25, 100, true);
+		textAreaControl.getModel().setLabel("Type some text.");
+		try
+		{
+			textAreaControl.getModel().setValue("This is some text\nand some more on another line.\n\nSkipping two lines down, we find a line that is really long, is really, really, ;lkjas;lfk alkg; ;alkghj;alg lkjahq glkjh flkjhasdflkjhasdfl kjhasdf lkjh lkadhf lkshd flksadhf lksadhlskdqah slhjfg sd long.");
+		}
+		catch (ValidationException e)
+		{
+			throw new AssertionError(e);
+		}
+		add(textAreaControl);
 	}
 
 }
