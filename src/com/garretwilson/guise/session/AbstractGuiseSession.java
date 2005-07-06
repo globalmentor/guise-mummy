@@ -8,7 +8,7 @@ import static java.util.Collections.*;
 
 import com.garretwilson.beans.*;
 import com.garretwilson.event.PostponedEvent;
-import com.garretwilson.guise.application.GuiseApplication;
+import com.garretwilson.guise.GuiseApplication;
 import com.garretwilson.guise.component.NavigationFrame;
 import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.lang.ObjectUtilities;

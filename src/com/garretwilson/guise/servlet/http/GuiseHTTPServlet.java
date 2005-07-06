@@ -11,14 +11,15 @@ import static java.util.Collections.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import com.garretwilson.guise.application.AbstractGuiseApplication;
-import com.garretwilson.guise.application.GuiseApplication;
+import com.garretwilson.guise.*;
 import com.garretwilson.guise.component.*;
 import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.text.xml.xhtml.*;
 import com.garretwilson.guise.session.GuiseSession;
 import com.garretwilson.guise.validator.*;
 import com.garretwilson.io.OutputStreamUtilities;
+
+import static com.garretwilson.lang.ObjectUtilities.checkNull;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.net.http.*;
@@ -29,6 +30,7 @@ import static com.garretwilson.util.LocaleUtilities.*;
 
 /**The servlet that controls a Guise web applications. 
 Navigation frame bindings for paths can be set in initialization parameters named <code>navigation.<var>frameID</var></code>, with values in the form <code><var>contextRelativePath</var>?class=<var>com.example.Frame</var></code>.
+This implementation only works with Guise applications that descend from {@link AbstractGuiseApplication}.
 @author Garret Wilson
 */
 public class GuiseHTTPServlet extends DefaultHTTPServlet
@@ -54,11 +56,17 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	}
 */
 
+	/**The Guise container that owns the application.*/
+	private final HTTPServletGuiseContainer guiseContainer;
+
+		/**@return The Guise container that owns the application.*/
+		protected HTTPServletGuiseContainer getGuiseContainer() {return guiseContainer;}
+
 	/**The Guise application controlled by this servlet.*/
-	private final HTTPServletGuiseApplication guiseApplication;
+	private final AbstractGuiseApplication guiseApplication;
 
 		/**@return The Guise application controlled by this servlet.*/
-		protected HTTPServletGuiseApplication getGuiseApplication() {return guiseApplication;}
+		protected AbstractGuiseApplication getGuiseApplication() {return guiseApplication;}
 
 	/**The context path of the servlet, and thereby of the Guise application.
 	Because this servlet's context path is only available via the request object, we must wait until the first request to update it.
@@ -71,9 +79,9 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	Subclasses can override this method to create a specialized application type. 
 	@return A new Guise application object.
 	*/
-	protected HTTPServletGuiseApplication createGuiseApplication()
+	protected AbstractGuiseApplication createGuiseApplication()
 	{
-		final HTTPServletGuiseApplication guiseApplication=new HTTPServletGuiseApplication();	//create a default application
+		final AbstractGuiseApplication guiseApplication=new DefaultGuiseApplication();	//create a default application
 		guiseApplication.installControllerKit(new XHTMLControllerKit<AbstractHTTPServletGuiseContext>());	//create and install an XHTML controller kit
 		return guiseApplication;	//return the created Guise application
 	}
@@ -84,6 +92,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	*/
 	public GuiseHTTPServlet()
 	{
+		guiseContainer=new HTTPServletGuiseContainer();	//create the Guise container
 		guiseApplication=createGuiseApplication();	//create a store a Guise application
 	}
 		
@@ -118,7 +127,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	@exception ServletException if there is a problem initializing the frame bindings.
 	@see com.garretwilson.guise.component.NavigationFrame
 	*/
-	protected void initGuiseApplication(final HTTPServletGuiseApplication guiseApplication, final ServletConfig servletConfig) throws ServletException
+	protected void initGuiseApplication(final AbstractGuiseApplication guiseApplication, final ServletConfig servletConfig) throws ServletException
 	{
 			//initialize the supported locales
 		final String supportedLocalesString=servletConfig.getInitParameter(SUPPORTED_LOCALES_INIT_PARAMETER_PREFIX);	//get the supported locales init parameter
@@ -196,24 +205,21 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
   */
 	public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
 	{
-		if(guiseApplicationContextPath==null)	//if we haven't updated our context path for this servlet instance (the context path should always be the same, but it's not available until the first request arrives)
+		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
+		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
+		if(guiseApplication.getContainer()==null)	//if this application has not yet been installed (note that there is a race condition here if multiple HTTP requests attempt to access the application simultaneously, but the losing thread will simply throw an exception and not otherwise disturb the application functionality)
 		{
-			guiseApplicationContextPath=request.getContextPath()+request.getServletPath()+PATH_SEPARATOR;	//set the application context path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash
+			final String guiseApplicationContextPath=request.getContextPath()+request.getServletPath()+PATH_SEPARATOR;	//construct the Guise application context path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash
+			guiseContainer.installApplication(guiseApplication, guiseApplicationContextPath);	//install the application			
 		}
-		assert guiseApplicationContextPath.equals(request.getContextPath()+request.getServletPath()) : "Guise HTTP servlet context path changed unexpectedly.";
-
-		final HTTPServletGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-		final HTTPServletGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseApplication, request);	//retrieves the Guise session for this application and request
+		final HTTPServletGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, request);	//retrieves the Guise session for this container and request
 		final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, request, response);	//create a new Guise context
 		guiseSession.addContext(guiseContext);	//add this context to the session
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 Debug.trace("raw path info", rawPathInfo);
+		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
 		try
 		{
-			if(!rawPathInfo.startsWith(ROOT_PATH))	//the Java servlet specification says that the path info will start with a '/'
-			{
-				throw new IllegalArgumentException("Expected absolute path info, received "+rawPathInfo);
-			}
 			final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
 			final NavigationFrame navigationFrame=guiseSession.getBoundNavigationFrame(navigationPath);	//get the frame bound to the requested path
 			if(navigationFrame!=null)	//if we found a frame class for this address
@@ -279,11 +285,47 @@ Debug.trace("raw path info", rawPathInfo);
 		}
 	}
 
-	/**A Guise application for Guise HTTP servlets.
+	/**Called by the servlet container to indicate to a servlet that the servlet is being taken out of service.
+	This version uninstalls the Guise application from the Guise container.
+	*/
+	public void destroy()
+	{
+		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
+		if(guiseApplication.getContainer()!=null)	//if the Guise application is installed
+		{
+			getGuiseContainer().uninstallApplication(guiseApplication);	//uninstall the application
+		}
+		super.destroy();	//do the default destroying
+	}
+
+	/**A Guise container for Guise HTTP servlets.
 	@author Garret Wilson
 	*/
-	protected class HTTPServletGuiseApplication extends AbstractGuiseApplication<AbstractHTTPServletGuiseContext>
+	protected class HTTPServletGuiseContainer extends AbstractGuiseContainer
 	{
+		/**Installs the given application at the given context path.
+		This version is provided to expose the method to the servlet.
+		@param contextPath The context path at which the application is being installed.
+		@exception NullPointerException if either the application or context path is <code>null</code>.
+		@exception IllegalArgumentException if the context path is not absolute and does not end with a slash ('/') character.
+		@exception IllegalStateException if the application is already installed in some container.
+		@exception IllegalStateException if there is already an application installed in this container at the given context path.
+		*/
+		protected void installApplication(final AbstractGuiseApplication application, final String contextPath)
+		{
+			super.installApplication(application, contextPath);	//delegate to the parent class
+		}
+
+		/**Uninstalls the given application.
+		This version is provided to expose the method to the servlet.
+		@exception NullPointerException if the application is <code>null</code>.
+		@exception IllegalStateException if the application is not installed in this container.
+		*/
+		protected void uninstallApplication(final AbstractGuiseApplication application)
+		{
+			super.uninstallApplication(application);	//delegate to the parent class			
+		}
+
 		/**The synchronized map of Guise sessions keyed to HTTP sessions.*/
 		private final Map<HttpSession, HTTPServletGuiseSession> guiseSessionMap=synchronizedMap(new HashMap<HttpSession, HTTPServletGuiseSession>());
 
@@ -336,7 +378,7 @@ Debug.trace("raw path info", rawPathInfo);
 		*/ 
 		protected HTTPServletGuiseSession createGuiseSession(final HttpSession httpSession)
 		{
-			return new HTTPServletGuiseSession(this, httpSession);	//create a default HTTP guise session
+			return new HTTPServletGuiseSession(getGuiseApplication(), httpSession);	//create a default HTTP guise session
 		}
 
 		/**Reports the context path of the application.

@@ -6,7 +6,7 @@ import java.util.*;
 
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.event.PostponedEvent;
-import com.garretwilson.guise.application.GuiseApplication;
+import com.garretwilson.guise.GuiseApplication;
 import com.garretwilson.guise.component.NavigationFrame;
 import com.garretwilson.guise.context.GuiseContext;
 import static com.garretwilson.lang.ClassUtilities.*;

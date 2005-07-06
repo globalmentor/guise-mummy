@@ -1,4 +1,4 @@
-package com.garretwilson.guise.application;
+package com.garretwilson.guise;
 
 import java.net.URI;
 import java.util.*;
@@ -8,6 +8,7 @@ import static java.util.Collections.*;
 
 import com.garretwilson.beans.BoundPropertyObject;
 import static com.garretwilson.guise.GuiseResourceConstants.*;
+
 import com.garretwilson.guise.component.Component;
 import com.garretwilson.guise.component.NavigationFrame;
 import com.garretwilson.guise.context.GuiseContext;
@@ -22,8 +23,66 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 /**An abstract base class for a Guise application.
 @author Garret Wilson
 */
-public abstract class AbstractGuiseApplication<GC extends GuiseContext>	extends BoundPropertyObject implements GuiseApplication<GC>
+public abstract class AbstractGuiseApplication<GC extends GuiseContext> extends BoundPropertyObject implements GuiseApplication<GC>
 {
+
+	/**The Guise container into which this application is installed, or <code>null</code> if the application is not yet installed.*/
+	private GuiseContainer container=null;
+
+		/**@return The Guise container into which this application is installed, or <code>null</code> if the application is not yet installed.*/
+		public GuiseContainer getContainer() {return container;}
+
+	/**The context path of the application, or <code>null</code> if the application is not yet installed.*/
+	private String contextPath=null;
+
+		/**Reports the context path of the application.
+		The context path is an absolute path that ends with a slash ('/'), indicating the application's context relative to its navigation frames.
+		@return The path representing the context of the Guise application, or <code>null</code> if the application is not yet installed.
+		*/
+		public String getContextPath() {return contextPath;}
+
+	/**Installs the application into the given container at the given context path.
+	This method is package-visible so that it can be accessed by {@link AbstractGuiseContainer}.
+	@param container The Guise container into which the application is being installed.
+	@param contextPath The context path at which the application is being installed.
+	@exception NullPointerException if either the container or context path is <code>null</code>.
+	@exception IllegalArgumentException if the context path is not absolute and does not end with a slash ('/') character.
+	@exception IllegalStateException if the application is already installed.
+	*/
+	void install(final GuiseContainer container, final String contextPath)
+	{
+		if(this.container!=null || this.contextPath!=null)	//if we already have a container and/or a context path
+		{
+			throw new IllegalStateException("Application already installed.");
+		}
+		checkNull(container, "Container cannot be null");
+		checkNull(contextPath, "Application context path cannot be null");
+		if(!isAbsolutePath(contextPath) || !isContainerPath(contextPath))	//if the path doesn't begin and end with a slash
+		{
+			throw new IllegalArgumentException("Context path "+contextPath+" does not begin and ends with a path separator.");
+		}
+		this.container=container;	//store the container
+		this.contextPath=contextPath;	//store the context path
+	}
+
+	/**Uninstalls the application from the given container.
+	This method is package-visible so that it can be accessed by {@link AbstractGuiseContainer}.
+	@param container The Guise container into which the application is being installed.
+	@exception IllegalStateException if the application is not installed or is installed into another container.
+	*/
+	void uninstall(final GuiseContainer container)
+	{
+		if(this.container==null)	//if we don't have a container
+		{
+			throw new IllegalStateException("Application not installed.");
+		}
+		if(this.container!=container)	//if we're installed into a different container
+		{
+			throw new IllegalStateException("Application installed into different container.");
+		}
+		this.container=null;	//release the container
+		this.contextPath=null;	//remove the context path
+	}
 
 	/**The application locale used by default if a new session cannot determine the users's preferred locale.*/
 	private Locale defaultLocale;

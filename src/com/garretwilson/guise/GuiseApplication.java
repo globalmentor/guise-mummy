@@ -1,4 +1,4 @@
-package com.garretwilson.guise.application;
+package com.garretwilson.guise;
 
 import java.net.URI;
 import java.util.Locale;
@@ -82,9 +82,12 @@ public interface GuiseApplication<GC extends GuiseContext> extends PropertyBinda
 	*/
 	public Class<? extends NavigationFrame> getBoundNavigationFrameClass(final String path);
 
+	/**@return The Guise container into which this application is installed, or <code>null</code> if the application is not yet installed.*/
+	public GuiseContainer getContainer();
+
 	/**Reports the context path of the application.
 	The context path is an absolute path that ends with a slash ('/'), indicating the application's context relative to its navigation frames.
-	@return The path representing the context of the Guise application.
+	@return The path representing the context of the Guise application, or <code>null</code> if the application is not yet installed.
 	*/
 	public String getContextPath();
 
