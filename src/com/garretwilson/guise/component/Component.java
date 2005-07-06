@@ -33,14 +33,14 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	public Iterable<Component<?>> getChildren();
 
 	/**@return The model used by this component.*/
-	public Controller<? extends GuiseContext, ? super C> getController();
+	public Controller<? extends GuiseContext<?>, ? super C> getController();
 
 	/**Sets the controller used by this component.
 	This is a bound property.
 	@param newController The new controller to use.
 	@see #CONTROLLER_PROPERTY
 	*/
-	public void setController(final Controller<? extends GuiseContext, ? super C> newController);
+	public void setController(final Controller<? extends GuiseContext<?>, ? super C> newController);
 
 	/**@return An iterable interface to all errors associated with this component.*/
 	public Iterable<Throwable> getErrors();
@@ -127,7 +127,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@see GuiseContext.State#QUERY_VIEW
 	@see #getController(GC, C)
 	*/
-	public <GC extends GuiseContext> void queryView(final GC context) throws IOException;
+	public <GC extends GuiseContext<?>> void queryView(final GC context) throws IOException;
 
 	/**Decodes the data of the view of this component.
 	This method should not normally be called directly by applications.
@@ -138,7 +138,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@see #getController(GC, C)
 	@see GuiseContext.State#DECODE_VIEW
 	*/
-	public <GC extends GuiseContext> void decodeView(final GC context) throws IOException, ValidationsException;
+	public <GC extends GuiseContext<?>> void decodeView(final GC context) throws IOException, ValidationsException;
 
 	/**Validates the view of this component.
 	This method should not normally be called directly by applications.
@@ -149,7 +149,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@see #getController(GC, C)
 	@see GuiseContext.State#VALIDATE_VIEW
 	*/
-	public <GC extends GuiseContext> void validateView(final GC context) throws IOException, ValidationsException;
+	public <GC extends GuiseContext<?>> void validateView(final GC context) throws IOException, ValidationsException;
 
 	/**Updates the model of this component.
 	This method should not normally be called directly by applications.
@@ -160,7 +160,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@see #getController(GC, C)
 	@see GuiseContext.State#UPDATE_MODEL
 	*/
-	public <GC extends GuiseContext> void updateModel(final GC context) throws IOException, ValidationException;
+	public <GC extends GuiseContext<?>> void updateModel(final GC context) throws IOException, ValidationException;
 
 	/**Collects the current data from the model of this component.
 	This method should not normally be called directly by applications.
@@ -170,7 +170,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@see #getController(GC, C)
 	@see GuiseContext.State#QUERY_MODEL
 	*/
-	public <GC extends GuiseContext> void queryModel(final GC context) throws IOException;
+	public <GC extends GuiseContext<?>> void queryModel(final GC context) throws IOException;
 
 	/**Encodes the data of the model of this component.
 	This method should not normally be called directly by applications.
@@ -180,7 +180,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@see #getController(GC, C)
 	@see GuiseContext.State#ENCODE_MODEL
 	*/
-	public <GC extends GuiseContext> void encodeModel(final GC context) throws IOException;
+	public <GC extends GuiseContext<?>> void encodeModel(final GC context) throws IOException;
 
 	/**Updates the view of this component.
 	This method should not normally be called directly by applications.
@@ -190,5 +190,5 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@see #getController(GC, C)
 	@see GuiseContext.State#UPDATE_VIEW
 	*/
-	public <GC extends GuiseContext> void updateView(final GC context) throws IOException;
+	public <GC extends GuiseContext<?>> void updateView(final GC context) throws IOException;
 }

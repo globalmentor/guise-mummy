@@ -44,21 +44,21 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	public Iterable<Component<?>> getChildren() {return emptyList();}
 
 	/**The controller installed in this component, or <code>null</code> if no controller is installed.*/
-	private Controller<? extends GuiseContext, ? super C> controller=null;
+	private Controller<? extends GuiseContext<?>, ? super C> controller=null;
 
 		/**@return The model used by this component.*/
-		public Controller<? extends GuiseContext, ? super C> getController() {return controller;}
+		public Controller<? extends GuiseContext<?>, ? super C> getController() {return controller;}
 
 		/**Sets the controller used by this component.
 		This is a bound property.
 		@param newController The new controller to use.
 		@see Component#CONTROLLER_PROPERTY
 		*/
-		public void setController(final Controller<? extends GuiseContext, ? super C> newController)
+		public void setController(final Controller<? extends GuiseContext<?>, ? super C> newController)
 		{
 			if(newController!=controller)	//if the value is really changing
 			{
-				final Controller<? extends GuiseContext, ? super C> oldController=controller;	//get a reference to the old value
+				final Controller<? extends GuiseContext<?>, ? super C> oldController=controller;	//get a reference to the old value
 				controller=newController;	//actually change values
 				firePropertyChange(CONTROLLER_PROPERTY, oldController, newController);	//indicate that the value changed				
 			}
@@ -294,9 +294,9 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	@see GuiseContext.State#QUERY_VIEW
 	@see #getController(GC, C)
 	*/
-	public <GC extends GuiseContext> void queryView(final GC context) throws IOException
+	public <GC extends GuiseContext<?>> void queryView(final GC context) throws IOException
 	{
-		final Controller<GC, ? super C> controller=getController(context);	//get the controller
+		final Controller<? super GC, ? super C> controller=getController(context);	//get the controller
 		controller.queryView(context, getThis());	//tell the controller to query the view
 	}
 
@@ -309,9 +309,9 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	@see #getController(GC, C)
 	@see GuiseContext.State#DECODE_VIEW
 	*/
-	public <GC extends GuiseContext> void decodeView(final GC context) throws IOException, ValidationsException
+	public <GC extends GuiseContext<?>> void decodeView(final GC context) throws IOException, ValidationsException
 	{
-		final Controller<GC, ? super C> controller=getController(context);	//get the controller
+		final Controller<? super GC, ? super C> controller=getController(context);	//get the controller
 		controller.decodeView(context, getThis());	//tell the controller to decode the view
 	}
 
@@ -324,9 +324,9 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	@see #getController(GC, C)
 	@see GuiseContext.State#VALIDATE_VIEW
 	*/
-	public <GC extends GuiseContext> void validateView(final GC context) throws IOException, ValidationsException
+	public <GC extends GuiseContext<?>> void validateView(final GC context) throws IOException, ValidationsException
 	{
-		final Controller<GC, ? super C> controller=getController(context);	//get the controller
+		final Controller<? super GC, ? super C> controller=getController(context);	//get the controller
 		controller.validateView(context, getThis());	//tell the controller to update the view
 	}
 
@@ -339,9 +339,9 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	@see #getController(GC, C)
 	@see GuiseContext.State#UPDATE_MODEL
 	*/
-	public <GC extends GuiseContext> void updateModel(final GC context) throws IOException, ValidationException
+	public <GC extends GuiseContext<?>> void updateModel(final GC context) throws IOException, ValidationException
 	{
-		final Controller<GC, ? super C> controller=getController(context);	//get the controller
+		final Controller<? super GC, ? super C> controller=getController(context);	//get the controller
 		controller.updateModel(context, getThis());	//tell the controller to update the model
 	}
 
@@ -353,9 +353,9 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	@see #getController(GC, C)
 	@see GuiseContext.State#QUERY_MODEL
 	*/
-	public <GC extends GuiseContext> void queryModel(final GC context) throws IOException
+	public <GC extends GuiseContext<?>> void queryModel(final GC context) throws IOException
 	{
-		final Controller<GC, ? super C> controller=getController(context);	//get the controller
+		final Controller<? super GC, ? super C> controller=getController(context);	//get the controller
 		controller.queryModel(context, getThis());	//tell the controller to query the model
 	}
 
@@ -367,9 +367,9 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	@see #getController(GC, C)
 	@see GuiseContext.State#ENCODE_MODEL
 	*/
-	public <GC extends GuiseContext> void encodeModel(final GC context) throws IOException
+	public <GC extends GuiseContext<?>> void encodeModel(final GC context) throws IOException
 	{
-		final Controller<GC, ? super C> controller=getController(context);	//get the controller
+		final Controller<? super GC, ? super C> controller=getController(context);	//get the controller
 		controller.encodeModel(context, getThis());	//tell the controller to encode the model
 	}
 
@@ -381,9 +381,9 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	@see #getController(GC, C)
 	@see GuiseContext.State#UPDATE_VIEW
 	*/
-	public <GC extends GuiseContext> void updateView(final GC context) throws IOException
+	public <GC extends GuiseContext<?>> void updateView(final GC context) throws IOException
 	{
-		final Controller<GC, ? super C> controller=getController(context);	//get the controller
+		final Controller<? super GC, ? super C> controller=getController(context);	//get the controller
 		controller.updateView(context, getThis());	//tell the controller to update the view
 	}
 
@@ -391,16 +391,16 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	@param context Guise context information.
 	@exception NullPointerException if there is no controller installed and no appropriate controller registered with the Guise context.
 	*/
-	@SuppressWarnings("unchecked")
-	protected <GC extends GuiseContext> Controller<GC, ? super C> getController(final GC context)
+	@SuppressWarnings("unchecked")	//because of erasure, we must assume that any controller instantiated from a class object is of the correct generic type
+	protected <GC extends GuiseContext<?>> Controller<? super GC, ? super C> getController(final GC context)
 	{
-		Controller<GC, ? super C> controller=(Controller<GC, ? super C>)getController();	//get the installed controller TODO check
+		Controller<? super GC, ? super C> controller=(Controller<? super GC, ? super C>)getController();	//get the installed controller
 		if(controller==null)	//if no controller is installed
 		{
-			controller=context.getSession().getApplication().getController(this);	//ask the application for a controller
+			controller=context.getSession().getApplication().getController(context, getThis());	//ask the application for a controller
 			if(controller!=null)	//if we found a controller
 			{
-				setController(controller);	//install the new controller
+				setController((Controller<? extends GuiseContext<?>, ? super C>)controller);	//install the new controller
 			}
 			else	//if we don't have a controller
 			{

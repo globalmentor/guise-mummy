@@ -22,7 +22,7 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	public final static String LOCALE_PROPERTY=getPropertyName(GuiseSession.class, "locale");
 
 	/**@return The Guise application to which this session belongs.*/
-	public GuiseApplication<GC> getApplication();
+	public GuiseApplication getApplication();
 
 	/**@return The current session locale.*/
 	public Locale getLocale();

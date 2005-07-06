@@ -2,6 +2,7 @@ package com.garretwilson.guise;
 
 import java.net.URI;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import static java.util.Collections.*;
@@ -23,7 +24,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 /**An abstract base class for a Guise application.
 @author Garret Wilson
 */
-public abstract class AbstractGuiseApplication<GC extends GuiseContext> extends BoundPropertyObject implements GuiseApplication<GC>
+public abstract class AbstractGuiseApplication extends BoundPropertyObject implements GuiseApplication
 {
 
 	/**The Guise container into which this application is installed, or <code>null</code> if the application is not yet installed.*/
@@ -149,15 +150,15 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext> extends 
 		this.defaultLocale=locale;	//set the default locale
 	}
 
-	/**The synchronized list of installed controller kits, with later registrations taking precedence*/
-	private final List<ControllerKit<GC>> controllerKitList=synchronizedList(new ArrayList<ControllerKit<GC>>());
+	/**The thread-safe list of installed controller kits, with later registrations taking precedence*/
+	private final List<ControllerKit> controllerKitList=new CopyOnWriteArrayList<ControllerKit>();
 
 	/**Installs a controller kit.
 	Later controller kits take precedence over earlier-installed controller kits.
 	If the controller kit is already installed, no action occurs.
 	@param controllerKit The controller kit to install.
 	*/
-	public void installControllerKit(final ControllerKit<GC> controllerKit)
+	public void installControllerKit(final ControllerKit controllerKit)
 	{
 		synchronized(controllerKitList)	//don't allow anyone to access the list of controller kits while we access it
 		{
@@ -172,7 +173,7 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext> extends 
 	If the controller kit is not installed, no action occurs.
 	@param controllerKit The controller kit to uninstall.
 	*/
-	public void uninstallControllerKit(final ControllerKit<GC> controllerKit)
+	public void uninstallControllerKit(final ControllerKit controllerKit)
 	{
 		controllerKitList.remove(controllerKit);	//remove the installed controller kit
 	}
@@ -182,17 +183,14 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext> extends 
 	@param componentClass The class of component that may be registered.
 	@return A class of controller registered to render component of the specific class, or <code>null</code> if no controller is registered.
 	*/
-	protected <C extends Component<?>> Class<? extends Controller<GC, ? super C>> getRegisteredControllerClass(final Class<C> componentClass)
+	protected Class<? extends Controller> getRegisteredControllerClass(final Class<? extends Component> componentClass)
 	{
-		synchronized(controllerKitList)	//don't allow anyone to access the list of controller kits while we access it
+		for(final ControllerKit controllerKit:controllerKitList)	//for each controller kit in our list
 		{
-			for(final ControllerKit<GC> controllerKit:controllerKitList)	//for each controller kit in our list
+			final Class<? extends Controller> controllerKitClass=controllerKit.getRegisteredControllerClass(componentClass);	//ask the controller kit for a registered controller class for this component
+			if(controllerKitClass!=null)	//if this controller kit gave us a controller class
 			{
-				final Class<? extends Controller<GC, ? super C>> controllerKitClass=controllerKit.getRegisteredControllerClass(componentClass);	//ask the controller kit for a registered controller class for this component
-				if(controllerKitClass!=null)	//if this controller kit gave us a controller class
-				{
-					return controllerKitClass;	//return the class
-				}
+				return controllerKitClass;	//return the class
 			}
 		}
 		return null;	//indicate that none of our installed controller kits had a controller class registered for the specified component class
@@ -203,8 +201,8 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext> extends 
 	@param componentClass The class of component for which a render strategy should be returned.
 	@return A class of render strategy to render the given component class, or <code>null</code> if no render strategy is registered.
 	*/
-	@SuppressWarnings("unchecked")
-	protected <C extends Component<?>> Class<? extends Controller<GC, ? super C>> getControllerClass(final Class<C> componentClass)
+	@SuppressWarnings("unchecked")	//we programmatically check the super classes and implemented interfaces to make sure they are component classes before casts
+	protected Class<? extends Controller> getControllerClass(final Class<? extends Component> componentClass)
 	{
 		Class<? extends Controller> controllerClass=getRegisteredControllerClass(componentClass);	//see if there is a controller class registered for this component type
 		if(controllerClass==null)	//if we didn't find a render strategy for this class, check the super class
@@ -212,7 +210,7 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext> extends 
 			final Class<?> superClass=componentClass.getSuperclass();	//get the super class of the component
 			if(superClass!=null && Component.class.isAssignableFrom(superClass))	//if the super class is a component
 			{
-				controllerClass=getControllerClass((Class<? extends C>)superClass);	//check the super class
+				controllerClass=getControllerClass((Class<? extends Component>)superClass);	//check the super class
 			}
 		}
 		if(controllerClass==null)	//if we still couldn't find a render strategy for this class, check the interfaces
@@ -221,7 +219,7 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext> extends 
 			{
 				if(Component.class.isAssignableFrom(classInterface))	//if the class interface is a component
 				{
-					controllerClass=getControllerClass((Class<? extends C>)classInterface);	//check the interface
+					controllerClass=getControllerClass((Class<? extends Component>)classInterface);	//check the interface
 					if(controllerClass!=null)	//if we found a render strategy class
 					{
 						break;	//stop looking at the interfaces
@@ -229,24 +227,27 @@ public abstract class AbstractGuiseApplication<GC extends GuiseContext> extends 
 				}					
 			}
 		}
-		return (Class<? extends Controller<GC, ? super C>>)controllerClass;	//show which if any render strategy class we found
+		return controllerClass;	//show which if any render strategy class we found
 	}
 
 	/**Determines the controller appropriate for the given component.
 	A controller class is located by individually looking up the component class hiearchy for registered render strategies, at each checking all installed controller kits.
+	@param <GC> The type of Guise context being used.
+	@param <C> The type of component for which a controller is requested.
+	@param context Guise context information.
 	@param component The component for which a controller should be returned.
 	@return A controller to render the given component, or <code>null</code> if no controller is registered.
 	*/
-	@SuppressWarnings("unchecked")
-	public <C extends Component<?>> Controller<GC, ? super C> getController(final C component)
+	@SuppressWarnings("unchecked")	//class objects don't carry deep generic information so we have to assume that the instantiated controller is of the correct generic type
+	public <GC extends GuiseContext<?>, C extends Component<?>> Controller<? super GC, ? super C> getController(final GC context, final C component)
 	{
-		Class<C> componentClass=(Class<C>)component.getClass();	//get the component class
-		final Class<? extends Controller<GC, ? super C>> renderStrategyClass=getControllerClass(componentClass);	//walk the hierarchy to see if there is a render strategy class registered for this component type
+		Class<? extends Component> componentClass=component.getClass();	//get the component class
+		final Class<? extends Controller> renderStrategyClass=getControllerClass(componentClass);	//walk the hierarchy to see if there is a render strategy class registered for this component type
 		if(renderStrategyClass!=null)	//if we found a render strategy class
 		{
 			try
 			{
-				return renderStrategyClass.newInstance();	//return a new instance of the class
+				return (Controller<? super GC, ? super C>)renderStrategyClass.newInstance();	//return a new instance of the class
 			}
 			catch (InstantiationException e)
 			{

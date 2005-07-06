@@ -24,10 +24,10 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 {
 
 	/**The Guise application to which this session belongs.*/
-	private final GuiseApplication<GC> application;
+	private final GuiseApplication application;
 
 		/**@return The Guise application to which this session belongs.*/
-		public GuiseApplication<GC> getApplication() {return application;}
+		public GuiseApplication getApplication() {return application;}
 
 	/**The map binding navigation frame types to appplication context-relative paths.*/
 	private final Map<String, NavigationFrame> navigationPathFrameBindingMap=new HashMap<String, NavigationFrame>();
@@ -298,7 +298,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 	@param application The Guise application to which this session belongs.
 	@see #onDestroy()
 	*/
-	public AbstractGuiseSession(final GuiseApplication<GC> application)
+	public AbstractGuiseSession(final GuiseApplication application)
 	{
 		this.application=application;	//save the Guise instance
 		this.locale=application.getDefaultLocale();	//default to the application locale

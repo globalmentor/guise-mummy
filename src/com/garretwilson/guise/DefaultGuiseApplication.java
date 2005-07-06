@@ -2,12 +2,10 @@ package com.garretwilson.guise;
 
 import java.util.*;
 
-import com.garretwilson.guise.context.GuiseContext;
-
 /**The default implementation of a Guise application.
 @author Garret Wilson
 */
-public class DefaultGuiseApplication<GC extends GuiseContext> extends AbstractGuiseApplication<GC>
+public class DefaultGuiseApplication extends AbstractGuiseApplication
 {
 
 	/**Default constructor.

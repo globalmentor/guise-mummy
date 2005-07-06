@@ -14,7 +14,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 /**An application running Guise.
 @author Garret Wilson
 */
-public interface GuiseApplication<GC extends GuiseContext> extends PropertyBindable
+public interface GuiseApplication extends PropertyBindable
 {
 
 	/**The locale bound property.*/
@@ -50,20 +50,23 @@ public interface GuiseApplication<GC extends GuiseContext> extends PropertyBinda
 	If the controller kit is already installed, no action occurs.
 	@param controllerKit The controller kit to install.
 	*/
-	public void installControllerKit(final ControllerKit<GC> controllerKit);
+	public void installControllerKit(final ControllerKit controllerKit);
 
 	/**Uninstalls a controller kit.
 	If the controller kit is not installed, no action occurs.
 	@param controllerKit The controller kit to uninstall.
 	*/
-	public void uninstallControllerKit(final ControllerKit<GC> controllerKit);
+	public void uninstallControllerKit(final ControllerKit controllerKit);
 
 	/**Determines the controller appropriate for the given component.
 	A controller class is located by individually looking up the component class hiearchy for registered render strategies, at each checking all installed controller kits.
+	@param <GC> The type of Guise context being used.
+	@param <C> The type of component for which a controller is requested.
+	@param context Guise context information.
 	@param component The component for which a controller should be returned.
 	@return A controller to render the given component, or <code>null</code> if no controller is registered.
 	*/
-	public <C extends Component<?>> Controller<GC, ? super C> getController(final C component);
+	public <GC extends GuiseContext<?>, C extends Component<?>> Controller<? super GC, ? super C> getController(final GC context, final C component);
 
 	/**Binds a frame type to a particular application context-relative path.
 	Any existing binding for the given context-relative path is replaced.

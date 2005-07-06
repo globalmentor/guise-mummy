@@ -17,9 +17,7 @@ import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.text.xml.xhtml.*;
 import com.garretwilson.guise.session.GuiseSession;
 import com.garretwilson.guise.validator.*;
-import com.garretwilson.io.OutputStreamUtilities;
 
-import static com.garretwilson.lang.ObjectUtilities.checkNull;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.net.http.*;
@@ -68,12 +66,6 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		/**@return The Guise application controlled by this servlet.*/
 		protected AbstractGuiseApplication getGuiseApplication() {return guiseApplication;}
 
-	/**The context path of the servlet, and thereby of the Guise application.
-	Because this servlet's context path is only available via the request object, we must wait until the first request to update it.
-	@see HTTPServletGuiseApplication#getContextPath()
-	*/
-	private String guiseApplicationContextPath=null;
-
 	/**The factory method to create a Guise application.
 	This implementation creates a default Guise application and registers an XHTML controller kit.
 	Subclasses can override this method to create a specialized application type. 
@@ -82,7 +74,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	protected AbstractGuiseApplication createGuiseApplication()
 	{
 		final AbstractGuiseApplication guiseApplication=new DefaultGuiseApplication();	//create a default application
-		guiseApplication.installControllerKit(new XHTMLControllerKit<AbstractHTTPServletGuiseContext>());	//create and install an XHTML controller kit
+		guiseApplication.installControllerKit(new XHTMLControllerKit());	//create and install an XHTML controller kit
 		return guiseApplication;	//return the created Guise application
 	}
 
@@ -380,21 +372,6 @@ Debug.trace("raw path info", rawPathInfo);
 		{
 			return new HTTPServletGuiseSession(getGuiseApplication(), httpSession);	//create a default HTTP guise session
 		}
-
-		/**Reports the context path of the application.
-		The context path is an absolute path that ends with a slash ('/'), indicating the application's context relative to its navigation frames.
-		@return The path representing the context of the Guise application.
-		@exception IllegalStateException if this method is called before this Guise servlet services its first request.
-		*/
-		public String getContextPath()	//update method now that new servlet-level getContextPath() method is available
-		{
-			if(guiseApplicationContextPath==null)	//if there is no context path
-			{
-				throw new IllegalStateException("The Guise HTTP servlet's Guise application getContextPath() method cannot be called before the servlet services its first request.");
-			}
-			return guiseApplicationContextPath;	//return the context path, always updated by the 
-		}
-
 	}
 
 	/**An implementation of an HTTP Guise session that gives special access to to the servlet.
@@ -406,7 +383,7 @@ Debug.trace("raw path info", rawPathInfo);
 		@param application The Guise application to which this session belongs.
 		@param httpSession The HTTP session with which this Guise session is associated.
 		*/
-		public HTTPServletGuiseSession(final GuiseApplication<AbstractHTTPServletGuiseContext> application, final HttpSession httpSession)
+		public HTTPServletGuiseSession(final GuiseApplication application, final HttpSession httpSession)
 		{
 			super(application, httpSession);	//construct the parent class
 		}
