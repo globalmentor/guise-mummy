@@ -71,7 +71,7 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	@see #getResourceBundle()
 	@see #getStringResource(String, String)
 	*/
-	public String getStringResource(final String resourceKey);
+	public String getStringResource(final String resourceKey) throws MissingResourceException;
 
 	/**Retrieves a string resource from the resource bundle, using a specified default if no such resource is available.
 	This is a preferred convenience method for accessing the resources in the session's resource bundle.
@@ -83,7 +83,7 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	@see #getResourceBundle()
 	@see #getStringResource(String)
 	*/
-	public String getStringResource(final String resourceKey, final String defaultValue);
+	public String getStringResource(final String resourceKey, final String defaultValue) throws MissingResourceException;
 
 	/**Retrieves a <code>Boolean</code> resource from the resource bundle.
 	If the given resource is a string, it will be interpreted according to the {@link Boolean#valueOf(java.lang.String)} rules.
@@ -96,7 +96,7 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	@see #getResourceBundle()
 	@see #getBooleanResource(String, Boolean)
 	*/
-	public Boolean getBooleanResource(final String resourceKey);
+	public Boolean getBooleanResource(final String resourceKey) throws MissingResourceException;
 
 	/**Retrieves a <code>Boolean</code> resource from the resource bundle, using a specified default if no such resource is available.
 	If the given resource is a string, it will be interpreted according to the {@link Boolean#valueOf(java.lang.String)} rules.
@@ -109,7 +109,7 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	@see #getResourceBundle()
 	@see #getBooleanResource(String)
 	*/
-	public Boolean getBooleanResource(final String resourceKey, final Boolean defaultValue);
+	public Boolean getBooleanResource(final String resourceKey, final Boolean defaultValue) throws MissingResourceException;
 
 	/**Retrieves a <code>URI</code> resource from the resource bundle.
 	If the given resource is a string, it will be converted to a URI.
@@ -123,7 +123,7 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	@see #getResourceBundle()
 	@see #getURIResource(String, URI)
 	*/
-	public URI getURIResource(final String resourceKey);
+	public URI getURIResource(final String resourceKey) throws MissingResourceException;
 
 	/**Retrieves a <code>URI</code> resource from the resource bundle, using a specified default if no such resource is available.
 	If the given resource is a string, it will be converted to a URI.
@@ -136,7 +136,7 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	@see #getResourceBundle()
 	@see #getURIResource(String)
 	*/
-	public URI getURIResource(final String resourceKey, final URI defaultValue);
+	public URI getURIResource(final String resourceKey, final URI defaultValue) throws MissingResourceException;
 
 	/**@return The unmodifiable set of all states of available Guise contexts.*/
 	public Set<GuiseContext.State> getContextStates();

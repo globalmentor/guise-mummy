@@ -1,5 +1,7 @@
 package com.garretwilson.guise.model;
 
+import java.util.MissingResourceException;
+
 import static com.garretwilson.lang.ClassUtilities.*;
 
 /**A model for an identifier such as text and/or an icon.
@@ -15,10 +17,10 @@ public interface LabelModel extends Model
 	/**Determines the text of the label.
 	If a label is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
 	@return The label text, or <code>null</code> if there is no label text.
-	@exception java.util.MissingResourceException if there was an error loading the value from the resources.
+	@exception MissingResourceException if there was an error loading the value from the resources.
 	@see #getLabelResourceKey()
 	*/
-	public String getLabel();
+	public String getLabel() throws MissingResourceException;
 
 	/**Sets the text of the label.
 	This is a bound property.

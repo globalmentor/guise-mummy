@@ -1,6 +1,7 @@
 package com.garretwilson.guise.test;
 
 import java.net.URI;
+import java.util.Locale;
 
 import com.garretwilson.beans.AbstractPropertyValueChangeListener;
 import com.garretwilson.beans.PropertyValueChangeEvent;
@@ -169,6 +170,13 @@ public class HomeFrame extends NavigationFrame
 			throw new AssertionError(e);
 		}
 		add(textAreaControl);
+
+		final Text text=new Text(session);
+		//TODO del text.getModel().setText("This is some cool text! This is some text\nand some more on another line.\n\nSkipping two lines down, we find a line that is really long, is really, really, ;lkjas;lfk alkg; ;alkghj;alg lkjahq glkjh flkjhasdflkjhasdfl kjhasdf lkjh lkadhf lkshd flksadhf lksadhlskdqah slhjfg sd long. This is some text\nand some more on another line.\n\nSkipping two lines down, we find a line that is really long, is really, really, ;lkjas;lfk alkg; ;alkghj;alg lkjahq glkjh flkjhasdflkjhasdfl kjhasdf lkjh lkadhf lkshd flksadhf lksadhlskdqah slhjfg sd long.");
+		text.getModel().setTextResourceKey("sample.txt");
+		add(text);
+
+		getSession().setLocale(Locale.FRANCE);
 	}
 
 }

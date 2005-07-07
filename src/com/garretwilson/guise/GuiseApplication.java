@@ -1,5 +1,6 @@
 package com.garretwilson.guise;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Locale;
 import java.util.Set;
@@ -10,6 +11,7 @@ import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.*;
 
 import static com.garretwilson.lang.ClassUtilities.*;
+import static com.garretwilson.util.LocaleUtilities.getLocaleCandidatePath;
 
 /**An application running Guise.
 @author Garret Wilson
@@ -88,33 +90,80 @@ public interface GuiseApplication extends PropertyBindable
 	/**@return The Guise container into which this application is installed, or <code>null</code> if the application is not yet installed.*/
 	public GuiseContainer getContainer();
 
-	/**Reports the context path of the application.
-	The context path is an absolute path that ends with a slash ('/'), indicating the application's context relative to its navigation frames.
-	@return The path representing the context of the Guise application, or <code>null</code> if the application is not yet installed.
+	/**Reports the base path of the application.
+	The base path is an absolute path that ends with a slash ('/'), indicating the base path of the navigation frames.
+	@return The base path representing the Guise application, or <code>null</code> if the application is not yet installed.
 	*/
-	public String getContextPath();
+	public String getBasePath();
 
-	/**Resolves a relative or absolute path against the application context path.
-	Relative paths will be resolved relative to the application context path. Absolute paths will be be considered already resolved.
+	/**@return Whether this application has been installed into a container at some base path.
+	@see #getContainer()
+	@see #getBasePath()
+	*/
+	public boolean isInstalled();
+
+	/**Checks to ensure that this application is installed.
+	@exception IllegalStateException if the application is not installed.
+	@see #isInstalled()
+	*/
+	public void checkInstalled();
+
+	/**Resolves a relative or absolute path against the application base path.
+	Relative paths will be resolved relative to the application base path. Absolute paths will be be considered already resolved.
 	For an application path "/path/to/application/", resolving "relative/path" will yield "/path/to/application/relative/path",
 	while resolving "/absolute/path" will yield "/absolute/path".
 	@param path The path to be resolved.
-	@return The path resolved against the application context path.
+	@return The path resolved against the application base path.
 	@exception NullPointerException if the given path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #resolveURI(URI)} should be used instead).
 	@see #resolveURI(URI)
 	*/
 	public String resolvePath(final String path);
 
-	/**Resolves URI against the application context path.
-	Relative paths will be resolved relative to the application context path. Absolute paths will be considered already resolved, as will absolute URIs.
+	/**Resolves URI against the application base path.
+	Relative paths will be resolved relative to the application base path. Absolute paths will be considered already resolved, as will absolute URIs.
 	For an application path "/path/to/application/", resolving "relative/path" will yield "/path/to/application/relative/path",
 	while resolving "/absolute/path" will yield "/absolute/path". Resolving "http://example.com/path" will yield "http://example.com/path".
 	@param uri The URI to be resolved.
-	@return The uri resolved against the application context path.
+	@return The uri resolved against the application base path.
 	@exception NullPointerException if the given URI is <code>null</code>.
-	@see #getContextPath()
+	@see #getBasePath()
 	*/
 	public URI resolveURI(final URI uri);
+
+	/**Determines the locale-sensitive path of the given resource path.
+	Based upon the provided locale, candidate resource paths are checked in the following order:
+	<ol>
+		<li> <var>resourceBasePath</var> + "_" + <var>language</var> + "_" + <var>country</var> + "_" + <var>variant</var> </li>
+		<li> <var>resourceBasePath</var> + "_" + <var>language</var> + "_" + <var>country</var> </li>
+		<li> <var>resourceBasePath</var> + "_" + <var>language</var> </li>
+	</ol>	 
+	@param resourceBasePath An application-relative base path to a resource in the application resource storage area.
+	@param locale The locale to use in generating candidate resource names.
+	@return The locale-sensitive path to an existing resource based upon the given locale, or <code>null</code> if no resource exists at the given resource base path or any of its locale candidates.
+	@exception NullPointerException if the given resource base path and/or locale is <code>null</code>.
+	@exception IllegalArgumentException if the given resource path is absolute.
+	@exception IllegalArgumentException if the given path is not a valid path.
+	@see #hasResource(String)
+	*/
+	public String getLocaleResourcePath(final String resourceBasePath, final Locale locale);
+
+	/**Determines if the application has a resource available stored at the given resource path.
+	The provided path is first normalized.
+	@param resourcePath An application-relative path to a resource in the application resource storage area.
+	@return <code>true</code> if a resource exists at the given resource path.
+	@exception IllegalArgumentException if the given resource path is absolute.
+	@exception IllegalArgumentException if the given path is not a valid path.
+	*/
+	public boolean hasResource(final String resourcePath);
+
+	/**Retrieves and input stream to the resource at the given path.
+	The provided path is first normalized.
+	@param resourcePath An application-relative path to a resource in the application resource storage area.
+	@return An input stream to the resource at the given resource path, or <code>null</code> if no resource exists at the given resource path.
+	@exception IllegalArgumentException if the given resource path is absolute.
+	@exception IllegalArgumentException if the given path is not a valid path.
+	*/
+	public InputStream getResourceAsStream(final String resourcePath);
 
 }

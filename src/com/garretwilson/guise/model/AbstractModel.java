@@ -2,6 +2,7 @@ package com.garretwilson.guise.model;
 
 import java.beans.PropertyChangeEvent;
 import java.net.URI;
+import java.util.MissingResourceException;
 
 import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.event.EventListenerManager;
@@ -50,9 +51,9 @@ public class AbstractModel extends BoundPropertyObject implements Model
 	@param value The value explicitly set, which will override any resource.
 	@param resourceKey The key for looking up a resource if no value is explicitly set.
 	@return The string value, or <code>null</code> if there is no value available, neither explicitly set nor in the resources.
-	@exception java.util.MissingResourceException if there was an error loading the value from the resources.
+	@exception MissingResourceException if there was an error loading the value from the resources.
 	*/
-	protected String getString(final String value, final String resourceKey)
+	protected String getString(final String value, final String resourceKey) throws MissingResourceException
 	{
 		if(value!=null)	//if a value is provided
 		{
@@ -73,9 +74,9 @@ public class AbstractModel extends BoundPropertyObject implements Model
 	@param value The value explicitly set, which will override any resource.
 	@param resourceKey The key for looking up a resource if no value is explicitly set.
 	@return The URI value, or <code>null</code> if there is no value available, neither explicitly set nor in the resources.
-	@exception java.util.MissingResourceException if there was an error loading the value from the resources.
+	@exception MissingResourceException if there was an error loading the value from the resources.
 	*/
-	protected URI getURI(final URI value, final String resourceKey)
+	protected URI getURI(final URI value, final String resourceKey) throws MissingResourceException
 	{
 		if(value!=null)	//if a value is provided
 		{

@@ -5,11 +5,13 @@ import static java.util.Collections.*;
 
 import javax.servlet.http.*;
 
+import com.garretwilson.guise.GuiseApplication;
+
 /**Manages Guise sessions for an HTTP web application.
 Guise sessions are created and released in conjunction with associated HTTP servlet sessions.
 There may be multiple Guise applications within one web application.
 @author Garret Wilson
-@see HTTPServletGuise
+@see com.garretwilson.guise.servlet.http.GuiseHTTPServlet.HTTPServletGuiseContainer
 */
 public class HTTPGuiseSessionManager implements HttpSessionListener
 {
@@ -19,16 +21,17 @@ public class HTTPGuiseSessionManager implements HttpSessionListener
 
 	/**Retrieves a session for the given HTTP session.
 	This method can only be accessed by classes in the same package.
-	@param guiseContainer The Guise container to own the retrieved Guise session. 
+	@param guiseContainer The Guise container that owns the application. 
+	@param guiseApplication The application to install to own the created session..
 	@param httpRequest The HTTP request with which the Guise session is to be associated. 
 	@return The Guise session associated with the provided HTTP session.
 	@exception IllegalArgumentException if the provided HTTP session is not a session from this web application or the HTTP session has been invalidated, and there is therefore no corresponding Guise session.
 	*/
-	static GuiseHTTPServlet.HTTPServletGuiseSession getGuiseSession(final GuiseHTTPServlet.HTTPServletGuiseContainer guiseContainer, final HttpServletRequest httpRequest)
+	static GuiseHTTPServlet.HTTPServletGuiseSession getGuiseSession(final GuiseHTTPServlet.HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final HttpServletRequest httpRequest)
 	{
 		final HttpSession httpSession=httpRequest.getSession();	//get the current HTTP session from the HTTP request
 		guiseContainerMap.put(httpSession, guiseContainer);	//store our Guise container so we'll know with which container this session is associated (this servlet may serve many Guise applications in many Guise containers in the web application)
-		return guiseContainer.getGuiseSession(httpRequest, httpSession);	//ask the Guise application for a Guise session corresponding to the HTTP session
+		return guiseContainer.getGuiseSession(guiseApplication, httpRequest, httpSession);	//ask the Guise application for a Guise session corresponding to the HTTP session
 	}
 	
 

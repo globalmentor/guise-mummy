@@ -12,6 +12,7 @@ import com.garretwilson.guise.GuiseApplication;
 import com.garretwilson.guise.component.NavigationFrame;
 import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.util.Debug;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
@@ -161,6 +162,46 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 				}
 			};
 
+		/**Retrieves an object resource from the resource bundle.
+		Every resource access method should eventually call this method.
+		This is a preferred convenience method for accessing the resources in the session's resource bundle.
+		This method involves an implicit cast that will throw a class cast exception after the method ends if the resource is not of the expected type.
+		@param resourceKey The key of the resource to retrieve.
+		@return The resource associated with the specified resource key.
+		@exception NullPointerException if the provided resource key is <code>null</code>.
+		@exception MissingResourceException if no resource could be found associated with the given key.
+		@see #getResourceBundle()
+		@see #getResource(String, T)
+		*/
+		@SuppressWarnings("unchecked")
+		public <T> T getResource(final String resourceKey) throws MissingResourceException
+		{
+			return (T)getResourceBundle().getObject(resourceKey);	//retrieve an object from the resource bundle
+		}
+
+		/**Retrieves an object resource from the resource bundle, using a specified default if no such resource is available.
+		This is a preferred convenience method for accessing the resources in the session's resource bundle.
+		This method involves an implicit cast that will throw a class cast exception after the method ends if the resource is not of the expected type.
+		@param resourceKey The key of the resource to retrieve.
+		@param defaultValue The default value to use if there is no resource associated with the given key.
+		@return The resource associated with the specified resource key or the default if none is available.
+		@exception NullPointerException if the provided resource key is <code>null</code>.
+		@see #getResourceBundle()
+		@see #getResource(String)
+		*/
+		@SuppressWarnings("unchecked")
+		public <T> T getResource(final String resourceKey, final T defaultValue) throws MissingResourceException
+		{
+			try
+			{
+				return (T)getResource(resourceKey);	//try to load the string from the resources
+			}
+			catch(final MissingResourceException missingResourceException)	//if no such resource is available
+			{
+				return defaultValue;	//return the specified default value
+			}
+		}
+
 		/**Retrieves a string resource from the resource bundle.
 		This is a preferred convenience method for accessing the resources in the session's resource bundle.
 		@param resourceKey The key of the resource to retrieve.
@@ -171,9 +212,9 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		@see #getResourceBundle()
 		@see #getStringResource(String, String)
 		*/
-		public String getStringResource(final String resourceKey)
+		public String getStringResource(final String resourceKey) throws MissingResourceException
 		{
-			return getResourceBundle().getString(resourceKey);	//retrieve a string from the resource bundle
+			return getResource(resourceKey);	//retrieve a string from the resource bundle
 		}
 
 		/**Retrieves a string resource from the resource bundle, using a specified default if no such resource is available.
@@ -186,7 +227,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		@see #getResourceBundle()
 		@see #getStringResource(String)
 		*/
-		public String getStringResource(final String resourceKey, final String defaultValue)
+		public String getStringResource(final String resourceKey, final String defaultValue) throws MissingResourceException
 		{
 			try
 			{
@@ -209,7 +250,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		@see #getResourceBundle()
 		@see #getBooleanResource(String, Boolean)
 		*/
-		public Boolean getBooleanResource(final String resourceKey)
+		public Boolean getBooleanResource(final String resourceKey) throws MissingResourceException
 		{
 			final Object resource=getResourceBundle().getObject(resourceKey);	//retrieve a key from the resource bundle
 			if(resource instanceof String)	//if the resource is a string
@@ -233,7 +274,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		@see #getResourceBundle()
 		@see #getBooleanResource(String)
 		*/
-		public Boolean getBooleanResource(final String resourceKey, final Boolean defaultValue)
+		public Boolean getBooleanResource(final String resourceKey, final Boolean defaultValue) throws MissingResourceException
 		{
 			try
 			{
@@ -257,7 +298,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		@see #getResourceBundle()
 		@see #getURIResource(String, URI)
 		*/
-		public URI getURIResource(final String resourceKey)
+		public URI getURIResource(final String resourceKey) throws MissingResourceException
 		{
 			final Object resource=getResourceBundle().getObject(resourceKey);	//retrieve a key from the resource bundle
 			if(resource instanceof String)	//if the resource is a string
@@ -281,7 +322,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		@see #getResourceBundle()
 		@see #getURIResource(String)
 		*/
-		public URI getURIResource(final String resourceKey, final URI defaultValue)
+		public URI getURIResource(final String resourceKey, final URI defaultValue) throws MissingResourceException
 		{
 			try
 			{

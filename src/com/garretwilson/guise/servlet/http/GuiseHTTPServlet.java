@@ -2,6 +2,7 @@ package com.garretwilson.guise.servlet.http;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
@@ -20,8 +21,10 @@ import com.garretwilson.guise.validator.*;
 
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
+
 import com.garretwilson.net.http.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
+import static com.garretwilson.servlet.ServletConstants.*;
 import static com.garretwilson.text.CharacterConstants.*;
 import com.garretwilson.util.*;
 import static com.garretwilson.util.LocaleUtilities.*;
@@ -43,6 +46,9 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	/**The parameter, "class", used to identify the navigation frame class in the web application's init parameters.*/
 	public final static String NAVIGATION_CLASS_PARAMETER="class";
 
+	/**The absolute path, relative to the servlet context, of the resources directory.*/
+	public final static String RESOURCES_DIRECTORY_PATH=ROOT_PATH+WEB_INF_DIRECTORY_NAME+PATH_SEPARATOR+"guise-application-resources"+PATH_SEPARATOR;
+	
 	/**@return The global HTTP servlet Guise instance.
 	This is a convenience method.
 	@see HTTPServletGuise#getInstance()
@@ -54,11 +60,23 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	}
 */
 
-	/**The Guise container that owns the application.*/
-	private final HTTPServletGuiseContainer guiseContainer;
+	/**The Guise container that owns the applications.*/
+	private HTTPServletGuiseContainer guiseContainer=null;
 
-		/**@return The Guise container that owns the application.*/
-		protected HTTPServletGuiseContainer getGuiseContainer() {return guiseContainer;}
+		/**Determines the Guise container. If one does not exist, one will be created.
+		This method must not be called before a request is processed.
+		@return The Guise container that owns the applications.
+		@exception IllegalStateException if this method is called before any requests have been processed.
+		*/
+		protected HTTPServletGuiseContainer getGuiseContainer()
+		{
+			if(guiseContainer==null)	//if no container exists
+			{
+				final String guiseContainerBasePath=getContextPath()+PATH_SEPARATOR;	//construct the Guise container base path from the servlet request, which is the web application path with an ending slash
+				guiseContainer=new HTTPServletGuiseContainer(guiseContainerBasePath);	//create a new container
+			}
+			return guiseContainer;	//return the Guise container
+		}
 
 	/**The Guise application controlled by this servlet.*/
 	private final AbstractGuiseApplication guiseApplication;
@@ -84,7 +102,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	*/
 	public GuiseHTTPServlet()
 	{
-		guiseContainer=new HTTPServletGuiseContainer();	//create the Guise container
+//TODO del		guiseContainer=new HTTPServletGuiseContainer();	//create the Guise container
 		guiseApplication=createGuiseApplication();	//create a store a Guise application
 	}
 		
@@ -204,7 +222,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 			final String guiseApplicationContextPath=request.getContextPath()+request.getServletPath()+PATH_SEPARATOR;	//construct the Guise application context path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash
 			guiseContainer.installApplication(guiseApplication, guiseApplicationContextPath);	//install the application			
 		}
-		final HTTPServletGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, request);	//retrieves the Guise session for this container and request
+		final HTTPServletGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
 		final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, request, response);	//create a new Guise context
 		guiseSession.addContext(guiseContext);	//add this context to the session
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
@@ -293,8 +311,18 @@ Debug.trace("raw path info", rawPathInfo);
 	/**A Guise container for Guise HTTP servlets.
 	@author Garret Wilson
 	*/
-	protected class HTTPServletGuiseContainer extends AbstractGuiseContainer
+	protected class HTTPServletGuiseContainer extends AbstractGuiseContainer	//TODO eventually make this static and share it among servlets
 	{
+		/**Container base path constructor.
+		@param basePath The base path of the container.
+		@exception NullPointerException if the base path is <code>null</code>.
+		@exception IllegalArgumentException if the base path is not absolute and does not end with a slash ('/') character.
+		*/
+		public HTTPServletGuiseContainer(final String basePath)
+		{
+			super(basePath);	//construct the parent class
+		}
+
 		/**Installs the given application at the given context path.
 		This version is provided to expose the method to the servlet.
 		@param contextPath The context path at which the application is being installed.
@@ -326,19 +354,20 @@ Debug.trace("raw path info", rawPathInfo);
 		When a Guise session is first created, its locale will be updated to match the language, if any, accepted by the HTTP request.
 		This method can only be accessed by classes in the same package.
 		This method should only be called by HTTP Guise session manager.
+		@param guiseApplication The Guise application that will own the Guise session.
 		@param httpRequest The HTTP request with which the Guise session is associated. 
 		@param httpSession The HTTP session for which a Guise session should be retrieved. 
 		@return The Guise session associated with the provided HTTP session.
 		@see HTTPGuiseSessionManager
 		*/
-		protected HTTPServletGuiseSession getGuiseSession(final HttpServletRequest httpRequest, final HttpSession httpSession)
+		protected HTTPServletGuiseSession getGuiseSession(final GuiseApplication guiseApplication, final HttpServletRequest httpRequest, final HttpSession httpSession)
 		{
 			synchronized(guiseSessionMap)	//don't allow anyone to modify the map of sessions while we access it
 			{
 				HTTPServletGuiseSession guiseSession=guiseSessionMap.get(httpSession);	//get the Guise session associated with the HTTP session
 				if(guiseSession==null)	//if no Guise session is associated with the given HTTP session
 				{
-					guiseSession=createGuiseSession(httpSession);	//create a new Guise session
+					guiseSession=createGuiseSession(guiseApplication, httpSession);	//create a new Guise session
 					final Locale[] clientAcceptedLanguages=getAcceptedLanguages(httpRequest);	//get all languages accepted by the client
 					guiseSession.requestLocale(asList(clientAcceptedLanguages));	//ask the Guise session to change to one of the accepted locales, if the application supports one
 					guiseSessionMap.put(httpSession, guiseSession);	//associate the Guise session with the HTTP session
@@ -365,19 +394,67 @@ Debug.trace("raw path info", rawPathInfo);
 		}
 
 		/**Factory method to create a Guise session from an HTTP session.
+		@param guiseApplication The Guise application that will own the created Guise session.
 		@param httpSession The HTTP session for which a Guise session should be created.
 		@return A new Guise session corresponding to the given HTTP session.
-		*/ 
-		protected HTTPServletGuiseSession createGuiseSession(final HttpSession httpSession)
+		*/
+		protected HTTPServletGuiseSession createGuiseSession(final GuiseApplication guiseApplication, final HttpSession httpSession)
 		{
-			return new HTTPServletGuiseSession(getGuiseApplication(), httpSession);	//create a default HTTP guise session
+			return new HTTPServletGuiseSession(guiseApplication, httpSession);	//create a default HTTP guise session
 		}
+
+		/**Determines if the container has a resource available stored at the given resource path.
+		The provided path is first normalized.
+		@param resourcePath A container-relative path to a resource in the resource storage area.
+		@return <code>true</code> if a resource exists at the given resource path.
+		@exception IllegalArgumentException if the given resource path is absolute.
+		@exception IllegalArgumentException if the given path is not a valid path.
+		*/
+		protected boolean hasResource(final String resourcePath)
+		{
+			try
+			{
+				return getServletContext().getResource(getContextAbsoluteResourcePath(resourcePath))!=null;	//determine whether we can get a URL to that resource
+			}
+			catch(final MalformedURLException malformedURLException)	//if the path is malformed
+			{
+				throw new IllegalArgumentException(malformedURLException);
+			}
+		}
+
+		/**Retrieves and input stream to the resource at the given path.
+		The provided path is first normalized.
+		@param resourcePath A container-relative path to a resource in the resource storage area.
+		@return An input stream to the resource at the given resource path, or <code>null</code> if no resource exists at the given resource path.
+		@exception IllegalArgumentException if the given resource path is absolute.
+		*/
+		protected InputStream getResourceAsStream(final String resourcePath)
+		{
+			return getServletContext().getResourceAsStream(getContextAbsoluteResourcePath(resourcePath));	//try to get an input stream to the resource
+		}
+
+		/**Determines the servlet context-relative absolute path of the given container-relative path.
+		The provided path is first normalized.
+		@param containerRelativeResourcePath A container-relative path to a resource in the resource storage area.
+		@return The absolute path to the resource relative to the servlet context.
+		@exception IllegalArgumentException if the given resource path is absolute.
+		*/
+		protected String getContextAbsoluteResourcePath(final String containerRelativeResourcePath)
+		{
+			final String normalizedPath=normalizePath(containerRelativeResourcePath);	//normalize the path
+			if(isAbsolutePath(normalizedPath))	//if the given path is absolute
+			{
+				throw new IllegalArgumentException("Resource path "+normalizedPath+" is not a relative path.");
+			}
+			return RESOURCES_DIRECTORY_PATH+normalizedPath;	//construct the absolute context-relative path to the resource
+		}
+
 	}
 
 	/**An implementation of an HTTP Guise session that gives special access to to the servlet.
 	@author Garret Wilson
 	*/
-	protected class HTTPServletGuiseSession extends AbstractHTTPGuiseSession
+	protected static class HTTPServletGuiseSession extends AbstractHTTPGuiseSession
 	{
 		/**Guise and HTTP session constructor.
 		@param application The Guise application to which this session belongs.

@@ -1,5 +1,7 @@
 package com.garretwilson.guise.model;
 
+import java.util.MissingResourceException;
+
 import com.garretwilson.guise.session.GuiseSession;
 import com.garretwilson.lang.ObjectUtilities;
 
@@ -15,10 +17,10 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 		/**Determines the text of the label.
 		If a label is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
 		@return The label text, or <code>null</code> if there is no label text.
-		@exception java.util.MissingResourceException if there was an error loading the value from the resources.
+		@exception MissingResourceException if there was an error loading the value from the resources.
 		@see #getLabelResourceKey()
 		*/
-		public String getLabel()
+		public String getLabel() throws MissingResourceException
 		{
 			return getString(label, getLabelResourceKey());	//get the value or the resource, if available
 		}
