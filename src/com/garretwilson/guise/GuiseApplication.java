@@ -11,7 +11,6 @@ import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.*;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.util.LocaleUtilities.getLocaleCandidatePath;
 
 /**An application running Guise.
 @author Garret Wilson

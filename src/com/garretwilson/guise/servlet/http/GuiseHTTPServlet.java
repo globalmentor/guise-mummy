@@ -388,7 +388,7 @@ Debug.trace("raw path info", rawPathInfo);
 			HTTPServletGuiseSession guiseSession=guiseSessionMap.remove(httpSession);	//remove the HTTP session and Guise session association
 			if(guiseSession!=null)	//if there is a Guise session associated with the HTTP session
 			{
-				guiseSession.onDestroy();	//let the Guise session know it's being destroyed so that it can clean up and release references to the application
+				guiseSession.destroy();	//let the Guise session know it's being destroyed so that it can clean up and release references to the application
 			}
 			return guiseSession;	//return the associated Guise session
 		}
@@ -448,103 +448,6 @@ Debug.trace("raw path info", rawPathInfo);
 			}
 			return RESOURCES_DIRECTORY_PATH+normalizedPath;	//construct the absolute context-relative path to the resource
 		}
-
 	}
 
-	/**An implementation of an HTTP Guise session that gives special access to to the servlet.
-	@author Garret Wilson
-	*/
-	protected static class HTTPServletGuiseSession extends AbstractHTTPGuiseSession
-	{
-		/**Guise and HTTP session constructor.
-		@param application The Guise application to which this session belongs.
-		@param httpSession The HTTP session with which this Guise session is associated.
-		*/
-		public HTTPServletGuiseSession(final GuiseApplication application, final HttpSession httpSession)
-		{
-			super(application, httpSession);	//construct the parent class
-		}
-
-		/**Changes the navigation path of the session so that user interaction can change to another frame.
-		This method is provided so that the Guise HTTP servlet can update the navigation path when new requests come in.
-		If the given navigation path is the same as the current navigation path, no action occurs.
-		@param navigationPath The navigation path relative to the application context path.
-		@exception IllegalArgumentException if the provided path is absolute.
-		@exception IllegalArgumentException if the navigation path is not recognized (e.g. there is no frame bound to the navigation path).
-		*/
-		protected void setNavigationPath(final String navigationPath)
-		{
-			super.setNavigationPath(navigationPath);	//change the navigation path, delegating to the parent version
-		}
-
-		/**@return The requested navigation URI---usually either a relative or absolute path, or an absolute URI---or <code>null</code> if no navigation has been requested.
-		This method is provided so that the Guise HTTP servlet can retrieve the requested navigation URI when determining whether to redirect.
-		*/
-		protected URI getRequestedNavigation()
-		{
-			return super.getRequestedNavigation();	//delegate to the parent version
-		}
-
-		/**Removes any requests for navigation.
-		This method is provided so that the Guise HTTP servlet can clear the requested navigation URI.
-		*/
-		protected void clearRequestedNavigation()
-		{
-			super.clearRequestedNavigation();	//delegate to the parent version
-		}
-
-		/**Adds a context to this session and registers a listener for context state changes.
-		This implementation exposes the method to the servlet.
-		@param context The context to add to this session.
-		*/
-		protected void addContext(final HTTPServletGuiseContext context)
-		{
-			super.addContext(context);	//add this context normally
-		}
-	
-		/**Removes a context from this session and unregisters the listener for context state changes.
-		This implementation exposes the method to the servlet.
-		@param context The context to remove from this session.
-		*/
-		protected void removeContext(final HTTPServletGuiseContext context)
-		{
-			super.removeContext(context);	//remove this context normally
-		}
-
-		/**Called when the session is destroyed.
-		This implementation exposes the method to the servlet.
-		*/
-		protected void onDestroy()
-		{
-			super.onDestroy();	//do the default destroying
-		}
-	}
-
-	/**An implementation of an HTTP servlet Guise context that allows the servlet to update the state of the context.
-	@author Garret Wilson
-	*/
-	protected class HTTPServletGuiseContext extends AbstractHTTPServletGuiseContext
-	{
-		/**Constructor.
-		@param session The Guise user session of which this context is a part.
-		@param request The HTTP servlet request.
-		@param response The HTTP servlet response.
-		@exception NullPointerException if the session, request or response is <code>null</code>.
-		*/
-		public HTTPServletGuiseContext(final GuiseSession<AbstractHTTPServletGuiseContext> session, final HttpServletRequest request, final HttpServletResponse response)
-		{
-			super(session, request, response);
-		}
-
-		/**Sets the current view interaction state of this context.
-		This is a bound property.
-		@param newState The new context state.
-		@see GuiseContext#STATE_PROPERTY
-		*/
-		protected void setState(final State newState)
-		{
-			super.setState(newState);
-		}
-
-	}
 }

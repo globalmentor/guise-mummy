@@ -337,7 +337,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 	/**Guise application constructor.
 	The session local will initially be set to the locale of the associated Guise application.
 	@param application The Guise application to which this session belongs.
-	@see #onDestroy()
+	@see #destroy()
 	*/
 	public AbstractGuiseSession(final GuiseApplication application)
 	{
@@ -546,7 +546,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 
 
 	/**Called when the session is destroyed.*/
-	protected void onDestroy()
+	protected void destroy()
 	{
 		application.removePropertyChangeListener(GuiseApplication.RESOURCE_BUNDLE_BASE_NAME_PROPERTY, resourceBundleReleasePropertyValueChangeListener);	//stop listening for the application to change its resource bundle base name				
 	}

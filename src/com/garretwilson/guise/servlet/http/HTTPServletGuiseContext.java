@@ -9,6 +9,7 @@ import static java.util.Collections.*;
 import javax.mail.internet.ContentType;
 import javax.servlet.http.*;
 
+import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.context.text.AbstractTextGuiseContext;
 import com.garretwilson.guise.session.GuiseSession;
 import static com.garretwilson.io.ContentTypeConstants.*;
@@ -25,7 +26,7 @@ import com.garretwilson.util.*;
 The output stream defaults to <code>text/plain</code> encoded in <code>UTF-8</code>.
 @author Garret Wilson
 */
-public abstract class AbstractHTTPServletGuiseContext extends AbstractTextGuiseContext<AbstractHTTPServletGuiseContext>
+public class HTTPServletGuiseContext extends AbstractTextGuiseContext<HTTPServletGuiseContext>
 {
 
 	/**The HTTP servlet request.*/
@@ -55,7 +56,7 @@ public abstract class AbstractHTTPServletGuiseContext extends AbstractTextGuiseC
 	@param response The HTTP servlet response.
 	@exception NullPointerException if the session, request or response is <code>null</code>.
 	*/
-	public AbstractHTTPServletGuiseContext(final GuiseSession<AbstractHTTPServletGuiseContext> session, final HttpServletRequest request, final HttpServletResponse response)
+	public HTTPServletGuiseContext(final GuiseSession<HTTPServletGuiseContext> session, final HttpServletRequest request, final HttpServletResponse response)
 	{
 		super(session);	//construct the parent class
 		this.request=checkNull(request, "Request cannot be null.");
@@ -75,6 +76,17 @@ public abstract class AbstractHTTPServletGuiseContext extends AbstractTextGuiseC
 		}
 		final ContentType defaultContentType=createContentType(outputContentType.getPrimaryType(), outputContentType.getSubType(), new NameValuePair<String, String>(CHARSET_PARAMETER, UTF_8));	//default to text/plain encoded in UTF-8
 		response.setContentType(defaultContentType.toString());	//initialize the default content type and encoding
+	}
+
+	/**Sets the current view interaction state of this context.
+	This implementation exposes the method to the servlet.
+	This is a bound property.
+	@param newState The new context state.
+	@see GuiseContext#STATE_PROPERTY
+	*/
+	protected void setState(final State newState)
+	{
+		super.setState(newState);
 	}
 
 	/**@return A writer for rendering text content.
@@ -140,4 +152,5 @@ public abstract class AbstractHTTPServletGuiseContext extends AbstractTextGuiseC
 	{
 		return getAcceptedLanguages(getRequest());	//return the accepted languages from the request
 	}
+
 }
