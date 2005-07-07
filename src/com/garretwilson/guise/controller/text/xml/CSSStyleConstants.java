@@ -13,13 +13,14 @@ public class CSSStyleConstants
 
 	/**The URI of the Guise XHTML CSS stylesheet.*/
 	public final static URI GUISE_XHTML_CSS_STYLESHEET_URI=URI.create(addExtension("guise", CSS_EXTENSION));
-
 	
 	//style IDs
 	
 	/**The CSS class for panels meant to visually group components.*/
 	public final static String GROUP_PANEL_CLASS="groupPanel";
-	
+	/**The CSS class for license information.*/
+	public final static String LICENSE_CLASS="license";
+
 	//components
 	
 	/**The CSS class postfix for the decorator wrapper of a component.*/
