@@ -227,6 +227,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		guiseSession.addContext(guiseContext);	//add this context to the session
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 Debug.trace("raw path info", rawPathInfo);
+Debug.trace("Referrer:", getReferer(request));
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
 		try
 		{

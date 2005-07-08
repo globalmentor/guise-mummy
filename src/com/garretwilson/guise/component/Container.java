@@ -3,16 +3,22 @@ package com.garretwilson.guise.component;
 import com.garretwilson.guise.component.layout.Layout;
 
 /**Component that allows for addition and removal of child components.
-A container is iterable, and can be used in short <code>for(:)</code> form. 
 @author Garret Wilson
 */
-public interface Container<C extends Container<C>> extends Component<C>, Iterable<Component<?>>
+public interface Container<C extends Container<C>> extends Component<C>
 {
 
 	/**Adds a component to the container
 	@param component The component to add.
+	@exception IllegalArgumentException if the component already has a parent.
 	*/
 	public void add(final Component<?> component);
+
+	/**Removes a component from the container.
+	@param component The component to remove.
+	@exception IllegalArgumentException if the component is not a member of the container.
+	*/
+	public void remove(final Component<?> component);
 
 	/**Determines whether this container contains the given component.
 	@param component The component to check.
@@ -22,24 +28,5 @@ public interface Container<C extends Container<C>> extends Component<C>, Iterabl
 
 	/**@return The layout definition for the container.*/
 	public Layout getLayout();
-
-	/**@return The character used by this container when building absolute IDs.*/
-	public char getAbsoluteIDSegmentDelimiter();
-
-	/**Determines the unique ID of the provided child component within this container.
-	This method is typically called by child components when determining their own unique IDs.
-	@param childComponent A component within this container.
-	@return An identifier of the given component unique within this container.
-	@exception IllegalArgumentException if the given component is not a child of this container.
-	*/
-	public String getUniqueID(final Component<?> childComponent);
-
-	/**Determines the absolute unique ID of the provided child component up the component's hierarchy.
-	This method is typically called by child components when determining their own absolute unique IDs.
-	@param childComponent A component within this container.
-	@return An absolute identifier of the given component unique up the component's hierarchy.
-	@exception IllegalArgumentException if the given component is not a child of this container.
-	*/
-	public String getAbsoluteUniqueID(final Component<?> childComponent);
 
 }

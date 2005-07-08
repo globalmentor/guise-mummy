@@ -17,12 +17,14 @@ public class HelloWorldFrame extends NavigationFrame
 	*/
 	public HelloWorldFrame(final GuiseSession<?> session)
 	{
-		super(session, new FlowLayout(Axis.Y));	//construct the parent class, flowing vertically
+		super(session);	//construct the parent class
 		getModel().setLabel("Hello World Guise\u2122 Demonstration");	//set the frame title
 		
+		final Panel panel=new Panel(session, new FlowLayout(Axis.Y));	//create a panel flowing vertically
 		final Heading helloWorldHeading=new Heading(session, 0);	//create a top-level heading
 		helloWorldHeading.getModel().setLabel("Hello World!");	//set the text of the heading, using its model
-		add(helloWorldHeading);	//add the heading to the frame
+		panel.add(helloWorldHeading);	//add the heading to the panel
+		setContent(panel);	//set the panel as the frame's content
 	}
 
 }

@@ -14,9 +14,10 @@ import com.garretwilson.guise.validator.ValidationsException;
 /**Base interface for all Guise components.
 Each component must provide either a Guise session constructor; or a Guise session and string ID constructor.
 Any component may contain other components, but only a {@link Container} allows for custom addition and removal of child components.
+A component is iterable over its child components, and can be used in short <code>for(:)</code> form. 
 @author Garret Wilson
 */
-public interface Component<C extends Component<C>> extends PropertyBindable
+public interface Component<C extends Component<C>> extends PropertyBindable, Iterable<Component<?>>
 {
 
 	/**The bound property of the controller.*/
@@ -28,9 +29,6 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 
 	/**@return Whether this component has children.*/
 	public boolean hasChildren();
-
-	/**@return The child components of this component.*/
-	public Iterable<Component<?>> getChildren();
 
 	/**@return The model used by this component.*/
 	public Controller<? extends GuiseContext<?>, ? super C> getController();
@@ -69,32 +67,48 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	/**@return The component identifier.*/
 	public String getID();
 
-	/**@return An identifier unique within this component's parent container, if any.*/
+	/**@return An identifier unique within this component's parent, if any.*/
 	public String getUniqueID();
 
 	/**@return An identifier unique up this component's hierarchy.*/
 	public String getAbsoluteUniqueID();
 
-	/**@return The container parent of this component, or <code>null</code> if this component is not embedded in any container.*/
-	public Container getParent();
+	/**Determines the unique ID of the provided child component within this component.
+	This method is typically called by child components when determining their own unique IDs.
+	@param childComponent A component within this component.
+	@return An identifier of the given component unique within this component.
+	@exception IllegalArgumentException if the given component is not a child of this component.
+	*/
+	public String getUniqueID(final Component<?> childComponent);
+
+	/**Determines the absolute unique ID of the provided child component up the component's hierarchy.
+	This method is typically called by child components when determining their own absolute unique IDs.
+	@param childComponent A component within this component.
+	@return An absolute identifier of the given component unique up the component's hierarchy.
+	@exception IllegalArgumentException if the given component is not a child of this component.
+	*/
+	public String getAbsoluteUniqueID(final Component<?> childComponent);
+
+	/**@return The parent of this component, or <code>null</code> if this component does not have a parent.*/
+	public Component<?> getParent();
 
 	/**Retrieves the first ancestor of the given type.
-	@param <A> The type of ancestor container requested.
-	@param ancestorClass The class of ancestor container requested.
-	@return The first ancestor container of the given type, or <code>null</code> if this component has no such ancestor.
+	@param <C> The type of ancestor component requested.
+	@param ancestorClass The class of ancestor component requested.
+	@return The first ancestor component of the given type, or <code>null</code> if this component has no such ancestor.
 	*/
-	public <A extends Container<?>> A getAncestor(final Class<A> ancestorClass);
+	public <A extends Component<?>> A getAncestor(final Class<A> ancestorClass);
 
 	/**Sets the parent of this component.
 	This method is managed by containers, and should usually never be called my other classes.
-	In order to hinder inadvertent incorrect use, the parent must only be set after the component is added to the container, and only be unset after the component is removed from the container.
+	In order to hinder inadvertent incorrect use, the parent must only be set after the component is added to the component, and only be unset after the component is removed from the component.
 	If a component is given the same parent it already has, no action occurs.
-	@param newParent The new parent for this component, or <code>null</code> if this component is being removed from a container.
+	@param newParent The new parent for this component, or <code>null</code> if this component is being removed from a component.
 	@exception IllegalStateException if a parent is provided and this component already has a parent.
 	@exception IllegalStateException if no parent is provided and this component's old parent still recognizes this component as its child.
 	@exception IllegalArgumentException if a parent is provided and the given parent does not already recognize this component as its child.
 	*/
-	public void setParent(final Container<?> newParent);
+	public void setParent(final Component<?> newParent);
 
 	/**@return The Guise session that owns this component.*/
 	public GuiseSession<?> getSession();
@@ -118,6 +132,9 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@see #VISIBLE_PROPERTY
 	*/
 	public void setVisible(final boolean newVisible);
+
+	/**@return The character used by this component when building absolute IDs.*/
+	public char getAbsoluteIDSegmentDelimiter();
 
 	/**Collects the current data from the view of this component.
 	This method should not normally be called directly by applications.

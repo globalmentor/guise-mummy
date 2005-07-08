@@ -26,7 +26,7 @@ public class TemperatureConversionFrame extends NavigationFrame
 	*/
 	public TemperatureConversionFrame(final GuiseSession<?> session)
 	{
-		super(session, new FlowLayout(Axis.Y));	//construct the parent class, flowing vertically
+		super(session);	//construct the parent class
 		getModel().setLabel("Temperature Conversion Guise\u2122 Demonstration");	//set the frame title	
 
 		final Panel temperaturePanel=new Panel(session, new FlowLayout(Axis.X));	//create the root panel flowing horizontally
@@ -102,7 +102,7 @@ public class TemperatureConversionFrame extends NavigationFrame
 		
 		temperaturePanel.add(conversionPanel);	//add the conversion panel to the temperature panel
 		
-		add(temperaturePanel);	//add the entire temperature panel to the navigation frame
+		setContent(temperaturePanel);	//set the entire temperature panel as the navigation frame's content
 	}
 
 }

@@ -19,12 +19,13 @@ public class HelloUserFrame extends NavigationFrame
 	*/
 	public HelloUserFrame(final GuiseSession<?> session)
 	{
-		super(session, new FlowLayout(Axis.Y));	//construct the parent class, flowing vertically
+		super(session);	//construct the parent class
 		getModel().setLabel("Hello User Guise\u2122 Demonstration");	//set the frame title	
 
+		final Panel panel=new Panel(session, new FlowLayout(Axis.Y));	//create a panel flowing vertically
 		final Label helloUserLabel=new Label(session);	//create a label
 		helloUserLabel.setVisible(false);	//don't show the label initially
-		add(helloUserLabel);	//add the label to the frame
+		panel.add(helloUserLabel);	//add the label to the panel
 		
 		final TextControl<String> userInput=new TextControl<String>(session, String.class);	//create a text input control to retrieve a string
 		userInput.getModel().setLabel("What's your name?");	//add a label to the text input control
@@ -37,7 +38,9 @@ public class HelloUserFrame extends NavigationFrame
 						helloUserLabel.setVisible(true);	//make the label visible
 					}
 				});
-		add(userInput);	//add the user input control to the form
+		panel.add(userInput);	//add the user input control to the panel
+		
+		setContent(panel);	//set the panel as the frame's content
 	}
 
 }

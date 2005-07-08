@@ -16,9 +16,6 @@ Iterating over child components is thread safe.
 public abstract class AbstractContainer<C extends Container<C>> extends AbstractComponent<C> implements Container<C>
 {
 
-	/**The character used when building absolute IDs.*/
-	protected final static char ABSOLUTE_ID_SEGMENT_DELIMITER=':';
-
 	/**The list of child components.*/ 
 	private final List<Component<?>> componentList=new CopyOnWriteArrayList<Component<?>>();	//create a new component list, using a thread-safe array that takes into consideration that adding or removing children usually takes place up-front, and most later access will be only reads
 
@@ -30,7 +27,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 
 	/**Adds a component to the container.
 	@param component The component to add.
-	@exception IllegalArgumentException if the component is already a member of a container.
+	@exception IllegalArgumentException if the component already has a parent.
 	*/
 	public void add(final Component<?> component)
 	{
@@ -40,6 +37,20 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		}
 		componentList.add(component);	//add the component to the list
 		component.setParent(this);	//tell the component who its parent is
+	}
+
+	/**Removes a component from the container.
+	@param component The component to remove.
+	@exception IllegalArgumentException if the component is not a member of the container.
+	*/
+	public void remove(final Component<?> component)
+	{
+		if(component.getParent()!=this)	//if this component is not a member of this container
+		{
+			throw new IllegalArgumentException("Component "+component+" is not member of a container "+this+".");
+		}
+		componentList.remove(component);	//remove the component to the list
+		component.setParent(null);	//tell the component it no longer has a parent
 	}
 
 	/**Determines whether this container contains the given component.
@@ -103,70 +114,4 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		this.layout=checkNull(layout, "Layout cannot be null.");	//save the layout
 	}
 
-	/**@return The character used by this container when building absolute IDs.*/
-	public char getAbsoluteIDSegmentDelimiter()
-	{
-		return ABSOLUTE_ID_SEGMENT_DELIMITER;	//return our absolute segment connector character		
-	}
-
-	/**Determines the unique ID of the provided child component within this container.
-	If the child component's ID is already unique, that ID will be used.
-	This method is typically called by child components when determining their own unique IDs.
-	@param childComponent A component within this container.
-	@return An identifier of the given component unique within this container.
-	@exception IllegalArgumentException if the given component is not a child of this container.
-	*/
-	public String getUniqueID(final Component<?> childComponent)
-	{
-		final String childID=childComponent.getID();	//get the child component's preferred ID
-		boolean idClashes=false;	//we'll start out assuming that the child's preferred ID doesn't class with any of the other child IDs
-		int childIndex=-1;	//we'll ensure that the child is actually one of our children by setting this variable to a value greater than or equal to zero
-		int i=-1;	//we'll find the index of this component within this container; currently we haven't looked at any child components
-		for(final Component<?> component:this)	//for each component in the container
-		{
-			++i;	//show that we're looking at another child component
-			if(component==childComponent)	//if this child is the provided child component
-			{
-				assert childIndex<0 : "Unexpectedly found component listed as a child more than once in this container.";
-				childIndex=i;	//store the child index of this component
-			}
-			else if(!idClashes)	//if this is another child and we haven't had an ID clash, yet
-			{
-				if(childID.equals(component.getID()))	//if the child component's preferred ID clashes with this component's preferred ID
-				{
-					idClashes=true;	//indicate that there is an ID clash
-				}
-			}
-			if(childIndex>=0 && idClashes)	//if we've located the child component in the container, and we've already found an ID clash, there's no point in looking any further
-			{
-				break;	//stop looking; there's no new information we can find
-			}
-		}
-		if(childIndex>=0)	//if we found the child component in the container
-		{
-			return idClashes ? childID+childIndex : childID;	//if there was an ID clash, append the child component's index within this container; otherwise, just use the child component's preferred ID
-		}
-		throw new IllegalArgumentException("Component "+childComponent+" is not a child of container "+this);
-	}
-
-	/**Determines the absolute unique ID of the provided child component up the component's hierarchy.
-	This method is typically called by child components when determining their own absolute unique IDs.
-	@param childComponent A component within this container.
-	@return An absolute identifier of the given component unique up the component's hierarchy.
-	@exception IllegalArgumentException if the given component is not a child of this container.
-	*/
-	public String getAbsoluteUniqueID(final Component<?> childComponent)
-	{
-		return getAbsoluteUniqueID(getUniqueID(childComponent));	//return the absolute form of the unique ID of the child component
-	}
-
-	/**Determines the absolute unique ID up the component's hierarchy for the given local unique ID.
-	This method is useful for generating radio button group identifiers, for example.
-	@param uniqueID An identifier unique within this container.
-	@return An absolute form of the given identifier unique up the component's hierarchy.
-	*/
-	protected String getAbsoluteUniqueID(final String uniqueID)
-	{
-		return getAbsoluteUniqueID()+getAbsoluteIDSegmentDelimiter()+uniqueID;	//concatenate our own absolute unique ID and the local unique ID of the child, separated by the correct delimiter character		
-	}
 }

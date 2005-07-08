@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static java.util.Collections.*;
-
 import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.event.EventListenerManager;
 import com.garretwilson.guise.context.GuiseContext;
@@ -13,6 +11,7 @@ import com.garretwilson.guise.controller.Controller;
 import com.garretwilson.guise.session.GuiseSession;
 import com.garretwilson.guise.validator.ValidationException;
 import com.garretwilson.guise.validator.ValidationsException;
+import com.garretwilson.util.EmptyIterator;
 
 import static com.garretwilson.lang.CharSequenceUtilities.*;
 import static com.garretwilson.lang.ClassUtilities.*;
@@ -23,6 +22,9 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 */
 public class AbstractComponent<C extends Component<C>> extends BoundPropertyObject implements Component<C>
 {
+
+	/**The character used when building absolute IDs.*/
+	protected final static char ABSOLUTE_ID_SEGMENT_DELIMITER=':';
 
 	/**Extra characters allowed in the ID, verified for URI safeness.*/
 	protected final static String ID_EXTRA_CHARACTERS="-_";
@@ -40,8 +42,8 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	/**@return Whether this component has children. This implementation returns <code>false</code>.*/
 	public boolean hasChildren() {return false;}
 
-	/**@return The child components of this component. This implementation returns an empty list.*/
-	public Iterable<Component<?>> getChildren() {return emptyList();}
+	/**@return An iterator to child components. This implementation returns an empty iterator.*/
+	public Iterator<Component<?>> iterator() {return new EmptyIterator<Component<?>>();}
 
 	/**The controller installed in this component, or <code>null</code> if no controller is installed.*/
 	private Controller<? extends GuiseContext<?>, ? super C> controller=null;
@@ -97,18 +99,79 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 		/**@return The component identifier.*/
 		public String getID() {return id;}
 
-		/**@return An identifier unique within this component's parent container, if any.*/
+		/**@return An identifier unique within this component's parent, if any.*/
 		public String getUniqueID()
 		{
-			final Container<?> parent=getParent();	//get this component's parent
+			final Component<?> parent=getParent();	//get this component's parent
 			return parent!=null ? parent.getUniqueID(this) : getID();	//if we have a parent, ask it for our unique ID; otherwise, our ID is already unique
 		}
 
 		/**@return An identifier unique up this component's hierarchy.*/
 		public String getAbsoluteUniqueID()
 		{
-			final Container<?> parent=getParent();	//get this component's parent
-			return parent!=null ? parent.getAbsoluteUniqueID(this) : getUniqueID();	//if we have a parent container, ask it for our absolute ID; otherwise, return our local unique ID
+			final Component<?> parent=getParent();	//get this component's parent
+			return parent!=null ? parent.getAbsoluteUniqueID(this) : getUniqueID();	//if we have a parent component, ask it for our absolute ID; otherwise, return our local unique ID
+		}
+
+		/**Determines the unique ID of the provided child component within this component.
+		If the child component's ID is already unique, that ID will be used.
+		This method is typically called by child components when determining their own unique IDs.
+		@param childComponent A component within this component.
+		@return An identifier of the given component unique within this component.
+		@exception IllegalArgumentException if the given component is not a child of this component.
+		*/
+		public String getUniqueID(final Component<?> childComponent)
+		{
+			final String childID=childComponent.getID();	//get the child component's preferred ID
+			boolean idClashes=false;	//we'll start out assuming that the child's preferred ID doesn't class with any of the other child IDs
+			int childIndex=-1;	//we'll ensure that the child is actually one of our children by setting this variable to a value greater than or equal to zero
+			int i=-1;	//we'll find the index of this component within this component; currently we haven't looked at any child components
+			for(final Component<?> component:this)	//for each component in the component
+			{
+				++i;	//show that we're looking at another child component
+				if(component==childComponent)	//if this child is the provided child component
+				{
+					assert childIndex<0 : "Unexpectedly found component listed as a child more than once in this component.";
+					childIndex=i;	//store the child index of this component
+				}
+				else if(!idClashes)	//if this is another child and we haven't had an ID clash, yet
+				{
+					if(childID.equals(component.getID()))	//if the child component's preferred ID clashes with this component's preferred ID
+					{
+						idClashes=true;	//indicate that there is an ID clash
+					}
+				}
+				if(childIndex>=0 && idClashes)	//if we've located the child component in the component, and we've already found an ID clash, there's no point in looking any further
+				{
+					break;	//stop looking; there's no new information we can find
+				}
+			}
+			if(childIndex>=0)	//if we found the child component in the component
+			{
+				return idClashes ? childID+childIndex : childID;	//if there was an ID clash, append the child component's index within this component; otherwise, just use the child component's preferred ID
+			}
+			throw new IllegalArgumentException("Component "+childComponent+" is not a child of component "+this);
+		}
+
+		/**Determines the absolute unique ID of the provided child component up the component's hierarchy.
+		This method is typically called by child components when determining their own absolute unique IDs.
+		@param childComponent A component within this component.
+		@return An absolute identifier of the given component unique up the component's hierarchy.
+		@exception IllegalArgumentException if the given component is not a child of this component.
+		*/
+		public String getAbsoluteUniqueID(final Component<?> childComponent)
+		{
+			return getAbsoluteUniqueID(getUniqueID(childComponent));	//return the absolute form of the unique ID of the child component
+		}
+
+		/**Determines the absolute unique ID up the component's hierarchy for the given local unique ID.
+		This method is useful for generating radio button group identifiers, for example.
+		@param uniqueID An identifier unique within this component.
+		@return An absolute form of the given identifier unique up the component's hierarchy.
+		*/
+		protected String getAbsoluteUniqueID(final String uniqueID)
+		{
+			return getAbsoluteUniqueID()+getAbsoluteIDSegmentDelimiter()+uniqueID;	//concatenate our own absolute unique ID and the local unique ID of the child, separated by the correct delimiter character		
 		}
 
 		/**Determines if the given string is a valid component ID.
@@ -149,21 +212,21 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 		}
 */
 
-	/**The container parent of this component, or <code>null</code> if this component is not embedded in any container.*/
-	private Container parent=null;
+	/**The parent of this component, or <code>null</code> if this component does not have a parent.*/
+	private Component<?> parent=null;
 
-		/**@return The container parent of this component, or <code>null</code> if this component is not embedded in any container.*/
-		public Container getParent() {return parent;}
+		/**@return The parent of this component, or <code>null</code> if this component does not have a parent.*/
+		public Component<?> getParent() {return parent;}
 
 		/**Retrieves the first ancestor of the given type.
-		@param <C> The type of ancestor container requested.
-		@param ancestorClass The class of ancestor container requested.
-		@return The first ancestor container of the given type, or <code>null</code> if this component has no such ancestor.
+		@param <C> The type of ancestor component requested.
+		@param ancestorClass The class of ancestor component requested.
+		@return The first ancestor component of the given type, or <code>null</code> if this component has no such ancestor.
 		*/
 		@SuppressWarnings("unchecked")	//we check to see if the ancestor is of the correct type before casting, so the cast is logically checked, though not syntactically checked
-		public <A extends Container<?>> A getAncestor(final Class<A> ancestorClass)
+		public <A extends Component<?>> A getAncestor(final Class<A> ancestorClass)
 		{
-			final Container<?> parent=getParent();	//get this component's parent
+			final Component<?> parent=getParent();	//get this component's parent
 			if(parent!=null)	//if there is a parent
 			{
 				return ancestorClass.isInstance(parent) ? (A)parent : parent.getAncestor(ancestorClass);	//if the parent is of the correct type, return it; otherwise, ask it to search its own ancestors
@@ -176,16 +239,16 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 
 		/**Sets the parent of this component.
 		This method is managed by containers, and should usually never be called my other classes.
-		In order to guard against inadvertent incorrect use, the parent must only be set after the component is added to the container, and only be unset after the component is removed from the container.
+		In order to guard against inadvertent incorrect use, the parent must only be set after the component is added to the parent, and only be unset after the component is removed from the parent.
 		If a component is given the same parent it already has, no action occurs.
-		@param newParent The new parent for this component, or <code>null</code> if this component is being removed from a container.
+		@param newParent The new parent for this component, or <code>null</code> if this component is being removed from a parent.
 		@exception IllegalStateException if a parent is provided and this component already has a parent.
 		@exception IllegalStateException if no parent is provided and this component's old parent still recognizes this component as its child.
 		@exception IllegalArgumentException if a parent is provided and the given parent does not already recognize this component as its child.
 		*/
-		public void setParent(final Container<?> newParent)
+		public void setParent(final Component<?> newParent)
 		{
-			final Container<?> oldParent=parent;	//get the old parent
+			final Component<?> oldParent=parent;	//get the old parent
 			if(oldParent!=newParent)	//if the parent is really changing
 			{
 				if(newParent!=null)	//if a parent is provided
@@ -194,17 +257,21 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 					{
 						throw new IllegalStateException("Component "+this+" already has parent: "+oldParent);
 					}
+/*TODO fix
 					if(!newParent.contains(this))	//if the container is not really our parent
 					{
 						throw new IllegalArgumentException("Provided parent "+newParent+" is not really parent of component "+this);
 					}
+*/
 				}
 				else	//if no parent is provided
 				{
+/*TODO fix
 					if(oldParent!=null && oldParent.contains(this))	//if we had a parent before, and that parent still thinks this component is its child
 					{
 						throw new IllegalStateException("Old parent "+oldParent+" still thinks this component, "+this+", is a child."); 
 					}
+*/
 				}
 				parent=newParent;	//this is really our parent; make a note of it
 			}
@@ -284,6 +351,12 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 		{
 			this.id=getVariableName(getClass());	//create an ID by transforming the simple class name to a variable name
 		}
+	}
+
+	/**@return The character used by this component when building absolute IDs.*/
+	public char getAbsoluteIDSegmentDelimiter()
+	{
+		return ABSOLUTE_ID_SEGMENT_DELIMITER;	//return our absolute segment connector character		
 	}
 
 	/**Collects the current data from the view of this component.
