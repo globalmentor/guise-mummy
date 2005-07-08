@@ -10,6 +10,7 @@ import com.garretwilson.beans.BoundPropertyObject;
 import static com.garretwilson.guise.GuiseResourceConstants.*;
 
 import com.garretwilson.guise.component.Component;
+import com.garretwilson.guise.component.Frame;
 import com.garretwilson.guise.component.NavigationFrame;
 import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.*;
@@ -283,23 +284,23 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 //TODO how do we keep the general public from changing the frame bindings?
 
 	/**The synchronized map binding frame types to appplication context-relative absolute paths.*/
-	private final Map<String, Class<? extends NavigationFrame>> navigationPathFrameBindingMap=synchronizedMap(new HashMap<String, Class<? extends NavigationFrame>>());
+	private final Map<String, Class<? extends Frame>> navigationPathFrameBindingMap=synchronizedMap(new HashMap<String, Class<? extends Frame>>());
 
 		/**Binds a frame type to a particular application context-relative path.
 		Any existing binding for the given context-relative path is replaced.
 		@param path The appplication context-relative path to which the frame should be bound.
-		@param navigationFrameClass The class of frame to render for this particular appplication context-relative path.
+		@param frameClass The class of frame to render for this particular appplication context-relative path.
 		@return The frame previously bound to the given appplication context-relative path, or <code>null</code> if no frame was previously bound to the path.
 		@exception NullPointerException if the path and/or the frame is null.
 		@exception IllegalArgumentException if the provided path is absolute.
 		*/
-		public Class<? extends NavigationFrame> bindNavigationFrame(final String path, final Class<? extends NavigationFrame> navigationFrameClass)
+		public Class<? extends Frame> bindNavigationFrame(final String path, final Class<? extends Frame> frameClass)
 		{
 			if(isAbsolutePath(path))	//if the path is absolute
 			{
 				throw new IllegalArgumentException("Bound navigation path cannot be absolute: "+path);
 			}
-			return navigationPathFrameBindingMap.put(checkNull(path, "Path cannot be null."), checkNull(navigationFrameClass, "Type cannot be null."));	//store the binding
+			return navigationPathFrameBindingMap.put(checkNull(path, "Path cannot be null."), checkNull(frameClass, "Type cannot be null."));	//store the binding
 		}
 
 		/**Determines the class of frame bound to the given application context-relative path.
@@ -307,7 +308,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		@return The type of frame bound to the given path, or <code>null</code> if no frame is bound to the path. 
 		@exception IllegalArgumentException if the provided path is absolute.
 		*/
-		public Class<? extends NavigationFrame> getBoundNavigationFrameClass(final String path)
+		public Class<? extends Frame> getBoundNavigationFrameClass(final String path)
 		{
 			if(isAbsolutePath(path))	//if the path is absolute
 			{

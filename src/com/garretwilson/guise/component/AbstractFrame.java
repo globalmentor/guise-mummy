@@ -1,12 +1,12 @@
 package com.garretwilson.guise.component;
 
+import java.net.URI;
 import java.util.*;
 
 import com.garretwilson.guise.model.DefaultLabelModel;
 import com.garretwilson.guise.model.LabelModel;
 import com.garretwilson.guise.session.GuiseSession;
-import com.garretwilson.util.EmptyIterator;
-import com.garretwilson.util.ObjectIterator;
+import com.garretwilson.util.*;
 
 /**Abstract implementation of a frame.
 @author Garret Wilson
@@ -77,6 +77,27 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractModelCom
 			}
 			return iterator;	//return the children we found
 		}
+
+		/**The URI of the referring frame or other entity, or <code>null</code> if no referring URI is known.*/
+		private URI referrerURI;
+
+			/**@return The URI of the referring frame or other entity, or <code>null</code> if no referring URI is known.*/
+			public URI getReferrerURI() {return referrerURI;}
+
+			/**Sets the URI of the referrer.
+			This is a bound property
+			@param newReferrerURI The URI of the referring frame or other entity, or <code>null</code> if no referring URI is known.
+			@see Frame#REFERRER_URI_PROPERTY
+			*/
+			public void setReferrerURI(final URI newReferrerURI)
+			{
+				if(referrerURI!=newReferrerURI)	//if the value is really changing
+				{
+					final URI oldReferrerURI=referrerURI;	//get the old value
+					referrerURI=newReferrerURI;	//actually change the value
+					firePropertyChange(REFERRER_URI_PROPERTY, oldReferrerURI, newReferrerURI);	//indicate that the value changed
+				}
+			}
 
 	/**Session constructor.
 	@param session The Guise session that owns this component.

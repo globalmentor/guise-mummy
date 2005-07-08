@@ -78,6 +78,27 @@ public class HomeFrame extends NavigationFrame
 					}
 				});
 		buttonPanel.add(testLink);	//add a new button
+		final Link modalLink=new Link(session);
+		modalLink.getModel().setLabel("Test modal.");
+		modalLink.getModel().addActionListener(new ActionListener<ActionModel>()
+				{
+					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
+					{
+						getSession().navigateModal("edituser", new ActionListener<ModalFrame<?, ?>>()
+								{
+									/**Called when an action is initiated.
+									@param actionEvent The event indicating the source of the action.
+									*/
+									public void actionPerformed(final ActionEvent<ModalFrame<?, ?>> actionEvent)
+									{
+										
+									}
+								}
+						
+						);
+					}
+				});
+		buttonPanel.add(modalLink);	//add a new button
 		panel.add(buttonPanel);	//add the button panel to the panel
 		final TextControl<String> textInput=new TextControl<String>(session, "textInput", String.class);	//create a text input control
 		textInput.getModel().setLabel("This is the text input label.");

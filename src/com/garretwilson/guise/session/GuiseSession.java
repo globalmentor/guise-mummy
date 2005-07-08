@@ -7,8 +7,9 @@ import java.util.*;
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.event.PostponedEvent;
 import com.garretwilson.guise.GuiseApplication;
-import com.garretwilson.guise.component.NavigationFrame;
+import com.garretwilson.guise.component.*;
 import com.garretwilson.guise.context.GuiseContext;
+import com.garretwilson.guise.event.ActionListener;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
@@ -165,7 +166,19 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	@exception InstantiationException if the bound frame is an abstract class.
 	@exception InvocationTargetException if the bound frame's underlying constructor throws an exception.
 	*/
-	public NavigationFrame getBoundNavigationFrame(final String path) throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException;
+	public Frame getBoundNavigationFrame(final String path) throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException;
+
+	/**@return Whether the session is in a modal navigation state.*/
+	public boolean isModalNavigation();
+
+	/**Ends modal interaction for a particular modal frame.
+	This method is called by modal frames and should seldom if ever be called directly.
+	If the current modal state corresponds to the current navigation state, the current modal state is removed, the modal state's event is fired, and modal state is handed to the previous modal state, if any.
+	If there is no modal state remaining, navigation is transferred to the modal frame's referring URI, if any. 
+	@param modalFrame The frame for which modal navigation state should be ended.
+	@see Frame#getReferrerURI()
+	*/
+	public void endModalNavigation(final ModalFrame<?, ?> modalFrame);
 
 	/**Reports the navigation path relative to the application context path.
 	@return The path representing the current navigation location of the Guise application.
@@ -190,5 +203,25 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	@exception NullPointerException if the given URI is <code>null</code>.
 	*/
 	public void navigate(final URI uri);
+
+	/**Requests modal navigation to the specified path.
+	The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
+	Later requested navigation before navigation occurs will override this request.
+	@param path A path that is either relative to the application context path or is absolute.
+	@param endModalListener The listener to respond to the end of modal interaction.
+	@exception NullPointerException if the given path is <code>null</code>.
+	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
+	@see #navigateModal(URI, ActionListener)
+	*/
+	public void navigateModal(final String path, final ActionListener<ModalFrame<?, ?>> endModalListener);
+
+	/**Requests modal navigation to the specified URI.
+	The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
+	Later requested navigation before navigation occurs will override this request.
+	@param uri Either a relative or absolute path, or an absolute URI.
+	@param endModalListener The listener to respond to the end of modal interaction.
+	@exception NullPointerException if the given URI is <code>null</code>.
+	*/
+	public void navigateModal(final URI uri, final ActionListener<ModalFrame<?, ?>> endModalListener);
 
 }

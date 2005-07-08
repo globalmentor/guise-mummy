@@ -17,6 +17,8 @@ import com.garretwilson.guise.component.*;
 import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.text.xml.xhtml.*;
 import com.garretwilson.guise.session.GuiseSession;
+import com.garretwilson.guise.session.ModalNavigation;
+import com.garretwilson.guise.session.Navigation;
 import com.garretwilson.guise.validator.*;
 
 import static com.garretwilson.net.URIConstants.*;
@@ -135,7 +137,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	@exception IllegalArgumentException if the one of the classes specified as a frame binding could not be found.
 	@exception ClassCastException if the one of the classes specified as a frame binding does not represent a subclass of a frame component.
 	@exception ServletException if there is a problem initializing the frame bindings.
-	@see com.garretwilson.guise.component.NavigationFrame
+	@see Frame
 	*/
 	protected void initGuiseApplication(final AbstractGuiseApplication guiseApplication, final ServletConfig servletConfig) throws ServletException
 	{
@@ -179,7 +181,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 							try
 							{
 								final Class<?> specifiedClass=Class.forName(className);	//load the class for the specified name
-								final Class<? extends NavigationFrame> navigationFrameClass=specifiedClass.asSubclass(NavigationFrame.class);	//cast the specified class to a frame class just to make sure it's the correct type
+								final Class<? extends Frame> navigationFrameClass=specifiedClass.asSubclass(Frame.class);	//cast the specified class to a frame class just to make sure it's the correct type
 								guiseApplication.bindNavigationFrame(path, navigationFrameClass);	//cast the class to a frame class and bind it to the path in the Guise application
 							}
 							catch(final ClassNotFoundException classNotFoundException)
@@ -215,6 +217,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
   */
 	public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
 	{
+		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
 		if(guiseApplication.getContainer()==null)	//if this application has not yet been installed (note that there is a race condition here if multiple HTTP requests attempt to access the application simultaneously, but the losing thread will simply throw an exception and not otherwise disturb the application functionality)
@@ -232,9 +235,31 @@ Debug.trace("Referrer:", getReferer(request));
 		try
 		{
 			final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
-			final NavigationFrame navigationFrame=guiseSession.getBoundNavigationFrame(navigationPath);	//get the frame bound to the requested path
+			final Frame<?> navigationFrame=guiseSession.getBoundNavigationFrame(navigationPath);	//get the frame bound to the requested path
 			if(navigationFrame!=null)	//if we found a frame class for this address
 			{
+				setNoCache(response);	//TODO testing; fix; update method
+				
+					//before actually changing the navigation path, check to see if we're in the middle of modal navigation (only do this after we find a navigation frame, as this request might be for a stylesheet or some other non-frame resource, which shouldn't be redirected)
+				final ModalNavigation modalNavigation=guiseSession.peekModalNavigation();	//see if we are currently doing modal navigation
+				if(modalNavigation!=null)	//if we are currently in the middle of modal navigation, make sure the correct frame was requested
+				{
+					final URI modalNavigationURI=modalNavigation.getNavigationURI();	//get the modal navigation URI
+					if(!requestURI.getRawPath().equals(modalNavigationURI.getRawPath()))		//if this request was for a different path than our current modal navigation path (we wouldn't be here if the domain, application, etc. weren't equivalent)
+					{
+						throw new HTTPMovedTemporarilyException(modalNavigationURI);	//redirect to the modal navigation location				
+					}
+				}
+					//update the frame's referrer
+				final String referrer=getReferer(request);	//see if the request has a referrer
+				if(referrer!=null)	//if the request indicates a referrer
+				{
+					final URI plainReferrerURI=getPlainURI(URI.create(referrer));	//get a plain URI version of the referrer
+					if(!plainReferrerURI.equals(getPlainURI(requestURI)))	//if we aren't being referred from ourselves
+					{
+						navigationFrame.setReferrerURI(plainReferrerURI);	//update the frame's referrer URI
+					}
+				}
 				guiseSession.setNavigationPath(navigationPath);	//make sure the Guise session has the correct navigation path
 				try
 				{
@@ -259,10 +284,18 @@ Debug.trace("Referrer:", getReferer(request));
 				{
 					navigationFrame.addError(validationException);	//store the validation error so that the frame can report it to the user
 				}
-				final URI requestedNavigationURI=guiseSession.getRequestedNavigation();	//get the requested navigation URI
-				if(requestedNavigationURI!=null)	//if navigation is requested
+Debug.trace("looking for requested navigation");
+				final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
+				if(requestedNavigation!=null)	//if navigation is requested
 				{
+Debug.trace("got requested navigation");
+					final URI requestedNavigationURI=requestedNavigation.getNavigationURI();
 					guiseSession.clearRequestedNavigation();	//remove any navigation requests
+					if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
+					{
+Debug.trace("this is a modal navigation; pushing it on the stack");
+						guiseSession.pushModalNavigation((ModalNavigation)requestedNavigation);	//push the modal navigation onto the top of the modal navigation stack
+					}
 					throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
 				}
 				guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view

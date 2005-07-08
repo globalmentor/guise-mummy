@@ -10,8 +10,9 @@ import static java.util.Collections.*;
 import com.garretwilson.beans.*;
 import com.garretwilson.event.PostponedEvent;
 import com.garretwilson.guise.GuiseApplication;
-import com.garretwilson.guise.component.NavigationFrame;
+import com.garretwilson.guise.component.*;
 import com.garretwilson.guise.context.GuiseContext;
+import com.garretwilson.guise.event.ActionListener;
 import com.garretwilson.io.BOMInputStreamReader;
 import static com.garretwilson.io.WriterUtilities.*;
 import com.garretwilson.lang.ObjectUtilities;
@@ -35,7 +36,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		public GuiseApplication getApplication() {return application;}
 
 	/**The map binding navigation frame types to appplication context-relative paths.*/
-	private final Map<String, NavigationFrame> navigationPathFrameBindingMap=new HashMap<String, NavigationFrame>();
+	private final Map<String, Frame> navigationPathFrameBindingMap=new HashMap<String, Frame>();
 
 		/**Binds a frame to a particular appplication context-relative path.
 		Any existing binding for the given context-relative path is replaced.
@@ -45,7 +46,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		@exception NullPointerException if the path and/or the frame is null.
 		@exception IllegalArgumentException if the provided path is absolute.
 		*/
-		protected NavigationFrame bindNavigationFrame(final String path, final NavigationFrame frame)
+		protected Frame bindNavigationFrame(final String path, final Frame frame)
 		{
 			if(isAbsolutePath(path))	//if the path is absolute
 			{
@@ -402,16 +403,16 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 	@exception InstantiationException if the bound frame is an abstract class.
 	@exception InvocationTargetException if the bound frame's underlying constructor throws an exception.
 	*/
-	public NavigationFrame getBoundNavigationFrame(final String path) throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException
+	public Frame getBoundNavigationFrame(final String path) throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException
 	{
 		if(isAbsolutePath(path))	//if the path is absolute
 		{
 			throw new IllegalArgumentException("Bound navigation path cannot be absolute: "+path);
 		}
-		NavigationFrame frame=navigationPathFrameBindingMap.get(path);	//get the bound frame type, if any
+		Frame frame=navigationPathFrameBindingMap.get(path);	//get the bound frame type, if any
 		if(frame==null)	//if no frame is cached
 		{
-			final Class<? extends NavigationFrame> frameClass=getApplication().getBoundNavigationFrameClass(path);	//see which frame we should show for this path
+			final Class<? extends Frame> frameClass=getApplication().getBoundNavigationFrameClass(path);	//see which frame we should show for this path
 			if(frameClass!=null)	//if we found a frame class for this path
 			{
 				try
@@ -428,6 +429,87 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		}
 		return frame;	//return the frame, or null if we couldn't find a frame
 	}
+
+	/**The stack of modal navigation points.*/
+	private final List<ModalNavigation> modalNavigationStack=synchronizedList(new ArrayList<ModalNavigation>());
+
+		/**Pushes the given model navigation onto the top of the stack.
+		@param modalNavigation The modal navigation to add.
+		@exception NullPointerException if the given modal navigation is <code>null</code>.
+		*/
+		protected void pushModalNavigation(final ModalNavigation modalNavigation)
+		{
+			modalNavigationStack.add(checkNull(modalNavigation, "Modal navigation cannot be null."));	//push the modal navigation onto the top of the stack (the end of the list)
+		}
+
+		/**@return The modal navigation on the top of the stack, or <code>null</code> if there are no modal navigations.*/
+		protected ModalNavigation peekModalNavigation()
+		{
+			synchronized(modalNavigationStack)	//don't allow anyone to to access the modal navigation stack while we access it
+			{
+				return !modalNavigationStack.isEmpty() ? modalNavigationStack.get(modalNavigationStack.size()-1) : null;	//return the last (top) modal navigation in the stack
+			}
+		}
+
+		/**@return The modal navigation from the top of the stack, or <code>null</code> if there are no modal navigations on the stack.*/
+		protected ModalNavigation pollModalNavigation()
+		{
+			synchronized(modalNavigationStack)	//don't allow anyone to to access the modal navigation stack while we access it
+			{
+				return !modalNavigationStack.isEmpty() ? modalNavigationStack.remove(modalNavigationStack.size()-1) : null;	//return the last (top) modal navigation in the stack
+			}
+		}
+
+		/**@return The modal navigation from the top of the stack.
+		@exception NoSuchElementException if there are no modal navigations on the stack.
+		*/
+		protected ModalNavigation popModalNavigation()
+		{
+			final ModalNavigation modalNavigation=pollModalNavigation();	//get the modal navigation from the top of the stack, if there is one
+			if(modalNavigation==null)	//if the stack was empty
+			{
+				throw new NoSuchElementException("No modal navigations are on the stack.");
+			}
+			return modalNavigation;	//return the modal navigation we popped from the top of the stack
+		}
+
+		/**@return Whether the session is in a modal navigation state.*/
+		public boolean isModalNavigation()
+		{
+			return !modalNavigationStack.isEmpty();	//we are modally navigating if there is one or more modal navigation states on the stack
+		}
+
+		/**Ends modal interaction for a particular modal frame.
+		This method is called by modal frames and should seldom if ever be called directly.
+		If the current modal state corresponds to the current navigation state, the current modal state is removed, the modal state's event is fired, and modal state is handed to the previous modal state, if any.
+		If there is no modal state remaining, navigation is transferred to the modal frame's referring URI, if any. 
+		@param modalFrame The frame for which modal navigation state should be ended.
+		@see #popModalNavigation()
+		@see Frame#getReferrerURI()
+		*/
+		public void endModalNavigation(final ModalFrame<?, ?> modalFrame)
+		{
+			synchronized(modalNavigationStack)	//don't allow anyone to to access the modal navigation stack while we access it
+			{
+				ModalNavigation modalNavigation=peekModalNavigation();	//see which model navigation is on the top of the stack
+				if(modalNavigation!=null)	//if there is a modal navigation currently in use
+				{
+					if(getApplication().resolvePath(getNavigationPath()).equals(modalNavigation.getNavigationURI().getPath()))	//if we're navigating where we expect to be (if we somehow got to here at something other than the modal navigation path, we wouldn't want to remove the current navigation path)
+					{
+						popModalNavigation();	//end the current modal navigation
+//TODO fire an event
+						modalNavigation=peekModalNavigation();	//see which model navigation is next on the stack; that's where we want to go next
+					}
+				}
+					//if we know where to go now that this modal navigation is finished (if we were somehow at the wrong place to begin with, we'll go to where we should be), use that URI; otherwise, fall back to the modal frame's referring URI, if there is one
+				final URI navigationURI=modalNavigation!=null ? modalNavigation.getNavigationURI() : modalFrame.getReferrerURI();	//we'll determine where we should go, now that this modal navigation is over				
+				if(navigationURI!=null)	//if we know where to go now that navigation is finished
+				{
+					navigate(navigationURI);	//navigate to the new URI
+				}
+			}			
+		}
+
 
 	/**The navigation path relative to the application context path.*/
 	private String navigationPath=null;
@@ -463,11 +545,11 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 			}
 		}
 
-	/**The requested navigation URI; usually either a relative or absolute path, or an absolute URI.*/
-	private URI requestedNavigation=null;
+	/**The requested navigation, or <code>null</code> if no navigation has been requested.*/
+	private Navigation requestedNavigation=null;
 
-		/**@return The requested navigation URI---usually either a relative or absolute path, or an absolute URI---or <code>null</code> if no navigation has been requested.*/
-		protected URI getRequestedNavigation() {return requestedNavigation;}
+		/**@return The requested navigation, or <code>null</code> if no navigation has been requested.*/
+		protected Navigation getRequestedNavigation() {return requestedNavigation;}
 
 		/**Removes any requests for navigation.*/
 		protected void clearRequestedNavigation() {requestedNavigation=null;}
@@ -493,8 +575,34 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		*/
 		public void navigate(final URI uri)
 		{
-			requestedNavigation=getApplication().resolveURI(checkNull(uri, "URI cannot be null."));	//resolve the URI against the application context path
+			requestedNavigation=new Navigation(getApplication().resolveURI(checkNull(uri, "URI cannot be null.")));	//resolve the URI against the application context path
 		}
+
+		/**Requests modal navigation to the specified path.
+		The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
+		Later requested navigation before navigation occurs will override this request.
+		@param path A path that is either relative to the application context path or is absolute.
+		@param endModalListener The listener to respond to the end of modal interaction.
+		@exception NullPointerException if the given path is <code>null</code>.
+		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
+		@see #navigateModal(URI, ActionListener)
+		*/
+		public void navigateModal(final String path, final ActionListener<ModalFrame<?, ?>> endModalListener)
+		{
+			navigateModal(createPathURI(path), endModalListener);	//navigate to the requested URI, converting the path to a URI and verifying that it is only a path
+		}
+
+		/**Requests modal navigation to the specified URI.
+		The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
+		Later requested navigation before navigation occurs will override this request.
+		@param uri Either a relative or absolute path, or an absolute URI.
+		@param endModalListener The listener to respond to the end of modal interaction.
+		@exception NullPointerException if the given URI is <code>null</code>.
+		*/
+		public void navigateModal(final URI uri, final ActionListener<ModalFrame<?, ?>> endModalListener)
+		{
+			requestedNavigation=new ModalNavigation(getApplication().resolveURI(checkNull(uri, "URI cannot be null.")), endModalListener);	//resolve the URI against the application context path
+		}		
 
 	/**The object that listenes for context state changes and updates the set of context states in response.*/
 	private final ContextStateListener contextStateListener=new ContextStateListener();
@@ -553,7 +661,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		}
 
 	/**The synchronized list of postponed model events.*/
-	private final List<PostponedEvent<?>> queuedModelEventList=synchronizedList(new ArrayList<PostponedEvent<?>>());
+	private final List<PostponedEvent<?>> queuedModelEventList=synchronizedList(new LinkedList<PostponedEvent<?>>());	//use a linked list because we'll be removing items from the front of the list as we process the events
 
 		/**Queues a postponed model event to be fired after all contexts have finished updating the model.
 		If a Guise context is currently updating the model, the event will be queued for later.
@@ -581,9 +689,17 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		{
 			synchronized(queuedModelEventList)	//don't allow any changes to the postponed model event list while we access it
 			{
-				for(final PostponedEvent<?> postponedModelEvent:queuedModelEventList)	//for each postponed model event
+				final Iterator<PostponedEvent<?>> postponedModelEventIterator=queuedModelEventList.iterator();	//get an iterator to all the model events
+				while(postponedModelEventIterator.hasNext())	//while there are more postponed model events
 				{
-					postponedModelEvent.fireEvent();	//fire the event
+					try
+					{
+						postponedModelEventIterator.next().fireEvent();	//fire the event
+					}
+					finally	//there could be an exception while we're firing the event
+					{
+						postponedModelEventIterator.remove();	//always remove the event we fired, even if there's an exception, so it won't be fired again if there is an exception
+					}
 				}
 				queuedModelEventList.clear();	//remove all pending model events
 			}

@@ -72,19 +72,19 @@ public interface GuiseApplication extends PropertyBindable
 	/**Binds a frame type to a particular application context-relative path.
 	Any existing binding for the given context-relative path is replaced.
 	@param path The appplication context-relative path to which the frame should be bound.
-	@param navigationFrameClass The class of frame to render for this particular appplication context-relative path.
+	@param frameClass The class of frame to render for this particular appplication context-relative path.
 	@return The frame previously bound to the given appplication context-relative path, or <code>null</code> if no frame was previously bound to the path.
 	@exception NullPointerException if the path and/or the frame is null.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public Class<? extends NavigationFrame> bindNavigationFrame(final String path, final Class<? extends NavigationFrame> navigationFrameClass);
+	public Class<? extends Frame> bindNavigationFrame(final String path, final Class<? extends Frame> frameClass);
 
 	/**Determines the class of frame bound to the given application context-relative path.
 	@param path The address for which a frame should be retrieved.
 	@return The type of frame bound to the given path, or <code>null</code> if no frame is bound to the path. 
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public Class<? extends NavigationFrame> getBoundNavigationFrameClass(final String path);
+	public Class<? extends Frame> getBoundNavigationFrameClass(final String path);
 
 	/**@return The Guise container into which this application is installed, or <code>null</code> if the application is not yet installed.*/
 	public GuiseContainer getContainer();
