@@ -15,6 +15,7 @@ import com.garretwilson.guise.model.ActionModel;
 import com.garretwilson.guise.model.ModelGroup;
 import com.garretwilson.guise.model.MutualExclusionModelGroup;
 import com.garretwilson.guise.model.SingleSelectionStrategy;
+import com.garretwilson.guise.model.TextModel;
 import com.garretwilson.guise.model.ValueModel;
 import com.garretwilson.guise.session.GuiseSession;
 import com.garretwilson.guise.validator.RegularExpressionStringValidator;
@@ -173,7 +174,8 @@ public class HomeFrame extends NavigationFrame
 
 		final Text text=new Text(session);
 		//TODO del text.getModel().setText("This is some cool text! This is some text\nand some more on another line.\n\nSkipping two lines down, we find a line that is really long, is really, really, ;lkjas;lfk alkg; ;alkghj;alg lkjahq glkjh flkjhasdflkjhasdfl kjhasdf lkjh lkadhf lkshd flksadhf lksadhlskdqah slhjfg sd long. This is some text\nand some more on another line.\n\nSkipping two lines down, we find a line that is really long, is really, really, ;lkjas;lfk alkg; ;alkghj;alg lkjahq glkjh flkjhasdflkjhasdfl kjhasdf lkjh lkadhf lkshd flksadhf lksadhlskdqah slhjfg sd long.");
-		text.getModel().setTextResourceKey("sample.txt");
+		text.getModel().setTextResourceKey("sample.html");
+		text.getModel().setContentType(TextModel.XHTML_CONTENT_TYPE);
 		add(text);
 
 		getSession().setLocale(Locale.FRANCE);

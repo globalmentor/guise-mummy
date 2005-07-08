@@ -9,6 +9,7 @@ import com.garretwilson.event.PostponedEvent;
 import com.garretwilson.guise.GuiseApplication;
 import com.garretwilson.guise.component.NavigationFrame;
 import com.garretwilson.guise.context.GuiseContext;
+
 import static com.garretwilson.lang.ClassUtilities.*;
 
 /**Represents a session with a user.
@@ -62,8 +63,10 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	public ResourceBundle getResourceBundle();
 
 	/**Retrieves a string resource from the resource bundle.
+	If the resource cannot be found in the resource bundle, it will be loaded from the application's resources, if possible,
+	treating the resource key as a locale-sensitive resource path in the application resource area.
 	This is a preferred convenience method for accessing the resources in the session's resource bundle.
-	@param resourceKey The key of the resource to retrieve.
+	@param resourceKey The key of the resource to retrieve, or a relative path to the resource in the application's resource area.
 	@return The resource associated with the specified resource key.
 	@exception NullPointerException if the provided resource key is <code>null</code>.
 	@exception MissingResourceException if no resource could be found associated with the given key.
@@ -74,8 +77,10 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	public String getStringResource(final String resourceKey) throws MissingResourceException;
 
 	/**Retrieves a string resource from the resource bundle, using a specified default if no such resource is available.
+	If the resource cannot be found in the resource bundle, it will be loaded from the application's resources, if possible,
+	treating the resource key as a locale-sensitive resource path in the application resource area.
 	This is a preferred convenience method for accessing the resources in the session's resource bundle.
-	@param resourceKey The key of the resource to retrieve.
+	@param resourceKey The key of the resource to retrieve, or a relative path to the resource in the application's resource area.
 	@param defaultValue The default value to use if there is no resource associated with the given key.
 	@return The resource associated with the specified resource key or the default if none is available.
 	@exception NullPointerException if the provided resource key is <code>null</code>.

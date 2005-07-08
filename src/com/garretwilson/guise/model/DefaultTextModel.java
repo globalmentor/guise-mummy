@@ -1,18 +1,14 @@
 package com.garretwilson.guise.model;
 
-import java.io.*;
 import java.util.MissingResourceException;
 
 import javax.mail.internet.ContentType;
 
 import com.garretwilson.guise.session.GuiseSession;
-import com.garretwilson.io.*;
 import static com.garretwilson.io.ContentTypeConstants.*;
-import static com.garretwilson.io.WriterUtilities.*;
+import static com.garretwilson.io.ContentTypeUtilities.*;
 import com.garretwilson.lang.ObjectUtilities;
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.net.URIUtilities.*;
-import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static com.garretwilson.text.TextUtilities.*;
 
 /**The default implementation of a model for text and an associated label.
@@ -21,11 +17,8 @@ import static com.garretwilson.text.TextUtilities.*;
 public class DefaultTextModel extends AbstractModel implements TextModel
 {
 
-	/**A preinstantiated shared default content type of <code>text/plain</code>.*/
-	protected final static ContentType TEXT_PLAIN_CONTENT_TYPE=new ContentType(TEXT, PLAIN_SUBTYPE, null);
-
 	/**The content type of the text.*/
-	private ContentType contentType=TEXT_PLAIN_CONTENT_TYPE;
+	private ContentType contentType=PLAIN_TEXT_CONTENT_TYPE;
 
 		/**@return The content type of the text.*/
 		public ContentType getContentType() {return contentType;}
@@ -63,44 +56,7 @@ public class DefaultTextModel extends AbstractModel implements TextModel
 		*/
 		public String getText() throws MissingResourceException
 		{
-			try
-			{
-				return getString(text, getTextResourceKey());	//get the value or the resource, if available
-			}
-			catch(final MissingResourceException missingResourceException)	//if the resource does not exist
-			{
-				final String resourceKey=getTextResourceKey();	//get the resource key for the text, if there is one
-				if(resourceKey!=null && isPath(resourceKey) && !isAbsolutePath(resourceKey))	//if the resource key is a relative path
-				{
-					final String applicationResourcePath=getSession().getApplication().getLocaleResourcePath(resourceKey, getSession().getLocale());	//try to get a locale-sensitive path to the resource
-					if(applicationResourcePath!=null)	//if there is a path to the resource
-					{
-						final InputStream inputStream=getSession().getApplication().getResourceAsStream(applicationResourcePath);	//get a stream to the resource
-						if(inputStream!=null)	//if we got a stream to the resource (we always should, as we already checked to see which path represents an existing resource)
-						{
-							try
-							{
-								try
-								{
-									final StringWriter stringWriter=new StringWriter();	//create a new string writer to receive the resource contents
-									final Reader resourceReader=new BOMInputStreamReader(new BufferedInputStream(inputStream), UTF_8);	//get an input reader to the file, defaulting to UTF-8 if we don't know its encoding
-									write(resourceReader, stringWriter);	//copy the resource to the string
-									return stringWriter.toString();	//return the string read from the resource
-								}
-								finally
-								{
-									inputStream.close();	//always close the input stream
-								}
-							}
-							catch(final IOException ioException)	//if there is an I/O error, convert it to a missing resource exception
-							{
-								throw (MissingResourceException)new MissingResourceException(ioException.getMessage(), missingResourceException.getClassName(), missingResourceException.getKey()).initCause(ioException);
-							}
-						}
-					}
-				}
-				throw missingResourceException;	//if we couldn't find an application resource, throw the original missing resource exception
-			}
+			return getString(text, getTextResourceKey());	//get the value or the resource, if available
 		}
 
 		/**Sets the text.
@@ -147,4 +103,5 @@ public class DefaultTextModel extends AbstractModel implements TextModel
 	{
 		super(session);	//construct the parent class
 	}
+
 }

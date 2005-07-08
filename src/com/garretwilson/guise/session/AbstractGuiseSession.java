@@ -1,5 +1,6 @@
 package com.garretwilson.guise.session;
 
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.*;
@@ -11,11 +12,14 @@ import com.garretwilson.event.PostponedEvent;
 import com.garretwilson.guise.GuiseApplication;
 import com.garretwilson.guise.component.NavigationFrame;
 import com.garretwilson.guise.context.GuiseContext;
+import com.garretwilson.io.BOMInputStreamReader;
+import static com.garretwilson.io.WriterUtilities.*;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.Debug;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
+import static com.garretwilson.text.CharacterEncodingConstants.UTF_8;
 import static com.garretwilson.text.xml.XMLUtilities.*;
 
 /**An abstract implementation that keeps track of the components of a user session.
@@ -203,8 +207,10 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		}
 
 		/**Retrieves a string resource from the resource bundle.
+		If the resource cannot be found in the resource bundle, it will be loaded from the application's resources, if possible,
+		treating the resource key as a locale-sensitive resource path in the application resource area.
 		This is a preferred convenience method for accessing the resources in the session's resource bundle.
-		@param resourceKey The key of the resource to retrieve.
+		@param resourceKey The key of the resource to retrieve, or a relative path to the resource in the application's resource area.
 		@return The resource associated with the specified resource key.
 		@exception NullPointerException if the provided resource key is <code>null</code>.
 		@exception MissingResourceException if no resource could be found associated with the given key.
@@ -214,12 +220,51 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		*/
 		public String getStringResource(final String resourceKey) throws MissingResourceException
 		{
-			return getResource(resourceKey);	//retrieve a string from the resource bundle
+			try
+			{
+				return getResource(resourceKey);	//retrieve a string from the resource bundle
+			}
+			catch(final MissingResourceException missingResourceException)	//if the resource does not exist
+			{
+				if(isPath(resourceKey) && !isAbsolutePath(resourceKey))	//if the resource key is a relative path
+				{
+					final String applicationResourcePath=getApplication().getLocaleResourcePath(resourceKey, getLocale());	//try to get a locale-sensitive path to the resource
+					if(applicationResourcePath!=null)	//if there is a path to the resource
+					{
+						final InputStream inputStream=getApplication().getResourceAsStream(applicationResourcePath);	//get a stream to the resource
+						if(inputStream!=null)	//if we got a stream to the resource (we always should, as we already checked to see which path represents an existing resource)
+						{
+							try
+							{
+								try
+								{
+									final StringWriter stringWriter=new StringWriter();	//create a new string writer to receive the resource contents
+										//TODO do better checking of XML encoding type by prereading
+									final Reader resourceReader=new BOMInputStreamReader(new BufferedInputStream(inputStream), UTF_8);	//get an input reader to the file, defaulting to UTF-8 if we don't know its encoding
+									write(resourceReader, stringWriter);	//copy the resource to the string
+									return stringWriter.toString();	//return the string read from the resource
+								}
+								finally
+								{
+									inputStream.close();	//always close the input stream
+								}
+							}
+							catch(final IOException ioException)	//if there is an I/O error, convert it to a missing resource exception
+							{
+								throw (MissingResourceException)new MissingResourceException(ioException.getMessage(), missingResourceException.getClassName(), missingResourceException.getKey()).initCause(ioException);
+							}
+						}
+					}
+				}
+				throw missingResourceException;	//if we couldn't find an application resource, throw the original missing resource exception
+			}			
 		}
 
 		/**Retrieves a string resource from the resource bundle, using a specified default if no such resource is available.
+		If the resource cannot be found in the resource bundle, it will be loaded from the application's resources, if possible,
+		treating the resource key as a locale-sensitive resource path in the application resource area.
 		This is a preferred convenience method for accessing the resources in the session's resource bundle.
-		@param resourceKey The key of the resource to retrieve.
+		@param resourceKey The key of the resource to retrieve, or a relative path to the resource in the application's resource area.
 		@param defaultValue The default value to use if there is no resource associated with the given key.
 		@return The resource associated with the specified resource key or the default if none is available.
 		@exception NullPointerException if the provided resource key is <code>null</code>.

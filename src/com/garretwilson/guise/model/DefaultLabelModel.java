@@ -1,5 +1,6 @@
 package com.garretwilson.guise.model;
 
+import java.io.Reader;
 import java.util.MissingResourceException;
 
 import com.garretwilson.guise.session.GuiseSession;
@@ -24,7 +25,6 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 		{
 			return getString(label, getLabelResourceKey());	//get the value or the resource, if available
 		}
-
 		/**Sets the text of the label.
 		This is a bound property.
 		@param newLabel The new text of the label.

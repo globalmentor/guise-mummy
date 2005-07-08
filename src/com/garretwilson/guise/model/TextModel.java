@@ -3,7 +3,9 @@ package com.garretwilson.guise.model;
 import java.util.MissingResourceException;
 import javax.mail.internet.ContentType;
 
+import static com.garretwilson.io.ContentTypeConstants.*;
 import static com.garretwilson.lang.ClassUtilities.*;
+import com.garretwilson.text.xml.xhtml.XHTMLConstants;
 
 /**A model for text and an associated label.
 This model only supports text content types, including:
@@ -12,6 +14,7 @@ This model only supports text content types, including:
 	<li><code>application/xml</code></li>
 	<li><code>application/*+xml</code></li>
 </ul>
+<p>The model defaults to a content type of <code>text/plain</code>.</p>
 @author Garret Wilson
 */
 public interface TextModel extends Model
@@ -22,6 +25,12 @@ public interface TextModel extends Model
 	public final static String TEXT_PROPERTY=getPropertyName(TextModel.class, "text");
 	/**The text resource key bound property.*/
 	public final static String TEXT_RESOURCE_KEY_PROPERTY=getPropertyName(MessageModel.class, "textResourceKey");
+
+	/**A content type of <code>text/plain</code>.*/
+	public final static ContentType PLAIN_TEXT_CONTENT_TYPE=new ContentType(TEXT, PLAIN_SUBTYPE, null);
+
+	/**A content type of <code>application/xhtml+xml</code>.*/
+	public final static ContentType XHTML_CONTENT_TYPE=XHTMLConstants.XHTML_CONTENT_TYPE;
 
 	/**@return The content type of the text.*/
 	public ContentType getContentType();
