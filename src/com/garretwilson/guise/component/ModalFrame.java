@@ -14,7 +14,7 @@ public interface ModalFrame<R, C extends ModalFrame<R, C>> extends Frame<C>
 	public final static String RESULT_PROPERTY=getPropertyName(ModalFrame.class, "result");
 
 	/**@return The result of this frame's modal interaction, or <code>null</code> if no result is given.*/
-	public R result();
+	public R getResult();
 
 	/**Sets the modal result.
 	This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method.

@@ -5,13 +5,14 @@ import com.garretwilson.guise.component.*;
 import com.garretwilson.guise.component.layout.*;
 import com.garretwilson.guise.model.ValueModel;
 import com.garretwilson.guise.session.GuiseSession;
+import com.garretwilson.guise.validator.RegularExpressionStringValidator;
 
 /**Hello User Guise demonstration frame.
 Copyright © 2005 GlobalMentor, Inc.
-Demonstrates hidden components, text controls, control labels, buttons, and listeners.
+Demonstrates hidden components, text controls, control labels, text control regular expression validators, buttons, and listeners.
 @author Garret Wilson
 */
-public class HelloUserFrame extends NavigationFrame
+public class HelloUserFrame extends DefaultFrame
 {
 
 	/**Guise session constructor.
@@ -29,6 +30,7 @@ public class HelloUserFrame extends NavigationFrame
 		
 		final TextControl<String> userInput=new TextControl<String>(session, String.class);	//create a text input control to retrieve a string
 		userInput.getModel().setLabel("What's your name?");	//add a label to the text input control
+		userInput.getModel().setValidator(new RegularExpressionStringValidator(session, "\\S+.*", true));	//require at least a single non-whitespace character followed by any other characters
 		userInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<String>()
 				{
 					public void propertyValueChange(PropertyValueChangeEvent<String> propertyValueChangeEvent)

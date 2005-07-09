@@ -9,7 +9,7 @@ import com.garretwilson.event.PostponedEvent;
 import com.garretwilson.guise.GuiseApplication;
 import com.garretwilson.guise.component.*;
 import com.garretwilson.guise.context.GuiseContext;
-import com.garretwilson.guise.event.ActionListener;
+import com.garretwilson.guise.event.ModalListener;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
@@ -155,30 +155,44 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	*/
 	public void queueModelEvent(final PostponedEvent<?> postponedModelEvent);
 
-	/**Retrieves the frame bound to the given appplication context-relateive path.
+	/**Retrieves the frame bound to the given appplication context-relative path.
 	If a frame has already been created and cached, it will be be returned; otherwise, one will be created and cached. 
 	The frame will be given an ID of a modified form of the path.
 	@param path The appplication context-relative path within the Guise container context.
-	@return The frame bound to the given path, or <code>null</code> if no frame is bound to the given path
+	@return The frame bound to the given path, or <code>null</code> if no frame is bound to the given path.
+	@exception NullPointerException if the path is null.
 	@exception IllegalArgumentException if the provided path is absolute.
 	@exception NoSuchMethodException if the frame bound to the path does not provide Guise session constructor; or a Guise session and ID string constructor.
 	@exception IllegalAccessException if the bound frame enforces Java language access control and the underlying constructor is inaccessible.
 	@exception InstantiationException if the bound frame is an abstract class.
 	@exception InvocationTargetException if the bound frame's underlying constructor throws an exception.
 	*/
-	public Frame getBoundNavigationFrame(final String path) throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException;
+	public Frame getNavigationFrame(final String path) throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException;
+
+	/**Releases the frame bound to the given appplication context-relative path.
+	@param path The appplication context-relative path within the Guise container context.
+	@return The frame previously bound to the given path, or <code>null</code> if no frame was bound to the given path.
+	@exception NullPointerException if the path is null.
+	@exception IllegalArgumentException if the provided path is absolute.
+	*/
+	public Frame releaseNavigationFrame(final String path);
 
 	/**@return Whether the session is in a modal navigation state.*/
 	public boolean isModalNavigation();
 
 	/**Ends modal interaction for a particular modal frame.
+	The frame is released from the cache so that new navigation will create a new modal frame.
 	This method is called by modal frames and should seldom if ever be called directly.
 	If the current modal state corresponds to the current navigation state, the current modal state is removed, the modal state's event is fired, and modal state is handed to the previous modal state, if any.
-	If there is no modal state remaining, navigation is transferred to the modal frame's referring URI, if any. 
+	Otherwise, navigation is transferred to the modal frame's referring URI, if any.
+	If the given modal frame is not the frame at the current navigation path, the modal state is not changed, although navigation and releasal will still occur.
+	@param <R> The type of modal result the modal frame produces.
 	@param modalFrame The frame for which modal navigation state should be ended.
+	@return true if modality actually ended for the given frame.
 	@see Frame#getReferrerURI()
+	@see #releaseNavigationFrame(String)
 	*/
-	public void endModalNavigation(final ModalFrame<?, ?> modalFrame);
+	public <R> boolean endModalNavigation(final ModalFrame<R, ?> modalFrame);
 
 	/**Reports the navigation path relative to the application context path.
 	@return The path representing the current navigation location of the Guise application.
@@ -207,21 +221,23 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	/**Requests modal navigation to the specified path.
 	The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
 	Later requested navigation before navigation occurs will override this request.
+	@param <R> The type of modal result the modal frame produces.
 	@param path A path that is either relative to the application context path or is absolute.
-	@param endModalListener The listener to respond to the end of modal interaction.
+	@param modalListener The listener to respond to the end of modal interaction.
 	@exception NullPointerException if the given path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
-	@see #navigateModal(URI, ActionListener)
+	@see #navigateModal(URI, ModalListener)
 	*/
-	public void navigateModal(final String path, final ActionListener<ModalFrame<?, ?>> endModalListener);
+	public <R> void navigateModal(final String path, final ModalListener<R> modalListener);
 
 	/**Requests modal navigation to the specified URI.
 	The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
 	Later requested navigation before navigation occurs will override this request.
+	@param <R> The type of modal result the modal frame produces.
 	@param uri Either a relative or absolute path, or an absolute URI.
-	@param endModalListener The listener to respond to the end of modal interaction.
+	@param modalListener The listener to respond to the end of modal interaction.
 	@exception NullPointerException if the given URI is <code>null</code>.
 	*/
-	public void navigateModal(final URI uri, final ActionListener<ModalFrame<?, ?>> endModalListener);
+	public <R> void navigateModal(final URI uri, final ModalListener<R> modalListener);
 
 }

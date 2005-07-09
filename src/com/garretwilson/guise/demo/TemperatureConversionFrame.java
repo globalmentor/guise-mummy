@@ -18,7 +18,7 @@ Demonstrates float input controls, float input validation, radio button controls
 	required value validation, disabled controls, and style IDs.
 @author Garret Wilson
 */
-public class TemperatureConversionFrame extends NavigationFrame
+public class TemperatureConversionFrame extends DefaultFrame
 {
 
 	/**Guise session constructor.
@@ -74,28 +74,31 @@ public class TemperatureConversionFrame extends NavigationFrame
 				{
 					public void actionPerformed(ActionEvent<ActionModel> actionEvent)	//convert the temperature in the input field and place the result in the output field
 					{
-						final float inputValue=temperatureInput.getModel().getValue().floatValue();	//get the input value from the control
-						final float outputValue;	//we'll convert the value and store it here
-						if(celsiusCheckControl.getModel().getValue())	//if the Celsius radio button is selected
+						if(isValid())	//if this frame and all of its components have valid model values
 						{
-							outputValue=(inputValue*9)/5+32;	//convert: (9c/5)+32
+							final float inputValue=temperatureInput.getModel().getValue().floatValue();	//get the input value from the control
+							final float outputValue;	//we'll convert the value and store it here
+							if(celsiusCheckControl.getModel().getValue())	//if the Celsius radio button is selected
+							{
+								outputValue=(inputValue*9)/5+32;	//convert: (9c/5)+32
+							}
+							else if(farenheitCheckControl.getModel().getValue())	//if the Farenheit radio button is selected
+							{
+								outputValue=((inputValue-32)*5)/9;	//convert: 5(f-32)/9							
+							}
+							else	//if neither check control is selected (which should never happen, because we set one to begin with and they are both using a mutual exclusion model group)
+							{
+								throw new AssertionError("Expected one of the scale radio buttons to be selected.");
+							}
+							try
+							{
+								temperatureOutput.getModel().setValue(new Float(outputValue));	//store the conversion result in the temperature output control
+							}
+							catch(final ValidationException validationException)	//we have no validator installed in the temperature output text control, so we don't expect changing its value ever to cause any problems
+							{
+								throw new AssertionError(validationException);
+							}
 						}
-						else if(farenheitCheckControl.getModel().getValue())	//if the Farenheit radio button is selected
-						{
-							outputValue=((inputValue-32)*5)/9;	//convert: 5(f-32)/9							
-						}
-						else	//if neither check control is selected (which should never happen, because we set one to begin with and they are both using a mutual exclusion model group)
-						{
-							throw new AssertionError("Expected one of the scale radio buttons to be selected.");
-						}
-						try
-						{
-							temperatureOutput.getModel().setValue(new Float(outputValue));	//store the conversion result in the temperature output control
-						}
-						catch(final ValidationException validationException)	//we have no validator installed in the temperature output text control, so we don't expect changing its value ever to cause any problems
-						{
-							throw new AssertionError(validationException);
-						}						
 					}
 				});
 		conversionPanel.add(convertButton);	//add the button to the conversion panel

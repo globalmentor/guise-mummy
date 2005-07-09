@@ -41,6 +41,12 @@ public class AbstractModel extends BoundPropertyObject implements Model
 		this.session=checkNull(session, "Session cannot be null");	//save the session
 	}
 
+	/**Determines whether the contents of this model are valid.
+	This version returns <code>true</code>.
+	@return Whether the contents of this model are valid.
+	*/
+	public boolean isValid() {return true;}
+
 	/**Reports that a bound property has changed.
 	This implementation delegates to the Guise session to fire or postpone the property change event.
 	@param propertyChangeEvent The event to fire.

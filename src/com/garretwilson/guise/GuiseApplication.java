@@ -84,7 +84,7 @@ public interface GuiseApplication extends PropertyBindable
 	@return The type of frame bound to the given path, or <code>null</code> if no frame is bound to the path. 
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public Class<? extends Frame> getBoundNavigationFrameClass(final String path);
+	public Class<? extends Frame> getNavigationFrameClass(final String path);
 
 	/**@return The Guise container into which this application is installed, or <code>null</code> if the application is not yet installed.*/
 	public GuiseContainer getContainer();

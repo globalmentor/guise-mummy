@@ -22,6 +22,7 @@ public class DefaultValueModel<V> extends DefaultControlModel implements ValueMo
 		/**Sets the input value.
 		This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method.
 		If a validator is installed, the value will first be validated before the current value is changed.
+		Validation always occurs if a validator is installed, even if the value is not changing.
 		@param newValue The input value of the model.
 		@exception ValidationException if the provided value is not valid.
 		@see #getValidator()
@@ -29,13 +30,13 @@ public class DefaultValueModel<V> extends DefaultControlModel implements ValueMo
 		*/
 		public void setValue(final V newValue) throws ValidationException
 		{
+			if(validator!=null)	//if a validator is installed, always validate the value, even if it isn't changing, so that an initial value that may not be valid will throw an error when it's tried to be set to the same, but invalid, value
+			{
+				validator.validate(newValue);	//validate the new value, throwing an exception if anything is wrong
+			}
 			if(!ObjectUtilities.equals(value, newValue))	//if the value is really changing (compare their values, rather than identity)
 			{
 				final Validator<V> validator=getValidator();	//get the currently installed validator, if there is one
-				if(validator!=null)	//if a validator is installed
-				{
-					validator.validate(newValue);	//validate the new value, throwing an exception if anything is wrong
-				}
 				final V oldValue=value;	//get the old value
 				value=newValue;	//actually change the value
 				firePropertyChange(VALUE_PROPERTY, oldValue, newValue);	//indicate that the value changed
@@ -79,4 +80,24 @@ public class DefaultValueModel<V> extends DefaultControlModel implements ValueMo
 		super(session);	//construct the parent class
 		this.valueClass=checkNull(valueClass, "Value class cannot be null.");	//store the value class
 	}
+
+	/**Determines whether the contenxt of this model are valid.
+	This version delegates to the validator, if one is installed.
+	@return Whether the contents of this model are valid.
+	@see #getValidator()
+	@see #getValue()
+	*/
+	public boolean isValid()
+	{
+		if(super.isValid())	//if the super class thinks we're valid
+		{
+			final Validator<V> validator=getValidator();	//get the current validator
+			return validator!=null ? validator.isValid(getValue()) : true;	//if we have a validator, make sure it thinks the value is valid
+		}
+		else	//if the super class doesn't think we're valid
+		{
+			return false;	//indicate that we're not valid
+		}
+	}
+
 }

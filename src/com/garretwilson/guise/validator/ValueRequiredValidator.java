@@ -2,7 +2,7 @@ package com.garretwilson.guise.validator;
 
 import com.garretwilson.guise.session.GuiseSession;
 
-/**An abstract implementation of an object that can determine whether a value is valid.
+/**A validator that requires a value to be entered.
 @author Garret Wilson
 */
 public class ValueRequiredValidator<V> extends AbstractValidator<V>

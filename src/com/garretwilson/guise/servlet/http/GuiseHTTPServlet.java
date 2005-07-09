@@ -235,7 +235,7 @@ Debug.trace("Referrer:", getReferer(request));
 		try
 		{
 			final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
-			final Frame<?> navigationFrame=guiseSession.getBoundNavigationFrame(navigationPath);	//get the frame bound to the requested path
+			final Frame<?> navigationFrame=guiseSession.getNavigationFrame(navigationPath);	//get the frame bound to the requested path
 			if(navigationFrame!=null)	//if we found a frame class for this address
 			{
 				setNoCache(response);	//TODO testing; fix; update method
@@ -244,7 +244,7 @@ Debug.trace("Referrer:", getReferer(request));
 				final ModalNavigation modalNavigation=guiseSession.peekModalNavigation();	//see if we are currently doing modal navigation
 				if(modalNavigation!=null)	//if we are currently in the middle of modal navigation, make sure the correct frame was requested
 				{
-					final URI modalNavigationURI=modalNavigation.getNavigationURI();	//get the modal navigation URI
+					final URI modalNavigationURI=modalNavigation.getNewNavigationURI();	//get the modal navigation URI
 					if(!requestURI.getRawPath().equals(modalNavigationURI.getRawPath()))		//if this request was for a different path than our current modal navigation path (we wouldn't be here if the domain, application, etc. weren't equivalent)
 					{
 						throw new HTTPMovedTemporarilyException(modalNavigationURI);	//redirect to the modal navigation location				
@@ -252,7 +252,7 @@ Debug.trace("Referrer:", getReferer(request));
 				}
 					//update the frame's referrer
 				final String referrer=getReferer(request);	//see if the request has a referrer
-				if(referrer!=null)	//if the request indicates a referrer
+				if(referrer!=null && navigationFrame.getReferrerURI()==null)	//if the request indicates a referrer, but the navigation frame has not yet been updated with a referrer
 				{
 					final URI plainReferrerURI=getPlainURI(URI.create(referrer));	//get a plain URI version of the referrer
 					if(!plainReferrerURI.equals(getPlainURI(requestURI)))	//if we aren't being referred from ourselves
@@ -267,8 +267,8 @@ Debug.trace("Referrer:", getReferer(request));
 					navigationFrame.queryView(guiseContext);		//tell the frame to query its view
 					guiseContext.setState(GuiseContext.State.DECODE_VIEW);	//update the context state for decoding the view
 					navigationFrame.decodeView(guiseContext);		//tell the frame to decode its view
-					guiseContext.setState(GuiseContext.State.VALIDATE_VIEW);	//update the context state for validating the view
-					navigationFrame.validateView(guiseContext);		//tell the frame to validate its view
+//TODO delete phase if not needed					guiseContext.setState(GuiseContext.State.VALIDATE_VIEW);	//update the context state for validating the view
+//TODO delete phase if not needed					navigationFrame.validateView(guiseContext);		//tell the frame to validate its view
 					guiseContext.setState(GuiseContext.State.UPDATE_MODEL);	//update the context state for updating the model
 					navigationFrame.updateModel(guiseContext);	//tell the frame to update its model
 					guiseContext.setState(GuiseContext.State.QUERY_MODEL);	//update the context state for querying the model
@@ -280,25 +280,24 @@ Debug.trace("Referrer:", getReferer(request));
 				{
 					navigationFrame.addErrors(validationsException);	//store the validation error(s) so that the frame can report them to the user
 				}
+/*TODO del when works
 				catch(final ValidationException validationException)	//if there were any validation errors while updating the model
 				{
 					navigationFrame.addError(validationException);	//store the validation error so that the frame can report it to the user
 				}
-Debug.trace("looking for requested navigation");
+*/
+				guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view; make the change now in case queued model changes want to navigate, and an error was thrown when updating the model)
 				final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
 				if(requestedNavigation!=null)	//if navigation is requested
 				{
-Debug.trace("got requested navigation");
-					final URI requestedNavigationURI=requestedNavigation.getNavigationURI();
+					final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
 					guiseSession.clearRequestedNavigation();	//remove any navigation requests
 					if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
 					{
-Debug.trace("this is a modal navigation; pushing it on the stack");
 						guiseSession.pushModalNavigation((ModalNavigation)requestedNavigation);	//push the modal navigation onto the top of the modal navigation stack
 					}
 					throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
 				}
-				guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view
 				navigationFrame.updateView(guiseContext);		//tell the frame to update its view
 			}
 			else	//if we have no frame type for this address
@@ -402,6 +401,7 @@ Debug.trace("this is a modal navigation; pushing it on the stack");
 				if(guiseSession==null)	//if no Guise session is associated with the given HTTP session
 				{
 					guiseSession=createGuiseSession(guiseApplication, httpSession);	//create a new Guise session
+					guiseSession.initialize();	//let the Guise session know it's being initializes so that it can listen to the application
 					final Locale[] clientAcceptedLanguages=getAcceptedLanguages(httpRequest);	//get all languages accepted by the client
 					guiseSession.requestLocale(asList(clientAcceptedLanguages));	//ask the Guise session to change to one of the accepted locales, if the application supports one
 					guiseSessionMap.put(httpSession, guiseSession);	//associate the Guise session with the HTTP session

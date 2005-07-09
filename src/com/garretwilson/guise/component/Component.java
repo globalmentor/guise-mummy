@@ -133,6 +133,9 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	*/
 	public void setVisible(final boolean newVisible);
 
+	/**@return Whether the models of this component and all of its child components are valid.*/
+	public boolean isValid();
+
 	/**@return The character used by this component when building absolute IDs.*/
 	public char getAbsoluteIDSegmentDelimiter();
 
@@ -173,11 +176,11 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	This method delegates to the installed controller, and if no controller is installed one is created and installed.
 	@param context Guise context information.
 	@exception IOException if there is an error updating the model.
-	@exception ValidationException if the view information is not valid to store in the model.
+	@exception ValidationsException if the view information is not valid to store in the model.
 	@see #getController(GC, C)
 	@see GuiseContext.State#UPDATE_MODEL
 	*/
-	public <GC extends GuiseContext<?>> void updateModel(final GC context) throws IOException, ValidationException;
+	public <GC extends GuiseContext<?>> void updateModel(final GC context) throws IOException, ValidationsException;
 
 	/**Collects the current data from the model of this component.
 	This method should not normally be called directly by applications.

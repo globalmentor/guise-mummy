@@ -6,6 +6,7 @@ import java.util.*;
 import com.garretwilson.guise.model.DefaultLabelModel;
 import com.garretwilson.guise.model.LabelModel;
 import com.garretwilson.guise.session.GuiseSession;
+import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.*;
 
 /**Abstract implementation of a frame.
@@ -91,7 +92,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractModelCom
 			*/
 			public void setReferrerURI(final URI newReferrerURI)
 			{
-				if(referrerURI!=newReferrerURI)	//if the value is really changing
+				if(!ObjectUtilities.equals(referrerURI, newReferrerURI))	//if the value is really changing
 				{
 					final URI oldReferrerURI=referrerURI;	//get the old value
 					referrerURI=newReferrerURI;	//actually change the value

@@ -12,7 +12,8 @@ import com.garretwilson.event.PostponedEvent;
 import com.garretwilson.guise.GuiseApplication;
 import com.garretwilson.guise.component.*;
 import com.garretwilson.guise.context.GuiseContext;
-import com.garretwilson.guise.event.ActionListener;
+import com.garretwilson.guise.event.ModalEvent;
+import com.garretwilson.guise.event.ModalListener;
 import com.garretwilson.io.BOMInputStreamReader;
 import static com.garretwilson.io.WriterUtilities.*;
 import com.garretwilson.lang.ObjectUtilities;
@@ -35,17 +36,18 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		/**@return The Guise application to which this session belongs.*/
 		public GuiseApplication getApplication() {return application;}
 
-	/**The map binding navigation frame types to appplication context-relative paths.*/
-	private final Map<String, Frame> navigationPathFrameBindingMap=new HashMap<String, Frame>();
+	/**The cache of navigation frame types to appplication context-relative paths.*/
+	private final Map<String, Frame> navigationPathFrameMap=synchronizedMap(new HashMap<String, Frame>());
 
 		/**Binds a frame to a particular appplication context-relative path.
 		Any existing binding for the given context-relative path is replaced.
 		@param path The appplication context-relative path to which the frame should be bound.
-		@param frame The frame to render for this particular context-relative path.
+		@param frame The frame to bind to this particular context-relative path.
 		@return The frame previously bound to the given context-relative path, or <code>null</code> if no frame was previously bound to the path.
 		@exception NullPointerException if the path and/or the frame is null.
 		@exception IllegalArgumentException if the provided path is absolute.
 		*/
+/*TODO del if not needed
 		protected Frame bindNavigationFrame(final String path, final Frame frame)
 		{
 			if(isAbsolutePath(path))	//if the path is absolute
@@ -54,6 +56,25 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 			}
 			return navigationPathFrameBindingMap.put(checkNull(path, "Path cannot be null."), checkNull(frame, "Bound frame cannot be null."));	//store the binding
 		}
+*/
+
+		/**Removes the binding a frame from a particular appplication context-relative path.
+		If no frame is bound to the given navigation path, no action occurs.
+		@param path The appplication context-relative path to which the frame should be bound.
+		@return The frame previously bound to the given context-relative path, or <code>null</code> if no frame was previously bound to the path.
+		@exception NullPointerException if the path is null.
+		@exception IllegalArgumentException if the provided path is absolute.
+		*/
+/*TODO del if not needed
+		protected Frame unbindNavigationFrame(final String path)
+		{
+			if(isAbsolutePath(path))	//if the path is absolute
+			{
+				throw new IllegalArgumentException("Bound navigation path cannot be absolute: "+path);
+			}
+			return navigationPathFrameBindingMap.remove(checkNull(path, "Path cannot be null."));	//remove the binding
+		}
+*/
 
 	/**The current session locale.*/
 	private Locale locale;
@@ -383,51 +404,69 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 	/**Guise application constructor.
 	The session local will initially be set to the locale of the associated Guise application.
 	@param application The Guise application to which this session belongs.
-	@see #destroy()
 	*/
 	public AbstractGuiseSession(final GuiseApplication application)
 	{
 		this.application=application;	//save the Guise instance
 		this.locale=application.getDefaultLocale();	//default to the application locale
-		application.addPropertyChangeListener(GuiseApplication.RESOURCE_BUNDLE_BASE_NAME_PROPERTY, resourceBundleReleasePropertyValueChangeListener);	//when the application changes its resource bundle base name, release the resource bundle		
 	}
 
-	/**Retrieves the frame bound to the given appplication context-relateive path.
+	/**Retrieves the frame bound to the given appplication context-relative path.
 	If a frame has already been created and cached, it will be be returned; otherwise, one will be created and cached. 
 	The frame will be given an ID of a modified form of the path.
 	@param path The appplication context-relative path within the Guise container context.
-	@return The frame bound to the given path, or <code>null</code> if no frame is bound to the given path
+	@return The frame bound to the given path, or <code>null</code> if no frame is bound to the given path.
+	@exception NullPointerException if the path is null.
 	@exception IllegalArgumentException if the provided path is absolute.
 	@exception NoSuchMethodException if the frame bound to the path does not provide Guise session constructor; or a Guise session and ID string constructor.
 	@exception IllegalAccessException if the bound frame enforces Java language access control and the underlying constructor is inaccessible.
 	@exception InstantiationException if the bound frame is an abstract class.
 	@exception InvocationTargetException if the bound frame's underlying constructor throws an exception.
 	*/
-	public Frame getBoundNavigationFrame(final String path) throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException
+	public Frame getNavigationFrame(final String path) throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException
 	{
-		if(isAbsolutePath(path))	//if the path is absolute
+		if(isAbsolutePath(checkNull(path, "Path cannot be null")))	//if the path is absolute
 		{
 			throw new IllegalArgumentException("Bound navigation path cannot be absolute: "+path);
 		}
-		Frame frame=navigationPathFrameBindingMap.get(path);	//get the bound frame type, if any
-		if(frame==null)	//if no frame is cached
+		Frame frame;	//we'll store the frame here, either a cached frame or a created frame
+		synchronized(navigationPathFrameMap)	//don't allow the map to be modified while we access it
 		{
-			final Class<? extends Frame> frameClass=getApplication().getBoundNavigationFrameClass(path);	//see which frame we should show for this path
-			if(frameClass!=null)	//if we found a frame class for this path
+			frame=navigationPathFrameMap.get(path);	//get the bound frame type, if any
+			if(frame==null)	//if no frame is cached
 			{
-				try
+				final Class<? extends Frame> frameClass=getApplication().getNavigationFrameClass(path);	//see which frame we should show for this path
+				if(frameClass!=null)	//if we found a frame class for this path
 				{
-					final String frameID=createName(path);	//convert the path to a valid ID TODO use a Guise-specific routine or, better yet, bind an ID with the frame
-					frame=frameClass.getConstructor(GuiseSession.class, String.class).newInstance(this, frameID);	//find the Guise session and ID constructor and create an instance of the class
+					try
+					{
+						final String frameID=createName(path);	//convert the path to a valid ID TODO use a Guise-specific routine or, better yet, bind an ID with the frame
+						frame=frameClass.getConstructor(GuiseSession.class, String.class).newInstance(this, frameID);	//find the Guise session and ID constructor and create an instance of the class
+					}
+					catch(final NoSuchMethodException noSuchMethodException)	//if there was no Guise session and string ID constructor
+					{
+						frame=frameClass.getConstructor(GuiseSession.class).newInstance(this);	//use the Guise session constructor if there is one					
+					}
+					navigationPathFrameMap.put(path, frame);	//bind the frame to the path, caching it for next time
 				}
-				catch(final NoSuchMethodException noSuchMethodException)	//if there was no Guise session and string ID constructor
-				{
-					frame=frameClass.getConstructor(GuiseSession.class).newInstance(this);	//use the Guise session constructor if there is one					
-				}
-				bindNavigationFrame(path, frame);	//bind the frame to the path, caching it for next time
 			}
 		}
 		return frame;	//return the frame, or null if we couldn't find a frame
+	}
+
+	/**Releases the frame bound to the given appplication context-relative path.
+	@param path The appplication context-relative path within the Guise container context.
+	@return The frame previously bound to the given path, or <code>null</code> if no frame was bound to the given path.
+	@exception NullPointerException if the path is null.
+	@exception IllegalArgumentException if the provided path is absolute.
+	*/
+	public Frame releaseNavigationFrame(final String path)
+	{
+		if(isAbsolutePath(checkNull(path, "Path cannot be null")))	//if the path is absolute
+		{
+			throw new IllegalArgumentException("Bound navigation path cannot be absolute: "+path);
+		}
+		return navigationPathFrameMap.remove(path);	//uncache the frame
 	}
 
 	/**The stack of modal navigation points.*/
@@ -480,34 +519,54 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		}
 
 		/**Ends modal interaction for a particular modal frame.
+		The frame is released from the cache so that new navigation will create a new modal frame.
 		This method is called by modal frames and should seldom if ever be called directly.
 		If the current modal state corresponds to the current navigation state, the current modal state is removed, the modal state's event is fired, and modal state is handed to the previous modal state, if any.
-		If there is no modal state remaining, navigation is transferred to the modal frame's referring URI, if any. 
+		Otherwise, navigation is transferred to the modal frame's referring URI, if any.
+		If the given modal frame is not the frame at the current navigation path, the modal state is not changed, although navigation and releasal will still occur.
+		@param <R> The type of modal result the modal frame produces.
 		@param modalFrame The frame for which modal navigation state should be ended.
+		@return true if modality actually ended for the given frame.
 		@see #popModalNavigation()
 		@see Frame#getReferrerURI()
+		@see #releaseNavigationFrame(String)
 		*/
-		public void endModalNavigation(final ModalFrame<?, ?> modalFrame)
+		@SuppressWarnings("unchecked")	//we check to see that the given frame is the same one at this navigation path, and that this navigation path is in a modal state, implying that the current navigation state's listener has same generic result type as does the modal frame
+		public <R> boolean endModalNavigation(final ModalFrame<R, ?> modalFrame)
 		{
-			synchronized(modalNavigationStack)	//don't allow anyone to to access the modal navigation stack while we access it
+			final String navigationPath=getNavigationPath();	//get our current navigation path
+			ModalNavigation modalNavigation=null;	//if we actually end modal navigation, we'll store the information here
+			URI navigationURI=modalFrame.getReferrerURI();	//in the worse case scenario, we'll want to go back to where the modal frame came from, if that's available
+			if(navigationPathFrameMap.get(navigationPath)==modalFrame)	//before we try to actually ending modality, make sure this frame is actually the one at our current navigation path
 			{
-				ModalNavigation modalNavigation=peekModalNavigation();	//see which model navigation is on the top of the stack
-				if(modalNavigation!=null)	//if there is a modal navigation currently in use
+				synchronized(modalNavigationStack)	//don't allow anyone to to access the modal navigation stack while we access it
 				{
-					if(getApplication().resolvePath(getNavigationPath()).equals(modalNavigation.getNavigationURI().getPath()))	//if we're navigating where we expect to be (if we somehow got to here at something other than the modal navigation path, we wouldn't want to remove the current navigation path)
+					final ModalNavigation currentModalNavigation=peekModalNavigation();	//see which model navigation is on the top of the stack
+					if(currentModalNavigation!=null)	//if there is a modal navigation currently in use
 					{
-						popModalNavigation();	//end the current modal navigation
-//TODO fire an event
-						modalNavigation=peekModalNavigation();	//see which model navigation is next on the stack; that's where we want to go next
+						if(getApplication().resolvePath(navigationPath).equals(currentModalNavigation.getNewNavigationURI().getPath()))	//if we're navigating where we expect to be (if we somehow got to here at something other than the modal navigation path, we wouldn't want to remove the current navigation path)
+						{
+							modalNavigation=popModalNavigation();	//end the current modal navigation
+							navigationURI=modalNavigation.getOldNavigationURI();	//we'll return to where the current modal navigation came from---that's a better choice
+							final ModalNavigation oldModalNavigation=peekModalNavigation();	//see which model navigation is next on the stack
+							if(oldModalNavigation!=null)	//if there is another modal navigation to go to
+							{
+								navigationURI=oldModalNavigation.getOldNavigationURI();	//we're forced to go to the navigation URI of the old modal navigation							
+							}
+						}
 					}
 				}
-					//if we know where to go now that this modal navigation is finished (if we were somehow at the wrong place to begin with, we'll go to where we should be), use that URI; otherwise, fall back to the modal frame's referring URI, if there is one
-				final URI navigationURI=modalNavigation!=null ? modalNavigation.getNavigationURI() : modalFrame.getReferrerURI();	//we'll determine where we should go, now that this modal navigation is over				
-				if(navigationURI!=null)	//if we know where to go now that navigation is finished
-				{
-					navigate(navigationURI);	//navigate to the new URI
-				}
-			}			
+			}
+			if(navigationURI!=null)	//if we know where to go now that modality has ended
+			{
+				navigate(navigationURI);	//navigate to the new URI
+			}
+			releaseNavigationFrame(navigationPath);	//release the frame associated with this navigation path
+			if(modalNavigation!=null)	//if we if we ended modality for the frame
+			{
+				((ModalListener<R>)modalNavigation.getModalListener()).modalEnded(new ModalEvent<R>(this, modalFrame, modalFrame.getResult()));	//send an event to the modal listener
+			}
+			return modalNavigation!=null;	//return whether we ended modality
 		}
 
 
@@ -537,7 +596,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		{
 			if(!ObjectUtilities.equals(this.navigationPath, navigationPath))	//if the navigation path is really changing
 			{
-				if(getApplication().getBoundNavigationFrameClass(navigationPath)==null)	//if no frame is bound to the given navigation path
+				if(getApplication().getNavigationFrameClass(navigationPath)==null)	//if no frame is bound to the given navigation path
 				{
 					throw new IllegalArgumentException("Unknown navigation path: "+navigationPath);
 				}
@@ -575,33 +634,35 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		*/
 		public void navigate(final URI uri)
 		{
-			requestedNavigation=new Navigation(getApplication().resolveURI(checkNull(uri, "URI cannot be null.")));	//resolve the URI against the application context path
+			requestedNavigation=new Navigation(getApplication().resolveURI(createPathURI(getNavigationPath())), getApplication().resolveURI(checkNull(uri, "URI cannot be null.")));	//resolve the URI against the application context path
 		}
 
 		/**Requests modal navigation to the specified path.
 		The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
 		Later requested navigation before navigation occurs will override this request.
+		@param <R> The type of modal result the modal frame produces.
 		@param path A path that is either relative to the application context path or is absolute.
-		@param endModalListener The listener to respond to the end of modal interaction.
+		@param modalListener The listener to respond to the end of modal interaction.
 		@exception NullPointerException if the given path is <code>null</code>.
 		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
-		@see #navigateModal(URI, ActionListener)
+		@see #navigateModal(URI, ModalListener)
 		*/
-		public void navigateModal(final String path, final ActionListener<ModalFrame<?, ?>> endModalListener)
+		public <R> void navigateModal(final String path, final ModalListener<R> modalListener)
 		{
-			navigateModal(createPathURI(path), endModalListener);	//navigate to the requested URI, converting the path to a URI and verifying that it is only a path
+			navigateModal(createPathURI(path), modalListener);	//navigate to the requested URI, converting the path to a URI and verifying that it is only a path
 		}
 
 		/**Requests modal navigation to the specified URI.
 		The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
 		Later requested navigation before navigation occurs will override this request.
+		@param <R> The type of modal result the modal frame produces.
 		@param uri Either a relative or absolute path, or an absolute URI.
-		@param endModalListener The listener to respond to the end of modal interaction.
+		@param modalListener The listener to respond to the end of modal interaction.
 		@exception NullPointerException if the given URI is <code>null</code>.
 		*/
-		public void navigateModal(final URI uri, final ActionListener<ModalFrame<?, ?>> endModalListener)
+		public <R> void navigateModal(final URI uri, final ModalListener<R> modalListener)
 		{
-			requestedNavigation=new ModalNavigation(getApplication().resolveURI(checkNull(uri, "URI cannot be null.")), endModalListener);	//resolve the URI against the application context path
+			requestedNavigation=new ModalNavigation<R>(getApplication().resolveURI(createPathURI(getNavigationPath())), getApplication().resolveURI(checkNull(uri, "URI cannot be null.")), modalListener);	//resolve the URI against the application context path
 		}		
 
 	/**The object that listenes for context state changes and updates the set of context states in response.*/
@@ -705,11 +766,20 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 			}
 		}
 
+	/**Called when the session is initialized.
+	@see #destroy()
+	*/
+	protected void initialize()
+	{
+		getApplication().addPropertyChangeListener(GuiseApplication.RESOURCE_BUNDLE_BASE_NAME_PROPERTY, resourceBundleReleasePropertyValueChangeListener);	//when the application changes its resource bundle base name, release the resource bundle		
+	}
 
-	/**Called when the session is destroyed.*/
+	/**Called when the session is destroyed.
+	@see #initialize()
+	*/
 	protected void destroy()
 	{
-		application.removePropertyChangeListener(GuiseApplication.RESOURCE_BUNDLE_BASE_NAME_PROPERTY, resourceBundleReleasePropertyValueChangeListener);	//stop listening for the application to change its resource bundle base name				
+		getApplication().removePropertyChangeListener(GuiseApplication.RESOURCE_BUNDLE_BASE_NAME_PROPERTY, resourceBundleReleasePropertyValueChangeListener);	//stop listening for the application to change its resource bundle base name				
 	}
 
 	/**The class that listens for context state changes and updates the context state set in response.

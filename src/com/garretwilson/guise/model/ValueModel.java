@@ -21,6 +21,7 @@ public interface ValueModel<V> extends ControlModel
 	/**Sets the input value.
 	This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method.
 	If a validator is installed, the value will first be validated before the current value is changed.
+	Validation always occurs if a validator is installed, even if the value is not changing.
 	@param newValue The input value of the model.
 	@exception ValidationException if the provided value is not valid.
 	@see #getValidator()

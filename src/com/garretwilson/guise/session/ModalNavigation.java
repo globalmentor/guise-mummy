@@ -2,30 +2,33 @@ package com.garretwilson.guise.session;
 
 import java.net.URI;
 
-import com.garretwilson.guise.component.ModalFrame;
-import com.garretwilson.guise.event.ActionListener;
+import com.garretwilson.guise.event.ModalListener;
+
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**The encapsulation of a point of modal navigation.
+@param <R> The type of modal result the modal frame produces.
 @author Garret Wilson
 */
-public class ModalNavigation extends Navigation
+public class ModalNavigation<R> extends Navigation
 {
 
 	/**The listener to respond to the end of modal interaction.*/
-	private final ActionListener<ModalFrame<?, ?>> endModalListener;
+	private final ModalListener<R> modalListener;
 
 		/**@return The listener to respond to the end of modal interaction.*/
-		protected final ActionListener<ModalFrame<?, ?>> getEndModalListener() {return endModalListener;}
+		public ModalListener<R> getModalListener() {return modalListener;}
 
 	/**Creates an object encapsulating a point of modal navigation.
-	@param navigationURI The point of modal navigation.
-	@param endModalListener The listener to respond to the end of modal interaction.
-	@exception NullPointerException if the given navigation URI and/or listener is <code>null</code>.
+	@param oldNavigationURI The old point of navigation, with an absolute path.
+	@param newNavigationURI The new point of navigation, with an absolute path.
+	@param modalListener The listener to respond to the end of modal interaction.
+	@exception NullPointerException if one of the navigation URIs is <code>null</code>, or does not contain a path.
+	@exception IllegalArgumentException if one of the given navigation URIs contains a relative path.
 	*/
-	public ModalNavigation(final URI navigationURI, final ActionListener<ModalFrame<?, ?>> endModalListener)
+	public ModalNavigation(final URI oldNavigationURI, final URI newNavigationURI, final ModalListener<R> modalListener)
 	{
-		super(navigationURI);	//construct the parent class
-		this.endModalListener=checkNull(endModalListener, "End modal listener cannot be null.");
+		super(oldNavigationURI, newNavigationURI);	//construct the parent class
+		this.modalListener=checkNull(modalListener, "Modal listener cannot be null.");
 	}
 }

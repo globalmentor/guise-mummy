@@ -2,21 +2,21 @@ package com.garretwilson.guise.component;
 
 import com.garretwilson.guise.session.GuiseSession;
 
-/**Frame that represents a point of modal navigation.
-Each dialog frame subclass must provide either a Guise session constructor; or a Guise session and string ID constructor.
+/**Default implementation of a frame that represents a point of modal navigation.
+Each frame subclass must provide either a Guise session constructor; or a Guise session and string ID constructor.
 @param <R> The type of modal result this modal frame produces.
 @author Garret Wilson
-@see #DialogFrame(GuiseSession)
-@see #DialogFrame(GuiseSession, String)
+@see #DefaultModalFrame(GuiseSession)
+@see #DefaultModalFrame(GuiseSession, String)
 */
-public class DialogFrame<R> extends AbstractModalFrame<R, DialogFrame<R>>
+public class DefaultModalFrame<R> extends AbstractModalFrame<R, DefaultModalFrame<R>>
 {
 
 	/**Session constructor.
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public DialogFrame(final GuiseSession<?> session)
+	public DefaultModalFrame(final GuiseSession<?> session)
 	{
 		this(session, (String)null);	//construct the component, indicating that a default ID should be used
 	}
@@ -27,7 +27,7 @@ public class DialogFrame<R> extends AbstractModalFrame<R, DialogFrame<R>>
 	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public DialogFrame(final GuiseSession<?> session, final String id)
+	public DefaultModalFrame(final GuiseSession<?> session, final String id)
 	{
 		this(session, id, null);	//default to no content component
 	}
@@ -37,7 +37,7 @@ public class DialogFrame<R> extends AbstractModalFrame<R, DialogFrame<R>>
 	@param content The component representing this frame's content, <code>null</code> if this frame has no content.
 	@exception NullPointerException if the given session and/or content component is <code>null</code>.
 	*/
-	public DialogFrame(final GuiseSession<?> session, final Component<?> content)
+	public DefaultModalFrame(final GuiseSession<?> session, final Component<?> content)
 	{
 		this(session, null, content);	//construct the component with the content component, indicating that a default ID should be used
 	}
@@ -49,7 +49,7 @@ public class DialogFrame<R> extends AbstractModalFrame<R, DialogFrame<R>>
 	@exception NullPointerException if the given session and/or content component is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public DialogFrame(final GuiseSession<?> session, final String id, final Component<?> content)
+	public DefaultModalFrame(final GuiseSession<?> session, final String id, final Component<?> content)
 	{
 		super(session, id, content);	//construct the parent class
 	}

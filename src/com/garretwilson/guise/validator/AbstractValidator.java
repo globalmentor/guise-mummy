@@ -3,6 +3,8 @@ package com.garretwilson.guise.validator;
 import static java.text.MessageFormat.*;
 import static com.garretwilson.guise.GuiseResourceConstants.*;
 import com.garretwilson.guise.session.GuiseSession;
+import com.garretwilson.util.Debug;
+
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**An abstract implementation of an object that can determine whether a value is valid.
@@ -58,7 +60,7 @@ public abstract class AbstractValidator<V> implements Validator<V>
 			}
 			else	//for all other invalid values
 			{
-				throw new ValidationException(format(getSession().getStringResource(VALIDATOR_VALUE_REQUIRED_MESSAGE_RESOURCE), value), value);
+				throw new ValidationException(format(getSession().getStringResource(VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE), value), value);
 			}
 		}
 	}

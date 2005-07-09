@@ -14,4 +14,6 @@ public interface Model extends PropertyBindable
 	/**@return The Guise session that owns this model.*/
 	public GuiseSession<?> getSession();
 
+	/**@return Whether the contents of this model are valid.*/
+	public boolean isValid();
 }

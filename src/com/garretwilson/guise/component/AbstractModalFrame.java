@@ -17,7 +17,7 @@ public abstract class AbstractModalFrame<R, C extends ModalFrame<R, C>> extends 
 	private R result=null;
 
 		/**@return The result of this frame's modal interaction, or <code>null</code> if no result is given.*/
-		public R result() {return result;}
+		public R getResult() {return result;}
 
 		/**Sets the modal result.
 		This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method.

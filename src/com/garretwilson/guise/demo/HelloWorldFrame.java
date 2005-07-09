@@ -9,7 +9,7 @@ Copyright © 2005 GlobalMentor, Inc.
 Demonstrates frames and headings.
 @author Garret Wilson
 */
-public class HelloWorldFrame extends NavigationFrame
+public class HelloWorldFrame extends DefaultFrame
 {
 
 	/**Guise session constructor.

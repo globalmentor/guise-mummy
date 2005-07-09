@@ -9,6 +9,8 @@ import com.garretwilson.guise.component.*;
 import com.garretwilson.guise.component.layout.*;
 import com.garretwilson.guise.event.ActionEvent;
 import com.garretwilson.guise.event.ActionListener;
+import com.garretwilson.guise.event.ModalEvent;
+import com.garretwilson.guise.event.ModalListener;
 import com.garretwilson.guise.event.NavigateActionListener;
 import com.garretwilson.guise.model.AbstractModelGroup;
 import com.garretwilson.guise.model.ActionModel;
@@ -25,7 +27,7 @@ import com.garretwilson.util.Debug;
 /**Test frame for a home page.
 @author Garret Wilson
 */
-public class HomeFrame extends NavigationFrame
+public class HomeFrame extends DefaultFrame
 {
 
 	/**Guise session constructor.
@@ -84,12 +86,12 @@ public class HomeFrame extends NavigationFrame
 				{
 					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
 					{
-						getSession().navigateModal("edituser", new ActionListener<ModalFrame<?, ?>>()
+						getSession().navigateModal("edituser", new ModalListener<Object>()
 								{
-									/**Called when an action is initiated.
-									@param actionEvent The event indicating the source of the action.
+									/**Called when an a modal frame ends its modality.
+									@param modalEvent The event indicating the frame ending modality and the modal value.
 									*/
-									public void actionPerformed(final ActionEvent<ModalFrame<?, ?>> actionEvent)
+									public void modalEnded(final ModalEvent<Object> modalEvent)
 									{
 										
 									}

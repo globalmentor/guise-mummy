@@ -353,6 +353,22 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 		}
 	}
 
+	/**Determines whether the models of this component and all of its child components are valid.
+	This version returns <code>true</code> if all its child components are valid.
+	@return Whether the models of this component and all of its child components are valid.
+	*/
+	public boolean isValid()
+	{
+		for(final Component<?> childComponent:this)	//for each child component
+		{
+			if(!childComponent.isValid())	//if this child component isn't valid
+			{
+				return false;	//indicate that this component is consequently not valid
+			}
+		}
+		return true;	//indicate that all child components are valid
+	}
+
 	/**@return The character used by this component when building absolute IDs.*/
 	public char getAbsoluteIDSegmentDelimiter()
 	{
@@ -408,11 +424,11 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	This method delegates to the installed controller, and if no controller is installed one is created and installed.
 	@param context Guise context information.
 	@exception IOException if there is an error updating the model.
-	@exception ValidationException if the view information is not valid to store in the model.
+	@exception ValidationsException if the view information is not valid to store in the model.
 	@see #getController(GC, C)
 	@see GuiseContext.State#UPDATE_MODEL
 	*/
-	public <GC extends GuiseContext<?>> void updateModel(final GC context) throws IOException, ValidationException
+	public <GC extends GuiseContext<?>> void updateModel(final GC context) throws IOException, ValidationsException
 	{
 		final Controller<? super GC, ? super C> controller=getController(context);	//get the controller
 		controller.updateModel(context, getThis());	//tell the controller to update the model

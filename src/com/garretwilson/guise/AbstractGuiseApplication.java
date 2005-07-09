@@ -11,7 +11,7 @@ import static com.garretwilson.guise.GuiseResourceConstants.*;
 
 import com.garretwilson.guise.component.Component;
 import com.garretwilson.guise.component.Frame;
-import com.garretwilson.guise.component.NavigationFrame;
+import com.garretwilson.guise.component.DefaultFrame;
 import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.controller.*;
 import com.garretwilson.lang.ObjectUtilities;
@@ -308,7 +308,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		@return The type of frame bound to the given path, or <code>null</code> if no frame is bound to the path. 
 		@exception IllegalArgumentException if the provided path is absolute.
 		*/
-		public Class<? extends Frame> getBoundNavigationFrameClass(final String path)
+		public Class<? extends Frame> getNavigationFrameClass(final String path)
 		{
 			if(isAbsolutePath(path))	//if the path is absolute
 			{
