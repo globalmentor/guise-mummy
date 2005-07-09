@@ -1,12 +1,16 @@
 package com.garretwilson.guise.demo;
 
 import java.security.Principal;
+import java.text.Collator;
 
-/**A demo user class for the Guise demo.
+/**A user class for the Guise demo.
 @author Garret Wilson
 */
-public class User implements Principal
+public class DemoUser implements Principal, Comparable<DemoUser>
 {
+
+	/**The collator for comparing user names.*/
+	protected final static Collator COLLATOR=Collator.getInstance();
 
 	/**The user ID.*/
 	private final String id;
@@ -53,7 +57,7 @@ public class User implements Principal
 	@param email The email address of the user.
 	@exception NullPointerException if the ID, first name, last name, and/or email address is <code>null</code>.
 	*/
-	public User(final String id, final String firstName, final String middleName, final String lastName, final String email)
+	public DemoUser(final String id, final String firstName, final String middleName, final String lastName, final String email)
 	{
 		if(id==null || firstName==null || lastName==null || email==null)	//if anything besides the middle name is null
 		{
@@ -66,12 +70,22 @@ public class User implements Principal
 		this.email=email;
 	}
 
+	/**Compares users based upon lastName+firstName+middleName+ID.
+	A more internationalized 
+	@param user The user with which to compare.
+	@return A value indicating whether the first user is alphabetically less than, equal to, or greater than the second.
+	*/
+	public int compareTo(final DemoUser user)
+	{
+		return COLLATOR.compare(getLastName()+getFirstName()+getMiddleName()+getID(), user.getLastName()+user.getFirstName()+user.getMiddleName()+user.getID());	//compare names
+	}
+
 	/**@return <code>true</code> if the given object is another user with the same ID.
 	@see #getID()
 	*/
 	public boolean equals(final Object object)
 	{
-		return object instanceof User && getID().equals(((User)object).getID());	//see if the other object is a user with the same ID
+		return object instanceof DemoUser && getID().equals(((DemoUser)object).getID());	//see if the other object is a user with the same ID
 	}
 
 	/**@return The hash code for this user.

@@ -14,7 +14,7 @@ public class ModalEvent<R> extends GuiseEvent<ModalFrame<R, ?>>
 	private final R result;
 
 		/**@return The result of this frame's modal interaction, or <code>null</code> if no result is given.*/
-		public R result() {return result;}
+		public R getResult() {return result;}
 
 	/**Session and source constructor.
 	@param session The Guise session in which this event was generated.

@@ -3,12 +3,7 @@ package com.garretwilson.guise.model;
 import java.util.*;
 
 import com.garretwilson.event.EventListenerManager;
-import com.garretwilson.guise.event.ListEvent;
-import com.garretwilson.guise.event.ListListener;
-import com.garretwilson.guise.event.PostponedListEvent;
-import com.garretwilson.guise.event.PostponedSelectionEvent;
-import com.garretwilson.guise.event.SelectionEvent;
-import com.garretwilson.guise.event.SelectionListener;
+import com.garretwilson.guise.event.*;
 
 import static java.util.Collections.*;
 import static com.garretwilson.util.ArrayUtilities.*;
@@ -34,6 +29,18 @@ public abstract class AbstractSelectionStrategy<V> implements SelectionStrategy<
 		/**@return The thread-safe sorted set of selected indices on which synchronization can be performed.*/
 		protected Set<Integer> getSelectedIndices() {return selectedIndices;}
 
+	/**Determines the selected index.
+	If more than one index is selected, the lead selected index will be returned.
+	@param selectModel The model containing the selected values.
+	@return The index currently selected, or -1 if no index is selected.
+	@see #getSelectedValue(SelectModel)
+	*/
+	public int getSelectedIndex(final SelectModel<V> selectModel)
+	{
+		final int[] selectedIndices=getSelectedIndices(selectModel);	//get the selected indices
+		return selectedIndices.length>0 ? selectedIndices[0] : -1;	//if there are indices, return the first one		
+	}
+
 	/**Determines the selected indices.
 	@param selectModel The model containing the selected values.
 	@return The indices currently selected.
@@ -54,6 +61,18 @@ public abstract class AbstractSelectionStrategy<V> implements SelectionStrategy<
 		return intIndices;	//return the selected indexes
 	}
 
+	/**Determines the selected value.
+	If more than one value is selected, the lead selected value will be returned.
+	@param selectModel The model containing the selected values.
+	@return The value currently selected, or <code>null</code> if no value is currently selected.
+	@see #getSelectedIndex(SelectModel)
+	*/
+	public V getSelectedValue(final SelectModel<V> selectModel)
+	{
+		final V[] selectedValues=getSelectedValues(selectModel);	//get the selected values
+		return selectedValues.length>0 ? selectedValues[0] : null;	//if there are values, return the first one
+	}
+
 	/**Determines the selected values.
 	@param selectModel The model containing the selected values.
 	@return The values currently selected.
@@ -65,7 +84,7 @@ public abstract class AbstractSelectionStrategy<V> implements SelectionStrategy<
 		{
 			final int[] selectedIndices=getSelectedIndices(selectModel);	//get the selected indices
 			final V[] selectedValues=createArray(selectModel.getValueClass(), selectedIndices.length);	//create an array of selected objects
-			for(int i=selectedIndices.length; i>=0; --i)	//for each selected index
+			for(int i=selectedIndices.length-1; i>=0; --i)	//for each selected index
 			{
 				selectedValues[i]=selectModel.get(selectedIndices[i]);	//get the value from the model at this index
 			}
@@ -110,7 +129,7 @@ public abstract class AbstractSelectionStrategy<V> implements SelectionStrategy<
 		synchronized(selectModel)	//don't allow the model to be changed while we determine the indices 
 		{
 			final int[] indices=new int[values.length];	//create a new array in which to hold the indices to select
-			for(int i=values.length; i>=0; --i)	//for each value
+			for(int i=values.length-1; i>=0; --i)	//for each value
 			{
 				indices[i]=selectModel.indexOf(values[i]);	//get the index of this value, ignoring whether it is valid as its validity will be checked in setSelectedIndices()
 			}

@@ -9,11 +9,10 @@ import com.garretwilson.guise.validator.*;
 
 /**Edit User Guise demonstration frame.
 Copyright © 2005 GlobalMentor, Inc.
-Demonstrates float input controls, float input validation, radio button controls,
-	required value validation, disabled controls, and style IDs.
+Demonstrates modal frames, component validity checks, ending modality, and modal cancel functionality.
 @author Garret Wilson
 */
-public class EditUserFrame extends DefaultModalFrame<User>
+public class EditUserFrame extends DefaultModalFrame<DemoUser>
 {
 
 	private final TextControl<String> idControl; 
@@ -98,25 +97,32 @@ public class EditUserFrame extends DefaultModalFrame<User>
 	/**Initializes the frame with user information.
 	@param user The user with which to initialize the frame.
 	@exception NullPointerException if the provided user is <code>null</code>.
-	@exception ValidationException if any user information is invalid.
+	@exception IllegalArgumentException if any user information is invalid.
 	*/
-	public void setUser(final User user) throws ValidationException
+	public void setUser(final DemoUser user)
 	{
-		idControl.getModel().setValue(user.getID());	//update the values
-		firstNameControl.getModel().setValue(user.getFirstName());
-		middleNameControl.getModel().setValue(user.getMiddleName());
-		lastNameControl.getModel().setValue(user.getLastName());
-		emailControl.getModel().setValue(user.getEmail());
+		try
+		{
+			idControl.getModel().setValue(user.getID());	//update the values
+			firstNameControl.getModel().setValue(user.getFirstName());
+			middleNameControl.getModel().setValue(user.getMiddleName());
+			lastNameControl.getModel().setValue(user.getLastName());
+			emailControl.getModel().setValue(user.getEmail());
+		}
+		catch(final ValidationException validationException)	//if the user information is invalid
+		{
+			throw new IllegalArgumentException(validationException);
+		}
 	}
 
 	/**@return A user representing the information entered in the frame.*/
-	public User getUser()
+	public DemoUser getUser()
 	{
-		return new User(	//create and return a new user
+		return new DemoUser(	//create and return a new user
 				idControl.getModel().getValue(),
 				firstNameControl.getModel().getValue(),
 				middleNameControl.getModel().getValue(),
-				firstNameControl.getModel().getValue(),
+				lastNameControl.getModel().getValue(),
 				emailControl.getModel().getValue());
 	}
 }

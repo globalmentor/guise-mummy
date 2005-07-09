@@ -224,11 +224,42 @@ public class DefaultSelectModel<V> extends DefaultControlModel implements Select
 	*/
 	public synchronized List<V> subList(final int fromIndex, final int toIndex) {return values.subList(fromIndex, toIndex);}
 
+	/**Replaces the first occurrence in the of the given value with its replacement.
+	This method ensures that another thread does not change the model while the search and replace operation occurs.
+	@param oldValue The value for which to search.
+	@param newValue The replacement value.
+	@return Whether the operation resulted in a modification of the model.
+	*/
+	public synchronized boolean replace(final V oldValue, final V newValue)
+	{
+		final int index=indexOf(oldValue);	//get the index of the old value
+		if(index>=0)	//if the value is in the model
+		{
+			set(index, newValue);	//change the value at the given index, which will fire the appropriate event
+			return true;	//indicate that we modified the model
+		}
+		else	//if the value is not in the model
+		{
+			return false;	//report that the old value could not be found
+		}
+	}
+
 	/**The selection strategy for this model.*/
 	private SelectionStrategy<V> selectionStrategy;
 
 		/**@return The selection strategy for this model.*/
 		public SelectionStrategy<V> getSelectionStrategy() {return selectionStrategy;}
+
+	/**Determines the selected index.
+	This method delegates to the selection strategy.
+	If more than one index is selected, the lead selected index will be returned.
+	@return The index currently selected, or -1 if no index is selected.
+	@see #getSelectedValue()
+	*/
+	public int getSelectedIndex()
+	{
+		return getSelectionStrategy().getSelectedIndex(this);	//delegate to the selection strategy		
+	}
 
 	/**Determines the selected indices.
 	This method delegates to the selection strategy.
@@ -238,6 +269,17 @@ public class DefaultSelectModel<V> extends DefaultControlModel implements Select
 	public int[] getSelectedIndices()
 	{
 		return getSelectionStrategy().getSelectedIndices(this);	//delegate to the selection strategy
+	}
+
+	/**Determines the selected value.
+	This method delegates to the selection strategy.
+	If more than one value is selected, the lead selected value will be returned.
+	@return The value currently selected, or <code>null</code> if no value is currently selected.
+	@see #getSelectedIndex()
+	*/
+	public V getSelectedValue()
+	{
+		return getSelectionStrategy().getSelectedValue(this);	//delegate to the selection strategy		
 	}
 
 	/**Determines the selected values.
@@ -313,6 +355,7 @@ public class DefaultSelectModel<V> extends DefaultControlModel implements Select
 	}
 
 	/**Fires an event to all registered list listeners indicating the list was modified.
+	This method first manually notifies its selection strategy that the list has changed.
 	@param index The index at which an element was added and/or removed, or -1 if the index is unknown.
 	@param addedElement The element that was added to the list, or <code>null</code> if no element was added or it is unknown whether or which elements were added.
 	@param removedElement The element that was removed from the list, or <code>null</code> if no element was removed or it is unknown whether or which elements were removed.
@@ -321,10 +364,11 @@ public class DefaultSelectModel<V> extends DefaultControlModel implements Select
 	*/
 	protected void fireListModified(final int index, final V addedElement, final V removedElement)
 	{
+		final ListEvent<SelectModel<V>, V> listEvent=new ListEvent<SelectModel<V>, V>(getSession(), this, index, addedElement, removedElement);	//create a new event
+		getSelectionStrategy().listModified(listEvent);	//manually notify the selection strategy, because the queued event might be delayed and reported out of order
 		if(getEventListenerManager().hasListeners(ListListener.class))	//if there are appropriate listeners registered
 		{
-			final ListEvent<SelectModel, V> listEvent=new ListEvent<SelectModel, V>(getSession(), this, index, addedElement, removedElement);	//create a new event
-			getSession().queueModelEvent(new PostponedListEvent<SelectModel, V>(getEventListenerManager(), listEvent));	//tell the Guise session to queue the event
+			getSession().queueModelEvent(new PostponedListEvent<SelectModel<V>, V>(getEventListenerManager(), listEvent));	//tell the Guise session to queue the event
 		}
 	}
 
@@ -345,7 +389,7 @@ public class DefaultSelectModel<V> extends DefaultControlModel implements Select
 	}
 
 	/**Constructs a select model indicating the type of values it can hold.
-	The selection strategy will be added as a listener to this model so that it can be notified of list changes.
+	The selection strategy is not added as a listener to this model but is rather notified manually so that the event won't be delayed and/or sent out of order
 	@param session The Guise session that owns this model.
 	@param valueClass The class indicating the type of values held in the model.
 	@param selectionStrategy The strategy for selecting values in the model.
@@ -356,6 +400,5 @@ public class DefaultSelectModel<V> extends DefaultControlModel implements Select
 		super(session);	//construct the parent class
 		this.valueClass=checkNull(valueClass, "Value class cannot be null.");	//store the value class
 		this.selectionStrategy=checkNull(selectionStrategy, "Selection strategy cannot be null.");
-		addListListener(selectionStrategy);	//allow the selection strategy to be notified when this list changes
 	}
 }

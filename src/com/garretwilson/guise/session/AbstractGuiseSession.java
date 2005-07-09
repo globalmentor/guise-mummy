@@ -418,12 +418,9 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 	@return The frame bound to the given path, or <code>null</code> if no frame is bound to the given path.
 	@exception NullPointerException if the path is null.
 	@exception IllegalArgumentException if the provided path is absolute.
-	@exception NoSuchMethodException if the frame bound to the path does not provide Guise session constructor; or a Guise session and ID string constructor.
-	@exception IllegalAccessException if the bound frame enforces Java language access control and the underlying constructor is inaccessible.
-	@exception InstantiationException if the bound frame is an abstract class.
-	@exception InvocationTargetException if the bound frame's underlying constructor throws an exception.
+	@exception IllegalStateException if the frame class bound to the path does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
 	*/
-	public Frame getNavigationFrame(final String path) throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException
+	public Frame getNavigationFrame(final String path)
 	{
 		if(isAbsolutePath(checkNull(path, "Path cannot be null")))	//if the path is absolute
 		{
@@ -440,14 +437,33 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 				{
 					try
 					{
-						final String frameID=createName(path);	//convert the path to a valid ID TODO use a Guise-specific routine or, better yet, bind an ID with the frame
-						frame=frameClass.getConstructor(GuiseSession.class, String.class).newInstance(this, frameID);	//find the Guise session and ID constructor and create an instance of the class
+						try
+						{
+							final String frameID=createName(path);	//convert the path to a valid ID TODO use a Guise-specific routine or, better yet, bind an ID with the frame
+							frame=frameClass.getConstructor(GuiseSession.class, String.class).newInstance(this, frameID);	//find the Guise session and ID constructor and create an instance of the class
+						}
+						catch(final NoSuchMethodException noSuchMethodException)	//if there was no Guise session and string ID constructor
+						{
+							frame=frameClass.getConstructor(GuiseSession.class).newInstance(this);	//use the Guise session constructor if there is one					
+						}
+						navigationPathFrameMap.put(path, frame);	//bind the frame to the path, caching it for next time
 					}
-					catch(final NoSuchMethodException noSuchMethodException)	//if there was no Guise session and string ID constructor
+					catch(final NoSuchMethodException noSuchMethodException)	//if the constructor could not be found
 					{
-						frame=frameClass.getConstructor(GuiseSession.class).newInstance(this);	//use the Guise session constructor if there is one					
+						throw new IllegalStateException(noSuchMethodException);
 					}
-					navigationPathFrameMap.put(path, frame);	//bind the frame to the path, caching it for next time
+					catch(final IllegalAccessException illegalAccessException)	//if the constructor is not visible
+					{
+						throw new IllegalStateException(illegalAccessException);
+					}
+					catch(final InstantiationException instantiationException)	//if the class is an interface or is abstract
+					{
+						throw new IllegalStateException(instantiationException);
+					}
+					catch(final InvocationTargetException invocationTargetException)	//if the constructor throws an exception
+					{
+						throw new IllegalStateException(invocationTargetException);
+					}
 				}
 			}
 		}

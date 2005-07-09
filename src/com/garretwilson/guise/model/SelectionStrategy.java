@@ -25,6 +25,14 @@ public interface SelectionStrategy<V> extends ListListener<SelectModel<V>, V>
 	*/
 	public V[] getSelectedValues(final SelectModel<V> selectModel);
 
+	/**Determines the selected index.
+	If more than one index is selected, the lead selected index will be returned.
+	@param selectModel The model containing the selected values.
+	@return The index currently selected, or -1 if no index is selected.
+	@see #getSelectedValue(SelectModel)
+	*/
+	public int getSelectedIndex(final SelectModel<V> selectModel);
+
 	/**Sets the selected indices.
 	Invalid and duplicate indices will be ignored.
 	@param selectModel The model containing the values to select.
@@ -33,6 +41,14 @@ public interface SelectionStrategy<V> extends ListListener<SelectModel<V>, V>
 	@see #addSelectedIndex(SelectModel, int)
 	*/
 	public void setSelectedIndices(final SelectModel<V> selectModel, final int... indices);
+
+	/**Determines the selected value.
+	If more than one value is selected, the lead selected value will be returned.
+	@param selectModel The model containing the selected values.
+	@return The value currently selected, or <code>null</code> if no value is currently selected.
+	@see #getSelectedIndex(SelectModel)
+	*/
+	public V getSelectedValue(final SelectModel<V> selectModel);
 
 	/**Sets the selected values.
 	If a value occurs more than one time in the model, the first occurrence of the value will be selected.

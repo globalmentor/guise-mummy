@@ -162,12 +162,9 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	@return The frame bound to the given path, or <code>null</code> if no frame is bound to the given path.
 	@exception NullPointerException if the path is null.
 	@exception IllegalArgumentException if the provided path is absolute.
-	@exception NoSuchMethodException if the frame bound to the path does not provide Guise session constructor; or a Guise session and ID string constructor.
-	@exception IllegalAccessException if the bound frame enforces Java language access control and the underlying constructor is inaccessible.
-	@exception InstantiationException if the bound frame is an abstract class.
-	@exception InvocationTargetException if the bound frame's underlying constructor throws an exception.
+	@exception IllegalStateException if the frame class bound to the path does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
 	*/
-	public Frame getNavigationFrame(final String path) throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException;
+	public Frame getNavigationFrame(final String path);
 
 	/**Releases the frame bound to the given appplication context-relative path.
 	@param path The appplication context-relative path within the Guise container context.

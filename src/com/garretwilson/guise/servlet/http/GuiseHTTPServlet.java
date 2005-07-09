@@ -305,22 +305,6 @@ Debug.trace("Referrer:", getReferer(request));
 				super.doGet(request, response);	//let the default functionality take over
 			}
 		}
-		catch(final NoSuchMethodException noSuchMethodException)	//catch and rethrow instantiation errors from retrieving/creating the frame
-		{
-			throw new ServletException(noSuchMethodException);
-		}
-		catch(final InvocationTargetException invocationTargetException)
-		{
-			throw new ServletException(invocationTargetException);
-		}
-		catch(final InstantiationException instantiationException)
-		{
-			throw new ServletException(instantiationException);
-		}
-		catch(final IllegalAccessException illegalAccessException)
-		{
-			throw new ServletException(illegalAccessException);
-		}
 		finally
 		{
 			guiseContext.setState(GuiseContext.State.INACTIVE);	//always deactivate the context			

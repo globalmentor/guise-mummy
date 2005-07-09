@@ -9,16 +9,26 @@ import com.garretwilson.guise.session.GuiseSession;
 public class DefaultActionModel extends DefaultControlModel implements ActionModel
 {
 
-	/**Whether the button is pressed.*/
-	private boolean pressed=false;
+	/**The confirmation message for the action, or <code>null</code> if there is no confirmation message.*/
+	private MessageModel confirmationMessage;
 
-		/**@return Whether the button is pressed.*/
-		public boolean isPressed() {return pressed;}
+		/**@return The confirmation message for the action, or <code>null</code> if there is no confirmation message.*/
+		public MessageModel getConfirmationMessage() {return confirmationMessage;}
 
-		/**Sets whether the button is pressed.
-		@param newPressed Whether the button should be in the pressed state.
+		/**Sets the confirmation message.
+		This is a bound property
+		@param newConfirmationMessage The new confirmation message for the action, or <code>null</code> if there is no confirmation message.
+		@see ActionModel#CONFIRMATION_MESSAGE_PROPERTY
 		*/
-		public void setPressed(final boolean newPressed) {pressed=newPressed;}
+		public void setConfirmationMessage(final MessageModel newConfirmationMessage)
+		{
+			if(confirmationMessage!=newConfirmationMessage)	//if the value is really changing
+			{
+				final MessageModel oldConfirmationMessage=confirmationMessage;	//get the old value
+				confirmationMessage=newConfirmationMessage;	//actually change the value
+				firePropertyChange(CONFIRMATION_MESSAGE_PROPERTY, oldConfirmationMessage, newConfirmationMessage);	//indicate that the value changed
+			}
+		}
 
 	/**Adds an action listener.
 	@param actionListener The action listener to add.
