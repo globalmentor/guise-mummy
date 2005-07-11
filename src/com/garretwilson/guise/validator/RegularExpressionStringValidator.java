@@ -19,7 +19,7 @@ public class RegularExpressionStringValidator extends AbstractValidator<String>
 	/**Constructs a string regular expression validator from a regular expression string, without requiring a non-<code>null</code> value..
 	@param session The Guise session that owns this validator.
 	@param regularExpression The regular expression against which to validate string values.
-	@exception NullPointerException if the given regular expression is <code>null</code>.
+	@exception NullPointerException if the given session and/or regular expression is <code>null</code>.
 	*/
 	public RegularExpressionStringValidator(final GuiseSession<?> session, final String regularExpression)
 	{
@@ -30,7 +30,7 @@ public class RegularExpressionStringValidator extends AbstractValidator<String>
 	@param session The Guise session that owns this validator.
 	@param regularExpression The regular expression against which to validate string values.
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
-	@exception NullPointerException if the given regular expression is <code>null</code>.
+	@exception NullPointerException if the given session and/or regular expression is <code>null</code>.
 	*/
 	public RegularExpressionStringValidator(final GuiseSession<?> session, final String regularExpression, final boolean valueRequired)
 	{

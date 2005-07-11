@@ -22,23 +22,13 @@ public class EditUsersFrame extends DefaultFrame	//TODO add a way to keep user I
 	/**The application-relative navigation path to the edit user modal frame.*/
 	protected final static String EDIT_USER_FRAME_NAVIGATION_PATH="edituser";
 
-	/**Comparator for comparing users.*/
-	protected final static Comparator<DemoUser> USER_COMPARATOR=new Comparator<DemoUser>()
-			{
-				/**Compares users based upon lastName+firstName+middleName+ID.*/
-				public int compare(final DemoUser user1, final DemoUser user2)
-				{
-					return (user1.getLastName()+user1.getFirstName()+user1.getMiddleName()+user1.getID()).compareTo(user2.getLastName()+user2.getFirstName()+user2.getMiddleName()+user2.getID());
-				}
-			};
-	
 	/**Guise session constructor.
 	@param session The Guise session that owns this frame.
 	*/
 	public EditUsersFrame(final GuiseSession<?> session)
 	{
 		super(session);	//construct the parent class
-		getModel().setLabel("Edit Users Guise\u2122 Demonstration");	//set the frame title	
+		getModel().setLabel("Guise\u2122 Demonstration: Edit Users");	//set the frame title	
 
 		final ListControl<DemoUser> userListControl=new ListControl<DemoUser>(session, DemoUser.class, new SingleSelectionStrategy<DemoUser>());	//create a list control allowing only single selections
 		userListControl.getModel().setLabel("Users");	//set the list control label

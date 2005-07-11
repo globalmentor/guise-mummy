@@ -27,7 +27,7 @@ public class EditUserFrame extends DefaultModalFrame<DemoUser>
 	public EditUserFrame(final GuiseSession<?> session)
 	{
 		super(session);	//construct the parent class
-		getModel().setLabel("Edit User Guise\u2122 Demonstration");	//set the frame title	
+		getModel().setLabel("Guise\u2122 Demonstration: Edit User");	//set the frame title	
 
 		final Panel idPanel=new Panel(session, new FlowLayout(Axis.X));	//create the ID panel flowing horizontally
 			//ID

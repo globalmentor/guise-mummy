@@ -9,7 +9,8 @@ import com.garretwilson.guise.validator.RegularExpressionStringValidator;
 
 /**Hello User Guise demonstration frame.
 Copyright © 2005 GlobalMentor, Inc.
-Demonstrates hidden components, text controls, control labels, text control regular expression validators, buttons, and listeners.
+Demonstrates hidden components, text controls, control labels,
+	text control regular expression validators, buttons, and model value change listeners.
 @author Garret Wilson
 */
 public class HelloUserFrame extends DefaultFrame
@@ -21,7 +22,7 @@ public class HelloUserFrame extends DefaultFrame
 	public HelloUserFrame(final GuiseSession<?> session)
 	{
 		super(session);	//construct the parent class
-		getModel().setLabel("Hello User Guise\u2122 Demonstration");	//set the frame title	
+		getModel().setLabel("Guise\u2122 Demonstration: Hello User");	//set the frame title	
 
 		final Panel panel=new Panel(session, new FlowLayout(Axis.Y));	//create a panel flowing vertically
 		final Label helloUserLabel=new Label(session);	//create a label

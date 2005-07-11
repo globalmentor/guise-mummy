@@ -3,7 +3,6 @@ package com.garretwilson.guise.servlet.http;
 import java.io.*;
 import java.net.URI;
 import java.util.*;
-
 import static java.util.Collections.*;
 
 import javax.mail.internet.ContentType;
@@ -11,16 +10,17 @@ import javax.servlet.http.*;
 
 import com.garretwilson.guise.context.GuiseContext;
 import com.garretwilson.guise.context.text.AbstractTextGuiseContext;
+import com.garretwilson.guise.model.FileItemResourceImport;
 import com.garretwilson.guise.session.GuiseSession;
 import static com.garretwilson.io.ContentTypeConstants.*;
 import static com.garretwilson.io.ContentTypeUtilities.*;
-
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
-
 import com.garretwilson.text.CharacterEncoding;
 import static com.garretwilson.text.CharacterEncodingConstants.*;
 import com.garretwilson.util.*;
+
+import org.apache.commons.fileupload.*;
 
 /**The Guise context of an HTTP servlet.
 The output stream defaults to <code>text/plain</code> encoded in <code>UTF-8</code>.
@@ -64,15 +64,38 @@ public class HTTPServletGuiseContext extends AbstractTextGuiseContext<HTTPServle
 		this.navigationURI=URI.create(request.getRequestURL().toString());	//create the absolute navigation URI from the HTTP requested URL
 			//populate our parameter map
 		final ListMap<Object, Object> parameterListMap=getParameterListMap();	//get the map of parameter lists
-		final Iterator parameterEntryIterator=request.getParameterMap().entrySet().iterator();	//get an iterator to the parameter entries
-		while(parameterEntryIterator.hasNext())	//while there are more parameter entries
+		if(FileUpload.isMultipartContent(request))	//if this is multipart/form-data content
 		{
-			final Map.Entry parameterEntry=(Map.Entry)parameterEntryIterator.next();	//get the next parameter entry
-			final String parameterKey=(String)parameterEntry.getKey();	//get the parameter key
-			final String[] parameterValues=(String[])parameterEntry.getValue();	//get the parameter values
-			final List<Object> parameterValueList=new ArrayList<Object>(parameterValues.length);	//create a list to hold the parameters
-			addAll(parameterValueList, parameterValues);	//add all the parameter values to our list
-			parameterListMap.put(parameterKey, parameterValueList);	//store the the array of values as a list, keyed to the value
+			final DiskFileUpload diskFileUpload=new DiskFileUpload();	//create a file upload handler
+			diskFileUpload.setSizeMax(-1);	//don't reject anything
+			try	//try to parse the file items submitted in the request
+			{
+				final List fileItems=diskFileUpload.parseRequest(request);	//parse the request
+				for(final Object object:fileItems)	//look at each file item
+				{
+					final FileItem fileItem=(FileItem)object;	//cast the object to a file item
+					final String parameterKey=fileItem.getFieldName();	//the parameter key will always be the field name
+					final Object parameterValue=fileItem.isFormField() ? fileItem.getString() : new FileItemResourceImport(fileItem);	//if this is a form field, store it normally; otherwise, create a file item resource import object
+					parameterListMap.addItem(parameterKey, parameterValue);	//store the value in the parameters
+				}
+			}
+			catch(final FileUploadException fileUploadException)	//if there was an error parsing the files
+			{
+				throw new IllegalArgumentException("Couldn't parse multipart/form-data request.");
+			}
+		}
+		else	//if this is normal application/x-www-form-urlencoded data
+		{
+			final Iterator parameterEntryIterator=request.getParameterMap().entrySet().iterator();	//get an iterator to the parameter entries
+			while(parameterEntryIterator.hasNext())	//while there are more parameter entries
+			{
+				final Map.Entry parameterEntry=(Map.Entry)parameterEntryIterator.next();	//get the next parameter entry
+				final String parameterKey=(String)parameterEntry.getKey();	//get the parameter key
+				final String[] parameterValues=(String[])parameterEntry.getValue();	//get the parameter values
+				final List<Object> parameterValueList=new ArrayList<Object>(parameterValues.length);	//create a list to hold the parameters
+				addAll(parameterValueList, parameterValues);	//add all the parameter values to our list
+				parameterListMap.put(parameterKey, parameterValueList);	//store the the array of values as a list, keyed to the value
+			}
 		}
 		final ContentType defaultContentType=createContentType(outputContentType.getPrimaryType(), outputContentType.getSubType(), new NameValuePair<String, String>(CHARSET_PARAMETER, UTF_8));	//default to text/plain encoded in UTF-8
 		response.setContentType(defaultContentType.toString());	//initialize the default content type and encoding

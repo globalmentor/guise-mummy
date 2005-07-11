@@ -23,7 +23,7 @@ public class ListControl<V> extends AbstractSelectControl<V, ModelComponent<? ex
 		/**Sets the estimated number of rows requested to be visible.
 		This is a bound property of type <code>Integer</code>.
 		@param newRowCount The new requested number of visible rows, or -1 if no row count is specified.
-		@see #ROW_COUNT_PROPERTY 
+		@see #ROW_COUNT_PROPERTY
 		*/
 		public void setRowCount(final int newRowCount)
 		{

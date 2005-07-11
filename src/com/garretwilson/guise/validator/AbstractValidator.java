@@ -60,7 +60,7 @@ public abstract class AbstractValidator<V> implements Validator<V>
 			}
 			else	//for all other invalid values
 			{
-				throw new ValidationException(format(getSession().getStringResource(VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE), value), value);
+				throw new ValidationException(format(getSession().getStringResource(VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE), toString(value)), value);
 			}
 		}
 	}
@@ -74,5 +74,15 @@ public abstract class AbstractValidator<V> implements Validator<V>
 	public boolean isValid(final V value)
 	{
 		return value!=null || !isValueRequired();	//if the value is not present, it's still valid if we don't require a value
+	}
+
+	/**Retrieves a string representation of the given value appropriate for error messages.
+	This implementation returns the {@link Object#toString()} string representation of the value.
+	@param value The value for which a string representation should be returned.
+	@return A string representation of the given value.
+	*/
+	protected String toString(final V value)
+	{
+		return value.toString();	//return to toString() version by default
 	}
 }
