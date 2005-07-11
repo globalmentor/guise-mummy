@@ -15,7 +15,7 @@ import com.garretwilson.guise.validator.ValueRequiredValidator;
 /**Temperature Conversion Guise demonstration frame.
 Copyright © 2005 GlobalMentor, Inc.
 Demonstrates float input controls, float input validation, radio button controls,
-	required value validation, disabled controls, and style IDs.
+	required value validation, read-only controls, and style IDs.
 @author Garret Wilson
 */
 public class TemperatureConversionFrame extends DefaultFrame
@@ -39,7 +39,7 @@ public class TemperatureConversionFrame extends DefaultFrame
 		inputPanel.add(temperatureInput);	//add the input control to the input panel
 		final TextControl<Float> temperatureOutput=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
 		temperatureOutput.getModel().setLabel("Output Temperature");	//add a label to the text output control
-		temperatureOutput.getModel().setEnabled(false);	//disable the text output control so that the user cannot modify it
+		temperatureOutput.getModel().setEditable(false);	//set the text output control to read-only so that the user cannot modify it
 		inputPanel.add(temperatureOutput);	//add the output control to the input panel
 
 		temperaturePanel.add(inputPanel);	//add the input panel to the temperature panel

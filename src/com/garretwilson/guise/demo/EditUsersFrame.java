@@ -13,7 +13,7 @@ Copyright © 2005 GlobalMentor, Inc.
 Demonstrates list controls with default representation, thread-safe select model access,
 	sorting list control models, listening for select model list changes,
 	retrieving navigation frames, invoking modal frames, retrieving modal frame results,
-	and action model confirmation messages.
+	disabled control models, and action model confirmation messages.
 @author Garret Wilson
 */
 public class EditUsersFrame extends DefaultFrame	//TODO add a way to keep user IDs from being duplicated

@@ -13,6 +13,27 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 public class DefaultValueModel<V> extends DefaultControlModel implements ValueModel<V>
 {
 
+	/**Whether the model's value is editable and the corresponding control will allow the the user to change the value.*/
+	private boolean editable=true;
+
+		/**@return Whether the model's value is editable and the corresponding control will allow the the user to change the value.*/
+		public boolean isEditable() {return editable;}
+
+		/**Sets whether the model's value is editable and the corresponding control will allow the the user to change the value.
+		This is a bound property of type <code>Boolean</code>.
+		@param newEditable <code>true</code> if the corresponding control should allow the user to change the value.
+		@see ValueModel#EDITABLE_PROPERTY
+		*/
+		public void setEditable(final boolean newEditable)
+		{
+			if(editable!=newEditable)	//if the value is really changing
+			{
+				final boolean oldEditable=editable;	//get the old value
+				editable=newEditable;	//actually change the value
+				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
+			}			
+		}
+
 	/**The input value, or <code>null</code> if there is no value.*/
 	private V value=null;
 

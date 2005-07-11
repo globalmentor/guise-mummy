@@ -10,10 +10,22 @@ import com.garretwilson.guise.validator.*;
 public interface ValueModel<V> extends ControlModel
 {
 
+	/**The editable bound property.*/
+	public final static String EDITABLE_PROPERTY=getPropertyName(ValueModel.class, "editable");
 	/**The value bound property.*/
 	public final static String VALUE_PROPERTY=getPropertyName(ValueModel.class, "value");
 	/**The validator bound property.*/
 	public final static String VALIDATOR_PROPERTY=getPropertyName(ValueModel.class, "validator");
+
+	/**@return Whether the model's value is editable and the corresponding control will allow the the user to change the value.*/
+	public boolean isEditable();
+
+	/**Sets whether the model's value is editable and the corresponding control will allow the the user to change the value.
+	This is a bound property of type <code>Boolean</code>.
+	@param newEditable <code>true</code> if the corresponding control should allow the user to change the value.
+	@see #EDITABLE_PROPERTY
+	*/
+	public void setEditable(final boolean newEditable);
 
 	/**@return The input value, or <code>null</code> if there is no input value.*/
 	public V getValue();

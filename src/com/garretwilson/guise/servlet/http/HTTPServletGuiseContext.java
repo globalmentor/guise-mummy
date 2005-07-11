@@ -9,7 +9,7 @@ import javax.mail.internet.ContentType;
 import javax.servlet.http.*;
 
 import com.garretwilson.guise.context.GuiseContext;
-import com.garretwilson.guise.context.text.AbstractTextGuiseContext;
+import com.garretwilson.guise.context.text.xml.AbstractXMLGuiseContext;
 import com.garretwilson.guise.model.FileItemResourceImport;
 import com.garretwilson.guise.session.GuiseSession;
 import static com.garretwilson.io.ContentTypeConstants.*;
@@ -26,7 +26,7 @@ import org.apache.commons.fileupload.*;
 The output stream defaults to <code>text/plain</code> encoded in <code>UTF-8</code>.
 @author Garret Wilson
 */
-public class HTTPServletGuiseContext extends AbstractTextGuiseContext<HTTPServletGuiseContext>
+public class HTTPServletGuiseContext extends AbstractXMLGuiseContext<HTTPServletGuiseContext>
 {
 
 	/**The HTTP servlet request.*/
