@@ -10,7 +10,7 @@ This implementation does not yet fully support elements that appear more than on
 @param <R> The type of component allowed to represent each value.
 @author Garret Wilson
 */
-public abstract class AbstractSelectControl<V, R extends Component<?>, C extends SelectControl<V, R, C>> extends AbstractControl<SelectModel<V>, C> implements SelectControl<V, R, C>
+public abstract class AbstractSelectControl<V, R extends Component<?>, C extends SelectControl<V, R, C>> extends AbstractControl<ListSelectModel<V>, C> implements SelectControl<V, R, C>
 {
 
 	/**The strategy used to generate a component to represent each value in the model.*/
@@ -45,7 +45,7 @@ public abstract class AbstractSelectControl<V, R extends Component<?>, C extends
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	@see #setValueRepresentationStrategy(ValueRepresentationStrategy)
 	*/
-	protected AbstractSelectControl(final GuiseSession<?> session, final String id, final SelectModel<V> model)
+	protected AbstractSelectControl(final GuiseSession<?> session, final String id, final ListSelectModel<V> model)
 	{
 		super(session, id, model);	//construct the parent class
 		valueRepresentationStrategy=null;	//the value representation strategy is now null, and must be set by the super class
@@ -59,7 +59,7 @@ public abstract class AbstractSelectControl<V, R extends Component<?>, C extends
 	@exception NullPointerException if the given session, model, and/or value representation strategy is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractSelectControl(final GuiseSession<?> session, final String id, final SelectModel<V> model, final ValueRepresentationStrategy<V, R> valueRepresentationStrategy)
+	public AbstractSelectControl(final GuiseSession<?> session, final String id, final ListSelectModel<V> model, final ValueRepresentationStrategy<V, R> valueRepresentationStrategy)
 	{
 		super(session, id, model);	//construct the parent class
 		this.valueRepresentationStrategy=checkNull(valueRepresentationStrategy, "Value representation strategy cannot be null.");

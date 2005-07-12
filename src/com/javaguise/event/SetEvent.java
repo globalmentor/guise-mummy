@@ -9,20 +9,8 @@ If neither an added nor a removed element are provided, the event represents a g
 @param <E> The type of elements contained in the set.
 @author Garret Wilson
 */
-public class SetEvent<S, E> extends GuiseEvent<S>
+public class SetEvent<S, E> extends CollectionEvent<S, E>
 {
-
-	/**The element that was added to the set, or <code>null</code> if no element was added or it is unknown whether or which elements were added.*/
-	private E addedElement;
-
-		/**@return The element that was added to the set, or <code>null</code> if no element was added or it is unknown whether or which elements were added.*/
-		public E getAddedElement() {return addedElement;}
-
-	/**The element that was removed from the set, or <code>null</code> if no element was removed or it is unknown whether or which elements were removed.*/
-	private E removedElement;
-
-		/**@return The element that was removed from the set, or <code>null</code> if no element was added or it is unknown whether or which elements were removed.*/
-		public E getRemovedElement() {return removedElement;}
 
 	/**Session and source constructor for general set modification.
 	@param session The Guise session in which this event was generated.
@@ -43,8 +31,6 @@ public class SetEvent<S, E> extends GuiseEvent<S>
 	*/
 	public SetEvent(final GuiseSession<?> session, final S source, final E addedElement, final E removedElement)
 	{
-		super(session, source);	//construct the parent class
-		this.addedElement=addedElement;
-		this.removedElement=removedElement;
+		super(session, source, addedElement, removedElement);	//construct the parent class
 	}
 }

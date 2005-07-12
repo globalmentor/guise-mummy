@@ -62,7 +62,7 @@ public class ListControl<V> extends AbstractSelectControl<V, ModelComponent<? ex
 	@param selectionStrategy The strategy for selecting values in the model.
 	@exception NullPointerException if the given session, value class, and/or selection strategy is <code>null</code>.
 	*/
-	public ListControl(final GuiseSession<?> session, final Class<V> valueClass, final SelectionStrategy<V> selectionStrategy)
+	public ListControl(final GuiseSession<?> session, final Class<V> valueClass, final ListSelectionStrategy<V> selectionStrategy)
 	{
 		this(session, null, valueClass, selectionStrategy);	//construct the component, indicating that a default ID should be used
 	}
@@ -74,7 +74,7 @@ public class ListControl<V> extends AbstractSelectControl<V, ModelComponent<? ex
 	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
 	@exception NullPointerException if the given session, value class, and/or selection strategy is <code>null</code>.
 	*/
-	public ListControl(final GuiseSession<?> session, final Class<V> valueClass, final SelectionStrategy<V> selectionStrategy, final int rowCount)
+	public ListControl(final GuiseSession<?> session, final Class<V> valueClass, final ListSelectionStrategy<V> selectionStrategy, final int rowCount)
 	{
 		this(session, null, valueClass, selectionStrategy, rowCount);	//construct the component, indicating the row count and that a default ID should be used
 	}
@@ -112,7 +112,7 @@ public class ListControl<V> extends AbstractSelectControl<V, ModelComponent<? ex
 	@exception NullPointerException if the given session, value class, and/or selection strategy is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public ListControl(final GuiseSession<?> session, final String id, final Class<V> valueClass, final SelectionStrategy<V> selectionStrategy)
+	public ListControl(final GuiseSession<?> session, final String id, final Class<V> valueClass, final ListSelectionStrategy<V> selectionStrategy)
 	{
 		this(session, id, new DefaultSelectModel<V>(session, valueClass, selectionStrategy));	//construct the class with a default model
 	}
@@ -126,7 +126,7 @@ public class ListControl<V> extends AbstractSelectControl<V, ModelComponent<? ex
 	@exception NullPointerException if the given session, value class, and/or selection strategy is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public ListControl(final GuiseSession<?> session, final String id, final Class<V> valueClass, final SelectionStrategy<V> selectionStrategy, final int rowCount)
+	public ListControl(final GuiseSession<?> session, final String id, final Class<V> valueClass, final ListSelectionStrategy<V> selectionStrategy, final int rowCount)
 	{
 		this(session, id, new DefaultSelectModel<V>(session, valueClass, selectionStrategy), rowCount);	//construct the class with a default model and the row count
 	}
@@ -138,7 +138,7 @@ public class ListControl<V> extends AbstractSelectControl<V, ModelComponent<? ex
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public ListControl(final GuiseSession<?> session, final String id, final SelectModel<V> model)
+	public ListControl(final GuiseSession<?> session, final String id, final ListSelectModel<V> model)
 	{
 		this(session, id, model, -1);	//construct the class with no row count
 	}
@@ -150,7 +150,7 @@ public class ListControl<V> extends AbstractSelectControl<V, ModelComponent<? ex
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public ListControl(final GuiseSession<?> session, final String id, final SelectModel<V> model, final int rowCount)
+	public ListControl(final GuiseSession<?> session, final String id, final ListSelectModel<V> model, final int rowCount)
 	{
 		super(session, id, model);	//construct the parent class
 		setValueRepresentationStrategy(new DefaultValueRepresentationStrategy());	//install a default value representation strategy
@@ -165,7 +165,7 @@ public class ListControl<V> extends AbstractSelectControl<V, ModelComponent<? ex
 	@exception NullPointerException if the given session, model, and/or value representation strategy is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public ListControl(final GuiseSession<?> session, final String id, final SelectModel<V> model, final ValueRepresentationStrategy<V> valueRepresentationStrategy)
+	public ListControl(final GuiseSession<?> session, final String id, final ListSelectModel<V> model, final ValueRepresentationStrategy<V> valueRepresentationStrategy)
 	{
 		this(session, id, model, valueRepresentationStrategy, -1);	//construct the class with no row count
 	}
@@ -179,7 +179,7 @@ public class ListControl<V> extends AbstractSelectControl<V, ModelComponent<? ex
 	@exception NullPointerException if the given session, model, and/or value representation strategy is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public ListControl(final GuiseSession<?> session, final String id, final SelectModel<V> model, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final int rowCount)
+	public ListControl(final GuiseSession<?> session, final String id, final ListSelectModel<V> model, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final int rowCount)
 	{
 		super(session, id, model, valueRepresentationStrategy);	//construct the parent class
 		this.rowCount=rowCount;	//save the row count

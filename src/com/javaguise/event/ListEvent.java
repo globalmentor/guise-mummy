@@ -9,7 +9,7 @@ If neither an added nor a removed element are provided, the event represents a g
 @param <E> The type of elements contained in the list.
 @author Garret Wilson
 */
-public class ListEvent<S, E> extends SetEvent<S, E>
+public class ListEvent<S, E> extends CollectionEvent<S, E>
 {
 
 	/**The index at which an element was added and/or removed, or -1 if the index is unknown.*/

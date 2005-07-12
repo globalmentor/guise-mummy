@@ -16,7 +16,7 @@ import com.javaguise.model.AbstractModelGroup;
 import com.javaguise.model.ActionModel;
 import com.javaguise.model.ModelGroup;
 import com.javaguise.model.MutualExclusionModelGroup;
-import com.javaguise.model.SingleSelectionStrategy;
+import com.javaguise.model.SingleListSelectionStrategy;
 import com.javaguise.model.TextModel;
 import com.javaguise.model.ValueModel;
 import com.javaguise.session.GuiseSession;
@@ -176,7 +176,7 @@ public class HomeFrame extends DefaultFrame
 		afterImageLabel.getModel().setLabel("This is a lot of text. ;alsjfd ;lkjas ;ljag ;lkjas g;lkajg; laksgj akjlshf lkjashd flkjsdhlksahlsadkhj asldkhjf ;sgdh a;lgkh a;glkha s;dglh asgd;");
 		panel.add(afterImageLabel);
 
-		final ListControl<String> listSelectControl=new ListControl<String>(session, String.class, new SingleSelectionStrategy<String>());
+		final ListControl<String> listSelectControl=new ListControl<String>(session, String.class, new SingleListSelectionStrategy<String>());
 		listSelectControl.getModel().setLabel("Choose an option.");
 		listSelectControl.getModel().add("The first option");
 		listSelectControl.getModel().add(null);

@@ -12,7 +12,7 @@ The model is thread-safe, synchronized on itself. Any iteration over values shou
 @param <V> The type of values contained in the model.
 @author Garret Wilson
 */
-public class DefaultSelectModel<V> extends DefaultControlModel implements SelectModel<V>
+public class DefaultSelectModel<V> extends DefaultControlModel implements ListSelectModel<V>
 {
 
 	/**The list of values, all access to which will be synchronized on this.*/
@@ -245,10 +245,10 @@ public class DefaultSelectModel<V> extends DefaultControlModel implements Select
 	}
 
 	/**The selection strategy for this model.*/
-	private SelectionStrategy<V> selectionStrategy;
+	private ListSelectionStrategy<V> selectionStrategy;
 
 		/**@return The selection strategy for this model.*/
-		public SelectionStrategy<V> getSelectionStrategy() {return selectionStrategy;}
+		public ListSelectionStrategy<V> getSelectionStrategy() {return selectionStrategy;}
 
 	/**Determines the selected index.
 	This method delegates to the selection strategy.
@@ -341,7 +341,7 @@ public class DefaultSelectModel<V> extends DefaultControlModel implements Select
 	/**Adds a list listener.
 	@param listListener The list listener to add.
 	*/
-	public void addListListener(final ListListener<SelectModel<V>, V> listListener)
+	public void addListListener(final ListListener<ListSelectModel<V>, V> listListener)
 	{
 		getEventListenerManager().add(ListListener.class, listListener);	//add the listener
 	}
@@ -349,7 +349,7 @@ public class DefaultSelectModel<V> extends DefaultControlModel implements Select
 	/**Removes a list listener.
 	@param listListener The list listener to remove.
 	*/
-	public void removeListListener(final ListListener<SelectModel<V>, V> listListener)
+	public void removeListListener(final ListListener<ListSelectModel<V>, V> listListener)
 	{
 		getEventListenerManager().remove(ListListener.class, listListener);	//remove the listener
 	}
@@ -364,11 +364,11 @@ public class DefaultSelectModel<V> extends DefaultControlModel implements Select
 	*/
 	protected void fireListModified(final int index, final V addedElement, final V removedElement)
 	{
-		final ListEvent<SelectModel<V>, V> listEvent=new ListEvent<SelectModel<V>, V>(getSession(), this, index, addedElement, removedElement);	//create a new event
+		final ListEvent<ListSelectModel<V>, V> listEvent=new ListEvent<ListSelectModel<V>, V>(getSession(), this, index, addedElement, removedElement);	//create a new event
 		getSelectionStrategy().listModified(listEvent);	//manually notify the selection strategy, because the queued event might be delayed and reported out of order
 		if(getEventListenerManager().hasListeners(ListListener.class))	//if there are appropriate listeners registered
 		{
-			getSession().queueModelEvent(new PostponedListEvent<SelectModel<V>, V>(getEventListenerManager(), listEvent));	//tell the Guise session to queue the event
+			getSession().queueModelEvent(new PostponedListEvent<ListSelectModel<V>, V>(getEventListenerManager(), listEvent));	//tell the Guise session to queue the event
 		}
 	}
 
@@ -385,7 +385,7 @@ public class DefaultSelectModel<V> extends DefaultControlModel implements Select
 	*/
 	public DefaultSelectModel(final GuiseSession<?> session, final Class<V> valueClass)
 	{
-		this(session, valueClass, new MultipleSelectionStrategy<V>());	//construct the class with a multiple selection strategy
+		this(session, valueClass, new MultipleListSelectionStrategy<V>());	//construct the class with a multiple selection strategy
 	}
 
 	/**Constructs a select model indicating the type of values it can hold.
@@ -395,7 +395,7 @@ public class DefaultSelectModel<V> extends DefaultControlModel implements Select
 	@param selectionStrategy The strategy for selecting values in the model.
 	@exception NullPointerException if the given session, class object, and/or selection strategy is <code>null</code>.
 	*/
-	public DefaultSelectModel(final GuiseSession<?> session, final Class<V> valueClass, final SelectionStrategy<V> selectionStrategy)
+	public DefaultSelectModel(final GuiseSession<?> session, final Class<V> valueClass, final ListSelectionStrategy<V> selectionStrategy)
 	{
 		super(session);	//construct the parent class
 		this.valueClass=checkNull(valueClass, "Value class cannot be null.");	//store the value class

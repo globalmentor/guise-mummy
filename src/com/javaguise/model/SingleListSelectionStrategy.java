@@ -7,9 +7,9 @@ This class is marked final because it demarcates certain selection semantics tha
 This class is thread-safe, and assumes that the corresponding select model is thread-safe, synchronized on itself.
 @param <V> The type of values contained in the select model.
 @author Garret Wilson
-@see SelectModel
+@see ListSelectModel
 */
-public final class SingleSelectionStrategy<V> extends AbstractSelectionStrategy<V>
+public final class SingleListSelectionStrategy<V> extends AbstractListSelectionStrategy<V>
 {
 	/**Determines whether the provided index can be added to the selected indices.
 	This method does default validations and then ensures that only one item is selected at any given time.
@@ -17,7 +17,7 @@ public final class SingleSelectionStrategy<V> extends AbstractSelectionStrategy<
 	@param index The index to be selected.
 	@return <code>true</code> if the provided index is valid and no other indices are selected.
 	*/
-	protected boolean canSelectIndex(final SelectModel<V> selectModel, final int index)
+	protected boolean canSelectIndex(final ListSelectModel<V> selectModel, final int index)
 	{
 		final Set<Integer> selectedIndices=getSelectedIndices();	//get the set of selected indices
 		synchronized(selectedIndices)	//don't allow anyone to alter the selected indices while we check its size and contents

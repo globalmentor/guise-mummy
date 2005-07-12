@@ -30,7 +30,7 @@ public class EditUsersFrame extends DefaultFrame	//TODO add a way to keep user I
 		super(session);	//construct the parent class
 		getModel().setLabel("Guise\u2122 Demonstration: Edit Users");	//set the frame title	
 
-		final ListControl<DemoUser> userListControl=new ListControl<DemoUser>(session, DemoUser.class, new SingleSelectionStrategy<DemoUser>());	//create a list control allowing only single selections
+		final ListControl<DemoUser> userListControl=new ListControl<DemoUser>(session, DemoUser.class, new SingleListSelectionStrategy<DemoUser>());	//create a list control allowing only single selections
 		userListControl.getModel().setLabel("Users");	//set the list control label
 		userListControl.setRowCount(8);	//request eight visible rows in the list
 
@@ -126,9 +126,9 @@ public class EditUsersFrame extends DefaultFrame	//TODO add a way to keep user I
 		editUsersPanel.add(buttonPanel);	//add the button panel
 
 			//disable the add and remove buttons whenever there are no users 
-		userListControl.getModel().addListListener(new ListListener<SelectModel<DemoUser>, DemoUser>()	//listen for the list being modified
+		userListControl.getModel().addListListener(new ListListener<ListSelectModel<DemoUser>, DemoUser>()	//listen for the list being modified
 				{
-					public void listModified(final ListEvent<SelectModel<DemoUser>, DemoUser> listEvent)	//if the list is modified
+					public void listModified(final ListEvent<ListSelectModel<DemoUser>, DemoUser> listEvent)	//if the list is modified
 					{
 						final boolean listEmpty=listEvent.getSource().isEmpty();	//see if the list is empty
 						editButton.getModel().setEnabled(!listEmpty);	//only enable the edit button if there are users to edit
