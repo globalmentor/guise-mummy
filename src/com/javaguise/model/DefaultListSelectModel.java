@@ -4,16 +4,48 @@ import java.util.*;
 
 import com.javaguise.event.*;
 import com.javaguise.session.GuiseSession;
+import com.javaguise.validator.ValidationException;
+import com.javaguise.validator.Validator;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-/**A default implementation of a model for selecting one or more values from a collection.
+/**The default implementation of a model for selecting one or more values from a list.
 The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class. 
 @param <V> The type of values contained in the model.
 @author Garret Wilson
 */
-public class DefaultSelectModel<V> extends DefaultControlModel implements ListSelectModel<V>
+public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements ListSelectModel<V>
 {
+
+	/**@return The selected value, or <code>null</code> if there is no selected value.*/
+	public V getValue() {return getSelectedValue();}
+
+	/**Sets the input value.
+	This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method.
+	If a validator is installed, the value will first be validated before the current value is changed.
+	Validation always occurs if a validator is installed, even if the value is not changing.
+	@param newValue The input value of the model.
+	@exception ValidationException if the provided value is not valid.
+	@see #getValidator()
+	@see ValueModel#VALUE_PROPERTY
+	*/
+	public void setValue(final V newValue) throws ValidationException
+	{
+		final Validator<V> validator=getValidator();	//get the currently installed validator, if there is one
+		if(validator!=null)	//if a validator is installed, always validate the value, even if it isn't changing, so that an initial value that may not be valid will throw an error when it's tried to be set to the same, but invalid, value
+		{
+			validator.validate(newValue);	//validate the new value, throwing an exception if anything is wrong
+		}
+/*TODO fix; place equivalent functionality in the selection strategy
+		if(!ObjectUtilities.equals(value, newValue))	//if the value is really changing (compare their values, rather than identity)
+		{
+			final V oldValue=value;	//get the old value
+			value=newValue;	//actually change the value
+			firePropertyChange(VALUE_PROPERTY, oldValue, newValue);	//indicate that the value changed
+		}
+*/
+		setSelectedValues(newValue);
+	}
 
 	/**The list of values, all access to which will be synchronized on this.*/
 	private final List<V> values=new ArrayList<V>();
@@ -372,33 +404,26 @@ public class DefaultSelectModel<V> extends DefaultControlModel implements ListSe
 		}
 	}
 
-	/**The class representing the type of values this model can hold.*/
-	private final Class<V> valueClass;
-
-		/**@return The class representing the type of values this model can hold.*/
-		public Class<V> getValueClass() {return valueClass;}
-
-	/**Constructs a select model indicating the type of values it can hold, using a default multiple selection strategy.
+	/**Constructs a list select model indicating the type of values it can hold, using a default multiple selection strategy.
 	@param session The Guise session that owns this model.
 	@param valueClass The class indicating the type of values held in the model.
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	*/
-	public DefaultSelectModel(final GuiseSession<?> session, final Class<V> valueClass)
+	public DefaultListSelectModel(final GuiseSession<?> session, final Class<V> valueClass)
 	{
 		this(session, valueClass, new MultipleListSelectionStrategy<V>());	//construct the class with a multiple selection strategy
 	}
 
-	/**Constructs a select model indicating the type of values it can hold.
+	/**Constructs a list select model indicating the type of values it can hold.
 	The selection strategy is not added as a listener to this model but is rather notified manually so that the event won't be delayed and/or sent out of order
 	@param session The Guise session that owns this model.
 	@param valueClass The class indicating the type of values held in the model.
-	@param selectionStrategy The strategy for selecting values in the model.
+	@param listSelectionStrategy The strategy for selecting values in the model.
 	@exception NullPointerException if the given session, class object, and/or selection strategy is <code>null</code>.
 	*/
-	public DefaultSelectModel(final GuiseSession<?> session, final Class<V> valueClass, final ListSelectionStrategy<V> selectionStrategy)
+	public DefaultListSelectModel(final GuiseSession<?> session, final Class<V> valueClass, final ListSelectionStrategy<V> listSelectionStrategy)
 	{
-		super(session);	//construct the parent class
-		this.valueClass=checkNull(valueClass, "Value class cannot be null.");	//store the value class
-		this.selectionStrategy=checkNull(selectionStrategy, "Selection strategy cannot be null.");
+		super(session, valueClass);	//construct the parent class
+		this.selectionStrategy=checkNull(listSelectionStrategy, "Selection strategy cannot be null.");
 	}
 }

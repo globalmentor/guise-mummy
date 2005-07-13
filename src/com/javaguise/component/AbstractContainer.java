@@ -25,6 +25,15 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	/**@return An iterator to contained components.*/
 	public Iterator<Component<?>> iterator() {return componentList.iterator();}
 
+	/**@return Whether this component has children. This implementation delegates to the component list.*/
+	public boolean hasChildren() {return !componentList.isEmpty();}
+
+	/**Determines whether this container contains the given component.
+	@param component The component to check.
+	@return <code>true</code> if this container contains the given component.
+	*/
+	public boolean contains(final Component<?> component) {return componentList.contains(component);}
+
 	/**Adds a component to the container.
 	@param component The component to add.
 	@exception IllegalArgumentException if the component already has a parent.
@@ -52,18 +61,6 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		componentList.remove(component);	//remove the component to the list
 		component.setParent(null);	//tell the component it no longer has a parent
 	}
-
-	/**Determines whether this container contains the given component.
-	@param component The component to check.
-	@return <code>true</code> if this container contains the given component.
-	*/
-	public boolean contains(final Component<?> component) {return componentList.contains(component);}
-
-	/**@return Whether this component has children. This implementation delegates to the component list.*/
-	public boolean hasChildren() {return !componentList.isEmpty();}
-
-	/**@return The child components of this component. This implementation returns this instance.*/
-	public Iterable<Component<?>> getChildren() {return this;}
 
 	/**The layout definition for the container.*/
 	private final Layout layout;

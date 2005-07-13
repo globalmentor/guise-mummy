@@ -204,6 +204,18 @@ public class HomeFrame extends DefaultFrame
 		panel.add(text);
 
 		getSession().setLocale(Locale.FRANCE);
+
+		final Object[][] multiplicationTableData=new Object[10][10];
+		for(int row=0; row<10; ++row)
+		{
+			for(int column=0; column<10; ++column)
+			{
+				multiplicationTableData[row][column]=new Integer(row*column);
+			}
+		}
+		final Table multiplicationTable=new Table(session, multiplicationTableData, "0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
+		multiplicationTable.getModel().setLabel("Multiplication Table");
+		panel.add(multiplicationTable);
 		
 		setContent(panel);
 	}

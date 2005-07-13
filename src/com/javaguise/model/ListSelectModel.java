@@ -9,7 +9,7 @@ The model must be thread-safe, synchronized on itself. Any iteration over values
 @param <V> The type of values contained in the model.
 @author Garret Wilson
 */
-public interface ListSelectModel<V> extends ControlModel, List<V>
+public interface ListSelectModel<V> extends SelectModel<V>, List<V>
 {
 
 	/**Replaces the first occurrence in the of the given value with its replacement.
@@ -38,21 +38,6 @@ public interface ListSelectModel<V> extends ControlModel, List<V>
 	*/
 	public int[] getSelectedIndices();
 
-	/**Determines the selected value.
-	This method delegates to the selection strategy.
-	If more than one value is selected, the lead selected value will be returned.
-	@return The value currently selected, or <code>null</code> if no value is currently selected.
-	@see #getSelectedIndex()
-	*/
-	public V getSelectedValue();
-
-	/**Determines the selected values.
-	This method delegates to the selection strategy.
-	@return The values currently selected.
-	@see #getSelectedIndices()
-	*/
-	public V[] getSelectedValues();
-
 	/**Sets the selected indices.
 	Invalid and duplicate indices will be ignored.
 	This method delegates to the selection strategy.
@@ -61,15 +46,6 @@ public interface ListSelectModel<V> extends ControlModel, List<V>
 	@see #addSelectedIndex(int)
 	*/
 	public void setSelectedIndices(final int... indices);
-
-	/**Sets the selected values.
-	If a value occurs more than one time in the model, the first occurrence of the value will be selected.
-	Values that do not occur in the select model will be ignored.
-	This method delegates to the selection strategy.
-	@param values The values to select.
-	@see #setSelectedIndices(int[])
-	*/
-	public void setSelectedValues(final V... values);
 
 	/**Adds a selection at the given index.
 	An invalid index will be ignored.
@@ -87,9 +63,6 @@ public interface ListSelectModel<V> extends ControlModel, List<V>
 	*/
 	public void removeSelectedIndex(final int index);
 	
-	/**@return The class representing the type of value this model can hold.*/
-	public Class<V> getValueClass();
-
 	/**Adds a list listener.
 	@param listListener The list listener to add.
 	*/

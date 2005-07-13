@@ -68,10 +68,10 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	public String getID();
 
 	/**@return An identifier unique within this component's parent, if any.*/
-	public String getUniqueID();
+//TODO del when works	public String getUniqueID();
 
 	/**@return An identifier unique up this component's hierarchy.*/
-	public String getAbsoluteUniqueID();
+//TODO del when works	public String getAbsoluteUniqueID();
 
 	/**Determines the unique ID of the provided child component within this component.
 	This method is typically called by child components when determining their own unique IDs.
@@ -79,7 +79,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	@return An identifier of the given component unique within this component.
 	@exception IllegalArgumentException if the given component is not a child of this component.
 	*/
-	public String getUniqueID(final Component<?> childComponent);
+//TODO del when works	public String getUniqueID(final Component<?> childComponent);
 
 	/**Determines the absolute unique ID of the provided child component up the component's hierarchy.
 	This method is typically called by child components when determining their own absolute unique IDs.
@@ -87,7 +87,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	@return An absolute identifier of the given component unique up the component's hierarchy.
 	@exception IllegalArgumentException if the given component is not a child of this component.
 	*/
-	public String getAbsoluteUniqueID(final Component<?> childComponent);
+//TODO del when works	public String getAbsoluteUniqueID(final Component<?> childComponent);
 
 	/**@return The parent of this component, or <code>null</code> if this component does not have a parent.*/
 	public Component<?> getParent();
@@ -100,13 +100,17 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	public <A extends Component<?>> A getAncestor(final Class<A> ancestorClass);
 
 	/**Sets the parent of this component.
-	This method is managed by containers, and should usually never be called my other classes.
-	In order to hinder inadvertent incorrect use, the parent must only be set after the component is added to the component, and only be unset after the component is removed from the component.
+	This method is managed by containers, and normally should not be called by applications.
+	A component cannot be given a parent if it already has a parent.
+	A component's parent cannot be removed if that parent is a container and this component is still a child of that container.
+	A container's parent cannot be set to a container unless that container already recognizes this component as one of its children.
 	If a component is given the same parent it already has, no action occurs.
-	@param newParent The new parent for this component, or <code>null</code> if this component is being removed from a component.
+	@param newParent The new parent for this component, or <code>null</code> if this component is being removed from a parent.
 	@exception IllegalStateException if a parent is provided and this component already has a parent.
-	@exception IllegalStateException if no parent is provided and this component's old parent still recognizes this component as its child.
-	@exception IllegalArgumentException if a parent is provided and the given parent does not already recognize this component as its child.
+	@exception IllegalStateException if no parent is provided and this component's old parent is a container that still recognizes this component as its child.
+	@exception IllegalArgumentException if a parent container is provided and the given parent container does not already recognize this component as its child.
+	@see Container#add(Component)
+	@see Container#remove(Component)
 	*/
 	public void setParent(final Component<?> newParent);
 
@@ -137,7 +141,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	public boolean isValid();
 
 	/**@return The character used by this component when building absolute IDs.*/
-	public char getAbsoluteIDSegmentDelimiter();
+//TODO del when works	public char getAbsoluteIDSegmentDelimiter();
 
 	/**Collects the current data from the view of this component.
 	This method should not normally be called directly by applications.

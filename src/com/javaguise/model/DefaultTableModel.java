@@ -1,0 +1,175 @@
+package com.javaguise.model;
+
+import java.util.*;
+import static java.util.Collections.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.util.ArrayUtilities.*;
+import com.garretwilson.util.SynchronizedListDecorator;
+
+import com.javaguise.session.GuiseSession;
+
+/**The default implementation of a table model representing.
+The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class. 
+@param <C> The type of values contained in all the table's cells.
+@author Garret Wilson
+*/
+public class DefaultTableModel<C> extends DefaultLabelModel implements TableModel<C>
+{
+
+	/**The map of table column models in logical order.*/
+	private final List<TableColumnModel<? extends C>> logicalTableColumnModels=new CopyOnWriteArrayList<TableColumnModel<? extends C>>();
+
+		/**Determines the logical index of the given table column.
+		@param column One of the table columns.
+		@return The zero-based logical index of the column within the table, or -1 if the column is not one of the model's columns.
+		*/
+		public int getColumnIndex(final TableColumnModel<? extends C> column) {return logicalTableColumnModels.indexOf(column);}
+	
+	/**The list of table column models.*/
+	private final List<TableColumnModel<? extends C>> tableColumnModels=new CopyOnWriteArrayList<TableColumnModel<? extends C>>();
+
+	/**@return A read-only list of table columns in physical order.*/ 
+	public List<TableColumnModel<? extends C>> getColumns() {return unmodifiableList(tableColumnModels);}
+
+	/**The list of value lists for rows.*/
+	private final List<List<C>> valueRowLists;
+
+	/**@return The number of rows in this table.*/
+	public int getRowCount() {return valueRowLists.size();}
+
+	/**@return The number of columns in this table.*/
+	public int getColumnCount() {return logicalTableColumnModels.size();}
+
+	/**Constructs a default table model indicating the type of values it can hold, using default column models.
+	@param session The Guise session that owns this model.
+	@param valueClass The class indicating the type of values held in the model.
+	@param columnNames The names to serve as label headers for the columns.
+	@exception NullPointerException if the given session and/or class object is <code>null</code>.
+	*/
+	public DefaultTableModel(final GuiseSession<?> session, final Class<C> valueClass, final String... columnNames)
+	{
+		this(session, valueClass, null, columnNames);	//construct the class with no values
+	}
+
+	/**Constructs a default table model indicating the type of values it can hold along with column definitions.
+	@param session The Guise session that owns this model.
+	@param valueClass The class indicating the type of values held in the model.
+	@param columns The models representing the table columns.
+	@exception NullPointerException if the given session and/or class object is <code>null</code>.
+	*/
+	public DefaultTableModel(final GuiseSession<?> session, final Class<C> valueClass, final TableColumnModel<? extends C>... columns)
+	{
+		this(session, valueClass, null, columns);	//construct the class with no values
+	}
+
+	/**Constructs a default table model indicating the type of values it can hold and column names.
+	@param session The Guise session that owns this model.
+	@param valueClass The class indicating the type of values held in the model.
+	@param rowValues The two-dimensional list of values, where the first index represents the row and the second represents the column, or <code>null</code> if no default values should be given.
+	@param columnNames The names to serve as label headers for the columns.
+	@exception NullPointerException if the given session and/or class object is <code>null</code>.
+	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
+	*/
+	public DefaultTableModel(final GuiseSession<?> session, final Class<C> valueClass, final C[][] rowValues, final String... columnNames)
+	{
+		this(session, valueClass, rowValues, (TableColumnModel<? extends C>[])createDefaultColumns(session, valueClass, columnNames));	//create default columns for the column names
+	}
+
+	/**Constructs a default table model indicating the type of values it can hold.
+	@param session The Guise session that owns this model.
+	@param valueClass The class indicating the type of values held in the model.
+	@param rowValues The two-dimensional list of values, where the first index represents the row and the second represents the column, or <code>null</code> if no default values should be given.
+	@param columns The models representing the table columns.
+	@exception NullPointerException if the given session and/or class object is <code>null</code>.
+	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
+	*/
+	public DefaultTableModel(final GuiseSession<?> session, final Class<C> valueClass, final C[][] rowValues, final TableColumnModel<? extends C>... columns)
+	{
+		super(session);	//construct the parent class
+		Collections.addAll(logicalTableColumnModels, columns);	//add all the columns to our logical list of table columns
+		Collections.addAll(tableColumnModels, columns);	//add all the columns to our list of table columns
+		valueRowLists=new SynchronizedListDecorator<List<C>>(new ArrayList<List<C>>(), this);	//create a list of value lists, synchronizing all access on this object
+		if(rowValues!=null)	//if table data was given
+		{
+			synchronized(this)	//synchronize on this object out of consistency (even though it is highly unlikely another thread could have access to our data as the class is not yet constructed)
+			{
+				for(final C[] values:rowValues)	//for each row of given data
+				{
+					if(values.length!=columns.length)	//if the number of columns doesn't match the columns of data that were supplied
+					{
+						throw new IllegalArgumentException("Received "+columns.length+" columns but encountered row with "+values.length+" values.");
+					}
+					final List<C> valueList=new SynchronizedListDecorator<C>(new ArrayList<C>(values.length), this);	//create a list of value, synchronizing all access on this object
+					Collections.addAll(valueList, values);	//add all this row's values to the list
+					valueRowLists.add(valueList);	//add this row to the list of row lists
+				}
+			}
+		}
+	}
+
+	/**Creates default columns with the given column names.
+	@param <T> The type of values contained in the columns.
+	@param session The Guise session that owns this model.
+	@param valueClass The class representing the values contained in the columns.
+	@param columnNames The names to serve as label headers for the columns.
+	@return An array of default columns.
+	@exception NullPointerException if the given session is <code>null</code>.
+	*/
+	@SuppressWarnings("unchecked")	//as generics are only one-deep for class objects, we must cast the generic type of the default table column model class
+	public static <T> TableColumnModel<T>[] createDefaultColumns(final GuiseSession<?> session, final Class<T> valueClass, final String... columnNames)
+	{
+		checkNull(session, "Session cannot be null.");
+		final DefaultTableColumnModel<T>[] columns=createArray((Class<DefaultTableColumnModel<T>>)(Object)DefaultTableColumnModel.class, columnNames.length);	//create an array of default table columns
+		for(int i=columns.length-1; i>=0; --i)	//for each column
+		{
+			final DefaultTableColumnModel<T> column=new DefaultTableColumnModel<T>(session, valueClass);	//create a new default table column
+			column.setLabel(columnNames[i]);	//set the column label
+			columns[i]=column;	//store the column
+		}
+		return columns;	//return the columns we created
+	}
+
+	/**Returns the cell value at the given row and column.
+	@param rowIndex The zero-based row index.
+	@param column The column for which a value should be returned.
+	@return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
+	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	*/
+	public <T extends C> T getCellValue(final int rowIndex, final TableColumnModel<T> column)
+	{
+		final int columnIndex=getColumnIndex(column);	//get the index of this column
+		if(columnIndex<0)	//if this column isn't in this table
+		{
+			throw new IllegalArgumentException("Table column "+column+" not in table.");
+		}
+		synchronized(this)	//don't allow others to change the table data while we access the values
+		{
+			return column.getValueClass().cast(valueRowLists.get(rowIndex).get(columnIndex));	//get the value in the given row and column, cast to the appropriate type
+		}
+	}
+
+	/**Sets the cell value at the given row and column.
+	@param rowIndex The zero-based row index.
+	@param column The column for which a value should be returned.
+	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
+	@return The value previously in the given cell.
+	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	*/
+	public <T extends C> T setCellValue(final int rowIndex, final TableColumnModel<T> column, final T newCellValue)
+	{
+		final int columnIndex=getColumnIndex(column);	//get the index of this column
+		if(columnIndex<0)	//if this column isn't in this table
+		{
+			throw new IllegalArgumentException("Table column "+column+" not in table.");
+		}
+		synchronized(this)	//don't allow others to change the table data while we access the values
+		{
+			return column.getValueClass().cast(valueRowLists.get(rowIndex).set(columnIndex, newCellValue));	//get the value in the given row and column, cast to the appropriate type
+		}
+	}
+
+}
