@@ -26,6 +26,7 @@ import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 import static com.garretwilson.servlet.ServletConstants.*;
 import static com.garretwilson.text.CharacterConstants.*;
 import com.garretwilson.util.*;
+
 import static com.garretwilson.util.LocaleUtilities.*;
 
 /**The servlet that controls a Guise web applications. 
@@ -265,6 +266,7 @@ Debug.trace("Referrer:", getReferer(request));
 					try
 					{
 						guiseContext.setState(GuiseContext.State.QUERY_VIEW);	//update the context state for querying the view
+Debug.trace("ready to query the navigation frame view");
 						navigationFrame.queryView(guiseContext);		//tell the frame to query its view
 						guiseContext.setState(GuiseContext.State.DECODE_VIEW);	//update the context state for decoding the view
 						navigationFrame.decodeView(guiseContext);		//tell the frame to decode its view

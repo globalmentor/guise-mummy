@@ -1,26 +1,21 @@
 package com.javaguise.component;
 
-import static com.garretwilson.lang.ObjectUtilities.checkNull;
-
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.javaguise.component.ListSelectControl.ValueRepresentationStrategy;
-import com.javaguise.model.DefaultLabelModel;
-import com.javaguise.model.DefaultMessageModel;
-import com.javaguise.model.DefaultTableModel;
-import com.javaguise.model.LabelModel;
-import com.javaguise.model.ListSelectModel;
-import com.javaguise.model.TableColumnModel;
-import com.javaguise.model.TableModel;
+import static com.garretwilson.lang.ObjectUtilities.*;
+
+import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
+import com.javaguise.validator.ValidationException;
+import com.javaguise.validator.Validator;
 
 /**A table component.
 The generic constructors are to be preferred. They create a genericized model and ensure that all the column types extend the table model cell types,
 but because of erasure the models created are otherwise identical.
 @author Garret Wilson
 */
-public class Table extends AbstractModelComponent<TableModel<?>, Table>
+public class Table extends AbstractModelComponent<TableModel, Table>
 {
 
 	/**@return An iterator to child components.*/
@@ -29,134 +24,34 @@ public class Table extends AbstractModelComponent<TableModel<?>, Table>
 	/**@return Whether this component has children. This implementation delegates to the cell component map.*/
 //TODO del	public boolean hasChildren() {return !cellComponentMap.isEmpty();}
 
-	/**The map of value representation strategies for columns.*/
-	private final Map<TableColumnModel<?>, ValueRepresentationStrategy<?>> columnValueRepresentationStrategyMap=new ConcurrentHashMap<TableColumnModel<?>, ValueRepresentationStrategy<?>>();
+	/**The map of cell representation strategies for columns.*/
+	private final Map<TableColumnModel<?>, CellRepresentationStrategy<?>> columnCellRepresentationStrategyMap=new ConcurrentHashMap<TableColumnModel<?>, CellRepresentationStrategy<?>>();
 
-	/**Installs the given value representation strategy to produce representation components for the given column.
+	/**Installs the given cell representation strategy to produce representation components for the given column.
 	@param <V> The type of value the column represents.
 	@param column The column with which the strategy should be associated.
-	@param valueRepresentationStrategy The strategy for generating components to represent values in the given column.
+	@param cellRepresentationStrategy The strategy for generating components to represent values in the given column.
 	@return The representation strategy previously associated with the given column.
 	*/	
 	@SuppressWarnings("unchecked")	//we check the generic types before putting them in the map, so it's fine to cast the retrieved values
-	public <V> ValueRepresentationStrategy<? super V> setValueRepresentationStrategy(final TableColumnModel<V> column, ValueRepresentationStrategy<V> valueRepresentationStrategy)
+	public <V> CellRepresentationStrategy<? super V> setCellRepresentationStrategy(final TableColumnModel<V> column, CellRepresentationStrategy<V> cellRepresentationStrategy)
 	{
-		return (ValueRepresentationStrategy<? super V>)columnValueRepresentationStrategyMap.put(column, valueRepresentationStrategy);	//associate the strategy with the column in the map
+		return (CellRepresentationStrategy<? super V>)columnCellRepresentationStrategyMap.put(column, cellRepresentationStrategy);	//associate the strategy with the column in the map
 	}
 
-	/**Returns the given value representation strategy assigned to produce representation components for the given column.
+	/**Returns the given cell representation strategy assigned to produce representation components for the given column.
 	@param <V> The type of value the column represents.
 	@param column The column with which the strategy should be associated.
-	@return valueRepresentationStrategy The strategy for generating components to represent values in the given column.
+	@return The strategy for generating components to represent values in the given column.
 	*/	
 	@SuppressWarnings("unchecked")	//we check the generic types before putting them in the map, so it's fine to cast the retrieved values
-	public <V> ValueRepresentationStrategy<? super V> getValueRepresentationStrategy(final TableColumnModel<V> column)
+	public <V> CellRepresentationStrategy<? super V> getCellRepresentationStrategy(final TableColumnModel<V> column)
 	{
-		return (ValueRepresentationStrategy<? super V>)columnValueRepresentationStrategyMap.get(column);	//return the strategy linked to the column in the map
-	}
-
-	/**Session, value class, and column names constructor with a default ID and default data model.
-	@param session The Guise session that owns this component.
-	@param columnNames The names to serve as label headers for the columns.
-	@exception NullPointerException if the given session and/or class object is <code>null</code>.
-	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
-	*/
-	public <C> Table(final GuiseSession<?> session, final String... columnNames)
-	{
-		this(session, (String)null, columnNames);	//construct the class, indicating that a default ID should be generated
-	}
-
-	/**Session, value class, and columns constructor with a default ID and default data model.
-	@param session The Guise session that owns this component.
-	@param columns The models representing the table columns.
-	@exception NullPointerException if the given session and/or class object is <code>null</code>.
-	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
-	*/
-	public Table(final GuiseSession<?> session, final TableColumnModel<? extends Object>... columns)
-	{
-		this(session, (String)null, columns);	//construct the class, indicating that a default ID should be generated
-	}
-
-	/**Session, value class, table data, and column names constructor with a default ID and default data model.
-	@param session The Guise session that owns this component.
-	@param rowValues The two-dimensional list of values, where the first index represents the row and the second represents the column, or <code>null</code> if no default values should be given.
-	@param columnNames The names to serve as label headers for the columns.
-	@exception NullPointerException if the given session and/or class object is <code>null</code>.
-	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
-	*/
-	public Table(final GuiseSession<?> session, final Object[][] rowValues, final String... columnNames)
-	{
-		this(session, (String)null, rowValues, columnNames);	//construct the class, indicating that a default ID should be generated
-	}
-
-	/**Session, value class, table data, and columns constructor with a default ID and default data model.
-	@param session The Guise session that owns this component.
-	@param rowValues The two-dimensional list of values, where the first index represents the row and the second represents the column, or <code>null</code> if no default values should be given.
-	@param columns The models representing the table columns.
-	@exception NullPointerException if the given session and/or class object is <code>null</code>.
-	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
-	*/
-	public Table(final GuiseSession<?> session, final Object[][] rowValues, final TableColumnModel<? extends Object>... columns)
-	{
-		this(session, (String)null, rowValues, columns);	//construct the class, indicating that a default ID should be generated
-	}
-	
-	/**Session, ID, value class, and column names constructor with a default data model.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param columnNames The names to serve as label headers for the columns.
-	@exception NullPointerException if the given session and/or class object is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
-	*/
-	public <C> Table(final GuiseSession<?> session, final String id, final String... columnNames)
-	{
-		this(session, id, Object.class, columnNames);	//construct the class with object values
-	}
-
-	/**Session, ID, value class, and columns constructor with a default data model.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param columns The models representing the table columns.
-	@exception NullPointerException if the given session and/or class object is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
-	*/
-	public Table(final GuiseSession<?> session, final String id, final TableColumnModel<? extends Object>... columns)
-	{
-		this(session, id, Object.class, columns);	//construct the class with object values
-	}
-
-	/**Session, ID, value class, table data, and column names constructor with a default data model.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param rowValues The two-dimensional list of values, where the first index represents the row and the second represents the column, or <code>null</code> if no default values should be given.
-	@param columnNames The names to serve as label headers for the columns.
-	@exception NullPointerException if the given session and/or class object is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
-	*/
-	public Table(final GuiseSession<?> session, final String id, final Object[][] rowValues, final String... columnNames)
-	{
-		this(session, id, Object.class, rowValues, columnNames);	//construct the class with object values
-	}
-
-	/**Session, ID, value class, table data, and columns constructor with a default data model.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param rowValues The two-dimensional list of values, where the first index represents the row and the second represents the column, or <code>null</code> if no default values should be given.
-	@param columns The models representing the table columns.
-	@exception NullPointerException if the given session and/or class object is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
-	*/
-	public Table(final GuiseSession<?> session, final String id, final Object[][] rowValues, final TableColumnModel<? extends Object>... columns)
-	{
-		this(session, id, Object.class, rowValues, columns);	//construct the class with object values
+		return (CellRepresentationStrategy<? super V>)columnCellRepresentationStrategyMap.get(column);	//return the strategy linked to the column in the map
 	}
 	
 	/**Session, value class, and column names constructor with a default ID and default data model.
-	@param <C> The type of values contained in all the table's cells.
+	@param <C> The type of values in all the cells in the table.
 	@param session The Guise session that owns this component.
 	@param valueClass The class indicating the type of values held in the model.
 	@param columnNames The names to serve as label headers for the columns.
@@ -169,26 +64,25 @@ public class Table extends AbstractModelComponent<TableModel<?>, Table>
 	}
 
 	/**Session, value class, and columns constructor with a default ID and default data model.
-	@param <C> The type of values contained in all the table's cells.
 	@param session The Guise session that owns this component.
-	@param valueClass The class indicating the type of values held in the model.
 	@param columns The models representing the table columns.
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
 	*/
-	public <C> Table(final GuiseSession<?> session, final Class<C> valueClass, final TableColumnModel<? extends C>... columns)
+	public Table(final GuiseSession<?> session, final TableColumnModel<?>... columns)
 	{
-		this(session, null, valueClass, columns);	//construct the class, indicating that a default ID should be generated
+		this(session, (String)null, columns);	//construct the class, indicating that a default ID should be generated
 	}
 
 	/**Session, value class, table data, and column names constructor with a default ID and default data model.
-	@param <C> The type of values contained in all the table's cells.
+	@param <C> The type of values in all the cells in the table.
 	@param session The Guise session that owns this component.
 	@param valueClass The class indicating the type of values held in the model.
 	@param rowValues The two-dimensional list of values, where the first index represents the row and the second represents the column, or <code>null</code> if no default values should be given.
 	@param columnNames The names to serve as label headers for the columns.
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
+	@exception ClassCastException if one of the values in a row is not compatible with the type of its column.
 	*/
 	public <C> Table(final GuiseSession<?> session, final Class<C> valueClass, final C[][] rowValues, final String... columnNames)
 	{
@@ -196,32 +90,30 @@ public class Table extends AbstractModelComponent<TableModel<?>, Table>
 	}
 
 	/**Session, value class, table data, and columns constructor with a default ID and default data model.
-	@param <C> The type of values contained in all the table's cells.
 	@param session The Guise session that owns this component.
-	@param valueClass The class indicating the type of values held in the model.
 	@param rowValues The two-dimensional list of values, where the first index represents the row and the second represents the column, or <code>null</code> if no default values should be given.
 	@param columns The models representing the table columns.
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
+	@exception ClassCastException if one of the values in a row is not compatible with the type of its column.
 	*/
-	public <C> Table(final GuiseSession<?> session, final Class<C> valueClass, final C[][] rowValues, final TableColumnModel<? extends C>... columns)
+	public Table(final GuiseSession<?> session, final Object[][] rowValues, final TableColumnModel<?>... columns)
 	{
-		this(session, null, valueClass, rowValues, columns);	//construct the class, indicating that a default ID should be generated
+		this(session, null, rowValues, columns);	//construct the class, indicating that a default ID should be generated
 	}
 
 	/**Session, value class, and model constructor with a default ID.
-	@param <C> The type of values contained in all the table's cells.
 	@param session The Guise session that owns this component.
 	@param model The component data model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	*/
-	public <C> Table(final GuiseSession<?> session, final TableModel<C> model)
+	public Table(final GuiseSession<?> session, final TableModel model)
 	{
 		this(session, null, model);	//construct the class, indicating that a default ID should be generated
 	}
 	
 	/**Session, ID, value class, and column names constructor with a default data model.
-	@param <C> The type of values contained in all the table's cells.
+	@param <C> The type of values in all the cells in the table.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@param valueClass The class indicating the type of values held in the model.
@@ -232,26 +124,24 @@ public class Table extends AbstractModelComponent<TableModel<?>, Table>
 	*/
 	public <C> Table(final GuiseSession<?> session, final String id, final Class<C> valueClass, final String... columnNames)
 	{
-		this(session, id, new DefaultTableModel<C>(session, valueClass, null, columnNames));	//construct the class with no default data
+		this(session, id, new DefaultTableModel(session, valueClass, null, columnNames));	//construct the class with no default data
 	}
 
 	/**Session, ID, value class, and columns constructor with a default data model.
-	@param <C> The type of values contained in all the table's cells.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param valueClass The class indicating the type of values held in the model.
 	@param columns The models representing the table columns.
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
 	*/
-	public <C> Table(final GuiseSession<?> session, final String id, final Class<C> valueClass, final TableColumnModel<? extends C>... columns)
+	public Table(final GuiseSession<?> session, final String id, final TableColumnModel<?>... columns)
 	{
-		this(session, id, new DefaultTableModel<C>(session, valueClass, null, columns));	//construct the class with no default data
+		this(session, id, new DefaultTableModel(session, null, columns));	//construct the class with no default data
 	}
 
 	/**Session, ID, value class, table data, and column names constructor with a default data model.
-	@param <C> The type of values contained in all the table's cells.
+	@param <C> The type of values in all the cells in the table.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@param valueClass The class indicating the type of values held in the model.
@@ -260,65 +150,63 @@ public class Table extends AbstractModelComponent<TableModel<?>, Table>
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
+	@exception ClassCastException if one of the values in a row is not compatible with the type of its column.
 	*/
 	public <C> Table(final GuiseSession<?> session, final String id, final Class<C> valueClass, final C[][] rowValues, final String... columnNames)
 	{
-		this(session, id, new DefaultTableModel<C>(session, valueClass, rowValues, columnNames));	//construct the class with a default model
+		this(session, id, new DefaultTableModel(session, valueClass, rowValues, columnNames));	//construct the class with a default model
 	}
 
 	/**Session, ID, value class, table data, and columns constructor with a default data model.
-	@param <C> The type of values contained in all the table's cells.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param valueClass The class indicating the type of values held in the model.
 	@param rowValues The two-dimensional list of values, where the first index represents the row and the second represents the column, or <code>null</code> if no default values should be given.
 	@param columns The models representing the table columns.
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
+	@exception ClassCastException if one of the values in a row is not compatible with the type of its column.
 	*/
-	public <C> Table(final GuiseSession<?> session, final String id, final Class<C> valueClass, final C[][] rowValues, final TableColumnModel<? extends C>... columns)
+	public Table(final GuiseSession<?> session, final String id, final Object[][] rowValues, final TableColumnModel<?>... columns)
 	{
-		this(session, id, new DefaultTableModel<C>(session, valueClass, rowValues, columns));	//construct the class with a default model
+		this(session, id, new DefaultTableModel(session, rowValues, columns));	//construct the class with a default model
 	}
 
 	/**Session, ID, value class, and model constructor.
-	@param <C> The type of values contained in all the table's cells.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@param model The component data model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public <C> Table(final GuiseSession<?> session, final String id, final TableModel<C> model)
+	public Table(final GuiseSession<?> session, final String id, final TableModel model)
 	{
 		super(session, id, model);	//construct the parent class
-		for(final TableColumnModel<? extends C> column:model.getColumns())	//install a default value representation strategy for each column
+		for(final TableColumnModel<?> column:model.getColumns())	//install a default cell representation strategy for each column
 		{
-			installDefaultValueRepresentationStrategy(column);	//create and install a default representation strategy for this column
+			installDefaultCellRepresentationStrategy(column);	//create and install a default representation strategy for this column
 		}
 	}
 
-	/**Installs a default value representation strategy for the given column.
-	@param <T> The type of value contained in teh column.
-	@param column The table column for which a default value representation strategy should be installed.
+	/**Installs a default cell representation strategy for the given column.
+	@param <T> The type of value contained in the column.
+	@param column The table column for which a default cell representation strategy should be installed.
 	*/
-	private <T> void installDefaultValueRepresentationStrategy(final TableColumnModel<T> column)
+	private <T> void installDefaultCellRepresentationStrategy(final TableColumnModel<T> column)
 	{
-		setValueRepresentationStrategy(column, new DefaultValueRepresentationStrategy<T>(getSession()));	//create a default value representation strategy
+		setCellRepresentationStrategy(column, new DefaultCellRepresentationStrategy<T>(getSession()));	//create a default cell representation strategy
 	}
 
 	/**A strategy for generating components to represent table cell model values.
-	The component ID should reflect a unique identifier of the value.
+	The component ID should reflect a unique identifier for the cell.
 	@param <V> The type of value the strategy is to represent.
 	@author Garret Wilson
 	*/
-	public interface ValueRepresentationStrategy<V>
+	public interface CellRepresentationStrategy<V>
 	{
-		/**Creates a component for the given cell value.
-		@param <T> The type of value contained in the column.
+		/**Creates a component to represent the given cell.
+		@param <C> The type of value contained in the column.
 		@param model The model containing the value.
-		@param value The value for which a component should be created.
 		@param rowIndex The zero-based row index of the value.
 		@param column The column of the value.
 		@param editable Whether values in this column are editable.
@@ -326,19 +214,18 @@ public class Table extends AbstractModelComponent<TableModel<?>, Table>
 		@param focused <code>true</code> if the value has the focus.
 		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
 		*/
-		public <T extends V> Component<?> createComponent(final TableModel<? super T> model, final V value, final int rowIndex, final TableColumnModel<T> column, final boolean editable, final boolean selected, final boolean focused);
+		public <C extends V> Component<?> createComponent(final TableModel model, final int rowIndex, final TableColumnModel<C> column, final boolean editable, final boolean selected, final boolean focused);
 	}
 
-	/**A default table cell value representation strategy.
-	A message component will be generated containing the default string representation of a value.
-	The message's ID will be generated by appending the hexadecimal representation of the object's hash code to the word "hash".
+	/**A default table cell representation strategy.
+	A message component will be generated using the cell's value as its message.
+	The message's ID will be in the form "cell-<var>rowIndex</var>-<var>columnIndex</var>.
 	@param <V> The type of value the strategy is to represent.
 	@see Message
 	@see Object#toString() 
-	@see Object#hashCode() 
 	@author Garret Wilson
 	*/
-	public static class DefaultValueRepresentationStrategy<V> implements ValueRepresentationStrategy<V>
+	public static class DefaultCellRepresentationStrategy<V> implements CellRepresentationStrategy<V>
 	{
 
 		/**The Guise session that owns this representation strategy.*/
@@ -351,17 +238,16 @@ public class Table extends AbstractModelComponent<TableModel<?>, Table>
 		@param session The Guise session that owns this representation strategy.
 		@exception NullPointerException if the given session is <code>null</code>.
 		*/
-		public DefaultValueRepresentationStrategy(final GuiseSession<?> session)
+		public DefaultCellRepresentationStrategy(final GuiseSession<?> session)
 		{
 			this.session=checkNull(session, "Session cannot be null");	//save the session
 		}
 
-		/**Creates a component for the given cell value.
+		/**Creates a component for the given cell.
 		This implementation returns a message with string value of the given value using the object's <code>toString()</code> method.
 		The label's ID is set to the hexadecimal representation of the object's hash code appended to the word "hash".
-		@param <T> The type of value contained in the column.
+		@param <C> The type of value contained in the column.
 		@param model The model containing the value.
-		@param value The value for which a component should be created.
 		@param rowIndex The zero-based row index of the value.
 		@param column The column of the value.
 		@param editable Whether values in this column are editable.
@@ -369,23 +255,141 @@ public class Table extends AbstractModelComponent<TableModel<?>, Table>
 		@param focused <code>true</code> if the value has the focus.
 		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
 		*/
-		public <T extends V> Message createComponent(final TableModel<? super T> model, final V value, final int rowIndex, final TableColumnModel<T> column, final boolean editable, final boolean selected, final boolean focused)
+		@SuppressWarnings("unchecked")	//we check the type of the column value class, so the casts are safe
+		public <C extends V> Component<?> createComponent(final TableModel model, final int rowIndex, final TableColumnModel<C> column, final boolean editable, final boolean selected, final boolean focused)
 		{
-			return value!=null	//if there is a value
-					? new Message(getSession(), getID(value), new DefaultMessageModel(getSession(), value.toString()))	//generate a label containing the value's string value
-					: null;	//otherwise return null
+			final GuiseSession<?> session=getSession();	//get the session
+			final TableModel.Cell<C> cell=new TableModel.Cell<C>(rowIndex, column);	//create a cell to represent the row and column
+			final int columnIndex=model.getColumnIndex(column);	//get the logical index of the given column
+			final String id=new StringBuilder("cell-").append(rowIndex).append('-').append(columnIndex).toString();	//generate an ID for this row and column
+			if(editable)	//if the component should be editable
+			{
+				final ValueModel<C> valueModel=new DefaultCellValueModel<C>(session, model, cell);	//create a new value model for the cell
+				final Class<C> valueClass=column.getValueClass();	//get the value class of the column
+				if(Boolean.class.isAssignableFrom(valueClass))	//if the value class is subclass of Boolean
+				{
+					return new CheckControl(session, id, (ValueModel<Boolean>)(Object)valueModel);	//create a new check control for the Boolean value model TODO find out why JDK 1.5.0_03 requires the intermediate Object cast
+				}
+				else	//for all other values
+				{
+					return new TextControl<C>(session, id, valueModel);	//generate a message containing a text input control for the value model
+				}
+			}
+			else	//if the component should not be editable, return a message control
+			{
+				return new Message(session, id, new DefaultCellMessageModel<C>(session, model, cell));	//create a message component containing a message model representing the value's string value				
+			}
+		}
+	}
+
+	/**A message model that returns a default representation of the cell in a message.
+	@param <C> The type of value in the cell.
+	@author Garret Wilson
+	*/
+	public static class DefaultCellMessageModel<C> extends DefaultMessageModel
+	{
+		/**The table model of the cell.*/
+		private final TableModel model;
+
+			/**@return The table model of the cell.*/
+			protected TableModel getModel() {return model;}
+
+		/**The cell being represented*/
+		private TableModel.Cell<C> cell;
+
+			/**@return The cell being represented*/
+			protected TableModel.Cell<C> getCell() {return cell;}
+
+		/**Constructs a default message model for a cell.
+		@param session The Guise session that owns this model.
+		@param model The table model of the cell.
+		@param cell The cell being represented.
+		@exception NullPointerException if the given session, table model and/or cell is <code>null</code>.
+		*/
+		public DefaultCellMessageModel(final GuiseSession<?> session, final TableModel model, final TableModel.Cell<C> cell)
+		{
+			super(session);	//construct the parent class
+			this.model=checkNull(model, "Table model cannot be null");
+			this.cell=checkNull(cell, "Cell cannot be null");
 		}
 
-		/**Determines an identier for the given object.
-		This implementation returns the hexadecimal representation of the object's hash code appended to the word "hash".
-		@param value The value for which an identifier should be returned.
-		@return A string identifying the value, or <code>null</code> if the provided value is <code>null</code>.
-		@see Component#getID()
+		/**Determines the message text of the cell.
+		This implementation returns a message with string value of the given value using the object's <code>toString()</code> method.
+		@return The message text of the cell.
 		*/
-		protected String getID(final V value)	//TODO del and incorporate into createComponent()
+		public String getMessage()
 		{
-			return value!=null ? "hash"+Integer.toHexString(value.hashCode()) : null;	//if a value is given return the word "hash" followed by a hexadecimal representation of the value's hash code
+			final TableModel.Cell<C> cell=getCell();	//get our current cell
+			final C value=getModel().getCellValue(cell.getRowIndex(), cell.getColumn());	//get the value from the table model
+			return value!=null ? value.toString() : null;	//if there is a value, return value's string value
 		}
+
+		/**Sets the text of the message. This version throws an exception, as this model is read-only.
+		@param newMessage The new text of the message.
+		@exception UnsupportedOperationException because default cell message models are read-only.
+		*/
+		public void setMessage(final String newMessage)
+		{
+			throw new UnsupportedOperationException("Cell is read-only.");
+		}
+
+	}
+
+	/**A value model that returns and updates a the value of the cell.
+	@param <C> The type of value in the cell.
+	@author Garret Wilson
+	*/
+	public static class DefaultCellValueModel<C> extends DefaultValueModel<C>
+	{
+		/**The table model of the cell.*/
+		private final TableModel model;
+
+			/**@return The table model of the cell.*/
+			protected TableModel getModel() {return model;}
+
+		/**The cell being represented*/
+		private TableModel.Cell<C> cell;
+
+			/**@return The cell being represented*/
+			protected TableModel.Cell<C> getCell() {return cell;}
+
+		/**Constructs a default value model for a cell.
+		@param session The Guise session that owns this model.
+		@param model The table model of the cell.
+		@param cell The cell being represented.
+		@exception NullPointerException if the given session, table model and/or cell is <code>null</code>.
+		*/
+		public DefaultCellValueModel(final GuiseSession<?> session, final TableModel model, final TableModel.Cell<C> cell)
+		{
+			super(session, checkNull(cell, "Cell cannot be null").getColumn().getValueClass());	//construct the parent class
+			this.model=checkNull(model, "Table model cannot be null");
+			this.cell=cell;
+		}
+
+		/**@return The value from the table model cell, or <code>null</code> if there is no value in the cell.*/
+		public C getValue()
+		{
+			final TableModel.Cell<C> cell=getCell();	//get our current cell
+			return getModel().getCellValue(cell.getRowIndex(), cell.getColumn());	//return the value from the table model
+		}
+
+		/**Sets the value in the cell.
+		@param newValue The value of the cell.
+		@exception ValidationException if the provided value is not valid.
+		@see #getValidator()
+		@see ValueModel#VALUE_PROPERTY
+		*/
+		public void setValue(final C newValue) throws ValidationException
+		{
+			final Validator<C> validator=getValidator();	//get the currently installed validator, if there is one
+			if(validator!=null)	//if a validator is installed, always validate the value, even if it isn't changing, so that an initial value that may not be valid will throw an error when it's tried to be set to the same, but invalid, value
+			{
+				validator.validate(newValue);	//validate the new value, throwing an exception if anything is wrong
+			}
+			final TableModel.Cell<C> cell=getCell();	//get our current cell
+			getModel().setCellValue(cell.getRowIndex(), cell.getColumn(), newValue);	//set the value in the table model
+		}
+
 	}
 
 }

@@ -7,18 +7,8 @@ import com.garretwilson.beans.AbstractPropertyValueChangeListener;
 import com.garretwilson.beans.PropertyValueChangeEvent;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
-import com.javaguise.event.ActionEvent;
-import com.javaguise.event.ActionListener;
-import com.javaguise.event.ModalEvent;
-import com.javaguise.event.ModalListener;
-import com.javaguise.event.NavigateActionListener;
-import com.javaguise.model.AbstractModelGroup;
-import com.javaguise.model.ActionModel;
-import com.javaguise.model.ModelGroup;
-import com.javaguise.model.MutualExclusionModelGroup;
-import com.javaguise.model.SingleListSelectionStrategy;
-import com.javaguise.model.TextModel;
-import com.javaguise.model.ValueModel;
+import com.javaguise.event.*;
+import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.RegularExpressionStringValidator;
 import com.javaguise.validator.ValidationException;
@@ -205,16 +195,20 @@ public class HomeFrame extends DefaultFrame
 
 		getSession().setLocale(Locale.FRANCE);
 
-		final Object[][] multiplicationTableData=new Object[10][10];
-		for(int row=0; row<10; ++row)
+		final Integer[][] multiplicationTableData=new Integer[2][2];
+		for(int row=0; row<2; ++row)
 		{
-			for(int column=0; column<10; ++column)
+			for(int column=0; column<2; ++column)
 			{
 				multiplicationTableData[row][column]=new Integer(row*column);
 			}
 		}
-		final Table multiplicationTable=new Table(session, multiplicationTableData, "0", "1", "2", "3", "4", "5", "6", "7", "8", "9");
+		final Table multiplicationTable=new Table(session, Integer.class, multiplicationTableData, "0", "1");
 		multiplicationTable.getModel().setLabel("Multiplication Table");
+		for(final TableColumnModel<?> column:multiplicationTable.getModel().getColumns())
+		{
+			column.setEditable(true);
+		}
 		panel.add(multiplicationTable);
 		
 		setContent(panel);

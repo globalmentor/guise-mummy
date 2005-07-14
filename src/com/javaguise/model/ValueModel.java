@@ -1,6 +1,7 @@
 package com.javaguise.model;
 
 import static com.garretwilson.lang.ClassUtilities.*;
+
 import com.javaguise.validator.*;
 
 /**A model for user input of a value.
@@ -10,8 +11,6 @@ import com.javaguise.validator.*;
 public interface ValueModel<V> extends ControlModel
 {
 
-	/**The editable bound property.*/
-	public final static String EDITABLE_PROPERTY=getPropertyName(ValueModel.class, "editable");
 	/**The value bound property.*/
 	public final static String VALUE_PROPERTY=getPropertyName(ValueModel.class, "value");
 	/**The validator bound property.*/

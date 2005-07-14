@@ -2,30 +2,37 @@ package com.javaguise.model;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
-import com.javaguise.component.Component;
-
 /**A column in a table.
 @param <V> The type of values contained in the table column.
 @author Garret Wilson
 */
-public interface TableColumnModel<V> extends LabelModel
+public interface TableColumnModel<V> extends ControlModel
 {
 
-	/**The value representation strategy bound property.*/
-//TODO del when works	public final static String VALUE_REPRESENTATION_STRATEGY_PROPERTY=getPropertyName(TableColumnModel.class, "valueRepresentationStrategy");
+	/**The bound property of whether the component is visible.*/
+	public final static String VISIBLE_PROPERTY=getPropertyName(TableColumnModel.class, "visible");
 
 	/**@return The class representing the type of values this model can hold.*/
 	public Class<V> getValueClass();
 
-	/**@return The strategy used to generate a component to represent each value in the model.*/
-//TODO del when works	public ValueRepresentationStrategy<V, ? extends Component<?>> getValueRepresentationStrategy();
+	/**@return Whether the cells in this table column model are editable and will allow the the user to change their values.*/
+	public boolean isEditable();
 
-	/**Sets the strategy used to generate a component to represent each value in the model.
-	This is a bound property
-	@param newValueRepresentationStrategy The new strategy to create components to represent this model's values.
-	@exception NullPointerException if the provided value representation strategy is <code>null</code>.
-	@see TableColumnModel#VALUE_REPRESENTATION_STRATEGY_PROPERTY
+	/**Sets whether the cells in this table column model are editable and will allow the the user to change their values.
+	This is a bound property of type <code>Boolean</code>.
+	@param newEditable <code>true</code> if the table column cells should allow the user to change their values.
+	@see #EDITABLE_PROPERTY
 	*/
-//TODO del when works	public void setValueRepresentationStrategy(final ValueRepresentationStrategy<V, ? extends Component<?>> newValueRepresentationStrategy);
+	public void setEditable(final boolean newEditable);
+
+	/**@return Whether the column is visible.*/
+	public boolean isVisible();
+
+	/**Sets whether the column is visible.
+	This is a bound property of type <code>Boolean</code>.
+	@param newVisible <code>true</code> if the column should be visible, else <code>false</code>.
+	@see #VISIBLE_PROPERTY
+	*/
+	public void setVisible(final boolean newVisible);
 
 }

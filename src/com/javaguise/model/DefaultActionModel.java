@@ -6,7 +6,7 @@ import com.javaguise.session.GuiseSession;
 /**A default implementation of a button model.
 @author Garret Wilson
 */
-public class DefaultActionModel extends DefaultControlModel implements ActionModel
+public class DefaultActionModel extends AbstractControlModel implements ActionModel
 {
 
 	/**The confirmation message for the action, or <code>null</code> if there is no confirmation message.*/

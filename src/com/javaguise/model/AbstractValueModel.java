@@ -10,7 +10,7 @@ A derived class need only implement the value access methods.
 @param <V> The type of value contained in the model.
 @author Garret Wilson
 */
-public abstract class AbstractValueModel<V> extends DefaultControlModel implements ValueModel<V>
+public abstract class AbstractValueModel<V> extends AbstractControlModel implements ValueModel<V>
 {
 
 	/**Whether the model's value is editable and the corresponding control will allow the the user to change the value.*/

@@ -18,8 +18,29 @@ The model is thread-safe, synchronized on itself. Any iteration over values shou
 @param <V> The type of values representing table rows.
 @author Garret Wilson
 */
-public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectModel<V> implements TableModel<Object>
+public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectModel<V> implements TableModel
 {
+
+	/**Whether the table is editable and the cells will allow the the user to change their values, if their respective columns are designated as editable as well.*/
+	private boolean editable=true;
+
+		/**@return Whether the table is editable and the cells will allow the the user to change their values, if their respective columns are designated as editable as well.*/
+		public boolean isEditable() {return editable;}
+
+		/**Sets whether the table is editable and the cells will allow the the user to change their values, if their respective columns are designated as editable as well.
+		This is a bound property of type <code>Boolean</code>.
+		@param newEditable <code>true</code> if the cells should allow the user to change their values if their respective columns are also designated as editable.
+		@see TableModel#EDITABLE_PROPERTY
+		*/
+		public void setEditable(final boolean newEditable)
+		{
+			if(editable!=newEditable)	//if the value is really changing
+			{
+				final boolean oldEditable=editable;	//get the old value
+				editable=newEditable;	//actually change the value
+				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
+			}			
+		}
 
 	/**The list of table column models.*/
 	private final List<TableColumnModel<?>> tableColumnModels=new CopyOnWriteArrayList<TableColumnModel<?>>();
@@ -75,18 +96,20 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 	}
 	
 	/**Returns the cell value at the given row and column.
+	@param <C> The type of cell values in the given column.
 	@param rowIndex The zero-based row index.
 	@param column The column for which a value should be returned.
 	@return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
 	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
 	@exception IllegalArgumentException if the given column is not one of this table's columns.
 	*/
-	public <T> T getCellValue(final int rowIndex, final TableColumnModel<T> column)
+	public <C> C getCellValue(final int rowIndex, final TableColumnModel<C> column)
 	{
 		return getCellValue(get(rowIndex), rowIndex, column);	//retrieve the value in the given row and ask for the corresponding cell value 
 	}
 
 	/**Sets the cell value at the given row and column.
+	@param <C> The type of cell values in the given column.
 	@param rowIndex The zero-based row index.
 	@param column The column for which a value should be returned.
 	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
@@ -94,12 +117,13 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
 	@exception IllegalArgumentException if the given column is not one of this table's columns.
 	*/
-	public <T> T setCellValue(final int rowIndex, final TableColumnModel<T> column, final T newCellValue)
+	public <C> C setCellValue(final int rowIndex, final TableColumnModel<C> column, final C newCellValue)
 	{
 		return setCellValue(get(rowIndex), rowIndex, column, newCellValue);	//retrieve the value in the given row and set the corresponding cell value 
 	}
 
 	/**Returns the value's property for the given column.
+	@param <C> The type of cell values in the given column.
 	@param value The value in this list select model.
 	@param rowIndex The zero-based row index of the value.
 	@param column The column for which a value should be returned.
@@ -107,9 +131,10 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
 	@exception IllegalArgumentException if the given column is not one of this table's columns.
 	*/
-	protected abstract <T> T getCellValue(final V value, final int rowIndex, final TableColumnModel<T> column);
+	protected abstract <C> C getCellValue(final V value, final int rowIndex, final TableColumnModel<C> column);
 
 	/**Sets the value's property for the given column.
+	@param <C> The type of cell values in the given column.
 	@param value The value in this list select model.
 	@param rowIndex The zero-based row index of the value.
 	@param column The column for which a value should be returned.
@@ -117,6 +142,6 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
 	@exception IllegalArgumentException if the given column is not one of this table's columns.
 	*/
-	protected abstract <T> T setCellValue(final V value, final int rowIndex, final TableColumnModel<T> column, final T newCellValue);
+	protected abstract <C> C setCellValue(final V value, final int rowIndex, final TableColumnModel<C> column, final C newCellValue);
 
 }
