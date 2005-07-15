@@ -76,7 +76,7 @@ public class HomeFrame extends DefaultFrame
 				{
 					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
 					{
-						getSession().navigateModal("edituser", new ModalListener<Object>()
+						getSession().navigateModal("edituser", new ModalAdapter<Object>()
 								{
 									/**Called when an a modal frame ends its modality.
 									@param modalEvent The event indicating the frame ending modality and the modal value.

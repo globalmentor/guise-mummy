@@ -1,7 +1,9 @@
 package com.javaguise.model;
 
 import java.util.*;
+
 import static java.util.Collections.*;
+
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.garretwilson.lang.ObjectUtilities;
@@ -42,10 +44,19 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 			}			
 		}
 
+	/**The map of table column models in logical order.*/
+	private final List<TableColumnModel<?>> logicalTableColumnModels=new CopyOnWriteArrayList<TableColumnModel<?>>();
+
+		/**Determines the logical index of the given table column.
+		@param column One of the table columns.
+		@return The zero-based logical index of the column within the table, or -1 if the column is not one of the model's columns.
+		*/
+		public int getColumnIndex(final TableColumnModel<?> column) {return logicalTableColumnModels.indexOf(column);}
+	
 	/**The list of table column models.*/
 	private final List<TableColumnModel<?>> tableColumnModels=new CopyOnWriteArrayList<TableColumnModel<?>>();
 
-	/**@return A read-only list of table columns.*/ 
+	/**@return A read-only list of table columns in physical order.*/ 
 	public List<TableColumnModel<?>> getColumns() {return unmodifiableList(tableColumnModels);}
 
 	/**@return The number of rows in this table.*/

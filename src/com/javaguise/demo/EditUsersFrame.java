@@ -13,7 +13,8 @@ Copyright © 2005 GlobalMentor, Inc.
 Demonstrates list controls with default representation, thread-safe select model access,
 	sorting list control models, listening for select model list changes,
 	retrieving navigation frames, invoking modal frames, retrieving modal frame results,
-	disabled control models, and action model confirmation messages.
+	disabled control models, action model confirmation messages, and
+	accessing a custom Guise application.
 @author Garret Wilson
 */
 public class EditUsersFrame extends DefaultFrame	//TODO add a way to keep user IDs from being duplicated
@@ -33,10 +34,11 @@ public class EditUsersFrame extends DefaultFrame	//TODO add a way to keep user I
 		final ListControl<DemoUser> userListControl=new ListControl<DemoUser>(session, DemoUser.class, new SingleListSelectionStrategy<DemoUser>());	//create a list control allowing only single selections
 		userListControl.getModel().setLabel("Users");	//set the list control label
 		userListControl.setRowCount(8);	//request eight visible rows in the list
-
-		userListControl.getModel().add(new DemoUser("user1", "Jane", null, "Smith", "janesmith@example.com"));	//add example users
-		userListControl.getModel().add(new DemoUser("user2", "John", null, "Smith", "johnsmith@example.com"));
-		userListControl.getModel().add(new DemoUser("user3", "Jill", null, "Jones", "jilljones@example.com"));
+		final List<DemoUser> applicationUserList=((DemoApplication)getSession().getApplication()).getUsers();	//get the application's list of users
+		synchronized(applicationUserList)	//don't allow others to modify the application user list while we iterate over it
+		{
+			userListControl.getModel().addAll(applicationUserList);	//add all the users from the application
+		}
 
 		synchronized(userListControl.getModel())	//don't allow the user select model to be changed by another thread while we sort it
 		{
@@ -51,9 +53,11 @@ public class EditUsersFrame extends DefaultFrame	//TODO add a way to keep user I
 				{
 					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
 					{
-						session.releaseNavigationFrame(EDIT_USER_FRAME_NAVIGATION_PATH);	//make sure we'll be going to a blank slate
 						session.navigateModal(EDIT_USER_FRAME_NAVIGATION_PATH, new ModalListener<DemoUser>()	//navigate modally to the edit user frame
 								{
+									public void modalBegan(final ModalEvent<DemoUser> modalEvent)	//when modal editing begins
+									{
+									}
 									public void modalEnded(final ModalEvent<DemoUser> modalEvent)	//when modal editing is finished
 									{
 										final DemoUser newUser=modalEvent.getResult();	//get the modal result
@@ -81,10 +85,12 @@ public class EditUsersFrame extends DefaultFrame	//TODO add a way to keep user I
 						final DemoUser user=userListControl.getModel().getSelectedValue();	//get the selected user
 						if(user!=null)	//if a user is selected
 						{
-							final EditUserFrame editUserFrame=(EditUserFrame)session.getNavigationFrame(EDIT_USER_FRAME_NAVIGATION_PATH);	//get the edit user frame
-							editUserFrame.setUser(user);	//initialize the frame with this user
 							session.navigateModal(EDIT_USER_FRAME_NAVIGATION_PATH, new ModalListener<DemoUser>()	//navigate modally to the edit user frame
 									{
+										public void modalBegan(final ModalEvent<DemoUser> modalEvent)	//when modal editing begins
+										{
+											((EditUserFrame)modalEvent.getSource()).setUser(user);	//initialize the frame with this user
+										}
 										public void modalEnded(final ModalEvent<DemoUser> modalEvent)	//when modal editing is finished
 										{
 											final DemoUser newUser=modalEvent.getResult();	//get the modal result
@@ -133,6 +139,12 @@ public class EditUsersFrame extends DefaultFrame	//TODO add a way to keep user I
 						final boolean listEmpty=listEvent.getSource().isEmpty();	//see if the list is empty
 						editButton.getModel().setEnabled(!listEmpty);	//only enable the edit button if there are users to edit
 						removeButton.getModel().setEnabled(!listEmpty);	//only enable the remove button if there are users to remove
+						final List<DemoUser> applicationUserList=((DemoApplication)getSession().getApplication()).getUsers();	//get the application's list of users
+						synchronized(applicationUserList)	//don't allow others to modify the application user list while we modify it
+						{
+							applicationUserList.clear();	//clear all the application users
+							applicationUserList.addAll(userListControl.getModel());	//update the application users with the ones we are editing						
+						}
 					}
 				});	
 		

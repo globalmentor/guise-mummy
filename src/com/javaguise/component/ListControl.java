@@ -36,6 +36,49 @@ public class ListControl<V> extends AbstractListSelectControl<V, ListSelectModel
 			}			
 		}
 
+	/**Session and model constructor.
+	@param session The Guise session that owns this component.
+	@param model The component data model.
+	@exception NullPointerException if the given session and/or model is <code>null</code>.
+	*/
+	public ListControl(final GuiseSession<?> session, final ListSelectModel<V> model)
+	{
+		this(session, null, model);	//construct the class, indicating that a default ID should be generated
+	}
+
+	/**Session, model, and row count constructor.
+	@param session The Guise session that owns this component.
+	@param model The component data model.
+	@exception NullPointerException if the given session and/or model is <code>null</code>.
+	*/
+	public ListControl(final GuiseSession<?> session, final ListSelectModel<V> model, final int rowCount)
+	{
+		this(session, null, model, rowCount);	//construct the class, indicating that a default ID should be generated
+	}
+
+	/**Session, model, and value representation strategy constructor.
+	@param session The Guise session that owns this component.
+	@param model The component data model.
+	@param valueRepresentationStrategy The strategy to create label models to represent this model's values.
+	@exception NullPointerException if the given session, model, and/or value representation strategy is <code>null</code>.
+	*/
+	public ListControl(final GuiseSession<?> session, final ListSelectModel<V> model, final ValueRepresentationStrategy<V> valueRepresentationStrategy)
+	{
+		this(session, null, model, valueRepresentationStrategy);	//construct the class, indicating that a default ID should be generated
+	}
+
+	/**Session, model, value representation strategy, and row count constructor.
+	@param session The Guise session that owns this component.
+	@param model The component data model.
+	@param valueRepresentationStrategy The strategy to create label models to represent this model's values.
+	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
+	@exception NullPointerException if the given session, model, and/or value representation strategy is <code>null</code>.
+	*/
+	public ListControl(final GuiseSession<?> session, final ListSelectModel<V> model, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final int rowCount)
+	{
+		this(session, null, model, valueRepresentationStrategy, rowCount);	//construct the class, indicating that a default ID should be generated
+	}
+		
 	/**Session constructor with a default data model to represent a given type with multiple selection.
 	@param session The Guise session that owns this component.
 	@param valueClass The class indicating the type of value held in the model.
@@ -153,7 +196,7 @@ public class ListControl<V> extends AbstractListSelectControl<V, ListSelectModel
 	*/
 	public ListControl(final GuiseSession<?> session, final String id, final ListSelectModel<V> model, final int rowCount)
 	{
-		this(session, id, model, new DefaultValueRepresentationStrategy<V>(session));	//construct the class with a default representation strategy
+		this(session, id, model, new DefaultValueRepresentationStrategy<V>(session), rowCount);	//construct the class with a default representation strategy
 	}
 
 	/**Session, ID, model, and value representation strategy constructor.

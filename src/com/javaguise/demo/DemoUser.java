@@ -44,10 +44,34 @@ public class DemoUser implements Principal, Comparable<DemoUser>
 		public String getLastName() {return lastName;}
 
 	/**The email address of the user.*/
-	private final String email;
+	private String email;
 
 		/**@return The email address of the user.*/
-		public final String getEmail() {return email;}
+		public String getEmail() {return email;}
+
+		/**Sets the email address of the user.
+		@param email The new email address of the user.
+		@exception NullPointerException if the email is <code>null</code>.
+		*/
+		public void setEmail(final String email)
+		{
+			if(email==null)	//if the email is null
+			{
+				throw new NullPointerException("Only the user middle name is optional");
+			}
+			this.email=email;	//save the email
+		}
+
+	/**Whether the user is authorized.*/
+	private boolean authorized=false;
+
+		/**@return Whether the user is authorized.*/
+		public boolean isAuthorized() {return authorized;}
+
+		/**Sets whether the user is authorized.
+		@param authorized Whether the user is authorized.
+		*/
+		public void setAuthorized(final boolean authorized) {this.authorized=authorized;}
 
 	/**Constructor.
 	@param id The user ID.

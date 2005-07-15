@@ -2,21 +2,13 @@ package com.javaguise.event;
 
 import java.net.URI;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.net.URIUtilities.*;
-
-/**An object that listens for action events.
+/**An object that listens for action events and in response changes the navigation.
+This class if declared final because it encapsulates a set of known, bounded functionality that may be deferred to the client if possible.
 @param <S> The type of the event source.
 @author Garret Wilson
 */
-public class NavigateActionListener<S> implements ActionListener<S>
+public final class NavigateActionListener<S> extends AbstractNavigateActionListener<S>
 {
-
-	/**The requested navigation URI.*/
-	private final URI navigationURI;
-
-		/**@return The requested navigation URI.*/
-		public URI getNavigationURI() {return navigationURI;}
 
 	/**Constructs a listener to navigate to the provided path.
 	@param navigationPath A path that is either relative to the application context path or is absolute.
@@ -25,7 +17,7 @@ public class NavigateActionListener<S> implements ActionListener<S>
 	*/
 	public NavigateActionListener(final String navigationPath)
 	{
-		this(createPathURI(navigationPath));	//create a URI from the path and construct the class
+		super(navigationPath);	//construct the parent class
 	}
 
 	/**Constructs a listener to navigate to the provided URI.
@@ -34,7 +26,7 @@ public class NavigateActionListener<S> implements ActionListener<S>
 	*/
 	public NavigateActionListener(final URI navigationURI)
 	{
-		this.navigationURI=checkNull(navigationURI, "Navigation URI cannot be null.");
+		super(navigationURI);	//construct the parent class
 	}
 
 	/**Called when an action is initiated.

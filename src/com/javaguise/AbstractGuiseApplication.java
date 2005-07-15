@@ -15,6 +15,8 @@ import com.javaguise.component.DefaultFrame;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.*;
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.net.URIUtilities;
+
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.util.LocaleUtilities.*;
@@ -325,6 +327,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@return The path resolved against the application base path.
 	@exception NullPointerException if the given path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #resolveURI(URI)} should be used instead).
+	@see #getBasePath()
 	@see #resolveURI(URI)
 	*/
 	public String resolvePath(final String path)
@@ -339,11 +342,39 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@param uri The URI to be resolved.
 	@return The uri resolved against the application base path.
 	@exception NullPointerException if the given URI is <code>null</code>.
-	@see GuiseApplication#getBasePath()
+	@see #getBasePath()
+	@see #resolvePath(String)
 	*/
 	public URI resolveURI(final URI uri)
 	{
 		return URI.create(getBasePath()).resolve(checkNull(uri, "URI cannot be null."));	//create a URI from the application base path and resolve the given path against it
+	}
+
+	/**Changes an absolute path to an application-relative path.
+	For an application base path "/path/to/application/", relativizing "/path/to/application/relative/path" will yield "relative/path"
+	@param path The path to be relativized.
+	@return The path relativized to the application base path.
+	@exception NullPointerException if the given path is <code>null</code>.
+	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #resolveURI(URI)} should be used instead).
+	@see #getBasePath()
+	@see #relativizeURI(URI)
+	*/
+	public String relativizePath(final String path)
+	{
+		return URIUtilities.relativizePath(getBasePath(), path);	//get the path relative to the application path 
+	}
+
+	/**Changes a URI to an application-relative path.
+	For an application base path "/path/to/application/", relativizing "http://www.example.com/path/to/application/relative/path" will yield "relative/path"
+	@param uri The URI to be relativized.
+	@return The URI path relativized to the application base path.
+	@exception NullPointerException if the given URI is <code>null</code>.
+	@see #getBasePath()
+	@see #relativizePath(String)
+	*/
+	public String relativizeURI(final URI uri)
+	{
+		return relativizePath(uri.getRawPath());	//relativize the path of the URI TODO make sure the URI is from the correct domain
 	}
 
 	/**Determines the locale-sensitive path of the given resource path.
@@ -389,7 +420,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	public boolean hasResource(final String resourcePath)
 	{
 		checkInstalled();	//make sure we're installed
-		final String relativeApplicationPath=relativizePath(getContainer().getBasePath(), getBasePath());	//get the application path relative to the container path 
+		final String relativeApplicationPath=URIUtilities.relativizePath(getContainer().getBasePath(), getBasePath());	//get the application path relative to the container path 
 		return container.hasResource(relativeApplicationPath+resourcePath);	//delegate to the container
 	}
 
@@ -404,7 +435,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	public InputStream getResourceAsStream(final String resourcePath)
 	{
 		checkInstalled();	//make sure we're installed
-		final String relativeApplicationPath=relativizePath(getContainer().getBasePath(), getBasePath());	//get the application path relative to the container path 
+		final String relativeApplicationPath=URIUtilities.relativizePath(getContainer().getBasePath(), getBasePath());	//get the application path relative to the container path 
 		return container.getResourceAsStream(relativeApplicationPath+resourcePath);	//delegate to the container
 	}
 

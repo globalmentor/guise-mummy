@@ -83,7 +83,7 @@ public class TextSearchFrame extends DefaultFrame
 		inputPanel.add(searchButton);	//add the search button to the input panel
 
 			//text area
-		final TextAreaControl textAreaControl=new TextAreaControl(session, 25, 80);	//create a text area control 25 rows by 80 columns
+		final TextAreaControl textAreaControl=new TextAreaControl(session, 25, 40);	//create a text area control 25 rows by 40 columns
 		textAreaControl.getModel().setLabel("Results");	//set the label of the text area
 		textAreaControl.getModel().setEditable(false);	//don't allow the text area control to be edited.
 

@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import com.garretwilson.beans.PropertyBindable;
+import com.garretwilson.net.URIUtilities;
 import com.javaguise.component.*;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.*;
@@ -115,6 +116,7 @@ public interface GuiseApplication extends PropertyBindable
 	@return The path resolved against the application base path.
 	@exception NullPointerException if the given path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #resolveURI(URI)} should be used instead).
+	@see #getBasePath()
 	@see #resolveURI(URI)
 	*/
 	public String resolvePath(final String path);
@@ -127,8 +129,30 @@ public interface GuiseApplication extends PropertyBindable
 	@return The uri resolved against the application base path.
 	@exception NullPointerException if the given URI is <code>null</code>.
 	@see #getBasePath()
+	@see #resolvePath(String)
 	*/
 	public URI resolveURI(final URI uri);
+
+	/**Changes an absolute path to an application-relative path.
+	For an application base path "/path/to/application/", relativizing "/path/to/application/relative/path" will yield "relative/path"
+	@param path The path to be relativized.
+	@return The path relativized to the application base path.
+	@exception NullPointerException if the given path is <code>null</code>.
+	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #resolveURI(URI)} should be used instead).
+	@see #getBasePath()
+	@see #relativizeURI(URI)
+	*/
+	public String relativizePath(final String path);
+
+	/**Changes a URI to an application-relative path.
+	For an application base path "/path/to/application/", relativizing "http://www.example.com/path/to/application/relative/path" will yield "relative/path"
+	@param uri The URI to be relativized.
+	@return The URI path relativized to the application base path.
+	@exception NullPointerException if the given URI is <code>null</code>.
+	@see #getBasePath()
+	@see #relativizePath(String)
+	*/
+	public String relativizeURI(final URI uri);
 
 	/**Determines the locale-sensitive path of the given resource path.
 	Based upon the provided locale, candidate resource paths are checked in the following order:

@@ -177,6 +177,14 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	/**@return Whether the session is in a modal navigation state.*/
 	public boolean isModalNavigation();
 
+	/**Begins modal interaction for a particular modal frame.
+	The modal navigation is pushed onto the stack, and an event is fired to the modal listener of the modal navigation.
+	@param <R> The type of modal result the modal frame produces.
+	@param modalFrame The frame for which modal navigation state should begin.
+	@param modalNavigation The state of modal navigation.
+	*/
+	public <R> void beginModalNavigation(final ModalFrame<R, ?> modalFrame, final ModalNavigation<R> modalNavigation);
+
 	/**Ends modal interaction for a particular modal frame.
 	The frame is released from the cache so that new navigation will create a new modal frame.
 	This method is called by modal frames and should seldom if ever be called directly.

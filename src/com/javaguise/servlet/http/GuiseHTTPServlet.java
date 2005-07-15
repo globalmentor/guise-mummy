@@ -40,6 +40,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 
 	/**The init parameter, "defaultLocale", used to specify the default locale.*/
 	public final static String DEFAULT_LOCALE_INIT_PARAMETER_PREFIX="defaultLocale";
+	/**The init parameter, "guiseApplicationClass", used to specify the application class.*/
+	public final static String GUISE_APPLICATION_CLASS_INIT_PARAMETER_PREFIX="guiseApplicationClass";
 	/**The init parameter, "supportedLocales", used to specify the supported locales.*/
 	public final static String SUPPORTED_LOCALES_INIT_PARAMETER_PREFIX="supportedLocales";
 	/**The prefix, "navigation.", used to identify navigation definitions in the web application's init parameters.*/
@@ -80,7 +82,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		}
 
 	/**The Guise application controlled by this servlet.*/
-	private final AbstractGuiseApplication guiseApplication;
+	private AbstractGuiseApplication guiseApplication;
 
 		/**@return The Guise application controlled by this servlet.*/
 		protected AbstractGuiseApplication getGuiseApplication() {return guiseApplication;}
@@ -90,12 +92,15 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	Subclasses can override this method to create a specialized application type. 
 	@return A new Guise application object.
 	*/
+/*TODO del when works
 	protected AbstractGuiseApplication createGuiseApplication()
 	{
+		getServl
 		final AbstractGuiseApplication guiseApplication=new DefaultGuiseApplication();	//create a default application
 		guiseApplication.installControllerKit(new XHTMLControllerKit());	//create and install an XHTML controller kit
 		return guiseApplication;	//return the created Guise application
 	}
+*/
 
 	/**Default constructor.
 	Creates a single Guise application.
@@ -104,7 +109,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	public GuiseHTTPServlet()
 	{
 //TODO del		guiseContainer=new HTTPServletGuiseContainer();	//create the Guise container
-		guiseApplication=createGuiseApplication();	//create a store a Guise application
+//TODO del		guiseApplication=createGuiseApplication();	//create a store a Guise application
 	}
 		
 	/**Initializes the servlet.
@@ -120,7 +125,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		//TODO turn off directory listings, and/or fix them
 		try
 		{
-			initGuiseApplication(getGuiseApplication(), servletConfig);	//initialize the frame bindings
+			guiseApplication=initGuiseApplication(servletConfig);	//initialize the application and frame bindings
 		}
 		catch(final Exception exception)	//if there is any problem initializing the Guise application
 		{
@@ -130,16 +135,43 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 
 	/**Initializes bindings between paths and associated navigation frame classes.
 	This implementation reads the initialization parameters named <code>navigation.<var>frameID</var></code>, expecting values in the form <code><var>contextRelativePath</var>?class=<var>com.example.Frame</var></code>.
-	@param guiseApplication The Guise application to initialize.
-	@param servletConfig The servlet configuration. 
+	@param servletConfig The servlet configuration.
+	@return The new initialized application. 
 	@exception IllegalArgumentException if the one of the frame bindings is not expressed in correct format.
 	@exception IllegalArgumentException if the one of the classes specified as a frame binding could not be found.
+	@exception IllegalArgumentException if the one of the classes specified as a frame binding could not be found.
 	@exception ClassCastException if the one of the classes specified as a frame binding does not represent a subclass of a frame component.
-	@exception ServletException if there is a problem initializing the frame bindings.
+	@exception ServletException if there is a problem initializing the application or frame bindings.
 	@see Frame
 	*/
-	protected void initGuiseApplication(final AbstractGuiseApplication guiseApplication, final ServletConfig servletConfig) throws ServletException
+	protected AbstractGuiseApplication initGuiseApplication(final ServletConfig servletConfig) throws ServletException
 	{
+		final AbstractGuiseApplication guiseApplication;	//create the application and store it here
+		final String guiseApplicationClassName=servletConfig.getInitParameter(GUISE_APPLICATION_CLASS_INIT_PARAMETER_PREFIX);	//get name of the guise application class
+		if(guiseApplicationClassName!=null)	//if there is a Guise application class name specified
+		{
+			try
+			{
+				guiseApplication=(AbstractGuiseApplication)Class.forName(guiseApplicationClassName).newInstance();	//create the Guise application from the specified class
+			}
+			catch(final ClassNotFoundException classNotFoundException)	//if the application class cannot be found
+			{
+				throw new IllegalArgumentException("The initialization parameter specified application class "+guiseApplicationClassName+" could not be found.", classNotFoundException);						
+			}			
+			catch(final InstantiationException instantiationException)	//if the application class could not be instantiated
+			{
+				throw new IllegalArgumentException("The initialization parameter specified application class "+guiseApplicationClassName+" is an interface or an abstract class.", instantiationException);						
+			}			
+			catch(final IllegalAccessException illegalAccessException)	//if the application class constructor cannot be accessed
+			{
+				throw new IllegalArgumentException("The initialization parameter specified application class "+guiseApplicationClassName+" does not have an accessible constructor.", illegalAccessException);						
+			}			
+		}
+		else	//if no Guise application class was specified
+		{
+			guiseApplication=new DefaultGuiseApplication();	//create a default application
+		}
+		guiseApplication.installControllerKit(new XHTMLControllerKit());	//create and install an XHTML controller kit
 			//initialize the supported locales
 		final String supportedLocalesString=servletConfig.getInitParameter(SUPPORTED_LOCALES_INIT_PARAMETER_PREFIX);	//get the supported locales init parameter
 		if(supportedLocalesString!=null)	//if supported locales are specified
@@ -204,6 +236,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 				}
 			}
 		}
+		return guiseApplication;	//return the created Guise application
 	}
 
 //TODO fix HEAD method servicing, probably by overriding serveResource()
@@ -243,7 +276,7 @@ Debug.trace("Referrer:", getReferer(request));
 					setNoCache(response);	//TODO testing; fix; update method
 					
 						//before actually changing the navigation path, check to see if we're in the middle of modal navigation (only do this after we find a navigation frame, as this request might be for a stylesheet or some other non-frame resource, which shouldn't be redirected)
-					final ModalNavigation modalNavigation=guiseSession.peekModalNavigation();	//see if we are currently doing modal navigation
+					final ModalNavigation modalNavigation=guiseSession.peekModalNavigation();	//see if we are currently doing modal navigation TODO make public access routines
 					if(modalNavigation!=null)	//if we are currently in the middle of modal navigation, make sure the correct frame was requested
 					{
 						final URI modalNavigationURI=modalNavigation.getNewNavigationURI();	//get the modal navigation URI
@@ -297,7 +330,7 @@ Debug.trace("ready to query the navigation frame view");
 						guiseSession.clearRequestedNavigation();	//remove any navigation requests
 						if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
 						{
-							guiseSession.pushModalNavigation((ModalNavigation)requestedNavigation);	//push the modal navigation onto the top of the modal navigation stack
+							beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation<?>)requestedNavigation);	//begin the modal navigation
 						}
 						throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
 					}
@@ -313,6 +346,21 @@ Debug.trace("ready to query the navigation frame view");
 		{
 			guiseContext.setState(GuiseContext.State.INACTIVE);	//always deactivate the context			
 			guiseSession.removeContext(guiseContext);	//remove this context from the session
+		}
+	}
+
+	/**Begins modal navigation based upon modal navigation information.
+	@param <R> The type of modal result the modal navigation involves.
+	@param guiseApplication The Guise application.
+	@param guiseSession The Guise session.
+	@param modalNavigation The modal navigation information
+	*/
+	protected <R> void beginModalNavigation(final GuiseApplication guiseApplication, final GuiseSession<?> guiseSession, final ModalNavigation<R> modalNavigation)
+	{
+		final ModalFrame<R, ?> modalFrame=(ModalFrame<R, ?>)guiseSession.getNavigationFrame(guiseApplication.relativizeURI(modalNavigation.getNewNavigationURI()));	//get the modal frame for this navigation path
+		if(modalFrame!=null)	//if we have a modal frame
+		{
+			guiseSession.beginModalNavigation(modalFrame, modalNavigation);
 		}
 	}
 

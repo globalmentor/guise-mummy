@@ -61,24 +61,48 @@ public class DefaultTableColumnModel<V> extends AbstractControlModel implements 
 	/**Session and value class constructor.
 	@param session The Guise session that owns this component.
 	@param valueClass The class indicating the type of values held in the model.
-	@exception NullPointerException if the given session and/or value class is <code>null</code>.
+	@exception NullPointerException if the given session, and/or value class is <code>null</code>.
 	*/
 	public DefaultTableColumnModel(final GuiseSession<?> session, final Class<V> valueClass)
 	{
 		this(session, null, valueClass);	//construct the class indicating that a default ID should be generated
 	}
+	
+	/**Session, value class, and label constructor.
+	@param session The Guise session that owns this component.
+	@param valueClass The class indicating the type of values held in the model.
+	@param label The text of the label.
+	@exception NullPointerException if the given session, and/or value class is <code>null</code>.
+	*/
+	public DefaultTableColumnModel(final GuiseSession<?> session, final Class<V> valueClass, final String label)
+	{
+		this(session, null, valueClass, label);	//construct the class indicating that a default ID should be generated
+	}
 
-	/**Session, ID, value class, and value representation strategy constructor.
+	/**Session, ID, and value class constructor.
 	@param session The Guise session that owns this component.
 	@param id The column identifier, or <code>null</code> if a default column identifier should be generated.
 	@param valueClass The class indicating the type of values held in the model.
-	@exception NullPointerException if the given session, value class, and/or value representation strategy is <code>null</code>.
+	@exception NullPointerException if the given session, and/or value class is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
 	public DefaultTableColumnModel(final GuiseSession<?> session, final String id, final Class<V> valueClass)
 	{
-		super(session);	//construct the parent class
+		this(session, id, valueClass, null);	//construct the class with no label
+	}
+	
+	/**Session, ID, value class, and label constructor.
+	@param session The Guise session that owns this component.
+	@param id The column identifier, or <code>null</code> if a default column identifier should be generated.
+	@param valueClass The class indicating the type of values held in the model.
+	@param label The text of the label.
+	@exception NullPointerException if the given session, and/or value class is <code>null</code>.
+	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	*/
+	public DefaultTableColumnModel(final GuiseSession<?> session, final String id, final Class<V> valueClass, final String label)
+	{
+		super(session, label);	//construct the parent class
 		this.valueClass=valueClass;	//save the value class
 	}
-
+	
 }

@@ -13,6 +13,8 @@ public class CSSStyleConstants
 
 	/**The URI of the Guise XHTML CSS stylesheet.*/
 	public final static URI GUISE_XHTML_CSS_STYLESHEET_URI=URI.create(addExtension("guise", CSS_EXTENSION));
+	/**The URI of the Guise JavaScript file.*/
+	public final static URI GUISE_JAVASCRIPT_URI=URI.create(addExtension("guise", JS_EXTENSION));
 	
 	//style IDs
 	

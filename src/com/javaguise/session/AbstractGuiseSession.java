@@ -12,6 +12,7 @@ import com.garretwilson.event.PostponedEvent;
 import com.javaguise.GuiseApplication;
 import com.javaguise.component.*;
 import com.javaguise.context.GuiseContext;
+import com.javaguise.demo.EditUserFrame;
 import com.javaguise.event.ModalEvent;
 import com.javaguise.event.ModalListener;
 import com.garretwilson.io.BOMInputStreamReader;
@@ -534,6 +535,20 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 			return !modalNavigationStack.isEmpty();	//we are modally navigating if there is one or more modal navigation states on the stack
 		}
 
+		/**Begins modal interaction for a particular modal frame.
+		The modal navigation is pushed onto the stack, and an event is fired to the modal listener of the modal navigation.
+		@param <R> The type of modal result the modal frame produces.
+		@param modalFrame The frame for which modal navigation state should begin.
+		@param modalNavigation The state of modal navigation.
+		@see #pushModalNavigation(ModalNavigation)
+		*/
+		public <R> void beginModalNavigation(final ModalFrame<R, ?> modalFrame, final ModalNavigation<R> modalNavigation)
+		{
+			//TODO release the navigation frame, maybe, just in case
+			pushModalNavigation(modalNavigation);	//push the modal navigation onto the top of the modal navigation stack
+			modalNavigation.getModalListener().modalBegan(new ModalEvent<R>(this, modalFrame, modalFrame.getResult()));
+		}
+
 		/**Ends modal interaction for a particular modal frame.
 		The frame is released from the cache so that new navigation will create a new modal frame.
 		This method is called by modal frames and should seldom if ever be called directly.
@@ -584,7 +599,6 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 			}
 			return modalNavigation!=null;	//return whether we ended modality
 		}
-
 
 	/**The navigation path relative to the application context path.*/
 	private String navigationPath=null;
