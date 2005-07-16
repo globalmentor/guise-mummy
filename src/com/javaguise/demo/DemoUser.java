@@ -63,7 +63,7 @@ public class DemoUser implements Principal, Comparable<DemoUser>
 		}
 
 	/**Whether the user is authorized.*/
-	private boolean authorized=false;
+	private boolean authorized=true;
 
 		/**@return Whether the user is authorized.*/
 		public boolean isAuthorized() {return authorized;}

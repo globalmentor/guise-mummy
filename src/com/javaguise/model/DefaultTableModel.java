@@ -14,7 +14,7 @@ import com.javaguise.session.GuiseSession;
 The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class. 
 @author Garret Wilson
 */
-public class DefaultTableModel extends AbstractTableModel implements TableModel
+public class DefaultTableModel extends AbstractTableModel
 {
 
 	/**The map of table column models in logical order.*/
@@ -135,6 +135,19 @@ public class DefaultTableModel extends AbstractTableModel implements TableModel
 		return columns;	//return the columns we created
 	}
 
+	/**Returns the cell value for the given cell.
+	This method delegates to {@link #getCellValue(int, TableColumnModel)}.
+	@param <C> The type of cell value.
+	@param cell The cell containing the row index and column information.
+	@return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
+	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	*/
+	public <C> C getCellValue(final Cell<C> cell)
+	{
+		return getCellValue(cell.getRowIndex(), cell.getColumn());	//return the cell value for the cell row index and column
+	}
+
 	/**Returns the cell value at the given row and column.
 	@param <C> The type of cell values in the given column.
 	@param rowIndex The zero-based row index.
@@ -154,6 +167,19 @@ public class DefaultTableModel extends AbstractTableModel implements TableModel
 		{
 			return column.getValueClass().cast(valueRowLists.get(rowIndex).get(columnIndex));	//get the value in the given row and column, cast to the appropriate type
 		}
+	}
+	/**Sets the cell value for the given cell.
+	This method delegates to {@link #setCellValue(int, TableColumnModel, C)}.
+	@param <C> The type of cell value.
+	@param cell The cell containing the row index and column information.
+	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
+	@return The value previously in the given cell.
+	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	*/
+	public <C> C setCellValue(final Cell<C> cell, final C newCellValue)
+	{
+		return setCellValue(cell.getRowIndex(), cell.getColumn(), newCellValue);	//set the cell value for the cell row index and column
 	}
 
 	/**Sets the cell value at the given row and column.

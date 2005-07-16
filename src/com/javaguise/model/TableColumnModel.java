@@ -2,6 +2,8 @@ package com.javaguise.model;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
+import com.javaguise.validator.Validator;
+
 /**A column in a table.
 @param <V> The type of values contained in the table column.
 @author Garret Wilson
@@ -9,6 +11,8 @@ import static com.garretwilson.lang.ClassUtilities.*;
 public interface TableColumnModel<V> extends ControlModel
 {
 
+	/**The validator bound property.*/
+	public final static String VALIDATOR_PROPERTY=getPropertyName(TableColumnModel.class, "validator");
 	/**The bound property of whether the component is visible.*/
 	public final static String VISIBLE_PROPERTY=getPropertyName(TableColumnModel.class, "visible");
 
@@ -24,6 +28,16 @@ public interface TableColumnModel<V> extends ControlModel
 	@see #EDITABLE_PROPERTY
 	*/
 	public void setEditable(final boolean newEditable);
+
+	/**@return The validator for cells in this column, or <code>null</code> if no validator is installed.*/
+	public Validator<V> getValidator();
+
+	/**Sets the validator.
+	This is a bound property
+	@param newValidator The validator for cells in this column, or <code>null</code> if no validator should be used.
+	@see #VALIDATOR_PROPERTY
+	*/
+	public void setValidator(final Validator<V> newValidator);
 
 	/**@return Whether the column is visible.*/
 	public boolean isVisible();

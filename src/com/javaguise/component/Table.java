@@ -366,12 +366,34 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 			this.cell=cell;
 		}
 
+		/**@return Whether the model's value is editable and the corresponding control will allow the the user to change the value.
+		This version returns <code>true</code> if the model and column are both editable.*/
+		public boolean isEditable() {return getModel().isEditable() && getCell().getColumn().isEditable();}
+
+		/**Sets whether the model's value is editable and the corresponding control will allow the the user to change the value. This version throws an exception, as the editable status is read-only.
+		@param newEditable <code>true</code> if the corresponding control should allow the user to change the value.
+		*/
+		public void setEditable(final boolean newEditable) {throw new UnsupportedOperationException("Editable is read-only.");}
+
+		/**@return Whether the model is enabled and and the corresponding control can receive user input.
+		This version returns <code>true</code> if the model and column are both enabled.*/
+		public boolean isEnabled() {return getModel().isEnabled() && getCell().getColumn().isEnabled();}
+
+		/**Sets whether the model is enabled and and the corresponding control can receive user input. This version throws an exception, as the enabled status is read-only.
+		@param newEnabled <code>true</code> if the corresponding control should indicate and accept user input.
+		*/
+		public void setEnabled(final boolean newEnabled) {throw new UnsupportedOperationException("Enabled is read-only.");}
+
+		/**@return The validator for this model, or <code>null</code> if no validator is installed.*/
+		public Validator<C> getValidator() {return getCell().getColumn().getValidator();}	//return the validator from the column
+
+		/**Sets the validator. This version throws an exception, as the validator is read-only.
+		@param newValidator The validator for this model, or <code>null</code> if no validator should be used.
+		*/
+		public void setValidator(final Validator<C> newValidator) {throw new UnsupportedOperationException("Validator is read-only.");}
+
 		/**@return The value from the table model cell, or <code>null</code> if there is no value in the cell.*/
-		public C getValue()
-		{
-			final TableModel.Cell<C> cell=getCell();	//get our current cell
-			return getModel().getCellValue(cell.getRowIndex(), cell.getColumn());	//return the value from the table model
-		}
+		public C getValue() {return getModel().getCellValue(getCell());}	//return the value from the table model
 
 		/**Sets the value in the cell.
 		@param newValue The value of the cell.
@@ -386,8 +408,7 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 			{
 				validator.validate(newValue);	//validate the new value, throwing an exception if anything is wrong
 			}
-			final TableModel.Cell<C> cell=getCell();	//get our current cell
-			getModel().setCellValue(cell.getRowIndex(), cell.getColumn(), newValue);	//set the value in the table model
+			getModel().setCellValue(getCell(), newValue);	//set the value in the table model
 		}
 
 	}

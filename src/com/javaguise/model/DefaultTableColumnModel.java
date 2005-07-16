@@ -1,6 +1,7 @@
 package com.javaguise.model;
 
 import com.javaguise.session.GuiseSession;
+import com.javaguise.validator.Validator;
 
 /**The default implementation of a column in a table.
 The table column model by default is not editable.
@@ -35,6 +36,27 @@ public class DefaultTableColumnModel<V> extends AbstractControlModel implements 
 				editable=newEditable;	//actually change the value
 				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
 			}			
+		}
+
+	/**The validator for cells in this column, or <code>null</code> if no validator is installed.*/
+	private Validator<V> validator;
+
+		/**@return The validator for cells in this column, or <code>null</code> if no validator is installed.*/
+		public Validator<V> getValidator() {return validator;}
+
+		/**Sets the validator.
+		This is a bound property
+		@param newValidator The validator for cells in this column, or <code>null</code> if no validator should be used.
+		@see TableColumnModel#VALIDATOR_PROPERTY
+		*/
+		public void setValidator(final Validator<V> newValidator)
+		{
+			if(validator!=newValidator)	//if the value is really changing
+			{
+				final Validator<V> oldValidator=validator;	//get the old value
+				validator=newValidator;	//actually change the value
+				firePropertyChange(ValueModel.VALIDATOR_PROPERTY, oldValidator, newValidator);	//indicate that the value changed
+			}
 		}
 
 	/**Whether the column is visible.*/

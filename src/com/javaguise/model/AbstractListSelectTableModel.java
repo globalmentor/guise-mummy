@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.SynchronizedListDecorator;
 import com.javaguise.event.*;
+import com.javaguise.model.TableModel.Cell;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
 import com.javaguise.validator.Validator;
@@ -91,6 +92,7 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 	public AbstractListSelectTableModel(final GuiseSession<?> session, final Class<V> valueClass, final ListSelectionStrategy<V> listSelectionStrategy, final TableColumnModel<?>... columns)
 	{
 		super(session, valueClass, listSelectionStrategy);	//construct the parent class
+		Collections.addAll(logicalTableColumnModels, columns);	//add all the columns to our logical list of table columns
 		Collections.addAll(tableColumnModels, columns);	//add all the columns to our list of table columns
 		valueModelRowArrays=new SynchronizedListDecorator<ValueModel<Object>[]>(new ArrayList<ValueModel<Object>[]>(), this);	//create a list of value model arrays, synchronizing all access on this object
 	}
@@ -105,7 +107,20 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 	{
 		return valueModelRowArrays.get(rowIndex)[colIndex];	//return the value model in the given row for the given column
 	}
-	
+
+	/**Returns the cell value for the given cell.
+	This method delegates to {@link #getCellValue(int, TableColumnModel)}.
+	@param <C> The type of cell value.
+	@param cell The cell containing the row index and column information.
+	@return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
+	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	*/
+	public <C> C getCellValue(final Cell<C> cell)
+	{
+		return getCellValue(cell.getRowIndex(), cell.getColumn());	//return the cell value for the cell row index and column
+	}
+
 	/**Returns the cell value at the given row and column.
 	@param <C> The type of cell values in the given column.
 	@param rowIndex The zero-based row index.
@@ -117,6 +132,20 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 	public <C> C getCellValue(final int rowIndex, final TableColumnModel<C> column)
 	{
 		return getCellValue(get(rowIndex), rowIndex, column);	//retrieve the value in the given row and ask for the corresponding cell value 
+	}
+
+	/**Sets the cell value for the given cell.
+	This method delegates to {@link #setCellValue(int, TableColumnModel, C)}.
+	@param <C> The type of cell value.
+	@param cell The cell containing the row index and column information.
+	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
+	@return The value previously in the given cell.
+	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	*/
+	public <C> C setCellValue(final Cell<C> cell, final C newCellValue)
+	{
+		return setCellValue(cell.getRowIndex(), cell.getColumn(), newCellValue);	//set the cell value for the cell row index and column
 	}
 
 	/**Sets the cell value at the given row and column.

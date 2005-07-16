@@ -32,8 +32,8 @@ public class EditUserFrame extends DefaultModalFrame<DemoUser>
 		final Panel idPanel=new Panel(session, new FlowLayout(Axis.X));	//create the ID panel flowing horizontally
 			//ID
 		idControl=new TextControl<String>(session, String.class);	//create the ID input control
-		idControl.getModel().setLabel("ID *");	//set the ID control label
-		idControl.getModel().setValidator(new RegularExpressionStringValidator(session, "[a-zA-z][\\w]*", true));	//require an ID beginning with a letter and followed by any number of letters, numbers, or underscores
+		idControl.getModel().setLabel("ID");	//set the ID control label
+		idControl.getModel().setEditable(false);	//don't allow the ID to be edited
 		idPanel.add(idControl);	//add the ID control to the ID panel
 		
 		final Panel namePanel=new Panel(session, new FlowLayout(Axis.X));	//create the name panel flowing horizontally
@@ -92,6 +92,23 @@ public class EditUserFrame extends DefaultModalFrame<DemoUser>
 		editUserPanel.add(buttonPanel);	//add the buttonpanel
 
 		setContent(editUserPanel);	//set the edit user panel as the frame's content
+	}
+
+	/**Initializes the frame with information for a new user.
+	@param id The ID of the new user to be edited.
+	@exception NullPointerException if the provided user is <code>null</code>.
+	@exception IllegalArgumentException if any user information is invalid.
+	*/
+	public void setNewUser(final String id)
+	{
+		try
+		{
+			idControl.getModel().setValue(id);	//set the user ID
+		}
+		catch(final ValidationException validationException)	//if the user information is invalid
+		{
+			throw new IllegalArgumentException(validationException);
+		}		
 	}
 
 	/**Initializes the frame with user information.

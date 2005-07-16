@@ -1,22 +1,19 @@
 package com.javaguise.demo;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 
 import com.javaguise.component.*;
-import com.javaguise.component.layout.Axis;
-import com.javaguise.component.layout.FlowLayout;
+import com.javaguise.component.layout.*;
 import com.javaguise.context.GuiseContext;
-
-import com.javaguise.model.AbstractListSelectTableModel;
-import com.javaguise.model.DefaultTableColumnModel;
-import com.javaguise.model.TableColumnModel;
+import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
+import com.javaguise.validator.RegularExpressionStringValidator;
 
 /**Authorize Users Guise demonstration frame.
 Copyright © 2005 GlobalMentor, Inc.
-Demonstrates custom table models, editable table cells, custom table column validators,
-	tables and list controls sharing models,
+Demonstrates custom table models, editable string table cells, editable boolean table cells,
+	table column validators, and tables and list controls sharing models.
 @author Garret Wilson
 */
 public class AuthorizeUsersFrame extends DefaultFrame
@@ -44,36 +41,29 @@ public class AuthorizeUsersFrame extends DefaultFrame
 		firstNameColumn=new DefaultTableColumnModel<String>(session, String.class, "First Name");	//first name
 		emailColumn=new DefaultTableColumnModel<String>(session, String.class, "Email");	//email
 		emailColumn.setEditable(true);	//allow the email column to be edited
+		emailColumn.setValidator(new RegularExpressionStringValidator(session, ".+@.+\\.[a-z]+", true));	//require an email in the correct format
 		authorizedColumn=new DefaultTableColumnModel<Boolean>(session, Boolean.class, "Authorized");	//authorized
 		authorizedColumn.setEditable(true);	//allow the authorized column to be edited
 			//create and initialize the table model
 		userAuthorizationModel=new UserAuthorizationTableModel(session, lastNameColumn, firstNameColumn, emailColumn, authorizedColumn);	//create the table model
-		final List<DemoUser> applicationUserList=((DemoApplication)getSession().getApplication()).getUsers();	//get the application's list of users
-		synchronized(applicationUserList)	//don't allow others to modify the application user list while we iterate over it
-		{
-			userAuthorizationModel.addAll(applicationUserList);	//add all the users from the application
-		}
 			//create the table
 		final Table userAuthorizationTable=new Table(session, userAuthorizationModel);	//create the table component
 		userAuthorizationTable.getModel().setLabel("User Authorizations");	//give the table a label
 		authorizationPanel.add(userAuthorizationTable);	//add the user authorization table to the panel
 			//create a separate list control to illustrate model sharing
-		final ListControl userListControl=new ListControl<DemoUser>(session, userAuthorizationModel, 16);	//create a list control using the same model as the table
+		final ListControl userListControl=new ListControl<DemoUser>(session, userAuthorizationModel, 10);	//create a list control using the same model as the table
 		authorizationPanel.add(userListControl);	//add the user list control to the panel
-
-//TODO fix missing initial value bug
-//TODO create the authorize button
-//TODO add new value loading upon model query
-//TODO add email column validator here and in controller
+			//apply button
+		final Button applyButton=new Button(session);	//create a button for applying the values
+		applyButton.getModel().setLabel("Apply");	//set the button label
 
 		final Panel userAuthorizationPanel=new Panel(session, new FlowLayout(Axis.Y));	//create the root panel flowing vertically
 		userAuthorizationPanel.add(authorizationPanel);	//add the authorization panel to the root panel
+		userAuthorizationPanel.add(applyButton);	//add the apply button to the root panel
 		
 		setContent(userAuthorizationPanel);	//set the user authorization panel as the navigation frame's content
 	}
 
-//TODO fix	protected void loadUsers()
-	
 	/**Collects the current data from the model of this component.
 	@param context Guise context information.
 	@exception IOException if there is an error querying the model.
@@ -81,12 +71,17 @@ public class AuthorizeUsersFrame extends DefaultFrame
 	*/
 	public <GC extends GuiseContext<?>> void queryModel(final GC context) throws IOException
 	{
-		super.queryModel(context);	//do the default model querying for the frame
+		userAuthorizationModel.clear();	//clear all the users we currently have
 		final List<DemoUser> applicationUserList=((DemoApplication)getSession().getApplication()).getUsers();	//get the application's list of users
 		synchronized(applicationUserList)	//don't allow others to modify the application user list while we iterate over it
 		{
 			userAuthorizationModel.addAll(applicationUserList);	//add all the users from the application
 		}
+		synchronized(userAuthorizationModel)	//don't allow the model of users to be changed by another thread while we sort it
+		{
+			Collections.sort(userAuthorizationModel);	//sort the user list model (each user implements Comparable)
+		}
+		super.queryModel(context);	//do the default model querying for the frame
 	}
 
 	/**A table model based upon a list of users, each column representing a property of the user.

@@ -17,7 +17,7 @@ Demonstrates list controls with default representation, thread-safe select model
 	accessing a custom Guise application.
 @author Garret Wilson
 */
-public class EditUsersFrame extends DefaultFrame	//TODO add a way to keep user IDs from being duplicated
+public class EditUsersFrame extends DefaultFrame
 {
 
 	/**The application-relative navigation path to the edit user modal frame.*/
@@ -57,6 +57,8 @@ public class EditUsersFrame extends DefaultFrame	//TODO add a way to keep user I
 								{
 									public void modalBegan(final ModalEvent<DemoUser> modalEvent)	//when modal editing begins
 									{
+										final String newUserID=((DemoApplication)getSession().getApplication()).generateUserID();	//ask the application to generate a new user ID
+										((EditUserFrame)modalEvent.getSource()).setNewUser(newUserID);	//initialize the frame for a new user
 									}
 									public void modalEnded(final ModalEvent<DemoUser> modalEvent)	//when modal editing is finished
 									{
