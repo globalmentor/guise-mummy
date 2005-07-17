@@ -34,17 +34,15 @@ public class HomeFrame extends DefaultFrame
 	*/
 	public HomeFrame(final GuiseSession<?> session, final String id)
 	{
-		super(session, id);	//construct the parent class
+		super(session, id, new FlowLayout(Orientation.Flow.PAGE));	//construct the parent flowing vertically
 		getModel().setLabel("Home Frame Test");	//set the frame label
 
-		final Panel panel=new Panel(session);
-		
 		final Label testLabel=new Label(session, "testLabel");
 		testLabel.setStyleID("title");
 		testLabel.getModel().setLabel("This is label text from the model.");
-		panel.add(testLabel);	//add a new label
+		add(testLabel);	//add a new label
 		
-		final Panel buttonPanel=new Panel(session, "testButtonPanel", new FlowLayout(Orientation.Axis.X));	//create a panel flowing horizontally
+		final Panel buttonPanel=new Panel(session, "testButtonPanel", new FlowLayout(Orientation.Flow.LINE));	//create a panel flowing horizontally
 
 		final Button testButton=new Button(session, "testButton");
 		testButton.getModel().setLabel("Click here to go to the 'Hello World' demo.");
@@ -91,7 +89,7 @@ public class HomeFrame extends DefaultFrame
 					}
 				});
 		buttonPanel.add(modalLink);	//add a new button
-		panel.add(buttonPanel);	//add the button panel to the panel
+		add(buttonPanel);	//add the button panel to the panel
 		final TextControl<String> textInput=new TextControl<String>(session, "textInput", String.class);	//create a text input control
 		textInput.getModel().setLabel("This is the text input label.");
 		textInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<String>()
@@ -102,14 +100,14 @@ public class HomeFrame extends DefaultFrame
 					}
 				});
 //TODO del		textInput.getModel().setValidator(new RegularExpressionStringValidator("[a-z]*"));
-		panel.add(textInput);
+		add(textInput);
 	
 	
 	
-		final Panel horizontalPanel=new Panel(session, new FlowLayout(Orientation.Axis.X));	//create a panel flowing horizontally
+		final Panel horizontalPanel=new Panel(session, new FlowLayout(Orientation.Flow.LINE));	//create a panel flowing horizontally
 	
 	
-		final Panel booleanPanel=new Panel(session, new FlowLayout(Orientation.Axis.Y));	//create a panel flowing vertically
+		final Panel booleanPanel=new Panel(session, new FlowLayout(Orientation.Flow.PAGE));	//create a panel flowing vertically
 		booleanPanel.getModel().setLabel("Check one of these");
 		final CheckControl check1=new CheckControl(session, "check1");
 		check1.setCheckType(CheckControl.CheckType.ELLIPSE);
@@ -154,7 +152,7 @@ public class HomeFrame extends DefaultFrame
 		horizontalPanel.add(image);
 		
 		
-		panel.add(horizontalPanel);
+		add(horizontalPanel);
 		
 /*TODO del		
 		final Heading resourceHeading=new Heading(session, 2);
@@ -164,7 +162,7 @@ public class HomeFrame extends DefaultFrame
 
 		final Label afterImageLabel=new Label(session);
 		afterImageLabel.getModel().setLabel("This is a lot of text. ;alsjfd ;lkjas ;ljag ;lkjas g;lkajg; laksgj akjlshf lkjashd flkjsdhlksahlsadkhj asldkhjf ;sgdh a;lgkh a;glkha s;dglh asgd;");
-		panel.add(afterImageLabel);
+		add(afterImageLabel);
 
 		final ListControl<String> listSelectControl=new ListControl<String>(session, String.class, new SingleListSelectionStrategy<String>());
 		listSelectControl.getModel().setLabel("Choose an option.");
@@ -173,7 +171,7 @@ public class HomeFrame extends DefaultFrame
 		listSelectControl.getModel().add("The second option");
 		listSelectControl.getModel().add("The third option");
 		listSelectControl.getModel().add("The fourth option");
-		panel.add(listSelectControl);
+		add(listSelectControl);
 
 		final TextAreaControl textAreaControl=new TextAreaControl(session, 25, 100, true);
 		textAreaControl.getModel().setLabel("Type some text.");
@@ -185,13 +183,13 @@ public class HomeFrame extends DefaultFrame
 		{
 			throw new AssertionError(e);
 		}
-		panel.add(textAreaControl);
+		add(textAreaControl);
 
 		final Text text=new Text(session);
 		//TODO del text.getModel().setText("This is some cool text! This is some text\nand some more on another line.\n\nSkipping two lines down, we find a line that is really long, is really, really, ;lkjas;lfk alkg; ;alkghj;alg lkjahq glkjh flkjhasdflkjhasdfl kjhasdf lkjh lkadhf lkshd flksadhf lksadhlskdqah slhjfg sd long. This is some text\nand some more on another line.\n\nSkipping two lines down, we find a line that is really long, is really, really, ;lkjas;lfk alkg; ;alkghj;alg lkjahq glkjh flkjhasdflkjhasdfl kjhasdf lkjh lkadhf lkshd flksadhf lksadhlskdqah slhjfg sd long.");
 		text.getModel().setTextResourceKey("sample.html");
 		text.getModel().setContentType(TextModel.XHTML_CONTENT_TYPE);
-		panel.add(text);
+		add(text);
 
 		getSession().setLocale(Locale.FRANCE);
 
@@ -209,9 +207,7 @@ public class HomeFrame extends DefaultFrame
 		{
 			column.setEditable(true);
 		}
-		panel.add(multiplicationTable);
-		
-		setContent(panel);
+		add(multiplicationTable);
 	}
 
 }

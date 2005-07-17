@@ -3,6 +3,7 @@ package com.javaguise.component;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.garretwilson.util.ReverseIterator;
 import com.javaguise.component.layout.*;
 import com.javaguise.session.GuiseSession;
 
@@ -23,6 +24,9 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 
 	/**@return An iterator to contained components.*/
 	public Iterator<Component<?>> iterator() {return componentList.iterator();}
+
+	/**@return An iterator to contained components in reverse order.*/
+	public Iterator<Component<?>> reverseIterator() {return new ReverseIterator<Component<?>>(componentList.listIterator(componentList.size()));}
 
 	/**@return Whether this component has children. This implementation delegates to the component list.*/
 	public boolean hasChildren() {return !componentList.isEmpty();}
@@ -50,9 +54,9 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
 	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
 	*/
-	public void add(final Component<?> component, final Object constraints)
+	public void add(final Component<?> component, final Layout.Constraints constraints)
 	{
-		add(component, getLayout(), constraints);
+		add(component, getLayout(), constraints);	//TODO comment
 	}
 
 	/**Adds a component to the container.
@@ -63,7 +67,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
 	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
 	*/
-	protected <T> void add(final Component<?> component, final Layout<T> layout, final Object constraints)	//TODO check ClassCastException---it will not be thrown here
+	protected <T extends Layout.Constraints> void add(final Component<?> component, final Layout<T> layout, final Object constraints)	//TODO check ClassCastException---it will not be thrown here
 	{
 		if(component.getParent()!=null)	//if this component has already been added to container
 		{
@@ -113,7 +117,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	*/
 	public AbstractContainer(final GuiseSession<?> session, final String id)
 	{
-		this(session, id, new FlowLayout(Orientation.Axis.Y));	//default to flowing vertically
+		this(session, id, new FlowLayout(Orientation.Flow.PAGE));	//default to flowing vertically
 	}
 
 	/**Session and layout constructor.

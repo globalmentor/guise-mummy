@@ -11,7 +11,6 @@ import com.javaguise.component.layout.Orientation;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.Controller;
 import com.javaguise.session.GuiseSession;
-import com.javaguise.validator.ValidationException;
 import com.javaguise.validator.ValidationsException;
 import com.garretwilson.util.EmptyIterator;
 
@@ -46,6 +45,9 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 
 	/**@return An iterator to child components. This implementation returns an empty iterator.*/
 	public Iterator<Component<?>> iterator() {return new EmptyIterator<Component<?>>();}
+
+	/**@return An iterator to contained components in reverse order.*/
+	public Iterator<Component<?>> reverseIterator() {return new EmptyIterator<Component<?>>();}
 
 	/**The controller installed in this component, or <code>null</code> if no controller is installed.*/
 	private Controller<? extends GuiseContext<?>, ? super C> controller=null;

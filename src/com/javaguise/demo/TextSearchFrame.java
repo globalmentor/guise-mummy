@@ -52,13 +52,11 @@ public class TextSearchFrame extends DefaultFrame
 	*/
 	public TextSearchFrame(final GuiseSession<?> session)
 	{
-		super(session);	//construct the parent class
+		super(session, new FlowLayout(Orientation.Flow.LINE));	//construct the parent class flowing horizontally
 		getModel().setLabel("Guise\u2122 Demonstration: Text Search");	//set the frame title	
 
-		final Panel textSearchPanel=new Panel(session, new FlowLayout(Orientation.Axis.X));	//create the root panel flowing horizontally
-
 			//input panel
-		final Panel inputPanel=new Panel(session, new FlowLayout(Orientation.Axis.Y));	//create the input panel flowing vertically
+		final Panel inputPanel=new Panel(session, new FlowLayout(Orientation.Flow.PAGE));	//create the input panel flowing vertically
 			//instructions
 		final Message message=new Message(session);	//create a new message
 		message.getModel().setLabel("Instructions");	//give a label to the message
@@ -151,10 +149,8 @@ public class TextSearchFrame extends DefaultFrame
 					}
 				});
 
-		textSearchPanel.add(inputPanel);	//add the input panel to the main panel
-		textSearchPanel.add(textAreaControl);	//add the text area control to the main panel
-
-		setContent(textSearchPanel);	//set the entire search panel as the navigation frame's content
+		add(inputPanel);	//add the input panel to the frame
+		add(textAreaControl);	//add the text area control to the frame
 	}
 
 	/**A pattern validator that can validate whether a regular expression has valid syntax, allowing <code>null</code> values.

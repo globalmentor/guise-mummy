@@ -3,11 +3,11 @@ package com.javaguise.component.layout;
 import com.javaguise.component.Component;
 
 /**Contains layout information for a container.
-@param <T> The type of layout metadata associated with each component.
+@param <T> The type of layout constraints associated with each component.
 This interface and subclasses represent layout definitions, not layout implementations.
 @author Garret Wilson
 */
-public interface Layout<T>
+public interface Layout<T extends Layout.Constraints>
 {
 	/**Associates layout metadata with a component.
 	Any metadata previously associated with the component will be removed.
@@ -35,4 +35,12 @@ public interface Layout<T>
 	@exception IllegalStateException if this layout does not support default constraints.
 	*/
 	public T createDefaultConstraints(final Component<?> component);
+
+	/**Metadata about individual component layout.
+	@author Garret Wilson
+	*/
+	public interface Constraints
+	{
+	}
+
 }

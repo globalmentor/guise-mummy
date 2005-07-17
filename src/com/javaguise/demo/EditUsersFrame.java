@@ -28,7 +28,7 @@ public class EditUsersFrame extends DefaultFrame
 	*/
 	public EditUsersFrame(final GuiseSession<?> session)
 	{
-		super(session);	//construct the parent class
+		super(session, new FlowLayout(Orientation.Flow.LINE));	//construct the parent class flowing horizontally
 		getModel().setLabel("Guise\u2122 Demonstration: Edit Users");	//set the frame title	
 
 		final ListControl<DemoUser> userListControl=new ListControl<DemoUser>(session, DemoUser.class, new SingleListSelectionStrategy<DemoUser>());	//create a list control allowing only single selections
@@ -45,7 +45,7 @@ public class EditUsersFrame extends DefaultFrame
 			Collections.sort(userListControl.getModel());	//sort the user list model (each user implements Comparable)
 		}
 		
-		final Panel buttonPanel=new Panel(session, new FlowLayout(Orientation.Axis.X));	//create the button panel flowing horizontally
+		final Panel buttonPanel=new Panel(session, new FlowLayout(Orientation.Flow.LINE));	//create the button panel flowing horizontally
 			//add button
 		final Button addButton=new Button(session);	//create the add button
 		addButton.getModel().setLabel("Add User");	//set the text of the add button
@@ -128,10 +128,8 @@ public class EditUsersFrame extends DefaultFrame
 				});
 		buttonPanel.add(removeButton);	//add the button to the button panel
 		
-		final Panel editUsersPanel=new Panel(session, new FlowLayout(Orientation.Axis.X));	//create the entire users panel flowing horizontally
-		editUsersPanel.getModel().setLabel("Edit Users");	//set the label of the edit users panel 
-		editUsersPanel.add(userListControl);	//add the list control
-		editUsersPanel.add(buttonPanel);	//add the button panel
+		add(userListControl);	//add the list control to the frame
+		add(buttonPanel);	//add the button panel to the frame
 
 			//disable the add and remove buttons whenever there are no users 
 		userListControl.getModel().addListListener(new ListListener<ListSelectModel<DemoUser>, DemoUser>()	//listen for the list being modified
@@ -149,8 +147,6 @@ public class EditUsersFrame extends DefaultFrame
 						}
 					}
 				});	
-		
-		setContent(editUsersPanel);	//set the edit users panel as the frame's content
 	}
 
 }

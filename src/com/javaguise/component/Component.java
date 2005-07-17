@@ -2,8 +2,10 @@ package com.javaguise.component;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Iterator;
 
 import com.garretwilson.beans.PropertyBindable;
+import com.garretwilson.util.ReverseIterator;
 import com.javaguise.component.layout.Orientation;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.Controller;
@@ -32,6 +34,9 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 
 	/**@return Whether this component has children.*/
 	public boolean hasChildren();
+
+	/**@return An iterator to contained components in reverse order.*/
+	public Iterator<Component<?>> reverseIterator();
 
 	/**@return The model used by this component.*/
 	public Controller<? extends GuiseContext<?>, ? super C> getController();

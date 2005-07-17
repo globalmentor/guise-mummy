@@ -10,21 +10,19 @@ import com.javaguise.component.Component;
 public class FlowLayout extends AbstractLayout<FlowLayout.Constraints>
 {
 
-//TODO change axis to a relative axis (i.e. page/line); in fact, switch to Orientation.Axis (page/line)
-	
-	/**The axis along which information is flowed.*/
-	private final Orientation.Axis axis;
+	/**The logical axis (line or page) along which information is flowed.*/
+	private final Orientation.Flow flow;
 
-		/**@return The axis along which information is flowed.*/
-		public Orientation.Axis getAxis() {return axis;}
+		/**@return The logical axis (line or page) along which information is flowed.*/
+		public Orientation.Flow getFlow() {return flow;}
 
 	/**Axis constructor.
-	@param axis The axis along which information is flowed.
+	@param flow The logical axis (line or page) along which information is flowed.
 	@exception NullPointerException if the axis is <code>null</code>.
 	*/
-	public FlowLayout(final Orientation.Axis axis)
+	public FlowLayout(final Orientation.Flow flow)
 	{
-		this.axis=checkNull(axis, "Axis cannot be null.");	//store the axis
+		this.flow=checkNull(flow, "Flow cannot be null.");	//store the flow
 	}
 
 	/**Creates default constraints for the given component.
@@ -40,7 +38,7 @@ public class FlowLayout extends AbstractLayout<FlowLayout.Constraints>
 	/**Metadata about individual component flow.
 	@author Garret Wilson
 	*/
-	public static class Constraints
+	public static class Constraints implements Layout.Constraints
 	{
 	}
 

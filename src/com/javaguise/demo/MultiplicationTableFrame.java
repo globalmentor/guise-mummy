@@ -39,7 +39,7 @@ public class MultiplicationTableFrame extends DefaultFrame
 		final Table multiplicationTable=new Table(session, Integer.class, multiplicationTableData, columnNames);	//create the table component
 		multiplicationTable.getModel().setLabel("Multiplication Table");	//give the table a label
 		
-		setContent(multiplicationTable);	//set the multiplication table as the navigation frame's content
+		add(multiplicationTable);	//add the multiplication table to the center of the frame
 	}
 
 }

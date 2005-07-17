@@ -14,7 +14,7 @@ import com.javaguise.validator.ValueRequiredValidator;
 
 /**Temperature Conversion Guise demonstration frame.
 Copyright © 2005 GlobalMentor, Inc.
-Demonstrates float input controls, float input validation, radio button controls,
+Demonstrates panels, float input controls, float input validation, radio button controls,
 	required value validation, read-only controls, and style IDs.
 @author Garret Wilson
 */
@@ -26,13 +26,11 @@ public class TemperatureConversionFrame extends DefaultFrame
 	*/
 	public TemperatureConversionFrame(final GuiseSession<?> session)
 	{
-		super(session);	//construct the parent class
+		super(session, new FlowLayout(Orientation.Flow.LINE));	//construct the parent class flowing horizontally
 		getModel().setLabel("Guise\u2122 Demonstration: Temperature Conversion");	//set the frame title	
 
-		final Panel temperaturePanel=new Panel(session, new FlowLayout(Orientation.Axis.X));	//create the root panel flowing horizontally
-
 			//input panel
-		final Panel inputPanel=new Panel(session, new FlowLayout(Orientation.Axis.Y));	//create the input panel flowing vertically
+		final Panel inputPanel=new Panel(session, new FlowLayout(Orientation.Flow.PAGE));	//create the input panel flowing vertically
 		final TextControl<Float> temperatureInput=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
 		temperatureInput.getModel().setLabel("Input Temperature");	//add a label to the text input control
 		temperatureInput.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
@@ -42,12 +40,12 @@ public class TemperatureConversionFrame extends DefaultFrame
 		temperatureOutput.getModel().setEditable(false);	//set the text output control to read-only so that the user cannot modify it
 		inputPanel.add(temperatureOutput);	//add the output control to the input panel
 
-		temperaturePanel.add(inputPanel);	//add the input panel to the temperature panel
+		add(inputPanel);	//add the input panel to the temperature frame
 
-		final Panel conversionPanel=new Panel(session, new FlowLayout(Orientation.Axis.Y));	//create the right-hand panel flowing vertically
+		final Panel conversionPanel=new Panel(session, new FlowLayout(Orientation.Flow.PAGE));	//create the right-hand panel flowing vertically
 			
 			//scale panel
-		final Panel scalePanel=new Panel(session, new FlowLayout(Orientation.Axis.Y));	//create the scale panel flowing vertically
+		final Panel scalePanel=new Panel(session, new FlowLayout(Orientation.Flow.PAGE));	//create the scale panel flowing vertically
 		scalePanel.setStyleID(GROUP_PANEL_CLASS);	//show that we want to style the scale panel as one that visually groups components
 		scalePanel.getModel().setLabel("Input Scale");	//set the panel label
 		final CheckControl celsiusCheckControl=new CheckControl(session, CheckControl.CheckType.ELLIPSE);	//create a check control for the Celsius scale, using an ellipse check are
@@ -103,9 +101,7 @@ public class TemperatureConversionFrame extends DefaultFrame
 				});
 		conversionPanel.add(convertButton);	//add the button to the conversion panel
 		
-		temperaturePanel.add(conversionPanel);	//add the conversion panel to the temperature panel
-		
-		setContent(temperaturePanel);	//set the entire temperature panel as the navigation frame's content
+		add(conversionPanel);	//add the conversion panel to the frame
 	}
 
 }

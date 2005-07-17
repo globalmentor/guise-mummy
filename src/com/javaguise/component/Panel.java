@@ -5,7 +5,7 @@ import com.javaguise.model.DefaultLabelModel;
 import com.javaguise.model.LabelModel;
 import com.javaguise.session.GuiseSession;
 
-/**A general container component.
+/**A general container component with a default page flow layout.
 @author Garret Wilson
 */
 public class Panel extends AbstractModelBox<LabelModel, Panel>
@@ -38,7 +38,7 @@ public class Panel extends AbstractModelBox<LabelModel, Panel>
 	*/
 	public Panel(final GuiseSession<?> session, final String id)
 	{
-		this(session, id, new FlowLayout(Orientation.Axis.Y));	//default to flowing vertically
+		this(session, id, new FlowLayout(Orientation.Flow.PAGE));	//default to flowing vertically
 	}
 
 	/**Session, ID, and model constructor with a default vertical flow layout.
@@ -50,7 +50,7 @@ public class Panel extends AbstractModelBox<LabelModel, Panel>
 	*/
 	public Panel(final GuiseSession<?> session, final String id, final LabelModel model)
 	{
-		this(session, id, new FlowLayout(Orientation.Axis.Y), model);	//default to flowing vertically
+		this(session, id, new FlowLayout(Orientation.Flow.PAGE), model);	//default to flowing vertically
 	}
 
 	/**Session and layout constructor.

@@ -13,69 +13,78 @@ Static preinstantiated orientation objects are provided for common orientations.
 public class Orientation
 {
 
-	/**Indicates an axis; for example, a direction of layout.
+	/**Indicates a logical flow axis.
 	@author Garret Wilson
 	*/
-	public enum Axis
+	public enum Flow
 	{
-		/**Layout along a line; the X axis in left-to-right, top-to-botom orientation.*/
-		X,
+		/**Flow along a line; the X axis in left-to-right, top-to-botom orientation.*/
+		LINE,
 		
-		/**Layout along a page; the Y axis in left-to-right, top-to-botom orientation.*/
-		Y;		
+		/**Flow along a page; the Y axis in left-to-right, top-to-botom orientation.*/
+		PAGE;		
 	}
 
 	/**Left-to-right line, top-to-bottom page orientation (e.g. English).*/
-	public final static Orientation LEFT_TO_RIGHT_TOP_TO_BOTTOM=new Orientation(Direction.LEFT_TO_RIGHT, Direction.TOP_TO_BOTTOM);
+	public final static Orientation LEFT_TO_RIGHT_TOP_TO_BOTTOM=new Orientation(Axis.X, Direction.INCREASING, Direction.INCREASING);
 	
 	/**Right-to-left line, top-to-bottom page orientation (e.g. Arabic).*/
-	public final static Orientation RIGHT_TO_LEFT_TOP_TO_BOTTOM=new Orientation(Direction.RIGHT_TO_LEFT, Direction.TOP_TO_BOTTOM);
+	public final static Orientation RIGHT_TO_LEFT_TOP_TO_BOTTOM=new Orientation(Axis.X, Direction.DECREASING, Direction.INCREASING);
 
 	/**Top-to-bottom line, right-to-left page orientation (e.g. Chinese).*/
-	public final static Orientation TOP_TO_BOTTOM_RIGHT_TO_LEFT=new Orientation(Direction.TOP_TO_BOTTOM, Direction.RIGHT_TO_LEFT);
+	public final static Orientation TOP_TO_BOTTOM_RIGHT_TO_LEFT=new Orientation(Axis.Y, Direction.INCREASING, Direction.DECREASING);
 
-	/**The writing direction for a line or page.
+	/**The flow direction for a line or page, relative to the origin in the top, left-hand corner of the area.
 	@author Garret Wilson
 	*/
 	public enum Direction
 	{
-		/**Left-to-right orientation (e.g. English lines).*/
-		LEFT_TO_RIGHT,
+		/**Left-to-right lines or top-to-bottom pages.*/
+		INCREASING,
 
-		/**Right-to-left orientation (e.g. Farsi lines).*/
-		RIGHT_TO_LEFT,
-		
-		/**Top-to-bottom orientation (e.g. Chinese lines).*/
-		TOP_TO_BOTTOM,
-
-		/**Bottom-to-top orientation.*/
-		BOTTOM_TO_TOP;		
+		/**Right-to-left lines or bottom-to-top pages.*/
+		DECREASING;
 	}
 
-	/**The direction of lines.*/
-	private final Direction lineDirection;
+	/**The axis for each flow (line and page).*/
+	private final Axis[] axes=new Axis[2];
 
-		/**@return The direction of lines.*/
-		public Direction getLineDirection() {return lineDirection;}
+		/**Determines the axis for the particular flow.
+		@param flow The flow (line or page).
+		@return The axis for the specified flow.
+		*/
+		public Axis getAxis(final Flow flow)
+		{
+			return axes[flow.ordinal()];	//get the axis for this flow
+		}
+	
+	/**The direction for each flow (line and page).*/
+	private final Direction[] directions=new Direction[2];
 
-	/**The direction of pages.*/
-	private final Direction pageDirection;
-
-		/**@return The direction of pages.*/
-		public Direction getPageDirection() {return pageDirection;}
+		/**Determines the direction of the particular flow.
+		@param flow The flow (line or page).
+		@return The direction of the specified flow.
+		*/
+		public Direction getDirection(final Flow flow)
+		{
+			return directions[flow.ordinal()];	//get the direction for this flow
+		}
 
 	/**The lazily-created set of right-to-left, top-to-bottom languages.*/
 	private static Set<String> rightToLeftTopToBottomLanguages;
 
 	/**Constructor.
+	@param lineAxis The axis of lines in this orientation.
 	@param lineDirection The direction of lines.
 	@param pageDirection The direction of pages.
-	@exception NullPointerException if the horizontal and/or vertical orientation is <code>null</code>.
+	@exception NullPointerException if the line axis, line direction, and/or page direction is <code>null</code>.
 	*/
-	public Orientation(final Direction lineDirection, final Direction pageDirection)
+	public Orientation(final Axis lineAxis, final Direction lineDirection, final Direction pageDirection)
 	{
-		this.lineDirection=checkNull(lineDirection, "Line direction cannot be null.");
-		this.pageDirection=checkNull(pageDirection, "Page direction cannot be null.");
+		axes[Flow.LINE.ordinal()]=checkNull(lineAxis, "Line axiscannot be null.");	//set the line axis
+		axes[Flow.PAGE.ordinal()]=lineAxis==Axis.X ? Axis.Y : Axis.X;	//the page axis will be the perpendicular axis
+		directions[Flow.LINE.ordinal()]=checkNull(lineDirection, "Line direction cannot be null.");	//set the line direction
+		directions[Flow.PAGE.ordinal()]=checkNull(pageDirection, "Page direction cannot be null.");	//set the page direction
 	}
 
 	/**Retrieves the default orientation for a particular locale.
@@ -115,20 +124,31 @@ public class Orientation
 	*/
 	public boolean equals(final Object object)
 	{
-		if(object instanceof Orientation)	//if the object is an orientation
-		{
-			final Orientation orientation=(Orientation)object;	//cast the object to an orientation
-			return getLineDirection()==orientation.getLineDirection() && getPageDirection().equals(orientation.getPageDirection());	//compare line and page directions
-		}
-		else	//if the object is not an orientation
+		if(!(object instanceof Orientation))	//if the object is not an orientation
 		{
 			return false;	//the objects aren't equal
-		}			
+		}
+		final Orientation orientation=(Orientation)object;	//cast the object to an orientation
+		for(int axisIndex=axes.length-1; axisIndex>=0; --axisIndex)	//check each axis
+		{
+			if(axes[axisIndex]!=orientation.axes[axisIndex])	//if an axis doesn't match
+			{
+				return false;	//the objects aren't equal
+			}
+		}
+		for(int directionIndex=directions.length-1; directionIndex>=0; --directionIndex)	//check each direction
+		{
+			if(directions[directionIndex]!=orientation.directions[directionIndex])	//if an direction doesn't match
+			{
+				return false;	//the objects aren't equal
+			}
+		}
+		return true;	//the objects passed all the tests
 	}
 
 	/**@return A hash code for the cell.*/
   public int hashCode()
   {
-  	return ObjectUtilities.hashCode(getPageDirection(), getLineDirection());	//generate a hash code
+  	return ObjectUtilities.hashCode(axes[0], axes[1], directions[0], directions[1]);	//generate a hash code
   }
 }

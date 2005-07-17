@@ -22,7 +22,7 @@ public interface Container<C extends Container<C>> extends Component<C>
 	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
 	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
 	*/
-	public void add(final Component<?> component, final Object constraints);
+	public void add(final Component<?> component, final Layout.Constraints constraints);
 
 	/**Removes a component from the container.
 	@param component The component to remove.

@@ -26,7 +26,7 @@ public abstract class AbstractBox<C extends Box<C>> extends AbstractContainer<C>
 	*/
 	public AbstractBox(final GuiseSession<?> session, final String id)
 	{
-		this(session, id, new FlowLayout(Orientation.Axis.Y));	//default to flowing vertically
+		this(session, id, new FlowLayout(Orientation.Flow.PAGE));	//default to flowing vertically
 	}
 
 	/**Session and layout constructor.
