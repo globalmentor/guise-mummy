@@ -29,10 +29,10 @@ public class TemperatureConversionFrame extends DefaultFrame
 		super(session);	//construct the parent class
 		getModel().setLabel("Guise\u2122 Demonstration: Temperature Conversion");	//set the frame title	
 
-		final Panel temperaturePanel=new Panel(session, new FlowLayout(Axis.X));	//create the root panel flowing horizontally
+		final Panel temperaturePanel=new Panel(session, new FlowLayout(Orientation.Axis.X));	//create the root panel flowing horizontally
 
 			//input panel
-		final Panel inputPanel=new Panel(session, new FlowLayout(Axis.Y));	//create the input panel flowing vertically
+		final Panel inputPanel=new Panel(session, new FlowLayout(Orientation.Axis.Y));	//create the input panel flowing vertically
 		final TextControl<Float> temperatureInput=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
 		temperatureInput.getModel().setLabel("Input Temperature");	//add a label to the text input control
 		temperatureInput.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
@@ -44,10 +44,10 @@ public class TemperatureConversionFrame extends DefaultFrame
 
 		temperaturePanel.add(inputPanel);	//add the input panel to the temperature panel
 
-		final Panel conversionPanel=new Panel(session, new FlowLayout(Axis.Y));	//create the right-hand panel flowing vertically
+		final Panel conversionPanel=new Panel(session, new FlowLayout(Orientation.Axis.Y));	//create the right-hand panel flowing vertically
 			
 			//scale panel
-		final Panel scalePanel=new Panel(session, new FlowLayout(Axis.Y));	//create the scale panel flowing vertically
+		final Panel scalePanel=new Panel(session, new FlowLayout(Orientation.Axis.Y));	//create the scale panel flowing vertically
 		scalePanel.setStyleID(GROUP_PANEL_CLASS);	//show that we want to style the scale panel as one that visually groups components
 		scalePanel.getModel().setLabel("Input Scale");	//set the panel label
 		final CheckControl celsiusCheckControl=new CheckControl(session, CheckControl.CheckType.ELLIPSE);	//create a check control for the Celsius scale, using an ellipse check are

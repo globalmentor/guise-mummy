@@ -35,7 +35,7 @@ public class AuthorizeUsersFrame extends DefaultFrame
 		super(session);	//construct the parent class
 		getModel().setLabel("Guise\u2122 Demonstration: Authorize Users");	//set the frame title	
 
-		final Panel authorizationPanel=new Panel(session, new FlowLayout(Axis.X));	//create the authorization panel flowing horizontally
+		final Panel authorizationPanel=new Panel(session, new FlowLayout(Orientation.Axis.X));	//create the authorization panel flowing horizontally
 			//create the table columns
 		lastNameColumn=new DefaultTableColumnModel<String>(session, String.class, "Last Name");	//last name
 		firstNameColumn=new DefaultTableColumnModel<String>(session, String.class, "First Name");	//first name
@@ -57,7 +57,7 @@ public class AuthorizeUsersFrame extends DefaultFrame
 		final Button applyButton=new Button(session);	//create a button for applying the values
 		applyButton.getModel().setLabel("Apply");	//set the button label
 
-		final Panel userAuthorizationPanel=new Panel(session, new FlowLayout(Axis.Y));	//create the root panel flowing vertically
+		final Panel userAuthorizationPanel=new Panel(session, new FlowLayout(Orientation.Axis.Y));	//create the root panel flowing vertically
 		userAuthorizationPanel.add(authorizationPanel);	//add the authorization panel to the root panel
 		userAuthorizationPanel.add(applyButton);	//add the apply button to the root panel
 		

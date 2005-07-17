@@ -4,11 +4,12 @@ import java.io.IOException;
 import java.util.Collection;
 
 import com.garretwilson.beans.PropertyBindable;
+import com.javaguise.component.layout.Orientation;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.Controller;
 import static com.garretwilson.lang.ClassUtilities.*;
+
 import com.javaguise.session.GuiseSession;
-import com.javaguise.validator.ValidationException;
 import com.javaguise.validator.ValidationsException;
 
 /**Base interface for all Guise components.
@@ -22,6 +23,8 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 
 	/**The bound property of the controller.*/
 	public final static String CONTROLLER_PROPERTY=getPropertyName(Component.class, "controller");
+	/**The orientation bound property.*/
+	public final static String ORIENTATION_PROPERTY=getPropertyName(Component.class, "orientation");
 	/**The bound property of the component style ID.*/
 	public final static String STYLE_ID_PROPERTY=getPropertyName(Component.class, "styleID");
 	/**The bound property of whether the component is visible.*/
@@ -66,6 +69,22 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 
 	/**@return The component identifier.*/
 	public String getID();
+
+	/**Determines the internationalization orientation of the component's contents.
+	This method returns the local orientation value, if there is one.
+	If there is no orientation specified for this component, the request is deferred to this component's parent.
+	If there is no parent component, a default orientation is retrieved from the current session.
+	@return The internationalization orientation of the component's contents.
+	@see GuiseSession#getOrientation()
+	*/
+	public Orientation getOrientation();
+
+	/**Sets the orientation.
+	This is a bound property
+	@param newOrientation The new internationalization orientation of the component's contents, or <code>null</code> if default orientation should be determined based upon the session's locale.
+	@see #ORIENTATION_PROPERTY
+	*/
+	public void setOrientation(final Orientation newOrientation);
 
 	/**@return An identifier unique within this component's parent, if any.*/
 //TODO del when works	public String getUniqueID();

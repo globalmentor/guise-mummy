@@ -1,8 +1,6 @@
 package com.javaguise.model;
 
 import java.util.*;
-import static java.util.Collections.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.util.ArrayUtilities.*;
@@ -17,29 +15,11 @@ The model is thread-safe, synchronized on itself. Any iteration over values shou
 public class DefaultTableModel extends AbstractTableModel
 {
 
-	/**The map of table column models in logical order.*/
-	private final List<TableColumnModel<?>> logicalTableColumnModels=new CopyOnWriteArrayList<TableColumnModel<?>>();
-
-		/**Determines the logical index of the given table column.
-		@param column One of the table columns.
-		@return The zero-based logical index of the column within the table, or -1 if the column is not one of the model's columns.
-		*/
-		public int getColumnIndex(final TableColumnModel<?> column) {return logicalTableColumnModels.indexOf(column);}
-	
-	/**The list of table column models.*/
-	private final List<TableColumnModel<?>> tableColumnModels=new CopyOnWriteArrayList<TableColumnModel<?>>();
-
-	/**@return A read-only list of table columns in physical order.*/ 
-	public List<TableColumnModel<?>> getColumns() {return unmodifiableList(tableColumnModels);}
-
 	/**The list of value lists for rows.*/
 	private final List<List<Object>> valueRowLists;
 
 	/**@return The number of rows in this table.*/
 	public int getRowCount() {return valueRowLists.size();}
-
-	/**@return The number of columns in this table.*/
-	public int getColumnCount() {return logicalTableColumnModels.size();}
 
 	/**Constructs a default table model indicating the type of values it can hold, using default column models.
 	@param <C> The type of values in all the cells in the table.
@@ -87,9 +67,7 @@ public class DefaultTableModel extends AbstractTableModel
 	*/
 	public DefaultTableModel(final GuiseSession<?> session, final Object[][] rowValues, final TableColumnModel<?>... columns)
 	{
-		super(session);	//construct the parent class
-		Collections.addAll(logicalTableColumnModels, columns);	//add all the columns to our logical list of table columns
-		Collections.addAll(tableColumnModels, columns);	//add all the columns to our list of table columns
+		super(session, columns);	//construct the parent class
 		valueRowLists=new SynchronizedListDecorator<List<Object>>(new ArrayList<List<Object>>(), this);	//create a list of value lists, synchronizing all access on this object
 		if(rowValues!=null)	//if table data was given
 		{
@@ -135,19 +113,6 @@ public class DefaultTableModel extends AbstractTableModel
 		return columns;	//return the columns we created
 	}
 
-	/**Returns the cell value for the given cell.
-	This method delegates to {@link #getCellValue(int, TableColumnModel)}.
-	@param <C> The type of cell value.
-	@param cell The cell containing the row index and column information.
-	@return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
-	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	@exception IllegalArgumentException if the given column is not one of this table's columns.
-	*/
-	public <C> C getCellValue(final Cell<C> cell)
-	{
-		return getCellValue(cell.getRowIndex(), cell.getColumn());	//return the cell value for the cell row index and column
-	}
-
 	/**Returns the cell value at the given row and column.
 	@param <C> The type of cell values in the given column.
 	@param rowIndex The zero-based row index.
@@ -167,19 +132,6 @@ public class DefaultTableModel extends AbstractTableModel
 		{
 			return column.getValueClass().cast(valueRowLists.get(rowIndex).get(columnIndex));	//get the value in the given row and column, cast to the appropriate type
 		}
-	}
-	/**Sets the cell value for the given cell.
-	This method delegates to {@link #setCellValue(int, TableColumnModel, C)}.
-	@param <C> The type of cell value.
-	@param cell The cell containing the row index and column information.
-	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	@return The value previously in the given cell.
-	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
-	@exception IllegalArgumentException if the given column is not one of this table's columns.
-	*/
-	public <C> C setCellValue(final Cell<C> cell, final C newCellValue)
-	{
-		return setCellValue(cell.getRowIndex(), cell.getColumn(), newCellValue);	//set the cell value for the cell row index and column
 	}
 
 	/**Sets the cell value at the given row and column.

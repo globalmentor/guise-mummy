@@ -38,7 +38,7 @@ public class Panel extends AbstractModelBox<LabelModel, Panel>
 	*/
 	public Panel(final GuiseSession<?> session, final String id)
 	{
-		this(session, id, new FlowLayout(Axis.Y));	//default to flowing vertically
+		this(session, id, new FlowLayout(Orientation.Axis.Y));	//default to flowing vertically
 	}
 
 	/**Session, ID, and model constructor with a default vertical flow layout.
@@ -50,7 +50,7 @@ public class Panel extends AbstractModelBox<LabelModel, Panel>
 	*/
 	public Panel(final GuiseSession<?> session, final String id, final LabelModel model)
 	{
-		this(session, id, new FlowLayout(Axis.Y), model);	//default to flowing vertically
+		this(session, id, new FlowLayout(Orientation.Axis.Y), model);	//default to flowing vertically
 	}
 
 	/**Session and layout constructor.
@@ -83,7 +83,7 @@ public class Panel extends AbstractModelBox<LabelModel, Panel>
 	*/
 	public Panel(final GuiseSession<?> session, final String id, final Layout layout)
 	{
-		super(session, id, layout, new DefaultLabelModel(session));	//construct the parent class
+		this(session, id, layout, new DefaultLabelModel(session));	//construct the class with a default model
 	}
 
 	/**Session, ID, layout, and model constructor.

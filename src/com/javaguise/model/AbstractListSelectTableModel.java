@@ -45,7 +45,7 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 			}			
 		}
 
-	/**The map of table column models in logical order.*/
+	/**The list of table column models in logical order.*/
 	private final List<TableColumnModel<?>> logicalTableColumnModels=new CopyOnWriteArrayList<TableColumnModel<?>>();
 
 		/**Determines the logical index of the given table column.

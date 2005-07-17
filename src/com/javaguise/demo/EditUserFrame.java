@@ -29,14 +29,14 @@ public class EditUserFrame extends DefaultModalFrame<DemoUser>
 		super(session);	//construct the parent class
 		getModel().setLabel("Guise\u2122 Demonstration: Edit User");	//set the frame title	
 
-		final Panel idPanel=new Panel(session, new FlowLayout(Axis.X));	//create the ID panel flowing horizontally
+		final Panel idPanel=new Panel(session, new FlowLayout(Orientation.Axis.X));	//create the ID panel flowing horizontally
 			//ID
 		idControl=new TextControl<String>(session, String.class);	//create the ID input control
 		idControl.getModel().setLabel("ID");	//set the ID control label
 		idControl.getModel().setEditable(false);	//don't allow the ID to be edited
 		idPanel.add(idControl);	//add the ID control to the ID panel
 		
-		final Panel namePanel=new Panel(session, new FlowLayout(Axis.X));	//create the name panel flowing horizontally
+		final Panel namePanel=new Panel(session, new FlowLayout(Orientation.Axis.X));	//create the name panel flowing horizontally
 			//first name
 		firstNameControl=new TextControl<String>(session, String.class);	//create the first name input control
 		firstNameControl.getModel().setLabel("First Name *");	//set the name control label
@@ -52,14 +52,14 @@ public class EditUserFrame extends DefaultModalFrame<DemoUser>
 		lastNameControl.getModel().setValidator(new RegularExpressionStringValidator(session, "\\S+.*", true));	//require at least a single non-whitespace character followed by any other characters
 		namePanel.add(lastNameControl);	//add the name control to the name panel
 
-		final Panel emailPanel=new Panel(session, new FlowLayout(Axis.X));	//create the email panel flowing horizontally
+		final Panel emailPanel=new Panel(session, new FlowLayout(Orientation.Axis.X));	//create the email panel flowing horizontally
 			//email
 		emailControl=new TextControl<String>(session, String.class);	//create the email input control
 		emailControl.getModel().setLabel("Email *");	//set the email control label
 		emailControl.getModel().setValidator(new RegularExpressionStringValidator(session, ".+@.+\\.[a-z]+", true));	//require an email in the correct format
 		emailPanel.add(emailControl);	//add the email control to the email panel
 
-		final Panel buttonPanel=new Panel(session, new FlowLayout(Axis.X));	//create the button panel flowing horizontally
+		final Panel buttonPanel=new Panel(session, new FlowLayout(Orientation.Axis.X));	//create the button panel flowing horizontally
 		final Button okButton=new Button(session);	//create the OK button
 		okButton.getModel().setLabel("OK");	//set the text of the OK button
 		okButton.getModel().addActionListener(new ActionListener<ActionModel>()	//if the OK button was pressed
@@ -84,7 +84,7 @@ public class EditUserFrame extends DefaultModalFrame<DemoUser>
 				});
 		buttonPanel.add(cancelButton);	//add the button to the button panel
 
-		final Panel editUserPanel=new Panel(session, new FlowLayout(Axis.Y));	//create the entire user panel flowing vertically
+		final Panel editUserPanel=new Panel(session, new FlowLayout(Orientation.Axis.Y));	//create the entire user panel flowing vertically
 		editUserPanel.getModel().setLabel("Edit User");	//set the label of the edit user panel 
 		editUserPanel.add(idPanel);	//add the ID panel
 		editUserPanel.add(namePanel);	//add the name panel

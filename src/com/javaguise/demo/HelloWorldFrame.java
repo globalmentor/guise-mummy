@@ -20,7 +20,7 @@ public class HelloWorldFrame extends DefaultFrame
 		super(session);	//construct the parent class
 		getModel().setLabel("Guise\u2122 Demonstration: Hello World");	//set the frame title
 		
-		final Panel panel=new Panel(session, new FlowLayout(Axis.Y));	//create a panel flowing vertically
+		final Panel panel=new Panel(session, new FlowLayout(Orientation.Axis.Y));	//create a panel flowing vertically
 		final Heading helloWorldHeading=new Heading(session, 0);	//create a top-level heading
 		helloWorldHeading.getModel().setLabel("Hello World!");	//set the text of the heading, using its model
 		panel.add(helloWorldHeading);	//add the heading to the panel

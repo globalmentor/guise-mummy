@@ -24,7 +24,7 @@ public class HelloUserFrame extends DefaultFrame
 		super(session);	//construct the parent class
 		getModel().setLabel("Guise\u2122 Demonstration: Hello User");	//set the frame title	
 
-		final Panel panel=new Panel(session, new FlowLayout(Axis.Y));	//create a panel flowing vertically
+		final Panel panel=new Panel(session, new FlowLayout(Orientation.Axis.Y));	//create a panel flowing vertically
 		final Label helloUserLabel=new Label(session);	//create a label
 		helloUserLabel.setVisible(false);	//don't show the label initially
 		panel.add(helloUserLabel);	//add the label to the panel

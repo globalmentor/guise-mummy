@@ -1,6 +1,5 @@
 package com.javaguise.session;
 
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.*;
 
@@ -8,6 +7,7 @@ import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.event.PostponedEvent;
 import com.javaguise.GuiseApplication;
 import com.javaguise.component.*;
+import com.javaguise.component.layout.Orientation;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.event.ModalListener;
 
@@ -20,6 +20,8 @@ A client application may only have one session, while a web server application w
 public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBindable
 {
 
+	/**The orientation bound property.*/
+	public final static String ORIENTATION_PROPERTY=getPropertyName(GuiseSession.class, "orientation");
 	/**The locale bound property.*/
 	public final static String LOCALE_PROPERTY=getPropertyName(GuiseSession.class, "locale");
 
@@ -30,10 +32,12 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	public Locale getLocale();
 
 	/**Sets the current session locale.
+	The default orientation will be updated if needed to reflect the new locale.
 	This is a bound property.
 	@param newLocale The new session locale.
 	@exception NullPointerException if the given locale is <code>null</code>.
 	@see #LOCALE_PROPERTY
+	@see #setOrientation(Orientation)
 	*/
 	public void setLocale(final Locale newLocale);
 
@@ -46,6 +50,17 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	@see #setLocale(Locale)
 	*/
 	public Locale requestLocale(final List<Locale> requestedLocales);
+
+	/**@return The default internationalization orientation of components for this session.*/
+	public Orientation getOrientation();
+
+	/**Sets the default orientation.
+	This is a bound property
+	@param newOrientation The new default internationalization orientation of components for this session.
+	@exception NullPointerException if the given orientation is <code>null</code>.
+	@see #ORIENTATION_PROPERTY
+	*/
+	public void setOrientation(final Orientation newOrientation);
 
 	/**Retrieves a resource bundle to be used by this session.
 	One of the <code>getXXXResource()</code> should be used in preference to using this method directly.

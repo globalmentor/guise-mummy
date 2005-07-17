@@ -11,14 +11,13 @@ import com.garretwilson.beans.*;
 import com.garretwilson.event.PostponedEvent;
 import com.javaguise.GuiseApplication;
 import com.javaguise.component.*;
+import com.javaguise.component.layout.Orientation;
 import com.javaguise.context.GuiseContext;
-import com.javaguise.demo.EditUserFrame;
 import com.javaguise.event.ModalEvent;
 import com.javaguise.event.ModalListener;
 import com.garretwilson.io.BOMInputStreamReader;
 import static com.garretwilson.io.WriterUtilities.*;
 import com.garretwilson.lang.ObjectUtilities;
-import com.garretwilson.util.Debug;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
@@ -84,10 +83,12 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		public Locale getLocale() {return locale;}
 
 		/**Sets the current session locale.
+		The default orientation will be updated if needed to reflect the new locale.
 		This is a bound property.
 		@param newLocale The new session locale.
 		@exception NullPointerException if the given locale is <code>null</code>.
 		@see GuiseSession#LOCALE_PROPERTY
+		@see #setOrientation(Orientation)
 		*/
 		public void setLocale(final Locale newLocale)
 		{
@@ -97,6 +98,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 				locale=checkNull(newLocale, "Guise session locale cannot be null.");	//actually change the value
 				releaseResourceBundle();	//release the resource bundle, as the new locale may indicate that new resources should be used
 				firePropertyChange(LOCALE_PROPERTY, oldLocale, newLocale);	//indicate that the value changed
+				setOrientation(Orientation.getOrientation(locale));	//update the orientation based upon the new locale
 			}
 		}
 
@@ -141,6 +143,28 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 				}
 			}
 			return null;	//indicate that the application supports none of the requested locales and none of their more general variations
+		}
+
+	/**The default internationalization orientation of components for this session.*/
+	private Orientation orientation=Orientation.LEFT_TO_RIGHT_TOP_TO_BOTTOM;
+		
+		/**@return The default internationalization orientation of components for this session.*/
+		public Orientation getOrientation() {return orientation;}
+
+		/**Sets the default orientation.
+		This is a bound property
+		@param newOrientation The new default internationalization orientation of components for this session.
+		@exception NullPointerException if the given orientation is <code>null</code>.
+		@see GuiseSession#ORIENTATION_PROPERTY
+		*/
+		public void setOrientation(final Orientation newOrientation)
+		{
+			if(!ObjectUtilities.equals(orientation, newOrientation))	//if the value is really changing
+			{
+				final Orientation oldOrientation=checkNull(orientation, "Orientation cannot be null");	//get the old value
+				orientation=newOrientation;	//actually change the value
+				firePropertyChange(ORIENTATION_PROPERTY, oldOrientation, newOrientation);	//indicate that the value changed
+			}
 		}
 
 	/**The lazily-created resource bundle used by this session.*/
@@ -410,6 +434,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 	{
 		this.application=application;	//save the Guise instance
 		this.locale=application.getDefaultLocale();	//default to the application locale
+		this.orientation=Orientation.getOrientation(locale);	//set the orientation default based upon the locale		
 	}
 
 	/**Retrieves the frame bound to the given appplication context-relative path.

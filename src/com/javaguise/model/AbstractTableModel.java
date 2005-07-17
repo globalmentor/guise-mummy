@@ -1,5 +1,10 @@
 package com.javaguise.model;
 
+import java.util.*;
+import static java.util.Collections.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import com.javaguise.model.TableModel.Cell;
 import com.javaguise.session.GuiseSession;
 
 /**An abstract implementation of a table model.
@@ -31,22 +36,72 @@ public abstract class AbstractTableModel extends AbstractControlModel implements
 			}			
 		}
 
+	/**The list of table column models in logical order.*/
+	private final List<TableColumnModel<?>> logicalTableColumnModels=new CopyOnWriteArrayList<TableColumnModel<?>>();
+
+		/**Determines the logical index of the given table column.
+		@param column One of the table columns.
+		@return The zero-based logical index of the column within the table, or -1 if the column is not one of the model's columns.
+		*/
+		public int getColumnIndex(final TableColumnModel<?> column) {return logicalTableColumnModels.indexOf(column);}
+	
+	/**The list of table column models.*/
+	private final List<TableColumnModel<?>> tableColumnModels=new CopyOnWriteArrayList<TableColumnModel<?>>();
+
+	/**@return A read-only list of table columns in physical order.*/ 
+	public List<TableColumnModel<?>> getColumns() {return unmodifiableList(tableColumnModels);}
+
+	/**@return The number of columns in this table.*/
+	public int getColumnCount() {return logicalTableColumnModels.size();}
+
 	/**Session constructor.
 	@param session The Guise session that owns this model.
+	@param columns The models representing the table columns.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public AbstractTableModel(final GuiseSession<?> session)
+	public AbstractTableModel(final GuiseSession<?> session, final TableColumnModel<?>... columns)
 	{
-		this(session, null);	//construct the class with no label
+		this(session, null, columns);	//construct the class with no label
 	}
 
 	/**Session and label constructor.
 	@param session The Guise session that owns this model.
 	@param label The text of the label.
+	@param columns The models representing the table columns.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public AbstractTableModel(final GuiseSession<?> session, final String label)
+	public AbstractTableModel(final GuiseSession<?> session, final String label, final TableColumnModel<?>... columns)
 	{
 		super(session, label);	//construct the parent class
+		addAll(logicalTableColumnModels, columns);	//add all the columns to our logical list of table columns
+		addAll(tableColumnModels, columns);	//add all the columns to our list of table columns
 	}
+
+	/**Returns the cell value for the given cell.
+	This method delegates to {@link #getCellValue(int, TableColumnModel)}.
+	@param <C> The type of cell value.
+	@param cell The cell containing the row index and column information.
+	@return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
+	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	*/
+	public <C> C getCellValue(final Cell<C> cell)
+	{
+		return getCellValue(cell.getRowIndex(), cell.getColumn());	//return the cell value for the cell row index and column
+	}
+
+	/**Sets the cell value for the given cell.
+	This method delegates to {@link #setCellValue(int, TableColumnModel, C)}.
+	@param <C> The type of cell value.
+	@param cell The cell containing the row index and column information.
+	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
+	@return The value previously in the given cell.
+	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	*/
+	public <C> C setCellValue(final Cell<C> cell, final C newCellValue)
+	{
+		return setCellValue(cell.getRowIndex(), cell.getColumn(), newCellValue);	//set the cell value for the cell row index and column
+	}
+
 }

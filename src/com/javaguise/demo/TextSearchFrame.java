@@ -55,10 +55,10 @@ public class TextSearchFrame extends DefaultFrame
 		super(session);	//construct the parent class
 		getModel().setLabel("Guise\u2122 Demonstration: Text Search");	//set the frame title	
 
-		final Panel textSearchPanel=new Panel(session, new FlowLayout(Axis.X));	//create the root panel flowing horizontally
+		final Panel textSearchPanel=new Panel(session, new FlowLayout(Orientation.Axis.X));	//create the root panel flowing horizontally
 
 			//input panel
-		final Panel inputPanel=new Panel(session, new FlowLayout(Axis.Y));	//create the input panel flowing vertically
+		final Panel inputPanel=new Panel(session, new FlowLayout(Orientation.Axis.Y));	//create the input panel flowing vertically
 			//instructions
 		final Message message=new Message(session);	//create a new message
 		message.getModel().setLabel("Instructions");	//give a label to the message

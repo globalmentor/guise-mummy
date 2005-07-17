@@ -14,6 +14,8 @@ public interface Frame<C extends Frame<C>> extends ModelComponent<LabelModel, C>
 {
 	/**The content bound property.*/
 	public final static String CONTENT_PROPERTY=getPropertyName(Frame.class, "content");
+	/**The header bound property.*/
+	public final static String HEADER_PROPERTY=getPropertyName(Frame.class, "header");
 	/**The URI of the referrer bound property.*/
 	public final static String REFERRER_URI_PROPERTY=getPropertyName(Frame.class, "referrerURI");
 

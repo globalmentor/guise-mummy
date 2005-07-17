@@ -6,6 +6,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.event.EventListenerManager;
+import com.garretwilson.lang.ObjectUtilities;
+import com.javaguise.component.layout.Orientation;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.Controller;
 import com.javaguise.session.GuiseSession;
@@ -98,6 +100,51 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 
 		/**@return The component identifier.*/
 		public String getID() {return id;}
+
+	/**The internationalization orientation of the component's contents, or <code>null</code> if the default orientation should be used.*/
+	private Orientation orientation=null;
+
+		/**Determines the internationalization orientation of the component's contents.
+		This method returns the local orientation value, if there is one.
+		If there is no orientation specified for this component, the request is deferred to this component's parent.
+		If there is no parent component, a default orientation is retrieved from the current session.
+		@return The internationalization orientation of the component's contents.
+		@see GuiseSession#getOrientation()
+		*/
+		public Orientation getOrientation()
+		{
+			if(orientation!=null)	//if an orientation is explicitly set for this component
+			{
+				return orientation;	//return this component's orientation
+			}
+			else	//otherwise, try to defer to the parent
+			{
+				final Component<?> parent=getParent();	//get this component's parent
+				if(parent!=null)	//if we have a parent
+				{
+					return parent.getOrientation();	//return the parent's orientation
+				}
+				else	//if we don't have a parent
+				{
+					return getSession().getOrientation();	//return the session's default orientation
+				}
+			}
+		}
+
+		/**Sets the orientation.
+		This is a bound property
+		@param newOrientation The new internationalization orientation of the component's contents, or <code>null</code> if default orientation should be determined based upon the session's locale.
+		@see Component#ORIENTATION_PROPERTY
+		*/
+		public void setOrientation(final Orientation newOrientation)
+		{
+			if(!ObjectUtilities.equals(orientation, newOrientation))	//if the value is really changing
+			{
+				final Orientation oldOrientation=orientation;	//get the old value
+				orientation=newOrientation;	//actually change the value
+				firePropertyChange(ORIENTATION_PROPERTY, oldOrientation, newOrientation);	//indicate that the value changed
+			}
+		}
 
 		/**@return An identifier unique within this component's parent, if any.*/
 /*TODO del when works

@@ -44,7 +44,7 @@ public class HomeFrame extends DefaultFrame
 		testLabel.getModel().setLabel("This is label text from the model.");
 		panel.add(testLabel);	//add a new label
 		
-		final Panel buttonPanel=new Panel(session, "testButtonPanel", new FlowLayout(Axis.X));	//create a panel flowing horizontally
+		final Panel buttonPanel=new Panel(session, "testButtonPanel", new FlowLayout(Orientation.Axis.X));	//create a panel flowing horizontally
 
 		final Button testButton=new Button(session, "testButton");
 		testButton.getModel().setLabel("Click here to go to the 'Hello World' demo.");
@@ -106,10 +106,10 @@ public class HomeFrame extends DefaultFrame
 	
 	
 	
-		final Panel horizontalPanel=new Panel(session, new FlowLayout(Axis.X));	//create a panel flowing horizontally
+		final Panel horizontalPanel=new Panel(session, new FlowLayout(Orientation.Axis.X));	//create a panel flowing horizontally
 	
 	
-		final Panel booleanPanel=new Panel(session, new FlowLayout(Axis.Y));	//create a panel flowing vertically
+		final Panel booleanPanel=new Panel(session, new FlowLayout(Orientation.Axis.Y));	//create a panel flowing vertically
 		booleanPanel.getModel().setLabel("Check one of these");
 		final CheckControl check1=new CheckControl(session, "check1");
 		check1.setCheckType(CheckControl.CheckType.ELLIPSE);
