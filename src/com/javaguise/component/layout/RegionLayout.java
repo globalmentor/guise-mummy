@@ -1,5 +1,6 @@
 package com.javaguise.component.layout;
 
+import java.util.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.javaguise.component.Component;
 
@@ -49,6 +50,22 @@ public class RegionLayout extends AbstractLayout<RegionLayout.Constraints>
 		{
 			this.region=checkNull(region, "Region cannot be null.");
 		}
+	}
+
+	/**Retrieves a component for a given region.
+	@param region The region for which a component should be returned.
+	@return The component with which the given region is associated, or <code>null</code> if no component has the given region specified.
+	*/
+	public Component<?> getComponent(final Region region)	//TODO later use reverse maps or something similar for quicker lookup
+	{
+		for(final Map.Entry<Component<?>, Constraints> entry:componentConstraintsMap.entrySet())	//for each entry in the map of components and constraints
+		{
+			if(entry.getValue().getRegion()==region)	//if this component is in the correct region
+			{
+				return entry.getKey();	//return the component
+			}
+		}
+		return null;	//indicate that no component has the given region
 	}
 
 }

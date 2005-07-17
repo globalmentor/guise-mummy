@@ -37,7 +37,20 @@ public class CSSStyleConstants
 	public final static String COMPONENT_ERROR_CLASS_POSTFIX="-error";
 	
 	//layout
-	
+
+	/**The CSS class for any enclosing element needed for region layout.*/
+	public final static String LAYOUT_REGION_CLASS="layout-region";
+	/**The CSS class for the bottom region layout.*/
+	public final static String LAYOUT_REGION_BOTTOM_CLASS="layout-region-bottom";
+	/**The CSS class for the center region layout.*/
+	public final static String LAYOUT_REGION_CENTER_CLASS="layout-region-center";
+	/**The CSS class for the left region layout.*/
+	public final static String LAYOUT_REGION_LEFT_CLASS="layout-region-left";
+	/**The CSS class for the right region layout.*/
+	public final static String LAYOUT_REGION_RIGHT_CLASS="layout-region-right";
+	/**The CSS class for the top region layout.*/
+	public final static String LAYOUT_REGION_TOP_CLASS="layout-region-top";
+
 	/**The CSS class for any enclosing element needed for horizontal flow layout.*/
 	public final static String LAYOUT_FLOW_X_CLASS="layout-flow-x";
 	/**The CSS class for horizontal flow layout children.*/

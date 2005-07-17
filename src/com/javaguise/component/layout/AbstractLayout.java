@@ -16,7 +16,7 @@ public abstract class AbstractLayout<T extends Layout.Constraints> implements La
 {
 
 	/**The thread-safe map of layout metadata associated with components.*/
-	final Map<Component<?>, T> componentConstraintsMap=new ConcurrentHashMap<Component<?>, T>();
+	protected final Map<Component<?>, T> componentConstraintsMap=new ConcurrentHashMap<Component<?>, T>();
 
 	/**Associates layout metadata with a component.
 	Any metadata previously associated with the component will be removed.
