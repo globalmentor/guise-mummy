@@ -194,6 +194,7 @@ public class HomeFrame extends DefaultFrame
 		contentPanel.add(text);
 
 		getSession().setLocale(Locale.FRANCE);
+//TODO del		getSession().setLocale(new Locale("ar"));
 
 		final Integer[][] multiplicationTableData=new Integer[2][2];
 		for(int row=0; row<2; ++row)

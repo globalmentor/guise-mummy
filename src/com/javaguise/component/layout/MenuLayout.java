@@ -1,28 +1,20 @@
 package com.javaguise.component.layout;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
-
 import com.javaguise.component.Component;
 
 /**A layout for a menu that flows along an axis.
 @author Garret Wilson
 */
-public class MenuLayout extends AbstractLayout<MenuLayout.Constraints>	//TODO probably derive from a shared AbstractFlowLayout
+public class MenuLayout extends AbstractFlowLayout<MenuLayout.Constraints>
 {
 
-	/**The logical axis (line or page) along which information is flowed.*/
-	private final Orientation.Flow flow;
-
-		/**@return The logical axis (line or page) along which information is flowed.*/
-		public Orientation.Flow getFlow() {return flow;}
-
-	/**Axis constructor.
+	/**Flow constructor.
 	@param flow The logical axis (line or page) along which information is flowed.
 	@exception NullPointerException if the axis is <code>null</code>.
 	*/
 	public MenuLayout(final Orientation.Flow flow)
 	{
-		this.flow=checkNull(flow, "Flow cannot be null.");	//store the flow
+		super(flow);	//construct the parent class
 	}
 
 	/**Creates default constraints for the given component.
@@ -38,7 +30,7 @@ public class MenuLayout extends AbstractLayout<MenuLayout.Constraints>	//TODO pr
 	/**Metadata about individual component flow.
 	@author Garret Wilson
 	*/
-	public static class Constraints implements Layout.Constraints
+	public static class Constraints extends AbstractFlowLayout.Constraints
 	{
 	}
 

@@ -106,15 +106,24 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	/**The internationalization orientation of the component's contents, or <code>null</code> if the default orientation should be used.*/
 	private Orientation orientation=null;
 
+		/**Returns this component's requested orientation.
+		To resolve the orientation up the hierarchy, {@link #getComponentOrientation()} should be used.
+		@return The internationalization orientation of the component's contents, or <code>null</code> if the default orientation should be used.
+		@see #getComponentOrientation()
+		*/
+		public Orientation getOrientation() {return orientation=null;}
+
 		/**Determines the internationalization orientation of the component's contents.
 		This method returns the local orientation value, if there is one.
 		If there is no orientation specified for this component, the request is deferred to this component's parent.
 		If there is no parent component, a default orientation is retrieved from the current session.
 		@return The internationalization orientation of the component's contents.
+		@see #getOrientation()
 		@see GuiseSession#getOrientation()
 		*/
-		public Orientation getOrientation()
+		public Orientation getComponentOrientation()
 		{
+			final Orientation orientation=getOrientation();	//get this component's orientation
 			if(orientation!=null)	//if an orientation is explicitly set for this component
 			{
 				return orientation;	//return this component's orientation
@@ -124,7 +133,7 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 				final Component<?> parent=getParent();	//get this component's parent
 				if(parent!=null)	//if we have a parent
 				{
-					return parent.getOrientation();	//return the parent's orientation
+					return parent.getComponentOrientation();	//return the parent's orientation
 				}
 				else	//if we don't have a parent
 				{

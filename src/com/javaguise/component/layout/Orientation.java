@@ -57,7 +57,23 @@ public class Orientation
 		{
 			return axes[flow.ordinal()];	//get the axis for this flow
 		}
-	
+
+		/**Determines the flow (line or page) that is aligned to the given axis.
+		@param axis The axis for which flow should be determined.
+		@return The flow that is aligned to the given axis.
+		*/
+		public Flow getFlow(final Axis axis)
+		{
+			for(final Flow flow:Flow.values())	//for each flow
+			{
+				if(getAxis(flow)==axis)	//if the flow is on the requested axis
+				{
+					return flow;	//return this flow
+				}
+			}
+			throw new IllegalArgumentException("Unsupported orientation axis: "+axis);	//hopefully they won't pass Axis.Z, because orientations don't support the Z axis
+		}
+
 	/**The direction for each flow (line and page).*/
 	private final Direction[] directions=new Direction[2];
 

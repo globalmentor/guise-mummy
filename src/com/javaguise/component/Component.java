@@ -75,14 +75,22 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	/**@return The component identifier.*/
 	public String getID();
 
+	/**Returns this component's requested orientation.
+	To resolve the orientation up the hierarchy, {@link #getComponentOrientation()} should be used.
+	@return The internationalization orientation of the component's contents, or <code>null</code> if the default orientation should be used.
+	@see #getComponentOrientation()
+	*/
+	public Orientation getOrientation();
+
 	/**Determines the internationalization orientation of the component's contents.
 	This method returns the local orientation value, if there is one.
 	If there is no orientation specified for this component, the request is deferred to this component's parent.
 	If there is no parent component, a default orientation is retrieved from the current session.
 	@return The internationalization orientation of the component's contents.
+	@see #getOrientation()
 	@see GuiseSession#getOrientation()
 	*/
-	public Orientation getOrientation();
+	public Orientation getComponentOrientation();
 
 	/**Sets the orientation.
 	This is a bound property
