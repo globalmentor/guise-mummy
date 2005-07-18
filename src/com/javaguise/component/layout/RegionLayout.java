@@ -12,6 +12,18 @@ This layout uses default constraints of {@link Region#CENTER}.
 public class RegionLayout extends AbstractLayout<RegionLayout.Constraints>
 {
 
+	/**Default constraints for the beginning of a line; "left" in left-to-right, top-to-botom orientation.*/
+	public final static Constraints LINE_START_CONSTRAINTS=new Constraints(Region.LINE_START);
+
+	/**Default constraints for the end of a line; "right" in left-to-right, top-to-botom orientation.*/
+	public final static Constraints LINE_END_CONSTRAINTS=new Constraints(Region.LINE_END);
+
+	/**Default constraints for the beginning of a page; "top" in left-to-right, top-to-botom orientation.*/
+	public final static Constraints PAGE_START_CONSTRAINTS=new Constraints(Region.PAGE_START);
+
+	/**Default constraints for the end of a page; "bottom" in left-to-right, top-to-botom orientation.*/
+	public final static Constraints PAGE_END_CONSTRAINTS=new Constraints(Region.PAGE_END);
+
 	/**Default constraints for the center region.*/
 	public final static Constraints CENTER_CONSTRAINTS=new Constraints(Region.CENTER);
 

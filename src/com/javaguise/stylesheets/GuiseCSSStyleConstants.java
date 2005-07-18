@@ -1,4 +1,4 @@
-package com.javaguise.controller.text.xml;
+package com.javaguise.stylesheets;
 
 import static com.garretwilson.io.FileConstants.*;
 import static com.garretwilson.io.FileUtilities.*;
@@ -8,13 +8,11 @@ import java.net.URI;
 /**Constants to be used with the Guise stylesheet.
 @author Garret Wilson
 */
-public class CSSStyleConstants
+public class GuiseCSSStyleConstants
 {
 
 	/**The URI of the Guise XHTML CSS stylesheet.*/
 	public final static URI GUISE_XHTML_CSS_STYLESHEET_URI=URI.create(addExtension("guise", CSS_EXTENSION));
-	/**The URI of the Guise JavaScript file.*/
-	public final static URI GUISE_JAVASCRIPT_URI=URI.create(addExtension("guise", JS_EXTENSION));
 	
 	//style IDs
 	
@@ -35,7 +33,12 @@ public class CSSStyleConstants
 	public final static String COMPONENT_BODY_CLASS_POSTFIX="-body";
 	/**The CSS class postfix for the error part of a component.*/
 	public final static String COMPONENT_ERROR_CLASS_POSTFIX="-error";
-	
+
+	/**The CSS class postfix indicating the X axis.*/
+	public final static String COMPONENT_X_AXIS_CLASS_POSTFIX="-x";
+	/**The CSS class postfix indicating the Y axis.*/
+	public final static String COMPONENT_Y_AXIS_CLASS_POSTFIX="-y";
+
 	//layout
 
 	/**The CSS class for any enclosing element needed for region layout.*/

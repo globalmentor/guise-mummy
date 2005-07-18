@@ -34,13 +34,15 @@ public class HomeFrame extends DefaultFrame
 	*/
 	public HomeFrame(final GuiseSession<?> session, final String id)
 	{
-		super(session, id, new FlowLayout(Orientation.Flow.PAGE));	//construct the parent flowing vertically
+		super(session, id);	//construct the parent
 		getModel().setLabel("Home Frame Test");	//set the frame label
 
+		final Panel contentPanel=new Panel(session, new FlowLayout(Orientation.Flow.PAGE)); 
+		
 		final Label testLabel=new Label(session, "testLabel");
 		testLabel.setStyleID("title");
 		testLabel.getModel().setLabel("This is label text from the model.");
-		add(testLabel);	//add a new label
+		contentPanel.add(testLabel);	//add a new label
 		
 		final Panel buttonPanel=new Panel(session, "testButtonPanel", new FlowLayout(Orientation.Flow.LINE));	//create a panel flowing horizontally
 
@@ -89,7 +91,7 @@ public class HomeFrame extends DefaultFrame
 					}
 				});
 		buttonPanel.add(modalLink);	//add a new button
-		add(buttonPanel);	//add the button panel to the panel
+		contentPanel.add(buttonPanel);	//add the button panel to the panel
 		final TextControl<String> textInput=new TextControl<String>(session, "textInput", String.class);	//create a text input control
 		textInput.getModel().setLabel("This is the text input label.");
 		textInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<String>()
@@ -100,7 +102,7 @@ public class HomeFrame extends DefaultFrame
 					}
 				});
 //TODO del		textInput.getModel().setValidator(new RegularExpressionStringValidator("[a-z]*"));
-		add(textInput);
+		contentPanel.add(textInput);
 	
 	
 	
@@ -152,7 +154,7 @@ public class HomeFrame extends DefaultFrame
 		horizontalPanel.add(image);
 		
 		
-		add(horizontalPanel);
+		contentPanel.add(horizontalPanel);
 		
 /*TODO del		
 		final Heading resourceHeading=new Heading(session, 2);
@@ -162,7 +164,7 @@ public class HomeFrame extends DefaultFrame
 
 		final Label afterImageLabel=new Label(session);
 		afterImageLabel.getModel().setLabel("This is a lot of text. ;alsjfd ;lkjas ;ljag ;lkjas g;lkajg; laksgj akjlshf lkjashd flkjsdhlksahlsadkhj asldkhjf ;sgdh a;lgkh a;glkha s;dglh asgd;");
-		add(afterImageLabel);
+		contentPanel.add(afterImageLabel);
 
 		final ListControl<String> listSelectControl=new ListControl<String>(session, String.class, new SingleListSelectionStrategy<String>());
 		listSelectControl.getModel().setLabel("Choose an option.");
@@ -171,7 +173,7 @@ public class HomeFrame extends DefaultFrame
 		listSelectControl.getModel().add("The second option");
 		listSelectControl.getModel().add("The third option");
 		listSelectControl.getModel().add("The fourth option");
-		add(listSelectControl);
+		contentPanel.add(listSelectControl);
 
 		final TextAreaControl textAreaControl=new TextAreaControl(session, 25, 100, true);
 		textAreaControl.getModel().setLabel("Type some text.");
@@ -183,13 +185,13 @@ public class HomeFrame extends DefaultFrame
 		{
 			throw new AssertionError(e);
 		}
-		add(textAreaControl);
+		contentPanel.add(textAreaControl);
 
 		final Text text=new Text(session);
 		//TODO del text.getModel().setText("This is some cool text! This is some text\nand some more on another line.\n\nSkipping two lines down, we find a line that is really long, is really, really, ;lkjas;lfk alkg; ;alkghj;alg lkjahq glkjh flkjhasdflkjhasdfl kjhasdf lkjh lkadhf lkshd flksadhf lksadhlskdqah slhjfg sd long. This is some text\nand some more on another line.\n\nSkipping two lines down, we find a line that is really long, is really, really, ;lkjas;lfk alkg; ;alkghj;alg lkjahq glkjh flkjhasdflkjhasdfl kjhasdf lkjh lkadhf lkshd flksadhf lksadhlskdqah slhjfg sd long.");
 		text.getModel().setTextResourceKey("sample.html");
 		text.getModel().setContentType(TextModel.XHTML_CONTENT_TYPE);
-		add(text);
+		contentPanel.add(text);
 
 		getSession().setLocale(Locale.FRANCE);
 
@@ -207,7 +209,37 @@ public class HomeFrame extends DefaultFrame
 		{
 			column.setEditable(true);
 		}
-		add(multiplicationTable);
+		contentPanel.add(multiplicationTable);
+
+		add(contentPanel, RegionLayout.CENTER_CONSTRAINTS);	//add the content panel in the center
+
+		final Menu pulldownMenu=new Menu(session, Orientation.Flow.LINE);
+		
+		final Menu fileMenu=new Menu(session, "fileMenu", Orientation.Flow.PAGE);
+		fileMenu.getModel().setLabel("File");
+		final Link openMenuLink=new Link(session, "openMenuItem");
+		openMenuLink.getModel().setLabel("Open");
+		fileMenu.add(openMenuLink);
+		final Link closeMenuLink=new Link(session, "closeMenuItem");
+		closeMenuLink.getModel().setLabel("Close");
+		fileMenu.add(closeMenuLink);
+		pulldownMenu.add(fileMenu);
+
+		final Menu editMenu=new Menu(session, "editMenu", Orientation.Flow.PAGE);
+		editMenu.getModel().setLabel("Edit");
+		final Link copyMenuLink=new Link(session, "copyMenuItem");
+		copyMenuLink.getModel().setLabel("Copy");
+		editMenu.add(copyMenuLink);
+		final Link cutMenuLink=new Link(session, "cutMenuItem");
+		cutMenuLink.getModel().setLabel("Cut");
+		editMenu.add(cutMenuLink);
+		final Link pasteMenuLink=new Link(session, "pasteMenuItem");
+		pasteMenuLink.getModel().setLabel("Paste");
+		editMenu.add(pasteMenuLink);
+		pulldownMenu.add(editMenu);
+
+		add(pulldownMenu, RegionLayout.PAGE_START_CONSTRAINTS);	//add the pulldown menu at the top
+
 	}
 
 }

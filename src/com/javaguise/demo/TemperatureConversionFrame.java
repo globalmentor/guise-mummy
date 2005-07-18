@@ -5,7 +5,7 @@ import com.javaguise.component.layout.*;
 import com.javaguise.event.ActionEvent;
 import com.javaguise.event.ActionListener;
 
-import static com.javaguise.controller.text.xml.CSSStyleConstants.*;
+import static com.javaguise.stylesheets.GuiseCSSStyleConstants.*;
 
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;

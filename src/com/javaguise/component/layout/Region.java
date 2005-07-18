@@ -18,7 +18,7 @@ public enum Region
 	/**At the end of a page; "bottom" in left-to-right, top-to-botom orientation.*/
 	PAGE_END,
 	
-	/**In the center of the region.*/
+	/**In the center of the area.*/
 	CENTER;
 
 	/**The number of regions for each of the the line and page flows.*/
