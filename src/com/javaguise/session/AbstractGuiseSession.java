@@ -442,7 +442,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 	The frame will be given an ID of a modified form of the path.
 	@param path The appplication context-relative path within the Guise container context.
 	@return The frame bound to the given path, or <code>null</code> if no frame is bound to the given path.
-	@exception NullPointerException if the path is null.
+	@exception NullPointerException if the path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
 	@exception IllegalStateException if the frame class bound to the path does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
 	*/
@@ -450,7 +450,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 	{
 		if(isAbsolutePath(checkNull(path, "Path cannot be null")))	//if the path is absolute
 		{
-			throw new IllegalArgumentException("Bound navigation path cannot be absolute: "+path);
+			throw new IllegalArgumentException("Navigation path cannot be absolute: "+path);
 		}
 		Frame frame;	//we'll store the frame here, either a cached frame or a created frame
 		synchronized(navigationPathFrameMap)	//don't allow the map to be modified while we access it

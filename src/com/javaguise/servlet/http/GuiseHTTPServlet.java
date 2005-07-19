@@ -38,10 +38,10 @@ This implementation only works with Guise applications that descend from {@link 
 public class GuiseHTTPServlet extends DefaultHTTPServlet
 {
 
+	/**The init parameter, "applicationClass", used to specify the application class.*/
+	public final static String APPLICATION_CLASS_INIT_PARAMETER_PREFIX="applicationClass";
 	/**The init parameter, "defaultLocale", used to specify the default locale.*/
 	public final static String DEFAULT_LOCALE_INIT_PARAMETER_PREFIX="defaultLocale";
-	/**The init parameter, "guiseApplicationClass", used to specify the application class.*/
-	public final static String GUISE_APPLICATION_CLASS_INIT_PARAMETER_PREFIX="guiseApplicationClass";
 	/**The init parameter, "supportedLocales", used to specify the supported locales.*/
 	public final static String SUPPORTED_LOCALES_INIT_PARAMETER_PREFIX="supportedLocales";
 	/**The prefix, "navigation.", used to identify navigation definitions in the web application's init parameters.*/
@@ -71,7 +71,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		@return The Guise container that owns the applications.
 		@exception IllegalStateException if this method is called before any requests have been processed.
 		*/
-		protected HTTPServletGuiseContainer getGuiseContainer()
+		protected HTTPServletGuiseContainer getGuiseContainer()	//TODO probably move this logic to init(HttpServletRequest)
 		{
 			if(guiseContainer==null)	//if no container exists
 			{
@@ -87,29 +87,11 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		/**@return The Guise application controlled by this servlet.*/
 		protected AbstractGuiseApplication getGuiseApplication() {return guiseApplication;}
 
-	/**The factory method to create a Guise application.
-	This implementation creates a default Guise application and registers an XHTML controller kit.
-	Subclasses can override this method to create a specialized application type. 
-	@return A new Guise application object.
-	*/
-/*TODO del when works
-	protected AbstractGuiseApplication createGuiseApplication()
-	{
-		getServl
-		final AbstractGuiseApplication guiseApplication=new DefaultGuiseApplication();	//create a default application
-		guiseApplication.installControllerKit(new XHTMLControllerKit());	//create and install an XHTML controller kit
-		return guiseApplication;	//return the created Guise application
-	}
-*/
-
 	/**Default constructor.
 	Creates a single Guise application.
-	@see #createGuiseApplication()
 	*/
 	public GuiseHTTPServlet()
 	{
-//TODO del		guiseContainer=new HTTPServletGuiseContainer();	//create the Guise container
-//TODO del		guiseApplication=createGuiseApplication();	//create a store a Guise application
 	}
 		
 	/**Initializes the servlet.
@@ -147,7 +129,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	protected AbstractGuiseApplication initGuiseApplication(final ServletConfig servletConfig) throws ServletException
 	{
 		final AbstractGuiseApplication guiseApplication;	//create the application and store it here
-		final String guiseApplicationClassName=servletConfig.getInitParameter(GUISE_APPLICATION_CLASS_INIT_PARAMETER_PREFIX);	//get name of the guise application class
+		final String guiseApplicationClassName=servletConfig.getInitParameter(APPLICATION_CLASS_INIT_PARAMETER_PREFIX);	//get name of the guise application class
 		if(guiseApplicationClassName!=null)	//if there is a Guise application class name specified
 		{
 			try
@@ -239,6 +221,24 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		return guiseApplication;	//return the created Guise application
 	}
 
+	/**Initializes the servlet upon receipt of the first request.
+	This version installs the application into the container.
+	@param request The servlet request.
+	@exception IllegalStateException if this servlet has already been initialized from a request.
+	@exception ServletException if there is a problem initializing.
+	*/
+	public void init(final HttpServletRequest request) throws ServletException
+	{
+		super.init(request);	//do the default initialization
+		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
+		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
+		if(guiseApplication.getContainer()==null)	//if this application has not yet been installed (note that there is a race condition here if multiple HTTP requests attempt to access the application simultaneously, but the losing thread will simply throw an exception and not otherwise disturb the application functionality)
+		{
+			final String guiseApplicationContextPath=request.getContextPath()+request.getServletPath()+PATH_SEPARATOR;	//construct the Guise application context path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash
+			guiseContainer.installApplication(guiseApplication, guiseApplicationContextPath);	//install the application			
+		}
+	}
+
 //TODO fix HEAD method servicing, probably by overriding serveResource()
 
 	/**Services the GET method.
@@ -249,17 +249,21 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
   */
 	public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
 	{
-		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
+/*TODO del when works
 		if(guiseApplication.getContainer()==null)	//if this application has not yet been installed (note that there is a race condition here if multiple HTTP requests attempt to access the application simultaneously, but the losing thread will simply throw an exception and not otherwise disturb the application functionality)
 		{
 			final String guiseApplicationContextPath=request.getContextPath()+request.getServletPath()+PATH_SEPARATOR;	//construct the Guise application context path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash
 			guiseContainer.installApplication(guiseApplication, guiseApplicationContextPath);	//install the application			
 		}
+*/
 		final HTTPServletGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
 		final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, request, response);	//create a new Guise context
 		guiseSession.addContext(guiseContext);	//add this context to the session
+Debug.trace("before getting requested URI, application base path is:", guiseApplication.getBasePath());
+		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request		
+			//TODO get the raw path info from the request URI
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 Debug.trace("raw path info", rawPathInfo);
 Debug.trace("Referrer:", getReferer(request));
@@ -339,7 +343,26 @@ Debug.trace("ready to query the navigation frame view");
 			}
 			else	//if we have no frame type for this address
 			{
-				super.doGet(request, response);	//let the default functionality take over
+					//TODO del the redirect code here now that this is done when we get the request URI
+//TODO del Debug.trace("could not find navigation path \""+navigationPath+"\", trying to load resource.");
+//TODO del when works				try
+				{
+					super.doGet(request, response);	//let the default functionality take over					
+				}
+/*TODO del when works
+				catch(final HTTPNotFoundException httpNotFoundException)	//if the default version couldn't find the resource
+				{
+					if(!isContainerPath(navigationPath))	//if the navigation path is not a container
+					{
+						final String containerPath=navigationPath+PATH_SEPARATOR;	//create a container path by adding a separator
+						if(guiseSession.getNavigationFrame(containerPath)!=null)	//if adding a path separator would give us a navigation frame
+						{
+							throw new HTTPMovedPermanentlyException(URI.create(guiseApplication.resolvePath(containerPath)));	//redirect to the container path
+						}
+					}
+					throw httpNotFoundException;	//rethrow the exception if we can't find a collection the user was trying to access
+				}
+*/
 			}
 		}
 		finally
@@ -348,6 +371,25 @@ Debug.trace("ready to query the navigation frame view");
 			guiseSession.removeContext(guiseContext);	//remove this context from the session
 		}
 	}
+
+  /**Determines if the resource at a given URI exists.
+  This version adds checks to see if the URI represents a valid application navigation path.
+  @param resourceURI The URI of the requested resource.
+  @return <code>true</code> if the resource exists, else <code>false</code>.
+	@exception IOException if there is an error accessing the resource.
+  */
+  protected boolean exists(final URI resourceURI) throws IOException
+  {
+  	final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
+  	if(guiseApplication.hasNavigationPath(guiseApplication.relativizeURI(resourceURI)))	//if the URI represents a valid navigation path
+  	{
+  		return true;	//the navigation path exists
+  	}
+  	else	//if there is no navigation path
+  	{
+  		return super.exists(resourceURI);	//see if a physical resource exists at the location
+  	}
+  }
 
 	/**Begins modal navigation based upon modal navigation information.
 	@param <R> The type of modal result the modal navigation involves.

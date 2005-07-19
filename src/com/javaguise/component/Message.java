@@ -16,7 +16,7 @@ public class Message extends AbstractModelComponent<MessageModel, Message>
 	*/
 	public Message(final GuiseSession<?> session)
 	{
-		this(session, null);	//construct the component, indicating that a default ID should be used
+		this(session, (String)null);	//construct the component, indicating that a default ID should be used
 	}
 
 	/**Session and ID constructor with a default data model.
@@ -28,6 +28,16 @@ public class Message extends AbstractModelComponent<MessageModel, Message>
 	public Message(final GuiseSession<?> session, final String id)
 	{
 		this(session, id, new DefaultMessageModel(session));	//construct the class with a default model
+	}
+
+	/**Session and model constructor.
+	@param session The Guise session that owns this component.
+	@param model The component data model.
+	@exception NullPointerException if the given session and/or model is <code>null</code>.
+	*/
+	public Message(final GuiseSession<?> session, final MessageModel model)
+	{
+		this(session, null, model);	//construct the class, indicating that a default ID should be used
 	}
 
 	/**Session, ID, and model constructor.

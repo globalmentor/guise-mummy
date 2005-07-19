@@ -214,8 +214,16 @@ public class HomeFrame extends DefaultFrame
 
 		add(contentPanel, RegionLayout.CENTER_CONSTRAINTS);	//add the content panel in the center
 
-		final Menu pulldownMenu=new Menu(session, Orientation.Flow.LINE);
-		
+		add(createMenu(session, Orientation.Flow.LINE), RegionLayout.PAGE_START_CONSTRAINTS);	//add the pulldown menu at the top
+
+		add(createMenu(session, Orientation.Flow.PAGE), RegionLayout.LINE_START_CONSTRAINTS);	//add the menu at the left
+
+	}
+
+	protected Menu createMenu(final GuiseSession<?> session, final Orientation.Flow flow)
+	{
+		final Menu menu=new Menu(session, flow);
+
 		final Menu fileMenu=new Menu(session, "fileMenu", Orientation.Flow.PAGE);
 		fileMenu.getModel().setLabel("File");
 		final Link openMenuLink=new Link(session, "openMenuItem");
@@ -224,7 +232,7 @@ public class HomeFrame extends DefaultFrame
 		final Link closeMenuLink=new Link(session, "closeMenuItem");
 		closeMenuLink.getModel().setLabel("Close");
 		fileMenu.add(closeMenuLink);
-		pulldownMenu.add(fileMenu);
+		menu.add(fileMenu);
 
 		final Menu editMenu=new Menu(session, "editMenu", Orientation.Flow.PAGE);
 		editMenu.getModel().setLabel("Edit");
@@ -237,10 +245,30 @@ public class HomeFrame extends DefaultFrame
 		final Link pasteMenuLink=new Link(session, "pasteMenuItem");
 		pasteMenuLink.getModel().setLabel("Paste");
 		editMenu.add(pasteMenuLink);
-		pulldownMenu.add(editMenu);
+		menu.add(editMenu);
 
-		add(pulldownMenu, RegionLayout.PAGE_START_CONSTRAINTS);	//add the pulldown menu at the top
+		final Menu windowMenu=new Menu(session, "windowMenu", Orientation.Flow.PAGE);
+		windowMenu.getModel().setLabel("Window");
 
+		final Menu arrangeMenu=new Menu(session, "arrangeMenu", Orientation.Flow.PAGE);
+		arrangeMenu.getModel().setLabel("Arrange");
+		
+		final Link tileMenuLink=new Link(session, "tileMenuItem");
+		tileMenuLink.getModel().setLabel("Tile");
+		arrangeMenu.add(tileMenuLink);
+		final Link cascadeMenuLink=new Link(session, "cascadeMenuItem");
+		cascadeMenuLink.getModel().setLabel("Cascade");
+		arrangeMenu.add(cascadeMenuLink);
+		windowMenu.add(arrangeMenu);
+		menu.add(windowMenu);
+
+			//GlobalMentor
+		final Link globalmentorLink=new Link(session);
+		globalmentorLink.getModel().setLabel("GlobalMentor");
+		globalmentorLink.getModel().addActionListener(new NavigateActionListener<ActionModel>(URI.create("http://www.globalmentor.com/")));
+		menu.add(globalmentorLink);
+
+		return menu;
 	}
 
 }

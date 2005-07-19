@@ -319,6 +319,21 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			return navigationPathFrameBindingMap.get(path);	//return the bound frame type, if any
 		}
 
+		/**Determines if there is a frame class bound to the given appplication context-relative path.
+		@param path The appplication context-relative path within the Guise container context.
+		@return <code>true</code> if there is a frame bound to the given path, or <code>false</code> if no frame is bound to the given path.
+		@exception NullPointerException if the path is <code>null</code>.
+		@exception IllegalArgumentException if the provided path is absolute.
+		*/
+		public boolean hasNavigationPath(final String path)
+		{
+			if(isAbsolutePath(path))	//if the path is absolute
+			{
+				throw new IllegalArgumentException("Navigation path cannot be absolute: "+path);
+			}
+			return getNavigationFrameClass(path)!=null;	//see if there is a frame class bound to this navigation path
+		}
+
 	/**Resolves a relative or absolute path against the application base path.
 	Relative paths will be resolved relative to the application base path. Absolute paths will be be considered already resolved.
 	For an application base path "/path/to/application/", resolving "relative/path" will yield "/path/to/application/relative/path",

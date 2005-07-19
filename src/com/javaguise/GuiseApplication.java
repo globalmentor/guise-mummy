@@ -87,6 +87,14 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public Class<? extends Frame> getNavigationFrameClass(final String path);
 
+	/**Determines if there is a frame class bound to the given appplication context-relative path.
+	@param path The appplication context-relative path within the Guise container context.
+	@return <code>true</code> if there is a frame bound to the given path, or <code>false</code> if no frame is bound to the given path.
+	@exception NullPointerException if the path is <code>null</code>.
+	@exception IllegalArgumentException if the provided path is absolute.
+	*/
+	public boolean hasNavigationPath(final String path);
+
 	/**@return The Guise container into which this application is installed, or <code>null</code> if the application is not yet installed.*/
 	public GuiseContainer getContainer();
 
