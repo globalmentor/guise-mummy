@@ -149,8 +149,12 @@ public class HomeFrame extends DefaultFrame
 		
 		final Image image=new Image(session);
 		image.getModel().setImage(URI.create("http://www.garretwilson.com/photos/2000/february/cowcalf.jpg"));
+/*TODO fix
 		image.getModel().setLabel("Cow and Calf");
 		image.getModel().setMessage("A cow and her minutes-old calf.");
+*/
+		image.getModel().setLabel("\u0622\u067E");
+		image.getModel().setMessage("\u0628\u0627\u062A");
 		horizontalPanel.add(image);
 		
 		

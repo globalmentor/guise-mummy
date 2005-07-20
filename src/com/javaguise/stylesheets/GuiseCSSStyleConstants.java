@@ -39,6 +39,11 @@ public class GuiseCSSStyleConstants
 	/**The CSS class postfix indicating the Y axis.*/
 	public final static String COMPONENT_Y_AXIS_CLASS_POSTFIX="-y";
 
+	/**The CSS class postfix indicating left-to-right line direction.*/
+	public final static String COMPONENT_LTR_CLASS_POSTFIX="-ltr";
+	/**The CSS class postfix indicating right-to-left line direction.*/
+	public final static String COMPONENT_RTL_CLASS_POSTFIX="-rtl";
+
 	//layout
 
 	/**The CSS class for any enclosing element needed for region layout.*/
