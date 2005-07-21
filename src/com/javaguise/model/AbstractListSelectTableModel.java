@@ -139,13 +139,12 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 	@param <C> The type of cell value.
 	@param cell The cell containing the row index and column information.
 	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	@return The value previously in the given cell.
 	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
 	@exception IllegalArgumentException if the given column is not one of this table's columns.
 	*/
-	public <C> C setCellValue(final Cell<C> cell, final C newCellValue)
+	public <C> void setCellValue(final Cell<C> cell, final C newCellValue)
 	{
-		return setCellValue(cell.getRowIndex(), cell.getColumn(), newCellValue);	//set the cell value for the cell row index and column
+		setCellValue(cell.getRowIndex(), cell.getColumn(), newCellValue);	//set the cell value for the cell row index and column
 	}
 
 	/**Sets the cell value at the given row and column.
@@ -153,13 +152,12 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 	@param rowIndex The zero-based row index.
 	@param column The column for which a value should be returned.
 	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	@return The value previously in the given cell.
 	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
 	@exception IllegalArgumentException if the given column is not one of this table's columns.
 	*/
-	public <C> C setCellValue(final int rowIndex, final TableColumnModel<C> column, final C newCellValue)
+	public <C> void setCellValue(final int rowIndex, final TableColumnModel<C> column, final C newCellValue)
 	{
-		return setCellValue(get(rowIndex), rowIndex, column, newCellValue);	//retrieve the value in the given row and set the corresponding cell value 
+		setCellValue(get(rowIndex), rowIndex, column, newCellValue);	//retrieve the value in the given row and set the corresponding cell value 
 	}
 
 	/**Returns the value's property for the given column.
@@ -182,6 +180,6 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
 	@exception IllegalArgumentException if the given column is not one of this table's columns.
 	*/
-	protected abstract <C> C setCellValue(final V value, final int rowIndex, final TableColumnModel<C> column, final C newCellValue);
+	protected abstract <C> void setCellValue(final V value, final int rowIndex, final TableColumnModel<C> column, final C newCellValue);
 
 }

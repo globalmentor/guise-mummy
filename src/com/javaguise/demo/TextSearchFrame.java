@@ -18,7 +18,7 @@ import com.javaguise.validator.AbstractValidator;
 import com.javaguise.validator.ResourceImportValidator;
 import com.javaguise.validator.ValidationException;
 
-/**Temperature Conversion Guise demonstration frame.
+/**Text Search Guise demonstration frame.
 Copyright © 2005 GlobalMentor, Inc.
 Demonstrates resource input (file upload) controls, file upload content type and size validation,
 	manual component error specification, custom model validation, and text area controls.
@@ -60,7 +60,7 @@ public class TextSearchFrame extends DefaultFrame
 			//instructions
 		final Message message=new Message(session);	//create a new message
 		message.getModel().setLabel("Instructions");	//give a label to the message
-		message.getModel().setMessageContentType(MessageModel.XHTML_CONTENT_TYPE);	//indicate that the message will a "application/xhtml+xml" content type
+		message.getModel().setMessageContentType(MessageModel.XHTML_CONTENT_TYPE);	//indicate that the message will be of the "application/xhtml+xml" content type
 		message.getModel().setMessage(INSTRUCTIONS);	//set the instructions
 		inputPanel.add(message);	//add the message to the input panel
 			//search regular expression input

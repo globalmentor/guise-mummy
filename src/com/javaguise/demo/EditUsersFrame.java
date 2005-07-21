@@ -58,7 +58,8 @@ public class EditUsersFrame extends DefaultFrame
 									public void modalBegan(final ModalEvent<DemoUser> modalEvent)	//when modal editing begins
 									{
 										final String newUserID=((DemoApplication)getSession().getApplication()).generateUserID();	//ask the application to generate a new user ID
-										((EditUserFrame)modalEvent.getSource()).setNewUser(newUserID);	//initialize the frame for a new user
+										final EditUserFrame editUserFrame=((EditUserFrame)(Object)modalEvent.getSource());	//TODO add better workaround for Java 1.5.0_04 cast requirement 
+										editUserFrame.setNewUser(newUserID);	//initialize the frame for a new user
 									}
 									public void modalEnded(final ModalEvent<DemoUser> modalEvent)	//when modal editing is finished
 									{
@@ -91,7 +92,8 @@ public class EditUsersFrame extends DefaultFrame
 									{
 										public void modalBegan(final ModalEvent<DemoUser> modalEvent)	//when modal editing begins
 										{
-											((EditUserFrame)modalEvent.getSource()).setUser(user);	//initialize the frame with this user
+											final EditUserFrame editUserFrame=((EditUserFrame)(Object)modalEvent.getSource());	//TODO add better workaround for Java 1.5.0_04 cast requirement 
+											editUserFrame.setUser(user);	//initialize the frame with this user
 										}
 										public void modalEnded(final ModalEvent<DemoUser> modalEvent)	//when modal editing is finished
 										{

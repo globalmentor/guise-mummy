@@ -155,7 +155,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		}
 
 	/**Default constructor.
-	This implemetation sets the locale to the JVM default.
+	This implementation sets the locale to the JVM default.
 	*/
 	public AbstractGuiseApplication()
 	{

@@ -62,22 +62,20 @@ public interface TableModel extends ControlModel
 	@param <C> The type of cell value.
 	@param cell The cell containing the row index and column information.
 	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	@return The value previously in the given cell.
 	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
 	@exception IllegalArgumentException if the given column is not one of this table's columns.
 	*/
-	public <C> C setCellValue(final Cell<C> cell, final C newCellValue);
+	public <C> void setCellValue(final Cell<C> cell, final C newCellValue);
 
 	/**Sets the cell value at the given row and column.
 	@param <C> The type of cell values in the given column.
 	@param rowIndex The zero-based row index.
 	@param column The column for which a value should be returned.
 	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	@return The value previously in the given cell.
 	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
 	@exception IllegalArgumentException if the given column is not one of this table's columns.
 	*/
-	public <C> C setCellValue(final int rowIndex, final TableColumnModel<C> column, final C newCellValue);
+	public <C> void setCellValue(final int rowIndex, final TableColumnModel<C> column, final C newCellValue);
 
 	/**A lightweight class representing a row and column in a table.
 	This class is useful as a map key, for instance.

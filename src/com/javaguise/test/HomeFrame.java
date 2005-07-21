@@ -194,7 +194,7 @@ public class HomeFrame extends DefaultFrame
 		final Text text=new Text(session);
 		//TODO del text.getModel().setText("This is some cool text! This is some text\nand some more on another line.\n\nSkipping two lines down, we find a line that is really long, is really, really, ;lkjas;lfk alkg; ;alkghj;alg lkjahq glkjh flkjhasdflkjhasdfl kjhasdf lkjh lkadhf lkshd flksadhf lksadhlskdqah slhjfg sd long. This is some text\nand some more on another line.\n\nSkipping two lines down, we find a line that is really long, is really, really, ;lkjas;lfk alkg; ;alkghj;alg lkjahq glkjh flkjhasdflkjhasdfl kjhasdf lkjh lkadhf lkshd flksadhf lksadhlskdqah slhjfg sd long.");
 		text.getModel().setTextResourceKey("sample.html");
-		text.getModel().setContentType(TextModel.XHTML_CONTENT_TYPE);
+		text.getModel().setTextContentType(TextModel.XHTML_CONTENT_TYPE);
 		contentPanel.add(text);
 
 		getSession().setLocale(Locale.FRANCE);

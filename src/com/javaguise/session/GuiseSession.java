@@ -14,7 +14,7 @@ import com.javaguise.event.ModalListener;
 import static com.garretwilson.lang.ClassUtilities.*;
 
 /**Represents a session with a user.
-A client application may only have one session, while a web server application will likely have multiple sessions.
+A Swing-based client application may only have one session, while a web server application will likely have multiple sessions.
 @author Garret Wilson
 */
 public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBindable

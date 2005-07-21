@@ -9,7 +9,7 @@ public class DefaultGuiseApplication extends AbstractGuiseApplication
 {
 
 	/**Default constructor.
-	This implemetation sets the locale to the JVM default.
+	This implementation sets the locale to the JVM default.
 	*/
 	public DefaultGuiseApplication()
 	{

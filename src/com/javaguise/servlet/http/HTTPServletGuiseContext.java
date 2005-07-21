@@ -97,7 +97,11 @@ public class HTTPServletGuiseContext extends AbstractXMLGuiseContext<HTTPServlet
 				parameterListMap.put(parameterKey, parameterValueList);	//store the the array of values as a list, keyed to the value
 			}
 		}
+/*TODO del
 Debug.trace("parameter names:", request.getParameterNames());	//TODO del when finished with dual mulipart+encoded content
+Debug.trace("number of parameter names:", request.getParameterNames());
+Debug.trace("***********number of distinct parameter keys", parameterListMap.size());
+*/
 		final ContentType defaultContentType=createContentType(outputContentType.getPrimaryType(), outputContentType.getSubType(), new NameValuePair<String, String>(CHARSET_PARAMETER, UTF_8));	//default to text/plain encoded in UTF-8
 		response.setContentType(defaultContentType.toString());	//initialize the default content type and encoding
 		setContentLanguage(response, session.getLocale());	//set the response content language

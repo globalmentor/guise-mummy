@@ -95,13 +95,12 @@ public abstract class AbstractTableModel extends AbstractControlModel implements
 	@param <C> The type of cell value.
 	@param cell The cell containing the row index and column information.
 	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	@return The value previously in the given cell.
 	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
 	@exception IllegalArgumentException if the given column is not one of this table's columns.
 	*/
-	public <C> C setCellValue(final Cell<C> cell, final C newCellValue)
+	public <C> void setCellValue(final Cell<C> cell, final C newCellValue)
 	{
-		return setCellValue(cell.getRowIndex(), cell.getColumn(), newCellValue);	//set the cell value for the cell row index and column
+		setCellValue(cell.getRowIndex(), cell.getColumn(), newCellValue);	//set the cell value for the cell row index and column
 	}
 
 }

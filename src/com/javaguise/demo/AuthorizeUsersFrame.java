@@ -138,19 +138,15 @@ public class AuthorizeUsersFrame extends DefaultFrame
 		@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
 		@exception IllegalArgumentException if the given column is not one of this table's columns.
 		*/
-		protected <C> C setCellValue(final DemoUser user, final int rowIndex, final TableColumnModel<C> column, final C newCellValue)
+		protected <C> void setCellValue(final DemoUser user, final int rowIndex, final TableColumnModel<C> column, final C newCellValue)
 		{
 			if(column==emailColumn)	//email
 			{
-//TODO fix				final String oldValue=getCellValue(user, rowIndex, emailColumn);	//get the old value
 				user.setEmail((String)newCellValue);	//cast and set the value
-//TODO fix				return oldValue;
-				return null;
 			}
 			else if(column==authorizedColumn)	//authorized
 			{
 				user.setAuthorized(((Boolean)newCellValue).booleanValue());	//cast and set the value
-				return null;	//TODO fix; dangerous
 			}
 			else	//nothing else should be editable
 			{

@@ -143,7 +143,7 @@ public class DefaultTableModel extends AbstractTableModel
 	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
 	@exception IllegalArgumentException if the given column is not one of this table's columns.
 	*/
-	public <C> C setCellValue(final int rowIndex, final TableColumnModel<C> column, final C newCellValue)
+	public <C> void setCellValue(final int rowIndex, final TableColumnModel<C> column, final C newCellValue)
 	{
 		final int columnIndex=getColumnIndex(column);	//get the index of this column
 		if(columnIndex<0)	//if this column isn't in this table
@@ -152,7 +152,7 @@ public class DefaultTableModel extends AbstractTableModel
 		}
 		synchronized(this)	//don't allow others to change the table data while we access the values
 		{
-			return column.getValueClass().cast(valueRowLists.get(rowIndex).set(columnIndex, newCellValue));	//get the value in the given row and column, cast to the appropriate type
+			valueRowLists.get(rowIndex).set(columnIndex, newCellValue);	//set the value in the given row and column
 		}
 	}
 

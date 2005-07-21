@@ -17,34 +17,6 @@ import static com.garretwilson.text.TextUtilities.*;
 public class DefaultTextModel extends AbstractModel implements TextModel
 {
 
-	/**The content type of the text.*/
-	private ContentType contentType=PLAIN_TEXT_CONTENT_TYPE;
-
-		/**@return The content type of the text.*/
-		public ContentType getContentType() {return contentType;}
-
-		/**Sets the content type of the text.
-		This is a bound property.
-		@param newContentType The new text content type.
-		@exception NullPointerException if the given content type is <code>null</code>.
-		@exception IllegalArgumentException if the given content type is not a text content type.
-		@see TextModel#CONTENT_TYPE_PROPERTY
-		*/
-		public void setContentType(final ContentType newContentType)
-		{
-			checkNull(newContentType, "Content type cannot be null.");
-			if(contentType!=newContentType)	//if the value is really changing
-			{
-				final ContentType oldContentType=contentType;	//get the old value
-				if(!isText(newContentType))	//if the new content type is not a text content type
-				{
-					throw new IllegalArgumentException("Content type "+newContentType+" is not a text content type.");
-				}
-				contentType=newContentType;	//actually change the value
-				firePropertyChange(CONTENT_TYPE_PROPERTY, oldContentType, newContentType);	//indicate that the value changed
-			}			
-		}
-
 	/**The text, or <code>null</code> if there is no text.*/
 	private String text=null;
 
@@ -71,6 +43,34 @@ public class DefaultTextModel extends AbstractModel implements TextModel
 				final String oldText=text;	//get the old value
 				text=newText;	//actually change the value
 				firePropertyChange(TEXT_PROPERTY, oldText, newText);	//indicate that the value changed
+			}			
+		}
+
+	/**The content type of the text.*/
+	private ContentType textContentType=PLAIN_TEXT_CONTENT_TYPE;
+
+		/**@return The content type of the text.*/
+		public ContentType getTextContentType() {return textContentType;}
+
+		/**Sets the content type of the text.
+		This is a bound property.
+		@param newContentType The new text content type.
+		@exception NullPointerException if the given content type is <code>null</code>.
+		@exception IllegalArgumentException if the given content type is not a text content type.
+		@see TextModel#TEXT_CONTENT_TYPE_PROPERTY
+		*/
+		public void setTextContentType(final ContentType newContentType)
+		{
+			checkNull(newContentType, "Content type cannot be null.");
+			if(textContentType!=newContentType)	//if the value is really changing
+			{
+				final ContentType oldContentType=textContentType;	//get the old value
+				if(!isText(newContentType))	//if the new content type is not a text content type
+				{
+					throw new IllegalArgumentException("Content type "+newContentType+" is not a text content type.");
+				}
+				textContentType=newContentType;	//actually change the value
+				firePropertyChange(TEXT_CONTENT_TYPE_PROPERTY, oldContentType, newContentType);	//indicate that the value changed
 			}			
 		}
 

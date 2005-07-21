@@ -6,6 +6,7 @@ import com.javaguise.AbstractGuiseApplication;
 
 /**Demonstration Guise application.
 Copyright © 2005 GlobalMentor, Inc.
+Demonstrates custom Guise applications.
 @author Garret Wilson
 */
 public class DemoApplication extends AbstractGuiseApplication
@@ -27,7 +28,7 @@ public class DemoApplication extends AbstractGuiseApplication
 		}
 
 	/**Default constructor.
-	This implemetation sets the locale to the JVM default.
+	This implementation sets the locale to the JVM default.
 	*/
 	public DemoApplication()
 	{

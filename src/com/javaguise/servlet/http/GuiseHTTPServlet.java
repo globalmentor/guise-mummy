@@ -302,15 +302,18 @@ Debug.trace("Referrer:", getReferer(request));
 					guiseSession.setNavigationPath(navigationPath);	//make sure the Guise session has the correct navigation path
 					try
 					{
-						guiseContext.setState(GuiseContext.State.QUERY_VIEW);	//update the context state for querying the view
-Debug.trace("ready to query the navigation frame view");
-						navigationFrame.queryView(guiseContext);		//tell the frame to query its view
-						guiseContext.setState(GuiseContext.State.DECODE_VIEW);	//update the context state for decoding the view
-						navigationFrame.decodeView(guiseContext);		//tell the frame to decode its view
-	//TODO delete phase if not needed					guiseContext.setState(GuiseContext.State.VALIDATE_VIEW);	//update the context state for validating the view
-	//TODO delete phase if not needed					navigationFrame.validateView(guiseContext);		//tell the frame to validate its view
-						guiseContext.setState(GuiseContext.State.UPDATE_MODEL);	//update the context state for updating the model
-						navigationFrame.updateModel(guiseContext);	//tell the frame to update its model
+						if(guiseContext.getParameterListMap().size()>0)	//only query the view if there were submitted values---especially important for radio buttons and checkboxes, which must assume a value of false if nothing is submitted for them, thereby updating the model
+						{
+							guiseContext.setState(GuiseContext.State.QUERY_VIEW);	//update the context state for querying the view
+	//TODO del Debug.trace("ready to query the navigation frame view");
+							navigationFrame.queryView(guiseContext);		//tell the frame to query its view
+							guiseContext.setState(GuiseContext.State.DECODE_VIEW);	//update the context state for decoding the view
+							navigationFrame.decodeView(guiseContext);		//tell the frame to decode its view
+		//TODO delete phase if not needed					guiseContext.setState(GuiseContext.State.VALIDATE_VIEW);	//update the context state for validating the view
+		//TODO delete phase if not needed					navigationFrame.validateView(guiseContext);		//tell the frame to validate its view
+							guiseContext.setState(GuiseContext.State.UPDATE_MODEL);	//update the context state for updating the model
+							navigationFrame.updateModel(guiseContext);	//tell the frame to update its model
+						}
 						guiseContext.setState(GuiseContext.State.QUERY_MODEL);	//update the context state for querying the model
 						navigationFrame.queryModel(guiseContext);		//tell the frame to query its model
 						guiseContext.setState(GuiseContext.State.ENCODE_MODEL);	//update the context state for encoding the model

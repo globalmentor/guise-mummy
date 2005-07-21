@@ -20,7 +20,7 @@ This model only supports text content types, including:
 public interface TextModel extends Model
 {
 	/**The content type bound property.*/
-	public final static String CONTENT_TYPE_PROPERTY=getPropertyName(TextModel.class, "contentType");
+	public final static String TEXT_CONTENT_TYPE_PROPERTY=getPropertyName(TextModel.class, "contentType");
 	/**The text bound property.*/
 	public final static String TEXT_PROPERTY=getPropertyName(TextModel.class, "text");
 	/**The text resource key bound property.*/
@@ -31,18 +31,6 @@ public interface TextModel extends Model
 
 	/**A content type of <code>application/xhtml+xml</code>.*/
 	public final static ContentType XHTML_CONTENT_TYPE=XHTMLConstants.XHTML_CONTENT_TYPE;
-
-	/**@return The content type of the text.*/
-	public ContentType getContentType();
-
-	/**Sets the content type of the text.
-	This is a bound property.
-	@param newContentType The new text content type.
-	@exception NullPointerException if the given content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
-	@see #CONTENT_TYPE_PROPERTY
-	*/
-	public void setContentType(final ContentType newContentType);
 
 	/**Determines the text.
 	If text is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
@@ -58,6 +46,18 @@ public interface TextModel extends Model
 	@see #TEXT_PROPERTY
 	*/
 	public void setText(final String newText);
+
+	/**@return The content type of the text.*/
+	public ContentType getTextContentType();
+
+	/**Sets the content type of the text.
+	This is a bound property.
+	@param newContentType The new text content type.
+	@exception NullPointerException if the given content type is <code>null</code>.
+	@exception IllegalArgumentException if the given content type is not a text content type.
+	@see #TEXT_CONTENT_TYPE_PROPERTY
+	*/
+	public void setTextContentType(final ContentType newContentType);
 
 	/**@return The text resource key, or <code>null</code> if there is no text resource specified.*/
 	public String getTextResourceKey();
