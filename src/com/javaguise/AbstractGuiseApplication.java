@@ -2,8 +2,10 @@ package com.javaguise;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.security.Principal;
 import java.util.*;
 import java.util.concurrent.*;
+
 import static java.util.Collections.*;
 
 import com.garretwilson.beans.BoundPropertyObject;
@@ -11,7 +13,6 @@ import static com.javaguise.GuiseResourceConstants.*;
 
 import com.javaguise.component.Component;
 import com.javaguise.component.Frame;
-import com.javaguise.component.DefaultFrame;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.*;
 import com.garretwilson.lang.ObjectUtilities;
@@ -452,6 +453,48 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		checkInstalled();	//make sure we're installed
 		final String relativeApplicationPath=URIUtilities.relativizePath(getContainer().getBasePath(), getBasePath());	//get the application path relative to the container path 
 		return container.getResourceAsStream(relativeApplicationPath+resourcePath);	//delegate to the container
+	}
+
+	/**Looks up a principal from the given ID.
+	This version returns <code>null</code>. 
+	@param id The ID of the principal.
+	@return The principal corresponding to the given ID, or <code>null</code> if no principal could be determined.
+	*/
+	protected Principal getPrincipal(final String id)
+	{
+		return null;	//the abstract Guise application doesn't know any principals
+	}
+
+	/**Looks up the corresponding password for the given principal.
+	This version returns <code>null</code>. 
+	@param principal The principal for which a password should be returned.
+	@return The password associated with the given principal, or <code>null</code> if no password is associated with the given principal.
+	*/
+	protected char[] getPassword(final Principal principal)
+	{
+		return null;	//the abstract Guise application doesn't know any passwords
+	}
+
+	/**Determines the realm applicable for the resource indicated by the given application path.
+	This version returns the application base path as the realm for all application paths.
+	@param applicationPath The relative path of the resource requested.
+	@return The realm appropriate for the resource, or <code>null</code> if the given resource is not in a known realm.
+	*/
+	protected String getRealm(final String applicationPath)
+	{
+		return getBasePath();	//return the application base path as the realm for all resouces
+	}
+
+	/**Checks whether the given principal is authorized to access the resouce at the given application path.
+	This version authorized any principal accessing any application path.
+	@param applicationPath The relative path of the resource requested.
+	@param principal The principal requesting authentication, or <code>null</code> if the principal is not known.
+	@param realm The realm with which the resource is associated, or <code>null</code> if the realm is not known.
+	@return <code>true</code> if the given principal is authorized to access the resource represented by the given application path.
+	*/
+	protected boolean isAuthorized(final String applicationPath, final Principal principal, final String realm)
+	{
+		return true;	//default to authorizing access
 	}
 
 }

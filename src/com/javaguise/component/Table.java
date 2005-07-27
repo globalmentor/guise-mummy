@@ -5,6 +5,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.garretwilson.lang.ObjectUtilities;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
@@ -409,6 +410,15 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 				validator.validate(newValue);	//validate the new value, throwing an exception if anything is wrong
 			}
 			getModel().setCellValue(getCell(), newValue);	//set the value in the table model
+		}
+
+		/**Resets the value to a default value, which may be invalid according to any installed validators.
+		No validation occurs.
+		@see ValueModel#VALUE_PROPERTY
+		*/
+		public void resetValue()
+		{
+			getModel().setCellValue(getCell(), null);	//set a null value in the table model
 		}
 
 	}

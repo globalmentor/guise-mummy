@@ -1,6 +1,7 @@
 package com.javaguise.session;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.*;
 
 import com.garretwilson.beans.PropertyBindable;
@@ -22,6 +23,8 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 
 	/**The orientation bound property.*/
 	public final static String ORIENTATION_PROPERTY=getPropertyName(GuiseSession.class, "orientation");
+	/**The principal (e.g. user) bound property.*/
+	public final static String PRINCIPAL_PROPERTY=getPropertyName(GuiseSession.class, "principal");
 	/**The locale bound property.*/
 	public final static String LOCALE_PROPERTY=getPropertyName(GuiseSession.class, "locale");
 
@@ -158,6 +161,16 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	@see #getURIResource(String)
 	*/
 	public URI getURIResource(final String resourceKey, final URI defaultValue) throws MissingResourceException;
+
+	/**@return The current principal (e.g. logged-in user), or <code>null</code> if there is no principal authenticated for this session.*/
+	public Principal getPrincipal();
+
+	/**Sets the current principal (e.g. logged-in user).
+	This is a bound property.
+	@param newPrincipal The new principal, or <code>null</code> if there should be no associated principal (e.g. the user should be logged off).
+	@see #PRINCIPAL_PROPERTY
+	*/
+	public void setPrincipal(final Principal newPrincipal);
 
 	/**@return The unmodifiable set of all states of available Guise contexts.*/
 	public Set<GuiseContext.State> getContextStates();

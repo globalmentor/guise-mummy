@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.Principal;
 import java.util.*;
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
@@ -21,10 +22,14 @@ import com.javaguise.validator.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 
+import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.net.http.*;
+
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 import static com.garretwilson.servlet.ServletConstants.*;
 import static com.garretwilson.text.CharacterConstants.*;
+
+import com.garretwilson.security.Nonce;
 import com.garretwilson.util.*;
 
 import static com.garretwilson.util.LocaleUtilities.*;
@@ -251,17 +256,10 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	{
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-/*TODO del when works
-		if(guiseApplication.getContainer()==null)	//if this application has not yet been installed (note that there is a race condition here if multiple HTTP requests attempt to access the application simultaneously, but the losing thread will simply throw an exception and not otherwise disturb the application functionality)
-		{
-			final String guiseApplicationContextPath=request.getContextPath()+request.getServletPath()+PATH_SEPARATOR;	//construct the Guise application context path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash
-			guiseContainer.installApplication(guiseApplication, guiseApplicationContextPath);	//install the application			
-		}
-*/
 		final HTTPServletGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
 		final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, request, response);	//create a new Guise context
 		guiseSession.addContext(guiseContext);	//add this context to the session
-Debug.trace("before getting requested URI, application base path is:", guiseApplication.getBasePath());
+//TODO del Debug.trace("before getting requested URI, application base path is:", guiseApplication.getBasePath());
 		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request		
 			//TODO get the raw path info from the request URI
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
@@ -300,6 +298,7 @@ Debug.trace("Referrer:", getReferer(request));
 						}
 					}
 					guiseSession.setNavigationPath(navigationPath);	//make sure the Guise session has the correct navigation path
+					final Principal oldPrincipal=guiseSession.getPrincipal();	//get the old principal
 					try
 					{
 						if(guiseContext.getParameterListMap().size()>0)	//only query the view if there were submitted values---especially important for radio buttons and checkboxes, which must assume a value of false if nothing is submitted for them, thereby updating the model
@@ -330,6 +329,10 @@ Debug.trace("Referrer:", getReferer(request));
 					}
 	*/
 					guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view; make the change now in case queued model changes want to navigate, and an error was thrown when updating the model)
+					if(!ObjectUtilities.equals(oldPrincipal, guiseSession.getPrincipal()))	//if the principal has changed after updating the model
+					{
+						throw new HTTPMovedTemporarilyException(guiseContext.getNavigationURI());	//redirect to the same page, which will generate a new request with no POST parameters, which would likely change the principal again)
+					}
 					final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
 					if(requestedNavigation!=null)	//if navigation is requested
 					{
@@ -420,6 +423,110 @@ Debug.trace("Referrer:", getReferer(request));
 			getGuiseContainer().uninstallApplication(guiseApplication);	//uninstall the application
 		}
 		super.destroy();	//do the default destroying
+	}
+
+	/**Looks up a principal from the given ID.
+	This version delegates to the Guise container.
+	@param id The ID of the principal.
+	@return The principal corresponding to the given ID, or <code>null</code> if no principal could be determined.
+	@exception HTTPInternalServerErrorException if there is an error getting the principal.
+	*/
+	protected Principal getPrincipal(final String id) throws HTTPInternalServerErrorException
+	{
+		return getGuiseContainer().getPrincipal(getGuiseApplication(), id);	//delegate to the container
+	}
+
+	/**Looks up the corresponding password for the given principal.
+	This version delegates to the Guise container.
+	@param principal The principal for which a password should be returned.
+	@return The password associated with the given principal, or <code>null</code> if no password is associated with the given principal.
+	@exception HTTPInternalServerErrorException if there is an error getting the principal's password.
+	*/
+	protected char[] getPassword(final Principal principal) throws HTTPInternalServerErrorException
+	{
+		return getGuiseContainer().getPassword(getGuiseApplication(), principal);	//delegate to the container
+	}
+
+	/**Determines the realm applicable for the resource indicated by the given URI.
+	This version delegates to the container.
+	@param resourceURI The URI of the resource requested.
+	@return The realm appropriate for the resource, or <code>null</code> if the given resource is not in a known realm.
+	@exception HTTPInternalServerErrorException if there is an error getting the realm.
+	*/
+	protected String getRealm(final URI resourceURI) throws HTTPInternalServerErrorException
+	{
+		return getGuiseContainer().getRealm(getGuiseApplication(), resourceURI);	//delegate to the container
+	}
+
+	/**Checks whether the given principal is authorized to invoke the given method on the given resource.
+	This version delegates to the Guise container, using the principal of the current Guise session instead of the given principal.
+	This technique allows browser-based authentication to function normally (as successful authentication will have already updated the session's principal),
+	and also allows browser-based authentication to work with session-based authentication in the even that the session has already authenticated a principal unknown to the browser.
+  @param request The HTTP request.
+	@param resourceURI The URI of the resource requested.
+	@param method The HTTP method requested on the resource.
+	@param principal The principal requesting authentication, or <code>null</code> if the principal is not known.
+	@param realm The realm with which the resource is associated, or <code>null</code> if the realm is not known.
+	@return <code>true</code> if the given principal is authorized to perform the given method on the resource represented by the given URI.
+	@exception HTTPInternalServerErrorException if there is an error determining if the principal is authorized.
+	*/
+	protected boolean isAuthorized(final HttpServletRequest request, final URI resourceURI, final String method, final Principal principal, final String realm) throws HTTPInternalServerErrorException
+	{
+		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
+		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
+		final HTTPServletGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
+		return getGuiseContainer().isAuthorized(getGuiseApplication(), resourceURI, guiseSession.getPrincipal(), realm);	//delegate to the container, using the current Guise session
+	}
+
+	/**Determines if the given nonce is valid.
+	This version counts a nonce as invalid if it was associated with a different principal than the current Guise session principal (i.e. the Guise principal was logged out).
+  @param request The HTTP request.
+	@param nonce The nonce to check for validity.
+	@return <code>true</code> if the nonce is not valid.
+	*/
+	protected boolean isValid(final HttpServletRequest request, final Nonce nonce)
+	{
+//	TODO del Debug.trace("ready to check validity of nonce; default validity", nonce);
+		if(!super.isValid(request, nonce))	//if the nonce doesn't pass the normal validity checks
+		{
+//		TODO del Debug.trace("doesn't pass the basic checks");
+			return false;	//the nonce isn't valid
+		}
+		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
+		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
+		final HTTPServletGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
+		final Principal guiseSessionPrincipal=guiseSession.getPrincipal();	//get the current principal of the Guise session
+		final String guiseSessionPrincipalID=guiseSessionPrincipal!=null ? guiseSessionPrincipal.getName() : null;	//get the current guise session principal ID
+//	TODO del Debug.trace("checking to see if nonce principal ID", getNoncePrincipalID(nonce), "matches Guise session principal ID", guiseSessionPrincipalID); 
+		if(!ObjectUtilities.equals(getNoncePrincipalID(nonce), guiseSessionPrincipalID))	//if this nonce was for a different principal
+		{
+			return false;	//the user must have logged out or have been changed
+		}
+//	TODO del Debug.trace("nonce is valid");
+		return true;	//indicate that the nonce passed all the tests
+	}
+
+	/**Called when a principal has went through authentication and indicates the result of authentication.
+	This version stores the authenticated principal in the current Guise session if authentication was successful for valid credentials.
+  @param request The HTTP request.
+	@param resourceURI The URI of the resource requested.
+	@param method The HTTP method requested on the resource.
+	@param requestURI The request URI as given in the HTTP request.
+	@param principal The principal requesting authentication, or <code>null</code> if the principal is not known.
+	@param realm The realm for which the principal was authenticated.
+	@param credentials The principal's credentials, or <code>null</code> if no credentials are available.
+	@param authenticated <code>true</code> if the principal succeeded in authentication, else <code>false</code>.
+	@see HTTPServletGuiseSession#setPrincipal(Principal)
+	*/
+	protected void authenticated(final HttpServletRequest request, final URI resourceURI, final String method, final String requestURI, final Principal principal, final String realm, final AuthenticateCredentials credentials, final boolean authenticated)
+	{
+		if(authenticated && credentials!=null)	//if authentication was successful with credentials (don't change the session principal for no credentials, because this might remove a principal set by the session itself with no knowledge of the browser)
+		{
+			final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
+			final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
+			final HTTPServletGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
+			guiseSession.setPrincipal(principal);	//set the new principal in the Guise session
+		}
 	}
 
 	/**A Guise container for Guise HTTP servlets.
@@ -563,6 +670,54 @@ Debug.trace("Referrer:", getReferer(request));
 			}
 			return RESOURCES_DIRECTORY_PATH+normalizedPath;	//construct the absolute context-relative path to the resource
 		}
+
+		/**Looks up an application principal from the given ID.
+		This version is provided to allow package access.
+		@param application The application for which a principal should be returned for the given ID.
+		@param id The ID of the principal.
+		@return The principal corresponding to the given ID, or <code>null</code> if no principal could be determined.
+		*/
+		protected Principal getPrincipal(final AbstractGuiseApplication application, final String id)
+		{
+			return super.getPrincipal(application, id);	//delegate to the parent class
+		}
+
+		/**Looks up the corresponding password for the given principal.
+		This version is provided to allow package access.
+		@param application The application for which a password should e retrieved for the given principal.
+		@param principal The principal for which a password should be returned.
+		@return The password associated with the given principal, or <code>null</code> if no password is associated with the given principal.
+		*/
+		protected char[] getPassword(final AbstractGuiseApplication application, final Principal principal)
+		{
+			return super.getPassword(application, principal);	//delegate to the parent class			
+		}
+
+		/**Determines the realm applicable for the resource indicated by the given URI.
+		This version is provided to allow package access.
+		@param application The application for a realm should be returned for the given resouce URI.
+		@param resourceURI The URI of the resource requested.
+		@return The realm appropriate for the resource, or <code>null</code> if the given resource is not in a known realm.
+		@see GuiseApplication#relativizeURI(URI)
+		*/
+		protected String getRealm(final AbstractGuiseApplication application, final URI resourceURI)
+		{
+			return super.getRealm(application, resourceURI);	//delegate to the parent class
+		}
+
+		/**Checks whether the given principal is authorized to access the resouce at the given application path.
+		This version is provided to allow package access.
+		@param application The application for which a principal should be authorized for a given resouce URI.
+		@param resourceURI The URI of the resource requested.
+		@param principal The principal requesting authentication, or <code>null</code> if the principal is not known.
+		@param realm The realm with which the resource is associated, or <code>null</code> if the realm is not known.
+		@return <code>true</code> if the given principal is authorized to access the resource represented by the given resource URI.
+		*/
+		protected boolean isAuthorized(final AbstractGuiseApplication application, final URI resourceURI, final Principal principal, final String realm)
+		{
+			return super.isAuthorized(application, resourceURI, principal, realm);	//delegate to the parent class
+		}
+
 	}
 
 }

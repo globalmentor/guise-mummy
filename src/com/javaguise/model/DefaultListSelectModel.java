@@ -2,6 +2,7 @@ package com.javaguise.model;
 
 import java.util.*;
 
+import com.garretwilson.lang.ObjectUtilities;
 import com.javaguise.event.*;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
@@ -45,6 +46,23 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 		}
 */
 		setSelectedValues(newValue);
+	}
+
+	/**Resets the value to a default value, which may be invalid according to any installed validators.
+	No validation occurs.
+	@see ValueModel#VALUE_PROPERTY
+	*/
+	public void resetValue()
+	{
+		setSelectedValues();	//select no values
+/*TODO fix some equivalent functionality in the selection strategy
+		if(!ObjectUtilities.equals(value, null))	//if the value is really changing (compare their values, rather than identity)
+		{
+			final V oldValue=value;	//get the old value
+			value=null;	//actually change the value
+			firePropertyChange(VALUE_PROPERTY, oldValue, null);	//indicate that the value changed
+		}
+*/
 	}
 
 	/**The list of values, all access to which will be synchronized on this.*/

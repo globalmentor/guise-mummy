@@ -2,6 +2,7 @@ package com.javaguise;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.security.Principal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -138,4 +139,50 @@ public abstract class AbstractGuiseContainer	implements GuiseContainer
 	*/
 	protected abstract InputStream getResourceAsStream(final String resourcePath);
 
+	/**Looks up an application principal from the given ID.
+	This version delegates to the given Guise application.
+	@param application The application for which a principal should be returned for the given ID.
+	@param id The ID of the principal.
+	@return The principal corresponding to the given ID, or <code>null</code> if no principal could be determined.
+	*/
+	protected Principal getPrincipal(final AbstractGuiseApplication application, final String id)
+	{
+		return application.getPrincipal(id);	//delegate to the application
+	}
+
+	/**Looks up the corresponding password for the given principal.
+	This version delegates to the given Guise application. 
+	@param application The application for which a password should e retrieved for the given principal.
+	@param principal The principal for which a password should be returned.
+	@return The password associated with the given principal, or <code>null</code> if no password is associated with the given principal.
+	*/
+	protected char[] getPassword(final AbstractGuiseApplication application, final Principal principal)
+	{
+		return application.getPassword(principal);	//delegate to the application 
+	}
+
+	/**Determines the realm applicable for the resource indicated by the given URI.
+	This version delegates to the given Guise application.
+	@param application The application for which a realm should be returned for the given resouce URI.
+	@param resourceURI The URI of the resource requested.
+	@return The realm appropriate for the resource, or <code>null</code> if the given resource is not in a known realm.
+	@see GuiseApplication#relativizeURI(URI)
+	*/
+	protected String getRealm(final AbstractGuiseApplication application, final URI resourceURI)
+	{
+		return application.getRealm(application.relativizeURI(resourceURI));	//delegate to the application
+	}
+
+	/**Checks whether the given principal is authorized to access the resouce at the given application path.
+	This version delegates to the given Guise application.
+	@param application The application for which a principal should be authorized for a given resouce URI.
+	@param resourceURI The URI of the resource requested.
+	@param principal The principal requesting authentication, or <code>null</code> if the principal is not known.
+	@param realm The realm with which the resource is associated, or <code>null</code> if the realm is not known.
+	@return <code>true</code> if the given principal is authorized to access the resource represented by the given resource URI.
+	*/
+	protected boolean isAuthorized(final AbstractGuiseApplication application, final URI resourceURI, final Principal principal, final String realm)
+	{
+		return application.isAuthorized(application.relativizeURI(resourceURI), principal, realm);	//delegate to the application
+	}
 }

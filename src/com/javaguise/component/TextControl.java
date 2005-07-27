@@ -1,5 +1,7 @@
 package com.javaguise.component;
 
+import static com.garretwilson.lang.ClassUtilities.*;
+
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 
@@ -9,6 +11,30 @@ import com.javaguise.session.GuiseSession;
 */
 public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 {
+
+	/**The masked bound property.*/
+	public final static String MASKED_PROPERTY=getPropertyName(TextControl.class, "masked");
+
+	/**Whether the user input text is masked to prevent viewing of the literal entered value.*/
+	private boolean masked=false;
+
+		/**@return Whether the user input text is masked to prevent viewing of the litereal entered value.*/
+		public boolean isMasked() {return masked;}
+
+		/**Sets whether the user input text is masked to prevent viewing of the litereal entered value.
+		This is a bound property of type <code>Boolean</code>.
+		@param newMasked <code>true</code> if the user input text should be masked.
+		@see #MASKED_PROPERTY
+		*/
+		public void setMasked(final boolean newMasked)
+		{
+			if(masked!=newMasked)	//if the value is really changing
+			{
+				final boolean oldEnabled=masked;	//get the old value
+				masked=newMasked;	//actually change the value
+				firePropertyChange(MASKED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newMasked));	//indicate that the value changed
+			}			
+		}
 
 	/**Session constructor with a default data model to represent a given type.
 	@param session The Guise session that owns this component.

@@ -62,6 +62,7 @@ public class AuthorizeUsersFrame extends DefaultFrame
 	}
 
 	/**Collects the current data from the model of this component.
+	This versions makes sure the user list is updated from the application.
 	@param context Guise context information.
 	@exception IOException if there is an error querying the model.
 	@see GuiseContext.State#QUERY_MODEL

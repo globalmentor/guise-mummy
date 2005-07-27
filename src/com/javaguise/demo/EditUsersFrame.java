@@ -20,9 +20,6 @@ Demonstrates list controls with default representation, thread-safe select model
 public class EditUsersFrame extends DefaultFrame
 {
 
-	/**The application-relative navigation path to the edit user modal frame.*/
-	protected final static String EDIT_USER_FRAME_NAVIGATION_PATH="edituser";
-
 	/**Guise session constructor.
 	@param session The Guise session that owns this frame.
 	*/
@@ -53,7 +50,7 @@ public class EditUsersFrame extends DefaultFrame
 				{
 					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
 					{
-						session.navigateModal(EDIT_USER_FRAME_NAVIGATION_PATH, new ModalListener<DemoUser>()	//navigate modally to the edit user frame
+						session.navigateModal(DemoApplication.EDIT_USER_FRAME_NAVIGATION_PATH, new ModalListener<DemoUser>()	//navigate modally to the edit user frame
 								{
 									public void modalBegan(final ModalEvent<DemoUser> modalEvent)	//when modal editing begins
 									{
@@ -88,7 +85,7 @@ public class EditUsersFrame extends DefaultFrame
 						final DemoUser user=userListControl.getModel().getSelectedValue();	//get the selected user
 						if(user!=null)	//if a user is selected
 						{
-							session.navigateModal(EDIT_USER_FRAME_NAVIGATION_PATH, new ModalListener<DemoUser>()	//navigate modally to the edit user frame
+							session.navigateModal(DemoApplication.EDIT_USER_FRAME_NAVIGATION_PATH, new ModalListener<DemoUser>()	//navigate modally to the edit user frame
 									{
 										public void modalBegan(final ModalEvent<DemoUser> modalEvent)	//when modal editing begins
 										{

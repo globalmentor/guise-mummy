@@ -43,6 +43,12 @@ public class DemoUser implements Principal, Comparable<DemoUser>
 		/**@return The last name of the user.*/
 		public String getLastName() {return lastName;}
 
+	/**The password of the user.*/
+	private final char[] password;
+
+		/**@return The password of the user.*/
+		public char[] getPassword() {return password;}
+
 	/**The email address of the user.*/
 	private String email;
 
@@ -78,12 +84,13 @@ public class DemoUser implements Principal, Comparable<DemoUser>
 	@param firstName The first name of the user.
 	@param middleName The middle name of the user, or <code>null</code> if there is no middle name.
 	@param lastName The last name of the user.
+	@param password The password of the user.
 	@param email The email address of the user.
 	@exception NullPointerException if the ID, first name, last name, and/or email address is <code>null</code>.
 	*/
-	public DemoUser(final String id, final String firstName, final String middleName, final String lastName, final String email)
+	public DemoUser(final String id, final String firstName, final String middleName, final String lastName, final char[] password, final String email)
 	{
-		if(id==null || firstName==null || lastName==null || email==null)	//if anything besides the middle name is null
+		if(id==null || firstName==null || lastName==null || password==null || email==null)	//if anything besides the middle name is null
 		{
 			throw new NullPointerException("Only the user middle name is optional");
 		}
@@ -91,6 +98,7 @@ public class DemoUser implements Principal, Comparable<DemoUser>
 		this.firstName=firstName;
 		this.middleName=middleName;
 		this.lastName=lastName;
+		this.password=password;
 		this.email=email;
 	}
 

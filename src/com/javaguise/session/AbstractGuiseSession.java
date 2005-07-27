@@ -3,6 +3,7 @@ package com.javaguise.session;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.security.Principal;
 import java.util.*;
 
 import static java.util.Collections.*;
@@ -423,6 +424,28 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 			catch(final MissingResourceException missingResourceException)	//if no such resource is available
 			{
 				return defaultValue;	//return the specified default value
+			}
+		}
+
+
+	/**The current principal (e.g. logged-in user), or <code>null</code> if there is no principal authenticated for this session.*/
+	private Principal principal;
+
+		/**@return The current principal (e.g. logged-in user), or <code>null</code> if there is no principal authenticated for this session.*/
+		public Principal getPrincipal() {return principal;}
+
+		/**Sets the current principal (e.g. logged-in user).
+		This is a bound property.
+		@param newPrincipal The new principal, or <code>null</code> if there should be no associated principal (e.g. the user should be logged off).
+		@see GuiseSession#PRINCIPAL_PROPERTY
+		*/
+		public void setPrincipal(final Principal newPrincipal)
+		{
+			if(!ObjectUtilities.equals(principal, newPrincipal))	//if the value is really changing (compare their values, rather than identity)
+			{
+				final Principal oldPrincipal=principal;	//get the old value
+				principal=newPrincipal;	//actually change the value
+				firePropertyChange(PRINCIPAL_PROPERTY, oldPrincipal, newPrincipal);	//indicate that the value changed
 			}
 		}
 

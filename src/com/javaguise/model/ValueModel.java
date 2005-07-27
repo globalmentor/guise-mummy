@@ -40,6 +40,12 @@ public interface ValueModel<V> extends ControlModel
 	*/
 	public void setValue(final V newValue) throws ValidationException;
 
+	/**Resets the value to a default value, which may be invalid according to any installed validators.
+	No validation occurs.
+	@see #VALUE_PROPERTY
+	*/
+	public void resetValue();
+
 	/**@return The validator for this model, or <code>null</code> if no validator is installed.*/
 	public Validator<V> getValidator();
 

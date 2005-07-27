@@ -41,6 +41,20 @@ public class DefaultValueModel<V> extends AbstractValueModel<V>
 			}			
 		}
 
+		/**Resets the value to a default value, which may be invalid according to any installed validators.
+		No validation occurs.
+		@see ValueModel#VALUE_PROPERTY
+		*/
+		public void resetValue()
+		{
+			if(!ObjectUtilities.equals(value, null))	//if the value is really changing (compare their values, rather than identity)
+			{
+				final V oldValue=value;	//get the old value
+				value=null;	//actually change the value
+				firePropertyChange(VALUE_PROPERTY, oldValue, null);	//indicate that the value changed
+			}						
+		}
+
 	/**Constructs a value model indicating the type of value it can hold.
 	@param session The Guise session that owns this model.
 	@param valueClass The class indicating the type of value held in the model.
