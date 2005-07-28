@@ -11,7 +11,8 @@ import com.javaguise.validator.*;
 
 /**Login Guise demonstration frame.
 Copyright © 2005 GlobalMentor, Inc.
-Demonstrates on-the-fly validation, on-the-fly error reporting, resetting control values, and setting Guise session user.
+Demonstrates on-the-fly validation, on-the-fly error reporting,
+	resetting control values, and setting Guise session user.
 @author Garret Wilson
 */
 public class LoginFrame extends DefaultFrame

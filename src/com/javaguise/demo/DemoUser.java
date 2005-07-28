@@ -18,11 +18,11 @@ public class DemoUser implements Principal, Comparable<DemoUser>
 		/**@return The user ID.*/
 		public String getID() {return id;}
 
-    /**@return the name of this principal.
-    This implementation returns the user ID.
-    This method is provided to implement the {@link Principal} interface.
-    @see #getID()
-    */
+		/**@return the name of this principal.
+		This implementation returns the user ID.
+		This method is provided to implement the {@link Principal} interface.
+		@see #getID()
+		*/
 		public String getName()	{return getID();}
 
 	/**The first name of the user.*/

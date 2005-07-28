@@ -7,7 +7,7 @@ import com.javaguise.AbstractGuiseApplication;
 
 /**Demonstration Guise application.
 Copyright © 2005 GlobalMentor, Inc.
-Demonstrates custom Guise applications, resource bundles, custom authorization.
+Demonstrates custom Guise applications, setting application resource bundles, and custom authorization.
 @author Garret Wilson
 */
 public class DemoApplication extends AbstractGuiseApplication

@@ -13,13 +13,14 @@ import com.javaguise.validator.RegularExpressionStringValidator;
 /**Authorize Users Guise demonstration frame.
 Copyright © 2005 GlobalMentor, Inc.
 Demonstrates custom table models, editable string table cells, editable boolean table cells,
-	table column validators, and tables and list controls sharing models.
+	table column validators, and tables.
 @author Garret Wilson
 */
 public class AuthorizeUsersFrame extends DefaultFrame
 {
 
 		//the table columns
+	private final TableColumnModel<String> idColumn;
 	private final TableColumnModel<String> lastNameColumn;
 	private final TableColumnModel<String> firstNameColumn;
 	private final TableColumnModel<String> emailColumn;
@@ -35,8 +36,8 @@ public class AuthorizeUsersFrame extends DefaultFrame
 		super(session, new FlowLayout(Orientation.Flow.PAGE));	//construct the parent class flowing vertically
 		getModel().setLabel("Guise\u2122 Demonstration: Authorize Users");	//set the frame title	
 
-		final Panel authorizationPanel=new Panel(session, new FlowLayout(Orientation.Flow.LINE));	//create the authorization panel flowing horizontally
 			//create the table columns
+		idColumn=new DefaultTableColumnModel<String>(session, String.class, "ID");	//ID
 		lastNameColumn=new DefaultTableColumnModel<String>(session, String.class, "Last Name");	//last name
 		firstNameColumn=new DefaultTableColumnModel<String>(session, String.class, "First Name");	//first name
 		emailColumn=new DefaultTableColumnModel<String>(session, String.class, "Email");	//email
@@ -45,19 +46,14 @@ public class AuthorizeUsersFrame extends DefaultFrame
 		authorizedColumn=new DefaultTableColumnModel<Boolean>(session, Boolean.class, "Authorized");	//authorized
 		authorizedColumn.setEditable(true);	//allow the authorized column to be edited
 			//create and initialize the table model
-		userAuthorizationModel=new UserAuthorizationTableModel(session, lastNameColumn, firstNameColumn, emailColumn, authorizedColumn);	//create the table model
+		userAuthorizationModel=new UserAuthorizationTableModel(session, idColumn, lastNameColumn, firstNameColumn, emailColumn, authorizedColumn);	//create the table model
 			//create the table
 		final Table userAuthorizationTable=new Table(session, userAuthorizationModel);	//create the table component
 		userAuthorizationTable.getModel().setLabel("User Authorizations");	//give the table a label
-		authorizationPanel.add(userAuthorizationTable);	//add the user authorization table to the panel
-			//create a separate list control to illustrate model sharing
-		final ListControl userListControl=new ListControl<DemoUser>(session, userAuthorizationModel, 10);	//create a list control using the same model as the table
-		authorizationPanel.add(userListControl);	//add the user list control to the panel
+		add(userAuthorizationTable);	//add the user authorization table to the frame
 			//apply button
 		final Button applyButton=new Button(session);	//create a button for applying the values
 		applyButton.getModel().setLabel("Apply");	//set the button label
-
-		add(authorizationPanel);	//add the authorization panel to the frame
 		add(applyButton);	//add the apply button to the frame
 	}
 
@@ -108,7 +104,11 @@ public class AuthorizeUsersFrame extends DefaultFrame
 		*/
 		protected <C> C getCellValue(final DemoUser user, final int rowIndex, final TableColumnModel<C> column)
 		{
-			if(column==lastNameColumn)	//last name
+			if(column==idColumn)	//ID
+			{
+				return column.getValueClass().cast(user.getID());	//cast and return the value	
+			}
+			else if(column==lastNameColumn)	//last name
 			{
 				return column.getValueClass().cast(user.getLastName());	//cast and return the value	
 			}
