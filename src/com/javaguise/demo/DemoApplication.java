@@ -7,7 +7,7 @@ import com.javaguise.AbstractGuiseApplication;
 
 /**Demonstration Guise application.
 Copyright © 2005 GlobalMentor, Inc.
-Demonstrates custom Guise applications.
+Demonstrates custom Guise applications, resource bundles, custom authorization.
 @author Garret Wilson
 */
 public class DemoApplication extends AbstractGuiseApplication
@@ -39,6 +39,7 @@ public class DemoApplication extends AbstractGuiseApplication
 	public DemoApplication()
 	{
 		super();	//construct the parent class
+		setResourceBundleBaseName(getClass().getPackage().getName()+"/resources");	//set the resource bundle
 		users.add(new DemoUser(generateUserID(), "Jane", null, "Smith", "password".toCharArray(), "janesmith@example.com"));	//add example users
 		users.add(new DemoUser(generateUserID(), "John", null, "Smith", "password".toCharArray(), "johnsmith@example.com"));
 		users.add(new DemoUser(generateUserID(), "Jill", null, "Jones", "password".toCharArray(), "jilljones@example.com"));

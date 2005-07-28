@@ -120,7 +120,7 @@ public class HomeFrame extends DefaultFrame
 		check2.getModel().setLabel("Second check");
 		check2.getModel().setEnabled(false);	//TODO fix
 		booleanPanel.add(check2);	
-		final ModelGroup<ValueModel<Boolean>> booleanGroup=new MutualExclusionModelGroup();
+		final ModelGroup<ValueModel<Boolean>> booleanGroup=new MutualExclusionPolicyModelGroup();
 		booleanGroup.add(check1.getModel());
 		booleanGroup.add(check2.getModel());
 	
@@ -190,12 +190,13 @@ public class HomeFrame extends DefaultFrame
 			throw new AssertionError(e);
 		}
 		contentPanel.add(textAreaControl);
-
+/*TODO del
 		final Text text=new Text(session);
 		//TODO del text.getModel().setText("This is some cool text! This is some text\nand some more on another line.\n\nSkipping two lines down, we find a line that is really long, is really, really, ;lkjas;lfk alkg; ;alkghj;alg lkjahq glkjh flkjhasdflkjhasdfl kjhasdf lkjh lkadhf lkshd flksadhf lksadhlskdqah slhjfg sd long. This is some text\nand some more on another line.\n\nSkipping two lines down, we find a line that is really long, is really, really, ;lkjas;lfk alkg; ;alkghj;alg lkjahq glkjh flkjhasdflkjhasdfl kjhasdf lkjh lkadhf lkshd flksadhf lksadhlskdqah slhjfg sd long.");
 		text.getModel().setTextResourceKey("sample.html");
 		text.getModel().setTextContentType(TextModel.XHTML_CONTENT_TYPE);
 		contentPanel.add(text);
+*/
 
 		getSession().setLocale(Locale.FRANCE);
 //TODO del		getSession().setLocale(new Locale("ar"));

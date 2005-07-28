@@ -33,7 +33,7 @@ public class HelloUserFrame extends DefaultFrame
 		userInput.getModel().setValidator(new RegularExpressionStringValidator(session, "\\S+.*", true));	//require at least a single non-whitespace character followed by any other characters
 		userInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<String>()
 				{
-					public void propertyValueChange(PropertyValueChangeEvent<String> propertyValueChangeEvent)
+					public void propertyValueChange(final PropertyValueChangeEvent<String> propertyValueChangeEvent)
 					{
 						final String user=propertyValueChangeEvent.getNewValue();	//get the name the user entered
 						helloUserLabel.getModel().setLabel("Hello, "+user+"!");	//update the label

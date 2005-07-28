@@ -52,7 +52,7 @@ public class TemperatureConversionFrame extends DefaultFrame
 		celsiusCheckControl.getModel().setLabel("Celsius");	//set the label of the check to indicate the scale
 		try
 		{
-			celsiusCheckControl.getModel().setValue(true);	//default to converting from Celsius to Farenheit
+			celsiusCheckControl.getModel().setValue(Boolean.TRUE);	//default to converting from Celsius to Farenheit
 		}
 		catch(final ValidationException validationException)	//we have no validator installed in the check control model, so we don't expect changing its value ever to cause any problems
 		{
@@ -62,8 +62,8 @@ public class TemperatureConversionFrame extends DefaultFrame
 		final CheckControl farenheitCheckControl=new CheckControl(session, CheckControl.CheckType.ELLIPSE);	//create a check control for the Farenheit scale, using an ellipse check are
 		farenheitCheckControl.getModel().setLabel("Farenheit");	//set the label of the check to indicate the scale
 		scalePanel.add(farenheitCheckControl);	//add the Farenheit check control to the panel	
-			//create a mutual exclusion group and add the Celsius and Farenheit check box boolean value models to get radio button functionality
-		final ModelGroup<ValueModel<Boolean>> radioButtonModelGroup=new MutualExclusionModelGroup(celsiusCheckControl.getModel(), farenheitCheckControl.getModel());
+			//create a mutual exclusion policy group and add the Celsius and Farenheit check box boolean value models to get radio button functionality
+		final ModelGroup<ValueModel<Boolean>> radioButtonModelGroup=new MutualExclusionPolicyModelGroup(celsiusCheckControl.getModel(), farenheitCheckControl.getModel());
 		conversionPanel.add(scalePanel);	//add the scale panel to the conversion panel			
 			//conversion button
 		final Button convertButton=new Button(session);	//create a button for initiating the conversion

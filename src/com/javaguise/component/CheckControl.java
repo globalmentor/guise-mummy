@@ -88,6 +88,16 @@ public class CheckControl extends AbstractValueControl<Boolean, CheckControl>
 		this(session, id, new DefaultValueModel<Boolean>(session, Boolean.class), checkType);	//construct the class with a default model
 	}
 
+	/**Session and model constructor with a default rectangle check type.
+	@param session The Guise session that owns this component.
+	@param model The component data model.
+	@exception NullPointerException if the given session and/or model is <code>null</code>.
+	*/
+	public CheckControl(final GuiseSession<?> session, final ValueModel<Boolean> model)
+	{
+		this(session, null, model);	//construct the class, indicating that a default ID should be used
+	}
+
 	/**Session, ID, and model constructor with a default rectangle check type.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.

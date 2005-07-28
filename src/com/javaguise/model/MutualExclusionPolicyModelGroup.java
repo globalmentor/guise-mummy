@@ -10,14 +10,14 @@ This class is declared final because it represents a particular defined semantic
 This allows controllers to make assumptions about models with only this listener, and offload mutual exclusion to client that have this capability built in.
 @author Garret Wilson.
 */
-public final class MutualExclusionModelGroup extends ValuePolicyModelGroup<Boolean>
+public final class MutualExclusionPolicyModelGroup extends ValuePolicyModelGroup<Boolean>
 {
 
 	/**Model constructor.
 	@param models Zero or more models with which to initially place in the group.
 	@exception NullPointerException if one of the models is <code>null</code>.
 	*/
-	public MutualExclusionModelGroup(final ValueModel<Boolean>... models)
+	public MutualExclusionPolicyModelGroup(final ValueModel<Boolean>... models)
 	{
 		super(models);	//construct the parent class
 	}

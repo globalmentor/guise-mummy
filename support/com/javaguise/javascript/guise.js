@@ -108,7 +108,7 @@ function closeMenu()
 	}
 	if(menu.closeID)	//if a menu was being closed
 	{
-		document.getElementById(menu.closeID).style.display="none";	//close the menu
+		document.getElementById(menu.closeID).style.visibility="hidden";	//close the menu
 		menu.closeID=null;	//indicate that no menu is closing
 	}
 }
@@ -131,7 +131,7 @@ function onMenuMouseOver(id)
 			closeMenu();	//go ahead and close it now
 		}
 	}
-	document.getElementById(id).style.display="block";	//show thismenu
+	document.getElementById(id).style.visibility="visible";	//show this menu
 }
 
 function onMenuMouseOut(id)
