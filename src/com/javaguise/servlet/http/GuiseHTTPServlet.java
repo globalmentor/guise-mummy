@@ -31,6 +31,7 @@ import static com.garretwilson.text.CharacterConstants.*;
 
 import com.garretwilson.security.Nonce;
 import com.garretwilson.util.*;
+import com.globalmentor.webapps.globalmentor.groups.MentorGroups;
 
 import static com.garretwilson.util.LocaleUtilities.*;
 
@@ -56,7 +57,16 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 
 	/**The absolute path, relative to the servlet context, of the resources directory.*/
 	public final static String RESOURCES_DIRECTORY_PATH=ROOT_PATH+WEB_INF_DIRECTORY_NAME+PATH_SEPARATOR+"guise-application-resources"+PATH_SEPARATOR;
-	
+
+	/**The context parameter of the data base directory.*/
+	public final static String DATA_BASE_DIRECTORY_CONTEXT_PARAMETER="dataBaseDirectory";
+
+	/**Whether debug is turned on for Mentor Groups.*/
+	protected final static boolean DEBUG=true;	//TODO load this from an init parameter
+
+	/**The minimum level of debug reporting for Mentor Groups.*/
+	protected final static Debug.ReportLevel DEBUG_LEVEL=Debug.ReportLevel.TRACE;	//TODO load this from an init parameter
+
 	/**@return The global HTTP servlet Guise instance.
 	This is a convenience method.
 	@see HTTPServletGuise#getInstance()
@@ -67,6 +77,33 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		return HTTPServletGuise.getInstance();	//return the global HTTP servlet Guise instance
 	}
 */
+
+	/**Determines the debug log file.
+	@param context The servlet context from which to retrieve context parameters.
+	@return The file for debug logging.
+	@see com.garretwilson.servlet.ServletUtilities#getWebInfDirectory
+	@see #DATA_BASE_DIRECTORY_CONTEXT_PARAMETER
+	*/
+	public static File getDebugLogFile(final ServletContext context)
+	{
+		return new File(getDataBaseDirectory(context), "debug.log");	//TODO use a constant
+	}
+
+	/**Determines the data base directory, in this order:
+	<ol>
+		<li>The file for the value of the context parameter <code>dataBaseDirectory</code>.</li>
+		<li>The file for the real path to "/WEB-INF".</li>
+	</ol>
+	@param context The servlet context from which to retrieve context parameters.
+	@return The data base directory.
+	@see com.garretwilson.servlet.ServletUtilities#getWebInfDirectory
+	@see #DATA_BASE_DIRECTORY_CONTEXT_PARAMETER
+	*/
+	public static File getDataBaseDirectory(final ServletContext context)
+	{
+		final String path=context.getInitParameter(DATA_BASE_DIRECTORY_CONTEXT_PARAMETER);	//get the context parameter
+		return path!=null ? new File(path) : getWebInfDirectory(context);	//return a file for the path, or the default WEB-INF-based path
+	}
 
 	/**The Guise container that owns the applications.*/
 	private HTTPServletGuiseContainer guiseContainer=null;
@@ -97,6 +134,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	*/
 	public GuiseHTTPServlet()
 	{
+		Debug.setDebug(DEBUG);	//turn on debug if needed
 	}
 		
 	/**Initializes the servlet.
@@ -106,8 +144,18 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	public void init(final ServletConfig servletConfig) throws ServletException
 	{
 		super.init(servletConfig);	//do the default initialization
-		Debug.setDebug(true);	//turn on debug
-		Debug.setMinimumReportLevel(Debug.ReportLevel.TRACE);	//set the level of reporting
+		Debug.setMinimumReportLevel(DEBUG_LEVEL);	//set the level of reporting
+		try
+		{
+			Debug.setOutput(MentorGroups.getDebugLogFile(getServletContext()));	//set the log file
+		}
+		catch(final FileNotFoundException fileNotFoundException)	//if we can't find the debug file
+		{
+			throw new ServletException(fileNotFoundException);
+		}
+		
+		
+		
 		setReadOnly(true);	//make this servlet read-only
 		//TODO turn off directory listings, and/or fix them
 		try
@@ -263,8 +311,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request		
 			//TODO get the raw path info from the request URI
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
-Debug.trace("raw path info", rawPathInfo);
-Debug.trace("Referrer:", getReferer(request));
+//TODO del Debug.trace("raw path info", rawPathInfo);
+//TODO del Debug.trace("Referrer:", getReferer(request));
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
 		try
 		{
