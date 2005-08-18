@@ -6,15 +6,9 @@ import static java.util.Collections.*;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.util.CollectionUtilities;
 import com.garretwilson.util.SynchronizedListDecorator;
-import com.javaguise.event.*;
-import com.javaguise.model.TableModel.Cell;
 import com.javaguise.session.GuiseSession;
-import com.javaguise.validator.ValidationException;
-import com.javaguise.validator.Validator;
-
-import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**An abstract implementation of a table model representing selectable list values.
 The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class. 
@@ -92,8 +86,8 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 	public AbstractListSelectTableModel(final GuiseSession<?> session, final Class<V> valueClass, final ListSelectionStrategy<V> listSelectionStrategy, final TableColumnModel<?>... columns)
 	{
 		super(session, valueClass, listSelectionStrategy);	//construct the parent class
-		Collections.addAll(logicalTableColumnModels, columns);	//add all the columns to our logical list of table columns
-		Collections.addAll(tableColumnModels, columns);	//add all the columns to our list of table columns
+		CollectionUtilities.addAll(logicalTableColumnModels, columns);	//add all the columns to our logical list of table columns
+		CollectionUtilities.addAll(tableColumnModels, columns);	//add all the columns to our list of table columns
 		valueModelRowArrays=new SynchronizedListDecorator<ValueModel<Object>[]>(new ArrayList<ValueModel<Object>[]>(), this);	//create a list of value model arrays, synchronizing all access on this object
 	}
 

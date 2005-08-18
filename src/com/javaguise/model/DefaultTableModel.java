@@ -2,8 +2,11 @@ package com.javaguise.model;
 
 import java.util.*;
 
+import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.util.ArrayUtilities.*;
+
+import com.garretwilson.util.CollectionUtilities;
 import com.garretwilson.util.SynchronizedListDecorator;
 
 import com.javaguise.session.GuiseSession;
@@ -81,10 +84,10 @@ public class DefaultTableModel extends AbstractTableModel
 					}
 					for(int columnIndex=columns.length-1; columnIndex>=0; --columnIndex)	//for each column, make sure the given value is of an allowed type
 					{
-						columns[columnIndex].getValueClass().cast(values[columnIndex]);	//make sure this value can be cast to the column type
+						cast(columns[columnIndex].getValueClass(), values[columnIndex]);	//make sure this value can be cast to the column type
 					}
 					final List<Object> valueList=new SynchronizedListDecorator<Object>(new ArrayList<Object>(values.length), this);	//create a list of value, synchronizing all access on this object
-					Collections.addAll(valueList, values);	//add all this row's values to the list
+					CollectionUtilities.addAll(valueList, values);	//add all this row's values to the list
 					valueRowLists.add(valueList);	//add this row to the list of row lists
 				}
 			}
@@ -130,7 +133,7 @@ public class DefaultTableModel extends AbstractTableModel
 		}
 		synchronized(this)	//don't allow others to change the table data while we access the values
 		{
-			return column.getValueClass().cast(valueRowLists.get(rowIndex).get(columnIndex));	//get the value in the given row and column, cast to the appropriate type
+			return cast(column.getValueClass(), valueRowLists.get(rowIndex).get(columnIndex));	//get the value in the given row and column, cast to the appropriate type
 		}
 	}
 
@@ -139,7 +142,6 @@ public class DefaultTableModel extends AbstractTableModel
 	@param rowIndex The zero-based row index.
 	@param column The column for which a value should be returned.
 	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
-	@return The value previously in the given cell.
 	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
 	@exception IllegalArgumentException if the given column is not one of this table's columns.
 	*/

@@ -19,11 +19,13 @@ import com.javaguise.event.ModalListener;
 import com.garretwilson.io.BOMInputStreamReader;
 import static com.garretwilson.io.WriterUtilities.*;
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.util.CollectionUtilities;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.text.CharacterEncodingConstants.UTF_8;
 import static com.garretwilson.text.xml.XMLUtilities.*;
+import static com.garretwilson.util.SetUtilities.*;
 
 /**An abstract implementation that keeps track of the components of a user session.
 @author Garret Wilson
@@ -750,7 +752,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		protected ContextStateListener getContextStateListener() {return contextStateListener;}
 
 	/**The unmodifiable set of all states of available Guise contexts.*/
-	private Set<GuiseContext.State> contextStateSet=emptySet();
+	private Set<GuiseContext.State> contextStateSet=CollectionUtilities.emptySet();
 
 		/**@return The unmodifiable set of all states of available Guise contexts.*/
 		public Set<GuiseContext.State> getContextStates() {return contextStateSet;}
@@ -784,7 +786,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		*/
 		protected void updateContextStates()
 		{
-			final EnumSet<GuiseContext.State> updatedContextStateSet=EnumSet.noneOf(GuiseContext.State.class);	//create an empty enum set
+			final Set<GuiseContext.State> updatedContextStateSet=createEnumSet(GuiseContext.State.class);	//create an empty enum set
 			synchronized(contextSet)	//don't allow anyone to add or remove context sets while we read them, and ensure we have the latest data
 			{
 				for(final GC context:contextSet)	//for each context

@@ -218,7 +218,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 				supportedLocales[i]=createLocale(supportedLocaleStrings[i].trim());	//create a locale for this specified locale (trimming whitespace just to be extra helpful)
 			}
 			guiseApplication.getSupportedLocales().clear();	//remove the application's currently supported locales
-			addAll(guiseApplication.getSupportedLocales(), supportedLocales);	//add all supported locales to the application 
+			CollectionUtilities.addAll(guiseApplication.getSupportedLocales(), supportedLocales);	//add all supported locales to the application 
 		}
 			//initialize the default locale
 		final String defaultLocaleString=servletConfig.getInitParameter(DEFAULT_LOCALE_INIT_PARAMETER_PREFIX);	//get the default locale init parameter
@@ -247,7 +247,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 							try
 							{
 								final Class<?> specifiedClass=Class.forName(className);	//load the class for the specified name
-								final Class<? extends Frame> navigationFrameClass=specifiedClass.asSubclass(Frame.class);	//cast the specified class to a frame class just to make sure it's the correct type
+//TODO bring back for JDK 5 when backwards-compatibility isn't needed								final Class<? extends Frame> navigationFrameClass=specifiedClass.asSubclass(Frame.class);	//cast the specified class to a frame class just to make sure it's the correct type
+								final Class<? extends Frame> navigationFrameClass=(Class<? extends Frame>)specifiedClass;	//cast the specified class to a frame class just to make sure it's the correct type
 								guiseApplication.bindNavigationFrame(path, navigationFrameClass);	//cast the class to a frame class and bind it to the path in the Guise application
 							}
 							catch(final ClassNotFoundException classNotFoundException)
@@ -311,6 +312,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request		
 			//TODO get the raw path info from the request URI
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
+System.out.println("raw path info: "+rawPathInfo);
 //TODO del Debug.trace("raw path info", rawPathInfo);
 //TODO del Debug.trace("Referrer:", getReferer(request));
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'

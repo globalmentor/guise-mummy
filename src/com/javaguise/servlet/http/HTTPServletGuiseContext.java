@@ -93,7 +93,7 @@ public class HTTPServletGuiseContext extends AbstractXMLGuiseContext<HTTPServlet
 				final String parameterKey=(String)parameterEntry.getKey();	//get the parameter key
 				final String[] parameterValues=(String[])parameterEntry.getValue();	//get the parameter values
 				final List<Object> parameterValueList=new ArrayList<Object>(parameterValues.length);	//create a list to hold the parameters
-				addAll(parameterValueList, parameterValues);	//add all the parameter values to our list
+				CollectionUtilities.addAll(parameterValueList, parameterValues);	//add all the parameter values to our list
 				parameterListMap.put(parameterKey, parameterValueList);	//store the the array of values as a list, keyed to the value
 			}
 		}

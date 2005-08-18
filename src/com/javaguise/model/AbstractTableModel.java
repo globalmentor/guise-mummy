@@ -4,7 +4,8 @@ import java.util.*;
 import static java.util.Collections.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.javaguise.model.TableModel.Cell;
+import com.garretwilson.util.CollectionUtilities;
+
 import com.javaguise.session.GuiseSession;
 
 /**An abstract implementation of a table model.
@@ -73,8 +74,8 @@ public abstract class AbstractTableModel extends AbstractControlModel implements
 	public AbstractTableModel(final GuiseSession<?> session, final String label, final TableColumnModel<?>... columns)
 	{
 		super(session, label);	//construct the parent class
-		addAll(logicalTableColumnModels, columns);	//add all the columns to our logical list of table columns
-		addAll(tableColumnModels, columns);	//add all the columns to our list of table columns
+		CollectionUtilities.addAll(logicalTableColumnModels, columns);	//add all the columns to our logical list of table columns
+		CollectionUtilities.addAll(tableColumnModels, columns);	//add all the columns to our list of table columns
 	}
 
 	/**Returns the cell value for the given cell.
