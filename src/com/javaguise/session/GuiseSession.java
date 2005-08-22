@@ -172,8 +172,8 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	*/
 	public void setPrincipal(final Principal newPrincipal);
 
-	/**@return The unmodifiable set of all states of available Guise contexts.*/
-	public Set<GuiseContext.State> getContextStates();
+	/**@return The current context for this session, or <code>null</code> if there currently is no context.*/
+	public GC getContext();
 
 	/**Queues a postponed model event to be fired after all contexts have finished updating the model.
 	If a Guise context is currently updating the model, the event will be queued for later.

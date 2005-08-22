@@ -52,7 +52,7 @@ public class DefaultActionModel extends AbstractControlModel implements ActionMo
 	*/
 	public void fireAction()
 	{
-		if(getEventListenerManager().hasListeners(ActionListener.class))	//if there are action listeners registered
+//TODO del; the event needs to be reported to the session unconditionally		if(getEventListenerManager().hasListeners(ActionListener.class))	//if there are action listeners registered
 		{
 			final ActionEvent<ActionModel> actionEvent=new ActionEvent<ActionModel>(getSession(), this);	//create a new action event
 			getSession().queueModelEvent(new PostponedActionEvent<ActionModel>(getEventListenerManager(), actionEvent));	//tell the Guise session to queue the event

@@ -12,6 +12,7 @@ import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.RegularExpressionStringValidator;
 import com.javaguise.validator.ValidationException;
+import com.javaguise.validator.ValueRequiredValidator;
 import com.garretwilson.util.Debug;
 
 /**Test frame for a home page.
@@ -38,6 +39,36 @@ public class HomeFrame extends DefaultFrame
 		getModel().setLabel("Home Frame Test");	//set the frame label
 
 		final Panel contentPanel=new Panel(session, new FlowLayout(Orientation.Flow.PAGE)); 
+
+		//input panel
+		final Panel inputPanel=new Panel(session, new FlowLayout(Orientation.Flow.PAGE));	//create the input panel flowing vertically
+		final TextControl<Float> temperatureInput=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
+		temperatureInput.getModel().setLabel("Input Temperature");	//add a label to the text input control
+		temperatureInput.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
+		inputPanel.add(temperatureInput);	//add the input control to the input panel
+		final TextControl<Float> temperatureOutput=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
+		temperatureOutput.getModel().setLabel("Output Temperature");	//add a label to the text output control
+//TODO del		temperatureOutput.getModel().setEditable(false);	//set the text output control to read-only so that the user cannot modify it
+		inputPanel.add(temperatureOutput);	//add the output control to the input panel
+		temperatureInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<Float>()
+				{
+					public void propertyValueChange(final PropertyValueChangeEvent<Float> propertyValueChangeEvent)
+					{
+						final Float newValue=propertyValueChangeEvent.getNewValue();	//get the new value
+Debug.trace("temperature input changed to value", newValue);
+						try
+						{
+							temperatureOutput.getModel().setValue(newValue);	//update the value
+						}
+						catch(final ValidationException validationException)	//we have no validator installed in the check control model, so we don't expect changing its value ever to cause any problems
+						{
+							throw new AssertionError(validationException);
+						}							
+					}
+				});
+
+		contentPanel.add(inputPanel);	//add the input panel to the temperature frame
+		
 		
 		final Label testLabel=new Label(session, "testLabel");
 		testLabel.setStyleID("title");

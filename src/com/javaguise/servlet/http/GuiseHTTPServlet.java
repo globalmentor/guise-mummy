@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.*;
+
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
@@ -15,7 +16,9 @@ import javax.servlet.http.*;
 import com.javaguise.*;
 import com.javaguise.component.*;
 import com.javaguise.context.GuiseContext;
+import com.javaguise.controller.Controller;
 import com.javaguise.controller.text.xml.xhtml.*;
+import com.javaguise.model.Model;
 import com.javaguise.session.*;
 import com.javaguise.validator.*;
 
@@ -28,6 +31,8 @@ import com.garretwilson.net.http.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 import static com.garretwilson.servlet.ServletConstants.*;
 import static com.garretwilson.text.CharacterConstants.*;
+import static com.garretwilson.text.xml.XMLConstants.*;
+import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
 import com.garretwilson.security.Nonce;
 import com.garretwilson.util.*;
@@ -307,95 +312,183 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
 		final HTTPServletGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
 		final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, request, response);	//create a new Guise context
-		guiseSession.addContext(guiseContext);	//add this context to the session
+		synchronized(guiseSession)	//don't allow other session contexts to be active at the same time
+		{
+		
+		guiseSession.setContext(guiseContext);	//set the context for this session
+		try
+		{
 //TODO del Debug.trace("before getting requested URI, application base path is:", guiseApplication.getBasePath());
 		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request		
 			//TODO get the raw path info from the request URI
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
-System.out.println("raw path info: "+rawPathInfo);
+//TODO del System.out.println("raw path info: "+rawPathInfo);
+		if("/_ajax".equals(rawPathInfo))	//TODO testing
+		{
+Debug.trace("got an AJAX request!");
+			if(Debug.isDebug() && Debug.getReportLevels().contains(Debug.ReportLevel.INFO))	//indicate the parameters if information tracing is turned on
+			{
+				Debug.info("Received AJAX parameters:");
+				final ListMap<Object, Object> parameterListMap=guiseContext.getParameterListMap();	//get the request parameter map
+				for(final Map.Entry<Object, List<Object>> parameterListMapEntry:parameterListMap.entrySet())	//for each entry in the map of parameter lists
+				{
+					Debug.info("Key:", parameterListMapEntry.getKey(), "Value:", ArrayUtilities.toString(parameterListMapEntry.getValue().toArray()));				
+				}
+			}
+			final String navigationPath=(String)guiseContext.getParameterListMap().getItem("navigationPath");	//TODO decode param value
+			final Frame<?> navigationFrame=guiseSession.getNavigationFrame(navigationPath);	//get the frame bound to the requested path
+			if(navigationFrame!=null)	//if we found a frame class for this address
+			{
+				final ListMap<Object, Object> parameterListMap=guiseContext.getParameterListMap();	//get the request parameter map
+				for(final Map.Entry<Object, List<Object>> parameterListMapEntry:parameterListMap.entrySet())	//for each entry in the map of parameter lists
+				{
+					final String parameterKey=(String)parameterListMapEntry.getKey();
+					if(!"navigationPath".equals(parameterKey))
+					{
+						final String parameterValue=(String)parameterListMapEntry.getValue().toArray()[0];	//TODO double-check that value has at least one element
+							//TODO don't re-update nested components (less important for controls, which don't have nested components) 
+Debug.trace("looking for component with ID", parameterKey);
+							final Component<?> component=getComponentByAbsoluteUniqueID(navigationFrame, parameterKey);
+							if(component!=null)
+							{
+Debug.trace("found component:", component);
+final Set<Component<?>> affectedComponents=new HashSet<Component<?>>();
+							try
+							{
+								guiseContext.setState(GuiseContext.State.QUERY_VIEW);	//update the context state for querying the view
+						//TODO del Debug.trace("ready to query the navigation frame view");
+								component.queryView(guiseContext);		//tell the frame to query its view
+								guiseContext.setState(GuiseContext.State.DECODE_VIEW);	//update the context state for decoding the view
+								component.decodeView(guiseContext);		//tell the frame to decode its view
+						//TODO delete phase if not needed					guiseContext.setState(GuiseContext.State.VALIDATE_VIEW);	//update the context state for validating the view
+						//TODO delete phase if not needed					navigationFrame.validateView(guiseContext);		//tell the frame to validate its view
+								guiseContext.setState(GuiseContext.State.UPDATE_MODEL);	//update the context state for updating the model
+								component.updateModel(guiseContext);	//tell the frame to update its model
+								guiseContext.setState(GuiseContext.State.INACTIVE);	//deactivate the context so that any model update events will be generated			
+
+								final List<EventObject> contextEvents=guiseContext.getEventList();
+								Debug.trace("we now have events:", contextEvents.size());
+								for(final EventObject contextEvent:contextEvents)	//for each postponed event
+									{
+Debug.trace("context event:", contextEvent);
+									final Object source=contextEvent.getSource();	//get the event source
+									if(source instanceof Model)	//if this was a model change
+									{
+										affectedComponents.addAll(AbstractModelComponent.getModelComponents(navigationFrame, (Model)source));	//get all components that use this model
+									}
+								}
+								Debug.trace("we now have affected components:", affectedComponents.size());
+								guiseContext.setState(GuiseContext.State.QUERY_MODEL);	//update the context state for querying the model
+								for(final Component<?> affectedComponent:affectedComponents)
+								{
+									Debug.trace("affected component:", affectedComponent);
+									affectedComponent.queryModel(guiseContext);		//tell the component to query its model
+								}
+								guiseContext.setState(GuiseContext.State.ENCODE_MODEL);	//update the context state for encoding the model
+								for(final Component<?> affectedComponent:affectedComponents)
+								{
+									affectedComponent.encodeModel(guiseContext);		//tell the component to encode its model
+								}
+							}
+							catch(final ValidationsException validationsException)	//if there were any validation errors during validation
+							{
+								navigationFrame.addErrors(validationsException);	//store the validation error(s) so that the frame can report them to the user
+							}
+							guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view; make the change now in case queued model changes want to navigate, and an error was thrown when updating the model)
+Debug.trace("default context content type:", guiseContext.getOutputContentType());
+							guiseContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type
+							guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_HTML);	//<xhtml:html>
+							guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
+							for(final Component<?> affectedComponent:affectedComponents)
+							{
+								affectedComponent.updateView(guiseContext);		//tell the component to update its view
+							}
+							guiseContext.writeElementEnd();	//</xhtml:html>
+						}
+					}
+				}					
+			}
+return;
+		}
+
+
 //TODO del Debug.trace("raw path info", rawPathInfo);
 //TODO del Debug.trace("Referrer:", getReferer(request));
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
-		try
-		{
 			final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
 			final Frame<?> navigationFrame=guiseSession.getNavigationFrame(navigationPath);	//get the frame bound to the requested path
 			if(navigationFrame!=null)	//if we found a frame class for this address
 			{
-				synchronized(guiseSession)	//don't allow other session contexts to be active at the same time
-				{
+				setNoCache(response);	//TODO testing; fix; update method
 				
-					setNoCache(response);	//TODO testing; fix; update method
-					
-						//before actually changing the navigation path, check to see if we're in the middle of modal navigation (only do this after we find a navigation frame, as this request might be for a stylesheet or some other non-frame resource, which shouldn't be redirected)
-					final ModalNavigation modalNavigation=guiseSession.peekModalNavigation();	//see if we are currently doing modal navigation TODO make public access routines
-					if(modalNavigation!=null)	//if we are currently in the middle of modal navigation, make sure the correct frame was requested
+					//before actually changing the navigation path, check to see if we're in the middle of modal navigation (only do this after we find a navigation frame, as this request might be for a stylesheet or some other non-frame resource, which shouldn't be redirected)
+				final ModalNavigation modalNavigation=guiseSession.peekModalNavigation();	//see if we are currently doing modal navigation TODO make public access routines
+				if(modalNavigation!=null)	//if we are currently in the middle of modal navigation, make sure the correct frame was requested
+				{
+					final URI modalNavigationURI=modalNavigation.getNewNavigationURI();	//get the modal navigation URI
+					if(!requestURI.getRawPath().equals(modalNavigationURI.getRawPath()))		//if this request was for a different path than our current modal navigation path (we wouldn't be here if the domain, application, etc. weren't equivalent)
 					{
-						final URI modalNavigationURI=modalNavigation.getNewNavigationURI();	//get the modal navigation URI
-						if(!requestURI.getRawPath().equals(modalNavigationURI.getRawPath()))		//if this request was for a different path than our current modal navigation path (we wouldn't be here if the domain, application, etc. weren't equivalent)
-						{
-							throw new HTTPMovedTemporarilyException(modalNavigationURI);	//redirect to the modal navigation location				
-						}
+						throw new HTTPMovedTemporarilyException(modalNavigationURI);	//redirect to the modal navigation location				
 					}
-						//update the frame's referrer
-					final String referrer=getReferer(request);	//see if the request has a referrer
-					if(referrer!=null && navigationFrame.getReferrerURI()==null)	//if the request indicates a referrer, but the navigation frame has not yet been updated with a referrer
-					{
-						final URI plainReferrerURI=getPlainURI(URI.create(referrer));	//get a plain URI version of the referrer
-						if(!plainReferrerURI.equals(getPlainURI(requestURI)))	//if we aren't being referred from ourselves
-						{
-							navigationFrame.setReferrerURI(plainReferrerURI);	//update the frame's referrer URI
-						}
-					}
-					guiseSession.setNavigationPath(navigationPath);	//make sure the Guise session has the correct navigation path
-					final Principal oldPrincipal=guiseSession.getPrincipal();	//get the old principal
-					try
-					{
-						if(guiseContext.getParameterListMap().size()>0)	//only query the view if there were submitted values---especially important for radio buttons and checkboxes, which must assume a value of false if nothing is submitted for them, thereby updating the model
-						{
-							guiseContext.setState(GuiseContext.State.QUERY_VIEW);	//update the context state for querying the view
-	//TODO del Debug.trace("ready to query the navigation frame view");
-							navigationFrame.queryView(guiseContext);		//tell the frame to query its view
-							guiseContext.setState(GuiseContext.State.DECODE_VIEW);	//update the context state for decoding the view
-							navigationFrame.decodeView(guiseContext);		//tell the frame to decode its view
-		//TODO delete phase if not needed					guiseContext.setState(GuiseContext.State.VALIDATE_VIEW);	//update the context state for validating the view
-		//TODO delete phase if not needed					navigationFrame.validateView(guiseContext);		//tell the frame to validate its view
-							guiseContext.setState(GuiseContext.State.UPDATE_MODEL);	//update the context state for updating the model
-							navigationFrame.updateModel(guiseContext);	//tell the frame to update its model
-						}
-						guiseContext.setState(GuiseContext.State.QUERY_MODEL);	//update the context state for querying the model
-						navigationFrame.queryModel(guiseContext);		//tell the frame to query its model
-						guiseContext.setState(GuiseContext.State.ENCODE_MODEL);	//update the context state for encoding the model
-						navigationFrame.encodeModel(guiseContext);		//tell the frame to encode its model
-					}
-					catch(final ValidationsException validationsException)	//if there were any validation errors during validation
-					{
-						navigationFrame.addErrors(validationsException);	//store the validation error(s) so that the frame can report them to the user
-					}
-	/*TODO del when works
-					catch(final ValidationException validationException)	//if there were any validation errors while updating the model
-					{
-						navigationFrame.addError(validationException);	//store the validation error so that the frame can report it to the user
-					}
-	*/
-					guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view; make the change now in case queued model changes want to navigate, and an error was thrown when updating the model)
-					if(!ObjectUtilities.equals(oldPrincipal, guiseSession.getPrincipal()))	//if the principal has changed after updating the model
-					{
-						throw new HTTPMovedTemporarilyException(guiseContext.getNavigationURI());	//redirect to the same page, which will generate a new request with no POST parameters, which would likely change the principal again)
-					}
-					final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
-					if(requestedNavigation!=null)	//if navigation is requested
-					{
-						final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
-						guiseSession.clearRequestedNavigation();	//remove any navigation requests
-						if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
-						{
-							beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation<?>)requestedNavigation);	//begin the modal navigation
-						}
-						throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
-					}
-					navigationFrame.updateView(guiseContext);		//tell the frame to update its view
 				}
+					//update the frame's referrer
+				final String referrer=getReferer(request);	//see if the request has a referrer
+				if(referrer!=null && navigationFrame.getReferrerURI()==null)	//if the request indicates a referrer, but the navigation frame has not yet been updated with a referrer
+				{
+					final URI plainReferrerURI=getPlainURI(URI.create(referrer));	//get a plain URI version of the referrer
+					if(!plainReferrerURI.equals(getPlainURI(requestURI)))	//if we aren't being referred from ourselves
+					{
+						navigationFrame.setReferrerURI(plainReferrerURI);	//update the frame's referrer URI
+					}
+				}
+				guiseSession.setNavigationPath(navigationPath);	//make sure the Guise session has the correct navigation path
+				final Principal oldPrincipal=guiseSession.getPrincipal();	//get the old principal
+				try
+				{
+					if(guiseContext.getParameterListMap().size()>0)	//only query the view if there were submitted values---especially important for radio buttons and checkboxes, which must assume a value of false if nothing is submitted for them, thereby updating the model
+					{
+						guiseContext.setState(GuiseContext.State.QUERY_VIEW);	//update the context state for querying the view
+//TODO del Debug.trace("ready to query the navigation frame view");
+						navigationFrame.queryView(guiseContext);		//tell the frame to query its view
+						guiseContext.setState(GuiseContext.State.DECODE_VIEW);	//update the context state for decoding the view
+						navigationFrame.decodeView(guiseContext);		//tell the frame to decode its view
+	//TODO delete phase if not needed					guiseContext.setState(GuiseContext.State.VALIDATE_VIEW);	//update the context state for validating the view
+	//TODO delete phase if not needed					navigationFrame.validateView(guiseContext);		//tell the frame to validate its view
+						guiseContext.setState(GuiseContext.State.UPDATE_MODEL);	//update the context state for updating the model
+						navigationFrame.updateModel(guiseContext);	//tell the frame to update its model
+					}
+					guiseContext.setState(GuiseContext.State.QUERY_MODEL);	//update the context state for querying the model
+					navigationFrame.queryModel(guiseContext);		//tell the frame to query its model
+					guiseContext.setState(GuiseContext.State.ENCODE_MODEL);	//update the context state for encoding the model
+					navigationFrame.encodeModel(guiseContext);		//tell the frame to encode its model
+				}
+				catch(final ValidationsException validationsException)	//if there were any validation errors during validation
+				{
+					navigationFrame.addErrors(validationsException);	//store the validation error(s) so that the frame can report them to the user
+				}
+/*TODO del when works
+				catch(final ValidationException validationException)	//if there were any validation errors while updating the model
+				{
+					navigationFrame.addError(validationException);	//store the validation error so that the frame can report it to the user
+				}
+*/
+				guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view; make the change now in case queued model changes want to navigate, and an error was thrown when updating the model)
+				if(!ObjectUtilities.equals(oldPrincipal, guiseSession.getPrincipal()))	//if the principal has changed after updating the model
+				{
+					throw new HTTPMovedTemporarilyException(guiseContext.getNavigationURI());	//redirect to the same page, which will generate a new request with no POST parameters, which would likely change the principal again)
+				}
+				final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
+				if(requestedNavigation!=null)	//if navigation is requested
+				{
+					final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
+					guiseSession.clearRequestedNavigation();	//remove any navigation requests
+					if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
+					{
+						beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation<?>)requestedNavigation);	//begin the modal navigation
+					}
+					throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
+				}
+				navigationFrame.updateView(guiseContext);		//tell the frame to update its view
 			}
 			else	//if we have no frame type for this address
 			{
@@ -424,8 +517,30 @@ System.out.println("raw path info: "+rawPathInfo);
 		finally
 		{
 			guiseContext.setState(GuiseContext.State.INACTIVE);	//always deactivate the context			
-			guiseSession.removeContext(guiseContext);	//remove this context from the session
+			guiseSession.setContext(null);	//remove this context from the session
 		}
+		}
+	}
+
+	protected <T extends Component<?>> Component<?> getComponentByAbsoluteUniqueID(final T component, final String absoluteUniqueID)
+	{
+		final Controller<? extends GuiseContext<?>, ? super T> controller=component.getController();
+		if(controller.getAbsoluteUniqueID(component).equals(absoluteUniqueID))
+		{
+			return component;
+		}
+		else
+		{
+			for(final Component<?> childComponent:component)
+			{
+				final Component<?> selectedComponent=getComponentByAbsoluteUniqueID(childComponent, absoluteUniqueID);
+				if(selectedComponent!=null)
+				{
+					return selectedComponent;
+				}
+			}
+		}
+		return null;
 	}
 
   /**Determines if the resource at a given URI exists.

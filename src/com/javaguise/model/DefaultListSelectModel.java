@@ -416,7 +416,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	{
 		final ListEvent<ListSelectModel<V>, V> listEvent=new ListEvent<ListSelectModel<V>, V>(getSession(), this, index, addedElement, removedElement);	//create a new event
 		getSelectionStrategy().listModified(listEvent);	//manually notify the selection strategy, because the queued event might be delayed and reported out of order
-		if(getEventListenerManager().hasListeners(ListListener.class))	//if there are appropriate listeners registered
+//TODO del; the event needs to be reported to the session unconditionally		if(getEventListenerManager().hasListeners(ListListener.class))	//if there are appropriate listeners registered
 		{
 			getSession().queueModelEvent(new PostponedListEvent<ListSelectModel<V>, V>(getEventListenerManager(), listEvent));	//tell the Guise session to queue the event
 		}

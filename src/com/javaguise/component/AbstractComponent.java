@@ -10,6 +10,7 @@ import com.garretwilson.lang.ObjectUtilities;
 import com.javaguise.component.layout.Orientation;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.Controller;
+import com.javaguise.model.Model;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationsException;
 import com.garretwilson.util.EmptyIterator;

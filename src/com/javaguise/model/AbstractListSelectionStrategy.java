@@ -224,7 +224,7 @@ public abstract class AbstractListSelectionStrategy<V> implements ListSelectionS
 	*/
 	protected void fireSelectionChanged(final ListSelectModel<V> selectModel, final Integer addedIndex, final Integer removedIndex)
 	{
-		if(getEventListenerManager().hasListeners(ListSelectionListener.class))	//if there are appropriate listeners registered
+//TODO del; the event needs to be reported to the session unconditionally		if(getEventListenerManager().hasListeners(ListSelectionListener.class))	//if there are appropriate listeners registered
 		{
 			final ListSelectionEvent<V> selectionEvent=new ListSelectionEvent<V>(selectModel.getSession(), selectModel, addedIndex, removedIndex);	//create a new event
 			selectModel.getSession().queueModelEvent(new PostponedListSelectionEvent<V>(getEventListenerManager(), selectionEvent));	//tell the Guise session to queue the event

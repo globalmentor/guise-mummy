@@ -1,24 +1,16 @@
 package com.javaguise.model;
 
-import java.beans.PropertyChangeEvent;
-import java.io.*;
 import java.net.URI;
 import java.util.MissingResourceException;
 
-import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.event.EventListenerManager;
+import com.javaguise.event.GuiseBoundPropertyObject;
 import com.javaguise.session.GuiseSession;
-import com.garretwilson.io.BOMInputStreamReader;
-
-import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.net.URIUtilities.isAbsolutePath;
-import static com.garretwilson.net.URIUtilities.isPath;
-import static com.garretwilson.text.CharacterEncodingConstants.UTF_8;
 
 /**A base abstract class implementing helpful functionality for models.
 @author Garret Wilson
 */
-public class AbstractModel extends BoundPropertyObject implements Model
+public class AbstractModel extends GuiseBoundPropertyObject implements Model
 {
 	/**The object managing event listeners.*/
 	private final EventListenerManager eventListenerManager=new EventListenerManager();
@@ -26,19 +18,13 @@ public class AbstractModel extends BoundPropertyObject implements Model
 		/**@return The object managing event listeners.*/
 		protected EventListenerManager getEventListenerManager() {return eventListenerManager;}
 
-	/**The Guise session that owns this model.*/
-	private final GuiseSession<?> session;
-
-		/**@return The Guise session that owns this model.*/
-		public GuiseSession<?> getSession() {return session;}
-
 	/**Session constructor.
 	@param session The Guise session that owns this model.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
 	public AbstractModel(final GuiseSession<?> session)
 	{
-		this.session=checkNull(session, "Session cannot be null");	//save the session
+		super(session);	//construct the parent class
 	}
 
 	/**Determines whether the contents of this model are valid.
@@ -46,16 +32,6 @@ public class AbstractModel extends BoundPropertyObject implements Model
 	@return Whether the contents of this model are valid.
 	*/
 	public boolean isValid() {return true;}
-
-	/**Reports that a bound property has changed.
-	This implementation delegates to the Guise session to fire or postpone the property change event.
-	@param propertyChangeEvent The event to fire.
-	@see GuiseSession#queueModelEvent(com.garretwilson.event.PostponedEvent)
-	*/
-	protected void firePropertyChange(final PropertyChangeEvent propertyChangeEvent)
-	{
-		getSession().queueModelEvent(createPostponedPropertyChangeEvent(propertyChangeEvent));	//create and queue a postponed property change event
-	}
 
 	/**Determines a string value either explicitly set or stored in the resources.
 	If a value is explicitly specified, it will be used; otherwise, a value will be loaded from the session resources if possible.

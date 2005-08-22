@@ -757,52 +757,48 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		/**@return The unmodifiable set of all states of available Guise contexts.*/
 		public Set<GuiseContext.State> getContextStates() {return contextStateSet;}
 
-	/**The set of registered contexts. A synchronized set is used so that updating the set of states can be based upon the very latest data when used by multiple threads.*/
-	private final Set<GC> contextSet=synchronizedSet(new HashSet<GC>());
+	/**The current context for this session, or <code>null</code> if there currently is no context.*/
+	private GC context=null;
 
-		/**Adds a context to this session and registers a listener for context state changes.
-		@param context The context to add to this session.
+		/**@return The current context for this session, or <code>null</code> if there currently is no context.*/
+		public synchronized GC getContext() {return context;}
+
+		/**Sets the current context.
+		@param context The current context for this session, or <code>null</code> if there currently is no context.
 		*/
-		protected void addContext(final GC context)
+		protected synchronized void setContext(final GC context)
 		{
-			contextSet.add(context);	//add this context to the set
-			context.addPropertyChangeListener(GuiseContext.STATE_PROPERTY, getContextStateListener());	//listen for context state changes and update the set of context states in response
-			updateContextStates();	//make sure the record of context states is up to date
+			if(this.context!=context)	//if the context is really changing
+			{
+				final GC oldContext=this.context;	//save the old context
+				if(oldContext!=null)	//if there was a previous context
+				{
+					oldContext.removePropertyChangeListener(GuiseContext.STATE_PROPERTY, getContextStateListener());	//stop listening for context state changes					
+				}
+				this.context=context;	//set the context
+				if(context!=null)	//if a new context is given
+				{
+					context.addPropertyChangeListener(GuiseContext.STATE_PROPERTY, getContextStateListener());	//listen for context state changes and update the set of context states in response
+				}
+				updateContextStates();	//make sure the record of context states is up to date
+			}
 		}
 	
-		/**Removes a context from this session and unregisters the listener for context state changes.
-		@param context The context to remove from this session.
-		*/
-		protected void removeContext(final GC context)
-		{
-			context.removePropertyChangeListener(GuiseContext.STATE_PROPERTY, getContextStateListener());	//stop listening for context state changes
-			contextSet.remove(context);	//remove this context from the set
-			updateContextStates();	//make sure the record of context states is up to date
-		}
-
-		/**Updates the record of current states of available contexts.
+		/**Checks the state of the current context.
 		If any model change events are pending and no context is in an update model state, the model change events are processed.
 		@see #fireQueuedModelEvents()
 		*/
-		protected void updateContextStates()
+		protected synchronized void updateContextStates()
 		{
-			final Set<GuiseContext.State> updatedContextStateSet=createEnumSet(GuiseContext.State.class);	//create an empty enum set
-			synchronized(contextSet)	//don't allow anyone to add or remove context sets while we read them, and ensure we have the latest data
+			final GC context=getContext();	//get the current context
+			if(context==null || context.getState()!=GuiseContext.State.UPDATE_MODEL)	//if the context is not updating the model
 			{
-				for(final GC context:contextSet)	//for each context
-				{
-					updatedContextStateSet.add(context.getState());	//add this state to our enumeration
-				}
-				contextStateSet=unmodifiableSet(updatedContextStateSet);	//update the set of context states
-				if(!contextStateSet.contains(GuiseContext.State.UPDATE_MODEL))	//if no contexts are updating the model
-				{
-					fireQueuedModelEvents();	//fire any queued events
-				}
+				fireQueuedModelEvents();	//fire any queued events				
 			}
 		}
 
 	/**The synchronized list of postponed model events.*/
-	private final List<PostponedEvent<?>> queuedModelEventList=synchronizedList(new LinkedList<PostponedEvent<?>>());	//use a linked list because we'll be removing items from the front of the list as we process the events
+	private final List<PostponedEvent<?>> queuedModelEventList=synchronizedList(new LinkedList<PostponedEvent<?>>());	//use a linked list because we'll be removing items from the front of the list as we process the events TODO fix; this doesn't seem to be the case anymore, so we can use a synchronized array list
 
 		/**Queues a postponed model event to be fired after all contexts have finished updating the model.
 		If a Guise context is currently updating the model, the event will be queued for later.
@@ -810,17 +806,19 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		@param postponedModelEvent The event to fire at a later time.
 		@see GuiseContext.State#UPDATE_MODEL
 		*/
-		public void queueModelEvent(final PostponedEvent<?> postponedModelEvent)
+		public synchronized void queueModelEvent(final PostponedEvent<?> postponedModelEvent)
 		{
-			synchronized(contextSet)	//don't let the state of context states change while we check the states (the method updating context states synchronizes on the same value)
+			final GC context=getContext();	//get the current context
+			if(context!=null && context.getState()==GuiseContext.State.UPDATE_MODEL)	//if the context is updating the model
 			{
-				if(contextStateSet.contains(GuiseContext.State.UPDATE_MODEL))	//if at least one context is changing the model
+				queuedModelEventList.add(postponedModelEvent);	//add the postponed event to our list of postponed events					
+			}
+			else	//if no context is changing the model
+			{
+				postponedModelEvent.fireEvent();	//go ahead and fire the event immediately
+				if(context!=null)	//if there is a context
 				{
-					queuedModelEventList.add(postponedModelEvent);	//add the postponed event to our list of postponed events					
-				}
-				else	//if no context is changing the model
-				{
-					postponedModelEvent.fireEvent();	//go ahead and fire the event immediately
+					context.getEventList().add(postponedModelEvent.getEvent());	//store the event in the context
 				}
 			}
 		}
@@ -833,18 +831,32 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 				final Iterator<PostponedEvent<?>> postponedModelEventIterator=queuedModelEventList.iterator();	//get an iterator to all the model events
 				while(postponedModelEventIterator.hasNext())	//while there are more postponed model events
 				{
+					final PostponedEvent<?> postponedModelEvent=postponedModelEventIterator.next();	//get the next postponed event
 					try
 					{
-						postponedModelEventIterator.next().fireEvent();	//fire the event
+						postponedModelEvent.fireEvent();	//fire the event
 					}
 					finally	//there could be an exception while we're firing the event
 					{
 						postponedModelEventIterator.remove();	//always remove the event we fired, even if there's an exception, so it won't be fired again if there is an exception
+						final GC context=getContext();	//get the current context
+						if(context!=null)	//if there is a context
+						{
+							context.getEventList().add(postponedModelEvent.getEvent());	//store the event in the context
+						}						
 					}
 				}
 				queuedModelEventList.clear();	//remove all pending model events
 			}
 		}
+
+		/**@return A copy of the list of postponed events.*/
+/*TODO del
+		protected List<PostponedEvent<?>> getPostponedEvents()
+		{
+			return new ArrayList<PostponedEvent<?>>(queuedModelEventList);	//TODO testing
+		}
+*/
 
 	/**Called when the session is initialized.
 	@see #destroy()
