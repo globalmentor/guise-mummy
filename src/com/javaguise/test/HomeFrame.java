@@ -42,23 +42,22 @@ public class HomeFrame extends DefaultFrame
 
 		//input panel
 		final Panel inputPanel=new Panel(session, new FlowLayout(Orientation.Flow.PAGE));	//create the input panel flowing vertically
-		final TextControl<Float> temperatureInput=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
-		temperatureInput.getModel().setLabel("Input Temperature");	//add a label to the text input control
-		temperatureInput.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
-		inputPanel.add(temperatureInput);	//add the input control to the input panel
-		final TextControl<Float> temperatureOutput=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
-		temperatureOutput.getModel().setLabel("Output Temperature");	//add a label to the text output control
-//TODO del		temperatureOutput.getModel().setEditable(false);	//set the text output control to read-only so that the user cannot modify it
-		inputPanel.add(temperatureOutput);	//add the output control to the input panel
-		temperatureInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<Float>()
+		final TextControl<Float> inputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
+		inputTextControl.getModel().setLabel("Input Number");	//add a label to the text input control
+		inputTextControl.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
+		inputPanel.add(inputTextControl);	//add the input control to the input panel
+		final TextControl<Float> outputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
+		outputTextControl.getModel().setLabel("Double the Number");	//add a label to the text output control
+		outputTextControl.getModel().setEditable(false);	//set the text output control to read-only so that the user cannot modify it
+		inputPanel.add(outputTextControl);	//add the output control to the input panel
+		inputTextControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<Float>()
 				{
 					public void propertyValueChange(final PropertyValueChangeEvent<Float> propertyValueChangeEvent)
 					{
 						final Float newValue=propertyValueChangeEvent.getNewValue();	//get the new value
-Debug.trace("temperature input changed to value", newValue);
 						try
 						{
-							temperatureOutput.getModel().setValue(newValue);	//update the value
+							outputTextControl.getModel().setValue(newValue*2);	//update the value
 						}
 						catch(final ValidationException validationException)	//we have no validator installed in the check control model, so we don't expect changing its value ever to cause any problems
 						{
@@ -66,6 +65,17 @@ Debug.trace("temperature input changed to value", newValue);
 						}							
 					}
 				});
+		final CheckControl checkbox=new CheckControl(session, "checkbox");
+		checkbox.getModel().setLabel("Enable the button");
+		try
+		{
+			checkbox.getModel().setValue(Boolean.TRUE);
+		}
+		catch(final ValidationException validationException)	//we have no validator installed in the check control model, so we don't expect changing its value ever to cause any problems
+		{
+			throw new AssertionError(validationException);
+		}										
+		inputPanel.add(checkbox);	
 
 		contentPanel.add(inputPanel);	//add the input panel to the temperature frame
 		
@@ -81,6 +91,21 @@ Debug.trace("temperature input changed to value", newValue);
 		testButton.getModel().setLabel("Click here to go to the 'Hello World' demo.");
 		testButton.getModel().addActionListener(new NavigateActionListener<ActionModel>("helloworld"));
 		buttonPanel.add(testButton);	//add a new button
+		
+		
+		
+		
+		checkbox.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<Boolean>()
+				{
+					public void propertyValueChange(final PropertyValueChangeEvent<Boolean> propertyValueChangeEvent)
+					{
+						final Boolean newValue=propertyValueChangeEvent.getNewValue();	//get the new value
+						testButton.getModel().setEnabled(newValue);	//update the button enabled state
+					}
+				});
+		
+		
+		
 		final Button testButton2=new Button(session, "testButton2");
 		testButton2.getModel().setLabel("Click this button to change the text.");
 		testButton2.getModel().addActionListener(new ActionListener<ActionModel>()

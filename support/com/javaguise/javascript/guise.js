@@ -4,6 +4,36 @@
 
 //TODO add node types for IE from Professional JavaScript page 169
 
+//Array
+
+/**An enqueue() method for arrays, equivalent to Array.push().*/
+Array.prototype.enqueue=Array.prototype.push;
+
+/**A dequeue() method for arrays, equivalent to Array.shift().*/
+Array.prototype.dequeue=Array.prototype.shift;
+
+//Node
+
+if(typeof Node=="undefined")	//if no Node type is defined (e.g. IE), create one to give us constant node types
+{
+	var Node=
+			{
+				ELEMENT_NODE: 1,
+				ATTRIBUTE_NODE: 2,
+				TEXT_NODE: 3,
+				CDATA_SECTION_NODE: 4,
+				ENTITY_REFERENCE_NODE: 5,
+				ENTITY_NODE: 6,
+				PROCESSING_INSTRUCTION_NODE: 7,
+				COMMENT_NODE: 8,
+				DOCUMENT_NODE: 9,
+				DOCUMENT_TYPE_NODE: 10,
+				DOCUMENT_FRAGMENT_NODE: 11,
+				NOTATION_NODE: 12
+			}
+}
+
+
 function HTTPCommunicator()
 {
 //	this.XXX=xxx;
@@ -75,12 +105,10 @@ HTTPCommunicator.prototype._performRequest=function(method, uri)
 	}	
 	xmlHTTP.send(content);	//send the request
 	this.parameters=null;	//remove any parameters
-//TODO del	alert("got status: "+xmlHTTP.status);
-//TODO del	alert("response text: "+xmlHTTP.responseText);
+//TODO del alert("got status: "+xmlHTTP.status);
+//TODO del alert("response text: "+xmlHTTP.responseText);
 	return xmlHTTP.responseXML ? xmlHTTP.responseXML : xmlHTTP.responseText;
 }
-
-var httpCommunicator=new HTTPCommunicator();
 
 /**Adds an event listener to an object.
 @param object The object for which a listener should be added.
@@ -194,6 +222,13 @@ alert("looking at event src element: "+event.srcElement);
 	return event;	//return our event
 }
 
+//Guise functionality
+
+var httpCommunicator=new HTTPCommunicator();
+
+/**The queue of AJAX response XML DOM trees.*/
+var ajaxResponses=new Array();
+
 /**Called when the window loads.
 This implementation installs listeners.
 */
@@ -216,19 +251,54 @@ function installListeners()
 //TODO del alert("found text input element "+inputElement.id);
 			addEvent(inputElement, "change", onTextInputChange, false);
 		}
+		else if("checkbox"==inputType || "radio"==inputType)	//if this is a checkbox or a radio button
+		{
+//TODO del alert("found text input element "+inputElement.id);
+			addEvent(inputElement, "click", onCheckInputChange, false);
+		}
 	}
 }
 
 function onTextInputChange(event)
 {
-	var w3cEvent=getEvent(event);
-//TODO del alert("an input changed! "+w3cEvent.target.id);
+	var w3cEvent=getEvent(event);	//get the W3C event object
+	var target=w3cEvent.target;	//get the target of the event
+//TODO del alert("an input changed! "+target.id);
 	httpCommunicator.addParameter("navigationPath", "test");	//TODO fix; testing
-	httpCommunicator.addParameter(w3cEvent.target.id, w3cEvent.target.value);
+	httpCommunicator.addParameter(target.name, target.value);
 	var ajaxXML=httpCommunicator.post("_ajax");
-	weaveAjaxElement(ajaxXML.documentElement);
+	ajaxResponses.enqueue(ajaxXML);	//enqueue the response XML
+	setTimeout("processAJAXResponses();", 1);	//process the AJAX responses later
 }
 
+function onCheckInputChange(event)
+{
+	var w3cEvent=getEvent(event);	//get the W3C event object
+	var target=w3cEvent.target;	//get the target of the event
+//TODO del alert("checkbox "+target.id+" changed to "+target.checked);
+	httpCommunicator.addParameter("navigationPath", "test");	//TODO fix; testing
+	httpCommunicator.addParameter(target.name, target.checked ? target.id : "");
+	var ajaxXML=httpCommunicator.post("_ajax");
+	ajaxResponses.enqueue(ajaxXML);	//enqueue the response XML
+	setTimeout("processAJAXResponses();", 1);	//process the AJAX responses later
+}
+
+/**Processes responses from AJAX requests.
+This routine should be called asynchronously from an event so that the DOM tree can be successfully updated.
+@see ajaxResponses
+*/
+function processAJAXResponses()
+{
+	while(ajaxResponses.length>0)	//while there are more AJAX responses
+	{
+		weaveAjaxElement(ajaxResponses.dequeue().documentElement);
+	}
+}
+
+/**Weaves an element and its children into the existing element hierarchy.
+Any element in the hierarchy without an ID attribute will be ignored, although its children will be processed.
+@param element The element hierarchy to weave into the existing document.
+*/ 
 function weaveAjaxElement(element)
 {
 	var id=element.getAttribute("id");	//get the element's ID, if there is one
@@ -237,6 +307,20 @@ function weaveAjaxElement(element)
 		var oldElement=document.getElementById(id);	//get the old element
 		if(oldElement)	//if the element currently exists in the document
 		{
+				//remove any attributes the old element has that are not in the new element
+			var oldAttributes=oldElement.attributes;	//get the old element's attributes
+			for(var i=oldAttributes.length-1; i>=0; --i)	//for each old attribute
+			{
+				var attribute=oldAttributes[i];	//get this attribute
+				var attributeName=attribute.nodeName;	//get the attribute name
+				var attributeValue=attribute.nodeValue;	//get the attribute value
+				if(/*TODO fix or del attributeValue!=null && attributeValue.length>0 && */!element.getAttribute(attributeName))	//if there is really an attribute value (IE provides all possible attributes, even with those with no value) and the new element doesn't have this attribute
+				{
+//TODO del alert("ready to remove "+id+" attribute "+attributeName+" with current value "+attributeValue);
+					oldElement.removeAttribute(attributeName);	//remove the attribute normally TODO make sure this works in IE
+//TODO fix					i=0;	//TODO fix; temporary to get out of looking at all IE's attributes
+				}
+			}
 			var attributes=element.attributes;	//get the new element's attributes
 			for(var i=attributes.length-1; i>=0; --i)	//for each attribute
 			{
@@ -244,11 +328,19 @@ function weaveAjaxElement(element)
 //TODO del alert("looking at attribute: "+attribute.nodeName);
 				var attributeName=attribute.nodeName;	//get the attribute name
 				var attributeValue=attribute.nodeValue;	//get the attribute value
+					//TODO fix for oldElement.class/oldElement.className on IE
 				if(oldElement.getAttribute(attributeName)!=attributeValue)	//if the old element has a different (or no) value for this attribute
 				{
 //TODO del alert("updating "+id+" attribute "+attributeName+" to new value "+attributeValue);
-setTimeout("setElementAttribute('"+id+"', '"+attributeName+"', '"+attributeValue+"');", 1);	//TODO del; testing
-/*TODO fix
+//TODO del when works setTimeout("setElementAttribute('"+id+"', '"+attributeName+"', '"+attributeValue+"');", 1);	//TODO del; testing
+					oldElement[attributeName]=attributeValue;	//update the old element's attribute (this format works for Firefox where oldElement.setAttribute("value", attributeValue) does not)
+/*TODO del
+if("disabled"==attributeName)
+{
+alert("added disabled value: "+attributeValue+" which registered as "+oldElement.getAttribute(attributeName));
+}
+*/
+/*TODO fix when works
 					if(attributeName=="value")	//TODO find out why this works on IE but not on Firefox
 					{
 						oldElement.value=attributeValue;	//update the old element's attribute
@@ -275,25 +367,11 @@ setTimeout("setElementAttribute('"+id+"', '"+attributeName+"', '"+attributeValue
 	for(var i=0; i<childNodeList.length; ++i)	//for each child node
 	{
 		var childNode=childNodeList[i];	//get this child node
-		if(childNode.nodeType==1)	//if this is a child node
+		if(childNode.nodeType==Node.ELEMENT_NODE)	//if this is a child node
 		{
 			weaveAjaxElement(childNode);	//weave this child element
 		}
 	}
-}
-
-function setElementAttribute(id, attributeName, attributeValue)	//TODO fix; temporary hack to make IE understand that the value really changes
-{
-//TODO del	document.getElementById(id).setAttribute(attributeName, attributeValue);	//update the old element's attribute
-					if(attributeName=="value")	//TODO find out why this works on IE but not on Firefox
-					{
-						document.getElementById(id).value=attributeValue;	//update the old element's attribute
-					}
-					else
-					{
-							//TODO figure out why IE wants to use a different name for class attributes
-						document.getElementById(id).setAttribute(attributeName, attributeValue);	//update the old element's attribute
-					}
 }
 
 addEvent(window, "load", onWindowLoad, false);	//do the appropriate initialization when the window loads

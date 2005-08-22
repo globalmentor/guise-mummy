@@ -364,36 +364,45 @@ final Set<Component<?>> affectedComponents=new HashSet<Component<?>>();
 						//TODO delete phase if not needed					navigationFrame.validateView(guiseContext);		//tell the frame to validate its view
 								guiseContext.setState(GuiseContext.State.UPDATE_MODEL);	//update the context state for updating the model
 								component.updateModel(guiseContext);	//tell the frame to update its model
-								guiseContext.setState(GuiseContext.State.INACTIVE);	//deactivate the context so that any model update events will be generated			
-
-								final List<EventObject> contextEvents=guiseContext.getEventList();
-								Debug.trace("we now have events:", contextEvents.size());
-								for(final EventObject contextEvent:contextEvents)	//for each postponed event
-									{
-Debug.trace("context event:", contextEvent);
-									final Object source=contextEvent.getSource();	//get the event source
-									if(source instanceof Model)	//if this was a model change
-									{
-										affectedComponents.addAll(AbstractModelComponent.getModelComponents(navigationFrame, (Model)source));	//get all components that use this model
-									}
-								}
-								Debug.trace("we now have affected components:", affectedComponents.size());
-								guiseContext.setState(GuiseContext.State.QUERY_MODEL);	//update the context state for querying the model
-								for(final Component<?> affectedComponent:affectedComponents)
-								{
-									Debug.trace("affected component:", affectedComponent);
-									affectedComponent.queryModel(guiseContext);		//tell the component to query its model
-								}
-								guiseContext.setState(GuiseContext.State.ENCODE_MODEL);	//update the context state for encoding the model
-								for(final Component<?> affectedComponent:affectedComponents)
-								{
-									affectedComponent.encodeModel(guiseContext);		//tell the component to encode its model
-								}
 							}
 							catch(final ValidationsException validationsException)	//if there were any validation errors during validation
 							{
-								navigationFrame.addErrors(validationsException);	//store the validation error(s) so that the frame can report them to the user
+								for(final ValidationException validationException:validationsException)	//for each validation exception
+								{
+									final Component<?> affectedComponent=validationException.getComponent();	//see if this error is for a component
+									if(affectedComponent!=null)	//if this validation exception was for a specific component
+									{
+										affectedComponents.add(affectedComponent);	//add this component to our list of affected components
+									}
+								}
+//TODO del if not needed, or do something useful								navigationFrame.addErrors(validationsException);	//store the validation error(s) so that the frame can report them to the user
 							}
+							guiseContext.setState(GuiseContext.State.INACTIVE);	//deactivate the context so that any model update events will be generated			
+
+							final List<EventObject> contextEvents=guiseContext.getEventList();
+							Debug.trace("we now have events:", contextEvents.size());
+							for(final EventObject contextEvent:contextEvents)	//for each postponed event
+								{
+Debug.trace("context event:", contextEvent);
+								final Object source=contextEvent.getSource();	//get the event source
+								if(source instanceof Model)	//if this was a model change
+								{
+									affectedComponents.addAll(AbstractModelComponent.getModelComponents(navigationFrame, (Model)source));	//get all components that use this model
+								}
+							}
+							Debug.trace("we now have affected components:", affectedComponents.size());
+							guiseContext.setState(GuiseContext.State.QUERY_MODEL);	//update the context state for querying the model
+							for(final Component<?> affectedComponent:affectedComponents)
+							{
+								Debug.trace("affected component:", affectedComponent);
+								affectedComponent.queryModel(guiseContext);		//tell the component to query its model
+							}
+							guiseContext.setState(GuiseContext.State.ENCODE_MODEL);	//update the context state for encoding the model
+							for(final Component<?> affectedComponent:affectedComponents)
+							{
+								affectedComponent.encodeModel(guiseContext);		//tell the component to encode its model
+							}
+							
 							guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view; make the change now in case queued model changes want to navigate, and an error was thrown when updating the model)
 Debug.trace("default context content type:", guiseContext.getOutputContentType());
 							guiseContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type
@@ -457,6 +466,7 @@ return;
 						guiseContext.setState(GuiseContext.State.UPDATE_MODEL);	//update the context state for updating the model
 						navigationFrame.updateModel(guiseContext);	//tell the frame to update its model
 					}
+						//TODO fix! if some components have an error, it will prevent other non-error components from appropriately querying and encoding there models; perhaps query and encode all components, but skip error components
 					guiseContext.setState(GuiseContext.State.QUERY_MODEL);	//update the context state for querying the model
 					navigationFrame.queryModel(guiseContext);		//tell the frame to query its model
 					guiseContext.setState(GuiseContext.State.ENCODE_MODEL);	//update the context state for encoding the model
