@@ -7,6 +7,7 @@ import com.garretwilson.beans.AbstractPropertyValueChangeListener;
 import com.garretwilson.beans.PropertyValueChangeEvent;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
+import com.javaguise.demo.DemoUser;
 import com.javaguise.event.*;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
@@ -75,7 +76,32 @@ public class HomeFrame extends DefaultFrame
 		{
 			throw new AssertionError(validationException);
 		}										
-		inputPanel.add(checkbox);	
+		inputPanel.add(checkbox);
+		
+		final ListControl<Float> listControl=new ListControl<Float>(session, Float.class, new SingleListSelectionStrategy<Float>());	//create a list control allowing only single selections
+		listControl.getModel().setLabel("Pick a Number");	//set the list control label
+		listControl.setRowCount(5);
+		listControl.getModel().add(new Float(10));
+		listControl.getModel().add(new Float(20));
+		listControl.getModel().add(new Float(30));
+		listControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<Float>()
+				{
+					public void propertyValueChange(final PropertyValueChangeEvent<Float> propertyValueChangeEvent)
+					{
+						final Float newValue=propertyValueChangeEvent.getNewValue();	//get the new value
+						try
+						{
+Debug.trace("list control changed value to", newValue);
+							outputTextControl.getModel().setValue(newValue!=null ? newValue*2 : null);	//update the value
+						}
+						catch(final ValidationException validationException)	//we have no validator installed in the check control model, so we don't expect changing its value ever to cause any problems
+						{
+							throw new AssertionError(validationException);
+						}							
+					}
+				});
+		inputPanel.add(listControl);
+
 
 		contentPanel.add(inputPanel);	//add the input panel to the temperature frame
 		

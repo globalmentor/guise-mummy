@@ -37,14 +37,6 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 		{
 			validator.validate(newValue);	//validate the new value, throwing an exception if anything is wrong
 		}
-/*TODO fix; place equivalent functionality in the selection strategy
-		if(!ObjectUtilities.equals(value, newValue))	//if the value is really changing (compare their values, rather than identity)
-		{
-			final V oldValue=value;	//get the old value
-			value=newValue;	//actually change the value
-			firePropertyChange(VALUE_PROPERTY, oldValue, newValue);	//indicate that the value changed
-		}
-*/
 		setSelectedValues(newValue);
 	}
 
@@ -55,14 +47,6 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	public void resetValue()
 	{
 		setSelectedValues();	//select no values
-/*TODO fix some equivalent functionality in the selection strategy
-		if(!ObjectUtilities.equals(value, null))	//if the value is really changing (compare their values, rather than identity)
-		{
-			final V oldValue=value;	//get the old value
-			value=null;	//actually change the value
-			firePropertyChange(VALUE_PROPERTY, oldValue, null);	//indicate that the value changed
-		}
-*/
 	}
 
 	/**The list of values, all access to which will be synchronized on this.*/
@@ -95,6 +79,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	public synchronized <T> T[] toArray(final T[] array) {return values.toArray(array);}
 
 	/**Appends the specified value to the end of this model.
+	This version delegates to {@link #add(int, Object)}.
 	@param value The value to be appended to this model.
 	@return <code>true</code>, indicating that the model changed as a result of the operation.
 	*/
@@ -111,10 +96,12 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	@SuppressWarnings("unchecked")	//we only cast the value if the list was modified, which implies the value was in the list, implying that that list is of the appropriate type or it wouldn't have been in the list to begin with
 	public synchronized boolean remove(final Object value)
 	{
+		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		final boolean modified=values.remove(value);	//remove the value from the list
 		if(modified)	//if the list was modified
 		{
 			fireListModified(-1, null, (V)value);	//indicate the value was removed from an unknown index
+			firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 		}
 		return modified;	//indicate whether the list was modified
 	}
@@ -135,10 +122,12 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	*/
 	public synchronized boolean addAll(final Collection<? extends V> collection)
 	{
+		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		final boolean modified=values.addAll(collection);	//add all the values
 		if(modified)	//if the list was modified
 		{
 			fireListModified(-1, null, null);	//indicate a general list modification
+			firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 		}
 		return modified;	//indicate whether the list was modified
 	}
@@ -152,10 +141,12 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	*/
 	public synchronized boolean addAll(final int index, final Collection<? extends V> collection)
 	{
+		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		final boolean modified=values.addAll(index, collection);	//add the values
 		if(modified)	//if the list was modified
 		{
 			fireListModified(-1, null, null);	//indicate a general list modification
+			firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 		}
 		return modified;	//indicate whether the list was modified
 }
@@ -169,10 +160,12 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	*/
 	public synchronized boolean removeAll(final Collection<?> collection)
 	{
+		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		final boolean modified=values.removeAll(collection);	//remove the values
 		if(modified)	//if the list was modified
 		{
 			fireListModified(-1, null, null);	//indicate a general list modification
+			firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 		}
 		return modified;	//indicate whether the list was modified
 	}
@@ -186,10 +179,12 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	*/
 	public synchronized boolean retainAll(final Collection<?> collection)
 	{
+		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		final boolean modified=values.retainAll(collection);	//remove values if needed
 		if(modified)	//if the list was modified
 		{
 			fireListModified(-1, null, null);	//indicate a general list modification
+			firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 		}
 		return modified;	//indicate whether the list was modified		
 	}
@@ -197,8 +192,10 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	/**Removes all of the values from this model.*/
 	public synchronized void clear()
 	{
+		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		values.clear();	//clear the list
 		fireListModified(-1, null, null);	//indicate a general list modification (without more intricate synchornization, we can't know for sure if the list was modified, even checking the size beforehand, because of thread race conditions)
+		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 	}
 
 	/**Returns the value at the specified position in this model.
@@ -216,8 +213,10 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	*/
 	public synchronized V set(final int index, final V value)
 	{
+		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		final V oldValue=values.set(index, value);	//set the value at the given index
 		fireListModified(index, oldValue, value);	//indicate that the value at the given index was replaced
+		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 		return oldValue;	//return the old value
 	}
 
@@ -228,8 +227,10 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	*/
 	public synchronized void add(final int index, final V value)
 	{
+		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		values.add(index, value);	//add the value at the requested index
 		fireListModified(index, value, null);	//indicate the value was added at the given index
+		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 	}
 
 	/**Removes the value at the specified position in this model.
@@ -239,8 +240,10 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	*/
 	public synchronized V remove(final int index)
 	{
+		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		final V value=values.remove(index);	//remove the value at this index	
 		fireListModified(index, null, value);	//indicate the value was removed from the given index
+		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 		return value;	//return the value that was removed
 	}
 
@@ -285,7 +288,9 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 		final int index=indexOf(oldValue);	//get the index of the old value
 		if(index>=0)	//if the value is in the model
 		{
+			final V oldSelectedValue=getSelectedValue();	//get the old selected value
 			set(index, newValue);	//change the value at the given index, which will fire the appropriate event
+			firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 			return true;	//indicate that we modified the model
 		}
 		else	//if the value is not in the model
@@ -351,7 +356,9 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	*/
 	public void setSelectedIndices(final int... indices)
 	{
+		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		getSelectionStrategy().setSelectedIndices(this, indices);	//delegate to the selection strategy
+		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 	}
 
 	/**Sets the selected values.
@@ -363,7 +370,9 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	*/
 	public void setSelectedValues(final V... values)
 	{
+		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		getSelectionStrategy().setSelectedValues(this, values);	//delegate to the selection strategy
+		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 	}
 
 	/**Adds a selection at the given index.
@@ -374,7 +383,9 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	*/
 	public void addSelectedIndex(final int index)
 	{
+		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		getSelectionStrategy().addSelectedIndex(this, index);	//delegate to the selection strategy
+		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 	}
 
 	/**Removes a selection at the given index.
@@ -385,7 +396,9 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	*/
 	public void removeSelectedIndex(final int index)
 	{
+		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		getSelectionStrategy().removeSelectedIndex(this, index);	//delegate to the selection strategy
+		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 	}
 
 	/**Adds a list listener.

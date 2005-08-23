@@ -119,6 +119,7 @@ public abstract class AbstractListSelectionStrategy<V> implements ListSelectionS
 	/**Sets the selected values.
 	If a value occurs more than one time in the model, the first occurrence of the value will be selected.
 	Values that do not occur in the select model will be ignored.
+	This version calls {@link #setSelectedIndices(ListSelectModel, int[])}
 	@param selectModel The model containing the values to select.
 	@param values The values to select.
 	@see #setSelectedIndices(ListSelectModel, int[])
@@ -184,7 +185,7 @@ public abstract class AbstractListSelectionStrategy<V> implements ListSelectionS
 	/**Called when a list is modified.
 	@param listEvent The event indicating the source of the event and the list modifications.
 	*/
-	public void listModified(final ListEvent<ListSelectModel<V>, V> listEvent)
+	public void listModified(final ListEvent<ListSelectModel<V>, V> listEvent)	//TODO fire selection change events if we need to
 	{
 		final ListSelectModel<V> selectModel=listEvent.getSource();	//get the source of the event
 		final int index=listEvent.getIndex();	//get the modified index, if any
@@ -217,6 +218,7 @@ public abstract class AbstractListSelectionStrategy<V> implements ListSelectionS
 	}
 
 	/**Fires an event to all registered selection listeners indicating the selection changed.
+	@param selectModel The model that is the source of the event.
 	@param addedIndex The index that was added to the selection, or <code>null</code> if no index was added or it is unknown whether or which indices were added.
 	@param removedIndex The index that was removed from the list, or <code>null</code> if no index was removed or it is unknown whether or which indices were removed.
 	@see ListSelectionListener
@@ -230,5 +232,4 @@ public abstract class AbstractListSelectionStrategy<V> implements ListSelectionS
 			selectModel.getSession().queueModelEvent(new PostponedListSelectionEvent<V>(getEventListenerManager(), selectionEvent));	//tell the Guise session to queue the event
 		}
 	}
-
 }

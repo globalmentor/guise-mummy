@@ -246,26 +246,32 @@ function installListeners()
 	{
 		var inputElement=inputElementList[i];	//get this input element
 		var inputType=inputElement.type;	//get the type of input
-		if("text"==inputType || "password"==inputType)	//if this is a text control
+		if(inputType=="text" || inputType=="password")	//if this is a text control
 		{
 //TODO del alert("found text input element "+inputElement.id);
 			addEvent(inputElement, "change", onTextInputChange, false);
 		}
-		else if("checkbox"==inputType || "radio"==inputType)	//if this is a checkbox or a radio button
+		else if(inputType=="checkbox" || inputType=="radio")	//if this is a checkbox or a radio button
 		{
 //TODO del alert("found text input element "+inputElement.id);
 			addEvent(inputElement, "click", onCheckInputChange, false);
 		}
+	}
+	var selectElementList=document.getElementsByTagName("select");	//get all select elements
+	for(var i=0; i<selectElementList.length; ++i)	//for each select element
+	{
+		var selectElement=selectElementList[i];	//get this select element
+		addEvent(selectElement, "change", onSelectChange, false);
 	}
 }
 
 function onTextInputChange(event)
 {
 	var w3cEvent=getEvent(event);	//get the W3C event object
-	var target=w3cEvent.target;	//get the target of the event
-//TODO del alert("an input changed! "+target.id);
+	var textInput=w3cEvent.target;	//get the target of the event
+//TODO del alert("an input changed! "+textInput.id);
 	httpCommunicator.addParameter("navigationPath", "test");	//TODO fix; testing
-	httpCommunicator.addParameter(target.name, target.value);
+	httpCommunicator.addParameter(textInput.name, textInput.value);
 	var ajaxXML=httpCommunicator.post("_ajax");
 	ajaxResponses.enqueue(ajaxXML);	//enqueue the response XML
 	setTimeout("processAJAXResponses();", 1);	//process the AJAX responses later
@@ -274,10 +280,30 @@ function onTextInputChange(event)
 function onCheckInputChange(event)
 {
 	var w3cEvent=getEvent(event);	//get the W3C event object
-	var target=w3cEvent.target;	//get the target of the event
-//TODO del alert("checkbox "+target.id+" changed to "+target.checked);
+	var checkInput=w3cEvent.target;	//get the target of the event
+//TODO del alert("checkbox "+checkInput.id+" changed to "+checkInput.checked);
 	httpCommunicator.addParameter("navigationPath", "test");	//TODO fix; testing
-	httpCommunicator.addParameter(target.name, target.checked ? target.id : "");
+	httpCommunicator.addParameter(checkInput.name, checkInput.checked ? checkInput.id : "");
+	var ajaxXML=httpCommunicator.post("_ajax");
+	ajaxResponses.enqueue(ajaxXML);	//enqueue the response XML
+	setTimeout("processAJAXResponses();", 1);	//process the AJAX responses later
+}
+
+function onSelectChange(event)
+{
+	var w3cEvent=getEvent(event);	//get the W3C event object
+	var select=w3cEvent.target;	//get the target of the event
+//TODO del alert("a select changed! "+select.id);
+	var options=select.options;	//get the select options
+	httpCommunicator.addParameter("navigationPath", "test");	//TODO fix; testing
+	for(var i=0; i<options.length; ++i)	//for each option
+	{
+		var option=options[i];	//get this option
+		if(option.selected)	//if this option is selected
+		{
+			httpCommunicator.addParameter(select.name, option.value);
+		}
+	}
 	var ajaxXML=httpCommunicator.post("_ajax");
 	ajaxResponses.enqueue(ajaxXML);	//enqueue the response XML
 	setTimeout("processAJAXResponses();", 1);	//process the AJAX responses later
