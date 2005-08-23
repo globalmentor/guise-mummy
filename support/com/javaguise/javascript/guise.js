@@ -1,8 +1,8 @@
 //Guise(TM) JavaScript support routines
 //Copyright (c) 2005 GlobalMentor, Inc.
 //Modal window support referenced code by Danny Goodman, http://www.dannyg.com/ .
-
-//TODO add node types for IE from Professional JavaScript page 169
+//
+//var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX communication should not occur.
 
 //Array
 
@@ -16,55 +16,23 @@ Array.prototype.dequeue=Array.prototype.shift;
 
 if(typeof Node=="undefined")	//if no Node type is defined (e.g. IE), create one to give us constant node types
 {
-	var Node=
-			{
-				ELEMENT_NODE: 1,
-				ATTRIBUTE_NODE: 2,
-				TEXT_NODE: 3,
-				CDATA_SECTION_NODE: 4,
-				ENTITY_REFERENCE_NODE: 5,
-				ENTITY_NODE: 6,
-				PROCESSING_INSTRUCTION_NODE: 7,
-				COMMENT_NODE: 8,
-				DOCUMENT_NODE: 9,
-				DOCUMENT_TYPE_NODE: 10,
-				DOCUMENT_FRAGMENT_NODE: 11,
-				NOTATION_NODE: 12
-			}
+	var Node={ELEMENT_NODE: 1, ATTRIBUTE_NODE: 2, TEXT_NODE: 3, CDATA_SECTION_NODE: 4, ENTITY_REFERENCE_NODE: 5, ENTITY_NODE: 6, PROCESSING_INSTRUCTION_NODE: 7, COMMENT_NODE: 8, DOCUMENT_NODE: 9, DOCUMENT_TYPE_NODE: 10, DOCUMENT_FRAGMENT_NODE: 11, NOTATION_NODE: 12}
 }
 
+//HTTPRequestInfo
 
-function HTTPCommunicator()
+/**A class encapsulating HTTP request information.
+var parameters: An array of encoded name=value parameters.
+*/
+function HTTPRequestInfo()
 {
-//	this.XXX=xxx;
 }
 
-/**The versions of the Microsoft XML HTTP ActiveX objects, in increasing order of preference.*/
-HTTPCommunicator.prototype.MSXMLHTTP_VERSIONS=["Microsoft.XMLHTTP", "MSXML2.XMLHTTP", "MSXML2.XMLHTTP.3.0", "MSXML2.XMLHTTP.4.0", "MSXML2.XMLHTTP.5.0", "MSXML2.XMLHTTP.6.0", "MSXML2.XMLHTTP.7.0"];
-
-HTTPCommunicator.prototype.createXMLHTTP=function()
-{
-	if(window.XMLHttpRequest)	//if we can create an XML HTTP request (e.g. Mozilla)
-	{
-		return new XMLHttpRequest();
-	}
-	else if(window.ActiveXObject)	//if we can create ActiveX objects
-	{
-		for(var i=this.MSXMLHTTP_VERSIONS.length-1; i>=0; --i)	//for each available version
-		{
-			try
-			{
-				return new ActiveXObject(this.MSXMLHTTP_VERSIONS[i]);	//try to create a new ActiveX object
-			}
-			catch(exception)	//ignore the errors
-			{
-			}
-		}
-	}
-	throw new Error("XMLHTTP not available.");
-}
-
-HTTPCommunicator.prototype.addParameter=function(name, value)
+/**Adds a parameter to the HTTP request.
+@param name The name of the parameter.
+@param value The value of the parameter.
+*/
+HTTPRequestInfo.prototype.addParameter=function(name, value)
 {
 	if(!this.parameters)	//if there are no parameters
 	{
@@ -73,42 +41,251 @@ HTTPCommunicator.prototype.addParameter=function(name, value)
 	this.parameters.push(encodeURIComponent(name)+"="+encodeURIComponent(value));	//add another parameter to the array
 }
 
-HTTPCommunicator.prototype.get=function(uri)
-{
-	return this._performRequest("GET", uri);	//perform a GET request
-}
+//HTTP Communicator
 
-HTTPCommunicator.prototype.post=function(uri)
-{
-	return this._performRequest("POST", uri);	//perform a POST request
-}
-
-/**
-@return The text of the response or, if the response provides an XML DOM tree, the XML document object.
+/**A class encapsulating HTTP communication functionality.
+This class creates a shared HTTPCommunicator.prototype.xmlHTTP variable, necessary for the onreadystate() callback function.
+function processHTTPResponse: A reference to a function to call for asynchronous HTTP requests, or null if HTTP communication should be synchronous.
 */
-HTTPCommunicator.prototype._performRequest=function(method, uri)
+function HTTPCommunicator()
 {
-	var xmlHTTP=this.createXMLHTTP();	//create an XML HTTP object
-	if("GET"==method && this.parameters && this.parameters.length>0)	//if there are parameters for the GET method
+//TODO fix flag with another variable	if(typeof HTTPCommunicator.prototype.xmlHTTP=="undefined")	//if there isn't yet a global XML HTTP request object
+
+	/**@return true if the commmunicator is in the process of communicating.*/
+	HTTPCommunicator.prototype.isCommunicating=function()
 	{
-		uri=uri+"?"+this.parameters.join("&");	//add the parameters to the URI
-	}
-	xmlHTTP.open(method, uri, false);
-	var content=null;	//we'll create content if we need to
-	if("POST"==method)	//if this is the POST method
-	{
-		xmlHTTP.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");	//set the post content type
-		if(this.parameters && this.parameters.length>0)	//if there are parameters for the POST method
-		{
-			content=this.parameters.join("&");	//create the content from the parameters
-		}	
+		return typeof HTTPCommunicator.prototype.xmlHTTP!="undefined" && HTTPCommunicator.prototype.xmlHTTP!=null;	//we're communicating if we have an XML HTTP request object
 	}	
-	xmlHTTP.send(content);	//send the request
-	this.parameters=null;	//remove any parameters
-//TODO del alert("got status: "+xmlHTTP.status);
-//TODO del alert("response text: "+xmlHTTP.responseText);
-	return xmlHTTP.responseXML ? xmlHTTP.responseXML : xmlHTTP.responseText;
+
+	/**The enumeration of ready states for asynchronous XMLHTTP requests.*/
+	//TODO del if not needed HTTPCommunicator.prototype.READY_STATE={UNINITIALIZED: 0, LOADING: 1, LOADED: 2, INTERACTIVE: 3, COMPLETED: 4}
+	
+	/**The versions of the Microsoft XML HTTP ActiveX objects, in increasing order of preference.*/
+	HTTPCommunicator.prototype.MSXMLHTTP_VERSIONS=["Microsoft.XMLHTTP", "MSXML2.XMLHTTP", "MSXML2.XMLHTTP.3.0", "MSXML2.XMLHTTP.4.0", "MSXML2.XMLHTTP.5.0", "MSXML2.XMLHTTP.6.0", "MSXML2.XMLHTTP.7.0"];
+	
+	/**Sets the callback method to use for processing an HTTP response.
+	The callback function is set for the HTTP communicator prototype, shared among all instances of the HTTP communicator.
+	@param fn The function to call when processing HTTP responses, or null if requests should be synchronous.
+	*/
+	HTTPCommunicator.prototype.setProcessHTTPResponse=function(fn)
+	{
+//TODO del	alert("setting up a callback using function: "+typeof fn);
+		HTTPCommunicator.prototype.processHTTPResponse=fn;	//save the function for processing HTTP responses
+	}
+	
+	/**@return A newly created XML HTTP request object.*/
+	HTTPCommunicator.prototype._createXMLHTTP=function()
+	{
+		if(window.XMLHttpRequest)	//if we can create an XML HTTP request (e.g. Mozilla)
+		{
+			return new XMLHttpRequest();
+		}
+		else if(window.ActiveXObject)	//if we can create ActiveX objects
+		{
+			for(var i=this.MSXMLHTTP_VERSIONS.length-1; i>=0; --i)	//for each available version
+			{
+				try
+				{
+					return new ActiveXObject(this.MSXMLHTTP_VERSIONS[i]);	//try to create a new ActiveX object
+				}
+				catch(exception)	//ignore the errors
+				{
+				}
+			}
+		}
+		throw new Error("XMLHTTP not available.");
+	}
+	
+	/**Performs an HTTP GET request.
+	@param uri The request URI.
+	@param httpRequestInfo The HTTP request information, or null if there is no related information.
+	*/
+	HTTPCommunicator.prototype.get=function(uri, httpRequestInfo)
+	{
+		return this._performRequest("GET", uri, httpRequestInfo);	//perform a GET request
+	}
+	
+	/**Performs an HTTP POST request.
+	@param uri The request URI.
+	@param httpRequestInfo The HTTP request information, or null if there is no related information.
+	*/
+	HTTPCommunicator.prototype.post=function(uri, httpRequestInfo)
+	{
+		return this._performRequest("POST", uri, httpRequestInfo);	//perform a POST request
+	}
+	
+	/**Performs an HTTP request and returns the result.
+	@param The HTTP request method.
+	@param uri The request URI.
+	@param httpRequestInfo The HTTP request information, or null if there is no related information.
+	@return The text of the response or, if the response provides an XML DOM tree, the XML document object; or null if the request is asynchronous.
+	@throws Exception if an error occurs performing the request.
+	@throws Number if the HTTP response code was not 200 (OK).
+	*/
+	HTTPCommunicator.prototype._performRequest=function(method, uri, httpRequestInfo)
+	{
+			//TODO assert HTTPCommunicator.prototype.xmlHTTP does not exist
+		HTTPCommunicator.prototype.xmlHTTP=HTTPCommunicator.prototype._createXMLHTTP();	//create an XML HTTP object
+	
+		var xmlHTTP=HTTPCommunicator.prototype.xmlHTTP;	//put the XML HTTP object in a local variable
+		if("GET"==method && httpRequestInfo && httpRequestInfo.parameters && httpRequestInfo.parameters.length>0)	//if there are parameters for the GET method
+		{
+			uri=uri+"?"+httpRequestInfo.parameters.join("&");	//add the parameters to the URI
+		}
+//TODO del	alert("typeof HTTPCommunicator.prototype.processHTTPResponse: "+HTTPCommunicator.prototype.processHTTPResponse);
+		var asynchronous=typeof HTTPCommunicator.prototype.processHTTPResponse!="undefined" && typeof HTTPCommunicator.prototype.processHTTPResponse!=null;	//see if we should make an asynchronous request
+		
+		HTTPCommunicator.prototype.xmlHTTP.onreadystatechange=function()
+		{
+			if(HTTPCommunicator.prototype.xmlHTTP.readyState==4)	//if a transfer is completed
+			{
+//TODO del	alert("new state: "+HTTPCommunicator.prototype.xmlHTTP.readyState);
+				HTTPCommunicator.prototype.status=HTTPCommunicator.prototype.xmlHTTP.status;	//store the status in the communicator
+				HTTPCommunicator.prototype.responseText=HTTPCommunicator.prototype.xmlHTTP.responseText;	//store the response text in the communicator
+				HTTPCommunicator.prototype.responseXML=HTTPCommunicator.prototype.xmlHTTP.responseXML;	//store the response XML in the communicator
+				HTTPCommunicator.prototype.xmlHTTP=null;	//remove the XML HTTP request object (Firefox only allows one asynchronous communication per object)
+				HTTPCommunicator.prototype.processHTTPResponse();	//process the response
+			}
+		}
+		xmlHTTP.open(method, uri, asynchronous);
+		var content=null;	//we'll create content if we need to
+		if("POST"==method)	//if this is the POST method
+		{
+			xmlHTTP.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");	//set the post content type
+			if(httpRequestInfo && httpRequestInfo.parameters && httpRequestInfo.parameters.length>0)	//if there are parameters for the POST method
+			{
+				content=httpRequestInfo.parameters.join("&");	//create the content from the parameters
+			}	
+		}
+		xmlHTTP.send(content);	//send the request
+		if(asynchronous)	//if we're communicating asynchronously
+		{
+//TODO del	alert("sending back null for asynchronous mode");
+			return null;	//don't return anything to process
+		}
+		else	//if we're processing synchronously, process the return value
+		{
+	//TODO alert("got status: "+xmlHTTP.status);
+	//TODO del alert("response text: "+xmlHTTP.responseText);
+			HTTPCommunicator.prototype.status=HTTPCommunicator.prototype.xmlHTTP.status;	//store the status in the communicator
+			HTTPCommunicator.prototype.responseText=HTTPCommunicator.prototype.xmlHTTP.responseText;	//store the response text in the communicator
+			HTTPCommunicator.prototype.responseXML=HTTPCommunicator.prototype.xmlHTTP.responseXML;	//store the response XML in the communicator
+			HTTPCommunicator.prototype.xmlHTTP=null;	//remove the XML HTTP request object (Firefox only allows one asynchronous communication per object)
+			if(HTTPCommunicator.prototype.status==200)	//if everything went OK
+			{
+				return HTTPCommunicator.prototype.responseXML ? HTTPCommunicator.prototype.responseXML : HTTPCommunicator.prototype.responseText;
+			}
+			else	//if there was an HTTP error TODO check for redirects
+			{
+				throw HTTPCommunicator.prototype.status;	//throw the status code
+			}
+		}
+	}
 }
+
+
+//GuiseAJAX
+
+/**A class encapsulating AJAX functionality for Guise.*/
+function GuiseAJAX()
+{
+	/**The object for communicating with Guise via AJAX.*/
+	GuiseAJAX.prototype.httpCommunicator=new HTTPCommunicator();
+	
+	/**The queue of AJAX HTTP request information objects.*/
+	GuiseAJAX.prototype.ajaxRequests=new Array();
+
+	/**The queue of AJAX response XML DOM trees.*/
+	GuiseAJAX.prototype.ajaxResponses=new Array();
+
+	/**Immediately sends or queues an AJAX request.
+	@param The HTTP request method.
+	@param uri The request URI.
+	@param httpRequestInfo The HTTP request information, or null if there is no related information.
+	@return The text of the response or, if the response provides an XML DOM tree, the XML document object.
+	@throws Exception if an error occurs performing the request.
+	@throws Number if the HTTP response code was not 200 (OK).
+	*/
+	GuiseAJAX.prototype.sendAJAX=function(httpRequestInfo)
+	{
+		if(AJAX_URI)	//if AJAX is enabled
+		{
+			GuiseAJAX.prototype.ajaxRequests.enqueue(httpRequestInfo);	//enqueue the request info
+			GuiseAJAX.prototype.processAJAXRequests();	//process any waiting requests now if we can
+		}
+	}
+	
+	/**Called in response to asynchronous HTTP communication.*/
+	GuiseAJAX.prototype._processHTTPResponse=function()
+	{
+//TODO del alert("processing asynch result");
+		if(HTTPCommunicator.prototype.status==200)	//if everything went OK
+		{
+			if(HTTPCommunicator.prototype.responseXML)
+			{
+				GuiseAJAX.prototype.ajaxResponses.enqueue(HTTPCommunicator.prototype.responseXML);	//enqueue the response XML
+				setTimeout("GuiseAJAX.prototype.processAJAXResponses();", 1);	//process the AJAX responses later		
+				GuiseAJAX.prototype.processAJAXRequests();	//make sure there are no waiting AJAX requests
+			}
+		}
+		else	//if there was an HTTP error TODO check for redirects
+		{
+	//TODO fix		throw xmlHTTP.status;	//throw the status code
+		}
+	}
+
+	if(true)	//TODO add asynchronous configuration
+	{
+		this.httpCommunicator.setProcessHTTPResponse(GuiseAJAX.prototype._processHTTPResponse);	//set up our callback function for process HTTP responses
+	}
+
+	/**Processes AJAX requests.
+	@see GuiseAJAX#ajaxRequests
+	*/
+	GuiseAJAX.prototype.processAJAXRequests=function()
+	{
+		//see if the communicator is not busy (if it is busy, we're in asychronous mode and the end of the processing will call this method again to check for new requests)
+		while(!GuiseAJAX.prototype.httpCommunicator.isCommunicating() && GuiseAJAX.prototype.ajaxRequests.length>0)	//while the communicator is not busy and there are more AJAX requests
+		{
+			try
+			{			
+				var httpRequestInfo=GuiseAJAX.prototype.ajaxRequests.dequeue();	//post the HTTP request information
+				var ajaxXML=GuiseAJAX.prototype.httpCommunicator.post(AJAX_URI, httpRequestInfo);	//post the HTTP request information
+				if(ajaxXML)	//if we receive an AJAX response
+				{
+//TODO del	alert("processing synch result");
+					GuiseAJAX.prototype.ajaxResponses.enqueue(ajaxXML);	//enqueue the response XML
+					setTimeout("GuiseAJAX.prototype.processAJAXResponses();", 1);	//process the AJAX responses later
+				}
+			}
+			catch(exception)	//if a problem occurred
+			{
+				//TODO log a warning
+//TODO del		alert(exception);
+				AJAX_URI=null;	//stop further AJAX communication
+			}
+		}
+	}
+
+	/**Processes responses from AJAX requests.
+	This routine should be called asynchronously from an event so that the DOM tree can be successfully updated.
+	@see GuiseAJAX#ajaxResponses
+	*/
+	GuiseAJAX.prototype.processAJAXResponses=function()
+	{
+		while(GuiseAJAX.prototype.ajaxResponses.length>0)	//while there are more AJAX responses
+		{
+			patchAjaxElement(GuiseAJAX.prototype.ajaxResponses.dequeue().documentElement);
+		}
+		GuiseAJAX.prototype.processAJAXRequests();	//make sure there are no waiting AJAX requests
+	}
+
+}
+
+
+
+/**The global object for AJAX communication with Guise.*/
+var guiseAJAX=new GuiseAJAX();
 
 /**Adds an event listener to an object.
 @param object The object for which a listener should be added.
@@ -224,17 +401,16 @@ alert("looking at event src element: "+event.srcElement);
 
 //Guise functionality
 
-var httpCommunicator=new HTTPCommunicator();
-
-/**The queue of AJAX response XML DOM trees.*/
-var ajaxResponses=new Array();
-
 /**Called when the window loads.
-This implementation installs listeners.
+This implementation installs listeners if AJAX is enabled.
+@see #AJAX_URI
 */
 function onWindowLoad()
 {
-	installListeners();
+	if(AJAX_URI)	//if AJAX is enabled
+	{
+		installListeners();	//install listeners for appropriate elements
+	}
 }
 
 /**Installs listeners on the appropriate controls.*/
@@ -267,65 +443,56 @@ function installListeners()
 
 function onTextInputChange(event)
 {
-	var w3cEvent=getEvent(event);	//get the W3C event object
-	var textInput=w3cEvent.target;	//get the target of the event
-//TODO del alert("an input changed! "+textInput.id);
-	httpCommunicator.addParameter("navigationPath", "test");	//TODO fix; testing
-	httpCommunicator.addParameter(textInput.name, textInput.value);
-	var ajaxXML=httpCommunicator.post("_ajax");
-	ajaxResponses.enqueue(ajaxXML);	//enqueue the response XML
-	setTimeout("processAJAXResponses();", 1);	//process the AJAX responses later
+	if(AJAX_URI)	//if AJAX is enabled
+	{
+		var w3cEvent=getEvent(event);	//get the W3C event object
+		var textInput=w3cEvent.target;	//get the target of the event
+	//TODO del alert("an input changed! "+textInput.id);
+		var httpRequestInfo=new HTTPRequestInfo();	//create new HTTP request information
+		httpRequestInfo.addParameter(textInput.name, textInput.value);
+		guiseAJAX.sendAJAX(httpRequestInfo);	//send the AJAX request
+	}
 }
 
 function onCheckInputChange(event)
 {
-	var w3cEvent=getEvent(event);	//get the W3C event object
-	var checkInput=w3cEvent.target;	//get the target of the event
+	if(AJAX_URI)	//if AJAX is enabled
+	{
+		var w3cEvent=getEvent(event);	//get the W3C event object
+		var checkInput=w3cEvent.target;	//get the target of the event
 //TODO del alert("checkbox "+checkInput.id+" changed to "+checkInput.checked);
-	httpCommunicator.addParameter("navigationPath", "test");	//TODO fix; testing
-	httpCommunicator.addParameter(checkInput.name, checkInput.checked ? checkInput.id : "");
-	var ajaxXML=httpCommunicator.post("_ajax");
-	ajaxResponses.enqueue(ajaxXML);	//enqueue the response XML
-	setTimeout("processAJAXResponses();", 1);	//process the AJAX responses later
+		var httpRequestInfo=new HTTPRequestInfo();	//create new HTTP request information
+		httpRequestInfo.addParameter(checkInput.name, checkInput.checked ? checkInput.id : "");
+		guiseAJAX.sendAJAX(httpRequestInfo);	//send the AJAX request
+	}
 }
 
 function onSelectChange(event)
 {
-	var w3cEvent=getEvent(event);	//get the W3C event object
-	var select=w3cEvent.target;	//get the target of the event
-//TODO del alert("a select changed! "+select.id);
-	var options=select.options;	//get the select options
-	httpCommunicator.addParameter("navigationPath", "test");	//TODO fix; testing
-	for(var i=0; i<options.length; ++i)	//for each option
+	if(AJAX_URI)	//if AJAX is enabled
 	{
-		var option=options[i];	//get this option
-		if(option.selected)	//if this option is selected
+		var w3cEvent=getEvent(event);	//get the W3C event object
+		var select=w3cEvent.target;	//get the target of the event
+	//TODO del alert("a select changed! "+select.id);
+		var options=select.options;	//get the select options
+		var httpRequestInfo=new HTTPRequestInfo();	//create new HTTP request information
+		for(var i=0; i<options.length; ++i)	//for each option
 		{
-			httpCommunicator.addParameter(select.name, option.value);
+			var option=options[i];	//get this option
+			if(option.selected)	//if this option is selected
+			{
+				httpRequestInfo.addParameter(select.name, option.value);
+			}
 		}
-	}
-	var ajaxXML=httpCommunicator.post("_ajax");
-	ajaxResponses.enqueue(ajaxXML);	//enqueue the response XML
-	setTimeout("processAJAXResponses();", 1);	//process the AJAX responses later
-}
-
-/**Processes responses from AJAX requests.
-This routine should be called asynchronously from an event so that the DOM tree can be successfully updated.
-@see ajaxResponses
-*/
-function processAJAXResponses()
-{
-	while(ajaxResponses.length>0)	//while there are more AJAX responses
-	{
-		weaveAjaxElement(ajaxResponses.dequeue().documentElement);
+		guiseAJAX.sendAJAX(httpRequestInfo);	//send the AJAX request
 	}
 }
 
-/**Weaves an element and its children into the existing element hierarchy.
+/**Patches an element and its children into the existing element hierarchy.
 Any element in the hierarchy without an ID attribute will be ignored, although its children will be processed.
-@param element The element hierarchy to weave into the existing document.
+@param element The element hierarchy to patch into the existing document.
 */ 
-function weaveAjaxElement(element)
+function patchAjaxElement(element)
 {
 	var id=element.getAttribute("id");	//get the element's ID, if there is one
 	if(id)	//if the element has an ID
@@ -343,7 +510,7 @@ function weaveAjaxElement(element)
 				if(/*TODO fix or del attributeValue!=null && attributeValue.length>0 && */!element.getAttribute(attributeName))	//if there is really an attribute value (IE provides all possible attributes, even with those with no value) and the new element doesn't have this attribute
 				{
 //TODO del alert("ready to remove "+id+" attribute "+attributeName+" with current value "+attributeValue);
-					oldElement.removeAttribute(attributeName);	//remove the attribute normally TODO make sure this works in IE
+					oldElement.removeAttribute(attributeName);	//remove the attribute normally (apparently no action will take place if performed on IE-specific attributes such as element.start)
 //TODO fix					i=0;	//TODO fix; temporary to get out of looking at all IE's attributes
 				}
 			}
@@ -358,32 +525,9 @@ function weaveAjaxElement(element)
 				if(oldElement.getAttribute(attributeName)!=attributeValue)	//if the old element has a different (or no) value for this attribute
 				{
 //TODO del alert("updating "+id+" attribute "+attributeName+" to new value "+attributeValue);
-//TODO del when works setTimeout("setElementAttribute('"+id+"', '"+attributeName+"', '"+attributeValue+"');", 1);	//TODO del; testing
 					oldElement[attributeName]=attributeValue;	//update the old element's attribute (this format works for Firefox where oldElement.setAttribute("value", attributeValue) does not)
-/*TODO del
-if("disabled"==attributeName)
-{
-alert("added disabled value: "+attributeValue+" which registered as "+oldElement.getAttribute(attributeName));
-}
-*/
-/*TODO fix when works
-					if(attributeName=="value")	//TODO find out why this works on IE but not on Firefox
-					{
-						oldElement.value=attributeValue;	//update the old element's attribute
-					}
-					else
-					{
-							//TODO figure out why IE wants to use a different name for class attributes
-						oldElement.setAttribute(attributeName, attributeValue);	//update the old element's attribute
-					}
-*/
-//TODO fix						oldElement.setAttribute(attributeName, id);	//update the old element's attribute
-//TODO fix					oldElement.setAttribute(attributeName, attributeValue);	//update the old element's attribute
-
-
 //TODO: fix the Firefox problem of sending an onchange event for any elements that get updated from an Ajax request, but only later when the focus blurs
 //TODO fix the focus problem if the user has focus on an element that gets changed in response to the event
-
 				}
 			}
 			//TODO remove all attributes from the old element that have been deleted; maybe doing this first will result in efficiencies in some cases
@@ -395,7 +539,7 @@ alert("added disabled value: "+attributeValue+" which registered as "+oldElement
 		var childNode=childNodeList[i];	//get this child node
 		if(childNode.nodeType==Node.ELEMENT_NODE)	//if this is a child node
 		{
-			weaveAjaxElement(childNode);	//weave this child element
+			patchAjaxElement(childNode);	//patch this child element
 		}
 	}
 }
