@@ -219,6 +219,8 @@ function GuiseAJAX()
 	GuiseAJAX.prototype._processHTTPResponse=function()
 	{
 //TODO del alert("processing asynch result");
+//TODO del alert("got status: "+HTTPCommunicator.prototype.status);
+//TODO del alert("response text: "+HTTPCommunicator.prototype.responseText);
 		if(HTTPCommunicator.prototype.status==200)	//if everything went OK
 		{
 			if(HTTPCommunicator.prototype.responseXML)
@@ -456,10 +458,15 @@ function onTextInputChange(event)
 
 function onCheckInputChange(event)
 {
+	//TODO fix Mozilla bug that doesn't see an onclick of a checkbox label changes the checkbox
 	if(AJAX_URI)	//if AJAX is enabled
 	{
 		var w3cEvent=getEvent(event);	//get the W3C event object
 		var checkInput=w3cEvent.target;	//get the target of the event
+		if(checkInput.nodeName=="label" && checkInput.htmlFor)	//if the check input's label was passed as the target (as occurs in Mozilla)
+		{
+			checkInput=document.getElementById(checkInput.htmlFor);	//the real target is the check input with which this label is associated; the htmlFor attribute is the ID of the element, not the actual element as Danny Goodman says in JavaScript Bible 5th Edition (649)
+		}
 //TODO del alert("checkbox "+checkInput.id+" changed to "+checkInput.checked);
 		var httpRequestInfo=new HTTPRequestInfo();	//create new HTTP request information
 		httpRequestInfo.addParameter(checkInput.name, checkInput.checked ? checkInput.id : "");
@@ -497,6 +504,7 @@ function patchAjaxElement(element)
 	var id=element.getAttribute("id");	//get the element's ID, if there is one
 	if(id)	//if the element has an ID
 	{
+//TODO del alert("patching stuff for ID "+id);
 		var oldElement=document.getElementById(id);	//get the old element
 		if(oldElement)	//if the element currently exists in the document
 		{

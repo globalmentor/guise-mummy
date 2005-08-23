@@ -348,25 +348,33 @@ Debug.trace("got an AJAX request for navigation path", navigationPath);
 				{
 					final String parameterKey=(String)parameterListMapEntry.getKey();
 					final String parameterValue=(String)parameterListMapEntry.getValue().toArray()[0];	//TODO double-check that value has at least one element
-						//TODO don't re-update nested components (less important for controls, which don't have nested components) 
-Debug.trace("looking for component with ID", parameterKey);
-							final Component<?> component=getComponentByAbsoluteUniqueID(navigationFrame, parameterKey);
-							if(component!=null)
-							{
-Debug.trace("found component:", component);
+					//TODO don't re-update nested components (less important for controls, which don't have nested components) 
+Debug.trace("looking for component with name", parameterKey);
+					final List<Component<?>> ajaxComponents=new ArrayList<Component<?>>();
+					getControlsByName(navigationFrame, parameterKey, ajaxComponents);
+					if(!ajaxComponents.isEmpty())
+					{
 final Set<Component<?>> affectedComponents=new HashSet<Component<?>>();
-							try
+						try
+						{
+							guiseContext.setState(GuiseContext.State.QUERY_VIEW);	//update the context state for querying the view
+							for(final Component<?> component:ajaxComponents)
 							{
-								guiseContext.setState(GuiseContext.State.QUERY_VIEW);	//update the context state for querying the view
-					//TODO del Debug.trace("ready to query the navigation frame view");
-							component.queryView(guiseContext);		//tell the frame to query its view
+								Debug.trace("AJAX component:", component);
+								component.queryView(guiseContext);		//tell the frame to query its view
+							}
 							guiseContext.setState(GuiseContext.State.DECODE_VIEW);	//update the context state for decoding the view
-							component.decodeView(guiseContext);		//tell the frame to decode its view
-					//TODO delete phase if not needed					guiseContext.setState(GuiseContext.State.VALIDATE_VIEW);	//update the context state for validating the view
-					//TODO delete phase if not needed					navigationFrame.validateView(guiseContext);		//tell the frame to validate its view
+							for(final Component<?> component:ajaxComponents)
+							{
+								component.decodeView(guiseContext);		//tell the frame to decode its view
+							}
 							guiseContext.setState(GuiseContext.State.UPDATE_MODEL);	//update the context state for updating the model
-							component.updateModel(guiseContext);	//tell the frame to update its model
+							for(final Component<?> component:ajaxComponents)
+							{
+								component.updateModel(guiseContext);	//tell the frame to update its model
+							}
 						}
+							//TODO important! fix error handling---don't bail out of all updates if there is an error in one phase---the other components might be fine
 						catch(final ValidationsException validationsException)	//if there were any validation errors during validation
 						{
 							for(final ValidationException validationException:validationsException)	//for each validation exception
@@ -533,6 +541,7 @@ return;
 		}
 	}
 
+/*TODO del if not needed
 	protected <T extends Component<?>> Component<?> getComponentByAbsoluteUniqueID(final T component, final String absoluteUniqueID)
 	{
 		final Controller<? extends GuiseContext<?>, ? super T> controller=component.getController();
@@ -553,6 +562,28 @@ return;
 		}
 		return null;
 	}
+*/
+	
+	protected <T extends Component<?>> void getControlsByName(final T component, final String name, final List<Component<?>> componentList)
+	{
+			//TODO check first that the component is a control; that should be much faster
+		final Controller<? extends GuiseContext<?>, ? super T> controller=component.getController();
+		if(controller instanceof XHTMLControlController)
+		{
+			final XHTMLControlController xhtmlControlController=(XHTMLControlController)controller;
+Debug.trace("checking control with ID", xhtmlControlController.getAbsoluteUniqueID(component), "and name", xhtmlControlController.getComponentName((Control)component));
+			if(name.equals(xhtmlControlController.getComponentName((Control)component)))	//TODO comment: the returned name can be null
+			{
+Debug.trace("using this component");
+				componentList.add(component);
+			}
+		}
+		for(final Component<?> childComponent:component)
+		{
+			getControlsByName(childComponent, name, componentList);
+		}
+	}
+
 
   /**Determines if the resource at a given URI exists.
   This version adds checks to see if the URI represents a valid application navigation path.
