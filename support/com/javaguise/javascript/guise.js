@@ -218,21 +218,30 @@ function GuiseAJAX()
 	/**Called in response to asynchronous HTTP communication.*/
 	GuiseAJAX.prototype._processHTTPResponse=function()
 	{
+		try
+		{
 //TODO del alert("processing asynch result");
 //TODO del alert("got status: "+HTTPCommunicator.prototype.status);
 //TODO del alert("response text: "+HTTPCommunicator.prototype.responseText);
-		if(HTTPCommunicator.prototype.status==200)	//if everything went OK
-		{
-			if(HTTPCommunicator.prototype.responseXML)
+			if(HTTPCommunicator.prototype.status==200)	//if everything went OK
 			{
-				GuiseAJAX.prototype.ajaxResponses.enqueue(HTTPCommunicator.prototype.responseXML);	//enqueue the response XML
-				setTimeout("GuiseAJAX.prototype.processAJAXResponses();", 1);	//process the AJAX responses later		
-				GuiseAJAX.prototype.processAJAXRequests();	//make sure there are no waiting AJAX requests
+				if(HTTPCommunicator.prototype.responseXML)
+				{
+					GuiseAJAX.prototype.ajaxResponses.enqueue(HTTPCommunicator.prototype.responseXML);	//enqueue the response XML
+					setTimeout("GuiseAJAX.prototype.processAJAXResponses();", 1);	//process the AJAX responses later		
+					GuiseAJAX.prototype.processAJAXRequests();	//make sure there are no waiting AJAX requests
+				}
+			}
+			else	//if there was an HTTP error TODO check for redirects
+			{
+		//TODO fix		throw xmlHTTP.status;	//throw the status code
 			}
 		}
-		else	//if there was an HTTP error TODO check for redirects
+		catch(exception)	//if a problem occurred
 		{
-	//TODO fix		throw xmlHTTP.status;	//throw the status code
+			//TODO log a warning
+alert(exception);
+			AJAX_URI=null;	//stop further AJAX communication
 		}
 	}
 
@@ -263,7 +272,7 @@ function GuiseAJAX()
 			catch(exception)	//if a problem occurred
 			{
 				//TODO log a warning
-//TODO del		alert(exception);
+alert(exception);
 				AJAX_URI=null;	//stop further AJAX communication
 			}
 		}
@@ -283,8 +292,6 @@ function GuiseAJAX()
 	}
 
 }
-
-
 
 /**The global object for AJAX communication with Guise.*/
 var guiseAJAX=new GuiseAJAX();
@@ -501,6 +508,24 @@ Any element in the hierarchy without an ID attribute will be ignored, although i
 */ 
 function patchAjaxElement(element)
 {
+		//do depth-first patching, allowing us to precheck children at the same time for later patching at this level in the hierarchy
+	var childNodeList=element.childNodes;	//get all the child nodes of the element
+	var childNodeCount=childNodeList.length;	//find out how many children there are
+	var childTextNodeCount=0;	//keep track of how many child text nodes there are
+	for(var i=0; i<childNodeCount; ++i)	//for each child node
+	{
+		var childNode=childNodeList[i];	//get this child node
+		switch(childNode.nodeType)	//see which type of child node this is
+		{
+			case Node.ELEMENT_NODE:	//element
+				patchAjaxElement(childNode);	//patch this child element
+				break;
+			case Node.TEXT_NODE:	//text
+				++childTextNodeCount;	//show that we found another text child
+				break;
+		}
+	}
+		//TODO make sure the Mozilla/IE attribute access functionality is robust, taking into account Mozilla's separate value structure
 	var id=element.getAttribute("id");	//get the element's ID, if there is one
 	if(id)	//if the element has an ID
 	{
@@ -522,15 +547,17 @@ function patchAjaxElement(element)
 //TODO fix					i=0;	//TODO fix; temporary to get out of looking at all IE's attributes
 				}
 			}
+				//patch in the new and changed attributes
 			var attributes=element.attributes;	//get the new element's attributes
 			for(var i=attributes.length-1; i>=0; --i)	//for each attribute
 			{
 				var attribute=attributes[i];	//get this attribute
-//TODO del alert("looking at attribute: "+attribute.nodeName);
 				var attributeName=attribute.nodeName;	//get the attribute name
 				var attributeValue=attribute.nodeValue;	//get the attribute value
+//TODO del alert("looking at attribute "+attributeName+" with value "+attributeValue);
+//TODO del alert("looking at old attribute "+attributeName+" with value "+oldElement.getAttribute(attributeName)+" other way "+oldElement[attributeName]);
 					//TODO fix for oldElement.class/oldElement.className on IE
-				if(oldElement.getAttribute(attributeName)!=attributeValue)	//if the old element has a different (or no) value for this attribute
+				if(oldElement[attributeName]!=attributeValue)	//if the old element has a different (or no) value for this attribute (Firefox maintains different values for element.getAttribute(attributeName) and element[attributeName])
 				{
 //TODO del alert("updating "+id+" attribute "+attributeName+" to new value "+attributeValue);
 					oldElement[attributeName]=attributeValue;	//update the old element's attribute (this format works for Firefox where oldElement.setAttribute("value", attributeValue) does not)
@@ -538,16 +565,57 @@ function patchAjaxElement(element)
 //TODO fix the focus problem if the user has focus on an element that gets changed in response to the event
 				}
 			}
-			//TODO remove all attributes from the old element that have been deleted; maybe doing this first will result in efficiencies in some cases
-		}
-	}
-	var childNodeList=element.childNodes;	//get all the child nodes of the element
-	for(var i=0; i<childNodeList.length; ++i)	//for each child node
-	{
-		var childNode=childNodeList[i];	//get this child node
-		if(childNode.nodeType==Node.ELEMENT_NODE)	//if this is a child node
-		{
-			patchAjaxElement(childNode);	//patch this child element
+				//patch in the new child element hierarchy
+			var oldChildNodeList=oldElement.childNodes;	//get all the child nodes of the old element
+			var oldChildNodeCount=oldChildNodeList.length;	//find out how many old children there are
+			if(childNodeCount>0)	//if the new element has child nodes
+			{
+					//patch any changed text
+				if(childTextNodeCount==childNodeCount)	//if all the child nodes are text nodes
+				{
+					var onlyChangeValues=false;	//see if we can get by with just changing text node values
+					if(oldChildNodeCount==childNodeCount)	//if the old element has the same number of children as the new element
+					{
+						onlyChangeValues=true;	//we may get away with only changing values after all
+						for(var i=0; i<oldChildNodeCount; ++i)	//look at each old child node
+						{
+							if(oldChildNodeList[i].nodeType!=childNodeList[i].nodeType)	//if the old child element is a different type than the new one
+							{
+								onlyChangeValues=false;	//we'll have to actually change around child nodes
+								break;	//stop looking for difficulties---we just found one
+							}
+						}
+					}
+					if(onlyChangeValues)	//if we think we can simply change text node values
+					{
+						for(var i=0; i<childNodeCount; ++i)	//for each new child node
+						{
+								//TODO later check for text
+							oldChildNodeList[i].nodeValue=childNodeList[i].nodeValue;	//copy the text over to the old node
+						}
+					}
+					else	//if we have to rearrange the child nodes
+					{
+						for(var i=oldChildNodeCount-1; i>=0; --i)	//for all of the old nodes
+						{
+							oldElement.removeChild(oldChildNodeList[i]);	//remove this child
+						}
+						for(var i=0; i<childNodeCount; ++i)	//for each new child node
+						{
+							var childNode=childNodeList[i];	//get this child node
+								//TODO later check for text
+							oldElement.appendChild(document.createTextNode(childNode.nodeValue));	//create and append an equivalent text node
+						}
+					}
+				}
+			}
+			else	//if the element has no child nodes, remove all the child nodes from the old element
+			{
+				for(var i=oldChildNodeCount-1; i>=0; --i)	//for all of the old nodes
+				{
+					oldElement.removeChild(oldChildNodeList[i]);	//remove this child
+				}
+			}
 		}
 	}
 }
