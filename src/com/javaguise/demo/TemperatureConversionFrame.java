@@ -1,7 +1,6 @@
 package com.javaguise.demo;
 
 import com.garretwilson.beans.*;
-import com.garretwilson.util.Debug;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
 import com.javaguise.event.ActionEvent;
@@ -27,7 +26,7 @@ public class TemperatureConversionFrame extends DefaultFrame
 	private final TextControl<Float> temperatureInput;
 	private final TextControl<Float> temperatureOutput;
 	private final CheckControl celsiusCheckControl;
-	private final CheckControl farenheitCheckControl;
+	private final CheckControl fahrenheitCheckControl;
 
 	/**Guise session constructor.
 	@param session The Guise session that owns this frame.
@@ -42,6 +41,13 @@ public class TemperatureConversionFrame extends DefaultFrame
 		temperatureInput=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
 		temperatureInput.getModel().setLabel("Input Temperature");	//add a label to the text input control
 		temperatureInput.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
+		temperatureInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<Float>()	//listen for temperature changes
+				{
+					public void propertyValueChange(final PropertyValueChangeEvent<Float> propertyValueChangeEvent)	//if the input temperature changes
+					{
+						convertTemperature();	//convert the temperature						
+					}
+				});		
 		inputPanel.add(temperatureInput);	//add the input control to the input panel
 		temperatureOutput=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
 		temperatureOutput.getModel().setLabel("Output Temperature");	//add a label to the text output control
@@ -60,18 +66,18 @@ public class TemperatureConversionFrame extends DefaultFrame
 		celsiusCheckControl.getModel().setLabel("Celsius");	//set the label of the check to indicate the scale
 		try
 		{
-			celsiusCheckControl.getModel().setValue(Boolean.TRUE);	//default to converting from Celsius to Farenheit
+			celsiusCheckControl.getModel().setValue(Boolean.TRUE);	//default to converting from Celsius to Fahrenheit
 		}
 		catch(final ValidationException validationException)	//we have no validator installed in the check control model, so we don't expect changing its value ever to cause any problems
 		{
 			throw new AssertionError(validationException);
 		}
 		scalePanel.add(celsiusCheckControl);	//add the Celsius check control to the panel	
-		farenheitCheckControl=new CheckControl(session, CheckControl.CheckType.ELLIPSE);	//create a check control for the Farenheit scale, using an ellipse check are
-		farenheitCheckControl.getModel().setLabel("Farenheit");	//set the label of the check to indicate the scale
-		scalePanel.add(farenheitCheckControl);	//add the Farenheit check control to the panel	
-			//create a mutual exclusion policy group and add the Celsius and Farenheit check box boolean value models to get radio button functionality
-		final ModelGroup<ValueModel<Boolean>> radioButtonModelGroup=new MutualExclusionPolicyModelGroup(celsiusCheckControl.getModel(), farenheitCheckControl.getModel());
+		fahrenheitCheckControl=new CheckControl(session, CheckControl.CheckType.ELLIPSE);	//create a check control for the Fahrenheit scale, using an ellipse check are
+		fahrenheitCheckControl.getModel().setLabel("Fahrenheit");	//set the label of the check to indicate the scale
+		scalePanel.add(fahrenheitCheckControl);	//add the Fahrenheit check control to the panel	
+			//create a mutual exclusion policy group and add the Celsius and Fahrenheit check box boolean value models to get radio button functionality
+		final ModelGroup<ValueModel<Boolean>> radioButtonModelGroup=new MutualExclusionPolicyModelGroup(celsiusCheckControl.getModel(), fahrenheitCheckControl.getModel());
 		conversionPanel.add(scalePanel);	//add the scale panel to the conversion panel
 
 			//create a listener to listen for check control changes and update the temperature immediately (e.g. with AJAX on the web platform)
@@ -86,8 +92,8 @@ public class TemperatureConversionFrame extends DefaultFrame
 					}
 				};
 
-		celsiusCheckControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, checkControlListener);	//listen for the Celcius control changing
-		farenheitCheckControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, checkControlListener);	//listen for the Farenheit control changing
+		celsiusCheckControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, checkControlListener);	//listen for the Celsius control changing
+		fahrenheitCheckControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, checkControlListener);	//listen for the Fahrenheit control changing
 		
 			//conversion button
 		final Button convertButton=new Button(session);	//create a button for initiating the conversion
@@ -107,7 +113,6 @@ public class TemperatureConversionFrame extends DefaultFrame
 	/**Converts the temperature based upon the current UI values.*/
 	protected void convertTemperature()
 	{
-Debug.trace("converting temperature");
 		if(isValid())	//if this frame and all of its components have valid model values
 		{
 			final float inputValue=temperatureInput.getModel().getValue().floatValue();	//get the input value from the control
@@ -116,7 +121,7 @@ Debug.trace("converting temperature");
 			{
 				outputValue=(inputValue*9)/5+32;	//convert: (9c/5)+32
 			}
-			else if(farenheitCheckControl.getModel().getValue())	//if the Farenheit radio button is selected
+			else if(fahrenheitCheckControl.getModel().getValue())	//if the Fahrenheit radio button is selected
 			{
 				outputValue=((inputValue-32)*5)/9;	//convert: 5(f-32)/9							
 			}
@@ -124,7 +129,6 @@ Debug.trace("converting temperature");
 			{
 				throw new AssertionError("Expected one of the scale radio buttons to be selected.");
 			}
-Debug.trace("new output value:", outputValue);
 			try
 			{
 				temperatureOutput.getModel().setValue(new Float(outputValue));	//store the conversion result in the temperature output control

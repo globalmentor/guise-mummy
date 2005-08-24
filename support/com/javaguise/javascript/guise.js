@@ -4,6 +4,8 @@
 //
 //var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX communication should not occur.
 
+//TODO turn off AJAX when unloading
+
 //Array
 
 /**An enqueue() method for arrays, equivalent to Array.push().*/
@@ -240,7 +242,7 @@ function GuiseAJAX()
 		catch(exception)	//if a problem occurred
 		{
 			//TODO log a warning
-alert(exception);
+//TODO log alert(exception);
 			AJAX_URI=null;	//stop further AJAX communication
 		}
 	}
@@ -272,7 +274,7 @@ alert(exception);
 			catch(exception)	//if a problem occurred
 			{
 				//TODO log a warning
-alert(exception);
+//TODO log alert(exception);
 				AJAX_URI=null;	//stop further AJAX communication
 			}
 		}
@@ -537,13 +539,18 @@ function patchAjaxElement(element)
 			var oldAttributes=oldElement.attributes;	//get the old element's attributes
 			for(var i=oldAttributes.length-1; i>=0; --i)	//for each old attribute
 			{
-				var attribute=oldAttributes[i];	//get this attribute
-				var attributeName=attribute.nodeName;	//get the attribute name
-				var attributeValue=attribute.nodeValue;	//get the attribute value
+				var oldAttribute=oldAttributes[i];	//get this attribute
+				var oldAttributeName=oldAttribute.nodeName;	//get the attribute name
+				var oldAttributeValue=oldAttribute.nodeValue;	//get the attribute value
+				var attributeName=oldAttributeName;
+				if(oldAttributeName=="readOnly")	//TODO fix for other misspelled attributes, such as className
+				{
+					attributeName="readonly";
+				}
 				if(/*TODO fix or del attributeValue!=null && attributeValue.length>0 && */!element.getAttribute(attributeName))	//if there is really an attribute value (IE provides all possible attributes, even with those with no value) and the new element doesn't have this attribute
 				{
 //TODO del alert("ready to remove "+id+" attribute "+attributeName+" with current value "+attributeValue);
-					oldElement.removeAttribute(attributeName);	//remove the attribute normally (apparently no action will take place if performed on IE-specific attributes such as element.start)
+					oldElement.removeAttribute(oldAttributeName);	//remove the attribute normally (apparently no action will take place if performed on IE-specific attributes such as element.start)
 //TODO fix					i=0;	//TODO fix; temporary to get out of looking at all IE's attributes
 				}
 			}

@@ -428,6 +428,10 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	*/
 	public boolean isValid()
 	{
+		if(!getController().isValid())	//if the controller isn't valid
+		{
+			return false;	//although the model may be valid, its view representation is not
+		}
 		for(final Component<?> childComponent:this)	//for each child component
 		{
 			if(!childComponent.isValid())	//if this child component isn't valid

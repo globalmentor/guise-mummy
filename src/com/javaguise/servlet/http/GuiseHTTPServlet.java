@@ -363,37 +363,35 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 						}
 						guiseSession.setNavigationPath(navigationPath);	//make sure the Guise session has the correct navigation path
 						final Principal oldPrincipal=guiseSession.getPrincipal();	//get the old principal
-						try
+						if(guiseContext.getParameterListMap().size()>0)	//only query the view if there were submitted values---especially important for radio buttons and checkboxes, which must assume a value of false if nothing is submitted for them, thereby updating the model
 						{
-							if(guiseContext.getParameterListMap().size()>0)	//only query the view if there were submitted values---especially important for radio buttons and checkboxes, which must assume a value of false if nothing is submitted for them, thereby updating the model
+							guiseContext.setState(GuiseContext.State.QUERY_VIEW);	//update the context state for querying the view
+	//TODO del Debug.trace("ready to query the navigation frame view");
+							navigationFrame.queryView(guiseContext);		//tell the frame to query its view
+							guiseContext.setState(GuiseContext.State.DECODE_VIEW);	//update the context state for decoding the view
+							try
 							{
-								guiseContext.setState(GuiseContext.State.QUERY_VIEW);	//update the context state for querying the view
-		//TODO del Debug.trace("ready to query the navigation frame view");
-								navigationFrame.queryView(guiseContext);		//tell the frame to query its view
-								guiseContext.setState(GuiseContext.State.DECODE_VIEW);	//update the context state for decoding the view
 								navigationFrame.decodeView(guiseContext);		//tell the frame to decode its view
-			//TODO delete phase if not needed					guiseContext.setState(GuiseContext.State.VALIDATE_VIEW);	//update the context state for validating the view
-			//TODO delete phase if not needed					navigationFrame.validateView(guiseContext);		//tell the frame to validate its view
-								guiseContext.setState(GuiseContext.State.UPDATE_MODEL);	//update the context state for updating the model
+							}
+							catch(final ValidationsException validationsException)	//if there were any validation errors during validation
+							{
+								navigationFrame.addErrors(validationsException);	//store the validation error(s) so that the frame can report them to the user
+							}
+							guiseContext.setState(GuiseContext.State.UPDATE_MODEL);	//update the context state for updating the model
+							try
+							{
 								navigationFrame.updateModel(guiseContext);	//tell the frame to update its model
 							}
-								//TODO fix! if some components have an error, it will prevent other non-error components from appropriately querying and encoding there models; perhaps query and encode all components, but skip error components
-							guiseContext.setState(GuiseContext.State.QUERY_MODEL);	//update the context state for querying the model
-							navigationFrame.queryModel(guiseContext);		//tell the frame to query its model
-							guiseContext.setState(GuiseContext.State.ENCODE_MODEL);	//update the context state for encoding the model
-							navigationFrame.encodeModel(guiseContext);		//tell the frame to encode its model
+							catch(final ValidationsException validationsException)	//if there were any validation errors during validation
+							{
+								navigationFrame.addErrors(validationsException);	//store the validation error(s) so that the frame can report them to the user
+							}									
 						}
-						catch(final ValidationsException validationsException)	//if there were any validation errors during validation
-						{
-							navigationFrame.addErrors(validationsException);	//store the validation error(s) so that the frame can report them to the user
-						}
-		/*TODO del when works
-						catch(final ValidationException validationException)	//if there were any validation errors while updating the model
-						{
-							navigationFrame.addError(validationException);	//store the validation error so that the frame can report it to the user
-						}
-		*/
-						guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view; make the change now in case queued model changes want to navigate, and an error was thrown when updating the model)
+						guiseContext.setState(GuiseContext.State.QUERY_MODEL);	//update the context state for querying the model
+						navigationFrame.queryModel(guiseContext);		//tell the frame to query its model
+						guiseContext.setState(GuiseContext.State.ENCODE_MODEL);	//update the context state for encoding the model
+						navigationFrame.encodeModel(guiseContext);		//tell the frame to encode its model
+						guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view; make the change now in case queued model changes want to navigate, and an error was thrown when updating the model) TODO see if this comment is relevant after new local-error-catching changes above
 						if(!ObjectUtilities.equals(oldPrincipal, guiseSession.getPrincipal()))	//if the principal has changed after updating the model
 						{
 							throw new HTTPMovedTemporarilyException(guiseContext.getNavigationURI());	//redirect to the same page, which will generate a new request with no POST parameters, which would likely change the principal again)
@@ -506,16 +504,16 @@ Debug.trace("got an AJAX request for navigation path", navigationPath);
 				final String parameterValue=parameterValues.size()>0 ? asInstance(parameterValues.get(0), String.class) : null;	//get the first parameter value
 */
 				//TODO don't re-update nested components (less important for controls, which don't have nested components) 
-Debug.trace("looking for component with name", parameterName);
+//TODO del Debug.trace("looking for component with name", parameterName);
 				getControlsByName(navigationFrame, parameterName, requestedComponents);	//get all components identified by this name
 			}
 			if(!requestedComponents.isEmpty())	//if components were requested
 			{
-				final Set<Component<?>> affectedComponents=new HashSet<Component<?>>();	//we'll keep track of components that were affected by this update cycle
+				final Set<Component<?>> affectedComponents=new HashSet<Component<?>>(requestedComponents);	//we'll keep track of components that were affected by this update cycle (always include the requested components, just in case they changed their views but the model did not change---if an erroneous view value changed back to the previous, non-erroneous value, for example) 
 				guiseContext.setState(GuiseContext.State.QUERY_VIEW);	//update the context state for querying the view
 				for(final Component<?> component:requestedComponents)	//for each requested component
-					{
-Debug.trace("AJAX component:", component);
+				{
+//TODO del Debug.trace("AJAX component:", component);
 					component.queryView(guiseContext);		//tell the component to query its view
 				}
 				guiseContext.setState(GuiseContext.State.DECODE_VIEW);	//update the context state for decoding the view
@@ -557,21 +555,21 @@ Debug.trace("AJAX component:", component);
 					}
 				}
 				guiseContext.setState(GuiseContext.State.INACTIVE);	//deactivate the context so that any model update events will be generated			
-Debug.trace("we now have events:", guiseContext.getEventList().size());
+//TODO del Debug.trace("we now have events:", guiseContext.getEventList().size());
 				for(final EventObject contextEvent:guiseContext.getEventList())	//for each event generated in this context
 				{
-Debug.trace("context event:", contextEvent);
+//				TODO del Debug.trace("context event:", contextEvent);
 					final Object source=contextEvent.getSource();	//get the event source
 					if(source instanceof Model)	//if this was a model change
 					{
 						affectedComponents.addAll(AbstractModelComponent.getModelComponents(navigationFrame, (Model)source));	//get all components that use this model
 					}
 				}
-Debug.trace("we now have affected components:", affectedComponents.size());
+//			TODO del Debug.trace("we now have affected components:", affectedComponents.size());
 				guiseContext.setState(GuiseContext.State.QUERY_MODEL);	//update the context state for querying the model
 				for(final Component<?> affectedComponent:affectedComponents)	//for each component affected by this update cycle
 				{
-Debug.trace("affected component:", affectedComponent);
+//				TODO del Debug.trace("affected component:", affectedComponent);
 					affectedComponent.queryModel(guiseContext);		//tell the component to query its model
 				}
 				guiseContext.setState(GuiseContext.State.ENCODE_MODEL);	//update the context state for encoding the model
@@ -595,7 +593,7 @@ Debug.trace("affected component:", affectedComponent);
 	protected <T extends Component<?>> void getControlsByName(final T component, final String name, final Set<Component<?>> componentSet)
 	{
 			//TODO check first that the component is a control; that should be much faster
-		final Controller<? extends GuiseContext<?>, ? super T> controller=component.getController();
+		final Controller<? extends GuiseContext<?>, ?> controller=component.getController();
 		if(controller instanceof XHTMLControlController)
 		{
 			final XHTMLControlController xhtmlControlController=(XHTMLControlController)controller;
