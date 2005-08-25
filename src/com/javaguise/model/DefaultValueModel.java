@@ -12,7 +12,7 @@ public class DefaultValueModel<V> extends AbstractValueModel<V>
 {
 
 	/**The input value, or <code>null</code> if there is no value.*/
-	private V value=null;
+	private V value;
 
 		/**@return The input value, or <code>null</code> if there is no input value.*/
 		public V getValue() {return value;}
@@ -62,7 +62,19 @@ public class DefaultValueModel<V> extends AbstractValueModel<V>
 	*/
 	public DefaultValueModel(final GuiseSession<?> session, final Class<V> valueClass)
 	{
+		this(session, valueClass, null);	//construct the class with a null initial value
+	}
+
+	/**Constructs a value model indicating the type of value it can hold, along with an initial value.
+	@param session The Guise session that owns this model.
+	@param valueClass The class indicating the type of value held in the model.
+	@param initialValue The initial value, which will not be validated.
+	@exception NullPointerException if the given session and/or class object is <code>null</code>.
+	*/
+	public DefaultValueModel(final GuiseSession<?> session, final Class<V> valueClass, final V initialValue)
+	{
 		super(session, valueClass);	//construct the parent class
+		this.value=initialValue;	//save the initial value
 	}
 
 }

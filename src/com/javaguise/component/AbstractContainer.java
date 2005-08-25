@@ -71,7 +71,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	{
 		if(component.getParent()!=null)	//if this component has already been added to container
 		{
-			throw new IllegalArgumentException("Component "+component+" is already a member of a container, "+component.getParent()+".");
+			throw new IllegalArgumentException("Component "+component+" is already a member of a component, "+component.getParent()+".");
 		}
 		final T layoutConstraints=constraints!=null ? (T)constraints : layout.createDefaultConstraints(component);	//create default constraints if we need to TODO use the layout constraints class to cast the value
 		componentList.add(component);	//add the component to the list
@@ -87,7 +87,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	{
 		if(component.getParent()!=this)	//if this component is not a member of this container
 		{
-			throw new IllegalArgumentException("Component "+component+" is not member of a container "+this+".");
+			throw new IllegalArgumentException("Component "+component+" is not member of container "+this+".");
 		}
 		getLayout().removeConstraints(component);	//remove the constraints for this component
 		componentList.remove(component);	//remove the component to the list

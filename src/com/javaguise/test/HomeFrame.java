@@ -299,6 +299,17 @@ Debug.trace("list control changed value to", newValue);
 		}
 		contentPanel.add(multiplicationTable);
 
+		final TreeControl treeControl=new TreeControl(session);
+		final TreeNodeModel<String> firstItem=new DefaultTreeNodeModel<String>(session, String.class, "First Item");
+		firstItem.add(new DefaultTreeNodeModel<String>(session, String.class, "Sub Item A"));
+		firstItem.add(new DefaultTreeNodeModel<String>(session, String.class, "Sub Item B"));
+		treeControl.getModel().getRootNode().add(firstItem);
+		treeControl.getModel().getRootNode().add(new DefaultTreeNodeModel<String>(session, String.class, "Second Item"));
+		treeControl.getModel().getRootNode().add(new DefaultTreeNodeModel<String>(session, String.class, "Third Item"));
+
+		contentPanel.add(treeControl);
+		
+
 		add(contentPanel, RegionLayout.CENTER_CONSTRAINTS);	//add the content panel in the center
 
 		add(createMenu(session, Orientation.Flow.LINE), RegionLayout.PAGE_START_CONSTRAINTS);	//add the pulldown menu at the top

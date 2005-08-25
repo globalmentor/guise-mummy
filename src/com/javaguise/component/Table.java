@@ -5,15 +5,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import com.garretwilson.lang.ObjectUtilities;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
 import com.javaguise.validator.Validator;
 
 /**A table component.
-The generic constructors are to be preferred. They create a genericized model and ensure that all the column types extend the table model cell types,
-but because of erasure the models created are otherwise identical.
 @author Garret Wilson
 */
 public class Table extends AbstractModelComponent<TableModel, Table>
@@ -43,7 +40,7 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 	/**Returns the given cell representation strategy assigned to produce representation components for the given column.
 	@param <V> The type of value the column represents.
 	@param column The column with which the strategy should be associated.
-	@return The strategy for generating components to represent values in the given column.
+	@return The strategy for generating components to represent values in the given column, or <code>null</code> if there is no associated representation strategy.
 	*/	
 	@SuppressWarnings("unchecked")	//we check the generic types before putting them in the map, so it's fine to cast the retrieved values
 	public <V> CellRepresentationStrategy<? super V> getCellRepresentationStrategy(final TableColumnModel<V> column)
@@ -273,10 +270,10 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 				}
 				else	//for all other values
 				{
-					return new TextControl<C>(session, id, valueModel);	//generate a message containing a text input control for the value model
+					return new TextControl<C>(session, id, valueModel);	//generate a text input control for the value model
 				}
 			}
-			else	//if the component should not be editable, return a message control
+			else	//if the component should not be editable, return a message component
 			{
 				return new Message(session, id, new DefaultCellMessageModel<C>(session, model, cell));	//create a message component containing a message model representing the value's string value				
 			}

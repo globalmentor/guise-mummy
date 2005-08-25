@@ -282,7 +282,7 @@ public class ListControl<V> extends AbstractListSelectControl<V, ListSelectModel
 					: null;	//otherwise return null
 		}
 
-		/**Determines an identier for the given object.
+		/**Determines an identifier for the given object.
 		This implementation returns the hexadecimal representation of the object's hash code appended to the word "hash".
 		@param value The value for which an identifier should be returned.
 		@return A string identifying the value, or <code>null</code> if the provided value is <code>null</code>.
