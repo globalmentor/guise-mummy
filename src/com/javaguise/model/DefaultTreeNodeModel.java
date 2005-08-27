@@ -13,6 +13,27 @@ import com.javaguise.session.GuiseSession;
 public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements TreeNodeModel<V>
 {
 
+	/**Whether the node is expanded, showing its children, if any.*/
+	private boolean expanded=false;
+
+		/**@return Whether the node is expanded, showing its children, if any.*/
+		public boolean isExpanded() {return expanded;}
+
+		/**Sets whether the node is expanded, showing its children, if any.
+		This is a bound property of type <code>Boolean</code>.
+		@param newExpanded <code>true</code> if the node is expanded
+		@see TreeNodeModel#EXPANDED_PROPERTY
+		*/
+		public void setExpanded(final boolean newExpanded)
+		{
+			if(expanded!=newExpanded)	//if the value is really changing
+			{
+				final boolean oldExpanded=expanded;	//get the old value
+				expanded=newExpanded;	//actually change the value
+				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldExpanded), Boolean.valueOf(newExpanded));	//indicate that the value changed
+			}			
+		}
+
 	/**The list of child tree nodes.*/ 
 	private final List<TreeNodeModel<?>> treeNodeList=new CopyOnWriteArrayList<TreeNodeModel<?>>();
 
@@ -104,7 +125,6 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 				parent=newParent;	//this is really our parent; make a note of it
 			}
 		}
-
 
 	/**Determines the tree model in which this tree node is located.
 	This implementation delegates to the parent tree node, if available.

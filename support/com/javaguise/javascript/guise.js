@@ -6,6 +6,15 @@
 
 //TODO turn off AJAX when unloading
 
+/**The class prefix of a tree node.*/
+var TREE_NODE_CLASS_PREFIX="treeNode-";
+/**The class suffix of a collapsed tree node.*/
+var TREE_NODE_COLLAPSED_CLASS_SUFFIX="-collapsed";
+/**The class suffix of an expanded tree node.*/
+var TREE_NODE_EXPANDED_CLASS_SUFFIX="-expanded";
+/**The class suffix of a leaf tree node.*/
+//TODO del var TREE_NODE_LEAF_CLASS_SUFFIX="-leaf";
+
 //Array
 
 /**An enqueue() method for arrays, equivalent to Array.push().*/
@@ -368,10 +377,10 @@ function addLoadListener(func)
 	else	//if there is a window onload function
 	{
 		window.onload=function()	//create a new function
-		{
-			oldonload();	//call the old function using closure
-			func();	//call the new function
-		}
+				{
+					oldonload();	//call the old function using closure
+					func();	//call the new function
+				}
 	}
 }
 
@@ -379,7 +388,7 @@ function addLoadListener(func)
 @param event The event information, or null if no event information is available (e.g. on IE).
 @return A W3C-compliant event object.
 */
-function getEvent(event)
+function getW3CEvent(event)
 {
 /*TODO del
 alert("looking at event: "+event);
@@ -407,6 +416,17 @@ alert("looking at event src element: "+event.srcElement);
 		//TODO assert event.keyCode
 		event.data=event.keyCode;	//assign a W3C data property
 	}
+	if(!event.stopPropagation)	//if there is no method for stopping propagation TODO add workaround for Safari, which has this method but doesn't actually stop propagation
+	{
+		//TODO assert window.event && window.event.cancelBubble
+		if(window.event && typeof window.event.cancelBubble=="boolean")	//if the event has a cancel bubble property (e.g. IE)
+		{
+			event.stopPropagation=function()	//create a new function to stop propagation
+					{
+						window.event.cancelBubble=true;	//stop bubbling the IE way
+					}
+		}
+	}
 	return event;	//return our event
 }
 
@@ -428,6 +448,7 @@ function onWindowLoad()
 function installListeners()
 {
 //TODO del	alert("installing listeners");
+		//install input listeners
 	var inputElementList=document.getElementsByTagName("input");	//get all input elements
 	for(var i=0; i<inputElementList.length; ++i)	//for each input element
 	{
@@ -444,35 +465,53 @@ function installListeners()
 			addEvent(inputElement, "click", onCheckInputChange, false);
 		}
 	}
+		//install select listeners
 	var selectElementList=document.getElementsByTagName("select");	//get all select elements
 	for(var i=0; i<selectElementList.length; ++i)	//for each select element
 	{
 		var selectElement=selectElementList[i];	//get this select element
 		addEvent(selectElement, "change", onSelectChange, false);
 	}
+		//install tree node listeners
+	var liElementList=document.getElementsByTagName("li");	//get all list item elements
+	for(var i=0; i<liElementList.length; ++i)	//for each li element
+	{
+		var liElement=liElementList[i];	//get this li element
+		var className=liElement.className;	//get the style class
+		if(className.indexOf(TREE_NODE_CLASS_PREFIX)==0)	//if this is a tree node
+		{
+			addEvent(liElement, "click", onTreeNodeClick, false);	//listen for clicks
+		}
+	}
 }
 
+/**Called when the contents of a text input changes.
+@param event The object describing the event.
+*/
 function onTextInputChange(event)
 {
 	if(AJAX_URI)	//if AJAX is enabled
 	{
-		var w3cEvent=getEvent(event);	//get the W3C event object
+		var w3cEvent=getW3CEvent(event);	//get the W3C event object
 		var textInput=w3cEvent.target;	//get the target of the event
 	//TODO del alert("an input changed! "+textInput.id);
 		var httpRequestInfo=new HTTPRequestInfo();	//create new HTTP request information
 		httpRequestInfo.addParameter(textInput.name, textInput.value);
 		guiseAJAX.sendAJAX(httpRequestInfo);	//send the AJAX request
+		w3cEvent.stopPropagation();	//tell the event to stop bubbling
 	}
 }
 
+/**Called when a checkbox is activated.
+@param event The object describing the event.
+*/
 function onCheckInputChange(event)
 {
-	//TODO fix Mozilla bug that doesn't see an onclick of a checkbox label changes the checkbox
 	if(AJAX_URI)	//if AJAX is enabled
 	{
-		var w3cEvent=getEvent(event);	//get the W3C event object
+		var w3cEvent=getW3CEvent(event);	//get the W3C event object
 		var checkInput=w3cEvent.target;	//get the target of the event
-		if(checkInput.nodeName=="label" && checkInput.htmlFor)	//if the check input's label was passed as the target (as occurs in Mozilla)
+		if(checkInput.nodeName.toLowerCase()=="label" && checkInput.htmlFor)	//if the check input's label was passed as the target (as occurs in Mozilla)
 		{
 			checkInput=document.getElementById(checkInput.htmlFor);	//the real target is the check input with which this label is associated; the htmlFor attribute is the ID of the element, not the actual element as Danny Goodman says in JavaScript Bible 5th Edition (649)
 		}
@@ -480,14 +519,18 @@ function onCheckInputChange(event)
 		var httpRequestInfo=new HTTPRequestInfo();	//create new HTTP request information
 		httpRequestInfo.addParameter(checkInput.name, checkInput.checked ? checkInput.id : "");
 		guiseAJAX.sendAJAX(httpRequestInfo);	//send the AJAX request
+		w3cEvent.stopPropagation();	//tell the event to stop bubbling
 	}
 }
 
+/**Called when a select control changes.
+@param event The object describing the event.
+*/
 function onSelectChange(event)
 {
 	if(AJAX_URI)	//if AJAX is enabled
 	{
-		var w3cEvent=getEvent(event);	//get the W3C event object
+		var w3cEvent=getW3CEvent(event);	//get the W3C event object
 		var select=w3cEvent.target;	//get the target of the event
 	//TODO del alert("a select changed! "+select.id);
 		var options=select.options;	//get the select options
@@ -501,8 +544,75 @@ function onSelectChange(event)
 			}
 		}
 		guiseAJAX.sendAJAX(httpRequestInfo);	//send the AJAX request
+		w3cEvent.stopPropagation();	//tell the event to stop bubbling
 	}
 }
+
+/**Called when a checkbox is activated.
+@param event The object describing the event.
+*/
+function onTreeNodeClick(event)
+{
+//TODO del 	alert("tree node clicked");
+	if(AJAX_URI)	//if AJAX is enabled
+	{
+		var w3cEvent=getW3CEvent(event);	//get the W3C event object
+		var treeNode=w3cEvent.target;	//get the target of the event
+//TODO del alert("target of tree click: "+treeNode.nodeName);
+		while(treeNode.nodeName.toLowerCase()!="li" || !treeNode.className || treeNode.className.indexOf(TREE_NODE_CLASS_PREFIX)<0)	//a child of the tree node likely got the event; look up the chain until we find the tree node parent
+		{
+			treeNode=treeNode.parentNode;	//get the node parent
+			if(!treeNode)	//if we ran out of nodes without finding a tree node
+			{
+				return;	//don't process the event
+			}
+		}
+		w3cEvent.stopPropagation();	//tell the event to stop bubbling
+//TODO del	alert("ID of tree node: "+treeNode.lastChild.id);
+		var oldClassName=treeNode.className;	//get the class name of the tree node
+/*TODO del
+alert("target node name: "+w3cEvent.target.nodeName);
+alert("target class name: "+w3cEvent.target.className);
+alert("target parent is the tree node?: "+(w3cEvent.target.parentNode==treeNode));
+alert("target parent node name: "+w3cEvent.target.parentNode.nodeName);
+*/
+		if(w3cEvent.target.nodeName.toLowerCase()=="ul" && w3cEvent.target.className==oldClassName && w3cEvent.target.parentNode==treeNode)	//if the user clicked on the tree node's list of child nodes
+		{
+			return;	//don't toggle the list if the user clicked on the children
+		}
+		var isCollapsed=oldClassName.indexOf(TREE_NODE_COLLAPSED_CLASS_SUFFIX)>=0;	//see if this tree node has a class name representing the collapsed state
+		var isExpanded=oldClassName.indexOf(TREE_NODE_EXPANDED_CLASS_SUFFIX)>=0;	//see if this tree node has a class name representing the expanded state
+		if(isCollapsed || isExpanded)	//if the tree node is collapsed or expanded (ignore leaf nodes)
+		{
+			var childNodeList=treeNode.childNodes;	//get all the child nodes of the element
+			var childNodeCount=childNodeList.length;	//find out how many children there are
+			for(var i=childNodeList.length-1; i>=0; --i)	//for each child node (the sub-list is probably the last one)
+			{
+				var childNode=childNodeList[i];	//get this child node
+				if(childNode.nodeType==Node.ELEMENT_NODE && childNode.nodeName.toLowerCase()=="ul" && childNode.className==oldClassName)	//if there is a child ul element with the same class name
+				{
+					if(isExpanded)	//if the tree node is expanded
+					{
+						var newClassName=oldClassName.replace(TREE_NODE_EXPANDED_CLASS_SUFFIX, TREE_NODE_COLLAPSED_CLASS_SUFFIX);	//convert from expanded to collapsed
+					}
+					else	//if the tree node is collapsed
+					{
+						var newClassName=oldClassName.replace(TREE_NODE_COLLAPSED_CLASS_SUFFIX, TREE_NODE_EXPANDED_CLASS_SUFFIX);	//convert from expanded to collapsed				
+					}
+					childNode.className=newClassName;	//update the child list class
+					treeNode.className=newClassName;	//update class of the the tree node itself to match
+					break;	//we've switched states, so stop looking for a tree child
+				}
+				}
+		}
+/*TODO fix
+		var httpRequestInfo=new HTTPRequestInfo();	//create new HTTP request information
+		httpRequestInfo.addParameter(checkInput.name, checkInput.checked ? checkInput.id : "");
+		guiseAJAX.sendAJAX(httpRequestInfo);	//send the AJAX request
+*/
+	}
+}
+
 
 /**Patches an element and its children into the existing element hierarchy.
 Any element in the hierarchy without an ID attribute will be ignored, although its children will be processed.

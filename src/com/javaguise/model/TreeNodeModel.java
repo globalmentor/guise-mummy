@@ -1,11 +1,26 @@
 package com.javaguise.model;
 
+import static com.garretwilson.lang.ClassUtilities.getPropertyName;
+
 /**A node in a tree model.
 @author Garret Wilson
 @param <V> The type of value contained in the tree node.
 */
 public interface TreeNodeModel<V> extends ValueModel<V>, Iterable<TreeNodeModel<?>>
 {
+
+	/**The expanded bound property.*/
+	public final static String EXPANDED_PROPERTY=getPropertyName(TreeNodeModel.class, "expanded");
+
+	/**@return Whether the node is expanded, showing its children, if any.*/
+	public boolean isExpanded();
+
+	/**Sets whether the node is expanded, showing its children, if any.
+	This is a bound property of type <code>Boolean</code>.
+	@param newExpanded <code>true</code> if the node is expanded
+	@see #EXPANDED_PROPERTY
+	*/
+	public void setExpanded(final boolean newExpanded);
 
 	/**@return Whether this tree node has children. This implementation delegates to the tree node list.*/
 	public boolean hasChildren();

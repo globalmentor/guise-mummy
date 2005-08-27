@@ -44,6 +44,16 @@ public class GuiseCSSStyleConstants
 	/**The CSS class postfix indicating right-to-left line direction.*/
 	public final static String COMPONENT_RTL_CLASS_POSTFIX="-rtl";
 
+		//tree nodes
+	/**The CSS class for a tree node.*/
+	public final static String TREE_NODE_CLASS="treeNode";
+	/**The CSS class suffix indicating that a tree node is collapsed.*/
+	public final static String TREE_NODE_COLLAPSED_CLASS_SUFFIX="-collapsed";
+	/**The CSS class suffix indicating that a tree node is expanded.*/
+	public final static String TREE_NODE_EXPANDED_CLASS_SUFFIX="-expanded";
+	/**The CSS class suffix indicating that a tree node is a leaf node and is neither expanded nor collapsed.*/
+	public final static String TREE_NODE_LEAF_CLASS_SUFFIX="-leaf";
+
 	//layout
 
 	/**The CSS class for any enclosing element needed for region layout.*/

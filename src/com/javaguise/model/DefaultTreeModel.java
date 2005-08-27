@@ -4,7 +4,10 @@ import com.javaguise.event.*;
 import com.javaguise.session.GuiseSession;
 
 /**A default implementation of a tree model.
+If no root node is specified, the root node will be a dummy root node that will not be displayed.
+If a dummy root node is used, it will automatically be set to an expanded state.
 @author Garret Wilson
+@see DummyTreeNodeModel
 */
 public class DefaultTreeModel extends AbstractControlModel implements TreeModel
 {
@@ -38,14 +41,13 @@ public class DefaultTreeModel extends AbstractControlModel implements TreeModel
 		}
 */
 
-	/**Session constructor with a default root tree node.
+	/**Session constructor with a dummy root tree node.
 	@param session The Guise session that owns this model.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
 	public DefaultTreeModel(final GuiseSession<?> session)
 	{
-			//TODO decide what type to use for the default root node, and what type of editor to use in the default editor (Object won't work with the default text input component)
-		this(session, new DefaultTreeNodeModel<String>(session, String.class));	//create a default root node
+		this(session, new DummyTreeNodeModel(session));	//create a dummy root node
 	}
 
 	/**Session constructor.
@@ -57,6 +59,10 @@ public class DefaultTreeModel extends AbstractControlModel implements TreeModel
 	{
 		super(session);	//construct the parent class
 		this.rootNode=rootNode;	//save the root node
+		if(rootNode instanceof DummyTreeNodeModel)	//if a dummy tree node model is being used
+		{
+			rootNode.setExpanded(true);	//expand the dummy root, as the root node itself will not normally be available to the user
+		}
 	}
 
 }
