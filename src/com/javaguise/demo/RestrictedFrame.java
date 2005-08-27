@@ -31,7 +31,7 @@ public class RestrictedFrame extends DefaultFrame
 		super(session);	//construct the parent class, defaulting to a region layout
 		getModel().setLabel("Guise\u2122 Demonstration: Restricted");	//set the frame title
 		
-		final Panel restrictionPanel=new Panel(session, new FlowLayout(Orientation.Flow.PAGE));	//create the authorization panel flowing vertically
+		final LayoutPanel restrictionPanel=new LayoutPanel(session, new FlowLayout(Orientation.Flow.PAGE));	//create the authorization panel flowing vertically
 		
 			//heading
 		final Heading heading=new Heading(session, 0);	//create a top-level heading

@@ -42,7 +42,7 @@ public class EditUsersFrame extends DefaultFrame
 			Collections.sort(userListControl.getModel());	//sort the user list model (each user implements Comparable)
 		}
 		
-		final Panel buttonPanel=new Panel(session, new FlowLayout(Orientation.Flow.LINE));	//create the button panel flowing horizontally
+		final LayoutPanel buttonPanel=new LayoutPanel(session, new FlowLayout(Orientation.Flow.LINE));	//create the button panel flowing horizontally
 			//add button
 		final Button addButton=new Button(session);	//create the add button
 		addButton.getModel().setLabel("Add User");	//set the text of the add button

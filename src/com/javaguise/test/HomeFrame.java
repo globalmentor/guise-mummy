@@ -39,10 +39,10 @@ public class HomeFrame extends DefaultFrame
 		super(session, id);	//construct the parent
 		getModel().setLabel("Home Frame Test");	//set the frame label
 
-		final Panel contentPanel=new Panel(session, new FlowLayout(Orientation.Flow.PAGE)); 
+		final LayoutPanel contentPanel=new LayoutPanel(session, new FlowLayout(Orientation.Flow.PAGE)); 
 
 		//input panel
-		final Panel inputPanel=new Panel(session, new FlowLayout(Orientation.Flow.PAGE));	//create the input panel flowing vertically
+		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(Orientation.Flow.PAGE));	//create the input panel flowing vertically
 		final TextControl<Float> inputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
 		inputTextControl.getModel().setLabel("Input Number");	//add a label to the text input control
 		inputTextControl.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
@@ -111,7 +111,7 @@ Debug.trace("list control changed value to", newValue);
 		testLabel.getModel().setLabel("This is label text from the model.");
 		contentPanel.add(testLabel);	//add a new label
 		
-		final Panel buttonPanel=new Panel(session, "testButtonPanel", new FlowLayout(Orientation.Flow.LINE));	//create a panel flowing horizontally
+		final LayoutPanel buttonPanel=new LayoutPanel(session, "testButtonPanel", new FlowLayout(Orientation.Flow.LINE));	//create a panel flowing horizontally
 
 		final Button testButton=new Button(session, "testButton");
 		testButton.getModel().setLabel("Click here to go to the 'Hello World' demo.");
@@ -188,10 +188,10 @@ Debug.trace("list control changed value to", newValue);
 	
 	
 	
-		final Panel horizontalPanel=new Panel(session, new FlowLayout(Orientation.Flow.LINE));	//create a panel flowing horizontally
+		final LayoutPanel horizontalPanel=new LayoutPanel(session, new FlowLayout(Orientation.Flow.LINE));	//create a panel flowing horizontally
 	
 	
-		final Panel booleanPanel=new Panel(session, new FlowLayout(Orientation.Flow.PAGE));	//create a panel flowing vertically
+		final GroupPanel booleanPanel=new GroupPanel(session, new FlowLayout(Orientation.Flow.PAGE));	//create a panel flowing vertically
 		booleanPanel.getModel().setLabel("Check one of these");
 		final CheckControl check1=new CheckControl(session, "check1");
 		check1.setCheckType(CheckControl.CheckType.ELLIPSE);

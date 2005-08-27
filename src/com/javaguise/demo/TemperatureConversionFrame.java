@@ -17,7 +17,7 @@ import com.javaguise.validator.ValueRequiredValidator;
 Copyright © 2005 GlobalMentor, Inc.
 Demonstrates panels, float input controls, float input validation, radio button controls,
 	dynamic updates (e.g. AJAX on the web platform),
-	required value validation, read-only controls, and style IDs.
+	required value validation, read-only controls, and group panels.
 @author Garret Wilson
 */
 public class TemperatureConversionFrame extends DefaultFrame
@@ -37,7 +37,7 @@ public class TemperatureConversionFrame extends DefaultFrame
 		getModel().setLabel("Guise\u2122 Demonstration: Temperature Conversion");	//set the frame title	
 
 			//input panel
-		final Panel inputPanel=new Panel(session, new FlowLayout(Orientation.Flow.PAGE));	//create the input panel flowing vertically
+		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(Orientation.Flow.PAGE));	//create the input panel flowing vertically
 		temperatureInput=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
 		temperatureInput.getModel().setLabel("Input Temperature");	//add a label to the text input control
 		temperatureInput.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
@@ -56,12 +56,11 @@ public class TemperatureConversionFrame extends DefaultFrame
 
 		add(inputPanel);	//add the input panel to the temperature frame
 
-		final Panel conversionPanel=new Panel(session, new FlowLayout(Orientation.Flow.PAGE));	//create the right-hand panel flowing vertically
+		final LayoutPanel conversionPanel=new LayoutPanel(session, new FlowLayout(Orientation.Flow.PAGE));	//create the right-hand panel flowing vertically
 			
 			//scale panel
-		final Panel scalePanel=new Panel(session, new FlowLayout(Orientation.Flow.PAGE));	//create the scale panel flowing vertically
-		scalePanel.setStyleID(GROUP_PANEL_CLASS);	//show that we want to style the scale panel as one that visually groups components
-		scalePanel.getModel().setLabel("Input Scale");	//set the panel label
+		final GroupPanel scalePanel=new GroupPanel(session, new FlowLayout(Orientation.Flow.PAGE));	//create the scale panel flowing vertically
+		scalePanel.getModel().setLabel("Input Scale");	//set the group panel label
 		celsiusCheckControl=new CheckControl(session, CheckControl.CheckType.ELLIPSE);	//create a check control for the Celsius scale, using an ellipse check are
 		celsiusCheckControl.getModel().setLabel("Celsius");	//set the label of the check to indicate the scale
 		try

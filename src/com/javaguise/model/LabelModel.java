@@ -11,7 +11,7 @@ import com.garretwilson.text.xml.xhtml.XHTMLConstants;
 /**A model for an identifier such as text and/or an icon.
 @author Garret Wilson
 */
-public interface LabelModel extends Model
+public interface LabelModel extends Model	//TODO add icon and hasLabel() method, which checks for label text and/or icon
 {
 	/**The label bound property.*/
 	public final static String LABEL_PROPERTY=getPropertyName(LabelModel.class, "label");

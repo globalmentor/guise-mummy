@@ -26,14 +26,14 @@ public class LoginFrame extends DefaultFrame
 		super(session);	//construct the parent class, defaulting to a region layout
 		getModel().setLabel("Guise\u2122 Demonstration: Login");	//set the frame title
 		
-		final Panel loginPanel=new Panel(session, new FlowLayout(Orientation.Flow.PAGE));	//create the authorization panel flowing vertically
+		final LayoutPanel loginPanel=new LayoutPanel(session, new FlowLayout(Orientation.Flow.PAGE));	//create the authorization panel flowing vertically
 		
 			//heading
 		final Heading heading=new Heading(session, 0);	//create a top-level heading
 		heading.getModel().setLabel("Login");	//set the text of the heading, using its model
 		loginPanel.add(heading);	//add the heading to the panel
 
-		final Panel userPanel=new Panel(session, new FlowLayout(Orientation.Flow.LINE));	//create the user panel flowing horizontally
+		final LayoutPanel userPanel=new LayoutPanel(session, new FlowLayout(Orientation.Flow.LINE));	//create the user panel flowing horizontally
 
 			//ID
 		final TextControl<String> idControl=new TextControl<String>(session, String.class);	//create the ID input control

@@ -5,5 +5,4 @@ package com.javaguise.component;
 */
 public interface Box<C extends Box<C>> extends Container<C>
 {
-
 }
