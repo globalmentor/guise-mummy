@@ -186,6 +186,10 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		@see #getStringResource(String, String)
 		@see #getBooleanResource(String)
 		@see #getBooleanResource(String, Boolean)
+		@see #getIntegerResource(String)
+		@see #getIntegerResource(String, Integer)
+		@see #getURIResource(String)
+		@see #getURIResource(String, URI)
 		*/
 		public ResourceBundle getResourceBundle()
 		{
@@ -341,7 +345,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		@return The resource associated with the specified resource key.
 		@exception NullPointerException if the provided resource key is <code>null</code>.
 		@exception MissingResourceException if no resource could be found associated with the given key.
-		@exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>Boolean</code> object.
+		@exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>Boolean</code>.
 		@see #getResourceBundle()
 		@see #getBooleanResource(String, Boolean)
 		*/
@@ -365,7 +369,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		@param defaultValue The default value to use if there is no resource associated with the given key.
 		@return The resource associated with the specified resource key or the default if none is available.
 		@exception NullPointerException if the provided resource key is <code>null</code>.
-		@exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>Boolean</code> object.
+		@exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>Boolean</code>.
 		@see #getResourceBundle()
 		@see #getBooleanResource(String)
 		*/
@@ -381,6 +385,54 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 			}
 		}
 
+		/**Retrieves an <code>Integer</code> resource from the resource bundle.
+		If the given resource is a string, it will be interpreted according to the {@link Integer#valueOf(java.lang.String)} rules.
+		This is a preferred convenience method for accessing the resources in the session's resource bundle.
+		@param resourceKey The key of the resource to retrieve.
+		@return The resource associated with the specified resource key.
+		@exception NullPointerException if the provided resource key is <code>null</code>.
+		@exception MissingResourceException if no resource could be found associated with the given key.
+		@exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>Integer</code>.
+		@exception NumberFormatException if the resource key identifies a string that is not a valid integer.
+		@see #getResourceBundle()
+		@see #getIntegerResource(String, Integer)
+		*/
+		public Integer getIntegerResource(final String resourceKey) throws MissingResourceException
+		{
+			final Object resource=getResourceBundle().getObject(resourceKey);	//retrieve a key from the resource bundle
+			if(resource instanceof String)	//if the resource is a string
+			{
+				return Integer.valueOf((String)resource);	//get the Integer value of the resource string
+			}
+			else	//if the resource is not a string, assume it is an Integer
+			{
+				return (Integer)resource;	//return the resource as an Integer object, throwing a ClassCastException if it isn't an instance of Integer
+			}
+		}
+
+		/**Retrieves an <code>Integer</code> resource from the resource bundle, using a specified default if no such resource is available.
+		If the given resource is a string, it will be interpreted according to the {@link Integer#valueOf(java.lang.String)} rules.
+		This is a preferred convenience method for accessing the resources in the session's resource bundle.
+		@param resourceKey The key of the resource to retrieve.
+		@param defaultValue The default value to use if there is no resource associated with the given key.
+		@return The resource associated with the specified resource key or the default if none is available.
+		@exception NullPointerException if the provided resource key is <code>null</code>.
+		@exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>Integer</code>.
+		@see #getResourceBundle()
+		@see #getIntegerResource(String)
+		*/
+		public Integer getIntegerResource(final String resourceKey, final Integer defaultValue) throws MissingResourceException
+		{
+			try
+			{
+				return getIntegerResource(resourceKey);	//try to load the Integer from the resources
+			}
+			catch(final MissingResourceException missingResourceException)	//if no such resource is available
+			{
+				return defaultValue;	//return the specified default value
+			}
+		}
+
 		/**Retrieves a <code>URI</code> resource from the resource bundle.
 		If the given resource is a string, it will be converted to a URI.
 		This is a preferred convenience method for accessing the resources in the session's resource bundle.
@@ -388,7 +440,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		@return The resource associated with the specified resource key.
 		@exception NullPointerException if the provided resource key is <code>null</code>.
 		@exception MissingResourceException if no resource could be found associated with the given key.
-		@exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>URI</code> object.
+		@exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>URI</code>.
 		@exception IllegalArgumentException if a string is provided that is not a valid URI.
 		@see #getResourceBundle()
 		@see #getURIResource(String, URI)

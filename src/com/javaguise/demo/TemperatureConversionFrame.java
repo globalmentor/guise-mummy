@@ -6,8 +6,6 @@ import com.javaguise.component.layout.*;
 import com.javaguise.event.ActionEvent;
 import com.javaguise.event.ActionListener;
 
-import static com.javaguise.stylesheets.GuiseCSSStyleConstants.*;
-
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
@@ -15,9 +13,9 @@ import com.javaguise.validator.ValueRequiredValidator;
 
 /**Temperature Conversion Guise demonstration frame.
 Copyright © 2005 GlobalMentor, Inc.
-Demonstrates panels, float input controls, float input validation, radio button controls,
-	dynamic updates (e.g. AJAX on the web platform),
-	required value validation, read-only controls, and group panels.
+Demonstrates layout panels, group panels, float input controls, float input validation,
+	radio button controls, dynamic updates (e.g. AJAX on the web platform),
+	required value validation, and read-only controls.
 @author Garret Wilson
 */
 public class TemperatureConversionFrame extends DefaultFrame

@@ -15,7 +15,7 @@ import com.javaguise.event.ModalListener;
 import static com.garretwilson.lang.ClassUtilities.*;
 
 /**Represents a session with a user.
-A Swing-based client application may only have one session, while a web server application will likely have multiple sessions.
+A Swing-based client application may have only one session, while a web server application will likely have multiple sessions.
 @author Garret Wilson
 */
 public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBindable
@@ -78,6 +78,10 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	@see #getStringResource(String, String)
 	@see #getBooleanResource(String)
 	@see #getBooleanResource(String, Boolean)
+	@see #getIntegerResource(String)
+	@see #getIntegerResource(String, Integer)
+	@see #getURIResource(String)
+	@see #getURIResource(String, URI)
 	*/
 	public ResourceBundle getResourceBundle();
 
@@ -134,6 +138,33 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	@see #getBooleanResource(String)
 	*/
 	public Boolean getBooleanResource(final String resourceKey, final Boolean defaultValue) throws MissingResourceException;
+
+	/**Retrieves an <code>Integer</code> resource from the resource bundle.
+	If the given resource is a string, it will be interpreted according to the {@link Integer#valueOf(java.lang.String)} rules.
+	This is a preferred convenience method for accessing the resources in the session's resource bundle.
+	@param resourceKey The key of the resource to retrieve.
+	@return The resource associated with the specified resource key.
+	@exception NullPointerException if the provided resource key is <code>null</code>.
+	@exception MissingResourceException if no resource could be found associated with the given key.
+	@exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>Integer</code>.
+	@exception NumberFormatException if the resource key identifies a string that is not a valid integer.
+	@see #getResourceBundle()
+	@see #getIntegerResource(String, Integer)
+	*/
+	public Integer getIntegerResource(final String resourceKey) throws MissingResourceException;
+
+	/**Retrieves an <code>Integer</code> resource from the resource bundle, using a specified default if no such resource is available.
+	If the given resource is a string, it will be interpreted according to the {@link Integer#valueOf(java.lang.String)} rules.
+	This is a preferred convenience method for accessing the resources in the session's resource bundle.
+	@param resourceKey The key of the resource to retrieve.
+	@param defaultValue The default value to use if there is no resource associated with the given key.
+	@return The resource associated with the specified resource key or the default if none is available.
+	@exception NullPointerException if the provided resource key is <code>null</code>.
+	@exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>Integer</code>.
+	@see #getResourceBundle()
+	@see #getIntegerResource(String)
+	*/
+	public Integer getIntegerResource(final String resourceKey, final Integer defaultValue) throws MissingResourceException;
 
 	/**Retrieves a <code>URI</code> resource from the resource bundle.
 	If the given resource is a string, it will be converted to a URI.
