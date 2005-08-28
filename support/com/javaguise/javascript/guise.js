@@ -297,7 +297,7 @@ function GuiseAJAX()
 	{
 		while(GuiseAJAX.prototype.ajaxResponses.length>0)	//while there are more AJAX responses
 		{
-			patchAjaxElement(GuiseAJAX.prototype.ajaxResponses.dequeue().documentElement);
+			patchElement(GuiseAJAX.prototype.ajaxResponses.dequeue().documentElement);
 		}
 		GuiseAJAX.prototype.processAJAXRequests();	//make sure there are no waiting AJAX requests
 	}
@@ -448,6 +448,21 @@ function onWindowLoad()
 function installListeners()
 {
 //TODO del	alert("installing listeners");
+//TODO check for IDs before adding listeners
+		//install link listeners
+	var anchorElementList=document.getElementsByTagName("a");	//get all anchor elements
+	for(var i=0; i<anchorElementList.length; ++i)	//for each anchorelement
+	{
+		var anchorElement=anchorElementList[i];	//get this anchor element
+		addEvent(anchorElement, "click", onButtonClick, false);	//listen for anchor clicks
+	}
+		//install button listeners
+	var buttonElementList=document.getElementsByTagName("button");	//get all button elements
+	for(var i=0; i<buttonElementList.length; ++i)	//for each button element
+	{
+		var buttonElement=buttonElementList[i];	//get this button element
+		addEvent(buttonElement, "click", onButtonClick, false);	//listen for button clicks
+	}
 		//install input listeners
 	var inputElementList=document.getElementsByTagName("input");	//get all input elements
 	for(var i=0; i<inputElementList.length; ++i)	//for each input element
@@ -499,6 +514,59 @@ function onTextInputChange(event)
 		httpRequestInfo.addParameter(textInput.name, textInput.value);
 		guiseAJAX.sendAJAX(httpRequestInfo);	//send the AJAX request
 		w3cEvent.stopPropagation();	//tell the event to stop bubbling
+	}
+}
+
+/**Called when a button is activated.
+@param event The object describing the event.
+*/
+function onButtonClick(event)
+{
+	var w3cEvent=getW3CEvent(event);	//get the W3C event object
+	var button=w3cEvent.target;	//get the target of the event
+	if(button.id)	//if the button has an ID
+	{
+			//ask confirmations if needed
+		var childNodeList=button.childNodes;	//get all the child nodes of the element
+		var childNodeCount=childNodeList.length;	//find out how many children there are
+		for(var i=0; i<childNodeCount; ++i)	//for each child node
+		{
+			var childNode=childNodeList[i];	//get this child node
+			if(childNode.nodeType==Node.COMMENT_NODE && childNode.nodeValue)	//if this is a comment node
+			{
+				var commentValue=childNode.nodeValue;	//get the comment value
+				var delimiterIndex=commentValue.indexOf(':');	//get the delimiter index
+				if(delimiterIndex>=0)	//if there is a delimiter
+				{
+					var paramName=commentValue.substring(0, delimiterIndex);	//get the parameter name
+					var paramValue=commentValue.substring(delimiterIndex+1);	//get the parameter value
+					if(paramName="confirm")	//if this is a confirmation
+					{
+						if(!confirm(paramValue))	//ask for confirmation; if the user does not confirm
+						{
+							w3cEvent.stopPropagation();	//tell the event to stop bubbling
+							return;	//don't process the event further
+						}
+					}
+				}
+			}
+		}
+		var form=getForm(button);	//get the form
+		if(form && form.id)	//if there is a form with an ID
+		{
+			var actionInputID=form.id.replace(":form", ":input");	//determine the ID of the hidden action input
+			var actionInput=document.getElementById(actionInputID);	//get the action input
+			if(actionInput)	//if there is an action input
+			{
+				actionInput.value=button.id;	//indicate which button was pressed
+			}
+			form.submit();	//submit the form
+			if(actionInput)	//if there is an action input
+			{
+				actionInput.value=null;	//remove the indication of which button was pressed
+			}
+			w3cEvent.stopPropagation();	//tell the event to stop bubbling
+		}
 	}
 }
 
@@ -585,7 +653,6 @@ alert("target parent node name: "+w3cEvent.target.parentNode.nodeName);
 		if(isCollapsed || isExpanded)	//if the tree node is collapsed or expanded (ignore leaf nodes)
 		{
 			var childNodeList=treeNode.childNodes;	//get all the child nodes of the element
-			var childNodeCount=childNodeList.length;	//find out how many children there are
 			for(var i=childNodeList.length-1; i>=0; --i)	//for each child node (the sub-list is probably the last one)
 			{
 				var childNode=childNodeList[i];	//get this child node
@@ -603,7 +670,7 @@ alert("target parent node name: "+w3cEvent.target.parentNode.nodeName);
 					treeNode.className=newClassName;	//update class of the the tree node itself to match
 					break;	//we've switched states, so stop looking for a tree child
 				}
-				}
+			}
 		}
 /*TODO fix
 		var httpRequestInfo=new HTTPRequestInfo();	//create new HTTP request information
@@ -613,12 +680,28 @@ alert("target parent node name: "+w3cEvent.target.parentNode.nodeName);
 	}
 }
 
+/**Retrieves the ancestor form of the given node, starting at the node itself.
+@param node The node the form of which to find.
+@return The form in which the node lies, or null if the node is not within a form.
+*/
+function getForm(node)
+{
+	while(node.nodeType!=Node.ELEMENT_NODE || node.nodeName.toLowerCase()!="form")	//while we haven't found a form element
+	{
+		node=node.parentNode;	//get the parent node
+		if(node==null)	//if there is no parent
+		{
+			return null;	//we couldn't find a form
+		}
+	}
+	return node;	//return the form we found
+}
 
 /**Patches an element and its children into the existing element hierarchy.
 Any element in the hierarchy without an ID attribute will be ignored, although its children will be processed.
 @param element The element hierarchy to patch into the existing document.
 */ 
-function patchAjaxElement(element)
+function patchElement(element)
 {
 		//do depth-first patching, allowing us to precheck children at the same time for later patching at this level in the hierarchy
 	var childNodeList=element.childNodes;	//get all the child nodes of the element
@@ -630,7 +713,7 @@ function patchAjaxElement(element)
 		switch(childNode.nodeType)	//see which type of child node this is
 		{
 			case Node.ELEMENT_NODE:	//element
-				patchAjaxElement(childNode);	//patch this child element
+				patchElement(childNode);	//patch this child element
 				break;
 			case Node.TEXT_NODE:	//text
 				++childTextNodeCount;	//show that we found another text child
