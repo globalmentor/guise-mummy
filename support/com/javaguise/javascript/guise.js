@@ -558,12 +558,9 @@ function initializeNode(node)
 				var elementClassName=node.className;	//get the element class name
 				switch(elementName)	//see which element this is
 				{
+/*TODO bring back when works
 					case "a":
-						addEvent(node, "click", onButtonClick, false);	//listen for anchor clicks
-						break;
-/*TODO del if not needed
-					case "body":
-						addEvent(node, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document, as dragging may end somewhere else besides the 
+						addEvent(node, "click", onLinkClick, false);	//listen for anchor clicks
 						break;
 */
 					case "button":
@@ -634,17 +631,43 @@ function onTextInputChange(event)
 	}
 }
 
-/**Called when a button is activated.
+/**Called when a button is clicked.
 @param event The object describing the event.
 */
 function onButtonClick(event)
 {
 	var w3cEvent=getW3CEvent(event);	//get the W3C event object
-	var button=w3cEvent.target;	//get the target of the event
-	if(button.id)	//if the button has an ID
+	var button=getAncestorElementByName(w3cEvent.target, "button");	//get the button itself
+	if(button)	//if a button was found
+	{
+		onAction(event, button);	//process an action for the button
+	}
+}
+
+/**Called when an anchor is clicked.
+@param event The object describing the event.
+*/
+function onLinkClick(event)
+{
+	var w3cEvent=getW3CEvent(event);	//get the W3C event object
+	var anchor=getAncestorElementByName(w3cEvent.target, "a");	//get the anchor itself
+	if(anchor)	//if a button was found
+	{
+		onAction(event, anchor);	//process an action for the anchor
+	}
+}
+
+/**Called when an action should be processed for an element
+@param event The object describing the event.
+@param element The element representing the action.
+*/
+function onAction(event, element)
+{
+//TODO del alert("action on: "+element.nodeName);
+	if(element.id)	//if the button has an ID
 	{
 			//ask confirmations if needed
-		var childNodeList=button.childNodes;	//get all the child nodes of the element
+		var childNodeList=element.childNodes;	//get all the child nodes of the element
 		var childNodeCount=childNodeList.length;	//find out how many children there are
 		for(var i=0; i<childNodeCount; ++i)	//for each child node
 		{
@@ -671,19 +694,19 @@ function onButtonClick(event)
 				}
 			}
 		}
-		var form=getForm(button);	//get the form
+		var form=getForm(element);	//get the form
 		if(form && form.id)	//if there is a form with an ID
 		{
 			var actionInputID=form.id.replace(":form", ":input");	//determine the ID of the hidden action input
 			var actionInput=document.getElementById(actionInputID);	//get the action input
 			if(actionInput)	//if there is an action input
 			{
-				actionInput.value=button.id;	//indicate which button was pressed
+				actionInput.value=element.id;	//indicate which action was activated
 			}
 			form.submit();	//submit the form
 			if(actionInput)	//if there is an action input
 			{
-				actionInput.value=null;	//remove the indication of which button was pressed
+				actionInput.value=null;	//remove the indication of which action was activated
 			}
 			w3cEvent.stopPropagation();	//tell the event to stop bubbling
 			w3cEvent.preventDefault();	//prevent the default functionality from occurring
@@ -742,18 +765,25 @@ function onSelectChange(event)
 */
 function onTreeNodeClick(event)
 {
-//TODO del 	alert("tree node clicked");
 	if(AJAX_URI)	//if AJAX is enabled
 	{
 		var w3cEvent=getW3CEvent(event);	//get the W3C event object
 		var treeNode=w3cEvent.target;	//get the target of the event
 //TODO del alert("target of tree click: "+treeNode.nodeName);
+		if(treeNode.nodeName.toLowerCase()=="a")	//TODO fix; temporary hack for allowing links inside trees
+		{
+			return;
+		}
 		while(treeNode.nodeName.toLowerCase()!="li" || !treeNode.className || treeNode.className.indexOf(TREE_NODE_CLASS_PREFIX)<0)	//a child of the tree node likely got the event; look up the chain until we find the tree node parent
 		{
 			treeNode=treeNode.parentNode;	//get the node parent
 			if(!treeNode)	//if we ran out of nodes without finding a tree node
 			{
 				return;	//don't process the event
+			}
+			if(treeNode.nodeName.toLowerCase()=="a")	//TODO fix; temporary hack for allowing links inside trees
+			{
+				return;
 			}
 		}
 		w3cEvent.stopPropagation();	//tell the event to stop bubbling

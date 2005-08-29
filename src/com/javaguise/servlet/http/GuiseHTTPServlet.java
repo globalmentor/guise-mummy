@@ -400,6 +400,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 						if(requestedNavigation!=null)	//if navigation is requested
 						{
 							final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
+//TODO del Debug.trace("navigation requested to", requestedNavigationURI);
 							guiseSession.clearRequestedNavigation();	//remove any navigation requests
 							if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
 							{
