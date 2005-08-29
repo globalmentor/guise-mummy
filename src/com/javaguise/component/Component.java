@@ -25,6 +25,8 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 
 	/**The bound property of the controller.*/
 	public final static String CONTROLLER_PROPERTY=getPropertyName(Component.class, "controller");
+	/**The bound property of whether the component has dragging enabled.*/
+	public final static String DRAG_ENABLED_PROPERTY=getPropertyName(Component.class, "dragEnabled");
 	/**The orientation bound property.*/
 	public final static String ORIENTATION_PROPERTY=getPropertyName(Component.class, "orientation");
 	/**The bound property of the component style ID.*/
@@ -168,6 +170,16 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	@see #VISIBLE_PROPERTY
 	*/
 	public void setVisible(final boolean newVisible);
+
+	/**@return Whether the component has dragging enabled.*/
+	public boolean isDragEnabled();
+
+	/**Sets whether the component is has dragging enabled.
+	This is a bound property of type <code>Boolean</code>.
+	@param newDragEnabled <code>true</code> if the component should allow dragging, else false, else <code>false</code>.
+	@see #DRAG_ENABLED_PROPERTY
+	*/
+	public void setDragEnabled(final boolean newDragEnabled);
 
 	/**@return Whether the models of this component and all of its child components are valid.*/
 	public boolean isValid();

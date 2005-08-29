@@ -394,6 +394,27 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 			}
 		}
 
+	/**Whether the component has dragging enabled.*/
+	private boolean dragEnabled=true;
+
+		/**@return Whether the component has dragging enabled.*/
+		public boolean isDragEnabled() {return dragEnabled;}
+
+		/**Sets whether the component is has dragging enabled.
+		This is a bound property of type <code>Boolean</code>.
+		@param newDragEnabled <code>true</code> if the component should allow dragging, else false, else <code>false</code>.
+		@see Component#DRAG_ENABLED_PROPERTY
+		*/
+		public void setDragEnabled(final boolean newDragEnabled)
+		{
+			if(dragEnabled!=newDragEnabled)	//if the value is really changing
+			{
+				final boolean oldDragEnabled=dragEnabled;	//get the current value
+				dragEnabled=newDragEnabled;	//update the value
+				firePropertyChange(DRAG_ENABLED_PROPERTY, Boolean.valueOf(oldDragEnabled), Boolean.valueOf(newDragEnabled));
+			}
+		}
+
 	/**Session constructor.
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session is <code>null</code>.

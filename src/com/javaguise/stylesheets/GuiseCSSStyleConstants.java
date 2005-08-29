@@ -54,6 +54,14 @@ public class GuiseCSSStyleConstants
 	/**The CSS class suffix indicating that a tree node is a leaf node and is neither expanded nor collapsed.*/
 	public final static String TREE_NODE_LEAF_CLASS_SUFFIX="-leaf";
 
+		//drag and drop
+	/**The potential source of a drag and drop operation.*/
+	public final static String DRAG_SOURCE_CLASS="dragSource";
+	/**The handle of a drag source.*/
+	public final static String DRAG_HANDLE_CLASS="dragHandle";
+	/**The potential target of a drag and drop operation.*/
+	public final static String DRAG_TARGET_CLASS="dragTarget";
+	
 	//layout
 
 	/**The CSS class for any enclosing element needed for region layout.*/

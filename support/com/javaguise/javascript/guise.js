@@ -30,6 +30,18 @@ if(typeof Node=="undefined")	//if no Node type is defined (e.g. IE), create one 
 	var Node={ELEMENT_NODE: 1, ATTRIBUTE_NODE: 2, TEXT_NODE: 3, CDATA_SECTION_NODE: 4, ENTITY_REFERENCE_NODE: 5, ENTITY_NODE: 6, PROCESSING_INSTRUCTION_NODE: 7, COMMENT_NODE: 8, DOCUMENT_NODE: 9, DOCUMENT_TYPE_NODE: 10, DOCUMENT_FRAGMENT_NODE: 11, NOTATION_NODE: 12}
 }
 
+//Point
+
+/**A class encapsulating a point.
+@param x: The X coordinate, stored under this.x;
+@param y: The Y coordinate, stored under this.y;
+*/
+function Point(x, y)
+{
+	this.x=x;
+	this.y=y;
+}
+
 //HTTPRequestInfo
 
 /**A class encapsulating HTTP request information.
@@ -307,6 +319,83 @@ function GuiseAJAX()
 /**The global object for AJAX communication with Guise.*/
 var guiseAJAX=new GuiseAJAX();
 
+/**A class encapsulating drag state.
+@param dragSource: The element to drag.
+@param mouseDeltaX: The difference between the element X and the mouse X position.
+@param mouseDeltaY: The difference between the element Y and the mouse Y position.
+var dragSource: The element to drag.
+var element: The actual element being dragged.
+var mouseDeltaX: The difference between the element X and the mouse X position.
+var mouseDeltaY: The difference between the element Y and the mouse Y position.
+*/
+function DragState(dragSource, mouseDeltaX, mouseDeltaY)
+{
+	this.dragSource=dragSource;
+	this.mouseDeltaX=mouseDeltaX;
+	this.mouseDeltaY=mouseDeltaY;
+
+	if(!DragState.prototype._initialized)
+	{
+		DragState.prototype._initialized=true;
+
+		/**Begins the drag process.*/
+		DragState.prototype.beginDrag=function()
+		{
+			this.element=this._getDragElement();	//create an element for dragging
+			if(this.element!=this.dragSource)	//if we have a new element to drag
+			{
+				document.body.appendChild(this.element);	//add the element to the document
+			}
+/*TODO del after new stop default method
+			document.body.ondrag=function() {return false;};	//turn off IE drag event processing; see http://www.ditchnet.org/wp/2005/06/15/ajax-freakshow-drag-n-drop-events-2/
+			document.body.onselectstart=function() {return false;};
+*/
+			addEvent(document, "mousemove", onDrag, false);	//listen for mouse move anywhere in document (IE doesn't allow us to listen on the window), as dragging may end somewhere else besides a drop target
+		}
+	
+		/**Ends the drag process.*/
+		DragState.prototype.endDrag=function()
+		{
+			removeEvent(document, "mousemove", onDrag, false);	//stop listening for mouse moves
+/*TODO del after new stop default method
+			document.body.ondrag=null;	//turn IE drag event processing back on
+			document.body.onselectstart=null;
+*/
+			if(this.element!=this.dragSource)	//if we have a different element that we're dragging
+			{
+				document.body.removeChild(this.element);
+			}
+		}
+
+		/**@return An element appropriate for dragging, such as a clone of the original.*/
+		DragState.prototype._getDragElement=function()
+		{
+			var element=dragSource.cloneNode(true);	//create a clone of the original element
+			this._cleanClone(element);	//clean the clone
+			//TODO clean the element better, removing drag handles and such
+			element.style.position="absolute";	//change the element's position to absolute TODO update the element's initial position
+			//TODO set the z-order completely to the front
+			//TODO make sure resizeable elements are the correct size
+			return element;	//return the cloned element
+		}
+
+		/**Cleans a cloned node, removing its element IDs, for example, so that it can inserted into a document.*/
+		DragState.prototype._cleanClone=function(elementClone)
+		{
+			elementClone.id=null;	//remove the ID
+			var childNodeList=elementClone.childNodes;	//get all the child nodes
+			for(var i=childNodeList.length-1; i>=0; --i)	//for each child node
+			{
+				this._cleanNode(childNodeList[i]);	//clean this child nodethis child node
+			}
+		}		
+	}
+}
+
+
+/**The global drag state variable.*/
+var dragState;
+
 /**Adds an event listener to an object.
 @param object The object for which a listener should be added.
 @param eventType The type of event.
@@ -419,7 +508,7 @@ alert("looking at event src element: "+event.srcElement);
 	if(!event.stopPropagation)	//if there is no method for stopping propagation TODO add workaround for Safari, which has this method but doesn't actually stop propagation
 	{
 		//TODO assert window.event && window.event.cancelBubble
-		if(window.event && typeof window.event.cancelBubble=="boolean")	//if the event has a cancel bubble property (e.g. IE)
+		if(window.event && typeof window.event.cancelBubble=="boolean")	//if there is a global event with a cancel bubble property (e.g. IE)
 		{
 			event.stopPropagation=function()	//create a new function to stop propagation
 					{
@@ -427,6 +516,19 @@ alert("looking at event src element: "+event.srcElement);
 					}
 		}
 	}
+	if(!event.preventDefault)	//if there is no method for preventing the default functionality TODO add workaround for Safari, which has this method but doesn't actually prevent default functionality
+	{
+		//TODO assert window.event && window.event.returnValue
+//TODO find out why IE returns "undefined" for window.event.returnValue, yet enumerates it in for:in		if(window.event && typeof window.event.returnValue=="boolean")	//if there is a global event with a return value property (e.g. IE)
+		if(window.event)	//if there is a global event with a return value property (e.g. IE)
+		{
+			event.preventDefault=function()	//create a new function to stop propagation
+					{
+						window.event.returnValue=false;	//prevent default functionality the IE way
+					}
+		}
+	}
+	//TODO update clientX and clientY as per _DHTML Utopia_ page 90.
 	return event;	//return our event
 }
 
@@ -438,65 +540,80 @@ This implementation installs listeners if AJAX is enabled.
 */
 function onWindowLoad()
 {
-	if(AJAX_URI)	//if AJAX is enabled
-	{
-		installListeners();	//install listeners for appropriate elements
-	}
+	initializeNode(document.documentElement);	//initialize the document tree
+	addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
 }
 
-/**Installs listeners on the appropriate controls.*/
-function installListeners()
+/**Initializes a node and all its children, adding the correct listeners.
+@param node The node to initialize.
+*/
+function initializeNode(node)
 {
-//TODO del	alert("installing listeners");
-//TODO check for IDs before adding listeners
-		//install link listeners
-	var anchorElementList=document.getElementsByTagName("a");	//get all anchor elements
-	for(var i=0; i<anchorElementList.length; ++i)	//for each anchorelement
+	switch(node.nodeType)	//see which type of child node this is
 	{
-		var anchorElement=anchorElementList[i];	//get this anchor element
-		addEvent(anchorElement, "click", onButtonClick, false);	//listen for anchor clicks
+		case Node.ELEMENT_NODE:	//element
+//TODO bring back after giving all relevant nodes IDs			if(node.id)	//only look at element swith IDs
+			{
+				var elementName=node.nodeName.toLowerCase();	//get the element name
+				var elementClassName=node.className;	//get the element class name
+				switch(elementName)	//see which element this is
+				{
+					case "a":
+						addEvent(node, "click", onButtonClick, false);	//listen for anchor clicks
+						break;
+/*TODO del if not needed
+					case "body":
+						addEvent(node, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document, as dragging may end somewhere else besides the 
+						break;
+*/
+					case "button":
+						addEvent(node, "click", onButtonClick, false);	//listen for button clicks
+						break;
+					case "input":
+						switch(node.type)	//get the type of input
+						{
+							case "text":
+							case "password":
+								addEvent(node, "change", onTextInputChange, false);
+								break;
+							case "checkbox":
+							case "radio":
+								addEvent(node, "click", onCheckInputChange, false);
+								break;
+						}
+						break;
+					case "li":
+						if(elementClassName.indexOf(TREE_NODE_CLASS_PREFIX)==0)	//if this is a tree node
+						{
+							addEvent(node, "click", onTreeNodeClick, false);	//listen for clicks
+						}
+						break;
+					case "select":
+						addEvent(node, "change", onSelectChange, false);
+						break;
+				}
+				if(elementClassName)	//if there is an element class name
+				{
+					var elementClassNames=elementClassName.split(/\s/);	//split out the class names
+					for(var i=elementClassNames.length-1; i>=0; --i)	//for each class name
+					{
+						switch(elementClassNames[i])	//check out this class name
+						{
+							case "dragHandle":
+								addEvent(node, "mousedown", onDragBegin, false);	//listen for mouse down on a drag handle
+								break;
+						}
+					}
+				}
+			}
+			break;
 	}
-		//install button listeners
-	var buttonElementList=document.getElementsByTagName("button");	//get all button elements
-	for(var i=0; i<buttonElementList.length; ++i)	//for each button element
+		//initialize child nodes
+	var childNodeList=node.childNodes;	//get all the child nodes
+	var childNodeCount=childNodeList.length;	//find out how many children there are
+	for(var i=0; i<childNodeCount; ++i)	//for each child node
 	{
-		var buttonElement=buttonElementList[i];	//get this button element
-		addEvent(buttonElement, "click", onButtonClick, false);	//listen for button clicks
-	}
-		//install input listeners
-	var inputElementList=document.getElementsByTagName("input");	//get all input elements
-	for(var i=0; i<inputElementList.length; ++i)	//for each input element
-	{
-		var inputElement=inputElementList[i];	//get this input element
-		var inputType=inputElement.type;	//get the type of input
-		if(inputType=="text" || inputType=="password")	//if this is a text control
-		{
-//TODO del alert("found text input element "+inputElement.id);
-			addEvent(inputElement, "change", onTextInputChange, false);
-		}
-		else if(inputType=="checkbox" || inputType=="radio")	//if this is a checkbox or a radio button
-		{
-//TODO del alert("found text input element "+inputElement.id);
-			addEvent(inputElement, "click", onCheckInputChange, false);
-		}
-	}
-		//install select listeners
-	var selectElementList=document.getElementsByTagName("select");	//get all select elements
-	for(var i=0; i<selectElementList.length; ++i)	//for each select element
-	{
-		var selectElement=selectElementList[i];	//get this select element
-		addEvent(selectElement, "change", onSelectChange, false);
-	}
-		//install tree node listeners
-	var liElementList=document.getElementsByTagName("li");	//get all list item elements
-	for(var i=0; i<liElementList.length; ++i)	//for each li element
-	{
-		var liElement=liElementList[i];	//get this li element
-		var className=liElement.className;	//get the style class
-		if(className.indexOf(TREE_NODE_CLASS_PREFIX)==0)	//if this is a tree node
-		{
-			addEvent(liElement, "click", onTreeNodeClick, false);	//listen for clicks
-		}
+		initializeNode(childNodeList[i]);	//initialize this child node
 	}
 }
 
@@ -544,7 +661,10 @@ function onButtonClick(event)
 					{
 						if(!confirm(paramValue))	//ask for confirmation; if the user does not confirm
 						{
+/*TODO del if not needed
 							w3cEvent.stopPropagation();	//tell the event to stop bubbling
+							w3cEvent.preventDefault();	//prevent the default functionality from occurring
+*/
 							return;	//don't process the event further
 						}
 					}
@@ -566,6 +686,7 @@ function onButtonClick(event)
 				actionInput.value=null;	//remove the indication of which button was pressed
 			}
 			w3cEvent.stopPropagation();	//tell the event to stop bubbling
+			w3cEvent.preventDefault();	//prevent the default functionality from occurring
 		}
 	}
 }
@@ -636,6 +757,7 @@ function onTreeNodeClick(event)
 			}
 		}
 		w3cEvent.stopPropagation();	//tell the event to stop bubbling
+		w3cEvent.preventDefault();	//prevent the default functionality from occurring
 //TODO del	alert("ID of tree node: "+treeNode.lastChild.id);
 		var oldClassName=treeNode.className;	//get the class name of the tree node
 /*TODO del
@@ -680,21 +802,144 @@ alert("target parent node name: "+w3cEvent.target.parentNode.nodeName);
 	}
 }
 
+/**Called when dragging begins on a drag handle.
+@param event The object describing the event.
+*/
+function onDragBegin(event)	//TODO rename to onDragClick
+{
+	if(!dragState)	//if there's a drag state, stay with that one (e.g. the mouse button might have been released outside the document on Mozilla)
+	{
+		var w3cEvent=getW3CEvent(event);	//get the W3C event object
+		var dragHandle=w3cEvent.target;	//get the target of the event
+			//TODO make sure this isn't the context mouse button
+		var dragSource=getAncestorElementByClassName(dragHandle, "dragSource");	//determine which element to drag
+		if(dragSource)	//if there is a drag source
+		{
+			var dragSourcePoint=getElementCoordinates(dragSource);	//get the position of the 
+			var mouseDeltaX=event.clientX-dragSourcePoint.x;	//calculate the mouse position relative to the drag source
+			var mouseDeltaY=event.clientY-dragSourcePoint.y;
+			dragState=new DragState(dragSource, mouseDeltaX, mouseDeltaY);	//create a new drag state
+			dragState.beginDrag();	//begin dragging
+			w3cEvent.stopPropagation();	//tell the event to stop bubbling
+			w3cEvent.preventDefault();	//prevent the default functionality from occurring
+		}
+	}
+}
+
+/**Called when dragging occurs.
+@param event The object describing the event.
+*/
+function onDrag(event)
+{
+	if(dragState)	//if we are in the middle of a drag
+	{
+		var w3cEvent=getW3CEvent(event);	//get the W3C event object
+		dragState.element.style.left=(event.clientX-dragState.mouseDeltaX).toString()+"px";	//update the position of the dragged element
+		dragState.element.style.top=(event.clientY-dragState.mouseDeltaY).toString()+"px";
+		w3cEvent.stopPropagation();	//tell the event to stop bubbling
+		w3cEvent.preventDefault();	//prevent the default functionality from occurring
+	}
+}
+
+/**Called when dragging ends.
+@param event The object describing the event.
+*/
+function onDragEnd(event)
+{
+	if(dragState)	//if we are in the middle of a drag
+	{
+		dragState.endDrag();	//end dragging
+		dragState=null;	//release our drag state
+		var w3cEvent=getW3CEvent(event);	//get the W3C event object
+		var target=w3cEvent.target;	//get the target of the event
+		w3cEvent.stopPropagation();	//tell the event to stop bubbling
+		w3cEvent.preventDefault();	//prevent the default functionality from occurring
+	}
+}
+
 /**Retrieves the ancestor form of the given node, starting at the node itself.
 @param node The node the form of which to find.
 @return The form in which the node lies, or null if the node is not within a form.
 */
 function getForm(node)
 {
-	while(node.nodeType!=Node.ELEMENT_NODE || node.nodeName.toLowerCase()!="form")	//while we haven't found a form element
+	return getAncestorElementByName(node, "form");	//get the form ancestor
+}
+
+/**Retrieves the named ancestor element of the given node, starting at the node itself.
+@param node The node the ancestor of which to find.
+@param elementName The name of the element to find.
+@return The named element in which the node lies, or null if the node is not within such a named element.
+*/
+function getAncestorElementByName(node, elementName)
+{
+	while(node.nodeType!=Node.ELEMENT_NODE || node.nodeName.toLowerCase()!=elementName)	//while we haven't found the named element
 	{
 		node=node.parentNode;	//get the parent node
 		if(node==null)	//if there is no parent
 		{
-			return null;	//we couldn't find a form
+			return null;	//we couldn't find a named element
 		}
 	}
-	return node;	//return the form we found
+	return node;	//return the element we found
+}
+
+/**Retrieves the ancestor element with the given class of the given node, starting at the node itself. Multiple class names are supported
+@param node The node the ancestor of which to find.
+@param elementName The name of the element class to find.
+@return The element with the given class in which the node lies, or null if the node is not within such an element.
+*/
+function getAncestorElementByClassName(node, className)
+{
+	while(node)	//while we haven't reached the top of the hierarchy
+	{
+		if(node.nodeType==Node.ELEMENT_NODE)	//if this is an element
+		{
+			var elementClassNames=node.className.split(/\s/);	//split out the class names
+			for(var i=elementClassNames.length-1; i>=0; --i)	//for each class name
+			{
+				if(elementClassNames[i]==className)	//if this class name matches
+				{
+					return node;	//this node has a matching class name; we'll use it
+				}
+			}
+		}
+		node=node.parentNode;	//try the parent node
+	}
+	return node;	//return whatever node we found
+}
+
+/**Retrieves the absolute X and Y coordinates of the given element.
+@param The element the coordinates of which to find.
+@return A Point containing the coordinates of the element.
+@see http://www.oreillynet.com/pub/a/javascript/excerpt/JSDHTMLCkbk_chap13/index6.html
+@see http://www.quirksmode.org/js/findpos.html
+*/
+function getElementCoordinates(element)
+{
+	var x=0, y=0;
+	if(element.offsetParent)	//if element.offsetParent is supported
+	{
+		while(element)	//while we have an element
+		{
+			x+=element.offsetLeft;	//add this element's offsets
+			y+=element.offsetTop;
+			element=element.offsetParent;	//go to the element's parent offset
+		}
+/*TODO fix for Mac
+    if (navigator.userAgent.indexOf("Mac") != -1 && 
+        typeof document.body.leftMargin != "undefined") {
+        offsetLeft += document.body.leftMargin;
+        offsetTop += document.body.topMargin;
+    }
+*/
+	}
+	else if(element.x && element.y)	//if element.offsetParent is not supported by but element.x and element.y are supported (e.g. Navigator 4)
+	{
+		x=element.x;	//get the element's coordinates directly
+		y=element.y;
+	}
+	return new Point(x, y);	//return the point we calculated
 }
 
 /**Patches an element and its children into the existing element hierarchy.

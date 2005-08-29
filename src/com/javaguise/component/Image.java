@@ -1,5 +1,7 @@
 package com.javaguise.component;
 
+import static com.garretwilson.lang.ClassUtilities.*;
+
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 
@@ -8,6 +10,9 @@ import com.javaguise.session.GuiseSession;
 */
 public class Image extends AbstractModelComponent<ImageModel, Image>
 {
+
+	/**The bound property of whether the component has image dragging enabled.*/
+	public final static String IMAGE_DRAG_ENABLED_PROPERTY=getPropertyName(Image.class, "imageDragEnabled");
 
 	/**Session constructor with a default model.
 	@param session The Guise session that owns this component.
@@ -40,4 +45,26 @@ public class Image extends AbstractModelComponent<ImageModel, Image>
 	{
 		super(session, id, model);	//construct the parent class
 	}
+
+	/**Whether the component has image dragging enabled.*/
+	private boolean imageDragEnabled=true;
+
+		/**@return Whether the component has image dragging enabled.*/
+		public boolean isImageDragEnabled() {return imageDragEnabled;}
+
+		/**Sets whether the component has image dragging enabled.
+		This is a bound property of type <code>Boolean</code>.
+		@param newImageDragEnabled <code>true</code> if the component should allow image dragging, else false, else <code>false</code>.
+		@see #IMAGE_DRAG_ENABLED_PROPERTY
+		*/
+		public void setImageDragEnabled(final boolean newImageDragEnabled)
+		{
+			if(imageDragEnabled!=newImageDragEnabled)	//if the value is really changing
+			{
+				final boolean oldImageDragEnabled=imageDragEnabled;	//get the current value
+				imageDragEnabled=newImageDragEnabled;	//update the value
+				firePropertyChange(IMAGE_DRAG_ENABLED_PROPERTY, Boolean.valueOf(oldImageDragEnabled), Boolean.valueOf(newImageDragEnabled));
+			}
+		}
+
 }
