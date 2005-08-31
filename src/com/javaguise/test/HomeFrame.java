@@ -107,6 +107,7 @@ Debug.trace("list control changed value to", newValue);
 		
 		
 		final Label testLabel=new Label(session, "testLabel");
+		testLabel.setDragEnabled(true);
 		testLabel.setStyleID("title");
 		testLabel.getModel().setLabel("This is label text from the model.");
 		contentPanel.add(testLabel);	//add a new label
@@ -192,6 +193,7 @@ Debug.trace("list control changed value to", newValue);
 	
 	
 		final GroupPanel booleanPanel=new GroupPanel(session, new FlowLayout(Orientation.Flow.PAGE));	//create a panel flowing vertically
+		booleanPanel.setDragEnabled(true);
 		booleanPanel.getModel().setLabel("Check one of these");
 		final CheckControl check1=new CheckControl(session, "check1");
 		check1.setCheckType(CheckControl.CheckType.ELLIPSE);
@@ -210,6 +212,7 @@ Debug.trace("list control changed value to", newValue);
 
 		final Button testButtona=new Button(session, "testButton");
 		testButtona.getModel().setLabel("Nuther button.");
+		testButtona.setDragEnabled(true);
 		horizontalPanel.add(testButtona);	//add a new button
 /*TODO fix		
 		final Panel booleanPanela=new Panel(session, new FlowLayout(Axis.Y));	//create a panel flowing vertically

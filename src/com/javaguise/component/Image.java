@@ -47,7 +47,7 @@ public class Image extends AbstractModelComponent<ImageModel, Image>
 	}
 
 	/**Whether the component has image dragging enabled.*/
-	private boolean imageDragEnabled=true;
+	private boolean imageDragEnabled=false;
 
 		/**@return Whether the component has image dragging enabled.*/
 		public boolean isImageDragEnabled() {return imageDragEnabled;}

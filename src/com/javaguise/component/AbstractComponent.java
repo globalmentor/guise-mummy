@@ -395,7 +395,7 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 		}
 
 	/**Whether the component has dragging enabled.*/
-	private boolean dragEnabled=true;
+	private boolean dragEnabled=false;
 
 		/**@return Whether the component has dragging enabled.*/
 		public boolean isDragEnabled() {return dragEnabled;}

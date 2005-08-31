@@ -10,32 +10,55 @@ import java.util.*;
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
+import javax.mail.internet.ContentType;
 import javax.servlet.*;
 import javax.servlet.http.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.commons.fileupload.DiskFileUpload;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUpload;
+import org.apache.commons.fileupload.FileUploadException;
+import org.w3c.dom.*;
+import org.xml.sax.SAXException;
 
 import com.javaguise.*;
 import com.javaguise.component.*;
 import com.javaguise.context.GuiseContext;
+import com.javaguise.controller.ControlEvent;
 import com.javaguise.controller.Controller;
 import com.javaguise.controller.text.xml.xhtml.*;
+import com.javaguise.model.FileItemResourceImport;
 import com.javaguise.model.Model;
+import com.javaguise.platform.web.FormSubmitEvent;
 import com.javaguise.session.*;
 import com.javaguise.validator.*;
 
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 
+import com.garretwilson.io.ContentTypeConstants;
 import com.garretwilson.lang.ObjectUtilities;
+
+import static com.garretwilson.io.ContentTypeConstants.CHARSET_PARAMETER;
+import static com.garretwilson.io.ContentTypeUtilities.createContentType;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.net.http.*;
 
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 import static com.garretwilson.servlet.ServletConstants.*;
 import static com.garretwilson.text.CharacterConstants.*;
+import static com.garretwilson.text.CharacterEncodingConstants.UTF_8;
 import static com.garretwilson.text.xml.XMLConstants.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
 import com.garretwilson.security.Nonce;
+import com.garretwilson.text.xml.XMLUtilities;
+import com.garretwilson.text.xml.xhtml.XHTMLConstants;
+import com.garretwilson.text.xml.xpath.PathExpression;
+import com.garretwilson.text.xml.xpath.XPath;
 import com.garretwilson.util.*;
 import com.globalmentor.webapps.globalmentor.groups.MentorGroups;
 
@@ -69,6 +92,12 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 
 	/**The suffic for AJAX requests for each navigation path.*/
 	public final static String AJAX_URI_SUFFIX="_guise_ajax";
+
+	/**The content type of a Guise AJAX request, <code>application/x-guise-ajax-request</code>.*/
+	public final static ContentType GUISE_AJAX_REQUEST_CONTENT_TYPE=new ContentType(ContentTypeConstants.APPLICATION, ContentTypeConstants.EXTENSION_PREFIX+"guise-ajax-request"+ContentTypeConstants.SUBTYPE_SUFFIX_DELIMITER_CHAR+ContentTypeConstants.XML_SUBTYPE_SUFFIX, null);
+
+	/**The content type of a Guise AJAX response, <code>application/x-guise-ajax-response</code>.*/
+	public final static ContentType GUISE_AJAX_RESPONSE_CONTENT_TYPE=new ContentType(ContentTypeConstants.APPLICATION, ContentTypeConstants.EXTENSION_PREFIX+"guise-ajax-response"+ContentTypeConstants.SUBTYPE_SUFFIX_DELIMITER_CHAR+ContentTypeConstants.XML_SUBTYPE_SUFFIX, null);
 
 	/**Whether debug is turned on for Mentor Groups.*/
 	protected final static boolean DEBUG=true;	//TODO load this from an init parameter
@@ -315,6 +344,9 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
 		final HTTPServletGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
+Debug.info("session ID", guiseSession.getHTTPSession().getId());	//TODO del
+Debug.info("content length:", request.getContentLength());
+Debug.info("content type:", request.getContentType());
 		final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, request, response);	//create a new Guise context
 		synchronized(guiseSession)	//don't allow other session contexts to be active at the same time
 		{
@@ -340,6 +372,10 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 					if(navigationFrame!=null)	//if we found a frame class for this address
 					{
 						setNoCache(response);	//TODO testing; fix; update method
+
+						final List<ControlEvent> controlEvents=getControlEvents(request);	//get all control events from the request
+						final FormSubmitEvent formSubmitEvent=(FormSubmitEvent)controlEvents.get(0);	//get the form submit event TODO fix, combine with AJAX code
+
 						
 							//before actually changing the navigation path, check to see if we're in the middle of modal navigation (only do this after we find a navigation frame, as this request might be for a stylesheet or some other non-frame resource, which shouldn't be redirected)
 						final ModalNavigation modalNavigation=guiseSession.peekModalNavigation();	//see if we are currently doing modal navigation TODO make public access routines
@@ -363,7 +399,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 						}
 						guiseSession.setNavigationPath(navigationPath);	//make sure the Guise session has the correct navigation path
 						final Principal oldPrincipal=guiseSession.getPrincipal();	//get the old principal
-						if(guiseContext.getParameterListMap().size()>0)	//only query the view if there were submitted values---especially important for radio buttons and checkboxes, which must assume a value of false if nothing is submitted for them, thereby updating the model
+						if(formSubmitEvent.getParameterListMap().size()>0)	//only query the view if there were submitted values---especially important for radio buttons and checkboxes, which must assume a value of false if nothing is submitted for them, thereby updating the model
 						{
 							guiseContext.setState(GuiseContext.State.QUERY_VIEW);	//update the context state for querying the view
 	//TODO del Debug.trace("ready to query the navigation frame view");
@@ -482,6 +518,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 		final String navigationPath=rawPathInfo.substring(1, rawPathInfo.length()-AJAX_URI_SUFFIX.length());	//remove the beginning slash and the AJAX suffix
 Debug.trace("got an AJAX request for navigation path", navigationPath);
+/*TODO del when works
 		if(Debug.isDebug() && Debug.getReportLevels().contains(Debug.ReportLevel.INFO))	//indicate the parameters if information tracing is turned on
 		{
 			Debug.info("Received AJAX parameters:");
@@ -491,102 +528,108 @@ Debug.trace("got an AJAX request for navigation path", navigationPath);
 				Debug.info("Key:", parameterListMapEntry.getKey(), "Value:", ArrayUtilities.toString(parameterListMapEntry.getValue().toArray()));				
 			}
 		}
+*/
 //	TODO del			final String navigationPath=(String)guiseContext.getParameterListMap().getItem("navigationPath");	//TODO decode param value
 		final Frame<?> navigationFrame=guiseSession.getNavigationFrame(navigationPath);	//get the frame bound to the requested path
 		if(navigationFrame!=null)	//if we found a frame class for this address
 		{
-			final Set<Component<?>> requestedComponents=new HashSet<Component<?>>();	//create a set of component that were identified in the request
-			final ListMap<Object, Object> parameterListMap=guiseContext.getParameterListMap();	//get the request parameter map
-			for(final Map.Entry<Object, List<Object>> parameterListMapEntry:parameterListMap.entrySet())	//for each entry in the map of parameter lists
+			final List<ControlEvent> controlEvents=getControlEvents(request);	//get all control events from the request
+			for(final ControlEvent controlEvent:controlEvents)	//for each control event
 			{
-				final String parameterName=(String)parameterListMapEntry.getKey();	//get the parameter name
-/*TODO del if not needed
-				final List<Object> parameterValues=parameterListMapEntry.getValue();	//get the parameter values
-				final String parameterValue=parameterValues.size()>0 ? asInstance(parameterValues.get(0), String.class) : null;	//get the first parameter value
-*/
-				//TODO don't re-update nested components (less important for controls, which don't have nested components) 
-//TODO del Debug.trace("looking for component with name", parameterName);
-				getControlsByName(navigationFrame, parameterName, requestedComponents);	//get all components identified by this name
-			}
-			if(!requestedComponents.isEmpty())	//if components were requested
-			{
-				final Set<Component<?>> affectedComponents=new HashSet<Component<?>>(requestedComponents);	//we'll keep track of components that were affected by this update cycle (always include the requested components, just in case they changed their views but the model did not change---if an erroneous view value changed back to the previous, non-erroneous value, for example) 
-				guiseContext.setState(GuiseContext.State.QUERY_VIEW);	//update the context state for querying the view
-				for(final Component<?> component:requestedComponents)	//for each requested component
+				guiseContext.setControlEvent(controlEvent);	//tell the context which control event is being used
+				final Set<Component<?>> requestedComponents=new HashSet<Component<?>>();	//create a set of component that were identified in the request
+				if(controlEvent instanceof FormSubmitEvent)	//if this is a form submission
 				{
-//TODO del Debug.trace("AJAX component:", component);
-					component.queryView(guiseContext);		//tell the component to query its view
-				}
-				guiseContext.setState(GuiseContext.State.DECODE_VIEW);	//update the context state for decoding the view
-				for(final Component<?> component:requestedComponents)	//for each requested component
-				{
-					try
+					final FormSubmitEvent formSubmitEvent=(FormSubmitEvent)controlEvent;	//get the form submit event
+					final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the request parameter map
+					for(final Map.Entry<String, List<Object>> parameterListMapEntry:parameterListMap.entrySet())	//for each entry in the map of parameter lists
 					{
-						component.decodeView(guiseContext);		//tell the frame to decode its view
+						final String parameterName=parameterListMapEntry.getKey();	//get the parameter name
+						//TODO don't re-update nested components (less important for controls, which don't have nested components) 
+		//TODO del Debug.trace("looking for component with name", parameterName);
+						getControlsByName(navigationFrame, parameterName, requestedComponents);	//get all components identified by this name
 					}
-					catch(final ValidationsException validationsException)	//if there were any validation errors during validation
+				}
+				if(!requestedComponents.isEmpty())	//if components were requested
+				{
+					final Set<Component<?>> affectedComponents=new HashSet<Component<?>>(requestedComponents);	//we'll keep track of components that were affected by this update cycle (always include the requested components, just in case they changed their views but the model did not change---if an erroneous view value changed back to the previous, non-erroneous value, for example) 
+					guiseContext.setState(GuiseContext.State.QUERY_VIEW);	//update the context state for querying the view
+					for(final Component<?> component:requestedComponents)	//for each requested component
 					{
-						for(final ValidationException validationException:validationsException)	//for each validation exception
+	//TODO del Debug.trace("AJAX component:", component);
+						component.queryView(guiseContext);		//tell the component to query its view
+					}
+					guiseContext.setState(GuiseContext.State.DECODE_VIEW);	//update the context state for decoding the view
+					for(final Component<?> component:requestedComponents)	//for each requested component
+					{
+						try
 						{
-							final Component<?> affectedComponent=validationException.getComponent();	//see if this error is for a component
-							if(affectedComponent!=null)	//if this validation exception was for a specific component
+							component.decodeView(guiseContext);		//tell the frame to decode its view
+						}
+						catch(final ValidationsException validationsException)	//if there were any validation errors during validation
+						{
+							for(final ValidationException validationException:validationsException)	//for each validation exception
 							{
-								affectedComponents.add(affectedComponent);	//add this component to our list of affected components
+								final Component<?> affectedComponent=validationException.getComponent();	//see if this error is for a component
+								if(affectedComponent!=null)	//if this validation exception was for a specific component
+								{
+									affectedComponents.add(affectedComponent);	//add this component to our list of affected components
+								}
 							}
 						}
 					}
-				}
-				guiseContext.setState(GuiseContext.State.UPDATE_MODEL);	//update the context state for updating the model
-				for(final Component<?> component:requestedComponents)	//for each requested component
-				{
-					try
+					guiseContext.setState(GuiseContext.State.UPDATE_MODEL);	//update the context state for updating the model
+					for(final Component<?> component:requestedComponents)	//for each requested component
 					{
-						component.updateModel(guiseContext);	//tell the frame to update its model
-					}
-					catch(final ValidationsException validationsException)	//if there were any validation errors during validation
-					{
-						for(final ValidationException validationException:validationsException)	//for each validation exception
+						try
 						{
-							final Component<?> affectedComponent=validationException.getComponent();	//see if this error is for a component
-							if(affectedComponent!=null)	//if this validation exception was for a specific component
+							component.updateModel(guiseContext);	//tell the frame to update its model
+						}
+						catch(final ValidationsException validationsException)	//if there were any validation errors during validation
+						{
+							for(final ValidationException validationException:validationsException)	//for each validation exception
 							{
-								affectedComponents.add(affectedComponent);	//add this component to our list of affected components
+								final Component<?> affectedComponent=validationException.getComponent();	//see if this error is for a component
+								if(affectedComponent!=null)	//if this validation exception was for a specific component
+								{
+									affectedComponents.add(affectedComponent);	//add this component to our list of affected components
+								}
 							}
 						}
 					}
-				}
-				guiseContext.setState(GuiseContext.State.INACTIVE);	//deactivate the context so that any model update events will be generated			
-//TODO del Debug.trace("we now have events:", guiseContext.getEventList().size());
-				for(final EventObject contextEvent:guiseContext.getEventList())	//for each event generated in this context
-				{
-//				TODO del Debug.trace("context event:", contextEvent);
-					final Object source=contextEvent.getSource();	//get the event source
-					if(source instanceof Model)	//if this was a model change
+					guiseContext.setState(GuiseContext.State.INACTIVE);	//deactivate the context so that any model update events will be generated			
+	//TODO del Debug.trace("we now have events:", guiseContext.getEventList().size());
+					for(final EventObject contextEvent:guiseContext.getEventList())	//for each event generated in this context
 					{
-						affectedComponents.addAll(AbstractModelComponent.getModelComponents(navigationFrame, (Model)source));	//get all components that use this model
+	//				TODO del Debug.trace("context event:", contextEvent);
+						final Object source=contextEvent.getSource();	//get the event source
+						if(source instanceof Model)	//if this was a model change
+						{
+							affectedComponents.addAll(AbstractModelComponent.getModelComponents(navigationFrame, (Model)source));	//get all components that use this model
+						}
 					}
+	//			TODO del Debug.trace("we now have affected components:", affectedComponents.size());
+					guiseContext.setState(GuiseContext.State.QUERY_MODEL);	//update the context state for querying the model
+					for(final Component<?> affectedComponent:affectedComponents)	//for each component affected by this update cycle
+					{
+	//				TODO del Debug.trace("affected component:", affectedComponent);
+						affectedComponent.queryModel(guiseContext);		//tell the component to query its model
+					}
+					guiseContext.setState(GuiseContext.State.ENCODE_MODEL);	//update the context state for encoding the model
+					for(final Component<?> affectedComponent:affectedComponents)	//for each component affected by this update cycle
+					{
+						affectedComponent.encodeModel(guiseContext);		//tell the component to encode its model
+					}				
+					guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view; make the change now in case queued model changes want to navigate, and an error was thrown when updating the model)
+					guiseContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type
+					guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_HTML);	//<xhtml:html>
+					guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
+					for(final Component<?> affectedComponent:affectedComponents)	//for each component affected by this update cycle
+					{
+						affectedComponent.updateView(guiseContext);		//tell the component to update its view
+					}
+					guiseContext.writeElementEnd();	//</xhtml:html>
 				}
-//			TODO del Debug.trace("we now have affected components:", affectedComponents.size());
-				guiseContext.setState(GuiseContext.State.QUERY_MODEL);	//update the context state for querying the model
-				for(final Component<?> affectedComponent:affectedComponents)	//for each component affected by this update cycle
-				{
-//				TODO del Debug.trace("affected component:", affectedComponent);
-					affectedComponent.queryModel(guiseContext);		//tell the component to query its model
-				}
-				guiseContext.setState(GuiseContext.State.ENCODE_MODEL);	//update the context state for encoding the model
-				for(final Component<?> affectedComponent:affectedComponents)	//for each component affected by this update cycle
-				{
-					affectedComponent.encodeModel(guiseContext);		//tell the component to encode its model
-				}				
-				guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view; make the change now in case queued model changes want to navigate, and an error was thrown when updating the model)
-				guiseContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type
-				guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_HTML);	//<xhtml:html>
-				guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
-				for(final Component<?> affectedComponent:affectedComponents)	//for each component affected by this update cycle
-				{
-					affectedComponent.updateView(guiseContext);		//tell the component to update its view
-				}
-				guiseContext.writeElementEnd();	//</xhtml:html>
 			}
 		}
 	}
@@ -611,6 +654,109 @@ Debug.trace("using this component");
 		}
 	}
 
+	private final PathExpression AJAX_REQUEST_EVENTS_WILDCARD_XPATH_EXPRESSION=new PathExpression("request", "events", "*");	//TODO use constants; comment 
+	private final PathExpression AJAX_REQUEST_CONTROL_NAME_XPATH_EXPRESSION=new PathExpression("control", "name");	//TODO use constants; comment 
+	private final PathExpression AJAX_REQUEST_CONTROL_VALUE_XPATH_EXPRESSION=new PathExpression("control", "value");	//TODO use constants; comment 
+	
+	/**Retrieves control events from the HTTP request.
+  @param request The HTTP request.
+  @exception ServletException if there is a problem servicing the request.
+  @exception IOException if there is an error reading or writing data.
+  */
+	protected List<ControlEvent> getControlEvents(final HttpServletRequest request) throws ServletException, IOException
+	{
+		final List<ControlEvent> controlEventList=new ArrayList<ControlEvent>();	//create a new list for storing control events
+		final String contentTypeString=request.getContentType();	//get the request content type
+		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
+		if(contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType))	//if this is a Guise AJAX request
+		{
+			try
+			{
+				final DocumentBuilderFactory documentBuilderFactory=DocumentBuilderFactory.newInstance();	//create a document builder factory TODO create a shared document builder factory, maybe---but make sure it is used by only one thread			
+				final DocumentBuilder documentBuilder=documentBuilderFactory.newDocumentBuilder();	//create a new document builder
+				final Document document=documentBuilder.parse(request.getInputStream());	//read the document from the request
+				final List<Node> eventNodes=(List<Node>)XPath.evaluatePathExpression(document, AJAX_REQUEST_EVENTS_WILDCARD_XPATH_EXPRESSION);	//get all the events
+				for(final Node eventNode:eventNodes)	//for each event node
+				{
+					final FormSubmitEvent formSubmitEvent=new FormSubmitEvent();	//create a new form submission event
+					final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
+					if(eventNode.getNodeType()==Node.ELEMENT_NODE && "form".equals(eventNode.getNodeName()))	//if this is a form event TODO use a constant
+					{
+						final Element controlNameElement=(Element)XPath.getNode(eventNode, AJAX_REQUEST_CONTROL_NAME_XPATH_EXPRESSION);	//get the control name node
+						final Element controlValueElement=(Element)XPath.getNode(eventNode, AJAX_REQUEST_CONTROL_VALUE_XPATH_EXPRESSION);	//get the control value  node
+						final String controlName=controlNameElement!=null ? controlNameElement.getTextContent() : null;	//get the control name
+						final String controlValue=controlValueElement!=null ? controlValueElement.getTextContent() : null;	//get the control value
+						if(controlName!=null && controlName.length()>0 && controlValue!=null)	 //if there is a non-empty control name and a control value
+						{
+							parameterListMap.addItem(controlName, controlValue);	//store the value in the parameters
+						}
+					}
+					controlEventList.add(formSubmitEvent);	//add the event to the list
+				}
+			}
+			catch(final ParserConfigurationException parserConfigurationException)	//we don't expect parser configuration errors
+			{
+				throw new AssertionError(parserConfigurationException);
+			}
+			catch(final SAXException saxException)	//we don't expect parsing errors
+			{
+				throw new AssertionError(saxException);	//TODO maybe change to throwing an IOException
+			}
+			catch(final IOException ioException)	//if there is an I/O exception
+			{
+				throw new AssertionError(ioException);	//TODO fix better
+			}
+		}
+		else	//if this is not a Guise AJAX request
+		{
+				//populate our parameter map
+			if(FileUpload.isMultipartContent(request))	//if this is multipart/form-data content
+			{
+				final FormSubmitEvent formSubmitEvent=new FormSubmitEvent();	//create a new form submission event
+				final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
+				final DiskFileUpload diskFileUpload=new DiskFileUpload();	//create a file upload handler
+				diskFileUpload.setSizeMax(-1);	//don't reject anything
+				try	//try to parse the file items submitted in the request
+				{
+					final List fileItems=diskFileUpload.parseRequest(request);	//parse the request
+					for(final Object object:fileItems)	//look at each file item
+					{
+						final FileItem fileItem=(FileItem)object;	//cast the object to a file item
+						final String parameterKey=fileItem.getFieldName();	//the parameter key will always be the field name
+						final Object parameterValue=fileItem.isFormField() ? fileItem.getString() : new FileItemResourceImport(fileItem);	//if this is a form field, store it normally; otherwise, create a file item resource import object
+						parameterListMap.addItem(parameterKey, parameterValue);	//store the value in the parameters
+					}
+				}
+				catch(final FileUploadException fileUploadException)	//if there was an error parsing the files
+				{
+					throw new IllegalArgumentException("Couldn't parse multipart/form-data request.");
+				}
+				controlEventList.add(formSubmitEvent);	//add the event to the list
+			}
+			else	//if this is normal application/x-www-form-urlencoded data
+			{
+				final FormSubmitEvent formSubmitEvent=new FormSubmitEvent();	//create a new form submission event
+				final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
+				final Iterator parameterEntryIterator=request.getParameterMap().entrySet().iterator();	//get an iterator to the parameter entries
+				while(parameterEntryIterator.hasNext())	//while there are more parameter entries
+				{
+					final Map.Entry parameterEntry=(Map.Entry)parameterEntryIterator.next();	//get the next parameter entry
+					final String parameterKey=(String)parameterEntry.getKey();	//get the parameter key
+					final String[] parameterValues=(String[])parameterEntry.getValue();	//get the parameter values
+					final List<Object> parameterValueList=new ArrayList<Object>(parameterValues.length);	//create a list to hold the parameters
+					CollectionUtilities.addAll(parameterValueList, parameterValues);	//add all the parameter values to our list
+					parameterListMap.put(parameterKey, parameterValueList);	//store the the array of values as a list, keyed to the value
+				}
+				controlEventList.add(formSubmitEvent);	//add the event to the list
+			}
+		}
+/*TODO del
+Debug.trace("parameter names:", request.getParameterNames());	//TODO del when finished with dual mulipart+encoded content
+Debug.trace("number of parameter names:", request.getParameterNames());
+Debug.trace("***********number of distinct parameter keys", parameterListMap.size());
+*/
+		return controlEventList;	//return the list of control events
+	}
 
   /**Determines if the resource at a given URI exists.
   This version adds checks to see if the URI represents a valid application navigation path.

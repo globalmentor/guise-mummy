@@ -7,9 +7,11 @@ import static java.util.Collections.*;
 
 import javax.mail.internet.ContentType;
 import javax.servlet.http.*;
+import javax.xml.parsers.*;
 
 import com.javaguise.context.GuiseContext;
 import com.javaguise.context.text.xml.AbstractXMLGuiseContext;
+import com.javaguise.controller.ControlEvent;
 import com.javaguise.model.FileItemResourceImport;
 import com.javaguise.session.GuiseSession;
 import static com.garretwilson.io.ContentTypeConstants.*;
@@ -17,10 +19,14 @@ import static com.garretwilson.io.ContentTypeUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 import com.garretwilson.text.CharacterEncoding;
+import com.garretwilson.text.xml.xpath.XPath;
+
 import static com.garretwilson.text.CharacterEncodingConstants.*;
 import com.garretwilson.util.*;
 
 import org.apache.commons.fileupload.*;
+import org.w3c.dom.*;
+import org.xml.sax.SAXException;
 
 /**The Guise context of an HTTP servlet.
 The output stream defaults to <code>text/plain</code> encoded in <code>UTF-8</code>.
@@ -47,6 +53,12 @@ public class HTTPServletGuiseContext extends AbstractXMLGuiseContext<HTTPServlet
 		/**@return The current absolute navigation URI for this context.*/
 		public URI getNavigationURI() {return navigationURI;}
 
+	/**The content type of the request, or <code>null</code> if no content type was specified.*/
+//TODO del when not needed	private final ContentType inputContentType;
+
+		/**@return The content type of the request, or <code>null</code> if no content type was specified.*/
+//	TODO del when not needed		protected ContentType getInputContentType() {return inputContentType;}
+
 	/**The current content type of the output.*/
 	private ContentType outputContentType=createContentType(TEXT, PLAIN_SUBTYPE);	//default to text/plain
 
@@ -62,41 +74,108 @@ public class HTTPServletGuiseContext extends AbstractXMLGuiseContext<HTTPServlet
 		this.request=checkNull(request, "Request cannot be null.");
 		this.response=checkNull(response, "Response cannot be null.");
 		this.navigationURI=URI.create(request.getRequestURL().toString());	//create the absolute navigation URI from the HTTP requested URL
-			//populate our parameter map
-		final ListMap<Object, Object> parameterListMap=getParameterListMap();	//get the map of parameter lists
-		if(FileUpload.isMultipartContent(request))	//if this is multipart/form-data content
+/*TODO del when not needed
+		final String contentTypeString=request.getContentType();	//get the request content type
+		inputContentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
+		if(inputContentType!=null && GuiseHTTPServlet.GUISE_AJAX_REQUEST_CONTENT_TYPE.match(inputContentType))	//if this is a Guise AJAX request
 		{
-			final DiskFileUpload diskFileUpload=new DiskFileUpload();	//create a file upload handler
-			diskFileUpload.setSizeMax(-1);	//don't reject anything
-			try	//try to parse the file items submitted in the request
+			try
 			{
-				final List fileItems=diskFileUpload.parseRequest(request);	//parse the request
-				for(final Object object:fileItems)	//look at each file item
+				final DocumentBuilderFactory documentBuilderFactory=DocumentBuilderFactory.newInstance();	//create a document builder factory TODO create a shared document builder factory, maybe---but make sure it is used by only one thread			
+				final DocumentBuilder documentBuilder=documentBuilderFactory.newDocumentBuilder();	//create a new document builder
+				final Document document=documentBuilder.parse(request.getInputStream());	//read the document from the request
+				final List<Node> formElementList=(List<Node>)XPath.evaluatePathExpression(document, "/request/events/form");	//get all the form events TODO later step through just the events, checking for form or for other events
+				if(formElementList.size()>0)	//if there is at least one form event
 				{
-					final FileItem fileItem=(FileItem)object;	//cast the object to a file item
-					final String parameterKey=fileItem.getFieldName();	//the parameter key will always be the field name
-					final Object parameterValue=fileItem.isFormField() ? fileItem.getString() : new FileItemResourceImport(fileItem);	//if this is a form field, store it normally; otherwise, create a file item resource import object
-					parameterListMap.addItem(parameterKey, parameterValue);	//store the value in the parameters
+					final Node formEventElement=formElementList.get(0);	//get the first form event TODO allow for multiple form events
+*/
+/*TODO fix
+					final NodeList formEventElementChildNodeList=document.getDocumentElement().getChildNodes();	//get the child nodes of the document
+					final int documentChildNodeCount=documentChildNodeList.getLength();	//find out how many document child nodes there are
+					for(int documentChildNodeIndex=0; documentChildNodeIndex<documentChildNodeCount; ++documentChildNodeIndex)	//for each child node
+					{
+						final Node documentChildNode=documentChildNodeList.item(documentChildNodeIndex);	//get this document child node
+						if(documentChildNode.getNodeType()==Node.ELEMENT_NODE && "request".equals(documentChildNode.getLocalName()))	//<request>
+						{
+
+				}
+*/
+				
+
+/*TODO fix
+				final NodeList documentChildNodeList=document.getDocumentElement().getChildNodes();	//get the child nodes of the document
+				final int documentChildNodeCount=documentChildNodeList.getLength();	//find out how many document child nodes there are
+				for(int documentChildNodeIndex=0; documentChildNodeIndex<documentChildNodeCount; ++documentChildNodeIndex)	//for each child node
+				{
+					final Node documentChildNode=documentChildNodeList.item(documentChildNodeIndex);	//get this document child node
+					if(documentChildNode.getNodeType()==Node.ELEMENT_NODE && "request".equals(documentChildNode.getLocalName()))	//<request>
+					{
+						final NodeList requestChildNodeList=document.getDocumentElement().getChildNodes();	//get the child nodes of the document
+						final int documentChildNodeCount=documentChildNodeList.getLength();	//find out how many document child nodes there are
+						for(int documentChildNodeIndex=0; documentChildNodeIndex<documentChildNodeCount; ++documentChildNodeIndex)	//for each child node
+						{
+							final Node documentChildNode=documentChildNodeList.item(documentChildNodeIndex);	//get this document child node
+							if(documentChildNode.getNodeType()==Node.ELEMENT_NODE && "request".equals(documentChildNode.getLocalName()))	//<request>
+							{
+						
+						
+					}
+*/
+/*TODO del when not needed
 				}
 			}
-			catch(final FileUploadException fileUploadException)	//if there was an error parsing the files
+			catch(final ParserConfigurationException parserConfigurationException)	//we don't expect parser configuration errors
 			{
-				throw new IllegalArgumentException("Couldn't parse multipart/form-data request.");
+				throw new AssertionError(parserConfigurationException);
+			}
+			catch(final SAXException saxException)	//we don't expect parsing errors
+			{
+				throw new AssertionError(saxException);	//TODO maybe change to throwing an IOException
+			}
+			catch(final IOException ioException)	//if there is an I/O exception
+			{
+				throw new AssertionError(ioException);	//TODO fix better
 			}
 		}
-		else	//if this is normal application/x-www-form-urlencoded data
+		else	//if this is not a Guise AJAX request
 		{
-			final Iterator parameterEntryIterator=request.getParameterMap().entrySet().iterator();	//get an iterator to the parameter entries
-			while(parameterEntryIterator.hasNext())	//while there are more parameter entries
+				//populate our parameter map
+			final ListMap<Object, Object> parameterListMap=getParameterListMap();	//get the map of parameter lists
+			if(FileUpload.isMultipartContent(request))	//if this is multipart/form-data content
 			{
-				final Map.Entry parameterEntry=(Map.Entry)parameterEntryIterator.next();	//get the next parameter entry
-				final String parameterKey=(String)parameterEntry.getKey();	//get the parameter key
-				final String[] parameterValues=(String[])parameterEntry.getValue();	//get the parameter values
-				final List<Object> parameterValueList=new ArrayList<Object>(parameterValues.length);	//create a list to hold the parameters
-				CollectionUtilities.addAll(parameterValueList, parameterValues);	//add all the parameter values to our list
-				parameterListMap.put(parameterKey, parameterValueList);	//store the the array of values as a list, keyed to the value
+				final DiskFileUpload diskFileUpload=new DiskFileUpload();	//create a file upload handler
+				diskFileUpload.setSizeMax(-1);	//don't reject anything
+				try	//try to parse the file items submitted in the request
+				{
+					final List fileItems=diskFileUpload.parseRequest(request);	//parse the request
+					for(final Object object:fileItems)	//look at each file item
+					{
+						final FileItem fileItem=(FileItem)object;	//cast the object to a file item
+						final String parameterKey=fileItem.getFieldName();	//the parameter key will always be the field name
+						final Object parameterValue=fileItem.isFormField() ? fileItem.getString() : new FileItemResourceImport(fileItem);	//if this is a form field, store it normally; otherwise, create a file item resource import object
+						parameterListMap.addItem(parameterKey, parameterValue);	//store the value in the parameters
+					}
+				}
+				catch(final FileUploadException fileUploadException)	//if there was an error parsing the files
+				{
+					throw new IllegalArgumentException("Couldn't parse multipart/form-data request.");
+				}
+			}
+			else	//if this is normal application/x-www-form-urlencoded data
+			{
+				final Iterator parameterEntryIterator=request.getParameterMap().entrySet().iterator();	//get an iterator to the parameter entries
+				while(parameterEntryIterator.hasNext())	//while there are more parameter entries
+				{
+					final Map.Entry parameterEntry=(Map.Entry)parameterEntryIterator.next();	//get the next parameter entry
+					final String parameterKey=(String)parameterEntry.getKey();	//get the parameter key
+					final String[] parameterValues=(String[])parameterEntry.getValue();	//get the parameter values
+					final List<Object> parameterValueList=new ArrayList<Object>(parameterValues.length);	//create a list to hold the parameters
+					CollectionUtilities.addAll(parameterValueList, parameterValues);	//add all the parameter values to our list
+					parameterListMap.put(parameterKey, parameterValueList);	//store the the array of values as a list, keyed to the value
+				}
 			}
 		}
+*/
 /*TODO del
 Debug.trace("parameter names:", request.getParameterNames());	//TODO del when finished with dual mulipart+encoded content
 Debug.trace("number of parameter names:", request.getParameterNames());
@@ -116,6 +195,15 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	protected void setState(final State newState)
 	{
 		super.setState(newState);
+	}
+
+	/**Sets the control event being processed.
+	This implementation exposes the method to the servlet.
+	@param controlEvent The control event to be processed.
+	*/
+	protected void setControlEvent(final ControlEvent controlEvent)
+	{
+		super.setControlEvent(controlEvent);
 	}
 
 	/**@return A writer for rendering text content.

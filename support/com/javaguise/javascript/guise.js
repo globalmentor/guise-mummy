@@ -1,8 +1,28 @@
-//Guise(TM) JavaScript support routines
-//Copyright (c) 2005 GlobalMentor, Inc.
-//Modal window support referenced code by Danny Goodman, http://www.dannyg.com/ .
-//
-//var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX communication should not occur.
+/**Guise(TM) JavaScript support routines
+Copyright (c) 2005 GlobalMentor, Inc.
+Modal window support referenced code by Danny Goodman, http://www.dannyg.com/ .
+var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX communication should not occur.
+*/
+
+/**Guise AJAX Request Format, content type application/x-guise-ajax-request+xml
+<request>
+	<events>	<!--the list of events (zero or more)-->
+		<form>	<!--information resulting from form changes, analogous to that in an HTTP POST-->
+			<control>	<!--a control change (zero or more)-->
+				<name></name>	<!--the name of the control-->
+				<value></value>	<!--the new value of the control-->
+			</control>
+		</form>
+	</events>
+</request>
+*/
+
+/**Guise AJAX Response Format, content type application/x-guise-ajax-response+xml
+<response>
+	<patch></patch>	<!--XML elements to be patched into the existing DOM tree.-->
+	...
+</response>
+*/
 
 //TODO turn off AJAX when unloading
 
@@ -27,7 +47,37 @@ Array.prototype.dequeue=Array.prototype.shift;
 
 if(typeof Node=="undefined")	//if no Node type is defined (e.g. IE), create one to give us constant node types
 {
-	var Node={ELEMENT_NODE: 1, ATTRIBUTE_NODE: 2, TEXT_NODE: 3, CDATA_SECTION_NODE: 4, ENTITY_REFERENCE_NODE: 5, ENTITY_NODE: 6, PROCESSING_INSTRUCTION_NODE: 7, COMMENT_NODE: 8, DOCUMENT_NODE: 9, DOCUMENT_TYPE_NODE: 10, DOCUMENT_FRAGMENT_NODE: 11, NOTATION_NODE: 12}
+	var Node={ELEMENT_NODE: 1, ATTRIBUTE_NODE: 2, TEXT_NODE: 3, CDATA_SECTION_NODE: 4, ENTITY_REFERENCE_NODE: 5, ENTITY_NODE: 6, PROCESSING_INSTRUCTION_NODE: 7, COMMENT_NODE: 8, DOCUMENT_NODE: 9, DOCUMENT_TYPE_NODE: 10, DOCUMENT_FRAGMENT_NODE: 11, NOTATION_NODE: 12};
+}
+
+//StringBuilder
+
+/**A class for concatenating string with more efficiency than using the additive operator.
+Inspired by Nicholas C. Zakas, _Professional JavaScript for Web Developers_, Wiley, 2005, p. 97.
+*/
+function StringBuilder()
+{
+	this._strings=new Array();	//create an array of strings
+	if(!this._initialized)
+	{
+		this._initialized=true;
+
+		/**Appends a string to the string builder.
+		@param string The string to append.
+		@return A reference to the string builder.
+		*/
+		StringBuilder.prototype.append=function(string)
+		{
+			this._strings.push(string);	//add this string to the array
+			return this;
+		};
+
+		/**@return A single string containing the contents of the string builder.*/
+		StringBuilder.prototype.toString=function()
+		{
+			return this._strings.join("");	//join with no separator and return the strings
+		};
+	}
 }
 
 //Parameter
@@ -67,7 +117,7 @@ function FormAJAXRequest(parameter)
 		FormAJAXRequest.prototype.addParameter=function(parameter)
 		{
 			this.parameters.push(parameter);	//add another parameter to the array
-		}
+		};
 	}
 	if(parameter)	//if a parameter was passed
 	{
@@ -83,147 +133,155 @@ function processHTTPResponse(): A reference to a function to call for asynchrono
 */
 function HTTPCommunicator()
 {
-	this.name="HTTP Communicator";	//TODO del; testing
-
 	/**The reference to the current XMLHTTP request object, or null if no communication is occurring.*/
 	this.xmlHTTP=null;
 
 	/**The configured method for processing an HTTP response.*/
 	this.processHTTPResponse=null;
 
-	/**@return true if the commmunicator is in the process of communicating.*/
-	HTTPCommunicator.prototype.isCommunicating=function() {return this.xmlHTTP!=null;}
+	if(!this._initialized)
+	{
+		this._initialized=true;
 
-	/**The enumeration of ready states for asynchronous XMLHTTP requests.*/
-	HTTPCommunicator.prototype.READY_STATE={UNINITIALIZED: 0, LOADING: 1, LOADED: 2, INTERACTIVE: 3, COMPLETED: 4}
+		/**@return true if the commmunicator is in the process of communicating.*/
+		HTTPCommunicator.prototype.isCommunicating=function() {return this.xmlHTTP!=null;};
 	
-	/**The versions of the Microsoft XML HTTP ActiveX objects, in increasing order of preference.*/
-	HTTPCommunicator.prototype.MSXMLHTTP_VERSIONS=["Microsoft.XMLHTTP", "MSXML2.XMLHTTP", "MSXML2.XMLHTTP.3.0", "MSXML2.XMLHTTP.4.0", "MSXML2.XMLHTTP.5.0", "MSXML2.XMLHTTP.6.0", "MSXML2.XMLHTTP.7.0"];
-	
-	/**Sets the callback method to use for processing an HTTP response.
-	When the provided method is called, the this variable will be set to this HTTP communicator.
-	@param fn The function to call when processing HTTP responses, or null if requests should be synchronous.
-	*/
-	HTTPCommunicator.prototype.setProcessHTTPResponse=function(fn)
-	{
-		this.processHTTPResponse=fn;	//save the function for processing HTTP responses
-	}
-	
-	/**@return A newly created XML HTTP request object.*/
-	HTTPCommunicator.prototype._createXMLHTTP=function()
-	{
-		if(window.XMLHttpRequest)	//if we can create an XML HTTP request (e.g. Mozilla)
-		{
-			return new XMLHttpRequest();
-		}
-		else if(window.ActiveXObject)	//if we can create ActiveX objects
-		{
-			for(var i=this.MSXMLHTTP_VERSIONS.length-1; i>=0; --i)	//for each available version
-			{
-				try
-				{
-					return new ActiveXObject(this.MSXMLHTTP_VERSIONS[i]);	//try to create a new ActiveX object
-				}
-				catch(exception)	//ignore the errors
-				{
-				}
-			}
-		}
-		throw new Error("XMLHTTP not available.");
-	}
-	
-	/**Performs an HTTP GET request.
-	@param uri The request URI.
-	@param query Query information for the URI of the GET request, or null if there is no query.
-	*/
-	HTTPCommunicator.prototype.get=function(uri, query)
-	{
-		return this._performRequest("GET", uri, query);	//perform a GET request
-	}
-	
-	/**Performs an HTTP POST request.
-	@param uri The request URI.
-	@param query Query information for the body of the POST request, or null if there is no query.
-	*/
-	HTTPCommunicator.prototype.post=function(uri, query)
-	{
-		return this._performRequest("POST", uri, query);	//perform a POST request
-	}
-
-	/**Performs an HTTP request and returns the result.
-	@param The HTTP request method.
-	@param uri The request URI.
-	@param query Query information for the request, or null if there is no query.
-	@return The text of the response or, if the response provides an XML DOM tree, the XML document object; or null if the request is asynchronous.
-	@throws Exception if an error occurs performing the request.
-	@throws Number if the HTTP response code was not 200 (OK).
-	*/
-	HTTPCommunicator.prototype._performRequest=function(method, uri, query)
-	{
-			//TODO assert this.xmlHTTP does not exist
-		this.xmlHTTP=HTTPCommunicator.prototype._createXMLHTTP();	//create an XML HTTP object
-		if(method=="GET" && query)	//if there is a query for the GET method
-		{
-			uri=uri+"?"+query;	//add the query to the URI
-		}
-		var asynchronous=Boolean(this.processHTTPResponse);	//see if we should make an asynchronous request
-		if(asynchronous)	//if we're making asynchronous requests
-		{
-			this.xmlHTTP.onreadystatechange=this._createOnReadyStateChangeCallback();	//create and assign a callback function for processing the response
-		}
-		this.xmlHTTP.open(method, uri, asynchronous);
-		var content=null;	//we'll create content if we need to
-		if("POST"==method)	//if this is the POST method
-		{
-//TODO del alert("posting with query: "+query);
-			this.xmlHTTP.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");	//set the post content type
-			if(query)	//if there is a post query
-			{
-				content=query;	//use the query as the content
-			}	
-		}
-		this.xmlHTTP.send(content);	//send the request
-		if(!asynchronous)	//if we're communicating synchronously
-		{
-			thisHTTPCommunicator._reportReportResponse();	//report the response immediately TODO maybe put this into an asynchrous call using setTimeout()
-		}
-	}
-
-	/**Creates a method for processing XML HTTP on ready state changes.
-	This method uses JavaScript closure to capture a reference to this class so that it will be present during later callback.
-	*/
-	HTTPCommunicator.prototype._createOnReadyStateChangeCallback=function()
-	{
-		var thisHTTPCommunicator=this;	//save this
-		/**A new function that captures this in the form of the thisHTTPCommunicator variable.
-		var thisHTTPCommunicator The captured reference to the HTTPCommunicator instance.
+		/**The enumeration of ready states for asynchronous XMLHTTP requests.*/
+		HTTPCommunicator.prototype.READY_STATE={UNINITIALIZED: 0, LOADING: 1, LOADED: 2, INTERACTIVE: 3, COMPLETED: 4};
+		
+		/**The versions of the Microsoft XML HTTP ActiveX objects, in increasing order of preference.*/
+		HTTPCommunicator.prototype.MSXMLHTTP_VERSIONS=["Microsoft.XMLHTTP", "MSXML2.XMLHTTP", "MSXML2.XMLHTTP.3.0", "MSXML2.XMLHTTP.4.0", "MSXML2.XMLHTTP.5.0", "MSXML2.XMLHTTP.6.0", "MSXML2.XMLHTTP.7.0"];
+		
+		/**Sets the callback method to use for processing an HTTP response.
+		When the provided method is called, the this variable will be set to this HTTP communicator.
+		@param fn The function to call when processing HTTP responses, or null if requests should be synchronous.
 		*/
-		return function()
+		HTTPCommunicator.prototype.setProcessHTTPResponse=function(fn)
 		{
-			if(thisHTTPCommunicator.xmlHTTP && thisHTTPCommunicator.xmlHTTP.readyState==thisHTTPCommunicator.READY_STATE.COMPLETED)	//if a transfer is completed
-			{
-				thisHTTPCommunicator._reportResponse();	//report the response
-			}
-		}
-	}
-
-	/**Reports the response from the XML HTTP request object by calling the processHTTPResponse() callback method.
-	The reference to the XML HTTP request object is removed.
-	@see #processHTTPResponse()
-	*/
-	HTTPCommunicator.prototype._reportResponse=function()
-	{
-		if(this.xmlHTTP)	//if we have an XML HTTP request object
+			this.processHTTPResponse=fn;	//save the function for processing HTTP responses
+		};
+		
+		/**@return A newly created XML HTTP request object.*/
+		HTTPCommunicator.prototype._createXMLHTTP=function()
 		{
-			this.status=this.xmlHTTP.status;	//store the status in the communicator
-			this.responseText=this.xmlHTTP.responseText;	//store the response text in the communicator
-			this.responseXML=this.xmlHTTP.responseXML;	//store the response XML in the communicator
-			this.xmlHTTP=null;	//remove the XML HTTP request object (Firefox only allows one asynchronous communication per object)
-			if(this.processHTTPResponse)	//if we have a method for processing responses
+			if(window.XMLHttpRequest)	//if we can create an XML HTTP request (e.g. Mozilla)
 			{
-				this.processHTTPResponse();	//process the response
+				return new XMLHttpRequest();
 			}
-		}
+			else if(window.ActiveXObject)	//if we can create ActiveX objects
+			{
+				for(var i=this.MSXMLHTTP_VERSIONS.length-1; i>=0; --i)	//for each available version
+				{
+					try
+					{
+						return new ActiveXObject(this.MSXMLHTTP_VERSIONS[i]);	//try to create a new ActiveX object
+					}
+					catch(exception)	//ignore the errors
+					{
+					}
+				}
+			}
+			throw new Error("XMLHTTP not available.");
+		};
+		
+		/**Performs an HTTP GET request.
+		@param uri The request URI.
+		@param query Query information for the URI of the GET request, or null if there is no query.
+		*/
+		HTTPCommunicator.prototype.get=function(uri, query)
+		{
+			return this._performRequest("GET", uri, query);	//perform a GET request
+		};
+		
+		/**Performs an HTTP POST request.
+		@param uri The request URI.
+		@param query Query information for the body of the POST request, or null if there is no query.
+		@param contentType The content type of the request, or null if no content type should be specified.
+		*/
+		HTTPCommunicator.prototype.post=function(uri, query, contentType)
+		{
+			return this._performRequest("POST", uri, query, contentType);	//perform a POST request
+		};
+	
+		/**Performs an HTTP request and returns the result.
+		@param The HTTP request method.
+		@param uri The request URI.
+		@param query Query information for the request, or null if there is no query.
+		@return The text of the response or, if the response provides an XML DOM tree, the XML document object; or null if the request is asynchronous.
+		@throws Exception if an error occurs performing the request.
+		@throws Number if the HTTP response code was not 200 (OK).
+		*/
+		HTTPCommunicator.prototype._performRequest=function(method, uri, query, contentType)
+		{
+				//TODO assert this.xmlHTTP does not exist
+			this.xmlHTTP=HTTPCommunicator.prototype._createXMLHTTP();	//create an XML HTTP object
+			if(method=="GET" && query)	//if there is a query for the GET method
+			{
+				uri=uri+"?"+query;	//add the query to the URI
+			}
+			var asynchronous=Boolean(this.processHTTPResponse);	//see if we should make an asynchronous request
+			if(asynchronous)	//if we're making asynchronous requests
+			{
+				this.xmlHTTP.onreadystatechange=this._createOnReadyStateChangeCallback();	//create and assign a callback function for processing the response
+			}
+			this.xmlHTTP.open(method, uri, asynchronous);
+			var content=null;	//we'll create content if we need to
+			if(method=="POST")	//if this is the POST method
+			{
+	//TODO del alert("posting with query: "+query);
+//TODO del				this.xmlHTTP.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");	//set the post content type
+				if(contentType)	//if a content type was given
+				{
+					this.xmlHTTP.setRequestHeader("Content-Type", contentType);	//set the post content type
+				}
+				if(query)	//if there is a post query
+				{
+					content=query;	//use the query as the content
+				}	
+			}
+			this.xmlHTTP.send(content);	//send the request
+			if(!asynchronous)	//if we're communicating synchronously
+			{
+				thisHTTPCommunicator._reportReportResponse();	//report the response immediately TODO maybe put this into an asynchrous call using setTimeout()
+			}
+		};
+	
+		/**Creates a method for processing XML HTTP on ready state changes.
+		This method uses JavaScript closure to capture a reference to this class so that it will be present during later callback.
+		*/
+		HTTPCommunicator.prototype._createOnReadyStateChangeCallback=function()
+		{
+			var thisHTTPCommunicator=this;	//save this
+			/**A new function that captures this in the form of the thisHTTPCommunicator variable.
+			var thisHTTPCommunicator The captured reference to the HTTPCommunicator instance.
+			*/
+			return function()
+			{
+				if(thisHTTPCommunicator.xmlHTTP && thisHTTPCommunicator.xmlHTTP.readyState==thisHTTPCommunicator.READY_STATE.COMPLETED)	//if a transfer is completed
+				{
+					thisHTTPCommunicator._reportResponse();	//report the response
+				}
+			};
+		};
+	
+		/**Reports the response from the XML HTTP request object by calling the processHTTPResponse() callback method.
+		The reference to the XML HTTP request object is removed.
+		@see #processHTTPResponse()
+		*/
+		HTTPCommunicator.prototype._reportResponse=function()
+		{
+			if(this.xmlHTTP)	//if we have an XML HTTP request object
+			{
+				this.status=this.xmlHTTP.status;	//store the status in the communicator
+				this.responseText=this.xmlHTTP.responseText;	//store the response text in the communicator
+				this.responseXML=this.xmlHTTP.responseXML;	//store the response XML in the communicator
+				this.xmlHTTP=null;	//remove the XML HTTP request object (Firefox only allows one asynchronous communication per object)
+				if(this.processHTTPResponse)	//if we have a method for processing responses
+				{
+					this.processHTTPResponse();	//process the response
+				}
+			}
+		};
 	}
 }
 
@@ -234,8 +292,6 @@ function HTTPCommunicator()
 function GuiseAJAX()
 {
 
-	this.name="Guise AJAX";	//TODO del; testing
-
 	/**The object for communicating with Guise via AJAX.*/
 	this.httpCommunicator=new HTTPCommunicator();
 
@@ -245,261 +301,376 @@ function GuiseAJAX()
 	/**The queue of AJAX response XML DOM trees.*/
 	this.ajaxResponses=new Array();
 
-	/**Immediately sends or queues an AJAX request.
-	@param ajaxRequest The AJAX request to send.
-	*/
-	GuiseAJAX.prototype.sendAJAXRequest=function(ajaxRequest)
-	{
-		if(AJAX_URI)	//if AJAX is enabled
-		{
-			this.ajaxRequests.enqueue(ajaxRequest);	//enqueue the request info
-			this.processAJAXRequests();	//process any waiting requests now if we can
-		}
-	}
-
 	/**Whether we are currently processing AJAX requests.*/
 	this.processingAJAXRequests=false;
 
-	/**Processes AJAX requests.
-	@see GuiseAJAX#ajaxRequests
-	*/
-	GuiseAJAX.prototype.processAJAXRequests=function()
+	/**Whether we are currently processing AJAX responses.*/
+	this.processingAJAXResponses=false;
+
+	if(!this._initialized)
 	{
-		if(!this.processingAJAXRequests)	//if we aren't processing AJAX requests TODO fix small race condition in determining whether processing is occurring
+		this._initialized=true;
+
+		/**The content type of a Guise AJAX request.*/
+		GuiseAJAX.prototype.REQUEST_CONTENT_TYPE="application/x-guise-ajax-request+xml";
+
+		/**The enumeration of the names of the request elements.*/
+		GuiseAJAX.prototype.RequestElement={REQUEST: "request", EVENTS: "events", FORM: "form", CONTROL: "control", NAME: "name", VALUE: "value"};
+
+		/**The content type of a Guise AJAX response.*/
+		GuiseAJAX.prototype.RESPONSE_CONTENT_TYPE="application/x-guise-ajax-response+xml";
+
+		/**The enumeration of the names of the response elements.*/
+		GuiseAJAX.prototype.ResponseElement={RESPONSE: "response", PATCH: "patch"};
+
+		/**Immediately sends or queues an AJAX request.
+		@param ajaxRequest The AJAX request to send.
+		*/
+		GuiseAJAX.prototype.sendAJAXRequest=function(ajaxRequest)
 		{
-			this.processingAJAXRequests=true;	//we are processing AJAX requests now
-			try
+			if(AJAX_URI)	//if AJAX is enabled
 			{
-				//see if the communicator is not busy (if it is busy, we're in asychronous mode and the end of the processing will call this method again to check for new requests)
-				while(!this.httpCommunicator.isCommunicating() && this.ajaxRequests.length>0)	//while the communicator is not busy and there are more AJAX requests
+				this.ajaxRequests.enqueue(ajaxRequest);	//enqueue the request info
+				this.processAJAXRequests();	//process any waiting requests now if we can
+			}
+		};
+	
+		/**Processes AJAX requests.
+		@see GuiseAJAX#ajaxRequests
+		*/
+		GuiseAJAX.prototype.processAJAXRequests=function()
+		{
+				//see if the communicator is not busy (if it is busy, we're in asychronous mode and the end of the processing this method will be called again to check for new requests)
+			if(!this.httpCommunicator.isCommunicating() && !this.processingAJAXRequests && this.ajaxRequests.length>0)	//if we aren't processing AJAX requests or communicating with the server, and there are requests queued TODO fix small race condition in determining whether processing is occurring
+			{
+				this.processingAJAXRequests=true;	//we are processing AJAX requests now
+				try
 				{
-					try
-					{			
+					var requestStringBuilder=new StringBuilder();	//create a string builder to hold the request string					
+					this.appendXMLStartTag(requestStringBuilder, this.RequestElement.REQUEST);	//<request>
+					this.appendXMLStartTag(requestStringBuilder, this.RequestElement.EVENTS);	//<event>
+					while(this.ajaxRequests.length>0)	//there are more AJAX requests
+					{
 						var ajaxRequest=this.ajaxRequests.dequeue();	//get the next AJAX request to process
-						if(ajaxRequest instanceof FormAJAXRequest)	//TODO complete redesign
+						if(ajaxRequest instanceof FormAJAXRequest)	//if this is a form event
 						{
-							var query=null;	//we'll determine the query
-							var parameters=ajaxRequest.parameters;	//get the parameters
-							if(parameters.length>0)	//if there are parameters
-							{
-								var parameterStrings=new Array(parameters.length);	//create an array of parameter strings
-								for(var i=parameterStrings.length-1; i>=0; --i)	//for each parameter string
-								{
-									var parameter=parameters[i];	//get this parameter
-									parameterStrings[i]=encodeURIComponent(parameter.name)+"="+encodeURIComponent(parameter.value);	//encode this parameter string
-								}
-								var query=parameterStrings.join("&");	//join the parameters to get the query
-							}
-							this.httpCommunicator.post(AJAX_URI, query);	//post the HTTP request information TODO have the HTTP communicator call the callback method even for synchronous calls
+							this._appendAJAXFormEvent(requestStringBuilder, ajaxRequest);	//append the form event
 						}
+					}
+					this.appendXMLEndTag(requestStringBuilder, this.RequestElement.EVENTS);	//</events>
+					this.appendXMLEndTag(requestStringBuilder, this.RequestElement.REQUEST);	//</request>
+					try
+					{
+//TODO del alert("ready to post: "+requestStringBuilder.toString());
+						this.httpCommunicator.post(AJAX_URI, requestStringBuilder.toString(), this.REQUEST_CONTENT_TYPE);	//post the HTTP request information
 					}
 					catch(exception)	//if a problem occurred
 					{
 						//TODO log a warning
 alert(exception);
 						AJAX_URI=null;	//stop further AJAX communication
-					}
+					}						
+				}
+				finally
+				{
+					this.processingAJAXRequests=false;	//we are no longer processing AJAX requests
 				}
 			}
-			finally
-			{
-				this.processingAJAXRequests=false;	//we are no longer processing AJAX requests
-			}
-		}
-	}
+		};
 
-	/**Processes responses from AJAX requests.
-	This routine should be called asynchronously from an event so that the DOM tree can be successfully updated.
-	@see GuiseAJAX#ajaxResponses
-	*/
-	GuiseAJAX.prototype.processAJAXResponses=function()
-	{
-		if(!this.processingAJAXResponses)	//if we aren't processing AJAX responses TODO fix small race condition in determining whether processing is occurring
+		/**Appends an AJAX form event to a string builder.
+		@param stringBuilder The string builder collecting the request data.
+		@param ajaxFormRequest The form request information to append.
+		@return The string builder.
+		*/
+		GuiseAJAX.prototype._appendAJAXFormEvent=function(stringBuilder, ajaxFormRequest)
 		{
-			this.processingAJAXResponses=true;	//we are processing AJAX responses now
-			try
-			{
-				while(this.ajaxResponses.length>0)	//while there are more AJAX responses TODO fix small race condition on adding responses
-				{
-					this.patchElement(this.ajaxResponses.dequeue().documentElement);
-					this.processAJAXRequests();	//make sure there are no waiting AJAX requests
-				}
-			}
-			finally
-			{
-				this.processingAJAXResponses=false;	//we are no longer processing AJAX responses
-			}
-		}
-	}
-
-	/**Creates a method for processing HTTP communication.
-	This method uses JavaScript closure to capture a reference to this class so that it will be present during later callback.
-	*/
-	GuiseAJAX.prototype._createHTTPResponseCallback=function()
-	{
-		var thisGuiseAJAX=this;	//save this
-		/**A new function that captures this in the form of the thisGuiseAJAX variable.
-		var this The HTTP communicator that calls this function.
-		var thisGuiseAJAX The captured reference to the GuiseAJAX instance.
-		*/ 
-		return function()
-		{
-/*TODO del
-alert("processing HTTP response with thisGuiseAJAX of "+thisGuiseAJAX.name);
-alert("the this we received is "+this.name);
-*/
-			try
-			{
-	//TODO del alert("processing asynch result");
-/*TODO del
-alert("got status: "+this.status);
-alert("response text: "+this.responseText);
-*/
-				if(this.status==200)	//if everything went OK
-				{
-					if(this.responseXML)
-					{
-						thisGuiseAJAX.ajaxResponses.enqueue(this.responseXML);	//enqueue the response XML
-						thisGuiseAJAX.processAJAXResponses();	//process enqueued AJAX responses
-//TODO del						setTimeout("GuiseAJAX.prototype.processAJAXResponses();", 1);	//process the AJAX responses later		
-//TODO del						thisGuiseAJAX.processAJAXRequests();	//make sure there are no waiting AJAX requests
-					}
-				}
-				else	//if there was an HTTP error TODO check for redirects
-				{
-			//TODO fix		throw xmlHTTP.status;	//throw the status code
-				}
-			}
-			catch(exception)	//if a problem occurred
-			{
-				//TODO log a warning
-alert(exception);
-				AJAX_URI=null;	//stop further AJAX communication
-			}
-		}
-	}
-
-	/**Patches an element and its children into the existing element hierarchy.
-	Any element in the hierarchy without an ID attribute will be ignored, although its children will be processed.
-	@param element The element hierarchy to patch into the existing document.
-	*/ 
-	GuiseAJAX.prototype.patchElement=function(element)
-	{
-			//do depth-first patching, allowing us to precheck children at the same time for later patching at this level in the hierarchy
-		var childNodeList=element.childNodes;	//get all the child nodes of the element
-		var childNodeCount=childNodeList.length;	//find out how many children there are
-		var childTextNodeCount=0;	//keep track of how many child text nodes there are
-		for(var i=0; i<childNodeCount; ++i)	//for each child node
-		{
-			var childNode=childNodeList[i];	//get this child node
-			switch(childNode.nodeType)	//see which type of child node this is
-			{
-				case Node.ELEMENT_NODE:	//element
-					this.patchElement(childNode);	//patch this child element
-					break;
-				case Node.TEXT_NODE:	//text
-					++childTextNodeCount;	//show that we found another text child
-					break;
-			}
-		}
-			//TODO make sure the Mozilla/IE attribute access functionality is robust, taking into account Mozilla's separate value structure
-		var id=element.getAttribute("id");	//get the element's ID, if there is one
-		if(id)	//if the element has an ID
-		{
-	//TODO del alert("patching stuff for ID "+id);
-			var oldElement=document.getElementById(id);	//get the old element
-			if(oldElement)	//if the element currently exists in the document
-			{
-					//remove any attributes the old element has that are not in the new element
-				var oldAttributes=oldElement.attributes;	//get the old element's attributes
-				for(var i=oldAttributes.length-1; i>=0; --i)	//for each old attribute
-				{
-					var oldAttribute=oldAttributes[i];	//get this attribute
-					var oldAttributeName=oldAttribute.nodeName;	//get the attribute name
-					var oldAttributeValue=oldAttribute.nodeValue;	//get the attribute value
-					var attributeName=oldAttributeName;
-					if(oldAttributeName=="readOnly")	//TODO fix for other misspelled attributes, such as className
-					{
-						attributeName="readonly";
-					}
-					if(/*TODO fix or del attributeValue!=null && attributeValue.length>0 && */!element.getAttribute(attributeName))	//if there is really an attribute value (IE provides all possible attributes, even with those with no value) and the new element doesn't have this attribute
-					{
-	//TODO del alert("ready to remove "+id+" attribute "+attributeName+" with current value "+attributeValue);
-						oldElement.removeAttribute(oldAttributeName);	//remove the attribute normally (apparently no action will take place if performed on IE-specific attributes such as element.start)
-	//TODO fix					i=0;	//TODO fix; temporary to get out of looking at all IE's attributes
-					}
-				}
-					//patch in the new and changed attributes
-				var attributes=element.attributes;	//get the new element's attributes
-				for(var i=attributes.length-1; i>=0; --i)	//for each attribute
-				{
-					var attribute=attributes[i];	//get this attribute
-					var attributeName=attribute.nodeName;	//get the attribute name
-					var attributeValue=attribute.nodeValue;	//get the attribute value
-	//TODO del alert("looking at attribute "+attributeName+" with value "+attributeValue);
-	//TODO del alert("looking at old attribute "+attributeName+" with value "+oldElement.getAttribute(attributeName)+" other way "+oldElement[attributeName]);
-						//TODO fix for oldElement.class/oldElement.className on IE
-					if(oldElement[attributeName]!=attributeValue)	//if the old element has a different (or no) value for this attribute (Firefox maintains different values for element.getAttribute(attributeName) and element[attributeName])
-					{
-	//TODO del alert("updating "+id+" attribute "+attributeName+" to new value "+attributeValue);
-						oldElement[attributeName]=attributeValue;	//update the old element's attribute (this format works for Firefox where oldElement.setAttribute("value", attributeValue) does not)
-	//TODO: fix the Firefox problem of sending an onchange event for any elements that get updated from an Ajax request, but only later when the focus blurs
-	//TODO fix the focus problem if the user has focus on an element that gets changed in response to the event
-					}
-				}
-					//patch in the new child element hierarchy
-				var oldChildNodeList=oldElement.childNodes;	//get all the child nodes of the old element
-				var oldChildNodeCount=oldChildNodeList.length;	//find out how many old children there are
-				if(childNodeCount>0)	//if the new element has child nodes
-				{
-						//patch any changed text
-					if(childTextNodeCount==childNodeCount)	//if all the child nodes are text nodes
-					{
-						var onlyChangeValues=false;	//see if we can get by with just changing text node values
-						if(oldChildNodeCount==childNodeCount)	//if the old element has the same number of children as the new element
-						{
-							onlyChangeValues=true;	//we may get away with only changing values after all
-							for(var i=0; i<oldChildNodeCount; ++i)	//look at each old child node
-							{
-								if(oldChildNodeList[i].nodeType!=childNodeList[i].nodeType)	//if the old child element is a different type than the new one
+			this.appendXMLStartTag(stringBuilder, this.RequestElement.FORM);	//<form>
+/*TODO del if not needed
+								var query=null;	//we'll determine the query
+								var parameters=ajaxFormRequest.parameters;	//get the parameters
+								if(parameters.length>0)	//if there are parameters
 								{
-									onlyChangeValues=false;	//we'll have to actually change around child nodes
-									break;	//stop looking for difficulties---we just found one
+									var parameterStrings=new Array(parameters.length);	//create an array of parameter strings
+									for(var i=parameterStrings.length-1; i>=0; --i)	//for each parameter string
+									{
+										var parameter=parameters[i];	//get this parameter
+										parameterStrings[i]=encodeURIComponent(parameter.name)+"="+encodeURIComponent(parameter.value);	//encode this parameter string
+									}
+									var query=parameterStrings.join("&");	//join the parameters to get the query
+								}
+*/
+			var parameters=ajaxFormRequest.parameters;	//get the parameters
+			if(parameters.length>0)	//if there are parameters
+			{
+				var parameterStrings=new Array(parameters.length);	//create an array of parameter strings
+				for(var i=parameterStrings.length-1; i>=0; --i)	//for each parameter string
+				{
+					var parameter=parameters[i];	//get this parameter
+					this.appendXMLStartTag(stringBuilder, this.RequestElement.CONTROL);	//<control>
+					this.appendXMLTextElement(stringBuilder, this.RequestElement.NAME, parameter.name);	//<name>name</name>
+					this.appendXMLTextElement(stringBuilder, this.RequestElement.VALUE, parameter.value);	//<value>value</value>
+					this.appendXMLEndTag(stringBuilder, this.RequestElement.CONTROL);	//</control>
+				}
+			}
+			this.appendXMLEndTag(stringBuilder, this.RequestElement.FORM);	//</form>
+			return stringBuilder;	//return the string builder
+		};
+
+		/**Appends an XML start tag with the given name to the given string builder.
+		@param stringBuilder The string builder to hold the data.
+		@param tagName The name of the XML tag.
+		@return A reference to the string builder.
+		*/ 
+		GuiseAJAX.prototype.appendXMLStartTag=function(stringBuilder, tagName)
+		{
+			return stringBuilder.append("<").append(tagName).append(">");	//append the start tag
+		};
+
+		/**Appends an XML end tag with the given name to the given string builder.
+		@param stringBuilder The string builder to hold the data.
+		@param tagName The name of the XML tag.
+		@return A reference to the string builder.
+		*/
+		GuiseAJAX.prototype.appendXMLEndTag=function(stringBuilder, tagName)
+		{
+			return stringBuilder.append("</").append(tagName).append(">");	//append the start tag
+		};
+
+		/**Appends an XML element containing text.
+		@param stringBuilder The string builder to hold the data.
+		@param tagName The name of the XML tag.
+		@param text The text to store in the element.
+		@return A reference to the string builder.
+		*/
+		GuiseAJAX.prototype.appendXMLTextElement=function(stringBuilder, tagName, text)
+		{
+			this.appendXMLStartTag(stringBuilder, tagName);	//append the start tag
+			stringBuilder.append(text);	//append the text TODO encode the text
+			return this.appendXMLEndTag(stringBuilder, tagName);	//append the end tag
+		};
+	
+		/**Creates a method for processing HTTP communication.
+		This method uses JavaScript closure to capture a reference to this class so that it will be present during later callback.
+		*/
+		GuiseAJAX.prototype._createHTTPResponseCallback=function()
+		{
+			var thisGuiseAJAX=this;	//save this
+			/**A new function that captures this in the form of the thisGuiseAJAX variable.
+			var this The HTTP communicator that calls this function.
+			var thisGuiseAJAX The captured reference to the GuiseAJAX instance.
+			*/ 
+			return function()
+			{
+	/*TODO del
+	alert("processing HTTP response with thisGuiseAJAX of "+thisGuiseAJAX.name);
+	alert("the this we received is "+this.name);
+	*/
+				try
+				{
+		//TODO del alert("processing asynch result");
+/*TODO del
+	alert("got status: "+this.status);
+	alert("response text: "+this.responseText);
+	alert("response XML: "+this.responseXML);
+*/
+					if(this.status==200)	//if everything went OK
+					{
+						if(this.responseXML)
+						{
+//TODO if the content is empty, IE may send back a document with a document element with no children, generating an error when trying to access the child list; always send back XML or send back another response
+							thisGuiseAJAX.ajaxResponses.enqueue(this.responseXML);	//enqueue the response XML
+							thisGuiseAJAX.processAJAXResponses();	//process enqueued AJAX responses
+	//TODO del						setTimeout("GuiseAJAX.prototype.processAJAXResponses();", 1);	//process the AJAX responses later		
+	//TODO del						thisGuiseAJAX.processAJAXRequests();	//make sure there are no waiting AJAX requests
+						}
+					}
+					else	//if there was an HTTP error TODO check for redirects
+					{
+				//TODO fix		throw xmlHTTP.status;	//throw the status code
+					}
+				}
+				catch(exception)	//if a problem occurred
+				{
+					//TODO log a warning
+	alert(exception);
+					AJAX_URI=null;	//stop further AJAX communication
+				}
+			};
+		};
+
+		/**Processes responses from AJAX requests.
+		This routine should be called asynchronously from an event so that the DOM tree can be successfully updated.
+		@see GuiseAJAX#ajaxResponses
+		*/
+		GuiseAJAX.prototype.processAJAXResponses=function()
+		{
+			if(!this.processingAJAXResponses)	//if we aren't processing AJAX responses TODO fix small race condition in determining whether processing is occurring
+			{
+				this.processingAJAXResponses=true;	//we are processing AJAX responses now
+				try
+				{
+					while(this.ajaxResponses.length>0)	//while there are more AJAX responses TODO fix small race condition on adding responses
+					{
+						var responseDocument=this.ajaxResponses.dequeue();	//get this response
+/*TODO fix
+
+						
+				//do depth-first patching, allowing us to precheck children at the same time for later patching at this level in the hierarchy
+			var childNodeList=element.childNodes;	//get all the child nodes of the element
+			var childNodeCount=childNodeList.length;	//find out how many children there are
+alert("childnode count: "+childNodeCount);
+			var childTextNodeCount=0;	//keep track of how many child text nodes there are
+			for(var i=0; i<childNodeCount; ++i)	//for each child node
+			{
+				var childNode=childNodeList[i];	//get this child node
+				switch(childNode.nodeType)	//see which type of child node this is
+				{
+					case Node.ELEMENT_NODE:	//element
+						this.patchElement(childNode);	//patch this child element
+						break;
+					case Node.TEXT_NODE:	//text
+						++childTextNodeCount;	//show that we found another text child
+						break;
+				}
+			}
+						
+
+*/
+						this._patchElement(responseDocument.documentElement);	//TODO fix
+						this.processAJAXRequests();	//make sure there are no waiting AJAX requests
+					}
+				}
+				finally
+				{
+					this.processingAJAXResponses=false;	//we are no longer processing AJAX responses
+				}
+			}
+		};
+	
+		/**Patches an element and its children into the existing element hierarchy.
+		Any element in the hierarchy without an ID attribute will be ignored, although its children will be processed.
+		@param element The element hierarchy to patch into the existing document.
+		*/ 
+		GuiseAJAX.prototype._patchElement=function(element)
+		{
+				//do depth-first patching, allowing us to precheck children at the same time for later patching at this level in the hierarchy
+			var childNodeList=element.childNodes;	//get all the child nodes of the element
+			var childNodeCount=childNodeList.length;	//find out how many children there are
+			var childTextNodeCount=0;	//keep track of how many child text nodes there are
+			for(var i=0; i<childNodeCount; ++i)	//for each child node
+			{
+				var childNode=childNodeList[i];	//get this child node
+				switch(childNode.nodeType)	//see which type of child node this is
+				{
+					case Node.ELEMENT_NODE:	//element
+						this._patchElement(childNode);	//patch this child element
+						break;
+					case Node.TEXT_NODE:	//text
+						++childTextNodeCount;	//show that we found another text child
+						break;
+				}
+			}
+				//TODO make sure the Mozilla/IE attribute access functionality is robust, taking into account Mozilla's separate value structure
+			var id=element.getAttribute("id");	//get the element's ID, if there is one
+			if(id)	//if the element has an ID
+			{
+		//TODO del alert("patching stuff for ID "+id);
+				var oldElement=document.getElementById(id);	//get the old element
+				if(oldElement)	//if the element currently exists in the document
+				{
+						//remove any attributes the old element has that are not in the new element
+					var oldAttributes=oldElement.attributes;	//get the old element's attributes
+					for(var i=oldAttributes.length-1; i>=0; --i)	//for each old attribute
+					{
+						var oldAttribute=oldAttributes[i];	//get this attribute
+						var oldAttributeName=oldAttribute.nodeName;	//get the attribute name
+						var oldAttributeValue=oldAttribute.nodeValue;	//get the attribute value
+						var attributeName=oldAttributeName;
+						if(oldAttributeName=="readOnly")	//TODO fix for other misspelled attributes, such as className
+						{
+							attributeName="readonly";
+						}
+						if(/*TODO fix or del attributeValue!=null && attributeValue.length>0 && */!element.getAttribute(attributeName))	//if there is really an attribute value (IE provides all possible attributes, even with those with no value) and the new element doesn't have this attribute
+						{
+		//TODO del alert("ready to remove "+id+" attribute "+attributeName+" with current value "+attributeValue);
+							oldElement.removeAttribute(oldAttributeName);	//remove the attribute normally (apparently no action will take place if performed on IE-specific attributes such as element.start)
+		//TODO fix					i=0;	//TODO fix; temporary to get out of looking at all IE's attributes
+						}
+					}
+						//patch in the new and changed attributes
+					var attributes=element.attributes;	//get the new element's attributes
+					for(var i=attributes.length-1; i>=0; --i)	//for each attribute
+					{
+						var attribute=attributes[i];	//get this attribute
+						var attributeName=attribute.nodeName;	//get the attribute name
+						var attributeValue=attribute.nodeValue;	//get the attribute value
+		//TODO del alert("looking at attribute "+attributeName+" with value "+attributeValue);
+		//TODO del alert("looking at old attribute "+attributeName+" with value "+oldElement.getAttribute(attributeName)+" other way "+oldElement[attributeName]);
+							//TODO fix for oldElement.class/oldElement.className on IE
+						if(oldElement[attributeName]!=attributeValue)	//if the old element has a different (or no) value for this attribute (Firefox maintains different values for element.getAttribute(attributeName) and element[attributeName])
+						{
+		//TODO del alert("updating "+id+" attribute "+attributeName+" to new value "+attributeValue);
+							oldElement[attributeName]=attributeValue;	//update the old element's attribute (this format works for Firefox where oldElement.setAttribute("value", attributeValue) does not)
+		//TODO: fix the Firefox problem of sending an onchange event for any elements that get updated from an Ajax request, but only later when the focus blurs
+		//TODO fix the focus problem if the user has focus on an element that gets changed in response to the event
+						}
+					}
+						//patch in the new child element hierarchy
+					var oldChildNodeList=oldElement.childNodes;	//get all the child nodes of the old element
+					var oldChildNodeCount=oldChildNodeList.length;	//find out how many old children there are
+					if(childNodeCount>0)	//if the new element has child nodes
+					{
+							//patch any changed text
+						if(childTextNodeCount==childNodeCount)	//if all the child nodes are text nodes
+						{
+							var onlyChangeValues=false;	//see if we can get by with just changing text node values
+							if(oldChildNodeCount==childNodeCount)	//if the old element has the same number of children as the new element
+							{
+								onlyChangeValues=true;	//we may get away with only changing values after all
+								for(var i=0; i<oldChildNodeCount; ++i)	//look at each old child node
+								{
+									if(oldChildNodeList[i].nodeType!=childNodeList[i].nodeType)	//if the old child element is a different type than the new one
+									{
+										onlyChangeValues=false;	//we'll have to actually change around child nodes
+										break;	//stop looking for difficulties---we just found one
+									}
+								}
+							}
+							if(onlyChangeValues)	//if we think we can simply change text node values
+							{
+								for(var i=0; i<childNodeCount; ++i)	//for each new child node
+								{
+										//TODO later check for text
+									oldChildNodeList[i].nodeValue=childNodeList[i].nodeValue;	//copy the text over to the old node
+								}
+							}
+							else	//if we have to rearrange the child nodes
+							{
+								for(var i=oldChildNodeCount-1; i>=0; --i)	//for all of the old nodes
+								{
+									oldElement.removeChild(oldChildNodeList[i]);	//remove this child
+								}
+								for(var i=0; i<childNodeCount; ++i)	//for each new child node
+								{
+									var childNode=childNodeList[i];	//get this child node
+										//TODO later check for text
+									oldElement.appendChild(document.createTextNode(childNode.nodeValue));	//create and append an equivalent text node
 								}
 							}
 						}
-						if(onlyChangeValues)	//if we think we can simply change text node values
-						{
-							for(var i=0; i<childNodeCount; ++i)	//for each new child node
-							{
-									//TODO later check for text
-								oldChildNodeList[i].nodeValue=childNodeList[i].nodeValue;	//copy the text over to the old node
-							}
-						}
-						else	//if we have to rearrange the child nodes
-						{
-							for(var i=oldChildNodeCount-1; i>=0; --i)	//for all of the old nodes
-							{
-								oldElement.removeChild(oldChildNodeList[i]);	//remove this child
-							}
-							for(var i=0; i<childNodeCount; ++i)	//for each new child node
-							{
-								var childNode=childNodeList[i];	//get this child node
-									//TODO later check for text
-								oldElement.appendChild(document.createTextNode(childNode.nodeValue));	//create and append an equivalent text node
-							}
-						}
 					}
-				}
-				else	//if the element has no child nodes, remove all the child nodes from the old element
-				{
-					for(var i=oldChildNodeCount-1; i>=0; --i)	//for all of the old nodes
+					else	//if the element has no child nodes, remove all the child nodes from the old element
 					{
-						oldElement.removeChild(oldChildNodeList[i]);	//remove this child
+						for(var i=oldChildNodeCount-1; i>=0; --i)	//for all of the old nodes
+						{
+							oldElement.removeChild(oldChildNodeList[i]);	//remove this child
+						}
 					}
 				}
 			}
-		}
+		};
+
 	}
 
 	this.httpCommunicator.setProcessHTTPResponse(this._createHTTPResponseCallback());	//set up our callback function for processing HTTP responses
@@ -541,7 +712,7 @@ function DragState(dragSource, mouseDeltaX, mouseDeltaY)
 			document.body.onselectstart=function() {return false;};
 */
 			addEvent(document, "mousemove", onDrag, false);	//listen for mouse move anywhere in document (IE doesn't allow us to listen on the window), as dragging may end somewhere else besides a drop target
-		}
+		};
 	
 		/**Ends the drag process.*/
 		DragState.prototype.endDrag=function()
@@ -555,33 +726,46 @@ function DragState(dragSource, mouseDeltaX, mouseDeltaY)
 			{
 				document.body.removeChild(this.element);
 			}
-		}
+		};
 
 		/**@return An element appropriate for dragging, such as a clone of the original.*/
 		DragState.prototype._getDragElement=function()
 		{
-			var element=dragSource.cloneNode(true);	//create a clone of the original element
+			var element=this.dragSource.cloneNode(true);	//create a clone of the original element
 			this._cleanClone(element);	//clean the clone
 			//TODO clean the element better, removing drag handles and such
+/*TODO add workaround to cover IE select controls, which are windowed and will appear over the dragged element
+			if(document.all)	//if this is IE	TODO add better check
+			{
+				var shimElement=document.createElement("iframe");	//create a shim iframe that can accept z-index changes so as to cover controls; see http://dotnetjunkies.com/WebLog/jking/archive/category/139.aspx and http://dev2dev.bea.com/pub/a/2005/04/portal_menus.html
+				shimElement.appendChild(element);	//place the real element inside the shim element
+				element=shimElement;	//use the shim element as the drag element
+			}
+*/
 			element.style.position="absolute";	//change the element's position to absolute TODO update the element's initial position
-			//TODO set the z-order completely to the front
+			element.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components
 			//TODO make sure resizeable elements are the correct size
 			return element;	//return the cloned element
-		}
+		};
 
 		/**Cleans a cloned node, removing its element IDs, for example, so that it can inserted into a document.*/
 		DragState.prototype._cleanClone=function(elementClone)
 		{
-			elementClone.id=null;	//remove the ID
+			if(elementClone.nodeType==Node.ELEMENT_NODE)	//if this is an element
+			{
+				if(elementClone.id)	//if this element has an ID
+				{
+					elementClone.id=null;	//remove the ID
+				}
+			}
 			var childNodeList=elementClone.childNodes;	//get all the child nodes
 			for(var i=childNodeList.length-1; i>=0; --i)	//for each child node
 			{
-				this._cleanNode(childNodeList[i]);	//clean this child nodethis child node
+				this._cleanClone(childNodeList[i]);	//clean this child nodethis child node
 			}
-		}		
+		};
 	}
 }
-
 
 /**The global drag state variable.*/
 var dragState;
@@ -659,7 +843,7 @@ function addLoadListener(func)
 				{
 					oldonload();	//call the old function using closure
 					func();	//call the new function
-				}
+				};
 	}
 }
 
@@ -703,7 +887,7 @@ alert("looking at event src element: "+event.srcElement);
 			event.stopPropagation=function()	//create a new function to stop propagation
 					{
 						window.event.cancelBubble=true;	//stop bubbling the IE way
-					}
+					};
 		}
 	}
 	if(!event.preventDefault)	//if there is no method for preventing the default functionality TODO add workaround for Safari, which has this method but doesn't actually prevent default functionality
@@ -715,7 +899,7 @@ alert("looking at event src element: "+event.srcElement);
 			event.preventDefault=function()	//create a new function to stop propagation
 					{
 						window.event.returnValue=false;	//prevent default functionality the IE way
-					}
+					};
 		}
 	}
 	//TODO update clientX and clientY as per _DHTML Utopia_ page 90.
@@ -1040,6 +1224,7 @@ function onDragBegin(event)	//TODO rename to onDragClick
 			var mouseDeltaY=event.clientY-dragSourcePoint.y;
 			dragState=new DragState(dragSource, mouseDeltaX, mouseDeltaY);	//create a new drag state
 			dragState.beginDrag();	//begin dragging
+//TODO del alert("drag state element: "+dragState.element.nodeName);
 			w3cEvent.stopPropagation();	//tell the event to stop bubbling
 			w3cEvent.preventDefault();	//prevent the default functionality from occurring
 		}
@@ -1188,7 +1373,7 @@ function openModalWindow(url)
          modalState.top = (screen.height - modalState.height) / 2;
          var modalAttributes = "left=" + modalState.left + ",top=" + modalState.top + ",resizable=no,width=" + modalState.width + ",height=" + modalState.height;
       }
-      modalState.name = (new Date()).getSeconds().toString()      
+      modalState.name = (new Date()).getSeconds().toString();
       // Generate the dialog and make sure it has focus.
 		modalState.window=window.open(url, modalState.name, modalAttributes);
 		modalState.window.onclose=endModal;
