@@ -655,8 +655,9 @@ Debug.trace("using this component");
 	}
 
 	private final PathExpression AJAX_REQUEST_EVENTS_WILDCARD_XPATH_EXPRESSION=new PathExpression("request", "events", "*");	//TODO use constants; comment 
-	private final PathExpression AJAX_REQUEST_CONTROL_NAME_XPATH_EXPRESSION=new PathExpression("control", "name");	//TODO use constants; comment 
-	private final PathExpression AJAX_REQUEST_CONTROL_VALUE_XPATH_EXPRESSION=new PathExpression("control", "value");	//TODO use constants; comment 
+	private final PathExpression AJAX_REQUEST_CONTROL_XPATH_EXPRESSION=new PathExpression("control");	//TODO use constants; comment 
+//TODO del	private final PathExpression AJAX_REQUEST_CONTROL_NAME_XPATH_EXPRESSION=new PathExpression("control", "name");	//TODO use constants; comment 
+//TODO del	private final PathExpression AJAX_REQUEST_CONTROL_VALUE_XPATH_EXPRESSION=new PathExpression("control", "value");	//TODO use constants; comment 
 	
 	/**Retrieves control events from the HTTP request.
   @param request The HTTP request.
@@ -682,13 +683,16 @@ Debug.trace("using this component");
 					final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
 					if(eventNode.getNodeType()==Node.ELEMENT_NODE && "form".equals(eventNode.getNodeName()))	//if this is a form event TODO use a constant
 					{
-						final Element controlNameElement=(Element)XPath.getNode(eventNode, AJAX_REQUEST_CONTROL_NAME_XPATH_EXPRESSION);	//get the control name node
-						final Element controlValueElement=(Element)XPath.getNode(eventNode, AJAX_REQUEST_CONTROL_VALUE_XPATH_EXPRESSION);	//get the control value  node
-						final String controlName=controlNameElement!=null ? controlNameElement.getTextContent() : null;	//get the control name
-						final String controlValue=controlValueElement!=null ? controlValueElement.getTextContent() : null;	//get the control value
-						if(controlName!=null && controlName.length()>0 && controlValue!=null)	 //if there is a non-empty control name and a control value
+						final List<Node> controlNodes=(List<Node>)XPath.evaluatePathExpression(eventNode, AJAX_REQUEST_CONTROL_XPATH_EXPRESSION);	//get all the control settings
+						for(final Node controlNode:controlNodes)	//for each control node
 						{
-							parameterListMap.addItem(controlName, controlValue);	//store the value in the parameters
+							final Element controlElement=(Element)controlNode;	//get this control element
+							final String controlName=controlElement.getAttribute("name");	//get the control name TODO use a constant
+							if(controlName!=null && controlName.length()>0)	//if this control has a name
+							{
+								final String controlValue=controlElement.getTextContent();	//get the control value
+								parameterListMap.addItem(controlName, controlValue);	//store the value in the parameters
+							}
 						}
 					}
 					controlEventList.add(formSubmitEvent);	//add the event to the list

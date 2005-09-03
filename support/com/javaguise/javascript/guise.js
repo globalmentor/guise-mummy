@@ -8,11 +8,15 @@ var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX c
 <request>
 	<events>	<!--the list of events (zero or more)-->
 		<form>	<!--information resulting from form changes, analogous to that in an HTTP POST-->
-			<control>	<!--a control change (zero or more)-->
-				<name></name>	<!--the name of the control-->
-				<value></value>	<!--the new value of the control-->
+			<control name="">	<!--a control change (zero or more)-->
+				<!--the value of the control (putting the value into an attribute could corrupt the value because of XML attribute canonicalization rules-->
 			</control>
 		</form>
+		<drop>	<!--the end of a drag-and-drop operation-->
+			<source id=""/>	<!--the element that was the source of the drag and drop operation-->
+			<target id=""/>	<!--the element that was is the target of the drag and drop operation-->
+			<mouse x="" y=""/>	<!--the mouse information at the time of the drop-->
+		</drop>
 	</events>
 </request>
 */
@@ -35,13 +39,50 @@ var TREE_NODE_EXPANDED_CLASS_SUFFIX="-expanded";
 /**The class suffix of a leaf tree node.*/
 //TODO del var TREE_NODE_LEAF_CLASS_SUFFIX="-leaf";
 
+/**The enumeration of recognized styles.*/
+var STYLES={DRAG_SOURCE: "dragSource", DRAG_HANDLE: "dragHandle", DROP_TARGET: "dropTarget"};
+
+/**The array of drop targets, determined when the document is loaded. The drop targets are stored in increasing order of hierarchical depth.*/
+var dropTargets=new Array();
+
 //Array
+
+/**An add() method for arrays, equivalent to Array.push().*/
+Array.prototype.add=Array.prototype.push;
 
 /**An enqueue() method for arrays, equivalent to Array.push().*/
 Array.prototype.enqueue=Array.prototype.push;
 
 /**A dequeue() method for arrays, equivalent to Array.shift().*/
 Array.prototype.dequeue=Array.prototype.shift;
+
+/**Determines the index of the first occurrence of a given object in the array.
+@param object The object to find in the array.
+@return The index of the object in the array, or -1 if the object is not in the array.
+*/
+Array.prototype.indexOf=function(object)
+{
+	var length=this.length;	//get the length of the array
+	for(var i=0; i<length; ++i)	//for each index
+	{
+		if(this[i]==object)	//if this object is the requested object
+		{
+			return i;	//return this index
+		}
+	}
+	return -1;	//indicate that the object could not be found
+};
+
+/**Determines whether the given object is present in the array.
+@param object The object for which to check.
+@return true if the object is present in the array.
+*/
+Array.prototype.contains=function(object)
+{
+	return this.indexOf(object)>=0;	//see if the object is in the array
+};
+
+var EMPTY_ARRAY=new Array();	//a shared empty array
 
 //Node
 
@@ -68,7 +109,7 @@ function StringBuilder()
 		*/
 		StringBuilder.prototype.append=function(string)
 		{
-			this._strings.push(string);	//add this string to the array
+			this._strings.add(string);	//add this string to the array
 			return this;
 		};
 
@@ -96,33 +137,50 @@ function Parameter(name, value) {this.name=name; this.value=value;}
 */
 function Point(x, y) {this.x=x; this.y=y;}
 
-//Form AJAX Request
+//Form AJAX Event
 
 /**A class encapsulating form information for an AJAX request.
 @param parameter: An optional parameter with which to initialize the request.
 var parameters: The list of parameters.
 @see Parameter
 */
-function FormAJAXRequest(parameter)
+function FormAJAXEvent(parameter)
 {
 	this.parameters=new Array();	//create the parameter array
-	if(!FormAJAXRequest.prototype._initialized)
+	if(!FormAJAXEvent.prototype._initialized)
 	{
-		FormAJAXRequest.prototype._initialized=true;
+		FormAJAXEvent.prototype._initialized=true;
 		
 		/**Adds a parameter to the form AJAX request.
 		@param parameter: The parameter to add.
 		@see Parameter
 		*/
-		FormAJAXRequest.prototype.addParameter=function(parameter)
+		FormAJAXEvent.prototype.addParameter=function(parameter)
 		{
-			this.parameters.push(parameter);	//add another parameter to the array
+			this.parameters.add(parameter);	//add another parameter to the array
 		};
 	}
 	if(parameter)	//if a parameter was passed
 	{
 		this.addParameter(parameter);	//add this parameter to the request
 	}
+}
+
+//Drop AJAX Event
+
+/**A class encapsulating drop information for an AJAX request.
+@param dragState: The object containing the state of the drag and drop operation.
+@param dropTarget: The element that is the target of the drag and drop operation.
+@param event: The W3C event object associated with the drop.
+var dragSource: The element that was the source of the drag and drop operation.
+var dropTarget: The element that is the target of the drag and drop operation.
+var mousePosition: The position of the mouse at the drop.
+*/
+function DropAJAXEvent(dragState, dropTarget, event)
+{
+	this.dragSource=dragState.dragSource;	//save the drag source
+	this.dropTarget=dropTarget;	//save the drop target
+	this.mousePosition=new Point(event.clientX, event.clientY);	//save the mouse position
 }
 
 //HTTP Communicator
@@ -315,7 +373,7 @@ function GuiseAJAX()
 		GuiseAJAX.prototype.REQUEST_CONTENT_TYPE="application/x-guise-ajax-request+xml";
 
 		/**The enumeration of the names of the request elements.*/
-		GuiseAJAX.prototype.RequestElement={REQUEST: "request", EVENTS: "events", FORM: "form", CONTROL: "control", NAME: "name", VALUE: "value"};
+		GuiseAJAX.prototype.RequestElement={REQUEST: "request", EVENTS: "events", FORM: "form", CONTROL: "control", NAME: "name", VALUE: "value", DROP: "drop", SOURCE: "source", TARGET: "target", MOUSE: "mouse", ID: "id", X: "x", Y: "y"};
 
 		/**The content type of a Guise AJAX response.*/
 		GuiseAJAX.prototype.RESPONSE_CONTENT_TYPE="application/x-guise-ajax-response+xml";
@@ -352,9 +410,13 @@ function GuiseAJAX()
 					while(this.ajaxRequests.length>0)	//there are more AJAX requests
 					{
 						var ajaxRequest=this.ajaxRequests.dequeue();	//get the next AJAX request to process
-						if(ajaxRequest instanceof FormAJAXRequest)	//if this is a form event
+						if(ajaxRequest instanceof FormAJAXEvent)	//if this is a form event
 						{
 							this._appendAJAXFormEvent(requestStringBuilder, ajaxRequest);	//append the form event
+						}
+						else if(ajaxRequest instanceof DropAJAXEvent)	//if this is a drop event
+						{
+							this._appendAJAXDropEvent(requestStringBuilder, ajaxRequest);	//append the drop event
 						}
 					}
 					this.appendXMLEndTag(requestStringBuilder, this.RequestElement.EVENTS);	//</events>
@@ -386,20 +448,6 @@ alert(exception);
 		GuiseAJAX.prototype._appendAJAXFormEvent=function(stringBuilder, ajaxFormRequest)
 		{
 			this.appendXMLStartTag(stringBuilder, this.RequestElement.FORM);	//<form>
-/*TODO del if not needed
-								var query=null;	//we'll determine the query
-								var parameters=ajaxFormRequest.parameters;	//get the parameters
-								if(parameters.length>0)	//if there are parameters
-								{
-									var parameterStrings=new Array(parameters.length);	//create an array of parameter strings
-									for(var i=parameterStrings.length-1; i>=0; --i)	//for each parameter string
-									{
-										var parameter=parameters[i];	//get this parameter
-										parameterStrings[i]=encodeURIComponent(parameter.name)+"="+encodeURIComponent(parameter.value);	//encode this parameter string
-									}
-									var query=parameterStrings.join("&");	//join the parameters to get the query
-								}
-*/
 			var parameters=ajaxFormRequest.parameters;	//get the parameters
 			if(parameters.length>0)	//if there are parameters
 			{
@@ -407,9 +455,8 @@ alert(exception);
 				for(var i=parameterStrings.length-1; i>=0; --i)	//for each parameter string
 				{
 					var parameter=parameters[i];	//get this parameter
-					this.appendXMLStartTag(stringBuilder, this.RequestElement.CONTROL);	//<control>
-					this.appendXMLTextElement(stringBuilder, this.RequestElement.NAME, parameter.name);	//<name>name</name>
-					this.appendXMLTextElement(stringBuilder, this.RequestElement.VALUE, parameter.value);	//<value>value</value>
+					this.appendXMLStartTag(stringBuilder, this.RequestElement.CONTROL, new Parameter(this.RequestElement.NAME, parameter.name));	//<control name="name">
+					stringBuilder.append(parameter.value);	//append the parameter value TODO encode the value
 					this.appendXMLEndTag(stringBuilder, this.RequestElement.CONTROL);	//</control>
 				}
 			}
@@ -417,14 +464,40 @@ alert(exception);
 			return stringBuilder;	//return the string builder
 		};
 
+		/**Appends an AJAX drop event to a string builder.
+		@param stringBuilder The string builder collecting the request data.
+		@param ajaxDropEvent The drop event information to append.
+		@return The string builder.
+		*/
+		GuiseAJAX.prototype._appendAJAXDropEvent=function(stringBuilder, ajaxDropEvent)
+		{
+			this.appendXMLStartTag(stringBuilder, this.RequestElement.DROP);	//<drop>
+			this.appendXMLStartTag(stringBuilder, this.RequestElement.SOURCE, new Parameter(this.RequestElement.ID, ajaxDropEvent.dragSource.id));	//<source id="id">
+			this.appendXMLEndTag(stringBuilder, this.RequestElement.SOURCE);	//</source>
+			this.appendXMLStartTag(stringBuilder, this.RequestElement.TARGET, new Parameter(this.RequestElement.ID, ajaxDropEvent.dropTarget.id));	//<source id="id">
+			this.appendXMLEndTag(stringBuilder, this.RequestElement.TARGET);	//</target>
+			this.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE, new Parameter(this.RequestElement.X, ajaxDropEvent.mousePosition.x), new Parameter(this.RequestElement.Y, ajaxDropEvent.mousePosition.y));	//<mouse x="x" y="y">
+			this.appendXMLEndTag(stringBuilder, this.RequestElement.MOUSE);	//</mouse>
+			this.appendXMLEndTag(stringBuilder, this.RequestElement.DROP);	//</drop>
+			return stringBuilder;	//return the string builder
+		};
+
 		/**Appends an XML start tag with the given name to the given string builder.
 		@param stringBuilder The string builder to hold the data.
 		@param tagName The name of the XML tag.
+		@param parameters (...) Zero or more parameters of type Parameter.
 		@return A reference to the string builder.
 		*/ 
-		GuiseAJAX.prototype.appendXMLStartTag=function(stringBuilder, tagName)
+		GuiseAJAX.prototype.appendXMLStartTag=function(stringBuilder, tagName, parameters)
 		{
-			return stringBuilder.append("<").append(tagName).append(">");	//append the start tag
+			stringBuilder.append("<").append(tagName);	//<tagName
+			var argumentCount=arguments.length;	//find out how many arguments there are
+			for(var i=2; i<argumentCount; ++i)	//for each argument (not counting the first two)
+			{
+				var parameter=arguments[i];	//get this argument
+				stringBuilder.append(" ").append(parameter.name).append("=\"").append(parameter.value).append("\"");	//name="value" TODO encode the parameter value
+			}
+			return stringBuilder.append(">");	//>
 		};
 
 		/**Appends an XML end tag with the given name to the given string builder.
@@ -682,29 +755,34 @@ var guiseAJAX=new GuiseAJAX();
 
 /**A class encapsulating drag state.
 @param dragSource: The element to drag.
-@param mouseDeltaX: The difference between the element X and the mouse X position.
-@param mouseDeltaY: The difference between the element Y and the mouse Y position.
+@param mouseX The horizontal position of the mouse.
+@param mouseY The vertical position of the mouse.
 var dragSource: The element to drag.
 var element: The actual element being dragged.
-var mouseDeltaX: The difference between the element X and the mouse X position.
-var mouseDeltaY: The difference between the element Y and the mouse Y position.
 */
-function DragState(dragSource, mouseDeltaX, mouseDeltaY)
+function DragState(dragSource, mouseX, mouseY)
 {
 	this.dragSource=dragSource;
-	this.mouseDeltaX=mouseDeltaX;
-	this.mouseDeltaY=mouseDeltaY;
+	var dragSourcePoint=getElementCoordinates(dragSource);	//get the position of the drag source
+	this.mouseDeltaX=mouseX-dragSourcePoint.x;	//calculate the mouse position relative to the drag source
+	this.mouseDeltaY=mouseY-dragSourcePoint.y;
 
 	if(!DragState.prototype._initialized)
 	{
 		DragState.prototype._initialized=true;
 
-		/**Begins the drag process.*/
-		DragState.prototype.beginDrag=function()
+		/**Begins the drag process.
+		@param mouseX The horizontal position of the mouse.
+		@param mouseY The vertical position of the mouse.
+		*/
+		DragState.prototype.beginDrag=function(mouseX, mouseY)
 		{
 			this.element=this._getDragElement();	//create an element for dragging
+			this.drag(mouseX, mouseY);	//drag the element to the current mouse position
 			if(this.element!=this.dragSource)	//if we have a new element to drag
 			{
+				this.oldVisibility=this.dragSource.style.visibility;	//get the old visibility status				
+				this.dragSource.style.visibility="hidden";	//hide the original element
 				document.body.appendChild(this.element);	//add the element to the document
 			}
 /*TODO del after new stop default method
@@ -713,6 +791,17 @@ function DragState(dragSource, mouseDeltaX, mouseDeltaY)
 */
 			addEvent(document, "mousemove", onDrag, false);	//listen for mouse move anywhere in document (IE doesn't allow us to listen on the window), as dragging may end somewhere else besides a drop target
 		};
+
+		/*Drags the component to the location indicated by the mouse coordinates.
+		The mouse/component deltas are taken into consideration when calculating the new component position.
+		@param mouseX The horizontal position of the mouse.
+		@param mouseY The vertical position of the mouse.
+		*/
+		DragState.prototype.drag=function(mouseX, mouseY)
+		{
+			dragState.element.style.left=(mouseX-dragState.mouseDeltaX).toString()+"px";	//update the position of the dragged element
+			dragState.element.style.top=(mouseY-dragState.mouseDeltaY).toString()+"px";
+		}
 	
 		/**Ends the drag process.*/
 		DragState.prototype.endDrag=function()
@@ -724,7 +813,8 @@ function DragState(dragSource, mouseDeltaX, mouseDeltaY)
 */
 			if(this.element!=this.dragSource)	//if we have a different element that we're dragging
 			{
-				document.body.removeChild(this.element);
+				document.body.removeChild(this.element);	//remove the drag element
+				this.dragSource.style.visibility=this.oldVisibility;	//reset the original element's visibility status
 			}
 		};
 
@@ -915,6 +1005,7 @@ This implementation installs listeners if AJAX is enabled.
 function onWindowLoad()
 {
 	initializeNode(document.documentElement);	//initialize the document tree
+	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth	
 	addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
 }
 
@@ -930,6 +1021,7 @@ function initializeNode(node)
 			{
 				var elementName=node.nodeName.toLowerCase();	//get the element name
 				var elementClassName=node.className;	//get the element class name
+				var elementClassNames=elementClassName ? elementClassName.split(/\s/) : EMPTY_ARRAY;	//split out the class names
 				switch(elementName)	//see which element this is
 				{
 /*TODO bring back when works
@@ -954,7 +1046,7 @@ function initializeNode(node)
 						}
 						break;
 					case "li":
-						if(elementClassName.indexOf(TREE_NODE_CLASS_PREFIX)==0)	//if this is a tree node
+						if(elementClassName && elementClassName.indexOf(TREE_NODE_CLASS_PREFIX)==0)	//if this is a tree node
 						{
 							addEvent(node, "click", onTreeNodeClick, false);	//listen for clicks
 						}
@@ -963,17 +1055,16 @@ function initializeNode(node)
 						addEvent(node, "change", onSelectChange, false);
 						break;
 				}
-				if(elementClassName)	//if there is an element class name
+				for(var i=elementClassNames.length-1; i>=0; --i)	//for each class name
 				{
-					var elementClassNames=elementClassName.split(/\s/);	//split out the class names
-					for(var i=elementClassNames.length-1; i>=0; --i)	//for each class name
+					switch(elementClassNames[i])	//check out this class name
 					{
-						switch(elementClassNames[i])	//check out this class name
-						{
-							case "dragHandle":
-								addEvent(node, "mousedown", onDragBegin, false);	//listen for mouse down on a drag handle
-								break;
-						}
+						case STYLES.DRAG_HANDLE:
+							addEvent(node, "mousedown", onDragBegin, false);	//listen for mouse down on a drag handle
+							break;
+						case STYLES.DROP_TARGET:
+							dropTargets.add(node);	//add this node to the list of drop targets
+							break;
 					}
 				}
 			}
@@ -998,7 +1089,7 @@ function onTextInputChange(event)
 		var w3cEvent=getW3CEvent(event);	//get the W3C event object
 		var textInput=w3cEvent.target;	//get the target of the event
 	//TODO del alert("an input changed! "+textInput.id);
-		var ajaxRequest=new FormAJAXRequest(new Parameter(textInput.name, textInput.value));	//create a new form request with the control name and value
+		var ajaxRequest=new FormAJAXEvent(new Parameter(textInput.name, textInput.value));	//create a new form request with the control name and value
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		w3cEvent.stopPropagation();	//tell the event to stop bubbling
 	}
@@ -1092,8 +1183,6 @@ function onAction(event, element)
 */
 function onCheckInputChange(event)
 {
-try
-{
 	if(AJAX_URI)	//if AJAX is enabled
 	{
 		var w3cEvent=getW3CEvent(event);	//get the W3C event object
@@ -1103,15 +1192,10 @@ try
 			checkInput=document.getElementById(checkInput.htmlFor);	//the real target is the check input with which this label is associated; the htmlFor attribute is the ID of the element, not the actual element as Danny Goodman says in JavaScript Bible 5th Edition (649)
 		}
 //TODO del alert("checkbox "+checkInput.id+" changed to "+checkInput.checked);
-		var ajaxRequest=new FormAJAXRequest(new Parameter(checkInput.name, checkInput.checked ? checkInput.id : ""));	//create a new form request with the control name and value
+		var ajaxRequest=new FormAJAXEvent(new Parameter(checkInput.name, checkInput.checked ? checkInput.id : ""));	//create a new form request with the control name and value
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		w3cEvent.stopPropagation();	//tell the event to stop bubbling
 	}
-}
-catch(e)	//TODO del
-{
-alert(e);
-}
 }
 
 /**Called when a select control changes.
@@ -1125,7 +1209,7 @@ function onSelectChange(event)
 		var select=w3cEvent.target;	//get the target of the event
 	//TODO del alert("a select changed! "+select.id);
 		var options=select.options;	//get the select options
-		var ajaxRequest=new FormAJAXRequest();	//create a new form request
+		var ajaxRequest=new FormAJAXEvent();	//create a new form request
 		for(var i=0; i<options.length; ++i)	//for each option
 		{
 			var option=options[i];	//get this option
@@ -1216,14 +1300,11 @@ function onDragBegin(event)	//TODO rename to onDragClick
 		var w3cEvent=getW3CEvent(event);	//get the W3C event object
 		var dragHandle=w3cEvent.target;	//get the target of the event
 			//TODO make sure this isn't the context mouse button
-		var dragSource=getAncestorElementByClassName(dragHandle, "dragSource");	//determine which element to drag
+		var dragSource=getAncestorElementByClassName(dragHandle, STYLES.DRAG_SOURCE);	//determine which element to drag
 		if(dragSource)	//if there is a drag source
 		{
-			var dragSourcePoint=getElementCoordinates(dragSource);	//get the position of the 
-			var mouseDeltaX=event.clientX-dragSourcePoint.x;	//calculate the mouse position relative to the drag source
-			var mouseDeltaY=event.clientY-dragSourcePoint.y;
-			dragState=new DragState(dragSource, mouseDeltaX, mouseDeltaY);	//create a new drag state
-			dragState.beginDrag();	//begin dragging
+			dragState=new DragState(dragSource, w3cEvent.clientX, w3cEvent.clientY);	//create a new drag state
+			dragState.beginDrag(w3cEvent.clientX, w3cEvent.clientY);	//begin dragging
 //TODO del alert("drag state element: "+dragState.element.nodeName);
 			w3cEvent.stopPropagation();	//tell the event to stop bubbling
 			w3cEvent.preventDefault();	//prevent the default functionality from occurring
@@ -1239,8 +1320,7 @@ function onDrag(event)
 	if(dragState)	//if we are in the middle of a drag
 	{
 		var w3cEvent=getW3CEvent(event);	//get the W3C event object
-		dragState.element.style.left=(event.clientX-dragState.mouseDeltaX).toString()+"px";	//update the position of the dragged element
-		dragState.element.style.top=(event.clientY-dragState.mouseDeltaY).toString()+"px";
+		dragState.drag(w3cEvent.clientX, w3cEvent.clientY);	//drag the object to the new mouse position
 		w3cEvent.stopPropagation();	//tell the event to stop bubbling
 		w3cEvent.preventDefault();	//prevent the default functionality from occurring
 	}
@@ -1254,11 +1334,35 @@ function onDragEnd(event)
 	if(dragState)	//if we are in the middle of a drag
 	{
 		dragState.endDrag();	//end dragging
-		dragState=null;	//release our drag state
 		var w3cEvent=getW3CEvent(event);	//get the W3C event object
-		var target=w3cEvent.target;	//get the target of the event
+		var dropTarget=getDropTarget(w3cEvent.clientX, w3cEvent.clientY);	//get the drop target under the mouse
+		if(dropTarget)	//if the mouse was dropped over a drop target
+		{
+//TODO del when works alert("over drop target: "+dropTarget.nodeName);
+			var ajaxRequest=new DropAJAXEvent(dragState, dropTarget, w3cEvent);	//create a new AJAX drop event
+			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+		}
+		dragState=null;	//release our drag state
 		w3cEvent.stopPropagation();	//tell the event to stop bubbling
 		w3cEvent.preventDefault();	//prevent the default functionality from occurring
+	}
+}
+
+/**Determines the drop target at the given coordinates.
+@param x The horizontal test position.
+@param y The vertical test position.
+@return The drop target at the given coordinates, or null if there is no drop target at the given coordinates.
+*/
+function getDropTarget(x, y)
+{
+	for(var i=dropTargets.length-1; i>=0; --i)	//for each drop target (which have been sorted by increasing element depth)
+	{
+		var dropTarget=dropTargets[i];	//get this drop target
+		var dropTargetCoordinates=getElementCoordinates(dropTarget);	//get the coordinates of the drop target
+		if(x>=dropTargetCoordinates.x && y>=dropTargetCoordinates.y && x<dropTargetCoordinates.x+dropTarget.offsetWidth && y<dropTargetCoordinates.y+dropTarget.offsetHeight)	//if the coordinates are within the drop target area
+		{
+			return dropTarget;	//we've found the deepest drop target
+		}
 	}
 }
 
@@ -1300,18 +1404,31 @@ function getAncestorElementByClassName(node, className)
 	{
 		if(node.nodeType==Node.ELEMENT_NODE)	//if this is an element
 		{
-			var elementClassNames=node.className.split(/\s/);	//split out the class names
-			for(var i=elementClassNames.length-1; i>=0; --i)	//for each class name
+			var elementClassNames=node.className ? node.className.split(/\s/) : EMPTY_ARRAY;	//split out the class names
+			if(elementClassNames.contains(className))	//if this class name is one of the class names
 			{
-				if(elementClassNames[i]==className)	//if this class name matches
-				{
-					return node;	//this node has a matching class name; we'll use it
-				}
+				return node;	//this node has a matching class name; we'll use it
 			}
 		}
 		node=node.parentNode;	//try the parent node
 	}
 	return node;	//return whatever node we found
+}
+
+/**Determines the document tree depth of the given element, returning a zero-level depth for the document node.
+@param element The element for which a depth should be found.
+@return The zero-based depth of the given element in the document, with a zero-level depth for the document node.
+*/
+function getElementDepth(element)
+{
+	var depth=-1;	//this element will be at least depth zero
+	do
+	{
+		element=element.parentNode;	//get the parent node
+		++depth;	//increase the depth
+	}
+	while(element);	//keep getting the parent node while there are ancestors left
+	return depth;	//return the depth we calculated
 }
 
 /**Retrieves the absolute X and Y coordinates of the given element.
@@ -1320,7 +1437,7 @@ function getAncestorElementByClassName(node, className)
 @see http://www.oreillynet.com/pub/a/javascript/excerpt/JSDHTMLCkbk_chap13/index6.html
 @see http://www.quirksmode.org/js/findpos.html
 */
-function getElementCoordinates(element)
+function getElementCoordinates(element)	//TODO make sure this method correctly calculates margins and padding, as Mozilla and IE both show slight variations for text, but not for images
 {
 	var x=0, y=0;
 	if(element.offsetParent)	//if element.offsetParent is supported

@@ -83,7 +83,7 @@ public class TextSearchFrame extends DefaultFrame
 			//text area
 		final TextAreaControl textAreaControl=new TextAreaControl(session, 25, 40);	//create a text area control 25 rows by 40 columns
 		textAreaControl.getModel().setLabel("Results");	//set the label of the text area
-		textAreaControl.getModel().setEditable(false);	//don't allow the text area control to be edited.
+		textAreaControl.getModel().setEditable(false);	//don't allow the text area control to be edited
 
 		//listen for the value of the resource import changing
 		resourceImportControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<ResourceImport>()

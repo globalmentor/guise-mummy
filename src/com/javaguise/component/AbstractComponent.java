@@ -415,6 +415,27 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 			}
 		}
 
+	/**Whether the component has dropping enabled.*/
+	private boolean dropEnabled=false;
+
+		/**@return Whether the component has dropping enabled.*/
+		public boolean isDropEnabled() {return dropEnabled;}
+
+		/**Sets whether the component is has dropping enabled.
+		This is a bound property of type <code>Boolean</code>.
+		@param newDropEnabled <code>true</code> if the component should allow dropping, else false, else <code>false</code>.
+		@see Component#DROP_ENABLED_PROPERTY
+		*/
+		public void setDropEnabled(final boolean newDropEnabled)
+		{
+			if(dropEnabled!=newDropEnabled)	//if the value is really changing
+			{
+				final boolean oldDropEnabled=dropEnabled;	//get the current value
+				dropEnabled=newDropEnabled;	//update the value
+				firePropertyChange(DRAG_ENABLED_PROPERTY, Boolean.valueOf(oldDropEnabled), Boolean.valueOf(newDropEnabled));
+			}
+		}
+
 	/**Session constructor.
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session is <code>null</code>.

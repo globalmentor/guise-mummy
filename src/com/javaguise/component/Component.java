@@ -27,6 +27,8 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	public final static String CONTROLLER_PROPERTY=getPropertyName(Component.class, "controller");
 	/**The bound property of whether the component has dragging enabled.*/
 	public final static String DRAG_ENABLED_PROPERTY=getPropertyName(Component.class, "dragEnabled");
+	/**The bound property of whether the component has dropping enabled.*/
+	public final static String DROP_ENABLED_PROPERTY=getPropertyName(Component.class, "dropEnabled");
 	/**The orientation bound property.*/
 	public final static String ORIENTATION_PROPERTY=getPropertyName(Component.class, "orientation");
 	/**The bound property of the component style ID.*/
@@ -180,6 +182,16 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	@see #DRAG_ENABLED_PROPERTY
 	*/
 	public void setDragEnabled(final boolean newDragEnabled);
+
+	/**@return Whether the component has dropping enabled.*/
+	public boolean isDropEnabled();
+
+	/**Sets whether the component is has dropping enabled.
+	This is a bound property of type <code>Boolean</code>.
+	@param newDropEnabled <code>true</code> if the component should allow dropping, else false, else <code>false</code>.
+	@see #DROP_ENABLED_PROPERTY
+	*/
+	public void setDropEnabled(final boolean newDropEnabled);
 
 	/**@return Whether the models of this component and all of its child components are valid.*/
 	public boolean isValid();

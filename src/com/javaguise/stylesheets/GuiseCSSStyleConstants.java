@@ -60,7 +60,7 @@ public class GuiseCSSStyleConstants
 	/**The handle of a drag source.*/
 	public final static String DRAG_HANDLE_CLASS="dragHandle";
 	/**The potential target of a drag and drop operation.*/
-	public final static String DRAG_TARGET_CLASS="dragTarget";
+	public final static String DROP_TARGET_CLASS="dropTarget";
 	
 	//layout
 

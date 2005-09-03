@@ -240,7 +240,7 @@ Debug.trace("list control changed value to", newValue);
 */
 		image.getModel().setLabel("\u0622\u067E");
 		image.getModel().setMessage("\u0628\u0627\u062A");
-		image.setImageDragEnabled(true);
+		image.setDragEnabled(true);
 		horizontalPanel.add(image);
 		
 		
