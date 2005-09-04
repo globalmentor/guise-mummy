@@ -17,22 +17,19 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.fileupload.DiskFileUpload;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUpload;
-import org.apache.commons.fileupload.FileUploadException;
+import org.apache.commons.fileupload.*;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import com.javaguise.*;
 import com.javaguise.component.*;
+import com.javaguise.component.transfer.*;
 import com.javaguise.context.GuiseContext;
-import com.javaguise.controller.ControlEvent;
-import com.javaguise.controller.Controller;
+import com.javaguise.controller.*;
 import com.javaguise.controller.text.xml.xhtml.*;
 import com.javaguise.model.FileItemResourceImport;
 import com.javaguise.model.Model;
-import com.javaguise.platform.web.FormSubmitEvent;
+import com.javaguise.platform.web.*;
 import com.javaguise.session.*;
 import com.javaguise.validator.*;
 
@@ -344,9 +341,11 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
 		final HTTPServletGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
+/*TODO del
 Debug.info("session ID", guiseSession.getHTTPSession().getId());	//TODO del
 Debug.info("content length:", request.getContentLength());
 Debug.info("content type:", request.getContentType());
+*/
 		final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, request, response);	//create a new Guise context
 		synchronized(guiseSession)	//don't allow other session contexts to be active at the same time
 		{
@@ -479,7 +478,7 @@ Debug.info("content type:", request.getContentType());
 		}
 	}
 
-/*TODO del if not needed
+	//TODO del and use the static method in AbstractController
 	protected <T extends Component<?>> Component<?> getComponentByAbsoluteUniqueID(final T component, final String absoluteUniqueID)
 	{
 		final Controller<? extends GuiseContext<?>, ? super T> controller=component.getController();
@@ -500,7 +499,6 @@ Debug.info("content type:", request.getContentType());
 		}
 		return null;
 	}
-*/
 
 	/**Services an AJAX request.
   @param request The HTTP request.
@@ -548,6 +546,15 @@ Debug.trace("got an AJAX request for navigation path", navigationPath);
 						//TODO don't re-update nested components (less important for controls, which don't have nested components) 
 		//TODO del Debug.trace("looking for component with name", parameterName);
 						getControlsByName(navigationFrame, parameterName, requestedComponents);	//get all components identified by this name
+					}
+				}
+				else if(controlEvent instanceof DropEvent)	//if this is a drag and drop drop event
+				{
+					final DropEvent dropEvent=(DropEvent)controlEvent;	//get the drop event
+					final Component<?> dropTarget=getComponentByAbsoluteUniqueID(navigationFrame, dropEvent.getDropTargetID());	//get the drop target component
+					if(dropTarget!=null)	//if there is a drop target
+					{
+						requestedComponents.add(dropTarget);	//add the drop target to the set of requested components
 					}
 				}
 				if(!requestedComponents.isEmpty())	//if components were requested
@@ -658,6 +665,8 @@ Debug.trace("using this component");
 	private final PathExpression AJAX_REQUEST_CONTROL_XPATH_EXPRESSION=new PathExpression("control");	//TODO use constants; comment 
 //TODO del	private final PathExpression AJAX_REQUEST_CONTROL_NAME_XPATH_EXPRESSION=new PathExpression("control", "name");	//TODO use constants; comment 
 //TODO del	private final PathExpression AJAX_REQUEST_CONTROL_VALUE_XPATH_EXPRESSION=new PathExpression("control", "value");	//TODO use constants; comment 
+	private final PathExpression AJAX_REQUEST_SOURCE_XPATH_EXPRESSION=new PathExpression("source");	//TODO use constants; comment 
+	private final PathExpression AJAX_REQUEST_TARGET_XPATH_EXPRESSION=new PathExpression("target");	//TODO use constants; comment 
 	
 	/**Retrieves control events from the HTTP request.
   @param request The HTTP request.
@@ -666,11 +675,13 @@ Debug.trace("using this component");
   */
 	protected List<ControlEvent> getControlEvents(final HttpServletRequest request) throws ServletException, IOException
 	{
+Debug.trace("getting control events");
 		final List<ControlEvent> controlEventList=new ArrayList<ControlEvent>();	//create a new list for storing control events
 		final String contentTypeString=request.getContentType();	//get the request content type
 		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
 		if(contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType))	//if this is a Guise AJAX request
 		{
+Debug.trace("this is a Guise AJAX post");
 			try
 			{
 				final DocumentBuilderFactory documentBuilderFactory=DocumentBuilderFactory.newInstance();	//create a document builder factory TODO create a shared document builder factory, maybe---but make sure it is used by only one thread			
@@ -679,10 +690,11 @@ Debug.trace("using this component");
 				final List<Node> eventNodes=(List<Node>)XPath.evaluatePathExpression(document, AJAX_REQUEST_EVENTS_WILDCARD_XPATH_EXPRESSION);	//get all the events
 				for(final Node eventNode:eventNodes)	//for each event node
 				{
-					final FormSubmitEvent formSubmitEvent=new FormSubmitEvent();	//create a new form submission event
-					final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
+Debug.trace("looking at event node:", eventNode.getNodeName());
 					if(eventNode.getNodeType()==Node.ELEMENT_NODE && "form".equals(eventNode.getNodeName()))	//if this is a form event TODO use a constant
 					{
+						final FormSubmitEvent formSubmitEvent=new FormSubmitEvent();	//create a new form submission event
+						final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
 						final List<Node> controlNodes=(List<Node>)XPath.evaluatePathExpression(eventNode, AJAX_REQUEST_CONTROL_XPATH_EXPRESSION);	//get all the control settings
 						for(final Node controlNode:controlNodes)	//for each control node
 						{
@@ -694,8 +706,20 @@ Debug.trace("using this component");
 								parameterListMap.addItem(controlName, controlValue);	//store the value in the parameters
 							}
 						}
+						controlEventList.add(formSubmitEvent);	//add the event to the list
 					}
-					controlEventList.add(formSubmitEvent);	//add the event to the list
+					else if(eventNode.getNodeType()==Node.ELEMENT_NODE && "drop".equals(eventNode.getNodeName()))	//if this is a drop event TODO use a constant
+					{
+//TODO del Debug.trace("this is a drop event");
+						final Node sourceNode=XPath.getNode(eventNode, AJAX_REQUEST_SOURCE_XPATH_EXPRESSION);	//get the source node
+						final String dragSourceID=((Element)sourceNode).getAttribute("id");	//TODO tidy; improve; comment
+//TODO del Debug.trace("drag source:", dragSourceID);
+						final Node targetNode=XPath.getNode(eventNode, AJAX_REQUEST_TARGET_XPATH_EXPRESSION);	//get the target node
+						final String dropTargetID=((Element)targetNode).getAttribute("id");	//TODO tidy; improve; comment
+//TODO del Debug.trace("drop target:", dropTargetID);
+						final DropEvent dropEvent=new DropEvent(dragSourceID, dropTargetID);	//create a new drop event
+						controlEventList.add(dropEvent);	//add the event to the list
+					}
 				}
 			}
 			catch(final ParserConfigurationException parserConfigurationException)	//we don't expect parser configuration errors

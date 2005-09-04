@@ -8,6 +8,9 @@ import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.event.EventListenerManager;
 import com.garretwilson.lang.ObjectUtilities;
 import com.javaguise.component.layout.Orientation;
+import com.javaguise.component.transfer.ExportStrategy;
+import com.javaguise.component.transfer.ImportStrategy;
+import com.javaguise.component.transfer.Transferable;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.Controller;
 import com.javaguise.model.Model;
@@ -434,6 +437,71 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 				dropEnabled=newDropEnabled;	//update the value
 				firePropertyChange(DRAG_ENABLED_PROPERTY, Boolean.valueOf(oldDropEnabled), Boolean.valueOf(newDropEnabled));
 			}
+		}
+
+	/**The list of installed export strategies, from most recently added to earliest added.*/
+	private List<ExportStrategy<? super C>> exportStrategyList=new CopyOnWriteArrayList<ExportStrategy<? super C>>();
+
+		/**Adds an export strategy to the component.
+		The export strategy will take prececence over any compatible export strategy previously added.
+		@param exportStrategy The export strategy to add.
+		*/
+		public void addExportStrategy(final ExportStrategy<? super C> exportStrategy) {exportStrategyList.add(0, exportStrategy);}	//add the export strategy to the beginning of the list
+
+		/**Removes an export strategy from the component.
+		@param exportStrategy The export strategy to remove.
+		*/
+		public void removeExportStrategy(final ExportStrategy<? super C> exportStrategy) {exportStrategyList.remove(exportStrategy);}	//remove the export strategy from the list
+
+		/**Exports data from the component.
+		Each export strategy, from last to first added, will be asked to export data, until one is successful.
+		@return The object to be transferred, or <code>null</code> if no data can be transferred.
+		*/
+		public Transferable exportTransfer()
+		{
+			for(final ExportStrategy<? super C> exportStrategy:exportStrategyList)	//for each export strategy
+			{
+				final Transferable transferable=exportStrategy.exportTransfer(getThis());	//ask this export strategy to transfer data
+				if(transferable!=null)	//if this export succeeded
+				{
+					return transferable;	//return this transferable data
+				}
+			}
+			return null;	//indicate that no data could be exported
+		}
+
+	/**The list of installed import strategies, from most recently added to earliest added.*/
+	private List<ImportStrategy<? super C>> importStrategyList=new CopyOnWriteArrayList<ImportStrategy<? super C>>();
+
+		/**Adds an import strategy to the component.
+		The import strategy will take prececence over any compatible import strategy previously added.
+		@param importStrategy The importstrategy to add.
+		*/
+		public void addImportStrategy(final ImportStrategy<? super C> importStrategy) {importStrategyList.add(0, importStrategy);}	//add the import strategy to the beginning of the list
+
+		/**Removes an import strategy from the component.
+		@param importStrategy The import strategy to remove.
+		*/
+		public void removeImportStrategy(final ImportStrategy<? super C> importStrategy) {importStrategyList.remove(importStrategy);}	//remove the import strategy from the list
+
+		/**Imports data to the component.
+		Each import strategy, from last to first added, will be asked to import data, until one is successful.
+		@param transferable The object to be transferred.
+		@return <code>true</code> if the given object was be imported.
+		*/
+		public boolean importTransfer(final Transferable transferable)
+		{
+			for(final ImportStrategy<? super C> importStrategy:importStrategyList)	//for each importstrategy
+			{
+				if(importStrategy.canImportTransfer(getThis(), transferable))	//if this import strategy can import the data
+				{
+					if(importStrategy.importTransfer(getThis(), transferable))	//import the data; if we are successful
+					{
+						return true;	//stop trying to import data, and indicate we were successful
+					}
+				}
+			}
+			return false;	//indicate that no data could be imported
 		}
 
 	/**Session constructor.

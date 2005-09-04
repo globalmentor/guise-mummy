@@ -13,6 +13,7 @@ import javax.mail.internet.ContentType;
 
 import com.garretwilson.beans.AbstractPropertyValueChangeListener;
 import com.garretwilson.beans.PropertyValueChangeEvent;
+import com.garretwilson.util.Debug;
 import com.javaguise.component.Button;
 import com.javaguise.component.CheckControl;
 import com.javaguise.component.DefaultFrame;
@@ -26,6 +27,8 @@ import com.javaguise.component.TextAreaControl;
 import com.javaguise.component.TextControl;
 import com.javaguise.component.layout.FlowLayout;
 import com.javaguise.component.layout.Orientation;
+import com.javaguise.component.transfer.ImportStrategy;
+import com.javaguise.component.transfer.Transferable;
 import com.javaguise.model.DefaultLabelModel;
 import com.javaguise.model.MessageModel;
 import com.javaguise.model.ModelGroup;
@@ -99,6 +102,19 @@ public class DropDetailsFrame extends DefaultFrame
 		detailsTextArea.getModel().setLabel("Drop Here for Details");	//set the label of the text area
 		detailsTextArea.getModel().setEditable(false);	//don't allow the text area control to be edited
 		detailsTextArea.setDropEnabled(true);	//allow dropping on the text area
+		detailsTextArea.addImportStrategy(new ImportStrategy<TextAreaControl>()	//add a new import strategy for this component
+				{		
+					public boolean canImportTransfer(final TextAreaControl component, final Transferable transferable)
+					{
+						return true;	//accept all import types
+					}
+
+					public boolean importTransfer(final TextAreaControl component, final Transferable transferable)
+					{
+						Debug.trace("we're ready to transfer!");
+						return true;
+					}
+				});
 		add(detailsTextArea);	//add the text area control to the frame
 	}
 

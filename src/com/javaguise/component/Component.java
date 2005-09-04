@@ -3,10 +3,15 @@ package com.javaguise.component;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.util.ReverseIterator;
 import com.javaguise.component.layout.Orientation;
+import com.javaguise.component.transfer.ExportStrategy;
+import com.javaguise.component.transfer.ImportStrategy;
+import com.javaguise.component.transfer.Transferable;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.Controller;
 import static com.garretwilson.lang.ClassUtilities.*;
@@ -192,6 +197,41 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	@see #DROP_ENABLED_PROPERTY
 	*/
 	public void setDropEnabled(final boolean newDropEnabled);
+
+	/**Adds an export strategy to the component.
+	The export strategy will take prececence over any compatible export strategy previously added.
+	@param exportStrategy The export strategy to add.
+	*/
+	public void addExportStrategy(final ExportStrategy<? super C> exportStrategy);
+
+	/**Removes an export strategy from the component.
+	@param exportStrategy The export strategy to remove.
+	*/
+	public void removeExportStrategy(final ExportStrategy<? super C> exportStrategy);
+
+	/**Exports data from the component.
+	Each export strategy, from last to first added, will be asked to export data, until one is successful.
+	@return The object to be transferred, or <code>null</code> if no data can be transferred.
+	*/
+	public Transferable exportTransfer();
+
+	/**Adds an import strategy to the component.
+	The import strategy will take prececence over any compatible import strategy previously added.
+	@param importStrategy The importstrategy to add.
+	*/
+	public void addImportStrategy(final ImportStrategy<? super C> importStrategy);
+
+	/**Removes an import strategy from the component.
+	@param importStrategy The import strategy to remove.
+	*/
+	public void removeImportStrategy(final ImportStrategy<? super C> importStrategy);
+
+	/**Imports data to the component.
+	Each import strategy, from last to first added, will be asked to import data, until one is successful.
+	@param transferable The object to be transferred.
+	@return <code>true</code> if the given object was be imported.
+	*/
+	public boolean importTransfer(final Transferable transferable);
 
 	/**@return Whether the models of this component and all of its child components are valid.*/
 	public boolean isValid();
