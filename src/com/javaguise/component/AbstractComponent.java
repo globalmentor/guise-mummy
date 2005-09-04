@@ -8,12 +8,9 @@ import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.event.EventListenerManager;
 import com.garretwilson.lang.ObjectUtilities;
 import com.javaguise.component.layout.Orientation;
-import com.javaguise.component.transfer.ExportStrategy;
-import com.javaguise.component.transfer.ImportStrategy;
-import com.javaguise.component.transfer.Transferable;
+import com.javaguise.component.transfer.*;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.Controller;
-import com.javaguise.model.Model;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationsException;
 import com.garretwilson.util.EmptyIterator;
@@ -683,5 +680,4 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 		}
 		return controller;	//return the controller we found
 	}
-
 }

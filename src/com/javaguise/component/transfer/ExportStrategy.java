@@ -13,5 +13,5 @@ public interface ExportStrategy<C extends Component<?>>
 	@param component The component from which data will be transferred.
 	@return The object to be transferred, or <code>null</code> if no data can be transferred.
 	*/
-	public Transferable exportTransfer(final C component);
+	public Transferable<C> exportTransfer(final C component);
 }

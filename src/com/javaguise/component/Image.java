@@ -1,15 +1,40 @@
 package com.javaguise.component;
 
-import static com.garretwilson.lang.ClassUtilities.*;
+import java.net.URI;
+import javax.mail.internet.ContentType;
 
+import static com.garretwilson.io.ContentTypeConstants.*;
+import static com.garretwilson.io.ContentTypeUtilities.*;
+import static com.garretwilson.net.URIUtilities.*;
+import static com.garretwilson.util.ArrayUtilities.*;
+
+import com.javaguise.component.transfer.*;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 
 /**An image component.
+This component installs a default export strategy supporting export of the following content types:
+<ul>
+	<li><code>text/uri-list</code></li>
+	<li>The label content type.</li>
+</ul>
 @author Garret Wilson
 */
 public class Image extends AbstractModelComponent<ImageModel, Image>
 {
+
+	/**The default export strategy for this component type.*/
+	protected final static ExportStrategy<Image> DEFAULT_EXPORT_STRATEGY=new ExportStrategy<Image>()
+			{
+				/**Exports data from the given component.
+				@param component The component from which data will be transferred.
+				@return The object to be transferred, or <code>null</code> if no data can be transferred.
+				*/
+				public Transferable<Image> exportTransfer(final Image component)
+				{
+					return new DefaultTransferable(component);	//return a default transferable for this component
+				}
+			};
 
 	/**The bound property of whether the component has image dragging enabled.*/
 //TODO del if not needed	public final static String IMAGE_DRAG_ENABLED_PROPERTY=getPropertyName(Image.class, "imageDragEnabled");
@@ -44,6 +69,7 @@ public class Image extends AbstractModelComponent<ImageModel, Image>
 	public Image(final GuiseSession<?> session, final String id, final ImageModel model)
 	{
 		super(session, id, model);	//construct the parent class
+		addExportStrategy(DEFAULT_EXPORT_STRATEGY);	//install a default export strategy 
 	}
 
 	/**Whether the component has image dragging enabled.*/
@@ -68,5 +94,49 @@ public class Image extends AbstractModelComponent<ImageModel, Image>
 			}
 		}
 */
+
+	/**The default transferable object for an image.
+	@author Garret Wilson
+	*/
+	protected static class DefaultTransferable extends AbstractTransferable<Image>
+	{
+		/**Source constructor.
+		@param source The source of the transferable data.
+		@exception NullPointerException if the provided source is <code>null</code>.
+		*/
+		public DefaultTransferable(final Image source)
+		{
+			super(source);	//construct the parent class
+		}
+
+		/**Determines the content types available for this transfer.
+		This implementation returns a URI-list content type and the content type of the label.
+		@return The content types available for this transfer.
+		*/
+		public ContentType[] getContentTypes() {return toArray(new ContentType(TEXT, URI_LIST_SUBTYPE, null), getSource().getModel().getLabelContentType());}
+
+		/**Transfers data using the given content type.
+		@param contentType The type of data expected.
+		@return The transferred data, which may be <code>null</code>.
+		@exception IllegalArgumentException if the given content type is not supported.
+		*/
+		public Object transfer(final ContentType contentType)
+		{
+			final ImageModel imageModel=getSource().getModel();	//get the model
+			if(match(contentType, TEXT, URI_LIST_SUBTYPE))	//if this is a text/uri-list type
+			{
+				final URI imageURI=imageModel.getImage();	//get the image URI
+				return imageURI!=null ? createURIList(imageURI) : null;	//return the image URI, if there is one
+			}
+			else if(contentType.match(imageModel.getLabelContentType()))	//if the label has the content type requested
+			{
+				return imageModel.getLabel();	//return the label
+			}
+			else	//if we don't support this content type
+			{
+				throw new IllegalArgumentException("Content type not supported: "+contentType);
+			}
+		}
+	}
 
 }

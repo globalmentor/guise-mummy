@@ -29,6 +29,7 @@ var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX c
 */
 
 //TODO turn off AJAX when unloading
+//TODO before sending a drop event, send a component update for the drop target so that its value will be updated; or otherwise make sure the value is synchronized
 
 /**The class prefix of a tree node.*/
 var TREE_NODE_CLASS_PREFIX="treeNode-";
@@ -649,6 +650,7 @@ alert("childnode count: "+childNodeCount);
 			if(id)	//if the element has an ID
 			{
 		//TODO del alert("patching stuff for ID "+id);
+				var elementName=element.nodeName;	//save the element name
 				var oldElement=document.getElementById(id);	//get the old element
 				if(oldElement)	//if the element currently exists in the document
 				{
@@ -690,54 +692,68 @@ alert("childnode count: "+childNodeCount);
 						}
 					}
 						//patch in the new child element hierarchy
-					var oldChildNodeList=oldElement.childNodes;	//get all the child nodes of the old element
-					var oldChildNodeCount=oldChildNodeList.length;	//find out how many old children there are
-					if(childNodeCount>0)	//if the new element has child nodes
+					if(elementName=="textarea")	//if this is a text area, do special-case value changing (restructuring won't work in IE and Mozilla) TODO check for other similar types TODO use a constant
 					{
-							//patch any changed text
-						if(childTextNodeCount==childNodeCount)	//if all the child nodes are text nodes
+						var stringBuilder=new StringBuilder();	//create a new string builder to construct the value
+						for(var i=0; i<childNodeCount; ++i)	//for each new child node
 						{
-							var onlyChangeValues=false;	//see if we can get by with just changing text node values
-							if(oldChildNodeCount==childNodeCount)	//if the old element has the same number of children as the new element
+							var childNode=childNodeList[i];	//get this child node
+								//TODO later check for text
+							stringBuilder.append(childNode.nodeValue);	//add this value
+						}
+						oldElement.value=stringBuilder.toString();	//set the new value
+					}
+					else	//for other elements, restructure the DOM tree normally
+					{
+						var oldChildNodeList=oldElement.childNodes;	//get all the child nodes of the old element
+						var oldChildNodeCount=oldChildNodeList.length;	//find out how many old children there are
+						if(childNodeCount>0)	//if the new element has child nodes
+						{
+								//patch any changed text
+							if(childTextNodeCount==childNodeCount)	//if all the child nodes are text nodes
 							{
-								onlyChangeValues=true;	//we may get away with only changing values after all
-								for(var i=0; i<oldChildNodeCount; ++i)	//look at each old child node
+								var onlyChangeValues=false;	//see if we can get by with just changing text node values
+								if(oldChildNodeCount==childNodeCount)	//if the old element has the same number of children as the new element
 								{
-									if(oldChildNodeList[i].nodeType!=childNodeList[i].nodeType)	//if the old child element is a different type than the new one
+									onlyChangeValues=true;	//we may get away with only changing values after all
+									for(var i=0; i<oldChildNodeCount; ++i)	//look at each old child node
 									{
-										onlyChangeValues=false;	//we'll have to actually change around child nodes
-										break;	//stop looking for difficulties---we just found one
+										if(oldChildNodeList[i].nodeType!=childNodeList[i].nodeType)	//if the old child element is a different type than the new one
+										{
+											onlyChangeValues=false;	//we'll have to actually change around child nodes
+											break;	//stop looking for difficulties---we just found one
+										}
+									}
+								}
+								if(onlyChangeValues)	//if we think we can simply change text node values
+								{
+									for(var i=0; i<childNodeCount; ++i)	//for each new child node
+									{
+											//TODO later check for text
+										oldChildNodeList[i].nodeValue=childNodeList[i].nodeValue;	//copy the text over to the old node
+									}
+								}
+								else	//if we have to rearrange the child nodes
+								{
+									for(var i=oldChildNodeCount-1; i>=0; --i)	//for all of the old nodes
+									{
+										oldElement.removeChild(oldChildNodeList[i]);	//remove this child
+									}
+									for(var i=0; i<childNodeCount; ++i)	//for each new child node
+									{
+										var childNode=childNodeList[i];	//get this child node
+											//TODO later check for text
+										oldElement.appendChild(document.createTextNode(childNode.nodeValue));	//create and append an equivalent text node
 									}
 								}
 							}
-							if(onlyChangeValues)	//if we think we can simply change text node values
-							{
-								for(var i=0; i<childNodeCount; ++i)	//for each new child node
-								{
-										//TODO later check for text
-									oldChildNodeList[i].nodeValue=childNodeList[i].nodeValue;	//copy the text over to the old node
-								}
-							}
-							else	//if we have to rearrange the child nodes
-							{
-								for(var i=oldChildNodeCount-1; i>=0; --i)	//for all of the old nodes
-								{
-									oldElement.removeChild(oldChildNodeList[i]);	//remove this child
-								}
-								for(var i=0; i<childNodeCount; ++i)	//for each new child node
-								{
-									var childNode=childNodeList[i];	//get this child node
-										//TODO later check for text
-									oldElement.appendChild(document.createTextNode(childNode.nodeValue));	//create and append an equivalent text node
-								}
-							}
 						}
-					}
-					else	//if the element has no child nodes, remove all the child nodes from the old element
-					{
-						for(var i=oldChildNodeCount-1; i>=0; --i)	//for all of the old nodes
+						else	//if the element has no child nodes, remove all the child nodes from the old element
 						{
-							oldElement.removeChild(oldChildNodeList[i]);	//remove this child
+							for(var i=oldChildNodeCount-1; i>=0; --i)	//for all of the old nodes
+							{
+								oldElement.removeChild(oldChildNodeList[i]);	//remove this child
+							}
 						}
 					}
 				}

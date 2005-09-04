@@ -7,31 +7,41 @@ import javax.mail.internet.ContentType;
 import com.javaguise.component.Component;
 
 /**An abstract object that can be transferred, such as between components using drag and drop.
+@param <T> The type of component this transferable supports.
 @author Garret Wilson
 */
-public abstract class AbstractTransferable implements Transferable	//TODO decide what to do with this class
+public abstract class AbstractTransferable<T extends Component<?>> implements Transferable<T>
 {
 
 	/**The source of the transferable data.*/
-	private final Component<?> source;
+	private final T source;
 
 		/**@return The source of the transferable data.*/
-		public Component<?> getSource() {return source;}
+		public T getSource() {return source;}
 
-	/**The content types available for this transfer.*/
-	private ContentType[] transferContentTypes;
-
-		/**@return The content types available for this transfer.*/
-		public ContentType[] getTransferContentTypes() {return transferContentTypes.clone();}	//return a copy of the transfer content types array
+	/**Determines whether this transferable can transfer data with the given content type.
+	This implementation calls {@link Transferable#getContentTypes()}.
+	@param contentType The type of data requested, which may include wildcards.
+	@return <code>true</code> if this object can transfer data with the requested content type.
+	*/
+	public boolean canTransfer(final ContentType contentType)
+	{
+		for(final ContentType transferContentType:getContentTypes())	//for each content type
+		{
+			if(contentType.match(transferContentType))	//if this content type matches
+			{
+				return true;	//indicate that we found a match
+			}
+		}
+		return false;	//indicate that there is no matching content type
+	}
 
 	/**Source constructor.
 	@param source The source of the transferable data.
-	@param transferContentTypes The content types available for this transfer.
-	@exception NullPointerException if the provided source or content types is <code>null</code>.
+	@exception NullPointerException if the provided source is <code>null</code>.
 	*/
-	public AbstractTransferable(final Component<?> source, final ContentType... transferContentTypes)
+	public AbstractTransferable(final T source)
 	{
-		this.source=checkNull(source, "Source cannot be null");
-		this.transferContentTypes=checkNull(transferContentTypes, "Transfer content types cannot be null.");
+		this.source=checkNull(source, "Source cannot be null.");
 	}
 }

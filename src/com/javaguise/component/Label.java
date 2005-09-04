@@ -7,22 +7,26 @@ import com.javaguise.component.transfer.*;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 
-/**A label component with a default transferable.
+/**A label component.
+This component installs a default export strategy supporting export of the following content types:
+<ul>
+	<li>The label content type.</li>
+</ul>
 @author Garret Wilson
 */
 public class Label extends AbstractModelComponent<LabelModel, Label>
 {
 
 	/**The default export strategy for this component type.*/
-	protected final ExportStrategy DEFAULT_EXPORT_STRATEGY=new ExportStrategy<Label>()
+	protected final static ExportStrategy<Label> DEFAULT_EXPORT_STRATEGY=new ExportStrategy<Label>()
 			{
 				/**Exports data from the given component.
 				@param component The component from which data will be transferred.
 				@return The object to be transferred, or <code>null</code> if no data can be transferred.
 				*/
-				public Transferable exportTransfer(final Label component)
+				public Transferable<Label> exportTransfer(final Label component)
 				{
-					return new DefaultTransferable();
+					return new DefaultTransferable(component);	//return a default transferable for this component
 				}
 			};
 	
@@ -66,38 +70,37 @@ public class Label extends AbstractModelComponent<LabelModel, Label>
 	public Label(final GuiseSession<?> session, final String id, final LabelModel model)
 	{
 		super(session, id, model);	//construct the parent class
-		addExportStrategy(new ExportStrategy<Label>()	//install an export strategy to return a default transferable 
-			{
-				/**Exports data from the given component.
-				@param component The component from which data will be transferred.
-				@return The object to be transferred, or <code>null</code> if no data can be transferred.
-				*/
-				public Transferable exportTransfer(final Label component)
-				{
-					return new DefaultTransferable();	//return a default transferable for labels
-				}
-			});
+		addExportStrategy(DEFAULT_EXPORT_STRATEGY);	//install a default export strategy 
 	}
 
 	/**The default transferable object for a label.
 	@author Garret Wilson
 	*/
-	protected class DefaultTransferable implements Transferable
+	protected static class DefaultTransferable extends AbstractTransferable<Label>
 	{
+		/**Source constructor.
+		@param source The source of the transferable data.
+		@exception NullPointerException if the provided source is <code>null</code>.
+		*/
+		public DefaultTransferable(final Label source)
+		{
+			super(source);	//construct the parent class
+		}
+
 		/**Determines the content types available for this transfer.
 		This implementation returns the content type of the label.
 		@return The content types available for this transfer.
 		*/
-		public ContentType[] getTransferContentTypes() {return toArray(getModel().getLabelContentType());}
+		public ContentType[] getContentTypes() {return toArray(getSource().getModel().getLabelContentType());}
 
 		/**Transfers data using the given content type.
 		@param contentType The type of data expected.
-		@return The transferred data.
+		@return The transferred data, which may be <code>null</code>.
 		@exception IllegalArgumentException if the given content type is not supported.
 		*/
 		public Object transfer(final ContentType contentType)
 		{
-			final LabelModel labelModel=getModel();	//get the label model
+			final LabelModel labelModel=getSource().getModel();	//get the label model
 			if(contentType.match(labelModel.getLabelContentType()))	//if we have the content type requested
 			{
 				return labelModel.getLabel();	//return the label
