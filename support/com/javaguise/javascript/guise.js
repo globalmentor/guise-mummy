@@ -287,6 +287,7 @@ function HTTPCommunicator()
 			var content=null;	//we'll create content if we need to
 			if(method=="POST")	//if this is the POST method
 			{
+//TODO del alert("posting with query: "+query);
 	//TODO del alert("posting with query: "+query);
 //TODO del				this.xmlHTTP.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");	//set the post content type
 				if(contentType)	//if a content type was given
@@ -430,7 +431,7 @@ function GuiseAJAX()
 					catch(exception)	//if a problem occurred
 					{
 						//TODO log a warning
-alert(exception);
+//TODO fix alert(exception);
 						AJAX_URI=null;	//stop further AJAX communication
 					}						
 				}
@@ -457,7 +458,7 @@ alert(exception);
 				{
 					var parameter=parameters[i];	//get this parameter
 					this.appendXMLStartTag(stringBuilder, this.RequestElement.CONTROL, new Parameter(this.RequestElement.NAME, parameter.name));	//<control name="name">
-					stringBuilder.append(parameter.value);	//append the parameter value TODO encode the value
+					this.appendXMLText(stringBuilder, parameter.value);	//append the parameter value
 					this.appendXMLEndTag(stringBuilder, this.RequestElement.CONTROL);	//</control>
 				}
 			}
@@ -483,7 +484,31 @@ alert(exception);
 			return stringBuilder;	//return the string builder
 		};
 
+		/**Encodes a string so that it may be used in XML by escaping XML-specific characters.
+		@param string The string to encode.
+		@return The XML-encoded string.
+		*/
+		GuiseAJAX.prototype.encodeXML=function(string)
+		{
+			string=string.replace(/&/g, "&amp;");	//encode '&' first
+			string=string.replace(/</g, "&lt;");	//encode '<'
+			string=string.replace(/>/g, "&gt;");	//encode '>'
+			string=string.replace(/"/g, "&quot;");	//encode '\"'
+			return string;	//return the encoded string
+		};
+
+		/**Encodes and appends XML text to the given string builder.
+		@param stringBuilder The string builder to hold the data.
+		@param text The text to encode and append.
+		@return A reference to the string builder.
+		*/ 
+		GuiseAJAX.prototype.appendXMLText=function(stringBuilder, text)
+		{
+			return stringBuilder.append(this.encodeXML(text));	//encode and append the text, and return the string builder
+		};
+
 		/**Appends an XML start tag with the given name to the given string builder.
+		If the value of a parameter is not a string, it will be converted to one.
 		@param stringBuilder The string builder to hold the data.
 		@param tagName The name of the XML tag.
 		@param parameters (...) Zero or more parameters of type Parameter.
@@ -496,7 +521,7 @@ alert(exception);
 			for(var i=2; i<argumentCount; ++i)	//for each argument (not counting the first two)
 			{
 				var parameter=arguments[i];	//get this argument
-				stringBuilder.append(" ").append(parameter.name).append("=\"").append(parameter.value).append("\"");	//name="value" TODO encode the parameter value
+				stringBuilder.append(" ").append(parameter.name).append("=\"").append(this.encodeXML(parameter.value.toString())).append("\"");	//name="value"
 			}
 			return stringBuilder.append(">");	//>
 		};
@@ -520,7 +545,7 @@ alert(exception);
 		GuiseAJAX.prototype.appendXMLTextElement=function(stringBuilder, tagName, text)
 		{
 			this.appendXMLStartTag(stringBuilder, tagName);	//append the start tag
-			stringBuilder.append(text);	//append the text TODO encode the text
+			this.appendXMLText(stringBuilder, text);	//append the text
 			return this.appendXMLEndTag(stringBuilder, tagName);	//append the end tag
 		};
 	
@@ -550,9 +575,8 @@ alert(exception);
 */
 					if(this.status==200)	//if everything went OK
 					{
-						if(this.responseXML)
+						if(this.responseText && this.responseXML)	//if we have XML (if there is no content, IE sends back a document that will generate an error when trying to access this.responseXML.documentElement.childNodes, even using typeof)
 						{
-//TODO if the content is empty, IE may send back a document with a document element with no children, generating an error when trying to access the child list; always send back XML or send back another response
 							thisGuiseAJAX.ajaxResponses.enqueue(this.responseXML);	//enqueue the response XML
 							thisGuiseAJAX.processAJAXResponses();	//process enqueued AJAX responses
 	//TODO del						setTimeout("GuiseAJAX.prototype.processAJAXResponses();", 1);	//process the AJAX responses later		
@@ -567,7 +591,7 @@ alert(exception);
 				catch(exception)	//if a problem occurred
 				{
 					//TODO log a warning
-	alert(exception);
+alert(exception);
 					AJAX_URI=null;	//stop further AJAX communication
 				}
 			};
@@ -587,31 +611,23 @@ alert(exception);
 					while(this.ajaxResponses.length>0)	//while there are more AJAX responses TODO fix small race condition on adding responses
 					{
 						var responseDocument=this.ajaxResponses.dequeue();	//get this response
-/*TODO fix
-
-						
-				//do depth-first patching, allowing us to precheck children at the same time for later patching at this level in the hierarchy
-			var childNodeList=element.childNodes;	//get all the child nodes of the element
-			var childNodeCount=childNodeList.length;	//find out how many children there are
-alert("childnode count: "+childNodeCount);
-			var childTextNodeCount=0;	//keep track of how many child text nodes there are
-			for(var i=0; i<childNodeCount; ++i)	//for each child node
-			{
-				var childNode=childNodeList[i];	//get this child node
-				switch(childNode.nodeType)	//see which type of child node this is
-				{
-					case Node.ELEMENT_NODE:	//element
-						this.patchElement(childNode);	//patch this child element
-						break;
-					case Node.TEXT_NODE:	//text
-						++childTextNodeCount;	//show that we found another text child
-						break;
-				}
-			}
-						
-
-*/
-						this._patchElement(responseDocument.documentElement);	//TODO fix
+						//TODO assert document element name is "response"
+						var childNodeList=responseDocument.documentElement.childNodes;	//get all the child nodes of the document element
+						var childNodeCount=childNodeList.length;	//find out how many children there are
+						for(var i=0; i<childNodeCount; ++i)	//for each child node
+						{
+							var childNode=childNodeList[i];	//get this child node
+							if(childNode.nodeType==Node.ELEMENT_NODE)	//if this is an element
+							{
+								var elementName=childNode.nodeName;	//get this element name
+								switch(elementName)	//see which type of response this is
+								{
+									case this.ResponseElement.PATCH:	//patch
+										this._patchElement(childNode);	//patch the document with this patch information
+										break;
+								}
+							}
+						}
 						this.processAJAXRequests();	//make sure there are no waiting AJAX requests
 					}
 				}

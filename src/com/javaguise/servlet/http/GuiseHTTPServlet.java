@@ -375,7 +375,7 @@ Debug.info("content type:", request.getContentType());
 						final List<ControlEvent> controlEvents=getControlEvents(request);	//get all control events from the request
 						final FormSubmitEvent formSubmitEvent=(FormSubmitEvent)controlEvents.get(0);	//get the form submit event TODO fix, combine with AJAX code
 
-						
+						guiseContext.setControlEvent(formSubmitEvent);	//tell the context which control event is being used
 							//before actually changing the navigation path, check to see if we're in the middle of modal navigation (only do this after we find a navigation frame, as this request might be for a stylesheet or some other non-frame resource, which shouldn't be redirected)
 						final ModalNavigation modalNavigation=guiseSession.peekModalNavigation();	//see if we are currently doing modal navigation TODO make public access routines
 						if(modalNavigation!=null)	//if we are currently in the middle of modal navigation, make sure the correct frame was requested
@@ -515,7 +515,6 @@ Debug.info("content type:", request.getContentType());
 		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request		
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 		final String navigationPath=rawPathInfo.substring(1, rawPathInfo.length()-AJAX_URI_SUFFIX.length());	//remove the beginning slash and the AJAX suffix
-Debug.trace("got an AJAX request for navigation path", navigationPath);
 /*TODO del when works
 		if(Debug.isDebug() && Debug.getReportLevels().contains(Debug.ReportLevel.INFO))	//indicate the parameters if information tracing is turned on
 		{
@@ -532,6 +531,8 @@ Debug.trace("got an AJAX request for navigation path", navigationPath);
 		if(navigationFrame!=null)	//if we found a frame class for this address
 		{
 			final List<ControlEvent> controlEvents=getControlEvents(request);	//get all control events from the request
+			guiseContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type
+			guiseContext.writeElementBegin(null, "response");	//<response>	//TODO use a constant, decide on a namespace
 			for(final ControlEvent controlEvent:controlEvents)	//for each control event
 			{
 				guiseContext.setControlEvent(controlEvent);	//tell the context which control event is being used
@@ -628,16 +629,18 @@ Debug.trace("got an AJAX request for navigation path", navigationPath);
 						affectedComponent.encodeModel(guiseContext);		//tell the component to encode its model
 					}				
 					guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view; make the change now in case queued model changes want to navigate, and an error was thrown when updating the model)
-					guiseContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type
-					guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_HTML);	//<xhtml:html>
+
+					guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
 					guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
 					for(final Component<?> affectedComponent:affectedComponents)	//for each component affected by this update cycle
 					{
 						affectedComponent.updateView(guiseContext);		//tell the component to update its view
 					}
-					guiseContext.writeElementEnd();	//</xhtml:html>
+					guiseContext.writeElementEnd();	//</xhtml:patch>
 				}
 			}
+			guiseContext.setState(GuiseContext.State.INACTIVE);	//deactivate the context so that any model update events will be generated			
+			guiseContext.writeElementEnd();	//</response>
 		}
 	}
 	
@@ -648,10 +651,10 @@ Debug.trace("got an AJAX request for navigation path", navigationPath);
 		if(controller instanceof XHTMLControlController)
 		{
 			final XHTMLControlController xhtmlControlController=(XHTMLControlController)controller;
-Debug.trace("checking control with ID", xhtmlControlController.getAbsoluteUniqueID(component), "and name", xhtmlControlController.getComponentName((Control)component));
+//TODO del Debug.trace("checking control with ID", xhtmlControlController.getAbsoluteUniqueID(component), "and name", xhtmlControlController.getComponentName((Control)component));
 			if(name.equals(xhtmlControlController.getComponentName((Control)component)))	//TODO comment: the returned name can be null
 			{
-Debug.trace("using this component");
+//TODO del Debug.trace("using this component");
 				componentSet.add(component);
 			}
 		}
@@ -675,13 +678,11 @@ Debug.trace("using this component");
   */
 	protected List<ControlEvent> getControlEvents(final HttpServletRequest request) throws ServletException, IOException
 	{
-Debug.trace("getting control events");
 		final List<ControlEvent> controlEventList=new ArrayList<ControlEvent>();	//create a new list for storing control events
 		final String contentTypeString=request.getContentType();	//get the request content type
 		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
 		if(contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType))	//if this is a Guise AJAX request
 		{
-Debug.trace("this is a Guise AJAX post");
 			try
 			{
 				final DocumentBuilderFactory documentBuilderFactory=DocumentBuilderFactory.newInstance();	//create a document builder factory TODO create a shared document builder factory, maybe---but make sure it is used by only one thread			
@@ -690,7 +691,6 @@ Debug.trace("this is a Guise AJAX post");
 				final List<Node> eventNodes=(List<Node>)XPath.evaluatePathExpression(document, AJAX_REQUEST_EVENTS_WILDCARD_XPATH_EXPRESSION);	//get all the events
 				for(final Node eventNode:eventNodes)	//for each event node
 				{
-Debug.trace("looking at event node:", eventNode.getNodeName());
 					if(eventNode.getNodeType()==Node.ELEMENT_NODE && "form".equals(eventNode.getNodeName()))	//if this is a form event TODO use a constant
 					{
 						final FormSubmitEvent formSubmitEvent=new FormSubmitEvent();	//create a new form submission event
