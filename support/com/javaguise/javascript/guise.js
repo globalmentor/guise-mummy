@@ -24,6 +24,7 @@ var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX c
 /**Guise AJAX Response Format, content type application/x-guise-ajax-response+xml
 <response>
 	<patch></patch>	<!--XML elements to be patched into the existing DOM tree.-->
+	<navigate>uri</navigate>	<!--URI of another page to which to navigate.-->
 </response>
 */
 
@@ -389,13 +390,11 @@ function HTTPCommunicator()
 		{
 			if(this.xmlHTTP)	//if we have an XML HTTP request object
 			{
-				this.status=this.xmlHTTP.status;	//store the status in the communicator
-				this.responseText=this.xmlHTTP.responseText;	//store the response text in the communicator
-				this.responseXML=this.xmlHTTP.responseXML;	//store the response XML in the communicator
+				var xmlHTTP=this.xmlHTTP;	//make a local copy of the XML HTTP request object
 				this.xmlHTTP=null;	//remove the XML HTTP request object (Firefox only allows one asynchronous communication per object)
 				if(this.processHTTPResponse)	//if we have a method for processing responses
 				{
-					this.processHTTPResponse();	//process the response
+					this.processHTTPResponse(xmlHTTP);	//process the response
 				}
 			}
 		};
@@ -438,7 +437,7 @@ function GuiseAJAX()
 		GuiseAJAX.prototype.RESPONSE_CONTENT_TYPE="application/x-guise-ajax-response+xml";
 
 		/**The enumeration of the names of the response elements.*/
-		GuiseAJAX.prototype.ResponseElement={RESPONSE: "response", PATCH: "patch"};
+		GuiseAJAX.prototype.ResponseElement={RESPONSE: "response", PATCH: "patch", NAVIGATE: "navigate"};
 
 		/**Immediately sends or queues an AJAX request.
 		@param ajaxRequest The AJAX request to send.
@@ -613,33 +612,41 @@ function GuiseAJAX()
 		{
 			var thisGuiseAJAX=this;	//save this
 			/**A new function that captures this in the form of the thisGuiseAJAX variable.
+			@param xmlHTTP The XML HTTP object.
 			var this The HTTP communicator that calls this function.
 			var thisGuiseAJAX The captured reference to the GuiseAJAX instance.
 			*/ 
-			return function()
+			return function(xmlHTTP)
 			{
-	/*TODO del
-	alert("processing HTTP response with thisGuiseAJAX of "+thisGuiseAJAX.name);
-	alert("the this we received is "+this.name);
-	*/
 				try
 				{
 		//TODO del alert("processing asynch result");
 /*TODO del
-	alert("got status: "+this.status);
-	alert("response text: "+this.responseText);
-	alert("response XML: "+this.responseXML);
+	alert("got status: "+xmlHTTP.status);
+	alert("response text: "+xmlHTTP.responseText);
+	alert("response XML: "+xmlHTTP.responseXML);
 */
-					if(this.status==200)	//if everything went OK
+					var status=xmlHTTP.status;	//get the status
+					if(status==200)	//if everything went OK
 					{
-						if(this.responseText && this.responseXML)	//if we have XML (if there is no content, IE sends back a document that will generate an error when trying to access this.responseXML.documentElement.childNodes, even using typeof)
+						if(xmlHTTP.responseText && xmlHTTP.responseXML)	//if we have XML (if there is no content, IE sends back a document that will generate an error when trying to access this.responseXML.documentElement.childNodes, even using typeof)
 						{
-							thisGuiseAJAX.ajaxResponses.enqueue(this.responseXML);	//enqueue the response XML
+							thisGuiseAJAX.ajaxResponses.enqueue(xmlHTTP.responseXML);	//enqueue the response XML
 							thisGuiseAJAX.processAJAXResponses();	//process enqueued AJAX responses
 	//TODO del						setTimeout("GuiseAJAX.prototype.processAJAXResponses();", 1);	//process the AJAX responses later		
 	//TODO del						thisGuiseAJAX.processAJAXRequests();	//make sure there are no waiting AJAX requests
 						}
 					}
+/*TODO del; XMLHTTPRequest automatically follows redirects
+					else if(status>=300 && status<400)	//if this is a redirect
+					{
+						var location=xmlHTTP.getResponseHeader("Location");	//get the Location header
+						if(location)
+						{
+							alert("redirect to: "+location);
+						}
+					}
+*/
 					else	//if there was an HTTP error TODO check for redirects
 					{
 				//TODO fix		throw xmlHTTP.status;	//throw the status code
@@ -682,6 +689,9 @@ alert(exception);
 									case this.ResponseElement.PATCH:	//patch
 										this._patchElement(childNode);	//patch the document with this patch information
 										break;
+									case this.ResponseElement.NAVIGATE:	//navigate
+										window.location.href=getText(childNode);	//go to the new location
+										break;	//TODO decide whether we should continue processing events or not
 								}
 							}
 						}
@@ -767,14 +777,7 @@ alert(exception);
 						//patch in the new child element hierarchy
 					if(elementName=="textarea")	//if this is a text area, do special-case value changing (restructuring won't work in IE and Mozilla) TODO check for other similar types TODO use a constant
 					{
-						var stringBuilder=new StringBuilder();	//create a new string builder to construct the value
-						for(var i=0; i<childNodeCount; ++i)	//for each new child node
-						{
-							var childNode=childNodeList[i];	//get this child node
-								//TODO later check for text
-							stringBuilder.append(childNode.nodeValue);	//add this value
-						}
-						oldElement.value=stringBuilder.toString();	//set the new value
+						oldElement.value=getText(element);	//set the new value to be the text of the new element
 					}
 					else	//for other elements, restructure the DOM tree normally
 					{
@@ -1161,13 +1164,17 @@ function initializeNode(node)
 				var elementClassNames=elementClassName ? elementClassName.split(/\s/) : EMPTY_ARRAY;	//split out the class names
 				switch(elementName)	//see which element this is
 				{
-/*TODO bring back when works
 					case "a":
-						addEvent(node, "click", onLinkClick, false);	//listen for anchor clicks
+						if(elementClassNames.contains("link"))	//if this is a Guise link TODO later look at *all* link clicks and do popups for certain ones
+						{
+							addEvent(node, "click", onLinkClick, false);	//listen for anchor clicks
+						}
 						break;
-*/
 					case "button":
-						addEvent(node, "click", onButtonClick, false);	//listen for button clicks
+						if(elementClassNames.contains("button"))	//if this is a Guise button
+						{
+							addEvent(node, "click", onButtonClick, false);	//listen for button clicks
+						}
 						break;
 					case "div":
 								//check for menu
@@ -1242,7 +1249,7 @@ function onTextInputChange(event)
 {
 	if(AJAX_URI)	//if AJAX is enabled
 	{
-		var textInput=event.target;	//get the target of the event
+		var textInput=event.currentTarget;	//get the control in which text changed
 	//TODO del alert("an input changed! "+textInput.id);
 		var ajaxRequest=new FormAJAXEvent(new Parameter(textInput.name, textInput.value));	//create a new form request with the control name and value
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
@@ -1255,11 +1262,7 @@ function onTextInputChange(event)
 */
 function onButtonClick(event)
 {
-	var button=getAncestorElementByName(event.target, "button");	//get the button itself
-	if(button)	//if a button was found
-	{
-		onAction(event, button);	//process an action for the button
-	}
+	onAction(event);	//process an action for the button
 }
 
 /**Called when an anchor is clicked.
@@ -1267,19 +1270,16 @@ function onButtonClick(event)
 */
 function onLinkClick(event)
 {
-	var anchor=getAncestorElementByName(event.target, "a");	//get the anchor itself
-	if(anchor)	//if a button was found
-	{
-		onAction(event, anchor);	//process an action for the anchor
-	}
+	onAction(event);	//process an action for the anchor
 }
 
 /**Called when an action should be processed for an element
 @param event The object describing the event.
 @param element The element representing the action.
 */
-function onAction(event, element)
+function onAction(event)
 {
+	var element=event.currentTarget;	//get the element on which the event was registered
 //TODO del alert("action on: "+element.nodeName);
 	if(element.id)	//if the button has an ID
 	{
@@ -1301,10 +1301,6 @@ function onAction(event, element)
 					{
 						if(!confirm(paramValue))	//ask for confirmation; if the user does not confirm
 						{
-/*TODO del if not needed
-							event.stopPropagation();	//tell the event to stop bubbling
-							event.preventDefault();	//prevent the default functionality from occurring
-*/
 							return;	//don't process the event further
 						}
 					}
@@ -1315,15 +1311,23 @@ function onAction(event, element)
 		if(form && form.id)	//if there is a form with an ID
 		{
 			var actionInputID=form.id.replace(":form", ":input");	//determine the ID of the hidden action input
-			var actionInput=document.getElementById(actionInputID);	//get the action input
-			if(actionInput)	//if there is an action input
+			if(AJAX_URI)	//if AJAX is enabled
 			{
-				actionInput.value=element.id;	//indicate which action was activated
+				var ajaxRequest=new FormAJAXEvent(new Parameter(actionInputID, element.id));	//create a new form request with form's hidden action control and the action element ID
+				guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request			
 			}
-			form.submit();	//submit the form
-			if(actionInput)	//if there is an action input
+			else	//if AJAX is not enabled, do a POST
 			{
-				actionInput.value=null;	//remove the indication of which action was activated
+				var actionInput=document.getElementById(actionInputID);	//get the action input
+				if(actionInput)	//if there is an action input
+				{
+					actionInput.value=element.id;	//indicate which action was activated
+				}
+				form.submit();	//submit the form
+				if(actionInput)	//if there is an action input
+				{
+					actionInput.value=null;	//remove the indication of which action was activated
+				}
 			}
 			event.stopPropagation();	//tell the event to stop bubbling
 			event.preventDefault();	//prevent the default functionality from occurring
@@ -1338,12 +1342,7 @@ function onCheckInputChange(event)
 {
 	if(AJAX_URI)	//if AJAX is enabled
 	{
-		var checkInput=event.target;	//get the target of the event
-		if(checkInput.nodeName.toLowerCase()=="label" && checkInput.htmlFor)	//if the check input's label was passed as the target (as occurs in Mozilla)
-		{
-			checkInput=document.getElementById(checkInput.htmlFor);	//the real target is the check input with which this label is associated; the htmlFor attribute is the ID of the element, not the actual element as Danny Goodman says in JavaScript Bible 5th Edition (649)
-		}
-//TODO del alert("checkbox "+checkInput.id+" changed to "+checkInput.checked);
+		var checkInput=event.currentTarget;	//get the control that was listening for events (the target could be the check input's label, as occurs in Mozilla)
 		var ajaxRequest=new FormAJAXEvent(new Parameter(checkInput.name, checkInput.checked ? checkInput.id : ""));	//create a new form request with the control name and value
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		event.stopPropagation();	//tell the event to stop bubbling
@@ -1357,7 +1356,7 @@ function onSelectChange(event)
 {
 	if(AJAX_URI)	//if AJAX is enabled
 	{
-		var select=event.target;	//get the target of the event
+		var select=event.currentTarget;	//get the control to which the listener was listening
 	//TODO del alert("a select changed! "+select.id);
 		var options=select.options;	//get the select options
 		var ajaxRequest=new FormAJAXEvent();	//create a new form request
@@ -1381,24 +1380,16 @@ function onTreeNodeClick(event)
 {
 	if(AJAX_URI)	//if AJAX is enabled
 	{
-		var treeNode=event.target;	//get the target of the event
-//TODO del alert("target of tree click: "+treeNode.nodeName);
-		if(treeNode.nodeName.toLowerCase()=="a")	//TODO fix; temporary hack for allowing links inside trees
+		if(event.target.nodeName.toLowerCase()=="a")	//TODO fix; temporary hack for allowing links inside trees
 		{
 			return;
 		}
-		while(treeNode.nodeName.toLowerCase()!="li" || !treeNode.className || treeNode.className.indexOf(TREE_NODE_CLASS_PREFIX)<0)	//a child of the tree node likely got the event; look up the chain until we find the tree node parent
+		if(event.target.nodeName.toLowerCase()=="ul" && event.target.className==oldClassName && event.target.parentNode==treeNode)	//if the user clicked on the tree node's list of child nodes
 		{
-			treeNode=treeNode.parentNode;	//get the node parent
-			if(!treeNode)	//if we ran out of nodes without finding a tree node
-			{
-				return;	//don't process the event
-			}
-			if(treeNode.nodeName.toLowerCase()=="a")	//TODO fix; temporary hack for allowing links inside trees
-			{
-				return;
-			}
+			return;	//don't toggle the list if the user clicked on the children
 		}
+		var treeNode=event.currentTarget;	//get tree node that owns the clicked element
+//TODO del alert("target of tree click: "+treeNode.nodeName);
 		event.stopPropagation();	//tell the event to stop bubbling
 		event.preventDefault();	//prevent the default functionality from occurring
 //TODO del	alert("ID of tree node: "+treeNode.lastChild.id);
@@ -1409,10 +1400,6 @@ alert("target class name: "+event.target.className);
 alert("target parent is the tree node?: "+(event.target.parentNode==treeNode));
 alert("target parent node name: "+event.target.parentNode.nodeName);
 */
-		if(event.target.nodeName.toLowerCase()=="ul" && event.target.className==oldClassName && event.target.parentNode==treeNode)	//if the user clicked on the tree node's list of child nodes
-		{
-			return;	//don't toggle the list if the user clicked on the children
-		}
 		var isCollapsed=oldClassName.indexOf(TREE_NODE_COLLAPSED_CLASS_SUFFIX)>=0;	//see if this tree node has a class name representing the collapsed state
 		var isExpanded=oldClassName.indexOf(TREE_NODE_EXPANDED_CLASS_SUFFIX)>=0;	//see if this tree node has a class name representing the expanded state
 		if(isCollapsed || isExpanded)	//if the tree node is collapsed or expanded (ignore leaf nodes)
@@ -1709,8 +1696,7 @@ function getAncestorElementByClassName(node, className)
 	{
 		if(node.nodeType==Node.ELEMENT_NODE)	//if this is an element
 		{
-			var elementClassNames=node.className ? node.className.split(/\s/) : EMPTY_ARRAY;	//split out the class names
-			if(elementClassNames.contains(className))	//if this class name is one of the class names
+			if(hasClassName(className))		//if this class name is one of the class names
 			{
 				return node;	//this node has a matching class name; we'll use it
 			}
@@ -1718,6 +1704,18 @@ function getAncestorElementByClassName(node, className)
 		node=node.parentNode;	//try the parent node
 	}
 	return node;	//return whatever node we found
+}
+
+/**Determines whether the given element has the given class. Multiple class names are supported.
+@param element The element that should be checked for class.
+@param className The name of the class for which to check.
+@return true if one of the element's class names equals the given class name.
+*/
+function hasClassName(element, className)
+{
+	var classNamesString=element.className;	//get the element's class names
+	var classNames=classNamesString ? classNamesString.split(/\s/) : EMPTY_ARRAY;	//split out the class names
+	return classNames.contains(className)	//return whether this class name is one of the class names
 }
 
 /**Determines the document tree depth of the given element, returning a zero-level depth for the document node.
@@ -1734,6 +1732,33 @@ function getElementDepth(element)
 	}
 	while(element);	//keep getting the parent node while there are ancestors left
 	return depth;	//return the depth we calculated
+}
+
+/**Retrieves the immediate text nodes of the given element as a string.
+@param element The element from which to retrieve text.
+@return The text of the given element.
+*/ 
+function getText(element)
+{
+	var childNodeList=element.childNodes;	//get all the child nodes of the element
+	var childNodeCount=childNodeList.length;	//find out how many children there are
+	if(childNodeCount>0)	//if there are child nodes
+	{
+		var stringBuilder=new StringBuilder();	//create a new string builder to construct the string
+		for(var i=0; i<childNodeCount; ++i)	//for each child node
+		{
+			var childNode=childNodeList[i];	//get this child node
+			if(childNode.nodeType==Node.TEXT_NODE)	//if this is a text node
+			{
+				stringBuilder.append(childNode.nodeValue);	//append this value			
+			}
+		}
+		return stringBuilder.toString();	//return the string we constructed
+	}
+	else	//if there are no child nodes
+	{
+		return "";	//return an empty string
+	}
 }
 
 /**Retrieves the absolute X and Y coordinates of the given element.

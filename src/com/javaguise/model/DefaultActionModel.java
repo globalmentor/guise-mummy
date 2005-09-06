@@ -1,5 +1,7 @@
 package com.javaguise.model;
 
+import java.util.Iterator;
+
 import com.javaguise.event.*;
 import com.javaguise.session.GuiseSession;
 
@@ -44,6 +46,13 @@ public class DefaultActionModel extends AbstractControlModel implements ActionMo
 	public void removeActionListener(final ActionListener<ActionModel> actionListener)
 	{
 		getEventListenerManager().remove(ActionListener.class, actionListener);	//remove the listener
+	}
+
+	/**@return all registered action listeners.*/
+	@SuppressWarnings("unchecked")
+	public Iterator<ActionListener<ActionModel>> getActionListeners()
+	{
+		return (Iterator<ActionListener<ActionModel>>)getEventListenerManager().getListeners(ActionListener.class);	//remove the listener
 	}
 
 	/**Fires an action to all registered action listeners.

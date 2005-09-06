@@ -1,6 +1,9 @@
 package com.javaguise.model;
 
+import java.util.Iterator;
+
 import com.javaguise.event.*;
+
 import static com.garretwilson.lang.ClassUtilities.*;
 
 /**A model for a potential action.
@@ -31,6 +34,9 @@ public interface ActionModel extends ControlModel
 	@param actionListener The action listener to remove.
 	*/
 	public void removeActionListener(final ActionListener<ActionModel> actionListener);
+
+	/**@return all registered action listeners.*/
+	public Iterator<ActionListener<ActionModel>> getActionListeners();
 
 	/**Fires an action to all registered action listeners.
 	@see ActionListener

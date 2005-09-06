@@ -447,26 +447,7 @@ Debug.info("content type:", request.getContentType());
 					}
 					else	//if we have no frame type for this address
 					{
-							//TODO del the redirect code here now that this is done when we get the request URI
-		//TODO del Debug.trace("could not find navigation path \""+navigationPath+"\", trying to load resource.");
-		//TODO del when works				try
-						{
-							super.doGet(request, response);	//let the default functionality take over					
-						}
-		/*TODO del when works
-						catch(final HTTPNotFoundException httpNotFoundException)	//if the default version couldn't find the resource
-						{
-							if(!isContainerPath(navigationPath))	//if the navigation path is not a container
-							{
-								final String containerPath=navigationPath+PATH_SEPARATOR;	//create a container path by adding a separator
-								if(guiseSession.getNavigationFrame(containerPath)!=null)	//if adding a path separator would give us a navigation frame
-								{
-									throw new HTTPMovedPermanentlyException(URI.create(guiseApplication.resolvePath(containerPath)));	//redirect to the container path
-								}
-							}
-							throw httpNotFoundException;	//rethrow the exception if we can't find a collection the user was trying to access
-						}
-		*/
+						super.doGet(request, response);	//let the default functionality take over					
 					}
 				}
 			}
@@ -545,9 +526,25 @@ Debug.info("content type:", request.getContentType());
 					for(final Map.Entry<String, List<Object>> parameterListMapEntry:parameterListMap.entrySet())	//for each entry in the map of parameter lists
 					{
 						final String parameterName=parameterListMapEntry.getKey();	//get the parameter name
-						//TODO don't re-update nested components (less important for controls, which don't have nested components) 
-		//TODO del Debug.trace("looking for component with name", parameterName);
-						getControlsByName(navigationFrame, parameterName, requestedComponents);	//get all components identified by this name
+
+						
+						final XHTMLFrameController frameController=(XHTMLFrameController)navigationFrame.getController();	//get the frame's controller, assuming it's of the required type TODO later improve the entire action hidden control framework
+
+						
+						if(parameterName.equals(frameController.getAbsoluteUniqueActionInputID(navigationFrame)) && parameterListMapEntry.getValue().size()>0)	//if this parameter is for an action
+						{
+							final Component<?> actionComponent=getComponentByAbsoluteUniqueID(navigationFrame, parameterListMapEntry.getValue().get(0).toString());	//get an action component
+							if(actionComponent!=null)	//if we found an action component
+							{
+								requestedComponents.add(actionComponent);	//add it to the list of requested components
+							}
+						}
+						else	//if this parameter is not a special action parameter
+						{
+							//TODO don't re-update nested components (less important for controls, which don't have nested components) 
+			//TODO del Debug.trace("looking for component with name", parameterName);
+							getControlsByName(navigationFrame, parameterName, requestedComponents);	//get all components identified by this name
+						}
 					}
 				}
 				else if(controlEvent instanceof DropEvent)	//if this is a drag and drop drop event
@@ -631,6 +628,32 @@ Debug.info("content type:", request.getContentType());
 					}				
 					guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view; make the change now in case queued model changes want to navigate, and an error was thrown when updating the model)
 
+					
+					
+					
+//TODO check about principal change
+					
+					final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
+					if(requestedNavigation!=null)	//if navigation is requested
+					{
+						final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
+//TODO del Debug.trace("navigation requested to", requestedNavigationURI);
+						guiseSession.clearRequestedNavigation();	//remove any navigation requests
+						if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
+						{
+							beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation<?>)requestedNavigation);	//begin the modal navigation
+						}
+						//TODO ifAJAX()
+						guiseContext.writeElementBegin(null, "navigate");	//<xhtml:navigate>	//TODO use a constant
+						guiseContext.write(requestedNavigationURI.toString());	//write the navigation URI
+						guiseContext.writeElementEnd();	//</xhtml:navigate>
+//TODO if !AJAX						throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
+						//TODO store a flag or something---if we're navigating, we probably should flush the other queued events
+					}
+					
+					
+					
+					
 					guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
 					guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
 					for(final Component<?> affectedComponent:affectedComponents)	//for each component affected by this update cycle
@@ -779,6 +802,15 @@ Debug.info("content type:", request.getContentType());
 				controlEventList.add(formSubmitEvent);	//add the event to the list
 			}
 		}
+		if(controlEventList.size()>0 && Debug.isDebug() && Debug.getReportLevels().contains(Debug.ReportLevel.INFO))	//indicate the parameters if information tracing is turned on
+		{
+			Debug.info("Received Control Events:");
+			for(final ControlEvent controlEvent:controlEventList)	//for each control event
+			{
+				Debug.info("  Event:", controlEvent.getClass(), controlEvent);				
+			}
+		}
+
 /*TODO del
 Debug.trace("parameter names:", request.getParameterNames());	//TODO del when finished with dual mulipart+encoded content
 Debug.trace("number of parameter names:", request.getParameterNames());

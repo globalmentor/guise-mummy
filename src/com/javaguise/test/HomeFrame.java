@@ -174,6 +174,12 @@ Debug.trace("list control changed value to", newValue);
 					}
 				});
 		buttonPanel.add(modalLink);	//add a new button
+		
+		final Link helloLink=new Link(session);
+		helloLink.getModel().setLabel("More Hello World.");
+		helloLink.getModel().addActionListener(new NavigateActionListener<ActionModel>("helloworld"));
+		buttonPanel.add(helloLink);	//add the link
+
 		contentPanel.add(buttonPanel);	//add the button panel to the panel
 		final TextControl<String> textInput=new TextControl<String>(session, "textInput", String.class);	//create a text input control
 		textInput.getModel().setLabel("This is the text input label.");
