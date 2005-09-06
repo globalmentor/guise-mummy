@@ -481,7 +481,8 @@ Debug.info("content type:", request.getContentType());
 	//TODO del and use the static method in AbstractController
 	protected <T extends Component<?>> Component<?> getComponentByAbsoluteUniqueID(final T component, final String absoluteUniqueID)
 	{
-		final Controller<? extends GuiseContext<?>, ? super T> controller=component.getController();
+//	TODO fix use of raw types to get around ultra-restrictive JDK 1.5 compiler		final Controller<? extends GuiseContext<?>, ? super T> controller=component.getController();
+		final Controller controller=component.getController();		
 		if(controller.getAbsoluteUniqueID(component).equals(absoluteUniqueID))
 		{
 			return component;

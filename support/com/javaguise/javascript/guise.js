@@ -24,12 +24,14 @@ var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX c
 /**Guise AJAX Response Format, content type application/x-guise-ajax-response+xml
 <response>
 	<patch></patch>	<!--XML elements to be patched into the existing DOM tree.-->
-	...
 </response>
 */
 
 //TODO turn off AJAX when unloading
 //TODO before sending a drop event, send a component update for the drop target so that its value will be updated; or otherwise make sure the value is synchronized
+
+/**The class prefix of a menu.*/
+var MENU_CLASS_PREFIX="menu-";
 
 /**The class prefix of a tree node.*/
 var TREE_NODE_CLASS_PREFIX="treeNode-";
@@ -39,6 +41,9 @@ var TREE_NODE_COLLAPSED_CLASS_SUFFIX="-collapsed";
 var TREE_NODE_EXPANDED_CLASS_SUFFIX="-expanded";
 /**The class suffix of a leaf tree node.*/
 //TODO del var TREE_NODE_LEAF_CLASS_SUFFIX="-leaf";
+
+/**The class suffix of a decorator.*/
+var DECORATOR_CLASS_PREFIX="-decorator";
 
 /**The enumeration of recognized styles.*/
 var STYLES={DRAG_SOURCE: "dragSource", DRAG_HANDLE: "dragHandle", DROP_TARGET: "dropTarget"};
@@ -83,6 +88,15 @@ Array.prototype.contains=function(object)
 	return this.indexOf(object)>=0;	//see if the object is in the array
 };
 
+/**Removes an item at the given index in the array.
+@param index The index at which the element should be removed.
+@return The element previously at the given index in the array.
+*/
+Array.prototype.remove=function(index)
+{
+	return this.splice(index, 1)[0];	//splice out the element and return it (note that this will not work on Netscape <4.06 or IE <=5.5; see http://www.samspublishing.com/articles/article.asp?p=30111&seqNum=3&rl=1)
+};
+
 var EMPTY_ARRAY=new Array();	//a shared empty array
 
 //Node
@@ -91,6 +105,49 @@ if(typeof Node=="undefined")	//if no Node type is defined (e.g. IE), create one 
 {
 	var Node={ELEMENT_NODE: 1, ATTRIBUTE_NODE: 2, TEXT_NODE: 3, CDATA_SECTION_NODE: 4, ENTITY_REFERENCE_NODE: 5, ENTITY_NODE: 6, PROCESSING_INSTRUCTION_NODE: 7, COMMENT_NODE: 8, DOCUMENT_NODE: 9, DOCUMENT_TYPE_NODE: 10, DOCUMENT_FRAGMENT_NODE: 11, NOTATION_NODE: 12};
 }
+
+//String
+
+/**Determines whether this string starts with the indicated substring.
+@param substring The string to check to see if it is at the beginning of this string.
+@return true if the given string is at the start of this string.
+*/
+String.prototype.startsWith=function(substring)
+{
+	return this.hasSubstring(substring, 0);	//see if this substring is at the beginning of the string
+};
+
+/**Determines whether this string ends with the indicated substring.
+@param substring The string to check to see if it is at the end of this string.
+@return true if the given string is at the end of this string.
+*/
+String.prototype.endsWith=function(substring)
+{
+	return this.hasSubstring(substring, this.length-substring.length);	//see if this substring is at the end of the string
+};
+
+/**Determines if this string has the given substring at the given index in the string.
+@param substring The substring to compare.
+@param index The index to compare.
+@return true if the given substring matches the characters as the given index of this string.
+*/
+String.prototype.hasSubstring=function(substring, index)
+{
+	var length=substring.length;	//get the length of the substring
+	if(index<0 || this.length<index+length)	//if the range doesn't fall within this string
+	{
+		return false;	//the substring can't start this string
+	}
+	for(var i=length-1; i>=0; --i)	//for each character in the substring
+	{
+		if(this.charAt(i+index)!=substring.charAt(i))	//if these characters don't match
+		{
+			return false;	//the substring doesn't match
+		}
+	}
+	return true;	//show that the string matches
+}
+
 
 //StringBuilder
 
@@ -892,6 +949,39 @@ function DragState(dragSource, mouseX, mouseY)
 /**The global drag state variable.*/
 var dragState;
 
+/**A class adapting an event function to a W3C compliant version.
+A decorator will be created for the event function.
+@param currentTarget The object for which a listener should be added.
+@param eventType The type of event.
+@param fn The function to listen for the event.
+@param useCapture Whether event capture should be used.
+var decorator The decorator created to wrap the event function and ensure W3C compliancy.
+*/
+function EventFunctionAdapter(currentTarget, eventType, fn, useCapture)
+{
+	this.currentTarget=currentTarget;
+	this.eventType=eventType;
+	this.fn=fn;
+	this.useCapture=useCapture;
+	this.decorator=createIEEventFunctionDecorator(fn, currentTarget);	//create the decorator function
+}
+
+/**The array of event function adapters.*/
+var eventFunctionAdapters=new Array();
+
+/**Creates an event function decorator to appropriately set up the event to be W3C compliant, including event.currentTarget support.
+@param eventFunction The event listener to be decorated.
+@param currentTarget The node on which the event listener is to be registered.
+*/
+function createIEEventFunctionDecorator(eventFunction, currentTarget)	//TODO save and release these to keep the IE memory leak from occurring
+{
+	return function(event)	//create the decorator function
+	{
+		event=getW3CEvent(event, currentTarget);	//make sure the event is a W3C-compliant event
+		eventFunction(event);	//call the event function with our new event information
+	}
+}
+
 /**Adds an event listener to an object.
 @param object The object for which a listener should be added.
 @param eventType The type of event.
@@ -911,7 +1001,10 @@ function addEvent(object, eventType, fn, useCapture)
 		var eventName="on"+eventType;	//create the event name
 		if(object.attachEvent)	//if we can use the IE version
 		{
-			return object.attachEvent(eventName, fn);	//attach the function
+//TODO del			var eventFunctionDecorator=createIEEventFunctionDecorator(fn, object);	//create an event function decorator to ensure W3C compliancy
+			var eventFunctionAdapter=new EventFunctionAdapter(object, eventType, fn, useCapture);	//create an event function adapter
+			eventFunctionAdapters.add(eventFunctionAdapter);	//add this adapter to the list
+			return object.attachEvent(eventName, eventFunctionAdapter.decorator);	//attach the adapter's function decorator
 		}
 		else	//if we can't use the IE version
 		{
@@ -939,7 +1032,14 @@ function removeEvent(object, eventType, fn, useCapture)
 		var eventName="on"+eventType;	//create the event name
 		if(object.detachEvent)	//if we can use the IE version
 		{
-			return object.detachEvent(eventName, fn);
+for(var i=eventFunctionAdapters.length-1; i>=0; --i)	//for each event function adapter
+{
+	var eventFunctionAdapter=eventFunctionAdapters[i];	//get this event function adapter
+	if(eventFunctionAdapter.fn=fn)	//if this is the adapter that decorates our function
+	{
+		return object.detachEvent(eventName, eventFunctionAdapter.decorator);	//detach the function decorator
+	}
+}
 		}
 		else	//if we can't use the IE version
 		{
@@ -971,9 +1071,10 @@ function addLoadListener(func)
 
 /**Retrieves W3C event information in a cross-browser manner.
 @param event The event information, or null if no event information is available (e.g. on IE).
+@param currentTarget The current target (the node to which the event listener is bound), or null if the current target is not known.
 @return A W3C-compliant event object.
 */
-function getW3CEvent(event)
+function getW3CEvent(event, currentTarget)
 {
 /*TODO del
 alert("looking at event: "+event);
@@ -995,6 +1096,10 @@ alert("looking at event src element: "+event.srcElement);
 	{
 		//TODO assert event.srcElement
 		event.target=event.srcElement;	//assign a W3C target property
+	}
+	if(!event.currentTarget && currentTarget)	//if there is no current target information, but one was passed to us
+	{
+		event.currentTarget=currentTarget;	//assign a W3C current target property
 	}
 	if(!event.data)	//if there is no data
 	{
@@ -1064,6 +1169,25 @@ function initializeNode(node)
 					case "button":
 						addEvent(node, "click", onButtonClick, false);	//listen for button clicks
 						break;
+					case "div":
+								//check for menu
+						for(var i=elementClassNames.length-1; i>=0; --i)	//for each class name
+						{
+							var className=elementClassNames[i];	//get a reference to this class name
+							if(className.startsWith(MENU_CLASS_PREFIX) && className.endsWith(DECORATOR_CLASS_PREFIX))	//if this is a menu-*-decorator TODO just use a regular expression
+							{
+								var menu=getMenu(node);	//get the menu ancestor
+								if(menu)	//if there is a menu ancestor (i.e. this is not the root menu)
+								{
+//TODO del when works alert("for class "+className+" non-root menu: "+menu.id);
+									addEvent(node, "mouseover", onMenuMouseOver, false);
+									addEvent(node, "mouseout", onMenuMouseOut, false);
+									break;
+								}
+//TODO del alert("found menu class: "+elementClassName);
+							}
+						}
+						break;
 					case "input":
 						switch(node.type)	//get the type of input
 						{
@@ -1118,12 +1242,11 @@ function onTextInputChange(event)
 {
 	if(AJAX_URI)	//if AJAX is enabled
 	{
-		var w3cEvent=getW3CEvent(event);	//get the W3C event object
-		var textInput=w3cEvent.target;	//get the target of the event
+		var textInput=event.target;	//get the target of the event
 	//TODO del alert("an input changed! "+textInput.id);
 		var ajaxRequest=new FormAJAXEvent(new Parameter(textInput.name, textInput.value));	//create a new form request with the control name and value
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
-		w3cEvent.stopPropagation();	//tell the event to stop bubbling
+		event.stopPropagation();	//tell the event to stop bubbling
 	}
 }
 
@@ -1132,8 +1255,7 @@ function onTextInputChange(event)
 */
 function onButtonClick(event)
 {
-	var w3cEvent=getW3CEvent(event);	//get the W3C event object
-	var button=getAncestorElementByName(w3cEvent.target, "button");	//get the button itself
+	var button=getAncestorElementByName(event.target, "button");	//get the button itself
 	if(button)	//if a button was found
 	{
 		onAction(event, button);	//process an action for the button
@@ -1145,8 +1267,7 @@ function onButtonClick(event)
 */
 function onLinkClick(event)
 {
-	var w3cEvent=getW3CEvent(event);	//get the W3C event object
-	var anchor=getAncestorElementByName(w3cEvent.target, "a");	//get the anchor itself
+	var anchor=getAncestorElementByName(event.target, "a");	//get the anchor itself
 	if(anchor)	//if a button was found
 	{
 		onAction(event, anchor);	//process an action for the anchor
@@ -1181,8 +1302,8 @@ function onAction(event, element)
 						if(!confirm(paramValue))	//ask for confirmation; if the user does not confirm
 						{
 /*TODO del if not needed
-							w3cEvent.stopPropagation();	//tell the event to stop bubbling
-							w3cEvent.preventDefault();	//prevent the default functionality from occurring
+							event.stopPropagation();	//tell the event to stop bubbling
+							event.preventDefault();	//prevent the default functionality from occurring
 */
 							return;	//don't process the event further
 						}
@@ -1204,8 +1325,8 @@ function onAction(event, element)
 			{
 				actionInput.value=null;	//remove the indication of which action was activated
 			}
-			w3cEvent.stopPropagation();	//tell the event to stop bubbling
-			w3cEvent.preventDefault();	//prevent the default functionality from occurring
+			event.stopPropagation();	//tell the event to stop bubbling
+			event.preventDefault();	//prevent the default functionality from occurring
 		}
 	}
 }
@@ -1217,8 +1338,7 @@ function onCheckInputChange(event)
 {
 	if(AJAX_URI)	//if AJAX is enabled
 	{
-		var w3cEvent=getW3CEvent(event);	//get the W3C event object
-		var checkInput=w3cEvent.target;	//get the target of the event
+		var checkInput=event.target;	//get the target of the event
 		if(checkInput.nodeName.toLowerCase()=="label" && checkInput.htmlFor)	//if the check input's label was passed as the target (as occurs in Mozilla)
 		{
 			checkInput=document.getElementById(checkInput.htmlFor);	//the real target is the check input with which this label is associated; the htmlFor attribute is the ID of the element, not the actual element as Danny Goodman says in JavaScript Bible 5th Edition (649)
@@ -1226,7 +1346,7 @@ function onCheckInputChange(event)
 //TODO del alert("checkbox "+checkInput.id+" changed to "+checkInput.checked);
 		var ajaxRequest=new FormAJAXEvent(new Parameter(checkInput.name, checkInput.checked ? checkInput.id : ""));	//create a new form request with the control name and value
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
-		w3cEvent.stopPropagation();	//tell the event to stop bubbling
+		event.stopPropagation();	//tell the event to stop bubbling
 	}
 }
 
@@ -1237,8 +1357,7 @@ function onSelectChange(event)
 {
 	if(AJAX_URI)	//if AJAX is enabled
 	{
-		var w3cEvent=getW3CEvent(event);	//get the W3C event object
-		var select=w3cEvent.target;	//get the target of the event
+		var select=event.target;	//get the target of the event
 	//TODO del alert("a select changed! "+select.id);
 		var options=select.options;	//get the select options
 		var ajaxRequest=new FormAJAXEvent();	//create a new form request
@@ -1251,7 +1370,7 @@ function onSelectChange(event)
 			}
 		}
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
-		w3cEvent.stopPropagation();	//tell the event to stop bubbling
+		event.stopPropagation();	//tell the event to stop bubbling
 	}
 }
 
@@ -1262,8 +1381,7 @@ function onTreeNodeClick(event)
 {
 	if(AJAX_URI)	//if AJAX is enabled
 	{
-		var w3cEvent=getW3CEvent(event);	//get the W3C event object
-		var treeNode=w3cEvent.target;	//get the target of the event
+		var treeNode=event.target;	//get the target of the event
 //TODO del alert("target of tree click: "+treeNode.nodeName);
 		if(treeNode.nodeName.toLowerCase()=="a")	//TODO fix; temporary hack for allowing links inside trees
 		{
@@ -1281,17 +1399,17 @@ function onTreeNodeClick(event)
 				return;
 			}
 		}
-		w3cEvent.stopPropagation();	//tell the event to stop bubbling
-		w3cEvent.preventDefault();	//prevent the default functionality from occurring
+		event.stopPropagation();	//tell the event to stop bubbling
+		event.preventDefault();	//prevent the default functionality from occurring
 //TODO del	alert("ID of tree node: "+treeNode.lastChild.id);
 		var oldClassName=treeNode.className;	//get the class name of the tree node
 /*TODO del
-alert("target node name: "+w3cEvent.target.nodeName);
-alert("target class name: "+w3cEvent.target.className);
-alert("target parent is the tree node?: "+(w3cEvent.target.parentNode==treeNode));
-alert("target parent node name: "+w3cEvent.target.parentNode.nodeName);
+alert("target node name: "+event.target.nodeName);
+alert("target class name: "+event.target.className);
+alert("target parent is the tree node?: "+(event.target.parentNode==treeNode));
+alert("target parent node name: "+event.target.parentNode.nodeName);
 */
-		if(w3cEvent.target.nodeName.toLowerCase()=="ul" && w3cEvent.target.className==oldClassName && w3cEvent.target.parentNode==treeNode)	//if the user clicked on the tree node's list of child nodes
+		if(event.target.nodeName.toLowerCase()=="ul" && event.target.className==oldClassName && event.target.parentNode==treeNode)	//if the user clicked on the tree node's list of child nodes
 		{
 			return;	//don't toggle the list if the user clicked on the children
 		}
@@ -1322,6 +1440,106 @@ alert("target parent node name: "+w3cEvent.target.parentNode.nodeName);
 	}
 }
 
+
+/**A class encapsulating menu state.*/
+function MenuState()
+{
+
+	/**The menu currently open, or null if no menu is currently open.*/
+	this._openedMenu=null;	//TODO this currently works with two-deep nested menus; verify that it works on multiple levels; if not, we may need to use an array---or maybe using stopPropagation on the event will obviate the problem
+
+	this._closingMenus=new Array();	//create an array to keep track of closing menus
+
+	this._closeTimeout=null;	//show that we have no timer in use
+
+	if(!MenuState.prototype._initialized)
+	{
+		MenuState.prototype._initialized=true;
+
+		/**Opens a menu.
+		@param menu The menu to open.
+		*/
+		MenuState.prototype.openMenu=function(menu)
+		{
+			for(var i=this._closingMenus.length-1; i>=0; --i)	//look at all the menus set for closing, in reverse order
+			{
+				if(this._closingMenus[i]==menu)	//if this menu was scheduled for closing
+				{
+					this._closingMenus.remove(i);	//remove this menu from the closing list
+				}
+			}
+			if(this._openedMenu!=menu)	//if this menu wasn't already open
+			{
+				this._closeMenus();	//close all menus, if any, that were queued to be closed
+				menu.style.visibility="visible";	//show the menu
+				this._openedMenu=menu;	//show that this menu is open
+			}
+		};
+
+		/**Closes a menu.
+		@param menu The menu to close.
+		*/
+		MenuState.prototype.closeMenu=function(menu)
+		{
+			this._closingMenus.enqueue(menu);	//add this menu to the list of menus needing closing
+			var timeout=this._closeTimeout;	//get the current close timer
+			if(timeout)	//if there is a close timer
+			{
+				clearTimeout(timeout);	//clear the timeout
+			}
+			this._closeTimeout=window.setTimeout("menuState._closeMenus();", 500);	//TODO fix; use local function with closure; place variables in W3Compiler build script so they won't get mangled
+		};
+
+		/**Closes all menus immediately.*/
+		MenuState.prototype._closeMenus=function()
+		{
+			var timeout=this._closeTimeout;	//get the current close timer
+			if(timeout)	//if there is a close timer
+			{
+				this._closeTimeout=null;	//remove the timeout
+				clearTimeout(timeout);	//clear the timeout, but leave it 
+			}
+			while(this._closingMenus.length>0)	//while there are menus to close
+			{
+				var menu=this._closingMenus.dequeue();	//get the next menu to close
+				menu.style.visibility="hidden";	//hide the menu
+				if(this._openedMenu==menu)	//if this was the last-opened menu
+				{
+					this._openedMenu=null;	//show that the menu is no longer open
+				}
+			}
+		};
+	}
+}
+
+var menuState=new MenuState();	//create a new menu state object
+
+/**Called when the mouse is over a menu.
+@param event The object describing the event.
+*/
+function onMenuMouseOver(event)
+{
+	var menu=getMenuDescendant(event.currentTarget);	//get the menu below us
+	if(menu)	//if there is a menu below us
+	{
+		menuState.openMenu(menu);	//open this menu
+		//TODO stop bubbling, and see if this changes the currently-opened-menu code
+	}
+}
+
+/**Called when the mouse is over a menu.
+@param event The object describing the event.
+*/
+function onMenuMouseOut(event)
+{
+	var menu=getMenuDescendant(event.currentTarget);	//get the menu below us
+	if(menu)	//if there is a menu below us
+	{
+		menuState.closeMenu(menu);	//close this menu
+		//TODO stop bubbling, and see if this changes the currently-opened-menu code
+	}
+}
+
 /**Called when dragging begins on a drag handle.
 @param event The object describing the event.
 */
@@ -1329,17 +1547,16 @@ function onDragBegin(event)	//TODO rename to onDragClick
 {
 	if(!dragState)	//if there's a drag state, stay with that one (e.g. the mouse button might have been released outside the document on Mozilla)
 	{
-		var w3cEvent=getW3CEvent(event);	//get the W3C event object
-		var dragHandle=w3cEvent.target;	//get the target of the event
+		var dragHandle=event.target;	//get the target of the event
 			//TODO make sure this isn't the context mouse button
 		var dragSource=getAncestorElementByClassName(dragHandle, STYLES.DRAG_SOURCE);	//determine which element to drag
 		if(dragSource)	//if there is a drag source
 		{
-			dragState=new DragState(dragSource, w3cEvent.clientX, w3cEvent.clientY);	//create a new drag state
-			dragState.beginDrag(w3cEvent.clientX, w3cEvent.clientY);	//begin dragging
+			dragState=new DragState(dragSource, event.clientX, event.clientY);	//create a new drag state
+			dragState.beginDrag(event.clientX, event.clientY);	//begin dragging
 //TODO del alert("drag state element: "+dragState.element.nodeName);
-			w3cEvent.stopPropagation();	//tell the event to stop bubbling
-			w3cEvent.preventDefault();	//prevent the default functionality from occurring
+			event.stopPropagation();	//tell the event to stop bubbling
+			event.preventDefault();	//prevent the default functionality from occurring
 		}
 	}
 }
@@ -1351,10 +1568,9 @@ function onDrag(event)
 {
 	if(dragState)	//if we are in the middle of a drag
 	{
-		var w3cEvent=getW3CEvent(event);	//get the W3C event object
-		dragState.drag(w3cEvent.clientX, w3cEvent.clientY);	//drag the object to the new mouse position
-		w3cEvent.stopPropagation();	//tell the event to stop bubbling
-		w3cEvent.preventDefault();	//prevent the default functionality from occurring
+		dragState.drag(event.clientX, event.clientY);	//drag the object to the new mouse position
+		event.stopPropagation();	//tell the event to stop bubbling
+		event.preventDefault();	//prevent the default functionality from occurring
 	}
 }
 
@@ -1366,17 +1582,16 @@ function onDragEnd(event)
 	if(dragState)	//if we are in the middle of a drag
 	{
 		dragState.endDrag();	//end dragging
-		var w3cEvent=getW3CEvent(event);	//get the W3C event object
-		var dropTarget=getDropTarget(w3cEvent.clientX, w3cEvent.clientY);	//get the drop target under the mouse
+		var dropTarget=getDropTarget(event.clientX, event.clientY);	//get the drop target under the mouse
 		if(dropTarget)	//if the mouse was dropped over a drop target
 		{
 //TODO del when works alert("over drop target: "+dropTarget.nodeName);
-			var ajaxRequest=new DropAJAXEvent(dragState, dropTarget, w3cEvent);	//create a new AJAX drop event
+			var ajaxRequest=new DropAJAXEvent(dragState, dropTarget, event);	//create a new AJAX drop event
 			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		}
 		dragState=null;	//release our drag state
-		w3cEvent.stopPropagation();	//tell the event to stop bubbling
-		w3cEvent.preventDefault();	//prevent the default functionality from occurring
+		event.stopPropagation();	//tell the event to stop bubbling
+		event.preventDefault();	//prevent the default functionality from occurring
 	}
 }
 
@@ -1399,7 +1614,7 @@ function getDropTarget(x, y)
 }
 
 /**Retrieves the ancestor form of the given node, starting at the node itself.
-@param node The node the form of which to find.
+@param node The node the form of which to find, or null if the search should not take place.
 @return The form in which the node lies, or null if the node is not within a form.
 */
 function getForm(node)
@@ -1407,26 +1622,84 @@ function getForm(node)
 	return getAncestorElementByName(node, "form");	//get the form ancestor
 }
 
+/**Retrieves the ancestor menu element of the node, starting at the node itself.
+@param node The node the ancestor of which to find, or null if the search should not take place.
+@return The menu ancestor, or null if there is no menu ancestor.
+*/
+function getMenu(node)
+{
+	while(node)	//while we haven't reached the top of the hierarchy
+	{
+		if(node.nodeType==Node.ELEMENT_NODE)	//if this is an element
+		{
+			var elementClassNames=node.className ? node.className.split(/\s/) : EMPTY_ARRAY;	//split out the class names
+			for(var i=elementClassNames.length-1; i>=0; --i)	//for each class name
+			{
+				var className=elementClassNames[i];	//get a reference to this class name
+				if(className.match(/^menu-.-...$/))	//if this is a menu TODO use a constant
+				{
+//TODO fix alert("found class: "+className+" for element "+node.nodeName+" with ID "+node.id);
+					return node;	//show that we found a menu
+				}
+			}
+		}
+		node=node.parentNode;	//try the parent node
+	}
+	return node;	//return whatever node we found
+}
+
+/**Retrieves the descendant menu element of the node, starting at the node itself.
+@param node The node the descendant of which to find, or null if the search should not take place.
+@return The menu desdendant, or null if there is no menu descendant.
+*/
+function getMenuDescendant(node)
+{
+	if(node)	//if we have a node
+	{
+		if(node.nodeType==Node.ELEMENT_NODE)	//if this is an element
+		{
+			var elementClassNames=node.className ? node.className.split(/\s/) : EMPTY_ARRAY;	//split out the class names
+			for(var i=elementClassNames.length-1; i>=0; --i)	//for each class name
+			{
+				var className=elementClassNames[i];	//get a reference to this class name
+				if(className.match(/^menu-.-...$/))	//if this is a menu TODO use a constant
+				{
+//TODO fix alert("found class: "+className+" for element "+node.nodeName+" with ID "+node.id);
+					return node;	//show that we found a menu
+				}
+			}
+		}
+		var childNodeList=node.childNodes;	//get all the child nodes
+		var childNodeCount=childNodeList.length;	//find out how many children there are
+		for(var i=0; i<childNodeCount; ++i)	//for each child node
+		{
+			var childNode=childNodeList[i];	//get this child node
+			var menu=getMenuDescendant(childNode);	//see if we can find the node in this branch
+			if(menu)	//if we found a menu
+			{
+				return menu;	//return it
+			}
+		}
+	}
+	return null;	//show that we didn't find a menu
+}
+
 /**Retrieves the named ancestor element of the given node, starting at the node itself.
-@param node The node the ancestor of which to find.
+@param node The node the ancestor of which to find, or null if the search should not take place.
 @param elementName The name of the element to find.
 @return The named element in which the node lies, or null if the node is not within such a named element.
 */
 function getAncestorElementByName(node, elementName)
 {
-	while(node.nodeType!=Node.ELEMENT_NODE || node.nodeName.toLowerCase()!=elementName)	//while we haven't found the named element
+	while(node && node.nodeType!=Node.ELEMENT_NODE || node.nodeName.toLowerCase()!=elementName)	//while we haven't found the named element
 	{
 		node=node.parentNode;	//get the parent node
-		if(node==null)	//if there is no parent
-		{
-			return null;	//we couldn't find a named element
-		}
 	}
 	return node;	//return the element we found
 }
 
-/**Retrieves the ancestor element with the given class of the given node, starting at the node itself. Multiple class names are supported
-@param node The node the ancestor of which to find.
+/**Retrieves the ancestor element with the given class of the given node, starting at the node itself. Multiple class names are supported.
+@param node The node the ancestor of which to find, or null if the search should not take place.
 @param elementName The name of the element class to find.
 @return The element with the given class in which the node lies, or null if the node is not within such an element.
 */
@@ -1591,47 +1864,4 @@ function test()
 {
 	setTimeout("openModalWindow('test.html')", 5000);
 	openModalWindow("test.html");
-}
-
-var menu=new Object();
-
-function closeMenu()
-{
-	if(menu.closeTimeout)	//if there is a timer running
-	{
-		clearTimeout(menu.closeTimeout);	//clear the timer
-		menu.closeTimeout=null;	//release the timer
-	}
-	if(menu.closeID)	//if a menu was being closed
-	{
-		document.getElementById(menu.closeID).style.visibility="hidden";	//close the menu
-		menu.closeID=null;	//indicate that no menu is closing
-	}
-}
-
-function onMenuMouseOver(id)
-{
-	if(menu.closeID)	//if a menu is closing
-	{
-		if(menu.closeID==id)	//if this menu is closing
-		{
-			menu.closeID=null;	//quickly stop our menu from closing
-			if(menu.closeTimeout)	//if there's a timer running
-			{
-				clearTimeout(menu.closeTimeout);	//clear the timer
-				menu.closeTimeout=null;	//release the timer
-			}
-		}
-		else	//if another menu is closing
-		{
-			closeMenu();	//go ahead and close it now
-		}
-	}
-	document.getElementById(id).style.visibility="visible";	//show this menu
-}
-
-function onMenuMouseOut(id)
-{
-	menu.closeID=id;	//show that this menu should be closed
-	menu.timeout=window.setTimeout('closeMenu()', 1000);	//close the menu after a pause
 }
