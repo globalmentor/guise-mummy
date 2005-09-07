@@ -28,7 +28,6 @@ var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX c
 </response>
 */
 
-//TODO turn off AJAX when unloading
 //TODO before sending a drop event, send a component update for the drop target so that its value will be updated; or otherwise make sure the value is synchronized
 
 /**The class prefix of a menu.*/
@@ -845,6 +844,238 @@ alert(exception);
 /**The global object for AJAX communication with Guise.*/
 var guiseAJAX=new GuiseAJAX();
 
+/**A class maintaining event function information and optionally adapting an event to a W3C compliant version.
+A decorator will be created for the event function.
+@param currentTarget The object for which a listener should be added.
+@param eventType The type of event.
+@param fn The function to listen for the event.
+@param useCapture Whether event capture should be used.
+@param createDecorator Whether a decorator should be created to wrap the event function and ensure W3DC compliancy.
+var decorator The decorator created to wrap the event function and ensure W3C compliancy.
+*/
+function EventListener(currentTarget, eventType, fn, useCapture, createDecorator)
+{
+	this.currentTarget=currentTarget;
+	this.eventType=eventType;
+	this.fn=fn;
+	this.useCapture=useCapture;
+	if(!EventListener.prototype._initialized)
+	{
+		EventListener.prototype._initialized=true;
+
+		/**Creates an event function decorator to appropriately set up the event to be W3C compliant, including event.currentTarget support.
+		@param eventFunction The event function to be decorated.
+		@param currentTarget The node on which the event listener is to be registered.
+		*/
+		EventListener.prototype._createDecorator=function(eventFunction, currentTarget)
+		{
+			var eventListener=this;	//store the event listener so that it can be referenced later via closure
+			return function(event)	//create the decorator function
+			{
+				event=eventListener.getW3CEvent(event, currentTarget);	//make sure the event is a W3C-compliant event
+				eventFunction(event);	//call the event function with our new event information
+			}
+		};
+
+		/**Retrieves W3C event information in a cross-browser manner.
+		@param event The event information, or null if no event information is available (e.g. on IE).
+		@param currentTarget The current target (the node to which the event listener is bound), or null if the current target is not known.
+		@return A W3C-compliant event object.
+		*/
+		EventListener.prototype.getW3CEvent=function(event, currentTarget)
+		{
+		/*TODO del
+		alert("looking at event: "+event);
+		alert("looking at event target: "+event.target);
+		alert("looking at event src element: "+event.srcElement);
+		*/
+			if(!event)	//if no event was passed
+			{
+				if(window.event)	//if IE has provided an event object
+				{
+					event=window.event;	//switch to using the IE event
+				}
+				else	//if there is no IE event object
+				{
+					//TODO throw an assertion
+				}
+			}
+			if(!event.target)	//if there is no target information
+			{
+				//TODO assert event.srcElement
+				event.target=event.srcElement;	//assign a W3C target property
+			}
+			if(!event.currentTarget && currentTarget)	//if there is no current target information, but one was passed to us
+			{
+				event.currentTarget=currentTarget;	//assign a W3C current target property
+			}
+			if(!event.data)	//if there is no data
+			{
+				//TODO assert event.keyCode
+				event.data=event.keyCode;	//assign a W3C data property
+			}
+			if(!event.stopPropagation)	//if there is no method for stopping propagation TODO add workaround for Safari, which has this method but doesn't actually stop propagation
+			{
+				//TODO assert window.event && window.event.cancelBubble
+				if(window.event && typeof window.event.cancelBubble=="boolean")	//if there is a global event with a cancel bubble property (e.g. IE)
+				{
+					event.stopPropagation=function()	//create a new function to stop propagation
+							{
+								window.event.cancelBubble=true;	//stop bubbling the IE way
+							};
+				}
+			}
+			if(!event.preventDefault)	//if there is no method for preventing the default functionality TODO add workaround for Safari, which has this method but doesn't actually prevent default functionality
+			{
+				//TODO assert window.event && window.event.returnValue
+		//TODO find out why IE returns "undefined" for window.event.returnValue, yet enumerates it in for:in		if(window.event && typeof window.event.returnValue=="boolean")	//if there is a global event with a return value property (e.g. IE)
+				if(window.event)	//if there is a global event with a return value property (e.g. IE)
+				{
+					event.preventDefault=function()	//create a new function to stop propagation
+							{
+								window.event.returnValue=false;	//prevent default functionality the IE way
+							};
+				}
+			}
+			//TODO update clientX and clientY as per _DHTML Utopia_ page 90.
+			return event;	//return our event
+		};
+	}
+	this.decorator=createDecorator ? this._createDecorator(fn, currentTarget) : null;	//create the decorator function if we were asked to do so
+}
+
+
+/**A class that manages events.*/
+function EventManager()
+{
+	/**The array of event listeners.*/
+	this._eventListeners=new Array();
+
+	if(!EventManager.prototype._initialized)
+	{
+		EventManager.prototype._initialized=true;
+
+		/**Adds an event listener to an object.
+		@param object The object for which a listener should be added.
+		@param eventType The type of event.
+		@param fn The function to listen for the event.
+		@param useCapture Whether event capture should be used.
+		@see http://www.scottandrew.com/weblog/articles/cbs-events
+		*/
+		EventManager.prototype.addEvent=function(object, eventType, fn, useCapture)
+		{
+			var eventListener=null;	//we'll create an event listener and hold it here
+			var result=true;	//we'll store the result here
+			if(object.addEventListener)	//if the W3C DOM method is supported
+			{
+				object.addEventListener(eventType, fn, useCapture);	//add the event normally
+				eventListener=new EventListener(object, eventType, fn, useCapture, false);	//create an event listener to keep track of the information
+			}
+			else	//if the W3C version isn't available
+			{
+				var eventName="on"+eventType;	//create the event name
+				if(object.attachEvent)	//if we can use the IE version
+				{
+					eventListener=new EventListener(object, eventType, fn, useCapture, true);	//create an event listener with a decorator
+					result=object.attachEvent(eventName, eventListener.decorator);	//attach the function decorator
+				}
+				else	//if we can't use the IE version
+				{
+					eventListener=new EventListener(object, eventType, fn, useCapture, true);	//create an event listener with a decorator
+					object[eventName]=eventListener.decorator;	//use the object.onEvent property and our decorator
+				}
+			}
+			this._eventListeners.add(eventListener);	//add this listener to the list
+			return result;	//return the result
+		};
+
+		/**Removes an event listener from an object.
+		@param object The object for which a listener should be removed.
+		@param eventType The type of event.
+		@param fn The function listening for the event.
+		@param useCapture Whether event capture should be used.
+		@see http://www.scottandrew.com/weblog/articles/cbs-events
+		*/
+		EventManager.prototype.removeEvent=function(object, eventType, fn, useCapture)
+		{
+			var eventListener=this._removeEventListener(object, eventType, fn);	//remove the event listener keeping information about this event
+			var result=true;	//we'll store the result here
+			if(object.removeEventListener)	//if the W3C DOM method is supported
+			{
+				object.removeEventListener(eventType, fn, useCapture);	//remove the event normally
+			}
+			else	//if the W3C version isn't available
+			{
+				var eventName="on"+eventType;	//create the event name
+				if(object.detachEvent)	//if we can use the IE version
+				{
+					result=eventListener!=null ? object.detachEvent(eventName, eventListener.decorator) : null;	//detach the function decorator, if there is one
+				}
+				else	//if we can't use the IE version
+				{
+					object[eventName]=null;	//use the object.onEvent property
+				}
+		  }
+		};
+	
+		/**Clears all registered events on all objects.*/
+		EventManager.prototype.clearEvents=function()
+		{
+			while(this._eventListeners.length)	//while there are event listeners
+			{
+				var eventListener=this._eventListeners[this._eventListeners.length-1];	//get the last event listener
+				this.removeEvent(eventListener.currentTarget, eventListener.eventType, eventListener.fn, eventListener.useCapture);	//remove this event, which will also remove the event listener from the array
+			}
+		};
+		
+		/**Removes and returns an event listener object encapsulating information on the object, event type, and function.
+		@param object The object for which a listener is listening.
+		@param eventType The type of event.
+		@param fn The function listening for the event.
+		@return The event listener or null if no matching event listener could be found.
+		*/
+		EventManager.prototype._removeEventListener=function(object, eventType, fn)
+		{
+			for(var i=this._eventListeners.length-1; i>=0; --i)	//for each event listener
+			{
+				var eventListener=this._eventListeners[i];	//get this event listener
+				if(eventListener.currentTarget==object && eventListener.eventType==eventType && eventListener.fn==fn)	//if this is the event listener
+				{
+					this._eventListeners.remove(i);	//remove this event listener
+					return eventListener;	//return this event listener
+				}
+			}
+			return null;	//indicate that we couldn't find a matching event listener
+		}
+	}
+}		
+
+/**Adds a function to be called when a window loads.
+@param func The function to listen for window loading.
+@see http://simon.incutio.com/archive/2004/05/26/addLoadEvent
+*/
+/*TODO transfer to EventManager and modify as fix for Safari
+function addLoadListener(func)
+{
+	var oldonload=window.onload;	//get the old function
+	if(typeof window.onload!="function")	//if there is no onload function
+	{
+		window.onload=func;	//use the given function
+	}
+	else	//if there is a window onload function
+	{
+		window.onload=function()	//create a new function
+				{
+					oldonload();	//call the old function using closure
+					func();	//call the new function
+				};
+	}
+}
+*/
+
+/**The single instance manager of events.*/
+var eventManager=new EventManager();
+
 /**A class encapsulating drag state.
 @param dragSource: The element to drag.
 @param mouseX The horizontal position of the mouse.
@@ -881,7 +1112,7 @@ function DragState(dragSource, mouseX, mouseY)
 			document.body.ondrag=function() {return false;};	//turn off IE drag event processing; see http://www.ditchnet.org/wp/2005/06/15/ajax-freakshow-drag-n-drop-events-2/
 			document.body.onselectstart=function() {return false;};
 */
-			addEvent(document, "mousemove", onDrag, false);	//listen for mouse move anywhere in document (IE doesn't allow us to listen on the window), as dragging may end somewhere else besides a drop target
+			eventManager.addEvent(document, "mousemove", onDrag, false);	//listen for mouse move anywhere in document (IE doesn't allow us to listen on the window), as dragging may end somewhere else besides a drop target
 		};
 
 		/*Drags the component to the location indicated by the mouse coordinates.
@@ -898,7 +1129,7 @@ function DragState(dragSource, mouseX, mouseY)
 		/**Ends the drag process.*/
 		DragState.prototype.endDrag=function()
 		{
-			removeEvent(document, "mousemove", onDrag, false);	//stop listening for mouse moves
+			eventManager.removeEvent(document, "mousemove", onDrag, false);	//stop listening for mouse moves
 /*TODO del after new stop default method
 			document.body.ondrag=null;	//turn IE drag event processing back on
 			document.body.onselectstart=null;
@@ -952,201 +1183,25 @@ function DragState(dragSource, mouseX, mouseY)
 /**The global drag state variable.*/
 var dragState;
 
-/**A class adapting an event function to a W3C compliant version.
-A decorator will be created for the event function.
-@param currentTarget The object for which a listener should be added.
-@param eventType The type of event.
-@param fn The function to listen for the event.
-@param useCapture Whether event capture should be used.
-var decorator The decorator created to wrap the event function and ensure W3C compliancy.
-*/
-function EventFunctionAdapter(currentTarget, eventType, fn, useCapture)
-{
-	this.currentTarget=currentTarget;
-	this.eventType=eventType;
-	this.fn=fn;
-	this.useCapture=useCapture;
-	this.decorator=createIEEventFunctionDecorator(fn, currentTarget);	//create the decorator function
-}
-
-/**The array of event function adapters.*/
-var eventFunctionAdapters=new Array();
-
-/**Creates an event function decorator to appropriately set up the event to be W3C compliant, including event.currentTarget support.
-@param eventFunction The event listener to be decorated.
-@param currentTarget The node on which the event listener is to be registered.
-*/
-function createIEEventFunctionDecorator(eventFunction, currentTarget)	//TODO save and release these to keep the IE memory leak from occurring
-{
-	return function(event)	//create the decorator function
-	{
-		event=getW3CEvent(event, currentTarget);	//make sure the event is a W3C-compliant event
-		eventFunction(event);	//call the event function with our new event information
-	}
-}
-
-/**Adds an event listener to an object.
-@param object The object for which a listener should be added.
-@param eventType The type of event.
-@param fn The function to listen for the event.
-@param useCapture Whether event capture should be used.
-@see http://www.scottandrew.com/weblog/articles/cbs-events
-*/
-function addEvent(object, eventType, fn, useCapture)
-{
-	if(object.addEventListener)	//if the W3C DOM method is supported
-	{
-		object.addEventListener(eventType, fn, useCapture);	//add the event normally
-		return true;
-	}
-	else	//if the W3C version isn't available
-	{
-		var eventName="on"+eventType;	//create the event name
-		if(object.attachEvent)	//if we can use the IE version
-		{
-//TODO del			var eventFunctionDecorator=createIEEventFunctionDecorator(fn, object);	//create an event function decorator to ensure W3C compliancy
-			var eventFunctionAdapter=new EventFunctionAdapter(object, eventType, fn, useCapture);	//create an event function adapter
-			eventFunctionAdapters.add(eventFunctionAdapter);	//add this adapter to the list
-			return object.attachEvent(eventName, eventFunctionAdapter.decorator);	//attach the adapter's function decorator
-		}
-		else	//if we can't use the IE version
-		{
-			object[eventName]=fn;	//use the object.onEvent property
-		}
-	}
-}
-
-/**Removes an event listener from an object.
-@param object The object for which a listener should be removed.
-@param eventType The type of event.
-@param fn The function listening for the event.
-@param useCapture Whether event capture should be used.
-@see http://www.scottandrew.com/weblog/articles/cbs-events
-*/
-function removeEvent(object, eventType, fn, useCapture)
-{
-	if(object.removeEventListener)	//if the W3C DOM method is supported
-	{
-		object.removeEventListener(eventType, fn, useCapture);	//remove the event normally
-		return true;
-	}
-	else	//if the W3C version isn't available
-	{
-		var eventName="on"+eventType;	//create the event name
-		if(object.detachEvent)	//if we can use the IE version
-		{
-for(var i=eventFunctionAdapters.length-1; i>=0; --i)	//for each event function adapter
-{
-	var eventFunctionAdapter=eventFunctionAdapters[i];	//get this event function adapter
-	if(eventFunctionAdapter.fn=fn)	//if this is the adapter that decorates our function
-	{
-		return object.detachEvent(eventName, eventFunctionAdapter.decorator);	//detach the function decorator
-	}
-}
-		}
-		else	//if we can't use the IE version
-		{
-			object[eventName]=null;	//use the object.onEvent property
-		}
-  }
-}
-
-/**Adds a function to be called when a window loads.
-@param func The function to listen for window loading.
-@see http://simon.incutio.com/archive/2004/05/26/addLoadEvent
-*/
-function addLoadListener(func)
-{
-	var oldonload=window.onload;	//get the old function
-	if(typeof window.onload!="function")	//if there is no onload function
-	{
-		window.onload=func;	//use the given function
-	}
-	else	//if there is a window onload function
-	{
-		window.onload=function()	//create a new function
-				{
-					oldonload();	//call the old function using closure
-					func();	//call the new function
-				};
-	}
-}
-
-/**Retrieves W3C event information in a cross-browser manner.
-@param event The event information, or null if no event information is available (e.g. on IE).
-@param currentTarget The current target (the node to which the event listener is bound), or null if the current target is not known.
-@return A W3C-compliant event object.
-*/
-function getW3CEvent(event, currentTarget)
-{
-/*TODO del
-alert("looking at event: "+event);
-alert("looking at event target: "+event.target);
-alert("looking at event src element: "+event.srcElement);
-*/
-	if(!event)	//if no event was passed
-	{
-		if(window.event)	//if IE has provided an event object
-		{
-			event=window.event;	//switch to using the IE event
-		}
-		else	//if there is no IE event object
-		{
-			//TODO throw an assertion
-		}
-	}
-	if(!event.target)	//if there is no target information
-	{
-		//TODO assert event.srcElement
-		event.target=event.srcElement;	//assign a W3C target property
-	}
-	if(!event.currentTarget && currentTarget)	//if there is no current target information, but one was passed to us
-	{
-		event.currentTarget=currentTarget;	//assign a W3C current target property
-	}
-	if(!event.data)	//if there is no data
-	{
-		//TODO assert event.keyCode
-		event.data=event.keyCode;	//assign a W3C data property
-	}
-	if(!event.stopPropagation)	//if there is no method for stopping propagation TODO add workaround for Safari, which has this method but doesn't actually stop propagation
-	{
-		//TODO assert window.event && window.event.cancelBubble
-		if(window.event && typeof window.event.cancelBubble=="boolean")	//if there is a global event with a cancel bubble property (e.g. IE)
-		{
-			event.stopPropagation=function()	//create a new function to stop propagation
-					{
-						window.event.cancelBubble=true;	//stop bubbling the IE way
-					};
-		}
-	}
-	if(!event.preventDefault)	//if there is no method for preventing the default functionality TODO add workaround for Safari, which has this method but doesn't actually prevent default functionality
-	{
-		//TODO assert window.event && window.event.returnValue
-//TODO find out why IE returns "undefined" for window.event.returnValue, yet enumerates it in for:in		if(window.event && typeof window.event.returnValue=="boolean")	//if there is a global event with a return value property (e.g. IE)
-		if(window.event)	//if there is a global event with a return value property (e.g. IE)
-		{
-			event.preventDefault=function()	//create a new function to stop propagation
-					{
-						window.event.returnValue=false;	//prevent default functionality the IE way
-					};
-		}
-	}
-	//TODO update clientX and clientY as per _DHTML Utopia_ page 90.
-	return event;	//return our event
-}
-
 //Guise functionality
 
 /**Called when the window loads.
-This implementation installs listeners if AJAX is enabled.
-@see #AJAX_URI
+This implementation installs listeners.
 */
 function onWindowLoad()
 {
 	initializeNode(document.documentElement);	//initialize the document tree
 	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth	
-	addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
+	eventManager.addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
+}
+
+/**Called when the window unloads.
+This implementation uninstalls all listeners.
+*/
+function onWindowUnload()
+{
+	AJAX_URI=null;	//turn off AJAX
+	eventManager.clearEvents();	//unload all events
 }
 
 /**Initializes a node and all its children, adding the correct listeners.
@@ -1167,13 +1222,13 @@ function initializeNode(node)
 					case "a":
 						if(elementClassNames.contains("link"))	//if this is a Guise link TODO later look at *all* link clicks and do popups for certain ones
 						{
-							addEvent(node, "click", onLinkClick, false);	//listen for anchor clicks
+							eventManager.addEvent(node, "click", onLinkClick, false);	//listen for anchor clicks
 						}
 						break;
 					case "button":
 						if(elementClassNames.contains("button"))	//if this is a Guise button
 						{
-							addEvent(node, "click", onButtonClick, false);	//listen for button clicks
+							eventManager.addEvent(node, "click", onButtonClick, false);	//listen for button clicks
 						}
 						break;
 					case "div":
@@ -1187,8 +1242,8 @@ function initializeNode(node)
 								if(menu)	//if there is a menu ancestor (i.e. this is not the root menu)
 								{
 //TODO del when works alert("for class "+className+" non-root menu: "+menu.id);
-									addEvent(node, "mouseover", onMenuMouseOver, false);
-									addEvent(node, "mouseout", onMenuMouseOut, false);
+									eventManager.addEvent(node, "mouseover", onMenuMouseOver, false);
+									eventManager.addEvent(node, "mouseout", onMenuMouseOut, false);
 									break;
 								}
 //TODO del alert("found menu class: "+elementClassName);
@@ -1200,22 +1255,22 @@ function initializeNode(node)
 						{
 							case "text":
 							case "password":
-								addEvent(node, "change", onTextInputChange, false);
+								eventManager.addEvent(node, "change", onTextInputChange, false);
 								break;
 							case "checkbox":
 							case "radio":
-								addEvent(node, "click", onCheckInputChange, false);
+								eventManager.addEvent(node, "click", onCheckInputChange, false);
 								break;
 						}
 						break;
 					case "li":
 						if(elementClassName && elementClassName.indexOf(TREE_NODE_CLASS_PREFIX)==0)	//if this is a tree node
 						{
-							addEvent(node, "click", onTreeNodeClick, false);	//listen for clicks
+							eventManager.addEvent(node, "click", onTreeNodeClick, false);	//listen for clicks
 						}
 						break;
 					case "select":
-						addEvent(node, "change", onSelectChange, false);
+						eventManager.addEvent(node, "change", onSelectChange, false);
 						break;
 				}
 				for(var i=elementClassNames.length-1; i>=0; --i)	//for each class name
@@ -1223,7 +1278,7 @@ function initializeNode(node)
 					switch(elementClassNames[i])	//check out this class name
 					{
 						case STYLES.DRAG_HANDLE:
-							addEvent(node, "mousedown", onDragBegin, false);	//listen for mouse down on a drag handle
+							eventManager.addEvent(node, "mousedown", onDragBegin, false);	//listen for mouse down on a drag handle
 							break;
 						case STYLES.DROP_TARGET:
 							dropTargets.add(node);	//add this node to the list of drop targets
@@ -1559,6 +1614,10 @@ function onDrag(event)
 		event.stopPropagation();	//tell the event to stop bubbling
 		event.preventDefault();	//prevent the default functionality from occurring
 	}
+	else
+	{
+		alert("Unexpectedly dragging without drag state.");	//TODO del
+	}
 }
 
 /**Called when dragging ends.
@@ -1694,12 +1753,9 @@ function getAncestorElementByClassName(node, className)
 {
 	while(node)	//while we haven't reached the top of the hierarchy
 	{
-		if(node.nodeType==Node.ELEMENT_NODE)	//if this is an element
+		if(node.nodeType==Node.ELEMENT_NODE && hasClassName(node, className))	//if this is an element and this class name is one of the class names
 		{
-			if(hasClassName(className))		//if this class name is one of the class names
-			{
-				return node;	//this node has a matching class name; we'll use it
-			}
+			return node;	//this node has a matching class name; we'll use it
 		}
 		node=node.parentNode;	//try the parent node
 	}
@@ -1794,7 +1850,8 @@ function getElementCoordinates(element)	//TODO make sure this method correctly c
 	return new Point(x, y);	//return the point we calculated
 }
 
-addEvent(window, "load", onWindowLoad, false);	//do the appropriate initialization when the window loads
+eventManager.addEvent(window, "load", onWindowLoad, false);	//do the appropriate initialization when the window loads
+eventManager.addEvent(window, "unload", onWindowUnload, false);	//do the appropriate uninitialization when the window unloads
 
 var Nav4 = ((navigator.appName == "Netscape") && (parseInt(navigator.appVersion) >= 4));
 var modalState=new Object();	//the state of modality
