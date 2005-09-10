@@ -30,11 +30,27 @@ public interface Container<C extends Container<C>> extends Component<C>
 	*/
 	public void remove(final Component<?> component);
 
+	/**@return The number of child components in this container.*/
+	public int size();
+
 	/**Determines whether this container contains the given component.
 	@param component The component to check.
 	@return <code>true</code> if this container contains the given component.
 	*/
 	public boolean contains(final Component<?> component);
+
+	/**Returns the index in the container of the first occurrence of the specified component.
+	@param component The component the index of which should be returned.
+	@return The index in this container of the first occurrence of the specified component, or -1 if this container does not contain the given component.
+	*/
+	public int indexOf(final Component<?> component);
+
+  /**Returns the component at the specified index in the container.
+  @param index The index of component to return.
+	@return The component at the specified position in this container.
+	@exception IndexOutOfBoundsException if the index is out of range.
+	*/
+	public Component<?> get(int index);
 
 	/**@return The layout definition for the container.*/
 	public Layout<?> getLayout();

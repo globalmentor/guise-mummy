@@ -44,7 +44,7 @@ public class DefaultModalFrame<R> extends AbstractModalFrame<R, DefaultModalFram
 	*/
 	public DefaultModalFrame(final GuiseSession<?> session, final String id)
 	{
-		this(session, id, new RegionLayout());	//default to flowing vertically
+		this(session, id, new RegionLayout(session));	//default to flowing vertically
 	}
 
 	/**Session, ID, and model constructor with a default region layout.
@@ -56,7 +56,7 @@ public class DefaultModalFrame<R> extends AbstractModalFrame<R, DefaultModalFram
 	*/
 	public DefaultModalFrame(final GuiseSession<?> session, final String id, final LabelModel model)
 	{
-		this(session, id, new RegionLayout(), model);	//default to flowing vertically
+		this(session, id, new RegionLayout(session), model);	//default to flowing vertically
 	}
 
 	/**Session and layout constructor.

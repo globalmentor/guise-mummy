@@ -11,6 +11,7 @@ import com.javaguise.component.layout.Orientation;
 import com.javaguise.component.transfer.*;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.Controller;
+import com.javaguise.event.GuiseBoundPropertyObject;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationsException;
 import com.garretwilson.util.EmptyIterator;
@@ -22,7 +23,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 /**An abstract implementation of a component.
 @author Garret Wilson
 */
-public class AbstractComponent<C extends Component<C>> extends BoundPropertyObject implements Component<C>
+public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropertyObject implements Component<C>
 {
 
 	/**The character used when building absolute IDs.*/
@@ -346,12 +347,6 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 			}
 		}
 
-	/**The Guise session that owns this component.*/
-	private final GuiseSession<?> session;
-
-		/**@return The Guise session that owns this component.*/
-		public GuiseSession<?> getSession() {return session;}
-
 	/**The style identifier, or <code>null</code> if there is no style ID.*/
 	private String styleID=null;
 
@@ -518,7 +513,7 @@ public class AbstractComponent<C extends Component<C>> extends BoundPropertyObje
 	*/
 	public AbstractComponent(final GuiseSession<?> session, final String id)
 	{
-		this.session=checkNull(session, "Session cannot be null");	//save the session
+		super(session);	//construct the parent class
 		if(id!=null)	//if an ID was provided
 		{
 			this.id=checkValidComponentID(id);	//save the ID, checking for compliance

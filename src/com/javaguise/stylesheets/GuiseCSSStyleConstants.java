@@ -54,6 +54,15 @@ public class GuiseCSSStyleConstants
 	/**The CSS class suffix indicating that a tree node is a leaf node and is neither expanded nor collapsed.*/
 	public final static String TREE_NODE_LEAF_CLASS_SUFFIX="-leaf";
 
+		//tabbed panel
+	/**The CSS class suffix for the tab part of a tabbed panel.*/
+	public final static String TABBED_PANEL_TAB_CLASS_SUFFIX="-tab";
+	/**The CSS class suffix for a selected tab part of a tabbed panel.*/
+	public final static String TABBED_PANEL_TAB_SELECTED_CLASS_SUFFIX="-tab-selected";
+	/**The CSS class suffix for the tab set part of a tabbed panel.*/
+	public final static String TABBED_PANEL_TABS_CLASS_SUFFIX="-tabs";
+
+
 		//drag and drop
 	/**The potential source of a drag and drop operation.*/
 	public final static String DRAG_SOURCE_CLASS="dragSource";

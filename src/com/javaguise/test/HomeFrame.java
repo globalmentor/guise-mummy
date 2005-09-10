@@ -39,10 +39,10 @@ public class HomeFrame extends DefaultFrame
 		super(session, id);	//construct the parent
 		getModel().setLabel("Home Frame Test");	//set the frame label
 
-		final LayoutPanel contentPanel=new LayoutPanel(session, new FlowLayout(Orientation.Flow.PAGE)); 
+		final LayoutPanel contentPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.PAGE)); 
 
 		//input panel
-		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(Orientation.Flow.PAGE));	//create the input panel flowing vertically
+		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.PAGE));	//create the input panel flowing vertically
 		final TextControl<Float> inputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
 		inputTextControl.getModel().setLabel("Input Number");	//add a label to the text input control
 		inputTextControl.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
@@ -112,7 +112,7 @@ Debug.trace("list control changed value to", newValue);
 		testLabel.getModel().setLabel("This is label text from the model.");
 		contentPanel.add(testLabel);	//add a new label
 		
-		final LayoutPanel buttonPanel=new LayoutPanel(session, "testButtonPanel", new FlowLayout(Orientation.Flow.LINE));	//create a panel flowing horizontally
+		final LayoutPanel buttonPanel=new LayoutPanel(session, "testButtonPanel", new FlowLayout(session, Orientation.Flow.LINE));	//create a panel flowing horizontally
 
 		final Button testButton=new Button(session, "testButton");
 		testButton.getModel().setLabel("Click here to go to the 'Hello World' demo.");
@@ -195,10 +195,10 @@ Debug.trace("list control changed value to", newValue);
 	
 	
 	
-		final LayoutPanel horizontalPanel=new LayoutPanel(session, new FlowLayout(Orientation.Flow.LINE));	//create a panel flowing horizontally
+		final LayoutPanel horizontalPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.LINE));	//create a panel flowing horizontally
 	
 	
-		final GroupPanel booleanPanel=new GroupPanel(session, new FlowLayout(Orientation.Flow.PAGE));	//create a panel flowing vertically
+		final GroupPanel booleanPanel=new GroupPanel(session, new FlowLayout(session, Orientation.Flow.PAGE));	//create a panel flowing vertically
 		booleanPanel.setDragEnabled(true);
 		booleanPanel.getModel().setLabel("Check one of these");
 		final CheckControl check1=new CheckControl(session, "check1");
@@ -318,7 +318,28 @@ Debug.trace("list control changed value to", newValue);
 		treeControl.getModel().getRootNode().add(new DefaultTreeNodeModel<String>(session, String.class, "Third Item"));
 
 		contentPanel.add(treeControl);
+
+		final TabbedPanel tabbedPanel=new TabbedPanel(session);
+		//input panel
+		final LayoutPanel temperaturePanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.PAGE));	//create the input panel flowing vertically
+		final TextControl<Float> temperatureInput=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
+		temperatureInput.getModel().setLabel("Input Temperature");	//add a label to the text input control
+		temperatureInput.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
+		temperaturePanel.add(temperatureInput);	//add the input control to the input panel
+		final TextControl<Float> temperatureOutput=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
+		temperatureOutput.getModel().setLabel("Output Temperature");	//add a label to the text output control
+		temperatureOutput.getModel().setEditable(false);	//set the text output control to read-only so that the user cannot modify it
+		temperaturePanel.add(temperatureOutput);	//add the output control to the input panel
+		tabbedPanel.add(temperaturePanel, new CardLayout.Constraints(new DefaultLabelModel(session, "Temperature")));
+	
+		final LayoutPanel helloPanel=new LayoutPanel(session);
+		final Heading helloWorldHeading=new Heading(session, 0);	//create a top-level heading
+		helloWorldHeading.getModel().setLabel("Hello World!");	//set the text of the heading, using its model
+		helloPanel.add(helloWorldHeading);
+		tabbedPanel.add(helloPanel, new CardLayout.Constraints(new DefaultLabelModel(session, "Hello")));
 		
+		contentPanel.add(tabbedPanel);
+
 
 		add(contentPanel, RegionLayout.CENTER_CONSTRAINTS);	//add the content panel in the center
 
@@ -375,7 +396,7 @@ Debug.trace("list control changed value to", newValue);
 		globalmentorLink.getModel().setLabel("GlobalMentor");
 		globalmentorLink.getModel().addActionListener(new NavigateActionListener<ActionModel>(URI.create("http://www.globalmentor.com/")));
 		menu.add(globalmentorLink);
-
+		
 		return menu;
 	}
 

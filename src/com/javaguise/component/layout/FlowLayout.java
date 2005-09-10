@@ -1,6 +1,6 @@
 package com.javaguise.component.layout;
 
-import com.javaguise.component.Component;
+import com.javaguise.session.GuiseSession;
 
 /**A layout that flows information along an axis.
 @author Garret Wilson
@@ -8,21 +8,21 @@ import com.javaguise.component.Component;
 public class FlowLayout extends AbstractFlowLayout<FlowLayout.Constraints>
 {
 
-	/**Flow constructor.
+	/**Session and flow constructor.
+	@param session The Guise session that owns this layout.
 	@param flow The logical axis (line or page) along which information is flowed.
 	@exception NullPointerException if the axis is <code>null</code>.
 	*/
-	public FlowLayout(final Orientation.Flow flow)
+	public FlowLayout(final GuiseSession<?> session, final Orientation.Flow flow)
 	{
-		super(flow);	//construct the parent class
+		super(session, flow);	//construct the parent class
 	}
 
-	/**Creates default constraints for the given component.
-	@param component The component for which constraints should be provided.
-	@return New default constraints for the given component.
+	/**Creates default constraints for the container.
+	@return New default constraints for the container.
 	@exception IllegalStateException if this layout does not support default constraints.
 	*/
-	public Constraints createDefaultConstraints(final Component<?> component)
+	public Constraints createDefaultConstraints()
 	{
 		return new Constraints();	//return a default constraints object
 	}

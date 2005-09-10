@@ -38,7 +38,7 @@ public class GroupPanel extends AbstractModelBox<LabelModel, GroupPanel> impleme
 	*/
 	public GroupPanel(final GuiseSession<?> session, final String id)
 	{
-		this(session, id, new FlowLayout(Orientation.Flow.PAGE));	//default to flowing vertically
+		this(session, id, new FlowLayout(session, Orientation.Flow.PAGE));	//default to flowing vertically
 	}
 
 	/**Session, ID, and model constructor with a default vertical flow layout.
@@ -50,7 +50,7 @@ public class GroupPanel extends AbstractModelBox<LabelModel, GroupPanel> impleme
 	*/
 	public GroupPanel(final GuiseSession<?> session, final String id, final LabelModel model)
 	{
-		this(session, id, new FlowLayout(Orientation.Flow.PAGE), model);	//default to flowing vertically
+		this(session, id, new FlowLayout(session, Orientation.Flow.PAGE), model);	//default to flowing vertically
 	}
 
 	/**Session and layout constructor.

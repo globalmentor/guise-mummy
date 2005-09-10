@@ -1,19 +1,25 @@
 package com.javaguise.component;
 
-import com.javaguise.component.layout.*;
+import com.javaguise.component.layout.CardLayout;
+import com.javaguise.model.ValueModel;
 import com.javaguise.session.GuiseSession;
 
-/**A general panel with a default page flow layout.
+/**A tabbed panel with a card layout.
+The panel's value model reflects the currently selected component, if any.
 @author Garret Wilson
+@see CardLayout
 */
-public class LayoutPanel extends AbstractPanel<LayoutPanel>
+public class TabbedPanel extends AbstractModelBox<ValueModel<Component<?>>, TabbedPanel> implements Panel<TabbedPanel>, Control<ValueModel<Component<?>>, TabbedPanel>
 {
+
+	/**@return The layout definition for the container.*/
+	public CardLayout getLayout() {return (CardLayout)super.getLayout();}
 
 	/**Session constructor with a default vertical flow layout.
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public LayoutPanel(final GuiseSession<?> session)
+	public TabbedPanel(final GuiseSession<?> session)
 	{
 		this(session, (String)null);	//construct the component, indicating that a default ID should be used
 	}
@@ -24,9 +30,9 @@ public class LayoutPanel extends AbstractPanel<LayoutPanel>
 	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public LayoutPanel(final GuiseSession<?> session, final String id)
+	public TabbedPanel(final GuiseSession<?> session, final String id)
 	{
-		this(session, id, new FlowLayout(session, Orientation.Flow.PAGE));	//default to flowing vertically
+		this(session, id, new CardLayout(session));	//default to flowing vertically
 	}
 
 	/**Session and layout constructor.
@@ -34,7 +40,7 @@ public class LayoutPanel extends AbstractPanel<LayoutPanel>
 	@param layout The layout definition for the container.
 	@exception NullPointerException if the given session and/or layout is <code>null</code>.
 	*/
-	public LayoutPanel(final GuiseSession<?> session, final Layout layout)
+	public TabbedPanel(final GuiseSession<?> session, final CardLayout layout)
 	{
 		this(session, null, layout);	//construct the component with the layout, indicating that a default ID should be used
 	}
@@ -46,9 +52,9 @@ public class LayoutPanel extends AbstractPanel<LayoutPanel>
 	@exception NullPointerException if the given session and/or layout is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public LayoutPanel(final GuiseSession<?> session, final String id, final Layout layout)
+	protected TabbedPanel(final GuiseSession<?> session, final String id, final CardLayout layout)
 	{
-		super(session, id, layout);	//construct the parent class
+		super(session, id, layout, layout);	//construct the parent class, using the card layout as the value model as well
 	}
 
 }

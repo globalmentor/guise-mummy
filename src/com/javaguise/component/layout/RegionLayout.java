@@ -3,6 +3,7 @@ package com.javaguise.component.layout;
 import java.util.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.javaguise.component.Component;
+import com.javaguise.session.GuiseSession;
 
 /**A layout that defines locations of components in internationalized relative terms.
 This layout uses default constraints of {@link Region#CENTER}.
@@ -27,22 +28,25 @@ public class RegionLayout extends AbstractLayout<RegionLayout.Constraints>
 	/**Default constraints for the center region.*/
 	public final static Constraints CENTER_CONSTRAINTS=new Constraints(Region.CENTER);
 
-	/**Constructor.*/
-	public RegionLayout()
+	/**Session constructor.
+	@param session The Guise session that owns this layout.
+	@exception NullPointerException if the given session is <code>null</code>.
+	*/
+	public RegionLayout(final GuiseSession<?> session)
 	{
+		super(session);	//construct the parent class
 	}
 
-	/**Creates default constraints for the given component.
+	/**Creates default constraints for the container.
 	This implementation returns {@link #CENTER_CONSTRAINTS}.
-	@param component The component for which constraints should be provided.
 	@return New default constraints for the given component.
 	*/
-	public Constraints createDefaultConstraints(final Component<?> component)
+	public Constraints createDefaultConstraints()
 	{
 		return CENTER_CONSTRAINTS;	//default to the center region
 	}
 
-	/**Metadata about individual component flow.
+	/**Metadata about individual component layout.
 	@author Garret Wilson
 	*/
 	public static class Constraints implements Layout.Constraints

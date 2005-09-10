@@ -41,6 +41,10 @@ var TREE_NODE_COLLAPSED_CLASS_SUFFIX="-collapsed";
 var TREE_NODE_EXPANDED_CLASS_SUFFIX="-expanded";
 /**The class suffix of a leaf tree node.*/
 //TODO del var TREE_NODE_LEAF_CLASS_SUFFIX="-leaf";
+/**The class suffix for a tab.*/
+var TAB_CLASS_SUFFIX="-tab";
+/**The class suffix for a selected tab.*/
+var TAB_SELECTED_CLASS_SUFFIX="-tab-selected";
 
 /**The class suffix of a decorator.*/
 var DECORATOR_CLASS_PREFIX="-decorator";
@@ -79,6 +83,24 @@ Array.prototype.indexOf=function(object)
 	return -1;	//indicate that the object could not be found
 };
 
+/**Determines the index of the first match of a given object in the array using object.toString() if the object isn't null.
+@param regexp The regular expression of the string version of the object to find in the array.
+@return The index of the matching object in the array, or -1 if a matching object is not in the array.
+*/
+Array.prototype.indexOfMatch=function(regexp)
+{
+	var length=this.length;	//get the length of the array
+	for(var i=0; i<length; ++i)	//for each index
+	{
+		var object=this[i];	//get a reference to this object
+		if(object!=null && object.toString().match(regexp))	//if this object isn't null and it matches the given regular expression
+		{
+			return i;	//return this index
+		}
+	}
+	return -1;	//indicate that the object could not be found
+};
+
 /**Determines whether the given object is present in the array.
 @param object The object for which to check.
 @return true if the object is present in the array.
@@ -86,6 +108,15 @@ Array.prototype.indexOf=function(object)
 Array.prototype.contains=function(object)
 {
 	return this.indexOf(object)>=0;	//see if the object is in the array
+};
+
+/**Determines whether a match of the given regular expression is present in the array, using object.toString() if the object isn't null.
+@param regexp The regular expression of the string version of the object to find in the array.
+@return true if a matching object is present in the array.
+*/
+Array.prototype.containsMatch=function(regexp)
+{
+	return this.indexOfMatch(regexp)>=0;	//see if a matching object is in the array
 };
 
 /**Removes an item at the given index in the array.
@@ -148,7 +179,6 @@ String.prototype.hasSubstring=function(substring, index)
 	return true;	//show that the string matches
 }
 
-
 //StringBuilder
 
 /**A class for concatenating string with more efficiency than using the additive operator.
@@ -194,6 +224,75 @@ function Parameter(name, value) {this.name=name; this.value=value;}
 @param y: The Y coordinate, stored under this.y;
 */
 function Point(x, y) {this.x=x; this.y=y;}
+
+//URI
+
+/**A class for parsing and encapsulting a URI according to RFC 2396, "Uniform Resource Identifiers (URI): Generic Syntax".
+@param uriString The string form of the URI.
+@see http://www.ietf.org/rfc/rfc2396.txt
+var scheme The scheme of the URI.
+var authority The authority of the URI.
+var path The path of the URI.
+var query The query of the URI.
+var fragment The fragment of the URI.
+var parameters An array of parameters (which may be empty) each of type Parameter.
+*/
+function URI(uriString)
+{
+	if(!this._initialized)
+	{
+		this._initialized=true;
+
+		URI.prototype.URI_REG_EXP=/^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/;	//the regular expression for parsing URIs, from http://www.ietf.org/rfc/rfc2396.txt
+
+		/**Determines first occurrence of a given parameter.
+		@param name The name of the parameter.
+		@return The first matching parameter (of type Parameter), or null if there is no such parameter.
+		*/
+		URI.prototype.getParameter=function(name)
+		{
+			var parameterCount=this.parameters.length;	//find out how many parameters there are
+			for(var i=0; i<parameterCount; ++i)	//for each parameter
+			{
+				var parameter=this.parameters[i];	//get a reference to this parameter
+				if(parameter.name==name)	//if this parameter name matches
+				{
+					return parameter;	//return this parameter
+				}
+			}
+			return null;	//indicate that no parameter matched
+		};
+
+		/**Determines the value of the first occurrence of a given parameter.
+		@param name The name of the parameter.
+		@return The value of the given parameter, or null if the parameter value is null or there is no such parameter.
+		*/
+		URI.prototype.getParameterValue=function(name)
+		{
+			var parameter=getParameter(name);	//get the requested parameter
+			return parameter!=null ? parameter.value : null;	//return the parameter value, or null if there is no such parameter
+		};
+	}
+	this.URI_REG_EXP.test(uriString);	//split out the components of the URI using a regular expression
+	this.scheme=RegExp.$2;	//save the URI components
+	this.authority=RegExp.$4;
+	this.path=RegExp.$5;
+	this.query=RegExp.$7;
+	this.parameters=new Array();	//create a new array to hold parameters
+	if(this.query)	//if a query is given
+	{
+		var queryComponents=this.query.split("&");	//split up the query components
+		var parameterCount=queryComponents.length;	//find out how many parameters there are
+		for(var i=0; i<parameterCount; ++i)	//for each parameter
+		{
+			var parameterComponents=queryComponents[i].split("=");	//split out the parameter components
+			var parameterName=decodeURIComponent(parameterComponents[0]);	//get and decode the parameter name
+			var parameterValue=parameterComponents.length>1 ? decodeURIComponent(parameterComponents[1]) : null;	//get and decode the parameter value
+			this.parameters.add(new Parameter(parameterName, parameterValue));	//create and add a new parameter to the parameter array
+		}
+	}
+	this.fragment=RegExp.$9;
+}
 
 //Form AJAX Event
 
@@ -625,6 +724,7 @@ function GuiseAJAX()
 	alert("response text: "+xmlHTTP.responseText);
 	alert("response XML: "+xmlHTTP.responseXML);
 */
+//TODO fix	alert("response text: "+xmlHTTP.responseText);
 					var status=xmlHTTP.status;	//get the status
 					if(status==200)	//if everything went OK
 					{
@@ -1224,6 +1324,10 @@ function initializeNode(node)
 						{
 							eventManager.addEvent(node, "click", onLinkClick, false);	//listen for anchor clicks
 						}
+						else if(elementClassNames.containsMatch(/-tab(-selected)?$/))	//if this is a tab TODO use a constant
+						{
+							eventManager.addEvent(node, "click", onTabClick, false);	//listen for tab clicks
+						}
 						break;
 					case "button":
 						if(elementClassNames.contains("button"))	//if this is a Guise button
@@ -1384,6 +1488,46 @@ function onAction(event)
 					actionInput.value=null;	//remove the indication of which action was activated
 				}
 			}
+			event.stopPropagation();	//tell the event to stop bubbling
+			event.preventDefault();	//prevent the default functionality from occurring
+		}
+	}
+}
+
+/**Called when a tab is clicked.
+A tab link is expected to have an href with parameters in the form "?tabbedPanelID=tabID".
+@param event The object describing the event.
+*/
+function onTabClick(event)
+{
+	var element=event.currentTarget;	//get the element on which the event was registered
+	var href=element.href;	//get the link href, which should be in the form "?tabbedPanelID=tabID"
+	if(href)	//if there is an href
+	{
+		var uri=new URI(href);	//create a URI from the href
+		if(uri.parameters.length>0)	//if there are parameters given
+		{
+			var parameter=uri.parameters[0];	//get the first parameter
+			if(AJAX_URI)	//if AJAX is enabled
+			{
+				var ajaxRequest=new FormAJAXEvent(parameter);	//create a new form request with the parameter
+				guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+			}
+/*TODO fix
+			else	//if AJAX is not enabled, do a POST
+			{
+				var actionInput=document.getElementById(actionInputID);	//get the action input
+				if(actionInput)	//if there is an action input
+				{
+					actionInput.value=element.id;	//indicate which action was activated
+				}
+				form.submit();	//submit the form
+				if(actionInput)	//if there is an action input
+				{
+					actionInput.value=null;	//remove the indication of which action was activated
+				}
+			}
+*/
 			event.stopPropagation();	//tell the event to stop bubbling
 			event.preventDefault();	//prevent the default functionality from occurring
 		}
@@ -1561,7 +1705,7 @@ var menuState=new MenuState();	//create a new menu state object
 */
 function onMenuMouseOver(event)
 {
-	var menu=getMenuDescendant(event.currentTarget);	//get the menu below us
+	var menu=getDescendantElementByClassName(event.currentTarget, /^menu-.-...$/);	//get the menu below us TODO use a constant
 	if(menu)	//if there is a menu below us
 	{
 		menuState.openMenu(menu);	//open this menu
@@ -1574,7 +1718,7 @@ function onMenuMouseOver(event)
 */
 function onMenuMouseOut(event)
 {
-	var menu=getMenuDescendant(event.currentTarget);	//get the menu below us
+	var menu=getDescendantElementByClassName(event.currentTarget, /^menu-.-...$/);	//get the menu below us TODO use a constant
 	if(menu)	//if there is a menu below us
 	{
 		menuState.closeMenu(menu);	//close this menu
@@ -1694,42 +1838,6 @@ function getMenu(node)
 	return node;	//return whatever node we found
 }
 
-/**Retrieves the descendant menu element of the node, starting at the node itself.
-@param node The node the descendant of which to find, or null if the search should not take place.
-@return The menu desdendant, or null if there is no menu descendant.
-*/
-function getMenuDescendant(node)
-{
-	if(node)	//if we have a node
-	{
-		if(node.nodeType==Node.ELEMENT_NODE)	//if this is an element
-		{
-			var elementClassNames=node.className ? node.className.split(/\s/) : EMPTY_ARRAY;	//split out the class names
-			for(var i=elementClassNames.length-1; i>=0; --i)	//for each class name
-			{
-				var className=elementClassNames[i];	//get a reference to this class name
-				if(className.match(/^menu-.-...$/))	//if this is a menu TODO use a constant
-				{
-//TODO fix alert("found class: "+className+" for element "+node.nodeName+" with ID "+node.id);
-					return node;	//show that we found a menu
-				}
-			}
-		}
-		var childNodeList=node.childNodes;	//get all the child nodes
-		var childNodeCount=childNodeList.length;	//find out how many children there are
-		for(var i=0; i<childNodeCount; ++i)	//for each child node
-		{
-			var childNode=childNodeList[i];	//get this child node
-			var menu=getMenuDescendant(childNode);	//see if we can find the node in this branch
-			if(menu)	//if we found a menu
-			{
-				return menu;	//return it
-			}
-		}
-	}
-	return null;	//show that we didn't find a menu
-}
-
 /**Retrieves the named ancestor element of the given node, starting at the node itself.
 @param node The node the ancestor of which to find, or null if the search should not take place.
 @param elementName The name of the element to find.
@@ -1746,7 +1854,7 @@ function getAncestorElementByName(node, elementName)
 
 /**Retrieves the ancestor element with the given class of the given node, starting at the node itself. Multiple class names are supported.
 @param node The node the ancestor of which to find, or null if the search should not take place.
-@param elementName The name of the element class to find.
+@param className The name of the class for which to check, or a regular expression if a match should be found.
 @return The element with the given class in which the node lies, or null if the node is not within such an element.
 */
 function getAncestorElementByClassName(node, className)
@@ -1762,16 +1870,44 @@ function getAncestorElementByClassName(node, className)
 	return node;	//return whatever node we found
 }
 
+/**Retrieves the descendant element with the given class of the given node, starting at the node itself. Multiple class names are supported.
+@param node The node the descendant of which to find, or null if the search should not take place.
+@param className The name of the class for which to check, or a regular expression if a match should be found.
+@return The element with the given class for which the given node is a parent or itself, or null if there is no such element descendant.
+*/
+function getDescendantElementByClassName(node, className)
+{
+	if(node)	//if we have a node
+	{
+		if(node.nodeType==Node.ELEMENT_NODE && hasClassName(node, className))	//if this is an element with the given class name
+		{
+			return node;	//show that we found a matching element class name
+		}
+		var childNodeList=node.childNodes;	//get all the child nodes
+		var childNodeCount=childNodeList.length;	//find out how many children there are
+		for(var i=0; i<childNodeCount; ++i)	//for each child node
+		{
+			var childNode=childNodeList[i];	//get this child node
+			var menu=getDescendantElementByClassName(childNode, className);	//see if we can find the node in this branch
+			if(menu)	//if we found a menu
+			{
+				return menu;	//return it
+			}
+		}
+	}
+	return null;	//show that we didn't find a menu
+}
+
 /**Determines whether the given element has the given class. Multiple class names are supported.
 @param element The element that should be checked for class.
-@param className The name of the class for which to check.
+@param className The name of the class for which to check, or a regular expression if a match should be found.
 @return true if one of the element's class names equals the given class name.
 */
 function hasClassName(element, className)
 {
 	var classNamesString=element.className;	//get the element's class names
 	var classNames=classNamesString ? classNamesString.split(/\s/) : EMPTY_ARRAY;	//split out the class names
-	return classNames.contains(className)	//return whether this class name is one of the class names
+	return className instanceof RegExp ? classNames.containsMatch(className) : classNames.contains(className);	//return whether this class name is one of the class names
 }
 
 /**Determines the document tree depth of the given element, returning a zero-level depth for the document node.

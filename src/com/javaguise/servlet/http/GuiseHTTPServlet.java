@@ -682,6 +682,16 @@ Debug.info("content type:", request.getContentType());
 				componentSet.add(component);
 			}
 		}
+		else if(controller instanceof XHTMLTabbedPanelController)	//TODO fix hack; make XHTMLTabbedPanelController descend from XHTMLControlController
+		{
+			final XHTMLTabbedPanelController tabbedPanelController=(XHTMLTabbedPanelController)controller;
+			if(name.equals(tabbedPanelController.getAbsoluteUniqueID(component)))	//TODO fix hack
+			{
+//TODO del Debug.trace("using this component");
+				componentSet.add(component);
+			}
+			
+		}
 		for(final Component<?> childComponent:component)
 		{
 			getControlsByName(childComponent, name, componentSet);

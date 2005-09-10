@@ -56,7 +56,7 @@ public class Menu extends AbstractContainerControl<LabelModel, Menu>
 	*/
 	public Menu(final GuiseSession<?> session, final String id, final Orientation.Flow axis, final LabelModel model)
 	{
-		super(session, id, new MenuLayout(axis), model);	//construct the parent class
+		super(session, id, new MenuLayout(session, axis), model);	//construct the parent class
 	}
 
 	/**@return The layout definition for the menu.*/

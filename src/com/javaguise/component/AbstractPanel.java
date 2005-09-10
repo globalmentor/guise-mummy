@@ -26,7 +26,7 @@ public abstract class AbstractPanel<C extends Panel<C>> extends AbstractBox<C> i
 	*/
 	public AbstractPanel(final GuiseSession<?> session, final String id)
 	{
-		this(session, id, new FlowLayout(Orientation.Flow.PAGE));	//default to flowing vertically
+		this(session, id, new FlowLayout(session, Orientation.Flow.PAGE));	//default to flowing vertically
 	}
 
 	/**Session and layout constructor.

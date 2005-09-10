@@ -28,6 +28,9 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	/**@return An iterator to contained components in reverse order.*/
 	public Iterator<Component<?>> reverseIterator() {return new ReverseIterator<Component<?>>(componentList.listIterator(componentList.size()));}
 
+	/**@return The number of child components in this container.*/
+	public int size() {return componentList.size();}
+
 	/**@return Whether this component has children. This implementation delegates to the component list.*/
 	public boolean hasChildren() {return !componentList.isEmpty();}
 
@@ -36,6 +39,19 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@return <code>true</code> if this container contains the given component.
 	*/
 	public boolean contains(final Component<?> component) {return componentList.contains(component);}
+
+	/**Returns the index in the container of the first occurrence of the specified component.
+	@param component The component the index of which should be returned.
+	@return The index in this container of the first occurrence of the specified component, or -1 if this container does not contain the given component.
+	*/
+	public int indexOf(final Component<?> component) {return componentList.indexOf(component);}
+
+  /**Returns the component at the specified index in the container.
+  @param index The index of component to return.
+	@return The component at the specified position in this container.
+	@exception IndexOutOfBoundsException if the index is out of range.
+	*/
+	public Component<?> get(int index) {return componentList.get(index);}
 
 	/**Adds a component to the container with default constraints.
 	@param component The component to add.
@@ -73,7 +89,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		{
 			throw new IllegalArgumentException("Component "+component+" is already a member of a component, "+component.getParent()+".");
 		}
-		final T layoutConstraints=constraints!=null ? (T)constraints : layout.createDefaultConstraints(component);	//create default constraints if we need to TODO use the layout constraints class to cast the value
+		final T layoutConstraints=constraints!=null ? (T)constraints : layout.createDefaultConstraints();	//create default constraints if we need to TODO use the layout constraints class to cast the value
 		componentList.add(component);	//add the component to the list
 		component.setParent(this);	//tell the component who its parent is
 		layout.setConstraints(component, layoutConstraints);	//tell the layout the constraints
@@ -117,7 +133,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	*/
 	public AbstractContainer(final GuiseSession<?> session, final String id)
 	{
-		this(session, id, new FlowLayout(Orientation.Flow.PAGE));	//default to flowing vertically
+		this(session, id, new FlowLayout(session, Orientation.Flow.PAGE));	//default to flowing vertically
 	}
 
 	/**Session and layout constructor.
@@ -141,6 +157,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	{
 		super(session, id);	//construct the parent class
 		this.layout=checkNull(layout, "Layout cannot be null.");	//save the layout
+		layout.setContainer(this);	//tell the layout which container owns it
 	}
 
 }
