@@ -7,7 +7,7 @@ var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX c
 /**Guise AJAX Request Format, content type application/x-guise-ajax-request+xml
 <request>
 	<events>	<!--the list of events (zero or more)-->
-		<form>	<!--information resulting from form changes, analogous to that in an HTTP POST-->
+		<form exhaustive="true|false">	<!--information resulting from form changes, analogous to that in an HTTP POST; exhaustive indicates whether the event contains values for all form controls (defaults to false)-->
 			<control name="">	<!--a control change (zero or more)-->
 				<!--the value of the control (putting the value into an attribute could corrupt the value because of XML attribute canonicalization rules-->
 			</control>
@@ -420,13 +420,16 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 */
 
 	/**Removes all children from the given node.
+	This implementation also unregistered any events for the node and all its children.
 	@param node The node the children of which to remove.
 	*/
 	removeChildren:function(node)
 	{
 		while(node.childNodes.length>0)	//while there are child nodes left (remove the last node, one at a time, because because IE can sometimes add an element back in after the last one was removed)
 		{
-			node.removeChild(node.childNodes[node.childNodes.length-1]);	//remove the last node
+			var childNode=node.childNodes.length-1;	//get a reference to the last node
+			eventManager.clearEvents(childNode);	//clear events for this node and descendants
+			node.removeChild(childNode);	//remove the last node
 		}
 	},
 
@@ -883,7 +886,7 @@ function GuiseAJAX()
 					var status=xmlHTTP.status;	//get the status
 					if(status==200)	//if everything went OK
 					{
-						if(xmlHTTP.responseText && xmlHTTP.responseXML)	//if we have XML (if there is no content, IE sends back a document that will generate an error when trying to access this.responseXML.documentElement.childNodes, even using typeof)
+						if(xmlHTTP.responseXML && xmlHTTP.responseXML.documentElement)	//if we have XML (if there is no content or there is an error, IE sends back a document has a null xmlHTTP.responseXML.documentElement)
 						{
 							thisGuiseAJAX.ajaxResponses.enqueue(xmlHTTP.responseXML);	//enqueue the response XML
 							thisGuiseAJAX.processAJAXResponses();	//process enqueued AJAX responses
@@ -994,7 +997,7 @@ alert(exception);
 		*/ 
 		GuiseAJAX.prototype._synchronizeElement=function(oldElement, element)
 		{
-		//TODO del alert("patching stuff for ID "+id);
+//TODO del alert("ready to synchronize element "+oldElement.nodeName+" with ID: "+oldElement.id+" against element "+element.nodeName+" with ID: "+element.getAttribute("id"));
 				//remove any attributes the old element has that are not in the new element
 			var oldAttributes=oldElement.attributes;	//get the old element's attributes
 			for(var i=oldAttributes.length-1; i>=0; --i)	//for each old attribute
@@ -1052,10 +1055,28 @@ alert(exception);
 					var childNode=childNodeList[i];	//get the new child node
 					if(oldChildNode.nodeType==childNode.nodeType)	//if these are the same type of nodes
 					{
-						if(childNode.nodeType==Node.ELEMENT_NODE && oldChildNode.nodeName.toLowerCase()!=childNode.nodeName.toLowerCase())	//if these are elements with different node names
+						if(childNode.nodeType==Node.ELEMENT_NODE)	//if this is an element, check the name and ID
 						{
-//TODO del alert("found different node names; old: "+oldChildNode.nodeName+" and new: "+childNode.nodeName);
-							isChildrenCompatible=false;	//these child elements aren't compatible because they have different node name
+							
+							if(oldChildNode.nodeName.toLowerCase()!=childNode.nodeName.toLowerCase())	//if these are elements with different node names
+							{
+	//TODO del alert("found different node names; old: "+oldChildNode.nodeName+" and new: "+childNode.nodeName);
+								isChildrenCompatible=false;	//these child elements aren't compatible because they have different node name
+							}
+/*TODO maybe add this later to prevent shifting elements from creating duplicate IDs; it would be better to simply remove the child ID attribute, though
+							else	//if the names are the same
+							{
+								var oldChildID=oldChildNode.getAttribute("id");	//get the old child ID
+								var oldChildID=oldChildNode.id ? oldChildNode.id : null;	//normalize the ID because some browsers such as IE in HTML mode might return "" for a missing attribute rather than null
+								var childID=childNode.getAttribute("id");	//get the new child's ID
+//TODO del alert("comparing "+oldChildNode.nodeName+" IDs "+oldChildID+" "+typeof oldChildID+" and "+childID+" "+typeof childID);
+								if(oldChildID!=childID)	//if the IDs are different
+								{
+//TODO fix alert("IDs don't match: "+oldChildNode.nodeName+" IDs "+oldChildID+" "+typeof oldChildID+" and "+childID+" "+typeof childID);
+									isChildrenCompatible=false;	//these child elements aren't compatible because they have different IDs
+								}
+							}
+*/
 						}
 					}
 					else	//if the node types are different
@@ -1065,14 +1086,29 @@ alert(exception);
 				}
 				if(isChildrenCompatible)	//if the children are compatible
 				{
-//TODO del alert("children are compatible, old child node count: "+oldChildNodeCount+" new child node count "+childNodeCount);
+//TODO del alert("children are compatible, old "+oldElement.nodeName+" with ID "+oldElement.id+" child node count: "+oldChildNodeCount+" new "+element.nodeName+" "+"with ID "+element.getAttribute("id")+" child node count "+childNodeCount+" (verify) "+element.childNodes.length);
+
+/*TODO del
+if(oldChildNodeCount!=childNodeCount)	//TODO del
+{
+	for(var i=0; i<oldChildNodeCount; ++i)
+	{
+		var childNode=oldElement.childNodes[i];
+//TODO fix alert("child node "+i+" is of type "+childNode.nodeType+" with name "+childNode.nodeName);
+alert("child node "+i+" is of type "+childNode.nodeType+" with name "+childNode.nodeName+(childNode.nodeType==Node.ELEMENT_NODE ? " with ID "+childNode.id : ""));
+	}
+}
+*/
 						//remove superfluous old nodes
 					for(var i=oldChildNodeCount-1; i>=childNodeCount; --i)	//for each old child node that is not in the new node
 					{
+						var oldChildNode=oldChildNodeList[i];	//get this child node
+						eventManager.clearEvents(oldChildNode);	//clear events for this node and descendants
 //TODO del alert("removing old node: "+oldChildNodeList[i].nodeName);
-						oldElement.removeChild(oldChildNodeList[i]);	//remove this old child
+						oldElement.removeChild(oldChildNode);	//remove this old child
+						
 					}
-//TODO del alert("children are still compatible, old child node count: "+oldChildNodeCount+" new child node count "+childNodeCount);
+//TODO del alert("children are still compatible, old child node count: "+oldElement.childNodes.length+" new child node count "+childNodeCount);
 				}
 				else	//if children are not compatible
 				{
@@ -1293,14 +1329,34 @@ function EventManager()
 		  }
 		};
 	
-		/**Clears all registered events on all objects.*/
-		EventManager.prototype.clearEvents=function()
+		/**Clears all registered events, optionally for a specific object.
+		@param object The object for which events should be cleared, including all child objects, or null if events should be cleared on all objects.
+		*/
+		EventManager.prototype.clearEvents=function(object)
 		{
+			for(var i=this._eventListeners.length-1; i>=0; --i)	//for each event listener, going backwards so that removing an event listener will not disturb iteration
+			{
+				var eventListener=this._eventListeners[i];	//get the last event listener
+				if(!object || eventListener.currentTarget==object)	//if this event listener was registered on this object, or if all event listeners should be removed)
+				{
+					this.removeEvent(eventListener.currentTarget, eventListener.eventType, eventListener.fn, eventListener.useCapture);	//remove this event, which will also remove the event listener from the array
+				}
+			}
+			if(object && object.nodeType==Node.ELEMENT_NODE)	//if a DOM element was given
+			{
+				var childNodes=object.childNodes;	//get a reference to all child nodes
+				for(var i=childNodes.length-1; i>=0; --i)	//for each child node
+				{
+					this.clearEvents(childNodes[i]);	//clear events for this child
+				}
+			}		
+/*TODO del when works
 			while(this._eventListeners.length)	//while there are event listeners
 			{
 				var eventListener=this._eventListeners[this._eventListeners.length-1];	//get the last event listener
 				this.removeEvent(eventListener.currentTarget, eventListener.eventType, eventListener.fn, eventListener.useCapture);	//remove this event, which will also remove the event listener from the array
 			}
+*/
 		};
 		
 		/**Removes and returns an event listener object encapsulating information on the object, event type, and function.

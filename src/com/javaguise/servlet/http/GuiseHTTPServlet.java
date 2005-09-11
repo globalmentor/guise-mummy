@@ -43,6 +43,7 @@ import static com.garretwilson.io.ContentTypeConstants.CHARSET_PARAMETER;
 import static com.garretwilson.io.ContentTypeUtilities.createContentType;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.net.http.*;
+import static com.garretwilson.net.http.HTTPConstants.*;
 
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 import static com.garretwilson.servlet.ServletConstants.*;
@@ -57,7 +58,6 @@ import com.garretwilson.text.xml.xhtml.XHTMLConstants;
 import com.garretwilson.text.xml.xpath.PathExpression;
 import com.garretwilson.text.xml.xpath.XPath;
 import com.garretwilson.util.*;
-import com.globalmentor.webapps.globalmentor.groups.MentorGroups;
 
 import static com.garretwilson.util.LocaleUtilities.*;
 
@@ -96,10 +96,10 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	/**The content type of a Guise AJAX response, <code>application/x-guise-ajax-response</code>.*/
 	public final static ContentType GUISE_AJAX_RESPONSE_CONTENT_TYPE=new ContentType(ContentTypeConstants.APPLICATION, ContentTypeConstants.EXTENSION_PREFIX+"guise-ajax-response"+ContentTypeConstants.SUBTYPE_SUFFIX_DELIMITER_CHAR+ContentTypeConstants.XML_SUBTYPE_SUFFIX, null);
 
-	/**Whether debug is turned on for Mentor Groups.*/
+	/**Whether debug is turned on for Guise.*/
 	protected final static boolean DEBUG=true;	//TODO load this from an init parameter
 
-	/**The minimum level of debug reporting for Mentor Groups.*/
+	/**The minimum level of debug reporting for Guise.*/
 	protected final static Debug.ReportLevel DEBUG_LEVEL=Debug.ReportLevel.TRACE;	//TODO load this from an init parameter
 
 	/**@return The global HTTP servlet Guise instance.
@@ -182,7 +182,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		Debug.setMinimumReportLevel(DEBUG_LEVEL);	//set the level of reporting
 		try
 		{
-			Debug.setOutput(MentorGroups.getDebugLogFile(getServletContext()));	//set the log file
+			Debug.setOutput(getDebugLogFile(getServletContext()));	//set the log file
 		}
 		catch(final FileNotFoundException fileNotFoundException)	//if we can't find the debug file
 		{
@@ -373,7 +373,7 @@ Debug.info("content type:", request.getContentType());
 						setNoCache(response);	//TODO testing; fix; update method
 
 						final List<ControlEvent> controlEvents=getControlEvents(request);	//get all control events from the request
-						final FormSubmitEvent formSubmitEvent=(FormSubmitEvent)controlEvents.get(0);	//get the form submit event TODO fix, combine with AJAX code
+						final FormEvent formSubmitEvent=(FormEvent)controlEvents.get(0);	//get the form submit event TODO fix, combine with AJAX code
 
 						guiseContext.setControlEvent(formSubmitEvent);	//tell the context which control event is being used
 							//before actually changing the navigation path, check to see if we're in the middle of modal navigation (only do this after we find a navigation frame, as this request might be for a stylesheet or some other non-frame resource, which shouldn't be redirected)
@@ -519,9 +519,9 @@ Debug.info("content type:", request.getContentType());
 			{
 				guiseContext.setControlEvent(controlEvent);	//tell the context which control event is being used
 				final Set<Component<?>> requestedComponents=new HashSet<Component<?>>();	//create a set of component that were identified in the request
-				if(controlEvent instanceof FormSubmitEvent)	//if this is a form submission
+				if(controlEvent instanceof FormEvent)	//if this is a form submission
 				{
-					final FormSubmitEvent formSubmitEvent=(FormSubmitEvent)controlEvent;	//get the form submit event
+					final FormEvent formSubmitEvent=(FormEvent)controlEvent;	//get the form submit event
 					final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the request parameter map
 					for(final Map.Entry<String, List<Object>> parameterListMapEntry:parameterListMap.entrySet())	//for each entry in the map of parameter lists
 					{
@@ -727,7 +727,7 @@ Debug.info("content type:", request.getContentType());
 				{
 					if(eventNode.getNodeType()==Node.ELEMENT_NODE && "form".equals(eventNode.getNodeName()))	//if this is a form event TODO use a constant
 					{
-						final FormSubmitEvent formSubmitEvent=new FormSubmitEvent();	//create a new form submission event
+						final FormEvent formSubmitEvent=new FormEvent(false);	//create a new form submission event TODO get the exhaustive indication from the element
 						final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
 						final List<Node> controlNodes=(List<Node>)XPath.evaluatePathExpression(eventNode, AJAX_REQUEST_CONTROL_XPATH_EXPRESSION);	//get all the control settings
 						for(final Node controlNode:controlNodes)	//for each control node
@@ -774,7 +774,7 @@ Debug.info("content type:", request.getContentType());
 				//populate our parameter map
 			if(FileUpload.isMultipartContent(request))	//if this is multipart/form-data content
 			{
-				final FormSubmitEvent formSubmitEvent=new FormSubmitEvent();	//create a new form submission event
+				final FormEvent formSubmitEvent=new FormEvent(true);	//create a new form submission event, indicating that the event is exhaustive
 				final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
 				final DiskFileUpload diskFileUpload=new DiskFileUpload();	//create a file upload handler
 				diskFileUpload.setSizeMax(-1);	//don't reject anything
@@ -797,7 +797,8 @@ Debug.info("content type:", request.getContentType());
 			}
 			else	//if this is normal application/x-www-form-urlencoded data
 			{
-				final FormSubmitEvent formSubmitEvent=new FormSubmitEvent();	//create a new form submission event
+				final boolean exhaustive=POST_METHOD.equals(request.getMethod());	//if this is an HTTP post, the form event is exhaustive of all controls on the form
+				final FormEvent formSubmitEvent=new FormEvent(exhaustive);	//create a new form submission event
 				final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
 				final Iterator parameterEntryIterator=request.getParameterMap().entrySet().iterator();	//get an iterator to the parameter entries
 				while(parameterEntryIterator.hasNext())	//while there are more parameter entries

@@ -282,7 +282,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 		@SuppressWarnings("unchecked")	//classes don't support generics multilevel, so we have to cast Component.class to the correct generic type
 		public CardValueModel(final GuiseSession<?> session)
 		{
-			super(session, (Class<Component<?>>)Component.class);	//construct the parent class
+			super(session, (Class<Component<?>>)(Object)Component.class);	//construct the parent class TODO find out why we have to do the double-cast for JDK 1.5 to work
 		}
 
 		/**Sets the input value.

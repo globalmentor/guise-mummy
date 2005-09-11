@@ -52,7 +52,7 @@ public class DefaultActionModel extends AbstractControlModel implements ActionMo
 	@SuppressWarnings("unchecked")
 	public Iterator<ActionListener<ActionModel>> getActionListeners()
 	{
-		return (Iterator<ActionListener<ActionModel>>)getEventListenerManager().getListeners(ActionListener.class);	//remove the listener
+		return (Iterator<ActionListener<ActionModel>>)(Object)getEventListenerManager().getListeners(ActionListener.class);	//remove the listener TODO find out why we have to use the double cast for JDK 1.5 to compile
 	}
 
 	/**Fires an action to all registered action listeners.
