@@ -30,6 +30,9 @@ var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX c
 
 //TODO before sending a drop event, send a component update for the drop target so that its value will be updated; or otherwise make sure the value is synchronized
 
+/**The URI of the XHTML namespace.*/
+var XHTML_NAMESPACE_URI="http://www.w3.org/1999/xhtml";
+
 /**The class prefix of a menu.*/
 var MENU_CLASS_PREFIX="menu-";
 
@@ -129,6 +132,83 @@ Array.prototype.remove=function(index)
 };
 
 var EMPTY_ARRAY=new Array();	//a shared empty array
+
+//Document
+
+if(typeof document.createElementNS=="undefined")	//if the document does not support createElementNS(), create a substitute
+{
+	/**Create an element for the given namespace URI and qualified name using the document.createElement() method.
+	@param namespaceURI The URI of the of the namespace.
+	@param qname The qualified name of the element.
+	@return The new created element.
+	*/
+	document.createElementNS=function(namespaceURI, qname)	//create an adapter function to call document.createElement()
+	{
+    return document.createElement(qname);	//create the element, ignoring the namespace
+	};
+}
+
+if(typeof document.importNode=="undefined")	//if the document does not support document.importNode(), create a substitute
+{
+	/**Imports a new node in the the document.
+	@param node The node to import.
+	@param deep Whether the entire hierarchy should be imported.
+	@return A new clone of the node with the document as its owner.
+	*/
+	document.importNode=function(node, deep)	//create a function to manually import a node
+	{
+		var importedNode=null;	//we'll create a new node and store it here
+		switch(node.nodeType)	//see which type of child node this is
+		{
+			case Node.COMMENT_NODE:	//comment
+				importedNode=document.createCommentNode(node.nodeValue);	//create a new comment node with appropriate text
+				break;
+			case Node.ELEMENT_NODE:	//element
+				if(document.createElementNS instanceof Function && typeof node.namespaceURI!="undefined")	//if the node supports namespaces
+				{
+					importedNode=document.createElementNS(node.namespaceURI, node.nodeName);	//create a namespace-aware element
+				}
+				else	//if the node does not support namespaces
+				{
+					importedNode=document.createElement(node.nodeName);	//create a non-namespace-aware element
+				}
+				var attributes=node.attributes;	//get the element's attributes
+				var attributeCount=attributes.length;	//find out how many attributes there are
+				for(var i=0; i<attributeCount; ++i)	//for each attribute
+				{
+					var attribute=attributes[i];	//get this attribute
+					if(document.createAttributeNS instanceof Function && typeof attribute.namespaceURI!="undefined")	//if the attribute supports namespaces
+					{
+						var importedAttribute=document.createAttributeNS(attribute.namespaceURI, attribute.nodeName);	//create a namespace-aware attribute
+						importedAttribute.nodeValue=attribute.nodeValue;	//set the attribute value
+						importedNode.setAttributeNodeNS(importedAttribute);	//set the attribute for the element						
+					}
+					else	//if the attribute does not support namespaces
+					{
+						var importedAttribute=document.createAttribute(attribute.nodeName);	//create a non-namespace-aware element
+						importedAttribute.nodeValue=attribute.nodeValue;	//set the attribute value TODO verify this works on Safari
+						importedNode.setAttributeNode(importedAttribute);	//set the attribute for the element
+					}
+				}
+				if(deep)	//if we should import deep
+				{
+					var childNodes=node.childNodes;	//get a list of child nodes
+					var childNodeCount=childNodes.length;	//find out how many child nodes there are
+					for(var i=0; i<childNodeCount; ++i)	//for all of the child nodes
+					{
+						var childNode=childNodes[i];	//get a reference to this child node
+						importedNode.appendChild(document.importNode(childNode, deep));	//import and append the new child node
+					}
+				}
+				break;
+			case Node.TEXT_NODE:	//text
+				importedNode=document.createTextNode(node.nodeValue);	//create a new text node with appropriate text
+				break;
+			//TODO add checks for other elements, such as CDATA
+		}
+		return importedNode;	//return the imported node
+	};
+}
 
 //Node
 
@@ -293,6 +373,82 @@ function URI(uriString)
 	}
 	this.fragment=RegExp.$9;
 }
+
+
+/**Global utilities for working with the DOM.*/
+var DOMUtilities=
+{
+
+	/**Imports all the attributes from the source element into the destination element.
+	The destination element's original attributes will not be first removed.
+	@param destinationElement The element into which the attributes should be imported.
+	@param sourceElement The element from which the attributes should be imported.
+	*/
+/**TODO del when works
+	importAttributes:function(destinationElement, sourceElement)
+	{
+		var attributes=sourceElement.attributes;	//get the element's attributes
+		var attributeCount=attributes.length;	//find out how many attributes there are
+		for(var i=0; i<attributeCount; ++i)	//for each attribute
+		{
+			var attribute=attributes[i];	//get this attribute
+			if(document.createAttributeNS instanceof Function && typeof attribute.namespaceURI!="undefined")	//if the attribute supports namespaces
+			{
+				var importedAttribute=document.createAttributeNS(attribute.namespaceURI, attribute.nodeName);	//create a namespace-aware attribute
+				importedAttribute.nodeValue=attribute.nodeValue;	//set the attribute value
+				destinationElement.setAttributeNodeNS(importedAttribute);	//set the attribute for the element						
+			}
+			else	//if the attribute does not support namespaces
+			{
+			try
+			{
+alert("ready to create attribute: "+attribute.nodeName);
+				var importedAttribute=document.createAttribute(attribute.nodeName);	//create a non-namespace-aware element
+alert("ready to set value: "+attribute.nodeValue);
+				importedAttribute.nodeValue=attribute.nodeValue;	//set the attribute value TODO verify this works on Safari
+alert("ready set attribute node: "+attribute.nodeName);
+				destinationElement.setAttributeNode(importedAttribute);	//set the attribute for the element
+			}
+			catch(e)
+			{
+alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with value: "+attribute.nodeValue);
+			}
+				
+			}
+		}
+	},
+*/
+
+	/**Removes all children from the given node.
+	@param node The node the children of which to remove.
+	*/
+	removeChildren:function(node)
+	{
+		while(node.childNodes.length>0)	//while there are child nodes left (remove the last node, one at a time, because because IE can sometimes add an element back in after the last one was removed)
+		{
+			node.removeChild(node.childNodes[node.childNodes.length-1]);	//remove the last node
+		}
+	},
+
+	/**Retrieves the HTML attribute name from the DOM attribute name.
+	This method converts "class" to "className", for example.
+	@param domAttributeName The literal DOM attribute name.
+	@return The attribute name expected in HTML.
+	*/
+	getHTMLAttributeName:function(domAttributeName)
+	{
+		switch(domAttributeName)	//see which DOM attribute name was given
+		{
+			case "class":
+				return "className";
+			case "readonly":
+				return "readOnly";
+			default:	//for all other class names, return the DOM attribute
+				return domAttributeName;
+		}
+	}
+
+};
 
 //Form AJAX Event
 
@@ -724,7 +880,6 @@ function GuiseAJAX()
 	alert("response text: "+xmlHTTP.responseText);
 	alert("response XML: "+xmlHTTP.responseXML);
 */
-//TODO fix	alert("response text: "+xmlHTTP.responseText);
 					var status=xmlHTTP.status;	//get the status
 					if(status==200)	//if everything went OK
 					{
@@ -756,6 +911,7 @@ function GuiseAJAX()
 					//TODO log a warning
 alert(exception);
 					AJAX_URI=null;	//stop further AJAX communication
+					throw exception;	//TODO testing
 				}
 			};
 		};
@@ -810,126 +966,145 @@ alert(exception);
 		*/ 
 		GuiseAJAX.prototype._patchElement=function(element)
 		{
-				//do depth-first patching, allowing us to precheck children at the same time for later patching at this level in the hierarchy
-			var childNodeList=element.childNodes;	//get all the child nodes of the element
-			var childNodeCount=childNodeList.length;	//find out how many children there are
-			var childTextNodeCount=0;	//keep track of how many child text nodes there are
-			for(var i=0; i<childNodeCount; ++i)	//for each child node
-			{
-				var childNode=childNodeList[i];	//get this child node
-				switch(childNode.nodeType)	//see which type of child node this is
-				{
-					case Node.ELEMENT_NODE:	//element
-						this._patchElement(childNode);	//patch this child element
-						break;
-					case Node.TEXT_NODE:	//text
-						++childTextNodeCount;	//show that we found another text child
-						break;
-				}
-			}
-				//TODO make sure the Mozilla/IE attribute access functionality is robust, taking into account Mozilla's separate value structure
 			var id=element.getAttribute("id");	//get the element's ID, if there is one
 			if(id)	//if the element has an ID
 			{
-		//TODO del alert("patching stuff for ID "+id);
-				var elementName=element.nodeName;	//save the element name
 				var oldElement=document.getElementById(id);	//get the old element
 				if(oldElement)	//if the element currently exists in the document
 				{
-						//remove any attributes the old element has that are not in the new element
-					var oldAttributes=oldElement.attributes;	//get the old element's attributes
-					for(var i=oldAttributes.length-1; i>=0; --i)	//for each old attribute
+					this._synchronizeElement(oldElement, element);	//synchronize this element tree
+					return;	//don't process this subtree further; we've already performed the patch
+				}
+			}
+			var childNodes=element.childNodes;	//get all the child nodes of the element
+			var childNodeCount=childNodes.length;	//find out how many children there are
+			for(var i=0; i<childNodeCount; ++i)	//for each child node
+			{
+				var childNode=childNodes[i];	//get this child node
+				if(childNode.nodeType==Node.ELEMENT_NODE)	//if this is an element
+				{
+					this._patchElement(childNode);	//try to patch this child element
+				}
+			}
+		};
+
+		/**Synchronizes an element hierarchy with its patch element.
+		@param oldElement The old version of the element.
+		@param element The element hierarchy to patch into the existing document.
+		*/ 
+		GuiseAJAX.prototype._synchronizeElement=function(oldElement, element)
+		{
+		//TODO del alert("patching stuff for ID "+id);
+				//remove any attributes the old element has that are not in the new element
+			var oldAttributes=oldElement.attributes;	//get the old element's attributes
+			for(var i=oldAttributes.length-1; i>=0; --i)	//for each old attribute
+			{
+				var oldAttribute=oldAttributes[i];	//get this attribute
+				var oldAttributeName=oldAttribute.nodeName;	//get the attribute name
+				var oldAttributeValue=oldAttribute.nodeValue;	//get the attribute value
+				var attributeName=oldAttributeName;
+				if(oldAttributeName=="readOnly")	//TODO fix for other misspelled attributes, such as className
+				{
+					attributeName="readonly";
+				}
+//TODO fix or del				if(attributeValue!=null && attributeValue.length>0 && !element.getAttribute(attributeName))	//if there is really an attribute value (IE provides all possible attributes, even with those with no value) and the new element doesn't have this attribute
+				if(!element.getAttribute(attributeName))	//if there is really an attribute value (IE provides all possible attributes, even with those with no value) and the new element doesn't have this attribute
+				{
+//TODO del alert("ready to remove "+id+" attribute "+attributeName+" with current value "+attributeValue);
+					oldElement.removeAttribute(oldAttributeName);	//remove the attribute normally (apparently no action will take place if performed on IE-specific attributes such as element.start)
+//TODO fix					i=0;	//TODO fix; temporary to get out of looking at all IE's attributes
+				}
+			}
+				//patch in the new and changed attributes
+			var attributes=element.attributes;	//get the new element's attributes
+			for(var i=attributes.length-1; i>=0; --i)	//for each attribute
+			{
+				var attribute=attributes[i];	//get this attribute
+				var attributeName=DOMUtilities.getHTMLAttributeName(attribute.nodeName);	//get the attribute name, compensating for special HTML attributes such as "className"
+				var attributeValue=attribute.nodeValue;	//get the attribute value
+//TODO del alert("looking at attribute "+attributeName+" with value "+attributeValue);
+//TODO del alert("looking at old attribute "+attributeName+" with value "+oldElement.getAttribute(attributeName)+" other way "+oldElement[attributeName]);
+				if(oldElement[attributeName]!=attributeValue)	//if the old element has a different (or no) value for this attribute (Firefox maintains different values for element.getAttribute(attributeName) and element[attributeName]) (note also that using setAttribute() IE will sometimes throw an error if button.style is changed, for instance)
+				{
+//TODO del alert("updating "+element.nodeName+" attribute "+attributeName+" from value "+oldElement[attributeName]+" to new value "+attributeValue);
+					oldElement[attributeName]=attributeValue;	//update the old element's attribute (this format works for Firefox where oldElement.setAttribute("value", attributeValue) does not)
+//TODO: fix the Firefox problem of sending an onchange event for any elements that get updated from an Ajax request, but only later when the focus blurs
+//TODO fix the focus problem if the user has focus on an element that gets changed in response to the event
+				}
+			}
+			var elementName=element.nodeName;	//save the element name
+			
+				//patch in the new child element hierarchy
+			if(elementName=="textarea")	//if this is a text area, do special-case value changing (restructuring won't work in IE and Mozilla) TODO check for other similar types TODO use a constant
+			{
+				oldElement.value=getText(element);	//set the new value to be the text of the new element
+			}
+			else	//for other elements, restructure the DOM tree normally
+			{
+				var oldChildNodeList=oldElement.childNodes;	//get all the child nodes of the old element
+				var oldChildNodeCount=oldChildNodeList.length;	//find out how many old children there are
+				var childNodeList=element.childNodes;	//get all the child nodes of the element
+				var childNodeCount=childNodeList.length;	//find out how many children there are
+				var isChildrenCompatible=true;	//start by assuming children are compatible; children will be compatible as long as the exiting children are of the same types and, if they are elements, of the same name
+				for(var i=0; i<oldChildNodeCount && i<childNodeCount && isChildrenCompatible; ++i)	//for each child node (as long as children are compatible)
+				{
+					var oldChildNode=oldChildNodeList[i];	//get the old child node
+					var childNode=childNodeList[i];	//get the new child node
+					if(oldChildNode.nodeType==childNode.nodeType)	//if these are the same type of nodes
 					{
-						var oldAttribute=oldAttributes[i];	//get this attribute
-						var oldAttributeName=oldAttribute.nodeName;	//get the attribute name
-						var oldAttributeValue=oldAttribute.nodeValue;	//get the attribute value
-						var attributeName=oldAttributeName;
-						if(oldAttributeName=="readOnly")	//TODO fix for other misspelled attributes, such as className
+						if(childNode.nodeType==Node.ELEMENT_NODE && oldChildNode.nodeName.toLowerCase()!=childNode.nodeName.toLowerCase())	//if these are elements with different node names
 						{
-							attributeName="readonly";
-						}
-						if(/*TODO fix or del attributeValue!=null && attributeValue.length>0 && */!element.getAttribute(attributeName))	//if there is really an attribute value (IE provides all possible attributes, even with those with no value) and the new element doesn't have this attribute
-						{
-		//TODO del alert("ready to remove "+id+" attribute "+attributeName+" with current value "+attributeValue);
-							oldElement.removeAttribute(oldAttributeName);	//remove the attribute normally (apparently no action will take place if performed on IE-specific attributes such as element.start)
-		//TODO fix					i=0;	//TODO fix; temporary to get out of looking at all IE's attributes
+//TODO del alert("found different node names; old: "+oldChildNode.nodeName+" and new: "+childNode.nodeName);
+							isChildrenCompatible=false;	//these child elements aren't compatible because they have different node name
 						}
 					}
-						//patch in the new and changed attributes
-					var attributes=element.attributes;	//get the new element's attributes
-					for(var i=attributes.length-1; i>=0; --i)	//for each attribute
+					else	//if the node types are different
 					{
-						var attribute=attributes[i];	//get this attribute
-						var attributeName=attribute.nodeName;	//get the attribute name
-						var attributeValue=attribute.nodeValue;	//get the attribute value
-		//TODO del alert("looking at attribute "+attributeName+" with value "+attributeValue);
-		//TODO del alert("looking at old attribute "+attributeName+" with value "+oldElement.getAttribute(attributeName)+" other way "+oldElement[attributeName]);
-							//TODO fix for oldElement.class/oldElement.className on IE
-						if(oldElement[attributeName]!=attributeValue)	//if the old element has a different (or no) value for this attribute (Firefox maintains different values for element.getAttribute(attributeName) and element[attributeName])
+						isChildrenCompatible=false;	//these child nodes aren't compatible because they are of different types
+					}
+				}
+				if(isChildrenCompatible)	//if the children are compatible
+				{
+//TODO del alert("children are compatible, old child node count: "+oldChildNodeCount+" new child node count "+childNodeCount);
+						//remove superfluous old nodes
+					for(var i=oldChildNodeCount-1; i>=childNodeCount; --i)	//for each old child node that is not in the new node
+					{
+//TODO del alert("removing old node: "+oldChildNodeList[i].nodeName);
+						oldElement.removeChild(oldChildNodeList[i]);	//remove this old child
+					}
+//TODO del alert("children are still compatible, old child node count: "+oldChildNodeCount+" new child node count "+childNodeCount);
+				}
+				else	//if children are not compatible
+				{
+//TODO del alert("children are not compatible");
+					DOMUtilities.removeChildren(oldElement);	//remove all the children from the old element and start from scratch
+//TODO del alert("incompatible old element now has children: "+oldElement.childNodes.length);
+				}
+				for(var i=0; i<childNodeCount; ++i)	//for each new child node
+				{
+					var childNode=childNodeList[i];	//get this child node
+					oldChildNodeList=oldElement.childNodes;	//get the old child nodes all over again, as we may have removed some nodes before arriving here, and we may add some nodes later on
+					if(i<oldChildNodeList.length)	//if we already have an old child node
+					{
+						var oldChildNode=oldChildNodeList[i];	//get the old child node
+						switch(childNode.nodeType)	//see which type of child node this is
 						{
-		//TODO del alert("updating "+id+" attribute "+attributeName+" to new value "+attributeValue);
-							oldElement[attributeName]=attributeValue;	//update the old element's attribute (this format works for Firefox where oldElement.setAttribute("value", attributeValue) does not)
-		//TODO: fix the Firefox problem of sending an onchange event for any elements that get updated from an Ajax request, but only later when the focus blurs
-		//TODO fix the focus problem if the user has focus on an element that gets changed in response to the event
+							case Node.ELEMENT_NODE:	//element
+								this._synchronizeElement(oldChildNode, childNode);	//synchronize these elements
+								break;
+							case Node.COMMENT_NODE:	//comment
+							case Node.TEXT_NODE:	//text
+								oldChildNode.nodeValue=childNode.nodeValue;	//copy the text over to the old node
+								break;
+							//TODO add checks for other elements, such as CDATA
 						}
 					}
-						//patch in the new child element hierarchy
-					if(elementName=="textarea")	//if this is a text area, do special-case value changing (restructuring won't work in IE and Mozilla) TODO check for other similar types TODO use a constant
+					else	//if we're out of old child nodes, create a new one
 					{
-						oldElement.value=getText(element);	//set the new value to be the text of the new element
-					}
-					else	//for other elements, restructure the DOM tree normally
-					{
-						var oldChildNodeList=oldElement.childNodes;	//get all the child nodes of the old element
-						var oldChildNodeCount=oldChildNodeList.length;	//find out how many old children there are
-						if(childNodeCount>0)	//if the new element has child nodes
-						{
-								//patch any changed text
-							if(childTextNodeCount==childNodeCount)	//if all the child nodes are text nodes
-							{
-								var onlyChangeValues=false;	//see if we can get by with just changing text node values
-								if(oldChildNodeCount==childNodeCount)	//if the old element has the same number of children as the new element
-								{
-									onlyChangeValues=true;	//we may get away with only changing values after all
-									for(var i=0; i<oldChildNodeCount; ++i)	//look at each old child node
-									{
-										if(oldChildNodeList[i].nodeType!=childNodeList[i].nodeType)	//if the old child element is a different type than the new one
-										{
-											onlyChangeValues=false;	//we'll have to actually change around child nodes
-											break;	//stop looking for difficulties---we just found one
-										}
-									}
-								}
-								if(onlyChangeValues)	//if we think we can simply change text node values
-								{
-									for(var i=0; i<childNodeCount; ++i)	//for each new child node
-									{
-											//TODO later check for text
-										oldChildNodeList[i].nodeValue=childNodeList[i].nodeValue;	//copy the text over to the old node
-									}
-								}
-								else	//if we have to rearrange the child nodes
-								{
-									for(var i=oldChildNodeCount-1; i>=0; --i)	//for all of the old nodes
-									{
-										oldElement.removeChild(oldChildNodeList[i]);	//remove this child
-									}
-									for(var i=0; i<childNodeCount; ++i)	//for each new child node
-									{
-										var childNode=childNodeList[i];	//get this child node
-											//TODO later check for text
-										oldElement.appendChild(document.createTextNode(childNode.nodeValue));	//create and append an equivalent text node
-									}
-								}
-							}
-						}
-						else	//if the element has no child nodes, remove all the child nodes from the old element
-						{
-							for(var i=oldChildNodeCount-1; i>=0; --i)	//for all of the old nodes
-							{
-								oldElement.removeChild(oldChildNodeList[i]);	//remove this child
-							}
-						}
+//TODO del alert("ready to clone node: "+childNode.nodeName);
+						var importedNode=document.importNode(childNode, true);	//create an import clone of the node
+						oldElement.appendChild(importedNode);	//append the imported node to the old element
+						initializeNode(importedNode);	//initialize the new imported node, installing the correct event handlers
 					}
 				}
 			}
