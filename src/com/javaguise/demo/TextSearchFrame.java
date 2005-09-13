@@ -52,11 +52,11 @@ public class TextSearchFrame extends DefaultFrame
 	*/
 	public TextSearchFrame(final GuiseSession<?> session)
 	{
-		super(session, new FlowLayout(Orientation.Flow.LINE));	//construct the parent class flowing horizontally
+		super(session, new FlowLayout(session, Orientation.Flow.LINE));	//construct the parent class flowing horizontally
 		getModel().setLabel("Guise\u2122 Demonstration: Text Search");	//set the frame title	
 
 			//input panel
-		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(Orientation.Flow.PAGE));	//create the input panel flowing vertically
+		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.PAGE));	//create the input panel flowing vertically
 			//instructions
 		final Message message=new Message(session);	//create a new message
 		message.getModel().setLabel("Instructions");	//give a label to the message

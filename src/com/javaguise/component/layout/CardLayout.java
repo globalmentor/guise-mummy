@@ -147,6 +147,45 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 		valueModel=new CardValueModel(session);	//create a new decorated value model
 	}
 
+	//model delegation
+
+	/**Determines the advisory information text, such as might appear in a tooltip.
+	If information is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
+	@return The advisory information text, such as might appear in a tooltip, or <code>null</code> if there is no advisory information.
+	@exception MissingResourceException if there was an error loading the value from the resources.
+	@see #getInfoResourceKey()
+	*/
+	public String getInfo() throws MissingResourceException {return getValueModel().getInfo();}
+
+	/**Sets the advisory information text, such as might appear in a tooltip.
+	This is a bound property.
+	@param newInfo The new text of the advisory information text, such as might appear in a tooltip.
+	@see Model#INFO_PROPERTY
+	*/
+	public void setInfo(final String newInfo) {getValueModel().setInfo(newInfo);}
+
+	/**@return The content type of the advisory information text.*/
+	public ContentType getInfoContentType() {return getValueModel().getInfoContentType();}
+
+	/**Sets the content type of the advisory information text.
+	This is a bound property.
+	@param newInfoContentType The new advisory information text content type.
+	@exception NullPointerException if the given content type is <code>null</code>.
+	@exception IllegalArgumentException if the given content type is not a text content type.
+	@see Model#INFO_CONTENT_TYPE_PROPERTY
+	*/
+	public void setInfoContentType(final ContentType newInfoContentType) {getValueModel().setInfoContentType(newInfoContentType);}
+
+	/**@return The advisory information text resource key, or <code>null</code> if there is no advisory information text resource specified.*/
+	public String getInfoResourceKey() {return getValueModel().getInfoResourceKey();}
+
+	/**Sets the key identifying the text of the advisory information in the resources.
+	This is a bound property.
+	@param newInfoResourceKey The new advisory information text resource key.
+	@see Model#INFO_RESOURCE_KEY_PROPERTY
+	*/
+	public void setInfoResourceKey(final String newInfoResourceKey) {getValueModel().setInfoResourceKey(newInfoResourceKey);}
+
 	//value model delegation
 
 	/**@return Whether the contents of this model are valid.*/
@@ -160,14 +199,6 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 	@see #getPlainLabel()
 	*/
 	public String getLabel() throws MissingResourceException {return getValueModel().getLabel();}
-
-	/**Determines the plain text of the label, with no markup.
-	If a label is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
-	@return The label plain text, or <code>null</code> if there is no label text.
-	@exception MissingResourceException if there was an error loading the value from the resources.
-	@see #getLabel()
-	*/
-	public String getPlainLabel() throws MissingResourceException {return getValueModel().getPlainLabel();}
 
 	/**Sets the text of the label.
 	This is a bound property.

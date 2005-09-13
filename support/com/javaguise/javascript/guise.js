@@ -427,7 +427,7 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 	{
 		while(node.childNodes.length>0)	//while there are child nodes left (remove the last node, one at a time, because because IE can sometimes add an element back in after the last one was removed)
 		{
-			var childNode=node.childNodes.length-1;	//get a reference to the last node
+			var childNode=node.childNodes[node.childNodes.length-1];	//get a reference to the last node
 			eventManager.clearEvents(childNode);	//clear events for this node and descendants
 			node.removeChild(childNode);	//remove the last node
 		}
@@ -694,7 +694,7 @@ function GuiseAJAX()
 		GuiseAJAX.prototype.RESPONSE_CONTENT_TYPE="application/x-guise-ajax-response+xml";
 
 		/**The enumeration of the names of the response elements.*/
-		GuiseAJAX.prototype.ResponseElement={RESPONSE: "response", PATCH: "patch", NAVIGATE: "navigate"};
+		GuiseAJAX.prototype.ResponseElement={RESPONSE: "response", PATCH: "patch", NAVIGATE: "navigate", RELOAD: "reload"};
 
 		/**Immediately sends or queues an AJAX request.
 		@param ajaxRequest The AJAX request to send.
@@ -879,11 +879,21 @@ function GuiseAJAX()
 				{
 		//TODO del alert("processing asynch result");
 /*TODO del
+alert("we returned, at least");
+	alert("ready state: "+xmlHTTP.readyState);
 	alert("got status: "+xmlHTTP.status);
 	alert("response text: "+xmlHTTP.responseText);
 	alert("response XML: "+xmlHTTP.responseXML);
 */
-					var status=xmlHTTP.status;	//get the status
+					var status=0;
+					try
+					{
+						status=xmlHTTP.status;	//get the status
+					}
+					catch(e)	//if there is a problem getting the status, don't do anything TODO fix this hack to get around Firefox problem when the form is submitted right before an AJAX request occurs; investigate turning off Enter-based submission, too
+					{
+						return;
+					}
 					if(status==200)	//if everything went OK
 					{
 						if(xmlHTTP.responseXML && xmlHTTP.responseXML.documentElement)	//if we have XML (if there is no content or there is an error, IE sends back a document has a null xmlHTTP.responseXML.documentElement)
@@ -949,7 +959,11 @@ alert(exception);
 										break;
 									case this.ResponseElement.NAVIGATE:	//navigate
 										window.location.href=getText(childNode);	//go to the new location
-										break;	//TODO decide whether we should continue processing events or not
+										return;	//stop processing events
+//TODO del when works										break;	//TODO decide whether we should continue processing events or not
+									case this.ResponseElement.RELOAD:	//reload
+										window.location.reload();	//reload the page
+										return;	//stop processing events
 								}
 							}
 						}
@@ -1652,7 +1666,57 @@ function onTextInputChange(event)
 */
 function onButtonClick(event)
 {
-	onAction(event);	//process an action for the button
+//TODO fix	onAction(event);	//process an action for the button
+
+		//TODO for now, always do a POST so that table updates and file uploads can work; later fix this---perhaps check to see if file uploads are on the form
+
+	var element=event.currentTarget;	//get the element on which the event was registered
+//TODO del alert("action on: "+element.nodeName);
+	if(element.id)	//if the button has an ID
+	{
+			//ask confirmations if needed
+		var childNodeList=element.childNodes;	//get all the child nodes of the element
+		var childNodeCount=childNodeList.length;	//find out how many children there are
+		for(var i=0; i<childNodeCount; ++i)	//for each child node
+		{
+			var childNode=childNodeList[i];	//get this child node
+			if(childNode.nodeType==Node.COMMENT_NODE && childNode.nodeValue)	//if this is a comment node
+			{
+				var commentValue=childNode.nodeValue;	//get the comment value
+				var delimiterIndex=commentValue.indexOf(':');	//get the delimiter index
+				if(delimiterIndex>=0)	//if there is a delimiter
+				{
+					var paramName=commentValue.substring(0, delimiterIndex);	//get the parameter name
+					var paramValue=commentValue.substring(delimiterIndex+1);	//get the parameter value
+					if(paramName="confirm")	//if this is a confirmation
+					{
+						if(!confirm(paramValue))	//ask for confirmation; if the user does not confirm
+						{
+							return;	//don't process the event further
+						}
+					}
+				}
+			}
+		}
+		var form=getForm(element);	//get the form
+		if(form && form.id)	//if there is a form with an ID
+		{
+			var actionInputID=form.id.replace(":form", ":input");	//determine the ID of the hidden action input
+			var actionInput=document.getElementById(actionInputID);	//get the action input
+			if(actionInput)	//if there is an action input
+			{
+				actionInput.value=element.id;	//indicate which action was activated
+			}
+			form.submit();	//submit the form
+			if(actionInput)	//if there is an action input
+			{
+				actionInput.value=null;	//remove the indication of which action was activated
+			}
+			event.stopPropagation();	//tell the event to stop bubbling
+			event.preventDefault();	//prevent the default functionality from occurring
+		}
+	}
+
 }
 
 /**Called when an anchor is clicked.
@@ -1770,12 +1834,23 @@ function onTabClick(event)
 */
 function onCheckInputChange(event)
 {
+	var checkInput=event.currentTarget;	//get the control that was listening for events (the target could be the check input's label, as occurs in Mozilla)
 	if(AJAX_URI)	//if AJAX is enabled
 	{
-		var checkInput=event.currentTarget;	//get the control that was listening for events (the target could be the check input's label, as occurs in Mozilla)
 		var ajaxRequest=new FormAJAXEvent(new Parameter(checkInput.name, checkInput.checked ? checkInput.id : ""));	//create a new form request with the control name and value
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		event.stopPropagation();	//tell the event to stop bubbling
+	}
+	else	//if AJAX is not enabled
+	{
+		if(getMenu(checkInput))	//if this check is inside a menu, submit the form so that menus will cause immediate reaction
+		{
+			var form=getForm(element);	//get the form
+			if(form)	//if there is a form
+			{
+				form.submit();	//submit the form		
+			}
+		}
 	}
 }
 

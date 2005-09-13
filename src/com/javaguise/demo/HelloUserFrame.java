@@ -10,7 +10,8 @@ import com.javaguise.validator.RegularExpressionStringValidator;
 /**Hello User Guise demonstration frame.
 Copyright © 2005 GlobalMentor, Inc.
 Demonstrates flow layouts, hidden components, text controls, control labels,
-	text control regular expression validators, buttons, and model value change listeners.
+	tooltips, text control regular expression validators, buttons,
+	and model value change listeners.
 @author Garret Wilson
 */
 public class HelloUserFrame extends DefaultFrame
@@ -21,7 +22,7 @@ public class HelloUserFrame extends DefaultFrame
 	*/
 	public HelloUserFrame(final GuiseSession<?> session)
 	{
-		super(session, new FlowLayout(Orientation.Flow.PAGE));	//construct the parent class flowing vertically
+		super(session, new FlowLayout(session, Orientation.Flow.PAGE));	//construct the parent class flowing vertically
 		getModel().setLabel("Guise\u2122 Demonstration: Hello User");	//set the frame title	
 
 		final Label helloUserLabel=new Label(session);	//create a label
@@ -30,6 +31,7 @@ public class HelloUserFrame extends DefaultFrame
 		
 		final TextControl<String> userInput=new TextControl<String>(session, String.class);	//create a text input control to retrieve a string
 		userInput.getModel().setLabel("What's your name?");	//add a label to the text input control
+		userInput.getModel().setInfo("Enter a name that does not start with whitespace.");	//add advisory information that may be shown as a tooltip
 		userInput.getModel().setValidator(new RegularExpressionStringValidator(session, "\\S+.*", true));	//require at least a single non-whitespace character followed by any other characters
 		userInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<String>()
 				{

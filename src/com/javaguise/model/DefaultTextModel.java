@@ -5,8 +5,6 @@ import java.util.MissingResourceException;
 import javax.mail.internet.ContentType;
 
 import com.javaguise.session.GuiseSession;
-import static com.garretwilson.io.ContentTypeConstants.*;
-import static com.garretwilson.io.ContentTypeUtilities.*;
 import com.garretwilson.lang.ObjectUtilities;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.text.TextUtilities.*;

@@ -25,7 +25,7 @@ public class EditUsersFrame extends DefaultFrame
 	*/
 	public EditUsersFrame(final GuiseSession<?> session)
 	{
-		super(session, new FlowLayout(Orientation.Flow.LINE));	//construct the parent class flowing horizontally
+		super(session, new FlowLayout(session, Orientation.Flow.LINE));	//construct the parent class flowing horizontally
 		getModel().setLabel("Guise\u2122 Demonstration: Edit Users");	//set the frame title	
 
 		final ListControl<DemoUser> userListControl=new ListControl<DemoUser>(session, DemoUser.class, new SingleListSelectionStrategy<DemoUser>());	//create a list control allowing only single selections
@@ -42,7 +42,7 @@ public class EditUsersFrame extends DefaultFrame
 			Collections.sort(userListControl.getModel());	//sort the user list model (each user implements Comparable)
 		}
 		
-		final LayoutPanel buttonPanel=new LayoutPanel(session, new FlowLayout(Orientation.Flow.LINE));	//create the button panel flowing horizontally
+		final LayoutPanel buttonPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.LINE));	//create the button panel flowing horizontally
 			//add button
 		final Button addButton=new Button(session);	//create the add button
 		addButton.getModel().setLabel("Add User");	//set the text of the add button

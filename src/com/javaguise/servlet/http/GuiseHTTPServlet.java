@@ -613,6 +613,11 @@ Debug.info("content type:", request.getContentType());
 						{
 							affectedComponents.addAll(AbstractModelComponent.getModelComponents(navigationFrame, (Model)source));	//get all components that use this model
 						}
+						else if(source instanceof GuiseSession)	//if the session caused the event TODO maybe check to see if a property changed
+						{
+							affectedComponents.add(navigationFrame);	//if the session changed a property (such as its locale, its orientation or its principal), the whole frame has been affected
+						}
+							//TODO check for hierarchical relations, to prevent duplication
 					}
 	//			TODO del Debug.trace("we now have affected components:", affectedComponents.size());
 					guiseContext.setState(GuiseContext.State.QUERY_MODEL);	//update the context state for querying the model
@@ -644,23 +649,30 @@ Debug.info("content type:", request.getContentType());
 							beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation<?>)requestedNavigation);	//begin the modal navigation
 						}
 						//TODO ifAJAX()
-						guiseContext.writeElementBegin(null, "navigate");	//<xhtml:navigate>	//TODO use a constant
+						guiseContext.writeElementBegin(null, "navigate");	//<navigate>	//TODO use a constant
 						guiseContext.write(requestedNavigationURI.toString());	//write the navigation URI
-						guiseContext.writeElementEnd();	//</xhtml:navigate>
+						guiseContext.writeElementEnd();	//</navigate>
 //TODO if !AJAX						throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
 						//TODO store a flag or something---if we're navigating, we probably should flush the other queued events
 					}
 					
 					
-					
-					
-					guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
-					guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
-					for(final Component<?> affectedComponent:affectedComponents)	//for each component affected by this update cycle
+					if(affectedComponents.contains(navigationFrame))	//if the frame itself was affected, we might as well reload the page (trying to send the frame's XML contents back would corrupt the XML tree, anyway)
 					{
-						affectedComponent.updateView(guiseContext);		//tell the component to update its view
+						guiseContext.writeElementBegin(null, "reload", true);	//<reload>	//TODO use a constant
+						guiseContext.writeElementEnd();	//</reload>
+						
 					}
-					guiseContext.writeElementEnd();	//</xhtml:patch>
+					else	//if the frame wasn't affected
+					{
+						guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
+						guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
+						for(final Component<?> affectedComponent:affectedComponents)	//for each component affected by this update cycle
+						{
+							affectedComponent.updateView(guiseContext);		//tell the component to update its view
+						}
+						guiseContext.writeElementEnd();	//</xhtml:patch>
+					}
 				}
 			}
 			guiseContext.setState(GuiseContext.State.INACTIVE);	//deactivate the context so that any model update events will be generated			

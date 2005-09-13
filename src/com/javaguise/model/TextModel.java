@@ -26,12 +26,6 @@ public interface TextModel extends Model
 	/**The text resource key bound property.*/
 	public final static String TEXT_RESOURCE_KEY_PROPERTY=getPropertyName(MessageModel.class, "textResourceKey");
 
-	/**A content type of <code>text/plain</code>.*/
-	public final static ContentType PLAIN_TEXT_CONTENT_TYPE=new ContentType(TEXT, PLAIN_SUBTYPE, null);
-
-	/**A content type of <code>application/xhtml+xml</code>.*/
-	public final static ContentType XHTML_CONTENT_TYPE=XHTMLConstants.XHTML_CONTENT_TYPE;
-
 	/**Determines the text.
 	If text is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
 	@return The text, or <code>null</code> if there is no text.

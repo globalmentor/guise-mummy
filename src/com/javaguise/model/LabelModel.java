@@ -20,28 +20,13 @@ public interface LabelModel extends Model	//TODO add icon and hasLabel() method,
 	/**The label resource key bound property.*/
 	public final static String LABEL_RESOURCE_KEY_PROPERTY=getPropertyName(LabelModel.class, "labelResourceKey");
 
-	/**A content type of <code>text/plain</code>.*/
-	public final static ContentType PLAIN_TEXT_CONTENT_TYPE=new ContentType(TEXT, PLAIN_SUBTYPE, null);
-
-	/**A content type of <code>application/xhtml+xml</code>.*/
-	public final static ContentType XHTML_CONTENT_TYPE=XHTMLConstants.XHTML_CONTENT_TYPE;
-
 	/**Determines the text of the label.
 	If a label is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
 	@return The label text, or <code>null</code> if there is no label text.
 	@exception MissingResourceException if there was an error loading the value from the resources.
 	@see #getLabelResourceKey()
-	@see #getPlainLabel()
 	*/
 	public String getLabel() throws MissingResourceException;
-
-	/**Determines the plain text of the label, with no markup.
-	If a label is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
-	@return The label plain text, or <code>null</code> if there is no label text.
-	@exception MissingResourceException if there was an error loading the value from the resources.
-	@see #getLabel()
-	*/
-	public String getPlainLabel() throws MissingResourceException;
 
 	/**Sets the text of the label.
 	This is a bound property.
