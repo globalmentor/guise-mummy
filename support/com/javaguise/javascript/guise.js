@@ -523,7 +523,9 @@ function HTTPCommunicator()
 		/**The enumeration of ready states for asynchronous XMLHTTP requests.*/
 		HTTPCommunicator.prototype.READY_STATE={UNINITIALIZED: 0, LOADING: 1, LOADED: 2, INTERACTIVE: 3, COMPLETED: 4};
 		
-		/**The versions of the Microsoft XML HTTP ActiveX objects, in increasing order of preference.*/
+		/**The versions of the Microsoft XML HTTP ActiveX objects, in increasing order of preference.
+		@see http://support.microsoft.com/?kbid=269238
+		*/
 		HTTPCommunicator.prototype.MSXMLHTTP_VERSIONS=["Microsoft.XMLHTTP", "MSXML2.XMLHTTP", "MSXML2.XMLHTTP.3.0", "MSXML2.XMLHTTP.4.0", "MSXML2.XMLHTTP.5.0", "MSXML2.XMLHTTP.6.0", "MSXML2.XMLHTTP.7.0"];
 		
 		/**Sets the callback method to use for processing an HTTP response.
@@ -1025,9 +1027,9 @@ alert(exception);
 					attributeName="readonly";
 				}
 //TODO fix or del				if(attributeValue!=null && attributeValue.length>0 && !element.getAttribute(attributeName))	//if there is really an attribute value (IE provides all possible attributes, even with those with no value) and the new element doesn't have this attribute
-				if(!element.getAttribute(attributeName))	//if there is really an attribute value (IE provides all possible attributes, even with those with no value) and the new element doesn't have this attribute
+				if(element.getAttribute(attributeName)==null)	//if the new element doesn't have this attribute
 				{
-//TODO del alert("ready to remove "+id+" attribute "+attributeName+" with current value "+attributeValue);
+//TODO del alert("ready to remove "+oldElement.nodeName+" attribute "+oldAttributeName+" with current value "+oldAttributeValue);
 					oldElement.removeAttribute(oldAttributeName);	//remove the attribute normally (apparently no action will take place if performed on IE-specific attributes such as element.start)
 //TODO fix					i=0;	//TODO fix; temporary to get out of looking at all IE's attributes
 				}
@@ -1098,6 +1100,12 @@ alert(exception);
 						isChildrenCompatible=false;	//these child nodes aren't compatible because they are of different types
 					}
 				}
+				
+				
+				if(elementName=="select")	//TODO hack for Firefox select, which will allow the value of the selected option to be updated but not update that value shown in the drop-down list when the display changes
+				{
+					isChildrenCompatible=false;	//TODO testing
+				}
 				if(isChildrenCompatible)	//if the children are compatible
 				{
 //TODO del alert("children are compatible, old "+oldElement.nodeName+" with ID "+oldElement.id+" child node count: "+oldChildNodeCount+" new "+element.nodeName+" "+"with ID "+element.getAttribute("id")+" child node count "+childNodeCount+" (verify) "+element.childNodes.length);
@@ -1126,7 +1134,7 @@ alert("child node "+i+" is of type "+childNode.nodeType+" with name "+childNode.
 				}
 				else	//if children are not compatible
 				{
-//TODO del alert("children are not compatible");
+//TODO del alert("children are not compatible, old "+oldElement.nodeName+" with ID "+oldElement.id+" child node count: "+oldChildNodeCount+" new "+element.nodeName+" "+"with ID "+element.getAttribute("id")+" child node count "+childNodeCount+" (verify) "+element.childNodes.length);
 					DOMUtilities.removeChildren(oldElement);	//remove all the children from the old element and start from scratch
 //TODO del alert("incompatible old element now has children: "+oldElement.childNodes.length);
 				}

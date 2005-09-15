@@ -3,6 +3,7 @@ package com.javaguise.model;
 import java.util.List;
 
 import com.javaguise.event.ListListener;
+import com.javaguise.validator.ValidationException;
 
 /**A model for selecting one or more values from a list.
 The model must be thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this interface.
@@ -42,26 +43,29 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>
 	Invalid and duplicate indices will be ignored.
 	This method delegates to the selection strategy.
 	@param indices The indices to select.
+	@exception ValidationException if the provided value is not valid.
 	@see #setSelectedValues(V[])
 	@see #addSelectedIndex(int)
 	*/
-	public void setSelectedIndices(final int... indices);
+	public void setSelectedIndices(final int... indices) throws ValidationException;
 
 	/**Adds a selection at the given index.
 	An invalid index will be ignored.
 	This method delegates to the selection strategy.
 	@param index The index to add as a selection.
+	@exception ValidationException if the provided value is not valid.
 	@see #setSelectedIndices(int[])
 	*/
-	public void addSelectedIndex(final int index);
+	public void addSelectedIndex(final int index) throws ValidationException;
 
 	/**Removes a selection at the given index.
 	An invalid index will be ignored.
 	This method delegates to the selection strategy.
 	@param index The index to remove as a selection.
+	@exception ValidationException if the provided value is not valid.
 	@see #setSelectedIndices(int[])
 	*/
-	public void removeSelectedIndex(final int index);
+	public void removeSelectedIndex(final int index) throws ValidationException;
 	
 	/**Adds a list listener.
 	@param listListener The list listener to add.

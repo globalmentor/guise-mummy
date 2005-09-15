@@ -46,7 +46,10 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	*/
 	public void resetValue()
 	{
-		setSelectedValues();	//select no values
+//TODO del when works		setSelectedValues();	//select no values
+		final V oldSelectedValue=getSelectedValue();	//get the old selected value
+		getSelectionStrategy().setSelectedValues(this);	//delegate to the selection strategy, selecting no values
+		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 	}
 
 	/**The list of values, all access to which will be synchronized on this.*/
@@ -351,11 +354,28 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	Invalid and duplicate indices will be ignored.
 	This method delegates to the selection strategy.
 	@param indices The indices to select.
+	@exception ValidationException if the provided value is not valid.
 	@see #setSelectedValues(V[])
 	@see #addSelectedIndex(int)
 	*/
-	public void setSelectedIndices(final int... indices)
+	public void setSelectedIndices(final int... indices) throws ValidationException
 	{
+int validIndexCount=0;	//TODO fix validation hack
+for(int i=indices.length-1; i>=0; --i)
+{
+	if(indices[i]>=0)
+	{
+		++validIndexCount;
+	}
+}
+if(validIndexCount==0)	//TODO add more thorough validation throughout; right now we only check for null not being valid; also take into consideration that some of the indices may be invalid and therefore ignored
+{
+	final Validator<V> validator=getValidator();	//get the currently installed validator, if there is one
+	if(validator!=null)	//if a validator is installed, always validate the value, even if it isn't changing, so that an initial value that may not be valid will throw an error when it's tried to be set to the same, but invalid, value
+	{
+		validator.validate(null);	//validate the new value, throwing an exception if anything is wrong
+	}
+}
 		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		getSelectionStrategy().setSelectedIndices(this, indices);	//delegate to the selection strategy
 		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
@@ -366,10 +386,19 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	Values that do not occur in the select model will be ignored.
 	This method delegates to the selection strategy.
 	@param values The values to select.
+	@exception ValidationException if the provided value is not valid.
 	@see #setSelectedIndices(int[])
 	*/
-	public void setSelectedValues(final V... values)
+	public void setSelectedValues(final V... values) throws ValidationException
 	{
+if(values.length==0)	//TODO add more thorough validation throughout; right now we only check for null not being valid
+{
+	final Validator<V> validator=getValidator();	//get the currently installed validator, if there is one
+	if(validator!=null)	//if a validator is installed, always validate the value, even if it isn't changing, so that an initial value that may not be valid will throw an error when it's tried to be set to the same, but invalid, value
+	{
+		validator.validate(null);	//validate the new value, throwing an exception if anything is wrong
+	}
+}
 		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		getSelectionStrategy().setSelectedValues(this, values);	//delegate to the selection strategy
 		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
@@ -379,9 +408,10 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	An invalid index will be ignored.
 	This method delegates to the selection strategy.
 	@param index The index to add as a selection.
+	@exception ValidationException if the provided value is not valid.
 	@see #setSelectedIndices(int[])
 	*/
-	public void addSelectedIndex(final int index)
+	public void addSelectedIndex(final int index) throws ValidationException
 	{
 		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		getSelectionStrategy().addSelectedIndex(this, index);	//delegate to the selection strategy
@@ -392,9 +422,10 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	An invalid index will be ignored.
 	This method delegates to the selection strategy.
 	@param index The index to remove as a selection.
+	@exception ValidationException if the provided value is not valid.
 	@see #setSelectedIndices(int[])
 	*/
-	public void removeSelectedIndex(final int index)
+	public void removeSelectedIndex(final int index) throws ValidationException
 	{
 		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		getSelectionStrategy().removeSelectedIndex(this, index);	//delegate to the selection strategy

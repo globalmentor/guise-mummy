@@ -7,6 +7,7 @@ import com.javaguise.component.layout.*;
 import com.javaguise.event.*;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
+import com.javaguise.validator.ValidationException;
 
 /**Edit Users Guise demonstration frame.
 Copyright © 2005 GlobalMentor, Inc.
@@ -68,7 +69,14 @@ public class EditUsersFrame extends DefaultFrame
 											{
 												Collections.sort(userListControl.getModel());	//sort the user list model (each user implements Comparable)
 											}
-											userListControl.getModel().setSelectedValues(newUser);	//select the new user
+											try
+											{
+												userListControl.getModel().setSelectedValues(newUser);	//select the new user
+											}
+											catch(final ValidationException validationException)	//we never expect a validation exception
+											{
+												throw new AssertionError(validationException);
+											}
 										}
 									}
 								});
@@ -102,7 +110,14 @@ public class EditUsersFrame extends DefaultFrame
 												{
 													Collections.sort(userListControl.getModel());	//sort the user list model (each user implements Comparable)
 												}
-												userListControl.getModel().setSelectedValues(newUser);	//select the edited user
+												try
+												{
+													userListControl.getModel().setSelectedValues(newUser);	//select the edited user
+												}
+												catch(final ValidationException validationException)	//we never expect a validation exception
+												{
+													throw new AssertionError(validationException);
+												}
 											}											
 										}
 									});

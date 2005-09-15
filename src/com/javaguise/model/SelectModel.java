@@ -2,6 +2,8 @@ package com.javaguise.model;
 
 import java.util.Collection;
 
+import com.javaguise.validator.ValidationException;
+
 /**A model for selecting one or more values from a collection.
 The model must be thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this interface.
 @param <V> The type of values contained in the model.
@@ -36,8 +38,9 @@ public interface SelectModel<V> extends ValueModel<V>, Collection<V>
 	Values that do not occur in the select model will be ignored.
 	This method delegates to the selection strategy.
 	@param values The values to select.
+	@exception ValidationException if the provided value is not valid.
 	*/
-	public void setSelectedValues(final V... values);
+	public void setSelectedValues(final V... values) throws ValidationException;
 
 	/**@return The class representing the type of value this model can hold.*/
 	public Class<V> getValueClass();
