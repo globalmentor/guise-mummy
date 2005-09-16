@@ -1,6 +1,7 @@
 package com.javaguise.component;
 
 import com.javaguise.component.layout.Layout;
+import com.javaguise.event.ContainerListener;
 
 /**Component that allows for addition and removal of child components.
 @author Garret Wilson
@@ -54,5 +55,15 @@ public interface Container<C extends Container<C>> extends Component<C>
 
 	/**@return The layout definition for the container.*/
 	public Layout<?> getLayout();
+
+	/**Adds a container listener.
+	@param containerListener The container listener to add.
+	*/
+	public void addContainerListener(final ContainerListener containerListener);
+
+	/**Removes a container listener.
+	@param containerListener The container listener to remove.
+	*/
+	public void removeContainerListener(final ContainerListener containerListener);
 
 }

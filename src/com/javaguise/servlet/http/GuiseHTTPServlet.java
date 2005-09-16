@@ -25,6 +25,7 @@ import com.javaguise.*;
 import com.javaguise.component.*;
 import com.javaguise.component.transfer.*;
 import com.javaguise.context.GuiseContext;
+import com.javaguise.context.text.xml.XMLGuiseContext;
 import com.javaguise.controller.*;
 import com.javaguise.controller.text.xml.xhtml.*;
 import com.javaguise.model.FileItemResourceImport;
@@ -459,12 +460,14 @@ Debug.info("content type:", request.getContentType());
 		}
 	}
 
+	/*TODO comment
 	//TODO del and use the static method in AbstractController
-	protected <T extends Component<?>> Component<?> getComponentByAbsoluteUniqueID(final T component, final String absoluteUniqueID)
+	*/
+	protected <T extends Component<?>> Component<?> getComponentByAbsoluteUniqueID(final GuiseContext<?> context, final T component, final String absoluteUniqueID)
 	{
 //	TODO fix use of raw types to get around ultra-restrictive JDK 1.5 compiler		final Controller<? extends GuiseContext<?>, ? super T> controller=component.getController();
 		final Controller controller=component.getController();		
-		if(controller.getAbsoluteUniqueID(component).equals(absoluteUniqueID))
+		if(controller.getAbsoluteUniqueID(context, component).equals(absoluteUniqueID))
 		{
 			return component;
 		}
@@ -472,7 +475,7 @@ Debug.info("content type:", request.getContentType());
 		{
 			for(final Component<?> childComponent:component)
 			{
-				final Component<?> selectedComponent=getComponentByAbsoluteUniqueID(childComponent, absoluteUniqueID);
+				final Component<?> selectedComponent=getComponentByAbsoluteUniqueID(context, childComponent, absoluteUniqueID);
 				if(selectedComponent!=null)
 				{
 					return selectedComponent;
@@ -531,9 +534,9 @@ Debug.info("content type:", request.getContentType());
 						final XHTMLFrameController frameController=(XHTMLFrameController)navigationFrame.getController();	//get the frame's controller, assuming it's of the required type TODO later improve the entire action hidden control framework
 
 						
-						if(parameterName.equals(frameController.getAbsoluteUniqueActionInputID(navigationFrame)) && parameterListMapEntry.getValue().size()>0)	//if this parameter is for an action
+						if(parameterName.equals(frameController.getAbsoluteUniqueActionInputID(guiseContext, navigationFrame)) && parameterListMapEntry.getValue().size()>0)	//if this parameter is for an action
 						{
-							final Component<?> actionComponent=getComponentByAbsoluteUniqueID(navigationFrame, parameterListMapEntry.getValue().get(0).toString());	//get an action component
+							final Component<?> actionComponent=getComponentByAbsoluteUniqueID(guiseContext, navigationFrame, parameterListMapEntry.getValue().get(0).toString());	//get an action component
 							if(actionComponent!=null)	//if we found an action component
 							{
 								requestedComponents.add(actionComponent);	//add it to the list of requested components
@@ -543,14 +546,14 @@ Debug.info("content type:", request.getContentType());
 						{
 							//TODO don't re-update nested components (less important for controls, which don't have nested components) 
 			//TODO del Debug.trace("looking for component with name", parameterName);
-							getControlsByName(navigationFrame, parameterName, requestedComponents);	//get all components identified by this name
+							getControlsByName(guiseContext, navigationFrame, parameterName, requestedComponents);	//get all components identified by this name
 						}
 					}
 				}
 				else if(controlEvent instanceof DropEvent)	//if this is a drag and drop drop event
 				{
 					final DropEvent dropEvent=(DropEvent)controlEvent;	//get the drop event
-					final Component<?> dropTarget=getComponentByAbsoluteUniqueID(navigationFrame, dropEvent.getDropTargetID());	//get the drop target component
+					final Component<?> dropTarget=getComponentByAbsoluteUniqueID(guiseContext, navigationFrame, dropEvent.getDropTargetID());	//get the drop target component
 					if(dropTarget!=null)	//if there is a drop target
 					{
 						requestedComponents.add(dropTarget);	//add the drop target to the set of requested components
@@ -613,13 +616,39 @@ Debug.info("content type:", request.getContentType());
 						{
 							affectedComponents.addAll(AbstractModelComponent.getModelComponents(navigationFrame, (Model)source));	//get all components that use this model
 						}
+						else if(source instanceof Component)	//if this was a component
+						{
+							affectedComponents.add((Component<?>)source);	//add this component to the list of affected components
+						}
 						else if(source instanceof GuiseSession)	//if the session caused the event TODO maybe check to see if a property changed
 						{
 							affectedComponents.add(navigationFrame);	//if the session changed a property (such as its locale, its orientation or its principal), the whole frame has been affected
 						}
 							//TODO check for hierarchical relations, to prevent duplication
 					}
-	//			TODO del Debug.trace("we now have affected components:", affectedComponents.size());
+						//check for containment so that only top-most affected components are included
+					final Iterator<Component<?>> affectedComponentIterator=affectedComponents.iterator();	//get an iterator to look at all affected components
+					while(affectedComponentIterator.hasNext())	//while there are more affected components
+					{
+						final Component<?> affectedComponent=affectedComponentIterator.next();	//get the next affected component
+						Component<?> parent=affectedComponent.getParent();	//get the component's parent
+						while(parent!=null)	//while there is a parent
+						{
+							if(affectedComponents.contains(parent))	//if this parent is also an affected component
+							{
+								affectedComponentIterator.remove();	//remove this component from the set; there's no need to update the component twice
+								break;	//we've thrown out this component, so go to the next component
+							}
+							parent=parent.getParent();	//check the parent's parent
+						}
+					}
+/*TODO del
+Debug.trace("we now have affected components:", affectedComponents.size());
+for(final Component<?> affectedComponent:affectedComponents)
+{
+	Debug.trace("affected component:", affectedComponent);
+}
+*/
 					guiseContext.setState(GuiseContext.State.QUERY_MODEL);	//update the context state for querying the model
 					for(final Component<?> affectedComponent:affectedComponents)	//for each component affected by this update cycle
 					{
@@ -680,7 +709,10 @@ Debug.info("content type:", request.getContentType());
 		}
 	}
 	
-	protected <T extends Component<?>> void getControlsByName(final T component, final String name, final Set<Component<?>> componentSet)
+	/*TODO comment
+	@param context Guise context information.
+	*/
+	protected <T extends Component<?>> void getControlsByName(final GuiseContext<?> context, final T component, final String name, final Set<Component<?>> componentSet)
 	{
 			//TODO check first that the component is a control; that should be much faster
 		final Controller<? extends GuiseContext<?>, ?> controller=component.getController();
@@ -688,7 +720,7 @@ Debug.info("content type:", request.getContentType());
 		{
 			final XHTMLControlController xhtmlControlController=(XHTMLControlController)controller;
 //TODO del Debug.trace("checking control with ID", xhtmlControlController.getAbsoluteUniqueID(component), "and name", xhtmlControlController.getComponentName((Control)component));
-			if(name.equals(xhtmlControlController.getComponentName((Control)component)))	//TODO comment: the returned name can be null
+			if(name.equals(xhtmlControlController.getComponentName((XMLGuiseContext)context, (Control)component)))	//TODO comment: the returned name can be null
 			{
 //TODO del Debug.trace("using this component");
 				componentSet.add(component);
@@ -697,7 +729,7 @@ Debug.info("content type:", request.getContentType());
 		else if(controller instanceof XHTMLTabbedPanelController)	//TODO fix hack; make XHTMLTabbedPanelController descend from XHTMLControlController
 		{
 			final XHTMLTabbedPanelController tabbedPanelController=(XHTMLTabbedPanelController)controller;
-			if(name.equals(tabbedPanelController.getAbsoluteUniqueID(component)))	//TODO fix hack
+			if(name.equals(tabbedPanelController.getAbsoluteUniqueID(context, component)))	//TODO fix hack
 			{
 //TODO del Debug.trace("using this component");
 				componentSet.add(component);
@@ -706,7 +738,7 @@ Debug.info("content type:", request.getContentType());
 		}
 		for(final Component<?> childComponent:component)
 		{
-			getControlsByName(childComponent, name, componentSet);
+			getControlsByName(context, childComponent, name, componentSet);
 		}
 	}
 

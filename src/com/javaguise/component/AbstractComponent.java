@@ -653,12 +653,12 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 		controller.updateView(context, getThis());	//tell the controller to update the view
 	}
 
-	/**Determines the controller of this. If no controller is installed, one is created and installed.
+	/**Determines the controller of this component. If no controller is installed, one is created and installed.
 	@param context Guise context information.
 	@exception NullPointerException if there is no controller installed and no appropriate controller registered with the Guise context.
 	*/
 	@SuppressWarnings("unchecked")	//because of erasure, we must assume that any controller instantiated from a class object is of the correct generic type
-	protected <GC extends GuiseContext<?>> Controller<? super GC, ? super C> getController(final GC context)
+	public <GC extends GuiseContext<?>> Controller<? super GC, ? super C> getController(final GC context)	//TODO make this protected again, if we can, if we reorganize the controller.getAbsoluteID framework
 	{
 		Controller<? super GC, ? super C> controller=(Controller<? super GC, ? super C>)getController();	//get the installed controller
 		if(controller==null)	//if no controller is installed
@@ -674,5 +674,17 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 			}
 		}
 		return controller;	//return the controller we found
+	}
+
+	/**@return A string representation of this component.*/
+	public String toString()
+	{
+		final StringBuilder stringBuilder=new StringBuilder(super.toString());	//create a string builder for constructing the string
+		final String id=getID();	//get the component's ID
+		if(id!=null)	//if this component has an ID
+		{
+			stringBuilder.append(' ').append('[').append(id).append(']');	//append the ID
+		}
+		return stringBuilder.toString();	//return the string builder
 	}
 }

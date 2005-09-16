@@ -5,6 +5,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.garretwilson.util.ReverseIterator;
 import com.javaguise.component.layout.*;
+import com.javaguise.event.ContainerEvent;
+import com.javaguise.event.ContainerListener;
+import com.javaguise.event.ListEvent;
+import com.javaguise.event.ListListener;
+import com.javaguise.event.PostponedContainerEvent;
+import com.javaguise.event.PostponedListEvent;
+import com.javaguise.model.ListSelectModel;
 import com.javaguise.session.GuiseSession;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
@@ -93,6 +100,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		componentList.add(component);	//add the component to the list
 		component.setParent(this);	//tell the component who its parent is
 		layout.setConstraints(component, layoutConstraints);	//tell the layout the constraints
+		fireContainerModified(componentList.indexOf(component), component, null);	//indicate the component was added at the index
 	}
 
 	/**Removes a component from the container.
@@ -105,9 +113,11 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		{
 			throw new IllegalArgumentException("Component "+component+" is not member of container "+this+".");
 		}
+		final int index=componentList.indexOf(component);	//get the index of the component TODO do we want to see if the component is actually in the container?
 		getLayout().removeConstraints(component);	//remove the constraints for this component
 		componentList.remove(component);	//remove the component to the list
 		component.setParent(null);	//tell the component it no longer has a parent
+		fireContainerModified(index, null, component);	//indicate the component was removed from the index
 	}
 
 	/**The layout definition for the container.*/
@@ -158,6 +168,35 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		super(session, id);	//construct the parent class
 		this.layout=checkNull(layout, "Layout cannot be null.");	//save the layout
 		layout.setContainer(this);	//tell the layout which container owns it
+	}
+
+	/**Adds a container listener.
+	@param containerListener The container listener to add.
+	*/
+	public void addContainerListener(final ContainerListener containerListener)
+	{
+		getEventListenerManager().add(ContainerListener.class, containerListener);	//add the listener
+	}
+
+	/**Removes a container listener.
+	@param containerListener The container listener to remove.
+	*/
+	public void removeContainerListener(final ContainerListener containerListener)
+	{
+		getEventListenerManager().remove(ContainerListener.class, containerListener);	//remove the listener
+	}
+
+	/**Fires an event to all registered container listeners indicating the components in the container changed.
+	@param index The index at which a component was added and/or removed, or -1 if the index is unknown.
+	@param addedComponent The component that was added to the container, or <code>null</code> if no component was added or it is unknown whether or which components were added.
+	@param removedComponent The component that was removed from the container, or <code>null</code> if no component was removed or it is unknown whether or which components were removed.
+	@see ContainerListener
+	@see ContainerEvent
+	*/
+	protected void fireContainerModified(final int index, final Component<?> addedComponent, final Component<?> removedComponent)
+	{
+		final ContainerEvent containerEvent=new ContainerEvent(getSession(), getThis(), index, addedComponent, removedComponent);	//create a new event
+		getSession().queueModelEvent(new PostponedContainerEvent(getEventListenerManager(), containerEvent));	//tell the Guise session to queue the event
 	}
 
 }

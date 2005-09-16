@@ -50,6 +50,12 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	/**@return The model used by this component.*/
 	public Controller<? extends GuiseContext<?>, ? super C> getController();
 
+	/**Determines the controller of this component. If no controller is installed, one is created and installed.
+	@param context Guise context information.
+	@exception NullPointerException if there is no controller installed and no appropriate controller registered with the Guise context.
+	*/
+	public <GC extends GuiseContext<?>> Controller<? super GC, ? super C> getController(final GC context);
+
 	/**Sets the controller used by this component.
 	This is a bound property.
 	@param newController The new controller to use.
