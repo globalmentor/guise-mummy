@@ -927,6 +927,20 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		getApplication().removePropertyChangeListener(GuiseApplication.RESOURCE_BUNDLE_BASE_NAME_PROPERTY, resourceBundleReleasePropertyValueChangeListener);	//stop listening for the application to change its resource bundle base name				
 	}
 
+	/**The variable used to generate unique component IDs.*/
+	private long componentIDCounter=0;
+
+		/**@return A new component ID appropriate for using with a new component.*/
+		public String generateComponentID()
+		{
+			final long counter;
+			synchronized(this)	//don't allow other threads to modify the counter while we're modifying it
+			{
+				counter=++componentIDCounter;	//increment the component ID counter and retrieve the resulting value
+			}
+			return "id"+Long.toHexString(counter);	//create an ID from the counter
+		}	
+
 	/**Reports that a bound property has changed. This method can be called	when a bound property has changed and it will send the appropriate property change event to any registered property change listeners.
 	This version fires a property change event even if no listeners are attached, so that the Guise session can be notified of the event.
 	No event is fired if old and new are both <code>null</code> or are both non-<code>null</code> and equal according to the {@link Object#equals(java.lang.Object)} method.
@@ -956,7 +970,6 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 	{
 		queueModelEvent(createPostponedPropertyChangeEvent(propertyChangeEvent));	//create and queue a postponed property change event
 	}
-
 
 	/**The class that listens for context state changes and updates the context state set in response.
 	@author Garret Wilson

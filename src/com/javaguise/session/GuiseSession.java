@@ -304,4 +304,7 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	*/
 	public <R> void navigateModal(final URI uri, final ModalListener<R> modalListener);
 
+	/**@return A new component ID appropriate for using with a new component.*/
+	public String generateComponentID();
+
 }

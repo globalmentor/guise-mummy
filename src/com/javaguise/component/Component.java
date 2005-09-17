@@ -41,6 +41,9 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	/**The bound property of whether the component is visible.*/
 	public final static String VISIBLE_PROPERTY=getPropertyName(Component.class, "visible");
 
+	/**The character used to combine hierarchical IDs.*/
+	public final static char ID_SEGMENT_DELIMITER='.';
+
 	/**@return Whether this component has children.*/
 	public boolean hasChildren();
 
@@ -89,6 +92,14 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 
 	/**@return The component identifier.*/
 	public String getID();
+
+	/**Generates an ID by combining this component's ID and the the given ID segment.
+	@param idSegment The ID segment, which must itself be a valid ID, to include in the full ID.
+	@return An ID appropriate for a child component of this component.
+	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@see Component#ID_SEGMENT_DELIMITER
+	*/
+	public String generateID(final String idSegment);
 
 	/**Returns this component's requested orientation.
 	To resolve the orientation up the hierarchy, {@link #getComponentOrientation()} should be used.

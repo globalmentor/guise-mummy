@@ -105,6 +105,18 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 		/**@return The component identifier.*/
 		public String getID() {return id;}
 
+		/**Generates an ID by combining this component's ID and the the given ID segment.
+		This implementation combines this component's ID with the ID segment using '.' as a delimiter.
+		@param idSegment The ID segment, which must itself be a valid ID, to include in the full ID.
+		@return An ID appropriate for a child component of this component.
+		@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+		@see Component#ID_SEGMENT_DELIMITER
+		*/
+		public String generateID(final String idSegment)
+		{
+			return getID()+ID_SEGMENT_DELIMITER+checkValidComponentID(idSegment);	//make sure the ID segment is a valid ID and combine it with this component's ID
+		}
+		
 	/**The internationalization orientation of the component's contents, or <code>null</code> if the default orientation should be used.*/
 	private Orientation orientation=null;
 
@@ -520,7 +532,8 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 		}
 		else	//if an ID was not provided
 		{
-			this.id=getVariableName(getClass());	//create an ID by transforming the simple class name to a variable name
+			this.id=getSession().generateComponentID();	//ask the session to generate a new ID
+//TODO del when works			this.id=getVariableName(getClass());	//create an ID by transforming the simple class name to a variable name
 		}
 	}
 

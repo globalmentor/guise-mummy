@@ -263,12 +263,12 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	public <GC extends GuiseContext<?>, C extends Component<?>> Controller<? super GC, ? super C> getController(final GC context, final C component)
 	{
 		Class<? extends Component> componentClass=component.getClass();	//get the component class
-		final Class<? extends Controller> renderStrategyClass=getControllerClass(componentClass);	//walk the hierarchy to see if there is a render strategy class registered for this component type
-		if(renderStrategyClass!=null)	//if we found a render strategy class
+		final Class<? extends Controller> controllerClass=getControllerClass(componentClass);	//walk the hierarchy to see if there is a controller class registered for this component type
+		if(controllerClass!=null)	//if we found a render strategy class
 		{
 			try
 			{
-				return (Controller<? super GC, ? super C>)renderStrategyClass.newInstance();	//return a new instance of the class
+				return (Controller<? super GC, ? super C>)controllerClass.newInstance();	//return a new instance of the class
 			}
 			catch (InstantiationException e)
 			{
