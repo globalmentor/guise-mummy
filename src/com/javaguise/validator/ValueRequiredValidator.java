@@ -12,7 +12,7 @@ public class ValueRequiredValidator<V> extends AbstractValidator<V>
 	@param session The Guise session that owns this validator.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public ValueRequiredValidator(final GuiseSession<?> session)
+	public ValueRequiredValidator(final GuiseSession session)
 	{
 		super(session, true);	//construct the parent class, indicating that values are required
 	}

@@ -15,10 +15,10 @@ public abstract class AbstractValidator<V> implements Validator<V>
 {
 
 	/**The Guise session that owns this validator.*/
-	private final GuiseSession<?> session;
+	private final GuiseSession session;
 
 		/**@return The Guise session that owns this validator.*/
-		public GuiseSession<?> getSession() {return session;}
+		public GuiseSession getSession() {return session;}
 
 	/**Whether the value must be non-<code>null</code> in order to be considered valid.*/
 	private boolean valueRequired; 
@@ -30,7 +30,7 @@ public abstract class AbstractValidator<V> implements Validator<V>
 	@param session The Guise session that owns this validator.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public AbstractValidator(final GuiseSession<?> session)
+	public AbstractValidator(final GuiseSession session)
 	{
 		this(session, false);	//construct the class and don't required non-null values
 	}
@@ -40,7 +40,7 @@ public abstract class AbstractValidator<V> implements Validator<V>
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public AbstractValidator(final GuiseSession<?> session, final boolean valueRequired)
+	public AbstractValidator(final GuiseSession session, final boolean valueRequired)
 	{
 		this.session=checkNull(session, "Session cannot be null");	//save the session
 		this.valueRequired=valueRequired;	//save the value required specification

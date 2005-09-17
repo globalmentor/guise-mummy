@@ -143,7 +143,7 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 	@param valueClass The class indicating the type of value held in the model.
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	*/
-	public DefaultTreeNodeModel(final GuiseSession<?> session, final Class<V> valueClass)
+	public DefaultTreeNodeModel(final GuiseSession session, final Class<V> valueClass)
 	{
 		this(session, valueClass, null);	//construct the class with a null initial value
 	}
@@ -154,7 +154,7 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 	@param initialValue The initial value, which will not be validated.
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	*/
-	public DefaultTreeNodeModel(final GuiseSession<?> session, final Class<V> valueClass, final V initialValue)
+	public DefaultTreeNodeModel(final GuiseSession session, final Class<V> valueClass, final V initialValue)
 	{
 		super(session, valueClass, initialValue);	//construct the parent class
 		setEditable(false);	//default to not being editable

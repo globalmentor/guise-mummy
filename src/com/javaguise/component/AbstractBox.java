@@ -13,7 +13,7 @@ public abstract class AbstractBox<C extends Box<C>> extends AbstractContainer<C>
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public AbstractBox(final GuiseSession<?> session)
+	public AbstractBox(final GuiseSession session)
 	{
 		this(session, (String)null);	//construct the component, indicating that a default ID should be used
 	}
@@ -24,7 +24,7 @@ public abstract class AbstractBox<C extends Box<C>> extends AbstractContainer<C>
 	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractBox(final GuiseSession<?> session, final String id)
+	public AbstractBox(final GuiseSession session, final String id)
 	{
 		this(session, id, new FlowLayout(session, Orientation.Flow.PAGE));	//default to flowing vertically
 	}
@@ -34,7 +34,7 @@ public abstract class AbstractBox<C extends Box<C>> extends AbstractContainer<C>
 	@param layout The layout definition for the container.
 	@exception NullPointerException if the given session and/or layout is <code>null</code>.
 	*/
-	public AbstractBox(final GuiseSession<?> session, final Layout layout)
+	public AbstractBox(final GuiseSession session, final Layout layout)
 	{
 		this(session, null, layout);	//construct the component with the layout, indicating that a default ID should be used
 	}
@@ -46,7 +46,7 @@ public abstract class AbstractBox<C extends Box<C>> extends AbstractContainer<C>
 	@exception NullPointerException if the given session and/or layout is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractBox(final GuiseSession<?> session, final String id, final Layout layout)
+	public AbstractBox(final GuiseSession session, final String id, final Layout layout)
 	{
 		super(session, id, layout);	//construct the parent class
 	}

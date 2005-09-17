@@ -26,7 +26,7 @@ public class RestrictedFrame extends DefaultFrame
 	/**Guise session constructor.
 	@param session The Guise session that owns this frame.
 	*/
-	public RestrictedFrame(final GuiseSession<?> session)
+	public RestrictedFrame(final GuiseSession session)
 	{
 		super(session);	//construct the parent class, defaulting to a region layout
 		getModel().setLabel("Guise\u2122 Demonstration: Restricted");	//set the frame title

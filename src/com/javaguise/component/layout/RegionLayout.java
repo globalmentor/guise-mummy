@@ -32,7 +32,7 @@ public class RegionLayout extends AbstractLayout<RegionLayout.Constraints>
 	@param session The Guise session that owns this layout.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public RegionLayout(final GuiseSession<?> session)
+	public RegionLayout(final GuiseSession session)
 	{
 		super(session);	//construct the parent class
 	}

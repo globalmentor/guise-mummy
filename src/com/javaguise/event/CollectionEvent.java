@@ -29,7 +29,7 @@ public class CollectionEvent<S, E> extends GuiseEvent<S>
 	@param source The object on which the event initially occurred.
 	@exception NullPointerException if the given session and/or source is <code>null</code>.
 	*/
-	public CollectionEvent(final GuiseSession<?> session, final S source)
+	public CollectionEvent(final GuiseSession session, final S source)
 	{
 		this(session, source, null, null);	//construct the class with no known modification values
 	}
@@ -41,7 +41,7 @@ public class CollectionEvent<S, E> extends GuiseEvent<S>
 	@param removedElement The element that was removed from the collection, or <code>null</code> if no element was removed or it is unknown whether or which elements were removed.
 	@exception NullPointerException if the given session and/or source is <code>null</code>.
 	*/
-	public CollectionEvent(final GuiseSession<?> session, final S source, final E addedElement, final E removedElement)
+	public CollectionEvent(final GuiseSession session, final S source, final E addedElement, final E removedElement)
 	{
 		super(session, source);	//construct the parent class
 		this.addedElement=addedElement;

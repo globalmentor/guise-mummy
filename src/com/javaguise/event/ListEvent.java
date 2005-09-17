@@ -23,7 +23,7 @@ public class ListEvent<S, E> extends CollectionEvent<S, E>
 	@param source The object on which the event initially occurred.
 	@exception NullPointerException if the given session and/or source is <code>null</code>.
 	*/
-	public ListEvent(final GuiseSession<?> session, final S source)
+	public ListEvent(final GuiseSession session, final S source)
 	{
 		this(session, source, -1, null, null);	//construct the class with no known modification values
 	}
@@ -36,7 +36,7 @@ public class ListEvent<S, E> extends CollectionEvent<S, E>
 	@param removedElement The element that was removed from the list, or <code>null</code> if no element was removed or it is unknown whether or which elements were removed.
 	@exception NullPointerException if the given session and/or source is <code>null</code>.
 	*/
-	public ListEvent(final GuiseSession<?> session, final S source, final int index, final E addedElement, final E removedElement)
+	public ListEvent(final GuiseSession session, final S source, final int index, final E addedElement, final E removedElement)
 	{
 		super(session, source, addedElement, removedElement);	//construct the parent class
 		this.index=index;	//save the index

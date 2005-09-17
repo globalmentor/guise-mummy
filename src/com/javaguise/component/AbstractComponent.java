@@ -51,23 +51,24 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 	/**@return An iterator to contained components in reverse order.*/
 	public Iterator<Component<?>> reverseIterator() {return new EmptyIterator<Component<?>>();}
 
-	/**The controller installed in this component, or <code>null</code> if no controller is installed.*/
-	private Controller<? extends GuiseContext<?>, ? super C> controller=null;
+	/**The controller installed in this component.*/
+	private Controller<? extends GuiseContext, ? super C> controller;
 
-		/**@return The model used by this component.*/
-		public Controller<? extends GuiseContext<?>, ? super C> getController() {return controller;}
+		/**@return The controller installed in this component.*/
+		public Controller<? extends GuiseContext, ? super C> getController() {return controller;}
 
 		/**Sets the controller used by this component.
 		This is a bound property.
 		@param newController The new controller to use.
 		@see Component#CONTROLLER_PROPERTY
+		@exception NullPointerException if the given controller is <code>null</code>.
 		*/
-		public void setController(final Controller<? extends GuiseContext<?>, ? super C> newController)
+		public void setController(final Controller<? extends GuiseContext, ? super C> newController)
 		{
 			if(newController!=controller)	//if the value is really changing
 			{
-				final Controller<? extends GuiseContext<?>, ? super C> oldController=controller;	//get a reference to the old value
-				controller=newController;	//actually change values
+				final Controller<? extends GuiseContext, ? super C> oldController=controller;	//get a reference to the old value
+				controller=checkNull(newController);	//actually change values
 				firePropertyChange(CONTROLLER_PROPERTY, oldController, newController);	//indicate that the value changed				
 			}
 		}
@@ -105,14 +106,14 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 		/**@return The component identifier.*/
 		public String getID() {return id;}
 
-		/**Generates an ID by combining this component's ID and the the given ID segment.
+		/**Creates an ID by combining this component's ID and the the given ID segment.
 		This implementation combines this component's ID with the ID segment using '.' as a delimiter.
 		@param idSegment The ID segment, which must itself be a valid ID, to include in the full ID.
 		@return An ID appropriate for a child component of this component.
 		@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 		@see Component#ID_SEGMENT_DELIMITER
 		*/
-		public String generateID(final String idSegment)
+		public String createID(final String idSegment)
 		{
 			return getID()+ID_SEGMENT_DELIMITER+checkValidComponentID(idSegment);	//make sure the ID segment is a valid ID and combine it with this component's ID
 		}
@@ -511,8 +512,9 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 	/**Session constructor.
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session is <code>null</code>.
+	@exception IllegalStateException if no controller is registered for this component type.
 	*/
-	public AbstractComponent(final GuiseSession<?> session)
+	public AbstractComponent(final GuiseSession session)
 	{
 		this(session, null);	//construct the component, indicating that a default ID should be used
 	}
@@ -522,8 +524,9 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception IllegalStateException if no controller is registered for this component type.
 	*/
-	public AbstractComponent(final GuiseSession<?> session, final String id)
+	public AbstractComponent(final GuiseSession session, final String id)
 	{
 		super(session);	//construct the parent class
 		if(id!=null)	//if an ID was provided
@@ -534,6 +537,11 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 		{
 			this.id=getSession().generateComponentID();	//ask the session to generate a new ID
 //TODO del when works			this.id=getVariableName(getClass());	//create an ID by transforming the simple class name to a variable name
+		}
+		controller=session.getApplication().getController(getThis());	//ask the application for a controller
+		if(controller==null)	//if we couldn't find a controller
+		{
+			throw new IllegalStateException("No registered controller for "+getClass().getName());	//TODO use a better error
 		}
 	}
 
@@ -573,9 +581,9 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 	@see GuiseContext.State#QUERY_VIEW
 	@see #getController(GC, C)
 	*/
-	public <GC extends GuiseContext<?>> void queryView(final GC context) throws IOException
+	public <GC extends GuiseContext> void queryView(final GC context) throws IOException
 	{
-		final Controller<? super GC, ? super C> controller=getController(context);	//get the controller
+		final Controller<? super GC, ? super C> controller=(Controller<? super GC, ? super C>)getController();	//get the controller
 		controller.queryView(context, getThis());	//tell the controller to query the view
 	}
 
@@ -588,9 +596,9 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 	@see #getController(GC, C)
 	@see GuiseContext.State#DECODE_VIEW
 	*/
-	public <GC extends GuiseContext<?>> void decodeView(final GC context) throws IOException, ValidationsException
+	public <GC extends GuiseContext> void decodeView(final GC context) throws IOException, ValidationsException
 	{
-		final Controller<? super GC, ? super C> controller=getController(context);	//get the controller
+		final Controller<? super GC, ? super C> controller=(Controller<? super GC, ? super C>)getController();	//get the controller
 		controller.decodeView(context, getThis());	//tell the controller to decode the view
 	}
 
@@ -603,9 +611,9 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 	@see #getController(GC, C)
 	@see GuiseContext.State#VALIDATE_VIEW
 	*/
-	public <GC extends GuiseContext<?>> void validateView(final GC context) throws IOException, ValidationsException
+	public <GC extends GuiseContext> void validateView(final GC context) throws IOException, ValidationsException
 	{
-		final Controller<? super GC, ? super C> controller=getController(context);	//get the controller
+		final Controller<? super GC, ? super C> controller=(Controller<? super GC, ? super C>)getController();	//get the controller
 		controller.validateView(context, getThis());	//tell the controller to update the view
 	}
 
@@ -618,9 +626,9 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 	@see #getController(GC, C)
 	@see GuiseContext.State#UPDATE_MODEL
 	*/
-	public <GC extends GuiseContext<?>> void updateModel(final GC context) throws IOException, ValidationsException
+	public <GC extends GuiseContext> void updateModel(final GC context) throws IOException, ValidationsException
 	{
-		final Controller<? super GC, ? super C> controller=getController(context);	//get the controller
+		final Controller<? super GC, ? super C> controller=(Controller<? super GC, ? super C>)getController();	//get the controller
 		controller.updateModel(context, getThis());	//tell the controller to update the model
 	}
 
@@ -632,9 +640,9 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 	@see #getController(GC, C)
 	@see GuiseContext.State#QUERY_MODEL
 	*/
-	public <GC extends GuiseContext<?>> void queryModel(final GC context) throws IOException
+	public <GC extends GuiseContext> void queryModel(final GC context) throws IOException
 	{
-		final Controller<? super GC, ? super C> controller=getController(context);	//get the controller
+		final Controller<? super GC, ? super C> controller=(Controller<? super GC, ? super C>)getController();	//get the controller
 		controller.queryModel(context, getThis());	//tell the controller to query the model
 	}
 
@@ -646,9 +654,9 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 	@see #getController(GC, C)
 	@see GuiseContext.State#ENCODE_MODEL
 	*/
-	public <GC extends GuiseContext<?>> void encodeModel(final GC context) throws IOException
+	public <GC extends GuiseContext> void encodeModel(final GC context) throws IOException
 	{
-		final Controller<? super GC, ? super C> controller=getController(context);	//get the controller
+		final Controller<? super GC, ? super C> controller=(Controller<? super GC, ? super C>)getController();	//get the controller
 		controller.encodeModel(context, getThis());	//tell the controller to encode the model
 	}
 
@@ -660,9 +668,9 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 	@see #getController(GC, C)
 	@see GuiseContext.State#UPDATE_VIEW
 	*/
-	public <GC extends GuiseContext<?>> void updateView(final GC context) throws IOException
+	public <GC extends GuiseContext> void updateView(final GC context) throws IOException
 	{
-		final Controller<? super GC, ? super C> controller=getController(context);	//get the controller
+		final Controller<? super GC, ? super C> controller=(Controller<? super GC, ? super C>)getController();	//get the controller
 		controller.updateView(context, getThis());	//tell the controller to update the view
 	}
 
@@ -670,8 +678,9 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 	@param context Guise context information.
 	@exception NullPointerException if there is no controller installed and no appropriate controller registered with the Guise context.
 	*/
+/*TODO del when works
 	@SuppressWarnings("unchecked")	//because of erasure, we must assume that any controller instantiated from a class object is of the correct generic type
-	public <GC extends GuiseContext<?>> Controller<? super GC, ? super C> getController(final GC context)	//TODO make this protected again, if we can, if we reorganize the controller.getAbsoluteID framework
+	public <GC extends GuiseContext> Controller<? super GC, ? super C> getController(final GC context)	//TODO make this protected again, if we can, if we reorganize the controller.getAbsoluteID framework
 	{
 		Controller<? super GC, ? super C> controller=(Controller<? super GC, ? super C>)getController();	//get the installed controller
 		if(controller==null)	//if no controller is installed
@@ -679,7 +688,7 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 			controller=context.getSession().getApplication().getController(context, getThis());	//ask the application for a controller
 			if(controller!=null)	//if we found a controller
 			{
-				setController((Controller<? extends GuiseContext<?>, ? super C>)controller);	//install the new controller
+				setController((Controller<? extends GuiseContext, ? super C>)controller);	//install the new controller
 			}
 			else	//if we don't have a controller
 			{
@@ -688,6 +697,26 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 		}
 		return controller;	//return the controller we found
 	}
+*/
+/*TODO del when works
+	public Controller<? extends GuiseContext, ? super C> getController(final GuiseContext context)	//TODO make this protected again, if we can, if we reorganize the controller.getAbsoluteID framework
+	{
+		Controller<? extends GuiseContext, ? super C> controller=getController();	//get the installed controller
+		if(controller==null)	//if no controller is installed
+		{
+			controller=context.getSession().getApplication().getController(getThis());	//ask the application for a controller
+			if(controller!=null)	//if we found a controller
+			{
+				setController((Controller<? extends GuiseContext, ? super C>)controller);	//install the new controller
+			}
+			else	//if we don't have a controller
+			{
+				throw new NullPointerException("No registered controller for "+getClass().getName());	//TODO use a better error
+			}
+		}
+		return controller;	//return the controller we found
+	}
+*/
 
 	/**@return A string representation of this component.*/
 	public String toString()

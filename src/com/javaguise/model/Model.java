@@ -33,7 +33,7 @@ public interface Model extends PropertyBindable
 	public final static ContentType XHTML_CONTENT_TYPE=XHTMLConstants.XHTML_CONTENT_TYPE;
 
 	/**@return The Guise session that owns this model.*/
-	public GuiseSession<?> getSession();
+	public GuiseSession getSession();
 
 	/**@return Whether the contents of this model are valid.*/
 	public boolean isValid();

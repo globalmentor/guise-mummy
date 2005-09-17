@@ -29,7 +29,7 @@ public class TemperatureConversionFrame extends DefaultFrame
 	/**Guise session constructor.
 	@param session The Guise session that owns this frame.
 	*/
-	public TemperatureConversionFrame(final GuiseSession<?> session)
+	public TemperatureConversionFrame(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Orientation.Flow.LINE));	//construct the parent class flowing horizontally
 		getModel().setLabel("Guise\u2122 Demonstration: Temperature Conversion");	//set the frame title	

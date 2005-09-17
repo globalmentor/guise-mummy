@@ -22,7 +22,7 @@ public abstract class AbstractRegularExpressionValidator<V> extends AbstractVali
 	@param regularExpression The regular expression against which to validate string values.
 	@exception NullPointerException if the given session and/or regular expression is <code>null</code>.
 	*/
-	public AbstractRegularExpressionValidator(final GuiseSession<?> session, final String regularExpression)
+	public AbstractRegularExpressionValidator(final GuiseSession session, final String regularExpression)
 	{
 		this(session, regularExpression, false);	//construct the class without requiring a value
 	}
@@ -33,7 +33,7 @@ public abstract class AbstractRegularExpressionValidator<V> extends AbstractVali
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
 	@exception NullPointerException if the given session and/or regular expression is <code>null</code>.
 	*/
-	public AbstractRegularExpressionValidator(final GuiseSession<?> session, final String regularExpression, final boolean valueRequired)
+	public AbstractRegularExpressionValidator(final GuiseSession session, final String regularExpression, final boolean valueRequired)
 	{
 		this(session, Pattern.compile(checkNull(regularExpression, "Regular expression cannot be null.")), valueRequired);	//compile the regular expression into a pattern and construct the class
 	}
@@ -43,7 +43,7 @@ public abstract class AbstractRegularExpressionValidator<V> extends AbstractVali
 	@param pattern The regular expression pattern against which to validate string values.
 	@exception NullPointerException if the given session and/or regular expression is <code>null</code>.
 	*/
-	public AbstractRegularExpressionValidator(final GuiseSession<?> session, final Pattern pattern)
+	public AbstractRegularExpressionValidator(final GuiseSession session, final Pattern pattern)
 	{
 		this(session, pattern, false);	//construct the class without requiring a value
 	}
@@ -54,7 +54,7 @@ public abstract class AbstractRegularExpressionValidator<V> extends AbstractVali
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
 	@exception NullPointerException if the given session and/or regular expression is <code>null</code>.
 	*/
-	public AbstractRegularExpressionValidator(final GuiseSession<?> session, final Pattern pattern, final boolean valueRequired)
+	public AbstractRegularExpressionValidator(final GuiseSession session, final Pattern pattern, final boolean valueRequired)
 	{
 		super(session, valueRequired);	//construct the parent class
 		this.pattern=checkNull(pattern, "Regular expression pattern cannot be null.");	//save the pattern

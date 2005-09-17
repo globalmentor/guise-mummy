@@ -50,7 +50,7 @@ public class CheckControl extends AbstractValueControl<Boolean, CheckControl>
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public CheckControl(final GuiseSession<?> session)
+	public CheckControl(final GuiseSession session)
 	{
 		this(session, (String)null);	//construct the component, indicating that a default ID should be used
 	}
@@ -60,7 +60,7 @@ public class CheckControl extends AbstractValueControl<Boolean, CheckControl>
 	@param checkType The type of check area presented to the user.
 	@exception NullPointerException if the given session and/or check type is <code>null</code>.
 	*/
-	public CheckControl(final GuiseSession<?> session, final CheckType checkType)
+	public CheckControl(final GuiseSession session, final CheckType checkType)
 	{
 		this(session, null, checkType);	//construct the component, indicating that a default ID should be used
 	}
@@ -71,7 +71,7 @@ public class CheckControl extends AbstractValueControl<Boolean, CheckControl>
 	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public CheckControl(final GuiseSession<?> session, final String id)
+	public CheckControl(final GuiseSession session, final String id)
 	{
 		this(session, id, new DefaultValueModel<Boolean>(session, Boolean.class));	//construct the class with a default model
 	}
@@ -83,7 +83,7 @@ public class CheckControl extends AbstractValueControl<Boolean, CheckControl>
 	@exception NullPointerException if the given session and/or check type is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public CheckControl(final GuiseSession<?> session, final String id, final CheckType checkType)
+	public CheckControl(final GuiseSession session, final String id, final CheckType checkType)
 	{
 		this(session, id, new DefaultValueModel<Boolean>(session, Boolean.class), checkType);	//construct the class with a default model
 	}
@@ -93,7 +93,7 @@ public class CheckControl extends AbstractValueControl<Boolean, CheckControl>
 	@param model The component data model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	*/
-	public CheckControl(final GuiseSession<?> session, final ValueModel<Boolean> model)
+	public CheckControl(final GuiseSession session, final ValueModel<Boolean> model)
 	{
 		this(session, null, model);	//construct the class, indicating that a default ID should be used
 	}
@@ -105,7 +105,7 @@ public class CheckControl extends AbstractValueControl<Boolean, CheckControl>
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public CheckControl(final GuiseSession<?> session, final String id, final ValueModel<Boolean> model)
+	public CheckControl(final GuiseSession session, final String id, final ValueModel<Boolean> model)
 	{
 		this(session, id, model, CheckType.RECTANGLE);	//construct the class with a rectangle check type
 	}
@@ -118,7 +118,7 @@ public class CheckControl extends AbstractValueControl<Boolean, CheckControl>
 	@exception NullPointerException if the given session, model, and/or check type is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public CheckControl(final GuiseSession<?> session, final String id, final ValueModel<Boolean> model, final CheckType checkType)
+	public CheckControl(final GuiseSession session, final String id, final ValueModel<Boolean> model, final CheckType checkType)
 	{
 		super(session, id, model);	//construct the parent class
 		this.checkType=checkNull(checkType, "Check type cannot be null");	//save the check type

@@ -14,7 +14,7 @@ public class Button extends AbstractActionControl<Button>
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public Button(final GuiseSession<?> session)
+	public Button(final GuiseSession session)
 	{
 		this(session, (String)null);	//construct the component, indicating that a default ID should be used
 	}
@@ -25,7 +25,7 @@ public class Button extends AbstractActionControl<Button>
 	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public Button(final GuiseSession<?> session, final String id)
+	public Button(final GuiseSession session, final String id)
 	{
 		this(session, id, new DefaultActionModel(session));	//construct the class with a default model
 	}
@@ -35,7 +35,7 @@ public class Button extends AbstractActionControl<Button>
 	@param model The component data model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	*/
-	public Button(final GuiseSession<?> session, final ActionModel model)
+	public Button(final GuiseSession session, final ActionModel model)
 	{
 		this(session, null, model);	//construct the component, indicating that a default ID should be used
 	}
@@ -47,7 +47,7 @@ public class Button extends AbstractActionControl<Button>
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public Button(final GuiseSession<?> session, final String id, final ActionModel model)
+	public Button(final GuiseSession session, final String id, final ActionModel model)
 	{
 		super(session, id, model);	//construct the parent class
 	}

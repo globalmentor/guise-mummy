@@ -42,7 +42,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractModelBox
 	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractFrame(final GuiseSession<?> session, final String id, final Layout layout, final LabelModel model)
+	public AbstractFrame(final GuiseSession session, final String id, final Layout layout, final LabelModel model)
 	{
 		super(session, id, layout, model);	//construct the parent class
 	}

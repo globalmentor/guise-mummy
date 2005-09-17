@@ -19,7 +19,7 @@ public abstract class AbstractContainerControl<M extends LabelModel, C extends C
 	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractContainerControl(final GuiseSession<?> session, final String id, final Layout layout, final M model)
+	public AbstractContainerControl(final GuiseSession session, final String id, final Layout layout, final M model)
 	{
 		super(session, id, layout, model);	//construct the parent class
 	}

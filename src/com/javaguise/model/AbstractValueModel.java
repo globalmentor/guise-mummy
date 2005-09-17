@@ -66,7 +66,7 @@ public abstract class AbstractValueModel<V> extends AbstractControlModel impleme
 	@param valueClass The class indicating the type of value held in the model.
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	*/
-	public AbstractValueModel(final GuiseSession<?> session, final Class<V> valueClass)
+	public AbstractValueModel(final GuiseSession session, final Class<V> valueClass)
 	{
 		super(session);	//construct the parent class
 		this.valueClass=checkNull(valueClass, "Value class cannot be null.");	//store the value class

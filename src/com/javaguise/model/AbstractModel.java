@@ -106,7 +106,7 @@ public class AbstractModel extends GuiseBoundPropertyObject implements Model
 	@param session The Guise session that owns this model.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public AbstractModel(final GuiseSession<?> session)
+	public AbstractModel(final GuiseSession session)
 	{
 		super(session);	//construct the parent class
 	}

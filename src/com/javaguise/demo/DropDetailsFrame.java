@@ -22,7 +22,7 @@ public class DropDetailsFrame extends DefaultFrame
 	/**Guise session constructor.
 	@param session The Guise session that owns this frame.
 	*/
-	public DropDetailsFrame(final GuiseSession<?> session)
+	public DropDetailsFrame(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Orientation.Flow.PAGE));	//construct the parent class flowing vertically
 		getModel().setLabel("Guise\u2122 Demonstration: Drop Details");	//set the frame title

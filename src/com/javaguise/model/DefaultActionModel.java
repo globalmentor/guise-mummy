@@ -72,7 +72,7 @@ public class DefaultActionModel extends AbstractControlModel implements ActionMo
 	@param session The Guise session that owns this model.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public DefaultActionModel(final GuiseSession<?> session)
+	public DefaultActionModel(final GuiseSession session)
 	{
 		super(session);	//construct the parent class
 	}

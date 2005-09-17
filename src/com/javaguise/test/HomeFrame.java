@@ -25,7 +25,7 @@ public class HomeFrame extends DefaultFrame
 	/**Guise session constructor.
 	@param session The Guise session that owns this frame.
 	*/
-	public HomeFrame(final GuiseSession<?> session)
+	public HomeFrame(final GuiseSession session)
 	{
 		this(session, null);	//construct the component, indicating that a default ID should be used
 	}
@@ -34,7 +34,7 @@ public class HomeFrame extends DefaultFrame
 	@param session The Guise session that owns this frame.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	*/
-	public HomeFrame(final GuiseSession<?> session, final String id)
+	public HomeFrame(final GuiseSession session, final String id)
 	{
 		super(session, id);	//construct the parent
 		getModel().setLabel("Home Frame Test");	//set the frame label
@@ -349,7 +349,7 @@ Debug.trace("list control changed value to", newValue);
 
 	}
 
-	protected Menu createMenu(final GuiseSession<?> session, final Orientation.Flow flow)
+	protected Menu createMenu(final GuiseSession session, final Orientation.Flow flow)
 	{
 		final Menu menu=new Menu(session, flow);
 

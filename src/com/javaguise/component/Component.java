@@ -50,21 +50,23 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	/**@return An iterator to contained components in reverse order.*/
 	public Iterator<Component<?>> reverseIterator();
 
-	/**@return The model used by this component.*/
-	public Controller<? extends GuiseContext<?>, ? super C> getController();
-
-	/**Determines the controller of this component. If no controller is installed, one is created and installed.
-	@param context Guise context information.
-	@exception NullPointerException if there is no controller installed and no appropriate controller registered with the Guise context.
-	*/
-	public <GC extends GuiseContext<?>> Controller<? super GC, ? super C> getController(final GC context);
+	/**@return The controller installed in this component.*/
+	public Controller<? extends GuiseContext, ? super C> getController();
 
 	/**Sets the controller used by this component.
 	This is a bound property.
 	@param newController The new controller to use.
 	@see #CONTROLLER_PROPERTY
+	@exception NullPointerException if the given controller is <code>null</code>.
 	*/
-	public void setController(final Controller<? extends GuiseContext<?>, ? super C> newController);
+	public void setController(final Controller<? extends GuiseContext, ? super C> newController);
+
+	/**Determines the controller of this component. If no controller is installed, one is created and installed.
+	@param context Guise context information.
+	@exception NullPointerException if there is no controller installed and no appropriate controller registered with the Guise context.
+	*/
+//TODO del when works	public <GC extends GuiseContext> Controller<? super GC, ? super C> getController(final GC context);
+//TODO del when works	public Controller<? extends GuiseContext, ? super C> getController(final GuiseContext context);	//TODO make this protected again, if we can, if we reorganize the controller.getAbsoluteID framework
 
 	/**@return An iterable interface to all errors associated with this component.*/
 	public Iterable<Throwable> getErrors();
@@ -93,13 +95,13 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	/**@return The component identifier.*/
 	public String getID();
 
-	/**Generates an ID by combining this component's ID and the the given ID segment.
+	/**Creates an ID by combining this component's ID and the the given ID segment.
 	@param idSegment The ID segment, which must itself be a valid ID, to include in the full ID.
 	@return An ID appropriate for a child component of this component.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	@see Component#ID_SEGMENT_DELIMITER
 	*/
-	public String generateID(final String idSegment);
+	public String createID(final String idSegment);
 
 	/**Returns this component's requested orientation.
 	To resolve the orientation up the hierarchy, {@link #getComponentOrientation()} should be used.
@@ -173,7 +175,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	public void setParent(final Component<?> newParent);
 
 	/**@return The Guise session that owns this component.*/
-	public GuiseSession<?> getSession();
+	public GuiseSession getSession();
 
 	/**@return The style identifier, or <code>null</code> if there is no style ID.*/
 	public String getStyleID();
@@ -264,7 +266,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	@see GuiseContext.State#QUERY_VIEW
 	@see #getController(GC, C)
 	*/
-	public <GC extends GuiseContext<?>> void queryView(final GC context) throws IOException;
+	public <GC extends GuiseContext> void queryView(final GC context) throws IOException;
 
 	/**Decodes the data of the view of this component.
 	This method should not normally be called directly by applications.
@@ -275,7 +277,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	@see #getController(GC, C)
 	@see GuiseContext.State#DECODE_VIEW
 	*/
-	public <GC extends GuiseContext<?>> void decodeView(final GC context) throws IOException, ValidationsException;
+	public <GC extends GuiseContext> void decodeView(final GC context) throws IOException, ValidationsException;
 
 	/**Validates the view of this component.
 	This method should not normally be called directly by applications.
@@ -286,7 +288,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	@see #getController(GC, C)
 	@see GuiseContext.State#VALIDATE_VIEW
 	*/
-	public <GC extends GuiseContext<?>> void validateView(final GC context) throws IOException, ValidationsException;
+	public <GC extends GuiseContext> void validateView(final GC context) throws IOException, ValidationsException;
 
 	/**Updates the model of this component.
 	This method should not normally be called directly by applications.
@@ -297,7 +299,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	@see #getController(GC, C)
 	@see GuiseContext.State#UPDATE_MODEL
 	*/
-	public <GC extends GuiseContext<?>> void updateModel(final GC context) throws IOException, ValidationsException;
+	public <GC extends GuiseContext> void updateModel(final GC context) throws IOException, ValidationsException;
 
 	/**Collects the current data from the model of this component.
 	This method should not normally be called directly by applications.
@@ -307,7 +309,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	@see #getController(GC, C)
 	@see GuiseContext.State#QUERY_MODEL
 	*/
-	public <GC extends GuiseContext<?>> void queryModel(final GC context) throws IOException;
+	public <GC extends GuiseContext> void queryModel(final GC context) throws IOException;
 
 	/**Encodes the data of the model of this component.
 	This method should not normally be called directly by applications.
@@ -317,7 +319,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	@see #getController(GC, C)
 	@see GuiseContext.State#ENCODE_MODEL
 	*/
-	public <GC extends GuiseContext<?>> void encodeModel(final GC context) throws IOException;
+	public <GC extends GuiseContext> void encodeModel(final GC context) throws IOException;
 
 	/**Updates the view of this component.
 	This method should not normally be called directly by applications.
@@ -327,5 +329,5 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	@see #getController(GC, C)
 	@see GuiseContext.State#UPDATE_VIEW
 	*/
-	public <GC extends GuiseContext<?>> void updateView(final GC context) throws IOException;
+	public <GC extends GuiseContext> void updateView(final GC context) throws IOException;
 }

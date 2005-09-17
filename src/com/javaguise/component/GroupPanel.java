@@ -15,7 +15,7 @@ public class GroupPanel extends AbstractModelBox<LabelModel, GroupPanel> impleme
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public GroupPanel(final GuiseSession<?> session)
+	public GroupPanel(final GuiseSession session)
 	{
 		this(session, (String)null);	//construct the component, indicating that a default ID should be used
 	}
@@ -25,7 +25,7 @@ public class GroupPanel extends AbstractModelBox<LabelModel, GroupPanel> impleme
 	@param model The component data model.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public GroupPanel(final GuiseSession<?> session, final LabelModel model)
+	public GroupPanel(final GuiseSession session, final LabelModel model)
 	{
 		this(session, (String)null, model);	//construct the component, indicating that a default ID should be used
 	}
@@ -36,7 +36,7 @@ public class GroupPanel extends AbstractModelBox<LabelModel, GroupPanel> impleme
 	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public GroupPanel(final GuiseSession<?> session, final String id)
+	public GroupPanel(final GuiseSession session, final String id)
 	{
 		this(session, id, new FlowLayout(session, Orientation.Flow.PAGE));	//default to flowing vertically
 	}
@@ -48,7 +48,7 @@ public class GroupPanel extends AbstractModelBox<LabelModel, GroupPanel> impleme
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public GroupPanel(final GuiseSession<?> session, final String id, final LabelModel model)
+	public GroupPanel(final GuiseSession session, final String id, final LabelModel model)
 	{
 		this(session, id, new FlowLayout(session, Orientation.Flow.PAGE), model);	//default to flowing vertically
 	}
@@ -58,7 +58,7 @@ public class GroupPanel extends AbstractModelBox<LabelModel, GroupPanel> impleme
 	@param layout The layout definition for the container.
 	@exception NullPointerException if the given session and/or layout is <code>null</code>.
 	*/
-	public GroupPanel(final GuiseSession<?> session, final Layout layout)
+	public GroupPanel(final GuiseSession session, final Layout layout)
 	{
 		this(session, null, layout);	//construct the component with the layout, indicating that a default ID should be used
 	}
@@ -69,7 +69,7 @@ public class GroupPanel extends AbstractModelBox<LabelModel, GroupPanel> impleme
 	@param model The component data model.
 	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
 	*/
-	public GroupPanel(final GuiseSession<?> session, final Layout layout, final LabelModel model)
+	public GroupPanel(final GuiseSession session, final Layout layout, final LabelModel model)
 	{
 		this(session, null, layout, model);	//construct the component with the layout, indicating that a default ID should be used
 	}
@@ -81,7 +81,7 @@ public class GroupPanel extends AbstractModelBox<LabelModel, GroupPanel> impleme
 	@exception NullPointerException if the given session and/or layout is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public GroupPanel(final GuiseSession<?> session, final String id, final Layout layout)
+	public GroupPanel(final GuiseSession session, final String id, final Layout layout)
 	{
 		this(session, id, layout, new DefaultLabelModel(session));	//construct the class with a default model
 	}
@@ -94,7 +94,7 @@ public class GroupPanel extends AbstractModelBox<LabelModel, GroupPanel> impleme
 	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public GroupPanel(final GuiseSession<?> session, final String id, final Layout layout, final LabelModel model)
+	public GroupPanel(final GuiseSession session, final String id, final Layout layout, final LabelModel model)
 	{
 		super(session, id, layout, model);	//construct the parent class
 	}

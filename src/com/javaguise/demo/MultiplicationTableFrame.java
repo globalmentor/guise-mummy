@@ -18,7 +18,7 @@ public class MultiplicationTableFrame extends DefaultFrame
 	/**Guise session constructor.
 	@param session The Guise session that owns this frame.
 	*/
-	public MultiplicationTableFrame(final GuiseSession<?> session)
+	public MultiplicationTableFrame(final GuiseSession session)
 	{
 		super(session);	//construct the parent class
 		getModel().setLabel("Guise\u2122 Demonstration: Multiplication Table");	//set the frame title	

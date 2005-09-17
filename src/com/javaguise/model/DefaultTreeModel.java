@@ -45,7 +45,7 @@ public class DefaultTreeModel extends AbstractControlModel implements TreeModel
 	@param session The Guise session that owns this model.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public DefaultTreeModel(final GuiseSession<?> session)
+	public DefaultTreeModel(final GuiseSession session)
 	{
 		this(session, new DummyTreeNodeModel(session));	//create a dummy root node
 	}
@@ -55,7 +55,7 @@ public class DefaultTreeModel extends AbstractControlModel implements TreeModel
 	@param rootNode The root node of the tree model.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public DefaultTreeModel(final GuiseSession<?> session, final TreeNodeModel<?> rootNode)
+	public DefaultTreeModel(final GuiseSession session, final TreeNodeModel<?> rootNode)
 	{
 		super(session);	//construct the parent class
 		this.rootNode=rootNode;	//save the root node

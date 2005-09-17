@@ -14,7 +14,7 @@ public class HelloWorldFrame extends DefaultFrame
 	/**Guise session constructor.
 	@param session The Guise session that owns this frame.
 	*/
-	public HelloWorldFrame(final GuiseSession<?> session)
+	public HelloWorldFrame(final GuiseSession session)
 	{
 		super(session);	//construct the parent class, defaulting to a region layout
 		getModel().setLabel("Guise\u2122 Demonstration: Hello World");	//set the frame title

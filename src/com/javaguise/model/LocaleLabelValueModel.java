@@ -24,7 +24,7 @@ public class LocaleLabelValueModel<V> extends DefaultValueModel<V>
 	@param valueClass The class indicating the type of value held in the model.
 	@exception NullPointerException if the given session, class object, and/or locale is <code>null</code>.
 	*/
-	public LocaleLabelValueModel(final GuiseSession<?> session, final Class<V> valueClass, final Locale locale)
+	public LocaleLabelValueModel(final GuiseSession session, final Class<V> valueClass, final Locale locale)
 	{
 		super(session, valueClass);	//construct the parent class
 		this.locale=checkNull(locale, "Locale cannot be null");	//save the locale

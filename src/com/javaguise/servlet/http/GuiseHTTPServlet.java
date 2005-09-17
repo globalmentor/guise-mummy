@@ -463,11 +463,12 @@ Debug.info("content type:", request.getContentType());
 	/*TODO comment
 	//TODO del and use the static method in AbstractController
 	*/
-	protected <T extends Component<?>> Component<?> getComponentByAbsoluteUniqueID(final GuiseContext<?> context, final T component, final String absoluteUniqueID)
+/*TODO del when works
+	protected <T extends Component<?>> Component<?> getComponentByAbsoluteUniqueID(final GuiseContext context, final T component, final String absoluteUniqueID)
 	{
-//	TODO fix use of raw types to get around ultra-restrictive JDK 1.5 compiler		final Controller<? extends GuiseContext<?>, ? super T> controller=component.getController();
+//	TODO fix use of raw types to get around ultra-restrictive JDK 1.5 compiler		final Controller<? extends GuiseContext, ? super T> controller=component.getController();
 		final Controller controller=component.getController();		
-		if(controller.getAbsoluteUniqueID(context, component).equals(absoluteUniqueID))
+		if(component.getID().equals(absoluteUniqueID))
 		{
 			return component;
 		}
@@ -484,6 +485,7 @@ Debug.info("content type:", request.getContentType());
 		}
 		return null;
 	}
+*/
 
 	/**Services an AJAX request.
   @param request The HTTP request.
@@ -531,12 +533,9 @@ Debug.info("content type:", request.getContentType());
 						final String parameterName=parameterListMapEntry.getKey();	//get the parameter name
 
 						
-						final XHTMLFrameController frameController=(XHTMLFrameController)navigationFrame.getController();	//get the frame's controller, assuming it's of the required type TODO later improve the entire action hidden control framework
-
-						
-						if(parameterName.equals(frameController.getAbsoluteUniqueActionInputID(guiseContext, navigationFrame)) && parameterListMapEntry.getValue().size()>0)	//if this parameter is for an action
+						if(parameterName.equals(XHTMLFrameController.getActionInputID(navigationFrame)) && parameterListMapEntry.getValue().size()>0)	//if this parameter is for an action
 						{
-							final Component<?> actionComponent=getComponentByAbsoluteUniqueID(guiseContext, navigationFrame, parameterListMapEntry.getValue().get(0).toString());	//get an action component
+							final Component<?> actionComponent=AbstractController.getComponentByID(navigationFrame, parameterListMapEntry.getValue().get(0).toString());	//get an action component
 							if(actionComponent!=null)	//if we found an action component
 							{
 								requestedComponents.add(actionComponent);	//add it to the list of requested components
@@ -553,7 +552,7 @@ Debug.info("content type:", request.getContentType());
 				else if(controlEvent instanceof DropEvent)	//if this is a drag and drop drop event
 				{
 					final DropEvent dropEvent=(DropEvent)controlEvent;	//get the drop event
-					final Component<?> dropTarget=getComponentByAbsoluteUniqueID(guiseContext, navigationFrame, dropEvent.getDropTargetID());	//get the drop target component
+					final Component<?> dropTarget=AbstractController.getComponentByID(navigationFrame, dropEvent.getDropTargetID());	//get the drop target component
 					if(dropTarget!=null)	//if there is a drop target
 					{
 						requestedComponents.add(dropTarget);	//add the drop target to the set of requested components
@@ -712,10 +711,10 @@ for(final Component<?> affectedComponent:affectedComponents)
 	/*TODO comment
 	@param context Guise context information.
 	*/
-	protected <T extends Component<?>> void getControlsByName(final GuiseContext<?> context, final T component, final String name, final Set<Component<?>> componentSet)
+	protected <T extends Component<?>> void getControlsByName(final GuiseContext context, final T component, final String name, final Set<Component<?>> componentSet)
 	{
 			//TODO check first that the component is a control; that should be much faster
-		final Controller<? extends GuiseContext<?>, ?> controller=component.getController();
+		final Controller<? extends GuiseContext, ?> controller=component.getController();
 		if(controller instanceof XHTMLControlController)
 		{
 			final XHTMLControlController xhtmlControlController=(XHTMLControlController)controller;
@@ -729,14 +728,14 @@ for(final Component<?> affectedComponent:affectedComponents)
 		else if(controller instanceof XHTMLTabbedPanelController)	//TODO fix hack; make XHTMLTabbedPanelController descend from XHTMLControlController
 		{
 			final XHTMLTabbedPanelController tabbedPanelController=(XHTMLTabbedPanelController)controller;
-			if(name.equals(tabbedPanelController.getAbsoluteUniqueID(context, component)))	//TODO fix hack
+			if(name.equals(component.getID()))	//TODO fix hack
 			{
 //TODO del Debug.trace("using this component");
 				componentSet.add(component);
 			}
 			
 		}
-		for(final Component<?> childComponent:component)
+		for(final Component<?> childComponent:component.getController().getChildComponents(component))
 		{
 			getControlsByName(context, childComponent, name, componentSet);
 		}
@@ -899,7 +898,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	@param guiseSession The Guise session.
 	@param modalNavigation The modal navigation information
 	*/
-	protected <R> void beginModalNavigation(final GuiseApplication guiseApplication, final GuiseSession<?> guiseSession, final ModalNavigation<R> modalNavigation)
+	protected <R> void beginModalNavigation(final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ModalNavigation<R> modalNavigation)
 	{
 		final ModalFrame<R, ?> modalFrame=(ModalFrame<R, ?>)guiseSession.getNavigationFrame(guiseApplication.relativizeURI(modalNavigation.getNewNavigationURI()));	//get the modal frame for this navigation path
 		if(modalFrame!=null)	//if we have a modal frame

@@ -17,7 +17,7 @@ public class SetEvent<S, E> extends CollectionEvent<S, E>
 	@param source The object on which the event initially occurred.
 	@exception NullPointerException if the given session and/or source is <code>null</code>.
 	*/
-	public SetEvent(final GuiseSession<?> session, final S source)
+	public SetEvent(final GuiseSession session, final S source)
 	{
 		this(session, source, null, null);	//construct the class with no known modification values
 	}
@@ -29,7 +29,7 @@ public class SetEvent<S, E> extends CollectionEvent<S, E>
 	@param removedElement The element that was removed from the set, or <code>null</code> if no element was removed or it is unknown whether or which elements were removed.
 	@exception NullPointerException if the given session and/or source is <code>null</code>.
 	*/
-	public SetEvent(final GuiseSession<?> session, final S source, final E addedElement, final E removedElement)
+	public SetEvent(final GuiseSession session, final S source, final E addedElement, final E removedElement)
 	{
 		super(session, source, addedElement, removedElement);	//construct the parent class
 	}

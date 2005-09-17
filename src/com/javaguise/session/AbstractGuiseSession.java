@@ -31,7 +31,7 @@ import static com.garretwilson.util.SetUtilities.*;
 /**An abstract implementation that keeps track of the components of a user session.
 @author Garret Wilson
 */
-public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends BoundPropertyObject implements GuiseSession<GC>
+public abstract class AbstractGuiseSession extends BoundPropertyObject implements GuiseSession
 {
 
 	/**The Guise application to which this session belongs.*/
@@ -811,19 +811,19 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		public Set<GuiseContext.State> getContextStates() {return contextStateSet;}
 
 	/**The current context for this session, or <code>null</code> if there currently is no context.*/
-	private GC context=null;
+	private GuiseContext context=null;
 
 		/**@return The current context for this session, or <code>null</code> if there currently is no context.*/
-		public synchronized GC getContext() {return context;}
+		public synchronized GuiseContext getContext() {return context;}
 
 		/**Sets the current context.
 		@param context The current context for this session, or <code>null</code> if there currently is no context.
 		*/
-		protected synchronized void setContext(final GC context)
+		protected synchronized void setContext(final GuiseContext context)
 		{
 			if(this.context!=context)	//if the context is really changing
 			{
-				final GC oldContext=this.context;	//save the old context
+				final GuiseContext oldContext=this.context;	//save the old context
 				if(oldContext!=null)	//if there was a previous context
 				{
 					oldContext.removePropertyChangeListener(GuiseContext.STATE_PROPERTY, getContextStateListener());	//stop listening for context state changes					
@@ -843,7 +843,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		*/
 		protected synchronized void updateContextStates()
 		{
-			final GC context=getContext();	//get the current context
+			final GuiseContext context=getContext();	//get the current context
 			if(context==null || context.getState()!=GuiseContext.State.UPDATE_MODEL)	//if the context is not updating the model
 			{
 				fireQueuedModelEvents();	//fire any queued events				
@@ -861,7 +861,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 		*/
 		public synchronized void queueModelEvent(final PostponedEvent<?> postponedModelEvent)
 		{
-			final GC context=getContext();	//get the current context
+			final GuiseContext context=getContext();	//get the current context
 			if(context!=null && context.getState()==GuiseContext.State.UPDATE_MODEL)	//if the context is updating the model
 			{
 				queuedModelEventList.add(postponedModelEvent);	//add the postponed event to our list of postponed events					
@@ -892,7 +892,7 @@ public abstract class AbstractGuiseSession<GC extends GuiseContext<GC>> extends 
 					finally	//there could be an exception while we're firing the event
 					{
 						postponedModelEventIterator.remove();	//always remove the event we fired, even if there's an exception, so it won't be fired again if there is an exception
-						final GC context=getContext();	//get the current context
+						final GuiseContext context=getContext();	//get the current context
 						if(context!=null)	//if there is a context
 						{
 							context.getEventList().add(postponedModelEvent.getEvent());	//store the event in the context

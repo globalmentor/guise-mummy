@@ -60,7 +60,7 @@ public class DefaultValueModel<V> extends AbstractValueModel<V>
 	@param valueClass The class indicating the type of value held in the model.
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	*/
-	public DefaultValueModel(final GuiseSession<?> session, final Class<V> valueClass)
+	public DefaultValueModel(final GuiseSession session, final Class<V> valueClass)
 	{
 		this(session, valueClass, null);	//construct the class with a null initial value
 	}
@@ -71,7 +71,7 @@ public class DefaultValueModel<V> extends AbstractValueModel<V>
 	@param initialValue The initial value, which will not be validated.
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	*/
-	public DefaultValueModel(final GuiseSession<?> session, final Class<V> valueClass, final V initialValue)
+	public DefaultValueModel(final GuiseSession session, final Class<V> valueClass, final V initialValue)
 	{
 		super(session, valueClass);	//construct the parent class
 		this.value=initialValue;	//save the initial value

@@ -10,7 +10,7 @@ public interface Validator<V>
 {
 
 	/**@return The Guise session that owns this validator.*/
-	public GuiseSession<?> getSession();
+	public GuiseSession getSession();
 
 	/**Determines whether a given value is valid.
 	@param value The value to validate.

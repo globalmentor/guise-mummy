@@ -18,7 +18,7 @@ public class Menu extends AbstractContainerControl<LabelModel, Menu>
 	@param axis The axis along which the menu is oriented.
 	@exception NullPointerException if the given session and/or axis is <code>null</code>.
 	*/
-	public Menu(final GuiseSession<?> session, final Orientation.Flow axis)
+	public Menu(final GuiseSession session, final Orientation.Flow axis)
 	{
 		this(session, null, axis);	//construct the component with the axis, indicating that a default ID should be used
 	}
@@ -29,7 +29,7 @@ public class Menu extends AbstractContainerControl<LabelModel, Menu>
 	@param model The component data model.
 	@exception NullPointerException if the given session, axis, and/or model is <code>null</code>.
 	*/
-	public Menu(final GuiseSession<?> session, final Orientation.Flow axis, final LabelModel model)
+	public Menu(final GuiseSession session, final Orientation.Flow axis, final LabelModel model)
 	{
 		this(session, null, axis, model);	//construct the component with the axis, indicating that a default ID should be used
 	}
@@ -41,7 +41,7 @@ public class Menu extends AbstractContainerControl<LabelModel, Menu>
 	@exception NullPointerException if the given session and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public Menu(final GuiseSession<?> session, final String id, final Orientation.Flow axis)
+	public Menu(final GuiseSession session, final String id, final Orientation.Flow axis)
 	{
 		this(session, id, axis, new DefaultLabelModel(session));	//construct the class with a default model
 	}
@@ -54,7 +54,7 @@ public class Menu extends AbstractContainerControl<LabelModel, Menu>
 	@exception NullPointerException if the given session, axis, and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public Menu(final GuiseSession<?> session, final String id, final Orientation.Flow axis, final LabelModel model)
+	public Menu(final GuiseSession session, final String id, final Orientation.Flow axis, final LabelModel model)
 	{
 		super(session, id, new MenuLayout(session, axis), model);	//construct the parent class
 	}

@@ -20,7 +20,7 @@ public class HelloUserFrame extends DefaultFrame
 	/**Guise session constructor.
 	@param session The Guise session that owns this frame.
 	*/
-	public HelloUserFrame(final GuiseSession<?> session)
+	public HelloUserFrame(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Orientation.Flow.PAGE));	//construct the parent class flowing vertically
 		getModel().setLabel("Guise\u2122 Demonstration: Hello User");	//set the frame title	

@@ -51,7 +51,7 @@ public class TreeControl extends AbstractModelComponent<TreeModel, TreeControl>
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public TreeControl(final GuiseSession<?> session)
+	public TreeControl(final GuiseSession session)
 	{
 		this(session, (String)null);	//construct the component, indicating that a default ID should be used
 	}
@@ -62,7 +62,7 @@ public class TreeControl extends AbstractModelComponent<TreeModel, TreeControl>
 	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public TreeControl(final GuiseSession<?> session, final String id)
+	public TreeControl(final GuiseSession session, final String id)
 	{
 		this(session, id, new DefaultTreeModel(session));	//construct the class with a default model
 	}
@@ -72,7 +72,7 @@ public class TreeControl extends AbstractModelComponent<TreeModel, TreeControl>
 	@param model The component data model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	*/
-	public TreeControl(final GuiseSession<?> session, final TreeModel model)
+	public TreeControl(final GuiseSession session, final TreeModel model)
 	{
 		this(session, null, model);	//construct the component, indicating that a default ID should be used
 	}
@@ -84,7 +84,7 @@ public class TreeControl extends AbstractModelComponent<TreeModel, TreeControl>
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public TreeControl(final GuiseSession<?> session, final String id, final TreeModel model)
+	public TreeControl(final GuiseSession session, final String id, final TreeModel model)
 	{
 		super(session, id, model);	//construct the parent class
 		setTreeNodeRepresentationStrategy(Object.class, new DefaultValueRepresentationStrategy<Object>(session));	//create a default representation strategy and set it as the default by associating it with the Object class
@@ -122,16 +122,16 @@ public class TreeControl extends AbstractModelComponent<TreeModel, TreeControl>
 	{
 
 		/**The Guise session that owns this representation strategy.*/
-		private final GuiseSession<?> session;
+		private final GuiseSession session;
 
 			/**@return The Guise session that owns this representation strategy.*/
-			public GuiseSession<?> getSession() {return session;}
+			public GuiseSession getSession() {return session;}
 
 		/**Session constructor.
 		@param session The Guise session that owns this representation strategy.
 		@exception NullPointerException if the given session is <code>null</code>.
 		*/
-		public AbstractValueRepresentationStrategy(final GuiseSession<?> session)
+		public AbstractValueRepresentationStrategy(final GuiseSession session)
 		{
 			this.session=checkNull(session, "Session cannot be null");	//save the session
 		}
@@ -166,7 +166,7 @@ public class TreeControl extends AbstractModelComponent<TreeModel, TreeControl>
 		@param session The Guise session that owns this representation strategy.
 		@exception NullPointerException if the given session is <code>null</code>.
 		*/
-		public DefaultValueRepresentationStrategy(final GuiseSession<?> session)
+		public DefaultValueRepresentationStrategy(final GuiseSession session)
 		{
 			super(session);	//construct the parent class
 		}
@@ -186,7 +186,7 @@ public class TreeControl extends AbstractModelComponent<TreeModel, TreeControl>
 		public Component<?> createComponent(final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
 //TODO bring back after Eclipse fixes its bug		public <N extends V> Component<?> createComponent(final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
 		{
-			final GuiseSession<?> session=getSession();	//get the session
+			final GuiseSession session=getSession();	//get the session
 			final String id=getID(treeNode.getValue());	//get the ID from the value TODO don't get the ID from the value, as this can change if edited
 			if(editable)	//if the component should be editable
 			{
@@ -221,7 +221,7 @@ public class TreeControl extends AbstractModelComponent<TreeModel, TreeControl>
 		@param session The Guise session that owns this representation strategy.
 		@exception NullPointerException if the given session is <code>null</code>.
 		*/
-		public LabelModelRepresentationStrategy(final GuiseSession<?> session)
+		public LabelModelRepresentationStrategy(final GuiseSession session)
 		{
 			super(session);	//construct the parent class
 		}
@@ -238,7 +238,7 @@ public class TreeControl extends AbstractModelComponent<TreeModel, TreeControl>
 		public Label createComponent(final TreeModel model, final TreeNodeModel<LabelModel> treeNode, final boolean editable, final boolean selected, final boolean focused)
 //TODO bring back after Eclipse fixes its bug		public <N extends LabelModel> Label createComponent(final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
 		{
-			final GuiseSession<?> session=getSession();	//get the session
+			final GuiseSession session=getSession();	//get the session
 			final String id=getID(treeNode.getValue());	//get the ID from the value TODO don't get the ID from the value, as this can change if edited
 			return new Label(session, id, treeNode.getValue());	//return a label from the label model
 		}
@@ -255,7 +255,7 @@ public class TreeControl extends AbstractModelComponent<TreeModel, TreeControl>
 		@param session The Guise session that owns this representation strategy.
 		@exception NullPointerException if the given session is <code>null</code>.
 		*/
-		public MessageModelRepresentationStrategy(final GuiseSession<?> session)
+		public MessageModelRepresentationStrategy(final GuiseSession session)
 		{
 			super(session);	//construct the parent class
 		}
@@ -272,7 +272,7 @@ public class TreeControl extends AbstractModelComponent<TreeModel, TreeControl>
 		public Message createComponent(final TreeModel model, final TreeNodeModel<MessageModel> treeNode, final boolean editable, final boolean selected, final boolean focused)
 //TODO bring back after Eclipse fixes its bug		public <N extends LabelModel> Label createComponent(final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
 		{
-			final GuiseSession<?> session=getSession();	//get the session
+			final GuiseSession session=getSession();	//get the session
 			final String id=getID(treeNode.getValue());	//get the ID from the value TODO don't get the ID from the value, as this can change if edited
 			return new Message(session, id, treeNode.getValue());	//return a message from the message model
 		}

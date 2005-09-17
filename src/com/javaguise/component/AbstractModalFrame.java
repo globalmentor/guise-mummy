@@ -41,7 +41,7 @@ public abstract class AbstractModalFrame<R, C extends ModalFrame<R, C>> extends 
 	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractModalFrame(final GuiseSession<?> session, final String id, final Layout layout, final LabelModel model)
+	public AbstractModalFrame(final GuiseSession session, final String id, final Layout layout, final LabelModel model)
 	{
 		super(session, id, layout, model);	//construct the parent class
 	}

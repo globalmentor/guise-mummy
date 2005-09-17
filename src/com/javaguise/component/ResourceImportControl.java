@@ -13,7 +13,7 @@ public class ResourceImportControl extends AbstractValueControl<ResourceImport, 
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session and/or value class is <code>null</code>.
 	*/
-	public ResourceImportControl(final GuiseSession<?> session)
+	public ResourceImportControl(final GuiseSession session)
 	{
 		this(session, null);	//construct the component, indicating that a default ID should be used
 	}
@@ -24,7 +24,7 @@ public class ResourceImportControl extends AbstractValueControl<ResourceImport, 
 	@exception NullPointerException if the given session and/or value class is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public ResourceImportControl(final GuiseSession<?> session, final String id)
+	public ResourceImportControl(final GuiseSession session, final String id)
 	{
 		this(session, id, new DefaultValueModel<ResourceImport>(session, ResourceImport.class));	//construct the class with a default model
 	}
@@ -36,7 +36,7 @@ public class ResourceImportControl extends AbstractValueControl<ResourceImport, 
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public ResourceImportControl(final GuiseSession<?> session, final String id, final ValueModel<ResourceImport> model)
+	public ResourceImportControl(final GuiseSession session, final String id, final ValueModel<ResourceImport> model)
 	{
 		super(session, id, model);	//construct the parent class
 	}

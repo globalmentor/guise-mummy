@@ -21,7 +21,7 @@ public class LoginFrame extends DefaultFrame
 	/**Guise session constructor.
 	@param session The Guise session that owns this frame.
 	*/
-	public LoginFrame(final GuiseSession<?> session)
+	public LoginFrame(final GuiseSession session)
 	{
 		super(session);	//construct the parent class, defaulting to a region layout
 		getModel().setLabel("Guise\u2122 Demonstration: Login");	//set the frame title

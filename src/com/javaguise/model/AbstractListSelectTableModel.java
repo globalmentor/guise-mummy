@@ -70,7 +70,7 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 	@param columns The models representing the table columns.
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	*/
-	public AbstractListSelectTableModel(final GuiseSession<?> session, final Class<V> valueClass, final TableColumnModel<?>... columns)
+	public AbstractListSelectTableModel(final GuiseSession session, final Class<V> valueClass, final TableColumnModel<?>... columns)
 	{
 		this(session, valueClass, new MultipleListSelectionStrategy<V>(), columns);	//construct the class with a multiple selection strategy
 	}
@@ -83,7 +83,7 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 	@param columns The models representing the table columns.
 	@exception NullPointerException if the given session, class object, and/or selection strategy is <code>null</code>.
 	*/
-	public AbstractListSelectTableModel(final GuiseSession<?> session, final Class<V> valueClass, final ListSelectionStrategy<V> listSelectionStrategy, final TableColumnModel<?>... columns)
+	public AbstractListSelectTableModel(final GuiseSession session, final Class<V> valueClass, final ListSelectionStrategy<V> listSelectionStrategy, final TableColumnModel<?>... columns)
 	{
 		super(session, valueClass, listSelectionStrategy);	//construct the parent class
 		CollectionUtilities.addAll(logicalTableColumnModels, columns);	//add all the columns to our logical list of table columns

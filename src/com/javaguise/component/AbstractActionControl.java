@@ -16,7 +16,7 @@ public abstract class AbstractActionControl<C extends AbstractActionControl<C>> 
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractActionControl(final GuiseSession<?> session, final String id, final ActionModel model)
+	public AbstractActionControl(final GuiseSession session, final String id, final ActionModel model)
 	{
 		super(session, id, model);	//construct the parent class
 	}

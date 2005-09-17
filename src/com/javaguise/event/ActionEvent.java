@@ -14,7 +14,7 @@ public class ActionEvent<S> extends GuiseEvent<S>
 	@param source The object on which the event initially occurred.
 	@exception NullPointerException if the given session and/or source is <code>null</code>.
 	*/
-	public ActionEvent(final GuiseSession<?> session, final S source)
+	public ActionEvent(final GuiseSession session, final S source)
 	{
 		super(session, source);	//construct the parent class
 	}

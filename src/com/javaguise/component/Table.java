@@ -56,7 +56,7 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
 	*/
-	public <C> Table(final GuiseSession<?> session, final Class<C> valueClass, final String... columnNames)
+	public <C> Table(final GuiseSession session, final Class<C> valueClass, final String... columnNames)
 	{
 		this(session, null, valueClass, columnNames);	//construct the class, indicating that a default ID should be generated
 	}
@@ -67,7 +67,7 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
 	*/
-	public Table(final GuiseSession<?> session, final TableColumnModel<?>... columns)
+	public Table(final GuiseSession session, final TableColumnModel<?>... columns)
 	{
 		this(session, (String)null, columns);	//construct the class, indicating that a default ID should be generated
 	}
@@ -82,7 +82,7 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
 	@exception ClassCastException if one of the values in a row is not compatible with the type of its column.
 	*/
-	public <C> Table(final GuiseSession<?> session, final Class<C> valueClass, final C[][] rowValues, final String... columnNames)
+	public <C> Table(final GuiseSession session, final Class<C> valueClass, final C[][] rowValues, final String... columnNames)
 	{
 		this(session, null, valueClass, rowValues, columnNames);	//construct the class, indicating that a default ID should be generated
 	}
@@ -95,7 +95,7 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
 	@exception ClassCastException if one of the values in a row is not compatible with the type of its column.
 	*/
-	public Table(final GuiseSession<?> session, final Object[][] rowValues, final TableColumnModel<?>... columns)
+	public Table(final GuiseSession session, final Object[][] rowValues, final TableColumnModel<?>... columns)
 	{
 		this(session, null, rowValues, columns);	//construct the class, indicating that a default ID should be generated
 	}
@@ -105,7 +105,7 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 	@param model The component data model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	*/
-	public Table(final GuiseSession<?> session, final TableModel model)
+	public Table(final GuiseSession session, final TableModel model)
 	{
 		this(session, null, model);	//construct the class, indicating that a default ID should be generated
 	}
@@ -120,7 +120,7 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
 	*/
-	public <C> Table(final GuiseSession<?> session, final String id, final Class<C> valueClass, final String... columnNames)
+	public <C> Table(final GuiseSession session, final String id, final Class<C> valueClass, final String... columnNames)
 	{
 		this(session, id, new DefaultTableModel(session, valueClass, null, columnNames));	//construct the class with no default data
 	}
@@ -133,7 +133,7 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
 	*/
-	public Table(final GuiseSession<?> session, final String id, final TableColumnModel<?>... columns)
+	public Table(final GuiseSession session, final String id, final TableColumnModel<?>... columns)
 	{
 		this(session, id, new DefaultTableModel(session, null, columns));	//construct the class with no default data
 	}
@@ -150,7 +150,7 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
 	@exception ClassCastException if one of the values in a row is not compatible with the type of its column.
 	*/
-	public <C> Table(final GuiseSession<?> session, final String id, final Class<C> valueClass, final C[][] rowValues, final String... columnNames)
+	public <C> Table(final GuiseSession session, final String id, final Class<C> valueClass, final C[][] rowValues, final String... columnNames)
 	{
 		this(session, id, new DefaultTableModel(session, valueClass, rowValues, columnNames));	//construct the class with a default model
 	}
@@ -165,7 +165,7 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
 	@exception ClassCastException if one of the values in a row is not compatible with the type of its column.
 	*/
-	public Table(final GuiseSession<?> session, final String id, final Object[][] rowValues, final TableColumnModel<?>... columns)
+	public Table(final GuiseSession session, final String id, final Object[][] rowValues, final TableColumnModel<?>... columns)
 	{
 		this(session, id, new DefaultTableModel(session, rowValues, columns));	//construct the class with a default model
 	}
@@ -177,7 +177,7 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public Table(final GuiseSession<?> session, final String id, final TableModel model)
+	public Table(final GuiseSession session, final String id, final TableModel model)
 	{
 		super(session, id, model);	//construct the parent class
 		for(final TableColumnModel<?> column:model.getColumns())	//install a default cell representation strategy for each column
@@ -227,16 +227,16 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 	{
 
 		/**The Guise session that owns this representation strategy.*/
-		private final GuiseSession<?> session;
+		private final GuiseSession session;
 
 			/**@return The Guise session that owns this representation strategy.*/
-			public GuiseSession<?> getSession() {return session;}
+			public GuiseSession getSession() {return session;}
 
 		/**Session constructor.
 		@param session The Guise session that owns this representation strategy.
 		@exception NullPointerException if the given session is <code>null</code>.
 		*/
-		public DefaultCellRepresentationStrategy(final GuiseSession<?> session)
+		public DefaultCellRepresentationStrategy(final GuiseSession session)
 		{
 			this.session=checkNull(session, "Session cannot be null");	//save the session
 		}
@@ -256,7 +256,7 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 		@SuppressWarnings("unchecked")	//we check the type of the column value class, so the casts are safe
 		public <C extends V> Component<?> createComponent(final TableModel model, final int rowIndex, final TableColumnModel<C> column, final boolean editable, final boolean selected, final boolean focused)
 		{
-			final GuiseSession<?> session=getSession();	//get the session
+			final GuiseSession session=getSession();	//get the session
 			final TableModel.Cell<C> cell=new TableModel.Cell<C>(rowIndex, column);	//create a cell to represent the row and column
 			final int columnIndex=model.getColumnIndex(column);	//get the logical index of the given column
 			final String id=new StringBuilder("cell-").append(rowIndex).append('-').append(columnIndex).toString();	//generate an ID for this row and column
@@ -304,7 +304,7 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 		@param cell The cell being represented.
 		@exception NullPointerException if the given session, table model and/or cell is <code>null</code>.
 		*/
-		public DefaultCellMessageModel(final GuiseSession<?> session, final TableModel model, final TableModel.Cell<C> cell)
+		public DefaultCellMessageModel(final GuiseSession session, final TableModel model, final TableModel.Cell<C> cell)
 		{
 			super(session);	//construct the parent class
 			this.model=checkNull(model, "Table model cannot be null");
@@ -357,7 +357,7 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 		@param cell The cell being represented.
 		@exception NullPointerException if the given session, table model and/or cell is <code>null</code>.
 		*/
-		public DefaultCellValueModel(final GuiseSession<?> session, final TableModel model, final TableModel.Cell<C> cell)
+		public DefaultCellValueModel(final GuiseSession session, final TableModel model, final TableModel.Cell<C> cell)
 		{
 			super(session, checkNull(cell, "Cell cannot be null").getColumn().getValueClass());	//construct the parent class
 			this.model=checkNull(model, "Table model cannot be null");

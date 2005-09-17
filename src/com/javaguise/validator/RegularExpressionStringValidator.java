@@ -14,7 +14,7 @@ public class RegularExpressionStringValidator extends AbstractRegularExpressionV
 	@param regularExpression The regular expression against which to validate string values.
 	@exception NullPointerException if the given session and/or regular expression is <code>null</code>.
 	*/
-	public RegularExpressionStringValidator(final GuiseSession<?> session, final String regularExpression)
+	public RegularExpressionStringValidator(final GuiseSession session, final String regularExpression)
 	{
 		super(session, regularExpression);	//construct the parent class
 	}
@@ -25,7 +25,7 @@ public class RegularExpressionStringValidator extends AbstractRegularExpressionV
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
 	@exception NullPointerException if the given session and/or regular expression is <code>null</code>.
 	*/
-	public RegularExpressionStringValidator(final GuiseSession<?> session, final String regularExpression, final boolean valueRequired)
+	public RegularExpressionStringValidator(final GuiseSession session, final String regularExpression, final boolean valueRequired)
 	{
 		super(session, regularExpression, valueRequired);	//construct the parent class
 	}
@@ -35,7 +35,7 @@ public class RegularExpressionStringValidator extends AbstractRegularExpressionV
 	@param pattern The regular expression pattern against which to validate string values.
 	@exception NullPointerException if the given session and/or regular expression is <code>null</code>.
 	*/
-	public RegularExpressionStringValidator(final GuiseSession<?> session, final Pattern pattern)
+	public RegularExpressionStringValidator(final GuiseSession session, final Pattern pattern)
 	{
 		super(session, pattern);	//construct the parent class
 	}
@@ -46,7 +46,7 @@ public class RegularExpressionStringValidator extends AbstractRegularExpressionV
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
 	@exception NullPointerException if the given session and/or regular expression is <code>null</code>.
 	*/
-	public RegularExpressionStringValidator(final GuiseSession<?> session, final Pattern pattern, final boolean valueRequired)
+	public RegularExpressionStringValidator(final GuiseSession session, final Pattern pattern, final boolean valueRequired)
 	{
 		super(session, pattern, valueRequired);	//construct the parent class
 	}

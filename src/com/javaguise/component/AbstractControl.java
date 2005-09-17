@@ -16,7 +16,7 @@ public abstract class AbstractControl<M extends LabelModel, C extends Control<M,
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractControl(final GuiseSession<?> session, final String id, final M model)
+	public AbstractControl(final GuiseSession session, final String id, final M model)
 	{
 		super(session, id, model);	//construct the parent class
 	}

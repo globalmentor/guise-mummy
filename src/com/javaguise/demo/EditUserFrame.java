@@ -30,7 +30,7 @@ public class EditUserFrame extends DefaultModalFrame<DemoUser>
 	/**Guise session constructor.
 	@param session The Guise session that owns this frame.
 	*/
-	public EditUserFrame(final GuiseSession<?> session)
+	public EditUserFrame(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Orientation.Flow.PAGE));	//construct the parent class flowing vertically
 		getModel().setLabel("Guise\u2122 Demonstration: Edit User");	//set the frame title	
@@ -131,7 +131,7 @@ public class EditUserFrame extends DefaultModalFrame<DemoUser>
 	This version makes sure the entered passwords match.
 	@see #isPasswordMatch()
 	*/
-	public <GC extends GuiseContext<?>> void updateModel(final GC context) throws IOException, ValidationsException
+	public <GC extends GuiseContext> void updateModel(final GC context) throws IOException, ValidationsException
 	{
 		super.updateModel(context);	//update the model normally
 		if(!isPasswordMatch())	//if the password isn't valid

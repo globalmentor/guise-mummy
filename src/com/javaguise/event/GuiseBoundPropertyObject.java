@@ -14,16 +14,16 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 public class GuiseBoundPropertyObject extends BoundPropertyObject
 {
 	/**The Guise session that owns this model.*/
-	private final GuiseSession<?> session;
+	private final GuiseSession session;
 
 		/**@return The Guise session that owns this model.*/
-		public GuiseSession<?> getSession() {return session;}
+		public GuiseSession getSession() {return session;}
 
 	/**Session constructor.
 	@param session The Guise session that owns this object.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public GuiseBoundPropertyObject(final GuiseSession<?> session)
+	public GuiseBoundPropertyObject(final GuiseSession session)
 	{
 		this.session=checkNull(session, "Session cannot be null");	//save the session
 	}

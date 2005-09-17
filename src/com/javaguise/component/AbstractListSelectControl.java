@@ -43,7 +43,7 @@ public abstract class AbstractListSelectControl<V, M extends ListSelectModel<V>,
 	@exception NullPointerException if the given session, model, and/or value representation strategy is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractListSelectControl(final GuiseSession<?> session, final String id, final M model, final ValueRepresentationStrategy<V> valueRepresentationStrategy)
+	public AbstractListSelectControl(final GuiseSession session, final String id, final M model, final ValueRepresentationStrategy<V> valueRepresentationStrategy)
 	{
 		super(session, id, model);	//construct the parent class
 		this.valueRepresentationStrategy=checkNull(valueRepresentationStrategy, "Value representation strategy cannot be null.");

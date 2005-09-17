@@ -17,7 +17,7 @@ public class ContainerEvent extends ListEvent<Container<?>, Component<?>>
 	@param source The object on which the event initially occurred.
 	@exception NullPointerException if the given session and/or source is <code>null</code>.
 	*/
-	public ContainerEvent(final GuiseSession<?> session, final Container<?> source)
+	public ContainerEvent(final GuiseSession session, final Container<?> source)
 	{
 		this(session, source, -1, null, null);	//construct the class with no known modification values
 	}
@@ -30,7 +30,7 @@ public class ContainerEvent extends ListEvent<Container<?>, Component<?>>
 	@param removedComponent The component that was removed from the container, or <code>null</code> if no component was removed or it is unknown whether or which components were removed.
 	@exception NullPointerException if the given session and/or source is <code>null</code>.
 	*/
-	public ContainerEvent(final GuiseSession<?> session, final Container<?> source, final int index, final Component<?> addedComponent, final Component<?> removedComponent)
+	public ContainerEvent(final GuiseSession session, final Container<?> source, final int index, final Component<?> addedComponent, final Component<?> removedComponent)
 	{
 		super(session, source, index, addedComponent, removedComponent);	//construct the parent class
 	}

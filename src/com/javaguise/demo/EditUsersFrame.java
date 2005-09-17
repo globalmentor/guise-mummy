@@ -24,7 +24,7 @@ public class EditUsersFrame extends DefaultFrame
 	/**Guise session constructor.
 	@param session The Guise session that owns this frame.
 	*/
-	public EditUsersFrame(final GuiseSession<?> session)
+	public EditUsersFrame(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Orientation.Flow.LINE));	//construct the parent class flowing horizontally
 		getModel().setLabel("Guise\u2122 Demonstration: Edit Users");	//set the frame title	

@@ -31,7 +31,7 @@ public class DefaultTableModel extends AbstractTableModel
 	@param columnNames The names to serve as label headers for the columns.
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	*/
-	public <C> DefaultTableModel(final GuiseSession<?> session, final Class<C> valueClass, final String... columnNames)
+	public <C> DefaultTableModel(final GuiseSession session, final Class<C> valueClass, final String... columnNames)
 	{
 		this(session, valueClass, null, columnNames);	//construct the class with no values
 	}
@@ -41,7 +41,7 @@ public class DefaultTableModel extends AbstractTableModel
 	@param columns The models representing the table columns.
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	*/
-	public DefaultTableModel(final GuiseSession<?> session, final TableColumnModel<?>... columns)
+	public DefaultTableModel(final GuiseSession session, final TableColumnModel<?>... columns)
 	{
 		this(session, null, columns);	//construct the class with no values
 	}
@@ -55,7 +55,7 @@ public class DefaultTableModel extends AbstractTableModel
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
 	*/
-	public <C> DefaultTableModel(final GuiseSession<?> session, final Class<C> valueClass, final C[][] rowValues, final String... columnNames)
+	public <C> DefaultTableModel(final GuiseSession session, final Class<C> valueClass, final C[][] rowValues, final String... columnNames)
 	{
 		this(session, rowValues, (TableColumnModel<?>[])createDefaultColumns(session, valueClass, columnNames));	//create default columns for the column names
 	}
@@ -68,7 +68,7 @@ public class DefaultTableModel extends AbstractTableModel
 	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
 	@exception ClassCastException if one of the values in a row is not compatible with the type of its column.
 	*/
-	public DefaultTableModel(final GuiseSession<?> session, final Object[][] rowValues, final TableColumnModel<?>... columns)
+	public DefaultTableModel(final GuiseSession session, final Object[][] rowValues, final TableColumnModel<?>... columns)
 	{
 		super(session, columns);	//construct the parent class
 		valueRowLists=new SynchronizedListDecorator<List<Object>>(new ArrayList<List<Object>>(), this);	//create a list of value lists, synchronizing all access on this object
@@ -103,7 +103,7 @@ public class DefaultTableModel extends AbstractTableModel
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
 	@SuppressWarnings("unchecked")	//as generics are only one-deep for class objects, we must cast the generic type of the default table column model class
-	public static <C> TableColumnModel<C>[] createDefaultColumns(final GuiseSession<?> session, final Class<C> valueClass, final String... columnNames)
+	public static <C> TableColumnModel<C>[] createDefaultColumns(final GuiseSession session, final Class<C> valueClass, final String... columnNames)
 	{
 		checkNull(session, "Session cannot be null.");
 		final DefaultTableColumnModel<C>[] columns=createArray((Class<DefaultTableColumnModel<C>>)(Object)DefaultTableColumnModel.class, columnNames.length);	//create an array of default table columns

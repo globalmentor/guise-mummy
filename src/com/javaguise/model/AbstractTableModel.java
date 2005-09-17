@@ -60,7 +60,7 @@ public abstract class AbstractTableModel extends AbstractControlModel implements
 	@param columns The models representing the table columns.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public AbstractTableModel(final GuiseSession<?> session, final TableColumnModel<?>... columns)
+	public AbstractTableModel(final GuiseSession session, final TableColumnModel<?>... columns)
 	{
 		this(session, null, columns);	//construct the class with no label
 	}
@@ -71,7 +71,7 @@ public abstract class AbstractTableModel extends AbstractControlModel implements
 	@param columns The models representing the table columns.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public AbstractTableModel(final GuiseSession<?> session, final String label, final TableColumnModel<?>... columns)
+	public AbstractTableModel(final GuiseSession session, final String label, final TableColumnModel<?>... columns)
 	{
 		super(session, label);	//construct the parent class
 		CollectionUtilities.addAll(logicalTableColumnModels, columns);	//add all the columns to our logical list of table columns

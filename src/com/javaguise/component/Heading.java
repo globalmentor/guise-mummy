@@ -13,7 +13,7 @@ public class Heading extends AbstractModelComponent<HeadingModel, Heading>
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public Heading(final GuiseSession<?> session)
+	public Heading(final GuiseSession session)
 	{
 		this(session, null);	//construct the component, indicating that a default ID should be used
 	}
@@ -23,7 +23,7 @@ public class Heading extends AbstractModelComponent<HeadingModel, Heading>
 	@param level The zero-based level of the heading, or <code>-1</code> if no level is specified.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public Heading(final GuiseSession<?> session, final int level)
+	public Heading(final GuiseSession session, final int level)
 	{
 		this(session, null, level);	//construct the component, indicating that a default ID and the given heading level should be used
 	}
@@ -34,7 +34,7 @@ public class Heading extends AbstractModelComponent<HeadingModel, Heading>
 	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public Heading(final GuiseSession<?> session, final String id)
+	public Heading(final GuiseSession session, final String id)
 	{
 		this(session, id, HeadingModel.NO_HEADING_LEVEL);	//construct the class with a default model with no heading level
 	}
@@ -46,7 +46,7 @@ public class Heading extends AbstractModelComponent<HeadingModel, Heading>
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public Heading(final GuiseSession<?> session, final String id, final int level)
+	public Heading(final GuiseSession session, final String id, final int level)
 	{
 		super(session, id, new DefaultHeadingModel(session, level));	//construct the class with a default model
 	}
@@ -58,7 +58,7 @@ public class Heading extends AbstractModelComponent<HeadingModel, Heading>
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public Heading(final GuiseSession<?> session, final String id, final HeadingModel model)
+	public Heading(final GuiseSession session, final String id, final HeadingModel model)
 	{
 		super(session, id, model);	//construct the parent class
 	}

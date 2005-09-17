@@ -32,7 +32,7 @@ import org.xml.sax.SAXException;
 The output stream defaults to <code>text/plain</code> encoded in <code>UTF-8</code>.
 @author Garret Wilson
 */
-public class HTTPServletGuiseContext extends AbstractXMLGuiseContext<HTTPServletGuiseContext>
+public class HTTPServletGuiseContext extends AbstractXMLGuiseContext
 {
 
 	/**The HTTP servlet request.*/
@@ -68,7 +68,7 @@ public class HTTPServletGuiseContext extends AbstractXMLGuiseContext<HTTPServlet
 	@param response The HTTP servlet response.
 	@exception NullPointerException if the session, request or response is <code>null</code>.
 	*/
-	public HTTPServletGuiseContext(final GuiseSession<HTTPServletGuiseContext> session, final HttpServletRequest request, final HttpServletResponse response)
+	public HTTPServletGuiseContext(final GuiseSession session, final HttpServletRequest request, final HttpServletResponse response)
 	{
 		super(session);	//construct the parent class
 		this.request=checkNull(request, "Request cannot be null.");

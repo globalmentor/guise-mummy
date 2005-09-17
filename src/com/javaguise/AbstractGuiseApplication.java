@@ -259,8 +259,9 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@param component The component for which a controller should be returned.
 	@return A controller to render the given component, or <code>null</code> if no controller is registered.
 	*/
+/*TODO del when works
 	@SuppressWarnings("unchecked")	//class objects don't carry deep generic information so we have to assume that the instantiated controller is of the correct generic type
-	public <GC extends GuiseContext<?>, C extends Component<?>> Controller<? super GC, ? super C> getController(final GC context, final C component)
+	public <GC extends GuiseContext, C extends Component<?>> Controller<? super GC, ? super C> getController(final GC context, final C component)
 	{
 		Class<? extends Component> componentClass=component.getClass();	//get the component class
 		final Class<? extends Controller> controllerClass=getControllerClass(componentClass);	//walk the hierarchy to see if there is a controller class registered for this component type
@@ -283,6 +284,31 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		}
 		return null;	//show that we could not find a registered render strategy
 	}
+*/
+	public <C extends Component<?>> Controller<? extends GuiseContext, ? super C> getController(final C component)
+	{
+		Class<? extends Component> componentClass=component.getClass();	//get the component class
+		final Class<? extends Controller> controllerClass=getControllerClass(componentClass);	//walk the hierarchy to see if there is a controller class registered for this component type
+		if(controllerClass!=null)	//if we found a render strategy class
+		{
+			try
+			{
+				return (Controller<? extends GuiseContext, ? super C>)controllerClass.newInstance();	//return a new instance of the class
+			}
+			catch (InstantiationException e)
+			{
+				Debug.error(e);
+				throw new AssertionError(e);	//TODO fix
+			}
+			catch (IllegalAccessException e)
+			{
+				Debug.error(e);
+				throw new AssertionError(e);	//TODO fix
+			}
+		}
+		return null;	//show that we could not find a registered render strategy
+	}
+
 
 //TODO how do we keep the general public from changing the frame bindings?
 

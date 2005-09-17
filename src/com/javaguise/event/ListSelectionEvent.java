@@ -17,7 +17,7 @@ public class ListSelectionEvent<V> extends SetEvent<ListSelectModel<V>, Integer>
 	@param source The object on which the event initially occurred.
 	@exception NullPointerException if the given session and/or source is <code>null</code>.
 	*/
-	public ListSelectionEvent(final GuiseSession<?> session, final ListSelectModel<V> source)
+	public ListSelectionEvent(final GuiseSession session, final ListSelectModel<V> source)
 	{
 		this(session, source, null, null);	//construct the class with no known modification values
 	}
@@ -29,7 +29,7 @@ public class ListSelectionEvent<V> extends SetEvent<ListSelectModel<V>, Integer>
 	@param removedElement The index that was removed from the selection, or <code>null</code> if no index was removed or it is unknown whether or which indices were removed.
 	@exception NullPointerException if the given session and/or source is <code>null</code>.
 	*/
-	public ListSelectionEvent(final GuiseSession<?> session, final ListSelectModel<V> source, final Integer addedElement, final Integer removedElement)
+	public ListSelectionEvent(final GuiseSession session, final ListSelectModel<V> source, final Integer addedElement, final Integer removedElement)
 	{
 		super(session, source, addedElement, removedElement);	//construct the parent class
 	}

@@ -14,7 +14,7 @@ public class Text extends AbstractModelComponent<TextModel, Text>
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public Text(final GuiseSession<?> session)
+	public Text(final GuiseSession session)
 	{
 		this(session, null);	//construct the component, indicating that a default ID should be used
 	}
@@ -25,7 +25,7 @@ public class Text extends AbstractModelComponent<TextModel, Text>
 	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public Text(final GuiseSession<?> session, final String id)
+	public Text(final GuiseSession session, final String id)
 	{
 		this(session, id, new DefaultTextModel(session));	//construct the class with a default model
 	}
@@ -37,7 +37,7 @@ public class Text extends AbstractModelComponent<TextModel, Text>
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public Text(final GuiseSession<?> session, final String id, final TextModel model)
+	public Text(final GuiseSession session, final String id, final TextModel model)
 	{
 		super(session, id, model);	//construct the parent class
 	}

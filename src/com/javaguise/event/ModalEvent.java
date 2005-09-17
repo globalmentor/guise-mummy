@@ -22,7 +22,7 @@ public class ModalEvent<R> extends GuiseEvent<ModalFrame<R, ?>>
 	@param result The result of this frame's modal interaction, or <code>null</code> if no result is given.
 	@exception NullPointerException if the given session and/or source is <code>null</code>.
 	*/
-	public ModalEvent(final GuiseSession<?> session, final ModalFrame<R, ?> source, final R result)
+	public ModalEvent(final GuiseSession session, final ModalFrame<R, ?> source, final R result)
 	{
 		super(session, source);	//construct the parent class
 		this.result=result;	//save the result

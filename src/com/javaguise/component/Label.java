@@ -34,7 +34,7 @@ public class Label extends AbstractModelComponent<LabelModel, Label>
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public Label(final GuiseSession<?> session)
+	public Label(final GuiseSession session)
 	{
 		this(session, (String)null);	//construct the component, indicating that a default ID should be used
 	}
@@ -45,7 +45,7 @@ public class Label extends AbstractModelComponent<LabelModel, Label>
 	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public Label(final GuiseSession<?> session, final String id)
+	public Label(final GuiseSession session, final String id)
 	{
 		this(session, id, new DefaultLabelModel(session));	//construct the class with a default model
 	}
@@ -55,7 +55,7 @@ public class Label extends AbstractModelComponent<LabelModel, Label>
 	@param model The component data model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	*/
-	public Label(final GuiseSession<?> session, final LabelModel model)
+	public Label(final GuiseSession session, final LabelModel model)
 	{
 		this(session, null, model);	//construct the class, indicating that a default ID should be used
 	}
@@ -67,7 +67,7 @@ public class Label extends AbstractModelComponent<LabelModel, Label>
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public Label(final GuiseSession<?> session, final String id, final LabelModel model)
+	public Label(final GuiseSession session, final String id, final LabelModel model)
 	{
 		super(session, id, model);	//construct the parent class
 		addExportStrategy(DEFAULT_EXPORT_STRATEGY);	//install a default export strategy 

@@ -1709,7 +1709,7 @@ function onButtonClick(event)
 		var form=getForm(element);	//get the form
 		if(form && form.id)	//if there is a form with an ID
 		{
-			var actionInputID=form.id.replace(":form", ":input");	//determine the ID of the hidden action input
+			var actionInputID=form.id.replace(".form", ".input");	//determine the ID of the hidden action input TODO use a constant, or get these values using a better method
 			var actionInput=document.getElementById(actionInputID);	//get the action input
 			if(actionInput)	//if there is an action input
 			{
@@ -1772,7 +1772,7 @@ function onAction(event)
 		var form=getForm(element);	//get the form
 		if(form && form.id)	//if there is a form with an ID
 		{
-			var actionInputID=form.id.replace(":form", ":input");	//determine the ID of the hidden action input
+			var actionInputID=form.id.replace(".form", ".input");	//determine the ID of the hidden action input TODO use a constant, or get these values using a better method
 			if(AJAX_URI)	//if AJAX is enabled
 			{
 				var ajaxRequest=new FormAJAXEvent(new Parameter(actionInputID, element.id));	//create a new form request with form's hidden action control and the action element ID

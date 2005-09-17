@@ -85,7 +85,7 @@ public class DefaultTableColumnModel<V> extends AbstractControlModel implements 
 	@param valueClass The class indicating the type of values held in the model.
 	@exception NullPointerException if the given session, and/or value class is <code>null</code>.
 	*/
-	public DefaultTableColumnModel(final GuiseSession<?> session, final Class<V> valueClass)
+	public DefaultTableColumnModel(final GuiseSession session, final Class<V> valueClass)
 	{
 		this(session, null, valueClass);	//construct the class indicating that a default ID should be generated
 	}
@@ -96,7 +96,7 @@ public class DefaultTableColumnModel<V> extends AbstractControlModel implements 
 	@param label The text of the label.
 	@exception NullPointerException if the given session, and/or value class is <code>null</code>.
 	*/
-	public DefaultTableColumnModel(final GuiseSession<?> session, final Class<V> valueClass, final String label)
+	public DefaultTableColumnModel(final GuiseSession session, final Class<V> valueClass, final String label)
 	{
 		this(session, null, valueClass, label);	//construct the class indicating that a default ID should be generated
 	}
@@ -108,7 +108,7 @@ public class DefaultTableColumnModel<V> extends AbstractControlModel implements 
 	@exception NullPointerException if the given session, and/or value class is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public DefaultTableColumnModel(final GuiseSession<?> session, final String id, final Class<V> valueClass)
+	public DefaultTableColumnModel(final GuiseSession session, final String id, final Class<V> valueClass)
 	{
 		this(session, id, valueClass, null);	//construct the class with no label
 	}
@@ -121,7 +121,7 @@ public class DefaultTableColumnModel<V> extends AbstractControlModel implements 
 	@exception NullPointerException if the given session, and/or value class is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public DefaultTableColumnModel(final GuiseSession<?> session, final String id, final Class<V> valueClass, final String label)
+	public DefaultTableColumnModel(final GuiseSession session, final String id, final Class<V> valueClass, final String label)
 	{
 		super(session, label);	//construct the parent class
 		this.valueClass=valueClass;	//save the value class

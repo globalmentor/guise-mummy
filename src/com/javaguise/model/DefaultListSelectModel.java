@@ -471,7 +471,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	@param valueClass The class indicating the type of values held in the model.
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	*/
-	public DefaultListSelectModel(final GuiseSession<?> session, final Class<V> valueClass)
+	public DefaultListSelectModel(final GuiseSession session, final Class<V> valueClass)
 	{
 		this(session, valueClass, new MultipleListSelectionStrategy<V>());	//construct the class with a multiple selection strategy
 	}
@@ -483,7 +483,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	@param listSelectionStrategy The strategy for selecting values in the model.
 	@exception NullPointerException if the given session, class object, and/or selection strategy is <code>null</code>.
 	*/
-	public DefaultListSelectModel(final GuiseSession<?> session, final Class<V> valueClass, final ListSelectionStrategy<V> listSelectionStrategy)
+	public DefaultListSelectModel(final GuiseSession session, final Class<V> valueClass, final ListSelectionStrategy<V> listSelectionStrategy)
 	{
 		super(session, valueClass);	//construct the parent class
 		this.selectionStrategy=checkNull(listSelectionStrategy, "Selection strategy cannot be null.");

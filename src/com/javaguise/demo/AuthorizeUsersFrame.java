@@ -31,7 +31,7 @@ public class AuthorizeUsersFrame extends DefaultFrame
 	/**Guise session constructor.
 	@param session The Guise session that owns this frame.
 	*/
-	public AuthorizeUsersFrame(final GuiseSession<?> session)
+	public AuthorizeUsersFrame(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Orientation.Flow.PAGE));	//construct the parent class flowing vertically
 		getModel().setLabel("Guise\u2122 Demonstration: Authorize Users");	//set the frame title	
@@ -63,7 +63,7 @@ public class AuthorizeUsersFrame extends DefaultFrame
 	@exception IOException if there is an error querying the model.
 	@see GuiseContext.State#QUERY_MODEL
 	*/
-	public <GC extends GuiseContext<?>> void queryModel(final GC context) throws IOException
+	public <GC extends GuiseContext> void queryModel(final GC context) throws IOException
 	{
 		userAuthorizationModel.clear();	//clear all the users we currently have
 		final List<DemoUser> applicationUserList=((DemoApplication)getSession().getApplication()).getUsers();	//get the application's list of users
@@ -88,7 +88,7 @@ public class AuthorizeUsersFrame extends DefaultFrame
 		@param columns The models representing the table columns.
 		@exception NullPointerException if the given session is <code>null</code>.
 		*/
-		public UserAuthorizationTableModel(final GuiseSession<?> session, final TableColumnModel<?>... columns)
+		public UserAuthorizationTableModel(final GuiseSession session, final TableColumnModel<?>... columns)
 		{
 			super(session, DemoUser.class, columns);	//construct the parent class with the class representing users
 		}

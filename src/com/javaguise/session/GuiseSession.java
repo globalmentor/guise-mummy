@@ -18,7 +18,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 A Swing-based client application may have only one session, while a web server application will likely have multiple sessions.
 @author Garret Wilson
 */
-public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBindable
+public interface GuiseSession extends PropertyBindable
 {
 
 	/**The orientation bound property.*/
@@ -204,7 +204,7 @@ public interface GuiseSession<GC extends GuiseContext<GC>> extends PropertyBinda
 	public void setPrincipal(final Principal newPrincipal);
 
 	/**@return The current context for this session, or <code>null</code> if there currently is no context.*/
-	public GC getContext();
+	public GuiseContext getContext();
 
 	/**Queues a postponed model event to be fired after all contexts have finished updating the model.
 	If a Guise context is currently updating the model, the event will be queued for later.

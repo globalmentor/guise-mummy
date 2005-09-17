@@ -117,7 +117,7 @@ public abstract class AbstractLayout<T extends Layout.Constraints> extends Guise
 	@param session The Guise session that owns this layout.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public AbstractLayout(final GuiseSession<?> session)
+	public AbstractLayout(final GuiseSession session)
 	{
 		super(session);	//construct the parent class
 	}

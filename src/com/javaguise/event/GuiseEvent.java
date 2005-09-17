@@ -12,10 +12,10 @@ public class GuiseEvent<S> extends EventObject
 {
 
 	/**The Guise session in which this event was generated.*/
-	private final GuiseSession<?> session;
+	private final GuiseSession session;
 
 		/**@return The Guise session in which this event was generated.*/
-		public GuiseSession<?> getSession() {return session;}
+		public GuiseSession getSession() {return session;}
 
 	/**@return The source of the event.*/
 	@SuppressWarnings("unchecked")
@@ -29,7 +29,7 @@ public class GuiseEvent<S> extends EventObject
 	@param source The object on which the event initially occurred.
 	@exception NullPointerException if the given session and/or source is <code>null</code>.
 	*/
-	public GuiseEvent(final GuiseSession<?> session, final S source)
+	public GuiseEvent(final GuiseSession session, final S source)
 	{
 		super(checkNull(source, "Event source object cannot be null"));	//construct the parent class
 		this.session=checkNull(session, "Session cannot be null");	//save the session

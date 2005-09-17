@@ -97,7 +97,7 @@ public class DefaultTextModel extends AbstractModel implements TextModel
 	@param session The Guise session that owns this model.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public DefaultTextModel(final GuiseSession<?> session)
+	public DefaultTextModel(final GuiseSession session)
 	{
 		super(session);	//construct the parent class
 	}

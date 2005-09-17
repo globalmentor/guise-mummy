@@ -22,7 +22,7 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowLayout.Constraint
 	@param flow The logical axis (line or page) along which information is flowed.
 	@exception NullPointerException if the axis is <code>null</code>.
 	*/
-	public AbstractFlowLayout(final GuiseSession<?> session, final Orientation.Flow flow)
+	public AbstractFlowLayout(final GuiseSession session, final Orientation.Flow flow)
 	{
 		super(session);	//construct the parent class
 		this.flow=checkNull(flow, "Flow cannot be null.");	//store the flow
