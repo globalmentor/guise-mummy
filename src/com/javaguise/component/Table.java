@@ -1,26 +1,21 @@
 package com.javaguise.component;
 
+import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.garretwilson.util.EmptyIterator;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
-import com.javaguise.validator.ValidationException;
-import com.javaguise.validator.Validator;
+import com.javaguise.validator.*;
 
 /**A table component.
 @author Garret Wilson
 */
-public class Table extends AbstractModelComponent<TableModel, Table>
+public class Table extends AbstractCompositeModelComponent<TableModel, TableModel.Cell<?>, Table.CellComponentState, Table>
 {
-
-	/**@return An iterator to child components.*/
-//TODO del	public Iterator<Component<?>> iterator() {return cellComponentMap.values().iterator();}
-
-	/**@return Whether this component has children. This implementation delegates to the cell component map.*/
-//TODO del	public boolean hasChildren() {return !cellComponentMap.isEmpty();}
 
 	/**The map of cell representation strategies for columns.*/
 	private final Map<TableColumnModel<?>, CellRepresentationStrategy<?>> columnCellRepresentationStrategyMap=new ConcurrentHashMap<TableColumnModel<?>, CellRepresentationStrategy<?>>();
@@ -47,7 +42,28 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 	{
 		return (CellRepresentationStrategy<? super V>)columnCellRepresentationStrategyMap.get(column);	//return the strategy linked to the column in the map
 	}
-	
+
+	/**Ensures the component for a particular row and column exists.
+	@param <T> The type of value contained in the cells of the column.
+	@param rowIndex The zero-based cell row index.
+	@param column The cell column.
+	@exception IOException if there is an error updating the cell view.
+	*/
+	public <T> void verifyCellComponent(final int rowIndex, final TableColumnModel<T> column) throws IOException
+	{
+		final TableModel tableModel=getModel();	//get the table model
+		final boolean editable=tableModel.isEditable() && column.isEditable();	//see if the cell is editable (a cell is only editable if both its table and column are editable)
+		final TableModel.Cell<T> cell=new TableModel.Cell<T>(rowIndex, column);	//create a cell object representing this row and column
+		CellComponentState cellComponentState=getComponentState(cell);	//get the component information for this cell
+		if(cellComponentState==null || cellComponentState.isEditable()!=editable)	//if there is no component for this cell, or the component has a different editable status
+		{
+			final Component<?> valueComponent=getCellRepresentationStrategy(column).createComponent(tableModel, rowIndex, column, editable, false, false);	//create a new component for the cell
+			valueComponent.setParent(this);	//tell this component that this table component is its parent
+			cellComponentState=new CellComponentState(valueComponent, editable);	//create a new component state for the cell's component and metadata
+			putComponentState(cell, cellComponentState);	//store the component state in the map for next time
+		}
+	}
+
 	/**Session, value class, and column names constructor with a default ID and default data model.
 	@param <C> The type of values in all the cells in the table.
 	@param session The Guise session that owns this component.
@@ -183,6 +199,29 @@ public class Table extends AbstractModelComponent<TableModel, Table>
 		for(final TableColumnModel<?> column:model.getColumns())	//install a default cell representation strategy for each column
 		{
 			installDefaultCellRepresentationStrategy(column);	//create and install a default representation strategy for this column
+		}
+	}
+
+	/**An encapsulation of a component for a cell along with other metadata, such as whether the component was editable when created.
+	@author Garret Wilson
+	*/ 
+	protected static class CellComponentState extends AbstractCompositeModelComponent.ComponentState
+	{
+		/**Whether the component is for a cell that was editable when the component was created.*/
+		private final boolean editable;
+
+			/**@return Whether the component is for a cell that was editable when the component was created.*/
+			public boolean isEditable() {return editable;}
+
+		/**Constructor
+		@param component The component for a cell.
+		@param editable Whether the component is for a cell that was editable when the component was created.
+		@exception NullPointerException if the given component is <code>null</code>.
+		*/
+		public CellComponentState(final Component<?> component, final boolean editable)
+		{
+			super(component);	//construct the parent class
+			this.editable=editable;
 		}
 	}
 

@@ -1,17 +1,11 @@
 package com.javaguise.component;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.*;
 
 import com.garretwilson.beans.PropertyBindable;
-import com.garretwilson.util.ReverseIterator;
 import com.javaguise.component.layout.Orientation;
-import com.javaguise.component.transfer.ExportStrategy;
-import com.javaguise.component.transfer.ImportStrategy;
-import com.javaguise.component.transfer.Transferable;
+import com.javaguise.component.transfer.*;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.Controller;
 import static com.garretwilson.lang.ClassUtilities.*;
@@ -25,7 +19,7 @@ Any component may contain other components, but only a {@link Container} allows 
 A component is iterable over its child components, and can be used in short <code>for(:)</code> form. 
 @author Garret Wilson
 */
-public interface Component<C extends Component<C>> extends PropertyBindable, Iterable<Component<?>>
+public interface Component<C extends Component<C>> extends PropertyBindable
 {
 
 	/**The bound property of the controller.*/
@@ -43,12 +37,6 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 
 	/**The character used to combine hierarchical IDs.*/
 	public final static char ID_SEGMENT_DELIMITER='.';
-
-	/**@return Whether this component has children.*/
-	public boolean hasChildren();
-
-	/**@return An iterator to contained components in reverse order.*/
-	public Iterator<Component<?>> reverseIterator();
 
 	/**@return The controller installed in this component.*/
 	public Controller<? extends GuiseContext, ? super C> getController();
@@ -150,14 +138,14 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 //TODO del when works	public String getAbsoluteUniqueID(final Component<?> childComponent);
 
 	/**@return The parent of this component, or <code>null</code> if this component does not have a parent.*/
-	public Component<?> getParent();
+	public CompositeComponent<?> getParent();
 
 	/**Retrieves the first ancestor of the given type.
-	@param <C> The type of ancestor component requested.
+	@param <A> The type of ancestor component requested.
 	@param ancestorClass The class of ancestor component requested.
 	@return The first ancestor component of the given type, or <code>null</code> if this component has no such ancestor.
 	*/
-	public <A extends Component<?>> A getAncestor(final Class<A> ancestorClass);
+	public <A extends CompositeComponent<?>> A getAncestor(final Class<A> ancestorClass);
 
 	/**Sets the parent of this component.
 	This method is managed by containers, and normally should not be called by applications.
@@ -172,7 +160,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Ite
 	@see Container#add(Component)
 	@see Container#remove(Component)
 	*/
-	public void setParent(final Component<?> newParent);
+	public void setParent(final CompositeComponent<?> newParent);
 
 	/**@return The Guise session that owns this component.*/
 	public GuiseSession getSession();

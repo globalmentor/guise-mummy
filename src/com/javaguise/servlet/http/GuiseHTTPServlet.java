@@ -535,7 +535,7 @@ Debug.info("content type:", request.getContentType());
 						
 						if(parameterName.equals(XHTMLFrameController.getActionInputID(navigationFrame)) && parameterListMapEntry.getValue().size()>0)	//if this parameter is for an action
 						{
-							final Component<?> actionComponent=AbstractController.getComponentByID(navigationFrame, parameterListMapEntry.getValue().get(0).toString());	//get an action component
+							final Component<?> actionComponent=AbstractComponent.getComponentByID(navigationFrame, parameterListMapEntry.getValue().get(0).toString());	//get an action component
 							if(actionComponent!=null)	//if we found an action component
 							{
 								requestedComponents.add(actionComponent);	//add it to the list of requested components
@@ -552,7 +552,7 @@ Debug.info("content type:", request.getContentType());
 				else if(controlEvent instanceof DropEvent)	//if this is a drag and drop drop event
 				{
 					final DropEvent dropEvent=(DropEvent)controlEvent;	//get the drop event
-					final Component<?> dropTarget=AbstractController.getComponentByID(navigationFrame, dropEvent.getDropTargetID());	//get the drop target component
+					final Component<?> dropTarget=AbstractComponent.getComponentByID(navigationFrame, dropEvent.getDropTargetID());	//get the drop target component
 					if(dropTarget!=null)	//if there is a drop target
 					{
 						requestedComponents.add(dropTarget);	//add the drop target to the set of requested components
@@ -735,9 +735,12 @@ for(final Component<?> affectedComponent:affectedComponents)
 			}
 			
 		}
-		for(final Component<?> childComponent:component.getController().getChildComponents(component))
+		if(component instanceof CompositeComponent)
 		{
-			getControlsByName(context, childComponent, name, componentSet);
+			for(final Component<?> childComponent:(CompositeComponent<?>)component)
+			{
+				getControlsByName(context, childComponent, name, componentSet);
+			}
 		}
 	}
 

@@ -1,13 +1,18 @@
 package com.javaguise.component;
 
+import java.util.Iterator;
+
 import com.javaguise.component.layout.Layout;
 import com.javaguise.event.ContainerListener;
 
 /**Component that allows for addition and removal of child components.
 @author Garret Wilson
 */
-public interface Container<C extends Container<C>> extends Component<C>
+public interface Container<C extends Container<C>> extends CompositeComponent<C>
 {
+
+	/**@return An iterator to contained components in reverse order.*/
+	public Iterator<Component<?>> reverseIterator();
 
 	/**Adds a component to the container with default constraints.
 	@param component The component to add.

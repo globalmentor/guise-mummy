@@ -23,7 +23,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 /**An abstract implementation of a component.
 @author Garret Wilson
 */
-public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropertyObject implements Component<C>
+public abstract class AbstractComponent<C extends Component<C>> extends GuiseBoundPropertyObject implements Component<C>
 {
 
 	/**The character used when building absolute IDs.*/
@@ -42,15 +42,6 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 	@SuppressWarnings("unchecked")
 	protected final C getThis() {return (C)this;}
 		
-	/**@return Whether this component has children. This implementation returns <code>false</code>.*/
-	public boolean hasChildren() {return false;}
-
-	/**@return An iterator to child components. This implementation returns an empty iterator.*/
-	public Iterator<Component<?>> iterator() {return new EmptyIterator<Component<?>>();}
-
-	/**@return An iterator to contained components in reverse order.*/
-	public Iterator<Component<?>> reverseIterator() {return new EmptyIterator<Component<?>>();}
-
 	/**The controller installed in this component.*/
 	private Controller<? extends GuiseContext, ? super C> controller;
 
@@ -296,20 +287,20 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 */
 
 	/**The parent of this component, or <code>null</code> if this component does not have a parent.*/
-	private Component<?> parent=null;
+	private CompositeComponent<?> parent=null;
 
 		/**@return The parent of this component, or <code>null</code> if this component does not have a parent.*/
-		public Component<?> getParent() {return parent;}
+		public CompositeComponent<?> getParent() {return parent;}
 
 		/**Retrieves the first ancestor of the given type.
-		@param <C> The type of ancestor component requested.
+		@param <A> The type of ancestor component requested.
 		@param ancestorClass The class of ancestor component requested.
 		@return The first ancestor component of the given type, or <code>null</code> if this component has no such ancestor.
 		*/
 		@SuppressWarnings("unchecked")	//we check to see if the ancestor is of the correct type before casting, so the cast is logically checked, though not syntactically checked
-		public <A extends Component<?>> A getAncestor(final Class<A> ancestorClass)
+		public <A extends CompositeComponent<?>> A getAncestor(final Class<A> ancestorClass)
 		{
-			final Component<?> parent=getParent();	//get this component's parent
+			final CompositeComponent<?> parent=getParent();	//get this component's parent
 			if(parent!=null)	//if there is a parent
 			{
 				return ancestorClass.isInstance(parent) ? (A)parent : parent.getAncestor(ancestorClass);	//if the parent is of the correct type, return it; otherwise, ask it to search its own ancestors
@@ -333,9 +324,9 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 		@see Container#add(Component)
 		@see Container#remove(Component)
 		*/
-		public void setParent(final Component<?> newParent)
+		public void setParent(final CompositeComponent<?> newParent)
 		{
-			final Component<?> oldParent=parent;	//get the old parent
+			final CompositeComponent<?> oldParent=parent;	//get the old parent
 			if(oldParent!=newParent)	//if the parent is really changing
 			{
 				if(newParent!=null)	//if a parent is provided
@@ -546,7 +537,6 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 	}
 
 	/**Determines whether the models of this component and all of its child components are valid.
-	This version returns <code>true</code> if all its child components are valid.
 	@return Whether the models of this component and all of its child components are valid.
 	*/
 	public boolean isValid()
@@ -555,14 +545,7 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 		{
 			return false;	//although the model may be valid, its view representation is not
 		}
-		for(final Component<?> childComponent:this)	//for each child component
-		{
-			if(!childComponent.isValid())	//if this child component isn't valid
-			{
-				return false;	//indicate that this component is consequently not valid
-			}
-		}
-		return true;	//indicate that all child components are valid
+		return true;	//indicate that this component is valid
 	}
 
 	/**@return The character used by this component when building absolute IDs.*/
@@ -717,6 +700,45 @@ public class AbstractComponent<C extends Component<C>> extends GuiseBoundPropert
 		return controller;	//return the controller we found
 	}
 */
+
+	/**Determines the root parent of the given component.
+	@param component The component for which the root should be found.
+	@return The root component (the component or ancestor which has no parent).
+	*/
+	public static Component<?> getRootComponent(Component<?> component)
+	{
+		Component<?> parent;	//we'll keep track of the parent at each level when finding the root component
+		while((parent=component.getParent())!=null)	//get the parent; while there is a parent
+		{
+			component=parent;	//move up the chain
+		}
+		return component;	//return whatever component we ended up with without a parent
+	}
+
+	/**Retrieves a component with the given ID.
+	This method checks the given component and all descendant components.
+	@param component The component that should be checked, along with its descendants, for the given ID.
+	@return The component with the given ID, or <code>null</code> if this component and all descendant components do not have the given ID. 
+	*/
+	public static Component<?> getComponentByID(final Component<?> component, final String id)
+	{
+		if(component.getID().equals(id))	//if this component has the correct ID
+		{
+			return component;	//return this component
+		}
+		else if(component instanceof CompositeComponent)	//if this component doesn't have the correct ID, but it is a composite component
+		{
+			for(final Component<?> childComponent:(CompositeComponent<?>)component)	//for each child component
+			{
+				final Component<?> matchingComponent=getComponentByID(childComponent, id);	//see if we can find a component in this tree
+				if(matchingComponent!=null)	//if we found a matching component
+				{
+					return matchingComponent;	//return the matching component
+				}
+			}
+		}
+		return null;
+	}
 
 	/**@return A string representation of this component.*/
 	public String toString()

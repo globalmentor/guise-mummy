@@ -1,7 +1,8 @@
 package com.javaguise.component;
 
+import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
@@ -11,7 +12,7 @@ import com.javaguise.session.GuiseSession;
 /**A tree control.
 @author Garret Wilson
 */
-public class TreeControl extends AbstractModelComponent<TreeModel, TreeControl>
+public class TreeControl extends AbstractCompositeModelComponent<TreeModel, TreeNodeModel<?>, TreeControl.TreeNodeComponentState, TreeControl> implements Control<TreeModel, TreeControl>
 {
 
 	/**The map of tree node representation strategies for classes.*/
@@ -46,7 +47,36 @@ public class TreeControl extends AbstractModelComponent<TreeModel, TreeControl>
 		}
 		return treeNodeRepresentationStrategy;	//return the tree node representation strategy
 	}
-	
+
+	/**Ensures the component for a particular tree hierarchy exists.
+	This method is meant to be called primarily from the associated controller.
+	This method recursively calls itself for all child nodes of the given tree node.
+	@param <T> The type of value contained in the tree node.
+	@param treeNode The tree node to verify.
+	@exception IOException if there is an error updating the tree node view.
+	*/
+	public <T> void verifyTreeNodeComponent(final TreeNodeModel<T> treeNode) throws IOException
+	{
+		final boolean editable=treeNode.isEditable();	//see if the tree node is editable
+		TreeNodeComponentState treeNodeComponentState=getComponentState(treeNode);	//get the component information for this tree node
+		if(treeNodeComponentState==null || treeNodeComponentState.isEditable()!=editable)	//if there is no component for this tree node, or the component has a different editable status
+		{
+				//TODO assert that there is a representation strategy, or otherwise check
+			final Component<?> valueComponent=((TreeControl.ValueRepresentationStrategy<T>)getTreeNodeRepresentationStrategy(treeNode.getValueClass())).createComponent(getModel(), treeNode, editable, false, false);	//create a new component for the tree node
+//TODO bring back when Eclipse fixes its bug			final Component<?> valueComponent=component.getTreeNodeRepresentationStrategy(treeNode.getValueClass()).createComponent(treeModel, treeNode, editable, false, false);	//create a new component for the tree node
+			if(valueComponent!=null)	//if a value component is given TODO see if this check occurs in the table controller TODO make sure this is the way we want to do this---why not just return a label with a null value?
+			{
+				valueComponent.setParent(this);	//tell this component that this tree component is its parent
+				treeNodeComponentState=new TreeNodeComponentState(valueComponent, editable);	//create a new component state for the tree node's component and metadata
+				putComponentState(treeNode, treeNodeComponentState);	//store the component state in the map for next time
+			}
+		}
+		for(final TreeNodeModel<?> childTreeNode:treeNode)	//for each child tree node
+		{
+			verifyTreeNodeComponent(childTreeNode);	//verify this child node tree
+		}
+	}
+
 	/**Session constructor with a default data model.
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session is <code>null</code>.
@@ -90,6 +120,29 @@ public class TreeControl extends AbstractModelComponent<TreeModel, TreeControl>
 		setTreeNodeRepresentationStrategy(Object.class, new DefaultValueRepresentationStrategy<Object>(session));	//create a default representation strategy and set it as the default by associating it with the Object class
 		setTreeNodeRepresentationStrategy(LabelModel.class, new LabelModelRepresentationStrategy(session));	//create and associate a label model representation strategy
 		setTreeNodeRepresentationStrategy(MessageModel.class, new MessageModelRepresentationStrategy(session));	//create and associate a message model representation strategy
+	}
+
+	/**An encapsulation of a component for a tree node along with other metadata, such as whether the component was editable when created.
+	@author Garret Wilson
+	*/ 
+	protected static class TreeNodeComponentState extends AbstractCompositeModelComponent.ComponentState
+	{
+		/**Whether the component is for a tree node that was editable when the component was created.*/
+		private final boolean editable;
+
+			/**@return Whether the component is for a tree node that was editable when the component was created.*/
+			public boolean isEditable() {return editable;}
+
+		/**Constructor
+		@param component The component for a tree node.
+		@param editable Whether the component is for a tree node that was editable when the component was created.
+		@exception NullPointerException if the given component is <code>null</code>.
+		*/
+		public TreeNodeComponentState(final Component<?> component, final boolean editable)
+		{
+			super(component);	//construct the parent class
+			this.editable=editable;
+		}
 	}
 
 	/**A strategy for generating components to represent tree node model values.
