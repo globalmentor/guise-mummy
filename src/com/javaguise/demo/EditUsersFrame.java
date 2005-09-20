@@ -7,7 +7,7 @@ import com.javaguise.component.layout.*;
 import com.javaguise.event.*;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
-import com.javaguise.validator.ValidationException;
+import com.javaguise.validator.*;
 
 /**Edit Users Guise demonstration frame.
 Copyright © 2005 GlobalMentor, Inc.
@@ -30,6 +30,7 @@ public class EditUsersFrame extends DefaultFrame
 		getModel().setLabel("Guise\u2122 Demonstration: Edit Users");	//set the frame title	
 
 		final ListControl<DemoUser> userListControl=new ListControl<DemoUser>(session, DemoUser.class, new SingleListSelectionStrategy<DemoUser>());	//create a list control allowing only single selections
+		userListControl.getModel().setValidator(new ValueRequiredValidator<DemoUser>(session));	//require a value to be selected
 		userListControl.getModel().setLabel("Users");	//set the list control label
 		userListControl.setRowCount(8);	//request eight visible rows in the list
 		final List<DemoUser> applicationUserList=((DemoApplication)getSession().getApplication()).getUsers();	//get the application's list of users

@@ -4,6 +4,7 @@ import com.javaguise.model.LabelModel;
 import com.javaguise.session.GuiseSession;
 
 /**An abstract implementation of a model component that allows user interaction to modify the model.
+@param <M> The type of model represented by the control.
 @author Garret Wilson
 */
 public abstract class AbstractControl<M extends LabelModel, C extends Control<M, C>> extends AbstractModelComponent<M, C> implements Control<M, C>

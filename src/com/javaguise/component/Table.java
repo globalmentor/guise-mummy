@@ -57,7 +57,7 @@ public class Table extends AbstractCompositeModelComponent<TableModel, TableMode
 		CellComponentState cellComponentState=getComponentState(cell);	//get the component information for this cell
 		if(cellComponentState==null || cellComponentState.isEditable()!=editable)	//if there is no component for this cell, or the component has a different editable status
 		{
-			final Component<?> valueComponent=getCellRepresentationStrategy(column).createComponent(tableModel, rowIndex, column, editable, false, false);	//create a new component for the cell
+			final Component<?> valueComponent=getCellRepresentationStrategy(column).createComponent(this, tableModel, rowIndex, column, editable, false, false);	//create a new component for the cell
 			valueComponent.setParent(this);	//tell this component that this table component is its parent
 			cellComponentState=new CellComponentState(valueComponent, editable);	//create a new component state for the cell's component and metadata
 			putComponentState(cell, cellComponentState);	//store the component state in the map for next time
@@ -243,6 +243,7 @@ public class Table extends AbstractCompositeModelComponent<TableModel, TableMode
 	{
 		/**Creates a component to represent the given cell.
 		@param <C> The type of value contained in the column.
+		@param table The component containing the model.
 		@param model The model containing the value.
 		@param rowIndex The zero-based row index of the value.
 		@param column The column of the value.
@@ -251,7 +252,7 @@ public class Table extends AbstractCompositeModelComponent<TableModel, TableMode
 		@param focused <code>true</code> if the value has the focus.
 		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
 		*/
-		public <C extends V> Component<?> createComponent(final TableModel model, final int rowIndex, final TableColumnModel<C> column, final boolean editable, final boolean selected, final boolean focused);
+		public <C extends V> Component<?> createComponent(final Table table, final TableModel model, final int rowIndex, final TableColumnModel<C> column, final boolean editable, final boolean selected, final boolean focused);
 	}
 
 	/**A default table cell representation strategy.
@@ -284,6 +285,7 @@ public class Table extends AbstractCompositeModelComponent<TableModel, TableMode
 		This implementation returns a message with string value of the given value using the object's <code>toString()</code> method.
 		The label's ID is set to the hexadecimal representation of the object's hash code appended to the word "hash".
 		@param <C> The type of value contained in the column.
+		@param table The component containing the model.
 		@param model The model containing the value.
 		@param rowIndex The zero-based row index of the value.
 		@param column The column of the value.
@@ -293,12 +295,13 @@ public class Table extends AbstractCompositeModelComponent<TableModel, TableMode
 		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
 		*/
 		@SuppressWarnings("unchecked")	//we check the type of the column value class, so the casts are safe
-		public <C extends V> Component<?> createComponent(final TableModel model, final int rowIndex, final TableColumnModel<C> column, final boolean editable, final boolean selected, final boolean focused)
+		public <C extends V> Component<?> createComponent(final Table table, final TableModel model, final int rowIndex, final TableColumnModel<C> column, final boolean editable, final boolean selected, final boolean focused)
 		{
 			final GuiseSession session=getSession();	//get the session
 			final TableModel.Cell<C> cell=new TableModel.Cell<C>(rowIndex, column);	//create a cell to represent the row and column
 			final int columnIndex=model.getColumnIndex(column);	//get the logical index of the given column
-			final String id=new StringBuilder("cell-").append(rowIndex).append('-').append(columnIndex).toString();	//generate an ID for this row and column
+			final String idSegment=new StringBuilder("cell-").append(rowIndex).append('-').append(columnIndex).toString();	//generate an ID for this row and column
+			final String id=table.createID(idSegment);	//create an ID for the new component
 			if(editable)	//if the component should be editable
 			{
 				final ValueModel<C> valueModel=new DefaultCellValueModel<C>(session, model, cell);	//create a new value model for the cell

@@ -57,13 +57,13 @@ public class AuthorizeUsersFrame extends DefaultFrame
 		add(applyButton);	//add the apply button to the frame
 	}
 
-	/**Collects the current data from the model of this component.
+	/**Updates the view of this component.
 	This versions makes sure the user list is updated from the application.
 	@param context Guise context information.
-	@exception IOException if there is an error querying the model.
-	@see GuiseContext.State#QUERY_MODEL
+	@exception IOException if there is an error updating the view.
+	@see GuiseContext.State#UPDATE_VIEW
 	*/
-	public <GC extends GuiseContext> void queryModel(final GC context) throws IOException
+	public <GC extends GuiseContext> void updateView(final GC context) throws IOException
 	{
 		userAuthorizationModel.clear();	//clear all the users we currently have
 		final List<DemoUser> applicationUserList=((DemoApplication)getSession().getApplication()).getUsers();	//get the application's list of users
@@ -75,7 +75,7 @@ public class AuthorizeUsersFrame extends DefaultFrame
 		{
 			Collections.sort(userAuthorizationModel);	//sort the user list model (each user implements Comparable)
 		}
-		super.queryModel(context);	//do the default model querying for the frame
+		super.updateView(context);	//do the default model querying for the frame
 	}
 
 	/**A table model based upon a list of users, each column representing a property of the user.

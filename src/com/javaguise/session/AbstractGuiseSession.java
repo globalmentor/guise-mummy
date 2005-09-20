@@ -838,13 +838,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		}
 	
 		/**Checks the state of the current context.
-		If any model change events are pending and no context is in an update model state, the model change events are processed.
+		If any model change events are pending and no context is processing an event, the model change events are processed.
+		@see GuiseContext.State#PROCESS_EVENT
 		@see #fireQueuedModelEvents()
 		*/
 		protected synchronized void updateContextStates()
 		{
 			final GuiseContext context=getContext();	//get the current context
-			if(context==null || context.getState()!=GuiseContext.State.UPDATE_MODEL)	//if the context is not updating the model
+			if(context==null || context.getState()!=GuiseContext.State.PROCESS_EVENT)	//if the context is not processing an event
 			{
 				fireQueuedModelEvents();	//fire any queued events				
 			}
@@ -854,15 +855,15 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	private final List<PostponedEvent<?>> queuedModelEventList=synchronizedList(new LinkedList<PostponedEvent<?>>());	//use a linked list because we'll be removing items from the front of the list as we process the events TODO fix; this doesn't seem to be the case anymore, so we can use a synchronized array list
 
 		/**Queues a postponed model event to be fired after all contexts have finished updating the model.
-		If a Guise context is currently updating the model, the event will be queued for later.
-		If no Guise context is currently updating the model, the event will be fired immediately.
+		If a Guise context is currently processing an event, the event will be queued for later.
+		If no Guise context is currently processing an event, the event will be fired immediately.
 		@param postponedModelEvent The event to fire at a later time.
-		@see GuiseContext.State#UPDATE_MODEL
+		@see GuiseContext.State#PROCESS_EVENT
 		*/
 		public synchronized void queueModelEvent(final PostponedEvent<?> postponedModelEvent)
 		{
 			final GuiseContext context=getContext();	//get the current context
-			if(context!=null && context.getState()==GuiseContext.State.UPDATE_MODEL)	//if the context is updating the model
+			if(context!=null && (context.getState()==GuiseContext.State.PROCESS_EVENT))	//if the context is processing an event
 			{
 				queuedModelEventList.add(postponedModelEvent);	//add the postponed event to our list of postponed events					
 			}

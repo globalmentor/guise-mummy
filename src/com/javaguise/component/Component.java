@@ -7,6 +7,7 @@ import com.garretwilson.beans.PropertyBindable;
 import com.javaguise.component.layout.Orientation;
 import com.javaguise.component.transfer.*;
 import com.javaguise.context.GuiseContext;
+import com.javaguise.controller.ControlEvent;
 import com.javaguise.controller.Controller;
 import static com.garretwilson.lang.ClassUtilities.*;
 
@@ -243,78 +244,22 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	/**@return Whether the models of this component and all of its child components are valid.*/
 	public boolean isValid();
 
-	/**@return The character used by this component when building absolute IDs.*/
-//TODO del when works	public char getAbsoluteIDSegmentDelimiter();
-
-	/**Collects the current data from the view of this component.
+	/**Processes an event for the component.
 	This method should not normally be called directly by applications.
 	This method delegates to the installed controller, and if no controller is installed one is created and installed.
-	@param context Guise context information.
-	@exception IOException if there is an error querying the view.
-	@see GuiseContext.State#QUERY_VIEW
-	@see #getController(GC, C)
+	@param event The event to be processed.
+	@exception ComponentExceptions if there was a component-related error processing the event.
+	@see #getController()
+	@see GuiseContext.State#PROCESS_EVENT
 	*/
-	public <GC extends GuiseContext> void queryView(final GC context) throws IOException;
-
-	/**Decodes the data of the view of this component.
-	This method should not normally be called directly by applications.
-	This method delegates to the installed controller, and if no controller is installed one is created and installed.
-	@param context Guise context information.
-	@exception IOException if there is an error decoding the view.
-	@exception ValidationsException if the view information is in an invalid format and cannot be decoded.
-	@see #getController(GC, C)
-	@see GuiseContext.State#DECODE_VIEW
-	*/
-	public <GC extends GuiseContext> void decodeView(final GC context) throws IOException, ValidationsException;
-
-	/**Validates the view of this component.
-	This method should not normally be called directly by applications.
-	This method delegates to the installed controller, and if no controller is installed one is created and installed.
-	@param context Guise context information.
-	@exception IOException if there is an error validating the view.
-	@exception ValidationsException if the view information is not valid to store in the model.
-	@see #getController(GC, C)
-	@see GuiseContext.State#VALIDATE_VIEW
-	*/
-	public <GC extends GuiseContext> void validateView(final GC context) throws IOException, ValidationsException;
-
-	/**Updates the model of this component.
-	This method should not normally be called directly by applications.
-	This method delegates to the installed controller, and if no controller is installed one is created and installed.
-	@param context Guise context information.
-	@exception IOException if there is an error updating the model.
-	@exception ValidationsException if the view information is not valid to store in the model.
-	@see #getController(GC, C)
-	@see GuiseContext.State#UPDATE_MODEL
-	*/
-	public <GC extends GuiseContext> void updateModel(final GC context) throws IOException, ValidationsException;
-
-	/**Collects the current data from the model of this component.
-	This method should not normally be called directly by applications.
-	This method delegates to the installed controller, and if no controller is installed one is created and installed.
-	@param context Guise context information.
-	@exception IOException if there is an error querying the model.
-	@see #getController(GC, C)
-	@see GuiseContext.State#QUERY_MODEL
-	*/
-	public <GC extends GuiseContext> void queryModel(final GC context) throws IOException;
-
-	/**Encodes the data of the model of this component.
-	This method should not normally be called directly by applications.
-	This method delegates to the installed controller, and if no controller is installed one is created and installed.
-	@param context Guise context information.
-	@exception IOException if there is an error encoding the model.
-	@see #getController(GC, C)
-	@see GuiseContext.State#ENCODE_MODEL
-	*/
-	public <GC extends GuiseContext> void encodeModel(final GC context) throws IOException;
+	public void processEvent(final ControlEvent event) throws ComponentExceptions;
 
 	/**Updates the view of this component.
 	This method should not normally be called directly by applications.
 	This method delegates to the installed controller, and if no controller is installed one is created and installed.
 	@param context Guise context information.
 	@exception IOException if there is an error updating the view.
-	@see #getController(GC, C)
+	@see #getController()
 	@see GuiseContext.State#UPDATE_VIEW
 	*/
 	public <GC extends GuiseContext> void updateView(final GC context) throws IOException;

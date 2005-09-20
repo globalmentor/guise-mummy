@@ -10,6 +10,7 @@ import com.garretwilson.lang.ObjectUtilities;
 import com.javaguise.component.layout.Orientation;
 import com.javaguise.component.transfer.*;
 import com.javaguise.context.GuiseContext;
+import com.javaguise.controller.ControlEvent;
 import com.javaguise.controller.Controller;
 import com.javaguise.event.GuiseBoundPropertyObject;
 import com.javaguise.session.GuiseSession;
@@ -30,7 +31,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 //TODO del when works	protected final static char ABSOLUTE_ID_SEGMENT_DELIMITER=':';
 
 	/**Extra characters allowed in the ID, verified for URI safeness.*/
-	protected final static String ID_EXTRA_CHARACTERS="-_";
+	protected final static String ID_EXTRA_CHARACTERS="-_.";
 
 	/**The object managing event listeners.*/
 	private final EventListenerManager eventListenerManager=new EventListenerManager();
@@ -541,114 +542,35 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 	*/
 	public boolean isValid()
 	{
+/*TODO decide whether this is needed, now that we've refactored information into the component
 		if(!getController().isValid())	//if the controller isn't valid
 		{
 			return false;	//although the model may be valid, its view representation is not
 		}
+*/
 		return true;	//indicate that this component is valid
 	}
 
-	/**@return The character used by this component when building absolute IDs.*/
-/*TODO del when works
-	public char getAbsoluteIDSegmentDelimiter()
-	{
-		return ABSOLUTE_ID_SEGMENT_DELIMITER;	//return our absolute segment connector character		
-	}
-*/
-
-	/**Collects the current data from the view of this component.
+	/**Processes an event for the component.
 	This method should not normally be called directly by applications.
 	This method delegates to the installed controller, and if no controller is installed one is created and installed.
-	@param context Guise context information.
-	@exception IOException if there is an error querying the view.
-	@see GuiseContext.State#QUERY_VIEW
-	@see #getController(GC, C)
+	@param event The event to be processed.
+	@exception ComponentExceptions if there was a component-related error processing the event.
+	@see #getController()
+	@see GuiseContext.State#PROCESS_EVENT
 	*/
-	public <GC extends GuiseContext> void queryView(final GC context) throws IOException
+	public void processEvent(final ControlEvent event) throws ComponentExceptions
 	{
-		final Controller<? super GC, ? super C> controller=(Controller<? super GC, ? super C>)getController();	//get the controller
-		controller.queryView(context, getThis());	//tell the controller to query the view
+		getController().processEvent(getThis(), event);	//tell the controller to process the event
 	}
 
-	/**Decodes the data of the view of this component.
-	This method should not normally be called directly by applications.
-	This method delegates to the installed controller, and if no controller is installed one is created and installed.
-	@param context Guise context information.
-	@exception IOException if there is an error decoding the view.
-	@exception ValidationsException if the view information is in an invalid format and cannot be decoded.
-	@see #getController(GC, C)
-	@see GuiseContext.State#DECODE_VIEW
-	*/
-	public <GC extends GuiseContext> void decodeView(final GC context) throws IOException, ValidationsException
-	{
-		final Controller<? super GC, ? super C> controller=(Controller<? super GC, ? super C>)getController();	//get the controller
-		controller.decodeView(context, getThis());	//tell the controller to decode the view
-	}
-
-	/**Validates the view of this component.
-	This method should not normally be called directly by applications.
-	This method delegates to the installed controller, and if no controller is installed one is created and installed.
-	@param context Guise context information.
-	@exception IOException if there is an error validating the view.
-	@exception ValidationsException if the view information is not valid to store in the model.
-	@see #getController(GC, C)
-	@see GuiseContext.State#VALIDATE_VIEW
-	*/
-	public <GC extends GuiseContext> void validateView(final GC context) throws IOException, ValidationsException
-	{
-		final Controller<? super GC, ? super C> controller=(Controller<? super GC, ? super C>)getController();	//get the controller
-		controller.validateView(context, getThis());	//tell the controller to update the view
-	}
-
-	/**Updates the model of this component.
-	This method should not normally be called directly by applications.
-	This method delegates to the installed controller, and if no controller is installed one is created and installed.
-	@param context Guise context information.
-	@exception IOException if there is an error updating the model.
-	@exception ValidationsException if the view information is not valid to store in the model.
-	@see #getController(GC, C)
-	@see GuiseContext.State#UPDATE_MODEL
-	*/
-	public <GC extends GuiseContext> void updateModel(final GC context) throws IOException, ValidationsException
-	{
-		final Controller<? super GC, ? super C> controller=(Controller<? super GC, ? super C>)getController();	//get the controller
-		controller.updateModel(context, getThis());	//tell the controller to update the model
-	}
-
-	/**Collects the current data from the model of this component.
-	This method should not normally be called directly by applications.
-	This method delegates to the installed controller, and if no controller is installed one is created and installed.
-	@param context Guise context information.
-	@exception IOException if there is an error querying the model.
-	@see #getController(GC, C)
-	@see GuiseContext.State#QUERY_MODEL
-	*/
-	public <GC extends GuiseContext> void queryModel(final GC context) throws IOException
-	{
-		final Controller<? super GC, ? super C> controller=(Controller<? super GC, ? super C>)getController();	//get the controller
-		controller.queryModel(context, getThis());	//tell the controller to query the model
-	}
-
-	/**Encodes the data of the model of this component.
-	This method should not normally be called directly by applications.
-	This method delegates to the installed controller, and if no controller is installed one is created and installed.
-	@param context Guise context information.
-	@exception IOException if there is an error encoding the model.
-	@see #getController(GC, C)
-	@see GuiseContext.State#ENCODE_MODEL
-	*/
-	public <GC extends GuiseContext> void encodeModel(final GC context) throws IOException
-	{
-		final Controller<? super GC, ? super C> controller=(Controller<? super GC, ? super C>)getController();	//get the controller
-		controller.encodeModel(context, getThis());	//tell the controller to encode the model
-	}
 
 	/**Updates the view of this component.
 	This method should not normally be called directly by applications.
 	This method delegates to the installed controller, and if no controller is installed one is created and installed.
 	@param context Guise context information.
 	@exception IOException if there is an error updating the view.
-	@see #getController(GC, C)
+	@see #getController()
 	@see GuiseContext.State#UPDATE_VIEW
 	*/
 	public <GC extends GuiseContext> void updateView(final GC context) throws IOException
@@ -656,50 +578,6 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		final Controller<? super GC, ? super C> controller=(Controller<? super GC, ? super C>)getController();	//get the controller
 		controller.updateView(context, getThis());	//tell the controller to update the view
 	}
-
-	/**Determines the controller of this component. If no controller is installed, one is created and installed.
-	@param context Guise context information.
-	@exception NullPointerException if there is no controller installed and no appropriate controller registered with the Guise context.
-	*/
-/*TODO del when works
-	@SuppressWarnings("unchecked")	//because of erasure, we must assume that any controller instantiated from a class object is of the correct generic type
-	public <GC extends GuiseContext> Controller<? super GC, ? super C> getController(final GC context)	//TODO make this protected again, if we can, if we reorganize the controller.getAbsoluteID framework
-	{
-		Controller<? super GC, ? super C> controller=(Controller<? super GC, ? super C>)getController();	//get the installed controller
-		if(controller==null)	//if no controller is installed
-		{
-			controller=context.getSession().getApplication().getController(context, getThis());	//ask the application for a controller
-			if(controller!=null)	//if we found a controller
-			{
-				setController((Controller<? extends GuiseContext, ? super C>)controller);	//install the new controller
-			}
-			else	//if we don't have a controller
-			{
-				throw new NullPointerException("No registered controller for "+getClass().getName());	//TODO use a better error
-			}
-		}
-		return controller;	//return the controller we found
-	}
-*/
-/*TODO del when works
-	public Controller<? extends GuiseContext, ? super C> getController(final GuiseContext context)	//TODO make this protected again, if we can, if we reorganize the controller.getAbsoluteID framework
-	{
-		Controller<? extends GuiseContext, ? super C> controller=getController();	//get the installed controller
-		if(controller==null)	//if no controller is installed
-		{
-			controller=context.getSession().getApplication().getController(getThis());	//ask the application for a controller
-			if(controller!=null)	//if we found a controller
-			{
-				setController((Controller<? extends GuiseContext, ? super C>)controller);	//install the new controller
-			}
-			else	//if we don't have a controller
-			{
-				throw new NullPointerException("No registered controller for "+getClass().getName());	//TODO use a better error
-			}
-		}
-		return controller;	//return the controller we found
-	}
-*/
 
 	/**Determines the root parent of the given component.
 	@param component The component for which the root should be found.

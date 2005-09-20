@@ -90,6 +90,13 @@ public class EditUserFrame extends DefaultModalFrame<DemoUser>
 						{
 							endModal(getUser());	//end the frame modality with the edited user
 						}
+						else if(!isPasswordMatch())	//if the password isn't valid
+						{
+							final ValidationException validationException=new ValidationException(EditUserFrame.this, "Passwords do not match");
+							passwordControl.addError(validationException);	//add the error to each password control
+							passwordVerificationControl.addError(validationException);
+							addError(validationException);	//add the error to the frame itself
+						}
 					}
 				});
 		buttonPanel.add(okButton);	//add the button to the button panel
@@ -125,22 +132,6 @@ public class EditUserFrame extends DefaultModalFrame<DemoUser>
 	public boolean isValid()
 	{
 		return super.isValid() && isPasswordMatch();	//add a check for password validity
-	}
-
-	/**Updates the model of this component.
-	This version makes sure the entered passwords match.
-	@see #isPasswordMatch()
-	*/
-	public <GC extends GuiseContext> void updateModel(final GC context) throws IOException, ValidationsException
-	{
-		super.updateModel(context);	//update the model normally
-		if(!isPasswordMatch())	//if the password isn't valid
-		{
-			final ValidationException validationException=new ValidationException(this, "Passwords do not match");
-			passwordControl.addError(validationException);	//add the error to each password control
-			passwordVerificationControl.addError(validationException);
-			throw new ValidationsException(validationException);	//report the error
-		}
 	}
 
 	/**Initializes the frame with information for a new user.
