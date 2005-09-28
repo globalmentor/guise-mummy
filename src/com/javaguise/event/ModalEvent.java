@@ -1,13 +1,13 @@
 package com.javaguise.event;
 
-import com.javaguise.component.ModalFrame;
+import com.javaguise.component.ModalNavigationPanel;
 import com.javaguise.session.GuiseSession;
 
 /**An event indicating that a modal frame ended its modalitay.
 @param <R> The type of modal result the modal frame produces.
 author Garret Wilson
 */
-public class ModalEvent<R> extends GuiseEvent<ModalFrame<R, ?>>
+public class ModalEvent<R> extends GuiseEvent<ModalNavigationPanel<R, ?>>
 {
 
 	/**The result of this frame's modal interaction, or <code>null</code> if no result is given.*/
@@ -22,7 +22,7 @@ public class ModalEvent<R> extends GuiseEvent<ModalFrame<R, ?>>
 	@param result The result of this frame's modal interaction, or <code>null</code> if no result is given.
 	@exception NullPointerException if the given session and/or source is <code>null</code>.
 	*/
-	public ModalEvent(final GuiseSession session, final ModalFrame<R, ?> source, final R result)
+	public ModalEvent(final GuiseSession session, final ModalNavigationPanel<R, ?> source, final R result)
 	{
 		super(session, source);	//construct the parent class
 		this.result=result;	//save the result

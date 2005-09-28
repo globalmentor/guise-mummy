@@ -14,8 +14,11 @@ import com.javaguise.validator.*;
 /**A table component.
 @author Garret Wilson
 */
-public class Table extends AbstractCompositeModelComponent<TableModel, TableModel.Cell<?>, Table.CellComponentState, Table>
+public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, Table.CellComponentState, Table>
 {
+
+	/**@return The data model used by this component.*/
+	public TableModel getModel() {return (TableModel)super.getModel();}
 
 	/**The map of cell representation strategies for columns.*/
 	private final Map<TableColumnModel<?>, CellRepresentationStrategy<?>> columnCellRepresentationStrategyMap=new ConcurrentHashMap<TableColumnModel<?>, CellRepresentationStrategy<?>>();
@@ -205,7 +208,7 @@ public class Table extends AbstractCompositeModelComponent<TableModel, TableMode
 	/**An encapsulation of a component for a cell along with other metadata, such as whether the component was editable when created.
 	@author Garret Wilson
 	*/ 
-	protected static class CellComponentState extends AbstractCompositeModelComponent.ComponentState
+	protected static class CellComponentState extends AbstractCompositeStateComponent.ComponentState
 	{
 		/**Whether the component is for a cell that was editable when the component was created.*/
 		private final boolean editable;

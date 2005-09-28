@@ -1,14 +1,13 @@
 package com.javaguise.component;
 
 import com.javaguise.component.layout.Layout;
-import com.javaguise.model.LabelModel;
+import com.javaguise.model.Model;
 import com.javaguise.session.GuiseSession;
 
 /**An abstract implementation of a container that is also a control.
-@param <M> The type of model contained in the component.
 @author Garret Wilson
 */
-public abstract class AbstractContainerControl<M extends LabelModel, C extends Container<C> & Control<M, C>> extends AbstractModelContainer<M, C> implements Control<M, C>
+public abstract class AbstractContainerControl<C extends Container<C> & Control<C>> extends AbstractContainer<C> implements Control<C>
 {
 
 	/**Session, ID, layout, and model constructor.
@@ -19,7 +18,7 @@ public abstract class AbstractContainerControl<M extends LabelModel, C extends C
 	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractContainerControl(final GuiseSession session, final String id, final Layout layout, final M model)
+	public AbstractContainerControl(final GuiseSession session, final String id, final Layout layout, final Model model)
 	{
 		super(session, id, layout, model);	//construct the parent class
 	}

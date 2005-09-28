@@ -6,6 +6,10 @@ import com.javaguise.model.ValueModel;
 @param <V> The type of value to represent.
 @author Garret Wilson
 */
-public interface ValueControl<V, C extends ValueControl<V, C>> extends Control<ValueModel<V>, C>
+public interface ValueControl<V, C extends ValueControl<V, C>> extends Control<C>
 {
+
+	/**@return The data model used by this component.*/
+	public ValueModel<V> getModel();
+
 }

@@ -1,13 +1,12 @@
 package com.javaguise.component;
 
-import com.javaguise.model.LabelModel;
+import com.javaguise.model.Model;
 import com.javaguise.session.GuiseSession;
 
 /**An abstract implementation of a model component that allows user interaction to modify the model.
-@param <M> The type of model represented by the control.
 @author Garret Wilson
 */
-public abstract class AbstractControl<M extends LabelModel, C extends Control<M, C>> extends AbstractModelComponent<M, C> implements Control<M, C>
+public abstract class AbstractControl<C extends Control<C>> extends AbstractComponent<C> implements Control<C>
 {
 
 	/**Session, ID, and model constructor.
@@ -17,7 +16,7 @@ public abstract class AbstractControl<M extends LabelModel, C extends Control<M,
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractControl(final GuiseSession session, final String id, final M model)
+	public AbstractControl(final GuiseSession session, final String id, final Model model)
 	{
 		super(session, id, model);	//construct the parent class
 	}

@@ -9,25 +9,25 @@ import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.*;
 
-/**Edit Users Guise demonstration frame.
+/**Edit Users Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
 Demonstrates list controls with default representation, thread-safe select model access,
 	sorting list control models, listening for select model list changes,
-	retrieving navigation frames, invoking modal frames, retrieving modal frame results,
+	retrieving navigation panels, invoking modal panels, retrieving modal panel results,
 	disabled control models, action model confirmation messages, and
 	accessing a custom Guise application.
 @author Garret Wilson
 */
-public class EditUsersFrame extends DefaultFrame
+public class EditUsersPanel extends DefaultNavigationPanel
 {
 
 	/**Guise session constructor.
-	@param session The Guise session that owns this frame.
+	@param session The Guise session that owns this panel.
 	*/
-	public EditUsersFrame(final GuiseSession session)
+	public EditUsersPanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Orientation.Flow.LINE));	//construct the parent class flowing horizontally
-		getModel().setLabel("Guise\u2122 Demonstration: Edit Users");	//set the frame title	
+		getModel().setLabel("Guise\u2122 Demonstration: Edit Users");	//set the panel title	
 
 		final ListControl<DemoUser> userListControl=new ListControl<DemoUser>(session, DemoUser.class, new SingleListSelectionStrategy<DemoUser>());	//create a list control allowing only single selections
 		userListControl.getModel().setValidator(new ValueRequiredValidator<DemoUser>(session));	//require a value to be selected
@@ -52,13 +52,13 @@ public class EditUsersFrame extends DefaultFrame
 				{
 					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
 					{
-						session.navigateModal(DemoApplication.EDIT_USER_FRAME_NAVIGATION_PATH, new ModalListener<DemoUser>()	//navigate modally to the edit user frame
+						session.navigateModal(DemoApplication.EDIT_USER_PANEL_NAVIGATION_PATH, new ModalListener<DemoUser>()	//navigate modally to the edit user panel
 								{
 									public void modalBegan(final ModalEvent<DemoUser> modalEvent)	//when modal editing begins
 									{
 										final String newUserID=((DemoApplication)getSession().getApplication()).generateUserID();	//ask the application to generate a new user ID
-										final EditUserFrame editUserFrame=((EditUserFrame)(Object)modalEvent.getSource());	//TODO add better workaround for Java 1.5.0_04 cast requirement 
-										editUserFrame.setNewUser(newUserID);	//initialize the frame for a new user
+										final EditUserPanel editUserPanel=((EditUserPanel)(Object)modalEvent.getSource());	//TODO add better workaround for Java 1.5.0_04 cast requirement 
+										editUserPanel.setNewUser(newUserID);	//initialize the panel for a new user
 									}
 									public void modalEnded(final ModalEvent<DemoUser> modalEvent)	//when modal editing is finished
 									{
@@ -94,12 +94,12 @@ public class EditUsersFrame extends DefaultFrame
 						final DemoUser user=userListControl.getModel().getSelectedValue();	//get the selected user
 						if(user!=null)	//if a user is selected
 						{
-							session.navigateModal(DemoApplication.EDIT_USER_FRAME_NAVIGATION_PATH, new ModalListener<DemoUser>()	//navigate modally to the edit user frame
+							session.navigateModal(DemoApplication.EDIT_USER_PANEL_NAVIGATION_PATH, new ModalListener<DemoUser>()	//navigate modally to the edit user panel
 									{
 										public void modalBegan(final ModalEvent<DemoUser> modalEvent)	//when modal editing begins
 										{
-											final EditUserFrame editUserFrame=((EditUserFrame)(Object)modalEvent.getSource());	//TODO add better workaround for Java 1.5.0_04 cast requirement 
-											editUserFrame.setUser(user);	//initialize the frame with this user
+											final EditUserPanel editUserPanel=((EditUserPanel)(Object)modalEvent.getSource());	//TODO add better workaround for Java 1.5.0_04 cast requirement 
+											editUserPanel.setUser(user);	//initialize the panel with this user
 										}
 										public void modalEnded(final ModalEvent<DemoUser> modalEvent)	//when modal editing is finished
 										{
@@ -143,8 +143,8 @@ public class EditUsersFrame extends DefaultFrame
 				});
 		buttonPanel.add(removeButton);	//add the button to the button panel
 		
-		add(userListControl);	//add the list control to the frame
-		add(buttonPanel);	//add the button panel to the frame
+		add(userListControl);	//add the list control to the panel
+		add(buttonPanel);	//add the button panel to the panel
 
 			//disable the add and remove buttons whenever there are no users 
 		userListControl.getModel().addListListener(new ListListener<ListSelectModel<DemoUser>, DemoUser>()	//listen for the list being modified

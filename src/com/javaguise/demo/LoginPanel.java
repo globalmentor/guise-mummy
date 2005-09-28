@@ -9,22 +9,22 @@ import com.javaguise.model.ActionModel;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.*;
 
-/**Login Guise demonstration frame.
+/**Login Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
 Demonstrates on-the-fly validation, on-the-fly error reporting,
 	resetting control values, and setting Guise session user.
 @author Garret Wilson
 */
-public class LoginFrame extends DefaultFrame
+public class LoginPanel extends DefaultNavigationPanel
 {
 
 	/**Guise session constructor.
-	@param session The Guise session that owns this frame.
+	@param session The Guise session that owns this panel.
 	*/
-	public LoginFrame(final GuiseSession session)
+	public LoginPanel(final GuiseSession session)
 	{
-		super(session);	//construct the parent class, defaulting to a region layout
-		getModel().setLabel("Guise\u2122 Demonstration: Login");	//set the frame title
+		super(session, new RegionLayout(session));	//construct the parent class, using a region layout
+		getModel().setLabel("Guise\u2122 Demonstration: Login");	//set the panel title
 		
 		final LayoutPanel loginPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.PAGE));	//create the authorization panel flowing vertically
 		
@@ -68,27 +68,27 @@ public class LoginFrame extends DefaultFrame
 								if(Arrays.equals(user.getPassword(), password))	//if the entered password matches that of the user
 								{
 									session.setPrincipal(user);	//log in the user
-									session.navigate(DemoApplication.RESTRICTED_FRAME_NAVIGATION_PATH);	//navigate to the restricted frame
+									session.navigate(DemoApplication.RESTRICTED_PANEL_NAVIGATION_PATH);	//navigate to the restricted panel
 								}
 								else	//if the password doesn't match
 								{
 									final ValidationException validationException=new ValidationException(passwordControl, "Invalid password");	//create an invalid password exception for the password control
 									idControl.addError(validationException);	//indicate that the ID control has a validation exception
-									addError(validationException);	//tell the frame the error so that it can be reported to the user									
+									addError(validationException);	//tell the panel the error so that it can be reported to the user									
 								}
 							}
 							else	//if the user ID is not valid
 							{
 								final ValidationException validationException=new ValidationException(idControl, "Invalid user ID");	//create an invalid user ID exception for the ID control
 								idControl.addError(validationException);	//indicate that the ID control has a validation exception
-								addError(validationException);	//tell the frame the error so that it can be reported to the user
+								addError(validationException);	//tell the panel the error so that it can be reported to the user
 							}
 						}
 					}
 				});
 		loginPanel.add(loginButton);	//add the button to the panel
 	
-		add(loginPanel);	//add the panel to the frame in the default center
+		add(loginPanel);	//add the panel to the panel in the default center
 	}
 
 

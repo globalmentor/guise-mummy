@@ -3,47 +3,20 @@ package com.javaguise.component;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArraySet;
 
-import com.garretwilson.util.EmptyIterator;
 import com.javaguise.model.Model;
 import com.javaguise.session.GuiseSession;
 
-/**A composite component that represents data by its child components.
-@param <M> The type of model contained in the component.
+/**A composite component that represents the state of its child components.
 @param <T> The type of object being represented.
 @param <S> The component state of each object.
 @author Garret Wilson
 */
-public abstract class AbstractCompositeModelComponent<M extends Model, T, S extends AbstractCompositeModelComponent.ComponentState, C extends CompositeComponent<C> & ModelComponent<M, C>> extends AbstractCompositeComponent<C> implements ModelComponent<M, C>	//TODO fire events when component states are added or removed so that AJAX updates can be sent
+public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompositeStateComponent.ComponentState, C extends CompositeComponent<C>> extends AbstractCompositeComponent<C>	//TODO fire events when component states are added or removed so that AJAX updates can be sent
 {
-
-	/**The model used by this component.*/
-	private final M model;
-
-		/**@return The model used by this component.*/
-		public M getModel() {return model;}
-
-	/**Determines whether the models of this component and all of its child components are valid.
-	This version checks to ensure its model is valid.
-	@return Whether this component's model is valid along with those of all of its child components.
-	*/
-	public boolean isValid()
-	{
-		return getModel().isValid() ? super.isValid() : false;	//make sure the model is valid, along with the default checks
-	}
 
 	/**The map of component state for each object.*/
 	private final Map<T, S> componentStateMap=new HashMap<T, S>();
-
-	/**The set of components that are being represented.*/
-//TODO del	private final Set<Component<?>> componentSet=new CopyOnWriteArraySet<Component<?>>();
-
-	/**@return Whether this component has children.*/
-//TODO del	public boolean hasChildren() {return !componentSet.isEmpty();}
-
-	/**@return An iterator to child components.*/
-//TODO del	public Iterator<Component<?>> iterator() {return componentSet.iterator();}
 
 	/**Retrieves a component state for the given object.
 	@param object The object for which a representation component should be returned.
@@ -94,17 +67,6 @@ public abstract class AbstractCompositeModelComponent<M extends Model, T, S exte
 		return oldComponentState;	//return whatever component state was previously in the map
 	}
 
-	/**Session constructor.
-	@param session The Guise session that owns this component.
-	@param model The component data model.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalStateException if no controller is registered for this component type.
-	*/
-	public AbstractCompositeModelComponent(final GuiseSession session, final M model)
-	{
-		this(session, null, model);	//construct the component, indicating that a default ID should be used
-	}
-
 	/**Session and ID constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
@@ -113,10 +75,9 @@ public abstract class AbstractCompositeModelComponent<M extends Model, T, S exte
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	@exception IllegalStateException if no controller is registered for this component type.
 	*/
-	public AbstractCompositeModelComponent(final GuiseSession session, final String id, final M model)
+	public AbstractCompositeStateComponent(final GuiseSession session, final String id, final Model model)
 	{
-		super(session, id);	//construct the parent class
-		this.model=checkNull(model, "Model cannot be null.");	//save the model
+		super(session, id, model);	//construct the parent class
 	}
 
 	/**An encapsulation of the state of a representation component.

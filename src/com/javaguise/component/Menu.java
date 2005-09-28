@@ -10,8 +10,11 @@ This component uses a {@link MenuLayout}.
 @author Garret Wilson
 @see MenuLayout
 */
-public class Menu extends AbstractContainerControl<LabelModel, Menu>
+public class Menu extends AbstractContainerControl<Menu>
 {
+
+	/**@return The data model used by this component.*/
+	public LabelModel getModel() {return (LabelModel)super.getModel();}
 
 	/**Session and axis constructor.
 	@param session The Guise session that owns this component.

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.event.EventListenerManager;
 import com.garretwilson.lang.ObjectUtilities;
 import com.javaguise.component.layout.Orientation;
@@ -13,12 +12,11 @@ import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.ControlEvent;
 import com.javaguise.controller.Controller;
 import com.javaguise.event.GuiseBoundPropertyObject;
+import com.javaguise.model.Model;
 import com.javaguise.session.GuiseSession;
-import com.javaguise.validator.ValidationsException;
-import com.garretwilson.util.EmptyIterator;
+import com.javaguise.view.View;
 
 import static com.garretwilson.lang.CharSequenceUtilities.*;
-import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**An abstract implementation of a component.
@@ -26,9 +24,6 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 */
 public abstract class AbstractComponent<C extends Component<C>> extends GuiseBoundPropertyObject implements Component<C>
 {
-
-	/**The character used when building absolute IDs.*/
-//TODO del when works	protected final static char ABSOLUTE_ID_SEGMENT_DELIMITER=':';
 
 	/**Extra characters allowed in the ID, verified for URI safeness.*/
 	protected final static String ID_EXTRA_CHARACTERS="-_.";
@@ -42,7 +37,13 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 	/**@return A reference to this instance, cast to the generic self type.*/
 	@SuppressWarnings("unchecked")
 	protected final C getThis() {return (C)this;}
-		
+
+	/**The data model used by this component.*/
+	private final Model model;
+
+		/**@return The data model used by this component.*/
+		public Model getModel() {return model;}
+
 	/**The controller installed in this component.*/
 	private Controller<? extends GuiseContext, ? super C> controller;
 
@@ -60,8 +61,32 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			if(newController!=controller)	//if the value is really changing
 			{
 				final Controller<? extends GuiseContext, ? super C> oldController=controller;	//get a reference to the old value
-				controller=checkNull(newController);	//actually change values
+				controller=checkNull(newController, "Controller cannot be null.");	//actually change values
 				firePropertyChange(CONTROLLER_PROPERTY, oldController, newController);	//indicate that the value changed				
+			}
+		}
+
+	/**The view installed in this component.*/
+	private View<? extends GuiseContext, ? super C> view;
+
+		/**@return The view installed in this component.*/
+		public View<? extends GuiseContext, ? super C> getView() {return view;}
+
+		/**Sets the view used by this component.
+		This is a bound property.
+		@param newView The new view to use.
+		@see Component#VIEW_PROPERTY
+		@exception NullPointerException if the given view is <code>null</code>.
+		*/
+		public void setView(final View<? extends GuiseContext, ? super C> newView)
+		{
+			if(newView!=checkNull(view, "View cannot be null"))	//if the value is really changing
+			{
+				final View<? extends GuiseContext, ? super C> oldView=view;	//get a reference to the old value
+				oldView.uninstalled(getThis());	//tell the old view it's being uninstalled
+				view=newView;	//actually change values
+				oldView.installed(getThis());	//tell the new view it's being installed
+				firePropertyChange(VIEW_PROPERTY, oldView, newView);	//indicate that the value changed				
 			}
 		}
 
@@ -164,91 +189,6 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			}
 		}
 
-		/**@return An identifier unique within this component's parent, if any.*/
-/*TODO del when works
-		public String getUniqueID()
-		{
-			final Component<?> parent=getParent();	//get this component's parent
-			return parent!=null ? parent.getUniqueID(this) : getID();	//if we have a parent, ask it for our unique ID; otherwise, our ID is already unique
-		}
-*/
-
-		/**@return An identifier unique up this component's hierarchy.*/
-/*TODO del when works
-		public String getAbsoluteUniqueID()
-		{
-			final Component<?> parent=getParent();	//get this component's parent
-			return parent!=null ? parent.getAbsoluteUniqueID(this) : getUniqueID();	//if we have a parent component, ask it for our absolute ID; otherwise, return our local unique ID
-		}
-*/
-
-		/**Determines the unique ID of the provided child component within this component.
-		If the child component's ID is already unique, that ID will be used.
-		This method is typically called by child components when determining their own unique IDs.
-		@param childComponent A component within this component.
-		@return An identifier of the given component unique within this component.
-		@exception IllegalArgumentException if the given component is not a child of this component.
-		*/
-/*TODO del when works
-		public String getUniqueID(final Component<?> childComponent)
-		{
-			final String childID=childComponent.getID();	//get the child component's preferred ID
-			boolean idClashes=false;	//we'll start out assuming that the child's preferred ID doesn't class with any of the other child IDs
-			int childIndex=-1;	//we'll ensure that the child is actually one of our children by setting this variable to a value greater than or equal to zero
-			int i=-1;	//we'll find the index of this component within this component; currently we haven't looked at any child components
-			for(final Component<?> component:this)	//for each component in the component
-			{
-				++i;	//show that we're looking at another child component
-				if(component==childComponent)	//if this child is the provided child component
-				{
-					assert childIndex<0 : "Unexpectedly found component listed as a child more than once in this component.";
-					childIndex=i;	//store the child index of this component
-				}
-				else if(!idClashes)	//if this is another child and we haven't had an ID clash, yet
-				{
-					if(childID.equals(component.getID()))	//if the child component's preferred ID clashes with this component's preferred ID
-					{
-						idClashes=true;	//indicate that there is an ID clash
-					}
-				}
-				if(childIndex>=0 && idClashes)	//if we've located the child component in the component, and we've already found an ID clash, there's no point in looking any further
-				{
-					break;	//stop looking; there's no new information we can find
-				}
-			}
-			if(childIndex>=0)	//if we found the child component in the component
-			{
-				return idClashes ? childID+childIndex : childID;	//if there was an ID clash, append the child component's index within this component; otherwise, just use the child component's preferred ID
-			}
-			throw new IllegalArgumentException("Component "+childComponent+" is not a child of component "+this);
-		}
-*/
-
-		/**Determines the absolute unique ID of the provided child component up the component's hierarchy.
-		This method is typically called by child components when determining their own absolute unique IDs.
-		@param childComponent A component within this component.
-		@return An absolute identifier of the given component unique up the component's hierarchy.
-		@exception IllegalArgumentException if the given component is not a child of this component.
-		*/
-/*TODO del when works
-		public String getAbsoluteUniqueID(final Component<?> childComponent)
-		{
-			return getAbsoluteUniqueID(getUniqueID(childComponent));	//return the absolute form of the unique ID of the child component
-		}
-*/
-
-		/**Determines the absolute unique ID up the component's hierarchy for the given local unique ID.
-		This method is useful for generating radio button group identifiers, for example.
-		@param uniqueID An identifier unique within this component.
-		@return An absolute form of the given identifier unique up the component's hierarchy.
-		*/
-/*TODO del when works
-		protected String getAbsoluteUniqueID(final String uniqueID)
-		{
-			return getAbsoluteUniqueID()+getAbsoluteIDSegmentDelimiter()+uniqueID;	//concatenate our own absolute unique ID and the local unique ID of the child, separated by the correct delimiter character		
-		}
-*/
-
 		/**Determines if the given string is a valid component ID.
 		A valid component ID begins with a letter and is composed only of letters, digits, and/or the characters '-' and '_'.
 		@param string The string to check for component identifier compliance.
@@ -275,17 +215,6 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			}
 			return string;	//return the string; it passed the test
 		}
-
-		/**Creates a default identifier for this component.
-		This implementation creates an identifier by transforming the simple class name to a variable name.
-		@return A default identifier for this component.
-		*/
-/*TODO del if not needed
-		protected String getDefaultID()
-		{
-			return getVariableName(getClass());	//create an ID by transforming the simple class name to a variable name
-		}
-*/
 
 	/**The parent of this component, or <code>null</code> if this component does not have a parent.*/
 	private CompositeComponent<?> parent=null;
@@ -501,24 +430,16 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			return false;	//indicate that no data could be imported
 		}
 
-	/**Session constructor.
-	@param session The Guise session that owns this component.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalStateException if no controller is registered for this component type.
-	*/
-	public AbstractComponent(final GuiseSession session)
-	{
-		this(session, null);	//construct the component, indicating that a default ID should be used
-	}
-
-	/**Session and ID constructor.
+	/**Session, ID, and model constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the given session is <code>null</code>.
+	@param model The component data model.
+	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	@exception IllegalStateException if no controller is registered for this component type.
+	@exception IllegalStateException if no view is registered for this component type.
 	*/
-	public AbstractComponent(final GuiseSession session, final String id)
+	public AbstractComponent(final GuiseSession session, final String id, final Model model)
 	{
 		super(session);	//construct the parent class
 		if(id!=null)	//if an ID was provided
@@ -530,14 +451,22 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			this.id=getSession().generateComponentID();	//ask the session to generate a new ID
 //TODO del when works			this.id=getVariableName(getClass());	//create an ID by transforming the simple class name to a variable name
 		}
+		this.model=checkNull(model, "Model cannot be null.");	//save the model
 		controller=session.getApplication().getController(getThis());	//ask the application for a controller
 		if(controller==null)	//if we couldn't find a controller
 		{
 			throw new IllegalStateException("No registered controller for "+getClass().getName());	//TODO use a better error
 		}
+		view=session.getApplication().getView(getThis());	//ask the application for a view
+		if(view==null)	//if we couldn't find a view
+		{
+			throw new IllegalStateException("No registered view for "+getClass().getName());	//TODO use a better error
+		}
+		view.installed(getThis());	//tell the view it's being installed
 	}
 
 	/**Determines whether the models of this component and all of its child components are valid.
+	This version checks to ensure the component's model is valid.
 	@return Whether the models of this component and all of its child components are valid.
 	*/
 	public boolean isValid()
@@ -548,12 +477,13 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			return false;	//although the model may be valid, its view representation is not
 		}
 */
-		return true;	//indicate that this component is valid
+//TODO del		return true;	//indicate that this component is valid
+		return getModel().isValid();	//return whether the model is valid
 	}
 
 	/**Processes an event for the component.
 	This method should not normally be called directly by applications.
-	This method delegates to the installed controller, and if no controller is installed one is created and installed.
+	This method delegates to the installed controller.
 	@param event The event to be processed.
 	@exception ComponentExceptions if there was a component-related error processing the event.
 	@see #getController()
@@ -564,19 +494,18 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		getController().processEvent(getThis(), event);	//tell the controller to process the event
 	}
 
-
 	/**Updates the view of this component.
 	This method should not normally be called directly by applications.
-	This method delegates to the installed controller, and if no controller is installed one is created and installed.
+	This method delegates to the installed view
 	@param context Guise context information.
 	@exception IOException if there is an error updating the view.
-	@see #getController()
+	@see #getView()
 	@see GuiseContext.State#UPDATE_VIEW
 	*/
 	public <GC extends GuiseContext> void updateView(final GC context) throws IOException
 	{
-		final Controller<? super GC, ? super C> controller=(Controller<? super GC, ? super C>)getController();	//get the controller
-		controller.updateView(context, getThis());	//tell the controller to update the view
+		final View<? super GC, ? super C> view=(View<? super GC, ? super C>)getView();	//get the view
+		view.update(context, getThis());	//tell the view to update
 	}
 
 	/**Determines the root parent of the given component.
@@ -616,6 +545,40 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			}
 		}
 		return null;
+	}
+
+	/**Retrieves all components that have views needing updated.
+	This method checks the given component and all descendant components.
+	If a given component is dirty, its child views will not be checked.
+	@param component The component that should be checked, along with its descendants, for out-of-date views.
+	@return The components with views needing to be updated. 
+	*/
+	public static Collection<Component<?>> getDirtyComponents(final Component<?> component)
+	{
+		return getDirtyComponents(component, new ArrayList<Component<?>>());	//gather dirty components and put them in a list
+	}
+
+	/**Retrieves all components that have views needing updated.
+	This method checks the given component and all descendant components.
+	If a given component is dirty, its child views will not be checked.
+	@param component The component that should be checked, along with its descendants, for out-of-date views.
+	@param dirtyComponents The collection that will be updated with more dirty components if any are found.
+	@return The components with views needing to be updated. 
+	*/
+	public static Collection<Component<?>> getDirtyComponents(final Component<?> component, final Collection<Component<?>> dirtyComponents)
+	{
+		if(!component.getView().isUpdated())	//if this component's view isn't updated
+		{
+			dirtyComponents.add(component);	//add this component to the list
+		}
+		else if(component instanceof CompositeComponent)	//if the component's view is updated, check its children if it has any
+		{
+			for(final Component<?> childComponent:(CompositeComponent<?>)component)	//for each child component
+			{
+				getDirtyComponents(childComponent, dirtyComponents);	//gather dirty components in this child hierarchy
+			}
+		}
+		return dirtyComponents;
 	}
 
 	/**@return A string representation of this component.*/

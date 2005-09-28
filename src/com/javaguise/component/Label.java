@@ -14,8 +14,11 @@ This component installs a default export strategy supporting export of the follo
 </ul>
 @author Garret Wilson
 */
-public class Label extends AbstractModelComponent<LabelModel, Label>
+public class Label extends AbstractComponent<Label>
 {
+
+	/**@return The data model used by this component.*/
+	public LabelModel getModel() {return (LabelModel)super.getModel();}
 
 	/**The default export strategy for this component type.*/
 	protected final static ExportStrategy<Label> DEFAULT_EXPORT_STRATEGY=new ExportStrategy<Label>()

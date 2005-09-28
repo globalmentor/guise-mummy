@@ -20,8 +20,11 @@ This component installs a default export strategy supporting export of the follo
 </ul>
 @author Garret Wilson
 */
-public class Image extends AbstractModelComponent<ImageModel, Image>
+public class Image extends AbstractComponent<Image>
 {
+
+	/**@return The data model used by this component.*/
+	public ImageModel getModel() {return (ImageModel)super.getModel();}
 
 	/**The default export strategy for this component type.*/
 	protected final static ExportStrategy<Image> DEFAULT_EXPORT_STRATEGY=new ExportStrategy<Image>()

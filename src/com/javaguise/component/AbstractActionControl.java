@@ -6,8 +6,11 @@ import com.javaguise.session.GuiseSession;
 /**Abstract control with an action model.
 @author Garret Wilson
 */
-public abstract class AbstractActionControl<C extends AbstractActionControl<C>> extends AbstractControl<ActionModel, C> implements ActionControl<C>
+public abstract class AbstractActionControl<C extends AbstractActionControl<C>> extends AbstractControl<C> implements ActionControl<C>
 {
+
+	/**@return The data model used by this component.*/
+	public ActionModel getModel() {return (ActionModel)super.getModel();}
 
 	/**Session, ID, and model constructor.
 	@param session The Guise session that owns this component.

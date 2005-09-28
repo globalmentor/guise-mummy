@@ -1,49 +1,111 @@
 package com.javaguise.component;
 
-import java.net.URI;
+import java.util.Iterator;
 
-import com.javaguise.component.layout.Layout;
+import com.garretwilson.util.EmptyIterator;
+import com.garretwilson.util.ObjectIterator;
 import com.javaguise.model.LabelModel;
 import com.javaguise.session.GuiseSession;
-import com.garretwilson.lang.ObjectUtilities;
 
 /**Abstract implementation of a frame.
 @author Garret Wilson
+@see LayoutPanel
 */
-public abstract class AbstractFrame<C extends Frame<C>> extends AbstractModelBox<LabelModel, C> implements Frame<C>
+public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponent<C> implements Frame<C>
 {
 
-	/**The URI of the referring frame or other entity, or <code>null</code> if no referring URI is known.*/
-	private URI referrerURI;
+	/**@return The data model used by this component.*/
+	public LabelModel getModel() {return (LabelModel)super.getModel();}
 
-		/**@return The URI of the referring frame or other entity, or <code>null</code> if no referring URI is known.*/
-		public URI getReferrerURI() {return referrerURI;}
+	/**The single child component, or <code>null</code> if this frame does not have a child component.*/
+	private Component<?> component;
 
-		/**Sets the URI of the referrer.
+		/**@return The single child component, or <code>null</code> if this frame does not have a child component.*/
+		public Component<?> getComponent() {return component;}
+
+		/**Sets the single child component.
 		This is a bound property
-		@param newReferrerURI The URI of the referring frame or other entity, or <code>null</code> if no referring URI is known.
-		@see Frame#REFERRER_URI_PROPERTY
+		@param newComponent The single child component, or <code>null</code> if this frame does not have a child component.
+		@see Frame#COMPONENT_PROPERTY
 		*/
-		public void setReferrerURI(final URI newReferrerURI)
+		public void setComponent(final Component<?> newComponent)
 		{
-			if(!ObjectUtilities.equals(referrerURI, newReferrerURI))	//if the value is really changing
+			if(component!=newComponent)	//if the value is really changing
 			{
-				final URI oldReferrerURI=referrerURI;	//get the old value
-				referrerURI=newReferrerURI;	//actually change the value
-				firePropertyChange(REFERRER_URI_PROPERTY, oldReferrerURI, newReferrerURI);	//indicate that the value changed
+				final Component<?> oldComponent=component;	//get the old value
+				component=newComponent;	//actually change the value
+				if(oldComponent!=null)	//if there was an old component
+				{
+					oldComponent.setParent(null);	//tell the old component it no longer has a parent
+				}
+				if(component!=null)	//if there is a new component
+				{
+					component.setParent(this);	//tell the new component who its parent is					
+				}
+				firePropertyChange(COMPONENT_PROPERTY, oldComponent, newComponent);	//indicate that the value changed
 			}
 		}
 
-	/**Session, ID, layout, and model constructor.
+	/**@return Whether this component has children.*/
+	public boolean hasChildren() {return getComponent()!=null;}
+
+	/**Retrieves the child component with the given ID.
+	@param id The ID of the component to return.
+	@return The child component with the given ID, or <code>null</code> if there is no child component with the given ID. 
+	*/
+	public Component<?> getComponent(final String id)
+	{
+		final Component<?> component=getComponent();	//get the child component, if there is one
+		return (component!=null && id.equals(component.getID())) ? component : null;	//return the child component if it has the correct ID
+	}
+
+	/**@return An iterator to the single child component, if there is one.*/
+	public Iterator<Component<?>> iterator()
+	{
+		final Component<?> component=getComponent();	//get the child component, if there is one
+		return component!=null ? new ObjectIterator<Component<?>>(getComponent()) : new EmptyIterator<Component<?>>();
+	}
+
+	/**Whether this frame has been initialized.*/
+	private boolean initialized=false;
+
+	/**Sets whether the frame is visible.
+	This version registers or unregisters the frame with the session as needed.
+	@param newVisible <code>true</code> if the component should be visible, else <code>false</code>.
+	@see Component#VISIBLE_PROPERTY
+	*/
+	public void setVisible(final boolean newVisible)
+	{
+		if(isVisible()!=newVisible)	//if the value is really changing
+		{
+			if(initialized)	//if we've initialized the frame
+			{
+				if(newVisible)	//if the frame is being shown
+				{
+					getSession().addFrame(this);	//add the frame to the session
+				}
+				else	//if the frame is being hidden
+				{
+					getSession().removeFrame(this);	//remove the frame from the session
+				}
+			}
+			super.setVisible(newVisible);	//set the visibility normally
+		}
+	}
+
+	/**Session, ID, model, and component constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param layout The layout definition for the container.
 	@param model The component data model.
-	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
+	@param component The single child component, or <code>null</code> if this frame should have no child component.
+	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractFrame(final GuiseSession session, final String id, final Layout layout, final LabelModel model)
+	public AbstractFrame(final GuiseSession session, final String id, final LabelModel model, final Component<?> component)
 	{
-		super(session, id, layout, model);	//construct the parent class
+		super(session, id, model);	//construct the parent class
+		this.component=component;	//set the child component
+		setVisible(false);	//default to not being visible
+		initialized=true;	//show that we've initialized the frame
 	}
 }

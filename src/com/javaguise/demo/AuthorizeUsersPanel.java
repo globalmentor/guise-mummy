@@ -10,13 +10,13 @@ import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.RegularExpressionStringValidator;
 
-/**Authorize Users Guise demonstration frame.
+/**Authorize Users Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
 Demonstrates custom table models, editable string table cells, editable boolean table cells,
 	table column validators, and tables.
 @author Garret Wilson
 */
-public class AuthorizeUsersFrame extends DefaultFrame
+public class AuthorizeUsersPanel extends DefaultNavigationPanel
 {
 
 		//the table columns
@@ -29,12 +29,12 @@ public class AuthorizeUsersFrame extends DefaultFrame
 	private final UserAuthorizationTableModel userAuthorizationModel;
 
 	/**Guise session constructor.
-	@param session The Guise session that owns this frame.
+	@param session The Guise session that owns this panel.
 	*/
-	public AuthorizeUsersFrame(final GuiseSession session)
+	public AuthorizeUsersPanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Orientation.Flow.PAGE));	//construct the parent class flowing vertically
-		getModel().setLabel("Guise\u2122 Demonstration: Authorize Users");	//set the frame title	
+		getModel().setLabel("Guise\u2122 Demonstration: Authorize Users");	//set the panel title	
 
 			//create the table columns
 		idColumn=new DefaultTableColumnModel<String>(session, String.class, "ID");	//ID
@@ -50,11 +50,11 @@ public class AuthorizeUsersFrame extends DefaultFrame
 			//create the table
 		final Table userAuthorizationTable=new Table(session, userAuthorizationModel);	//create the table component
 		userAuthorizationTable.getModel().setLabel("User Authorizations");	//give the table a label
-		add(userAuthorizationTable);	//add the user authorization table to the frame
+		add(userAuthorizationTable);	//add the user authorization table to the panel
 			//apply button
 		final Button applyButton=new Button(session);	//create a button for applying the values
 		applyButton.getModel().setLabel("Apply");	//set the button label
-		add(applyButton);	//add the apply button to the frame
+		add(applyButton);	//add the apply button to the panel
 	}
 
 	/**Updates the view of this component.
@@ -75,7 +75,7 @@ public class AuthorizeUsersFrame extends DefaultFrame
 		{
 			Collections.sort(userAuthorizationModel);	//sort the user list model (each user implements Comparable)
 		}
-		super.updateView(context);	//do the default model querying for the frame
+		super.updateView(context);	//do the default model querying for the panel
 	}
 
 	/**A table model based upon a list of users, each column representing a property of the user.

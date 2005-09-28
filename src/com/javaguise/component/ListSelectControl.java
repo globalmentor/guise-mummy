@@ -4,11 +4,13 @@ import com.javaguise.model.*;
 
 /**A control to allow selection by the user of a value from a list.
 @param <V> The type of values to select.
-@param <M> The type of select model used.
 @author Garret Wilson
 */
-public interface ListSelectControl<V, M extends ListSelectModel<V>, C extends SelectControl<V, M, C>> extends SelectControl<V, M, C>
+public interface ListSelectControl<V, C extends ListSelectControl<V, C>> extends SelectControl<V, C>
 {
+
+	/**@return The data model used by this component.*/
+	public ListSelectModel<V> getModel();
 
 	/**@return The strategy used to generate a component to represent each value in the model.*/
 	public ValueRepresentationStrategy<V> getValueRepresentationStrategy();
@@ -66,7 +68,7 @@ public interface ListSelectControl<V, M extends ListSelectModel<V>, C extends Se
 		@param focused <code>true</code> if the value has the focus.
 		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
 		*/
-		public ModelComponent<? extends LabelModel, ?> createComponent(final ListSelectModel<VV> model, final VV value, final int index, final boolean selected, final boolean focused);
+		public Component<?> createComponent(final ListSelectModel<VV> model, final VV value, final int index, final boolean selected, final boolean focused);
 
 		/**Determines an identier for the given object.
 		This value must be equal to the ID of the component returned by the {@link #createComponent(VV)} method.

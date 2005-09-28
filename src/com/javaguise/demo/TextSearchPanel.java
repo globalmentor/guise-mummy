@@ -18,14 +18,14 @@ import com.javaguise.validator.AbstractValidator;
 import com.javaguise.validator.ResourceImportValidator;
 import com.javaguise.validator.ValidationException;
 
-/**Text Search Guise demonstration frame.
+/**Text Search Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
 Demonstrates resource input (file upload) controls, file upload content type and size validation,
 	manual component error specification, custom model validation, and text area controls.
 This demonstration assumes text files are encoded using the system default character encoding.
 @author Garret Wilson
 */
-public class TextSearchFrame extends DefaultFrame
+public class TextSearchPanel extends DefaultNavigationPanel
 {
 
 	/**Instructions for the this demo.*/
@@ -48,12 +48,12 @@ public class TextSearchFrame extends DefaultFrame
 		"</html>";
 
 	/**Guise session constructor.
-	@param session The Guise session that owns this frame.
+	@param session The Guise session that owns this panel.
 	*/
-	public TextSearchFrame(final GuiseSession session)
+	public TextSearchPanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Orientation.Flow.LINE));	//construct the parent class flowing horizontally
-		getModel().setLabel("Guise\u2122 Demonstration: Text Search");	//set the frame title	
+		getModel().setLabel("Guise\u2122 Demonstration: Text Search");	//set the panel title	
 
 			//input panel
 		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.PAGE));	//create the input panel flowing vertically
@@ -149,8 +149,8 @@ public class TextSearchFrame extends DefaultFrame
 					}
 				});
 
-		add(inputPanel);	//add the input panel to the frame
-		add(textAreaControl);	//add the text area control to the frame
+		add(inputPanel);	//add the input panel to the panel
+		add(textAreaControl);	//add the text area control to the panel
 	}
 
 	/**A pattern validator that can validate whether a regular expression has valid syntax, allowing <code>null</code> values.

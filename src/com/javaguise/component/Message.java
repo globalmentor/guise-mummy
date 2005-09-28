@@ -7,8 +7,11 @@ import com.javaguise.session.GuiseSession;
 /**A message component.
 @author Garret Wilson
 */
-public class Message extends AbstractModelComponent<MessageModel, Message>
+public class Message extends AbstractComponent<Message>
 {
+
+	/**@return The data model used by this component.*/
+	public MessageModel getModel() {return (MessageModel)super.getModel();}
 
 	/**Session constructor with a default model.
 	@param session The Guise session that owns this component.

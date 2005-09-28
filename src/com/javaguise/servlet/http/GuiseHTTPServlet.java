@@ -33,6 +33,7 @@ import com.javaguise.model.Model;
 import com.javaguise.platform.web.*;
 import com.javaguise.session.*;
 import com.javaguise.validator.*;
+import com.javaguise.view.text.xml.xhtml.XHTMLNavigationPanelView;
 
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
@@ -242,7 +243,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		{
 			guiseApplication=new DefaultGuiseApplication();	//create a default application
 		}
-		guiseApplication.installControllerKit(new XHTMLControllerKit());	//create and install an XHTML controller kit
+		guiseApplication.installComponentKit(new XHTMLComponentKit());	//create and install an XHTML controller kit
 			//initialize the supported locales
 		final String supportedLocalesString=servletConfig.getInitParameter(SUPPORTED_LOCALES_INIT_PARAMETER_PREFIX);	//get the supported locales init parameter
 		if(supportedLocalesString!=null)	//if supported locales are specified
@@ -262,30 +263,30 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		{
 			guiseApplication.setDefaultLocale(createLocale(defaultLocaleString.trim()));	//create a locale from the default locale string and store it in the application (trimming whitespace just to be extra helpful)
 		}
-			//initialize navigation path/frame bindings
+			//initialize navigation path/panel bindings
 		final Enumeration initParameterNames=servletConfig.getInitParameterNames();	//get the names of all init parameters
 		while(initParameterNames.hasMoreElements())	//while there are more initialization parameters
 		{
 			final String initParameterName=(String)initParameterNames.nextElement();	//get the next initialization parameter name
-			if(initParameterName.startsWith(NAVIGATION_INIT_PARAMETER_PREFIX))	//if this is a path/frame binding
+			if(initParameterName.startsWith(NAVIGATION_INIT_PARAMETER_PREFIX))	//if this is a path/panel binding
 			{
 				final String initParameterValue=servletConfig.getInitParameter(initParameterName);	//get this init parameter value
 				try
 				{
-					final URI pathFrameBindingURI=new URI(initParameterValue);	//create a URI from the frame binding expression
-					final String path=pathFrameBindingURI.getRawPath();	//extract the path from the URI
+					final URI pathPanelBindingURI=new URI(initParameterValue);	//create a URI from the panel binding expression
+					final String path=pathPanelBindingURI.getRawPath();	//extract the path from the URI
 					if(path!=null)	//if a path was specified
 					{
-						final ListMap<String, String> parameterListMap=getParameters(pathFrameBindingURI);	//get the URI parameters
+						final ListMap<String, String> parameterListMap=getParameters(pathPanelBindingURI);	//get the URI parameters
 						final String className=parameterListMap.getItem(NAVIGATION_CLASS_PARAMETER);	//get the class parameter
 						if(className!=null)	//if a class name was specified
 						{
 							try
 							{
 								final Class<?> specifiedClass=Class.forName(className);	//load the class for the specified name
-//TODO bring back for JDK 5 when backwards-compatibility isn't needed								final Class<? extends Frame> navigationFrameClass=specifiedClass.asSubclass(Frame.class);	//cast the specified class to a frame class just to make sure it's the correct type
-								final Class<? extends Frame> navigationFrameClass=(Class<? extends Frame>)specifiedClass;	//cast the specified class to a frame class just to make sure it's the correct type
-								guiseApplication.bindNavigationFrame(path, navigationFrameClass);	//cast the class to a frame class and bind it to the path in the Guise application
+//TODO bring back for JDK 5 when backwards-compatibility isn't needed								final Class<? extends NavigationPanel> navigationFrameClass=specifiedClass.asSubclass(Frame.class);	//cast the specified class to a frame class just to make sure it's the correct type
+								final Class<? extends DefaultNavigationPanel> navigationPanelClass=(Class<? extends DefaultNavigationPanel>)specifiedClass;	//cast the specified class to a panel class just to make sure it's the correct type
+								guiseApplication.bindNavigationPanel(path, navigationPanelClass);	//cast the class to a panel class and bind it to the path in the Guise application
 							}
 							catch(final ClassNotFoundException classNotFoundException)
 							{
@@ -294,17 +295,17 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 						}
 						else	//if no class name was specified
 						{
-							throw new IllegalArgumentException("The initialization parameter path/frame binding "+pathFrameBindingURI+" for "+initParameterName+" did not specify a class name.");												
+							throw new IllegalArgumentException("The initialization parameter path/panel binding "+pathPanelBindingURI+" for "+initParameterName+" did not specify a class name.");												
 						}
 					}
 					else	//if no path was specified
 					{
-						throw new IllegalArgumentException("The initialization parameter path/frame binding "+pathFrameBindingURI+" for "+initParameterName+" did not specify a path.");												
+						throw new IllegalArgumentException("The initialization parameter path/panel binding "+pathPanelBindingURI+" for "+initParameterName+" did not specify a path.");												
 					}
 				}
 				catch(final URISyntaxException uriSyntaxException)	//if the parameter value was not in the correct format
 				{
-					throw new IllegalArgumentException("Incorrect initialization parameter path/frame class binding URI "+initParameterValue+" for "+initParameterName, uriSyntaxException);
+					throw new IllegalArgumentException("Incorrect initialization parameter path/panel class binding URI "+initParameterValue+" for "+initParameterName, uriSyntaxException);
 				}
 			}
 		}
@@ -368,18 +369,19 @@ Debug.info("content type:", request.getContentType());
 //TODO del Debug.trace("Referrer:", getReferer(request));
 					assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
 					final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
-					final Frame<?> navigationFrame=guiseSession.getNavigationFrame(navigationPath);	//get the frame bound to the requested path
-					if(navigationFrame!=null)	//if we found a frame class for this address
+					final NavigationPanel<?> navigationPanel=guiseSession.getNavigationPanel(navigationPath);	//get the panel bound to the requested path
+					if(navigationPanel!=null)	//if we found a frame class for this address
 					{
+						guiseSession.getApplicationFrame().setComponent(navigationPanel);	//place the navigation panel in the application frame
+						
 						setNoCache(response);	//TODO testing; fix; update method
 
 						final List<ControlEvent> controlEvents=getControlEvents(request);	//get all control events from the request
 						final FormEvent formSubmitEvent=(FormEvent)controlEvents.get(0);	//get the form submit event TODO fix, combine with AJAX code
 
-						guiseContext.setControlEvent(formSubmitEvent);	//tell the context which control event is being used
-							//before actually changing the navigation path, check to see if we're in the middle of modal navigation (only do this after we find a navigation frame, as this request might be for a stylesheet or some other non-frame resource, which shouldn't be redirected)
+							//before actually changing the navigation path, check to see if we're in the middle of modal navigation (only do this after we find a navigation panel, as this request might be for a stylesheet or some other non-panel resource, which shouldn't be redirected)
 						final ModalNavigation modalNavigation=guiseSession.peekModalNavigation();	//see if we are currently doing modal navigation TODO make public access routines
-						if(modalNavigation!=null)	//if we are currently in the middle of modal navigation, make sure the correct frame was requested
+						if(modalNavigation!=null)	//if we are currently in the middle of modal navigation, make sure the correct panel was requested
 						{
 							final URI modalNavigationURI=modalNavigation.getNewNavigationURI();	//get the modal navigation URI
 							if(!requestURI.getRawPath().equals(modalNavigationURI.getRawPath()))		//if this request was for a different path than our current modal navigation path (we wouldn't be here if the domain, application, etc. weren't equivalent)
@@ -387,16 +389,18 @@ Debug.info("content type:", request.getContentType());
 								throw new HTTPMovedTemporarilyException(modalNavigationURI);	//redirect to the modal navigation location				
 							}
 						}
+/*TODO del if not needed
 							//update the frame's referrer
 						final String referrer=getReferer(request);	//see if the request has a referrer
-						if(referrer!=null && navigationFrame.getReferrerURI()==null)	//if the request indicates a referrer, but the navigation frame has not yet been updated with a referrer
+						if(referrer!=null && navigationPanel.getReferrerURI()==null)	//if the request indicates a referrer, but the navigation frame has not yet been updated with a referrer
 						{
 							final URI plainReferrerURI=getPlainURI(URI.create(referrer));	//get a plain URI version of the referrer
 							if(!plainReferrerURI.equals(getPlainURI(requestURI)))	//if we aren't being referred from ourselves
 							{
-								navigationFrame.setReferrerURI(plainReferrerURI);	//update the frame's referrer URI
+								navigationPanel.setReferrerURI(plainReferrerURI);	//update the frame's referrer URI
 							}
 						}
+*/
 						guiseSession.setNavigationPath(navigationPath);	//make sure the Guise session has the correct navigation path
 						final Principal oldPrincipal=guiseSession.getPrincipal();	//get the old principal
 						if(formSubmitEvent.getParameterListMap().size()>0)	//only query the view if there were submitted values---especially important for radio buttons and checkboxes, which must assume a value of false if nothing is submitted for them, thereby updating the model
@@ -404,11 +408,11 @@ Debug.info("content type:", request.getContentType());
 							guiseContext.setState(GuiseContext.State.PROCESS_EVENT);	//update the context state for processing an event
 							try
 							{
-								navigationFrame.processEvent(formSubmitEvent);		//tell the frame to process the event
+								navigationPanel.processEvent(formSubmitEvent);		//tell the panel to process the event
 							}
 							catch(final ComponentExceptions componentExceptions)	//if there were any component errors while processing the event
 							{
-								navigationFrame.addErrors(componentExceptions);	//store the validation error(s) so that the frame can report them to the user
+								navigationPanel.addErrors(componentExceptions);	//store the validation error(s) so that the panel can report them to the user
 							}
 						}
 						guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view; make the change now in case queued model changes want to navigate, and an error was thrown when updating the model) TODO see if this comment is relevant after new local-error-catching changes above
@@ -428,9 +432,9 @@ Debug.info("content type:", request.getContentType());
 							}
 							throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
 						}
-						navigationFrame.updateView(guiseContext);		//tell the frame to update its view
+						guiseSession.getApplicationFrame().updateView(guiseContext);		//tell the application frame to update its view
 					}
-					else	//if we have no frame type for this address
+					else	//if we have no panel type for this address
 					{
 						super.doGet(request, response);	//let the default functionality take over					
 					}
@@ -471,15 +475,14 @@ Debug.info("content type:", request.getContentType());
 		}
 */
 //	TODO del			final String navigationPath=(String)guiseContext.getParameterListMap().getItem("navigationPath");	//TODO decode param value
-		final Frame<?> navigationFrame=guiseSession.getNavigationFrame(navigationPath);	//get the frame bound to the requested path
-		if(navigationFrame!=null)	//if we found a frame class for this address
+		final NavigationPanel navigationPanel=guiseSession.getNavigationPanel(navigationPath);	//get the panel bound to the requested path
+		if(navigationPanel!=null)	//if we found a panel class for this address
 		{
 			final List<ControlEvent> controlEvents=getControlEvents(request);	//get all control events from the request
 			guiseContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type
 			guiseContext.writeElementBegin(null, "response");	//<response>	//TODO use a constant, decide on a namespace
 			for(final ControlEvent controlEvent:controlEvents)	//for each control event
 			{
-				guiseContext.setControlEvent(controlEvent);	//tell the context which control event is being used
 				final Set<Component<?>> requestedComponents=new HashSet<Component<?>>();	//create a set of component that were identified in the request
 				if(controlEvent instanceof FormEvent)	//if this is a form submission
 				{
@@ -490,9 +493,9 @@ Debug.info("content type:", request.getContentType());
 						final String parameterName=parameterListMapEntry.getKey();	//get the parameter name
 
 						
-						if(parameterName.equals(XHTMLFrameController.getActionInputID(navigationFrame)) && parameterListMapEntry.getValue().size()>0)	//if this parameter is for an action
+						if(parameterName.equals(XHTMLNavigationPanelView.getActionInputID(navigationPanel)) && parameterListMapEntry.getValue().size()>0)	//if this parameter is for an action
 						{
-							final Component<?> actionComponent=AbstractComponent.getComponentByID(navigationFrame, parameterListMapEntry.getValue().get(0).toString());	//get an action component
+							final Component<?> actionComponent=AbstractComponent.getComponentByID(navigationPanel, parameterListMapEntry.getValue().get(0).toString());	//get an action component
 							if(actionComponent!=null)	//if we found an action component
 							{
 								requestedComponents.add(actionComponent);	//add it to the list of requested components
@@ -502,14 +505,14 @@ Debug.info("content type:", request.getContentType());
 						{
 							//TODO don't re-update nested components (less important for controls, which don't have nested components) 
 			//TODO del Debug.trace("looking for component with name", parameterName);
-							getControlsByName(guiseContext, navigationFrame, parameterName, requestedComponents);	//get all components identified by this name
+							getControlsByName(guiseContext, navigationPanel, parameterName, requestedComponents);	//get all components identified by this name
 						}
 					}
 				}
 				else if(controlEvent instanceof DropEvent)	//if this is a drag and drop drop event
 				{
 					final DropEvent dropEvent=(DropEvent)controlEvent;	//get the drop event
-					final Component<?> dropTarget=AbstractComponent.getComponentByID(navigationFrame, dropEvent.getDropTargetID());	//get the drop target component
+					final Component<?> dropTarget=AbstractComponent.getComponentByID(navigationPanel, dropEvent.getDropTargetID());	//get the drop target component
 					if(dropTarget!=null)	//if there is a drop target
 					{
 						requestedComponents.add(dropTarget);	//add the drop target to the set of requested components
@@ -517,7 +520,6 @@ Debug.info("content type:", request.getContentType());
 				}
 				if(!requestedComponents.isEmpty())	//if components were requested
 				{
-					final Set<Component<?>> affectedComponents=new HashSet<Component<?>>(requestedComponents);	//we'll keep track of components that were affected by this update cycle (always include the requested components, just in case they changed their views but the model did not change---if an erroneous view value changed back to the previous, non-erroneous value, for example) 
 					guiseContext.setState(GuiseContext.State.PROCESS_EVENT);	//update the context state for processing an event
 					for(final Component<?> component:requestedComponents)	//for each requested component
 					{
@@ -527,6 +529,7 @@ Debug.info("content type:", request.getContentType());
 						}
 						catch(final ComponentExceptions componentExceptions)	//if there were any component errors while processing the event
 						{
+/*TODO fix dirtying on errors
 							for(final ComponentException componentException:componentExceptions)	//for each validation exception
 							{
 								final Component<?> affectedComponent=componentException.getComponent();	//see if this error is for a component
@@ -535,44 +538,10 @@ Debug.info("content type:", request.getContentType());
 									affectedComponents.add(affectedComponent);	//add this component to our list of affected components
 								}
 							}
+*/
 						}
 					}
-					guiseContext.setState(GuiseContext.State.INACTIVE);	//deactivate the context so that any model update events will be generated			
-	//TODO del Debug.trace("we now have events:", guiseContext.getEventList().size());
-					for(final EventObject contextEvent:guiseContext.getEventList())	//for each event generated in this context
-					{
-	//				TODO del Debug.trace("context event:", contextEvent);
-						final Object source=contextEvent.getSource();	//get the event source
-						if(source instanceof Model)	//if this was a model change
-						{
-							affectedComponents.addAll(AbstractModelComponent.getModelComponents(navigationFrame, (Model)source));	//get all components that use this model
-						}
-						else if(source instanceof Component)	//if this was a component
-						{
-							affectedComponents.add((Component<?>)source);	//add this component to the list of affected components
-						}
-						else if(source instanceof GuiseSession)	//if the session caused the event TODO maybe check to see if a property changed
-						{
-							affectedComponents.add(navigationFrame);	//if the session changed a property (such as its locale, its orientation or its principal), the whole frame has been affected
-						}
-							//TODO check for hierarchical relations, to prevent duplication
-					}
-						//check for containment so that only top-most affected components are included
-					final Iterator<Component<?>> affectedComponentIterator=affectedComponents.iterator();	//get an iterator to look at all affected components
-					while(affectedComponentIterator.hasNext())	//while there are more affected components
-					{
-						final Component<?> affectedComponent=affectedComponentIterator.next();	//get the next affected component
-						Component<?> parent=affectedComponent.getParent();	//get the component's parent
-						while(parent!=null)	//while there is a parent
-						{
-							if(affectedComponents.contains(parent))	//if this parent is also an affected component
-							{
-								affectedComponentIterator.remove();	//remove this component from the set; there's no need to update the component twice
-								break;	//we've thrown out this component, so go to the next component
-							}
-							parent=parent.getParent();	//check the parent's parent
-						}
-					}
+					guiseContext.setState(GuiseContext.State.INACTIVE);	//deactivate the context so that any model update events will be generated
 /*TODO del
 Debug.trace("we now have affected components:", affectedComponents.size());
 for(final Component<?> affectedComponent:affectedComponents)
@@ -580,13 +549,6 @@ for(final Component<?> affectedComponent:affectedComponents)
 	Debug.trace("affected component:", affectedComponent);
 }
 */
-					guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view; make the change now in case queued model changes want to navigate, and an error was thrown when updating the model)
-
-					
-					
-					
-//TODO check about principal change
-					
 					final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
 					if(requestedNavigation!=null)	//if navigation is requested
 					{
@@ -604,23 +566,36 @@ for(final Component<?> affectedComponent:affectedComponents)
 //TODO if !AJAX						throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
 						//TODO store a flag or something---if we're navigating, we probably should flush the other queued events
 					}
+					final Frame<?> applicationFrame=guiseSession.getApplicationFrame();	//get the application frame
+					final Collection<Component<?>> dirtyComponents=getDirtyComponents(guiseSession);	//get all dirty components in all the session frames 
+
 					
 					
-					if(affectedComponents.contains(navigationFrame))	//if the frame itself was affected, we might as well reload the page (trying to send the frame's XML contents back would corrupt the XML tree, anyway)
+					
+					Debug.trace("we now have dirty components:", dirtyComponents.size());
+					for(final Component<?> affectedComponent:dirtyComponents)
+					{
+						Debug.trace("affected component:", affectedComponent);
+					}
+					
+					
+					
+					if(dirtyComponents.contains(applicationFrame))	//if the application frame itself was affected, we might as well reload the page
 					{
 						guiseContext.writeElementBegin(null, "reload", true);	//<reload>	//TODO use a constant
-						guiseContext.writeElementEnd();	//</reload>
-						
+						guiseContext.writeElementEnd();	//</reload>						
 					}
-					else	//if the frame wasn't affected
+					else	//if the application frame wasn't affected
 					{
-						guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
-						guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
-						for(final Component<?> affectedComponent:affectedComponents)	//for each component affected by this update cycle
+						guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view
+						for(final Component<?> dirtyComponent:dirtyComponents)	//for each component affected by this update cycle
 						{
-							affectedComponent.updateView(guiseContext);		//tell the component to update its view
+							guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
+							guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
+							guiseContext.writeAttribute(null, "isFrame", Boolean.valueOf(dirtyComponent instanceof Frame).toString());	//isFrame="affectedComponent instanceof Frame" TODO fix hack
+							dirtyComponent.updateView(guiseContext);		//tell the component to update its view
+							guiseContext.writeElementEnd();	//</xhtml:patch>
 						}
-						guiseContext.writeElementEnd();	//</xhtml:patch>
 					}
 				}
 			}
@@ -636,9 +611,9 @@ for(final Component<?> affectedComponent:affectedComponents)
 	{
 			//TODO check first that the component is a control; that should be much faster
 		final Controller<? extends GuiseContext, ?> controller=component.getController();
-		if(controller instanceof XHTMLControlController)
+		if(controller instanceof AbstractXHTMLControlController)
 		{
-			final XHTMLControlController xhtmlControlController=(XHTMLControlController)controller;
+			final AbstractXHTMLControlController xhtmlControlController=(AbstractXHTMLControlController)controller;
 //TODO del Debug.trace("checking control with ID", xhtmlControlController.getAbsoluteUniqueID(component), "and name", xhtmlControlController.getComponentName((Control)component));
 			if(name.equals(xhtmlControlController.getComponentName((Control)component)))	//TODO comment: the returned name can be null
 			{
@@ -664,6 +639,24 @@ for(final Component<?> affectedComponent:affectedComponents)
 			}
 		}
 	}
+
+	/**Retrieves all components that have views needing updated within a session.
+	This method checks all frames in the session.
+	If a given component is dirty, its child views will not be checked.
+	@param session The Guise session to check for dirty views.
+	@return The components with views needing to be updated. 
+	*/
+	public static Collection<Component<?>> getDirtyComponents(final GuiseSession session)
+	{
+		final ArrayList<Component<?>> dirtyComponents=new ArrayList<Component<?>>();	//create a new list to hold dirty components
+		final Iterator<Frame<?>> frameIterator=session.getFrameIterator();	//get an iterator to session frames
+		while(frameIterator.hasNext())	//while there are more frames
+		{
+			AbstractComponent.getDirtyComponents(frameIterator.next(), dirtyComponents);	//gather more dirty components
+		}
+		return dirtyComponents;	//return the dirty components we collected
+	}
+
 
 	private final PathExpression AJAX_REQUEST_EVENTS_WILDCARD_XPATH_EXPRESSION=new PathExpression("request", "events", "*");	//TODO use constants; comment 
 	private final PathExpression AJAX_REQUEST_CONTROL_XPATH_EXPRESSION=new PathExpression("control");	//TODO use constants; comment 
@@ -824,10 +817,10 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	*/
 	protected <R> void beginModalNavigation(final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ModalNavigation<R> modalNavigation)
 	{
-		final ModalFrame<R, ?> modalFrame=(ModalFrame<R, ?>)guiseSession.getNavigationFrame(guiseApplication.relativizeURI(modalNavigation.getNewNavigationURI()));	//get the modal frame for this navigation path
-		if(modalFrame!=null)	//if we have a modal frame
+		final ModalNavigationPanel<R, ?> modalPanel=(ModalNavigationPanel<R, ?>)guiseSession.getNavigationPanel(guiseApplication.relativizeURI(modalNavigation.getNewNavigationURI()));	//get the modal frame for this navigation path
+		if(modalPanel!=null)	//if we have a modal frame
 		{
-			guiseSession.beginModalNavigation(modalFrame, modalNavigation);
+			guiseSession.beginModalNavigation(modalPanel, modalNavigation);
 		}
 	}
 

@@ -8,8 +8,11 @@ import java.util.Set;
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.net.URIUtilities;
 import com.javaguise.component.*;
+import com.javaguise.component.kit.ComponentKit;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.*;
+import com.javaguise.session.GuiseSession;
+import com.javaguise.view.View;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
@@ -47,50 +50,57 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public void setResourceBundleBaseName(final String newResourceBundleBaseName);
 
-	/**Installs a controller kit.
-	Later controller kits take precedence over earlier-installed controller kits.
-	If the controller kit is already installed, no action occurs.
-	@param controllerKit The controller kit to install.
+	/**Installs a component kit.
+	Later component kits take precedence over earlier-installed component kits.
+	If the component kit is already installed, no action occurs.
+	@param componentKit The component kit to install.
 	*/
-	public void installControllerKit(final ControllerKit controllerKit);
+	public void installComponentKit(final ComponentKit componentKit);
 
-	/**Uninstalls a controller kit.
-	If the controller kit is not installed, no action occurs.
-	@param controllerKit The controller kit to uninstall.
+	/**Uninstalls a component kit.
+	If the component kit is not installed, no action occurs.
+	@param componentKit The component kit to uninstall.
 	*/
-	public void uninstallControllerKit(final ControllerKit controllerKit);
+	public void uninstallComponentKit(final ComponentKit componentKit);
 
 	/**Determines the controller appropriate for the given component.
-	A controller class is located by individually looking up the component class hiearchy for registered render strategies, at each checking all installed controller kits.
+	A controller class is located by individually looking up the component class hiearchy for registered render strategies, at each checking all installed component kits.
 	@param <GC> The type of Guise context being used.
 	@param <C> The type of component for which a controller is requested.
-	@param context Guise context information.
 	@param component The component for which a controller should be returned.
 	@return A controller to render the given component, or <code>null</code> if no controller is registered.
 	*/
-//TODO del when works	public <GC extends GuiseContext, C extends Component<?>> Controller<? super GC, ? super C> getController(final GC context, final C component);
 	public <C extends Component<?>> Controller<? extends GuiseContext, ? super C> getController(final C component);
 
-	/**Binds a frame type to a particular application context-relative path.
+	/**Determines the view appropriate for the given component.
+	A view class is located by individually looking up the component class hiearchy for registered render strategies, at each checking all installed component kits.
+	@param <GC> The type of Guise context being used.
+	@param <C> The type of component for which a view is requested.
+	@param component The component for which a view should be returned.
+	@return A view to render the given component, or <code>null</code> if no view is registered.
+	*/
+	public <C extends Component<?>> View<? extends GuiseContext, ? super C> getView(final C component);
+
+	/**Binds a panel type to a particular application context-relative path.
 	Any existing binding for the given context-relative path is replaced.
-	@param path The appplication context-relative path to which the frame should be bound.
-	@param frameClass The class of frame to render for this particular appplication context-relative path.
-	@return The frame previously bound to the given appplication context-relative path, or <code>null</code> if no frame was previously bound to the path.
-	@exception NullPointerException if the path and/or the frame is null.
+	@param path The appplication context-relative path to which the panel should be bound.
+	@param panelClass The class of panel to render for this particular appplication context-relative path.
+	@return The panel previously bound to the given appplication context-relative path, or <code>null</code> if no panel was previously bound to the path.
+	@exception NullPointerException if the path and/or the panel is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public Class<? extends Frame> bindNavigationFrame(final String path, final Class<? extends Frame> frameClass);
+	public Class<? extends DefaultNavigationPanel> bindNavigationPanel(final String path, final Class<? extends DefaultNavigationPanel> panelClass);
 
-	/**Determines the class of frame bound to the given application context-relative path.
-	@param path The address for which a frame should be retrieved.
-	@return The type of frame bound to the given path, or <code>null</code> if no frame is bound to the path. 
+	/**Determines the class of panel bound to the given application context-relative path.
+	@param path The address for which a panel should be retrieved.
+	@return The type of panel bound to the given path, or <code>null</code> if no panel is bound to the path. 
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public Class<? extends Frame> getNavigationFrameClass(final String path);
+	public Class<? extends DefaultNavigationPanel> getNavigationPanelClass(final String path);
 
-	/**Determines if there is a frame class bound to the given appplication context-relative path.
+	/**Determines if there is a panel class bound to the given appplication context-relative path.
 	@param path The appplication context-relative path within the Guise container context.
-	@return <code>true</code> if there is a frame bound to the given path, or <code>false</code> if no frame is bound to the given path.
+	@return <code>true</code> if there is a panel bound to the given path, or <code>false</code> if no panel is bound to the given path.
 	@exception NullPointerException if the path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
@@ -99,8 +109,14 @@ public interface GuiseApplication extends PropertyBindable
 	/**@return The Guise container into which this application is installed, or <code>null</code> if the application is not yet installed.*/
 	public GuiseContainer getContainer();
 
+	/**Creates a frame for the application.
+	@param session The Guise session that will own the application frame.
+	@return A new frame for the application.
+	*/
+	public ApplicationFrame<?> createApplicationFrame(final GuiseSession session);
+
 	/**Reports the base path of the application.
-	The base path is an absolute path that ends with a slash ('/'), indicating the base path of the navigation frames.
+	The base path is an absolute path that ends with a slash ('/'), indicating the base path of the navigation panels.
 	@return The base path representing the Guise application, or <code>null</code> if the application is not yet installed.
 	*/
 	public String getBasePath();

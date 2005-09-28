@@ -7,27 +7,27 @@ import com.javaguise.model.ValueModel;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.RegularExpressionStringValidator;
 
-/**Hello User Guise demonstration frame.
+/**Hello User Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
 Demonstrates flow layouts, hidden components, text controls, control labels,
 	tooltips, text control regular expression validators, buttons,
 	and model value change listeners.
 @author Garret Wilson
 */
-public class HelloUserFrame extends DefaultFrame
+public class HelloUserPanel extends DefaultNavigationPanel
 {
 
 	/**Guise session constructor.
-	@param session The Guise session that owns this frame.
+	@param session The Guise session that owns this panel.
 	*/
-	public HelloUserFrame(final GuiseSession session)
+	public HelloUserPanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Orientation.Flow.PAGE));	//construct the parent class flowing vertically
-		getModel().setLabel("Guise\u2122 Demonstration: Hello User");	//set the frame title	
+		getModel().setLabel("Guise\u2122 Demonstration: Hello User");	//set the panel title	
 
 		final Label helloUserLabel=new Label(session);	//create a label
 		helloUserLabel.setVisible(false);	//don't show the label initially
-		add(helloUserLabel);	//add the label to the frame
+		add(helloUserLabel);	//add the label to the panel
 		
 		final TextControl<String> userInput=new TextControl<String>(session, String.class);	//create a text input control to retrieve a string
 		userInput.getModel().setLabel("What's your name?");	//add a label to the text input control
@@ -42,7 +42,7 @@ public class HelloUserFrame extends DefaultFrame
 						helloUserLabel.setVisible(true);	//make the label visible
 					}
 				});
-		add(userInput);	//add the user input control to the frame
+		add(userInput);	//add the user input control to the panel
 	}
 
 }

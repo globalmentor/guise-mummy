@@ -8,8 +8,11 @@ import com.javaguise.session.GuiseSession;
 /**A panel for grouping multiple components with a default page flow layout.
 @author Garret Wilson
 */
-public class GroupPanel extends AbstractModelBox<LabelModel, GroupPanel> implements Panel<GroupPanel>
+public class GroupPanel extends AbstractBox<GroupPanel> implements Panel<GroupPanel>
 {
+
+	/**@return The data model used by this component.*/
+	public LabelModel getModel() {return (LabelModel)super.getModel();}
 
 	/**Session constructor with a default vertical flow layout.
 	@param session The Guise session that owns this component.

@@ -7,8 +7,11 @@ import com.javaguise.session.GuiseSession;
 /**A text component.
 @author Garret Wilson
 */
-public class Text extends AbstractModelComponent<TextModel, Text>
+public class Text extends AbstractComponent<Text>
 {
+
+	/**@return The data model used by this component.*/
+	public TextModel getModel() {return (TextModel)super.getModel();}
 
 	/**Session constructor with a default model.
 	@param session The Guise session that owns this component.

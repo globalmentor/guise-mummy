@@ -7,11 +7,14 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 /**Abstract implementation of a control to allow selection by the user of a value from a list.
 This implementation does not yet fully support elements that appear more than once in the model.
 @param <V> The type of values to select.
-@param <M> The type of select model used.
 @author Garret Wilson
 */
-public abstract class AbstractListSelectControl<V, M extends ListSelectModel<V>, C extends ListSelectControl<V, M, C>> extends AbstractControl<M, C> implements ListSelectControl<V, M, C>
+public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V, C>> extends AbstractControl<C> implements ListSelectControl<V, C>
 {
+
+	/**@return The data model used by this component.*/
+	@SuppressWarnings("unchecked")
+	public ListSelectModel<V> getModel() {return (ListSelectModel<V>)super.getModel();}
 
 	/**The strategy used to generate a component to represent each value in the model.*/
 	private ValueRepresentationStrategy<V> valueRepresentationStrategy;
@@ -43,7 +46,7 @@ public abstract class AbstractListSelectControl<V, M extends ListSelectModel<V>,
 	@exception NullPointerException if the given session, model, and/or value representation strategy is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractListSelectControl(final GuiseSession session, final String id, final M model, final ValueRepresentationStrategy<V> valueRepresentationStrategy)
+	public AbstractListSelectControl(final GuiseSession session, final String id, final ListSelectModel<V> model, final ValueRepresentationStrategy<V> valueRepresentationStrategy)
 	{
 		super(session, id, model);	//construct the parent class
 		this.valueRepresentationStrategy=checkNull(valueRepresentationStrategy, "Value representation strategy cannot be null.");

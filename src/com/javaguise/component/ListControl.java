@@ -9,7 +9,7 @@ import static com.garretwilson.lang.ObjectUtilities.checkNull;
 @param <V> The type of values to select.
 @author Garret Wilson
 */
-public class ListControl<V> extends AbstractListSelectControl<V, ListSelectModel<V>, ListControl<V>>
+public class ListControl<V> extends AbstractListSelectControl<V, ListControl<V>>
 {
 
 	/**The row count bound property.*/

@@ -13,10 +13,10 @@ Demonstrates custom Guise applications, setting application resource bundles, an
 public class DemoApplication extends AbstractGuiseApplication
 {
 
-	/**The application-relative navigation path to the edit user modal frame.*/
-	public final static String EDIT_USER_FRAME_NAVIGATION_PATH="edituser";
-	/**The application-relative navigation path to the restricted frame.*/
-	public final static String RESTRICTED_FRAME_NAVIGATION_PATH="restricted";
+	/**The application-relative navigation path to the edit user modal panel.*/
+	public final static String EDIT_USER_PANEL_NAVIGATION_PATH="edituser";
+	/**The application-relative navigation path to the restricted panel.*/
+	public final static String RESTRICTED_PANEL_NAVIGATION_PATH="restricted";
 
 	/**The synchronized list of application users.*/
 	final private List<DemoUser> users=Collections.synchronizedList(new ArrayList<DemoUser>());

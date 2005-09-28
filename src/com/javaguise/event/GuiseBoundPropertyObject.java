@@ -51,11 +51,11 @@ public class GuiseBoundPropertyObject extends BoundPropertyObject
 	/**Reports that a bound property has changed.
 	This implementation delegates to the Guise session to fire or postpone the property change event.
 	@param propertyChangeEvent The event to fire.
-	@see GuiseSession#queueModelEvent(com.garretwilson.event.PostponedEvent)
+	@see GuiseSession#queueEvent(com.garretwilson.event.PostponedEvent)
 	*/
 	protected void firePropertyChange(final PropertyChangeEvent propertyChangeEvent)
 	{
-		getSession().queueModelEvent(createPostponedPropertyChangeEvent(propertyChangeEvent));	//create and queue a postponed property change event
+		getSession().queueEvent(createPostponedPropertyChangeEvent(propertyChangeEvent));	//create and queue a postponed property change event
 	}
 
 }

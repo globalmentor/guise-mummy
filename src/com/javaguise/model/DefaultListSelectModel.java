@@ -462,7 +462,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 		getSelectionStrategy().listModified(listEvent);	//manually notify the selection strategy, because the queued event might be delayed and reported out of order
 //TODO del; the event needs to be reported to the session unconditionally		if(getEventListenerManager().hasListeners(ListListener.class))	//if there are appropriate listeners registered
 		{
-			getSession().queueModelEvent(new PostponedListEvent<ListSelectModel<V>, V>(getEventListenerManager(), listEvent));	//tell the Guise session to queue the event
+			getSession().queueEvent(new PostponedListEvent<ListSelectModel<V>, V>(getEventListenerManager(), listEvent));	//tell the Guise session to queue the event
 		}
 	}
 

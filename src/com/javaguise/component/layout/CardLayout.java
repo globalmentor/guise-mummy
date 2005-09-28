@@ -18,16 +18,17 @@ import com.javaguise.validator.*;
 
 /**A layout that manages child components as an ordered stack of cards.
 Only one child comoponent is visible at a time.
+The card layout maintains its own value model that maintains the current selected card.
 @author Garret Wilson
 */
-public class CardLayout extends AbstractLayout<CardLayout.Constraints> implements ValueModel<Component<?>>
+public class CardLayout extends AbstractLayout<CardLayout.Constraints> //TODO del when works implements ValueModel<Component<?>>
 {
 
 	/**The decorated value model maintaining the selected component.*/
 	private final ValueModel<Component<?>> valueModel;
 
 		/**@return The decorated value model maintaining the selected component.*/
-		protected ValueModel<Component<?>> getValueModel() {return valueModel;}
+		public ValueModel<Component<?>> getValueModel() {return valueModel;}
 
 	/**The index of the selected component, or -1 if the index is not known and should be recalculated.*/
 	private int selectedIndex=-1;
@@ -122,7 +123,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 			}
 			catch(final ValidationException validationException)	//if we can't select the next component
 			{
-				resetValue();	//reset the selected component value
+				getValueModel().resetValue();	//reset the selected component value
 				selectedIndex=-1;	//uncache the selected component index
 			}
 		}
@@ -155,17 +156,17 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 	@exception MissingResourceException if there was an error loading the value from the resources.
 	@see #getInfoResourceKey()
 	*/
-	public String getInfo() throws MissingResourceException {return getValueModel().getInfo();}
+//TODO del when works	public String getInfo() throws MissingResourceException {return getValueModel().getInfo();}
 
 	/**Sets the advisory information text, such as might appear in a tooltip.
 	This is a bound property.
 	@param newInfo The new text of the advisory information text, such as might appear in a tooltip.
 	@see Model#INFO_PROPERTY
 	*/
-	public void setInfo(final String newInfo) {getValueModel().setInfo(newInfo);}
+//TODO del when works	public void setInfo(final String newInfo) {getValueModel().setInfo(newInfo);}
 
 	/**@return The content type of the advisory information text.*/
-	public ContentType getInfoContentType() {return getValueModel().getInfoContentType();}
+//TODO del when works	public ContentType getInfoContentType() {return getValueModel().getInfoContentType();}
 
 	/**Sets the content type of the advisory information text.
 	This is a bound property.
@@ -174,22 +175,22 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 	@exception IllegalArgumentException if the given content type is not a text content type.
 	@see Model#INFO_CONTENT_TYPE_PROPERTY
 	*/
-	public void setInfoContentType(final ContentType newInfoContentType) {getValueModel().setInfoContentType(newInfoContentType);}
+//TODO del when works	public void setInfoContentType(final ContentType newInfoContentType) {getValueModel().setInfoContentType(newInfoContentType);}
 
 	/**@return The advisory information text resource key, or <code>null</code> if there is no advisory information text resource specified.*/
-	public String getInfoResourceKey() {return getValueModel().getInfoResourceKey();}
+//TODO del when works	public String getInfoResourceKey() {return getValueModel().getInfoResourceKey();}
 
 	/**Sets the key identifying the text of the advisory information in the resources.
 	This is a bound property.
 	@param newInfoResourceKey The new advisory information text resource key.
 	@see Model#INFO_RESOURCE_KEY_PROPERTY
 	*/
-	public void setInfoResourceKey(final String newInfoResourceKey) {getValueModel().setInfoResourceKey(newInfoResourceKey);}
+//TODO del when works	public void setInfoResourceKey(final String newInfoResourceKey) {getValueModel().setInfoResourceKey(newInfoResourceKey);}
 
 	//value model delegation
 
 	/**@return Whether the contents of this model are valid.*/
-	public boolean isValid() {return getValueModel().isValid();}
+//TODO del when works	public boolean isValid() {return getValueModel().isValid();}
 
 	/**Determines the text of the label.
 	If a label is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
@@ -198,17 +199,17 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 	@see #getLabelResourceKey()
 	@see #getPlainLabel()
 	*/
-	public String getLabel() throws MissingResourceException {return getValueModel().getLabel();}
+//TODO del when works	public String getLabel() throws MissingResourceException {return getValueModel().getLabel();}
 
 	/**Sets the text of the label.
 	This is a bound property.
 	@param newLabel The new text of the label.
 	@see #LABEL_PROPERTY
 	*/
-	public void setLabel(final String newLabel) {getValueModel().setLabel(newLabel);}
+//TODO del when works	public void setLabel(final String newLabel) {getValueModel().setLabel(newLabel);}
 
 	/**@return The content type of the label text.*/
-	public ContentType getLabelContentType() {return getValueModel().getLabelContentType();}
+//TODO del when works	public ContentType getLabelContentType() {return getValueModel().getLabelContentType();}
 
 	/**Sets the content type of the label text.
 	This is a bound property.
@@ -217,39 +218,39 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 	@exception IllegalArgumentException if the given content type is not a text content type.
 	@see #LABEL_CONTENT_TYPE_PROPERTY
 	*/
-	public void setLabelContentType(final ContentType newLabelContentType) {getValueModel().setLabelContentType(newLabelContentType);}
+//TODO del when works	public void setLabelContentType(final ContentType newLabelContentType) {getValueModel().setLabelContentType(newLabelContentType);}
 
 	/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-	public String getLabelResourceKey() {return getValueModel().getLabelResourceKey();}
+//TODO del when works	public String getLabelResourceKey() {return getValueModel().getLabelResourceKey();}
 
 	/**Sets the key identifying the text of the label in the resources.
 	This is a bound property.
 	@param newLabelResourceKey The new label text resource key.
 	@see #LABEL_RESOURCE_KEY_PROPERTY
 	*/
-	public void setLabelResourceKey(final String newLabelResourceKey) {getValueModel().setLabelResourceKey(newLabelResourceKey);}
+//TODO del when works	public void setLabelResourceKey(final String newLabelResourceKey) {getValueModel().setLabelResourceKey(newLabelResourceKey);}
 
 	/**@return Whether the model is enabled and and the corresponding control can receive user input.*/
-	public boolean isEnabled() {return getValueModel().isEnabled();}
+//TODO del when works	public boolean isEnabled() {return getValueModel().isEnabled();}
 
 	/**Sets whether the model is enabled and and the corresponding control can receive user input..
 	This is a bound property of type <code>Boolean</code>.
 	@param newEnabled <code>true</code> if the corresponding control should indicate and accept user input.
 	@see #ENABLED_PROPERTY
 	*/
-	public void setEnabled(final boolean newEnabled) {getValueModel().setEnabled(newEnabled);}
+//TODO del when works	public void setEnabled(final boolean newEnabled) {getValueModel().setEnabled(newEnabled);}
 
 	/**@return Whether the model's value is editable and the corresponding control will allow the the user to change the value.*/
-	public boolean isEditable() {return getValueModel().isEditable();}
+//TODO del when works	public boolean isEditable() {return getValueModel().isEditable();}
 
 	/**Sets whether the model's value is editable and the corresponding control will allow the the user to change the value.
 	This is a bound property of type <code>Boolean</code>.
 	@param newEditable <code>true</code> if the corresponding control should allow the user to change the value.
 	@see #EDITABLE_PROPERTY
 	*/
-	public void setEditable(final boolean newEditable) {getValueModel().setEditable(newEditable);}
+//TODO del when works	public void setEditable(final boolean newEditable) {getValueModel().setEditable(newEditable);}
 
-	/**@return The input value, or <code>null</code> if there is no input value.*/
+	/**@return The current value, or <code>null</code> if there is no input value.*/
 	public Component<?> getValue() {return getValueModel().getValue();}
 
 	/**Sets the input value.
@@ -267,20 +268,20 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 	No validation occurs.
 	@see #VALUE_PROPERTY
 	*/
-	public void resetValue() {getValueModel().resetValue();}
+//TODO del when works	public void resetValue() {getValueModel().resetValue();}
 
 	/**@return The validator for this model, or <code>null</code> if no validator is installed.*/
-	public Validator<Component<?>> getValidator() {return getValueModel().getValidator();}
+//TODO del when works	public Validator<Component<?>> getValidator() {return getValueModel().getValidator();}
 
 	/**Sets the validator.
 	This is a bound property
 	@param newValidator The validator for this model, or <code>null</code> if no validator should be used.
 	@see #VALIDATOR_PROPERTY
 	*/
-	public void setValidator(final Validator<Component<?>> newValidator) {getValueModel().setValidator(newValidator);}
+//TODO del when works	public void setValidator(final Validator<Component<?>> newValidator) {getValueModel().setValidator(newValidator);}
 
 	/**@return The class representing the type of value this model can hold.*/
-	public Class<Component<?>> getValueClass() {return getValueModel().getValueClass();}
+//TODO del when works	public Class<Component<?>> getValueClass() {return getValueModel().getValueClass();}
 
 	/**Metadata about individual component layout.
 	@author Garret Wilson
@@ -304,6 +305,9 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 		}
 	}
 
+	/**The value model that maintains the current selected tab.
+	@author Garret Wilson
+	*/
 	protected class CardValueModel extends DefaultValueModel<Component<?>>
 	{
 		/**Session constructor.

@@ -9,8 +9,12 @@ The panel's value model reflects the currently selected component, if any.
 @author Garret Wilson
 @see CardLayout
 */
-public class TabbedPanel extends AbstractModelBox<ValueModel<Component<?>>, TabbedPanel> implements Panel<TabbedPanel>, Control<ValueModel<Component<?>>, TabbedPanel>
+public class TabbedPanel extends AbstractBox<TabbedPanel> implements Panel<TabbedPanel>, Control<TabbedPanel>
 {
+
+	/**@return The data model used by this component.*/
+	@SuppressWarnings("unchecked")
+	public ValueModel<Component<?>> getModel() {return (ValueModel<Component<?>>)super.getModel();}
 
 	/**@return The layout definition for the container.*/
 	public CardLayout getLayout() {return (CardLayout)super.getLayout();}
@@ -54,7 +58,7 @@ public class TabbedPanel extends AbstractModelBox<ValueModel<Component<?>>, Tabb
 	*/
 	protected TabbedPanel(final GuiseSession session, final String id, final CardLayout layout)
 	{
-		super(session, id, layout, layout);	//construct the parent class, using the card layout as the value model as well
+		super(session, id, layout, layout.getValueModel());	//construct the parent class, using the card layout's value model
 	}
 
 }

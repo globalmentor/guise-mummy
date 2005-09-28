@@ -23,8 +23,9 @@ var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX c
 
 /**Guise AJAX Response Format, content type application/x-guise-ajax-response+xml
 <response>
-	<patch></patch>	<!--XML elements to be patched into the existing DOM tree.-->
+	<patch isFrame="true|false"></patch>	<!--XML elements to be patched into the existing DOM tree.--> <!--TODO fix isFrame hack; perhaps just report all available component types-->
 	<navigate>uri</navigate>	<!--URI of another page to which to navigate.-->
+	<frame></frame>	<!--definition of a frame to show-->
 </response>
 */
 
@@ -957,7 +958,7 @@ alert(exception);
 								switch(elementName)	//see which type of response this is
 								{
 									case this.ResponseElement.PATCH:	//patch
-										this._patchElement(childNode);	//patch the document with this patch information
+										this._processPatch(childNode);	//patch the document with this patch information
 										break;
 									case this.ResponseElement.NAVIGATE:	//navigate
 										window.location.href=getText(childNode);	//go to the new location
@@ -978,23 +979,16 @@ alert(exception);
 				}
 			}
 		};
-	
-		/**Patches an element and its children into the existing element hierarchy.
-		Any element in the hierarchy without an ID attribute will be ignored, although its children will be processed.
-		@param element The element hierarchy to patch into the existing document.
+
+		/**Processes the AJAX patch response.
+		Only child elements with IDs will be processed.
+		@param element The element representing patch response.
 		*/ 
-		GuiseAJAX.prototype._patchElement=function(element)
+		GuiseAJAX.prototype._processPatch=function(element)
 		{
-			var id=element.getAttribute("id");	//get the element's ID, if there is one
-			if(id)	//if the element has an ID
-			{
-				var oldElement=document.getElementById(id);	//get the old element
-				if(oldElement)	//if the element currently exists in the document
-				{
-					this._synchronizeElement(oldElement, element);	//synchronize this element tree
-					return;	//don't process this subtree further; we've already performed the patch
-				}
-			}
+		
+			var isFrame=element.getAttribute("isFrame")=="true";	//TODO fix isFrame hack
+		
 			var childNodes=element.childNodes;	//get all the child nodes of the element
 			var childNodeCount=childNodes.length;	//find out how many children there are
 			for(var i=0; i<childNodeCount; ++i)	//for each child node
@@ -1002,10 +996,35 @@ alert(exception);
 				var childNode=childNodes[i];	//get this child node
 				if(childNode.nodeType==Node.ELEMENT_NODE)	//if this is an element
 				{
-					this._patchElement(childNode);	//try to patch this child element
+					var id=childNode.getAttribute("id");	//get the child node's ID, if there is one
+					if(id)	//if the element has an ID
+					{
+						var oldElement=document.getElementById(id);	//get the old element
+/*TODO del
+						if(oldElement==null && isFrame)	//if there is no old element, but the patch is for a frame, create a new frame
+						{
+						}
+*/
+						if(oldElement)	//if the element currently exists in the document
+						{
+							this._synchronizeElement(oldElement, childNode);	//synchronize this element tree
+						}
+						else if(isFrame)	//if the element doesn't currently exist, but the patch is for a frame, create a new frame
+						{
+							oldElement=document.importNode(childNode, true);	//create an import clone of the node
+							oldElement.style.position="absolute";	//change the element's position to absolute TODO update the element's initial position
+							oldElement.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components
+							oldElement.style.left="10px";	//TODO fix
+							oldElement.style.top="10px";
+							oldElement.style.width="100px";	//TODO fix
+							oldElement.style.height="100px";
+							document.body.appendChild(oldElement);	//add the frame element to the document
+							initializeNode(oldElement);	//initialize the new imported node, installing the correct event handlers
+						}
+					}
 				}
 			}
-		};
+		}
 
 		/**Synchronizes an element hierarchy with its patch element.
 		@param oldElement The old version of the element.
@@ -1497,20 +1516,25 @@ function DragState(dragSource, mouseX, mouseY)
 		/**@return An element appropriate for dragging, such as a clone of the original.*/
 		DragState.prototype._getDragElement=function()
 		{
-			var element=this.dragSource.cloneNode(true);	//create a clone of the original element
-			this._cleanClone(element);	//clean the clone
-			//TODO clean the element better, removing drag handles and such
-/*TODO add workaround to cover IE select controls, which are windowed and will appear over the dragged element
-			if(document.all)	//if this is IE	TODO add better check
+			var isAbsolute=this.dragSource.style.position="absolute";	//see if the drag source is already absolutely positioned
+			var element=this.dragSource;	//start out assuming we'll use the drag source as is
+			if(!isAbsolute)	//if the drag source is not absolutely positioned
 			{
-				var shimElement=document.createElement("iframe");	//create a shim iframe that can accept z-index changes so as to cover controls; see http://dotnetjunkies.com/WebLog/jking/archive/category/139.aspx and http://dev2dev.bea.com/pub/a/2005/04/portal_menus.html
-				shimElement.appendChild(element);	//place the real element inside the shim element
-				element=shimElement;	//use the shim element as the drag element
+				element=this.dragSource.cloneNode(true);	//create a clone of the original element
+				this._cleanClone(element);	//clean the clone
+				//TODO clean the element better, removing drag handles and such
+	/*TODO add workaround to cover IE select controls, which are windowed and will appear over the dragged element
+				if(document.all)	//if this is IE	TODO add better check
+				{
+					var shimElement=document.createElement("iframe");	//create a shim iframe that can accept z-index changes so as to cover controls; see http://dotnetjunkies.com/WebLog/jking/archive/category/139.aspx and http://dev2dev.bea.com/pub/a/2005/04/portal_menus.html
+					shimElement.appendChild(element);	//place the real element inside the shim element
+					element=shimElement;	//use the shim element as the drag element
+				}
+	*/
+				element.style.position="absolute";	//change the element's position to absolute TODO update the element's initial position
+				element.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components
+				//TODO make sure resizeable elements are the correct size
 			}
-*/
-			element.style.position="absolute";	//change the element's position to absolute TODO update the element's initial position
-			element.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components
-			//TODO make sure resizeable elements are the correct size
 			return element;	//return the cloned element
 		};
 
@@ -1763,6 +1787,8 @@ function onAction(event)
 					{
 						if(!confirm(paramValue))	//ask for confirmation; if the user does not confirm
 						{
+							event.stopPropagation();	//tell the event to stop bubbling
+							event.preventDefault();	//prevent the default functionality from occurring
 							return;	//don't process the event further
 						}
 					}
@@ -2049,9 +2075,11 @@ function onDragBegin(event)	//TODO rename to onDragClick
 	{
 		var dragHandle=event.target;	//get the target of the event
 			//TODO make sure this isn't the context mouse button
+//TODO del alert("checking to start drag");
 		var dragSource=getAncestorElementByClassName(dragHandle, STYLES.DRAG_SOURCE);	//determine which element to drag
 		if(dragSource)	//if there is a drag source
 		{
+//TODO del alert("found drag source: "+dragSource.nodeName);
 			dragState=new DragState(dragSource, event.clientX, event.clientY);	//create a new drag state
 			dragState.beginDrag(event.clientX, event.clientY);	//begin dragging
 //TODO del alert("drag state element: "+dragState.element.nodeName);

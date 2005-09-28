@@ -16,7 +16,7 @@ import com.javaguise.session.GuiseSession;
 /**A base abstract class implementing helpful functionality for models.
 @author Garret Wilson
 */
-public class AbstractModel extends GuiseBoundPropertyObject implements Model
+public abstract class AbstractModel extends GuiseBoundPropertyObject implements Model
 {
 	/**The object managing event listeners.*/
 	private final EventListenerManager eventListenerManager=new EventListenerManager();

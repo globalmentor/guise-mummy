@@ -197,15 +197,6 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 		super.setState(newState);
 	}
 
-	/**Sets the control event being processed.
-	This implementation exposes the method to the servlet.
-	@param controlEvent The control event to be processed.
-	*/
-	protected void setControlEvent(final ControlEvent controlEvent)
-	{
-		super.setControlEvent(controlEvent);
-	}
-
 	/**@return A writer for rendering text content.
 	@exception IOException if there is an error getting the writer.
 	*/

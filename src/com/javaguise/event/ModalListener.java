@@ -1,12 +1,12 @@
 package com.javaguise.event;
 
-import com.javaguise.component.ModalFrame;
+import com.javaguise.component.ModalNavigationPanel;
 
 /**An object that listens for the end of a modal frame's modality.
 @param <R> The type of modal result the modal frame produces.
 @author Garret Wilson
 */
-public interface ModalListener<R> extends GuiseEventListener<ModalFrame<R, ?>>
+public interface ModalListener<R> extends GuiseEventListener<ModalNavigationPanel<R, ?>>
 {
 
 	/**Called when an a modal frame Begins its modality.

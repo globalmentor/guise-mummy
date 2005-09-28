@@ -12,6 +12,7 @@ import com.javaguise.event.ListListener;
 import com.javaguise.event.PostponedContainerEvent;
 import com.javaguise.event.PostponedListEvent;
 import com.javaguise.model.ListSelectModel;
+import com.javaguise.model.Model;
 import com.javaguise.session.GuiseSession;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
@@ -148,46 +149,17 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		/**@return The layout definition for the container.*/
 		public Layout<?> getLayout() {return layout;}
 
-	/**Session constructor with a default vertical flow layout.
-	@param session The Guise session that owns this component.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public AbstractContainer(final GuiseSession session)
-	{
-		this(session, (String)null);	//construct the component, indicating that a default ID should be used
-	}
-
-	/**Session and ID constructor with a default vertical flow layout.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public AbstractContainer(final GuiseSession session, final String id)
-	{
-		this(session, id, new FlowLayout(session, Orientation.Flow.PAGE));	//default to flowing vertically
-	}
-
-	/**Session and layout constructor.
-	@param session The Guise session that owns this component.
-	@param layout The layout definition for the container.
-	@exception NullPointerException if the given session and/or layout is <code>null</code>.
-	*/
-	public AbstractContainer(final GuiseSession session, final Layout<?> layout)
-	{
-		this(session, null, layout);	//construct the component with the layout, indicating that a default ID should be used
-	}
-
-	/**Session, ID, and layout constructor.
+	/**Session, ID, layout, and model constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given session and/or layout is <code>null</code>.
+	@param model The component data model.
+	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractContainer(final GuiseSession session, final String id, final Layout<?> layout)
+	public AbstractContainer(final GuiseSession session, final String id, final Layout<?> layout, final Model model)
 	{
-		super(session, id);	//construct the parent class
+		super(session, id, model);	//construct the parent class
 		this.layout=checkNull(layout, "Layout cannot be null.");	//save the layout
 		layout.setContainer(this);	//tell the layout which container owns it
 	}
@@ -218,7 +190,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	protected void fireContainerModified(final int index, final Component<?> addedComponent, final Component<?> removedComponent)
 	{
 		final ContainerEvent containerEvent=new ContainerEvent(getSession(), getThis(), index, addedComponent, removedComponent);	//create a new event
-		getSession().queueModelEvent(new PostponedContainerEvent(getEventListenerManager(), containerEvent));	//tell the Guise session to queue the event
+		getSession().queueEvent(new PostponedContainerEvent(getEventListenerManager(), containerEvent));	//tell the Guise session to queue the event
 	}
 
 }

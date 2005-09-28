@@ -13,26 +13,26 @@ import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
 
-/**Internationalization Guise demonstration frame.
+/**Internationalization Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
 Demonstrates locale label value models, date label models,
 	application default locale, application supported locales, menus,
 	component IDs, localized resource bundle resources, and localized resource files.
 @author Garret Wilson
 */
-public class InternationalizationFrame extends DefaultFrame
+public class InternationalizationPanel extends DefaultNavigationPanel
 {
 
 	/**The key to the UN Charter Preamble resource.*/
 	protected final static String UN_CHARTER_PREAMBLE_RESOURCE_KEY="uncharterpreamble.html";
 
 	/**Guise session constructor.
-	@param session The Guise session that owns this frame.
+	@param session The Guise session that owns this panel.
 	*/
-	public InternationalizationFrame(final GuiseSession session)
+	public InternationalizationPanel(final GuiseSession session)
 	{
-		super(session);	//construct the parent class, defaulting to a region layout
-		getModel().setLabel("Guise\u2122 Demonstration: Internationalization");	//set the frame title
+		super(session, new RegionLayout(session));	//construct the parent class, using a region layout
+		getModel().setLabel("Guise\u2122 Demonstration: Internationalization");	//set the panel title
 
 			//create a value change listener to listen for language selection changes
 		final PropertyValueChangeListener<Boolean> languageChangeListener=new AbstractPropertyValueChangeListener<Boolean>()
@@ -104,7 +104,7 @@ public class InternationalizationFrame extends DefaultFrame
 		text.getModel().setTextContentType(TextModel.XHTML_CONTENT_TYPE);	//use application/xhtml+xml content
 		text.getModel().setTextResourceKey(UN_CHARTER_PREAMBLE_RESOURCE_KEY);	//use the UN Charter Preamble resource, appropriately localized
 
-		add(text, RegionLayout.CENTER_CONSTRAINTS);	//add the text in the center of the frame
+		add(text, RegionLayout.CENTER_CONSTRAINTS);	//add the text in the center of the panel
 	}
 
 }

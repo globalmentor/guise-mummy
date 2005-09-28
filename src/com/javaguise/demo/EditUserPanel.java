@@ -1,22 +1,20 @@
 package com.javaguise.demo;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
-import com.javaguise.context.GuiseContext;
 import com.javaguise.event.*;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.*;
 
-/**Edit User Guise demonstration frame.
+/**Edit User Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
-Demonstrates modal frames, component validity checks, masked text controls, ending modality, and modal cancel functionality.
+Demonstrates modal panels, component validity checks, masked text controls, ending modality, and modal cancel functionality.
 @author Garret Wilson
 */
-public class EditUserFrame extends DefaultModalFrame<DemoUser>
+public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser>
 {
 
 	private final TextControl<String> idControl; 
@@ -28,12 +26,12 @@ public class EditUserFrame extends DefaultModalFrame<DemoUser>
 	private final TextControl<String> emailControl; 
 
 	/**Guise session constructor.
-	@param session The Guise session that owns this frame.
+	@param session The Guise session that owns this panel.
 	*/
-	public EditUserFrame(final GuiseSession session)
+	public EditUserPanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Orientation.Flow.PAGE));	//construct the parent class flowing vertically
-		getModel().setLabel("Guise\u2122 Demonstration: Edit User");	//set the frame title	
+		getModel().setLabel("Guise\u2122 Demonstration: Edit User");	//set the panel title	
 
 		final LayoutPanel idPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.LINE));	//create the ID panel flowing horizontally
 			//ID
@@ -88,14 +86,14 @@ public class EditUserFrame extends DefaultModalFrame<DemoUser>
 					{
 						if(isValid())	//if the model values of all form components are valid
 						{
-							endModal(getUser());	//end the frame modality with the edited user
+							endModal(getUser());	//end the panel modality with the edited user
 						}
 						else if(!isPasswordMatch())	//if the password isn't valid
 						{
-							final ValidationException validationException=new ValidationException(EditUserFrame.this, "Passwords do not match");
+							final ValidationException validationException=new ValidationException(EditUserPanel.this, "Passwords do not match");
 							passwordControl.addError(validationException);	//add the error to each password control
 							passwordVerificationControl.addError(validationException);
-							addError(validationException);	//add the error to the frame itself
+//TODO fix							addError(validationException);	//add the error to the panel itself
 						}
 					}
 				});
@@ -106,16 +104,16 @@ public class EditUserFrame extends DefaultModalFrame<DemoUser>
 				{
 					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
 					{
-						endModal(null);	//end the frame modality with no user
+						endModal(null);	//end the panel modality with no user
 					}
 				});
 		buttonPanel.add(cancelButton);	//add the button to the button panel
 
-		add(idPanel);	//add the ID panel to the frame
-		add(namePanel);	//add the name panel to the frame
-		add(passwordPanel);	//add the password panel to the frame
-		add(emailPanel);	//add the email panel to the frame
-		add(buttonPanel);	//add the buttonpanel to the frame
+		add(idPanel);	//add the ID panel to the panel
+		add(namePanel);	//add the name panel to the panel
+		add(passwordPanel);	//add the password panel to the panel
+		add(emailPanel);	//add the email panel to the panel
+		add(buttonPanel);	//add the buttonpanel to the panel
 	}
 
 	/**@return <code>true</code> if both entered passwords are identical.*/ 
@@ -134,7 +132,7 @@ public class EditUserFrame extends DefaultModalFrame<DemoUser>
 		return super.isValid() && isPasswordMatch();	//add a check for password validity
 	}
 
-	/**Initializes the frame with information for a new user.
+	/**Initializes the panel with information for a new user.
 	@param id The ID of the new user to be edited.
 	@exception NullPointerException if the provided user is <code>null</code>.
 	@exception IllegalArgumentException if any user information is invalid.
@@ -151,8 +149,8 @@ public class EditUserFrame extends DefaultModalFrame<DemoUser>
 		}		
 	}
 
-	/**Initializes the frame with user information.
-	@param user The user with which to initialize the frame.
+	/**Initializes the panel with user information.
+	@param user The user with which to initialize the panel.
 	@exception NullPointerException if the provided user is <code>null</code>.
 	@exception IllegalArgumentException if any user information is invalid.
 	*/
@@ -174,7 +172,7 @@ public class EditUserFrame extends DefaultModalFrame<DemoUser>
 		}
 	}
 
-	/**@return A user representing the information entered in the frame.*/
+	/**@return A user representing the information entered in the panel.*/
 	public DemoUser getUser()
 	{
 		return new DemoUser(	//create and return a new user

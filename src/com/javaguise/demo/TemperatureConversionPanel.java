@@ -11,14 +11,14 @@ import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
 import com.javaguise.validator.ValueRequiredValidator;
 
-/**Temperature Conversion Guise demonstration frame.
+/**Temperature Conversion Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
 Demonstrates layout panels, group panels, float input controls, float input validation,
 	radio button controls, dynamic updates (e.g. AJAX on the web platform),
 	required value validation, and read-only controls.
 @author Garret Wilson
 */
-public class TemperatureConversionFrame extends DefaultFrame
+public class TemperatureConversionPanel extends DefaultNavigationPanel
 {
 
 	private final TextControl<Float> temperatureInput;
@@ -27,12 +27,12 @@ public class TemperatureConversionFrame extends DefaultFrame
 	private final CheckControl fahrenheitCheckControl;
 
 	/**Guise session constructor.
-	@param session The Guise session that owns this frame.
+	@param session The Guise session that owns this panel.
 	*/
-	public TemperatureConversionFrame(final GuiseSession session)
+	public TemperatureConversionPanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Orientation.Flow.LINE));	//construct the parent class flowing horizontally
-		getModel().setLabel("Guise\u2122 Demonstration: Temperature Conversion");	//set the frame title	
+		getModel().setLabel("Guise\u2122 Demonstration: Temperature Conversion");	//set the panel title	
 
 			//input panel
 		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.PAGE));	//create the input panel flowing vertically
@@ -52,7 +52,7 @@ public class TemperatureConversionFrame extends DefaultFrame
 		temperatureOutput.getModel().setEditable(false);	//set the text output control to read-only so that the user cannot modify it
 		inputPanel.add(temperatureOutput);	//add the output control to the input panel
 
-		add(inputPanel);	//add the input panel to the temperature frame
+		add(inputPanel);	//add the input panel to the temperature panel
 
 		final LayoutPanel conversionPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.PAGE));	//create the right-hand panel flowing vertically
 			
@@ -104,13 +104,13 @@ public class TemperatureConversionFrame extends DefaultFrame
 				});
 		conversionPanel.add(convertButton);	//add the button to the conversion panel
 		
-		add(conversionPanel);	//add the conversion panel to the frame
+		add(conversionPanel);	//add the conversion panel to the panel
 	}
 
 	/**Converts the temperature based upon the current UI values.*/
 	protected void convertTemperature()
 	{
-		if(isValid())	//if this frame and all of its components have valid model values
+		if(isValid())	//if this panel and all of its components have valid model values
 		{
 			final float inputValue=temperatureInput.getModel().getValue().floatValue();	//get the input value from the control
 			final float outputValue;	//we'll convert the value and store it here

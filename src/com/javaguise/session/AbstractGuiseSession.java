@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.security.Principal;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static java.util.Collections.*;
 
@@ -21,6 +22,7 @@ import com.garretwilson.io.BOMInputStreamReader;
 import static com.garretwilson.io.WriterUtilities.*;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.CollectionUtilities;
+import com.garretwilson.util.Debug;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
@@ -40,8 +42,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		/**@return The Guise application to which this session belongs.*/
 		public GuiseApplication getApplication() {return application;}
 
-	/**The cache of navigation frame types to appplication context-relative paths.*/
-	private final Map<String, Frame> navigationPathFrameMap=synchronizedMap(new HashMap<String, Frame>());
+	/**The application frame.*/
+	private final ApplicationFrame<?> applicationFrame;
+
+		/**@return The application frame.*/
+		public ApplicationFrame<?> getApplicationFrame() {return applicationFrame;}
+
+	/**The cache of navigation panel types keyed to appplication context-relative paths.*/
+	private final Map<String, NavigationPanel> navigationPathPanelMap=synchronizedMap(new HashMap<String, NavigationPanel>());
 
 		/**Binds a frame to a particular appplication context-relative path.
 		Any existing binding for the given context-relative path is replaced.
@@ -79,6 +87,30 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			return navigationPathFrameBindingMap.remove(checkNull(path, "Path cannot be null."));	//remove the binding
 		}
 */
+
+	/**The list of visible frames according to z-order.*/
+	private final List<Frame<?>> frameList=new CopyOnWriteArrayList<Frame<?>>();
+
+		/**@return An iterator to all visible frames.*/
+		public Iterator<Frame<?>> getFrameIterator() {return frameList.iterator();}
+	
+		/**Adds a frame to the list of visible frames.
+		This method should usually only be called by the frames themselves.
+		@param frame The frame to add.
+		*/
+		public void addFrame(final Frame<?> frame)
+		{
+			frameList.add(frame);	//add this frame to the list
+		}
+
+		/**Removes a frame from the list of visible frames.
+		This method should usually only be called by the frames themselves.
+		@param frame The frame to remove.
+		*/
+		public void removeFrame(final Frame<?> frame)
+		{
+			frameList.remove(frame);	//remove this frame from the list
+		}
 
 	/**The current session locale.*/
 	private Locale locale;
@@ -512,45 +544,47 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	{
 		this.application=application;	//save the Guise instance
 		this.locale=application.getDefaultLocale();	//default to the application locale
-		this.orientation=Orientation.getOrientation(locale);	//set the orientation default based upon the locale		
+		this.orientation=Orientation.getOrientation(locale);	//set the orientation default based upon the locale
+		this.applicationFrame=application.createApplicationFrame(this);	//create the application frame
+		this.applicationFrame.setVisible(true);	//show the application frame
 	}
 
-	/**Retrieves the frame bound to the given appplication context-relative path.
-	If a frame has already been created and cached, it will be be returned; otherwise, one will be created and cached. 
-	The frame will be given an ID of a modified form of the path.
+	/**Retrieves the panel bound to the given appplication context-relative path.
+	If a panel has already been created and cached, it will be be returned; otherwise, one will be created and cached. 
+	The panel will be given an ID of a modified form of the path.
 	@param path The appplication context-relative path within the Guise container context.
-	@return The frame bound to the given path, or <code>null</code> if no frame is bound to the given path.
+	@return The panel bound to the given path, or <code>null</code> if no panel is bound to the given path.
 	@exception NullPointerException if the path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
-	@exception IllegalStateException if the frame class bound to the path does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
+	@exception IllegalStateException if the panel class bound to the path does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
 	*/
-	public Frame getNavigationFrame(final String path)
+	public NavigationPanel<?> getNavigationPanel(final String path)
 	{
 		if(isAbsolutePath(checkNull(path, "Path cannot be null")))	//if the path is absolute
 		{
 			throw new IllegalArgumentException("Navigation path cannot be absolute: "+path);
 		}
-		Frame frame;	//we'll store the frame here, either a cached frame or a created frame
-		synchronized(navigationPathFrameMap)	//don't allow the map to be modified while we access it
+		NavigationPanel panel;	//we'll store the panel here, either a cached panel or a created panel
+		synchronized(navigationPathPanelMap)	//don't allow the map to be modified while we access it
 		{
-			frame=navigationPathFrameMap.get(path);	//get the bound frame type, if any
-			if(frame==null)	//if no frame is cached
+			panel=navigationPathPanelMap.get(path);	//get the bound panel type, if any
+			if(panel==null)	//if no panel is cached
 			{
-				final Class<? extends Frame> frameClass=getApplication().getNavigationFrameClass(path);	//see which frame we should show for this path
-				if(frameClass!=null)	//if we found a frame class for this path
+				final Class<? extends NavigationPanel> panelClass=getApplication().getNavigationPanelClass(path);	//see which panel we should show for this path
+				if(panelClass!=null)	//if we found a panel class for this path
 				{
 					try
 					{
 						try
 						{
-							final String frameID=createName(path);	//convert the path to a valid ID TODO use a Guise-specific routine or, better yet, bind an ID with the frame
-							frame=frameClass.getConstructor(GuiseSession.class, String.class).newInstance(this, frameID);	//find the Guise session and ID constructor and create an instance of the class
+							final String panelID=createName(path);	//convert the path to a valid ID TODO use a Guise-specific routine or, better yet, bind an ID with the panel
+							panel=panelClass.getConstructor(GuiseSession.class, String.class).newInstance(this, panelID);	//find the Guise session and ID constructor and create an instance of the class
 						}
 						catch(final NoSuchMethodException noSuchMethodException)	//if there was no Guise session and string ID constructor
 						{
-							frame=frameClass.getConstructor(GuiseSession.class).newInstance(this);	//use the Guise session constructor if there is one					
+							panel=panelClass.getConstructor(GuiseSession.class).newInstance(this);	//use the Guise session constructor if there is one					
 						}
-						navigationPathFrameMap.put(path, frame);	//bind the frame to the path, caching it for next time
+						navigationPathPanelMap.put(path, panel);	//bind the panel to the path, caching it for next time
 					}
 					catch(final NoSuchMethodException noSuchMethodException)	//if the constructor could not be found
 					{
@@ -571,22 +605,22 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 				}
 			}
 		}
-		return frame;	//return the frame, or null if we couldn't find a frame
+		return panel;	//return the panel, or null if we couldn't find a panel
 	}
 
-	/**Releases the frame bound to the given appplication context-relative path.
+	/**Releases the panel bound to the given appplication context-relative path.
 	@param path The appplication context-relative path within the Guise container context.
-	@return The frame previously bound to the given path, or <code>null</code> if no frame was bound to the given path.
-	@exception NullPointerException if the path is null.
+	@return The panel previously bound to the given path, or <code>null</code> if no panel was bound to the given path.
+	@exception NullPointerException if the path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public Frame releaseNavigationFrame(final String path)
+	public NavigationPanel<?> releaseNavigationPanel(final String path)
 	{
 		if(isAbsolutePath(checkNull(path, "Path cannot be null")))	//if the path is absolute
 		{
 			throw new IllegalArgumentException("Bound navigation path cannot be absolute: "+path);
 		}
-		return navigationPathFrameMap.remove(path);	//uncache the frame
+		return navigationPathPanelMap.remove(path);	//uncache the panel
 	}
 
 	/**The stack of modal navigation points.*/
@@ -638,40 +672,41 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			return !modalNavigationStack.isEmpty();	//we are modally navigating if there is one or more modal navigation states on the stack
 		}
 
-		/**Begins modal interaction for a particular modal frame.
+		/**Begins modal interaction for a particular modal panel.
 		The modal navigation is pushed onto the stack, and an event is fired to the modal listener of the modal navigation.
-		@param <R> The type of modal result the modal frame produces.
-		@param modalFrame The frame for which modal navigation state should begin.
+		@param <R> The type of modal result the modal panel produces.
+		@param modalPanel The panel for which modal navigation state should begin.
 		@param modalNavigation The state of modal navigation.
 		@see #pushModalNavigation(ModalNavigation)
 		*/
-		public <R> void beginModalNavigation(final ModalFrame<R, ?> modalFrame, final ModalNavigation<R> modalNavigation)
+		public <R> void beginModalNavigation(final ModalNavigationPanel<R, ?> modalPanel, final ModalNavigation<R> modalNavigation)
 		{
-			//TODO release the navigation frame, maybe, just in case
+			//TODO release the navigation panel, maybe, just in case
 			pushModalNavigation(modalNavigation);	//push the modal navigation onto the top of the modal navigation stack
-			modalNavigation.getModalListener().modalBegan(new ModalEvent<R>(this, modalFrame, modalFrame.getResult()));
+			modalNavigation.getModalListener().modalBegan(new ModalEvent<R>(this, modalPanel, modalPanel.getResult()));
 		}
 
-		/**Ends modal interaction for a particular modal frame.
-		The frame is released from the cache so that new navigation will create a new modal frame.
-		This method is called by modal frames and should seldom if ever be called directly.
+		/**Ends modal interaction for a particular modal panel.
+		The panel is released from the cache so that new navigation will create a new modal panel.
+		This method is called by modal panels and should seldom if ever be called directly.
 		If the current modal state corresponds to the current navigation state, the current modal state is removed, the modal state's event is fired, and modal state is handed to the previous modal state, if any.
-		Otherwise, navigation is transferred to the modal frame's referring URI, if any.
-		If the given modal frame is not the frame at the current navigation path, the modal state is not changed, although navigation and releasal will still occur.
-		@param <R> The type of modal result the modal frame produces.
-		@param modalFrame The frame for which modal navigation state should be ended.
-		@return true if modality actually ended for the given frame.
+		Otherwise, navigation is transferred to the modal panel's referring URI, if any.
+		If the given modal panel is not the panel at the current navigation path, the modal state is not changed, although navigation and releasal will still occur.
+		@param <R> The type of modal result the modal panel produces.
+		@param modalPanel The panel for which modal navigation state should be ended.
+		@return true if modality actually ended for the given panel.
 		@see #popModalNavigation()
 		@see Frame#getReferrerURI()
-		@see #releaseNavigationFrame(String)
+		@see #releaseNavigationPanel(String)
 		*/
-		@SuppressWarnings("unchecked")	//we check to see that the given frame is the same one at this navigation path, and that this navigation path is in a modal state, implying that the current navigation state's listener has same generic result type as does the modal frame
-		public <R> boolean endModalNavigation(final ModalFrame<R, ?> modalFrame)
+		@SuppressWarnings("unchecked")	//we check to see that the given panel is the same one at this navigation path, and that this navigation path is in a modal state, implying that the current navigation state's listener has same generic result type as does the modal panel
+		public <R> boolean endModalNavigation(final ModalNavigationPanel<R, ?> modalPanel)
 		{
 			final String navigationPath=getNavigationPath();	//get our current navigation path
 			ModalNavigation modalNavigation=null;	//if we actually end modal navigation, we'll store the information here
-			URI navigationURI=modalFrame.getReferrerURI();	//in the worse case scenario, we'll want to go back to where the modal frame came from, if that's available
-			if(navigationPathFrameMap.get(navigationPath)==modalFrame)	//before we try to actually ending modality, make sure this frame is actually the one at our current navigation path
+//TODO fix			URI navigationURI=modalPanel.getReferrerURI();	//in the worse case scenario, we'll want to go back to where the modal panel came from, if that's available
+			URI navigationURI=null;	//TODO fix
+			if(navigationPathPanelMap.get(navigationPath)==modalPanel)	//before we try to actually ending modality, make sure this panel is actually the one at our current navigation path
 			{
 				synchronized(modalNavigationStack)	//don't allow anyone to to access the modal navigation stack while we access it
 				{
@@ -695,10 +730,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			{
 				navigate(navigationURI);	//navigate to the new URI
 			}
-			releaseNavigationFrame(navigationPath);	//release the frame associated with this navigation path
-			if(modalNavigation!=null)	//if we if we ended modality for the frame
+			releaseNavigationPanel(navigationPath);	//release the panel associated with this navigation path
+			if(modalNavigation!=null)	//if we if we ended modality for the panel
 			{
-				((ModalListener<R>)modalNavigation.getModalListener()).modalEnded(new ModalEvent<R>(this, modalFrame, modalFrame.getResult()));	//send an event to the modal listener
+				((ModalListener<R>)modalNavigation.getModalListener()).modalEnded(new ModalEvent<R>(this, modalPanel, modalPanel.getResult()));	//send an event to the modal listener
 			}
 			return modalNavigation!=null;	//return whether we ended modality
 		}
@@ -719,17 +754,17 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			return navigationPath;	//return the navigation path
 		}
 
-		/**Changes the navigation path of the session so that user interaction can change to another frame.
+		/**Changes the navigation path of the session so that user interaction can change to another panel.
 		If the given navigation path is the same as the current navigation path, no action occurs.
 		@param navigationPath The navigation path relative to the application context path.
 		@exception IllegalArgumentException if the provided path is absolute.
-		@exception IllegalArgumentException if the navigation path is not recognized (e.g. there is no frame bound to the navigation path).
+		@exception IllegalArgumentException if the navigation path is not recognized (e.g. there is no panel bound to the navigation path).
 		*/
 		protected void setNavigationPath(final String navigationPath)
 		{
 			if(!ObjectUtilities.equals(this.navigationPath, navigationPath))	//if the navigation path is really changing
 			{
-				if(getApplication().getNavigationFrameClass(navigationPath)==null)	//if no frame is bound to the given navigation path
+				if(getApplication().getNavigationPanelClass(navigationPath)==null)	//if no panel is bound to the given navigation path
 				{
 					throw new IllegalArgumentException("Unknown navigation path: "+navigationPath);
 				}
@@ -773,7 +808,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		/**Requests modal navigation to the specified path.
 		The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
 		Later requested navigation before navigation occurs will override this request.
-		@param <R> The type of modal result the modal frame produces.
+		@param <R> The type of modal result the modal panel produces.
 		@param path A path that is either relative to the application context path or is absolute.
 		@param modalListener The listener to respond to the end of modal interaction.
 		@exception NullPointerException if the given path is <code>null</code>.
@@ -788,7 +823,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		/**Requests modal navigation to the specified URI.
 		The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
 		Later requested navigation before navigation occurs will override this request.
-		@param <R> The type of modal result the modal frame produces.
+		@param <R> The type of modal result the modal panel produces.
 		@param uri Either a relative or absolute path, or an absolute URI.
 		@param modalListener The listener to respond to the end of modal interaction.
 		@exception NullPointerException if the given URI is <code>null</code>.
@@ -854,25 +889,25 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	/**The synchronized list of postponed model events.*/
 	private final List<PostponedEvent<?>> queuedModelEventList=synchronizedList(new LinkedList<PostponedEvent<?>>());	//use a linked list because we'll be removing items from the front of the list as we process the events TODO fix; this doesn't seem to be the case anymore, so we can use a synchronized array list
 
-		/**Queues a postponed model event to be fired after all contexts have finished updating the model.
-		If a Guise context is currently processing an event, the event will be queued for later.
-		If no Guise context is currently processing an event, the event will be fired immediately.
-		@param postponedModelEvent The event to fire at a later time.
+		/**Queues a postponed event to be fired after the context has finished processing events.
+		If a Guise context is currently processing events, the event will be queued for later.
+		If no Guise context is currently processing events, the event will be fired immediately.
+		@param postponedEvent The event to fire at a later time.
 		@see GuiseContext.State#PROCESS_EVENT
 		*/
-		public synchronized void queueModelEvent(final PostponedEvent<?> postponedModelEvent)
+		public synchronized void queueEvent(final PostponedEvent<?> postponedEvent)
 		{
 			final GuiseContext context=getContext();	//get the current context
 			if(context!=null && (context.getState()==GuiseContext.State.PROCESS_EVENT))	//if the context is processing an event
 			{
-				queuedModelEventList.add(postponedModelEvent);	//add the postponed event to our list of postponed events					
+				queuedModelEventList.add(postponedEvent);	//add the postponed event to our list of postponed events					
 			}
 			else	//if no context is changing the model
 			{
-				postponedModelEvent.fireEvent();	//go ahead and fire the event immediately
+				postponedEvent.fireEvent();	//go ahead and fire the event immediately
 				if(context!=null)	//if there is a context
 				{
-					context.getEventList().add(postponedModelEvent.getEvent());	//store the event in the context
+					context.getEventList().add(postponedEvent.getEvent());	//store the event in the context
 				}
 			}
 		}
@@ -965,11 +1000,11 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	/**Reports that a bound property has changed.
 	This implementation delegates to the Guise session to fire or postpone the property change event.
 	@param propertyChangeEvent The event to fire.
-	@see GuiseSession#queueModelEvent(com.garretwilson.event.PostponedEvent)
+	@see GuiseSession#queueEvent(com.garretwilson.event.PostponedEvent)
 	*/
 	protected void firePropertyChange(final PropertyChangeEvent propertyChangeEvent)
 	{
-		queueModelEvent(createPostponedPropertyChangeEvent(propertyChangeEvent));	//create and queue a postponed property change event
+		queueEvent(createPostponedPropertyChangeEvent(propertyChangeEvent));	//create and queue a postponed property change event
 	}
 
 	/**The class that listens for context state changes and updates the context state set in response.

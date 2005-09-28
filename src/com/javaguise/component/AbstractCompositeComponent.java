@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.javaguise.model.Model;
 import com.javaguise.session.GuiseSession;
 
 /**An abstract implementation of a composite component.
@@ -50,26 +51,18 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 		return idComponentMap.get(id);	//return the component with the given ID
 	}
 
-	/**Session constructor.
-	@param session The Guise session that owns this component.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalStateException if no controller is registered for this component type.
-	*/
-	public AbstractCompositeComponent(final GuiseSession session)
-	{
-		this(session, null);	//construct the component, indicating that a default ID should be used
-	}
-
-	/**Session and ID constructor.
+	/**Session, ID, and model constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the given session is <code>null</code>.
+	@param model The component data model.
+	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	@exception IllegalStateException if no controller is registered for this component type.
+	@exception IllegalStateException if no view is registered for this component type.
 	*/
-	public AbstractCompositeComponent(final GuiseSession session, final String id)
+	public AbstractCompositeComponent(final GuiseSession session, final String id, final Model model)
 	{
-		super(session, id);	//construct the parent class
+		super(session, id, model);	//construct the parent class
 	}
 
 	/**Determines whether the models of this component and all of its child components are valid.

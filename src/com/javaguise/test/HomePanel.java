@@ -19,13 +19,13 @@ import com.garretwilson.util.Debug;
 /**Test frame for a home page.
 @author Garret Wilson
 */
-public class HomeFrame extends DefaultFrame
+public class HomePanel extends DefaultNavigationPanel
 {
 
 	/**Guise session constructor.
 	@param session The Guise session that owns this frame.
 	*/
-	public HomeFrame(final GuiseSession session)
+	public HomePanel(final GuiseSession session)
 	{
 		this(session, null);	//construct the component, indicating that a default ID should be used
 	}
@@ -34,9 +34,9 @@ public class HomeFrame extends DefaultFrame
 	@param session The Guise session that owns this frame.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	*/
-	public HomeFrame(final GuiseSession session, final String id)
+	public HomePanel(final GuiseSession session, final String id)
 	{
-		super(session, id);	//construct the parent
+		super(session, id, new RegionLayout(session));	//construct the parent using a region layout
 		getModel().setLabel("Home Frame Test");	//set the frame label
 
 		final LayoutPanel contentPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.PAGE)); 
@@ -120,8 +120,6 @@ Debug.trace("list control changed value to", newValue);
 		buttonPanel.add(testButton);	//add a new button
 		
 		
-		
-		
 		checkbox.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<Boolean>()
 				{
 					public void propertyValueChange(final PropertyValueChangeEvent<Boolean> propertyValueChangeEvent)
@@ -179,6 +177,23 @@ Debug.trace("list control changed value to", newValue);
 		helloLink.getModel().setLabel("More Hello World.");
 		helloLink.getModel().addActionListener(new NavigateActionListener<ActionModel>("helloworld"));
 		buttonPanel.add(helloLink);	//add the link
+
+		final Link frameLink=new Link(session);
+		frameLink.getModel().setLabel("Frame");
+		frameLink.getModel().addActionListener(new ActionListener<ActionModel>()
+				{
+					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
+					{
+						final Label label=new Label(session);
+						label.getModel().setLabel("This is frame content");
+						final Frame<?> frame=new DefaultFrame(session, label);
+						frame.getModel().setLabel("Test Frame");
+Debug.trace("ready to set frame visible");
+						frame.setVisible(true);
+						
+					}
+				});
+		buttonPanel.add(frameLink);
 
 		contentPanel.add(buttonPanel);	//add the button panel to the panel
 		final TextControl<String> textInput=new TextControl<String>(session, "textInput", String.class);	//create a text input control

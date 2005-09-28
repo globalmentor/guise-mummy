@@ -12,8 +12,11 @@ import com.javaguise.session.GuiseSession;
 /**A tree control.
 @author Garret Wilson
 */
-public class TreeControl extends AbstractCompositeModelComponent<TreeModel, TreeNodeModel<?>, TreeControl.TreeNodeComponentState, TreeControl> implements Control<TreeModel, TreeControl>
+public class TreeControl extends AbstractCompositeStateComponent<TreeNodeModel<?>, TreeControl.TreeNodeComponentState, TreeControl> implements Control<TreeControl>
 {
+
+	/**@return The data model used by this component.*/
+	public TreeModel getModel() {return (TreeModel)super.getModel();}
 
 	/**The map of tree node representation strategies for classes.*/
 	private final Map<Class<?>, ValueRepresentationStrategy<?>> classTreeNodeRepresentationStrategyMap=new ConcurrentHashMap<Class<?>, ValueRepresentationStrategy<?>>();
@@ -62,8 +65,9 @@ public class TreeControl extends AbstractCompositeModelComponent<TreeModel, Tree
 		if(treeNodeComponentState==null || treeNodeComponentState.isEditable()!=editable)	//if there is no component for this tree node, or the component has a different editable status
 		{
 				//TODO assert that there is a representation strategy, or otherwise check
-			final Component<?> valueComponent=((TreeControl.ValueRepresentationStrategy<T>)getTreeNodeRepresentationStrategy(treeNode.getValueClass())).createComponent(this, getModel(), treeNode, editable, false, false);	//create a new component for the tree node
+//TODO del			final Component<?> valueComponent=((TreeControl.ValueRepresentationStrategy<T>)getTreeNodeRepresentationStrategy(treeNode.getValueClass())).createComponent(this, getModel(), treeNode, editable, false, false);	//create a new component for the tree node
 //TODO bring back when Eclipse fixes its bug			final Component<?> valueComponent=component.getTreeNodeRepresentationStrategy(treeNode.getValueClass()).createComponent(treeModel, treeNode, editable, false, false);	//create a new component for the tree node
+			final Component<?> valueComponent=getTreeNodeRepresentationStrategy(treeNode.getValueClass()).createComponent(this, getModel(), treeNode, editable, false, false);	//create a new component for the tree node
 			if(valueComponent!=null)	//if a value component is given TODO see if this check occurs in the table controller TODO make sure this is the way we want to do this---why not just return a label with a null value?
 			{
 				valueComponent.setParent(this);	//tell this component that this tree component is its parent
@@ -125,7 +129,7 @@ public class TreeControl extends AbstractCompositeModelComponent<TreeModel, Tree
 	/**An encapsulation of a component for a tree node along with other metadata, such as whether the component was editable when created.
 	@author Garret Wilson
 	*/ 
-	protected static class TreeNodeComponentState extends AbstractCompositeModelComponent.ComponentState
+	protected static class TreeNodeComponentState extends AbstractCompositeStateComponent.ComponentState
 	{
 		/**Whether the component is for a tree node that was editable when the component was created.*/
 		private final boolean editable;
@@ -162,8 +166,9 @@ public class TreeControl extends AbstractCompositeModelComponent<TreeModel, Tree
 		@param focused <code>true</code> if the value has the focus.
 		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
 		*/
-		public Component<?> createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<V> treeNode, final boolean editable, final boolean selected, final boolean focused);
+//TODO del		public Component<?> createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<V> treeNode, final boolean editable, final boolean selected, final boolean focused);
 //TODO bring back after Eclipse fixes its bug		public <N extends V> Component<?> createComponent(final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused);
+		public <N extends V> Component<?> createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused);
 	}
 
 	/**An abstract tree node representation strategy.
@@ -212,8 +217,9 @@ public class TreeControl extends AbstractCompositeModelComponent<TreeModel, Tree
 	@see Object#hashCode() 
 	@author Garret Wilson
 	*/
-	public static class DefaultValueRepresentationStrategy<N> extends AbstractValueRepresentationStrategy<N>
+//TODO del	public static class DefaultValueRepresentationStrategy<N> extends AbstractValueRepresentationStrategy<N>
 //TODO bring back after Eclipse fixes its bug	public static class DefaultValueRepresentationStrategy<V> extends AbstractValueRepresentationStrategy<V>
+	public static class DefaultValueRepresentationStrategy<V> extends AbstractValueRepresentationStrategy<V>
 	{
 
 		/**Session constructor.
@@ -238,8 +244,9 @@ public class TreeControl extends AbstractCompositeModelComponent<TreeModel, Tree
 		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
 		*/
 		@SuppressWarnings("unchecked")
-		public Component<?> createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
+//TODO del		public Component<?> createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
 //TODO bring back after Eclipse fixes its bug		public <N extends V> Component<?> createComponent(final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
+		public <N extends V> Component<?> createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
 		{
 			final GuiseSession session=getSession();	//get the session
 			final String id=treeControl.createID(getID(treeNode.getValue()));	//get the ID from the value TODO don't get the ID from the value, as this can change if edited
@@ -291,8 +298,9 @@ public class TreeControl extends AbstractCompositeModelComponent<TreeModel, Tree
 		@param focused <code>true</code> if the value has the focus.
 		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
 		*/
-		public Label createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<LabelModel> treeNode, final boolean editable, final boolean selected, final boolean focused)
+//TODO del		public Label createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<LabelModel> treeNode, final boolean editable, final boolean selected, final boolean focused)
 //TODO bring back after Eclipse fixes its bug		public <N extends LabelModel> Label createComponent(final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
+		public <N extends LabelModel> Label createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
 		{
 			final GuiseSession session=getSession();	//get the session
 			final String id=treeControl.createID(getID(treeNode.getValue()));	//get the ID from the value TODO don't get the ID from the value, as this can change if edited
@@ -326,8 +334,9 @@ public class TreeControl extends AbstractCompositeModelComponent<TreeModel, Tree
 		@param focused <code>true</code> if the value has the focus.
 		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
 		*/
-		public Message createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<MessageModel> treeNode, final boolean editable, final boolean selected, final boolean focused)
+//TODO del		public Message createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<MessageModel> treeNode, final boolean editable, final boolean selected, final boolean focused)
 //TODO bring back after Eclipse fixes its bug		public <N extends LabelModel> Label createComponent(final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
+		public <N extends MessageModel> Message createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
 		{
 			final GuiseSession session=getSession();	//get the session
 			final String id=treeControl.createID(getID(treeNode.getValue()));	//get the ID from the value TODO don't get the ID from the value, as this can change if edited

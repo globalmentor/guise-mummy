@@ -11,8 +11,9 @@ import com.javaguise.controller.ControlEvent;
 import com.javaguise.controller.Controller;
 import static com.garretwilson.lang.ClassUtilities.*;
 
+import com.javaguise.model.Model;
 import com.javaguise.session.GuiseSession;
-import com.javaguise.validator.ValidationsException;
+import com.javaguise.view.View;
 
 /**Base interface for all Guise components.
 Each component must provide either a Guise session constructor; or a Guise session and string ID constructor.
@@ -33,11 +34,16 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	public final static String ORIENTATION_PROPERTY=getPropertyName(Component.class, "orientation");
 	/**The bound property of the component style ID.*/
 	public final static String STYLE_ID_PROPERTY=getPropertyName(Component.class, "styleID");
+	/**The bound property of the view.*/
+	public final static String VIEW_PROPERTY=getPropertyName(Component.class, "view");
 	/**The bound property of whether the component is visible.*/
 	public final static String VISIBLE_PROPERTY=getPropertyName(Component.class, "visible");
 
 	/**The character used to combine hierarchical IDs.*/
 	public final static char ID_SEGMENT_DELIMITER='.';
+
+	/**@return The data model used by this component.*/
+	public Model getModel();
 
 	/**@return The controller installed in this component.*/
 	public Controller<? extends GuiseContext, ? super C> getController();
@@ -50,12 +56,16 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	*/
 	public void setController(final Controller<? extends GuiseContext, ? super C> newController);
 
-	/**Determines the controller of this component. If no controller is installed, one is created and installed.
-	@param context Guise context information.
-	@exception NullPointerException if there is no controller installed and no appropriate controller registered with the Guise context.
+	/**@return The view installed in this component.*/
+	public View<? extends GuiseContext, ? super C> getView();
+
+	/**Sets the view used by this component.
+	This is a bound property.
+	@param newView The new view to use.
+	@see #VIEW_PROPERTY
+	@exception NullPointerException if the given view is <code>null</code>.
 	*/
-//TODO del when works	public <GC extends GuiseContext> Controller<? super GC, ? super C> getController(final GC context);
-//TODO del when works	public Controller<? extends GuiseContext, ? super C> getController(final GuiseContext context);	//TODO make this protected again, if we can, if we reorganize the controller.getAbsoluteID framework
+	public void setView(final View<? extends GuiseContext, ? super C> newView);
 
 	/**@return An iterable interface to all errors associated with this component.*/
 	public Iterable<Throwable> getErrors();
@@ -115,28 +125,6 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@see #ORIENTATION_PROPERTY
 	*/
 	public void setOrientation(final Orientation newOrientation);
-
-	/**@return An identifier unique within this component's parent, if any.*/
-//TODO del when works	public String getUniqueID();
-
-	/**@return An identifier unique up this component's hierarchy.*/
-//TODO del when works	public String getAbsoluteUniqueID();
-
-	/**Determines the unique ID of the provided child component within this component.
-	This method is typically called by child components when determining their own unique IDs.
-	@param childComponent A component within this component.
-	@return An identifier of the given component unique within this component.
-	@exception IllegalArgumentException if the given component is not a child of this component.
-	*/
-//TODO del when works	public String getUniqueID(final Component<?> childComponent);
-
-	/**Determines the absolute unique ID of the provided child component up the component's hierarchy.
-	This method is typically called by child components when determining their own absolute unique IDs.
-	@param childComponent A component within this component.
-	@return An absolute identifier of the given component unique up the component's hierarchy.
-	@exception IllegalArgumentException if the given component is not a child of this component.
-	*/
-//TODO del when works	public String getAbsoluteUniqueID(final Component<?> childComponent);
 
 	/**@return The parent of this component, or <code>null</code> if this component does not have a parent.*/
 	public CompositeComponent<?> getParent();
@@ -246,7 +234,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 
 	/**Processes an event for the component.
 	This method should not normally be called directly by applications.
-	This method delegates to the installed controller, and if no controller is installed one is created and installed.
+	This method delegates to the installed controller.
 	@param event The event to be processed.
 	@exception ComponentExceptions if there was a component-related error processing the event.
 	@see #getController()
@@ -256,10 +244,10 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 
 	/**Updates the view of this component.
 	This method should not normally be called directly by applications.
-	This method delegates to the installed controller, and if no controller is installed one is created and installed.
+	This method delegates to the installed view.
 	@param context Guise context information.
 	@exception IOException if there is an error updating the view.
-	@see #getController()
+	@see #getView()
 	@see GuiseContext.State#UPDATE_VIEW
 	*/
 	public <GC extends GuiseContext> void updateView(final GC context) throws IOException;

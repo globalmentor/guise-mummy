@@ -7,8 +7,12 @@ import com.javaguise.session.GuiseSession;
 @param <V> The type of value to represent.
 @author Garret Wilson
 */
-public abstract class AbstractValueControl<V, C extends ValueControl<V, C>> extends AbstractControl<ValueModel<V>, C> implements ValueControl<V, C>
+public abstract class AbstractValueControl<V, C extends ValueControl<V, C>> extends AbstractControl<C> implements ValueControl<V, C>
 {
+
+	/**@return The data model used by this component.*/
+	@SuppressWarnings("unchecked")
+	public ValueModel<V> getModel() {return (ValueModel<V>)super.getModel();}
 
 	/**Session constructor with a default data model to represent a given type.
 	@param session The Guise session that owns this component.
