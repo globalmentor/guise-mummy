@@ -16,14 +16,16 @@ import com.javaguise.validator.ValidationException;
 import com.javaguise.validator.ValueRequiredValidator;
 import com.garretwilson.util.Debug;
 
-/**Test frame for a home page.
+/**Test panel for a home page.
 @author Garret Wilson
 */
 public class HomePanel extends DefaultNavigationPanel
 {
 
+	private TestFrame frame=null;
+
 	/**Guise session constructor.
-	@param session The Guise session that owns this frame.
+	@param session The Guise session that owns this panel.
 	*/
 	public HomePanel(final GuiseSession session)
 	{
@@ -31,13 +33,13 @@ public class HomePanel extends DefaultNavigationPanel
 	}
 
 	/**ID constructor.
-	@param session The Guise session that owns this frame.
+	@param session The Guise session that owns this panel.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	*/
 	public HomePanel(final GuiseSession session, final String id)
 	{
 		super(session, id, new RegionLayout(session));	//construct the parent using a region layout
-		getModel().setLabel("Home Frame Test");	//set the frame label
+		getModel().setLabel("Home Panel Test");	//set the panel label
 
 		final LayoutPanel contentPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.PAGE)); 
 
@@ -103,7 +105,7 @@ Debug.trace("list control changed value to", newValue);
 		inputPanel.add(listControl);
 
 
-		contentPanel.add(inputPanel);	//add the input panel to the temperature frame
+		contentPanel.add(inputPanel);	//add the input panel to the temperature panel
 		
 		
 		final Label testLabel=new Label(session, "testLabel");
@@ -159,8 +161,8 @@ Debug.trace("list control changed value to", newValue);
 					{
 						getSession().navigateModal("edituser", new ModalAdapter<Object>()
 								{
-									/**Called when an a modal frame ends its modality.
-									@param modalEvent The event indicating the frame ending modality and the modal value.
+									/**Called when an a modal panel ends its modality.
+									@param modalEvent The event indicating the panel ending modality and the modal value.
 									*/
 									public void modalEnded(final ModalEvent<Object> modalEvent)
 									{
@@ -184,13 +186,13 @@ Debug.trace("list control changed value to", newValue);
 				{
 					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
 					{
-						final Label label=new Label(session);
-						label.getModel().setLabel("This is frame content");
-						final Frame<?> frame=new DefaultFrame(session, label);
-						frame.getModel().setLabel("Test Frame");
-Debug.trace("ready to set frame visible");
+						if(frame==null)
+						{
+							frame=new TestFrame(session);
+							frame.getModel().setLabel("Test Frame");
+						}
+	Debug.trace("ready to set frame visible");
 						frame.setVisible(true);
-						
 					}
 				});
 		buttonPanel.add(frameLink);
@@ -203,6 +205,11 @@ Debug.trace("ready to set frame visible");
 					public void propertyValueChange(PropertyValueChangeEvent<String> propertyValueChangeEvent)
 					{
 						testLabel.getModel().setLabel(propertyValueChangeEvent.getNewValue());
+						if(frame!=null)
+						{
+							frame.label.getModel().setLabel(propertyValueChangeEvent.getNewValue());
+							frame.getModel().setLabel("Updated frame.");
+						}
 					}
 				});
 //TODO del		textInput.getModel().setValidator(new RegularExpressionStringValidator("[a-z]*"));
@@ -415,4 +422,19 @@ Debug.trace("ready to set frame visible");
 		return menu;
 	}
 
+	
+	protected static class TestFrame extends DefaultFrame
+	{
+		protected final Label label;
+		
+		public TestFrame(final GuiseSession session)
+		{
+			super(session);
+			setStyleID("defaultFrame");
+			label=new Label(session);
+			label.getModel().setLabel("This is frame content");
+			setComponent(label);
+			
+		}
+	}
 }

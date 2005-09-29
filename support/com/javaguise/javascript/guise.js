@@ -17,6 +17,11 @@ var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX c
 			<target id=""/>	<!--the element that was is the target of the drag and drop operation-->
 			<mouse x="" y=""/>	<!--the mouse information at the time of the drop-->
 		</drop>
+		<action	<!--an action on a component-->
+			componentID=""	<!--the ID of the component-->
+			targetID=""	<!--the ID of the target element on which the action occurred-->
+			actionID=""	<!--the action identifier-->
+		/>
 	</events>
 </request>
 */
@@ -24,6 +29,7 @@ var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX c
 /**Guise AJAX Response Format, content type application/x-guise-ajax-response+xml
 <response>
 	<patch isFrame="true|false"></patch>	<!--XML elements to be patched into the existing DOM tree.--> <!--TODO fix isFrame hack; perhaps just report all available component types-->
+	<remove id=""/>	<!--ID of the XML element to be removed from the existing DOM tree.-->
 	<navigate>uri</navigate>	<!--URI of another page to which to navigate.-->
 	<frame></frame>	<!--definition of a frame to show-->
 </response>
@@ -54,7 +60,14 @@ var TAB_SELECTED_CLASS_SUFFIX="-tab-selected";
 var DECORATOR_CLASS_PREFIX="-decorator";
 
 /**The enumeration of recognized styles.*/
-var STYLES={DRAG_SOURCE: "dragSource", DRAG_HANDLE: "dragHandle", DROP_TARGET: "dropTarget"};
+var STYLES=
+{
+	/**A component element that can be clicked as an action.*/
+	ACTION: "action",
+	DRAG_SOURCE: "dragSource",
+	DRAG_HANDLE: "dragHandle",
+	DROP_TARGET: "dropTarget"
+};
 
 /**The array of drop targets, determined when the document is loaded. The drop targets are stored in increasing order of hierarchical depth.*/
 var dropTargets=new Array();
@@ -483,6 +496,23 @@ function FormAJAXEvent(parameter)
 	}
 }
 
+//Action AJAX Event
+
+/**A class encapsulating action information for an AJAX request.
+@param componentID: The ID of the source component.
+@param targetID: The ID of the target element.
+@param actionID: The action identifier, or null if no particular action is indicated.
+var componentID: The ID of the source component.
+var targetID: The ID of the target element.
+var actionID: The action identifier, or null if no particular action is indicated.
+*/
+function ActionAJAXEvent(componentID, targetID, actionID)
+{
+	this.componentID=componentID;
+	this.targetID=targetID;
+	this.actionID=actionID;
+}
+
 //Drop AJAX Event
 
 /**A class encapsulating drop information for an AJAX request.
@@ -691,13 +721,19 @@ function GuiseAJAX()
 		GuiseAJAX.prototype.REQUEST_CONTENT_TYPE="application/x-guise-ajax-request+xml";
 
 		/**The enumeration of the names of the request elements.*/
-		GuiseAJAX.prototype.RequestElement={REQUEST: "request", EVENTS: "events", FORM: "form", CONTROL: "control", NAME: "name", VALUE: "value", DROP: "drop", SOURCE: "source", TARGET: "target", MOUSE: "mouse", ID: "id", X: "x", Y: "y"};
+		GuiseAJAX.prototype.RequestElement=
+			{
+				REQUEST: "request", EVENTS: "events",
+				FORM: "form", CONTROL: "control", NAME: "name", VALUE: "value",
+				ACTION: "action", COMPONENT_ID: "componentID", TARGET_ID: "targetID", ACTION_ID: "actionID",
+				DROP: "drop", SOURCE: "source", TARGET: "target", MOUSE: "mouse", ID: "id", X: "x", Y: "y"
+			};
 
 		/**The content type of a Guise AJAX response.*/
 		GuiseAJAX.prototype.RESPONSE_CONTENT_TYPE="application/x-guise-ajax-response+xml";
 
 		/**The enumeration of the names of the response elements.*/
-		GuiseAJAX.prototype.ResponseElement={RESPONSE: "response", PATCH: "patch", NAVIGATE: "navigate", RELOAD: "reload"};
+		GuiseAJAX.prototype.ResponseElement={RESPONSE: "response", PATCH: "patch", REMOVE: "remove", NAVIGATE: "navigate", RELOAD: "reload"};
 
 		/**Immediately sends or queues an AJAX request.
 		@param ajaxRequest The AJAX request to send.
@@ -730,11 +766,15 @@ function GuiseAJAX()
 						var ajaxRequest=this.ajaxRequests.dequeue();	//get the next AJAX request to process
 						if(ajaxRequest instanceof FormAJAXEvent)	//if this is a form event
 						{
-							this._appendAJAXFormEvent(requestStringBuilder, ajaxRequest);	//append the form event
+							this._appendFormAJAXEvent(requestStringBuilder, ajaxRequest);	//append the form event
+						}
+						else if(ajaxRequest instanceof ActionAJAXEvent)	//if this is an action event
+						{
+							this._appendActionAJAXEvent(requestStringBuilder, ajaxRequest);	//append the action event
 						}
 						else if(ajaxRequest instanceof DropAJAXEvent)	//if this is a drop event
 						{
-							this._appendAJAXDropEvent(requestStringBuilder, ajaxRequest);	//append the drop event
+							this._appendDropAJAXEvent(requestStringBuilder, ajaxRequest);	//append the drop event
 						}
 					}
 					this.appendXMLEndTag(requestStringBuilder, this.RequestElement.EVENTS);	//</events>
@@ -763,7 +803,7 @@ function GuiseAJAX()
 		@param ajaxFormRequest The form request information to append.
 		@return The string builder.
 		*/
-		GuiseAJAX.prototype._appendAJAXFormEvent=function(stringBuilder, ajaxFormRequest)
+		GuiseAJAX.prototype._appendFormAJAXEvent=function(stringBuilder, ajaxFormRequest)
 		{
 			this.appendXMLStartTag(stringBuilder, this.RequestElement.FORM);	//<form>
 			var parameters=ajaxFormRequest.parameters;	//get the parameters
@@ -782,12 +822,27 @@ function GuiseAJAX()
 			return stringBuilder;	//return the string builder
 		};
 
+		/**Appends an AJAX action event to a string builder.
+		@param stringBuilder The string builder collecting the request data.
+		@param ajaxActionEvent The action event information to append.
+		@return The string builder.
+		*/
+		GuiseAJAX.prototype._appendActionAJAXEvent=function(stringBuilder, ajaxActionEvent)
+		{
+			this.appendXMLStartTag(stringBuilder, this.RequestElement.ACTION,	//<action>
+					new Parameter(this.RequestElement.COMPONENT_ID, ajaxActionEvent.componentID),	//componentID="componentID"
+					new Parameter(this.RequestElement.TARGET_ID, ajaxActionEvent.targetID),	//targetID="targetID"
+					new Parameter(this.RequestElement.ACTION_ID, ajaxActionEvent.actionID))	//actionID="actionID"
+			this.appendXMLEndTag(stringBuilder, this.RequestElement.ACTION);	//</action>
+			return stringBuilder;	//return the string builder
+		};
+
 		/**Appends an AJAX drop event to a string builder.
 		@param stringBuilder The string builder collecting the request data.
 		@param ajaxDropEvent The drop event information to append.
 		@return The string builder.
 		*/
-		GuiseAJAX.prototype._appendAJAXDropEvent=function(stringBuilder, ajaxDropEvent)
+		GuiseAJAX.prototype._appendDropAJAXEvent=function(stringBuilder, ajaxDropEvent)
 		{
 			this.appendXMLStartTag(stringBuilder, this.RequestElement.DROP);	//<drop>
 			this.appendXMLStartTag(stringBuilder, this.RequestElement.SOURCE, new Parameter(this.RequestElement.ID, ajaxDropEvent.dragSource.id));	//<source id="id">
@@ -824,6 +879,7 @@ function GuiseAJAX()
 		};
 
 		/**Appends an XML start tag with the given name to the given string builder.
+		If the value of a parameter is null, that parameter will not be used.
 		If the value of a parameter is not a string, it will be converted to one.
 		@param stringBuilder The string builder to hold the data.
 		@param tagName The name of the XML tag.
@@ -837,7 +893,10 @@ function GuiseAJAX()
 			for(var i=2; i<argumentCount; ++i)	//for each argument (not counting the first two)
 			{
 				var parameter=arguments[i];	//get this argument
-				stringBuilder.append(" ").append(parameter.name).append("=\"").append(this.encodeXML(parameter.value.toString())).append("\"");	//name="value"
+				if(parameter.value!=null)	//if a parameter value was given
+				{
+					stringBuilder.append(" ").append(parameter.name).append("=\"").append(this.encodeXML(parameter.value.toString())).append("\"");	//name="value"
+				}
 			}
 			return stringBuilder.append(">");	//>
 		};
@@ -960,6 +1019,9 @@ alert(exception);
 									case this.ResponseElement.PATCH:	//patch
 										this._processPatch(childNode);	//patch the document with this patch information
 										break;
+									case this.ResponseElement.REMOVE:	//remove
+										this._processRemove(childNode);	//remove the elements from the document with this removal element
+										break;
 									case this.ResponseElement.NAVIGATE:	//navigate
 										window.location.href=getText(childNode);	//go to the new location
 										return;	//stop processing events
@@ -1016,14 +1078,50 @@ alert(exception);
 							oldElement.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components
 							oldElement.style.left="10px";	//TODO fix
 							oldElement.style.top="10px";
-							oldElement.style.width="100px";	//TODO fix
-							oldElement.style.height="100px";
+							oldElement.style.width="300px";	//TODO fix
+							oldElement.style.height="200px";
 							document.body.appendChild(oldElement);	//add the frame element to the document
 							initializeNode(oldElement);	//initialize the new imported node, installing the correct event handlers
 						}
 					}
 				}
 			}
+		}
+
+		/**Processes the AJAX remove response.
+		@param element The element representing removal response.
+		*/ 
+		GuiseAJAX.prototype._processRemove=function(element)
+		{
+			var id=element.getAttribute("id");	//get the element ID, if there is one
+			if(id)	//if the element has an ID
+			{
+				var oldElement=document.getElementById(id);	//get the old element
+				if(oldElement!=null)	//if we found the old element
+				{
+					oldElement.parentNode.removeChild(oldElement);	//remove the old element from the document
+				}
+			}
+/*TODO del when works
+			var childNodes=element.childNodes;	//get all the child nodes of the element
+			var childNodeCount=childNodes.length;	//find out how many children there are
+			for(var i=0; i<childNodeCount; ++i)	//for each child node
+			{
+				var childNode=childNodes[i];	//get this child node
+				if(childNode.nodeType==Node.ELEMENT_NODE)	//if this is an element
+				{
+					var id=childNode.getAttribute("id");	//get the child node's ID, if there is one
+					if(id)	//if the element has an ID
+					{
+						var oldElement=document.getElementById(id);	//get the old element
+						if(oldElement!=null)	//if we found the old element
+						{
+							oldElement.parentNode.removeChild(oldElement);	//remove the old element from the document
+						}
+					}
+				}
+			}
+*/
 		}
 
 		/**Synchronizes an element hierarchy with its patch element.
@@ -1048,8 +1146,11 @@ alert(exception);
 //TODO fix or del				if(attributeValue!=null && attributeValue.length>0 && !element.getAttribute(attributeName))	//if there is really an attribute value (IE provides all possible attributes, even with those with no value) and the new element doesn't have this attribute
 				if(element.getAttribute(attributeName)==null)	//if the new element doesn't have this attribute
 				{
+					if(attributeName!="style")	//don't remove local styles, because they may be used by Guise (with frames, for instance)
+					{
 //TODO del alert("ready to remove "+oldElement.nodeName+" attribute "+oldAttributeName+" with current value "+oldAttributeValue);
-					oldElement.removeAttribute(oldAttributeName);	//remove the attribute normally (apparently no action will take place if performed on IE-specific attributes such as element.start)
+						oldElement.removeAttribute(oldAttributeName);	//remove the attribute normally (apparently no action will take place if performed on IE-specific attributes such as element.start)
+					}
 //TODO fix					i=0;	//TODO fix; temporary to get out of looking at all IE's attributes
 				}
 			}
@@ -1516,7 +1617,7 @@ function DragState(dragSource, mouseX, mouseY)
 		/**@return An element appropriate for dragging, such as a clone of the original.*/
 		DragState.prototype._getDragElement=function()
 		{
-			var isAbsolute=this.dragSource.style.position="absolute";	//see if the drag source is already absolutely positioned
+			var isAbsolute=this.dragSource.style.position=="absolute";	//see if the drag source is already absolutely positioned
 			var element=this.dragSource;	//start out assuming we'll use the drag source as is
 			if(!isAbsolute)	//if the drag source is not absolutely positioned
 			{
@@ -1658,6 +1759,9 @@ function initializeNode(node)
 				{
 					switch(elementClassNames[i])	//check out this class name
 					{
+						case STYLES.ACTION:
+							eventManager.addEvent(node, "click", onActionClick, false);	//listen for a click on an action element
+							break;
 						case STYLES.DRAG_HANDLE:
 							eventManager.addEvent(node, "mousedown", onDragBegin, false);	//listen for mouse down on a drag handle
 							break;
@@ -1827,7 +1931,7 @@ function onAction(event)
 A tab link is expected to have an href with parameters in the form "?tabbedPanelID=tabID".
 @param event The object describing the event.
 */
-function onTabClick(event)
+function onTabClick(event)	//TODO maybe refactor to use new action click
 {
 	var element=event.currentTarget;	//get the element on which the event was registered
 	var href=element.href;	//get the link href, which should be in the form "?tabbedPanelID=tabID"
@@ -1859,6 +1963,35 @@ function onTabClick(event)
 */
 			event.stopPropagation();	//tell the event to stop bubbling
 			event.preventDefault();	//prevent the default functionality from occurring
+		}
+	}
+}
+
+/**Called when an element marked as "action" is clicked.
+This method searches up the hierarchy to find the enclosing "component" element and sends an AJAX action event.
+@param event The object describing the event.
+*/
+function onActionClick(event)
+{
+	var target=event.currentTarget;	//get the element on which the event was registered
+	var targetID=target.id;	//get the target ID
+	if(targetID)	//if the element has an ID (otherwise, we couldn't report the action)
+	{
+		var component=getAncestorElementByClassName(target, /^component$|-decorator$/);	//get the component element TODO improve all this
+		if(component)	//if there is a component
+		{
+			var componentID=component.id;	//get the component ID
+			if(componentID)	//if there is a component ID
+			{
+				componentID=componentID.replace(/-decorator$/, "");	//remove from the ID the "-decorator", if there is one
+				if(AJAX_URI)	//if AJAX is enabled
+				{
+					var ajaxRequest=new ActionAJAXEvent(componentID, targetID, null);	//create a new action request with no action ID
+					guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+					event.stopPropagation();	//tell the event to stop bubbling
+					event.preventDefault();	//prevent the default functionality from occurring
+				}
+			}
 		}
 	}
 }

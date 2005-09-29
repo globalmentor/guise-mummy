@@ -26,4 +26,14 @@ public interface Frame<C extends Frame<C>> extends CompositeComponent<C>
 	*/
 	public void setComponent(final Component<?> newComponent);
 
+	/**Determines whether the frame should be allowed to close.
+	This method is called from {@link #close()}.
+	@return <code>true</code> if the frame should be allowed to close.
+	*/
+	public boolean canClose();
+	
+	/**Closes the frame.
+	This method calls {@link #canClose()} and only performs closing functionality if that method returns <code>true</code>. 
+	*/
+	public void close();
 }

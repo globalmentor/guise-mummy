@@ -22,4 +22,14 @@ public abstract class AbstractApplicationFrame<C extends ApplicationFrame<C>> ex
 	{
 		super(session, id, model, component);	//construct the parent class
 	}
+
+	/**Determines whether the frame should be allowed to close.
+	This implementation returns <code>false</code>.
+	This method is called from {@link #close()}.
+	@return <code>true</code> if the frame should be allowed to close.
+	*/
+	public boolean canClose()
+	{
+		return false;	//don't allow application frames to be closed
+	}
 }

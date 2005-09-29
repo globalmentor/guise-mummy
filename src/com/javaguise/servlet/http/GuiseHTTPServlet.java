@@ -41,8 +41,8 @@ import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.io.ContentTypeConstants;
 import com.garretwilson.lang.ObjectUtilities;
 
-import static com.garretwilson.io.ContentTypeConstants.CHARSET_PARAMETER;
-import static com.garretwilson.io.ContentTypeUtilities.createContentType;
+import static com.garretwilson.io.ContentTypeConstants.*;
+import static com.garretwilson.io.ContentTypeUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.net.http.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
@@ -377,7 +377,7 @@ Debug.info("content type:", request.getContentType());
 						setNoCache(response);	//TODO testing; fix; update method
 
 						final List<ControlEvent> controlEvents=getControlEvents(request);	//get all control events from the request
-						final FormEvent formSubmitEvent=(FormEvent)controlEvents.get(0);	//get the form submit event TODO fix, combine with AJAX code
+						final FormControlEvent formSubmitEvent=(FormControlEvent)controlEvents.get(0);	//get the form submit event TODO fix, combine with AJAX code
 
 							//before actually changing the navigation path, check to see if we're in the middle of modal navigation (only do this after we find a navigation panel, as this request might be for a stylesheet or some other non-panel resource, which shouldn't be redirected)
 						final ModalNavigation modalNavigation=guiseSession.peekModalNavigation();	//see if we are currently doing modal navigation TODO make public access routines
@@ -478,15 +478,19 @@ Debug.info("content type:", request.getContentType());
 		final NavigationPanel navigationPanel=guiseSession.getNavigationPanel(navigationPath);	//get the panel bound to the requested path
 		if(navigationPanel!=null)	//if we found a panel class for this address
 		{
+			final Set<Frame<?>> frames=new HashSet<Frame<?>>();	//create a set of frames TODO testing
+			CollectionUtilities.addAll(frames, guiseSession.getFrameIterator());	//get all the current frames; we'll determine which ones were removed, later TODO improve all this
+			
+			
 			final List<ControlEvent> controlEvents=getControlEvents(request);	//get all control events from the request
 			guiseContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type
 			guiseContext.writeElementBegin(null, "response");	//<response>	//TODO use a constant, decide on a namespace
 			for(final ControlEvent controlEvent:controlEvents)	//for each control event
 			{
 				final Set<Component<?>> requestedComponents=new HashSet<Component<?>>();	//create a set of component that were identified in the request
-				if(controlEvent instanceof FormEvent)	//if this is a form submission
+				if(controlEvent instanceof FormControlEvent)	//if this is a form submission
 				{
-					final FormEvent formSubmitEvent=(FormEvent)controlEvent;	//get the form submit event
+					final FormControlEvent formSubmitEvent=(FormControlEvent)controlEvent;	//get the form submit event
 					final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the request parameter map
 					for(final Map.Entry<String, List<Object>> parameterListMapEntry:parameterListMap.entrySet())	//for each entry in the map of parameter lists
 					{
@@ -509,14 +513,15 @@ Debug.info("content type:", request.getContentType());
 						}
 					}
 				}
-				else if(controlEvent instanceof DropEvent)	//if this is a drag and drop drop event
+				else if(controlEvent instanceof ComponentControlEvent)	//if this event is bound for a specific component
 				{
-					final DropEvent dropEvent=(DropEvent)controlEvent;	//get the drop event
-					final Component<?> dropTarget=AbstractComponent.getComponentByID(navigationPanel, dropEvent.getDropTargetID());	//get the drop target component
-					if(dropTarget!=null)	//if there is a drop target
+Debug.trace("this is a control event; looking for component with ID", ((ComponentControlEvent)controlEvent).getComponentID());
+					final Component<?> component=getComponentByID(guiseSession, ((ComponentControlEvent)controlEvent).getComponentID());	//get the target component from its ID
+					if(component!=null)	//if there is a target component
 					{
-						requestedComponents.add(dropTarget);	//add the drop target to the set of requested components
-					}
+Debug.trace("got component", component);
+						requestedComponents.add(component);	//add the component to the set of requested components
+					}					
 				}
 				if(!requestedComponents.isEmpty())	//if components were requested
 				{
@@ -525,6 +530,7 @@ Debug.info("content type:", request.getContentType());
 					{
 						try
 						{
+Debug.trace("ready to process event", controlEvent, "for component", component);
 							component.processEvent(controlEvent);		//tell the component to process the event
 						}
 						catch(final ComponentExceptions componentExceptions)	//if there were any component errors while processing the event
@@ -566,11 +572,13 @@ for(final Component<?> affectedComponent:affectedComponents)
 //TODO if !AJAX						throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
 						//TODO store a flag or something---if we're navigating, we probably should flush the other queued events
 					}
+
+					
 					final Frame<?> applicationFrame=guiseSession.getApplicationFrame();	//get the application frame
 					final Collection<Component<?>> dirtyComponents=getDirtyComponents(guiseSession);	//get all dirty components in all the session frames 
 
-					
-					
+					CollectionUtilities.removeAll(frames, guiseSession.getFrameIterator());	//remove all the ending frames, leaving us the frames that were removed TODO improve all this
+//TODO fix					dirtyComponents.addAll(frames);	//add all the frames that were removed
 					
 					Debug.trace("we now have dirty components:", dirtyComponents.size());
 					for(final Component<?> affectedComponent:dirtyComponents)
@@ -590,11 +598,19 @@ for(final Component<?> affectedComponent:affectedComponents)
 						guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view
 						for(final Component<?> dirtyComponent:dirtyComponents)	//for each component affected by this update cycle
 						{
+//TODO fix							if(dirtyComponent.isVisible())	//if the component is visible
 							guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
+//TODO fix							else	//if the component is not visible, remove the component's elements
 							guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
 							guiseContext.writeAttribute(null, "isFrame", Boolean.valueOf(dirtyComponent instanceof Frame).toString());	//isFrame="affectedComponent instanceof Frame" TODO fix hack
 							dirtyComponent.updateView(guiseContext);		//tell the component to update its view
 							guiseContext.writeElementEnd();	//</xhtml:patch>
+						}
+						for(final Frame<?> frame:frames)	//for each removed frame
+						{
+							guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "remove");	//<xhtml:remove>	//TODO use a constant TODO don't use the XHTML namespace if we can help it								
+							guiseContext.writeAttribute(null, "id", frame.getID());	//TODO fix
+							guiseContext.writeElementEnd();	//</xhtml:remove>							
 						}
 					}
 				}
@@ -652,11 +668,31 @@ for(final Component<?> affectedComponent:affectedComponents)
 		final Iterator<Frame<?>> frameIterator=session.getFrameIterator();	//get an iterator to session frames
 		while(frameIterator.hasNext())	//while there are more frames
 		{
-			AbstractComponent.getDirtyComponents(frameIterator.next(), dirtyComponents);	//gather more dirty components
+			final Frame<?> frame=frameIterator.next();	//get the next frame
+			AbstractComponent.getDirtyComponents(frame, dirtyComponents);	//gather more dirty components
 		}
 		return dirtyComponents;	//return the dirty components we collected
 	}
 
+	/**Retrieves a component with the given ID.
+	This method searches the hierarchies of all frames in the session.
+	@param session The Guise session to check for the component.
+	@return The component with the given ID, or <code>null</code> if no component with the given ID could be found on any of the given frames. 
+	*/
+	public static Component<?> getComponentByID(final GuiseSession session, final String id)
+	{
+		final Iterator<Frame<?>> frameIterator=session.getFrameIterator();	//get an iterator to session frames
+		while(frameIterator.hasNext())	//while there are more frames
+		{
+			final Frame<?> frame=frameIterator.next();	//get the next frame
+			final Component<?> component=AbstractComponent.getComponentByID(frame, id);	//try to find the component within this frame
+			if(component!=null)	//if a component with the given ID was found
+			{
+				return component;	//return the component
+			}
+		}
+		return null;	//indicate that no such component could be found
+	}
 
 	private final PathExpression AJAX_REQUEST_EVENTS_WILDCARD_XPATH_EXPRESSION=new PathExpression("request", "events", "*");	//TODO use constants; comment 
 	private final PathExpression AJAX_REQUEST_CONTROL_XPATH_EXPRESSION=new PathExpression("control");	//TODO use constants; comment 
@@ -685,34 +721,46 @@ for(final Component<?> affectedComponent:affectedComponents)
 				final List<Node> eventNodes=(List<Node>)XPath.evaluatePathExpression(document, AJAX_REQUEST_EVENTS_WILDCARD_XPATH_EXPRESSION);	//get all the events
 				for(final Node eventNode:eventNodes)	//for each event node
 				{
-					if(eventNode.getNodeType()==Node.ELEMENT_NODE && "form".equals(eventNode.getNodeName()))	//if this is a form event TODO use a constant
+					if(eventNode.getNodeType()==Node.ELEMENT_NODE)//if this is an event element
 					{
-						final FormEvent formSubmitEvent=new FormEvent(false);	//create a new form submission event TODO get the exhaustive indication from the element
-						final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
-						final List<Node> controlNodes=(List<Node>)XPath.evaluatePathExpression(eventNode, AJAX_REQUEST_CONTROL_XPATH_EXPRESSION);	//get all the control settings
-						for(final Node controlNode:controlNodes)	//for each control node
+						final Element eventElement=(Element)eventNode;	//cast the node to an element
+						if("form".equals(eventNode.getNodeName()))	//if this is a form event TODO use a constant
 						{
-							final Element controlElement=(Element)controlNode;	//get this control element
-							final String controlName=controlElement.getAttribute("name");	//get the control name TODO use a constant
-							if(controlName!=null && controlName.length()>0)	//if this control has a name
+							final FormControlEvent formSubmitEvent=new FormControlEvent(false);	//create a new form submission event TODO get the exhaustive indication from the element
+							final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
+							final List<Node> controlNodes=(List<Node>)XPath.evaluatePathExpression(eventNode, AJAX_REQUEST_CONTROL_XPATH_EXPRESSION);	//get all the control settings
+							for(final Node controlNode:controlNodes)	//for each control node
 							{
-								final String controlValue=controlElement.getTextContent();	//get the control value
-								parameterListMap.addItem(controlName, controlValue);	//store the value in the parameters
+								final Element controlElement=(Element)controlNode;	//get this control element
+								final String controlName=controlElement.getAttribute("name");	//get the control name TODO use a constant
+								if(controlName!=null && controlName.length()>0)	//if this control has a name
+								{
+									final String controlValue=controlElement.getTextContent();	//get the control value
+									parameterListMap.addItem(controlName, controlValue);	//store the value in the parameters
+								}
+							}
+							controlEventList.add(formSubmitEvent);	//add the event to the list
+						}
+						else if("action".equals(eventNode.getNodeName()))	//if this is an action event TODO use a constant
+						{
+							final String componentID=eventElement.getAttribute("componentID");	//get the ID of the component TODO use a constant
+							if(componentID!=null)	//if there is a component ID TODO add better event handling, to throw an error and send back that error
+							{
+								final String targetID=eventElement.getAttribute("targetID");	//get the ID of the target element TODO use a constant
+								final String actionID=eventElement.getAttribute("actionID");	//get the action identifier TODO use a constant								
+								final ActionControlEvent actionControlEvent=new ActionControlEvent(componentID, targetID, actionID);	//create a new action control event
+								controlEventList.add(actionControlEvent);	//add the event to the list
 							}
 						}
-						controlEventList.add(formSubmitEvent);	//add the event to the list
-					}
-					else if(eventNode.getNodeType()==Node.ELEMENT_NODE && "drop".equals(eventNode.getNodeName()))	//if this is a drop event TODO use a constant
-					{
-//TODO del Debug.trace("this is a drop event");
-						final Node sourceNode=XPath.getNode(eventNode, AJAX_REQUEST_SOURCE_XPATH_EXPRESSION);	//get the source node
-						final String dragSourceID=((Element)sourceNode).getAttribute("id");	//TODO tidy; improve; comment
-//TODO del Debug.trace("drag source:", dragSourceID);
-						final Node targetNode=XPath.getNode(eventNode, AJAX_REQUEST_TARGET_XPATH_EXPRESSION);	//get the target node
-						final String dropTargetID=((Element)targetNode).getAttribute("id");	//TODO tidy; improve; comment
-//TODO del Debug.trace("drop target:", dropTargetID);
-						final DropEvent dropEvent=new DropEvent(dragSourceID, dropTargetID);	//create a new drop event
-						controlEventList.add(dropEvent);	//add the event to the list
+						else if("drop".equals(eventNode.getNodeName()))	//if this is a drop event TODO use a constant
+						{
+							final Node sourceNode=XPath.getNode(eventNode, AJAX_REQUEST_SOURCE_XPATH_EXPRESSION);	//get the source node
+							final String dragSourceID=((Element)sourceNode).getAttribute("id");	//TODO tidy; improve; comment
+							final Node targetNode=XPath.getNode(eventNode, AJAX_REQUEST_TARGET_XPATH_EXPRESSION);	//get the target node
+							final String dropTargetID=((Element)targetNode).getAttribute("id");	//TODO tidy; improve; comment
+							final DropControlEvent dropEvent=new DropControlEvent(dragSourceID, dropTargetID);	//create a new drop event
+							controlEventList.add(dropEvent);	//add the event to the list
+						}
 					}
 				}
 			}
@@ -734,7 +782,7 @@ for(final Component<?> affectedComponent:affectedComponents)
 				//populate our parameter map
 			if(FileUpload.isMultipartContent(request))	//if this is multipart/form-data content
 			{
-				final FormEvent formSubmitEvent=new FormEvent(true);	//create a new form submission event, indicating that the event is exhaustive
+				final FormControlEvent formSubmitEvent=new FormControlEvent(true);	//create a new form submission event, indicating that the event is exhaustive
 				final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
 				final DiskFileUpload diskFileUpload=new DiskFileUpload();	//create a file upload handler
 				diskFileUpload.setSizeMax(-1);	//don't reject anything
@@ -758,7 +806,7 @@ for(final Component<?> affectedComponent:affectedComponents)
 			else	//if this is normal application/x-www-form-urlencoded data
 			{
 				final boolean exhaustive=POST_METHOD.equals(request.getMethod());	//if this is an HTTP post, the form event is exhaustive of all controls on the form
-				final FormEvent formSubmitEvent=new FormEvent(exhaustive);	//create a new form submission event
+				final FormControlEvent formSubmitEvent=new FormControlEvent(exhaustive);	//create a new form submission event
 				final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
 				final Iterator parameterEntryIterator=request.getParameterMap().entrySet().iterator();	//get an iterator to the parameter entries
 				while(parameterEntryIterator.hasNext())	//while there are more parameter entries

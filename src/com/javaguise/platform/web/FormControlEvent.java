@@ -10,7 +10,7 @@ import com.javaguise.controller.*;
 /**A control event indicating that a full or partial form submission occurred.
 @author Garret Wilson
 */
-public class FormEvent implements ControlEvent
+public class FormControlEvent implements ControlEvent
 {
 
 	/**Whether this event represents all components on the form.*/
@@ -28,7 +28,7 @@ public class FormEvent implements ControlEvent
 	/**Constructor that indicates whether the event is exhaustive.
 	@param exhaustive Whether this event represents all components on the form.
 	*/
-	public FormEvent(final boolean exhaustive)
+	public FormControlEvent(final boolean exhaustive)
 	{
 		this.exhaustive=exhaustive;
 	}

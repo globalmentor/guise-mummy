@@ -89,8 +89,8 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 					getSession().removeFrame(this);	//remove the frame from the session
 				}
 			}
-			super.setVisible(newVisible);	//set the visibility normally
 		}
+		super.setVisible(newVisible);	//set the visibility normally
 	}
 
 	/**Session, ID, model, and component constructor.
@@ -108,4 +108,33 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 		setVisible(false);	//default to not being visible
 		initialized=true;	//show that we've initialized the frame
 	}
+
+	/**Determines whether the frame should be allowed to close.
+	This implementation returns <code>true</code>.
+	This method is called from {@link #close()}.
+	@return <code>true</code> if the frame should be allowed to close.
+	*/
+	public boolean canClose()
+	{
+		return true;	//always allow the frame to be closed
+	}
+
+	/**Closes the frame.
+	This method calls {@link #canClose()} and only performs closing functionality if that method returns <code>true</code>.
+	This method delegates actual closing to {@link #closeImpl()}, and that method should be overridden rather than this one. 
+	*/
+	public final void close()
+	{
+		if(canClose())	//if the frame can close
+		{
+			closeImpl();	//actually close the frame
+		}
+	}
+	
+	/**Implementation of frame closing.*/
+	protected void closeImpl()
+	{
+		setVisible(false);	//make the frame invisible.
+	}
+
 }
