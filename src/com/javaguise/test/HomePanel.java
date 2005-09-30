@@ -430,7 +430,6 @@ Debug.trace("list control changed value to", newValue);
 		public TestFrame(final GuiseSession session)
 		{
 			super(session);
-			setStyleID("defaultFrame");
 			label=new Label(session);
 			label.getModel().setLabel("This is frame content");
 			setComponent(label);

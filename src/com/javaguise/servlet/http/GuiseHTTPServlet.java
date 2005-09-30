@@ -602,7 +602,6 @@ for(final Component<?> affectedComponent:affectedComponents)
 							guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
 //TODO fix							else	//if the component is not visible, remove the component's elements
 							guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
-							guiseContext.writeAttribute(null, "isFrame", Boolean.valueOf(dirtyComponent instanceof Frame).toString());	//isFrame="affectedComponent instanceof Frame" TODO fix hack
 							dirtyComponent.updateView(guiseContext);		//tell the component to update its view
 							guiseContext.writeElementEnd();	//</xhtml:patch>
 						}

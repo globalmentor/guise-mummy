@@ -28,7 +28,7 @@ var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX c
 
 /**Guise AJAX Response Format, content type application/x-guise-ajax-response+xml
 <response>
-	<patch isFrame="true|false"></patch>	<!--XML elements to be patched into the existing DOM tree.--> <!--TODO fix isFrame hack; perhaps just report all available component types-->
+	<patch></patch>	<!--XML elements to be patched into the existing DOM tree.-->
 	<remove id=""/>	<!--ID of the XML element to be removed from the existing DOM tree.-->
 	<navigate>uri</navigate>	<!--URI of another page to which to navigate.-->
 	<frame></frame>	<!--definition of a frame to show-->
@@ -947,6 +947,7 @@ alert("we returned, at least");
 	alert("response text: "+xmlHTTP.responseText);
 	alert("response XML: "+xmlHTTP.responseXML);
 */
+	alert("response text: "+xmlHTTP.responseText);
 					var status=0;
 					try
 					{
@@ -1048,9 +1049,6 @@ alert(exception);
 		*/ 
 		GuiseAJAX.prototype._processPatch=function(element)
 		{
-		
-			var isFrame=element.getAttribute("isFrame")=="true";	//TODO fix isFrame hack
-		
 			var childNodes=element.childNodes;	//get all the child nodes of the element
 			var childNodeCount=childNodes.length;	//find out how many children there are
 			for(var i=0; i<childNodeCount; ++i)	//for each child node
@@ -1062,16 +1060,11 @@ alert(exception);
 					if(id)	//if the element has an ID
 					{
 						var oldElement=document.getElementById(id);	//get the old element
-/*TODO del
-						if(oldElement==null && isFrame)	//if there is no old element, but the patch is for a frame, create a new frame
-						{
-						}
-*/
 						if(oldElement)	//if the element currently exists in the document
 						{
 							this._synchronizeElement(oldElement, childNode);	//synchronize this element tree
 						}
-						else if(isFrame)	//if the element doesn't currently exist, but the patch is for a frame, create a new frame
+						else if(hasClassName(childNode, "frame"))	//if the element doesn't currently exist, but the patch is for a frame, create a new frame
 						{
 							oldElement=document.importNode(childNode, true);	//create an import clone of the node
 							oldElement.style.position="absolute";	//change the element's position to absolute TODO update the element's initial position

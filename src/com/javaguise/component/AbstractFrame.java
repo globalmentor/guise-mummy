@@ -14,6 +14,27 @@ import com.javaguise.session.GuiseSession;
 public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponent<C> implements Frame<C>
 {
 
+	/**Whether the frame is moveable.*/
+	private boolean moveable=true;
+
+		/**@return Whether the frame is moveable.*/
+		public boolean isMoveable() {return moveable;}
+
+		/**Sets whether the frame is moveable.
+		This is a bound property of type <code>Boolean</code>.
+		@param newMoveable <code>true</code> if the frame should be moveable, else <code>false</code>.
+		@see Frame#MOVEABLE_PROPERTY
+		*/
+		public void setMoveable(final boolean newMoveable)
+		{
+			if(moveable!=newMoveable)	//if the value is really changing
+			{
+				final boolean oldMoveable=moveable;	//get the current value
+				moveable=newMoveable;	//update the value
+				firePropertyChange(MOVEABLE_PROPERTY, Boolean.valueOf(oldMoveable), Boolean.valueOf(newMoveable));
+			}
+		}
+
 	/**@return The data model used by this component.*/
 	public LabelModel getModel() {return (LabelModel)super.getModel();}
 
