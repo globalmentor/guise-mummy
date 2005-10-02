@@ -72,6 +72,63 @@ var STYLES=
 /**The array of drop targets, determined when the document is loaded. The drop targets are stored in increasing order of hierarchical depth.*/
 var dropTargets=new Array();
 
+/**The array of frame elements.*/
+var frames=new Array();
+
+/**Adds a frame to the array.
+This version adds the frame to the document, initializes the frame, and updates the modal state.
+@param frame The frame to add.
+*/
+frames.add=function(frame)
+{
+	document.body.appendChild(frame);	//add the frame element to the document
+	initializeNode(frame);	//initialize the new imported frame, installing the correct event handlers
+	Array.prototype.add.call(this, frame);	//do the default adding to the array
+	updateModal();	//update the modal state
+};
+
+/**Removes a frame from the array.
+This version removes the frame to the document, uninitializes the frame, and updates the modal state.
+@param frame The frame to remove.
+*/
+frames.remove=function(frame)
+{
+	var index=this.indexOf(frame);	//get the frame index
+	if(index>=0)	//if we know the index of the frame
+	{
+		Array.prototype.remove.call(this, index);	//do the default removal from the array
+		uninitializeNode(frame);	//uninitialize the frame tree
+		document.body.removeChild(frame);	//remove the frame element to the document
+		updateModal();	//update the modal state
+	}
+};
+
+/**The current modal frame, or null if there is no modal frame.*/
+var modalFrame=null;
+
+/**Updates the modal layer and current modal frame.*/
+function updateModal()
+{
+	modalFrame=null;	//start out presuming there is no modal frame
+	for(var i=frames.length-1; i>=0; --i)	//for each frame
+	{
+		var frame=frames[i];	//get a reference to this frame
+		if(hasClassName(frame, "frameModal"))	//if this is a modal frame
+		{
+			modalFrame=frame;	//indicate our modal frame TODO allow for multiple modal frames
+		}
+	}
+	if(modalFrame!=null)	//if there is a modal frame
+	{
+			//TODO update modal layer zIndex
+		modalLayer.style.display="block";	//make the modal layer visible
+	}
+	else
+	{
+		modalLayer.style.display="none";	//hide the modal layer
+	}
+}
+
 //Array
 
 /**An add() method for arrays, equivalent to Array.push().*/
@@ -442,7 +499,7 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 		while(node.childNodes.length>0)	//while there are child nodes left (remove the last node, one at a time, because because IE can sometimes add an element back in after the last one was removed)
 		{
 			var childNode=node.childNodes[node.childNodes.length-1];	//get a reference to the last node
-			eventManager.clearEvents(childNode);	//clear events for this node and descendants
+			uninitializeNode(childNode);	//uninitialize the node tree
 			node.removeChild(childNode);	//remove the last node
 		}
 	},
@@ -947,7 +1004,6 @@ alert("we returned, at least");
 	alert("response text: "+xmlHTTP.responseText);
 	alert("response XML: "+xmlHTTP.responseXML);
 */
-	alert("response text: "+xmlHTTP.responseText);
 					var status=0;
 					try
 					{
@@ -1064,7 +1120,7 @@ alert(exception);
 						{
 							this._synchronizeElement(oldElement, childNode);	//synchronize this element tree
 						}
-						else if(hasClassName(childNode, "frame"))	//if the element doesn't currently exist, but the patch is for a frame, create a new frame
+						else if(hasClass(childNode, "frame"))	//if the element doesn't currently exist, but the patch is for a frame, create a new frame
 						{
 							oldElement=document.importNode(childNode, true);	//create an import clone of the node
 							oldElement.style.position="absolute";	//change the element's position to absolute TODO update the element's initial position
@@ -1073,8 +1129,11 @@ alert(exception);
 							oldElement.style.top="10px";
 							oldElement.style.width="300px";	//TODO fix
 							oldElement.style.height="200px";
+							frames.add(oldElement);	//add this frame
+/*TODO del when works
 							document.body.appendChild(oldElement);	//add the frame element to the document
 							initializeNode(oldElement);	//initialize the new imported node, installing the correct event handlers
+*/
 						}
 					}
 				}
@@ -1092,7 +1151,15 @@ alert(exception);
 				var oldElement=document.getElementById(id);	//get the old element
 				if(oldElement!=null)	//if we found the old element
 				{
-					oldElement.parentNode.removeChild(oldElement);	//remove the old element from the document
+					if(frames.contains(oldElement))	//if we're removing a frame
+					{
+						frames.remove(oldElement);	//remove the frame
+					}
+					else	//if we're removing any other node
+					{
+						uninitializeNode(oldElement);	//uninitialize the element
+						oldElement.parentNode.removeChild(oldElement);	//remove the old element from the document
+					}
 				}
 			}
 /*TODO del when works
@@ -1238,7 +1305,7 @@ alert("child node "+i+" is of type "+childNode.nodeType+" with name "+childNode.
 					for(var i=oldChildNodeCount-1; i>=childNodeCount; --i)	//for each old child node that is not in the new node
 					{
 						var oldChildNode=oldChildNodeList[i];	//get this child node
-						eventManager.clearEvents(oldChildNode);	//clear events for this node and descendants
+						uninitializeNode(oldChildNode);	//uninitialize the node tree
 //TODO del alert("removing old node: "+oldChildNodeList[i].nodeName);
 						oldElement.removeChild(oldChildNode);	//remove this old child
 						
@@ -1654,6 +1721,9 @@ function DragState(dragSource, mouseX, mouseY)
 /**The global drag state variable.*/
 var dragState;
 
+/**The layer that allows modality by blocking user interaction to elements below.*/
+var modalLayer;
+
 //Guise functionality
 
 /**Called when the window loads.
@@ -1662,8 +1732,26 @@ This implementation installs listeners.
 function onWindowLoad()
 {
 	initializeNode(document.documentElement);	//initialize the document tree
-	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth	
+	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
 	eventManager.addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
+		//set up the modal layer
+	modalLayer=document.createElementNS("http://www.w3.org/1999/xhtml", "div");	//create a div
+	modalLayer.style.position="absolute";	//position the div absolutely
+	modalLayer.style.left="0px";
+	modalLayer.style.top="0px";
+	modalLayer.style.width="1000px";
+	modalLayer.style.height="700px";
+	modalLayer.style.zIndex=200;
+	modalLayer.style.opacity=".4";
+	modalLayer.style.filter="alpha(opacity=40)";
+	/* this hack is so it works in IE
+	 * I find setting the color in the css gives me more flexibility 
+	 * than the PNG solution.
+	 */
+	modalLayer.style.backgroundColor="transparent";
+	modalLayer.style.backgroundColor="#333333";
+	modalLayer.style.display="none";
+	document.body.appendChild(modalLayer);	//add the modal layer to the document		
 }
 
 /**Called when the window unloads.
@@ -1773,6 +1861,14 @@ function initializeNode(node)
 	{
 		initializeNode(childNodeList[i]);	//initialize this child node
 	}
+}
+
+/**Uninitializes a node and all its children, removing all added listeners.
+@param node The node to uninitialize.
+*/
+function uninitializeNode(node)
+{
+	eventManager.clearEvents(node);	//clear events for this node and descendants
 }
 
 /**Called when the contents of a text input changes.
@@ -2374,6 +2470,18 @@ function getDescendantElementByClassName(node, className)
 function hasClassName(element, className)
 {
 	var classNamesString=element.className;	//get the element's class names
+	var classNames=classNamesString ? classNamesString.split(/\s/) : EMPTY_ARRAY;	//split out the class names
+	return className instanceof RegExp ? classNames.containsMatch(className) : classNames.contains(className);	//return whether this class name is one of the class names
+}
+
+/**Determines whether the given element has the given class, using DOM methods. Multiple class names are supported.
+@param element The element that should be checked for class.
+@param className The name of the class for which to check, or a regular expression if a match should be found.
+@return true if one of the element's class names equals the given class name.
+*/
+function hasClass(element, className)
+{
+	var classNamesString=element.getAttribute("class");	//get the element's class names
 	var classNames=classNamesString ? classNamesString.split(/\s/) : EMPTY_ARRAY;	//split out the class names
 	return className instanceof RegExp ? classNames.containsMatch(className) : classNames.contains(className);	//return whether this class name is one of the class names
 }

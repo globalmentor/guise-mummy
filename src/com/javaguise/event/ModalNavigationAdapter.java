@@ -4,7 +4,7 @@ package com.javaguise.event;
 @param <R> The type of modal result the modal frame produces.
 @author Garret Wilson
 */
-public class ModalAdapter<R> implements ModalListener<R>
+public class ModalNavigationAdapter<R> implements ModalNavigationListener<R>
 {
 
 	/**Called when an a modal frame Begins its modality.

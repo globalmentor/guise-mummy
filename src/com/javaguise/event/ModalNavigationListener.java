@@ -6,10 +6,10 @@ import com.javaguise.component.ModalNavigationPanel;
 @param <R> The type of modal result the modal frame produces.
 @author Garret Wilson
 */
-public interface ModalListener<R> extends GuiseEventListener<ModalNavigationPanel<R, ?>>
+public interface ModalNavigationListener<R> extends GuiseEventListener<ModalNavigationPanel<R, ?>>
 {
 
-	/**Called when an a modal frame Begins its modality.
+	/**Called when an a modal frame begins its modality.
 	@param modalEvent The event indicating the frame beginning modality and the modal value.
 	*/
 	public void modalBegan(final ModalEvent<R> modalEvent);

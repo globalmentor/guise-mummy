@@ -159,7 +159,7 @@ Debug.trace("list control changed value to", newValue);
 				{
 					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
 					{
-						getSession().navigateModal("edituser", new ModalAdapter<Object>()
+						getSession().navigateModal("edituser", new ModalNavigationAdapter<Object>()
 								{
 									/**Called when an a modal panel ends its modality.
 									@param modalEvent The event indicating the panel ending modality and the modal value.
@@ -192,10 +192,23 @@ Debug.trace("list control changed value to", newValue);
 							frame.getModel().setLabel("Test Frame");
 						}
 	Debug.trace("ready to set frame visible");
-						frame.setVisible(true);
+						frame.open();
 					}
 				});
 		buttonPanel.add(frameLink);
+
+		final Link modalFrameLink=new Link(session);
+		modalFrameLink.getModel().setLabel("Modal Frame");
+		modalFrameLink.getModel().addActionListener(new ActionListener<ActionModel>()
+				{
+					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
+					{
+						final DefaultDialogFrame<Boolean> dialog=new DefaultDialogFrame<Boolean>(session, Boolean.class);
+						dialog.getModel().setLabel("Test Dialog");
+						dialog.open(true);
+					}
+				});
+		buttonPanel.add(modalFrameLink);
 
 		contentPanel.add(buttonPanel);	//add the button panel to the panel
 		final TextControl<String> textInput=new TextControl<String>(session, "textInput", String.class);	//create a text input control

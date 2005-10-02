@@ -52,7 +52,7 @@ public class EditUsersPanel extends DefaultNavigationPanel
 				{
 					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
 					{
-						session.navigateModal(DemoApplication.EDIT_USER_PANEL_NAVIGATION_PATH, new ModalListener<DemoUser>()	//navigate modally to the edit user panel
+						session.navigateModal(DemoApplication.EDIT_USER_PANEL_NAVIGATION_PATH, new ModalNavigationListener<DemoUser>()	//navigate modally to the edit user panel
 								{
 									public void modalBegan(final ModalEvent<DemoUser> modalEvent)	//when modal editing begins
 									{
@@ -94,7 +94,7 @@ public class EditUsersPanel extends DefaultNavigationPanel
 						final DemoUser user=userListControl.getModel().getSelectedValue();	//get the selected user
 						if(user!=null)	//if a user is selected
 						{
-							session.navigateModal(DemoApplication.EDIT_USER_PANEL_NAVIGATION_PATH, new ModalListener<DemoUser>()	//navigate modally to the edit user panel
+							session.navigateModal(DemoApplication.EDIT_USER_PANEL_NAVIGATION_PATH, new ModalNavigationListener<DemoUser>()	//navigate modally to the edit user panel
 									{
 										public void modalBegan(final ModalEvent<DemoUser> modalEvent)	//when modal editing begins
 										{

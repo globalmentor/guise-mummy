@@ -62,6 +62,13 @@ public class GuiseCSSStyleConstants
 	/**The CSS class suffix for the tab set part of a tabbed panel.*/
 	public final static String TABBED_PANEL_TABS_CLASS_SUFFIX="-tabs";
 
+		//frames
+	/**The CSS class for a closed frame.*/
+	public final static String FRAME_CLOSED_CLASS="frameClosed";
+	/**The CSS class for an open, nonmodal frame.*/
+	public final static String FRAME_NONMODAL_CLASS="frameNonmodal";
+	/**The CSS class for an open, modal frame.*/
+	public final static String FRAME_MODAL_CLASS="frameModal";
 
 		//drag and drop
 	/**The potential source of a drag and drop operation.*/

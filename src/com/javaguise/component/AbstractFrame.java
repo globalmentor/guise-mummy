@@ -14,24 +14,87 @@ import com.javaguise.session.GuiseSession;
 public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponent<C> implements Frame<C>
 {
 
-	/**Whether the frame is moveable.*/
-	private boolean moveable=true;
+	/**The state of the frame.*/
+	private State state=State.CLOSED;
 
-		/**@return Whether the frame is moveable.*/
-		public boolean isMoveable() {return moveable;}
+		/**@return The state of the frame.*/
+		public State getState() {return state;}
 
-		/**Sets whether the frame is moveable.
-		This is a bound property of type <code>Boolean</code>.
-		@param newMoveable <code>true</code> if the frame should be moveable, else <code>false</code>.
-		@see Frame#MOVEABLE_PROPERTY
+		/**Sets the state of the frame.
+		This is a bound property.
+		@param newState The new state of the frame.
+		@see Frame#STATE_PROPERTY 
 		*/
-		public void setMoveable(final boolean newMoveable)
+		protected void setState(final State newState)
 		{
-			if(moveable!=newMoveable)	//if the value is really changing
+			if(state!=newState)	//if the value is really changing
 			{
-				final boolean oldMoveable=moveable;	//get the current value
-				moveable=newMoveable;	//update the value
-				firePropertyChange(MOVEABLE_PROPERTY, Boolean.valueOf(oldMoveable), Boolean.valueOf(newMoveable));
+				final State oldState=state;	//get the old value
+				state=newState;	//actually change the value
+				firePropertyChange(STATE_PROPERTY, oldState, newState);	//indicate that the value changed
+			}			
+		}
+
+	/**Whether the frame is modal if and when it is open.*/
+	private boolean modal=false;
+
+		/**@return Whether the frame is modal if and when it is open.*/
+		public boolean isModal() {return modal;}
+
+		/**Sets whether the frame is modal if and when it is open.
+		This is a bound property of type <code>Boolean</code>.
+		@param newModal <code>true</code> if the frame should be modal, else <code>false</code>.
+		@see Frame#MODAL_PROPERTY
+		*/
+		public void setModal(final boolean newModal)
+		{
+			if(modal!=newModal)	//if the value is really changing
+			{
+				final boolean oldModal=modal;	//get the current value
+				modal=newModal;	//update the value
+				firePropertyChange(MODAL_PROPERTY, Boolean.valueOf(oldModal), Boolean.valueOf(newModal));
+			}
+		}
+
+	/**Whether the frame is movable.*/
+	private boolean movable=true;
+
+		/**@return Whether the frame is movable.*/
+		public boolean isMovable() {return movable;}
+
+		/**Sets whether the frame is movable.
+		This is a bound property of type <code>Boolean</code>.
+		@param newMovable <code>true</code> if the frame should be movable, else <code>false</code>.
+		@see Frame#MOVABLE_PROPERTY
+		*/
+		public void setMovable(final boolean newMovable)
+		{
+			if(movable!=newMovable)	//if the value is really changing
+			{
+				final boolean oldMovable=movable;	//get the current value
+				movable=newMovable;	//update the value
+				firePropertyChange(MOVABLE_PROPERTY, Boolean.valueOf(oldMovable), Boolean.valueOf(newMovable));
+			}
+		}
+
+	/**Whether the frame can be resized.*/
+	private boolean resizable=true;
+
+		/**@return Whether the frame can be resized.*/
+		public boolean isResizable() {return resizable;}
+
+		/**Sets whether the frame can be resized.
+		This is a bound property of type <code>Boolean</code>.
+		@param newResizable <code>true</code> if the frame can be resized, else <code>false</code>.
+		@see Frame#RESIZABLE_PROPERTY
+		*/
+		public void setResizable(final boolean newResizable)
+		{
+			if(resizable!=newResizable)	//if the value is really changing
+			{
+				final boolean oldResizable=resizable;	//get the current value
+				resizable=newResizable;	//update the value
+				firePropertyChange(MOVABLE_PROPERTY, Boolean.valueOf(oldResizable), Boolean.valueOf(newResizable));
 			}
 		}
 
@@ -87,33 +150,6 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 		return component!=null ? new ObjectIterator<Component<?>>(getComponent()) : new EmptyIterator<Component<?>>();
 	}
 
-	/**Whether this frame has been initialized.*/
-	private boolean initialized=false;
-
-	/**Sets whether the frame is visible.
-	This version registers or unregisters the frame with the session as needed.
-	@param newVisible <code>true</code> if the component should be visible, else <code>false</code>.
-	@see Component#VISIBLE_PROPERTY
-	*/
-	public void setVisible(final boolean newVisible)
-	{
-		if(isVisible()!=newVisible)	//if the value is really changing
-		{
-			if(initialized)	//if we've initialized the frame
-			{
-				if(newVisible)	//if the frame is being shown
-				{
-					getSession().addFrame(this);	//add the frame to the session
-				}
-				else	//if the frame is being hidden
-				{
-					getSession().removeFrame(this);	//remove the frame from the session
-				}
-			}
-		}
-		super.setVisible(newVisible);	//set the visibility normally
-	}
-
 	/**Session, ID, model, and component constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
@@ -126,8 +162,34 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 	{
 		super(session, id, model);	//construct the parent class
 		this.component=component;	//set the child component
-		setVisible(false);	//default to not being visible
-		initialized=true;	//show that we've initialized the frame
+	}
+
+	/**Opens the frame with the currently set modality.
+	Opening the frame registers the frame with the session.
+	If the frame is already open, no action occurs.
+	@see #getState() 
+	@see Frame#STATE_PROPERTY
+	*/
+	public void open()
+	{
+		if(getState()==State.CLOSED)	//if the state is closed
+		{
+			getSession().addFrame(this);	//add the frame to the session
+			setState(State.OPEN);	//change the state
+		}		
+	}
+
+	/**Opens the frame, specifying modality.
+	Opening the frame registers the frame with the session.
+	If the frame is already open, no action occurs.
+	@param modal <code>true</code> if the frame should be opened as a modal frame, else <code>false</code>.
+	@see #getState() 
+	@see Frame#STATE_PROPERTY
+	*/
+	public void open(final boolean modal)
+	{
+		setModal(modal);	//update the modality
+		open();	//open the frame normally
 	}
 
 	/**Determines whether the frame should be allowed to close.
@@ -137,25 +199,33 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 	*/
 	public boolean canClose()
 	{
-		return true;	//always allow the frame to be closed
+		return true;	//by default always allow the frame to be closed
 	}
 
 	/**Closes the frame.
+	Closing the frame unregisters the frame with the session.
+	If the frame is already closed, no action occurs.
 	This method calls {@link #canClose()} and only performs closing functionality if that method returns <code>true</code>.
-	This method delegates actual closing to {@link #closeImpl()}, and that method should be overridden rather than this one. 
+	This method delegates actual closing to {@link #closeImpl()}, and that method should be overridden rather than this one.
+	@see #getState() 
+	@see Frame#STATE_PROPERTY
 	*/
 	public final void close()
 	{
-		if(canClose())	//if the frame can close
+		if(getState()!=State.CLOSED)	//if the frame is not already closed
 		{
-			closeImpl();	//actually close the frame
+			if(canClose())	//if the frame can close
+			{
+				closeImpl();	//actually close the frame
+			}
 		}
 	}
 	
 	/**Implementation of frame closing.*/
 	protected void closeImpl()
 	{
-		setVisible(false);	//make the frame invisible.
+		getSession().removeFrame(this);	//remove the frame from the session
+		setState(State.CLOSED);	//change the state
 	}
 
 }

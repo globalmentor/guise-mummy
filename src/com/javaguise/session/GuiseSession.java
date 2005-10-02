@@ -10,7 +10,7 @@ import com.javaguise.GuiseApplication;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.Orientation;
 import com.javaguise.context.GuiseContext;
-import com.javaguise.event.ModalListener;
+import com.javaguise.event.ModalNavigationListener;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
@@ -308,9 +308,9 @@ public interface GuiseSession extends PropertyBindable
 	@param modalListener The listener to respond to the end of modal interaction.
 	@exception NullPointerException if the given path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
-	@see #navigateModal(URI, ModalListener)
+	@see #navigateModal(URI, ModalNavigationListener)
 	*/
-	public <R> void navigateModal(final String path, final ModalListener<R> modalListener);
+	public <R> void navigateModal(final String path, final ModalNavigationListener<R> modalListener);
 
 	/**Requests modal navigation to the specified URI.
 	The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
@@ -320,7 +320,7 @@ public interface GuiseSession extends PropertyBindable
 	@param modalListener The listener to respond to the end of modal interaction.
 	@exception NullPointerException if the given URI is <code>null</code>.
 	*/
-	public <R> void navigateModal(final URI uri, final ModalListener<R> modalListener);
+	public <R> void navigateModal(final URI uri, final ModalNavigationListener<R> modalListener);
 
 	/**@return A new component ID appropriate for using with a new component.*/
 	public String generateComponentID();

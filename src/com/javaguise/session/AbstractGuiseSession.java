@@ -17,7 +17,7 @@ import com.javaguise.component.*;
 import com.javaguise.component.layout.Orientation;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.event.ModalEvent;
-import com.javaguise.event.ModalListener;
+import com.javaguise.event.ModalNavigationListener;
 import com.garretwilson.io.BOMInputStreamReader;
 import static com.garretwilson.io.WriterUtilities.*;
 import com.garretwilson.lang.ObjectUtilities;
@@ -546,7 +546,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		this.locale=application.getDefaultLocale();	//default to the application locale
 		this.orientation=Orientation.getOrientation(locale);	//set the orientation default based upon the locale
 		this.applicationFrame=application.createApplicationFrame(this);	//create the application frame
-		this.applicationFrame.setVisible(true);	//show the application frame
+		this.applicationFrame.open();	//open the application frame
 	}
 
 	/**Retrieves the panel bound to the given appplication context-relative path.
@@ -733,7 +733,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			releaseNavigationPanel(navigationPath);	//release the panel associated with this navigation path
 			if(modalNavigation!=null)	//if we if we ended modality for the panel
 			{
-				((ModalListener<R>)modalNavigation.getModalListener()).modalEnded(new ModalEvent<R>(this, modalPanel, modalPanel.getResult()));	//send an event to the modal listener
+				((ModalNavigationListener<R>)modalNavigation.getModalListener()).modalEnded(new ModalEvent<R>(this, modalPanel, modalPanel.getResult()));	//send an event to the modal listener
 			}
 			return modalNavigation!=null;	//return whether we ended modality
 		}
@@ -813,9 +813,9 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@param modalListener The listener to respond to the end of modal interaction.
 		@exception NullPointerException if the given path is <code>null</code>.
 		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
-		@see #navigateModal(URI, ModalListener)
+		@see #navigateModal(URI, ModalNavigationListener)
 		*/
-		public <R> void navigateModal(final String path, final ModalListener<R> modalListener)
+		public <R> void navigateModal(final String path, final ModalNavigationListener<R> modalListener)
 		{
 			navigateModal(createPathURI(path), modalListener);	//navigate to the requested URI, converting the path to a URI and verifying that it is only a path
 		}
@@ -828,7 +828,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@param modalListener The listener to respond to the end of modal interaction.
 		@exception NullPointerException if the given URI is <code>null</code>.
 		*/
-		public <R> void navigateModal(final URI uri, final ModalListener<R> modalListener)
+		public <R> void navigateModal(final URI uri, final ModalNavigationListener<R> modalListener)
 		{
 			requestedNavigation=new ModalNavigation<R>(getApplication().resolveURI(createPathURI(getNavigationPath())), getApplication().resolveURI(checkNull(uri, "URI cannot be null.")), modalListener);	//resolve the URI against the application context path
 		}		
