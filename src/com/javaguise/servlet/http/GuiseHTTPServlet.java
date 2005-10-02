@@ -478,8 +478,8 @@ Debug.info("content type:", request.getContentType());
 		final NavigationPanel navigationPanel=guiseSession.getNavigationPanel(navigationPath);	//get the panel bound to the requested path
 		if(navigationPanel!=null)	//if we found a panel class for this address
 		{
-			final Set<Frame<?>> frames=new HashSet<Frame<?>>();	//create a set of frames TODO testing
-			CollectionUtilities.addAll(frames, guiseSession.getFrameIterator());	//get all the current frames; we'll determine which ones were removed, later TODO improve all this
+			final Set<Frame<?>> removedFrames=new HashSet<Frame<?>>();	//create a set of frames so that we can know which ones were removed TODO testing
+			CollectionUtilities.addAll(removedFrames, guiseSession.getFrameIterator());	//get all the current frames; we'll determine which ones were removed, later TODO improve all this
 			
 			
 			final List<ControlEvent> controlEvents=getControlEvents(request);	//get all control events from the request
@@ -548,6 +548,7 @@ Debug.trace("ready to process event", controlEvent, "for component", component);
 						}
 					}
 					guiseContext.setState(GuiseContext.State.INACTIVE);	//deactivate the context so that any model update events will be generated
+				}					
 /*TODO del
 Debug.trace("we now have affected components:", affectedComponents.size());
 for(final Component<?> affectedComponent:affectedComponents)
@@ -555,61 +556,84 @@ for(final Component<?> affectedComponent:affectedComponents)
 	Debug.trace("affected component:", affectedComponent);
 }
 */
-					final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
-					if(requestedNavigation!=null)	//if navigation is requested
-					{
-						final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
+				final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
+				if(requestedNavigation!=null)	//if navigation is requested
+				{
+					final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
 //TODO del Debug.trace("navigation requested to", requestedNavigationURI);
-						guiseSession.clearRequestedNavigation();	//remove any navigation requests
-						if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
-						{
-							beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation<?>)requestedNavigation);	//begin the modal navigation
-						}
-						//TODO ifAJAX()
-						guiseContext.writeElementBegin(null, "navigate");	//<navigate>	//TODO use a constant
-						guiseContext.write(requestedNavigationURI.toString());	//write the navigation URI
-						guiseContext.writeElementEnd();	//</navigate>
+					guiseSession.clearRequestedNavigation();	//remove any navigation requests
+					if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
+					{
+						beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation<?>)requestedNavigation);	//begin the modal navigation
+					}
+					//TODO ifAJAX()
+					guiseContext.writeElementBegin(null, "navigate");	//<navigate>	//TODO use a constant
+					guiseContext.write(requestedNavigationURI.toString());	//write the navigation URI
+					guiseContext.writeElementEnd();	//</navigate>
 //TODO if !AJAX						throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
-						//TODO store a flag or something---if we're navigating, we probably should flush the other queued events
-					}
+					//TODO store a flag or something---if we're navigating, we probably should flush the other queued events
+				}
 
-					
-					final Frame<?> applicationFrame=guiseSession.getApplicationFrame();	//get the application frame
-					final Collection<Component<?>> dirtyComponents=getDirtyComponents(guiseSession);	//get all dirty components in all the session frames 
+				
+				final Frame<?> applicationFrame=guiseSession.getApplicationFrame();	//get the application frame
+				final Collection<Component<?>> dirtyComponents=getDirtyComponents(guiseSession);	//get all dirty components in all the session frames 
 
-					CollectionUtilities.removeAll(frames, guiseSession.getFrameIterator());	//remove all the ending frames, leaving us the frames that were removed TODO improve all this
+				CollectionUtilities.removeAll(removedFrames, guiseSession.getFrameIterator());	//remove all the ending frames, leaving us the frames that were removed TODO improve all this
 //TODO fix					dirtyComponents.addAll(frames);	//add all the frames that were removed
-					
-					Debug.trace("we now have dirty components:", dirtyComponents.size());
-					for(final Component<?> affectedComponent:dirtyComponents)
+/*TODO del
+					if(controlEvent instanceof InitControlEvent)	//if this is an initialization event
 					{
-						Debug.trace("affected component:", affectedComponent);
+Debug.trace("found init event; currently have frame count:", frames.size());
+						CollectionUtilities.addAll(frames, guiseSession.getFrameIterator());	//get all the current frames so that the page can have the most up-to-date frame information
+Debug.trace("now have frames: ", frames.size());
 					}
-					
-					
-					
-					if(dirtyComponents.contains(applicationFrame))	//if the application frame itself was affected, we might as well reload the page
+*/
+				
+				Debug.trace("we now have dirty components:", dirtyComponents.size());
+				for(final Component<?> affectedComponent:dirtyComponents)
+				{
+					Debug.trace("affected component:", affectedComponent);
+				}
+				
+				
+				
+				if(dirtyComponents.contains(applicationFrame))	//if the application frame itself was affected, we might as well reload the page
+				{
+					guiseContext.writeElementBegin(null, "reload", true);	//<reload>	//TODO use a constant
+					guiseContext.writeElementEnd();	//</reload>						
+				}
+				else	//if the application frame wasn't affected
+				{
+					guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view
+					for(final Component<?> dirtyComponent:dirtyComponents)	//for each component affected by this update cycle
 					{
-						guiseContext.writeElementBegin(null, "reload", true);	//<reload>	//TODO use a constant
-						guiseContext.writeElementEnd();	//</reload>						
-					}
-					else	//if the application frame wasn't affected
-					{
-						guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view
-						for(final Component<?> dirtyComponent:dirtyComponents)	//for each component affected by this update cycle
-						{
 //TODO fix							if(dirtyComponent.isVisible())	//if the component is visible
-							guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
+						guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
 //TODO fix							else	//if the component is not visible, remove the component's elements
-							guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
-							dirtyComponent.updateView(guiseContext);		//tell the component to update its view
-							guiseContext.writeElementEnd();	//</xhtml:patch>
-						}
-						for(final Frame<?> frame:frames)	//for each removed frame
+						guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
+						dirtyComponent.updateView(guiseContext);		//tell the component to update its view
+						guiseContext.writeElementEnd();	//</xhtml:patch>
+					}
+					for(final Frame<?> frame:removedFrames)	//for each removed frame
+					{
+						guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "remove");	//<xhtml:remove>	//TODO use a constant TODO don't use the XHTML namespace if we can help it								
+						guiseContext.writeAttribute(null, "id", frame.getID());	//TODO fix
+						guiseContext.writeElementEnd();	//</xhtml:remove>							
+					}
+					if(controlEvent instanceof InitControlEvent)	//if this is an initialization event TODO maybe just dirty all the frames so this happens automatically
+					{
+						final Iterator<Frame<?>> frameIterator=guiseSession.getFrameIterator();	//get an iterator to all the frames
+						while(frameIterator.hasNext())	//while there are more frames
 						{
-							guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "remove");	//<xhtml:remove>	//TODO use a constant TODO don't use the XHTML namespace if we can help it								
-							guiseContext.writeAttribute(null, "id", frame.getID());	//TODO fix
-							guiseContext.writeElementEnd();	//</xhtml:remove>							
+							final Frame<?> frame=frameIterator.next();	//get the next frame
+							if(frame!=guiseSession.getApplicationFrame())	//don't send back the application frame
+							{
+								guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
+	//							TODO fix							else	//if the component is not visible, remove the component's elements
+								guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
+								frame.updateView(guiseContext);		//tell the component to update its view
+								guiseContext.writeElementEnd();	//</xhtml:patch>
+							}
 						}
 					}
 				}
@@ -759,6 +783,11 @@ for(final Component<?> affectedComponent:affectedComponents)
 							final String dropTargetID=((Element)targetNode).getAttribute("id");	//TODO tidy; improve; comment
 							final DropControlEvent dropEvent=new DropControlEvent(dragSourceID, dropTargetID);	//create a new drop event
 							controlEventList.add(dropEvent);	//add the event to the list
+						}
+						else if("init".equals(eventNode.getNodeName()))	//if this is an initialization event TODO use a constant
+						{
+							final InitControlEvent initEvent=new InitControlEvent();	//create a new initialization event
+							controlEventList.add(initEvent);	//add the event to the list
 						}
 					}
 				}

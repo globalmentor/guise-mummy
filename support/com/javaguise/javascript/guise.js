@@ -5,6 +5,7 @@ var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX c
 
 /**Guise AJAX Request Format, content type application/x-guise-ajax-request+xml
 <request>
+	<init/>	<!--initializes the page, requesting all frames to be resent-->
 	<events>	<!--the list of events (zero or more)-->
 		<form exhaustive="true|false">	<!--information resulting from form changes, analogous to that in an HTTP POST; exhaustive indicates whether the event contains values for all form controls (defaults to false)-->
 			<control name="">	<!--a control change (zero or more)-->
@@ -569,6 +570,14 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 	
 };
 
+//Initialization AJAX Event
+
+/**A class indicating an initialization AJAX request.
+*/
+function InitAJAXEvent()
+{
+}
+
 //Form AJAX Event
 
 /**A class encapsulating form information for an AJAX request.
@@ -828,7 +837,8 @@ function GuiseAJAX()
 				REQUEST: "request", EVENTS: "events",
 				FORM: "form", CONTROL: "control", NAME: "name", VALUE: "value",
 				ACTION: "action", COMPONENT_ID: "componentID", TARGET_ID: "targetID", ACTION_ID: "actionID",
-				DROP: "drop", SOURCE: "source", TARGET: "target", MOUSE: "mouse", ID: "id", X: "x", Y: "y"
+				DROP: "drop", SOURCE: "source", TARGET: "target", MOUSE: "mouse", ID: "id", X: "x", Y: "y",
+				INIT: "init"
 			};
 
 		/**The content type of a Guise AJAX response.*/
@@ -877,6 +887,10 @@ function GuiseAJAX()
 						else if(ajaxRequest instanceof DropAJAXEvent)	//if this is a drop event
 						{
 							this._appendDropAJAXEvent(requestStringBuilder, ajaxRequest);	//append the drop event
+						}
+						else if(ajaxRequest instanceof InitAJAXEvent)	//if this is an initialization event
+						{
+							this._appendInitAJAXEvent(requestStringBuilder, ajaxRequest);	//append the init event
 						}
 					}
 					this.appendXMLEndTag(requestStringBuilder, this.RequestElement.EVENTS);	//</events>
@@ -934,7 +948,7 @@ function GuiseAJAX()
 			this.appendXMLStartTag(stringBuilder, this.RequestElement.ACTION,	//<action>
 					new Parameter(this.RequestElement.COMPONENT_ID, ajaxActionEvent.componentID),	//componentID="componentID"
 					new Parameter(this.RequestElement.TARGET_ID, ajaxActionEvent.targetID),	//targetID="targetID"
-					new Parameter(this.RequestElement.ACTION_ID, ajaxActionEvent.actionID))	//actionID="actionID"
+					new Parameter(this.RequestElement.ACTION_ID, ajaxActionEvent.actionID));	//actionID="actionID"
 			this.appendXMLEndTag(stringBuilder, this.RequestElement.ACTION);	//</action>
 			return stringBuilder;	//return the string builder
 		};
@@ -954,6 +968,18 @@ function GuiseAJAX()
 			this.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE, new Parameter(this.RequestElement.X, ajaxDropEvent.mousePosition.x), new Parameter(this.RequestElement.Y, ajaxDropEvent.mousePosition.y));	//<mouse x="x" y="y">
 			this.appendXMLEndTag(stringBuilder, this.RequestElement.MOUSE);	//</mouse>
 			this.appendXMLEndTag(stringBuilder, this.RequestElement.DROP);	//</drop>
+			return stringBuilder;	//return the string builder
+		};
+
+		/**Appends an AJAX initialization event to a string builder.
+		@param stringBuilder The string builder collecting the request data.
+		@param ajaxInitEvent The init event information to append.
+		@return The string builder.
+		*/
+		GuiseAJAX.prototype._appendInitAJAXEvent=function(stringBuilder, ajaxInitEvent)
+		{
+			this.appendXMLStartTag(stringBuilder, this.RequestElement.INIT);	//<init>
+			this.appendXMLEndTag(stringBuilder, this.RequestElement.INIT);	//</init>
 			return stringBuilder;	//return the string builder
 		};
 
@@ -1170,10 +1196,12 @@ alert(exception);
 							oldElement=document.importNode(childNode, true);	//create an import clone of the node
 							oldElement.style.position="absolute";	//change the element's position to absolute TODO update the element's initial position
 							oldElement.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components
+/*TODO del
 							oldElement.style.left="10px";	//TODO fix
 							oldElement.style.top="10px";
 							oldElement.style.width="300px";	//TODO fix
 							oldElement.style.height="200px";
+*/
 							frames.add(oldElement);	//add this frame
 /*TODO del when works
 							document.body.appendChild(oldElement);	//add the frame element to the document
@@ -1802,6 +1830,7 @@ function onWindowLoad()
 	{
 		focusable.focus();	//focus on the node
 	}
+	guiseAJAX.sendAJAXRequest(new InitAJAXEvent());	//send an initialization AJAX request
 }
 
 /**Called when the window unloads.
