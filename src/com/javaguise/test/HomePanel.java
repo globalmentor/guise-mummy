@@ -205,6 +205,15 @@ Debug.trace("list control changed value to", newValue);
 					{
 						final DefaultDialogFrame<Boolean> dialog=new DefaultDialogFrame<Boolean>(session, Boolean.class);
 						dialog.getModel().setLabel("Test Dialog");
+						
+						final TextControl<Float> inputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
+						inputTextControl.getModel().setLabel("Input Number");	//add a label to the text input control
+						inputTextControl.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
+						((Container<?>)dialog.getComponent()).add(inputTextControl);	//add the input control to the input panel
+						final TextControl<Float> outputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
+						outputTextControl.getModel().setLabel("Double the Number");	//add a label to the text output control
+						((Container<?>)dialog.getComponent()).add(outputTextControl);	//add the output control to the input panel
+						
 						dialog.open(true);
 					}
 				});

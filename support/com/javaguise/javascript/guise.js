@@ -1,6 +1,5 @@
 /**Guise(TM) JavaScript support routines
 Copyright (c) 2005 GlobalMentor, Inc.
-Modal window support referenced code by Danny Goodman, http://www.dannyg.com/ .
 var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX communication should not occur.
 */
 
@@ -85,6 +84,11 @@ frames.add=function(frame)
 	initializeNode(frame);	//initialize the new imported frame, installing the correct event handlers
 	Array.prototype.add.call(this, frame);	//do the default adding to the array
 	updateModal();	//update the modal state
+	var focusable=getFocusableDescendant(frame);	//see if this frame has a node that can be focused
+	if(focusable)	//if we found a focusable node
+	{
+		focusable.focus();	//focus on the node
+	}
 };
 
 /**Removes a frame from the array.
@@ -209,13 +213,26 @@ var EMPTY_ARRAY=new Array();	//a shared empty array
 if(typeof document.createElementNS=="undefined")	//if the document does not support createElementNS(), create a substitute
 {
 	/**Create an element for the given namespace URI and qualified name using the document.createElement() method.
-	@param namespaceURI The URI of the of the namespace.
+	@param namespaceURI The URI of the namespace.
 	@param qname The qualified name of the element.
 	@return The new created element.
 	*/
 	document.createElementNS=function(namespaceURI, qname)	//create an adapter function to call document.createElement()
 	{
     return document.createElement(qname);	//create the element, ignoring the namespace
+	};
+}
+
+if(typeof document.createAttributeNS=="undefined")	//if the document does not support createAttributeNS(), create a substitute
+{
+	/**Create an attribute for the given namespace URI and qualified name using the document.createAttribute() method.
+	@param namespaceURI The URI of the namespace.
+	@param qname The qualified name of the attribute.
+	@return The new created attribute.
+	*/
+	document.createAttributeNS=function(namespaceURI, qname)	//create an adapter function to call document.createAttribute()
+	{
+    return document.createAttribute(qname);	//create the attribute, ignoring the namespace
 	};
 }
 
@@ -248,7 +265,7 @@ if(typeof document.importNode=="undefined")	//if the document does not support d
 				for(var i=0; i<attributeCount; ++i)	//for each attribute
 				{
 					var attribute=attributes[i];	//get this attribute
-					if(document.createAttributeNS instanceof Function && typeof attribute.namespaceURI!="undefined")	//if the attribute supports namespaces
+					if(document.createAttributeNS instanceof Function && importedNode.setAttributeNodeNS instanceof Function && typeof attribute.namespaceURI!="undefined")	//if the attribute supports namespaces
 					{
 						var importedAttribute=document.createAttributeNS(attribute.namespaceURI, attribute.nodeName);	//create a namespace-aware attribute
 						importedAttribute.nodeValue=attribute.nodeValue;	//set the attribute value
@@ -375,6 +392,14 @@ function Parameter(name, value) {this.name=name; this.value=value;}
 @param y: The Y coordinate, stored under this.y;
 */
 function Point(x, y) {this.x=x; this.y=y;}
+
+//Size
+
+/**A class encapsulating a size.
+@param width: The width, stored under this.width;
+@param height: The height coordinate, stored under this.height;
+*/
+function Size(width, height) {this.width=width; this.height=height;}
 
 //URI
 
@@ -520,8 +545,28 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 			default:	//for all other class names, return the DOM attribute
 				return domAttributeName;
 		}
-	}
+	},
 
+	/**Sets the attribute value of an element, using namespaces if the DOM supports them.
+	@param element The element for which an attribute should be set.
+	@param namespaceURI The URI of the namespace.
+	@param qname The qualified name of the attribute.
+	@param value The value of the attribute.
+	*/
+	setAttributeNS:function(element, namespaceURI, qname, value)
+	{
+		var attribute=document.createAttributeNS(namesapceURI, qname);	//create the attribute
+		attribute.nodeValue=value;	//set the value
+		if(element.setAttributeNodeNS instanceof Function)	//if this DOM supports setAttributeNodeNS
+		{
+			element.setAttributeNodeNS(attribute);	//use a namespace-aware attribute setting function
+		}
+		else	//if the DOM isn't namespace aware
+		{
+			element.setAttributeNode(attribute);	//set the attribute with no namespace information
+		}
+	}
+	
 };
 
 //Form AJAX Event
@@ -1722,7 +1767,21 @@ function DragState(dragSource, mouseX, mouseY)
 var dragState;
 
 /**The layer that allows modality by blocking user interaction to elements below.*/
-var modalLayer;
+var modalLayer=null;
+
+/**Updates the size of the modal layer, creating it if necessary.*/
+function updateModalLayer()
+{
+	if(modalLayer==null)	//if the modal layer has not yet been created
+	{
+		modalLayer=document.createElementNS("http://www.w3.org/1999/xhtml", "div");	//create a div
+		modalLayer.className="modalLayer";	//load the modal layer style
+		document.body.appendChild(modalLayer);	//add the modal layer to the document
+	}
+	var pageSize=getPageSize();	//get the size of the page
+	modalLayer.style.width=pageSize.width+"px";	//update the size of the modal layer
+	modalLayer.style.height=pageSize.height+"px";
+}
 
 //Guise functionality
 
@@ -1731,36 +1790,44 @@ This implementation installs listeners.
 */
 function onWindowLoad()
 {
+	eventManager.addEvent(window, "resize", onWindowResize, false);	//add a resize listener
+	eventManager.addEvent(window, "scroll", onWindowResize, false);	//add a scroll listener
+	eventManager.addEvent(window, "unload", onWindowUnload, false);	//do the appropriate uninitialization when the window unloads
 	initializeNode(document.documentElement);	//initialize the document tree
 	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
 	eventManager.addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
-		//set up the modal layer
-	modalLayer=document.createElementNS("http://www.w3.org/1999/xhtml", "div");	//create a div
-	modalLayer.style.position="absolute";	//position the div absolutely
-	modalLayer.style.left="0px";
-	modalLayer.style.top="0px";
-	modalLayer.style.width="1000px";
-	modalLayer.style.height="700px";
-	modalLayer.style.zIndex=200;
-	modalLayer.style.opacity=".4";
-	modalLayer.style.filter="alpha(opacity=40)";
-	/* this hack is so it works in IE
-	 * I find setting the color in the css gives me more flexibility 
-	 * than the PNG solution.
-	 */
-	modalLayer.style.backgroundColor="transparent";
-	modalLayer.style.backgroundColor="#333333";
-	modalLayer.style.display="none";
-	document.body.appendChild(modalLayer);	//add the modal layer to the document		
+	updateModalLayer();	//create and update the modal layer
+	var focusable=getFocusableDescendant(document.documentElement);	//see if the document has a node that can be focused
+	if(focusable)	//if we found a focusable node
+	{
+		focusable.focus();	//focus on the node
+	}
 }
 
 /**Called when the window unloads.
 This implementation uninstalls all listeners.
+@param event The object containing event information.
 */
-function onWindowUnload()
+function onWindowUnload(event)
 {
 	AJAX_URI=null;	//turn off AJAX
 	eventManager.clearEvents();	//unload all events
+}
+
+/**Called when the window resizes.
+This implementation updates the modal layer.
+@param event The object containing event information.
+*/
+function onWindowResize(event)
+{
+	updateModalLayer();	//update the modal layer
+}
+
+/**Called when the window scrolls.
+@param event The object containing event information.
+*/
+function onWindowScroll(event)
+{
 }
 
 /**Initializes a node and all its children, adding the correct listeners.
@@ -1851,6 +1918,16 @@ function initializeNode(node)
 							break;
 					}
 				}
+				if(node.focus)	//if this element can receive the focus
+				{
+/*TODO fix
+					if(node.nodeName=="a")
+					{
+						alert("listening for focus on a");
+					}
+*/
+					eventManager.addEvent(node, "focus", onFocus, false);	//listen for focus events
+				}
 			}
 			break;
 	}
@@ -1869,6 +1946,89 @@ function initializeNode(node)
 function uninitializeNode(node)
 {
 	eventManager.clearEvents(node);	//clear events for this node and descendants
+}
+
+//TODO del var test=new Array();
+
+var lastFocusedNode=null;
+
+/**Called when an element receives a focus event.
+@param event The object containing event information.
+*/
+function onFocus(event)
+{
+	var currentTarget=event.currentTarget;	//get the control receiving the focus
+	if(modalFrame!=null)	//if there is a modal frame
+	{
+	
+//TODO del var dummy=currentTarget.nodeName+" "+currentTarget.id;
+
+		if(!hasAncestor(currentTarget, modalFrame))	//if focus is trying to go to something outside the modal frame
+		{
+//TODO fix alert("focus outside of frame");
+			if(hasAncestor(lastFocusedNode, modalFrame))	//if we know the last focused node, and it was in the modal frame
+			{
+
+//TODO del dummy+=" changing to last focused "+lastFocusedNode.nodeName+" id "+lastFocusedNode.id;
+
+				lastFocusedNode.focus();	//focus back on the last focused node
+
+
+			}
+			else	//if we don't know the last focused node
+			{
+				var focusable=getFocusableDescendant(modalFrame);	//see if the modal frame has a node that can be focused
+				if(focusable)	//if we found a focusable node
+				{
+//TODO del dummy+=" changing to first focusable "+focusable.nodeName+" id "+focusable.id;
+					focusable.focus();	//focus on the node
+				}
+				else	//if we can't find a focusable node on the modal frame
+				{
+					currentTarget.blur();	//don't allow the element to get the focus, even though we don't know what to focus
+				}
+			}
+/*TODO del 
+test.add(dummy);
+
+	if(test.length==8)
+	{
+		test.add("done");
+		modalFrame=null;
+		for(var i=0; i<test.length; ++i)
+		{
+			alert(test[i]);
+		}
+	}
+*/
+			return;	//don't process the focus event any further
+		}
+/*TODO del
+
+test.add(dummy);
+
+	if(test.length==8)
+	{
+		test.add("done");
+		modalFrame=null;
+		for(var i=0; i<test.length; ++i)
+		{
+			alert(test[i]);
+		}
+	}
+*/
+	}
+	lastFocusedNode=currentTarget;	//see what was last focused
+/*TODO fix
+	if(modalFrame==null && test.length>10)
+	{
+		test.add("done");
+		for(var i=0; i<test.length; ++i)
+		{
+			alert(test[i]);
+		}
+	}
+*/
 }
 
 /**Called when the contents of a text input changes.
@@ -2452,10 +2612,10 @@ function getDescendantElementByClassName(node, className)
 		for(var i=0; i<childNodeCount; ++i)	//for each child node
 		{
 			var childNode=childNodeList[i];	//get this child node
-			var menu=getDescendantElementByClassName(childNode, className);	//see if we can find the node in this branch
-			if(menu)	//if we found a menu
+			var match=getDescendantElementByClassName(childNode, className);	//see if we can find the node in this branch
+			if(match)	//if we found a match
 			{
-				return menu;	//return it
+				return match;	//return it
 			}
 		}
 	}
@@ -2484,6 +2644,24 @@ function hasClass(element, className)
 	var classNamesString=element.getAttribute("class");	//get the element's class names
 	var classNames=classNamesString ? classNamesString.split(/\s/) : EMPTY_ARRAY;	//split out the class names
 	return className instanceof RegExp ? classNames.containsMatch(className) : classNames.contains(className);	//return whether this class name is one of the class names
+}
+
+/**Determines whether the given node has the indicated ancestor, including the node itself in the search.
+@param node The node the ancestor of which to find, or null if the search should not take place.
+@param ancestor The ancestor to find.
+@return true if the node or one of its ancestors is the given ancestor.
+*/
+function hasAncestor(node, ancestor)
+{
+	while(node)	//while we haven't ran out of nodes
+	{
+		if(node==ancestor)	//if this node is the ancestor
+		{
+			return true;	//show that there was such an ancestor
+		}
+		node=node.parentNode;	//go up one level
+	}
+	return false;	//indicate that we didn't find the given ancestor
 }
 
 /**Determines the document tree depth of the given element, returning a zero-level depth for the document node.
@@ -2529,6 +2707,49 @@ function getText(element)
 	}
 }
 
+/**The elements that can receive focus.*/
+var FOCUSABLE_ELEMENT_NAMES=new Array("button", "input", "select", "textarea");
+
+/**Retrieves the first descendant node, including the node, that can be focused.
+This method recognizes the following focusable elements:
+<ul>
+	<li>button</li>
+	<li>input</li>
+	<li>select</li>
+	<li>textarea</li>
+</ul>
+@param node The root of the node tree to check.
+@return The first descendant node that can be focused, or null if there is no focusable descendant.
+*/
+function getFocusableDescendant(node)
+{
+//TODO del	alert("node has focus type of: "+(typeof node.focus));
+//TODO del	if(node.focus)	//if we can focus this node
+	var nodeName=node.nodeName.toLowerCase();
+	if(FOCUSABLE_ELEMENT_NAMES.contains(nodeName))	//if this is a focusable node
+	{
+		if((!node.style || node.style.visibility!="hidden") && !node.disabled)	//make sure the node is not hidden or disabled
+		{
+			if(nodeName!="input" || node.type!="hidden")	//make this isn't a hidden input
+			{
+				return node;	//indicate that this node can be focused
+			}
+		}
+	}
+	var childNodeList=node.childNodes;	//get all the child nodes
+	var childNodeCount=childNodeList.length;	//find out how many children there are
+	for(var i=0; i<childNodeCount; ++i)	//for each child node
+	{
+		var childNode=childNodeList[i];	//get this child node
+		var focusable=getFocusableDescendant(childNode);	//see if this subtree has a focusable node
+		if(focusable)	//if we found a focusable node
+		{
+			return focusable;	//return it
+		}
+	}
+	return null;	//indicate that no focusable node could be found
+}
+
 /**Retrieves the absolute X and Y coordinates of the given element.
 @param The element the coordinates of which to find.
 @return A Point containing the coordinates of the element.
@@ -2562,8 +2783,52 @@ function getElementCoordinates(element)	//TODO make sure this method correctly c
 	return new Point(x, y);	//return the point we calculated
 }
 
+/**@return The size of the document, even if it is outside the viewport.
+@see http://www.quirksmode.org/viewport/compatibility.html 
+*/
+function getPageSize()
+{
+	var width=0, height=0;	//we'll determine the width and height
+	var scrollHeight=document.body.scrollHeight;	//get the scroll height
+	var offsetHeight=document.body.offsetHeight;	//get the offset height
+	if(scrollHeight>offsetHeight)	//if the scroll height is larger
+	{
+		width=document.body.scrollWidth;	//use the scroll dimensions
+		height=document.body.scrollHeight;
+	}
+	else	//if the body offsets are larger (e.g. Explorer Mac and IE 6 strict)
+	{
+		width=document.body.offsetWidth;	//use the body offsets
+		height=document.body.offsetHeight;
+	}
+	return new Size(width, height);	//return the page size
+}
+
+/**@return The size of the viewport.
+@see http://www.quirksmode.org/viewport/compatibility.html 
+*/
+function getViewportSize()
+{
+	var width=0, height=0;	//we'll determine the width and height
+	if(window.innerWidth && window.innerHeight)	//if the window knows its inner width and height
+	{
+		width=window.innerWidth;	//use the window's inner dimensions
+		height=window.innerHeight;
+	}
+	else if(document.documentElement && document.documentElement.clientWidth && document.documentElement.clientHeight)	//if the document element knows its dimensions (e.g. IE 6 in strict mode)
+	{
+		width=document.documentElement.clientWidth;	//use the document element's client width and height
+		height=document.documentElement.clientHeight;
+	}
+	else if(document.body)	//if there is a document body
+	{
+		width=document.body.clientWidth;	//use the document body's client width and height
+		height=document.body.clientHeight;
+	}
+	return new Size(width, height);	//return the size
+}
+
 eventManager.addEvent(window, "load", onWindowLoad, false);	//do the appropriate initialization when the window loads
-eventManager.addEvent(window, "unload", onWindowUnload, false);	//do the appropriate uninitialization when the window unloads
 
 var Nav4 = ((navigator.appName == "Netscape") && (parseInt(navigator.appVersion) >= 4));
 var modalState=new Object();	//the state of modality
