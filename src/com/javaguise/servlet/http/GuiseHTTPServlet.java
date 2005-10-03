@@ -31,6 +31,7 @@ import com.javaguise.controller.text.xml.xhtml.*;
 import com.javaguise.model.FileItemResourceImport;
 import com.javaguise.model.Model;
 import com.javaguise.platform.web.*;
+import static com.javaguise.platform.web.WebPlatformConstants.*;
 import com.javaguise.session.*;
 import com.javaguise.validator.*;
 import com.javaguise.view.text.xml.xhtml.XHTMLNavigationPanelView;
@@ -39,6 +40,7 @@ import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 
 import com.garretwilson.io.ContentTypeConstants;
+import com.garretwilson.io.FileUtilities;
 import com.garretwilson.lang.ObjectUtilities;
 
 import static com.garretwilson.io.ContentTypeConstants.*;
@@ -340,6 +342,26 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
   */
 	public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
 	{
+		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
+Debug.trace("raw path info:", rawPathInfo);
+		if(rawPathInfo.startsWith(GUISE_PUBLIC_RESOURCE_BASE_PATH))	//if this is a request for a public resource
+		{
+			final String resourceKey=Guise.PUBLIC_RESOURCE_BASE_PATH+rawPathInfo.substring(GUISE_PUBLIC_RESOURCE_BASE_PATH.length());	//replace the beginning web base path to the resource base path
+			final byte[] resource=Guise.getInstance().getPublicResource(resourceKey);	//load the resource
+			if(resource!=null)	//if the resource was found
+			{
+				final ContentType contentType=FileUtilities.getMediaType(rawPathInfo);	//see what content type the resource is
+				if(contentType!=null)	//if we know the content type
+				{
+					response.setContentType(contentType.toString());	//set the response content type
+				}
+				response.setContentLength(resource.length);	//indicate the size of the resource
+					//TODO write encoding if appropriate for content type
+					//TODO write cache information
+				response.getOutputStream().write(resource);	//write the resource
+				return;	//don't process this request further
+			}
+		}		
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
 		final HTTPServletGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
@@ -356,9 +378,7 @@ Debug.info("content type:", request.getContentType());
 			{
 //TODO del Debug.trace("before getting requested URI, application base path is:", guiseApplication.getBasePath());
 				final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request		
-					//TODO get the raw path info from the request URI
-				final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
-		//TODO del System.out.println("raw path info: "+rawPathInfo);
+				
 				if(rawPathInfo.endsWith(AJAX_URI_SUFFIX))	//if this is an AJAX request
 				{
 					serviceAJAX(request, response, guiseContainer, guiseApplication, guiseSession, guiseContext);	//service this AJAX request
