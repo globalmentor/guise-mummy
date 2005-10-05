@@ -2,8 +2,14 @@ package com.javaguise.component;
 
 import java.util.Iterator;
 
+import static com.garretwilson.lang.ObjectUtilities.*;
+
+import com.garretwilson.util.Debug;
 import com.garretwilson.util.EmptyIterator;
 import com.garretwilson.util.ObjectIterator;
+import com.javaguise.event.ModalEvent;
+import com.javaguise.event.ModalListener;
+import com.javaguise.event.PostponedModalEvent;
 import com.javaguise.model.LabelModel;
 import com.javaguise.session.GuiseSession;
 
@@ -14,6 +20,9 @@ import com.javaguise.session.GuiseSession;
 public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponent<C> implements Frame<C>
 {
 
+	/**The default mode of an open, modal frame.*/
+	public final static Mode DEFAULT_MODAL_FRAME_MODE=new Mode(){};
+
 	/**The state of the frame.*/
 	private State state=State.CLOSED;
 
@@ -23,15 +32,17 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 		/**Sets the state of the frame.
 		This is a bound property.
 		@param newState The new state of the frame.
+		@exception NullPointerException if the given state is <code>null</code>.
 		@see Frame#STATE_PROPERTY 
 		*/
 		protected void setState(final State newState)
 		{
-			if(state!=newState)	//if the value is really changing
+			if(state!=checkNull(newState, "State cannot be null."))	//if the value is really changing
 			{
 				final State oldState=state;	//get the old value
 				state=newState;	//actually change the value
 				firePropertyChange(STATE_PROPERTY, oldState, newState);	//indicate that the value changed
+				setMode(isModal() && newState!=State.CLOSED ? DEFAULT_MODAL_FRAME_MODE : null);	//set the modal mode if we are open and modal
 			}			
 		}
 
@@ -53,7 +64,29 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 				final boolean oldModal=modal;	//get the current value
 				modal=newModal;	//update the value
 				firePropertyChange(MODAL_PROPERTY, Boolean.valueOf(oldModal), Boolean.valueOf(newModal));
+				setMode(newModal && getState()!=State.CLOSED ? DEFAULT_MODAL_FRAME_MODE : null);	//set the modal mode if we are open and modal
 			}
+		}
+
+	/**The current mode of interaction, or <code>null</code> if the component is in a modeless state.*/
+	private Mode mode=null;
+
+		/**@return The current mode of interaction, or <code>null</code> if the component is in a modeless state.*/
+		public Mode getMode() {return mode;}
+
+		/**Sets the mode of interaction.
+		This is a bound property.
+		@param newMode The new mode of component interaction.
+		@see ModalComponent#MODE_PROPERTY 
+		*/
+		public void setMode(final Mode newMode)
+		{
+			if(mode!=newMode)	//if the value is really changing
+			{
+				final Mode oldMode=mode;	//get the old value
+				mode=newMode;	//actually change the value
+				firePropertyChange(MODE_PROPERTY, oldMode, newMode);	//indicate that the value changed
+			}			
 		}
 
 	/**Whether the frame is movable.*/
@@ -108,7 +141,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 		public Component<?> getComponent() {return component;}
 
 		/**Sets the single child component.
-		This is a bound property
+		This is a bound property.
 		@param newComponent The single child component, or <code>null</code> if this frame does not have a child component.
 		@see Frame#COMPONENT_PROPERTY
 		*/
@@ -220,12 +253,42 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 			}
 		}
 	}
-	
+
 	/**Implementation of frame closing.*/
 	protected void closeImpl()
 	{
+Debug.trace("ready to remove frame");
 		getSession().removeFrame(this);	//remove the frame from the session
 		setState(State.CLOSED);	//change the state
+	}
+
+	/**Adds a modal listener.
+	@param modalListener The modal listener to add.
+	*/
+	public void addModalListener(final ModalListener<C> modalListener)
+	{
+		getEventListenerManager().add(ModalListener.class, modalListener);	//add the listener
+	}
+
+	/**Removes a modal listener.
+	@param modalListener The modal listener to remove.
+	*/
+	public void removeModalListener(final ModalListener<C> modalListener)
+	{
+		getEventListenerManager().remove(ModalListener.class, modalListener);	//remove the listener
+	}
+
+	/**Fires an action to all registered modal listeners indicating that the mode began.
+	@see ModalListener
+	@see ModalEvent
+	*/
+	protected void fireModalBegan()
+	{
+		if(getEventListenerManager().hasListeners(ModalListener.class))	//if there are modal listeners registered
+		{
+			final ModalEvent<C> modalEvent=new ModalEvent<C>(getSession(), getThis());	//create a new modal event
+			getSession().queueEvent(new PostponedModalEvent<C>(getEventListenerManager(), modalEvent, PostponedModalEvent.ModalEventType.BEGAN));	//tell the Guise session to queue the event
+		}
 	}
 
 }

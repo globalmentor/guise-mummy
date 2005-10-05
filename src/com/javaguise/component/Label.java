@@ -94,7 +94,7 @@ public class Label extends AbstractComponent<Label>
 		This implementation returns the content type of the label.
 		@return The content types available for this transfer.
 		*/
-		public ContentType[] getContentTypes() {return toArray(getSource().getModel().getLabelContentType());}
+		public ContentType[] getContentTypes() {return createArray(getSource().getModel().getLabelContentType());}
 
 		/**Transfers data using the given content type.
 		@param contentType The type of data expected.

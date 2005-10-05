@@ -34,6 +34,7 @@ import com.javaguise.platform.web.*;
 import static com.javaguise.platform.web.WebPlatformConstants.*;
 import com.javaguise.session.*;
 import com.javaguise.validator.*;
+import com.javaguise.view.text.xml.xhtml.XHTMLApplicationFrameView;
 import com.javaguise.view.text.xml.xhtml.XHTMLNavigationPanelView;
 
 import static com.garretwilson.net.URIConstants.*;
@@ -498,6 +499,7 @@ Debug.info("content type:", request.getContentType());
 		final NavigationPanel navigationPanel=guiseSession.getNavigationPanel(navigationPath);	//get the panel bound to the requested path
 		if(navigationPanel!=null)	//if we found a panel class for this address
 		{
+			final ApplicationFrame<?> applicationFrame=guiseSession.getApplicationFrame();	//get the application frame
 			final Set<Frame<?>> removedFrames=new HashSet<Frame<?>>();	//create a set of frames so that we can know which ones were removed TODO testing
 			CollectionUtilities.addAll(removedFrames, guiseSession.getFrameIterator());	//get all the current frames; we'll determine which ones were removed, later TODO improve all this
 			
@@ -516,10 +518,9 @@ Debug.info("content type:", request.getContentType());
 					{
 						final String parameterName=parameterListMapEntry.getKey();	//get the parameter name
 
-						
-						if(parameterName.equals(XHTMLNavigationPanelView.getActionInputID(navigationPanel)) && parameterListMapEntry.getValue().size()>0)	//if this parameter is for an action
+						if(parameterName.equals(XHTMLApplicationFrameView.getActionInputID(applicationFrame)) && parameterListMapEntry.getValue().size()>0)	//if this parameter is for an action
 						{
-							final Component<?> actionComponent=AbstractComponent.getComponentByID(navigationPanel, parameterListMapEntry.getValue().get(0).toString());	//get an action component
+							final Component<?> actionComponent=getComponentByID(guiseSession, parameterListMapEntry.getValue().get(0).toString());	//get an action component
 							if(actionComponent!=null)	//if we found an action component
 							{
 								requestedComponents.add(actionComponent);	//add it to the list of requested components
@@ -595,7 +596,6 @@ for(final Component<?> affectedComponent:affectedComponents)
 				}
 
 				
-				final Frame<?> applicationFrame=guiseSession.getApplicationFrame();	//get the application frame
 				final Collection<Component<?>> dirtyComponents=getDirtyComponents(guiseSession);	//get all dirty components in all the session frames 
 
 				CollectionUtilities.removeAll(removedFrames, guiseSession.getFrameIterator());	//remove all the ending frames, leaving us the frames that were removed TODO improve all this
@@ -906,14 +906,14 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
   }
 
 	/**Begins modal navigation based upon modal navigation information.
-	@param <R> The type of modal result the modal navigation involves.
+	@param <P> The type of navigation panel beginning navigation.
 	@param guiseApplication The Guise application.
 	@param guiseSession The Guise session.
 	@param modalNavigation The modal navigation information
 	*/
-	protected <R> void beginModalNavigation(final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ModalNavigation<R> modalNavigation)
+	protected <P extends ModalNavigationPanel<?, ?>> void beginModalNavigation(final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ModalNavigation<P> modalNavigation)
 	{
-		final ModalNavigationPanel<R, ?> modalPanel=(ModalNavigationPanel<R, ?>)guiseSession.getNavigationPanel(guiseApplication.relativizeURI(modalNavigation.getNewNavigationURI()));	//get the modal frame for this navigation path
+		final P modalPanel=(P)guiseSession.getNavigationPanel(guiseApplication.relativizeURI(modalNavigation.getNewNavigationURI()));	//get the modal frame for this navigation path
 		if(modalPanel!=null)	//if we have a modal frame
 		{
 			guiseSession.beginModalNavigation(modalPanel, modalNavigation);

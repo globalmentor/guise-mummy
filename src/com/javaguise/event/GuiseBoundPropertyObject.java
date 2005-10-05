@@ -40,6 +40,7 @@ public class GuiseBoundPropertyObject extends BoundPropertyObject
 	@see PropertyValueChangeEvent
 	@see PropertyValueChangeListener
 	*/
+/*TODO del; with new view hierarchy, it is no longer necessary to unconditionally fire events
 	protected <V> void firePropertyChange(final String propertyName, V oldValue, final V newValue)
 	{
 		if(!ObjectUtilities.equals(oldValue, newValue))	//if the values are different
@@ -47,6 +48,7 @@ public class GuiseBoundPropertyObject extends BoundPropertyObject
 			firePropertyChange(new PropertyValueChangeEvent<V>(this, propertyName, oldValue, newValue));	//create and fire a genericized subclass of a property change event
 		}
 	}
+*/
 
 	/**Reports that a bound property has changed.
 	This implementation delegates to the Guise session to fire or postpone the property change event.

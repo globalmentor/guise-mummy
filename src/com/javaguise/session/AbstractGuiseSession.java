@@ -674,16 +674,16 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 		/**Begins modal interaction for a particular modal panel.
 		The modal navigation is pushed onto the stack, and an event is fired to the modal listener of the modal navigation.
-		@param <R> The type of modal result the modal panel produces.
-		@param modalPanel The panel for which modal navigation state should begin.
+		@param <N> The type of navigation panel beginning navigation.
+		@param modalNavigationPanel The panel for which modal navigation state should begin.
 		@param modalNavigation The state of modal navigation.
 		@see #pushModalNavigation(ModalNavigation)
 		*/
-		public <R> void beginModalNavigation(final ModalNavigationPanel<R, ?> modalPanel, final ModalNavigation<R> modalNavigation)
+		public <N extends ModalNavigationPanel<?, ?>> void beginModalNavigation(final N modalNavigationPanel, final ModalNavigation<N> modalNavigation)
 		{
 			//TODO release the navigation panel, maybe, just in case
 			pushModalNavigation(modalNavigation);	//push the modal navigation onto the top of the modal navigation stack
-			modalNavigation.getModalListener().modalBegan(new ModalEvent<R>(this, modalPanel, modalPanel.getResult()));
+			modalNavigation.getModalListener().modalBegan(new ModalEvent<N>(this, modalNavigationPanel));
 		}
 
 		/**Ends modal interaction for a particular modal panel.
@@ -692,21 +692,21 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		If the current modal state corresponds to the current navigation state, the current modal state is removed, the modal state's event is fired, and modal state is handed to the previous modal state, if any.
 		Otherwise, navigation is transferred to the modal panel's referring URI, if any.
 		If the given modal panel is not the panel at the current navigation path, the modal state is not changed, although navigation and releasal will still occur.
-		@param <R> The type of modal result the modal panel produces.
-		@param modalPanel The panel for which modal navigation state should be ended.
+		@param <P> The type of navigation panel ending navigation.
+		@param modalNavigationPanel The panel for which modal navigation state should be ended.
 		@return true if modality actually ended for the given panel.
 		@see #popModalNavigation()
 		@see Frame#getReferrerURI()
 		@see #releaseNavigationPanel(String)
 		*/
 		@SuppressWarnings("unchecked")	//we check to see that the given panel is the same one at this navigation path, and that this navigation path is in a modal state, implying that the current navigation state's listener has same generic result type as does the modal panel
-		public <R> boolean endModalNavigation(final ModalNavigationPanel<R, ?> modalPanel)
+		public <P extends ModalNavigationPanel<?, ?>> boolean endModalNavigation(final P modalNavigationPanel)
 		{
 			final String navigationPath=getNavigationPath();	//get our current navigation path
 			ModalNavigation modalNavigation=null;	//if we actually end modal navigation, we'll store the information here
 //TODO fix			URI navigationURI=modalPanel.getReferrerURI();	//in the worse case scenario, we'll want to go back to where the modal panel came from, if that's available
 			URI navigationURI=null;	//TODO fix
-			if(navigationPathPanelMap.get(navigationPath)==modalPanel)	//before we try to actually ending modality, make sure this panel is actually the one at our current navigation path
+			if(navigationPathPanelMap.get(navigationPath)==modalNavigationPanel)	//before we try to actually ending modality, make sure this panel is actually the one at our current navigation path
 			{
 				synchronized(modalNavigationStack)	//don't allow anyone to to access the modal navigation stack while we access it
 				{
@@ -733,7 +733,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			releaseNavigationPanel(navigationPath);	//release the panel associated with this navigation path
 			if(modalNavigation!=null)	//if we if we ended modality for the panel
 			{
-				((ModalNavigationListener<R>)modalNavigation.getModalListener()).modalEnded(new ModalEvent<R>(this, modalPanel, modalPanel.getResult()));	//send an event to the modal listener
+				((ModalNavigationListener<P>)modalNavigation.getModalListener()).modalEnded(new ModalEvent<P>(this, modalNavigationPanel));	//send an event to the modal listener
 			}
 			return modalNavigation!=null;	//return whether we ended modality
 		}
@@ -808,14 +808,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		/**Requests modal navigation to the specified path.
 		The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
 		Later requested navigation before navigation occurs will override this request.
-		@param <R> The type of modal result the modal panel produces.
+		@param <P> The type of navigation panel for modal navigation.
 		@param path A path that is either relative to the application context path or is absolute.
 		@param modalListener The listener to respond to the end of modal interaction.
 		@exception NullPointerException if the given path is <code>null</code>.
 		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 		@see #navigateModal(URI, ModalNavigationListener)
 		*/
-		public <R> void navigateModal(final String path, final ModalNavigationListener<R> modalListener)
+		public <P extends ModalNavigationPanel<?, ?>> void navigateModal(final String path, final ModalNavigationListener<P> modalListener)
 		{
 			navigateModal(createPathURI(path), modalListener);	//navigate to the requested URI, converting the path to a URI and verifying that it is only a path
 		}
@@ -823,14 +823,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		/**Requests modal navigation to the specified URI.
 		The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
 		Later requested navigation before navigation occurs will override this request.
-		@param <R> The type of modal result the modal panel produces.
+		@param <P> The type of navigation panel for modal navigation.
 		@param uri Either a relative or absolute path, or an absolute URI.
 		@param modalListener The listener to respond to the end of modal interaction.
 		@exception NullPointerException if the given URI is <code>null</code>.
 		*/
-		public <R> void navigateModal(final URI uri, final ModalNavigationListener<R> modalListener)
+		public <P extends ModalNavigationPanel<?, ?>> void navigateModal(final URI uri, final ModalNavigationListener<P> modalListener)
 		{
-			requestedNavigation=new ModalNavigation<R>(getApplication().resolveURI(createPathURI(getNavigationPath())), getApplication().resolveURI(checkNull(uri, "URI cannot be null.")), modalListener);	//resolve the URI against the application context path
+			requestedNavigation=new ModalNavigation<P>(getApplication().resolveURI(createPathURI(getNavigationPath())), getApplication().resolveURI(checkNull(uri, "URI cannot be null.")), modalListener);	//resolve the URI against the application context path
 		}		
 
 	/**The object that listenes for context state changes and updates the set of context states in response.*/
@@ -905,10 +905,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			else	//if no context is changing the model
 			{
 				postponedEvent.fireEvent();	//go ahead and fire the event immediately
-				if(context!=null)	//if there is a context
-				{
-					context.getEventList().add(postponedEvent.getEvent());	//store the event in the context
-				}
 			}
 		}
 
@@ -928,24 +924,11 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 					finally	//there could be an exception while we're firing the event
 					{
 						postponedModelEventIterator.remove();	//always remove the event we fired, even if there's an exception, so it won't be fired again if there is an exception
-						final GuiseContext context=getContext();	//get the current context
-						if(context!=null)	//if there is a context
-						{
-							context.getEventList().add(postponedModelEvent.getEvent());	//store the event in the context
-						}						
 					}
 				}
 				queuedModelEventList.clear();	//remove all pending model events
 			}
 		}
-
-		/**@return A copy of the list of postponed events.*/
-/*TODO del
-		protected List<PostponedEvent<?>> getPostponedEvents()
-		{
-			return new ArrayList<PostponedEvent<?>>(queuedModelEventList);	//TODO testing
-		}
-*/
 
 	/**Called when the session is initialized.
 	@see #destroy()

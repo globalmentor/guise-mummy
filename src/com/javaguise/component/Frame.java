@@ -2,6 +2,7 @@ package com.javaguise.component;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
+import com.javaguise.event.ModalListener;
 import com.javaguise.model.LabelModel;
 
 /**A root-level component such as a window or an HTML page.
@@ -9,7 +10,7 @@ import com.javaguise.model.LabelModel;
 <p>A frame like other components is by default visible, but is not actually shown until its {@link #open(boolean)} method is called.</p>
 @author Garret Wilson
 */
-public interface Frame<C extends Frame<C>> extends CompositeComponent<C>
+public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalComponent<C>
 {
 	/**The component bound property.*/
 	public final static String COMPONENT_PROPERTY=getPropertyName(Frame.class, "component");
@@ -107,4 +108,15 @@ public interface Frame<C extends Frame<C>> extends CompositeComponent<C>
 	@see #STATE_PROPERTY
 	*/
 	public void close();
+
+	/**Adds a modal listener.
+	@param modalListener The modal listener to add.
+	*/
+	public void addModalListener(final ModalListener<C> modalListener);
+
+	/**Removes a modal listener.
+	@param modalListener The modal listener to remove.
+	*/
+	public void removeModalListener(final ModalListener<C> modalListener);
+
 }

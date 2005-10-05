@@ -8,12 +8,8 @@ import com.javaguise.session.GuiseSession;
 @param <V> The value to be communicated.
 @author Garret Wilson
 */
-public class DefaultDialogFrame<V> extends AbstractFrame<DefaultDialogFrame<V>> implements DialogFrame<V, DefaultDialogFrame<V>>
+public class DefaultDialogFrame<V> extends AbstractDialogFrame<V, DefaultDialogFrame<V>>
 {
-
-	/**@return The data model used by this component.*/
-	@SuppressWarnings("unchecked")
-	public ValueModel<V> getModel() {return (ValueModel<V>)super.getModel();}
 
 	/**Session constructor.
 	@param session The Guise session that owns this component.
@@ -66,7 +62,7 @@ public class DefaultDialogFrame<V> extends AbstractFrame<DefaultDialogFrame<V>> 
 	*/
 	public DefaultDialogFrame(final GuiseSession session, final String id, final Class<V> valueClass)
 	{
-		this(session, id, new DefaultValueModel<V>(session, valueClass));	//use a default label model
+		this(session, id, new DefaultValueModel<V>(session, valueClass));	//use a default value model
 	}
 
 	/**Session, ID, and component constructor.
@@ -79,7 +75,7 @@ public class DefaultDialogFrame<V> extends AbstractFrame<DefaultDialogFrame<V>> 
 	*/
 	public DefaultDialogFrame(final GuiseSession session, final String id, final Class<V> valueClass, final Component<?> component)
 	{
-		this(session, id, new DefaultValueModel<V>(session, valueClass), component);	//use a default label model
+		this(session, id, new DefaultValueModel<V>(session, valueClass), component);	//use a default value model
 	}
 
 	/**Session, ID, and model constructor.

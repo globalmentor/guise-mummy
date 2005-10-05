@@ -8,6 +8,7 @@ import com.garretwilson.beans.PropertyValueChangeEvent;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
 import com.javaguise.demo.DemoUser;
+import com.javaguise.demo.EditUserPanel;
 import com.javaguise.event.*;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
@@ -140,6 +141,40 @@ Debug.trace("list control changed value to", newValue);
 					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
 					{
 						testLabel.getModel().setLabel("You pressed the button!");
+/*TODO del test						
+						final int MAX_FACTOR=5;
+						final Integer[][] multiplicationTableData=new Integer[MAX_FACTOR+1][MAX_FACTOR+1];	//create the table data array
+						for(int rowIndex=MAX_FACTOR; rowIndex>=0; --rowIndex)	//for each row
+						{
+							for(int columnIndex=MAX_FACTOR; columnIndex>=0; --columnIndex)	//for each column
+							{
+								multiplicationTableData[rowIndex][columnIndex]=new Integer(rowIndex*columnIndex);	//fill this cell with data
+							}
+						}
+						final String[] columnNames=new String[MAX_FACTOR+1];	//create the array of column names
+						for(int columnIndex=MAX_FACTOR; columnIndex>=0; --columnIndex)	//for each column
+						{
+							columnNames[columnIndex]=Integer.toString(columnIndex);	//generate the column name
+						}
+						final Table multiplicationTable=new Table(session, Integer.class, multiplicationTableData, columnNames);	//create the table component
+						multiplicationTable.getModel().setLabel("Multiplication Table");	//give the table a label
+*/
+						
+						final Label label=new Label(session, new DefaultLabelModel(session, "Are you sure?"));
+
+						final DefaultOptionDialogFrame confirmDialog=new DefaultOptionDialogFrame(session, label, DefaultOptionDialogFrame.Option.OK, DefaultOptionDialogFrame.Option.CANCEL);
+						confirmDialog.getModel().setLabel("Confirm your choice");
+						confirmDialog.addPropertyChangeListener(ModalComponent.MODE_PROPERTY, new AbstractPropertyValueChangeListener<Mode>()
+								{
+									public void propertyValueChange(final PropertyValueChangeEvent<Mode> propertyValueChangeEvent)
+									{
+										if(propertyValueChangeEvent.getNewValue()==null)	//if modality is ended
+										{
+											testLabel.getModel().setLabel("resulting option is "+confirmDialog.getModel().getValue());											
+										}
+									}
+								});
+						confirmDialog.open();
 					}
 				});
 		buttonPanel.add(testButton2);	//add a new button
@@ -159,12 +194,12 @@ Debug.trace("list control changed value to", newValue);
 				{
 					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
 					{
-						getSession().navigateModal("edituser", new ModalNavigationAdapter<Object>()
+						getSession().navigateModal("edituser", new ModalNavigationAdapter<EditUserPanel>()
 								{
 									/**Called when an a modal panel ends its modality.
 									@param modalEvent The event indicating the panel ending modality and the modal value.
 									*/
-									public void modalEnded(final ModalEvent<Object> modalEvent)
+									public void modalEnded(final ModalEvent<EditUserPanel> modalEvent)
 									{
 										
 									}

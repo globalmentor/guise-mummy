@@ -81,7 +81,7 @@ This version adds the frame to the document, initializes the frame, and updates 
 */
 frames.add=function(frame)
 {
-	document.body.appendChild(frame);	//add the frame element to the document
+	document.body.appendChild(frame);	//add the frame element to the document; do this first, because IE doesn't allow the style to be accessed directly with imported nodes until they are added to the document
 	initializeNode(frame);	//initialize the new imported frame, installing the correct event handlers
 	Array.prototype.add.call(this, frame);	//do the default adding to the array
 	updateModal();	//update the modal state
@@ -253,7 +253,7 @@ if(typeof document.importNode=="undefined")	//if the document does not support d
 				importedNode=document.createCommentNode(node.nodeValue);	//create a new comment node with appropriate text
 				break;
 			case Node.ELEMENT_NODE:	//element
-				if(document.createElementNS instanceof Function && typeof node.namespaceURI!="undefined")	//if the node supports namespaces
+				if(typeof node.namespaceURI!="undefined")	//if the node supports namespaces
 				{
 					importedNode=document.createElementNS(node.namespaceURI, node.nodeName);	//create a namespace-aware element
 				}
@@ -266,7 +266,7 @@ if(typeof document.importNode=="undefined")	//if the document does not support d
 				for(var i=0; i<attributeCount; ++i)	//for each attribute
 				{
 					var attribute=attributes[i];	//get this attribute
-					if(document.createAttributeNS instanceof Function && importedNode.setAttributeNodeNS instanceof Function && typeof attribute.namespaceURI!="undefined")	//if the attribute supports namespaces
+					if(importedNode.setAttributeNodeNS instanceof Function && typeof attribute.namespaceURI!="undefined")	//if the attribute supports namespaces
 					{
 						var importedAttribute=document.createAttributeNS(attribute.namespaceURI, attribute.nodeName);	//create a namespace-aware attribute
 						importedAttribute.nodeValue=attribute.nodeValue;	//set the attribute value
@@ -286,12 +286,31 @@ if(typeof document.importNode=="undefined")	//if the document does not support d
 					for(var i=0; i<childNodeCount; ++i)	//for all of the child nodes
 					{
 						var childNode=childNodes[i];	//get a reference to this child node
-						importedNode.appendChild(document.importNode(childNode, deep));	//import and append the new child node
+						try
+						{
+							var childImportedNode=document.importNode(childNode, deep);
+						}
+						catch(exception)	//if there is an error importing the node (this is just a safety precaution in case future versions of IE still throw an exception on button.type and 
+						{
+							var childImportedNode=null;	//set the node to null
+						}
+						if(childImportedNode)	//if we imported the node correctly
+						{
+							importedNode.appendChild(childImportedNode);	//import and append the new child node
+						}
+						else	//if something went wrong importing the node (IE 6 will fail to add the button.type attribute, but will not throw an exception, leaving childImportedNode undefined
+						{
+							var nodeString=DOMUtilities.getNodeString(childNode);	//serialize the node
+							importedNode.innerHTML+=nodeString;	//append the node string to the element's inner HTML
+						}
 					}
 				}
 				break;
 			case Node.TEXT_NODE:	//text
 				importedNode=document.createTextNode(node.nodeValue);	//create a new text node with appropriate text
+				break;
+			default:
+				alert("Unknown node type: "+node.nodeType);
 				break;
 			//TODO add checks for other elements, such as CDATA
 		}
@@ -566,7 +585,139 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 		{
 			element.setAttributeNode(attribute);	//set the attribute with no namespace information
 		}
+	},
+
+	/**Creates a string representation of the given node.
+	@param node The node to serialize.
+	@return A string representation of the given node.
+	*/
+	getNodeString:function(node)
+	{
+		return this.appendNodeString(new StringBuilder(), node).toString();	//serialize the node and return its string representation
+	},
+
+	/**Appends a string representation of the given node.
+	@param stringBuilder The string builder to which a text representation of the node should be appended.
+	@param node The node to serialize.
+	@return A reference to the string builder.
+	*/
+	appendNodeString:function(stringBuilder, node)
+	{
+		switch(node.nodeType)	//see which type of node this is
+		{
+			case Node.ELEMENT_NODE:	//element
+				var nodeName=node.nodeName;	//get the name of the node
+				stringBuilder.append("<").append(nodeName);	//<nodeName
+				var attributes=node.attributes;	//get the element's attributes
+				var attributeCount=attributes.length;	//find out how many attributes there are
+				for(var i=0; i<attributeCount; ++i)	//for each attribute
+				{
+					var attribute=attributes[i];	//get this attribute
+					this.appendXMLAttribute(stringBuilder, attribute.nodeName, attribute.nodeValue);	//append this attribute
+				}
+				stringBuilder.append(">");	//>
+				var childNodes=node.childNodes;	//get a list of child nodes
+				var childNodeCount=childNodes.length;	//find out how many child nodes there are
+				for(var i=0; i<childNodeCount; ++i)	//for all of the child nodes
+				{
+					var childNode=childNodes[i];	//get a reference to this child node
+					this.appendNodeString(stringBuilder, childNode);	//append this child node
+				}
+				this.appendXMLEndTag(stringBuilder, nodeName);	//append the end tag
+				break;
+			case Node.COMMENT_NODE:	//comment
+				stringBuilder.append(node.nodeValue);	//append the node's value with no changes TODO encode the sequence "--"
+				break;
+			case Node.TEXT_NODE:	//text
+				this.appendXMLText(stringBuilder, node.nodeValue);	//append the node's text value
+				break;
+			//TODO add checks for other elements, such as CDATA
+		}
+		return stringBuilder;	//return the string builder
+	},
+
+	/**Encodes a string so that it may be used in XML by escaping XML-specific characters.
+	@param string The string to encode.
+	@return The XML-encoded string.
+	*/
+	encodeXML:function(string)
+	{
+		string=string.replace(/&/g, "&amp;");	//encode '&' first
+		string=string.replace(/</g, "&lt;");	//encode '<'
+		string=string.replace(/>/g, "&gt;");	//encode '>'
+		string=string.replace(/"/g, "&quot;");	//encode '\"'
+		return string;	//return the encoded string
+	},
+
+	/**Encodes and appends XML text to the given string builder.
+	@param stringBuilder The string builder to hold the data.
+	@param text The text to encode and append.
+	@return A reference to the string builder.
+	*/ 
+	appendXMLText:function(stringBuilder, text)
+	{
+		return stringBuilder.append(this.encodeXML(text));	//encode and append the text, and return the string builder
+	},
+
+	/**Appends an XML start tag with the given name to the given string builder.
+	If the value of a parameter is null, that parameter will not be used.
+	If the value of a parameter is not a string, it will be converted to one.
+	@param stringBuilder The string builder to hold the data.
+	@param tagName The name of the XML tag.
+	@param parameters (...) Zero or more parameters of type Parameter.
+	@return A reference to the string builder.
+	*/ 
+	appendXMLStartTag:function(stringBuilder, tagName, parameters)
+	{
+		stringBuilder.append("<").append(tagName);	//<tagName
+		var argumentCount=arguments.length;	//find out how many arguments there are
+		for(var i=2; i<argumentCount; ++i)	//for each argument (not counting the first two)
+		{
+			var parameter=arguments[i];	//get this argument
+			if(parameter.value!=null)	//if a parameter value was given
+			{
+				this.appendXMLAttribute(stringBuilder, parameter.name, parameter.value);	//append the attribute
+			}
+		}
+		return stringBuilder.append(">");	//>
+	},
+
+	/**Appends an XML attribute with the given name and value to the given string builder.
+	If the value of a parameter is not a string, it will be converted to one.
+	The attribute-value combination will be preceded by a space.
+	@param stringBuilder The string builder to hold the data.
+	@param attributeName The name of the XML attribute.
+	@param attributeValue The value of the XML attribute.
+	@return A reference to the string builder.
+	*/ 
+	appendXMLAttribute:function(stringBuilder, attributeName, attributeValue)
+	{
+		return stringBuilder.append(" ").append(attributeName).append("=\"").append(this.encodeXML(attributeValue.toString())).append("\"");	//name="value"
+	},
+
+	/**Appends an XML end tag with the given name to the given string builder.
+	@param stringBuilder The string builder to hold the data.
+	@param tagName The name of the XML tag.
+	@return A reference to the string builder.
+	*/
+	appendXMLEndTag:function(stringBuilder, tagName)
+	{
+		return stringBuilder.append("</").append(tagName).append(">");	//append the start tag
+	},
+
+	/**Appends an XML element containing text.
+	@param stringBuilder The string builder to hold the data.
+	@param tagName The name of the XML tag.
+	@param text The text to store in the element.
+	@return A reference to the string builder.
+	*/
+	appendXMLTextElement:function(stringBuilder, tagName, text)
+	{
+		this.appendXMLStartTag(stringBuilder, tagName);	//append the start tag
+		this.appendXMLText(stringBuilder, text);	//append the text
+		return this.appendXMLEndTag(stringBuilder, tagName);	//append the end tag
 	}
+
 	
 };
 
@@ -871,8 +1022,8 @@ function GuiseAJAX()
 				try
 				{
 					var requestStringBuilder=new StringBuilder();	//create a string builder to hold the request string					
-					this.appendXMLStartTag(requestStringBuilder, this.RequestElement.REQUEST);	//<request>
-					this.appendXMLStartTag(requestStringBuilder, this.RequestElement.EVENTS);	//<event>
+					DOMUtilities.appendXMLStartTag(requestStringBuilder, this.RequestElement.REQUEST);	//<request>
+					DOMUtilities.appendXMLStartTag(requestStringBuilder, this.RequestElement.EVENTS);	//<event>
 					while(this.ajaxRequests.length>0)	//there are more AJAX requests
 					{
 						var ajaxRequest=this.ajaxRequests.dequeue();	//get the next AJAX request to process
@@ -893,8 +1044,8 @@ function GuiseAJAX()
 							this._appendInitAJAXEvent(requestStringBuilder, ajaxRequest);	//append the init event
 						}
 					}
-					this.appendXMLEndTag(requestStringBuilder, this.RequestElement.EVENTS);	//</events>
-					this.appendXMLEndTag(requestStringBuilder, this.RequestElement.REQUEST);	//</request>
+					DOMUtilities.appendXMLEndTag(requestStringBuilder, this.RequestElement.EVENTS);	//</events>
+					DOMUtilities.appendXMLEndTag(requestStringBuilder, this.RequestElement.REQUEST);	//</request>
 					try
 					{
 //TODO del alert("ready to post: "+requestStringBuilder.toString());
@@ -921,7 +1072,7 @@ function GuiseAJAX()
 		*/
 		GuiseAJAX.prototype._appendFormAJAXEvent=function(stringBuilder, ajaxFormRequest)
 		{
-			this.appendXMLStartTag(stringBuilder, this.RequestElement.FORM);	//<form>
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.FORM);	//<form>
 			var parameters=ajaxFormRequest.parameters;	//get the parameters
 			if(parameters.length>0)	//if there are parameters
 			{
@@ -929,12 +1080,12 @@ function GuiseAJAX()
 				for(var i=parameterStrings.length-1; i>=0; --i)	//for each parameter string
 				{
 					var parameter=parameters[i];	//get this parameter
-					this.appendXMLStartTag(stringBuilder, this.RequestElement.CONTROL, new Parameter(this.RequestElement.NAME, parameter.name));	//<control name="name">
-					this.appendXMLText(stringBuilder, parameter.value);	//append the parameter value
-					this.appendXMLEndTag(stringBuilder, this.RequestElement.CONTROL);	//</control>
+					DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.CONTROL, new Parameter(this.RequestElement.NAME, parameter.name));	//<control name="name">
+					DOMUtilities.appendXMLText(stringBuilder, parameter.value);	//append the parameter value
+					DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.CONTROL);	//</control>
 				}
 			}
-			this.appendXMLEndTag(stringBuilder, this.RequestElement.FORM);	//</form>
+			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.FORM);	//</form>
 			return stringBuilder;	//return the string builder
 		};
 
@@ -945,11 +1096,11 @@ function GuiseAJAX()
 		*/
 		GuiseAJAX.prototype._appendActionAJAXEvent=function(stringBuilder, ajaxActionEvent)
 		{
-			this.appendXMLStartTag(stringBuilder, this.RequestElement.ACTION,	//<action>
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.ACTION,	//<action>
 					new Parameter(this.RequestElement.COMPONENT_ID, ajaxActionEvent.componentID),	//componentID="componentID"
 					new Parameter(this.RequestElement.TARGET_ID, ajaxActionEvent.targetID),	//targetID="targetID"
 					new Parameter(this.RequestElement.ACTION_ID, ajaxActionEvent.actionID));	//actionID="actionID"
-			this.appendXMLEndTag(stringBuilder, this.RequestElement.ACTION);	//</action>
+			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.ACTION);	//</action>
 			return stringBuilder;	//return the string builder
 		};
 
@@ -960,14 +1111,14 @@ function GuiseAJAX()
 		*/
 		GuiseAJAX.prototype._appendDropAJAXEvent=function(stringBuilder, ajaxDropEvent)
 		{
-			this.appendXMLStartTag(stringBuilder, this.RequestElement.DROP);	//<drop>
-			this.appendXMLStartTag(stringBuilder, this.RequestElement.SOURCE, new Parameter(this.RequestElement.ID, ajaxDropEvent.dragSource.id));	//<source id="id">
-			this.appendXMLEndTag(stringBuilder, this.RequestElement.SOURCE);	//</source>
-			this.appendXMLStartTag(stringBuilder, this.RequestElement.TARGET, new Parameter(this.RequestElement.ID, ajaxDropEvent.dropTarget.id));	//<source id="id">
-			this.appendXMLEndTag(stringBuilder, this.RequestElement.TARGET);	//</target>
-			this.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE, new Parameter(this.RequestElement.X, ajaxDropEvent.mousePosition.x), new Parameter(this.RequestElement.Y, ajaxDropEvent.mousePosition.y));	//<mouse x="x" y="y">
-			this.appendXMLEndTag(stringBuilder, this.RequestElement.MOUSE);	//</mouse>
-			this.appendXMLEndTag(stringBuilder, this.RequestElement.DROP);	//</drop>
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.DROP);	//<drop>
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.SOURCE, new Parameter(this.RequestElement.ID, ajaxDropEvent.dragSource.id));	//<source id="id">
+			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.SOURCE);	//</source>
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.TARGET, new Parameter(this.RequestElement.ID, ajaxDropEvent.dropTarget.id));	//<source id="id">
+			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.TARGET);	//</target>
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE, new Parameter(this.RequestElement.X, ajaxDropEvent.mousePosition.x), new Parameter(this.RequestElement.Y, ajaxDropEvent.mousePosition.y));	//<mouse x="x" y="y">
+			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.MOUSE);	//</mouse>
+			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.DROP);	//</drop>
 			return stringBuilder;	//return the string builder
 		};
 
@@ -978,78 +1129,9 @@ function GuiseAJAX()
 		*/
 		GuiseAJAX.prototype._appendInitAJAXEvent=function(stringBuilder, ajaxInitEvent)
 		{
-			this.appendXMLStartTag(stringBuilder, this.RequestElement.INIT);	//<init>
-			this.appendXMLEndTag(stringBuilder, this.RequestElement.INIT);	//</init>
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.INIT);	//<init>
+			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.INIT);	//</init>
 			return stringBuilder;	//return the string builder
-		};
-
-		/**Encodes a string so that it may be used in XML by escaping XML-specific characters.
-		@param string The string to encode.
-		@return The XML-encoded string.
-		*/
-		GuiseAJAX.prototype.encodeXML=function(string)
-		{
-			string=string.replace(/&/g, "&amp;");	//encode '&' first
-			string=string.replace(/</g, "&lt;");	//encode '<'
-			string=string.replace(/>/g, "&gt;");	//encode '>'
-			string=string.replace(/"/g, "&quot;");	//encode '\"'
-			return string;	//return the encoded string
-		};
-
-		/**Encodes and appends XML text to the given string builder.
-		@param stringBuilder The string builder to hold the data.
-		@param text The text to encode and append.
-		@return A reference to the string builder.
-		*/ 
-		GuiseAJAX.prototype.appendXMLText=function(stringBuilder, text)
-		{
-			return stringBuilder.append(this.encodeXML(text));	//encode and append the text, and return the string builder
-		};
-
-		/**Appends an XML start tag with the given name to the given string builder.
-		If the value of a parameter is null, that parameter will not be used.
-		If the value of a parameter is not a string, it will be converted to one.
-		@param stringBuilder The string builder to hold the data.
-		@param tagName The name of the XML tag.
-		@param parameters (...) Zero or more parameters of type Parameter.
-		@return A reference to the string builder.
-		*/ 
-		GuiseAJAX.prototype.appendXMLStartTag=function(stringBuilder, tagName, parameters)
-		{
-			stringBuilder.append("<").append(tagName);	//<tagName
-			var argumentCount=arguments.length;	//find out how many arguments there are
-			for(var i=2; i<argumentCount; ++i)	//for each argument (not counting the first two)
-			{
-				var parameter=arguments[i];	//get this argument
-				if(parameter.value!=null)	//if a parameter value was given
-				{
-					stringBuilder.append(" ").append(parameter.name).append("=\"").append(this.encodeXML(parameter.value.toString())).append("\"");	//name="value"
-				}
-			}
-			return stringBuilder.append(">");	//>
-		};
-
-		/**Appends an XML end tag with the given name to the given string builder.
-		@param stringBuilder The string builder to hold the data.
-		@param tagName The name of the XML tag.
-		@return A reference to the string builder.
-		*/
-		GuiseAJAX.prototype.appendXMLEndTag=function(stringBuilder, tagName)
-		{
-			return stringBuilder.append("</").append(tagName).append(">");	//append the start tag
-		};
-
-		/**Appends an XML element containing text.
-		@param stringBuilder The string builder to hold the data.
-		@param tagName The name of the XML tag.
-		@param text The text to store in the element.
-		@return A reference to the string builder.
-		*/
-		GuiseAJAX.prototype.appendXMLTextElement=function(stringBuilder, tagName, text)
-		{
-			this.appendXMLStartTag(stringBuilder, tagName);	//append the start tag
-			this.appendXMLText(stringBuilder, text);	//append the text
-			return this.appendXMLEndTag(stringBuilder, tagName);	//append the end tag
 		};
 	
 		/**Creates a method for processing HTTP communication.
@@ -1194,6 +1276,7 @@ alert(exception);
 						else if(hasClass(childNode, "frame"))	//if the element doesn't currently exist, but the patch is for a frame, create a new frame
 						{
 							oldElement=document.importNode(childNode, true);	//create an import clone of the node
+//TODO del alert("imported element "+typeof oldElement+" with ID "+oldElement.id);
 							oldElement.style.position="absolute";	//change the element's position to absolute TODO update the element's initial position
 							oldElement.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components
 /*TODO del
@@ -2014,7 +2097,7 @@ function onFocus(event)
 				}
 				else	//if we can't find a focusable node on the modal frame
 				{
-					currentTarget.blur();	//don't allow the element to get the focus, even though we don't know what to focus
+//TODO fix for IE					currentTarget.blur();	//don't allow the element to get the focus, even though we don't know what to focus
 				}
 			}
 /*TODO del 
@@ -2080,8 +2163,8 @@ function onTextInputChange(event)
 */
 function onButtonClick(event)
 {
-//TODO fix	onAction(event);	//process an action for the button
-
+	onAction(event);	//process an action for the button
+/*TODO fix for file uploads
 		//TODO for now, always do a POST so that table updates and file uploads can work; later fix this---perhaps check to see if file uploads are on the form
 
 	var element=event.currentTarget;	//get the element on which the event was registered
@@ -2130,7 +2213,7 @@ function onButtonClick(event)
 			event.preventDefault();	//prevent the default functionality from occurring
 		}
 	}
-
+*/
 }
 
 /**Called when an anchor is clicked.
@@ -2562,7 +2645,12 @@ function getDropTarget(x, y)
 */
 function getForm(node)
 {
-	return getAncestorElementByName(node, "form");	//get the form ancestor
+	var form=getAncestorElementByName(node, "form");	//get the form ancestor
+	if(form==null)	//if there is no form ancestor (e.g. the node is a frame outside the form)
+	{
+		form=getDescendantElementByName(document.documentElement, "form");	//search the whole document for the form
+	}
+	return form;	//return the form we found, if any
 }
 
 /**Retrieves the ancestor menu element of the node, starting at the node itself.
@@ -2598,7 +2686,7 @@ function getMenu(node)
 */
 function getAncestorElementByName(node, elementName)
 {
-	while(node && node.nodeType!=Node.ELEMENT_NODE || node.nodeName.toLowerCase()!=elementName)	//while we haven't found the named element
+	while(node && (node.nodeType!=Node.ELEMENT_NODE || node.nodeName.toLowerCase()!=elementName))	//while we haven't found the named element
 	{
 		node=node.parentNode;	//get the parent node
 	}
@@ -2621,6 +2709,34 @@ function getAncestorElementByClassName(node, className)
 		node=node.parentNode;	//try the parent node
 	}
 	return node;	//return whatever node we found
+}
+
+/**Retrieves the descendant element with the given name, starting at the node itself.
+@param node The node the descendant of which to find, or null if the search should not take place.
+@param elementName The name of the element to find.
+@return The element with the given name, or null if there is no such element descendant.
+*/
+function getDescendantElementByName(node, elementName)
+{
+	if(node)	//if we have a node
+	{
+		if(node.nodeType==Node.ELEMENT_NODE && node.nodeName.toLowerCase()==elementName)	//if this is an element with the given name
+		{
+			return node;	//show that we found a matching element name
+		}
+		var childNodeList=node.childNodes;	//get all the child nodes
+		var childNodeCount=childNodeList.length;	//find out how many children there are
+		for(var i=0; i<childNodeCount; ++i)	//for each child node
+		{
+			var childNode=childNodeList[i];	//get this child node
+			var match=getDescendantElementByName(childNode, elementName);	//see if we can find the node in this branch
+			if(match)	//if we found a match
+			{
+				return match;	//return it
+			}
+		}
+	}
+	return null;	//show that we didn't find a menu
 }
 
 /**Retrieves the descendant element with the given class of the given node, starting at the node itself. Multiple class names are supported.

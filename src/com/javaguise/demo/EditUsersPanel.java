@@ -52,17 +52,16 @@ public class EditUsersPanel extends DefaultNavigationPanel
 				{
 					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
 					{
-						session.navigateModal(DemoApplication.EDIT_USER_PANEL_NAVIGATION_PATH, new ModalNavigationListener<DemoUser>()	//navigate modally to the edit user panel
+						session.navigateModal(DemoApplication.EDIT_USER_PANEL_NAVIGATION_PATH, new ModalNavigationListener<EditUserPanel>()	//navigate modally to the edit user panel
 								{
-									public void modalBegan(final ModalEvent<DemoUser> modalEvent)	//when modal editing begins
+									public void modalBegan(final ModalEvent<EditUserPanel> modalEvent)	//when modal editing begins
 									{
 										final String newUserID=((DemoApplication)getSession().getApplication()).generateUserID();	//ask the application to generate a new user ID
-										final EditUserPanel editUserPanel=((EditUserPanel)(Object)modalEvent.getSource());	//TODO add better workaround for Java 1.5.0_04 cast requirement 
-										editUserPanel.setNewUser(newUserID);	//initialize the panel for a new user
+										modalEvent.getSource().setNewUser(newUserID);	//initialize the panel for a new user
 									}
-									public void modalEnded(final ModalEvent<DemoUser> modalEvent)	//when modal editing is finished
+									public void modalEnded(final ModalEvent<EditUserPanel> modalEvent)	//when modal editing is finished
 									{
-										final DemoUser newUser=modalEvent.getResult();	//get the modal result
+										final DemoUser newUser=modalEvent.getSource().getResult();	//get the modal result
 										if(newUser!=null)	//if a new user was created
 										{
 											userListControl.getModel().add(newUser);	//add the new user to the list
@@ -94,16 +93,15 @@ public class EditUsersPanel extends DefaultNavigationPanel
 						final DemoUser user=userListControl.getModel().getSelectedValue();	//get the selected user
 						if(user!=null)	//if a user is selected
 						{
-							session.navigateModal(DemoApplication.EDIT_USER_PANEL_NAVIGATION_PATH, new ModalNavigationListener<DemoUser>()	//navigate modally to the edit user panel
+							session.navigateModal(DemoApplication.EDIT_USER_PANEL_NAVIGATION_PATH, new ModalNavigationListener<EditUserPanel>()	//navigate modally to the edit user panel
 									{
-										public void modalBegan(final ModalEvent<DemoUser> modalEvent)	//when modal editing begins
+										public void modalBegan(final ModalEvent<EditUserPanel> modalEvent)	//when modal editing begins
 										{
-											final EditUserPanel editUserPanel=((EditUserPanel)(Object)modalEvent.getSource());	//TODO add better workaround for Java 1.5.0_04 cast requirement 
-											editUserPanel.setUser(user);	//initialize the panel with this user
+											modalEvent.getSource().setUser(user);	//initialize the panel with this user
 										}
-										public void modalEnded(final ModalEvent<DemoUser> modalEvent)	//when modal editing is finished
+										public void modalEnded(final ModalEvent<EditUserPanel> modalEvent)	//when modal editing is finished
 										{
-											final DemoUser newUser=modalEvent.getResult();	//get the modal result
+											final DemoUser newUser=modalEvent.getSource().getResult();	//get the modal result
 											if(newUser!=null)	//if a new user was created
 											{
 												userListControl.getModel().replace(user, newUser);	//replace the user with the new user
