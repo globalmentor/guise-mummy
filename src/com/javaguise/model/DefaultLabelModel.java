@@ -19,7 +19,6 @@ public class DefaultLabelModel extends AbstractLabelModel
 		@return The label text, or <code>null</code> if there is no label text.
 		@exception MissingResourceException if there was an error loading the value from the resources.
 		@see #getLabelResourceKey()
-		@see #getPlainLabel()
 		*/
 		public String getLabel() throws MissingResourceException
 		{
@@ -60,4 +59,11 @@ public class DefaultLabelModel extends AbstractLabelModel
 		super(session);	//construct the parent class
 		this.label=label;	//save the label
 	}
+
+	/**@return <code>true</code> if this model has label information, such as an icon or a label string.*/
+	public boolean hasLabel()
+	{
+		return label!=null || getLabelResourceKey()!=null || getIcon()!=null;	//see if there is label text, a label resource key, or an icon
+	}
+
 }

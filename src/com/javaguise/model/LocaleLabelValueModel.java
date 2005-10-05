@@ -48,5 +48,11 @@ public class LocaleLabelValueModel<V> extends DefaultValueModel<V>
 	{
 		throw new UnsupportedOperationException("A date label cannot be set.");
 	}
+	
+	/**@return <code>true</code> if this model has label information, such as an icon or a label string.*/
+	public boolean hasLabel()
+	{
+		return true;	//a locale label value model always has label information
+	}
 
 }

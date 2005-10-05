@@ -243,6 +243,7 @@ public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultO
 		{
 			final ActionModel actionModel=new DefaultActionModel(session);	//create an action model
 			actionModel.setLabelResourceKey(MessageFormat.format("frame.dialog.options.{0}.label", option.toString()));	//set the option action label
+			actionModel.setIconResourceKey(MessageFormat.format("frame.dialog.options.{0}.icon", option.toString()));	//set the option action icon
 			actionModel.addActionListener(new ActionListener<ActionModel>()	//listen for the action being performed
 					{
 						public void actionPerformed(ActionEvent<ActionModel> actionEvent)	//if the action is performed
