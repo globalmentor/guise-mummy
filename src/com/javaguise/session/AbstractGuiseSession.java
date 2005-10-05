@@ -23,12 +23,15 @@ import static com.garretwilson.io.WriterUtilities.*;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.CollectionUtilities;
 import com.garretwilson.util.Debug;
+import com.garretwilson.util.ResourceBundleUtilities;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.text.CharacterEncodingConstants.UTF_8;
 import static com.garretwilson.text.xml.XMLUtilities.*;
+import static com.garretwilson.util.ResourceBundleUtilities.*;
 import static com.garretwilson.util.SetUtilities.*;
+import static com.javaguise.GuiseResourceConstants.*;
 
 /**An abstract implementation that keeps track of the components of a user session.
 @author Garret Wilson
@@ -228,7 +231,28 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		{
 			if(resourceBundle==null)	//if the resource bundle has not yet been loaded
 			{
-				resourceBundle=ResourceBundle.getBundle(getApplication().getResourceBundleBaseName(), getLocale());	//load a resource bundle appropriate for the locale
+				try
+				{
+	Debug.trace("ready to load default resource bundle for base name", DEFAULT_RESOURCE_BUNDLE_BASE_NAME);
+					final ClassLoader loader=getClass().getClassLoader();	//get our class loader
+					final ResourceBundle defaultResourceBundle=ResourceBundleUtilities.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null);
+					final String resourceBundleBaseName=getApplication().getResourceBundleBaseName();	//get the specified resource bundle base name
+					if(!DEFAULT_RESOURCE_BUNDLE_BASE_NAME.equals(resourceBundleBaseName))	//if a distinct resource bundle base name was specified
+					{
+	Debug.trace("ready to load default resource bundle for base name", resourceBundleBaseName);
+						resourceBundle=ResourceBundleUtilities.getResourceBundle(resourceBundleBaseName, locale, loader, defaultResourceBundle);	//load the new resource bundle, specifying the default resource bundle as the parent					
+					}
+					else	//if no custom resource bundle was specified
+					{
+	Debug.trace("using the default resource bundle");
+						resourceBundle=defaultResourceBundle;	//just use the default resource bundle
+					}
+				}
+				catch(final IOException ioException)	//if there is an error loading the resource
+				{
+					throw new AssertionError(ioException);	//TODO fix
+				}
+//TODO del when works				resourceBundle=ResourceBundle.getBundle(getApplication().getResourceBundleBaseName(), getLocale());	//load a resource bundle appropriate for the locale
 			}
 			return resourceBundle;	//return the resource bundle
 		}

@@ -150,7 +150,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		public Set<Locale> getSupportedLocales() {return supportedLocales;}
 
 	/**The base name of the resource bundle to use for this application.*/
-	private String resourceBundleBaseName=DEFAULT_RESOURCE_BUNDLE_BASE_NAME;
+	private String resourceBundleBaseName=DEFAULT_RESOURCE_BUNDLE_BASE_NAME;	//TODO later just set this to null, as we'll always load the default resources
 
 		/**@return The base name of the resource bundle to use for this application.*/
 		public String getResourceBundleBaseName() {return resourceBundleBaseName;}
