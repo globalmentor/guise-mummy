@@ -40,12 +40,12 @@ public interface GuiseApplication extends PropertyBindable
 	/**@return The thread-safe set of locales supported by this application.*/
 	public Set<Locale> getSupportedLocales();
 
-	/**@return The base name of the resource bundle to use for this application.*/
+	/**@return The base name of the resource bundle to use for this application, or <code>null</code> if no custom resource bundle is specified for this application..*/
 	public String getResourceBundleBaseName();
 
 	/**Changes the resource bundle base name.
 	This is a bound property.
-	@param newResourceBundleBaseName The new base name of the resource bundle.
+	@param newResourceBundleBaseName The new base name of the resource bundle, or <code>null</code> if no custom resource bundle is specified for this application.
 	@see #RESOURCE_BUNDLE_BASE_NAME_PROPERTY
 	*/
 	public void setResourceBundleBaseName(final String newResourceBundleBaseName);

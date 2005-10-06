@@ -149,15 +149,15 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		/**@return The thread-safe set of locales supported by this application.*/
 		public Set<Locale> getSupportedLocales() {return supportedLocales;}
 
-	/**The base name of the resource bundle to use for this application.*/
-	private String resourceBundleBaseName=DEFAULT_RESOURCE_BUNDLE_BASE_NAME;	//TODO later just set this to null, as we'll always load the default resources
+	/**The base name of the resource bundle to use for this application, or <code>null</code> if no custom resource bundle is specified for this application.*/
+	private String resourceBundleBaseName=null;
 
-		/**@return The base name of the resource bundle to use for this application.*/
+		/**@return The base name of the resource bundle to use for this application, or <code>null</code> if no custom resource bundle is specified for this application..*/
 		public String getResourceBundleBaseName() {return resourceBundleBaseName;}
 
 		/**Changes the resource bundle base name.
 		This is a bound property.
-		@param newResourceBundleBaseName The new base name of the resource bundle.
+		@param newResourceBundleBaseName The new base name of the resource bundle, or <code>null</code> if no custom resource bundle is specified for this application.
 		@see GuiseApplication#RESOURCE_BUNDLE_BASE_NAME_PROPERTY
 		*/
 		public void setResourceBundleBaseName(final String newResourceBundleBaseName)
@@ -165,7 +165,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			if(!ObjectUtilities.equals(resourceBundleBaseName, newResourceBundleBaseName))	//if the value is really changing
 			{
 				final String oldResourceBundleBaseName=resourceBundleBaseName;	//get the old value
-				resourceBundleBaseName=checkNull(newResourceBundleBaseName, "Resource bundle base name cannot be null.");	//actually change the value
+				resourceBundleBaseName=newResourceBundleBaseName;	//actually change the value
 				firePropertyChange(RESOURCE_BUNDLE_BASE_NAME_PROPERTY, oldResourceBundleBaseName, newResourceBundleBaseName);	//indicate that the value changed
 			}			
 		}

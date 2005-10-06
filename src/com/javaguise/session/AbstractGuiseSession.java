@@ -231,26 +231,17 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		{
 			if(resourceBundle==null)	//if the resource bundle has not yet been loaded
 			{
-				try
+				final Locale locale=getLocale();	//get the current locale
+				final ClassLoader loader=getClass().getClassLoader();	//get our class loader
+				final ResourceBundle defaultResourceBundle=ResourceBundleUtilities.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null);	//load the default resource bundle
+				final String resourceBundleBaseName=getApplication().getResourceBundleBaseName();	//get the specified resource bundle base name
+				if(resourceBundleBaseName!=null && !resourceBundleBaseName.equals(DEFAULT_RESOURCE_BUNDLE_BASE_NAME))	//if a distinct resource bundle base name was specified
 				{
-	Debug.trace("ready to load default resource bundle for base name", DEFAULT_RESOURCE_BUNDLE_BASE_NAME);
-					final ClassLoader loader=getClass().getClassLoader();	//get our class loader
-					final ResourceBundle defaultResourceBundle=ResourceBundleUtilities.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null);
-					final String resourceBundleBaseName=getApplication().getResourceBundleBaseName();	//get the specified resource bundle base name
-					if(!DEFAULT_RESOURCE_BUNDLE_BASE_NAME.equals(resourceBundleBaseName))	//if a distinct resource bundle base name was specified
-					{
-	Debug.trace("ready to load default resource bundle for base name", resourceBundleBaseName);
-						resourceBundle=ResourceBundleUtilities.getResourceBundle(resourceBundleBaseName, locale, loader, defaultResourceBundle);	//load the new resource bundle, specifying the default resource bundle as the parent					
-					}
-					else	//if no custom resource bundle was specified
-					{
-	Debug.trace("using the default resource bundle");
-						resourceBundle=defaultResourceBundle;	//just use the default resource bundle
-					}
+					resourceBundle=ResourceBundleUtilities.getResourceBundle(resourceBundleBaseName, locale, loader, defaultResourceBundle);	//load the new resource bundle, specifying the default resource bundle as the parent					
 				}
-				catch(final IOException ioException)	//if there is an error loading the resource
+				else	//if no custom resource bundle was specified
 				{
-					throw new AssertionError(ioException);	//TODO fix
+					resourceBundle=defaultResourceBundle;	//just use the default resource bundle
 				}
 //TODO del when works				resourceBundle=ResourceBundle.getBundle(getApplication().getResourceBundleBaseName(), getLocale());	//load a resource bundle appropriate for the locale
 			}
