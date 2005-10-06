@@ -147,7 +147,7 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@param model The component data model.
 	@param converter The converter for this component.
-	@exception NullPointerException if the given session model, and/or converter is <code>null</code>.
+	@exception NullPointerException if the given session, model, and/or converter is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
 	public TextControl(final GuiseSession session, final String id, final ValueModel<V> model, final Converter<V, String> converter)

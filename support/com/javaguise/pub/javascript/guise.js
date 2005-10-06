@@ -66,7 +66,11 @@ var STYLES=
 	ACTION: "action",
 	DRAG_SOURCE: "dragSource",
 	DRAG_HANDLE: "dragHandle",
-	DROP_TARGET: "dropTarget"
+	DROP_TARGET: "dropTarget",
+	SLIDER_CONTROL_X_LTR_THUMB: "sliderControl-x-ltr-thumb",
+	SLIDER_CONTROL_X_RTL_THUMB: "sliderControl-x-rtl-thumb",
+	SLIDER_CONTROL_Y_LTR_THUMB: "sliderControl-y-ltr-thumb",
+	SLIDER_CONTROL_Y_RTL_THUMB: "sliderControl-y-rtl-thumb"
 };
 
 /**The array of drop targets, determined when the document is loaded. The drop targets are stored in increasing order of hierarchical depth.*/
@@ -1766,11 +1770,14 @@ function addLoadListener(func)
 var eventManager=new EventManager();
 
 /**A class encapsulating drag state.
+By default the drag state allows dragging along both axes.
 @param dragSource: The element to drag.
 @param mouseX The horizontal position of the mouse.
 @param mouseY The vertical position of the mouse.
 var dragSource: The element to drag.
-var element: The actual element being dragged.
+var element: The actual element being dragged, which may or may not be the same element as the drag souce.
+var allowX: Whether dragging is allowed along the X axis.
+var allowY: Whether dragging is allowed along the Y axis.
 */
 function DragState(dragSource, mouseX, mouseY)
 {
@@ -1778,6 +1785,8 @@ function DragState(dragSource, mouseX, mouseY)
 	var dragSourcePoint=getElementCoordinates(dragSource);	//get the position of the drag source
 	this.mouseDeltaX=mouseX-dragSourcePoint.x;	//calculate the mouse position relative to the drag source
 	this.mouseDeltaY=mouseY-dragSourcePoint.y;
+	this.allowX=true;	//default to allowing dragging along the X axis
+	this.allowY=true;	//default to allowing dragging along the Y axis
 
 	if(!DragState.prototype._initialized)
 	{
@@ -1811,8 +1820,14 @@ function DragState(dragSource, mouseX, mouseY)
 		*/
 		DragState.prototype.drag=function(mouseX, mouseY)
 		{
-			dragState.element.style.left=(mouseX-dragState.mouseDeltaX).toString()+"px";	//update the position of the dragged element
-			dragState.element.style.top=(mouseY-dragState.mouseDeltaY).toString()+"px";
+			if(this.allowX)	//if horizontal dragging is allowed
+			{
+				dragState.element.style.left=(mouseX-dragState.mouseDeltaX).toString()+"px";	//update the horizontal position of the dragged element
+			}
+			if(this.allowY)	//if vertical dragging is allowed
+			{
+				dragState.element.style.top=(mouseY-dragState.mouseDeltaY).toString()+"px";	//update the horizontal position of the dragged element
+			}
 		}
 	
 		/**Ends the drag process.*/
@@ -2027,6 +2042,12 @@ function initializeNode(node)
 							break;
 						case STYLES.DROP_TARGET:
 							dropTargets.add(node);	//add this node to the list of drop targets
+							break;
+						case STYLES.SLIDER_CONTROL_X_LTR_THUMB:
+						case STYLES.SLIDER_CONTROL_X_RTL_THUMB:
+						case STYLES.SLIDER_CONTROL_Y_LTR_THUMB:
+						case STYLES.SLIDER_CONTROL_Y_RTL_THUMB:
+							eventManager.addEvent(node, "mousedown", onSliderThumbDragBegin, false);	//listen for mouse down on a slider thumb
 							break;
 					}
 				}
@@ -2596,7 +2617,7 @@ function onDrag(event)
 	}
 	else
 	{
-		alert("Unexpectedly dragging without drag state.");	//TODO del
+		alert("Unexpectedly dragging without drag state.");	//TODO change to an assertion
 	}
 }
 
@@ -2616,6 +2637,33 @@ function onDragEnd(event)
 			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		}
 		dragState=null;	//release our drag state
+		event.stopPropagation();	//tell the event to stop bubbling
+		event.preventDefault();	//prevent the default functionality from occurring
+	}
+}
+
+/**Called when dragging begins on a slider thumb.
+@param event The object describing the event.
+*/
+function onSliderThumbDragBegin(event)
+{
+	//TODO perhaps just end the dragging if there's already a drag state
+	if(!dragState)	//if there's a drag state, stay with that one (e.g. the mouse button might have been released outside the document on Mozilla)
+	{
+		var dragHandle=event.target;	//get the target of the event
+//TODO find out why none of the styles are accessible
+
+//TODO fix alert("drag handle position: "+dragHandle.style.position);
+//TODO fix alert("drag handle width: "+dragHandle.style.width);
+//TODO fix alert("drag handle background: "+dragHandle.style.background);
+
+			//TODO make sure this isn't the context mouse button
+//TODO del alert("checking to start drag");
+//TODO del alert("found drag source: "+dragSource.nodeName);
+		dragState=new DragState(dragHandle, event.clientX, event.clientY);	//create a new drag state
+		dragState.allowY=false;	//TODO testing
+		dragState.beginDrag(event.clientX, event.clientY);	//begin dragging
+//TODO del alert("drag state element: "+dragState.element.nodeName);
 		event.stopPropagation();	//tell the event to stop bubbling
 		event.preventDefault();	//prevent the default functionality from occurring
 	}

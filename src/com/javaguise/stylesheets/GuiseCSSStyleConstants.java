@@ -62,6 +62,10 @@ public class GuiseCSSStyleConstants
 	/**The CSS class for an open, modal frame.*/
 	public final static String FRAME_MODAL_CLASS="frameModal";
 
+		//slider
+	/**The CSS class suffix identifying the slider thumb.*/
+	public final static String THUMB_CLASS_SUFFIX="-thumb";
+
 		//drag and drop
 	/**The potential source of a drag and drop operation.*/
 	public final static String DRAG_SOURCE_CLASS="dragSource";
@@ -70,7 +74,7 @@ public class GuiseCSSStyleConstants
 	/**The potential target of a drag and drop operation.*/
 	public final static String DROP_TARGET_CLASS="dropTarget";
 	
-	//layout
+		//layout
 
 	/**The CSS class for any enclosing element needed for region layout.*/
 	public final static String LAYOUT_REGION_CLASS="layout-region";

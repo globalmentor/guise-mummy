@@ -255,6 +255,16 @@ Debug.trace("list control changed value to", newValue);
 		buttonPanel.add(modalFrameLink);
 
 		contentPanel.add(buttonPanel);	//add the button panel to the panel
+		
+		
+		
+		final LayoutPanel sliderPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.LINE));
+		
+		final SliderControl<Integer> horizontalSlider=new SliderControl<Integer>(session, Integer.class, Orientation.Flow.LINE);
+		sliderPanel.add(horizontalSlider);
+		
+		contentPanel.add(sliderPanel);	//add the slider panel to the panel
+		
 		final TextControl<String> textInput=new TextControl<String>(session, "textInput", String.class);	//create a text input control
 		textInput.getModel().setLabel("This is the text input label.");
 		textInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<String>()
