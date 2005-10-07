@@ -1281,6 +1281,7 @@ alert(exception);
 						{
 							oldElement=document.importNode(childNode, true);	//create an import clone of the node
 //TODO del alert("imported element "+typeof oldElement+" with ID "+oldElement.id);
+//TODO fix so that it works both on IE and Firefox							oldElement.style.position="fixed";	//TODO testing
 							oldElement.style.position="absolute";	//change the element's position to absolute TODO update the element's initial position
 							oldElement.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components
 /*TODO del
@@ -1776,15 +1777,45 @@ By default the drag state allows dragging along both axes.
 @param mouseY The vertical position of the mouse.
 var dragSource: The element to drag.
 var element: The actual element being dragged, which may or may not be the same element as the drag souce.
-var allowX: Whether dragging is allowed along the X axis.
-var allowY: Whether dragging is allowed along the Y axis.
+var initialFixedPosition: The initial position of the drag source in fixed terms of the viewport.
+var initialOffsetPosition: The initial position of the drag source relative to the offset parent.
+var initialPosition: The initial position of the element in correct terms, fixed or offset; initialized when dragging starts.
+var dragCopy Whether a copy of the element should be dragged, rather than the original element. Defaults to true unless the element is absolute or fixed.
+var allowX: Whether dragging is allowed along the X axis (true by default).
+var allowY: Whether dragging is allowed along the Y axis (true by default).
+var minX: The minimum horizontal position, inclusive, in correct element terms, or null if there is no minumum horizontal position.
+var maxX: The maximum horizontal position, inclusive, in correct element terms, or null if there is no maximum horizontal position.
 */
 function DragState(dragSource, mouseX, mouseY)
 {
 	this.dragSource=dragSource;
-	var dragSourcePoint=getElementCoordinates(dragSource);	//get the position of the drag source
-	this.mouseDeltaX=mouseX-dragSourcePoint.x;	//calculate the mouse position relative to the drag source
-	this.mouseDeltaY=mouseY-dragSourcePoint.y;
+
+	this.initialMouseFixedPosition=new Point(mouseX, mouseY);
+	this.initialFixedPosition=getElementCoordinates(dragSource);	//get the initial position of the drag source in fixed terms of the viewport
+	this.initialOffsetPosition=new Point(dragSource.offsetLeft, dragSource.offsetTop);	//get the offset position of the drag source
+	
+	this.initialPosition=null;	//these will be updated when dragging is started
+	this.mouseDeltaX=0;
+	this.mouseDeltaY=0;
+
+	this.minX=null;
+	this.maxX=null;	
+//TODO fix	this.initialPosition=new Point(dragSource.offsetLeft, dragSource.offsetTop);	//get the position of the drag source
+	
+//TODO fix	this.initialPosition=getElementCoordinates(dragSource);	//get the position of the drag source
+/*TODO fix
+	this.mouseDeltaX=mouseX-this.initialPosition.x;	//calculate the mouse position relative to the drag source
+	this.mouseDeltaY=mouseY-this.initialPosition.y;
+*/
+	if(dragSource.style)	//if the drag source has style specified
+	{
+		var style=dragSource.style;	//get the element style
+		this.dragCopy=style.position!="absolute" && style.position!="fixed";	//see if the drag source is already fixed or absolutely positioned; if so, we won't drag a copy	
+	}
+	else	//if this drag source has no style specified
+	{
+		this.dragCopy=true;	//default to dragging a copy
+	}
 	this.allowX=true;	//default to allowing dragging along the X axis
 	this.allowY=true;	//default to allowing dragging along the Y axis
 
@@ -1797,7 +1828,7 @@ function DragState(dragSource, mouseX, mouseY)
 		@param mouseY The vertical position of the mouse.
 		*/
 		DragState.prototype.beginDrag=function(mouseX, mouseY)
-		{
+		{		
 			this.element=this._getDragElement();	//create an element for dragging
 			this.drag(mouseX, mouseY);	//drag the element to the current mouse position
 			if(this.element!=this.dragSource)	//if we have a new element to drag
@@ -1822,11 +1853,45 @@ function DragState(dragSource, mouseX, mouseY)
 		{
 			if(this.allowX)	//if horizontal dragging is allowed
 			{
-				dragState.element.style.left=(mouseX-dragState.mouseDeltaX).toString()+"px";	//update the horizontal position of the dragged element
+				var onTrackY=this.allowY || (mouseY>=this.initialFixedPosition.y && mouseY<(this.initialFixedPosition.y+this.element.offsetHeight))	//see if the mouse is on the track vertically
+				if(onTrackY)	//if the mouse is on the track
+				{
+					var newX=mouseX-dragState.mouseDeltaX;	//calculate the new left position
+					if(this.minX!=null && newX<this.minX)	//if there is a minimum specified and the new position is below it
+					{
+						newX=this.minX;	//stop at the floor
+					}
+					else if(this.maxX!=null && newX>this.maxX)	//if there is a maximum specified and the new position is above it
+					{
+						newX=this.maxX;	//stop at the ceiling
+					}
+					this.element.style.left=newX.toString()+"px";	//update the horizontal position of the dragged element
+				}
+				else	//if the mouse is off the track
+				{
+					this.element.style.left=(this.initialPosition.x).toString()+"px";	//reset the horizontal position
+				}
 			}
 			if(this.allowY)	//if vertical dragging is allowed
 			{
-				dragState.element.style.top=(mouseY-dragState.mouseDeltaY).toString()+"px";	//update the horizontal position of the dragged element
+				var onTrackX=this.allowX || (mouseX>=this.initialFixedPosition.x && mouseX<(this.initialFixedPosition.x+this.element.offsetWidth))	//see if the mouse is on the track horizontally
+				if(onTrackX)	//if the mouse is on the track
+				{
+					var newY=mouseY-dragState.mouseDeltaY;	//calculate the new top position
+					if(this.minY!=null && newY<this.minY)	//if there is a minimum specified and the new position is below it
+					{
+						newY=this.minY;	//stop at the floor
+					}
+					else if(this.maxY!=null && newY>this.maxY)	//if there is a maximum specified and the new position is above it
+					{
+						newY=this.maxY;	//stop at the ceiling
+					}
+					this.element.style.top=newY.toString()+"px";	//update the vertical position of the dragged element
+				}
+				else	//if the mouse is off the track
+				{
+					this.element.style.top=(this.initialPosition.y).toString()+"px";	//reset the vertical position
+				}
 			}
 		}
 	
@@ -1848,10 +1913,11 @@ function DragState(dragSource, mouseX, mouseY)
 		/**@return An element appropriate for dragging, such as a clone of the original.*/
 		DragState.prototype._getDragElement=function()
 		{
-			var isAbsolute=this.dragSource.style.position=="absolute";	//see if the drag source is already absolutely positioned
-			var element=this.dragSource;	//start out assuming we'll use the drag source as is
-			if(!isAbsolute)	//if the drag source is not absolutely positioned
+			var element;	//we'll determine which element to use
+			if(this.dragCopy)	//if we should make a copy of the element
 			{
+				this.initialPosition=this.initialFixedPosition;	//the initial position is the fixed position
+
 				element=this.dragSource.cloneNode(true);	//create a clone of the original element
 				this._cleanClone(element);	//clean the clone
 				//TODO clean the element better, removing drag handles and such
@@ -1863,10 +1929,28 @@ function DragState(dragSource, mouseX, mouseY)
 					element=shimElement;	//use the shim element as the drag element
 				}
 	*/
+
+				element.style.left=(this.initialPosition.x).toString()+"px";	//initialize the horizontal position of the copy
+				element.style.top=(this.initialPosition.y).toString()+"px";	//initialize the vertical position of the copy
 				element.style.position="absolute";	//change the element's position to absolute TODO update the element's initial position
 				element.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components
 				//TODO make sure resizeable elements are the correct size
+
 			}
+			else	//if we should keep the same element
+			{
+				element=this.dragSource;	//drag the drag source itself
+				if(element.style && element.style.position=="fixed")	//if this is a fixed element
+				{
+					this.initialPosition=this.initialFixedPosition;	//used fixed coordinates
+				}
+				else	//if this is not a fixed element, or we don't know
+				{
+					this.initialPosition=this.initialOffsetPosition;	//the initial position is the offset position TODO check for fixed position, which would also mean using fixed coordinates
+				}
+			}
+			this.mouseDeltaX=this.initialMouseFixedPosition.x-this.initialPosition.x;	//calculate the mouse position relative to the drag source
+			this.mouseDeltaY=this.initialMouseFixedPosition.y-this.initialPosition.y;
 			return element;	//return the cloned element
 		};
 
@@ -2650,22 +2734,31 @@ function onSliderThumbDragBegin(event)
 	//TODO perhaps just end the dragging if there's already a drag state
 	if(!dragState)	//if there's a drag state, stay with that one (e.g. the mouse button might have been released outside the document on Mozilla)
 	{
-		var dragHandle=event.target;	//get the target of the event
-//TODO find out why none of the styles are accessible
-
-//TODO fix alert("drag handle position: "+dragHandle.style.position);
-//TODO fix alert("drag handle width: "+dragHandle.style.width);
-//TODO fix alert("drag handle background: "+dragHandle.style.background);
-
-			//TODO make sure this isn't the context mouse button
-//TODO del alert("checking to start drag");
-//TODO del alert("found drag source: "+dragSource.nodeName);
-		dragState=new DragState(dragHandle, event.clientX, event.clientY);	//create a new drag state
-		dragState.allowY=false;	//TODO testing
-		dragState.beginDrag(event.clientX, event.clientY);	//begin dragging
-//TODO del alert("drag state element: "+dragState.element.nodeName);
-		event.stopPropagation();	//tell the event to stop bubbling
-		event.preventDefault();	//prevent the default functionality from occurring
+				//TODO make sure this isn't the context mouse button
+		var thumb=event.currentTarget;	//get the target of the event
+		var slider=getAncestorElementByClassName(thumb, /^sliderControl-[xy]-(ltr|rtl)$/);	//find the slider TODO use a constant
+		if(slider)	//if we found the slider
+		{
+			var isHorizontal=hasClassName(slider, /^sliderControl-x-(ltr|rtl)$/);	//see if this is a horizontal slider
+			dragState=new DragState(thumb, event.clientX, event.clientY);	//create a new drag state
+			dragState.dragCopy=false;	//drag the actual element, not a copy
+			if(isHorizontal)	//if this is a horizontal slider
+			{
+				dragState.allowY=false;	//only allow horizontal dragging
+				dragState.minX=0;	//set the minimum
+				dragState.maxX=slider.offsetWidth-thumb.offsetWidth;	//set the maximum
+			}
+			else	//if this is a vertical slider
+			{
+				dragState.allowX=false;	//only allow vertical dragging
+				dragState.minY=0;	//set the minimum
+				dragState.maxY=slider.offsetHeight-thumb.offsetHeight;	//set the maximum
+			}
+			dragState.beginDrag(event.clientX, event.clientY);	//begin dragging
+	//TODO del alert("drag state element: "+dragState.element.nodeName);
+			event.stopPropagation();	//tell the event to stop bubbling
+			event.preventDefault();	//prevent the default functionality from occurring
+		}
 	}
 }
 

@@ -262,7 +262,10 @@ Debug.trace("list control changed value to", newValue);
 		
 		final SliderControl<Integer> horizontalSlider=new SliderControl<Integer>(session, Integer.class, Orientation.Flow.LINE);
 		sliderPanel.add(horizontalSlider);
-		
+
+		final SliderControl<Integer> verticalSlider=new SliderControl<Integer>(session, Integer.class, Orientation.Flow.PAGE);
+		sliderPanel.add(verticalSlider);
+
 		contentPanel.add(sliderPanel);	//add the slider panel to the panel
 		
 		final TextControl<String> textInput=new TextControl<String>(session, "textInput", String.class);	//create a text input control
