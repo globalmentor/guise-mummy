@@ -41,7 +41,7 @@ var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX c
 var XHTML_NAMESPACE_URI="http://www.w3.org/1999/xhtml";
 
 /**The class prefix of a menu.*/
-var MENU_CLASS_PREFIX="menu-";
+//TODO del when works var MENU_CLASS_PREFIX="menu-";
 
 /**The class prefix of a tree node.*/
 var TREE_NODE_CLASS_PREFIX="treeNode-";
@@ -2074,21 +2074,17 @@ function initializeNode(node)
 						break;
 					case "div":
 								//check for menu
-						for(var i=elementClassNames.length-1; i>=0; --i)	//for each class name
+						if(elementClassNames.containsMatch(/^menu-[xy]-(ltr|rtl)$/))	//if this is a menu TODO use a constant
 						{
-							var className=elementClassNames[i];	//get a reference to this class name
-							if(className.startsWith(MENU_CLASS_PREFIX) && className.endsWith(DECORATOR_CLASS_PREFIX))	//if this is a menu-*-decorator TODO just use a regular expression
+							var menu=getMenu(node);	//get the menu ancestor
+							if(menu)	//if there is a menu ancestor (i.e. this is not the root menu)
 							{
-								var menu=getMenu(node);	//get the menu ancestor
-								if(menu)	//if there is a menu ancestor (i.e. this is not the root menu)
-								{
 //TODO del when works alert("for class "+className+" non-root menu: "+menu.id);
-									eventManager.addEvent(node, "mouseover", onMenuMouseOver, false);
-									eventManager.addEvent(node, "mouseout", onMenuMouseOut, false);
-									break;
-								}
-//TODO del alert("found menu class: "+elementClassName);
+								eventManager.addEvent(node, "mouseover", onMenuMouseOver, false);
+								eventManager.addEvent(node, "mouseout", onMenuMouseOut, false);
+								break;
 							}
+//TODO del alert("found menu class: "+elementClassName);
 						}
 						break;
 					case "input":
@@ -2470,7 +2466,7 @@ function onCheckInputChange(event)
 	var checkInput=event.currentTarget;	//get the control that was listening for events (the target could be the check input's label, as occurs in Mozilla)
 	if(AJAX_URI)	//if AJAX is enabled
 	{
-		var ajaxRequest=new FormAJAXEvent(new Parameter(checkInput.name, checkInput.checked ? checkInput.id : ""));	//create a new form request with the control name and value
+		var ajaxRequest=new FormAJAXEvent(new Parameter(checkInput.name, checkInput.checked ? checkInput.value : ""));	//create a new form request with the control name and value
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		event.stopPropagation();	//tell the event to stop bubbling
 	}
@@ -2644,7 +2640,7 @@ var menuState=new MenuState();	//create a new menu state object
 */
 function onMenuMouseOver(event)
 {
-	var menu=getDescendantElementByClassName(event.currentTarget, /^menu-.-...$/);	//get the menu below us TODO use a constant
+	var menu=getDescendantElementByClassName(event.currentTarget, /^menu-[xy]-(ltr|rtl)-body$/);	//get the menu below us TODO use a constant
 	if(menu)	//if there is a menu below us
 	{
 		menuState.openMenu(menu);	//open this menu
@@ -2657,7 +2653,7 @@ function onMenuMouseOver(event)
 */
 function onMenuMouseOut(event)
 {
-	var menu=getDescendantElementByClassName(event.currentTarget, /^menu-.-...$/);	//get the menu below us TODO use a constant
+	var menu=getDescendantElementByClassName(event.currentTarget, /^menu-[xy]-(ltr|rtl)-body$/);	//get the menu below us TODO use a constant
 	if(menu)	//if there is a menu below us
 	{
 		menuState.closeMenu(menu);	//close this menu
@@ -2798,8 +2794,10 @@ function getForm(node)
 @param node The node the ancestor of which to find, or null if the search should not take place.
 @return The menu ancestor, or null if there is no menu ancestor.
 */
-function getMenu(node)
+function getMenu(node)	//TODO rename method when works
 {
+	return getAncestorElementByClassName(node, /^menu-[xy]-(ltr|rtl)-body$/);	//TODO comment; use a constant
+/*TODO del when works
 	while(node)	//while we haven't reached the top of the hierarchy
 	{
 		if(node.nodeType==Node.ELEMENT_NODE)	//if this is an element
@@ -2818,6 +2816,7 @@ function getMenu(node)
 		node=node.parentNode;	//try the parent node
 	}
 	return node;	//return whatever node we found
+*/
 }
 
 /**Retrieves the named ancestor element of the given node, starting at the node itself.
@@ -2877,7 +2876,7 @@ function getDescendantElementByName(node, elementName)
 			}
 		}
 	}
-	return null;	//show that we didn't find a menu
+	return null;	//show that we didn't find a matching element
 }
 
 /**Retrieves the descendant element with the given class of the given node, starting at the node itself. Multiple class names are supported.
@@ -2905,7 +2904,7 @@ function getDescendantElementByClassName(node, className)
 			}
 		}
 	}
-	return null;	//show that we didn't find a menu
+	return null;	//show that we didn't find a matching element
 }
 
 /**Determines whether the given element has the given class. Multiple class names are supported.

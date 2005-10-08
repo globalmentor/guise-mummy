@@ -590,7 +590,7 @@ for(final Component<?> affectedComponent:affectedComponents)
 					//TODO ifAJAX()
 					guiseContext.writeElementBegin(null, "navigate");	//<navigate>	//TODO use a constant
 					guiseContext.write(requestedNavigationURI.toString());	//write the navigation URI
-					guiseContext.writeElementEnd();	//</navigate>
+					guiseContext.writeElementEnd(null, "navigate");	//</navigate>
 //TODO if !AJAX						throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
 					//TODO store a flag or something---if we're navigating, we probably should flush the other queued events
 				}
@@ -620,7 +620,7 @@ Debug.trace("now have frames: ", frames.size());
 				if(dirtyComponents.contains(applicationFrame))	//if the application frame itself was affected, we might as well reload the page
 				{
 					guiseContext.writeElementBegin(null, "reload", true);	//<reload>	//TODO use a constant
-					guiseContext.writeElementEnd();	//</reload>						
+					guiseContext.writeElementEnd(null, "reload");	//</reload>						
 				}
 				else	//if the application frame wasn't affected
 				{
@@ -632,13 +632,13 @@ Debug.trace("now have frames: ", frames.size());
 //TODO fix							else	//if the component is not visible, remove the component's elements
 						guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
 						dirtyComponent.updateView(guiseContext);		//tell the component to update its view
-						guiseContext.writeElementEnd();	//</xhtml:patch>
+						guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "patch");	//</xhtml:patch>
 					}
 					for(final Frame<?> frame:removedFrames)	//for each removed frame
 					{
 						guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "remove");	//<xhtml:remove>	//TODO use a constant TODO don't use the XHTML namespace if we can help it								
 						guiseContext.writeAttribute(null, "id", frame.getID());	//TODO fix
-						guiseContext.writeElementEnd();	//</xhtml:remove>							
+						guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "remove");	//</xhtml:remove>							
 					}
 					if(controlEvent instanceof InitControlEvent)	//if this is an initialization event TODO maybe just dirty all the frames so this happens automatically
 					{
@@ -652,14 +652,14 @@ Debug.trace("now have frames: ", frames.size());
 	//							TODO fix							else	//if the component is not visible, remove the component's elements
 								guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
 								frame.updateView(guiseContext);		//tell the component to update its view
-								guiseContext.writeElementEnd();	//</xhtml:patch>
+								guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "patch");	//</xhtml:patch>
 							}
 						}
 					}
 				}
 			}
 			guiseContext.setState(GuiseContext.State.INACTIVE);	//deactivate the context so that any model update events will be generated			
-			guiseContext.writeElementEnd();	//</response>
+			guiseContext.writeElementEnd(null, "response");	//</response>
 		}
 	}
 	

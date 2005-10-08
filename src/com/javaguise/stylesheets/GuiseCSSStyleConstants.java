@@ -15,26 +15,28 @@ public class GuiseCSSStyleConstants
 
 	//components
 	
-	/**The CSS class postfix for the decorator wrapper of a component.*/
-	public final static String COMPONENT_DECORATOR_CLASS_POSTFIX="-decorator";
-	/**The CSS class postfix for the label part of a component.*/
-	public final static String COMPONENT_LABEL_CLASS_POSTFIX="-label";
-	/**The CSS class postfix for the message part of a component.*/
-	public final static String COMPONENT_MESSAGE_CLASS_POSTFIX="-message";
-	/**The CSS class postfix for the component part of a component.*/
-	public final static String COMPONENT_BODY_CLASS_POSTFIX="-body";
-	/**The CSS class postfix for the error part of a component.*/
-	public final static String COMPONENT_ERROR_CLASS_POSTFIX="-error";
+	/**The CSS class suffix for the decorator wrapper of a component.*/
+	public final static String COMPONENT_DECORATOR_CLASS_SUFFIX="-decorator";
+	/**The CSS class suffix for the label part of a component.*/
+	public final static String COMPONENT_LABEL_CLASS_SUFFIX="-label";
+	/**The CSS class suffix for the message part of a component.*/
+	public final static String COMPONENT_MESSAGE_CLASS_SUFFIX="-message";
+	/**The CSS class suffix for the component part of a component.*/
+	public final static String COMPONENT_BODY_CLASS_SUFFIX="-body";
+	/**The CSS class suffix for the error part of a component.*/
+	public final static String COMPONENT_ERROR_CLASS_SUFFIX="-error";
+	/**The CSS class suffix for the XHTML control part of a component.*/
+	public final static String COMPONENT_CONTROL_CLASS_SUFFIX="-control";
 
-	/**The CSS class postfix indicating the X axis.*/
-	public final static String COMPONENT_X_AXIS_CLASS_POSTFIX="-x";
-	/**The CSS class postfix indicating the Y axis.*/
-	public final static String COMPONENT_Y_AXIS_CLASS_POSTFIX="-y";
+	/**The CSS class suffix indicating the X axis.*/
+	public final static String COMPONENT_X_AXIS_CLASS_SUFFIX="-x";
+	/**The CSS class suffix indicating the Y axis.*/
+	public final static String COMPONENT_Y_AXIS_CLASS_SUFFIX="-y";
 
-	/**The CSS class postfix indicating left-to-right line direction.*/
-	public final static String COMPONENT_LTR_CLASS_POSTFIX="-ltr";
-	/**The CSS class postfix indicating right-to-left line direction.*/
-	public final static String COMPONENT_RTL_CLASS_POSTFIX="-rtl";
+	/**The CSS class suffix indicating left-to-right line direction.*/
+	public final static String COMPONENT_LTR_CLASS_SUFFIX="-ltr";
+	/**The CSS class suffix indicating right-to-left line direction.*/
+	public final static String COMPONENT_RTL_CLASS_SUFFIX="-rtl";
 
 		//tree nodes
 	/**The CSS class for a tree node.*/
