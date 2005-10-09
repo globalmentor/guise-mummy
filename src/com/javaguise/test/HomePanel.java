@@ -12,6 +12,7 @@ import com.javaguise.demo.EditUserPanel;
 import com.javaguise.event.*;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
+import com.javaguise.validator.IntegerRangeValidator;
 import com.javaguise.validator.RegularExpressionStringValidator;
 import com.javaguise.validator.ValidationException;
 import com.javaguise.validator.ValueRequiredValidator;
@@ -259,12 +260,20 @@ Debug.trace("list control changed value to", newValue);
 		
 		
 		final LayoutPanel sliderPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.LINE));
+
 		
-		final SliderControl<Integer> horizontalSlider=new SliderControl<Integer>(session, Integer.class, Orientation.Flow.LINE);
+		final ValueModel<Integer> sliderModel=new DefaultValueModel<Integer>(session, Integer.class, 0);
+		sliderModel.setValidator(new IntegerRangeValidator(session, 0, 100));	//set a range validator for the model
+		sliderModel.setLabel("Slider Value");
+		
+		final SliderControl<Integer> horizontalSlider=new SliderControl<Integer>(session, sliderModel, Orientation.Flow.LINE);
 		sliderPanel.add(horizontalSlider);
 
-		final SliderControl<Integer> verticalSlider=new SliderControl<Integer>(session, Integer.class, Orientation.Flow.PAGE);
+		final SliderControl<Integer> verticalSlider=new SliderControl<Integer>(session, sliderModel, Orientation.Flow.PAGE);
 		sliderPanel.add(verticalSlider);
+		
+		final TextControl<Integer> sliderInput=new TextControl<Integer>(session, sliderModel);	//create a text input control
+		sliderPanel.add(sliderInput);
 
 		contentPanel.add(sliderPanel);	//add the slider panel to the panel
 		

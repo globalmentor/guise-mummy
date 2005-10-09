@@ -87,6 +87,7 @@ frames.add=function(frame)
 {
 	document.body.appendChild(frame);	//add the frame element to the document; do this first, because IE doesn't allow the style to be accessed directly with imported nodes until they are added to the document
 	initializeNode(frame);	//initialize the new imported frame, installing the correct event handlers
+	updateComponents(frame);	//update all the components within the frame
 	Array.prototype.add.call(this, frame);	//do the default adding to the array
 	updateModal();	//update the modal state
 	var focusable=getFocusableDescendant(frame);	//see if this frame has a node that can be focused
@@ -1276,10 +1277,14 @@ alert(exception);
 						if(oldElement)	//if the element currently exists in the document
 						{
 							this._synchronizeElement(oldElement, childNode);	//synchronize this element tree
+							updateComponents(oldElement);	//now that we've patched the old element, update any components that rely on the old element
 						}
 						else if(hasClass(childNode, "frame"))	//if the element doesn't currently exist, but the patch is for a frame, create a new frame
 						{
 							oldElement=document.importNode(childNode, true);	//create an import clone of the node
+//TODO don't we need to initialize here? or do we do it in frames.add()? if the latter, we need to update the components there
+
+
 //TODO del alert("imported element "+typeof oldElement+" with ID "+oldElement.id);
 //TODO fix so that it works both on IE and Firefox							oldElement.style.position="fixed";	//TODO testing
 							oldElement.style.position="absolute";	//change the element's position to absolute TODO update the element's initial position
@@ -1785,6 +1790,8 @@ var allowX: Whether dragging is allowed along the X axis (true by default).
 var allowY: Whether dragging is allowed along the Y axis (true by default).
 var minX: The minimum horizontal position, inclusive, in correct element terms, or null if there is no minumum horizontal position.
 var maxX: The maximum horizontal position, inclusive, in correct element terms, or null if there is no maximum horizontal position.
+var onDrag(element, x, y): The method called when dragging occurs, or null if no additional action should be taken. The coordinates are in terms of the element's position type.
+var onEnd(element): The method called when dragging ends, or null if no additional action should be taken. The coordinates are in terms of the element's position type.
 */
 function DragState(dragSource, mouseX, mouseY)
 {
@@ -1841,6 +1848,7 @@ function DragState(dragSource, mouseX, mouseY)
 			document.body.ondrag=function() {return false;};	//turn off IE drag event processing; see http://www.ditchnet.org/wp/2005/06/15/ajax-freakshow-drag-n-drop-events-2/
 			document.body.onselectstart=function() {return false;};
 */
+//TODO del if not needed			drag(mouseX, mouseY);	//do a fake drag to make sure that the position of the element is within any ranges
 			eventManager.addEvent(document, "mousemove", onDrag, false);	//listen for mouse move anywhere in document (IE doesn't allow us to listen on the window), as dragging may end somewhere else besides a drop target
 		};
 
@@ -1851,25 +1859,36 @@ function DragState(dragSource, mouseX, mouseY)
 		*/
 		DragState.prototype.drag=function(mouseX, mouseY)
 		{
+			var oldLeft=this.element.style.left;	//get the old left position
+			var oldTop=this.element.style.top;	//get the old top position
+/*TODO del when works
+			var oldX=typeof oldLeft!="undefined" && oldLeft.length>0 ? parseInt(oldLeft) : this.initialPosition.x;	//find the old coordinates
+			var oldY=typeof oldTop!="undefined" && oldTop.length>0 ? parseInt(oldTop) : this.initialPosition.y;
+*/
+			var oldX=oldLeft ? parseInt(oldLeft) : this.initialPosition.x;	//find the old coordinates
+			var oldY=oldTop ? parseInt(oldTop) : this.initialPosition.y;
+
+			var newX=oldX;	//we'll determine the new X and Y values
+			var newY=oldY;
 			if(this.allowX)	//if horizontal dragging is allowed
 			{
 				var onTrackY=this.allowY || (mouseY>=this.initialFixedPosition.y && mouseY<(this.initialFixedPosition.y+this.element.offsetHeight))	//see if the mouse is on the track vertically
 				if(onTrackY)	//if the mouse is on the track
 				{
-					var newX=mouseX-dragState.mouseDeltaX;	//calculate the new left position
-					if(this.minX!=null && newX<this.minX)	//if there is a minimum specified and the new position is below it
-					{
-						newX=this.minX;	//stop at the floor
-					}
-					else if(this.maxX!=null && newX>this.maxX)	//if there is a maximum specified and the new position is above it
-					{
-						newX=this.maxX;	//stop at the ceiling
-					}
-					this.element.style.left=newX.toString()+"px";	//update the horizontal position of the dragged element
+					newX=mouseX-dragState.mouseDeltaX;	//calculate the new left position
 				}
 				else	//if the mouse is off the track
 				{
-					this.element.style.left=(this.initialPosition.x).toString()+"px";	//reset the horizontal position
+					newX=this.initialPosition.x;	//reset the horizontal position
+//TODO del alert("off track Y, changing to initial position X: "+newX+" with max "+this.maxX);
+				}
+				if(this.minX!=null && newX<this.minX)	//if there is a minimum specified and the new position is below it
+				{
+					newX=this.minX;	//stop at the floor
+				}
+				else if(this.maxX!=null && newX>this.maxX)	//if there is a maximum specified and the new position is above it
+				{
+					newX=this.maxX;	//stop at the ceiling
 				}
 			}
 			if(this.allowY)	//if vertical dragging is allowed
@@ -1877,20 +1896,34 @@ function DragState(dragSource, mouseX, mouseY)
 				var onTrackX=this.allowX || (mouseX>=this.initialFixedPosition.x && mouseX<(this.initialFixedPosition.x+this.element.offsetWidth))	//see if the mouse is on the track horizontally
 				if(onTrackX)	//if the mouse is on the track
 				{
-					var newY=mouseY-dragState.mouseDeltaY;	//calculate the new top position
-					if(this.minY!=null && newY<this.minY)	//if there is a minimum specified and the new position is below it
-					{
-						newY=this.minY;	//stop at the floor
-					}
-					else if(this.maxY!=null && newY>this.maxY)	//if there is a maximum specified and the new position is above it
-					{
-						newY=this.maxY;	//stop at the ceiling
-					}
-					this.element.style.top=newY.toString()+"px";	//update the vertical position of the dragged element
+					newY=mouseY-dragState.mouseDeltaY;	//calculate the new top position
 				}
 				else	//if the mouse is off the track
 				{
-					this.element.style.top=(this.initialPosition.y).toString()+"px";	//reset the vertical position
+					newY=this.initialPosition.y;	//reset the vertical position
+				}
+				if(this.minY!=null && newY<this.minY)	//if there is a minimum specified and the new position is below it
+				{
+					newY=this.minY;	//stop at the floor
+				}
+				else if(this.maxY!=null && newY>this.maxY)	//if there is a maximum specified and the new position is above it
+				{
+					newY=this.maxY;	//stop at the ceiling
+				}
+			}
+			if(newX!=oldX || newY!=oldY)	//if one of the coordinates has changed
+			{
+				if(newX!=oldX)	//if the horizontal position has changed
+				{
+					this.element.style.left=newX.toString()+"px";	//update the horizontal position of the dragged element
+				}
+				if(newY!=oldY)	//if the horizontal position has changed
+				{
+					this.element.style.top=newY.toString()+"px";	//update the vertical position of the dragged element
+				}
+				if(this.onDrag)	//if there is a function for dragging
+				{
+					this.onDrag(this.element, newX, newY);	//call the dragging method
 				}
 			}
 		}
@@ -1907,6 +1940,10 @@ function DragState(dragSource, mouseX, mouseY)
 			{
 				document.body.removeChild(this.element);	//remove the drag element
 				this.dragSource.style.visibility=this.oldVisibility;	//reset the original element's visibility status
+			}
+			if(this.onDragEnd)	//if there is a function for ending dragging
+			{
+				this.onDragEnd(this.element);	//call the dragging end method
 			}
 		};
 
@@ -2004,6 +2041,7 @@ function onWindowLoad()
 	eventManager.addEvent(window, "scroll", onWindowResize, false);	//add a scroll listener
 	eventManager.addEvent(window, "unload", onWindowUnload, false);	//do the appropriate uninitialization when the window unloads
 	initializeNode(document.documentElement);	//initialize the document tree
+	updateComponents(document.documentElement);	//update all components represented by elements within the document
 	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
 	eventManager.addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
 	updateModalLayer();	//create and update the modal layer
@@ -2150,6 +2188,42 @@ function initializeNode(node)
 	for(var i=0; i<childNodeCount; ++i)	//for each child node
 	{
 		initializeNode(childNodeList[i]);	//initialize this child node
+	}
+}
+
+/**Updates the representation of any dynamic components based upon the state of the underlying element.
+Components for the given node and any descendant nodes are updated.
+@param node The node for which components should be updated.
+*/
+function updateComponents(node)
+{
+	switch(node.nodeType)	//see which type of child node this is
+	{
+		case Node.ELEMENT_NODE:	//element
+//TODO bring back after giving all relevant nodes IDs			if(node.id)	//only look at element swith IDs
+			{
+				var elementName=node.nodeName.toLowerCase();	//get the element name
+				var elementClassName=node.className;	//get the element class name
+				var elementClassNames=elementClassName ? elementClassName.split(/\s/) : EMPTY_ARRAY;	//split out the class names
+				switch(elementName)	//see which element this is
+				{
+					case "div":
+								//check for slider
+						if(elementClassNames.containsMatch(/^sliderControl-[xy]-(ltr|rtl)$/))	//if this is a slider control TODO use a constant
+						{
+							updateSlider(node);	//update the slider
+						}
+						break;
+				}
+			}
+			break;
+	}
+		//update child node components
+	var childNodeList=node.childNodes;	//get all the child nodes
+	var childNodeCount=childNodeList.length;	//find out how many children there are
+	for(var i=0; i<childNodeCount; ++i)	//for each child node
+	{
+		updateComponents(childNodeList[i]);	//initialize the components for this child node
 	}
 }
 
@@ -2733,28 +2807,96 @@ function onSliderThumbDragBegin(event)
 				//TODO make sure this isn't the context mouse button
 		var thumb=event.currentTarget;	//get the target of the event
 		var slider=getAncestorElementByClassName(thumb, /^sliderControl-[xy]-(ltr|rtl)$/);	//find the slider TODO use a constant
-		if(slider)	//if we found the slider
+		var track=getAncestorElementByClassName(thumb, /^sliderControl-[xy]-(ltr|rtl)-track$/);	//find the slider track TODO use a constant
+		var positionID=slider.id+".position";	//TODO use constant
+		var positionInput=document.getElementById(positionID);	//get the position element		
+		if(slider && track && positionInput)	//if we found the slider and the slider track
 		{
-			var isHorizontal=hasClassName(slider, /^sliderControl-x-(ltr|rtl)$/);	//see if this is a horizontal slider
+			var isHorizontal=hasClassName(track, /^sliderControl-x-(ltr|rtl)-track$/);	//see if this is a horizontal slider
 			dragState=new DragState(thumb, event.clientX, event.clientY);	//create a new drag state
 			dragState.dragCopy=false;	//drag the actual element, not a copy
 			if(isHorizontal)	//if this is a horizontal slider
 			{
 				dragState.allowY=false;	//only allow horizontal dragging
-				dragState.minX=0;	//set the minimum
-				dragState.maxX=slider.offsetWidth-thumb.offsetWidth;	//set the maximum
+				var min=0;	//calculate the minimum
+				var max=track.offsetWidth-thumb.offsetWidth+1;	//calculate the maximum
+				dragState.minX=min;	//set the minimum
+				dragState.maxX=max;	//set the maximum
 			}
 			else	//if this is a vertical slider
 			{
 				dragState.allowX=false;	//only allow vertical dragging
-				dragState.minY=0;	//set the minimum
-				dragState.maxY=slider.offsetHeight-thumb.offsetHeight;	//set the maximum
+				var min=0;	//calculate the minimum
+				var max=track.offsetHeight-thumb.offsetHeight+1;	//calculate the maximum
+				dragState.minY=min;	//set the minimum
+				dragState.maxY=max;	//set the maximum
 			}
+			var span=max-min;	//find the available range of the values
+			dragState.onDrag=function(element, x, y)	//when dragging occurs, update the slider value
+					{
+						var coordinate=isHorizontal ? x.toString() : y.toString();	//get the new slider position
+						var position=(coordinate-min)/span;	//determine the position as a fraction of the total track available
+						if(!isHorizontal)	//if this is a vertical slider
+						{
+							position=1.0-position;	//take into account that the vertical slider origin is the opposite of the graphics origin
+						}
+						positionInput.value=position.toString();	//put the position in the value
+//TODO del						var test="coordinate: "+coordinate+" min: "+min+" coordinate-min: "+(coordinate-min)+" position: "+position;
+						var ajaxRequest=new FormAJAXEvent(new Parameter(positionInput.name, position.toString()));	//create a new form request with the control name and value
+						guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+					};
+			dragState.onDragEnd=function(element)	//when dragging ends, update the slider view to make sure it is synchronized with the updated value
+					{
+						updateSlider(slider);	//update the slider view
+					}
 			dragState.beginDrag(event.clientX, event.clientY);	//begin dragging
 	//TODO del alert("drag state element: "+dragState.element.nodeName);
 			event.stopPropagation();	//tell the event to stop bubbling
 			event.preventDefault();	//prevent the default functionality from occurring
 		}
+	}
+}
+
+/**Updates the representation of a slider based upon the slider's model value.
+@param slider The slider element.
+*/
+function updateSlider(slider)	//TODO maybe rename to updateSliderView
+{
+	var track=getDescendantElementByClassName(slider, /^sliderControl-[xy]-(ltr|rtl)-track$/);	//find the slider track TODO use a constant
+	var thumb=getDescendantElementByClassName(slider, /^sliderControl-[xy]-(ltr|rtl)-thumb$/);	//find the slider thumb TODO use a constant
+	if(dragState && dragState.dragSource==thumb)	//if the slider thumb is being dragged
+	{
+		return;	//don't update the slider while a drag is occurring
+	}
+	var positionID=slider.id+".position";	//TODO use constant
+	var positionInput=document.getElementById(positionID);	//get the position element
+	if(track && thumb && positionInput)	//if we found the slider track and thumb
+	{
+		var position=positionInput.value ? parseFloat(positionInput.value) : 0;	//get the position TODO make sure this logic is in synch with whether server code will always provide a value, even for null
+		var isHorizontal=hasClassName(track, /^sliderControl-x-(ltr|rtl)-track$/);	//see if this is a horizontal slider
+		if(isHorizontal)	//if this is a horizontal slider
+		{
+			var min=0;	//calculate the minimum
+			var max=track.offsetWidth-thumb.offsetWidth+1;	//calculate the maximum
+		}
+		else	//if this is a vertical slider
+		{
+			var min=0;	//calculate the minimum
+			var max=track.offsetHeight-thumb.offsetHeight+1;	//calculate the maximum
+			position=1.0-position;	//take into account that the vertical slider origin is the opposite of the graphics origin
+		}
+		var span=max-min;	//find the available range of the values
+		var newCoordinate=Math.round(position*span+min);	//determine the new coordinate
+//TODO del when works alert("new coordinate for "+slider.id+" is "+newCoordinate);
+		if(isHorizontal)	//if this is a horizontal slider
+		{
+			thumb.style.left=newCoordinate+"px";	//update the horizontal position of the slider
+		}
+		else	//if this is a vertical slider
+		{
+			thumb.style.top=newCoordinate+"px";	//update the vertical position of the slider
+		}
+//TODO del		alert("ready to update slider "+slider.id+" with value:"+positionInput.value);
 	}
 }
 
@@ -3114,98 +3256,3 @@ function getViewportSize()
 }
 
 eventManager.addEvent(window, "load", onWindowLoad, false);	//do the appropriate initialization when the window loads
-
-var Nav4 = ((navigator.appName == "Netscape") && (parseInt(navigator.appVersion) >= 4));
-var modalState=new Object();	//the state of modality
-
-function openModalWindow(url)
-{
-	modalState.url=url;	//save the modal URL
-	if(!modalState.window || (modalState.window && modalState.window.closed))
-	{
-		modalState.width = screen.availWidth*2/3;
-    modalState.height = screen.availHeight*2/3;
-		if(Nav4)
-		{
-         // Center on the main window.
-         modalState.left = window.screenX + ((window.outerWidth - modalState.width) / 2);
-         modalState.top = window.screenY + ((window.outerHeight - modalState.height) / 2);
-         var modalAttributes = "screenX=" + modalState.left + ",screenY=" + modalState.top + ",resizable=no,width=" + modalState.width + ",height=" + modalState.height;
-      }
-      else
-      {
-         // The best we can do is center in screen.;
-         modalState.left = (screen.width - modalState.width) / 2;
-         modalState.top = (screen.height - modalState.height) / 2;
-         var modalAttributes = "left=" + modalState.left + ",top=" + modalState.top + ",resizable=no,width=" + modalState.width + ",height=" + modalState.height;
-      }
-      modalState.name = (new Date()).getSeconds().toString();
-      // Generate the dialog and make sure it has focus.
-		modalState.window=window.open(url, modalState.name, modalAttributes);
-		modalState.window.onclose=endModal;
-//TODO fix for IE		modalState.window=showModalDialog(url);
-		modalState.window.focus();
-	}
-	window.onfocus=recoverModality;	//recover modality if the original window gets focus
-	installNodeModalRecovery(window.document);	//install modal recovery for the entire document tree
-
-	for(var formIndex=0; formIndex<window.document.forms.length; ++formIndex)	//for all the forms
-	{
-		for(var elementIndex=0; elementIndex<window.document.forms[formIndex].elements.length; elementIndex++)	//for all the elements on each form
-		{
-			window.document.forms[formIndex].elements[elementIndex].onfocus=recoverModality;	//recover modality for focus
-			window.document.forms[formIndex].elements[elementIndex].onclick=recoverModality;	//recover modality for clicks
-		}
-	}
-}
-
-function installNodeModalRecovery(node)
-{
-	try
-	{
-		node.onfocus=recoverModality;
-		node.onfocus=recoverModality;
-	}
-	catch(exception)
-	{
-	}	
-	for(var i=node.childNodes.length-1; i>=0; --i)
-	{
-		installNodeModalRecovery(node.childNodes[i]);
-	}
-}
-
-function recoverModality()
-{
-	if(modalState.window)	//if we've been modal before
-	{
-		if(modalState.window.closed)	//if the modal window is closed
-		{
-		}
-		else
-		{
-			modalState.window.focus();
-		}
-	}
-}
-
-//Ends modality for a modal window. It is assumed that the window is being closed.
-function endModal()
-{
-//	if(opener && !opener.closed)	//if the window has an open opener
-	{
-//		endModal(opener);	//end modality for the opener
-	}
-}
-
-//Ends modality for the given opener
-function endModal(opener)
-{
-//	alert("modality ended for opener");
-}
-
-function test()
-{
-	setTimeout("openModalWindow('test.html')", 5000);
-	openModalWindow("test.html");
-}

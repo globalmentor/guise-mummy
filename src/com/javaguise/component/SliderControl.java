@@ -12,7 +12,7 @@ import com.javaguise.session.GuiseSession;
 @author Garret Wilson
 @param <V> The type of value the slider represents.
 */
-public class SliderControl<V> extends AbstractValueControl<V, SliderControl<V>>
+public class SliderControl<V extends Number> extends AbstractValueControl<V, SliderControl<V>>
 {
 
 	/**The axis bound property.*/
@@ -40,6 +40,17 @@ public class SliderControl<V> extends AbstractValueControl<V, SliderControl<V>>
 			}
 		}
 
+	/**Session, model, and axis constructor.
+	@param session The Guise session that owns this component.
+	@param model The component data model.
+	@param axis The axis along which the slider is oriented.
+	@exception NullPointerException if the given session, axis, and/or model is <code>null</code>.
+	*/
+	public SliderControl(final GuiseSession session, final ValueModel<V> model, final Orientation.Flow axis)
+	{
+		this(session, null, model, axis);	//construct the component, indicating that a default ID should be used
+	}
+
 	/**Session and axis constructor with a default data model to represent a given type.
 	@param session The Guise session that owns this component.
 	@param valueClass The class indicating the type of value held in the model.
@@ -66,7 +77,7 @@ public class SliderControl<V> extends AbstractValueControl<V, SliderControl<V>>
 		this(session, id, new DefaultValueModel<V>(session, valueClass), axis);	//construct the class with a default model
 	}
 
-	/**Session, ID, axis, and model constructor.
+	/**Session, ID, model, and axis constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@param model The component data model.

@@ -40,12 +40,12 @@ public abstract class AbstractComparableRangeValidator<V extends Number & Compar
 		if(value!=null)	//if there is a value (the super class has already checked for null compliance)
 		{
 			final V minimum=getMinimum();	//get the minimum value
-			if(minimum!=null && minimum.compareTo(value)<0)	//if the value is too small
+			if(minimum!=null && minimum.compareTo(value)>0)	//if the value is too small
 			{
 				return false;	//the value is too low
 			}
 			final V maximum=getMaximum();	//get the maximum value
-			if(maximum!=null && maximum.compareTo(value)>0)	//if the value is too large
+			if(maximum!=null && maximum.compareTo(value)<0)	//if the value is too large
 			{
 				return false;	//the value is too high
 			}

@@ -116,6 +116,27 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 		this(session, null, valueClass);	//construct the component, indicating that a default ID should be used
 	}
 
+	/**Session, and model constructor.
+	@param session The Guise session that owns this component.
+	@param model The component data model.
+	@exception NullPointerException if the given session and/or model is <code>null</code>.
+	*/
+	public TextControl(final GuiseSession session, final ValueModel<V> model)
+	{
+		this(session, null, model);	//construct the component, indicating that a default ID should be used				
+	}
+
+	/**Session, model, and converter constructor.
+	@param session The Guise session that owns this component.
+	@param model The component data model.
+	@param converter The converter for this component.
+	@exception NullPointerException if the given session, model, and/or converter is <code>null</code>.
+	*/
+	public TextControl(final GuiseSession session, final ValueModel<V> model, final Converter<V, String> converter)
+	{
+		this(session, null, model, converter);	//construct the component, indicating that a default ID should be used		
+	}
+
 	/**Session and ID constructor with a default data model to represent a given type and a default converter.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.

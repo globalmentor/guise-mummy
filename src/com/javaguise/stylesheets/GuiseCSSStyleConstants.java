@@ -71,8 +71,10 @@ public class GuiseCSSStyleConstants
 	public final static String FRAME_CLOSE_CLASS_SUFFIX="-close";
 
 		//slider
+	/**The CSS class suffix identifying the slider track.*/
+	public final static String SLIDER_TRACK_CLASS_SUFFIX="-track";
 	/**The CSS class suffix identifying the slider thumb.*/
-	public final static String THUMB_CLASS_SUFFIX="-thumb";
+	public final static String SLIDER_THUMB_CLASS_SUFFIX="-thumb";
 
 		//drag and drop
 	/**The potential source of a drag and drop operation.*/

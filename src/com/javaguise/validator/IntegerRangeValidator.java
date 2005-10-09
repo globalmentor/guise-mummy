@@ -9,7 +9,7 @@ The step value is considered relative either to the minimum value, if available,
 public class IntegerRangeValidator extends AbstractComparableRangeValidator<Integer>
 {
 
-	/**Session constructor with no value required.
+	/**Session constructor with no value required and a step of one.
 	@param session The Guise session that owns this validator.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
@@ -18,7 +18,7 @@ public class IntegerRangeValidator extends AbstractComparableRangeValidator<Inte
 		this(session, false);	//construct the class and don't required non-null values
 	}
 
-	/**Session and value required constructor.
+	/**Session and value required constructor with a step of one.
 	@param session The Guise session that owns this validator.
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
 	@exception NullPointerException if the given session is <code>null</code>.
@@ -28,7 +28,7 @@ public class IntegerRangeValidator extends AbstractComparableRangeValidator<Inte
 		this(session, null, null, valueRequired);	//construct the class with no minimum or maximum value
 	}
 
-	/**Session, minimum, and maximum constructor.
+	/**Session, minimum, and maximum constructor with a step of one.
 	@param session The Guise session that owns this validator.
 	@param minimum The minimum value, inclusive, or <code>null</code> if the range has no lower bound.
 	@param maximum The maximum value, inclusive, or <code>null</code> if the range has no upper bound.
@@ -36,7 +36,7 @@ public class IntegerRangeValidator extends AbstractComparableRangeValidator<Inte
 	*/
 	public IntegerRangeValidator(final GuiseSession session, final Integer minimum, final Integer maximum)
 	{
-		this(session, minimum, maximum, null);	//construct the class with no step
+		this(session, minimum, maximum, new Integer(1));	//construct the class with a step of 1
 	}
 
 	/**Session, minimum, maximum, and step constructor.
@@ -85,7 +85,7 @@ public class IntegerRangeValidator extends AbstractComparableRangeValidator<Inte
 	protected boolean isValidStep(final Integer value, final Integer step, final Integer base)
 	{
 		final int baseInt=base!=null ? base.intValue() : 0;	//get the primitive base value
-		return (value.intValue()-base.intValue())%step.intValue()==0;	//normalize the value to the base and see if the step divides the result evenly
+		return (value.intValue()-baseInt)%step.intValue()==0;	//normalize the value to the base and see if the step divides the result evenly
 	}
 
 }
