@@ -57,7 +57,7 @@ var TAB_CLASS_SUFFIX="-tab";
 var TAB_SELECTED_CLASS_SUFFIX="-tab-selected";
 
 /**The class suffix of a decorator.*/
-var DECORATOR_CLASS_PREFIX="-decorator";
+//TODO del var DECORATOR_CLASS_PREFIX="-decorator";
 
 /**The enumeration of recognized styles.*/
 var STYLES=
