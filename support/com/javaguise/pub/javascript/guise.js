@@ -784,15 +784,16 @@ function ActionAJAXEvent(componentID, targetID, actionID)
 
 /**A class encapsulating drop information for an AJAX request.
 @param dragState: The object containing the state of the drag and drop operation.
+@param dragSource: The element that was the source of the drag and drop operation.
 @param dropTarget: The element that is the target of the drag and drop operation.
 @param event: The W3C event object associated with the drop.
 var dragSource: The element that was the source of the drag and drop operation.
 var dropTarget: The element that is the target of the drag and drop operation.
 var mousePosition: The position of the mouse at the drop.
 */
-function DropAJAXEvent(dragState, dropTarget, event)
+function DropAJAXEvent(dragState, dragSource, dropTarget, event)
 {
-	this.dragSource=dragState.dragSource;	//save the drag source
+	this.dragSource=dragSource;	//save the drag source
 	this.dropTarget=dropTarget;	//save the drop target
 	this.mousePosition=new Point(event.clientX, event.clientY);	//save the mouse position
 }
@@ -2338,57 +2339,60 @@ function onTextInputChange(event)
 */
 function onButtonClick(event)
 {
-	onAction(event);	//process an action for the button
-/*TODO fix for file uploads
-		//TODO for now, always do a POST so that table updates and file uploads can work; later fix this---perhaps check to see if file uploads are on the form
-
 	var element=event.currentTarget;	//get the element on which the event was registered
-//TODO del alert("action on: "+element.nodeName);
-	if(element.id)	//if the button has an ID
+	var form=getForm(element);	//get the form
+	if(form && getDescendantElementByName(form, "input", new Parameter("type", "file")))	//if there is a file input element, we'll have to submit the entire page rather than using AJAX
 	{
-			//ask confirmations if needed
-		var childNodeList=element.childNodes;	//get all the child nodes of the element
-		var childNodeCount=childNodeList.length;	//find out how many children there are
-		for(var i=0; i<childNodeCount; ++i)	//for each child node
+		if(element.id)	//if the button has an ID
 		{
-			var childNode=childNodeList[i];	//get this child node
-			if(childNode.nodeType==Node.COMMENT_NODE && childNode.nodeValue)	//if this is a comment node
+				//ask confirmations if needed
+			var childNodeList=element.childNodes;	//get all the child nodes of the element
+			var childNodeCount=childNodeList.length;	//find out how many children there are
+			for(var i=0; i<childNodeCount; ++i)	//for each child node
 			{
-				var commentValue=childNode.nodeValue;	//get the comment value
-				var delimiterIndex=commentValue.indexOf(':');	//get the delimiter index
-				if(delimiterIndex>=0)	//if there is a delimiter
+				var childNode=childNodeList[i];	//get this child node
+				if(childNode.nodeType==Node.COMMENT_NODE && childNode.nodeValue)	//if this is a comment node
 				{
-					var paramName=commentValue.substring(0, delimiterIndex);	//get the parameter name
-					var paramValue=commentValue.substring(delimiterIndex+1);	//get the parameter value
-					if(paramName="confirm")	//if this is a confirmation
+					var commentValue=childNode.nodeValue;	//get the comment value
+					var delimiterIndex=commentValue.indexOf(':');	//get the delimiter index
+					if(delimiterIndex>=0)	//if there is a delimiter
 					{
-						if(!confirm(paramValue))	//ask for confirmation; if the user does not confirm
+						var paramName=commentValue.substring(0, delimiterIndex);	//get the parameter name
+						var paramValue=commentValue.substring(delimiterIndex+1);	//get the parameter value
+						if(paramName="confirm")	//if this is a confirmation
 						{
-							return;	//don't process the event further
+							if(!confirm(paramValue))	//ask for confirmation; if the user does not confirm
+							{
+								return;	//don't process the event further
+							}
 						}
 					}
 				}
 			}
-		}
-		var form=getForm(element);	//get the form
-		if(form && form.id)	//if there is a form with an ID
-		{
-			var actionInputID=form.id.replace(".form", ".input");	//determine the ID of the hidden action input TODO use a constant, or get these values using a better method
-			var actionInput=document.getElementById(actionInputID);	//get the action input
-			if(actionInput)	//if there is an action input
+//TODO del			var form=getForm(element);	//get the form
+//TODO del			if(form && form.id)	//if there is a form with an ID
+			if(form.id)	//if the form has an ID
 			{
-				actionInput.value=element.id;	//indicate which action was activated
+				var actionInputID=form.id.replace(".form", ".input");	//determine the ID of the hidden action input TODO use a constant, or get these values using a better method
+				var actionInput=document.getElementById(actionInputID);	//get the action input
+				if(actionInput)	//if there is an action input
+				{
+					actionInput.value=element.id;	//indicate which action was activated
+				}
+				form.submit();	//submit the form
+				if(actionInput)	//if there is an action input
+				{
+					actionInput.value=null;	//remove the indication of which action was activated
+				}
+				event.stopPropagation();	//tell the event to stop bubbling
+				event.preventDefault();	//prevent the default functionality from occurring
 			}
-			form.submit();	//submit the form
-			if(actionInput)	//if there is an action input
-			{
-				actionInput.value=null;	//remove the indication of which action was activated
-			}
-			event.stopPropagation();	//tell the event to stop bubbling
-			event.preventDefault();	//prevent the default functionality from occurring
 		}
 	}
-*/
+	else	//if there is no file input element, we can submit the action via AJAX normally
+	{
+		onAction(event);	//process an action for the button
+	}
 }
 
 /**Called when an anchor is clicked.
@@ -2513,13 +2517,12 @@ function onActionClick(event)
 	var targetID=target.id;	//get the target ID
 	if(targetID)	//if the element has an ID (otherwise, we couldn't report the action)
 	{
-		var component=getAncestorElementByClassName(target, /^component$|-decorator$/);	//get the component element TODO improve all this
+		var component=getAncestorElementByClassName(target, "component");	//get the component element TODO improve all this
 		if(component)	//if there is a component
 		{
 			var componentID=component.id;	//get the component ID
 			if(componentID)	//if there is a component ID
 			{
-				componentID=componentID.replace(/-decorator$/, "");	//remove from the ID the "-decorator", if there is one
 				if(AJAX_URI)	//if AJAX is enabled
 				{
 					var ajaxRequest=new ActionAJAXEvent(componentID, targetID, null);	//create a new action request with no action ID
@@ -2714,7 +2717,7 @@ var menuState=new MenuState();	//create a new menu state object
 */
 function onMenuMouseOver(event)
 {
-	var menu=getDescendantElementByClassName(event.currentTarget, /^menu-[xy]-(ltr|rtl)-body$/);	//get the menu below us TODO use a constant
+	var menu=getDescendantElementByClassName(event.currentTarget, /^menu-[xy]-(ltr|rtl)-children$/);	//get the menu below us TODO use a constant
 	if(menu)	//if there is a menu below us
 	{
 		menuState.openMenu(menu);	//open this menu
@@ -2727,7 +2730,7 @@ function onMenuMouseOver(event)
 */
 function onMenuMouseOut(event)
 {
-	var menu=getDescendantElementByClassName(event.currentTarget, /^menu-[xy]-(ltr|rtl)-body$/);	//get the menu below us TODO use a constant
+	var menu=getDescendantElementByClassName(event.currentTarget, /^menu-[xy]-(ltr|rtl)-children$/);	//get the menu below us TODO use a constant
 	if(menu)	//if there is a menu below us
 	{
 		menuState.closeMenu(menu);	//close this menu
@@ -2787,8 +2790,13 @@ function onDragEnd(event)
 		if(dropTarget)	//if the mouse was dropped over a drop target
 		{
 //TODO del when works alert("over drop target: "+dropTarget.nodeName);
-			var ajaxRequest=new DropAJAXEvent(dragState, dropTarget, event);	//create a new AJAX drop event
-			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+			var dragSourceComponent=getAncestorElementByClassName(dragState.dragSource, "component");	//get the component element TODO improve all this; decide if we want the dropTarget style on the component element or the drop target subcomponent, and how we want to relate that to the component ID
+			var dropTargetComponent=getAncestorElementByClassName(dropTarget, "component");	//get the component element TODO improve all this; decide if we want the dropTarget style on the component element or the drop target subcomponent, and how we want to relate that to the component ID
+			if(dragSourceComponent && dropTargetComponent)	//if there source and target components
+			{
+				var ajaxRequest=new DropAJAXEvent(dragState, dragSourceComponent, dropTargetComponent, event);	//create a new AJAX drop event TODO probably remove the dragState parameter
+				guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+			}
 		}
 		dragState=null;	//release our drag state
 		event.stopPropagation();	//tell the event to stop bubbling
@@ -2993,25 +3001,40 @@ function getAncestorElementByClassName(node, className)
 	return node;	//return whatever node we found
 }
 
-/**Retrieves the descendant element with the given name, starting at the node itself.
+/**Retrieves the descendant element with the given name and attributes, starting at the node itself.
+Currently this function only accepts a single parameter specification.
 @param node The node the descendant of which to find, or null if the search should not take place.
 @param elementName The name of the element to find.
+@param parameters (...) Zero or more parameters of type Parameter, each representing an attribute name and value that should be present (or, if the parameter value is null, an attribute that must not be present).
 @return The element with the given name, or null if there is no such element descendant.
 */
-function getDescendantElementByName(node, elementName)
+function getDescendantElementByName(node, elementName, parameters)
 {
 	if(node)	//if we have a node
 	{
 		if(node.nodeType==Node.ELEMENT_NODE && node.nodeName.toLowerCase()==elementName)	//if this is an element with the given name
 		{
-			return node;	//show that we found a matching element name
+			var parametersMatch=true;	//start out assuming that the parameters match		
+			var argumentCount=arguments.length;	//find out how many arguments there are
+			for(var i=2; i<argumentCount && parametersMatch; ++i)	//for each argument (not counting the first two), as long as all parameters match so far
+			{
+				var parameter=arguments[i];	//get this argument
+				if(node.getAttribute(parameter.name)!=parameter.value)	//if this attribute doesn't exist or doesn't have the correct value
+				{
+					parametersMatch=false;	//indicate that the parameters do not match
+				}
+			}
+			if(parametersMatch)	//if all the parameters match
+			{
+				return node;	//show that we found a matching element name and attribute(s)
+			}
 		}
 		var childNodeList=node.childNodes;	//get all the child nodes
 		var childNodeCount=childNodeList.length;	//find out how many children there are
 		for(var i=0; i<childNodeCount; ++i)	//for each child node
 		{
 			var childNode=childNodeList[i];	//get this child node
-			var match=getDescendantElementByName(childNode, elementName);	//see if we can find the node in this branch
+			var match=getDescendantElementByName(childNode, elementName, parameters);	//see if we can find the node in this branch TODO fix passing more than one parameter
 			if(match)	//if we found a match
 			{
 				return match;	//return it
