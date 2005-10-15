@@ -16,7 +16,6 @@ import com.javaguise.model.Model;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.style.Color;
 import com.javaguise.style.RGBColor;
-import com.javaguise.validator.ValidationException;
 import com.javaguise.view.View;
 
 import static com.garretwilson.lang.CharSequenceUtilities.*;
@@ -87,6 +86,32 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 				}
 			}
 			return color!=null ? color : RGBColor.BLACK;	//return the default color if there is no specified color
+		}
+
+	/**The opacity of the entire component in the range (0.0-1.0), with a default of 1.0.*/
+	private float opacity=1.0f;
+
+		/**@return The opacity of the entire component in the range (0.0-1.0), with a default of 1.0.*/
+		public float getOpacity() {return opacity;}
+
+		/**Sets the opacity of the entire component.
+		This is a bound property of type <code>Float</code>.
+		@param newOpacity The new opacity of the entire component in the range (0.0-1.0).
+		@exception IllegalArgumentException if the given opacity is not within the range (0.0-1.0).
+		@see #OPACITY_PROPERTY 
+		*/
+		public void setOpacity(final float newOpacity)
+		{
+			if(newOpacity<0.0f || newOpacity>1.0f)	//if the new opacity is out of range
+			{
+				throw new IllegalArgumentException("Opacity "+newOpacity+" is not within the allowed range.");
+			}
+			if(opacity!=newOpacity)	//if the value is really changing
+			{
+				final float oldOpacity=opacity;	//get the old value
+				opacity=newOpacity;	//actually change the value
+				firePropertyChange(OPACITY_PROPERTY, new Float(oldOpacity), new Float(newOpacity));	//indicate that the value changed
+			}			
 		}
 
 	/**The controller installed in this component.*/
@@ -165,10 +190,18 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		/**Removes a specific error from this component.
 		@param error The error to remove.
 		*/
-		public void removeError(final Throwable error) {errorList.remove(error);}
+		public void removeError(final Throwable error) {errorList.remove(error);
+		
+		getView().setUpdated(false);	//TODO fix hack; make the view listen for error changes		
+		
+		}
 
 		/**Clears all errors associated with this component.*/
-		public void clearErrors() {errorList.clear();}
+		public void clearErrors() {errorList.clear();
+		
+		getView().setUpdated(false);	//TODO fix hack; make the view listen for error changes		
+		
+		}
 
 	/**The component identifier*/
 	private final String id;
@@ -543,6 +576,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 	{
 		try
 		{
+			clearErrors();	//clear all errors TODO check
 			getModel().validate();	//validate the model
 		}
 		catch(final ComponentException componentException)	//if there is a component error

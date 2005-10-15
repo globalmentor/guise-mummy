@@ -1,4 +1,4 @@
-package com.javaguise.stylesheets;
+package com.javaguise.platform.web;
 
 /**Constants to be used with the Guise stylesheet.
 @author Garret Wilson

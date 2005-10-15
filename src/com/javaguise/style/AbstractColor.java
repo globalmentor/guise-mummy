@@ -65,7 +65,7 @@ TODO fix	@exception IllegalArgumentException if the number of component values d
 	*/
   public int getAbsoluteComponent(final C component, final int bitDepth)
   {
-  	return Math.round(getComponent(component)*((1<<bitDepth))-1);	//multiply the component value by the range of values at the given bit depth
+  	return Math.round(getComponent(component)*((1<<bitDepth)-1));	//multiply the component value by the range of values at the given bit depth
   }
 
 	/**@return A hash code value for the object.*/

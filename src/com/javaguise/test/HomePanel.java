@@ -262,9 +262,22 @@ Debug.trace("list control changed value to", newValue);
 		final LayoutPanel sliderPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.LINE));
 
 		
-		final ValueModel<Integer> sliderModel=new DefaultValueModel<Integer>(session, Integer.class, 0);
+		final ValueModel<Integer> sliderModel=new DefaultValueModel<Integer>(session, Integer.class, 100);	//default to 100
 		sliderModel.setValidator(new IntegerRangeValidator(session, 0, 100));	//set a range validator for the model
 		sliderModel.setLabel("Slider Value");
+		
+		sliderModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<Integer>()
+				{
+					public void propertyValueChange(PropertyValueChangeEvent<Integer> propertyValueChangeEvent)
+					{
+						final Integer newValue=propertyValueChangeEvent.getNewValue();	//get the new value
+						if(newValue!=null)	//if there is a new value
+						{
+							testLabel.setOpacity(newValue.floatValue()/100);	//update the label opacity
+						}
+					}
+				});
+
 		
 		final SliderControl<Integer> horizontalSlider=new SliderControl<Integer>(session, sliderModel, Orientation.Flow.LINE);
 		sliderPanel.add(horizontalSlider);

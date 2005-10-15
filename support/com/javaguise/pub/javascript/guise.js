@@ -372,6 +372,14 @@ String.prototype.hasSubstring=function(substring, index)
 	return true;	//show that the string matches
 }
 
+/**Trims the given string of whitespace.
+@see https://lists.latech.edu/pipermail/javascript/2004-May/007570.html
+*/
+String.prototype.trim=function()
+{
+	return this.replace(/^\s+|\s+$/g, "");	//replace beginning and ending whitespace with nothing
+}
+
 //StringBuilder
 
 /**A class for concatenating string with more efficiency than using the additive operator.
@@ -1388,14 +1396,34 @@ alert(exception);
 				var attribute=attributes[i];	//get this attribute
 				var attributeName=DOMUtilities.getHTMLAttributeName(attribute.nodeName);	//get the attribute name, compensating for special HTML attributes such as "className"
 				var attributeValue=attribute.nodeValue;	//get the attribute value
-//TODO del alert("looking at attribute "+attributeName+" with value "+attributeValue);
-//TODO del alert("looking at old attribute "+attributeName+" with value "+oldElement.getAttribute(attributeName)+" other way "+oldElement[attributeName]);
-				if(oldElement[attributeName]!=attributeValue)	//if the old element has a different (or no) value for this attribute (Firefox maintains different values for element.getAttribute(attributeName) and element[attributeName]) (note also that using setAttribute() IE will sometimes throw an error if button.style is changed, for instance)
+				if(attributeName=="style")	//if this is a style attribute, we have to treat it differently, because neither Mozilla nor IE provide normal DOM access to the literal style attribute value
 				{
-//TODO del alert("updating "+element.nodeName+" attribute "+attributeName+" from value "+oldElement[attributeName]+" to new value "+attributeValue);
-					oldElement[attributeName]=attributeValue;	//update the old element's attribute (this format works for Firefox where oldElement.setAttribute("value", attributeValue) does not)
-//TODO: fix the Firefox problem of sending an onchange event for any elements that get updated from an Ajax request, but only later when the focus blurs
-//TODO fix the focus problem if the user has focus on an element that gets changed in response to the event
+//TODO fix with something else to give IE layout					oldElement["contentEditable"]=false;	//for IE 6, give the component "layout" so that things like opacity will work
+					var styles=attributeValue.split(";");	//split out the individual styles
+					for(var styleIndex=styles.length-1; styleIndex>=0; --styleIndex)	//for each style
+					{
+						var styleComponents=styles[styleIndex].split(":");	//get a reference to this style and split out the property and value
+						if(styleComponents.length==2)	//we expect there to be a property and a value
+						{
+							var styleProperty=styleComponents[0].trim();	//get the trimmed style property
+							var styleValue=styleComponents[1].trim();	//get the trimmed style value
+							if(oldElement.style[styleProperty]!=styleValue)	//if the style is different	TODO check about removing a style
+							{
+//TODO del alert("ready to set element style "+styleProperty+" to value "+styleValue);
+								oldElement.style[styleProperty]=styleValue;	//update this style
+							}
+						}
+					}				
+				}
+				else	//for any other attribute
+				{
+					if(oldElement[attributeName]!=attributeValue)	//if the old element has a different (or no) value for this attribute (Firefox maintains different values for element.getAttribute(attributeName) and element[attributeName]) (note also that using setAttribute() IE will sometimes throw an error if button.style is changed, for instance)
+					{
+	//TODO del alert("updating "+element.nodeName+" attribute "+attributeName+" from value "+oldElement[attributeName]+" to new value "+attributeValue);
+						oldElement[attributeName]=attributeValue;	//update the old element's attribute (this format works for Firefox where oldElement.setAttribute("value", attributeValue) does not)
+	//TODO: fix the Firefox problem of sending an onchange event for any elements that get updated from an Ajax request, but only later when the focus blurs
+	//TODO fix the focus problem if the user has focus on an element that gets changed in response to the event
+					}
 				}
 			}
 			var elementName=element.nodeName;	//save the element name
@@ -2088,6 +2116,7 @@ function initializeNode(node)
 	switch(node.nodeType)	//see which type of child node this is
 	{
 		case Node.ELEMENT_NODE:	//element
+//TODO fix with something else to give IE layout			node["contentEditable"]=false;	//for IE 6, give the component "layout" so that things like opacity will work
 //TODO bring back after giving all relevant nodes IDs			if(node.id)	//only look at element swith IDs
 			{
 				var elementName=node.nodeName.toLowerCase();	//get the element name

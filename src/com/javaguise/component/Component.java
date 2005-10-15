@@ -33,6 +33,8 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	public final static String DRAG_ENABLED_PROPERTY=getPropertyName(Component.class, "dragEnabled");
 	/**The bound property of whether the component has dropping enabled.*/
 	public final static String DROP_ENABLED_PROPERTY=getPropertyName(Component.class, "dropEnabled");
+	/**The opacity bound property.*/
+	public final static String OPACITY_PROPERTY=getPropertyName(Component.class, "opacity");
 	/**The orientation bound property.*/
 	public final static String ORIENTATION_PROPERTY=getPropertyName(Component.class, "orientation");
 	/**The bound property of the component style ID.*/
@@ -66,6 +68,17 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@see #getColor()
 	*/
 	public Color<?> determineColor();
+
+	/**@return The opacity of the entire component in the range (0.0-1.0), with a default of 1.0.*/
+	public float getOpacity();
+
+	/**Sets the opacity of the entire component.
+	This is a bound property of type <code>Float</code>.
+	@param newOpacity The new opacity of the entire component in the range (0.0-1.0).
+	@exception IllegalArgumentException if the given opacity is not within the range (0.0-1.0).
+	@see #OPACITY_PROPERTY 
+	*/
+	public void setOpacity(final float newOpacity);
 
 	/**@return The controller installed in this component.*/
 	public Controller<? extends GuiseContext, ? super C> getController();
