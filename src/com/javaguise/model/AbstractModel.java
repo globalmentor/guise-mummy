@@ -12,6 +12,8 @@ import com.garretwilson.event.EventListenerManager;
 import com.garretwilson.lang.ObjectUtilities;
 import com.javaguise.event.GuiseBoundPropertyObject;
 import com.javaguise.session.GuiseSession;
+import com.javaguise.validator.ValidationException;
+import com.javaguise.validator.Validator;
 
 /**A base abstract class implementing helpful functionality for models.
 @author Garret Wilson
@@ -116,6 +118,14 @@ public abstract class AbstractModel extends GuiseBoundPropertyObject implements 
 	@return Whether the contents of this model are valid.
 	*/
 	public boolean isValid() {return true;}
+
+	/**Validates the contents of this model, throwing an exception if the model is not valid.
+	This version performs no action.
+	@exception ValidationException if the contents of this model are not valid.	
+	*/
+	public void validate() throws ValidationException
+	{
+	}
 
 	/**Determines the plain text form of the given text, based upon its content type.
 	@param text The given text.

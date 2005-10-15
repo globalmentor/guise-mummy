@@ -72,7 +72,7 @@ public abstract class AbstractValueModel<V> extends AbstractControlModel impleme
 		this.valueClass=checkNull(valueClass, "Value class cannot be null.");	//store the value class
 	}
 
-	/**Determines whether the contenxt of this model are valid.
+	/**Determines whether the contents of this model are valid.
 	This version delegates to the validator, if one is installed.
 	@return Whether the contents of this model are valid.
 	@see #getValidator()
@@ -88,6 +88,20 @@ public abstract class AbstractValueModel<V> extends AbstractControlModel impleme
 		else	//if the super class doesn't think we're valid
 		{
 			return false;	//indicate that we're not valid
+		}
+	}
+
+	/**Validates the contents of this model, throwing an exception if the model is not valid.
+	This version validates the current value, if there is a validator installed.
+	@exception ValidationException if the contents of this model are not valid.	
+	*/
+	public void validate() throws ValidationException
+	{
+		super.validate();	//do the default validation
+		final Validator<V> validator=getValidator();	//get the currently installed validator, if there is one
+		if(validator!=null)	//if a validator is installed
+		{
+			validator.validate(getValue());	//validate the current value, throwing an exception if anything is wrong
 		}
 	}
 

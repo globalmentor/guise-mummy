@@ -13,6 +13,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 
 import com.javaguise.model.Model;
 import com.javaguise.session.GuiseSession;
+import com.javaguise.style.Color;
 import com.javaguise.view.View;
 
 /**Base interface for all Guise components.
@@ -24,6 +25,8 @@ A component is iterable over its child components, and can be used in short <cod
 public interface Component<C extends Component<C>> extends PropertyBindable
 {
 
+	/**The bound property of the color.*/
+	public final static String COLOR_PROPERTY=getPropertyName(Component.class, "color");
 	/**The bound property of the controller.*/
 	public final static String CONTROLLER_PROPERTY=getPropertyName(Component.class, "controller");
 	/**The bound property of whether the component has dragging enabled.*/
@@ -44,6 +47,25 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 
 	/**@return The data model used by this component.*/
 	public Model getModel();
+
+	/**@return The foreground color of the component, or <code>null</code> if no foreground color is specified for this component.
+	@see #determineColor()
+	*/
+	public Color<?> getColor();
+
+	/**Sets the foreground color of the component.
+	This is a bound property.
+	@param newColor The foreground color of the component, or <code>null</code> if the default foreground color should be used.
+	@see #COLOR_PROPERTY 
+	*/
+	public void setColor(final Color<?> newColor);
+
+	/**Determines the foreground color to use for the component.
+	The color is determined by finding the first non-<code>null</code> color up the component hierarchy or the default color.
+	@return The foreground color to use for the component.
+	@see #getColor()
+	*/
+	public Color<?> determineColor();
 
 	/**@return The controller installed in this component.*/
 	public Controller<? extends GuiseContext, ? super C> getController();
@@ -231,6 +253,12 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 
 	/**@return Whether the models of this component and all of its child components are valid.*/
 	public boolean isValid();
+
+	/**Validates the model of this component and all child components.
+	The component will be updated with error information.
+	@exception ComponentExceptions if there was one or more validation error.
+	*/
+	public void validate() throws ComponentExceptions;
 
 	/**Processes an event for the component.
 	This method should not normally be called directly by applications.

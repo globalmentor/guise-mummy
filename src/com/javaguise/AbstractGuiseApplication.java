@@ -170,6 +170,27 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			}			
 		}
 
+	/**The absolute or application-relative URI of the application style, or <code>null</code> if the default style should be used.*/
+	private URI style;
+
+		/**@return The absolute or application-relative URI of the application style, or <code>null</code> if the default style should be used.*/
+		public URI getStyle() {return style;}
+
+		/**Sets the URI of the style of the application.
+		This is a bound property.
+		@param newStyle The URI of the application style, or <code>null</code> if the default style should be used.
+		@see GuiseApplication#STYLE_PROPERTY
+		*/
+		public void setStyle(final URI newStyle)
+		{
+			if(!ObjectUtilities.equals(style, newStyle))	//if the value is really changing (compare their values, rather than identity)
+			{
+				final URI oldStyle=style;	//get the old value
+				style=newStyle;	//actually change the value
+				firePropertyChange(STYLE_PROPERTY, oldStyle, newStyle);	//indicate that the value changed
+			}
+		}
+
 	/**Default constructor.
 	This implementation sets the locale to the JVM default.
 	*/

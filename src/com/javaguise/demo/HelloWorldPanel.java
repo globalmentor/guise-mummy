@@ -6,7 +6,7 @@ import com.javaguise.session.GuiseSession;
 
 /**Hello World Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
-Demonstrates panels, region layouts, and headings.
+Demonstrates navigation panels, region layouts, and headings.
 @author Garret Wilson
 */
 public class HelloWorldPanel extends DefaultNavigationPanel

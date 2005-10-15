@@ -1,5 +1,7 @@
 package com.javaguise.component.layout;
 
+import com.javaguise.geometry.Axis;
+
 /**Indicates a region of a larger area in internationalized relative terms.
 @author Garret Wilson
 */

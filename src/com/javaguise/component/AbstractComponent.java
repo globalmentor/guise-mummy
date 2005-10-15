@@ -14,6 +14,9 @@ import com.javaguise.controller.Controller;
 import com.javaguise.event.GuiseBoundPropertyObject;
 import com.javaguise.model.Model;
 import com.javaguise.session.GuiseSession;
+import com.javaguise.style.Color;
+import com.javaguise.style.RGBColor;
+import com.javaguise.validator.ValidationException;
 import com.javaguise.view.View;
 
 import static com.garretwilson.lang.CharSequenceUtilities.*;
@@ -43,6 +46,48 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 
 		/**@return The data model used by this component.*/
 		public Model getModel() {return model;}
+
+	/**The foreground color of the component, or <code>null</code> if no foreground color is specified for this component.*/
+	private Color<?> color=null;
+
+		/**@return The foreground color of the component, or <code>null</code> if no foreground color is specified for this component.
+		@see #determineColor()
+		*/
+		public Color<?> getColor() {return color;}
+
+		/**Sets the foreground color of the component.
+		This is a bound property.
+		@param newColor The foreground color of the component, or <code>null</code> if the default foreground color should be used.
+		@see #COLOR_PROPERTY 
+		*/
+		public void setColor(final Color<?> newColor)
+		{
+			if(color!=newColor)	//if the value is really changing
+			{
+				final Color<?> oldColor=color;	//get the old value
+				color=newColor;	//actually change the value
+				firePropertyChange(COLOR_PROPERTY, oldColor, newColor);	//indicate that the value changed
+			}			
+		}
+
+		/**Determines the foreground color to use for the component.
+		The color is determined by finding the first non-<code>null</code> color up the component hierarchy or the default color.
+		@return The foreground color to use for the component.
+		@see #getColor()
+		*/
+		public Color<?> determineColor()
+		{
+			Color<?> color=getColor();	//find this component's color
+			if(color==null)	//if we don't have a color, ask the parent
+			{
+				final CompositeComponent<?> parent=getParent();	//get the parent
+				if(parent!=null)	//if there is a parent
+				{
+					color=parent.determineColor();	//ask the parent to determine the color
+				}
+			}
+			return color!=null ? color : RGBColor.BLACK;	//return the default color if there is no specified color
+		}
 
 	/**The controller installed in this component.*/
 	private Controller<? extends GuiseContext, ? super C> controller;
@@ -102,12 +147,20 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**Adds an error to the component.
 		@param error The error to add.
 		*/
-		public void addError(final Throwable error) {errorList.add(error);}
+		public void addError(final Throwable error) {errorList.add(error);
+		
+getView().setUpdated(false);	//TODO fix hack; make the view listen for error changes		
+		
+		}
 
 		/**Adds errors to the component.
 		@param errors The errors to add.
 		*/
-		public void addErrors(final Collection<? extends Throwable> errors) {errorList.addAll(errors);}
+		public void addErrors(final Collection<? extends Throwable> errors) {errorList.addAll(errors);
+		
+getView().setUpdated(false);	//TODO fix hack; make the view listen for error changes		
+		
+		}
 
 		/**Removes a specific error from this component.
 		@param error The error to remove.
@@ -479,6 +532,25 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 */
 //TODO del		return true;	//indicate that this component is valid
 		return getModel().isValid();	//return whether the model is valid
+	}
+
+	/**Validates the model of this component and all child components.
+	The component will be updated with error information.
+	This version validates the associated model.
+	@exception ComponentExceptions if there was one or more validation error.
+	*/
+	public void validate() throws ComponentExceptions
+	{
+		try
+		{
+			getModel().validate();	//validate the model
+		}
+		catch(final ComponentException componentException)	//if there is a component error
+		{
+			componentException.setComponent(this);	//make sure the exception knows to which component it relates
+			addError(componentException);	//add this error to the component
+			throw new ComponentExceptions(componentException);	//throw a new component exception list exception
+		}
 	}
 
 	/**Processes an event for the component.

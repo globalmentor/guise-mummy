@@ -26,6 +26,8 @@ public interface GuiseApplication extends PropertyBindable
 	public final static String DEFAULT_LOCALE_PROPERTY=getPropertyName(GuiseApplication.class, "defaultLocale");
 	/**The resource bundle base name bound property.*/
 	public final static String RESOURCE_BUNDLE_BASE_NAME_PROPERTY=getPropertyName(GuiseApplication.class, "resourceBundleBaseName");
+	/**The style bound property.*/
+	public final static String STYLE_PROPERTY=getPropertyName(GuiseApplication.class, "style");
 
 	/**@return The application locale used by default if a new session cannot determine the users's preferred locale.*/
 	public Locale getDefaultLocale();
@@ -49,6 +51,16 @@ public interface GuiseApplication extends PropertyBindable
 	@see #RESOURCE_BUNDLE_BASE_NAME_PROPERTY
 	*/
 	public void setResourceBundleBaseName(final String newResourceBundleBaseName);
+
+	/**@return The absolute or application-relative URI of the application style, or <code>null</code> if the default style should be used.*/
+	public URI getStyle();
+
+	/**Sets the URI of the style of the application.
+	This is a bound property.
+	@param newStyle The URI of the application style, or <code>null</code> if the default style should be used.
+	@see #STYLE_PROPERTY
+	*/
+	public void setStyle(final URI newStyle);
 
 	/**Installs a component kit.
 	Later component kits take precedence over earlier-installed component kits.

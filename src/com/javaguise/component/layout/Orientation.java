@@ -3,6 +3,8 @@ package com.javaguise.component.layout;
 import java.util.*;
 
 import com.garretwilson.lang.ObjectUtilities;
+import com.javaguise.geometry.Axis;
+
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.util.LanguageConstants.*;
 

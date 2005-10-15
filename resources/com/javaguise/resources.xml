@@ -31,5 +31,6 @@
 	<entry key="frame.dialog.options.STOP.icon">guise/images/stop.gif</entry>
 	<entry key="frame.dialog.options.CANCEL.label">Cancel</entry>
 	<entry key="frame.dialog.options.CANCEL.icon">guise/images/reject.gif</entry>
+
 </properties>
 

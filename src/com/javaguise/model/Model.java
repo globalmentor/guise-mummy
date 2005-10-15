@@ -10,6 +10,7 @@ import com.garretwilson.beans.*;
 import com.garretwilson.text.TextConstants;
 import com.garretwilson.text.xml.xhtml.XHTMLConstants;
 import com.javaguise.session.GuiseSession;
+import com.javaguise.validator.ValidationException;
 
 /**Base interface for all component models.
 A model should never fire a model-related event directly. It should rather create a postponed event and queue that event with the session.
@@ -37,6 +38,11 @@ public interface Model extends PropertyBindable
 
 	/**@return Whether the contents of this model are valid.*/
 	public boolean isValid();
+
+	/**Validates the contents of this model, throwing an exception if the model is not valid.
+	@exception ValidationException if the contents of this model are not valid.	
+	*/
+	public void validate() throws ValidationException;
 
 	/**Determines the advisory information text, such as might appear in a tooltip.
 	If information is specified, it will be used; otherwise, a value will be loaded from the resources if possible.

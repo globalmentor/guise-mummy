@@ -76,15 +76,17 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 {
 
 	/**The init parameter, "applicationClass", used to specify the application class.*/
-	public final static String APPLICATION_CLASS_INIT_PARAMETER_PREFIX="applicationClass";
+	public final static String APPLICATION_CLASS_INIT_PARAMETER="applicationClass";
 	/**The init parameter, "defaultLocale", used to specify the default locale.*/
-	public final static String DEFAULT_LOCALE_INIT_PARAMETER_PREFIX="defaultLocale";
+	public final static String DEFAULT_LOCALE_INIT_PARAMETER="defaultLocale";
 	/**The init parameter, "supportedLocales", used to specify the supported locales.*/
-	public final static String SUPPORTED_LOCALES_INIT_PARAMETER_PREFIX="supportedLocales";
+	public final static String SUPPORTED_LOCALES_INIT_PARAMETER="supportedLocales";
 	/**The prefix, "navigation.", used to identify navigation definitions in the web application's init parameters.*/
 	public final static String NAVIGATION_INIT_PARAMETER_PREFIX="navigation.";
 	/**The parameter, "class", used to identify the navigation frame class in the web application's init parameters.*/
 	public final static String NAVIGATION_CLASS_PARAMETER="class";
+	/**The init parameter, "style", used to specify the style definition URIs.*/
+	public final static String STYLE_INIT_PARAMETER="style";
 
 	/**The absolute path, relative to the servlet context, of the resources directory.*/
 	public final static String RESOURCES_DIRECTORY_PATH=ROOT_PATH+WEB_INF_DIRECTORY_NAME+PATH_SEPARATOR+"guise-application-resources"+PATH_SEPARATOR;
@@ -222,7 +224,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	protected AbstractGuiseApplication initGuiseApplication(final ServletConfig servletConfig) throws ServletException
 	{
 		final AbstractGuiseApplication guiseApplication;	//create the application and store it here
-		final String guiseApplicationClassName=servletConfig.getInitParameter(APPLICATION_CLASS_INIT_PARAMETER_PREFIX);	//get name of the guise application class
+		final String guiseApplicationClassName=servletConfig.getInitParameter(APPLICATION_CLASS_INIT_PARAMETER);	//get name of the guise application class
 		if(guiseApplicationClassName!=null)	//if there is a Guise application class name specified
 		{
 			try
@@ -248,7 +250,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		}
 		guiseApplication.installComponentKit(new XHTMLComponentKit());	//create and install an XHTML controller kit
 			//initialize the supported locales
-		final String supportedLocalesString=servletConfig.getInitParameter(SUPPORTED_LOCALES_INIT_PARAMETER_PREFIX);	//get the supported locales init parameter
+		final String supportedLocalesString=servletConfig.getInitParameter(SUPPORTED_LOCALES_INIT_PARAMETER);	//get the supported locales init parameter
 		if(supportedLocalesString!=null)	//if supported locales are specified
 		{
 			final String[] supportedLocaleStrings=supportedLocalesString.split(String.valueOf(COMMA_CHAR));	//split the string into separate locale strings
@@ -261,11 +263,19 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 			CollectionUtilities.addAll(guiseApplication.getSupportedLocales(), supportedLocales);	//add all supported locales to the application 
 		}
 			//initialize the default locale
-		final String defaultLocaleString=servletConfig.getInitParameter(DEFAULT_LOCALE_INIT_PARAMETER_PREFIX);	//get the default locale init parameter
+		final String defaultLocaleString=servletConfig.getInitParameter(DEFAULT_LOCALE_INIT_PARAMETER);	//get the default locale init parameter
 		if(defaultLocaleString!=null)	//if a default locale is specified
 		{
 			guiseApplication.setDefaultLocale(createLocale(defaultLocaleString.trim()));	//create a locale from the default locale string and store it in the application (trimming whitespace just to be extra helpful)
 		}
+
+			//initialize the style TODO allow for multiple styles
+		final String styleString=servletConfig.getInitParameter(STYLE_INIT_PARAMETER);	//get the style init parameter
+		if(styleString!=null)	//if a style is specified
+		{
+			guiseApplication.setStyle(URI.create(styleString));	//create a locale from the default locale string and store it in the application (trimming whitespace just to be extra helpful)
+		}
+
 			//initialize navigation path/panel bindings
 		final Enumeration initParameterNames=servletConfig.getInitParameterNames();	//get the names of all init parameters
 		while(initParameterNames.hasMoreElements())	//while there are more initialization parameters

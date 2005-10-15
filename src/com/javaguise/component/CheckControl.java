@@ -7,6 +7,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**Control accepting boolean input rendered as a check, either a checked square or a circle. 
+<p>The default model used by a check control defaults to a value of {@link Boolean#FALSE}, as a check control does not have the capability of indicating <code>null</code>.</p>
 @author Garret Wilson
 */
 public class CheckControl extends AbstractValueControl<Boolean, CheckControl>
@@ -73,7 +74,7 @@ public class CheckControl extends AbstractValueControl<Boolean, CheckControl>
 	*/
 	public CheckControl(final GuiseSession session, final String id)
 	{
-		this(session, id, new DefaultValueModel<Boolean>(session, Boolean.class));	//construct the class with a default model
+		this(session, id, new DefaultValueModel<Boolean>(session, Boolean.class, Boolean.FALSE));	//construct the class with a default model
 	}
 
 	/**Session, ID, and check type constructor with a default boolean data model.
@@ -85,7 +86,7 @@ public class CheckControl extends AbstractValueControl<Boolean, CheckControl>
 	*/
 	public CheckControl(final GuiseSession session, final String id, final CheckType checkType)
 	{
-		this(session, id, new DefaultValueModel<Boolean>(session, Boolean.class), checkType);	//construct the class with a default model
+		this(session, id, new DefaultValueModel<Boolean>(session, Boolean.class, Boolean.FALSE), checkType);	//construct the class with a default model
 	}
 
 	/**Session and model constructor with a default rectangle check type.
