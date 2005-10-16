@@ -2118,6 +2118,7 @@ function initializeNode(node)
 		case Node.ELEMENT_NODE:	//element
 //TODO fix with something else to give IE layout			node["contentEditable"]=false;	//for IE 6, give the component "layout" so that things like opacity will work
 //TODO bring back after giving all relevant nodes IDs			if(node.id)	//only look at element swith IDs
+//TODO this may allow "layout" for IE, but only do it when we need it (otherwise it will screw up buttons and such)			node.style.zoom=1;	//TODO testing
 			{
 				var elementName=node.nodeName.toLowerCase();	//get the element name
 				var elementClassName=node.className;	//get the element class name

@@ -6,6 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.garretwilson.event.EventListenerManager;
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.util.Debug;
 import com.javaguise.component.layout.Orientation;
 import com.javaguise.component.transfer.*;
 import com.javaguise.context.GuiseContext;
@@ -564,6 +565,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		}
 */
 //TODO del		return true;	//indicate that this component is valid
+//TODO del Debug.trace("###checking to see if model is valid for", getID(), getModel().isValid());
 		return getModel().isValid();	//return whether the model is valid
 	}
 

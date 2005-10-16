@@ -2,6 +2,7 @@ package com.javaguise.demo;
 
 import java.util.Arrays;
 
+import com.garretwilson.util.Debug;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
 import com.javaguise.event.*;
@@ -84,16 +85,15 @@ public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser>
 				{
 					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
 					{
-						if(isValid())	//if the model values of all form components are valid
+						try
 						{
-							endModal(getUser());	//end the panel modality with the edited user
+Debug.trace("ready to validate the form");
+							validate();	//validate the form
+Debug.trace("form validated with no errors");
+							endModal(getUser());	//end the panel modality with the edited user only if the form validates
 						}
-						else if(!isPasswordMatch())	//if the password isn't valid
+						catch(final ComponentExceptions componentExceptions)	//if there is an error, don't accept the input
 						{
-							final ValidationException validationException=new ValidationException(EditUserPanel.this, "Passwords do not match");
-							passwordControl.addError(validationException);	//add the error to each password control
-							passwordVerificationControl.addError(validationException);
-//TODO fix							addError(validationException);	//add the error to the panel itself
 						}
 					}
 				});
@@ -130,6 +130,49 @@ public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser>
 	public boolean isValid()
 	{
 		return super.isValid() && isPasswordMatch();	//add a check for password validity
+	}
+
+	/**Validates the model of this component and all child components.
+	The component will be updated with error information.
+	This version adds errors for non-matching passwords.
+	@exception ComponentExceptions if there was one or more validation error.
+	*/
+	public void validate() throws ComponentExceptions
+	{
+		ComponentExceptions componentExceptions=null;	//we'll store any component exceptions here and keep going
+		try
+		{
+			super.validate();	//validate the component normally
+		}
+		catch(final ComponentExceptions superComponentExceptions)	//if the super version returns an error
+		{
+			if(componentExceptions==null)	//if this is our first component exception
+			{
+				componentExceptions=superComponentExceptions;	//store the exception and continue processing events with other child components
+			}
+			else	//if we already have component exceptions
+			{
+				componentExceptions.addAll(superComponentExceptions);	//add all the exceptions to the exception we already have
+			}
+		}
+		if(!isPasswordMatch())	//if the password isn't valid
+		{
+			final ValidationException passwordValidationException=new ValidationException(EditUserPanel.this, "Passwords do not match");
+			passwordControl.addError(passwordValidationException);	//add the error to each password control
+			passwordVerificationControl.addError(passwordValidationException);
+			if(componentExceptions==null)	//if there are no component exceptions yet
+			{
+				componentExceptions=new ComponentExceptions(passwordValidationException);	//create a new component exception list with the validation exception
+			}
+			else	//if there are already component exceptions
+			{
+				componentExceptions.add(passwordValidationException);	//add the validation exception
+			}
+		}
+		if(componentExceptions!=null)	//if we encountered one or more component exceptions
+		{
+			throw componentExceptions;	//throw the exception, which may contain multiple exceptions
+		}
 	}
 
 	/**Initializes the panel with information for a new user.

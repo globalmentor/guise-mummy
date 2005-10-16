@@ -5,7 +5,6 @@ import static com.garretwilson.lang.ClassUtilities.*;
 import com.garretwilson.beans.AbstractPropertyValueChangeListener;
 import com.garretwilson.beans.PropertyValueChangeEvent;
 import com.garretwilson.lang.ObjectUtilities;
-import com.garretwilson.util.Debug;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
@@ -13,6 +12,7 @@ import com.javaguise.converter.*;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
+import com.javaguise.validator.Validator;
 
 /**Control to accept text input from the user representing a particular value type.
 This control keeps track of literal text entered by the user, distinct from the value stored in the model.
@@ -216,7 +216,54 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 			return false;	//although the model may be valid, its view representation is not
 		}
 */
-		return super.isValid() && getConverter().isEquivalent(getModel().getValue(), getText());	//if this component is valid, make sure the model value and the literal text value match
+//TODO del		return super.isValid() && getConverter().isEquivalent(getModel().getValue(), getText());	//if this component is valid, make sure the model value and the literal text value match
+
+//TODO also use the converter to make sure the converted text is valid
+
+		if(!super.isValid())	//if the super class is valid, check the validity of the text
+		{
+			return false;	//this class isn't valid
+		}
+		try
+		{
+			final V value=getConverter().convertLiteral(getText());	//see if the literal text can correctly be converted
+			final Validator<V> validator=getModel().getValidator();	//see if there is a validator installed
+			if(validator!=null)	//if there is a validator installed
+			{
+				validator.validate(value);	//validate the value represented by the literal text
+			}
+		}
+		catch(final ComponentException componentException)	//if there is a component error
+		{
+			return false;	//either the literal isn't valid or its converted value is not valid
+		}
+		return true;	//the values passed all validity checks
+//TODO del when works, but update comment		return super.isValid() && getConverter().isValidLiteral(getText());	//if this component is valid, make sure the literal value is valid, too (due to rounding, the displayed text may not represent the exact value as the literal)
+	}
+
+	/**Validates the model of this component and all child components.
+	The component will be updated with error information.
+	This version also validates the literal text.
+	@exception ComponentExceptions if there was one or more validation error.
+	*/
+	public void validate() throws ComponentExceptions
+	{
+		super.validate();	//validate the super class TODO accumulate errors
+		try
+		{
+			final V value=getConverter().convertLiteral(getText());	//see if the literal text can correctly be converted
+			final Validator<V> validator=getModel().getValidator();	//see if there is a validator installed
+			if(validator!=null)	//if there is a validator installed
+			{
+				validator.validate(value);	//validate the value represented by the literal text
+			}
+		}
+		catch(final ComponentException componentException)	//if there is a component error
+		{
+			componentException.setComponent(this);	//make sure the exception knows to which component it relates
+			addError(componentException);	//add this error to the component
+			throw new ComponentExceptions(componentException);	//throw a new component exception list exception
+		}
 	}
 
 	/**Creates a default converter for the value type represented by the given value class.

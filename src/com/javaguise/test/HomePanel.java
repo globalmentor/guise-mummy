@@ -266,19 +266,6 @@ Debug.trace("list control changed value to", newValue);
 		sliderModel.setValidator(new IntegerRangeValidator(session, 0, 100));	//set a range validator for the model
 		sliderModel.setLabel("Slider Value");
 		
-		sliderModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<Integer>()
-				{
-					public void propertyValueChange(PropertyValueChangeEvent<Integer> propertyValueChangeEvent)
-					{
-						final Integer newValue=propertyValueChangeEvent.getNewValue();	//get the new value
-						if(newValue!=null)	//if there is a new value
-						{
-							testLabel.setOpacity(newValue.floatValue()/100);	//update the label opacity
-						}
-					}
-				});
-
-		
 		final SliderControl<Integer> horizontalSlider=new SliderControl<Integer>(session, sliderModel, Orientation.Flow.LINE);
 		sliderPanel.add(horizontalSlider);
 
@@ -362,7 +349,20 @@ Debug.trace("list control changed value to", newValue);
 		image.getModel().setMessage("\u0628\u0627\u062A");
 		image.setDragEnabled(true);
 		horizontalPanel.add(image);
-		
+
+		sliderModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<Integer>()
+				{
+					public void propertyValueChange(PropertyValueChangeEvent<Integer> propertyValueChangeEvent)
+					{
+						final Integer newValue=propertyValueChangeEvent.getNewValue();	//get the new value
+						if(newValue!=null)	//if there is a new value
+						{
+							testLabel.setOpacity(newValue.floatValue()/100);	//update the label opacity
+							image.getModel().setOpacity(newValue.floatValue()/100);	//update the image opacity
+						}
+					}
+				});
+
 		
 		contentPanel.add(horizontalPanel);
 		
