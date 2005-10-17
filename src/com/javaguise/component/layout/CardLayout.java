@@ -7,6 +7,8 @@ import java.util.MissingResourceException;
 import javax.mail.internet.ContentType;
 
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.util.Debug;
+
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import static com.javaguise.GuiseResourceConstants.*;
@@ -64,7 +66,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> //TODO de
 			final Component<?> component=container.get(newIndex);	//get the component at the given index
 			if(newIndex!=getSelectedIndex() && component!=getValue())	//if we're really changing either the selected index of the component
 			{
-				selectedIndex=-1;	//uncache the selected index (don't actually change it yet---we want to make sure the value model allows the value to be changed
+				selectedIndex=-1;	//uncache the selected index (don't actually change it yet---we want to make sure the value model allows the value to be changed)
 				setValue(component);		//update the component value, throwing a validation exception if this index can't be selected
 			}
 		}
@@ -101,32 +103,31 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> //TODO de
 	*/
 	public Constraints removeConstraints(final Component<?> component)
 	{
-		int selectedIndex=getSelectedIndex();	//make sure we have the latest selected index
 		final Constraints oldConstraints=super.removeConstraints(component);	//remove the constraints normally
 		if(component==getValue())	//if the selected component was removed
 		{
-			final int size=getContainer().size();	//get the number of components in the container
-			if(size>=0)	//if there are components
+			final Container<?> container=getContainer();	//get our container
+			final int selectedIndex=container.indexOf(component);	//find the current index of the component that is being removed
+			final int containerSize=container.size();	//find out how many components are in the container
+			final int newSelectedComponentIndex;	//we'll determine the new selected index (that is, the index of the new selected component in this current state; it won't be the new selected index after removal)
+			if(selectedIndex<containerSize-1)	//if this component wasn't the last component
 			{
-				if(selectedIndex>=size)	//if the selected index is too high, now that a component has been removed
-				{
-					selectedIndex=size-1;	//select the last component
-				}
+				newSelectedComponentIndex=selectedIndex+1;	//get the subsequent component
 			}
-			else	//if there are no more components
+			else	//if this was the last component tha twas removed
 			{
-				selectedIndex=-1;	//don't select any components
+				newSelectedComponentIndex=containerSize-2;	//get the second-to last component
 			}
 			try
 			{
-				setSelectedIndex(selectedIndex);	//update the selected component by its index
-			}
+				setValue(container.get(newSelectedComponentIndex));		//update the component value, throwing a validation exception if this index can't be selected
+			}				
 			catch(final ValidationException validationException)	//if we can't select the next component
 			{
 				getValueModel().resetValue();	//reset the selected component value
-				selectedIndex=-1;	//uncache the selected component index
 			}
 		}
+		this.selectedIndex=-1;	//always uncache the selected index, because the index of the selected component might have changed
 		return oldConstraints;	//return the previous constraints
 	}
 

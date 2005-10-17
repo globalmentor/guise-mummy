@@ -403,7 +403,7 @@ Debug.info("content type:", request.getContentType());
 					final NavigationPanel<?> navigationPanel=guiseSession.getNavigationPanel(navigationPath);	//get the panel bound to the requested path
 					if(navigationPanel!=null)	//if we found a frame class for this address
 					{
-						guiseSession.getApplicationFrame().setComponent(navigationPanel);	//place the navigation panel in the application frame
+						guiseSession.getApplicationFrame().setContent(navigationPanel);	//place the navigation panel in the application frame
 						
 						setNoCache(response);	//TODO testing; fix; update method
 

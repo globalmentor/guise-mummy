@@ -733,6 +733,21 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		return dirtyComponents;
 	}
 
+	/**Changes the updated status of the views of an entire component descendant hierarchy.
+	@param newUpdated Whether the views of this component and all child components are up to date.
+	*/
+	public static void setUpdated(final Component<?> component, final boolean newUpdated)
+	{
+		component.getView().setUpdated(newUpdated);	//change the updated status of this component's view
+		if(component instanceof CompositeComponent)	//if the component is a composite component
+		{
+			for(final Component<?> childComponent:(CompositeComponent<?>)component)	//for each child component
+			{
+				setUpdated(childComponent, newUpdated);	//changed the updated status for this child's hierarchy
+			}
+		}
+	}
+
 	/**@return A string representation of this component.*/
 	public String toString()
 	{

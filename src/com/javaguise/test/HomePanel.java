@@ -10,6 +10,7 @@ import com.javaguise.component.layout.*;
 import com.javaguise.demo.DemoUser;
 import com.javaguise.demo.EditUserPanel;
 import com.javaguise.event.*;
+import com.javaguise.geometry.Extent;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.IntegerRangeValidator;
@@ -165,6 +166,8 @@ Debug.trace("list control changed value to", newValue);
 
 						final DefaultOptionDialogFrame confirmDialog=new DefaultOptionDialogFrame(session, label, DefaultOptionDialogFrame.Option.OK, DefaultOptionDialogFrame.Option.CANCEL);
 						confirmDialog.getModel().setLabel("Confirm your choice");
+						confirmDialog.setPreferredWidth(new Extent(20, Extent.Unit.EM));
+						confirmDialog.setPreferredHeight(new Extent(10, Extent.Unit.EM));
 						confirmDialog.addPropertyChangeListener(ModalComponent.MODE_PROPERTY, new AbstractPropertyValueChangeListener<Mode>()
 								{
 									public void propertyValueChange(final PropertyValueChangeEvent<Mode> propertyValueChangeEvent)
@@ -245,10 +248,10 @@ Debug.trace("list control changed value to", newValue);
 						final TextControl<Float> inputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
 						inputTextControl.getModel().setLabel("Input Number");	//add a label to the text input control
 						inputTextControl.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
-						((Container<?>)dialog.getComponent()).add(inputTextControl);	//add the input control to the input panel
+						((Container<?>)dialog.getContent()).add(inputTextControl);	//add the input control to the input panel
 						final TextControl<Float> outputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
 						outputTextControl.getModel().setLabel("Double the Number");	//add a label to the text output control
-						((Container<?>)dialog.getComponent()).add(outputTextControl);	//add the output control to the input panel
+						((Container<?>)dialog.getContent()).add(outputTextControl);	//add the output control to the input panel
 						
 						dialog.open(true);
 					}
@@ -524,7 +527,7 @@ Debug.trace("list control changed value to", newValue);
 			super(session);
 			label=new Label(session);
 			label.getModel().setLabel("This is frame content");
-			setComponent(label);
+			setContent(label);
 			
 		}
 	}

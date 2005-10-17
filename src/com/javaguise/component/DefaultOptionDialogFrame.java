@@ -14,7 +14,7 @@ import com.javaguise.validator.ValidationException;
 
 /**Default implementation of a frame for communication of an option such as "OK" or "Cancel".
 An option frame defaults to a single composite child panel with a row of options along the bottom.
-A center content component within the child panel may be specified.
+The contents of an option dialog frame should be accessed by {@link #getOptionContent()} and {@link #setOptionContent(Component)}.
 @author Garret Wilson
 */
 public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultOptionDialogFrame.Option, DefaultOptionDialogFrame>
@@ -154,7 +154,7 @@ public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultO
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
 	@param options The available options.
-	@exception NullPointerException if the given session and/or optoins is <code>null</code>.
+	@exception NullPointerException if the given session and/or options is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
 	public DefaultOptionDialogFrame(final GuiseSession session, final String id, final Component<?> component, final Option... options)
@@ -167,7 +167,7 @@ public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultO
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
 	@param options The set of available options.
-	@exception NullPointerException if the given session and/or optoins is <code>null</code>.
+	@exception NullPointerException if the given session and/or options is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
 	public DefaultOptionDialogFrame(final GuiseSession session, final String id, final Component<?> component, final Set<Option> options)

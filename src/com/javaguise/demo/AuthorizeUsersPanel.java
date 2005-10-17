@@ -6,6 +6,7 @@ import java.util.*;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
 import com.javaguise.context.GuiseContext;
+import com.javaguise.event.*;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.RegularExpressionStringValidator;
@@ -13,7 +14,7 @@ import com.javaguise.validator.RegularExpressionStringValidator;
 /**Authorize Users Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
 Demonstrates custom table models, editable string table cells, editable boolean table cells,
-	table column validators, and tables.
+	table column validators, tables, and modal message option dialog frames.
 @author Garret Wilson
 */
 public class AuthorizeUsersPanel extends DefaultNavigationPanel
@@ -54,6 +55,17 @@ public class AuthorizeUsersPanel extends DefaultNavigationPanel
 			//apply button
 		final Button applyButton=new Button(session);	//create a button for applying the values
 		applyButton.getModel().setLabel("Apply");	//set the button label
+		applyButton.getModel().addActionListener(new ActionListener<ActionModel>()	//listen for the apply button
+				{					
+					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
+					{
+						final MessageOptionDialogFrame messageDialog=new MessageOptionDialogFrame(session,	//create a new message dialog
+								"The use of AJAX in Guise makes the \"Apply\" button unnecessary, because changes take place live. This button would only be useful if AJAX were disabled.",
+								MessageOptionDialogFrame.Option.OK);	//show the OK button
+						messageDialog.getModel().setLabel("Note on the \"Apply\" button.");	//set the message dialog label
+						messageDialog.open(true);	//open the dialog modally
+					}
+				});
 		add(applyButton);	//add the apply button to the panel
 	}
 

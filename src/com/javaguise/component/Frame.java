@@ -12,8 +12,8 @@ import com.javaguise.model.LabelModel;
 */
 public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalComponent<C>
 {
-	/**The component bound property.*/
-	public final static String COMPONENT_PROPERTY=getPropertyName(Frame.class, "component");
+	/**The content bound property.*/
+	public final static String CONTENT_PROPERTY=getPropertyName(Frame.class, "content");
 	/**The bound property of whether the frame is modal if and when it is open.*/
 	public final static String MODAL_PROPERTY=getPropertyName(Frame.class, "modal");
 	/**The bound property of whether the component is movable.*/
@@ -69,14 +69,14 @@ public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalC
 	public LabelModel getModel();
 
 	/**@return The single child component, or <code>null</code> if this frame does not have a child component.*/
-	public Component<?> getComponent();
+	public Component<?> getContent();
 
 	/**Sets the single child component.
 	This is a bound property
-	@param newComponent The single child component, or <code>null</code> if this frame does not have a child component.
-	@see #COMPONENT_PROPERTY
+	@param newContent The single child component, or <code>null</code> if this frame does not have a child component.
+	@see #CONTENT_PROPERTY
 	*/
-	public void setComponent(final Component<?> newComponent);
+	public void setContent(final Component<?> newContent);
 
 	/**Opens the frame with the currently set modality.
 	Opening the frame registers the frame with the session.

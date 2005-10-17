@@ -85,7 +85,21 @@ This version adds the frame to the document, initializes the frame, and updates 
 */
 frames.add=function(frame)
 {
+//TODO fix so that it works both on IE and Firefox							oldElement.style.position="fixed";	//TODO testing
+	frame.style.position="absolute";	//change the element's position to absolute; it should already be set like this, but set it specifically so that dragging will know not to drag a copy TODO update the element's initial position
+
+
+
+	
 	document.body.appendChild(frame);	//add the frame element to the document; do this first, because IE doesn't allow the style to be accessed directly with imported nodes until they are added to the document
+
+	var viewportSize=getViewportSize();	//get the size of the viewport
+	frame.style.left=((viewportSize.width-frame.offsetWidth)/2)+"px";	//center the frame horizontally
+	frame.style.top=((viewportSize.height-frame.offsetHeight)/2)+"px";	//center the frame vertically
+
+	frame.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components TODO fix
+
+
 	initializeNode(frame);	//initialize the new imported frame, installing the correct event handlers
 	updateComponents(frame);	//update all the components within the frame
 	Array.prototype.add.call(this, frame);	//do the default adding to the array
@@ -120,7 +134,7 @@ var modalFrame=null;
 function updateModal()
 {
 	modalFrame=null;	//start out presuming there is no modal frame
-	for(var i=frames.length-1; i>=0; --i)	//for each frame
+	for(var i=frames.length-1; i>=0 && modalFrame==null; --i)	//for each frame, find the last modal frame
 	{
 		var frame=frames[i];	//get a reference to this frame
 		if(hasClassName(frame, "frameModal"))	//if this is a modal frame
@@ -130,7 +144,7 @@ function updateModal()
 	}
 	if(modalFrame!=null)	//if there is a modal frame
 	{
-			//TODO update modal layer zIndex
+		modalLayer.style.zIndex=modalFrame.style.zIndex-1;	//place the modal layer directly behind the modal frame
 		modalLayer.style.display="block";	//make the modal layer visible
 	}
 	else
@@ -271,18 +285,26 @@ if(typeof document.importNode=="undefined")	//if the document does not support d
 				for(var i=0; i<attributeCount; ++i)	//for each attribute
 				{
 					var attribute=attributes[i];	//get this attribute
-					if(importedNode.setAttributeNodeNS instanceof Function && typeof attribute.namespaceURI!="undefined")	//if the attribute supports namespaces
+					var attributeName=attribute.nodeName;	//get the attribute name
+					if(attributeName=="style")	//if this is the style attribute, it must be copied differently or it will throw an error on IE
 					{
-						var importedAttribute=document.createAttributeNS(attribute.namespaceURI, attribute.nodeName);	//create a namespace-aware attribute
-						importedAttribute.nodeValue=attribute.nodeValue;	//set the attribute value
-						importedNode.setAttributeNodeNS(importedAttribute);	//set the attribute for the element						
+						DOMUtilities.copyStyleAttribute(importedNode, node);	//copy the style attribute
 					}
-					else	//if the attribute does not support namespaces
+					else	//for all other attributes
 					{
-						var importedAttribute=document.createAttribute(attribute.nodeName);	//create a non-namespace-aware element
-						importedAttribute.nodeValue=attribute.nodeValue;	//set the attribute value TODO verify this works on Safari
-						importedNode.setAttributeNode(importedAttribute);	//set the attribute for the element
-					}
+						if(importedNode.setAttributeNodeNS instanceof Function && typeof attribute.namespaceURI!="undefined")	//if the attribute supports namespaces
+						{
+							var importedAttribute=document.createAttributeNS(attribute.namespaceURI, attributeName);	//create a namespace-aware attribute
+							importedAttribute.nodeValue=attribute.nodeValue;	//set the attribute value
+							importedNode.setAttributeNodeNS(importedAttribute);	//set the attribute for the element						
+						}
+						else	//if the attribute does not support namespaces
+						{
+							var importedAttribute=document.createAttribute(attributeName);	//create a non-namespace-aware element
+							importedAttribute.nodeValue=attribute.nodeValue;	//set the attribute value TODO verify this works on Safari
+							importedNode.setAttributeNode(importedAttribute);	//set the attribute for the element
+						}
+					}	//TODO perhaps catch an exception here and return null or throw our own exception to improve IE "type" attribute error handling
 				}
 				if(deep)	//if we should import deep
 				{
@@ -597,6 +619,30 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 		else	//if the DOM isn't namespace aware
 		{
 			element.setAttributeNode(attribute);	//set the attribute with no namespace information
+		}
+	},
+
+	/**Copies the style attribute by parsing out the individual style declarations and applying them to the destination style.
+	This method is needed because the IE DOM does not allow the style attribute to be copied directly.
+	@param destinationElement The destination of the style information.
+	@param sourceElement The source of the style information.
+	*/
+	copyStyleAttribute:function(destinationElement, sourceElement)
+	{
+		var style=sourceElement.getAttribute("style");	//get the source style attribute
+		if(style!=null)	//if there is a style attribute
+		{
+			var styles=style.split(";");	//split out the individual styles
+			for(var styleIndex=styles.length-1; styleIndex>=0; --styleIndex)	//for each style
+			{
+				var styleComponents=styles[styleIndex].split(":");	//get a reference to this style and split out the property and value
+				if(styleComponents.length==2)	//we expect there to be a property and a value
+				{
+					var styleProperty=styleComponents[0].trim();	//get the trimmed style property
+					var styleValue=styleComponents[1].trim();	//get the trimmed style value
+					destinationElement.style[styleProperty]=styleValue;	//copy this style
+				}
+			}				
 		}
 	},
 
@@ -1291,13 +1337,6 @@ alert(exception);
 						else if(hasClass(childNode, "frame"))	//if the element doesn't currently exist, but the patch is for a frame, create a new frame
 						{
 							oldElement=document.importNode(childNode, true);	//create an import clone of the node
-//TODO don't we need to initialize here? or do we do it in frames.add()? if the latter, we need to update the components there
-
-
-//TODO del alert("imported element "+typeof oldElement+" with ID "+oldElement.id);
-//TODO fix so that it works both on IE and Firefox							oldElement.style.position="fixed";	//TODO testing
-							oldElement.style.position="absolute";	//change the element's position to absolute TODO update the element's initial position
-							oldElement.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components
 /*TODO del
 							oldElement.style.left="10px";	//TODO fix
 							oldElement.style.top="10px";
@@ -1305,10 +1344,6 @@ alert(exception);
 							oldElement.style.height="200px";
 */
 							frames.add(oldElement);	//add this frame
-/*TODO del when works
-							document.body.appendChild(oldElement);	//add the frame element to the document
-							initializeNode(oldElement);	//initialize the new imported node, installing the correct event handlers
-*/
 						}
 					}
 				}
@@ -2055,8 +2090,9 @@ function updateModalLayer()
 		document.body.appendChild(modalLayer);	//add the modal layer to the document
 	}
 	var pageSize=getPageSize();	//get the size of the page
-	modalLayer.style.width=pageSize.width+"px";	//update the size of the modal layer
-	modalLayer.style.height=pageSize.height+"px";
+	var viewportSize=getViewportSize();	//get the size of the viewport
+	modalLayer.style.width=Math.max(viewportSize.width, pageSize.width)+"px";	//update the size of the modal layer to the larger of the page and the viewport
+	modalLayer.style.height=Math.max(viewportSize.height, pageSize.height)+"px";
 }
 
 //Guise functionality
@@ -2977,26 +3013,6 @@ function getForm(node)
 function getMenu(node)	//TODO rename method when works
 {
 	return getAncestorElementByClassName(node, /^menu-[xy]-(ltr|rtl)-body$/);	//TODO comment; use a constant
-/*TODO del when works
-	while(node)	//while we haven't reached the top of the hierarchy
-	{
-		if(node.nodeType==Node.ELEMENT_NODE)	//if this is an element
-		{
-			var elementClassNames=node.className ? node.className.split(/\s/) : EMPTY_ARRAY;	//split out the class names
-			for(var i=elementClassNames.length-1; i>=0; --i)	//for each class name
-			{
-				var className=elementClassNames[i];	//get a reference to this class name
-				if(className.match(/^menu-.-...$/))	//if this is a menu TODO use a constant
-				{
-//TODO fix alert("found class: "+className+" for element "+node.nodeName+" with ID "+node.id);
-					return node;	//show that we found a menu
-				}
-			}
-		}
-		node=node.parentNode;	//try the parent node
-	}
-	return node;	//return whatever node we found
-*/
 }
 
 /**Retrieves the named ancestor element of the given node, starting at the node itself.
@@ -3042,10 +3058,10 @@ function getDescendantElementByName(node, elementName, parameters)
 {
 	if(node)	//if we have a node
 	{
+		var argumentCount=arguments.length;	//find out how many arguments there are
 		if(node.nodeType==Node.ELEMENT_NODE && node.nodeName.toLowerCase()==elementName)	//if this is an element with the given name
 		{
 			var parametersMatch=true;	//start out assuming that the parameters match		
-			var argumentCount=arguments.length;	//find out how many arguments there are
 			for(var i=2; i<argumentCount && parametersMatch; ++i)	//for each argument (not counting the first two), as long as all parameters match so far
 			{
 				var parameter=arguments[i];	//get this argument
@@ -3064,7 +3080,14 @@ function getDescendantElementByName(node, elementName, parameters)
 		for(var i=0; i<childNodeCount; ++i)	//for each child node
 		{
 			var childNode=childNodeList[i];	//get this child node
-			var match=getDescendantElementByName(childNode, elementName, parameters);	//see if we can find the node in this branch TODO fix passing more than one parameter
+			if(argumentCount==2)	//if there are only two arguments
+			{
+				var match=getDescendantElementByName(childNode, elementName);	//see if we can find the node in this branch
+			}
+			else	//if there are more arguments
+			{
+				var match=getDescendantElementByName(childNode, elementName, parameters);	//see if we can find the node in this branch TODO fix passing more than one parameter
+			}
 			if(match)	//if we found a match
 			{
 				return match;	//return it

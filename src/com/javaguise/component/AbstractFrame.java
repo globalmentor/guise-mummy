@@ -135,36 +135,36 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 	public LabelModel getModel() {return (LabelModel)super.getModel();}
 
 	/**The single child component, or <code>null</code> if this frame does not have a child component.*/
-	private Component<?> component;
+	private Component<?> content;
 
 		/**@return The single child component, or <code>null</code> if this frame does not have a child component.*/
-		public Component<?> getComponent() {return component;}
+		public Component<?> getContent() {return content;}
 
 		/**Sets the single child component.
 		This is a bound property.
-		@param newComponent The single child component, or <code>null</code> if this frame does not have a child component.
-		@see Frame#COMPONENT_PROPERTY
+		@param newContent The single child component, or <code>null</code> if this frame does not have a child component.
+		@see Frame#CONTENT_PROPERTY
 		*/
-		public void setComponent(final Component<?> newComponent)
+		public void setContent(final Component<?> newContent)
 		{
-			if(component!=newComponent)	//if the value is really changing
+			if(content!=newContent)	//if the value is really changing
 			{
-				final Component<?> oldComponent=component;	//get the old value
-				component=newComponent;	//actually change the value
+				final Component<?> oldComponent=content;	//get the old value
+				content=newContent;	//actually change the value
 				if(oldComponent!=null)	//if there was an old component
 				{
 					oldComponent.setParent(null);	//tell the old component it no longer has a parent
 				}
-				if(component!=null)	//if there is a new component
+				if(content!=null)	//if there is a new component
 				{
-					component.setParent(this);	//tell the new component who its parent is					
+					content.setParent(this);	//tell the new component who its parent is					
 				}
-				firePropertyChange(COMPONENT_PROPERTY, oldComponent, newComponent);	//indicate that the value changed
+				firePropertyChange(CONTENT_PROPERTY, oldComponent, newContent);	//indicate that the value changed
 			}
 		}
 
 	/**@return Whether this component has children.*/
-	public boolean hasChildren() {return getComponent()!=null;}
+	public boolean hasChildren() {return getContent()!=null;}
 
 	/**Retrieves the child component with the given ID.
 	@param id The ID of the component to return.
@@ -172,15 +172,15 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 	*/
 	public Component<?> getComponent(final String id)
 	{
-		final Component<?> component=getComponent();	//get the child component, if there is one
+		final Component<?> component=getContent();	//get the child component, if there is one
 		return (component!=null && id.equals(component.getID())) ? component : null;	//return the child component if it has the correct ID
 	}
 
 	/**@return An iterator to the single child component, if there is one.*/
 	public Iterator<Component<?>> iterator()
 	{
-		final Component<?> component=getComponent();	//get the child component, if there is one
-		return component!=null ? new ObjectIterator<Component<?>>(getComponent()) : new EmptyIterator<Component<?>>();
+		final Component<?> component=getContent();	//get the child component, if there is one
+		return component!=null ? new ObjectIterator<Component<?>>(getContent()) : new EmptyIterator<Component<?>>();
 	}
 
 	/**Session, ID, model, and component constructor.
@@ -194,7 +194,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 	public AbstractFrame(final GuiseSession session, final String id, final LabelModel model, final Component<?> component)
 	{
 		super(session, id, model);	//construct the parent class
-		this.component=component;	//set the child component
+		this.content=component;	//set the child component
 	}
 
 	/**Determines whether the models of this component and all of its child components are valid.
