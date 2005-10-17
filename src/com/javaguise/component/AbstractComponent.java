@@ -13,6 +13,8 @@ import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.ControlEvent;
 import com.javaguise.controller.Controller;
 import com.javaguise.event.GuiseBoundPropertyObject;
+import com.javaguise.geometry.Dimensions;
+import com.javaguise.geometry.Extent;
 import com.javaguise.model.Model;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.style.Color;
@@ -58,7 +60,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**Sets the foreground color of the component.
 		This is a bound property.
 		@param newColor The foreground color of the component, or <code>null</code> if the default foreground color should be used.
-		@see #COLOR_PROPERTY 
+		@see Component#COLOR_PROPERTY 
 		*/
 		public void setColor(final Color<?> newColor)
 		{
@@ -99,7 +101,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		This is a bound property of type <code>Float</code>.
 		@param newOpacity The new opacity of the entire component in the range (0.0-1.0).
 		@exception IllegalArgumentException if the given opacity is not within the range (0.0-1.0).
-		@see #OPACITY_PROPERTY 
+		@see Component#OPACITY_PROPERTY 
 		*/
 		public void setOpacity(final float newOpacity)
 		{
@@ -112,6 +114,48 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 				final float oldOpacity=opacity;	//get the old value
 				opacity=newOpacity;	//actually change the value
 				firePropertyChange(OPACITY_PROPERTY, new Float(oldOpacity), new Float(newOpacity));	//indicate that the value changed
+			}			
+		}
+
+	/**The preferred width of the component, or <code>null</code> if no preferred width has been specified.*/
+	private Extent preferredWidth=null;
+
+		/**@return The preferred width of the component, or <code>null</code> if no preferred width has been specified.*/
+		public Extent getPreferredWidth() {return preferredWidth;}
+
+		/**Sets the preferred extent of the component.
+		This is a bound property.
+		@param newPreferredWidth The new preferred extent of the component, or <code>null</code> there is no width preference.
+		@see Component#PREFERRED_WIDTH_PROPERTY 
+		*/
+		public void setPreferredWidth(final Extent newPreferredWidth)
+		{
+			if(preferredWidth!=newPreferredWidth)	//if the value is really changing
+			{
+				final Extent oldPreferredWidth=preferredWidth;	//get the old value
+				preferredWidth=newPreferredWidth;	//actually change the value
+				firePropertyChange(PREFERRED_WIDTH_PROPERTY, oldPreferredWidth, newPreferredWidth);	//indicate that the value changed
+			}			
+		}
+
+	/**The preferred height of the component, or <code>null</code> if no preferred height has been specified.*/
+	private Extent preferredHeight=null;
+
+		/**@return The preferred height of the component, or <code>null</code> if no preferred height has been specified.*/
+		public Extent getPreferredHeight() {return preferredHeight;}
+
+		/**Sets the preferred extent of the component.
+		This is a bound property.
+		@param newPreferredHeight The new preferred extent of the component, or <code>null</code> there is no height preference.
+		@see Component#PREFERRED_HEIGHT_PROPERTY 
+		*/
+		public void setPreferredHeight(final Extent newPreferredHeight)
+		{
+			if(preferredHeight!=newPreferredHeight)	//if the value is really changing
+			{
+				final Extent oldPreferredHeight=preferredHeight;	//get the old value
+				preferredHeight=newPreferredHeight;	//actually change the value
+				firePropertyChange(PREFERRED_HEIGHT_PROPERTY, oldPreferredHeight, newPreferredHeight);	//indicate that the value changed
 			}			
 		}
 

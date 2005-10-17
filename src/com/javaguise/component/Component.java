@@ -9,6 +9,9 @@ import com.javaguise.component.transfer.*;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.ControlEvent;
 import com.javaguise.controller.Controller;
+import com.javaguise.geometry.Dimensions;
+import com.javaguise.geometry.Extent;
+
 import static com.garretwilson.lang.ClassUtilities.*;
 
 import com.javaguise.model.Model;
@@ -37,6 +40,10 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	public final static String OPACITY_PROPERTY=getPropertyName(Component.class, "opacity");
 	/**The orientation bound property.*/
 	public final static String ORIENTATION_PROPERTY=getPropertyName(Component.class, "orientation");
+	/**The preferred height bound property.*/
+	public final static String PREFERRED_HEIGHT_PROPERTY=getPropertyName(Component.class, "preferredHeight");
+	/**The preferred width bound property.*/
+	public final static String PREFERRED_WIDTH_PROPERTY=getPropertyName(Component.class, "preferredWidth");
 	/**The bound property of the component style ID.*/
 	public final static String STYLE_ID_PROPERTY=getPropertyName(Component.class, "styleID");
 	/**The bound property of the view.*/
@@ -79,6 +86,26 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@see #OPACITY_PROPERTY 
 	*/
 	public void setOpacity(final float newOpacity);
+
+	/**@return The preferred width of the component, or <code>null</code> if no preferred width has been specified.*/
+	public Extent getPreferredWidth();
+
+	/**Sets the preferred extent of the component.
+	This is a bound property.
+	@param newPreferredWidth The new preferred extent of the component, or <code>null</code> there is no width preference.
+	@see #PREFERRED_WIDTH_PROPERTY 
+	*/
+	public void setPreferredWidth(final Extent newPreferredWidth);
+
+	/**@return The preferred height of the component, or <code>null</code> if no preferred height has been specified.*/
+	public Extent getPreferredHeight();
+
+	/**Sets the preferred extent of the component.
+	This is a bound property.
+	@param newPreferredHeight The new preferred extent of the component, or <code>null</code> there is no height preference.
+	@see #PREFERRED_HEIGHT_PROPERTY 
+	*/
+	public void setPreferredHeight(final Extent newPreferredHeight);
 
 	/**@return The controller installed in this component.*/
 	public Controller<? extends GuiseContext, ? super C> getController();
