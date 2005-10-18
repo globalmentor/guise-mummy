@@ -5,12 +5,12 @@ import com.javaguise.model.DefaultLabelModel;
 import com.javaguise.model.LabelModel;
 import com.javaguise.session.GuiseSession;
 
-/**A menu control.
+/**A menu control that drops its children down from the top or over to the side.
 This component uses a {@link MenuLayout}.
 @author Garret Wilson
 @see MenuLayout
 */
-public class Menu extends AbstractContainerControl<Menu>
+public class DropMenu extends AbstractContainerControl<DropMenu>
 {
 
 	/**@return The data model used by this component.*/
@@ -21,7 +21,7 @@ public class Menu extends AbstractContainerControl<Menu>
 	@param axis The axis along which the menu is oriented.
 	@exception NullPointerException if the given session and/or axis is <code>null</code>.
 	*/
-	public Menu(final GuiseSession session, final Orientation.Flow axis)
+	public DropMenu(final GuiseSession session, final Orientation.Flow axis)
 	{
 		this(session, (String)null, axis);	//construct the component with the axis, indicating that a default ID should be used
 	}
@@ -32,7 +32,7 @@ public class Menu extends AbstractContainerControl<Menu>
 	@param axis The axis along which the menu is oriented.
 	@exception NullPointerException if the given session, axis, and/or model is <code>null</code>.
 	*/
-	public Menu(final GuiseSession session, final LabelModel model, final Orientation.Flow axis)
+	public DropMenu(final GuiseSession session, final LabelModel model, final Orientation.Flow axis)
 	{
 		this(session, null, model, axis);	//construct the component with the axis, indicating that a default ID should be used
 	}
@@ -44,7 +44,7 @@ public class Menu extends AbstractContainerControl<Menu>
 	@exception NullPointerException if the given session and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public Menu(final GuiseSession session, final String id, final Orientation.Flow axis)
+	public DropMenu(final GuiseSession session, final String id, final Orientation.Flow axis)
 	{
 		this(session, id, new DefaultLabelModel(session), axis);	//construct the class with a default model
 	}
@@ -57,7 +57,7 @@ public class Menu extends AbstractContainerControl<Menu>
 	@exception NullPointerException if the given session, axis, and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public Menu(final GuiseSession session, final String id, final LabelModel model, final Orientation.Flow axis)
+	public DropMenu(final GuiseSession session, final String id, final LabelModel model, final Orientation.Flow axis)
 	{
 		super(session, id, new MenuLayout(session, axis), model);	//construct the parent class
 	}

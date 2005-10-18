@@ -466,11 +466,11 @@ Debug.trace("list control changed value to", newValue);
 
 	}
 
-	protected Menu createMenu(final GuiseSession session, final Orientation.Flow flow)
+	protected DropMenu createMenu(final GuiseSession session, final Orientation.Flow flow)
 	{
-		final Menu menu=new Menu(session, flow);
+		final DropMenu menu=new DropMenu(session, flow);
 
-		final Menu fileMenu=new Menu(session, "fileMenu", Orientation.Flow.PAGE);
+		final DropMenu fileMenu=new DropMenu(session, "fileMenu", Orientation.Flow.PAGE);
 		fileMenu.getModel().setLabel("File");
 		final Link openMenuLink=new Link(session, "openMenuItem");
 		openMenuLink.getModel().setLabel("Open");
@@ -480,7 +480,7 @@ Debug.trace("list control changed value to", newValue);
 		fileMenu.add(closeMenuLink);
 		menu.add(fileMenu);
 
-		final Menu editMenu=new Menu(session, "editMenu", Orientation.Flow.PAGE);
+		final DropMenu editMenu=new DropMenu(session, "editMenu", Orientation.Flow.PAGE);
 		editMenu.getModel().setLabel("Edit");
 		final Link copyMenuLink=new Link(session, "copyMenuItem");
 		copyMenuLink.getModel().setLabel("Copy");
@@ -493,10 +493,10 @@ Debug.trace("list control changed value to", newValue);
 		editMenu.add(pasteMenuLink);
 		menu.add(editMenu);
 
-		final Menu windowMenu=new Menu(session, "windowMenu", Orientation.Flow.PAGE);
+		final DropMenu windowMenu=new DropMenu(session, "windowMenu", Orientation.Flow.PAGE);
 		windowMenu.getModel().setLabel("Window");
 
-		final Menu arrangeMenu=new Menu(session, "arrangeMenu", Orientation.Flow.PAGE);
+		final DropMenu arrangeMenu=new DropMenu(session, "arrangeMenu", Orientation.Flow.PAGE);
 		arrangeMenu.getModel().setLabel("Arrange");
 		
 		final Link tileMenuLink=new Link(session, "tileMenuItem");

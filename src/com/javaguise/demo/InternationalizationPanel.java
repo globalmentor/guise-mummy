@@ -73,10 +73,10 @@ public class InternationalizationPanel extends DefaultNavigationPanel
 			localeMutualExclusionPolicyModelGroup.add(localeLabelValueModel);	//add this model to the mutual exclusion policy group
 		}
 
-		final Menu menu=new Menu(session, Orientation.Flow.LINE);	//create a horizontal menu
+		final DropMenu menu=new DropMenu(session, Orientation.Flow.LINE);	//create a horizontal menu
 
 			//Language
-		final Menu languageMenu=new Menu(session, "languageMenu", Orientation.Flow.PAGE);	//create a menu with a custom ID
+		final DropMenu languageMenu=new DropMenu(session, "languageMenu", Orientation.Flow.PAGE);	//create a menu with a custom ID
 		languageMenu.getModel().setLabelResourceKey("menu.language.label");	//show which resource to use for the label
 		for(final LocaleLabelValueModel<Boolean> localeLabelValueModel:localeLabelValueModels)	//for each locale model
 		{
@@ -89,7 +89,7 @@ public class InternationalizationPanel extends DefaultNavigationPanel
 		menu.add(languageMenu);	//add the language menu to the horizontal menu
 
 			//Date
-		final Menu dateMenu=new Menu(session, "dateMenu", Orientation.Flow.PAGE);	//create a menu with a custom ID
+		final DropMenu dateMenu=new DropMenu(session, "dateMenu", Orientation.Flow.PAGE);	//create a menu with a custom ID
 		dateMenu.getModel().setLabelResourceKey("menu.date.label");	//show which resource to use for the label
 			//Date|date
 		final Label dateLabel=new Label(session, "dateLabel", new DateLabelModel(session, new Date(), DateFormat.LONG));	//create a label with the current date and a long date label model
