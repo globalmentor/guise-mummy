@@ -64,13 +64,18 @@ var STYLES=
 {
 	/**A component element that can be clicked as an action.*/
 	ACTION: "action",
+	/**A general component.*/
+	COMPONENT_REGEXP: /^component(-[xy]-(ltr|rtl))?$/,
 	DRAG_SOURCE: "dragSource",
 	DRAG_HANDLE: "dragHandle",
 	DROP_TARGET: "dropTarget",
 	SLIDER_CONTROL_X_LTR_THUMB: "sliderControl-x-ltr-thumb",
 	SLIDER_CONTROL_X_RTL_THUMB: "sliderControl-x-rtl-thumb",
 	SLIDER_CONTROL_Y_LTR_THUMB: "sliderControl-y-ltr-thumb",
-	SLIDER_CONTROL_Y_RTL_THUMB: "sliderControl-y-rtl-thumb"
+	SLIDER_CONTROL_Y_RTL_THUMB: "sliderControl-y-rtl-thumb",
+	MENU_REGEXP: /^dropMenu-[xy]-(ltr|rtl)$/,
+	MENU_BODY_REGEXP: /^dropMenu-[xy]-(ltr|rtl)-body$/,
+	MENU_CHILDREN_REGEXP: /^dropMenu-[xy]-(ltr|rtl)-children$/
 };
 
 /**The array of drop targets, determined when the document is loaded. The drop targets are stored in increasing order of hierarchical depth.*/
@@ -2179,7 +2184,7 @@ function initializeNode(node)
 						break;
 					case "div":
 								//check for menu
-						if(elementClassNames.containsMatch(/^menu-[xy]-(ltr|rtl)$/))	//if this is a menu TODO use a constant
+						if(elementClassNames.containsMatch(STYLES.MENU_REGEXP))	//if this is a menu
 						{
 							var menu=getMenu(node);	//get the menu ancestor
 							if(menu)	//if there is a menu ancestor (i.e. this is not the root menu)
@@ -2583,7 +2588,7 @@ function onActionClick(event)
 	var targetID=target.id;	//get the target ID
 	if(targetID)	//if the element has an ID (otherwise, we couldn't report the action)
 	{
-		var component=getAncestorElementByClassName(target, "component");	//get the component element TODO improve all this
+		var component=getAncestorElementByClassName(target, STYLES.COMPONENT_REGEXP);	//get the component element TODO improve all this
 		if(component)	//if there is a component
 		{
 			var componentID=component.id;	//get the component ID
@@ -2783,7 +2788,7 @@ var menuState=new MenuState();	//create a new menu state object
 */
 function onMenuMouseOver(event)
 {
-	var menu=getDescendantElementByClassName(event.currentTarget, /^menu-[xy]-(ltr|rtl)-children$/);	//get the menu below us TODO use a constant
+	var menu=getDescendantElementByClassName(event.currentTarget, STYLES.MENU_CHILDREN_REGEXP);	//get the menu below us TODO use a constant
 	if(menu)	//if there is a menu below us
 	{
 		menuState.openMenu(menu);	//open this menu
@@ -2796,7 +2801,7 @@ function onMenuMouseOver(event)
 */
 function onMenuMouseOut(event)
 {
-	var menu=getDescendantElementByClassName(event.currentTarget, /^menu-[xy]-(ltr|rtl)-children$/);	//get the menu below us TODO use a constant
+	var menu=getDescendantElementByClassName(event.currentTarget, STYLES.MENU_CHILDREN_REGEXP);	//get the menu below us
 	if(menu)	//if there is a menu below us
 	{
 		menuState.closeMenu(menu);	//close this menu
@@ -3012,7 +3017,7 @@ function getForm(node)
 */
 function getMenu(node)	//TODO rename method when works
 {
-	return getAncestorElementByClassName(node, /^menu-[xy]-(ltr|rtl)-body$/);	//TODO comment; use a constant
+	return getAncestorElementByClassName(node, STYLES.MENU_BODY_REGEXP);	//TODO comment; use a constant
 }
 
 /**Retrieves the named ancestor element of the given node, starting at the node itself.

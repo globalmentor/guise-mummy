@@ -1,13 +1,14 @@
 package com.javaguise.component;
 
 import com.javaguise.component.layout.*;
+import com.javaguise.geometry.Extent;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 
-/**A menu that drops its children down from the top or over to the side.
+/**A menu that collapses its children's children between its children, like an accordion.
 @author Garret Wilson
 */
-public class DropMenu extends AbstractMenu<DropMenu>
+public class AccordionMenu extends AbstractMenu<AccordionMenu>
 {
 
 	/**Session and axis constructor.
@@ -15,7 +16,7 @@ public class DropMenu extends AbstractMenu<DropMenu>
 	@param axis The axis along which the menu is oriented.
 	@exception NullPointerException if the given session and/or axis is <code>null</code>.
 	*/
-	public DropMenu(final GuiseSession session, final Orientation.Flow axis)
+	public AccordionMenu(final GuiseSession session, final Orientation.Flow axis)
 	{
 		this(session, (String)null, axis);	//construct the component with the axis, indicating that a default ID should be used
 	}
@@ -26,7 +27,7 @@ public class DropMenu extends AbstractMenu<DropMenu>
 	@param axis The axis along which the menu is oriented.
 	@exception NullPointerException if the given session, axis, and/or model is <code>null</code>.
 	*/
-	public DropMenu(final GuiseSession session, final MenuModel model, final Orientation.Flow axis)
+	public AccordionMenu(final GuiseSession session, final MenuModel model, final Orientation.Flow axis)
 	{
 		this(session, null, model, axis);	//construct the component with the axis, indicating that a default ID should be used
 	}
@@ -38,7 +39,7 @@ public class DropMenu extends AbstractMenu<DropMenu>
 	@exception NullPointerException if the given session and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public DropMenu(final GuiseSession session, final String id, final Orientation.Flow axis)
+	public AccordionMenu(final GuiseSession session, final String id, final Orientation.Flow axis)
 	{
 		this(session, id, new DefaultMenuModel(session), axis);	//construct the class with a default model
 	}
@@ -51,9 +52,10 @@ public class DropMenu extends AbstractMenu<DropMenu>
 	@exception NullPointerException if the given session, axis, and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public DropMenu(final GuiseSession session, final String id, final MenuModel model, final Orientation.Flow axis)
+	public AccordionMenu(final GuiseSession session, final String id, final MenuModel model, final Orientation.Flow axis)
 	{
 		super(session, id, new MenuLayout(session, axis), model);	//construct the parent class
+		setPreferredWidth(new Extent(8, Extent.Unit.EM));	//set the default width
 	}
 
 }

@@ -161,9 +161,22 @@ Debug.trace("list control changed value to", newValue);
 						final Table multiplicationTable=new Table(session, Integer.class, multiplicationTableData, columnNames);	//create the table component
 						multiplicationTable.getModel().setLabel("Multiplication Table");	//give the table a label
 */
-						
-						final Label label=new Label(session, new DefaultLabelModel(session, "Are you sure?"));
 
+/*TODO del
+					  final DefaultOptionDialogFrame myDialog=new DefaultOptionDialogFrame(session, DefaultOptionDialogFrame.Option.OK);    //show the OK button
+						final Heading heading=new Heading(session, 0);
+
+						heading.getModel().setLabel("Delete Dialog");
+
+						myDialog.setOptionContent(heading);
+
+						myDialog.open();
+*/
+						
+						
+
+						final Label label=new Label(session, new DefaultLabelModel(session, "Are you sure?"));
+						
 						final DefaultOptionDialogFrame confirmDialog=new DefaultOptionDialogFrame(session, label, DefaultOptionDialogFrame.Option.OK, DefaultOptionDialogFrame.Option.CANCEL);
 						confirmDialog.getModel().setLabel("Confirm your choice");
 						confirmDialog.setPreferredWidth(new Extent(20, Extent.Unit.EM));
@@ -462,8 +475,9 @@ Debug.trace("list control changed value to", newValue);
 
 		add(createMenu(session, Orientation.Flow.LINE), RegionLayout.PAGE_START_CONSTRAINTS);	//add the pulldown menu at the top
 
-		add(createMenu(session, Orientation.Flow.PAGE), RegionLayout.LINE_START_CONSTRAINTS);	//add the menu at the left
+//TODO fix		add(createMenu(session, Orientation.Flow.PAGE), RegionLayout.LINE_START_CONSTRAINTS);	//add the menu at the left
 
+		add(createAccordionMenu(session, Orientation.Flow.PAGE), RegionLayout.LINE_START_CONSTRAINTS);	//add the menu at the left
 	}
 
 	protected DropMenu createMenu(final GuiseSession session, final Orientation.Flow flow)
@@ -517,7 +531,36 @@ Debug.trace("list control changed value to", newValue);
 		return menu;
 	}
 
-	
+
+	protected AccordionMenu createAccordionMenu(final GuiseSession session, final Orientation.Flow flow)
+	{
+		final AccordionMenu menu=new AccordionMenu(session, flow);
+
+		final AccordionMenu fileMenu=new AccordionMenu(session, Orientation.Flow.PAGE);
+		fileMenu.getModel().setLabel("File");
+		final Link openMenuLink=new Link(session);
+		openMenuLink.getModel().setLabel("Open");
+		fileMenu.add(openMenuLink);
+		final Link closeMenuLink=new Link(session);
+		closeMenuLink.getModel().setLabel("Close");
+		fileMenu.add(closeMenuLink);
+		menu.add(fileMenu);
+
+		final AccordionMenu editMenu=new AccordionMenu(session, Orientation.Flow.PAGE);
+		editMenu.getModel().setLabel("Edit");
+		final Message message1=new Message(session, new DefaultMessageModel(session, "This is a message to show."));
+		editMenu.add(message1);
+		menu.add(editMenu);
+
+		final AccordionMenu stuffMenu=new AccordionMenu(session, Orientation.Flow.PAGE);
+		stuffMenu.getModel().setLabel("Stuff");
+		final Message message2=new Message(session, new DefaultMessageModel(session, "This is a message to show."));
+		stuffMenu.add(message2);
+		menu.add(stuffMenu);
+
+		return menu;
+	}
+
 	protected static class TestFrame extends DefaultFrame
 	{
 		protected final Label label;
