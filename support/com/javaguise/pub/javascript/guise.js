@@ -1429,6 +1429,10 @@ alert(exception);
 //TODO fix					i=0;	//TODO fix; temporary to get out of looking at all IE's attributes
 				}
 			}
+			if(oldElement.value && element.getAttribute("value")==null)	//if there is an old value but no value attribute present in the new element (IE 6 and Mozilla do not show "value" in the list of enumerated values)
+			{
+				oldElement.value="";	//set the value to the empty string (setting the value to null will result in "null" being displayed in the input control on IE)
+			}
 				//patch in the new and changed attributes
 			var attributes=element.attributes;	//get the new element's attributes
 			for(var i=attributes.length-1; i>=0; --i)	//for each attribute

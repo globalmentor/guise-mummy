@@ -10,6 +10,12 @@ import com.garretwilson.lang.ObjectUtilities;
 */
 public class DefaultValueModel<V> extends AbstractValueModel<V>
 {
+	
+	/**The default value.*/
+	private final V defaultValue;
+
+		/**@return The default value.*/
+		public V getDefaultValue() {return defaultValue;}
 
 	/**The input value, or <code>null</code> if there is no value.*/
 	private V value;
@@ -41,11 +47,11 @@ public class DefaultValueModel<V> extends AbstractValueModel<V>
 			}			
 		}
 
-		/**Resets the value to a default value, which may be invalid according to any installed validators.
+		/**Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators.
 		No validation occurs.
 		@see ValueModel#VALUE_PROPERTY
 		*/
-		public void resetValue()
+		public void clearValue()
 		{
 			if(!ObjectUtilities.equals(value, null))	//if the value is really changing (compare their values, rather than identity)
 			{
@@ -55,26 +61,43 @@ public class DefaultValueModel<V> extends AbstractValueModel<V>
 			}						
 		}
 
+		/**Resets the value to a default value, which may be invalid according to any installed validators.
+		No validation occurs.
+		@see ValueModel#VALUE_PROPERTY
+		*/
+		public void resetValue()
+		{
+			final V defaultValue=getDefaultValue();	//get the default value
+			if(!ObjectUtilities.equals(value, getDefaultValue()))	//if the value is really changing (compare their values, rather than identity)
+			{
+				final V oldValue=value;	//get the old value
+				value=defaultValue;	//actually change the value
+				firePropertyChange(VALUE_PROPERTY, oldValue, null);	//indicate that the value changed
+			}						
+		}
+
 	/**Constructs a value model indicating the type of value it can hold.
+	The default value is set to <code>null</code>.
 	@param session The Guise session that owns this model.
 	@param valueClass The class indicating the type of value held in the model.
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	*/
 	public DefaultValueModel(final GuiseSession session, final Class<V> valueClass)
 	{
-		this(session, valueClass, null);	//construct the class with a null initial value
+		this(session, valueClass, null);	//construct the class with a null default value
 	}
 
 	/**Constructs a value model indicating the type of value it can hold, along with an initial value.
 	@param session The Guise session that owns this model.
 	@param valueClass The class indicating the type of value held in the model.
-	@param initialValue The initial value, which will not be validated.
+	@param defaultValue The default value, which will not be validated.
 	@exception NullPointerException if the given session and/or class object is <code>null</code>.
 	*/
-	public DefaultValueModel(final GuiseSession session, final Class<V> valueClass, final V initialValue)
+	public DefaultValueModel(final GuiseSession session, final Class<V> valueClass, final V defaultValue)
 	{
 		super(session, valueClass);	//construct the parent class
-		this.value=initialValue;	//save the initial value
+		this.defaultValue=defaultValue;	//save the default value
+		this.value=defaultValue;	//set the value to the default value
 	}
 
 }

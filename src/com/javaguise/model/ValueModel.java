@@ -26,6 +26,9 @@ public interface ValueModel<V> extends ControlModel
 	*/
 	public void setEditable(final boolean newEditable);
 
+	/**@return The default value.*/
+	public V getDefaultValue();
+
 	/**@return The input value, or <code>null</code> if there is no input value.*/
 	public V getValue();
 
@@ -39,6 +42,12 @@ public interface ValueModel<V> extends ControlModel
 	@see #VALUE_PROPERTY
 	*/
 	public void setValue(final V newValue) throws ValidationException;
+
+	/**Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators.
+	No validation occurs.
+	@see ValueModel#VALUE_PROPERTY
+	*/
+	public void clearValue();
 
 	/**Resets the value to a default value, which may be invalid according to any installed validators.
 	No validation occurs.

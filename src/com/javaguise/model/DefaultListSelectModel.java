@@ -2,7 +2,6 @@ package com.javaguise.model;
 
 import java.util.*;
 
-import com.garretwilson.lang.ObjectUtilities;
 import com.javaguise.event.*;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
@@ -11,12 +10,19 @@ import com.javaguise.validator.Validator;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**The default implementation of a model for selecting one or more values from a list.
-The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class. 
+The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class.
+This implementation has a default value of <code>null</code>. 
 @param <V> The type of values contained in the model.
 @author Garret Wilson
 */
 public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements ListSelectModel<V>
 {
+
+	/**The default value.*/
+	private final V defaultValue=null;
+
+		/**@return The default value.*/
+		public V getDefaultValue() {return defaultValue;}
 
 	/**@return The selected value, or <code>null</code> if there is no selected value.*/
 	public V getValue() {return getSelectedValue();}
@@ -40,16 +46,27 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 		setSelectedValues(newValue);
 	}
 
-	/**Resets the value to a default value, which may be invalid according to any installed validators.
+	/**Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators.
 	No validation occurs.
 	@see ValueModel#VALUE_PROPERTY
 	*/
-	public void resetValue()
+	public void clearValue()
 	{
-//TODO del when works		setSelectedValues();	//select no values
 		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		getSelectionStrategy().setSelectedValues(this);	//delegate to the selection strategy, selecting no values
 		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
+	}
+
+
+	/**Resets the value to a default value, which may be invalid according to any installed validators.
+	No validation occurs.
+	This implementation calls {@link #clearValue()}.
+	@see ValueModel#VALUE_PROPERTY
+	@see #clearValue()
+	*/
+	public void resetValue()
+	{
+		clearValue();	//clear the value, as null is the default value
 	}
 
 	/**The list of values, all access to which will be synchronized on this.*/
