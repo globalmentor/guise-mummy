@@ -13,6 +13,7 @@ import com.javaguise.event.*;
 import com.javaguise.geometry.Extent;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
+import com.javaguise.style.RGBColor;
 import com.javaguise.validator.IntegerRangeValidator;
 import com.javaguise.validator.RegularExpressionStringValidator;
 import com.javaguise.validator.ValidationException;
@@ -48,9 +49,11 @@ public class HomePanel extends DefaultNavigationPanel
 
 		//input panel
 		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.PAGE));	//create the input panel flowing vertically
+		inputPanel.setBackgrondColor(RGBColor.AQUA_MARINE);
 		final TextControl<Float> inputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
 		inputTextControl.getModel().setLabel("Input Number");	//add a label to the text input control
 		inputTextControl.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
+		inputTextControl.setBackgrondColor(RGBColor.DARK_GOLDEN_ROD);
 		inputPanel.add(inputTextControl);	//add the input control to the input panel
 		final TextControl<Float> outputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
 		outputTextControl.getModel().setLabel("Double the Number");	//add a label to the text output control
@@ -162,7 +165,6 @@ Debug.trace("list control changed value to", newValue);
 						multiplicationTable.getModel().setLabel("Multiplication Table");	//give the table a label
 */
 
-/*TODO del
 					  final DefaultOptionDialogFrame myDialog=new DefaultOptionDialogFrame(session, DefaultOptionDialogFrame.Option.OK);    //show the OK button
 						final Heading heading=new Heading(session, 0);
 
@@ -171,10 +173,9 @@ Debug.trace("list control changed value to", newValue);
 						myDialog.setOptionContent(heading);
 
 						myDialog.open();
-*/
 						
 						
-
+/*TODO bring back
 						final Label label=new Label(session, new DefaultLabelModel(session, "Are you sure?"));
 						
 						final DefaultOptionDialogFrame confirmDialog=new DefaultOptionDialogFrame(session, label, DefaultOptionDialogFrame.Option.OK, DefaultOptionDialogFrame.Option.CANCEL);
@@ -192,6 +193,7 @@ Debug.trace("list control changed value to", newValue);
 									}
 								});
 						confirmDialog.open();
+*/
 					}
 				});
 		buttonPanel.add(testButton2);	//add a new button

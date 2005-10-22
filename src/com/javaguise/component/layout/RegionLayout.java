@@ -3,6 +3,7 @@ package com.javaguise.component.layout;
 import java.util.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.javaguise.component.Component;
+import com.javaguise.geometry.Extent;
 import com.javaguise.session.GuiseSession;
 
 /**A layout that defines locations of components in internationalized relative terms.
@@ -58,13 +59,38 @@ public class RegionLayout extends AbstractLayout<RegionLayout.Constraints>
 			/**The layout region for the associated component.*/
 			public Region getRegion() {return region;}
 
+		/**The preferred width of the region, or <code>null</code> if no preferred width has been specified.*/
+		private final Extent preferredWidth;
+
+			/**@return The preferred width of the region, or <code>null</code> if no preferred width has been specified.*/
+			public Extent getPreferredWidth() {return preferredWidth;}
+
+		/**The preferred height of the region, or <code>null</code> if no preferred height has been specified.*/
+		private Extent preferredHeight;
+
+			/**@return The preferred height of the region , or <code>null</code> if no preferred height has been specified.*/
+			public Extent getPreferredHeight() {return preferredHeight;}
+
 		/**Constructor.
 		@param region The layout region for the associated component.
 		@exception NullPointerException if the given region is <code>null</code>.
 		*/
 		public Constraints(final Region region)
 		{
+			this(region, null, null);	//construct the region with no preferred extents
+		}
+
+		/**Preferred extents constructor.
+		@param region The layout region for the associated component.
+		@param preferredWidth The preferred width of the region, or <code>null</code> there is no width preference.		
+		@param preferredHeight The preferred height of the region, or <code>null</code> there is no height preference.		
+		@exception NullPointerException if the given region is <code>null</code>.
+		*/
+		public Constraints(final Region region, final Extent preferredWidth, final Extent preferredHeight)
+		{
 			this.region=checkNull(region, "Region cannot be null.");
+			this.preferredWidth=preferredWidth;
+			this.preferredHeight=preferredHeight;
 		}
 	}
 

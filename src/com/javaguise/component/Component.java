@@ -28,6 +28,8 @@ A component is iterable over its child components, and can be used in short <cod
 public interface Component<C extends Component<C>> extends PropertyBindable
 {
 
+	/**The bound property of the background color.*/
+	public final static String BACKGROUND_COLOR_PROPERTY=getPropertyName(Component.class, "backgroundColor");
 	/**The bound property of the color.*/
 	public final static String COLOR_PROPERTY=getPropertyName(Component.class, "color");
 	/**The bound property of the controller.*/
@@ -57,9 +59,17 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	/**@return The data model used by this component.*/
 	public Model getModel();
 
-	/**@return The foreground color of the component, or <code>null</code> if no foreground color is specified for this component.
-	@see #determineColor()
+	/**@return The background color of the component, or <code>null</code> if no background color is specified for this component.*/
+	public Color<?> getBackgroundColor();
+
+	/**Sets the background color of the component.
+	This is a bound property.
+	@param newBackgroundColor The background color of the component, or <code>null</code> if the default background color should be used.
+	@see #BACKGROUND_COLOR_PROPERTY 
 	*/
+	public void setBackgrondColor(final Color<?> newBackgroundColor);
+
+	/**@return The foreground color of the component, or <code>null</code> if no foreground color is specified for this component.*/
 	public Color<?> getColor();
 
 	/**Sets the foreground color of the component.
@@ -74,7 +84,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@return The foreground color to use for the component.
 	@see #getColor()
 	*/
-	public Color<?> determineColor();
+//TODO del if not needed	public Color<?> determineColor();
 
 	/**@return The opacity of the entire component in the range (0.0-1.0), with a default of 1.0.*/
 	public float getOpacity();
@@ -90,9 +100,9 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	/**@return The preferred width of the component, or <code>null</code> if no preferred width has been specified.*/
 	public Extent getPreferredWidth();
 
-	/**Sets the preferred extent of the component.
+	/**Sets the preferred width of the component.
 	This is a bound property.
-	@param newPreferredWidth The new preferred extent of the component, or <code>null</code> there is no width preference.
+	@param newPreferredWidth The new preferred width of the component, or <code>null</code> there is no width preference.
 	@see #PREFERRED_WIDTH_PROPERTY 
 	*/
 	public void setPreferredWidth(final Extent newPreferredWidth);
@@ -100,9 +110,9 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	/**@return The preferred height of the component, or <code>null</code> if no preferred height has been specified.*/
 	public Extent getPreferredHeight();
 
-	/**Sets the preferred extent of the component.
+	/**Sets the preferred height of the component.
 	This is a bound property.
-	@param newPreferredHeight The new preferred extent of the component, or <code>null</code> there is no height preference.
+	@param newPreferredHeight The new preferred height of the component, or <code>null</code> there is no height preference.
 	@see #PREFERRED_HEIGHT_PROPERTY 
 	*/
 	public void setPreferredHeight(final Extent newPreferredHeight);

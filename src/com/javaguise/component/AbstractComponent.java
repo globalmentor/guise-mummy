@@ -49,12 +49,31 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**@return The data model used by this component.*/
 		public Model getModel() {return model;}
 
+	/**The background color of the component, or <code>null</code> if no background color is specified for this component.*/
+	private Color<?> backgroundColor=null;
+
+		/**@return The background color of the component, or <code>null</code> if no background color is specified for this component.*/
+		public Color<?> getBackgroundColor() {return backgroundColor;}
+
+		/**Sets the background color of the component.
+		This is a bound property.
+		@param newBackgroundColor The background color of the component, or <code>null</code> if the default background color should be used.
+		@see Component#BACKGROUND_COLOR_PROPERTY 
+		*/
+		public void setBackgrondColor(final Color<?> newBackgroundColor)
+		{
+			if(!ObjectUtilities.equals(backgroundColor, newBackgroundColor))	//if the value is really changing
+			{
+				final Color<?> oldBackgroundColor=backgroundColor;	//get the old value
+				backgroundColor=newBackgroundColor;	//actually change the value
+				firePropertyChange(BACKGROUND_COLOR_PROPERTY, oldBackgroundColor, newBackgroundColor);	//indicate that the value changed
+			}			
+		}
+
 	/**The foreground color of the component, or <code>null</code> if no foreground color is specified for this component.*/
 	private Color<?> color=null;
 
-		/**@return The foreground color of the component, or <code>null</code> if no foreground color is specified for this component.
-		@see #determineColor()
-		*/
+		/**@return The foreground color of the component, or <code>null</code> if no foreground color is specified for this component.*/
 		public Color<?> getColor() {return color;}
 
 		/**Sets the foreground color of the component.
@@ -64,7 +83,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		*/
 		public void setColor(final Color<?> newColor)
 		{
-			if(color!=newColor)	//if the value is really changing
+			if(!ObjectUtilities.equals(color, newColor))	//if the value is really changing
 			{
 				final Color<?> oldColor=color;	//get the old value
 				color=newColor;	//actually change the value
@@ -77,6 +96,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		@return The foreground color to use for the component.
 		@see #getColor()
 		*/
+/*TODO del if not needed
 		public Color<?> determineColor()
 		{
 			Color<?> color=getColor();	//find this component's color
@@ -90,6 +110,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			}
 			return color!=null ? color : RGBColor.BLACK;	//return the default color if there is no specified color
 		}
+*/
 
 	/**The opacity of the entire component in the range (0.0-1.0), with a default of 1.0.*/
 	private float opacity=1.0f;
@@ -123,9 +144,9 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**@return The preferred width of the component, or <code>null</code> if no preferred width has been specified.*/
 		public Extent getPreferredWidth() {return preferredWidth;}
 
-		/**Sets the preferred extent of the component.
+		/**Sets the preferred width of the component.
 		This is a bound property.
-		@param newPreferredWidth The new preferred extent of the component, or <code>null</code> there is no width preference.
+		@param newPreferredWidth The new preferred width of the component, or <code>null</code> there is no width preference.
 		@see Component#PREFERRED_WIDTH_PROPERTY 
 		*/
 		public void setPreferredWidth(final Extent newPreferredWidth)
@@ -144,9 +165,9 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**@return The preferred height of the component, or <code>null</code> if no preferred height has been specified.*/
 		public Extent getPreferredHeight() {return preferredHeight;}
 
-		/**Sets the preferred extent of the component.
+		/**Sets the preferred height of the component.
 		This is a bound property.
-		@param newPreferredHeight The new preferred extent of the component, or <code>null</code> there is no height preference.
+		@param newPreferredHeight The new preferred height of the component, or <code>null</code> there is no height preference.
 		@see Component#PREFERRED_HEIGHT_PROPERTY 
 		*/
 		public void setPreferredHeight(final Extent newPreferredHeight)

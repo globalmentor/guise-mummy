@@ -108,7 +108,7 @@ frames.add=function(frame)
 	initializeNode(frame);	//initialize the new imported frame, installing the correct event handlers
 	updateComponents(frame);	//update all the components within the frame
 	Array.prototype.add.call(this, frame);	//do the default adding to the array
-	updateModal();	//update the modal state
+	this.updateModal();	//update the modal state
 	var focusable=getFocusableDescendant(frame);	//see if this frame has a node that can be focused
 	if(focusable)	//if we found a focusable node
 	{
@@ -128,28 +128,28 @@ frames.remove=function(frame)
 		Array.prototype.remove.call(this, index);	//do the default removal from the array
 		uninitializeNode(frame);	//uninitialize the frame tree
 		document.body.removeChild(frame);	//remove the frame element to the document
-		updateModal();	//update the modal state
+		this.updateModal();	//update the modal state
 	}
 };
 
 /**The current modal frame, or null if there is no modal frame.*/
-var modalFrame=null;
+frames.modalFrame=null;
 
 /**Updates the modal layer and current modal frame.*/
-function updateModal()
+frames.updateModal=function()
 {
-	modalFrame=null;	//start out presuming there is no modal frame
-	for(var i=frames.length-1; i>=0 && modalFrame==null; --i)	//for each frame, find the last modal frame
+	this.modalFrame=null;	//start out presuming there is no modal frame
+	for(var i=this.length-1; i>=0 && this.modalFrame==null; --i)	//for each frame, find the last modal frame
 	{
-		var frame=frames[i];	//get a reference to this frame
+		var frame=this[i];	//get a reference to this frame
 		if(hasClassName(frame, "frameModal"))	//if this is a modal frame
 		{
-			modalFrame=frame;	//indicate our modal frame TODO allow for multiple modal frames
+			this.modalFrame=frame;	//indicate our modal frame TODO allow for multiple modal frames
 		}
 	}
-	if(modalFrame!=null)	//if there is a modal frame
+	if(this.modalFrame!=null)	//if there is a modal frame
 	{
-		modalLayer.style.zIndex=modalFrame.style.zIndex-1;	//place the modal layer directly behind the modal frame
+		modalLayer.style.zIndex=this.modalFrame.style.zIndex-1;	//place the modal layer directly behind the modal frame
 		modalLayer.style.display="block";	//make the modal layer visible
 	}
 	else
@@ -2321,15 +2321,15 @@ var lastFocusedNode=null;
 function onFocus(event)
 {
 	var currentTarget=event.currentTarget;	//get the control receiving the focus
-	if(modalFrame!=null)	//if there is a modal frame
+	if(frames.modalFrame!=null)	//if there is a modal frame
 	{
 	
 //TODO del var dummy=currentTarget.nodeName+" "+currentTarget.id;
 
-		if(!hasAncestor(currentTarget, modalFrame))	//if focus is trying to go to something outside the modal frame
+		if(!hasAncestor(currentTarget, frames.modalFrame))	//if focus is trying to go to something outside the modal frame
 		{
 //TODO fix alert("focus outside of frame");
-			if(hasAncestor(lastFocusedNode, modalFrame))	//if we know the last focused node, and it was in the modal frame
+			if(hasAncestor(lastFocusedNode, frames.modalFrame))	//if we know the last focused node, and it was in the modal frame
 			{
 
 //TODO del dummy+=" changing to last focused "+lastFocusedNode.nodeName+" id "+lastFocusedNode.id;
@@ -2340,7 +2340,7 @@ function onFocus(event)
 			}
 			else	//if we don't know the last focused node
 			{
-				var focusable=getFocusableDescendant(modalFrame);	//see if the modal frame has a node that can be focused
+				var focusable=getFocusableDescendant(frames.modalFrame);	//see if the modal frame has a node that can be focused
 				if(focusable)	//if we found a focusable node
 				{
 //TODO del dummy+=" changing to first focusable "+focusable.nodeName+" id "+focusable.id;
