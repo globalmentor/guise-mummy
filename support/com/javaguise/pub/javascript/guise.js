@@ -92,19 +92,12 @@ frames.add=function(frame)
 {
 //TODO fix so that it works both on IE and Firefox							oldElement.style.position="fixed";	//TODO testing
 	frame.style.position="absolute";	//change the element's position to absolute; it should already be set like this, but set it specifically so that dragging will know not to drag a copy TODO update the element's initial position
-
-
-
-	
 	document.body.appendChild(frame);	//add the frame element to the document; do this first, because IE doesn't allow the style to be accessed directly with imported nodes until they are added to the document
-
 	var viewportSize=getViewportSize();	//get the size of the viewport
 	frame.style.left=((viewportSize.width-frame.offsetWidth)/2)+"px";	//center the frame horizontally
 	frame.style.top=((viewportSize.height-frame.offsetHeight)/2)+"px";	//center the frame vertically
 
 	frame.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components TODO fix
-
-
 	initializeNode(frame);	//initialize the new imported frame, installing the correct event handlers
 	updateComponents(frame);	//update all the components within the frame
 	Array.prototype.add.call(this, frame);	//do the default adding to the array
@@ -263,6 +256,29 @@ if(typeof document.createAttributeNS=="undefined")	//if the document does not su
 
 if(typeof document.importNode=="undefined")	//if the document does not support document.importNode(), create a substitute
 {
+
+	/**Imports a new node in the the document.
+	@param node The node to import.
+	@param deep Whether the entire hierarchy should be imported.
+	@return A new clone of the node with the document as its owner.
+	*/
+/*TODO fix
+	document.importNode=function(node, deep)	//create a function to manually import a node
+	{
+		try
+		{
+			var importedNode=this._importNode(node, deep);
+			return importedNode;
+		}
+		catch(e)
+		{
+			alert("error "+e+" importing node "+node.nodeName);
+
+//TODO fix			var nodeString=DOMUtilities.getNodeString(childNode);	//serialize the node
+		}
+	}
+*/
+
 	/**Imports a new node in the the document.
 	@param node The node to import.
 	@param deep Whether the entire hierarchy should be imported.
@@ -297,24 +313,34 @@ if(typeof document.importNode=="undefined")	//if the document does not support d
 					}
 					else	//for all other attributes
 					{
-						if(importedNode.setAttributeNodeNS instanceof Function && typeof attribute.namespaceURI!="undefined")	//if the attribute supports namespaces
+//TODO fix						try
 						{
-							var importedAttribute=document.createAttributeNS(attribute.namespaceURI, attributeName);	//create a namespace-aware attribute
-							importedAttribute.nodeValue=attribute.nodeValue;	//set the attribute value
-							importedNode.setAttributeNodeNS(importedAttribute);	//set the attribute for the element						
-						}
-						else	//if the attribute does not support namespaces
+							var attributeValue=attribute.nodeValue;	//get the attribute value
+							if(importedNode.setAttributeNodeNS instanceof Function && typeof attribute.namespaceURI!="undefined")	//if the attribute supports namespaces
+							{
+								var importedAttribute=document.createAttributeNS(attribute.namespaceURI, attributeName);	//create a namespace-aware attribute
+								importedAttribute.nodeValue=attributeValue;	//set the attribute value
+								importedNode.setAttributeNodeNS(importedAttribute);	//set the attribute for the element						
+							}
+							else	//if the attribute does not support namespaces
+							{
+								var importedAttribute=document.createAttribute(attributeName);	//create a non-namespace-aware element
+								importedAttribute.nodeValue=attributeValue;	//set the attribute value TODO verify this works on Safari
+								importedNode.setAttributeNode(importedAttribute);	//set the attribute for the element
+							}
+						}	//TODO check; perhaps catch an exception here and return null or throw our own exception to improve IE "type" attribute error handling
+//TODO fix						catch(exception)	//if there is an error copying the attribute (e.g. IE button type="button")
 						{
-							var importedAttribute=document.createAttribute(attributeName);	//create a non-namespace-aware element
-							importedAttribute.nodeValue=attribute.nodeValue;	//set the attribute value TODO verify this works on Safari
-							importedNode.setAttributeNode(importedAttribute);	//set the attribute for the element
+//TODO fix alert("error for "+node.nodeName+" adding attribute "+attributeName+"=\""+attributeValue+"\"");
+//TODO fix							return null;
 						}
-					}	//TODO perhaps catch an exception here and return null or throw our own exception to improve IE "type" attribute error handling
+					}
 				}
 				if(deep)	//if we should import deep
 				{
 					var childNodes=node.childNodes;	//get a list of child nodes
 					var childNodeCount=childNodes.length;	//find out how many child nodes there are
+/*TODO fix
 					for(var i=0; i<childNodeCount; ++i)	//for all of the child nodes
 					{
 						var childNode=childNodes[i];	//get a reference to this child node
@@ -336,6 +362,13 @@ if(typeof document.importNode=="undefined")	//if the document does not support d
 							importedNode.innerHTML+=nodeString;	//append the node string to the element's inner HTML
 						}
 					}
+*/
+					var innerHTMLStringBuilder=new StringBuilder();	//construct the inner HTML
+					for(var i=0; i<childNodeCount; ++i)	//for all of the child nodes
+					{
+						DOMUtilities.appendNodeString(innerHTMLStringBuilder, childNodes[i]);	//serialize the node and append it to the string builder
+					}
+					importedNode.innerHTML=innerHTMLStringBuilder.toString();	//set the element's inner HTML to the string we constructed
 				}
 				break;
 			case Node.TEXT_NODE:	//text
@@ -1341,14 +1374,11 @@ alert(exception);
 						}
 						else if(hasClass(childNode, "frame"))	//if the element doesn't currently exist, but the patch is for a frame, create a new frame
 						{
+//TODO fix alert("ready to import node");
 							oldElement=document.importNode(childNode, true);	//create an import clone of the node
-/*TODO del
-							oldElement.style.left="10px";	//TODO fix
-							oldElement.style.top="10px";
-							oldElement.style.width="300px";	//TODO fix
-							oldElement.style.height="200px";
-*/
+//TODO del alert("ready to add frame: "+typeof oldElement);
 							frames.add(oldElement);	//add this frame
+//TODO fix alert("frame added");
 						}
 					}
 				}
@@ -1871,7 +1901,8 @@ function DragState(dragSource, mouseX, mouseY)
 	this.dragSource=dragSource;
 
 	this.initialMouseFixedPosition=new Point(mouseX, mouseY);
-	this.initialFixedPosition=getElementCoordinates(dragSource);	//get the initial position of the drag source in fixed terms of the viewport
+//TODO del alert("initial mouse fixed position X: "+mouseX+" Y: "+mouseY);
+	this.initialFixedPosition=getElementFixedCoordinates(dragSource);	//get the initial position of the drag source in fixed terms of the viewport
 	this.initialOffsetPosition=new Point(dragSource.offsetLeft, dragSource.offsetTop);	//get the offset position of the drag source
 	
 	this.initialPosition=null;	//these will be updated when dragging is started
@@ -1882,7 +1913,7 @@ function DragState(dragSource, mouseX, mouseY)
 	this.maxX=null;	
 //TODO fix	this.initialPosition=new Point(dragSource.offsetLeft, dragSource.offsetTop);	//get the position of the drag source
 	
-//TODO fix	this.initialPosition=getElementCoordinates(dragSource);	//get the position of the drag source
+//TODO fix	this.initialPosition=getElementFixedCoordinates(dragSource);	//get the position of the drag source
 /*TODO fix
 	this.mouseDeltaX=mouseX-this.initialPosition.x;	//calculate the mouse position relative to the drag source
 	this.mouseDeltaY=mouseY-this.initialPosition.y;
@@ -1932,6 +1963,7 @@ function DragState(dragSource, mouseX, mouseY)
 		*/
 		DragState.prototype.drag=function(mouseX, mouseY)
 		{
+//TODO fix alert("dragging mouse X: "+mouseX+" mouseY: "+mouseY+" deltaX: "+dragState.mouseDeltaX+" deltaY: "+dragState.mouseDeltaY);
 			var oldLeft=this.element.style.left;	//get the old left position
 			var oldTop=this.element.style.top;	//get the old top position
 /*TODO del when works
@@ -1953,7 +1985,7 @@ function DragState(dragSource, mouseX, mouseY)
 				else	//if the mouse is off the track
 				{
 					newX=this.initialPosition.x;	//reset the horizontal position
-//TODO del alert("off track Y, changing to initial position X: "+newX+" with max "+this.maxX);
+//TODO del alert("off track Y, mouse Y: "+mouseY+" deltaY: "+dragState.mouseDeltaY+" initialY: "+this.initialFixedPosition.y);
 				}
 				if(this.minX!=null && newX<this.minX)	//if there is a minimum specified and the new position is below it
 				{
@@ -1974,6 +2006,7 @@ function DragState(dragSource, mouseX, mouseY)
 				else	//if the mouse is off the track
 				{
 					newY=this.initialPosition.y;	//reset the vertical position
+//TODO del alert("off track X, mouse X: "+mouseX+" mouse delta X: "+dragState.mouseDeltaX);
 				}
 				if(this.minY!=null && newY<this.minY)	//if there is a minimum specified and the new position is below it
 				{
@@ -1986,6 +2019,7 @@ function DragState(dragSource, mouseX, mouseY)
 			}
 			if(newX!=oldX || newY!=oldY)	//if one of the coordinates has changed
 			{
+//TODO del alert("oldX: "+oldX+" oldY: "+oldY+" newX: "+newX+" newY: "+newY);
 				if(newX!=oldX)	//if the horizontal position has changed
 				{
 					this.element.style.left=newX.toString()+"px";	//update the horizontal position of the dragged element
@@ -2026,7 +2060,8 @@ function DragState(dragSource, mouseX, mouseY)
 			var element;	//we'll determine which element to use
 			if(this.dragCopy)	//if we should make a copy of the element
 			{
-				this.initialPosition=this.initialFixedPosition;	//the initial position is the fixed position
+				this.initialPosition=this.initialFixedPosition;	//the initial position is the fixed position TODO find out why the vertical axis is off if drag-and-drop is used in a scrolled view
+//TODO fix				this.initialPosition=getElementCoordinates(dragSource);	//get the absolute element coordinates
 
 				element=this.dragSource.cloneNode(true);	//create a clone of the original element
 				this._cleanClone(element);	//clean the clone
@@ -2228,6 +2263,11 @@ function initializeNode(node)
 				{
 					switch(elementClassNames[i])	//check out this class name
 					{
+/*TODO del
+						case "button":	//TODO testing; del
+							eventManager.addEvent(node, "click", onButtonClick, false);	//listen for button clicks
+							break;
+*/
 						case STYLES.ACTION:
 							eventManager.addEvent(node, "click", onActionClick, false);	//listen for a click on an action element
 							break;
@@ -2993,7 +3033,7 @@ function getDropTarget(x, y)
 	for(var i=dropTargets.length-1; i>=0; --i)	//for each drop target (which have been sorted by increasing element depth)
 	{
 		var dropTarget=dropTargets[i];	//get this drop target
-		var dropTargetCoordinates=getElementCoordinates(dropTarget);	//get the coordinates of the drop target
+		var dropTargetCoordinates=getElementFixedCoordinates(dropTarget);	//get the coordinates of the drop target
 		if(x>=dropTargetCoordinates.x && y>=dropTargetCoordinates.y && x<dropTargetCoordinates.x+dropTarget.offsetWidth && y<dropTargetCoordinates.y+dropTarget.offsetHeight)	//if the coordinates are within the drop target area
 		{
 			return dropTarget;	//we've found the deepest drop target
@@ -3295,6 +3335,17 @@ function getElementCoordinates(element)	//TODO make sure this method correctly c
 	return new Point(x, y);	//return the point we calculated
 }
 
+/**Retrieves the X and Y coordinates of the given element relative to the viewport.
+@param The element the coordinates of which to find.
+@return A Point containing the coordinates of the element relative to the viewport.
+*/
+function getElementFixedCoordinates(element)
+{
+	var absoluteCoordinates=getElementCoordinates(element);	//get the element's absolute coordinates
+	var scrollCoordinates=getScrollCoordinates();	//get the viewport's scroll coordinates
+	return new Point(absoluteCoordinates.x-scrollCoordinates.x, absoluteCoordinates.y-scrollCoordinates.y);	//compensate for viewport scrolling
+}
+
 /**@return The size of the document, even if it is outside the viewport.
 @see http://www.quirksmode.org/viewport/compatibility.html 
 */
@@ -3314,6 +3365,30 @@ function getPageSize()
 		height=document.body.offsetHeight;
 	}
 	return new Size(width, height);	//return the page size
+}
+
+/**@return The coordinates that the page has scrolled.
+@see http://www.quirksmode.org/viewport/compatibility.html 
+*/
+function getScrollCoordinates()
+{
+	var x, y;
+	if(window.pageYOffset) //if we know the page vertical offset (all browsers except IE)
+	{
+		x=window.pageXOffset;
+		y=window.pageYOffset;
+	}
+	else if(document.documentElement && document.documentElement.scrollTop)	//if we know the document's scroll position (IE 6 strict mode)
+	{
+		x=document.documentElement.scrollLeft;
+		y=document.documentElement.scrollTop;
+	}
+	else if(document.body)	//for all other IE modes
+	{
+		x=document.body.scrollLeft;
+		y=document.body.scrollTop;
+	}
+	return new Point(x, y);	//return the scrolling coordinates
 }
 
 /**@return The size of the viewport.
