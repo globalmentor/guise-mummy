@@ -285,6 +285,8 @@ Debug.trace("list control changed value to", newValue);
 		sliderModel.setLabel("Slider Value");
 		
 		final SliderControl<Integer> horizontalSlider=new SliderControl<Integer>(session, sliderModel, Orientation.Flow.LINE);
+		horizontalSlider.setThumbImage(URI.create("slider-thumb.gif"));
+		horizontalSlider.setTrackImage(URI.create("slider-track.gif"));
 		sliderPanel.add(horizontalSlider);
 
 		final SliderControl<Integer> verticalSlider=new SliderControl<Integer>(session, sliderModel, Orientation.Flow.PAGE);

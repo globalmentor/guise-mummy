@@ -134,7 +134,7 @@ public abstract class AbstractModel extends GuiseBoundPropertyObject implements 
 	@exception NullPointerException if the given text and/or content type is <code>null</code>.
 	@exception IllegalArgumentException if the given content type is not a text content type.
 	*/
-	public static String getPlainText(final String text, final ContentType contentType)
+	public static String getPlainText(final String text, final ContentType contentType)	//TODO del or move
 	{
 		checkNull(text, "Text cannot be null");
 		checkNull(contentType, "Content Type cannot be null.");
@@ -225,7 +225,7 @@ public abstract class AbstractModel extends GuiseBoundPropertyObject implements 
 	@return The URI value, or <code>null</code> if there is no value available, neither explicitly set nor in the resources.
 	@exception MissingResourceException if there was an error loading the value from the resources.
 	*/
-	protected URI getURI(final URI value, final String resourceKey) throws MissingResourceException
+	protected URI getURI(final URI value, final String resourceKey) throws MissingResourceException	//TODO del in favor of GuiseSession.getURI()
 	{
 		if(value!=null)	//if a value is provided
 		{

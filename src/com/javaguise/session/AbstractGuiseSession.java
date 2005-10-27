@@ -399,7 +399,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public Boolean getBooleanResource(final String resourceKey) throws MissingResourceException
 		{
-			final Object resource=getResourceBundle().getObject(resourceKey);	//retrieve a key from the resource bundle
+			final Object resource=getResource(resourceKey);	//retrieve a resource from the resource bundle
 			if(resource instanceof String)	//if the resource is a string
 			{
 				return Boolean.valueOf((String)resource);	//get the Boolean value of the resource string
@@ -447,7 +447,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public Integer getIntegerResource(final String resourceKey) throws MissingResourceException
 		{
-			final Object resource=getResourceBundle().getObject(resourceKey);	//retrieve a key from the resource bundle
+			final Object resource=getResource(resourceKey);	//retrieve a resource from the resource bundle
 			if(resource instanceof String)	//if the resource is a string
 			{
 				return Integer.valueOf((String)resource);	//get the Integer value of the resource string
@@ -495,7 +495,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public URI getURIResource(final String resourceKey) throws MissingResourceException
 		{
-			final Object resource=getResourceBundle().getObject(resourceKey);	//retrieve a key from the resource bundle
+			final Object resource=getResource(resourceKey);	//retrieve a resource from the resource bundle
 			if(resource instanceof String)	//if the resource is a string
 			{
 				return URI.create((String)resource);	//create a URI from the resource string

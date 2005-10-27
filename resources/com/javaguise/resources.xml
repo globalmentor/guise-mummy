@@ -10,6 +10,8 @@
 	<entry key="validator.value.required.message">Value required.</entry>
 	<entry key="validator.invalid.value.message">Invalid value: "{0}".</entry>
 
+	<!-- components -->
+
 	<!-- Option Dialog Frame -->
 	<entry key="frame.dialog.options.OK.label">OK</entry>
 	<entry key="frame.dialog.options.OK.icon">guise/images/accept.gif</entry>
@@ -32,5 +34,10 @@
 	<entry key="frame.dialog.options.CANCEL.label">Cancel</entry>
 	<entry key="frame.dialog.options.CANCEL.icon">guise/images/reject.gif</entry>
 
-</properties>
+	<!-- Slider -->
+	<entry key="slider.thumb.image.x">guise/images/slider-thumb-x.gif</entry>
+	<entry key="slider.thumb.image.y">guise/images/slider-thumb-y.gif</entry>
+	<entry key="slider.track.image.x">guise/images/slider-track-x.gif</entry>
+	<entry key="slider.track.image.y">guise/images/slider-track-y.gif</entry>
 
+</properties>

@@ -363,12 +363,15 @@ if(typeof document.importNode=="undefined")	//if the document does not support d
 						}
 					}
 */
-					var innerHTMLStringBuilder=new StringBuilder();	//construct the inner HTML
-					for(var i=0; i<childNodeCount; ++i)	//for all of the child nodes
+					if(childNodeCount>0)	//if there are child nodes (IE will fail on importedNode.innerHTML="" for input type="text")
 					{
-						DOMUtilities.appendNodeString(innerHTMLStringBuilder, childNodes[i]);	//serialize the node and append it to the string builder
+						var innerHTMLStringBuilder=new StringBuilder();	//construct the inner HTML
+						for(var i=0; i<childNodeCount; ++i)	//for all of the child nodes
+						{
+							DOMUtilities.appendNodeString(innerHTMLStringBuilder, childNodes[i]);	//serialize the node and append it to the string builder
+						}
+						importedNode.innerHTML=innerHTMLStringBuilder.toString();	//set the element's inner HTML to the string we constructed
 					}
-					importedNode.innerHTML=innerHTMLStringBuilder.toString();	//set the element's inner HTML to the string we constructed
 				}
 				break;
 			case Node.TEXT_NODE:	//text
@@ -1550,11 +1553,12 @@ alert(exception);
 					}
 				}
 				
-				
+/*TODO fix Firefox select hack; right now, this slows things down too much for IE
 				if(elementName=="select")	//TODO hack for Firefox select, which will allow the value of the selected option to be updated but not update that value shown in the drop-down list when the display changes
 				{
 					isChildrenCompatible=false;	//TODO testing
 				}
+*/
 				if(isChildrenCompatible)	//if the children are compatible
 				{
 //TODO del alert("children are compatible, old "+oldElement.nodeName+" with ID "+oldElement.id+" child node count: "+oldChildNodeCount+" new "+element.nodeName+" "+"with ID "+element.getAttribute("id")+" child node count "+childNodeCount+" (verify) "+element.childNodes.length);
@@ -1608,7 +1612,7 @@ alert("child node "+i+" is of type "+childNode.nodeType+" with name "+childNode.
 					}
 					else	//if we're out of old child nodes, create a new one
 					{
-//TODO del alert("ready to clone node: "+childNode.nodeName);
+//TODO del alert("ready to clone node: "+DOMUtilities.getNodeString(childNode));
 						var importedNode=document.importNode(childNode, true);	//create an import clone of the node
 						oldElement.appendChild(importedNode);	//append the imported node to the old element
 						initializeNode(importedNode);	//initialize the new imported node, installing the correct event handlers

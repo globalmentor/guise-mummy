@@ -1,18 +1,22 @@
 package com.javaguise.component;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.garretwilson.event.EventListenerManager;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.Debug;
+
+import static com.javaguise.GuiseResourceConstants.*;
 import com.javaguise.component.layout.Orientation;
 import com.javaguise.component.transfer.*;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.ControlEvent;
 import com.javaguise.controller.Controller;
 import com.javaguise.event.GuiseBoundPropertyObject;
+import com.javaguise.geometry.Axis;
 import com.javaguise.geometry.Dimensions;
 import com.javaguise.geometry.Extent;
 import com.javaguise.model.Model;
@@ -295,7 +299,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		@return The internationalization orientation of the component's contents, or <code>null</code> if the default orientation should be used.
 		@see #getComponentOrientation()
 		*/
-		public Orientation getOrientation() {return orientation=null;}
+		public Orientation getOrientation() {return orientation;}
 
 		/**Determines the internationalization orientation of the component's contents.
 		This method returns the local orientation value, if there is one.
@@ -767,6 +771,65 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 				setUpdated(childComponent, newUpdated);	//changed the updated status for this child's hierarchy
 			}
 		}
+	}
+
+	/**Determines a URI value either explicitly set or stored in the resources.
+	If a value is explicitly specified, it will be used; otherwise, a value will be loaded from the resources if possible.
+	A resource will be retrieved first using an appended physical axis designator (".x" or ".y") based upon the given flow, if any.
+	For example, if a thumb image resource key of "<var>image</var>" is requested, first a resource of "<var>image</var>.x" will be retrieved (for Western orientation and a line axis),
+	after which a resource for "<var>image</var>" will be retrieved if there is no resource for "<var>image</var>.x".
+	@param value The value explicitly set, which will override any resource.
+	@param resourceKey The key for looking up a resource if no value is explicitly set.
+	@param flow The flow for which a physical axis should be determined, or <code>null</code> if the flow is irrelevant.
+	@return The URI value, or <code>null</code> if there is no value available, neither explicitly set nor in the resources.
+	@exception MissingResourceException if there was an error loading the value from the resources.
+	*/
+	protected URI getURI(final URI value, final String resourceKey, final Orientation.Flow flow) throws MissingResourceException
+	{
+		if(value!=null)	//if a value is provided
+		{
+			return value;	//return the specified value
+		}
+		else if(resourceKey!=null)	//if no value is provided, but if a resource key is provided
+		{
+			if(flow!=null)	//if a flow is specified
+			{
+				try
+				{
+					return getSession().getURIResource(resourceKey+getResourceKeyAxisSuffix(flow));	//get a specialized resource key for the physical axis of the given flow in relation to this component's orientation
+				}
+				catch(final MissingResourceException missingResourceException)	//ignore a missing axis resource and try the general resource
+				{
+				}
+			}
+			return getSession().getURIResource(resourceKey);	//lookup the value from the resources normally
+		}
+		else	//if neither a value nor a resource key are provided
+		{
+			return null;	//there is no value available
+		}
+	}
+
+
+	/**Returns a resource key suffix representing the physical axis based upon the given flow relative to the component's orientation.
+	@param flow The flow for which a physical axis should be determined.
+	@return The appropriate resource key suffix for the given flow.
+	@see #RESOURCE_KEY_X_SUFFIX
+	@see #RESOURCE_KEY_Y_SUFFIX
+	*/ 
+	protected String getResourceKeyAxisSuffix(final Orientation.Flow flow)
+	{
+		final Axis axis=getComponentOrientation().getAxis(flow);	//get the physical axis
+		switch(axis)
+		{
+			case X:
+				return RESOURCE_KEY_X_SUFFIX;
+			case Y:
+				return RESOURCE_KEY_Y_SUFFIX;
+			case Z:
+			default:
+				throw new IllegalArgumentException("Unsupported axis: "+axis);
+		}	
 	}
 
 	/**@return A string representation of this component.*/
