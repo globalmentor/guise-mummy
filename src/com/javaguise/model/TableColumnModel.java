@@ -11,6 +11,8 @@ import com.javaguise.validator.Validator;
 public interface TableColumnModel<V> extends ControlModel
 {
 
+	/**The bound property of the column style ID.*/
+	public final static String STYLE_ID_PROPERTY=getPropertyName(TableColumnModel.class, "styleID");
 	/**The validator bound property.*/
 	public final static String VALIDATOR_PROPERTY=getPropertyName(TableColumnModel.class, "validator");
 	/**The bound property of whether the component is visible.*/
@@ -28,6 +30,16 @@ public interface TableColumnModel<V> extends ControlModel
 	@see #EDITABLE_PROPERTY
 	*/
 	public void setEditable(final boolean newEditable);
+
+	/**@return The style identifier, or <code>null</code> if there is no style ID.*/
+	public String getStyleID();
+
+	/**Identifies the style for the column.
+	This is a bound property.
+	@param newStyleID The style identifier, or <code>null</code> if there is no style ID.
+	@see #STYLE_ID_PROPERTY
+	*/
+	public void setStyleID(final String newStyleID);
 
 	/**@return The validator for cells in this column, or <code>null</code> if no validator is installed.*/
 	public Validator<V> getValidator();

@@ -1,5 +1,6 @@
 package com.javaguise.model;
 
+import com.javaguise.component.Component;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.Validator;
 
@@ -37,6 +38,27 @@ public class DefaultTableColumnModel<V> extends AbstractControlModel implements 
 				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
 			}			
 		}
+
+		/**The style identifier, or <code>null</code> if there is no style ID.*/
+		private String styleID=null;
+
+			/**@return The style identifier, or <code>null</code> if there is no style ID.*/
+			public String getStyleID() {return styleID;}
+
+			/**Identifies the style for the column.
+			This is a bound property.
+			@param newStyleID The style identifier, or <code>null</code> if there is no style ID.
+			@see TableColumnModel#STYLE_ID_PROPERTY
+			*/
+			public void setStyleID(final String newStyleID)
+			{
+				if(styleID!=newStyleID)	//if the value is really changing
+				{
+					final String oldStyleID=styleID;	//get the current value
+					styleID=newStyleID;	//update the value
+					firePropertyChange(STYLE_ID_PROPERTY, oldStyleID, newStyleID);
+				}
+			}
 
 	/**The validator for cells in this column, or <code>null</code> if no validator is installed.*/
 	private Validator<V> validator;
@@ -81,7 +103,7 @@ public class DefaultTableColumnModel<V> extends AbstractControlModel implements 
 		}
 
 	/**Session and value class constructor.
-	@param session The Guise session that owns this component.
+	@param session The Guise session that owns this column.
 	@param valueClass The class indicating the type of values held in the model.
 	@exception NullPointerException if the given session, and/or value class is <code>null</code>.
 	*/
@@ -91,7 +113,7 @@ public class DefaultTableColumnModel<V> extends AbstractControlModel implements 
 	}
 	
 	/**Session, value class, and label constructor.
-	@param session The Guise session that owns this component.
+	@param session The Guise session that owns this column.
 	@param valueClass The class indicating the type of values held in the model.
 	@param label The text of the label.
 	@exception NullPointerException if the given session, and/or value class is <code>null</code>.
@@ -102,7 +124,7 @@ public class DefaultTableColumnModel<V> extends AbstractControlModel implements 
 	}
 
 	/**Session, ID, and value class constructor.
-	@param session The Guise session that owns this component.
+	@param session The Guise session that owns this column.
 	@param id The column identifier, or <code>null</code> if a default column identifier should be generated.
 	@param valueClass The class indicating the type of values held in the model.
 	@exception NullPointerException if the given session, and/or value class is <code>null</code>.
@@ -114,7 +136,7 @@ public class DefaultTableColumnModel<V> extends AbstractControlModel implements 
 	}
 	
 	/**Session, ID, value class, and label constructor.
-	@param session The Guise session that owns this component.
+	@param session The Guise session that owns this column.
 	@param id The column identifier, or <code>null</code> if a default column identifier should be generated.
 	@param valueClass The class indicating the type of values held in the model.
 	@param label The text of the label.
