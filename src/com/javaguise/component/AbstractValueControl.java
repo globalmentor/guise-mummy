@@ -1,5 +1,8 @@
 package com.javaguise.component;
 
+import static com.garretwilson.lang.ObjectUtilities.*;
+
+import com.javaguise.converter.*;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 
@@ -46,6 +49,52 @@ public abstract class AbstractValueControl<V, C extends ValueControl<V, C>> exte
 	public AbstractValueControl(final GuiseSession session, final String id, final ValueModel<V> model)
 	{
 		super(session, id, model);	//construct the parent class
+	}
+
+	/**Creates a default string literal converter for the value type represented by the given value class.
+	Default converters are available for the following types:
+	<ul>
+		<li><code>char[]</code></li>
+		<li><code>java.lang.Boolean</code></li>
+		<li><code>java.lang.Float</code></li>
+		<li><code>java.lang.Integer</code></li>
+		<li><code>java.lang.String</code></li>
+	</ul>
+	@param <VV> The type of value represented.
+	@param session The Guise session that will own the converter.
+	@param valueClass The class of the represented value.
+	@return The default converter for the value type represented by the given value class.
+	@exception NullPointerException if the given value class is <code>null</code>.
+	@exception IllegalArgumentException if no default converter is available for the given value class.
+	*/
+	@SuppressWarnings("unchecked")	//we check the value class before generic casting
+	protected static <VV> Converter<VV, String> createDefaultStringLiteralConverter(final GuiseSession session, final Class<VV> valueClass)
+	{
+		checkNull(valueClass, "Value class cannot be null.");
+		if(char[].class.equals(valueClass))	//char[]
+		{
+			return (Converter<VV, String>)new CharArrayStringLiteralConverter(session);
+		}
+		else if(Boolean.class.equals(valueClass))	//Boolean
+		{
+			return (Converter<VV, String>)new BooleanStringLiteralConverter(session);
+		}
+		else if(Float.class.equals(valueClass))	//Float
+		{
+			return (Converter<VV, String>)new FloatStringLiteralConverter(session);
+		}
+		else if(Integer.class.equals(valueClass))	//Integer
+		{
+			return (Converter<VV, String>)new IntegerStringLiteralConverter(session);
+		}
+		else if(String.class.equals(valueClass))	//String
+		{
+			return (Converter<VV, String>)new StringStringLiteralConverter(session);
+		}
+		else	//if we don't recognize the value class
+		{
+			throw new IllegalArgumentException("Unrecognized value class: "+valueClass);
+		}
 	}
 
 }

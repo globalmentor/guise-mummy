@@ -706,7 +706,7 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 		switch(node.nodeType)	//see which type of node this is
 		{
 			case Node.ELEMENT_NODE:	//element
-				var nodeName=node.nodeName;	//get the name of the node
+				var nodeName=node.nodeName.toLowerCase();	//get the name of the node
 				stringBuilder.append("<").append(nodeName);	//<nodeName
 				var attributes=node.attributes;	//get the element's attributes
 				var attributeCount=attributes.length;	//find out how many attributes there are
@@ -715,15 +715,22 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 					var attribute=attributes[i];	//get this attribute
 					this.appendXMLAttribute(stringBuilder, attribute.nodeName, attribute.nodeValue);	//append this attribute
 				}
-				stringBuilder.append(">");	//>
 				var childNodes=node.childNodes;	//get a list of child nodes
 				var childNodeCount=childNodes.length;	//find out how many child nodes there are
-				for(var i=0; i<childNodeCount; ++i)	//for all of the child nodes
-				{
-					var childNode=childNodes[i];	//get a reference to this child node
-					this.appendNodeString(stringBuilder, childNode);	//append this child node
+				if(childNodeCount>0 || nodeName=="div" || nodeName=="span")	//if there are children (special-case "div" and "span" for IE, which will drop a <div/> from the DOM
+				{				
+					stringBuilder.append(">");	//>
+					for(var i=0; i<childNodeCount; ++i)	//for all of the child nodes
+					{
+						var childNode=childNodes[i];	//get a reference to this child node
+						this.appendNodeString(stringBuilder, childNode);	//append this child node
+					}
+					this.appendXMLEndTag(stringBuilder, nodeName);	//append the end tag
 				}
-				this.appendXMLEndTag(stringBuilder, nodeName);	//append the end tag
+				else	//if there are no children, create an empty element (otherwise, for elements like <input></input>, IE6 will see two elements)
+				{
+					stringBuilder.append("/>");	///>
+				}
 				break;
 			case Node.COMMENT_NODE:	//comment
 				stringBuilder.append(node.nodeValue);	//append the node's value with no changes TODO encode the sequence "--"
@@ -1549,6 +1556,7 @@ alert(exception);
 					}
 					else	//if the node types are different
 					{
+//TODO del alert("node types are different; old: "+oldChildNode.nodeType+" new: "+childNode.nodeType);
 						isChildrenCompatible=false;	//these child nodes aren't compatible because they are of different types
 					}
 				}
@@ -1887,6 +1895,7 @@ By default the drag state allows dragging along both axes.
 @param dragSource: The element to drag.
 @param mouseX The horizontal position of the mouse.
 @param mouseY The vertical position of the mouse.
+var dragging true if dragging is occurring, else false.
 var dragSource: The element to drag.
 var element: The actual element being dragged, which may or may not be the same element as the drag souce.
 var initialFixedPosition: The initial position of the drag source in fixed terms of the viewport.
@@ -1902,13 +1911,14 @@ var onEnd(element): The method called when dragging ends, or null if no addition
 */
 function DragState(dragSource, mouseX, mouseY)
 {
+	this.dragging=false;	//initially we are not dragging
 	this.dragSource=dragSource;
 
 	this.initialMouseFixedPosition=new Point(mouseX, mouseY);
 //TODO del alert("initial mouse fixed position X: "+mouseX+" Y: "+mouseY);
 	this.initialFixedPosition=getElementFixedCoordinates(dragSource);	//get the initial position of the drag source in fixed terms of the viewport
 	this.initialOffsetPosition=new Point(dragSource.offsetLeft, dragSource.offsetTop);	//get the offset position of the drag source
-	
+
 	this.initialPosition=null;	//these will be updated when dragging is started
 	this.mouseDeltaX=0;
 	this.mouseDeltaY=0;
@@ -1945,6 +1955,11 @@ function DragState(dragSource, mouseX, mouseY)
 		DragState.prototype.beginDrag=function(mouseX, mouseY)
 		{		
 			this.element=this._getDragElement();	//create an element for dragging
+/*TODO del when works
+			this.width=this.element.offsetWidth;	//store the size of the element, because IE6 can sometimes reset the width and height to zero during AJAX calls for some unknown reason
+			this.height=this.element.offsetHeight;
+*/
+
 			this.drag(mouseX, mouseY);	//drag the element to the current mouse position
 			if(this.element!=this.dragSource)	//if we have a new element to drag
 			{
@@ -1957,6 +1972,7 @@ function DragState(dragSource, mouseX, mouseY)
 			document.body.onselectstart=function() {return false;};
 */
 //TODO del if not needed			drag(mouseX, mouseY);	//do a fake drag to make sure that the position of the element is within any ranges
+			this.dragging=true;	//show that we are dragging
 			eventManager.addEvent(document, "mousemove", onDrag, false);	//listen for mouse move anywhere in document (IE doesn't allow us to listen on the window), as dragging may end somewhere else besides a drop target
 		};
 
@@ -1989,7 +2005,7 @@ function DragState(dragSource, mouseX, mouseY)
 				else	//if the mouse is off the track
 				{
 					newX=this.initialPosition.x;	//reset the horizontal position
-//TODO del alert("off track Y, mouse Y: "+mouseY+" deltaY: "+dragState.mouseDeltaY+" initialY: "+this.initialFixedPosition.y);
+//TODO del alert("off track Y, mouse Y: "+mouseY+" deltaY: "+dragState.mouseDeltaY+" initialY: "+this.initialFixedPosition.y+" element height: "+this.element.offsetHeight);
 				}
 				if(this.minX!=null && newX<this.minX)	//if there is a minimum specified and the new position is below it
 				{
@@ -2052,10 +2068,12 @@ function DragState(dragSource, mouseX, mouseY)
 				document.body.removeChild(this.element);	//remove the drag element
 				this.dragSource.style.visibility=this.oldVisibility;	//reset the original element's visibility status
 			}
+			this.dragging=false;	//show that we are no longer dragging
 			if(this.onDragEnd)	//if there is a function for ending dragging
 			{
 				this.onDragEnd(this.element);	//call the dragging end method
 			}
+//TODO del alert("ended drag, drag element offsetWidth: "+this.element.offsetWidth+" offsetHeight: "+this.element.offsetHeight);
 		};
 
 		/**@return An element appropriate for dragging, such as a clone of the original.*/
@@ -2098,6 +2116,8 @@ function DragState(dragSource, mouseX, mouseY)
 					this.initialPosition=this.initialOffsetPosition;	//the initial position is the offset position TODO check for fixed position, which would also mean using fixed coordinates
 				}
 			}
+//TODO del; doesn't work			element.style.zoom=1;	//TODO testing
+//TODO del alert("element: "+element.nodeName+" class: "+element.className);
 			this.mouseDeltaX=this.initialMouseFixedPosition.x-this.initialPosition.x;	//calculate the mouse position relative to the drag source
 			this.mouseDeltaY=this.initialMouseFixedPosition.y-this.initialPosition.y;
 			return element;	//return the cloned element
@@ -2933,6 +2953,7 @@ function onSliderThumbDragBegin(event)
 	{
 				//TODO make sure this isn't the context mouse button
 		var thumb=event.currentTarget;	//get the target of the event
+//TODO del alert("thumb offsetWidth: "+thumb.offsetWidth+" offsetHeight: "+thumb.offsetHeight);
 		var slider=getAncestorElementByClassName(thumb, /^sliderControl-[xy]-(ltr|rtl)$/);	//find the slider TODO use a constant
 		var track=getAncestorElementByClassName(thumb, /^sliderControl-[xy]-(ltr|rtl)-track$/);	//find the slider track TODO use a constant
 		var positionID=slider.id+".position";	//TODO use constant
@@ -2967,6 +2988,7 @@ function onSliderThumbDragBegin(event)
 						{
 							position=1.0-position;	//take into account that the vertical slider origin is the opposite of the graphics origin
 						}
+//TODO del alert("new position: "+position);
 						positionInput.value=position.toString();	//put the position in the value
 //TODO del						var test="coordinate: "+coordinate+" min: "+min+" coordinate-min: "+(coordinate-min)+" position: "+position;
 						var ajaxRequest=new FormAJAXEvent(new Parameter(positionInput.name, position.toString()));	//create a new form request with the control name and value
@@ -2991,10 +3013,29 @@ function updateSlider(slider)	//TODO maybe rename to updateSliderView
 {
 	var track=getDescendantElementByClassName(slider, /^sliderControl-[xy]-(ltr|rtl)-track$/);	//find the slider track TODO use a constant
 	var thumb=getDescendantElementByClassName(slider, /^sliderControl-[xy]-(ltr|rtl)-thumb$/);	//find the slider thumb TODO use a constant
-	if(dragState && dragState.dragSource==thumb)	//if the slider thumb is being dragged
+	if(dragState && dragState.dragging && dragState.dragSource==thumb)	//if the slider thumb is being dragged
 	{
 		return;	//don't update the slider while a drag is occurring
 	}
+/*TODO del when works
+
+	else	//TODO del; debugging
+	{
+		if(!dragState)
+		{
+			alert("Staying in because no drag state");
+		}
+		else if(!dragState.dragging)
+		{
+			alert("Staying in because we aren't dragging");
+		}
+		else if(dragState.dragSource!=thumb)
+		{
+			alert("drag source is not thumb; thumb is "+thumb.id+" and drag source is "+dragState.dragSource.id);
+		}
+	}
+*/
+
 	var positionID=slider.id+".position";	//TODO use constant
 	var positionInput=document.getElementById(positionID);	//get the position element
 	if(track && thumb && positionInput)	//if we found the slider track and thumb

@@ -540,7 +540,8 @@ Debug.info("content type:", request.getContentType());
 						{
 							//TODO don't re-update nested components (less important for controls, which don't have nested components) 
 			//TODO del Debug.trace("looking for component with name", parameterName);
-							getControlsByName(guiseContext, navigationPanel, parameterName, requestedComponents);	//get all components identified by this name
+							getControlsByName(guiseSession, parameterName, requestedComponents);	//TODO comment; tidy
+//TODO del; test new method; tidy; comment							getControlsByName(guiseContext, navigationPanel, parameterName, requestedComponents);	//get all components identified by this name
 						}
 					}
 				}
@@ -676,6 +677,7 @@ Debug.trace("now have frames: ", frames.size());
 	/*TODO comment
 	@param context Guise context information.
 	*/
+/*TODO del when works
 	protected <T extends Component<?>> void getControlsByName(final GuiseContext context, final T component, final String name, final Set<Component<?>> componentSet)
 	{
 			//TODO check first that the component is a control; that should be much faster
@@ -705,6 +707,61 @@ Debug.trace("now have frames: ", frames.size());
 			for(final Component<?> childComponent:(CompositeComponent<?>)component)
 			{
 				getControlsByName(context, childComponent, name, componentSet);
+			}
+		}
+	}
+*/
+
+	/**Retrieves all components that have views needing updated within a session.
+	This method checks all frames in the session.
+	If a given component is dirty, its child views will not be checked.
+	@param session The Guise session to check for dirty views.
+	@return The components with views needing to be updated. 
+	*/
+	protected void getControlsByName(final GuiseSession session, final String name, final Set<Component<?>> componentSet)	//TODO comment; tidy
+	{
+		final Iterator<Frame<?>> frameIterator=session.getFrameIterator();	//get an iterator to session frames
+		while(frameIterator.hasNext())	//while there are more frames
+		{
+			final Frame<?> frame=frameIterator.next();	//get the next frame
+			getControlsByName(frame, name, componentSet);			
+//TODO del			AbstractComponent.getDirtyComponents(frame, dirtyComponents);	//gather more dirty components
+		}
+	}
+
+	/*TODO comment
+	@param context Guise context information.
+	*/
+	protected <T extends Component<?>> void getControlsByName(/*TODO fixfinal GuiseContext context, */final T component, final String name, final Set<Component<?>> componentSet)
+	{
+			//TODO check first that the component is a control; that should be much faster
+		final Controller<? extends GuiseContext, ?> controller=component.getController();
+		if(controller instanceof AbstractXHTMLControlController)
+		{
+			final AbstractXHTMLControlController xhtmlControlController=(AbstractXHTMLControlController)controller;
+//TODO del Debug.trace("checking control with ID", xhtmlControlController.getAbsoluteUniqueID(component), "and name", xhtmlControlController.getComponentName((Control)component));
+			if(name.equals(xhtmlControlController.getComponentName((Control)component)))	//TODO comment: the returned name can be null
+			{
+//TODO del Debug.trace("using this component");
+				componentSet.add(component);
+			}
+		}
+		else if(controller instanceof XHTMLTabbedPanelController)	//TODO fix hack; make XHTMLTabbedPanelController descend from XHTMLControlController
+		{
+			final XHTMLTabbedPanelController tabbedPanelController=(XHTMLTabbedPanelController)controller;
+			if(name.equals(component.getID()))	//TODO fix hack
+			{
+//TODO del Debug.trace("using this component");
+				componentSet.add(component);
+			}
+			
+		}
+		if(component instanceof CompositeComponent)
+		{
+			for(final Component<?> childComponent:(CompositeComponent<?>)component)
+			{
+				getControlsByName(childComponent, name, componentSet);
+//TODO fix				getControlsByName(context, childComponent, name, componentSet);
 			}
 		}
 	}

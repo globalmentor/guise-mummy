@@ -11,7 +11,6 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import com.javaguise.converter.*;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
-import com.javaguise.validator.ValidationException;
 import com.javaguise.validator.Validator;
 
 /**Control to accept text input from the user representing a particular value type.
@@ -30,16 +29,10 @@ Default converters are available for the following types:
 public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 {
 
-	/**The converter bound property.*/
-	public final static String CONVERTER_PROPERTY=getPropertyName(TextControl.class, "converter");
 	/**The text literal bound property.*/
 	public final static String TEXT_PROPERTY=getPropertyName(TextControl.class, "text");
 	/**The masked bound property.*/
 	public final static String MASKED_PROPERTY=getPropertyName(TextControl.class, "masked");
-
-
-	/**The map of string literal registered converters for each type.*/
-//TODO del	private final Map<Class<?>, Converter<?, String>> textConverterMap=new ConcurrentHashMap<Class<?>, Converter<?,String>>();
 
 	/**The converter for this component.*/
 	private Converter<V, String> converter;
@@ -160,7 +153,7 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 	*/
 	public TextControl(final GuiseSession session, final String id, final ValueModel<V> model)
 	{
-		this(session, id, model, createDefaultConverter(session, model.getValueClass()));	//construct the parent class
+		this(session, id, model, createDefaultStringLiteralConverter(session, model.getValueClass()));	//construct the class with a default converter
 	}
 
 	/**Session, ID, model, and converter constructor.
@@ -263,52 +256,6 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 			componentException.setComponent(this);	//make sure the exception knows to which component it relates
 			addError(componentException);	//add this error to the component
 			throw new ComponentExceptions(componentException);	//throw a new component exception list exception
-		}
-	}
-
-	/**Creates a default converter for the value type represented by the given value class.
-	Default converters are available for the following types:
-	<ul>
-		<li><code>char[]</code></li>
-		<li><code>java.lang.Boolean</code></li>
-		<li><code>java.lang.Float</code></li>
-		<li><code>java.lang.Integer</code></li>
-		<li><code>java.lang.String</code></li>
-	</ul>
-	@param <VV> The type of value represented.
-	@param session The Guise session that will own the converter.
-	@param valueClass The class of the represented value.
-	@return The default converter for the value type represented by the given value class.
-	@exception NullPointerException if the given value class is <code>null</code>.
-	@exception IllegalArgumentException if no default converter is available for the given value class.
-	*/
-	@SuppressWarnings("unchecked")	//we check the value class before generic casting
-	protected static <VV> Converter<VV, String> createDefaultConverter(final GuiseSession session, final Class<VV> valueClass)
-	{
-		checkNull(valueClass, "Value class cannot be null.");
-		if(char[].class.equals(valueClass))	//char[]
-		{
-			return (Converter<VV, String>)new CharArrayStringLiteralConverter(session);
-		}
-		else if(Boolean.class.equals(valueClass))	//Boolean
-		{
-			return (Converter<VV, String>)new BooleanStringLiteralConverter(session);
-		}
-		else if(Float.class.equals(valueClass))	//Float
-		{
-			return (Converter<VV, String>)new FloatStringLiteralConverter(session);
-		}
-		else if(Integer.class.equals(valueClass))	//Integer
-		{
-			return (Converter<VV, String>)new IntegerStringLiteralConverter(session);
-		}
-		else if(String.class.equals(valueClass))	//String
-		{
-			return (Converter<VV, String>)new StringStringLiteralConverter(session);
-		}
-		else	//if we don't recognize the value class
-		{
-			throw new IllegalArgumentException("Unrecognized value class: "+valueClass);
 		}
 	}
 }
