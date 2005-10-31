@@ -15,10 +15,11 @@ import com.javaguise.component.transfer.*;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.ControlEvent;
 import com.javaguise.controller.Controller;
-import com.javaguise.event.GuiseBoundPropertyObject;
+import com.javaguise.event.*;
 import com.javaguise.geometry.Axis;
 import com.javaguise.geometry.Dimensions;
 import com.javaguise.geometry.Extent;
+import com.javaguise.model.ActionModel;
 import com.javaguise.model.Model;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.style.Color;
@@ -683,6 +684,61 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 	{
 		final View<? super GC, ? super C> view=(View<? super GC, ? super C>)getView();	//get the view
 		view.update(context, getThis());	//tell the view to update
+	}
+
+	/**Adds a mouse listener.
+	@param mouseListener The mouse listener to add.
+	*/
+	public void addMouseListener(final MouseListener<? super C> mouseListener)
+	{
+		getEventListenerManager().add(MouseListener.class, mouseListener);	//add the listener
+	}
+
+	/**Removes a mouse listener.
+	@param mouseListener The mouse listener to remove.
+	*/
+	public void removeMouseListener(final MouseListener<? super C> mouseListener)
+	{
+		getEventListenerManager().remove(MouseListener.class, mouseListener);	//remove the listener
+	}
+
+	/**@return <code>true</code> if there is one or more mouse listeners registered.*/
+	public boolean hasMouseListeners()
+	{
+		return getEventListenerManager().hasListeners(MouseListener.class);	//return whether there are mouse listeners registered
+	}
+
+	/**@return all registered mouse listeners.*/
+	@SuppressWarnings("unchecked")
+	public Iterator<MouseListener<? super C>> getMouseListeners()
+	{
+		return (Iterator<MouseListener<? super C>>)(Object)getEventListenerManager().getListeners(MouseListener.class);	//remove the listener TODO find out why we have to use the double cast for JDK 1.5 to compile
+	}
+
+	/**Fires a mouse entered event to all registered mouse listeners.
+	@see MouseListener
+	@see MouseEvent
+	*/
+	public void fireMouseEntered()
+	{
+		if(hasMouseListeners())	//if there are mouse listeners registered
+		{
+			final MouseEvent<C> mouseEvent=new MouseEvent<C>(getSession(), getThis());	//create a new mouse event
+			getSession().queueEvent(new PostponedMouseEvent<C>(getEventListenerManager(), mouseEvent, PostponedMouseEvent.EventType.ENTERED));	//tell the Guise session to queue the event
+		}
+	}
+
+	/**Fires a mouse exited event to all registered mouse listeners.
+	@see MouseListener
+	@see MouseEvent
+	*/
+	public void fireMouseExited()
+	{
+		if(hasMouseListeners())	//if there are mouse listeners registered
+		{
+			final MouseEvent<C> mouseEvent=new MouseEvent<C>(getSession(), getThis());	//create a new mouse event
+			getSession().queueEvent(new PostponedMouseEvent<C>(getEventListenerManager(), mouseEvent, PostponedMouseEvent.EventType.EXITED));	//tell the Guise session to queue the event
+		}
 	}
 
 	/**Determines the root parent of the given component.

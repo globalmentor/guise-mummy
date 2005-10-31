@@ -54,6 +54,48 @@ public class HomePanel extends DefaultNavigationPanel
 		inputTextControl.getModel().setLabel("Input Number");	//add a label to the text input control
 		inputTextControl.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
 		inputTextControl.setBackgrondColor(RGBColor.DARK_GOLDEN_ROD);
+		
+		inputTextControl.addMouseListener(new MouseAdapter<TextControl>()
+				{
+
+			private Frame<?> frame=null; 
+			
+			
+			
+			/**Called when the mouse enters the source.
+			@param mouseEvent The event providing mouse information
+			*/
+			public void mouseEntered(final MouseEvent<TextControl> mouseEvent)
+			{
+Debug.trace("mouse entered");
+				if(frame==null)
+				{
+Debug.trace("no frame; created");
+					frame=new TestFrame(session);
+					frame.getModel().setLabel("Flyover");
+					frame.open();				
+Debug.trace("no frame; created frame", frame.getID());
+				}
+			}
+
+			/**Called when the mouse exits the source.
+			@param mouseEvent The event providing mouse information
+			*/
+			public void mouseExited(final MouseEvent<TextControl> mouseEvent)
+			{
+Debug.trace("mouse exited");
+				if(frame!=null)
+				{
+Debug.trace("ready to close frame", frame.getID());
+					frame.close();
+					frame=null;
+				}
+			}
+			
+			
+			
+				});	//TODO testing
+		
 		inputPanel.add(inputTextControl);	//add the input control to the input panel
 		final TextControl<Float> outputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
 		outputTextControl.getModel().setLabel("Double the Number");	//add a label to the text output control

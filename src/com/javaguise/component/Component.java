@@ -9,6 +9,8 @@ import com.javaguise.component.transfer.*;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.ControlEvent;
 import com.javaguise.controller.Controller;
+import com.javaguise.event.MouseEvent;
+import com.javaguise.event.MouseListener;
 import com.javaguise.geometry.Dimensions;
 import com.javaguise.geometry.Extent;
 
@@ -329,4 +331,33 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@see GuiseContext.State#UPDATE_VIEW
 	*/
 	public <GC extends GuiseContext> void updateView(final GC context) throws IOException;
+
+	/**Adds a mouse listener.
+	@param mouseListener The mouse listener to add.
+	*/
+	public void addMouseListener(final MouseListener<? super C> mouseListener);
+
+	/**Removes a mouse listener.
+	@param mouseListener The mouse listener to remove.
+	*/
+	public void removeMouseListener(final MouseListener<? super C> mouseListener);
+
+	/**@return all registered mouse listeners.*/
+	public Iterator<MouseListener<? super C>> getMouseListeners();
+
+	/**@return <code>true</code> if there is one or more mouse listeners registered.*/
+	public boolean hasMouseListeners();
+
+	/**Fires a mouse entered event to all registered mouse listeners.
+	@see MouseListener
+	@see MouseEvent
+	*/
+	public void fireMouseEntered();
+
+	/**Fires a mouse exited event to all registered mouse listeners.
+	@see MouseListener
+	@see MouseEvent
+	*/
+	public void fireMouseExited();
+
 }

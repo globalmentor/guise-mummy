@@ -510,15 +510,15 @@ Debug.info("content type:", request.getContentType());
 		if(navigationPanel!=null)	//if we found a panel class for this address
 		{
 			final ApplicationFrame<?> applicationFrame=guiseSession.getApplicationFrame();	//get the application frame
-			final Set<Frame<?>> removedFrames=new HashSet<Frame<?>>();	//create a set of frames so that we can know which ones were removed TODO testing
-			CollectionUtilities.addAll(removedFrames, guiseSession.getFrameIterator());	//get all the current frames; we'll determine which ones were removed, later TODO improve all this
-			
 			
 			final List<ControlEvent> controlEvents=getControlEvents(request);	//get all control events from the request
 			guiseContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type
 			guiseContext.writeElementBegin(null, "response");	//<response>	//TODO use a constant, decide on a namespace
 			for(final ControlEvent controlEvent:controlEvents)	//for each control event
 			{
+				final Set<Frame<?>> removedFrames=new HashSet<Frame<?>>();	//create a set of frames so that we can know which ones were removed TODO testing
+				CollectionUtilities.addAll(removedFrames, guiseSession.getFrameIterator());	//get all the current frames; we'll determine which ones were removed, later TODO improve all this
+				
 				final Set<Component<?>> requestedComponents=new HashSet<Component<?>>();	//create a set of component that were identified in the request
 				if(controlEvent instanceof FormControlEvent)	//if this is a form submission
 				{
@@ -547,11 +547,11 @@ Debug.info("content type:", request.getContentType());
 				}
 				else if(controlEvent instanceof ComponentControlEvent)	//if this event is bound for a specific component
 				{
-Debug.trace("this is a control event; looking for component with ID", ((ComponentControlEvent)controlEvent).getComponentID());
+//TODO del Debug.trace("this is a control event; looking for component with ID", ((ComponentControlEvent)controlEvent).getComponentID());
 					final Component<?> component=getComponentByID(guiseSession, ((ComponentControlEvent)controlEvent).getComponentID());	//get the target component from its ID
 					if(component!=null)	//if there is a target component
 					{
-Debug.trace("got component", component);
+//TODO del Debug.trace("got component", component);
 						requestedComponents.add(component);	//add the component to the set of requested components
 					}					
 				}
@@ -649,6 +649,7 @@ Debug.trace("now have frames: ", frames.size());
 					{
 						guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "remove");	//<xhtml:remove>	//TODO use a constant TODO don't use the XHTML namespace if we can help it								
 						guiseContext.writeAttribute(null, "id", frame.getID());	//TODO fix
+//TODO del Debug.trace("Sending message to remove frame:", frame.getID());
 						guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "remove");	//</xhtml:remove>							
 					}
 					if(controlEvent instanceof InitControlEvent)	//if this is an initialization event TODO maybe just dirty all the frames so this happens automatically
@@ -870,6 +871,24 @@ Debug.trace("now have frames: ", frames.size());
 							final String dropTargetID=((Element)targetNode).getAttribute("id");	//TODO tidy; improve; comment
 							final DropControlEvent dropEvent=new DropControlEvent(dragSourceID, dropTargetID);	//create a new drop event
 							controlEventList.add(dropEvent);	//add the event to the list
+						}
+						else if("mouse".equals(eventNode.getNodeName()))	//if this is a drop event TODO use a constant
+						{
+							final String type=((Element)eventNode).getAttribute("type");	//TODO tidy; improve; comment
+							if(type!=null)	//if we have an event type
+							{
+								try
+								{
+									final MouseControlEvent.EventType eventType=MouseControlEvent.EventType.valueOf(type.toUpperCase());	//get the event type from the type string
+									final Node targetNode=XPath.getNode(eventNode, AJAX_REQUEST_TARGET_XPATH_EXPRESSION);	//get the target node
+									final String targetID=((Element)targetNode).getAttribute("id");	//TODO tidy; improve; comment
+									final MouseControlEvent mouseEvent=new MouseControlEvent(eventType, targetID);	//create a new mouse event
+									controlEventList.add(mouseEvent);	//add the event to the list
+								}
+								catch(final IllegalArgumentException illegalArgumentException)	//if we don't ignore the event type, don't create an event
+								{								
+								}
+							}
 						}
 						else if("init".equals(eventNode.getNodeName()))	//if this is an initialization event TODO use a constant
 						{
