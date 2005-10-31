@@ -2082,8 +2082,7 @@ function DragState(dragSource, mouseX, mouseY)
 			var element;	//we'll determine which element to use
 			if(this.dragCopy)	//if we should make a copy of the element
 			{
-				this.initialPosition=this.initialFixedPosition;	//the initial position is the fixed position TODO find out why the vertical axis is off if drag-and-drop is used in a scrolled view
-//TODO fix				this.initialPosition=getElementCoordinates(dragSource);	//get the absolute element coordinates
+				this.initialPosition=getElementCoordinates(this.dragSource);	//get the absolute element coordinates, as we'll be positioning the element absolutely
 
 				element=this.dragSource.cloneNode(true);	//create a clone of the original element
 				this._cleanClone(element);	//clean the clone
@@ -2116,10 +2115,10 @@ function DragState(dragSource, mouseX, mouseY)
 					this.initialPosition=this.initialOffsetPosition;	//the initial position is the offset position TODO check for fixed position, which would also mean using fixed coordinates
 				}
 			}
-//TODO del; doesn't work			element.style.zoom=1;	//TODO testing
 //TODO del alert("element: "+element.nodeName+" class: "+element.className);
 			this.mouseDeltaX=this.initialMouseFixedPosition.x-this.initialPosition.x;	//calculate the mouse position relative to the drag source
 			this.mouseDeltaY=this.initialMouseFixedPosition.y-this.initialPosition.y;
+//TODO del alert("initialXY: "+this.initialPosition.x+", "+this.initialPosition.y+" mouseXY: "+this.initialMouseFixedPosition.x+", "+this.initialMouseFixedPosition.y+" deltaXY: "+this.mouseDeltaX+", "+this.mouseDeltaY);
 			return element;	//return the cloned element
 		};
 
@@ -2967,7 +2966,7 @@ function onSliderThumbDragBegin(event)
 			{
 				dragState.allowY=false;	//only allow horizontal dragging
 				var min=0;	//calculate the minimum
-				var max=track.offsetWidth-thumb.offsetWidth+1;	//calculate the maximum
+				var max=track.offsetWidth-thumb.width+1;	//calculate the maximum
 				dragState.minX=min;	//set the minimum
 				dragState.maxX=max;	//set the maximum
 			}
@@ -2975,7 +2974,7 @@ function onSliderThumbDragBegin(event)
 			{
 				dragState.allowX=false;	//only allow vertical dragging
 				var min=0;	//calculate the minimum
-				var max=track.offsetHeight-thumb.offsetHeight+1;	//calculate the maximum
+				var max=track.offsetHeight-thumb.height+1;	//calculate the maximum
 				dragState.minY=min;	//set the minimum
 				dragState.maxY=max;	//set the maximum
 			}
@@ -3007,6 +3006,7 @@ function onSliderThumbDragBegin(event)
 }
 
 /**Updates the representation of a slider based upon the slider's model value.
+This implementation also sets the thumb.width and thumb.height to work around a Mozilla bug that doesn't properly calculate thumb.offsetWidth and thumb.offsetHeight if the thumb is partially outside the track.
 @param slider The slider element.
 */
 function updateSlider(slider)	//TODO maybe rename to updateSliderView
@@ -3035,22 +3035,31 @@ function updateSlider(slider)	//TODO maybe rename to updateSliderView
 		}
 	}
 */
-
 	var positionID=slider.id+".position";	//TODO use constant
 	var positionInput=document.getElementById(positionID);	//get the position element
 	if(track && thumb && positionInput)	//if we found the slider track and thumb
 	{
+		if(typeof thumb.width=="undefined")	//if we haven't defined the thumb width
+		{
+			thumb.width=thumb.offsetWidth;	//set the thumb width so that it won't change later with the Mozilla bug if the thumb is partially outside the track
+		}
+		if(typeof thumb.height=="undefined")	//if we haven't defined the thumb height
+		{
+			thumb.height=thumb.offsetHeight;	//set the thumb height so that it won't change later with the Mozilla bug if the thumb is partially outside the track
+		}
 		var position=positionInput.value ? parseFloat(positionInput.value) : 0;	//get the position TODO make sure this logic is in synch with whether server code will always provide a value, even for null
 		var isHorizontal=hasClassName(track, /^sliderControl-x-(ltr|rtl)-track$/);	//see if this is a horizontal slider
 		if(isHorizontal)	//if this is a horizontal slider
 		{
 			var min=0;	//calculate the minimum
-			var max=track.offsetWidth-thumb.offsetWidth+1;	//calculate the maximum
+//TODO del alert("track width: "+track.offsetWidth);
+//TODO del alert("thumb width: "+thumb.offsetWidth);
+			var max=track.offsetWidth-thumb.width+1;	//calculate the maximum
 		}
 		else	//if this is a vertical slider
 		{
 			var min=0;	//calculate the minimum
-			var max=track.offsetHeight-thumb.offsetHeight+1;	//calculate the maximum
+			var max=track.offsetHeight-thumb.height+1;	//calculate the maximum
 			position=1.0-position;	//take into account that the vertical slider origin is the opposite of the graphics origin
 		}
 		var span=max-min;	//find the available range of the values

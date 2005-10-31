@@ -13,6 +13,8 @@ import com.javaguise.converter.Converter;
 import com.javaguise.model.DefaultValueModel;
 import com.javaguise.model.ValueModel;
 import com.javaguise.session.GuiseSession;
+import com.javaguise.validator.ValidationException;
+import com.javaguise.validator.Validator;
 
 /**A value control that represents its value by a slider.
 If a thumb or track image resource key is set, a resource will be retrieved first using an appended physical axis designator (".x" or ".y").
@@ -26,6 +28,8 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 
 	/**The axis bound property.*/
 	public final static String AXIS_PROPERTY=getPropertyName(SliderControl.class, "axis");
+	/**The interval step bound property.*/
+	public final static String INTERVAL_PROPERTY=getPropertyName(SliderControl.class, "intervalStep");
 	/**The thumb image bound property.*/
 	public final static String THUMB_IMAGE_PROPERTY=getPropertyName(SliderControl.class, "thumbImage");
 	/**The thumb image resource key bound property.*/
@@ -82,6 +86,27 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 				converter=checkNull(newConverter, "Converter cannot be null.");	//actually change the value
 				firePropertyChange(CONVERTER_PROPERTY, oldConverter, newConverter);	//indicate that the value changed
 			}
+		}
+
+	/**The value of the intervals, or <code>null</code> if a default interval should be used.*/
+	private V interval=null;
+
+		/**@return The value of the intervals, or <code>null</code> if a default interval should be used.*/
+		public V getInterval() {return interval;}
+
+		/**Sets the value of the intervals.
+		This is a bound property.
+		@param newInterval The new value of the intervals, or <code>null</code> if a default interval should be used.
+		@see #INTERVAL_PROPERTY
+		*/
+		public void setInterval(final V newInterval) throws ValidationException
+		{
+			if(!ObjectUtilities.equals(interval, newInterval))	//if the value is really changing (compare their values, rather than identity)
+			{
+				final V oldInterval=interval;	//get the old value
+				interval=newInterval;	//actually change the value
+				firePropertyChange(INTERVAL_PROPERTY, oldInterval, newInterval);	//indicate that the value changed
+			}			
 		}
 
 	/**The thumb image URI, or <code>null</code> if there is no thumb image URI.*/
