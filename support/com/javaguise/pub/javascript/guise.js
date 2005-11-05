@@ -22,6 +22,11 @@ var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX c
 			targetID=""	<!--the ID of the target element on which the action occurred-->
 			actionID=""	<!--the action identifier-->
 		/>
+		<mouseEnter|mouseExit	<!--a mouse event related to a component-->
+			componentID=""	<!--the ID of the component-->
+		>
+			<mouse x="" y=""/>	<!--the mouse information at the time of the drop-->
+		</mouseEnter|mouseExit>
 	</events>
 </request>
 */
@@ -83,13 +88,13 @@ var STYLES=
 var dropTargets=new Array();
 
 /**The array of frame elements.*/
-var frames=new Array();
+var guiseFrames=new Array();
 
 /**Adds a frame to the array.
 This version adds the frame to the document, initializes the frame, and updates the modal state.
 @param frame The frame to add.
 */
-frames.add=function(frame)
+guiseFrames.add=function(frame)
 {
 //TODO fix so that it works both on IE and Firefox							oldElement.style.position="fixed";	//TODO testing
 	frame.style.position="absolute";	//change the element's position to absolute; it should already be set like this, but set it specifically so that dragging will know not to drag a copy TODO update the element's initial position
@@ -114,7 +119,7 @@ frames.add=function(frame)
 This version removes the frame to the document, uninitializes the frame, and updates the modal state.
 @param frame The frame to remove.
 */
-frames.remove=function(frame)
+guiseFrames.remove=function(frame)
 {
 	var index=this.indexOf(frame);	//get the frame index
 	if(index>=0)	//if we know the index of the frame
@@ -127,10 +132,10 @@ frames.remove=function(frame)
 };
 
 /**The current modal frame, or null if there is no modal frame.*/
-frames.modalFrame=null;
+guiseFrames.modalFrame=null;
 
 /**Updates the modal layer and current modal frame.*/
-frames.updateModal=function()
+guiseFrames.updateModal=function()
 {
 	this.modalFrame=null;	//start out presuming there is no modal frame
 	for(var i=this.length-1; i>=0 && this.modalFrame==null; --i)	//for each frame, find the last modal frame
@@ -903,13 +908,15 @@ function DropAJAXEvent(dragState, dragSource, dropTarget, event)
 
 /**A class encapsulating mouse information for an AJAX request.
 @param eventType: The type of mouse event; one of MouseAJAXEvent.EventType.
+@param componentID: The ID of the source component.
 @param target: The element indicating the target of the event.
 @param event: The W3C event object associated with the drop.
 var eventType: The type of mouse event; one of MouseAJAXEvent.EventType.
 var componentID: The ID of the target component.
+var targetID: The ID of the target element.
 var mousePosition: The position of the mouse.
 */
-function MouseAJAXEvent(eventType, target, event)
+function MouseAJAXEvent(eventType, component, target, event)
 {
 /*TODO del if not needed
 	if(!MouseAJAXEvent.prototype._initialized)
@@ -918,12 +925,13 @@ function MouseAJAXEvent(eventType, target, event)
 	}
 */
 	this.eventType=eventType;	//save the event type
-	this.componentID=target.id;	//save the drag source
+	this.componentID=component.id;	//save the component ID
+	this.targetID=target.id;	//save the target ID
 	this.mousePosition=new Point(event.clientX, event.clientY);	//save the mouse position
 }
 
 /**The available types of mouse events.*/
-MouseAJAXEvent.EventType={ENTER: "enter", EXIT: "exit"};
+MouseAJAXEvent.EventType={ENTER: "mouseEnter", EXIT: "mouseExit"};
 
 //HTTP Communicator
 
@@ -1121,8 +1129,7 @@ function GuiseAJAX()
 				REQUEST: "request", EVENTS: "events",
 				FORM: "form", CONTROL: "control", NAME: "name", VALUE: "value",
 				ACTION: "action", COMPONENT_ID: "componentID", TARGET_ID: "targetID", ACTION_ID: "actionID",
-				DROP: "drop", SOURCE: "source", TARGET: "target", MOUSE_POS: "mousePos", ID: "id", X: "x", Y: "y",
-				MOUSE: "mouse", TYPE: "type",
+				DROP: "drop", SOURCE: "source", TARGET: "target", MOUSE: "mouse", ID: "id", X: "x", Y: "y",
 				INIT: "init"
 			};
 
@@ -1254,8 +1261,8 @@ function GuiseAJAX()
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.SOURCE);	//</source>
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.TARGET, new Parameter(this.RequestElement.ID, ajaxDropEvent.dropTarget.id));	//<target id="id">
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.TARGET);	//</target>
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE_POS, new Parameter(this.RequestElement.X, ajaxDropEvent.mousePosition.x), new Parameter(this.RequestElement.Y, ajaxDropEvent.mousePosition.y));	//<mousePos x="x" y="y">
-			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.MOUSE_POS);	//</mousePos>
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE, new Parameter(this.RequestElement.X, ajaxDropEvent.mousePosition.x), new Parameter(this.RequestElement.Y, ajaxDropEvent.mousePosition.y));	//<mouse x="x" y="y">
+			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.MOUSE);	//</mouse>
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.DROP);	//</drop>
 			return stringBuilder;	//return the string builder
 		};
@@ -1267,12 +1274,12 @@ function GuiseAJAX()
 		*/
 		GuiseAJAX.prototype._appendMouseAJAXEvent=function(stringBuilder, ajaxMouseEvent)
 		{
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE, new Parameter(this.RequestElement.TYPE, ajaxMouseEvent.eventType));	//<mouse type="eventType">
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.TARGET, new Parameter(this.RequestElement.ID, ajaxMouseEvent.componentID));	//<target id="id">
-			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.TARGET);	//</target>
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE_POS, new Parameter(this.RequestElement.X, ajaxMouseEvent.mousePosition.x), new Parameter(this.RequestElement.Y, ajaxMouseEvent.mousePosition.y));	//<mousePos x="x" y="y">
-			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.MOUSE_POS);	//</mousePos>
+			DOMUtilities.appendXMLStartTag(stringBuilder, ajaxMouseEvent.eventType,	//<mouseXXX>
+					new Parameter(this.RequestElement.COMPONENT_ID, ajaxMouseEvent.componentID),	//componentID="componentID"
+					new Parameter(this.RequestElement.TARGET_ID, ajaxMouseEvent.targetID));	//targetID="targetID"
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE, new Parameter(this.RequestElement.X, ajaxMouseEvent.mousePosition.x), new Parameter(this.RequestElement.Y, ajaxMouseEvent.mousePosition.y));	//<mouse x="x" y="y">
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.MOUSE);	//</mouse>
+			DOMUtilities.appendXMLEndTag(stringBuilder, ajaxMouseEvent.eventType);	//</mouseXXX>
 			return stringBuilder;	//return the string builder
 		};
 
@@ -1433,7 +1440,7 @@ alert(exception);
 //TODO fix alert("ready to import node");
 							oldElement=document.importNode(childNode, true);	//create an import clone of the node
 //TODO del alert("ready to add frame: "+typeof oldElement);
-							frames.add(oldElement);	//add this frame
+							guiseFrames.add(oldElement);	//add this frame
 //TODO fix alert("frame added");
 						}
 					}
@@ -1452,10 +1459,10 @@ alert(exception);
 				var oldElement=document.getElementById(id);	//get the old element
 				if(oldElement!=null)	//if we found the old element
 				{
-					if(frames.contains(oldElement))	//if we're removing a frame
+					if(guiseFrames.contains(oldElement))	//if we're removing a frame
 					{
 //TODO fix alert("removing frame "+id);
-						frames.remove(oldElement);	//remove the frame
+						guiseFrames.remove(oldElement);	//remove the frame
 					}
 					else	//if we're removing any other node
 					{
@@ -2365,8 +2372,8 @@ function initializeNode(node)
 							eventManager.addEvent(node, "mousedown", onDragBegin, false);	//listen for mouse down on a drag handle
 							break;
 						case STYLES.MOUSE_LISTENER:
-							eventManager.addEvent(node, "mouseover", onMouseOver, false);	//listen for mouse over on a mouse listener
-							eventManager.addEvent(node, "mouseout", onMouseOut, false);	//listen for mouse out on a mouse listener
+							eventManager.addEvent(node, "mouseover", onMouse, false);	//listen for mouse over on a mouse listener
+							eventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener
 							break;
 						case STYLES.DROP_TARGET:
 							dropTargets.add(node);	//add this node to the list of drop targets
@@ -2455,15 +2462,15 @@ var lastFocusedNode=null;
 function onFocus(event)
 {
 	var currentTarget=event.currentTarget;	//get the control receiving the focus
-	if(frames.modalFrame!=null)	//if there is a modal frame
+	if(guiseFrames.modalFrame!=null)	//if there is a modal frame
 	{
 	
 //TODO del var dummy=currentTarget.nodeName+" "+currentTarget.id;
 
-		if(!hasAncestor(currentTarget, frames.modalFrame))	//if focus is trying to go to something outside the modal frame
+		if(!hasAncestor(currentTarget, guiseFrames.modalFrame))	//if focus is trying to go to something outside the modal frame
 		{
 //TODO fix alert("focus outside of frame");
-			if(hasAncestor(lastFocusedNode, frames.modalFrame))	//if we know the last focused node, and it was in the modal frame
+			if(hasAncestor(lastFocusedNode, guiseFrames.modalFrame))	//if we know the last focused node, and it was in the modal frame
 			{
 
 //TODO del dummy+=" changing to last focused "+lastFocusedNode.nodeName+" id "+lastFocusedNode.id;
@@ -2474,7 +2481,7 @@ function onFocus(event)
 			}
 			else	//if we don't know the last focused node
 			{
-				var focusable=getFocusableDescendant(frames.modalFrame);	//see if the modal frame has a node that can be focused
+				var focusable=getFocusableDescendant(guiseFrames.modalFrame);	//see if the modal frame has a node that can be focused
 				if(focusable)	//if we found a focusable node
 				{
 //TODO del dummy+=" changing to first focusable "+focusable.nodeName+" id "+focusable.id;
@@ -3166,10 +3173,10 @@ function getDropTarget(x, y)
 	}
 }
 
-/**Called when the mouse enters a mouse listener.
+/**Called when the mouse enters or exits a mouse listener.
 @param event The object describing the event.
 */
-function onMouseOver(event)	//TODO maybe eventually combine onMouseOver() and onMouseOut(), using event.type to distinguish between the events
+function onMouse(event)
 {
 	var relatedTarget=event.relatedTarget;	//get the related target
 	if(relatedTarget)	//if there is a related target, see if we should ignore the event
@@ -3188,44 +3195,23 @@ function onMouseOver(event)	//TODO maybe eventually combine onMouseOver() and on
 			return;	//ignore extraneous mouse events
 		}
 	}
-	var target=event.target;	//get the target of the event
+	var target=event.currentTarget;	//get the target of the event
 	var component=getAncestorElementByClassName(target, "component");	//get the component element
 	if(component)	//if we know the component
 	{
-		var ajaxRequest=new MouseAJAXEvent(MouseAJAXEvent.EventType.ENTER, component, event);	//create a new AJAX mouse enter event
-		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
-		event.stopPropagation();	//tell the event to stop bubbling
-		event.preventDefault();	//prevent the default functionality from occurring
-	}	
-}
-
-/**Called when the mouse exits a mouse listener.
-@param event The object describing the event.
-*/
-function onMouseOut(event)
-{
-	var relatedTarget=event.relatedTarget;	//get the related target
-	if(relatedTarget)	//if there is a related target, see if we should ignore the event
-	{
-		var ignoreEvent=event.currentTarget==relatedTarget;	//ignore the event if is generated by leaving the same element, as Mozilla does (TODO probably see if relatedTarget is a child of current target)
-		try
+		var eventType;	//we'll determine the type of AJAX mouse event to send
+		switch(event.type)	//see which type of mouse event this is
 		{
-			var dummy=relatedTarget.nodeName;	//try to get the event.relatedTarget.nodeName, which on Mozilla will fail on the events we should ignore
+			case "mouseover":	//TODO use a constant
+				eventType=MouseAJAXEvent.EventType.ENTER;
+				break;
+			case "mouseout":	//TODO use a constant
+				eventType=MouseAJAXEvent.EventType.EXIT;
+				break;
+			default:	//TODO assert an error or warning
+				return;				
 		}
-		catch(e)	//if we can't access the related target node name, this is one of the Mozilla bug events
-		{
-			ignoreEvent=true;	//ignore the event
-		}
-		if(ignoreEvent)	//if we should ignore the event
-		{
-			return;	//ignore extraneous mouse events
-		}
-	}
-	var target=event.target;	//get the target of the event
-	var component=getAncestorElementByClassName(target, "component");	//get the component element
-	if(component)	//if we know the component
-	{
-		var ajaxRequest=new MouseAJAXEvent(MouseAJAXEvent.EventType.EXIT, component, event);	//create a new AJAX mouse exit event
+		var ajaxRequest=new MouseAJAXEvent(eventType, component, target, event);	//create a new AJAX mouse event
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		event.stopPropagation();	//tell the event to stop bubbling
 		event.preventDefault();	//prevent the default functionality from occurring

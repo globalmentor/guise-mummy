@@ -823,7 +823,6 @@ Debug.trace("now have frames: ", frames.size());
 	This method checks all frames in the session.
 	If a given component is dirty, its child views will not be checked.
 	@param session The Guise session to check for dirty views.
-	@return The components with views needing to be updated. 
 	*/
 	protected void getControlsByName(final GuiseSession session, final String name, final Set<Component<?>> componentSet)	//TODO comment; tidy
 	{
@@ -978,22 +977,21 @@ Debug.trace("now have frames: ", frames.size());
 							final DropControlEvent dropEvent=new DropControlEvent(dragSourceID, dropTargetID);	//create a new drop event
 							controlEventList.add(dropEvent);	//add the event to the list
 						}
-						else if("mouse".equals(eventNode.getNodeName()))	//if this is a drop event TODO use a constant
+						else if("mouseEnter".equals(eventNode.getNodeName()) || "mouseExit".equals(eventNode.getNodeName()))	//if this is a mouse event TODO use a constant
 						{
-							final String type=((Element)eventNode).getAttribute("type");	//TODO tidy; improve; comment
-							if(type!=null)	//if we have an event type
+							try
 							{
-								try
+								final MouseControlEvent.EventType eventType=MouseControlEvent.EventType.valueOf(eventNode.getNodeName().toUpperCase());	//get the event type from the type string
+								final String componentID=eventElement.getAttribute("componentID");	//get the ID of the component TODO use a constant
+								if(componentID!=null)	//if there is a component ID TODO add better event handling, to throw an error and send back that error
 								{
-									final MouseControlEvent.EventType eventType=MouseControlEvent.EventType.valueOf(type.toUpperCase());	//get the event type from the type string
-									final Node targetNode=XPath.getNode(eventNode, AJAX_REQUEST_TARGET_XPATH_EXPRESSION);	//get the target node
-									final String targetID=((Element)targetNode).getAttribute("id");	//TODO tidy; improve; comment
-									final MouseControlEvent mouseEvent=new MouseControlEvent(eventType, targetID);	//create a new mouse event
+									final String targetID=eventElement.getAttribute("targetID");	//get the ID of the target element TODO use a constant
+									final MouseControlEvent mouseEvent=new MouseControlEvent(eventType, componentID, targetID);	//create a new mouse event
 									controlEventList.add(mouseEvent);	//add the event to the list
 								}
-								catch(final IllegalArgumentException illegalArgumentException)	//if we don't ignore the event type, don't create an event
-								{								
-								}
+							}
+							catch(final IllegalArgumentException illegalArgumentException)	//if we don't ignore the event type, don't create an event
+							{								
 							}
 						}
 						else if("init".equals(eventNode.getNodeName()))	//if this is an initialization event TODO use a constant

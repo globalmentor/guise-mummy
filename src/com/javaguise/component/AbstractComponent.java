@@ -488,7 +488,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 
 		/**Sets whether the component is has dragging enabled.
 		This is a bound property of type <code>Boolean</code>.
-		@param newDragEnabled <code>true</code> if the component should allow dragging, else false, else <code>false</code>.
+		@param newDragEnabled <code>true</code> if the component should allow dragging, else <code>false</code>.
 		@see Component#DRAG_ENABLED_PROPERTY
 		*/
 		public void setDragEnabled(final boolean newDragEnabled)
@@ -509,7 +509,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 
 		/**Sets whether the component is has dropping enabled.
 		This is a bound property of type <code>Boolean</code>.
-		@param newDropEnabled <code>true</code> if the component should allow dropping, else false, else <code>false</code>.
+		@param newDropEnabled <code>true</code> if the component should allow dropping, else <code>false</code>.
 		@see Component#DROP_ENABLED_PROPERTY
 		*/
 		public void setDropEnabled(final boolean newDropEnabled)
@@ -519,6 +519,109 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 				final boolean oldDropEnabled=dropEnabled;	//get the current value
 				dropEnabled=newDropEnabled;	//update the value
 				firePropertyChange(DRAG_ENABLED_PROPERTY, Boolean.valueOf(oldDropEnabled), Boolean.valueOf(newDropEnabled));
+			}
+		}
+
+	/**Whether flyovers are enabled for this component.*/
+	private boolean flyoverEnabled=false;
+
+		/**@return Whether flyovers are enabled for this component.*/
+		public boolean isFlyoverEnabled() {return flyoverEnabled;}
+
+		/**A reference to the default flyover strategy, if we're using one.*/
+		private FlyoverStrategy<C> defaultFlyoverStrategy=null;
+		
+		/**Sets whether flyovers are enabled for this component.
+		Flyovers contain information from the component model's "description" property.
+		This implementation adds or removes a default flyover strategy if one is not already installed.
+		This is a bound property of type <code>Boolean</code>.
+		@param newFlyoverEnabled <code>true</code> if the component should display flyovers, else <code>false</code>.
+		@see Model#getDescription()
+		@see Component#FLYOVER_ENABLED_PROPERTY
+		*/
+		public void setFlyoverEnabled(final boolean newFlyoverEnabled)
+		{
+			if(flyoverEnabled!=newFlyoverEnabled)	//if the value is really changing
+			{
+				final boolean oldFlyoverEnabled=flyoverEnabled;	//get the current value
+				flyoverEnabled=newFlyoverEnabled;	//update the value
+				if(newFlyoverEnabled)	//if flyovers are now enabled
+				{
+					if(getFlyoverStrategy()==null)	//if no flyover strategy is installed
+					{
+						defaultFlyoverStrategy=new DefaultFlyoverStrategy<C>(getThis());	//create a default flyover strategy
+						setFlyoverStrategy(defaultFlyoverStrategy);	//start using our default flyover strategy
+					}
+				}
+				else	//if flyovers are now disabled
+				{
+					if(defaultFlyoverStrategy!=null)	//if we had created a default flyover strategy
+					{
+						if(getFlyoverStrategy()==defaultFlyoverStrategy)	//if we were using the default flyover strategy
+						{
+							setFlyoverStrategy(null);	//remove our default flyover strategy
+						}
+						defaultFlyoverStrategy=null;	//release the default flyover strategy
+					}
+				}
+				firePropertyChange(FLYOVER_ENABLED_PROPERTY, Boolean.valueOf(oldFlyoverEnabled), Boolean.valueOf(newFlyoverEnabled));
+			}
+		}
+
+		/**The installed flyover strategy, or <code>null</code> if there is no flyover strategy installed.*/
+		private FlyoverStrategy<? super C> flyoverStrategy=null;
+
+			/**@return The installed flyover strategy, or <code>null</code> if there is no flyover strategy installed.*/
+			public FlyoverStrategy<? super C> getFlyoverStrategy() {return flyoverStrategy;}
+
+			/**Sets the strategy for controlling flyovers.
+			The flyover strategy will be registered as a mouse listener for this component.
+			This is a bound property.
+			@param newFlyoverStrategy The new flyover strategy, or <code>null</code> if there is no flyover strategy installed.
+			@see Component#FLYOVER_STRATEGY_PROPERTY 
+			*/
+			public void setFlyoverStrategy(final FlyoverStrategy<? super C> newFlyoverStrategy)
+			{
+				if(flyoverStrategy!=newFlyoverStrategy)	//if the value is really changing
+				{
+					final FlyoverStrategy<? super C> oldFlyoverStrategy=flyoverStrategy;	//get the old value
+					if(oldFlyoverStrategy!=null)	//if there was a flyover strategy
+					{
+						removeMouseListener(oldFlyoverStrategy);	//let the old flyover strategy stop listening for mouse events
+						if(oldFlyoverStrategy==defaultFlyoverStrategy)	//if the default flyover strategy was just uninstalled
+						{
+							defaultFlyoverStrategy=null;	//we don't need to keep around default flyover strategy
+						}
+					}
+					flyoverStrategy=newFlyoverStrategy;	//actually change the value
+					if(newFlyoverStrategy!=null)	//if there is now a new flyover strategy
+					{
+						addMouseListener(newFlyoverStrategy);	//let the new flyover strategy start listening for mouse events
+					}					
+					firePropertyChange(FLYOVER_STRATEGY_PROPERTY, oldFlyoverStrategy, newFlyoverStrategy);	//indicate that the value changed
+				}			
+			}
+
+	/**Whether tooltips are enabled for this component.*/
+	private boolean tooltipEnabled=true;
+
+		/**@return Whether tooltips are enabled for this component.*/
+		public boolean isTooltipEnabled() {return tooltipEnabled;}
+
+		/**Sets whether tooltips are enabled for this component.
+		Tooltips contain information from the component model's "info" property.
+		This is a bound property of type <code>Boolean</code>.
+		@param newTooltipEnabled <code>true</code> if the component should display tooltips, else <code>false</code>.
+		@see Model#getInfo()
+		@see Component#TOOLTIP_ENABLED_PROPERTY
+		*/
+		public void setTooltipEnabled(final boolean newTooltipEnabled)
+		{
+			if(tooltipEnabled!=newTooltipEnabled)	//if the value is really changing
+			{
+				final boolean oldTooltipEnabled=tooltipEnabled;	//get the current value
+				tooltipEnabled=newTooltipEnabled;	//update the value
+				firePropertyChange(TOOLTIP_ENABLED_PROPERTY, Boolean.valueOf(oldTooltipEnabled), Boolean.valueOf(newTooltipEnabled));
 			}
 		}
 
@@ -899,4 +1002,108 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		}
 		return stringBuilder.toString();	//return the string builder
 	}
+
+	/**An abstract implementation of a strategy for showing and hiding flyovers in response to mouse events.
+	@param <S> The type of component for which this object is to control flyovers.
+	@author Garret Wilson
+	*/
+	public static abstract class AbstractFlyoverStrategy<S extends Component<?>> implements FlyoverStrategy<S>
+	{
+		/**The component for which this object will control flyovers.*/
+		private final S component;
+
+			/**@return The component for which this object will control flyovers.*/
+			public S getComponent() {return component;}
+
+		/**Component constructor.
+		@param component The component for which this object will control flyovers.
+		@exception NullPointerException if the given component is <code>null</code>.
+		*/
+		public AbstractFlyoverStrategy(final S component)
+		{
+			this.component=checkNull(component, "Component cannot be null.");			
+		}
+		/**Called when the mouse enters the source.
+		This implementation opens the flyover.
+		@param mouseEvent The event providing mouse information
+		@see #openFlyover()
+		*/
+		public void mouseEntered(final MouseEvent<S> mouseEvent)
+		{
+			openFlyover();	//open the flyover
+		}
+
+		/**Called when the mouse exits the source.
+		This implementation closes any open flyover.
+		@param mouseEvent The event providing mouse information
+		@see #closeFlyover()
+		*/
+		public void mouseExited(final MouseEvent<S> mouseEvent)
+		{
+			closeFlyover();	//close the flyover if it is open
+		}
+	}
+	
+	
+	/**The default strategy for showing and hiding flyovers in response to mouse events.
+	This implementation uses frames to represent flyovers.
+	@param <S> The type of component for which this object is to control flyovers.
+	@author Garret Wilson
+	*/
+	public static class DefaultFlyoverStrategy<S extends Component<?>> extends AbstractFlyoverStrategy<S>
+	{
+		/**The frame used for displaying flyovers.*/
+		private Frame<?> flyoverFrame=null;
+
+		/**Component constructor.
+		@param component The component for which this object will control flyovers.
+		@exception NullPointerException if the given component is <code>null</code>.
+		*/
+		public DefaultFlyoverStrategy(final S component)
+		{
+			super(component);	//construct the parent class
+		}
+
+		/**Shows a flyover for the component.
+		This implementation creates a flyover frame if necessary and then opens the frame.
+		@see #createFrame()
+		*/
+		public void openFlyover()
+		{
+			if(flyoverFrame==null)	//if no flyover frame has been created
+			{
+Debug.trace("no frame; created");
+				flyoverFrame=createFrame();	//create a new frame
+//TODO fix				frame.getModel().setLabel("Flyover");
+				flyoverFrame.open();				
+			}			
+		}
+
+		/**Closes the flyover for the component.
+		This implementation closes any open flyover frame.
+		*/
+		public void closeFlyover()
+		{
+			if(flyoverFrame!=null)	//if there is a flyover frame
+			{
+				flyoverFrame.close();	//close the frame
+				flyoverFrame=null;	//release our reference to the frame
+			}			
+		}
+
+		/**@return A new frame for displaying flyover information.*/
+		protected Frame<?> createFrame()
+		{
+			final S component=getComponent();	//get the component
+			final GuiseSession session=component.getSession();	//get the session
+			final Frame<?> frame=new DefaultFrame(session);	//create a default frame
+			//TODO set the related component
+			final Message message=new Message(session);	//create a new message
+			message.getModel().setMessageContentType(component.getModel().getDescriptionContentType());	//set the appropriate message content
+			message.getModel().setMessage(component.getModel().getDescription());	//set the appropriate message text
+			frame.setContent(message);	//put the message in the frame
+			return frame;	//return the frame we created
+		}
+	}
+
 }

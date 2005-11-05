@@ -4,17 +4,20 @@ import java.io.IOException;
 import java.util.*;
 
 import com.garretwilson.beans.PropertyBindable;
+import com.garretwilson.util.Debug;
 import com.javaguise.component.layout.Orientation;
 import com.javaguise.component.transfer.*;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.ControlEvent;
 import com.javaguise.controller.Controller;
+import com.javaguise.event.MouseAdapter;
 import com.javaguise.event.MouseEvent;
 import com.javaguise.event.MouseListener;
 import com.javaguise.geometry.Dimensions;
 import com.javaguise.geometry.Extent;
 
 import static com.garretwilson.lang.ClassUtilities.*;
+import static com.garretwilson.lang.ObjectUtilities.checkNull;
 
 import com.javaguise.model.Model;
 import com.javaguise.session.GuiseSession;
@@ -40,6 +43,12 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	public final static String DRAG_ENABLED_PROPERTY=getPropertyName(Component.class, "dragEnabled");
 	/**The bound property of whether the component has dropping enabled.*/
 	public final static String DROP_ENABLED_PROPERTY=getPropertyName(Component.class, "dropEnabled");
+	/**The bound property of whether the component has flyovers enabled.*/
+	public final static String FLYOVER_ENABLED_PROPERTY=getPropertyName(Component.class, "flyoverEnabled");
+	/**The bound property of the strategy controlling flyovers.*/
+	public final static String FLYOVER_STRATEGY_PROPERTY=getPropertyName(Component.class, "flyoverStrategy");
+	/**The bound property of whether the component has tooltips enabled.*/
+	public final static String TOOLTIP_ENABLED_PROPERTY=getPropertyName(Component.class, "tooltipEnabled");
 	/**The opacity bound property.*/
 	public final static String OPACITY_PROPERTY=getPropertyName(Component.class, "opacity");
 	/**The orientation bound property.*/
@@ -253,7 +262,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 
 	/**Sets whether the component is has dragging enabled.
 	This is a bound property of type <code>Boolean</code>.
-	@param newDragEnabled <code>true</code> if the component should allow dragging, else false, else <code>false</code>.
+	@param newDragEnabled <code>true</code> if the component should allow dragging, else <code>false</code>.
 	@see #DRAG_ENABLED_PROPERTY
 	*/
 	public void setDragEnabled(final boolean newDragEnabled);
@@ -263,10 +272,34 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 
 	/**Sets whether the component is has dropping enabled.
 	This is a bound property of type <code>Boolean</code>.
-	@param newDropEnabled <code>true</code> if the component should allow dropping, else false, else <code>false</code>.
+	@param newDropEnabled <code>true</code> if the component should allow dropping, else <code>false</code>.
 	@see #DROP_ENABLED_PROPERTY
 	*/
 	public void setDropEnabled(final boolean newDropEnabled);
+
+	/**@return Whether flyovers are enabled for this component.*/
+	public boolean isFlyoverEnabled();
+
+	/**Sets whether flyovers are enabled for this component.
+	Flyovers contain information from the component model's "description" property.
+	This is a bound property of type <code>Boolean</code>.
+	@param newFlyoverEnabled <code>true</code> if the component should display flyovers, else <code>false</code>.
+	@see Model#getDescription()
+	@see #FLYOVER_ENABLED_PROPERTY
+	*/
+	public void setFlyoverEnabled(final boolean newFlyoverEnabled);
+
+	/**@return Whether tooltips are enabled for this component.*/
+	public boolean isTooltipEnabled();
+
+	/**Sets whether tooltips are enabled for this component.
+	Tooltips contain information from the component model's "info" property.
+	This is a bound property of type <code>Boolean</code>.
+	@param newTooltipEnabled <code>true</code> if the component should display tooltips, else <code>false</code>.
+	@see Model#getInfo()
+	@see #TOOLTIP_ENABLED_PROPERTY
+	*/
+	public void setTooltipEnabled(final boolean newTooltipEnabled);
 
 	/**Adds an export strategy to the component.
 	The export strategy will take prececence over any compatible export strategy previously added.
@@ -359,5 +392,18 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@see MouseEvent
 	*/
 	public void fireMouseExited();
+
+	/**A strategy for showing and hiding flyovers in response to mouse events.
+	@param <S> The type of component for which this object is to control flyovers.
+	@author Garret Wilson
+	*/
+	public interface FlyoverStrategy<S extends Component<?>> extends MouseListener<S>
+	{
+		/**Shows a flyover for the component.*/
+		public void openFlyover();
+
+		/**Closes the flyover for the component.*/
+		public void closeFlyover();
+	}
 
 }

@@ -131,6 +131,27 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 			}
 		}
 
+	/**The related component such as a popup source, or <code>null</code> if the frame is not related to another component.*/
+	private Component<?> relatedComponent=null;
+
+		/**@return The related component such as a popup source, or <code>null</code> if the frame is not related to another component.*/
+		public Component<?> getRelatedComponent() {return relatedComponent;}
+
+		/**Sets the related component
+		This is a bound property.
+		@param newRelatedComponent The new related component, or <code>null</code> if the frame is not related to another component.
+		@see Frame#RELATED_COMPONENT_PROPERTY 
+		*/
+		public void setRelatedComponent(final Component<?> newRelatedComponent)
+		{
+			if(relatedComponent!=newRelatedComponent)	//if the value is really changing
+			{
+				final Component<?> oldRelatedComponent=relatedComponent;	//get the old value
+				relatedComponent=newRelatedComponent;	//actually change the value
+				firePropertyChange(RELATED_COMPONENT_PROPERTY, oldRelatedComponent, newRelatedComponent);	//indicate that the value changed
+			}			
+		}
+
 	/**@return The data model used by this component.*/
 	public LabelModel getModel() {return (LabelModel)super.getModel();}
 

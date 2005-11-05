@@ -42,7 +42,7 @@ public abstract class AbstractModel extends GuiseBoundPropertyObject implements 
 
 		/**Sets the advisory information text, such as might appear in a tooltip.
 		This is a bound property.
-		@param newInfo The new text of the advisory information text, such as might appear in a tooltip.
+		@param newInfo The new text of the advisory information, such as might appear in a tooltip.
 		@see Model#INFO_PROPERTY
 		*/
 		public void setInfo(final String newInfo)
@@ -104,6 +104,84 @@ public abstract class AbstractModel extends GuiseBoundPropertyObject implements 
 			}
 		}
 
+	/**The description text, such as might appear in a flyover, or <code>null</code> if there is no description.*/
+	private String description=null;
+
+		/**Determines the description text, such as might appear in a flyover.
+		If a description is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
+		@return The description text, such as might appear in a flyover, or <code>null</code> if there is no description.
+		@exception MissingResourceException if there was an error loading the value from the resources.
+		@see #getDescriptionResourceKey()
+		*/
+		public String getDescription() throws MissingResourceException
+		{
+			return getString(description, getDescriptionResourceKey());	//get the value or the resource, if available
+		}
+
+		/**Sets the description text, such as might appear in a flyover.
+		This is a bound property.
+		@param newDescription The new text of the description, such as might appear in a flyover.
+		@see Model#DESCRIPTION_PROPERTY
+		*/
+		public void setDescription(final String newDescription)
+		{
+			if(!ObjectUtilities.equals(description, newDescription))	//if the value is really changing
+			{
+				final String oldDescription=description;	//get the old value
+				description=newDescription;	//actually change the value
+				firePropertyChange(DESCRIPTION_PROPERTY, oldDescription, newDescription);	//indicate that the value changed
+			}			
+		}
+
+	/**The content type of the description text.*/
+	private ContentType descriptionContentType=PLAIN_TEXT_CONTENT_TYPE;
+
+		/**@return The content type of the description text.*/
+		public ContentType getDescriptionContentType() {return descriptionContentType;}
+
+		/**Sets the content type of the description text.
+		This is a bound property.
+		@param newDescriptionContentType The new description text content type.
+		@exception NullPointerException if the given content type is <code>null</code>.
+		@exception IllegalArgumentException if the given content type is not a text content type.
+		@see Model#DESCRIPTION_CONTENT_TYPE_PROPERTY
+		*/
+		public void setDescriptionContentType(final ContentType newDescriptionContentType)
+		{
+			checkNull(newDescriptionContentType, "Content type cannot be null.");
+			if(descriptionContentType!=newDescriptionContentType)	//if the value is really changing
+			{
+				final ContentType oldDescriptionContentType=descriptionContentType;	//get the old value
+				if(!isText(newDescriptionContentType))	//if the new content type is not a text content type
+				{
+					throw new IllegalArgumentException("Content type "+newDescriptionContentType+" is not a text content type.");
+				}
+				descriptionContentType=newDescriptionContentType;	//actually change the value
+				firePropertyChange(DESCRIPTION_CONTENT_TYPE_PROPERTY, oldDescriptionContentType, newDescriptionContentType);	//indicate that the value changed
+			}			
+		}
+
+	/**The description text resource key, or <code>null</code> if there is no description text resource specified.*/
+	private String descriptionResourceKey=null;
+
+		/**@return The description text resource key, or <code>null</code> if there is no description text resource specified.*/
+		public String getDescriptionResourceKey() {return descriptionResourceKey;}
+
+		/**Sets the key identifying the text of the description in the resources.
+		This is a bound property.
+		@param newDescriptionResourceKey The new description text resource key.
+		@see Model#DESCRIPTION_RESOURCE_KEY_PROPERTY
+		*/
+		public void setDescriptionResourceKey(final String newDescriptionResourceKey)
+		{
+			if(!ObjectUtilities.equals(descriptionResourceKey, newDescriptionResourceKey))	//if the value is really changing
+			{
+				final String oldDescriptionResourceKey=descriptionResourceKey;	//get the old value
+				descriptionResourceKey=newDescriptionResourceKey;	//actually change the value
+				firePropertyChange(DESCRIPTION_RESOURCE_KEY_PROPERTY, oldDescriptionResourceKey, newDescriptionResourceKey);	//indicate that the value changed
+			}
+		}
+		
 	/**Session constructor.
 	@param session The Guise session that owns this model.
 	@exception NullPointerException if the given session is <code>null</code>.

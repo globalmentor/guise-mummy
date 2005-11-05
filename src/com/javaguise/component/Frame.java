@@ -18,6 +18,8 @@ public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalC
 	public final static String MODAL_PROPERTY=getPropertyName(Frame.class, "modal");
 	/**The bound property of whether the component is movable.*/
 	public final static String MOVABLE_PROPERTY=getPropertyName(Frame.class, "movable");
+	/**The bound property of the related component.*/
+	public final static String RELATED_COMPONENT_PROPERTY=getPropertyName(Frame.class, "relatedComponent");
 	/**The bound property of whether the frame can be resized.*/
 	public final static String RESIZABLE_PROPERTY=getPropertyName(Frame.class, "resizable");
 	/**The bound state property.*/
@@ -64,6 +66,16 @@ public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalC
 	@see #RESIZABLE_PROPERTY
 	*/
 	public void setResizable(final boolean newResizable);
+
+	/**@return The related component such as a popup source, or <code>null</code> if the frame is not related to another component.*/
+	public Component<?> getRelatedComponent();
+
+	/**Sets the related component
+	This is a bound property.
+	@param newRelatedComponent The new related component, or <code>null</code> if the frame is not related to another component.
+	@see Frame#RELATED_COMPONENT_PROPERTY 
+	*/
+	public void setRelatedComponent(final Component<?> newRelatedComponent);
 
 	/**@return The data model used by this component.*/
 	public LabelModel getModel();
