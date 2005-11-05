@@ -160,6 +160,15 @@ Debug.trace("list control changed value to", newValue);
 		testLabel.setDragEnabled(true);
 		testLabel.setStyleID("title");
 		testLabel.getModel().setLabel("This is label text from the model.");
+		
+		
+		final Object testCookie=session.getEnvironment().getProperty("testCookie");
+		if(testCookie instanceof String)
+		{
+			testLabel.getModel().setLabel((String)testCookie);
+		}
+		
+		
 		contentPanel.add(testLabel);	//add a new label
 		
 		final LayoutPanel buttonPanel=new LayoutPanel(session, "testButtonPanel", new FlowLayout(session, Orientation.Flow.LINE));	//create a panel flowing horizontally
@@ -216,6 +225,7 @@ Debug.trace("list control changed value to", newValue);
 
 						myDialog.open();
 						
+						session.getEnvironment().setProperty("testCookie", "This is a successful cookie value.");
 						
 /*TODO bring back
 						final Label label=new Label(session, new DefaultLabelModel(session, "Are you sure?"));
@@ -245,7 +255,13 @@ Debug.trace("list control changed value to", newValue);
 				{
 					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
 					{
+
+						session.getEnvironment().removeProperty("testCookie");
+
 						testLabel.getModel().setLabel("The link works.");
+
+					
+					
 					}
 				});
 		buttonPanel.add(testLink);	//add a new button

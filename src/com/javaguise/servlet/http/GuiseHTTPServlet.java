@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.*;
+import java.util.Map.Entry;
 
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
@@ -13,6 +14,7 @@ import static java.util.Collections.*;
 import javax.mail.internet.ContentType;
 import javax.servlet.*;
 import javax.servlet.http.*;
+import javax.servlet.http.Cookie;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -47,6 +49,8 @@ import com.garretwilson.lang.ObjectUtilities;
 import static com.garretwilson.io.ContentTypeConstants.*;
 import static com.garretwilson.io.ContentTypeUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
+
+import com.garretwilson.net.URIUtilities;
 import com.garretwilson.net.http.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 
@@ -463,6 +467,48 @@ Debug.info("content type:", request.getContentType());
 							}
 							throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
 						}
+						synchronizeCookies(request, response, guiseSession);	//synchronize the cookies going out in the response; do this before anything is written back to the client
+/*TODO del when works
+							//synchronize the cookies going out in the response; do this before anything is written back to the client; first remove unneeded cookies						
+						final GuiseEnvironment environment=guiseSession.getEnvironment();	//get the session's environment
+						final Cookie[] cookies=request.getCookies();	//get the cookies in the request
+						final Map<String, Cookie> cookieMap=new HashMap<String, Cookie>(cookies!=null ? cookies.length : 0);	//create a map to hold the cookies for quick lookup
+						if(cookies!=null)	//if a cookie array was returned
+						{
+							for(final Cookie cookie:cookies)	//for each cookie in the request
+							{
+								final String cookieName=cookie.getName();	//get the name of this cookie
+								final String environmentPropertyValue=asInstance(environment.getProperty(cookieName), String.class);	//see if there is a string environment property value for this cookie's name
+								if(environmentPropertyValue!=null)	//if a value in the environment matches the cookie's name
+								{
+									if(!ObjectUtilities.equals(cookie.getValue(), environmentPropertyValue))	//if the cookie's value doesn't match the environment property value
+									{
+										cookie.setValue(environmentPropertyValue);	//update the cookie's value
+									}
+									cookieMap.put(cookieName, cookie);	//store the cookie in the map
+								}
+								else	//if there is no such environment property, remove the cookie
+								{
+									cookie.setValue(null);	//remove the value now
+									cookie.setMaxAge(0);	//tell the cookie to expire immediately
+								}
+							}
+						}
+						for(final Map.Entry<String, Object> environmentPropertyEntry:environment.getProperties())	//iterate the environment properties so that new cookies can be added as needed
+						{
+							final String environmentPropertyName=environmentPropertyEntry.getKey();	//get the name of the environment property value
+							if(!cookieMap.containsKey(environmentPropertyName))	//if no cookie contains this environment variable
+							{
+								final String environmentPropertyValue=asInstance(environmentPropertyEntry.getValue(), String.class);	//get the environment property value as a string
+								if(environmentPropertyValue!=null)	//if there is a non-null environment property value
+								{									
+									final Cookie cookie=new Cookie(environmentPropertyName, environmentPropertyValue);	//create a new cookie
+									cookie.setMaxAge(Integer.MAX_VALUE);	//don't allow the cookie to expire for a very long time
+									response.addCookie(cookie);	//add the cookie to the response
+								}
+							}
+						}
+*/
 						guiseSession.getApplicationFrame().updateView(guiseContext);		//tell the application frame to update its view
 					}
 					else	//if we have no panel type for this address
@@ -626,7 +672,9 @@ Debug.trace("now have frames: ", frames.size());
 					Debug.trace("affected component:", affectedComponent);
 				}
 				
-				
+					//TODO this is not guaranteed to work here (although it works on Tomcat), because content has already been written to the server; change the context so that it collects everything into a StringBuilder before sending it back
+					//TODO move this to the bottom of the processing, as cookies only need to be updated before they go back
+				synchronizeCookies(request, response, guiseSession);	//synchronize the cookies going out in the response; do this before anything is written back to the client
 				
 				if(dirtyComponents.contains(applicationFrame))	//if the application frame itself was affected, we might as well reload the page
 				{
@@ -674,7 +722,65 @@ Debug.trace("now have frames: ", frames.size());
 			guiseContext.writeElementEnd(null, "response");	//</response>
 		}
 	}
-	
+
+	/**Synchronizes the cookies in a request with the environment properties in a Guise session.
+  Any cookies missing from the request will be added from the environment to the response.
+  @param request The HTTP request.
+  @param response The HTTP response.
+  @param guiseSession The Guise session.
+  */
+	protected void synchronizeCookies(final HttpServletRequest request, final HttpServletResponse response, final GuiseSession guiseSession)
+	{
+			//remove unneeded cookies from the request						
+		final String applicationBasePath=guiseSession.getApplication().getBasePath();	//get the application's base path
+		assert applicationBasePath!=null : "Application not yet installed during cookie synchronization.";
+		final GuiseEnvironment environment=guiseSession.getEnvironment();	//get the session's environment
+		final Cookie[] cookies=request.getCookies();	//get the cookies in the request
+		final Map<String, Cookie> cookieMap=new HashMap<String, Cookie>(cookies!=null ? cookies.length : 0);	//create a map to hold the cookies for quick lookup
+		if(cookies!=null)	//if a cookie array was returned
+		{
+			for(final Cookie cookie:cookies)	//for each cookie in the request
+			{
+				final String cookieName=cookie.getName();	//get the name of this cookie
+				if(!"jsessionid".equalsIgnoreCase(cookieName))	//ignore the session ID TODO use a constant
+				{
+					final String environmentPropertyValue=asInstance(environment.getProperty(cookieName), String.class);	//see if there is a string environment property value for this cookie's name
+					if(environmentPropertyValue!=null)	//if a value in the environment matches the cookie's name
+					{
+						if(!ObjectUtilities.equals(cookie.getValue(), encode(environmentPropertyValue)))	//if the cookie's value doesn't match the encoded environment property value
+						{
+							cookie.setValue(encode(environmentPropertyValue));	//update the cookie's value, making sure the value is encoded
+						}
+						cookieMap.put(cookieName, cookie);	//store the cookie in the map
+					}
+					else	//if there is no such environment property, remove the cookie
+					{
+						cookie.setValue(null);	//remove the value now
+						cookie.setPath(applicationBasePath);	//set the cookie path to the application base path, because we'll need the same base path as the one that was set
+						cookie.setMaxAge(0);	//tell the cookie to expire immediately
+						response.addCookie(cookie);	//add the cookie to the response to delete it
+					}
+				}
+			}
+		}
+			//add new cookies from the environment to the response
+		for(final Map.Entry<String, Object> environmentPropertyEntry:environment.getProperties())	//iterate the environment properties so that new cookies can be added as needed
+		{
+			final String environmentPropertyName=environmentPropertyEntry.getKey();	//get the name of the environment property value
+			if(!cookieMap.containsKey(environmentPropertyName))	//if no cookie contains this environment variable
+			{
+				final String environmentPropertyValue=asInstance(environmentPropertyEntry.getValue(), String.class);	//get the environment property value as a string
+				if(environmentPropertyValue!=null)	//if there is a non-null environment property value
+				{									
+					final Cookie cookie=new Cookie(environmentPropertyName, encode(environmentPropertyValue));	//create a new cookie with the encoded property value
+					cookie.setPath(applicationBasePath);	//set the cookie path to the application base path
+					cookie.setMaxAge(Integer.MAX_VALUE);	//don't allow the cookie to expire for a very long time
+					response.addCookie(cookie);	//add the cookie to the response
+				}
+			}
+		}		
+	}
+
 	/*TODO comment
 	@param context Guise context information.
 	*/
@@ -1183,6 +1289,15 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 				if(guiseSession==null)	//if no Guise session is associated with the given HTTP session
 				{
 					guiseSession=createGuiseSession(guiseApplication, httpSession);	//create a new Guise session
+					final GuiseEnvironment environment=guiseSession.getEnvironment();	//get the new session's environment
+					final Cookie[] cookies=httpRequest.getCookies();	//get the cookies in the request
+					if(cookies!=null)	//if a cookie array was returned
+					{
+						for(final Cookie cookie:cookies)	//for each cookie in the request
+						{
+							environment.setProperty(cookie.getName(), decode(cookie.getValue()));	//put this cookie's decoded value into the session's environment
+						}
+					}
 					guiseSession.initialize();	//let the Guise session know it's being initializes so that it can listen to the application
 					final Locale[] clientAcceptedLanguages=getAcceptedLanguages(httpRequest);	//get all languages accepted by the client
 					guiseSession.requestLocale(asList(clientAcceptedLanguages));	//ask the Guise session to change to one of the accepted locales, if the application supports one

@@ -7,6 +7,7 @@ import java.util.*;
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.event.PostponedEvent;
 import com.javaguise.GuiseApplication;
+import com.javaguise.GuiseEnvironment;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.Orientation;
 import com.javaguise.context.GuiseContext;
@@ -22,18 +23,32 @@ A Swing-based client application may have only one session, while a web server a
 public interface GuiseSession extends PropertyBindable
 {
 
+	/**The environment bound property.*/
+	public final static String ENVIRONMENT_PROPERTY=getPropertyName(GuiseSession.class, "environment");
+	/**The locale bound property.*/
+	public final static String LOCALE_PROPERTY=getPropertyName(GuiseSession.class, "locale");
 	/**The orientation bound property.*/
 	public final static String ORIENTATION_PROPERTY=getPropertyName(GuiseSession.class, "orientation");
 	/**The principal (e.g. user) bound property.*/
 	public final static String PRINCIPAL_PROPERTY=getPropertyName(GuiseSession.class, "principal");
-	/**The locale bound property.*/
-	public final static String LOCALE_PROPERTY=getPropertyName(GuiseSession.class, "locale");
 
 	/**@return The Guise application to which this session belongs.*/
 	public GuiseApplication getApplication();
 
 	/**@return The application frame.*/
 	public ApplicationFrame<?> getApplicationFrame();
+
+	/**@return The user local environment.*/
+	public GuiseEnvironment getEnvironment();
+
+	/**Sets the user local environment.
+	This method will not normally be called directly from applications.
+	This is a bound property.
+	@param newEnvironment The new user local environment.
+	@exception NullPointerException if the given environment is <code>null</code>.
+	@see #ENVIRONMENT_PROPERTY
+	*/
+	public void setEnvironment(final GuiseEnvironment newEnvironment);
 
 	/**@return An iterator to all visible frames.*/
 	public Iterator<Frame<?>> getFrameIterator();

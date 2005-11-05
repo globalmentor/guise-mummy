@@ -12,7 +12,7 @@ import static java.util.Collections.*;
 
 import com.garretwilson.beans.*;
 import com.garretwilson.event.PostponedEvent;
-import com.javaguise.GuiseApplication;
+import com.javaguise.*;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.Orientation;
 import com.javaguise.context.GuiseContext;
@@ -91,6 +91,29 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		}
 */
 
+	/**The user local environment.*/
+	private GuiseEnvironment environment;
+
+		/**@return The user local environment.*/
+		public GuiseEnvironment getEnvironment() {return environment;}
+
+		/**Sets the user local environment.
+		This method will not normally be called directly from applications.
+		This is a bound property.
+		@param newEnvironment The new user local environment.
+		@exception NullPointerException if the given environment is <code>null</code>.
+		@see GuiseSession#ENVIRONMENT_PROPERTY
+		*/
+		public void setEnvironment(final GuiseEnvironment newEnvironment)
+		{
+			if(!ObjectUtilities.equals(environment, newEnvironment))	//if the value is really changing (compare their values, rather than identity)
+			{
+				final GuiseEnvironment oldEnvironment=environment;	//get the old value
+				environment=checkNull(newEnvironment, "Guise session environment cannot be null.");	//actually change the value
+				firePropertyChange(ENVIRONMENT_PROPERTY, oldEnvironment, newEnvironment);	//indicate that the value changed
+			}
+		}
+	
 	/**The list of visible frames according to z-order.*/
 	private final List<Frame<?>> frameList=new CopyOnWriteArrayList<Frame<?>>();
 
@@ -558,6 +581,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	public AbstractGuiseSession(final GuiseApplication application)
 	{
 		this.application=application;	//save the Guise instance
+		this.environment=new DefaultGuiseEnvironment();	//create a default environment
 		this.locale=application.getDefaultLocale();	//default to the application locale
 		this.orientation=Orientation.getOrientation(locale);	//set the orientation default based upon the locale
 		this.applicationFrame=application.createApplicationFrame(this);	//create the application frame

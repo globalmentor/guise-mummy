@@ -96,7 +96,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		checkNull(basePath, "Application base path cannot be null");
 		if(!isAbsolutePath(basePath) || !isContainerPath(basePath))	//if the path doesn't begin and end with a slash
 		{
-			throw new IllegalArgumentException("Application base path "+basePath+" does not begin and ends with a path separator.");
+			throw new IllegalArgumentException("Application base path "+basePath+" does not begin and end with a path separator.");
 		}
 		this.container=container;	//store the container
 		this.basePath=basePath;	//store the base path

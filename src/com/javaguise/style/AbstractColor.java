@@ -2,8 +2,6 @@ package com.javaguise.style;
 
 import java.util.Arrays;
 
-import com.garretwilson.lang.ObjectUtilities;
-
 /**Abstract encapsulation of a color value.
 @param <C> The type of color component for this color space.
 @author Garret Wilson
