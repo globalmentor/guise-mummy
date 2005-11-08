@@ -345,7 +345,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 	/**Implementation of frame closing.*/
 	protected void closeImpl()
 	{
-Debug.trace("ready to remove frame");
+//TODO del Debug.trace("ready to remove frame");
 		getSession().removeFrame(this);	//remove the frame from the session
 		setState(State.CLOSED);	//change the state
 	}

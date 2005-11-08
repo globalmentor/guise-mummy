@@ -22,10 +22,11 @@ var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX c
 			targetID=""	<!--the ID of the target element on which the action occurred-->
 			actionID=""	<!--the action identifier-->
 		/>
-		<mouseEnter|mouseExit	<!--a mouse event related to a component-->
-			componentID=""	<!--the ID of the component-->
-		>
-			<mouse x="" y=""/>	<!--the mouse information at the time of the drop-->
+		<mouseEnter|mouseExit>	<!--a mouse event related to a component-->
+			<viewport x="" y="" width="" height=""/>	<!--information on the viewport (scroll position and size)-->
+			<component id="" x="" y="" width="" height=""/>	<!--information on the component that was the target of the mouse event (in absolute terms)-->
+			<target id="" x="" y="" width="" height=""/>	<!--information on the element that was the target of the mouse event (in absolute terms)-->
+			<mouse x="" y=""/>	<!--the mouse information at the time of the drop (in fixed terms)-->
 		</mouseEnter|mouseExit>
 	</events>
 </request>
@@ -495,6 +496,24 @@ function Parameter(name, value) {this.name=name; this.value=value;}
 */
 function Point(x, y) {this.x=x; this.y=y;}
 
+//Rectangle
+
+/**A class encapsulating a rectangle.
+@param coordinates: The position of the top left corner of the rectangle, stored under this.coordinates.
+@param size: The size of the rectangle, stored under this.size.
+var x, y: The coordinates of the upper-left corner of the rectangle.
+var width, height: The dimensions of the rectangle.
+*/
+function Rectangle(coordinates, size)
+{
+	this.coordinates=coordinates;
+	this.x=coordinates.x;
+	this.y=coordinates.y;
+	this.size=size;
+	this.width=size.width;
+	this.height=size.height;
+}
+
 //Size
 
 /**A class encapsulating a size.
@@ -908,13 +927,16 @@ function DropAJAXEvent(dragState, dragSource, dropTarget, event)
 
 /**A class encapsulating mouse information for an AJAX request.
 @param eventType: The type of mouse event; one of MouseAJAXEvent.EventType.
-@param componentID: The ID of the source component.
+@param component: The target component.
 @param target: The element indicating the target of the event.
 @param event: The W3C event object associated with the drop.
 var eventType: The type of mouse event; one of MouseAJAXEvent.EventType.
 var componentID: The ID of the target component.
+var componentBounds: The rectangle of the component.
 var targetID: The ID of the target element.
-var mousePosition: The position of the mouse.
+var targetBounds: The rectangle of the target element.
+var viewportBounds: the absolute bounds of the viewport.
+var mousePosition: The position of the mouse relative to the viewport.
 */
 function MouseAJAXEvent(eventType, component, target, event)
 {
@@ -926,7 +948,10 @@ function MouseAJAXEvent(eventType, component, target, event)
 */
 	this.eventType=eventType;	//save the event type
 	this.componentID=component.id;	//save the component ID
+	this.componentBounds=getElementBounds(component);	//get the component bounds
 	this.targetID=target.id;	//save the target ID
+	this.targetBounds=getElementBounds(component);	//get the target bounds
+	this.viewportBounds=getViewportBounds();	//get the viewport bounds
 	this.mousePosition=new Point(event.clientX, event.clientY);	//save the mouse position
 }
 
@@ -1128,8 +1153,8 @@ function GuiseAJAX()
 			{
 				REQUEST: "request", EVENTS: "events",
 				FORM: "form", CONTROL: "control", NAME: "name", VALUE: "value",
-				ACTION: "action", COMPONENT_ID: "componentID", TARGET_ID: "targetID", ACTION_ID: "actionID",
-				DROP: "drop", SOURCE: "source", TARGET: "target", MOUSE: "mouse", ID: "id", X: "x", Y: "y",
+				ACTION: "action", COMPONENT: "component", COMPONENT_ID: "componentID", TARGET_ID: "targetID", ACTION_ID: "actionID",
+				DROP: "drop", SOURCE: "source", TARGET: "target", VIEWPORT: "viewport", MOUSE: "mouse", ID: "id", X: "x", Y: "y", WIDTH: "width", HEIGHT: "height",
 				INIT: "init"
 			};
 
@@ -1274,9 +1299,28 @@ function GuiseAJAX()
 		*/
 		GuiseAJAX.prototype._appendMouseAJAXEvent=function(stringBuilder, ajaxMouseEvent)
 		{
-			DOMUtilities.appendXMLStartTag(stringBuilder, ajaxMouseEvent.eventType,	//<mouseXXX>
-					new Parameter(this.RequestElement.COMPONENT_ID, ajaxMouseEvent.componentID),	//componentID="componentID"
-					new Parameter(this.RequestElement.TARGET_ID, ajaxMouseEvent.targetID));	//targetID="targetID"
+			DOMUtilities.appendXMLStartTag(stringBuilder, ajaxMouseEvent.eventType);	//<mouseXXX>
+//TODO del alert("ready to append viewport info: "+this.RequestElement.VIEWPORT+" x: "+ajaxMouseEvent.viewportBounds.x+" y: "+ajaxMouseEvent.viewportBounds.y+" width: "+ajaxMouseEvent.viewportBounds.width+" height: "+ajaxMouseEvent.viewportBounds.height);
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.VIEWPORT,	//<viewport
+					new Parameter(this.RequestElement.X, ajaxMouseEvent.viewportBounds.x),	//x="viewportBounds.x"
+					new Parameter(this.RequestElement.Y, ajaxMouseEvent.viewportBounds.y),	//y="viewportBounds.y"
+					new Parameter(this.RequestElement.WIDTH, ajaxMouseEvent.viewportBounds.width),	//width="viewportBounds.width"
+					new Parameter(this.RequestElement.HEIGHT, ajaxMouseEvent.viewportBounds.height))	//height="viewportBounds.height">
+			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.VIEWPORT);	//</viewport>
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.COMPONENT,	//<component
+					new Parameter(this.RequestElement.ID, ajaxMouseEvent.componentID),	//id="componentID"
+					new Parameter(this.RequestElement.X, ajaxMouseEvent.componentBounds.x),	//x="componentBounds.x"
+					new Parameter(this.RequestElement.Y, ajaxMouseEvent.componentBounds.y),	//y="componentBounds.y"
+					new Parameter(this.RequestElement.WIDTH, ajaxMouseEvent.componentBounds.width),	//width="componentBounds.width"
+					new Parameter(this.RequestElement.HEIGHT, ajaxMouseEvent.componentBounds.height))	//height="componentBounds.height">
+			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.COMPONENT);	//</component>
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.TARGET,	//<target
+					new Parameter(this.RequestElement.ID, ajaxMouseEvent.targetID),	//id="targetID"
+					new Parameter(this.RequestElement.X, ajaxMouseEvent.targetBounds.x),	//x="targetBounds.x"
+					new Parameter(this.RequestElement.Y, ajaxMouseEvent.targetBounds.y),	//y="targetBounds.y"
+					new Parameter(this.RequestElement.WIDTH, ajaxMouseEvent.targetBounds.width),	//width="targetBounds.width"
+					new Parameter(this.RequestElement.HEIGHT, ajaxMouseEvent.targetBounds.height))	//height="targetBounds.height">
+			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.TARGET);	//</target>
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE, new Parameter(this.RequestElement.X, ajaxMouseEvent.mousePosition.x), new Parameter(this.RequestElement.Y, ajaxMouseEvent.mousePosition.y));	//<mouse x="x" y="y">
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.MOUSE);	//</mouse>
 			DOMUtilities.appendXMLEndTag(stringBuilder, ajaxMouseEvent.eventType);	//</mouseXXX>
@@ -3479,6 +3523,15 @@ function getFocusableDescendant(node)
 	return null;	//indicate that no focusable node could be found
 }
 
+/**Retrieves the absolute bounds of the given element.
+@param The element the bounds of which to find.
+@return A Rectangle containing the coordinates and size of the element.
+*/
+function getElementBounds(element)
+{
+	return new Rectangle(getElementCoordinates(element), new Size(element.offsetWidth, element.offsetHeight));	//create a rectangle containing the coordinates and size of the element
+}
+
 /**Retrieves the absolute X and Y coordinates of the given element.
 @param The element the coordinates of which to find.
 @return A Point containing the coordinates of the element.
@@ -3566,6 +3619,12 @@ function getScrollCoordinates()
 		y=document.body.scrollTop;
 	}
 	return new Point(x, y);	//return the scrolling coordinates
+}
+
+/**@return A Rectangle containing the coordinates and size of the viewport.*/
+function getViewportBounds()
+{
+	return new Rectangle(getScrollCoordinates(), getViewportSize());	//create a rectangle containing the coordinates and size of the viewport
 }
 
 /**@return The size of the viewport.

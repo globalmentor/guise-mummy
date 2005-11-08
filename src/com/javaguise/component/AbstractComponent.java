@@ -1,6 +1,7 @@
 package com.javaguise.component;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -15,10 +16,14 @@ import com.javaguise.component.transfer.*;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.ControlEvent;
 import com.javaguise.controller.Controller;
+import com.javaguise.controller.MouseControlEvent.EventType;
 import com.javaguise.event.*;
 import com.javaguise.geometry.Axis;
+import com.javaguise.geometry.CompassPoint;
 import com.javaguise.geometry.Dimensions;
 import com.javaguise.geometry.Extent;
+import com.javaguise.geometry.Point;
+import com.javaguise.geometry.Rectangle;
 import com.javaguise.model.ActionModel;
 import com.javaguise.model.Model;
 import com.javaguise.session.GuiseSession;
@@ -819,27 +824,35 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 	}
 
 	/**Fires a mouse entered event to all registered mouse listeners.
+	@param componentBounds The absolute bounds of the component.
+	@param viewportBounds The absolute bounds of the viewport.
+	@param mousePosition The position of the mouse relative to the viewport.
+	@exception NullPointerException if one or more of the arguments are <code>null</code>.
 	@see MouseListener
 	@see MouseEvent
 	*/
-	public void fireMouseEntered()
+	public void fireMouseEntered(final Rectangle componentBounds, final Rectangle viewportBounds, final Point mousePosition)
 	{
 		if(hasMouseListeners())	//if there are mouse listeners registered
 		{
-			final MouseEvent<C> mouseEvent=new MouseEvent<C>(getSession(), getThis());	//create a new mouse event
+			final MouseEvent<C> mouseEvent=new MouseEvent<C>(getSession(), getThis(), componentBounds, viewportBounds, mousePosition);	//create a new mouse event
 			getSession().queueEvent(new PostponedMouseEvent<C>(getEventListenerManager(), mouseEvent, PostponedMouseEvent.EventType.ENTERED));	//tell the Guise session to queue the event
 		}
 	}
 
 	/**Fires a mouse exited event to all registered mouse listeners.
+	@param componentBounds The absolute bounds of the component.
+	@param viewportBounds The absolute bounds of the viewport.
+	@param mousePosition The position of the mouse relative to the viewport.
+	@exception NullPointerException if one or more of the arguments are <code>null</code>.
 	@see MouseListener
 	@see MouseEvent
 	*/
-	public void fireMouseExited()
+	public void fireMouseExited(final Rectangle componentBounds, final Rectangle viewportBounds, final Point mousePosition)
 	{
 		if(hasMouseListeners())	//if there are mouse listeners registered
 		{
-			final MouseEvent<C> mouseEvent=new MouseEvent<C>(getSession(), getThis());	//create a new mouse event
+			final MouseEvent<C> mouseEvent=new MouseEvent<C>(getSession(), getThis(), componentBounds, viewportBounds, mousePosition);	//create a new mouse event
 			getSession().queueEvent(new PostponedMouseEvent<C>(getEventListenerManager(), mouseEvent, PostponedMouseEvent.EventType.EXITED));	//tell the Guise session to queue the event
 		}
 	}
@@ -969,6 +982,52 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		}
 	}
 
+	/**Determines a URI value either explicitly set or stored in the resources.
+	If a value is explicitly specified, it will be used; otherwise, a value will be loaded from the resources if possible.
+	A resource will be retrieved first using an appended bearing designator (".W", ".WbS", etc) based upon the given bearing, if any.
+	For example, with a bearing of 250 and a resource key of "myTether", a resource key will be requested using "myResource.WSW", "myResource.SWbW", "myResource.SW", etc.
+		until all compass points are exhausted, after which a resource key of "myResource" will be requested.
+	@param value The value explicitly set, which will override any resource.
+	@param resourceKey The key for looking up a resource if no value is explicitly set.
+	@param bearing The bearing to use in determining the resource key, or <code>null</code> if the bearing is irrelevant.
+	@return The URI value, or <code>null</code> if there is no value available, neither explicitly set nor in the resources.
+	@exception IllegalArgumentException if the given bearing is greater than 360.
+	@exception MissingResourceException if there was an error loading the value from the resources.
+	*/
+	protected URI getURI(final URI value, final String resourceKey, final BigDecimal bearing) throws MissingResourceException
+	{
+		if(value!=null)	//if a value is provided
+		{
+			return value;	//return the specified value
+		}
+		else if(resourceKey!=null)	//if no value is provided, but if a resource key is provided
+		{
+			if(bearing!=null)	//if a bearing was given
+			{
+				int ordinal=CompassPoint.getCompassPoint(bearing).ordinal();	//get the ordinal of the compass point nearest the bearing
+				final CompassPoint[] compassPoints=CompassPoint.values();	//get the compass point values
+				//TODO decide if the closest point algorithm should be removed, because it may result in the incorrect image for a particular bearing
+				do
+				{
+					final CompassPoint compassPoint=compassPoints[ordinal];	//get this compass point
+					try
+					{
+						return getSession().getURIResource(resourceKey+'.'+compassPoint.getAbbreviation());	//get a specialized resource key for the compass point abbreviation in the form resourceKey.abbreviation TODO use a constant
+					}
+					catch(final MissingResourceException missingResourceException)	//ignore all missing bearing-specific resources
+					{
+						--ordinal;	//try the previous compass point counter-clockwise
+					}						
+				}
+				while(ordinal>=0);	//keep looking for compass points until we reach north
+			}
+			return getSession().getURIResource(resourceKey);	//lookup the value from the resources normally
+		}
+		else	//if neither a value nor a resource key are provided
+		{
+			return null;	//there is no value available
+		}
+	}
 
 	/**Returns a resource key suffix representing the physical axis based upon the given flow relative to the component's orientation.
 	@param flow The flow for which a physical axis should be determined.
@@ -1015,6 +1074,26 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 			/**@return The component for which this object will control flyovers.*/
 			public S getComponent() {return component;}
 
+		/**The bearing of the tether in relation to the frame.*/
+		private BigDecimal tetherBearing=CompassPoint.NORTHWEST_BY_WEST.getBearing();
+
+			/**@return The bearing of the tether in relation to the frame.*/
+			public BigDecimal getTetherBearing() {return tetherBearing;}
+
+			/**Sets the bearing of the tether in relation to the frame.
+			@param newTetherBearing The new bearing of the tether in relation to the frame.
+			@exception NullPointerException if the given bearing is <code>null</code>.
+			@exception IllegalArgumentException if the given bearing is greater than 360.
+			*/
+			public void setTetherBearing(final BigDecimal newTetherBearing)
+			{
+				if(!tetherBearing.equals(checkNull(newTetherBearing, "Tether bearing cannot be null.")))	//if the value is really changing
+				{
+					final BigDecimal oldTetherBearing=tetherBearing;	//get the current value
+					tetherBearing=CompassPoint.checkBearing(newTetherBearing);	//update the value
+				}
+			}
+
 		/**Component constructor.
 		@param component The component for which this object will control flyovers.
 		@exception NullPointerException if the given component is <code>null</code>.
@@ -1030,6 +1109,31 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		*/
 		public void mouseEntered(final MouseEvent<S> mouseEvent)
 		{
+/*TODO del when works
+Debug.trace("source bounds:", mouseEvent.getSourceBounds());
+			final Dimensions sourceSize=mouseEvent.getSourceBounds().getSize();	//get the size of the source
+			final Point sourceCenter=mouseEvent.getSourceBounds().getPosition().translate(sourceSize.getWidth().getValue()/2, sourceSize.getHeight().getValue()/2);	//determine the center of the source
+Debug.trace("source center:", sourceCenter);
+Debug.trace("viewport bounds:", mouseEvent.getViewportBounds());
+			final Point viewportPosition=mouseEvent.getViewportBounds().getPosition();	//get the position of the viewport
+			final Dimensions viewportSize=mouseEvent.getViewportBounds().getSize();	//get the size of the viewport
+			final Point viewportSourceCenter=sourceCenter.translate(-viewportPosition.getX().getValue(), -viewportPosition.getY().getValue());	//translate the source center into the viewport
+Debug.trace("viewport source center:", viewportSourceCenter);
+*/
+			final Rectangle viewportBounds=mouseEvent.getViewportBounds();	//get the bounds of the viewport
+//TODO del Debug.trace("viewport bounds:", viewportBounds);
+			final Dimensions viewportSize=viewportBounds.getSize();	//get the size of the viewport
+			final Point mousePosition=mouseEvent.getMousePosition();	//get the mouse position
+//TODO del Debug.trace("mouse position:", mousePosition);
+				//get the mouse position inside the traditional coordinate space with the origin at the center of the viewport
+			final Point traditionalMousePosition=new Point(mousePosition.getX().getValue()-(viewportSize.getWidth().getValue()/2), -(mousePosition.getY().getValue()-(viewportSize.getHeight().getValue()/2)));
+//TODO del Debug.trace("traditional mouse position:", traditionalMousePosition);
+				//get the angle of the point from the y axis in the range of (-PI, PI)
+			final double atan2=Math.atan2(traditionalMousePosition.getX().getValue(), traditionalMousePosition.getY().getValue());
+			final double normalizedAtan2=atan2>=0 ? atan2 : (Math.PI*2)+atan2;	//normalize the angle to the range (0, 2PI) 
+			final BigDecimal tetherBearing=CompassPoint.MAX_BEARING.multiply(new BigDecimal(normalizedAtan2/(Math.PI*2)));	//get the fraction of the range and multiply by 360
+			setTetherBearing(tetherBearing);	//set the tether bearing to use for flyovers
+			
 			openFlyover();	//open the flyover
 		}
 
@@ -1046,14 +1150,14 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 	
 	
 	/**The default strategy for showing and hiding flyovers in response to mouse events.
-	This implementation uses frames to represent flyovers.
+	This implementation uses flyover frames to represent flyovers.
 	@param <S> The type of component for which this object is to control flyovers.
 	@author Garret Wilson
 	*/
 	public static class DefaultFlyoverStrategy<S extends Component<?>> extends AbstractFlyoverStrategy<S>
 	{
 		/**The frame used for displaying flyovers.*/
-		private Frame<?> flyoverFrame=null;
+		private FlyoverFrame<?> flyoverFrame=null;
 
 		/**Component constructor.
 		@param component The component for which this object will control flyovers.
@@ -1072,8 +1176,9 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		{
 			if(flyoverFrame==null)	//if no flyover frame has been created
 			{
-Debug.trace("no frame; created");
+//TODO del Debug.trace("no frame; created");
 				flyoverFrame=createFrame();	//create a new frame
+				flyoverFrame.setTetherBearing(getTetherBearing());	//set the bearing of the tether
 //TODO fix				frame.getModel().setLabel("Flyover");
 				flyoverFrame.open();				
 			}			
@@ -1092,12 +1197,12 @@ Debug.trace("no frame; created");
 		}
 
 		/**@return A new frame for displaying flyover information.*/
-		protected Frame<?> createFrame()
+		protected FlyoverFrame<?> createFrame()
 		{
 			final S component=getComponent();	//get the component
 			final GuiseSession session=component.getSession();	//get the session
-			final Frame<?> frame=new DefaultFrame(session);	//create a default frame
-			//TODO set the related component
+			final FlyoverFrame<?> frame=new DefaultFlyoverFrame(session);	//create a default frame
+			frame.setRelatedComponent(getComponent());	//tell the flyover frame with which component it is related
 			final Message message=new Message(session);	//create a new message
 			message.getModel().setMessageContentType(component.getModel().getDescriptionContentType());	//set the appropriate message content
 			message.getModel().setMessage(component.getModel().getDescription());	//set the appropriate message text

@@ -14,7 +14,6 @@ import static java.util.Collections.*;
 import javax.mail.internet.ContentType;
 import javax.servlet.*;
 import javax.servlet.http.*;
-import javax.servlet.http.Cookie;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -30,6 +29,7 @@ import com.javaguise.context.GuiseContext;
 import com.javaguise.context.text.xml.XMLGuiseContext;
 import com.javaguise.controller.*;
 import com.javaguise.controller.text.xml.xhtml.*;
+import com.javaguise.geometry.*;
 import com.javaguise.model.FileItemResourceImport;
 import com.javaguise.model.Model;
 import com.javaguise.platform.web.*;
@@ -916,6 +916,9 @@ Debug.trace("now have frames: ", frames.size());
 //TODO del	private final PathExpression AJAX_REQUEST_CONTROL_VALUE_XPATH_EXPRESSION=new PathExpression("control", "value");	//TODO use constants; comment 
 	private final PathExpression AJAX_REQUEST_SOURCE_XPATH_EXPRESSION=new PathExpression("source");	//TODO use constants; comment 
 	private final PathExpression AJAX_REQUEST_TARGET_XPATH_EXPRESSION=new PathExpression("target");	//TODO use constants; comment 
+	private final PathExpression AJAX_REQUEST_COMPONENT_XPATH_EXPRESSION=new PathExpression("component");	//TODO use constants; comment 
+	private final PathExpression AJAX_REQUEST_MOUSE_XPATH_EXPRESSION=new PathExpression("mouse");	//TODO use constants; comment 
+	private final PathExpression AJAX_REQUEST_VIEWPORT_XPATH_EXPRESSION=new PathExpression("viewport");	//TODO use constants; comment 
 	
 	/**Retrieves control events from the HTTP request.
   @param request The HTTP request.
@@ -982,11 +985,36 @@ Debug.trace("now have frames: ", frames.size());
 							try
 							{
 								final MouseControlEvent.EventType eventType=MouseControlEvent.EventType.valueOf(eventNode.getNodeName().toUpperCase());	//get the event type from the type string
-								final String componentID=eventElement.getAttribute("componentID");	//get the ID of the component TODO use a constant
+
+								final Node componentNode=XPath.getNode(eventNode, AJAX_REQUEST_COMPONENT_XPATH_EXPRESSION);	//get the component node
+								final String componentID=((Element)componentNode).getAttribute("id");	//TODO tidy; improve; comment
+								final int componentX=Integer.parseInt(((Element)componentNode).getAttribute("x"));	//TODO tidy; improve; check for errors; comment
+								final int componentY=Integer.parseInt(((Element)componentNode).getAttribute("y"));	//TODO tidy; improve; check for errors; comment
+								final int componentWidth=Integer.parseInt(((Element)componentNode).getAttribute("width"));	//TODO tidy; improve; check for errors; comment
+								final int componentHeight=Integer.parseInt(((Element)componentNode).getAttribute("height"));	//TODO tidy; improve; check for errors; comment
+
+								final Node targetNode=XPath.getNode(eventNode, AJAX_REQUEST_TARGET_XPATH_EXPRESSION);	//get the target node
+								final String targetID=((Element)targetNode).getAttribute("id");	//TODO tidy; improve; comment
+								final int targetX=Integer.parseInt(((Element)targetNode).getAttribute("x"));	//TODO tidy; improve; check for errors; comment
+								final int targetY=Integer.parseInt(((Element)targetNode).getAttribute("y"));	//TODO tidy; improve; check for errors; comment
+								final int targetWidth=Integer.parseInt(((Element)targetNode).getAttribute("width"));	//TODO tidy; improve; check for errors; comment
+								final int targetHeight=Integer.parseInt(((Element)targetNode).getAttribute("height"));	//TODO tidy; improve; check for errors; comment
+								
+								final Node viewportNode=XPath.getNode(eventNode, AJAX_REQUEST_VIEWPORT_XPATH_EXPRESSION);	//get the viewport node
+								final int viewportX=Integer.parseInt(((Element)viewportNode).getAttribute("x"));	//TODO tidy; improve; check for errors; comment
+								final int viewportY=Integer.parseInt(((Element)viewportNode).getAttribute("y"));	//TODO tidy; improve; check for errors; comment
+								final int viewportWidth=Integer.parseInt(((Element)viewportNode).getAttribute("width"));	//TODO tidy; improve; check for errors; comment
+								final int viewportHeight=Integer.parseInt(((Element)viewportNode).getAttribute("height"));	//TODO tidy; improve; check for errors; comment
+
+								final Node mouseNode=XPath.getNode(eventNode, AJAX_REQUEST_MOUSE_XPATH_EXPRESSION);	//get the mouse node
+								final int mouseX=Integer.parseInt(((Element)mouseNode).getAttribute("x"));	//TODO tidy; improve; check for errors; comment
+								final int mouseY=Integer.parseInt(((Element)mouseNode).getAttribute("y"));	//TODO tidy; improve; check for errors; comment
+
 								if(componentID!=null)	//if there is a component ID TODO add better event handling, to throw an error and send back that error
 								{
-									final String targetID=eventElement.getAttribute("targetID");	//get the ID of the target element TODO use a constant
-									final MouseControlEvent mouseEvent=new MouseControlEvent(eventType, componentID, targetID);	//create a new mouse event
+									final MouseControlEvent mouseEvent=new MouseControlEvent(eventType, componentID, new Rectangle(componentX, componentY, componentWidth, componentHeight),
+											targetID, new Rectangle(targetX, targetY, targetWidth, targetHeight), new Rectangle(viewportX, viewportY, viewportWidth, viewportHeight),
+											new Point(mouseX, mouseY));	//create a new mouse event
 									controlEventList.add(mouseEvent);	//add the event to the list
 								}
 							}

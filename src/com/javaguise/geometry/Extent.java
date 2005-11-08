@@ -39,9 +39,6 @@ public class Extent
 		RELATIVE;
 	}
 
-	/**The precalculated hash code of the extent.*/
-	private final int hashCode;
-
 	/**The value of the extent.*/
 	private final double value;
 
@@ -94,13 +91,12 @@ public class Extent
 		this.value=value;	//save the value
 		this.unit=checkNull(unit, "Unit cannot be null.");	//save the unit
 		this.degree=degree;	//save the degree		
-		this.hashCode=ObjectUtilities.hashCode(value, unit, degree);	//precalculate the hash code
 	}
 
 	/**@return A hash code value for the object.*/
 	public int hashCode()
 	{
-		return hashCode;	//return the precalculated hash code
+		return ObjectUtilities.hashCode(getValue(), getUnit(), getDegree());	//determine the hash code
 	}
 
 	/**Indicates whether some other object is "equal to" this one.

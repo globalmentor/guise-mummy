@@ -40,4 +40,15 @@
 	<entry key="slider.track.image.x">guise/images/slider-track-x.gif</entry>
 	<entry key="slider.track.image.y">guise/images/slider-track-y.gif</entry>
 
+	<!-- FlyoverFrame -->
+	<entry key="flyover.frame.tether.image">guise/images/flyover-frame-tether-SWbW.gif</entry>
+	<entry key="flyover.frame.tether.image.NEbN">guise/images/flyover-frame-tether-NEbN.gif</entry>
+	<entry key="flyover.frame.tether.image.NEbE">guise/images/flyover-frame-tether-NEbE.gif</entry>
+	<entry key="flyover.frame.tether.image.SEbE">guise/images/flyover-frame-tether-SEbE.gif</entry>
+	<entry key="flyover.frame.tether.image.SEbS">guise/images/flyover-frame-tether-SEbS.gif</entry>
+	<entry key="flyover.frame.tether.image.SWbW">guise/images/flyover-frame-tether-SWbS.gif</entry>
+	<entry key="flyover.frame.tether.image.SWbW">guise/images/flyover-frame-tether-SWbW.gif</entry>
+	<entry key="flyover.frame.tether.image.NWbW">guise/images/flyover-frame-tether-NWbW.gif</entry>
+	<entry key="flyover.frame.tether.image.NWbN">guise/images/flyover-frame-tether-NWbN.gif</entry>
+
 </properties>

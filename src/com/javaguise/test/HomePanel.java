@@ -139,6 +139,8 @@ Debug.trace("list control changed value to", newValue);
 
 		final Button testButton=new Button(session, "testButton");
 		testButton.getModel().setLabel("Click here to go to the 'Hello World' demo.");
+		testButton.getModel().setDescription("This is the hello world button.");
+		testButton.setFlyoverEnabled(true);	//turn on flyovers
 		testButton.getModel().addActionListener(new NavigateActionListener<ActionModel>("helloworld"));
 		buttonPanel.add(testButton);	//add a new button
 		
@@ -258,6 +260,8 @@ Debug.trace("list control changed value to", newValue);
 
 		final Link frameLink=new Link(session);
 		frameLink.getModel().setLabel("Frame");
+		frameLink.getModel().setDescription("This is a flyover for the frame link.");
+		frameLink.setFlyoverEnabled(true);	//turn on flyovers
 		frameLink.getModel().addActionListener(new ActionListener<ActionModel>()
 				{
 					public void actionPerformed(ActionEvent<ActionModel> actionEvent)

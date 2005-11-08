@@ -113,4 +113,10 @@ public class Dimensions
 		return false;	//the object did not match this dimensions
 	}
 
+	/**@return A string representation of the object.*/
+	public final String toString()
+	{
+		return "["+getWidth().getValue()+", "+getHeight().getValue()+", "+getDepth().getValue()+"]";	//"[width, depth, height]"
+	}
+
 }

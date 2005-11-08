@@ -10,11 +10,8 @@ import com.javaguise.component.transfer.*;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.ControlEvent;
 import com.javaguise.controller.Controller;
-import com.javaguise.event.MouseAdapter;
-import com.javaguise.event.MouseEvent;
-import com.javaguise.event.MouseListener;
-import com.javaguise.geometry.Dimensions;
-import com.javaguise.geometry.Extent;
+import com.javaguise.event.*;
+import com.javaguise.geometry.*;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.checkNull;
@@ -382,16 +379,24 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	public boolean hasMouseListeners();
 
 	/**Fires a mouse entered event to all registered mouse listeners.
+	@param componentBounds The absolute bounds of the component.
+	@param viewportBounds The absolute bounds of the viewport.
+	@param mousePosition The position of the mouse relative to the viewport.
+	@exception NullPointerException if one or more of the arguments are <code>null</code>.
 	@see MouseListener
 	@see MouseEvent
 	*/
-	public void fireMouseEntered();
+	public void fireMouseEntered(final Rectangle componentBounds, final Rectangle viewportBounds, final Point mousePosition);
 
 	/**Fires a mouse exited event to all registered mouse listeners.
+	@param componentBounds The absolute bounds of the component.
+	@param viewportBounds The absolute bounds of the viewport.
+	@param mousePosition The position of the mouse relative to the viewport.
+	@exception NullPointerException if one or more of the arguments are <code>null</code>.
 	@see MouseListener
 	@see MouseEvent
 	*/
-	public void fireMouseExited();
+	public void fireMouseExited(final Rectangle componentBounds, final Rectangle viewportBounds, final Point mousePosition);
 
 	/**A strategy for showing and hiding flyovers in response to mouse events.
 	@param <S> The type of component for which this object is to control flyovers.
