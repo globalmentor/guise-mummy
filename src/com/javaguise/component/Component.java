@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.*;
 
 import com.garretwilson.beans.PropertyBindable;
+import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.Debug;
 import com.javaguise.component.layout.Orientation;
 import com.javaguise.component.transfer.*;
@@ -404,6 +405,30 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	*/
 	public interface FlyoverStrategy<S extends Component<?>> extends MouseListener<S>
 	{
+		/**@return The preferred width of the flyover component, or <code>null</code> if no preferred width has been specified.*/
+		public Extent getPreferredWidth();
+
+		/**Sets the preferred width of the flyover component.
+		@param newPreferredWidth The new preferred width of the flyover component, or <code>null</code> there is no width preference.
+		*/
+		public void setPreferredWidth(final Extent newPreferredWidth);
+
+		/**@return The preferred height of the flyover component, or <code>null</code> if no preferred height has been specified.*/
+		public Extent getPreferredHeight();
+
+		/**Sets the preferred height of the flyover component.
+		@param newPreferredHeight The new preferred height of the flyover component, or <code>null</code> there is no height preference.
+		*/
+		public void setPreferredHeight(final Extent newPreferredHeight);
+
+		/**@return The style identifier of the flyover, or <code>null</code> if there is no style ID.*/
+		public String getStyleID();
+
+		/**Identifies the style for the flyover component.
+		@param newStyleID The style identifier of the flyover, or <code>null</code> if there is no style ID.
+		*/
+		public void setStyleID(final String newStyleID);
+
 		/**Shows a flyover for the component.*/
 		public void openFlyover();
 

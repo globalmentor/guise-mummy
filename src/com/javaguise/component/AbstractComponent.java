@@ -161,7 +161,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		*/
 		public void setPreferredWidth(final Extent newPreferredWidth)
 		{
-			if(preferredWidth!=newPreferredWidth)	//if the value is really changing
+			if(!ObjectUtilities.equals(preferredWidth, newPreferredWidth))	//if the value is really changing
 			{
 				final Extent oldPreferredWidth=preferredWidth;	//get the old value
 				preferredWidth=newPreferredWidth;	//actually change the value
@@ -182,7 +182,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		*/
 		public void setPreferredHeight(final Extent newPreferredHeight)
 		{
-			if(preferredHeight!=newPreferredHeight)	//if the value is really changing
+			if(!ObjectUtilities.equals(preferredHeight, newPreferredHeight))	//if the value is really changing
 			{
 				final Extent oldPreferredHeight=preferredHeight;	//get the old value
 				preferredHeight=newPreferredHeight;	//actually change the value
@@ -456,7 +456,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		*/
 		public void setStyleID(final String newStyleID)
 		{
-			if(styleID!=newStyleID)	//if the value is really changing
+			if(!ObjectUtilities.equals(styleID, newStyleID))	//if the value is really changing
 			{
 				final String oldStyleID=styleID;	//get the current value
 				styleID=newStyleID;	//update the value
@@ -1073,7 +1073,61 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 
 			/**@return The component for which this object will control flyovers.*/
 			public S getComponent() {return component;}
+			
+		/**The preferred width of the flyover component, or <code>null</code> if no preferred width has been specified.*/
+		private Extent preferredWidth=null;
 
+			/**@return The preferred width of the flyover component, or <code>null</code> if no preferred width has been specified.*/
+			public Extent getPreferredWidth() {return preferredWidth;}
+
+			/**Sets the preferred width of the flyover component.
+			@param newPreferredWidth The new preferred width of the flyover component, or <code>null</code> there is no width preference.
+			*/
+			public void setPreferredWidth(final Extent newPreferredWidth)
+			{
+				if(!ObjectUtilities.equals(preferredWidth, newPreferredWidth))	//if the value is really changing
+				{
+					final Extent oldPreferredWidth=preferredWidth;	//get the old value
+					preferredWidth=newPreferredWidth;	//actually change the value
+				}			
+			}
+
+		/**The preferred height of the flyover component, or <code>null</code> if no preferred height has been specified.*/
+		private Extent preferredHeight=null;
+
+			/**@return The preferred height of the flyover component, or <code>null</code> if no preferred height has been specified.*/
+			public Extent getPreferredHeight() {return preferredHeight;}
+
+			/**Sets the preferred height of the flyover component.
+			@param newPreferredHeight The new preferred height of the flyover component, or <code>null</code> there is no height preference.
+			*/
+			public void setPreferredHeight(final Extent newPreferredHeight)
+			{
+				if(!ObjectUtilities.equals(preferredHeight, newPreferredHeight))	//if the value is really changing
+				{
+					final Extent oldPreferredHeight=preferredHeight;	//get the old value
+					preferredHeight=newPreferredHeight;	//actually change the value
+				}			
+			}
+			
+		/**The style identifier of the flyover, or <code>null</code> if there is no style ID.*/
+		private String styleID=null;
+
+			/**@return The style identifier of the flyover, or <code>null</code> if there is no style ID.*/
+			public String getStyleID() {return styleID;}
+
+			/**Identifies the style for the flyover component.
+			@param newStyleID The style identifier of the flyover, or <code>null</code> if there is no style ID.
+			*/
+			public void setStyleID(final String newStyleID)
+			{
+				if(ObjectUtilities.equals(styleID, newStyleID))	//if the value is really changing
+				{
+					final String oldStyleID=styleID;	//get the current value
+					styleID=newStyleID;	//update the value
+				}
+			}
+			
 		/**The bearing of the tether in relation to the frame.*/
 		private BigDecimal tetherBearing=CompassPoint.NORTHWEST_BY_WEST.getBearing();
 
@@ -1178,6 +1232,21 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 			{
 //TODO del Debug.trace("no frame; created");
 				flyoverFrame=createFrame();	//create a new frame
+				final String styleID=getStyleID();	//get the styld ID
+				if(styleID!=null)	//if there is a style ID
+				{
+					flyoverFrame.setStyleID(styleID);	//set the style ID of the flyover
+				}
+				final Extent preferredWidth=getPreferredWidth();	//get the preferred width
+				if(preferredWidth!=null)	//if there is a preferred width
+				{
+					flyoverFrame.setPreferredWidth(preferredWidth);	//set the flyover preferred width
+				}
+				final Extent preferredHeight=getPreferredHeight();	//get the preferred height
+				if(preferredHeight!=null)	//if there is a preferred height
+				{
+					flyoverFrame.setPreferredHeight(preferredHeight);	//set the flyover preferred height
+				}
 				flyoverFrame.setTetherBearing(getTetherBearing());	//set the bearing of the tether
 //TODO fix				frame.getModel().setLabel("Flyover");
 				flyoverFrame.open();				

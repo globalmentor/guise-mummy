@@ -57,6 +57,8 @@ public class HomePanel extends DefaultNavigationPanel
 
 		inputTextControl.getModel().setDescription("This is a description of the first text control.");
 		inputTextControl.setFlyoverEnabled(true);	//turn on flyovers
+		inputTextControl.getFlyoverStrategy().setPreferredWidth(new Extent(15, Extent.Unit.EM));
+		inputTextControl.getFlyoverStrategy().setPreferredHeight(new Extent(10, Extent.Unit.EM));
 		
 //TODO del when works		inputTextControl.addMouseListener(new TextControl.DefaultFlyoverStrategy<TextControl>(inputTextControl));
 		
@@ -141,6 +143,8 @@ Debug.trace("list control changed value to", newValue);
 		testButton.getModel().setLabel("Click here to go to the 'Hello World' demo.");
 		testButton.getModel().setDescription("This is the hello world button.");
 		testButton.setFlyoverEnabled(true);	//turn on flyovers
+		testButton.getFlyoverStrategy().setPreferredWidth(new Extent(15, Extent.Unit.EM));
+		testButton.getFlyoverStrategy().setPreferredHeight(new Extent(10, Extent.Unit.EM));
 		testButton.getModel().addActionListener(new NavigateActionListener<ActionModel>("helloworld"));
 		buttonPanel.add(testButton);	//add a new button
 		
@@ -262,6 +266,8 @@ Debug.trace("list control changed value to", newValue);
 		frameLink.getModel().setLabel("Frame");
 		frameLink.getModel().setDescription("This is a flyover for the frame link.");
 		frameLink.setFlyoverEnabled(true);	//turn on flyovers
+		frameLink.getFlyoverStrategy().setPreferredWidth(new Extent(15, Extent.Unit.EM));
+		frameLink.getFlyoverStrategy().setPreferredHeight(new Extent(10, Extent.Unit.EM));
 		frameLink.getModel().addActionListener(new ActionListener<ActionModel>()
 				{
 					public void actionPerformed(ActionEvent<ActionModel> actionEvent)

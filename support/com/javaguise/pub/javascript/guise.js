@@ -82,7 +82,8 @@ var STYLES=
 	SLIDER_CONTROL_Y_RTL_THUMB: "sliderControl-y-rtl-thumb",
 	MENU_REGEXP: /^dropMenu-[xy]-(ltr|rtl)$/,
 	MENU_BODY_REGEXP: /^dropMenu-[xy]-(ltr|rtl)-body$/,
-	MENU_CHILDREN_REGEXP: /^dropMenu-[xy]-(ltr|rtl)-children$/
+	MENU_CHILDREN_REGEXP: /^dropMenu-[xy]-(ltr|rtl)-children$/,
+	FRAME_TETHER_REGEXP: /.+-tether-.+/
 };
 
 /**The array of drop targets, determined when the document is loaded. The drop targets are stored in increasing order of hierarchical depth.*/
@@ -99,10 +100,16 @@ guiseFrames.add=function(frame)
 {
 //TODO fix so that it works both on IE and Firefox							oldElement.style.position="fixed";	//TODO testing
 	frame.style.position="absolute";	//change the element's position to absolute; it should already be set like this, but set it specifically so that dragging will know not to drag a copy TODO update the element's initial position
+
+
+	frame.style.visibility="hidden";	//TODO testing
+	frame.style.left="-9999px";	//TODO testing; this works; maybe even remove the visibility changing
+	frame.style.top="-9999px";	//TODO testing
+
+
 	document.body.appendChild(frame);	//add the frame element to the document; do this first, because IE doesn't allow the style to be accessed directly with imported nodes until they are added to the document
-	var viewportSize=getViewportSize();	//get the size of the viewport
-	frame.style.left=((viewportSize.width-frame.offsetWidth)/2)+"px";	//center the frame horizontally
-	frame.style.top=((viewportSize.height-frame.offsetHeight)/2)+"px";	//center the frame vertically
+	this._initializePosition(frame);	//initialize the frame's position
+	frame.style.visibility="visible";	//TODO testing
 
 	frame.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components TODO fix
 	initializeNode(frame);	//initialize the new imported frame, installing the correct event handlers
@@ -114,6 +121,78 @@ guiseFrames.add=function(frame)
 	{
 		focusable.focus();	//focus on the node
 	}
+};
+
+/**Initializes the position of the frame.
+@param frame The frame to position.
+*/
+guiseFrames._initializePosition=function(frame)
+{
+	var frameX, frameY;	//we'll calculate the frame position
+	var relatedComponentID=getInputParameter(frame, "relatedComponentID");	//get the related component ID, if any TODO use a constant
+	var relatedComponent=relatedComponentID ? document.getElementById(relatedComponentID) : null;	//get the related component, if there is one
+	if(relatedComponent)	//if there is a related component
+	{
+//TODO del alert("found related component: "+relatedComponentID);
+		var tether=getDescendantElementByClassName(frame, STYLES.FRAME_TETHER_REGEXP);	//get the frame tether, if there is one
+		if(tether)	//if there is a frame tether
+		{
+//TODO del alert("found tether: "+tether.id);
+			var frameBounds=getElementBounds(frame);	//get the bounds of the frame
+			var relatedComponentBounds=getElementBounds(relatedComponent);	//get the bounds of the related component
+			var tetherBounds=getElementBounds(tether);	//get the bounds of the tether
+			var tetherX, tetherY, relatedComponentX, relatedComponentY;	//get the relevant tether anchor point and the relevant component point
+			if(tetherBounds.x<=frameBounds.x+8)	//if the tether is on the left side (use an arbitrary amount to account for variations in browser position calculations) TODO compare centers, which will be more accurate
+			{
+//TODO del alert("tether left");
+				tetherX=tetherBounds.x;	//use the left side of the tether
+				relatedComponentX=relatedComponentBounds.x+relatedComponentBounds.width;	//use the right side of the component
+			}
+			else	//if the tether is on the right side
+			{
+//TODO del alert("tether right");
+				tetherX=tetherBounds.x+tetherBounds.width;	//use the right side of the tether
+				relatedComponentX=relatedComponentBounds.x;	//use the left side of the component
+			}
+			if(tetherBounds.y<=frameBounds.y+8)	//if the tether is on the top (use an arbitrary amount to account for variations in browser position calculations)
+			{
+//TODO del alert("tether top");
+				tetherY=tetherBounds.y;	//use the top of the tether
+				relatedComponentY=relatedComponentBounds.y+relatedComponentBounds.height;	//use the bottom of the component
+			}
+			else	//if the tether is on the bottom
+			{
+//TODO del alert("tether bottom");
+				tetherY=tetherBounds.y+tetherBounds.height;	//use the bottom of the tether
+				relatedComponentY=relatedComponentBounds.y;	//use the top of the component
+			}
+//TODO del alert("tetherX: "+tetherX);
+//TODO del alert("tetherY: "+tetherY);
+//TODO del alert("relatedComponentX: "+relatedComponentX);
+//TODO del alert("relatedComponentY: "+relatedComponentY);
+			var tetherDeltaX=tetherX-frameBounds.x;	//find the horizontal delta of the tether from the frame
+//TODO del alert("tetherDeltaX: "+tetherDeltaX);
+			var tetherDeltaY=tetherY-frameBounds.y;	//find the vertical delta of the tether from the frame
+//TODO del alert("tetherDeltaY: "+tetherDeltaY);
+			frameX=relatedComponentX-tetherDeltaX;	//position the frame tether horizontally on the related component
+//TODO del alert("frameX: "+frameX);
+			frameY=relatedComponentY-tetherDeltaY;	//position the frame tether vertically on the related component
+//TODO del alert("frameY: "+frameY);
+		}
+		else
+		{
+alert("error: fix for no tether");	//TODO fix for if there is no tether
+		}		
+	}
+	else	//if this frame is not related to another component, center it
+	{
+		var viewportBounds=getViewportBounds();	//get the bounds of the viewport so that we can center the frame
+		frameX=viewportBounds.x+((viewportBounds.width-frame.offsetWidth)/2);	//center the frame horizontally
+		frameY=viewportBounds.y+((viewportBounds.height-frame.offsetHeight)/2);	//center the frame vertically
+	}
+
+	frame.style.left=frameX+"px";	//center the frame horizontally
+	frame.style.top=frameY+"px";	//center the frame vertically
 };
 
 /**Removes a frame from the array.
@@ -377,6 +456,7 @@ if(typeof document.importNode=="undefined")	//if the document does not support d
 						{
 							DOMUtilities.appendNodeString(innerHTMLStringBuilder, childNodes[i]);	//serialize the node and append it to the string builder
 						}
+//TODO del alert("ready to add inner HTML: "+innerHTMLStringBuilder.toString());
 						importedNode.innerHTML=innerHTMLStringBuilder.toString();	//set the element's inner HTML to the string we constructed
 					}
 				}
@@ -758,7 +838,7 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 				}
 				break;
 			case Node.COMMENT_NODE:	//comment
-				stringBuilder.append(node.nodeValue);	//append the node's value with no changes TODO encode the sequence "--"
+				stringBuilder.append("<!--").append(node.nodeValue).append("-->");	//append the node's value with no changes TODO encode the sequence "--"
 				break;
 			case Node.TEXT_NODE:	//text
 				this.appendXMLText(stringBuilder, node.nodeValue);	//append the node's text value
@@ -3451,6 +3531,62 @@ function getElementDepth(element)
 	}
 	while(element);	//keep getting the parent node while there are ancestors left
 	return depth;	//return the depth we calculated
+}
+
+
+/**Gets the indicated parameter from a direct child comment of the given node.
+@param node The node for a which a comment parameter should be found.
+@param parameterName The name of the parameter to find.
+@return The specified parameter value, or null if no such parameter is found.
+*/
+/*TODO del; IE doesn't allow comments to be cloned easily; replace action confirmation parameters with inputs
+function getCommentParameter(node, parameterName)	//TODO replace the action confirmation parameter code with this method
+{
+	var childNodeList=node.childNodes;	//get all the child nodes of the element
+	var childNodeCount=childNodeList.length;	//find out how many children there are
+	for(var i=0; i<childNodeCount; ++i)	//for each child node
+	{
+		var childNode=childNodeList[i];	//get this child node
+		if(childNode.nodeType==Node.COMMENT_NODE && childNode.nodeValue)	//if this is a comment node
+		{
+			var commentValue=childNode.nodeValue;	//get the comment value
+alert("looking at comment value: "+commentValue);
+			var delimiterIndex=commentValue.indexOf(':');	//get the delimiter index
+			if(delimiterIndex>=0)	//if there is a delimiter
+			{
+				var paramName=commentValue.substring(0, delimiterIndex);	//get the parameter name
+				if(paramName=parameterName)	//if this is the correct parameter
+				{
+					return commentValue.substring(delimiterIndex+1);	//return the parameter value
+				}
+			}
+		}
+	}
+	return null;	//indicate that the given parameter could not be found
+}
+*/
+
+/**Gets the indicated parameter from a direct child input of the given node.
+@param node The node for a which an input parameter should be found.
+@param parameterName The name of the parameter to find.
+@return The specified parameter value, or null if no such parameter is found.
+*/
+function getInputParameter(node, parameterName)	//TODO replace the action confirmation parameter code with this method
+{
+	var childNodeList=node.childNodes;	//get all the child nodes of the element
+	var childNodeCount=childNodeList.length;	//find out how many children there are
+	for(var i=0; i<childNodeCount; ++i)	//for each child node
+	{
+		var childNode=childNodeList[i];	//get this child node
+		if(childNode.nodeType==Node.ELEMENT_NODE && childNode.nodeName.toLowerCase()=="input")	//if this is an input node TODO maybe make sure it's hidden
+		{
+			if(childNode.name==parameterName)	//if this is the correct parameter
+			{
+				return childNode.value;	//return the value
+			}
+		}
+	}
+	return null;	//indicate that the given parameter could not be found
 }
 
 /**Retrieves the immediate text nodes of the given element as a string.
