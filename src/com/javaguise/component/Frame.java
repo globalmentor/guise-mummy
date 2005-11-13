@@ -24,6 +24,8 @@ public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalC
 	public final static String RESIZABLE_PROPERTY=getPropertyName(Frame.class, "resizable");
 	/**The bound state property.*/
 	public final static String STATE_PROPERTY=getPropertyName(Frame.class, "state");
+	/**The bound property of whether the title bar is visible.*/
+	public final static String TITLE_VISIBLE_PROPERTY=getPropertyName(Frame.class, "titleVisible");
 
 	/**The state of the frame.*/
 	public enum State
@@ -76,6 +78,16 @@ public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalC
 	@see Frame#RELATED_COMPONENT_PROPERTY 
 	*/
 	public void setRelatedComponent(final Component<?> newRelatedComponent);
+
+	/**@return Whether the title bar is visible.*/
+	public boolean isTitleVisible();
+
+	/**Sets whether the title bar is visible.
+	This is a bound property of type <code>Boolean</code>.
+	@param newTitleVisible <code>true</code> if the title bar should be visible, else <code>false</code>.
+	@see #TITLE_VISIBLE_PROPERTY
+	*/
+	public void setTitleVisible(final boolean newTitleVisible);
 
 	/**@return The data model used by this component.*/
 	public LabelModel getModel();

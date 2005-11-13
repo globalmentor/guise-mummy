@@ -180,6 +180,7 @@ public abstract class AbstractFlyoverFrame<C extends FlyoverFrame<C>> extends Ab
 		setModal(false);	//default to being a nonmodal frame
 		setMovable(false);	//default to being nonmovable
 		setResizable(false);	//default to not allowing resizing
+		setTitleVisible(false);	//don't show a title
 		tetherBearingCompassPoints=createEnumSet(CompassPoint.class,	//establish the default accepted tether bearings
 				CompassPoint.NORTHEAST_BY_NORTH,
 				CompassPoint.NORTHEAST_BY_EAST,

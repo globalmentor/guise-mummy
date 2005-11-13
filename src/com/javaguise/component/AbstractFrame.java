@@ -152,6 +152,27 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 			}			
 		}
 
+	/**Whether the title bar is visible.*/
+	private boolean titleVisible=true;
+
+		/**@return Whether the title bar is visible.*/
+		public boolean isTitleVisible() {return titleVisible;}
+
+		/**Sets whether the title bar is visible.
+		This is a bound property of type <code>Boolean</code>.
+		@param newTitleVisible <code>true</code> if the title bar should be visible, else <code>false</code>.
+		@see Frame#TITLE_VISIBLE_PROPERTY
+		*/
+		public void setTitleVisible(final boolean newTitleVisible)
+		{
+			if(titleVisible!=newTitleVisible)	//if the value is really changing
+			{
+				final boolean oldTitleVisible=titleVisible;	//get the current value
+				titleVisible=newTitleVisible;	//update the value
+				firePropertyChange(TITLE_VISIBLE_PROPERTY, Boolean.valueOf(oldTitleVisible), Boolean.valueOf(newTitleVisible));
+			}
+		}
+
 	/**@return The data model used by this component.*/
 	public LabelModel getModel() {return (LabelModel)super.getModel();}
 
