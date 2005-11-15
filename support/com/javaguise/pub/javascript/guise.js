@@ -1666,6 +1666,8 @@ alert(exception);
 				oldElement.value="";	//set the value to the empty string (setting the value to null will result in "null" being displayed in the input control on IE)
 			}
 				//patch in the new and changed attributes
+			var display=null;	//we'll record whatever display we use
+			var visibility=null;	//we'll record whatever visibility we use
 			var attributes=element.attributes;	//get the new element's attributes
 			for(var i=attributes.length-1; i>=0; --i)	//for each attribute
 			{
@@ -1683,13 +1685,21 @@ alert(exception);
 						{
 							var styleProperty=styleComponents[0].trim();	//get the trimmed style property
 							var styleValue=styleComponents[1].trim();	//get the trimmed style value
+							if(styleProperty=="display")	//if this is the display style
+							{
+								display=styleValue;	//save the display
+							}
+							else if(styleProperty=="visibility")	//if this is the visibility style
+							{
+								visibility=styleValue;	//save the visibility
+							}
 							if(oldElement.style[styleProperty]!=styleValue)	//if the style is different	TODO check about removing a style
 							{
 //TODO del alert("ready to set element style "+styleProperty+" to value "+styleValue);
 								oldElement.style[styleProperty]=styleValue;	//update this style
 							}
 						}
-					}				
+					}
 				}
 				else	//for any other attribute
 				{
@@ -1702,6 +1712,14 @@ alert(exception);
 					}
 				}
 			}
+			if(display==null && oldElement.style["display"])	//if there was no display style in the new element but there is in the old element
+			{
+				oldElement.style["display"]="";	//remove the display style
+			}
+			if(visibility==null && oldElement.style["visibility"])	//if there was no visibility style in the new element but there is in the old element
+			{
+				oldElement.style["visibility"]="";	//remove the visibility style
+			}			
 			var elementName=element.nodeName;	//save the element name
 			
 				//patch in the new child element hierarchy

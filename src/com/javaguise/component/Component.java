@@ -25,7 +25,11 @@ import com.javaguise.view.View;
 /**Base interface for all Guise components.
 Each component must provide either a Guise session constructor; or a Guise session and string ID constructor.
 Any component may contain other components, but only a {@link Container} allows for custom addition and removal of child components.
-A component is iterable over its child components, and can be used in short <code>for(:)</code> form. 
+A component is iterable over its child components, and can be used in short <code>for(:)</code> form.
+<p>A component takes up space regardless of whether it is set to be visible using {@link Component#setVisible(boolean)}.
+{@link Component#setDisplayed(boolean)} determines whether the component is displayed at all. If a component is not displayed, it takes up no space.
+If a component is not displayed, it is not visible regardless of whether it is set to be visible.
+If a developer must hide sensitive data, the developer should remove the component from its parent container altogether.</p>
 @author Garret Wilson
 */
 public interface Component<C extends Component<C>> extends PropertyBindable
@@ -37,6 +41,8 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	public final static String COLOR_PROPERTY=getPropertyName(Component.class, "color");
 	/**The bound property of the controller.*/
 	public final static String CONTROLLER_PROPERTY=getPropertyName(Component.class, "controller");
+	/**The bound property of whether the component is displayed or has no representation, taking up no space.*/
+	public final static String DISPLAYED_PROPERTY=getPropertyName(Component.class, "displayed");
 	/**The bound property of whether the component has dragging enabled.*/
 	public final static String DRAG_ENABLED_PROPERTY=getPropertyName(Component.class, "dragEnabled");
 	/**The bound property of whether the component has dropping enabled.*/
@@ -245,15 +251,31 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	*/
 	public void setStyleID(final String newStyleID);
 
-	/**@return Whether the component is visible.*/
+	/**@return Whether the component is visible.
+	@see #isDisplayed()
+	*/
 	public boolean isVisible();
 
 	/**Sets whether the component is visible.
 	This is a bound property of type <code>Boolean</code>.
 	@param newVisible <code>true</code> if the component should be visible, else <code>false</code>.
 	@see #VISIBLE_PROPERTY
+	@see #setDisplayed(boolean)
 	*/
 	public void setVisible(final boolean newVisible);
+
+	/**@return Whether the component is displayed or has no representation, taking up no space.
+	@see #isVisible()
+	*/
+	public boolean isDisplayed();
+
+	/**Sets whether the component is displayed or has no representation, taking up no space.
+	This is a bound property of type <code>Boolean</code>.
+	@param newDisplayed <code>true</code> if the component should be displayed, else <code>false</code> if the component should take up no space.
+	@see #DISPLAYED_PROPERTY
+	@see #setVisible(boolean)
+	*/
+	public void setDisplayed(final boolean newDisplayed);
 
 	/**@return Whether the component has dragging enabled.*/
 	public boolean isDragEnabled();

@@ -156,7 +156,9 @@ Debug.trace("list control changed value to", newValue);
 					public void propertyValueChange(final PropertyValueChangeEvent<Boolean> propertyValueChangeEvent)
 					{
 						final Boolean newValue=propertyValueChangeEvent.getNewValue();	//get the new value
+//TODO del						testButton.setDisplayed(newValue);	//update the button enabled state
 						testButton.setVisible(newValue);	//update the button enabled state
+//TODO del						testButton.setVisible(newValue);	//update the button enabled state
 //TODO bring back						testButton.getModel().setEnabled(newValue);	//update the button enabled state
 					}
 				});

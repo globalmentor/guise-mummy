@@ -467,13 +467,16 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 	/**Whether the component is visible.*/
 	private boolean visible=true;
 
-		/**@return Whether the component is visible.*/
+		/**@return Whether the component is visible.
+		@see #isDisplayed()
+		*/
 		public boolean isVisible() {return visible;}
 
 		/**Sets whether the component is visible.
 		This is a bound property of type <code>Boolean</code>.
 		@param newVisible <code>true</code> if the component should be visible, else <code>false</code>.
 		@see Component#VISIBLE_PROPERTY
+		@see #setDisplayed(boolean)
 		*/
 		public void setVisible(final boolean newVisible)
 		{
@@ -482,6 +485,30 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 				final boolean oldVisible=visible;	//get the current value
 				visible=newVisible;	//update the value
 				firePropertyChange(VISIBLE_PROPERTY, Boolean.valueOf(oldVisible), Boolean.valueOf(newVisible));
+			}
+		}
+
+	/**Whether the component is displayed or has no representation, taking up no space.*/
+	private boolean displayed=true;
+
+		/**@return Whether the component is displayed or has no representation, taking up no space.
+		@see #isVisible()
+		*/
+		public boolean isDisplayed() {return displayed;}
+
+		/**Sets whether the component is displayed or has no representation, taking up no space.
+		This is a bound property of type <code>Boolean</code>.
+		@param newDisplayed <code>true</code> if the component should be displayed, else <code>false</code> if the component should take up no space.
+		@see Component#DISPLAYED_PROPERTY
+		@see #setVisible(boolean)
+		*/
+		public void setDisplayed(final boolean newDisplayed)
+		{
+			if(displayed!=newDisplayed)	//if the value is really changing
+			{
+				final boolean oldDisplayed=displayed;	//get the current value
+				displayed=newDisplayed;	//update the value
+				firePropertyChange(DISPLAYED_PROPERTY, Boolean.valueOf(oldDisplayed), Boolean.valueOf(newDisplayed));
 			}
 		}
 
