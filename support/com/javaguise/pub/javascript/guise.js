@@ -387,77 +387,91 @@ if(typeof document.importNode=="undefined")	//if the document does not support d
 				{
 					importedNode=document.createElement(node.nodeName);	//create a non-namespace-aware element
 				}
-				var attributes=node.attributes;	//get the element's attributes
-				var attributeCount=attributes.length;	//find out how many attributes there are
-				for(var i=0; i<attributeCount; ++i)	//for each attribute
+/*TODO del; doesn't work
+				if(node.nodeName=="button")	//if this is a button (IE fails when trying to import a button with type="button")
 				{
-					var attribute=attributes[i];	//get this attribute
-					var attributeName=attribute.nodeName;	//get the attribute name
-					if(attributeName=="style")	//if this is the style attribute, it must be copied differently or it will throw an error on IE
-					{
-						DOMUtilities.copyStyleAttribute(importedNode, node);	//copy the style attribute
-					}
-					else	//for all other attributes
-					{
-//TODO fix						try
-						{
-							var attributeValue=attribute.nodeValue;	//get the attribute value
-							if(importedNode.setAttributeNodeNS instanceof Function && typeof attribute.namespaceURI!="undefined")	//if the attribute supports namespaces
-							{
-								var importedAttribute=document.createAttributeNS(attribute.namespaceURI, attributeName);	//create a namespace-aware attribute
-								importedAttribute.nodeValue=attributeValue;	//set the attribute value
-								importedNode.setAttributeNodeNS(importedAttribute);	//set the attribute for the element						
-							}
-							else	//if the attribute does not support namespaces
-							{
-								var importedAttribute=document.createAttribute(attributeName);	//create a non-namespace-aware element
-								importedAttribute.nodeValue=attributeValue;	//set the attribute value TODO verify this works on Safari
-								importedNode.setAttributeNode(importedAttribute);	//set the attribute for the element
-							}
-						}	//TODO check; perhaps catch an exception here and return null or throw our own exception to improve IE "type" attribute error handling
-//TODO fix						catch(exception)	//if there is an error copying the attribute (e.g. IE button type="button")
-						{
-//TODO fix alert("error for "+node.nodeName+" adding attribute "+attributeName+"=\""+attributeValue+"\"");
-//TODO fix							return null;
-						}
-					}
+alert("importing a button");
+					var outerHTML=DOMUtilities.appendNodeString(new StringBuilder(), node).toString();	//serialize the node
+alert("using HTML: "+outerHTML);
+					document.body.appendChild(importedNode);	//append the element to the body just so outerHTML will work
+					importedNode.outerHTML=outerHTML;	//set the element's outer HTML to the string we constructed					
+					document.body.removeChild(importedNode);	//remove the element from the body
 				}
-				if(deep)	//if we should import deep
+				else	//for all other nodes
+*/
 				{
-					var childNodes=node.childNodes;	//get a list of child nodes
-					var childNodeCount=childNodes.length;	//find out how many child nodes there are
-/*TODO fix
-					for(var i=0; i<childNodeCount; ++i)	//for all of the child nodes
+					var attributes=node.attributes;	//get the element's attributes
+					var attributeCount=attributes.length;	//find out how many attributes there are
+					for(var i=0; i<attributeCount; ++i)	//for each attribute
 					{
-						var childNode=childNodes[i];	//get a reference to this child node
-						try
+						var attribute=attributes[i];	//get this attribute
+						var attributeName=attribute.nodeName;	//get the attribute name
+						if(attributeName=="style")	//if this is the style attribute, it must be copied differently or it will throw an error on IE
 						{
-							var childImportedNode=document.importNode(childNode, deep);
+							DOMUtilities.copyStyleAttribute(importedNode, node);	//copy the style attribute
 						}
-						catch(exception)	//if there is an error importing the node (this is just a safety precaution in case future versions of IE still throw an exception on button.type and 
+						else	//for all other attributes
 						{
-							var childImportedNode=null;	//set the node to null
-						}
-						if(childImportedNode)	//if we imported the node correctly
-						{
-							importedNode.appendChild(childImportedNode);	//import and append the new child node
-						}
-						else	//if something went wrong importing the node (IE 6 will fail to add the button.type attribute, but will not throw an exception, leaving childImportedNode undefined
-						{
-							var nodeString=DOMUtilities.getNodeString(childNode);	//serialize the node
-							importedNode.innerHTML+=nodeString;	//append the node string to the element's inner HTML
+	//TODO fix						try
+							{
+								var attributeValue=attribute.nodeValue;	//get the attribute value
+								if(importedNode.setAttributeNodeNS instanceof Function && typeof attribute.namespaceURI!="undefined")	//if the attribute supports namespaces
+								{
+									var importedAttribute=document.createAttributeNS(attribute.namespaceURI, attributeName);	//create a namespace-aware attribute
+									importedAttribute.nodeValue=attributeValue;	//set the attribute value
+									importedNode.setAttributeNodeNS(importedAttribute);	//set the attribute for the element						
+								}
+								else	//if the attribute does not support namespaces
+								{
+									var importedAttribute=document.createAttribute(attributeName);	//create a non-namespace-aware element
+									importedAttribute.nodeValue=attributeValue;	//set the attribute value TODO verify this works on Safari
+									importedNode.setAttributeNode(importedAttribute);	//set the attribute for the element
+								}
+							}	//TODO check; perhaps catch an exception here and return null or throw our own exception to improve IE "type" attribute error handling
+	//TODO fix						catch(exception)	//if there is an error copying the attribute (e.g. IE button type="button")
+							{
+	//TODO fix alert("error for "+node.nodeName+" adding attribute "+attributeName+"=\""+attributeValue+"\"");
+	//TODO fix							return null;
+							}
 						}
 					}
-*/
-					if(childNodeCount>0)	//if there are child nodes (IE will fail on importedNode.innerHTML="" for input type="text")
+					if(deep)	//if we should import deep
 					{
-						var innerHTMLStringBuilder=new StringBuilder();	//construct the inner HTML
+						var childNodes=node.childNodes;	//get a list of child nodes
+						var childNodeCount=childNodes.length;	//find out how many child nodes there are
+	/*TODO fix
 						for(var i=0; i<childNodeCount; ++i)	//for all of the child nodes
 						{
-							DOMUtilities.appendNodeString(innerHTMLStringBuilder, childNodes[i]);	//serialize the node and append it to the string builder
+							var childNode=childNodes[i];	//get a reference to this child node
+							try
+							{
+								var childImportedNode=document.importNode(childNode, deep);
+							}
+							catch(exception)	//if there is an error importing the node (this is just a safety precaution in case future versions of IE still throw an exception on button.type and 
+							{
+								var childImportedNode=null;	//set the node to null
+							}
+							if(childImportedNode)	//if we imported the node correctly
+							{
+								importedNode.appendChild(childImportedNode);	//import and append the new child node
+							}
+							else	//if something went wrong importing the node (IE 6 will fail to add the button.type attribute, but will not throw an exception, leaving childImportedNode undefined
+							{
+								var nodeString=DOMUtilities.getNodeString(childNode);	//serialize the node
+								importedNode.innerHTML+=nodeString;	//append the node string to the element's inner HTML
+							}
 						}
-//TODO del alert("ready to add inner HTML: "+innerHTMLStringBuilder.toString());
-						importedNode.innerHTML=innerHTMLStringBuilder.toString();	//set the element's inner HTML to the string we constructed
+	*/
+						if(childNodeCount>0)	//if there are child nodes (IE will fail on importedNode.innerHTML="" for input type="text")
+						{
+							var innerHTMLStringBuilder=new StringBuilder();	//construct the inner HTML
+							for(var i=0; i<childNodeCount; ++i)	//for all of the child nodes
+							{
+								DOMUtilities.appendNodeString(innerHTMLStringBuilder, childNodes[i]);	//serialize the node and append it to the string builder
+							}
+	//TODO del alert("ready to add inner HTML: "+innerHTMLStringBuilder.toString());
+							importedNode.innerHTML=innerHTMLStringBuilder.toString();	//set the element's inner HTML to the string we constructed
+						}
 					}
 				}
 				break;
@@ -2437,7 +2451,7 @@ function initializeNode(node)
 						}
 						break;
 					case "button":
-						if(elementClassNames.contains("button"))	//if this is a Guise button
+						if(elementClassNames.contains("button-body"))	//if this is a Guise button TODO use constant; check
 						{
 							eventManager.addEvent(node, "click", onButtonClick, false);	//listen for button clicks
 						}
@@ -2749,60 +2763,65 @@ function onLinkClick(event)
 */
 function onAction(event)
 {
-	var element=event.currentTarget;	//get the element on which the event was registered
+	var target=event.currentTarget;	//get the element on which the event was registered
 //TODO del alert("action on: "+element.nodeName);
-	if(element.id)	//if the button has an ID
+	var component=getAncestorElementByClassName(target, STYLES.COMPONENT_REGEXP);	//get the component element TODO improve all this
+	if(component)	//if there is a component
 	{
-			//ask confirmations if needed
-		var childNodeList=element.childNodes;	//get all the child nodes of the element
-		var childNodeCount=childNodeList.length;	//find out how many children there are
-		for(var i=0; i<childNodeCount; ++i)	//for each child node
+		var componentID=component.id;	//get the component ID
+		if(componentID)	//if there is a component ID
 		{
-			var childNode=childNodeList[i];	//get this child node
-			if(childNode.nodeType==Node.COMMENT_NODE && childNode.nodeValue)	//if this is a comment node
+				//ask confirmations if needed
+			var childNodeList=target.childNodes;	//get all the child nodes of the element
+			var childNodeCount=childNodeList.length;	//find out how many children there are
+			for(var i=0; i<childNodeCount; ++i)	//for each child node
 			{
-				var commentValue=childNode.nodeValue;	//get the comment value
-				var delimiterIndex=commentValue.indexOf(':');	//get the delimiter index
-				if(delimiterIndex>=0)	//if there is a delimiter
+				var childNode=childNodeList[i];	//get this child node
+				if(childNode.nodeType==Node.COMMENT_NODE && childNode.nodeValue)	//if this is a comment node
 				{
-					var paramName=commentValue.substring(0, delimiterIndex);	//get the parameter name
-					var paramValue=commentValue.substring(delimiterIndex+1);	//get the parameter value
-					if(paramName="confirm")	//if this is a confirmation
+					var commentValue=childNode.nodeValue;	//get the comment value
+					var delimiterIndex=commentValue.indexOf(':');	//get the delimiter index
+					if(delimiterIndex>=0)	//if there is a delimiter
 					{
-						if(!confirm(paramValue))	//ask for confirmation; if the user does not confirm
+						var paramName=commentValue.substring(0, delimiterIndex);	//get the parameter name
+						var paramValue=commentValue.substring(delimiterIndex+1);	//get the parameter value
+						if(paramName="confirm")	//if this is a confirmation
 						{
-							event.stopPropagation();	//tell the event to stop bubbling
-							event.preventDefault();	//prevent the default functionality from occurring
-							return;	//don't process the event further
+							if(!confirm(paramValue))	//ask for confirmation; if the user does not confirm
+							{
+								event.stopPropagation();	//tell the event to stop bubbling
+								event.preventDefault();	//prevent the default functionality from occurring
+								return;	//don't process the event further
+							}
 						}
 					}
 				}
 			}
-		}
-		var form=getForm(element);	//get the form
-		if(form && form.id)	//if there is a form with an ID
-		{
-			var actionInputID=form.id.replace(".form", ".input");	//determine the ID of the hidden action input TODO use a constant, or get these values using a better method
-			if(AJAX_URI)	//if AJAX is enabled
+			var form=getForm(component);	//get the form
+			if(form && form.id)	//if there is a form with an ID
 			{
-				var ajaxRequest=new FormAJAXEvent(new Parameter(actionInputID, element.id));	//create a new form request with form's hidden action control and the action element ID
-				guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request			
-			}
-			else	//if AJAX is not enabled, do a POST
-			{
-				var actionInput=document.getElementById(actionInputID);	//get the action input
-				if(actionInput)	//if there is an action input
+				var actionInputID=form.id.replace(".form", ".input");	//determine the ID of the hidden action input TODO use a constant, or get these values using a better method
+				if(AJAX_URI)	//if AJAX is enabled
 				{
-					actionInput.value=element.id;	//indicate which action was activated
+					var ajaxRequest=new FormAJAXEvent(new Parameter(actionInputID, componentID));	//create a new form request with form's hidden action control and the action element ID
+					guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request			
 				}
-				form.submit();	//submit the form
-				if(actionInput)	//if there is an action input
+				else	//if AJAX is not enabled, do a POST
 				{
-					actionInput.value=null;	//remove the indication of which action was activated
+					var actionInput=document.getElementById(actionInputID);	//get the action input
+					if(actionInput)	//if there is an action input
+					{
+						actionInput.value=componentID;	//indicate which action was activated
+					}
+					form.submit();	//submit the form
+					if(actionInput)	//if there is an action input
+					{
+						actionInput.value=null;	//remove the indication of which action was activated
+					}
 				}
+				event.stopPropagation();	//tell the event to stop bubbling
+				event.preventDefault();	//prevent the default functionality from occurring
 			}
-			event.stopPropagation();	//tell the event to stop bubbling
-			event.preventDefault();	//prevent the default functionality from occurring
 		}
 	}
 }

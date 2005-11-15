@@ -142,9 +142,11 @@ Debug.trace("list control changed value to", newValue);
 		final Button testButton=new Button(session, "testButton");
 		testButton.getModel().setLabel("Click here to go to the 'Hello World' demo.");
 		testButton.getModel().setDescription("This is the hello world button.");
+/*TODO fix
 		testButton.setFlyoverEnabled(true);	//turn on flyovers
 		testButton.getFlyoverStrategy().setPreferredWidth(new Extent(15, Extent.Unit.EM));
 		testButton.getFlyoverStrategy().setPreferredHeight(new Extent(10, Extent.Unit.EM));
+*/
 		testButton.getModel().addActionListener(new NavigateActionListener<ActionModel>("helloworld"));
 		buttonPanel.add(testButton);	//add a new button
 		
@@ -154,7 +156,8 @@ Debug.trace("list control changed value to", newValue);
 					public void propertyValueChange(final PropertyValueChangeEvent<Boolean> propertyValueChangeEvent)
 					{
 						final Boolean newValue=propertyValueChangeEvent.getNewValue();	//get the new value
-						testButton.getModel().setEnabled(newValue);	//update the button enabled state
+						testButton.setVisible(newValue);	//update the button enabled state
+//TODO bring back						testButton.getModel().setEnabled(newValue);	//update the button enabled state
 					}
 				});
 		

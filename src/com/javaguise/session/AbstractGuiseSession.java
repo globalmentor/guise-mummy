@@ -616,6 +616,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 					{
 						try
 						{
+Debug.trace("***ready to create navigation panel for path", path);
 							final String panelID=createName(path);	//convert the path to a valid ID TODO use a Guise-specific routine or, better yet, bind an ID with the panel
 							panel=panelClass.getConstructor(GuiseSession.class, String.class).newInstance(this, panelID);	//find the Guise session and ID constructor and create an instance of the class
 						}

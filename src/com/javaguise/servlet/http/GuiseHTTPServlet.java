@@ -742,8 +742,10 @@ Debug.trace("now have frames: ", frames.size());
 			for(final Cookie cookie:cookies)	//for each cookie in the request
 			{
 				final String cookieName=cookie.getName();	//get the name of this cookie
+//TODO del Debug.trace("Looking at cookie", cookieName, "with value", cookie.getValue());
 				if(!"jsessionid".equalsIgnoreCase(cookieName))	//ignore the session ID TODO use a constant
 				{
+//TODO del Debug.trace("Removing cookie", cookieName);
 					final String environmentPropertyValue=asInstance(environment.getProperty(cookieName), String.class);	//see if there is a string environment property value for this cookie's name
 					if(environmentPropertyValue!=null)	//if a value in the environment matches the cookie's name
 					{
@@ -1314,6 +1316,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 				HTTPServletGuiseSession guiseSession=guiseSessionMap.get(httpSession);	//get the Guise session associated with the HTTP session
 				if(guiseSession==null)	//if no Guise session is associated with the given HTTP session
 				{
+Debug.trace("+++creating Guise session", httpSession.getId());
 					guiseSession=createGuiseSession(guiseApplication, httpSession);	//create a new Guise session
 					final GuiseEnvironment environment=guiseSession.getEnvironment();	//get the new session's environment
 					final Cookie[] cookies=httpRequest.getCookies();	//get the cookies in the request
@@ -1342,6 +1345,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 		*/
 		protected HTTPServletGuiseSession removeGuiseSession(final HttpSession httpSession)
 		{
+Debug.trace("+++removing Guise session", httpSession.getId());
 			HTTPServletGuiseSession guiseSession=guiseSessionMap.remove(httpSession);	//remove the HTTP session and Guise session association
 			if(guiseSession!=null)	//if there is a Guise session associated with the HTTP session
 			{
