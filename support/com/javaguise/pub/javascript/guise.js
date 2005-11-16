@@ -60,7 +60,7 @@ var TREE_NODE_EXPANDED_CLASS_SUFFIX="-expanded";
 /**The class suffix for a tab.*/
 var TAB_CLASS_SUFFIX="-tab";
 /**The class suffix for a selected tab.*/
-var TAB_SELECTED_CLASS_SUFFIX="-tab-selected";
+//TODO del var TAB_SELECTED_CLASS_SUFFIX="-tab-selected";
 
 /**The class suffix of a decorator.*/
 //TODO del var DECORATOR_CLASS_PREFIX="-decorator";
@@ -2459,11 +2459,11 @@ function initializeNode(node)
 				switch(elementName)	//see which element this is
 				{
 					case "a":
-						if(elementClassNames.contains("link"))	//if this is a Guise link TODO later look at *all* link clicks and do popups for certain ones
+						if(elementClassNames.contains("actionControl"))	//if this is a Guise action TODO later look at *all* link clicks and do popups for certain ones
 						{
 							eventManager.addEvent(node, "click", onLinkClick, false);	//listen for anchor clicks
 						}
-						else if(elementClassNames.containsMatch(/-tab(-selected)?$/))	//if this is a tab TODO use a constant
+						else if(elementClassNames.containsMatch(/-tab(-disabled|-selected)?$/))	//if this is a tab TODO use a constant
 						{
 							eventManager.addEvent(node, "click", onTabClick, false);	//listen for tab clicks
 						}

@@ -55,6 +55,8 @@ public class GuiseCSSStyleConstants
 		//tabbed panel
 	/**The CSS class suffix for the tab part of a tabbed panel.*/
 	public final static String TABBED_PANEL_TAB_CLASS_SUFFIX="-tab";
+	/**The CSS class suffix for a disabled tab part of a tabbed panel.*/
+	public final static String TABBED_PANEL_TAB_DISABLED_CLASS_SUFFIX="-tab-disabled";
 	/**The CSS class suffix for a selected tab part of a tabbed panel.*/
 	public final static String TABBED_PANEL_TAB_SELECTED_CLASS_SUFFIX="-tab-selected";
 	/**The CSS class suffix for the tab set part of a tabbed panel.*/

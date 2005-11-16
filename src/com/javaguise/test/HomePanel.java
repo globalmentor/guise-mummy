@@ -83,7 +83,7 @@ public class HomePanel extends DefaultNavigationPanel
 					}
 				});
 		final CheckControl checkbox=new CheckControl(session, "checkbox");
-		checkbox.getModel().setLabel("Enable the button");
+		checkbox.getModel().setLabel("Enable the button \u278A");
 		try
 		{
 			checkbox.getModel().setValue(Boolean.TRUE);
@@ -149,21 +149,6 @@ Debug.trace("list control changed value to", newValue);
 */
 		testButton.getModel().addActionListener(new NavigateActionListener<ActionModel>("helloworld"));
 		buttonPanel.add(testButton);	//add a new button
-		
-		
-		checkbox.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<Boolean>()
-				{
-					public void propertyValueChange(final PropertyValueChangeEvent<Boolean> propertyValueChangeEvent)
-					{
-						final Boolean newValue=propertyValueChangeEvent.getNewValue();	//get the new value
-//TODO del						testButton.setDisplayed(newValue);	//update the button enabled state
-						testButton.setVisible(newValue);	//update the button enabled state
-//TODO del						testButton.setVisible(newValue);	//update the button enabled state
-//TODO bring back						testButton.getModel().setEnabled(newValue);	//update the button enabled state
-					}
-				});
-		
-		
 		
 		final Button testButton2=new Button(session, "testButton2");
 		testButton2.getModel().setLabel("Click this button to change the text.");
@@ -510,6 +495,19 @@ Debug.trace("list control changed value to", newValue);
 		tabbedPanel.add(helloPanel, new CardLayout.Constraints(new DefaultLabelModel(session, "Hello")));
 		
 		contentPanel.add(tabbedPanel);
+
+		checkbox.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<Boolean>()
+				{
+					public void propertyValueChange(final PropertyValueChangeEvent<Boolean> propertyValueChangeEvent)
+					{
+						final Boolean newValue=propertyValueChangeEvent.getNewValue();	//get the new value
+//TODO del						testButton.setDisplayed(newValue);	//update the button enabled state
+						testButton.setVisible(newValue);	//update the button enabled state
+//TODO del						testButton.setVisible(newValue);	//update the button enabled state
+//TODO bring back						testButton.getModel().setEnabled(newValue);	//update the button enabled state
+						tabbedPanel.getLayout().getConstraints(helloPanel).setEnabled(newValue);	//TODO testing
+					}
+				});
 
 
 		add(contentPanel, RegionLayout.CENTER_CONSTRAINTS);	//add the content panel in the center

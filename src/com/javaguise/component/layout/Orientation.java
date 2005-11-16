@@ -25,6 +25,22 @@ public class Orientation
 		
 		/**Flow along a page; the Y axis in left-to-right, top-to-botom orientation.*/
 		PAGE;		
+
+	
+		/**Indicates an end of a flow, relative to a direction.
+		@author Garret Wilson
+		@see Direction
+		*/
+		public enum End
+		{
+			/**Flow along a line; the X axis in left-to-right, top-to-botom orientation.*/
+			LINE,
+			
+			/**Flow along a page; the Y axis in left-to-right, top-to-botom orientation.*/
+			PAGE;		
+		}
+	
+	
 	}
 
 	/**Left-to-right line, top-to-bottom page orientation (e.g. English).*/

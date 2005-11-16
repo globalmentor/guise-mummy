@@ -1,14 +1,16 @@
 package com.javaguise.component.layout;
 
+import com.garretwilson.beans.PropertyBindable;
 import com.javaguise.component.Component;
 import com.javaguise.component.Container;
 
 /**Contains layout information for a container.
 @param <T> The type of layout constraints associated with each component.
 This interface and subclasses represent layout definitions, not layout implementations.
+If the property of a component's constraints changes, a subclass of {@link LayoutConstraintsPropertyChangeEvent} will be fired indicating the associated component and constraints for which the value changed.
 @author Garret Wilson
 */
-public interface Layout<T extends Layout.Constraints>
+public interface Layout<T extends Layout.Constraints> extends PropertyBindable
 {
 
 	/**@return The container that owns this layout, or <code>null</code> if this layout has not been installed into a container.*/
@@ -59,7 +61,7 @@ public interface Layout<T extends Layout.Constraints>
 	/**Metadata about individual component layout.
 	@author Garret Wilson
 	*/
-	public interface Constraints
+	public interface Constraints extends PropertyBindable
 	{
 	}
 

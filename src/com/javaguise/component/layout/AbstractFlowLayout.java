@@ -31,7 +31,7 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowLayout.Constraint
 	/**Metadata about individual component flow.
 	@author Garret Wilson
 	*/
-	public static class Constraints implements Layout.Constraints
+	public static class Constraints extends AbstractConstraints
 	{
 	}
 

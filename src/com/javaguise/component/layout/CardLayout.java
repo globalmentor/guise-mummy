@@ -9,6 +9,7 @@ import javax.mail.internet.ContentType;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.Debug;
 
+import static com.garretwilson.lang.ClassUtilities.getPropertyName;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import static com.javaguise.GuiseResourceConstants.*;
@@ -23,7 +24,7 @@ Only one child comoponent is visible at a time.
 The card layout maintains its own value model that maintains the current selected card.
 @author Garret Wilson
 */
-public class CardLayout extends AbstractLayout<CardLayout.Constraints> //TODO del when works implements ValueModel<Component<?>>
+public class CardLayout extends AbstractLayout<CardLayout.Constraints>
 {
 
 	/**The decorated value model maintaining the selected component.*/
@@ -149,108 +150,6 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> //TODO de
 		valueModel=new CardValueModel(session);	//create a new decorated value model
 	}
 
-	//model delegation
-
-	/**Determines the advisory information text, such as might appear in a tooltip.
-	If information is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
-	@return The advisory information text, such as might appear in a tooltip, or <code>null</code> if there is no advisory information.
-	@exception MissingResourceException if there was an error loading the value from the resources.
-	@see #getInfoResourceKey()
-	*/
-//TODO del when works	public String getInfo() throws MissingResourceException {return getValueModel().getInfo();}
-
-	/**Sets the advisory information text, such as might appear in a tooltip.
-	This is a bound property.
-	@param newInfo The new text of the advisory information text, such as might appear in a tooltip.
-	@see Model#INFO_PROPERTY
-	*/
-//TODO del when works	public void setInfo(final String newInfo) {getValueModel().setInfo(newInfo);}
-
-	/**@return The content type of the advisory information text.*/
-//TODO del when works	public ContentType getInfoContentType() {return getValueModel().getInfoContentType();}
-
-	/**Sets the content type of the advisory information text.
-	This is a bound property.
-	@param newInfoContentType The new advisory information text content type.
-	@exception NullPointerException if the given content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
-	@see Model#INFO_CONTENT_TYPE_PROPERTY
-	*/
-//TODO del when works	public void setInfoContentType(final ContentType newInfoContentType) {getValueModel().setInfoContentType(newInfoContentType);}
-
-	/**@return The advisory information text resource key, or <code>null</code> if there is no advisory information text resource specified.*/
-//TODO del when works	public String getInfoResourceKey() {return getValueModel().getInfoResourceKey();}
-
-	/**Sets the key identifying the text of the advisory information in the resources.
-	This is a bound property.
-	@param newInfoResourceKey The new advisory information text resource key.
-	@see Model#INFO_RESOURCE_KEY_PROPERTY
-	*/
-//TODO del when works	public void setInfoResourceKey(final String newInfoResourceKey) {getValueModel().setInfoResourceKey(newInfoResourceKey);}
-
-	//value model delegation
-
-	/**@return Whether the contents of this model are valid.*/
-//TODO del when works	public boolean isValid() {return getValueModel().isValid();}
-
-	/**Determines the text of the label.
-	If a label is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
-	@return The label text, or <code>null</code> if there is no label text.
-	@exception MissingResourceException if there was an error loading the value from the resources.
-	@see #getLabelResourceKey()
-	@see #getPlainLabel()
-	*/
-//TODO del when works	public String getLabel() throws MissingResourceException {return getValueModel().getLabel();}
-
-	/**Sets the text of the label.
-	This is a bound property.
-	@param newLabel The new text of the label.
-	@see #LABEL_PROPERTY
-	*/
-//TODO del when works	public void setLabel(final String newLabel) {getValueModel().setLabel(newLabel);}
-
-	/**@return The content type of the label text.*/
-//TODO del when works	public ContentType getLabelContentType() {return getValueModel().getLabelContentType();}
-
-	/**Sets the content type of the label text.
-	This is a bound property.
-	@param newLabelContentType The new label text content type.
-	@exception NullPointerException if the given content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
-	@see #LABEL_CONTENT_TYPE_PROPERTY
-	*/
-//TODO del when works	public void setLabelContentType(final ContentType newLabelContentType) {getValueModel().setLabelContentType(newLabelContentType);}
-
-	/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-//TODO del when works	public String getLabelResourceKey() {return getValueModel().getLabelResourceKey();}
-
-	/**Sets the key identifying the text of the label in the resources.
-	This is a bound property.
-	@param newLabelResourceKey The new label text resource key.
-	@see #LABEL_RESOURCE_KEY_PROPERTY
-	*/
-//TODO del when works	public void setLabelResourceKey(final String newLabelResourceKey) {getValueModel().setLabelResourceKey(newLabelResourceKey);}
-
-	/**@return Whether the model is enabled and and the corresponding control can receive user input.*/
-//TODO del when works	public boolean isEnabled() {return getValueModel().isEnabled();}
-
-	/**Sets whether the model is enabled and and the corresponding control can receive user input..
-	This is a bound property of type <code>Boolean</code>.
-	@param newEnabled <code>true</code> if the corresponding control should indicate and accept user input.
-	@see #ENABLED_PROPERTY
-	*/
-//TODO del when works	public void setEnabled(final boolean newEnabled) {getValueModel().setEnabled(newEnabled);}
-
-	/**@return Whether the model's value is editable and the corresponding control will allow the the user to change the value.*/
-//TODO del when works	public boolean isEditable() {return getValueModel().isEditable();}
-
-	/**Sets whether the model's value is editable and the corresponding control will allow the the user to change the value.
-	This is a bound property of type <code>Boolean</code>.
-	@param newEditable <code>true</code> if the corresponding control should allow the user to change the value.
-	@see #EDITABLE_PROPERTY
-	*/
-//TODO del when works	public void setEditable(final boolean newEditable) {getValueModel().setEditable(newEditable);}
-
 	/**@return The current value, or <code>null</code> if there is no input value.*/
 	public Component<?> getValue() {return getValueModel().getValue();}
 
@@ -265,30 +164,14 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> //TODO de
 	*/
 	public void setValue(final Component<?> newValue) throws ValidationException {getValueModel().setValue(newValue);}
 
-	/**Resets the value to a default value, which may be invalid according to any installed validators.
-	No validation occurs.
-	@see #VALUE_PROPERTY
-	*/
-//TODO del when works	public void resetValue() {getValueModel().resetValue();}
-
-	/**@return The validator for this model, or <code>null</code> if no validator is installed.*/
-//TODO del when works	public Validator<Component<?>> getValidator() {return getValueModel().getValidator();}
-
-	/**Sets the validator.
-	This is a bound property
-	@param newValidator The validator for this model, or <code>null</code> if no validator should be used.
-	@see #VALIDATOR_PROPERTY
-	*/
-//TODO del when works	public void setValidator(final Validator<Component<?>> newValidator) {getValueModel().setValidator(newValidator);}
-
-	/**@return The class representing the type of value this model can hold.*/
-//TODO del when works	public Class<Component<?>> getValueClass() {return getValueModel().getValueClass();}
-
 	/**Metadata about individual component layout.
 	@author Garret Wilson
 	*/
-	public static class Constraints implements Layout.Constraints
+	public static class Constraints extends AbstractLayout.AbstractConstraints
 	{
+
+		/**The enabled bound property.*/
+		public final static String ENABLED_PROPERTY=getPropertyName(ControlModel.class, "enabled");
 
 		/**The label associated with an individual component.*/
 		private final LabelModel labelModel;
@@ -296,13 +179,45 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> //TODO de
 			/**@return The label associated with an individual component.*/
 			public LabelModel getLabel() {return labelModel;}
 
-		/**Constructor.
+		/**Whether the card is enabled for selection.*/
+		private boolean enabled=true;
+
+			/**@return Whether the card is enabled for selection.*/
+			public boolean isEnabled() {return enabled;}
+
+			/**Sets whether the the card is enabled for selection.
+			This is a bound property of type <code>Boolean</code>.
+			@param newEnabled <code>true</code> if the corresponding card can be selected.
+			@see ControlModel#ENABLED_PROPERTY
+			*/
+			public void setEnabled(final boolean newEnabled)
+			{
+				if(enabled!=newEnabled)	//if the value is really changing
+				{
+					final boolean oldEnabled=enabled;	//get the old value
+					enabled=newEnabled;	//actually change the value
+					firePropertyChange(ENABLED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newEnabled));	//indicate that the value changed
+				}			
+			}
+
+		/**Label constructor.
 		@param labelModel The label associated with an individual component.
 		@exception NullPointerException if the given label is <code>null</code>.
 		*/
 		public Constraints(final LabelModel labelModel)
 		{
+			this(labelModel, true);	//default to enabling the card
+		}
+
+		/**Label and enabled constructor.
+		@param labelModel The label associated with an individual component.
+		@param enabled Whether the card is enabled.
+		@exception NullPointerException if the given label is <code>null</code>.
+		*/
+		public Constraints(final LabelModel labelModel, final boolean enabled)
+		{
 			this.labelModel=checkNull(labelModel, "Label cannot be null.");
+			this.enabled=enabled;
 		}
 	}
 

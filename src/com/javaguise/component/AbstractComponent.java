@@ -213,10 +213,24 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		}
 
 	/**The view installed in this component.*/
-	private View<? extends GuiseContext, ? super C> view;
+	private View<? extends GuiseContext, ? super C> view=null;
 
-		/**@return The view installed in this component.*/
-		public View<? extends GuiseContext, ? super C> getView() {return view;}
+		/**@return The view installed in this component.
+		This implementation lazily creates a view if one has not yet been created, allowing view creation to be delayed so that appropriate properties such as layout may first be installed.
+		*/
+		public View<? extends GuiseContext, ? super C> getView()
+		{
+			if(view==null)	//if a view has not yet been created
+			{
+				view=getSession().getApplication().getView(getThis());	//ask the application for a view
+				if(view==null)	//if we couldn't find a view
+				{
+					throw new IllegalStateException("No registered view for "+getClass().getName());	//TODO use a better error
+				}
+				view.installed(getThis());	//tell the view it's being installed
+			}
+			return view;	//return the view
+		}
 
 		/**Sets the view used by this component.
 		This is a bound property.
@@ -229,7 +243,10 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			if(newView!=checkNull(view, "View cannot be null"))	//if the value is really changing
 			{
 				final View<? extends GuiseContext, ? super C> oldView=view;	//get a reference to the old value
-				oldView.uninstalled(getThis());	//tell the old view it's being uninstalled
+				if(oldView!=null)	//if a view has been installed
+				{
+					oldView.uninstalled(getThis());	//tell the old view it's being uninstalled
+				}
 				view=newView;	//actually change values
 				oldView.installed(getThis());	//tell the new view it's being installed
 				firePropertyChange(VIEW_PROPERTY, oldView, newView);	//indicate that the value changed				
@@ -749,12 +766,6 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		{
 			throw new IllegalStateException("No registered controller for "+getClass().getName());	//TODO use a better error
 		}
-		view=session.getApplication().getView(getThis());	//ask the application for a view
-		if(view==null)	//if we couldn't find a view
-		{
-			throw new IllegalStateException("No registered view for "+getClass().getName());	//TODO use a better error
-		}
-		view.installed(getThis());	//tell the view it's being installed
 	}
 
 	/**Determines whether the models of this component and all of its child components are valid.

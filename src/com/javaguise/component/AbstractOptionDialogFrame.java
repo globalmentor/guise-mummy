@@ -37,7 +37,7 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 	/**@return The container component used to hold content, including the option child component.*/
 	protected Container<?> getContentContainer() {return (Container<?>)super.getContent();}
 
-	/**@return The component representing option contents.*/ 
+	/**@return The component representing option contents, or <code>null</code> if this frame does not have an option contents component.*/ 
 	public Component<?> getOptionContent()
 	{
 		return ((RegionLayout)getContentContainer().getLayout()).getComponent(Region.CENTER);	//return the center component, if there is one
@@ -53,13 +53,13 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 		if(oldOptionContents!=newOptionContent)	//if the value is really changing
 		{
 			final Container<?> contentsContainer=getContentContainer();	//get our container
-			if(newOptionContent!=null)	//if a content component is given
-			{
-				contentsContainer.add(newOptionContent, RegionLayout.CENTER_CONSTRAINTS);	//add the component to the center of the container
-			}
-			else if(oldOptionContents!=null)	//no component was given but an old content component was present
+			if(oldOptionContents!=null)	//if an old content component was present
 			{
 				contentsContainer.remove(oldOptionContents);	//remove the old component
+			}
+			if(newOptionContent!=null)	//if a new content component is given
+			{
+				contentsContainer.add(newOptionContent, RegionLayout.CENTER_CONSTRAINTS);	//add the component to the center of the container
 			}
 		}
 	}

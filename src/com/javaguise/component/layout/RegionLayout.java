@@ -50,7 +50,7 @@ public class RegionLayout extends AbstractLayout<RegionLayout.Constraints>
 	/**Metadata about individual component layout.
 	@author Garret Wilson
 	*/
-	public static class Constraints implements Layout.Constraints
+	public static class Constraints extends AbstractLayout.AbstractConstraints
 	{
 
 		/**The layout region for the associated component.*/

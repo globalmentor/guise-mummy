@@ -9,7 +9,7 @@ The contents of an option dialog frame should be accessed by {@link #getOptionCo
 public interface OptionDialogFrame<O, C extends OptionDialogFrame<O, C>> extends DialogFrame<O, C>
 {
 
-	/**@return The component representing option contents.*/ 
+	/**@return The component representing option contents, or <code>null</code> if this frame does not have an option contents component.*/ 
 	public Component<?> getOptionContent();
 
 	/**Sets the component representing option contents.

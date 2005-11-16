@@ -102,7 +102,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	*/
 	public void add(final Component<?> component, final Layout.Constraints constraints)
 	{
-		add(component, getLayout(), constraints);	//TODO comment
+		add(component, getLayout(), constraints);	//add the component with the given constraints
 	}
 
 	/**Adds a component to the container.
