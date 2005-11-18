@@ -57,6 +57,7 @@ public class HomePanel extends DefaultNavigationPanel
 
 		inputTextControl.getModel().setDescription("This is a description of the first text control.");
 		inputTextControl.setFlyoverEnabled(true);	//turn on flyovers
+
 		inputTextControl.getFlyoverStrategy().setPreferredWidth(new Extent(15, Extent.Unit.EM));
 		inputTextControl.getFlyoverStrategy().setPreferredHeight(new Extent(10, Extent.Unit.EM));
 		
@@ -94,7 +95,7 @@ public class HomePanel extends DefaultNavigationPanel
 		}										
 		inputPanel.add(checkbox);
 		
-		final ListControl<Float> listControl=new ListControl<Float>(session, Float.class, new SingleListSelectionStrategy<Float>());	//create a list control allowing only single selections
+		final ListControl<Float> listControl=new ListControl<Float>(session, Float.class, new SingleListSelectionPolicy<Float>());	//create a list control allowing only single selections
 		listControl.getModel().setLabel("Pick a Number");	//set the list control label
 		listControl.setRowCount(5);
 		listControl.getModel().add(new Float(10));
@@ -418,7 +419,7 @@ Debug.trace("list control changed value to", newValue);
 		afterImageLabel.getModel().setLabel("This is a lot of text. ;alsjfd ;lkjas ;ljag ;lkjas g;lkajg; laksgj akjlshf lkjashd flkjsdhlksahlsadkhj asldkhjf ;sgdh a;lgkh a;glkha s;dglh asgd;");
 		contentPanel.add(afterImageLabel);
 
-		final ListControl<String> listSelectControl=new ListControl<String>(session, String.class, new SingleListSelectionStrategy<String>());
+		final ListControl<String> listSelectControl=new ListControl<String>(session, String.class, new SingleListSelectionPolicy<String>());
 		listSelectControl.getModel().setLabel("Choose an option.");
 		listSelectControl.getModel().add("The first option");
 		listSelectControl.getModel().add(null);
@@ -509,6 +510,25 @@ Debug.trace("list control changed value to", newValue);
 					}
 				});
 
+		final TabControl<String> stringTabControl=new TabControl<String>(session, String.class, Orientation.Flow.LINE);
+		stringTabControl.getModel().add("First tab");
+		stringTabControl.getModel().add("Second tab");
+		stringTabControl.getModel().add("Third tab");
+		contentPanel.add(stringTabControl);
+		try
+		{
+			stringTabControl.getModel().setSelectedValues("First tab");
+		}
+		catch (ValidationException e)
+		{
+			throw new AssertionError(e);
+		}
+
+		
+		
+		final CardTabControl remoteTabControl=new CardTabControl(session, tabbedPanel, Orientation.Flow.LINE);
+		contentPanel.add(remoteTabControl);
+		
 
 		add(contentPanel, RegionLayout.CENTER_CONSTRAINTS);	//add the content panel in the center
 

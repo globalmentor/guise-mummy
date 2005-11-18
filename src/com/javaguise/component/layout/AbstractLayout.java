@@ -192,7 +192,7 @@ public abstract class AbstractLayout<T extends Layout.Constraints> extends Guise
 			{
 				if(componentConstraintsEntry.getValue()==constraints)	//if this component was associated with the constraints
 				{
-Debug.trace("Ready to fire an event indicating that component", componentConstraintsEntry.getKey(), "changed property", propertyValueChangeEvent.getPropertyName(), "to value", propertyValueChangeEvent.getNewValue());	//TODO del
+//TODO del Debug.trace("Ready to fire an event indicating that component", componentConstraintsEntry.getKey(), "changed property", propertyValueChangeEvent.getPropertyName(), "to value", propertyValueChangeEvent.getNewValue());	//TODO del
 						//fire an event indicating that the constraints for this component changed one if its properties
 					fireConstraintsPropertyChange(componentConstraintsEntry.getKey(), constraints, propertyValueChangeEvent.getPropertyName(), propertyValueChangeEvent.getOldValue(), propertyValueChangeEvent.getNewValue());								
 				}

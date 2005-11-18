@@ -43,7 +43,7 @@ public interface Container<C extends Container<C>> extends CompositeComponent<C>
 	@param component The component to check.
 	@return <code>true</code> if this container contains the given component.
 	*/
-	public boolean contains(final Component<?> component);
+	public boolean contains(final Object component);
 
 	/**Returns the index in the container of the first occurrence of the specified component.
 	@param component The component the index of which should be returned.

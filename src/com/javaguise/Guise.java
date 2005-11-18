@@ -23,7 +23,7 @@ public class Guise
 	public final static String GUISE_NAME="Guise"+TRADE_MARK_SIGN_CHAR;
 
 	/**The web address of Guise.*/
-	public final static URI GUISE_WEB_URI=URI.create("http://www.javaguise.com/");
+	public final static URI GUISE_WEB_URI=URI.create("http://www.guiseframework.com/");
 
 	/**The base path to Guise public resources.*/
 	public final static String PUBLIC_RESOURCE_BASE_PATH="pub/";

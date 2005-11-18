@@ -1,13 +1,19 @@
 package com.javaguise.model;
 
 import java.util.*;
+import static java.util.Collections.*;
 
+import com.garretwilson.util.ArrayUtilities;
+import com.garretwilson.util.Debug;
+import com.garretwilson.util.SynchronizedSetDecorator;
 import com.javaguise.event.*;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
 import com.javaguise.validator.Validator;
 
+import static com.garretwilson.lang.IntegerUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.util.ArrayUtilities.createArray;
 
 /**The default implementation of a model for selecting one or more values from a list.
 The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class.
@@ -17,6 +23,12 @@ This implementation has a default value of <code>null</code>.
 */
 public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements ListSelectModel<V>
 {
+
+	/**The thread-safe sorted set of selected indices, synchronized on this model.*/
+	private final Set<Integer> selectedIndexSet;
+
+		/**@return The thread-safe sorted set of selected indices, synchronized on this model.*/
+		protected Set<Integer> getSelectedIndexSet() {return selectedIndexSet;}
 
 	/**The default value.*/
 	private final V defaultValue=null;
@@ -52,11 +64,15 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	*/
 	public void clearValue()
 	{
-		final V oldSelectedValue=getSelectedValue();	//get the old selected value
-		getSelectionStrategy().setSelectedValues(this);	//delegate to the selection strategy, selecting no values
-		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
+		final V oldSelectedValue, newSelectedValue;
+		synchronized(this)	//don't allow the list to be modified while we update the selections
+		{
+			oldSelectedValue=getSelectedValue();	//get the old selected value
+			getSelectedIndexSet().clear();	//remove all selected indices
+			newSelectedValue=getSelectedValue();	//find out the new selected value
+		}
+		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, newSelectedValue);	//indicate that the value changed if needed		
 	}
-
 
 	/**Resets the value to a default value, which may be invalid according to any installed validators.
 	No validation occurs.
@@ -120,7 +136,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 		final boolean modified=values.remove(value);	//remove the value from the list
 		if(modified)	//if the list was modified
 		{
-			fireListModified(-1, null, (V)value);	//indicate the value was removed from an unknown index
+			listModified(-1, null, (V)value);	//indicate the value was removed from an unknown index
 			firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 		}
 		return modified;	//indicate whether the list was modified
@@ -146,7 +162,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 		final boolean modified=values.addAll(collection);	//add all the values
 		if(modified)	//if the list was modified
 		{
-			fireListModified(-1, null, null);	//indicate a general list modification
+			listModified(-1, null, null);	//indicate a general list modification
 			firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 		}
 		return modified;	//indicate whether the list was modified
@@ -165,7 +181,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 		final boolean modified=values.addAll(index, collection);	//add the values
 		if(modified)	//if the list was modified
 		{
-			fireListModified(-1, null, null);	//indicate a general list modification
+			listModified(-1, null, null);	//indicate a general list modification
 			firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 		}
 		return modified;	//indicate whether the list was modified
@@ -184,7 +200,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 		final boolean modified=values.removeAll(collection);	//remove the values
 		if(modified)	//if the list was modified
 		{
-			fireListModified(-1, null, null);	//indicate a general list modification
+			listModified(-1, null, null);	//indicate a general list modification
 			firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 		}
 		return modified;	//indicate whether the list was modified
@@ -203,7 +219,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 		final boolean modified=values.retainAll(collection);	//remove values if needed
 		if(modified)	//if the list was modified
 		{
-			fireListModified(-1, null, null);	//indicate a general list modification
+			listModified(-1, null, null);	//indicate a general list modification
 			firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 		}
 		return modified;	//indicate whether the list was modified		
@@ -214,7 +230,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	{
 		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		values.clear();	//clear the list
-		fireListModified(-1, null, null);	//indicate a general list modification (without more intricate synchornization, we can't know for sure if the list was modified, even checking the size beforehand, because of thread race conditions)
+		listModified(-1, null, null);	//indicate a general list modification (without more intricate synchornization, we can't know for sure if the list was modified, even checking the size beforehand, because of thread race conditions)
 		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 	}
 
@@ -235,7 +251,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	{
 		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		final V oldValue=values.set(index, value);	//set the value at the given index
-		fireListModified(index, oldValue, value);	//indicate that the value at the given index was replaced
+		listModified(index, oldValue, value);	//indicate that the value at the given index was replaced
 		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 		return oldValue;	//return the old value
 	}
@@ -249,7 +265,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	{
 		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		values.add(index, value);	//add the value at the requested index
-		fireListModified(index, value, null);	//indicate the value was added at the given index
+		listModified(index, value, null);	//indicate the value was added at the given index
 		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 	}
 
@@ -262,7 +278,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	{
 		final V oldSelectedValue=getSelectedValue();	//get the old selected value
 		final V value=values.remove(index);	//remove the value at this index	
-		fireListModified(index, null, value);	//indicate the value was removed from the given index
+		listModified(index, null, value);	//indicate the value was removed from the given index
 		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 		return value;	//return the value that was removed
 	}
@@ -297,7 +313,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	*/
 	public synchronized List<V> subList(final int fromIndex, final int toIndex) {return values.subList(fromIndex, toIndex);}
 
-	/**Replaces the first occurrence in the of the given value with its replacement.
+	/**Replaces the first occurrence of the given value with its replacement.
 	This method ensures that another thread does not change the model while the search and replace operation occurs.
 	@param oldValue The value for which to search.
 	@param newValue The replacement value.
@@ -319,63 +335,47 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 		}
 	}
 
-	/**The selection strategy for this model.*/
-	private ListSelectionStrategy<V> selectionStrategy;
+	/**The selection policy for this model.*/
+	private ListSelectionPolicy<V> selectionPolicy;
 
-		/**@return The selection strategy for this model.*/
-		public ListSelectionStrategy<V> getSelectionStrategy() {return selectionStrategy;}
+		/**@return The selection policy for this model.*/
+		public ListSelectionPolicy<V> getSelectionPolicy() {return selectionPolicy;}
 
 	/**Determines the selected index.
-	This method delegates to the selection strategy.
 	If more than one index is selected, the lead selected index will be returned.
 	@return The index currently selected, or -1 if no index is selected.
 	@see #getSelectedValue()
 	*/
 	public int getSelectedIndex()
 	{
-		return getSelectionStrategy().getSelectedIndex(this);	//delegate to the selection strategy		
+		final int[] selectedIndices=getSelectedIndices();	//get the selected indices
+		return selectedIndices.length>0 ? selectedIndices[0] : -1;	//if there are indices, return the first one					
 	}
 
 	/**Determines the selected indices.
-	This method delegates to the selection strategy.
 	@return The indices currently selected.
 	@see #getSelectedValues()
 	*/
 	public int[] getSelectedIndices()
 	{
-		return getSelectionStrategy().getSelectedIndices(this);	//delegate to the selection strategy
-	}
-
-	/**Determines the selected value.
-	This method delegates to the selection strategy.
-	If more than one value is selected, the lead selected value will be returned.
-	@return The value currently selected, or <code>null</code> if no value is currently selected.
-	@see #getSelectedIndex()
-	*/
-	public V getSelectedValue()
-	{
-		return getSelectionStrategy().getSelectedValue(this);	//delegate to the selection strategy		
-	}
-
-	/**Determines the selected values.
-	This method delegates to the selection strategy.
-	@return The values currently selected.
-	@see #getSelectedIndices()
-	*/
-	public V[] getSelectedValues()
-	{
-		return getSelectionStrategy().getSelectedValues(this);	//delegate to the selection strategy
+		final Set<Integer> selectedIndexSet=getSelectedIndexSet();	//get the set of selected indices
+		final Integer[] integerIndices;	//we'll initially get the selected indices as integers
+		synchronized(selectedIndexSet)	//don't allow the selection set to be changed while we calculate how many indices to allocate 
+		{
+			integerIndices=selectedIndexSet.toArray(new Integer[selectedIndexSet.size()]);	//create an array of integer selected indices
+		}
+		return toIntArray(integerIndices);	//return the integers as an array of ints
 	}
 
 	/**Sets the selected indices.
 	Invalid and duplicate indices will be ignored.
-	This method delegates to the selection strategy.
 	@param indices The indices to select.
 	@exception ValidationException if the provided value is not valid.
+	@see ListSelectionPolicy#getSetSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedValues(V[])
-	@see #addSelectedIndex(int)
+	@see #addSelectedIndices(int...)
 	*/
-	public void setSelectedIndices(final int... indices) throws ValidationException
+	public void setSelectedIndices(int... indices) throws ValidationException
 	{
 int validIndexCount=0;	//TODO fix validation hack
 for(int i=indices.length-1; i>=0; --i)
@@ -393,9 +393,128 @@ if(validIndexCount==0)	//TODO add more thorough validation throughout; right now
 		validator.validate(null);	//validate the new value, throwing an exception if anything is wrong
 	}
 }
-		final V oldSelectedValue=getSelectedValue();	//get the old selected value
-		getSelectionStrategy().setSelectedIndices(this, indices);	//delegate to the selection strategy
-		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
+			//TODO this method, along with the add and remove methods, need to collect added and/or removed indices and report them after all changes are done; better event classes should be created as well
+		final V oldSelectedValue, newSelectedValue;
+		synchronized(this)	//don't allow the list to be modified while we update the selections
+		{
+			indices=getSelectionPolicy().getSetSelectedIndices(this, indices);	//get the indices to set
+			oldSelectedValue=getSelectedValue();	//get the old selected value
+			final Set<Integer> selectedIndexSet=getSelectedIndexSet();	//get the set of selected indices
+			final Iterator<Integer> oldSelectedIndexIterator=selectedIndexSet.iterator();	//get an iterator to the old selected indices
+			while(oldSelectedIndexIterator.hasNext())	//while there are more old selected indices
+			{
+				final Integer oldSelectedIndex=oldSelectedIndexIterator.next();	//get the next old selected index
+				if(ArrayUtilities.indexOf(indices, oldSelectedIndex.intValue())<0)	//if the new set of indices doesn't have this old index
+				{
+					oldSelectedIndexIterator.remove();	//remove this old selected index
+				}
+			}
+			final int itemCount=size();	//find out how many items there are
+			for(final Integer index:indices)	//for each index
+			{
+				if(index>=0 && index<itemCount)	//if the index is within the allowed range
+				{
+					if(selectedIndexSet.add(index))	//add this selection to the set; if the index was added
+					{
+						fireSelectionChanged(index, null);	//notify listeners that an index was added						
+					}
+				}
+			}
+			newSelectedValue=getSelectedValue();	//find out the new selected value
+		}
+		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, newSelectedValue);	//indicate that the value changed if needed		
+	}
+
+	/**Adds a selection at the given indices.
+	Any invalid indices will be ignored.
+	@param indices The indices to add to the selection.
+	@exception ValidationException if the provided value is not valid.
+	@see ListSelectionPolicy#getAddSelectedIndices(ListSelectModel, int[])
+	@see #setSelectedIndices(int[])
+	*/
+	public void addSelectedIndices(int... indices) throws ValidationException
+	{
+		final V oldSelectedValue, newSelectedValue;
+		synchronized(this)	//don't allow the list to be modified while we update the selections
+		{
+			indices=getSelectionPolicy().getAddSelectedIndices(this, indices);	//get the indices to add
+			oldSelectedValue=getSelectedValue();	//get the old selected value
+			final Set<Integer> selectedIndexSet=getSelectedIndexSet();	//get the set of selected indices
+			final int itemCount=size();	//find out how many items there are
+			for(final Integer index:indices)	//for each index
+			{
+				if(index>=0 && index<itemCount)	//if the index is within the allowed range
+				{
+					if(selectedIndexSet.add(index))	//add this selection to the set; if the index was added
+					{
+						fireSelectionChanged(index, null);	//notify listeners that an index was added						
+					}
+				}
+			}
+			newSelectedValue=getSelectedValue();	//find out the new selected value
+		}
+		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, newSelectedValue);	//indicate that the value changed if needed		
+	}
+
+	/**Removes a selection at the given indices.
+	Any invalid indices will be ignored.
+	@param indices The indices to remove from the selection.
+	@exception ValidationException if the provided value is not valid.
+	@see ListSelectionPolicy#getRemoveSelectedIndices(ListSelectModel, int[])
+	@see #setSelectedIndices(int[])
+	*/
+	public void removeSelectedIndices(int... indices) throws ValidationException
+	{
+		final V oldSelectedValue, newSelectedValue;
+		synchronized(this)	//don't allow the list to be modified while we update the selections
+		{
+			indices=getSelectionPolicy().getRemoveSelectedIndices(this, indices);	//get the indices to remove
+			oldSelectedValue=getSelectedValue();	//get the old selected value
+			final Set<Integer> selectedIndexSet=getSelectedIndexSet();	//get the set of selected indices
+			final int itemCount=size();	//find out how many items there are
+			for(final Integer index:indices)	//for each index
+			{
+				if(index>=0 && index<itemCount)	//if the index is within the allowed range
+				{
+					if(selectedIndexSet.remove(index))	//remove this selection from the set; if the index was removed
+					{
+						fireSelectionChanged(null, index);	//notify listeners that an index was removed						
+					}
+				}
+			}
+			newSelectedValue=getSelectedValue();	//find out the new selected value
+		}
+		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, newSelectedValue);	//indicate that the value changed if needed		
+	}
+
+	/**Determines the selected value.
+	If more than one value is selected, the lead selected value will be returned.
+	@return The value currently selected, or <code>null</code> if no value is currently selected.
+	@see #getSelectedIndex()
+	*/
+	public V getSelectedValue()
+	{
+		final V[] selectedValues=getSelectedValues();	//get the selected values
+		return selectedValues.length>0 ? selectedValues[0] : null;	//if there are values, return the first one
+	}
+
+	/**Determines the selected values.
+	This method delegates to the selection strategy.
+	@return The values currently selected.
+	@see #getSelectedIndices()
+	*/
+	public V[] getSelectedValues()
+	{		
+		synchronized(this)	//don't allow the model to be changed while we determine the selections 
+		{
+			final int[] selectedIndices=getSelectedIndices();	//get the selected indices
+			final V[] selectedValues=createArray(getValueClass(), selectedIndices.length);	//create an array of selected objects
+			for(int i=selectedIndices.length-1; i>=0; --i)	//for each selected index
+			{
+				selectedValues[i]=get(selectedIndices[i]);	//get the value from the model at this index
+			}
+			return selectedValues;	//return the selected values
+		}
 	}
 
 	/**Sets the selected values.
@@ -416,37 +535,15 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 		validator.validate(null);	//validate the new value, throwing an exception if anything is wrong
 	}
 }
-		final V oldSelectedValue=getSelectedValue();	//get the old selected value
-		getSelectionStrategy().setSelectedValues(this, values);	//delegate to the selection strategy
-		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
-	}
-
-	/**Adds a selection at the given index.
-	An invalid index will be ignored.
-	This method delegates to the selection strategy.
-	@param index The index to add as a selection.
-	@exception ValidationException if the provided value is not valid.
-	@see #setSelectedIndices(int[])
-	*/
-	public void addSelectedIndex(final int index) throws ValidationException
-	{
-		final V oldSelectedValue=getSelectedValue();	//get the old selected value
-		getSelectionStrategy().addSelectedIndex(this, index);	//delegate to the selection strategy
-		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
-	}
-
-	/**Removes a selection at the given index.
-	An invalid index will be ignored.
-	This method delegates to the selection strategy.
-	@param index The index to remove as a selection.
-	@exception ValidationException if the provided value is not valid.
-	@see #setSelectedIndices(int[])
-	*/
-	public void removeSelectedIndex(final int index) throws ValidationException
-	{
-		final V oldSelectedValue=getSelectedValue();	//get the old selected value
-		getSelectionStrategy().removeSelectedIndex(this, index);	//delegate to the selection strategy
-		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
+		synchronized(this)	//don't allow the model to be changed while we determine the indices 
+		{
+			final int[] indices=new int[values.length];	//create a new array in which to hold the indices to select
+			for(int i=values.length-1; i>=0; --i)	//for each value
+			{
+				indices[i]=indexOf(values[i]);	//get the index of this value, ignoring whether it is valid as its validity will be checked in setSelectedIndices()
+			}
+			setSelectedIndices(indices);	//select the indices
+		}
 	}
 
 	/**Adds a list listener.
@@ -465,6 +562,51 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 		getEventListenerManager().remove(ListListener.class, listListener);	//remove the listener
 	}
 
+	/**Adds a list selection listener.
+	@param selectionListener The selection listener to add.
+	*/
+	public void addListSelectionListener(final ListSelectionListener<V> selectionListener)
+	{
+		getEventListenerManager().add(ListSelectionListener.class, selectionListener);	//add the listener
+	}
+
+	/**Removes a list selection listener.
+	@param selectionListener The selection listener to remove.
+	*/
+	public void removeListSelectionListener(final ListSelectionListener<V> selectionListener)
+	{
+		getEventListenerManager().remove(ListSelectionListener.class, selectionListener);	//remove the listener
+	}
+
+	/**Called when the list is modified.
+	This method calls the method for notifying listeners that the list was modified.
+	@param index The index at which an element was added and/or removed, or -1 if the index is unknown.
+	@param addedElement The element that was added to the list, or <code>null</code> if no element was added or it is unknown whether or which elements were added.
+	@param removedElement The element that was removed from the list, or <code>null</code> if no element was removed or it is unknown whether or which elements were removed.
+	@see #fireListModified(int, Object, Object)
+	*/
+	protected void listModified(final int index, final V addedElement, final V removedElement)	//TODO fire selection change events if we need to
+	{
+		try
+		{
+			if(index>=0 && addedElement==null && removedElement!=null)	//if a single element was removed and not replaced
+			{
+				removeSelectedIndices(index);	//make sure the removed index is not selected, as there's a different (or no) value there, now
+					//TODO go through the other indices and adjust them
+			}
+			else if(index<0 || (addedElement==null && removedElement==null))	//if we don't have enough information about what exactly happened
+			{
+				setSelectedIndices();	//clear all selections, as we don't know which values were added or removed
+			}
+		}
+		catch(final ValidationException validationException)
+		{
+			Debug.warn(validationException);	//TODO improve error handling
+		}
+		fireListModified(index, addedElement, removedElement);	//fire an event indicating that the list changed
+	}
+
+	
 	/**Fires an event to all registered list listeners indicating the list was modified.
 	This method first manually notifies its selection strategy that the list has changed.
 	@param index The index at which an element was added and/or removed, or -1 if the index is unknown.
@@ -475,11 +617,25 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	*/
 	protected void fireListModified(final int index, final V addedElement, final V removedElement)
 	{
-		final ListEvent<ListSelectModel<V>, V> listEvent=new ListEvent<ListSelectModel<V>, V>(getSession(), this, index, addedElement, removedElement);	//create a new event
-		getSelectionStrategy().listModified(listEvent);	//manually notify the selection strategy, because the queued event might be delayed and reported out of order
 		if(getEventListenerManager().hasListeners(ListListener.class))	//if there are appropriate listeners registered
 		{
+			final ListEvent<ListSelectModel<V>, V> listEvent=new ListEvent<ListSelectModel<V>, V>(getSession(), this, index, addedElement, removedElement);	//create a new event
 			getSession().queueEvent(new PostponedListEvent<ListSelectModel<V>, V>(getEventListenerManager(), listEvent));	//tell the Guise session to queue the event
+		}
+	}
+
+	/**Fires an event to all registered selection listeners indicating the selection changed.
+	@param addedIndex The index that was added to the selection, or <code>null</code> if no index was added or it is unknown whether or which indices were added.
+	@param removedIndex The index that was removed from the list, or <code>null</code> if no index was removed or it is unknown whether or which indices were removed.
+	@see ListSelectionListener
+	@see ListSelectionEvent
+	*/
+	protected void fireSelectionChanged(final Integer addedIndex, final Integer removedIndex)
+	{
+		if(getEventListenerManager().hasListeners(ListSelectionListener.class))	//if there are appropriate listeners registered
+		{
+			final ListSelectionEvent<V> selectionEvent=new ListSelectionEvent<V>(getSession(), this, addedIndex, removedIndex);	//create a new event
+			getSession().queueEvent(new PostponedListSelectionEvent<V>(getEventListenerManager(), selectionEvent));	//tell the Guise session to queue the event
 		}
 	}
 
@@ -490,7 +646,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	*/
 	public DefaultListSelectModel(final GuiseSession session, final Class<V> valueClass)
 	{
-		this(session, valueClass, new MultipleListSelectionStrategy<V>());	//construct the class with a multiple selection strategy
+		this(session, valueClass, new MultipleListSelectionPolicy<V>());	//construct the class with a multiple selection strategy
 	}
 
 	/**Constructs a list select model indicating the type of values it can hold.
@@ -500,9 +656,10 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	@param listSelectionStrategy The strategy for selecting values in the model.
 	@exception NullPointerException if the given session, class object, and/or selection strategy is <code>null</code>.
 	*/
-	public DefaultListSelectModel(final GuiseSession session, final Class<V> valueClass, final ListSelectionStrategy<V> listSelectionStrategy)
+	public DefaultListSelectModel(final GuiseSession session, final Class<V> valueClass, final ListSelectionPolicy<V> listSelectionStrategy)
 	{
 		super(session, valueClass);	//construct the parent class
-		this.selectionStrategy=checkNull(listSelectionStrategy, "Selection strategy cannot be null.");
+		selectedIndexSet=new SynchronizedSetDecorator<Integer>(new TreeSet<Integer>(), this);	//create a sorted set synchronized on this object
+		this.selectionPolicy=checkNull(listSelectionStrategy, "Selection strategy cannot be null.");
 	}
 }

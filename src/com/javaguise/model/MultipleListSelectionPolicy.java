@@ -7,6 +7,6 @@ This class is thread-safe, and assumes that the corresponding select model is th
 @author Garret Wilson
 @see ListSelectModel
 */
-public final class MultipleListSelectionStrategy<V> extends AbstractListSelectionStrategy<V>
+public final class MultipleListSelectionPolicy<V> extends AbstractListSelectionPolicy<V>
 {
 }

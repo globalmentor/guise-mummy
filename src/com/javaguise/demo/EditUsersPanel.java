@@ -29,7 +29,7 @@ public class EditUsersPanel extends DefaultNavigationPanel
 		super(session, new FlowLayout(session, Orientation.Flow.LINE));	//construct the parent class flowing horizontally
 		getModel().setLabel("Guise\u2122 Demonstration: Edit Users");	//set the panel title	
 
-		final ListControl<DemoUser> userListControl=new ListControl<DemoUser>(session, DemoUser.class, new SingleListSelectionStrategy<DemoUser>());	//create a list control allowing only single selections
+		final ListControl<DemoUser> userListControl=new ListControl<DemoUser>(session, DemoUser.class, new SingleListSelectionPolicy<DemoUser>());	//create a list control allowing only single selections
 		userListControl.getModel().setValidator(new ValueRequiredValidator<DemoUser>(session));	//require a value to be selected
 		userListControl.getModel().setLabel("Users");	//set the list control label
 		userListControl.setRowCount(8);	//request eight visible rows in the list
