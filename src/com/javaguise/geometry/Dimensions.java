@@ -10,6 +10,9 @@ import com.garretwilson.lang.ObjectUtilities;
 public class Dimensions
 {
 
+	/**A convenience dimensions of zero pixel size.*/
+	public final static Dimensions ZERO_DIMENSIONS=new Dimensions(0, 0, 0, Extent.Unit.PIXEL);
+
 	/**The width extent.*/
 	private final Extent width;
 
@@ -116,7 +119,7 @@ public class Dimensions
 	/**@return A string representation of the object.*/
 	public final String toString()
 	{
-		return "["+getWidth().getValue()+", "+getHeight().getValue()+", "+getDepth().getValue()+"]";	//"[width, depth, height]"
+		return "["+getWidth().getValue()+", "+getHeight().getValue()+", "+getDepth().getValue()+"]";	//"[width, height, depth]"
 	}
 
 }

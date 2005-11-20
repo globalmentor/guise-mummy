@@ -49,11 +49,11 @@ public class HomePanel extends DefaultNavigationPanel
 
 		//input panel
 		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE));	//create the input panel flowing vertically
-		inputPanel.setBackgrondColor(RGBColor.AQUA_MARINE);
+		inputPanel.setBackgroundColor(RGBColor.AQUA_MARINE);
 		final TextControl<Float> inputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
 		inputTextControl.getModel().setLabel("Input Number");	//add a label to the text input control
 		inputTextControl.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
-		inputTextControl.setBackgrondColor(RGBColor.DARK_GOLDEN_ROD);
+		inputTextControl.setBackgroundColor(RGBColor.DARK_GOLDEN_ROD);
 
 		inputTextControl.getModel().setDescription("This is a description of the first text control.");
 		inputTextControl.setFlyoverEnabled(true);	//turn on flyovers
@@ -149,8 +149,8 @@ Debug.trace("list control changed value to", newValue);
 		testButton.getFlyoverStrategy().setPreferredHeight(new Extent(10, Extent.Unit.EM));
 */
 		
-		testButton.setCornerRadius(Corner.LINE_FAR_PAGE_NEAR, Component.ROUNDED_CORNER_RADIUS_EXTENT);
-		testButton.setCornerRadius(Corner.LINE_FAR_PAGE_FAR, Component.ROUNDED_CORNER_RADIUS_EXTENT);
+		testButton.setCornerArcSize(Corner.LINE_FAR_PAGE_NEAR, Component.ROUNDED_CORNER_ARC_SIZE);
+		testButton.setCornerArcSize(Corner.LINE_FAR_PAGE_FAR, Component.ROUNDED_CORNER_ARC_SIZE);
 		
 		testButton.getModel().addActionListener(new NavigateActionListener<ActionModel>("helloworld"));
 		buttonPanel.add(testButton);	//add a new button
