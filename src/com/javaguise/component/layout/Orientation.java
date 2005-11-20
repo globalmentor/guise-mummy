@@ -15,54 +15,14 @@ Static preinstantiated orientation objects are provided for common orientations.
 public class Orientation
 {
 
-	/**Indicates a logical flow axis.
-	@author Garret Wilson
-	*/
-	public enum Flow
-	{
-		/**Flow along a line; the X axis in left-to-right, top-to-botom orientation.*/
-		LINE,
-		
-		/**Flow along a page; the Y axis in left-to-right, top-to-botom orientation.*/
-		PAGE;		
-
-	
-		/**Indicates an end of a flow, relative to a direction.
-		@author Garret Wilson
-		@see Direction
-		*/
-		public enum End
-		{
-			/**Flow along a line; the X axis in left-to-right, top-to-botom orientation.*/
-			LINE,
-			
-			/**Flow along a page; the Y axis in left-to-right, top-to-botom orientation.*/
-			PAGE;		
-		}
-	
-	
-	}
-
 	/**Left-to-right line, top-to-bottom page orientation (e.g. English).*/
-	public final static Orientation LEFT_TO_RIGHT_TOP_TO_BOTTOM=new Orientation(Axis.X, Direction.INCREASING, Direction.INCREASING);
+	public final static Orientation LEFT_TO_RIGHT_TOP_TO_BOTTOM=new Orientation(Axis.X, Flow.Direction.INCREASING, Flow.Direction.INCREASING);
 	
 	/**Right-to-left line, top-to-bottom page orientation (e.g. Arabic).*/
-	public final static Orientation RIGHT_TO_LEFT_TOP_TO_BOTTOM=new Orientation(Axis.X, Direction.DECREASING, Direction.INCREASING);
+	public final static Orientation RIGHT_TO_LEFT_TOP_TO_BOTTOM=new Orientation(Axis.X, Flow.Direction.DECREASING, Flow.Direction.INCREASING);
 
 	/**Top-to-bottom line, right-to-left page orientation (e.g. Chinese).*/
-	public final static Orientation TOP_TO_BOTTOM_RIGHT_TO_LEFT=new Orientation(Axis.Y, Direction.INCREASING, Direction.DECREASING);
-
-	/**The flow direction for a line or page, relative to the origin in the top, left-hand corner of the area.
-	@author Garret Wilson
-	*/
-	public enum Direction
-	{
-		/**Left-to-right lines or top-to-bottom pages.*/
-		INCREASING,
-
-		/**Right-to-left lines or bottom-to-top pages.*/
-		DECREASING;
-	}
+	public final static Orientation TOP_TO_BOTTOM_RIGHT_TO_LEFT=new Orientation(Axis.Y, Flow.Direction.INCREASING, Flow.Direction.DECREASING);
 
 	/**The axis for each flow (line and page).*/
 	private final Axis[] axes=new Axis[2];
@@ -93,13 +53,13 @@ public class Orientation
 		}
 
 	/**The direction for each flow (line and page).*/
-	private final Direction[] directions=new Direction[2];
+	private final Flow.Direction[] directions=new Flow.Direction[2];
 
 		/**Determines the direction of the particular flow.
 		@param flow The flow (line or page).
 		@return The direction of the specified flow.
 		*/
-		public Direction getDirection(final Flow flow)
+		public Flow.Direction getDirection(final Flow flow)
 		{
 			return directions[flow.ordinal()];	//get the direction for this flow
 		}
@@ -113,9 +73,9 @@ public class Orientation
 	@param pageDirection The direction of pages.
 	@exception NullPointerException if the line axis, line direction, and/or page direction is <code>null</code>.
 	*/
-	public Orientation(final Axis lineAxis, final Direction lineDirection, final Direction pageDirection)
+	public Orientation(final Axis lineAxis, final Flow.Direction lineDirection, final Flow.Direction pageDirection)
 	{
-		axes[Flow.LINE.ordinal()]=checkNull(lineAxis, "Line axiscannot be null.");	//set the line axis
+		axes[Flow.LINE.ordinal()]=checkNull(lineAxis, "Line axis cannot be null.");	//set the line axis
 		axes[Flow.PAGE.ordinal()]=lineAxis==Axis.X ? Axis.Y : Axis.X;	//the page axis will be the perpendicular axis
 		directions[Flow.LINE.ordinal()]=checkNull(lineDirection, "Line direction cannot be null.");	//set the line direction
 		directions[Flow.PAGE.ordinal()]=checkNull(pageDirection, "Page direction cannot be null.");	//set the page direction

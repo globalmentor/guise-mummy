@@ -11,7 +11,8 @@ import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.Debug;
 
 import static com.javaguise.GuiseResourceConstants.*;
-import com.javaguise.component.layout.Orientation;
+
+import com.javaguise.component.layout.*;
 import com.javaguise.component.transfer.*;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.ControlEvent;
@@ -32,7 +33,9 @@ import com.javaguise.style.RGBColor;
 import com.javaguise.view.View;
 
 import static com.garretwilson.lang.CharSequenceUtilities.*;
+import static com.garretwilson.lang.ClassUtilities.getPropertyName;
 import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.util.ArrayUtilities.*;
 
 /**An abstract implementation of a component.
 @author Garret Wilson
@@ -122,6 +125,86 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		}
 */
 
+
+	/**The array of extents each representing a corner radius.*/
+	private Extent[] cornerRadiuses=fill(new Extent[Corner.values().length], Extent.ZERO_EXTENT1);
+
+	/**The properties corresponding to the corner radiuses.*/
+	private final static String[] CORNER_RADIUS_PROPERTIES=new String[]{CORNER_RADIUS_LINE_NEAR_PAGE_NEAR_PROPERTY, CORNER_RADIUS_LINE_FAR_PAGE_NEAR_PROPERTY, CORNER_RADIUS_LINE_NEAR_PAGE_FAR_PROPERTY, CORNER_RADIUS_LINE_FAR_PAGE_FAR_PROPERTY};
+
+		/**Returns the radius for the indicated corner.
+		@param corner The corner for which a radius should be returned.
+		@return The radius of the given corner, or a radius of zero if the corner should not be rounded
+		*/
+		public Extent getCornerRadius(final Corner corner) {return cornerRadiuses[corner.ordinal()];}
+	
+		/**Sets the radius of a given corner.
+		The radius of each corner represents a bound property.
+		@param corner The corner for which the radius should be set.
+		@param newCornerRadius The radius extent indicating the amount of rounding of the corner, or a radius of zero if the corner should not be rounded.
+		@exception NullPointerException if the given corner and/or radius is <code>null</code>. 
+		@see Component#CORNER_RADIUS_LINE_NEAR_PAGE_NEAR_PROPERTY
+		@see Component#CORNER_RADIUS_LINE_FAR_PAGE_NEAR_PROPERTY
+		@see Component#CORNER_RADIUS_LINE_NEAR_PAGE_FAR_PROPERTY
+		@see Component#CORNER_RADIUS_LINE_FAR_PAGE_FAR_PROPERTY
+		*/
+		public void setCornerRadius(final Corner corner, final Extent newCornerRadius)
+		{
+			final int cornerOrdinal=checkNull(corner, "Corner cannot be null").ordinal();	//get the ordinal of the corner
+			final Extent oldCornerRadius=cornerRadiuses[cornerOrdinal];	//get the old value
+			if(!ObjectUtilities.equals(oldCornerRadius, checkNull(newCornerRadius, "Corner radius cannot be null")))	//if the value is really changing
+			{
+				cornerRadiuses[cornerOrdinal]=newCornerRadius;	//actually change the value
+				firePropertyChange(CORNER_RADIUS_PROPERTIES[cornerOrdinal], oldCornerRadius, newCornerRadius);	//indicate that the value changed
+			}			
+		}
+
+		/**Sets the radius of all corners.
+		This is a convenience method that calls {@link #setCornerRadius(Corner, Extent)} for each corner.
+		@param newCornerRadius The radius extent indicating the amount of rounding of the corners, or a radius of zero if the corners should not be rounded.
+		@exception NullPointerException if the given radius is <code>null</code>. 
+		*/
+		public void setCornerRadius(final Extent newCornerRadius)
+		{
+			for(final Corner corner:Corner.values())	//for each corner
+			{
+				setCornerRadius(corner, newCornerRadius);	//set this corner radius
+			}
+		}
+		
+		/**The preferred width of the component, or <code>null</code> if no preferred width has been specified.*/
+//		private Extent lineNearPageNearCornerRadius=null;
+
+			/**@return The preferred width of the component, or <code>null</code> if no preferred width has been specified.*/
+//			public Extent getPreferredWidth() {return preferredWidth;}
+
+			/**Sets the preferred width of the component.
+			This is a bound property.
+			@param newPreferredWidth The new preferred width of the component, or <code>null</code> there is no width preference.
+			@see Component#PREFERRED_WIDTH_PROPERTY 
+			*/
+/*TODO fix
+			public void setPreferredWidth(final Extent newPreferredWidth)
+			{
+				if(!ObjectUtilities.equals(preferredWidth, newPreferredWidth))	//if the value is really changing
+				{
+					final Extent oldPreferredWidth=preferredWidth;	//get the old value
+					preferredWidth=newPreferredWidth;	//actually change the value
+					firePropertyChange(PREFERRED_WIDTH_PROPERTY, oldPreferredWidth, newPreferredWidth);	//indicate that the value changed
+				}			
+			}
+*/
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 	/**The opacity of the entire component in the range (0.0-1.0), with a default of 1.0.*/
 	private float opacity=1.0f;
 
@@ -766,6 +849,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		{
 			throw new IllegalStateException("No registered controller for "+getClass().getName());	//TODO use a better error
 		}
+		assert CORNER_RADIUS_PROPERTIES.length==cornerRadiuses.length : "Number of available corners changed.";
 	}
 
 	/**Determines whether the models of this component and all of its child components are valid.
@@ -994,7 +1078,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 	@return The URI value, or <code>null</code> if there is no value available, neither explicitly set nor in the resources.
 	@exception MissingResourceException if there was an error loading the value from the resources.
 	*/
-	protected URI getURI(final URI value, final String resourceKey, final Orientation.Flow flow) throws MissingResourceException
+	protected URI getURI(final URI value, final String resourceKey, final Flow flow) throws MissingResourceException
 	{
 		if(value!=null)	//if a value is provided
 		{
@@ -1073,7 +1157,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 	@see #RESOURCE_KEY_X_SUFFIX
 	@see #RESOURCE_KEY_Y_SUFFIX
 	*/ 
-	protected String getResourceKeyAxisSuffix(final Orientation.Flow flow)
+	protected String getResourceKeyAxisSuffix(final Flow flow)
 	{
 		final Axis axis=getComponentOrientation().getAxis(flow);	//get the physical axis
 		switch(axis)

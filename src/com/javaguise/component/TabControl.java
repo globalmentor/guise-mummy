@@ -1,6 +1,6 @@
 package com.javaguise.component;
 
-import com.javaguise.component.layout.Orientation;
+import com.javaguise.component.layout.Flow;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import static com.garretwilson.lang.ClassUtilities.*;
@@ -19,10 +19,10 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 	public final static String MAX_TAB_COUNT_PROPERTY=getPropertyName(TabControl.class, "maxTabCount");
 
 	/**The flow axis.*/
-	private Orientation.Flow axis;
+	private Flow axis;
 
 		/**@return The flow axis.*/
-		public Orientation.Flow getAxis() {return axis;}
+		public Flow getAxis() {return axis;}
 
 		/**Sets the flow axis.
 		This is a bound property
@@ -30,11 +30,11 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 		@exception NullPointerException if the given axis is <code>null</code>.
 		@see #AXIS_PROPERTY
 		*/
-		public void setAxis(final Orientation.Flow newAxis)
+		public void setAxis(final Flow newAxis)
 		{
 			if(axis!=checkNull(newAxis, "Flow axis cannot be null."))	//if the value is really changing
 			{
-				final Orientation.Flow oldAxis=axis;	//get the old value
+				final Flow oldAxis=axis;	//get the old value
 				axis=newAxis;	//actually change the value
 				firePropertyChange(AXIS_PROPERTY, oldAxis, newAxis);	//indicate that the value changed
 			}
@@ -67,7 +67,7 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 	@param axis The axis along which the tabs are oriented.
 	@exception NullPointerException if the given session, model, and/or axis is <code>null</code>.
 	*/
-	public TabControl(final GuiseSession session, final ListSelectModel<V> model, final Orientation.Flow axis)
+	public TabControl(final GuiseSession session, final ListSelectModel<V> model, final Flow axis)
 	{
 		this(session, null, model, axis);	//construct the class, indicating that a default ID should be generated
 	}
@@ -78,7 +78,7 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 	@param axis The axis along which the tabs are oriented.
 	@exception NullPointerException if the given session, model, and/or axis is <code>null</code>.
 	*/
-	public TabControl(final GuiseSession session, final ListSelectModel<V> model, final Orientation.Flow axis, final int maxTabCount)
+	public TabControl(final GuiseSession session, final ListSelectModel<V> model, final Flow axis, final int maxTabCount)
 	{
 		this(session, null, model, axis, maxTabCount);	//construct the class, indicating that a default ID should be generated
 	}
@@ -90,7 +90,7 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 	@param axis The axis along which the tabs are oriented.
 	@exception NullPointerException if the given session, model, value representation strategy, and/or axis is <code>null</code>.
 	*/
-	public TabControl(final GuiseSession session, final ListSelectModel<V> model, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final Orientation.Flow axis)
+	public TabControl(final GuiseSession session, final ListSelectModel<V> model, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final Flow axis)
 	{
 		this(session, null, model, valueRepresentationStrategy, axis);	//construct the class, indicating that a default ID should be generated
 	}
@@ -103,7 +103,7 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 	@param maxTabCount The requested number of visible rows, or -1 if no row count is specified.
 	@exception NullPointerException if the given session, model, value representation strategy, and/or axis is <code>null</code>.
 	*/
-	public TabControl(final GuiseSession session, final ListSelectModel<V> model, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final Orientation.Flow axis, final int maxTabCount)
+	public TabControl(final GuiseSession session, final ListSelectModel<V> model, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final Flow axis, final int maxTabCount)
 	{
 		this(session, null, model, valueRepresentationStrategy, axis, maxTabCount);	//construct the class, indicating that a default ID should be generated
 	}
@@ -114,7 +114,7 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 	@param axis The axis along which the tabs are oriented.
 	@exception NullPointerException if the given session, value class, and/or axis is <code>null</code>.
 	*/
-	public TabControl(final GuiseSession session, final Class<V> valueClass, final Orientation.Flow axis)
+	public TabControl(final GuiseSession session, final Class<V> valueClass, final Flow axis)
 	{
 		this(session, null, valueClass, axis);	//construct the component, indicating that a default ID should be used
 	}
@@ -126,7 +126,7 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 	@param maxTabCount The requested number of visible rows, or -1 if no row count is specified.
 	@exception NullPointerException if the given session, value class, and/or axis is <code>null</code>.
 	*/
-	public TabControl(final GuiseSession session, final Class<V> valueClass, final Orientation.Flow axis, final int maxTabCount)
+	public TabControl(final GuiseSession session, final Class<V> valueClass, final Flow axis, final int maxTabCount)
 	{
 		this(session, null, valueClass, axis, maxTabCount);	//construct the component, indicating the maximum tab count and that a default ID should be used
 	}
@@ -138,7 +138,7 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 	@param axis The axis along which the tabs are oriented.
 	@exception NullPointerException if the given session, value class, selection strategy, and/or axis is <code>null</code>.
 	*/
-	public TabControl(final GuiseSession session, final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy, final Orientation.Flow axis)
+	public TabControl(final GuiseSession session, final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy, final Flow axis)
 	{
 		this(session, null, valueClass, selectionStrategy, axis);	//construct the component, indicating that a default ID should be used
 	}
@@ -151,7 +151,7 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 	@param maxTabCount The requested number of visible rows, or -1 if no row count is specified.
 	@exception NullPointerException if the given session, value class, selection strategy, and/or axis is <code>null</code>.
 	*/
-	public TabControl(final GuiseSession session, final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy, final Orientation.Flow axis, final int maxTabCount)
+	public TabControl(final GuiseSession session, final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy, final Flow axis, final int maxTabCount)
 	{
 		this(session, null, valueClass, selectionStrategy, axis, maxTabCount);	//construct the component, indicating the maximum tab count and that a default ID should be used
 	}
@@ -164,7 +164,7 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 	@exception NullPointerException if the given session, value class, and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public TabControl(final GuiseSession session, final String id, final Class<V> valueClass, final Orientation.Flow axis)
+	public TabControl(final GuiseSession session, final String id, final Class<V> valueClass, final Flow axis)
 	{
 		this(session, id, new DefaultListSelectModel<V>(session, valueClass), axis);	//construct the class with a default model
 	}
@@ -178,7 +178,7 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 	@exception NullPointerException if the given session, value class, and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public TabControl(final GuiseSession session, final String id, final Class<V> valueClass, final Orientation.Flow axis, final int maxTabCount)
+	public TabControl(final GuiseSession session, final String id, final Class<V> valueClass, final Flow axis, final int maxTabCount)
 	{
 		this(session, id, new DefaultListSelectModel<V>(session, valueClass), axis, maxTabCount);	//construct the class with a default model and the maximum tab count
 	}
@@ -192,7 +192,7 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 	@exception NullPointerException if the given session, value class, selection strategy, and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public TabControl(final GuiseSession session, final String id, final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy, final Orientation.Flow axis)
+	public TabControl(final GuiseSession session, final String id, final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy, final Flow axis)
 	{
 		this(session, id, new DefaultListSelectModel<V>(session, valueClass, selectionStrategy), axis);	//construct the class with a default model
 	}
@@ -207,7 +207,7 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 	@exception NullPointerException if the given session, value class, selection strategy, and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public TabControl(final GuiseSession session, final String id, final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy, final Orientation.Flow axis, final int maxTabCount)
+	public TabControl(final GuiseSession session, final String id, final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy, final Flow axis, final int maxTabCount)
 	{
 		this(session, id, new DefaultListSelectModel<V>(session, valueClass, selectionStrategy), axis, maxTabCount);	//construct the class with a default model and the maximum tab count
 	}
@@ -220,7 +220,7 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 	@exception NullPointerException if the given session, model and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public TabControl(final GuiseSession session, final String id, final ListSelectModel<V> model, final Orientation.Flow axis)
+	public TabControl(final GuiseSession session, final String id, final ListSelectModel<V> model, final Flow axis)
 	{
 		this(session, id, model, axis, -1);	//construct the class with no maximum tab count
 	}
@@ -234,7 +234,7 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 	@exception NullPointerException if the given session, model, and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public TabControl(final GuiseSession session, final String id, final ListSelectModel<V> model, final Orientation.Flow axis, final int maxTabCount)
+	public TabControl(final GuiseSession session, final String id, final ListSelectModel<V> model, final Flow axis, final int maxTabCount)
 	{
 		this(session, id, model, new DefaultValueRepresentationStrategy<V>(session), axis, maxTabCount);	//construct the class with a default representation strategy
 	}
@@ -248,7 +248,7 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 	@exception NullPointerException if the given session, model, value representation strategy, and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public TabControl(final GuiseSession session, final String id, final ListSelectModel<V> model, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final Orientation.Flow axis)
+	public TabControl(final GuiseSession session, final String id, final ListSelectModel<V> model, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final Flow axis)
 	{
 		this(session, id, model, valueRepresentationStrategy, axis, -1);	//construct the class with no maximum tab count
 	}
@@ -263,7 +263,7 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 	@exception NullPointerException if the given session, model, value representation strategy, and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public TabControl(final GuiseSession session, final String id, final ListSelectModel<V> model, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final Orientation.Flow axis, final int maxTabCount)
+	public TabControl(final GuiseSession session, final String id, final ListSelectModel<V> model, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final Flow axis, final int maxTabCount)
 	{
 		super(session, id, model, valueRepresentationStrategy);	//construct the parent class
 		this.axis=checkNull(axis, "Flow axis cannot be null.");

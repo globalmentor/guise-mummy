@@ -45,10 +45,10 @@ public class HomePanel extends DefaultNavigationPanel
 		super(session, id, new RegionLayout(session));	//construct the parent using a region layout
 		getModel().setLabel("Home Panel Test");	//set the panel label
 
-		final LayoutPanel contentPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.PAGE)); 
+		final LayoutPanel contentPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE)); 
 
 		//input panel
-		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.PAGE));	//create the input panel flowing vertically
+		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE));	//create the input panel flowing vertically
 		inputPanel.setBackgrondColor(RGBColor.AQUA_MARINE);
 		final TextControl<Float> inputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
 		inputTextControl.getModel().setLabel("Input Number");	//add a label to the text input control
@@ -138,7 +138,7 @@ Debug.trace("list control changed value to", newValue);
 		
 		contentPanel.add(testLabel);	//add a new label
 		
-		final LayoutPanel buttonPanel=new LayoutPanel(session, "testButtonPanel", new FlowLayout(session, Orientation.Flow.LINE));	//create a panel flowing horizontally
+		final LayoutPanel buttonPanel=new LayoutPanel(session, "testButtonPanel", new FlowLayout(session, Flow.LINE));	//create a panel flowing horizontally
 
 		final Button testButton=new Button(session, "testButton");
 		testButton.getModel().setLabel("Click here to go to the 'Hello World' demo.");
@@ -148,6 +148,10 @@ Debug.trace("list control changed value to", newValue);
 		testButton.getFlyoverStrategy().setPreferredWidth(new Extent(15, Extent.Unit.EM));
 		testButton.getFlyoverStrategy().setPreferredHeight(new Extent(10, Extent.Unit.EM));
 */
+		
+		testButton.setCornerRadius(Corner.LINE_FAR_PAGE_NEAR, Component.ROUNDED_CORNER_RADIUS_EXTENT);
+		testButton.setCornerRadius(Corner.LINE_FAR_PAGE_FAR, Component.ROUNDED_CORNER_RADIUS_EXTENT);
+		
 		testButton.getModel().addActionListener(new NavigateActionListener<ActionModel>("helloworld"));
 		buttonPanel.add(testButton);	//add a new button
 		
@@ -300,19 +304,19 @@ Debug.trace("list control changed value to", newValue);
 		
 		
 		
-		final LayoutPanel sliderPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.LINE));
+		final LayoutPanel sliderPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));
 
 		
 		final ValueModel<Integer> sliderModel=new DefaultValueModel<Integer>(session, Integer.class, 100);	//default to 100
 		sliderModel.setValidator(new IntegerRangeValidator(session, 0, 100));	//set a range validator for the model
 		sliderModel.setLabel("Slider Value");
 		
-		final SliderControl<Integer> horizontalSlider=new SliderControl<Integer>(session, sliderModel, Orientation.Flow.LINE);
+		final SliderControl<Integer> horizontalSlider=new SliderControl<Integer>(session, sliderModel, Flow.LINE);
 		horizontalSlider.setThumbImage(URI.create("slider-thumb.gif"));
 		horizontalSlider.setTrackImage(URI.create("slider-track.gif"));
 		sliderPanel.add(horizontalSlider);
 
-		final SliderControl<Integer> verticalSlider=new SliderControl<Integer>(session, sliderModel, Orientation.Flow.PAGE);
+		final SliderControl<Integer> verticalSlider=new SliderControl<Integer>(session, sliderModel, Flow.PAGE);
 		sliderPanel.add(verticalSlider);
 		
 		final TextControl<Integer> sliderInput=new TextControl<Integer>(session, sliderModel);	//create a text input control
@@ -339,10 +343,10 @@ Debug.trace("list control changed value to", newValue);
 	
 	
 	
-		final LayoutPanel horizontalPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.LINE));	//create a panel flowing horizontally
+		final LayoutPanel horizontalPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create a panel flowing horizontally
 	
 	
-		final GroupPanel booleanPanel=new GroupPanel(session, new FlowLayout(session, Orientation.Flow.PAGE));	//create a panel flowing vertically
+		final GroupPanel booleanPanel=new GroupPanel(session, new FlowLayout(session, Flow.PAGE));	//create a panel flowing vertically
 		booleanPanel.setDragEnabled(true);
 		booleanPanel.getModel().setLabel("Check one of these");
 		final CheckControl check1=new CheckControl(session, "check1");
@@ -478,7 +482,7 @@ Debug.trace("list control changed value to", newValue);
 
 		final TabbedPanel tabbedPanel=new TabbedPanel(session);
 		//input panel
-		final LayoutPanel temperaturePanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.PAGE));	//create the input panel flowing vertically
+		final LayoutPanel temperaturePanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE));	//create the input panel flowing vertically
 		final TextControl<Float> temperatureInput=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
 		temperatureInput.getModel().setLabel("Input Temperature");	//add a label to the text input control
 		temperatureInput.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
@@ -510,7 +514,7 @@ Debug.trace("list control changed value to", newValue);
 					}
 				});
 
-		final TabControl<String> stringTabControl=new TabControl<String>(session, String.class, Orientation.Flow.LINE);
+		final TabControl<String> stringTabControl=new TabControl<String>(session, String.class, Flow.LINE);
 		stringTabControl.getModel().add("First tab");
 		stringTabControl.getModel().add("Second tab");
 		stringTabControl.getModel().add("Third tab");
@@ -526,24 +530,24 @@ Debug.trace("list control changed value to", newValue);
 
 		
 		
-		final CardTabControl remoteTabControl=new CardTabControl(session, tabbedPanel, Orientation.Flow.LINE);
+		final CardTabControl remoteTabControl=new CardTabControl(session, tabbedPanel, Flow.LINE);
 		contentPanel.add(remoteTabControl);
 		
 
 		add(contentPanel, RegionLayout.CENTER_CONSTRAINTS);	//add the content panel in the center
 
-		add(createMenu(session, Orientation.Flow.LINE), RegionLayout.PAGE_START_CONSTRAINTS);	//add the pulldown menu at the top
+		add(createMenu(session, Flow.LINE), RegionLayout.PAGE_START_CONSTRAINTS);	//add the pulldown menu at the top
 
 //TODO fix		add(createMenu(session, Orientation.Flow.PAGE), RegionLayout.LINE_START_CONSTRAINTS);	//add the menu at the left
 
-		add(createAccordionMenu(session, Orientation.Flow.PAGE), RegionLayout.LINE_START_CONSTRAINTS);	//add the menu at the left
+		add(createAccordionMenu(session, Flow.PAGE), RegionLayout.LINE_START_CONSTRAINTS);	//add the menu at the left
 	}
 
-	protected DropMenu createMenu(final GuiseSession session, final Orientation.Flow flow)
+	protected DropMenu createMenu(final GuiseSession session, final Flow flow)
 	{
 		final DropMenu menu=new DropMenu(session, flow);
 
-		final DropMenu fileMenu=new DropMenu(session, "fileMenu", Orientation.Flow.PAGE);
+		final DropMenu fileMenu=new DropMenu(session, "fileMenu", Flow.PAGE);
 		fileMenu.getModel().setLabel("File");
 		final Link openMenuLink=new Link(session, "openMenuItem");
 		openMenuLink.getModel().setLabel("Open");
@@ -553,7 +557,7 @@ Debug.trace("list control changed value to", newValue);
 		fileMenu.add(closeMenuLink);
 		menu.add(fileMenu);
 
-		final DropMenu editMenu=new DropMenu(session, "editMenu", Orientation.Flow.PAGE);
+		final DropMenu editMenu=new DropMenu(session, "editMenu", Flow.PAGE);
 		editMenu.getModel().setLabel("Edit");
 		final Link copyMenuLink=new Link(session, "copyMenuItem");
 		copyMenuLink.getModel().setLabel("Copy");
@@ -566,10 +570,10 @@ Debug.trace("list control changed value to", newValue);
 		editMenu.add(pasteMenuLink);
 		menu.add(editMenu);
 
-		final DropMenu windowMenu=new DropMenu(session, "windowMenu", Orientation.Flow.PAGE);
+		final DropMenu windowMenu=new DropMenu(session, "windowMenu", Flow.PAGE);
 		windowMenu.getModel().setLabel("Window");
 
-		final DropMenu arrangeMenu=new DropMenu(session, "arrangeMenu", Orientation.Flow.PAGE);
+		final DropMenu arrangeMenu=new DropMenu(session, "arrangeMenu", Flow.PAGE);
 		arrangeMenu.getModel().setLabel("Arrange");
 		
 		final Link tileMenuLink=new Link(session, "tileMenuItem");
@@ -591,11 +595,11 @@ Debug.trace("list control changed value to", newValue);
 	}
 
 
-	protected AccordionMenu createAccordionMenu(final GuiseSession session, final Orientation.Flow flow)
+	protected AccordionMenu createAccordionMenu(final GuiseSession session, final Flow flow)
 	{
 		final AccordionMenu menu=new AccordionMenu(session, flow);
 
-		final AccordionMenu fileMenu=new AccordionMenu(session, Orientation.Flow.PAGE);
+		final AccordionMenu fileMenu=new AccordionMenu(session, Flow.PAGE);
 		fileMenu.getModel().setLabel("File");
 		final Link openMenuLink=new Link(session);
 		openMenuLink.getModel().setLabel("Open");
@@ -605,13 +609,13 @@ Debug.trace("list control changed value to", newValue);
 		fileMenu.add(closeMenuLink);
 		menu.add(fileMenu);
 
-		final AccordionMenu editMenu=new AccordionMenu(session, Orientation.Flow.PAGE);
+		final AccordionMenu editMenu=new AccordionMenu(session, Flow.PAGE);
 		editMenu.getModel().setLabel("Edit");
 		final Message message1=new Message(session, new DefaultMessageModel(session, "This is a message to show."));
 		editMenu.add(message1);
 		menu.add(editMenu);
 
-		final AccordionMenu stuffMenu=new AccordionMenu(session, Orientation.Flow.PAGE);
+		final AccordionMenu stuffMenu=new AccordionMenu(session, Flow.PAGE);
 		stuffMenu.getModel().setLabel("Stuff");
 		final Message message2=new Message(session, new DefaultMessageModel(session, "This is a message to show."));
 		stuffMenu.add(message2);

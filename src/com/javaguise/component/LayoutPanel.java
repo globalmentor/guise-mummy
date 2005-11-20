@@ -38,7 +38,7 @@ public class LayoutPanel extends AbstractPanel<LayoutPanel>
 	*/
 	public LayoutPanel(final GuiseSession session, final String id)
 	{
-		this(session, id, new FlowLayout(session, Orientation.Flow.PAGE));	//default to flowing vertically
+		this(session, id, new FlowLayout(session, Flow.PAGE));	//default to flowing vertically
 	}
 
 	/**Session, ID, and model constructor with a default vertical flow layout.
@@ -50,7 +50,7 @@ public class LayoutPanel extends AbstractPanel<LayoutPanel>
 	*/
 	public LayoutPanel(final GuiseSession session, final String id, final Model model)
 	{
-		this(session, id, new FlowLayout(session, Orientation.Flow.PAGE), model);	//default to flowing vertically
+		this(session, id, new FlowLayout(session, Flow.PAGE), model);	//default to flowing vertically
 	}
 
 	/**Session and layout constructor.

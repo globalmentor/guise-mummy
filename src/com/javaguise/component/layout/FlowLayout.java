@@ -13,7 +13,7 @@ public class FlowLayout extends AbstractFlowLayout<FlowLayout.Constraints>
 	@param flow The logical axis (line or page) along which information is flowed.
 	@exception NullPointerException if the axis is <code>null</code>.
 	*/
-	public FlowLayout(final GuiseSession session, final Orientation.Flow flow)
+	public FlowLayout(final GuiseSession session, final Flow flow)
 	{
 		super(session, flow);	//construct the parent class
 	}

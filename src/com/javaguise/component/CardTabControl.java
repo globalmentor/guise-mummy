@@ -2,7 +2,7 @@ package com.javaguise.component;
 
 import com.javaguise.component.ListSelectControl.ValueRepresentationStrategy;
 import com.javaguise.component.layout.CardLayout;
-import com.javaguise.component.layout.Orientation;
+import com.javaguise.component.layout.Flow;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import static com.garretwilson.lang.ClassUtilities.*;
@@ -21,7 +21,7 @@ public class CardTabControl extends TabControl<Component<?>>
 	@param axis The axis along which the tabs are oriented.
 	@exception NullPointerException if the given session, model, and/or axis is <code>null</code>.
 	*/
-	public CardTabControl(final GuiseSession session, final CardControl<?> cardControl, final Orientation.Flow axis)
+	public CardTabControl(final GuiseSession session, final CardControl<?> cardControl, final Flow axis)
 	{
 		this(session, null, cardControl, axis);	//construct the class, indicating that a default ID should be generated
 	}
@@ -32,7 +32,7 @@ public class CardTabControl extends TabControl<Component<?>>
 	@param axis The axis along which the tabs are oriented.
 	@exception NullPointerException if the given session, model, and/or axis is <code>null</code>.
 	*/
-	public CardTabControl(final GuiseSession session, final CardControl<?> cardControl, final Orientation.Flow axis, final int maxTabCount)
+	public CardTabControl(final GuiseSession session, final CardControl<?> cardControl, final Flow axis, final int maxTabCount)
 	{
 		this(session, null, cardControl, axis, maxTabCount);	//construct the class, indicating that a default ID should be generated
 	}
@@ -44,7 +44,7 @@ public class CardTabControl extends TabControl<Component<?>>
 	@param axis The axis along which the tabs are oriented.
 	@exception NullPointerException if the given session, model, value representation strategy, and/or axis is <code>null</code>.
 	*/
-	public CardTabControl(final GuiseSession session, final CardControl<?> cardControl, final ValueRepresentationStrategy<Component<?>> valueRepresentationStrategy, final Orientation.Flow axis)
+	public CardTabControl(final GuiseSession session, final CardControl<?> cardControl, final ValueRepresentationStrategy<Component<?>> valueRepresentationStrategy, final Flow axis)
 	{
 		this(session, null, cardControl, valueRepresentationStrategy, axis);	//construct the class, indicating that a default ID should be generated
 	}
@@ -57,7 +57,7 @@ public class CardTabControl extends TabControl<Component<?>>
 	@param maxTabCount The requested number of visible rows, or -1 if no row count is specified.
 	@exception NullPointerException if the given session, model, value representation strategy, and/or axis is <code>null</code>.
 	*/
-	public CardTabControl(final GuiseSession session, final CardControl<?> cardControl, final ValueRepresentationStrategy<Component<?>> valueRepresentationStrategy, final Orientation.Flow axis, final int maxTabCount)
+	public CardTabControl(final GuiseSession session, final CardControl<?> cardControl, final ValueRepresentationStrategy<Component<?>> valueRepresentationStrategy, final Flow axis, final int maxTabCount)
 	{
 		this(session, null, cardControl, valueRepresentationStrategy, axis, maxTabCount);	//construct the class, indicating that a default ID should be generated
 	}
@@ -70,7 +70,7 @@ public class CardTabControl extends TabControl<Component<?>>
 	@exception NullPointerException if the given session, model and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public CardTabControl(final GuiseSession session, final String id, final CardControl<?> cardControl, final Orientation.Flow axis)
+	public CardTabControl(final GuiseSession session, final String id, final CardControl<?> cardControl, final Flow axis)
 	{
 		this(session, id, cardControl, axis, -1);	//construct the class with no maximum tab count
 	}
@@ -84,7 +84,7 @@ public class CardTabControl extends TabControl<Component<?>>
 	@exception NullPointerException if the given session, model, and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public CardTabControl(final GuiseSession session, final String id, final CardControl<?> cardControl, final Orientation.Flow axis, final int maxTabCount)
+	public CardTabControl(final GuiseSession session, final String id, final CardControl<?> cardControl, final Flow axis, final int maxTabCount)
 	{
 		this(session, id, cardControl, new CardRepresentationStrategy(cardControl.getLayout()), axis, maxTabCount);	//construct the class with a default representation strategy
 	}
@@ -98,7 +98,7 @@ public class CardTabControl extends TabControl<Component<?>>
 	@exception NullPointerException if the given session, model, value representation strategy, and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public CardTabControl(final GuiseSession session, final String id, final CardControl<?> cardControl, final ValueRepresentationStrategy<Component<?>> valueRepresentationStrategy, final Orientation.Flow axis)
+	public CardTabControl(final GuiseSession session, final String id, final CardControl<?> cardControl, final ValueRepresentationStrategy<Component<?>> valueRepresentationStrategy, final Flow axis)
 	{
 		this(session, id, cardControl, valueRepresentationStrategy, axis, -1);	//construct the class with no maximum tab count
 	}
@@ -113,7 +113,7 @@ public class CardTabControl extends TabControl<Component<?>>
 	@exception NullPointerException if the given session, model, value representation strategy, and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public CardTabControl(final GuiseSession session, final String id, final CardControl<?> cardControl, final ValueRepresentationStrategy<Component<?>> valueRepresentationStrategy, final Orientation.Flow axis, final int maxTabCount)
+	public CardTabControl(final GuiseSession session, final String id, final CardControl<?> cardControl, final ValueRepresentationStrategy<Component<?>> valueRepresentationStrategy, final Flow axis, final int maxTabCount)
 	{
 		super(session, id, cardControl.getModel(), valueRepresentationStrategy, axis, maxTabCount);	//construct the parent class using the card container's model
 	}

@@ -34,7 +34,7 @@ public class AuthorizeUsersPanel extends DefaultNavigationPanel
 	*/
 	public AuthorizeUsersPanel(final GuiseSession session)
 	{
-		super(session, new FlowLayout(session, Orientation.Flow.PAGE));	//construct the parent class flowing vertically
+		super(session, new FlowLayout(session, Flow.PAGE));	//construct the parent class flowing vertically
 		getModel().setLabel("Guise\u2122 Demonstration: Authorize Users");	//set the panel title	
 
 			//create the table columns

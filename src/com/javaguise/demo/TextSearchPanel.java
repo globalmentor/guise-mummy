@@ -52,11 +52,11 @@ public class TextSearchPanel extends DefaultNavigationPanel
 	*/
 	public TextSearchPanel(final GuiseSession session)
 	{
-		super(session, new FlowLayout(session, Orientation.Flow.LINE));	//construct the parent class flowing horizontally
+		super(session, new FlowLayout(session, Flow.LINE));	//construct the parent class flowing horizontally
 		getModel().setLabel("Guise\u2122 Demonstration: Text Search");	//set the panel title	
 
 			//input panel
-		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(session, Orientation.Flow.PAGE));	//create the input panel flowing vertically
+		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE));	//create the input panel flowing vertically
 			//instructions
 		final Message message=new Message(session);	//create a new message
 		message.getModel().setLabel("Instructions");	//give a label to the message

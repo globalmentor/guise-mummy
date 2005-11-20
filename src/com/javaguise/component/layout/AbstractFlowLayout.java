@@ -12,17 +12,17 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowLayout.Constraint
 {
 
 	/**The logical axis (line or page) along which information is flowed.*/
-	private final Orientation.Flow flow;
+	private final Flow flow;
 
 		/**@return The logical axis (line or page) along which information is flowed.*/
-		public Orientation.Flow getFlow() {return flow;}
+		public Flow getFlow() {return flow;}
 
 	/**Session and flow constructor.
 	@param session The Guise session that owns this layout.
 	@param flow The logical axis (line or page) along which information is flowed.
 	@exception NullPointerException if the axis is <code>null</code>.
 	*/
-	public AbstractFlowLayout(final GuiseSession session, final Orientation.Flow flow)
+	public AbstractFlowLayout(final GuiseSession session, final Flow flow)
 	{
 		super(session);	//construct the parent class
 		this.flow=checkNull(flow, "Flow cannot be null.");	//store the flow

@@ -2,8 +2,8 @@ package com.javaguise.demo;
 
 import com.javaguise.component.*;
 import com.javaguise.component.layout.CardLayout;
+import com.javaguise.component.layout.Flow;
 import com.javaguise.component.layout.FlowLayout;
-import com.javaguise.component.layout.Orientation;
 import com.javaguise.component.layout.RegionLayout;
 import com.javaguise.event.ActionEvent;
 import com.javaguise.event.ActionListener;
@@ -30,7 +30,7 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 	*/
 	public MultiplicationTablePanel(final GuiseSession session)
 	{
-		super(session, new FlowLayout(session, Orientation.Flow.LINE));	//construct the parent class flowing horizontally
+		super(session, new FlowLayout(session, Flow.LINE));	//construct the parent class flowing horizontally
 		getModel().setLabel("Guise\u2122 Demonstration: Multiplication Table");	//set the panel title	
 
 		final TabbedPanel tabbedPanel=new TabbedPanel(session);	//create a tabbed panel
@@ -39,7 +39,7 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 		final Component<?> defaultTab=createMultiplicationTableTab(9);	//create a default multiplication table with a maximum factor of 9
 		tabbedPanel.add(defaultTab, new CardLayout.Constraints(new DefaultLabelModel(session, "Default")));	//add the default tab
 			//create the maximum factor control
-		final LayoutPanel controlPanel=new LayoutPanel(getSession(), new FlowLayout(session, Orientation.Flow.PAGE));	//create a new panel for the controls
+		final LayoutPanel controlPanel=new LayoutPanel(getSession(), new FlowLayout(session, Flow.PAGE));	//create a new panel for the controls
 		final TextControl<Integer> maxFactorControl=new TextControl<Integer>(session, Integer.class);	//create a text input control to receive an integer
 		maxFactorControl.getModel().setLabel("Maximum Factor (1-25)");	//add a label to the text input control
 		maxFactorControl.getModel().setValidator(new IntegerRangeValidator(session, 1, 25, 1, true));	//require a value from 1-25

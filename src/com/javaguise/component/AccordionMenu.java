@@ -16,7 +16,7 @@ public class AccordionMenu extends AbstractMenu<AccordionMenu>
 	@param axis The axis along which the menu is oriented.
 	@exception NullPointerException if the given session and/or axis is <code>null</code>.
 	*/
-	public AccordionMenu(final GuiseSession session, final Orientation.Flow axis)
+	public AccordionMenu(final GuiseSession session, final Flow axis)
 	{
 		this(session, (String)null, axis);	//construct the component with the axis, indicating that a default ID should be used
 	}
@@ -27,7 +27,7 @@ public class AccordionMenu extends AbstractMenu<AccordionMenu>
 	@param axis The axis along which the menu is oriented.
 	@exception NullPointerException if the given session, axis, and/or model is <code>null</code>.
 	*/
-	public AccordionMenu(final GuiseSession session, final MenuModel model, final Orientation.Flow axis)
+	public AccordionMenu(final GuiseSession session, final MenuModel model, final Flow axis)
 	{
 		this(session, null, model, axis);	//construct the component with the axis, indicating that a default ID should be used
 	}
@@ -39,7 +39,7 @@ public class AccordionMenu extends AbstractMenu<AccordionMenu>
 	@exception NullPointerException if the given session and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AccordionMenu(final GuiseSession session, final String id, final Orientation.Flow axis)
+	public AccordionMenu(final GuiseSession session, final String id, final Flow axis)
 	{
 		this(session, id, new DefaultMenuModel(session), axis);	//construct the class with a default model
 	}
@@ -52,7 +52,7 @@ public class AccordionMenu extends AbstractMenu<AccordionMenu>
 	@exception NullPointerException if the given session, axis, and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AccordionMenu(final GuiseSession session, final String id, final MenuModel model, final Orientation.Flow axis)
+	public AccordionMenu(final GuiseSession session, final String id, final MenuModel model, final Flow axis)
 	{
 		super(session, id, new MenuLayout(session, axis), model);	//construct the parent class
 		setPreferredWidth(new Extent(8, Extent.Unit.EM));	//set the default width

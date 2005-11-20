@@ -24,11 +24,11 @@ public class DropDetailsPanel extends DefaultNavigationPanel
 	*/
 	public DropDetailsPanel(final GuiseSession session)
 	{
-		super(session, new FlowLayout(session, Orientation.Flow.PAGE));	//construct the parent class flowing vertically
+		super(session, new FlowLayout(session, Flow.PAGE));	//construct the parent class flowing vertically
 		getModel().setLabel("Guise\u2122 Demonstration: Drop Details");	//set the panel title
 
 			//flag panel
-		final GroupPanel flagPanel=new GroupPanel(session, new FlowLayout(session, Orientation.Flow.LINE));	//create the flag panel flowing horizontally
+		final GroupPanel flagPanel=new GroupPanel(session, new FlowLayout(session, Flow.LINE));	//create the flag panel flowing horizontally
 		flagPanel.getModel().setLabel("Drag a Flag");	//set the flag panel label				
 		final Image usFlag=new Image(session);	//US flag
 		usFlag.getModel().setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/us-flag.gif"));	//set the URI
@@ -53,7 +53,7 @@ public class DropDetailsPanel extends DefaultNavigationPanel
 		add(flagPanel);	//add the flag panel to the panel
 
 			//label panel
-		final GroupPanel labelPanel=new GroupPanel(session, new FlowLayout(session, Orientation.Flow.LINE));	//create the label panel flowing horizontally
+		final GroupPanel labelPanel=new GroupPanel(session, new FlowLayout(session, Flow.LINE));	//create the label panel flowing horizontally
 		labelPanel.getModel().setLabel("Drag a Label");	//set the label panel label
 		final String[] partsOfSpeech=new String[]{"Noun", "Verb", "Ajective", "Adverb", "Pronoun", "Preposition", "Conjunction", "Interjection"};
 		for(final String partOfSpeech:partsOfSpeech)	//for each label string

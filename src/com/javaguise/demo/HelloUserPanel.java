@@ -22,7 +22,7 @@ public class HelloUserPanel extends DefaultNavigationPanel
 	*/
 	public HelloUserPanel(final GuiseSession session)
 	{
-		super(session, new FlowLayout(session, Orientation.Flow.PAGE));	//construct the parent class flowing vertically
+		super(session, new FlowLayout(session, Flow.PAGE));	//construct the parent class flowing vertically
 		getModel().setLabel("Guise\u2122 Demonstration: Hello User");	//set the panel title	
 
 		final Label helloUserLabel=new Label(session);	//create a label

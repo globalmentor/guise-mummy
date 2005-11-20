@@ -23,7 +23,7 @@ public class ImageOpacityPanel extends DefaultNavigationPanel
 	*/
 	public ImageOpacityPanel(final GuiseSession session)
 	{
-		super(session, new FlowLayout(session, Orientation.Flow.LINE));	//construct the parent class flowing horizontally
+		super(session, new FlowLayout(session, Flow.LINE));	//construct the parent class flowing horizontally
 		getModel().setLabel("Guise\u2122 Demonstration: Image Opacity");	//set the panel title	
 
 			//image
@@ -53,10 +53,10 @@ public class ImageOpacityPanel extends DefaultNavigationPanel
 		final Converter<Float, String> percentConverter=new FloatStringLiteralConverter(session, NumberStringLiteralConverter.Style.PERCENT);
 		
 			//horizontal slider using shared value model
-		final SliderControl<Float> horizontalSlider=new SliderControl<Float>(session, sliderModel, Orientation.Flow.LINE);
+		final SliderControl<Float> horizontalSlider=new SliderControl<Float>(session, sliderModel, Flow.LINE);
 		add(horizontalSlider);
 			//vertical slider using shared value model
-		final SliderControl<Float> verticalSlider=new SliderControl<Float>(session, sliderModel, Orientation.Flow.PAGE);
+		final SliderControl<Float> verticalSlider=new SliderControl<Float>(session, sliderModel, Flow.PAGE);
 		add(verticalSlider);
 			//text control using shared value model
 		final TextControl<Float> sliderInput=new TextControl<Float>(session, sliderModel, percentConverter);

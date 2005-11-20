@@ -6,6 +6,8 @@ import java.util.*;
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.Debug;
+import com.javaguise.component.layout.Corner;
+import com.javaguise.component.layout.Flow;
 import com.javaguise.component.layout.Orientation;
 import com.javaguise.component.transfer.*;
 import com.javaguise.context.GuiseContext;
@@ -30,6 +32,7 @@ A component is iterable over its child components, and can be used in short <cod
 {@link Component#setDisplayed(boolean)} determines whether the component is displayed at all. If a component is not displayed, it takes up no space.
 If a component is not displayed, it is not visible regardless of whether it is set to be visible.
 If a developer must hide sensitive data, the developer should remove the component from its parent container altogether.</p>
+<p>For widest platform support the general {@link #ROUNDED_CORNER_RADIUS_EXTENT} constant should be used whenever possible when requesting rounded corners.</p> 
 @author Garret Wilson
 */
 public interface Component<C extends Component<C>> extends PropertyBindable
@@ -41,6 +44,14 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	public final static String COLOR_PROPERTY=getPropertyName(Component.class, "color");
 	/**The bound property of the controller.*/
 	public final static String CONTROLLER_PROPERTY=getPropertyName(Component.class, "controller");
+	/**The bound property of the line near page near corner radius.*/
+	public final static String CORNER_RADIUS_LINE_NEAR_PAGE_NEAR_PROPERTY=getPropertyName(Component.class, "cornerRadiusLineNearPageNear");
+	/**The bound property of the line far page near corner radius.*/
+	public final static String CORNER_RADIUS_LINE_FAR_PAGE_NEAR_PROPERTY=getPropertyName(Component.class, "cornerRadiusLineFarPageNear");
+	/**The bound property of the line near page far corner radius.*/
+	public final static String CORNER_RADIUS_LINE_NEAR_PAGE_FAR_PROPERTY=getPropertyName(Component.class, "cornerRadiusLineNearPageFar");
+	/**The bound property of the line far page far corner radius.*/
+	public final static String CORNER_RADIUS_LINE_FAR_PAGE_FAR_PROPERTY=getPropertyName(Component.class, "cornerRadiusLineFarPageFar");
 	/**The bound property of whether the component is displayed or has no representation, taking up no space.*/
 	public final static String DISPLAYED_PROPERTY=getPropertyName(Component.class, "displayed");
 	/**The bound property of whether the component has dragging enabled.*/
@@ -68,6 +79,9 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	/**The bound property of whether the component is visible.*/
 	public final static String VISIBLE_PROPERTY=getPropertyName(Component.class, "visible");
 
+	/*The constant value representing a general rounded corner.*/
+	public final static Extent ROUNDED_CORNER_RADIUS_EXTENT=new Extent(0.25, Extent.Unit.EM);
+	
 	/**The character used to combine hierarchical IDs.*/
 	public final static char ID_SEGMENT_DELIMITER='.';
 
@@ -93,6 +107,31 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@see #COLOR_PROPERTY 
 	*/
 	public void setColor(final Color<?> newColor);
+
+	/**Returns the radius for the indicated corner.
+	@param corner The corner for which a radius should be returned.
+	@return The radius of the given corner, or a radius of zero if the corner should not be rounded
+	*/
+	public Extent getCornerRadius(final Corner corner);
+
+	/**Sets the radius of a given corner.
+	The radius of each corner represents a bound property.
+	@param corner The corner for which the radius should be set.
+	@param newCornerRadius The radius extent indicating the amount of rounding of the corner, or a radius of zero if the corner should not be rounded.
+	@exception NullPointerException if the given corner and/or radius is <code>null</code>. 
+	@see #CORNER_RADIUS_LINE_NEAR_PAGE_NEAR_PROPERTY
+	@see #CORNER_RADIUS_LINE_FAR_PAGE_NEAR_PROPERTY
+	@see #CORNER_RADIUS_LINE_NEAR_PAGE_FAR_PROPERTY
+	@see #CORNER_RADIUS_LINE_FAR_PAGE_FAR_PROPERTY
+	*/
+	public void setCornerRadius(final Corner corner, final Extent newCornerRadius);
+
+	/**Sets the radius of all corners.
+	This is a convenience method that calls {@link #setCornerRadius(Corner, Extent)} for each corner.
+	@param newCornerRadius The radius extent indicating the amount of rounding of the corners, or a radius of zero if the corners should not be rounded.
+	@exception NullPointerException if the given radius is <code>null</code>. 
+	*/
+	public void setCornerRadius(final Extent newCornerRadius);
 
 	/**Determines the foreground color to use for the component.
 	The color is determined by finding the first non-<code>null</code> color up the component hierarchy or the default color.

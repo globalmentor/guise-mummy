@@ -101,7 +101,7 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 	*/
 	protected Container<?> createOptionContainer()
 	{
-		return new LayoutPanel(getSession(), createID("optionContainer"), new FlowLayout(getSession(), Orientation.Flow.LINE));	//create a horizontal layout panel
+		return new LayoutPanel(getSession(), createID("optionContainer"), new FlowLayout(getSession(), Flow.LINE));	//create a horizontal layout panel
 	}
 
 	/**Initializes the option container with the available options.

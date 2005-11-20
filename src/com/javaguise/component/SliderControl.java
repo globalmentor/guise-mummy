@@ -45,10 +45,10 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 	public final static String TRACK_IMAGE_RESOURCE_KEY="slider.track.image";
 
 	/**The flow axis.*/
-	private Orientation.Flow axis;
+	private Flow axis;
 
 		/**@return The flow axis.*/
-		public Orientation.Flow getAxis() {return axis;}
+		public Flow getAxis() {return axis;}
 
 		/**Sets the flow axis.
 		This is a bound property
@@ -56,11 +56,11 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 		@exception NullPointerException if the given axis is <code>null</code>.
 		@see #AXIS_PROPERTY
 		*/
-		public void setAxis(final Orientation.Flow newAxis)
+		public void setAxis(final Flow newAxis)
 		{
 			if(axis!=checkNull(newAxis, "Flow axis cannot be null."))	//if the value is really changing
 			{
-				final Orientation.Flow oldAxis=axis;	//get the old value
+				final Flow oldAxis=axis;	//get the old value
 				axis=newAxis;	//actually change the value
 				firePropertyChange(AXIS_PROPERTY, oldAxis, newAxis);	//indicate that the value changed
 			}
@@ -215,7 +215,7 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 	@param axis The axis along which the slider is oriented.
 	@exception NullPointerException if the given session, model, and/or axis is <code>null</code>.
 	*/
-	public SliderControl(final GuiseSession session, final ValueModel<V> model, final Orientation.Flow axis)
+	public SliderControl(final GuiseSession session, final ValueModel<V> model, final Flow axis)
 	{
 		this(session, null, model, axis);	//construct the component, indicating that a default ID should be used
 	}
@@ -228,7 +228,7 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 	@param axis The axis along which the slider is oriented.
 	@exception NullPointerException if the given session, model, converter, and/or axis is <code>null</code>.
 	*/
-	public SliderControl(final GuiseSession session, final ValueModel<V> model, final Converter<V, String> converter, final Orientation.Flow axis)
+	public SliderControl(final GuiseSession session, final ValueModel<V> model, final Converter<V, String> converter, final Flow axis)
 	{
 		this(session, null, model, converter, axis);	//construct the component, indicating that a default ID should be used
 	}
@@ -240,7 +240,7 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 	@exception NullPointerException if the given session, value class, and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if no default converter is available for the given value class.
 	*/
-	public SliderControl(final GuiseSession session, final Class<V> valueClass, final Orientation.Flow axis)
+	public SliderControl(final GuiseSession session, final Class<V> valueClass, final Flow axis)
 	{
 		this(session, null, valueClass, axis);	//construct the component, indicating that a default ID should be used
 	}
@@ -252,7 +252,7 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 	@param axis The axis along which the slider is oriented.
 	@exception NullPointerException if the given session, value class, converter, and/or axis is <code>null</code>.
 	*/
-	public SliderControl(final GuiseSession session, final Class<V> valueClass, final Converter<V, String> converter, final Orientation.Flow axis)
+	public SliderControl(final GuiseSession session, final Class<V> valueClass, final Converter<V, String> converter, final Flow axis)
 	{
 		this(session, null, valueClass, converter, axis);	//construct the component, indicating that a default ID should be used
 	}
@@ -266,7 +266,7 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	@exception IllegalArgumentException if no default converter is available for the given value class.
 	*/
-	public SliderControl(final GuiseSession session, final String id, final Class<V> valueClass, final Orientation.Flow axis)
+	public SliderControl(final GuiseSession session, final String id, final Class<V> valueClass, final Flow axis)
 	{
 		this(session, id, new DefaultValueModel<V>(session, valueClass), axis);	//construct the class with a default model
 	}
@@ -280,7 +280,7 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 	@exception NullPointerException if the given session, value class, converter, and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public SliderControl(final GuiseSession session, final String id, final Class<V> valueClass, final Converter<V, String> converter, final Orientation.Flow axis)
+	public SliderControl(final GuiseSession session, final String id, final Class<V> valueClass, final Converter<V, String> converter, final Flow axis)
 	{
 		this(session, id, new DefaultValueModel<V>(session, valueClass), converter, axis);	//construct the class with a default model
 	}
@@ -294,7 +294,7 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	@exception IllegalArgumentException if no default converter is available for the given model's value class.
 	*/
-	public SliderControl(final GuiseSession session, final String id, final ValueModel<V> model, final Orientation.Flow axis)
+	public SliderControl(final GuiseSession session, final String id, final ValueModel<V> model, final Flow axis)
 	{
 		this(session, id, model, createDefaultStringLiteralConverter(session, model.getValueClass()), axis);	//construct the class with a default converter
 	}
@@ -308,7 +308,7 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 	@exception NullPointerException if the given session, model, converter, and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public SliderControl(final GuiseSession session, final String id, final ValueModel<V> model, final Converter<V, String> converter, final Orientation.Flow axis)
+	public SliderControl(final GuiseSession session, final String id, final ValueModel<V> model, final Converter<V, String> converter, final Flow axis)
 	{
 		super(session, id, model);	//construct the parent class
 		this.converter=checkNull(converter, "Converter cannot be null");	//save the converter

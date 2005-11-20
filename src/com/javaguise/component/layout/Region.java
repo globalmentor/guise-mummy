@@ -27,7 +27,7 @@ public enum Region
 	public final static int FLOW_REGION_COUNT=3;
 
 	/**The three regions for each axis/direction combination.*/
-	protected final static Region[][][] REGIONS=new Region[Axis.values().length][Orientation.Direction.values().length][FLOW_REGION_COUNT];
+	protected final static Region[][][] REGIONS=new Region[Axis.values().length][Flow.Direction.values().length][FLOW_REGION_COUNT];
 
 	/**Determines the corresponding region for an orientation flow and absolute region number.
 	For example, a left-to-right, top-to-bottom page flow of index <code>2</code> will yield {@link #PAGE_END},
@@ -37,7 +37,7 @@ public enum Region
 	@param regionIndex The absolute region index (0, 1, or 2) from the upper left-hand corner.
 	@exception IllegalArgumentException if the given region index is less than <code>0</code> or greater than <code>2</code>. 
 	*/
-	public static Region getRegion(final Orientation orientation, final Orientation.Flow flow, final int regionIndex)
+	public static Region getRegion(final Orientation orientation, final Flow flow, final int regionIndex)
 	{
 		if(regionIndex<0 || regionIndex>=FLOW_REGION_COUNT)	//if an invalid region index was given
 		{
@@ -49,11 +49,11 @@ public enum Region
 	static
 	{
 			//initialize the regions lookup table
-		REGIONS[Axis.X.ordinal()][Orientation.Direction.INCREASING.ordinal()]=new Region[]{LINE_START, CENTER, LINE_END};
-		REGIONS[Axis.X.ordinal()][Orientation.Direction.DECREASING.ordinal()]=new Region[]{LINE_END, CENTER, LINE_START};
-		REGIONS[Axis.Y.ordinal()][Orientation.Direction.INCREASING.ordinal()]=new Region[]{PAGE_START, CENTER, PAGE_END};
-		REGIONS[Axis.Y.ordinal()][Orientation.Direction.DECREASING.ordinal()]=new Region[]{PAGE_END, CENTER, PAGE_START};		
-		REGIONS[Axis.Z.ordinal()][Orientation.Direction.INCREASING.ordinal()]=new Region[]{null, null, null};	//we don't currently use the Z axis
-		REGIONS[Axis.Z.ordinal()][Orientation.Direction.DECREASING.ordinal()]=new Region[]{null, null, null};
+		REGIONS[Axis.X.ordinal()][Flow.Direction.INCREASING.ordinal()]=new Region[]{LINE_START, CENTER, LINE_END};
+		REGIONS[Axis.X.ordinal()][Flow.Direction.DECREASING.ordinal()]=new Region[]{LINE_END, CENTER, LINE_START};
+		REGIONS[Axis.Y.ordinal()][Flow.Direction.INCREASING.ordinal()]=new Region[]{PAGE_START, CENTER, PAGE_END};
+		REGIONS[Axis.Y.ordinal()][Flow.Direction.DECREASING.ordinal()]=new Region[]{PAGE_END, CENTER, PAGE_START};		
+		REGIONS[Axis.Z.ordinal()][Flow.Direction.INCREASING.ordinal()]=new Region[]{null, null, null};	//we don't currently use the Z axis
+		REGIONS[Axis.Z.ordinal()][Flow.Direction.DECREASING.ordinal()]=new Region[]{null, null, null};
 	}
 }
