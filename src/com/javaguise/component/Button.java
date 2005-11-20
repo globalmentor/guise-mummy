@@ -5,7 +5,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 import java.net.URI;
 import java.util.MissingResourceException;
 import com.garretwilson.lang.ObjectUtilities;
-import com.javaguise.component.layout.Orientation;
+import com.javaguise.component.layout.Flow;
 import com.javaguise.model.ActionModel;
 import com.javaguise.model.DefaultActionModel;
 import com.javaguise.model.ImageModel;
@@ -34,7 +34,7 @@ public class Button extends AbstractActionControl<Button>
 		*/
 		public URI getImage() throws MissingResourceException
 		{
-			return getURI(image, getImageResourceKey(), (Orientation.Flow)null);	//get the value or the resource, if available
+			return getURI(image, getImageResourceKey(), (Flow)null);	//get the value or the resource, if available
 		}
 
 		/**Sets the URI of the image.
