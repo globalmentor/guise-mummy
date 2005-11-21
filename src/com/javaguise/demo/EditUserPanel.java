@@ -79,7 +79,7 @@ public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser>
 		emailPanel.add(emailControl);	//add the email control to the email panel
 
 		final LayoutPanel buttonPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create the button panel flowing horizontally
-		final DefaultButton okButton=new DefaultButton(session);	//create the OK button
+		final Button okButton=new Button(session);	//create the OK button
 		okButton.getModel().setLabel("OK");	//set the text of the OK button
 		okButton.getModel().addActionListener(new ActionListener<ActionModel>()	//if the OK button was pressed
 				{
@@ -98,7 +98,7 @@ Debug.trace("form validated with no errors");
 					}
 				});
 		buttonPanel.add(okButton);	//add the button to the button panel
-		final DefaultButton cancelButton=new DefaultButton(session);	//create the cancel button
+		final Button cancelButton=new Button(session);	//create the cancel button
 		cancelButton.getModel().setLabel("Cancel");	//set the text of the cancel button
 		cancelButton.getModel().addActionListener(new ActionListener<ActionModel>()	//if the cancel button was pressed
 				{

@@ -1,21 +1,21 @@
 package com.javaguise.component;
 
-import com.javaguise.model.ActionModel;
-import com.javaguise.model.DefaultActionModel;
+import com.javaguise.model.ActionValueModel;
+import com.javaguise.model.DefaultActionValueModel;
 import com.javaguise.session.GuiseSession;
 
-/**Control with an action model rendered as a button.
-If an image is specified, it will be used instead of the button label, if possible.
+/**Button that stores a boolean value in its model representing the selected state.
+A validator requiring a non-<code>null</code> value is automatically installed.
 @author Garret Wilson
 */
-public class DefaultButton extends AbstractButtonControl<DefaultButton>
+public class ToggleButton extends AbstractToggleButtonControl<ToggleButton>
 {
 
 	/**Session constructor with a default data model.
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public DefaultButton(final GuiseSession session)
+	public ToggleButton(final GuiseSession session)
 	{
 		this(session, (String)null);	//construct the component, indicating that a default ID should be used
 	}
@@ -26,9 +26,9 @@ public class DefaultButton extends AbstractButtonControl<DefaultButton>
 	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public DefaultButton(final GuiseSession session, final String id)
+	public ToggleButton(final GuiseSession session, final String id)
 	{
-		this(session, id, new DefaultActionModel(session));	//construct the class with a default model
+		this(session, id, new DefaultActionValueModel<Boolean>(session, Boolean.class, Boolean.FALSE));	//construct the class with a default model
 	}
 
 	/**Session and model constructor.
@@ -36,7 +36,7 @@ public class DefaultButton extends AbstractButtonControl<DefaultButton>
 	@param model The component data model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	*/
-	public DefaultButton(final GuiseSession session, final ActionModel model)
+	public ToggleButton(final GuiseSession session, final ActionValueModel<Boolean> model)
 	{
 		this(session, null, model);	//construct the component, indicating that a default ID should be used
 	}
@@ -48,7 +48,7 @@ public class DefaultButton extends AbstractButtonControl<DefaultButton>
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public DefaultButton(final GuiseSession session, final String id, final ActionModel model)
+	public ToggleButton(final GuiseSession session, final String id, final ActionValueModel<Boolean> model)
 	{
 		super(session, id, model);	//construct the parent class
 	}

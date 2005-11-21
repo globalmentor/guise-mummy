@@ -46,7 +46,7 @@ public class EditUsersPanel extends DefaultNavigationPanel
 		
 		final LayoutPanel buttonPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create the button panel flowing horizontally
 			//add button
-		final DefaultButton addButton=new DefaultButton(session);	//create the add button
+		final Button addButton=new Button(session);	//create the add button
 		addButton.getModel().setLabel("Add User");	//set the text of the add button
 		addButton.getModel().addActionListener(new ActionListener<ActionModel>()	//if the add button was pressed
 				{
@@ -84,7 +84,7 @@ public class EditUsersPanel extends DefaultNavigationPanel
 				});
 		buttonPanel.add(addButton);	//add the button to the button panel
 			//edit button	
-		final DefaultButton editButton=new DefaultButton(session);	//create the edit button
+		final Button editButton=new Button(session);	//create the edit button
 		editButton.getModel().setLabel("Edit");	//set the text of the edit button
 		editButton.getModel().addActionListener(new ActionListener<ActionModel>()	//if the edit button was pressed
 				{
@@ -125,7 +125,7 @@ public class EditUsersPanel extends DefaultNavigationPanel
 				});
 		buttonPanel.add(editButton);	//add the button to the button panel
 			//remove button	
-		final DefaultButton removeButton=new DefaultButton(session);	//create the remove button
+		final Button removeButton=new Button(session);	//create the remove button
 		removeButton.getModel().setLabel("Remove");	//set the text of the remove button
 		removeButton.getModel().setConfirmationMessage(new DefaultMessageModel(session, "Are you sure you want to remove this user?"));	//add a confirmation message to the button's action model
 		removeButton.getModel().addActionListener(new ActionListener<ActionModel>()	//if the remove button was pressed

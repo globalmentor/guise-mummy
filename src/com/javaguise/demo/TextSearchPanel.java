@@ -76,7 +76,7 @@ public class TextSearchPanel extends DefaultNavigationPanel
 		resourceImportControl.getModel().setValidator(textImportValidator);	//assign the validator to the the file upload control model		
 		inputPanel.add(resourceImportControl);	//add the file upload control to the input panel
 			//search button
-		final DefaultButton searchButton=new DefaultButton(session);	//create a button for initiating the upload and search
+		final Button searchButton=new Button(session);	//create a button for initiating the upload and search
 		searchButton.getModel().setLabel("Search");	//set the button label
 		inputPanel.add(searchButton);	//add the search button to the input panel
 
