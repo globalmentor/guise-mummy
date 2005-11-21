@@ -51,7 +51,7 @@ public class LoginPanel extends DefaultNavigationPanel
 		loginPanel.add(userPanel);	//add the user panel to the login panel
 
 			//login button
-		final Button loginButton=new Button(session);	//create a button for logging in
+		final DefaultButton loginButton=new DefaultButton(session);	//create a button for logging in
 		loginButton.getModel().setLabel("Log in");	//set the button label
 		loginButton.getModel().addActionListener(new ActionListener<ActionModel>()	//when the login button is pressed
 				{

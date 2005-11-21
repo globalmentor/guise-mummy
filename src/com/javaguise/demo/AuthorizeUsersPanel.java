@@ -53,7 +53,7 @@ public class AuthorizeUsersPanel extends DefaultNavigationPanel
 		userAuthorizationTable.getModel().setLabel("User Authorizations");	//give the table a label
 		add(userAuthorizationTable);	//add the user authorization table to the panel
 			//apply button
-		final Button applyButton=new Button(session);	//create a button for applying the values
+		final DefaultButton applyButton=new DefaultButton(session);	//create a button for applying the values
 		applyButton.getModel().setLabel("Apply");	//set the button label
 		applyButton.getModel().addActionListener(new ActionListener<ActionModel>()	//listen for the apply button
 				{					

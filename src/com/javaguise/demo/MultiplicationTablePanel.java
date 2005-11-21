@@ -46,7 +46,7 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 		maxFactorControl.getModel().setInfo("Enter the maximum factor (1-25) for the new multiplication table.");	//set the button information
 		controlPanel.add(maxFactorControl);	//add the count control to the control panel
 			//create the add button
-		final Button addButton=new Button(session);	//create the button for adding a tab
+		final DefaultButton addButton=new DefaultButton(session);	//create the button for adding a tab
 		addButton.getModel().setLabel("Add Tab");	//set the button label
 		addButton.getModel().setInfo("Add a tab containing a multiplication table of the specified factor.");	//set the button information
 		addButton.getModel().addActionListener(new ActionListener<ActionModel>()	//listen for the button being pressed
@@ -75,7 +75,7 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 				});
 		controlPanel.add(addButton);	//add the add button to this panel
 			//create the clear button
-		final Button clearButton=new Button(session);	//create the button for clearing the tabs
+		final DefaultButton clearButton=new DefaultButton(session);	//create the button for clearing the tabs
 		clearButton.getModel().setLabel("Clear Tabs");	//set the button label
 		clearButton.getModel().setInfo("Remove all tabs except the default tab.");	//set the button information
 		clearButton.getModel().addActionListener(new ActionListener<ActionModel>()	//listen for the button being pressed

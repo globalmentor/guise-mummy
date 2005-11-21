@@ -140,7 +140,7 @@ Debug.trace("list control changed value to", newValue);
 		
 		final LayoutPanel buttonPanel=new LayoutPanel(session, "testButtonPanel", new FlowLayout(session, Flow.LINE));	//create a panel flowing horizontally
 
-		final Button testButton=new Button(session, "testButton");
+		final DefaultButton testButton=new DefaultButton(session, "testButton");
 		testButton.getModel().setLabel("Click here to go to the 'Hello World' demo.");
 		testButton.getModel().setDescription("This is the hello world button.");
 /*TODO fix
@@ -155,7 +155,7 @@ Debug.trace("list control changed value to", newValue);
 		testButton.getModel().addActionListener(new NavigateActionListener<ActionModel>("helloworld"));
 		buttonPanel.add(testButton);	//add a new button
 		
-		final Button testButton2=new Button(session, "testButton2");
+		final DefaultButton testButton2=new DefaultButton(session, "testButton2");
 		testButton2.getModel().setLabel("Click this button to change the text.");
 		testButton2.getModel().addActionListener(new ActionListener<ActionModel>()
 				{
@@ -364,7 +364,7 @@ Debug.trace("list control changed value to", newValue);
 	
 		horizontalPanel.add(booleanPanel);
 
-		final Button testButtona=new Button(session, "testButton");
+		final DefaultButton testButtona=new DefaultButton(session, "testButton");
 		testButtona.getModel().setLabel("Nuther button.");
 		testButtona.setDragEnabled(true);
 		horizontalPanel.add(testButtona);	//add a new button

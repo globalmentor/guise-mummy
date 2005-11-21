@@ -45,7 +45,7 @@ public class RestrictedPanel extends DefaultNavigationPanel
 		restrictionPanel.add(notice);	//add the notice to the panel
 
 			//logout button
-		final Button logoutButton=new Button(session);	//create a button for logging out
+		final DefaultButton logoutButton=new DefaultButton(session);	//create a button for logging out
 		logoutButton.getModel().setLabel("Log out");	//set the button label
 		logoutButton.getModel().addActionListener(new ActionListener<ActionModel>()	//when the logout button is pressed
 				{

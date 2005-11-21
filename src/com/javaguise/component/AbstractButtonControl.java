@@ -3,14 +3,11 @@ package com.javaguise.component;
 import com.javaguise.model.ActionModel;
 import com.javaguise.session.GuiseSession;
 
-/**Abstract control with an action model.
+/**Abstract implementation of a button.
 @author Garret Wilson
 */
-public abstract class AbstractActionControl<C extends ActionControl<C>> extends AbstractControl<C> implements ActionControl<C>
+public abstract class AbstractButtonControl<C extends ButtonControl<C>> extends AbstractActionControl<C> implements ButtonControl<C>
 {
-
-	/**@return The data model used by this component.*/
-	public ActionModel getModel() {return (ActionModel)super.getModel();}
 
 	/**Session, ID, and model constructor.
 	@param session The Guise session that owns this component.
@@ -19,7 +16,7 @@ public abstract class AbstractActionControl<C extends ActionControl<C>> extends 
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractActionControl(final GuiseSession session, final String id, final ActionModel model)
+	public AbstractButtonControl(final GuiseSession session, final String id, final ActionModel model)
 	{
 		super(session, id, model);	//construct the parent class
 	}

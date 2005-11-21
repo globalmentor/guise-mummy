@@ -259,7 +259,7 @@ public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultO
 							}	
 						}
 					});
-			final Button button=new Button(session, actionModel);	//create a new button
+			final DefaultButton button=new DefaultButton(session, actionModel);	//create a new button
 			optionContainer.add(button);	//add the button to the container
 		}
 
