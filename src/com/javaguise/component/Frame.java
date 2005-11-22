@@ -2,6 +2,9 @@ package com.javaguise.component;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
+import java.beans.PropertyChangeListener;
+
+import com.javaguise.event.GuisePropertyChangeListener;
 import com.javaguise.event.ModalListener;
 import com.javaguise.model.LabelModel;
 
@@ -110,6 +113,13 @@ public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalC
 	*/
 	public void open();
 
+	/**Opens the frame as modal and installs the given property change listener to listen for the mode changing.
+	This is a convenience method that adds the mode change listener using {@link #addPropertyChangeListener(String, PropertyChangeListener)} and then calls {@link #open(boolean)} with a value of <code>true</code>.
+	@param modeChangeListener The mode property change listener to add.
+	@see ModalComponent#MODE_PROPERTY 
+	*/
+	public void open(final GuisePropertyChangeListener<? super C, Mode> modeChangeListener);
+
 	/**Opens the frame, specifying modality.
 	Opening the frame registers the frame with the session.
 	If the frame is already open, no action occurs.
@@ -132,15 +142,4 @@ public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalC
 	@see #STATE_PROPERTY
 	*/
 	public void close();
-
-	/**Adds a modal listener.
-	@param modalListener The modal listener to add.
-	*/
-	public void addModalListener(final ModalListener<C> modalListener);
-
-	/**Removes a modal listener.
-	@param modalListener The modal listener to remove.
-	*/
-	public void removeModalListener(final ModalListener<C> modalListener);
-
 }

@@ -1,7 +1,6 @@
 package com.javaguise.demo;
 
 import java.util.*;
-
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
 import com.javaguise.event.*;
@@ -14,8 +13,8 @@ Copyright © 2005 GlobalMentor, Inc.
 Demonstrates list controls with default representation, thread-safe select model access,
 	sorting list control models, listening for select model list changes,
 	retrieving navigation panels, invoking modal panels, retrieving modal panel results,
-	disabled control models, action model confirmation messages, and
-	accessing a custom Guise application.
+	disabled control models, message dialog frames,
+	and accessing a custom Guise application.
 @author Garret Wilson
 */
 public class EditUsersPanel extends DefaultNavigationPanel
@@ -127,7 +126,6 @@ public class EditUsersPanel extends DefaultNavigationPanel
 			//remove button	
 		final Button removeButton=new Button(session);	//create the remove button
 		removeButton.getModel().setLabel("Remove");	//set the text of the remove button
-		removeButton.getModel().setConfirmationMessage(new DefaultMessageModel(session, "Are you sure you want to remove this user?"));	//add a confirmation message to the button's action model
 		removeButton.getModel().addActionListener(new ActionListener<ActionModel>()	//if the remove button was pressed
 				{
 					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
@@ -135,7 +133,21 @@ public class EditUsersPanel extends DefaultNavigationPanel
 						final int selectedIndex=userListControl.getModel().getSelectedIndex();	//get the selected index
 						if(selectedIndex>=0)	//if an index is selected
 						{
-							userListControl.getModel().remove(selectedIndex);	//remove the user at the given index
+							final DemoUser user=userListControl.getModel().get(selectedIndex);	//get the selected user
+								//create a confirmation dialog
+							final MessageOptionDialogFrame confirmationDialog=new MessageOptionDialogFrame(session, "Are you sure you want to remove user "+user.getFirstName()+" "+user.getLastName()+"?",
+									MessageOptionDialogFrame.Option.YES, MessageOptionDialogFrame.Option.NO);	//present "yes" and "no" options to the user
+							confirmationDialog.open(new AbstractGuisePropertyChangeListener<DefaultOptionDialogFrame, Mode>()	//ask for confirmation
+									{		
+										public void propertyChange(final GuisePropertyChangeEvent<DefaultOptionDialogFrame, Mode> propertyChangeEvent)	//when the modal dialog mode changes
+										{
+												//if the message dialog is no longer modal and the selected option is "yes"
+											if(propertyChangeEvent.getSource().getMode()==null && propertyChangeEvent.getSource().getModel().getValue()==MessageOptionDialogFrame.Option.YES)
+											{
+												userListControl.getModel().remove(selectedIndex);	//remove the user at the given index												
+											}
+										}
+									});
 						}
 					}
 				});

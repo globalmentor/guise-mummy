@@ -3,8 +3,6 @@ package com.javaguise.test;
 import java.net.URI;
 import java.util.Locale;
 
-import com.garretwilson.beans.AbstractPropertyValueChangeListener;
-import com.garretwilson.beans.PropertyValueChangeEvent;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
 import com.javaguise.demo.DemoUser;
@@ -27,6 +25,7 @@ public class HomePanel extends DefaultNavigationPanel
 {
 
 	private TestFrame frame=null;
+	final Label testLabel;
 
 	/**Guise session constructor.
 	@param session The Guise session that owns this panel.
@@ -68,11 +67,11 @@ public class HomePanel extends DefaultNavigationPanel
 		outputTextControl.getModel().setLabel("Double the Number");	//add a label to the text output control
 		outputTextControl.getModel().setEditable(false);	//set the text output control to read-only so that the user cannot modify it
 		inputPanel.add(outputTextControl);	//add the output control to the input panel
-		inputTextControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<Float>()
+		inputTextControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ValueModel<Float>, Float>()
 				{
-					public void propertyValueChange(final PropertyValueChangeEvent<Float> propertyValueChangeEvent)
+					public void propertyChange(final GuisePropertyChangeEvent<ValueModel<Float>, Float> propertyChangeEvent)
 					{
-						final Float newValue=propertyValueChangeEvent.getNewValue();	//get the new value
+						final Float newValue=propertyChangeEvent.getNewValue();	//get the new value
 						try
 						{
 							outputTextControl.getModel().setValue(newValue*2);	//update the value
@@ -101,11 +100,11 @@ public class HomePanel extends DefaultNavigationPanel
 		listControl.getModel().add(new Float(10));
 		listControl.getModel().add(new Float(20));
 		listControl.getModel().add(new Float(30));
-		listControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<Float>()
+		listControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ListSelectModel<Float>, Float>()
 				{
-					public void propertyValueChange(final PropertyValueChangeEvent<Float> propertyValueChangeEvent)
+					public void propertyChange(final GuisePropertyChangeEvent<ListSelectModel<Float>, Float> propertyChangeEvent)
 					{
-						final Float newValue=propertyValueChangeEvent.getNewValue();	//get the new value
+						final Float newValue=propertyChangeEvent.getNewValue();	//get the new value
 						try
 						{
 Debug.trace("list control changed value to", newValue);
@@ -123,7 +122,7 @@ Debug.trace("list control changed value to", newValue);
 		contentPanel.add(inputPanel);	//add the input panel to the temperature panel
 		
 		
-		final Label testLabel=new Label(session, "testLabel");
+		testLabel=new Label(session, "testLabel");
 		testLabel.setDragEnabled(true);
 		testLabel.setStyleID("title");
 		testLabel.getModel().setLabel("This is label text from the model.");
@@ -326,14 +325,14 @@ Debug.trace("list control changed value to", newValue);
 		
 		final TextControl<String> textInput=new TextControl<String>(session, "textInput", String.class);	//create a text input control
 		textInput.getModel().setLabel("This is the text input label.");
-		textInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<String>()
+		textInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ValueModel<String>, String>()
 				{
-					public void propertyValueChange(PropertyValueChangeEvent<String> propertyValueChangeEvent)
+					public void propertyChange(GuisePropertyChangeEvent<ValueModel<String>, String> propertyChangeEvent)
 					{
-						testLabel.getModel().setLabel(propertyValueChangeEvent.getNewValue());
+						testLabel.getModel().setLabel(propertyChangeEvent.getNewValue());
 						if(frame!=null)
 						{
-							frame.label.getModel().setLabel(propertyValueChangeEvent.getNewValue());
+							frame.label.getModel().setLabel(propertyChangeEvent.getNewValue());
 							frame.getModel().setLabel("Updated frame.");
 						}
 					}
@@ -397,11 +396,11 @@ Debug.trace("list control changed value to", newValue);
 		image.setDragEnabled(true);
 		horizontalPanel.add(image);
 
-		sliderModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<Integer>()
+		sliderModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ValueModel<Integer>, Integer>()
 				{
-					public void propertyValueChange(PropertyValueChangeEvent<Integer> propertyValueChangeEvent)
+					public void propertyChange(GuisePropertyChangeEvent<ValueModel<Integer>, Integer> propertyChangeEvent)
 					{
-						final Integer newValue=propertyValueChangeEvent.getNewValue();	//get the new value
+						final Integer newValue=propertyChangeEvent.getNewValue();	//get the new value
 						if(newValue!=null)	//if there is a new value
 						{
 							testLabel.setOpacity(newValue.floatValue()/100);	//update the label opacity
@@ -501,11 +500,11 @@ Debug.trace("list control changed value to", newValue);
 		
 		contentPanel.add(tabbedPanel);
 
-		checkbox.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<Boolean>()
+		checkbox.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ValueModel<Boolean>, Boolean>()
 				{
-					public void propertyValueChange(final PropertyValueChangeEvent<Boolean> propertyValueChangeEvent)
+					public void propertyChange(final GuisePropertyChangeEvent<ValueModel<Boolean>, Boolean> propertyChangeEvent)
 					{
-						final Boolean newValue=propertyValueChangeEvent.getNewValue();	//get the new value
+						final Boolean newValue=propertyChangeEvent.getNewValue();	//get the new value
 //TODO del						testButton.setDisplayed(newValue);	//update the button enabled state
 						testButton.setVisible(newValue);	//update the button enabled state
 //TODO del						testButton.setVisible(newValue);	//update the button enabled state
@@ -614,6 +613,14 @@ Debug.trace("list control changed value to", newValue);
 		final Message message1=new Message(session, new DefaultMessageModel(session, "This is a message to show."));
 		editMenu.add(message1);
 		menu.add(editMenu);
+		
+		editMenu.getModel().addActionListener(new ActionListener<ActionModel>()	//testing accordion menu action
+				{
+					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
+					{
+						testLabel.getModel().setLabel("You pressed the accordion edit menu!");
+					}
+				});
 
 		final AccordionMenu stuffMenu=new AccordionMenu(session, Flow.PAGE);
 		stuffMenu.getModel().setLabel("Stuff");

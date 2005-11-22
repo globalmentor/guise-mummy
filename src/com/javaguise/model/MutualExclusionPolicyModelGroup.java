@@ -2,7 +2,7 @@ package com.javaguise.model;
 
 import java.util.*;
 
-import com.garretwilson.beans.PropertyValueChangeEvent;
+import com.javaguise.event.GuisePropertyChangeEvent;
 import com.javaguise.validator.ValidationException;
 
 /**A group that ensures that only one boolean model in the group is set to <code>true</code> at the same time.
@@ -23,13 +23,13 @@ public final class MutualExclusionPolicyModelGroup extends ValuePolicyModelGroup
 	}
 
 	/**Called when the boolean model value is changed.
-	@param propertyValueChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
+	@param propertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
 	*/
-	public void propertyValueChange(final PropertyValueChangeEvent<Boolean> propertyValueChangeEvent)
+	public void propertyChange(final GuisePropertyChangeEvent<ValueModel<Boolean>, Boolean> propertyChangeEvent)
 	{
-		if(Boolean.TRUE.equals(propertyValueChangeEvent.getNewValue()))	//if this model is changing to true, change the other models to false
+		if(Boolean.TRUE.equals(propertyChangeEvent.getNewValue()))	//if this model is changing to true, change the other models to false
 		{
-			final Object source=propertyValueChangeEvent.getSource();	//see which model changed
+			final ValueModel<Boolean> source=propertyChangeEvent.getSource();	//see which model changed
 			final Set<ValueModel<Boolean>> modelSet=getModelSet();	//get the set of models in the group
 			for(final ValueModel<Boolean> valueModel:modelSet)	//for each model in the group
 			{

@@ -1,5 +1,7 @@
 package com.javaguise.component;
 
+import static com.garretwilson.lang.ClassUtilities.*;
+
 import com.javaguise.component.layout.MenuLayout;
 import com.javaguise.model.MenuModel;
 
@@ -12,10 +14,22 @@ This component uses a {@link MenuModel} and a {@link MenuLayout}.
 public interface Menu<C extends Menu<C>> extends Container<C>, Control<C>
 {
 
+	/**The bound property of the rollover state.*/
+	public final static String ROLLOVER_PROPERTY=getPropertyName(Menu.class, "rollover");
+
 	/**@return The data model used by this component.*/
 	public MenuModel getModel();
 
 	/**@return The layout definition for the menu.*/
 	public MenuLayout getLayout();
 
+	/**@return Whether the component is in a rollover state.*/
+	public boolean isRollover();
+
+	/**Sets whether the component is in a rollover state.
+	This is a bound property of type <code>Boolean</code>.
+	@param newRollover <code>true</code> if the component should be in a rollover state, else <code>false</code>.
+	@see #ROLLOVER_PROPERTY
+	*/
+	public void setRollover(final boolean newRollover);
 }

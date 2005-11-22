@@ -6,6 +6,7 @@ import com.javaguise.session.GuiseSession;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**The base class for all Guise events.
+@param <S> The type of the event source.
 @author Garret Wilson
 */
 public class GuiseEvent<S> extends EventObject

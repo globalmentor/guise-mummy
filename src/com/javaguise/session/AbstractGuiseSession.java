@@ -16,6 +16,9 @@ import com.javaguise.*;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.Orientation;
 import com.javaguise.context.GuiseContext;
+import com.javaguise.event.AbstractGuisePropertyChangeListener;
+import com.javaguise.event.GuisePropertyChangeEvent;
+import com.javaguise.event.GuisePropertyChangeListener;
 import com.javaguise.event.ModalEvent;
 import com.javaguise.event.ModalNavigationListener;
 import com.garretwilson.io.BOMInputStreamReader;
@@ -29,8 +32,6 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.text.CharacterEncodingConstants.UTF_8;
 import static com.garretwilson.text.xml.XMLUtilities.*;
-import static com.garretwilson.util.ResourceBundleUtilities.*;
-import static com.garretwilson.util.SetUtilities.*;
 import static com.javaguise.GuiseResourceConstants.*;
 
 /**An abstract implementation that keeps track of the components of a user session.
@@ -280,12 +281,12 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		/**The property value change listener that, in response to a change in value, releases the resource bundle.
 		@see #releaseResourceBundle()
 		*/
-		private final PropertyValueChangeListener<String> resourceBundleReleasePropertyValueChangeListener=new AbstractPropertyValueChangeListener<String>()
+		private final GuisePropertyChangeListener<GuiseApplication, String> resourceBundleReleasePropertyValueChangeListener=new AbstractGuisePropertyChangeListener<GuiseApplication, String>()
 			{
 				/**Called when a bound property is changed.
-				@param propertyValueChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
+				@param propertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
 				*/
-				public void propertyValueChange(final PropertyValueChangeEvent<String> propertyValueChangeEvent)
+				public void propertyChange(final GuisePropertyChangeEvent<GuiseApplication, String> propertyChangeEvent)
 				{
 					releaseResourceBundle();	//release the resource bundle, as the new locale may indicate that new resources should be used					
 				}
@@ -1012,13 +1013,15 @@ Debug.trace("***ready to create navigation panel for path", path);
 	@see PropertyValueChangeEvent
 	@see PropertyValueChangeListener
 	*/
-	protected <V> void firePropertyChange(final String propertyName, V oldValue, final V newValue)
+/*TODO del; no longer needed now that unconditional firing isn't necessary
+	protected <V> void firePropertyChange(final String propertyName, V oldValue, final V newValue)	//TODO probably remove this method, now that we don't need unconditional firing anymore
 	{
 		if(!ObjectUtilities.equals(oldValue, newValue))	//if the values are different
 		{					
 			firePropertyChange(new PropertyValueChangeEvent<V>(this, propertyName, oldValue, newValue));	//create and fire a genericized subclass of a property change event
 		}
 	}
+*/
 
 	/**Reports that a bound property has changed.
 	This implementation delegates to the Guise session to fire or postpone the property change event.
@@ -1033,12 +1036,12 @@ Debug.trace("***ready to create navigation panel for path", path);
 	/**The class that listens for context state changes and updates the context state set in response.
 	@author Garret Wilson
 	*/
-	protected class ContextStateListener extends AbstractPropertyValueChangeListener<GuiseContext.State>
+	protected class ContextStateListener extends AbstractGuisePropertyChangeListener<GuiseSession, GuiseContext.State>
 	{
 		/**Called when a bound property is changed.
-		@param propertyValueChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
+		@param propertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
 		*/
-		public void propertyValueChange(final PropertyValueChangeEvent<GuiseContext.State> propertyValueChangeEvent)
+		public void propertyChange(final GuisePropertyChangeEvent<GuiseSession, GuiseContext.State> propertyChangeEvent)
 		{
 			updateContextStates();	//update the context states when a context state changes
 		}

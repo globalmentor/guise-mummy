@@ -2,13 +2,13 @@ package com.javaguise.component;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
-import com.garretwilson.beans.AbstractPropertyValueChangeListener;
-import com.garretwilson.beans.PropertyValueChangeEvent;
 import com.garretwilson.lang.ObjectUtilities;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.javaguise.converter.*;
+import com.javaguise.event.AbstractGuisePropertyChangeListener;
+import com.javaguise.event.GuisePropertyChangeEvent;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.Validator;
@@ -169,11 +169,11 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 		super(session, id, model);	//construct the parent class
 		this.converter=checkNull(converter, "Converter cannot be null");	//save the converter
 		updateText(model.getValue());	//initialize the text with the literal form of the initial model value
-		model.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<V>()	//listen for the model changing value, and update the text in response
+		model.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ValueModel<V>, V>()	//listen for the model changing value, and update the text in response
 				{
-					public void propertyValueChange(final PropertyValueChangeEvent<V> propertyValueChangeEvent)	//if the model value changes
+					public void propertyChange(final GuisePropertyChangeEvent<ValueModel<V>, V> propertyChangeEvent)	//if the model value changes
 					{
-						updateText(propertyValueChangeEvent.getNewValue());	//update the text with the new value
+						updateText(propertyChangeEvent.getNewValue());	//update the text with the new value
 					}
 				});
 	}

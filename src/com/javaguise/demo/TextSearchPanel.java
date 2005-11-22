@@ -5,10 +5,10 @@ import java.util.regex.*;
 
 import javax.mail.internet.ContentType;
 
-import com.garretwilson.beans.AbstractPropertyValueChangeListener;
-import com.garretwilson.beans.PropertyValueChangeEvent;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
+import com.javaguise.event.AbstractGuisePropertyChangeListener;
+import com.javaguise.event.GuisePropertyChangeEvent;
 
 import com.javaguise.model.MessageModel;
 import com.javaguise.model.ResourceImport;
@@ -86,13 +86,13 @@ public class TextSearchPanel extends DefaultNavigationPanel
 		textAreaControl.getModel().setEditable(false);	//don't allow the text area control to be edited
 
 		//listen for the value of the resource import changing
-		resourceImportControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<ResourceImport>()
+		resourceImportControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ValueModel<ResourceImport>, ResourceImport>()
 				{
-					public void propertyValueChange(PropertyValueChangeEvent<ResourceImport> propertyValueChangeEvent)
+					public void propertyChange(GuisePropertyChangeEvent<ValueModel<ResourceImport>, ResourceImport> propertyChangeEvent)
 					{
 						try
 						{
-							final ResourceImport resourceImport=propertyValueChangeEvent.getNewValue();	//get the new resource import
+							final ResourceImport resourceImport=propertyChangeEvent.getNewValue();	//get the new resource import
 							final String searchResults;	//we'll store the search results here
 							if(resourceImport!=null && searchRegExControl.getModel().isValid())	//if we have a new resource to import and the search expression is valid
 							{

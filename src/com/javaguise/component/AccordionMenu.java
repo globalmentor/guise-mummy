@@ -55,7 +55,6 @@ public class AccordionMenu extends AbstractMenu<AccordionMenu>
 	public AccordionMenu(final GuiseSession session, final String id, final MenuModel model, final Flow axis)
 	{
 		super(session, id, new MenuLayout(session, axis), model);	//construct the parent class
-		setPreferredWidth(new Extent(8, Extent.Unit.EM));	//set the default width
 	}
 
 }

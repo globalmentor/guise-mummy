@@ -1,6 +1,10 @@
 package com.javaguise.component;
 
 import com.javaguise.component.layout.*;
+import com.javaguise.event.MouseEvent;
+import com.javaguise.event.MouseListener;
+import com.javaguise.geometry.Point;
+import com.javaguise.geometry.Rectangle;
 import com.javaguise.model.MenuModel;
 import com.javaguise.session.GuiseSession;
 
@@ -17,6 +21,27 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainer<
 	/**@return The layout definition for the menu.*/
 	public MenuLayout getLayout() {return (MenuLayout)super.getLayout();}	//a menu can only have a menu layout
 
+	/**Whether the component is in a rollover state.*/
+	private boolean rollover=false;
+
+		/**@return Whether the component is in a rollover state.*/
+		public boolean isRollover() {return rollover;}
+
+		/**Sets whether the component is in a rollover state.
+		This is a bound property of type <code>Boolean</code>.
+		@param newRollover <code>true</code> if the component should be in a rollover state, else <code>false</code>.
+		@see Menu#ROLLOVER_PROPERTY
+		*/
+		public void setRollover(final boolean newRollover)
+		{
+			if(rollover!=newRollover)	//if the value is really changing
+			{
+				final boolean oldRollover=rollover;	//get the current value
+				rollover=newRollover;	//update the value
+				firePropertyChange(ROLLOVER_PROPERTY, Boolean.valueOf(oldRollover), Boolean.valueOf(newRollover));
+			}
+		}
+
 	/**Session, ID, layout, and model constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
@@ -28,6 +53,38 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainer<
 	public AbstractMenu(final GuiseSession session, final String id, final MenuLayout layout, final MenuModel model)
 	{
 		super(session, id, layout, model);	//construct the parent class
+	}
+
+	/**Fires a mouse entered event to all registered mouse listeners.
+	This implementation first sets the rollover state to <code>true</code>.
+	@param componentBounds The absolute bounds of the component.
+	@param viewportBounds The absolute bounds of the viewport.
+	@param mousePosition The position of the mouse relative to the viewport.
+	@exception NullPointerException if one or more of the arguments are <code>null</code>.
+	@see MouseListener
+	@see MouseEvent
+	@see #setRollover(boolean)
+	*/
+	public void fireMouseEntered(final Rectangle componentBounds, final Rectangle viewportBounds, final Point mousePosition)
+	{
+		setRollover(true);	//turn on the rollover state
+		super.fireMouseEntered(componentBounds, viewportBounds, mousePosition);	//fire the event normally
+	}
+
+	/**Fires a mouse exited event to all registered mouse listeners.
+	This implementation first sets the rollover state to <code>false</code>.
+	@param componentBounds The absolute bounds of the component.
+	@param viewportBounds The absolute bounds of the viewport.
+	@param mousePosition The position of the mouse relative to the viewport.
+	@exception NullPointerException if one or more of the arguments are <code>null</code>.
+	@see MouseListener
+	@see MouseEvent
+	@see #setRollover(boolean)
+	*/
+	public void fireMouseExited(final Rectangle componentBounds, final Rectangle viewportBounds, final Point mousePosition)
+	{
+		setRollover(false);	//turn off the rollover state
+		super.fireMouseExited(componentBounds, viewportBounds, mousePosition);	//fire the event normally
 	}
 
 	/**Adds a child component.

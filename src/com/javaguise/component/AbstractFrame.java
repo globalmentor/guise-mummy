@@ -1,5 +1,6 @@
 package com.javaguise.component;
 
+import java.beans.PropertyChangeListener;
 import java.util.Iterator;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
@@ -7,9 +8,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.EmptyIterator;
 import com.garretwilson.util.ObjectIterator;
-import com.javaguise.event.ModalEvent;
-import com.javaguise.event.ModalListener;
-import com.javaguise.event.PostponedModalEvent;
+import com.javaguise.event.GuisePropertyChangeListener;
 import com.javaguise.model.LabelModel;
 import com.javaguise.session.GuiseSession;
 
@@ -334,6 +333,17 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 		open();	//open the frame normally
 	}
 
+	/**Opens the frame as modal and installs the given property change listener to listen for the mode changing.
+	This is a convenience method that adds the mode change listener using {@link #addPropertyChangeListener(String, PropertyChangeListener)} and then calls {@link #open(boolean)} with a value of <code>true</code>.
+	@param modeChangeListener The mode property change listener to add.
+	@see ModalComponent#MODE_PROPERTY 
+	*/
+	public void open(final GuisePropertyChangeListener<? super C, Mode> modeChangeListener)
+	{
+		addPropertyChangeListener(MODE_PROPERTY, modeChangeListener);	//add the mode property change listener
+		open(true);	//open modally
+	}
+
 	/**Determines whether the frame should be allowed to close.
 	This implementation returns <code>true</code>.
 	This method is called from {@link #close()}.
@@ -370,34 +380,4 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 		getSession().removeFrame(this);	//remove the frame from the session
 		setState(State.CLOSED);	//change the state
 	}
-
-	/**Adds a modal listener.
-	@param modalListener The modal listener to add.
-	*/
-	public void addModalListener(final ModalListener<C> modalListener)
-	{
-		getEventListenerManager().add(ModalListener.class, modalListener);	//add the listener
-	}
-
-	/**Removes a modal listener.
-	@param modalListener The modal listener to remove.
-	*/
-	public void removeModalListener(final ModalListener<C> modalListener)
-	{
-		getEventListenerManager().remove(ModalListener.class, modalListener);	//remove the listener
-	}
-
-	/**Fires an action to all registered modal listeners indicating that the mode began.
-	@see ModalListener
-	@see ModalEvent
-	*/
-	protected void fireModalBegan()
-	{
-		if(getEventListenerManager().hasListeners(ModalListener.class))	//if there are modal listeners registered
-		{
-			final ModalEvent<C> modalEvent=new ModalEvent<C>(getSession(), getThis());	//create a new modal event
-			getSession().queueEvent(new PostponedModalEvent<C>(getEventListenerManager(), modalEvent, PostponedModalEvent.ModalEventType.BEGAN));	//tell the Guise session to queue the event
-		}
-	}
-
 }

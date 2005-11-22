@@ -1,8 +1,8 @@
 package com.javaguise.component.layout;
 
-import com.garretwilson.beans.PropertyValueChangeEvent;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.javaguise.component.Component;
+import com.javaguise.event.GuisePropertyChangeEvent;
 
 /**An event indicating that a property of layout constraints changed.
 The source is always the layout object. The component and constraints are also provided.
@@ -10,11 +10,8 @@ The source is always the layout object. The component and constraints are also p
 @param <V> The type of property value.
 @author Garret Wilson
 */
-public class LayoutConstraintsPropertyChangeEvent<T extends Layout.Constraints, V> extends PropertyValueChangeEvent<V>
+public class LayoutConstraintsPropertyChangeEvent<T extends Layout.Constraints, V> extends GuisePropertyChangeEvent<Layout, V>
 {
-
-	/**@return The layout in which the event occurred.*/
-	public Layout getSource() {return (Layout)super.getSource();}
 
 	/**The component for which a constraint value changed.*/
 	private final Component<?> component;

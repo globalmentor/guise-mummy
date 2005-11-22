@@ -2,7 +2,7 @@ package com.javaguise.model;
 
 import java.beans.PropertyChangeEvent;
 
-import com.garretwilson.beans.*;
+import com.javaguise.event.*;
 
 /**An abstract implementation of a group of value models implementing a value policy across several models, such as mutual exclusion.
 When value models are added to the list, the group adds itself as a property value change listeners to the model, listening for changes in the value.
@@ -10,7 +10,7 @@ When value models are added to the list, the group adds itself as a property val
 @author Garret Wilson.
 @see com.javaguise.model.ValueModel
 */
-public abstract class ValuePolicyModelGroup<V> extends AbstractModelGroup<ValueModel<V>> implements PropertyValueChangeListener<V>
+public abstract class ValuePolicyModelGroup<V> extends AbstractModelGroup<ValueModel<V>> implements GuisePropertyChangeListener<ValueModel<V>, V>
 {
 
 	/**Actual implementation of adding a model to the group.
@@ -37,12 +37,13 @@ public abstract class ValuePolicyModelGroup<V> extends AbstractModelGroup<ValueM
 	This not-generics version calls the generic version, creating a new event if necessary.
 	No checks are made at compile time to ensure the given event actually supports the given generic type.
 	@param propertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
-	@see PropertyValueChangeListener#propertyValueChange(PropertyValueChangeEvent)
+	@see GuisePropertyChangeListener#propertyChange(GuisePropertyChangeEvent)
 	*/
 	@SuppressWarnings("unchecked")
 	public final void propertyChange(final PropertyChangeEvent propertyChangeEvent)
 	{
-		propertyValueChange((PropertyValueChangeEvent<V>)AbstractPropertyValueChangeListener.getPropertyValueChangeEvent(propertyChangeEvent));	//call the generic version of the method with the genericized event object
+		final GuisePropertyChangeEvent<ValueModel<V>, V> guisePropertyChangeEvent=AbstractGuisePropertyChangeListener.getGuisePropertyChangeEvent(propertyChangeEvent);	//create a genericized event object
+		propertyChange(guisePropertyChangeEvent);	//call the generic version of the method with the genericized event object
 	}
 
 	/**Model constructor.

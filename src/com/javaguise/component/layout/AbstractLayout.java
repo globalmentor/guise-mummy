@@ -6,15 +6,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import com.garretwilson.beans.AbstractPropertyValueChangeListener;
 import com.garretwilson.beans.BoundPropertyObject;
-import com.garretwilson.beans.PropertyValueChangeEvent;
-import com.garretwilson.beans.PropertyValueChangeListener;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.Debug;
 import com.javaguise.component.Component;
 import com.javaguise.component.Container;
-import com.javaguise.event.GuiseBoundPropertyObject;
+import com.javaguise.event.*;
 import com.javaguise.session.GuiseSession;
 
 /**Abstract implementation of layout information for a container.
@@ -176,17 +173,16 @@ public abstract class AbstractLayout<T extends Layout.Constraints> extends Guise
 	@author Garret Wilson
 	@see LayoutConstraintsPropertyChangeEvent
 	*/
-	protected class ConstraintsPropertyChangeListener extends AbstractPropertyValueChangeListener<Object>
+	protected class ConstraintsPropertyChangeListener extends AbstractGuisePropertyChangeListener<T, Object>
 	{
 
 		/**Called when a bound property is changed.
 		This implementation fires a {@link LayoutConstraintsPropertyChangeEvent} indicating the constraints and associated component. 
-		@param propertyValueChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
+		@param propertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
 		*/
-		@SuppressWarnings("unchecked")	//we assume that the source of the event is constraints, because that's the only place we register this listener
-		public void propertyValueChange(final PropertyValueChangeEvent<Object> propertyValueChangeEvent)
+		public void propertyChange(final GuisePropertyChangeEvent<T, Object> propertyChangeEvent)
 		{
-			final T constraints=(T)propertyValueChangeEvent.getSource();	//get the constraints for which a property changed
+			final T constraints=propertyChangeEvent.getSource();	//get the constraints for which a property changed
 				//find the component for these constraints
 			for(final Map.Entry<Component<?>, T> componentConstraintsEntry:componentConstraintsMap.entrySet())	//for each entry in the map of constraints
 			{
@@ -194,7 +190,7 @@ public abstract class AbstractLayout<T extends Layout.Constraints> extends Guise
 				{
 //TODO del Debug.trace("Ready to fire an event indicating that component", componentConstraintsEntry.getKey(), "changed property", propertyValueChangeEvent.getPropertyName(), "to value", propertyValueChangeEvent.getNewValue());	//TODO del
 						//fire an event indicating that the constraints for this component changed one if its properties
-					fireConstraintsPropertyChange(componentConstraintsEntry.getKey(), constraints, propertyValueChangeEvent.getPropertyName(), propertyValueChangeEvent.getOldValue(), propertyValueChangeEvent.getNewValue());								
+					fireConstraintsPropertyChange(componentConstraintsEntry.getKey(), constraints, propertyChangeEvent.getPropertyName(), propertyChangeEvent.getOldValue(), propertyChangeEvent.getNewValue());								
 				}
 			}
 		}

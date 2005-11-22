@@ -1,8 +1,8 @@
 package com.javaguise.demo;
 
-import com.garretwilson.beans.*;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
+import com.javaguise.event.*;
 import com.javaguise.model.ValueModel;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.RegularExpressionStringValidator;
@@ -33,9 +33,9 @@ public class HelloUserPanel extends DefaultNavigationPanel
 		userInput.getModel().setLabel("What's your name?");	//add a label to the text input control
 		userInput.getModel().setInfo("Enter a name that does not start with whitespace.");	//add advisory information that may be shown as a tooltip
 		userInput.getModel().setValidator(new RegularExpressionStringValidator(session, "\\S+.*", true));	//require at least a single non-whitespace character followed by any other characters
-		userInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractPropertyValueChangeListener<String>()
+		userInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ValueModel<String>, String>()
 				{
-					public void propertyValueChange(final PropertyValueChangeEvent<String> propertyValueChangeEvent)
+					public void propertyChange(final GuisePropertyChangeEvent<ValueModel<String>, String> propertyValueChangeEvent)
 					{
 						final String user=propertyValueChangeEvent.getNewValue();	//get the name the user entered
 						helloUserLabel.getModel().setLabel("Hello, "+user+"!");	//update the label

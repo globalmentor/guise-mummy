@@ -11,27 +11,6 @@ import com.javaguise.session.GuiseSession;
 public class DefaultActionModel extends AbstractControlModel implements ActionModel
 {
 
-	/**The confirmation message for the action, or <code>null</code> if there is no confirmation message.*/
-	private MessageModel confirmationMessage;
-
-		/**@return The confirmation message for the action, or <code>null</code> if there is no confirmation message.*/
-		public MessageModel getConfirmationMessage() {return confirmationMessage;}
-
-		/**Sets the confirmation message.
-		This is a bound property
-		@param newConfirmationMessage The new confirmation message for the action, or <code>null</code> if there is no confirmation message.
-		@see ActionModel#CONFIRMATION_MESSAGE_PROPERTY
-		*/
-		public void setConfirmationMessage(final MessageModel newConfirmationMessage)
-		{
-			if(confirmationMessage!=newConfirmationMessage)	//if the value is really changing
-			{
-				final MessageModel oldConfirmationMessage=confirmationMessage;	//get the old value
-				confirmationMessage=newConfirmationMessage;	//actually change the value
-				firePropertyChange(CONFIRMATION_MESSAGE_PROPERTY, oldConfirmationMessage, newConfirmationMessage);	//indicate that the value changed
-			}
-		}
-
 	/**Adds an action listener.
 	@param actionListener The action listener to add.
 	*/
@@ -74,7 +53,17 @@ public class DefaultActionModel extends AbstractControlModel implements ActionMo
 	*/
 	public DefaultActionModel(final GuiseSession session)
 	{
-		super(session);	//construct the parent class
+		this(session, null);	//construct the class with no label
+	}
+
+	/**Session and label constructor.
+	@param session The Guise session that owns this model.
+	@param label The text of the label.
+	@exception NullPointerException if the given session is <code>null</code>.
+	*/
+	public DefaultActionModel(final GuiseSession session, final String label)
+	{
+		super(session, label);	//construct the parent class
 	}
 
 }

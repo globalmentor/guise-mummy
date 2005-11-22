@@ -3,12 +3,10 @@ package com.javaguise.demo;
 import java.text.DateFormat;
 import java.util.*;
 
-import com.garretwilson.beans.AbstractPropertyValueChangeListener;
-import com.garretwilson.beans.PropertyValueChangeEvent;
-import com.garretwilson.beans.PropertyValueChangeListener;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.Flow;
 import com.javaguise.component.layout.RegionLayout;
+import com.javaguise.event.*;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
@@ -35,13 +33,13 @@ public class InternationalizationPanel extends DefaultNavigationPanel
 		getModel().setLabel("Guise\u2122 Demonstration: Internationalization");	//set the panel title
 
 			//create a value change listener to listen for language selection changes
-		final PropertyValueChangeListener<Boolean> languageChangeListener=new AbstractPropertyValueChangeListener<Boolean>()
+		final GuisePropertyChangeListener<LocaleLabelValueModel<Boolean>, Boolean> languageChangeListener=new AbstractGuisePropertyChangeListener<LocaleLabelValueModel<Boolean>, Boolean>()
 			{
-				public void propertyValueChange(final PropertyValueChangeEvent<Boolean> propertyValueChangeEvent)	//when a language boolean model changes
+				public void propertyChange(final GuisePropertyChangeEvent<LocaleLabelValueModel<Boolean>, Boolean> propertyChangeEvent)	//when a language boolean model changes
 				{
-					if(Boolean.TRUE.equals(propertyValueChangeEvent.getNewValue()))	//if this language is being set
+					if(Boolean.TRUE.equals(propertyChangeEvent.getNewValue()))	//if this language is being set
 					{
-						final Locale locale=((LocaleLabelValueModel<?>)propertyValueChangeEvent.getSource()).getLocale();	//get the selected locale
+						final Locale locale=propertyChangeEvent.getSource().getLocale();	//get the selected locale
 						session.setLocale(locale);	//change to the session selected locale
 					}
 				}

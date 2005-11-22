@@ -3167,8 +3167,8 @@ function onDragEnd(event)
 		if(dropTarget)	//if the mouse was dropped over a drop target
 		{
 //TODO del when works alert("over drop target: "+dropTarget.nodeName);
-			var dragSourceComponent=getAncestorElementByClassName(dragState.dragSource, "component");	//get the component element TODO improve all this; decide if we want the dropTarget style on the component element or the drop target subcomponent, and how we want to relate that to the component ID
-			var dropTargetComponent=getAncestorElementByClassName(dropTarget, "component");	//get the component element TODO improve all this; decide if we want the dropTarget style on the component element or the drop target subcomponent, and how we want to relate that to the component ID
+			var dragSourceComponent=getAncestorElementByClassName(dragState.dragSource, STYLES.COMPONENT_REGEXP);	//get the component element TODO improve all this; decide if we want the dropTarget style on the component element or the drop target subcomponent, and how we want to relate that to the component ID
+			var dropTargetComponent=getAncestorElementByClassName(dropTarget, STYLES.COMPONENT_REGEXP);	//get the component element TODO improve all this; decide if we want the dropTarget style on the component element or the drop target subcomponent, and how we want to relate that to the component ID
 			if(dragSourceComponent && dropTargetComponent)	//if there source and target components
 			{
 				var ajaxRequest=new DropAJAXEvent(dragState, dragSourceComponent, dropTargetComponent, event);	//create a new AJAX drop event TODO probably remove the dragState parameter
@@ -3357,7 +3357,17 @@ function onMouse(event)
 		}
 	}
 	var target=event.currentTarget;	//get the target of the event
-	var component=getAncestorElementByClassName(target, "component");	//get the component element
+		//if the mouse is supposedly leaving the element, make sure it's not just moving to a child element, and vice versa (see http://www.quirksmode.org/js/events_mouse.html#mouseover)
+	var otherTarget=event.relatedTarget;	//see which element the mouse is going to or from
+	while(otherTarget!=document.documentElement)	//while we haven't reached the top of the DOM
+	{
+		if(otherTarget==target)	//if the mouse is still over the original element
+		{
+			return;	//ignore the mouse exit event while it is still over this element
+		}
+		otherTarget=otherTarget.parentNode;	//check up the hierarchy
+	}
+	var component=getAncestorElementByClassName(target, STYLES.COMPONENT_REGEXP);	//get the component element
 	if(component)	//if we know the component
 	{
 		var eventType;	//we'll determine the type of AJAX mouse event to send

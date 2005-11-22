@@ -2,9 +2,9 @@ package com.javaguise.event;
 
 import java.beans.PropertyChangeEvent;
 
-import com.garretwilson.beans.*;
-import com.javaguise.session.GuiseSession;
+import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.lang.ObjectUtilities;
+import com.javaguise.session.GuiseSession;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
@@ -29,26 +29,28 @@ public class GuiseBoundPropertyObject extends BoundPropertyObject
 	}
 
 	/**Reports that a bound property has changed. This method can be called	when a bound property has changed and it will send the appropriate property change event to any registered property change listeners.
-	This version fires a property change event even if no listeners are attached, so that the Guise session can be notified of the event.
 	No event is fired if old and new are both <code>null</code> or are both non-<code>null</code> and equal according to the {@link Object#equals(java.lang.Object)} method.
+	No event is fired if no listeners are registered for the given property.
 	This method delegates actual firing of the event to {@link #firePropertyChange(PropertyChangeEvent)}.
+	This implementation fires an event of type {@link GuisePropertyChangeEvent}, although the generic type of that event's source is not specific to the actual subclass used.
 	@param propertyName The name of the property being changed.
 	@param oldValue The old property value.
 	@param newValue The new property value.
 	@see #firePropertyChange(PropertyChangeEvent)
 	@see #hasListeners(String)
-	@see PropertyValueChangeEvent
-	@see PropertyValueChangeListener
+	@see GuisePropertyChangeEvent
+	@see GuisePropertyChangeListener
 	*/
-/*TODO del; with new view hierarchy, it is no longer necessary to unconditionally fire events
-	protected <V> void firePropertyChange(final String propertyName, V oldValue, final V newValue)
+	protected <V> void firePropertyChange(final String propertyName, final V oldValue, final V newValue)
 	{
-		if(!ObjectUtilities.equals(oldValue, newValue))	//if the values are different
-		{					
-			firePropertyChange(new PropertyValueChangeEvent<V>(this, propertyName, oldValue, newValue));	//create and fire a genericized subclass of a property change event
+		if(hasListeners(propertyName)) //if we have listeners registered for this property
+		{
+			if(!ObjectUtilities.equals(oldValue, newValue))	//if the values are different
+			{					
+				firePropertyChange(new GuisePropertyChangeEvent<GuiseBoundPropertyObject, V>(this, propertyName, oldValue, newValue));	//create and fire a genericized subclass of a property change event
+			}
 		}
 	}
-*/
 
 	/**Reports that a bound property has changed.
 	This implementation delegates to the Guise session to fire or postpone the property change event.
