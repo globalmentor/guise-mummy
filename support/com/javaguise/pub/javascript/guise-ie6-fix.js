@@ -2,6 +2,7 @@
 Copyright (c) 2005 GlobalMentor, Inc.
 This file should be included after the main guise.js file and after all stylesheet references.
 */
+//TODO fix to work with pseudo-classes
 
 /**A class for representing a selector for a single element (which can be a component in a nested element selector).
 @param selectorText The string form of the element selector.
@@ -157,54 +158,13 @@ function GuiseIE6Fix(selectorText)
 				var cssSelector=new CSSSelector(selectorText);	//create a selector from this selector text
 				if(cssSelector.isMultipleClassSelector)	//if this is a multi-class selector
 				{
-					this.cssMultipleClassSelectors.add(cssSelector);	//add this selector to our list of multiple class selector
 					var cssText=rule.style.cssText;	//get the text of the rule (even though Danny Goodman's _JavaScript Bible_, Fifth Edition says that IE doesn't support this property
-//TODO del alert("before: cssText: "+cssText);
-/*TODO fix					
-					for(var property in rule.style)	//for each property in the original style
+					if(cssText.length>0)	//if there is actually text for this rule (IE won't allow us to add a rule with no text, but an empty rule doesn't do anything anyway, so ignore it)
 					{
-if(style[property])
-{
-alert("property: "+property+" is string "+(property instanceof String));
-alert("property to string: "+property.toString());
-alert("test is uppercase : "+("test".isUpperCase()));
-alert("property to string is uppercase: "+property.toString().isUpperCase());
-//TODO fix	if(!property.toString().isUpperCase())
-alert("property: "+property+": "+style[property]);
-}
-//TODO fix						newRule.style[property]=rule.style[property];	//copy over this style property
+						this.cssMultipleClassSelectors.add(cssSelector);	//add this selector to our list of multiple class selector
+						stylesheet.removeRule(ruleIndex);	//remove the rule at this index (using an IE6-specific method)
+						stylesheet.addRule(cssSelector.ie6FixSelectorText, cssText, ruleIndex);	//add a new rule in its place with the new selector text (using an IE6-specific method)
 					}
-*/
-//					alert("ready to substitute "+rule.selectorText+" with "+cssSelector.ie6FixSelectorText);
-					stylesheet.removeRule(ruleIndex);	//remove the rule at this index (using an IE6-specific method)
-					stylesheet.addRule(cssSelector.ie6FixSelectorText, cssText, ruleIndex);	//add a new rule in its place with the new selector text (using an IE6-specific method)
-//TODO del					var newRule=rules[ruleIndex];	//get a reference to the new rule
-//TODO del alert("new rule selector text: "+newRule.selectorText);
-//alert("new rule style: "+newRule.style);
-
-
-
-
-//TODO fix					newRule.style=style;
-/*TODO fix
-					for(var property in rule.style)	//for each property in the original style
-					{
-alert("property: "+property+": "+rule.style[property]);
-//TODO fix						newRule.style[property]=rule.style[property];	//copy over this style property
-					}
-*/
-					
-					
-//TODO fix; doesn't work					rules[ruleIndex].style=rule.style;	//use the same style as the old rule had
-//TODO del alert("new selector text: "+rules[ruleIndex].selectorText);
-					
-//					rule.selectorText=cssSelector.ie6FixSelectorText;	//change the selector to the special IE6 version
-//alert("new selector text: "+rule.selectorText);
-/*TODO del when works
-						cssMultiClassSelectors
-						alert("multi selector: "+cssSelector.selectorText);
-						alert("element selector: "+elementSelector.selectorText+" consisting of "+elementSelector.classes[0]+" and "+elementSelector.classes[1]);
-*/
 				}
 			}
 		}

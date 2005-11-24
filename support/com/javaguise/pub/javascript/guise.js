@@ -70,19 +70,20 @@ var STYLES=
 {
 	/**A component element that can be clicked as an action.*/
 	ACTION: "action",
+	AXIS_X: "axisX",
+	AXIS_Y: "axisY",
 	/**A general component.*/
 	COMPONENT_REGEXP: /^component(-[xy]-(ltr|rtl))?$/,
 	DRAG_SOURCE: "dragSource",
 	DRAG_HANDLE: "dragHandle",
 	DROP_TARGET: "dropTarget",
 	MOUSE_LISTENER: "mouseListener",
-	SLIDER_CONTROL_X_LTR_THUMB: "sliderControl-x-ltr-thumb",
-	SLIDER_CONTROL_X_RTL_THUMB: "sliderControl-x-rtl-thumb",
-	SLIDER_CONTROL_Y_LTR_THUMB: "sliderControl-y-ltr-thumb",
-	SLIDER_CONTROL_Y_RTL_THUMB: "sliderControl-y-rtl-thumb",
-	MENU_REGEXP: /^dropMenu-[xy]-(ltr|rtl)$/,
-	MENU_BODY_REGEXP: /^dropMenu-[xy]-(ltr|rtl)-body$/,
-	MENU_CHILDREN_REGEXP: /^dropMenu-[xy]-(ltr|rtl)-children$/,
+	SLIDER_CONTROL: "sliderControl",
+	SLIDER_CONTROL_THUMB: "sliderControl-thumb",
+	SLIDER_CONTROL_TRACK: "sliderControl-track",
+	MENU: "dropMenu",
+	MENU_BODY: "dropMenu-body",
+	MENU_CHILDREN: "dropMenu-children",
 	FRAME_TETHER_REGEXP: /.+-tether-.+/
 };
 
@@ -1741,14 +1742,20 @@ alert(exception);
 				}
 				else	//for any other attribute
 				{
-					if(attributeName=="className");	//if we're changing the class name
+					var oldAttributeValue=oldElement[attributeName];	//get the old attribute value
+					var valueChanged=oldAttributeValue!=attributeValue;	//see if the value is really changing
+					if(valueChanged)	//if the value is changing, see if we have to do fixes for IE6 (if the value hasn't changed, that means there were no fixes before and no fixes afterwards; we may want to categorically do fixes in the future if we add attribute-based selectors)
 					{
-						if(typeof guiseIE6Fix!="undefined")	//if we have IE6 fix routines loaded
+						if(attributeName=="className");	//if we're changing the class name
 						{
-							attributeValue=guiseIE6Fix.getFixedElementClassName(oldElement, attributeValue);	//get the IE6 fixed form of the class name TODO make sure this is done last if we start doing CSS2 attribute-based selectors
+							if(typeof guiseIE6Fix!="undefined")	//if we have IE6 fix routines loaded
+							{
+								attributeValue=guiseIE6Fix.getFixedElementClassName(oldElement, attributeValue);	//get the IE6 fixed form of the class name TODO make sure this is done last if we start doing CSS2 attribute-based selectors
+								valueChanged=oldAttributeValue!=attributeValue;	//check again to see if the value is really changing; maybe the value was originally different because we hadn't added the IE6 fixes
+							}
 						}
 					}
-					if(oldElement[attributeName]!=attributeValue)	//if the old element has a different (or no) value for this attribute (Firefox maintains different values for element.getAttribute(attributeName) and element[attributeName]) (note also that using setAttribute() IE will sometimes throw an error if button.style is changed, for instance)
+					if(valueChanged)	//if the old element has a different (or no) value for this attribute (Firefox maintains different values for element.getAttribute(attributeName) and element[attributeName]) (note also that using setAttribute() IE will sometimes throw an error if button.style is changed, for instance)
 					{
 	//TODO del alert("updating "+element.nodeName+" attribute "+attributeName+" from value "+oldElement[attributeName]+" to new value "+attributeValue);
 						oldElement[attributeName]=attributeValue;	//update the old element's attribute (this format works for Firefox where oldElement.setAttribute("value", attributeValue) does not)
@@ -2521,7 +2528,7 @@ function initializeNode(node)
 						{
 							eventManager.addEvent(node, "click", onLinkClick, false);	//listen for anchor clicks
 						}
-						else if(elementClassNames.containsMatch(/-tab(-disabled|-selected)?$/))	//if this is a tab TODO use a constant
+						else if(elementClassNames.containsMatch(/-tab$/))	//if this is a tab TODO use a constant
 						{
 							eventManager.addEvent(node, "click", onTabClick, false);	//listen for tab clicks
 						}
@@ -2534,7 +2541,7 @@ function initializeNode(node)
 						break;
 					case "div":
 								//check for menu
-						if(elementClassNames.containsMatch(STYLES.MENU_REGEXP))	//if this is a menu
+						if(elementClassNames.contains(STYLES.MENU))	//if this is a menu
 						{
 							var menu=getMenu(node);	//get the menu ancestor
 							if(menu)	//if there is a menu ancestor (i.e. this is not the root menu)
@@ -2592,10 +2599,7 @@ function initializeNode(node)
 						case STYLES.DROP_TARGET:
 							dropTargets.add(node);	//add this node to the list of drop targets
 							break;
-						case STYLES.SLIDER_CONTROL_X_LTR_THUMB:
-						case STYLES.SLIDER_CONTROL_X_RTL_THUMB:
-						case STYLES.SLIDER_CONTROL_Y_LTR_THUMB:
-						case STYLES.SLIDER_CONTROL_Y_RTL_THUMB:
+						case STYLES.SLIDER_CONTROL_THUMB:
 							eventManager.addEvent(node, "mousedown", onSliderThumbDragBegin, false);	//listen for mouse down on a slider thumb
 							break;
 					}
@@ -2640,7 +2644,7 @@ function updateComponents(node)
 				{
 					case "div":
 								//check for slider
-						if(elementClassNames.containsMatch(/^sliderControl-[xy]-(ltr|rtl)$/))	//if this is a slider control TODO use a constant
+						if(elementClassNames.containsMatch(STYLES.SLIDER_CONTROL))	//if this is a slider control
 						{
 							updateSlider(node);	//update the slider
 						}
@@ -3152,7 +3156,7 @@ var menuState=new MenuState();	//create a new menu state object
 */
 function onMenuMouseOver(event)
 {
-	var menu=getDescendantElementByClassName(event.currentTarget, STYLES.MENU_CHILDREN_REGEXP);	//get the menu below us TODO use a constant
+	var menu=getDescendantElementByClassName(event.currentTarget, STYLES.MENU_CHILDREN);	//get the menu below us TODO use a constant
 	if(menu)	//if there is a menu below us
 	{
 		menuState.openMenu(menu);	//open this menu
@@ -3165,7 +3169,7 @@ function onMenuMouseOver(event)
 */
 function onMenuMouseOut(event)
 {
-	var menu=getDescendantElementByClassName(event.currentTarget, STYLES.MENU_CHILDREN_REGEXP);	//get the menu below us
+	var menu=getDescendantElementByClassName(event.currentTarget, STYLES.MENU_CHILDREN);	//get the menu below us
 	if(menu)	//if there is a menu below us
 	{
 		menuState.closeMenu(menu);	//close this menu
@@ -3250,13 +3254,13 @@ function onSliderThumbDragBegin(event)
 				//TODO make sure this isn't the context mouse button
 		var thumb=event.currentTarget;	//get the target of the event
 //TODO del alert("thumb offsetWidth: "+thumb.offsetWidth+" offsetHeight: "+thumb.offsetHeight);
-		var slider=getAncestorElementByClassName(thumb, /^sliderControl-[xy]-(ltr|rtl)$/);	//find the slider TODO use a constant
-		var track=getAncestorElementByClassName(thumb, /^sliderControl-[xy]-(ltr|rtl)-track$/);	//find the slider track TODO use a constant
+		var slider=getAncestorElementByClassName(thumb, STYLES.SLIDER_CONTROL);	//find the slider
+		var track=getAncestorElementByClassName(thumb, STYLES.SLIDER_CONTROL_TRACK);	//find the slider track
 		var positionID=slider.id+".position";	//TODO use constant
 		var positionInput=document.getElementById(positionID);	//get the position element		
 		if(slider && track && positionInput)	//if we found the slider and the slider track
 		{
-			var isHorizontal=hasClassName(track, /^sliderControl-x-(ltr|rtl)-track$/);	//see if this is a horizontal slider
+			var isHorizontal=hasClassName(track, STYLES.AXIS_X);	//see if this is a horizontal slider
 			dragState=new DragState(thumb, event.clientX, event.clientY);	//create a new drag state
 			dragState.dragCopy=false;	//drag the actual element, not a copy
 			if(isHorizontal)	//if this is a horizontal slider
@@ -3308,8 +3312,8 @@ This implementation also sets the thumb.width and thumb.height to work around a 
 */
 function updateSlider(slider)	//TODO maybe rename to updateSliderView
 {
-	var track=getDescendantElementByClassName(slider, /^sliderControl-[xy]-(ltr|rtl)-track$/);	//find the slider track TODO use a constant
-	var thumb=getDescendantElementByClassName(slider, /^sliderControl-[xy]-(ltr|rtl)-thumb$/);	//find the slider thumb TODO use a constant
+	var track=getDescendantElementByClassName(slider, STYLES.SLIDER_CONTROL_TRACK);	//find the slider track
+	var thumb=getDescendantElementByClassName(slider, STYLES.SLIDER_CONTROL_THUMB);	//find the slider thumb
 	if(dragState && dragState.dragging && dragState.dragSource==thumb)	//if the slider thumb is being dragged
 	{
 		return;	//don't update the slider while a drag is occurring
@@ -3345,7 +3349,7 @@ function updateSlider(slider)	//TODO maybe rename to updateSliderView
 			thumb.height=thumb.offsetHeight;	//set the thumb height so that it won't change later with the Mozilla bug if the thumb is partially outside the track
 		}
 		var position=positionInput.value ? parseFloat(positionInput.value) : 0;	//get the position TODO make sure this logic is in synch with whether server code will always provide a value, even for null
-		var isHorizontal=hasClassName(track, /^sliderControl-x-(ltr|rtl)-track$/);	//see if this is a horizontal slider
+		var isHorizontal=hasClassName(track, STYLES.AXIS_X);	//see if this is a horizontal slider
 		if(isHorizontal)	//if this is a horizontal slider
 		{
 			var min=0;	//calculate the minimum
@@ -3467,7 +3471,7 @@ function getForm(node)
 */
 function getMenu(node)	//TODO rename method when works
 {
-	return getAncestorElementByClassName(node, STYLES.MENU_BODY_REGEXP);	//TODO comment; use a constant
+	return getAncestorElementByClassName(node, STYLES.MENU_BODY);	//TODO comment
 }
 
 /**Retrieves the named ancestor element of the given node, starting at the node itself.

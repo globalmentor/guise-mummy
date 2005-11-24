@@ -28,15 +28,22 @@ public class GuiseCSSStyleConstants
 	/**The CSS class suffix for the error part of a component.*/
 	public final static String COMPONENT_ERROR_CLASS_SUFFIX="-error";
 
-	/**The CSS class suffix indicating the X axis.*/
-	public final static String COMPONENT_X_AXIS_CLASS_SUFFIX="-x";
-	/**The CSS class suffix indicating the Y axis.*/
-	public final static String COMPONENT_Y_AXIS_CLASS_SUFFIX="-y";
-
-	/**The CSS class suffix indicating left-to-right line direction.*/
-	public final static String COMPONENT_LTR_CLASS_SUFFIX="-ltr";
-	/**The CSS class suffix indicating right-to-left line direction.*/
-	public final static String COMPONENT_RTL_CLASS_SUFFIX="-rtl";
+	/**The CSS class indicating the X axis.*/
+	public final static String AXIS_X_CLASS="axisX";
+	/**The CSS class indicating the Y axis.*/
+	public final static String AXIS_Y_CLASS="axisY";
+	/**The CSS class indicating the Z axis.*/
+	public final static String AXIS_Z_CLASS="axisZ";
+	/**The CSS class indicating left-to-right line direction.*/
+	public final static String DIR_LTR_CLASS="dirLTR";
+	/**The CSS class indicating right-to-left line direction.*/
+	public final static String DIR_RTL_CLASS="dirRTL";
+	/**The CSS class indicating disabled state.*/
+	public final static String DISABLED_CLASS="disabled";
+	/**The CSS class indicating open state.*/
+	public final static String OPEN_CLASS="open";
+	/**The CSS class indicating selected state.*/
+	public final static String SELECTED_CLASS="selected";
 
 		//images
 	/**The CSS class suffix identifying the image caption.*/
@@ -55,10 +62,6 @@ public class GuiseCSSStyleConstants
 		//tabbed panel
 	/**The CSS class suffix for the tab part of a tabbed panel.*/
 	public final static String TABBED_PANEL_TAB_CLASS_SUFFIX="-tab";
-	/**The CSS class suffix for a disabled tab part of a tabbed panel.*/
-	public final static String TABBED_PANEL_TAB_DISABLED_CLASS_SUFFIX="-tab-disabled";
-	/**The CSS class suffix for a selected tab part of a tabbed panel.*/
-	public final static String TABBED_PANEL_TAB_SELECTED_CLASS_SUFFIX="-tab-selected";
 	/**The CSS class suffix for the tab set part of a tabbed panel.*/
 	public final static String TABBED_PANEL_TABS_CLASS_SUFFIX="-tabs";
 
