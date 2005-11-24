@@ -638,10 +638,46 @@ Debug.trace("list control changed value to", newValue);
 		public TestFrame(final GuiseSession session)
 		{
 			super(session);
+//TODO del			final LayoutPanel contentPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE)); 
 			label=new Label(session);
 			label.getModel().setLabel("This is frame content");
 			setContent(label);
+/*TODO del; testing scrolled flyovers			
+			contentPanel.add(label);
 			
+			final Text text=new Text(session);
+			text.getModel().setText("This is some text. It is added so that it will make the frame wrap and keep going."
+					+" This is some text. It is added so that it will make the frame wrap and keep going."
+					+" This is some text. It is added so that it will make the frame wrap and keep going."
+					+" This is some text. It is added so that it will make the frame wrap and keep going."
+					+" This is some text. It is added so that it will make the frame wrap and keep going."
+					+" This is some text. It is added so that it will make the frame wrap and keep going."
+					+" This is some text. It is added so that it will make the frame wrap and keep going."
+					+" This is some text. It is added so that it will make the frame wrap and keep going."
+					+" This is some text. It is added so that it will make the frame wrap and keep going."
+					+" This is some text. It is added so that it will make the frame wrap and keep going."
+			);
+			contentPanel.add(text);
+
+			final Link frameLink=new Link(session);
+			frameLink.getModel().setLabel("Frame");
+			frameLink.getModel().setDescription("This is a flyover for the frame link.");
+			frameLink.setFlyoverEnabled(true);	//turn on flyovers
+			frameLink.getFlyoverStrategy().setPreferredWidth(new Extent(15, Extent.Unit.EM));
+			frameLink.getFlyoverStrategy().setPreferredHeight(new Extent(10, Extent.Unit.EM));
+			contentPanel.add(frameLink);
+
+			final Text otherText=new Text(session);
+			otherText.getModel().setText("This is some text. It is added so that it will make the frame wrap and keep going."
+					+" This is some text. It is added so that it will make the frame wrap and keep going."
+			);
+			contentPanel.add(otherText);
+
+			setContent(contentPanel);
+		
+			setPreferredWidth(new Extent(15, Extent.Unit.EM));
+			setPreferredHeight(new Extent(10, Extent.Unit.EM));
+*/
 		}
 	}
 }

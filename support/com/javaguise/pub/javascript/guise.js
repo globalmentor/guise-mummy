@@ -310,7 +310,7 @@ Array.prototype.remove=function(index)
 	return this.splice(index, 1)[0];	//splice out the element and return it (note that this will not work on Netscape <4.06 or IE <=5.5; see http://www.samspublishing.com/articles/article.asp?p=30111&seqNum=3&rl=1)
 };
 
-var EMPTY_ARRAY=new Array();	//a shared empty array
+var EMPTY_ARRAY=new Array();	//a shared empty array TODO create methods to make this read-only
 
 //Document
 
@@ -496,6 +496,22 @@ if(typeof Node=="undefined")	//if no Node type is defined (e.g. IE), create one 
 
 //String
 
+/**Determines whether this string is in all lowercase.
+@return true if the string is in all lowercase.
+*/
+String.prototype.isLowerCase=function()
+{
+	return this==this.toLowerCase();	//see if this substring matches the same string in all lowercase
+};
+
+/**Determines whether this string is in all uppercase.
+@return true if the string is in all uppercase.
+*/
+String.prototype.isUpperCase=function()
+{
+	return this==this.toUpperCase();	//see if this substring matches the same string in all uppercase
+};
+
 /**Determines whether this string starts with the indicated substring.
 @param substring The string to check to see if it is at the beginning of this string.
 @return true if the given string is at the start of this string.
@@ -634,7 +650,7 @@ function URI(uriString)
 	{
 		URI.prototype._initialized=true;
 
-		URI.prototype.URI_REG_EXP=/^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/;	//the regular expression for parsing URIs, from http://www.ietf.org/rfc/rfc2396.txt
+		URI.prototype.URI_REGEXP=/^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/;	//the regular expression for parsing URIs, from http://www.ietf.org/rfc/rfc2396.txt
 
 		/**Determines first occurrence of a given parameter.
 		@param name The name of the parameter.
@@ -664,7 +680,7 @@ function URI(uriString)
 			return parameter!=null ? parameter.value : null;	//return the parameter value, or null if there is no such parameter
 		};
 	}
-	this.URI_REG_EXP.test(uriString);	//split out the components of the URI using a regular expression
+	this.URI_REGEXP.test(uriString);	//split out the components of the URI using a regular expression
 	this.scheme=RegExp.$2;	//save the URI components
 	this.authority=RegExp.$4;
 	this.path=RegExp.$5;
@@ -1144,6 +1160,7 @@ function HTTPCommunicator()
 		{
 				//TODO assert this.xmlHTTP does not exist
 			this.xmlHTTP=HTTPCommunicator.prototype._createXMLHTTP();	//create an XML HTTP object
+			var xmlHTTP=this.xmlHTTP;	//make a local copy of the XML HTTP request object
 			if(method=="GET" && query)	//if there is a query for the GET method
 			{
 				uri=uri+"?"+query;	//add the query to the URI
@@ -1151,9 +1168,9 @@ function HTTPCommunicator()
 			var asynchronous=Boolean(this.processHTTPResponse);	//see if we should make an asynchronous request
 			if(asynchronous)	//if we're making asynchronous requests
 			{
-				this.xmlHTTP.onreadystatechange=this._createOnReadyStateChangeCallback();	//create and assign a callback function for processing the response
+				xmlHTTP.onreadystatechange=this._createOnReadyStateChangeCallback();	//create and assign a callback function for processing the response
 			}
-			this.xmlHTTP.open(method, uri, asynchronous);
+			xmlHTTP.open(method, uri, asynchronous);
 			var content=null;	//we'll create content if we need to
 			if(method=="POST")	//if this is the POST method
 			{
@@ -1162,17 +1179,25 @@ function HTTPCommunicator()
 //TODO del				this.xmlHTTP.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");	//set the post content type
 				if(contentType)	//if a content type was given
 				{
-					this.xmlHTTP.setRequestHeader("Content-Type", contentType);	//set the post content type
+					xmlHTTP.setRequestHeader("Content-Type", contentType);	//set the post content type
 				}
 				if(query)	//if there is a post query
 				{
 					content=query;	//use the query as the content
 				}	
 			}
-			this.xmlHTTP.send(content);	//send the request
+			try
+			{
+				xmlHTTP.send(content);	//send the request
+			}
+			catch(e)
+			{
+//TODO fix---why does this occur?				alert("error loading content: "+e);
+			}
 			if(!asynchronous)	//if we're communicating synchronously
 			{
-				thisHTTPCommunicator._reportReportResponse();	//report the response immediately TODO maybe put this into an asynchrous call using setTimeout()
+				this._reportResponse();	//report the response immediately TODO maybe put this into an asynchrous call using setTimeout()
+				return xmlHTTP;	//TODO testing synchronous
 			}
 		};
 	
@@ -1212,7 +1237,6 @@ function HTTPCommunicator()
 		};
 	}
 }
-
 
 //GuiseAJAX
 
@@ -1584,6 +1608,13 @@ alert(exception);
 					}
 				}
 			}
+			
+/*TODO testirng IE7			
+			if(document.recalc)
+			{
+				document.recalc();
+			}
+*/
 		}
 
 		/**Processes the AJAX remove response.
@@ -1666,6 +1697,7 @@ alert(exception);
 				oldElement.value="";	//set the value to the empty string (setting the value to null will result in "null" being displayed in the input control on IE)
 			}
 				//patch in the new and changed attributes
+//TODO del when works			var isClassNameModified=false;	//keep track of whether we update the class name; if so, we'll need to do some fixes for IE6
 			var display=null;	//we'll record whatever display we use
 			var visibility=null;	//we'll record whatever visibility we use
 			var attributes=element.attributes;	//get the new element's attributes
@@ -1697,12 +1729,25 @@ alert(exception);
 							{
 //TODO del alert("ready to set element style "+styleProperty+" to value "+styleValue);
 								oldElement.style[styleProperty]=styleValue;	//update this style
+/*TODO del
+								if(styleProperty=="className");	//if we're changing the class name
+								{
+									isClassNameModified=true;	//show that we changed the class name
+								}
+*/
 							}
 						}
 					}
 				}
 				else	//for any other attribute
 				{
+					if(attributeName=="className");	//if we're changing the class name
+					{
+						if(typeof guiseIE6Fix!="undefined")	//if we have IE6 fix routines loaded
+						{
+							attributeValue=guiseIE6Fix.getFixedElementClassName(oldElement, attributeValue);	//get the IE6 fixed form of the class name TODO make sure this is done last if we start doing CSS2 attribute-based selectors
+						}
+					}
 					if(oldElement[attributeName]!=attributeValue)	//if the old element has a different (or no) value for this attribute (Firefox maintains different values for element.getAttribute(attributeName) and element[attributeName]) (note also that using setAttribute() IE will sometimes throw an error if button.style is changed, for instance)
 					{
 	//TODO del alert("updating "+element.nodeName+" attribute "+attributeName+" from value "+oldElement[attributeName]+" to new value "+attributeValue);
@@ -1719,7 +1764,16 @@ alert(exception);
 			if(visibility==null && oldElement.style["visibility"])	//if there was no visibility style in the new element but there is in the old element
 			{
 				oldElement.style["visibility"]="";	//remove the visibility style
-			}			
+			}
+/*TODO del when works
+			if(isClassNameModified)	//if we changed the class name
+			{
+				if(typeof guiseIE6Fix!="undefined")	//if we have IE6 fix routines loaded
+				{
+					guiseIE6Fix.fixElementClassName(oldElement);	//fix the class name of this element
+				}
+			}
+*/
 			var elementName=element.nodeName;	//save the element name
 			
 				//patch in the new child element hierarchy
@@ -2453,6 +2507,10 @@ function initializeNode(node)
 //TODO bring back after giving all relevant nodes IDs			if(node.id)	//only look at element swith IDs
 //TODO this may allow "layout" for IE, but only do it when we need it (otherwise it will screw up buttons and such)			node.style.zoom=1;	//TODO testing
 			{
+				if(typeof guiseIE6Fix!="undefined")	//if we have IE6 fix routines loaded
+				{
+					guiseIE6Fix.fixElementClassName(node);	//fix the class name of this element
+				}
 				var elementName=node.nodeName.toLowerCase();	//get the element name
 				var elementClassName=node.className;	//get the element class name
 				var elementClassNames=elementClassName ? elementClassName.split(/\s/) : EMPTY_ARRAY;	//split out the class names
@@ -3723,13 +3781,26 @@ function getElementBounds(element)
 */
 function getElementCoordinates(element)	//TODO make sure this method correctly calculates margins and padding, as Mozilla and IE both show slight variations for text, but not for images
 {
+var originalElement=element;	//TODO del; testing
 	var x=0, y=0;
 	if(element.offsetParent)	//if element.offsetParent is supported
 	{
+//TODO del alert("using calculated element position");
 		while(element)	//while we have an element
 		{
 			x+=element.offsetLeft;	//add this element's offsets
 			y+=element.offsetTop;
+/*TODO fix
+			if(element.scrollLeft)
+			{
+				x-=element.scrollLeft;
+			}
+			if(element.scrollTop)
+			{
+//TODO del alert("element "+element.nodeName+" scroll top "+element.scrollTop);
+				y-=element.scrollTop;
+			}
+*/
 			element=element.offsetParent;	//go to the element's parent offset
 		}
 /*TODO fix for Mac
@@ -3739,6 +3810,16 @@ function getElementCoordinates(element)	//TODO make sure this method correctly c
         offsetTop += document.body.topMargin;
     }
 */
+		var parent=originalElement.parentNode;
+		while(parent!=document.documentElement)
+		{
+			if(parent.scrollTop)
+			{
+//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
+				y-=parent.scrollTop;
+			}
+			parent=parent.parentNode;		
+		}
 	}
 	else if(element.x && element.y)	//if element.offsetParent is not supported by but element.x and element.y are supported (e.g. Navigator 4)
 	{
