@@ -2,16 +2,17 @@ package com.javaguise.component.layout;
 
 import static java.text.MessageFormat.*;
 
+import java.beans.PropertyChangeEvent;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.MissingResourceException;
 
 import javax.mail.internet.ContentType;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.garretwilson.util.Debug;
 
 import static com.garretwilson.lang.ClassUtilities.getPropertyName;
 import static com.garretwilson.lang.ObjectUtilities.*;
@@ -19,6 +20,9 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.javaguise.GuiseResourceConstants.*;
 import com.javaguise.component.Component;
 import com.javaguise.component.Container;
+import com.javaguise.component.layout.AbstractLayout.ConstraintsPropertyChangeListener;
+import com.javaguise.event.AbstractGuisePropertyChangeListener;
+import com.javaguise.event.GuisePropertyChangeEvent;
 import com.javaguise.event.ListListener;
 import com.javaguise.event.ListSelectionListener;
 import com.javaguise.model.*;
@@ -34,10 +38,23 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints>
 {
 
 	/**The decorated model maintaining the selected component.*/
-	private final ListSelectModel<Component<?>> model;
+	private final CardModel model;
 
 		/**@return The decorated model maintaining the selected component.*/
 		public ListSelectModel<Component<?>> getModel() {return model;}
+
+	/**The lazily-created listener of constraint property changes.*/
+	private CardConstraintsPropertyChangeListener cardConstraintsPropertyChangeListener=null;
+
+		/**@return The lazily-created listener of card constraint property changes.*/
+		protected CardConstraintsPropertyChangeListener getConstraintsPropertyChangeListener()
+		{
+			if(cardConstraintsPropertyChangeListener==null)	//if we haven't yet created a property change listener for constraints
+			{
+				cardConstraintsPropertyChangeListener=new CardConstraintsPropertyChangeListener();	//create a new constraints property change listener
+			}
+			return cardConstraintsPropertyChangeListener;	//return the listener of constraints properties
+		}
 
 	/**The index of the selected component, or -1 if the index is not known and should be recalculated.*/
 	private int selectedIndex=-1;
@@ -230,7 +247,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints>
 	/**The list select model that maintains the current selected tab.
 	@author Garret Wilson
 	*/
-	protected class CardModel extends DefaultValueModel<Component<?>> implements ListSelectModel<Component<?>>
+	protected class CardModel extends DefaultValueModel<Component<?>> implements ListSelectModel<Component<?>>	//TODO make sure the list select events are fired when a constraint value (e.g. enabled) changes directly, rather than going through the list select interface
 	{
 		/**Session constructor.
 		@param session The Guise session that owns this model.
@@ -307,7 +324,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints>
 		@return The indices currently selected.
 		@see #getSelectedValues()
 		*/
-		public int[] getSelectedIndices()
+		public int[] getSelectedIndexes()
 		{
 			final int selectedIndex=getSelectedIndex();	//get the selected index
 			return selectedIndex>=0 ? new int[]{selectedIndex} : new int[0];	//if there is a selected index, return it in an array
@@ -319,9 +336,9 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints>
 		@exception ValidationException if the provided value is not valid.
 		@see ListSelectionPolicy#getSetSelectedIndices(ListSelectModel, int[])
 		@see #setSelectedValues(V[])
-		@see #addSelectedIndices(int...)
+		@see #addSelectedIndexes(int...)
 		*/
-		public void setSelectedIndices(int... indices) throws ValidationException
+		public void setSelectedIndexes(int... indices) throws ValidationException
 		{
 			setSelectedIndex(indices.length>0 ? indices[0] : -1);	//if there is at least one requested index, select the first one
 		}
@@ -331,18 +348,18 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints>
 		@param indices The indices to add to the selection.
 		@exception ValidationException if the provided value is not valid.
 		@see ListSelectionPolicy#getAddSelectedIndices(ListSelectModel, int[])
-		@see #setSelectedIndices(int[])
+		@see #setSelectedIndexes(int[])
 		*/
-		public void addSelectedIndices(int... indices) throws ValidationException {throw new UnsupportedOperationException();}
+		public void addSelectedIndexes(int... indices) throws ValidationException {throw new UnsupportedOperationException();}
 		
 		/**Removes a selection at the given indices.
 		Any invalid indices will be ignored.
 		@param indices The indices to remove from the selection.
 		@exception ValidationException if the provided value is not valid.
 		@see ListSelectionPolicy#getRemoveSelectedIndices(ListSelectModel, int[])
-		@see #setSelectedIndices(int[])
+		@see #setSelectedIndexes(int[])
 		*/
-		public void removeSelectedIndices(int... indices) throws ValidationException {throw new UnsupportedOperationException();}
+		public void removeSelectedIndexes(int... indices) throws ValidationException {throw new UnsupportedOperationException();}
 		
 		/**Determines the selected value.
 		If more than one value is selected, the lead selected value will be returned.
@@ -357,7 +374,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints>
 		/**Determines the selected values.
 		This method delegates to the selection strategy.
 		@return The values currently selected.
-		@see #getSelectedIndices()
+		@see #getSelectedIndexes()
 		*/
 		public Component<?>[] getSelectedValues()
 		{
@@ -371,7 +388,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints>
 		This method delegates to the selection strategy.
 		@param values The values to select.
 		@exception ValidationException if the provided value is not valid.
-		@see #setSelectedIndices(int[])
+		@see #setSelectedIndexes(int[])
 		*/
 		public void setSelectedValues(final Component<?>... values) throws ValidationException
 		{
@@ -571,5 +588,118 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints>
 		*/
 		public synchronized List<Component<?>> subList(final int fromIndex, final int toIndex) {throw new UnsupportedOperationException();}
 
+		/**Determines the enabled status of the first occurrence of a given value.
+		@param value The value for which the enabled status is to be determined.
+		@return <code>true</code> if the value is enabled, else <code>false</code>.
+		@exception IndexOutOfBoundsException if the given value does not occur in the model.
+		*/
+		public boolean isValueEnabled(final Component<?> value)
+		{
+			synchronized(this)	//don't allow the model to be changed
+			{
+				final Constraints constraints=getConstraints(value);	//get the constraints for this component
+				return constraints.isEnabled();	//return whether the constraints are enabled for this component
+			}
+		}
+
+		/**Sets the enabled status of the first occurrence of a given value.
+		This is a bound value state property.
+		@param value The value to enable or disable.
+		@param newEnabled Whether the value should be enabled.
+		@see ValuePropertyChangeEvent
+		@see ControlModel#ENABLED_PROPERTY
+		*/
+		public void setValueEnabled(final Component<?> value, final boolean newEnabled) 
+		{
+			synchronized(this)	//don't allow the model to be changed
+			{
+				final Constraints constraints=getConstraints(value);	//get the constraints for this component
+				final boolean oldEnabled=constraints.isEnabled();	//get the old enabled state
+				if(oldEnabled!=newEnabled)	//if the value is really changing
+				{
+					constraints.setEnabled(newEnabled);	//update the enabled state
+					fireValuePropertyChange(value, ControlModel.ENABLED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newEnabled));	//indicate that the value state changed
+				}
+			}
+		}
+
+		/**Determines the enabled status of a given index.
+		@param index The index of the value for which the enabled status is to be determined.
+		@return <code>true</code> if the value at the given index is enabled, else <code>false</code>.
+		*/
+		public boolean isIndexEnabled(final int index)
+		{
+			synchronized(this)	//don't allow the model to be changed
+			{
+				final Component<?> component=getContainer().get(index);	//get the component at this index
+				return isValueEnabled(component);	//determine whether this component is enabled
+			}
+		}
+
+		/**Sets the enabled status of a given index.
+		This is a bound value state property.
+		@param index The index of the value to enable or disable.
+		@param newEnabled Whether the value at the given index should be enabled.
+		@see ValuePropertyChangeEvent
+		@see ControlModel#ENABLED_PROPERTY
+		@exception IndexOutOfBoundsException if the given index is not within the range of the list.
+		*/
+		public void setIndexEnabled(final int index, final boolean newEnabled) 
+		{
+			synchronized(this)	//don't allow the the model to change while we update the enabled status
+			{
+				final Component<?> component=getContainer().get(index);	//get the component at this index
+				setValueEnabled(component, newEnabled);	//change the constraints for the component at the index
+			}
+		}
+
+		/**Reports that an associated property of a value, such as enabled status, has changed.
+		No event is fired if old and new are both <code>null</code> or are both non-<code>null</code> and equal according to the {@link Object#equals(java.lang.Object)} method.
+		No event is fired if no listeners are registered for the given property.
+		This method delegates actual firing of the event to {@link #firePropertyChange(PropertyChangeEvent)}.
+		@param value The value for which a property value changed.
+		@param propertyName The name of the property being changed.
+		@param oldValue The old property value.
+		@param newValue The new property value.
+		@see ValuePropertyChangeEvent
+		*/
+		protected <P> void fireValuePropertyChange(final Component<?> value, final String propertyName, final P oldValue, final P newValue)
+		{
+			if(hasListeners(propertyName)) //if we have listeners registered for this property
+			{
+				if(!ObjectUtilities.equals(oldValue, newValue))	//if the values are different
+				{					
+					firePropertyChange(new ValuePropertyChangeEvent<ListSelectModel<Component<?>>, Component<?>, P>(this, value, propertyName, oldValue, newValue));	//create and fire a value property change event
+				}
+			}
+		}
 	}
+
+	/**A property change listener that listens for changes in a constraint object's properties and fires a layout constraints property change event in response.
+	This version also fires model {@link ValuePropertyChangeEvent}s if appropriate.
+	A {@link LayoutConstraintsPropertyChangeEvent} will be fired for each component associated with the constraints for which a property changed
+	@author Garret Wilson
+	@see ValuePropertyChangeEvent
+	*/
+	protected class CardConstraintsPropertyChangeListener extends ConstraintsPropertyChangeListener
+	{
+
+		/**Refires a constraint property change event for the layout in the form of a {@link LayoutConstraintsPropertyChangeEvent}.
+		This version also fires a model {@link ValuePropertyChangeEvent} if appropriate to satisfy the list select model contract for value state changes.
+		@param component The component for which a constraint value changed.
+		@param constraints The constraints for which a value changed.
+		@param propertyName The name of the property being changed.
+		@param oldValue The old property value.
+		@param newValue The new property value.
+		*/
+		protected <V> void refirePropertyChange(final Component<?> component, final Constraints constraints, final String propertyName, final V oldValue, final V newValue)
+		{
+			super.refirePropertyChange(component, constraints, propertyName, oldValue, newValue);	//refire the event normally
+			if(Constraints.ENABLED_PROPERTY.equals(propertyName))	//if the enabled constraint changed
+			{
+				model.fireValuePropertyChange(component, propertyName, oldValue, newValue);	//tell the model to fire its own event to satisfy the model's contract
+			}			
+		}
+	}
+
 }

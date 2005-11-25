@@ -500,19 +500,6 @@ Debug.trace("list control changed value to", newValue);
 		
 		contentPanel.add(tabbedPanel);
 
-		checkbox.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ValueModel<Boolean>, Boolean>()
-				{
-					public void propertyChange(final GuisePropertyChangeEvent<ValueModel<Boolean>, Boolean> propertyChangeEvent)
-					{
-						final Boolean newValue=propertyChangeEvent.getNewValue();	//get the new value
-//TODO del						testButton.setDisplayed(newValue);	//update the button enabled state
-						testButton.setVisible(newValue);	//update the button enabled state
-//TODO del						testButton.setVisible(newValue);	//update the button enabled state
-//TODO bring back						testButton.getModel().setEnabled(newValue);	//update the button enabled state
-						tabbedPanel.getLayout().getConstraints(helloPanel).setEnabled(newValue);	//TODO testing
-					}
-				});
-
 		final TabControl<String> stringTabControl=new TabControl<String>(session, String.class, Flow.LINE);
 		stringTabControl.getModel().add("First tab");
 		stringTabControl.getModel().add("Second tab");
@@ -532,6 +519,22 @@ Debug.trace("list control changed value to", newValue);
 		final CardTabControl remoteTabControl=new CardTabControl(session, tabbedPanel, Flow.LINE);
 		contentPanel.add(remoteTabControl);
 		
+
+		checkbox.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ValueModel<Boolean>, Boolean>()
+				{
+					public void propertyChange(final GuisePropertyChangeEvent<ValueModel<Boolean>, Boolean> propertyChangeEvent)
+					{
+						final Boolean newValue=propertyChangeEvent.getNewValue();	//get the new value
+//TODO del						testButton.setDisplayed(newValue);	//update the button enabled state
+						testButton.setVisible(newValue);	//update the button enabled state
+//TODO del						testButton.setVisible(newValue);	//update the button enabled state
+//TODO bring back						testButton.getModel().setEnabled(newValue);	//update the button enabled state
+//TODO del Debug.trace("ready to set tabbed panel enabled to ", newValue);
+//TODO del						tabbedPanel.getLayout().getConstraints(helloPanel).setEnabled(newValue);	//TODO testing
+						remoteTabControl.getModel().setValueEnabled(helloPanel, newValue);	//TODO testing
+					}
+				});
+
 
 		add(contentPanel, RegionLayout.CENTER_CONSTRAINTS);	//add the content panel in the center
 

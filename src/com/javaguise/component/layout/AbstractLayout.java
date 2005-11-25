@@ -152,6 +152,8 @@ public abstract class AbstractLayout<T extends Layout.Constraints> extends Guise
 	No event is fired if old and new are both <code>null</code> or are both non-<code>null</code> and equal according to the {@link Object#equals(java.lang.Object)} method.
 	No event is fired if no listeners are registered for the given property.
 	This method delegates actual firing of the event to {@link #firePropertyChange(PropertyChangeEvent)}.
+	@param component The component for which a constraint value changed.
+	@param constraints The constraints for which a value changed.
 	@param propertyName The name of the property being changed.
 	@param oldValue The old property value.
 	@param newValue The new property value.
@@ -188,14 +190,26 @@ public abstract class AbstractLayout<T extends Layout.Constraints> extends Guise
 			{
 				if(componentConstraintsEntry.getValue()==constraints)	//if this component was associated with the constraints
 				{
-//TODO del Debug.trace("Ready to fire an event indicating that component", componentConstraintsEntry.getKey(), "changed property", propertyValueChangeEvent.getPropertyName(), "to value", propertyValueChangeEvent.getNewValue());	//TODO del
-						//fire an event indicating that the constraints for this component changed one if its properties
-					fireConstraintsPropertyChange(componentConstraintsEntry.getKey(), constraints, propertyChangeEvent.getPropertyName(), propertyChangeEvent.getOldValue(), propertyChangeEvent.getNewValue());								
+					refirePropertyChange(componentConstraintsEntry.getKey(), constraints, propertyChangeEvent.getPropertyName(), propertyChangeEvent.getOldValue(), propertyChangeEvent.getNewValue());	//refire the event
 				}
 			}
 		}
+	
+		/**Refires a constraint property change event for the layout in the form of a {@link LayoutConstraintsPropertyChangeEvent}.
+		@param component The component for which a constraint value changed.
+		@param constraints The constraints for which a value changed.
+		@param propertyName The name of the property being changed.
+		@param oldValue The old property value.
+		@param newValue The new property value.
+		*/
+		protected <V> void refirePropertyChange(final Component<?> component, final T constraints, final String propertyName, final V oldValue, final V newValue)
+		{
+//TODO del Debug.trace("Ready to fire an event indicating that component", componentConstraintsEntry.getKey(), "changed property", propertyChangeEvent.getPropertyName(), "to value", propertyChangeEvent.getNewValue());	//TODO del
+			//fire an event indicating that the constraints for this component changed one if its properties
+			fireConstraintsPropertyChange(component, constraints, propertyName, oldValue, newValue);								
+			
+		}
 	}
-
 	
 	/**An abstract implementation of metadata about individual component layout.
 	@author Garret Wilson

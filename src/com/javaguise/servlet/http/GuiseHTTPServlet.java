@@ -1324,7 +1324,12 @@ Debug.trace("+++creating Guise session", httpSession.getId());
 					{
 						for(final Cookie cookie:cookies)	//for each cookie in the request
 						{
-							environment.setProperty(cookie.getName(), decode(cookie.getValue()));	//put this cookie's decoded value into the session's environment
+							final String cookieName=cookie.getName();	//get the name of this cookie
+//						TODO del Debug.trace("Looking at cookie", cookieName, "with value", cookie.getValue());
+							if(!"jsessionid".equalsIgnoreCase(cookieName))	//ignore the session ID TODO use a constant; testing
+							{
+								environment.setProperty(cookieName, decode(cookie.getValue()));	//put this cookie's decoded value into the session's environment
+							}
 						}
 					}
 					guiseSession.initialize();	//let the Guise session know it's being initializes so that it can listen to the application

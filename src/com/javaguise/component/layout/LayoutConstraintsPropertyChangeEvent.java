@@ -10,7 +10,7 @@ The source is always the layout object. The component and constraints are also p
 @param <V> The type of property value.
 @author Garret Wilson
 */
-public class LayoutConstraintsPropertyChangeEvent<T extends Layout.Constraints, V> extends GuisePropertyChangeEvent<Layout, V>
+public class LayoutConstraintsPropertyChangeEvent<T extends Layout.Constraints, V> extends GuisePropertyChangeEvent<Layout<T>, V>
 {
 
 	/**The component for which a constraint value changed.*/

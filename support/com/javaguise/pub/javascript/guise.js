@@ -3746,7 +3746,7 @@ function getFocusableDescendant(node)
 	var nodeName=node.nodeName.toLowerCase();
 	if(FOCUSABLE_ELEMENT_NAMES.contains(nodeName))	//if this is a focusable node
 	{
-		if((!node.style || node.style.visibility!="hidden") && !node.disabled)	//make sure the node is not hidden or disabled
+		if((!node.style || node.style.visibility!="hidden") && !node.disabled)	//make sure the node is not hidden or disabled TODO add check for display: none
 		{
 			if(nodeName!="input" || node.type!="hidden")	//make this isn't a hidden input
 			{

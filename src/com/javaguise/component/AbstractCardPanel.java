@@ -64,10 +64,12 @@ public abstract class AbstractCardPanel<C extends Box<C> & Panel<C> & CardContro
 	@exception NullPointerException if the given label is <code>null</code>.
 	@exception IllegalArgumentException if the component already has a parent.
 	*/
+/*TODO del if not wanted
 	public void add(final Component<?> component, final LabelModel labelModel)
 	{
 		add(component, new CardLayout.Constraints(labelModel));	//create card layout constraints for the label and add the component to the container
 	}
+*/
 
 	/**Enables or disables a card.
 	This convenience method looks up card layout constraints for the given component and changes the enabled status of those constraints.
@@ -75,6 +77,7 @@ public abstract class AbstractCardPanel<C extends Box<C> & Panel<C> & CardContro
 	@param newEnabled <code>true</code> if the card can be selected.
 	@see CardLayout.Constraints#setEnabled(boolean)
 	*/
+/*TODO del if not wanted
 	public void setEnabled(final Component<?> component, final boolean newEnabled)
 	{
 		final CardLayout.Constraints constraints=getLayout().getConstraints(component);	//get the card constraints for this component
@@ -83,4 +86,5 @@ public abstract class AbstractCardPanel<C extends Box<C> & Panel<C> & CardContro
 			constraints.setEnabled(newEnabled);	//change the enabled status of the constraints
 		}
 	}
+*/
 }
