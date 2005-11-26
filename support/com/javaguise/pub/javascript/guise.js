@@ -73,7 +73,7 @@ var STYLES=
 	AXIS_X: "axisX",
 	AXIS_Y: "axisY",
 	/**A general component.*/
-	COMPONENT_REGEXP: /^component(-[xy]-(ltr|rtl))?$/,
+	COMPONENT: "component",
 	DRAG_SOURCE: "dragSource",
 	DRAG_HANDLE: "dragHandle",
 	DROP_TARGET: "dropTarget",
@@ -84,7 +84,7 @@ var STYLES=
 	MENU: "dropMenu",
 	MENU_BODY: "dropMenu-body",
 	MENU_CHILDREN: "dropMenu-children",
-	FRAME_TETHER_REGEXP: /.+-tether-.+/
+	FRAME_TETHER: "frame-tether"
 };
 
 /**The array of drop targets, determined when the document is loaded. The drop targets are stored in increasing order of hierarchical depth.*/
@@ -102,18 +102,16 @@ guiseFrames.add=function(frame)
 //TODO fix so that it works both on IE and Firefox							oldElement.style.position="fixed";	//TODO testing
 	frame.style.position="absolute";	//change the element's position to absolute; it should already be set like this, but set it specifically so that dragging will know not to drag a copy TODO update the element's initial position
 
-
 	frame.style.visibility="hidden";	//TODO testing
 	frame.style.left="-9999px";	//TODO testing; this works; maybe even remove the visibility changing
 	frame.style.top="-9999px";	//TODO testing
 
-
 	document.body.appendChild(frame);	//add the frame element to the document; do this first, because IE doesn't allow the style to be accessed directly with imported nodes until they are added to the document
+	initializeNode(frame);	//initialize the new imported frame, installing the correct event handlers; do this before the frame is positioned, because initialization also fixes IE6 classes, which can affect position
 	this._initializePosition(frame);	//initialize the frame's position
 	frame.style.visibility="visible";	//TODO testing
 
 	frame.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components TODO fix
-	initializeNode(frame);	//initialize the new imported frame, installing the correct event handlers
 	updateComponents(frame);	//update all the components within the frame
 	Array.prototype.add.call(this, frame);	//do the default adding to the array
 	this.updateModal();	//update the modal state
@@ -135,7 +133,7 @@ guiseFrames._initializePosition=function(frame)
 	if(relatedComponent)	//if there is a related component
 	{
 //TODO del alert("found related component: "+relatedComponentID);
-		var tether=getDescendantElementByClassName(frame, STYLES.FRAME_TETHER_REGEXP);	//get the frame tether, if there is one
+		var tether=getDescendantElementByClassName(frame, STYLES.FRAME_TETHER);	//get the frame tether, if there is one
 		if(tether)	//if there is a frame tether
 		{
 //TODO del alert("found tether: "+tether.id);
@@ -565,8 +563,9 @@ String.prototype.trim=function()
 
 /**A class for concatenating string with more efficiency than using the additive operator.
 Inspired by Nicholas C. Zakas, _Professional JavaScript for Web Developers_, Wiley, 2005, p. 97.
+@param strings (...) Zero or more strings with which to initialize the string builder.
 */
-function StringBuilder()
+function StringBuilder(strings)
 {
 	this._strings=new Array();	//create an array of strings
 	if(!StringBuilder.prototype._initialized)
@@ -588,6 +587,11 @@ function StringBuilder()
 		{
 			return this._strings.join("");	//join with no separator and return the strings
 		};
+	}
+	var argumentCount=arguments.length;	//find out how many arguments there are
+	for(var i=0; i<argumentCount; ++i)	//for each argument
+	{
+		this.append(arguments[i]);	//append this string
 	}
 }
 
@@ -2845,7 +2849,7 @@ function onAction(event)
 {
 	var target=event.currentTarget;	//get the element on which the event was registered
 //TODO del alert("action on: "+element.nodeName);
-	var component=getAncestorElementByClassName(target, STYLES.COMPONENT_REGEXP);	//get the component element TODO improve all this
+	var component=getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element TODO improve all this
 	if(component)	//if there is a component
 	{
 		var componentID=component.id;	//get the component ID
@@ -2956,7 +2960,7 @@ function onActionClick(event)
 	var targetID=target.id;	//get the target ID
 	if(targetID)	//if the element has an ID (otherwise, we couldn't report the action)
 	{
-		var component=getAncestorElementByClassName(target, STYLES.COMPONENT_REGEXP);	//get the component element TODO improve all this
+		var component=getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element TODO improve all this
 		if(component)	//if there is a component
 		{
 			var componentID=component.id;	//get the component ID
@@ -3229,8 +3233,8 @@ function onDragEnd(event)
 		if(dropTarget)	//if the mouse was dropped over a drop target
 		{
 //TODO del when works alert("over drop target: "+dropTarget.nodeName);
-			var dragSourceComponent=getAncestorElementByClassName(dragState.dragSource, STYLES.COMPONENT_REGEXP);	//get the component element TODO improve all this; decide if we want the dropTarget style on the component element or the drop target subcomponent, and how we want to relate that to the component ID
-			var dropTargetComponent=getAncestorElementByClassName(dropTarget, STYLES.COMPONENT_REGEXP);	//get the component element TODO improve all this; decide if we want the dropTarget style on the component element or the drop target subcomponent, and how we want to relate that to the component ID
+			var dragSourceComponent=getAncestorElementByClassName(dragState.dragSource, STYLES.COMPONENT);	//get the component element TODO improve all this; decide if we want the dropTarget style on the component element or the drop target subcomponent, and how we want to relate that to the component ID
+			var dropTargetComponent=getAncestorElementByClassName(dropTarget, STYLES.COMPONENT);	//get the component element TODO improve all this; decide if we want the dropTarget style on the component element or the drop target subcomponent, and how we want to relate that to the component ID
 			if(dragSourceComponent && dropTargetComponent)	//if there source and target components
 			{
 				var ajaxRequest=new DropAJAXEvent(dragState, dragSourceComponent, dropTargetComponent, event);	//create a new AJAX drop event TODO probably remove the dragState parameter
@@ -3427,9 +3431,9 @@ function onMouse(event)
 		{
 			return;	//ignore the mouse exit event while it is still over this element
 		}
-		otherTarget=otherTarget.parentNode;	//check up the hierarchy
+		otherTarget=otherTarget.parentNode;	//check up the hierarchy TODO fix; IE gave an error here once, so maybe somehow otherTarget was null
 	}
-	var component=getAncestorElementByClassName(target, STYLES.COMPONENT_REGEXP);	//get the component element
+	var component=getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element
 	if(component)	//if we know the component
 	{
 		var eventType;	//we'll determine the type of AJAX mouse event to send
@@ -3641,7 +3645,6 @@ function getElementDepth(element)
 	while(element);	//keep getting the parent node while there are ancestors left
 	return depth;	//return the depth we calculated
 }
-
 
 /**Gets the indicated parameter from a direct child comment of the given node.
 @param node The node for a which a comment parameter should be found.

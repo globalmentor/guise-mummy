@@ -42,6 +42,28 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainer<
 			}
 		}
 
+	/**Whether the menu children will be shown during rollover.*/
+	private boolean rolloverOpenEnabled=false;
+
+		/**@return Whether the menu children will be shown during rollover.*/
+		public boolean isRolloverOpenEnabled() {return rolloverOpenEnabled;}
+
+		/**Sets whether the menu children will be shown during rollover.
+		If rollover open is enabled, the open state will not actually be changed during rollover.
+		This is a bound property of type <code>Boolean</code>.
+		@param newRolloverOpenEnabled <code>true</code> if the component should allow dropping, else <code>false</code>.
+		@see Menu#ROLLOVER_OPEN_ENABLED_PROPERTY
+		*/
+		public void setRolloverOpenEnabled(final boolean newRolloverOpenEnabled)
+		{
+			if(rolloverOpenEnabled!=newRolloverOpenEnabled)	//if the value is really changing
+			{
+				final boolean oldRolloverOpenEnabled=rolloverOpenEnabled;	//get the current value
+				rolloverOpenEnabled=newRolloverOpenEnabled;	//update the value
+				firePropertyChange(ROLLOVER_OPEN_ENABLED_PROPERTY, Boolean.valueOf(oldRolloverOpenEnabled), Boolean.valueOf(newRolloverOpenEnabled));
+			}
+		}
+
 	/**Session, ID, layout, and model constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.

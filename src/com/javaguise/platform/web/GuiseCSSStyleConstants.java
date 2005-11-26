@@ -72,6 +72,8 @@ public class GuiseCSSStyleConstants
 	public final static String FRAME_NONMODAL_CLASS="frameNonmodal";
 	/**The CSS class for an open, modal frame.*/
 	public final static String FRAME_MODAL_CLASS="frameModal";
+	/**The CSS class suffix identifying the frame tether.*/
+	public final static String FRAME_TETHER_CLASS_SUFFIX="-tether";
 	/**The CSS class suffix identifying the frame title.*/
 	public final static String FRAME_TITLE_CLASS_SUFFIX="-title";
 	/**The CSS class suffix identifying the frame title controls.*/

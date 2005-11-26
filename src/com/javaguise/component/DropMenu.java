@@ -5,7 +5,9 @@ import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 
 /**A menu that drops its children down from the top or over to the side.
+By default rollover open is enabled.
 @author Garret Wilson
+@see Menu#setRolloverOpenEnabled
 */
 public class DropMenu extends AbstractMenu<DropMenu>
 {
@@ -54,6 +56,7 @@ public class DropMenu extends AbstractMenu<DropMenu>
 	public DropMenu(final GuiseSession session, final String id, final MenuModel model, final Flow axis)
 	{
 		super(session, id, new MenuLayout(session, axis), model);	//construct the parent class
+		setRolloverOpenEnabled(true);	//default to showing the menu as open upon rollover
 	}
 
 }

@@ -11,34 +11,34 @@ var ie6FixSelectorText The selector text to use in IE6.
 var ie6FixClassName The selector class to use in an element on IE6, or null if no special selector class is needed on IE6.
 var elementName The name of the element selected, or null if no element name was selected.
 var classes The classes selected by the selector.
+var pseudoClass The pseudo-class specified by the selector, or null if no pseudo-class was specified.
 */
 function CSSElementSelector(selectorText)
 {
 	this.selectorText=selectorText;	//save the selector text
-	this.classes=selectorText.split(".");	//get the name and classes of this selector
+	var selectorTextPseudoClass=selectorText.split(":");	//split out the pseudo-class, if there is one
+	var bareSelectorText=selectorTextPseudoClass[0];	//get the selector text without a pseudo class
+		//TODO assert selectorTextPseudoClass.length==1 || selectorTextPseudoClass.length==2
+	this.pseudoClass=selectorTextPseudoClass.length>1 ? selectorTextPseudoClass[1] : null;	//save the pseudo-class, if there is one
+	this.classes=bareSelectorText.split(".");	//get the name and classes of this selector
 //TODO del	var elementName=this.classes.remove(0).toLowerCase();	//the first "selector" was an element name, so remove it (changing it to lowercase in case some browser put it in uppercase)
 	var elementName=this.classes.remove(0);	//the first "selector" was an element name, so remove it
 	this.elementName=elementName ? elementName : null;	//if there was no element name (i.e. the string started with "."), the element name will be empty
-/*TODO del
-	if(!selectorText.startsWith(".") && this.classes.length>0)	//if the selector didn't start with a class selector
-	{
-		this.elementName=this.classes.remove(0).toLowerCase();	//the first "selector" was an element name, so remove it and save it (changing it to lowercase in case some browser put it in uppercase)
-	}
-	else	//if there was no element name
-	{
-		this.elementName=null;	//show that there was no element name
-	}
-*/
 	if(this.classes.length>1)	//if there are multiple classes being selected
 	{
 		this.ie6FixClassName=GuiseIE6Fix.GUISE_IE6_CLASS_PREFIX+"-"+this.classes.join("-");	//create a new class in the form guiseIE6-class1-class2-class3
 		this.ie6FixSelectorText=elementName+"."+this.ie6FixClassName;	//create new selector text in the form elementName.guiseIE6-class1-class2-class3 (use the removed element name, which is never null)
+		if(this.pseudoClass!=null)	//if there was a pseudo-class
+		{
+			this.ie6FixSelectorText+=":"+this.pseudoClass;	//append the pseudo-class to the IE6 fix selector
+		}
 	}
 	else	//if multiple classes are not being selected
 	{
 		this.ie6FixClassName=null;	//don't create a special IE 6 class
 		this.ie6FixSelectorText=this.selectorText;	//use the standard selector text
 	}
+//alert("from "+selectorText+" derived
 	if(!CSSElementSelector.prototype._initialized)
 	{
 		CSSElementSelector.prototype._initialized=true;

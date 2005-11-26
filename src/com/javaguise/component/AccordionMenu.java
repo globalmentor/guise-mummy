@@ -1,12 +1,13 @@
 package com.javaguise.component;
 
 import com.javaguise.component.layout.*;
-import com.javaguise.geometry.Extent;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 
 /**A menu that collapses its children's children between its children, like an accordion.
+By default rollover open is disabled.
 @author Garret Wilson
+@see Menu#setRolloverOpenEnabled
 */
 public class AccordionMenu extends AbstractMenu<AccordionMenu>
 {
@@ -55,6 +56,7 @@ public class AccordionMenu extends AbstractMenu<AccordionMenu>
 	public AccordionMenu(final GuiseSession session, final String id, final MenuModel model, final Flow axis)
 	{
 		super(session, id, new MenuLayout(session, axis), model);	//construct the parent class
+		setRolloverOpenEnabled(false);	//default to not showing the menu as open upon rollover
 	}
 
 }
