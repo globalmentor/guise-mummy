@@ -58,7 +58,7 @@ public interface TableModel extends ControlModel
 	public <C> C getCellValue(final int rowIndex, final TableColumnModel<C> column);
 
 	/**Sets the cell value for the given cell.
-	This method delegates to {@link #setCellValue(int, TableColumnModel, C)}.
+	This method delegates to {@link #setCellValue(int, TableColumnModel, Object)}.
 	@param <C> The type of cell value.
 	@param cell The cell containing the row index and column information.
 	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.

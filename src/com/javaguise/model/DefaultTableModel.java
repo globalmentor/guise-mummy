@@ -11,7 +11,7 @@ import com.garretwilson.util.SynchronizedListDecorator;
 
 import com.javaguise.session.GuiseSession;
 
-/**The default implementation of a table model representing.
+/**The default implementation of a table model.
 The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class. 
 @author Garret Wilson
 */
@@ -64,7 +64,7 @@ public class DefaultTableModel extends AbstractTableModel
 	@param session The Guise session that owns this model.
 	@param rowValues The two-dimensional list of values, where the first index represents the row and the second represents the column, or <code>null</code> if no default values should be given.
 	@param columns The models representing the table columns.
-	@exception NullPointerException if the given session and/or class object is <code>null</code>.
+	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given number of columns does not equal the number of columns in any given data row.
 	@exception ClassCastException if one of the values in a row is not compatible with the type of its column.
 	*/

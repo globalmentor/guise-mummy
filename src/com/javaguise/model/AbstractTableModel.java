@@ -9,7 +9,6 @@ import com.garretwilson.util.CollectionUtilities;
 import com.javaguise.session.GuiseSession;
 
 /**An abstract implementation of a table model.
-The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class. 
 The table model is editable by default.
 @author Garret Wilson
 */
@@ -37,6 +36,12 @@ public abstract class AbstractTableModel extends AbstractControlModel implements
 			}			
 		}
 
+	/**The list of table column models.*/
+	private final List<TableColumnModel<?>> tableColumnModels=new CopyOnWriteArrayList<TableColumnModel<?>>();
+
+	/**@return A read-only list of table columns in physical order.*/ 
+	public List<TableColumnModel<?>> getColumns() {return unmodifiableList(tableColumnModels);}
+
 	/**The list of table column models in logical order.*/
 	private final List<TableColumnModel<?>> logicalTableColumnModels=new CopyOnWriteArrayList<TableColumnModel<?>>();
 
@@ -46,15 +51,18 @@ public abstract class AbstractTableModel extends AbstractControlModel implements
 		*/
 		public int getColumnIndex(final TableColumnModel<?> column) {return logicalTableColumnModels.indexOf(column);}
 	
-	/**The list of table column models.*/
-	private final List<TableColumnModel<?>> tableColumnModels=new CopyOnWriteArrayList<TableColumnModel<?>>();
-
-	/**@return A read-only list of table columns in physical order.*/ 
-	public List<TableColumnModel<?>> getColumns() {return unmodifiableList(tableColumnModels);}
-
 	/**@return The number of columns in this table.*/
 	public int getColumnCount() {return logicalTableColumnModels.size();}
 
+	/**Adds a column to the table.
+	@param column The column to add.
+	*/
+	protected void addColumn(final TableColumnModel<?> column)	//TODO syncrhonize access
+	{
+		tableColumnModels.add(column);	//add this column to the list of columns
+		logicalTableColumnModels.add(column);	//add this column to the list of columns in logical order
+	}
+	
 	/**Session constructor.
 	@param session The Guise session that owns this model.
 	@param columns The models representing the table columns.
@@ -74,8 +82,8 @@ public abstract class AbstractTableModel extends AbstractControlModel implements
 	public AbstractTableModel(final GuiseSession session, final String label, final TableColumnModel<?>... columns)
 	{
 		super(session, label);	//construct the parent class
-		CollectionUtilities.addAll(logicalTableColumnModels, columns);	//add all the columns to our logical list of table columns
 		CollectionUtilities.addAll(tableColumnModels, columns);	//add all the columns to our list of table columns
+		CollectionUtilities.addAll(logicalTableColumnModels, columns);	//add all the columns to our logical list of table columns
 	}
 
 	/**Returns the cell value for the given cell.
@@ -92,7 +100,7 @@ public abstract class AbstractTableModel extends AbstractControlModel implements
 	}
 
 	/**Sets the cell value for the given cell.
-	This method delegates to {@link #setCellValue(int, TableColumnModel, C)}.
+	This method delegates to {@link #setCellValue(int, TableColumnModel, Object)}.
 	@param <C> The type of cell value.
 	@param cell The cell containing the row index and column information.
 	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.

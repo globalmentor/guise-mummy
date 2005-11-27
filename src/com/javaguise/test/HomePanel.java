@@ -46,6 +46,13 @@ public class HomePanel extends DefaultNavigationPanel
 
 		final LayoutPanel contentPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE)); 
 
+		final CalendarMonthTableModel calendarMonthTableModel=new CalendarMonthTableModel(session);
+		final Table calendarMonthTable=new Table(session, calendarMonthTableModel);
+		contentPanel.add(calendarMonthTable);
+		
+		final CalendarControl calendarControl=new CalendarControl(session);
+		contentPanel.add(calendarControl);
+		
 		//input panel
 		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE));	//create the input panel flowing vertically
 		inputPanel.setBackgroundColor(RGBColor.AQUA_MARINE);
@@ -450,7 +457,7 @@ Debug.trace("list control changed value to", newValue);
 		contentPanel.add(text);
 */
 
-		getSession().setLocale(Locale.FRANCE);
+//TODO del		getSession().setLocale(Locale.FRANCE);
 //TODO del		getSession().setLocale(new Locale("ar"));
 
 		final Integer[][] multiplicationTableData=new Integer[2][2];

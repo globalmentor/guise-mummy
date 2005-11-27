@@ -41,7 +41,7 @@ public abstract class AbstractValueModel<V> extends AbstractControlModel impleme
 		public Validator<V> getValidator() {return validator;}
 
 		/**Sets the validator.
-		This is a bound property
+		This is a bound property.
 		@param newValidator The validator for this model, or <code>null</code> if no validator should be used.
 		@see ValueModel#VALIDATOR_PROPERTY
 		*/

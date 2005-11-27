@@ -364,6 +364,11 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 		{
 			final TableModel.Cell<C> cell=getCell();	//get our current cell
 			final C value=getModel().getCellValue(cell.getRowIndex(), cell.getColumn());	//get the value from the table model
+			
+			if(value instanceof Calendar)
+			{
+				return Integer.toString(((Calendar)value).get(Calendar.DAY_OF_MONTH));	//TODO testing
+			}
 			return value!=null ? value.toString() : null;	//if there is a value, return value's string value
 		}
 
