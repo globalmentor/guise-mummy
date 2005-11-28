@@ -8,7 +8,7 @@ import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
 
-/**Tabs Guise demonstration panel.
+/**Menus Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
 Demonstrates drop menus, accordion menus, menu rollovers, and menu actions. 
 @author Garret Wilson

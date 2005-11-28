@@ -1,6 +1,7 @@
 package com.javaguise.test;
 
 import java.net.URI;
+import java.util.Calendar;
 import java.util.Locale;
 
 import com.javaguise.component.*;
@@ -52,6 +53,22 @@ public class HomePanel extends DefaultNavigationPanel
 		
 		final CalendarControl calendarControl=new CalendarControl(session);
 		contentPanel.add(calendarControl);
+		
+		
+		calendarControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<CalendarMonthTableModel, Calendar>()
+				{
+					public void propertyChange(final GuisePropertyChangeEvent<CalendarMonthTableModel, Calendar> propertyChangeEvent)
+					{
+						final Calendar newValue=propertyChangeEvent.getNewValue();	//get the new value
+						if(newValue!=null)
+						{
+							new MessageOptionDialogFrame(session,	//create a new message dialog
+									"You selected date: "+newValue.getTime().toString(),
+									MessageOptionDialogFrame.Option.OK).open(true);
+						}
+					}
+				});
+		
 		
 		//input panel
 		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE));	//create the input panel flowing vertically

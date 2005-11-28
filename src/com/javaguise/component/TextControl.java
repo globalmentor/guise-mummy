@@ -102,7 +102,6 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 	@param session The Guise session that owns this component.
 	@param valueClass The class indicating the type of value held in the model.
 	@exception NullPointerException if the given session and/or value class is <code>null</code>.
-	@exception IllegalArgumentException if no default converter is available for the given value class.
 	*/
 	public TextControl(final GuiseSession session, final Class<V> valueClass)
 	{
@@ -136,7 +135,6 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 	@param valueClass The class indicating the type of value held in the model.
 	@exception NullPointerException if the given session and/or value class is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	@exception IllegalArgumentException if no default converter is available for the given value class.
 	*/
 	public TextControl(final GuiseSession session, final String id, final Class<V> valueClass)
 	{
@@ -149,11 +147,10 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 	@param model The component data model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	@exception IllegalArgumentException if no default converter is available for the given model's value class.
 	*/
 	public TextControl(final GuiseSession session, final String id, final ValueModel<V> model)
 	{
-		this(session, id, model, createDefaultStringLiteralConverter(session, model.getValueClass()));	//construct the class with a default converter
+		this(session, id, model, AbstractStringLiteralConverter.getInstance(session, model.getValueClass()));	//construct the class with a default converter
 	}
 
 	/**Session, ID, model, and converter constructor.

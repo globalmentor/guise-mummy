@@ -19,7 +19,7 @@ public abstract class AbstractConverter<V, L> implements Converter<V, L>
 		/**@return The Guise session that owns this converter.*/
 		public GuiseSession getSession() {return session;}
 
-	/**Session constructor with no value required.
+	/**Session constructor.
 	@param session The Guise session that owns this converter.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/

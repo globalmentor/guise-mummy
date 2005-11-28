@@ -45,7 +45,7 @@ public class InternationalizationPanel extends DefaultNavigationPanel
 				}
 			};
 
-		final Locale defaultLocale=session.getApplication().getDefaultLocale();	//get the default application locale (supported by the
+		final Locale defaultLocale=session.getApplication().getDefaultLocale();	//get the default application locale supported by the application
 		final Set<Locale> supportedLocales=session.getApplication().getSupportedLocales();	//get the locales supported by the application
 			//create a mutual exclusion policy group to only allow one language to be selected at one time
 		final ModelGroup<ValueModel<Boolean>> localeMutualExclusionPolicyModelGroup=new MutualExclusionPolicyModelGroup();

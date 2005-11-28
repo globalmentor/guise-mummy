@@ -12,6 +12,7 @@ If the currency style is chosen, care should be taken to indicate a specific con
 public interface NumberStringLiteralConverter<V extends Number> extends Converter<V, String>
 {
 
+	/**The style of the number in its literal form.*/
 	public enum Style
 	{
 		/**General number formatting.*/

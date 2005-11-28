@@ -58,6 +58,9 @@ public interface Container<C extends Container<C>> extends CompositeComponent<C>
 	*/
 	public Component<?> get(int index);
 
+	/**Removes all of the components from this container.*/
+	public void clear();
+
 	/**@return The layout definition for the container.*/
 	public Layout<?> getLayout();
 

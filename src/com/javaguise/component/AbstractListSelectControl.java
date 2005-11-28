@@ -1,5 +1,7 @@
 package com.javaguise.component;
 
+import java.util.Locale;
+
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import static com.garretwilson.lang.ObjectUtilities.*;
@@ -92,8 +94,18 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 		public Label createComponent(final ListSelectModel<VV> model, final VV value, final int index, final boolean selected, final boolean focused)
 		{
 			return value!=null	//if there is a value
-					? new Label(getSession(), getID(value), new DefaultLabelModel(getSession(), value.toString()))	//generate a label containing the value's string value
+					? new Label(getSession(), getID(value), createLabelModel(value))	//generate a label containing the value's string value
 					: null;	//otherwise return null
+		}
+
+		/**Creates a value model to represent the given value.
+		This version returns a {@link DefaultLabelModel}.
+		@param value The value to represent.
+		@return A label model for representing the given value model.
+		*/
+		protected LabelModel createLabelModel(final VV value)
+		{
+			return new DefaultLabelModel(getSession(), value.toString());	//create a new label model representing the string version of the value
 		}
 
 		/**Determines an identifier for the given object.
@@ -102,10 +114,39 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 		@return A string identifying the value, or <code>null</code> if the provided value is <code>null</code>.
 		@see Component#getID()
 		*/
-		public String getID(final VV value)
+		public String getID(final VV value)	//TODO fix; this can result in duplicate component IDs on the same page
 		{
 			return value!=null ? "hash"+Integer.toHexString(value.hashCode()) : null;	//if a value is given return the word "hash" followed by a hexadecimal representation of the value's hash code
 		}
+	}
+
+	/**A list select value representation strategy for representing locales in the current session locale.
+	@see LocaleLabelModel
+	@author Garret Wilson
+	*/
+	public static class LocaleRepresentationStrategy extends DefaultValueRepresentationStrategy<Locale>
+	{
+
+		/**Session constructor.
+		@param session The Guise session that owns this representation strategy.
+		@exception NullPointerException if the given session is <code>null</code>.
+		*/
+		public LocaleRepresentationStrategy(final GuiseSession session)
+		{
+			super(session);	//construct the parent class
+		}
+
+		/**Creates a value model to represent the given value.
+		This version returns a {@link LocaleLabelModel}.
+		@param value The value to represent.
+		@return A label model for representing the given value model.
+		*/
+		protected LabelModel createLabelModel(final Locale value)
+		{
+			return new LocaleLabelModel(getSession(), value);	//return a new locale label model
+		}
+		
+		//TODO fix getID()
 	}
 
 }

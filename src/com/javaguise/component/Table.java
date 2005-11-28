@@ -7,6 +7,9 @@ import java.util.concurrent.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.garretwilson.util.EmptyIterator;
+import com.javaguise.converter.AbstractStringLiteralConverter;
+import com.javaguise.converter.ConversionException;
+import com.javaguise.converter.Converter;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.*;
@@ -234,7 +237,7 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 	*/
 	private <T> void installDefaultCellRepresentationStrategy(final TableColumnModel<T> column)
 	{
-		setCellRepresentationStrategy(column, new DefaultCellRepresentationStrategy<T>(getSession()));	//create a default cell representation strategy
+		setCellRepresentationStrategy(column, new DefaultCellRepresentationStrategy<T>(column.getSession(), AbstractStringLiteralConverter.getInstance(column.getSession(), column.getValueClass())));	//create a default cell representation strategy
 	}
 
 	/**A strategy for generating components to represent table cell model values.
@@ -260,10 +263,10 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 
 	/**A default table cell representation strategy.
 	A message component will be generated using the cell's value as its message.
-	The message's ID will be in the form "cell-<var>rowIndex</var>-<var>columnIndex</var>.
+	The message's ID will be in the form "<var>tableID</var>.cell-<var>rowIndex</var>-<var>columnIndex</var>".
 	@param <V> The type of value the strategy is to represent.
 	@see Message
-	@see Object#toString() 
+	@see Converter
 	@author Garret Wilson
 	*/
 	public static class DefaultCellRepresentationStrategy<V> implements CellRepresentationStrategy<V>
@@ -275,13 +278,21 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 			/**@return The Guise session that owns this representation strategy.*/
 			public GuiseSession getSession() {return session;}
 
+		/**The converter to use for displaying the value as a string.*/
+		private final Converter<V, String> converter;
+			
+			/**@return The converter to use for displaying the value as a string.*/
+			public Converter<V, String> getConverter() {return converter;}
+
 		/**Session constructor.
 		@param session The Guise session that owns this representation strategy.
-		@exception NullPointerException if the given session is <code>null</code>.
+		@param converter The converter to use for displaying the value as a string.
+		@exception NullPointerException if the given session and/or converter is <code>null</code>.
 		*/
-		public DefaultCellRepresentationStrategy(final GuiseSession session)
+		public DefaultCellRepresentationStrategy(final GuiseSession session, final Converter<V, String> converter)
 		{
-			this.session=checkNull(session, "Session cannot be null");	//save the session
+			this.session=checkNull(session, "Session cannot be null.");	//save the session
+			this.converter=checkNull(converter, "Converter cannot be null.");	//save the converter
 		}
 
 		/**Creates a component for the given cell.
@@ -320,7 +331,7 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 			}
 			else	//if the component should not be editable, return a message component
 			{
-				return new Message(session, id, new DefaultCellMessageModel<C>(session, model, cell));	//create a message component containing a message model representing the value's string value				
+				return new Message(session, id, new DefaultCellMessageModel<C>(session, model, cell, getConverter()));	//create a message component containing a message model representing the value's string value				
 			}
 		}
 	}
@@ -343,42 +354,49 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 			/**@return The cell being represented*/
 			protected TableModel.Cell<C> getCell() {return cell;}
 
+		/**The converter to use for displaying the value as a string.*/
+		private final Converter<? super C, String> converter;
+			
+			/**@return The converter to use for displaying the value as a string.*/
+			public Converter<? super C, String> getConverter() {return converter;}
+
 		/**Constructs a default message model for a cell.
 		@param session The Guise session that owns this model.
 		@param model The table model of the cell.
 		@param cell The cell being represented.
+		@param converter The converter to use for displaying the value as a string.
 		@exception NullPointerException if the given session, table model and/or cell is <code>null</code>.
 		*/
-		public DefaultCellMessageModel(final GuiseSession session, final TableModel model, final TableModel.Cell<C> cell)
+		public DefaultCellMessageModel(final GuiseSession session, final TableModel model, final TableModel.Cell<C> cell, final Converter<? super C, String> converter)
 		{
 			super(session);	//construct the parent class
-			this.model=checkNull(model, "Table model cannot be null");
-			this.cell=checkNull(cell, "Cell cannot be null");
+			this.model=checkNull(model, "Table model cannot be null.");
+			this.cell=checkNull(cell, "Cell cannot be null.");
+			this.converter=checkNull(converter, "Converter cannot be null.");
 		}
 
 		/**Determines the message text of the cell.
-		This implementation returns a message with string value of the given value using the object's <code>toString()</code> method.
+		This implementation returns a message with a string value of the given value using the installed converter, if no message has been explicitly set.
 		@return The message text of the cell.
+		@see #getConverter()
 		*/
 		public String getMessage()
 		{
-			final TableModel.Cell<C> cell=getCell();	//get our current cell
-			final C value=getModel().getCellValue(cell.getRowIndex(), cell.getColumn());	//get the value from the table model
-			
-			if(value instanceof Calendar)
+			String message=super.getMessage();	//get the message explicitly set
+			if(message==null)	//if no message has been explicitly set
 			{
-				return Integer.toString(((Calendar)value).get(Calendar.DAY_OF_MONTH));	//TODO testing
+				final TableModel.Cell<C> cell=getCell();	//get our current cell
+				final C value=getModel().getCellValue(cell.getRowIndex(), cell.getColumn());	//get the value from the table model
+				try
+				{
+					message=getConverter().convertValue(value);	//return the literal value of the value
+				}
+				catch(final ConversionException conversionException)	//we don't expect a value-to-string conversion to result in an error
+				{
+					throw new AssertionError(conversionException);
+				}
 			}
-			return value!=null ? value.toString() : null;	//if there is a value, return value's string value
-		}
-
-		/**Sets the text of the message. This version throws an exception, as this model is read-only.
-		@param newMessage The new text of the message.
-		@exception UnsupportedOperationException because default cell message models are read-only.
-		*/
-		public void setMessage(final String newMessage)
-		{
-			throw new UnsupportedOperationException("Cell is read-only.");
+			return message;	//return the message
 		}
 
 	}
@@ -409,8 +427,8 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 		*/
 		public DefaultCellValueModel(final GuiseSession session, final TableModel model, final TableModel.Cell<C> cell)
 		{
-			super(session, checkNull(cell, "Cell cannot be null").getColumn().getValueClass());	//construct the parent class
-			this.model=checkNull(model, "Table model cannot be null");
+			super(session, checkNull(cell, "Cell cannot be null.").getColumn().getValueClass());	//construct the parent class
+			this.model=checkNull(model, "Table model cannot be null.");
 			this.cell=cell;
 		}
 

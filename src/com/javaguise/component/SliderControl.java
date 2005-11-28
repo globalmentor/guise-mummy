@@ -9,12 +9,12 @@ import java.util.MissingResourceException;
 import com.garretwilson.lang.ObjectUtilities;
 
 import com.javaguise.component.layout.*;
+import com.javaguise.converter.AbstractStringLiteralConverter;
 import com.javaguise.converter.Converter;
 import com.javaguise.model.DefaultValueModel;
 import com.javaguise.model.ValueModel;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
-import com.javaguise.validator.Validator;
 
 /**A value control that represents its value by a slider.
 If a thumb or track image resource key is set, a resource will be retrieved first using an appended physical axis designator (".x" or ".y").
@@ -238,7 +238,6 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 	@param valueClass The class indicating the type of value held in the model.
 	@param axis The axis along which the slider is oriented.
 	@exception NullPointerException if the given session, value class, and/or axis is <code>null</code>.
-	@exception IllegalArgumentException if no default converter is available for the given value class.
 	*/
 	public SliderControl(final GuiseSession session, final Class<V> valueClass, final Flow axis)
 	{
@@ -264,7 +263,6 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 	@param axis The axis along which the slider is oriented.
 	@exception NullPointerException if the given session, value class, and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	@exception IllegalArgumentException if no default converter is available for the given value class.
 	*/
 	public SliderControl(final GuiseSession session, final String id, final Class<V> valueClass, final Flow axis)
 	{
@@ -296,7 +294,7 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 	*/
 	public SliderControl(final GuiseSession session, final String id, final ValueModel<V> model, final Flow axis)
 	{
-		this(session, id, model, createDefaultStringLiteralConverter(session, model.getValueClass()), axis);	//construct the class with a default converter
+		this(session, id, model, AbstractStringLiteralConverter.getInstance(session, model.getValueClass()), axis);	//construct the class with a default converter
 	}
 
 	/**Session, ID, model, and axis constructor.

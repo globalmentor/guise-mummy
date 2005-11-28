@@ -72,7 +72,7 @@ public abstract class AbstractNumberStringLiteralConverter<V extends Number> ext
 	/**Creates a new number format object for the indicated locale.
 //TODO del	This implementation defaults to formatting as many fraction digits as is possible to keep the value synchronized with the lexical form.
 	@param locale The locale for which a number format should be created.
-	@return A number format object appropriate for the session's current locale.
+	@return A number format object appropriate for the given locale.
 	@see #getStyle()
 	*/
 	protected NumberFormat createNumberFormat(final Locale locale)
@@ -117,7 +117,7 @@ public abstract class AbstractNumberStringLiteralConverter<V extends Number> ext
 	}
 
 	/**Converts a value from the value space to a literal value in the lexical space.
-	This implementation returns the {@link Object#toString()} version of the value, if a value is given.
+	This implementation converts the value using the number format object.
 	This implementation synchronizes on the {@link NumberFormat} instance. 
 	@param value The value in the value space to convert.
 	@return The converted value in the lexical space, or <code>null</code> if the given literal is <code>null</code>..

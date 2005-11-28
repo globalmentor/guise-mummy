@@ -84,6 +84,15 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		fireContainerModified(index, null, component);	//indicate the component was removed from the index
 	}
 
+	/**Removes all of the components from this container.*/
+	public void clear()
+	{
+		for(final Component<?> component:this)	//for each component in the container
+		{
+			remove(component);	//remove this component
+		}
+	}
+
 	/**The layout definition for the container.*/
 	private final Layout<?> layout;
 

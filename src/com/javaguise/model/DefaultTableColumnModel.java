@@ -1,6 +1,5 @@
 package com.javaguise.model;
 
-import com.javaguise.component.Component;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.Validator;
 

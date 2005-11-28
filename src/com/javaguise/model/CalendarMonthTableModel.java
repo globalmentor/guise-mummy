@@ -18,6 +18,7 @@ import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.Validator;
 
 /**A table model representing the days of a calendar month.
+Each cell contains a {@link Calendar} value.
 @author Garret Wilson
 */
 public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the model to read-only
@@ -43,6 +44,10 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 	{
 		monthCalendar=(Calendar)calendar.clone();	//make a copy of the calendar
 		monthCalendar.set(Calendar.DAY_OF_MONTH, 1);	//set the month calendar to the first day of the month
+		monthCalendar.set(Calendar.HOUR_OF_DAY, 0);	//set the hour to midnight
+		monthCalendar.set(Calendar.MINUTE, 0);	//set the minute to zero
+		monthCalendar.set(Calendar.SECOND, 0);	//set the second to zero
+		monthCalendar.set(Calendar.MILLISECOND, 0);	//set the millisecond to zero
 Debug.trace("ready to update model with calendar", monthCalendar);
 		final int firstDayOfWeek=monthCalendar.getFirstDayOfWeek();	//get the first day of the week for this calendar
 Debug.trace("first day of week", firstDayOfWeek);
@@ -144,6 +149,7 @@ Debug.trace("first day of week", firstDayOfWeek);
 	}
 
 	/**A day-of-week column in a calendar month table.
+	Each cell contains a {@link Date} value.
 	@author Garret Wilson
 	*/
 	public class WeekDayTableColumnModel extends DefaultTableColumnModel<Calendar>
