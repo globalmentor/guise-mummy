@@ -57,7 +57,7 @@ public abstract class AbstractTableModel extends AbstractControlModel implements
 	/**Adds a column to the table.
 	@param column The column to add.
 	*/
-	protected void addColumn(final TableColumnModel<?> column)	//TODO syncrhonize access
+	protected void addColumn(final TableColumnModel<?> column)	//TODO synchronize access
 	{
 		tableColumnModels.add(column);	//add this column to the list of columns
 		logicalTableColumnModels.add(column);	//add this column to the list of columns in logical order

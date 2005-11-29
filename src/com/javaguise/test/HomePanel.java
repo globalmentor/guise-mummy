@@ -47,6 +47,39 @@ public class HomePanel extends DefaultNavigationPanel
 
 		final LayoutPanel contentPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE)); 
 
+		
+		final SelectLink selectLink=new SelectLink(session);
+		selectLink.getModel().setLabel("This is a select link");
+		selectLink.setToggle(true);
+		contentPanel.add(selectLink);
+		
+/*TODO del		
+    final GroupPanel cardPanelPanel=new GroupPanel(session, new FlowLayout(session, Flow.PAGE));    //create a panel flowing vertically
+    cardPanelPanel.getModel().setLabel("CardTabControl associated with CardPanel");
+            //CardPanel
+    final CardPanel cardPanel=new CardPanel(session);   //create a card panel
+                //page 1
+    final Panel<?> cardPanelPage1=new LayoutPanel(session); //create a panel to serve as the page
+    final Heading cardPanelPage1Heading=new Heading(session, 0);    //create a top-level heading
+    cardPanelPage1Heading.getModel().setLabel("This is page 1.");   //set the text of the heading
+    cardPanelPage1.add(cardPanelPage1Heading);  //add the heading to the page
+    cardPanel.add(cardPanelPage1, new CardLayout.Constraints(new DefaultLabelModel(session, "Page 1")));    //add the panel with a label
+                //page 2
+    final Panel<?> cardPanelPage2=new LayoutPanel(session); //create a panel to serve as the page
+    final Heading cardPanelPage2Heading=new Heading(session, 0);    //create a top-level heading
+    cardPanelPage2Heading.getModel().setLabel("This is page 2.");   //set the text of the heading
+    cardPanelPage2.add(cardPanelPage2Heading);  //add the heading to the page
+    cardPanel.add(cardPanelPage2, new CardLayout.Constraints(new DefaultLabelModel(session, "Page 2")));    //add the panel with a label
+            //CardTabControl
+    final CardTabControl cardPanelTabControl=new CardTabControl(session, cardPanel, Flow.LINE); //create a horizontal card tab control to control the existing card panel
+    cardPanelPanel.add(cardPanelTabControl);    //place the tab control above the card panel to illustrate common usage
+    cardPanelPanel.add(cardPanel);
+    cardPanel.getLayout().getConstraints(cardPanelPage2).setEnabled(Boolean.FALSE);
+    
+    contentPanel.add(cardPanelPanel);
+*/
+		
+/*TODO del		
 		final CalendarMonthTableModel calendarMonthTableModel=new CalendarMonthTableModel(session);
 		final Table calendarMonthTable=new Table(session, calendarMonthTableModel);
 		contentPanel.add(calendarMonthTable);
@@ -68,6 +101,7 @@ public class HomePanel extends DefaultNavigationPanel
 						}
 					}
 				});
+*/
 		
 		
 		//input panel

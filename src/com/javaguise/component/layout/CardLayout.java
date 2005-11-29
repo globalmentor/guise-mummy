@@ -87,8 +87,8 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints>
 			{
 				throw new IllegalStateException("Layout does not have container.");
 			}
-			final Component<?> component=container.get(newIndex);	//get the component at the given index
-			if(newIndex!=getSelectedIndex() && component!=getValue())	//if we're really changing either the selected index of the component
+			final Component<?> component=newIndex>=0 ? container.get(newIndex) : null;	//get the component at the given index, if a valid index was given
+			if(newIndex!=getSelectedIndex() && component!=getValue())	//if we're really changing either the selected index or the component
 			{
 				selectedIndex=-1;	//uncache the selected index (don't actually change it yet---we want to make sure the value model allows the value to be changed)
 				setValue(component);		//update the component value, throwing a validation exception if this index can't be selected

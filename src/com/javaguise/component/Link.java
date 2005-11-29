@@ -7,7 +7,7 @@ import com.javaguise.session.GuiseSession;
 /**Control with an action model rendered as a link.
 @author Garret Wilson
 */
-public class Link extends AbstractActionControl<Link>
+public class Link extends AbstractLinkControl<Link>
 {
 
 	/**Session constructor with a default data model.

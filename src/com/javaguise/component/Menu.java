@@ -41,7 +41,7 @@ public interface Menu<C extends Menu<C>> extends Container<C>, Control<C>
 	/**Sets whether the menu children will be shown during rollover.
 	If rollover open is enabled, the open state will not actually be changed during rollover.
 	This is a bound property of type <code>Boolean</code>.
-	@param newRolloverOpenEnabled <code>true</code> if the component should allow dropping, else <code>false</code>.
+	@param newRolloverOpenEnabled <code>true</code> if the component should allow display during rollover, else <code>false</code>.
 	@see #ROLLOVER_OPEN_ENABLED_PROPERTY
 	*/
 	public void setRolloverOpenEnabled(final boolean newRolloverOpenEnabled);
