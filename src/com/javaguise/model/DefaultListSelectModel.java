@@ -104,7 +104,13 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	public boolean contains(final Object value) {return values.contains(value);}
 
 	/**@return A read-only iterator over the values in this model.*/
-	public Iterator<V> iterator() {return unmodifiableList(values).iterator();}	//TODO fix the synchronized list decorator to return a synchronized iterator
+//TODO fix; this can't be read-only because we want the list sortable	public Iterator<V> iterator() {return unmodifiableList(values).iterator();}	//TODO fix the synchronized list decorator to return a synchronized iterator
+
+	
+	//TODO important: fix---we need to be editable for sorting, but this messes up the association with the states
+	
+	/**@return An iterator over the values in this model.*/
+	public Iterator<V> iterator() {return values.iterator();}	//TODO fix the synchronized list decorator to return a synchronized iterator
 
 	/**@return An array containing all of the values in this model.*/
 	public Object[] toArray() {return values.toArray();}

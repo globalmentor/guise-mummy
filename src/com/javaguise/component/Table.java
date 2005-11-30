@@ -10,6 +10,8 @@ import com.garretwilson.util.EmptyIterator;
 import com.javaguise.converter.AbstractStringLiteralConverter;
 import com.javaguise.converter.ConversionException;
 import com.javaguise.converter.Converter;
+import com.javaguise.event.AbstractGuisePropertyChangeListener;
+import com.javaguise.event.GuisePropertyChangeEvent;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.*;
@@ -206,6 +208,13 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 		{
 			installDefaultCellRepresentationStrategy(column);	//create and install a default representation strategy for this column
 		}
+		session.addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, new AbstractGuisePropertyChangeListener<GuiseSession, Locale>()	//listen for the session locale changing
+				{
+					public void propertyChange(GuisePropertyChangeEvent<GuiseSession, Locale> propertyChangeEvent)	//if the locale changes
+					{
+						clearComponentStates();	//clear all the components and component states in case they are locale-related TODO probably transfer this up to the abstract composite state class
+					}			
+				});
 	}
 
 	/**An encapsulation of a component for a cell along with other metadata, such as whether the component was editable when created.

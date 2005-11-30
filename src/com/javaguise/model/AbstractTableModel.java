@@ -62,6 +62,13 @@ public abstract class AbstractTableModel extends AbstractControlModel implements
 		tableColumnModels.add(column);	//add this column to the list of columns
 		logicalTableColumnModels.add(column);	//add this column to the list of columns in logical order
 	}
+
+	/**Clears all columns from the table.*/
+	protected void clearColumns()	//TODO synchronize access
+	{
+		tableColumnModels.clear();	//clear the columns
+		logicalTableColumnModels.clear();	//clear the logical columns		
+	}
 	
 	/**Session constructor.
 	@param session The Guise session that owns this model.

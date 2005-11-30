@@ -67,6 +67,16 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 		return oldComponentState;	//return whatever component state was previously in the map
 	}
 
+	/**Removes all child component states.*/
+	protected void clearComponentStates()	//TODO make sure this and related routines doesn't leak components or component states
+	{
+		for(final Component<?> component:this)	//for each component in the container
+		{
+			removeComponent(component);	//remove this component
+		}
+		componentStateMap.clear();	//remove all component states
+	}
+
 	/**Session and ID constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.

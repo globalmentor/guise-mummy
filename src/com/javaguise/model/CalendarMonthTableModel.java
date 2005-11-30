@@ -1,5 +1,6 @@
 package com.javaguise.model;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -14,18 +15,24 @@ import com.garretwilson.util.CollectionUtilities;
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.SynchronizedListDecorator;
 
+import com.javaguise.converter.AbstractDateStringLiteralConverter;
+import com.javaguise.converter.DateStringLiteralStyle;
+import com.javaguise.event.AbstractGuisePropertyChangeListener;
+import com.javaguise.event.GuisePropertyChangeEvent;
 import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.Validator;
 
 /**A table model representing the days of a calendar month.
-Each cell contains a {@link Calendar} value.
+Each cell contains a {@link Date} value.
 @author Garret Wilson
 */
 public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the model to read-only
 {
 
-	/**The month calendar bound property.*/
-	public final static String MONTH_CALENDAR_PROPERTY=getPropertyName(CalendarMonthTableModel.class, "monthCalendar");
+	/**The column style bound property.*/
+	public final static String COLUMN_LABEL_DATE_STYLE_PROPERTY=getPropertyName(CalendarMonthTableModel.class, "columnLabelStyle");
+	/**The date bound property.*/
+	public final static String DATE_PROPERTY=getPropertyName(CalendarMonthTableModel.class, "date");
 
 	/**The number of days this calendar should be offset left (negative) or right (positive) so that the days align with the correct day-of-the-week column.*/
 	private int dayOffset=0;
@@ -39,55 +46,99 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 		/**@return The number of rows in this table.*/
 		public int getRowCount() {return rowCount;}
 
-	/**Updates the model based upon the current calendar.*/
-	protected void updateModel()
-	{
-		monthCalendar=(Calendar)calendar.clone();	//make a copy of the calendar
-		monthCalendar.set(Calendar.DAY_OF_MONTH, 1);	//set the month calendar to the first day of the month
-		monthCalendar.set(Calendar.HOUR_OF_DAY, 0);	//set the hour to midnight
-		monthCalendar.set(Calendar.MINUTE, 0);	//set the minute to zero
-		monthCalendar.set(Calendar.SECOND, 0);	//set the second to zero
-		monthCalendar.set(Calendar.MILLISECOND, 0);	//set the millisecond to zero
-Debug.trace("ready to update model with calendar", monthCalendar);
-		final int firstDayOfWeek=monthCalendar.getFirstDayOfWeek();	//get the first day of the week for this calendar
-Debug.trace("first day of week", firstDayOfWeek);
-		final int dayOfWeek=monthCalendar.get(Calendar.DAY_OF_WEEK);	//get the day of the week of the first day of the month
-		Debug.trace("day of week", dayOfWeek);
-		dayOffset=firstDayOfWeek-dayOfWeek;	//calculate the offset for the first day of the month, and all days
-		Debug.trace("day offset", dayOffset);
-		rowCount=(int)Math.ceil((calendar.getMaximum(Calendar.DAY_OF_MONTH)-dayOffset)/(double)WEEK_DAY_COUNT);	//find out how many partial rows are used, taking into account the day offset
-		Debug.trace("row count", rowCount);
-	}
-
 	/**The calendar representing the first day of the month.*/
 	private Calendar monthCalendar;
 
 		/**@return A clone of the calendar representing the first day of the month.*/
 		protected Calendar getMonthCalendar() {return (Calendar)monthCalendar.clone();}
 
-	/**The calendar representing the date.*/
-	private Calendar calendar;
+	/**The date this calendar represents.*/
+	private Date date;
 
-		/**@return The calendar representing the date.*/
-		public Calendar getCalendar() {return (Calendar)calendar.clone();}
+		/**@return The date this calendar represents.*/
+		public Date getDate() {return (Date)date.clone();}
 
-		/**Sets the calendar representing the date.
-		A copy will be made of the calendar before it is stored.
+		/**Sets the date this calendar represents.
+		A copy will be made of the date before it is stored.
 		This is a bound property.
-		@param newCalendar The calendar representing the date.
-		@exception NullPointerException if the given calendar is <code>null</code>.
-		@see #MONTH_CALENDAR_PROPERTY
+		@param newDate The date this calendar is to represent.
+		@exception NullPointerException if the given date is <code>null</code>.
+		@see #DATE_PROPERTY
 		*/
-		public void setCalendar(final Calendar newCalendar)
+		public void setDate(final Date newDate)
 		{
-			if(!calendar.equals(checkNull(newCalendar, "Calendar cannot be null.")))	//if the value is really changing
+			if(!date.equals(checkNull(newDate, "Date cannot be null.")))	//if the value is really changing
 			{
-				final Calendar oldCalendar=calendar;	//get the old value
-				calendar=(Calendar)newCalendar.clone();	//clone the new month calendar and actually change the value
+				final Date oldDate=date;	//get the old value
+				date=(Date)newDate.clone();	//clone the new date and actually change the value
 				updateModel();	//update the model based upon the new value
-				firePropertyChange(MONTH_CALENDAR_PROPERTY, oldCalendar, newCalendar);	//indicate that the value changed
+				firePropertyChange(DATE_PROPERTY, oldDate, newDate);	//indicate that the value changed
 			}
 		}
+
+	/**The style of the column label.*/
+	private DateStringLiteralStyle columnLabelDateStyle=DateStringLiteralStyle.DAY_OF_WEEK;
+
+		/**@return The style of the column label.*/
+		public DateStringLiteralStyle getColumnLabelDateStyle() {return columnLabelDateStyle;}
+
+		/**Sets the style of the column label.
+		Note that this property is experimental, and may eventually be replaced with a style specification in the table component rather than the table model.
+		This is a bound property.
+		@param newColumnLabelStyle The style of the column label.
+		@exception NullPointerException if the given label style is <code>null</code>.
+		@see #COLUMN_LABEL_DATE_STYLE_PROPERTY
+		*/
+		public void setColumnLabelDateStyle(final DateStringLiteralStyle newColumnLabelStyle)
+		{
+			if(columnLabelDateStyle!=newColumnLabelStyle)	//if the value is really changing
+			{
+				final DateStringLiteralStyle oldColumnLabelStyle=columnLabelDateStyle;	//get the old value
+				columnLabelDateStyle=checkNull(newColumnLabelStyle, "Column label style cannot be null.");	//actually change the value
+				updateColumnLabelDateFormat();	//update the column label date format object based upon the new style
+				firePropertyChange(COLUMN_LABEL_DATE_STYLE_PROPERTY, oldColumnLabelStyle, newColumnLabelStyle);	//indicate that the value changed
+			}
+		}
+
+	/**The date format object for formatting the column labels.*/
+	private DateFormat columnLabelDateFormat;
+
+		/**@return The date format object for formatting the column labels.*/
+		protected DateFormat getColumnLabelDateFormat() {return columnLabelDateFormat;}
+
+	/**Updates the model based upon the current calendar. The column label date format is also updated.
+	@see #updateColumnLabelDateFormat()
+	*/
+	protected void updateModel()
+	{
+		monthCalendar=Calendar.getInstance(getSession().getLocale());	//create a month calendar for the current locale
+//TODO del when works		monthCalendar=(Calendar)calendar.clone();	//make a copy of the calendar
+		monthCalendar.setTime(getDate());	//set the calendar to the correct time
+		monthCalendar.set(Calendar.DAY_OF_MONTH, 1);	//set the month calendar to the first day of the month
+		monthCalendar.set(Calendar.HOUR_OF_DAY, 0);	//set the hour to midnight
+		monthCalendar.set(Calendar.MINUTE, 0);	//set the minute to zero
+		monthCalendar.set(Calendar.SECOND, 0);	//set the second to zero
+		monthCalendar.set(Calendar.MILLISECOND, 0);	//set the millisecond to zero
+//TODO fix Debug.trace("updating calendar model in locale", getSession().getLocale());
+//	TODO fix Debug.trace("ready to update model with calendar", monthCalendar);
+		final int firstDayOfWeek=monthCalendar.getFirstDayOfWeek();	//get the first day of the week for this calendar
+//	TODO fix Debug.trace("first day of week", firstDayOfWeek);
+		final int dayOfWeek=monthCalendar.get(Calendar.DAY_OF_WEEK);	//get the day of the week of the first day of the month
+		Debug.trace("day of week", dayOfWeek);
+		dayOffset=firstDayOfWeek-dayOfWeek;	//calculate the offset for the first day of the month, and all days
+		Debug.trace("day offset", dayOffset);
+		rowCount=(int)Math.ceil((monthCalendar.getMaximum(Calendar.DAY_OF_MONTH)-dayOffset)/(double)WEEK_DAY_COUNT);	//find out how many partial rows are used, taking into account the day offset
+		Debug.trace("row count", rowCount);
+		updateColumnLabelDateFormat();	//update the date format object for formatting column labels
+	}
+
+	/**Updates the column label date format based upon the column label date style and current locale.
+	@see #getColumnLabelDateStyle()
+	*/
+	protected void updateColumnLabelDateFormat()
+	{
+		columnLabelDateFormat=AbstractDateStringLiteralConverter.createDateFormat(getColumnLabelDateStyle(), null, getSession().getLocale());	//create a new date format based upon the style and locale		
+	}
 
 	/**Session constructor for current month using the session locale.
 	@param session The Guise session that owns this model.
@@ -95,23 +146,30 @@ Debug.trace("first day of week", firstDayOfWeek);
 	*/
 	public CalendarMonthTableModel(final GuiseSession session)
 	{
-		this(session, Calendar.getInstance(session.getLocale()));	//construct the class using the current month in the session locale
+		this(session, new Date());	//construct the class using the current date
 	}
 
-	/**Session and month calendar constructor.
+	/**Session and date constructor.
 	@param session The Guise session that owns this model.
-	@param calendar The calendar representing the date.
-	@exception NullPointerException if the given session and/or month calendar is <code>null</code>.
+	@param date The date this calendar is to represent.
+	@exception NullPointerException if the given session and/or date is <code>null</code>.
 	*/
-	public CalendarMonthTableModel(final GuiseSession session, final Calendar calendar)
+	public CalendarMonthTableModel(final GuiseSession session, final Date date)	//TODO decide if we want to allow a calendar with another locale to be set, because right now we change calendars automatically
 	{
 		super(session);	//construct the parent class
-		for(int i=0; i<WEEK_DAY_COUNT; ++i)	//for each week day index
+		for(int i=0; i<WEEK_DAY_COUNT; ++i)	//for each week day index (the indices are constant, regardless of with which day of the week the locale starts)
 		{
 			addColumn(new WeekDayTableColumnModel(session, i));	//add a new week day table column
 		}
-		this.calendar=checkNull(calendar, "Calendar cannot be null");
+		this.date=checkNull(date, "Date cannot be null");
 		updateModel();	//update the model to match the initial month calendar
+		session.addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, new AbstractGuisePropertyChangeListener<GuiseSession, Locale>()	//listen for the session locale changing
+				{
+					public void propertyChange(GuisePropertyChangeEvent<GuiseSession, Locale> propertyChangeEvent)	//if the locale changes
+					{
+						updateModel();	//update the model based upon the new locale
+					}			
+				});
 	}
 
 	/**Returns the cell value at the given row and column.
@@ -132,7 +190,7 @@ Debug.trace("first day of week", firstDayOfWeek);
 		final int offset=rowIndex*WEEK_DAY_COUNT+columnIndex+getDayOffset();	//find the absolute offset from the beginning, and then compensate for the first day of the month
 		final Calendar cellCalendar=getMonthCalendar();	//get a clone of the month calendar
 		cellCalendar.add(Calendar.DAY_OF_MONTH, offset);	//move the calendar day to the requested cell
-		return cast(column.getValueClass(), cellCalendar);	//return the calendar representing the date of the cell
+		return cast(column.getValueClass(), cellCalendar.getTime());	//return the calendar time representing the date of the cell
 	}
 
 	/**Sets the cell value at the given row and column.
@@ -152,7 +210,7 @@ Debug.trace("first day of week", firstDayOfWeek);
 	Each cell contains a {@link Date} value.
 	@author Garret Wilson
 	*/
-	public class WeekDayTableColumnModel extends DefaultTableColumnModel<Calendar>
+	public class WeekDayTableColumnModel extends DefaultTableColumnModel<Date>
 	{
 	
 		/**The physical index of the day of the week relative to the first day of the week.*/
@@ -181,7 +239,7 @@ Debug.trace("first day of week", firstDayOfWeek);
 				final Calendar columnCalendar=getMonthCalendar();	//get a clone of the month calendar
 				final int dayOfWeek=((columnCalendar.getFirstDayOfWeek()+getIndex()-1)%WEEK_DAY_COUNT)+1;	//find out which day of the week this column represents
 				columnCalendar.set(Calendar.DAY_OF_WEEK, dayOfWeek);	//set the calendar to the correct day of the week, without caring the actual date
-				label=new SimpleDateFormat("E", getSession().getLocale()).format(columnCalendar.getTime());	//format the day of the week for the label
+				label=getColumnLabelDateFormat().format(columnCalendar.getTime());	//format the day of the week for the label
 			}
 			return label;	//return the label for this column
 		}
@@ -194,10 +252,9 @@ Debug.trace("first day of week", firstDayOfWeek);
 		*/
 		public WeekDayTableColumnModel(final GuiseSession session, final int index)
 		{
-			super(session, Calendar.class);	//construct the parent class
+			super(session, Date.class);	//construct the parent class
 			this.index=checkIndexBounds(index, 0, WEEK_DAY_COUNT);	//make sure the index is within bounds
-		}
-		
+		}		
 	}
 	
 }

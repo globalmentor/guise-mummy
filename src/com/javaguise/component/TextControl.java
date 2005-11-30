@@ -2,6 +2,8 @@ package com.javaguise.component;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
+import java.util.Locale;
+
 import com.garretwilson.lang.ObjectUtilities;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
@@ -171,6 +173,13 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 					public void propertyChange(final GuisePropertyChangeEvent<ValueModel<V>, V> propertyChangeEvent)	//if the model value changes
 					{
 						updateText(propertyChangeEvent.getNewValue());	//update the text with the new value
+					}
+				});
+		session.addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, new AbstractGuisePropertyChangeListener<GuiseSession, Locale>()	//listen for the session locale changing
+				{
+					public void propertyChange(GuisePropertyChangeEvent<GuiseSession, Locale> propertyChangeEvent)	//if the locale changes
+					{
+						updateText(model.getValue());	//update the text with the value from the model, just in case the converter is locale-dependent
 					}
 				});
 	}

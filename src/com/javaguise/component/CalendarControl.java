@@ -1,7 +1,7 @@
 package com.javaguise.component;
 
-
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -17,6 +17,7 @@ import com.javaguise.component.Table.DefaultCellValueModel;
 import com.javaguise.component.layout.Flow;
 import com.javaguise.component.layout.FlowLayout;
 import com.javaguise.converter.Converter;
+import com.javaguise.converter.DateStringLiteralStyle;
 import com.javaguise.event.AbstractGuisePropertyChangeListener;
 import com.javaguise.event.ActionEvent;
 import com.javaguise.event.ActionListener;
@@ -34,14 +35,14 @@ import com.javaguise.validator.ValidationException;
 /**Control that allows selection of a date.
 @author Garret Wilson
 */
-public class CalendarControl extends AbstractContainer<CalendarControl> implements ValueControl<Calendar, CalendarControl>
+public class CalendarControl extends AbstractContainer<CalendarControl> implements ValueControl<Date, CalendarControl>
 {
 	
-	private int getMonthCount() {return 2;}	//TODO update to allow modification
+	private int getMonthCount() {return 1;}	//TODO update to allow modification
 
 	/**@return The data model used by this component.*/
 	@SuppressWarnings("unchecked")
-	public ValueModel<Calendar> getModel() {return (ValueModel<Calendar>)super.getModel();}
+	public ValueModel<Date> getModel() {return (ValueModel<Date>)super.getModel();}
 
 	/**The container containing the controls.*/
 	private Container<?> controlContainer;
@@ -109,32 +110,42 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 		calendarContainer=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create the calendar panel
 		add(calendarContainer);	//add the calendar panel
 		updateCalendars();	//update the calendars
+		model.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ValueModel<Date>, Date>()	//listen for the model value changing
+				{
+					public void propertyChange(final GuisePropertyChangeEvent<ValueModel<Date>, Date> propertyChangeEvent)	//if the model value value changed
+					{
+						updateCalendars();	//update the calendars based upon the new selected date
+					}
+				});
 	}
 
 	/**Updates the calendars on the calendar panel.*/
 	protected void updateCalendars()
 	{
+			//TODO when the date changes, make sure we're actually going to a different month (i.e. don't update the calendars for date changes within the month)
 		final Container<?> calendarContainer=getCalendarContainer();	//get the calendar container
 		calendarContainer.clear();	//remove all calendars from the container
 		final GuiseSession session=getSession();	//get the current session
-		final CellRepresentationStrategy<Calendar> dayRepresentationStrategy=createDayRepresentationStrategy();	//create a strategy for representing the days in the month calendar cells
+		final CellRepresentationStrategy<Date> dayRepresentationStrategy=createDayRepresentationStrategy();	//create a strategy for representing the days in the month calendar cells
 		final Calendar calendar=Calendar.getInstance(session.getLocale());	//TODO listen for a change in locale and update the calendars
+		final Date date=getModel().getValue();	//get the model value
+		if(date!=null)	//if the model specifies a date
+		{
+			calendar.setTime(date);	//set the calendar date to our model value
+		}
 		for(int monthIndex=0; monthIndex<getMonthCount(); ++monthIndex)	//for each month
 		{
-			final CalendarMonthTableModel calendarMonthTableModel=new CalendarMonthTableModel(session, calendar);	//create a table model for this month
+			final CalendarMonthTableModel calendarMonthTableModel=new CalendarMonthTableModel(session, new Date());	//create a table model for this month
+			calendarMonthTableModel.setColumnLabelDateStyle(DateStringLiteralStyle.DAY_OF_WEEK_SHORT);	//show the short day of the week in each column
 			final Table calendarMonthTable=new Table(session, calendarMonthTableModel);	//create a table to hold the calendar month
 			for(final TableColumnModel<?> tableColumn:calendarMonthTable.getModel().getColumns())	//for each table column
 			{
-				calendarMonthTable.setCellRepresentationStrategy((TableColumnModel<Calendar>)tableColumn, dayRepresentationStrategy);	//install the representation strategy for this column
+				calendarMonthTable.setCellRepresentationStrategy((TableColumnModel<Date>)tableColumn, dayRepresentationStrategy);	//install the representation strategy for this column
 			}
 			calendarContainer.add(calendarMonthTable);	//add the month table to the calendar container
 			calendarTables.add(calendarMonthTable);	//add this table to the list of calendar tables
 			calendar.add(Calendar.MONTH, 1);	//go to the next month
 		}
-		
-		
-		
-		
 	}
 
 	/**Creates a representation strategy for each cell in a calendar.
@@ -142,7 +153,7 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 	@return a representation strategy for each cell in a calendar.
 	@see DayRepresentationStrategy
 	*/
-	protected CellRepresentationStrategy<Calendar> createDayRepresentationStrategy()
+	protected CellRepresentationStrategy<Date> createDayRepresentationStrategy()
 	{
 		return new DayRepresentationStrategy();	//return a new day representation strategy
 	}
@@ -153,7 +164,7 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 	@see Link
 	@author Garret Wilson
 	*/
-	protected class DayRepresentationStrategy implements CellRepresentationStrategy<Calendar>
+	protected class DayRepresentationStrategy implements CellRepresentationStrategy<Date>
 	{
 
 		/**Creates a component for the given cell.
@@ -168,13 +179,15 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
 		*/
 		@SuppressWarnings("unchecked")	//we check the type of the column value class, so the casts are safe
-		public <C extends Calendar> Component<?> createComponent(final Table table, final TableModel model, final int rowIndex, final TableColumnModel<C> column, final boolean editable, final boolean selected, final boolean focused)
+		public <C extends Date> Component<?> createComponent(final Table table, final TableModel model, final int rowIndex, final TableColumnModel<C> column, final boolean editable, final boolean selected, final boolean focused)
 		{
 			final GuiseSession session=getSession();	//get the session
-			final Calendar calendar=model.getCellValue(rowIndex, column);	//get the calendar for this cell
-			final long time=calendar.getTimeInMillis();	//get the time of the cell in milliseconds
+			final Date date=model.getCellValue(rowIndex, column);	//get the date for this cell
+			final long time=date.getTime();	//get the time of the cell in milliseconds
 			final String id=table.createID("time"+Long.toHexString(time));	//create an ID for the new component
 			final Link link=new Link(session, id);	//create a link for this cell
+			final Calendar calendar=Calendar.getInstance(getSession().getLocale());	//create a calendar TODO cache the calendar and only change it if the locale has changed
+			calendar.setTime(date);	//set the time of the calendar to that of the cell
 			link.getModel().setLabel(Integer.toString(calendar.get(Calendar.DAY_OF_MONTH)));	//set the label of the link to the day of the month
 			link.getModel().addActionListener(new ActionListener<ActionModel>()	//create a listener to listen for calendar actions
 					{
@@ -182,7 +195,7 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 						{
 							try
 							{
-								CalendarControl.this.getModel().setValue(calendar);	//change the control's value to the calendar for this cell
+								CalendarControl.this.getModel().setValue(date);	//change the control's value to the calendar for this cell
 							}
 							catch(final ValidationException validationException)
 							{

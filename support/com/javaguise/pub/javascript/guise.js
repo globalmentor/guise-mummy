@@ -133,12 +133,12 @@ guiseFrames._initializePosition=function(frame)
 	if(relatedComponent)	//if there is a related component
 	{
 //TODO del alert("found related component: "+relatedComponentID);
+		var frameBounds=getElementBounds(frame);	//get the bounds of the frame
+		var relatedComponentBounds=getElementBounds(relatedComponent);	//get the bounds of the related component
 		var tether=getDescendantElementByClassName(frame, STYLES.FRAME_TETHER);	//get the frame tether, if there is one
 		if(tether)	//if there is a frame tether
 		{
 //TODO del alert("found tether: "+tether.id);
-			var frameBounds=getElementBounds(frame);	//get the bounds of the frame
-			var relatedComponentBounds=getElementBounds(relatedComponent);	//get the bounds of the related component
 			var tetherBounds=getElementBounds(tether);	//get the bounds of the tether
 			var tetherX, tetherY, relatedComponentX, relatedComponentY;	//get the relevant tether anchor point and the relevant component point
 			if(tetherBounds.x<=frameBounds.x+8)	//if the tether is on the left side (use an arbitrary amount to account for variations in browser position calculations) TODO compare centers, which will be more accurate
@@ -180,7 +180,23 @@ guiseFrames._initializePosition=function(frame)
 		}
 		else
 		{
-alert("error: fix for no tether");	//TODO fix for if there is no tether
+			var viewportBounds=getViewportBounds();	//get the bounds of the viewport so that we can center the frame
+			if(relatedComponentBounds.x<viewportBounds.x+(viewportBounds.width/2))	//if the related component is on the left half of the screen
+			{
+				frameX=relatedComponentBounds.x+relatedComponentBounds.width;	//put the frame on the right side
+			}
+			else	//if the related component is on the right half side of the screen
+			{
+				frameX=relatedComponentBounds.x-frameBounds.width;	//put the frame on the left side
+			}
+			if(relatedComponentBounds.y<viewportBounds.y+(viewportBounds.height/2))	//if the related component is on the top half of the screen
+			{
+				frameY=relatedComponentBounds.y+relatedComponentBounds.height;	//put the frame on the bottom side
+			}
+			else	//if the related component is on the bottom half side of the screen
+			{
+				frameY=relatedComponentBounds.y-frameBounds.height;	//put the frame on the top side
+			}
 		}		
 	}
 	else	//if this frame is not related to another component, center it

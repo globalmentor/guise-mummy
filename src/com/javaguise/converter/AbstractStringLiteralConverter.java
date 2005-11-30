@@ -64,11 +64,11 @@ public abstract class AbstractStringLiteralConverter<V> extends AbstractConverte
 		}
 		else if(Calendar.class.equals(valueClass))	//Calendar
 		{
-			return (Converter<VV, String>)new CalendarStringLiteralConverter(session, DateStringLiteralConverter.Style.FULL, DateStringLiteralConverter.Style.FULL);
+			return (Converter<VV, String>)new CalendarStringLiteralConverter(session, DateStringLiteralStyle.FULL, TimeStringLiteralStyle.FULL);
 		}
 		else if(Date.class.equals(valueClass))	//Date
 		{
-			return (Converter<VV, String>)new DateStringLiteralConverter(session, DateStringLiteralConverter.Style.FULL, DateStringLiteralConverter.Style.FULL);
+			return (Converter<VV, String>)new DateStringLiteralConverter(session, DateStringLiteralStyle.FULL, TimeStringLiteralStyle.FULL);
 		}
 		else if(Float.class.equals(valueClass))	//Float
 		{

@@ -16,7 +16,7 @@ public class CalendarStringLiteralConverter extends AbstractDateStringLiteralCon
 	@param timeStyle The time representation style, or <code>null</code> if the time should not be represented.
 	@exception NullPointerException if the given session and/or both the date style and time style is <code>null</code>.
 	*/
-	public CalendarStringLiteralConverter(final GuiseSession session, final Style dateStyle, final Style timeStyle)
+	public CalendarStringLiteralConverter(final GuiseSession session, final DateStringLiteralStyle dateStyle, final TimeStringLiteralStyle timeStyle)
 	{
 		super(session, dateStyle, timeStyle);	//construct the parent class
 	}

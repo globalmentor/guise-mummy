@@ -1,22 +1,20 @@
 package com.javaguise.demo;
 
-import java.text.DateFormat;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
-import com.garretwilson.util.Debug;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
 import com.javaguise.event.*;
 
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
-import com.javaguise.validator.ValidationException;
-import com.javaguise.validator.ValueRequiredValidator;
+import com.javaguise.validator.*;
 
 /**Calendars Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
-Demonstrates drop menus, accordion menus, menu rollovers, and menu actions. 
+Demonstrates calendar month table models, calendar controls,
+	calendar dialog frames, and text controls with date value models. 
 @author Garret Wilson
 */
 public class CalendarsPanel extends DefaultNavigationPanel
@@ -39,30 +37,12 @@ public class CalendarsPanel extends DefaultNavigationPanel
 		calendarMonthTable.getModel().setLabel("Normal Table using Default CalendarMonthTableModel");
 		calendarMonthTableModelPanel.add(calendarMonthTable);
 		centerPanel.add(calendarMonthTableModelPanel);
-			//CalendarControl demonstration
-		final GroupPanel calendarControlPanel=new GroupPanel(session, new FlowLayout(session, Flow.PAGE));	//create a group panel flowing vertically
-		calendarControlPanel.getModel().setLabel("Calendar Control");
-		final CalendarControl calendarControl=new CalendarControl(session);	//create a default calendar control
-		calendarControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<CalendarMonthTableModel, Calendar>()	//listen for the calendar control value changing
-				{
-					public void propertyChange(final GuisePropertyChangeEvent<CalendarMonthTableModel, Calendar> propertyChangeEvent)	//if the calendar control value changed
-					{
-						final Calendar newCalendarValue=propertyChangeEvent.getNewValue();	//get the new value
-						if(newCalendarValue!=null)	//if a new calendar value was selected
-						{
-							new MessageOptionDialogFrame(session,	//show a message dialog with the new calendar value
-									"You selected date: "+
-									DateFormat.getDateInstance(DateFormat.FULL, session.getLocale()).format(newCalendarValue.getTime()),
-									MessageOptionDialogFrame.Option.OK).open(true);
-						}
-					}
-				});
-		calendarControlPanel.add(calendarControl);
-		centerPanel.add(calendarControlPanel);
 		
 		add(centerPanel, RegionLayout.CENTER_CONSTRAINTS);	//add the center panel in the center
 		
-			//locale panel
+			//side panel
+		final LayoutPanel sidePanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE)); //create the side panel flowing vertically
+				//locale panel
 		final GroupPanel localePanel=new GroupPanel(session, new FlowLayout(session, Flow.PAGE));	//create a group panel flowing vertically
 		localePanel.getModel().setLabel("Specify Session Locale");
 		final ListControl<Locale> localeListControl=new ListControl<Locale>(session, Locale.class, new SingleListSelectionPolicy<Locale>());	//create a list control allowing only single selections of locales
@@ -70,7 +50,7 @@ public class CalendarsPanel extends DefaultNavigationPanel
 		localeListControl.setValueRepresentationStrategy(new AbstractListSelectControl.LocaleRepresentationStrategy(session));	//represent the locales in the correct locale
 		localeListControl.getModel().setValidator(new ValueRequiredValidator<Locale>(session));	//require a locale to be selected in the list control
 		localeListControl.setRowCount(1);	//make this a drop-down list
-		localeListControl.getModel().add(session.getLocale());	//TODO fix
+		localeListControl.getModel().add(session.getLocale());	//add the current locale
 		localeListControl.getModel().add(Locale.FRANCE);
 		localeListControl.getModel().add(Locale.CHINA);
 		localeListControl.getModel().add(new Locale("ar"));
@@ -94,7 +74,76 @@ public class CalendarsPanel extends DefaultNavigationPanel
 			throw new AssertionError(validationException);
 		}
 		localePanel.add(localeListControl);
-		add(localePanel, RegionLayout.LINE_END_CONSTRAINTS);	//add the locale panel on the right
+		sidePanel.add(localePanel);
+				//CalendarControl demonstration
+		final GroupPanel calendarControlPanel=new GroupPanel(session, new FlowLayout(session, Flow.PAGE));	//create a group panel flowing vertically
+		calendarControlPanel.getModel().setLabel("Calendar Control");
+		final CalendarControl calendarControl=new CalendarControl(session);	//create a default calendar control
+		calendarControlPanel.add(calendarControl);
+		final TextControl<Date> embeddedDateTextControl=new TextControl<Date>(session, Date.class);	//create a text control to display the date
+		embeddedDateTextControl.getModel().setLabel("Selected Date:");
+		embeddedDateTextControl.getModel().setEditable(false);
+		calendarControlPanel.add(embeddedDateTextControl);
+		calendarControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<CalendarMonthTableModel, Date>()	//listen for the calendar control value changing
+				{
+					public void propertyChange(final GuisePropertyChangeEvent<CalendarMonthTableModel, Date> propertyChangeEvent)	//if the calendar control value changed
+					{
+						final Date newDate=propertyChangeEvent.getNewValue();	//get the new date
+						if(newDate!=null)	//if a new date was selected
+						{
+							try
+							{
+								embeddedDateTextControl.getModel().setValue(newDate);	//show the date in the text control
+							}
+							catch(final ValidationException validationException)	//no text control validator is installed, so there should be no validation errors
+							{
+								throw new AssertionError(validationException);
+							}
+						}
+					}
+				});
+		sidePanel.add(calendarControlPanel);
+			//Popup CalendarControl demonstration
+		final GroupPanel popupCalendarControlPanel=new GroupPanel(session, new FlowLayout(session, Flow.PAGE));	//create a group panel flowing horizontally
+		popupCalendarControlPanel.getModel().setLabel("Popup Calendar Control");
+		final Button calendarButton=new Button(session);	//create a button
+		calendarButton.getModel().setLabel("Select Date");	//set the button label
+		popupCalendarControlPanel.add(calendarButton);
+		final TextControl<Date> popupDateTextControl=new TextControl<Date>(session, Date.class);	//create a text control to display the date
+		popupDateTextControl.getModel().setLabel("Selected Date:");
+		popupDateTextControl.getModel().setEditable(false);
+		popupCalendarControlPanel.add(popupDateTextControl);
+		calendarButton.getModel().addActionListener(new ActionListener<ActionModel>()	//listen for the calendar button being pressed
+				{
+					public void actionPerformed(final ActionEvent<ActionModel> actionEvent)	//if the calendar button is pressed
+					{
+						final CalendarDialogFrame calendarDialogFrame=new CalendarDialogFrame(session);	//create a new calendar popup
+						calendarDialogFrame.getModel().setLabel("Select a date");
+						calendarDialogFrame.setRelatedComponent(calendarButton);	//associate the popup with the button
+						calendarDialogFrame.open();	//show the calendar popup
+						calendarDialogFrame.open(new AbstractGuisePropertyChangeListener<CalendarDialogFrame, Mode>()	//ask for the date to be selected
+								{		
+									public void propertyChange(final GuisePropertyChangeEvent<CalendarDialogFrame, Mode> propertyChangeEvent)	//when the modal dialog mode changes
+									{
+										final Date newDate=propertyChangeEvent.getSource().getModel().getValue();	//get the value of the frame's model
+										if(newDate!=null)	//if a new date was selected (i.e. the calendar dialog frame was not closed without a selection)
+										{
+											try
+											{
+												popupDateTextControl.getModel().setValue(newDate);	//show the date in the text control
+											}
+											catch(final ValidationException validationException)	//no text control validator is installed, so there should be no validation errors
+											{
+												throw new AssertionError(validationException);
+											}
+										}
+									}
+								});
+					}
+				});
+		sidePanel.add(popupCalendarControlPanel);
+
+		add(sidePanel, RegionLayout.LINE_END_CONSTRAINTS);	//add the side panel on the right
 	}
 
 }
