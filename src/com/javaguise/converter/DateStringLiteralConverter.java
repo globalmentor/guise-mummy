@@ -12,7 +12,18 @@ This implementation synchronizes all conversions on the {@link DateFormat} objec
 */
 public class DateStringLiteralConverter extends AbstractDateStringLiteralConverter<Date>
 {
-	/**Session, date style, time style, and currency constructor.
+
+	/**Session and date style constructor with no time style.
+	@param session The Guise session that owns this converter.
+	@param dateStyle The date representation style, or <code>null</code> if the date should not be represented.
+	@exception NullPointerException if the given session and/or date style is <code>null</code>.
+	*/
+	public DateStringLiteralConverter(final GuiseSession session, final DateStringLiteralStyle dateStyle)
+	{
+		this(session, dateStyle, null);	//construct the class with no time style
+	}
+
+	/**Session, date style, and time style constructor.
 	@param session The Guise session that owns this converter.
 	@param dateStyle The date representation style, or <code>null</code> if the date should not be represented.
 	@param timeStyle The time representation style, or <code>null</code> if the time should not be represented.

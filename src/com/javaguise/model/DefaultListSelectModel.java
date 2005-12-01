@@ -266,7 +266,9 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 			oldSelectedValue=getSelectedValue();	//get the old selected value
 			values.clear();	//clear the list
 			valueStates.clear();	//clear the value states
-			listModified(-1, null, null);	//indicate a general list modification (without more intricate synchornization, we can't know for sure if the list was modified, even checking the size beforehand, because of thread race conditions)
+			getSelectedIndexSet().clear();	//clear all selections
+			fireListModified(-1, null, null);	//fire an event indicating that the list changed
+//TODO del; this will try to update the selections, which we already did			listModified(-1, null, null);	//indicate a general list modification (without more intricate synchornization, we can't know for sure if the list was modified, even checking the size beforehand, because of thread race conditions)
 			firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 		}
 	}
@@ -711,8 +713,19 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 				removeSelectedIndexes(index);	//make sure the removed index is not selected, as there's a different (or no) value there, now
 					//TODO go through the other indices and adjust them
 			}
-			else if(index<0 || (addedElement==null && removedElement==null))	//if we don't have enough information about what exactly happened
+			else if(index<0 || (addedElement==null && removedElement==null))	//if we don't have enough information about what exactly happened, remove all selected indexes TODO fix , but don't check for validation, because this could be coming from the clear() method 
 			{
+/*TODO fix
+				final Set<Integer> selectedIndexSet=getSelectedIndexSet();	//get the set of selected indices
+				final Iterator<Integer> oldSelectedIndexIterator=selectedIndexSet.iterator();	//get an iterator to the old selected indices
+				while(oldSelectedIndexIterator.hasNext())	//while there are more old selected indices
+				{
+					final Integer oldSelectedIndex=oldSelectedIndexIterator.next();	//get the next old selected index
+					oldSelectedIndexIterator.remove();	//remove this old selected index
+					valueStates.get(oldSelectedIndex.intValue()).setSelected(false);	//unselect the corresponding value state
+				}
+//TODO fix				setSelectedIndexes();	//clear all selections, as we don't know which values were added or removed
+*/
 				setSelectedIndexes();	//clear all selections, as we don't know which values were added or removed
 			}
 		}

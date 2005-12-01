@@ -1,6 +1,7 @@
 package com.javaguise.component;
 
 import com.javaguise.component.layout.Flow;
+import com.javaguise.converter.AbstractStringLiteralConverter;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import static com.garretwilson.lang.ClassUtilities.*;
@@ -236,7 +237,7 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 	*/
 	public TabControl(final GuiseSession session, final String id, final ListSelectModel<V> model, final Flow axis, final int maxTabCount)
 	{
-		this(session, id, model, new DefaultValueRepresentationStrategy<V>(session), axis, maxTabCount);	//construct the class with a default representation strategy
+		this(session, id, model, new DefaultValueRepresentationStrategy<V>(session, AbstractStringLiteralConverter.getInstance(session, model.getValueClass())), axis, maxTabCount);	//construct the class with a default representation strategy
 	}
 
 	/**Session, ID, model, and value representation strategy constructor.

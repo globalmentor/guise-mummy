@@ -52,7 +52,7 @@ public abstract class AbstractDateStringLiteralConverter<V> extends AbstractConv
 		return dateFormat;	//return the date format
 	}
 
-	/**Session, date style, time style, and currency constructor.
+	/**Session, date style, and time style constructor.
 	@param session The Guise session that owns this converter.
 	@param dateStyle The date representation style, or <code>null</code> if the date should not be represented.
 	@param timeStyle The time representation style, or <code>null</code> if the time should not be represented.
@@ -140,6 +140,12 @@ public abstract class AbstractDateStringLiteralConverter<V> extends AbstractConv
 						break;
 					case DAY_OF_WEEK_SHORT:
 						dateFormat=new SimpleDateFormat("E", locale);	//get a short day-of-week date format
+						break;
+					case MONTH_OF_YEAR:
+						dateFormat=new SimpleDateFormat("MMMM", locale);	//get a month-of-year  date format
+						break;
+					case MONTH_OF_YEAR_SHORT:
+						dateFormat=new SimpleDateFormat("M", locale);	//get a short month-of-year date format
 						break;
 					default:
 						throw new AssertionError("Unrecognized date style: "+dateStyle);

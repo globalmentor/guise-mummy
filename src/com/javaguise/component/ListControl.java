@@ -1,9 +1,9 @@
 package com.javaguise.component;
 
+import com.javaguise.converter.AbstractStringLiteralConverter;
 import com.javaguise.model.*;
 import com.javaguise.session.GuiseSession;
 import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.checkNull;
 
 /**Control to allow selection of one or more values from a list.
 @param <V> The type of values to select.
@@ -197,7 +197,7 @@ public class ListControl<V> extends AbstractListSelectControl<V, ListControl<V>>
 	*/
 	public ListControl(final GuiseSession session, final String id, final ListSelectModel<V> model, final int rowCount)
 	{
-		this(session, id, model, new DefaultValueRepresentationStrategy<V>(session), rowCount);	//construct the class with a default representation strategy
+		this(session, id, model, new DefaultValueRepresentationStrategy<V>(session, AbstractStringLiteralConverter.getInstance(session, model.getValueClass())), rowCount);	//construct the class with a default representation strategy
 	}
 
 	/**Session, ID, model, and value representation strategy constructor.

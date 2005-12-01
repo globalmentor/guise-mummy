@@ -28,6 +28,11 @@ Each cell contains a {@link Date} value.
 */
 public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the model to read-only
 {
+	
+//TODO switch to using calendar.getActualMaximum(calobject.DAY_OF_WEEK) or something to determine the days in the week, rather than a constant
+	
+//TODO fix May 2005 in French calendar, which doesn't show the first week
+//TODO fix April 2005 in the English calendar, which shows too many rows
 
 	/**The column style bound property.*/
 	public final static String COLUMN_LABEL_DATE_STYLE_PROPERTY=getPropertyName(CalendarMonthTableModel.class, "columnLabelStyle");
@@ -163,6 +168,7 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 		}
 		this.date=checkNull(date, "Date cannot be null");
 		updateModel();	//update the model to match the initial month calendar
+			//TODO important: this is a memory leak---make sure we uninstall the listener when the session goes away
 		session.addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, new AbstractGuisePropertyChangeListener<GuiseSession, Locale>()	//listen for the session locale changing
 				{
 					public void propertyChange(GuisePropertyChangeEvent<GuiseSession, Locale> propertyChangeEvent)	//if the locale changes

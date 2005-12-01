@@ -47,7 +47,6 @@ public class CalendarsPanel extends DefaultNavigationPanel
 		localePanel.getModel().setLabel("Specify Session Locale");
 		final ListControl<Locale> localeListControl=new ListControl<Locale>(session, Locale.class, new SingleListSelectionPolicy<Locale>());	//create a list control allowing only single selections of locales
 		localeListControl.getModel().setLabel("Locale");	//set the list control label
-		localeListControl.setValueRepresentationStrategy(new AbstractListSelectControl.LocaleRepresentationStrategy(session));	//represent the locales in the correct locale
 		localeListControl.getModel().setValidator(new ValueRequiredValidator<Locale>(session));	//require a locale to be selected in the list control
 		localeListControl.setRowCount(1);	//make this a drop-down list
 		localeListControl.getModel().add(session.getLocale());	//add the current locale

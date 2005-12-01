@@ -2,6 +2,8 @@ package com.javaguise.converter;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
+
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.javaguise.session.GuiseSession;
 
@@ -41,6 +43,7 @@ public abstract class AbstractStringLiteralConverter<V> extends AbstractConverte
 		<li><code>java.util.Date</code></li>
 		<li><code>java.lang.Float</code></li>
 		<li><code>java.lang.Integer</code></li>
+		<li><code>java.util.Locale</code></li>
 		<li><code>java.lang.String</code></li>
 	</ul>
 	If the given type is not recognized, a default one-way value-to-literal converter will be returned that uses a value's {@link Object#toString()} method for generating values in the lexical space.
@@ -77,6 +80,10 @@ public abstract class AbstractStringLiteralConverter<V> extends AbstractConverte
 		else if(Integer.class.equals(valueClass))	//Integer
 		{
 			return (Converter<VV, String>)new IntegerStringLiteralConverter(session);
+		}
+		else if(Locale.class.equals(valueClass))	//Locale
+		{
+			return (Converter<VV, String>)new LocaleStringLiteralConverter(session, LocaleStringLiteralStyle.NAME);
 		}
 		else if(String.class.equals(valueClass))	//String
 		{
