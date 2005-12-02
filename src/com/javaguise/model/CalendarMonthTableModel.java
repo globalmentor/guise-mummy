@@ -31,9 +31,6 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 	
 //TODO switch to using calendar.getActualMaximum(calobject.DAY_OF_WEEK) or something to determine the days in the week, rather than a constant
 	
-//TODO fix May 2005 in French calendar, which doesn't show the first week
-//TODO fix April 2005 in the English calendar, which shows too many rows
-
 	/**The column style bound property.*/
 	public final static String COLUMN_LABEL_DATE_STYLE_PROPERTY=getPropertyName(CalendarMonthTableModel.class, "columnLabelStyle");
 	/**The date bound property.*/
@@ -127,12 +124,16 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 //TODO fix Debug.trace("updating calendar model in locale", getSession().getLocale());
 //	TODO fix Debug.trace("ready to update model with calendar", monthCalendar);
 		final int firstDayOfWeek=monthCalendar.getFirstDayOfWeek();	//get the first day of the week for this calendar
-//	TODO fix Debug.trace("first day of week", firstDayOfWeek);
+//TODO del Debug.trace("first day of week", firstDayOfWeek);
 		final int dayOfWeek=monthCalendar.get(Calendar.DAY_OF_WEEK);	//get the day of the week of the first day of the month
-		Debug.trace("day of week", dayOfWeek);
+//TODO del Debug.trace("day of week", dayOfWeek);
 		dayOffset=firstDayOfWeek-dayOfWeek;	//calculate the offset for the first day of the month, and all days
-		Debug.trace("day offset", dayOffset);
-		rowCount=(int)Math.ceil((monthCalendar.getMaximum(Calendar.DAY_OF_MONTH)-dayOffset)/(double)WEEK_DAY_COUNT);	//find out how many partial rows are used, taking into account the day offset
+		if(dayOfWeek<firstDayOfWeek)	//if the day of the week is before the first day of the week
+		{
+			dayOffset-=WEEK_DAY_COUNT;		//keep from going backwards too far TODO there should be a better way to do this using modulus
+		}
+//TODO del Debug.trace("day offset", dayOffset);
+		rowCount=(int)Math.ceil((monthCalendar.getActualMaximum(Calendar.DAY_OF_MONTH)-dayOffset)/(double)WEEK_DAY_COUNT);	//find out how many partial rows are used, taking into account the day offset
 		Debug.trace("row count", rowCount);
 		updateColumnLabelDateFormat();	//update the date format object for formatting column labels
 	}
