@@ -1,8 +1,8 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.layout.*;
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 
 /**A menu that drops its children down from the top or over to the side.
 By default rollover open is enabled.

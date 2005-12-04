@@ -1,7 +1,7 @@
 package com.javaguise.event;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.model.ListSelectModel;
-import com.javaguise.session.GuiseSession;
 
 /**An event indicating the list selection has been modified.
 An added or removed element represents an added or removed index of the selection.

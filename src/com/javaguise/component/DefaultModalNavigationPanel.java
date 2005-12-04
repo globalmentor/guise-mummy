@@ -1,10 +1,10 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.layout.Layout;
 import com.javaguise.component.layout.RegionLayout;
 import com.javaguise.model.DefaultLabelModel;
 import com.javaguise.model.LabelModel;
-import com.javaguise.session.GuiseSession;
 
 /**Default implementation of a panel that represents a point of modal navigation with default region layout.
 Each panel subclass must provide either a Guise session constructor; or a Guise session and string ID constructor.

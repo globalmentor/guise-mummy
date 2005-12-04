@@ -2,8 +2,8 @@ package com.javaguise.event;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.geometry.*;
-import com.javaguise.session.GuiseSession;
 
 /**An event providing mouse information.
 @param <S> The type of the event source.

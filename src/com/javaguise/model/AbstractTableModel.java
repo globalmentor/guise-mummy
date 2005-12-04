@@ -6,7 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.garretwilson.util.CollectionUtilities;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**An abstract implementation of a table model.
 The table model is editable by default.

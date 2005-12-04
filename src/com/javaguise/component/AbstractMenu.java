@@ -1,12 +1,12 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.layout.*;
 import com.javaguise.event.MouseEvent;
 import com.javaguise.event.MouseListener;
 import com.javaguise.geometry.Point;
 import com.javaguise.geometry.Rectangle;
 import com.javaguise.model.MenuModel;
-import com.javaguise.session.GuiseSession;
 
 /**An abstract menu component.
 This implementation initially closes any child menu added to this menu.

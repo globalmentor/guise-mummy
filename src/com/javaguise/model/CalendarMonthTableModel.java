@@ -15,11 +15,11 @@ import com.garretwilson.util.CollectionUtilities;
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.SynchronizedListDecorator;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.converter.AbstractDateStringLiteralConverter;
 import com.javaguise.converter.DateStringLiteralStyle;
 import com.javaguise.event.AbstractGuisePropertyChangeListener;
 import com.javaguise.event.GuisePropertyChangeEvent;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.Validator;
 
 /**A table model representing the days of a calendar month.

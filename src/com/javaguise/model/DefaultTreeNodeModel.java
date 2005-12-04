@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**A default node in a tree model.
 @author Garret Wilson

@@ -379,7 +379,7 @@ Debug.trace("raw path info:", rawPathInfo);
 		}		
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-		final HTTPServletGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
+		final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
 /*TODO del
 Debug.info("session ID", guiseSession.getHTTPSession().getId());	//TODO del
 Debug.info("content length:", request.getContentLength());
@@ -415,7 +415,7 @@ Debug.info("content type:", request.getContentType());
 						final FormControlEvent formSubmitEvent=(FormControlEvent)controlEvents.get(0);	//get the form submit event TODO fix, combine with AJAX code
 
 							//before actually changing the navigation path, check to see if we're in the middle of modal navigation (only do this after we find a navigation panel, as this request might be for a stylesheet or some other non-panel resource, which shouldn't be redirected)
-						final ModalNavigation modalNavigation=guiseSession.peekModalNavigation();	//see if we are currently doing modal navigation TODO make public access routines
+						final ModalNavigation modalNavigation=guiseSession.getModalNavigation();	//see if we are currently doing modal navigation
 						if(modalNavigation!=null)	//if we are currently in the middle of modal navigation, make sure the correct panel was requested
 						{
 							final URI modalNavigationURI=modalNavigation.getNewNavigationURI();	//get the modal navigation URI
@@ -535,7 +535,7 @@ Debug.info("content type:", request.getContentType());
   @exception ServletException if there is a problem servicing the request.
   @exception IOException if there is an error reading or writing data.
   */
-	public void serviceAJAX(final HttpServletRequest request, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final AbstractGuiseApplication guiseApplication, final HTTPServletGuiseSession guiseSession, final HTTPServletGuiseContext guiseContext) throws ServletException, IOException
+	public void serviceAJAX(final HttpServletRequest request, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final AbstractGuiseApplication guiseApplication, final GuiseSession guiseSession, final HTTPServletGuiseContext guiseContext) throws ServletException, IOException
 	{
 		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request		
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
@@ -1202,7 +1202,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	{
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-		final HTTPServletGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
+		final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
 		return getGuiseContainer().isAuthorized(getGuiseApplication(), resourceURI, guiseSession.getPrincipal(), realm);	//delegate to the container, using the current Guise session
 	}
 
@@ -1222,7 +1222,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 		}
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-		final HTTPServletGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
+		final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
 		final Principal guiseSessionPrincipal=guiseSession.getPrincipal();	//get the current principal of the Guise session
 		final String guiseSessionPrincipalID=guiseSessionPrincipal!=null ? guiseSessionPrincipal.getName() : null;	//get the current guise session principal ID
 //	TODO del Debug.trace("checking to see if nonce principal ID", getNoncePrincipalID(nonce), "matches Guise session principal ID", guiseSessionPrincipalID); 
@@ -1244,7 +1244,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	@param realm The realm for which the principal was authenticated.
 	@param credentials The principal's credentials, or <code>null</code> if no credentials are available.
 	@param authenticated <code>true</code> if the principal succeeded in authentication, else <code>false</code>.
-	@see HTTPServletGuiseSession#setPrincipal(Principal)
+	@see GuiseSession#setPrincipal(Principal)
 	*/
 	protected void authenticated(final HttpServletRequest request, final URI resourceURI, final String method, final String requestURI, final Principal principal, final String realm, final AuthenticateCredentials credentials, final boolean authenticated)
 	{
@@ -1252,7 +1252,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 		{
 			final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 			final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-			final HTTPServletGuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
+			final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
 			guiseSession.setPrincipal(principal);	//set the new principal in the Guise session
 		}
 	}
@@ -1296,7 +1296,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 		}
 
 		/**The synchronized map of Guise sessions keyed to HTTP sessions.*/
-		private final Map<HttpSession, HTTPServletGuiseSession> guiseSessionMap=synchronizedMap(new HashMap<HttpSession, HTTPServletGuiseSession>());
+		private final Map<HttpSession, GuiseSession> guiseSessionMap=synchronizedMap(new HashMap<HttpSession, GuiseSession>());
 
 		/**Retrieves a Guise session for the given HTTP session.
 		A Guise session will be created if none is currently associated with the given HTTP session.
@@ -1309,15 +1309,15 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 		@return The Guise session associated with the provided HTTP session.
 		@see HTTPGuiseSessionManager
 		*/
-		protected HTTPServletGuiseSession getGuiseSession(final GuiseApplication guiseApplication, final HttpServletRequest httpRequest, final HttpSession httpSession)
+		protected GuiseSession getGuiseSession(final GuiseApplication guiseApplication, final HttpServletRequest httpRequest, final HttpSession httpSession)
 		{
 			synchronized(guiseSessionMap)	//don't allow anyone to modify the map of sessions while we access it
 			{
-				HTTPServletGuiseSession guiseSession=guiseSessionMap.get(httpSession);	//get the Guise session associated with the HTTP session
+				GuiseSession guiseSession=guiseSessionMap.get(httpSession);	//get the Guise session associated with the HTTP session
 				if(guiseSession==null)	//if no Guise session is associated with the given HTTP session
 				{
 Debug.trace("+++creating Guise session", httpSession.getId());
-					guiseSession=createGuiseSession(guiseApplication, httpSession);	//create a new Guise session
+					guiseSession=guiseApplication.createSession();	//create a new Guise session
 					final GuiseEnvironment environment=guiseSession.getEnvironment();	//get the new session's environment
 					final Cookie[] cookies=httpRequest.getCookies();	//get the cookies in the request
 					if(cookies!=null)	//if a cookie array was returned
@@ -1348,25 +1348,15 @@ Debug.trace("+++creating Guise session", httpSession.getId());
 		@return The Guise session previously associated with the provided HTTP session, or <code>null</code> if no Guise session was associated with the given HTTP session.
 		@see HTTPGuiseSessionManager
 		*/
-		protected HTTPServletGuiseSession removeGuiseSession(final HttpSession httpSession)
+		protected GuiseSession removeGuiseSession(final HttpSession httpSession)
 		{
 Debug.trace("+++removing Guise session", httpSession.getId());
-			HTTPServletGuiseSession guiseSession=guiseSessionMap.remove(httpSession);	//remove the HTTP session and Guise session association
+			GuiseSession guiseSession=guiseSessionMap.remove(httpSession);	//remove the HTTP session and Guise session association
 			if(guiseSession!=null)	//if there is a Guise session associated with the HTTP session
 			{
 				guiseSession.destroy();	//let the Guise session know it's being destroyed so that it can clean up and release references to the application
 			}
 			return guiseSession;	//return the associated Guise session
-		}
-
-		/**Factory method to create a Guise session from an HTTP session.
-		@param guiseApplication The Guise application that will own the created Guise session.
-		@param httpSession The HTTP session for which a Guise session should be created.
-		@return A new Guise session corresponding to the given HTTP session.
-		*/
-		protected HTTPServletGuiseSession createGuiseSession(final GuiseApplication guiseApplication, final HttpSession httpSession)
-		{
-			return new HTTPServletGuiseSession(guiseApplication, httpSession);	//create a default HTTP guise session
 		}
 
 		/**Determines if the container has a resource available stored at the given resource path.

@@ -1,6 +1,6 @@
 package com.javaguise.model;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**A dummy tree node that holds no value and, if placed as the root of a tree, will not be displayed.
 @author Garret Wilson

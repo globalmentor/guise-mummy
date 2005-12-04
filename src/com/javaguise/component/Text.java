@@ -1,8 +1,8 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.model.DefaultTextModel;
 import com.javaguise.model.TextModel;
-import com.javaguise.session.GuiseSession;
 
 /**A text component.
 @author Garret Wilson

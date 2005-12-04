@@ -1,7 +1,7 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 
 /**Control accepting a resource to be imported, such as a web file upload. 
 @author Garret Wilson

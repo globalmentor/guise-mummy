@@ -1,6 +1,6 @@
 package com.javaguise.converter;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**A converter that converts any object to a string literal using its {@link Object#toString()} method.
 This class cannot convert from a literal to the supported object, and considers all non-<code>null</code> literal representations invalid.

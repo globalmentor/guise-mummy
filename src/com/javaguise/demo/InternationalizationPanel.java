@@ -3,12 +3,12 @@ package com.javaguise.demo;
 import java.text.DateFormat;
 import java.util.*;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.Flow;
 import com.javaguise.component.layout.RegionLayout;
 import com.javaguise.event.*;
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
 
 /**Internationalization Guise demonstration panel.

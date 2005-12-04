@@ -5,8 +5,8 @@ import static java.util.Collections.*;
 
 import javax.mail.internet.ContentType;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.model.ResourceImport;
-import com.javaguise.session.GuiseSession;
 import static com.garretwilson.io.FileUtilities.*;
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.util.CollectionUtilities.*;

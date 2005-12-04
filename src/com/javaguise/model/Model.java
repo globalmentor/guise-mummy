@@ -12,7 +12,7 @@ import com.garretwilson.beans.*;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.text.TextConstants;
 import com.garretwilson.text.xml.xhtml.XHTMLConstants;
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 import com.javaguise.validator.ValidationException;
 
 /**Base interface for all component models.

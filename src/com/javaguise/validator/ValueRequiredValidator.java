@@ -1,6 +1,6 @@
 package com.javaguise.validator;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**A validator that requires a value to be entered.
 @author Garret Wilson

@@ -4,8 +4,8 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.garretwilson.util.ReverseIterator;
+import com.javaguise.GuiseSession;
 import com.javaguise.model.Model;
-import com.javaguise.session.GuiseSession;
 
 /**Abstract implementation of a composite component that keeps track of its child components in sequence.
 Iterating over child components is thread safe.

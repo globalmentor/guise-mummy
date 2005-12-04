@@ -18,7 +18,6 @@ import com.javaguise.component.DefaultNavigationPanel;
 import com.javaguise.component.kit.ComponentKit;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.*;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.view.View;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.net.URIUtilities;
@@ -40,6 +39,15 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 		/**@return The Guise container into which this application is installed, or <code>null</code> if the application is not yet installed.*/
 		public GuiseContainer getContainer() {return container;}
+
+	/**Creates a new session for the application.
+ 	This version creates and returns a default session.
+	@return A new session for the application
+	*/
+	public GuiseSession createSession()
+	{
+		return new DefaultGuiseSession(this);	//create a new default Guise session
+	}
 
 	/**Creates a frame for the application.
 	This implementation returns a default application frame.

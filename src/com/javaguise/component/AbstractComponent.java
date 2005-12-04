@@ -12,6 +12,7 @@ import com.garretwilson.util.Debug;
 
 import static com.javaguise.GuiseResourceConstants.*;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.layout.*;
 import com.javaguise.component.transfer.*;
 import com.javaguise.context.GuiseContext;
@@ -27,7 +28,6 @@ import com.javaguise.geometry.Point;
 import com.javaguise.geometry.Rectangle;
 import com.javaguise.model.ActionModel;
 import com.javaguise.model.Model;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.style.Color;
 import com.javaguise.style.RGBColor;
 import com.javaguise.view.View;

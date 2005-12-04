@@ -1,6 +1,6 @@
 package com.javaguise.validator;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**Indicates an object that can determine whether a value is valid.
 @param <V> The value type this validator supports.

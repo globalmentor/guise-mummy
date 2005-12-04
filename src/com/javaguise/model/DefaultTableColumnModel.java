@@ -1,6 +1,6 @@
 package com.javaguise.model;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 import com.javaguise.validator.Validator;
 
 /**The default implementation of a column in a table.

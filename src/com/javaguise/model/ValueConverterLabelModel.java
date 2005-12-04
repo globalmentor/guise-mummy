@@ -2,9 +2,9 @@ package com.javaguise.model;
 
 import java.util.MissingResourceException;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.converter.ConversionException;
 import com.javaguise.converter.Converter;
-import com.javaguise.session.GuiseSession;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**A label model that converts a value to a string for the label.

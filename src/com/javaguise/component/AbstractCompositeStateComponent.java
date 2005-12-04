@@ -4,8 +4,8 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 
 import java.util.*;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.model.Model;
-import com.javaguise.session.GuiseSession;
 
 /**A composite component that represents the state of its child components.
 @param <T> The type of object being represented.

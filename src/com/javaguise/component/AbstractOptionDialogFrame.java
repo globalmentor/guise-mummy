@@ -7,9 +7,9 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.garretwilson.util.EmptyIterator;
 import com.garretwilson.util.ObjectIterator;
+import com.javaguise.GuiseSession;
 import com.javaguise.component.layout.*;
 import com.javaguise.model.ValueModel;
-import com.javaguise.session.GuiseSession;
 
 /**Abstract implementation of a frame for communication of an option.
 An option frame defaults to a single composite child panel with a row of options along the bottom.

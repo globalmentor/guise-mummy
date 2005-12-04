@@ -2,7 +2,7 @@ package com.javaguise.model;
 
 import java.util.MissingResourceException;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 import com.garretwilson.lang.ObjectUtilities;
 
 /**A default implementation of a model for an identifier such as text and/or an icon.

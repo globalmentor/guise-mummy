@@ -1,8 +1,8 @@
 package com.javaguise.demo;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.RegionLayout;
-import com.javaguise.session.GuiseSession;
 
 /**Hello World Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.

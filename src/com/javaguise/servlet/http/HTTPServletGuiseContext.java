@@ -9,11 +9,11 @@ import javax.mail.internet.ContentType;
 import javax.servlet.http.*;
 import javax.xml.parsers.*;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.context.text.xml.AbstractXMLGuiseContext;
 import com.javaguise.controller.ControlEvent;
 import com.javaguise.model.FileItemResourceImport;
-import com.javaguise.session.GuiseSession;
 import static com.garretwilson.io.ContentTypeConstants.*;
 import static com.garretwilson.io.ContentTypeUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;

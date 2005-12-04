@@ -6,7 +6,7 @@ import static java.text.MessageFormat.*;
 import java.text.*;
 import java.util.*;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**An object that can convert a date object from and to a string.
 This implementation caches a date format and only creates a new one if the locale has changed.

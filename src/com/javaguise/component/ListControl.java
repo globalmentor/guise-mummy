@@ -1,8 +1,8 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.converter.AbstractStringLiteralConverter;
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 import static com.garretwilson.lang.ClassUtilities.*;
 
 /**Control to allow selection of one or more values from a list.

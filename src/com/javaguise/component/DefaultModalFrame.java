@@ -1,8 +1,8 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.model.DefaultLabelModel;
 import com.javaguise.model.LabelModel;
-import com.javaguise.session.GuiseSession;
 
 /**Default implementation of a modal frame with a default layout panel.
 @param <R> The type of modal result this modal frame produces.

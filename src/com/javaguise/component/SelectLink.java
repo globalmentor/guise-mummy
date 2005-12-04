@@ -1,7 +1,7 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 
 /**Link that stores a boolean value in its model representing the selected state.
 A validator requiring a non-<code>null</code> value is automatically installed.

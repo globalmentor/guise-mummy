@@ -4,7 +4,7 @@ import java.beans.PropertyChangeEvent;
 
 import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.lang.ObjectUtilities;
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 

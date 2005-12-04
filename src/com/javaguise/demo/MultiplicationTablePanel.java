@@ -1,5 +1,6 @@
 package com.javaguise.demo;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.CardLayout;
 import com.javaguise.component.layout.Flow;
@@ -10,7 +11,6 @@ import com.javaguise.event.ActionListener;
 
 import com.javaguise.model.ActionModel;
 import com.javaguise.model.DefaultLabelModel;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.IntegerRangeValidator;
 
 /**Multiplication Table Guise demonstration panel.

@@ -18,6 +18,8 @@ import static com.garretwilson.lang.ClassUtilities.getPropertyName;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import static com.javaguise.GuiseResourceConstants.*;
+
+import com.javaguise.GuiseSession;
 import com.javaguise.component.Component;
 import com.javaguise.component.Container;
 import com.javaguise.component.layout.AbstractLayout.ConstraintsPropertyChangeListener;
@@ -26,7 +28,6 @@ import com.javaguise.event.GuisePropertyChangeEvent;
 import com.javaguise.event.ListListener;
 import com.javaguise.event.ListSelectionListener;
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.*;
 
 /**A layout that manages child components as an ordered stack of cards.

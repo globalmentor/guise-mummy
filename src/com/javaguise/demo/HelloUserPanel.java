@@ -1,10 +1,10 @@
 package com.javaguise.demo;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
 import com.javaguise.event.*;
 import com.javaguise.model.ValueModel;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.RegularExpressionStringValidator;
 
 /**Hello User Guise demonstration panel.

@@ -1,8 +1,8 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.layout.*;
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 
 /**A menu that collapses its children's children between its children, like an accordion.
 By default rollover open is disabled.

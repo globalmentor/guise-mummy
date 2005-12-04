@@ -1,7 +1,7 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.model.Model;
-import com.javaguise.session.GuiseSession;
 
 /**An abstract implementation of a model component that allows user interaction to modify the model.
 @author Garret Wilson

@@ -2,7 +2,8 @@ package com.javaguise.validator;
 
 import static java.text.MessageFormat.*;
 import static com.javaguise.GuiseResourceConstants.*;
-import com.javaguise.session.GuiseSession;
+
+import com.javaguise.GuiseSession;
 import com.garretwilson.util.Debug;
 
 import static com.garretwilson.lang.ObjectUtilities.*;

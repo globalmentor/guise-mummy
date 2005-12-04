@@ -2,11 +2,11 @@ package com.javaguise.demo;
 
 import java.net.URI;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
 import com.javaguise.geometry.Extent;
 import com.javaguise.model.Model;
-import com.javaguise.session.GuiseSession;
 
 /**Drop Details Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.

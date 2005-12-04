@@ -1,6 +1,6 @@
 package com.javaguise.validator;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**A range validator for integers.
 The step value is considered relative either to the minimum value, if available, the maximum value, if available, or zero, in that order or priority.

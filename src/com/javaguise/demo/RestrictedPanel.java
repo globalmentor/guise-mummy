@@ -1,5 +1,6 @@
 package com.javaguise.demo;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.Flow;
 import com.javaguise.component.layout.FlowLayout;
@@ -7,7 +8,6 @@ import com.javaguise.component.layout.RegionLayout;
 import com.javaguise.event.ActionEvent;
 import com.javaguise.event.ActionListener;
 import com.javaguise.model.ActionModel;
-import com.javaguise.session.GuiseSession;
 
 /**Restricted Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.

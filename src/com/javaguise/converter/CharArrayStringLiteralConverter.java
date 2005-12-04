@@ -1,6 +1,6 @@
 package com.javaguise.converter;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**A converter that converts a <code>char[]</code> from and to a string literal.
 @author Garret Wilson

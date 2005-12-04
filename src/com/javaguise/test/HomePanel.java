@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Calendar;
 import java.util.Locale;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
 import com.javaguise.demo.DemoUser;
@@ -11,7 +12,6 @@ import com.javaguise.demo.EditUserPanel;
 import com.javaguise.event.*;
 import com.javaguise.geometry.Extent;
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.style.RGBColor;
 import com.javaguise.validator.IntegerRangeValidator;
 import com.javaguise.validator.RegularExpressionStringValidator;

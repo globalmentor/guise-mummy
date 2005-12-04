@@ -1,7 +1,7 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.model.LabelModel;
-import com.javaguise.session.GuiseSession;
 
 /**Abstract implementation of an application frame.
 @author Garret Wilson

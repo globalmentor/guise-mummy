@@ -1,8 +1,8 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.layout.Layout;
 import com.javaguise.model.Model;
-import com.javaguise.session.GuiseSession;
 
 /**An abstract implementation of a container that is also a control.
 @author Garret Wilson

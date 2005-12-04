@@ -1,6 +1,6 @@
 package com.javaguise.component.layout;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**A layout that flows information along an axis.
 @author Garret Wilson

@@ -1,6 +1,6 @@
 package com.javaguise.event;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**An event indicating a list has been modified.
 If a single element was replaced both an added and removed element will be provided.

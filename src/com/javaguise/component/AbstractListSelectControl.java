@@ -2,9 +2,9 @@ package com.javaguise.component;
 
 import java.util.Locale;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.converter.Converter;
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**Abstract implementation of a control to allow selection by the user of a value from a list.

@@ -6,10 +6,10 @@ import java.util.Set;
 
 import static com.garretwilson.util.SetUtilities.*;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.event.ActionEvent;
 import com.javaguise.event.ActionListener;
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
 
 /**Default implementation of a frame for communication of an option such as "OK" or "Cancel".

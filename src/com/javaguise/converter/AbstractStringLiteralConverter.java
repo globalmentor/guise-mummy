@@ -5,7 +5,8 @@ import java.util.Date;
 import java.util.Locale;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
-import com.javaguise.session.GuiseSession;
+
+import com.javaguise.GuiseSession;
 
 /**An abstract implementation an object that can convert a value from and to a string.
 @param <V> The value type this converter supports.

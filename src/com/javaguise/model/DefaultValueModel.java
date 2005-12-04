@@ -1,6 +1,6 @@
 package com.javaguise.model;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 import com.javaguise.validator.*;
 import com.garretwilson.lang.ObjectUtilities;
 

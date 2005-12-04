@@ -9,7 +9,7 @@ import static com.garretwilson.util.ArrayUtilities.*;
 import com.garretwilson.util.CollectionUtilities;
 import com.garretwilson.util.SynchronizedListDecorator;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**The default implementation of a table model.
 The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class. 

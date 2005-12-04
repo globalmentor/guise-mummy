@@ -2,9 +2,9 @@ package com.javaguise.component;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.geometry.Extent;
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 
 /**An option dialog frame displaying a message.
 @author Garret Wilson

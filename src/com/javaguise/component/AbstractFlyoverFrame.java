@@ -12,9 +12,9 @@ import static com.garretwilson.util.SetUtilities.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.geometry.CompassPoint;
 import com.javaguise.model.LabelModel;
-import com.javaguise.session.GuiseSession;
 
 /**Abstract implementation of a frame for flyovers.
 A flyover frame by default is nonmodal, immovable, and not resizable.

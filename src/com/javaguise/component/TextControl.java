@@ -8,11 +8,11 @@ import com.garretwilson.lang.ObjectUtilities;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.converter.*;
 import com.javaguise.event.AbstractGuisePropertyChangeListener;
 import com.javaguise.event.GuisePropertyChangeEvent;
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.Validator;
 
 /**Control to accept text input from the user representing a particular value type.

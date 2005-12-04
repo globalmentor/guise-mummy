@@ -3,9 +3,10 @@ package com.javaguise.component;
 import javax.mail.internet.ContentType;
 
 import static com.garretwilson.util.ArrayUtilities.*;
+
+import com.javaguise.GuiseSession;
 import com.javaguise.component.transfer.*;
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 
 /**A label component.
 This component installs a default export strategy supporting export of the following content types:

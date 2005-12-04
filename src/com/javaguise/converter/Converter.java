@@ -1,6 +1,6 @@
 package com.javaguise.converter;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**Indicates an object that can convert a value from and to its lexical form.
 @param <V> The value type this converter supports.

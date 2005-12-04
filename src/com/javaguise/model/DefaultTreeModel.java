@@ -1,7 +1,7 @@
 package com.javaguise.model;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.event.*;
-import com.javaguise.session.GuiseSession;
 
 /**A default implementation of a tree model.
 If no root node is specified, the root node will be a dummy root node that will not be displayed.

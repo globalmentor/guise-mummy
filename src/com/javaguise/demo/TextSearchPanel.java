@@ -5,6 +5,7 @@ import java.util.regex.*;
 
 import javax.mail.internet.ContentType;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
 import com.javaguise.event.AbstractGuisePropertyChangeListener;
@@ -13,7 +14,6 @@ import com.javaguise.event.GuisePropertyChangeEvent;
 import com.javaguise.model.MessageModel;
 import com.javaguise.model.ResourceImport;
 import com.javaguise.model.ValueModel;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.AbstractValidator;
 import com.javaguise.validator.ResourceImportValidator;
 import com.javaguise.validator.ValidationException;

@@ -2,7 +2,7 @@ package com.javaguise.converter;
 
 import java.util.Currency;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**A converter that converts a <code>Float</code> from and to a string literal.
 @author Garret Wilson

@@ -2,11 +2,11 @@ package com.javaguise.demo;
 
 import java.util.Arrays;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
 import com.javaguise.event.*;
 import com.javaguise.model.ActionModel;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.*;
 
 /**Login Guise demonstration panel.

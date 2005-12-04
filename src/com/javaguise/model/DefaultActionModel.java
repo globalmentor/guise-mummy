@@ -2,8 +2,8 @@ package com.javaguise.model;
 
 import java.util.Iterator;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.event.*;
-import com.javaguise.session.GuiseSession;
 
 /**A default implementation of a button model.
 @author Garret Wilson

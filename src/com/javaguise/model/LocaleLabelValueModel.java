@@ -4,7 +4,8 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
-import com.javaguise.session.GuiseSession;
+
+import com.javaguise.GuiseSession;
 
 /**A value model with a label that provides a localized version of a locale name.
 @param <V> The type of value contained in the model.

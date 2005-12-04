@@ -1,8 +1,8 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.event.*;
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.*;
 
 /**Action control that stores a boolean value in its model representing the selected state.

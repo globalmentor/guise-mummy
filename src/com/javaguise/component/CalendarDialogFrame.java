@@ -3,12 +3,12 @@ package com.javaguise.component;
 import java.text.DateFormat;
 import java.util.Date;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.event.AbstractGuisePropertyChangeListener;
 import com.javaguise.event.GuisePropertyChangeEvent;
 import com.javaguise.model.CalendarMonthTableModel;
 import com.javaguise.model.DefaultValueModel;
 import com.javaguise.model.ValueModel;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
 
 /**A dialog frame meant for accepting entry of a date.

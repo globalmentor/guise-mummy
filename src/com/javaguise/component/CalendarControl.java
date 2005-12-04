@@ -13,6 +13,7 @@ import com.garretwilson.util.Debug;
 import static com.garretwilson.lang.ClassUtilities.getPropertyName;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.Table.CellRepresentationStrategy;
 import com.javaguise.component.Table.DefaultCellMessageModel;
 import com.javaguise.component.Table.DefaultCellValueModel;
@@ -34,7 +35,6 @@ import com.javaguise.model.SingleListSelectionPolicy;
 import com.javaguise.model.TableColumnModel;
 import com.javaguise.model.TableModel;
 import com.javaguise.model.ValueModel;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
 import com.javaguise.validator.ValueRequiredValidator;
 

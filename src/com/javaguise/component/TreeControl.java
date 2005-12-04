@@ -6,8 +6,8 @@ import java.util.concurrent.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 
 /**A tree control.
 @author Garret Wilson

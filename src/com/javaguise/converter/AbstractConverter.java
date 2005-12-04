@@ -1,7 +1,7 @@
 package com.javaguise.converter;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 

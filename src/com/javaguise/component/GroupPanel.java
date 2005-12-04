@@ -1,9 +1,9 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.layout.*;
 import com.javaguise.model.DefaultLabelModel;
 import com.javaguise.model.LabelModel;
-import com.javaguise.session.GuiseSession;
 
 /**A panel for grouping multiple components with a default page flow layout.
 @author Garret Wilson

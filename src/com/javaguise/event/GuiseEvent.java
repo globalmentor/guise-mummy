@@ -2,7 +2,8 @@ package com.javaguise.event;
 
 import java.util.EventObject;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
+
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**The base class for all Guise events.

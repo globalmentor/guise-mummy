@@ -1,10 +1,10 @@
 package com.javaguise.demo;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
 
 import com.javaguise.model.DefaultLabelModel;
-import com.javaguise.session.GuiseSession;
 
 /**Tabs Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.

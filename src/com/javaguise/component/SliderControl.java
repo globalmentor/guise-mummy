@@ -8,12 +8,12 @@ import java.util.MissingResourceException;
 
 import com.garretwilson.lang.ObjectUtilities;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.layout.*;
 import com.javaguise.converter.AbstractStringLiteralConverter;
 import com.javaguise.converter.Converter;
 import com.javaguise.model.DefaultValueModel;
 import com.javaguise.model.ValueModel;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
 
 /**A value control that represents its value by a slider.

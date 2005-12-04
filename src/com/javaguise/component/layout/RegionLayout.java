@@ -2,9 +2,10 @@ package com.javaguise.component.layout;
 
 import java.util.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
+
+import com.javaguise.GuiseSession;
 import com.javaguise.component.Component;
 import com.javaguise.geometry.Extent;
-import com.javaguise.session.GuiseSession;
 
 /**A layout that defines locations of components in internationalized relative terms.
 This layout uses default constraints of {@link Region#CENTER}.

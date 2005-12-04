@@ -9,10 +9,10 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.Debug;
+import com.javaguise.GuiseSession;
 import com.javaguise.component.Component;
 import com.javaguise.component.Container;
 import com.javaguise.event.*;
-import com.javaguise.session.GuiseSession;
 
 /**Abstract implementation of layout information for a container.
 @param <T> The type of layout constraints associated with each component.

@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.garretwilson.util.ReverseIterator;
+import com.javaguise.GuiseSession;
 import com.javaguise.component.layout.*;
 import com.javaguise.event.ContainerEvent;
 import com.javaguise.event.ContainerListener;
@@ -13,7 +14,6 @@ import com.javaguise.event.PostponedContainerEvent;
 import com.javaguise.event.PostponedListEvent;
 import com.javaguise.model.ListSelectModel;
 import com.javaguise.model.Model;
-import com.javaguise.session.GuiseSession;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 

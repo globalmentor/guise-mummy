@@ -8,9 +8,9 @@ import static com.garretwilson.io.ContentTypeUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.util.ArrayUtilities.*;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.transfer.*;
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 
 /**An image component.
 This component installs a default export strategy supporting export of the following content types:

@@ -1,7 +1,7 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.model.ActionModel;
-import com.javaguise.session.GuiseSession;
 
 /**Abstract control with an action model.
 @author Garret Wilson

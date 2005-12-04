@@ -10,8 +10,8 @@ import javax.mail.internet.ContentType;
 
 import com.garretwilson.event.EventListenerManager;
 import com.garretwilson.lang.ObjectUtilities;
+import com.javaguise.GuiseSession;
 import com.javaguise.event.GuiseBoundPropertyObject;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
 import com.javaguise.validator.Validator;
 

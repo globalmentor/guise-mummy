@@ -1,7 +1,7 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 
 /**A heading component.
 @author Garret Wilson

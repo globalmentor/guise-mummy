@@ -1,8 +1,8 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.model.ActionModel;
 import com.javaguise.model.DefaultActionModel;
-import com.javaguise.session.GuiseSession;
 
 /**Control with an action model rendered as a link.
 @author Garret Wilson

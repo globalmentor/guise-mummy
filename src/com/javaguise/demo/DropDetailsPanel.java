@@ -4,10 +4,10 @@ import java.net.URI;
 
 import javax.mail.internet.ContentType;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
 import com.javaguise.component.transfer.*;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
 
 /**Drop Details Guise demonstration panel.

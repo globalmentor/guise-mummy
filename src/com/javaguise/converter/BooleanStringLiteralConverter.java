@@ -3,7 +3,7 @@ package com.javaguise.converter;
 import static com.javaguise.GuiseResourceConstants.*;
 import static java.text.MessageFormat.*;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**A converter that converts a <code>Boolean</code> from and to a string literal.
 @author Garret Wilson

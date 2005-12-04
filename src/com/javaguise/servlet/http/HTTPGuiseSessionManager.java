@@ -6,6 +6,7 @@ import static java.util.Collections.*;
 import javax.servlet.http.*;
 
 import com.javaguise.GuiseApplication;
+import com.javaguise.GuiseSession;
 
 /**Manages Guise sessions for an HTTP web application.
 Guise sessions are created and released in conjunction with associated HTTP servlet sessions.
@@ -27,7 +28,7 @@ public class HTTPGuiseSessionManager implements HttpSessionListener
 	@return The Guise session associated with the provided HTTP session.
 	@exception IllegalArgumentException if the provided HTTP session is not a session from this web application or the HTTP session has been invalidated, and there is therefore no corresponding Guise session.
 	*/
-	protected static HTTPServletGuiseSession getGuiseSession(final GuiseHTTPServlet.HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final HttpServletRequest httpRequest)
+	protected static GuiseSession getGuiseSession(final GuiseHTTPServlet.HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final HttpServletRequest httpRequest)
 	{
 		final HttpSession httpSession=httpRequest.getSession();	//get the current HTTP session from the HTTP request
 		guiseContainerMap.put(httpSession, guiseContainer);	//store our Guise container so we'll know with which container this session is associated (this servlet may serve many Guise applications in many Guise containers in the web application)
@@ -56,7 +57,7 @@ public class HTTPGuiseSessionManager implements HttpSessionListener
 			if(guiseContainer!=null)	//if we know the Guise container associated with this HTTP request
 			{
 				guiseContainerMap.remove(httpSession);	//remove the association between this HTTP session and the container
-				final HTTPServletGuiseSession guiseSession=guiseContainer.removeGuiseSession(httpSession);	//remove the Guise session associated with the HTTP session in the application
+				final GuiseSession guiseSession=guiseContainer.removeGuiseSession(httpSession);	//remove the Guise session associated with the HTTP session in the application
 				assert guiseSession!=null : "Guise container associated with HTTP session unexpectedly did not have an associated Guise session.";
 			}
 		}

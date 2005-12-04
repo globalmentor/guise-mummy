@@ -3,12 +3,12 @@ package com.javaguise.demo;
 import java.io.IOException;
 import java.util.*;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.event.*;
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.RegularExpressionStringValidator;
 
 /**Authorize Users Guise demonstration panel.

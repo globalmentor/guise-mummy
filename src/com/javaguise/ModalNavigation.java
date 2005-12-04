@@ -1,4 +1,4 @@
-package com.javaguise.session;
+package com.javaguise;
 
 import java.net.URI;
 

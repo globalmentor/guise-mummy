@@ -8,7 +8,8 @@ import java.util.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.text.CharacterConstants.*;
-import com.javaguise.session.GuiseSession;
+
+import com.javaguise.GuiseSession;
 
 /**An abstract implementation an object that can convert a number from and to a string.
 If the currency style is chosen, care should be taken to indicate a specific constant currency unless it is desired that the currency type change whenever the locale changes. 

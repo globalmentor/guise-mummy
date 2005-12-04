@@ -4,7 +4,7 @@ import java.util.MissingResourceException;
 
 import javax.mail.internet.ContentType;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 import com.garretwilson.lang.ObjectUtilities;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.text.TextUtilities.*;

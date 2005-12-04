@@ -1,7 +1,7 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.model.ActionValueModel;
-import com.javaguise.session.GuiseSession;
 
 /**Abstract implementation of an action control containing a value.
 @author Garret Wilson

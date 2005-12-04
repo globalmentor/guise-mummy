@@ -4,8 +4,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.model.Model;
-import com.javaguise.session.GuiseSession;
 
 /**An abstract implementation of a composite component.
 @author Garret Wilson

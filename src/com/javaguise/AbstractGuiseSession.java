@@ -1,4 +1,4 @@
-package com.javaguise.session;
+package com.javaguise;
 
 import java.beans.PropertyChangeEvent;
 import java.io.*;
@@ -12,7 +12,6 @@ import static java.util.Collections.*;
 
 import com.garretwilson.beans.*;
 import com.garretwilson.event.PostponedEvent;
-import com.javaguise.*;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.Orientation;
 import com.javaguise.context.GuiseContext;
@@ -713,6 +712,9 @@ Debug.trace("***ready to create navigation panel for path", path);
 			return !modalNavigationStack.isEmpty();	//we are modally navigating if there is one or more modal navigation states on the stack
 		}
 
+		/**@return The current modal navigation state, or <code>null</code> if there are no modal navigations.*/
+		public ModalNavigation getModalNavigation() {return peekModalNavigation();}
+
 		/**Begins modal interaction for a particular modal panel.
 		The modal navigation is pushed onto the stack, and an event is fired to the modal listener of the modal navigation.
 		@param <N> The type of navigation panel beginning navigation.
@@ -795,13 +797,18 @@ Debug.trace("***ready to create navigation panel for path", path);
 			return navigationPath;	//return the navigation path
 		}
 
-		/**Changes the navigation path of the session so that user interaction can change to another panel.
+		/**Changes the navigation path of the session.
+		This method does not actually cause navigation to occur.
 		If the given navigation path is the same as the current navigation path, no action occurs.
 		@param navigationPath The navigation path relative to the application context path.
 		@exception IllegalArgumentException if the provided path is absolute.
 		@exception IllegalArgumentException if the navigation path is not recognized (e.g. there is no panel bound to the navigation path).
+		@see #navigate(String)
+		@see #navigate(URI)
+		@see #navigateModal(String, ModalNavigationListener)
+		@see #navigateModal(URI, ModalNavigationListener)
 		*/
-		protected void setNavigationPath(final String navigationPath)
+		public void setNavigationPath(final String navigationPath)
 		{
 			if(!ObjectUtilities.equals(this.navigationPath, navigationPath))	//if the navigation path is really changing
 			{
@@ -817,10 +824,10 @@ Debug.trace("***ready to create navigation panel for path", path);
 	private Navigation requestedNavigation=null;
 
 		/**@return The requested navigation, or <code>null</code> if no navigation has been requested.*/
-		protected Navigation getRequestedNavigation() {return requestedNavigation;}
+		public Navigation getRequestedNavigation() {return requestedNavigation;}
 
 		/**Removes any requests for navigation.*/
-		protected void clearRequestedNavigation() {requestedNavigation=null;}
+		public void clearRequestedNavigation() {requestedNavigation=null;}
 
 		/**Requests navigation to the specified path.
 		The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
@@ -893,9 +900,10 @@ Debug.trace("***ready to create navigation panel for path", path);
 		public synchronized GuiseContext getContext() {return context;}
 
 		/**Sets the current context.
+		This method should not normally be called by application code.
 		@param context The current context for this session, or <code>null</code> if there currently is no context.
 		*/
-		protected synchronized void setContext(final GuiseContext context)
+		public synchronized void setContext(final GuiseContext context)
 		{
 			if(this.context!=context)	//if the context is really changing
 			{
@@ -971,19 +979,24 @@ Debug.trace("***ready to create navigation panel for path", path);
 			}
 		}
 
+
 	/**Called when the session is initialized.
+	@exception IllegalStateException if the session is already initialized.
 	@see #destroy()
 	*/
-	protected void initialize()
+	public void initialize()
 	{
+			//TODO check active state
 		getApplication().addPropertyChangeListener(GuiseApplication.RESOURCE_BUNDLE_BASE_NAME_PROPERTY, resourceBundleReleasePropertyValueChangeListener);	//when the application changes its resource bundle base name, release the resource bundle		
 	}
 
 	/**Called when the session is destroyed.
+	@exception IllegalStateException if the session has not yet been initialized or has already been destroyed.
 	@see #initialize()
 	*/
-	protected void destroy()
+	public void destroy()
 	{
+			//TODO check active state
 		getApplication().removePropertyChangeListener(GuiseApplication.RESOURCE_BUNDLE_BASE_NAME_PROPERTY, resourceBundleReleasePropertyValueChangeListener);	//stop listening for the application to change its resource bundle base name				
 	}
 

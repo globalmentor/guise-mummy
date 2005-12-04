@@ -1,9 +1,9 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.layout.Flow;
 import com.javaguise.converter.AbstractStringLiteralConverter;
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 

@@ -3,7 +3,7 @@ package com.javaguise.validator;
 import java.util.regex.Pattern;
 
 import com.garretwilson.util.Debug;
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**A character array validator that can validate against regular expressions.
 @author Garret Wilson

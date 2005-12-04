@@ -1,7 +1,7 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.model.ValueModel;
-import com.javaguise.session.GuiseSession;
 
 /**Abstract implementation of a frame meant for communication of a value.
 A dialog frame by default is modal and movable but not resizable.

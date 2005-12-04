@@ -3,12 +3,12 @@ package com.javaguise.demo;
 import java.util.Date;
 import java.util.Locale;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
 import com.javaguise.event.*;
 
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.*;
 
 /**Calendars Guise demonstration panel.

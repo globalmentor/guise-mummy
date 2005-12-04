@@ -7,13 +7,13 @@ import java.util.concurrent.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.garretwilson.util.EmptyIterator;
+import com.javaguise.GuiseSession;
 import com.javaguise.converter.AbstractStringLiteralConverter;
 import com.javaguise.converter.ConversionException;
 import com.javaguise.converter.Converter;
 import com.javaguise.event.AbstractGuisePropertyChangeListener;
 import com.javaguise.event.GuisePropertyChangeEvent;
 import com.javaguise.model.*;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.*;
 
 /**A table component.

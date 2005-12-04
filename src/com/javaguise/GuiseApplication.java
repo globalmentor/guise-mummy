@@ -11,7 +11,6 @@ import com.javaguise.component.*;
 import com.javaguise.component.kit.ComponentKit;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.*;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.view.View;
 
 import static com.garretwilson.lang.ClassUtilities.*;
@@ -120,6 +119,11 @@ public interface GuiseApplication extends PropertyBindable
 
 	/**@return The Guise container into which this application is installed, or <code>null</code> if the application is not yet installed.*/
 	public GuiseContainer getContainer();
+
+	/**Creates a new session for the application.
+	@return A new session for the application
+	*/
+	public GuiseSession createSession();
 
 	/**Creates a frame for the application.
 	@param session The Guise session that will own the application frame.

@@ -6,6 +6,7 @@ import java.util.*;
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.Debug;
+import com.javaguise.GuiseSession;
 import com.javaguise.component.layout.Corner;
 import com.javaguise.component.layout.Flow;
 import com.javaguise.component.layout.Orientation;
@@ -20,7 +21,6 @@ import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.checkNull;
 
 import com.javaguise.model.Model;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.style.Color;
 import com.javaguise.view.View;
 

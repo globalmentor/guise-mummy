@@ -8,9 +8,9 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.EmptyIterator;
 import com.garretwilson.util.ObjectIterator;
+import com.javaguise.GuiseSession;
 import com.javaguise.event.GuisePropertyChangeListener;
 import com.javaguise.model.LabelModel;
-import com.javaguise.session.GuiseSession;
 
 /**Abstract implementation of a frame.
 @author Garret Wilson

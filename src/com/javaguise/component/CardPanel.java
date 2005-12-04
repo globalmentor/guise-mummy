@@ -1,7 +1,7 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.layout.CardLayout;
-import com.javaguise.session.GuiseSession;
 
 /**A panel with a card layout.
 The panel's value model reflects the currently selected component, if any.

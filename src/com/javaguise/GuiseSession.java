@@ -1,4 +1,4 @@
-package com.javaguise.session;
+package com.javaguise;
 
 import java.net.URI;
 import java.security.Principal;
@@ -6,8 +6,6 @@ import java.util.*;
 
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.event.PostponedEvent;
-import com.javaguise.GuiseApplication;
-import com.javaguise.GuiseEnvironment;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.Orientation;
 import com.javaguise.context.GuiseContext;
@@ -240,6 +238,12 @@ public interface GuiseSession extends PropertyBindable
 	/**@return The current context for this session, or <code>null</code> if there currently is no context.*/
 	public GuiseContext getContext();
 
+	/**Sets the current context.
+	This method should not normally be called by application code.
+	@param context The current context for this session, or <code>null</code> if there currently is no context.
+	*/
+	public void setContext(final GuiseContext context);
+
 	/**Queues a postponed event to be fired after the context has finished processing events.
 	If a Guise context is currently processing events, the event will be queued for later.
 	If no Guise context is currently processing events, the event will be fired immediately.
@@ -270,6 +274,9 @@ public interface GuiseSession extends PropertyBindable
 	/**@return Whether the session is in a modal navigation state.*/
 	public boolean isModalNavigation();
 
+	/**@return The current modal navigation state, or <code>null</code> if there are no modal navigations.*/
+	public ModalNavigation getModalNavigation();
+
 	/**Begins modal interaction for a particular modal panel.
 	The modal navigation is pushed onto the stack, and an event is fired to the modal listener of the modal navigation.
 	@param <P> The type of navigation panel beginning navigation.
@@ -297,6 +304,25 @@ public interface GuiseSession extends PropertyBindable
 	@exception IllegalStateException if this message has been called before the navigation path has been initialized.
 	*/
 	public String getNavigationPath();
+
+	/**Changes the navigation path of the session.
+	This method does not actually cause navigation to occur.
+	If the given navigation path is the same as the current navigation path, no action occurs.
+	@param navigationPath The navigation path relative to the application context path.
+	@exception IllegalArgumentException if the provided path is absolute.
+	@exception IllegalArgumentException if the navigation path is not recognized (e.g. there is no panel bound to the navigation path).
+	@see #navigate(String)
+	@see #navigate(URI)
+	@see #navigateModal(String, ModalNavigationListener)
+	@see #navigateModal(URI, ModalNavigationListener)
+	*/
+	public void setNavigationPath(final String navigationPath);
+
+	/**@return The requested navigation, or <code>null</code> if no navigation has been requested.*/
+	public Navigation getRequestedNavigation();
+
+	/**Removes any requests for navigation.*/
+	public void clearRequestedNavigation();
 
 	/**Requests navigation to the specified path.
 	The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
@@ -340,5 +366,17 @@ public interface GuiseSession extends PropertyBindable
 
 	/**@return A new component ID appropriate for using with a new component.*/
 	public String generateComponentID();
+
+	/**Called when the session is initialized.
+	@exception IllegalStateException if the session is already initialized.
+	@see #destroy()
+	*/
+	public void initialize();
+
+	/**Called when the session is destroyed.
+	@exception IllegalStateException if the session has not yet been initialized or has already been destroyed.
+	@see #initialize()
+	*/
+	public void destroy();
 
 }

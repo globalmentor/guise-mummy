@@ -1,7 +1,8 @@
 package com.javaguise.validator;
 
 import java.util.regex.Pattern;
-import com.javaguise.session.GuiseSession;
+
+import com.javaguise.GuiseSession;
 
 /**A string validator that can validate against regular expressions.
 @author Garret Wilson

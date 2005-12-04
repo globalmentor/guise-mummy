@@ -1,8 +1,8 @@
 package com.javaguise.event;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.Component;
 import com.javaguise.component.Container;
-import com.javaguise.session.GuiseSession;
 
 /**An event indicating a container has been modified.
 If a single component was replaced both an added and removed compontent will be provided.

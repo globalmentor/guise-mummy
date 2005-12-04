@@ -2,7 +2,7 @@ package com.javaguise.component.layout;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**A layout that flows information along an axis.
 @param <T> The type of layout constraints associated with each component.

@@ -1,8 +1,8 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.model.DefaultMessageModel;
 import com.javaguise.model.MessageModel;
-import com.javaguise.session.GuiseSession;
 
 /**A message component.
 @author Garret Wilson

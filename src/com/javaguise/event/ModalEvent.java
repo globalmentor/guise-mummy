@@ -1,6 +1,6 @@
 package com.javaguise.event;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**An event indicating that a component changed modes.
 @param <S> The type of the event source.

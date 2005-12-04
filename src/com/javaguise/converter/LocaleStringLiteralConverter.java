@@ -5,7 +5,7 @@ import java.util.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.util.LocaleUtilities.*;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**An object that can convert a locale to a string using the current locale.
 This implementation does not support conversion of a literal value to a locale.

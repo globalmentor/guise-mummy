@@ -6,8 +6,8 @@ import static java.util.Collections.*;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.*;
+import com.javaguise.GuiseSession;
 import com.javaguise.event.*;
-import com.javaguise.session.GuiseSession;
 import com.javaguise.validator.ValidationException;
 import com.javaguise.validator.Validator;
 

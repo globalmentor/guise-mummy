@@ -1,8 +1,8 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.model.ActionModel;
 import com.javaguise.model.DefaultActionModel;
-import com.javaguise.session.GuiseSession;
 
 /**Control with an action model rendered as a button.
 If an image is specified, it will be used instead of the button label, if possible.

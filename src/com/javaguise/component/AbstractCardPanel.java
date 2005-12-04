@@ -2,11 +2,11 @@ package com.javaguise.component;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.ListSelectControl.ValueRepresentationStrategy;
 import com.javaguise.component.layout.CardLayout;
 import com.javaguise.model.LabelModel;
 import com.javaguise.model.ListSelectModel;
-import com.javaguise.session.GuiseSession;
 
 /**An abstract panel with a card layout.
 The panel's model reflects the currently selected component, if any.

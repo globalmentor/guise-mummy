@@ -1,8 +1,8 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.layout.Layout;
 import com.javaguise.model.LabelModel;
-import com.javaguise.session.GuiseSession;
 import com.garretwilson.lang.ObjectUtilities;
 
 /**Abstract implementation of a modal navigation panel.

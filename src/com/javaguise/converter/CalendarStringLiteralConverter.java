@@ -3,7 +3,7 @@ package com.javaguise.converter;
 import java.text.*;
 import java.util.*;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**An object that can convert a calendar from and to a string.
 @author Garret Wilson

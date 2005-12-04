@@ -1,9 +1,9 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.layout.*;
 import com.javaguise.model.DefaultModel;
 import com.javaguise.model.Model;
-import com.javaguise.session.GuiseSession;
 
 /**A general panel with a default page flow layout.
 @author Garret Wilson

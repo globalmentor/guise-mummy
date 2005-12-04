@@ -1,6 +1,6 @@
 package com.javaguise.event;
 
-import com.javaguise.session.GuiseSession;
+import com.javaguise.GuiseSession;
 
 /**An event indicating an action should take place.
 @param <S> The type of the event source.

@@ -1,8 +1,8 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.model.DefaultValueModel;
 import com.javaguise.model.ValueModel;
-import com.javaguise.session.GuiseSession;
 
 /**Default implementation of a frame meant for communication of a value.
 @param <V> The value to be communicated.

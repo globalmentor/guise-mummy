@@ -1,8 +1,8 @@
 package com.javaguise.component;
 
+import com.javaguise.GuiseSession;
 import com.javaguise.component.layout.*;
 import com.javaguise.model.Model;
-import com.javaguise.session.GuiseSession;
 
 /**An abstract base class for boxes.
 @author Garret Wilson
