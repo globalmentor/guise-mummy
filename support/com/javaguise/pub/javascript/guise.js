@@ -955,6 +955,7 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 	*/ 
 	appendXMLAttribute:function(stringBuilder, attributeName, attributeValue)
 	{
+			//TODO assert attributeValue!=null, which will happen if we try to serialize an IE element; fix further up the call stack by representing null attributes
 		return stringBuilder.append(" ").append(attributeName).append("=\"").append(this.encodeXML(attributeValue.toString())).append("\"");	//name="value"
 	},
 
@@ -1913,6 +1914,15 @@ alert("child node "+i+" is of type "+childNode.nodeType+" with name "+childNode.
 					{
 //TODO del alert("ready to clone node: "+DOMUtilities.getNodeString(childNode));
 						var importedNode=document.importNode(childNode, true);	//create an import clone of the node
+						if(!importedNode)	//TODO check and improve big IE hack
+						{
+//TODO del							alert("big problem importing node: "+DOMUtilities.getNodeString(childNode));	//TODO fix importnode
+							var dummyNode=document.createElement("div");	//create a dummy node
+//TODO fix							document.documentElement.appendChild(dummyNode);	//append the dummy node to the document
+							dummyNode.innerHTML=DOMUtilities.getNodeString(childNode);	//convert the child node to a string and assign it to the dummy node
+							importedNode=dummyNode.removeChild(dummyNode.childNodes[0]);	//remove the dummy node's first and only node, which is our new imported node
+//TODO fix							document.documentElement.removeChild(dummyNode);	//throw away the dummy node
+						}
 						oldElement.appendChild(importedNode);	//append the imported node to the old element
 						initializeNode(importedNode);	//initialize the new imported node, installing the correct event handlers
 					}
@@ -3441,7 +3451,7 @@ function onMouse(event)
 	var target=event.currentTarget;	//get the target of the event
 		//if the mouse is supposedly leaving the element, make sure it's not just moving to a child element, and vice versa (see http://www.quirksmode.org/js/events_mouse.html#mouseover)
 	var otherTarget=event.relatedTarget;	//see which element the mouse is going to or from
-	while(otherTarget!=document.documentElement)	//while we haven't reached the top of the DOM
+	while(otherTarget && otherTarget!=document.documentElement)	//while we haven't reached the top of the DOM TODO find out why otherTarget can be null in IE
 	{
 		if(otherTarget==target)	//if the mouse is still over the original element
 		{
@@ -3762,10 +3772,19 @@ function getFocusableDescendant(node)
 {
 //TODO del	alert("node has focus type of: "+(typeof node.focus));
 //TODO del	if(node.focus)	//if we can focus this node
+	if(node.currentStyle)	//if this node has current style information (IE only) TODO add code for Mozilla
+	{
+//TODO del alert("node "+node.id+" has current style visibility "+node.currentStyle.visibility+" display "+node.currentStyle.display);
+		if(node.currentStyle.visibility=="hidden" || node.currentStyle.display=="none")	//if the stylesheet set this node to hidden or not displayed; at least this keeps elements from being found that are not focusable by IE (Mozilla allows focusing of hidden and non-displayed elements)
+		{
+			return null;	//neither this node nor any of its descendants should be focused
+		}
+	}
 	var nodeName=node.nodeName.toLowerCase();
 	if(FOCUSABLE_ELEMENT_NAMES.contains(nodeName))	//if this is a focusable node
 	{
-		if((!node.style || node.style.visibility!="hidden") && !node.disabled)	//make sure the node is not hidden or disabled TODO add check for display: none
+			//TODO add a check for computed styles
+		if((!node.style || (node.style.visibility!="hidden" && node.style.display!="none")) && !node.disabled)	//make sure the node is not hidden or disabled
 		{
 			if(nodeName!="input" || node.type!="hidden")	//make this isn't a hidden input
 			{

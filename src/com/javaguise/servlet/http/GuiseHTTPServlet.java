@@ -34,7 +34,6 @@ import com.javaguise.model.FileItemResourceImport;
 import com.javaguise.model.Model;
 import com.javaguise.platform.web.*;
 import static com.javaguise.platform.web.WebPlatformConstants.*;
-import com.javaguise.session.*;
 import com.javaguise.validator.*;
 import com.javaguise.view.text.xml.xhtml.XHTMLApplicationFrameView;
 import com.javaguise.view.text.xml.xhtml.XHTMLNavigationPanelView;
