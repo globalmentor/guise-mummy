@@ -271,7 +271,9 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 	}
 
 	/**A default table cell representation strategy.
-	A message component will be generated using the cell's value as its message.
+	Component values will be represented as themselves.
+	For non-editable cells, a message component will be generated using the cell's value as its message.
+	Editable cells will be represented using a checkbox for boolean values and a text control for all other values.
 	The message's ID will be in the form "<var>tableID</var>.cell-<var>rowIndex</var>-<var>columnIndex</var>".
 	@param <V> The type of value the strategy is to represent.
 	@see Message
@@ -322,13 +324,17 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 		{
 			final GuiseSession session=getSession();	//get the session
 			final TableModel.Cell<C> cell=new TableModel.Cell<C>(rowIndex, column);	//create a cell to represent the row and column
+			final Class<C> valueClass=column.getValueClass();	//get the value class of the column
+			if(Component.class.isAssignableFrom(valueClass))	//if a component is being represented
+			{
+				return (Component<?>)model.getCellValue(cell);	//return the value as a component TODO find a way to update the cached component if it changes
+			}
 			final int columnIndex=model.getColumnIndex(column);	//get the logical index of the given column
 			final String idSegment=new StringBuilder("cell-").append(rowIndex).append('-').append(columnIndex).toString();	//generate an ID for this row and column
 			final String id=table.createID(idSegment);	//create an ID for the new component
 			if(editable)	//if the component should be editable
 			{
 				final ValueModel<C> valueModel=new DefaultCellValueModel<C>(session, model, cell);	//create a new value model for the cell
-				final Class<C> valueClass=column.getValueClass();	//get the value class of the column
 				if(Boolean.class.isAssignableFrom(valueClass))	//if the value class is subclass of Boolean
 				{
 					return new CheckControl(session, id, (ValueModel<Boolean>)(Object)valueModel);	//create a new check control for the Boolean value model TODO find out why JDK 1.5.0_03 requires the intermediate Object cast

@@ -9,7 +9,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class. 
 @author Garret Wilson
 */
-public interface TableModel extends ControlModel
+public interface TableModel extends ControlModel	//TODO maybe specify row count to be a bound property 
 {
 
 	/**@return Whether the table is editable and the cells will allow the the user to change their values, if their respective columns are designated as editable as well.*/
