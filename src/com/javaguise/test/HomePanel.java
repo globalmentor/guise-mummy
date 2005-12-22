@@ -121,6 +121,7 @@ public class HomePanel extends DefaultNavigationPanel
 //TODO del when works		inputTextControl.addMouseListener(new TextControl.DefaultFlyoverStrategy<TextControl>(inputTextControl));
 		
 		inputPanel.add(inputTextControl);	//add the input control to the input panel
+		
 		final TextControl<Float> outputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
 		outputTextControl.getModel().setLabel("Double the Number");	//add a label to the text output control
 		outputTextControl.getModel().setEditable(false);	//set the text output control to read-only so that the user cannot modify it

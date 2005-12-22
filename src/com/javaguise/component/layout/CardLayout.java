@@ -399,25 +399,39 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints>
 			}
 		}
 		
+		//TODO make sure the list and selection events are firedd
+		
 		/**Adds a list listener.
 		@param listListener The list listener to add.
 		*/
-		public void addListListener(final ListListener<ListSelectModel<Component<?>>, Component<?>> listListener) {throw new UnsupportedOperationException();}
+		public void addListListener(final ListListener<ListSelectModel<Component<?>>, Component<?>> listListener)
+		{
+			getEventListenerManager().add(ListListener.class, listListener);	//add the listener
+		}
 
 		/**Removes a list listener.
 		@param listListener The list listener to remove.
 		*/
-		public void removeListListener(final ListListener<ListSelectModel<Component<?>>, Component<?>> listListener) {throw new UnsupportedOperationException();}
+		public void removeListListener(final ListListener<ListSelectModel<Component<?>>, Component<?>> listListener)
+		{
+			getEventListenerManager().remove(ListListener.class, listListener);	//remove the listener
+		}
 
 		/**Adds a list selection listener.
 		@param selectionListener The selection listener to add.
 		*/
-		public void addListSelectionListener(final ListSelectionListener<Component<?>> selectionListener) {throw new UnsupportedOperationException();}
+		public void addListSelectionListener(final ListSelectionListener<Component<?>> selectionListener)
+		{
+			getEventListenerManager().add(ListSelectionListener.class, selectionListener);	//add the listener
+		}
 
 		/**Removes a list selection listener.
 		@param selectionListener The selection listener to remove.
 		*/
-		public void removeListSelectionListener(final ListSelectionListener<Component<?>> selectionListener) {throw new UnsupportedOperationException();}
+		public void removeListSelectionListener(final ListSelectionListener<Component<?>> selectionListener)
+		{
+			getEventListenerManager().remove(ListSelectionListener.class, selectionListener);	//remove the listener
+		}
 	
 			//List methods
 		
