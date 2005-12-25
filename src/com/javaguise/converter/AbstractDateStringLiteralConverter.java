@@ -1,6 +1,5 @@
 package com.javaguise.converter;
 
-import static com.javaguise.GuiseResourceConstants.*;
 import static java.text.MessageFormat.*;
 
 import java.text.*;
@@ -211,7 +210,7 @@ public abstract class AbstractDateStringLiteralConverter<V> extends AbstractConv
 			}
 			if(parsePosition.getIndex()<literal.length())	//if the whole string wasn't parsed, we'll consider that an error (either there was an error, in which case the index is zero, or part of the string was ignored)
 			{
-				throw new ConversionException(format(getSession().getStringResource(VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE), literal), literal);	//TODO use a converter message resource
+				throw new ConversionException(format(getInvalidValueMessage(), literal), literal);
 			}
 			return date;	//return the date we parsed
 		}			

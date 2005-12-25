@@ -409,6 +409,30 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			}
 		}
 
+		/**Determines a string value either explicitly set or stored in the resources.
+		If a value is explicitly specified, it will be used; otherwise, a value will be loaded from the resources if possible.
+		@param value The value explicitly set, which will override any resource.
+		@param resourceKey The key for looking up a resource if no value is explicitly set.
+		@return The string value, or <code>null</code> if there is no value available, neither explicitly set nor in the resources.
+		@exception MissingResourceException if there was an error loading the value from the resources.
+		@see #getStringResource(String)
+		*/
+		public String determineString(final String value, final String resourceKey) throws MissingResourceException
+		{
+			if(value!=null)	//if a value is provided
+			{
+				return value;	//return the specified value
+			}
+			else if(resourceKey!=null)	//if no value is provided, but if a resource key is provided
+			{
+				return getStringResource(resourceKey);	//lookup the value from the resources 
+			}
+			else	//if neither a value nor a resource key are provided
+			{
+				return null;	//there is no value available
+			}
+		}
+
 		/**Retrieves a <code>Boolean</code> resource from the resource bundle.
 		If the given resource is a string, it will be interpreted according to the {@link Boolean#valueOf(java.lang.String)} rules.
 		This is a preferred convenience method for accessing the resources in the session's resource bundle.
@@ -616,7 +640,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 					{
 						try
 						{
-Debug.trace("***ready to create navigation panel for path", path);
+//TODO del Debug.trace("***ready to create navigation panel for path", path);
 							final String panelID=createName(path);	//convert the path to a valid ID TODO use a Guise-specific routine or, better yet, bind an ID with the panel
 							panel=panelClass.getConstructor(GuiseSession.class, String.class).newInstance(this, panelID);	//find the Guise session and ID constructor and create an instance of the class
 						}

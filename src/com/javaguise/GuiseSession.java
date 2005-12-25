@@ -145,6 +145,16 @@ public interface GuiseSession extends PropertyBindable
 	*/
 	public String getStringResource(final String resourceKey, final String defaultValue) throws MissingResourceException;
 
+	/**Determines a string value either explicitly set or stored in the resources.
+	If a value is explicitly specified, it will be used; otherwise, a value will be loaded from the resources if possible.
+	@param value The value explicitly set, which will override any resource.
+	@param resourceKey The key for looking up a resource if no value is explicitly set.
+	@return The string value, or <code>null</code> if there is no value available, neither explicitly set nor in the resources.
+	@exception MissingResourceException if there was an error loading the value from the resources.
+	@see #getStringResource(String)
+	*/
+	public String determineString(final String value, final String resourceKey) throws MissingResourceException;
+
 	/**Retrieves a <code>Boolean</code> resource from the resource bundle.
 	If the given resource is a string, it will be interpreted according to the {@link Boolean#valueOf(java.lang.String)} rules.
 	This is a preferred convenience method for accessing the resources in the session's resource bundle.

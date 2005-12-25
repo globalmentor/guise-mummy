@@ -277,7 +277,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints>
 				{
 					throw new IllegalStateException("Layout does not have container.");
 				}
-				if(newValue!=null && !container.contains(newValue))	//if there is a new component that isn't contained in the contianer
+				if(newValue!=null && !container.contains(newValue))	//if there is a new component that isn't contained in the container
 				{
 					throw new ValidationException(format(getSession().getStringResource(VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE), newValue.toString()), newValue);						
 				}

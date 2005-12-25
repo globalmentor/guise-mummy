@@ -3,23 +3,18 @@ package com.javaguise.validator;
 import static java.text.MessageFormat.*;
 import static com.javaguise.GuiseResourceConstants.*;
 
-import com.javaguise.GuiseSession;
-import com.garretwilson.util.Debug;
+import java.util.MissingResourceException;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import com.javaguise.GuiseSession;
+import com.javaguise.event.GuiseBoundPropertyObject;
+import com.garretwilson.lang.ObjectUtilities;
 
 /**An abstract implementation of an object that can determine whether a value is valid.
 @param <V> The value type this validator supports.
 @author Garret Wilson
 */
-public abstract class AbstractValidator<V> implements Validator<V>
+public abstract class AbstractValidator<V> extends GuiseBoundPropertyObject implements Validator<V>
 {
-
-	/**The Guise session that owns this validator.*/
-	private final GuiseSession session;
-
-		/**@return The Guise session that owns this validator.*/
-		public GuiseSession getSession() {return session;}
 
 	/**Whether the value must be non-<code>null</code> in order to be considered valid.*/
 	private boolean valueRequired; 
@@ -27,6 +22,57 @@ public abstract class AbstractValidator<V> implements Validator<V>
 		/**@return Whether the value must be non-<code>null</code> in order to be considered valid.*/
 		public boolean isValueRequired() {return valueRequired;} 
 
+	/**The invalid value message text, or <code>null</code> if there is no message text.*/
+	private String invalidValueMessage=null;
+
+		/**Determines the text of the invalid value message.
+		If a message is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
+		@return The invalid value message text, or <code>null</code> if there is no invalid value message text.
+		@exception MissingResourceException if there was an error loading the value from the resources.
+		@see #getInvalidValueMessageResourceKey()
+		*/
+		public String getInvalidValueMessage() throws MissingResourceException
+		{
+			return getSession().determineString(invalidValueMessage, getInvalidValueMessageResourceKey());	//get the value or the resource, if available
+		}
+
+		/**Sets the text of the invalid value message.
+		This is a bound property.
+		@param newInvalidValueMessage The new text of the invalid value message.
+		@see Validator#INVALID_VALUE_MESSAGE_PROPERTY
+		*/
+		public void setInvalidValueMessage(final String newInvalidValueMessage)
+		{
+			if(!ObjectUtilities.equals(invalidValueMessage, newInvalidValueMessage))	//if the value is really changing
+			{
+				final String oldInvalidValueMessage=invalidValueMessage;	//get the old value
+				invalidValueMessage=newInvalidValueMessage;	//actually change the value
+				firePropertyChange(INVALID_VALUE_MESSAGE_PROPERTY, oldInvalidValueMessage, newInvalidValueMessage);	//indicate that the value changed
+			}			
+		}
+
+	/**The invalid value message text resource key, or <code>null</code> if there is no invalid value message text resource specified.*/
+	private String invalidValueMessageResourceKey=VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE;
+
+		/**@return The invalid value message text resource key, or <code>null</code> if there is no invalid value message text resource specified.*/
+		public String getInvalidValueMessageResourceKey() {return invalidValueMessageResourceKey;}
+
+		/**Sets the key identifying the text of the invalid value message in the resources.
+		This property defaults to {@link VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE}.
+		This is a bound property.
+		@param newInvalidValueMessageResourceKey The new invalid value message text resource key.
+		@see Validator#INVALID_VALUE_MESSAGE_RESOURCE_KEY_PROPERTY
+		*/
+		public void setInvalidValueMessageResourceKey(final String newInvalidValueMessageResourceKey)
+		{
+			if(!ObjectUtilities.equals(invalidValueMessageResourceKey, newInvalidValueMessageResourceKey))	//if the value is really changing
+			{
+				final String oldInvalidValueMessageResourceKey=invalidValueMessageResourceKey;	//get the old value
+				invalidValueMessageResourceKey=newInvalidValueMessageResourceKey;	//actually change the value
+				firePropertyChange(INVALID_VALUE_MESSAGE_RESOURCE_KEY_PROPERTY, oldInvalidValueMessageResourceKey, newInvalidValueMessageResourceKey);	//indicate that the value changed
+			}
+		}
+		
 	/**Session constructor with no value required.
 	@param session The Guise session that owns this validator.
 	@exception NullPointerException if the given session is <code>null</code>.
@@ -43,7 +89,7 @@ public abstract class AbstractValidator<V> implements Validator<V>
 	*/
 	public AbstractValidator(final GuiseSession session, final boolean valueRequired)
 	{
-		this.session=checkNull(session, "Session cannot be null");	//save the session
+		super(session);	//construct the parent class
 		this.valueRequired=valueRequired;	//save the value required specification
 	}
 
@@ -61,7 +107,7 @@ public abstract class AbstractValidator<V> implements Validator<V>
 			}
 			else	//for all other invalid values
 			{
-				throw new ValidationException(format(getSession().getStringResource(VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE), toString(value)), value);
+				throw new ValidationException(format(getSession().getStringResource(getInvalidValueMessage()), toString(value)), value);
 			}
 		}
 	}

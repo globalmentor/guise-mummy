@@ -13,7 +13,6 @@ import com.garretwilson.lang.ObjectUtilities;
 import com.javaguise.GuiseSession;
 import com.javaguise.event.GuiseBoundPropertyObject;
 import com.javaguise.validator.ValidationException;
-import com.javaguise.validator.Validator;
 
 /**A base abstract class implementing helpful functionality for models.
 @author Garret Wilson
@@ -230,7 +229,7 @@ public abstract class AbstractModel extends GuiseBoundPropertyObject implements 
 	@return The string value, or <code>null</code> if there is no value available, neither explicitly set nor in the resources.
 	@exception MissingResourceException if there was an error loading the value from the resources.
 	*/
-	protected String getString(final String value, final String resourceKey) throws MissingResourceException
+	protected String getString(final String value, final String resourceKey) throws MissingResourceException	//TODO replace with new session method determineString()
 	{
 		if(value!=null)	//if a value is provided
 		{

@@ -1,6 +1,5 @@
 package com.javaguise.converter;
 
-import static com.javaguise.GuiseResourceConstants.*;
 import static java.text.MessageFormat.*;
 
 import com.javaguise.GuiseSession;
@@ -34,7 +33,7 @@ public class IntegerStringLiteralConverter extends AbstractStringLiteralConverte
 		}
 		catch(final NumberFormatException numberFormatException)	//if the string does not contain a valid Integer
 		{
-			throw new ConversionException(format(getSession().getStringResource(VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE), literal), literal);	//TODO use a converter message resource
+			throw new ConversionException(format(getInvalidValueMessage(), literal), literal);
 		}
 	}
 }

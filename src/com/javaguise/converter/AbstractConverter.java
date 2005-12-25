@@ -1,23 +1,20 @@
 package com.javaguise.converter;
 
+import java.util.MissingResourceException;
+
 import com.garretwilson.lang.ObjectUtilities;
 import com.javaguise.GuiseSession;
+import com.javaguise.event.GuiseBoundPropertyObject;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.javaguise.GuiseResourceConstants.*;
 
 /**An abstract implementation an object that can convert a value from and to its lexical form.
 @param <V> The value type this converter supports.
 @param <L> The literal type of the lexical form of the value.
 @author Garret Wilson
 */
-public abstract class AbstractConverter<V, L> implements Converter<V, L>
+public abstract class AbstractConverter<V, L> extends GuiseBoundPropertyObject implements Converter<V, L>
 {
-
-	/**The Guise session that owns this converter.*/
-	private final GuiseSession session;
-
-		/**@return The Guise session that owns this converter.*/
-		public GuiseSession getSession() {return session;}
 
 	/**Session constructor.
 	@param session The Guise session that owns this converter.
@@ -25,8 +22,59 @@ public abstract class AbstractConverter<V, L> implements Converter<V, L>
 	*/
 	public AbstractConverter(final GuiseSession session)
 	{
-		this.session=checkNull(session, "Session cannot be null");	//save the session
+		super(session);
 	}
+
+	/**The invalid value message text, or <code>null</code> if there is no message text.*/
+	private String invalidValueMessage=null;
+
+		/**Determines the text of the invalid value message.
+		If a message is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
+		@return The invalid value message text, or <code>null</code> if there is no invalid value message text.
+		@exception MissingResourceException if there was an error loading the value from the resources.
+		@see #getInvalidValueMessageResourceKey()
+		*/
+		public String getInvalidValueMessage() throws MissingResourceException
+		{
+			return getSession().determineString(invalidValueMessage, getInvalidValueMessageResourceKey());	//get the value or the resource, if available
+		}
+
+		/**Sets the text of the invalid value message.
+		This is a bound property.
+		@param newInvalidValueMessage The new text of the invalid value message.
+		@see Converter#INVALID_VALUE_MESSAGE_PROPERTY
+		*/
+		public void setInvalidValueMessage(final String newInvalidValueMessage)
+		{
+			if(!ObjectUtilities.equals(invalidValueMessage, newInvalidValueMessage))	//if the value is really changing
+			{
+				final String oldInvalidValueMessage=invalidValueMessage;	//get the old value
+				invalidValueMessage=newInvalidValueMessage;	//actually change the value
+				firePropertyChange(INVALID_VALUE_MESSAGE_PROPERTY, oldInvalidValueMessage, newInvalidValueMessage);	//indicate that the value changed
+			}			
+		}
+
+	/**The invalid value message text resource key, or <code>null</code> if there is no invalid value message text resource specified.*/
+	private String invalidValueMessageResourceKey=CONVERTER_INVALID_VALUE_MESSAGE_RESOURCE;
+
+		/**@return The invalid value message text resource key, or <code>null</code> if there is no invalid value message text resource specified.*/
+		public String getInvalidValueMessageResourceKey() {return invalidValueMessageResourceKey;}
+
+		/**Sets the key identifying the text of the invalid value message in the resources.
+		This property defaults to {@link CONVERTER_INVALID_VALUE_MESSAGE_RESOURCE}.
+		This is a bound property.
+		@param newInvalidValueMessageResourceKey The new invalid value message text resource key.
+		@see Converter#INVALID_VALUE_MESSAGE_RESOURCE_KEY_PROPERTY
+		*/
+		public void setInvalidValueMessageResourceKey(final String newInvalidValueMessageResourceKey)
+		{
+			if(!ObjectUtilities.equals(invalidValueMessageResourceKey, newInvalidValueMessageResourceKey))	//if the value is really changing
+			{
+				final String oldInvalidValueMessageResourceKey=invalidValueMessageResourceKey;	//get the old value
+				invalidValueMessageResourceKey=newInvalidValueMessageResourceKey;	//actually change the value
+				firePropertyChange(INVALID_VALUE_MESSAGE_RESOURCE_KEY_PROPERTY, oldInvalidValueMessageResourceKey, newInvalidValueMessageResourceKey);	//indicate that the value changed
+			}
+		}
 
 	/**Determines whether a given literal value in the lexical space can be converted to a value in the value space.
 	This implementation attempts to convert the literal value and returns <code>false</code> if conversion is unsuccessful.

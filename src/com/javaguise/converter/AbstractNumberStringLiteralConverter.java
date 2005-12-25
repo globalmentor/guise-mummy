@@ -1,6 +1,5 @@
 package com.javaguise.converter;
 
-import static com.javaguise.GuiseResourceConstants.*;
 import static java.text.MessageFormat.*;
 
 import java.text.*;
@@ -181,7 +180,7 @@ public abstract class AbstractNumberStringLiteralConverter<V extends Number> ext
 			}
 			if(parsePosition.getIndex()<literal.length())	//if the whole string wasn't parsed, we'll consider that an error (either there was an error, in which case the index is zero, or part of the string was ignored)
 			{
-				throw new ConversionException(format(getSession().getStringResource(VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE), literal), literal);	//TODO use a converter message resource
+				throw new ConversionException(format(getInvalidValueMessage(), literal), literal);
 			}
 			return number;	//return the number we parsed
 		}
