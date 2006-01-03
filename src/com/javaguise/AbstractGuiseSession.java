@@ -280,12 +280,12 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		/**The property value change listener that, in response to a change in value, releases the resource bundle.
 		@see #releaseResourceBundle()
 		*/
-		private final GuisePropertyChangeListener<GuiseApplication, String> resourceBundleReleasePropertyValueChangeListener=new AbstractGuisePropertyChangeListener<GuiseApplication, String>()
+		private final GuisePropertyChangeListener<String> resourceBundleReleasePropertyValueChangeListener=new AbstractGuisePropertyChangeListener<String>()
 			{
 				/**Called when a bound property is changed.
 				@param propertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
 				*/
-				public void propertyChange(final GuisePropertyChangeEvent<GuiseApplication, String> propertyChangeEvent)
+				public void propertyChange(final GuisePropertyChangeEvent<String> propertyChangeEvent)
 				{
 					releaseResourceBundle();	//release the resource bundle, as the new locale may indicate that new resources should be used					
 				}
@@ -300,7 +300,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@exception NullPointerException if the provided resource key is <code>null</code>.
 		@exception MissingResourceException if no resource could be found associated with the given key.
 		@see #getResourceBundle()
-		@see #getResource(String, T)
+		@see #getResource(String, Object)
 		*/
 		@SuppressWarnings("unchecked")
 		public <T> T getResource(final String resourceKey) throws MissingResourceException
@@ -1068,12 +1068,12 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	/**The class that listens for context state changes and updates the context state set in response.
 	@author Garret Wilson
 	*/
-	protected class ContextStateListener extends AbstractGuisePropertyChangeListener<GuiseSession, GuiseContext.State>
+	protected class ContextStateListener extends AbstractGuisePropertyChangeListener<GuiseContext.State>
 	{
 		/**Called when a bound property is changed.
 		@param propertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
 		*/
-		public void propertyChange(final GuisePropertyChangeEvent<GuiseSession, GuiseContext.State> propertyChangeEvent)
+		public void propertyChange(final GuisePropertyChangeEvent<GuiseContext.State> propertyChangeEvent)
 		{
 			updateContextStates();	//update the context states when a context state changes
 		}

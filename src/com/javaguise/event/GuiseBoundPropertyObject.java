@@ -47,7 +47,7 @@ public class GuiseBoundPropertyObject extends BoundPropertyObject
 		{
 			if(!ObjectUtilities.equals(oldValue, newValue))	//if the values are different
 			{					
-				firePropertyChange(new GuisePropertyChangeEvent<GuiseBoundPropertyObject, V>(this, propertyName, oldValue, newValue));	//create and fire a genericized subclass of a property change event
+				firePropertyChange(new GuisePropertyChangeEvent<V>(this, propertyName, oldValue, newValue));	//create and fire a genericized subclass of a property change event
 			}
 		}
 	}

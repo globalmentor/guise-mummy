@@ -37,9 +37,9 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 		temperatureInput=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
 		temperatureInput.getModel().setLabel("Input Temperature");	//add a label to the text input control
 		temperatureInput.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
-		temperatureInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ValueModel<Float>, Float>()	//listen for temperature changes
+		temperatureInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Float>()	//listen for temperature changes
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<ValueModel<Float>, Float> propertyChangeEvent)	//if the input temperature changes
+					public void propertyChange(final GuisePropertyChangeEvent<Float> propertyChangeEvent)	//if the input temperature changes
 					{
 						convertTemperature();	//convert the temperature						
 					}
@@ -76,9 +76,9 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 		conversionPanel.add(scalePanel);	//add the scale panel to the conversion panel
 
 			//create a listener to listen for check control changes and update the temperature immediately (e.g. with AJAX on the web platform)
-		final GuisePropertyChangeListener<ValueModel<Boolean>, Boolean> checkControlListener=new AbstractGuisePropertyChangeListener<ValueModel<Boolean>, Boolean>()
+		final GuisePropertyChangeListener<Boolean> checkControlListener=new AbstractGuisePropertyChangeListener<Boolean>()
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<ValueModel<Boolean>, Boolean> propertyChangeEvent)
+					public void propertyChange(final GuisePropertyChangeEvent<Boolean> propertyChangeEvent)
 					{
 						if(propertyChangeEvent.getNewValue())	//if this check control was selected
 						{

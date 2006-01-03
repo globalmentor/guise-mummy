@@ -10,7 +10,7 @@ When value models are added to the list, the group adds itself as a property val
 @author Garret Wilson.
 @see com.javaguise.model.ValueModel
 */
-public abstract class ValuePolicyModelGroup<V> extends AbstractModelGroup<ValueModel<V>> implements GuisePropertyChangeListener<ValueModel<V>, V>
+public abstract class ValuePolicyModelGroup<V> extends AbstractModelGroup<ValueModel<V>> implements GuisePropertyChangeListener<V>
 {
 
 	/**Actual implementation of adding a model to the group.
@@ -42,7 +42,7 @@ public abstract class ValuePolicyModelGroup<V> extends AbstractModelGroup<ValueM
 	@SuppressWarnings("unchecked")
 	public final void propertyChange(final PropertyChangeEvent propertyChangeEvent)
 	{
-		final GuisePropertyChangeEvent<ValueModel<V>, V> guisePropertyChangeEvent=AbstractGuisePropertyChangeListener.getGuisePropertyChangeEvent(propertyChangeEvent);	//create a genericized event object
+		final GuisePropertyChangeEvent<V> guisePropertyChangeEvent=AbstractGuisePropertyChangeListener.getGuisePropertyChangeEvent(propertyChangeEvent);	//create a genericized event object
 		propertyChange(guisePropertyChangeEvent);	//call the generic version of the method with the genericized event object
 	}
 

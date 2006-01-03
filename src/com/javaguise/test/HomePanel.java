@@ -126,9 +126,9 @@ public class HomePanel extends DefaultNavigationPanel
 		outputTextControl.getModel().setLabel("Double the Number");	//add a label to the text output control
 		outputTextControl.getModel().setEditable(false);	//set the text output control to read-only so that the user cannot modify it
 		inputPanel.add(outputTextControl);	//add the output control to the input panel
-		inputTextControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ValueModel<Float>, Float>()
+		inputTextControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Float>()
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<ValueModel<Float>, Float> propertyChangeEvent)
+					public void propertyChange(final GuisePropertyChangeEvent<Float> propertyChangeEvent)
 					{
 						final Float newValue=propertyChangeEvent.getNewValue();	//get the new value
 						try
@@ -159,9 +159,9 @@ public class HomePanel extends DefaultNavigationPanel
 		listControl.getModel().add(new Float(10));
 		listControl.getModel().add(new Float(20));
 		listControl.getModel().add(new Float(30));
-		listControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ListSelectModel<Float>, Float>()
+		listControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Float>()
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<ListSelectModel<Float>, Float> propertyChangeEvent)
+					public void propertyChange(final GuisePropertyChangeEvent<Float> propertyChangeEvent)
 					{
 						final Float newValue=propertyChangeEvent.getNewValue();	//get the new value
 						try
@@ -384,9 +384,9 @@ Debug.trace("list control changed value to", newValue);
 		
 		final TextControl<String> textInput=new TextControl<String>(session, "textInput", String.class);	//create a text input control
 		textInput.getModel().setLabel("This is the text input label.");
-		textInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ValueModel<String>, String>()
+		textInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<String>()
 				{
-					public void propertyChange(GuisePropertyChangeEvent<ValueModel<String>, String> propertyChangeEvent)
+					public void propertyChange(GuisePropertyChangeEvent<String> propertyChangeEvent)
 					{
 						testLabel.getModel().setLabel(propertyChangeEvent.getNewValue());
 						if(frame!=null)
@@ -455,9 +455,9 @@ Debug.trace("list control changed value to", newValue);
 		image.setDragEnabled(true);
 		horizontalPanel.add(image);
 
-		sliderModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ValueModel<Integer>, Integer>()
+		sliderModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Integer>()
 				{
-					public void propertyChange(GuisePropertyChangeEvent<ValueModel<Integer>, Integer> propertyChangeEvent)
+					public void propertyChange(GuisePropertyChangeEvent<Integer> propertyChangeEvent)
 					{
 						final Integer newValue=propertyChangeEvent.getNewValue();	//get the new value
 						if(newValue!=null)	//if there is a new value
@@ -579,9 +579,9 @@ Debug.trace("list control changed value to", newValue);
 		contentPanel.add(remoteTabControl);
 		
 
-		checkbox.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ValueModel<Boolean>, Boolean>()
+		checkbox.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Boolean>()
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<ValueModel<Boolean>, Boolean> propertyChangeEvent)
+					public void propertyChange(final GuisePropertyChangeEvent<Boolean> propertyChangeEvent)
 					{
 						final Boolean newValue=propertyChangeEvent.getNewValue();	//get the new value
 //TODO del						testButton.setDisplayed(newValue);	//update the button enabled state

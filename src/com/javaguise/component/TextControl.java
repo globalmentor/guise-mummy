@@ -168,16 +168,16 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 		super(session, id, model);	//construct the parent class
 		this.converter=checkNull(converter, "Converter cannot be null");	//save the converter
 		updateText(model.getValue());	//initialize the text with the literal form of the initial model value
-		model.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ValueModel<V>, V>()	//listen for the model changing value, and update the text in response
+		model.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<V>()	//listen for the model changing value, and update the text in response
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<ValueModel<V>, V> propertyChangeEvent)	//if the model value changes
+					public void propertyChange(final GuisePropertyChangeEvent<V> propertyChangeEvent)	//if the model value changes
 					{
 						updateText(propertyChangeEvent.getNewValue());	//update the text with the new value
 					}
 				});
-		session.addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, new AbstractGuisePropertyChangeListener<GuiseSession, Locale>()	//listen for the session locale changing
+		session.addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, new AbstractGuisePropertyChangeListener<Locale>()	//listen for the session locale changing
 				{
-					public void propertyChange(GuisePropertyChangeEvent<GuiseSession, Locale> propertyChangeEvent)	//if the locale changes
+					public void propertyChange(GuisePropertyChangeEvent<Locale> propertyChangeEvent)	//if the locale changes
 					{
 						updateText(model.getValue());	//update the text with the value from the model, just in case the converter is locale-dependent
 					}

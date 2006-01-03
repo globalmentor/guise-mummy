@@ -96,9 +96,9 @@ public class MenusPanel extends DefaultNavigationPanel
 		accordionMenuPanel.getModel().setLabel("Accordion Menu");
 		final CheckControl rolloverOpenCheckbox=new CheckControl(session);	//accordion rollover open enabled
 		rolloverOpenCheckbox.getModel().setLabel("Enable accordion menu rollover open.");
-		rolloverOpenCheckbox.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ValueModel<Boolean>, Boolean>()
+		rolloverOpenCheckbox.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Boolean>()
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<ValueModel<Boolean>, Boolean> propertyChangeEvent)
+					public void propertyChange(final GuisePropertyChangeEvent<Boolean> propertyChangeEvent)
 					{
 						continentsMenu.setRolloverOpenEnabled(propertyChangeEvent.getNewValue().booleanValue());	//update the accordion submenu rollover open enabled option
 						messageMenu.setRolloverOpenEnabled(propertyChangeEvent.getNewValue().booleanValue());	//update the accordion submenu rollover open enabled option

@@ -135,7 +135,7 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 //TODO del	protected final ActionListener<CalendarMonthTableModel> calendarActionListener;
 
 	/**The property change listener that updates the calendars when a property changes.*/
-	protected final GuisePropertyChangeListener<?, ?> updateModelPropertyChangeListener;
+	protected final GuisePropertyChangeListener<?> updateModelPropertyChangeListener;
 
 	/**Session, ID, and model constructor.
 	@param session The Guise session that owns this component.
@@ -161,9 +161,9 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 		monthListControl.setValueRepresentationStrategy(new ListControl.DefaultValueRepresentationStrategy<Date>(session, monthConverter));	//install a month representation strategy
 		controlContainer.add(monthListControl);	//add the month list control
 		updateCalendars();	//update the calendars
-		updateModelPropertyChangeListener=new AbstractGuisePropertyChangeListener<Object, Object>()	//create a property change listener to update the calendars
+		updateModelPropertyChangeListener=new AbstractGuisePropertyChangeListener<Object>()	//create a property change listener to update the calendars
 		{
-			public void propertyChange(final GuisePropertyChangeEvent<Object, Object> propertyChangeEvent)	//if the model value value changed
+			public void propertyChange(final GuisePropertyChangeEvent<Object> propertyChangeEvent)	//if the model value value changed
 			{
 				updateCalendars();	//update the calendars based upon the new selected date
 			}
@@ -171,9 +171,9 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 		model.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, updateModelPropertyChangeListener);	//update the calendars if the selected date changes
 			//TODO important: this is a memory leak---make sure we uninstall the listener when the session goes away
 		session.addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, updateModelPropertyChangeListener);	//update the calendars if the locale changes
-		monthListControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ListSelectModel<Date>, Date>()	//create a property change listener to listen for the month changing
+		monthListControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Date>()	//create a property change listener to listen for the month changing
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<ListSelectModel<Date>, Date> propertyChangeEvent)	//if the selected month changed
+					public void propertyChange(final GuisePropertyChangeEvent<Date> propertyChangeEvent)	//if the selected month changed
 					{
 						final Date newDate=propertyChangeEvent.getNewValue();	//get the new selected date
 						if(newDate!=null)	//if a new month was selected (a null value can be sent when the model is cleared)

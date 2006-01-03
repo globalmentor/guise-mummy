@@ -18,15 +18,6 @@ public abstract class AbstractGuiseEvent extends EventObject implements GuiseEve
 		/**@return The Guise session in which this event was generated.*/
 		public GuiseSession getSession() {return session;}
 
-	/**@return The source of the event.*/
-/*TODO del when works
-	@SuppressWarnings("unchecked")
-	public S getSource()
-	{
-		return (S)super.getSource();	//cast the event to the appropriate type
-	}
-*/
-
 	/**Session and source constructor.
 	@param session The Guise session in which this event was generated.
 	@param source The object on which the event initially occurred.

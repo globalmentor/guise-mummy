@@ -684,7 +684,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints>
 			{
 				if(!ObjectUtilities.equals(oldValue, newValue))	//if the values are different
 				{					
-					firePropertyChange(new ValuePropertyChangeEvent<ListSelectModel<Component<?>>, Component<?>, P>(this, value, propertyName, oldValue, newValue));	//create and fire a value property change event
+					firePropertyChange(new ValuePropertyChangeEvent<Component<?>, P>(this, value, propertyName, oldValue, newValue));	//create and fire a value property change event
 				}
 			}
 		}

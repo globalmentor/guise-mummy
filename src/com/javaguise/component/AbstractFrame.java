@@ -338,7 +338,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 	@param modeChangeListener The mode property change listener to add.
 	@see ModalComponent#MODE_PROPERTY 
 	*/
-	public void open(final GuisePropertyChangeListener<? super C, Mode> modeChangeListener)
+	public void open(final GuisePropertyChangeListener<Mode> modeChangeListener)
 	{
 		addPropertyChangeListener(MODE_PROPERTY, modeChangeListener);	//add the mode property change listener
 		open(true);	//open modally

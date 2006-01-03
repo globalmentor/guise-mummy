@@ -118,7 +118,7 @@ public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalC
 	@param modeChangeListener The mode property change listener to add.
 	@see ModalComponent#MODE_PROPERTY 
 	*/
-	public void open(final GuisePropertyChangeListener<? super C, Mode> modeChangeListener);
+	public void open(final GuisePropertyChangeListener<Mode> modeChangeListener);
 
 	/**Opens the frame, specifying modality.
 	Opening the frame registers the frame with the session.

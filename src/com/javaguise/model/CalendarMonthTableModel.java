@@ -170,9 +170,9 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 		this.date=checkNull(date, "Date cannot be null");
 		updateModel();	//update the model to match the initial month calendar
 			//TODO important: this is a memory leak---make sure we uninstall the listener when the session goes away
-		session.addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, new AbstractGuisePropertyChangeListener<GuiseSession, Locale>()	//listen for the session locale changing
+		session.addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, new AbstractGuisePropertyChangeListener<Locale>()	//listen for the session locale changing
 				{
-					public void propertyChange(GuisePropertyChangeEvent<GuiseSession, Locale> propertyChangeEvent)	//if the locale changes
+					public void propertyChange(GuisePropertyChangeEvent<Locale> propertyChangeEvent)	//if the locale changes
 					{
 						updateModel();	//update the model based upon the new locale
 					}			

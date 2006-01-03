@@ -37,9 +37,9 @@ public class ImageOpacityPanel extends DefaultNavigationPanel
 		final ValueModel<Float> sliderModel=new DefaultValueModel<Float>(session, Float.class, 1.0f);	//default to 1.0
 		sliderModel.setValidator(new DecimalRangeValidator<Float>(session, 0.0f, 1.0f, 0.01f));	//set a range validator for the model
 		sliderModel.setLabel("Image Opacity");	//set the label for the model
-		sliderModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ValueModel<Float>, Float>()	//listen for value changes
+		sliderModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Float>()	//listen for value changes
 				{
-					public void propertyChange(GuisePropertyChangeEvent<ValueModel<Float>, Float> propertyValueChangeEvent)	//if the opacity value changes
+					public void propertyChange(GuisePropertyChangeEvent<Float> propertyValueChangeEvent)	//if the opacity value changes
 					{
 						final Float newValue=propertyValueChangeEvent.getNewValue();	//get the new value
 						if(newValue!=null)	//if there is a new value

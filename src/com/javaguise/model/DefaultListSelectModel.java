@@ -785,7 +785,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 		{
 			if(!ObjectUtilities.equals(oldValue, newValue))	//if the values are different
 			{					
-				firePropertyChange(new ValuePropertyChangeEvent<ListSelectModel<V>, V, P>(this, value, propertyName, oldValue, newValue));	//create and fire a value property change event
+				firePropertyChange(new ValuePropertyChangeEvent<V, P>(this, value, propertyName, oldValue, newValue));	//create and fire a value property change event
 			}
 		}
 	}

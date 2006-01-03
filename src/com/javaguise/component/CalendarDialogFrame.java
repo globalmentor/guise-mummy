@@ -106,9 +106,9 @@ public class CalendarDialogFrame extends AbstractDialogFrame<Date, CalendarDialo
 				throw new AssertionError(validationException);	//TODO fix
 			}
 		}
-		calendarControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ValueModel<Date>, Date>()	//listen for the calendar control value changing
+		calendarControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Date>()	//listen for the calendar control value changing
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<ValueModel<Date>, Date> propertyChangeEvent)	//if the calendar control value changed
+					public void propertyChange(final GuisePropertyChangeEvent<Date> propertyChangeEvent)	//if the calendar control value changed
 					{
 						try
 						{

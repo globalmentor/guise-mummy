@@ -138,12 +138,12 @@ public class EditUsersPanel extends DefaultNavigationPanel
 								//create a confirmation dialog
 							final MessageOptionDialogFrame confirmationDialog=new MessageOptionDialogFrame(session, "Are you sure you want to remove user "+user.getFirstName()+" "+user.getLastName()+"?",
 									MessageOptionDialogFrame.Option.YES, MessageOptionDialogFrame.Option.NO);	//present "yes" and "no" options to the user
-							confirmationDialog.open(new AbstractGuisePropertyChangeListener<DefaultOptionDialogFrame, Mode>()	//ask for confirmation
+							confirmationDialog.open(new AbstractGuisePropertyChangeListener<Mode>()	//ask for confirmation
 									{		
-										public void propertyChange(final GuisePropertyChangeEvent<DefaultOptionDialogFrame, Mode> propertyChangeEvent)	//when the modal dialog mode changes
+										public void propertyChange(final GuisePropertyChangeEvent<Mode> propertyChangeEvent)	//when the modal dialog mode changes
 										{
 												//if the message dialog is no longer modal and the selected option is "yes"
-											if(propertyChangeEvent.getSource().getMode()==null && propertyChangeEvent.getSource().getModel().getValue()==MessageOptionDialogFrame.Option.YES)
+											if(confirmationDialog.getMode()==null && confirmationDialog.getModel().getValue()==MessageOptionDialogFrame.Option.YES)
 											{
 												userListControl.getModel().remove(selectedIndex);	//remove the user at the given index												
 											}

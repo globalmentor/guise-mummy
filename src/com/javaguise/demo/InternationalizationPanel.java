@@ -33,13 +33,13 @@ public class InternationalizationPanel extends DefaultNavigationPanel
 		getModel().setLabel("Guise\u2122 Demonstration: Internationalization");	//set the panel title
 
 			//create a value change listener to listen for language selection changes
-		final GuisePropertyChangeListener<LocaleLabelValueModel<Boolean>, Boolean> languageChangeListener=new AbstractGuisePropertyChangeListener<LocaleLabelValueModel<Boolean>, Boolean>()
+		final GuisePropertyChangeListener<Boolean> languageChangeListener=new AbstractGuisePropertyChangeListener<Boolean>()
 			{
-				public void propertyChange(final GuisePropertyChangeEvent<LocaleLabelValueModel<Boolean>, Boolean> propertyChangeEvent)	//when a language boolean model changes
+				public void propertyChange(final GuisePropertyChangeEvent<Boolean> propertyChangeEvent)	//when a language boolean model changes
 				{
 					if(Boolean.TRUE.equals(propertyChangeEvent.getNewValue()))	//if this language is being set
 					{
-						final Locale locale=propertyChangeEvent.getSource().getLocale();	//get the selected locale
+						final Locale locale=((LocaleLabelValueModel<?>)propertyChangeEvent.getSource()).getLocale();	//get the selected locale
 						session.setLocale(locale);	//change to the session selected locale
 					}
 				}

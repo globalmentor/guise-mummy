@@ -53,9 +53,9 @@ public class CalendarsPanel extends DefaultNavigationPanel
 		localeListControl.getModel().add(Locale.FRANCE);
 		localeListControl.getModel().add(Locale.CHINA);
 		localeListControl.getModel().add(new Locale("ar"));
-		localeListControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ListSelectModel<Locale>, Locale>()	//listen for selection changes
+		localeListControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Locale>()	//listen for selection changes
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<ListSelectModel<Locale>, Locale> propertyChangeEvent)	//if the locale selection changes
+					public void propertyChange(final GuisePropertyChangeEvent<Locale> propertyChangeEvent)	//if the locale selection changes
 					{
 						final Locale newLocale=propertyChangeEvent.getNewValue();	//get the new locale selected
 						if(newLocale!=null)	//if a new locale was selected
@@ -83,9 +83,9 @@ public class CalendarsPanel extends DefaultNavigationPanel
 		embeddedDateTextControl.getModel().setLabel("Selected Date:");
 		embeddedDateTextControl.getModel().setEditable(false);
 		calendarControlPanel.add(embeddedDateTextControl);
-		calendarControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<CalendarMonthTableModel, Date>()	//listen for the calendar control value changing
+		calendarControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Date>()	//listen for the calendar control value changing
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<CalendarMonthTableModel, Date> propertyChangeEvent)	//if the calendar control value changed
+					public void propertyChange(final GuisePropertyChangeEvent<Date> propertyChangeEvent)	//if the calendar control value changed
 					{
 						final Date newDate=propertyChangeEvent.getNewValue();	//get the new date
 						if(newDate!=null)	//if a new date was selected
@@ -120,11 +120,11 @@ public class CalendarsPanel extends DefaultNavigationPanel
 						calendarDialogFrame.getModel().setLabel("Select a date");
 						calendarDialogFrame.setRelatedComponent(calendarButton);	//associate the popup with the button
 						calendarDialogFrame.open();	//show the calendar popup
-						calendarDialogFrame.open(new AbstractGuisePropertyChangeListener<CalendarDialogFrame, Mode>()	//ask for the date to be selected
+						calendarDialogFrame.open(new AbstractGuisePropertyChangeListener<Mode>()	//ask for the date to be selected
 								{		
-									public void propertyChange(final GuisePropertyChangeEvent<CalendarDialogFrame, Mode> propertyChangeEvent)	//when the modal dialog mode changes
+									public void propertyChange(final GuisePropertyChangeEvent<Mode> propertyChangeEvent)	//when the modal dialog mode changes
 									{
-										final Date newDate=propertyChangeEvent.getSource().getModel().getValue();	//get the value of the frame's model
+										final Date newDate=calendarDialogFrame.getModel().getValue();	//get the value of the frame's model
 										if(newDate!=null)	//if a new date was selected (i.e. the calendar dialog frame was not closed without a selection)
 										{
 											try

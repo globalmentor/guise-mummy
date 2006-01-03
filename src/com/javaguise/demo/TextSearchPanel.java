@@ -86,9 +86,9 @@ public class TextSearchPanel extends DefaultNavigationPanel
 		textAreaControl.getModel().setEditable(false);	//don't allow the text area control to be edited
 
 		//listen for the value of the resource import changing
-		resourceImportControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ValueModel<ResourceImport>, ResourceImport>()
+		resourceImportControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ResourceImport>()
 				{
-					public void propertyChange(GuisePropertyChangeEvent<ValueModel<ResourceImport>, ResourceImport> propertyChangeEvent)
+					public void propertyChange(GuisePropertyChangeEvent<ResourceImport> propertyChangeEvent)
 					{
 						try
 						{
