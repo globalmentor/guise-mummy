@@ -9,8 +9,15 @@ If a single component was replaced both an added and removed compontent will be 
 If neither an added nor a removed component are provided, the event represents a general container modification.
 @author Garret Wilson
 */
-public class ContainerEvent extends ListEvent<Container<?>, Component<?>>
+public class ContainerEvent extends ListEvent<Component<?>>
 {
+
+	/**@return The source of the event.*/
+	@SuppressWarnings("unchecked")
+	public Container<?> getSource()
+	{
+		return (Container<?>)super.getSource();	//cast the event to the appropriate type
+	}
 
 	/**Session and source constructor for general container modification.
 	@param session The Guise session in which this event was generated.

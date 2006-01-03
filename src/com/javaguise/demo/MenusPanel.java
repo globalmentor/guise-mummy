@@ -112,9 +112,9 @@ public class MenusPanel extends DefaultNavigationPanel
 		accordionMenuPanel.add(continentsClickCountControl);		
 		centerPanel.add(accordionMenuPanel);
 		
-		continentsMenu.getModel().addActionListener(new ActionListener<ActionModel>()	//listen for accordion menu action
+		continentsMenu.getModel().addActionListener(new ActionListener()	//listen for accordion menu action
 				{
-					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
+					public void actionPerformed(ActionEvent actionEvent)
 					{
 						final int oldClickCount=continentsClickCountControl.getModel().getValue().intValue();	//get the old number of clicks
 						try

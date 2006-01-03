@@ -210,14 +210,14 @@ Debug.trace("list control changed value to", newValue);
 		testButton.setCornerArcSize(Corner.LINE_FAR_PAGE_NEAR, Component.ROUNDED_CORNER_ARC_SIZE);
 		testButton.setCornerArcSize(Corner.LINE_FAR_PAGE_FAR, Component.ROUNDED_CORNER_ARC_SIZE);
 		
-		testButton.getModel().addActionListener(new NavigateActionListener<ActionModel>("helloworld"));
+		testButton.getModel().addActionListener(new NavigateActionListener("helloworld"));
 		buttonPanel.add(testButton);	//add a new button
 		
 		final Button testButton2=new Button(session, "testButton2");
 		testButton2.getModel().setLabel("Click this button to change the text.");
-		testButton2.getModel().addActionListener(new ActionListener<ActionModel>()
+		testButton2.getModel().addActionListener(new ActionListener()
 				{
-					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
+					public void actionPerformed(ActionEvent actionEvent)
 					{
 						testLabel.getModel().setLabel("You pressed the button!");
 /*TODO del test						
@@ -274,9 +274,9 @@ Debug.trace("list control changed value to", newValue);
 		buttonPanel.add(testButton2);	//add a new button
 		final Link testLink=new Link(session);
 		testLink.getModel().setLabel("This is a link.");
-		testLink.getModel().addActionListener(new ActionListener<ActionModel>()
+		testLink.getModel().addActionListener(new ActionListener()
 				{
-					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
+					public void actionPerformed(ActionEvent actionEvent)
 					{
 
 						session.getEnvironment().removeProperty("testCookie");
@@ -290,16 +290,16 @@ Debug.trace("list control changed value to", newValue);
 		buttonPanel.add(testLink);	//add a new button
 		final Link modalLink=new Link(session);
 		modalLink.getModel().setLabel("Test modal.");
-		modalLink.getModel().addActionListener(new ActionListener<ActionModel>()
+		modalLink.getModel().addActionListener(new ActionListener()
 				{
-					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
+					public void actionPerformed(ActionEvent actionEvent)
 					{
-						getSession().navigateModal("edituser", new ModalNavigationAdapter<EditUserPanel>()
+						getSession().navigateModal("edituser", new ModalNavigationAdapter()
 								{
 									/**Called when an a modal panel ends its modality.
 									@param modalEvent The event indicating the panel ending modality and the modal value.
 									*/
-									public void modalEnded(final ModalEvent<EditUserPanel> modalEvent)
+									public void modalEnded(final ModalEvent modalEvent)
 									{
 										
 									}
@@ -312,7 +312,7 @@ Debug.trace("list control changed value to", newValue);
 		
 		final Link helloLink=new Link(session);
 		helloLink.getModel().setLabel("More Hello World.");
-		helloLink.getModel().addActionListener(new NavigateActionListener<ActionModel>("helloworld"));
+		helloLink.getModel().addActionListener(new NavigateActionListener("helloworld"));
 		buttonPanel.add(helloLink);	//add the link
 
 		final Link frameLink=new Link(session);
@@ -321,9 +321,9 @@ Debug.trace("list control changed value to", newValue);
 		frameLink.setFlyoverEnabled(true);	//turn on flyovers
 		frameLink.getFlyoverStrategy().setPreferredWidth(new Extent(15, Extent.Unit.EM));
 		frameLink.getFlyoverStrategy().setPreferredHeight(new Extent(10, Extent.Unit.EM));
-		frameLink.getModel().addActionListener(new ActionListener<ActionModel>()
+		frameLink.getModel().addActionListener(new ActionListener()
 				{
-					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
+					public void actionPerformed(ActionEvent actionEvent)
 					{
 						if(frame==null)
 						{
@@ -338,9 +338,9 @@ Debug.trace("list control changed value to", newValue);
 
 		final Link modalFrameLink=new Link(session);
 		modalFrameLink.getModel().setLabel("Modal Frame");
-		modalFrameLink.getModel().addActionListener(new ActionListener<ActionModel>()
+		modalFrameLink.getModel().addActionListener(new ActionListener()
 				{
-					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
+					public void actionPerformed(ActionEvent actionEvent)
 					{
 						final DefaultDialogFrame<Boolean> dialog=new DefaultDialogFrame<Boolean>(session, Boolean.class);
 						dialog.getModel().setLabel("Test Dialog");
@@ -649,7 +649,7 @@ Debug.trace("list control changed value to", newValue);
 			//GlobalMentor
 		final Link globalmentorLink=new Link(session);
 		globalmentorLink.getModel().setLabel("GlobalMentor");
-		globalmentorLink.getModel().addActionListener(new NavigateActionListener<ActionModel>(URI.create("http://www.globalmentor.com/")));
+		globalmentorLink.getModel().addActionListener(new NavigateActionListener(URI.create("http://www.globalmentor.com/")));
 		menu.add(globalmentorLink);
 		
 		return menu;
@@ -676,9 +676,9 @@ Debug.trace("list control changed value to", newValue);
 		editMenu.add(message1);
 		menu.add(editMenu);
 		
-		editMenu.getModel().addActionListener(new ActionListener<ActionModel>()	//testing accordion menu action
+		editMenu.getModel().addActionListener(new ActionListener()	//testing accordion menu action
 				{
-					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
+					public void actionPerformed(ActionEvent actionEvent)
 					{
 						testLabel.getModel().setLabel("You pressed the accordion edit menu!");
 					}

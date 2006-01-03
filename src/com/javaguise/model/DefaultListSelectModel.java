@@ -667,7 +667,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	/**Adds a list listener.
 	@param listListener The list listener to add.
 	*/
-	public void addListListener(final ListListener<ListSelectModel<V>, V> listListener)
+	public void addListListener(final ListListener<V> listListener)
 	{
 		getEventListenerManager().add(ListListener.class, listListener);	//add the listener
 	}
@@ -675,7 +675,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	/**Removes a list listener.
 	@param listListener The list listener to remove.
 	*/
-	public void removeListListener(final ListListener<ListSelectModel<V>, V> listListener)
+	public void removeListListener(final ListListener<V> listListener)
 	{
 		getEventListenerManager().remove(ListListener.class, listListener);	//remove the listener
 	}
@@ -749,8 +749,8 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	{
 		if(getEventListenerManager().hasListeners(ListListener.class))	//if there are appropriate listeners registered
 		{
-			final ListEvent<ListSelectModel<V>, V> listEvent=new ListEvent<ListSelectModel<V>, V>(getSession(), this, index, addedElement, removedElement);	//create a new event
-			getSession().queueEvent(new PostponedListEvent<ListSelectModel<V>, V>(getEventListenerManager(), listEvent));	//tell the Guise session to queue the event
+			final ListEvent<V> listEvent=new ListEvent<V>(getSession(), this, index, addedElement, removedElement);	//create a new event
+			getSession().queueEvent(new PostponedListEvent<V>(getEventListenerManager(), listEvent));	//tell the Guise session to queue the event
 		}
 	}
 

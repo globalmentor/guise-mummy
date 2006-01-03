@@ -125,12 +125,12 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>
 	/**Adds a list listener.
 	@param listListener The list listener to add.
 	*/
-	public void addListListener(final ListListener<ListSelectModel<V>, V> listListener);
+	public void addListListener(final ListListener<V> listListener);
 
 	/**Removes a list listener.
 	@param listListener The list listener to remove.
 	*/
-	public void removeListListener(final ListListener<ListSelectModel<V>, V> listListener);
+	public void removeListListener(final ListListener<V> listListener);
 
 	/**Adds a list selection listener.
 	@param selectionListener The selection listener to add.

@@ -9,7 +9,6 @@ import com.garretwilson.event.PostponedEvent;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.Orientation;
 import com.javaguise.context.GuiseContext;
-import com.javaguise.event.ModalEvent;
 import com.javaguise.event.ModalNavigationListener;
 
 import static com.garretwilson.lang.ClassUtilities.*;
@@ -289,11 +288,10 @@ public interface GuiseSession extends PropertyBindable
 
 	/**Begins modal interaction for a particular modal panel.
 	The modal navigation is pushed onto the stack, and an event is fired to the modal listener of the modal navigation.
-	@param <P> The type of navigation panel beginning navigation.
 	@param modalNavigationPanel The panel for which modal navigation state should begin.
 	@param modalNavigation The state of modal navigation.
 	*/
-	public <P extends ModalNavigationPanel<?, ?>> void beginModalNavigation(final P modalNavigationPanel, final ModalNavigation<P> modalNavigation);
+	public void beginModalNavigation(final ModalNavigationPanel<?, ?> modalNavigationPanel, final ModalNavigation modalNavigation);
 
 	/**Ends modal interaction for a particular modal panel.
 	The panel is released from the cache so that new navigation will create a new modal panel.
@@ -301,13 +299,12 @@ public interface GuiseSession extends PropertyBindable
 	If the current modal state corresponds to the current navigation state, the current modal state is removed, the modal state's event is fired, and modal state is handed to the previous modal state, if any.
 	Otherwise, navigation is transferred to the modal panel's referring URI, if any.
 	If the given modal panel is not the panel at the current navigation path, the modal state is not changed, although navigation and releasal will still occur.
-	@param <P> The type of navigation panel ending navigation.
 	@param modalNavigationPanel The panel for which modal navigation state should be ended.
 	@return true if modality actually ended for the given panel.
 	@see Frame#getReferrerURI()
 	@see #releaseNavigationPanel(String)
 	*/
-	public <P extends ModalNavigationPanel<?, ?>> boolean endModalNavigation(final P modalNavigationPanel);
+	public boolean endModalNavigation(final ModalNavigationPanel<?, ?> modalNavigationPanel);
 
 	/**Reports the navigation path relative to the application context path.
 	@return The path representing the current navigation location of the Guise application.
@@ -355,24 +352,22 @@ public interface GuiseSession extends PropertyBindable
 	/**Requests modal navigation to the specified path.
 	The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
 	Later requested navigation before navigation occurs will override this request.
-	@param <P> The type of navigation panel for modal navigation.
 	@param path A path that is either relative to the application context path or is absolute.
 	@param modalListener The listener to respond to the end of modal interaction.
 	@exception NullPointerException if the given path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 	@see #navigateModal(URI, ModalNavigationListener)
 	*/
-	public <P extends ModalNavigationPanel<?, ?>> void navigateModal(final String path, final ModalNavigationListener<P> modalListener);
+	public void navigateModal(final String path, final ModalNavigationListener modalListener);
 
 	/**Requests modal navigation to the specified URI.
 	The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
 	Later requested navigation before navigation occurs will override this request.
-	@param <P> The type of navigation panel for modal navigation.
 	@param uri Either a relative or absolute path, or an absolute URI.
 	@param modalListener The listener to respond to the end of modal interaction.
 	@exception NullPointerException if the given URI is <code>null</code>.
 	*/
-	public <P extends ModalNavigationPanel<?, ?>> void navigateModal(final URI uri, final ModalNavigationListener<P> modalListener);
+	public void navigateModal(final URI uri, final ModalNavigationListener modalListener);
 
 	/**@return A new component ID appropriate for using with a new component.*/
 	public String generateComponentID();

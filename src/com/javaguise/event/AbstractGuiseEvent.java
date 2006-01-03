@@ -7,10 +7,9 @@ import com.javaguise.GuiseSession;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**The base class for all Guise events.
-@param <S> The type of the event source.
 @author Garret Wilson
 */
-public class GuiseEvent<S> extends EventObject
+public abstract class AbstractGuiseEvent extends EventObject implements GuiseEvent
 {
 
 	/**The Guise session in which this event was generated.*/
@@ -20,18 +19,20 @@ public class GuiseEvent<S> extends EventObject
 		public GuiseSession getSession() {return session;}
 
 	/**@return The source of the event.*/
+/*TODO del when works
 	@SuppressWarnings("unchecked")
 	public S getSource()
 	{
 		return (S)super.getSource();	//cast the event to the appropriate type
 	}
+*/
 
 	/**Session and source constructor.
 	@param session The Guise session in which this event was generated.
 	@param source The object on which the event initially occurred.
 	@exception NullPointerException if the given session and/or source is <code>null</code>.
 	*/
-	public GuiseEvent(final GuiseSession session, final S source)
+	public AbstractGuiseEvent(final GuiseSession session, final Object source)
 	{
 		super(checkNull(source, "Event source object cannot be null"));	//construct the parent class
 		this.session=checkNull(session, "Session cannot be null");	//save the session

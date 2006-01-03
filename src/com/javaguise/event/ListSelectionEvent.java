@@ -9,8 +9,15 @@ If neither an added nor a removed element are provided, the event represents a g
 @param <V> The type of values selected.
 @author Garret Wilson
 */
-public class ListSelectionEvent<V> extends SetEvent<ListSelectModel<V>, Integer>
+public class ListSelectionEvent<V> extends SetEvent<Integer>
 {
+
+	/**@return The source of the event.*/
+	@SuppressWarnings("unchecked")
+	public ListSelectModel<V> getSource()
+	{
+		return (ListSelectModel<V>)super.getSource();	//cast the event to the appropriate type
+	}
 
 	/**Session and source constructor for general selection modification.
 	@param session The Guise session in which this event was generated.

@@ -112,9 +112,9 @@ public class CalendarsPanel extends DefaultNavigationPanel
 		popupDateTextControl.getModel().setLabel("Selected Date:");
 		popupDateTextControl.getModel().setEditable(false);
 		popupCalendarControlPanel.add(popupDateTextControl);
-		calendarButton.getModel().addActionListener(new ActionListener<ActionModel>()	//listen for the calendar button being pressed
+		calendarButton.getModel().addActionListener(new ActionListener()	//listen for the calendar button being pressed
 				{
-					public void actionPerformed(final ActionEvent<ActionModel> actionEvent)	//if the calendar button is pressed
+					public void actionPerformed(final ActionEvent actionEvent)	//if the calendar button is pressed
 					{
 						final CalendarDialogFrame calendarDialogFrame=new CalendarDialogFrame(session);	//create a new calendar popup
 						calendarDialogFrame.getModel().setLabel("Select a date");

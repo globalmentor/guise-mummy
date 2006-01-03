@@ -427,15 +427,15 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	/**Adds a mouse listener.
 	@param mouseListener The mouse listener to add.
 	*/
-	public void addMouseListener(final MouseListener<? super C> mouseListener);
+	public void addMouseListener(final MouseListener mouseListener);
 
 	/**Removes a mouse listener.
 	@param mouseListener The mouse listener to remove.
 	*/
-	public void removeMouseListener(final MouseListener<? super C> mouseListener);
+	public void removeMouseListener(final MouseListener mouseListener);
 
 	/**@return all registered mouse listeners.*/
-	public Iterator<MouseListener<? super C>> getMouseListeners();
+	public Iterator<MouseListener> getMouseListeners();
 
 	/**@return <code>true</code> if there is one or more mouse listeners registered.*/
 	public boolean hasMouseListeners();
@@ -464,7 +464,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@param <S> The type of component for which this object is to control flyovers.
 	@author Garret Wilson
 	*/
-	public interface FlyoverStrategy<S extends Component<?>> extends MouseListener<S>
+	public interface FlyoverStrategy<S extends Component<?>> extends MouseListener
 	{
 		/**@return The preferred width of the flyover component, or <code>null</code> if no preferred width has been specified.*/
 		public Extent getPreferredWidth();

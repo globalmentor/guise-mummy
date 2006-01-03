@@ -4,10 +4,9 @@ import java.net.URI;
 
 /**An object that listens for action events and in response changes the navigation.
 This class if declared final because it encapsulates a set of known, bounded functionality that may be deferred to the client if possible.
-@param <S> The type of the event source.
 @author Garret Wilson
 */
-public final class NavigateActionListener<S> extends AbstractNavigateActionListener<S>
+public final class NavigateActionListener extends AbstractNavigateActionListener
 {
 
 	/**Constructs a listener to navigate to the provided path.
@@ -33,7 +32,7 @@ public final class NavigateActionListener<S> extends AbstractNavigateActionListe
 	This implementation requests navigation from the session.
 	@param actionEvent The event indicating the source of the action.
 	*/
-	public void actionPerformed(final ActionEvent<S> actionEvent)
+	public void actionPerformed(final ActionEvent actionEvent)
 	{
 		actionEvent.getSession().navigate(getNavigationURI());	//request that the session navigate to the configured URI
 	}

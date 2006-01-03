@@ -3,10 +3,9 @@ package com.javaguise.event;
 import com.javaguise.GuiseSession;
 
 /**An event indicating an action should take place.
-@param <S> The type of the event source.
 @author Garret Wilson
 */
-public class ActionEvent<S> extends GuiseEvent<S>
+public class ActionEvent extends AbstractGuiseEvent
 {
 
 	/**Session and source constructor.
@@ -14,7 +13,7 @@ public class ActionEvent<S> extends GuiseEvent<S>
 	@param source The object on which the event initially occurred.
 	@exception NullPointerException if the given session and/or source is <code>null</code>.
 	*/
-	public ActionEvent(final GuiseSession session, final S source)
+	public ActionEvent(final GuiseSession session, final Object source)
 	{
 		super(session, source);	//construct the parent class
 	}

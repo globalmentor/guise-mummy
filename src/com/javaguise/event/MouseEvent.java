@@ -6,10 +6,9 @@ import com.javaguise.GuiseSession;
 import com.javaguise.geometry.*;
 
 /**An event providing mouse information.
-@param <S> The type of the event source.
 @author Garret Wilson
 */
-public class MouseEvent<S> extends GuiseEvent<S>
+public class MouseEvent extends AbstractGuiseEvent
 {
 
 	/**The absolute bounds of the event source.*/
@@ -38,7 +37,7 @@ public class MouseEvent<S> extends GuiseEvent<S>
 	@param mousePosition The position of the mouse relative to the viewport.
 	@exception NullPointerException if the given session, source, source bounds, viewport bounds and/or mouse position is <code>null</code>.
 	*/
-	public MouseEvent(final GuiseSession session, final S source, final Rectangle sourceBounds, final Rectangle viewportBounds, final Point mousePosition)
+	public MouseEvent(final GuiseSession session, final Object source, final Rectangle sourceBounds, final Rectangle viewportBounds, final Point mousePosition)
 	{
 		super(session, source);	//construct the parent class
 		this.sourceBounds=checkNull(sourceBounds, "Source bounds cannot be null");

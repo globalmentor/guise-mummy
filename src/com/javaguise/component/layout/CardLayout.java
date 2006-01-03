@@ -404,7 +404,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints>
 		/**Adds a list listener.
 		@param listListener The list listener to add.
 		*/
-		public void addListListener(final ListListener<ListSelectModel<Component<?>>, Component<?>> listListener)
+		public void addListListener(final ListListener<Component<?>> listListener)
 		{
 			getEventListenerManager().add(ListListener.class, listListener);	//add the listener
 		}
@@ -412,7 +412,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints>
 		/**Removes a list listener.
 		@param listListener The list listener to remove.
 		*/
-		public void removeListListener(final ListListener<ListSelectModel<Component<?>>, Component<?>> listListener)
+		public void removeListListener(final ListListener<Component<?>> listListener)
 		{
 			getEventListenerManager().remove(ListListener.class, listListener);	//remove the listener
 		}

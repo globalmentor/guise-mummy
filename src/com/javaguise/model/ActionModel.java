@@ -13,15 +13,15 @@ public interface ActionModel extends ControlModel
 	/**Adds an action listener.
 	@param actionListener The action listener to add.
 	*/
-	public void addActionListener(final ActionListener<ActionModel> actionListener);
+	public void addActionListener(final ActionListener actionListener);
 
 	/**Removes an action listener.
 	@param actionListener The action listener to remove.
 	*/
-	public void removeActionListener(final ActionListener<ActionModel> actionListener);
+	public void removeActionListener(final ActionListener actionListener);
 
 	/**@return all registered action listeners.*/
-	public Iterator<ActionListener<ActionModel>> getActionListeners();
+	public Iterator<ActionListener> getActionListeners();
 
 	/**Fires an action to all registered action listeners.
 	@see ActionListener

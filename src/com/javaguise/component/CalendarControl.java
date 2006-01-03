@@ -326,9 +326,9 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 			final Calendar calendar=Calendar.getInstance(getSession().getLocale());	//create a calendar TODO cache the calendar and only change it if the locale has changed
 			calendar.setTime(date);	//set the time of the calendar to that of the cell
 			link.getModel().setLabel(Integer.toString(calendar.get(Calendar.DAY_OF_MONTH)));	//set the label of the link to the day of the month
-			link.getModel().addActionListener(new ActionListener<ActionModel>()	//create a listener to listen for calendar actions
+			link.getModel().addActionListener(new ActionListener()	//create a listener to listen for calendar actions
 					{
-						public void actionPerformed(ActionEvent<ActionModel> actionEvent)	//when a day is selected
+						public void actionPerformed(ActionEvent actionEvent)	//when a day is selected
 						{
 							try
 							{

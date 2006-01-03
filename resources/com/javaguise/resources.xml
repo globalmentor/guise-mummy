@@ -7,7 +7,7 @@
 	<entry key="error.label">Error</entry>
 
 	<!-- Guise converters -->
-	<entry key="validator.invalid.value.message">Invalid value: "{0}".</entry>
+	<entry key="converter.invalid.value.message">Invalid value: "{0}".</entry>
 
 	<!-- Guise validators -->
 	<entry key="validator.value.required.message">Value required.</entry>

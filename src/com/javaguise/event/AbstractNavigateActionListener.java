@@ -6,10 +6,9 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
 
 /**An abstract that listens for action events and keeps information for navigating in response.
-@param <S> The type of the event source.
 @author Garret Wilson
 */
-public abstract class AbstractNavigateActionListener<S> implements ActionListener<S>
+public abstract class AbstractNavigateActionListener implements ActionListener
 {
 
 	/**The requested navigation URI.*/
@@ -41,7 +40,7 @@ public abstract class AbstractNavigateActionListener<S> implements ActionListene
 	This implementation requests navigation from the session.
 	@param actionEvent The event indicating the source of the action.
 	*/
-	public void actionPerformed(final ActionEvent<S> actionEvent)
+	public void actionPerformed(final ActionEvent actionEvent)
 	{
 		actionEvent.getSession().navigate(getNavigationURI());	//request that the session navigate to the configured URI
 	}

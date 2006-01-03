@@ -49,9 +49,9 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 		final Button addButton=new Button(session);	//create the button for adding a tab
 		addButton.getModel().setLabel("Add Tab");	//set the button label
 		addButton.getModel().setInfo("Add a tab containing a multiplication table of the specified factor.");	//set the button information
-		addButton.getModel().addActionListener(new ActionListener<ActionModel>()	//listen for the button being pressed
+		addButton.getModel().addActionListener(new ActionListener()	//listen for the button being pressed
 				{
-					public void actionPerformed(ActionEvent<ActionModel> actionEvent)	//if the button is pressed
+					public void actionPerformed(ActionEvent actionEvent)	//if the button is pressed
 					{
 						if(tabbedPanel.size()<MAX_TAB_COUNT)	//if we don't have too many tabs
 						{
@@ -78,9 +78,9 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 		final Button clearButton=new Button(session);	//create the button for clearing the tabs
 		clearButton.getModel().setLabel("Clear Tabs");	//set the button label
 		clearButton.getModel().setInfo("Remove all tabs except the default tab.");	//set the button information
-		clearButton.getModel().addActionListener(new ActionListener<ActionModel>()	//listen for the button being pressed
+		clearButton.getModel().addActionListener(new ActionListener()	//listen for the button being pressed
 				{
-					public void actionPerformed(ActionEvent<ActionModel> actionEvent)	//if the button is pressed
+					public void actionPerformed(ActionEvent actionEvent)	//if the button is pressed
 					{
 						for(final Component<?> tab:tabbedPanel)	//for each tab in the tabbed panel
 						{

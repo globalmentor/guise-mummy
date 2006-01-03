@@ -462,7 +462,7 @@ Debug.info("content type:", request.getContentType());
 							guiseSession.clearRequestedNavigation();	//remove any navigation requests
 							if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
 							{
-								beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation<?>)requestedNavigation);	//begin the modal navigation
+								beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation)requestedNavigation);	//begin the modal navigation
 							}
 							throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
 						}
@@ -641,7 +641,7 @@ for(final Component<?> affectedComponent:affectedComponents)
 					guiseSession.clearRequestedNavigation();	//remove any navigation requests
 					if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
 					{
-						beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation<?>)requestedNavigation);	//begin the modal navigation
+						beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation)requestedNavigation);	//begin the modal navigation
 					}
 					//TODO ifAJAX()
 					guiseContext.writeElementBegin(null, "navigate");	//<navigate>	//TODO use a constant
@@ -1125,14 +1125,13 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
   }
 
 	/**Begins modal navigation based upon modal navigation information.
-	@param <P> The type of navigation panel beginning navigation.
 	@param guiseApplication The Guise application.
 	@param guiseSession The Guise session.
 	@param modalNavigation The modal navigation information
 	*/
-	protected <P extends ModalNavigationPanel<?, ?>> void beginModalNavigation(final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ModalNavigation<P> modalNavigation)
+	protected void beginModalNavigation(final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ModalNavigation modalNavigation)
 	{
-		final P modalPanel=(P)guiseSession.getNavigationPanel(guiseApplication.relativizeURI(modalNavigation.getNewNavigationURI()));	//get the modal frame for this navigation path
+		final ModalNavigationPanel<?, ?> modalPanel=(ModalNavigationPanel<?, ?>)guiseSession.getNavigationPanel(guiseApplication.relativizeURI(modalNavigation.getNewNavigationURI()));	//get the modal frame for this navigation path
 		if(modalPanel!=null)	//if we have a modal frame
 		{
 			guiseSession.beginModalNavigation(modalPanel, modalNavigation);

@@ -14,7 +14,7 @@ public class DefaultActionModel extends AbstractControlModel implements ActionMo
 	/**Adds an action listener.
 	@param actionListener The action listener to add.
 	*/
-	public void addActionListener(final ActionListener<ActionModel> actionListener)
+	public void addActionListener(final ActionListener actionListener)
 	{
 		getEventListenerManager().add(ActionListener.class, actionListener);	//add the listener
 	}
@@ -22,16 +22,16 @@ public class DefaultActionModel extends AbstractControlModel implements ActionMo
 	/**Removes an action listener.
 	@param actionListener The action listener to remove.
 	*/
-	public void removeActionListener(final ActionListener<ActionModel> actionListener)
+	public void removeActionListener(final ActionListener actionListener)
 	{
 		getEventListenerManager().remove(ActionListener.class, actionListener);	//remove the listener
 	}
 
 	/**@return all registered action listeners.*/
 	@SuppressWarnings("unchecked")
-	public Iterator<ActionListener<ActionModel>> getActionListeners()
+	public Iterator<ActionListener> getActionListeners()
 	{
-		return (Iterator<ActionListener<ActionModel>>)(Object)getEventListenerManager().getListeners(ActionListener.class);	//remove the listener TODO find out why we have to use the double cast for JDK 1.5 to compile
+		return (Iterator<ActionListener>)(Object)getEventListenerManager().getListeners(ActionListener.class);	//remove the listener TODO find out why we have to use the double cast for JDK 1.5 to compile
 	}
 
 	/**Fires an action to all registered action listeners.
@@ -42,8 +42,8 @@ public class DefaultActionModel extends AbstractControlModel implements ActionMo
 	{
 		if(getEventListenerManager().hasListeners(ActionListener.class))	//if there are action listeners registered
 		{
-			final ActionEvent<ActionModel> actionEvent=new ActionEvent<ActionModel>(getSession(), this);	//create a new action event
-			getSession().queueEvent(new PostponedActionEvent<ActionModel>(getEventListenerManager(), actionEvent));	//tell the Guise session to queue the event
+			final ActionEvent actionEvent=new ActionEvent(getSession(), this);	//create a new action event
+			getSession().queueEvent(new PostponedActionEvent(getEventListenerManager(), actionEvent));	//tell the Guise session to queue the event
 		}
 	}
 

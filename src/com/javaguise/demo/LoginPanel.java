@@ -53,9 +53,9 @@ public class LoginPanel extends DefaultNavigationPanel
 			//login button
 		final Button loginButton=new Button(session);	//create a button for logging in
 		loginButton.getModel().setLabel("Log in");	//set the button label
-		loginButton.getModel().addActionListener(new ActionListener<ActionModel>()	//when the login button is pressed
+		loginButton.getModel().addActionListener(new ActionListener()	//when the login button is pressed
 				{
-					public void actionPerformed(ActionEvent<ActionModel> actionEvent)	//get the user, verify the password, and set the new session user
+					public void actionPerformed(ActionEvent actionEvent)	//get the user, verify the password, and set the new session user
 					{
 						if(isValid())	//if the form information is valid
 						{

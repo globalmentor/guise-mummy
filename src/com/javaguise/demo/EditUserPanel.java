@@ -2,12 +2,10 @@ package com.javaguise.demo;
 
 import java.util.Arrays;
 
-import com.garretwilson.util.Debug;
 import com.javaguise.GuiseSession;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
 import com.javaguise.event.*;
-import com.javaguise.model.*;
 import com.javaguise.validator.*;
 
 /**Edit User Guise demonstration panel.
@@ -81,15 +79,13 @@ public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser>
 		final LayoutPanel buttonPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create the button panel flowing horizontally
 		final Button okButton=new Button(session);	//create the OK button
 		okButton.getModel().setLabel("OK");	//set the text of the OK button
-		okButton.getModel().addActionListener(new ActionListener<ActionModel>()	//if the OK button was pressed
+		okButton.getModel().addActionListener(new ActionListener()	//if the OK button was pressed
 				{
-					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
+					public void actionPerformed(ActionEvent actionEvent)
 					{
 						try
 						{
-Debug.trace("ready to validate the form");
 							validate();	//validate the form
-Debug.trace("form validated with no errors");
 							endModal(getUser());	//end the panel modality with the edited user only if the form validates
 						}
 						catch(final ComponentExceptions componentExceptions)	//if there is an error, don't accept the input
@@ -100,9 +96,9 @@ Debug.trace("form validated with no errors");
 		buttonPanel.add(okButton);	//add the button to the button panel
 		final Button cancelButton=new Button(session);	//create the cancel button
 		cancelButton.getModel().setLabel("Cancel");	//set the text of the cancel button
-		cancelButton.getModel().addActionListener(new ActionListener<ActionModel>()	//if the cancel button was pressed
+		cancelButton.getModel().addActionListener(new ActionListener()	//if the cancel button was pressed
 				{
-					public void actionPerformed(ActionEvent<ActionModel> actionEvent)
+					public void actionPerformed(ActionEvent actionEvent)
 					{
 						endModal(null);	//end the panel modality with no user
 					}

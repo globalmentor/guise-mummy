@@ -1,11 +1,9 @@
 package com.javaguise.event;
 
-import com.javaguise.component.Container;
-
 /**An object that listens for container modification events.
 @author Garret Wilson
 */
-public interface ContainerListener extends GuiseEventListener<Container<?>>
+public interface ContainerListener extends GuiseEventListener
 {
 
 	/**Called when a container is modified.

@@ -107,7 +107,7 @@ public abstract class AbstractValidator<V> extends GuiseBoundPropertyObject impl
 			}
 			else	//for all other invalid values
 			{
-				throw new ValidationException(format(getSession().getStringResource(getInvalidValueMessage()), toString(value)), value);
+				throw new ValidationException(format(getInvalidValueMessage(), toString(value)), value);
 			}
 		}
 	}

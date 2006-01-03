@@ -886,7 +886,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 	/**Adds a mouse listener.
 	@param mouseListener The mouse listener to add.
 	*/
-	public void addMouseListener(final MouseListener<? super C> mouseListener)
+	public void addMouseListener(final MouseListener mouseListener)
 	{
 		getEventListenerManager().add(MouseListener.class, mouseListener);	//add the listener
 	}
@@ -894,7 +894,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 	/**Removes a mouse listener.
 	@param mouseListener The mouse listener to remove.
 	*/
-	public void removeMouseListener(final MouseListener<? super C> mouseListener)
+	public void removeMouseListener(final MouseListener mouseListener)
 	{
 		getEventListenerManager().remove(MouseListener.class, mouseListener);	//remove the listener
 	}
@@ -907,9 +907,9 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 
 	/**@return all registered mouse listeners.*/
 	@SuppressWarnings("unchecked")
-	public Iterator<MouseListener<? super C>> getMouseListeners()
+	public Iterator<MouseListener> getMouseListeners()
 	{
-		return (Iterator<MouseListener<? super C>>)(Object)getEventListenerManager().getListeners(MouseListener.class);	//remove the listener TODO find out why we have to use the double cast for JDK 1.5 to compile
+		return (Iterator<MouseListener>)getEventListenerManager().getListeners(MouseListener.class);	//remove the listener
 	}
 
 	/**Fires a mouse entered event to all registered mouse listeners.
@@ -924,8 +924,8 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 	{
 		if(hasMouseListeners())	//if there are mouse listeners registered
 		{
-			final MouseEvent<C> mouseEvent=new MouseEvent<C>(getSession(), getThis(), componentBounds, viewportBounds, mousePosition);	//create a new mouse event
-			getSession().queueEvent(new PostponedMouseEvent<C>(getEventListenerManager(), mouseEvent, PostponedMouseEvent.EventType.ENTERED));	//tell the Guise session to queue the event
+			final MouseEvent mouseEvent=new MouseEvent(getSession(), getThis(), componentBounds, viewportBounds, mousePosition);	//create a new mouse event
+			getSession().queueEvent(new PostponedMouseEvent(getEventListenerManager(), mouseEvent, PostponedMouseEvent.EventType.ENTERED));	//tell the Guise session to queue the event
 		}
 	}
 
@@ -941,8 +941,8 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 	{
 		if(hasMouseListeners())	//if there are mouse listeners registered
 		{
-			final MouseEvent<C> mouseEvent=new MouseEvent<C>(getSession(), getThis(), componentBounds, viewportBounds, mousePosition);	//create a new mouse event
-			getSession().queueEvent(new PostponedMouseEvent<C>(getEventListenerManager(), mouseEvent, PostponedMouseEvent.EventType.EXITED));	//tell the Guise session to queue the event
+			final MouseEvent mouseEvent=new MouseEvent(getSession(), getThis(), componentBounds, viewportBounds, mousePosition);	//create a new mouse event
+			getSession().queueEvent(new PostponedMouseEvent(getEventListenerManager(), mouseEvent, PostponedMouseEvent.EventType.EXITED));	//tell the Guise session to queue the event
 		}
 	}
 
@@ -1250,7 +1250,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		@param mouseEvent The event providing mouse information
 		@see #openFlyover()
 		*/
-		public void mouseEntered(final MouseEvent<S> mouseEvent)
+		public void mouseEntered(final MouseEvent mouseEvent)
 		{
 /*TODO del when works
 Debug.trace("source bounds:", mouseEvent.getSourceBounds());
@@ -1285,7 +1285,7 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 		@param mouseEvent The event providing mouse information
 		@see #closeFlyover()
 		*/
-		public void mouseExited(final MouseEvent<S> mouseEvent)
+		public void mouseExited(final MouseEvent mouseEvent)
 		{
 			closeFlyover();	//close the flyover if it is open
 		}

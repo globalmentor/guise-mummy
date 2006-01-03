@@ -1,12 +1,10 @@
 package com.javaguise.event;
 
-import com.javaguise.model.ListSelectModel;
-
 /**An object that listens for list selection modification events.
 @param <V> The type of values selected.
 @author Garret Wilson
 */
-public interface ListSelectionListener<V> extends GuiseEventListener<ListSelectModel<V>>
+public interface ListSelectionListener<V> extends GuiseEventListener
 {
 
 	/**Called when a selection changes.

@@ -5,11 +5,10 @@ import com.javaguise.GuiseSession;
 /**An event indicating a set has been modified.
 If a single element was replaced both an added and removed element will be provided.
 If neither an added nor a removed element are provided, the event represents a general set modification.
-@param <S> The type of the event source.
 @param <E> The type of elements contained in the set.
 @author Garret Wilson
 */
-public class SetEvent<S, E> extends CollectionEvent<S, E>
+public class SetEvent<E> extends CollectionEvent<E>
 {
 
 	/**Session and source constructor for general set modification.
@@ -17,7 +16,7 @@ public class SetEvent<S, E> extends CollectionEvent<S, E>
 	@param source The object on which the event initially occurred.
 	@exception NullPointerException if the given session and/or source is <code>null</code>.
 	*/
-	public SetEvent(final GuiseSession session, final S source)
+	public SetEvent(final GuiseSession session, final Object source)
 	{
 		this(session, source, null, null);	//construct the class with no known modification values
 	}
@@ -29,7 +28,7 @@ public class SetEvent<S, E> extends CollectionEvent<S, E>
 	@param removedElement The element that was removed from the set, or <code>null</code> if no element was removed or it is unknown whether or which elements were removed.
 	@exception NullPointerException if the given session and/or source is <code>null</code>.
 	*/
-	public SetEvent(final GuiseSession session, final S source, final E addedElement, final E removedElement)
+	public SetEvent(final GuiseSession session, final Object source, final E addedElement, final E removedElement)
 	{
 		super(session, source, addedElement, removedElement);	//construct the parent class
 	}
