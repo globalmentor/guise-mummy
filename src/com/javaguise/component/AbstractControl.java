@@ -9,6 +9,29 @@ import com.javaguise.model.Model;
 public abstract class AbstractControl<C extends Control<C>> extends AbstractComponent<C> implements Control<C>
 {
 
+	/**Whether the state of the control represents valid user input.*/
+//TODO fix	private boolean valid=true;
+
+		/**@return Whether the state of the control represents valid user input.*/
+//TODO fix		public boolean isValid() {return valid;}
+
+		/**Sets whether the state of the control represents valid user input
+		This is a bound property of type <code>Boolean</code>.
+		@param newValid <code>true</code> if user input should be considered valid
+		@see Control#VALID_PROPERTY
+		*/
+/*TODO fix
+		public void setValid(final boolean newValid)
+		{
+			if(valid!=newValid)	//if the value is really changing
+			{
+				final boolean oldValid=valid;	//get the current value
+				valid=newValid;	//update the value
+				firePropertyChange(VALID_PROPERTY, Boolean.valueOf(oldValid), Boolean.valueOf(newValid));
+			}
+		}
+*/
+
 	/**Session, ID, and model constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.

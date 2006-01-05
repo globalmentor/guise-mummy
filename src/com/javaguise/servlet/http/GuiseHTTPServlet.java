@@ -23,6 +23,7 @@ import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import com.javaguise.*;
+import com.javaguise.Bookmark.Parameter;
 import com.javaguise.component.*;
 import com.javaguise.component.transfer.*;
 import com.javaguise.context.GuiseContext;
@@ -49,6 +50,7 @@ import static com.garretwilson.io.ContentTypeConstants.*;
 import static com.garretwilson.io.ContentTypeUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.garretwilson.net.URIConstants;
 import com.garretwilson.net.URIUtilities;
 import com.garretwilson.net.http.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
@@ -98,7 +100,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	public final static String DATA_BASE_DIRECTORY_CONTEXT_PARAMETER="dataBaseDirectory";
 
 	/**The suffic for AJAX requests for each navigation path.*/
-	public final static String AJAX_URI_SUFFIX="_guise_ajax";
+//TODO del when works	public final static String AJAX_URI_SUFFIX="_guise_ajax";
 
 	/**The content type of a Guise AJAX request, <code>application/x-guise-ajax-request</code>.*/
 	public final static ContentType GUISE_AJAX_REQUEST_CONTENT_TYPE=new ContentType(ContentTypeConstants.APPLICATION, ContentTypeConstants.EXTENSION_PREFIX+"guise-ajax-request"+ContentTypeConstants.SUBTYPE_SUFFIX_DELIMITER_CHAR+ContentTypeConstants.XML_SUBTYPE_SUFFIX, null);
@@ -293,7 +295,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 					final String path=pathPanelBindingURI.getRawPath();	//extract the path from the URI
 					if(path!=null)	//if a path was specified
 					{
-						final ListMap<String, String> parameterListMap=getParameters(pathPanelBindingURI);	//get the URI parameters
+						final ListMap<String, String> parameterListMap=getParameterMap(pathPanelBindingURI);	//get the URI parameters
 						final String className=parameterListMap.getItem(NAVIGATION_CLASS_PARAMETER);	//get the class parameter
 						if(className!=null)	//if a class name was specified
 						{
@@ -392,8 +394,9 @@ Debug.info("content type:", request.getContentType());
 			{
 //TODO del Debug.trace("before getting requested URI, application base path is:", guiseApplication.getBasePath());
 				final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request		
-				
-				if(rawPathInfo.endsWith(AJAX_URI_SUFFIX))	//if this is an AJAX request
+				final String contentTypeString=request.getContentType();	//get the request content type
+				final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
+				if(contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType))	//if this is a Guise AJAX request
 				{
 					serviceAJAX(request, response, guiseContainer, guiseApplication, guiseSession, guiseContext);	//service this AJAX request
 				}
@@ -403,6 +406,9 @@ Debug.info("content type:", request.getContentType());
 //TODO del Debug.trace("Referrer:", getReferer(request));
 					assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
 					final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
+					
+					final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
+					
 					final NavigationPanel<?> navigationPanel=guiseSession.getNavigationPanel(navigationPath);	//get the panel bound to the requested path
 					if(navigationPanel!=null)	//if we found a frame class for this address
 					{
@@ -435,7 +441,25 @@ Debug.info("content type:", request.getContentType());
 							}
 						}
 */
+						
+						boolean isNavigation=true;	//TODO fix; workaround for initial IllegalStateException for navigation path not initialized
+						try
+						{
+							isNavigation=!navigationPath.equals(guiseSession.getNavigationPath()) || !ObjectUtilities.equals(bookmark, guiseSession.getBookmark());	//we're navigating if the navigation path or the bookmark changes
+						}
+						catch(final IllegalStateException illegalStateException)	//TODO fix
+						{
+							isNavigation=true;
+						}
+						
+						
+						
 						guiseSession.setNavigationPath(navigationPath);	//make sure the Guise session has the correct navigation path
+						guiseSession.setBookmark(bookmark);	//make sure the Guise session has the correct bookmark
+						if(isNavigation)	//if we are navigating to a different navigation path and/or bookmark
+						{
+							navigationPanel.navigated(navigationPath, bookmark);	//tell the navigation panel that navigation has occurred
+						}
 						final Principal oldPrincipal=guiseSession.getPrincipal();	//get the old principal
 						if(formSubmitEvent.getParameterListMap().size()>0)	//only query the view if there were submitted values---especially important for radio buttons and checkboxes, which must assume a value of false if nothing is submitted for them, thereby updating the model
 						{
@@ -467,47 +491,6 @@ Debug.info("content type:", request.getContentType());
 							throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
 						}
 						synchronizeCookies(request, response, guiseSession);	//synchronize the cookies going out in the response; do this before anything is written back to the client
-/*TODO del when works
-							//synchronize the cookies going out in the response; do this before anything is written back to the client; first remove unneeded cookies						
-						final GuiseEnvironment environment=guiseSession.getEnvironment();	//get the session's environment
-						final Cookie[] cookies=request.getCookies();	//get the cookies in the request
-						final Map<String, Cookie> cookieMap=new HashMap<String, Cookie>(cookies!=null ? cookies.length : 0);	//create a map to hold the cookies for quick lookup
-						if(cookies!=null)	//if a cookie array was returned
-						{
-							for(final Cookie cookie:cookies)	//for each cookie in the request
-							{
-								final String cookieName=cookie.getName();	//get the name of this cookie
-								final String environmentPropertyValue=asInstance(environment.getProperty(cookieName), String.class);	//see if there is a string environment property value for this cookie's name
-								if(environmentPropertyValue!=null)	//if a value in the environment matches the cookie's name
-								{
-									if(!ObjectUtilities.equals(cookie.getValue(), environmentPropertyValue))	//if the cookie's value doesn't match the environment property value
-									{
-										cookie.setValue(environmentPropertyValue);	//update the cookie's value
-									}
-									cookieMap.put(cookieName, cookie);	//store the cookie in the map
-								}
-								else	//if there is no such environment property, remove the cookie
-								{
-									cookie.setValue(null);	//remove the value now
-									cookie.setMaxAge(0);	//tell the cookie to expire immediately
-								}
-							}
-						}
-						for(final Map.Entry<String, Object> environmentPropertyEntry:environment.getProperties())	//iterate the environment properties so that new cookies can be added as needed
-						{
-							final String environmentPropertyName=environmentPropertyEntry.getKey();	//get the name of the environment property value
-							if(!cookieMap.containsKey(environmentPropertyName))	//if no cookie contains this environment variable
-							{
-								final String environmentPropertyValue=asInstance(environmentPropertyEntry.getValue(), String.class);	//get the environment property value as a string
-								if(environmentPropertyValue!=null)	//if there is a non-null environment property value
-								{									
-									final Cookie cookie=new Cookie(environmentPropertyName, environmentPropertyValue);	//create a new cookie
-									cookie.setMaxAge(Integer.MAX_VALUE);	//don't allow the cookie to expire for a very long time
-									response.addCookie(cookie);	//add the cookie to the response
-								}
-							}
-						}
-*/
 						guiseSession.getApplicationFrame().updateView(guiseContext);		//tell the application frame to update its view
 					}
 					else	//if we have no panel type for this address
@@ -538,7 +521,9 @@ Debug.info("content type:", request.getContentType());
 	{
 		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request		
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
-		final String navigationPath=rawPathInfo.substring(1, rawPathInfo.length()-AJAX_URI_SUFFIX.length());	//remove the beginning slash and the AJAX suffix
+		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
+		final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
+//TODO del		final String navigationPath=rawPathInfo.substring(1, rawPathInfo.length()-AJAX_URI_SUFFIX.length());	//remove the beginning slash and the AJAX suffix
 /*TODO del when works
 		if(Debug.isDebug() && Debug.getReportLevels().contains(Debug.ReportLevel.INFO))	//indicate the parameters if information tracing is turned on
 		{
@@ -555,6 +540,7 @@ Debug.info("content type:", request.getContentType());
 		if(navigationPanel!=null)	//if we found a panel class for this address
 		{
 			final ApplicationFrame<?> applicationFrame=guiseSession.getApplicationFrame();	//get the application frame
+			final Bookmark oldBookmark=guiseSession.getBookmark();	//get the original bookmark
 			
 			final List<ControlEvent> controlEvents=getControlEvents(request);	//get all control events from the request
 			guiseContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type
@@ -633,19 +619,34 @@ for(final Component<?> affectedComponent:affectedComponents)
 	Debug.trace("affected component:", affectedComponent);
 }
 */
+				final Bookmark newBookmark=guiseSession.getBookmark();	//see if the bookmark has changed
 				final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
-				if(requestedNavigation!=null)	//if navigation is requested
+				if(requestedNavigation!=null || !ObjectUtilities.equals(oldBookmark, newBookmark))	//if navigation is requested or the bookmark has changed, redirect the browser
 				{
-					final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
-//TODO del Debug.trace("navigation requested to", requestedNavigationURI);
-					guiseSession.clearRequestedNavigation();	//remove any navigation requests
-					if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
+					final String redirectURIString;	//we'll determine where to direct to
+					if(requestedNavigation!=null)	//if navigation is requested
 					{
-						beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation)requestedNavigation);	//begin the modal navigation
+						final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
+	//TODO del Debug.trace("navigation requested to", requestedNavigationURI);
+						guiseSession.clearRequestedNavigation();	//remove any navigation requests
+						if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
+						{
+							beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation)requestedNavigation);	//begin the modal navigation
+						}
+						redirectURIString=requestedNavigationURI.toString();	//we already have the destination URI
+					}
+					else	//if navigation is not requested, request a navigation to the new bookmark location
+					{
+/*TODO del
+						final StringBuffer stringBuffer=request.getRequestURL();	//get the request URL
+						stringBuffer.append(createURIQuery(newBookmark));	//append a query representing the bookmark
+Debug.trace("created bookmark URI from request URL", request.getRequestURL(), "and", createURIQuery(newBookmark));
+*/
+						redirectURIString=request.getRequestURL().append(newBookmark).toString();	//save the string form of the constructed bookmark URI
 					}
 					//TODO ifAJAX()
 					guiseContext.writeElementBegin(null, "navigate");	//<navigate>	//TODO use a constant
-					guiseContext.write(requestedNavigationURI.toString());	//write the navigation URI
+					guiseContext.write(redirectURIString);	//write the navigation URI
 					guiseContext.writeElementEnd(null, "navigate");	//</navigate>
 //TODO if !AJAX						throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
 					//TODO store a flag or something---if we're navigating, we probably should flush the other queued events
@@ -1255,6 +1256,48 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 		}
 	}
 
+	/**Creates a URI query string from a bookmark in the form "#<var>id</var>?<var>parameter1Name</var>=<var>parameter2Name</var>&amp;&hellip;".
+	@param bookmark The bookmark from which a query should be constructed.
+	@return A query string representing the bookmark appropriate for appending to a URI.
+	*/
+/*TODO del	
+	protected static String createURIQuery(final Bookmark bookmark)
+	{
+		final StringBuilder bookmarkQueryStringBuilder=new StringBuilder();	//create a new string builder
+		final List<Bookmark.Parameter> parameterList=bookmark.getParameters();	//get the list of bookmarks parameters
+		if(!parameterList.isEmpty())	//if there are parameters
+		{
+			final Bookmark.Parameter[] parameters=parameterList.toArray(new Bookmark.Parameter[parameterList.size()]);	//get an array of parameters
+			bookmarkQueryStringBuilder.append(constructQuery((NameValuePair<String, String>[])parameters));	//append the parameters to the query string
+		}
+		return bookmarkQueryStringBuilder.toString();	//return the string we constructed
+	}
+*/
+
+	/**Extracts the bookmark contained in the given request.
+	@param request The HTTP request object.
+	@return The bookmark represented by the request, or <code>null</code> if no bookmark is contained in the request.
+	*/
+	protected static Bookmark getBookmark(final HttpServletRequest request)
+	{
+		final String queryString=request.getQueryString();	//get the query string from the request
+		if(queryString!=null)	//if there is a query string
+		{
+			final NameValuePair<String, String>[] parameters=getParameters(queryString);	//get the parameters from the query string
+			final Bookmark.Parameter[] bookmarkParameters=new Bookmark.Parameter[parameters.length];	//create a new array of bookmark parameters
+			for(int i=parameters.length-1; i>=0; --i)	//for each parameter
+			{
+				final NameValuePair<String, String> parameter=parameters[i];	//get a reference to this parameter
+				bookmarkParameters[i]=new Bookmark.Parameter(parameter.getName(), parameter.getValue());	//create a corresponding bookmark parameter
+			}
+			return new Bookmark(bookmarkParameters);	//create a new bookmark from the parameters
+		}
+		else	//if there is no query string, there is no bookmark
+		{
+			return null;	//indicate that there is no bookmark information
+		}
+	}
+	
 	/**A Guise container for Guise HTTP servlets.
 	@author Garret Wilson
 	*/

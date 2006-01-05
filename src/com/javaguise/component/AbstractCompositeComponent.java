@@ -69,7 +69,7 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	This version returns <code>true</code> if all its child components are valid.
 	@return Whether the models of this component and all of its child components are valid.
 	*/
-	public boolean isValid()
+	public boolean isValid()	//TODO reconcile this design with the new control isValid() semantics
 	{
 		if(!super.isValid())	//if the component doesn't pass the default checks
 		{

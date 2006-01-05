@@ -31,10 +31,12 @@ Default converters are available for the following types:
 public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 {
 
-	/**The text literal bound property.*/
-	public final static String TEXT_PROPERTY=getPropertyName(TextControl.class, "text");
 	/**The masked bound property.*/
 	public final static String MASKED_PROPERTY=getPropertyName(TextControl.class, "masked");
+	/**The text literal bound property.*/
+	public final static String TEXT_PROPERTY=getPropertyName(TextControl.class, "text");
+	/**The valid bound property.*/
+//TODO del	public final static String VALID_PROPERTY=getPropertyName(TextControl.class, "valid");
 
 	/**The converter for this component.*/
 	private Converter<V, String> converter;
@@ -76,8 +78,35 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 				final String oldText=text;	//get the old value
 				text=newText;	//actually change the value
 				firePropertyChange(TEXT_PROPERTY, oldText, newText);	//indicate that the value changed
+				
+				
+				
+//TODO fix				updateValid();	//TODO testing; comment
 			}			
 		}
+
+	/**Whether the text literal value represents a valid value for the model.*/
+//TODO del	private boolean valid=true;
+
+		/**@return Whether the text literal value represents a valid value for the model.*/
+//TODO del		public boolean isValid() {return valid;}
+
+		/**Sets whether the text literal value represents a valid value for the value model.
+		This is a bound property of type <code>Boolean</code>.
+		@param newValid <code>true</code> if the text literal and model value should be considered valid.
+		@see #VALID_PROPERTY
+		*/
+/*TODO del
+		public void setValid(final boolean newValid)
+		{
+			if(valid!=newValid)	//if the value is really changing
+			{
+				final boolean oldValid=valid;	//get the current value
+				valid=newValid;	//update the value
+				firePropertyChange(VALID_PROPERTY, Boolean.valueOf(oldValid), Boolean.valueOf(newValid));
+			}
+		}
+*/
 
 	/**Whether the user input text is masked to prevent viewing of the literal entered value.*/
 	private boolean masked=false;
@@ -209,16 +238,7 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 	*/
 	public boolean isValid()
 	{
-/*TODO decide whether this is needed, now that we've refactored information into the component
-		if(!getController().isValid())	//if the controller isn't valid
-		{
-			return false;	//although the model may be valid, its view representation is not
-		}
-*/
-//TODO del		return super.isValid() && getConverter().isEquivalent(getModel().getValue(), getText());	//if this component is valid, make sure the model value and the literal text value match
-
 //TODO also use the converter to make sure the converted text is valid
-
 		if(!super.isValid())	//if the super class is valid, check the validity of the text
 		{
 			return false;	//this class isn't valid
@@ -239,6 +259,39 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 		return true;	//the values passed all validity checks
 //TODO del when works, but update comment		return super.isValid() && getConverter().isValidLiteral(getText());	//if this component is valid, make sure the literal value is valid, too (due to rounding, the displayed text may not represent the exact value as the literal)
 	}
+
+/*TODO fix
+	protected boolean determineValidity()
+	{
+		try
+		{
+			final V value=getConverter().convertLiteral(getText());	//see if the literal text can correctly be converted
+			final Validator<V> validator=getModel().getValidator();	//see if there is a validator installed
+			if(validator!=null)	//if there is a validator installed
+			{
+				validator.validate(value);	//validate the value represented by the literal text
+			}
+		}
+		catch(final ComponentException componentException)	//if there is a component error
+		{
+			return false;	//either the literal isn't valid or its converted value is not valid
+		}
+		return true;	//the values passed all validity checks
+	}
+*/
+	
+	/**Updates whether the control is valid based upon its current UI state.
+	This version checks to see if the current literal text can be converted to a valid value.
+	@see #getText()
+	@see #isValid()
+	@see #setValid(boolean)
+	*/
+/*TODO fix
+	protected void updateValid()
+	{
+		setValid(determineValidity());
+	}
+*/
 
 	/**Validates the model of this component and all child components.
 	The component will be updated with error information.

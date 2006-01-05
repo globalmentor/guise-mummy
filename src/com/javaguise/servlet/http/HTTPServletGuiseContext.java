@@ -18,6 +18,8 @@ import static com.garretwilson.io.ContentTypeConstants.*;
 import static com.garretwilson.io.ContentTypeUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
+
+import com.garretwilson.servlet.http.HttpServletUtilities;
 import com.garretwilson.text.CharacterEncoding;
 import com.garretwilson.text.xml.xpath.XPath;
 
@@ -73,7 +75,8 @@ public class HTTPServletGuiseContext extends AbstractXMLGuiseContext
 		super(session);	//construct the parent class
 		this.request=checkNull(request, "Request cannot be null.");
 		this.response=checkNull(response, "Response cannot be null.");
-		this.navigationURI=URI.create(request.getRequestURL().toString());	//create the absolute navigation URI from the HTTP requested URL
+//TODO decide if we want this to include parameters or not		this.navigationURI=URI.create(request.getRequestURL().toString());	//create the absolute navigation URI from the HTTP requested URL
+		this.navigationURI=HttpServletUtilities.getRequestURI(request);	//get the absolute navigation URI from the HTTP requested URL
 /*TODO del when not needed
 		final String contentTypeString=request.getContentType();	//get the request content type
 		inputContentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one

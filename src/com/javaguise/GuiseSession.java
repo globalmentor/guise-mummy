@@ -325,6 +325,17 @@ public interface GuiseSession extends PropertyBindable
 	*/
 	public void setNavigationPath(final String navigationPath);
 
+	/**Reports the current bookmark relative to the current navigation path.
+	@return The bookmark relative to the current navigation path, or <code>null</code> if there is no bookmark specified.
+	*/
+	public Bookmark getBookmark();
+
+	/**Changes the bookmark of the current navigation path.
+	This method does not necessarily cause navigation to occur, but instead "publishes" the bookmark to indicate that it is representative of the current state of the current navigation.
+	@param bookmark The bookmark relative to the current navigation path, or <code>null</code> if there should be no bookmark.
+	*/
+	public void setBookmark(final Bookmark bookmark);
+
 	/**@return The requested navigation, or <code>null</code> if no navigation has been requested.*/
 	public Navigation getRequestedNavigation();
 
@@ -340,6 +351,17 @@ public interface GuiseSession extends PropertyBindable
 	@see #navigate(URI)
 	*/
 	public void navigate(final String path);
+
+	/**Requests navigation to the specified path and bookmark.
+	The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
+	Later requested navigation before navigation occurs will override this request.
+	@param path A path that is either relative to the application context path or is absolute.
+	@param bookmark The bookmark at the given path, or <code>null</code> if no bookmark should be included in the navigation.
+	@exception NullPointerException if the given path is <code>null</code>.
+	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
+	@see #navigate(URI)
+	*/
+	public void navigate(final String path, final Bookmark bookmark);
 
 	/**Requests navigation to the specified URI.
 	The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
@@ -359,6 +381,18 @@ public interface GuiseSession extends PropertyBindable
 	@see #navigateModal(URI, ModalNavigationListener)
 	*/
 	public void navigateModal(final String path, final ModalNavigationListener modalListener);
+
+	/**Requests modal navigation to the specified path and bookmark.
+	The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
+	Later requested navigation before navigation occurs will override this request.
+	@param path A path that is either relative to the application context path or is absolute.
+	@param bookmark The bookmark at the given path, or <code>null</code> if no bookmark should be included in the navigation.
+	@param modalListener The listener to respond to the end of modal interaction.
+	@exception NullPointerException if the given path is <code>null</code>.
+	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
+	@see #navigateModal(URI, ModalNavigationListener)
+	*/
+	public void navigateModal(final String path, final Bookmark bookmark, final ModalNavigationListener modalListener);
 
 	/**Requests modal navigation to the specified URI.
 	The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.

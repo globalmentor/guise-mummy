@@ -23,6 +23,27 @@ public abstract class AbstractCardPanel<C extends Box<C> & Panel<C> & CardContro
 	/**@return The layout definition for the container.*/
 	public CardLayout getLayout() {return (CardLayout)super.getLayout();}
 
+	/**Whether the state of the control represents valid user input.*/
+	private boolean valid=true;
+
+		/**@return Whether the state of the control represents valid user input.*/
+		public boolean isValid() {return valid;}
+
+		/**Sets whether the state of the control represents valid user input
+		This is a bound property of type <code>Boolean</code>.
+		@param newValid <code>true</code> if user input should be considered valid
+		@see Control#VALID_PROPERTY
+		*/
+		public void setValid(final boolean newValid)
+		{
+			if(valid!=newValid)	//if the value is really changing
+			{
+				final boolean oldValid=valid;	//get the current value
+				valid=newValid;	//update the value
+				firePropertyChange(VALID_PROPERTY, Boolean.valueOf(oldValid), Boolean.valueOf(newValid));
+			}
+		}
+
 	/**The strategy used to generate a component to represent each value in the model.*/
 	private ValueRepresentationStrategy<Component<?>> valueRepresentationStrategy;
 

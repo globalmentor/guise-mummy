@@ -837,9 +837,32 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 				{
 					throw new IllegalArgumentException("Unknown navigation path: "+navigationPath);
 				}
-				this.navigationPath=navigationPath;	//change the navigation path TODO fire an event
+				this.navigationPath=navigationPath;	//change the navigation path TODO fire an event, but make sure that doesn't make the page reload
 			}
 		}
+
+	/**The bookmark relative to the navigation path.*/
+	private Bookmark bookmark=null;
+
+		/**Reports the current bookmark relative to the current navigation path.
+		@return The bookmark relative to the current navigation path, or <code>null</code> if there is no bookmark specified.
+		*/
+		public Bookmark getBookmark()
+		{
+			return bookmark;	//return the bookmark, if there is one
+		}
+	
+		/**Changes the bookmark of the current navigation path.
+		This method does not necessarily cause navigation to occur, but instead "publishes" the bookmark to indicate that it is representative of the current state of the current navigation.
+		@param bookmark The bookmark relative to the current navigation path, or <code>null</code> if there should be no bookmark.
+		*/
+		public void setBookmark(final Bookmark bookmark)
+		{
+			if(!ObjectUtilities.equals(this.bookmark, bookmark))	//if the bookmark is really changing
+			{
+				this.bookmark=bookmark;	//change the bookmark TODO fire an event, but make sure that doesn't make the page reload
+			}
+		}	
 
 	/**The requested navigation, or <code>null</code> if no navigation has been requested.*/
 	private Navigation requestedNavigation=null;
@@ -860,9 +883,24 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public void navigate(final String path)
 		{
-			navigate(createPathURI(path));	//navigate to the requested URI, converting the path to a URI and verifying that it is only a path
+			navigate(path, null);	//navigate to the requested path with no bookmark
 		}
-	
+
+		/**Requests navigation to the specified path and bookmark.
+		The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
+		Later requested navigation before navigation occurs will override this request.
+		@param path A path that is either relative to the application context path or is absolute.
+		@param bookmark The bookmark at the given path, or <code>null</code> if no bookmark should be included in the navigation.
+		@exception NullPointerException if the given path is <code>null</code>.
+		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
+		@see #navigate(URI)
+		*/
+		public void navigate(final String path, final Bookmark bookmark)
+		{
+			final String navigationPath=bookmark!=null ? path+bookmark.toString() : path;	//append the bookmark if needed
+			navigate(createPathURI(navigationPath));	//navigate to the requested URI, converting the path to a URI and verifying that it is only a path
+		}
+
 		/**Requests navigation to the specified URI.
 		The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
 		Later requested navigation before navigation occurs will override this request.
@@ -886,6 +924,22 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		public void navigateModal(final String path, final ModalNavigationListener modalListener)
 		{
 			navigateModal(createPathURI(path), modalListener);	//navigate to the requested URI, converting the path to a URI and verifying that it is only a path
+		}
+
+		/**Requests modal navigation to the specified path and bookmark.
+		The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
+		Later requested navigation before navigation occurs will override this request.
+		@param path A path that is either relative to the application context path or is absolute.
+		@param bookmark The bookmark at the given path, or <code>null</code> if no bookmark should be included in the navigation.
+		@param modalListener The listener to respond to the end of modal interaction.
+		@exception NullPointerException if the given path is <code>null</code>.
+		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
+		@see #navigateModal(URI, ModalNavigationListener)
+		*/
+		public void navigateModal(final String path, final Bookmark bookmark, final ModalNavigationListener modalListener)
+		{
+			final String navigationPath=bookmark!=null ? path+bookmark.toString() : path;	//append the bookmark if needed
+			navigateModal(createPathURI(navigationPath), modalListener);	//navigate to the requested URI, converting the path to a URI and verifying that it is only a path
 		}
 
 		/**Requests modal navigation to the specified URI.

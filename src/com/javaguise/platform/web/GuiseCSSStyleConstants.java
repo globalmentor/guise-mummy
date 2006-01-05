@@ -40,12 +40,15 @@ public class GuiseCSSStyleConstants
 	public final static String DIR_RTL_CLASS="dirRTL";
 	/**The CSS class indicating disabled state.*/
 	public final static String DISABLED_CLASS="disabled";
+	/**The CSS class indicating invalid contents.*/
+	public final static String INVALID_CLASS="invalid";
 	/**The CSS class indicating open state.*/
 	public final static String OPEN_CLASS="open";
 	/**The CSS class indicating rollover state.*/
 	public final static String ROLLOVER_CLASS="rollover";
 	/**The CSS class indicating selected state.*/
 	public final static String SELECTED_CLASS="selected";
+
 
 		//images
 	/**The CSS class suffix identifying the image caption.*/

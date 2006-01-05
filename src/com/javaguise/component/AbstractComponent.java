@@ -823,7 +823,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 	This version checks to ensure the component's model is valid.
 	@return Whether the models of this component and all of its child components are valid.
 	*/
-	public boolean isValid()
+	public boolean isValid()	//TODO remove this method to Control and integrate it into functionality there
 	{
 /*TODO decide whether this is needed, now that we've refactored information into the component
 		if(!getController().isValid())	//if the controller isn't valid

@@ -4,7 +4,9 @@ import java.net.URI;
 import java.util.Calendar;
 import java.util.Locale;
 
+import com.javaguise.Bookmark;
 import com.javaguise.GuiseSession;
+import com.javaguise.Bookmark.Parameter;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
 import com.javaguise.demo.DemoUser;
@@ -359,7 +361,52 @@ Debug.trace("list control changed value to", newValue);
 		buttonPanel.add(modalFrameLink);
 
 		contentPanel.add(buttonPanel);	//add the button panel to the panel
+
 		
+		
+		
+		
+		
+		
+		
+		
+		
+		final LayoutPanel bookmarkPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create a panel flowing horizontally
+
+		final Link bookmark1Link=new Link(session);
+		bookmark1Link.getModel().setLabel("Bookmark1");
+		bookmark1Link.getModel().addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent actionEvent)
+					{
+						getSession().setBookmark(new Bookmark(new Bookmark.Parameter("bookmark", "1")));
+					}
+				});
+		bookmarkPanel.add(bookmark1Link);
+
+		final Link bookmark2Link=new Link(session);
+		bookmark2Link.getModel().setLabel("Bookmark2");
+		bookmark2Link.getModel().addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent actionEvent)
+					{
+						getSession().setBookmark(new Bookmark(new Bookmark.Parameter("bookmark", "2")));
+					}
+				});
+		bookmarkPanel.add(bookmark2Link);
+
+		final Link bookmark3Link=new Link(session);
+		bookmark3Link.getModel().setLabel("Go Bookmark3");
+		bookmark3Link.getModel().addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent actionEvent)
+					{
+						getSession().navigate(getSession().getNavigationPath(), new Bookmark(new Bookmark.Parameter("bookmark", "3")));
+					}
+				});
+		bookmarkPanel.add(bookmark3Link);
+
+		contentPanel.add(bookmarkPanel);	//add the bookmark panel to the panel
 		
 		
 		final LayoutPanel sliderPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));

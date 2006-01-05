@@ -1,6 +1,5 @@
 /**Guise(TM) JavaScript support routines
 Copyright (c) 2005 GlobalMentor, Inc.
-var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX communication should not occur.
 */
 
 /**Guise AJAX Request Format, content type application/x-guise-ajax-request+xml
@@ -42,6 +41,8 @@ var AJAX_URI: The URI to use for AJAX communication, or null/undefined if AJAX c
 */
 
 //TODO before sending a drop event, send a component update for the drop target so that its value will be updated; or otherwise make sure the value is synchronized
+
+var AJAX_ENABLED=true;	//TODO allow this to be configured
 
 /**The URI of the XHTML namespace.*/
 var XHTML_NAMESPACE_URI="http://www.w3.org/1999/xhtml";
@@ -1309,7 +1310,7 @@ function GuiseAJAX()
 		*/
 		GuiseAJAX.prototype.sendAJAXRequest=function(ajaxRequest)
 		{
-			if(AJAX_URI)	//if AJAX is enabled
+			if(AJAX_ENABLED)	//if AJAX is enabled
 			{
 				this.ajaxRequests.enqueue(ajaxRequest);	//enqueue the request info
 				this.processAJAXRequests();	//process any waiting requests now if we can
@@ -1359,13 +1360,13 @@ function GuiseAJAX()
 					try
 					{
 //TODO del alert("ready to post: "+requestStringBuilder.toString());
-						this.httpCommunicator.post(AJAX_URI, requestStringBuilder.toString(), this.REQUEST_CONTENT_TYPE);	//post the HTTP request information
+						this.httpCommunicator.post(window.location.href, requestStringBuilder.toString(), this.REQUEST_CONTENT_TYPE);	//post the HTTP request information back to the same URI
 					}
 					catch(exception)	//if a problem occurred
 					{
 						//TODO log a warning
 //TODO fix alert(exception);
-						AJAX_URI=null;	//stop further AJAX communication
+						AJAX_ENABLED=false;	//stop further AJAX communication
 					}						
 				}
 				finally
@@ -1540,7 +1541,7 @@ alert("we returned, at least");
 				{
 					//TODO log a warning
 alert(exception);
-					AJAX_URI=null;	//stop further AJAX communication
+					AJAX_ENABLED=false;	//stop further AJAX communication
 					throw exception;	//TODO testing
 				}
 			};
@@ -2512,7 +2513,7 @@ This implementation uninstalls all listeners.
 */
 function onWindowUnload(event)
 {
-	AJAX_URI=null;	//turn off AJAX
+	AJAX_ENABLED=false;	//turn off AJAX
 	eventManager.clearEvents();	//unload all events
 }
 
@@ -2788,7 +2789,7 @@ test.add(dummy);
 */
 function onTextInputChange(event)
 {
-	if(AJAX_URI)	//if AJAX is enabled
+	if(AJAX_ENABLED)	//if AJAX is enabled
 	{
 		var textInput=event.currentTarget;	//get the control in which text changed
 	//TODO del alert("an input changed! "+textInput.id);
@@ -2911,7 +2912,7 @@ function onAction(event)
 			if(form && form.id)	//if there is a form with an ID
 			{
 				var actionInputID=form.id.replace(".form", ".input");	//determine the ID of the hidden action input TODO use a constant, or get these values using a better method
-				if(AJAX_URI)	//if AJAX is enabled
+				if(AJAX_ENABLED)	//if AJAX is enabled
 				{
 					var ajaxRequest=new FormAJAXEvent(new Parameter(actionInputID, componentID));	//create a new form request with form's hidden action control and the action element ID
 					guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request			
@@ -2950,7 +2951,7 @@ function onTabClick(event)	//TODO maybe refactor to use new action click
 		if(uri.parameters.length>0)	//if there are parameters given
 		{
 			var parameter=uri.parameters[0];	//get the first parameter
-			if(AJAX_URI)	//if AJAX is enabled
+			if(AJAX_ENABLED)	//if AJAX is enabled
 			{
 				var ajaxRequest=new FormAJAXEvent(parameter);	//create a new form request with the parameter
 				guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
@@ -2992,7 +2993,7 @@ function onActionClick(event)
 			var componentID=component.id;	//get the component ID
 			if(componentID)	//if there is a component ID
 			{
-				if(AJAX_URI)	//if AJAX is enabled
+				if(AJAX_ENABLED)	//if AJAX is enabled
 				{
 					var ajaxRequest=new ActionAJAXEvent(componentID, targetID, null);	//create a new action request with no action ID
 					guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
@@ -3010,7 +3011,7 @@ function onActionClick(event)
 function onCheckInputChange(event)
 {
 	var checkInput=event.currentTarget;	//get the control that was listening for events (the target could be the check input's label, as occurs in Mozilla)
-	if(AJAX_URI)	//if AJAX is enabled
+	if(AJAX_ENABLED)	//if AJAX is enabled
 	{
 		var ajaxRequest=new FormAJAXEvent(new Parameter(checkInput.name, checkInput.checked ? checkInput.value : ""));	//create a new form request with the control name and value
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
@@ -3034,7 +3035,7 @@ function onCheckInputChange(event)
 */
 function onSelectChange(event)
 {
-	if(AJAX_URI)	//if AJAX is enabled
+	if(AJAX_ENABLED)	//if AJAX is enabled
 	{
 		var select=event.currentTarget;	//get the control to which the listener was listening
 	//TODO del alert("a select changed! "+select.id);
@@ -3058,7 +3059,7 @@ function onSelectChange(event)
 */
 function onTreeNodeClick(event)
 {
-	if(AJAX_URI)	//if AJAX is enabled
+	if(AJAX_ENABLED)	//if AJAX is enabled
 	{
 		if(event.target.nodeName.toLowerCase()=="a")	//TODO fix; temporary hack for allowing links inside trees
 		{
