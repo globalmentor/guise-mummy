@@ -11,7 +11,7 @@ import com.javaguise.model.Model;
 Iterating over child components is thread safe.
 @author Garret Wilson
 */
-public abstract class AbstractListCompositeComponent<C extends CompositeComponent<C>> extends AbstractCompositeComponent<C>
+public abstract class AbstractListCompositeComponent<C extends CompositeComponent<C>> extends AbstractMultipleCompositeComponent<C>
 {
 
 	/**The list of child components.*/ 

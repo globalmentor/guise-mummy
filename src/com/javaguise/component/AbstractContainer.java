@@ -62,7 +62,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		}
 		final T layoutConstraints=constraints!=null ? (T)constraints : layout.createDefaultConstraints();	//create default constraints if we need to TODO use the layout constraints class to cast the value
 		addComponent(component);	//add the component to the list
-		component.setParent(this);	//tell the component who its parent is
+//TODO del; moved to AbstractCompositeComponent		component.setParent(this);	//tell the component who its parent is
 		layout.setConstraints(component, layoutConstraints);	//tell the layout the constraints
 		fireContainerModified(indexOf(component), component, null);	//indicate the component was added at the index
 	}
@@ -80,7 +80,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		final int index=indexOf(component);	//get the index of the component TODO do we want to see if the component is actually in the container?
 		getLayout().removeConstraints(component);	//remove the constraints for this component
 		removeComponent(component);	//remove the component from the list
-		component.setParent(null);	//tell the component it no longer has a parent
+//TODO del; moved to AbstractdCompositeComponent		component.setParent(null);	//tell the component it no longer has a parent
 		fireContainerModified(index, null, component);	//indicate the component was removed from the index
 	}
 

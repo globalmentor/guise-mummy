@@ -234,6 +234,16 @@ public interface GuiseSession extends PropertyBindable
 	*/
 	public URI getURIResource(final String resourceKey, final URI defaultValue) throws MissingResourceException;
 
+	/**Determines a URI value either explicitly set or stored in the resources.
+	If a value is explicitly specified, it will be used; otherwise, a value will be loaded from the resources if possible.
+	@param value The value explicitly set, which will override any resource.
+	@param resourceKey The key for looking up a resource if no value is explicitly set.
+	@return The URI value, or <code>null</code> if there is no value available, neither explicitly set nor in the resources.
+	@exception MissingResourceException if there was an error loading the value from the resources.
+	@see #getURIResource(String)
+	*/
+	public URI determineURI(final URI value, final String resourceKey) throws MissingResourceException;
+
 	/**@return The current principal (e.g. logged-in user), or <code>null</code> if there is no principal authenticated for this session.*/
 	public Principal getPrincipal();
 

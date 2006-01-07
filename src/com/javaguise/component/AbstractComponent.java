@@ -26,7 +26,6 @@ import com.javaguise.geometry.Dimensions;
 import com.javaguise.geometry.Extent;
 import com.javaguise.geometry.Point;
 import com.javaguise.geometry.Rectangle;
-import com.javaguise.model.ActionModel;
 import com.javaguise.model.Model;
 import com.javaguise.style.Color;
 import com.javaguise.style.RGBColor;

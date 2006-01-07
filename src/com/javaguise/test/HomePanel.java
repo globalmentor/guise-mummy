@@ -198,6 +198,22 @@ Debug.trace("list control changed value to", newValue);
 		
 		contentPanel.add(testLabel);	//add a new label
 		
+		
+		
+		
+		
+		
+		final Flash flash=new Flash(session);
+		flash.setFlashURI(URI.create("combos.swf"));
+		flash.setPreferredWidth(new Extent(760));
+		flash.setPreferredHeight(new Extent(955));
+		contentPanel.add(flash);
+		
+		
+		
+		
+		
+		
 		final LayoutPanel buttonPanel=new LayoutPanel(session, "testButtonPanel", new FlowLayout(session, Flow.LINE));	//create a panel flowing horizontally
 
 		final Button testButton=new Button(session, "testButton");

@@ -5,7 +5,7 @@ import com.javaguise.GuiseSession;
 /**A layout for a menu that flows along an axis.
 @author Garret Wilson
 */
-public class MenuLayout extends AbstractFlowLayout<MenuLayout.Constraints>
+public class MenuLayout extends AbstractFlowLayout<MenuLayout.Constraints>	//TODO probably move this into the menu class
 {
 
 	/**Session and flow constructor.
