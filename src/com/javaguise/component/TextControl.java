@@ -33,6 +33,8 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 
 	/**The masked bound property.*/
 	public final static String MASKED_PROPERTY=getPropertyName(TextControl.class, "masked");
+	/**The maximum length bound property.*/
+	public final static String MAXIMUM_LENGTH_PROPERTY=getPropertyName(TextControl.class, "maximumLength");
 	/**The text literal bound property.*/
 	public final static String TEXT_PROPERTY=getPropertyName(TextControl.class, "text");
 	/**The valid bound property.*/
@@ -126,6 +128,27 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 				final boolean oldEnabled=masked;	//get the old value
 				masked=newMasked;	//actually change the value
 				firePropertyChange(MASKED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newMasked));	//indicate that the value changed
+			}			
+		}
+
+	/**The maximum number of input characters to allow, or -1 if there is no maximum length.*/
+	private int maximumLength=-1;
+
+		/**@return The maximum number of input characters to allow, or -1 if there is no maximum length.*/
+		public int getMaximumLength() {return maximumLength;}
+
+		/**Sets the maximum number of input characters to allow.
+		This is a bound property of type <code>Integer</code>.
+		@param newMaximumLength The new maximum number of input characters to allow, or -1 if there is no maximum length.
+		@see #MAXIMUM_LENGTH_PROPERTY 
+		*/
+		public void setMaximumLength(final int newMaximumLength)
+		{
+			if(maximumLength!=newMaximumLength)	//if the value is really changing
+			{
+				final int oldMaximumLength=maximumLength;	//get the old value
+				maximumLength=newMaximumLength;	//actually change the value
+				firePropertyChange(MAXIMUM_LENGTH_PROPERTY, new Integer(oldMaximumLength), new Integer(newMaximumLength));	//indicate that the value changed
 			}			
 		}
 
