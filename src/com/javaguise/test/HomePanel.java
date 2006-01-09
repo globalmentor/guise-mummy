@@ -9,6 +9,7 @@ import com.javaguise.GuiseSession;
 import com.javaguise.Bookmark.Parameter;
 import com.javaguise.component.*;
 import com.javaguise.component.layout.*;
+import com.javaguise.component.layout.ReferenceLayout.Constraints;
 import com.javaguise.demo.DemoUser;
 import com.javaguise.demo.EditUserPanel;
 import com.javaguise.event.*;
@@ -202,13 +203,25 @@ Debug.trace("list control changed value to", newValue);
 		
 		
 		
-		
+/*TODO del; testing
 		final Flash flash=new Flash(session);
 		flash.setFlashURI(URI.create("combos.swf"));
 		flash.setPreferredWidth(new Extent(760));
 		flash.setPreferredHeight(new Extent(955));
 		contentPanel.add(flash);
+*/
 		
+		final Text testText=new Text(session);
+		testText.getModel().setTextContentType(TextModel.XHTML_CONTENT_TYPE);
+		testText.getModel().setTextResourceKey("test.html");
+		
+		final Label boundLabel=new Label(session);
+		boundLabel.getModel().setLabel("Button");
+		boundLabel.getModel().setDescription("This is button flyover.");
+		boundLabel.setFlyoverEnabled(true);	//turn on flyovers
+		testText.add(boundLabel, new ReferenceLayout.Constraints("boundComponent"));
+
+		contentPanel.add(testText);
 		
 		
 		
