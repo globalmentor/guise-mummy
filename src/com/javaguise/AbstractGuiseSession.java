@@ -932,7 +932,19 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public void navigate(final URI uri)
 		{
-			requestedNavigation=new Navigation(getApplication().resolveURI(createPathURI(getNavigationPath())), getApplication().resolveURI(checkNull(uri, "URI cannot be null.")));	//resolve the URI against the application context path
+			navigate(uri, null);	//navigate to the given URI in the current viewport
+		}
+
+		/**Requests navigation to the specified URI in an identified viewport.
+		The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
+		Later requested navigation before navigation occurs will override this request.
+		@param uri Either a relative or absolute path, or an absolute URI.
+		@param viewportID The ID of the viewport in which navigation should occur, or <code>null</code> if navigation should occur in the current viewport.
+		@exception NullPointerException if the given URI is <code>null</code>.
+		*/
+		public void navigate(final URI uri, final String viewportID)
+		{
+			requestedNavigation=new Navigation(getApplication().resolveURI(createPathURI(getNavigationPath())), getApplication().resolveURI(checkNull(uri, "URI cannot be null.")), viewportID);	//resolve the URI against the application context path
 		}
 
 		/**Requests modal navigation to the specified path.

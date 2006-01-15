@@ -381,6 +381,15 @@ public interface GuiseSession extends PropertyBindable
 	*/
 	public void navigate(final URI uri);
 
+	/**Requests navigation to the specified URI in an identified viewport.
+	The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
+	Later requested navigation before navigation occurs will override this request.
+	@param uri Either a relative or absolute path, or an absolute URI.
+	@param viewportID The ID of the viewport in which navigation should occur, or <code>null</code> if navigation should occur in the current viewport.
+	@exception NullPointerException if the given URI is <code>null</code>.
+	*/
+	public void navigate(final URI uri, final String viewportID);
+
 	/**Requests modal navigation to the specified path.
 	The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
 	Later requested navigation before navigation occurs will override this request.

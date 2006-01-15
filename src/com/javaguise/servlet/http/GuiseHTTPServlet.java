@@ -488,6 +488,7 @@ Debug.info("content type:", request.getContentType());
 							{
 								beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation)requestedNavigation);	//begin the modal navigation
 							}
+							//TODO fix to work with other viewports
 							throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
 						}
 						synchronizeCookies(request, response, guiseSession);	//synchronize the cookies going out in the response; do this before anything is written back to the client
@@ -646,6 +647,14 @@ Debug.trace("created bookmark URI from request URL", request.getRequestURL(), "a
 					}
 					//TODO ifAJAX()
 					guiseContext.writeElementBegin(null, "navigate");	//<navigate>	//TODO use a constant
+					if(requestedNavigation!=null)	//if navigation was requested (i.e. this isn't just a bookmark registration)
+					{
+						final String viewportID=requestedNavigation.getViewportID();	//get the requested viewport ID
+						if(viewportID!=null)	//if a viewport was requested
+						{
+							guiseContext.writeAttribute(null, "viewportID", viewportID);	//specify the viewport ID TODO use a constant
+						}
+					}
 					guiseContext.write(redirectURIString);	//write the navigation URI
 					guiseContext.writeElementEnd(null, "navigate");	//</navigate>
 //TODO if !AJAX						throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location

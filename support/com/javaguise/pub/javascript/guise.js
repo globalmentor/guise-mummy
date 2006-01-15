@@ -1303,7 +1303,7 @@ function GuiseAJAX()
 		GuiseAJAX.prototype.RESPONSE_CONTENT_TYPE="application/x-guise-ajax-response+xml";
 
 		/**The enumeration of the names of the response elements.*/
-		GuiseAJAX.prototype.ResponseElement={RESPONSE: "response", PATCH: "patch", REMOVE: "remove", NAVIGATE: "navigate", RELOAD: "reload"};
+		GuiseAJAX.prototype.ResponseElement={RESPONSE: "response", PATCH: "patch", REMOVE: "remove", NAVIGATE: "navigate", VIEWPORT_ID: "viewportID", RELOAD: "reload"};
 
 		/**Immediately sends or queues an AJAX request.
 		@param ajaxRequest The AJAX request to send.
@@ -1556,6 +1556,7 @@ alert(exception);
 			if(!this.processingAJAXResponses)	//if we aren't processing AJAX responses TODO fix small race condition in determining whether processing is occurring
 			{
 				this.processingAJAXResponses=true;	//we are processing AJAX responses now
+				var newHRef=null;	//we'll see if a new URI was requested at any point
 				try
 				{
 					while(this.ajaxResponses.length>0)	//while there are more AJAX responses TODO fix small race condition on adding responses
@@ -1579,9 +1580,12 @@ alert(exception);
 										this._processRemove(childNode);	//remove the elements from the document with this removal element
 										break;
 									case this.ResponseElement.NAVIGATE:	//navigate
-										window.location.href=getText(childNode);	//go to the new location
-										return;	//stop processing events
-//TODO del when works										break;	//TODO decide whether we should continue processing events or not
+										var navigateURI=this._processNavigate(childNode);	//navigate to the specified request
+										if(navigateURI!=null)	//if a new navigation URI was requested
+										{
+											newHRef=navigateURI;	//request navigation to the new URI
+										}
+										break;	//TODO decide whether we should continue processing events or not
 									case this.ResponseElement.RELOAD:	//reload
 										window.location.reload();	//reload the page
 										return;	//stop processing events
@@ -1590,6 +1594,11 @@ alert(exception);
 						}
 						this.processAJAXRequests();	//make sure there are no waiting AJAX requests
 					}
+					if(newHRef!=null)	//if navigation was requested
+					{
+						AJAX_ENABLED=false;	//turn off AJAX processing
+						window.location.href=newHRef;	//go to the new location
+					}
 				}
 				finally
 				{
@@ -1597,6 +1606,26 @@ alert(exception);
 				}
 			}
 		};
+
+		/**Processes the AJAX navigate response.
+		If navigation is requested in a new viewport, navigation occurs; otherwise, the new navigation URI is returned.
+		@param element The element representing the navigate response.
+		@return The URI of the new requested navigation, or null if there is no new navigation or if the navigation occurs in a separate viewport
+		*/ 
+		GuiseAJAX.prototype._processNavigate=function(element)
+		{
+			var navigateURI=getText(element);	//report the requested location
+			var viewportID=element.getAttribute(this.ResponseElement.VIEWPORT_ID);	//get the viewport ID, if there is one
+			if(viewportID!=null)	//if there is a viewport ID
+			{
+				window.open(navigateURI, viewportID);	//open the URI in the designated viewport
+				return null;
+			}
+			else	//if no viewport ID is specified, use the default viewport---just change our current location
+			{
+				return navigateURI;	//report the requested location
+			}
+		}
 
 		/**Processes the AJAX patch response.
 		Only child elements with IDs will be processed.
@@ -2557,9 +2586,12 @@ function initializeNode(node)
 					case "a":
 						if(elementClassNames.contains("actionControl"))	//if this is a Guise action TODO later look at *all* link clicks and do popups for certain ones
 						{
-							eventManager.addEvent(node, "click", onLinkClick, false);	//listen for anchor clicks
+							if(!node.getAttribute("target"))	//if the link has no target (the target wouldn't work if we tried to take over the events; we can't just check for null because IE will always send back at least "")
+							{
+								eventManager.addEvent(node, "click", onLinkClick, false);	//listen for anchor clicks
+							}
 						}
-						else if(elementClassNames.containsMatch(/-tab$/))	//if this is a tab TODO use a constant
+						else if(elementClassNames.containsMatch(/-tab$/))	//if this is a tab TODO use a constant TODO is this still used?
 						{
 							eventManager.addEvent(node, "click", onTabClick, false);	//listen for tab clicks
 						}

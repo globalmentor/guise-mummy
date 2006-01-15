@@ -28,13 +28,14 @@ public final class NavigateActionListener extends AbstractNavigateActionListener
 		super(navigationURI);	//construct the parent class
 	}
 
-	/**Called when an action is initiated.
-	This implementation requests navigation from the session.
-	@param actionEvent The event indicating the source of the action.
+	/**Constructs a listener to navigate to the provided URI in the identified viewport.
+	@param navigationURI The URI for navigation when the action occurs.
+	@param viewportID The ID of the viewport in which navigation should occur, or <code>null</code> if navigation should occur in the current viewport.
+	@exception NullPointerException if the given navigation URI is null.
 	*/
-	public void actionPerformed(final ActionEvent actionEvent)
+	public NavigateActionListener(final URI navigationURI, final String viewportID)
 	{
-		actionEvent.getSession().navigate(getNavigationURI());	//request that the session navigate to the configured URI
+		super(navigationURI, viewportID);	//construct the parent class
 	}
 
 }

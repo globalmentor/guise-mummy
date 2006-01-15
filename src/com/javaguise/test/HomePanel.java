@@ -210,7 +210,8 @@ Debug.trace("list control changed value to", newValue);
 		flash.setPreferredHeight(new Extent(955));
 		contentPanel.add(flash);
 */
-		
+
+/*TODO
 		final Text testText=new Text(session);
 		testText.getModel().setTextContentType(TextModel.XHTML_CONTENT_TYPE);
 		testText.getModel().setTextResourceKey("test.html");
@@ -222,10 +223,7 @@ Debug.trace("list control changed value to", newValue);
 		testText.add(boundLabel, new ReferenceLayout.Constraints("boundComponent"));
 
 		contentPanel.add(testText);
-		
-		
-		
-		
+*/
 		
 		final LayoutPanel buttonPanel=new LayoutPanel(session, "testButtonPanel", new FlowLayout(session, Flow.LINE));	//create a panel flowing horizontally
 
@@ -393,9 +391,44 @@ Debug.trace("list control changed value to", newValue);
 
 		
 		
+
+		
+		final LayoutPanel linkPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create a panel flowing horizontally
+		
+		final Link nearbyLink=new Link(session);
+		nearbyLink.getModel().setLabel("Inside");
+		nearbyLink.getModel().addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent actionEvent)
+					{
+						session.navigate(URI.create("http://www.cnn.com"));
+					}
+				});
+		linkPanel.add(nearbyLink);
+		
+		final Link popupLink=new Link(session);
+		popupLink.getModel().setLabel("Popup");
+		popupLink.getModel().addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent actionEvent)
+					{
+						session.navigate(URI.create("http://www.cnn.com"), "another");
+					}
+				});
+		linkPanel.add(popupLink);
+	
+		contentPanel.add(linkPanel);
+		
+		final Link listenerPopupLink=new Link(session);
+		listenerPopupLink.getModel().setLabel("Popup from NavigateActionListener");
+		listenerPopupLink.getModel().addActionListener(new NavigateActionListener(URI.create("http://www.about.com"), "another"));
+		linkPanel.add(listenerPopupLink);
 		
 		
-		
+		final CheckControl check3=new CheckControl(session);	
+		check3.setCheckType(CheckControl.CheckType.ELLIPSE);
+		check3.getModel().setLabel("Third, disconnected check");
+		contentPanel.add(check3);
 		
 		
 		
@@ -481,7 +514,7 @@ Debug.trace("list control changed value to", newValue);
 	
 	
 		final GroupPanel booleanPanel=new GroupPanel(session, new FlowLayout(session, Flow.PAGE));	//create a panel flowing vertically
-		booleanPanel.setDragEnabled(true);
+//		booleanPanel.setDragEnabled(true);
 		booleanPanel.getModel().setLabel("Check one of these");
 		final CheckControl check1=new CheckControl(session, "check1");
 		check1.setCheckType(CheckControl.CheckType.ELLIPSE);
@@ -490,17 +523,18 @@ Debug.trace("list control changed value to", newValue);
 		final CheckControl check2=new CheckControl(session, "check2");	
 		check2.setCheckType(CheckControl.CheckType.ELLIPSE);
 		check2.getModel().setLabel("Second check");
-		check2.getModel().setEnabled(false);	//TODO fix
-		booleanPanel.add(check2);	
+//		check2.getModel().setEnabled(false);	//TODO fix
+		booleanPanel.add(check2);
 		final ModelGroup<ValueModel<Boolean>> booleanGroup=new MutualExclusionPolicyModelGroup();
 		booleanGroup.add(check1.getModel());
 		booleanGroup.add(check2.getModel());
+		booleanGroup.add(check3.getModel());
 	
 		horizontalPanel.add(booleanPanel);
 
 		final Button testButtona=new Button(session, "testButton");
 		testButtona.getModel().setLabel("Nuther button.");
-		testButtona.setDragEnabled(true);
+//		testButtona.setDragEnabled(true);
 		horizontalPanel.add(testButtona);	//add a new button
 /*TODO fix		
 		final Panel booleanPanela=new Panel(session, new FlowLayout(Axis.Y));	//create a panel flowing vertically

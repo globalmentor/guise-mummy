@@ -1,0 +1,20 @@
+<!-- Guise XHTML DTD -->
+<!-- Copyright (c) 2006 GlobalMentor, Inc. -->
+<!--
+	Public and System Identifiers:
+		PUBLIC "-//Guise//DTD XHTML Guise 1.0//EN"
+		SYSTEM "http://www.guiseframework.org/guise/dtd/guise.dtd"
+
+		example: <!DOCTYPE html PUBLIC "-//Guise//DTD XHTML Guise 1.0//EN" "http://www.guiseframework.org/guise/dtd/guise.dtd">
+
+@see: http://golem.ph.utexas.edu/DTD/xhtml11-target.dtd
+@see http://groups.yahoo.com/group/XHTML-L/message/1933
+-->
+
+<!--import XHTML 1.1 base module-->
+<!ENTITY % xhtml11-base.mod PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+%xhtml11-base.mod;
+
+<!--import XHTML 1.1 target module-->
+<!ENTITY % xhtml-target.mod PUBLIC "-//W3C//ELEMENTS XHTML Target 1.0//EN" "http://www.w3.org/TR/xhtml-modularization/DTD/xhtml-target-1.mod">
+%xhtml-target.mod;
