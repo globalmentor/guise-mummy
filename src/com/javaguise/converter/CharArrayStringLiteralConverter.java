@@ -30,7 +30,7 @@ public class CharArrayStringLiteralConverter extends AbstractStringLiteralConver
 	/**Converts a value from the value space to a literal value in the lexical space.
 	This version creates a new string based upon the character array value. 
 	@param value The value in the value space to convert.
-	@return The converted value in the lexical space, or <code>null</code> if the given literal is <code>null</code>..
+	@return The converted value in the lexical space, or <code>null</code> if the given literal is <code>null</code>.
 	@exception ConversionException if the value cannot be converted.
 	*/ 
 	public String convertValue(final char[] value) throws ConversionException

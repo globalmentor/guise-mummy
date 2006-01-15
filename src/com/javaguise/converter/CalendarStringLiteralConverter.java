@@ -36,7 +36,7 @@ public class CalendarStringLiteralConverter extends AbstractDateStringLiteralCon
 	This implementation converts the value using the date format object.
 	This implementation synchronizes on the {@link DateFormat} instance. 
 	@param value The value in the value space to convert.
-	@return The converted value in the lexical space, or <code>null</code> if the given literal is <code>null</code>..
+	@return The converted value in the lexical space, or <code>null</code> if the given literal is <code>null</code>.
 	@exception ConversionException if the value cannot be converted.
 	@see #getDateFormat()
 	*/ 

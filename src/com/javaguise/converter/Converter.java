@@ -59,7 +59,7 @@ public interface Converter<V, L> extends PropertyBindable
 
 	/**Converts a value from the value space to a literal value in the lexical space.
 	@param value The value in the value space to convert.
-	@return The converted value in the lexical space, or <code>null</code> if the given literal is <code>null</code>..
+	@return The converted value in the lexical space, or <code>null</code> if the given literal is <code>null</code>.
 	@exception ConversionException if the value cannot be converted.
 	*/ 
 	public L convertValue(final V value) throws ConversionException;

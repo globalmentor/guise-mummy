@@ -54,7 +54,6 @@ public interface ListSelectControl<V, C extends ListSelectControl<V, C>> extends
 //TODO del if not needed	}
 
 	/**A strategy for generating components to represent list select model values.
-	The component ID should reflect a unique identifier of the item
 	@param <VV> The type of value the strategy is to represent.
 	@author Garret Wilson
 	*/
@@ -63,15 +62,14 @@ public interface ListSelectControl<V, C extends ListSelectControl<V, C>> extends
 		/**Creates a component for the given list value.
 		@param model The model containing the value.
 		@param value The value for which a component should be created.
-		@param index The index of the value within the list.
+		@param index The index of the value within the list, or -1 if the value is not in the list (e.g. for representing no selection).
 		@param selected <code>true</code> if the value is selected.
 		@param focused <code>true</code> if the value has the focus.
-		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
+		@return A new component to represent the given value.
 		*/
 		public Component<?> createComponent(final ListSelectModel<VV> model, final VV value, final int index, final boolean selected, final boolean focused);
 
 		/**Determines an identier for the given object.
-		This value must be equal to the ID of the component returned by the {@link #createComponent(VV)} method.
 		@param value The value for which an identifier should be returned.
 		@return A string identifying the value, or <code>null</code> if the provided value is <code>null</code>.
 		@see Component#getID()

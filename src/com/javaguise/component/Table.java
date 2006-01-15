@@ -265,7 +265,7 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 		@param editable Whether values in this column are editable.
 		@param selected <code>true</code> if the value is selected.
 		@param focused <code>true</code> if the value has the focus.
-		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
+		@return A new component to represent the given value.
 		*/
 		public <C extends V> Component<?> createComponent(final Table table, final TableModel model, final int rowIndex, final TableColumnModel<C> column, final boolean editable, final boolean selected, final boolean focused);
 	}
@@ -317,7 +317,7 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 		@param editable Whether values in this column are editable.
 		@param selected <code>true</code> if the value is selected.
 		@param focused <code>true</code> if the value has the focus.
-		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
+		@return A new component to represent the given value.
 		*/
 		@SuppressWarnings("unchecked")	//we check the type of the column value class, so the casts are safe
 		public <C extends V> Component<?> createComponent(final Table table, final TableModel model, final int rowIndex, final TableColumnModel<C> column, final boolean editable, final boolean selected, final boolean focused)

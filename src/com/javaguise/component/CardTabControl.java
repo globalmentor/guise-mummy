@@ -118,7 +118,7 @@ public class CardTabControl extends TabControl<Component<?>>
 
 	/**A value representation strategy for representing cards.
 	A label component will be generated based on the card layout information.
-	The label's ID will be the card component's ID.
+	The value's ID will be the card component's ID.
 	@see Label
 	@author Garret Wilson
 	*/
@@ -142,10 +142,9 @@ public class CardTabControl extends TabControl<Component<?>>
 
 		/**Creates a component for the given list value.
 		This implementation returns a label with information from the card layout.
-		The label's ID will be the card component's ID.
 		@param model The model containing the value.
 		@param value The value for which a component should be created.
-		@param index The index of the value within the list.
+		@param index The index of the value within the list, or -1 if the value is not in the list (e.g. for representing no selection).
 		@param selected <code>true</code> if the value is selected.
 		@param focused <code>true</code> if the value has the focus.
 		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
@@ -153,8 +152,8 @@ public class CardTabControl extends TabControl<Component<?>>
 		public Label createComponent(final ListSelectModel<Component<?>> model, final Component<?> value, final int index, final boolean selected, final boolean focused)
 		{
 			return value!=null	//if there is a value
-					? new Label(getCardLayout().getSession(), getID(value), getCardLayout().getConstraints(value).getLabel())	//generate a label containing the label model from the card layout constraints
-					: null;	//otherwise return null
+					? new Label(getCardLayout().getSession(), getCardLayout().getConstraints(value).getLabel())	//generate a label containing the label model from the card layout constraints
+					: new Label(getCardLayout().getSession());	//otherwise return an empty label
 		}
 
 		/**Determines an identifier for the given object.

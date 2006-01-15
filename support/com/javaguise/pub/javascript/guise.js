@@ -1,8 +1,8 @@
-/**Guise(TM) JavaScript support routines
+/*Guise(TM) JavaScript support routines
 Copyright (c) 2005 GlobalMentor, Inc.
 */
 
-/**Guise AJAX Request Format, content type application/x-guise-ajax-request+xml
+/*Guise AJAX Request Format, content type application/x-guise-ajax-request+xml
 <request>
 	<init/>	<!--initializes the page, requesting all frames to be resent-->
 	<events>	<!--the list of events (zero or more)-->
@@ -31,13 +31,22 @@ Copyright (c) 2005 GlobalMentor, Inc.
 </request>
 */
 
-/**Guise AJAX Response Format, content type application/x-guise-ajax-response+xml
+/*Guise AJAX Response Format, content type application/x-guise-ajax-response+xml
 <response>
 	<patch></patch>	<!--XML elements to be patched into the existing DOM tree.-->
 	<remove id=""/>	<!--ID of the XML element to be removed from the existing DOM tree.-->
 	<navigate>uri</navigate>	<!--URI of another page to which to navigate.-->
 	<frame></frame>	<!--definition of a frame to show-->
 </response>
+*/
+
+/*Guise modal windows
+Guise creates a div element and places it as a layer in the z-order behind the top frame when modal frames are needed.
+To work around the IE6 bug where select elements are windowed controls, Guise places a separate transparant IFrame behind the modal div element.
+This blocks out IE6 select elements, and does not help non-modal frames.
+See http://dotnetjunkies.com/WebLog/jking/archive/2003/07/21/488.aspx .
+See http://homepage.mac.com/igstudio/design/ulsmenus/vertical-uls-iframe.html .
+TODO only create modal IFrames if IE6 is present
 */
 
 //TODO before sending a drop event, send a component update for the drop target so that its value will be updated; or otherwise make sure the value is synchronized
@@ -246,10 +255,19 @@ guiseFrames.updateModal=function()
 	{
 		modalLayer.style.zIndex=this.modalFrame.style.zIndex-1;	//place the modal layer directly behind the modal frame
 		modalLayer.style.display="block";	//make the modal layer visible
+		if(modalIFrame)	//if we have a modal IFrame
+		{
+			modalIFrame.style.zIndex=modalLayer.style.zIndex-1;	//place the modal iframe directly behind the modal layer
+			modalIFrame.style.display="block";	//make the modal IFrame visible
+		}
 	}
 	else
 	{
 		modalLayer.style.display="none";	//hide the modal layer
+		if(modalIFrame)	//if we have a modal IFrame
+		{
+			modalIFrame.style.display="none";	//hide the modal iframe
+		}
 	}
 }
 
@@ -2498,19 +2516,42 @@ var dragState;
 /**The layer that allows modality by blocking user interaction to elements below.*/
 var modalLayer=null;
 
+/**The iframe that hides select elements in IE6; positioned right below the modal layer.*/
+var modalIFrame=null;
+
 /**Updates the size of the modal layer, creating it if necessary.*/
 function updateModalLayer()
 {
 	if(modalLayer==null)	//if the modal layer has not yet been created
 	{
-		modalLayer=document.createElementNS("http://www.w3.org/1999/xhtml", "div");	//create a div
+		modalLayer=document.createElementNS("http://www.w3.org/1999/xhtml", "div");	//create a div TODO use a constant for the namespace
 		modalLayer.className="modalLayer";	//load the modal layer style
 		document.body.appendChild(modalLayer);	//add the modal layer to the document
+		//TODO if(IE)
+		{
+			modalIFrame=document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");	//create an IFrame TODO use a constant for the namespace
+			modalIFrame.src="about:blank";
+	//TODO del		modalIFrame.className="modalLayer";	//load the modal layer style
+	//TODO del; allows select elements to shine through		modalIFrame.allowTransparency="true";
+			modalIFrame.frameBorder="0";
+	//		modalIFrame.style.backgroundColor="transparent";
+			modalIFrame.style.position="absolute";
+			modalIFrame.style.top="0px";
+			modalIFrame.style.left="0px";
+			modalIFrame.style.filter='progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0)';	//make the frame transparent (see http://dotnetjunkies.com/WebLog/jking/archive/2003/07/21/488.aspx )
+			modalIFrame.style.display="none";
+			document.body.appendChild(modalIFrame);	//add the modal IFrame to the document
+		}
 	}
 	var pageSize=getPageSize();	//get the size of the page
 	var viewportSize=getViewportSize();	//get the size of the viewport
 	modalLayer.style.width=Math.max(viewportSize.width, pageSize.width)+"px";	//update the size of the modal layer to the larger of the page and the viewport
 	modalLayer.style.height=Math.max(viewportSize.height, pageSize.height)+"px";
+	if(modalIFrame)	//if we have a modal IFrame
+	{
+		modalIFrame.style.width=modalLayer.style.width;
+		modalIFrame.style.height=modalLayer.style.height;
+	}
 }
 
 //Guise functionality
@@ -2638,6 +2679,21 @@ function initializeNode(node)
 						break;
 					case "select":
 						eventManager.addEvent(node, "change", onSelectChange, false);
+/*TODO del
+						var iframe=document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");	//TODO testing
+						iframe.src="about:blank";
+						iframe.scrolling="no";
+						iframe.frameborder="0";
+						document.body.appendChild(iframe);
+						iframe.position="absolute";
+						var coordinates=getElementCoordinates(node);
+						iframe.style.left=coordinates.x;
+						iframe.style.top=coordinates.y;
+						iframe.style.width=node.offsetWidth+"px";
+						iframe.style.height=node.offsetHeight+"px";
+						iframe.style.zIndex=1;
+*/	
+						
 						break;
 				}
 				for(var i=elementClassNames.length-1; i>=0; --i)	//for each class name
