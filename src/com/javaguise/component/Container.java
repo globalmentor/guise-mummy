@@ -1,5 +1,7 @@
 package com.javaguise.component;
 
+import static com.garretwilson.lang.ClassUtilities.*;
+
 import java.util.Iterator;
 
 import com.javaguise.component.layout.Layout;
@@ -10,6 +12,9 @@ import com.javaguise.event.ContainerListener;
 */
 public interface Container<C extends Container<C>> extends CompositeComponent<C>
 {
+
+	/**The bound property of the layout.*/
+	public final static String LAYOUT_PROPERTY=getPropertyName(Container.class, "layout");
 
 	/**@return An iterator to contained components in reverse order.*/
 	public Iterator<Component<?>> reverseIterator();
@@ -63,6 +68,16 @@ public interface Container<C extends Container<C>> extends CompositeComponent<C>
 
 	/**@return The layout definition for the container.*/
 	public Layout<?> getLayout();
+
+	/**Sets the layout definition for the container.
+	The layout definition can only be changed if the container currently has no child components.
+	This is a bound property.
+	@param newLayout The new layout definition for the container.
+	@exception NullPointerException if the given layout is <code>null</code>.
+	@exception IllegalStateException if a new layout is requested while this container has one or more children.
+	@see Container#LAYOUT_PROPERTY 
+	*/
+	public void setLayout(final Layout<?> newLayout);
 
 	/**Adds a container listener.
 	@param containerListener The container listener to add.

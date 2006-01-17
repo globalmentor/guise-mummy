@@ -211,7 +211,7 @@ Debug.trace("list control changed value to", newValue);
 		contentPanel.add(flash);
 */
 
-/*TODO
+/*TOODO del; testing Text
 		final Text testText=new Text(session);
 		testText.getModel().setTextContentType(TextModel.XHTML_CONTENT_TYPE);
 		testText.getModel().setTextResourceKey("test.html");

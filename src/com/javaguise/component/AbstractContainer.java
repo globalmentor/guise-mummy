@@ -1,18 +1,10 @@
 package com.javaguise.component;
 
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import com.garretwilson.util.ReverseIterator;
 import com.javaguise.GuiseSession;
 import com.javaguise.component.layout.*;
 import com.javaguise.event.ContainerEvent;
 import com.javaguise.event.ContainerListener;
-import com.javaguise.event.ListEvent;
-import com.javaguise.event.ListListener;
 import com.javaguise.event.PostponedContainerEvent;
-import com.javaguise.event.PostponedListEvent;
-import com.javaguise.model.ListSelectModel;
 import com.javaguise.model.Model;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
@@ -94,11 +86,34 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	}
 
 	/**The layout definition for the container.*/
-	private final Layout<?> layout;
+	private Layout<?> layout;
 
 		/**@return The layout definition for the container.*/
 		public Layout<?> getLayout() {return layout;}
 
+		/**Sets the layout definition for the container.
+		The layout definition can only be changed if the container currently has no child components.
+		This is a bound property.
+		@param newLayout The new layout definition for the container.
+		@exception NullPointerException if the given layout is <code>null</code>.
+		@exception IllegalStateException if a new layout is requested while this container has one or more children.
+		@see Container#LAYOUT_PROPERTY 
+		*/
+		public void setLayout(final Layout<?> newLayout)
+		{
+			if(layout!=checkNull(newLayout, "Layout cannot be null."))	//if the value is really changing
+			{
+				if(size()!=0)	//if this container has children
+				{
+					throw new IllegalArgumentException("Layout may not change if container has children.");
+				}
+				final Layout<?> oldLayout=layout;	//get the old value
+				layout=newLayout;	//actually change the value
+				firePropertyChange(LAYOUT_PROPERTY, oldLayout, newLayout);	//indicate that the value changed
+			}			
+		}
+		
+		
 	/**Session, ID, layout, and model constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
