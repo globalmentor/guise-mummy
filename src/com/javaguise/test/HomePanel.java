@@ -211,10 +211,10 @@ Debug.trace("list control changed value to", newValue);
 		contentPanel.add(flash);
 */
 
-/*TOODO del; testing Text
 		final Text testText=new Text(session);
-		testText.getModel().setTextContentType(TextModel.XHTML_CONTENT_TYPE);
-		testText.getModel().setTextResourceKey("test.html");
+		testText.getModel().setTextContentType(TextModel.XHTML_FRAGMENT_CONTENT_TYPE);
+//TODO bring back		testText.getModel().setTextResourceKey("test.html");
+		testText.getModel().setText("this is <strong>good</strong> stuff");
 		
 		final Label boundLabel=new Label(session);
 		boundLabel.getModel().setLabel("Button");
@@ -223,7 +223,6 @@ Debug.trace("list control changed value to", newValue);
 		testText.add(boundLabel, new ReferenceLayout.Constraints("boundComponent"));
 
 		contentPanel.add(testText);
-*/
 		
 		final LayoutPanel buttonPanel=new LayoutPanel(session, "testButtonPanel", new FlowLayout(session, Flow.LINE));	//create a panel flowing horizontally
 

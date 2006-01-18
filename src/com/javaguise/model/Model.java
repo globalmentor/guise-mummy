@@ -41,6 +41,9 @@ public interface Model extends PropertyBindable
 
 	/**A content type of <code>application/xhtml+xml</code>.*/
 	public final static ContentType XHTML_CONTENT_TYPE=XHTMLConstants.XHTML_CONTENT_TYPE;
+	
+	/**A content type of <code>application/xhtml+xml-external-parsed-entity</code>.*/
+	public final static ContentType XHTML_FRAGMENT_CONTENT_TYPE=XHTMLConstants.XHTML_FRAGMENT_CONTENT_TYPE;
 
 	/**@return The Guise session that owns this model.*/
 	public GuiseSession getSession();

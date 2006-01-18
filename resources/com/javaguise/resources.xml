@@ -21,7 +21,7 @@
 	<entry key="frame.dialog.options.YES.label">Yes</entry>
 	<entry key="frame.dialog.options.YES.icon">guise/images/accept.gif</entry>
 	<entry key="frame.dialog.options.YES_ALL.label">Yes to All</entry>
-	<entry key="frame.dialog.options.YES_ALL.icon">guise/images/accept_multipole.gif</entry>
+	<entry key="frame.dialog.options.YES_ALL.icon">guise/images/accept_multiple.gif</entry>
 	<entry key="frame.dialog.options.NO.label">No</entry>
 	<entry key="frame.dialog.options.NO.icon">guise/images/reject.gif</entry>
 	<entry key="frame.dialog.options.NO_ALL.label">No to ALl</entry>

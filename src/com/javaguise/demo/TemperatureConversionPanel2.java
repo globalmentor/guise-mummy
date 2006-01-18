@@ -3,6 +3,7 @@ package com.javaguise.demo;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -17,6 +18,12 @@ import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
 import static com.garretwilson.lang.JavaUtilities.*;
+
+import static com.garretwilson.net.URIConstants.*;
+
+import static com.garretwilson.lang.ClassUtilities.*;
+
+import com.garretwilson.lang.EnumUtilities;
 import com.garretwilson.rdf.*;
 import static com.garretwilson.rdf.RDFUtilities.*;
 import com.garretwilson.text.xml.XMLUtilities;
@@ -163,7 +170,7 @@ public class TemperatureConversionPanel2 extends DefaultNavigationPanel
 			
 			final RDFResource navigationPanelResource=RDFUtilities.getResourceByType(rdf, GUISE_COMPONENT_NAMESPACE_URI, "DefaultNavigationPanel");
 Debug.trace("ready to construct panel with resource", navigationPanelResource);
-			constructComponent(this, navigationPanelResource);
+			constructObject(this, navigationPanelResource);
 			
 			
 			
@@ -185,6 +192,10 @@ Debug.trace("ready to construct panel with resource", navigationPanelResource);
 		catch(final IOException ioException)	//if there is an I/O exception
 		{
 			throw new AssertionError(ioException);	//TODO fix better
+		}		
+		catch(final InvocationTargetException invocationTargetException)
+		{
+			throw new AssertionError(invocationTargetException);	//TODO fix better
 		}		
 	}
 
@@ -229,44 +240,129 @@ Debug.trace("ready to construct panel with resource", navigationPanelResource);
 	}
 */
 
-	protected Object createValue(final RDFObject rdfObject)
+	/**
+ 	@exception IllegalArgumentException if the given RDF object is a resource that does not specify type information.
+ 	@exception IllegalArgumentException if the given RDF object is a resource of a type other than a Java type.
+ 	@exception IllegalArgumentException if the given RDF object is a Java-typed resource the class of which cannot be found.
+ 	@exception IllegalArgumentException if the given RDF object indicates a Java class that has no default constructor and no {@link GuiseSession} constructor.
+ 	@exception IllegalArgumentException if the given RDF object indicates a Java class that is an interface or an abstract class.
+ 	@exception IllegalArgumentException if the given RDF object indicates a Java class the constructor of which is not accessible.
+	@exception InvocationTargetException if the given RDF object indicates a Java class the constructor of which throws an exception.
+ 	
+	 * 
+	 */
+	protected Object createValue(final RDFObject rdfObject) throws InvocationTargetException
 	{
-		if(rdfObject instanceof RDFLiteral)
+		if(rdfObject instanceof RDFLiteral)	//if the object is a literal
 		{
 			return ((RDFLiteral)rdfObject).getLexicalForm();	//TODO see if this is a typed literal, and construct other object types accordingly
 		}
-		throw new IllegalArgumentException("Support for component type "+rdfObject+" not yet supported.");
-		
+		else if(rdfObject instanceof RDFResource)	//if the object is a resource
+		{
+			final RDFResource resource=(RDFResource)rdfObject;	//cast the object to a resource
+			final RDFResource typeResource=getType(resource);	//get the type of the resource
+			if(typeResource==null)	//if we don't know the type of the resource
+			{
+				throw new IllegalArgumentException("Value resource "+resource+" missing type information.");
+			}
+			final URI typeURI=typeResource.getReferenceURI();	//get the type URI
+			if(!JAVA_SCHEME.equals(typeURI.getScheme()))	//if the type is not a Java type
+			{
+				throw new IllegalArgumentException("Value type "+typeURI+" is not a Java type.");				
+			}
+			final String valueClassName=typeURI.getSchemeSpecificPart();	//get the class name part of the type
+Debug.trace("Loading class", valueClassName);
+			final Object value;	//we'll determine the value by invoking the constructor
+			try
+			{
+				final Class<?> valueClass=Class.forName(valueClassName);	//load the class
+				final Constructor<?> defaultConstructor=getConstructor(valueClass);	//see if there is a default constructor
+				if(defaultConstructor!=null)	//if there is a default constructor
+				{
+Debug.trace("Invoking default constructor for", valueClassName);
+					value=defaultConstructor.newInstance();	//invoke the default constructor
+				}
+				else	//if there is no default constructor
+				{
+					final Constructor<?> sessionConstructor=getConstructor(valueClass, GuiseSession.class);	//see if there is a GuiseSession constructor
+					if(sessionConstructor!=null)	//if there is a session constructor
+					{
+Debug.trace("Invoking session constructor for", valueClassName);
+						value=sessionConstructor.newInstance();	//invoke the session constructor						
+					}
+					else	//if there is no session constructor
+					{
+						throw new IllegalArgumentException("Value class "+valueClassName+" must provide either a default constructor or a session constructor");
+					}
+				}
+			}
+			catch(final ClassNotFoundException classNotFoundException)	//if we couldn't find the class
+			{
+				throw new IllegalArgumentException(classNotFoundException);
+			}
+			catch(final IllegalArgumentException illegalArgumentException)	//our Guise session should always work OK---and we shouldn't get this exception for the default constructor
+			{
+				throw new AssertionError(illegalArgumentException);
+			}
+			catch(final InstantiationException instantiationException)
+			{
+				throw new IllegalArgumentException(instantiationException);
+			}
+			catch(final IllegalAccessException illegalAccessException)
+			{
+				throw new IllegalArgumentException(illegalAccessException);
+			}
+Debug.trace("Constructing value for", valueClassName);
+			constructObject(value, resource);	//construct the 
+			return value;
+		}
+		else	//if the object is neither a literal nor a resource
+		{
+			throw new AssertionError("Unknown RDF object type: "+rdfObject.getClass());
+		}
 	}
 
 
-	protected void constructComponent(final Component<?> component, final RDFResource resource)
+	/**
+	 * 
+	 * @param object
+	 * @param resource
+	@exception InvocationTargetException if the given RDF object indicates a Java class the constructor of which throws an exception.
+	 */
+	protected void constructObject(final Object object, final RDFResource resource) throws InvocationTargetException
 	{
 		final Iterator<RDFPropertyValuePair> propertyIterator=resource.getPropertyIterator();	//get an iterator to the resource properties
 		while(propertyIterator.hasNext())	//while there are more properties
 		{
 			final RDFPropertyValuePair property=propertyIterator.next();	//get the next property
-			setComponentProperty(component, property);	//set this component property
+			setObjectProperty(object, property);	//set this object property
 			
 			
 		}
 	}
 
-	protected void setComponentProperty(final Component<?> component, final RDFPropertyValuePair property)
+	/**Sets a property of the object based upon the given RDF property/value pair.
+	If the property isn't recognized as relevant to Guise, no action is taken.
+	@param object The component being constructed.
+	@param property The RDF property/value pair potentially representing a Guise object property.
+	@exception InvocationTargetException if the given RDF object indicates a Java class the constructor of which throws an exception.
+	*/
+	protected void setObjectProperty(final Object object, final RDFPropertyValuePair property) throws InvocationTargetException
 	{
 //TODO del		final RDFObject propertyValue=property.getValue();	//get the property value
 		final URI propertyURI=property.getName().getReferenceURI();	//get the URI of the property
 //TODO del Debug.trace("looking at property:", propertyURI);
 		if(GUISE_PROPERTY_NAMESPACE_URI.equals(getNamespaceURI(propertyURI)))	//if this is a property for Guise
 		{
-			final Object propertyValue=createValue(property.getValue());	//get the appropriate value for the property
+			final RDFObject propertyValueRDFObject=property.getValue();	//get the property value
+			final Object propertyValue=createValue(propertyValueRDFObject);	//get the appropriate value for the property
 			final Class<?> propertyValueType=propertyValue.getClass();	//get the type of the value
 			final String variableName=getLocalName(propertyURI);	//get the local name of the property
 	Debug.trace("looking at property name:", variableName);
 			final String setterMethodName="set"+getProperName(variableName);	//get the setter method
 Debug.trace("setter: ", setterMethodName);
-			final Class<?> componentClass=component.getClass();	//get the component class TODO check generic class type
-			final Method[] methods=componentClass.getMethods();	//get all the class methods
+			final Class<?> objectClass=object.getClass();	//get the object class TODO check generic class type
+			final Method[] methods=objectClass.getMethods();	//get all the class methods
 			for(final Method method:methods)	//for each method
 			{
 				if(method.getName().equals(setterMethodName))	//if this has the setter name
@@ -276,13 +372,48 @@ Debug.trace("found setter", setterMethodName);
 					if(parameterTypes.length==1)	//if this setter has one parameter
 					{
 	Debug.trace("this setter has one param");
+						Object parameter=null;	//we'll see if we can get a working parameter
 						final Class<?> parameterType=parameterTypes[0];	//get the type of the method parameter
 						if(parameterType.isAssignableFrom(propertyValueType))	//if this setter is made for the property value type
 						{
-	Debug.trace("param has correct type:", parameterType, "ready to invoke with value:", propertyValue);
+							Debug.trace("param has correct type:", parameterType);
+							parameter=propertyValue;	//use the property value as-is
+						}
+						else	//if this setter is made for another value type
+						{
+							if(propertyValue instanceof String)	//if the property value is a string, see if we can convert it to the correct type
+							{
+								final String propertyValueString=(String)propertyValue;	//cast the value to a string
+								if(Enum.class.isAssignableFrom(parameterType))	//if the parameter is an enumeration
+								{
+/*TODO del
+							  	final Class<? extends Enum> enumClass=(Class<? extends Enum>)parameterType;
+							  	parameter=(T) Enum.valueOf(enumClass, name);
+//									parameterType.as
+*/
+//TODO del								  EnumUtilities.enumValueOf(parameterType, propertyValueString);
+
+									parameter=Enum.valueOf((Class<? extends Enum>)parameterType, propertyValueString);
+//									parameter=(Enum)Enum.valueOf((Class<? extends Enum>)parameterType, propertyValue);
+								}
+								
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+							
+							
+/*TODO fix
+							
+							
+							Debug.trace("param has correct type:", parameterType, "ready to invoke with value:", propertyValue);
 							try
 							{
-								method.invoke(component, propertyValue);
+								method.invoke(object, propertyValue);
 							} catch (IllegalArgumentException e)
 							{
 								Debug.error(e);
@@ -297,14 +428,9 @@ Debug.trace("found setter", setterMethodName);
 					}
 				}
 			}
-/*TODO fix
-		final RDFObject propertyValue=property.getValue();	//get the property value
-		
-		final Class<? extends Component<?>> componentClass=component.getClass();	//get the component class
-		componentClass.getMethod(name, parameterTypes)
-*/
 		}
 		
 	}
+*/
 	
 }

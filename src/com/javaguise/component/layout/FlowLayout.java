@@ -8,6 +8,15 @@ import com.javaguise.GuiseSession;
 public class FlowLayout extends AbstractFlowLayout<FlowLayout.Constraints>
 {
 
+	/**Session constructor with {@link Flow#PAGE} layout.
+	@param session The Guise session that owns this layout.
+	@exception NullPointerException if the axis is <code>null</code>.
+	*/
+	public FlowLayout(final GuiseSession session)
+	{
+		this(session, Flow.PAGE);	//construct the class with page flow layout
+	}
+
 	/**Session and flow constructor.
 	@param session The Guise session that owns this layout.
 	@param flow The logical axis (line or page) along which information is flowed.
