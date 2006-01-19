@@ -122,54 +122,12 @@ var cssMultiClassSelectors: An array of CSSSelector objects that include a multi
 */
 function GuiseIE6Fix(selectorText)
 {
+
 	this.cssMultipleClassSelectors=new Array();	//create a new array of selectors
 
 	//TODO del var selectorText="a b.c d.e.f .g";
 
-	var httpCommunicator=new HTTPCommunicator();	//create a communicator to connect back to the server
-
-	for(var stylesheetIndex=0; stylesheetIndex<document.styleSheets.length; ++stylesheetIndex)	//for each stylesheet
-	{
-		var stylesheet=document.styleSheets[stylesheetIndex];	//get a reference to this stylesheet
-//TODO del alert("stylesheet: "+stylesheet.href);
-
-		var xmlHTTP=httpCommunicator.get(stylesheet.href);
-		if(xmlHTTP.status==200)	//if we were able to load the stylesheet
-		{
-			var stylesheetText=xmlHTTP.responseText;	//get the text of the stylesheet
-//TODO del alert("finished communicating; stylesheet text: "+stylesheetText);
-			var noComments=stylesheetText.replace(/\/\*(.|[\r\n])*?\*\//gm, "");	//remove comments (see http://ostermiller.org/findcomment.html)
-//TODO del alert("no comments: "+noComments);
-			var noDefinitions=noComments.replace(/\{(.|[\r\n])*?\}/gm, ",");	//replace definitions with commas
-//TODO del alert("no definitions: "+noDefinitions);
-			var selectors=noDefinitions.split(/\s*,\s*/m);	//split out the selectors
-			var rules=stylesheet.cssRules ? stylesheet.cssRules : stylesheet.rules;	//get a reference to the stylesheet rules, compensating for IE
-			if(selectors.length!=rules.length)	//if we don't recognize as many selectors as IE recognizes, we're in trouble
-			{
-				alert("We found selector count "+selectors.length+", but IE has rule count: "+rules.length);	//TODO fix
-				continue;
-			}
-			for(var ruleIndex=0; ruleIndex<rules.length; ++ruleIndex)	//for each rule in this stylesheet
-			{
-				var rule=rules[ruleIndex];	//get a reference to this rule
-//TODO fix					var selectorText=rule.selectorText;	//get the selector text
-				var selectorText=selectors[ruleIndex];	//get our own version of the selector text, because IE throws away some information for multiple-class selectors
-//alert("looking at selector: "+selectorText);	
-				var cssSelector=new CSSSelector(selectorText);	//create a selector from this selector text
-				if(cssSelector.isMultipleClassSelector)	//if this is a multi-class selector
-				{
-					var cssText=rule.style.cssText;	//get the text of the rule (even though Danny Goodman's _JavaScript Bible_, Fifth Edition says that IE doesn't support this property
-					if(cssText.length>0)	//if there is actually text for this rule (IE won't allow us to add a rule with no text, but an empty rule doesn't do anything anyway, so ignore it)
-					{
-						this.cssMultipleClassSelectors.add(cssSelector);	//add this selector to our list of multiple class selector
-						stylesheet.removeRule(ruleIndex);	//remove the rule at this index (using an IE6-specific method)
-						stylesheet.addRule(cssSelector.ie6FixSelectorText, cssText, ruleIndex);	//add a new rule in its place with the new selector text (using an IE6-specific method)
-					}
-				}
-			}
-		}
-	}
-
+	this.httpCommunicator=new HTTPCommunicator();	//create a communicator to connect back to the server
 
 	if(!GuiseIE6Fix.prototype._initialized)
 	{
@@ -231,8 +189,69 @@ function GuiseIE6Fix(selectorText)
 			return elementClassName;	//return the fixed class name
 		};
 
+
+		/**Fixes a stylesheet, and all its imported stylesheets.
+		@param stylesheet The styleheet to fix.
+		*/
+		GuiseIE6Fix.prototype._fixStylesheet=function(stylesheet)
+		{
+			var xmlHTTP=this.httpCommunicator.get(stylesheet.href);	//load this stylesheet
+			if(xmlHTTP.status==200)	//if we were able to load the stylesheet
+			{
+				var stylesheetText=xmlHTTP.responseText;	//get the text of the stylesheet
+	//TODO del alert("finished communicating; stylesheet text: "+stylesheetText);
+				var noComments=stylesheetText.replace(/\/\*(.|[\r\n])*?\*\//gm, "");	//remove comments (see http://ostermiller.org/findcomment.html)
+	//TODO del alert("no comments: "+noComments);
+				var noDefinitions=noComments.replace(/\{(.|[\r\n])*?\}/gm, ",");	//replace definitions with commas
+	//TODO del alert("no definitions: "+noDefinitions);
+				var noImports=noDefinitions.replace(/@import.*;/gm, "");	//remove stylesheet imports
+//TODO del alert("no imports: "+noImports);
+				var selectors=noImports.split(/\s*,\s*/m);	//split out the selectors
+				var rules=stylesheet.cssRules ? stylesheet.cssRules : stylesheet.rules;	//get a reference to the stylesheet rules, compensating for IE
+				var selectorCount=selectors.length==1 && selectors[0].trim().length==0 ? 0 : selectors.length;	//compensate for the special case of no selectors, which would still leave us with one blank selector
+				if(selectorCount!=rules.length)	//if we don't recognize as many selectors as IE recognizes, we're in trouble
+				{
+					alert("We found selector count "+selectors.length+", but IE has rule count: "+rules.length);	//TODO fix
+					return;	//don't process this stylesheet further
+				}
+				for(var ruleIndex=0; ruleIndex<rules.length; ++ruleIndex)	//for each rule in this stylesheet
+				{
+					var rule=rules[ruleIndex];	//get a reference to this rule
+	//TODO fix					var selectorText=rule.selectorText;	//get the selector text
+					var selectorText=selectors[ruleIndex];	//get our own version of the selector text, because IE throws away some information for multiple-class selectors
+	//alert("looking at selector: "+selectorText);	
+					var cssSelector=new CSSSelector(selectorText);	//create a selector from this selector text
+					if(cssSelector.isMultipleClassSelector)	//if this is a multi-class selector
+					{
+						var cssText=rule.style.cssText;	//get the text of the rule (even though Danny Goodman's _JavaScript Bible_, Fifth Edition says that IE doesn't support this property
+						if(cssText.length>0)	//if there is actually text for this rule (IE won't allow us to add a rule with no text, but an empty rule doesn't do anything anyway, so ignore it)
+						{
+							this.cssMultipleClassSelectors.add(cssSelector);	//add this selector to our list of multiple class selector
+							stylesheet.removeRule(ruleIndex);	//remove the rule at this index (using an IE6-specific method)
+							stylesheet.addRule(cssSelector.ie6FixSelectorText, cssText, ruleIndex);	//add a new rule in its place with the new selector text (using an IE6-specific method)
+						}
+					}
+				}
+			}
+				//fix any imported stylesheets
+			for(var stylesheetIndex=0; stylesheetIndex<stylesheet.imports.length; ++stylesheetIndex)	//for each imported stylesheet
+			{
+				var importedStylesheet=stylesheet.imports[stylesheetIndex];	//get a reference to this imported stylesheet
+				this._fixStylesheet(importedStylesheet);	//fix this imported stylesheet
+			}
+			
+		};
+
 		/**Regular expression for matching individual element selector segments.*/
 //TODO del		GuiseIE6Fix.prototype.ELEMENT_SELECTOR_REGEXP=/\s*(\S+)\s*/g;
+	}
+
+		//fix stylesheets
+	for(var stylesheetIndex=0; stylesheetIndex<document.styleSheets.length; ++stylesheetIndex)	//for each stylesheet
+	{
+		var stylesheet=document.styleSheets[stylesheetIndex];	//get a reference to this stylesheet
+//TODO del alert("stylesheet: "+stylesheet.href);
+		this._fixStylesheet(stylesheet);	//fix this stylesheet
 	}
 
 };

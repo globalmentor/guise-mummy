@@ -49,6 +49,12 @@ See http://homepage.mac.com/igstudio/design/ulsmenus/vertical-uls-iframe.html .
 TODO only create modal IFrames if IE6 is present
 */
 
+/**Rollovers
+For every component marked with the "mouseListener" class, Guise will send mouseover and mouseout events.
+Guise will also automatically add and remove a "rollover" class to the component and every subelement that is part of the component
+(that is, every element that has a component ID-derived ID (i.e. "componentID-XXX") before sending the mouse event.
+*/
+
 //TODO before sending a drop event, send a component update for the drop target so that its value will be updated; or otherwise make sure the value is synchronized
 
 var AJAX_ENABLED=true;	//TODO allow this to be configured
@@ -88,6 +94,7 @@ var STYLES=
 	DRAG_HANDLE: "dragHandle",
 	DROP_TARGET: "dropTarget",
 	MOUSE_LISTENER: "mouseListener",
+	ROLLOVER: "rollover",
 	SLIDER_CONTROL: "sliderControl",
 	SLIDER_CONTROL_THUMB: "sliderControl-thumb",
 	SLIDER_CONTROL_TRACK: "sliderControl-track",
@@ -999,7 +1006,20 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 		this.appendXMLStartTag(stringBuilder, tagName);	//append the start tag
 		this.appendXMLText(stringBuilder, text);	//append the text
 		return this.appendXMLEndTag(stringBuilder, tagName);	//append the end tag
+	},
+
+	/**Determines whether the given element has the given class, using DOM methods. Multiple class names are supported.
+	@param element The element that should be checked for class.
+	@param className The name of the class for which to check, or a regular expression if a match should be found.
+	@return true if one of the element's class names equals the given class name.
+	*/
+	hasClass:function(element, className)
+	{
+		var classNamesString=element.getAttribute("class");	//get the element's class names
+		var classNames=classNamesString ? classNamesString.split(/\s/) : EMPTY_ARRAY;	//split out the class names
+		return className instanceof RegExp ? classNames.containsMatch(className) : classNames.contains(className);	//return whether this class name is one of the class names
 	}
+
 
 	
 };
@@ -1667,7 +1687,7 @@ alert(exception);
 							this._synchronizeElement(oldElement, childNode);	//synchronize this element tree
 							updateComponents(oldElement);	//now that we've patched the old element, update any components that rely on the old element
 						}
-						else if(hasClass(childNode, "frame"))	//if the element doesn't currently exist, but the patch is for a frame, create a new frame
+						else if(DOMUtilities.hasClass(childNode, "frame"))	//if the element doesn't currently exist, but the patch is for a frame, create a new frame
 						{
 //TODO fix alert("ready to import node");
 							oldElement=document.importNode(childNode, true);	//create an import clone of the node
@@ -3556,9 +3576,11 @@ function onMouse(event)
 		{
 			case "mouseover":	//TODO use a constant
 				eventType=MouseAJAXEvent.EventType.ENTER;
+				addComponentClassName(component, STYLES.ROLLOVER, component.id);	//add the "rollover" style to all component elements
 				break;
 			case "mouseout":	//TODO use a constant
 				eventType=MouseAJAXEvent.EventType.EXIT;
+				removeComponentClassName(component, STYLES.ROLLOVER, component.id);	//remove the "rollover" style from all component elements
 				break;
 			default:	//TODO assert an error or warning
 				return;				
@@ -3715,16 +3737,82 @@ function hasClassName(element, className)
 	return className instanceof RegExp ? classNames.containsMatch(className) : classNames.contains(className);	//return whether this class name is one of the class names
 }
 
-/**Determines whether the given element has the given class, using DOM methods. Multiple class names are supported.
-@param element The element that should be checked for class.
-@param className The name of the class for which to check, or a regular expression if a match should be found.
-@return true if one of the element's class names equals the given class name.
+/**Adds the given class name to the element's style class.
+@param element The element that should be given a class.
+@param className The name of the class to add.
 */
-function hasClass(element, className)
+function addClassName(element, className)
 {
-	var classNamesString=element.getAttribute("class");	//get the element's class names
+	var classNamesString=element.className;	//get the element's class names
+	element.className=classNamesString ? classNamesString+" "+className : className;	//append the class name if there is a class name already
+}
+
+/**Removes the given class name from the element's style class.
+@param element The element that should have a class removed.
+@param className The name of the class to remove.
+*/
+function removeClassName(element, className)
+{
+	var classNamesString=element.className;	//get the element's class names
 	var classNames=classNamesString ? classNamesString.split(/\s/) : EMPTY_ARRAY;	//split out the class names
-	return className instanceof RegExp ? classNames.containsMatch(className) : classNames.contains(className);	//return whether this class name is one of the class names
+	for(var i=classNames.length-1; i>=0; --i)	//for each index (starting from the end so that we can remove indices at will)
+	{
+		if(classNames[i]==className)	//if this is a class name to remove
+		{
+			classNames.remove(i);	//remove this index
+		}
+	}
+	element.className=classNames.join(" ");	//join the remaining class names back together and assign them back to the element's class name
+}
+
+/**Adds the given class name to all a component's elements.
+The class name is added to the element and all child elements that have the given ID or an ID that begins with the ID and a hyphen.
+@param element The element that should be given a class.
+@param className The name of the class to add.
+@param componentID The ID of the component that owns relevant elements.
+*/
+function addComponentClassName(element, className, componentID)
+{
+	var id=element.id;	//get the element ID
+	if(id==componentID || (id && id.startsWith(componentID+"-")))	//if the element ID is the component ID or starts with the component ID TODO use a constant
+	{
+		addClassName(element, className);	//add the class to the element
+	}
+	var childNodeList=element.childNodes;	//get all the child nodes
+	var childNodeCount=childNodeList.length;	//find out how many children there are
+	for(var i=0; i<childNodeCount; ++i)	//for each child node
+	{
+		var childNode=childNodeList[i];	//get this child node
+		if(childNode.nodeType==Node.ELEMENT_NODE)	//if this is an element node
+		{
+			addComponentClassName(childNode, className, componentID);	//add this class to the child component
+		}
+	}
+}
+
+/**Removes the given class name from all a component's elements.
+The class name is removed from the element and all child elements that have the given ID or an ID that begins with the ID and a hyphen.
+@param element The element that should have a class removed.
+@param className The name of the class to remove.
+@param componentID The ID of the component that owns relevant elements.
+*/
+function removeComponentClassName(element, className, componentID)
+{
+	var id=element.id;	//get the element ID
+	if(id==componentID || (id && id.startsWith(componentID+"-")))	//if the element ID is the component ID or starts with the component ID TODO use a constant
+	{
+		removeClassName(element, className);	//add the class to the element
+	}
+	var childNodeList=element.childNodes;	//get all the child nodes
+	var childNodeCount=childNodeList.length;	//find out how many children there are
+	for(var i=0; i<childNodeCount; ++i)	//for each child node
+	{
+		var childNode=childNodeList[i];	//get this child node
+		if(childNode.nodeType==Node.ELEMENT_NODE)	//if this is an element node
+		{
+			removeComponentClassName(childNode, className, componentID);	//add this class to the child component
+		}
+	}
 }
 
 /**Determines whether the given node has the indicated ancestor, including the node itself in the search.

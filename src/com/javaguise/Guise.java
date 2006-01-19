@@ -29,7 +29,7 @@ public class Guise
 	public final static String PUBLIC_RESOURCE_BASE_PATH="pub/";
 
 	/**The identifier of this build.*/
-	public final static String BUILD_ID="2006-01-17";
+	public final static String BUILD_ID="2006-01-18";
 	
 	/**The singleton instance of Guise.*/
 	private static Guise instance=null;
