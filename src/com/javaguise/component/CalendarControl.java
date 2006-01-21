@@ -35,6 +35,7 @@ import com.javaguise.model.SingleListSelectionPolicy;
 import com.javaguise.model.TableColumnModel;
 import com.javaguise.model.TableModel;
 import com.javaguise.model.ValueModel;
+import com.javaguise.validator.IntegerRangeValidator;
 import com.javaguise.validator.ValidationException;
 import com.javaguise.validator.ValueRequiredValidator;
 
@@ -91,6 +92,12 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 
 		/**@return The list control containing the months.*/
 		protected ListControl<Date> getMonthListControl() {return monthListControl;}
+
+	/**The text control containing the year.*/
+	private final TextControl<Integer> yearTextControl;
+
+		/**@return The text control containing the year.*/
+		protected TextControl<Integer> getYearTextControl() {return yearTextControl;}
 
 	/**The list of calendar table components.*/
 	private final List<Table> calendarTables=new CopyOnWriteArrayList<Table>();
@@ -181,6 +188,11 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 		final Converter<Date, String> monthConverter=new DateStringLiteralConverter(session, DateStringLiteralStyle.MONTH_OF_YEAR);	//get a converter to display the month of the year
 		monthListControl.setValueRepresentationStrategy(new ListControl.DefaultValueRepresentationStrategy<Date>(session, monthConverter));	//install a month representation strategy
 		controlContainer.add(monthListControl);	//add the month list control
+		yearTextControl=new TextControl<Integer>(session, Integer.class);	//create a text control to select the year
+		yearTextControl.getModel().setLabel("Year");	//set the year control label TODO get from resources
+		yearTextControl.setMaximumLength(4);	//TODO testing
+		yearTextControl.getModel().setValidator(new IntegerRangeValidator(session, new Integer(1800), new Integer(2100), new Integer(1), true));	//restrict the range of the year TODO improve; don't arbitrarily restrict the range
+		controlContainer.add(yearTextControl);	//add the year text control
 		updateCalendars();	//update the calendars
 		updateModelPropertyChangeListener=new AbstractGuisePropertyChangeListener<Object>()	//create a property change listener to update the calendars
 		{
@@ -207,6 +219,23 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 							if(calendar.get(Calendar.MONTH)!=newMonth)	//if the currently visible date is in another month
 							{
 								calendar.set(Calendar.MONTH, newMonth);	//change to the given month
+								setDate(calendar.getTime());	//change the date to the given month, which will update the calenders TODO make sure that going from a 31-day month, for example, to a 28-day month will be OK, if the day is day 31
+							}
+						}
+					}
+				});
+		yearTextControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Integer>()	//create a property change listener to listen for the year changing
+				{
+					public void propertyChange(final GuisePropertyChangeEvent<Integer> propertyChangeEvent)	//if the selected year changed
+					{
+						final Integer newYear=propertyChangeEvent.getNewValue();	//get the new selected year
+						if(newYear!=null)	//if a new year was selected (a null value can be sent when the model is cleared)
+						{
+							final Calendar calendar=Calendar.getInstance(session.getLocale());	//create a new calendar
+							calendar.setTime(getDate());	//set the calendar date to our currently displayed date
+							if(calendar.get(Calendar.YEAR)!=newYear)	//if the currently visible date is in another year
+							{
+								calendar.set(Calendar.YEAR, newYear);	//change to the given year
 								setDate(calendar.getTime());	//change the date to the given month, which will update the calenders TODO make sure that going from a 31-day month, for example, to a 28-day month will be OK, if the day is day 31
 							}
 						}
@@ -247,33 +276,35 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 				{
 					calendar=oldCalendar;	//keep the calendar we had before
 				}
-				final boolean yearChanged=localeChanged || oldCalendar==null || oldCalendar.get(Calendar.YEAR)!=calendar.get(Calendar.YEAR);	//the year should be updated if the locale changed, there was no calendar, or the years are different
+				final int year=calendar.get(Calendar.YEAR);	//get the current year
+				final boolean yearChanged=localeChanged || oldCalendar==null || oldCalendar.get(Calendar.YEAR)!=year;	//the year should be updated if the locale changed, there was no calendar, or the years are different
 				final int month=calendar.get(Calendar.MONTH);	//get the current month
 				final boolean monthChanged=yearChanged || oldCalendar.get(Calendar.MONTH)!=month;	//the month should be updated if the the year or month changed
 				if(yearChanged)	//if the year changed (different years can have different months with some calendars
 				{
-					final ListSelectModel<Date> monthListModel=monthListControl.getModel();	//get model of the month list control
-					monthListModel.clear();	//clear the values in the month list control
-					final Calendar monthNameCalendar=(Calendar)calendar.clone();	//clone the month calendar as we step through the months
-					final int minMonth=monthNameCalendar.getActualMinimum(Calendar.MONTH);	//get the minimum month
-					final int maxMonth=monthNameCalendar.getActualMaximum(Calendar.MONTH);	//get the maximum month
-					int namedMonthIndex=-1;	//keep track of the named month index in the list
-					for(int namedMonth=minMonth; namedMonth<=maxMonth; ++namedMonth)	//for each month
+					try
 					{
-						++namedMonthIndex;	//keep track of the list index
-						monthNameCalendar.set(Calendar.MONTH, namedMonth);	//switch to the given month
-						monthListModel.add(monthNameCalendar.getTime());	//add this month date
-						if(namedMonth==month)	//if this is the selected month
+						yearTextControl.getModel().setValue(new Integer(year));	//show the selected year in the text box
+						final ListSelectModel<Date> monthListModel=monthListControl.getModel();	//get model of the month list control
+						monthListModel.clear();	//clear the values in the month list control
+						final Calendar monthNameCalendar=(Calendar)calendar.clone();	//clone the month calendar as we step through the months
+						final int minMonth=monthNameCalendar.getActualMinimum(Calendar.MONTH);	//get the minimum month
+						final int maxMonth=monthNameCalendar.getActualMaximum(Calendar.MONTH);	//get the maximum month
+						int namedMonthIndex=-1;	//keep track of the named month index in the list
+						for(int namedMonth=minMonth; namedMonth<=maxMonth; ++namedMonth)	//for each month
 						{
-							try
+							++namedMonthIndex;	//keep track of the list index
+							monthNameCalendar.set(Calendar.MONTH, namedMonth);	//switch to the given month
+							monthListModel.add(monthNameCalendar.getTime());	//add this month date
+							if(namedMonth==month)	//if this is the selected month
 							{
 								monthListModel.setSelectedIndexes(namedMonthIndex);	//select this month
 							}
-							catch(final ValidationException validationException)	//we should never have a problem selecting a month
-							{
-								throw new AssertionError(validationException);
-							}
 						}
+					}
+					catch(final ValidationException validationException)	//we should never have a problem selecting a year or a month
+					{
+						throw new AssertionError(validationException);
 					}
 				}
 				if(monthChanged)	//if the month needs updating
