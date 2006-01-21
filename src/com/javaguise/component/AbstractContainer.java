@@ -1,5 +1,8 @@
 package com.javaguise.component;
 
+import java.util.*;
+
+import static com.garretwilson.util.CollectionUtilities.*;
 import com.javaguise.GuiseSession;
 import com.javaguise.component.layout.*;
 import com.javaguise.event.ContainerEvent;
@@ -92,28 +95,63 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		public Layout<?> getLayout() {return layout;}
 
 		/**Sets the layout definition for the container.
-		The layout definition can only be changed if the container currently has no child components.
+//TODO fix		The layout definition can only be changed if the container currently has no child components.
 		This is a bound property.
 		@param newLayout The new layout definition for the container.
 		@exception NullPointerException if the given layout is <code>null</code>.
-		@exception IllegalStateException if a new layout is requested while this container has one or more children.
+//TODO fix		@exception IllegalStateException if a new layout is requested while this container has one or more children.
 		@see Container#LAYOUT_PROPERTY 
 		*/
-		public void setLayout(final Layout<?> newLayout)
+		public <T extends Layout.Constraints> void setLayout(final Layout<T> newLayout)
 		{
 			if(layout!=checkNull(newLayout, "Layout cannot be null."))	//if the value is really changing
 			{
+/*TODO testing
 				if(size()!=0)	//if this container has children
 				{
 					throw new IllegalArgumentException("Layout may not change if container has children.");
 				}
+*/
 				final Layout<?> oldLayout=layout;	//get the old value
+				oldLayout.setContainer(null);	//tell the old layout it is no longer installed
 				layout=newLayout;	//actually change the value
+				layout.setContainer(this);	//tell the new layout which container owns it
+				for(final Component<?> childComponent:this)	//for each child component
+				{
+					newLayout.setConstraints(childComponent, newLayout.createDefaultConstraints());	//
+				}
 				firePropertyChange(LAYOUT_PROPERTY, oldLayout, newLayout);	//indicate that the value changed
 			}			
 		}
-		
-		
+
+	/**Returns a list of children.
+	This method along with {@link #setChildren()} provides an <code>children</code> property for alternate children access.
+	@return A list of container children in order.
+	@see #iterator()
+	*/
+	@SuppressWarnings("unchecked")	//a cast is needed because a generic wildcard list cannot be created
+	public List<Component<?>> getChildren()
+	{
+		final List<Component<?>> children=(List<Component<?>>)new ArrayList<Component>(size());	//create a list of child components---we already know how many
+		addAll(children, iterator());	//add all our children to the list
+		return children;	//return the list of children
+	}
+
+	/**Sets the children in this container.
+	This method along with {@link #getChildren()} provides an <code>children</code> property for alternate children access.
+	@param children The new children for this container in order.
+	@see #clear()
+	@see #add(Component)
+	*/
+	public void setChildren(final List<Component<?>> children)
+	{
+		clear();	//remove all children from the container
+		for(final Component<?> child:children)	//for each child
+		{
+			add(child);	//add this child
+		}
+	}
+
 	/**Session, ID, layout, and model constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.

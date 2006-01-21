@@ -77,7 +77,7 @@ public interface Container<C extends Container<C>> extends CompositeComponent<C>
 	@exception IllegalStateException if a new layout is requested while this container has one or more children.
 	@see Container#LAYOUT_PROPERTY 
 	*/
-	public void setLayout(final Layout<?> newLayout);
+	public <T extends Layout.Constraints> void setLayout(final Layout<T> newLayout);
 
 	/**Adds a container listener.
 	@param containerListener The container listener to add.

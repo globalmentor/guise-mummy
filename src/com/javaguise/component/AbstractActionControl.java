@@ -1,7 +1,10 @@
 package com.javaguise.component;
 
+import java.util.MissingResourceException;
+
 import com.javaguise.GuiseSession;
 import com.javaguise.model.ActionModel;
+import com.javaguise.model.LabelModel;
 
 /**Abstract control with an action model.
 @author Garret Wilson
@@ -11,6 +14,27 @@ public abstract class AbstractActionControl<C extends ActionControl<C>> extends 
 
 	/**@return The data model used by this component.*/
 	public ActionModel getModel() {return (ActionModel)super.getModel();}
+
+	/**Determines the text of the label.
+	If a label is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
+	@return The label text, or <code>null</code> if there is no label text.
+	@exception MissingResourceException if there was an error loading the value from the resources.
+	@see #getLabelResourceKey()
+	*/
+	public String getLabelText() throws MissingResourceException	//TODO testing
+	{
+		return getModel().getLabel();	//TODO fix
+	}
+
+	/**Sets the text of the label.
+	This is a bound property.
+	@param newLabel The new text of the label.
+	@see LabelModel#LABEL_PROPERTY
+	*/
+	public void setLabelText(final String newLabel)	//TODO testing
+	{
+		getModel().setLabel(newLabel);	//TODO fix
+	}
 
 	/**Session, ID, and model constructor.
 	@param session The Guise session that owns this component.

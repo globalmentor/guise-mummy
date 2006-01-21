@@ -61,6 +61,24 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**@return The data model used by this component.*/
 		public Model getModel() {return model;}
 
+		/**Sets the data model used the component.
+		This is a bound property.
+		@param newModel The new data model used by this component.
+		@exception NullPointerException if the given model is <code>null</code>.
+		@see Component#MODEL_PROPERTY
+		*/
+/*TODO del
+		protected void setModel(final Model newModel)	//TODO eventually remove model from component and promote to control or something higher, probably storing separate types
+		{
+			if(model!=checkNull(newModel, "Model cannot be null."))	//if the value is really changing
+			{
+				final Model oldModel=model;	//get the old value
+				model=newModel;	//actually change the value
+				firePropertyChange(MODEL_PROPERTY, oldModel, newModel);	//indicate that the value changed
+			}			
+		}
+*/
+
 	/**The background color of the component, or <code>null</code> if no background color is specified for this component.*/
 	private Color<?> backgroundColor=null;
 

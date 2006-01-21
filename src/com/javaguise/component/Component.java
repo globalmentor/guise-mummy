@@ -64,6 +64,8 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	public final static String FLYOVER_STRATEGY_PROPERTY=getPropertyName(Component.class, "flyoverStrategy");
 	/**The bound property of whether the component has tooltips enabled.*/
 	public final static String TOOLTIP_ENABLED_PROPERTY=getPropertyName(Component.class, "tooltipEnabled");
+	/**The bound property of the model.*/
+//TODO del if not needed	public final static String MODEL_PROPERTY=getPropertyName(Component.class, "model");
 	/**The opacity bound property.*/
 	public final static String OPACITY_PROPERTY=getPropertyName(Component.class, "opacity");
 	/**The orientation bound property.*/

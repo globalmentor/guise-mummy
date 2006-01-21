@@ -1,5 +1,7 @@
 package com.javaguise.component;
 
+import java.util.MissingResourceException;
+
 import com.javaguise.GuiseSession;
 import com.javaguise.model.*;
 
@@ -46,6 +48,27 @@ public class CheckControl extends AbstractValueControl<Boolean, CheckControl>
 				firePropertyChange(CHECK_TYPE_PROPERTY, oldCheckType, newCheckType);	//indicate that the value changed
 			}			
 		}
+
+	/**Determines the text of the label.
+	If a label is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
+	@return The label text, or <code>null</code> if there is no label text.
+	@exception MissingResourceException if there was an error loading the value from the resources.
+	@see #getLabelResourceKey()
+	*/
+	public String getLabelText() throws MissingResourceException	//TODO testing
+	{
+		return getModel().getLabel();	//TODO fix
+	}
+
+	/**Sets the text of the label.
+	This is a bound property.
+	@param newLabel The new text of the label.
+	@see LabelModel#LABEL_PROPERTY
+	*/
+	public void setLabelText(final String newLabel)	//TODO testing
+	{
+		getModel().setLabel(newLabel);	//TODO fix
+	}
 
 	/**Session constructor with a default boolean data model and a default rectangle check type.
 	@param session The Guise session that owns this component.

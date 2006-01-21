@@ -5,10 +5,13 @@ import static com.garretwilson.lang.ClassUtilities.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Locale;
+import java.util.MissingResourceException;
 
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.util.Debug;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.javaguise.model.ValueModel.VALIDATOR_PROPERTY;
 
 import com.javaguise.GuiseSession;
 import com.javaguise.converter.*;
@@ -42,6 +45,47 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 	/**The valid bound property.*/
 //TODO del	public final static String VALID_PROPERTY=getPropertyName(TextControl.class, "valid");
 
+	/**Determines the text of the label.
+	If a label is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
+	@return The label text, or <code>null</code> if there is no label text.
+	@exception MissingResourceException if there was an error loading the value from the resources.
+	@see #getLabelResourceKey()
+	*/
+	public String getLabelText() throws MissingResourceException	//TODO testing
+	{
+		return getModel().getLabel();	//TODO fix
+	}
+
+	/**Sets the text of the label.
+	This is a bound property.
+	@param newLabel The new text of the label.
+	@see LabelModel#LABEL_PROPERTY
+	*/
+	public void setLabelText(final String newLabel)	//TODO testing
+	{
+		getModel().setLabel(newLabel);	//TODO fix
+	}
+
+	/**Sets the data model used the component.
+	This is a bound property.
+	@param newModel The new data model used by this component.
+	@exception NullPointerException if the given model is <code>null</code>.
+	@see Component#MODEL_PROPERTY
+	*/
+/*TODO del
+	public void setModel(final ValueModel<V> newModel)	//TODO testing
+	{
+		final ValueModel<V> oldModel=getModel();	//get the old model
+		if(oldModel!=newModel)	//if the model is really changing
+		{
+			oldModel.removePropertyChangeListener(ValueModel.VALUE_PROPERTY, updateTextPropertyChangeListener);	//stop listening for the old model changing value			
+			newModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, updateTextPropertyChangeListener);	//listen for the new model changing value, and update the text in response
+			super.setModel(newModel);	//update the model
+			setConverter(AbstractStringLiteralConverter.getInstance(getSession(), newModel.getValueClass()));	//update the converter to match the model value class (as a non-generic access could change the value class)
+		}
+	}
+*/
+
 	/**The converter for this component.*/
 	private Converter<V, String> converter;
 
@@ -64,7 +108,7 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 				updateText(getModel().getValue());	//update the text, now that we've installed a new converter
 			}
 		}
-	
+
 	/**The text literal value displayed in the control, or <code>null</code> if there is no literal value.*/
 	private String text;
 
@@ -154,7 +198,32 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 				firePropertyChange(MAXIMUM_LENGTH_PROPERTY, new Integer(oldMaximumLength), new Integer(newMaximumLength));	//indicate that the value changed
 			}			
 		}
-	
+
+	/**@return The validator for the model, or <code>null</code> if no validator is installed.*/
+	public Validator<V> getValidator()
+	{
+		return getModel().getValidator();	//TODO testing
+	}
+
+	/**Sets the validator.
+	This is a bound property
+	@param newValidator The validator for the model, or <code>null</code> if no validator should be used.
+	@see #VALIDATOR_PROPERTY
+	*/
+	public void setValidator(final Validator<V> newValidator)
+	{
+		getModel().setValidator(newValidator);	//TODO testing
+	}
+
+	/**Returns the model value class.
+	@return The class representing the type of value the model can hold.
+	@see ValueModel#getValueClass()
+	*/
+	public Class<V> getValueClass()
+	{
+		return getModel().getValueClass();	//return the value class of the model
+	}
+
 	/**The property change listener that updates the text in response to a property changing.*/
 	private final PropertyChangeListener updateTextPropertyChangeListener;
 
@@ -230,7 +299,7 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 				{
 					public void propertyChange(final PropertyChangeEvent propertyChangeEvent)	//if the property changes
 					{
-						updateText(model.getValue());	//update the text with the value from the model				
+						updateText(model.getValue());	//update the text with the value from the model
 					}
 				};
 		model.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, updateTextPropertyChangeListener);	//listen for the model changing value, and update the text in response
@@ -244,6 +313,7 @@ public class TextControl<V> extends AbstractValueControl<V, TextControl<V>>
 	*/
 	protected void updateText(final V value)	//TODO remove the value parameter and just get it from the model
 	{
+Debug.trace("ready to update text with value:", value);
 		final Converter<V, String> converter=getConverter();	//get the current converter
 		try
 		{

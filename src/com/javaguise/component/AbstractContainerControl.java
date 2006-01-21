@@ -2,6 +2,7 @@ package com.javaguise.component;
 
 import com.javaguise.GuiseSession;
 import com.javaguise.component.layout.Layout;
+import com.javaguise.model.ControlModel;
 import com.javaguise.model.Model;
 
 /**An abstract implementation of a container that is also a control.
@@ -9,6 +10,10 @@ import com.javaguise.model.Model;
 */
 public abstract class AbstractContainerControl<C extends Container<C> & Control<C>> extends AbstractContainer<C> implements Control<C>
 {
+
+	/**@return The data model used by this component.*/
+	@SuppressWarnings("unchecked")
+	public ControlModel getModel() {return (ControlModel)super.getModel();}
 
 	/**Session, ID, layout, and model constructor.
 	@param session The Guise session that owns this component.

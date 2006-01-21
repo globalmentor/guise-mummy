@@ -1,6 +1,7 @@
 package com.javaguise.component;
 
 import com.javaguise.GuiseSession;
+import com.javaguise.model.ControlModel;
 import com.javaguise.model.Model;
 
 /**An abstract implementation of a model component that allows user interaction to modify the model.
@@ -31,6 +32,10 @@ public abstract class AbstractControl<C extends Control<C>> extends AbstractComp
 			}
 		}
 */
+
+	/**@return The data model used by this component.*/
+	@SuppressWarnings("unchecked")
+	public ControlModel getModel() {return (ControlModel)super.getModel();}
 
 	/**Session, ID, and model constructor.
 	@param session The Guise session that owns this component.

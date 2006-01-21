@@ -43,11 +43,12 @@ public abstract class AbstractLayout<T extends Layout.Constraints> extends Guise
 
 		/**Sets the container that owns this layout
 		This method is managed by containers, and normally should not be called by applications.
-		A layout cannot be given a container if it is already installed in another container. Once a layout is installed in a container, it cannot be uninstalled.
+//TODO del		A layout cannot be given a container if it is already installed in another container. Once a layout is installed in a container, it cannot be uninstalled.
+		A layout cannot be given a container if it is already installed in another container.
 		A layout cannot be given a container unless that container already recognizes this layout as its layout.
 		If a layout is given the same container it already has, no action occurs.
 		@param newContainer The new container for this layout.
-		@exception NullPointerException if the given container is <code>null</code>.
+//TODO del		@exception NullPointerException if the given container is <code>null</code>.
 		@exception IllegalStateException if a different container is provided and this layout already has a container.
 		@exception IllegalArgumentException if a different container is provided and the given container does not already recognize this layout as its layout.
 		*/
@@ -56,12 +57,14 @@ public abstract class AbstractLayout<T extends Layout.Constraints> extends Guise
 			final Container<?> oldContainer=container;	//get the old component
 			if(oldContainer!=newContainer)	//if the component is really changing
 			{
+/*TODO fix
 				checkNull(newContainer, "Container cannot be null.");
 				if(oldContainer!=null)	//if we already have a parent
 				{
 					throw new IllegalStateException("Layout "+this+" already has container: "+oldContainer);
 				}
-				if(newContainer.getLayout()!=this)	//if the container that is not really our owner
+*/
+				if(newContainer!=null && newContainer.getLayout()!=this)	//if the container that is not really our owner
 				{
 					throw new IllegalArgumentException("Provided container "+newContainer+" is not really owner of layout "+this);
 				}
