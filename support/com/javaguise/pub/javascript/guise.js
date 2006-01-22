@@ -2715,6 +2715,9 @@ function initializeNode(node)
 */	
 						
 						break;
+					case "textarea":
+						eventManager.addEvent(node, "change", onTextInputChange, false);
+						break;
 				}
 				for(var i=elementClassNames.length-1; i>=0; --i)	//for each class name
 				{
@@ -2892,7 +2895,7 @@ test.add(dummy);
 */
 }
 
-/**Called when the contents of a text input changes.
+/**Called when the contents of a text input or a text area changes.
 @param event The object describing the event.
 */
 function onTextInputChange(event)

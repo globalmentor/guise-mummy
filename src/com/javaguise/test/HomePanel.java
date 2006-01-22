@@ -612,6 +612,7 @@ Debug.trace("list control changed value to", newValue);
 
 		final TextAreaControl textAreaControl=new TextAreaControl(session, 25, 100, true);
 		textAreaControl.getModel().setLabel("Type some text.");
+/*TODO bring back
 		try
 		{
 			textAreaControl.getModel().setValue("This is some text\nand some more on another line.\n\nSkipping two lines down, we find a line that is really long, is really, really, ;lkjas;lfk alkg; ;alkghj;alg lkjahq glkjh flkjhasdflkjhasdfl kjhasdf lkjh lkadhf lkshd flksadhf lksadhlskdqah slhjfg sd long.");
@@ -620,6 +621,8 @@ Debug.trace("list control changed value to", newValue);
 		{
 			throw new AssertionError(e);
 		}
+*/
+		textAreaControl.getModel().setValidator(new RegularExpressionStringValidator(session, ".{0,10}", true));
 		contentPanel.add(textAreaControl);
 /*TODO del
 		final Text text=new Text(session);

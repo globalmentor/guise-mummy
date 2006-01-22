@@ -191,6 +191,7 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 		yearTextControl=new TextControl<Integer>(session, Integer.class);	//create a text control to select the year
 		yearTextControl.getModel().setLabel("Year");	//set the year control label TODO get from resources
 		yearTextControl.setMaximumLength(4);	//TODO testing
+		yearTextControl.setColumnCount(4);	//TODO testing
 		yearTextControl.getModel().setValidator(new IntegerRangeValidator(session, new Integer(1800), new Integer(2100), new Integer(1), true));	//restrict the range of the year TODO improve; don't arbitrarily restrict the range
 		controlContainer.add(yearTextControl);	//add the year text control
 		updateCalendars();	//update the calendars
