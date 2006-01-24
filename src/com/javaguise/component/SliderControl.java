@@ -30,6 +30,8 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 	public final static String AXIS_PROPERTY=getPropertyName(SliderControl.class, "axis");
 	/**The interval step bound property.*/
 	public final static String INTERVAL_PROPERTY=getPropertyName(SliderControl.class, "intervalStep");
+	/**The bound property of the sliding state.*/
+	public final static String SLIDING_PROPERTY=getPropertyName(SliderControl.class, "sliding");
 	/**The thumb image bound property.*/
 	public final static String THUMB_IMAGE_PROPERTY=getPropertyName(SliderControl.class, "thumbImage");
 	/**The thumb image resource key bound property.*/
@@ -208,7 +210,28 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 					firePropertyChange(TRACK_IMAGE_RESOURCE_KEY_PROPERTY, oldTrackImageResourceKey, newTrackImageResourceKey);	//indicate that the value changed
 				}
 			}
-		
+
+	/**Whether the slider is being slid.*/
+	private boolean sliding=false;
+
+		/**@return Whether the slider is being slid.*/
+		public boolean isSliding() {return sliding;}
+
+		/**Sets whether the slider is being slid.
+		This is a bound property of type <code>Boolean</code>.
+		@param newSliding <code>true</code> if the slider is sliding, else <code>false</code>.
+		@see #SLIDING_PROPERTY
+		*/
+		public void setSliding(final boolean newSliding)
+		{
+			if(sliding!=newSliding)	//if the value is really changing
+			{
+				final boolean oldSliding=sliding;	//get the current value
+				sliding=newSliding;	//update the value
+				firePropertyChange(SLIDING_PROPERTY, Boolean.valueOf(oldSliding), Boolean.valueOf(newSliding));
+			}
+		}
+
 	/**Session, model, and axis constructor with a default converter.
 	@param session The Guise session that owns this component.
 	@param model The component data model.

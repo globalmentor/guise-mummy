@@ -1027,6 +1027,7 @@ Debug.trace("now have frames: ", frames.size());
 											targetID, new Rectangle(targetX, targetY, targetWidth, targetHeight), new Rectangle(viewportX, viewportY, viewportWidth, viewportHeight),
 											new Point(mouseX, mouseY));	//create a new mouse event
 									controlEventList.add(mouseEvent);	//add the event to the list
+//TODO del Debug.trace("mouse event; targetXY:", targetX, targetY, "viewportXY:", viewportX, viewportY, "mouseXY:", mouseX, mouseY);
 								}
 							}
 							catch(final IllegalArgumentException illegalArgumentException)	//if we don't ignore the event type, don't create an event

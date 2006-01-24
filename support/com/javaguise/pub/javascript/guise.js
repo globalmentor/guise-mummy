@@ -2295,8 +2295,9 @@ var allowX: Whether dragging is allowed along the X axis (true by default).
 var allowY: Whether dragging is allowed along the Y axis (true by default).
 var minX: The minimum horizontal position, inclusive, in correct element terms, or null if there is no minumum horizontal position.
 var maxX: The maximum horizontal position, inclusive, in correct element terms, or null if there is no maximum horizontal position.
+var onBegin(element): The method called when dragging begins, or null if no additional action should be taken.
 var onDrag(element, x, y): The method called when dragging occurs, or null if no additional action should be taken. The coordinates are in terms of the element's position type.
-var onEnd(element): The method called when dragging ends, or null if no additional action should be taken. The coordinates are in terms of the element's position type.
+var onEnd(element): The method called when dragging ends, or null if no additional action should be taken.
 */
 function DragState(dragSource, mouseX, mouseY)
 {
@@ -2363,6 +2364,10 @@ function DragState(dragSource, mouseX, mouseY)
 //TODO del if not needed			drag(mouseX, mouseY);	//do a fake drag to make sure that the position of the element is within any ranges
 			this.dragging=true;	//show that we are dragging
 			eventManager.addEvent(document, "mousemove", onDrag, false);	//listen for mouse move anywhere in document (IE doesn't allow us to listen on the window), as dragging may end somewhere else besides a drop target
+			if(this.onDragBegin)	//if there is a function for beginning dragging
+			{
+				this.onDragBegin(this.element);	//call the dragging begin method
+			}
 		};
 
 		/*Drags the component to the location indicated by the mouse coordinates.
@@ -3422,6 +3427,12 @@ function onSliderThumbDragBegin(event)
 				dragState.maxY=max;	//set the maximum
 			}
 			var span=max-min;	//find the available range of the values
+			dragState.onDragBegin=function(element)	//when dragging begins, send a slideBegin action event
+					{
+						updateSlider(slider);	//update the slider view
+						var ajaxRequest=new ActionAJAXEvent(slider.id, thumb.id, "slideBegin");	//create a new action request for sliding begin TODO use a constant
+						guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+					}
 			dragState.onDrag=function(element, x, y)	//when dragging occurs, update the slider value
 					{
 						var coordinate=isHorizontal ? x.toString() : y.toString();	//get the new slider position
@@ -3438,6 +3449,8 @@ function onSliderThumbDragBegin(event)
 					};
 			dragState.onDragEnd=function(element)	//when dragging ends, update the slider view to make sure it is synchronized with the updated value
 					{
+						var ajaxRequest=new ActionAJAXEvent(slider.id, thumb.id, "slideEnd");	//create a new action request for sliding end TODO use a constant
+						guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 						updateSlider(slider);	//update the slider view
 					}
 			dragState.beginDrag(event.clientX, event.clientY);	//begin dragging
@@ -3449,14 +3462,19 @@ function onSliderThumbDragBegin(event)
 }
 
 /**Updates the representation of a slider based upon the slider's model value.
+The slider is only updated if the slider is not in the sliding state (i.e. the user is not manually moving the slider).
 This implementation also sets the thumb.width and thumb.height to work around a Mozilla bug that doesn't properly calculate thumb.offsetWidth and thumb.offsetHeight if the thumb is partially outside the track.
 @param slider The slider element.
 */
 function updateSlider(slider)	//TODO maybe rename to updateSliderView
 {
+	if(hasClassName(slider, "sliding"))	//if the slider is not in a sliding state according to the server (i.e. the thumb is not being manually moved by the user) TODO use a constant
+	{
+		return;	//don't update the slider while the server still thinks the slider is sliding
+	}
 	var track=getDescendantElementByClassName(slider, STYLES.SLIDER_CONTROL_TRACK);	//find the slider track
 	var thumb=getDescendantElementByClassName(slider, STYLES.SLIDER_CONTROL_THUMB);	//find the slider thumb
-	if(dragState && dragState.dragging && dragState.dragSource==thumb)	//if the slider thumb is being dragged
+	if(dragState && dragState.dragging && dragState.dragSource==thumb)	//if the slider thumb is being dragged (i.e. the browser things the slider is being dragged)
 	{
 		return;	//don't update the slider while a drag is occurring
 	}
@@ -4012,7 +4030,7 @@ var originalElement=element;	//TODO del; testing
 		{
 			x+=element.offsetLeft;	//add this element's offsets
 			y+=element.offsetTop;
-/*TODO fix
+/*TODO fix or del; apparently this code is not as good as the version below, although it doesn't seem to compensate for scrollLeft
 			if(element.scrollLeft)
 			{
 				x-=element.scrollLeft;
@@ -4032,6 +4050,7 @@ var originalElement=element;	//TODO del; testing
         offsetTop += document.body.topMargin;
     }
 */
+/*TODO fix; this inappropriately adds in the viewport scroll position on IE but not on Mozilla---but this is needed for internal scrolled divs on IE; try to distinguish the two when internal scrolled divs are used
 		var parent=originalElement.parentNode;
 		while(parent!=document.documentElement)
 		{
@@ -4042,6 +4061,7 @@ var originalElement=element;	//TODO del; testing
 			}
 			parent=parent.parentNode;		
 		}
+*/
 	}
 	else if(element.x && element.y)	//if element.offsetParent is not supported by but element.x and element.y are supported (e.g. Navigator 4)
 	{
