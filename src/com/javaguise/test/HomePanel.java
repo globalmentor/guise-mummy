@@ -203,13 +203,11 @@ Debug.trace("list control changed value to", newValue);
 		
 		
 		
-/*TODO del; testing
 		final Flash flash=new Flash(session);
-		flash.setFlashURI(URI.create("combos.swf"));
-		flash.setPreferredWidth(new Extent(760));
-		flash.setPreferredHeight(new Extent(955));
+		flash.setFlashURI(URI.create("test.swf"));
+		flash.setPreferredWidth(new Extent(564));
+		flash.setPreferredHeight(new Extent(474));
 		contentPanel.add(flash);
-*/
 
 		final Text testText=new Text(session);
 		testText.getModel().setTextContentType(TextModel.XHTML_FRAGMENT_CONTENT_TYPE);

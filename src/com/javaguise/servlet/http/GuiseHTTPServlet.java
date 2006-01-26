@@ -6,7 +6,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.regex.*;
 
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
@@ -68,6 +68,7 @@ import com.garretwilson.text.xml.xhtml.XHTMLConstants;
 import com.garretwilson.text.xml.xpath.PathExpression;
 import com.garretwilson.text.xml.xpath.XPath;
 import com.garretwilson.util.*;
+import static com.garretwilson.util.regex.MatcherUtilities.*;
 
 import static com.garretwilson.util.LocaleUtilities.*;
 
@@ -1383,6 +1384,7 @@ Debug.trace("+++creating Guise session", httpSession.getId());
 							}
 						}
 					}
+					initializeUserAgentEnvironment(environment, httpRequest);	//initialize the user agent information
 					guiseSession.initialize();	//let the Guise session know it's being initializes so that it can listen to the application
 					final Locale[] clientAcceptedLanguages=getAcceptedLanguages(httpRequest);	//get all languages accepted by the client
 					guiseSession.requestLocale(asList(clientAcceptedLanguages));	//ask the Guise session to change to one of the accepted locales, if the application supports one
@@ -1390,6 +1392,76 @@ Debug.trace("+++creating Guise session", httpSession.getId());
 				}
 				return guiseSession;	//return the Guise session
 			}
+		}
+
+		/**The pattern for matching the Firefox user agent.*/
+		private final Pattern FIREFOX_PATTERN=Pattern.compile("Firefox/"+PRODUCT_VERSION_REGEX);
+
+		/**The pattern for matching the Opera user agent.
+		This pattern recognizes, for example, both "Opera/7.54" and "Opera 7.54".
+		*/
+		private final Pattern OPERA_PATTERN=Pattern.compile("Opera[/ ]"+PRODUCT_VERSION_REGEX);
+
+		/**The pattern for matching the MSIE user agent.
+		Microsoft recommended regular expression: "MSIE ([0-9]{1,}[\\.0-9]{0,})"
+		@see http://msdn.microsoft.com/workshop/author/dhtml/overview/browserdetection.asp
+		*/
+		private final Pattern MSIE_PATTERN=Pattern.compile("MSIE "+PRODUCT_VERSION_REGEX);
+
+		/**Initializes a Guise environment with user agent information.
+		For known browsers, the user agent string will be parsed with specific knowledge of the evolution of the user of the user agent string.
+		@param environment The Guise environment.
+		@param httpRequest The HTTP request representing the Guise environment. 
+		*/
+		protected void initializeUserAgentEnvironment(final GuiseEnvironment environment, final HttpServletRequest httpRequest)
+		{
+			final String userAgent=getUserAgent(httpRequest);	//get the user agent string
+			if(userAgent!=null)	//if there is a user agent string
+			{
+				//e.g. Opera: "Opera/7.54 (Windows NT 5.1; U)"
+				//e.g. Opera: "Mozilla/5.0 (Windows NT 5.1; U) Opera 7.54"
+				//e.g. Opera: "Mozilla/4.78 (Windows NT 5.1; U) Opera 7.54"
+				//e.g. Opera: "Mozilla/3.0 (Windows NT 5.1; U) Opera 7.54"
+				//e.g. Opera: "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1) Opera 7.54"
+				//e.g. Firefox 1.5: "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8) Gecko/20051111 Firefox/1.5"
+				//e.g. IE 6.0: "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)"						
+Debug.trace("user agent:", userAgent);
+				String userAgentName=null;	//we'll determint the user agent name
+				int[] userAgentVersion=null;	//we'll determine the version
+				final Matcher operaMatcher=OPERA_PATTERN.matcher(userAgent);	//first match for Opera, which can masquerade as other browsers
+				if(operaMatcher.find())	//if the user agent string finds an Opera match
+				{
+					userAgentName=GuiseEnvironment.USER_AGENT_NAME_OPERA;	//show that this is Opera
+					userAgentVersion=getIntGroups(operaMatcher);	//parse out the version
+				}
+				else	//if this is not Opera
+				{
+					final Matcher ieMatcher=MSIE_PATTERN.matcher(userAgent);	//match for IE
+					if(ieMatcher.find())	//if the user agent string finds an IE match
+					{
+						userAgentName=GuiseEnvironment.USER_AGENT_NAME_MSIE;	//show that this is MSIE
+						userAgentVersion=getIntGroups(ieMatcher);	//parse out the version
+					}
+					else	//if this is not IE
+					{
+						final Matcher firefoxMatcher=FIREFOX_PATTERN.matcher(userAgent);	//match for Firefox
+						if(firefoxMatcher.find())	//if the user agent string finds a Firefox match
+						{
+							userAgentName=GuiseEnvironment.USER_AGENT_NAME_FIREFOX;	//show that this is Firefox
+							userAgentVersion=getIntGroups(firefoxMatcher);	//parse out the version
+						}
+					}
+				}
+Debug.trace("user agent name:", userAgentName, "with version", userAgentVersion!=null ? Arrays.toString(userAgentVersion) : null);
+				if(userAgentName!=null)	//if we determined a user agent name
+				{
+					environment.setProperty(GuiseEnvironment.USER_AGENT_NAME_PROPERTY, userAgentName);	//store the user agent name
+				}
+				if(userAgentVersion!=null)	//if we determined a user agent version
+				{
+					environment.setProperty(GuiseEnvironment.USER_AGENT_VERSION_PROPERTY, userAgentVersion);	//store the user agent version
+				}
+			}			
 		}
 
 		/**Removes the Guise session for the given HTTP session.
