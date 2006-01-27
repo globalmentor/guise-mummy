@@ -135,8 +135,22 @@ guiseFrames.add=function(frame)
 	var focusable=getFocusableDescendant(frame);	//see if this frame has a node that can be focused
 	if(focusable)	//if we found a focusable node
 	{
-		focusable.focus();	//focus on the node
+		try
+		{
+			focusable.focus();	//focus on the node
+		}
+		catch(e)	//TODO fix
+		{
+			alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" visibility: "+focusable.style.visibility+" display: "+focusable.style.display+" disabled: "+focusable.style.disabled);
+/*TODO fix
+			alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" visibility: "+focusable.style.visibility+" display: "+focusable.style.display+" disabled: "+focusable.style.disabled);
+			alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" current visibility: "+focusable.currentStyle.visibility+" current display: "+focusable.currentStyle.display+" current disabled: "+focusable.currentStyle.disabled);
+			alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" runtime visibility: "+focusable.runtimeStyle.visibility+" runtime display: "+focusable.runtimeStyle.display+" runtime disabled: "+focusable.runtimeStyle.disabled);
+			alert("error trying to focus element great-grandparent: "+DOMUtilities.getNodeString(focusable.parentNode.parentNode.parentNode));
+*/
+		}
 	}
+//TODO del	debug(DOMUtilities.getNodeString(frame));
 };
 
 /**Initializes the position of the frame.
@@ -899,7 +913,7 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 				}
 				var childNodes=node.childNodes;	//get a list of child nodes
 				var childNodeCount=childNodes.length;	//find out how many child nodes there are
-				if(childNodeCount>0 || nodeName=="div" || nodeName=="span")	//if there are children (special-case "div" and "span" for IE, which will drop a <div/> from the DOM
+				if(childNodeCount>0 || nodeName=="div" || nodeName=="span" || nodeName=="label")	//if there are children (special-case "div" and "span" for IE, which will drop them from the DOM if they are empty) TODO use constants; create separate maintainable array
 				{				
 					stringBuilder.append(">");	//>
 					for(var i=0; i<childNodeCount; ++i)	//for all of the child nodes
@@ -982,7 +996,11 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 	appendXMLAttribute:function(stringBuilder, attributeName, attributeValue)
 	{
 			//TODO assert attributeValue!=null, which will happen if we try to serialize an IE element; fix further up the call stack by representing null attributes
-		return stringBuilder.append(" ").append(attributeName).append("=\"").append(this.encodeXML(attributeValue.toString())).append("\"");	//name="value"
+		if(attributeValue!=null)	//if the attribute value is not null, which will happen if we try to serialize an IE element TODO testing; update API documentation
+		{
+			stringBuilder.append(" ").append(attributeName).append("=\"").append(this.encodeXML(attributeValue.toString())).append("\"");	//name="value"
+		}
+		return stringBuilder;	//return the string builder
 	},
 
 	/**Appends an XML end tag with the given name to the given string builder.
@@ -2008,6 +2026,9 @@ alert("child node "+i+" is of type "+childNode.nodeType+" with name "+childNode.
 var guiseAJAX=new GuiseAJAX();
 
 /**A class maintaining event function information and optionally adapting an event to a W3C compliant version.
+<ul>
+	<li>charCode</li>
+</ul>
 A decorator will be created for the event function.
 @param currentTarget The object for which a listener should be added.
 @param eventType The type of event.
@@ -2074,12 +2095,19 @@ function EventListener(currentTarget, eventType, fn, useCapture, createDecorator
 			{
 				event.currentTarget=currentTarget;	//assign a W3C current target property
 			}
+				//fix event.charCode
+			if(!event.charCode)	//if this event has no character code
+			{
+				event.charCode=event.which ? event.which : event.keyCode;	//use the NN4  key indication if available; otherwise, use the key code TODO make sure this is a key event, because NN4 uses event.which for mouse events, too			
+			}
+/*TODO del when works; this is probably incorrect
 				//fix event.data
 			if(!event.data)	//if there is no data
 			{
 				//TODO assert event.keyCode
 				event.data=event.keyCode;	//assign a W3C data property
 			}
+*/
 				//fix event.stopPropagation
 			if(!event.stopPropagation)	//if there is no method for stopping propagation TODO add workaround for Safari, which has this method but doesn't actually stop propagation
 			{
@@ -2552,7 +2580,7 @@ function updateModalLayer()
 		modalLayer=document.createElementNS("http://www.w3.org/1999/xhtml", "div");	//create a div TODO use a constant for the namespace
 		modalLayer.className="modalLayer";	//load the modal layer style
 		document.body.appendChild(modalLayer);	//add the modal layer to the document
-		//TODO if(IE)
+		if(isIE)	//if we're in IE, create a modal IFrame to keep select components from showing through; but don't do this in Mozilla, or it will keep the cursor from showing up for text inputs in absolutely positioned div elements above the IFrame
 		{
 			modalIFrame=document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");	//create an IFrame TODO use a constant for the namespace
 			modalIFrame.src="about:blank";
@@ -2689,6 +2717,7 @@ function initializeNode(node)
 							case "text":
 							case "password":
 								eventManager.addEvent(node, "change", onTextInputChange, false);
+								eventManager.addEvent(node, "keypress", onTextInputKeyPress, false);
 								break;
 							case "checkbox":
 							case "radio":
@@ -2850,7 +2879,19 @@ function onFocus(event)
 				if(focusable)	//if we found a focusable node
 				{
 //TODO del dummy+=" changing to first focusable "+focusable.nodeName+" id "+focusable.id;
-					focusable.focus();	//focus on the node
+					try
+					{
+						focusable.focus();	//focus on the node
+					}						
+					catch(e)	//TODO fix
+					{
+/*TODO fix
+						alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" style: "+focusable.style+" class: "+focusable.className+" visibility: "+focusable.style.visibility+" display: "+focusable.style.display+" disabled: "+focusable.style.disabled);
+			alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" current visibility: "+focusable.currentStyle.visibility+" current display: "+focusable.currentStyle.display+" current disabled: "+focusable.currentStyle.disabled);
+			alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" runtime visibility: "+focusable.runtimeStyle.visibility+" runtime display: "+focusable.runtimeStyle.display+" runtime disabled: "+focusable.runtimeStyle.disabled);
+			alert("error trying to focus element great-grandparent: "+DOMUtilities.getNodeString(focusable.parentNode.parentNode.parentNode));
+*/
+					}
 				}
 				else	//if we can't find a focusable node on the modal frame
 				{
@@ -2898,6 +2939,30 @@ test.add(dummy);
 		}
 	}
 */
+}
+
+/**Called when a key is pressed in a text input.
+This implementation checks to see if the Enter/Return key was pressed, and if so commits the input by sending it to the server.
+@param event The object describing the event.
+*/
+function onTextInputKeyPress(event)
+{
+	var charCode=event.charCode;	//get the code of the entered character
+	if(charCode==13)	//if Enter/Return was pressed TODO use a constant
+	{
+		if(AJAX_ENABLED)	//if AJAX is enabled
+		{
+			var textInput=event.currentTarget;	//get the control in which text changed
+		//TODO del alert("an input changed! "+textInput.id);
+			var ajaxRequest=new FormAJAXEvent(new Parameter(textInput.name, textInput.value));	//create a new form request with the control name and value
+			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+			event.stopPropagation();	//tell the event to stop bubbling
+			event.preventDefault();	//prevent the default functionality from occurring
+		}
+		else	//TODO submit the form
+		{
+		}
+	}
 }
 
 /**Called when the contents of a text input or a text area changes.
@@ -4156,5 +4221,14 @@ function getViewportSize()
 	}
 	return new Size(width, height);	//return the size
 }
+
+function debug(text)
+{
+	var dymamicContent="javascript:document.write('<html><body>"+DOMUtilities.encodeXML(text)+"</body></html>');"	//create JavaScript for writing the dynamic content
+	window.open(dymamicContent, "debug", "status=no,menubar=no,scrollbars=yes,resizable=no,width=800,height=600");
+}
+
+/**See if the browser is IE.*/
+var isIE=navigator.userAgent.indexOf("MSIE")>=0;	//TODO use a better variable; do better checks---this will be fooled by Opera maquerading as IE, for example
 
 eventManager.addEvent(window, "load", onWindowLoad, false);	//do the appropriate initialization when the window loads

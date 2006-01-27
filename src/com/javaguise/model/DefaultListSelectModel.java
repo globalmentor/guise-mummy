@@ -204,7 +204,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 				int valueStateIndex=index;	//we'll start adding new states at the request4ed index
 				for(final V value:collection)	//for each new value
 				{
-					valueStates.add(valueStateIndex++, new ValueState(value));	//add a new value state corresponding to the aded value
+					valueStates.add(valueStateIndex++, new ValueState());	//add a new value state corresponding to the aded value
 				}
 				listModified(-1, null, null);	//indicate a general list modification
 				firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
@@ -293,7 +293,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 		{
 			final V oldSelectedValue=getSelectedValue();	//get the old selected value
 			oldValue=values.set(index, value);	//set the value at the given index
-			valueStates.set(index, new ValueState(value, valueStates.get(index)));	//store a new value state at the same location with the new value but with the same state
+			valueStates.set(index, new ValueState(valueStates.get(index)));	//store a new value state at the same location with the new value but with the same state
 			listModified(index, oldValue, value);	//indicate that the value at the given index was replaced
 			firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 		}
@@ -311,7 +311,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 		{
 			final V oldSelectedValue=getSelectedValue();	//get the old selected value
 			values.add(index, value);	//add the value at the requested index
-			valueStates.add(index, new ValueState(value));	//add a corresponding value state at the same index
+			valueStates.add(index, new ValueState());	//add a corresponding value state at the same index
 			listModified(index, value, null);	//indicate the value was added at the given index
 			firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 		}
@@ -349,14 +349,14 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	public int lastIndexOf(final Object value) {return values.lastIndexOf(value);}
 
 	/**@return A read-only list iterator of the values in this model (in proper sequence).*/
-	public ListIterator<V> listIterator() {return unmodifiableList(values).listIterator();}	//TODO update the synchronized list decorator to return a synchronized list iterator
+	public ListIterator<V> listIterator() {return values.listIterator();}	//TODO update the synchronized list decorator to return a synchronized list iterator
 
 	/**Returns a list iterator of the values in this model (in proper sequence), starting at the specified position in this model.
 	@param index The index of first value to be returned from the list iterator (by a call to the <code>next()</code> method).
 	@return A list iterator of the values in this model (in proper sequence), starting at the specified position in this model.
 	@exception IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt; <code>size()</code>).
 	*/
-	public ListIterator<V> listIterator(final int index) {return unmodifiableList(values).listIterator(index);}	//TODO update the synchronized list decorator to return a synchronized list iterator
+	public ListIterator<V> listIterator(final int index) {return values.listIterator(index);}	//TODO update the synchronized list decorator to return a synchronized list iterator
 
 	/**Returns a read-only view of the portion of this model between the specified <var>fromIndex</var>, inclusive, and <var>toIndex</var>, exclusive.
 	@param fromIndex The low endpoint (inclusive) of the sub-list.
@@ -726,7 +726,8 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 				}
 //TODO fix				setSelectedIndexes();	//clear all selections, as we don't know which values were added or removed
 */
-				setSelectedIndexes();	//clear all selections, as we don't know which values were added or removed
+				clearValue();	//clear all selections, as we don't know which values were added or removed
+//TODO fix; throws validation exception if value is required				setSelectedIndexes();	//clear all selections, as we don't know which values were added or removed
 			}
 		}
 		catch(final ValidationException validationException)
@@ -819,13 +820,13 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	/**An encapsulation of the state of a value in the model.
 	@author Garret Wilson
 	*/ 
-	protected class ValueState
+	protected class ValueState	//TODO delete the value state; sorting can disassociate the values with the states
 	{
 		/**The model value*/
-		private final V value;
+//TODO del if not needed		private final V value;
 
 			/**@return The model value.*/
-			public V getValue() {return value;}
+//	TODO del if not needed			public V getValue() {return value;}
 
 		/**Whether this value is enabled.*/
 		private boolean enabled=true;
@@ -852,18 +853,18 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 		/**Constructor
 		@param value The model value.
 		*/
-		public ValueState(final V value)
+		public ValueState(/*TODO del if not needed final V value*/)
 		{
-			this.value=value;
+//		TODO del if not needed			this.value=value;
 		}
 
 		/**State copy constructor
 		@param value The model value.
 		@param valueState The existing state containing values to copy.
 		*/
-		public ValueState(final V value, final ValueState valueState)
+		public ValueState(/*TODO del if not needed final V value, */final ValueState valueState)
 		{
-			this(value);	//construct the class with the value
+			this();	//construct the class with the value
 			this.enabled=valueState.isEnabled();	//copy the enabled state
 			this.selected=valueState.isSelected();	//copy the selected state
 		}

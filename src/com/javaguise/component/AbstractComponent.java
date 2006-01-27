@@ -1262,6 +1262,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		{
 			this.component=checkNull(component, "Component cannot be null.");			
 		}
+
 		/**Called when the mouse enters the source.
 		This implementation opens the flyover.
 		@param mouseEvent The event providing mouse information

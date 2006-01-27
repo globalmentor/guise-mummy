@@ -712,6 +712,17 @@ Debug.trace("now have frames: ", frames.size());
 					}
 					if(controlEvent instanceof InitControlEvent)	//if this is an initialization event TODO maybe just dirty all the frames so this happens automatically
 					{
+							//close all the flyover frames to get rid of stuck flyover frames, such as those left from refreshing the page during flyover TODO fix; this is a workaround to keep refreshing the page from leaving stuck flyover frames; maybe do something better
+						final Iterator<Frame<?>> flyoverFrameIterator=guiseSession.getFrameIterator();	//get an iterator to all the frames
+						while(flyoverFrameIterator.hasNext())	//while there are more frames
+						{
+							final Frame<?> frame=flyoverFrameIterator.next();	//get the next frame
+							if(frame instanceof FlyoverFrame)	//if this is a flyover frame
+							{
+								frame.close();	//close all flyover frames
+							}
+						}
+							//send back any open frames
 						final Iterator<Frame<?>> frameIterator=guiseSession.getFrameIterator();	//get an iterator to all the frames
 						while(frameIterator.hasNext())	//while there are more frames
 						{
