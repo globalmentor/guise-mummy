@@ -7,6 +7,7 @@ import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.Debug;
 import com.javaguise.GuiseSession;
+import com.javaguise.component.effect.Effect;
 import com.javaguise.component.layout.Corner;
 import com.javaguise.component.layout.Flow;
 import com.javaguise.component.layout.Orientation;
@@ -491,6 +492,15 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 		@param newStyleID The style identifier of the flyover, or <code>null</code> if there is no style ID.
 		*/
 		public void setStyleID(final String newStyleID);
+
+		/**@return The effect used for opening the flyover, or <code>null</code> if there is no open effect.*/
+		public Effect getOpenEffect();
+
+		/**Sets the effect used for opening the flyover.
+		@param newEffect The new effect used for opening the flyover, or <code>null</code> if there should be no open effect.
+		@see Frame#OPEN_EFFECT_PROPERTY 
+		*/
+		public void setOpenEffect(final Effect newOpenEffect);
 
 		/**Shows a flyover for the component.*/
 		public void openFlyover();

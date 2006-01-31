@@ -42,11 +42,10 @@ Copyright (c) 2005 GlobalMentor, Inc.
 
 /*Guise modal windows
 Guise creates a div element and places it as a layer in the z-order behind the top frame when modal frames are needed.
-To work around the IE6 bug where select elements are windowed controls, Guise places a separate transparant IFrame behind the modal div element.
+To work around the IE6 bug where select elements are windowed controls, Guise places a separate transparant IFrame behind the modal div element if IE6 is being used.
 This blocks out IE6 select elements, and does not help non-modal frames.
 See http://dotnetjunkies.com/WebLog/jking/archive/2003/07/21/488.aspx .
 See http://homepage.mac.com/igstudio/design/ulsmenus/vertical-uls-iframe.html .
-TODO only create modal IFrames if IE6 is present
 */
 
 /**Rollovers
@@ -93,6 +92,7 @@ var STYLES=
 	DRAG_SOURCE: "dragSource",
 	DRAG_HANDLE: "dragHandle",
 	DROP_TARGET: "dropTarget",
+	OPEN_EFFECT_REGEXP: /^openEffect-.+$/,
 	MOUSE_LISTENER: "mouseListener",
 	ROLLOVER: "rollover",
 	SLIDER_CONTROL: "sliderControl",
@@ -126,7 +126,36 @@ guiseFrames.add=function(frame)
 	document.body.appendChild(frame);	//add the frame element to the document; do this first, because IE doesn't allow the style to be accessed directly with imported nodes until they are added to the document
 	initializeNode(frame);	//initialize the new imported frame, installing the correct event handlers; do this before the frame is positioned, because initialization also fixes IE6 classes, which can affect position
 	this._initializePosition(frame);	//initialize the frame's position
-	frame.style.visibility="visible";	//TODO testing
+
+
+	var openEffectClassName=getClassName(frame, STYLES.OPEN_EFFECT_REGEXP);	//get the open effect specified for this frame
+	var openEffect=null;	//we'll create an open effect if appropriate
+	if(openEffectClassName)	//if there is an open effect
+	{
+		var effectNameMatch=/^openEffect-([\w]+)/.exec(openEffectClassName);	//search for the effect name TODO use a constant
+		var effectName=effectNameMatch && effectNameMatch.length==2 ? effectNameMatch[1] : null;	//retrieve the effect name
+		var delayMatch=/delay-([\d]+)/.exec(openEffectClassName);	//search for the delay amount TODO use a constant
+		var delay=delayMatch && delayMatch.length==2 ? (parseInt(delayMatch[1]) || 0) : 0;	//retrieve the delay amount, compensating for parse errors and defaulting to zero
+//TODO del alert("effect: "+effectName+" delay: "+delay);	
+		switch(effectName)	//see which effect name this is
+		{
+			case "DelayEffect":	//if this is a simple delay effect TODO use a constant
+				openEffect=new DelayEffect(frame, delay);	//create a delay effect
+				break;
+			case "OpacityFadeEffect":	//if this is an opacity fade effect TODO use a constant
+				openEffect=new OpacityFadeEffect(frame, delay);	//create an opacity fade effect
+				break;
+		}
+	}
+	if(openEffect)	//if we have an open effect
+	{
+		openEffect.effectBegin=function(){frame.style.visibility="visible";};	//TODO testing
+		openEffect.start();
+	}
+	else	//if there is no open effect
+	{
+		frame.style.visibility="visible";	//go ahead and make the frame visible
+	}
 
 	frame.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components TODO fix
 	updateComponents(frame);	//update all the components within the frame
@@ -3818,9 +3847,25 @@ function getDescendantElementByClassName(node, className)
 */
 function hasClassName(element, className)
 {
+	return getClassName(element, className)!=null;	//see if we can find a matching class name
+/*TODO del when works
 	var classNamesString=element.className;	//get the element's class names
 	var classNames=classNamesString ? classNamesString.split(/\s/) : EMPTY_ARRAY;	//split out the class names
 	return className instanceof RegExp ? classNames.containsMatch(className) : classNames.contains(className);	//return whether this class name is one of the class names
+*/
+}
+
+/**Returns the given element has the given class. Multiple class names are supported.
+@param element The element that should be checked for class.
+@param className The name of the class for which to check, or a regular expression if a match should be found.
+@return The given class name, which will be the regular expression match if a regular expression is used, or null if there is no matching class name.
+*/
+function getClassName(element, className)
+{
+	var classNamesString=element.className;	//get the element's class names
+	var classNames=classNamesString ? classNamesString.split(/\s/) : EMPTY_ARRAY;	//split out the class names
+	var index=className instanceof RegExp ? classNames.indexOfMatch(className) : classNames.indexOf(className);	//get the index of the matching class name
+	return index>=0 ? classNames[index] : null;	//return the matching class name, if there is one
 }
 
 /**Adds the given class name to the element's style class.
@@ -4221,6 +4266,158 @@ function getViewportSize()
 	}
 	return new Size(width, height);	//return the size
 }
+
+
+/**An abstract effect base class.
+Child classes should implement _doEffect() to perform the effect.
+@param element The element on which the effect will be performed.
+@param delay The delay before the effect should begin.
+var effectBegin The function indicating what should occur at the beginning of the effect, after the delay, or null if there is no effect begin function.
+var effectEnd The function indicating what should occur at the end of the effect, or null if there is no effect end function.
+*/
+function AbstractEffect(element, delay)
+{
+	this._element=element;	//save the element
+	this.effectBegin=null;
+	this.effectEnd=null;
+	this._delay=delay;
+//TODO del when works	this._delay=delay || 0;	//get the delay, compensating for no delay specified
+
+	/**The ID of the timeout currently in progress, or null if there is no timeout in progress.*/
+	this._timeoutID=null;
+
+	if(!AbstractEffect.prototype._initialized)
+	{
+		AbstractEffect.prototype._initialized=true;
+
+		/**Starts the effect process.*/
+		AbstractEffect.prototype.start=function()
+		{
+			var effect=this;	//save this effect to use in closure
+//TODO del alert("ready to start abstract effect with effect: "+(typeof effect));
+			var delayFunction=function()	//create a function to call this._beginEffect() after the delay
+					{
+						effect._timeoutID=null;	//show that there is no timeout in effect
+						effect._beginEffect();	//begin the effect
+					};
+			this._timeoutID=setTimeout(delayFunction, this._delay);	//call the delay function after the delay
+		};
+
+		/**Starts the actual effect.*/
+		AbstractEffect.prototype._beginEffect=function()
+		{
+			if(this.effectBegin instanceof Function)	//if there is an effect begin function
+			{
+				this.effectBegin();	//begin the effect
+			}
+			if(this._doEffect())	//if there is a _doEffect() method
+			{
+				this._doEffect();	//perform the effect
+			}
+		};
+
+		/**Ends the actual effect.*/
+		AbstractEffect.prototype._endEffect=function()
+		{
+			if(this.effectEnd instanceof Function)	//if there is an effect end function
+			{
+				this.effectEnd();	//end the effect
+			}
+		};
+
+	}
+}
+
+/**A delay effect.
+@param element The element on which the delay will be performed.
+@param delay The delay before the effect should begin.
+var effectBegin The function indicating what should occur at the beginning of the effect, after the delay, or null if there is no effect begin function.
+var effectEnd The function indicating what should occur at the end of the effect, or null if there is no effect end function.
+*/
+function DelayEffect(element, delay)	//extends AbstractEffect
+{
+	AbstractEffect.call(this, element, delay);	//call the parent class
+	this._opacity=0;	//we'll start at zero opacity
+
+	if(!DelayEffect.prototype._initialized)
+	{
+		DelayEffect.prototype._initialized=true;
+		DelayEffect.prototype.start=AbstractEffect.prototype.start;
+		DelayEffect.prototype._beginEffect=AbstractEffect.prototype._beginEffect;
+		DelayEffect.prototype._updateEffect=AbstractEffect.prototype._updateEffect;
+		DelayEffect.prototype._endEffect=AbstractEffect.prototype._endEffect;
+	}
+}
+
+/**An effect for fading an element using opacity.
+@param element The element on which the delay will be performed.
+@param delay The delay before the effect should begin.
+var effectBegin The function indicating what should occur at the beginning of the effect, after the delay, or null if there is no effect begin function.
+var effectEnd The function indicating what should occur at the end of the effect, or null if there is no effect end function.
+*/
+function OpacityFadeEffect(element, delay)	//extends AbstractEffect
+{
+	AbstractEffect.call(this, element, delay);	//call the parent class
+	this._opacity=0;	//we'll start at zero opacity
+
+	if(!OpacityFadeEffect.prototype._initialized)
+	{
+		OpacityFadeEffect.prototype._initialized=true;
+
+		OpacityFadeEffect.prototype.start=AbstractEffect.prototype.start;
+
+		/**Starts the actual effect.*/
+		OpacityFadeEffect.prototype._beginEffect=function()
+		{
+//TODO del alert("ready to begin opacity effect");
+			this._updateEffect();	//update the opacity
+			AbstractEffect.prototype._beginEffect.call(this);	//call the super version
+//TODO del alert("finished beginning opacity effect");
+		};
+
+		/**Performs the main effect procedure.*/
+		OpacityFadeEffect.prototype._doEffect=function()
+		{
+//			alert("ready to do effect");
+			if(this._opacity<=100)	//if we haven't reached full opacity
+			{
+				this._updateEffect();	//update the opacity
+				var effect=this;	//save this effect to use in closure
+				var timeoutFunction=function()	//create a function to call this._doEffect() after each timeout
+						{
+							effect._timeoutID=null;	//show that there is no timeout in effect
+							effect._opacity+=10;	//increase the opacity
+							effect._doEffect();	//perform the effect
+						};
+				this._timeoutID=setTimeout(timeoutFunction, 50);	//call the timeout function after the given interval TODO allow this to be configured
+			}
+			else	//if we've reached full opacity
+			{
+//TODO del alert("ready to end effect");
+				this._endEffect();	//finish the effect
+			}
+		};
+
+		/**Updates the effect.*/
+		OpacityFadeEffect.prototype._updateEffect=function()
+		{
+			this._element.style.opacity=this._opacity/100;	//update the opacity
+			this._element.style.filter="alpha(opacity="+this._opacity+")";	//update the opacity for IE			
+		};		
+
+		/**Ends the actual effect.*/
+		OpacityFadeEffect.prototype._endEffect=function()
+		{
+//TODO del alert("inside the correct endEffect");
+			this._element.style.filter="";	//remove the IE-specific filter, because it will cause some elements (such as flyover tethers) not to appear, even if opacity is set to 100
+			AbstractEffect.prototype._endEffect.call(this);	//call the super version
+		};
+
+	}
+}
+
+//TODO testing OpacityFadeEffect.prototype=new AbstractEffect();	//OpacityFadeEffect extends AbstractEffect
+
 
 function debug(text)
 {

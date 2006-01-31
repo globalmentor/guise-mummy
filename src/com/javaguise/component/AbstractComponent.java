@@ -13,26 +13,19 @@ import com.garretwilson.util.Debug;
 import static com.javaguise.GuiseResourceConstants.*;
 
 import com.javaguise.GuiseSession;
+import com.javaguise.component.effect.*;
 import com.javaguise.component.layout.*;
 import com.javaguise.component.transfer.*;
 import com.javaguise.context.GuiseContext;
 import com.javaguise.controller.ControlEvent;
 import com.javaguise.controller.Controller;
-import com.javaguise.controller.MouseControlEvent.EventType;
 import com.javaguise.event.*;
-import com.javaguise.geometry.Axis;
-import com.javaguise.geometry.CompassPoint;
-import com.javaguise.geometry.Dimensions;
-import com.javaguise.geometry.Extent;
-import com.javaguise.geometry.Point;
-import com.javaguise.geometry.Rectangle;
+import com.javaguise.geometry.*;
 import com.javaguise.model.Model;
 import com.javaguise.style.Color;
-import com.javaguise.style.RGBColor;
 import com.javaguise.view.View;
 
 import static com.garretwilson.lang.CharSequenceUtilities.*;
-import static com.garretwilson.lang.ClassUtilities.getPropertyName;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.util.ArrayUtilities.*;
 
@@ -1254,6 +1247,26 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 				}
 			}
 
+		/**The effect used for opening the flyover, or <code>null</code> if there is no open effect.*/
+		private Effect openEffect=null;
+
+			/**@return The effect used for opening the flyover, or <code>null</code> if there is no open effect.*/
+			public Effect getOpenEffect() {return openEffect;}
+
+			/**Sets the effect used for opening the flyover.
+			@param newEffect The new effect used for opening the flyover, or <code>null</code> if there should be no open effect.
+			@see Frame#OPEN_EFFECT_PROPERTY 
+			*/
+			public void setOpenEffect(final Effect newOpenEffect)
+			{
+				if(openEffect!=newOpenEffect)	//if the value is really changing
+				{
+					final Effect oldOpenEffect=openEffect;	//get the old value
+					openEffect=newOpenEffect;	//actually change the value
+//TODO fix					firePropertyChange(Frame.OPEN_EFFECT_PROPERTY, oldOpenEffect, newOpenEffect);	//indicate that the value changed
+				}			
+			}
+
 		/**Component constructor.
 		@param component The component for which this object will control flyovers.
 		@exception NullPointerException if the given component is <code>null</code>.
@@ -1312,6 +1325,7 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 	
 	/**The default strategy for showing and hiding flyovers in response to mouse events.
 	This implementation uses flyover frames to represent flyovers.
+	This implementation defaults to an opacity fade effect for opening with a one second delay.
 	@param <S> The type of component for which this object is to control flyovers.
 	@author Garret Wilson
 	*/
@@ -1327,6 +1341,7 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 		public DefaultFlyoverStrategy(final S component)
 		{
 			super(component);	//construct the parent class
+			setOpenEffect(new OpacityFadeEffect(component.getSession(), 1500));	//create a default open effect
 		}
 
 		/**Shows a flyover for the component.
@@ -1356,6 +1371,7 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 				}
 				flyoverFrame.setTetherBearing(getTetherBearing());	//set the bearing of the tether
 //TODO fix				frame.getModel().setLabel("Flyover");
+				flyoverFrame.setOpenEffect(getOpenEffect());	//set the effect for opening, if any
 				flyoverFrame.open();				
 			}			
 		}

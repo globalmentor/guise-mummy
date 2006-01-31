@@ -4,6 +4,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 
 import java.beans.PropertyChangeListener;
 
+import com.javaguise.component.effect.Effect;
 import com.javaguise.event.GuisePropertyChangeListener;
 import com.javaguise.event.ModalListener;
 import com.javaguise.model.LabelModel;
@@ -21,6 +22,8 @@ public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalC
 	public final static String MODAL_PROPERTY=getPropertyName(Frame.class, "modal");
 	/**The bound property of whether the component is movable.*/
 	public final static String MOVABLE_PROPERTY=getPropertyName(Frame.class, "movable");
+	/**The open effect bound property.*/
+	public final static String OPEN_EFFECT_PROPERTY=getPropertyName(Frame.class, "openEffect");
 	/**The bound property of the related component.*/
 	public final static String RELATED_COMPONENT_PROPERTY=getPropertyName(Frame.class, "relatedComponent");
 	/**The bound property of whether the frame can be resized.*/
@@ -91,6 +94,16 @@ public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalC
 	@see #TITLE_VISIBLE_PROPERTY
 	*/
 	public void setTitleVisible(final boolean newTitleVisible);
+
+	/**@return The effect used for opening the frame, or <code>null</code> if there is no open effect.*/
+	public Effect getOpenEffect();
+
+	/**Sets the effect used for opening the frame.
+	This is a bound property.
+	@param newEffect The new effect used for opening the frame, or <code>null</code> if there should be no open effect.
+	@see #OPEN_EFFECT_PROPERTY 
+	*/
+	public void setOpenEffect(final Effect newOpenEffect);
 
 	/**@return The data model used by this component.*/
 	public LabelModel getModel();

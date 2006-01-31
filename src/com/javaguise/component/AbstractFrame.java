@@ -9,6 +9,7 @@ import com.garretwilson.util.Debug;
 import com.garretwilson.util.EmptyIterator;
 import com.garretwilson.util.ObjectIterator;
 import com.javaguise.GuiseSession;
+import com.javaguise.component.effect.Effect;
 import com.javaguise.event.GuisePropertyChangeListener;
 import com.javaguise.model.LabelModel;
 
@@ -170,6 +171,27 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 				titleVisible=newTitleVisible;	//update the value
 				firePropertyChange(TITLE_VISIBLE_PROPERTY, Boolean.valueOf(oldTitleVisible), Boolean.valueOf(newTitleVisible));
 			}
+		}
+
+	/**The effect used for opening the frame, or <code>null</code> if there is no open effect.*/
+	private Effect openEffect=null;
+
+		/**@return The effect used for opening the frame, or <code>null</code> if there is no open effect.*/
+		public Effect getOpenEffect() {return openEffect;}
+
+		/**Sets the effect used for opening the frame.
+		This is a bound property.
+		@param newEffect The new effect used for opening the frame, or <code>null</code> if there should be no open effect.
+		@see Frame#OPEN_EFFECT_PROPERTY 
+		*/
+		public void setOpenEffect(final Effect newOpenEffect)
+		{
+			if(openEffect!=newOpenEffect)	//if the value is really changing
+			{
+				final Effect oldOpenEffect=openEffect;	//get the old value
+				openEffect=newOpenEffect;	//actually change the value
+				firePropertyChange(OPEN_EFFECT_PROPERTY, oldOpenEffect, newOpenEffect);	//indicate that the value changed
+			}			
 		}
 
 	/**@return The data model used by this component.*/

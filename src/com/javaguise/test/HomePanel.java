@@ -8,6 +8,7 @@ import com.javaguise.Bookmark;
 import com.javaguise.GuiseSession;
 import com.javaguise.Bookmark.Parameter;
 import com.javaguise.component.*;
+import com.javaguise.component.effect.*;
 import com.javaguise.component.layout.*;
 import com.javaguise.component.layout.ReferenceLayout.Constraints;
 import com.javaguise.demo.DemoUser;
@@ -348,6 +349,7 @@ Debug.trace("list control changed value to", newValue);
 		frameLink.setFlyoverEnabled(true);	//turn on flyovers
 		frameLink.getFlyoverStrategy().setPreferredWidth(new Extent(15, Extent.Unit.EM));
 		frameLink.getFlyoverStrategy().setPreferredHeight(new Extent(10, Extent.Unit.EM));
+		frameLink.getFlyoverStrategy().setOpenEffect(new OpacityFadeEffect(session, 1500));	//TODO testing openEffect
 		frameLink.getModel().addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent actionEvent)
