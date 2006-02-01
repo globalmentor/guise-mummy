@@ -8,7 +8,7 @@ The step value is considered relative either to the minimum value, if available,
 @author Garret Wilson
 @see Comparable
 */
-public abstract class AbstractComparableRangeValidator<V extends Number & Comparable<V>> extends AbstractRangeValidator<V>
+public abstract class AbstractComparableRangeValidator<V extends Comparable<V>> extends AbstractRangeValidator<V>
 {
 	
 	/**Session, minimum, maximum, step, and value required constructor.

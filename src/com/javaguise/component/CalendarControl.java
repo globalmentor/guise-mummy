@@ -1,45 +1,23 @@
 package com.javaguise.component;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.garretwilson.lang.ObjectUtilities;
-import com.garretwilson.util.Debug;
-
-import static com.garretwilson.lang.ClassUtilities.getPropertyName;
+import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.javaguise.GuiseSession;
 import com.javaguise.component.Table.CellRepresentationStrategy;
-import com.javaguise.component.Table.DefaultCellMessageModel;
-import com.javaguise.component.Table.DefaultCellValueModel;
 import com.javaguise.component.layout.Flow;
 import com.javaguise.component.layout.FlowLayout;
-import com.javaguise.converter.Converter;
-import com.javaguise.converter.DateStringLiteralConverter;
-import com.javaguise.converter.DateStringLiteralStyle;
-import com.javaguise.event.AbstractGuisePropertyChangeListener;
-import com.javaguise.event.ActionEvent;
-import com.javaguise.event.ActionListener;
-import com.javaguise.event.GuisePropertyChangeEvent;
-import com.javaguise.event.GuisePropertyChangeListener;
-import com.javaguise.model.ActionModel;
-import com.javaguise.model.CalendarMonthTableModel;
-import com.javaguise.model.DefaultValueModel;
-import com.javaguise.model.ListSelectModel;
-import com.javaguise.model.SingleListSelectionPolicy;
-import com.javaguise.model.TableColumnModel;
-import com.javaguise.model.TableModel;
-import com.javaguise.model.ValueModel;
-import com.javaguise.validator.IntegerRangeValidator;
-import com.javaguise.validator.ValidationException;
-import com.javaguise.validator.ValueRequiredValidator;
+import com.javaguise.converter.*;
+import com.javaguise.event.*;
+import com.javaguise.model.*;
+import com.javaguise.validator.*;
 
 /**Control that allows selection of a date.
+If the model used by the calendar control uses a {@link RangeValidator} with a date range of less than 100 years, a drop-down list will be used for the year control.
+Otherwise, a text input will be used for year selection.
 @author Garret Wilson
 */
 public class CalendarControl extends AbstractContainer<CalendarControl> implements ValueControl<Date, CalendarControl>
@@ -93,11 +71,11 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 		/**@return The list control containing the months.*/
 		protected ListControl<Date> getMonthListControl() {return monthListControl;}
 
-	/**The text control containing the year.*/
-	private final TextControl<Integer> yearTextControl;
+	/**The control containing the year; this control can change dynamically based upon the current model range.*/
+	private ValueControl<Integer, ?> yearControl=null;
 
-		/**@return The text control containing the year.*/
-		protected TextControl<Integer> getYearTextControl() {return yearTextControl;}
+		/**@return The control containing the year.*/
+		protected ValueControl<Integer, ?> getYearControl() {return yearControl;}
 
 	/**The list of calendar table components.*/
 	private final List<Table> calendarTables=new CopyOnWriteArrayList<Table>();
@@ -165,6 +143,9 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 	/**The property change listener that updates the calendars when a property changes.*/
 	protected final GuisePropertyChangeListener<?> updateModelPropertyChangeListener;
 
+	/**The property change listener that updates the visible dates if the year is different than the last one.*/
+	protected final GuisePropertyChangeListener<Integer> yearPropertyChangeListener;
+
 	/**Session, ID, and model constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
@@ -188,12 +169,35 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 		final Converter<Date, String> monthConverter=new DateStringLiteralConverter(session, DateStringLiteralStyle.MONTH_OF_YEAR);	//get a converter to display the month of the year
 		monthListControl.setValueRepresentationStrategy(new ListControl.DefaultValueRepresentationStrategy<Date>(session, monthConverter));	//install a month representation strategy
 		controlContainer.add(monthListControl);	//add the month list control
-		yearTextControl=new TextControl<Integer>(session, Integer.class);	//create a text control to select the year
-		yearTextControl.getModel().setLabel("Year");	//set the year control label TODO get from resources
-		yearTextControl.setMaximumLength(4);	//TODO testing
-		yearTextControl.setColumnCount(4);	//TODO testing
-		yearTextControl.getModel().setValidator(new IntegerRangeValidator(session, new Integer(1800), new Integer(2100), new Integer(1), true));	//restrict the range of the year TODO improve; don't arbitrarily restrict the range
-		controlContainer.add(yearTextControl);	//add the year text control
+			//create a year property change listener before we update the year control
+		yearPropertyChangeListener=new AbstractGuisePropertyChangeListener<Integer>()	//create a property change listener to listen for the year changing
+				{
+					public void propertyChange(final GuisePropertyChangeEvent<Integer> propertyChangeEvent)	//if the selected year changed
+					{
+						final Integer newYear=propertyChangeEvent.getNewValue();	//get the new selected year
+						if(newYear!=null)	//if a new year was selected (a null value can be sent when the model is cleared)
+						{
+							final Calendar calendar=Calendar.getInstance(session.getLocale());	//create a new calendar
+							calendar.setTime(getDate());	//set the calendar date to our currently displayed date
+							if(calendar.get(Calendar.YEAR)!=newYear)	//if the currently visible date is in another year
+							{
+								calendar.set(Calendar.YEAR, newYear);	//change to the given year
+								setDate(calendar.getTime());	//change the date to the given month, which will update the calenders TODO make sure that going from a 31-day month, for example, to a 28-day month will be OK, if the day is day 31
+							}
+						}
+					}
+				};
+		
+		if(model.getValidator()==null)	//TODO del; this is a temporary default for testing the date control based upon the model validator 
+		{
+			final Calendar calendar=Calendar.getInstance(session.getLocale());	//create a new calendar for determining the minimum and maximum year
+			final Date maxDate=calendar.getTime();	//the current date will be the maximum date
+			calendar.set(1940, 0, 1);	//set the calendar to the first day of 1940
+			final Date minDate=calendar.getTime();	//the first day of 1940 will be the minimum date
+			model.setValidator(new DateRangeValidator(session, minDate, maxDate));	//restrict the date range
+		}
+
+		updateYearControl();	//create and install an appropriate year control
 		updateCalendars();	//update the calendars
 		updateModelPropertyChangeListener=new AbstractGuisePropertyChangeListener<Object>()	//create a property change listener to update the calendars
 		{
@@ -203,6 +207,13 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 			}
 		};
 		model.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, updateModelPropertyChangeListener);	//update the calendars if the selected date changes
+		model.addPropertyChangeListener(ValueModel.VALIDATOR_PROPERTY, new AbstractGuisePropertyChangeListener<Validator>()	//create a property change listener to listen for our validator changing, so that we can update the date control if needed
+				{
+					public void propertyChange(final GuisePropertyChangeEvent<Validator> propertyChangeEvent)	//if the model's validator changed
+					{
+						updateYearControl();	//update the year control (e.g. a drop-down list) to match the new validator (e.g. a range validator), if any
+					}
+				});
 			//TODO important: this is a memory leak---make sure we uninstall the listener when the session goes away
 		session.addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, updateModelPropertyChangeListener);	//update the calendars if the locale changes
 		monthListControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Date>()	//create a property change listener to listen for the month changing
@@ -224,35 +235,79 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 							}
 						}
 					}
-				});
-		yearTextControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Integer>()	//create a property change listener to listen for the year changing
-				{
-					public void propertyChange(final GuisePropertyChangeEvent<Integer> propertyChangeEvent)	//if the selected year changed
-					{
-						final Integer newYear=propertyChangeEvent.getNewValue();	//get the new selected year
-						if(newYear!=null)	//if a new year was selected (a null value can be sent when the model is cleared)
-						{
-							final Calendar calendar=Calendar.getInstance(session.getLocale());	//create a new calendar
-							calendar.setTime(getDate());	//set the calendar date to our currently displayed date
-							if(calendar.get(Calendar.YEAR)!=newYear)	//if the currently visible date is in another year
-							{
-								calendar.set(Calendar.YEAR, newYear);	//change to the given year
-								setDate(calendar.getTime());	//change the date to the given month, which will update the calenders TODO make sure that going from a 31-day month, for example, to a 28-day month will be OK, if the day is day 31
-							}
-						}
-					}
-				});
+				});		
 	}
 
+	/**Updates the year control by removing any old year control from the component and adding a new year control.
+	If the model used by the calendar control uses a {@link RangeValidator} with a date range of less than 100 years, a drop-down list will be used for the year control.
+	Otherwise, a text input will be used for year selection.
+	*/
+	protected void updateYearControl()
+	{
+		final GuiseSession session=getSession();	//get a reference to the session
+		final ValueModel<Date> model=getModel();	//get a reference to the calendar model
+		if(yearControl!=null)	//if there is a year control already in use
+		{
+			controlContainer.remove(yearControl);	//remove our year control TODO later use controlContainer.replace() when that method is available
+			yearControl.getModel().removePropertyChangeListener(ValueModel.VALUE_PROPERTY, yearPropertyChangeListener);	//stop listening for the year changing
+			yearControl=null;	//for completeness, indicate that we don't currently have a year control
+		}
+			//see if there is a minimum and maximum date specified; this will determine what sort of control to use for the date input
+		int minYear=-1;	//we'll determine if there is a minimum and/or maximum year restriction
+		int maxYear=-1;
+		final Validator<Date> validator=model.getValidator();	//get the model's validator
+		if(validator instanceof RangeValidator)	//if there is a range validator installed
+		{
+			final RangeValidator<Date> rangeValidator=(RangeValidator<Date>)validator;	//get the validator as a range validator
+			final Calendar calendar=Calendar.getInstance(session.getLocale());	//create a new calendar for determining the year of the restricted dates
+			final Date minDate=rangeValidator.getMinimum();	//get the minimum date
+			if(minDate!=null)	//if there is a minimum date specified
+			{
+				calendar.setTime(minDate);	//set the calendar date to the minimum date
+				minYear=calendar.get(Calendar.YEAR);	//get the minimum year to use
+			}
+			final Date maxDate=rangeValidator.getMaximum();	//get the maximum date
+			if(maxDate!=null)	//if there is a maximum date specified
+			{
+				calendar.setTime(maxDate);	//set the calendar date to the maximum date
+				maxYear=calendar.get(Calendar.YEAR);	//get the maximum year to use
+			}
+		}
+		if(minYear>=0 && maxYear>=0 && maxYear-minYear<100)	//if there is a minimum year and maximum year specified, use a drop-down control
+		{
+			final ListControl<Integer> yearListControl=new ListControl<Integer>(session, Integer.class, new SingleListSelectionPolicy<Integer>());	//create a list control allowing only single selections
+			yearListControl.setRowCount(1);	//make the list control a drop-down list
+			final ListSelectModel<Integer> yearModel=yearListControl.getModel();	//get the list control model
+			for(int year=minYear; year<=maxYear; ++year)	//for each valid year
+			{
+				yearModel.add(new Integer(year));	//add this year to the choices
+			}
+			yearModel.setValidator(new ValueRequiredValidator<Integer>(session));	//require a value in the year drop-down
+			yearControl=yearListControl;	//use the year list control for the year control
+		}
+		else	//if minimum and maximum years are not specified, use a standard text control TODO update to use a spinner control as well, and auto-update the value once four characters are entered 
+		{
+			final TextControl<Integer> yearTextControl=new TextControl<Integer>(session, Integer.class);	//create a text control to select the year
+			yearTextControl.setMaximumLength(4);	//TODO testing
+			yearTextControl.setColumnCount(4);	//TODO testing
+			yearTextControl.getModel().setValidator(new IntegerRangeValidator(session, new Integer(1800), new Integer(2100), new Integer(1), true));	//restrict the range of the year TODO improve; don't arbitrarily restrict the range		
+			yearControl=yearTextControl;	//use the year text control for the year control
+		}
+		assert yearControl!=null : "Failed to create a year control";
+		yearControl.getModel().setLabel("Year");	//set the year control label TODO get from resources
+		yearControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, yearPropertyChangeListener);	//listen for the year changing
+		controlContainer.add(yearControl);	//add the year text control		
+	}
+	
 	/**The locale used the last time the calendars were updated, or <code>null</code> if no locale was known.*/
 	private Locale oldLocale=null;
 
 	/**The month calendar used the last time the calendars were updated, or <code>null</code> if no calendar was known.*/
-	private Calendar oldCalendar=null;
-
+	private Calendar oldCalendar=null;	
+	
 	/**Whether we're currently updating calendars, to avoid reentry from control events.*/
 	private boolean updatingCalendars=false;
-
+	
 	/**Updates the calendars on the calendar panel.*/
 	protected synchronized void updateCalendars()
 	{
@@ -261,7 +316,7 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 			updatingCalendars=true;	//show that we're updating the calendars
 			try
 			{
-		Debug.trace("*** Updating calendars");
+//TODO del		Debug.trace("*** Updating calendars");
 				final GuiseSession session=getSession();	//get the current session
 				final Locale locale=session.getLocale();	//get the current locale
 				final boolean localeChanged=!locale.equals(oldLocale);	//see if the locale changed		
@@ -285,7 +340,7 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 				{
 					try
 					{
-						yearTextControl.getModel().setValue(new Integer(year));	//show the selected year in the text box
+						yearControl.getModel().setValue(new Integer(year));	//show the selected year in the text box
 						final ListSelectModel<Date> monthListModel=monthListControl.getModel();	//get model of the month list control
 						monthListModel.clear();	//clear the values in the month list control
 						final Calendar monthNameCalendar=(Calendar)calendar.clone();	//clone the month calendar as we step through the months

@@ -7,7 +7,7 @@ The step value is considered relative either to the minimum value, if available,
 @param <V> The value type this validator supports.
 @author Garret Wilson
 */
-public abstract class AbstractRangeValidator<V extends Number> extends AbstractValidator<V> implements RangeValidator<V>
+public abstract class AbstractRangeValidator<V> extends AbstractValidator<V> implements RangeValidator<V>
 {
 	
 	/**The minimum value, inclusive, or <code>null</code> if the range has no lower bound.*/
