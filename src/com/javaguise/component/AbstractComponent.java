@@ -1296,6 +1296,7 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 */
 			final Rectangle viewportBounds=mouseEvent.getViewportBounds();	//get the bounds of the viewport
 //TODO del Debug.trace("viewport bounds:", viewportBounds);
+//TODO del Debug.trace("source bounds:", mouseEvent.getSourceBounds());
 			final Dimensions viewportSize=viewportBounds.getSize();	//get the size of the viewport
 			final Point mousePosition=mouseEvent.getMousePosition();	//get the mouse position
 //TODO del Debug.trace("mouse position:", mousePosition);
@@ -1320,12 +1321,11 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 		{
 			closeFlyover();	//close the flyover if it is open
 		}
-	}
-	
+	}	
 	
 	/**The default strategy for showing and hiding flyovers in response to mouse events.
 	This implementation uses flyover frames to represent flyovers.
-	This implementation defaults to an opacity fade effect for opening with a one second delay.
+	This implementation defaults to an opacity fade effect for opening with a 500 millisecond delay.
 	@param <S> The type of component for which this object is to control flyovers.
 	@author Garret Wilson
 	*/
@@ -1341,7 +1341,7 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 		public DefaultFlyoverStrategy(final S component)
 		{
 			super(component);	//construct the parent class
-			setOpenEffect(new OpacityFadeEffect(component.getSession(), 1500));	//create a default open effect
+			setOpenEffect(new OpacityFadeEffect(component.getSession(), 500));	//create a default open effect TODO use a constant
 		}
 
 		/**Shows a flyover for the component.

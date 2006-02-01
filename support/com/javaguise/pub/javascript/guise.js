@@ -187,6 +187,8 @@ guiseFrames.add=function(frame)
 */
 guiseFrames._initializePosition=function(frame)
 {
+//TODO del var debugString="";
+//TODO del	var framePosition=new Point();	//we'll calculate the frame position; create an object rather than using primitives so that the internal function can access its variables via closure
 	var frameX, frameY;	//we'll calculate the frame position
 	var relatedComponentID=getInputParameter(frame, "relatedComponentID");	//get the related component ID, if any TODO use a constant
 	var relatedComponent=relatedComponentID ? document.getElementById(relatedComponentID) : null;	//get the related component, if there is one
@@ -194,49 +196,69 @@ guiseFrames._initializePosition=function(frame)
 	{
 //TODO del alert("found related component: "+relatedComponentID);
 		var frameBounds=getElementBounds(frame);	//get the bounds of the frame
+//TODO del debugString+="frameBounds: "+frameBounds.x+","+frameBounds.y+","+frameBounds.width+","+frameBounds.height+"\n";
 		var relatedComponentBounds=getElementBounds(relatedComponent);	//get the bounds of the related component
+//TODO del debugString+="relatedComponentBounds: "+relatedComponentBounds.x+","+relatedComponentBounds.y+","+relatedComponentBounds.width+","+relatedComponentBounds.height+"\n";
 		var tether=getDescendantElementByClassName(frame, STYLES.FRAME_TETHER);	//get the frame tether, if there is one
 		if(tether)	//if there is a frame tether
 		{
-//TODO del alert("found tether: "+tether.id);
-			var tetherBounds=getElementBounds(tether);	//get the bounds of the tether
-			var tetherX, tetherY, relatedComponentX, relatedComponentY;	//get the relevant tether anchor point and the relevant component point
-			if(tetherBounds.x<=frameBounds.x+8)	//if the tether is on the left side (use an arbitrary amount to account for variations in browser position calculations) TODO compare centers, which will be more accurate
+			var positionTether=function()	//create a function to position relative to the tether
+					{
+			//TODO del alert("found tether: "+tether.id);
+						var tetherBounds=getElementBounds(tether);	//get the bounds of the tether
+			//TODO del debugString+="tetherBounds: "+tetherBounds.x+","+tetherBounds.y+","+tetherBounds.width+","+tetherBounds.height+"\n";
+						var tetherX, tetherY, relatedComponentX, relatedComponentY;	//get the relevant tether anchor point and the relevant component point
+						if(tetherBounds.x<=frameBounds.x+8)	//if the tether is on the left side (use an arbitrary amount to account for variations in browser position calculations) TODO compare centers, which will be more accurate
+						{
+			//TODO del alert("tether left");
+							tetherX=tetherBounds.x;	//use the left side of the tether
+							relatedComponentX=relatedComponentBounds.x+relatedComponentBounds.width;	//use the right side of the component
+						}
+						else	//if the tether is on the right side
+						{
+			//TODO del alert("tether right");
+							tetherX=tetherBounds.x+tetherBounds.width;	//use the right side of the tether
+							relatedComponentX=relatedComponentBounds.x;	//use the left side of the component
+						}
+						if(tetherBounds.y<=frameBounds.y+8)	//if the tether is on the top (use an arbitrary amount to account for variations in browser position calculations)
+						{
+			//TODO del alert("tether top");
+							tetherY=tetherBounds.y;	//use the top of the tether
+							relatedComponentY=relatedComponentBounds.y+relatedComponentBounds.height;	//use the bottom of the component
+						}
+						else	//if the tether is on the bottom
+						{
+			//TODO del alert("tether bottom");
+							tetherY=tetherBounds.y+tetherBounds.height;	//use the bottom of the tether
+							relatedComponentY=relatedComponentBounds.y;	//use the top of the component
+						}
+			//TODO del alert("tetherX: "+tetherX);
+			//TODO del alert("tetherY: "+tetherY);
+			//TODO del alert("relatedComponentX: "+relatedComponentX);
+			//TODO del alert("relatedComponentY: "+relatedComponentY);
+						var tetherDeltaX=tetherX-frameBounds.x;	//find the horizontal delta of the tether from the frame
+			//TODO del alert("tetherDeltaX: "+tetherDeltaX);
+						var tetherDeltaY=tetherY-frameBounds.y;	//find the vertical delta of the tether from the frame
+			//TODO del alert("tetherDeltaY: "+tetherDeltaY);
+						frameX=relatedComponentX-tetherDeltaX;	//position the frame tether horizontally on the related component
+			//TODO del alert("frameX: "+frameX);
+						frameY=relatedComponentY-tetherDeltaY;	//position the frame tether vertically on the related component
+			//TODO del alert("frameY: "+frameY);
+			//TODO del debugString+="frame pos: "+frameX+","+frameY+"\n";
+			//TODO del alert(debugString);
+						frame.style.left=frameX+"px";	//set the frame's horizontal position
+						frame.style.top=frameY+"px";	//set the frame's vertical position
+					};
+			var tetherIMG=getDescendantElementByName(tether, "img");	//see if the tether has an image TODO use a constant
+			if(tetherIMG)	//if there is a tether image
 			{
-//TODO del alert("tether left");
-				tetherX=tetherBounds.x;	//use the left side of the tether
-				relatedComponentX=relatedComponentBounds.x+relatedComponentBounds.width;	//use the right side of the component
+				DOMUtilities.waitIMGLoaded(tetherIMG, positionTether);	//wait until the image is loaded before positioning on the tether
+//TODO del alert("image: "+tetherImg.src+" not loaded!");
 			}
-			else	//if the tether is on the right side
+			else	//if there is no tether image
 			{
-//TODO del alert("tether right");
-				tetherX=tetherBounds.x+tetherBounds.width;	//use the right side of the tether
-				relatedComponentX=relatedComponentBounds.x;	//use the left side of the component
+				positionTether();	//position on the tether without waiting for an image
 			}
-			if(tetherBounds.y<=frameBounds.y+8)	//if the tether is on the top (use an arbitrary amount to account for variations in browser position calculations)
-			{
-//TODO del alert("tether top");
-				tetherY=tetherBounds.y;	//use the top of the tether
-				relatedComponentY=relatedComponentBounds.y+relatedComponentBounds.height;	//use the bottom of the component
-			}
-			else	//if the tether is on the bottom
-			{
-//TODO del alert("tether bottom");
-				tetherY=tetherBounds.y+tetherBounds.height;	//use the bottom of the tether
-				relatedComponentY=relatedComponentBounds.y;	//use the top of the component
-			}
-//TODO del alert("tetherX: "+tetherX);
-//TODO del alert("tetherY: "+tetherY);
-//TODO del alert("relatedComponentX: "+relatedComponentX);
-//TODO del alert("relatedComponentY: "+relatedComponentY);
-			var tetherDeltaX=tetherX-frameBounds.x;	//find the horizontal delta of the tether from the frame
-//TODO del alert("tetherDeltaX: "+tetherDeltaX);
-			var tetherDeltaY=tetherY-frameBounds.y;	//find the vertical delta of the tether from the frame
-//TODO del alert("tetherDeltaY: "+tetherDeltaY);
-			frameX=relatedComponentX-tetherDeltaX;	//position the frame tether horizontally on the related component
-//TODO del alert("frameX: "+frameX);
-			frameY=relatedComponentY-tetherDeltaY;	//position the frame tether vertically on the related component
-//TODO del alert("frameY: "+frameY);
 		}
 		else
 		{
@@ -257,17 +279,19 @@ guiseFrames._initializePosition=function(frame)
 			{
 				frameY=relatedComponentBounds.y-frameBounds.height;	//put the frame on the top side
 			}
-		}		
+			frame.style.left=frameX+"px";	//set the frame's horizontal position
+			frame.style.top=frameY+"px";	//set the frame's vertical position
+		}
 	}
 	else	//if this frame is not related to another component, center it
 	{
 		var viewportBounds=getViewportBounds();	//get the bounds of the viewport so that we can center the frame
 		frameX=viewportBounds.x+((viewportBounds.width-frame.offsetWidth)/2);	//center the frame horizontally
 		frameY=viewportBounds.y+((viewportBounds.height-frame.offsetHeight)/2);	//center the frame vertically
+		frame.style.left=frameX+"px";	//set the frame's horizontal position
+		frame.style.top=frameY+"px";	//set the frame's vertical position
 	}
 
-	frame.style.left=frameX+"px";	//center the frame horizontally
-	frame.style.top=frameY+"px";	//center the frame vertically
 };
 
 /**Removes a frame from the array.
@@ -835,6 +859,28 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 		}
 	},
 */
+
+	/**Ensures that an IMG is loaded before calling a given function.
+	@param img The img element to load.
+	@param fn The function to call after the image is loaded.
+	*/
+	waitIMGLoaded:function(img, fn)
+	{
+		if(img.complete)	//if the image is loaded
+		{
+			fn();	//call the function directly
+		}
+		else	//if the image is not loaded
+		{
+			var onLoad=function()	//create a function to call the function after the image is loaded TODO fix this creates a race condition, because the image could finish loading before we can install our listener
+					{
+						eventManager.removeEvent(img, "d", onLoad, false);	//stop waiting for the img to load
+						fn();	//call the function
+//TODO del alert("img loaded after waiting!");	//TODO del
+					};
+			eventManager.addEvent(img, "load", onLoad, false);	//register an event on the img to wait for it to load
+		}
+	},
 
 	/**Removes all children from the given node.
 	This implementation also unregistered any events for the node and all its children.
