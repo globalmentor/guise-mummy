@@ -250,12 +250,12 @@ guiseFrames._initializePosition=function(frame)
 						frame.style.top=frameY+"px";	//set the frame's vertical position
 					};
 			var tetherIMG=getDescendantElementByName(tether, "img");	//see if the tether has an image TODO use a constant
-			if(tetherIMG)	//if there is a tether image
+			if(tetherIMG && (tetherIMG.offsetWidth<=0 || tetherIMG.offsetHeight<=0))	//if there is a tether image with an invalid width and/or height
 			{
-				DOMUtilities.waitIMGLoaded(tetherIMG, positionTether);	//wait until the image is loaded before positioning on the tether
-//TODO del alert("image: "+tetherImg.src+" not loaded!");
+//TODO del alert("tether image: "+tetherIMG.src+" not yet loaded; size "+tetherIMG.offsetWidth+","+tetherIMG.offsetHeight);
+				DOMUtilities.waitIMGLoaded(tetherIMG, positionTether);	//make sure the image is loaded before positioning on the tether
 			}
-			else	//if there is no tether image
+			else	//if there is no tether image, or we already know its image size
 			{
 				positionTether();	//position on the tether without waiting for an image
 			}
@@ -3667,7 +3667,7 @@ function updateSlider(slider)	//TODO maybe rename to updateSliderView
 		var newCoordinate=Math.round(position*span+min);	//determine the new coordinate
 //TODO del when works alert("new coordinate for "+slider.id+" is "+newCoordinate);
 		if(isHorizontal)	//if this is a horizontal slider
-		{
+		{	//TODO fix; the compiled version on IE once gave an "invalid argument" error here
 			thumb.style.left=newCoordinate+"px";	//update the horizontal position of the slider
 		}
 		else	//if this is a vertical slider

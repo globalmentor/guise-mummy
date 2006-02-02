@@ -245,6 +245,7 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 	protected void updateYearControl()
 	{
 		final GuiseSession session=getSession();	//get a reference to the session
+		final Locale locale=session.getLocale();	//get the current locale
 		final ValueModel<Date> model=getModel();	//get a reference to the calendar model
 		if(yearControl!=null)	//if there is a year control already in use
 		{
@@ -259,7 +260,7 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 		if(validator instanceof RangeValidator)	//if there is a range validator installed
 		{
 			final RangeValidator<Date> rangeValidator=(RangeValidator<Date>)validator;	//get the validator as a range validator
-			final Calendar calendar=Calendar.getInstance(session.getLocale());	//create a new calendar for determining the year of the restricted dates
+			final Calendar calendar=Calendar.getInstance(locale);	//create a new calendar for determining the year of the restricted dates
 			final Date minDate=rangeValidator.getMinimum();	//get the minimum date
 			if(minDate!=null)	//if there is a minimum date specified
 			{
@@ -295,6 +296,17 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 		}
 		assert yearControl!=null : "Failed to create a year control";
 		yearControl.getModel().setLabel("Year");	//set the year control label TODO get from resources
+		final Calendar calendar=Calendar.getInstance(locale);	//create a new calendar for setting the year
+		calendar.setTime(getDate());	//set the calendar date to our displayed date
+		final int year=calendar.get(Calendar.YEAR);	//get the current year
+		try
+		{
+			yearControl.getModel().setValue(new Integer(year));	//show the selected year in the text box
+		}
+		catch(final ValidationException validationException)	//we should never have a problem selecting a year or a month
+		{
+			throw new AssertionError(validationException);
+		}
 		yearControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, yearPropertyChangeListener);	//listen for the year changing
 		controlContainer.add(yearControl);	//add the year text control		
 	}
