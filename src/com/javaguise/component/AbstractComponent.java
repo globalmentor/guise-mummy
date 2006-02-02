@@ -1324,8 +1324,8 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 	}	
 	
 	/**The default strategy for showing and hiding flyovers in response to mouse events.
-	This implementation uses flyover frames to represent flyovers.
-	This implementation defaults to an opacity fade effect for opening with a 500 millisecond delay.
+//TODO del	This implementation uses flyover frames to represent flyovers.
+//TODO del	This implementation defaults to an opacity fade effect for opening with a 500 millisecond delay.
 	@param <S> The type of component for which this object is to control flyovers.
 	@author Garret Wilson
 	*/
@@ -1341,7 +1341,7 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 		public DefaultFlyoverStrategy(final S component)
 		{
 			super(component);	//construct the parent class
-			setOpenEffect(new OpacityFadeEffect(component.getSession(), 500));	//create a default open effect TODO use a constant
+//TODO del			setOpenEffect(new OpacityFadeEffect(component.getSession(), 500));	//create a default open effect TODO use a constant
 		}
 
 		/**Shows a flyover for the component.

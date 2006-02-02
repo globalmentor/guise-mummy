@@ -327,6 +327,7 @@ guiseFrames.updateModal=function()
 	}
 	if(this.modalFrame!=null)	//if there is a modal frame
 	{
+		updateModalLayer();	//always update the modal layer before it is shown, as IE may not always call resize to keep the modal layer updated
 		modalLayer.style.zIndex=this.modalFrame.style.zIndex-1;	//place the modal layer directly behind the modal frame
 		modalLayer.style.display="block";	//make the modal layer visible
 		if(modalIFrame)	//if we have a modal IFrame
@@ -2654,6 +2655,10 @@ function updateModalLayer()
 	{
 		modalLayer=document.createElementNS("http://www.w3.org/1999/xhtml", "div");	//create a div TODO use a constant for the namespace
 		modalLayer.className="modalLayer";	//load the modal layer style
+		oldModalLayerDisplayDisplay="none";
+		modalLayer.style.position="absolute";
+		modalLayer.style.top="0px";
+		modalLayer.style.left="0px";
 		document.body.appendChild(modalLayer);	//add the modal layer to the document
 		if(isIE)	//if we're in IE, create a modal IFrame to keep select components from showing through; but don't do this in Mozilla, or it will keep the cursor from showing up for text inputs in absolutely positioned div elements above the IFrame
 		{
@@ -2671,14 +2676,52 @@ function updateModalLayer()
 			document.body.appendChild(modalIFrame);	//add the modal IFrame to the document
 		}
 	}
+
+	var oldModalLayerDisplay=modalLayer.style.display;	//get the current display status of the modal layer
+	modalLayer.style.display="none";	//make sure the modal layer is hidden, because having it visible will interfere with the page/viewport size calculations (setting the size to 0px will not give us immediate feedback in IE during resize)
+	var oldModalIFrameDisplay=null;	//get the old modal IFrame display if we need to
+	if(modalIFrame)	//if we have a modal IFrame
+	{
+		oldModalIFrameDisplay=modalIFrame.style.display;	//get the current display status of the modal layer
+		modalIFrame.style.display="none";	//make sure the modal layer is hidden, because having it visible will interfere with the page/viewport size calculations
+	}
+
+/*TODO del; doesn't work instantanously with IE
+	modalLayer.style.width="0px";	//don't let the size of the modal layer get in the way of the size calculations
+	modalLayer.style.height="0px";
+	if(modalIFrame)	//if we have a modal IFrame
+	{
+		modalIFrame.style.width="0px";	//don't let the size of the modal layer get in the way of the size calculations
+		modalIFrame.style.height="0px";
+	}
+*/
+
 	var pageSize=getPageSize();	//get the size of the page
 	var viewportSize=getViewportSize();	//get the size of the viewport
 	modalLayer.style.width=Math.max(viewportSize.width, pageSize.width)+"px";	//update the size of the modal layer to the larger of the page and the viewport
 	modalLayer.style.height=Math.max(viewportSize.height, pageSize.height)+"px";
+/*TODO fix
+alert("page: "+pageSize.width+","+pageSize.height+" viewport: "+viewportSize.width+","+viewportSize.height+" modalLayer: "+modalLayer.style.width+","+modalLayer.style.height
+	+"\n"+"scroll: "+document.body.scrollWidth+","+document.body.scrollHeight+" offset: "+document.body.offsetWidth+","+document.body.offsetHeight);
+*/
+/*TODO fix
+alert("pageSize.width: "+pageSize.width+"\n"+
+			"viewportSize.width: "+viewportSize.width+"\n"+
+			"document.body.scrollWidth: "+document.body.scrollWidth+"\n"+
+			"document.body.offsetWidth: "+document.body.offsetWidth+"\n"+
+			"document.body.clientWidth: "+document.body.clientWidth+"\n"+
+			"document.documentElement.scrollWidth: "+document.documentElement.scrollWidth+"\n"+
+			"document.documentElement.offsetWidth: "+document.documentElement.offsetWidth+"\n"+
+			"document.documentElement.clientWidth: "+document.documentElement.clientWidth+"\n"+
+			"modalLayer.style.width: "+modalLayer.style.width);
+*/
+
+	modalLayer.style.display=oldModalLayerDisplay;	//show the modal layer, if it was visible before
 	if(modalIFrame)	//if we have a modal IFrame
 	{
 		modalIFrame.style.width=modalLayer.style.width;
 		modalIFrame.style.height=modalLayer.style.height;
+		modalIFrame.style.display=oldModalIFrameDisplay;	//show the modal IFrame, if it was visible before
 	}
 }
 
@@ -2721,7 +2764,8 @@ This implementation updates the modal layer.
 */
 function onWindowResize(event)
 {
-	updateModalLayer();	//update the modal layer
+	//TODO work around IE bug that stops calling onWindowResize after a couple of maximization/minimization cycles
+	window.setTimeout(updateModalLayer, 1);	//update the modal layer later, because during resize IE won't allow us to hide the modal layer and have the correct size update instantaneously
 }
 
 /**Called when the window scrolls.
@@ -4239,10 +4283,14 @@ function getElementFixedCoordinates(element)
 }
 
 /**@return The size of the document, even if it is outside the viewport.
-@see http://www.quirksmode.org/viewport/compatibility.html 
+@see http://www.quirksmode.org/viewport/compatibility.html
 */
 function getPageSize()
 {
+	var width=Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
+	var height=Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+//	alert("width: "+width+" height: "+height);
+/*TODO this is presented at http://www.quirksmode.org/viewport/compatibility.html, but doesn't correctly give the scroll width for Firefox
 	var width=0, height=0;	//we'll determine the width and height
 	var scrollHeight=document.body.scrollHeight;	//get the scroll height
 	var offsetHeight=document.body.offsetHeight;	//get the offset height
@@ -4257,6 +4305,15 @@ function getPageSize()
 		height=document.body.offsetHeight;
 	}
 	return new Size(width, height);	//return the page size
+	
+alert("document.body.scrollWidth: "+document.body.scrollWidth+"\n"+
+			"document.body.offsetWidth: "+document.body.offsetWidth+"\n"+
+			"document.body.clientWidth: "+document.body.clientWidth+"\n"+
+			"document.documentElement.scrollWidth: "+document.documentElement.scrollWidth+"\n"+
+			"document.documentElement.offsetWidth: "+document.documentElement.offsetWidth+"\n"+
+			"document.documentElement.clientWidth: "+document.documentElement.clientWidth+"\n")
+*/	
+	return new Size(width, height);	//return the page size
 }
 
 /**@return The coordinates that the page has scrolled.
@@ -4264,8 +4321,13 @@ function getPageSize()
 */
 function getScrollCoordinates()
 {
+/*TODO del
+alert("window.pageXOffset: "+window.pageXOffset+"\n"+
+			"document.documentElement.scrollLeft: "+document.documentElement.scrollLeft+"\n"+
+			"document.body.scrollLeft: "+document.body.scrollLeft+"\n");
+*/
 	var x, y;
-	if(window.pageYOffset) //if we know the page vertical offset (all browsers except IE)
+	if(typeof window.pageYOffset!="undefined") //if we know the page vertical offset (all browsers except IE)
 	{
 		x=window.pageXOffset;
 		y=window.pageYOffset;

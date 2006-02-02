@@ -163,6 +163,7 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 		calendarContainer=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create the calendar panel
 		add(calendarContainer);	//add the calendar panel
 		monthListControl=new ListControl<Date>(session, Date.class, new SingleListSelectionPolicy<Date>());	//create a list control allowing only single selections of a month
+//TODO fix if needed		monthListControl.setStyleID("month");	//TODO use a constant
 		monthListControl.getModel().setLabel("Month");	//set the month control label TODO get from resources
 		monthListControl.getModel().setValidator(new ValueRequiredValidator<Date>(session));	//require a locale to be selected in the list control
 		monthListControl.setRowCount(1);	//make this a drop-down list
@@ -295,6 +296,7 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 			yearControl=yearTextControl;	//use the year text control for the year control
 		}
 		assert yearControl!=null : "Failed to create a year control";
+//TODO fix if needed		yearControl.setStyleID("year");	//TODO use a constant
 		yearControl.getModel().setLabel("Year");	//set the year control label TODO get from resources
 		final Calendar calendar=Calendar.getInstance(locale);	//create a new calendar for setting the year
 		calendar.setTime(getDate());	//set the calendar date to our displayed date
