@@ -348,7 +348,7 @@ Debug.trace("list control changed value to", newValue);
 		frameLink.setFlyoverEnabled(true);	//turn on flyovers
 		frameLink.getFlyoverStrategy().setPreferredWidth(new Extent(15, Extent.Unit.EM));
 		frameLink.getFlyoverStrategy().setPreferredHeight(new Extent(10, Extent.Unit.EM));
-		frameLink.getFlyoverStrategy().setOpenEffect(new OpacityFadeEffect(session, 1500));	//TODO testing openEffect
+//TODO del		frameLink.getFlyoverStrategy().setOpenEffect(new OpacityFadeEffect(session, 1500));	//TODO testing openEffect
 		frameLink.getModel().addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent actionEvent)

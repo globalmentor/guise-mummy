@@ -447,21 +447,30 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 			final Link link=new Link(session, id);	//create a link for this cell
 			final Calendar calendar=Calendar.getInstance(getSession().getLocale());	//create a calendar TODO cache the calendar and only change it if the locale has changed
 			calendar.setTime(date);	//set the time of the calendar to that of the cell
-			link.getModel().setLabel(Integer.toString(calendar.get(Calendar.DAY_OF_MONTH)));	//set the label of the link to the day of the month
-			link.getModel().addActionListener(new ActionListener()	//create a listener to listen for calendar actions
-					{
-						public void actionPerformed(ActionEvent actionEvent)	//when a day is selected
+			final String dayOfMonthString=Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));	//create a string using the day of the month
+			link.getModel().setLabel(dayOfMonthString);	//set the label of the link to the day of the month
+			final Validator<Date> validator=CalendarControl.this.getModel().getValidator();	//get the calendar control model's validator
+			if(validator==null || validator.isValid(date))	//if there is no validator installed, or there is a validator and this is a valid date
+			{
+				link.getModel().addActionListener(new ActionListener()	//create a listener to listen for calendar actions
 						{
-							try
+							public void actionPerformed(ActionEvent actionEvent)	//when a day is selected
 							{
-								CalendarControl.this.getModel().setValue(date);	//change the control's value to the calendar for this cell
+								try
+								{
+									CalendarControl.this.getModel().setValue(date);	//change the control's value to the calendar for this cell
+								}
+								catch(final ValidationException validationException)
+								{
+									throw new AssertionError(validationException);	//TODO fix to store the errors or something, because a validator could very well be installed in the control
+								}
 							}
-							catch(final ValidationException validationException)
-							{
-								throw new AssertionError(validationException);	//TODO fix to store the errors or something, because a validator could very well be installed in the control
-							}
-						}
-					});
+						});
+			}
+			else	//if there is a validator installed and this is not a valid date
+			{
+				link.getModel().setEnabled(false);	//disable this link
+			}
 			return link;	//return the link
 		}
 	}

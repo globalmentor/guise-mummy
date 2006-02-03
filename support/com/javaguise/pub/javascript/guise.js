@@ -58,6 +58,12 @@ Guise will also automatically add and remove a "rollover" class to the component
 
 var AJAX_ENABLED=true;	//TODO allow this to be configured
 
+/**See if the browser is IE.*/
+var isIE=navigator.userAgent.indexOf("MSIE")>=0;	//TODO use a better variable; do better checks---this will be fooled by Opera maquerading as IE, for example
+
+/**See if the browser is Safari.*/
+var isSafari=navigator.userAgent.indexOf("Safari")>=0;	//TODO use a better variable; do better checks
+
 /**The URI of the XHTML namespace.*/
 var XHTML_NAMESPACE_URI="http://www.w3.org/1999/xhtml";
 
@@ -449,7 +455,7 @@ if(typeof document.createAttributeNS=="undefined")	//if the document does not su
 	};
 }
 
-if(typeof document.importNode=="undefined")	//if the document does not support document.importNode(), create a substitute
+if(isSafari || (typeof document.importNode=="undefined"))	//if the document does not support document.importNode() (or this is Safari, which doesn't support importing XML into an XHTML DOM), create a substitute
 {
 
 	/**Imports a new node in the the document.
@@ -482,6 +488,20 @@ if(typeof document.importNode=="undefined")	//if the document does not support d
 	document.importNode=function(node, deep)	//create a function to manually import a node
 	{
 		var importedNode=null;	//we'll create a new node and store it here
+		
+		if(/*TODO bring back if doesn't work in IE isSafari && */deep	//if we should do a deep import, resort immediately to using innerHTML and a dummy node because of all the IE errors---and the Safari errors that make importing from walking the tree almost impossible		
+				&& node.nodeType!=Node.TEXT_NODE)	//Safari seems to break when using innerHTML to import a text node of length 1---it's probably better to use the DOM to import text, anyway
+		{
+//TODO del							alert("big problem importing node: "+DOMUtilities.getNodeString(childNode));	//TODO fix importnode
+			var dummyNode=document.createElement("div");	//create a dummy node
+//TODO fix							document.documentElement.appendChild(dummyNode);	//append the dummy node to the document
+			dummyNode.innerHTML=DOMUtilities.getNodeString(node);	//convert the child node to a string and assign it to the dummy node
+			importedNode=dummyNode.removeChild(dummyNode.childNodes[0]);	//remove the dummy node's first and only node, which is our new imported node
+//TODO fix							document.documentElement.removeChild(dummyNode);	//throw away the dummy node
+			return importedNode;
+		}
+
+		
 		switch(node.nodeType)	//see which type of child node this is
 		{
 			case Node.COMMENT_NODE:	//comment
@@ -517,7 +537,8 @@ alert("using HTML: "+outerHTML);
 						var attributeName=attribute.nodeName;	//get the attribute name
 						if(attributeName=="style")	//if this is the style attribute, it must be copied differently or it will throw an error on IE
 						{
-							DOMUtilities.copyStyleAttribute(importedNode, node);	//copy the style attribute
+//TODO fix for Safari alert("ready to copy style attributes");
+//TODO fix for Safari 							DOMUtilities.copyStyleAttribute(importedNode, node);	//copy the style attribute
 						}
 						else	//for all other attributes
 						{
@@ -953,7 +974,7 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 				{
 					var styleProperty=styleComponents[0].trim();	//get the trimmed style property
 					var styleValue=styleComponents[1].trim();	//get the trimmed style value
-					destinationElement.style[styleProperty]=styleValue;	//copy this style
+					destinationElement.style[styleProperty]=styleValue;	//copy this style TODO fix Safari; this causes a null value error in safari
 				}
 			}				
 		}
@@ -1783,7 +1804,7 @@ alert(exception);
 						}
 						else if(DOMUtilities.hasClass(childNode, "frame"))	//if the element doesn't currently exist, but the patch is for a frame, create a new frame
 						{
-//TODO fix alert("ready to import node");
+//TODO fix alert("ready to import frame node");
 							oldElement=document.importNode(childNode, true);	//create an import clone of the node
 //TODO del alert("ready to add frame: "+typeof oldElement);
 							guiseFrames.add(oldElement);	//add this frame
@@ -1807,14 +1828,17 @@ alert(exception);
 		GuiseAJAX.prototype._processRemove=function(element)
 		{
 			var id=element.getAttribute("id");	//get the element ID, if there is one
+//TODO del alert("processing remove with ID: "+id);
 			if(id)	//if the element has an ID
 			{
 				var oldElement=document.getElementById(id);	//get the old element
 				if(oldElement!=null)	//if we found the old element
 				{
+//TODO del alert("we found the old element");
 					if(guiseFrames.contains(oldElement))	//if we're removing a frame
 					{
 //TODO fix alert("removing frame "+id);
+//TODO del alert("it's a frame");
 						guiseFrames.remove(oldElement);	//remove the frame
 					}
 					else	//if we're removing any other node
@@ -1868,7 +1892,8 @@ alert(exception);
 //TODO fix or del				if(attributeValue!=null && attributeValue.length>0 && !element.getAttribute(attributeName))	//if there is really an attribute value (IE provides all possible attributes, even with those with no value) and the new element doesn't have this attribute
 				if(element.getAttribute(attributeName)==null)	//if the new element doesn't have this attribute
 				{
-					if(attributeName!="style")	//don't remove local styles, because they may be used by Guise (with frames, for instance)
+					if(attributeName!="style"	//don't remove local styles, because they may be used by Guise (with frames, for instance)
+							&& attributeName!="onclick")	//don't remove the onclick attribute, because we may be using it for Safari to prevent a default action
 					{
 //TODO del alert("ready to remove "+oldElement.nodeName+" attribute "+oldAttributeName+" with current value "+oldAttributeValue);
 						oldElement.removeAttribute(oldAttributeName);	//remove the attribute normally (apparently no action will take place if performed on IE-specific attributes such as element.start)
@@ -2023,19 +2048,6 @@ alert(exception);
 */
 				if(isChildrenCompatible)	//if the children are compatible
 				{
-//TODO del alert("children are compatible, old "+oldElement.nodeName+" with ID "+oldElement.id+" child node count: "+oldChildNodeCount+" new "+element.nodeName+" "+"with ID "+element.getAttribute("id")+" child node count "+childNodeCount+" (verify) "+element.childNodes.length);
-
-/*TODO del
-if(oldChildNodeCount!=childNodeCount)	//TODO del
-{
-	for(var i=0; i<oldChildNodeCount; ++i)
-	{
-		var childNode=oldElement.childNodes[i];
-//TODO fix alert("child node "+i+" is of type "+childNode.nodeType+" with name "+childNode.nodeName);
-alert("child node "+i+" is of type "+childNode.nodeType+" with name "+childNode.nodeName+(childNode.nodeType==Node.ELEMENT_NODE ? " with ID "+childNode.id : ""));
-	}
-}
-*/
 						//remove superfluous old nodes
 					for(var i=oldChildNodeCount-1; i>=childNodeCount; --i)	//for each old child node that is not in the new node
 					{
@@ -2074,8 +2086,14 @@ alert("child node "+i+" is of type "+childNode.nodeType+" with name "+childNode.
 					}
 					else	//if we're out of old child nodes, create a new one
 					{
+try
+{
 //TODO del alert("ready to clone node: "+DOMUtilities.getNodeString(childNode));
+//TODO del alert("ready to clone node");
 						var importedNode=document.importNode(childNode, true);	//create an import clone of the node
+//TODO del alert("imported node");
+							//TODO del; now inside importNode
+/*TODO del
 						if(!importedNode)	//TODO check and improve big IE hack
 						{
 //TODO del							alert("big problem importing node: "+DOMUtilities.getNodeString(childNode));	//TODO fix importnode
@@ -2085,8 +2103,16 @@ alert("child node "+i+" is of type "+childNode.nodeType+" with name "+childNode.
 							importedNode=dummyNode.removeChild(dummyNode.childNodes[0]);	//remove the dummy node's first and only node, which is our new imported node
 //TODO fix							document.documentElement.removeChild(dummyNode);	//throw away the dummy node
 						}
+*/
+//TODO del alert("ready to append node");
 						oldElement.appendChild(importedNode);	//append the imported node to the old element
+//TODO del alert("ready to initialize node");
 						initializeNode(importedNode);	//initialize the new imported node, installing the correct event handlers
+}
+catch(e)
+{
+	alert("error creating new child node: "+DOMUtilities.getNodeString(childNode));
+}
 					}
 				}
 			}
@@ -2802,17 +2828,29 @@ function initializeNode(node)
 							if(!node.getAttribute("target"))	//if the link has no target (the target wouldn't work if we tried to take over the events; we can't just check for null because IE will always send back at least "")
 							{
 								eventManager.addEvent(node, "click", onLinkClick, false);	//listen for anchor clicks
+								if(isSafari)	//if this is Safari TODO fix better
+								{
+									node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
+								}
 							}
 						}
 						else if(elementClassNames.containsMatch(/-tab$/))	//if this is a tab TODO use a constant TODO is this still used?
 						{
 							eventManager.addEvent(node, "click", onTabClick, false);	//listen for tab clicks
+							if(isSafari)	//if this is Safari TODO fix better
+							{
+								node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
+							}
 						}
 						break;
 					case "button":
 						if(elementClassNames.contains("button-body"))	//if this is a Guise button TODO use constant; check
 						{
 							eventManager.addEvent(node, "click", onButtonClick, false);	//listen for button clicks
+							if(isSafari)	//if this is Safari TODO fix better
+							{
+								node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
+							}
 						}
 						break;
 					case "div":
@@ -4532,8 +4570,5 @@ function debug(text)
 	var dymamicContent="javascript:document.write('<html><body>"+DOMUtilities.encodeXML(text)+"</body></html>');"	//create JavaScript for writing the dynamic content
 	window.open(dymamicContent, "debug", "status=no,menubar=no,scrollbars=yes,resizable=no,width=800,height=600");
 }
-
-/**See if the browser is IE.*/
-var isIE=navigator.userAgent.indexOf("MSIE")>=0;	//TODO use a better variable; do better checks---this will be fooled by Opera maquerading as IE, for example
 
 eventManager.addEvent(window, "load", onWindowLoad, false);	//do the appropriate initialization when the window loads
