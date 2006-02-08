@@ -1,5 +1,5 @@
 /*Guise(TM) JavaScript support routines
-Copyright (c) 2005 GlobalMentor, Inc.
+Copyright (c) 2005-2006 GlobalMentor, Inc.
 */
 
 /*Guise AJAX Request Format, content type application/x-guise-ajax-request+xml
@@ -163,7 +163,7 @@ guiseFrames.add=function(frame)
 		frame.style.visibility="visible";	//go ahead and make the frame visible
 	}
 
-	frame.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components TODO fix
+//TODO del; moved to updateModal()	frame.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components TODO fix
 	updateComponents(frame);	//update all the components within the frame
 	Array.prototype.add.call(this, frame);	//do the default adding to the array
 	this.updateModal();	//update the modal state
@@ -319,16 +319,21 @@ guiseFrames.remove=function(frame)
 /**The current modal frame, or null if there is no modal frame.*/
 guiseFrames.modalFrame=null;
 
-/**Updates the modal layer and current modal frame.*/
+/**Updates the modal layer and current modal frame.
+Each frame is given a z-order in the order of frames, starting with a z-order of 100 and incrementing by 100.
+The page is assumed to have a z-order of 0.
+*/
 guiseFrames.updateModal=function()
 {
+	var frameCount=this.length;	//find out how many frames there are
 	this.modalFrame=null;	//start out presuming there is no modal frame
-	for(var i=this.length-1; i>=0 && this.modalFrame==null; --i)	//for each frame, find the last modal frame
+	for(var i=0; i<frameCount; ++i)	//update the z-orders
 	{
 		var frame=this[i];	//get a reference to this frame
-		if(hasClassName(frame, "frameModal"))	//if this is a modal frame
+		frame.style.zIndex=(i+1)*100;	//give the element the appropriate z-order
+		if(hasClassName(frame, "frameModal"))	//if this is a modal frame TODO use a constant
 		{
-			this.modalFrame=frame;	//indicate our modal frame TODO allow for multiple modal frames
+			this.modalFrame=frame;	//indicate our last modal frame
 		}
 	}
 	if(this.modalFrame!=null)	//if there is a modal frame
@@ -342,7 +347,7 @@ guiseFrames.updateModal=function()
 			modalIFrame.style.display="block";	//make the modal IFrame visible
 		}
 	}
-	else
+	else	//if there is no modal frame
 	{
 		modalLayer.style.display="none";	//hide the modal layer
 		if(modalIFrame)	//if we have a modal IFrame
@@ -2623,7 +2628,7 @@ function DragState(dragSource, mouseX, mouseY)
 				element.style.left=(this.initialPosition.x).toString()+"px";	//initialize the horizontal position of the copy
 				element.style.top=(this.initialPosition.y).toString()+"px";	//initialize the vertical position of the copy
 				element.style.position="absolute";	//change the element's position to absolute TODO update the element's initial position
-				element.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components
+				element.style.zIndex=9001;	//give the element an arbitrarily high z-index value so that it will appear in front of other components TODO calculate the highest z-order
 				//TODO make sure resizeable elements are the correct size
 
 			}
@@ -2759,7 +2764,7 @@ This implementation installs listeners.
 function onWindowLoad()
 {
 	eventManager.addEvent(window, "resize", onWindowResize, false);	//add a resize listener
-	eventManager.addEvent(window, "scroll", onWindowResize, false);	//add a scroll listener
+//TODO del	eventManager.addEvent(window, "scroll", onWindowScroll, false);	//add a scroll listener
 	eventManager.addEvent(window, "unload", onWindowUnload, false);	//do the appropriate uninitialization when the window unloads
 	initializeNode(document.documentElement);	//initialize the document tree
 	updateComponents(document.documentElement);	//update all components represented by elements within the document
@@ -2795,11 +2800,15 @@ function onWindowResize(event)
 }
 
 /**Called when the window scrolls.
+Note that Firefox 1.0.7 calls this method even when a scrollable element scrolls; this problem is fixed in Firefox 1.5.
 @param event The object containing event information.
 */
+/*TODO bring back if needed
 function onWindowScroll(event)
 {
+alert("scroll");
 }
+*/
 
 /**Initializes a node and all its children, adding the correct listeners.
 @param node The node to initialize.

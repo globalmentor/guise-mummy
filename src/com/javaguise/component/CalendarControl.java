@@ -188,16 +188,18 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 						}
 					}
 				};
-		
+/*TODO del
 		if(model.getValidator()==null)	//TODO del; this is a temporary default for testing the date control based upon the model validator 
 		{
-			final Calendar calendar=Calendar.getInstance(session.getLocale());	//create a new calendar for determining the minimum and maximum year
-			final Date maxDate=calendar.getTime();	//the current date will be the maximum date
-			calendar.set(1940, 0, 1);	//set the calendar to the first day of 1940
-			final Date minDate=calendar.getTime();	//the first day of 1940 will be the minimum date
+			final Date maxDate=new Date();	//the current date will be the maximum date
+			final Date minDate=new GregorianCalendar(1940, 0, 1).getTime();	//the first day of 1940 in the Gregorian calendar will be the minimum date
+//TODO del			final Calendar calendar=Calendar.getInstance(session.getLocale());	//create a new calendar for determining the minimum and maximum year
+//TODO del			final Date maxDate=calendar.getTime();	//the current date will be the maximum date
+//TODO del			calendar.set(1940, 0, 1);	//set the calendar to the first day of 1940
+//TODO del			final Date minDate=calendar.getTime();	//the first day of 1940 will be the minimum date
 			model.setValidator(new DateRangeValidator(session, minDate, maxDate));	//restrict the date range
 		}
-
+*/
 		updateYearControl();	//create and install an appropriate year control
 		updateCalendars();	//update the calendars
 		updateModelPropertyChangeListener=new AbstractGuisePropertyChangeListener<Object>()	//create a property change listener to update the calendars
@@ -441,37 +443,47 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 		public <C extends Date> Component<?> createComponent(final Table table, final TableModel model, final int rowIndex, final TableColumnModel<C> column, final boolean editable, final boolean selected, final boolean focused)
 		{
 			final GuiseSession session=getSession();	//get the session
+			final Calendar calendar=Calendar.getInstance(getSession().getLocale());	//create a calendar TODO cache the calendar and only change it if the locale has changed
+			calendar.setTime(getDate());	//set the calendar date to the date of the calendar
+			final int calendarMonth=calendar.get(Calendar.MONTH);	//get the month of the calendar
 			final Date date=model.getCellValue(rowIndex, column);	//get the date for this cell
 			final long time=date.getTime();	//get the time of the cell in milliseconds
 			final String id=table.createID("time"+Long.toHexString(time));	//create an ID for the new component
-			final Link link=new Link(session, id);	//create a link for this cell
-			final Calendar calendar=Calendar.getInstance(getSession().getLocale());	//create a calendar TODO cache the calendar and only change it if the locale has changed
+//TODO del when works			final Calendar calendar=Calendar.getInstance(getSession().getLocale());	//create a calendar TODO cache the calendar and only change it if the locale has changed
 			calendar.setTime(date);	//set the time of the calendar to that of the cell
-			final String dayOfMonthString=Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));	//create a string using the day of the month
-			link.getModel().setLabel(dayOfMonthString);	//set the label of the link to the day of the month
-			final Validator<Date> validator=CalendarControl.this.getModel().getValidator();	//get the calendar control model's validator
-			if(validator==null || validator.isValid(date))	//if there is no validator installed, or there is a validator and this is a valid date
+			if(calendar.get(Calendar.MONTH)==calendarMonth)	//if this date is within the month
 			{
-				link.getModel().addActionListener(new ActionListener()	//create a listener to listen for calendar actions
-						{
-							public void actionPerformed(ActionEvent actionEvent)	//when a day is selected
+				final Link link=new Link(session, id);	//create a link for this cell
+				final String dayOfMonthString=Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));	//create a string using the day of the month
+				link.getModel().setLabel(dayOfMonthString);	//set the label of the link to the day of the month
+				final Validator<Date> validator=CalendarControl.this.getModel().getValidator();	//get the calendar control model's validator
+				if(validator==null || validator.isValid(date))	//if there is no validator installed, or there is a validator and this is a valid date
+				{
+					link.getModel().addActionListener(new ActionListener()	//create a listener to listen for calendar actions
 							{
-								try
+								public void actionPerformed(ActionEvent actionEvent)	//when a day is selected
 								{
-									CalendarControl.this.getModel().setValue(date);	//change the control's value to the calendar for this cell
+									try
+									{
+										CalendarControl.this.getModel().setValue(date);	//change the control's value to the calendar for this cell
+									}
+									catch(final ValidationException validationException)
+									{
+										throw new AssertionError(validationException);	//TODO fix to store the errors or something, because a validator could very well be installed in the control
+									}
 								}
-								catch(final ValidationException validationException)
-								{
-									throw new AssertionError(validationException);	//TODO fix to store the errors or something, because a validator could very well be installed in the control
-								}
-							}
-						});
+							});
+				}
+				else	//if there is a validator installed and this is not a valid date
+				{
+					link.getModel().setEnabled(false);	//disable this link
+				}
+				return link;	//return the link
 			}
-			else	//if there is a validator installed and this is not a valid date
+			else	//if the date is outside the month
 			{
-				link.getModel().setEnabled(false);	//disable this link
+				return new Label(session, id);	//return a blank label for the cell
 			}
-			return link;	//return the link
 		}
 	}
 

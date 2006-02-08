@@ -1435,7 +1435,8 @@ Debug.trace("+++creating Guise session", httpSession.getId());
 				//e.g. Opera: "Mozilla/3.0 (Windows NT 5.1; U) Opera 7.54"
 				//e.g. Opera: "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1) Opera 7.54"
 				//e.g. Firefox 1.5: "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8) Gecko/20051111 Firefox/1.5"
-				//e.g. IE 6.0: "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)"						
+				//e.g. IE 6.0: "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)"
+				//e.g. Safari 1.3.2: "Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en) AppleWebKit/312.8 (KHTML, like Gecko) Safari/312.5"
 Debug.trace("user agent:", userAgent);
 				String userAgentName=null;	//we'll determint the user agent name
 				int[] userAgentVersion=null;	//we'll determine the version
