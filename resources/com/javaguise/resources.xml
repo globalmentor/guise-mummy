@@ -15,6 +15,9 @@
 
 	<!-- components -->
 
+	<!-- Frame -->
+	<entry key="frame.close.icon">guise/images/frame-close.gif</entry>
+
 	<!-- Option Dialog Frame -->
 	<entry key="frame.dialog.options.OK.label">OK</entry>
 	<entry key="frame.dialog.options.OK.icon">guise/images/accept.gif</entry>

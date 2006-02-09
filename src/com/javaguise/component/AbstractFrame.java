@@ -1,6 +1,7 @@
 package com.javaguise.component;
 
 import java.beans.PropertyChangeListener;
+import java.net.URI;
 import java.util.Iterator;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
@@ -10,6 +11,8 @@ import com.garretwilson.util.EmptyIterator;
 import com.garretwilson.util.ObjectIterator;
 import com.javaguise.GuiseSession;
 import com.javaguise.component.effect.Effect;
+import com.javaguise.event.ActionEvent;
+import com.javaguise.event.ActionListener;
 import com.javaguise.event.GuisePropertyChangeListener;
 import com.javaguise.model.LabelModel;
 
@@ -17,8 +20,14 @@ import com.javaguise.model.LabelModel;
 @author Garret Wilson
 @see LayoutPanel
 */
-public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponent<C> implements Frame<C>
+public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumCompositeComponent<AbstractFrame.FrameComponent, C> implements Frame<C>
 {
+
+	/**The resource bundle key for the close image.*/
+	public final static String CLOSE_ICON_RESOURCE_KEY="frame.close.icon";
+
+	/**The enumeration of frame components.*/
+	private enum FrameComponent{CONTENT_COMPONENT, CLOSE_ACTION_CONTROL};
 
 	/**The default mode of an open, modal frame.*/
 	public final static Mode DEFAULT_MODAL_FRAME_MODE=new Mode(){};
@@ -198,52 +207,57 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 	public LabelModel getModel() {return (LabelModel)super.getModel();}
 
 	/**The single child component, or <code>null</code> if this frame does not have a child component.*/
-	private Component<?> content;
+//TODO del	private Component<?> content;
 
-		/**@return The single child component, or <code>null</code> if this frame does not have a child component.*/
-		public Component<?> getContent() {return content;}
+		/**@return The content child component, or <code>null</code> if this frame does not have a content child component.
+		@see FrameComponent#CONTENT_COMPONENT
+		*/
+		public Component<?> getContent() {return getComponent(FrameComponent.CONTENT_COMPONENT);}
 
-		/**Sets the single child component.
+		/**Sets the content child component.
 		This is a bound property.
-		@param newContent The single child component, or <code>null</code> if this frame does not have a child component.
+		@param newContent The content child component, or <code>null</code> if this frame does not have a content child component.
+		@see FrameComponent#CONTENT_COMPONENT
 		@see Frame#CONTENT_PROPERTY
 		*/
 		public void setContent(final Component<?> newContent)
 		{
-			if(content!=newContent)	//if the value is really changing
+			final Component<?> oldContent=setComponent(FrameComponent.CONTENT_COMPONENT, newContent);	//set the component
+			if(oldContent!=newContent)	//if the component really changed
 			{
-				final Component<?> oldComponent=content;	//get the old value
-				content=newContent;	//actually change the value
-				if(oldComponent!=null)	//if there was an old component
-				{
-					oldComponent.setParent(null);	//tell the old component it no longer has a parent
-				}
-				if(content!=null)	//if there is a new component
-				{
-					content.setParent(this);	//tell the new component who its parent is					
-				}
-				firePropertyChange(CONTENT_PROPERTY, oldComponent, newContent);	//indicate that the value changed
+				firePropertyChange(CONTENT_PROPERTY, oldContent, newContent);	//indicate that the value changed
 			}
 		}
 
-	/**@return Whether this component has children.*/
-	public boolean hasChildren() {return getContent()!=null;}
-
-	/**Retrieves the child component with the given ID.
-	@param id The ID of the component to return.
-	@return The child component with the given ID, or <code>null</code> if there is no child component with the given ID. 
+	/**The action listener for closing the frame.*/
+	private final ActionListener closeActionListener;
+		
+	/**@return The action control for closing the frame, or <code>null</code> if this frame does not have a close action control.
+	@see FrameComponent#CLOSE_ACTION_CONTROL
 	*/
-	public Component<?> getComponent(final String id)
-	{
-		final Component<?> component=getContent();	//get the child component, if there is one
-		return (component!=null && id.equals(component.getID())) ? component : null;	//return the child component if it has the correct ID
-	}
+	public ActionControl<?> getCloseActionControl() {return (ActionControl<?>)getComponent(FrameComponent.CLOSE_ACTION_CONTROL);}
 
-	/**@return An iterator to the single child component, if there is one.*/
-	public Iterator<Component<?>> iterator()
+	/**Sets the action control for closing the frame.
+	This is a bound property.
+	@param newCloseActionControl The action control for closing the frame, or <code>null</code> if this frame does not have a close action control.
+	@see FrameComponent#CLOSE_ACTION_CONTROL
+	@see Frame#CLOSE_ACTION_CONTROL_PROPERTY
+	*/
+	public void setCloseActionControl(final ActionControl<?> newCloseActionControl)
 	{
-		final Component<?> component=getContent();	//get the child component, if there is one
-		return component!=null ? new ObjectIterator<Component<?>>(getContent()) : new EmptyIterator<Component<?>>();
+		final ActionControl<?> oldCloseActionControl=(ActionControl<?>)setComponent(FrameComponent.CLOSE_ACTION_CONTROL, newCloseActionControl);	//set the component
+		if(oldCloseActionControl!=newCloseActionControl)	//if the component really changed
+		{
+			if(oldCloseActionControl!=null)	//if we had an old close action
+			{
+				oldCloseActionControl.getModel().removeActionListener(closeActionListener);	//remove the close action listener from the old control
+			}
+			if(newCloseActionControl!=null)	//if we have a new close action
+			{
+				newCloseActionControl.getModel().addActionListener(closeActionListener);	//listen for the new action control and close the frame in response
+			}
+			firePropertyChange(CLOSE_ACTION_CONTROL_PROPERTY, oldCloseActionControl, newCloseActionControl);	//indicate that the value changed
+		}
 	}
 
 	/**Session, ID, model, and component constructor.
@@ -256,75 +270,18 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractComponen
 	*/
 	public AbstractFrame(final GuiseSession session, final String id, final LabelModel model, final Component<?> component)
 	{
-		super(session, id, model);	//construct the parent class
-		this.content=component;	//set the child component
-	}
-
-	/**Determines whether the models of this component and all of its child components are valid.
-	This version returns <code>true</code> if all its child components are valid.
-	@return Whether the models of this component and all of its child components are valid.
-	*/
-	public boolean isValid()
-	{
-		if(!super.isValid())	//if the component doesn't pass the default checks
-		{
-			return false;	//this component isn't valid
-		}
-		for(final Component<?> childComponent:this)	//for each child component
-		{
-			if(!childComponent.isValid())	//if this child component isn't valid
-			{
-				return false;	//indicate that this component is consequently not valid
-			}
-		}
-		return true;	//indicate that all child components are valid
-	}
-
-	/**Validates the model of this component and all child components.
-	The component will be updated with error information.
-	This version validates the this component and all child components.
-	@exception ComponentExceptions if there was one or more validation error.
-	*/
-	public void validate() throws ComponentExceptions
-	{
-		ComponentExceptions componentExceptions=null;	//we'll store any component exceptions here and keep going
-		try
-		{
-			super.validate();	//validate the component normally
-		}
-		catch(final ComponentExceptions superComponentExceptions)	//if the super version returns an error
-		{
-			if(componentExceptions==null)	//if this is our first component exception
-			{
-				componentExceptions=superComponentExceptions;	//store the exception and continue processing events with other child components
-			}
-			else	//if we already have component exceptions
-			{
-				componentExceptions.addAll(superComponentExceptions);	//add all the exceptions to the exception we already have
-			}
-		}
-		for(final Component<?> childComponent:this)	//for each child component
-		{
-			try
-			{
-				childComponent.validate();	//validate the child
-			}
-			catch(final ComponentExceptions childComponentExceptions)	//if a child returns an error
-			{
-				if(componentExceptions==null)	//if this is our first component exception
+		super(session, id, model, FrameComponent.values());	//construct the parent class
+		closeActionListener=new ActionListener()	//create an action listener for closing
 				{
-					componentExceptions=childComponentExceptions;	//store the exception and continue processing events with other child components
-				}
-				else	//if we already have component exceptions
-				{
-					componentExceptions.addAll(childComponentExceptions);	//add all the child component exceptions to the exception we already have
-				}
-			}
-		}
-		if(componentExceptions!=null)	//if we encountered one or more component exceptions
-		{
-			throw componentExceptions;	//throw the exception, which may contain multiple exceptions
-		}
+					public void actionPerformed(final ActionEvent actionEvent)	//if the close action is initiated
+					{
+						close();	//close the frame
+					}
+				};
+		setComponent(FrameComponent.CONTENT_COMPONENT, component);	//set the component directly, because child classes may prevent the setContent() method from changing the component 
+		final Link closeButton=new Link(session);	//create a close action control
+		closeButton.getModel().setIconResourceKey(CLOSE_ICON_RESOURCE_KEY);	//indicate to the close action control the resource key for its icon
+		setCloseActionControl(closeButton);	//set the close action control
 	}
 
 	/**Opens the frame with the currently set modality.

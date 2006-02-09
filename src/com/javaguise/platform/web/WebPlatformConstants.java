@@ -22,11 +22,11 @@ public class WebPlatformConstants
 		//images
 	
 	/**The path of the image for frame close.*/
-	public final static String FRAME_CLOSE_IMAGE_PATH="guise/images/frame-close.gif";
+//TODO del	public final static String FRAME_CLOSE_IMAGE_PATH="guise/images/frame-close.gif";
 
 	/**The path of the horizontal slider thumb image.*/
-	public final static String SLIDER_THUMB_X_LTR_IMAGE_PATH="guise/images/slider-thumb-x-ltr.gif";
+//TODO del public final static String SLIDER_THUMB_X_LTR_IMAGE_PATH="guise/images/slider-thumb-x-ltr.gif";
 	/**The path of the vertical slider thumb image.*/
-	public final static String SLIDER_THUMB_Y_IMAGE_PATH="guise/images/slider-thumb-y.gif";
+//TODO del	public final static String SLIDER_THUMB_Y_IMAGE_PATH="guise/images/slider-thumb-y.gif";
 
 }

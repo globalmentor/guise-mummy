@@ -3,6 +3,8 @@ package com.javaguise.component;
 import java.util.*;
 
 import static com.garretwilson.util.CollectionUtilities.*;
+
+import com.garretwilson.util.ReverseIterator;
 import com.javaguise.GuiseSession;
 import com.javaguise.component.layout.*;
 import com.javaguise.event.ContainerEvent;
@@ -18,6 +20,35 @@ Iterating over child components is thread safe.
 */
 public abstract class AbstractContainer<C extends Container<C>> extends AbstractListCompositeComponent<C> implements Container<C>
 {
+
+	/**@return An iterator to contained components in reverse order.*/
+	public Iterator<Component<?>> reverseIterator()
+	{
+		final List<Component<?>> componentList=getComponentList();	//get the list of components
+		return new ReverseIterator<Component<?>>(componentList.listIterator(componentList.size()));
+	}
+
+	/**@return The number of child components in this container.*/
+	public int size() {return getComponentList().size();}
+
+	/**Determines whether this container contains the given component.
+	@param component The component to check.
+	@return <code>true</code> if this container contains the given component.
+	*/
+	public boolean contains(final Object component) {return getComponentList().contains(component);}
+
+	/**Returns the index in the container of the first occurrence of the specified component.
+	@param component The component the index of which should be returned.
+	@return The index in this container of the first occurrence of the specified component, or -1 if this container does not contain the given component.
+	*/
+	public int indexOf(final Component<?> component) {return getComponentList().indexOf(component);}
+
+  /**Returns the component at the specified index in the container.
+  @param index The index of the component to return.
+	@return The component at the specified position in this container.
+	@exception IndexOutOfBoundsException if the index is out of range.
+	*/
+	public Component<?> get(final int index) {return getComponentList().get(index);}
 
 	/**Adds a component to the container with default constraints.
 	@param component The component to add.

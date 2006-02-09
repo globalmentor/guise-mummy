@@ -45,33 +45,8 @@ public abstract class AbstractListCompositeComponent<C extends CompositeComponen
 	/**@return An iterator to contained components.*/
 	public Iterator<Component<?>> iterator() {return componentList.iterator();}
 
-	/**@return An iterator to contained components in reverse order.*/
-	public Iterator<Component<?>> reverseIterator() {return new ReverseIterator<Component<?>>(componentList.listIterator(componentList.size()));}
-
-	/**@return The number of child components in this container.*/
-	public int size() {return componentList.size();}
-
 	/**@return Whether this component has children. This implementation delegates to the component list.*/
 	public boolean hasChildren() {return !componentList.isEmpty();}
-
-	/**Determines whether this container contains the given component.
-	@param component The component to check.
-	@return <code>true</code> if this container contains the given component.
-	*/
-	public boolean contains(final Object component) {return componentList.contains(component);}
-
-	/**Returns the index in the container of the first occurrence of the specified component.
-	@param component The component the index of which should be returned.
-	@return The index in this container of the first occurrence of the specified component, or -1 if this container does not contain the given component.
-	*/
-	public int indexOf(final Component<?> component) {return componentList.indexOf(component);}
-
-  /**Returns the component at the specified index in the container.
-  @param index The index of component to return.
-	@return The component at the specified position in this container.
-	@exception IndexOutOfBoundsException if the index is out of range.
-	*/
-	public Component<?> get(int index) {return componentList.get(index);}
 
 	/**Session, ID, and model constructor.
 	@param session The Guise session that owns this component.

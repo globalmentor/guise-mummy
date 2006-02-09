@@ -16,6 +16,8 @@ import com.javaguise.model.LabelModel;
 */
 public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalComponent<C>
 {
+	/**The close action control bound property.*/
+	public final static String CLOSE_ACTION_CONTROL_PROPERTY=getPropertyName(Frame.class, "closeActionControl");
 	/**The content bound property.*/
 	public final static String CONTENT_PROPERTY=getPropertyName(Frame.class, "content");
 	/**The bound property of whether the frame is modal if and when it is open.*/
@@ -108,12 +110,22 @@ public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalC
 	/**@return The data model used by this component.*/
 	public LabelModel getModel();
 
-	/**@return The single child component, or <code>null</code> if this frame does not have a child component.*/
+	/**@return The action control for closing the frame, or <code>null</code> if this frame does not have a close action control.*/
+	public ActionControl<?> getCloseActionControl();
+
+	/**Sets the action control for closing the frame.
+	This is a bound property.
+	@param newCloseActionControl The action control for closing the frame, or <code>null</code> if this frame does not have a close action control.
+	@see #CLOSE_ACTION_CONTROL_PROPERTY
+	*/
+	public void setCloseActionControl(final ActionControl<?> newCloseActionControl);
+
+	/**@return The content child component, or <code>null</code> if this frame does not have a content child component.*/
 	public Component<?> getContent();
 
-	/**Sets the single child component.
+	/**Sets the content child component.
 	This is a bound property
-	@param newContent The single child component, or <code>null</code> if this frame does not have a child component.
+	@param newContent The content child component, or <code>null</code> if this frame does not have a content child component.
 	@see #CONTENT_PROPERTY
 	*/
 	public void setContent(final Component<?> newContent);

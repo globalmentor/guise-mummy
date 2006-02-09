@@ -8,6 +8,7 @@ import com.javaguise.GuiseSession;
 import com.javaguise.model.Model;
 
 /**An abstract implementation of a composite component that can contain multiple components.
+Every child component must be added or removed using {@link #addComponent(Component)} and {@link #removeComponent(Component)}, although other actions may take place.
 @author Garret Wilson
 */
 public abstract class AbstractMultipleCompositeComponent<C extends CompositeComponent<C>> extends AbstractCompositeComponent<C>
