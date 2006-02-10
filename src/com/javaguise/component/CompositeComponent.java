@@ -15,6 +15,6 @@ public interface CompositeComponent<C extends CompositeComponent<C>> extends Com
 	@param id The ID of the component to return.
 	@return The child component with the given ID, or <code>null</code> if there is no child component with the given ID. 
 	*/
-	public Component<?> getComponent(final String id);
+	public Component<?> getComponent(final String id);	//TODO perhaps remove; the speed may not be sufficient to outweigh the overhead; this is only a single-level search, anyway
 
 }

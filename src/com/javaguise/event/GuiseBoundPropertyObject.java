@@ -13,10 +13,10 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 */
 public class GuiseBoundPropertyObject extends BoundPropertyObject
 {
-	/**The Guise session that owns this model.*/
+	/**The Guise session that owns this object.*/
 	private final GuiseSession session;
 
-		/**@return The Guise session that owns this model.*/
+		/**@return The Guise session that owns this object.*/
 		public GuiseSession getSession() {return session;}
 
 	/**Session constructor.

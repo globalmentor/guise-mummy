@@ -4,14 +4,29 @@ import java.beans.PropertyChangeEvent;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.xml.parsers.*;
+
 
 import static java.util.Collections.*;
 
 import com.garretwilson.beans.*;
 import com.garretwilson.event.PostponedEvent;
+import com.garretwilson.io.BOMInputStreamReader;
+import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.rdf.RDF;
+import com.garretwilson.rdf.RDFResource;
+import com.garretwilson.rdf.RDFUtilities;
+import com.garretwilson.rdf.RDFXMLProcessor;
+import com.garretwilson.text.xml.XMLUtilities;
+import com.garretwilson.util.CollectionUtilities;
+import com.garretwilson.util.Debug;
+import com.garretwilson.util.ResourceBundleUtilities;
+
 import com.javaguise.component.*;
 import com.javaguise.component.layout.Orientation;
 import com.javaguise.context.GuiseContext;
@@ -20,17 +35,17 @@ import com.javaguise.event.GuisePropertyChangeEvent;
 import com.javaguise.event.GuisePropertyChangeListener;
 import com.javaguise.event.ModalEvent;
 import com.javaguise.event.ModalNavigationListener;
-import com.garretwilson.io.BOMInputStreamReader;
-import static com.garretwilson.io.WriterUtilities.*;
-import com.garretwilson.lang.ObjectUtilities;
-import com.garretwilson.util.CollectionUtilities;
-import com.garretwilson.util.Debug;
-import com.garretwilson.util.ResourceBundleUtilities;
 
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
+import static com.garretwilson.io.FileConstants.*;
+import static com.garretwilson.io.FileUtilities.*;
+import static com.garretwilson.io.WriterUtilities.*;
+import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
-import static com.garretwilson.text.CharacterEncodingConstants.UTF_8;
-import static com.garretwilson.text.xml.XMLUtilities.*;
+import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static com.javaguise.GuiseResourceConstants.*;
 
 /**An abstract implementation that keeps track of the components of a user session.
@@ -50,6 +65,18 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 		/**@return The application frame.*/
 		public ApplicationFrame<?> getApplicationFrame() {return applicationFrame;}
+
+	/**The processor that converts RDF to Guise objects.*/
+	private final GuiseRDFProcessor guiseRDFProcessor;
+
+		/**@return The processor that converts RDF to Guise objects.*/
+		private GuiseRDFProcessor getGuiseRDFProcessor() {return guiseRDFProcessor;}
+
+	/**The non-thread-safe document builder that parses XML documents for input to RDF.*/
+	private final DocumentBuilder documentBuilder;
+
+		/**@return The non-thread-safe document builder that parses XML documents for input to RDF.*/
+		private DocumentBuilder getDocumentBuilder() {return documentBuilder;}
 
 	/**The cache of navigation panel types keyed to appplication context-relative paths.*/
 	private final Map<String, NavigationPanel> navigationPathPanelMap=synchronizedMap(new HashMap<String, NavigationPanel>());
@@ -628,6 +655,17 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	public AbstractGuiseSession(final GuiseApplication application)
 	{
 		this.application=application;	//save the Guise instance
+		final DocumentBuilderFactory documentBuilderFactory=DocumentBuilderFactory.newInstance();	//create a document builder factory
+		documentBuilderFactory.setNamespaceAware(true);	//we must be aware of namespaces to work with RDF
+		try
+		{
+			documentBuilder=documentBuilderFactory.newDocumentBuilder();	//create a new document builder
+		}
+		catch(final ParserConfigurationException parserConfigurationException)	//if we can't find an XML parser
+		{
+			throw new AssertionError(parserConfigurationException);
+		}	
+		guiseRDFProcessor=new GuiseRDFProcessor(this);	//create a new Guise RDF processor, which is thread-safe
 		this.environment=new DefaultGuiseEnvironment();	//create a default environment
 		this.locale=application.getDefaultLocale();	//default to the application locale
 		this.orientation=Orientation.getOrientation(locale);	//set the orientation default based upon the locale
@@ -638,6 +676,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	/**Retrieves the panel bound to the given appplication context-relative path.
 	If a panel has already been created and cached, it will be be returned; otherwise, one will be created and cached. 
 	The panel will be given an ID of a modified form of the path.
+	This class synchronizes on {@link #navigationPathPanelMap}.
 	@param path The appplication context-relative path within the Guise container context.
 	@return The panel bound to the given path, or <code>null</code> if no panel is bound to the given path.
 	@exception NullPointerException if the path is <code>null</code>.
@@ -659,42 +698,123 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 				final Class<? extends NavigationPanel> panelClass=getApplication().getNavigationPanelClass(path);	//see which panel we should show for this path
 				if(panelClass!=null)	//if we found a panel class for this path
 				{
-					try
-					{
-						try
-						{
-//TODO del Debug.trace("***ready to create navigation panel for path", path);
-							final String panelID=createName(path);	//convert the path to a valid ID TODO use a Guise-specific routine or, better yet, bind an ID with the panel
-							panel=panelClass.getConstructor(GuiseSession.class, String.class).newInstance(this, panelID);	//find the Guise session and ID constructor and create an instance of the class
-						}
-						catch(final NoSuchMethodException noSuchMethodException)	//if there was no Guise session and string ID constructor
-						{
-							panel=panelClass.getConstructor(GuiseSession.class).newInstance(this);	//use the Guise session constructor if there is one					
-						}
-						navigationPathPanelMap.put(path, panel);	//bind the panel to the path, caching it for next time
-					}
-					catch(final NoSuchMethodException noSuchMethodException)	//if the constructor could not be found
-					{
-						throw new IllegalStateException(noSuchMethodException);
-					}
-					catch(final IllegalAccessException illegalAccessException)	//if the constructor is not visible
-					{
-						throw new IllegalStateException(illegalAccessException);
-					}
-					catch(final InstantiationException instantiationException)	//if the class is an interface or is abstract
-					{
-						throw new IllegalStateException(instantiationException);
-					}
-					catch(final InvocationTargetException invocationTargetException)	//if the constructor throws an exception
-					{
-						throw new IllegalStateException(invocationTargetException);
-					}
+					final String panelID=XMLUtilities.createName(path);	//convert the path to a valid ID TODO use a Guise-specific routine or, better yet, bind an ID with the panel
+					panel=createNavigationPanel(panelClass, panelID);	//create the panel
+					navigationPathPanelMap.put(path, panel);	//bind the panel to the path, caching it for next time
 				}
 			}
 		}
 		return panel;	//return the panel, or null if we couldn't find a panel
 	}
 
+	/**Creates the panel for the given class.
+	This class synchronizes on {@link #navigationPathPanelMap}.
+	@param panelClass The class representing the panel to create.
+	@param panelID The ID to assign to the panel.
+	@return The created panel.
+	@exception IllegalStateException if the panel class does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
+	*/
+	protected NavigationPanel<?> createNavigationPanel(final Class<? extends NavigationPanel> panelClass, final String panelID)
+	{
+		NavigationPanel panel;	//we'll store the panel here
+		try
+		{
+			try
+			{
+//TODO del Debug.trace("***ready to create navigation panel for path", path);
+				panel=panelClass.getConstructor(GuiseSession.class, String.class).newInstance(this, panelID);	//find the Guise session and ID constructor and create an instance of the class
+			}
+			catch(final NoSuchMethodException noSuchMethodException)	//if there was no Guise session and string ID constructor
+			{
+				panel=panelClass.getConstructor(GuiseSession.class).newInstance(this);	//use the Guise session constructor if there is one					
+			}
+		}
+		catch(final NoSuchMethodException noSuchMethodException)	//if the constructor could not be found
+		{
+			throw new IllegalStateException(noSuchMethodException);
+		}
+		catch(final IllegalAccessException illegalAccessException)	//if the constructor is not visible
+		{
+			throw new IllegalStateException(illegalAccessException);
+		}
+		catch(final InstantiationException instantiationException)	//if the class is an interface or is abstract
+		{
+			throw new IllegalStateException(instantiationException);
+		}
+		catch(final InvocationTargetException invocationTargetException)	//if the constructor throws an exception
+		{
+			throw new IllegalStateException(invocationTargetException);
+		}
+		final String descriptionFilename=addExtension(getLocalName(panelClass), RDF_EXTENSION);	//create a name in the form ClassName.rdf
+		//TODO del Debug.trace("Trying to load description file:", descriptionFilename);
+		final InputStream descriptionInputStream=panelClass.getResourceAsStream(descriptionFilename);	//get an input stream to the description file
+		if(descriptionInputStream!=null)	//if we have a description file
+		{
+			try
+			{
+				try
+				{
+					synchronized(navigationPathPanelMap)	//we should already be synchronized on this class by the caller; show it here for completeness, because the document builder is not thread-safe
+					{
+						final URI BASE_URI=URI.create("guise:/");	//TODO fix
+						final URI GUISE_COMPONENT_NAMESPACE_URI=URI.create("java:com.javaguise.component.");	//TODO fix; use constant
+						final Document document=getDocumentBuilder().parse(descriptionInputStream);	//parse the description document
+				//TODO del Debug.trace("just parsed XML:", XMLUtilities.toString(document));
+						final RDFXMLProcessor rdfProcessor=new RDFXMLProcessor();
+						final RDF rdf=rdfProcessor.processRDF(document, BASE_URI);
+						//integrate the structure into the RDF
+	//TODO del					Debug.trace("just read RDF", RDFUtilities.toString(rdf));
+						final RDFResource navigationPanelResource=RDFUtilities.getResourceByType(rdf, GUISE_COMPONENT_NAMESPACE_URI, "DefaultNavigationPanel");	//TODO fix better to indicate type; use constant
+						if(navigationPanelResource!=null)	//if we found a description for the navigation panel
+						{
+Debug.trace("ready to construct panel with resource", navigationPanelResource);
+							getGuiseRDFProcessor().initializeObject(panel, navigationPanelResource);
+							panel.initialize();	//initialize the panel
+						}
+					}
+				}
+				finally
+				{
+					descriptionInputStream.close();	//always close the description input stream for good measure
+				}
+			}
+			catch(final SAXException saxException)	//we don't expect parsing errors
+			{
+				throw new AssertionError(saxException);	//TODO maybe change to throwing an IOException
+			}
+			catch(final URISyntaxException uriSyntaxException)
+			{
+				throw new AssertionError(uriSyntaxException);	//TODO fix better
+			}
+			catch(final IOException ioException)	//if there is an I/O exception
+			{
+				throw new AssertionError(ioException);	//TODO fix better
+			}		
+			catch(final ClassNotFoundException classNotFoundTargetException)
+			{
+				throw new AssertionError(classNotFoundTargetException);	//TODO fix better
+			}		
+			catch(final InvocationTargetException invocationTargetException)
+			{
+				throw new AssertionError(invocationTargetException);	//TODO fix better
+			}
+		}		
+		return panel;	//return the panel
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	/**Releases the panel bound to the given appplication context-relative path.
 	@param path The appplication context-relative path within the Guise container context.
 	@return The panel previously bound to the given path, or <code>null</code> if no panel was bound to the given path.

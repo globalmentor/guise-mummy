@@ -303,6 +303,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 							try
 							{
 								final Class<?> specifiedClass=Class.forName(className);	//load the class for the specified name
+
+								
 //TODO bring back for JDK 5 when backwards-compatibility isn't needed								final Class<? extends NavigationPanel> navigationFrameClass=specifiedClass.asSubclass(Frame.class);	//cast the specified class to a frame class just to make sure it's the correct type
 								final Class<? extends DefaultNavigationPanel> navigationPanelClass=(Class<? extends DefaultNavigationPanel>)specifiedClass;	//cast the specified class to a panel class just to make sure it's the correct type
 								guiseApplication.bindNavigationPanel(path, navigationPanelClass);	//cast the class to a panel class and bind it to the path in the Guise application

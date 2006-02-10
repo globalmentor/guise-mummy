@@ -9,7 +9,7 @@ import com.javaguise.model.Model;
 /**An abstract implementation of a composite component that can contain a single component.
 @author Garret Wilson
 */
-public abstract class AbstractSingleCompositeComponent<C extends CompositeComponent<C>> extends AbstractCompositeComponent<C>
+public abstract class AbstractSingleCompositeComponent<C extends CompositeComponent<C>> extends AbstractCompositeComponent<C>	//TODO del class if we don't need
 {
 
 

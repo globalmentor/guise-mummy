@@ -15,7 +15,7 @@ public abstract class AbstractMultipleCompositeComponent<C extends CompositeComp
 {
 
 	/**The map of components keyed to IDs.*/
-	private final Map<String, Component<?>> idComponentMap=new ConcurrentHashMap<String, Component<?>>();
+	private final Map<String, Component<?>> idComponentMap=new ConcurrentHashMap<String, Component<?>>();	//TODO perhaps remove; the speed may not be sufficient to outweigh the overhead; this is only a single-level search, anyway
 
 	/**@return Whether this component has children.*/
 	public boolean hasChildren() {return !idComponentMap.isEmpty();}
@@ -49,7 +49,7 @@ public abstract class AbstractMultipleCompositeComponent<C extends CompositeComp
 	@param id The ID of the component to return.
 	@return The child component with the given ID, or <code>null</code> if there is no child component with the given ID. 
 	*/
-	public Component<?> getComponent(final String id)
+	public Component<?> getComponent(final String id)	//TODO perhaps remove; the speed may not be sufficient to outweigh the overhead; this is only a single-level search, anyway
 	{
 		return idComponentMap.get(id);	//return the component with the given ID
 	}

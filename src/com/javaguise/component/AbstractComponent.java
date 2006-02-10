@@ -71,6 +71,27 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			}			
 		}
 */
+	
+	/**The name of the component, not guaranteed to be unique and useful only for searching for components within a component sub-hierarchy, or <code>null</code> if the component has no name.*/
+	private String name=null;
+
+		/**@return The name of the component, not guaranteed to be unique and useful only for searching for components within a component sub-hierarchy, or <code>null</code> if the component has no name.*/
+		public String getName() {return name;}
+
+		/**Sets the name of the component.
+		This is a bound property.
+		@param newName The new name of the component, or <code>null</code> if the component should have no name.
+		@see Component#NAME_PROPERTY 
+		*/
+		public void setName(final String newName)
+		{
+			if(!ObjectUtilities.equals(name, newName))	//if the value is really changing
+			{
+				final String oldName=name;	//get the old value
+				name=newName;	//actually change the value
+				firePropertyChange(NAME_PROPERTY, oldName, newName);	//indicate that the value changed
+			}			
+		}
 
 	/**The background color of the component, or <code>null</code> if no background color is specified for this component.*/
 	private Color<?> backgroundColor=null;
@@ -829,6 +850,13 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		assert CORNER_ARC_SIZE_PROPERTIES.length==corneArcSizes.length : "Number of available corners changed.";
 	}
 
+	/**Initializes the component after construction.
+	This implementation does nothing.
+	*/
+	public void initialize()
+	{
+	}
+
 	/**Determines whether the models of this component and all of its child components are valid.
 	This version checks to ensure the component's model is valid.
 	@return Whether the models of this component and all of its child components are valid.
@@ -986,6 +1014,31 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 			for(final Component<?> childComponent:(CompositeComponent<?>)component)	//for each child component
 			{
 				final Component<?> matchingComponent=getComponentByID(childComponent, id);	//see if we can find a component in this tree
+				if(matchingComponent!=null)	//if we found a matching component
+				{
+					return matchingComponent;	//return the matching component
+				}
+			}
+		}
+		return null;
+	}
+
+	/**Retrieves a component with the given name.
+	This method checks the given component and all descendant components.
+	@param component The component that should be checked, along with its descendants, for the given name.
+	@return The first component with the given ID, or <code>null</code> if this component and all descendant components do not have the given name. 
+	*/
+	public static Component<?> getComponentByName(final Component<?> component, final String name)
+	{
+		if(name.equals(component.getName()))	//if this component has the correct name
+		{
+			return component;	//return this component
+		}
+		else if(component instanceof CompositeComponent)	//if this component doesn't have the correct name, but it is a composite component
+		{
+			for(final Component<?> childComponent:(CompositeComponent<?>)component)	//for each child component
+			{
+				final Component<?> matchingComponent=getComponentByName(childComponent, name);	//see if we can find a component in this tree
 				if(matchingComponent!=null)	//if we found a matching component
 				{
 					return matchingComponent;	//return the matching component

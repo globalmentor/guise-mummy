@@ -63,6 +63,8 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	public final static String FLYOVER_ENABLED_PROPERTY=getPropertyName(Component.class, "flyoverEnabled");
 	/**The bound property of the strategy controlling flyovers.*/
 	public final static String FLYOVER_STRATEGY_PROPERTY=getPropertyName(Component.class, "flyoverStrategy");
+	/**The bound property of the component name.*/
+	public final static String NAME_PROPERTY=getPropertyName(Component.class, "name");
 	/**The bound property of whether the component has tooltips enabled.*/
 	public final static String TOOLTIP_ENABLED_PROPERTY=getPropertyName(Component.class, "tooltipEnabled");
 	/**The bound property of the model.*/
@@ -90,6 +92,16 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 
 	/**@return The data model used by this component.*/
 	public Model getModel();
+
+	/**@return The name of the component, not guaranteed to be unique and useful only for searching for components within a component sub-hierarchy, or <code>null</code> if the component has no name.*/
+	public String getName();
+
+	/**Sets the name of the component.
+	This is a bound property.
+	@param newName The new name of the component, or <code>null</code> if the component should have no name.
+	@see #NAME_PROPERTY 
+	*/
+	public void setName(final String newName);
 
 	/**@return The background color of the component, or <code>null</code> if no background color is specified for this component.*/
 	public Color<?> getBackgroundColor();
@@ -397,6 +409,9 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@return <code>true</code> if the given object was be imported.
 	*/
 	public boolean importTransfer(final Transferable transferable);
+
+	/**Initializes the component after construction.*/
+	public void initialize();
 
 	/**@return Whether the models of this component and all of its child components are valid.*/
 	public boolean isValid();
