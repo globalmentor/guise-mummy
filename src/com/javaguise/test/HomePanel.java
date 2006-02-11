@@ -209,6 +209,11 @@ Debug.trace("list control changed value to", newValue);
 		flash.setPreferredHeight(new Extent(474));
 		contentPanel.add(flash);
 */
+    final ImageSelectActionControl imageAction=new ImageSelectActionControl(session);
+    imageAction.setImage(URI.create("http://www.garretwilson.com/photos/2000/february/cowcalf.jpg"));
+    imageAction.setRolloverImage(URI.create("slider-thumb.gif"));
+    contentPanel.add(imageAction);
+
 
 		final Text testText=new Text(session);
 		testText.getModel().setTextContentType(TextModel.XHTML_FRAGMENT_CONTENT_TYPE);

@@ -1,11 +1,18 @@
 package com.javaguise.platform.web;
 
+import java.net.URI;
+
 /**Constant values for the Guise web platform.
 @author Garret Wilson
 */
 public class WebPlatformConstants
 {
 
+	/**The namespace of the Guise markup language to be used with XHTML.*/
+	public final static URI GUISE_ML_NAMESPACE_URI=URI.create("http://guiseframework.com/id/ml#");
+	/**The standard prefix to use with the Guise markup language namespace.*/
+	public final static String GUISE_ML_NAMESPACE_PREFIX="guise";
+	
 	/**The base path for serving Guise resources.*/
 	public final static String GUISE_PUBLIC_RESOURCE_BASE_PATH="/guise/";
 

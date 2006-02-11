@@ -67,6 +67,9 @@ var isSafari=navigator.userAgent.indexOf("Safari")>=0;	//TODO use a better varia
 /**The URI of the XHTML namespace.*/
 var XHTML_NAMESPACE_URI="http://www.w3.org/1999/xhtml";
 
+/**The URI of the GuiseML namespace.*/
+//TODO use var GUISE_ML_NAMESPACE_URI="http://guiseframework.com/id/ml#";
+
 /**The class prefix of a menu.*/
 //TODO del when works var MENU_CLASS_PREFIX="menu-";
 
@@ -2876,6 +2879,20 @@ function initializeNode(node)
 							}
 //TODO del alert("found menu class: "+elementClassName);
 						}
+						break;
+					case "img":
+/*TODO fix
+						if(node.getAttribute("guise:rolloverSrc")!=null)	//TODO fix; testing
+						{
+							alert("rollover source: "+node.getAttribute("guise:rolloverSrc"));
+						}
+*/
+/*TODO fix
+						case STYLES.MOUSE_LISTENER:
+							eventManager.addEvent(node, "mouseover", onMouse, false);	//listen for mouse over on a mouse listener
+							eventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener
+							break;
+*/
 						break;
 					case "input":
 						switch(node.type)	//get the type of input
