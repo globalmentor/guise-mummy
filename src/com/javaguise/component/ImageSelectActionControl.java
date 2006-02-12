@@ -25,6 +25,10 @@ public class ImageSelectActionControl extends AbstractSelectActionControl<ImageS
 	public final static String ROLLOVER_IMAGE_PROPERTY=getPropertyName(ImageSelectActionControl.class, "rolloverImage");
 	/**The rollover image resource key bound property.*/
 	public final static String ROLLOVER_IMAGE_RESOURCE_KEY_PROPERTY=getPropertyName(ImageSelectActionControl.class, "rolloverImageResourceKey");
+	/**The selected image bound property.*/
+	public final static String SELECTED_IMAGE_PROPERTY=getPropertyName(ImageSelectActionControl.class, "selectedImage");
+	/**The selected image resource key bound property.*/
+	public final static String SELECTED_IMAGE_RESOURCE_KEY_PROPERTY=getPropertyName(ImageSelectActionControl.class, "selectedImageResourceKey");
 
 	/**The image URI, or <code>null</code> if there is no image URI.*/
 	private URI image=null;
@@ -123,6 +127,56 @@ public class ImageSelectActionControl extends AbstractSelectActionControl<ImageS
 				final String oldRolloverImageResourceKey=rolloverImageResourceKey;	//get the old value
 				rolloverImageResourceKey=newRolloverImageResourceKey;	//actually change the value
 				firePropertyChange(ROLLOVER_IMAGE_RESOURCE_KEY_PROPERTY, oldRolloverImageResourceKey, newRolloverImageResourceKey);	//indicate that the value changed
+			}
+		}
+
+	/**The selected image URI, or <code>null</code> if there is no selected image URI.*/
+	private URI selectedImage=null;
+
+		/**Determines the URI of the selected image.
+		If an image is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
+		@return The selected image URI, or <code>null</code> if there is no selected image URI.
+		@exception MissingResourceException if there was an error loading the value from the resources.
+		@see #getSelectedImageResourceKey()
+		*/
+		public URI getSelectedImage() throws MissingResourceException
+		{
+			return getSession().determineURI(selectedImage, getSelectedImageResourceKey());	//get the value or the resource, if available
+		}
+
+		/**Sets the URI of the selected image.
+		This is a bound property of type <code>URI</code>.
+		@param newSelectedImage The new URI of the selected image.
+		@see #SELECTED_IMAGE_PROPERTY
+		*/
+		public void setSelectedImage(final URI newSelectedImage)
+		{
+			if(!ObjectUtilities.equals(selectedImage, newSelectedImage))	//if the value is really changing
+			{
+				final URI oldSelectedImage=image;	//get the old value
+				selectedImage=newSelectedImage;	//actually change the value
+				firePropertyChange(SELECTED_IMAGE_PROPERTY, oldSelectedImage, newSelectedImage);	//indicate that the value changed
+			}			
+		}
+
+	/**The selected image URI resource key, or <code>null</code> if there is no selected image URI resource specified.*/
+	private String selectedImageResourceKey=null;
+
+		/**@return The selected image URI resource key, or <code>null</code> if there is no selected image URI resource specified.*/
+		public String getSelectedImageResourceKey() {return selectedImageResourceKey;}
+
+		/**Sets the key identifying the URI of the selected image in the resources.
+		This is a bound property.
+		@param newSelectedImageResourceKey The new selected image URI resource key.
+		@see #SELECTED_IMAGE_RESOURCE_KEY_PROPERTY
+		*/
+		public void setSelectedImageResourceKey(final String newSelectedImageResourceKey)
+		{
+			if(!ObjectUtilities.equals(selectedImageResourceKey, newSelectedImageResourceKey))	//if the value is really changing
+			{
+				final String oldSelectedImageResourceKey=selectedImageResourceKey;	//get the old value
+				selectedImageResourceKey=newSelectedImageResourceKey;	//actually change the value
+				firePropertyChange(SELECTED_IMAGE_RESOURCE_KEY_PROPERTY, oldSelectedImageResourceKey, newSelectedImageResourceKey);	//indicate that the value changed
 			}
 		}
 

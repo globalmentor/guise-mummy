@@ -113,253 +113,6 @@ var STYLES=
 	FRAME_TETHER: "frame-tether"
 };
 
-/**The array of drop targets, determined when the document is loaded. The drop targets are stored in increasing order of hierarchical depth.*/
-var dropTargets=new Array();
-
-/**The array of frame elements.*/
-var guiseFrames=new Array();
-
-/**Adds a frame to the array.
-This version adds the frame to the document, initializes the frame, and updates the modal state.
-@param frame The frame to add.
-*/
-guiseFrames.add=function(frame)
-{
-//TODO fix so that it works both on IE and Firefox							oldElement.style.position="fixed";	//TODO testing
-	frame.style.position="absolute";	//change the element's position to absolute; it should already be set like this, but set it specifically so that dragging will know not to drag a copy TODO update the element's initial position
-
-	frame.style.visibility="hidden";	//TODO testing
-	frame.style.left="-9999px";	//TODO testing; this works; maybe even remove the visibility changing
-	frame.style.top="-9999px";	//TODO testing
-
-	document.body.appendChild(frame);	//add the frame element to the document; do this first, because IE doesn't allow the style to be accessed directly with imported nodes until they are added to the document
-	initializeNode(frame);	//initialize the new imported frame, installing the correct event handlers; do this before the frame is positioned, because initialization also fixes IE6 classes, which can affect position
-	this._initializePosition(frame);	//initialize the frame's position
-
-
-	var openEffectClassName=getClassName(frame, STYLES.OPEN_EFFECT_REGEXP);	//get the open effect specified for this frame
-	var openEffect=null;	//we'll create an open effect if appropriate
-	if(openEffectClassName)	//if there is an open effect
-	{
-		var effectNameMatch=/^openEffect-([\w]+)/.exec(openEffectClassName);	//search for the effect name TODO use a constant
-		var effectName=effectNameMatch && effectNameMatch.length==2 ? effectNameMatch[1] : null;	//retrieve the effect name
-		var delayMatch=/delay-([\d]+)/.exec(openEffectClassName);	//search for the delay amount TODO use a constant
-		var delay=delayMatch && delayMatch.length==2 ? (parseInt(delayMatch[1]) || 0) : 0;	//retrieve the delay amount, compensating for parse errors and defaulting to zero
-//TODO del alert("effect: "+effectName+" delay: "+delay);	
-		switch(effectName)	//see which effect name this is
-		{
-			case "DelayEffect":	//if this is a simple delay effect TODO use a constant
-				openEffect=new DelayEffect(frame, delay);	//create a delay effect
-				break;
-			case "OpacityFadeEffect":	//if this is an opacity fade effect TODO use a constant
-				openEffect=new OpacityFadeEffect(frame, delay);	//create an opacity fade effect
-				break;
-		}
-	}
-	if(openEffect)	//if we have an open effect
-	{
-		openEffect.effectBegin=function(){frame.style.visibility="visible";};	//TODO testing
-		openEffect.start();
-	}
-	else	//if there is no open effect
-	{
-		frame.style.visibility="visible";	//go ahead and make the frame visible
-	}
-
-//TODO del; moved to updateModal()	frame.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components TODO fix
-	updateComponents(frame);	//update all the components within the frame
-	Array.prototype.add.call(this, frame);	//do the default adding to the array
-	this.updateModal();	//update the modal state
-	var focusable=getFocusableDescendant(frame);	//see if this frame has a node that can be focused
-	if(focusable)	//if we found a focusable node
-	{
-		try
-		{
-			focusable.focus();	//focus on the node
-		}
-		catch(e)	//TODO fix
-		{
-			alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" visibility: "+focusable.style.visibility+" display: "+focusable.style.display+" disabled: "+focusable.style.disabled);
-/*TODO fix
-			alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" visibility: "+focusable.style.visibility+" display: "+focusable.style.display+" disabled: "+focusable.style.disabled);
-			alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" current visibility: "+focusable.currentStyle.visibility+" current display: "+focusable.currentStyle.display+" current disabled: "+focusable.currentStyle.disabled);
-			alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" runtime visibility: "+focusable.runtimeStyle.visibility+" runtime display: "+focusable.runtimeStyle.display+" runtime disabled: "+focusable.runtimeStyle.disabled);
-			alert("error trying to focus element great-grandparent: "+DOMUtilities.getNodeString(focusable.parentNode.parentNode.parentNode));
-*/
-		}
-	}
-//TODO del	debug(DOMUtilities.getNodeString(frame));
-};
-
-/**Initializes the position of the frame.
-@param frame The frame to position.
-*/
-guiseFrames._initializePosition=function(frame)
-{
-//TODO del var debugString="";
-//TODO del	var framePosition=new Point();	//we'll calculate the frame position; create an object rather than using primitives so that the internal function can access its variables via closure
-	var frameX, frameY;	//we'll calculate the frame position
-	var relatedComponentID=getInputParameter(frame, "relatedComponentID");	//get the related component ID, if any TODO use a constant
-	var relatedComponent=relatedComponentID ? document.getElementById(relatedComponentID) : null;	//get the related component, if there is one
-	if(relatedComponent)	//if there is a related component
-	{
-//TODO del alert("found related component: "+relatedComponentID);
-		var frameBounds=getElementBounds(frame);	//get the bounds of the frame
-//TODO del debugString+="frameBounds: "+frameBounds.x+","+frameBounds.y+","+frameBounds.width+","+frameBounds.height+"\n";
-		var relatedComponentBounds=getElementBounds(relatedComponent);	//get the bounds of the related component
-//TODO del debugString+="relatedComponentBounds: "+relatedComponentBounds.x+","+relatedComponentBounds.y+","+relatedComponentBounds.width+","+relatedComponentBounds.height+"\n";
-		var tether=getDescendantElementByClassName(frame, STYLES.FRAME_TETHER);	//get the frame tether, if there is one
-		if(tether)	//if there is a frame tether
-		{
-			var positionTether=function()	//create a function to position relative to the tether
-					{
-			//TODO del alert("found tether: "+tether.id);
-						var tetherBounds=getElementBounds(tether);	//get the bounds of the tether
-			//TODO del debugString+="tetherBounds: "+tetherBounds.x+","+tetherBounds.y+","+tetherBounds.width+","+tetherBounds.height+"\n";
-						var tetherX, tetherY, relatedComponentX, relatedComponentY;	//get the relevant tether anchor point and the relevant component point
-						if(tetherBounds.x<=frameBounds.x+8)	//if the tether is on the left side (use an arbitrary amount to account for variations in browser position calculations) TODO compare centers, which will be more accurate
-						{
-			//TODO del alert("tether left");
-							tetherX=tetherBounds.x;	//use the left side of the tether
-							relatedComponentX=relatedComponentBounds.x+relatedComponentBounds.width;	//use the right side of the component
-						}
-						else	//if the tether is on the right side
-						{
-			//TODO del alert("tether right");
-							tetherX=tetherBounds.x+tetherBounds.width;	//use the right side of the tether
-							relatedComponentX=relatedComponentBounds.x;	//use the left side of the component
-						}
-						if(tetherBounds.y<=frameBounds.y+8)	//if the tether is on the top (use an arbitrary amount to account for variations in browser position calculations)
-						{
-			//TODO del alert("tether top");
-							tetherY=tetherBounds.y;	//use the top of the tether
-							relatedComponentY=relatedComponentBounds.y+relatedComponentBounds.height;	//use the bottom of the component
-						}
-						else	//if the tether is on the bottom
-						{
-			//TODO del alert("tether bottom");
-							tetherY=tetherBounds.y+tetherBounds.height;	//use the bottom of the tether
-							relatedComponentY=relatedComponentBounds.y;	//use the top of the component
-						}
-			//TODO del alert("tetherX: "+tetherX);
-			//TODO del alert("tetherY: "+tetherY);
-			//TODO del alert("relatedComponentX: "+relatedComponentX);
-			//TODO del alert("relatedComponentY: "+relatedComponentY);
-						var tetherDeltaX=tetherX-frameBounds.x;	//find the horizontal delta of the tether from the frame
-			//TODO del alert("tetherDeltaX: "+tetherDeltaX);
-						var tetherDeltaY=tetherY-frameBounds.y;	//find the vertical delta of the tether from the frame
-			//TODO del alert("tetherDeltaY: "+tetherDeltaY);
-						frameX=relatedComponentX-tetherDeltaX;	//position the frame tether horizontally on the related component
-			//TODO del alert("frameX: "+frameX);
-						frameY=relatedComponentY-tetherDeltaY;	//position the frame tether vertically on the related component
-			//TODO del alert("frameY: "+frameY);
-			//TODO del debugString+="frame pos: "+frameX+","+frameY+"\n";
-			//TODO del alert(debugString);
-						frame.style.left=frameX+"px";	//set the frame's horizontal position
-						frame.style.top=frameY+"px";	//set the frame's vertical position
-					};
-			var tetherIMG=getDescendantElementByName(tether, "img");	//see if the tether has an image TODO use a constant
-			if(tetherIMG && (tetherIMG.offsetWidth<=0 || tetherIMG.offsetHeight<=0))	//if there is a tether image with an invalid width and/or height
-			{
-//TODO del alert("tether image: "+tetherIMG.src+" not yet loaded; size "+tetherIMG.offsetWidth+","+tetherIMG.offsetHeight);
-				DOMUtilities.waitIMGLoaded(tetherIMG, positionTether);	//make sure the image is loaded before positioning on the tether
-			}
-			else	//if there is no tether image, or we already know its image size
-			{
-				positionTether();	//position on the tether without waiting for an image
-			}
-		}
-		else
-		{
-			var viewportBounds=getViewportBounds();	//get the bounds of the viewport so that we can center the frame
-			if(relatedComponentBounds.x<viewportBounds.x+(viewportBounds.width/2))	//if the related component is on the left half of the screen
-			{
-				frameX=relatedComponentBounds.x+relatedComponentBounds.width;	//put the frame on the right side
-			}
-			else	//if the related component is on the right half side of the screen
-			{
-				frameX=relatedComponentBounds.x-frameBounds.width;	//put the frame on the left side
-			}
-			if(relatedComponentBounds.y<viewportBounds.y+(viewportBounds.height/2))	//if the related component is on the top half of the screen
-			{
-				frameY=relatedComponentBounds.y+relatedComponentBounds.height;	//put the frame on the bottom side
-			}
-			else	//if the related component is on the bottom half side of the screen
-			{
-				frameY=relatedComponentBounds.y-frameBounds.height;	//put the frame on the top side
-			}
-			frame.style.left=frameX+"px";	//set the frame's horizontal position
-			frame.style.top=frameY+"px";	//set the frame's vertical position
-		}
-	}
-	else	//if this frame is not related to another component, center it
-	{
-		var viewportBounds=getViewportBounds();	//get the bounds of the viewport so that we can center the frame
-		frameX=viewportBounds.x+((viewportBounds.width-frame.offsetWidth)/2);	//center the frame horizontally
-		frameY=viewportBounds.y+((viewportBounds.height-frame.offsetHeight)/2);	//center the frame vertically
-		frame.style.left=frameX+"px";	//set the frame's horizontal position
-		frame.style.top=frameY+"px";	//set the frame's vertical position
-	}
-
-};
-
-/**Removes a frame from the array.
-This version removes the frame to the document, uninitializes the frame, and updates the modal state.
-@param frame The frame to remove.
-*/
-guiseFrames.remove=function(frame)
-{
-	var index=this.indexOf(frame);	//get the frame index
-	if(index>=0)	//if we know the index of the frame
-	{
-		Array.prototype.remove.call(this, index);	//do the default removal from the array
-		uninitializeNode(frame);	//uninitialize the frame tree
-		document.body.removeChild(frame);	//remove the frame element to the document
-		this.updateModal();	//update the modal state
-	}
-};
-
-/**The current modal frame, or null if there is no modal frame.*/
-guiseFrames.modalFrame=null;
-
-/**Updates the modal layer and current modal frame.
-Each frame is given a z-order in the order of frames, starting with a z-order of 100 and incrementing by 100.
-The page is assumed to have a z-order of 0.
-*/
-guiseFrames.updateModal=function()
-{
-	var frameCount=this.length;	//find out how many frames there are
-	this.modalFrame=null;	//start out presuming there is no modal frame
-	for(var i=0; i<frameCount; ++i)	//update the z-orders
-	{
-		var frame=this[i];	//get a reference to this frame
-		frame.style.zIndex=(i+1)*100;	//give the element the appropriate z-order
-		if(hasClassName(frame, "frameModal"))	//if this is a modal frame TODO use a constant
-		{
-			this.modalFrame=frame;	//indicate our last modal frame
-		}
-	}
-	if(this.modalFrame!=null)	//if there is a modal frame
-	{
-		updateModalLayer();	//always update the modal layer before it is shown, as IE may not always call resize to keep the modal layer updated
-		modalLayer.style.zIndex=this.modalFrame.style.zIndex-1;	//place the modal layer directly behind the modal frame
-		modalLayer.style.display="block";	//make the modal layer visible
-		if(modalIFrame)	//if we have a modal IFrame
-		{
-			modalIFrame.style.zIndex=modalLayer.style.zIndex-1;	//place the modal iframe directly behind the modal layer
-			modalIFrame.style.display="block";	//make the modal IFrame visible
-		}
-	}
-	else	//if there is no modal frame
-	{
-		modalLayer.style.display="none";	//hide the modal layer
-		if(modalIFrame)	//if we have a modal IFrame
-		{
-			modalIFrame.style.display="none";	//hide the modal iframe
-		}
-	}
-}
-
 //Array
 
 /**An add() method for arrays, equivalent to Array.push().*/
@@ -496,19 +249,33 @@ if(isSafari || (typeof document.importNode=="undefined"))	//if the document does
 	document.importNode=function(node, deep)	//create a function to manually import a node
 	{
 		var importedNode=null;	//we'll create a new node and store it here
-		
-		if(/*TODO bring back if doesn't work in IE isSafari && */deep	//if we should do a deep import, resort immediately to using innerHTML and a dummy node because of all the IE errors---and the Safari errors that make importing from walking the tree almost impossible		
-				&& node.nodeType!=Node.TEXT_NODE)	//Safari seems to break when using innerHTML to import a text node of length 1---it's probably better to use the DOM to import text, anyway
+
+		var nodeType=node.nodeType;	//get the type of the node
+		if(/*TODO bring back if doesn't work in IE isSafari && */deep	//if we should do a deep import, resort immediately to using innerHTML and a dummy node because of all the IE errors---and the Safari errors that make importing from walking the tree almost impossible
+				&& nodeType!=Node.TEXT_NODE)	//Safari seems to break when using innerHTML to import a text node of length 1---it's probably better to use the DOM to import text, anyway
 		{
 //TODO del							alert("big problem importing node: "+DOMUtilities.getNodeString(childNode));	//TODO fix importnode
+			var elementName=nodeType==Node.ELEMENT_NODE ? node.nodeName.toLowerCase() : null;	//get the name of the node to be imported, if it is an element
 			var dummyNode=document.createElement("div");	//create a dummy node
+			var nodeString=DOMUtilities.getNodeString(node);	//convert the child node to a string
+			if(elementName=="tr")	//if this is a table row
+			{
+				dummyNode.innerHTML="<table><tbody>"+nodeString+"</tbody></table>";	//create the tbody and put the row inside it
+				importedNode=dummyNode.childNodes[0].childNodes[0].childNodes[0];	//return the tbody's first and only node, which is our new imported node; do not actually remove the node, which will cause an error on IE TODO see the failure to remove the node causes any long-term problems
+			}
+			else	//if this is not a table row
+			{
 //TODO fix							document.documentElement.appendChild(dummyNode);	//append the dummy node to the document
-			dummyNode.innerHTML=DOMUtilities.getNodeString(node);	//convert the child node to a string and assign it to the dummy node
-			importedNode=dummyNode.removeChild(dummyNode.childNodes[0]);	//remove the dummy node's first and only node, which is our new imported node
-//TODO fix							document.documentElement.removeChild(dummyNode);	//throw away the dummy node
+				dummyNode.innerHTML=nodeString;	//assign the string version of the node to the dummy node
+				if(dummyNode.childNodes.length!=1)	//we expect a single child node at the end of the operation
+				{
+					alert("Error importing node: "+nodeString);	//TODO assert
+					alert("Imported: "+dummyNode.innerHTML);
+				}
+				importedNode=dummyNode.removeChild(dummyNode.childNodes[0]);	//remove the dummy node's first and only node, which is our new imported node
+			}
 			return importedNode;
 		}
-
 		
 		switch(node.nodeType)	//see which type of child node this is
 		{
@@ -924,6 +691,22 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 			uninitializeNode(childNode);	//uninitialize the node tree
 			node.removeChild(childNode);	//remove the last node
 		}
+	},
+
+	/**Determines the document tree depth of the given element, returning a zero-level depth for the document node.
+	@param element The element for which a depth should be found.
+	@return The zero-based depth of the given element in the document, with a zero-level depth for the document node.
+	*/
+	getElementDepth:function(element)
+	{
+		var depth=-1;	//this element will be at least depth zero
+		do
+		{
+			element=element.parentNode;	//get the parent node
+			++depth;	//increase the depth
+		}
+		while(element);	//keep getting the parent node while there are ancestors left
+		return depth;	//return the depth we calculated
 	},
 
 	/**Retrieves the HTML attribute name from the DOM attribute name.
@@ -1815,7 +1598,7 @@ alert(exception);
 //TODO fix alert("ready to import frame node");
 							oldElement=document.importNode(childNode, true);	//create an import clone of the node
 //TODO del alert("ready to add frame: "+typeof oldElement);
-							guiseFrames.add(oldElement);	//add this frame
+							guise.addFrame(oldElement);	//add this frame
 //TODO fix alert("frame added");
 						}
 					}
@@ -1843,11 +1626,11 @@ alert(exception);
 				if(oldElement!=null)	//if we found the old element
 				{
 //TODO del alert("we found the old element");
-					if(guiseFrames.contains(oldElement))	//if we're removing a frame
+					if(guise.frames.contains(oldElement))	//if we're removing a frame
 					{
 //TODO fix alert("removing frame "+id);
 //TODO del alert("it's a frame");
-						guiseFrames.remove(oldElement);	//remove the frame
+						guise.removeFrame(oldElement);	//remove the frame
 					}
 					else	//if we're removing any other node
 					{
@@ -1901,7 +1684,8 @@ alert(exception);
 				if(element.getAttribute(attributeName)==null)	//if the new element doesn't have this attribute
 				{
 					if(attributeName!="style"	//don't remove local styles, because they may be used by Guise (with frames, for instance)
-							&& attributeName!="onclick")	//don't remove the onclick attribute, because we may be using it for Safari to prevent a default action
+							&& attributeName!="onclick"	//don't remove the onclick attribute, because we may be using it for Safari to prevent a default action
+							&& attributeName!="hideFocus")	//don't remove the IE hideFocus attribute, because we're using it to fix the IE6 lack of CSS outline: none support
 					{
 //TODO del alert("ready to remove "+oldElement.nodeName+" attribute "+oldAttributeName+" with current value "+oldAttributeValue);
 						oldElement.removeAttribute(oldAttributeName);	//remove the attribute normally (apparently no action will take place if performed on IE-specific attributes such as element.start)
@@ -1974,7 +1758,15 @@ alert(exception);
 					if(valueChanged)	//if the old element has a different (or no) value for this attribute (Firefox maintains different values for element.getAttribute(attributeName) and element[attributeName]) (note also that using setAttribute() IE will sometimes throw an error if button.style is changed, for instance)
 					{
 	//TODO del alert("updating "+element.nodeName+" attribute "+attributeName+" from value "+oldElement[attributeName]+" to new value "+attributeValue);
-						oldElement[attributeName]=attributeValue;	//update the old element's attribute (this format works for Firefox where oldElement.setAttribute("value", attributeValue) does not)
+						if(attributeName.indexOf(":")>0)	//if this is a namespaced attribute, we must use the DOM, because Firefox 1.5 won't allow the indexed notation for such attributes
+						{
+							oldElement.setAttribute(attributeName, attributeValue);	//update the old element's attribute						
+						}
+						else	//if this is a normal attribute
+						{
+//TODO fix						oldElement[attributeName]=attributeValue;	//update the old element's attribute (this format works for Firefox where oldElement.setAttribute("value", attributeValue) does not)
+							oldElement.setAttribute(attributeName, attributeValue);	//TODO fix
+						}
 	//TODO: fix the Firefox problem of sending an onchange event for any elements that get updated from an Ajax request, but only later when the focus blurs
 	//TODO fix the focus problem if the user has focus on an element that gets changed in response to the event
 					}
@@ -2043,7 +1835,8 @@ alert(exception);
 					}
 					else	//if the node types are different
 					{
-//TODO del alert("node types are different; old: "+oldChildNode.nodeType+" new: "+childNode.nodeType);
+//TODO del alert("node types are different; old "+oldElement.nodeName+" with ID "+oldElement.id+" child node count: "+oldChildNodeCount+" new "+element.nodeName+" "+"with ID "+element.getAttribute("id")+" child: "+i+" of "+childNodeCount+" old node type: "+oldChildNode.nodeType+" new node type: "+childNode.nodeType);
+//TODO del alert("old node structure of parent is: "+DOMUtilities.getNodeString(oldElement));
 						isChildrenCompatible=false;	//these child nodes aren't compatible because they are of different types
 					}
 				}
@@ -2131,6 +1924,392 @@ catch(e)
 	this.httpCommunicator.setProcessHTTPResponse(this._createHTTPResponseCallback());	//set up our callback function for processing HTTP responses
 
 }
+
+var com=com||{}; com.guiseframework=com.guiseframework||{}; com.guiseframework.js=com.guiseframework.js||{};	//create the com.guiseframework.js package
+
+/**A class encapsulating JavaScript Guise client functionality for Guise.
+var frames The array of frame elements.
+var modalFrame The current topmost modal frame, or null if there is no modal frame.
+*/
+com.guiseframework.js.Client=function()
+{
+
+	/**The array of drop targets, determined when the document is loaded. The drop targets are stored in increasing order of hierarchical depth.*/
+	this._dropTargets=new Array();
+
+	/**TODO del The array of original source images, keyed to 
+	this.originalImageSrcs=new Array();*/
+
+	/**The array of frame elements.*/
+	this.frames=new Array();
+
+	/**The current topmost modal frame, or null if there is no modal frame.*/
+	this.modalFrame=null;
+
+	/**The layer that allows modality by blocking user interaction to elements below.*/
+	this._modalLayer=null;
+	
+	/**The iframe that hides select elements in IE6; positioned right below the modal layer.*/
+	this._modalIFrame=null;
+
+	if(!com.guiseframework.js.Client._initialized)
+	{
+		com.guiseframework.js.Client._initialized=true;
+
+		/**Adds a frame to the array of frames.
+		This implementation adds the frame to the document, initializes the frame, and updates the modal state.
+		@param frame The frame to add.
+		*/
+		com.guiseframework.js.Client.prototype.addFrame=function(frame)
+		{
+		//TODO fix so that it works both on IE and Firefox							oldElement.style.position="fixed";	//TODO testing
+			frame.style.position="absolute";	//change the element's position to absolute; it should already be set like this, but set it specifically so that dragging will know not to drag a copy TODO update the element's initial position
+		
+			frame.style.visibility="hidden";	//TODO testing
+			frame.style.left="-9999px";	//TODO testing; this works; maybe even remove the visibility changing
+			frame.style.top="-9999px";	//TODO testing
+		
+			document.body.appendChild(frame);	//add the frame element to the document; do this first, because IE doesn't allow the style to be accessed directly with imported nodes until they are added to the document
+			initializeNode(frame);	//initialize the new imported frame, installing the correct event handlers; do this before the frame is positioned, because initialization also fixes IE6 classes, which can affect position
+			this._initializeFramePosition(frame);	//initialize the frame's position
+		
+			var openEffectClassName=getClassName(frame, STYLES.OPEN_EFFECT_REGEXP);	//get the open effect specified for this frame
+			var openEffect=null;	//we'll create an open effect if appropriate
+			if(openEffectClassName)	//if there is an open effect
+			{
+				var effectNameMatch=/^openEffect-([\w]+)/.exec(openEffectClassName);	//search for the effect name TODO use a constant
+				var effectName=effectNameMatch && effectNameMatch.length==2 ? effectNameMatch[1] : null;	//retrieve the effect name
+				var delayMatch=/delay-([\d]+)/.exec(openEffectClassName);	//search for the delay amount TODO use a constant
+				var delay=delayMatch && delayMatch.length==2 ? (parseInt(delayMatch[1]) || 0) : 0;	//retrieve the delay amount, compensating for parse errors and defaulting to zero
+		//TODO del alert("effect: "+effectName+" delay: "+delay);	
+				switch(effectName)	//see which effect name this is
+				{
+					case "DelayEffect":	//if this is a simple delay effect TODO use a constant
+						openEffect=new DelayEffect(frame, delay);	//create a delay effect
+						break;
+					case "OpacityFadeEffect":	//if this is an opacity fade effect TODO use a constant
+						openEffect=new OpacityFadeEffect(frame, delay);	//create an opacity fade effect
+						break;
+				}
+			}
+			if(openEffect)	//if we have an open effect
+			{
+				openEffect.effectBegin=function(){frame.style.visibility="visible";};	//TODO testing
+				openEffect.start();
+			}
+			else	//if there is no open effect
+			{
+				frame.style.visibility="visible";	//go ahead and make the frame visible
+			}
+		
+		//TODO del; moved to updateModal()	frame.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components TODO fix
+			updateComponents(frame);	//update all the components within the frame
+			this.frames.add(frame);	//add the frame to the array
+			this._updateModal();	//update the modal state
+			var focusable=getFocusableDescendant(frame);	//see if this frame has a node that can be focused
+			if(focusable)	//if we found a focusable node
+			{
+				try
+				{
+					focusable.focus();	//focus on the node
+				}
+				catch(e)	//TODO fix
+				{
+					alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" visibility: "+focusable.style.visibility+" display: "+focusable.style.display+" disabled: "+focusable.style.disabled);
+		/*TODO fix
+					alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" visibility: "+focusable.style.visibility+" display: "+focusable.style.display+" disabled: "+focusable.style.disabled);
+					alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" current visibility: "+focusable.currentStyle.visibility+" current display: "+focusable.currentStyle.display+" current disabled: "+focusable.currentStyle.disabled);
+					alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" runtime visibility: "+focusable.runtimeStyle.visibility+" runtime display: "+focusable.runtimeStyle.display+" runtime disabled: "+focusable.runtimeStyle.disabled);
+					alert("error trying to focus element great-grandparent: "+DOMUtilities.getNodeString(focusable.parentNode.parentNode.parentNode));
+		*/
+				}
+			}
+		//TODO del	debug(DOMUtilities.getNodeString(frame));
+		};
+
+		/**Removes a frame from the array of frames.
+		This implementation removes the frame to the document, uninitializes the frame, and updates the modal state.
+		@param frame The frame to remove.
+		*/
+		com.guiseframework.js.Client.prototype.removeFrame=function(frame)
+		{
+			var index=this.frames.indexOf(frame);	//get the frame index
+			if(index>=0)	//if we know the index of the frame
+			{
+				this.frames.remove(index);	//remove the frame from the array
+				uninitializeNode(frame);	//uninitialize the frame tree
+				document.body.removeChild(frame);	//remove the frame element to the document
+				this._updateModal();	//update the modal state
+			}
+		};
+
+		/**Initializes the position of a frame.
+		@param frame The frame to position.
+		*/
+		com.guiseframework.js.Client.prototype._initializeFramePosition=function(frame)
+		{
+		//TODO del var debugString="";
+		//TODO del	var framePosition=new Point();	//we'll calculate the frame position; create an object rather than using primitives so that the internal function can access its variables via closure
+			var frameX, frameY;	//we'll calculate the frame position
+			var relatedComponentID=getInputParameter(frame, "relatedComponentID");	//get the related component ID, if any TODO use a constant
+			var relatedComponent=relatedComponentID ? document.getElementById(relatedComponentID) : null;	//get the related component, if there is one
+			if(relatedComponent)	//if there is a related component
+			{
+		//TODO del alert("found related component: "+relatedComponentID);
+				var frameBounds=getElementBounds(frame);	//get the bounds of the frame
+		//TODO del debugString+="frameBounds: "+frameBounds.x+","+frameBounds.y+","+frameBounds.width+","+frameBounds.height+"\n";
+				var relatedComponentBounds=getElementBounds(relatedComponent);	//get the bounds of the related component
+		//TODO del debugString+="relatedComponentBounds: "+relatedComponentBounds.x+","+relatedComponentBounds.y+","+relatedComponentBounds.width+","+relatedComponentBounds.height+"\n";
+				var tether=getDescendantElementByClassName(frame, STYLES.FRAME_TETHER);	//get the frame tether, if there is one
+				if(tether)	//if there is a frame tether
+				{
+					var positionTether=function()	//create a function to position relative to the tether
+							{
+					//TODO del alert("found tether: "+tether.id);
+								var tetherBounds=getElementBounds(tether);	//get the bounds of the tether
+					//TODO del debugString+="tetherBounds: "+tetherBounds.x+","+tetherBounds.y+","+tetherBounds.width+","+tetherBounds.height+"\n";
+								var tetherX, tetherY, relatedComponentX, relatedComponentY;	//get the relevant tether anchor point and the relevant component point
+								if(tetherBounds.x<=frameBounds.x+8)	//if the tether is on the left side (use an arbitrary amount to account for variations in browser position calculations) TODO compare centers, which will be more accurate
+								{
+					//TODO del alert("tether left");
+									tetherX=tetherBounds.x;	//use the left side of the tether
+									relatedComponentX=relatedComponentBounds.x+relatedComponentBounds.width;	//use the right side of the component
+								}
+								else	//if the tether is on the right side
+								{
+					//TODO del alert("tether right");
+									tetherX=tetherBounds.x+tetherBounds.width;	//use the right side of the tether
+									relatedComponentX=relatedComponentBounds.x;	//use the left side of the component
+								}
+								if(tetherBounds.y<=frameBounds.y+8)	//if the tether is on the top (use an arbitrary amount to account for variations in browser position calculations)
+								{
+					//TODO del alert("tether top");
+									tetherY=tetherBounds.y;	//use the top of the tether
+									relatedComponentY=relatedComponentBounds.y+relatedComponentBounds.height;	//use the bottom of the component
+								}
+								else	//if the tether is on the bottom
+								{
+					//TODO del alert("tether bottom");
+									tetherY=tetherBounds.y+tetherBounds.height;	//use the bottom of the tether
+									relatedComponentY=relatedComponentBounds.y;	//use the top of the component
+								}
+					//TODO del alert("tetherX: "+tetherX);
+					//TODO del alert("tetherY: "+tetherY);
+					//TODO del alert("relatedComponentX: "+relatedComponentX);
+					//TODO del alert("relatedComponentY: "+relatedComponentY);
+								var tetherDeltaX=tetherX-frameBounds.x;	//find the horizontal delta of the tether from the frame
+					//TODO del alert("tetherDeltaX: "+tetherDeltaX);
+								var tetherDeltaY=tetherY-frameBounds.y;	//find the vertical delta of the tether from the frame
+					//TODO del alert("tetherDeltaY: "+tetherDeltaY);
+								frameX=relatedComponentX-tetherDeltaX;	//position the frame tether horizontally on the related component
+					//TODO del alert("frameX: "+frameX);
+								frameY=relatedComponentY-tetherDeltaY;	//position the frame tether vertically on the related component
+					//TODO del alert("frameY: "+frameY);
+					//TODO del debugString+="frame pos: "+frameX+","+frameY+"\n";
+					//TODO del alert(debugString);
+								frame.style.left=frameX+"px";	//set the frame's horizontal position
+								frame.style.top=frameY+"px";	//set the frame's vertical position
+							};
+					var tetherIMG=getDescendantElementByName(tether, "img");	//see if the tether has an image TODO use a constant
+					if(tetherIMG && (tetherIMG.offsetWidth<=0 || tetherIMG.offsetHeight<=0))	//if there is a tether image with an invalid width and/or height
+					{
+		//TODO del alert("tether image: "+tetherIMG.src+" not yet loaded; size "+tetherIMG.offsetWidth+","+tetherIMG.offsetHeight);
+						DOMUtilities.waitIMGLoaded(tetherIMG, positionTether);	//make sure the image is loaded before positioning on the tether
+					}
+					else	//if there is no tether image, or we already know its image size
+					{
+						positionTether();	//position on the tether without waiting for an image
+					}
+				}
+				else
+				{
+					var viewportBounds=getViewportBounds();	//get the bounds of the viewport so that we can center the frame
+					if(relatedComponentBounds.x<viewportBounds.x+(viewportBounds.width/2))	//if the related component is on the left half of the screen
+					{
+						frameX=relatedComponentBounds.x+relatedComponentBounds.width;	//put the frame on the right side
+					}
+					else	//if the related component is on the right half side of the screen
+					{
+						frameX=relatedComponentBounds.x-frameBounds.width;	//put the frame on the left side
+					}
+					if(relatedComponentBounds.y<viewportBounds.y+(viewportBounds.height/2))	//if the related component is on the top half of the screen
+					{
+						frameY=relatedComponentBounds.y+relatedComponentBounds.height;	//put the frame on the bottom side
+					}
+					else	//if the related component is on the bottom half side of the screen
+					{
+						frameY=relatedComponentBounds.y-frameBounds.height;	//put the frame on the top side
+					}
+					frame.style.left=frameX+"px";	//set the frame's horizontal position
+					frame.style.top=frameY+"px";	//set the frame's vertical position
+				}
+			}
+			else	//if this frame is not related to another component, center it
+			{
+				var viewportBounds=getViewportBounds();	//get the bounds of the viewport so that we can center the frame
+				frameX=viewportBounds.x+((viewportBounds.width-frame.offsetWidth)/2);	//center the frame horizontally
+				frameY=viewportBounds.y+((viewportBounds.height-frame.offsetHeight)/2);	//center the frame vertically
+				frame.style.left=frameX+"px";	//set the frame's horizontal position
+				frame.style.top=frameY+"px";	//set the frame's vertical position
+			}
+		};
+
+		/**Updates the modal layer and current modal frame.
+		Each frame is given a z-order in the order of frames, starting with a z-order of 100 and incrementing by 100.
+		The page is assumed to have a z-order of 0.
+		*/
+		com.guiseframework.js.Client.prototype._updateModal=function()
+		{
+			var frameCount=this.frames.length;	//find out how many frames there are
+			this.modalFrame=null;	//start out presuming there is no modal frame
+			for(var i=0; i<frameCount; ++i)	//update the z-orders
+			{
+				var frame=this.frames[i];	//get a reference to this frame
+				frame.style.zIndex=(i+1)*100;	//give the element the appropriate z-order
+				if(hasClassName(frame, "frameModal"))	//if this is a modal frame TODO use a constant
+				{
+					this.modalFrame=frame;	//indicate our last modal frame
+				}
+			}
+			if(this.modalFrame!=null)	//if there is a modal frame
+			{
+				this.updateModalLayer();	//always update the modal layer before it is shown, as IE may not always call resize to keep the modal layer updated
+				this._modalLayer.style.zIndex=this.modalFrame.style.zIndex-1;	//place the modal layer directly behind the modal frame
+				this._modalLayer.style.display="block";	//make the modal layer visible
+				if(this._modalIFrame)	//if we have a modal IFrame
+				{
+					this._modalIFrame.style.zIndex=this._modalLayer.style.zIndex-1;	//place the modal iframe directly behind the modal layer
+					this._modalIFrame.style.display="block";	//make the modal IFrame visible
+				}
+			}
+			else	//if there is no modal frame
+			{
+				this._modalLayer.style.display="none";	//hide the modal layer
+				if(this._modalIFrame)	//if we have a modal IFrame
+				{
+					this._modalIFrame.style.display="none";	//hide the modal iframe
+				}
+			}
+		};
+
+		/**Updates the size of the modal layer, creating it if necessary.*/
+		com.guiseframework.js.Client.prototype.updateModalLayer=function()
+		{
+			if(this._modalLayer==null)	//if the modal layer has not yet been created
+			{
+				this._modalLayer=document.createElementNS("http://www.w3.org/1999/xhtml", "div");	//create a div TODO use a constant for the namespace
+				this._modalLayer.className="modalLayer";	//load the modal layer style
+//TODO fix				oldModalLayerDisplayDisplay="none";
+				this._modalLayer.style.display="none";
+				this._modalLayer.style.position="absolute";
+				this._modalLayer.style.top="0px";
+				this._modalLayer.style.left="0px";
+				document.body.appendChild(this._modalLayer);	//add the modal layer to the document
+				if(isIE)	//if we're in IE, create a modal IFrame to keep select components from showing through; but don't do this in Mozilla, or it will keep the cursor from showing up for text inputs in absolutely positioned div elements above the IFrame
+				{
+					this._modalIFrame=document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");	//create an IFrame TODO use a constant for the namespace
+					this._modalIFrame.src="about:blank";
+			//TODO del		modalIFrame.className="modalLayer";	//load the modal layer style
+			//TODO del; allows select elements to shine through		modalIFrame.allowTransparency="true";
+					this._modalIFrame.frameBorder="0";
+			//TODO del or fix		modalIFrame.style.backgroundColor="transparent";
+					this._modalIFrame.style.display="none";
+					this._modalIFrame.style.position="absolute";
+					this._modalIFrame.style.top="0px";
+					this._modalIFrame.style.left="0px";
+					this._modalIFrame.style.filter='progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0)';	//make the frame transparent (see http://dotnetjunkies.com/WebLog/jking/archive/2003/07/21/488.aspx )
+					document.body.appendChild(this._modalIFrame);	//add the modal IFrame to the document
+				}
+			}
+		
+			var oldModalLayerDisplay=this._modalLayer.style.display;	//get the current display status of the modal layer
+			this._modalLayer.style.display="none";	//make sure the modal layer is hidden, because having it visible will interfere with the page/viewport size calculations (setting the size to 0px will not give us immediate feedback in IE during resize)
+			var oldModalIFrameDisplay=null;	//get the old modal IFrame display if we need to
+			if(this._modalIFrame)	//if we have a modal IFrame
+			{
+				oldModalIFrameDisplay=this._modalIFrame.style.display;	//get the current display status of the modal layer
+				this._modalIFrame.style.display="none";	//make sure the modal layer is hidden, because having it visible will interfere with the page/viewport size calculations
+			}
+		
+		/*TODO del; doesn't work instantanously with IE
+			modalLayer.style.width="0px";	//don't let the size of the modal layer get in the way of the size calculations
+			modalLayer.style.height="0px";
+			if(modalIFrame)	//if we have a modal IFrame
+			{
+				modalIFrame.style.width="0px";	//don't let the size of the modal layer get in the way of the size calculations
+				modalIFrame.style.height="0px";
+			}
+		*/
+		
+			var pageSize=getPageSize();	//get the size of the page
+			var viewportSize=getViewportSize();	//get the size of the viewport
+			this._modalLayer.style.width=Math.max(viewportSize.width, pageSize.width)+"px";	//update the size of the modal layer to the larger of the page and the viewport
+			this._modalLayer.style.height=Math.max(viewportSize.height, pageSize.height)+"px";
+		/*TODO fix
+		alert("page: "+pageSize.width+","+pageSize.height+" viewport: "+viewportSize.width+","+viewportSize.height+" modalLayer: "+modalLayer.style.width+","+modalLayer.style.height
+			+"\n"+"scroll: "+document.body.scrollWidth+","+document.body.scrollHeight+" offset: "+document.body.offsetWidth+","+document.body.offsetHeight);
+		*/
+		/*TODO fix
+		alert("pageSize.width: "+pageSize.width+"\n"+
+					"viewportSize.width: "+viewportSize.width+"\n"+
+					"document.body.scrollWidth: "+document.body.scrollWidth+"\n"+
+					"document.body.offsetWidth: "+document.body.offsetWidth+"\n"+
+					"document.body.clientWidth: "+document.body.clientWidth+"\n"+
+					"document.documentElement.scrollWidth: "+document.documentElement.scrollWidth+"\n"+
+					"document.documentElement.offsetWidth: "+document.documentElement.offsetWidth+"\n"+
+					"document.documentElement.clientWidth: "+document.documentElement.clientWidth+"\n"+
+					"modalLayer.style.width: "+modalLayer.style.width);
+		*/
+		
+			this._modalLayer.style.display=oldModalLayerDisplay;	//show the modal layer, if it was visible before
+			if(this._modalIFrame)	//if we have a modal IFrame
+			{
+				this._modalIFrame.style.width=this._modalLayer.style.width;
+				this._modalIFrame.style.height=this._modalLayer.style.height;
+				this._modalIFrame.style.display=oldModalIFrameDisplay;	//show the modal IFrame, if it was visible before
+			}
+		};
+
+		/**Adds an element to the list of drop targets.
+		@param element The element to add to the list of drop targets.
+		*/
+		com.guiseframework.js.Client.prototype.addDropTarget=function(element)
+		{
+			this._dropTargets.add(element);	//add this element to the list of drop targets
+			this._dropTargets.sort(function(element1, element2) {return DOMUtilities.getElementDepth(element1)-DOMUtilities.getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
+		};
+
+		/**Determines the drop target at the given coordinates.
+		@param x The horizontal test position.
+		@param y The vertical test position.
+		@return The drop target at the given coordinates, or null if there is no drop target at the given coordinates.
+		*/
+		com.guiseframework.js.Client.prototype.getDropTarget=function(x, y)
+		{
+			for(var i=this._dropTargets.length-1; i>=0; --i)	//for each drop target (which have been sorted by increasing element depth)
+			{
+				var dropTarget=this._dropTargets[i];	//get this drop target
+				var dropTargetCoordinates=getElementFixedCoordinates(dropTarget);	//get the coordinates of the drop target
+				if(x>=dropTargetCoordinates.x && y>=dropTargetCoordinates.y && x<dropTargetCoordinates.x+dropTarget.offsetWidth && y<dropTargetCoordinates.y+dropTarget.offsetHeight)	//if the coordinates are within the drop target area
+				{
+					return dropTarget;	//we've found the deepest drop target
+				}
+			}
+		};
+
+		/**Loads an image so that it will be present when needed.
+		@param src The URL of the image to load.
+		*/
+		com.guiseframework.js.Client.prototype.loadImage=function(src)
+		{
+			var image=new Image();	//create a new image
+			image.src=src;	//set the src of the image so that it will load
+		};
+
+	}
+};
+
+var guise=new com.guiseframework.js.Client();	//create a new global variable for the Guise client
 
 /**The global object for AJAX communication with Guise.*/
 var guiseAJAX=new GuiseAJAX();
@@ -2676,89 +2855,6 @@ function DragState(dragSource, mouseX, mouseY)
 /**The global drag state variable.*/
 var dragState;
 
-/**The layer that allows modality by blocking user interaction to elements below.*/
-var modalLayer=null;
-
-/**The iframe that hides select elements in IE6; positioned right below the modal layer.*/
-var modalIFrame=null;
-
-/**Updates the size of the modal layer, creating it if necessary.*/
-function updateModalLayer()
-{
-	if(modalLayer==null)	//if the modal layer has not yet been created
-	{
-		modalLayer=document.createElementNS("http://www.w3.org/1999/xhtml", "div");	//create a div TODO use a constant for the namespace
-		modalLayer.className="modalLayer";	//load the modal layer style
-		oldModalLayerDisplayDisplay="none";
-		modalLayer.style.position="absolute";
-		modalLayer.style.top="0px";
-		modalLayer.style.left="0px";
-		document.body.appendChild(modalLayer);	//add the modal layer to the document
-		if(isIE)	//if we're in IE, create a modal IFrame to keep select components from showing through; but don't do this in Mozilla, or it will keep the cursor from showing up for text inputs in absolutely positioned div elements above the IFrame
-		{
-			modalIFrame=document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");	//create an IFrame TODO use a constant for the namespace
-			modalIFrame.src="about:blank";
-	//TODO del		modalIFrame.className="modalLayer";	//load the modal layer style
-	//TODO del; allows select elements to shine through		modalIFrame.allowTransparency="true";
-			modalIFrame.frameBorder="0";
-	//		modalIFrame.style.backgroundColor="transparent";
-			modalIFrame.style.position="absolute";
-			modalIFrame.style.top="0px";
-			modalIFrame.style.left="0px";
-			modalIFrame.style.filter='progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0)';	//make the frame transparent (see http://dotnetjunkies.com/WebLog/jking/archive/2003/07/21/488.aspx )
-			modalIFrame.style.display="none";
-			document.body.appendChild(modalIFrame);	//add the modal IFrame to the document
-		}
-	}
-
-	var oldModalLayerDisplay=modalLayer.style.display;	//get the current display status of the modal layer
-	modalLayer.style.display="none";	//make sure the modal layer is hidden, because having it visible will interfere with the page/viewport size calculations (setting the size to 0px will not give us immediate feedback in IE during resize)
-	var oldModalIFrameDisplay=null;	//get the old modal IFrame display if we need to
-	if(modalIFrame)	//if we have a modal IFrame
-	{
-		oldModalIFrameDisplay=modalIFrame.style.display;	//get the current display status of the modal layer
-		modalIFrame.style.display="none";	//make sure the modal layer is hidden, because having it visible will interfere with the page/viewport size calculations
-	}
-
-/*TODO del; doesn't work instantanously with IE
-	modalLayer.style.width="0px";	//don't let the size of the modal layer get in the way of the size calculations
-	modalLayer.style.height="0px";
-	if(modalIFrame)	//if we have a modal IFrame
-	{
-		modalIFrame.style.width="0px";	//don't let the size of the modal layer get in the way of the size calculations
-		modalIFrame.style.height="0px";
-	}
-*/
-
-	var pageSize=getPageSize();	//get the size of the page
-	var viewportSize=getViewportSize();	//get the size of the viewport
-	modalLayer.style.width=Math.max(viewportSize.width, pageSize.width)+"px";	//update the size of the modal layer to the larger of the page and the viewport
-	modalLayer.style.height=Math.max(viewportSize.height, pageSize.height)+"px";
-/*TODO fix
-alert("page: "+pageSize.width+","+pageSize.height+" viewport: "+viewportSize.width+","+viewportSize.height+" modalLayer: "+modalLayer.style.width+","+modalLayer.style.height
-	+"\n"+"scroll: "+document.body.scrollWidth+","+document.body.scrollHeight+" offset: "+document.body.offsetWidth+","+document.body.offsetHeight);
-*/
-/*TODO fix
-alert("pageSize.width: "+pageSize.width+"\n"+
-			"viewportSize.width: "+viewportSize.width+"\n"+
-			"document.body.scrollWidth: "+document.body.scrollWidth+"\n"+
-			"document.body.offsetWidth: "+document.body.offsetWidth+"\n"+
-			"document.body.clientWidth: "+document.body.clientWidth+"\n"+
-			"document.documentElement.scrollWidth: "+document.documentElement.scrollWidth+"\n"+
-			"document.documentElement.offsetWidth: "+document.documentElement.offsetWidth+"\n"+
-			"document.documentElement.clientWidth: "+document.documentElement.clientWidth+"\n"+
-			"modalLayer.style.width: "+modalLayer.style.width);
-*/
-
-	modalLayer.style.display=oldModalLayerDisplay;	//show the modal layer, if it was visible before
-	if(modalIFrame)	//if we have a modal IFrame
-	{
-		modalIFrame.style.width=modalLayer.style.width;
-		modalIFrame.style.height=modalLayer.style.height;
-		modalIFrame.style.display=oldModalIFrameDisplay;	//show the modal IFrame, if it was visible before
-	}
-}
-
 //Guise functionality
 
 /**Called when the window loads.
@@ -2771,9 +2867,9 @@ function onWindowLoad()
 	eventManager.addEvent(window, "unload", onWindowUnload, false);	//do the appropriate uninitialization when the window unloads
 	initializeNode(document.documentElement);	//initialize the document tree
 	updateComponents(document.documentElement);	//update all components represented by elements within the document
-	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
+//TODO del when works	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
 	eventManager.addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
-	updateModalLayer();	//create and update the modal layer
+	guise.updateModalLayer();	//create and update the modal layer TODO do we need or want this now? TODO put in an initialize method
 	var focusable=getFocusableDescendant(document.documentElement);	//see if the document has a node that can be focused
 	if(focusable)	//if we found a focusable node
 	{
@@ -2799,7 +2895,7 @@ This implementation updates the modal layer.
 function onWindowResize(event)
 {
 	//TODO work around IE bug that stops calling onWindowResize after a couple of maximization/minimization cycles
-	window.setTimeout(updateModalLayer, 1);	//update the modal layer later, because during resize IE won't allow us to hide the modal layer and have the correct size update instantaneously
+	window.setTimeout(function(){guise.updateModalLayer();}, 1);	//update the modal layer later, because during resize IE won't allow us to hide the modal layer and have the correct size update instantaneously; use closure to make sure the this variable is correctly passed to the function
 }
 
 /**Called when the window scrolls.
@@ -2835,6 +2931,10 @@ function initializeNode(node)
 				switch(elementName)	//see which element this is
 				{
 					case "a":
+						if(isIE && hasClassName(node, "imageSelectActionControl"))	//if this is IE (TODO check for IE6), which doesn't support the CSS outline: none property, create a workaround TODO use a constant; create something more general than just the image select action control
+						{
+							node.hideFocus="true";	//hide the focus on this element
+						}
 						if(elementClassNames.contains("actionControl"))	//if this is a Guise action TODO later look at *all* link clicks and do popups for certain ones
 						{
 							if(!node.getAttribute("target"))	//if the link has no target (the target wouldn't work if we tried to take over the events; we can't just check for null because IE will always send back at least "")
@@ -2881,18 +2981,17 @@ function initializeNode(node)
 						}
 						break;
 					case "img":
-/*TODO fix
-						if(node.getAttribute("guise:rolloverSrc")!=null)	//TODO fix; testing
+						var rolloverSrc=node.getAttribute("guise:rolloverSrc");	//get the image rollover, if there is one
+						if(rolloverSrc!=null)	//if the image has a rollover TODO use a constant
 						{
-							alert("rollover source: "+node.getAttribute("guise:rolloverSrc"));
+							guise.loadImage(rolloverSrc);	//preload the image
+							if(!hasClassName(node, STYLES.MOUSE_LISTENER))	//if this is not a mouse listener (which would get a onMouse listener registered, anyway)
+							{
+								eventManager.addEvent(node, "mouseover", onMouse, false);	//listen for mouse over on a mouse listener
+								eventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener							
+							}
+//TODO del							alert("rollover source: "+node.getAttribute("guise:rolloverSrc"));
 						}
-*/
-/*TODO fix
-						case STYLES.MOUSE_LISTENER:
-							eventManager.addEvent(node, "mouseover", onMouse, false);	//listen for mouse over on a mouse listener
-							eventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener
-							break;
-*/
 						break;
 					case "input":
 						switch(node.type)	//get the type of input
@@ -2956,7 +3055,7 @@ function initializeNode(node)
 							eventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener
 							break;
 						case STYLES.DROP_TARGET:
-							dropTargets.add(node);	//add this node to the list of drop targets
+							guise.addDropTarget(node);	//add this node to the list of drop targets
 							break;
 						case STYLES.SLIDER_CONTROL_THUMB:
 							eventManager.addEvent(node, "mousedown", onSliderThumbDragBegin, false);	//listen for mouse down on a slider thumb
@@ -3024,7 +3123,7 @@ function updateComponents(node)
 /**Uninitializes a node and all its children, removing all added listeners.
 @param node The node to uninitialize.
 */
-function uninitializeNode(node)
+function uninitializeNode(node)	//TODO remove the node from the sorted list of drop targets
 {
 	eventManager.clearEvents(node);	//clear events for this node and descendants
 }
@@ -3039,15 +3138,15 @@ var lastFocusedNode=null;
 function onFocus(event)
 {
 	var currentTarget=event.currentTarget;	//get the control receiving the focus
-	if(guiseFrames.modalFrame!=null)	//if there is a modal frame
+	if(guise.modalFrame!=null)	//if there is a modal frame
 	{
 	
 //TODO del var dummy=currentTarget.nodeName+" "+currentTarget.id;
 
-		if(!hasAncestor(currentTarget, guiseFrames.modalFrame))	//if focus is trying to go to something outside the modal frame
+		if(!hasAncestor(currentTarget, guise.modalFrame))	//if focus is trying to go to something outside the modal frame
 		{
 //TODO fix alert("focus outside of frame");
-			if(hasAncestor(lastFocusedNode, guiseFrames.modalFrame))	//if we know the last focused node, and it was in the modal frame
+			if(hasAncestor(lastFocusedNode, guise.modalFrame))	//if we know the last focused node, and it was in the modal frame
 			{
 
 //TODO del dummy+=" changing to last focused "+lastFocusedNode.nodeName+" id "+lastFocusedNode.id;
@@ -3058,7 +3157,7 @@ function onFocus(event)
 			}
 			else	//if we don't know the last focused node
 			{
-				var focusable=getFocusableDescendant(guiseFrames.modalFrame);	//see if the modal frame has a node that can be focused
+				var focusable=getFocusableDescendant(guise.modalFrame);	//see if the modal frame has a node that can be focused
 				if(focusable)	//if we found a focusable node
 				{
 //TODO del dummy+=" changing to first focusable "+focusable.nodeName+" id "+focusable.id;
@@ -3577,6 +3676,8 @@ function onMenuMouseOut(event)
 */
 function onDragBegin(event)	//TODO rename to onDragClick
 {
+try
+{
 	if(!dragState)	//if there's a drag state, stay with that one (e.g. the mouse button might have been released outside the document on Mozilla)
 	{
 		var dragHandle=event.target;	//get the target of the event
@@ -3593,6 +3694,11 @@ function onDragBegin(event)	//TODO rename to onDragClick
 			event.preventDefault();	//prevent the default functionality from occurring
 		}
 	}
+}
+catch(e)
+{
+	alert("drag error: "+e);
+}
 }
 
 /**Called when dragging occurs.
@@ -3620,7 +3726,7 @@ function onDragEnd(event)
 	if(dragState)	//if we are in the middle of a drag
 	{
 		dragState.endDrag();	//end dragging
-		var dropTarget=getDropTarget(event.clientX, event.clientY);	//get the drop target under the mouse
+		var dropTarget=guise.getDropTarget(event.clientX, event.clientY);	//get the drop target under the mouse
 		if(dropTarget)	//if the mouse was dropped over a drop target
 		{
 //TODO del when works alert("over drop target: "+dropTarget.nodeName);
@@ -3786,25 +3892,8 @@ function updateSlider(slider)	//TODO maybe rename to updateSliderView
 	}
 }
 
-/**Determines the drop target at the given coordinates.
-@param x The horizontal test position.
-@param y The vertical test position.
-@return The drop target at the given coordinates, or null if there is no drop target at the given coordinates.
-*/
-function getDropTarget(x, y)
-{
-	for(var i=dropTargets.length-1; i>=0; --i)	//for each drop target (which have been sorted by increasing element depth)
-	{
-		var dropTarget=dropTargets[i];	//get this drop target
-		var dropTargetCoordinates=getElementFixedCoordinates(dropTarget);	//get the coordinates of the drop target
-		if(x>=dropTargetCoordinates.x && y>=dropTargetCoordinates.y && x<dropTargetCoordinates.x+dropTarget.offsetWidth && y<dropTargetCoordinates.y+dropTarget.offsetHeight)	//if the coordinates are within the drop target area
-		{
-			return dropTarget;	//we've found the deepest drop target
-		}
-	}
-}
-
 /**Called when the mouse enters or exits a mouse listener.
+If the current target element has a "mouseListener" class, the event will be reported to the server.
 @param event The object describing the event.
 */
 function onMouse(event)
@@ -3837,6 +3926,22 @@ function onMouse(event)
 		}
 		otherTarget=otherTarget.parentNode;	//check up the hierarchy TODO fix; IE gave an error here once, so maybe somehow otherTarget was null
 	}
+	if(target.nodeName.toLowerCase()=="img")	//if this is an image, perform rollovers if needed
+	{
+		var rolloverSrc=target.getAttribute("guise:rolloverSrc");	//get the image rollover, if there is one
+		if(rolloverSrc!=null)	//if the image has a rollover TODO use a constant
+		{
+			switch(event.type)	//see which type of mouse event this is
+			{
+				case "mouseover":	//if we are rolling over the element TODO use a constant
+					target.src=rolloverSrc;	//switch to the rollover image
+					break;
+				case "mouseout":	//if we are rolling off the image TODO use a constant
+					target.src=target.getAttribute("guise:originalSrc");	//switch back to the original source TODO use a constant
+					break;
+			}
+		}
+	}
 	var component=getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element
 	if(component)	//if we know the component
 	{
@@ -3854,10 +3959,13 @@ function onMouse(event)
 			default:	//TODO assert an error or warning
 				return;				
 		}
-		var ajaxRequest=new MouseAJAXEvent(eventType, component, target, event);	//create a new AJAX mouse event
-		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
-		event.stopPropagation();	//tell the event to stop bubbling
-		event.preventDefault();	//prevent the default functionality from occurring
+		if(hasClassName(target, STYLES.MOUSE_LISTENER))	//if this is a mouse listener, report the event
+		{
+			var ajaxRequest=new MouseAJAXEvent(eventType, component, target, event);	//create a new AJAX mouse event
+			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+			event.stopPropagation();	//tell the event to stop bubbling
+			event.preventDefault();	//prevent the default functionality from occurring
+		}
 	}	
 }
 
@@ -4116,22 +4224,6 @@ function hasAncestor(node, ancestor)
 		node=node.parentNode;	//go up one level
 	}
 	return false;	//indicate that we didn't find the given ancestor
-}
-
-/**Determines the document tree depth of the given element, returning a zero-level depth for the document node.
-@param element The element for which a depth should be found.
-@return The zero-based depth of the given element in the document, with a zero-level depth for the document node.
-*/
-function getElementDepth(element)
-{
-	var depth=-1;	//this element will be at least depth zero
-	do
-	{
-		element=element.parentNode;	//get the parent node
-		++depth;	//increase the depth
-	}
-	while(element);	//keep getting the parent node while there are ancestors left
-	return depth;	//return the depth we calculated
 }
 
 /**Gets the indicated parameter from a direct child comment of the given node.

@@ -35,6 +35,7 @@ import com.javaguise.model.FileItemResourceImport;
 import com.javaguise.model.Model;
 import com.javaguise.platform.web.*;
 import static com.javaguise.platform.web.WebPlatformConstants.*;
+
 import com.javaguise.validator.*;
 import com.javaguise.view.text.xml.xhtml.XHTMLApplicationFrameView;
 import com.javaguise.view.text.xml.xhtml.XHTMLNavigationPanelView;
@@ -702,6 +703,7 @@ Debug.trace("now have frames: ", frames.size());
 						guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
 //TODO fix							else	//if the component is not visible, remove the component's elements
 						guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
+						guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
 						dirtyComponent.updateView(guiseContext);		//tell the component to update its view
 						guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "patch");	//</xhtml:patch>
 					}
