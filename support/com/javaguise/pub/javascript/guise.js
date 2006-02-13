@@ -1760,12 +1760,11 @@ alert(exception);
 	//TODO del alert("updating "+element.nodeName+" attribute "+attributeName+" from value "+oldElement[attributeName]+" to new value "+attributeValue);
 						if(attributeName.indexOf(":")>0)	//if this is a namespaced attribute, we must use the DOM, because Firefox 1.5 won't allow the indexed notation for such attributes
 						{
-							oldElement.setAttribute(attributeName, attributeValue);	//update the old element's attribute						
+							oldElement.setAttribute(attributeName, attributeValue);	//update the old element's attribute; only use this method when we need to, because it may be slower on Firefox and does not work with certain DOM attributes
 						}
 						else	//if this is a normal attribute
 						{
-//TODO fix						oldElement[attributeName]=attributeValue;	//update the old element's attribute (this format works for Firefox where oldElement.setAttribute("value", attributeValue) does not)
-							oldElement.setAttribute(attributeName, attributeValue);	//TODO fix
+							oldElement[attributeName]=attributeValue;	//update the old element's attribute (this format works for Firefox where oldElement.setAttribute("value", attributeValue) does not)
 						}
 	//TODO: fix the Firefox problem of sending an onchange event for any elements that get updated from an Ajax request, but only later when the focus blurs
 	//TODO fix the focus problem if the user has focus on an element that gets changed in response to the event
