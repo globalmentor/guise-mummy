@@ -1,0 +1,40 @@
+<rdf:RDF
+    xmlns:guiseml="http://guiseframework.com/id/ml#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:component="java:com.javaguise.component."
+    xmlns:layout="java:com.javaguise.component.layout."
+    xmlns:model="java:com.javaguise.model."
+    xmlns:validator="java:com.javaguise.validator."
+    xmlns:property="http://guiseframework.com/id/property#"
+>
+	<component:DefaultNavigationPanel rdf:ID="temperatureConversionPanel">
+		<property:layout><layout:FlowLayout><property:flow>LINE</property:flow></layout:FlowLayout></property:layout>
+		<property:labelText>Guise&#x2122; Demonstration: Temperature Conversion</property:labelText>
+		<property:children rdf:parseType="Collection">
+			<component:LayoutPanel rdf:ID="inputPanel">
+				<property:layout><layout:FlowLayout><property:flow>PAGE</property:flow></layout:FlowLayout></property:layout>
+				<property:children rdf:parseType="Collection">
+					<component:TextControl rdf:ID="temperatureInput" property:valueClass="java.lang.Float" property:labelText="Input Temperature">
+						<property:validator><validator:ValueRequiredValidator/></property:validator>
+					</component:TextControl>
+					<component:TextControl rdf:ID="temperatureOutput" property:valueClass="java.lang.Float" property:labelText="Output Temperature">
+<!--TODO set editable false-->					
+					</component:TextControl>
+				</property:children>		
+			</component:LayoutPanel>
+			<component:LayoutPanel rdf:ID="conversionPanel">
+				<property:layout><layout:FlowLayout><property:flow>PAGE</property:flow></layout:FlowLayout></property:layout>
+				<property:children rdf:parseType="Collection">
+					<component:GroupPanel rdf:ID="scalePanel" property:labelText="Input Scale">
+						<property:layout><layout:FlowLayout><property:flow>PAGE</property:flow></layout:FlowLayout></property:layout>
+						<property:children rdf:parseType="Collection">		
+							<component:CheckControl rdf:ID="celsiusCheckControl" property:checkType="ELLIPSE" property:labelText="Calsius"/>
+							<component:CheckControl rdf:ID="fahrenheitCheckControl" property:checkType="ELLIPSE" property:labelText="Fahrenheit"/>
+						</property:children>
+					</component:GroupPanel>
+					<component:Button rdf:ID="conversionButton" property:labelText="Convert"/>
+				</property:children>
+			</component:LayoutPanel>
+		</property:children>
+	</component:DefaultNavigationPanel>
+</rdf:RDF>
