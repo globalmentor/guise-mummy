@@ -30,41 +30,41 @@ public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser>
 	public EditUserPanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Flow.PAGE));	//construct the parent class flowing vertically
-		setLabelText("Guise\u2122 Demonstration: Edit User");	//set the panel title	
+		setLabel("Guise\u2122 Demonstration: Edit User");	//set the panel title	
 
 		final LayoutPanel idPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create the ID panel flowing horizontally
 			//ID
 		idControl=new TextControl<String>(session, String.class);	//create the ID input control
-		idControl.setLabelText("ID");	//set the ID control label
+		idControl.setLabel("ID");	//set the ID control label
 		idControl.getModel().setEditable(false);	//don't allow the ID to be edited
 		idPanel.add(idControl);	//add the ID control to the ID panel
 		
 		final LayoutPanel namePanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create the name panel flowing horizontally
 			//first name
 		firstNameControl=new TextControl<String>(session, String.class);	//create the first name input control
-		firstNameControl.setLabelText("First Name *");	//set the name control label
+		firstNameControl.setLabel("First Name *");	//set the name control label
 		firstNameControl.getModel().setValidator(new RegularExpressionStringValidator(session, "\\S+.*", true));	//require at least a single non-whitespace character followed by any other characters
 		namePanel.add(firstNameControl);	//add the name control to the name panel
 			//middle name
 		middleNameControl=new TextControl<String>(session, String.class);	//create the first name input control, but don't require any validation
-		middleNameControl.setLabelText("Middle Name");	//set the name control label
+		middleNameControl.setLabel("Middle Name");	//set the name control label
 		namePanel.add(middleNameControl);	//add the name control to the name panel
 			//last name
 		lastNameControl=new TextControl<String>(session, String.class);	//create the last name input control
-		lastNameControl.setLabelText("Last Name *");	//set the name control label
+		lastNameControl.setLabel("Last Name *");	//set the name control label
 		lastNameControl.getModel().setValidator(new RegularExpressionStringValidator(session, "\\S+.*", true));	//require at least a single non-whitespace character followed by any other characters
 		namePanel.add(lastNameControl);	//add the name control to the name panel
 
 		final LayoutPanel passwordPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create the password panel flowing horizontally
 			//password
 		passwordControl=new TextControl<char[]>(session, char[].class);	//create the password input control
-		passwordControl.setLabelText("Password *");	//set the password control label
+		passwordControl.setLabel("Password *");	//set the password control label
 		passwordControl.setMasked(true);	//mask the password input
 		passwordControl.getModel().setValidator(new RegularExpressionCharArrayValidator(session, "\\S+", true));	//require at least a single non-whitespace character
 		passwordPanel.add(passwordControl);	//add the password control to the password panel
 			//password verification
 		passwordVerificationControl=new TextControl<char[]>(session, char[].class);	//create the password verification input control
-		passwordVerificationControl.setLabelText("Password Verification *");	//set the password control label
+		passwordVerificationControl.setLabel("Password Verification *");	//set the password control label
 		passwordVerificationControl.setMasked(true);	//mask the password input
 		passwordVerificationControl.getModel().setValidator(new RegularExpressionCharArrayValidator(session, "\\S+", true));	//require at least a single non-whitespace character
 		passwordPanel.add(passwordVerificationControl);	//add the password verification control to the password panel
@@ -72,13 +72,13 @@ public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser>
 		final LayoutPanel emailPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create the email panel flowing horizontally
 			//email
 		emailControl=new TextControl<String>(session, String.class);	//create the email input control
-		emailControl.setLabelText("Email *");	//set the email control label
+		emailControl.setLabel("Email *");	//set the email control label
 		emailControl.getModel().setValidator(new RegularExpressionStringValidator(session, ".+@.+\\.[a-z]+", true));	//require an email in the correct format
 		emailPanel.add(emailControl);	//add the email control to the email panel
 
 		final LayoutPanel buttonPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create the button panel flowing horizontally
 		final Button okButton=new Button(session);	//create the OK button
-		okButton.setLabelText("OK");	//set the text of the OK button
+		okButton.setLabel("OK");	//set the text of the OK button
 		okButton.getModel().addActionListener(new ActionListener()	//if the OK button was pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)
@@ -95,7 +95,7 @@ public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser>
 				});
 		buttonPanel.add(okButton);	//add the button to the button panel
 		final Button cancelButton=new Button(session);	//create the cancel button
-		cancelButton.setLabelText("Cancel");	//set the text of the cancel button
+		cancelButton.setLabel("Cancel");	//set the text of the cancel button
 		cancelButton.getModel().addActionListener(new ActionListener()	//if the cancel button was pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)

@@ -11,7 +11,7 @@ import com.guiseframework.GuiseSession;
 @param <V> The type of value contained in the model.
 @author Garret Wilson
 */
-public class LocaleLabelValueModel<V> extends DefaultValueModel<V>
+public class LocaleLabelValueModel<V> extends DefaultValueModel<V>	//TODO important fix class
 {
 
 	/**The locale the label should represent.*/
@@ -43,7 +43,6 @@ public class LocaleLabelValueModel<V> extends DefaultValueModel<V>
 	/**Sets the text of the label.
 	This version throws an {@link UnsupportedOperationException}.
 	@param newLabel The new text of the label.
-	@see LabelModel#LABEL_PROPERTY
 	*/
 	public void setLabel(final String newLabel)
 	{

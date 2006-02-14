@@ -37,16 +37,16 @@ public class BookDescriptionPanel extends DefaultNavigationPanel
 	public BookDescriptionPanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Flow.PAGE));	//construct the parent class flowing vertically
-		setLabelText("Guise\u2122 Demonstration: Book Descriptions");	//set the panel title
+		setLabel("Guise\u2122 Demonstration: Book Descriptions");	//set the panel title
 
 			//book panel
 		final GroupPanel bookPanel=new GroupPanel(session, new FlowLayout(session, Flow.LINE));	//create the book panel flowing horizontally
-		bookPanel.setLabelText("Mouse over a Book");	//set the book panel label
+		bookPanel.setLabel("Mouse over a Book");	//set the book panel label
 
 		final Image book1=new Image(session);	//_The Great Philosophers_
 		book1.getModel().setImage(URI.create("http://www.garretwilson.com/books/reviews/greatphilosophers_small.jpg"));	//set the URI
-		book1.getModel().setDescriptionContentType(Model.XHTML_CONTENT_TYPE);	//use an XHTML description
-		book1.getModel().setDescription(	//set the description
+		book1.setDescriptionContentType(XHTML_CONTENT_TYPE);	//use an XHTML description
+		book1.setDescription(	//set the description
 			"<?xml version='1.0'?>"+
 			"<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>"+
 			"<html xmlns='http://www.w3.org/1999/xhtml'>"+
@@ -71,8 +71,8 @@ public class BookDescriptionPanel extends DefaultNavigationPanel
 
 		final Image book2=new Image(session);	//_The Supreme Court_
 		book2.getModel().setImage(URI.create("http://www.garretwilson.com/books/reviews/supremecourt_small.jpg"));	//set the URI
-		book2.getModel().setDescriptionContentType(Model.XHTML_CONTENT_TYPE);	//use an XHTML description
-		book2.getModel().setDescription(	//set the description
+		book2.setDescriptionContentType(XHTML_CONTENT_TYPE);	//use an XHTML description
+		book2.setDescription(	//set the description
 			"<?xml version='1.0'?>"+
 			"<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>"+
 			"<html xmlns='http://www.w3.org/1999/xhtml'>"+
@@ -90,8 +90,8 @@ public class BookDescriptionPanel extends DefaultNavigationPanel
 
 		final Image book3=new Image(session);	//_Uncertain Identities_
 		book3.getModel().setImage(URI.create("http://www.garretwilson.com/books/reviews/uncertainidentities_small.jpg"));	//set the URI
-		book3.getModel().setDescriptionContentType(Model.XHTML_CONTENT_TYPE);	//use an XHTML description
-		book3.getModel().setDescription(	//set the description
+		book3.setDescriptionContentType(XHTML_CONTENT_TYPE);	//use an XHTML description
+		book3.setDescription(	//set the description
 			"<?xml version='1.0'?>"+
 			"<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.1//EN' 'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd'>"+
 			"<html xmlns='http://www.w3.org/1999/xhtml'>"+

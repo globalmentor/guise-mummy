@@ -7,7 +7,6 @@ import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 import com.guiseframework.validator.ValidationException;
 
-
 /**Menus Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
 Demonstrates drop menus, accordion menus, menu rollovers, and menu actions. 
@@ -22,43 +21,43 @@ public class MenusPanel extends DefaultNavigationPanel
 	public MenusPanel(final GuiseSession session)
 	{
 		super(session, new RegionLayout(session));	//construct the parent class, using a region layout
-		setLabelText("Guise\u2122 Demonstration: Menus");	//set the panel title
+		setLabel("Guise\u2122 Demonstration: Menus");	//set the panel title
 			//drop-down menu
 		final DropMenu dropMenu=new DropMenu(session, Flow.LINE);	//create a drop menu flowing along the line
 			//file menu
 		final DropMenu fileMenu=new DropMenu(session, Flow.PAGE);	//the submenu flows along the page
-		fileMenu.setLabelText("File");
+		fileMenu.setLabel("File");
 		final Link openMenuLink=new Link(session);	//file|open link
-		openMenuLink.setLabelText("Open");
+		openMenuLink.setLabel("Open");
 		fileMenu.add(openMenuLink);
 		final Link closeMenuLink=new Link(session);	//the submenu flows along the page
-		closeMenuLink.setLabelText("Close");	//file|close link
+		closeMenuLink.setLabel("Close");	//file|close link
 		fileMenu.add(closeMenuLink);
 		dropMenu.add(fileMenu);
 			//edit menu
 		final DropMenu editMenu=new DropMenu(session, Flow.PAGE);	//the submenu flows along the page
-		editMenu.setLabelText("Edit");
+		editMenu.setLabel("Edit");
 		final Link copyMenuLink=new Link(session);	//edit|copy link
-		copyMenuLink.setLabelText("Copy");
+		copyMenuLink.setLabel("Copy");
 		editMenu.add(copyMenuLink);
 		final Link cutMenuLink=new Link(session);	//edit|cut link
-		cutMenuLink.setLabelText("Cut");
+		cutMenuLink.setLabel("Cut");
 		editMenu.add(cutMenuLink);
 		final Link pasteMenuLink=new Link(session);	//edit|paste link
-		pasteMenuLink.setLabelText("Paste");
+		pasteMenuLink.setLabel("Paste");
 		editMenu.add(pasteMenuLink);
 		dropMenu.add(editMenu);
 			//window menu
 		final DropMenu windowMenu=new DropMenu(session, Flow.PAGE);	//the submenu flows along the page
-		windowMenu.setLabelText("Window");
+		windowMenu.setLabel("Window");
 			//window|arrange menu
 		final DropMenu arrangeMenu=new DropMenu(session, Flow.PAGE);	//the sub-submenu flows along the page
-		arrangeMenu.setLabelText("Arrange");
+		arrangeMenu.setLabel("Arrange");
 		final Link tileMenuLink=new Link(session);	//window|arrange|tile link
-		tileMenuLink.setLabelText("Tile");
+		tileMenuLink.setLabel("Tile");
 		arrangeMenu.add(tileMenuLink);
 		final Link cascadeMenuLink=new Link(session);	//window|arrange|cascade
-		cascadeMenuLink.setLabelText("Cascade");
+		cascadeMenuLink.setLabel("Cascade");
 		arrangeMenu.add(cascadeMenuLink);
 		windowMenu.add(arrangeMenu);
 		dropMenu.add(windowMenu);		
@@ -68,20 +67,20 @@ public class MenusPanel extends DefaultNavigationPanel
 		final AccordionMenu accordionMenu=new AccordionMenu(session, Flow.PAGE);	//create an accordion menu flowing along the page
 			//continents menu
 		final AccordionMenu continentsMenu=new AccordionMenu(session, Flow.PAGE);	//the accordion submenu also flows along the page
-		continentsMenu.setLabelText("Continents");
+		continentsMenu.setLabel("Continents");
 		final String[] continents=new String[]{"Africa", "Asia", "Antarctica", "Australia", "Europe", "North America", "South America"};
 		for(final String continent:continents)	//for each continent
 		{
 			final Link continentLink=new Link(session);	//continents:continent link
-			continentLink.setLabelText(continent);
+			continentLink.setLabel(continent);
 			continentsMenu.add(continentLink);			
 		}
 		accordionMenu.add(continentsMenu);
 			//text menu
 		final AccordionMenu messageMenu=new AccordionMenu(session, Flow.PAGE);	//the accordion submenu also flows along the page
-		messageMenu.setLabelText("Message");
-		final Message message=new Message(session, new DefaultMessageModel(session));
-		message.getModel().setMessage("Because geography is defined by local convention, there are several conceptions as to which landmasses qualify as continents. "+
+		messageMenu.setLabel("Message");
+		final Message message=new Message(session);
+		message.setMessage("Because geography is defined by local convention, there are several conceptions as to which landmasses qualify as continents. "+
 				"There are names for six, but America is often divided, and Europe is often united with Asia. "+
 				"Ignoring cases where Antarctica is omitted, there are half a dozen lists. "+
 				"(Wikipedia)");
@@ -93,9 +92,9 @@ public class MenusPanel extends DefaultNavigationPanel
 		final LayoutPanel centerPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE)); //create the center panel flowing vertically
 			//accordion menu settings
 		final GroupPanel accordionMenuPanel=new GroupPanel(session, new FlowLayout(session, Flow.PAGE));	//create a group panel flowing vertically
-		accordionMenuPanel.setLabelText("Accordion Menu");
+		accordionMenuPanel.setLabel("Accordion Menu");
 		final CheckControl rolloverOpenCheckbox=new CheckControl(session);	//accordion rollover open enabled
-		rolloverOpenCheckbox.setLabelText("Enable accordion menu rollover open.");
+		rolloverOpenCheckbox.setLabel("Enable accordion menu rollover open.");
 		rolloverOpenCheckbox.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Boolean>()
 				{
 					public void propertyChange(final GuisePropertyChangeEvent<Boolean> propertyChangeEvent)
@@ -107,7 +106,7 @@ public class MenusPanel extends DefaultNavigationPanel
 		accordionMenuPanel.add(rolloverOpenCheckbox);
 				//create a text input control to indicate the number of continents clicks, and set its model's default to zero
 		final TextControl<Integer> continentsClickCountControl=new TextControl<Integer>(session, new DefaultValueModel<Integer>(session, Integer.class, new Integer(0)));
-		continentsClickCountControl.setLabelText("Number of clicks on the \"Continents\" accordion menu.");	//add a label to the input control
+		continentsClickCountControl.setLabel("Number of clicks on the \"Continents\" accordion menu.");	//add a label to the input control
 		continentsClickCountControl.getModel().setEditable(false);	//don't allow the control to be edited
 		accordionMenuPanel.add(continentsClickCountControl);		
 		centerPanel.add(accordionMenuPanel);

@@ -29,7 +29,7 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 	public MultiplicationTablePanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Flow.LINE));	//construct the parent class flowing horizontally
-		setLabelText("Guise\u2122 Demonstration: Multiplication Table");	//set the panel title	
+		setLabel("Guise\u2122 Demonstration: Multiplication Table");	//set the panel title	
 
 		final TabbedPanel tabbedPanel=new TabbedPanel(session);	//create a tabbed panel
 		add(tabbedPanel);	//add the tabbed panel to this panel
@@ -39,14 +39,14 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 			//create the maximum factor control
 		final LayoutPanel controlPanel=new LayoutPanel(getSession(), new FlowLayout(session, Flow.PAGE));	//create a new panel for the controls
 		final TextControl<Integer> maxFactorControl=new TextControl<Integer>(session, Integer.class);	//create a text input control to receive an integer
-		maxFactorControl.setLabelText("Maximum Factor (1-25)");	//add a label to the text input control
+		maxFactorControl.setLabel("Maximum Factor (1-25)");	//add a label to the text input control
+		maxFactorControl.setInfo("Enter the maximum factor (1-25) for the new multiplication table.");	//set the button information
 		maxFactorControl.getModel().setValidator(new IntegerRangeValidator(session, 1, 25, 1, true));	//require a value from 1-25
-		maxFactorControl.getModel().setInfo("Enter the maximum factor (1-25) for the new multiplication table.");	//set the button information
 		controlPanel.add(maxFactorControl);	//add the count control to the control panel
 			//create the add button
 		final Button addButton=new Button(session);	//create the button for adding a tab
-		addButton.setLabelText("Add Tab");	//set the button label
-		addButton.getModel().setInfo("Add a tab containing a multiplication table of the specified factor.");	//set the button information
+		addButton.setLabel("Add Tab");	//set the button label
+		addButton.setInfo("Add a tab containing a multiplication table of the specified factor.");	//set the button information
 		addButton.getModel().addActionListener(new ActionListener()	//listen for the button being pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)	//if the button is pressed
@@ -74,8 +74,8 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 		controlPanel.add(addButton);	//add the add button to this panel
 			//create the clear button
 		final Button clearButton=new Button(session);	//create the button for clearing the tabs
-		clearButton.setLabelText("Clear Tabs");	//set the button label
-		clearButton.getModel().setInfo("Remove all tabs except the default tab.");	//set the button information
+		clearButton.setLabel("Clear Tabs");	//set the button label
+		clearButton.setInfo("Remove all tabs except the default tab.");	//set the button information
 		clearButton.getModel().addActionListener(new ActionListener()	//listen for the button being pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)	//if the button is pressed
@@ -119,7 +119,7 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 			columnNames[columnIndex]=Integer.toString(columnIndex);	//generate the column name
 		}
 		final Table multiplicationTable=new Table(getSession(), Integer.class, multiplicationTableData, columnNames);	//create the table component
-		multiplicationTable.setLabelText("Multiplication Table up to "+maxFactor);	//give the table a label
+		multiplicationTable.setLabel("Multiplication Table up to "+maxFactor);	//give the table a label
 		
 		tab.add(multiplicationTable);	//add the multiplication table to the tab
 		return tab;	//return the tab component we created

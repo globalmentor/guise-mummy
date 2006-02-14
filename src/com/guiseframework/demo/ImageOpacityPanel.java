@@ -24,13 +24,13 @@ public class ImageOpacityPanel extends DefaultNavigationPanel
 	public ImageOpacityPanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Flow.LINE));	//construct the parent class flowing horizontally
-		setLabelText("Guise\u2122 Demonstration: Image Opacity");	//set the panel title	
+		setLabel("Guise\u2122 Demonstration: Image Opacity");	//set the panel title	
 
 			//image
 		final Image image=new Image(session);	//create the image control
 		image.getModel().setImage(URI.create("cowcalf.jpg"));	//reference an image in the root directory of the application
-		image.setLabelText("Cow and Calf");
-		image.getModel().setMessage("A cow and her minutes-old calf. Use the sliders to change the opacity of the image.");
+		image.setLabel("Cow and Calf");
+		image.setMessage("A cow and her minutes-old calf. Use the sliders to change the opacity of the image.");
 		add(image);	//add the image
 
 			//value model shared among slider controls and text control
@@ -59,7 +59,7 @@ public class ImageOpacityPanel extends DefaultNavigationPanel
 		add(verticalSlider);
 			//text control using shared value model
 		final TextControl<Float> sliderInput=new TextControl<Float>(session, sliderModel, percentConverter);
-		sliderInput.setLabelText("Image Opacity");	//set the label for the model
+		sliderInput.setLabel("Image Opacity");	//set the label for the model
 		add(sliderInput);
 	}
 }

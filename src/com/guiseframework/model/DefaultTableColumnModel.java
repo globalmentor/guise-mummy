@@ -9,6 +9,7 @@ import javax.mail.internet.ContentType;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
+import com.guiseframework.component.Component;
 import com.guiseframework.validator.Validator;
 
 /**The default implementation of a column in a table.
@@ -29,14 +30,14 @@ public class DefaultTableColumnModel<V> extends AbstractControlModel implements 
 	private URI labelIcon=null;
 
 		/**@return The label icon URI, or <code>null</code> if there is no icon URI.*/
-		public URI getLabelIcon() {return labelIcon;}
+		public URI getIcon() {return labelIcon;}
 
 		/**Sets the URI of the label icon.
 		This is a bound property of type <code>URI</code>.
 		@param newLabelIcon The new URI of the label icon.
 		@see #LABEL_ICON_PROPERTY
 		*/
-		public void setLabelIcon(final URI newLabelIcon)
+		public void setIcon(final URI newLabelIcon)
 		{
 			if(!ObjectUtilities.equals(labelIcon, newLabelIcon))	//if the value is really changing
 			{
@@ -50,14 +51,14 @@ public class DefaultTableColumnModel<V> extends AbstractControlModel implements 
 	private String labelIconResourceKey=null;
 
 		/**@return The label icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-		public String getLabelIconResourceKey() {return labelIconResourceKey;}
+		public String getIconResourceKey() {return labelIconResourceKey;}
 
 		/**Sets the key identifying the URI of the label icon in the resources.
 		This is a bound property.
 		@param newIconResourceKey The new label icon URI resource key.
 		@see #LABEL_ICON_RESOURCE_KEY_PROPERTY
 		*/
-		public void setLabelIconResourceKey(final String newIconResourceKey)
+		public void setIconResourceKey(final String newIconResourceKey)
 		{
 			if(!ObjectUtilities.equals(labelIconResourceKey, newIconResourceKey))	//if the value is really changing
 			{
@@ -71,14 +72,14 @@ public class DefaultTableColumnModel<V> extends AbstractControlModel implements 
 	private String labelText=null;
 
 		/**@return The label text, or <code>null</code> if there is no label text.*/
-		public String getLabelText() {return labelText;}
+		public String getLabel() {return labelText;}
 
 		/**Sets the text of the label.
 		This is a bound property.
 		@param newLabelText The new text of the label.
 		@see #LABEL_TEXT_PROPERTY
 		*/
-		public void setLabelText(final String newLabelText)
+		public void setLabel(final String newLabelText)
 		{
 			if(!ObjectUtilities.equals(labelText, newLabelText))	//if the value is really changing
 			{
@@ -89,10 +90,10 @@ public class DefaultTableColumnModel<V> extends AbstractControlModel implements 
 		}
 
 	/**The content type of the label text.*/
-	private ContentType labelTextContentType=Model.PLAIN_TEXT_CONTENT_TYPE;
+	private ContentType labelTextContentType=Component.PLAIN_TEXT_CONTENT_TYPE;
 
 		/**@return The content type of the label text.*/
-		public ContentType getLabelTextContentType() {return labelTextContentType;}
+		public ContentType getLabelContentType() {return labelTextContentType;}
 
 		/**Sets the content type of the label text.
 		This is a bound property.
@@ -101,7 +102,7 @@ public class DefaultTableColumnModel<V> extends AbstractControlModel implements 
 		@exception IllegalArgumentException if the given content type is not a text content type.
 		@see #LABEL_TEXT_CONTENT_TYPE_PROPERTY
 		*/
-		public void setLabelTextContentType(final ContentType newLabelTextContentType)
+		public void setLabelContentType(final ContentType newLabelTextContentType)
 		{
 			checkNull(newLabelTextContentType, "Content type cannot be null.");
 			if(labelTextContentType!=newLabelTextContentType)	//if the value is really changing
@@ -120,14 +121,14 @@ public class DefaultTableColumnModel<V> extends AbstractControlModel implements 
 	private String labelTextResourceKey=null;
 	
 		/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-		public String getLabelTextResourceKey() {return labelTextResourceKey;}
+		public String getLabelResourceKey() {return labelTextResourceKey;}
 	
 		/**Sets the key identifying the text of the label in the resources.
 		This is a bound property.
 		@param newLabelTextResourceKey The new label text resource key.
 		@see #LABEL_TEXT_RESOURCE_KEY_PROPERTY
 		*/
-		public void setLabelTextResourceKey(final String newLabelTextResourceKey)
+		public void setLabelResourceKey(final String newLabelTextResourceKey)
 		{
 			if(!ObjectUtilities.equals(labelTextResourceKey, newLabelTextResourceKey))	//if the value is really changing
 			{

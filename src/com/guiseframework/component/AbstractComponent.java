@@ -6,6 +6,8 @@ import java.net.URI;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.mail.internet.ContentType;
+
 import com.garretwilson.event.EventListenerManager;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.Debug;
@@ -22,10 +24,9 @@ import com.guiseframework.model.Model;
 import com.guiseframework.style.Color;
 import com.guiseframework.view.View;
 
-
-
 import static com.garretwilson.lang.CharSequenceUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.text.TextUtilities.isText;
 import static com.garretwilson.util.ArrayUtilities.*;
 import static com.guiseframework.GuiseResourceConstants.*;
 
@@ -93,6 +94,258 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			}			
 		}
 
+	/**The icon URI, or <code>null</code> if there is no icon URI.*/
+	private URI labelIcon=null;
+
+		/**@return The icon URI, or <code>null</code> if there is no icon URI.*/
+		public URI getIcon() {return labelIcon;}
+
+		/**Sets the URI of the icon.
+		This is a bound property of type <code>URI</code>.
+		@param newLabelIcon The new URI of the icon.
+		@see #ICON_PROPERTY
+		*/
+		public void setIcon(final URI newLabelIcon)
+		{
+			if(!ObjectUtilities.equals(labelIcon, newLabelIcon))	//if the value is really changing
+			{
+				final URI oldLabelIcon=labelIcon;	//get the old value
+				labelIcon=newLabelIcon;	//actually change the value
+				firePropertyChange(ICON_PROPERTY, oldLabelIcon, newLabelIcon);	//indicate that the value changed
+			}			
+		}
+
+	/**The icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
+	private String labelIconResourceKey=null;
+
+		/**@return The icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
+		public String getIconResourceKey() {return labelIconResourceKey;}
+
+		/**Sets the key identifying the URI of the icon in the resources.
+		This is a bound property.
+		@param newIconResourceKey The new icon URI resource key.
+		@see #ICON_RESOURCE_KEY_PROPERTY
+		*/
+		public void setIconResourceKey(final String newIconResourceKey)
+		{
+			if(!ObjectUtilities.equals(labelIconResourceKey, newIconResourceKey))	//if the value is really changing
+			{
+				final String oldIconResourceKey=labelIconResourceKey;	//get the old value
+				labelIconResourceKey=newIconResourceKey;	//actually change the value
+				firePropertyChange(ICON_RESOURCE_KEY_PROPERTY, oldIconResourceKey, newIconResourceKey);	//indicate that the value changed
+			}
+		}
+
+	/**The label text, or <code>null</code> if there is no label text.*/
+	private String labelText=null;
+
+		/**@return The label text, or <code>null</code> if there is no label text.*/
+		public String getLabel() {return labelText;}
+
+		/**Sets the text of the label.
+		This is a bound property.
+		@param newLabelText The new text of the label.
+		@see #LABEL_PROPERTY
+		*/
+		public void setLabel(final String newLabelText)
+		{
+			if(!ObjectUtilities.equals(labelText, newLabelText))	//if the value is really changing
+			{
+				final String oldLabel=labelText;	//get the old value
+				labelText=newLabelText;	//actually change the value
+				firePropertyChange(LABEL_PROPERTY, oldLabel, newLabelText);	//indicate that the value changed
+			}			
+		}
+
+	/**The content type of the label text.*/
+	private ContentType labelTextContentType=PLAIN_TEXT_CONTENT_TYPE;
+
+		/**@return The content type of the label text.*/
+		public ContentType getLabelContentType() {return labelTextContentType;}
+
+		/**Sets the content type of the label text.
+		This is a bound property.
+		@param newLabelTextContentType The new label text content type.
+		@exception NullPointerException if the given content type is <code>null</code>.
+		@exception IllegalArgumentException if the given content type is not a text content type.
+		@see #LABEL_CONTENT_TYPE_PROPERTY
+		*/
+		public void setLabelContentType(final ContentType newLabelTextContentType)
+		{
+			checkNull(newLabelTextContentType, "Content type cannot be null.");
+			if(labelTextContentType!=newLabelTextContentType)	//if the value is really changing
+			{
+				final ContentType oldLabelTextContentType=labelTextContentType;	//get the old value
+				if(!isText(newLabelTextContentType))	//if the new content type is not a text content type
+				{
+					throw new IllegalArgumentException("Content type "+newLabelTextContentType+" is not a text content type.");
+				}
+				labelTextContentType=newLabelTextContentType;	//actually change the value
+				firePropertyChange(LABEL_CONTENT_TYPE_PROPERTY, oldLabelTextContentType, newLabelTextContentType);	//indicate that the value changed
+			}			
+		}
+
+	/**The label text resource key, or <code>null</code> if there is no label text resource specified.*/
+	private String labelTextResourceKey=null;
+	
+		/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
+		public String getLabelResourceKey() {return labelTextResourceKey;}
+	
+		/**Sets the key identifying the text of the label in the resources.
+		This is a bound property.
+		@param newLabelTextResourceKey The new label text resource key.
+		@see #LABEL_RESOURCE_KEY_PROPERTY
+		*/
+		public void setLabelResourceKey(final String newLabelTextResourceKey)
+		{
+			if(!ObjectUtilities.equals(labelTextResourceKey, newLabelTextResourceKey))	//if the value is really changing
+			{
+				final String oldLabelTextResourceKey=labelTextResourceKey;	//get the old value
+				labelTextResourceKey=newLabelTextResourceKey;	//actually change the value
+				firePropertyChange(LABEL_RESOURCE_KEY_PROPERTY, oldLabelTextResourceKey, newLabelTextResourceKey);	//indicate that the value changed
+			}
+		}
+
+	/**The advisory information text, such as might appear in a tooltip, or <code>null</code> if there is no advisory information.*/
+	private String info=null;
+
+		/**@return The advisory information text, such as might appear in a tooltip, or <code>null</code> if there is no advisory information.*/
+		public String getInfo() {return info;}
+
+		/**Sets the advisory information text, such as might appear in a tooltip.
+		This is a bound property.
+		@param newInfo The new text of the advisory information, such as might appear in a tooltip.
+		@see #INFO_PROPERTY
+		*/
+		public void setInfo(final String newInfo)
+		{
+			if(!ObjectUtilities.equals(info, newInfo))	//if the value is really changing
+			{
+				final String oldInfo=info;	//get the old value
+				info=newInfo;	//actually change the value
+				firePropertyChange(INFO_PROPERTY, oldInfo, newInfo);	//indicate that the value changed
+			}			
+		}
+
+	/**The content type of the advisory information text.*/
+	private ContentType infoContentType=PLAIN_TEXT_CONTENT_TYPE;
+
+		/**@return The content type of the advisory information text.*/
+		public ContentType getInfoContentType() {return infoContentType;}
+
+		/**Sets the content type of the advisory information text.
+		This is a bound property.
+		@param newInfoContentType The new advisory information text content type.
+		@exception NullPointerException if the given content type is <code>null</code>.
+		@exception IllegalArgumentException if the given content type is not a text content type.
+		@see #INFO_CONTENT_TYPE_PROPERTY
+		*/
+		public void setInfoContentType(final ContentType newInfoContentType)
+		{
+			checkNull(newInfoContentType, "Content type cannot be null.");
+			if(infoContentType!=newInfoContentType)	//if the value is really changing
+			{
+				final ContentType oldInfoContentType=infoContentType;	//get the old value
+				if(!isText(newInfoContentType))	//if the new content type is not a text content type
+				{
+					throw new IllegalArgumentException("Content type "+newInfoContentType+" is not a text content type.");
+				}
+				infoContentType=newInfoContentType;	//actually change the value
+				firePropertyChange(INFO_CONTENT_TYPE_PROPERTY, oldInfoContentType, newInfoContentType);	//indicate that the value changed
+			}			
+		}
+
+	/**The advisory information text resource key, or <code>null</code> if there is no advisory information text resource specified.*/
+	private String infoResourceKey=null;
+
+		/**@return The advisory information text resource key, or <code>null</code> if there is no advisory information text resource specified.*/
+		public String getInfoResourceKey() {return infoResourceKey;}
+
+		/**Sets the key identifying the text of the advisory information in the resources.
+		This is a bound property.
+		@param newInfoResourceKey The new advisory information text resource key.
+		@see #INFO_RESOURCE_KEY_PROPERTY
+		*/
+		public void setInfoResourceKey(final String newInfoResourceKey)
+		{
+			if(!ObjectUtilities.equals(infoResourceKey, newInfoResourceKey))	//if the value is really changing
+			{
+				final String oldInfoResourceKey=infoResourceKey;	//get the old value
+				infoResourceKey=newInfoResourceKey;	//actually change the value
+				firePropertyChange(INFO_RESOURCE_KEY_PROPERTY, oldInfoResourceKey, newInfoResourceKey);	//indicate that the value changed
+			}
+		}
+
+	/**The description text, such as might appear in a flyover, or <code>null</code> if there is no description.*/
+	private String description=null;
+
+		/**@return The description text, such as might appear in a flyover, or <code>null</code> if there is no description.*/
+		public String getDescription() {return description;}
+
+		/**Sets the description text, such as might appear in a flyover.
+		This is a bound property.
+		@param newDescription The new text of the description, such as might appear in a flyover.
+		@see #DESCRIPTION_PROPERTY
+		*/
+		public void setDescription(final String newDescription)
+		{
+			if(!ObjectUtilities.equals(description, newDescription))	//if the value is really changing
+			{
+				final String oldDescription=description;	//get the old value
+				description=newDescription;	//actually change the value
+				firePropertyChange(DESCRIPTION_PROPERTY, oldDescription, newDescription);	//indicate that the value changed
+			}			
+		}
+
+	/**The content type of the description text.*/
+	private ContentType descriptionContentType=PLAIN_TEXT_CONTENT_TYPE;
+
+		/**@return The content type of the description text.*/
+		public ContentType getDescriptionContentType() {return descriptionContentType;}
+
+		/**Sets the content type of the description text.
+		This is a bound property.
+		@param newDescriptionContentType The new description text content type.
+		@exception NullPointerException if the given content type is <code>null</code>.
+		@exception IllegalArgumentException if the given content type is not a text content type.
+		@see #DESCRIPTION_CONTENT_TYPE_PROPERTY
+		*/
+		public void setDescriptionContentType(final ContentType newDescriptionContentType)
+		{
+			checkNull(newDescriptionContentType, "Content type cannot be null.");
+			if(descriptionContentType!=newDescriptionContentType)	//if the value is really changing
+			{
+				final ContentType oldDescriptionContentType=descriptionContentType;	//get the old value
+				if(!isText(newDescriptionContentType))	//if the new content type is not a text content type
+				{
+					throw new IllegalArgumentException("Content type "+newDescriptionContentType+" is not a text content type.");
+				}
+				descriptionContentType=newDescriptionContentType;	//actually change the value
+				firePropertyChange(DESCRIPTION_CONTENT_TYPE_PROPERTY, oldDescriptionContentType, newDescriptionContentType);	//indicate that the value changed
+			}			
+		}
+
+	/**The description text resource key, or <code>null</code> if there is no description text resource specified.*/
+	private String descriptionResourceKey=null;
+
+		/**@return The description text resource key, or <code>null</code> if there is no description text resource specified.*/
+		public String getDescriptionResourceKey() {return descriptionResourceKey;}
+
+		/**Sets the key identifying the text of the description in the resources.
+		This is a bound property.
+		@param newDescriptionResourceKey The new description text resource key.
+		@see #DESCRIPTION_RESOURCE_KEY_PROPERTY
+		*/
+		public void setDescriptionResourceKey(final String newDescriptionResourceKey)
+		{
+			if(!ObjectUtilities.equals(descriptionResourceKey, newDescriptionResourceKey))	//if the value is really changing
+			{
+				final String oldDescriptionResourceKey=descriptionResourceKey;	//get the old value
+				descriptionResourceKey=newDescriptionResourceKey;	//actually change the value
+				firePropertyChange(DESCRIPTION_RESOURCE_KEY_PROPERTY, oldDescriptionResourceKey, newDescriptionResourceKey);	//indicate that the value changed
+			}
+		}
+
 	/**The background color of the component, or <code>null</code> if no background color is specified for this component.*/
 	private Color<?> backgroundColor=null;
 
@@ -158,7 +411,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 
 
 	/**The array of dimensions each defining a corner arc by two radiuses.*/
-	private Dimensions[] corneArcSizes=fill(new Dimensions[Corner.values().length], Dimensions.ZERO_DIMENSIONS);
+	private Dimensions[] cornerArcSizes=fill(new Dimensions[Corner.values().length], Dimensions.ZERO_DIMENSIONS);
 
 	/**The properties corresponding to the corner arc sizes.*/
 	private final static String[] CORNER_ARC_SIZE_PROPERTIES=new String[]{CORNER_ARC_SIZE_LINE_NEAR_PAGE_NEAR_PROPERTY, CORNER_ARC_SIZE_LINE_FAR_PAGE_NEAR_PROPERTY, CORNER_ARC_SIZE_LINE_NEAR_PAGE_FAR_PROPERTY, CORNER_ARC_SIZE_LINE_FAR_PAGE_FAR_PROPERTY};
@@ -167,7 +420,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		@param corner The corner for which an arc size should be returned.
 		@return The dimensions indicating the two radiuses of the given corner arc, or dimensions of zero if the corner should not be rounded.
 		*/
-		public Dimensions getCornerArcSize(final Corner corner) {return corneArcSizes[corner.ordinal()];}
+		public Dimensions getCornerArcSize(final Corner corner) {return cornerArcSizes[corner.ordinal()];}
 	
 		/**Sets the arc size of a given corner.
 		The radius of each corner represents a bound property.
@@ -182,10 +435,10 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		public void setCornerArcSize(final Corner corner, final Dimensions newCornerArcSize)
 		{
 			final int cornerOrdinal=checkNull(corner, "Corner cannot be null").ordinal();	//get the ordinal of the corner
-			final Dimensions oldCornerArcSize=corneArcSizes[cornerOrdinal];	//get the old value
+			final Dimensions oldCornerArcSize=cornerArcSizes[cornerOrdinal];	//get the old value
 			if(!ObjectUtilities.equals(oldCornerArcSize, checkNull(newCornerArcSize, "Corner arc size cannot be null")))	//if the value is really changing
 			{
-				corneArcSizes[cornerOrdinal]=newCornerArcSize;	//actually change the value
+				cornerArcSizes[cornerOrdinal]=newCornerArcSize;	//actually change the value
 				firePropertyChange(CORNER_ARC_SIZE_PROPERTIES[cornerOrdinal], oldCornerArcSize, newCornerArcSize);	//indicate that the value changed
 			}			
 		}
@@ -666,7 +919,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		This implementation adds or removes a default flyover strategy if one is not already installed.
 		This is a bound property of type <code>Boolean</code>.
 		@param newFlyoverEnabled <code>true</code> if the component should display flyovers, else <code>false</code>.
-		@see Model#getDescription()
+		@see #getDescription()
 		@see Component#FLYOVER_ENABLED_PROPERTY
 		*/
 		public void setFlyoverEnabled(final boolean newFlyoverEnabled)
@@ -742,7 +995,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		Tooltips contain information from the component model's "info" property.
 		This is a bound property of type <code>Boolean</code>.
 		@param newTooltipEnabled <code>true</code> if the component should display tooltips, else <code>false</code>.
-		@see Model#getInfo()
+		@see #getInfo()
 		@see Component#TOOLTIP_ENABLED_PROPERTY
 		*/
 		public void setTooltipEnabled(final boolean newTooltipEnabled)
@@ -847,7 +1100,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		{
 			throw new IllegalStateException("No registered controller for "+getClass().getName());	//TODO use a better error
 		}
-		assert CORNER_ARC_SIZE_PROPERTIES.length==corneArcSizes.length : "Number of available corners changed.";
+		assert CORNER_ARC_SIZE_PROPERTIES.length==cornerArcSizes.length : "Number of available corners changed.";
 	}
 
 	/**Initializes the component after construction.
@@ -1449,8 +1702,9 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 			final FlyoverFrame<?> frame=new DefaultFlyoverFrame(session);	//create a default frame
 			frame.setRelatedComponent(getComponent());	//tell the flyover frame with which component it is related
 			final Message message=new Message(session);	//create a new message
-			message.getModel().setMessageContentType(component.getModel().getDescriptionContentType());	//set the appropriate message content
-			message.getModel().setMessage(component.getModel().getDescription());	//set the appropriate message text
+			message.setMessageContentType(component.getDescriptionContentType());	//set the appropriate message content
+			message.setMessage(component.getDescription());	//set the appropriate message text
+			message.setMessageResourceKey(component.getDescriptionResourceKey());	//set the appropriate message text resource			
 			frame.setContent(message);	//put the message in the frame
 			return frame;	//return the frame we created
 		}

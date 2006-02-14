@@ -238,9 +238,9 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 		@exception MissingResourceException if there was an error loading the value from the resources.
 		@see #getLabelResourceKey()
 		*/
-		public String getLabelText() throws MissingResourceException
+		public String getLabel() throws MissingResourceException
 		{
-			String label=super.getLabelText();	//get the specified label
+			String label=super.getLabel();	//get the specified label
 			if(label==null)	//if no label is specified
 			{
 				final Calendar columnCalendar=getMonthCalendar();	//get a clone of the month calendar

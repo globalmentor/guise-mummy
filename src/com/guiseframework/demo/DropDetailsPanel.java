@@ -25,41 +25,41 @@ public class DropDetailsPanel extends DefaultNavigationPanel
 	public DropDetailsPanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Flow.PAGE));	//construct the parent class flowing vertically
-		setLabelText("Guise\u2122 Demonstration: Drop Details");	//set the panel title
+		setLabel("Guise\u2122 Demonstration: Drop Details");	//set the panel title
 
 			//flag panel
 		final GroupPanel flagPanel=new GroupPanel(session, new FlowLayout(session, Flow.LINE));	//create the flag panel flowing horizontally
-		flagPanel.setLabelText("Drag a Flag");	//set the flag panel label				
+		flagPanel.setLabel("Drag a Flag");	//set the flag panel label				
 		final Image usFlag=new Image(session);	//US flag
 		usFlag.getModel().setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/us-flag.gif"));	//set the URI
-		usFlag.setLabelText("USA");	//set the label
+		usFlag.setLabel("USA");	//set the label
 		usFlag.setDragEnabled(true);	//enable dragging for the image
 		flagPanel.add(usFlag);	//add the image to the flag panel
 		final Image frFlag=new Image(session);	//France flag
 		frFlag.getModel().setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/fr-flag.gif"));	//set the URI
-		frFlag.setLabelText("France");	//set the label
+		frFlag.setLabel("France");	//set the label
 		frFlag.setDragEnabled(true);	//enable dragging for the image
 		flagPanel.add(frFlag);	//add the image to the flag panel
 		final Image inFlag=new Image(session);	//India flag
 		inFlag.getModel().setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/in-flag.gif"));	//set the URI
-		inFlag.setLabelText("India");	//set the label
+		inFlag.setLabel("India");	//set the label
 		inFlag.setDragEnabled(true);	//enable dragging for the image
 		flagPanel.add(inFlag);	//add the image to the flag panel
 		final Image irFlag=new Image(session);	//Iran flag
 		irFlag.getModel().setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/ir-flag.gif"));	//set the URI
-		irFlag.setLabelText("Iran");	//set the label
+		irFlag.setLabel("Iran");	//set the label
 		irFlag.setDragEnabled(true);	//enable dragging for the image
 		flagPanel.add(irFlag);	//add the image to the flag panel
 		add(flagPanel);	//add the flag panel to the panel
 
 			//label panel
 		final GroupPanel labelPanel=new GroupPanel(session, new FlowLayout(session, Flow.LINE));	//create the label panel flowing horizontally
-		labelPanel.setLabelText("Drag a Label");	//set the label panel label
+		labelPanel.setLabel("Drag a Label");	//set the label panel label
 		final String[] partsOfSpeech=new String[]{"Noun", "Verb", "Ajective", "Adverb", "Pronoun", "Preposition", "Conjunction", "Interjection"};
 		for(final String partOfSpeech:partsOfSpeech)	//for each label string
 		{
 			final Label label=new Label(session);	//create a label label
-			label.setLabelText(partOfSpeech);	//set the label text
+			label.setLabel(partOfSpeech);	//set the label text
 			label.setDragEnabled(true);	//enable dragging for the label
 			labelPanel.add(label);	//add the label to the label panel			
 		}
@@ -67,14 +67,14 @@ public class DropDetailsPanel extends DefaultNavigationPanel
 
 			//default text area
 		final TextAreaControl defaultTextArea=new TextAreaControl(session, 5, 80);	//create a text area control
-		defaultTextArea.setLabelText("Drop Here for Built-In Drop Functionality");	//set the label of the text area
+		defaultTextArea.setLabel("Drop Here for Built-In Drop Functionality");	//set the label of the text area
 		defaultTextArea.getModel().setEditable(false);	//don't allow the text area control to be edited
 		defaultTextArea.setDropEnabled(true);	//allow dropping on the text area
 		add(defaultTextArea);	//add the default drop text area control to the panel
 
 			//details text area
 		final TextAreaControl detailsTextArea=new TextAreaControl(session, 15, 80);	//create a text area control
-		detailsTextArea.setLabelText("Drop Here for Drop Details");	//set the label of the text area
+		detailsTextArea.setLabel("Drop Here for Drop Details");	//set the label of the text area
 		detailsTextArea.getModel().setEditable(false);	//don't allow the text area control to be edited
 		detailsTextArea.setDropEnabled(true);	//allow dropping on the text area
 		detailsTextArea.addImportStrategy(new ImportStrategy<TextAreaControl>()	//add a new import strategy for this component

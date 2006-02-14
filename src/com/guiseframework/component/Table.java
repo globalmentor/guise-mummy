@@ -1,16 +1,11 @@
 package com.guiseframework.component;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.*;
 import java.util.concurrent.*;
 
-import javax.mail.internet.ContentType;
-
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.text.TextUtilities.*;
 
-import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.converter.AbstractStringLiteralConverter;
 import com.guiseframework.converter.ConversionException;
@@ -23,123 +18,11 @@ import com.guiseframework.validator.*;
 /**A table component.
 @author Garret Wilson
 */
-public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, Table.CellComponentState, Table> implements LabeledComponent<Table>
+public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, Table.CellComponentState, Table>
 {
 
 	/**@return The data model used by this component.*/
 	public TableModel getModel() {return (TableModel)super.getModel();}
-
-	/**The label icon URI, or <code>null</code> if there is no icon URI.*/
-	private URI labelIcon=null;
-
-		/**@return The label icon URI, or <code>null</code> if there is no icon URI.*/
-		public URI getLabelIcon() {return labelIcon;}
-
-		/**Sets the URI of the label icon.
-		This is a bound property of type <code>URI</code>.
-		@param newLabelIcon The new URI of the label icon.
-		@see #LABEL_ICON_PROPERTY
-		*/
-		public void setLabelIcon(final URI newLabelIcon)
-		{
-			if(!ObjectUtilities.equals(labelIcon, newLabelIcon))	//if the value is really changing
-			{
-				final URI oldLabelIcon=labelIcon;	//get the old value
-				labelIcon=newLabelIcon;	//actually change the value
-				firePropertyChange(LABEL_ICON_PROPERTY, oldLabelIcon, newLabelIcon);	//indicate that the value changed
-			}			
-		}
-
-	/**The label icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-	private String labelIconResourceKey=null;
-
-		/**@return The label icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-		public String getLabelIconResourceKey() {return labelIconResourceKey;}
-
-		/**Sets the key identifying the URI of the label icon in the resources.
-		This is a bound property.
-		@param newIconResourceKey The new label icon URI resource key.
-		@see #LABEL_ICON_RESOURCE_KEY_PROPERTY
-		*/
-		public void setLabelIconResourceKey(final String newIconResourceKey)
-		{
-			if(!ObjectUtilities.equals(labelIconResourceKey, newIconResourceKey))	//if the value is really changing
-			{
-				final String oldIconResourceKey=labelIconResourceKey;	//get the old value
-				labelIconResourceKey=newIconResourceKey;	//actually change the value
-				firePropertyChange(LABEL_ICON_RESOURCE_KEY_PROPERTY, oldIconResourceKey, newIconResourceKey);	//indicate that the value changed
-			}
-		}
-
-	/**The label text, or <code>null</code> if there is no label text.*/
-	private String labelText=null;
-
-		/**@return The label text, or <code>null</code> if there is no label text.*/
-		public String getLabelText() {return labelText;}
-
-		/**Sets the text of the label.
-		This is a bound property.
-		@param newLabelText The new text of the label.
-		@see #LABEL_TEXT_PROPERTY
-		*/
-		public void setLabelText(final String newLabelText)
-		{
-			if(!ObjectUtilities.equals(labelText, newLabelText))	//if the value is really changing
-			{
-				final String oldLabel=labelText;	//get the old value
-				labelText=newLabelText;	//actually change the value
-				firePropertyChange(LABEL_TEXT_PROPERTY, oldLabel, newLabelText);	//indicate that the value changed
-			}			
-		}
-
-	/**The content type of the label text.*/
-	private ContentType labelTextContentType=Model.PLAIN_TEXT_CONTENT_TYPE;
-
-		/**@return The content type of the label text.*/
-		public ContentType getLabelTextContentType() {return labelTextContentType;}
-
-		/**Sets the content type of the label text.
-		This is a bound property.
-		@param newLabelTextContentType The new label text content type.
-		@exception NullPointerException if the given content type is <code>null</code>.
-		@exception IllegalArgumentException if the given content type is not a text content type.
-		@see #LABEL_TEXT_CONTENT_TYPE_PROPERTY
-		*/
-		public void setLabelTextContentType(final ContentType newLabelTextContentType)
-		{
-			checkNull(newLabelTextContentType, "Content type cannot be null.");
-			if(labelTextContentType!=newLabelTextContentType)	//if the value is really changing
-			{
-				final ContentType oldLabelTextContentType=labelTextContentType;	//get the old value
-				if(!isText(newLabelTextContentType))	//if the new content type is not a text content type
-				{
-					throw new IllegalArgumentException("Content type "+newLabelTextContentType+" is not a text content type.");
-				}
-				labelTextContentType=newLabelTextContentType;	//actually change the value
-				firePropertyChange(LABEL_TEXT_CONTENT_TYPE_PROPERTY, oldLabelTextContentType, newLabelTextContentType);	//indicate that the value changed
-			}			
-		}
-
-	/**The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-	private String labelTextResourceKey=null;
-	
-		/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-		public String getLabelTextResourceKey() {return labelTextResourceKey;}
-	
-		/**Sets the key identifying the text of the label in the resources.
-		This is a bound property.
-		@param newLabelTextResourceKey The new label text resource key.
-		@see #LABEL_TEXT_RESOURCE_KEY_PROPERTY
-		*/
-		public void setLabelTextResourceKey(final String newLabelTextResourceKey)
-		{
-			if(!ObjectUtilities.equals(labelTextResourceKey, newLabelTextResourceKey))	//if the value is really changing
-			{
-				final String oldLabelTextResourceKey=labelTextResourceKey;	//get the old value
-				labelTextResourceKey=newLabelTextResourceKey;	//actually change the value
-				firePropertyChange(LABEL_TEXT_RESOURCE_KEY_PROPERTY, oldLabelTextResourceKey, newLabelTextResourceKey);	//indicate that the value changed
-			}
-		}
 
 	/**The map of cell representation strategies for columns.*/
 	private final Map<TableColumnModel<?>, CellRepresentationStrategy<?>> columnCellRepresentationStrategyMap=new ConcurrentHashMap<TableColumnModel<?>, CellRepresentationStrategy<?>>();
@@ -462,7 +345,7 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 			}
 			else	//if the component should not be editable, return a message component
 			{
-				return new Message(session, id, new DefaultCellMessageModel<C>(session, model, cell, getConverter()));	//create a message component containing a message model representing the value's string value				
+				return new DefaultCellMessage<C>(session, id, model, cell, getConverter());	//create a message component containing a message model representing the value's string value				
 			}
 		}
 	}
@@ -471,13 +354,13 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 	@param <C> The type of value in the cell.
 	@author Garret Wilson
 	*/
-	public static class DefaultCellMessageModel<C> extends DefaultMessageModel
+	public static class DefaultCellMessage<C> extends Message	//TODO convert this to a DefaultCellText component
 	{
 		/**The table model of the cell.*/
-		private final TableModel model;
+		private final TableModel tableModel;
 
 			/**@return The table model of the cell.*/
-			protected TableModel getModel() {return model;}
+			protected TableModel getTableModel() {return tableModel;}
 
 		/**The cell being represented*/
 		private TableModel.Cell<C> cell;
@@ -491,17 +374,18 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 			/**@return The converter to use for displaying the value as a string.*/
 			public Converter<? super C, String> getConverter() {return converter;}
 
-		/**Constructs a default message model for a cell.
+		/**Constructs a default message for a cell.
 		@param session The Guise session that owns this model.
-		@param model The table model of the cell.
+		@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+		@param tableModel The table model of the cell.
 		@param cell The cell being represented.
 		@param converter The converter to use for displaying the value as a string.
 		@exception NullPointerException if the given session, table model and/or cell is <code>null</code>.
 		*/
-		public DefaultCellMessageModel(final GuiseSession session, final TableModel model, final TableModel.Cell<C> cell, final Converter<? super C, String> converter)
+		public DefaultCellMessage(final GuiseSession session, final String id, final TableModel tableModel, final TableModel.Cell<C> cell, final Converter<? super C, String> converter)
 		{
-			super(session);	//construct the parent class
-			this.model=checkNull(model, "Table model cannot be null.");
+			super(session, id);	//construct the parent class
+			this.tableModel=checkNull(tableModel, "Table model cannot be null.");
 			this.cell=checkNull(cell, "Cell cannot be null.");
 			this.converter=checkNull(converter, "Converter cannot be null.");
 		}
@@ -517,7 +401,7 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 			if(message==null)	//if no message has been explicitly set
 			{
 				final TableModel.Cell<C> cell=getCell();	//get our current cell
-				final C value=getModel().getCellValue(cell.getRowIndex(), cell.getColumn());	//get the value from the table model
+				final C value=getTableModel().getCellValue(cell.getRowIndex(), cell.getColumn());	//get the value from the table model
 				try
 				{
 					message=getConverter().convertValue(value);	//return the literal value of the value

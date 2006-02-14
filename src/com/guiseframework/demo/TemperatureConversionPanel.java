@@ -29,12 +29,12 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 	public TemperatureConversionPanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Flow.LINE));	//construct the parent class flowing horizontally
-		setLabelText("Guise\u2122 Demonstration: Temperature Conversion");	//set the panel title	
+		setLabel("Guise\u2122 Demonstration: Temperature Conversion");	//set the panel title	
 
 			//input panel
 		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE));	//create the input panel flowing vertically
 		temperatureInput=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
-		temperatureInput.setLabelText("Input Temperature");	//add a label to the text input control
+		temperatureInput.setLabel("Input Temperature");	//add a label to the text input control
 		temperatureInput.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
 		temperatureInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Float>()	//listen for temperature changes
 				{
@@ -45,7 +45,7 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 				});		
 		inputPanel.add(temperatureInput);	//add the input control to the input panel
 		temperatureOutput=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
-		temperatureOutput.setLabelText("Output Temperature");	//add a label to the text output control
+		temperatureOutput.setLabel("Output Temperature");	//add a label to the text output control
 		temperatureOutput.getModel().setEditable(false);	//set the text output control to read-only so that the user cannot modify it
 		inputPanel.add(temperatureOutput);	//add the output control to the input panel
 
@@ -55,9 +55,9 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 			
 			//scale panel
 		final GroupPanel scalePanel=new GroupPanel(session, new FlowLayout(session, Flow.PAGE));	//create the scale panel flowing vertically
-		scalePanel.setLabelText("Input Scale");	//set the group panel label
+		scalePanel.setLabel("Input Scale");	//set the group panel label
 		celsiusCheckControl=new CheckControl(session, CheckControl.CheckType.ELLIPSE);	//create a check control for the Celsius scale, using an ellipse check are
-		celsiusCheckControl.setLabelText("Celsius");	//set the label of the check to indicate the scale
+		celsiusCheckControl.setLabel("Celsius");	//set the label of the check to indicate the scale
 		try
 		{
 			celsiusCheckControl.getModel().setValue(Boolean.TRUE);	//default to converting from Celsius to Fahrenheit
@@ -68,7 +68,7 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 		}
 		scalePanel.add(celsiusCheckControl);	//add the Celsius check control to the panel	
 		fahrenheitCheckControl=new CheckControl(session, CheckControl.CheckType.ELLIPSE);	//create a check control for the Fahrenheit scale, using an ellipse check are
-		fahrenheitCheckControl.setLabelText("Fahrenheit");	//set the label of the check to indicate the scale
+		fahrenheitCheckControl.setLabel("Fahrenheit");	//set the label of the check to indicate the scale
 		scalePanel.add(fahrenheitCheckControl);	//add the Fahrenheit check control to the panel	
 			//create a mutual exclusion policy group and add the Celsius and Fahrenheit check box boolean value models to get radio button functionality
 		final ModelGroup<ValueModel<Boolean>> radioButtonModelGroup=new MutualExclusionPolicyModelGroup(celsiusCheckControl.getModel(), fahrenheitCheckControl.getModel());
@@ -91,7 +91,7 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 		
 			//conversion button
 		final Button convertButton=new Button(session);	//create a button for initiating the conversion
-		convertButton.setLabelText("Convert");	//set the button label
+		convertButton.setLabel("Convert");	//set the button label
 		convertButton.getModel().addActionListener(new ActionListener()	//when the convert button is pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)	//convert the temperature in the input field and place the result in the output field

@@ -29,7 +29,7 @@ public class BookmarksPanel extends DefaultNavigationPanel
 	public BookmarksPanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Flow.PAGE));	//construct the parent class flowing vertically
-		setLabelText("Guise\u2122 Demonstration: Bookmarks");	//set the panel title	
+		setLabel("Guise\u2122 Demonstration: Bookmarks");	//set the panel title	
 
 				//TabbedPanel
 		tabbedPanel=new TabbedPanel(session);	//create a tabbed panel
@@ -37,7 +37,7 @@ public class BookmarksPanel extends DefaultNavigationPanel
 		{
 			final Panel<?> tab=new LayoutPanel(session);	//create a panel to serve as the page
 			final Heading tabHeading=new Heading(session, 0);	//create a top-level heading
-			tabHeading.setLabelText("This is step "+i+".");	//set the text of the heading
+			tabHeading.setLabel("This is step "+i+".");	//set the text of the heading
 			tab.add(tabHeading);	//add the heading to the tab
 			tabbedPanel.add(tab, new CardLayout.Constraints("Step "+i));	//add the panel with a label			
 		}

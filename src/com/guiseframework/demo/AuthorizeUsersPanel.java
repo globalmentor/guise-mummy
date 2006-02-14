@@ -35,7 +35,7 @@ public class AuthorizeUsersPanel extends DefaultNavigationPanel
 	public AuthorizeUsersPanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Flow.PAGE));	//construct the parent class flowing vertically
-		setLabelText("Guise\u2122 Demonstration: Authorize Users");	//set the panel title	
+		setLabel("Guise\u2122 Demonstration: Authorize Users");	//set the panel title	
 
 			//create the table columns
 		idColumn=new DefaultTableColumnModel<String>(session, String.class, "ID");	//ID
@@ -50,11 +50,11 @@ public class AuthorizeUsersPanel extends DefaultNavigationPanel
 		userAuthorizationModel=new UserAuthorizationTableModel(session, idColumn, lastNameColumn, firstNameColumn, emailColumn, authorizedColumn);	//create the table model
 			//create the table
 		final Table userAuthorizationTable=new Table(session, userAuthorizationModel);	//create the table component
-		userAuthorizationTable.setLabelText("User Authorizations");	//give the table a label
+		userAuthorizationTable.setLabel("User Authorizations");	//give the table a label
 		add(userAuthorizationTable);	//add the user authorization table to the panel
 			//apply button
 		final Button applyButton=new Button(session);	//create a button for applying the values
-		applyButton.setLabelText("Apply");	//set the button label
+		applyButton.setLabel("Apply");	//set the button label
 		applyButton.getModel().addActionListener(new ActionListener()	//listen for the apply button
 				{					
 					public void actionPerformed(ActionEvent actionEvent)
@@ -62,7 +62,7 @@ public class AuthorizeUsersPanel extends DefaultNavigationPanel
 						final MessageOptionDialogFrame messageDialog=new MessageOptionDialogFrame(session,	//create a new message dialog
 								"The use of AJAX in Guise makes the \"Apply\" button unnecessary, because changes take place live. This button would only be useful if AJAX were disabled.",
 								MessageOptionDialogFrame.Option.OK);	//show the OK button
-						messageDialog.setLabelText("Note on the \"Apply\" button.");	//set the message dialog label
+						messageDialog.setLabel("Note on the \"Apply\" button.");	//set the message dialog label
 						messageDialog.open(true);	//open the dialog modally
 					}
 				});

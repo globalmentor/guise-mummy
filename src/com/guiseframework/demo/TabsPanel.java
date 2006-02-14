@@ -18,23 +18,23 @@ public class TabsPanel extends DefaultNavigationPanel
 	public TabsPanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Flow.PAGE));	//construct the parent class flowing vertically
-		setLabelText("Guise\u2122 Demonstration: Tabs");	//set the panel title	
+		setLabel("Guise\u2122 Demonstration: Tabs");	//set the panel title	
 
 			//TabbedPanel and CardTabControl demo
 		final GroupPanel tabbedPanelPanel=new GroupPanel(session, new FlowLayout(session, Flow.PAGE));	//create a panel flowing vertically
-		tabbedPanelPanel.setLabelText("TabbedPanel with associated CardTabControl");
+		tabbedPanelPanel.setLabel("TabbedPanel with associated CardTabControl");
 				//TabbedPanel
 		final TabbedPanel tabbedPanel=new TabbedPanel(session);	//create a tabbed panel
 					//page 1
 		final Panel<?> tabbedPanelPage1=new LayoutPanel(session);	//create a panel to serve as the page
 		final Heading tabbedPanelPage1Heading=new Heading(session, 0);	//create a top-level heading
-		tabbedPanelPage1Heading.setLabelText("This is page 1.");	//set the text of the heading
+		tabbedPanelPage1Heading.setLabel("This is page 1.");	//set the text of the heading
 		tabbedPanelPage1.add(tabbedPanelPage1Heading);	//add the heading to the page
 		tabbedPanel.add(tabbedPanelPage1, new CardLayout.Constraints("Page 1"));	//add the panel with a label
 					//page 2
 		final Panel<?> tabbedPanelPage2=new LayoutPanel(session);	//create a panel to serve as the page
 		final Heading tabbedPanelPage2Heading=new Heading(session, 0);	//create a top-level heading
-		tabbedPanelPage2Heading.setLabelText("This is page 2.");	//set the text of the heading
+		tabbedPanelPage2Heading.setLabel("This is page 2.");	//set the text of the heading
 		tabbedPanelPage2.add(tabbedPanelPage2Heading);	//add the heading to the page
 		tabbedPanel.add(tabbedPanelPage2, new CardLayout.Constraints("Page 2"));	//add the panel with a label
 		tabbedPanelPanel.add(tabbedPanel);
@@ -45,19 +45,19 @@ public class TabsPanel extends DefaultNavigationPanel
 
 			//CardPanel and CardTabControl demo
 		final GroupPanel cardPanelPanel=new GroupPanel(session, new FlowLayout(session, Flow.PAGE));	//create a panel flowing vertically
-		cardPanelPanel.setLabelText("CardTabControl associated with CardPanel");
+		cardPanelPanel.setLabel("CardTabControl associated with CardPanel");
 				//CardPanel
 		final CardPanel cardPanel=new CardPanel(session);	//create a card panel
 					//page 1
 		final Panel<?> cardPanelPage1=new LayoutPanel(session);	//create a panel to serve as the page
 		final Heading cardPanelPage1Heading=new Heading(session, 0);	//create a top-level heading
-		cardPanelPage1Heading.setLabelText("This is page 1.");	//set the text of the heading
+		cardPanelPage1Heading.setLabel("This is page 1.");	//set the text of the heading
 		cardPanelPage1.add(cardPanelPage1Heading);	//add the heading to the page
 		cardPanel.add(cardPanelPage1, new CardLayout.Constraints("Page 1"));	//add the panel with a label
 					//page 2
 		final Panel<?> cardPanelPage2=new LayoutPanel(session);	//create a panel to serve as the page
 		final Heading cardPanelPage2Heading=new Heading(session, 0);	//create a top-level heading
-		cardPanelPage2Heading.setLabelText("This is page 2.");	//set the text of the heading
+		cardPanelPage2Heading.setLabel("This is page 2.");	//set the text of the heading
 		cardPanelPage2.add(cardPanelPage2Heading);	//add the heading to the page
 		cardPanel.add(cardPanelPage2, new CardLayout.Constraints("Page 2"));	//add the panel with a label
 				//CardTabControl
@@ -68,7 +68,7 @@ public class TabsPanel extends DefaultNavigationPanel
 
 			//TabControl demo
 		final GroupPanel tabControlPanel=new GroupPanel(session, new FlowLayout(session, Flow.PAGE));	//create a panel flowing vertically
-		tabControlPanel.setLabelText("Standalone TabControl.");
+		tabControlPanel.setLabel("Standalone TabControl.");
 				//TabControl
 		final TabControl<Integer> tabControl=new TabControl<Integer>(session, Integer.class, Flow.LINE);	//create a horizontal
 		tabControl.getModel().add(new Integer(5));

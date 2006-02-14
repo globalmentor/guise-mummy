@@ -5,6 +5,7 @@ import javax.mail.internet.ContentType;
 
 import static com.garretwilson.io.ContentTypeConstants.*;
 import static com.garretwilson.io.ContentTypeUtilities.*;
+import static com.garretwilson.lang.ClassUtilities.getPropertyName;
 import static com.garretwilson.lang.ObjectUtilities.checkNull;
 import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.text.TextUtilities.isText;
@@ -23,7 +24,7 @@ This component installs a default export strategy supporting export of the follo
 </ul>
 @author Garret Wilson
 */
-public class Image extends AbstractComponent<Image> implements LabeledComponent<Image>
+public class Image extends AbstractComponent<Image>
 {
 
 	/**@return The data model used by this component.*/
@@ -45,115 +46,80 @@ public class Image extends AbstractComponent<Image> implements LabeledComponent<
 	/**The bound property of whether the component has image dragging enabled.*/
 //TODO del if not needed	public final static String IMAGE_DRAG_ENABLED_PROPERTY=getPropertyName(Image.class, "imageDragEnabled");
 
-	/**The label icon URI, or <code>null</code> if there is no icon URI.*/
-	private URI labelIcon=null;
+	/**The message bound property.*/
+	public final static String MESSAGE_PROPERTY=getPropertyName(Image.class, "message");
+	/**The message content type bound property.*/
+	public final static String MESSAGE_CONTENT_TYPE_PROPERTY=getPropertyName(Image.class, "messageContentType");
+	/**The message resource key bound property.*/
+	public final static String MESSAGE_RESOURCE_KEY_PROPERTY=getPropertyName(Image.class, "messageResourceKey");
 
-		/**@return The label icon URI, or <code>null</code> if there is no icon URI.*/
-		public URI getLabelIcon() {return labelIcon;}
+	/**The message text, or <code>null</code> if there is no message text.*/
+	private String message=null;
 
-		/**Sets the URI of the label icon.
-		This is a bound property of type <code>URI</code>.
-		@param newLabelIcon The new URI of the label icon.
-		@see #LABEL_ICON_PROPERTY
+		/**@return The message text, or <code>null</code> if there is no message text.*/
+		public String getMessage() {return message;}
+
+		/**Sets the text of the message.
+		This is a bound property.
+		@param newMessage The new text of the message.
+		@see #MESSAGE_PROPERTY
 		*/
-		public void setLabelIcon(final URI newLabelIcon)
+		public void setMessage(final String newMessage)
 		{
-			if(!ObjectUtilities.equals(labelIcon, newLabelIcon))	//if the value is really changing
+			if(!ObjectUtilities.equals(message, newMessage))	//if the value is really changing
 			{
-				final URI oldLabelIcon=labelIcon;	//get the old value
-				labelIcon=newLabelIcon;	//actually change the value
-				firePropertyChange(LABEL_ICON_PROPERTY, oldLabelIcon, newLabelIcon);	//indicate that the value changed
+				final String oldMessage=message;	//get the old value
+				message=newMessage;	//actually change the value
+				firePropertyChange(MESSAGE_PROPERTY, oldMessage, newMessage);	//indicate that the value changed
 			}			
 		}
 
-	/**The label icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-	private String labelIconResourceKey=null;
+	/**The content type of the message text.*/
+	private ContentType messageContentType=Component.PLAIN_TEXT_CONTENT_TYPE;
 
-		/**@return The label icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-		public String getLabelIconResourceKey() {return labelIconResourceKey;}
+		/**@return The content type of the message text.*/
+		public ContentType getMessageContentType() {return messageContentType;}
 
-		/**Sets the key identifying the URI of the label icon in the resources.
+		/**Sets the content type of the message text.
 		This is a bound property.
-		@param newIconResourceKey The new label icon URI resource key.
-		@see #LABEL_ICON_RESOURCE_KEY_PROPERTY
-		*/
-		public void setLabelIconResourceKey(final String newIconResourceKey)
-		{
-			if(!ObjectUtilities.equals(labelIconResourceKey, newIconResourceKey))	//if the value is really changing
-			{
-				final String oldIconResourceKey=labelIconResourceKey;	//get the old value
-				labelIconResourceKey=newIconResourceKey;	//actually change the value
-				firePropertyChange(LABEL_ICON_RESOURCE_KEY_PROPERTY, oldIconResourceKey, newIconResourceKey);	//indicate that the value changed
-			}
-		}
-
-	/**The label text, or <code>null</code> if there is no label text.*/
-	private String labelText=null;
-
-		/**@return The label text, or <code>null</code> if there is no label text.*/
-		public String getLabelText() {return labelText;}
-
-		/**Sets the text of the label.
-		This is a bound property.
-		@param newLabelText The new text of the label.
-		@see #LABEL_TEXT_PROPERTY
-		*/
-		public void setLabelText(final String newLabelText)
-		{
-			if(!ObjectUtilities.equals(labelText, newLabelText))	//if the value is really changing
-			{
-				final String oldLabel=labelText;	//get the old value
-				labelText=newLabelText;	//actually change the value
-				firePropertyChange(LABEL_TEXT_PROPERTY, oldLabel, newLabelText);	//indicate that the value changed
-			}			
-		}
-
-	/**The content type of the label text.*/
-	private ContentType labelTextContentType=Model.PLAIN_TEXT_CONTENT_TYPE;
-
-		/**@return The content type of the label text.*/
-		public ContentType getLabelTextContentType() {return labelTextContentType;}
-
-		/**Sets the content type of the label text.
-		This is a bound property.
-		@param newLabelTextContentType The new label text content type.
+		@param newMessageContentType The new message text content type.
 		@exception NullPointerException if the given content type is <code>null</code>.
 		@exception IllegalArgumentException if the given content type is not a text content type.
-		@see #LABEL_TEXT_CONTENT_TYPE_PROPERTY
+		@see #MESSAGE_CONTENT_TYPE_PROPERTY
 		*/
-		public void setLabelTextContentType(final ContentType newLabelTextContentType)
+		public void setMessageContentType(final ContentType newMessageContentType)
 		{
-			checkNull(newLabelTextContentType, "Content type cannot be null.");
-			if(labelTextContentType!=newLabelTextContentType)	//if the value is really changing
+			checkNull(newMessageContentType, "Content type cannot be null.");
+			if(messageContentType!=newMessageContentType)	//if the value is really changing
 			{
-				final ContentType oldLabelTextContentType=labelTextContentType;	//get the old value
-				if(!isText(newLabelTextContentType))	//if the new content type is not a text content type
+				final ContentType oldMessageContentType=messageContentType;	//get the old value
+				if(!isText(newMessageContentType))	//if the new content type is not a text content type
 				{
-					throw new IllegalArgumentException("Content type "+newLabelTextContentType+" is not a text content type.");
+					throw new IllegalArgumentException("Content type "+newMessageContentType+" is not a text content type.");
 				}
-				labelTextContentType=newLabelTextContentType;	//actually change the value
-				firePropertyChange(LABEL_TEXT_CONTENT_TYPE_PROPERTY, oldLabelTextContentType, newLabelTextContentType);	//indicate that the value changed
+				messageContentType=newMessageContentType;	//actually change the value
+				firePropertyChange(MESSAGE_CONTENT_TYPE_PROPERTY, oldMessageContentType, newMessageContentType);	//indicate that the value changed
 			}			
 		}
 
-	/**The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-	private String labelTextResourceKey=null;
-	
-		/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-		public String getLabelTextResourceKey() {return labelTextResourceKey;}
-	
-		/**Sets the key identifying the text of the label in the resources.
+	/**The message text resource key, or <code>null</code> if there is no message text resource specified.*/
+	private String messageResourceKey=null;
+
+		/**@return The message text resource key, or <code>null</code> if there is no message text resource specified.*/
+		public String getMessageResourceKey() {return messageResourceKey;}
+
+		/**Sets the key identifying the text of the message in the resources.
 		This is a bound property.
-		@param newLabelTextResourceKey The new label text resource key.
-		@see #LABEL_TEXT_RESOURCE_KEY_PROPERTY
+		@param newMessageResourceKey The new message text resource key.
+		@see #MESSAGE_RESOURCE_KEY_PROPERTY
 		*/
-		public void setLabelTextResourceKey(final String newLabelTextResourceKey)
+		public void setMessageResourceKey(final String newMessageResourceKey)
 		{
-			if(!ObjectUtilities.equals(labelTextResourceKey, newLabelTextResourceKey))	//if the value is really changing
+			if(!ObjectUtilities.equals(messageResourceKey, newMessageResourceKey))	//if the value is really changing
 			{
-				final String oldLabelTextResourceKey=labelTextResourceKey;	//get the old value
-				labelTextResourceKey=newLabelTextResourceKey;	//actually change the value
-				firePropertyChange(LABEL_TEXT_RESOURCE_KEY_PROPERTY, oldLabelTextResourceKey, newLabelTextResourceKey);	//indicate that the value changed
+				final String oldMessageResourceKey=messageResourceKey;	//get the old value
+				messageResourceKey=newMessageResourceKey;	//actually change the value
+				firePropertyChange(MESSAGE_RESOURCE_KEY_PROPERTY, oldMessageResourceKey, newMessageResourceKey);	//indicate that the value changed
 			}
 		}
 
@@ -231,7 +197,7 @@ public class Image extends AbstractComponent<Image> implements LabeledComponent<
 		This implementation returns a URI-list content type and the content type of the label.
 		@return The content types available for this transfer.
 		*/
-		public ContentType[] getContentTypes() {return createArray(new ContentType(TEXT, URI_LIST_SUBTYPE, null), getSource().getLabelTextContentType());}
+		public ContentType[] getContentTypes() {return createArray(new ContentType(TEXT, URI_LIST_SUBTYPE, null), getSource().getLabelContentType());}
 
 		/**Transfers data using the given content type.
 		@param contentType The type of data expected.
@@ -247,9 +213,9 @@ public class Image extends AbstractComponent<Image> implements LabeledComponent<
 				final URI imageURI=imageModel.getImage();	//get the image URI
 				return imageURI!=null ? createURIList(imageURI) : null;	//return the image URI, if there is one
 			}
-			else if(contentType.match(image.getLabelTextContentType()))	//if the label has the content type requested
+			else if(contentType.match(image.getLabelContentType()))	//if the label has the content type requested
 			{
-				return image.getSession().determineString(image.getLabelText(), image.getLabelTextResourceKey());	//return the label text
+				return image.getSession().determineString(image.getLabel(), image.getLabelResourceKey());	//return the label text
 			}
 			else	//if we don't support this content type
 			{

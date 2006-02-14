@@ -258,8 +258,8 @@ public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultO
 						}
 					});
 			final Button button=new Button(session, actionModel);	//create a new button
-			button.setLabelTextResourceKey(MessageFormat.format("frame.dialog.options.{0}.label", option.toString()));	//set the option action label
-			button.setLabelIconResourceKey(MessageFormat.format("frame.dialog.options.{0}.icon", option.toString()));	//set the option action icon
+			button.setLabelResourceKey(MessageFormat.format("frame.dialog.options.{0}.label", option.toString()));	//set the option action label
+			button.setIconResourceKey(MessageFormat.format("frame.dialog.options.{0}.icon", option.toString()));	//set the option action icon
 			optionContainer.add(button);	//add the button to the container
 		}
 

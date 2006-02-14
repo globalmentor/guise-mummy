@@ -1,136 +1,102 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ObjectUtilities.checkNull;
-import static com.garretwilson.text.TextUtilities.isText;
-
-import java.net.URI;
+import static com.garretwilson.lang.ClassUtilities.*;
+import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.text.TextUtilities.*;
 
 import javax.mail.internet.ContentType;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
-import com.guiseframework.model.DefaultMessageModel;
-import com.guiseframework.model.MessageModel;
-import com.guiseframework.model.Model;
+import com.guiseframework.model.*;
 
-/**A message component.
+/**A message component showing the message and any label.
+The message only supports text content types, including:
+<ul>
+	<li><code>text/*</code></li>
+	<li><code>application/xml</code></li>
+	<li><code>application/*+xml</code></li>
+</ul>
+<p>The message defaults to a content type of <code>text/plain</code>.</p>
 @author Garret Wilson
 */
-public class Message extends AbstractComponent<Message> implements LabeledComponent<Message>
+public class Message extends AbstractComponent<Message>
 {
 
-	/**@return The data model used by this component.*/
-	public MessageModel getModel() {return (MessageModel)super.getModel();}
+	/**The message bound property.*/
+	public final static String MESSAGE_PROPERTY=getPropertyName(Message.class, "message");
+	/**The message content type bound property.*/
+	public final static String MESSAGE_CONTENT_TYPE_PROPERTY=getPropertyName(Message.class, "messageContentType");
+	/**The message resource key bound property.*/
+	public final static String MESSAGE_RESOURCE_KEY_PROPERTY=getPropertyName(Message.class, "messageResourceKey");
 
-	/**The label icon URI, or <code>null</code> if there is no icon URI.*/
-	private URI labelIcon=null;
+	/**The message text, or <code>null</code> if there is no message text.*/
+	private String message=null;
 
-		/**@return The label icon URI, or <code>null</code> if there is no icon URI.*/
-		public URI getLabelIcon() {return labelIcon;}
+		/**@return The message text, or <code>null</code> if there is no message text.*/
+		public String getMessage() {return message;}
 
-		/**Sets the URI of the label icon.
-		This is a bound property of type <code>URI</code>.
-		@param newLabelIcon The new URI of the label icon.
-		@see #LABEL_ICON_PROPERTY
+		/**Sets the text of the message.
+		This is a bound property.
+		@param newMessage The new text of the message.
+		@see #MESSAGE_PROPERTY
 		*/
-		public void setLabelIcon(final URI newLabelIcon)
+		public void setMessage(final String newMessage)
 		{
-			if(!ObjectUtilities.equals(labelIcon, newLabelIcon))	//if the value is really changing
+			if(!ObjectUtilities.equals(message, newMessage))	//if the value is really changing
 			{
-				final URI oldLabelIcon=labelIcon;	//get the old value
-				labelIcon=newLabelIcon;	//actually change the value
-				firePropertyChange(LABEL_ICON_PROPERTY, oldLabelIcon, newLabelIcon);	//indicate that the value changed
+				final String oldMessage=message;	//get the old value
+				message=newMessage;	//actually change the value
+				firePropertyChange(MESSAGE_PROPERTY, oldMessage, newMessage);	//indicate that the value changed
 			}			
 		}
 
-	/**The label icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-	private String labelIconResourceKey=null;
+	/**The content type of the message text.*/
+	private ContentType messageContentType=Component.PLAIN_TEXT_CONTENT_TYPE;
 
-		/**@return The label icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-		public String getLabelIconResourceKey() {return labelIconResourceKey;}
+		/**@return The content type of the message text.*/
+		public ContentType getMessageContentType() {return messageContentType;}
 
-		/**Sets the key identifying the URI of the label icon in the resources.
+		/**Sets the content type of the message text.
 		This is a bound property.
-		@param newIconResourceKey The new label icon URI resource key.
-		@see #LABEL_ICON_RESOURCE_KEY_PROPERTY
-		*/
-		public void setLabelIconResourceKey(final String newIconResourceKey)
-		{
-			if(!ObjectUtilities.equals(labelIconResourceKey, newIconResourceKey))	//if the value is really changing
-			{
-				final String oldIconResourceKey=labelIconResourceKey;	//get the old value
-				labelIconResourceKey=newIconResourceKey;	//actually change the value
-				firePropertyChange(LABEL_ICON_RESOURCE_KEY_PROPERTY, oldIconResourceKey, newIconResourceKey);	//indicate that the value changed
-			}
-		}
-
-	/**The label text, or <code>null</code> if there is no label text.*/
-	private String labelText=null;
-
-		/**@return The label text, or <code>null</code> if there is no label text.*/
-		public String getLabelText() {return labelText;}
-
-		/**Sets the text of the label.
-		This is a bound property.
-		@param newLabelText The new text of the label.
-		@see #LABEL_TEXT_PROPERTY
-		*/
-		public void setLabelText(final String newLabelText)
-		{
-			if(!ObjectUtilities.equals(labelText, newLabelText))	//if the value is really changing
-			{
-				final String oldLabel=labelText;	//get the old value
-				labelText=newLabelText;	//actually change the value
-				firePropertyChange(LABEL_TEXT_PROPERTY, oldLabel, newLabelText);	//indicate that the value changed
-			}			
-		}
-
-	/**The content type of the label text.*/
-	private ContentType labelTextContentType=Model.PLAIN_TEXT_CONTENT_TYPE;
-
-		/**@return The content type of the label text.*/
-		public ContentType getLabelTextContentType() {return labelTextContentType;}
-
-		/**Sets the content type of the label text.
-		This is a bound property.
-		@param newLabelTextContentType The new label text content type.
+		@param newMessageContentType The new message text content type.
 		@exception NullPointerException if the given content type is <code>null</code>.
 		@exception IllegalArgumentException if the given content type is not a text content type.
-		@see #LABEL_TEXT_CONTENT_TYPE_PROPERTY
+		@see #MESSAGE_CONTENT_TYPE_PROPERTY
 		*/
-		public void setLabelTextContentType(final ContentType newLabelTextContentType)
+		public void setMessageContentType(final ContentType newMessageContentType)
 		{
-			checkNull(newLabelTextContentType, "Content type cannot be null.");
-			if(labelTextContentType!=newLabelTextContentType)	//if the value is really changing
+			checkNull(newMessageContentType, "Content type cannot be null.");
+			if(messageContentType!=newMessageContentType)	//if the value is really changing
 			{
-				final ContentType oldLabelTextContentType=labelTextContentType;	//get the old value
-				if(!isText(newLabelTextContentType))	//if the new content type is not a text content type
+				final ContentType oldMessageContentType=messageContentType;	//get the old value
+				if(!isText(newMessageContentType))	//if the new content type is not a text content type
 				{
-					throw new IllegalArgumentException("Content type "+newLabelTextContentType+" is not a text content type.");
+					throw new IllegalArgumentException("Content type "+newMessageContentType+" is not a text content type.");
 				}
-				labelTextContentType=newLabelTextContentType;	//actually change the value
-				firePropertyChange(LABEL_TEXT_CONTENT_TYPE_PROPERTY, oldLabelTextContentType, newLabelTextContentType);	//indicate that the value changed
+				messageContentType=newMessageContentType;	//actually change the value
+				firePropertyChange(MESSAGE_CONTENT_TYPE_PROPERTY, oldMessageContentType, newMessageContentType);	//indicate that the value changed
 			}			
 		}
 
-	/**The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-	private String labelTextResourceKey=null;
-	
-		/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-		public String getLabelTextResourceKey() {return labelTextResourceKey;}
-	
-		/**Sets the key identifying the text of the label in the resources.
+	/**The message text resource key, or <code>null</code> if there is no message text resource specified.*/
+	private String messageResourceKey=null;
+
+		/**@return The message text resource key, or <code>null</code> if there is no message text resource specified.*/
+		public String getMessageResourceKey() {return messageResourceKey;}
+
+		/**Sets the key identifying the text of the message in the resources.
 		This is a bound property.
-		@param newLabelTextResourceKey The new label text resource key.
-		@see #LABEL_TEXT_RESOURCE_KEY_PROPERTY
+		@param newMessageResourceKey The new message text resource key.
+		@see #MESSAGE_RESOURCE_KEY_PROPERTY
 		*/
-		public void setLabelTextResourceKey(final String newLabelTextResourceKey)
+		public void setMessageResourceKey(final String newMessageResourceKey)
 		{
-			if(!ObjectUtilities.equals(labelTextResourceKey, newLabelTextResourceKey))	//if the value is really changing
+			if(!ObjectUtilities.equals(messageResourceKey, newMessageResourceKey))	//if the value is really changing
 			{
-				final String oldLabelTextResourceKey=labelTextResourceKey;	//get the old value
-				labelTextResourceKey=newLabelTextResourceKey;	//actually change the value
-				firePropertyChange(LABEL_TEXT_RESOURCE_KEY_PROPERTY, oldLabelTextResourceKey, newLabelTextResourceKey);	//indicate that the value changed
+				final String oldMessageResourceKey=messageResourceKey;	//get the old value
+				messageResourceKey=newMessageResourceKey;	//actually change the value
+				firePropertyChange(MESSAGE_RESOURCE_KEY_PROPERTY, oldMessageResourceKey, newMessageResourceKey);	//indicate that the value changed
 			}
 		}
 
@@ -151,7 +117,7 @@ public class Message extends AbstractComponent<Message> implements LabeledCompon
 	*/
 	public Message(final GuiseSession session, final String id)
 	{
-		this(session, id, new DefaultMessageModel(session));	//construct the class with a default model
+		this(session, id, new DefaultModel(session));	//construct the class with a default model
 	}
 
 	/**Session and model constructor.
@@ -159,7 +125,7 @@ public class Message extends AbstractComponent<Message> implements LabeledCompon
 	@param model The component data model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	*/
-	public Message(final GuiseSession session, final MessageModel model)
+	public Message(final GuiseSession session, final Model model)
 	{
 		this(session, null, model);	//construct the class, indicating that a default ID should be used
 	}
@@ -171,7 +137,7 @@ public class Message extends AbstractComponent<Message> implements LabeledCompon
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public Message(final GuiseSession session, final String id, final MessageModel model)
+	public Message(final GuiseSession session, final String id, final Model model)
 	{
 		super(session, id, model);	//construct the parent class
 	}

@@ -23,22 +23,22 @@ public class HelloUserPanel extends DefaultNavigationPanel
 	public HelloUserPanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Flow.PAGE));	//construct the parent class flowing vertically
-		setLabelText("Guise\u2122 Demonstration: Hello User");	//set the panel title	
+		setLabel("Guise\u2122 Demonstration: Hello User");	//set the panel title	
 
 		final Label helloUserLabel=new Label(session);	//create a label
 		helloUserLabel.setVisible(false);	//don't show the label initially
 		add(helloUserLabel);	//add the label to the panel
 		
 		final TextControl<String> userInput=new TextControl<String>(session, String.class);	//create a text input control to retrieve a string
-		userInput.setLabelText("What's your name?");	//add a label to the text input control
-		userInput.getModel().setInfo("Enter a name that does not start with whitespace.");	//add advisory information that may be shown as a tooltip
+		userInput.setLabel("What's your name?");	//add a label to the text input control
+		userInput.setInfo("Enter a name that does not start with whitespace.");	//add advisory information that may be shown as a tooltip
 		userInput.getModel().setValidator(new RegularExpressionStringValidator(session, "\\S+.*", true));	//require at least a single non-whitespace character followed by any other characters
 		userInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<String>()
 				{
 					public void propertyChange(final GuisePropertyChangeEvent<String> propertyValueChangeEvent)
 					{
 						final String user=propertyValueChangeEvent.getNewValue();	//get the name the user entered
-						helloUserLabel.setLabelText("Hello, "+user+"!");	//update the label
+						helloUserLabel.setLabel("Hello, "+user+"!");	//update the label
 						helloUserLabel.setVisible(true);	//make the label visible
 					}
 				});

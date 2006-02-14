@@ -156,11 +156,11 @@ public class CardTabControl extends TabControl<Component<?>>
 			if(value!=null)	//if there is a value
 			{
 				final CardLayout.Constraints constraints=getCardLayout().getConstraints(value);	//get the constraints
-				label.setLabelTextContentType(constraints.getLabelTextContentType());	//initialize the label from the constraints TODO improve; if the constraints change, the component won't change
-				label.setLabelIcon(constraints.getLabelIcon());
-				label.setLabelIconResourceKey(constraints.getLabelIconResourceKey());
-				label.setLabelText(constraints.getLabelText());
-				label.setLabelTextResourceKey(constraints.getLabelTextResourceKey());
+				label.setLabelContentType(constraints.getLabelContentType());	//initialize the label from the constraints TODO improve; if the constraints change, the component won't change
+				label.setIcon(constraints.getIcon());
+				label.setIconResourceKey(constraints.getIconResourceKey());
+				label.setLabel(constraints.getLabel());
+				label.setLabelResourceKey(constraints.getLabelResourceKey());
 			}
 			return label;	//return the label, which will be empty if there was no value
 		}

@@ -12,7 +12,7 @@ import com.guiseframework.event.GuisePropertyChangeListener;
 <p>A frame like other components is by default visible, but is not actually shown until its {@link #open(boolean)} method is called.</p>
 @author Garret Wilson
 */
-public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalComponent<C>, LabeledComponent<C>
+public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalComponent<C>
 {
 	/**The close action control bound property.*/
 	public final static String CLOSE_ACTION_CONTROL_PROPERTY=getPropertyName(Frame.class, "closeActionControl");

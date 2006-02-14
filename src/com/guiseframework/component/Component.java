@@ -1,15 +1,17 @@
 package com.guiseframework.component;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.*;
 
+import javax.mail.internet.ContentType;
+
 import com.garretwilson.beans.PropertyBindable;
-import com.garretwilson.lang.ObjectUtilities;
-import com.garretwilson.util.Debug;
+import com.garretwilson.text.TextConstants;
+import com.garretwilson.text.xml.xhtml.XHTMLConstants;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.component.layout.Corner;
-import com.guiseframework.component.layout.Flow;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.component.transfer.*;
 import com.guiseframework.context.GuiseContext;
@@ -23,7 +25,6 @@ import com.guiseframework.view.View;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
-
 /**Base interface for all Guise components.
 Each component must provide either a Guise session constructor; or a Guise session and string ID constructor.
 Any component may contain other components, but only a {@link Container} allows for custom addition and removal of child components.
@@ -35,7 +36,7 @@ If a developer must hide sensitive data, the developer should remove the compone
 <p>For widest platform support the general {@link #ROUNDED_CORNER_RADIUS_EXTENT} constant should be used whenever possible when requesting rounded corners.</p> 
 @author Garret Wilson
 */
-public interface Component<C extends Component<C>> extends PropertyBindable
+public interface Component<C extends Component<C>> extends PropertyBindable, Labelable
 {
 
 	/**The bound property of the background color.*/
@@ -52,6 +53,12 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	public final static String CORNER_ARC_SIZE_LINE_NEAR_PAGE_FAR_PROPERTY=getPropertyName(Component.class, "cornerArcSizeLineNearPageFar");
 	/**The bound property of the line far page far corner arc size.*/
 	public final static String CORNER_ARC_SIZE_LINE_FAR_PAGE_FAR_PROPERTY=getPropertyName(Component.class, "cornerArcSizeLineFarPageFar");
+	/**The description bound property.*/
+	public final static String DESCRIPTION_PROPERTY=getPropertyName(Component.class, "description");
+	/**The description content type bound property.*/
+	public final static String DESCRIPTION_CONTENT_TYPE_PROPERTY=getPropertyName(Component.class, "descriptionContentType");
+	/**The description resource key bound property.*/
+	public final static String DESCRIPTION_RESOURCE_KEY_PROPERTY=getPropertyName(Component.class, "descriptionResourceKey");
 	/**The bound property of whether the component is displayed or has no representation, taking up no space.*/
 	public final static String DISPLAYED_PROPERTY=getPropertyName(Component.class, "displayed");
 	/**The bound property of whether the component has dragging enabled.*/
@@ -62,6 +69,12 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	public final static String FLYOVER_ENABLED_PROPERTY=getPropertyName(Component.class, "flyoverEnabled");
 	/**The bound property of the strategy controlling flyovers.*/
 	public final static String FLYOVER_STRATEGY_PROPERTY=getPropertyName(Component.class, "flyoverStrategy");
+	/**The info bound property.*/
+	public final static String INFO_PROPERTY=getPropertyName(Component.class, "info");
+	/**The info content type bound property.*/
+	public final static String INFO_CONTENT_TYPE_PROPERTY=getPropertyName(Component.class, "infoContentType");
+	/**The info resource key bound property.*/
+	public final static String INFO_RESOURCE_KEY_PROPERTY=getPropertyName(Component.class, "infoResourceKey");
 	/**The bound property of the component name.*/
 	public final static String NAME_PROPERTY=getPropertyName(Component.class, "name");
 	/**The bound property of whether the component has tooltips enabled.*/
@@ -83,6 +96,15 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	/**The bound property of whether the component is visible.*/
 	public final static String VISIBLE_PROPERTY=getPropertyName(Component.class, "visible");
 
+	/**A content type of <code>text/plain</code>.*/
+	public final static ContentType PLAIN_TEXT_CONTENT_TYPE=TextConstants.TEXT_PLAIN_CONTENT_TYPE;
+
+	/**A content type of <code>application/xhtml+xml</code>.*/
+	public final static ContentType XHTML_CONTENT_TYPE=XHTMLConstants.XHTML_CONTENT_TYPE;
+	
+	/**A content type of <code>application/xhtml+xml-external-parsed-entity</code>.*/
+	public final static ContentType XHTML_FRAGMENT_CONTENT_TYPE=XHTMLConstants.XHTML_FRAGMENT_CONTENT_TYPE;
+
 	/*The constant value representing a general rounded corner.*/
 	public final static Dimensions ROUNDED_CORNER_ARC_SIZE=new Dimensions(0.25, 0.25, Extent.Unit.EM);
 	
@@ -101,6 +123,122 @@ public interface Component<C extends Component<C>> extends PropertyBindable
 	@see #NAME_PROPERTY 
 	*/
 	public void setName(final String newName);
+
+	/**@return The label icon URI, or <code>null</code> if there is no icon URI.*/
+	public URI getIcon();
+
+	/**Sets the URI of the label icon.
+	This is a bound property of type <code>URI</code>.
+	@param newLabelIcon The new URI of the label icon.
+	@see #ICON_PROPERTY
+	*/
+	public void setIcon(final URI newLabelIcon);
+
+	/**@return The label icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
+	public String getIconResourceKey();
+
+	/**Sets the key identifying the URI of the label icon in the resources.
+	This is a bound property.
+	@param newIconResourceKey The new label icon URI resource key.
+	@see #ICON_RESOURCE_KEY_PROPERTY
+	*/
+	public void setIconResourceKey(final String newIconResourceKey);
+
+	/**@return The label text, or <code>null</code> if there is no label text.*/
+	public String getLabel();
+
+	/**Sets the text of the label.
+	This is a bound property.
+	@param newLabelText The new text of the label.
+	@see #LABEL_PROPERTY
+	*/
+	public void setLabel(final String newLabelText);
+
+	/**@return The content type of the label text.*/
+	public ContentType getLabelContentType();
+
+	/**Sets the content type of the label text.
+	This is a bound property.
+	@param newLabelTextContentType The new label text content type.
+	@exception NullPointerException if the given content type is <code>null</code>.
+	@exception IllegalArgumentException if the given content type is not a text content type.
+	@see #LABEL_CONTENT_TYPE_PROPERTY
+	*/
+	public void setLabelContentType(final ContentType newLabelTextContentType);
+
+	/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
+	public String getLabelResourceKey();
+
+	/**Sets the key identifying the text of the label in the resources.
+	This is a bound property.
+	@param newLabelTextResourceKey The new label text resource key.
+	@see #LABEL_RESOURCE_KEY_PROPERTY
+	*/
+	public void setLabelResourceKey(final String newLabelTextResourceKey);
+
+	/**@return The advisory information text, such as might appear in a tooltip, or <code>null</code> if there is no advisory information.*/
+	public String getInfo();
+
+	/**Sets the advisory information text, such as might appear in a tooltip.
+	This is a bound property.
+	@param newInfo The new text of the advisory information, such as might appear in a tooltip.
+	@see #INFO_PROPERTY
+	*/
+	public void setInfo(final String newInfo);
+
+	/**@return The content type of the advisory information text.*/
+	public ContentType getInfoContentType();
+
+	/**Sets the content type of the advisory information text.
+	This is a bound property.
+	@param newInfoContentType The new advisory information text content type.
+	@exception NullPointerException if the given content type is <code>null</code>.
+	@exception IllegalArgumentException if the given content type is not a text content type.
+	@see #INFO_CONTENT_TYPE_PROPERTY
+	*/
+	public void setInfoContentType(final ContentType newInfoContentType);
+
+	/**@return The advisory information text resource key, or <code>null</code> if there is no advisory information text resource specified.*/
+	public String getInfoResourceKey();
+
+	/**Sets the key identifying the text of the advisory information in the resources.
+	This is a bound property.
+	@param newInfoResourceKey The new advisory information text resource key.
+	@see #INFO_RESOURCE_KEY_PROPERTY
+	*/
+	public void setInfoResourceKey(final String newInfoResourceKey);
+
+	/**@return The description text, such as might appear in a flyover, or <code>null</code> if there is no description.*/
+	public String getDescription();
+
+	/**Sets the description text, such as might appear in a flyover.
+	This is a bound property.
+	@param newDescription The new text of the description, such as might appear in a flyover.
+	@see #DESCRIPTION_PROPERTY
+	*/
+	public void setDescription(final String newDescription);
+
+	/**@return The content type of the description text.*/
+	public ContentType getDescriptionContentType();
+
+	/**Sets the content type of the description text.
+	This is a bound property.
+	@param newDescriptionContentType The new description text content type.
+	@exception NullPointerException if the given content type is <code>null</code>.
+	@exception IllegalArgumentException if the given content type is not a text content type.
+	@see #DESCRIPTION_CONTENT_TYPE_PROPERTY
+	*/
+	public void setDescriptionContentType(final ContentType newDescriptionContentType);
+
+	/**@return The description text resource key, or <code>null</code> if there is no description text resource specified.*/
+	public String getDescriptionResourceKey();
+
+	/**Sets the key identifying the text of the description in the resources.
+	This is a bound property.
+	@param newDescriptionResourceKey The new description text resource key.
+	@see #DESCRIPTION_RESOURCE_KEY_PROPERTY
+	*/
+	public void setDescriptionResourceKey(final String newDescriptionResourceKey);
 
 	/**@return The background color of the component, or <code>null</code> if no background color is specified for this component.*/
 	public Color<?> getBackgroundColor();

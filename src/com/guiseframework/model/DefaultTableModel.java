@@ -110,7 +110,7 @@ public class DefaultTableModel extends AbstractTableModel
 		for(int i=columns.length-1; i>=0; --i)	//for each column
 		{
 			final DefaultTableColumnModel<C> column=new DefaultTableColumnModel<C>(session, valueClass);	//create a new default table column
-			column.setLabelText(columnNames[i]);	//set the column label
+			column.setLabel(columnNames[i]);	//set the column label
 			columns[i]=column;	//store the column
 		}
 		return columns;	//return the columns we created

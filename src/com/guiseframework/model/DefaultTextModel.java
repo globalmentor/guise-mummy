@@ -6,6 +6,7 @@ import javax.mail.internet.ContentType;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
+import com.guiseframework.component.Component;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.text.TextUtilities.*;
@@ -46,7 +47,7 @@ public class DefaultTextModel extends AbstractModel implements TextModel
 		}
 
 	/**The content type of the text.*/
-	private ContentType textContentType=PLAIN_TEXT_CONTENT_TYPE;
+	private ContentType textContentType=Component.PLAIN_TEXT_CONTENT_TYPE;
 
 		/**@return The content type of the text.*/
 		public ContentType getTextContentType() {return textContentType;}

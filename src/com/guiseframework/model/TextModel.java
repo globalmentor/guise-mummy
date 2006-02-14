@@ -24,7 +24,7 @@ public interface TextModel extends Model
 	/**The text bound property.*/
 	public final static String TEXT_PROPERTY=getPropertyName(TextModel.class, "text");
 	/**The text resource key bound property.*/
-	public final static String TEXT_RESOURCE_KEY_PROPERTY=getPropertyName(MessageModel.class, "textResourceKey");
+	public final static String TEXT_RESOURCE_KEY_PROPERTY=getPropertyName(TextModel.class, "textResourceKey");
 
 	/**Determines the text.
 	If text is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
