@@ -24,26 +24,26 @@ public class LoginPanel extends DefaultNavigationPanel
 	public LoginPanel(final GuiseSession session)
 	{
 		super(session, new RegionLayout(session));	//construct the parent class, using a region layout
-		getModel().setLabel("Guise\u2122 Demonstration: Login");	//set the panel title
+		setLabelText("Guise\u2122 Demonstration: Login");	//set the panel title
 		
 		final LayoutPanel loginPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE));	//create the authorization panel flowing vertically
 		
 			//heading
 		final Heading heading=new Heading(session, 0);	//create a top-level heading
-		heading.getModel().setLabel("Login");	//set the text of the heading, using its model
+		heading.setLabelText("Login");	//set the text of the heading, using its model
 		loginPanel.add(heading);	//add the heading to the panel
 
 		final LayoutPanel userPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create the user panel flowing horizontally
 
 			//ID
 		final TextControl<String> idControl=new TextControl<String>(session, String.class);	//create the ID input control
-		idControl.getModel().setLabel("User ID *");	//set the ID control label
+		idControl.setLabelText("User ID *");	//set the ID control label
 		idControl.getModel().setValidator(new RegularExpressionStringValidator(session, ".+", true));	//require at least a single character
 		userPanel.add(idControl);	//add the ID control to the panel
 
 			//password
 		final TextControl<char[]> passwordControl=new TextControl<char[]>(session, char[].class);	//create the password input control
-		passwordControl.getModel().setLabel("Password *");	//set the password control label
+		passwordControl.setLabelText("Password *");	//set the password control label
 		passwordControl.setMasked(true);	//mask the password input
 		passwordControl.getModel().setValidator(new RegularExpressionCharArrayValidator(session, ".+", true));	//require at least a single character
 		userPanel.add(passwordControl);	//add the password control to the panel
@@ -52,7 +52,7 @@ public class LoginPanel extends DefaultNavigationPanel
 
 			//login button
 		final Button loginButton=new Button(session);	//create a button for logging in
-		loginButton.getModel().setLabel("Log in");	//set the button label
+		loginButton.setLabelText("Log in");	//set the button label
 		loginButton.getModel().addActionListener(new ActionListener()	//when the login button is pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)	//get the user, verify the password, and set the new session user

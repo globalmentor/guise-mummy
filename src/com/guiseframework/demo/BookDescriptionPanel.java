@@ -37,11 +37,11 @@ public class BookDescriptionPanel extends DefaultNavigationPanel
 	public BookDescriptionPanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Flow.PAGE));	//construct the parent class flowing vertically
-		getModel().setLabel("Guise\u2122 Demonstration: Book Descriptions");	//set the panel title
+		setLabelText("Guise\u2122 Demonstration: Book Descriptions");	//set the panel title
 
 			//book panel
 		final GroupPanel bookPanel=new GroupPanel(session, new FlowLayout(session, Flow.LINE));	//create the book panel flowing horizontally
-		bookPanel.getModel().setLabel("Mouse over a Book");	//set the book panel label
+		bookPanel.setLabelText("Mouse over a Book");	//set the book panel label
 
 		final Image book1=new Image(session);	//_The Great Philosophers_
 		book1.getModel().setImage(URI.create("http://www.garretwilson.com/books/reviews/greatphilosophers_small.jpg"));	//set the URI

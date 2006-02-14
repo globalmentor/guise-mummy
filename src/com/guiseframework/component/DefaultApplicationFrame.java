@@ -1,8 +1,8 @@
 package com.guiseframework.component;
 
 import com.guiseframework.GuiseSession;
-import com.guiseframework.model.DefaultLabelModel;
-import com.guiseframework.model.LabelModel;
+import com.guiseframework.model.DefaultModel;
+import com.guiseframework.model.Model;
 
 /**Default implementation of an application frame with no default component.
 @author Garret Wilson
@@ -24,7 +24,7 @@ public class DefaultApplicationFrame extends AbstractApplicationFrame<DefaultApp
 	@param model The component data model.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public DefaultApplicationFrame(final GuiseSession session, final LabelModel model)
+	public DefaultApplicationFrame(final GuiseSession session, final Model model)
 	{
 		this(session, (String)null, model);	//construct the component, indicating that a default ID should be used
 	}
@@ -37,7 +37,7 @@ public class DefaultApplicationFrame extends AbstractApplicationFrame<DefaultApp
 	*/
 	public DefaultApplicationFrame(final GuiseSession session, final String id)
 	{
-		this(session, id, new DefaultLabelModel(session));	//default to flowing vertically
+		this(session, id, new DefaultModel(session));	//default to flowing vertically
 	}
 
 	/**Session, ID, and model constructor.
@@ -47,7 +47,7 @@ public class DefaultApplicationFrame extends AbstractApplicationFrame<DefaultApp
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public DefaultApplicationFrame(final GuiseSession session, final String id, final LabelModel model)
+	public DefaultApplicationFrame(final GuiseSession session, final String id, final Model model)
 	{
 		this(session, id, model, null);	//default to no component
 	}
@@ -60,7 +60,7 @@ public class DefaultApplicationFrame extends AbstractApplicationFrame<DefaultApp
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public DefaultApplicationFrame(final GuiseSession session, final String id, final LabelModel model, final Component<?> component)
+	public DefaultApplicationFrame(final GuiseSession session, final String id, final Model model, final Component<?> component)
 	{
 		super(session, id, model, component);	//construct the parent class
 	}

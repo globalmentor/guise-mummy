@@ -24,19 +24,18 @@ public class ImageOpacityPanel extends DefaultNavigationPanel
 	public ImageOpacityPanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Flow.LINE));	//construct the parent class flowing horizontally
-		getModel().setLabel("Guise\u2122 Demonstration: Image Opacity");	//set the panel title	
+		setLabelText("Guise\u2122 Demonstration: Image Opacity");	//set the panel title	
 
 			//image
 		final Image image=new Image(session);	//create the image control
 		image.getModel().setImage(URI.create("cowcalf.jpg"));	//reference an image in the root directory of the application
-		image.getModel().setLabel("Cow and Calf");
+		image.setLabelText("Cow and Calf");
 		image.getModel().setMessage("A cow and her minutes-old calf. Use the sliders to change the opacity of the image.");
 		add(image);	//add the image
 
 			//value model shared among slider controls and text control
 		final ValueModel<Float> sliderModel=new DefaultValueModel<Float>(session, Float.class, 1.0f);	//default to 1.0
 		sliderModel.setValidator(new DecimalRangeValidator<Float>(session, 0.0f, 1.0f, 0.01f));	//set a range validator for the model
-		sliderModel.setLabel("Image Opacity");	//set the label for the model
 		sliderModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Float>()	//listen for value changes
 				{
 					public void propertyChange(GuisePropertyChangeEvent<Float> propertyValueChangeEvent)	//if the opacity value changes
@@ -60,6 +59,7 @@ public class ImageOpacityPanel extends DefaultNavigationPanel
 		add(verticalSlider);
 			//text control using shared value model
 		final TextControl<Float> sliderInput=new TextControl<Float>(session, sliderModel, percentConverter);
+		sliderInput.setLabelText("Image Opacity");	//set the label for the model
 		add(sliderInput);
 	}
 }

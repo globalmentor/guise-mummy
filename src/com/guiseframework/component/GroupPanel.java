@@ -1,41 +1,135 @@
 package com.guiseframework.component;
 
-import java.util.MissingResourceException;
+import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.text.TextUtilities.*;
 
+import java.net.URI;
+
+import javax.mail.internet.ContentType;
+
+import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.*;
-import com.guiseframework.model.DefaultLabelModel;
-import com.guiseframework.model.LabelModel;
+import com.guiseframework.model.DefaultModel;
+import com.guiseframework.model.Model;
 
 /**A panel for grouping multiple components with a default page flow layout.
 @author Garret Wilson
 */
-public class GroupPanel extends AbstractBox<GroupPanel> implements Panel<GroupPanel>
+public class GroupPanel extends AbstractBox<GroupPanel> implements Panel<GroupPanel>, LabeledComponent<GroupPanel>
 {
 
-	/**@return The data model used by this component.*/
-	public LabelModel getModel() {return (LabelModel)super.getModel();}
+	/**The label icon URI, or <code>null</code> if there is no icon URI.*/
+	private URI labelIcon=null;
 
-	/**Determines the text of the label.
-	If a label is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
-	@return The label text, or <code>null</code> if there is no label text.
-	@exception MissingResourceException if there was an error loading the value from the resources.
-	@see #getLabelResourceKey()
-	*/
-	public String getLabelText() throws MissingResourceException	//TODO testing
-	{
-		return getModel().getLabel();	//TODO fix
-	}
+		/**@return The label icon URI, or <code>null</code> if there is no icon URI.*/
+		public URI getLabelIcon() {return labelIcon;}
 
-	/**Sets the text of the label.
-	This is a bound property.
-	@param newLabel The new text of the label.
-	@see LabelModel#LABEL_PROPERTY
-	*/
-	public void setLabelText(final String newLabel)	//TODO testing
-	{
-		getModel().setLabel(newLabel);	//TODO fix
-	}
+		/**Sets the URI of the label icon.
+		This is a bound property of type <code>URI</code>.
+		@param newLabelIcon The new URI of the label icon.
+		@see #LABEL_ICON_PROPERTY
+		*/
+		public void setLabelIcon(final URI newLabelIcon)
+		{
+			if(!ObjectUtilities.equals(labelIcon, newLabelIcon))	//if the value is really changing
+			{
+				final URI oldLabelIcon=labelIcon;	//get the old value
+				labelIcon=newLabelIcon;	//actually change the value
+				firePropertyChange(LABEL_ICON_PROPERTY, oldLabelIcon, newLabelIcon);	//indicate that the value changed
+			}			
+		}
+
+	/**The label icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
+	private String labelIconResourceKey=null;
+
+		/**@return The label icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
+		public String getLabelIconResourceKey() {return labelIconResourceKey;}
+
+		/**Sets the key identifying the URI of the label icon in the resources.
+		This is a bound property.
+		@param newIconResourceKey The new label icon URI resource key.
+		@see #LABEL_ICON_RESOURCE_KEY_PROPERTY
+		*/
+		public void setLabelIconResourceKey(final String newIconResourceKey)
+		{
+			if(!ObjectUtilities.equals(labelIconResourceKey, newIconResourceKey))	//if the value is really changing
+			{
+				final String oldIconResourceKey=labelIconResourceKey;	//get the old value
+				labelIconResourceKey=newIconResourceKey;	//actually change the value
+				firePropertyChange(LABEL_ICON_RESOURCE_KEY_PROPERTY, oldIconResourceKey, newIconResourceKey);	//indicate that the value changed
+			}
+		}
+
+	/**The label text, or <code>null</code> if there is no label text.*/
+	private String labelText=null;
+
+		/**@return The label text, or <code>null</code> if there is no label text.*/
+		public String getLabelText() {return labelText;}
+
+		/**Sets the text of the label.
+		This is a bound property.
+		@param newLabelText The new text of the label.
+		@see #LABEL_TEXT_PROPERTY
+		*/
+		public void setLabelText(final String newLabelText)
+		{
+			if(!ObjectUtilities.equals(labelText, newLabelText))	//if the value is really changing
+			{
+				final String oldLabel=labelText;	//get the old value
+				labelText=newLabelText;	//actually change the value
+				firePropertyChange(LABEL_TEXT_PROPERTY, oldLabel, newLabelText);	//indicate that the value changed
+			}			
+		}
+
+	/**The content type of the label text.*/
+	private ContentType labelTextContentType=Model.PLAIN_TEXT_CONTENT_TYPE;
+
+		/**@return The content type of the label text.*/
+		public ContentType getLabelTextContentType() {return labelTextContentType;}
+
+		/**Sets the content type of the label text.
+		This is a bound property.
+		@param newLabelTextContentType The new label text content type.
+		@exception NullPointerException if the given content type is <code>null</code>.
+		@exception IllegalArgumentException if the given content type is not a text content type.
+		@see #LABEL_TEXT_CONTENT_TYPE_PROPERTY
+		*/
+		public void setLabelTextContentType(final ContentType newLabelTextContentType)
+		{
+			checkNull(newLabelTextContentType, "Content type cannot be null.");
+			if(labelTextContentType!=newLabelTextContentType)	//if the value is really changing
+			{
+				final ContentType oldLabelTextContentType=labelTextContentType;	//get the old value
+				if(!isText(newLabelTextContentType))	//if the new content type is not a text content type
+				{
+					throw new IllegalArgumentException("Content type "+newLabelTextContentType+" is not a text content type.");
+				}
+				labelTextContentType=newLabelTextContentType;	//actually change the value
+				firePropertyChange(LABEL_TEXT_CONTENT_TYPE_PROPERTY, oldLabelTextContentType, newLabelTextContentType);	//indicate that the value changed
+			}			
+		}
+
+	/**The label text resource key, or <code>null</code> if there is no label text resource specified.*/
+	private String labelTextResourceKey=null;
+	
+		/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
+		public String getLabelTextResourceKey() {return labelTextResourceKey;}
+	
+		/**Sets the key identifying the text of the label in the resources.
+		This is a bound property.
+		@param newLabelTextResourceKey The new label text resource key.
+		@see #LABEL_TEXT_RESOURCE_KEY_PROPERTY
+		*/
+		public void setLabelTextResourceKey(final String newLabelTextResourceKey)
+		{
+			if(!ObjectUtilities.equals(labelTextResourceKey, newLabelTextResourceKey))	//if the value is really changing
+			{
+				final String oldLabelTextResourceKey=labelTextResourceKey;	//get the old value
+				labelTextResourceKey=newLabelTextResourceKey;	//actually change the value
+				firePropertyChange(LABEL_TEXT_RESOURCE_KEY_PROPERTY, oldLabelTextResourceKey, newLabelTextResourceKey);	//indicate that the value changed
+			}
+		}
 
 	/**Session constructor with a default vertical flow layout.
 	@param session The Guise session that owns this component.
@@ -51,7 +145,7 @@ public class GroupPanel extends AbstractBox<GroupPanel> implements Panel<GroupPa
 	@param model The component data model.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public GroupPanel(final GuiseSession session, final LabelModel model)
+	public GroupPanel(final GuiseSession session, final Model model)
 	{
 		this(session, (String)null, model);	//construct the component, indicating that a default ID should be used
 	}
@@ -74,7 +168,7 @@ public class GroupPanel extends AbstractBox<GroupPanel> implements Panel<GroupPa
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public GroupPanel(final GuiseSession session, final String id, final LabelModel model)
+	public GroupPanel(final GuiseSession session, final String id, final Model model)
 	{
 		this(session, id, new FlowLayout(session, Flow.PAGE), model);	//default to flowing vertically
 	}
@@ -95,7 +189,7 @@ public class GroupPanel extends AbstractBox<GroupPanel> implements Panel<GroupPa
 	@param model The component data model.
 	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
 	*/
-	public GroupPanel(final GuiseSession session, final Layout layout, final LabelModel model)
+	public GroupPanel(final GuiseSession session, final Layout layout, final Model model)
 	{
 		this(session, null, layout, model);	//construct the component with the layout, indicating that a default ID should be used
 	}
@@ -109,7 +203,7 @@ public class GroupPanel extends AbstractBox<GroupPanel> implements Panel<GroupPa
 	*/
 	public GroupPanel(final GuiseSession session, final String id, final Layout layout)
 	{
-		this(session, id, layout, new DefaultLabelModel(session));	//construct the class with a default model
+		this(session, id, layout, new DefaultModel(session));	//construct the class with a default model
 	}
 
 	/**Session, ID, layout, and model constructor.
@@ -120,7 +214,7 @@ public class GroupPanel extends AbstractBox<GroupPanel> implements Panel<GroupPa
 	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public GroupPanel(final GuiseSession session, final String id, final Layout layout, final LabelModel model)
+	public GroupPanel(final GuiseSession session, final String id, final Layout layout, final Model model)
 	{
 		super(session, id, layout, model);	//construct the parent class
 	}

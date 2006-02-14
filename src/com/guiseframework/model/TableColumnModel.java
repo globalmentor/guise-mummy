@@ -2,15 +2,30 @@ package com.guiseframework.model;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
+import java.net.URI;
+
+import javax.mail.internet.ContentType;
+
+import com.guiseframework.component.Labelable;
 import com.guiseframework.validator.Validator;
 
 /**A column in a table.
 @param <V> The type of values contained in the table column.
 @author Garret Wilson
 */
-public interface TableColumnModel<V> extends ControlModel
+public interface TableColumnModel<V> extends ControlModel, Labelable
 {
 
+	/**The label icon bound property.*/
+	public final static String LABEL_ICON_PROPERTY=getPropertyName(TableColumnModel.class, "labelIcon");
+	/**The label icon resource key bound property.*/
+	public final static String LABEL_ICON_RESOURCE_KEY_PROPERTY=getPropertyName(TableColumnModel.class, "labelIconResourceKey");
+	/**The label text bound property.*/
+	public final static String LABEL_TEXT_PROPERTY=getPropertyName(TableColumnModel.class, "labelText");
+	/**The label text content type bound property.*/
+	public final static String LABEL_TEXT_CONTENT_TYPE_PROPERTY=getPropertyName(TableColumnModel.class, "labelTextContentType");
+	/**The label text resource key bound property.*/
+	public final static String LABEL_TEXT_RESOURCE_KEY_PROPERTY=getPropertyName(TableColumnModel.class, "labelTextResourceKey");
 	/**The bound property of the column style ID.*/
 	public final static String STYLE_ID_PROPERTY=getPropertyName(TableColumnModel.class, "styleID");
 	/**The validator bound property.*/
@@ -20,6 +35,58 @@ public interface TableColumnModel<V> extends ControlModel
 
 	/**@return The class representing the type of values this model can hold.*/
 	public Class<V> getValueClass();
+
+	/**@return The label icon URI, or <code>null</code> if there is no icon URI.*/
+	public URI getLabelIcon();
+
+	/**Sets the URI of the label icon.
+	This is a bound property of type <code>URI</code>.
+	@param newLabelIcon The new URI of the label icon.
+	@see #LABEL_ICON_PROPERTY
+	*/
+	public void setLabelIcon(final URI newLabelIcon);
+
+	/**@return The label icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
+	public String getLabelIconResourceKey();
+
+	/**Sets the key identifying the URI of the label icon in the resources.
+	This is a bound property.
+	@param newIconResourceKey The new label icon URI resource key.
+	@see #LABEL_ICON_RESOURCE_KEY_PROPERTY
+	*/
+	public void setLabelIconResourceKey(final String newIconResourceKey);
+
+	/**@return The label text, or <code>null</code> if there is no label text.*/
+	public String getLabelText();
+
+	/**Sets the text of the label.
+	This is a bound property.
+	@param newLabelText The new text of the label.
+	@see #LABEL_TEXT_PROPERTY
+	*/
+	public void setLabelText(final String newLabelText);
+
+	/**@return The content type of the label text.*/
+	public ContentType getLabelTextContentType();
+
+	/**Sets the content type of the label text.
+	This is a bound property.
+	@param newLabelTextContentType The new label text content type.
+	@exception NullPointerException if the given content type is <code>null</code>.
+	@exception IllegalArgumentException if the given content type is not a text content type.
+	@see #LABEL_TEXT_CONTENT_TYPE_PROPERTY
+	*/
+	public void setLabelTextContentType(final ContentType newLabelTextContentType);
+
+	/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
+	public String getLabelTextResourceKey();
+
+	/**Sets the key identifying the text of the label in the resources.
+	This is a bound property.
+	@param newLabelTextResourceKey The new label text resource key.
+	@see #LABEL_TEXT_RESOURCE_KEY_PROPERTY
+	*/
+	public void setLabelTextResourceKey(final String newLabelTextResourceKey);
 
 	/**@return Whether the cells in this table column model are editable and will allow the the user to change their values.*/
 	public boolean isEditable();

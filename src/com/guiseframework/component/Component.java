@@ -22,7 +22,6 @@ import com.guiseframework.style.Color;
 import com.guiseframework.view.View;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.checkNull;
 
 
 /**Base interface for all Guise components.

@@ -43,27 +43,6 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 	/**The valid bound property.*/
 //TODO del	public final static String VALID_PROPERTY=getPropertyName(AbstractTextControl.class, "valid");
 
-	/**Determines the text of the label.
-	If a label is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
-	@return The label text, or <code>null</code> if there is no label text.
-	@exception MissingResourceException if there was an error loading the value from the resources.
-	@see #getLabelResourceKey()
-	*/
-	public String getLabelText() throws MissingResourceException	//TODO testing
-	{
-		return getModel().getLabel();	//TODO fix
-	}
-
-	/**Sets the text of the label.
-	This is a bound property.
-	@param newLabel The new text of the label.
-	@see LabelModel#LABEL_PROPERTY
-	*/
-	public void setLabelText(final String newLabel)	//TODO testing
-	{
-		getModel().setLabel(newLabel);	//TODO fix
-	}
-
 	/**The estimated number of columns requested to be visible, or -1 if no column count is specified.*/
 	private int columnCount=-1;
 

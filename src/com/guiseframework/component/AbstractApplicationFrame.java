@@ -1,7 +1,7 @@
 package com.guiseframework.component;
 
 import com.guiseframework.GuiseSession;
-import com.guiseframework.model.LabelModel;
+import com.guiseframework.model.Model;
 
 /**Abstract implementation of an application frame.
 @author Garret Wilson
@@ -18,7 +18,7 @@ public abstract class AbstractApplicationFrame<C extends ApplicationFrame<C>> ex
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractApplicationFrame(final GuiseSession session, final String id, final LabelModel model, final Component<?> component)
+	public AbstractApplicationFrame(final GuiseSession session, final String id, final Model model, final Component<?> component)
 	{
 		super(session, id, model, component);	//construct the parent class
 	}

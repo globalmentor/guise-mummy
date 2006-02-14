@@ -1,12 +1,10 @@
 package com.guiseframework.component;
 
-import java.text.DateFormat;
 import java.util.Date;
 
 import com.guiseframework.GuiseSession;
 import com.guiseframework.event.AbstractGuisePropertyChangeListener;
 import com.guiseframework.event.GuisePropertyChangeEvent;
-import com.guiseframework.model.CalendarMonthTableModel;
 import com.guiseframework.model.DefaultValueModel;
 import com.guiseframework.model.ValueModel;
 import com.guiseframework.validator.ValidationException;

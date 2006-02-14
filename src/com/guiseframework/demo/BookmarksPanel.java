@@ -6,7 +6,6 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.AbstractGuisePropertyChangeListener;
 import com.guiseframework.event.GuisePropertyChangeEvent;
-import com.guiseframework.model.DefaultLabelModel;
 import com.guiseframework.model.ValueModel;
 import com.guiseframework.validator.ValidationException;
 
@@ -30,7 +29,7 @@ public class BookmarksPanel extends DefaultNavigationPanel
 	public BookmarksPanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Flow.PAGE));	//construct the parent class flowing vertically
-		getModel().setLabel("Guise\u2122 Demonstration: Bookmarks");	//set the panel title	
+		setLabelText("Guise\u2122 Demonstration: Bookmarks");	//set the panel title	
 
 				//TabbedPanel
 		tabbedPanel=new TabbedPanel(session);	//create a tabbed panel
@@ -38,9 +37,9 @@ public class BookmarksPanel extends DefaultNavigationPanel
 		{
 			final Panel<?> tab=new LayoutPanel(session);	//create a panel to serve as the page
 			final Heading tabHeading=new Heading(session, 0);	//create a top-level heading
-			tabHeading.getModel().setLabel("This is step "+i+".");	//set the text of the heading
+			tabHeading.setLabelText("This is step "+i+".");	//set the text of the heading
 			tab.add(tabHeading);	//add the heading to the tab
-			tabbedPanel.add(tab, new CardLayout.Constraints(new DefaultLabelModel(session, "Step "+i)));	//add the panel with a label			
+			tabbedPanel.add(tab, new CardLayout.Constraints("Step "+i));	//add the panel with a label			
 		}
 			//save a new bookmark ever time the tab changes
 		tabbedPanel.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Component<?>>()	//listen for the tab changing

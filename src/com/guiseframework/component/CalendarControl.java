@@ -1,11 +1,16 @@
 package com.guiseframework.component;
 
+import java.net.URI;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.mail.internet.ContentType;
+
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.text.TextUtilities.isText;
 
+import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.Table.CellRepresentationStrategy;
 import com.guiseframework.component.layout.Flow;
@@ -25,6 +30,118 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 
 	/**The visible date bound property.*/
 	public final static String DATE_PROPERTY=getPropertyName(CalendarControl.class, "date");
+
+	/**The label icon URI, or <code>null</code> if there is no icon URI.*/
+	private URI labelIcon=null;
+
+		/**@return The label icon URI, or <code>null</code> if there is no icon URI.*/
+		public URI getLabelIcon() {return labelIcon;}
+
+		/**Sets the URI of the label icon.
+		This is a bound property of type <code>URI</code>.
+		@param newLabelIcon The new URI of the label icon.
+		@see #LABEL_ICON_PROPERTY
+		*/
+		public void setLabelIcon(final URI newLabelIcon)
+		{
+			if(!ObjectUtilities.equals(labelIcon, newLabelIcon))	//if the value is really changing
+			{
+				final URI oldLabelIcon=labelIcon;	//get the old value
+				labelIcon=newLabelIcon;	//actually change the value
+				firePropertyChange(LABEL_ICON_PROPERTY, oldLabelIcon, newLabelIcon);	//indicate that the value changed
+			}			
+		}
+
+	/**The label icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
+	private String labelIconResourceKey=null;
+
+		/**@return The label icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
+		public String getLabelIconResourceKey() {return labelIconResourceKey;}
+
+		/**Sets the key identifying the URI of the label icon in the resources.
+		This is a bound property.
+		@param newIconResourceKey The new label icon URI resource key.
+		@see #LABEL_ICON_RESOURCE_KEY_PROPERTY
+		*/
+		public void setLabelIconResourceKey(final String newIconResourceKey)
+		{
+			if(!ObjectUtilities.equals(labelIconResourceKey, newIconResourceKey))	//if the value is really changing
+			{
+				final String oldIconResourceKey=labelIconResourceKey;	//get the old value
+				labelIconResourceKey=newIconResourceKey;	//actually change the value
+				firePropertyChange(LABEL_ICON_RESOURCE_KEY_PROPERTY, oldIconResourceKey, newIconResourceKey);	//indicate that the value changed
+			}
+		}
+
+	/**The label text, or <code>null</code> if there is no label text.*/
+	private String labelText=null;
+
+		/**@return The label text, or <code>null</code> if there is no label text.*/
+		public String getLabelText() {return labelText;}
+
+		/**Sets the text of the label.
+		This is a bound property.
+		@param newLabelText The new text of the label.
+		@see #LABEL_TEXT_PROPERTY
+		*/
+		public void setLabelText(final String newLabelText)
+		{
+			if(!ObjectUtilities.equals(labelText, newLabelText))	//if the value is really changing
+			{
+				final String oldLabel=labelText;	//get the old value
+				labelText=newLabelText;	//actually change the value
+				firePropertyChange(LABEL_TEXT_PROPERTY, oldLabel, newLabelText);	//indicate that the value changed
+			}			
+		}
+
+	/**The content type of the label text.*/
+	private ContentType labelTextContentType=Model.PLAIN_TEXT_CONTENT_TYPE;
+
+		/**@return The content type of the label text.*/
+		public ContentType getLabelTextContentType() {return labelTextContentType;}
+
+		/**Sets the content type of the label text.
+		This is a bound property.
+		@param newLabelTextContentType The new label text content type.
+		@exception NullPointerException if the given content type is <code>null</code>.
+		@exception IllegalArgumentException if the given content type is not a text content type.
+		@see #LABEL_TEXT_CONTENT_TYPE_PROPERTY
+		*/
+		public void setLabelTextContentType(final ContentType newLabelTextContentType)
+		{
+			checkNull(newLabelTextContentType, "Content type cannot be null.");
+			if(labelTextContentType!=newLabelTextContentType)	//if the value is really changing
+			{
+				final ContentType oldLabelTextContentType=labelTextContentType;	//get the old value
+				if(!isText(newLabelTextContentType))	//if the new content type is not a text content type
+				{
+					throw new IllegalArgumentException("Content type "+newLabelTextContentType+" is not a text content type.");
+				}
+				labelTextContentType=newLabelTextContentType;	//actually change the value
+				firePropertyChange(LABEL_TEXT_CONTENT_TYPE_PROPERTY, oldLabelTextContentType, newLabelTextContentType);	//indicate that the value changed
+			}			
+		}
+
+	/**The label text resource key, or <code>null</code> if there is no label text resource specified.*/
+	private String labelTextResourceKey=null;
+	
+		/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
+		public String getLabelTextResourceKey() {return labelTextResourceKey;}
+	
+		/**Sets the key identifying the text of the label in the resources.
+		This is a bound property.
+		@param newLabelTextResourceKey The new label text resource key.
+		@see #LABEL_TEXT_RESOURCE_KEY_PROPERTY
+		*/
+		public void setLabelTextResourceKey(final String newLabelTextResourceKey)
+		{
+			if(!ObjectUtilities.equals(labelTextResourceKey, newLabelTextResourceKey))	//if the value is really changing
+			{
+				final String oldLabelTextResourceKey=labelTextResourceKey;	//get the old value
+				labelTextResourceKey=newLabelTextResourceKey;	//actually change the value
+				firePropertyChange(LABEL_TEXT_RESOURCE_KEY_PROPERTY, oldLabelTextResourceKey, newLabelTextResourceKey);	//indicate that the value changed
+			}
+		}
 
 	/**Whether the state of the control represents valid user input.*/
 	private boolean valid=true;
@@ -164,7 +281,7 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 		add(calendarContainer);	//add the calendar panel
 		monthListControl=new ListControl<Date>(session, Date.class, new SingleListSelectionPolicy<Date>());	//create a list control allowing only single selections of a month
 //TODO fix if needed		monthListControl.setStyleID("month");	//TODO use a constant
-		monthListControl.getModel().setLabel("Month");	//set the month control label TODO get from resources
+		monthListControl.setLabelText("Month");	//set the month control label TODO get from resources
 		monthListControl.getModel().setValidator(new ValueRequiredValidator<Date>(session));	//require a locale to be selected in the list control
 		monthListControl.setRowCount(1);	//make this a drop-down list
 		final Converter<Date, String> monthConverter=new DateStringLiteralConverter(session, DateStringLiteralStyle.MONTH_OF_YEAR);	//get a converter to display the month of the year
@@ -299,7 +416,10 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 		}
 		assert yearControl!=null : "Failed to create a year control";
 //TODO fix if needed		yearControl.setStyleID("year");	//TODO use a constant
-		yearControl.getModel().setLabel("Year");	//set the year control label TODO get from resources
+		if(yearControl instanceof LabeledComponent)	//if the year control is a labeled component
+		{
+			((LabeledComponent<?>)yearControl).setLabelText("Year");	//set the year control label TODO get from resources
+		}
 		final Calendar calendar=Calendar.getInstance(locale);	//create a new calendar for setting the year
 		calendar.setTime(getDate());	//set the calendar date to our displayed date
 		final int year=calendar.get(Calendar.YEAR);	//get the current year
@@ -455,7 +575,7 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 			{
 				final Link link=new Link(session, id);	//create a link for this cell
 				final String dayOfMonthString=Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));	//create a string using the day of the month
-				link.getModel().setLabel(dayOfMonthString);	//set the label of the link to the day of the month
+				link.setLabelText(dayOfMonthString);	//set the label of the link to the day of the month
 				final Validator<Date> validator=CalendarControl.this.getModel().getValidator();	//get the calendar control model's validator
 				if(validator==null || validator.isValid(date))	//if there is no validator installed, or there is a validator and this is a valid date
 				{

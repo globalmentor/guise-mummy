@@ -30,7 +30,7 @@ public class InternationalizationPanel extends DefaultNavigationPanel
 	public InternationalizationPanel(final GuiseSession session)
 	{
 		super(session, new RegionLayout(session));	//construct the parent class, using a region layout
-		getModel().setLabel("Guise\u2122 Demonstration: Internationalization");	//set the panel title
+		setLabelText("Guise\u2122 Demonstration: Internationalization");	//set the panel title
 
 			//create a value change listener to listen for language selection changes
 		final GuisePropertyChangeListener<Boolean> languageChangeListener=new AbstractGuisePropertyChangeListener<Boolean>()
@@ -75,7 +75,7 @@ public class InternationalizationPanel extends DefaultNavigationPanel
 
 			//Language
 		final DropMenu languageMenu=new DropMenu(session, "languageMenu", Flow.PAGE);	//create a menu with a custom ID
-		languageMenu.getModel().setLabelResourceKey("menu.language.label");	//show which resource to use for the label
+		languageMenu.setLabelTextResourceKey("menu.language.label");	//show which resource to use for the label
 		for(final LocaleLabelValueModel<Boolean> localeLabelValueModel:localeLabelValueModels)	//for each locale model
 		{
 				//create a check control, using the locale as the ID
@@ -88,9 +88,9 @@ public class InternationalizationPanel extends DefaultNavigationPanel
 
 			//Date
 		final DropMenu dateMenu=new DropMenu(session, "dateMenu", Flow.PAGE);	//create a menu with a custom ID
-		dateMenu.getModel().setLabelResourceKey("menu.date.label");	//show which resource to use for the label
+		dateMenu.setLabelTextResourceKey("menu.date.label");	//show which resource to use for the label
 			//Date|date
-		final Label dateLabel=new Label(session, "dateLabel", new DateLabelModel(session, new Date(), DateFormat.LONG));	//create a label with the current date and a long date label model
+		final DateLabel dateLabel=new DateLabel(session, new Date(), DateFormat.LONG);	//create a label with the current date and a long date label model
 		dateMenu.add(dateLabel);	//add the date label to the date menu
 		
 		menu.add(dateMenu);	//add the date menu to the horizontal menu

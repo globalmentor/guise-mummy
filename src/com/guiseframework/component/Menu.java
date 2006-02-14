@@ -11,7 +11,7 @@ This component uses a {@link MenuModel} and a {@link MenuLayout}.
 @see MenuLayout
 @see MenuModel
 */
-public interface Menu<C extends Menu<C>> extends Container<C>, Control<C>
+public interface Menu<C extends Menu<C>> extends Container<C>, Control<C>, LabeledComponent<C>
 {
 
 	/**The bound property of the rollover state.*/

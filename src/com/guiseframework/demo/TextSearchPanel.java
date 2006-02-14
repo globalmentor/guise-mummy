@@ -17,7 +17,6 @@ import com.guiseframework.validator.AbstractValidator;
 import com.guiseframework.validator.ResourceImportValidator;
 import com.guiseframework.validator.ValidationException;
 
-
 /**Text Search Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
 Demonstrates resource input (file upload) controls, file upload content type and size validation,
@@ -53,36 +52,36 @@ public class TextSearchPanel extends DefaultNavigationPanel
 	public TextSearchPanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Flow.LINE));	//construct the parent class flowing horizontally
-		getModel().setLabel("Guise\u2122 Demonstration: Text Search");	//set the panel title	
+		setLabelText("Guise\u2122 Demonstration: Text Search");	//set the panel title	
 
 			//input panel
 		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE));	//create the input panel flowing vertically
 			//instructions
 		final Message message=new Message(session);	//create a new message
-		message.getModel().setLabel("Instructions");	//give a label to the message
+		message.setLabelText("Instructions");	//give a label to the message
 		message.getModel().setMessageContentType(MessageModel.XHTML_CONTENT_TYPE);	//indicate that the message will be of the "application/xhtml+xml" content type
 		message.getModel().setMessage(INSTRUCTIONS);	//set the instructions
 		inputPanel.add(message);	//add the message to the input panel
 			//search regular expression input
 		final TextControl<String> searchRegExControl=new TextControl<String>(session, String.class);	//create a text input control
-		searchRegExControl.getModel().setLabel("Search Regular Expression");	//set the label for the regex control
+		searchRegExControl.setLabelText("Search Regular Expression");	//set the label for the regex control
 		searchRegExControl.getModel().setValidator(new PatternSyntaxValidator(session));	//install our custom regular expression pattern syntax validator
 		inputPanel.add(searchRegExControl);	//add the search text input to the input panel		
 			//file upload control
 		final ResourceImportControl resourceImportControl=new ResourceImportControl(session);	//create the file upload control
-		resourceImportControl.getModel().setLabel("Input Text File");	//give the file upload control a label	
+		resourceImportControl.setLabelText("Input Text File");	//give the file upload control a label	
 				//create a validator only allowing text files (files of type text/*) not greater than 64K to be uploaded, and require a value
 		final ResourceImportValidator textImportValidator=new ResourceImportValidator(session, new ContentType("text", "*", null), 1024*64, true);
 		resourceImportControl.getModel().setValidator(textImportValidator);	//assign the validator to the the file upload control model		
 		inputPanel.add(resourceImportControl);	//add the file upload control to the input panel
 			//search button
 		final Button searchButton=new Button(session);	//create a button for initiating the upload and search
-		searchButton.getModel().setLabel("Search");	//set the button label
+		searchButton.setLabelText("Search");	//set the button label
 		inputPanel.add(searchButton);	//add the search button to the input panel
 
 			//text area
 		final TextAreaControl textAreaControl=new TextAreaControl(session, 25, 40);	//create a text area control 25 rows by 40 columns
-		textAreaControl.getModel().setLabel("Results");	//set the label of the text area
+		textAreaControl.setLabelText("Results");	//set the label of the text area
 		textAreaControl.getModel().setEditable(false);	//don't allow the text area control to be edited
 
 		//listen for the value of the resource import changing

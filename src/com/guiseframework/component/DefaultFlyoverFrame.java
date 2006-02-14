@@ -1,8 +1,8 @@
 package com.guiseframework.component;
 
 import com.guiseframework.GuiseSession;
-import com.guiseframework.model.DefaultLabelModel;
-import com.guiseframework.model.LabelModel;
+import com.guiseframework.model.DefaultModel;
+import com.guiseframework.model.Model;
 
 /**Default implementation of a flyover frame with default layout panel.
 A flyover frame by default is nonmodal, immovable, and not resizable.
@@ -37,7 +37,7 @@ public class DefaultFlyoverFrame extends AbstractFlyoverFrame<DefaultFlyoverFram
 	@param model The component data model.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public DefaultFlyoverFrame(final GuiseSession session, final LabelModel model)
+	public DefaultFlyoverFrame(final GuiseSession session, final Model model)
 	{
 		this(session, (String)null, model);	//construct the component, indicating that a default ID should be used
 	}
@@ -48,7 +48,7 @@ public class DefaultFlyoverFrame extends AbstractFlyoverFrame<DefaultFlyoverFram
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public DefaultFlyoverFrame(final GuiseSession session, final LabelModel model, final Component<?> component)
+	public DefaultFlyoverFrame(final GuiseSession session, final Model model, final Component<?> component)
 	{
 		this(session, (String)null, model, component);	//construct the component, indicating that a default ID should be used
 	}
@@ -61,7 +61,7 @@ public class DefaultFlyoverFrame extends AbstractFlyoverFrame<DefaultFlyoverFram
 	*/
 	public DefaultFlyoverFrame(final GuiseSession session, final String id)
 	{
-		this(session, id, new DefaultLabelModel(session));	//use a default label model
+		this(session, id, new DefaultModel(session));	//use a default label model
 	}
 
 	/**Session, ID, and component constructor.
@@ -73,7 +73,7 @@ public class DefaultFlyoverFrame extends AbstractFlyoverFrame<DefaultFlyoverFram
 	*/
 	public DefaultFlyoverFrame(final GuiseSession session, final String id, final Component<?> component)
 	{
-		this(session, id, new DefaultLabelModel(session), component);	//use a default label model
+		this(session, id, new DefaultModel(session), component);	//use a default label model
 	}
 
 	/**Session, ID, and model constructor.
@@ -83,7 +83,7 @@ public class DefaultFlyoverFrame extends AbstractFlyoverFrame<DefaultFlyoverFram
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public DefaultFlyoverFrame(final GuiseSession session, final String id, final LabelModel model)
+	public DefaultFlyoverFrame(final GuiseSession session, final String id, final Model model)
 	{
 		this(session, id, model, new LayoutPanel(session));	//default to a layout panel
 	}
@@ -96,7 +96,7 @@ public class DefaultFlyoverFrame extends AbstractFlyoverFrame<DefaultFlyoverFram
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public DefaultFlyoverFrame(final GuiseSession session, final String id, final LabelModel model, final Component<?> component)
+	public DefaultFlyoverFrame(final GuiseSession session, final String id, final Model model, final Component<?> component)
 	{
 		super(session, id, model, component);	//construct the parent class
 	}

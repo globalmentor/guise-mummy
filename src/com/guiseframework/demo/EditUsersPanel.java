@@ -27,11 +27,11 @@ public class EditUsersPanel extends DefaultNavigationPanel
 	public EditUsersPanel(final GuiseSession session)
 	{
 		super(session, new FlowLayout(session, Flow.LINE));	//construct the parent class flowing horizontally
-		getModel().setLabel("Guise\u2122 Demonstration: Edit Users");	//set the panel title	
+		setLabelText("Guise\u2122 Demonstration: Edit Users");	//set the panel title	
 
 		final ListControl<DemoUser> userListControl=new ListControl<DemoUser>(session, DemoUser.class, new SingleListSelectionPolicy<DemoUser>());	//create a list control allowing only single selections
 		userListControl.getModel().setValidator(new ValueRequiredValidator<DemoUser>(session));	//require a value to be selected
-		userListControl.getModel().setLabel("Users");	//set the list control label
+		userListControl.setLabelText("Users");	//set the list control label
 		userListControl.setRowCount(8);	//request eight visible rows in the list
 		final List<DemoUser> applicationUserList=((DemoApplication)getSession().getApplication()).getUsers();	//get the application's list of users
 		synchronized(applicationUserList)	//don't allow others to modify the application user list while we iterate over it
@@ -47,7 +47,7 @@ public class EditUsersPanel extends DefaultNavigationPanel
 		final LayoutPanel buttonPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create the button panel flowing horizontally
 			//add button
 		final Button addButton=new Button(session);	//create the add button
-		addButton.getModel().setLabel("Add User");	//set the text of the add button
+		addButton.setLabelText("Add User");	//set the text of the add button
 		addButton.getModel().addActionListener(new ActionListener()	//if the add button was pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)
@@ -85,7 +85,7 @@ public class EditUsersPanel extends DefaultNavigationPanel
 		buttonPanel.add(addButton);	//add the button to the button panel
 			//edit button	
 		final Button editButton=new Button(session);	//create the edit button
-		editButton.getModel().setLabel("Edit");	//set the text of the edit button
+		editButton.setLabelText("Edit");	//set the text of the edit button
 		editButton.getModel().addActionListener(new ActionListener()	//if the edit button was pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)
@@ -126,7 +126,7 @@ public class EditUsersPanel extends DefaultNavigationPanel
 		buttonPanel.add(editButton);	//add the button to the button panel
 			//remove button	
 		final Button removeButton=new Button(session);	//create the remove button
-		removeButton.getModel().setLabel("Remove");	//set the text of the remove button
+		removeButton.setLabelText("Remove");	//set the text of the remove button
 		removeButton.getModel().addActionListener(new ActionListener()	//if the remove button was pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)

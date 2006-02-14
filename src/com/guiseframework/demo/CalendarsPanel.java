@@ -10,7 +10,6 @@ import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 import com.guiseframework.validator.*;
 
-
 /**Calendars Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
 Demonstrates calendar month table models, calendar controls,
@@ -26,15 +25,15 @@ public class CalendarsPanel extends DefaultNavigationPanel
 	public CalendarsPanel(final GuiseSession session)
 	{
 		super(session, new RegionLayout(session));	//construct the parent class, using a region layout
-		getModel().setLabel("Guise\u2122 Demonstration: Calendars");	//set the panel title
+		setLabelText("Guise\u2122 Demonstration: Calendars");	//set the panel title
 
 			//center panel
 		final LayoutPanel centerPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE)); //create the center panel flowing vertically
 				//CalendarMonthTableModel demonstration
 		final GroupPanel calendarMonthTableModelPanel=new GroupPanel(session, new FlowLayout(session, Flow.PAGE));	//create a group panel flowing vertically
-		calendarMonthTableModelPanel.getModel().setLabel("Calendar Month Table Model");
+		calendarMonthTableModelPanel.setLabelText("Calendar Month Table Model");
 		final Table calendarMonthTable=new Table(session, new CalendarMonthTableModel(session));	//create a normal table with a calendar month table model
-		calendarMonthTable.getModel().setLabel("Normal Table using Default CalendarMonthTableModel");
+		calendarMonthTable.setLabelText("Normal Table using Default CalendarMonthTableModel");
 		calendarMonthTableModelPanel.add(calendarMonthTable);
 		centerPanel.add(calendarMonthTableModelPanel);
 		
@@ -44,9 +43,9 @@ public class CalendarsPanel extends DefaultNavigationPanel
 		final LayoutPanel sidePanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE)); //create the side panel flowing vertically
 				//locale panel
 		final GroupPanel localePanel=new GroupPanel(session, new FlowLayout(session, Flow.PAGE));	//create a group panel flowing vertically
-		localePanel.getModel().setLabel("Specify Session Locale");
+		localePanel.setLabelText("Specify Session Locale");
 		final ListControl<Locale> localeListControl=new ListControl<Locale>(session, Locale.class, new SingleListSelectionPolicy<Locale>());	//create a list control allowing only single selections of locales
-		localeListControl.getModel().setLabel("Locale");	//set the list control label
+		localeListControl.setLabelText("Locale");	//set the list control label
 		localeListControl.getModel().setValidator(new ValueRequiredValidator<Locale>(session));	//require a locale to be selected in the list control
 		localeListControl.setRowCount(1);	//make this a drop-down list
 		localeListControl.getModel().add(session.getLocale());	//add the current locale
@@ -76,11 +75,11 @@ public class CalendarsPanel extends DefaultNavigationPanel
 		sidePanel.add(localePanel);
 				//CalendarControl demonstration
 		final GroupPanel calendarControlPanel=new GroupPanel(session, new FlowLayout(session, Flow.PAGE));	//create a group panel flowing vertically
-		calendarControlPanel.getModel().setLabel("Calendar Control");
+		calendarControlPanel.setLabelText("Calendar Control");
 		final CalendarControl calendarControl=new CalendarControl(session);	//create a default calendar control
 		calendarControlPanel.add(calendarControl);
 		final TextControl<Date> embeddedDateTextControl=new TextControl<Date>(session, Date.class);	//create a text control to display the date
-		embeddedDateTextControl.getModel().setLabel("Selected Date:");
+		embeddedDateTextControl.setLabelText("Selected Date:");
 		embeddedDateTextControl.getModel().setEditable(false);
 		calendarControlPanel.add(embeddedDateTextControl);
 		calendarControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Date>()	//listen for the calendar control value changing
@@ -104,12 +103,12 @@ public class CalendarsPanel extends DefaultNavigationPanel
 		sidePanel.add(calendarControlPanel);
 			//Popup CalendarControl demonstration
 		final GroupPanel popupCalendarControlPanel=new GroupPanel(session, new FlowLayout(session, Flow.PAGE));	//create a group panel flowing horizontally
-		popupCalendarControlPanel.getModel().setLabel("Popup Calendar Control");
+		popupCalendarControlPanel.setLabelText("Popup Calendar Control");
 		final Button calendarButton=new Button(session);	//create a button
-		calendarButton.getModel().setLabel("Select Date");	//set the button label
+		calendarButton.setLabelText("Select Date");	//set the button label
 		popupCalendarControlPanel.add(calendarButton);
 		final TextControl<Date> popupDateTextControl=new TextControl<Date>(session, Date.class);	//create a text control to display the date
-		popupDateTextControl.getModel().setLabel("Selected Date:");
+		popupDateTextControl.setLabelText("Selected Date:");
 		popupDateTextControl.getModel().setEditable(false);
 		popupCalendarControlPanel.add(popupDateTextControl);
 		calendarButton.getModel().addActionListener(new ActionListener()	//listen for the calendar button being pressed
@@ -117,7 +116,7 @@ public class CalendarsPanel extends DefaultNavigationPanel
 					public void actionPerformed(final ActionEvent actionEvent)	//if the calendar button is pressed
 					{
 						final CalendarDialogFrame calendarDialogFrame=new CalendarDialogFrame(session);	//create a new calendar popup
-						calendarDialogFrame.getModel().setLabel("Select a date");
+						calendarDialogFrame.setLabelText("Select a date");
 						calendarDialogFrame.setRelatedComponent(calendarButton);	//associate the popup with the button
 						calendarDialogFrame.open();	//show the calendar popup
 						calendarDialogFrame.open(new AbstractGuisePropertyChangeListener<Mode>()	//ask for the date to be selected

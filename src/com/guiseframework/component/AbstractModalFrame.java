@@ -2,7 +2,7 @@ package com.guiseframework.component;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
-import com.guiseframework.model.LabelModel;
+import com.guiseframework.model.Model;
 
 /**Abstract implementation of a modal frame.
 @param <R> The type of modal result this modal frame produces.
@@ -40,7 +40,7 @@ public abstract class AbstractModalFrame<R, C extends ModalFrame<R, C>> extends 
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractModalFrame(final GuiseSession session, final String id, final LabelModel model, final Component<?> component)
+	public AbstractModalFrame(final GuiseSession session, final String id, final Model model, final Component<?> component)
 	{
 		super(session, id, model, component);	//construct the parent class
 	}

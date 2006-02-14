@@ -1,33 +1,40 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.text.TextUtilities.isText;
-
 import java.net.URI;
 
 import javax.mail.internet.ContentType;
 
+import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.text.TextUtilities.*;
+import static com.garretwilson.util.ArrayUtilities.*;
+
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
-import com.guiseframework.component.ListSelectControl.ValueRepresentationStrategy;
-import com.guiseframework.component.layout.CardLayout;
-import com.guiseframework.model.ListSelectModel;
-import com.guiseframework.model.Model;
+import com.guiseframework.component.transfer.*;
+import com.guiseframework.model.*;
 
-/**An abstract panel with a card layout.
-The panel's model reflects the currently selected component, if any.
+/**An abstract label component.
+This component installs a default export strategy supporting export of the following content types:
+<ul>
+	<li>The label content type.</li>
+</ul>
 @author Garret Wilson
-@see CardLayout
 */
-public abstract class AbstractCardPanel<C extends Box<C> & Panel<C> & CardControl<C>> extends AbstractBox<C> implements Panel<C>, CardControl<C>
+public abstract class AbstractLabel<C extends LabeledComponent<C>> extends AbstractComponent<C> implements LabeledComponent<C>
 {
 
-	/**@return The data model used by this component.*/
-	@SuppressWarnings("unchecked")
-	public ListSelectModel<Component<?>> getModel() {return (ListSelectModel<Component<?>>)super.getModel();}
-
-	/**@return The layout definition for the container.*/
-	public CardLayout getLayout() {return (CardLayout)super.getLayout();}
+	/**The default export strategy for this component type.*/
+	protected final static ExportStrategy<LabeledComponent> DEFAULT_EXPORT_STRATEGY=new ExportStrategy<LabeledComponent>()
+			{
+				/**Exports data from the given component.
+				@param component The component from which data will be transferred.
+				@return The object to be transferred, or <code>null</code> if no data can be transferred.
+				*/
+				public Transferable<LabeledComponent> exportTransfer(final LabeledComponent component)
+				{
+					return new DefaultTransferable(component);	//return a default transferable for this component
+				}
+			};
 
 	/**The label icon URI, or <code>null</code> if there is no icon URI.*/
 	private URI labelIcon=null;
@@ -141,89 +148,85 @@ public abstract class AbstractCardPanel<C extends Box<C> & Panel<C> & CardContro
 			}
 		}
 
-	/**Whether the state of the control represents valid user input.*/
-	private boolean valid=true;
+	/**Session constructor with a default model.
+	@param session The Guise session that owns this component.
+	@exception NullPointerException if the given session is <code>null</code>.
+	*/
+	public AbstractLabel(final GuiseSession session)
+	{
+		this(session, (String)null);	//construct the component, indicating that a default ID should be used
+	}
 
-		/**@return Whether the state of the control represents valid user input.*/
-		public boolean isValid() {return valid;}
-
-		/**Sets whether the state of the control represents valid user input
-		This is a bound property of type <code>Boolean</code>.
-		@param newValid <code>true</code> if user input should be considered valid
-		@see Control#VALID_PROPERTY
-		*/
-		public void setValid(final boolean newValid)
-		{
-			if(valid!=newValid)	//if the value is really changing
-			{
-				final boolean oldValid=valid;	//get the current value
-				valid=newValid;	//update the value
-				firePropertyChange(VALID_PROPERTY, Boolean.valueOf(oldValid), Boolean.valueOf(newValid));
-			}
-		}
-
-	/**The strategy used to generate a component to represent each value in the model.*/
-	private ValueRepresentationStrategy<Component<?>> valueRepresentationStrategy;
-
-		/**@return The strategy used to generate a component to represent each value in the model.*/
-		public ValueRepresentationStrategy<Component<?>> getValueRepresentationStrategy() {return valueRepresentationStrategy;}
-
-		/**Sets the strategy used to generate a component to represent each value in the model.
-		This is a bound property
-		@param newValueRepresentationStrategy The new strategy to create components to represent this model's values.
-		@exception NullPointerException if the provided value representation strategy is <code>null</code>.
-		@see SelectControl#VALUE_REPRESENTATION_STRATEGY_PROPERTY
-		*/
-		public void setValueRepresentationStrategy(final ValueRepresentationStrategy<Component<?>> newValueRepresentationStrategy)
-		{
-			if(valueRepresentationStrategy!=newValueRepresentationStrategy)	//if the value is really changing
-			{
-				final ValueRepresentationStrategy<Component<?>> oldValueRepresentationStrategy=valueRepresentationStrategy;	//get the old value
-				valueRepresentationStrategy=checkNull(newValueRepresentationStrategy, "Value representation strategy cannot be null.");	//actually change the value
-				firePropertyChange(VALUE_REPRESENTATION_STRATEGY_PROPERTY, oldValueRepresentationStrategy, newValueRepresentationStrategy);	//indicate that the value changed
-			}
-		}
-
-	/**Session, ID, and layout constructor.
+	/**Session and ID constructor with a default data model.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param layout The layout definition for the container.
-	@exception NullPointerException if the given session and/or layout is <code>null</code>.
+	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	protected AbstractCardPanel(final GuiseSession session, final String id, final CardLayout layout)
+	public AbstractLabel(final GuiseSession session, final String id)
 	{
-		super(session, id, layout, layout.getModel());	//construct the parent class, using the card layout's value model
+		this(session, id, new DefaultModel(session));	//construct the class with a default model
 	}
 
-	/**Adds a component to the container along with a label.
-	This convenience method creates new card layout constraints from the given label model and adds the component.
-	@param component The component to add.
-	@param labelModel The label associated with an individual component.
-	@exception NullPointerException if the given label is <code>null</code>.
-	@exception IllegalArgumentException if the component already has a parent.
+	/**Session and model constructor.
+	@param session The Guise session that owns this component.
+	@param model The component data model.
+	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	*/
-/*TODO del if not wanted
-	public void add(final Component<?> component, final LabelModel labelModel)
+	public AbstractLabel(final GuiseSession session, final Model model)
 	{
-		add(component, new CardLayout.Constraints(labelModel));	//create card layout constraints for the label and add the component to the container
+		this(session, null, model);	//construct the class, indicating that a default ID should be used
 	}
-*/
 
-	/**Enables or disables a card.
-	This convenience method looks up card layout constraints for the given component and changes the enabled status of those constraints.
-	@param component The component for which the card should be enabled or disabled.
-	@param newEnabled <code>true</code> if the card can be selected.
-	@see CardLayout.Constraints#setEnabled(boolean)
+	/**Session, ID, and model constructor.
+	@param session The Guise session that owns this component.
+	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	@param model The component data model.
+	@exception NullPointerException if the given session and/or model is <code>null</code>.
+	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-/*TODO del if not wanted
-	public void setEnabled(final Component<?> component, final boolean newEnabled)
+	public AbstractLabel(final GuiseSession session, final String id, final Model model)
 	{
-		final CardLayout.Constraints constraints=getLayout().getConstraints(component);	//get the card constraints for this component
-		if(constraints!=null)	//if there are constraints for this component
+		super(session, id, model);	//construct the parent class
+		addExportStrategy(DEFAULT_EXPORT_STRATEGY);	//install a default export strategy 
+	}
+
+	/**The default transferable object for a label.
+	@author Garret Wilson
+	*/
+	protected static class DefaultTransferable extends AbstractTransferable<LabeledComponent>
+	{
+		/**Source constructor.
+		@param source The source of the transferable data.
+		@exception NullPointerException if the provided source is <code>null</code>.
+		*/
+		public DefaultTransferable(final LabeledComponent source)
 		{
-			constraints.setEnabled(newEnabled);	//change the enabled status of the constraints
+			super(source);	//construct the parent class
+		}
+
+		/**Determines the content types available for this transfer.
+		This implementation returns the content type of the label.
+		@return The content types available for this transfer.
+		*/
+		public ContentType[] getContentTypes() {return createArray(getSource().getLabelTextContentType());}
+
+		/**Transfers data using the given content type.
+		@param contentType The type of data expected.
+		@return The transferred data, which may be <code>null</code>.
+		@exception IllegalArgumentException if the given content type is not supported.
+		*/
+		public Object transfer(final ContentType contentType)
+		{
+			final LabeledComponent source=getSource();	//get the source of the transfer
+			if(contentType.match(source.getLabelTextContentType()))	//if we have the content type requested
+			{
+				return source.getSession().determineString(source.getLabelText(), source.getLabelTextResourceKey());	//return the label text
+			}
+			else	//if we don't support this content type
+			{
+				throw new IllegalArgumentException("Content type not supported: "+contentType);
+			}
 		}
 	}
-*/
 }

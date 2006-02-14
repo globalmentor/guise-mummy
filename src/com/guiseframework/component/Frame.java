@@ -6,15 +6,13 @@ import java.beans.PropertyChangeListener;
 
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.event.GuisePropertyChangeListener;
-import com.guiseframework.event.ModalListener;
-import com.guiseframework.model.LabelModel;
 
 /**A root-level component such as a window or an HTML page.
 <p>The title is specified by the frame model's label.</p>
 <p>A frame like other components is by default visible, but is not actually shown until its {@link #open(boolean)} method is called.</p>
 @author Garret Wilson
 */
-public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalComponent<C>
+public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalComponent<C>, LabeledComponent<C>
 {
 	/**The close action control bound property.*/
 	public final static String CLOSE_ACTION_CONTROL_PROPERTY=getPropertyName(Frame.class, "closeActionControl");
@@ -106,9 +104,6 @@ public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalC
 	@see #OPEN_EFFECT_PROPERTY 
 	*/
 	public void setOpenEffect(final Effect newOpenEffect);
-
-	/**@return The data model used by this component.*/
-	public LabelModel getModel();
 
 	/**@return The action control for closing the frame, or <code>null</code> if this frame does not have a close action control.*/
 	public ActionControl<?> getCloseActionControl();

@@ -1,7 +1,5 @@
 package com.guiseframework.component;
 
-import java.util.MissingResourceException;
-
 import com.guiseframework.GuiseSession;
 import com.guiseframework.model.*;
 
@@ -12,8 +10,12 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 <p>The default model used by a check control defaults to a value of {@link Boolean#FALSE}, as a check control does not have the capability of indicating <code>null</code>.</p>
 @author Garret Wilson
 */
-public class CheckControl extends AbstractValueControl<Boolean, CheckControl>
+public class CheckControl extends AbstractLabel<CheckControl> implements ValueControl<Boolean, CheckControl> 
 {
+
+	/**@return The data model used by this component.*/
+	@SuppressWarnings("unchecked")
+	public ValueModel<Boolean> getModel() {return (ValueModel<Boolean>)super.getModel();}
 
 	/**The check type bound property.*/
 	public final static String CHECK_TYPE_PROPERTY=getPropertyName(CheckControl.class, "checkType");
@@ -48,27 +50,6 @@ public class CheckControl extends AbstractValueControl<Boolean, CheckControl>
 				firePropertyChange(CHECK_TYPE_PROPERTY, oldCheckType, newCheckType);	//indicate that the value changed
 			}			
 		}
-
-	/**Determines the text of the label.
-	If a label is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
-	@return The label text, or <code>null</code> if there is no label text.
-	@exception MissingResourceException if there was an error loading the value from the resources.
-	@see #getLabelResourceKey()
-	*/
-	public String getLabelText() throws MissingResourceException	//TODO testing
-	{
-		return getModel().getLabel();	//TODO fix
-	}
-
-	/**Sets the text of the label.
-	This is a bound property.
-	@param newLabel The new text of the label.
-	@see LabelModel#LABEL_PROPERTY
-	*/
-	public void setLabelText(final String newLabel)	//TODO testing
-	{
-		getModel().setLabel(newLabel);	//TODO fix
-	}
 
 	/**Session constructor with a default boolean data model and a default rectangle check type.
 	@param session The Guise session that owns this component.

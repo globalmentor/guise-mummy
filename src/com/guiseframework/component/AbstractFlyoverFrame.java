@@ -9,12 +9,11 @@ import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.Debug;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.geometry.CompassPoint;
-import com.guiseframework.model.LabelModel;
+import com.guiseframework.model.Model;
 
 import static com.garretwilson.util.SetUtilities.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
-
 
 /**Abstract implementation of a frame for flyovers.
 A flyover frame by default is nonmodal, immovable, and not resizable.
@@ -174,7 +173,7 @@ public abstract class AbstractFlyoverFrame<C extends FlyoverFrame<C>> extends Ab
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractFlyoverFrame(final GuiseSession session, final String id, final LabelModel model, final Component<?> component)
+	public AbstractFlyoverFrame(final GuiseSession session, final String id, final Model model, final Component<?> component)
 	{
 		super(session, id, model, component);	//construct the parent class
 		setModal(false);	//default to being a nonmodal frame

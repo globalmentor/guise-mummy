@@ -7,7 +7,6 @@ import com.guiseframework.component.layout.FlowLayout;
 import com.guiseframework.component.layout.RegionLayout;
 import com.guiseframework.event.ActionEvent;
 import com.guiseframework.event.ActionListener;
-import com.guiseframework.model.ActionModel;
 
 /**Restricted Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
@@ -30,13 +29,13 @@ public class RestrictedPanel extends DefaultNavigationPanel
 	public RestrictedPanel(final GuiseSession session)
 	{
 		super(session, new RegionLayout(session));	//construct the parent class, using a region layout
-		getModel().setLabel("Guise\u2122 Demonstration: Restricted");	//set the panel title
+		setLabelText("Guise\u2122 Demonstration: Restricted");	//set the panel title
 		
 		final LayoutPanel restrictionPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE));	//create the authorization panel flowing vertically
 		
 			//heading
 		final Heading heading=new Heading(session, 0);	//create a top-level heading
-		heading.getModel().setLabel("Access Granted.");	//set the text of the heading, using its model
+		heading.setLabelText("Access Granted.");	//set the text of the heading, using its model
 		restrictionPanel.add(heading);	//add the heading to the panel
 
 			//notice
@@ -46,7 +45,7 @@ public class RestrictedPanel extends DefaultNavigationPanel
 
 			//logout button
 		final Button logoutButton=new Button(session);	//create a button for logging out
-		logoutButton.getModel().setLabel("Log out");	//set the button label
+		logoutButton.setLabelText("Log out");	//set the button label
 		logoutButton.getModel().addActionListener(new ActionListener()	//when the logout button is pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)	//set the session's user to null
