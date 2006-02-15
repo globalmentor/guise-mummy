@@ -6,7 +6,6 @@ import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.Extent;
-import com.guiseframework.model.Model;
 
 /**Drop Details Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
@@ -44,7 +43,7 @@ public class BookDescriptionPanel extends DefaultNavigationPanel
 		bookPanel.setLabel("Mouse over a Book");	//set the book panel label
 
 		final Image book1=new Image(session);	//_The Great Philosophers_
-		book1.getModel().setImage(URI.create("http://www.garretwilson.com/books/reviews/greatphilosophers_small.jpg"));	//set the URI
+		book1.setImage(URI.create("http://www.garretwilson.com/books/reviews/greatphilosophers_small.jpg"));	//set the URI
 		book1.setDescriptionContentType(XHTML_CONTENT_TYPE);	//use an XHTML description
 		book1.setDescription(	//set the description
 			"<?xml version='1.0'?>"+
@@ -70,7 +69,7 @@ public class BookDescriptionPanel extends DefaultNavigationPanel
 		bookPanel.add(book1);	//add the image to the book panel
 
 		final Image book2=new Image(session);	//_The Supreme Court_
-		book2.getModel().setImage(URI.create("http://www.garretwilson.com/books/reviews/supremecourt_small.jpg"));	//set the URI
+		book2.setImage(URI.create("http://www.garretwilson.com/books/reviews/supremecourt_small.jpg"));	//set the URI
 		book2.setDescriptionContentType(XHTML_CONTENT_TYPE);	//use an XHTML description
 		book2.setDescription(	//set the description
 			"<?xml version='1.0'?>"+
@@ -89,7 +88,7 @@ public class BookDescriptionPanel extends DefaultNavigationPanel
 		bookPanel.add(book2);	//add the image to the book panel
 
 		final Image book3=new Image(session);	//_Uncertain Identities_
-		book3.getModel().setImage(URI.create("http://www.garretwilson.com/books/reviews/uncertainidentities_small.jpg"));	//set the URI
+		book3.setImage(URI.create("http://www.garretwilson.com/books/reviews/uncertainidentities_small.jpg"));	//set the URI
 		book3.setDescriptionContentType(XHTML_CONTENT_TYPE);	//use an XHTML description
 		book3.setDescription(	//set the description
 			"<?xml version='1.0'?>"+

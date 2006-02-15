@@ -216,9 +216,9 @@ Debug.trace("list control changed value to", newValue);
 
 
 		final Text testText=new Text(session);
-		testText.getModel().setTextContentType(XHTML_FRAGMENT_CONTENT_TYPE);
+		testText.setTextContentType(XHTML_FRAGMENT_CONTENT_TYPE);
 //TODO bring back		testText.getModel().setTextResourceKey("test.html");
-		testText.getModel().setText("this is <strong>good</strong> stuff");
+		testText.setText("this is <strong>good</strong> stuff");
 		
 		final Label boundLabel=new Label(session);
 		boundLabel.setLabel("Button");
@@ -561,13 +561,13 @@ Debug.trace("list control changed value to", newValue);
 */
 		
 		final Image image=new Image(session);
-		image.getModel().setImage(URI.create("http://www.garretwilson.com/photos/2000/february/cowcalf.jpg"));
+		image.setImage(URI.create("http://www.garretwilson.com/photos/2000/february/cowcalf.jpg"));
 /*TODO fix
 		image.setLabelText("Cow and Calf");
 		image.getModel().setMessage("A cow and her minutes-old calf.");
 */
 		image.setLabel("\u0622\u067E");
-		image.setMessage("\u0628\u0627\u062A");
+		image.setDescription("\u0628\u0627\u062A");
 		image.setDragEnabled(true);
 		horizontalPanel.add(image);
 
@@ -579,7 +579,7 @@ Debug.trace("list control changed value to", newValue);
 						if(newValue!=null)	//if there is a new value
 						{
 							testLabel.setOpacity(newValue.floatValue()/100);	//update the label opacity
-							image.getModel().setOpacity(newValue.floatValue()/100);	//update the image opacity
+							image.setOpacity(newValue.floatValue()/100);	//update the image opacity
 						}
 					}
 				});

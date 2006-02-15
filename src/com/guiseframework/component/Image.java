@@ -1,14 +1,13 @@
 package com.guiseframework.component;
 
 import java.net.URI;
+
 import javax.mail.internet.ContentType;
 
 import static com.garretwilson.io.ContentTypeConstants.*;
 import static com.garretwilson.io.ContentTypeUtilities.*;
-import static com.garretwilson.lang.ClassUtilities.getPropertyName;
-import static com.garretwilson.lang.ObjectUtilities.checkNull;
+import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
-import static com.garretwilson.text.TextUtilities.isText;
 import static com.garretwilson.util.ArrayUtilities.*;
 
 import com.garretwilson.lang.ObjectUtilities;
@@ -16,7 +15,7 @@ import com.guiseframework.GuiseSession;
 import com.guiseframework.component.transfer.*;
 import com.guiseframework.model.*;
 
-/**An image component.
+/**An image component that displays an associated label and description, if present.
 This component installs a default export strategy supporting export of the following content types:
 <ul>
 	<li><code>text/uri-list</code></li>
@@ -27,8 +26,12 @@ This component installs a default export strategy supporting export of the follo
 public class Image extends AbstractComponent<Image>
 {
 
-	/**@return The data model used by this component.*/
-	public ImageModel getModel() {return (ImageModel)super.getModel();}
+	/**The image bound property.*/
+	public final static String IMAGE_PROPERTY=getPropertyName(Image.class, "image");
+	/**The image opacity bound property.*/
+	public final static String IMAGE_OPACITY_PROPERTY=getPropertyName(Image.class, "imageOpacity");
+	/**The image resource key bound property.*/
+	public final static String IMAGE_RESOURCE_KEY_PROPERTY=getPropertyName(Image.class, "imageResourceKey");
 
 	/**The default export strategy for this component type.*/
 	protected final static ExportStrategy<Image> DEFAULT_EXPORT_STRATEGY=new ExportStrategy<Image>()
@@ -46,81 +49,72 @@ public class Image extends AbstractComponent<Image>
 	/**The bound property of whether the component has image dragging enabled.*/
 //TODO del if not needed	public final static String IMAGE_DRAG_ENABLED_PROPERTY=getPropertyName(Image.class, "imageDragEnabled");
 
-	/**The message bound property.*/
-	public final static String MESSAGE_PROPERTY=getPropertyName(Image.class, "message");
-	/**The message content type bound property.*/
-	public final static String MESSAGE_CONTENT_TYPE_PROPERTY=getPropertyName(Image.class, "messageContentType");
-	/**The message resource key bound property.*/
-	public final static String MESSAGE_RESOURCE_KEY_PROPERTY=getPropertyName(Image.class, "messageResourceKey");
+	/**The image URI, or <code>null</code> if there is no image URI.*/
+	private URI image=null;
 
-	/**The message text, or <code>null</code> if there is no message text.*/
-	private String message=null;
+		/**@return The image URI, or <code>null</code> if there is no image URI.*/
+		public URI getImage() {return image;}
 
-		/**@return The message text, or <code>null</code> if there is no message text.*/
-		public String getMessage() {return message;}
-
-		/**Sets the text of the message.
-		This is a bound property.
-		@param newMessage The new text of the message.
-		@see #MESSAGE_PROPERTY
+		/**Sets the URI of the image.
+		This is a bound property of type <code>URI</code>.
+		@param newImage The new URI of the image.
+		@see #IMAGE_PROPERTY
 		*/
-		public void setMessage(final String newMessage)
+		public void setImage(final URI newImage)
 		{
-			if(!ObjectUtilities.equals(message, newMessage))	//if the value is really changing
+			if(!ObjectUtilities.equals(image, newImage))	//if the value is really changing
 			{
-				final String oldMessage=message;	//get the old value
-				message=newMessage;	//actually change the value
-				firePropertyChange(MESSAGE_PROPERTY, oldMessage, newMessage);	//indicate that the value changed
+				final URI oldImage=image;	//get the old value
+				image=newImage;	//actually change the value
+				firePropertyChange(IMAGE_PROPERTY, oldImage, newImage);	//indicate that the value changed
 			}			
 		}
 
-	/**The content type of the message text.*/
-	private ContentType messageContentType=Component.PLAIN_TEXT_CONTENT_TYPE;
+	/**The image URI resource key, or <code>null</code> if there is no image URI resource specified.*/
+	private String imageResourceKey=null;
 
-		/**@return The content type of the message text.*/
-		public ContentType getMessageContentType() {return messageContentType;}
+		/**@return The image URI resource key, or <code>null</code> if there is no image URI resource specified.*/
+		public String getImageResourceKey() {return imageResourceKey;}
 
-		/**Sets the content type of the message text.
+		/**Sets the key identifying the URI of the image in the resources.
 		This is a bound property.
-		@param newMessageContentType The new message text content type.
-		@exception NullPointerException if the given content type is <code>null</code>.
-		@exception IllegalArgumentException if the given content type is not a text content type.
-		@see #MESSAGE_CONTENT_TYPE_PROPERTY
+		@param newImageResourceKey The new image URI resource key.
+		@see #IMAGE_RESOURCE_KEY_PROPERTY
 		*/
-		public void setMessageContentType(final ContentType newMessageContentType)
+		public void setImageResourceKey(final String newImageResourceKey)
 		{
-			checkNull(newMessageContentType, "Content type cannot be null.");
-			if(messageContentType!=newMessageContentType)	//if the value is really changing
+			if(!ObjectUtilities.equals(imageResourceKey, newImageResourceKey))	//if the value is really changing
 			{
-				final ContentType oldMessageContentType=messageContentType;	//get the old value
-				if(!isText(newMessageContentType))	//if the new content type is not a text content type
-				{
-					throw new IllegalArgumentException("Content type "+newMessageContentType+" is not a text content type.");
-				}
-				messageContentType=newMessageContentType;	//actually change the value
-				firePropertyChange(MESSAGE_CONTENT_TYPE_PROPERTY, oldMessageContentType, newMessageContentType);	//indicate that the value changed
-			}			
-		}
-
-	/**The message text resource key, or <code>null</code> if there is no message text resource specified.*/
-	private String messageResourceKey=null;
-
-		/**@return The message text resource key, or <code>null</code> if there is no message text resource specified.*/
-		public String getMessageResourceKey() {return messageResourceKey;}
-
-		/**Sets the key identifying the text of the message in the resources.
-		This is a bound property.
-		@param newMessageResourceKey The new message text resource key.
-		@see #MESSAGE_RESOURCE_KEY_PROPERTY
-		*/
-		public void setMessageResourceKey(final String newMessageResourceKey)
-		{
-			if(!ObjectUtilities.equals(messageResourceKey, newMessageResourceKey))	//if the value is really changing
-			{
-				final String oldMessageResourceKey=messageResourceKey;	//get the old value
-				messageResourceKey=newMessageResourceKey;	//actually change the value
-				firePropertyChange(MESSAGE_RESOURCE_KEY_PROPERTY, oldMessageResourceKey, newMessageResourceKey);	//indicate that the value changed
+				final String oldImageResourceKey=imageResourceKey;	//get the old value
+				imageResourceKey=newImageResourceKey;	//actually change the value
+				firePropertyChange(IMAGE_RESOURCE_KEY_PROPERTY, oldImageResourceKey, newImageResourceKey);	//indicate that the value changed
 			}
+		}
+
+	/**The opacity of the image in the range (0.0-1.0), with a default of 1.0.*/
+	private float imageOpacity=1.0f;
+
+		/**@return The opacity of the image in the range (0.0-1.0), with a default of 1.0.*/
+		public float getImageOpacity() {return imageOpacity;}
+
+		/**Sets the opacity of the image.
+		This is a bound property of type <code>Float</code>.
+		@param newImageOpacity The new opacity of the image in the range (0.0-1.0).
+		@exception IllegalArgumentException if the given opacity is not within the range (0.0-1.0).
+		@see #IMAGE_OPACITY_PROPERTY 
+		*/
+		public void setImageOpacity(final float newImageOpacity)
+		{
+			if(newImageOpacity<0.0f || newImageOpacity>1.0f)	//if the new opacity is out of range
+			{
+				throw new IllegalArgumentException("Opacity "+newImageOpacity+" is not within the allowed range.");
+			}
+			if(imageOpacity!=newImageOpacity)	//if the value is really changing
+			{
+				final float oldImageOpacity=imageOpacity;	//get the old value
+				imageOpacity=newImageOpacity;	//actually change the value
+				firePropertyChange(IMAGE_OPACITY_PROPERTY, new Float(oldImageOpacity), new Float(newImageOpacity));	//indicate that the value changed
+			}			
 		}
 
 	/**Session constructor with a default model.
@@ -140,7 +134,7 @@ public class Image extends AbstractComponent<Image>
 	*/
 	public Image(final GuiseSession session, final String id)
 	{
-		this(session, id, new DefaultImageModel(session));	//construct the class with a default model
+		this(session, id, new DefaultModel(session));	//construct the class with a default model
 	}
 
 	/**Session, ID, and model constructor.
@@ -150,7 +144,7 @@ public class Image extends AbstractComponent<Image>
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public Image(final GuiseSession session, final String id, final ImageModel model)
+	public Image(final GuiseSession session, final String id, final Model model)
 	{
 		super(session, id, model);	//construct the parent class
 		addExportStrategy(DEFAULT_EXPORT_STRATEGY);	//install a default export strategy 
@@ -207,10 +201,9 @@ public class Image extends AbstractComponent<Image>
 		public Object transfer(final ContentType contentType)
 		{
 			final Image image=getSource();	//get the image
-			final ImageModel imageModel=image.getModel();	//get the model
 			if(match(contentType, TEXT, URI_LIST_SUBTYPE))	//if this is a text/uri-list type
 			{
-				final URI imageURI=imageModel.getImage();	//get the image URI
+				final URI imageURI=image.getImage();	//get the image URI
 				return imageURI!=null ? createURIList(imageURI) : null;	//return the image URI, if there is one
 			}
 			else if(contentType.match(image.getLabelContentType()))	//if the label has the content type requested

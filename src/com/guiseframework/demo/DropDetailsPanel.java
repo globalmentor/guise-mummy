@@ -31,22 +31,22 @@ public class DropDetailsPanel extends DefaultNavigationPanel
 		final GroupPanel flagPanel=new GroupPanel(session, new FlowLayout(session, Flow.LINE));	//create the flag panel flowing horizontally
 		flagPanel.setLabel("Drag a Flag");	//set the flag panel label				
 		final Image usFlag=new Image(session);	//US flag
-		usFlag.getModel().setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/us-flag.gif"));	//set the URI
+		usFlag.setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/us-flag.gif"));	//set the URI
 		usFlag.setLabel("USA");	//set the label
 		usFlag.setDragEnabled(true);	//enable dragging for the image
 		flagPanel.add(usFlag);	//add the image to the flag panel
 		final Image frFlag=new Image(session);	//France flag
-		frFlag.getModel().setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/fr-flag.gif"));	//set the URI
+		frFlag.setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/fr-flag.gif"));	//set the URI
 		frFlag.setLabel("France");	//set the label
 		frFlag.setDragEnabled(true);	//enable dragging for the image
 		flagPanel.add(frFlag);	//add the image to the flag panel
 		final Image inFlag=new Image(session);	//India flag
-		inFlag.getModel().setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/in-flag.gif"));	//set the URI
+		inFlag.setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/in-flag.gif"));	//set the URI
 		inFlag.setLabel("India");	//set the label
 		inFlag.setDragEnabled(true);	//enable dragging for the image
 		flagPanel.add(inFlag);	//add the image to the flag panel
 		final Image irFlag=new Image(session);	//Iran flag
-		irFlag.getModel().setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/ir-flag.gif"));	//set the URI
+		irFlag.setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/ir-flag.gif"));	//set the URI
 		irFlag.setLabel("Iran");	//set the label
 		irFlag.setDragEnabled(true);	//enable dragging for the image
 		flagPanel.add(irFlag);	//add the image to the flag panel

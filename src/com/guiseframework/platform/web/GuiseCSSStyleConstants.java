@@ -17,8 +17,8 @@ public class GuiseCSSStyleConstants
 	
 	/**The CSS class suffix for the label part of a component.*/
 	public final static String COMPONENT_LABEL_CLASS_SUFFIX="-label";
-	/**The CSS class suffix for the message part of a component.*/
-	public final static String COMPONENT_MESSAGE_CLASS_SUFFIX="-message";
+	/**The CSS class suffix for the description part of a component.*/
+	public final static String COMPONENT_DESCRIPTION_CLASS_SUFFIX="-description";
 	/**The CSS class suffix for the body part of a component.*/
 	public final static String COMPONENT_BODY_CLASS_SUFFIX="-body";
 	/**The CSS class suffix for a single child of a component.*/

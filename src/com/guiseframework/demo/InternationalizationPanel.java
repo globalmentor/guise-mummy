@@ -99,8 +99,8 @@ public class InternationalizationPanel extends DefaultNavigationPanel
 
 			//localized text
 		final Text text=new Text(session);	//create a text component
-		text.getModel().setTextContentType(XHTML_CONTENT_TYPE);	//use application/xhtml+xml content
-		text.getModel().setTextResourceKey(UN_CHARTER_PREAMBLE_RESOURCE_KEY);	//use the UN Charter Preamble resource, appropriately localized
+		text.setTextContentType(XHTML_CONTENT_TYPE);	//use application/xhtml+xml content
+		text.setTextResourceKey(UN_CHARTER_PREAMBLE_RESOURCE_KEY);	//use the UN Charter Preamble resource, appropriately localized
 
 		add(text, RegionLayout.CENTER_CONSTRAINTS);	//add the text in the center of the panel
 	}

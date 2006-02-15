@@ -28,9 +28,9 @@ public class ImageOpacityPanel extends DefaultNavigationPanel
 
 			//image
 		final Image image=new Image(session);	//create the image control
-		image.getModel().setImage(URI.create("cowcalf.jpg"));	//reference an image in the root directory of the application
+		image.setImage(URI.create("cowcalf.jpg"));	//reference an image in the root directory of the application
 		image.setLabel("Cow and Calf");
-		image.setMessage("A cow and her minutes-old calf. Use the sliders to change the opacity of the image.");
+		image.setDescription("A cow and her minutes-old calf. Use the sliders to change the opacity of the image.");
 		add(image);	//add the image
 
 			//value model shared among slider controls and text control
@@ -43,7 +43,7 @@ public class ImageOpacityPanel extends DefaultNavigationPanel
 						final Float newValue=propertyValueChangeEvent.getNewValue();	//get the new value
 						if(newValue!=null)	//if there is a new value
 						{
-							image.getModel().setOpacity(newValue.floatValue());	//update the image opacity
+							image.setImageOpacity(newValue.floatValue());	//update the image opacity
 						}
 					}
 				});

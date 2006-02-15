@@ -9,7 +9,6 @@ import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.model.ActionValueModel;
 import com.guiseframework.model.DefaultActionValueModel;
-import com.guiseframework.model.ImageModel;
 
 /**Image control that can be selected and generates actions.
 @author Garret Wilson
