@@ -6,7 +6,6 @@ import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
-import com.guiseframework.model.ActionModel;
 import com.guiseframework.validator.*;
 
 /**Login Guise demonstration panel.
@@ -53,7 +52,7 @@ public class LoginPanel extends DefaultNavigationPanel
 			//login button
 		final Button loginButton=new Button(session);	//create a button for logging in
 		loginButton.setLabel("Log in");	//set the button label
-		loginButton.getModel().addActionListener(new ActionListener()	//when the login button is pressed
+		loginButton.addActionListener(new ActionListener()	//when the login button is pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)	//get the user, verify the password, and set the new session user
 					{

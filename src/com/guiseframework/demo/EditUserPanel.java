@@ -36,7 +36,7 @@ public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser>
 			//ID
 		idControl=new TextControl<String>(session, String.class);	//create the ID input control
 		idControl.setLabel("ID");	//set the ID control label
-		idControl.getModel().setEditable(false);	//don't allow the ID to be edited
+		idControl.setEditable(false);	//don't allow the ID to be edited
 		idPanel.add(idControl);	//add the ID control to the ID panel
 		
 		final LayoutPanel namePanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create the name panel flowing horizontally
@@ -79,7 +79,7 @@ public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser>
 		final LayoutPanel buttonPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create the button panel flowing horizontally
 		final Button okButton=new Button(session);	//create the OK button
 		okButton.setLabel("OK");	//set the text of the OK button
-		okButton.getModel().addActionListener(new ActionListener()	//if the OK button was pressed
+		okButton.addActionListener(new ActionListener()	//if the OK button was pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
@@ -96,7 +96,7 @@ public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser>
 		buttonPanel.add(okButton);	//add the button to the button panel
 		final Button cancelButton=new Button(session);	//create the cancel button
 		cancelButton.setLabel("Cancel");	//set the text of the cancel button
-		cancelButton.getModel().addActionListener(new ActionListener()	//if the cancel button was pressed
+		cancelButton.addActionListener(new ActionListener()	//if the cancel button was pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{

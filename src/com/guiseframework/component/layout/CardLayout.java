@@ -745,7 +745,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints>
 				if(oldEnabled!=newEnabled)	//if the value is really changing
 				{
 					constraints.setEnabled(newEnabled);	//update the enabled state
-					fireValuePropertyChange(value, ControlModel.ENABLED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newEnabled));	//indicate that the value state changed
+//TODO important fix					fireValuePropertyChange(value, ControlModel.ENABLED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newEnabled));	//indicate that the value state changed
 				}
 			}
 		}

@@ -242,11 +242,11 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 		{
 			if(oldCloseActionControl!=null)	//if we had an old close action
 			{
-				oldCloseActionControl.getModel().removeActionListener(closeActionListener);	//remove the close action listener from the old control
+				oldCloseActionControl.removeActionListener(closeActionListener);	//remove the close action listener from the old control
 			}
 			if(newCloseActionControl!=null)	//if we have a new close action
 			{
-				newCloseActionControl.getModel().addActionListener(closeActionListener);	//listen for the new action control and close the frame in response
+				newCloseActionControl.addActionListener(closeActionListener);	//listen for the new action control and close the frame in response
 			}
 			firePropertyChange(CLOSE_ACTION_CONTROL_PROPERTY, oldCloseActionControl, newCloseActionControl);	//indicate that the value changed
 		}

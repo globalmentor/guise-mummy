@@ -11,7 +11,7 @@ The panel's model reflects the currently selected component, if any.
 @author Garret Wilson
 @see CardLayout
 */
-public abstract class AbstractCardPanel<C extends Box<C> & Panel<C> & CardControl<C>> extends AbstractBox<C> implements Panel<C>, CardControl<C>
+public abstract class AbstractCardPanel<C extends Box<C> & Panel<C> & CardControl<C>> extends AbstractContainerControl<C> implements Box<C>, Panel<C>, CardControl<C>
 {
 
 	/**@return The data model used by this component.*/

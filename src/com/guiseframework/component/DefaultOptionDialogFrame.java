@@ -241,10 +241,12 @@ public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultO
 //TODO del		final Option[] sortedOptions=getSorted(options);	//sort the options
 		for(final Option option:sortedOptions)	//for each option
 		{
-			final ActionModel actionModel=new DefaultActionModel(session);	//create an action model
-			actionModel.addActionListener(new ActionListener()	//listen for the action being performed
+			final Button button=new Button(session);	//create a new button
+			button.setLabelResourceKey(MessageFormat.format("frame.dialog.options.{0}.label", option.toString()));	//set the option action label
+			button.setIconResourceKey(MessageFormat.format("frame.dialog.options.{0}.icon", option.toString()));	//set the option action icon
+			button.addActionListener(new ActionListener()	//listen for the action being performed
 					{
-						public void actionPerformed(ActionEvent actionEvent)	//if the action is performed
+						public void actionPerformed(final ActionEvent actionEvent)	//if the action is performed
 						{
 							try
 							{
@@ -257,9 +259,6 @@ public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultO
 							}	
 						}
 					});
-			final Button button=new Button(session, actionModel);	//create a new button
-			button.setLabelResourceKey(MessageFormat.format("frame.dialog.options.{0}.label", option.toString()));	//set the option action label
-			button.setIconResourceKey(MessageFormat.format("frame.dialog.options.{0}.icon", option.toString()));	//set the option action icon
 			optionContainer.add(button);	//add the button to the container
 		}
 

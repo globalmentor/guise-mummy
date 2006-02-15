@@ -1,7 +1,7 @@
 package com.guiseframework.component;
 
 import com.guiseframework.GuiseSession;
-import com.guiseframework.model.ActionModel;
+import com.guiseframework.model.Model;
 
 /**Abstract implementation of a link.
 @author Garret Wilson
@@ -16,7 +16,7 @@ public abstract class AbstractLinkControl<C extends LinkControl<C>> extends Abst
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractLinkControl(final GuiseSession session, final String id, final ActionModel model)
+	public AbstractLinkControl(final GuiseSession session, final String id, final Model model)
 	{
 		super(session, id, model);	//construct the parent class
 	}

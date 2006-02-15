@@ -44,7 +44,7 @@ public abstract class AbstractSelectActionControl<C extends SelectActionControl<
 	{
 		super(session, id, model);	//construct the parent class
 		model.setValidator(new ValueRequiredValidator<Boolean>(session));	//install a value-required validator
-		model.addActionListener(new ActionListener()	//listen for an action and set the selected state accordingly
+		addActionListener(new ActionListener()	//listen for an action and set the selected state accordingly
 				{		
 					public void actionPerformed(final ActionEvent actionEvent)	//if an action occurs
 					{

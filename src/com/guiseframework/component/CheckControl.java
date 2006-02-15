@@ -10,7 +10,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 <p>The default model used by a check control defaults to a value of {@link Boolean#FALSE}, as a check control does not have the capability of indicating <code>null</code>.</p>
 @author Garret Wilson
 */
-public class CheckControl extends AbstractLabel<CheckControl> implements ValueControl<Boolean, CheckControl> 
+public class CheckControl extends AbstractValueControl<Boolean, CheckControl> implements ValueControl<Boolean, CheckControl> 
 {
 
 	/**@return The data model used by this component.*/

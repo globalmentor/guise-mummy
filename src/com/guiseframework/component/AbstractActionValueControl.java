@@ -14,6 +14,27 @@ public abstract class AbstractActionValueControl<V, C extends ActionValueControl
 	@SuppressWarnings("unchecked")
 	public ActionValueModel<V> getModel() {return (ActionValueModel<V>)super.getModel();}
 
+	/**Whether the value is editable and the control will allow the the user to change the value.*/
+	private boolean editable=true;
+
+		/**@return Whether the value is editable and the control will allow the the user to change the value.*/
+		public boolean isEditable() {return editable;}
+
+		/**Sets whether the value is editable and the control will allow the the user to change the value.
+		This is a bound property of type <code>Boolean</code>.
+		@param newEditable <code>true</code> if the control should allow the user to change the value.
+		@see #EDITABLE_PROPERTY
+		*/
+		public void setEditable(final boolean newEditable)
+		{
+			if(editable!=newEditable)	//if the value is really changing
+			{
+				final boolean oldEditable=editable;	//get the old value
+				editable=newEditable;	//actually change the value
+				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
+			}			
+		}
+
 	/**Session, ID, and model constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.

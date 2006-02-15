@@ -3,7 +3,6 @@ package com.guiseframework.component;
 import static com.garretwilson.lang.ClassUtilities.*;
 
 import com.guiseframework.component.layout.MenuLayout;
-import com.guiseframework.model.MenuModel;
 
 /**A group of components arranged as a menu.
 This component uses a {@link MenuModel} and a {@link MenuLayout}.
@@ -11,19 +10,28 @@ This component uses a {@link MenuModel} and a {@link MenuLayout}.
 @see MenuLayout
 @see MenuModel
 */
-public interface Menu<C extends Menu<C>> extends Container<C>, Control<C>
+public interface Menu<C extends Menu<C>> extends Container<C>, ActionControl<C>
 {
 
+	/**The open bound property.*/
+	public final static String OPEN_PROPERTY=getPropertyName(Menu.class, "open");
 	/**The bound property of the rollover state.*/
 	public final static String ROLLOVER_PROPERTY=getPropertyName(Menu.class, "rollover");
 	/**The bound property of whether children will be displayed upon rollover.*/
 	public final static String ROLLOVER_OPEN_ENABLED_PROPERTY=getPropertyName(Menu.class, "rolloverOpenEnabled");
 
-	/**@return The data model used by this component.*/
-	public MenuModel getModel();
-
 	/**@return The layout definition for the menu.*/
 	public MenuLayout getLayout();
+
+	/**@return Whether the menu is open.*/
+	public boolean isOpen();
+
+	/**Sets whether the menu is open.
+	This is a bound property of type <code>Boolean</code>.
+	@param newOpen <code>true</code> if the menu should be open.
+	@see #OPEN_PROPERTY
+	*/
+	public void setOpen(final boolean newOpen);
 
 	/**@return Whether the component is in a rollover state.*/
 	public boolean isRollover();

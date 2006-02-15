@@ -48,7 +48,7 @@ public class EditUsersPanel extends DefaultNavigationPanel
 			//add button
 		final Button addButton=new Button(session);	//create the add button
 		addButton.setLabel("Add User");	//set the text of the add button
-		addButton.getModel().addActionListener(new ActionListener()	//if the add button was pressed
+		addButton.addActionListener(new ActionListener()	//if the add button was pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
@@ -86,7 +86,7 @@ public class EditUsersPanel extends DefaultNavigationPanel
 			//edit button	
 		final Button editButton=new Button(session);	//create the edit button
 		editButton.setLabel("Edit");	//set the text of the edit button
-		editButton.getModel().addActionListener(new ActionListener()	//if the edit button was pressed
+		editButton.addActionListener(new ActionListener()	//if the edit button was pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
@@ -127,7 +127,7 @@ public class EditUsersPanel extends DefaultNavigationPanel
 			//remove button	
 		final Button removeButton=new Button(session);	//create the remove button
 		removeButton.setLabel("Remove");	//set the text of the remove button
-		removeButton.getModel().addActionListener(new ActionListener()	//if the remove button was pressed
+		removeButton.addActionListener(new ActionListener()	//if the remove button was pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
@@ -163,8 +163,8 @@ public class EditUsersPanel extends DefaultNavigationPanel
 					public void listModified(final ListEvent<DemoUser> listEvent)	//if the list is modified
 					{
 						final boolean listEmpty=userListControl.getModel().isEmpty();	//see if the list is empty
-						editButton.getModel().setEnabled(!listEmpty);	//only enable the edit button if there are users to edit
-						removeButton.getModel().setEnabled(!listEmpty);	//only enable the remove button if there are users to remove
+						editButton.setEnabled(!listEmpty);	//only enable the edit button if there are users to edit
+						removeButton.setEnabled(!listEmpty);	//only enable the remove button if there are users to remove
 						final List<DemoUser> applicationUserList=((DemoApplication)getSession().getApplication()).getUsers();	//get the application's list of users
 						synchronized(applicationUserList)	//don't allow others to modify the application user list while we modify it
 						{

@@ -17,7 +17,7 @@ The table column model by default is not editable.
 @param <V> The type of values contained in the table column.
 @author Garret Wilson
 */
-public class DefaultTableColumnModel<V> extends AbstractControlModel implements TableColumnModel<V>
+public class DefaultTableColumnModel<V> extends AbstractModel implements TableColumnModel<V>
 {
 
 	/**The class representing the type of values this model can hold.*/
@@ -26,115 +26,115 @@ public class DefaultTableColumnModel<V> extends AbstractControlModel implements 
 		/**@return The class representing the type of values this model can hold.*/
 		public Class<V> getValueClass() {return valueClass;}
 
-	/**The label icon URI, or <code>null</code> if there is no icon URI.*/
-	private URI labelIcon=null;
+	/**The icon URI, or <code>null</code> if there is no icon URI.*/
+	private URI icon=null;
 
-		/**@return The label icon URI, or <code>null</code> if there is no icon URI.*/
-		public URI getIcon() {return labelIcon;}
+		/**@return The icon URI, or <code>null</code> if there is no icon URI.*/
+		public URI getIcon() {return icon;}
 
-		/**Sets the URI of the label icon.
+		/**Sets the URI of the icon.
 		This is a bound property of type <code>URI</code>.
-		@param newLabelIcon The new URI of the label icon.
-		@see #LABEL_ICON_PROPERTY
+		@param newLabelIcon The new URI of the icon.
+		@see #ICON_PROPERTY
 		*/
 		public void setIcon(final URI newLabelIcon)
 		{
-			if(!ObjectUtilities.equals(labelIcon, newLabelIcon))	//if the value is really changing
+			if(!ObjectUtilities.equals(icon, newLabelIcon))	//if the value is really changing
 			{
-				final URI oldLabelIcon=labelIcon;	//get the old value
-				labelIcon=newLabelIcon;	//actually change the value
-				firePropertyChange(LABEL_ICON_PROPERTY, oldLabelIcon, newLabelIcon);	//indicate that the value changed
+				final URI oldLabelIcon=icon;	//get the old value
+				icon=newLabelIcon;	//actually change the value
+				firePropertyChange(ICON_PROPERTY, oldLabelIcon, newLabelIcon);	//indicate that the value changed
 			}			
 		}
 
-	/**The label icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-	private String labelIconResourceKey=null;
+	/**The icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
+	private String iconResourceKey=null;
 
-		/**@return The label icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-		public String getIconResourceKey() {return labelIconResourceKey;}
+		/**@return The icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
+		public String getIconResourceKey() {return iconResourceKey;}
 
-		/**Sets the key identifying the URI of the label icon in the resources.
+		/**Sets the key identifying the URI of the icon in the resources.
 		This is a bound property.
-		@param newIconResourceKey The new label icon URI resource key.
-		@see #LABEL_ICON_RESOURCE_KEY_PROPERTY
+		@param newIconResourceKey The new icon URI resource key.
+		@see #ICON_RESOURCE_KEY_PROPERTY
 		*/
 		public void setIconResourceKey(final String newIconResourceKey)
 		{
-			if(!ObjectUtilities.equals(labelIconResourceKey, newIconResourceKey))	//if the value is really changing
+			if(!ObjectUtilities.equals(iconResourceKey, newIconResourceKey))	//if the value is really changing
 			{
-				final String oldIconResourceKey=labelIconResourceKey;	//get the old value
-				labelIconResourceKey=newIconResourceKey;	//actually change the value
-				firePropertyChange(LABEL_ICON_RESOURCE_KEY_PROPERTY, oldIconResourceKey, newIconResourceKey);	//indicate that the value changed
+				final String oldIconResourceKey=iconResourceKey;	//get the old value
+				iconResourceKey=newIconResourceKey;	//actually change the value
+				firePropertyChange(ICON_RESOURCE_KEY_PROPERTY, oldIconResourceKey, newIconResourceKey);	//indicate that the value changed
 			}
 		}
 
 	/**The label text, or <code>null</code> if there is no label text.*/
-	private String labelText=null;
+	private String label=null;
 
 		/**@return The label text, or <code>null</code> if there is no label text.*/
-		public String getLabel() {return labelText;}
+		public String getLabel() {return label;}
 
 		/**Sets the text of the label.
 		This is a bound property.
 		@param newLabelText The new text of the label.
-		@see #LABEL_TEXT_PROPERTY
+		@see #LABEL_PROPERTY
 		*/
 		public void setLabel(final String newLabelText)
 		{
-			if(!ObjectUtilities.equals(labelText, newLabelText))	//if the value is really changing
+			if(!ObjectUtilities.equals(label, newLabelText))	//if the value is really changing
 			{
-				final String oldLabel=labelText;	//get the old value
-				labelText=newLabelText;	//actually change the value
-				firePropertyChange(LABEL_TEXT_PROPERTY, oldLabel, newLabelText);	//indicate that the value changed
+				final String oldLabel=label;	//get the old value
+				label=newLabelText;	//actually change the value
+				firePropertyChange(LABEL_PROPERTY, oldLabel, newLabelText);	//indicate that the value changed
 			}			
 		}
 
 	/**The content type of the label text.*/
-	private ContentType labelTextContentType=Component.PLAIN_TEXT_CONTENT_TYPE;
+	private ContentType labelContentType=Component.PLAIN_TEXT_CONTENT_TYPE;
 
 		/**@return The content type of the label text.*/
-		public ContentType getLabelContentType() {return labelTextContentType;}
+		public ContentType getLabelContentType() {return labelContentType;}
 
 		/**Sets the content type of the label text.
 		This is a bound property.
 		@param newLabelTextContentType The new label text content type.
 		@exception NullPointerException if the given content type is <code>null</code>.
 		@exception IllegalArgumentException if the given content type is not a text content type.
-		@see #LABEL_TEXT_CONTENT_TYPE_PROPERTY
+		@see #LABEL_CONTENT_TYPE_PROPERTY
 		*/
 		public void setLabelContentType(final ContentType newLabelTextContentType)
 		{
 			checkNull(newLabelTextContentType, "Content type cannot be null.");
-			if(labelTextContentType!=newLabelTextContentType)	//if the value is really changing
+			if(labelContentType!=newLabelTextContentType)	//if the value is really changing
 			{
-				final ContentType oldLabelTextContentType=labelTextContentType;	//get the old value
+				final ContentType oldLabelTextContentType=labelContentType;	//get the old value
 				if(!isText(newLabelTextContentType))	//if the new content type is not a text content type
 				{
 					throw new IllegalArgumentException("Content type "+newLabelTextContentType+" is not a text content type.");
 				}
-				labelTextContentType=newLabelTextContentType;	//actually change the value
-				firePropertyChange(LABEL_TEXT_CONTENT_TYPE_PROPERTY, oldLabelTextContentType, newLabelTextContentType);	//indicate that the value changed
+				labelContentType=newLabelTextContentType;	//actually change the value
+				firePropertyChange(LABEL_CONTENT_TYPE_PROPERTY, oldLabelTextContentType, newLabelTextContentType);	//indicate that the value changed
 			}			
 		}
 
 	/**The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-	private String labelTextResourceKey=null;
+	private String labelResourceKey=null;
 	
 		/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-		public String getLabelResourceKey() {return labelTextResourceKey;}
+		public String getLabelResourceKey() {return labelResourceKey;}
 	
 		/**Sets the key identifying the text of the label in the resources.
 		This is a bound property.
 		@param newLabelTextResourceKey The new label text resource key.
-		@see #LABEL_TEXT_RESOURCE_KEY_PROPERTY
+		@see #LABEL_RESOURCE_KEY_PROPERTY
 		*/
 		public void setLabelResourceKey(final String newLabelTextResourceKey)
 		{
-			if(!ObjectUtilities.equals(labelTextResourceKey, newLabelTextResourceKey))	//if the value is really changing
+			if(!ObjectUtilities.equals(labelResourceKey, newLabelTextResourceKey))	//if the value is really changing
 			{
-				final String oldLabelTextResourceKey=labelTextResourceKey;	//get the old value
-				labelTextResourceKey=newLabelTextResourceKey;	//actually change the value
-				firePropertyChange(LABEL_TEXT_RESOURCE_KEY_PROPERTY, oldLabelTextResourceKey, newLabelTextResourceKey);	//indicate that the value changed
+				final String oldLabelTextResourceKey=labelResourceKey;	//get the old value
+				labelResourceKey=newLabelTextResourceKey;	//actually change the value
+				firePropertyChange(LABEL_RESOURCE_KEY_PROPERTY, oldLabelTextResourceKey, newLabelTextResourceKey);	//indicate that the value changed
 			}
 		}
 
@@ -155,7 +155,7 @@ public class DefaultTableColumnModel<V> extends AbstractControlModel implements 
 			{
 				final boolean oldEditable=editable;	//get the old value
 				editable=newEditable;	//actually change the value
-				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
+//TODO important: fix				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
 			}			
 		}
 
@@ -267,7 +267,7 @@ public class DefaultTableColumnModel<V> extends AbstractControlModel implements 
 	{
 		super(session);	//construct the parent class
 		this.valueClass=valueClass;	//save the value class
-		this.labelText=labelText;	//save the label text
+		this.label=labelText;	//save the label text
 	}
 	
 }

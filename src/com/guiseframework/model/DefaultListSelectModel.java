@@ -659,7 +659,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 			if(oldEnabled!=newEnabled)	//if the value is really changing
 			{
 				valueState.setEnabled(newEnabled);	//update the enabled state
-				fireValuePropertyChange(values.get(index), ControlModel.ENABLED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newEnabled));	//indicate that the value state changed
+//TODO important fix after moving enabled from model to control				fireValuePropertyChange(values.get(index), ControlModel.ENABLED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newEnabled));	//indicate that the value state changed
 			}			
 		}
 	}

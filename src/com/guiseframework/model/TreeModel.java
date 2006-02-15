@@ -7,7 +7,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 /**A model for a tree of nodes.
 @author Garret Wilson
 */
-public interface TreeModel extends ControlModel
+public interface TreeModel extends Model
 {
 
 	/**@return The root node of the tree model.*/

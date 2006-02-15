@@ -68,14 +68,14 @@ public class DropDetailsPanel extends DefaultNavigationPanel
 			//default text area
 		final TextAreaControl defaultTextArea=new TextAreaControl(session, 5, 80);	//create a text area control
 		defaultTextArea.setLabel("Drop Here for Built-In Drop Functionality");	//set the label of the text area
-		defaultTextArea.getModel().setEditable(false);	//don't allow the text area control to be edited
+		defaultTextArea.setEditable(false);	//don't allow the text area control to be edited
 		defaultTextArea.setDropEnabled(true);	//allow dropping on the text area
 		add(defaultTextArea);	//add the default drop text area control to the panel
 
 			//details text area
 		final TextAreaControl detailsTextArea=new TextAreaControl(session, 15, 80);	//create a text area control
 		detailsTextArea.setLabel("Drop Here for Drop Details");	//set the label of the text area
-		detailsTextArea.getModel().setEditable(false);	//don't allow the text area control to be edited
+		detailsTextArea.setEditable(false);	//don't allow the text area control to be edited
 		detailsTextArea.setDropEnabled(true);	//allow dropping on the text area
 		detailsTextArea.addImportStrategy(new ImportStrategy<TextAreaControl>()	//add a new import strategy for this component
 				{		

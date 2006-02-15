@@ -1,6 +1,6 @@
 package com.guiseframework.model;
 
-import static com.garretwilson.lang.ClassUtilities.getPropertyName;
+import static com.garretwilson.lang.ClassUtilities.*;
 
 /**A node in a tree model.
 @author Garret Wilson

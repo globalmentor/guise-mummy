@@ -18,6 +18,28 @@ public class TreeControl extends AbstractCompositeStateComponent<TreeNodeModel<?
 	/**@return The data model used by this component.*/
 	public TreeModel getModel() {return (TreeModel)super.getModel();}
 
+	/**Whether the control is enabled and can receive user input.*/
+	private boolean enabled=true;
+
+		/**@return Whether the control is enabled and can receive user input.*/
+		public boolean isEnabled() {return enabled;}
+
+		/**Sets whether the control is enabled and and can receive user input.
+		This is a bound property of type <code>Boolean</code>.
+		@param newEnabled <code>true</code> if the control should indicate and accept user input.
+		@see #ENABLED_PROPERTY
+		*/
+		public void setEnabled(final boolean newEnabled)
+		{
+			if(enabled!=newEnabled)	//if the value is really changing
+			{
+				final boolean oldEnabled=enabled;	//get the old value
+				enabled=newEnabled;	//actually change the value
+				firePropertyChange(ENABLED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newEnabled));	//indicate that the value changed
+			}			
+		}
+
+
 	/**Whether the state of the control represents valid user input.*/
 	private boolean valid=true;
 
@@ -81,7 +103,8 @@ public class TreeControl extends AbstractCompositeStateComponent<TreeNodeModel<?
 	*/
 	public <T> void verifyTreeNodeComponent(final TreeNodeModel<T> treeNode) throws IOException
 	{
-		final boolean editable=treeNode.isEditable();	//see if the tree node is editable
+//TODO important fix		final boolean editable=treeNode.isEditable();	//see if the tree node is editable
+		final boolean editable=false;	//TODO fix
 		TreeNodeComponentState treeNodeComponentState=getComponentState(treeNode);	//get the component information for this tree node
 		if(treeNodeComponentState==null || treeNodeComponentState.isEditable()!=editable)	//if there is no component for this tree node, or the component has a different editable status
 		{

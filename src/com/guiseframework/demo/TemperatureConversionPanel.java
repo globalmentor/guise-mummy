@@ -46,7 +46,7 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 		inputPanel.add(temperatureInput);	//add the input control to the input panel
 		temperatureOutput=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
 		temperatureOutput.setLabel("Output Temperature");	//add a label to the text output control
-		temperatureOutput.getModel().setEditable(false);	//set the text output control to read-only so that the user cannot modify it
+		temperatureOutput.setEditable(false);	//set the text output control to read-only so that the user cannot modify it
 		inputPanel.add(temperatureOutput);	//add the output control to the input panel
 
 		add(inputPanel);	//add the input panel to the temperature panel
@@ -92,7 +92,7 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 			//conversion button
 		final Button convertButton=new Button(session);	//create a button for initiating the conversion
 		convertButton.setLabel("Convert");	//set the button label
-		convertButton.getModel().addActionListener(new ActionListener()	//when the convert button is pressed
+		convertButton.addActionListener(new ActionListener()	//when the convert button is pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)	//convert the temperature in the input field and place the result in the output field
 					{

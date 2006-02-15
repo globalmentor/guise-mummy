@@ -30,7 +30,7 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 			{
 				final boolean oldExpanded=expanded;	//get the old value
 				expanded=newExpanded;	//actually change the value
-				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldExpanded), Boolean.valueOf(newExpanded));	//indicate that the value changed
+				firePropertyChange(EXPANDED_PROPERTY, Boolean.valueOf(oldExpanded), Boolean.valueOf(newExpanded));	//indicate that the value changed
 			}			
 		}
 
@@ -157,7 +157,7 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 	public DefaultTreeNodeModel(final GuiseSession session, final Class<V> valueClass, final V initialValue)
 	{
 		super(session, valueClass, initialValue);	//construct the parent class
-		setEditable(false);	//default to not being editable
+//TODO del or move		setEditable(false);	//default to not being editable
 	}
 
 }

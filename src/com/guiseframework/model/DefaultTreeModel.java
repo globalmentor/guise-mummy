@@ -9,7 +9,7 @@ If a dummy root node is used, it will automatically be set to an expanded state.
 @author Garret Wilson
 @see DummyTreeNodeModel
 */
-public class DefaultTreeModel extends AbstractControlModel implements TreeModel
+public class DefaultTreeModel extends AbstractModel implements TreeModel
 {
 
 	/**The root node of the tree model.*/

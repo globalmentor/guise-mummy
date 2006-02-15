@@ -8,7 +8,7 @@ import com.guiseframework.validator.*;
 @param <V> The type of value contained in the model.
 @author Garret Wilson
 */
-public interface ValueModel<V> extends ControlModel
+public interface ValueModel<V> extends Model
 {
 
 	/**The value bound property.*/
@@ -17,14 +17,14 @@ public interface ValueModel<V> extends ControlModel
 	public final static String VALIDATOR_PROPERTY=getPropertyName(ValueModel.class, "validator");
 
 	/**@return Whether the model's value is editable and the corresponding control will allow the the user to change the value.*/
-	public boolean isEditable();
+//TODO del	public boolean isEditable();
 
 	/**Sets whether the model's value is editable and the corresponding control will allow the the user to change the value.
 	This is a bound property of type <code>Boolean</code>.
 	@param newEditable <code>true</code> if the corresponding control should allow the user to change the value.
 	@see #EDITABLE_PROPERTY
 	*/
-	public void setEditable(final boolean newEditable);
+//TODO del	public void setEditable(final boolean newEditable);
 
 	/**@return The default value.*/
 	public V getDefaultValue();

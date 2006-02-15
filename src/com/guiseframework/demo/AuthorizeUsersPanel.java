@@ -55,7 +55,7 @@ public class AuthorizeUsersPanel extends DefaultNavigationPanel
 			//apply button
 		final Button applyButton=new Button(session);	//create a button for applying the values
 		applyButton.setLabel("Apply");	//set the button label
-		applyButton.getModel().addActionListener(new ActionListener()	//listen for the apply button
+		applyButton.addActionListener(new ActionListener()	//listen for the apply button
 				{					
 					public void actionPerformed(ActionEvent actionEvent)
 					{

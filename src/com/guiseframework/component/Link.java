@@ -1,8 +1,8 @@
 package com.guiseframework.component;
 
 import com.guiseframework.GuiseSession;
-import com.guiseframework.model.ActionModel;
-import com.guiseframework.model.DefaultActionModel;
+import com.guiseframework.model.DefaultModel;
+import com.guiseframework.model.Model;
 
 /**Control with an action model rendered as a link.
 @author Garret Wilson
@@ -27,7 +27,7 @@ public class Link extends AbstractLinkControl<Link>
 	*/
 	public Link(final GuiseSession session, final String id)
 	{
-		this(session, id, new DefaultActionModel(session));	//construct the class with a default model
+		this(session, id, new DefaultModel(session));	//construct the class with a default model
 	}
 
 	/**Session and model constructor.
@@ -35,7 +35,7 @@ public class Link extends AbstractLinkControl<Link>
 	@param model The component data model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	*/
-	public Link(final GuiseSession session, final ActionModel model)
+	public Link(final GuiseSession session, final Model model)
 	{
 		this(session, null, model);	//construct the component, indicating that a default ID should be used
 	}
@@ -47,7 +47,7 @@ public class Link extends AbstractLinkControl<Link>
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public Link(final GuiseSession session, final String id, final ActionModel model)
+	public Link(final GuiseSession session, final String id, final Model model)
 	{
 		super(session, id, model);	//construct the parent class
 	}

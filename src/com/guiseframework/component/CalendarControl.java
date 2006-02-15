@@ -20,11 +20,32 @@ If the model used by the calendar control uses a {@link RangeValidator} with a d
 Otherwise, a text input will be used for year selection.
 @author Garret Wilson
 */
-public class CalendarControl extends AbstractContainer<CalendarControl> implements ValueControl<Date, CalendarControl>
+public class CalendarControl extends AbstractContainerControl<CalendarControl> implements ValueControl<Date, CalendarControl>
 {
 
 	/**The visible date bound property.*/
 	public final static String DATE_PROPERTY=getPropertyName(CalendarControl.class, "date");
+
+	/**Whether the value is editable and the control will allow the the user to change the value.*/
+	private boolean editable=true;	//TODO fix
+
+		/**@return Whether the value is editable and the control will allow the the user to change the value.*/
+		public boolean isEditable() {return editable;}
+
+		/**Sets whether the value is editable and the control will allow the the user to change the value.
+		This is a bound property of type <code>Boolean</code>.
+		@param newEditable <code>true</code> if the control should allow the user to change the value.
+		@see #EDITABLE_PROPERTY
+		*/
+		public void setEditable(final boolean newEditable)
+		{
+			if(editable!=newEditable)	//if the value is really changing
+			{
+				final boolean oldEditable=editable;	//get the old value
+				editable=newEditable;	//actually change the value
+				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
+			}			
+		}
 
 	/**Whether the state of the control represents valid user input.*/
 	private boolean valid=true;
@@ -459,9 +480,9 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 				final Validator<Date> validator=CalendarControl.this.getModel().getValidator();	//get the calendar control model's validator
 				if(validator==null || validator.isValid(date))	//if there is no validator installed, or there is a validator and this is a valid date
 				{
-					link.getModel().addActionListener(new ActionListener()	//create a listener to listen for calendar actions
+					link.addActionListener(new ActionListener()	//create a listener to listen for calendar actions
 							{
-								public void actionPerformed(ActionEvent actionEvent)	//when a day is selected
+								public void actionPerformed(final ActionEvent actionEvent)	//when a day is selected
 								{
 									try
 									{
@@ -476,7 +497,7 @@ public class CalendarControl extends AbstractContainer<CalendarControl> implemen
 				}
 				else	//if there is a validator installed and this is not a valid date
 				{
-					link.getModel().setEnabled(false);	//disable this link
+					link.setEnabled(false);	//disable this link
 				}
 				return link;	//return the link
 			}

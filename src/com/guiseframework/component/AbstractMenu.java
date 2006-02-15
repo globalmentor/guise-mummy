@@ -1,25 +1,48 @@
 package com.guiseframework.component;
 
+import java.util.Iterator;
+
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.*;
+import com.guiseframework.event.ActionEvent;
+import com.guiseframework.event.ActionListener;
 import com.guiseframework.event.MouseEvent;
 import com.guiseframework.event.MouseListener;
+import com.guiseframework.event.PostponedActionEvent;
 import com.guiseframework.geometry.Point;
 import com.guiseframework.geometry.Rectangle;
-import com.guiseframework.model.MenuModel;
+import com.guiseframework.model.Model;
 
 /**An abstract menu component.
 This implementation initially closes any child menu added to this menu.
 @author Garret Wilson
 */
-public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainer<C> implements Menu<C>  
+public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerControl<C> implements Menu<C>  
 {
-
-	/**@return The data model used by this component.*/
-	public MenuModel getModel() {return (MenuModel)super.getModel();}
 
 	/**@return The layout definition for the menu.*/
 	public MenuLayout getLayout() {return (MenuLayout)super.getLayout();}	//a menu can only have a menu layout
+
+	/**Whether the menu is open.*/
+	private boolean open=true;
+
+		/**@return Whether the menu is open.*/
+		public boolean isOpen() {return open;}
+
+		/**Sets whether the menu is open.
+		This is a bound property of type <code>Boolean</code>.
+		@param newOpen <code>true</code> if the menu should be open.
+		@see #OPEN_PROPERTY
+		*/
+		public void setOpen(final boolean newOpen)
+		{
+			if(open!=newOpen)	//if the value is really changing
+			{
+				final boolean oldOpen=open;	//get the old value
+				open=newOpen;	//actually change the value
+				firePropertyChange(OPEN_PROPERTY, Boolean.valueOf(oldOpen), Boolean.valueOf(newOpen));	//indicate that the value changed
+			}			
+		}
 
 	/**Whether the state of the control represents valid user input.*/
 	private boolean valid=true;
@@ -93,9 +116,45 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainer<
 	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractMenu(final GuiseSession session, final String id, final MenuLayout layout, final MenuModel model)
+	public AbstractMenu(final GuiseSession session, final String id, final MenuLayout layout, final Model model)
 	{
 		super(session, id, layout, model);	//construct the parent class
+	}
+
+	/**Adds an action listener.
+	@param actionListener The action listener to add.
+	*/
+	public void addActionListener(final ActionListener actionListener)
+	{
+		getEventListenerManager().add(ActionListener.class, actionListener);	//add the listener
+	}
+
+	/**Removes an action listener.
+	@param actionListener The action listener to remove.
+	*/
+	public void removeActionListener(final ActionListener actionListener)
+	{
+		getEventListenerManager().remove(ActionListener.class, actionListener);	//remove the listener
+	}
+
+	/**@return all registered action listeners.*/
+	@SuppressWarnings("unchecked")
+	public Iterator<ActionListener> getActionListeners()
+	{
+		return (Iterator<ActionListener>)(Object)getEventListenerManager().getListeners(ActionListener.class);	//remove the listener TODO find out why we have to use the double cast for JDK 1.5 to compile
+	}
+
+	/**Fires an action to all registered action listeners.
+	@see ActionListener
+	@see ActionEvent
+	*/
+	public void fireAction()
+	{
+		if(getEventListenerManager().hasListeners(ActionListener.class))	//if there are action listeners registered
+		{
+			final ActionEvent actionEvent=new ActionEvent(getSession(), this);	//create a new action event
+			getSession().queueEvent(new PostponedActionEvent(getEventListenerManager(), actionEvent));	//tell the Guise session to queue the event
+		}
 	}
 
 	/**Fires a mouse entered event to all registered mouse listeners.
@@ -139,7 +198,7 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainer<
 		super.addComponent(component);	//do the default adding
 		if(component instanceof Menu)	//if the component is a menu
 		{
-			((Menu<?>)component).getModel().setOpen(false);	//close the child menu
+			((Menu<?>)component).setOpen(false);	//close the child menu
 		}
 	}
 

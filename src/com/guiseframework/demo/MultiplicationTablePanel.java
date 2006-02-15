@@ -8,7 +8,6 @@ import com.guiseframework.component.layout.FlowLayout;
 import com.guiseframework.component.layout.RegionLayout;
 import com.guiseframework.event.ActionEvent;
 import com.guiseframework.event.ActionListener;
-import com.guiseframework.model.ActionModel;
 import com.guiseframework.validator.IntegerRangeValidator;
 
 /**Multiplication Table Guise demonstration panel.
@@ -47,7 +46,7 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 		final Button addButton=new Button(session);	//create the button for adding a tab
 		addButton.setLabel("Add Tab");	//set the button label
 		addButton.setInfo("Add a tab containing a multiplication table of the specified factor.");	//set the button information
-		addButton.getModel().addActionListener(new ActionListener()	//listen for the button being pressed
+		addButton.addActionListener(new ActionListener()	//listen for the button being pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)	//if the button is pressed
 					{
@@ -61,8 +60,8 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 								tabbedPanel.add(tab, new CardLayout.Constraints(String.valueOf(maxFactor)));	//add the tab to the tabbed panel
 								if(tabbedPanel.size()==MAX_TAB_COUNT)	//if we've reached the maximum tab count
 								{
-									maxFactorControl.getModel().setEnabled(false);	//disable the count control
-									addButton.getModel().setEnabled(false);	//disable the add button
+									maxFactorControl.setEnabled(false);	//disable the count control
+									addButton.setEnabled(false);	//disable the add button
 								}
 							}
 							catch (ComponentExceptions e)
@@ -76,7 +75,7 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 		final Button clearButton=new Button(session);	//create the button for clearing the tabs
 		clearButton.setLabel("Clear Tabs");	//set the button label
 		clearButton.setInfo("Remove all tabs except the default tab.");	//set the button information
-		clearButton.getModel().addActionListener(new ActionListener()	//listen for the button being pressed
+		clearButton.addActionListener(new ActionListener()	//listen for the button being pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)	//if the button is pressed
 					{
@@ -87,8 +86,8 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 								tabbedPanel.remove(tab);	//remove the tab
 							}
 						}
-						maxFactorControl.getModel().setEnabled(true);	//make sure the count control is enabled
-						addButton.getModel().setEnabled(true);	//make sure the add button is enabled 
+						maxFactorControl.setEnabled(true);	//make sure the count control is enabled
+						addButton.setEnabled(true);	//make sure the add button is enabled 
 					}
 				});
 		controlPanel.add(clearButton);	//add the clear button to this panel

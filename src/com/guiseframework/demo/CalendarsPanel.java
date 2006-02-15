@@ -80,7 +80,7 @@ public class CalendarsPanel extends DefaultNavigationPanel
 		calendarControlPanel.add(calendarControl);
 		final TextControl<Date> embeddedDateTextControl=new TextControl<Date>(session, Date.class);	//create a text control to display the date
 		embeddedDateTextControl.setLabel("Selected Date:");
-		embeddedDateTextControl.getModel().setEditable(false);
+		embeddedDateTextControl.setEditable(false);
 		calendarControlPanel.add(embeddedDateTextControl);
 		calendarControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Date>()	//listen for the calendar control value changing
 				{
@@ -109,9 +109,9 @@ public class CalendarsPanel extends DefaultNavigationPanel
 		popupCalendarControlPanel.add(calendarButton);
 		final TextControl<Date> popupDateTextControl=new TextControl<Date>(session, Date.class);	//create a text control to display the date
 		popupDateTextControl.setLabel("Selected Date:");
-		popupDateTextControl.getModel().setEditable(false);
+		popupDateTextControl.setEditable(false);
 		popupCalendarControlPanel.add(popupDateTextControl);
-		calendarButton.getModel().addActionListener(new ActionListener()	//listen for the calendar button being pressed
+		calendarButton.addActionListener(new ActionListener()	//listen for the calendar button being pressed
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the calendar button is pressed
 					{

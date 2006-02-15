@@ -107,11 +107,11 @@ public class MenusPanel extends DefaultNavigationPanel
 				//create a text input control to indicate the number of continents clicks, and set its model's default to zero
 		final TextControl<Integer> continentsClickCountControl=new TextControl<Integer>(session, new DefaultValueModel<Integer>(session, Integer.class, new Integer(0)));
 		continentsClickCountControl.setLabel("Number of clicks on the \"Continents\" accordion menu.");	//add a label to the input control
-		continentsClickCountControl.getModel().setEditable(false);	//don't allow the control to be edited
+		continentsClickCountControl.setEditable(false);	//don't allow the control to be edited
 		accordionMenuPanel.add(continentsClickCountControl);		
 		centerPanel.add(accordionMenuPanel);
 		
-		continentsMenu.getModel().addActionListener(new ActionListener()	//listen for accordion menu action
+		continentsMenu.addActionListener(new ActionListener()	//listen for accordion menu action
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{

@@ -13,19 +13,9 @@ import com.guiseframework.validator.Validator;
 @param <V> The type of values contained in the table column.
 @author Garret Wilson
 */
-public interface TableColumnModel<V> extends ControlModel, Labelable
+public interface TableColumnModel<V> extends Model, Labelable
 {
 
-	/**The label icon bound property.*/
-	public final static String LABEL_ICON_PROPERTY=getPropertyName(TableColumnModel.class, "labelIcon");
-	/**The label icon resource key bound property.*/
-	public final static String LABEL_ICON_RESOURCE_KEY_PROPERTY=getPropertyName(TableColumnModel.class, "labelIconResourceKey");
-	/**The label text bound property.*/
-	public final static String LABEL_TEXT_PROPERTY=getPropertyName(TableColumnModel.class, "labelText");
-	/**The label text content type bound property.*/
-	public final static String LABEL_TEXT_CONTENT_TYPE_PROPERTY=getPropertyName(TableColumnModel.class, "labelTextContentType");
-	/**The label text resource key bound property.*/
-	public final static String LABEL_TEXT_RESOURCE_KEY_PROPERTY=getPropertyName(TableColumnModel.class, "labelTextResourceKey");
 	/**The bound property of the column style ID.*/
 	public final static String STYLE_ID_PROPERTY=getPropertyName(TableColumnModel.class, "styleID");
 	/**The validator bound property.*/

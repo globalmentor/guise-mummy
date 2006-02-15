@@ -19,16 +19,17 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 {
 
 	/**Whether the table is editable and the cells will allow the the user to change their values, if their respective columns are designated as editable as well.*/
-	private boolean editable=true;
+//TODO fix	private boolean editable=true;
 
 		/**@return Whether the table is editable and the cells will allow the the user to change their values, if their respective columns are designated as editable as well.*/
-		public boolean isEditable() {return editable;}
+//TODO fix		public boolean isEditable() {return editable;}
 
 		/**Sets whether the table is editable and the cells will allow the the user to change their values, if their respective columns are designated as editable as well.
 		This is a bound property of type <code>Boolean</code>.
 		@param newEditable <code>true</code> if the cells should allow the user to change their values if their respective columns are also designated as editable.
 		@see TableModel#EDITABLE_PROPERTY
 		*/
+/*TODO fix
 		public void setEditable(final boolean newEditable)
 		{
 			if(editable!=newEditable)	//if the value is really changing
@@ -38,6 +39,7 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
 			}			
 		}
+*/
 
 	/**The list of table column models in logical order.*/
 	private final List<TableColumnModel<?>> logicalTableColumnModels=new CopyOnWriteArrayList<TableColumnModel<?>>();

@@ -69,7 +69,7 @@ public class TemperatureConversionPanel2 extends DefaultNavigationPanel
 		fahrenheitCheckControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, checkControlListener);	//listen for the Fahrenheit control changing
 			//conversion button
 		final Button convertButton=(Button)AbstractComponent.getComponentByName(this, "conversionButton");	//get the button for initiating the conversion
-		convertButton.getModel().addActionListener(new ActionListener()	//when the convert button is pressed
+		convertButton.addActionListener(new ActionListener()	//when the convert button is pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)	//convert the temperature in the input field and place the result in the output field
 					{

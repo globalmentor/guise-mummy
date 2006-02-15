@@ -128,7 +128,7 @@ public class HomePanel extends DefaultNavigationPanel
 		
 		final TextControl<Float> outputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
 		outputTextControl.setLabel("Double the Number");	//add a label to the text output control
-		outputTextControl.getModel().setEditable(false);	//set the text output control to read-only so that the user cannot modify it
+		outputTextControl.setEditable(false);	//set the text output control to read-only so that the user cannot modify it
 		inputPanel.add(outputTextControl);	//add the output control to the input panel
 		inputTextControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Float>()
 				{
@@ -242,12 +242,12 @@ Debug.trace("list control changed value to", newValue);
 		testButton.setCornerArcSize(Corner.LINE_FAR_PAGE_NEAR, Component.ROUNDED_CORNER_ARC_SIZE);
 		testButton.setCornerArcSize(Corner.LINE_FAR_PAGE_FAR, Component.ROUNDED_CORNER_ARC_SIZE);
 		
-		testButton.getModel().addActionListener(new NavigateActionListener("helloworld"));
+		testButton.addActionListener(new NavigateActionListener("helloworld"));
 		buttonPanel.add(testButton);	//add a new button
 		
 		final Button testButton2=new Button(session, "testButton2");
 		testButton2.setLabel("Click this button to change the text.");
-		testButton2.getModel().addActionListener(new ActionListener()
+		testButton2.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
@@ -306,7 +306,7 @@ Debug.trace("list control changed value to", newValue);
 		buttonPanel.add(testButton2);	//add a new button
 		final Link testLink=new Link(session);
 		testLink.setLabel("This is a link.");
-		testLink.getModel().addActionListener(new ActionListener()
+		testLink.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
@@ -322,7 +322,7 @@ Debug.trace("list control changed value to", newValue);
 		buttonPanel.add(testLink);	//add a new button
 		final Link modalLink=new Link(session);
 		modalLink.setLabel("Test modal.");
-		modalLink.getModel().addActionListener(new ActionListener()
+		modalLink.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
@@ -344,7 +344,7 @@ Debug.trace("list control changed value to", newValue);
 		
 		final Link helloLink=new Link(session);
 		helloLink.setLabel("More Hello World.");
-		helloLink.getModel().addActionListener(new NavigateActionListener("helloworld"));
+		helloLink.addActionListener(new NavigateActionListener("helloworld"));
 		buttonPanel.add(helloLink);	//add the link
 
 		final Link frameLink=new Link(session);
@@ -354,7 +354,7 @@ Debug.trace("list control changed value to", newValue);
 		frameLink.getFlyoverStrategy().setPreferredWidth(new Extent(15, Extent.Unit.EM));
 		frameLink.getFlyoverStrategy().setPreferredHeight(new Extent(10, Extent.Unit.EM));
 //TODO del		frameLink.getFlyoverStrategy().setOpenEffect(new OpacityFadeEffect(session, 1500));	//TODO testing openEffect
-		frameLink.getModel().addActionListener(new ActionListener()
+		frameLink.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
@@ -371,7 +371,7 @@ Debug.trace("list control changed value to", newValue);
 
 		final Link modalFrameLink=new Link(session);
 		modalFrameLink.setLabel("Modal Frame");
-		modalFrameLink.getModel().addActionListener(new ActionListener()
+		modalFrameLink.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
@@ -401,7 +401,7 @@ Debug.trace("list control changed value to", newValue);
 		
 		final Link nearbyLink=new Link(session);
 		nearbyLink.setLabel("Inside");
-		nearbyLink.getModel().addActionListener(new ActionListener()
+		nearbyLink.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
@@ -412,7 +412,7 @@ Debug.trace("list control changed value to", newValue);
 		
 		final Link popupLink=new Link(session);
 		popupLink.setLabel("Popup");
-		popupLink.getModel().addActionListener(new ActionListener()
+		popupLink.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
@@ -425,7 +425,7 @@ Debug.trace("list control changed value to", newValue);
 		
 		final Link listenerPopupLink=new Link(session);
 		listenerPopupLink.setLabel("Popup from NavigateActionListener");
-		listenerPopupLink.getModel().addActionListener(new NavigateActionListener(URI.create("http://www.about.com"), "another"));
+		listenerPopupLink.addActionListener(new NavigateActionListener(URI.create("http://www.about.com"), "another"));
 		linkPanel.add(listenerPopupLink);
 		
 		
@@ -441,7 +441,7 @@ Debug.trace("list control changed value to", newValue);
 
 		final Link bookmark1Link=new Link(session);
 		bookmark1Link.setLabel("Bookmark1");
-		bookmark1Link.getModel().addActionListener(new ActionListener()
+		bookmark1Link.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
@@ -452,7 +452,7 @@ Debug.trace("list control changed value to", newValue);
 
 		final Link bookmark2Link=new Link(session);
 		bookmark2Link.setLabel("Bookmark2");
-		bookmark2Link.getModel().addActionListener(new ActionListener()
+		bookmark2Link.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
@@ -463,7 +463,7 @@ Debug.trace("list control changed value to", newValue);
 
 		final Link bookmark3Link=new Link(session);
 		bookmark3Link.setLabel("Go Bookmark3");
-		bookmark3Link.getModel().addActionListener(new ActionListener()
+		bookmark3Link.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
@@ -679,7 +679,7 @@ Debug.trace("list control changed value to", newValue);
 		temperaturePanel.add(temperatureInput);	//add the input control to the input panel
 		final TextControl<Float> temperatureOutput=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
 		temperatureOutput.setLabel("Output Temperature");	//add a label to the text output control
-		temperatureOutput.getModel().setEditable(false);	//set the text output control to read-only so that the user cannot modify it
+		temperatureOutput.setEditable(false);	//set the text output control to read-only so that the user cannot modify it
 		temperaturePanel.add(temperatureOutput);	//add the output control to the input panel
 		tabbedPanel.add(temperaturePanel, new CardLayout.Constraints("Temperature"));
 	
@@ -781,7 +781,7 @@ Debug.trace("list control changed value to", newValue);
 			//GlobalMentor
 		final Link globalmentorLink=new Link(session);
 		globalmentorLink.setLabel("GlobalMentor");
-		globalmentorLink.getModel().addActionListener(new NavigateActionListener(URI.create("http://www.globalmentor.com/")));
+		globalmentorLink.addActionListener(new NavigateActionListener(URI.create("http://www.globalmentor.com/")));
 		menu.add(globalmentorLink);
 		
 		return menu;
@@ -809,7 +809,7 @@ Debug.trace("list control changed value to", newValue);
 		editMenu.add(message1);
 		menu.add(editMenu);
 		
-		editMenu.getModel().addActionListener(new ActionListener()	//testing accordion menu action
+		editMenu.addActionListener(new ActionListener()	//testing accordion menu action
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{

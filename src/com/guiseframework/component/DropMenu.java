@@ -28,7 +28,7 @@ public class DropMenu extends AbstractMenu<DropMenu>
 	@param axis The axis along which the menu is oriented.
 	@exception NullPointerException if the given session, axis, and/or model is <code>null</code>.
 	*/
-	public DropMenu(final GuiseSession session, final MenuModel model, final Flow axis)
+	public DropMenu(final GuiseSession session, final Model model, final Flow axis)
 	{
 		this(session, null, model, axis);	//construct the component with the axis, indicating that a default ID should be used
 	}
@@ -42,7 +42,7 @@ public class DropMenu extends AbstractMenu<DropMenu>
 	*/
 	public DropMenu(final GuiseSession session, final String id, final Flow axis)
 	{
-		this(session, id, new DefaultMenuModel(session), axis);	//construct the class with a default model
+		this(session, id, new DefaultModel(session), axis);	//construct the class with a default model
 	}
 
 	/**Session, ID, axis, and model constructor.
@@ -53,7 +53,7 @@ public class DropMenu extends AbstractMenu<DropMenu>
 	@exception NullPointerException if the given session, axis, and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public DropMenu(final GuiseSession session, final String id, final MenuModel model, final Flow axis)
+	public DropMenu(final GuiseSession session, final String id, final Model model, final Flow axis)
 	{
 		super(session, id, new MenuLayout(session, axis), model);	//construct the parent class
 		setRolloverOpenEnabled(true);	//default to showing the menu as open upon rollover

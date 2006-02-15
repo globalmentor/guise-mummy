@@ -1,14 +1,9 @@
 package com.guiseframework.component;
 
-import java.net.URI;
-
 import javax.mail.internet.ContentType;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.text.TextUtilities.*;
 import static com.garretwilson.util.ArrayUtilities.*;
 
-import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.transfer.*;
 import com.guiseframework.model.*;

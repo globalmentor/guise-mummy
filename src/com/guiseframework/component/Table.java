@@ -18,11 +18,53 @@ import com.guiseframework.validator.*;
 /**A table component.
 @author Garret Wilson
 */
-public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, Table.CellComponentState, Table>
+public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, Table.CellComponentState, Table> implements Control<Table>
 {
 
 	/**@return The data model used by this component.*/
 	public TableModel getModel() {return (TableModel)super.getModel();}
+
+	/**Whether the table is editable and the cells will allow the the user to change their values, if their respective columns are designated as editable as well.*/
+	private boolean editable=true;
+
+		/**@return Whether the table is editable and the cells will allow the the user to change their values, if their respective columns are designated as editable as well.*/
+		public boolean isEditable() {return editable;}
+
+		/**Sets whether the table is editable and the cells will allow the the user to change their values, if their respective columns are designated as editable as well.
+		This is a bound property of type <code>Boolean</code>.
+		@param newEditable <code>true</code> if the cells should allow the user to change their values if their respective columns are also designated as editable.
+		@see TableModel#EDITABLE_PROPERTY
+		*/
+		public void setEditable(final boolean newEditable)
+		{
+			if(editable!=newEditable)	//if the value is really changing
+			{
+				final boolean oldEditable=editable;	//get the old value
+				editable=newEditable;	//actually change the value
+				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
+			}			
+		}
+
+	/**Whether the control is enabled and can receive user input.*/
+	private boolean enabled=true;
+
+		/**@return Whether the control is enabled and can receive user input.*/
+		public boolean isEnabled() {return enabled;}
+
+		/**Sets whether the control is enabled and and can receive user input.
+		This is a bound property of type <code>Boolean</code>.
+		@param newEnabled <code>true</code> if the control should indicate and accept user input.
+		@see #ENABLED_PROPERTY
+		*/
+		public void setEnabled(final boolean newEnabled)
+		{
+			if(enabled!=newEnabled)	//if the value is really changing
+			{
+				final boolean oldEnabled=enabled;	//get the old value
+				enabled=newEnabled;	//actually change the value
+				firePropertyChange(ENABLED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newEnabled));	//indicate that the value changed
+			}			
+		}
 
 	/**The map of cell representation strategies for columns.*/
 	private final Map<TableColumnModel<?>, CellRepresentationStrategy<?>> columnCellRepresentationStrategyMap=new ConcurrentHashMap<TableColumnModel<?>, CellRepresentationStrategy<?>>();
@@ -59,7 +101,7 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 	public <T> void verifyCellComponent(final int rowIndex, final TableColumnModel<T> column) throws IOException
 	{
 		final TableModel tableModel=getModel();	//get the table model
-		final boolean editable=tableModel.isEditable() && column.isEditable();	//see if the cell is editable (a cell is only editable if both its table and column are editable)
+		final boolean editable=isEditable() && column.isEditable();	//see if the cell is editable (a cell is only editable if both its table and column are editable)
 		final TableModel.Cell<T> cell=new TableModel.Cell<T>(rowIndex, column);	//create a cell object representing this row and column
 		CellComponentState cellComponentState=getComponentState(cell);	//get the component information for this cell
 		if(cellComponentState==null || cellComponentState.isEditable()!=editable)	//if there is no component for this cell, or the component has a different editable status
@@ -449,21 +491,21 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 
 		/**@return Whether the model's value is editable and the corresponding control will allow the the user to change the value.
 		This version returns <code>true</code> if the model and column are both editable.*/
-		public boolean isEditable() {return getModel().isEditable() && getCell().getColumn().isEditable();}
+//TODO important fix		public boolean isEditable() {return getModel().isEditable() && getCell().getColumn().isEditable();}
 
 		/**Sets whether the model's value is editable and the corresponding control will allow the the user to change the value. This version throws an exception, as the editable status is read-only.
 		@param newEditable <code>true</code> if the corresponding control should allow the user to change the value.
 		*/
-		public void setEditable(final boolean newEditable) {throw new UnsupportedOperationException("Editable is read-only.");}
+//TODO important fix		public void setEditable(final boolean newEditable) {throw new UnsupportedOperationException("Editable is read-only.");}
 
 		/**@return Whether the model is enabled and and the corresponding control can receive user input.
 		This version returns <code>true</code> if the model and column are both enabled.*/
-		public boolean isEnabled() {return getModel().isEnabled() && getCell().getColumn().isEnabled();}
+//TODO update once enabled is moved		public boolean isEnabled() {return getModel().isEnabled() && getCell().getColumn().isEnabled();}
 
 		/**Sets whether the model is enabled and and the corresponding control can receive user input. This version throws an exception, as the enabled status is read-only.
 		@param newEnabled <code>true</code> if the corresponding control should indicate and accept user input.
 		*/
-		public void setEnabled(final boolean newEnabled) {throw new UnsupportedOperationException("Enabled is read-only.");}
+//TODO update		public void setEnabled(final boolean newEnabled) {throw new UnsupportedOperationException("Enabled is read-only.");}
 
 		/**@return The validator for this model, or <code>null</code> if no validator is installed.*/
 		public Validator<C> getValidator() {return getCell().getColumn().getValidator();}	//return the validator from the column
