@@ -15,9 +15,11 @@ This implementation does not yet fully support elements that appear more than on
 public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V, C>> extends AbstractControl<C> implements ListSelectControl<V, C>
 {
 
-	/**@return The data model used by this component.*/
-	@SuppressWarnings("unchecked")
-	public ListSelectModel<V> getModel() {return (ListSelectModel<V>)super.getModel();}
+	/**The list select model used by this component.*/
+	private final ListSelectModel<V> selectModel;
+
+		/**@return The list select model used by this component.*/
+		public ListSelectModel<V> getSelectModel() {return selectModel;}
 
 	/**The strategy used to generate a component to represent each value in the model.*/
 	private ValueRepresentationStrategy<V> valueRepresentationStrategy;
@@ -44,15 +46,16 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 	/**Session, ID, model, and value representation strategy constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
+	@param listSelectModel The component data model.
 	@param valueRepresentationStrategy The strategy to create controls to represent this model's values.
 	@exception NullPointerException if the given session, model, and/or value representation strategy is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractListSelectControl(final GuiseSession session, final String id, final ListSelectModel<V> model, final ValueRepresentationStrategy<V> valueRepresentationStrategy)
+	public AbstractListSelectControl(final GuiseSession session, final String id, final ListSelectModel<V> listSelectModel, final ValueRepresentationStrategy<V> valueRepresentationStrategy)
 	{
-		super(session, id, model);	//construct the parent class
+		super(session, id);	//construct the parent class
 		this.valueRepresentationStrategy=checkNull(valueRepresentationStrategy, "Value representation strategy cannot be null.");
+		this.selectModel=checkNull(listSelectModel, "List select model cannot be null.");	//save the list select model
 	}
 
 	/**A default list select value representation strategy.

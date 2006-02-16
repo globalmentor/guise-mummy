@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.guiseframework.GuiseSession;
-import com.guiseframework.model.Model;
 
 /**An abstract implementation of a composite component that can contain multiple components.
 Every child component must be added or removed using {@link #addComponent(Component)} and {@link #removeComponent(Component)}, although other actions may take place.
@@ -54,18 +53,17 @@ public abstract class AbstractMultipleCompositeComponent<C extends CompositeComp
 		return idComponentMap.get(id);	//return the component with the given ID
 	}
 
-	/**Session, ID, and model constructor.
+	/**Session and ID constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
+	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	@exception IllegalStateException if no controller is registered for this component type.
 	@exception IllegalStateException if no view is registered for this component type.
 	*/
-	public AbstractMultipleCompositeComponent(final GuiseSession session, final String id, final Model model)
+	public AbstractMultipleCompositeComponent(final GuiseSession session, final String id)
 	{
-		super(session, id, model);	//construct the parent class
+		super(session, id);	//construct the parent class
 	}
 
 }

@@ -95,7 +95,7 @@ public class MenusPanel extends DefaultNavigationPanel
 		accordionMenuPanel.setLabel("Accordion Menu");
 		final CheckControl rolloverOpenCheckbox=new CheckControl(session);	//accordion rollover open enabled
 		rolloverOpenCheckbox.setLabel("Enable accordion menu rollover open.");
-		rolloverOpenCheckbox.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Boolean>()
+		rolloverOpenCheckbox.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Boolean>()
 				{
 					public void propertyChange(final GuisePropertyChangeEvent<Boolean> propertyChangeEvent)
 					{
@@ -115,10 +115,10 @@ public class MenusPanel extends DefaultNavigationPanel
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
-						final int oldClickCount=continentsClickCountControl.getModel().getValue().intValue();	//get the old number of clicks
+						final int oldClickCount=continentsClickCountControl.getValue().intValue();	//get the old number of clicks
 						try
 						{
-							continentsClickCountControl.getModel().setValue(new Integer(oldClickCount+1));	//update the number of clicks
+							continentsClickCountControl.setValue(new Integer(oldClickCount+1));	//update the number of clicks
 						}
 						catch(final ValidationException validationException)	//we don't have validators installed, so we don't expect validation problems
 						{

@@ -2,7 +2,6 @@ package com.guiseframework.component;
 
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.Layout;
-import com.guiseframework.model.Model;
 
 /**An abstract implementation of a container that is also a control.
 @author Garret Wilson
@@ -31,16 +30,15 @@ public abstract class AbstractContainerControl<C extends Container<C> & Control<
 			}			
 		}
 
-	/**Session, ID, layout, and model constructor.
+	/**Session, ID, and layout constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@param layout The layout definition for the container.
-	@param model The component data model.
-	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
+	@exception NullPointerException if the given session, and/or layout is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractContainerControl(final GuiseSession session, final String id, final Layout layout, final Model model)
+	public AbstractContainerControl(final GuiseSession session, final String id, final Layout layout)
 	{
-		super(session, id, layout, model);	//construct the parent class
+		super(session, id, layout);	//construct the parent class
 	}
 }

@@ -15,9 +15,6 @@ import com.guiseframework.model.*;
 public class TreeControl extends AbstractCompositeStateComponent<TreeNodeModel<?>, TreeControl.TreeNodeComponentState, TreeControl> implements Control<TreeControl>	//TODO important: fix class
 {
 
-	/**@return The data model used by this component.*/
-	public TreeModel getModel() {return (TreeModel)super.getModel();}
-
 	/**Whether the control is enabled and can receive user input.*/
 	private boolean enabled=true;
 
@@ -39,12 +36,17 @@ public class TreeControl extends AbstractCompositeStateComponent<TreeNodeModel<?
 			}			
 		}
 
+	/**The tree model used by this component.*/
+	private final TreeModel treeModel;
+
+		/**@return The tree model used by this component.*/
+		public TreeModel getTreeModel() {return treeModel;}
 
 	/**Whether the state of the control represents valid user input.*/
 	private boolean valid=true;
 
 		/**@return Whether the state of the control represents valid user input.*/
-		public boolean isValid() {return valid;}
+		public boolean isValid() {return valid;}	//TODO important fix; currently out-of-synch with component
 
 		/**Sets whether the state of the control represents valid user input
 		This is a bound property of type <code>Boolean</code>.
@@ -111,7 +113,7 @@ public class TreeControl extends AbstractCompositeStateComponent<TreeNodeModel<?
 				//TODO assert that there is a representation strategy, or otherwise check
 //TODO del			final Component<?> valueComponent=((TreeControl.ValueRepresentationStrategy<T>)getTreeNodeRepresentationStrategy(treeNode.getValueClass())).createComponent(this, getModel(), treeNode, editable, false, false);	//create a new component for the tree node
 //TODO bring back when Eclipse fixes its bug			final Component<?> valueComponent=component.getTreeNodeRepresentationStrategy(treeNode.getValueClass()).createComponent(treeModel, treeNode, editable, false, false);	//create a new component for the tree node
-			final Component<?> valueComponent=getTreeNodeRepresentationStrategy(treeNode.getValueClass()).createComponent(this, getModel(), treeNode, editable, false, false);	//create a new component for the tree node
+			final Component<?> valueComponent=getTreeNodeRepresentationStrategy(treeNode.getValueClass()).createComponent(this, getTreeModel(), treeNode, editable, false, false);	//create a new component for the tree node
 			if(valueComponent!=null)	//if a value component is given TODO see if this check occurs in the table controller TODO make sure this is the way we want to do this---why not just return a label with a null value?
 			{
 				valueComponent.setParent(this);	//tell this component that this tree component is its parent
@@ -158,16 +160,17 @@ public class TreeControl extends AbstractCompositeStateComponent<TreeNodeModel<?
 	/**Session, ID, and model constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
+	@param treeModel The component data model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public TreeControl(final GuiseSession session, final String id, final TreeModel model)
+	public TreeControl(final GuiseSession session, final String id, final TreeModel treeModel)
 	{
-		super(session, id, model);	//construct the parent class
+		super(session, id);	//construct the parent class
 		setTreeNodeRepresentationStrategy(Object.class, new DefaultValueRepresentationStrategy<Object>(session));	//create a default representation strategy and set it as the default by associating it with the Object class
 //TODO fix		setTreeNodeRepresentationStrategy(LabelModel.class, new LabelModelRepresentationStrategy(session));	//create and associate a label model representation strategy
 //TODO fix		setTreeNodeRepresentationStrategy(MessageModel.class, new MessageModelRepresentationStrategy(session));	//create and associate a message model representation strategy
+		this.treeModel=checkNull(treeModel, "Tree model cannot be null.");	//save the tree model
 	}
 
 	/**An encapsulation of a component for a tree node along with other metadata, such as whether the component was editable when created.

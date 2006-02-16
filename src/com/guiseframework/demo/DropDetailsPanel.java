@@ -85,7 +85,7 @@ public class DropDetailsPanel extends DefaultNavigationPanel
 					}
 					public boolean importTransfer(final TextAreaControl component, final Transferable<Component<?>> transferable)
 					{
-						final String oldContent=component.getModel().getValue();	//get the old text area control content
+						final String oldContent=component.getValue();	//get the old text area control content
 						final StringBuilder newContent=new StringBuilder();	//create a string builder to collect our new information
 						if(oldContent!=null)	//if there is content already
 						{
@@ -100,7 +100,7 @@ public class DropDetailsPanel extends DefaultNavigationPanel
 						newContent.append('\n');
 						try
 						{
-							component.getModel().setValue(newContent.toString());	//update the text area contents
+							component.setValue(newContent.toString());	//update the text area contents
 						}
 						catch(final ValidationException validationException)	//we don't have a validator installed, so we don't expect validation exceptions
 						{

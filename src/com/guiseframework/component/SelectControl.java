@@ -13,7 +13,7 @@ public interface SelectControl<V, C extends SelectControl<V, C>> extends Control
 	/**The value representation strategy bound property.*/
 	public final static String VALUE_REPRESENTATION_STRATEGY_PROPERTY=getPropertyName(SelectControl.class, "valueRepresentationStrategy");
 
-	/**@return The data model used by this component.*/
-	public SelectModel<V> getModel();
+	/**@return The select model used by this component.*/
+	public SelectModel<V> getSelectModel();
 
 }

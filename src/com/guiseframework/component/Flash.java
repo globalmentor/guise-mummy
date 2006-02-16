@@ -1,13 +1,12 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ClassUtilities.getPropertyName;
+import static com.garretwilson.lang.ClassUtilities.*;
 
 import java.net.URI;
 import java.util.MissingResourceException;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
-import com.guiseframework.model.*;
 
 /**A component representing a Macromedia Flash object.
 @author Garret Wilson
@@ -87,18 +86,6 @@ public class Flash extends AbstractComponent<Flash>
 	*/
 	public Flash(final GuiseSession session, final String id)
 	{
-		this(session, id, new DefaultModel(session));	//create the component with a default model
-	}
-
-	/**Session, ID, and model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public Flash(final GuiseSession session, final String id, final Model model)
-	{
-		super(session, id, model);	//construct the parent class
+		super(session, id);	//construct the parent class
 	}
 }

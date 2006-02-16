@@ -37,14 +37,14 @@ public class LoginPanel extends DefaultNavigationPanel
 			//ID
 		final TextControl<String> idControl=new TextControl<String>(session, String.class);	//create the ID input control
 		idControl.setLabel("User ID *");	//set the ID control label
-		idControl.getModel().setValidator(new RegularExpressionStringValidator(session, ".+", true));	//require at least a single character
+		idControl.setValidator(new RegularExpressionStringValidator(session, ".+", true));	//require at least a single character
 		userPanel.add(idControl);	//add the ID control to the panel
 
 			//password
 		final TextControl<char[]> passwordControl=new TextControl<char[]>(session, char[].class);	//create the password input control
 		passwordControl.setLabel("Password *");	//set the password control label
 		passwordControl.setMasked(true);	//mask the password input
-		passwordControl.getModel().setValidator(new RegularExpressionCharArrayValidator(session, ".+", true));	//require at least a single character
+		passwordControl.setValidator(new RegularExpressionCharArrayValidator(session, ".+", true));	//require at least a single character
 		userPanel.add(passwordControl);	//add the password control to the panel
 
 		loginPanel.add(userPanel);	//add the user panel to the login panel
@@ -58,10 +58,10 @@ public class LoginPanel extends DefaultNavigationPanel
 					{
 						if(isValid())	//if the form information is valid
 						{
-							final char[] password=passwordControl.getModel().getValue();	//get the password entered by the user
-							passwordControl.getModel().resetValue();	//reset the password value so that it won't be available on subsequent accesses
+							final char[] password=passwordControl.getValue();	//get the password entered by the user
+							passwordControl.resetValue();	//reset the password value so that it won't be available on subsequent accesses
 							final DemoApplication demoApplication=(DemoApplication)session.getApplication();	//get a reference to the demo application
-							final DemoUser user=demoApplication.getPrincipal(idControl.getModel().getValue());	//get the user by ID
+							final DemoUser user=demoApplication.getPrincipal(idControl.getValue());	//get the user by ID
 							if(user!=null)	//if a valid user was entered
 							{
 								if(Arrays.equals(user.getPassword(), password))	//if the entered password matches that of the user

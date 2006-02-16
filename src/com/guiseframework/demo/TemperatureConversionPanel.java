@@ -35,8 +35,8 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE));	//create the input panel flowing vertically
 		temperatureInput=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
 		temperatureInput.setLabel("Input Temperature");	//add a label to the text input control
-		temperatureInput.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
-		temperatureInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Float>()	//listen for temperature changes
+		temperatureInput.setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
+		temperatureInput.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Float>()	//listen for temperature changes
 				{
 					public void propertyChange(final GuisePropertyChangeEvent<Float> propertyChangeEvent)	//if the input temperature changes
 					{
@@ -60,7 +60,7 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 		celsiusCheckControl.setLabel("Celsius");	//set the label of the check to indicate the scale
 		try
 		{
-			celsiusCheckControl.getModel().setValue(Boolean.TRUE);	//default to converting from Celsius to Fahrenheit
+			celsiusCheckControl.setValue(Boolean.TRUE);	//default to converting from Celsius to Fahrenheit
 		}
 		catch(final ValidationException validationException)	//we have no validator installed in the check control model, so we don't expect changing its value ever to cause any problems
 		{
@@ -71,7 +71,7 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 		fahrenheitCheckControl.setLabel("Fahrenheit");	//set the label of the check to indicate the scale
 		scalePanel.add(fahrenheitCheckControl);	//add the Fahrenheit check control to the panel	
 			//create a mutual exclusion policy group and add the Celsius and Fahrenheit check box boolean value models to get radio button functionality
-		final ModelGroup<ValueModel<Boolean>> radioButtonModelGroup=new MutualExclusionPolicyModelGroup(celsiusCheckControl.getModel(), fahrenheitCheckControl.getModel());
+		final ModelGroup<ValueModel<Boolean>> radioButtonModelGroup=new MutualExclusionPolicyModelGroup(celsiusCheckControl, fahrenheitCheckControl);
 		conversionPanel.add(scalePanel);	//add the scale panel to the conversion panel
 
 			//create a listener to listen for check control changes and update the temperature immediately (e.g. with AJAX on the web platform)
@@ -86,8 +86,8 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 					}
 				};
 
-		celsiusCheckControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, checkControlListener);	//listen for the Celsius control changing
-		fahrenheitCheckControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, checkControlListener);	//listen for the Fahrenheit control changing
+		celsiusCheckControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, checkControlListener);	//listen for the Celsius control changing
+		fahrenheitCheckControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, checkControlListener);	//listen for the Fahrenheit control changing
 		
 			//conversion button
 		final Button convertButton=new Button(session);	//create a button for initiating the conversion
@@ -109,13 +109,13 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 	{
 		if(isValid())	//if this panel and all of its components have valid model values
 		{
-			final float inputValue=temperatureInput.getModel().getValue().floatValue();	//get the input value from the control
+			final float inputValue=temperatureInput.getValue().floatValue();	//get the input value from the control
 			final float outputValue;	//we'll convert the value and store it here
-			if(celsiusCheckControl.getModel().getValue())	//if the Celsius radio button is selected
+			if(celsiusCheckControl.getValue())	//if the Celsius radio button is selected
 			{
 				outputValue=(inputValue*9)/5+32;	//convert: (9c/5)+32
 			}
-			else if(fahrenheitCheckControl.getModel().getValue())	//if the Fahrenheit radio button is selected
+			else if(fahrenheitCheckControl.getValue())	//if the Fahrenheit radio button is selected
 			{
 				outputValue=((inputValue-32)*5)/9;	//convert: 5(f-32)/9							
 			}
@@ -125,7 +125,7 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 			}
 			try
 			{
-				temperatureOutput.getModel().setValue(new Float(outputValue));	//store the conversion result in the temperature output control
+				temperatureOutput.setValue(new Float(outputValue));	//store the conversion result in the temperature output control
 			}
 			catch(final ValidationException validationException)	//we have no validator installed in the temperature output text control, so we don't expect changing its value ever to cause any problems
 			{

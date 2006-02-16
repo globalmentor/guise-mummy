@@ -14,9 +14,11 @@ The panel's model reflects the currently selected component, if any.
 public abstract class AbstractCardPanel<C extends Box<C> & Panel<C> & CardControl<C>> extends AbstractContainerControl<C> implements Box<C>, Panel<C>, CardControl<C>
 {
 
-	/**@return The data model used by this component.*/
-	@SuppressWarnings("unchecked")
-	public ListSelectModel<Component<?>> getModel() {return (ListSelectModel<Component<?>>)super.getModel();}
+	/**The list select model used by this component.*/
+	private final ListSelectModel<Component<?>> selectModel;
+
+		/**@return The list select model used by this component.*/
+		public ListSelectModel<Component<?>> getSelectModel() {return selectModel;}
 
 	/**@return The layout definition for the container.*/
 	public CardLayout getLayout() {return (CardLayout)super.getLayout();}
@@ -73,7 +75,8 @@ public abstract class AbstractCardPanel<C extends Box<C> & Panel<C> & CardContro
 	*/
 	protected AbstractCardPanel(final GuiseSession session, final String id, final CardLayout layout)
 	{
-		super(session, id, layout, layout.getModel());	//construct the parent class, using the card layout's value model
+		super(session, id, layout);	//construct the parent class
+		this.selectModel=checkNull(layout.getModel(), "Select model cannot be null.");	//save the card layout's value model
 	}
 
 	/**Adds a component to the container along with a label.

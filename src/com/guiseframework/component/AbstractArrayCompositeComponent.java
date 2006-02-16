@@ -4,7 +4,6 @@ import java.util.*;
 import static java.util.Arrays.*;
 
 import com.guiseframework.GuiseSession;
-import com.guiseframework.model.Model;
 
 /**Abstract implementation of a composite component that keeps track of its child components at specific indices in an array.
 Child components should not directly call {@link #addComponent(Component)} and {@link #removeComponent(Component)}.
@@ -84,17 +83,16 @@ public abstract class AbstractArrayCompositeComponent<C extends CompositeCompone
 		return false;	//all components in the array are null; we have no child components
 	}
 
-	/**Session, ID, model, and maximum component count constructor.
+	/**Session, ID, and maximum component count constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
 	@param maxComponentCount The maximum number of child components to support.
-	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
+	@exception NullPointerException if the given session, and/or layout is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractArrayCompositeComponent(final GuiseSession session, final String id, final Model model, final int maxComponentCount)
+	public AbstractArrayCompositeComponent(final GuiseSession session, final String id, final int maxComponentCount)
 	{
-		super(session, id, model);	//construct the parent class
+		super(session, id);	//construct the parent class
 		componentArray=new Component[maxComponentCount];	//create an array of components of the appropriate length
 		fill(componentArray, null);	//fill the array with nulls
 	}

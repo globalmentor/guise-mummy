@@ -71,9 +71,9 @@ public class TabsPanel extends DefaultNavigationPanel
 		tabControlPanel.setLabel("Standalone TabControl.");
 				//TabControl
 		final TabControl<Integer> tabControl=new TabControl<Integer>(session, Integer.class, Flow.LINE);	//create a horizontal
-		tabControl.getModel().add(new Integer(5));
-		tabControl.getModel().add(new Integer(10));
-		tabControl.getModel().add(new Integer(15));
+		tabControl.getSelectModel().add(new Integer(5));
+		tabControl.getSelectModel().add(new Integer(10));
+		tabControl.getSelectModel().add(new Integer(15));
 		tabControlPanel.add(tabControl);
 		add(tabControlPanel);
 	}

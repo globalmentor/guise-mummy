@@ -21,7 +21,7 @@ public abstract class AbstractSelectActionControl<C extends SelectActionControl<
 		/**Sets whether this control acts as a toggle, switching its value between <code>true</code> and <code>false</code>, or whether the action always sets the value to <code>true</code>.
 		This is a bound property of type <code>Boolean</code>.
 		@param newToggle <code>true</code> if the component should act as a toggle, else <code>false</code> if the action should unconditionally set the value to <code>true</code>.
-		@see SelectActionControl#TOGGLE_PROPERTY
+		@see #TOGGLE_PROPERTY
 		*/
 		public void setToggle(final boolean newToggle)
 		{
@@ -40,10 +40,10 @@ public abstract class AbstractSelectActionControl<C extends SelectActionControl<
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractSelectActionControl(final GuiseSession session, final String id, final ActionValueModel<Boolean> model)
+	public AbstractSelectActionControl(final GuiseSession session, final String id, final ValueModel<Boolean> model)
 	{
 		super(session, id, model);	//construct the parent class
-		model.setValidator(new ValueRequiredValidator<Boolean>(session));	//install a value-required validator
+		setValidator(new ValueRequiredValidator<Boolean>(session));	//install a value-required validator
 		addActionListener(new ActionListener()	//listen for an action and set the selected state accordingly
 				{		
 					public void actionPerformed(final ActionEvent actionEvent)	//if an action occurs

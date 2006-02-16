@@ -7,8 +7,8 @@ import java.util.MissingResourceException;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
-import com.guiseframework.model.ActionValueModel;
-import com.guiseframework.model.DefaultActionValueModel;
+import com.guiseframework.model.DefaultValueModel;
+import com.guiseframework.model.ValueModel;
 
 /**Image control that can be selected and generates actions.
 @author Garret Wilson
@@ -196,7 +196,7 @@ public class ImageSelectActionControl extends AbstractSelectActionControl<ImageS
 	*/
 	public ImageSelectActionControl(final GuiseSession session, final String id)
 	{
-		this(session, id, new DefaultActionValueModel<Boolean>(session, Boolean.class, Boolean.FALSE));	//construct the class with a default model
+		this(session, id, new DefaultValueModel<Boolean>(session, Boolean.class, Boolean.FALSE));	//construct the class with a default model
 	}
 
 	/**Session and model constructor.
@@ -204,7 +204,7 @@ public class ImageSelectActionControl extends AbstractSelectActionControl<ImageS
 	@param model The component data model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	*/
-	public ImageSelectActionControl(final GuiseSession session, final ActionValueModel<Boolean> model)
+	public ImageSelectActionControl(final GuiseSession session, final ValueModel<Boolean> model)
 	{
 		this(session, null, model);	//construct the component, indicating that a default ID should be used
 	}
@@ -216,7 +216,7 @@ public class ImageSelectActionControl extends AbstractSelectActionControl<ImageS
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public ImageSelectActionControl(final GuiseSession session, final String id, final ActionValueModel<Boolean> model)
+	public ImageSelectActionControl(final GuiseSession session, final String id, final ValueModel<Boolean> model)
 	{
 		super(session, id, model);	//construct the parent class
 	}

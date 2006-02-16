@@ -139,6 +139,6 @@ public class Message extends AbstractComponent<Message>
 	*/
 	public Message(final GuiseSession session, final String id, final Model model)
 	{
-		super(session, id, model);	//construct the parent class
+		super(session, id/*TODO add message model, model*/);	//construct the parent class
 	}
 }

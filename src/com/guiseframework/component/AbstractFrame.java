@@ -9,7 +9,6 @@ import com.guiseframework.component.effect.Effect;
 import com.guiseframework.event.ActionEvent;
 import com.guiseframework.event.ActionListener;
 import com.guiseframework.event.GuisePropertyChangeListener;
-import com.guiseframework.model.Model;
 
 /**Abstract implementation of a frame.
 @author Garret Wilson
@@ -252,17 +251,16 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 		}
 	}
 
-	/**Session, ID, model, and component constructor.
+	/**Session, ID, and component constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
+	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractFrame(final GuiseSession session, final String id, final Model model, final Component<?> component)
+	public AbstractFrame(final GuiseSession session, final String id, final Component<?> component)
 	{
-		super(session, id, model, FrameComponent.values());	//construct the parent class
+		super(session, id, FrameComponent.values());	//construct the parent class
 		closeActionListener=new ActionListener()	//create an action listener for closing
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the close action is initiated

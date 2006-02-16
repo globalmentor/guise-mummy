@@ -101,7 +101,7 @@ public class Heading extends AbstractComponent<Heading>
 	*/
 	public Heading(final GuiseSession session, final String id, final Model model, final int level)
 	{
-		super(session, id, model);	//construct the parent class
+		super(session, id/*TODO add label model, model*/);	//construct the parent class
 		this.level=level;	//save the level
 	}
 }

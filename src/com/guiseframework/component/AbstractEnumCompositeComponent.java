@@ -1,7 +1,6 @@
 package com.guiseframework.component;
 
 import com.guiseframework.GuiseSession;
-import com.guiseframework.model.Model;
 
 /**Abstract implementation of a composite component that keeps track of its child components at specific indices in an array.
 The array is indexed using the provided enum.
@@ -38,17 +37,16 @@ public abstract class AbstractEnumCompositeComponent<E extends Enum<E>, C extend
 		return super.setComponent(e.ordinal(), newComponent);	//look up the component in the array
 	}
 		
-	/**Session, ID, model, and enum class constructor.
+	/**Session, ID, and enum class constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
 	@param enumValues The values of enums that allow access to the underlying array.
-	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
+	@exception NullPointerException if the given session, and/or layout is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractEnumCompositeComponent(final GuiseSession session, final String id, final Model model, final E[] enumValues)
+	public AbstractEnumCompositeComponent(final GuiseSession session, final String id, final E[] enumValues)
 	{
-		super(session, id, model, enumValues.length);	//construct the parent class
+		super(session, id, enumValues.length);	//construct the parent class
 	}
 
 }

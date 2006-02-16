@@ -32,8 +32,8 @@ public class HelloUserPanel extends DefaultNavigationPanel
 		final TextControl<String> userInput=new TextControl<String>(session, String.class);	//create a text input control to retrieve a string
 		userInput.setLabel("What's your name?");	//add a label to the text input control
 		userInput.setInfo("Enter a name that does not start with whitespace.");	//add advisory information that may be shown as a tooltip
-		userInput.getModel().setValidator(new RegularExpressionStringValidator(session, "\\S+.*", true));	//require at least a single non-whitespace character followed by any other characters
-		userInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<String>()
+		userInput.setValidator(new RegularExpressionStringValidator(session, "\\S+.*", true));	//require at least a single non-whitespace character followed by any other characters
+		userInput.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<String>()
 				{
 					public void propertyChange(final GuisePropertyChangeEvent<String> propertyValueChangeEvent)
 					{

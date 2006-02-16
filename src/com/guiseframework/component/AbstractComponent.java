@@ -1,5 +1,7 @@
 package com.guiseframework.component;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -45,15 +47,34 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**@return The object managing event listeners.*/
 		protected EventListenerManager getEventListenerManager() {return eventListenerManager;}
 
+	/**A lazily-created property change listener to repeat copies of events received, using this component as the source.*/ 
+	private PropertyChangeListener repeaterPropertyChangeListener=null;
+
+	/**A property change listener to repeat copies of events received, using this component as the source.*/ 
+	protected PropertyChangeListener getRepeaterPropertyChangeListener()
+	{
+		if(repeaterPropertyChangeListener==null)	//if we have not yet created the repeater property change listener
+		{
+			repeaterPropertyChangeListener=new PropertyChangeListener()	//create a listener to listen for the value model changing a property value
+					{
+						public void propertyChange(final PropertyChangeEvent propertyChangeEvent)	//if the value model changes a property value
+								{
+									firePropertyChange(propertyChangeEvent.getPropertyName(), propertyChangeEvent.getOldValue(), propertyChangeEvent.getNewValue());	//forward the property change event, indicating this component as the event source
+								}			
+					};
+		}
+		return repeaterPropertyChangeListener;	//return the repeater property change listener
+	}
+		
 	/**@return A reference to this instance, cast to the generic self type.*/
 	@SuppressWarnings("unchecked")
 	protected final C getThis() {return (C)this;}
 
 	/**The data model used by this component.*/
-	private final Model model;
+//TODO del	private final Model model;
 
 		/**@return The data model used by this component.*/
-		public Model getModel() {return model;}
+//TODO del		public Model getModel() {return model;}
 
 		/**Sets the data model used the component.
 		This is a bound property.
@@ -1082,7 +1103,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 	@exception IllegalStateException if no controller is registered for this component type.
 	@exception IllegalStateException if no view is registered for this component type.
 	*/
-	public AbstractComponent(final GuiseSession session, final String id, final Model model)
+	public AbstractComponent(final GuiseSession session, final String id/*TODO del, final Model model*/)
 	{
 		super(session);	//construct the parent class
 		if(id!=null)	//if an ID was provided
@@ -1094,7 +1115,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 			this.id=getSession().generateComponentID();	//ask the session to generate a new ID
 //TODO del when works			this.id=getVariableName(getClass());	//create an ID by transforming the simple class name to a variable name
 		}
-		this.model=checkNull(model, "Model cannot be null.");	//save the model
+//TODO del		this.model=checkNull(model, "Model cannot be null.");	//save the model
 		controller=session.getApplication().getController(getThis());	//ask the application for a controller
 		if(controller==null)	//if we couldn't find a controller
 		{
@@ -1116,6 +1137,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 	*/
 	public boolean isValid()	//TODO remove this method to Control and integrate it into functionality there
 	{
+		return true;	//TODO eventually remove this method
 /*TODO decide whether this is needed, now that we've refactored information into the component
 		if(!getController().isValid())	//if the controller isn't valid
 		{
@@ -1124,27 +1146,16 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 */
 //TODO del		return true;	//indicate that this component is valid
 //TODO del Debug.trace("###checking to see if model is valid for", getID(), getModel().isValid());
-		return getModel().isValid();	//return whether the model is valid
+//TODO del		return getModel().isValid();	//return whether the model is valid
 	}
 
 	/**Validates the model of this component and all child components.
 	The component will be updated with error information.
-	This version validates the associated model.
 	@exception ComponentExceptions if there was one or more validation error.
 	*/
 	public void validate() throws ComponentExceptions
 	{
-		try
-		{
-			clearErrors();	//clear all errors TODO check
-			getModel().validate();	//validate the model
-		}
-		catch(final ComponentException componentException)	//if there is a component error
-		{
-			componentException.setComponent(this);	//make sure the exception knows to which component it relates
-			addError(componentException);	//add this error to the component
-			throw new ComponentExceptions(componentException);	//throw a new component exception list exception
-		}
+		clearErrors();	//clear all errors TODO check
 	}
 
 	/**Processes an event for the component.

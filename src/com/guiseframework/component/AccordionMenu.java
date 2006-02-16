@@ -24,13 +24,13 @@ public class AccordionMenu extends AbstractMenu<AccordionMenu>
 
 	/**Session, axis, and model constructor.
 	@param session The Guise session that owns this component.
-	@param model The component data model.
+	@param actionModel The component action model.
 	@param axis The axis along which the menu is oriented.
 	@exception NullPointerException if the given session, axis, and/or model is <code>null</code>.
 	*/
-	public AccordionMenu(final GuiseSession session, final Model model, final Flow axis)
+	public AccordionMenu(final GuiseSession session, final ActionModel actionModel, final Flow axis)
 	{
-		this(session, null, model, axis);	//construct the component with the axis, indicating that a default ID should be used
+		this(session, null, actionModel, axis);	//construct the component with the axis, indicating that a default ID should be used
 	}
 
 	/**Session, ID, and axis constructor.
@@ -42,20 +42,20 @@ public class AccordionMenu extends AbstractMenu<AccordionMenu>
 	*/
 	public AccordionMenu(final GuiseSession session, final String id, final Flow axis)
 	{
-		this(session, id, new DefaultModel(session), axis);	//construct the class with a default model
+		this(session, id, new DefaultActionModel(session), axis);	//construct the class with a default model
 	}
 
 	/**Session, ID, axis, and model constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
+	@param actionModel The component action model.
 	@param axis The axis along which the menu is oriented.
 	@exception NullPointerException if the given session, axis, and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AccordionMenu(final GuiseSession session, final String id, final Model model, final Flow axis)
+	public AccordionMenu(final GuiseSession session, final String id, final ActionModel actionModel, final Flow axis)
 	{
-		super(session, id, new MenuLayout(session, axis), model);	//construct the parent class
+		super(session, id, new MenuLayout(session, axis), actionModel);	//construct the parent class
 		setRolloverOpenEnabled(false);	//default to not showing the menu as open upon rollover
 	}
 

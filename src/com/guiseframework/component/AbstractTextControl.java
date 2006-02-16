@@ -19,7 +19,6 @@ import com.guiseframework.validator.Validator;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.guiseframework.model.ValueModel.VALIDATOR_PROPERTY;
 
-
 /**Control to accept text input from the user representing a particular value type.
 This control keeps track of literal text entered by the user, distinct from the value stored in the model.
 Default converters are available for the following types:
@@ -83,7 +82,7 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 				final Converter<V, String> oldConverter=converter;	//get the old value
 				converter=checkNull(newConverter, "Converter cannot be null.");	//actually change the value
 				firePropertyChange(CONVERTER_PROPERTY, oldConverter, newConverter);	//indicate that the value changed
-				updateText(getModel().getValue());	//update the text, now that we've installed a new converter
+				updateText(getValue());	//update the text, now that we've installed a new converter
 			}
 		}
 
@@ -132,31 +131,6 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 			}
 		}
 */
-
-	/**@return The validator for the model, or <code>null</code> if no validator is installed.*/
-	public Validator<V> getValidator()
-	{
-		return getModel().getValidator();	//TODO testing
-	}
-
-	/**Sets the validator.
-	This is a bound property
-	@param newValidator The validator for the model, or <code>null</code> if no validator should be used.
-	@see #VALIDATOR_PROPERTY
-	*/
-	public void setValidator(final Validator<V> newValidator)
-	{
-		getModel().setValidator(newValidator);	//TODO testing
-	}
-
-	/**Returns the model value class.
-	@return The class representing the type of value the model can hold.
-	@see ValueModel#getValueClass()
-	*/
-	public Class<V> getValueClass()
-	{
-		return getModel().getValueClass();	//return the value class of the model
-	}
 
 	/**The property change listener that updates the text in response to a property changing.*/
 	private final PropertyChangeListener updateTextPropertyChangeListener;
@@ -263,17 +237,21 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 	This version in addition to default functionality checks to make sure the literal text representation matches the value.
 	@return Whether the models of this component and all of its child components are valid.
 	*/
-	public boolean isValid()
+	public boolean isValid()	//TODO
 	{
 //TODO also use the converter to make sure the converted text is valid
 		if(!super.isValid())	//if the super class is valid, check the validity of the text
 		{
 			return false;	//this class isn't valid
 		}
+		if(!getValueModel().isValid())	//if the value model isn't valid
+		{
+			return false;	//the control isn't valid
+		}
 		try
 		{
 			final V value=getConverter().convertLiteral(getText());	//see if the literal text can correctly be converted
-			final Validator<V> validator=getModel().getValidator();	//see if there is a validator installed
+			final Validator<V> validator=getValidator();	//see if there is a validator installed
 			if(validator!=null)	//if there is a validator installed
 			{
 				validator.validate(value);	//validate the value represented by the literal text
@@ -331,7 +309,7 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 		try
 		{
 			final V value=getConverter().convertLiteral(getText());	//see if the literal text can correctly be converted
-			final Validator<V> validator=getModel().getValidator();	//see if there is a validator installed
+			final Validator<V> validator=getValidator();	//see if there is a validator installed
 			if(validator!=null)	//if there is a validator installed
 			{
 				validator.validate(value);	//validate the value represented by the literal text

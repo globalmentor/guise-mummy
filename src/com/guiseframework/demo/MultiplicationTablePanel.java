@@ -40,7 +40,7 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 		final TextControl<Integer> maxFactorControl=new TextControl<Integer>(session, Integer.class);	//create a text input control to receive an integer
 		maxFactorControl.setLabel("Maximum Factor (1-25)");	//add a label to the text input control
 		maxFactorControl.setInfo("Enter the maximum factor (1-25) for the new multiplication table.");	//set the button information
-		maxFactorControl.getModel().setValidator(new IntegerRangeValidator(session, 1, 25, 1, true));	//require a value from 1-25
+		maxFactorControl.setValidator(new IntegerRangeValidator(session, 1, 25, 1, true));	//require a value from 1-25
 		controlPanel.add(maxFactorControl);	//add the count control to the control panel
 			//create the add button
 		final Button addButton=new Button(session);	//create the button for adding a tab
@@ -55,7 +55,7 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 							try
 							{
 								maxFactorControl.validate();	//validate the count control to make sure the value is correct
-								final int maxFactor=maxFactorControl.getModel().getValue().intValue();	//find out how many factors to display
+								final int maxFactor=maxFactorControl.getValue().intValue();	//find out how many factors to display
 								final Component<?> tab=createMultiplicationTableTab(maxFactor);	//create a multiplication table with the desired maximum factor
 								tabbedPanel.add(tab, new CardLayout.Constraints(String.valueOf(maxFactor)));	//add the tab to the tabbed panel
 								if(tabbedPanel.size()==MAX_TAB_COUNT)	//if we've reached the maximum tab count

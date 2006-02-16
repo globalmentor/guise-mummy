@@ -3,16 +3,16 @@ package com.guiseframework.component;
 import static com.garretwilson.lang.ObjectUtilities.checkNull;
 
 import com.guiseframework.GuiseSession;
-import com.guiseframework.model.DefaultActionModel;
+import com.guiseframework.component.layout.Layout;
 import com.guiseframework.model.ValueModel;
 import com.guiseframework.validator.ValidationException;
 import com.guiseframework.validator.Validator;
 
-/**Abstract implementation of an action control containing a value.
+/**An abstract implementation of a container that is also a value control.
+@param <V> The type of value to represent.
 @author Garret Wilson
-@param <V> The type of value the control represents.
 */
-public abstract class AbstractActionValueControl<V, C extends ActionValueControl<V, C>> extends AbstractActionControl<C> implements ActionValueControl<V, C>
+public abstract class AbstractContainerValueControl<V, C extends Container<C> & ValueControl<V, C>> extends AbstractContainerControl<C> implements ValueControl<V, C>
 {
 
 	/**The value model used by this component.*/
@@ -21,37 +21,17 @@ public abstract class AbstractActionValueControl<V, C extends ActionValueControl
 		/**@return The value model used by this component.*/
 		protected ValueModel<V> getValueModel() {return valueModel;}
 
-	/**Whether the value is editable and the control will allow the the user to change the value.*/
-	private boolean editable=true;
-
-		/**@return Whether the value is editable and the control will allow the the user to change the value.*/
-		public boolean isEditable() {return editable;}
-
-		/**Sets whether the value is editable and the control will allow the the user to change the value.
-		This is a bound property of type <code>Boolean</code>.
-		@param newEditable <code>true</code> if the control should allow the user to change the value.
-		@see #EDITABLE_PROPERTY
-		*/
-		public void setEditable(final boolean newEditable)
-		{
-			if(editable!=newEditable)	//if the value is really changing
-			{
-				final boolean oldEditable=editable;	//get the old value
-				editable=newEditable;	//actually change the value
-				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
-			}			
-		}
-
-	/**Session, ID, and model constructor.
+	/**Session, ID, layout, and value model constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param valueModel The component value model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
+	@param layout The layout definition for the container.
+	@param valueModel The component data model.
+	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractActionValueControl(final GuiseSession session, final String id, final ValueModel<V> valueModel)
+	public AbstractContainerValueControl(final GuiseSession session, final String id, final Layout layout, final ValueModel<V> valueModel)
 	{
-		super(session, id, new DefaultActionModel(session));	//construct the parent class with a default action model TODO add an action model parameter
+		super(session, id, layout);	//construct the parent class
 		this.valueModel=checkNull(valueModel, "Value model cannot be null.");	//save the table model
 		this.valueModel.addPropertyChangeListener(getRepeaterPropertyChangeListener());	//listen an repeat all property changes of the value model
 	}

@@ -1,8 +1,6 @@
 package com.guiseframework.component;
 
 import com.guiseframework.GuiseSession;
-import com.guiseframework.model.DefaultModel;
-import com.guiseframework.model.Model;
 
 /**Default implementation of a modal frame with a default layout panel.
 @param <R> The type of modal result this modal frame produces.
@@ -30,27 +28,6 @@ public class DefaultModalFrame<R> extends AbstractModalFrame<R, DefaultModalFram
 		this(session, (String)null, component);	//construct the component, indicating that a default ID should be used
 	}
 
-	/**Session and model constructor.
-	@param session The Guise session that owns this component.
-	@param model The component data model.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public DefaultModalFrame(final GuiseSession session, final Model model)
-	{
-		this(session, (String)null, model);	//construct the component, indicating that a default ID should be used
-	}
-
-	/**Session, model, and component constructor.
-	@param session The Guise session that owns this component.
-	@param model The component data model.
-	@param component The single child component, or <code>null</code> if this frame should have no child component.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public DefaultModalFrame(final GuiseSession session, final Model model, final Component<?> component)
-	{
-		this(session, (String)null, model, component);	//construct the component, indicating that a default ID should be used
-	}
-
 	/**Session and ID constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
@@ -59,7 +36,7 @@ public class DefaultModalFrame<R> extends AbstractModalFrame<R, DefaultModalFram
 	*/
 	public DefaultModalFrame(final GuiseSession session, final String id)
 	{
-		this(session, id, new DefaultModel(session));	//use a default label model
+		this(session, id, new LayoutPanel(session));	//default to a layout panel
 	}
 
 	/**Session, ID, and component constructor.
@@ -71,32 +48,7 @@ public class DefaultModalFrame<R> extends AbstractModalFrame<R, DefaultModalFram
 	*/
 	public DefaultModalFrame(final GuiseSession session, final String id, final Component<?> component)
 	{
-		this(session, id, new DefaultModel(session), component);	//use a default label model
-	}
-
-	/**Session, ID, and model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public DefaultModalFrame(final GuiseSession session, final String id, final Model model)
-	{
-		this(session, id, model, new LayoutPanel(session));	//default to a layout panel
-	}
-
-	/**Session, ID, model, and component constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
-	@param component The single child component, or <code>null</code> if this frame should have no child component.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public DefaultModalFrame(final GuiseSession session, final String id, final Model model, final Component<?> component)
-	{
-		super(session, id, model, component);	//construct the parent class
+		super(session, id, component);	//construct the parent class
 	}
 
 }

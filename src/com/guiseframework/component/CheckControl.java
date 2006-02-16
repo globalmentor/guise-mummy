@@ -13,10 +13,6 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 public class CheckControl extends AbstractValueControl<Boolean, CheckControl> implements ValueControl<Boolean, CheckControl> 
 {
 
-	/**@return The data model used by this component.*/
-	@SuppressWarnings("unchecked")
-	public ValueModel<Boolean> getModel() {return (ValueModel<Boolean>)super.getModel();}
-
 	/**The check type bound property.*/
 	public final static String CHECK_TYPE_PROPERTY=getPropertyName(CheckControl.class, "checkType");
 

@@ -1,5 +1,7 @@
 package com.guiseframework.component;
 
+import static com.garretwilson.lang.ObjectUtilities.*;
+
 import java.util.Iterator;
 
 import com.guiseframework.GuiseSession;
@@ -11,7 +13,7 @@ import com.guiseframework.event.MouseListener;
 import com.guiseframework.event.PostponedActionEvent;
 import com.guiseframework.geometry.Point;
 import com.guiseframework.geometry.Rectangle;
-import com.guiseframework.model.Model;
+import com.guiseframework.model.ActionModel;
 
 /**An abstract menu component.
 This implementation initially closes any child menu added to this menu.
@@ -22,6 +24,12 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 
 	/**@return The layout definition for the menu.*/
 	public MenuLayout getLayout() {return (MenuLayout)super.getLayout();}	//a menu can only have a menu layout
+
+	/**The action model used by this component.*/
+	private final ActionModel actionModel;
+
+		/**@return The action model used by this component.*/
+		protected ActionModel getActionModel() {return actionModel;}
 
 	/**Whether the menu is open.*/
 	private boolean open=true;
@@ -55,7 +63,7 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 		@param newValid <code>true</code> if user input should be considered valid
 		@see Control#VALID_PROPERTY
 		*/
-		public void setValid(final boolean newValid)
+		public void setValid(final boolean newValid)	//TODO important fix; currently out of synch with component
 		{
 			if(valid!=newValid)	//if the value is really changing
 			{
@@ -108,17 +116,25 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 			}
 		}
 
-	/**Session, ID, layout, and model constructor.
+	/**Session, ID, and layout, and model constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@param layout The layout definition for the container.
-	@param model The component data model.
+	@param actionModel The component action model.
 	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractMenu(final GuiseSession session, final String id, final MenuLayout layout, final Model model)
+	public AbstractMenu(final GuiseSession session, final String id, final MenuLayout layout, final ActionModel actionModel)
 	{
-		super(session, id, layout, model);	//construct the parent class
+		super(session, id, layout);	//construct the parent class
+		this.actionModel=checkNull(actionModel, "Action model cannot be null.");	//save the action model
+		this.actionModel.addActionListener(new ActionListener()	//create an action repeater to forward events to this component's listeners TODO create a common method to create a forwarding listener, if we can
+				{
+					public void actionPerformed(final ActionEvent actionEvent)	//if the action is performed
+					{
+						fireAction();	//fire an action with this component as the source
+					}
+				});
 	}
 
 	/**Adds an action listener.

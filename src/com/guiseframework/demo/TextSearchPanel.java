@@ -64,14 +64,14 @@ public class TextSearchPanel extends DefaultNavigationPanel
 			//search regular expression input
 		final TextControl<String> searchRegExControl=new TextControl<String>(session, String.class);	//create a text input control
 		searchRegExControl.setLabel("Search Regular Expression");	//set the label for the regex control
-		searchRegExControl.getModel().setValidator(new PatternSyntaxValidator(session));	//install our custom regular expression pattern syntax validator
+		searchRegExControl.setValidator(new PatternSyntaxValidator(session));	//install our custom regular expression pattern syntax validator
 		inputPanel.add(searchRegExControl);	//add the search text input to the input panel		
 			//file upload control
 		final ResourceImportControl resourceImportControl=new ResourceImportControl(session);	//create the file upload control
 		resourceImportControl.setLabel("Input Text File");	//give the file upload control a label	
 				//create a validator only allowing text files (files of type text/*) not greater than 64K to be uploaded, and require a value
 		final ResourceImportValidator textImportValidator=new ResourceImportValidator(session, new ContentType("text", "*", null), 1024*64, true);
-		resourceImportControl.getModel().setValidator(textImportValidator);	//assign the validator to the the file upload control model		
+		resourceImportControl.setValidator(textImportValidator);	//assign the validator to the the file upload control model		
 		inputPanel.add(resourceImportControl);	//add the file upload control to the input panel
 			//search button
 		final Button searchButton=new Button(session);	//create a button for initiating the upload and search
@@ -84,7 +84,7 @@ public class TextSearchPanel extends DefaultNavigationPanel
 		textAreaControl.setEditable(false);	//don't allow the text area control to be edited
 
 		//listen for the value of the resource import changing
-		resourceImportControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ResourceImport>()
+		resourceImportControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ResourceImport>()
 				{
 					public void propertyChange(GuisePropertyChangeEvent<ResourceImport> propertyChangeEvent)
 					{
@@ -92,7 +92,7 @@ public class TextSearchPanel extends DefaultNavigationPanel
 						{
 							final ResourceImport resourceImport=propertyChangeEvent.getNewValue();	//get the new resource import
 							final String searchResults;	//we'll store the search results here
-							if(resourceImport!=null && searchRegExControl.getModel().isValid())	//if we have a new resource to import and the search expression is valid
+							if(resourceImport!=null && searchRegExControl.isValid())	//if we have a new resource to import and the search expression is valid
 							{
 								final Reader reader=new InputStreamReader(resourceImport.getInputStream());	//get an input stream to the resource, assuming the text file uses the default character encoding
 								try
@@ -105,7 +105,7 @@ public class TextSearchPanel extends DefaultNavigationPanel
 										inputStringBuilder.append(buffer, 0, readCount);	//append the read characters to the input string builder
 									}
 									final StringBuilder outputStringBuilder=new StringBuilder();	//create a string builder to hold the matches
-									final String regularExpression=searchRegExControl.getModel().getValue();	//get the entered regular expression (which we already validated in the validator)
+									final String regularExpression=searchRegExControl.getValue();	//get the entered regular expression (which we already validated in the validator)
 										//the regular expression may still be null or the empty string (the latter of which is a valid regular expression)
 									if(regularExpression!=null && regularExpression.length()>0)	//if there is a regular expression
 									{
@@ -133,7 +133,7 @@ public class TextSearchPanel extends DefaultNavigationPanel
 							}
 							try
 							{
-								textAreaControl.getModel().setValue(searchResults);	//show the search results in the text area
+								textAreaControl.setValue(searchResults);	//show the search results in the text area
 							}
 							catch(final ValidationException validationException)	//we don't have a text area validator installed, so we never expect to get validation errors
 							{

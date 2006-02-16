@@ -136,6 +136,6 @@ public class Text extends AbstractContainer<Text>
 	*/
 	public Text(final GuiseSession session, final String id, final Model model)
 	{
-		super(session, id, new ReferenceLayout(session), model);	//construct the parent class
+		super(session, id, new ReferenceLayout(session)/*TODO add text model, model*/);	//construct the parent class
 	}
 }

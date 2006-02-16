@@ -70,13 +70,12 @@ public abstract class AbstractValueModel<V> extends AbstractModel implements Val
 		}
 	}
 
-	/**Validates the contents of this model, throwing an exception if the model is not valid.
-	This version validates the current value, if there is a validator installed.
-	@exception ValidationException if the contents of this model are not valid.	
+	/**Validates the value of this model, throwing an exception if the model is not valid.
+	This version validates the current value if there is a validator installed.
+	@exception ValidationException if the value of this model is not valid.	
 	*/
-	public void validate() throws ValidationException
+	public void validateValue() throws ValidationException
 	{
-		super.validate();	//do the default validation
 		final Validator<V> validator=getValidator();	//get the currently installed validator, if there is one
 		if(validator!=null)	//if a validator is installed
 		{

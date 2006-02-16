@@ -13,7 +13,6 @@ import static com.garretwilson.util.ArrayUtilities.*;
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.transfer.*;
-import com.guiseframework.model.*;
 
 /**An image component that displays an associated label and description, if present.
 This component installs a default export strategy supporting export of the following content types:
@@ -117,7 +116,7 @@ public class Image extends AbstractComponent<Image>
 			}			
 		}
 
-	/**Session constructor with a default model.
+	/**Session constructor.
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
@@ -126,7 +125,7 @@ public class Image extends AbstractComponent<Image>
 		this(session, null);	//construct the component, indicating that a default ID should be used
 	}
 
-	/**Session and ID constructor with a default data model.
+	/**Session and ID constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@exception NullPointerException if the given session is <code>null</code>.
@@ -134,19 +133,7 @@ public class Image extends AbstractComponent<Image>
 	*/
 	public Image(final GuiseSession session, final String id)
 	{
-		this(session, id, new DefaultModel(session));	//construct the class with a default model
-	}
-
-	/**Session, ID, and model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public Image(final GuiseSession session, final String id, final Model model)
-	{
-		super(session, id, model);	//construct the parent class
+		super(session, id);	//construct the parent class
 		addExportStrategy(DEFAULT_EXPORT_STRATEGY);	//install a default export strategy 
 	}
 

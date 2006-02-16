@@ -21,9 +21,6 @@ import com.guiseframework.validator.*;
 public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, Table.CellComponentState, Table> implements Control<Table>
 {
 
-	/**@return The data model used by this component.*/
-	public TableModel getModel() {return (TableModel)super.getModel();}
-
 	/**Whether the table is editable and the cells will allow the the user to change their values, if their respective columns are designated as editable as well.*/
 	private boolean editable=true;
 
@@ -66,6 +63,12 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 			}			
 		}
 
+	/**The table model used by this component.*/
+	private final TableModel tableModel;
+
+		/**@return The table model used by this component.*/
+		public TableModel getTableModel() {return tableModel;}
+
 	/**The map of cell representation strategies for columns.*/
 	private final Map<TableColumnModel<?>, CellRepresentationStrategy<?>> columnCellRepresentationStrategyMap=new ConcurrentHashMap<TableColumnModel<?>, CellRepresentationStrategy<?>>();
 
@@ -100,7 +103,7 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 	*/
 	public <T> void verifyCellComponent(final int rowIndex, final TableColumnModel<T> column) throws IOException
 	{
-		final TableModel tableModel=getModel();	//get the table model
+		final TableModel tableModel=getTableModel();	//get the table model
 		final boolean editable=isEditable() && column.isEditable();	//see if the cell is editable (a cell is only editable if both its table and column are editable)
 		final TableModel.Cell<T> cell=new TableModel.Cell<T>(rowIndex, column);	//create a cell object representing this row and column
 		CellComponentState cellComponentState=getComponentState(cell);	//get the component information for this cell
@@ -238,14 +241,14 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 	/**Session, ID, value class, and model constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
+	@param tableModel The component data model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public Table(final GuiseSession session, final String id, final TableModel model)
+	public Table(final GuiseSession session, final String id, final TableModel tableModel)
 	{
-		super(session, id, model);	//construct the parent class
-		for(final TableColumnModel<?> column:model.getColumns())	//install a default cell representation strategy for each column
+		super(session, id);	//construct the parent class
+		for(final TableColumnModel<?> column:tableModel.getColumns())	//install a default cell representation strategy for each column
 		{
 			installDefaultCellRepresentationStrategy(column);	//create and install a default representation strategy for this column
 		}
@@ -256,6 +259,7 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 						clearComponentStates();	//clear all the components and component states in case they are locale-related TODO probably transfer this up to the abstract composite state class
 					}			
 				});
+		this.tableModel=checkNull(tableModel, "Tree model cannot be null.");	//save the table model
 	}
 
 	/**An encapsulation of a component for a cell along with other metadata, such as whether the component was editable when created.

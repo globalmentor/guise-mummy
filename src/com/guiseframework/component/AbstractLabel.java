@@ -70,7 +70,7 @@ public abstract class AbstractLabel<C extends LabelComponent<C>> extends Abstrac
 	*/
 	public AbstractLabel(final GuiseSession session, final String id, final Model model)
 	{
-		super(session, id, model);	//construct the parent class
+		super(session, id/*TODO update with data model, model*/);	//construct the parent class
 		addExportStrategy(DEFAULT_EXPORT_STRATEGY);	//install a default export strategy 
 	}
 

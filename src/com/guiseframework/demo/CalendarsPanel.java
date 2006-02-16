@@ -46,13 +46,13 @@ public class CalendarsPanel extends DefaultNavigationPanel
 		localePanel.setLabel("Specify Session Locale");
 		final ListControl<Locale> localeListControl=new ListControl<Locale>(session, Locale.class, new SingleListSelectionPolicy<Locale>());	//create a list control allowing only single selections of locales
 		localeListControl.setLabel("Locale");	//set the list control label
-		localeListControl.getModel().setValidator(new ValueRequiredValidator<Locale>(session));	//require a locale to be selected in the list control
+		localeListControl.setValidator(new ValueRequiredValidator<Locale>(session));	//require a locale to be selected in the list control
 		localeListControl.setRowCount(1);	//make this a drop-down list
-		localeListControl.getModel().add(session.getLocale());	//add the current locale
-		localeListControl.getModel().add(Locale.FRANCE);
-		localeListControl.getModel().add(Locale.CHINA);
-		localeListControl.getModel().add(new Locale("ar"));
-		localeListControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Locale>()	//listen for selection changes
+		localeListControl.getSelectModel().add(session.getLocale());	//add the current locale
+		localeListControl.getSelectModel().add(Locale.FRANCE);
+		localeListControl.getSelectModel().add(Locale.CHINA);
+		localeListControl.getSelectModel().add(new Locale("ar"));
+		localeListControl.getSelectModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Locale>()	//listen for selection changes
 				{
 					public void propertyChange(final GuisePropertyChangeEvent<Locale> propertyChangeEvent)	//if the locale selection changes
 					{
@@ -65,7 +65,7 @@ public class CalendarsPanel extends DefaultNavigationPanel
 				});
 		try
 		{
-			localeListControl.getModel().setSelectedValues(session.getLocale());	//show the session locale selected
+			localeListControl.getSelectModel().setSelectedValues(session.getLocale());	//show the session locale selected
 		}
 		catch(final ValidationException validationException)	//any of the values can be selected, so we don't expect any errors
 		{
@@ -82,7 +82,7 @@ public class CalendarsPanel extends DefaultNavigationPanel
 		embeddedDateTextControl.setLabel("Selected Date:");
 		embeddedDateTextControl.setEditable(false);
 		calendarControlPanel.add(embeddedDateTextControl);
-		calendarControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Date>()	//listen for the calendar control value changing
+		calendarControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Date>()	//listen for the calendar control value changing
 				{
 					public void propertyChange(final GuisePropertyChangeEvent<Date> propertyChangeEvent)	//if the calendar control value changed
 					{
@@ -91,7 +91,7 @@ public class CalendarsPanel extends DefaultNavigationPanel
 						{
 							try
 							{
-								embeddedDateTextControl.getModel().setValue(newDate);	//show the date in the text control
+								embeddedDateTextControl.setValue(newDate);	//show the date in the text control
 							}
 							catch(final ValidationException validationException)	//no text control validator is installed, so there should be no validation errors
 							{
@@ -123,12 +123,12 @@ public class CalendarsPanel extends DefaultNavigationPanel
 								{		
 									public void propertyChange(final GuisePropertyChangeEvent<Mode> propertyChangeEvent)	//when the modal dialog mode changes
 									{
-										final Date newDate=calendarDialogFrame.getModel().getValue();	//get the value of the frame's model
+										final Date newDate=calendarDialogFrame.getValue();	//get the value of the frame's model
 										if(newDate!=null)	//if a new date was selected (i.e. the calendar dialog frame was not closed without a selection)
 										{
 											try
 											{
-												popupDateTextControl.getModel().setValue(newDate);	//show the date in the text control
+												popupDateTextControl.setValue(newDate);	//show the date in the text control
 											}
 											catch(final ValidationException validationException)	//no text control validator is installed, so there should be no validation errors
 											{

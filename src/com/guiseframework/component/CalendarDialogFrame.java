@@ -97,21 +97,21 @@ public class CalendarDialogFrame extends AbstractDialogFrame<Date, CalendarDialo
 		{
 			try
 			{
-				calendarControl.getModel().setValue(defaultDate);	//select the default date TODO pass this to the calendar control as a default date
+				calendarControl.setValue(defaultDate);	//select the default date TODO pass this to the calendar control as a default date
 			}
 			catch(final ValidationException validationException)
 			{
 				throw new AssertionError(validationException);	//TODO fix
 			}
 		}
-		calendarControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Date>()	//listen for the calendar control value changing
+		calendarControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Date>()	//listen for the calendar control value changing
 				{
 					public void propertyChange(final GuisePropertyChangeEvent<Date> propertyChangeEvent)	//if the calendar control value changed
 					{
 						try
 						{
 							final Date newDate=propertyChangeEvent.getNewValue();	//get the new date
-							getModel().setValue(newDate);	//update our own value
+							setValue(newDate);	//update our own value
 							if(newDate!=null)	//if a date was selected
 							{
 								close();	//close the frame

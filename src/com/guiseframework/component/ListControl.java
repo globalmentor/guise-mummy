@@ -3,18 +3,33 @@ package com.guiseframework.component;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.converter.AbstractStringLiteralConverter;
 import com.guiseframework.model.*;
+import com.guiseframework.validator.ValidationException;
+import com.guiseframework.validator.Validator;
 
 import static com.garretwilson.lang.ClassUtilities.*;
+import static com.garretwilson.lang.ObjectUtilities.checkNull;
 
 /**Control to allow selection of one or more values from a list.
 @param <V> The type of values to select.
 @author Garret Wilson
 */
-public class ListControl<V> extends AbstractListSelectControl<V, ListControl<V>> implements ValueControl<V, ListControl<V>>
+public class ListControl<V> extends AbstractListSelectControl<V, ListControl<V>> implements ValueControl<V, ListControl<V>>	//TODO we probably shouldn't save both models separately
 {
 
 	/**The row count bound property.*/
 	public final static String ROW_COUNT_PROPERTY=getPropertyName(ListControl.class, "rowCount");
+
+	/**The list select model used by this component.*/
+	private final ListSelectModel<V> selectModel;
+
+		/**@return The list select model used by this component.*/
+		public ListSelectModel<V> getSelectModel() {return selectModel;}
+
+	/**The value model used by this component.*/
+	private final ValueModel<V> valueModel;
+
+		/**@return The value model used by this component.*/
+		protected ValueModel<V> getValueModel() {return valueModel;}
 
 	/**Whether the value is editable and the control will allow the the user to change the value.*/
 	private boolean editable=true;	//TODO fix or del if not needed
@@ -248,17 +263,76 @@ public class ListControl<V> extends AbstractListSelectControl<V, ListControl<V>>
 	{
 		super(session, id, model, valueRepresentationStrategy);	//construct the parent class
 		this.rowCount=rowCount;	//save the row count
+		this.selectModel=checkNull(model, "Select model cannot be null.");	//save the select model
+			//don't listen for list select model property changes specifically, because this would result in repeating events twice TODO or would it? doesn't the model keep track of double listeners?
+		this.valueModel=checkNull(model, "Value model cannot be null.");	//save the value model
+		this.valueModel.addPropertyChangeListener(getRepeaterPropertyChangeListener());	//listen an repeat all property changes of the value model
 	}
 
-	/**A convenience base strategy for generating components to represents model values in a list select control.
-	The component ID should reflect a unique identifier of the item
-	@param <RR> The type of value the strategy is to represent.
-	@author Garret Wilson
+	/**Validates the model of this component and all child components.
+	The component will be updated with error information.
+	This version validates the associated model.
+	@exception ComponentExceptions if there was one or more validation error.
 	*/
-/*TODO del when works
-	public abstract static class AbstractValueRepresentationStrategy<RR> implements ValueRepresentationStrategy<RR, ModelComponent<? extends LabelModel, ?>>
+	public void validate() throws ComponentExceptions
 	{
+		super.validate();	//validate the parent class
+		try
+		{
+			getValueModel().validateValue();	//validate the value model
+		}
+		catch(final ComponentException componentException)	//if there is a component error
+		{
+			componentException.setComponent(this);	//make sure the exception knows to which component it relates
+			addError(componentException);	//add this error to the component
+			throw new ComponentExceptions(componentException);	//throw a new component exception list exception
+		}
 	}
-*/
 
+	/**@return The default value.*/
+	public V getDefaultValue() {return getValueModel().getDefaultValue();}
+
+	/**@return The input value, or <code>null</code> if there is no input value.*/
+	public V getValue() {return getValueModel().getValue();}
+
+	/**Sets the input value.
+	This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method.
+	If a validator is installed, the value will first be validated before the current value is changed.
+	Validation always occurs if a validator is installed, even if the value is not changing.
+	@param newValue The input value of the model.
+	@exception ValidationException if the provided value is not valid.
+	@see #getValidator()
+	@see #VALUE_PROPERTY
+	*/
+	public void setValue(final V newValue) throws ValidationException {getValueModel().setValue(newValue);}
+
+	/**Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators.
+	No validation occurs.
+	@see ValueModel#VALUE_PROPERTY
+	*/
+	public void clearValue() {getValueModel().clearValue();}
+
+	/**Resets the value to a default value, which may be invalid according to any installed validators.
+	No validation occurs.
+	@see #VALUE_PROPERTY
+	*/
+	public void resetValue() {getValueModel().resetValue();}
+
+	/**@return The validator for this model, or <code>null</code> if no validator is installed.*/
+	public Validator<V> getValidator() {return getValueModel().getValidator();}
+
+	/**Sets the validator.
+	This is a bound property
+	@param newValidator The validator for this model, or <code>null</code> if no validator should be used.
+	@see #VALIDATOR_PROPERTY
+	*/
+	public void setValidator(final Validator<V> newValidator) {getValueModel().setValidator(newValidator);}
+
+	/**Validates the value of this model, throwing an exception if the model is not valid.
+	@exception ValidationException if the value of this model is not valid.	
+	*/
+	public void validateValue() throws ValidationException {getValueModel().validateValue();}
+
+	/**@return The class representing the type of value this model can hold.*/
+	public Class<V> getValueClass() {return getValueModel().getValueClass();}
 }

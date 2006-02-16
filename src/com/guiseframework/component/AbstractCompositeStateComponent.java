@@ -5,7 +5,6 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import java.util.*;
 
 import com.guiseframework.GuiseSession;
-import com.guiseframework.model.Model;
 
 /**A composite component that represents the state of its child components.
 @param <T> The type of object being represented.
@@ -80,14 +79,13 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 	/**Session and ID constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
 	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	@exception IllegalStateException if no controller is registered for this component type.
 	*/
-	public AbstractCompositeStateComponent(final GuiseSession session, final String id, final Model model)
+	public AbstractCompositeStateComponent(final GuiseSession session, final String id)
 	{
-		super(session, id, model);	//construct the parent class
+		super(session, id);	//construct the parent class
 	}
 
 	/**An encapsulation of the state of a representation component.

@@ -20,7 +20,7 @@ If the model used by the calendar control uses a {@link RangeValidator} with a d
 Otherwise, a text input will be used for year selection.
 @author Garret Wilson
 */
-public class CalendarControl extends AbstractContainerControl<CalendarControl> implements ValueControl<Date, CalendarControl>
+public class CalendarControl extends AbstractContainerValueControl<Date, CalendarControl>
 {
 
 	/**The visible date bound property.*/
@@ -69,10 +69,6 @@ public class CalendarControl extends AbstractContainerControl<CalendarControl> i
 		}
 
 	private int getMonthCount() {return 1;}	//TODO update to allow modification
-
-	/**@return The data model used by this component.*/
-	@SuppressWarnings("unchecked")
-	public ValueModel<Date> getModel() {return (ValueModel<Date>)super.getModel();}
 
 	/**The container containing the controls.*/
 	private Container<?> controlContainer;
@@ -186,7 +182,7 @@ public class CalendarControl extends AbstractContainerControl<CalendarControl> i
 		monthListControl=new ListControl<Date>(session, Date.class, new SingleListSelectionPolicy<Date>());	//create a list control allowing only single selections of a month
 //TODO fix if needed		monthListControl.setStyleID("month");	//TODO use a constant
 		monthListControl.setLabel("Month");	//set the month control label TODO get from resources
-		monthListControl.getModel().setValidator(new ValueRequiredValidator<Date>(session));	//require a locale to be selected in the list control
+		monthListControl.setValidator(new ValueRequiredValidator<Date>(session));	//require a locale to be selected in the list control
 		monthListControl.setRowCount(1);	//make this a drop-down list
 		final Converter<Date, String> monthConverter=new DateStringLiteralConverter(session, DateStringLiteralStyle.MONTH_OF_YEAR);	//get a converter to display the month of the year
 		monthListControl.setValueRepresentationStrategy(new ListControl.DefaultValueRepresentationStrategy<Date>(session, monthConverter));	//install a month representation strategy
@@ -240,7 +236,7 @@ public class CalendarControl extends AbstractContainerControl<CalendarControl> i
 				});
 			//TODO important: this is a memory leak---make sure we uninstall the listener when the session goes away
 		session.addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, updateModelPropertyChangeListener);	//update the calendars if the locale changes
-		monthListControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Date>()	//create a property change listener to listen for the month changing
+		monthListControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Date>()	//create a property change listener to listen for the month changing
 				{
 					public void propertyChange(final GuisePropertyChangeEvent<Date> propertyChangeEvent)	//if the selected month changed
 					{
@@ -270,17 +266,16 @@ public class CalendarControl extends AbstractContainerControl<CalendarControl> i
 	{
 		final GuiseSession session=getSession();	//get a reference to the session
 		final Locale locale=session.getLocale();	//get the current locale
-		final ValueModel<Date> model=getModel();	//get a reference to the calendar model
 		if(yearControl!=null)	//if there is a year control already in use
 		{
 			controlContainer.remove(yearControl);	//remove our year control TODO later use controlContainer.replace() when that method is available
-			yearControl.getModel().removePropertyChangeListener(ValueModel.VALUE_PROPERTY, yearPropertyChangeListener);	//stop listening for the year changing
+			yearControl.removePropertyChangeListener(ValueModel.VALUE_PROPERTY, yearPropertyChangeListener);	//stop listening for the year changing
 			yearControl=null;	//for completeness, indicate that we don't currently have a year control
 		}
 			//see if there is a minimum and maximum date specified; this will determine what sort of control to use for the date input
 		int minYear=-1;	//we'll determine if there is a minimum and/or maximum year restriction
 		int maxYear=-1;
-		final Validator<Date> validator=model.getValidator();	//get the model's validator
+		final Validator<Date> validator=getValidator();	//get our validator
 		if(validator instanceof RangeValidator)	//if there is a range validator installed
 		{
 			final RangeValidator<Date> rangeValidator=(RangeValidator<Date>)validator;	//get the validator as a range validator
@@ -302,7 +297,7 @@ public class CalendarControl extends AbstractContainerControl<CalendarControl> i
 		{
 			final ListControl<Integer> yearListControl=new ListControl<Integer>(session, Integer.class, new SingleListSelectionPolicy<Integer>());	//create a list control allowing only single selections
 			yearListControl.setRowCount(1);	//make the list control a drop-down list
-			final ListSelectModel<Integer> yearModel=yearListControl.getModel();	//get the list control model
+			final ListSelectModel<Integer> yearModel=yearListControl.getSelectModel();	//get the list control model
 			for(int year=minYear; year<=maxYear; ++year)	//for each valid year
 			{
 				yearModel.add(new Integer(year));	//add this year to the choices
@@ -315,7 +310,7 @@ public class CalendarControl extends AbstractContainerControl<CalendarControl> i
 			final TextControl<Integer> yearTextControl=new TextControl<Integer>(session, Integer.class);	//create a text control to select the year
 			yearTextControl.setMaximumLength(4);	//TODO testing
 			yearTextControl.setColumnCount(4);	//TODO testing
-			yearTextControl.getModel().setValidator(new IntegerRangeValidator(session, new Integer(1800), new Integer(2100), new Integer(1), true));	//restrict the range of the year TODO improve; don't arbitrarily restrict the range		
+			yearTextControl.setValidator(new IntegerRangeValidator(session, new Integer(1800), new Integer(2100), new Integer(1), true));	//restrict the range of the year TODO improve; don't arbitrarily restrict the range		
 			yearControl=yearTextControl;	//use the year text control for the year control
 		}
 		assert yearControl!=null : "Failed to create a year control";
@@ -326,13 +321,13 @@ public class CalendarControl extends AbstractContainerControl<CalendarControl> i
 		final int year=calendar.get(Calendar.YEAR);	//get the current year
 		try
 		{
-			yearControl.getModel().setValue(new Integer(year));	//show the selected year in the text box
+			yearControl.setValue(new Integer(year));	//show the selected year in the text box
 		}
 		catch(final ValidationException validationException)	//we should never have a problem selecting a year or a month
 		{
 			throw new AssertionError(validationException);
 		}
-		yearControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, yearPropertyChangeListener);	//listen for the year changing
+		yearControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, yearPropertyChangeListener);	//listen for the year changing
 		controlContainer.add(yearControl);	//add the year text control		
 	}
 	
@@ -377,8 +372,8 @@ public class CalendarControl extends AbstractContainerControl<CalendarControl> i
 				{
 					try
 					{
-						yearControl.getModel().setValue(new Integer(year));	//show the selected year in the text box
-						final ListSelectModel<Date> monthListModel=monthListControl.getModel();	//get model of the month list control
+						yearControl.setValue(new Integer(year));	//show the selected year in the text box
+						final ListSelectModel<Date> monthListModel=monthListControl.getSelectModel();	//get model of the month list control
 						monthListModel.clear();	//clear the values in the month list control
 						final Calendar monthNameCalendar=(Calendar)calendar.clone();	//clone the month calendar as we step through the months
 						final int minMonth=monthNameCalendar.getActualMinimum(Calendar.MONTH);	//get the minimum month
@@ -411,7 +406,7 @@ public class CalendarControl extends AbstractContainerControl<CalendarControl> i
 						final CalendarMonthTableModel calendarMonthTableModel=new CalendarMonthTableModel(session, monthCalendar.getTime());	//create a table model for this month
 						calendarMonthTableModel.setColumnLabelDateStyle(DateStringLiteralStyle.DAY_OF_WEEK_SHORT);	//show the short day of the week in each column
 						final Table calendarMonthTable=new Table(session, calendarMonthTableModel);	//create a table to hold the calendar month
-						for(final TableColumnModel<?> tableColumn:calendarMonthTable.getModel().getColumns())	//for each table column
+						for(final TableColumnModel<?> tableColumn:calendarMonthTable.getTableModel().getColumns())	//for each table column
 						{
 							calendarMonthTable.setCellRepresentationStrategy((TableColumnModel<Date>)tableColumn, dayRepresentationStrategy);	//install the representation strategy for this column
 						}
@@ -477,7 +472,7 @@ public class CalendarControl extends AbstractContainerControl<CalendarControl> i
 				final Link link=new Link(session, id);	//create a link for this cell
 				final String dayOfMonthString=Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));	//create a string using the day of the month
 				link.setLabel(dayOfMonthString);	//set the label of the link to the day of the month
-				final Validator<Date> validator=CalendarControl.this.getModel().getValidator();	//get the calendar control model's validator
+				final Validator<Date> validator=CalendarControl.this.getValidator();	//get the calendar control model's validator
 				if(validator==null || validator.isValid(date))	//if there is no validator installed, or there is a validator and this is a valid date
 				{
 					link.addActionListener(new ActionListener()	//create a listener to listen for calendar actions
@@ -486,7 +481,7 @@ public class CalendarControl extends AbstractContainerControl<CalendarControl> i
 								{
 									try
 									{
-										CalendarControl.this.getModel().setValue(date);	//change the control's value to the calendar for this cell
+										CalendarControl.this.setValue(date);	//change the control's value to the calendar for this cell
 									}
 									catch(final ValidationException validationException)
 									{

@@ -6,10 +6,8 @@ import java.util.MissingResourceException;
 import java.util.Set;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.garretwilson.util.Debug;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.geometry.CompassPoint;
-import com.guiseframework.model.Model;
 
 import static com.garretwilson.util.SetUtilities.*;
 
@@ -165,17 +163,16 @@ public abstract class AbstractFlyoverFrame<C extends FlyoverFrame<C>> extends Ab
 			}
 		}
 
-	/**Session, ID, model, and component constructor.
+	/**Session, ID, and component constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
+	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractFlyoverFrame(final GuiseSession session, final String id, final Model model, final Component<?> component)
+	public AbstractFlyoverFrame(final GuiseSession session, final String id, final Component<?> component)
 	{
-		super(session, id, model, component);	//construct the parent class
+		super(session, id, component);	//construct the parent class
 		setModal(false);	//default to being a nonmodal frame
 		setMovable(false);	//default to being nonmovable
 		setResizable(false);	//default to not allowing resizing

@@ -8,7 +8,7 @@ import com.guiseframework.model.ValueModel;
 @param <V> The type of value to represent.
 @author Garret Wilson
 */
-public interface ValueControl<V, C extends ValueControl<V, C>> extends Control<C>
+public interface ValueControl<V, C extends ValueControl<V, C>> extends Control<C>, ValueModel<V>
 {
 
 	/**The converter bound property.*/
@@ -24,7 +24,7 @@ public interface ValueControl<V, C extends ValueControl<V, C>> extends Control<C
 	*/
 	public void setEditable(final boolean newEditable);
 
-	/**@return The data model used by this component.*/
-	public ValueModel<V> getModel();
+	/**@return The value model used by this component.*/
+//TODO del	public ValueModel<V> getValueModel();
 
 }

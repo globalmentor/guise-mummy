@@ -27,7 +27,7 @@ public class SelectLink extends AbstractSelectActionControl<SelectLink> implemen
 	*/
 	public SelectLink(final GuiseSession session, final String id)
 	{
-		this(session, id, new DefaultActionValueModel<Boolean>(session, Boolean.class, Boolean.FALSE));	//construct the class with a default model
+		this(session, id, new DefaultValueModel<Boolean>(session, Boolean.class, Boolean.FALSE));	//construct the class with a default model
 	}
 
 	/**Session and model constructor.
@@ -35,7 +35,7 @@ public class SelectLink extends AbstractSelectActionControl<SelectLink> implemen
 	@param model The component data model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	*/
-	public SelectLink(final GuiseSession session, final ActionValueModel<Boolean> model)
+	public SelectLink(final GuiseSession session, final ValueModel<Boolean> model)
 	{
 		this(session, null, model);	//construct the component, indicating that a default ID should be used
 	}
@@ -47,7 +47,7 @@ public class SelectLink extends AbstractSelectActionControl<SelectLink> implemen
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public SelectLink(final GuiseSession session, final String id, final ActionValueModel<Boolean> model)
+	public SelectLink(final GuiseSession session, final String id, final ValueModel<Boolean> model)
 	{
 		super(session, id, model);	//construct the parent class
 	}

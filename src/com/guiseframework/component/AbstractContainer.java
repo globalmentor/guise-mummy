@@ -183,17 +183,16 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		}
 	}
 
-	/**Session, ID, layout, and model constructor.
+	/**Session, ID, and layout constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@param layout The layout definition for the container.
-	@param model The component data model.
-	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
+	@exception NullPointerException if the given session, and/or layout is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractContainer(final GuiseSession session, final String id, final Layout<?> layout, final Model model)
+	public AbstractContainer(final GuiseSession session, final String id, final Layout<?> layout)
 	{
-		super(session, id, model);	//construct the parent class
+		super(session, id);	//construct the parent class
 		this.layout=checkNull(layout, "Layout cannot be null.");	//save the layout
 		layout.setContainer(this);	//tell the layout which container owns it
 	}

@@ -9,8 +9,8 @@ import com.guiseframework.model.*;
 public interface ListSelectControl<V, C extends ListSelectControl<V, C>> extends SelectControl<V, C>
 {
 
-	/**@return The data model used by this component.*/
-	public ListSelectModel<V> getModel();
+	/**@return The list select model used by this component.*/
+	public ListSelectModel<V> getSelectModel();
 
 	/**@return The strategy used to generate a component to represent each value in the model.*/
 	public ValueRepresentationStrategy<V> getValueRepresentationStrategy();

@@ -3,8 +3,6 @@ package com.guiseframework.component;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.Layout;
 import com.guiseframework.component.layout.RegionLayout;
-import com.guiseframework.model.DefaultModel;
-import com.guiseframework.model.Model;
 
 /**Default implementation of a panel that represents a point of modal navigation with default region layout.
 Each panel subclass must provide either a Guise session constructor; or a Guise session and string ID constructor.
@@ -24,16 +22,6 @@ public class DefaultModalNavigationPanel<R> extends AbstractModalNavigationPanel
 		this(session, (String)null);	//construct the component, indicating that a default ID should be used
 	}
 
-	/**Session and model constructor with a default region layout.
-	@param session The Guise session that owns this component.
-	@param model The component data model.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public DefaultModalNavigationPanel(final GuiseSession session, final Model model)
-	{
-		this(session, (String)null, model);	//construct the component, indicating that a default ID should be used
-	}
-
 	/**Session and ID constructor with a default region layout.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
@@ -43,18 +31,6 @@ public class DefaultModalNavigationPanel<R> extends AbstractModalNavigationPanel
 	public DefaultModalNavigationPanel(final GuiseSession session, final String id)
 	{
 		this(session, id, new RegionLayout(session));	//default to flowing vertically
-	}
-
-	/**Session, ID, and model constructor with a default region layout.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public DefaultModalNavigationPanel(final GuiseSession session, final String id, final Model model)
-	{
-		this(session, id, new RegionLayout(session), model);	//default to flowing vertically
 	}
 
 	/**Session and layout constructor.
@@ -67,17 +43,6 @@ public class DefaultModalNavigationPanel<R> extends AbstractModalNavigationPanel
 		this(session, null, layout);	//construct the component with the layout, indicating that a default ID should be used
 	}
 
-	/**Session, layout, and model constructor.
-	@param session The Guise session that owns this component.
-	@param layout The layout definition for the container.
-	@param model The component data model.
-	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
-	*/
-	public DefaultModalNavigationPanel(final GuiseSession session, final Layout layout, final Model model)
-	{
-		this(session, null, layout, model);	//construct the component with the layout, indicating that a default ID should be used
-	}
-
 	/**Session, ID, and layout constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
@@ -87,20 +52,7 @@ public class DefaultModalNavigationPanel<R> extends AbstractModalNavigationPanel
 	*/
 	public DefaultModalNavigationPanel(final GuiseSession session, final String id, final Layout layout)
 	{
-		this(session, id, layout, new DefaultModel(session));	//construct the class with a default model
-	}
-
-	/**Session, ID, layout, and model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param layout The layout definition for the container.
-	@param model The component data model.
-	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public DefaultModalNavigationPanel(final GuiseSession session, final String id, final Layout layout, final Model model)
-	{
-		super(session, id, layout, model);	//construct the parent class
+		super(session, id, layout);	//construct the parent class
 	}
 
 	/**Ends this frame's modal interaction and navigates either to the previous modal navigation or to this frame's referring URI, if any.

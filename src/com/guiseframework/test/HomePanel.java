@@ -113,7 +113,7 @@ public class HomePanel extends DefaultNavigationPanel
 		inputPanel.setBackgroundColor(RGBColor.AQUA_MARINE);
 		final TextControl<Float> inputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
 		inputTextControl.setLabel("Input Number");	//add a label to the text input control
-		inputTextControl.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
+		inputTextControl.setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
 		inputTextControl.setBackgroundColor(RGBColor.DARK_GOLDEN_ROD);
 
 		inputTextControl.setDescription("This is a description of the first text control.");
@@ -130,14 +130,14 @@ public class HomePanel extends DefaultNavigationPanel
 		outputTextControl.setLabel("Double the Number");	//add a label to the text output control
 		outputTextControl.setEditable(false);	//set the text output control to read-only so that the user cannot modify it
 		inputPanel.add(outputTextControl);	//add the output control to the input panel
-		inputTextControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Float>()
+		inputTextControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Float>()
 				{
 					public void propertyChange(final GuisePropertyChangeEvent<Float> propertyChangeEvent)
 					{
 						final Float newValue=propertyChangeEvent.getNewValue();	//get the new value
 						try
 						{
-							outputTextControl.getModel().setValue(newValue*2);	//update the value
+							outputTextControl.setValue(newValue*2);	//update the value
 						}
 						catch(final ValidationException validationException)	//we have no validator installed in the check control model, so we don't expect changing its value ever to cause any problems
 						{
@@ -149,7 +149,7 @@ public class HomePanel extends DefaultNavigationPanel
 		checkbox.setLabel("Enable the button \u278A");
 		try
 		{
-			checkbox.getModel().setValue(Boolean.TRUE);
+			checkbox.setValue(Boolean.TRUE);
 		}
 		catch(final ValidationException validationException)	//we have no validator installed in the check control model, so we don't expect changing its value ever to cause any problems
 		{
@@ -160,10 +160,10 @@ public class HomePanel extends DefaultNavigationPanel
 		final ListControl<Float> listControl=new ListControl<Float>(session, Float.class, new SingleListSelectionPolicy<Float>());	//create a list control allowing only single selections
 		listControl.setLabel("Pick a Number");	//set the list control label
 		listControl.setRowCount(5);
-		listControl.getModel().add(new Float(10));
-		listControl.getModel().add(new Float(20));
-		listControl.getModel().add(new Float(30));
-		listControl.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Float>()
+		listControl.getSelectModel().add(new Float(10));
+		listControl.getSelectModel().add(new Float(20));
+		listControl.getSelectModel().add(new Float(30));
+		listControl.getSelectModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Float>()
 				{
 					public void propertyChange(final GuisePropertyChangeEvent<Float> propertyChangeEvent)
 					{
@@ -171,7 +171,7 @@ public class HomePanel extends DefaultNavigationPanel
 						try
 						{
 Debug.trace("list control changed value to", newValue);
-							outputTextControl.getModel().setValue(newValue!=null ? newValue*2 : null);	//update the value
+							outputTextControl.setValue(newValue!=null ? newValue*2 : null);	//update the value
 						}
 						catch(final ValidationException validationException)	//we have no validator installed in the check control model, so we don't expect changing its value ever to cause any problems
 						{
@@ -380,7 +380,7 @@ Debug.trace("list control changed value to", newValue);
 						
 						final TextControl<Float> inputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
 						inputTextControl.setLabel("Input Number");	//add a label to the text input control
-						inputTextControl.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
+						inputTextControl.setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
 						((Container<?>)dialog.getContent()).add(inputTextControl);	//add the input control to the input panel
 						final TextControl<Float> outputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
 						outputTextControl.setLabel("Double the Number");	//add a label to the text output control
@@ -499,7 +499,7 @@ Debug.trace("list control changed value to", newValue);
 		
 		final TextControl<String> textInput=new TextControl<String>(session, "textInput", String.class);	//create a text input control
 		textInput.setLabel("This is the text input label.");
-		textInput.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<String>()
+		textInput.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<String>()
 				{
 					public void propertyChange(GuisePropertyChangeEvent<String> propertyChangeEvent)
 					{
@@ -532,9 +532,9 @@ Debug.trace("list control changed value to", newValue);
 //		check2.getModel().setEnabled(false);	//TODO fix
 		booleanPanel.add(check2);
 		final ModelGroup<ValueModel<Boolean>> booleanGroup=new MutualExclusionPolicyModelGroup();
-		booleanGroup.add(check1.getModel());
-		booleanGroup.add(check2.getModel());
-		booleanGroup.add(check3.getModel());
+		booleanGroup.add(check1);
+		booleanGroup.add(check2);
+		booleanGroup.add(check3);
 	
 		horizontalPanel.add(booleanPanel);
 
@@ -599,11 +599,11 @@ Debug.trace("list control changed value to", newValue);
 
 		final ListControl<String> listSelectControl=new ListControl<String>(session, String.class, new SingleListSelectionPolicy<String>());
 		listSelectControl.setLabel("Choose an option.");
-		listSelectControl.getModel().add("The first option");
+		listSelectControl.getSelectModel().add("The first option");
 //TODO fix		listSelectControl.getModel().add(null);
-		listSelectControl.getModel().add("The second option");
-		listSelectControl.getModel().add("The third option");
-		listSelectControl.getModel().add("The fourth option");
+		listSelectControl.getSelectModel().add("The second option");
+		listSelectControl.getSelectModel().add("The third option");
+		listSelectControl.getSelectModel().add("The fourth option");
 		
 /*TODO fix
 		listSelectControl.setValueRepresentationStrategy(new ListControl.DefaultValueRepresentationStrategy<String>(session)
@@ -631,7 +631,7 @@ Debug.trace("list control changed value to", newValue);
 			throw new AssertionError(e);
 		}
 */
-		textAreaControl.getModel().setValidator(new RegularExpressionStringValidator(session, ".{0,10}", true));
+		textAreaControl.setValidator(new RegularExpressionStringValidator(session, ".{0,10}", true));
 		contentPanel.add(textAreaControl);
 /*TODO del
 		final Text text=new Text(session);
@@ -654,7 +654,7 @@ Debug.trace("list control changed value to", newValue);
 		}
 		final Table multiplicationTable=new Table(session, Integer.class, multiplicationTableData, "0", "1");
 		multiplicationTable.setLabel("Multiplication Table");
-		for(final TableColumnModel<?> column:multiplicationTable.getModel().getColumns())
+		for(final TableColumnModel<?> column:multiplicationTable.getTableModel().getColumns())
 		{
 			column.setEditable(true);
 		}
@@ -664,9 +664,9 @@ Debug.trace("list control changed value to", newValue);
 		final TreeNodeModel<String> firstItem=new DefaultTreeNodeModel<String>(session, String.class, "First Item");
 		firstItem.add(new DefaultTreeNodeModel<String>(session, String.class, "Sub Item A"));
 		firstItem.add(new DefaultTreeNodeModel<String>(session, String.class, "Sub Item B"));
-		treeControl.getModel().getRootNode().add(firstItem);
-		treeControl.getModel().getRootNode().add(new DefaultTreeNodeModel<String>(session, String.class, "Second Item"));
-		treeControl.getModel().getRootNode().add(new DefaultTreeNodeModel<String>(session, String.class, "Third Item"));
+		treeControl.getTreeModel().getRootNode().add(firstItem);
+		treeControl.getTreeModel().getRootNode().add(new DefaultTreeNodeModel<String>(session, String.class, "Second Item"));
+		treeControl.getTreeModel().getRootNode().add(new DefaultTreeNodeModel<String>(session, String.class, "Third Item"));
 
 		contentPanel.add(treeControl);
 
@@ -675,7 +675,7 @@ Debug.trace("list control changed value to", newValue);
 		final LayoutPanel temperaturePanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE));	//create the input panel flowing vertically
 		final TextControl<Float> temperatureInput=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
 		temperatureInput.setLabel("Input Temperature");	//add a label to the text input control
-		temperatureInput.getModel().setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
+		temperatureInput.setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
 		temperaturePanel.add(temperatureInput);	//add the input control to the input panel
 		final TextControl<Float> temperatureOutput=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
 		temperatureOutput.setLabel("Output Temperature");	//add a label to the text output control
@@ -692,13 +692,13 @@ Debug.trace("list control changed value to", newValue);
 		contentPanel.add(tabbedPanel);
 
 		final TabControl<String> stringTabControl=new TabControl<String>(session, String.class, Flow.LINE);
-		stringTabControl.getModel().add("First tab");
-		stringTabControl.getModel().add("Second tab");
-		stringTabControl.getModel().add("Third tab");
+		stringTabControl.getSelectModel().add("First tab");
+		stringTabControl.getSelectModel().add("Second tab");
+		stringTabControl.getSelectModel().add("Third tab");
 		contentPanel.add(stringTabControl);
 		try
 		{
-			stringTabControl.getModel().setSelectedValues("First tab");
+			stringTabControl.getSelectModel().setSelectedValues("First tab");
 		}
 		catch (ValidationException e)
 		{
@@ -711,7 +711,7 @@ Debug.trace("list control changed value to", newValue);
 		contentPanel.add(remoteTabControl);
 		
 
-		checkbox.getModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Boolean>()
+		checkbox.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Boolean>()
 				{
 					public void propertyChange(final GuisePropertyChangeEvent<Boolean> propertyChangeEvent)
 					{
@@ -722,7 +722,7 @@ Debug.trace("list control changed value to", newValue);
 //TODO bring back						testButton.getModel().setEnabled(newValue);	//update the button enabled state
 //TODO del Debug.trace("ready to set tabbed panel enabled to ", newValue);
 //TODO del						tabbedPanel.getLayout().getConstraints(helloPanel).setEnabled(newValue);	//TODO testing
-						remoteTabControl.getModel().setValueEnabled(helloPanel, newValue);	//TODO testing
+						remoteTabControl.getSelectModel().setValueEnabled(helloPanel, newValue);	//TODO testing
 					}
 				});
 

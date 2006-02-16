@@ -114,7 +114,7 @@ public class CardTabControl extends TabControl<Component<?>>
 	*/
 	public CardTabControl(final GuiseSession session, final String id, final CardControl<?> cardControl, final ValueRepresentationStrategy<Component<?>> valueRepresentationStrategy, final Flow axis, final int maxTabCount)
 	{
-		super(session, id, cardControl.getModel(), valueRepresentationStrategy, axis, maxTabCount);	//construct the parent class using the card container's model
+		super(session, id, cardControl.getSelectModel(), valueRepresentationStrategy, axis, maxTabCount);	//construct the parent class using the card container's model
 	}
 
 	/**A value representation strategy for representing cards.

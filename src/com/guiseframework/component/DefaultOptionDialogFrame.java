@@ -250,7 +250,7 @@ public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultO
 						{
 							try
 							{
-								DefaultOptionDialogFrame.this.getModel().setValue(option);	//chose this option
+								DefaultOptionDialogFrame.this.setValue(option);	//chose this option
 								close();	//close the frame
 							}
 							catch(final ValidationException validationException)	//we don't expect a validation exception

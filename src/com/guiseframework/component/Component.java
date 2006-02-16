@@ -112,7 +112,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public final static char ID_SEGMENT_DELIMITER='.';
 
 	/**@return The data model used by this component.*/
-	public Model getModel();
+//TODO del	public Model getModel();
 
 	/**@return The name of the component, not guaranteed to be unique and useful only for searching for components within a component sub-hierarchy, or <code>null</code> if the component has no name.*/
 	public String getName();

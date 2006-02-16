@@ -65,6 +65,11 @@ public interface ValueModel<V> extends Model
 	*/
 	public void setValidator(final Validator<V> newValidator);
 
+	/**Validates the value of this model, throwing an exception if the model is not valid.
+	@exception ValidationException if the value of this model is not valid.	
+	*/
+	public void validateValue() throws ValidationException;
+
 	/**@return The class representing the type of value this model can hold.*/
 	public Class<V> getValueClass();
 
