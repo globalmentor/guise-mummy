@@ -16,14 +16,6 @@ When the state of a value (besides its selection, such as its enabled status) ch
 public interface ListSelectModel<V> extends SelectModel<V>, List<V>
 {
 
-	/**Replaces the first occurrence of the given value with its replacement.
-	This method ensures that another thread does not change the model while the search and replace operation occurs.
-	@param oldValue The value for which to search.
-	@param newValue The replacement value.
-	@return Whether the operation resulted in a modification of the model.
-	*/
-	public boolean replace(final V oldValue, final V newValue);
-
 	/**@return The selection policy for this model.*/
 	public ListSelectionPolicy<V> getSelectionPolicy();
 
@@ -68,28 +60,6 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>
 	*/
 	public void removeSelectedIndexes(int... indexes) throws ValidationException;
 	
-	/**Determines the selected value.
-	If more than one value is selected, the lead selected value will be returned.
-	@return The value currently selected, or <code>null</code> if no value is currently selected.
-	@see #getSelectedIndex()
-	*/
-	public V getSelectedValue();
-	
-	/**Determines the selected values.
-	@return The values currently selected.
-	@see #getSelectedIndexes()
-	*/
-	public V[] getSelectedValues();
-	
-	/**Sets the selected values.
-	If a value occurs more than one time in the model, the first occurrence of the value will be selected.
-	Values that do not occur in the select model will be ignored.
-	@param values The values to select.
-	@exception ValidationException if the provided value is not valid.
-	@see #setSelectedIndexes(int[])
-	*/
-	public void setSelectedValues(final V... values) throws ValidationException;
-
 	/**Determines the enabled status of the first occurrence of a given value.
 	@param value The value for which the enabled status is to be determined.
 	@return <code>true</code> if the value is enabled, else <code>false</code>.
@@ -102,7 +72,7 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>
 	@param value The value to enable or disable.
 	@param newEnabled Whether the value should be enabled.
 	@see ValuePropertyChangeEvent
-	@see ControlModel#ENABLED_PROPERTY
+	@see #ENABLED_PROPERTY
 	*/
 	public void setValueEnabled(final V value, final boolean newEnabled); 
 
@@ -117,7 +87,7 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>
 	@param index The index of the value to enable or disable.
 	@param newEnabled Whether the value at the given index should be enabled.
 	@see ValuePropertyChangeEvent
-	@see ControlModel#ENABLED_PROPERTY
+	@see #ENABLED_PROPERTY
 	@exception IndexOutOfBoundsException if the given index is not within the range of the list.
 	*/
 	public void setIndexEnabled(final int index, final boolean newEnabled); 

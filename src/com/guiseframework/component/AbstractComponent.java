@@ -51,7 +51,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 	private PropertyChangeListener repeaterPropertyChangeListener=null;
 
 	/**A property change listener to repeat copies of events received, using this component as the source.*/ 
-	protected PropertyChangeListener getRepeaterPropertyChangeListener()
+	protected PropertyChangeListener getRepeaterPropertyChangeListener()	//TODO update to work with PropertyValueChangeEvent
 	{
 		if(repeaterPropertyChangeListener==null)	//if we have not yet created the repeater property change listener
 		{

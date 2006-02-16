@@ -160,10 +160,10 @@ public class HomePanel extends DefaultNavigationPanel
 		final ListControl<Float> listControl=new ListControl<Float>(session, Float.class, new SingleListSelectionPolicy<Float>());	//create a list control allowing only single selections
 		listControl.setLabel("Pick a Number");	//set the list control label
 		listControl.setRowCount(5);
-		listControl.getSelectModel().add(new Float(10));
-		listControl.getSelectModel().add(new Float(20));
-		listControl.getSelectModel().add(new Float(30));
-		listControl.getSelectModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Float>()
+		listControl.add(new Float(10));
+		listControl.add(new Float(20));
+		listControl.add(new Float(30));
+		listControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Float>()
 				{
 					public void propertyChange(final GuisePropertyChangeEvent<Float> propertyChangeEvent)
 					{
@@ -599,11 +599,11 @@ Debug.trace("list control changed value to", newValue);
 
 		final ListControl<String> listSelectControl=new ListControl<String>(session, String.class, new SingleListSelectionPolicy<String>());
 		listSelectControl.setLabel("Choose an option.");
-		listSelectControl.getSelectModel().add("The first option");
+		listSelectControl.add("The first option");
 //TODO fix		listSelectControl.getModel().add(null);
-		listSelectControl.getSelectModel().add("The second option");
-		listSelectControl.getSelectModel().add("The third option");
-		listSelectControl.getSelectModel().add("The fourth option");
+		listSelectControl.add("The second option");
+		listSelectControl.add("The third option");
+		listSelectControl.add("The fourth option");
 		
 /*TODO fix
 		listSelectControl.setValueRepresentationStrategy(new ListControl.DefaultValueRepresentationStrategy<String>(session)
@@ -692,13 +692,13 @@ Debug.trace("list control changed value to", newValue);
 		contentPanel.add(tabbedPanel);
 
 		final TabControl<String> stringTabControl=new TabControl<String>(session, String.class, Flow.LINE);
-		stringTabControl.getSelectModel().add("First tab");
-		stringTabControl.getSelectModel().add("Second tab");
-		stringTabControl.getSelectModel().add("Third tab");
+		stringTabControl.add("First tab");
+		stringTabControl.add("Second tab");
+		stringTabControl.add("Third tab");
 		contentPanel.add(stringTabControl);
 		try
 		{
-			stringTabControl.getSelectModel().setSelectedValues("First tab");
+			stringTabControl.setSelectedValues("First tab");
 		}
 		catch (ValidationException e)
 		{
@@ -720,9 +720,9 @@ Debug.trace("list control changed value to", newValue);
 						testButton.setVisible(newValue);	//update the button enabled state
 //TODO del						testButton.setVisible(newValue);	//update the button enabled state
 //TODO bring back						testButton.getModel().setEnabled(newValue);	//update the button enabled state
-//TODO del Debug.trace("ready to set tabbed panel enabled to ", newValue);
+Debug.trace("ready to set tabbed panel enabled to ", newValue);
 //TODO del						tabbedPanel.getLayout().getConstraints(helloPanel).setEnabled(newValue);	//TODO testing
-						remoteTabControl.getSelectModel().setValueEnabled(helloPanel, newValue);	//TODO testing
+						remoteTabControl.setValueEnabled(helloPanel, newValue);	//TODO testing
 					}
 				});
 

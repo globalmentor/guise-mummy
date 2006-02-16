@@ -42,7 +42,4 @@ public interface SelectModel<V> extends ValueModel<V>, Collection<V>
 	*/
 	public void setSelectedValues(final V... values) throws ValidationException;
 
-	/**@return The class representing the type of value this model can hold.*/
-	public Class<V> getValueClass();
-
 }

@@ -21,28 +21,42 @@ public interface Container<C extends Container<C>> extends CompositeComponent<C>
 
 	/**Adds a component to the container with default constraints.
 	@param component The component to add.
+	@return <code>true</code> if this container changed as a result of the operation.
 	@exception IllegalArgumentException if the component already has a parent.
 	@exception IllegalStateException the installed layout does not support default constraints.
 	*/
-	public void add(final Component<?> component);
+	public boolean add(final Component<?> component);
 
 	/**Adds a component to the container along with constraints.
 	@param component The component to add.
 	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
+	@return <code>true</code> if this container changed as a result of the operation.
 	@exception IllegalArgumentException if the component already has a parent.
 	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
 	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
 	*/
-	public void add(final Component<?> component, final Layout.Constraints constraints);
+	public boolean add(final Component<?> component, final Layout.Constraints constraints);
 
 	/**Removes a component from the container.
-	@param component The component to remove.
+	@param object The component to remove.
+	@return <code>true</code> if this collection changed as a result of the operation.
+	@throws ClassCastException if given element is not a component.
 	@exception IllegalArgumentException if the component is not a member of the container.
 	*/
-	public void remove(final Component<?> component);
+	public boolean remove(final Object component);
+
+	/**Removes the child component at the specified position in this container.
+	@param index The index of the component to removed.
+	@return The value previously at the specified position.
+	@exception IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
+	*/
+	public Component<?> remove(final int index);
 
 	/**@return The number of child components in this container.*/
 	public int size();
+
+	/**@return Whether this container contains no child components.*/
+	public boolean isEmpty();
 
 	/**Determines whether this container contains the given component.
 	@param component The component to check.
@@ -54,7 +68,13 @@ public interface Container<C extends Container<C>> extends CompositeComponent<C>
 	@param component The component the index of which should be returned.
 	@return The index in this container of the first occurrence of the specified component, or -1 if this container does not contain the given component.
 	*/
-	public int indexOf(final Component<?> component);
+	public int indexOf(final Object component);
+
+	/**Returns the index in this container of the last occurrence of the specified compoent.
+	@param component The component the last index of which should be returned.
+	@return The index in this container of the last occurrence of the specified component, or -1 if this container does not contain the given component.
+	*/
+	public int lastIndexOf(final Object component);
 
   /**Returns the component at the specified index in the container.
   @param index The index of component to return.

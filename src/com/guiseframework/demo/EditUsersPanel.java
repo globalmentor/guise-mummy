@@ -36,12 +36,12 @@ public class EditUsersPanel extends DefaultNavigationPanel
 		final List<DemoUser> applicationUserList=((DemoApplication)getSession().getApplication()).getUsers();	//get the application's list of users
 		synchronized(applicationUserList)	//don't allow others to modify the application user list while we iterate over it
 		{
-			userListControl.getSelectModel().addAll(applicationUserList);	//add all the users from the application
+			userListControl.addAll(applicationUserList);	//add all the users from the application
 		}
 
-		synchronized(userListControl.getSelectModel())	//don't allow the user select model to be changed by another thread while we sort it
+		synchronized(userListControl)	//don't allow the user select model to be changed by another thread while we sort it
 		{
-			Collections.sort(userListControl.getSelectModel());	//sort the user list model (each user implements Comparable)
+			Collections.sort(userListControl);	//sort the user list model (each user implements Comparable)
 		}
 		
 		final LayoutPanel buttonPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create the button panel flowing horizontally
@@ -64,14 +64,14 @@ public class EditUsersPanel extends DefaultNavigationPanel
 										final DemoUser newUser=((EditUserPanel)modalEvent.getSource()).getResult();	//get the modal result
 										if(newUser!=null)	//if a new user was created
 										{
-											userListControl.getSelectModel().add(newUser);	//add the new user to the list
-											synchronized(userListControl.getSelectModel())	//don't allow the user select model to be changed by another thread while we sort it
+											userListControl.add(newUser);	//add the new user to the list
+											synchronized(userListControl)	//don't allow the user select model to be changed by another thread while we sort it
 											{
-												Collections.sort(userListControl.getSelectModel());	//sort the user list model (each user implements Comparable)
+												Collections.sort(userListControl);	//sort the user list model (each user implements Comparable)
 											}
 											try
 											{
-												userListControl.getSelectModel().setSelectedValues(newUser);	//select the new user
+												userListControl.setSelectedValues(newUser);	//select the new user
 											}
 											catch(final ValidationException validationException)	//we never expect a validation exception
 											{
@@ -90,7 +90,7 @@ public class EditUsersPanel extends DefaultNavigationPanel
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
-						final DemoUser user=userListControl.getSelectModel().getSelectedValue();	//get the selected user
+						final DemoUser user=userListControl.getSelectedValue();	//get the selected user
 						if(user!=null)	//if a user is selected
 						{
 							session.navigateModal(DemoApplication.EDIT_USER_PANEL_NAVIGATION_PATH, new ModalNavigationListener()	//navigate modally to the edit user panel
@@ -104,14 +104,14 @@ public class EditUsersPanel extends DefaultNavigationPanel
 											final DemoUser newUser=((EditUserPanel)modalEvent.getSource()).getResult();	//get the modal result
 											if(newUser!=null)	//if a new user was created
 											{
-												userListControl.getSelectModel().replace(user, newUser);	//replace the user with the new user
-												synchronized(userListControl.getSelectModel())	//don't allow the user select model to be changed by another thread while we sort it
+												userListControl.replace(user, newUser);	//replace the user with the new user
+												synchronized(userListControl)	//don't allow the user select model to be changed by another thread while we sort it
 												{
-													Collections.sort(userListControl.getSelectModel());	//sort the user list model (each user implements Comparable)
+													Collections.sort(userListControl);	//sort the user list model (each user implements Comparable)
 												}
 												try
 												{
-													userListControl.getSelectModel().setSelectedValues(newUser);	//select the edited user
+													userListControl.setSelectedValues(newUser);	//select the edited user
 												}
 												catch(final ValidationException validationException)	//we never expect a validation exception
 												{
@@ -131,10 +131,10 @@ public class EditUsersPanel extends DefaultNavigationPanel
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
-						final int selectedIndex=userListControl.getSelectModel().getSelectedIndex();	//get the selected index
+						final int selectedIndex=userListControl.getSelectedIndex();	//get the selected index
 						if(selectedIndex>=0)	//if an index is selected
 						{
-							final DemoUser user=userListControl.getSelectModel().get(selectedIndex);	//get the selected user
+							final DemoUser user=userListControl.get(selectedIndex);	//get the selected user
 								//create a confirmation dialog
 							final MessageOptionDialogFrame confirmationDialog=new MessageOptionDialogFrame(session, "Are you sure you want to remove user "+user.getFirstName()+" "+user.getLastName()+"?",
 									MessageOptionDialogFrame.Option.YES, MessageOptionDialogFrame.Option.NO);	//present "yes" and "no" options to the user
@@ -145,7 +145,7 @@ public class EditUsersPanel extends DefaultNavigationPanel
 												//if the message dialog is no longer modal and the selected option is "yes"
 											if(confirmationDialog.getMode()==null && confirmationDialog.getValue()==MessageOptionDialogFrame.Option.YES)
 											{
-												userListControl.getSelectModel().remove(selectedIndex);	//remove the user at the given index												
+												userListControl.remove(selectedIndex);	//remove the user at the given index												
 											}
 										}
 									});
@@ -158,18 +158,18 @@ public class EditUsersPanel extends DefaultNavigationPanel
 		add(buttonPanel);	//add the button panel to the panel
 
 			//disable the add and remove buttons whenever there are no users 
-		userListControl.getSelectModel().addListListener(new ListListener<DemoUser>()	//listen for the list being modified
+		userListControl.addListListener(new ListListener<DemoUser>()	//listen for the list being modified
 				{
 					public void listModified(final ListEvent<DemoUser> listEvent)	//if the list is modified
 					{
-						final boolean listEmpty=userListControl.getSelectModel().isEmpty();	//see if the list is empty
+						final boolean listEmpty=userListControl.isEmpty();	//see if the list is empty
 						editButton.setEnabled(!listEmpty);	//only enable the edit button if there are users to edit
 						removeButton.setEnabled(!listEmpty);	//only enable the remove button if there are users to remove
 						final List<DemoUser> applicationUserList=((DemoApplication)getSession().getApplication()).getUsers();	//get the application's list of users
 						synchronized(applicationUserList)	//don't allow others to modify the application user list while we modify it
 						{
 							applicationUserList.clear();	//clear all the application users
-							applicationUserList.addAll(userListControl.getSelectModel());	//update the application users with the ones we are editing						
+							applicationUserList.addAll(userListControl);	//update the application users with the ones we are editing						
 						}
 					}
 				});	

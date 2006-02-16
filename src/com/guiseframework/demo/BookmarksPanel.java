@@ -46,8 +46,8 @@ public class BookmarksPanel extends DefaultNavigationPanel
 				{
 					public void propertyChange(GuisePropertyChangeEvent<Component<?>> propertyChangeEvent)	//if the tab changes
 					{
-						final String bookmarkID="step"+(tabbedPanel.getSelectModel().getSelectedIndex());	//create the bookmark ID
-						final Bookmark bookmark=new Bookmark(new Bookmark.Parameter("step", Integer.toString(tabbedPanel.getSelectModel().getSelectedIndex())));	//create a new bookmark
+						final String bookmarkID="step"+(tabbedPanel.getSelectedIndex());	//create the bookmark ID
+						final Bookmark bookmark=new Bookmark(new Bookmark.Parameter("step", Integer.toString(tabbedPanel.getSelectedIndex())));	//create a new bookmark
 						session.setBookmark(bookmark);	//save this state by setting a bookmark
 					}						
 				});
@@ -66,7 +66,7 @@ public class BookmarksPanel extends DefaultNavigationPanel
 		{
 			try
 			{
-				tabbedPanel.getSelectModel().setSelectedIndexes(stepIndex);	//select the appropriate tab
+				tabbedPanel.setSelectedIndexes(stepIndex);	//select the appropriate tab
 			}
 			catch(final ValidationException validationException)	//we should never encounter a validation problem selecting tabs
 			{

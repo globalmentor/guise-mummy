@@ -97,6 +97,8 @@ public abstract class AbstractValueControl<V, C extends ValueControl<V, C>> exte
 		}
 	}
 
+		//ValueModel delegations
+
 	/**@return The default value.*/
 	public V getDefaultValue() {return getValueModel().getDefaultValue();}
 
@@ -116,7 +118,7 @@ public abstract class AbstractValueControl<V, C extends ValueControl<V, C>> exte
 
 	/**Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators.
 	No validation occurs.
-	@see ValueModel#VALUE_PROPERTY
+	@see Value#VALUE_PROPERTY
 	*/
 	public void clearValue() {getValueModel().clearValue();}
 

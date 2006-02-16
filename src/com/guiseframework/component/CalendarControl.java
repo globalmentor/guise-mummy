@@ -297,12 +297,11 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 		{
 			final ListControl<Integer> yearListControl=new ListControl<Integer>(session, Integer.class, new SingleListSelectionPolicy<Integer>());	//create a list control allowing only single selections
 			yearListControl.setRowCount(1);	//make the list control a drop-down list
-			final ListSelectModel<Integer> yearModel=yearListControl.getSelectModel();	//get the list control model
 			for(int year=minYear; year<=maxYear; ++year)	//for each valid year
 			{
-				yearModel.add(new Integer(year));	//add this year to the choices
+				yearListControl.add(new Integer(year));	//add this year to the choices
 			}
-			yearModel.setValidator(new ValueRequiredValidator<Integer>(session));	//require a value in the year drop-down
+			yearListControl.setValidator(new ValueRequiredValidator<Integer>(session));	//require a value in the year drop-down
 			yearControl=yearListControl;	//use the year list control for the year control
 		}
 		else	//if minimum and maximum years are not specified, use a standard text control TODO update to use a spinner control as well, and auto-update the value once four characters are entered 
@@ -373,8 +372,7 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 					try
 					{
 						yearControl.setValue(new Integer(year));	//show the selected year in the text box
-						final ListSelectModel<Date> monthListModel=monthListControl.getSelectModel();	//get model of the month list control
-						monthListModel.clear();	//clear the values in the month list control
+						monthListControl.clear();	//clear the values in the month list control
 						final Calendar monthNameCalendar=(Calendar)calendar.clone();	//clone the month calendar as we step through the months
 						final int minMonth=monthNameCalendar.getActualMinimum(Calendar.MONTH);	//get the minimum month
 						final int maxMonth=monthNameCalendar.getActualMaximum(Calendar.MONTH);	//get the maximum month
@@ -383,10 +381,10 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 						{
 							++namedMonthIndex;	//keep track of the list index
 							monthNameCalendar.set(Calendar.MONTH, namedMonth);	//switch to the given month
-							monthListModel.add(monthNameCalendar.getTime());	//add this month date
+							monthListControl.add(monthNameCalendar.getTime());	//add this month date
 							if(namedMonth==month)	//if this is the selected month
 							{
-								monthListModel.setSelectedIndexes(namedMonthIndex);	//select this month
+								monthListControl.setSelectedIndexes(namedMonthIndex);	//select this month
 							}
 						}
 					}

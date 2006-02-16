@@ -6,11 +6,8 @@ import com.guiseframework.model.*;
 @param <V> The type of values to select.
 @author Garret Wilson
 */
-public interface ListSelectControl<V, C extends ListSelectControl<V, C>> extends SelectControl<V, C>
+public interface ListSelectControl<V, C extends ListSelectControl<V, C>> extends SelectControl<V, C>, ListSelectModel<V>
 {
-
-	/**@return The list select model used by this component.*/
-	public ListSelectModel<V> getSelectModel();
 
 	/**@return The strategy used to generate a component to represent each value in the model.*/
 	public ValueRepresentationStrategy<V> getValueRepresentationStrategy();

@@ -10,7 +10,6 @@ import com.guiseframework.component.layout.*;
 import com.guiseframework.event.ContainerEvent;
 import com.guiseframework.event.ContainerListener;
 import com.guiseframework.event.PostponedContainerEvent;
-import com.guiseframework.model.Model;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
@@ -31,6 +30,9 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	/**@return The number of child components in this container.*/
 	public int size() {return getComponentList().size();}
 
+	/**@return Whether this container contains no child components.*/
+	public boolean isEmpty() {return getComponentList().isEmpty();}
+
 	/**Determines whether this container contains the given component.
 	@param component The component to check.
 	@return <code>true</code> if this container contains the given component.
@@ -41,7 +43,13 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@param component The component the index of which should be returned.
 	@return The index in this container of the first occurrence of the specified component, or -1 if this container does not contain the given component.
 	*/
-	public int indexOf(final Component<?> component) {return getComponentList().indexOf(component);}
+	public int indexOf(final Object component) {return getComponentList().indexOf(component);}
+
+	/**Returns the index in this container of the last occurrence of the specified compoent.
+	@param component The component the last index of which should be returned.
+	@return The index in this container of the last occurrence of the specified component, or -1 if this container does not contain the given component.
+	*/
+	public int lastIndexOf(final Object component) {return getComponentList().lastIndexOf(component);}
 
   /**Returns the component at the specified index in the container.
   @param index The index of the component to return.
@@ -52,35 +60,38 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 
 	/**Adds a component to the container with default constraints.
 	@param component The component to add.
+	@return <code>true</code> if this container changed as a result of the operation.
 	@exception IllegalArgumentException if the component already has a parent.
 	@exception IllegalStateException the installed layout does not support default constraints.
 	*/
-	public void add(final Component<?> component)
+	public boolean add(final Component<?> component)
 	{
-		add(component, null);	//add the component, indicating default constraints should be used
+		return add(component, null);	//add the component, indicating default constraints should be used
 	}
 
 	/**Adds a component to the container along with constraints.
 	@param component The component to add.
 	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
+	@return <code>true</code> if this container changed as a result of the operation.
 	@exception IllegalArgumentException if the component already has a parent.
 	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
 	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
 	*/
-	public void add(final Component<?> component, final Layout.Constraints constraints)
+	public boolean add(final Component<?> component, final Layout.Constraints constraints)
 	{
-		add(component, getLayout(), constraints);	//add the component with the given constraints
+		return add(component, getLayout(), constraints);	//add the component with the given constraints
 	}
 
 	/**Adds a component to the container.
 	@param component The component to add.
 	@param layout The currently installed layout.
 	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
+	@return <code>true</code> if this container changed as a result of the operation.
 	@exception IllegalArgumentException if the component already has a parent.
 	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
 	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
 	*/
-	protected <T extends Layout.Constraints> void add(final Component<?> component, final Layout<T> layout, final Object constraints)	//TODO check ClassCastException---it will not be thrown here
+	protected <T extends Layout.Constraints> boolean add(final Component<?> component, final Layout<T> layout, final Object constraints)	//TODO check ClassCastException---it will not be thrown here
 	{
 		if(component.getParent()!=null)	//if this component has already been added to container
 		{
@@ -91,14 +102,18 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 //TODO del; moved to AbstractCompositeComponent		component.setParent(this);	//tell the component who its parent is
 		layout.setConstraints(component, layoutConstraints);	//tell the layout the constraints
 		fireContainerModified(indexOf(component), component, null);	//indicate the component was added at the index
+		return true;	//TODO improve to determine if the container was actually modified
 	}
 
 	/**Removes a component from the container.
-	@param component The component to remove.
+	@param componentObject The component to remove.
+	@return <code>true</code> if this collection changed as a result of the operation.
+	@throws ClassCastException if given element is not a component.
 	@exception IllegalArgumentException if the component is not a member of the container.
 	*/
-	public void remove(final Component<?> component)
+	public boolean remove(final Object componentObject)
 	{
+		final Component<?> component=(Component<?>)componentObject;	//cast the object to a component
 		if(component.getParent()!=this)	//if this component is not a member of this container
 		{
 			throw new IllegalArgumentException("Component "+component+" is not member of container "+this+".");
@@ -108,6 +123,19 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		removeComponent(component);	//remove the component from the list
 //TODO del; moved to AbstractdCompositeComponent		component.setParent(null);	//tell the component it no longer has a parent
 		fireContainerModified(index, null, component);	//indicate the component was removed from the index
+		return true;	//TODO improve to determine if the container was actually modified
+	}
+
+	/**Removes the child component at the specified position in this container.
+	@param index The index of the component to removed.
+	@return The value previously at the specified position.
+	@exception IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
+	*/
+	public Component<?> remove(final int index)
+	{
+		final Component<?> component=get(index);	//get the component at this index
+		remove(component);	//remove the component
+		return component;	//return the component that was removed
 	}
 
 	/**Removes all of the components from this container.*/

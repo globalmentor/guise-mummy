@@ -48,11 +48,11 @@ public class CalendarsPanel extends DefaultNavigationPanel
 		localeListControl.setLabel("Locale");	//set the list control label
 		localeListControl.setValidator(new ValueRequiredValidator<Locale>(session));	//require a locale to be selected in the list control
 		localeListControl.setRowCount(1);	//make this a drop-down list
-		localeListControl.getSelectModel().add(session.getLocale());	//add the current locale
-		localeListControl.getSelectModel().add(Locale.FRANCE);
-		localeListControl.getSelectModel().add(Locale.CHINA);
-		localeListControl.getSelectModel().add(new Locale("ar"));
-		localeListControl.getSelectModel().addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Locale>()	//listen for selection changes
+		localeListControl.add(session.getLocale());	//add the current locale
+		localeListControl.add(Locale.FRANCE);
+		localeListControl.add(Locale.CHINA);
+		localeListControl.add(new Locale("ar"));
+		localeListControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Locale>()	//listen for selection changes
 				{
 					public void propertyChange(final GuisePropertyChangeEvent<Locale> propertyChangeEvent)	//if the locale selection changes
 					{
@@ -65,7 +65,7 @@ public class CalendarsPanel extends DefaultNavigationPanel
 				});
 		try
 		{
-			localeListControl.getSelectModel().setSelectedValues(session.getLocale());	//show the session locale selected
+			localeListControl.setSelectedValues(session.getLocale());	//show the session locale selected
 		}
 		catch(final ValidationException validationException)	//any of the values can be selected, so we don't expect any errors
 		{

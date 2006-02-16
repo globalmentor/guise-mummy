@@ -736,10 +736,8 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 		}
 		fireListModified(index, addedElement, removedElement);	//fire an event indicating that the list changed
 	}
-
 	
 	/**Fires an event to all registered list listeners indicating the list was modified.
-	This method first manually notifies its selection strategy that the list has changed.
 	@param index The index at which an element was added and/or removed, or -1 if the index is unknown.
 	@param addedElement The element that was added to the list, or <code>null</code> if no element was added or it is unknown whether or which elements were added.
 	@param removedElement The element that was removed from the list, or <code>null</code> if no element was removed or it is unknown whether or which elements were removed.
