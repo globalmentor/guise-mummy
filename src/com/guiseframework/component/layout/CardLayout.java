@@ -421,6 +421,19 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 			this(true);	//enable the card
 			this.labelText=labelText;	//save the label text
 		}
+
+		/**Label model constructor.
+		@param labelModel The label model providing label information.
+		*/
+		public Constraints(final LabelModel labelModel)	//TODO improve entire class to obviate this constructor; right now the label model is only copied rather than used in delegation
+		{
+			this(true);	//enable the card
+			setIcon(labelModel.getIcon());	//initialize the constraints
+			setIconResourceKey(labelModel.getIconResourceKey());
+			setLabel(labelModel.getLabel());
+			setLabelContentType(labelModel.getLabelContentType());
+			setLabelResourceKey(labelModel.getLabelResourceKey());
+		}
 	}
 
 	/**A property change listener that listens for changes in a constraint object's properties and fires a layout constraints property change event in response.

@@ -25,6 +25,8 @@ This component installs a default export strategy supporting export of the follo
 public class Image extends AbstractComponent<Image>
 {
 
+	/**The bound property of whether the description is visible.*/
+	public final static String DESCRIPTION_VISIBLE_PROPERTY=getPropertyName(Image.class, "descriptionVisible");
 	/**The image bound property.*/
 	public final static String IMAGE_PROPERTY=getPropertyName(Image.class, "image");
 	/**The image opacity bound property.*/
@@ -47,6 +49,29 @@ public class Image extends AbstractComponent<Image>
 
 	/**The bound property of whether the component has image dragging enabled.*/
 //TODO del if not needed	public final static String IMAGE_DRAG_ENABLED_PROPERTY=getPropertyName(Image.class, "imageDragEnabled");
+
+	/**Whether the description is visible.*/
+	private boolean descriptionVisible=true;
+
+		/**@return Whether the description is visible.
+		@see #isDisplayed()
+		*/
+		public boolean isDescriptionVisible() {return descriptionVisible;}
+
+		/**Sets whether the description is visible.
+		This is a bound property of type <code>Boolean</code>.
+		@param newDescriptionVisible <code>true</code> if the description should be visible, else <code>false</code>.
+		@see #DESCRIPTION_VISIBLE_PROPERTY
+		*/
+		public void setDescriptionVisible(final boolean newDescriptionVisible)
+		{
+			if(descriptionVisible!=newDescriptionVisible)	//if the value is really changing
+			{
+				final boolean oldDescriptionVisible=descriptionVisible;	//get the current value
+				descriptionVisible=newDescriptionVisible;	//update the value
+				firePropertyChange(DESCRIPTION_VISIBLE_PROPERTY, Boolean.valueOf(oldDescriptionVisible), Boolean.valueOf(newDescriptionVisible));
+			}
+		}
 
 	/**The image URI, or <code>null</code> if there is no image URI.*/
 	private URI image=null;

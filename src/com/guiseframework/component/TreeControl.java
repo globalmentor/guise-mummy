@@ -12,8 +12,14 @@ import com.guiseframework.model.*;
 /**A tree control.
 @author Garret Wilson
 */
-public class TreeControl extends AbstractCompositeStateComponent<TreeNodeModel<?>, TreeControl.TreeNodeComponentState, TreeControl> implements Control<TreeControl>	//TODO important: fix class
+public class TreeControl extends AbstractCompositeStateComponent<TreeNodeModel<?>, TreeControl.TreeNodeComponentState, TreeControl> implements Control<TreeControl>, TreeModel
 {
+
+	/**The tree model used by this component.*/
+	private final TreeModel treeModel;
+
+		/**@return The tree model used by this component.*/
+		protected TreeModel getTreeModel() {return treeModel;}
 
 	/**Whether the control is enabled and can receive user input.*/
 	private boolean enabled=true;
@@ -35,12 +41,6 @@ public class TreeControl extends AbstractCompositeStateComponent<TreeNodeModel<?
 				firePropertyChange(ENABLED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newEnabled));	//indicate that the value changed
 			}			
 		}
-
-	/**The tree model used by this component.*/
-	private final TreeModel treeModel;
-
-		/**@return The tree model used by this component.*/
-		public TreeModel getTreeModel() {return treeModel;}
 
 	/**Whether the state of the control represents valid user input.*/
 	private boolean valid=true;
@@ -167,11 +167,20 @@ public class TreeControl extends AbstractCompositeStateComponent<TreeNodeModel<?
 	public TreeControl(final GuiseSession session, final String id, final TreeModel treeModel)
 	{
 		super(session, id);	//construct the parent class
-		setTreeNodeRepresentationStrategy(Object.class, new DefaultValueRepresentationStrategy<Object>(session));	//create a default representation strategy and set it as the default by associating it with the Object class
-//TODO fix		setTreeNodeRepresentationStrategy(LabelModel.class, new LabelModelRepresentationStrategy(session));	//create and associate a label model representation strategy
-//TODO fix		setTreeNodeRepresentationStrategy(MessageModel.class, new MessageModelRepresentationStrategy(session));	//create and associate a message model representation strategy
 		this.treeModel=checkNull(treeModel, "Tree model cannot be null.");	//save the tree model
+		this.treeModel.addPropertyChangeListener(getRepeaterPropertyChangeListener());	//listen and repeat all property changes of the tree model
+			//TODO listen for and repeat tree model-specific events
+		setTreeNodeRepresentationStrategy(Object.class, new DefaultValueRepresentationStrategy<Object>(session));	//create a default representation strategy and set it as the default by associating it with the Object class
+		setTreeNodeRepresentationStrategy(LabelModel.class, new LabelModelRepresentationStrategy(session));	//create and associate a label model representation strategy
+//TODO fix		setTreeNodeRepresentationStrategy(MessageModel.class, new MessageModelRepresentationStrategy(session));	//create and associate a message model representation strategy
+		setTreeNodeRepresentationStrategy(TextModel.class, new TextModelRepresentationStrategy(session));	//create and associate a text model representation strategy
 	}
+
+		//TreeModel delegations
+	
+	/**@return The root node of the tree model.*/
+	public TreeNodeModel<?> getRootNode() {return getTreeModel().getRootNode();}
+
 
 	/**An encapsulation of a component for a tree node along with other metadata, such as whether the component was editable when created.
 	@author Garret Wilson
@@ -213,8 +222,6 @@ public class TreeControl extends AbstractCompositeStateComponent<TreeNodeModel<?
 		@param focused <code>true</code> if the value has the focus.
 		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
 		*/
-//TODO del		public Component<?> createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<V> treeNode, final boolean editable, final boolean selected, final boolean focused);
-//TODO bring back after Eclipse fixes its bug		public <N extends V> Component<?> createComponent(final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused);
 		public <N extends V> Component<?> createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused);
 	}
 
@@ -264,8 +271,6 @@ public class TreeControl extends AbstractCompositeStateComponent<TreeNodeModel<?
 	@see Object#hashCode() 
 	@author Garret Wilson
 	*/
-//TODO del	public static class DefaultValueRepresentationStrategy<N> extends AbstractValueRepresentationStrategy<N>
-//TODO bring back after Eclipse fixes its bug	public static class DefaultValueRepresentationStrategy<V> extends AbstractValueRepresentationStrategy<V>
 	public static class DefaultValueRepresentationStrategy<V> extends AbstractValueRepresentationStrategy<V>
 	{
 
@@ -291,8 +296,6 @@ public class TreeControl extends AbstractCompositeStateComponent<TreeNodeModel<?
 		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
 		*/
 		@SuppressWarnings("unchecked")
-//TODO del		public Component<?> createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
-//TODO bring back after Eclipse fixes its bug		public <N extends V> Component<?> createComponent(final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
 		public <N extends V> Component<?> createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
 		{
 			final GuiseSession session=getSession();	//get the session
@@ -330,19 +333,17 @@ public class TreeControl extends AbstractCompositeStateComponent<TreeNodeModel<?
 	@see Label
 	@author Garret Wilson
 	*/
-	public static class LabelModelRepresentationStrategy //TODO fix extends AbstractValueRepresentationStrategy<LabelModel>
+	public static class LabelModelRepresentationStrategy extends AbstractValueRepresentationStrategy<LabelModel>
 	{
 
 		/**Session constructor.
 		@param session The Guise session that owns this representation strategy.
 		@exception NullPointerException if the given session is <code>null</code>.
 		*/
-/*TODO fix
 		public LabelModelRepresentationStrategy(final GuiseSession session)
 		{
 			super(session);	//construct the parent class
 		}
-*/
 
 		/**Creates a label to represent the given tree node.
 		@param <N> The type of value contained in the node.
@@ -354,16 +355,46 @@ public class TreeControl extends AbstractCompositeStateComponent<TreeNodeModel<?
 		@param focused <code>true</code> if the value has the focus.
 		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
 		*/
-//TODO del		public Label createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<LabelModel> treeNode, final boolean editable, final boolean selected, final boolean focused)
-//TODO bring back after Eclipse fixes its bug		public <N extends LabelModel> Label createComponent(final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
-/*TODO fix
 		public <N extends LabelModel> Label createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
 		{
 			final GuiseSession session=getSession();	//get the session
 			final String id=treeControl.createID(getID(treeNode.getValue()));	//get the ID from the value TODO don't get the ID from the value, as this can change if edited
 			return new Label(session, id, treeNode.getValue());	//return a label from the label model
 		}
-*/
+	}
+
+	/**A tree node representation strategy for a {@link TextModel}, generating a {@link Text} component.
+	@see Message
+	@author Garret Wilson
+	*/
+	public static class TextModelRepresentationStrategy extends AbstractValueRepresentationStrategy<TextModel>
+	{
+
+		/**Session constructor.
+		@param session The Guise session that owns this representation strategy.
+		@exception NullPointerException if the given session is <code>null</code>.
+		*/
+		public TextModelRepresentationStrategy(final GuiseSession session)
+		{
+			super(session);	//construct the parent class
+		}
+
+		/**Creates a text component to represent the given tree node.
+		@param <N> The type of value contained in the node.
+		@param treeControl The component containing the model.
+		@param model The model containing the value.
+		@param treeNode The node containing the value. 
+		@param editable Whether values in this column are editable.
+		@param selected <code>true</code> if the value is selected.
+		@param focused <code>true</code> if the value has the focus.
+		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
+		*/
+		public <N extends TextModel> Text createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
+		{
+			final GuiseSession session=getSession();	//get the session
+			final String id=treeControl.createID(getID(treeNode.getValue()));	//get the ID from the value TODO don't get the ID from the value, as this can change if edited
+			return new Text(session, id, treeNode.getValue());	//return a message from the message model
+		}
 	}
 
 	/**A tree node representation strategy for a message model, generating a message component.

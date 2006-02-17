@@ -18,8 +18,14 @@ import com.guiseframework.validator.*;
 /**A table component.
 @author Garret Wilson
 */
-public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, Table.CellComponentState, Table> implements Control<Table>
+public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, Table.CellComponentState, Table> implements Control<Table>, TableModel
 {
+
+	/**The table model used by this component.*/
+	private final TableModel tableModel;
+
+		/**@return The table model used by this component.*/
+		protected TableModel getTableModel() {return tableModel;}
 
 	/**Whether the table is editable and the cells will allow the the user to change their values, if their respective columns are designated as editable as well.*/
 	private boolean editable=true;
@@ -62,12 +68,6 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 				firePropertyChange(ENABLED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newEnabled));	//indicate that the value changed
 			}			
 		}
-
-	/**The table model used by this component.*/
-	private final TableModel tableModel;
-
-		/**@return The table model used by this component.*/
-		public TableModel getTableModel() {return tableModel;}
 
 	/**The map of cell representation strategies for columns.*/
 	private final Map<TableColumnModel<?>, CellRepresentationStrategy<?>> columnCellRepresentationStrategyMap=new ConcurrentHashMap<TableColumnModel<?>, CellRepresentationStrategy<?>>();
@@ -248,6 +248,9 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 	public Table(final GuiseSession session, final String id, final TableModel tableModel)
 	{
 		super(session, id);	//construct the parent class
+		this.tableModel=checkNull(tableModel, "Table model cannot be null.");	//save the table model
+		this.tableModel.addPropertyChangeListener(getRepeaterPropertyChangeListener());	//listen and repeat all property changes of the table model
+			//TODO listen to and repeat table model events
 		for(final TableColumnModel<?> column:tableModel.getColumns())	//install a default cell representation strategy for each column
 		{
 			installDefaultCellRepresentationStrategy(column);	//create and install a default representation strategy for this column
@@ -259,8 +262,62 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 						clearComponentStates();	//clear all the components and component states in case they are locale-related TODO probably transfer this up to the abstract composite state class
 					}			
 				});
-		this.tableModel=checkNull(tableModel, "Tree model cannot be null.");	//save the table model
 	}
+
+		//TableModel delegations
+
+	/**Determines the logical index of the given table column.
+	@param column One of the table columns.
+	@return The zero-based logical index of the column within the table, or -1 if the column is not one of the model's columns.
+	*/
+	public int getColumnIndex(final TableColumnModel<?> column) {return getTableModel().getColumnIndex(column);}
+
+	/**@return A read-only list of table columns in physical order.*/ 
+	public List<TableColumnModel<?>> getColumns() {return getTableModel().getColumns();}
+
+	/**@return The number of rows in this table.*/
+	public int getRowCount() {return getTableModel().getRowCount();}
+
+	/**@return The number of columns in this table.*/
+	public int getColumnCount() {return getTableModel().getColumnCount();}
+
+	/**Returns the cell value for the given cell.
+	@param <C> The type of cell value.
+	@param cell The cell containing the row index and column information.
+	@return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
+	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	*/
+	public <C> C getCellValue(final Cell<C> cell) {return getTableModel().getCellValue(cell);}
+
+	/**Returns the cell value at the given row and column.
+	@param <C> The type of cell values in the given column.
+	@param rowIndex The zero-based row index.
+	@param column The column for which a value should be returned.
+	@return The value in the cell at the given row and column, or <code>null</code> if there is no value in that cell.
+	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	*/
+	public <C> C getCellValue(final int rowIndex, final TableColumnModel<C> column) {return getTableModel().getCellValue(rowIndex, column);}
+
+	/**Sets the cell value for the given cell.
+	@param <C> The type of cell value.
+	@param cell The cell containing the row index and column information.
+	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
+	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	*/
+	public <C> void setCellValue(final Cell<C> cell, final C newCellValue) {getTableModel().setCellValue(cell, newCellValue);}
+
+	/**Sets the cell value at the given row and column.
+	@param <C> The type of cell values in the given column.
+	@param rowIndex The zero-based row index.
+	@param column The column for which a value should be returned.
+	@param newCellValue The value to place in the cell at the given row and column, or <code>null</code> if there should be no value in that cell.
+	@exception IndexOutOfBoundsException if the given row index represents an invalid location for the table.
+	@exception IllegalArgumentException if the given column is not one of this table's columns.
+	*/
+	public <C> void setCellValue(final int rowIndex, final TableColumnModel<C> column, final C newCellValue) {getTableModel().setCellValue(rowIndex, column, newCellValue);}
 
 	/**An encapsulation of a component for a cell along with other metadata, such as whether the component was editable when created.
 	@author Garret Wilson

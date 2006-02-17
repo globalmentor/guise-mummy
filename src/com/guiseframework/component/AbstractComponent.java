@@ -76,24 +76,6 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**@return The label model used by this component.*/
 		protected LabelModel getLabelModel() {return labelModel;}
 
-		/**Sets the data model used the component.
-		This is a bound property.
-		@param newModel The new data model used by this component.
-		@exception NullPointerException if the given model is <code>null</code>.
-		@see Component#MODEL_PROPERTY
-		*/
-/*TODO del
-		protected void setModel(final Model newModel)	//TODO eventually remove model from component and promote to control or something higher, probably storing separate types
-		{
-			if(model!=checkNull(newModel, "Model cannot be null."))	//if the value is really changing
-			{
-				final Model oldModel=model;	//get the old value
-				model=newModel;	//actually change the value
-				firePropertyChange(MODEL_PROPERTY, oldModel, newModel);	//indicate that the value changed
-			}			
-		}
-*/
-	
 	/**The name of the component, not guaranteed to be unique and useful only for searching for components within a component sub-hierarchy, or <code>null</code> if the component has no name.*/
 	private String name=null;
 

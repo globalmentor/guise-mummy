@@ -12,16 +12,6 @@ The model is thread-safe, synchronized on itself. Any iteration over values shou
 public interface TableModel extends Model	//TODO maybe specify row count to be a bound property 
 {
 
-	/**@return Whether the table is editable and the cells will allow the the user to change their values, if their respective columns are designated as editable as well.*/
-//TODO del	public boolean isEditable();
-
-	/**Sets whether the table is editable and the cells will allow the the user to change their values, if their respective columns are designated as editable as well.
-	This is a bound property of type <code>Boolean</code>.
-	@param newEditable <code>true</code> if the cells should allow the user to change their values if their respective columns are also designated as editable.
-	@see ControlModel#EDITABLE_PROPERTY
-	*/
-//TODO del	public void setEditable(final boolean newEditable);
-
 	/**Determines the logical index of the given table column.
 	@param column One of the table columns.
 	@return The zero-based logical index of the column within the table, or -1 if the column is not one of the model's columns.

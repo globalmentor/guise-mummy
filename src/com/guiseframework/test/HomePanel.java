@@ -654,7 +654,7 @@ Debug.trace("list control changed value to", newValue);
 		}
 		final Table multiplicationTable=new Table(session, Integer.class, multiplicationTableData, "0", "1");
 		multiplicationTable.setLabel("Multiplication Table");
-		for(final TableColumnModel<?> column:multiplicationTable.getTableModel().getColumns())
+		for(final TableColumnModel<?> column:multiplicationTable.getColumns())
 		{
 			column.setEditable(true);
 		}
@@ -664,9 +664,9 @@ Debug.trace("list control changed value to", newValue);
 		final TreeNodeModel<String> firstItem=new DefaultTreeNodeModel<String>(session, String.class, "First Item");
 		firstItem.add(new DefaultTreeNodeModel<String>(session, String.class, "Sub Item A"));
 		firstItem.add(new DefaultTreeNodeModel<String>(session, String.class, "Sub Item B"));
-		treeControl.getTreeModel().getRootNode().add(firstItem);
-		treeControl.getTreeModel().getRootNode().add(new DefaultTreeNodeModel<String>(session, String.class, "Second Item"));
-		treeControl.getTreeModel().getRootNode().add(new DefaultTreeNodeModel<String>(session, String.class, "Third Item"));
+		treeControl.getRootNode().add(firstItem);
+		treeControl.getRootNode().add(new DefaultTreeNodeModel<String>(session, String.class, "Second Item"));
+		treeControl.getRootNode().add(new DefaultTreeNodeModel<String>(session, String.class, "Third Item"));
 
 		contentPanel.add(treeControl);
 
