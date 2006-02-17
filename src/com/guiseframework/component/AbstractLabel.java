@@ -31,7 +31,7 @@ public abstract class AbstractLabel<C extends LabelComponent<C>> extends Abstrac
 				}
 			};
 
-	/**Session constructor with a default model.
+	/**Session constructor with a default label model.
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
@@ -40,7 +40,7 @@ public abstract class AbstractLabel<C extends LabelComponent<C>> extends Abstrac
 		this(session, (String)null);	//construct the component, indicating that a default ID should be used
 	}
 
-	/**Session and ID constructor with a default data model.
+	/**Session and ID constructor with a default label model.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@exception NullPointerException if the given session is <code>null</code>.
@@ -48,29 +48,29 @@ public abstract class AbstractLabel<C extends LabelComponent<C>> extends Abstrac
 	*/
 	public AbstractLabel(final GuiseSession session, final String id)
 	{
-		this(session, id, new DefaultModel(session));	//construct the class with a default model
+		this(session, id, new DefaultLabelModel(session));	//construct the class with a default label model
 	}
 
-	/**Session and model constructor.
+	/**Session and label model constructor.
 	@param session The Guise session that owns this component.
-	@param model The component data model.
+	@param labelModel The component label model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	*/
-	public AbstractLabel(final GuiseSession session, final Model model)
+	public AbstractLabel(final GuiseSession session, final LabelModel labelModel)
 	{
-		this(session, null, model);	//construct the class, indicating that a default ID should be used
+		this(session, null, labelModel);	//construct the class, indicating that a default ID should be used
 	}
 
-	/**Session, ID, and model constructor.
+	/**Session, ID, and label model constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
+	@param labelModel The component label model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractLabel(final GuiseSession session, final String id, final Model model)
+	public AbstractLabel(final GuiseSession session, final String id, final LabelModel labelModel)
 	{
-		super(session, id/*TODO update with data model, model*/);	//construct the parent class
+		super(session, id, labelModel);	//construct the parent class
 		addExportStrategy(DEFAULT_EXPORT_STRATEGY);	//install a default export strategy 
 	}
 

@@ -2,18 +2,13 @@ package com.guiseframework.model;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
-import java.net.URI;
-
-import javax.mail.internet.ContentType;
-
-import com.guiseframework.component.Labelable;
 import com.guiseframework.validator.Validator;
 
 /**A column in a table.
 @param <V> The type of values contained in the table column.
 @author Garret Wilson
 */
-public interface TableColumnModel<V> extends Model, Labelable
+public interface TableColumnModel<V> extends LabelModel
 {
 
 	/**The bound property of the column style ID.*/
@@ -25,58 +20,6 @@ public interface TableColumnModel<V> extends Model, Labelable
 
 	/**@return The class representing the type of values this model can hold.*/
 	public Class<V> getValueClass();
-
-	/**@return The label icon URI, or <code>null</code> if there is no icon URI.*/
-	public URI getIcon();
-
-	/**Sets the URI of the label icon.
-	This is a bound property of type <code>URI</code>.
-	@param newLabelIcon The new URI of the label icon.
-	@see #LABEL_ICON_PROPERTY
-	*/
-	public void setIcon(final URI newLabelIcon);
-
-	/**@return The label icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-	public String getIconResourceKey();
-
-	/**Sets the key identifying the URI of the label icon in the resources.
-	This is a bound property.
-	@param newIconResourceKey The new label icon URI resource key.
-	@see #LABEL_ICON_RESOURCE_KEY_PROPERTY
-	*/
-	public void setIconResourceKey(final String newIconResourceKey);
-
-	/**@return The label text, or <code>null</code> if there is no label text.*/
-	public String getLabel();
-
-	/**Sets the text of the label.
-	This is a bound property.
-	@param newLabelText The new text of the label.
-	@see #LABEL_TEXT_PROPERTY
-	*/
-	public void setLabel(final String newLabelText);
-
-	/**@return The content type of the label text.*/
-	public ContentType getLabelContentType();
-
-	/**Sets the content type of the label text.
-	This is a bound property.
-	@param newLabelTextContentType The new label text content type.
-	@exception NullPointerException if the given content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
-	@see #LABEL_TEXT_CONTENT_TYPE_PROPERTY
-	*/
-	public void setLabelContentType(final ContentType newLabelTextContentType);
-
-	/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-	public String getLabelResourceKey();
-
-	/**Sets the key identifying the text of the label in the resources.
-	This is a bound property.
-	@param newLabelTextResourceKey The new label text resource key.
-	@see #LABEL_TEXT_RESOURCE_KEY_PROPERTY
-	*/
-	public void setLabelResourceKey(final String newLabelTextResourceKey);
 
 	/**@return Whether the cells in this table column model are editable and will allow the the user to change their values.*/
 	public boolean isEditable();

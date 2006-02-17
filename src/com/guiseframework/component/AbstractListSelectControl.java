@@ -532,7 +532,7 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 		public Component<?> createComponent(final ListSelectModel<VV> model, final VV value, final int index, final boolean selected, final boolean focused)
 		{
 			final GuiseSession session=getSession();	//get the session
-			return new ValueConverterLabel<VV>(session, value, getConverter());	//create a label that will convert the value to a string
+			return new Label(session, new ValueConverterLabelModel<VV>(session, value, getConverter()));	//create a label that will convert the value to a string
 		}
 
 		/**Determines an identifier for the given object.

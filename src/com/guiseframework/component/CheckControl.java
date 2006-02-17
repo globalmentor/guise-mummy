@@ -89,14 +89,35 @@ public class CheckControl extends AbstractValueControl<Boolean, CheckControl> im
 		this(session, id, new DefaultValueModel<Boolean>(session, Boolean.class, Boolean.FALSE), checkType);	//construct the class with a default model
 	}
 
-	/**Session and model constructor with a default rectangle check type.
+	/**Session and label model constructor with a default rectangle check type.
 	@param session The Guise session that owns this component.
-	@param model The component data model.
+	@param labelModel The component label model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	*/
-	public CheckControl(final GuiseSession session, final ValueModel<Boolean> model)
+	public CheckControl(final GuiseSession session, final LabelModel labelModel)
 	{
-		this(session, null, model);	//construct the class, indicating that a default ID should be used
+		this(session, labelModel, new DefaultValueModel<Boolean>(session, Boolean.class, Boolean.FALSE));	//construct the class, indicating that a default ID and a default value model should be used
+	}
+
+	/**Session and value model constructor with a default rectangle check type.
+	@param session The Guise session that owns this component.
+	@param valueModel The component value model.
+	@exception NullPointerException if the given session and/or model is <code>null</code>.
+	*/
+	public CheckControl(final GuiseSession session, final ValueModel<Boolean> valueModel)
+	{
+		this(session, new DefaultLabelModel(session), valueModel);	//construct the class, indicating that a default ID and a default label model should be used
+	}
+
+	/**Session, label model, and value model constructor with a default rectangle check type.
+	@param session The Guise session that owns this component.
+	@param labelModel The component label model.
+	@param valueModel The component value model.
+	@exception NullPointerException if the given session and/or model is <code>null</code>.
+	*/
+	public CheckControl(final GuiseSession session, final LabelModel labelModel, final ValueModel<Boolean> valueModel)
+	{
+		this(session, null, labelModel, valueModel, CheckType.RECTANGLE);	//construct the class, indicating that a default ID should be used and that the check type should be rectangle
 	}
 
 	/**Session, ID, and model constructor with a default rectangle check type.
@@ -114,14 +135,28 @@ public class CheckControl extends AbstractValueControl<Boolean, CheckControl> im
 	/**Session, ID, model, and check type constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
+	@param valueModel The component value model.
 	@param checkType The type of check area presented to the user.
 	@exception NullPointerException if the given session, model, and/or check type is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public CheckControl(final GuiseSession session, final String id, final ValueModel<Boolean> model, final CheckType checkType)
+	public CheckControl(final GuiseSession session, final String id, final ValueModel<Boolean> valueModel, final CheckType checkType)
 	{
-		super(session, id, model);	//construct the parent class
+		this(session, id, new DefaultLabelModel(session), valueModel, checkType);	//construct the class with a default label model
+	}
+
+	/**Session, ID, model, and check type constructor.
+	@param session The Guise session that owns this component.
+	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	@param labelModel The component label model.
+	@param valueModel The component value model.
+	@param checkType The type of check area presented to the user.
+	@exception NullPointerException if the given session, model, and/or check type is <code>null</code>.
+	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	*/
+	public CheckControl(final GuiseSession session, final String id, final LabelModel labelModel, final ValueModel<Boolean> valueModel, final CheckType checkType)
+	{
+		super(session, id, labelModel, valueModel);	//construct the parent class
 		this.checkType=checkNull(checkType, "Check type cannot be null");	//save the check type
 	}
 

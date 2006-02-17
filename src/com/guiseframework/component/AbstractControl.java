@@ -1,6 +1,8 @@
 package com.guiseframework.component;
 
 import com.guiseframework.GuiseSession;
+import com.guiseframework.model.DefaultLabelModel;
+import com.guiseframework.model.LabelModel;
 
 /**An abstract implementation of a model component that allows user interaction to modify the model.
 @author Garret Wilson
@@ -60,7 +62,19 @@ public abstract class AbstractControl<C extends Control<C>> extends AbstractComp
 	*/
 	public AbstractControl(final GuiseSession session, final String id)
 	{
-		super(session, id);	//construct the parent class
+		this(session, id, new DefaultLabelModel(session));	//construct the class with a default label model
+	}
+
+	/**Session and ID constructor.
+	@param session The Guise session that owns this component.
+	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	@param labelModel The component label model.
+	@exception NullPointerException if the given session is <code>null</code>.
+	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	*/
+	public AbstractControl(final GuiseSession session, final String id, final LabelModel labelModel)
+	{
+		super(session, id, labelModel);	//construct the parent class
 	}
 
 }

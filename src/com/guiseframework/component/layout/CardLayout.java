@@ -13,7 +13,7 @@ import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.Component;
 import com.guiseframework.component.Container;
-import com.guiseframework.component.Labelable;
+import com.guiseframework.component.Control;
 import com.guiseframework.event.ListListener;
 import com.guiseframework.event.ListSelectionListener;
 import com.guiseframework.model.*;
@@ -257,32 +257,25 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 	/**Metadata about individual component layout.
 	@author Garret Wilson
 	*/
-	public static class Constraints extends AbstractLayout.AbstractConstraints implements Labelable
+	public static class Constraints extends AbstractLayout.AbstractConstraints implements LabelModel	//TODO fix hack; no session is supported for these constraints; refactor all constraints
 	{
 
-		/**The enabled bound property.*/
-		public final static String ENABLED_PROPERTY=getPropertyName(Constraints.class, "enabled");
-		/**The label icon bound property.*/
-		public final static String LABEL_ICON_PROPERTY=getPropertyName(Constraints.class, "labelIcon");
-		/**The label icon resource key bound property.*/
-		public final static String LABEL_ICON_RESOURCE_KEY_PROPERTY=getPropertyName(Constraints.class, "labelIconResourceKey");
-		/**The label text bound property.*/
-		public final static String LABEL_TEXT_PROPERTY=getPropertyName(Constraints.class, "labelText");
-		/**The label text content type bound property.*/
-		public final static String LABEL_TEXT_CONTENT_TYPE_PROPERTY=getPropertyName(Constraints.class, "labelTextContentType");
-		/**The label text resource key bound property.*/
-		public final static String LABEL_TEXT_RESOURCE_KEY_PROPERTY=getPropertyName(Constraints.class, "labelTextResourceKey");
+		/**@return The Guise session that owns this model.*/
+		public GuiseSession getSession() {throw new UnsupportedOperationException("Constraints does not currently support Guise session.");}
 
-		/**The label icon URI, or <code>null</code> if there is no icon URI.*/
+		/**@return Whether the contents of this model are valid.*/
+		public boolean isValid() {throw new UnsupportedOperationException("Constraints does not currently support isValid().");}	//TODO del
+
+		/**The icon URI, or <code>null</code> if there is no icon URI.*/
 		private URI labelIcon=null;
 
-			/**@return The label icon URI, or <code>null</code> if there is no icon URI.*/
+			/**@return The icon URI, or <code>null</code> if there is no icon URI.*/
 			public URI getIcon() {return labelIcon;}
 
-			/**Sets the URI of the label icon.
+			/**Sets the URI of the icon.
 			This is a bound property of type <code>URI</code>.
-			@param newLabelIcon The new URI of the label icon.
-			@see #LABEL_ICON_PROPERTY
+			@param newLabelIcon The new URI of the icon.
+			@see #ICON_PROPERTY
 			*/
 			public void setIcon(final URI newLabelIcon)
 			{
@@ -290,20 +283,20 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 				{
 					final URI oldLabelIcon=labelIcon;	//get the old value
 					labelIcon=newLabelIcon;	//actually change the value
-					firePropertyChange(LABEL_ICON_PROPERTY, oldLabelIcon, newLabelIcon);	//indicate that the value changed
+					firePropertyChange(LabelModel.ICON_PROPERTY, oldLabelIcon, newLabelIcon);	//indicate that the value changed
 				}			
 			}
 
-		/**The label icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
+		/**The icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
 		private String labelIconResourceKey=null;
 
-			/**@return The label icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
+			/**@return The icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
 			public String getIconResourceKey() {return labelIconResourceKey;}
 
-			/**Sets the key identifying the URI of the label icon in the resources.
+			/**Sets the key identifying the URI of the icon in the resources.
 			This is a bound property.
-			@param newIconResourceKey The new label icon URI resource key.
-			@see #LABEL_ICON_RESOURCE_KEY_PROPERTY
+			@param newIconResourceKey The new icon URI resource key.
+			@see #LABEL_RESOURCE_KEY_PROPERTY
 			*/
 			public void setIconResourceKey(final String newIconResourceKey)
 			{
@@ -311,7 +304,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 				{
 					final String oldIconResourceKey=labelIconResourceKey;	//get the old value
 					labelIconResourceKey=newIconResourceKey;	//actually change the value
-					firePropertyChange(LABEL_ICON_RESOURCE_KEY_PROPERTY, oldIconResourceKey, newIconResourceKey);	//indicate that the value changed
+					firePropertyChange(LabelModel.ICON_RESOURCE_KEY_PROPERTY, oldIconResourceKey, newIconResourceKey);	//indicate that the value changed
 				}
 			}
 
@@ -324,7 +317,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 			/**Sets the text of the label.
 			This is a bound property.
 			@param newLabelText The new text of the label.
-			@see #LABEL_TEXT_PROPERTY
+			@see #LABEL_PROPERTY
 			*/
 			public void setLabel(final String newLabelText)
 			{
@@ -332,7 +325,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 				{
 					final String oldLabel=labelText;	//get the old value
 					labelText=newLabelText;	//actually change the value
-					firePropertyChange(LABEL_TEXT_PROPERTY, oldLabel, newLabelText);	//indicate that the value changed
+					firePropertyChange(LabelModel.LABEL_PROPERTY, oldLabel, newLabelText);	//indicate that the value changed
 				}			
 			}
 
@@ -347,7 +340,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 			@param newLabelTextContentType The new label text content type.
 			@exception NullPointerException if the given content type is <code>null</code>.
 			@exception IllegalArgumentException if the given content type is not a text content type.
-			@see #LABEL_TEXT_CONTENT_TYPE_PROPERTY
+			@see #LABEL_CONTENT_TYPE_PROPERTY
 			*/
 			public void setLabelContentType(final ContentType newLabelTextContentType)
 			{
@@ -360,7 +353,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 						throw new IllegalArgumentException("Content type "+newLabelTextContentType+" is not a text content type.");
 					}
 					labelTextContentType=newLabelTextContentType;	//actually change the value
-					firePropertyChange(LABEL_TEXT_CONTENT_TYPE_PROPERTY, oldLabelTextContentType, newLabelTextContentType);	//indicate that the value changed
+					firePropertyChange(LabelModel.LABEL_CONTENT_TYPE_PROPERTY, oldLabelTextContentType, newLabelTextContentType);	//indicate that the value changed
 				}			
 			}
 
@@ -373,7 +366,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 			/**Sets the key identifying the text of the label in the resources.
 			This is a bound property.
 			@param newLabelTextResourceKey The new label text resource key.
-			@see #LABEL_TEXT_RESOURCE_KEY_PROPERTY
+			@see #LABEL_RESOURCE_KEY_PROPERTY
 			*/
 			public void setLabelResourceKey(final String newLabelTextResourceKey)
 			{
@@ -381,7 +374,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 				{
 					final String oldLabelTextResourceKey=labelTextResourceKey;	//get the old value
 					labelTextResourceKey=newLabelTextResourceKey;	//actually change the value
-					firePropertyChange(LABEL_TEXT_RESOURCE_KEY_PROPERTY, oldLabelTextResourceKey, newLabelTextResourceKey);	//indicate that the value changed
+					firePropertyChange(LabelModel.LABEL_RESOURCE_KEY_PROPERTY, oldLabelTextResourceKey, newLabelTextResourceKey);	//indicate that the value changed
 				}
 			}
 
@@ -394,7 +387,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 			/**Sets whether the the card is enabled for selection.
 			This is a bound property of type <code>Boolean</code>.
 			@param newEnabled <code>true</code> if the corresponding card can be selected.
-			@see #ENABLED_PROPERTY
+			@see Control#ENABLED_PROPERTY
 			*/
 			public void setEnabled(final boolean newEnabled)
 			{
@@ -402,7 +395,7 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 				{
 					final boolean oldEnabled=enabled;	//get the old value
 					enabled=newEnabled;	//actually change the value
-					firePropertyChange(ENABLED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newEnabled));	//indicate that the value changed
+					firePropertyChange(Control.ENABLED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newEnabled));	//indicate that the value changed
 				}			
 			}
 

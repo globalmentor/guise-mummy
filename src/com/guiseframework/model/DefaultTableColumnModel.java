@@ -1,15 +1,6 @@
 package com.guiseframework.model;
 
-import static com.garretwilson.lang.ObjectUtilities.checkNull;
-import static com.garretwilson.text.TextUtilities.isText;
-
-import java.net.URI;
-
-import javax.mail.internet.ContentType;
-
-import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
-import com.guiseframework.component.Component;
 import com.guiseframework.validator.Validator;
 
 /**The default implementation of a column in a table.
@@ -17,7 +8,7 @@ The table column model by default is not editable.
 @param <V> The type of values contained in the table column.
 @author Garret Wilson
 */
-public class DefaultTableColumnModel<V> extends AbstractModel implements TableColumnModel<V>
+public class DefaultTableColumnModel<V> extends DefaultLabelModel implements TableColumnModel<V>
 {
 
 	/**The class representing the type of values this model can hold.*/
@@ -25,118 +16,6 @@ public class DefaultTableColumnModel<V> extends AbstractModel implements TableCo
 
 		/**@return The class representing the type of values this model can hold.*/
 		public Class<V> getValueClass() {return valueClass;}
-
-	/**The icon URI, or <code>null</code> if there is no icon URI.*/
-	private URI icon=null;
-
-		/**@return The icon URI, or <code>null</code> if there is no icon URI.*/
-		public URI getIcon() {return icon;}
-
-		/**Sets the URI of the icon.
-		This is a bound property of type <code>URI</code>.
-		@param newLabelIcon The new URI of the icon.
-		@see #ICON_PROPERTY
-		*/
-		public void setIcon(final URI newLabelIcon)
-		{
-			if(!ObjectUtilities.equals(icon, newLabelIcon))	//if the value is really changing
-			{
-				final URI oldLabelIcon=icon;	//get the old value
-				icon=newLabelIcon;	//actually change the value
-				firePropertyChange(ICON_PROPERTY, oldLabelIcon, newLabelIcon);	//indicate that the value changed
-			}			
-		}
-
-	/**The icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-	private String iconResourceKey=null;
-
-		/**@return The icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-		public String getIconResourceKey() {return iconResourceKey;}
-
-		/**Sets the key identifying the URI of the icon in the resources.
-		This is a bound property.
-		@param newIconResourceKey The new icon URI resource key.
-		@see #ICON_RESOURCE_KEY_PROPERTY
-		*/
-		public void setIconResourceKey(final String newIconResourceKey)
-		{
-			if(!ObjectUtilities.equals(iconResourceKey, newIconResourceKey))	//if the value is really changing
-			{
-				final String oldIconResourceKey=iconResourceKey;	//get the old value
-				iconResourceKey=newIconResourceKey;	//actually change the value
-				firePropertyChange(ICON_RESOURCE_KEY_PROPERTY, oldIconResourceKey, newIconResourceKey);	//indicate that the value changed
-			}
-		}
-
-	/**The label text, or <code>null</code> if there is no label text.*/
-	private String label=null;
-
-		/**@return The label text, or <code>null</code> if there is no label text.*/
-		public String getLabel() {return label;}
-
-		/**Sets the text of the label.
-		This is a bound property.
-		@param newLabelText The new text of the label.
-		@see #LABEL_PROPERTY
-		*/
-		public void setLabel(final String newLabelText)
-		{
-			if(!ObjectUtilities.equals(label, newLabelText))	//if the value is really changing
-			{
-				final String oldLabel=label;	//get the old value
-				label=newLabelText;	//actually change the value
-				firePropertyChange(LABEL_PROPERTY, oldLabel, newLabelText);	//indicate that the value changed
-			}			
-		}
-
-	/**The content type of the label text.*/
-	private ContentType labelContentType=Component.PLAIN_TEXT_CONTENT_TYPE;
-
-		/**@return The content type of the label text.*/
-		public ContentType getLabelContentType() {return labelContentType;}
-
-		/**Sets the content type of the label text.
-		This is a bound property.
-		@param newLabelTextContentType The new label text content type.
-		@exception NullPointerException if the given content type is <code>null</code>.
-		@exception IllegalArgumentException if the given content type is not a text content type.
-		@see #LABEL_CONTENT_TYPE_PROPERTY
-		*/
-		public void setLabelContentType(final ContentType newLabelTextContentType)
-		{
-			checkNull(newLabelTextContentType, "Content type cannot be null.");
-			if(labelContentType!=newLabelTextContentType)	//if the value is really changing
-			{
-				final ContentType oldLabelTextContentType=labelContentType;	//get the old value
-				if(!isText(newLabelTextContentType))	//if the new content type is not a text content type
-				{
-					throw new IllegalArgumentException("Content type "+newLabelTextContentType+" is not a text content type.");
-				}
-				labelContentType=newLabelTextContentType;	//actually change the value
-				firePropertyChange(LABEL_CONTENT_TYPE_PROPERTY, oldLabelTextContentType, newLabelTextContentType);	//indicate that the value changed
-			}			
-		}
-
-	/**The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-	private String labelResourceKey=null;
-	
-		/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-		public String getLabelResourceKey() {return labelResourceKey;}
-	
-		/**Sets the key identifying the text of the label in the resources.
-		This is a bound property.
-		@param newLabelTextResourceKey The new label text resource key.
-		@see #LABEL_RESOURCE_KEY_PROPERTY
-		*/
-		public void setLabelResourceKey(final String newLabelTextResourceKey)
-		{
-			if(!ObjectUtilities.equals(labelResourceKey, newLabelTextResourceKey))	//if the value is really changing
-			{
-				final String oldLabelTextResourceKey=labelResourceKey;	//get the old value
-				labelResourceKey=newLabelTextResourceKey;	//actually change the value
-				firePropertyChange(LABEL_RESOURCE_KEY_PROPERTY, oldLabelTextResourceKey, newLabelTextResourceKey);	//indicate that the value changed
-			}
-		}
 
 	/**Whether the cells in this table column model are editable and will allow the the user to change their values.*/
 	private boolean editable=false;
@@ -267,7 +146,7 @@ public class DefaultTableColumnModel<V> extends AbstractModel implements TableCo
 	{
 		super(session);	//construct the parent class
 		this.valueClass=valueClass;	//save the value class
-		this.label=labelText;	//save the label text
+		setLabel(labelText);	//save the label text
 	}
 	
 }

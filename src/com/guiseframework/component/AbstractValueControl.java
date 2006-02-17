@@ -66,15 +66,28 @@ public abstract class AbstractValueControl<V, C extends ValueControl<V, C>> exte
 	/**Session, ID, and model constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param valueModel The component data model.
+	@param valueModel The component value model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
 	public AbstractValueControl(final GuiseSession session, final String id, final ValueModel<V> valueModel)
 	{
-		super(session, id);	//construct the parent class
+		this(session, id, new DefaultLabelModel(session), valueModel);	//construct the class with a default label model
+	}
+
+	/**Session, ID, and model constructor.
+	@param session The Guise session that owns this component.
+	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	@param labelModel The component label model.
+	@param valueModel The component value model.
+	@exception NullPointerException if the given session and/or model is <code>null</code>.
+	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	*/
+	public AbstractValueControl(final GuiseSession session, final String id, final LabelModel labelModel, final ValueModel<V> valueModel)
+	{
+		super(session, id, labelModel);	//construct the parent class
 		this.valueModel=checkNull(valueModel, "Value model cannot be null.");	//save the value model
-		this.valueModel.addPropertyChangeListener(getRepeaterPropertyChangeListener());	//listen an repeat all property changes of the value model
+		this.valueModel.addPropertyChangeListener(getRepeaterPropertyChangeListener());	//listen and repeat all property changes of the value model
 	}
 
 	/**Validates the model of this component and all child components.

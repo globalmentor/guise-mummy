@@ -22,7 +22,7 @@ import com.guiseframework.controller.ControlEvent;
 import com.guiseframework.controller.Controller;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
-import com.guiseframework.model.Model;
+import com.guiseframework.model.*;
 import com.guiseframework.style.Color;
 import com.guiseframework.view.View;
 
@@ -70,11 +70,11 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 	@SuppressWarnings("unchecked")
 	protected final C getThis() {return (C)this;}
 
-	/**The data model used by this component.*/
-//TODO del	private final Model model;
+	/**The label model used by this component.*/
+	private final LabelModel labelModel;
 
-		/**@return The data model used by this component.*/
-//TODO del		public Model getModel() {return model;}
+		/**@return The label model used by this component.*/
+		protected LabelModel getLabelModel() {return labelModel;}
 
 		/**Sets the data model used the component.
 		This is a bound property.
@@ -103,7 +103,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**Sets the name of the component.
 		This is a bound property.
 		@param newName The new name of the component, or <code>null</code> if the component should have no name.
-		@see Component#NAME_PROPERTY 
+		@see #NAME_PROPERTY 
 		*/
 		public void setName(final String newName)
 		{
@@ -115,117 +115,57 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			}			
 		}
 
-	/**The icon URI, or <code>null</code> if there is no icon URI.*/
-	private URI icon=null;
+	/**@return The icon URI, or <code>null</code> if there is no icon URI.*/
+	public URI getIcon() {return getLabelModel().getIcon();}
 
-		/**@return The icon URI, or <code>null</code> if there is no icon URI.*/
-		public URI getIcon() {return icon;}
+	/**Sets the URI of the icon.
+	This is a bound property of type <code>URI</code>.
+	@param newLabelIcon The new URI of the icon.
+	@see #ICON_PROPERTY
+	*/
+	public void setIcon(final URI newLabelIcon) {getLabelModel().setIcon(newLabelIcon);}
 
-		/**Sets the URI of the icon.
-		This is a bound property of type <code>URI</code>.
-		@param newLabelIcon The new URI of the icon.
-		@see #ICON_PROPERTY
-		*/
-		public void setIcon(final URI newLabelIcon)
-		{
-			if(!ObjectUtilities.equals(icon, newLabelIcon))	//if the value is really changing
-			{
-				final URI oldLabelIcon=icon;	//get the old value
-				icon=newLabelIcon;	//actually change the value
-				firePropertyChange(ICON_PROPERTY, oldLabelIcon, newLabelIcon);	//indicate that the value changed
-			}			
-		}
+	/**@return The icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
+	public String getIconResourceKey() {return getLabelModel().getIconResourceKey();}
 
-	/**The icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-	private String iconResourceKey=null;
+	/**Sets the key identifying the URI of the icon in the resources.
+	This is a bound property.
+	@param newIconResourceKey The new icon URI resource key.
+	@see #ICON_RESOURCE_KEY_PROPERTY
+	*/
+	public void setIconResourceKey(final String newIconResourceKey) {getLabelModel().setIconResourceKey(newIconResourceKey);}
 
-		/**@return The icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-		public String getIconResourceKey() {return iconResourceKey;}
+	/**@return The label text, or <code>null</code> if there is no label text.*/
+	public String getLabel() {return getLabelModel().getLabel();}
 
-		/**Sets the key identifying the URI of the icon in the resources.
-		This is a bound property.
-		@param newIconResourceKey The new icon URI resource key.
-		@see #ICON_RESOURCE_KEY_PROPERTY
-		*/
-		public void setIconResourceKey(final String newIconResourceKey)
-		{
-			if(!ObjectUtilities.equals(iconResourceKey, newIconResourceKey))	//if the value is really changing
-			{
-				final String oldIconResourceKey=iconResourceKey;	//get the old value
-				iconResourceKey=newIconResourceKey;	//actually change the value
-				firePropertyChange(ICON_RESOURCE_KEY_PROPERTY, oldIconResourceKey, newIconResourceKey);	//indicate that the value changed
-			}
-		}
+	/**Sets the text of the label.
+	This is a bound property.
+	@param newLabelText The new text of the label.
+	@see #LABEL_PROPERTY
+	*/
+	public void setLabel(final String newLabelText) {getLabelModel().setLabel(newLabelText);}
 
-	/**The label text, or <code>null</code> if there is no label text.*/
-	private String label=null;
+	/**@return The content type of the label text.*/
+	public ContentType getLabelContentType() {return getLabelModel().getLabelContentType();}
 
-		/**@return The label text, or <code>null</code> if there is no label text.*/
-		public String getLabel() {return label;}
+	/**Sets the content type of the label text.
+	This is a bound property.
+	@param newLabelTextContentType The new label text content type.
+	@exception NullPointerException if the given content type is <code>null</code>.
+	@exception IllegalArgumentException if the given content type is not a text content type.
+	@see #LABEL_CONTENT_TYPE_PROPERTY
+	*/
+	public void setLabelContentType(final ContentType newLabelTextContentType) {getLabelModel().setLabelContentType(newLabelTextContentType);}
 
-		/**Sets the text of the label.
-		This is a bound property.
-		@param newLabelText The new text of the label.
-		@see #LABEL_PROPERTY
-		*/
-		public void setLabel(final String newLabelText)
-		{
-			if(!ObjectUtilities.equals(label, newLabelText))	//if the value is really changing
-			{
-				final String oldLabel=label;	//get the old value
-				label=newLabelText;	//actually change the value
-				firePropertyChange(LABEL_PROPERTY, oldLabel, newLabelText);	//indicate that the value changed
-			}			
-		}
+	/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
+	public String getLabelResourceKey() {return getLabelModel().getLabelResourceKey();}
 
-	/**The content type of the label text.*/
-	private ContentType labelContentType=PLAIN_TEXT_CONTENT_TYPE;
-
-		/**@return The content type of the label text.*/
-		public ContentType getLabelContentType() {return labelContentType;}
-
-		/**Sets the content type of the label text.
-		This is a bound property.
-		@param newLabelTextContentType The new label text content type.
-		@exception NullPointerException if the given content type is <code>null</code>.
-		@exception IllegalArgumentException if the given content type is not a text content type.
-		@see #LABEL_CONTENT_TYPE_PROPERTY
-		*/
-		public void setLabelContentType(final ContentType newLabelTextContentType)
-		{
-			checkNull(newLabelTextContentType, "Content type cannot be null.");
-			if(labelContentType!=newLabelTextContentType)	//if the value is really changing
-			{
-				final ContentType oldLabelTextContentType=labelContentType;	//get the old value
-				if(!isText(newLabelTextContentType))	//if the new content type is not a text content type
-				{
-					throw new IllegalArgumentException("Content type "+newLabelTextContentType+" is not a text content type.");
-				}
-				labelContentType=newLabelTextContentType;	//actually change the value
-				firePropertyChange(LABEL_CONTENT_TYPE_PROPERTY, oldLabelTextContentType, newLabelTextContentType);	//indicate that the value changed
-			}			
-		}
-
-	/**The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-	private String labelResourceKey=null;
-	
-		/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-		public String getLabelResourceKey() {return labelResourceKey;}
-	
-		/**Sets the key identifying the text of the label in the resources.
-		This is a bound property.
-		@param newLabelTextResourceKey The new label text resource key.
-		@see #LABEL_RESOURCE_KEY_PROPERTY
-		*/
-		public void setLabelResourceKey(final String newLabelTextResourceKey)
-		{
-			if(!ObjectUtilities.equals(labelResourceKey, newLabelTextResourceKey))	//if the value is really changing
-			{
-				final String oldLabelTextResourceKey=labelResourceKey;	//get the old value
-				labelResourceKey=newLabelTextResourceKey;	//actually change the value
-				firePropertyChange(LABEL_RESOURCE_KEY_PROPERTY, oldLabelTextResourceKey, newLabelTextResourceKey);	//indicate that the value changed
-			}
-		}
+	/**Sets the key identifying the text of the label in the resources.
+	This is a bound property.
+	@param newLabelTextResourceKey The new label text resource key.
+	@see #LABEL_RESOURCE_KEY_PROPERTY
+	*/
+	public void setLabelResourceKey(final String newLabelTextResourceKey) {getLabelModel().setLabelResourceKey(newLabelTextResourceKey);}
 
 	/**The advisory information text, such as might appear in a tooltip, or <code>null</code> if there is no advisory information.*/
 	private String info=null;
@@ -1094,16 +1034,29 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 			return false;	//indicate that no data could be imported
 		}
 
-	/**Session, ID, and model constructor.
+	/**Session and ID constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
+	@exception NullPointerException if the given session is <code>null</code>.
+	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception IllegalStateException if no controller is registered for this component type.
+	@exception IllegalStateException if no view is registered for this component type.
+	*/
+	public AbstractComponent(final GuiseSession session, final String id)
+	{
+		this(session, id, new DefaultLabelModel(session));	//construct the component with a default label model
+	}
+
+	/**Session, ID, and label model constructor.
+	@param session The Guise session that owns this component.
+	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	@param labelModel The component label model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	@exception IllegalStateException if no controller is registered for this component type.
 	@exception IllegalStateException if no view is registered for this component type.
 	*/
-	public AbstractComponent(final GuiseSession session, final String id/*TODO del, final Model model*/)
+	public AbstractComponent(final GuiseSession session, final String id, final LabelModel labelModel)
 	{
 		super(session);	//construct the parent class
 		if(id!=null)	//if an ID was provided
@@ -1115,7 +1068,8 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 			this.id=getSession().generateComponentID();	//ask the session to generate a new ID
 //TODO del when works			this.id=getVariableName(getClass());	//create an ID by transforming the simple class name to a variable name
 		}
-//TODO del		this.model=checkNull(model, "Model cannot be null.");	//save the model
+		this.labelModel=checkNull(labelModel, "Label model cannot be null.");	//save the label model
+		this.labelModel.addPropertyChangeListener(getRepeaterPropertyChangeListener());	//listen and repeat all property changes of the label model
 		controller=session.getApplication().getController(getThis());	//ask the application for a controller
 		if(controller==null)	//if we couldn't find a controller
 		{

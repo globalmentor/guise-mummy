@@ -19,6 +19,7 @@ import com.guiseframework.controller.ControlEvent;
 import com.guiseframework.controller.Controller;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
+import com.guiseframework.model.LabelModel;
 import com.guiseframework.model.Model;
 import com.guiseframework.style.Color;
 import com.guiseframework.view.View;
@@ -36,7 +37,7 @@ If a developer must hide sensitive data, the developer should remove the compone
 <p>For widest platform support the general {@link #ROUNDED_CORNER_RADIUS_EXTENT} constant should be used whenever possible when requesting rounded corners.</p> 
 @author Garret Wilson
 */
-public interface Component<C extends Component<C>> extends PropertyBindable, Labelable
+public interface Component<C extends Component<C>> extends PropertyBindable, LabelModel
 {
 
 	/**The bound property of the background color.*/
@@ -95,15 +96,6 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public final static String VIEW_PROPERTY=getPropertyName(Component.class, "view");
 	/**The bound property of whether the component is visible.*/
 	public final static String VISIBLE_PROPERTY=getPropertyName(Component.class, "visible");
-
-	/**A content type of <code>text/plain</code>.*/
-	public final static ContentType PLAIN_TEXT_CONTENT_TYPE=TextConstants.TEXT_PLAIN_CONTENT_TYPE;
-
-	/**A content type of <code>application/xhtml+xml</code>.*/
-	public final static ContentType XHTML_CONTENT_TYPE=XHTMLConstants.XHTML_CONTENT_TYPE;
-	
-	/**A content type of <code>application/xhtml+xml-external-parsed-entity</code>.*/
-	public final static ContentType XHTML_FRAGMENT_CONTENT_TYPE=XHTMLConstants.XHTML_FRAGMENT_CONTENT_TYPE;
 
 	/*The constant value representing a general rounded corner.*/
 	public final static Dimensions ROUNDED_CORNER_ARC_SIZE=new Dimensions(0.25, 0.25, Extent.Unit.EM);

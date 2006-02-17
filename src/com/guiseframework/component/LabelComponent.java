@@ -5,5 +5,4 @@ package com.guiseframework.component;
 */
 public interface LabelComponent<C extends LabelComponent<C>> extends Component<C>
 {
-
 }
