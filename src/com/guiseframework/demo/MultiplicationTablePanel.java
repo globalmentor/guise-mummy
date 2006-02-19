@@ -2,6 +2,7 @@ package com.guiseframework.demo;
 
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
+import com.guiseframework.component.layout.CardConstraints;
 import com.guiseframework.component.layout.CardLayout;
 import com.guiseframework.component.layout.Flow;
 import com.guiseframework.component.layout.FlowLayout;
@@ -34,7 +35,7 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 		add(tabbedPanel);	//add the tabbed panel to this panel
 
 		final Component<?> defaultTab=createMultiplicationTableTab(9);	//create a default multiplication table with a maximum factor of 9
-		tabbedPanel.add(defaultTab, new CardLayout.Constraints("Default"));	//add the default tab
+		tabbedPanel.add(defaultTab, new CardConstraints(session, "Default"));	//add the default tab
 			//create the maximum factor control
 		final LayoutPanel controlPanel=new LayoutPanel(getSession(), new FlowLayout(session, Flow.PAGE));	//create a new panel for the controls
 		final TextControl<Integer> maxFactorControl=new TextControl<Integer>(session, Integer.class);	//create a text input control to receive an integer
@@ -57,7 +58,7 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 								maxFactorControl.validate();	//validate the count control to make sure the value is correct
 								final int maxFactor=maxFactorControl.getValue().intValue();	//find out how many factors to display
 								final Component<?> tab=createMultiplicationTableTab(maxFactor);	//create a multiplication table with the desired maximum factor
-								tabbedPanel.add(tab, new CardLayout.Constraints(String.valueOf(maxFactor)));	//add the tab to the tabbed panel
+								tabbedPanel.add(tab, new CardConstraints(session, String.valueOf(maxFactor)));	//add the tab to the tabbed panel
 								if(tabbedPanel.size()==MAX_TAB_COUNT)	//if we've reached the maximum tab count
 								{
 									maxFactorControl.setEnabled(false);	//disable the count control

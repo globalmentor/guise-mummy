@@ -29,8 +29,11 @@ Only one child component is visible at a time.
 The card layout maintains its own value model that maintains the current selected card.
 @author Garret Wilson
 */
-public class CardLayout extends AbstractLayout<CardLayout.Constraints> implements ValueModel<Component<?>>
+public class CardLayout extends AbstractLayout<CardConstraints> implements ValueModel<Component<?>>
 {
+
+	/**@return The class representing the type of constraints appropriate for this layout.*/
+	public Class<? extends CardConstraints> getConstraintsClass() {return CardConstraints.class;}
 
 	/**The value model used by this component.*/
 	private final ValueModel<Component<?>> valueModel;
@@ -95,17 +98,16 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 			}
 		}
 
-	/**Associates layout metadata with a component.
+	/**Adds a component to the layout.
+	Called immediately after a component is added to the associated container.
+	This method is called by the associated container, and should not be called directly by application code.
 	This version selects a component if none is selected.
-	@param component The component for which layout metadata is being specified.
-	@param constraints Layout information specifically for the component.
-	@return The layout information previously associated with the component, or <code>null</code> if the component did not previously have metadata specified.
-	@exception NullPointerException if the given constraints object is <code>null</code>.
+	@param component The component to add to the layout.
 	@exception IllegalStateException if this layout has not yet been installed into a container.
 	*/
-	public Constraints setConstraints(final Component<?> component, final Constraints constraints)
+	public void addComponent(final Component<?> component)
 	{
-		final Constraints oldConstraints=super.setConstraints(component, constraints);	//set the constraints normally
+		super.addComponent(component);	//add the component normally
 		if(getValue()==null)	//if there is no component selected
 		{
 			try
@@ -116,18 +118,17 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 			{
 			}
 		}
-		return oldConstraints;	//return the previously associated constraints, if any
 	}
 
-	/**Removes any layout metadata associated with a component.
+	/**Removes a component from the layout.
+	Called immediately before a component is removed from the associated container.
+	This method is called by the associated container, and should not be called directly by application code.
 	This implementation updates the selected component if necessary.
-	@param component The component for which layout metadata is being removed.
-	@return The layout information previously associated with the component, or <code>null</code> if the component did not previously have metadata specified.
-	@exception IllegalStateException if this layout has not yet been installed into a container.
+	@param component The component to remove from the layout.
 	*/
-	public Constraints removeConstraints(final Component<?> component)
+	public void removeComponent(final Component<?> component)
 	{
-		final Constraints oldConstraints=super.removeConstraints(component);	//remove the constraints normally
+		super.removeComponent(component);	//remove the component normally
 		if(component==getValue())	//if the selected component was removed
 		{
 			final Container<?> container=getContainer();	//get our container
@@ -152,15 +153,14 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 			}
 		}
 		this.selectedIndex=-1;	//always uncache the selected index, because the index of the selected component might have changed
-		return oldConstraints;	//return the previous constraints
 	}
 
 	/**Creates default constraints for the container.
 	@return New default constraints for the container.
 	*/
-	public Constraints createDefaultConstraints()
+	public CardConstraints createDefaultConstraints()
 	{
-		return new Constraints();	//create constraints with a default label model
+		return new CardConstraints(getSession());	//create constraints with a default label model
 	}
 
 	/**Session constructor.
@@ -253,188 +253,6 @@ public class CardLayout extends AbstractLayout<CardLayout.Constraints> implement
 
 	/**@return The class representing the type of value this model can hold.*/
 	public Class<Component<?>> getValueClass() {return getValueModel().getValueClass();}
-
-	/**Metadata about individual component layout.
-	@author Garret Wilson
-	*/
-	public static class Constraints extends AbstractLayout.AbstractConstraints implements LabelModel	//TODO fix hack; no session is supported for these constraints; refactor all constraints
-	{
-
-		/**@return The Guise session that owns this model.*/
-		public GuiseSession getSession() {throw new UnsupportedOperationException("Constraints does not currently support Guise session.");}
-
-		/**@return Whether the contents of this model are valid.*/
-		public boolean isValid() {throw new UnsupportedOperationException("Constraints does not currently support isValid().");}	//TODO del
-
-		/**The icon URI, or <code>null</code> if there is no icon URI.*/
-		private URI labelIcon=null;
-
-			/**@return The icon URI, or <code>null</code> if there is no icon URI.*/
-			public URI getIcon() {return labelIcon;}
-
-			/**Sets the URI of the icon.
-			This is a bound property of type <code>URI</code>.
-			@param newLabelIcon The new URI of the icon.
-			@see #ICON_PROPERTY
-			*/
-			public void setIcon(final URI newLabelIcon)
-			{
-				if(!ObjectUtilities.equals(labelIcon, newLabelIcon))	//if the value is really changing
-				{
-					final URI oldLabelIcon=labelIcon;	//get the old value
-					labelIcon=newLabelIcon;	//actually change the value
-					firePropertyChange(LabelModel.ICON_PROPERTY, oldLabelIcon, newLabelIcon);	//indicate that the value changed
-				}			
-			}
-
-		/**The icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-		private String labelIconResourceKey=null;
-
-			/**@return The icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-			public String getIconResourceKey() {return labelIconResourceKey;}
-
-			/**Sets the key identifying the URI of the icon in the resources.
-			This is a bound property.
-			@param newIconResourceKey The new icon URI resource key.
-			@see #LABEL_RESOURCE_KEY_PROPERTY
-			*/
-			public void setIconResourceKey(final String newIconResourceKey)
-			{
-				if(!ObjectUtilities.equals(labelIconResourceKey, newIconResourceKey))	//if the value is really changing
-				{
-					final String oldIconResourceKey=labelIconResourceKey;	//get the old value
-					labelIconResourceKey=newIconResourceKey;	//actually change the value
-					firePropertyChange(LabelModel.ICON_RESOURCE_KEY_PROPERTY, oldIconResourceKey, newIconResourceKey);	//indicate that the value changed
-				}
-			}
-
-		/**The label text, or <code>null</code> if there is no label text.*/
-		private String labelText=null;
-
-			/**@return The label text, or <code>null</code> if there is no label text.*/
-			public String getLabel() {return labelText;}
-
-			/**Sets the text of the label.
-			This is a bound property.
-			@param newLabelText The new text of the label.
-			@see #LABEL_PROPERTY
-			*/
-			public void setLabel(final String newLabelText)
-			{
-				if(!ObjectUtilities.equals(labelText, newLabelText))	//if the value is really changing
-				{
-					final String oldLabel=labelText;	//get the old value
-					labelText=newLabelText;	//actually change the value
-					firePropertyChange(LabelModel.LABEL_PROPERTY, oldLabel, newLabelText);	//indicate that the value changed
-				}			
-			}
-
-		/**The content type of the label text.*/
-		private ContentType labelTextContentType=Component.PLAIN_TEXT_CONTENT_TYPE;
-
-			/**@return The content type of the label text.*/
-			public ContentType getLabelContentType() {return labelTextContentType;}
-
-			/**Sets the content type of the label text.
-			This is a bound property.
-			@param newLabelTextContentType The new label text content type.
-			@exception NullPointerException if the given content type is <code>null</code>.
-			@exception IllegalArgumentException if the given content type is not a text content type.
-			@see #LABEL_CONTENT_TYPE_PROPERTY
-			*/
-			public void setLabelContentType(final ContentType newLabelTextContentType)
-			{
-				checkNull(newLabelTextContentType, "Content type cannot be null.");
-				if(labelTextContentType!=newLabelTextContentType)	//if the value is really changing
-				{
-					final ContentType oldLabelTextContentType=labelTextContentType;	//get the old value
-					if(!isText(newLabelTextContentType))	//if the new content type is not a text content type
-					{
-						throw new IllegalArgumentException("Content type "+newLabelTextContentType+" is not a text content type.");
-					}
-					labelTextContentType=newLabelTextContentType;	//actually change the value
-					firePropertyChange(LabelModel.LABEL_CONTENT_TYPE_PROPERTY, oldLabelTextContentType, newLabelTextContentType);	//indicate that the value changed
-				}			
-			}
-
-		/**The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-		private String labelTextResourceKey=null;
-		
-			/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-			public String getLabelResourceKey() {return labelTextResourceKey;}
-		
-			/**Sets the key identifying the text of the label in the resources.
-			This is a bound property.
-			@param newLabelTextResourceKey The new label text resource key.
-			@see #LABEL_RESOURCE_KEY_PROPERTY
-			*/
-			public void setLabelResourceKey(final String newLabelTextResourceKey)
-			{
-				if(!ObjectUtilities.equals(labelTextResourceKey, newLabelTextResourceKey))	//if the value is really changing
-				{
-					final String oldLabelTextResourceKey=labelTextResourceKey;	//get the old value
-					labelTextResourceKey=newLabelTextResourceKey;	//actually change the value
-					firePropertyChange(LabelModel.LABEL_RESOURCE_KEY_PROPERTY, oldLabelTextResourceKey, newLabelTextResourceKey);	//indicate that the value changed
-				}
-			}
-
-		/**Whether the card is enabled for selection.*/
-		private boolean enabled=true;
-
-			/**@return Whether the card is enabled for selection.*/
-			public boolean isEnabled() {return enabled;}
-
-			/**Sets whether the the card is enabled for selection.
-			This is a bound property of type <code>Boolean</code>.
-			@param newEnabled <code>true</code> if the corresponding card can be selected.
-			@see Control#ENABLED_PROPERTY
-			*/
-			public void setEnabled(final boolean newEnabled)
-			{
-				if(enabled!=newEnabled)	//if the value is really changing
-				{
-					final boolean oldEnabled=enabled;	//get the old value
-					enabled=newEnabled;	//actually change the value
-					firePropertyChange(Control.ENABLED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newEnabled));	//indicate that the value changed
-				}			
-			}
-
-		/**Default constructor.*/
-		public Constraints()
-		{
-			this(true);	//default to enabling the card
-		}
-
-		/**Enabled constructor.
-		@param enabled Whether the card is enabled.
-		*/
-		public Constraints(final boolean enabled)
-		{
-			this.enabled=enabled;
-		}
-
-		/**Label constructor.
-		@param labelText The text of the label.
-		*/
-		public Constraints(final String labelText)
-		{
-			this(true);	//enable the card
-			this.labelText=labelText;	//save the label text
-		}
-
-		/**Label model constructor.
-		@param labelModel The label model providing label information.
-		*/
-		public Constraints(final LabelModel labelModel)	//TODO improve entire class to obviate this constructor; right now the label model is only copied rather than used in delegation
-		{
-			this(true);	//enable the card
-			setIcon(labelModel.getIcon());	//initialize the constraints
-			setIconResourceKey(labelModel.getIconResourceKey());
-			setLabel(labelModel.getLabel());
-			setLabelContentType(labelModel.getLabelContentType());
-			setLabelResourceKey(labelModel.getLabelResourceKey());
-		}
-	}
 
 	/**A property change listener that listens for changes in a constraint object's properties and fires a layout constraints property change event in response.
 	This version also fires model {@link ValuePropertyChangeEvent}s if appropriate.

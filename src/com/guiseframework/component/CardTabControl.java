@@ -152,17 +152,9 @@ public class CardTabControl extends TabControl<Component<?>>
 		*/
 		public Label createComponent(final ListSelectModel<Component<?>> model, final Component<?> value, final int index, final boolean selected, final boolean focused)
 		{
-			final Label label=new Label(getCardLayout().getSession());	//create a new label
-			if(value!=null)	//if there is a value
-			{
-				final CardLayout.Constraints constraints=getCardLayout().getConstraints(value);	//get the constraints
-				label.setLabelContentType(constraints.getLabelContentType());	//initialize the label from the constraints TODO improve; if the constraints change, the component won't change
-				label.setIcon(constraints.getIcon());
-				label.setIconResourceKey(constraints.getIconResourceKey());
-				label.setLabel(constraints.getLabel());
-				label.setLabelResourceKey(constraints.getLabelResourceKey());
-			}
-			return label;	//return the label, which will be empty if there was no value
+			return value!=null	//if there is a value
+			? new Label(getCardLayout().getSession(), getCardLayout().getConstraints(value))	//generate a label using the the card layout constraints as the label model
+			: new Label(getCardLayout().getSession());	//otherwise return an empty label
 		}
 
 		/**Determines an identifier for the given object.

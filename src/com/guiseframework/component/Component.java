@@ -11,6 +11,7 @@ import com.garretwilson.text.TextConstants;
 import com.garretwilson.text.xml.xhtml.XHTMLConstants;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.effect.Effect;
+import com.guiseframework.component.layout.Constraints;
 import com.guiseframework.component.layout.Corner;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.component.transfer.*;
@@ -44,6 +45,8 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public final static String BACKGROUND_COLOR_PROPERTY=getPropertyName(Component.class, "backgroundColor");
 	/**The bound property of the color.*/
 	public final static String COLOR_PROPERTY=getPropertyName(Component.class, "color");
+	/**The bound property of the layout constraints.*/
+	public final static String CONSTRAINTS_PROPERTY=getPropertyName(Component.class, "constraints");
 	/**The bound property of the controller.*/
 	public final static String CONTROLLER_PROPERTY=getPropertyName(Component.class, "controller");
 	/**The bound property of the line near page near corner arc size.*/
@@ -251,6 +254,16 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	@see #COLOR_PROPERTY 
 	*/
 	public void setColor(final Color<?> newColor);
+
+	/**@return The layout constraints describing individual component layout information, or <code>null</code> if no constraints have been specified for this component.*/
+	public Constraints getConstraints();
+
+	/**Sets the layout constraints of this component.
+	This is a bound property.
+	@param newConstraints The layout constraints describing individual component layout information, or <code>null</code> if no constraints have been specified for this component.
+	@see #CONSTRAINTS_PROPERTY
+	*/
+	public void setConstraints(final Constraints newConstraints);
 
 	/**Returns the arc size for the indicated corner.
 	@param corner The corner for which an arc size should be returned.

@@ -5,8 +5,11 @@ import com.guiseframework.GuiseSession;
 /**A layout for a menu that flows along an axis.
 @author Garret Wilson
 */
-public class MenuLayout extends AbstractFlowLayout<MenuLayout.Constraints>	//TODO probably move this into the menu class
+public class MenuLayout extends AbstractFlowLayout<MenuConstraints>	//TODO probably move this into the menu class
 {
+
+	/**@return The class representing the type of constraints appropriate for this layout.*/
+	public Class<? extends MenuConstraints> getConstraintsClass() {return MenuConstraints.class;}
 
 	/**Session and flow constructor.
 	@param session The Guise session that owns this layout.
@@ -22,16 +25,9 @@ public class MenuLayout extends AbstractFlowLayout<MenuLayout.Constraints>	//TOD
 	@return New default constraints for the container.
 	@exception IllegalStateException if this layout does not support default constraints.
 	*/
-	public Constraints createDefaultConstraints()
+	public MenuConstraints createDefaultConstraints()
 	{
-		return new Constraints();	//return a default constraints object
-	}
-
-	/**Metadata about individual component flow.
-	@author Garret Wilson
-	*/
-	public static class Constraints extends AbstractFlowLayout.Constraints
-	{
+		return new MenuConstraints(getSession());	//return a default constraints object
 	}
 
 }

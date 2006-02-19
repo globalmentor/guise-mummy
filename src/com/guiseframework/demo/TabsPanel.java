@@ -30,13 +30,13 @@ public class TabsPanel extends DefaultNavigationPanel
 		final Heading tabbedPanelPage1Heading=new Heading(session, 0);	//create a top-level heading
 		tabbedPanelPage1Heading.setLabel("This is page 1.");	//set the text of the heading
 		tabbedPanelPage1.add(tabbedPanelPage1Heading);	//add the heading to the page
-		tabbedPanel.add(tabbedPanelPage1, new CardLayout.Constraints("Page 1"));	//add the panel with a label
+		tabbedPanel.add(tabbedPanelPage1, new CardConstraints(session, "Page 1"));	//add the panel with a label
 					//page 2
 		final Panel<?> tabbedPanelPage2=new LayoutPanel(session);	//create a panel to serve as the page
 		final Heading tabbedPanelPage2Heading=new Heading(session, 0);	//create a top-level heading
 		tabbedPanelPage2Heading.setLabel("This is page 2.");	//set the text of the heading
 		tabbedPanelPage2.add(tabbedPanelPage2Heading);	//add the heading to the page
-		tabbedPanel.add(tabbedPanelPage2, new CardLayout.Constraints("Page 2"));	//add the panel with a label
+		tabbedPanel.add(tabbedPanelPage2, new CardConstraints(session, "Page 2"));	//add the panel with a label
 		tabbedPanelPanel.add(tabbedPanel);
 				//CardTabControl
 		final CardTabControl tabbedPanelTabControl=new CardTabControl(session, tabbedPanel, Flow.LINE);	//create a horizontal card tab control to control the existing tab panel
@@ -53,13 +53,13 @@ public class TabsPanel extends DefaultNavigationPanel
 		final Heading cardPanelPage1Heading=new Heading(session, 0);	//create a top-level heading
 		cardPanelPage1Heading.setLabel("This is page 1.");	//set the text of the heading
 		cardPanelPage1.add(cardPanelPage1Heading);	//add the heading to the page
-		cardPanel.add(cardPanelPage1, new CardLayout.Constraints("Page 1"));	//add the panel with a label
+		cardPanel.add(cardPanelPage1, new CardConstraints(session, "Page 1"));	//add the panel with a label
 					//page 2
 		final Panel<?> cardPanelPage2=new LayoutPanel(session);	//create a panel to serve as the page
 		final Heading cardPanelPage2Heading=new Heading(session, 0);	//create a top-level heading
 		cardPanelPage2Heading.setLabel("This is page 2.");	//set the text of the heading
 		cardPanelPage2.add(cardPanelPage2Heading);	//add the heading to the page
-		cardPanel.add(cardPanelPage2, new CardLayout.Constraints("Page 2"));	//add the panel with a label
+		cardPanel.add(cardPanelPage2, new CardConstraints(session, "Page 2"));	//add the panel with a label
 				//CardTabControl
 		final CardTabControl cardPanelTabControl=new CardTabControl(session, cardPanel, Flow.LINE);	//create a horizontal card tab control to control the existing card panel
 		cardPanelPanel.add(cardPanelTabControl);	//place the tab control above the card panel to illustrate common usage

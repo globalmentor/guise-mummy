@@ -1,7 +1,5 @@
 package com.guiseframework.component;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -23,6 +21,7 @@ import com.guiseframework.controller.Controller;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
 import com.guiseframework.model.*;
+import com.guiseframework.style.AbstractColor;
 import com.guiseframework.style.Color;
 import com.guiseframework.view.View;
 
@@ -47,25 +46,6 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**@return The object managing event listeners.*/
 		protected EventListenerManager getEventListenerManager() {return eventListenerManager;}
 
-	/**A lazily-created property change listener to repeat copies of events received, using this component as the source.*/ 
-	private PropertyChangeListener repeaterPropertyChangeListener=null;
-
-	/**A property change listener to repeat copies of events received, using this component as the source.*/ 
-	protected PropertyChangeListener getRepeaterPropertyChangeListener()	//TODO update to work with PropertyValueChangeEvent
-	{
-		if(repeaterPropertyChangeListener==null)	//if we have not yet created the repeater property change listener
-		{
-			repeaterPropertyChangeListener=new PropertyChangeListener()	//create a listener to listen for the value model changing a property value
-					{
-						public void propertyChange(final PropertyChangeEvent propertyChangeEvent)	//if the value model changes a property value
-								{
-									firePropertyChange(propertyChangeEvent.getPropertyName(), propertyChangeEvent.getOldValue(), propertyChangeEvent.getNewValue());	//forward the property change event, indicating this component as the event source
-								}			
-					};
-		}
-		return repeaterPropertyChangeListener;	//return the repeater property change listener
-	}
-		
 	/**@return A reference to this instance, cast to the generic self type.*/
 	@SuppressWarnings("unchecked")
 	protected final C getThis() {return (C)this;}
@@ -319,7 +299,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**Sets the foreground color of the component.
 		This is a bound property.
 		@param newColor The foreground color of the component, or <code>null</code> if the default foreground color should be used.
-		@see Component#COLOR_PROPERTY 
+		@see Component#COLOR_PROPERTY
 		*/
 		public void setColor(final Color<?> newColor)
 		{
@@ -352,6 +332,26 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		}
 */
 
+	/**The layout constraints describing individual component layout information, or <code>null</code> if no constraints have been specified for this component.*/
+	private Constraints constraints=null;
+
+		/**@return The layout constraints describing individual component layout information, or <code>null</code> if no constraints have been specified for this component.*/
+		public Constraints getConstraints() {return constraints;}
+
+		/**Sets the layout constraints of this component.
+		This is a bound property.
+		@param newConstraints The layout constraints describing individual component layout information, or <code>null</code> if no constraints have been specified for this component.
+		@see #CONSTRAINTS_PROPERTY
+		*/
+		public void setConstraints(final Constraints newConstraints)
+		{
+			if(constraints!=newConstraints)	//if the value is really changing
+			{
+				final Constraints oldConstraints=constraints;	//get the old value
+				constraints=newConstraints;	//actually change the value
+				firePropertyChange(CONSTRAINTS_PROPERTY, oldConstraints, newConstraints);	//indicate that the value changed
+			}			
+		}
 
 	/**The array of dimensions each defining a corner arc by two radiuses.*/
 	private Dimensions[] cornerArcSizes=fill(new Dimensions[Corner.values().length], Dimensions.ZERO_DIMENSIONS);
@@ -1400,6 +1400,22 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 			default:
 				throw new IllegalArgumentException("Unsupported axis: "+axis);
 		}	
+	}
+
+	/**@return A hash code value for the object.*/
+	public int hashCode()
+	{
+		return getID().hashCode();	//return the hash code of the ID
+	}
+
+	/**Indicates whether some other object is "equal to" this one.
+	This implementation returns whether the object is a component with the same ID.
+	@param object The reference object with which to compare.
+	@return <code>true</code> if this object is equivalent to the given object.
+	*/
+	public boolean equals(final Object object)
+	{
+		return object instanceof Component && getID().equals(((Component<?>)object).getID());	//see if the other object is a component with the same ID
 	}
 
 	/**@return A string representation of this component.*/

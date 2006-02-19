@@ -37,7 +37,7 @@ public class CalendarsPanel extends DefaultNavigationPanel
 		calendarMonthTableModelPanel.add(calendarMonthTable);
 		centerPanel.add(calendarMonthTableModelPanel);
 		
-		add(centerPanel, RegionLayout.CENTER_CONSTRAINTS);	//add the center panel in the center
+		add(centerPanel, new RegionConstraints(session, Region.CENTER));	//add the center panel in the center
 		
 			//side panel
 		final LayoutPanel sidePanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE)); //create the side panel flowing vertically
@@ -141,7 +141,7 @@ public class CalendarsPanel extends DefaultNavigationPanel
 				});
 		sidePanel.add(popupCalendarControlPanel);
 
-		add(sidePanel, RegionLayout.LINE_END_CONSTRAINTS);	//add the side panel on the right
+		add(sidePanel, new RegionConstraints(session, Region.LINE_END));	//add the side panel on the right
 	}
 
 }

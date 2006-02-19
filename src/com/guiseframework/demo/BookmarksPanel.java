@@ -9,7 +9,6 @@ import com.guiseframework.event.GuisePropertyChangeEvent;
 import com.guiseframework.model.ValueModel;
 import com.guiseframework.validator.ValidationException;
 
-
 /**Bookmark Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
 Demonstrates saving bookmarks and updating state based upon bookmark navigation.
@@ -39,7 +38,7 @@ public class BookmarksPanel extends DefaultNavigationPanel
 			final Heading tabHeading=new Heading(session, 0);	//create a top-level heading
 			tabHeading.setLabel("This is step "+i+".");	//set the text of the heading
 			tab.add(tabHeading);	//add the heading to the tab
-			tabbedPanel.add(tab, new CardLayout.Constraints("Step "+i));	//add the panel with a label			
+			tabbedPanel.add(tab, new CardConstraints(session, "Step "+i));	//add the panel with a label			
 		}
 			//save a new bookmark ever time the tab changes
 		tabbedPanel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Component<?>>()	//listen for the tab changing

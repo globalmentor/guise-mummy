@@ -1,6 +1,7 @@
 package com.guiseframework.component.layout;
 
 import com.garretwilson.beans.PropertyBindable;
+import com.guiseframework.GuiseSession;
 import com.guiseframework.component.Component;
 import com.guiseframework.component.Container;
 
@@ -10,11 +11,17 @@ This interface and subclasses represent layout definitions, not layout implement
 If the property of a component's constraints changes, a subclass of {@link LayoutConstraintsPropertyChangeEvent} will be fired indicating the associated component and constraints for which the value changed.
 @author Garret Wilson
 */
-public interface Layout<T extends Layout.Constraints> extends PropertyBindable
+public interface Layout<T extends Constraints> extends PropertyBindable
 {
+
+	/**@return The Guise session that owns this layout.*/
+	public GuiseSession getSession();
 
 	/**@return The container that owns this layout, or <code>null</code> if this layout has not been installed into a container.*/
 	public Container<?> getContainer();
+
+	/**@return The class representing the type of constraints appropriate for this layout.*/
+	public Class<? extends T> getConstraintsClass();
 
 	/**Sets the container that owns this layout
 	This method is managed by containers, and normally should not be called by applications.
@@ -28,41 +35,39 @@ public interface Layout<T extends Layout.Constraints> extends PropertyBindable
 	*/
 	public void setContainer(final Container<?> newContainer);
 
-	/**Associates layout metadata with a component.
-	Any metadata previously associated with the component will be removed.
-	@param component The component for which layout metadata is being specified.
-	@param constraints Layout information specifically for the component.
-	@return The layout information previously associated with the component, or <code>null</code> if the component did not previously have metadata specified.
-	@exception NullPointerException if the given constraints object is <code>null</code>.
+	/**Adds a component to the layout.
+	Called immediately after a component is added to the associated container.
+	This method is called by the associated container, and should not be called directly by application code.
+	@param component The component to add to the layout.
 	@exception IllegalStateException if this layout has not yet been installed into a container.
 	*/
-	public T setConstraints(final Component<?> component, final T constraints);
+	public void addComponent(final Component<?> component);
 
-	/**Determines layout metadata associated with a component.
+	/**Removes a component from the layout.
+	Called immediately before a component is removed from the associated container.
+	This method is called by the associated container, and should not be called directly by application code.
+	@param component The component to remove from the layout.
+	*/
+	public void removeComponent(final Component<?> component);
+
+	/**Retreives layout constraints associated with a component.
+	If the constraints currently associated with the component are not compatible with this layout,
+		or if no constraints are associated with the given component,
+		default constraints are created and associated with the component.
 	@param component The component for which layout metadata is being requested.
-	@return metadata The layout information associated with the component, or <code>null</code> if the component does not have metadata specified.
+	@return The constraints associated with the component.
 	@exception IllegalStateException if this layout has not yet been installed into a container.
+	@exception IllegalStateException if no constraints are associated with the given component and this layout does not support default constraints.
+	@see #getConstraintsClass()
+	@see Component#getConstraints()
+	@see Component#setConstraints(Constraints)
 	*/
 	public T getConstraints(final Component<?> component);
-
-	/**Removes any layout metadata associated with a component.
-	@param component The component for which layout metadata is being removed.
-	@return metadata The layout information previously associated with the component, or <code>null</code> if the component did not previously have metadata specified.
-	@exception IllegalStateException if this layout has not yet been installed into a container.
-	*/
-	public T removeConstraints(final Component<?> component);
 
 	/**Creates default constraints for the container.
 	@return New default constraints for the container.
 	@exception IllegalStateException if this layout does not support default constraints.
 	*/
 	public T createDefaultConstraints();
-
-	/**Metadata about individual component layout.
-	@author Garret Wilson
-	*/
-	public interface Constraints extends PropertyBindable
-	{
-	}
 
 }

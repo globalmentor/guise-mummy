@@ -62,11 +62,34 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@param component The component to add.
 	@return <code>true</code> if this container changed as a result of the operation.
 	@exception IllegalArgumentException if the component already has a parent.
-	@exception IllegalStateException the installed layout does not support default constraints.
+	@exception IllegalStateException if the installed layout does not support default constraints.
 	*/
 	public boolean add(final Component<?> component)
 	{
-		return add(component, null);	//add the component, indicating default constraints should be used
+//TODO del when works		return add(component, null);	//add the component, indicating default constraints should be used
+		if(component.getParent()!=null)	//if this component has already been added to container
+		{
+			throw new IllegalArgumentException("Component "+component+" is already a member of a component, "+component.getParent()+".");
+		}
+		addComponent(component);	//add the component to the list
+		getLayout().addComponent(component);	//add the component to the layout
+		fireContainerModified(indexOf(component), component, null);	//indicate the component was added at the index
+		return true;	//TODO improve to determine if the container was actually modified
+	}
+
+	/**Adds a component to the container along with constraints.
+	This is a convenience method that first set the constraints of the component. 
+	@param component The component to add.
+	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
+	@return <code>true</code> if this container changed as a result of the operation.
+	@exception IllegalArgumentException if the component already has a parent.
+	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
+	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
+	*/
+	public boolean add(final Component<?> component, final Constraints constraints)
+	{
+		component.setConstraints(constraints);	//set the constraints in the component
+		return add(component);	//add the component, now that its constraints have been set
 	}
 
 	/**Adds a component to the container along with constraints.
@@ -77,10 +100,12 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
 	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
 	*/
+/*TODO del
 	public boolean add(final Component<?> component, final Layout.Constraints constraints)
 	{
 		return add(component, getLayout(), constraints);	//add the component with the given constraints
 	}
+*/
 
 	/**Adds a component to the container.
 	@param component The component to add.
@@ -91,6 +116,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
 	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
 	*/
+/*TODO del
 	protected <T extends Layout.Constraints> boolean add(final Component<?> component, final Layout<T> layout, final Object constraints)	//TODO check ClassCastException---it will not be thrown here
 	{
 		if(component.getParent()!=null)	//if this component has already been added to container
@@ -104,6 +130,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		fireContainerModified(indexOf(component), component, null);	//indicate the component was added at the index
 		return true;	//TODO improve to determine if the container was actually modified
 	}
+*/
 
 	/**Removes a component from the container.
 	@param componentObject The component to remove.
@@ -119,7 +146,8 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 			throw new IllegalArgumentException("Component "+component+" is not member of container "+this+".");
 		}
 		final int index=indexOf(component);	//get the index of the component TODO do we want to see if the component is actually in the container?
-		getLayout().removeConstraints(component);	//remove the constraints for this component
+		getLayout().removeComponent(component);	//remove the component from the layout
+//TODO del when works		getLayout().removeConstraints(component);	//remove the constraints for this component
 		removeComponent(component);	//remove the component from the list
 //TODO del; moved to AbstractdCompositeComponent		component.setParent(null);	//tell the component it no longer has a parent
 		fireContainerModified(index, null, component);	//indicate the component was removed from the index
@@ -161,7 +189,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 //TODO fix		@exception IllegalStateException if a new layout is requested while this container has one or more children.
 		@see Container#LAYOUT_PROPERTY 
 		*/
-		public <T extends Layout.Constraints> void setLayout(final Layout<T> newLayout)
+		public <T extends Constraints> void setLayout(final Layout<T> newLayout)
 		{
 			if(layout!=checkNull(newLayout, "Layout cannot be null."))	//if the value is really changing
 			{
@@ -177,7 +205,9 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 				layout.setContainer(this);	//tell the new layout which container owns it
 				for(final Component<?> childComponent:this)	//for each child component
 				{
-					newLayout.setConstraints(childComponent, newLayout.createDefaultConstraints());	//
+					childComponent.setConstraints(null);	//TODO improve
+					newLayout.getConstraints(childComponent);
+//TODO del when works					newLayout.setConstraints(childComponent, newLayout.createDefaultConstraints());	//
 				}
 				firePropertyChange(LAYOUT_PROPERTY, oldLayout, newLayout);	//indicate that the value changed
 			}			

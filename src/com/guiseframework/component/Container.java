@@ -5,6 +5,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 import java.util.Iterator;
 
 import com.guiseframework.component.layout.Layout;
+import com.guiseframework.component.layout.Constraints;
 import com.guiseframework.event.ContainerListener;
 
 /**Component that allows for addition and removal of child components.
@@ -23,7 +24,7 @@ public interface Container<C extends Container<C>> extends CompositeComponent<C>
 	@param component The component to add.
 	@return <code>true</code> if this container changed as a result of the operation.
 	@exception IllegalArgumentException if the component already has a parent.
-	@exception IllegalStateException the installed layout does not support default constraints.
+	@exception IllegalStateException if the installed layout does not support default constraints.
 	*/
 	public boolean add(final Component<?> component);
 
@@ -35,7 +36,18 @@ public interface Container<C extends Container<C>> extends CompositeComponent<C>
 	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
 	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
 	*/
-	public boolean add(final Component<?> component, final Layout.Constraints constraints);
+//TODO del; recomment main add method	public boolean add(final Component<?> component, final Layout.Constraints constraints);
+
+	/**Adds a component to the container along with constraints.
+	This is a convenience method that first set the constraints of the component. 
+	@param component The component to add.
+	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
+	@return <code>true</code> if this container changed as a result of the operation.
+	@exception IllegalArgumentException if the component already has a parent.
+	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
+	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
+	*/
+	public boolean add(final Component<?> component, final Constraints constraints);
 
 	/**Removes a component from the container.
 	@param object The component to remove.
@@ -97,7 +109,7 @@ public interface Container<C extends Container<C>> extends CompositeComponent<C>
 	@exception IllegalStateException if a new layout is requested while this container has one or more children.
 	@see Container#LAYOUT_PROPERTY 
 	*/
-	public <T extends Layout.Constraints> void setLayout(final Layout<T> newLayout);
+	public <T extends Constraints> void setLayout(final Layout<T> newLayout);
 
 	/**Adds a container listener.
 	@param containerListener The container listener to add.

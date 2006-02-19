@@ -1,12 +1,9 @@
 package com.guiseframework.component;
 
-import java.util.Iterator;
 import java.util.Set;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import com.garretwilson.util.EmptyIterator;
-import com.garretwilson.util.ObjectIterator;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.model.ValueModel;
@@ -59,7 +56,7 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 			}
 			if(newOptionContent!=null)	//if a new content component is given
 			{
-				contentsContainer.add(newOptionContent, RegionLayout.CENTER_CONSTRAINTS);	//add the component to the center of the container
+				contentsContainer.add(newOptionContent, new RegionConstraints(getSession(), Region.CENTER));	//add the component to the center of the container
 			}
 		}
 	}
@@ -91,7 +88,7 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 		this.options=checkNull(options, "Options cannot be null.");	//save the options
 		setOptionContent(component);	//set the component, if there is one
 		optionContainer=createOptionContainer();	//create the option container
-		getContentContainer().add(optionContainer, RegionLayout.PAGE_END_CONSTRAINTS);	//add the option container at the bottom
+		getContentContainer().add(optionContainer, new RegionConstraints(session, Region.PAGE_END));	//add the option container at the bottom
 		initializeOptionContainer(optionContainer, options);	//initialize the option container
 	}
 

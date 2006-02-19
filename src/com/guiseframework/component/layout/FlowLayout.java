@@ -5,8 +5,11 @@ import com.guiseframework.GuiseSession;
 /**A layout that flows information along an axis.
 @author Garret Wilson
 */
-public class FlowLayout extends AbstractFlowLayout<FlowLayout.Constraints>
+public class FlowLayout extends AbstractFlowLayout<FlowConstraints>
 {
+
+	/**@return The class representing the type of constraints appropriate for this layout.*/
+	public Class<? extends FlowConstraints> getConstraintsClass() {return FlowConstraints.class;}
 
 	/**Session constructor with {@link Flow#PAGE} layout.
 	@param session The Guise session that owns this layout.
@@ -31,16 +34,8 @@ public class FlowLayout extends AbstractFlowLayout<FlowLayout.Constraints>
 	@return New default constraints for the container.
 	@exception IllegalStateException if this layout does not support default constraints.
 	*/
-	public Constraints createDefaultConstraints()
+	public FlowConstraints createDefaultConstraints()
 	{
-		return new Constraints();	//return a default constraints object
+		return new FlowConstraints(getSession());	//return a default constraints object
 	}
-
-	/**Metadata about individual component flow.
-	@author Garret Wilson
-	*/
-	public static class Constraints extends AbstractFlowLayout.Constraints
-	{
-	}
-
 }

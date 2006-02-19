@@ -61,7 +61,7 @@ public class MenusPanel extends DefaultNavigationPanel
 		arrangeMenu.add(cascadeMenuLink);
 		windowMenu.add(arrangeMenu);
 		dropMenu.add(windowMenu);		
-		add(dropMenu, RegionLayout.PAGE_START_CONSTRAINTS);	//add the drop-down menu at the top
+		add(dropMenu, new RegionConstraints(session, Region.PAGE_START));	//add the drop-down menu at the top
 
 			//accordion menu
 		final AccordionMenu accordionMenu=new AccordionMenu(session, Flow.PAGE);	//create an accordion menu flowing along the page
@@ -86,7 +86,7 @@ public class MenusPanel extends DefaultNavigationPanel
 				"(Wikipedia)");
 		messageMenu.add(message);
 		accordionMenu.add(messageMenu);
-		add(accordionMenu, RegionLayout.LINE_START_CONSTRAINTS);	//add the accordion menu at the side
+		add(accordionMenu, new RegionConstraints(session, Region.LINE_START));	//add the accordion menu at the side
 
 			//center panel
 		final LayoutPanel centerPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE)); //create the center panel flowing vertically
@@ -127,7 +127,7 @@ public class MenusPanel extends DefaultNavigationPanel
 					}
 				});
 
-		add(centerPanel, RegionLayout.CENTER_CONSTRAINTS);	//add the center panel in the center
+		add(centerPanel, new RegionConstraints(session, Region.CENTER));	//add the center panel in the center
 	}
 
 }

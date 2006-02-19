@@ -12,23 +12,26 @@ This layout uses default constraints of {@link Region#CENTER}.
 @author Garret Wilson
 @see Region
 */
-public class RegionLayout extends AbstractLayout<RegionLayout.Constraints>
+public class RegionLayout extends AbstractLayout<RegionConstraints>
 {
 
-	/**Default constraints for the beginning of a line; "left" in left-to-right, top-to-botom orientation.*/
-	public final static Constraints LINE_START_CONSTRAINTS=new Constraints(Region.LINE_START);
+	/**Default constraints for the beginning of a line; "left" in left-to-right, top-to-bottom orientation.*/
+//TODO del	public final static Constraints LINE_START_CONSTRAINTS=new Constraints(Region.LINE_START);
 
-	/**Default constraints for the end of a line; "right" in left-to-right, top-to-botom orientation.*/
-	public final static Constraints LINE_END_CONSTRAINTS=new Constraints(Region.LINE_END);
+	/**Default constraints for the end of a line; "right" in left-to-right, top-to-bottom orientation.*/
+//TODO del	public final static Constraints LINE_END_CONSTRAINTS=new Constraints(Region.LINE_END);
 
-	/**Default constraints for the beginning of a page; "top" in left-to-right, top-to-botom orientation.*/
-	public final static Constraints PAGE_START_CONSTRAINTS=new Constraints(Region.PAGE_START);
+	/**Default constraints for the beginning of a page; "top" in left-to-right, top-to-bottom orientation.*/
+//TODO del	public final static Constraints PAGE_START_CONSTRAINTS=new Constraints(Region.PAGE_START);
 
-	/**Default constraints for the end of a page; "bottom" in left-to-right, top-to-botom orientation.*/
-	public final static Constraints PAGE_END_CONSTRAINTS=new Constraints(Region.PAGE_END);
+	/**Default constraints for the end of a page; "bottom" in left-to-right, top-to-bottom orientation.*/
+//TODO del	public final static Constraints PAGE_END_CONSTRAINTS=new Constraints(Region.PAGE_END);
 
 	/**Default constraints for the center region.*/
-	public final static Constraints CENTER_CONSTRAINTS=new Constraints(Region.CENTER);
+//TODO del	public final static Constraints CENTER_CONSTRAINTS=new Constraints(Region.CENTER);
+
+	/**@return The class representing the type of constraints appropriate for this layout.*/
+	public Class<? extends RegionConstraints> getConstraintsClass() {return RegionConstraints.class;}
 
 	/**Session constructor.
 	@param session The Guise session that owns this layout.
@@ -43,56 +46,9 @@ public class RegionLayout extends AbstractLayout<RegionLayout.Constraints>
 	This implementation returns {@link #CENTER_CONSTRAINTS}.
 	@return New default constraints for the given component.
 	*/
-	public Constraints createDefaultConstraints()
+	public RegionConstraints createDefaultConstraints()
 	{
-		return CENTER_CONSTRAINTS;	//default to the center region
-	}
-
-	/**Metadata about individual component layout.
-	@author Garret Wilson
-	*/
-	public static class Constraints extends AbstractLayout.AbstractConstraints
-	{
-
-		/**The layout region for the associated component.*/
-		private final Region region;
-			
-			/**The layout region for the associated component.*/
-			public Region getRegion() {return region;}
-
-		/**The preferred width of the region, or <code>null</code> if no preferred width has been specified.*/
-		private final Extent preferredWidth;
-
-			/**@return The preferred width of the region, or <code>null</code> if no preferred width has been specified.*/
-			public Extent getPreferredWidth() {return preferredWidth;}
-
-		/**The preferred height of the region, or <code>null</code> if no preferred height has been specified.*/
-		private Extent preferredHeight;
-
-			/**@return The preferred height of the region , or <code>null</code> if no preferred height has been specified.*/
-			public Extent getPreferredHeight() {return preferredHeight;}
-
-		/**Constructor.
-		@param region The layout region for the associated component.
-		@exception NullPointerException if the given region is <code>null</code>.
-		*/
-		public Constraints(final Region region)
-		{
-			this(region, null, null);	//construct the region with no preferred extents
-		}
-
-		/**Preferred extents constructor.
-		@param region The layout region for the associated component.
-		@param preferredWidth The preferred width of the region, or <code>null</code> there is no width preference.		
-		@param preferredHeight The preferred height of the region, or <code>null</code> there is no height preference.		
-		@exception NullPointerException if the given region is <code>null</code>.
-		*/
-		public Constraints(final Region region, final Extent preferredWidth, final Extent preferredHeight)
-		{
-			this.region=checkNull(region, "Region cannot be null.");
-			this.preferredWidth=preferredWidth;
-			this.preferredHeight=preferredHeight;
-		}
+		return new RegionConstraints(getSession(), Region.CENTER);	//default to the center region
 	}
 
 	/**Retrieves a component for a given region.
@@ -101,11 +57,12 @@ public class RegionLayout extends AbstractLayout<RegionLayout.Constraints>
 	*/
 	public Component<?> getComponent(final Region region)	//TODO later use reverse maps or something similar for quicker lookup
 	{
-		for(final Map.Entry<Component<?>, Constraints> entry:componentConstraintsMap.entrySet())	//for each entry in the map of components and constraints
+		for(final Component<?> childComponent:getContainer())	//for each child component in the container
 		{
-			if(entry.getValue().getRegion()==region)	//if this component is in the correct region
+			final RegionConstraints constraints=(RegionConstraints)getConstraints(childComponent);	//get the constraints for this component TODO use covariants on each subclass; update getConstraints() to ensure correct type
+			if(constraints.getRegion()==region)	//if this component is in the correct region
 			{
-				return entry.getKey();	//return the component
+				return childComponent;	//return the component
 			}
 		}
 		return null;	//indicate that no component has the given region

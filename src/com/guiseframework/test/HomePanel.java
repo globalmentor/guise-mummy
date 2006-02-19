@@ -11,7 +11,6 @@ import com.guiseframework.Bookmark.Parameter;
 import com.guiseframework.component.*;
 import com.guiseframework.component.effect.*;
 import com.guiseframework.component.layout.*;
-import com.guiseframework.component.layout.ReferenceLayout.Constraints;
 import com.guiseframework.demo.DemoUser;
 import com.guiseframework.demo.EditUserPanel;
 import com.guiseframework.event.*;
@@ -224,7 +223,7 @@ Debug.trace("list control changed value to", newValue);
 		boundLabel.setLabel("Button");
 		boundLabel.setDescription("This is button flyover.");
 		boundLabel.setFlyoverEnabled(true);	//turn on flyovers
-		testText.add(boundLabel, new ReferenceLayout.Constraints("boundComponent"));
+		testText.add(boundLabel, new ReferenceConstraints(session, "boundComponent"));
 
 		contentPanel.add(testText);
 		
@@ -681,13 +680,13 @@ Debug.trace("list control changed value to", newValue);
 		temperatureOutput.setLabel("Output Temperature");	//add a label to the text output control
 		temperatureOutput.setEditable(false);	//set the text output control to read-only so that the user cannot modify it
 		temperaturePanel.add(temperatureOutput);	//add the output control to the input panel
-		tabbedPanel.add(temperaturePanel, new CardLayout.Constraints("Temperature"));
+		tabbedPanel.add(temperaturePanel, new CardConstraints(session, "Temperature"));
 	
 		final LayoutPanel helloPanel=new LayoutPanel(session);
 		final Heading helloWorldHeading=new Heading(session, 0);	//create a top-level heading
 		helloWorldHeading.setLabel("Hello World!");	//set the text of the heading, using its model
 		helloPanel.add(helloWorldHeading);
-		tabbedPanel.add(helloPanel, new CardLayout.Constraints("Hello"));
+		tabbedPanel.add(helloPanel, new CardConstraints(session, "Hello"));
 		
 		contentPanel.add(tabbedPanel);
 
@@ -709,7 +708,9 @@ Debug.trace("list control changed value to", newValue);
 		
 		final CardTabControl remoteTabControl=new CardTabControl(session, tabbedPanel, Flow.LINE);
 		contentPanel.add(remoteTabControl);
-		
+
+Debug.trace("tabbed panel", tabbedPanel, "has view", tabbedPanel.getView());
+Debug.trace("card tab control", remoteTabControl, "has view", remoteTabControl.getView());
 
 		checkbox.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Boolean>()
 				{
@@ -720,20 +721,21 @@ Debug.trace("list control changed value to", newValue);
 						testButton.setVisible(newValue);	//update the button enabled state
 //TODO del						testButton.setVisible(newValue);	//update the button enabled state
 //TODO bring back						testButton.getModel().setEnabled(newValue);	//update the button enabled state
-Debug.trace("ready to set tabbed panel enabled to ", newValue);
+Debug.trace("ready to set tabbed panel enabled to", newValue);
 //TODO del						tabbedPanel.getLayout().getConstraints(helloPanel).setEnabled(newValue);	//TODO testing
 						remoteTabControl.setValueEnabled(helloPanel, newValue);	//TODO testing
+Debug.trace("now tab enabled is", remoteTabControl.isValueEnabled(helloPanel));
 					}
 				});
 
 
-		add(contentPanel, RegionLayout.CENTER_CONSTRAINTS);	//add the content panel in the center
+		add(contentPanel, new RegionConstraints(session, Region.CENTER));	//add the content panel in the center
 
-		add(createMenu(session, Flow.LINE), RegionLayout.PAGE_START_CONSTRAINTS);	//add the pulldown menu at the top
+		add(createMenu(session, Flow.LINE), new RegionConstraints(session, Region.PAGE_START));	//add the pulldown menu at the top
 
 //TODO fix		add(createMenu(session, Orientation.Flow.PAGE), RegionLayout.LINE_START_CONSTRAINTS);	//add the menu at the left
 
-		add(createAccordionMenu(session, Flow.PAGE), RegionLayout.LINE_START_CONSTRAINTS);	//add the menu at the left
+		add(createAccordionMenu(session, Flow.PAGE), new RegionConstraints(session, Region.LINE_START));	//add the menu at the left
 	}
 
 	protected DropMenu createMenu(final GuiseSession session, final Flow flow)

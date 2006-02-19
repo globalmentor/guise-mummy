@@ -19,7 +19,7 @@ import com.guiseframework.event.*;
 This class and subclasses represent layout definitions, not layout implementations.
 @author Garret Wilson
 */
-public abstract class AbstractLayout<T extends Layout.Constraints> extends GuiseBoundPropertyObject implements Layout<T>
+public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPropertyObject implements Layout<T>
 {
 
 	/**The lazily-created listener of constraint property changes.*/
@@ -34,6 +34,46 @@ public abstract class AbstractLayout<T extends Layout.Constraints> extends Guise
 			}
 			return constraintsPropertyChangeListener;	//return the listener of constraints properties
 		}
+
+	/**The lazily-created listener of component constraints changes.*/
+	private GuisePropertyChangeListener<Constraints> componentConstraintsChangeListener=null;
+
+		/**@return The lazily-created listener of component constraints changes.*/
+		protected GuisePropertyChangeListener<Constraints> getComponentConstraintsChangeListener()
+		{
+			if(componentConstraintsChangeListener==null)	//if we haven't yet created a property change listener for the component constraints property
+			{
+				componentConstraintsChangeListener=new AbstractGuisePropertyChangeListener<Constraints>()	//create a property change listener to listen for the component constraints property changing
+						{
+							public void propertyChange(final GuisePropertyChangeEvent<Constraints> propertyChangeEvent)	//if a component's constraints property changes
+							{
+									//indicate that the component's constraints changed, and update the constraints property listener
+								componentConstraintsChanged((Component<?>)propertyChangeEvent.getSource(), propertyChangeEvent.getOldValue(), propertyChangeEvent.getNewValue());
+							}					
+						};
+			}
+			return componentConstraintsChangeListener;	//return the listener of component constraints
+		}
+
+	/**Indicates that the constraints for a component have changed.
+	This method is also called when the component is first added to the layout.
+	This version removes and installs property change listeners to and from the constraints objects as appropriate.
+	@param component The component for which constraints have changed.
+	@param oldConstraints The old component constraints, or <code>null</code> if there were no constraints previously.
+	@param newConstraints The new component constraints, or <code>null</code> if the component now has no constraints.
+	*/
+	protected void componentConstraintsChanged(final Component<?> component, final Constraints oldConstraints, final Constraints newConstraints)
+	{
+		final ConstraintsPropertyChangeListener constraintsPropertyChangeListener=getConstraintsPropertyChangeListener();	//get the constraints property change listener
+		if(oldConstraints!=null)	//if there were old constraints
+		{
+			oldConstraints.removePropertyChangeListener(constraintsPropertyChangeListener);	//stop listening for the constraints properties changing
+		}
+		if(newConstraints!=null)	//if there are new constraints
+		{
+			newConstraints.addPropertyChangeListener(constraintsPropertyChangeListener);	//listn for the constraints properties changing
+		}		
+	}
 
 	/**The container that owns this layout, or <code>null</code> if this layout has not been installed into a container.*/
 	private Container<?> container=null;
@@ -68,7 +108,21 @@ public abstract class AbstractLayout<T extends Layout.Constraints> extends Guise
 				{
 					throw new IllegalArgumentException("Provided container "+newContainer+" is not really owner of layout "+this);
 				}
+				if(oldContainer!=null)	//if there was an old container
+				{
+					for(final Component<?> childComponent:oldContainer)	//for each child component in the old container
+					{
+						removeComponent(childComponent);	//remove the old component from the layout
+					}
+				}
 				container=newContainer;	//this is really our component; make a note of it
+				if(newContainer!=null)	//if there is a new container
+				{
+					for(final Component<?> childComponent:newContainer)	//for each child component in the new container
+					{
+						addComponent(childComponent);	//add the new component to the layout
+					}
+				}
 			}
 		}
 
@@ -81,39 +135,59 @@ public abstract class AbstractLayout<T extends Layout.Constraints> extends Guise
 	{		
 	}
 */
-		
-	/**The thread-safe map of layout metadata associated with components.*/
-	protected final Map<Component<?>, T> componentConstraintsMap=new ConcurrentHashMap<Component<?>, T>();
 
-	/**Associates layout metadata with a component.
-	Any metadata previously associated with the component will be removed.
-	@param component The component for which layout metadata is being specified.
-	@param constraints Layout information specifically for the component.
-	@return The layout information previously associated with the component, or <code>null</code> if the component did not previously have metadata specified.
-	@exception NullPointerException if the given constraints object is <code>null</code>.
+	/**Adds a component to the layout.
+	Called immediately after a component is added to the associated container.
+	This method is called by the associated container, and should not be called directly by application code.
+	@param component The component to add to the layout.
 	@exception IllegalStateException if this layout has not yet been installed into a container.
 	*/
-	public T setConstraints(final Component<?> component, final T constraints)
+	public void addComponent(final Component<?> component)
 	{
 		final Container<?> container=getContainer();	//get the layout's container
 		if(container==null)	//if we haven't been installed into a container
 		{
 			throw new IllegalStateException("Layout does not have container.");
 		}
-		final T oldConstraints=componentConstraintsMap.put(component, checkNull(constraints, "Constraints cannot be null"));	//put the metadata in the map, keyed to the component
-		final ConstraintsPropertyChangeListener constraintsPropertyChangeListener=getConstraintsPropertyChangeListener();	//get the constraints property change listener
-		if(oldConstraints!=null)	//if there were constraints before
+		final Constraints constraints=getConstraints(component);	//get the component constraints, installing appropriate constraints if necessary
+		if(constraints!=null)	//if there are constraints
 		{
-			oldConstraints.removePropertyChangeListener(constraintsPropertyChangeListener);	//stop listening for constraint property changes
+			componentConstraintsChanged(component, null, constraints);	//act as if the component changed from no constraints to its current constraints, adding a listener to those constraints
 		}
-		constraints.addPropertyChangeListener(constraintsPropertyChangeListener);	//listen for constraint property changes for the new constraints
-		return oldConstraints;	//return the old constraints, if any
+		component.addPropertyChangeListener(Component.CONSTRAINTS_PROPERTY, getComponentConstraintsChangeListener());	//listen for the component's constraints property changing so that we can listen for properties of the new constraints changing
 	}
 
-	/**Determines layout metadata associated with a component.
+	/**Removes a component from the layout.
+	Called immediately before a component is removed from the associated container.
+	This method is called by the associated container, and should not be called directly by application code.
+	@param component The component to remove from the layout.
+	*/
+	public void removeComponent(final Component<?> component)
+	{
+		final Container<?> container=getContainer();	//get the layout's container
+		if(container==null)	//if we haven't been installed into a container
+		{
+			throw new IllegalStateException("Layout does not have container.");
+		}		
+		component.removePropertyChangeListener(Component.CONSTRAINTS_PROPERTY, getComponentConstraintsChangeListener());	//stop listening for the component's constraints property changing
+		final Constraints constraints=component.getConstraints();	//get the component constraints
+		if(constraints!=null)	//if there are constraints
+		{
+			componentConstraintsChanged(component, constraints, null);	//act as if the component changed from its current constraints to no constraints, removing the listener from those constraints		
+		}
+	}
+		
+	/**Retreives layout constraints associated with a component.
+	If the constraints currently associated with the component are not compatible with this layout,
+		or if no constraints are associated with the given component,
+		default constraints are created and associated with the component.
 	@param component The component for which layout metadata is being requested.
-	@return The layout information associated with the component, or <code>null</code> if the component does not have metadata specified.
+	@return The constraints associated with the component.
 	@exception IllegalStateException if this layout has not yet been installed into a container.
+	@exception IllegalStateException if no constraints are associated with the given component and this layout does not support default constraints.
+	@see #getConstraintsClass()
+	@see Component#getConstraints()
+	@see Component#setConstraints(Constraints)
 	*/
 	public T getConstraints(final Component<?> component)
 	{
@@ -122,24 +196,14 @@ public abstract class AbstractLayout<T extends Layout.Constraints> extends Guise
 		{
 			throw new IllegalStateException("Layout does not have container.");
 		}
-		return componentConstraintsMap.get(component);	//return any metadata associated with the component
-	}
-
-	/**Removes any layout metadata associated with a component.
-	@param component The component for which layout metadata is being removed.
-	@return The layout information previously associated with the component, or <code>null</code> if the component did not previously have metadata specified.
-	@exception IllegalStateException if this layout has not yet been installed into a container.
-	*/
-	public T removeConstraints(final Component<?> component)	//TODO update comment; a component should always have associated constraints
-	{
-		final Container<?> container=getContainer();	//get the layout's container
-		if(container==null)	//if we haven't been installed into a container
+		final Class<? extends T> constraintsClass=getConstraintsClass();	//get the type of constraints we expect
+		Constraints constraints=component.getConstraints();	//get the constraints associated with the component
+		if(!constraintsClass.isInstance(constraints))	//if the current constraints are not compatible with the type of constraints we expect, or there are no constraints
 		{
-			throw new IllegalStateException("Layout does not have container.");
+			constraints=createDefaultConstraints();	//create default constraints for this component
+			component.setConstraints(constraints);	//associate the new constraints with this component			
 		}
-		final T constraints=componentConstraintsMap.remove(component);	//remove the metadata from the map and return the old metadata
-		constraints.removePropertyChangeListener(constraintsPropertyChangeListener);	//stop listening for constraint property changes		
-		return constraints;	//return the removed constraints
+		return constraintsClass.cast(constraints);	//return the constraints, casting them to the correct type, because we've verified that they are of the correct type
 	}
 
 	/**Session constructor.
@@ -174,11 +238,12 @@ public abstract class AbstractLayout<T extends Layout.Constraints> extends Guise
 	}
 
 	/**A property change listener that listens for changes in a constraint object's properties and fires a layout constraints property change event in response.
-	A {@link LayoutConstraintsPropertyChangeEvent} will be fired for each component associated with the constraints for which a property changed
+	A {@link LayoutConstraintsPropertyChangeEvent} will be fired for each component associated with the constraints for which a property changed.
+	Events are only fired for constraints of a type recognized by this layout.
 	@author Garret Wilson
 	@see LayoutConstraintsPropertyChangeEvent
 	*/
-	protected class ConstraintsPropertyChangeListener extends AbstractGuisePropertyChangeListener<Object>
+	protected class ConstraintsPropertyChangeListener extends AbstractGuisePropertyChangeListener<Object>	//TODO important fix; when a LayoutConstraintsPropertyChangeEvent is refired by the component, it won't be the correct type 
 	{
 
 		/**Called when a bound property is changed.
@@ -187,13 +252,18 @@ public abstract class AbstractLayout<T extends Layout.Constraints> extends Guise
 		*/
 		public void propertyChange(final GuisePropertyChangeEvent<Object> propertyChangeEvent)
 		{
-			final T constraints=(T)propertyChangeEvent.getSource();	//get the constraints for which a property changed TODO improve cast
-				//find the component for these constraints
-			for(final Map.Entry<Component<?>, T> componentConstraintsEntry:componentConstraintsMap.entrySet())	//for each entry in the map of constraints
+			final Class<? extends T> constraintsClass=getConstraintsClass();	//get the type of constraints we expect			
+			final Constraints constraints=(Constraints)propertyChangeEvent.getSource();	//get the constraints for which a property changed
+			if(constraintsClass.isInstance(constraints))	//if the current constraints are compatible with the type of constraints we expect
 			{
-				if(componentConstraintsEntry.getValue()==constraints)	//if this component was associated with the constraints
+				final T layoutConstraints=constraintsClass.cast(constraints);	//cast the constraints to this layout's type
+					//find the component for these constraints
+				for(final Component<?> childComponent:getContainer())	//for each child component in the container
 				{
-					refirePropertyChange(componentConstraintsEntry.getKey(), constraints, propertyChangeEvent.getPropertyName(), propertyChangeEvent.getOldValue(), propertyChangeEvent.getNewValue());	//refire the event
+					if(childComponent.getConstraints()==constraints)	//if this component was associated with the constraints
+					{
+						refirePropertyChange(childComponent, layoutConstraints, propertyChangeEvent.getPropertyName(), propertyChangeEvent.getOldValue(), propertyChangeEvent.getNewValue());	//refire the event
+					}
 				}
 			}
 		}
@@ -213,13 +283,4 @@ public abstract class AbstractLayout<T extends Layout.Constraints> extends Guise
 			
 		}
 	}
-	
-	/**An abstract implementation of metadata about individual component layout.
-	@author Garret Wilson
-	*/
-	public static abstract class AbstractConstraints extends BoundPropertyObject implements Constraints
-	{
-		
-	}
-
 }

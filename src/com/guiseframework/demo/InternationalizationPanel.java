@@ -4,8 +4,7 @@ import java.util.*;
 
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
-import com.guiseframework.component.layout.Flow;
-import com.guiseframework.component.layout.RegionLayout;
+import com.guiseframework.component.layout.*;
 import com.guiseframework.converter.Converter;
 import com.guiseframework.converter.DateStringLiteralConverter;
 import com.guiseframework.converter.DateStringLiteralStyle;
@@ -91,14 +90,14 @@ public class InternationalizationPanel extends DefaultNavigationPanel
 		
 		menu.add(dateMenu);	//add the date menu to the horizontal menu
 
-		add(menu, RegionLayout.PAGE_START_CONSTRAINTS);	//add the menu at the top
+		add(menu, new RegionConstraints(session, Region.PAGE_START));	//add the menu at the top
 
 			//localized text
 		final Text text=new Text(session);	//create a text component
 		text.setTextContentType(XHTML_CONTENT_TYPE);	//use application/xhtml+xml content
 		text.setTextResourceKey(UN_CHARTER_PREAMBLE_RESOURCE_KEY);	//use the UN Charter Preamble resource, appropriately localized
 
-		add(text, RegionLayout.CENTER_CONSTRAINTS);	//add the text in the center of the panel
+		add(text, new RegionConstraints(session, Region.CENTER));	//add the text in the center of the panel
 	}
 
 }
