@@ -1060,12 +1060,47 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		assert CORNER_ARC_SIZE_PROPERTIES.length==cornerArcSizes.length : "Number of available corners changed.";
 	}
 
+	/**Whether this component has been initialized.*/
+	private boolean initialized=false;
+
 	/**Initializes the component after construction.
-	This implementation does nothing.
+	This method can only be called once during the life of a component.
+	Subclasses should call this version.
+	This implementation performs no actions.
+	@exception IllegalStateException if this method has already been called.
 	*/
 	public void initialize()
 	{
+		if(initialized)	//if this method has already been called
+		{
+			throw new IllegalStateException("Component can only be initialized once.");
+		}
+		initialized=true;	//show that this component has been initialized
 	}
+
+	/**Initializes the component with a description in an RDF resource file.
+	This method calls {@link #initialize()} after loading.
+	@param resourceKey The key to an RDF description resource file.
+	@exception MissingResourceException if no resource could be found associated with the given key.
+	*/
+/*TODO del if not used
+	public void initializeFromResource(final String resourceKey) throws MissingResourceException
+	{
+		final String descriptionResource=getSession().getStringResource(resourceKey);	//get the description resource
+	}
+*/
+
+	/**Initializes the component with a description in an RDF resource file.
+	This method calls {@link #initialize()} after loading.
+	@param resourceKey The key to an RDF description resource file.
+	@exception MissingResourceException if no resource could be found associated with the given key.
+	*/
+/*TODO del when works
+	public void initializeFromDescription(final String resourceKey) throws MissingResourceException
+	{
+		final String descriptionResource=getSession().getStringResource(resourceKey);	//get the description resource
+	}
+*/
 
 	/**Determines whether the models of this component and all of its child components are valid.
 	This version checks to ensure the component's model is valid.

@@ -18,10 +18,8 @@ import com.garretwilson.beans.*;
 import com.garretwilson.event.PostponedEvent;
 import com.garretwilson.io.BOMInputStreamReader;
 import com.garretwilson.lang.ObjectUtilities;
-import com.garretwilson.rdf.RDF;
-import com.garretwilson.rdf.RDFResource;
-import com.garretwilson.rdf.RDFUtilities;
-import com.garretwilson.rdf.RDFXMLProcessor;
+import com.garretwilson.rdf.*;
+import com.garretwilson.rdf.ploop.PLOOPProcessor;
 import com.garretwilson.text.xml.XMLUtilities;
 import com.garretwilson.util.CollectionUtilities;
 import com.garretwilson.util.Debug;
@@ -29,12 +27,7 @@ import com.garretwilson.util.ResourceBundleUtilities;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.context.GuiseContext;
-import com.guiseframework.event.AbstractGuisePropertyChangeListener;
-import com.guiseframework.event.GuisePropertyChangeEvent;
-import com.guiseframework.event.GuisePropertyChangeListener;
-import com.guiseframework.event.ModalEvent;
-import com.guiseframework.event.ModalNavigationListener;
-
+import com.guiseframework.event.*;
 
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -44,6 +37,7 @@ import static com.garretwilson.io.FileUtilities.*;
 import static com.garretwilson.io.WriterUtilities.*;
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static com.guiseframework.GuiseResourceConstants.*;
@@ -67,10 +61,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		public ApplicationFrame<?> getApplicationFrame() {return applicationFrame;}
 
 	/**The processor that converts RDF to Guise objects.*/
-	private final GuiseRDFProcessor guiseRDFProcessor;
+	private final PLOOPProcessor guiseRDFProcessor;
 
 		/**@return The processor that converts RDF to Guise objects.*/
-		private GuiseRDFProcessor getGuiseRDFProcessor() {return guiseRDFProcessor;}
+		private PLOOPProcessor getGuiseRDFProcessor() {return guiseRDFProcessor;}
 
 	/**The non-thread-safe document builder that parses XML documents for input to RDF.*/
 	private final DocumentBuilder documentBuilder;
@@ -665,7 +659,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		{
 			throw new AssertionError(parserConfigurationException);
 		}	
-		guiseRDFProcessor=new GuiseRDFProcessor(this);	//create a new Guise RDF processor, which is thread-safe
+		guiseRDFProcessor=new PLOOPProcessor(this);	//create a new Guise RDF processor, which is thread-safe, passing the Guise session to use as a default constructor argument
+		guiseRDFProcessor.setNameProperty("name");	//indicate that components can be named using setName() TODO use a constant
 		this.environment=new DefaultGuiseEnvironment();	//create a default environment
 		this.locale=application.getDefaultLocale();	//default to the application locale
 		this.orientation=Orientation.getOrientation(locale);	//set the orientation default based upon the locale
@@ -708,7 +703,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	}
 
 	/**Creates the panel for the given class.
-	This class synchronizes on {@link #navigationPathPanelMap}.
 	@param panelClass The class representing the panel to create.
 	@param panelID The ID to assign to the panel.
 	@return The created panel.
@@ -722,6 +716,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			try
 			{
 //TODO del Debug.trace("***ready to create navigation panel for path", path);
+Debug.trace("***ready to create navigation panel for ID", panelID);
 				panel=panelClass.getConstructor(GuiseSession.class, String.class).newInstance(this, panelID);	//find the Guise session and ID constructor and create an instance of the class
 			}
 			catch(final NoSuchMethodException noSuchMethodException)	//if there was no Guise session and string ID constructor
@@ -754,66 +749,20 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			{
 				try
 				{
-					synchronized(navigationPathPanelMap)	//we should already be synchronized on this class by the caller; show it here for completeness, because the document builder is not thread-safe
-					{
-						final URI BASE_URI=URI.create("guise:/");	//TODO fix
-						final URI GUISE_COMPONENT_NAMESPACE_URI=URI.create("java:com.guiseframework.component.");	//TODO fix; use constant
-						final Document document=getDocumentBuilder().parse(descriptionInputStream);	//parse the description document
-				//TODO del Debug.trace("just parsed XML:", XMLUtilities.toString(document));
-						final RDFXMLProcessor rdfProcessor=new RDFXMLProcessor();
-						final RDF rdf=rdfProcessor.processRDF(document, BASE_URI);
-						//integrate the structure into the RDF
-	//TODO del					Debug.trace("just read RDF", RDFUtilities.toString(rdf));
-						final RDFResource navigationPanelResource=RDFUtilities.getResourceByType(rdf, GUISE_COMPONENT_NAMESPACE_URI, "DefaultNavigationPanel");	//TODO fix better to indicate type; use constant
-						if(navigationPanelResource!=null)	//if we found a description for the navigation panel
-						{
-Debug.trace("ready to construct panel with resource", navigationPanelResource);
-							getGuiseRDFProcessor().initializeObject(panel, navigationPanelResource);
-							panel.initialize();	//initialize the panel
-						}
-					}
+					initializeComponent(panel, descriptionInputStream);	//initialize the panel
 				}
 				finally
 				{
 					descriptionInputStream.close();	//always close the description input stream for good measure
 				}
 			}
-			catch(final SAXException saxException)	//we don't expect parsing errors
-			{
-				throw new AssertionError(saxException);	//TODO maybe change to throwing an IOException
-			}
-			catch(final URISyntaxException uriSyntaxException)
-			{
-				throw new AssertionError(uriSyntaxException);	//TODO fix better
-			}
 			catch(final IOException ioException)	//if there is an I/O exception
 			{
 				throw new AssertionError(ioException);	//TODO fix better
 			}		
-			catch(final ClassNotFoundException classNotFoundTargetException)
-			{
-				throw new AssertionError(classNotFoundTargetException);	//TODO fix better
-			}		
-			catch(final InvocationTargetException invocationTargetException)
-			{
-				throw new AssertionError(invocationTargetException);	//TODO fix better
-			}
 		}		
 		return panel;	//return the panel
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	/**Releases the panel bound to the given appplication context-relative path.
 	@param path The appplication context-relative path within the Guise container context.
@@ -829,7 +778,90 @@ Debug.trace("ready to construct panel with resource", navigationPanelResource);
 		}
 		return navigationPathPanelMap.remove(path);	//uncache the panel
 	}
-
+	
+	/**Initializes a component with a description in an RDF resource file.
+	This method calls {@link Component#initialize()} after initializing the component from the description.
+	This implementation calls {@link #initializeComponent(Component, InputStream)}.
+	This method synchronizes on {@link #getDocumentBuilder()}.
+	@param component The component to initialize.
+	@param resourceKey The key to an RDF description resource file.
+	@exception MissingResourceException if no resource could be found associated with the given key.
+	@exception IllegalArgumentException if the RDF description does not provide a resource description of the same type as the specified component.
+	@exception IllegalStateException if the given component has already been initialized.
+	@see Component#initialize()
+	*/
+	public void initializeComponentFromResource(final Component<?> component, final String resourceKey)
+	{
+		final String descriptionResource=getStringResource(resourceKey);	//get the description resource
+		try
+		{
+			final InputStream descriptionInputStream=new ByteArrayInputStream(descriptionResource.getBytes(UTF_8));	//convert the string to bytes and create an input string to the array of bytes TODO verify the encoding somehow
+			initializeComponent(component, descriptionInputStream);	//initialize the component from the description resource
+		}
+		catch(final UnsupportedEncodingException unsupportedEncodingException)	//UTF-8 should always be supported
+		{
+			throw new AssertionError(unsupportedEncodingException);
+		}
+	}
+	
+	/**Initializes a component from the contents of an RDF description input stream.
+	This method calls {@link Component#initialize()} after initializing the component from the description.
+	This method synchronizes on {@link #getDocumentBuilder()}.
+	@param component The component to initialize.
+	@param descriptionInputStream The input stream containing an RDF description.
+	@exception IllegalArgumentException if the RDF description does not provide a resource description of the same type as the specified component.
+	@exception IllegalStateException if the given component has already been initialized.
+	@see Component#initialize()
+	*/
+	public void initializeComponent(final Component<?> component, final InputStream descriptionInputStream)
+	{
+		try
+		{
+			synchronized(getDocumentBuilder())	//synchronize because the document builder is not thread-safe
+			{
+				final URI BASE_URI=URI.create("guise:/");	//TODO fix
+				final Document document=getDocumentBuilder().parse(descriptionInputStream);	//parse the description document
+		//TODO del Debug.trace("just parsed XML:", XMLUtilities.toString(document));
+				final RDFXMLProcessor rdfProcessor=new RDFXMLProcessor();	//create a new RDF processor
+				final RDF rdf=rdfProcessor.processRDF(document, BASE_URI);	//process the RDF from the XML
+				//integrate the structure into the RDF
+//TODO del					Debug.trace("just read RDF", RDFUtilities.toString(rdf));
+//TODO delDebug.trace("just read RDF", RDFUtilities.toString(rdf));
+				final URI componentResourceTypeURI=new URI(JAVA_SCHEME, component.getClass().getName(), null);	//create a new URI that indicates the type of the resource description we expect
+				final RDFResource componentResource=RDFUtilities.getResourceByType(rdf, componentResourceTypeURI);	//try to locate the description of the given component
+				if(componentResource!=null)	//if there is a resource description of a matching type
+				{
+					getGuiseRDFProcessor().initializeObject(component, componentResource);	//initialize the component from this resource
+					component.initialize();	//initialize the component
+				}
+				else	//if there is no resource of the appropriate type
+				{
+					throw new IllegalArgumentException("No resource description found of type "+componentResourceTypeURI);
+				}
+			}
+		}
+		catch(final SAXException saxException)	//we don't expect parsing errors
+		{
+			throw new AssertionError(saxException);	//TODO maybe change to throwing an IOException
+		}
+		catch(final URISyntaxException uriSyntaxException)
+		{
+			throw new AssertionError(uriSyntaxException);	//TODO fix better
+		}
+		catch(final IOException ioException)	//if there is an I/O exception
+		{
+			throw new AssertionError(ioException);	//TODO fix better
+		}		
+		catch(final ClassNotFoundException classNotFoundTargetException)
+		{
+			throw new AssertionError(classNotFoundTargetException);	//TODO fix better
+		}		
+		catch(final InvocationTargetException invocationTargetException)
+		{
+			throw new AssertionError(invocationTargetException);	//TODO fix better
+		}
+	}
+	
 	/**The stack of modal navigation points.*/
 	private final List<ModalNavigation> modalNavigationStack=synchronizedList(new ArrayList<ModalNavigation>());
 

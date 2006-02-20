@@ -1,5 +1,8 @@
 package com.guiseframework;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.Principal;
 import java.util.*;
@@ -12,6 +15,7 @@ import com.guiseframework.context.GuiseContext;
 import com.guiseframework.event.ModalNavigationListener;
 
 import static com.garretwilson.lang.ClassUtilities.*;
+import static com.garretwilson.text.CharacterEncodingConstants.UTF_8;
 
 /**Represents a session with a user.
 A Swing-based client application may have only one session, while a web server application will likely have multiple sessions.
@@ -95,6 +99,30 @@ public interface GuiseSession extends PropertyBindable
 	@see #ORIENTATION_PROPERTY
 	*/
 	public void setOrientation(final Orientation newOrientation);
+
+	/**Initializes a component with a description in an RDF resource file.
+	This method calls {@link Component#initialize()} after initializing the component from the description.
+	This implementation calls {@link #initializeComponent(Component, InputStream)}.
+	This method synchronizes on {@link #getDocumentBuilder()}.
+	@param component The component to initialize.
+	@param resourceKey The key to an RDF description resource file.
+	@exception MissingResourceException if no resource could be found associated with the given key.
+	@exception IllegalArgumentException if the RDF description does not provide a resource description of the same type as the specified component.
+	@exception IllegalStateException if the given component has already been initialized.
+	@see Component#initialize()
+	*/
+	public void initializeComponentFromResource(final Component<?> component, final String resourceKey);
+	
+	/**Initializes a component from the contents of an RDF description input stream.
+	This method calls {@link Component#initialize()} after initializing the component from the description.
+	This method synchronizes on {@link #getDocumentBuilder()}.
+	@param component The component to initialize.
+	@param descriptionInputStream The input stream containing an RDF description.
+	@exception IllegalArgumentException if the RDF description does not provide a resource description of the same type as the specified component.
+	@exception IllegalStateException if the given component has already been initialized.
+	@see Component#initialize()
+	*/
+	public void initializeComponent(final Component<?> component, final InputStream descriptionInputStream);
 
 	/**Retrieves a resource bundle to be used by this session.
 	One of the <code>getXXXResource()</code> should be used in preference to using this method directly.

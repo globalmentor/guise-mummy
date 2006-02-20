@@ -26,6 +26,7 @@ public class TemperatureConversionPanel2 extends DefaultNavigationPanel
 	public TemperatureConversionPanel2(final GuiseSession session)
 	{
 		super(session);	//construct the parent class
+//TODO del		session.initializeComponentFromResource(this, "TemperatureConversionPanel2.rdf");
 	}
 
 	/**Initializes the component after construction.*/

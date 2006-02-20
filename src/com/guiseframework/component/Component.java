@@ -552,7 +552,11 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	*/
 	public boolean importTransfer(final Transferable transferable);
 
-	/**Initializes the component after construction.*/
+	/**Initializes the component after construction.
+	This method can only be called once during the life of a component.
+	Subclasses should call this version.
+	@exception IllegalStateException if this method has already been called.
+	*/
 	public void initialize();
 
 	/**@return Whether the models of this component and all of its child components are valid.*/
