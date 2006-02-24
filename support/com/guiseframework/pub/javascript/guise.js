@@ -720,6 +720,8 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 		{
 			case "class":
 				return "className";
+			case "maxlength":	//see http://www.quirksmode.org/bugreports/archives/2005/02/IE_setAttributemaxlength_5_on_input.html
+				return "maxLength";
 			case "readonly":
 				return "readOnly";
 			default:	//for all other class names, return the DOM attribute

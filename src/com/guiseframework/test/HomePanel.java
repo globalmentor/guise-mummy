@@ -111,6 +111,7 @@ public class HomePanel extends DefaultNavigationPanel
 		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE));	//create the input panel flowing vertically
 		inputPanel.setBackgroundColor(RGBColor.AQUA_MARINE);
 		final TextControl<Float> inputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
+		inputTextControl.setMaximumLength(5);
 		inputTextControl.setLabel("Input Number");	//add a label to the text input control
 		inputTextControl.setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
 		inputTextControl.setBackgroundColor(RGBColor.DARK_GOLDEN_ROD);
