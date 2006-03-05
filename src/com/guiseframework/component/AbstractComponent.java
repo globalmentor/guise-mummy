@@ -8,7 +8,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.mail.internet.ContentType;
 
-import com.garretwilson.event.EventListenerManager;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.Debug;
 import com.guiseframework.GuiseSession;

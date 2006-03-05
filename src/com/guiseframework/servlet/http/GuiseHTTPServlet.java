@@ -1410,19 +1410,19 @@ Debug.trace("+++creating Guise session", httpSession.getId());
 			}
 		}
 
-		/**The pattern for matching the Firefox user agent.*/
-		private final Pattern FIREFOX_PATTERN=Pattern.compile("Firefox/"+PRODUCT_VERSION_REGEX);
+		/**The pattern for matching the Firefox user agent. The entire version number is the first matching group.*/
+		private final Pattern FIREFOX_PATTERN=Pattern.compile("Firefox/("+PRODUCT_VERSION_REGEX+")");
 
-		/**The pattern for matching the Opera user agent.
+		/**The pattern for matching the Opera user agent. The entire version number is the first matching group.
 		This pattern recognizes, for example, both "Opera/7.54" and "Opera 7.54".
 		*/
-		private final Pattern OPERA_PATTERN=Pattern.compile("Opera[/ ]"+PRODUCT_VERSION_REGEX);
+		private final Pattern OPERA_PATTERN=Pattern.compile("Opera[/ ]("+PRODUCT_VERSION_REGEX+")");
 
-		/**The pattern for matching the MSIE user agent.
+		/**The pattern for matching the MSIE user agent. The entire version number is the first matching group.
 		Microsoft recommended regular expression: "MSIE ([0-9]{1,}[\\.0-9]{0,})"
 		@see http://msdn.microsoft.com/workshop/author/dhtml/overview/browserdetection.asp
 		*/
-		private final Pattern MSIE_PATTERN=Pattern.compile("MSIE "+PRODUCT_VERSION_REGEX);
+		private final Pattern MSIE_PATTERN=Pattern.compile("MSIE ("+PRODUCT_VERSION_REGEX+")");
 
 		/**Initializes a Guise environment with user agent information.
 		For known browsers, the user agent string will be parsed with specific knowledge of the evolution of the user of the user agent string.
@@ -1443,13 +1443,15 @@ Debug.trace("+++creating Guise session", httpSession.getId());
 				//e.g. IE 6.0: "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)"
 				//e.g. Safari 1.3.2: "Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en) AppleWebKit/312.8 (KHTML, like Gecko) Safari/312.5"
 Debug.trace("user agent:", userAgent);
-				String userAgentName=null;	//we'll determint the user agent name
-				int[] userAgentVersion=null;	//we'll determine the version
+				String userAgentName=null;	//we'll determine the user agent name
+				String userAgentVersion=null;	//we'll determine the user agent version string
+				int[] userAgentVersionNumbers=null;	//we'll determine the version numbers
 				final Matcher operaMatcher=OPERA_PATTERN.matcher(userAgent);	//first match for Opera, which can masquerade as other browsers
 				if(operaMatcher.find())	//if the user agent string finds an Opera match
 				{
 					userAgentName=GuiseEnvironment.USER_AGENT_NAME_OPERA;	//show that this is Opera
-					userAgentVersion=getIntGroups(operaMatcher);	//parse out the version
+					userAgentVersion=operaMatcher.group(1);	//the first group is the entire version number
+					userAgentVersionNumbers=getIntGroups(operaMatcher, 2);	//parse out the version, skipping the entire version string group
 				}
 				else	//if this is not Opera
 				{
@@ -1457,7 +1459,8 @@ Debug.trace("user agent:", userAgent);
 					if(ieMatcher.find())	//if the user agent string finds an IE match
 					{
 						userAgentName=GuiseEnvironment.USER_AGENT_NAME_MSIE;	//show that this is MSIE
-						userAgentVersion=getIntGroups(ieMatcher);	//parse out the version
+						userAgentVersion=ieMatcher.group(1);	//the first group is the entire version number
+						userAgentVersionNumbers=getIntGroups(ieMatcher, 2);	//parse out the version, skipping the entire version string group
 					}
 					else	//if this is not IE
 					{
@@ -1465,11 +1468,12 @@ Debug.trace("user agent:", userAgent);
 						if(firefoxMatcher.find())	//if the user agent string finds a Firefox match
 						{
 							userAgentName=GuiseEnvironment.USER_AGENT_NAME_FIREFOX;	//show that this is Firefox
-							userAgentVersion=getIntGroups(firefoxMatcher);	//parse out the version
+							userAgentVersion=firefoxMatcher.group(1);	//the first group is the entire version number
+							userAgentVersionNumbers=getIntGroups(firefoxMatcher, 2);	//parse out the version, skipping the entire version string group
 						}
 					}
 				}
-Debug.trace("user agent name:", userAgentName, "with version", userAgentVersion!=null ? Arrays.toString(userAgentVersion) : null);
+Debug.trace("user agent name:", userAgentName, "with version", userAgentVersion, "with version numbers", userAgentVersionNumbers!=null ? Arrays.toString(userAgentVersionNumbers) : null);
 				if(userAgentName!=null)	//if we determined a user agent name
 				{
 					environment.setProperty(GuiseEnvironment.USER_AGENT_NAME_PROPERTY, userAgentName);	//store the user agent name
@@ -1477,6 +1481,10 @@ Debug.trace("user agent name:", userAgentName, "with version", userAgentVersion!
 				if(userAgentVersion!=null)	//if we determined a user agent version
 				{
 					environment.setProperty(GuiseEnvironment.USER_AGENT_VERSION_PROPERTY, userAgentVersion);	//store the user agent version
+				}
+				if(userAgentVersionNumbers!=null)	//if we determined a user agent version numbers
+				{
+					environment.setProperty(GuiseEnvironment.USER_AGENT_VERSION_NUMBERS_PROPERTY, userAgentVersionNumbers);	//store the user agent version numbers
 				}
 			}			
 		}

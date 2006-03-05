@@ -263,6 +263,11 @@ if(isSafari || (typeof document.importNode=="undefined"))	//if the document does
 				dummyNode.innerHTML="<table><tbody>"+nodeString+"</tbody></table>";	//create the tbody and put the row inside it
 				importedNode=dummyNode.childNodes[0].childNodes[0].childNodes[0];	//return the tbody's first and only node, which is our new imported node; do not actually remove the node, which will cause an error on IE TODO see the failure to remove the node causes any long-term problems
 			}
+			else if(elementName=="th" || elementName=="td")	//if this is a table header or cell
+			{
+				dummyNode.innerHTML="<table><tbody><tr>"+nodeString+"</tr></tbody></table>";	//create the tbody and put the row inside it
+				importedNode=dummyNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0];	//return the tr's first and only node, which is our new imported node; do not actually remove the node, which will cause an error on IE TODO see the failure to remove the node causes any long-term problems
+			}
 			else	//if this is not a table row
 			{
 //TODO fix							document.documentElement.appendChild(dummyNode);	//append the dummy node to the document
@@ -1818,6 +1823,18 @@ alert(exception);
 	//TODO del alert("found different node names; old: "+oldChildNode.nodeName+" and new: "+childNode.nodeName);
 								isChildrenCompatible=false;	//these child elements aren't compatible because they have different node name
 							}
+							else	//if the names are the same but the IDs are different, assume that the entire child should be replaced rather than synchronized---the event listeners would probably be different anyway
+							{
+								var oldChildID=oldChildNode.getAttribute("id");	//get the old child ID
+								var oldChildID=oldChildNode.id ? oldChildNode.id : null;	//normalize the ID because some browsers such as IE in HTML mode might return "" for a missing attribute rather than null
+								var childID=childNode.getAttribute("id");	//get the new child's ID
+//TODO del alert("comparing "+oldChildNode.nodeName+" IDs "+oldChildID+" "+typeof oldChildID+" and "+childID+" "+typeof childID);
+								if(oldChildID!=childID)	//if the IDs are different
+								{
+//TODO fix alert("IDs don't match: "+oldChildNode.nodeName+" IDs "+oldChildID+" "+typeof oldChildID+" and "+childID+" "+typeof childID);
+									isChildrenCompatible=false;	//these child elements aren't compatible because they have different IDs
+								}
+							}
 /*TODO maybe add this later to prevent shifting elements from creating duplicate IDs; it would be better to simply remove the child ID attribute, though
 							else	//if the names are the same
 							{
@@ -2877,6 +2894,7 @@ function onWindowLoad()
 		focusable.focus();	//focus on the node
 	}
 	guiseAJAX.sendAJAXRequest(new InitAJAXEvent());	//send an initialization AJAX request
+//TODO del	alert("compatibility mode: "+document.compatMode);
 }
 
 /**Called when the window unloads.

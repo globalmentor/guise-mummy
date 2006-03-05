@@ -8,10 +8,8 @@ import java.util.MissingResourceException;
 
 import javax.mail.internet.ContentType;
 
-import com.garretwilson.event.EventListenerManager;
-import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
-import com.guiseframework.event.GuiseBoundPropertyObject;
+import com.guiseframework.event.*;
 import com.guiseframework.validator.ValidationException;
 
 /**A base abstract class implementing helpful functionality for models.

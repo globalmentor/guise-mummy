@@ -1,26 +1,19 @@
 package com.guiseframework.model;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.IntegerUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.util.ArrayUtilities.*;
 import static com.garretwilson.util.CalendarConstants.*;
 
-import com.garretwilson.util.ArrayUtilities;
-import com.garretwilson.util.CollectionUtilities;
 import com.garretwilson.util.Debug;
-import com.garretwilson.util.SynchronizedListDecorator;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.converter.AbstractDateStringLiteralConverter;
 import com.guiseframework.converter.DateStringLiteralStyle;
 import com.guiseframework.event.AbstractGuisePropertyChangeListener;
 import com.guiseframework.event.GuisePropertyChangeEvent;
-import com.guiseframework.validator.Validator;
-
 
 /**A table model representing the days of a calendar month.
 Each cell contains a {@link Date} value.
