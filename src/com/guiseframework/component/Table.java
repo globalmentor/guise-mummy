@@ -12,6 +12,9 @@ import com.guiseframework.converter.ConversionException;
 import com.guiseframework.converter.Converter;
 import com.guiseframework.event.AbstractGuisePropertyChangeListener;
 import com.guiseframework.event.GuisePropertyChangeEvent;
+import com.guiseframework.event.ListEvent;
+import com.guiseframework.event.ListListenable;
+import com.guiseframework.event.ListListener;
 import com.guiseframework.model.*;
 import com.guiseframework.validator.*;
 
@@ -262,6 +265,18 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 						clearComponentStates();	//clear all the components and component states in case they are locale-related TODO probably transfer this up to the abstract composite state class
 					}			
 				});
+		if(tableModel instanceof ListListenable)	//if this table model allows list listeners TODO improve this; create a table model listener---maybe that will implement ListListener
+		{
+			final ListListenable<Object> listListenable=(ListListenable<Object>)tableModel;	//get the list listenable
+			listListenable.addListListener(new ListListener<Object>()	//listen for table modifications
+					{
+						public void listModified(final ListEvent<Object> listEvent)	//if the table list is modified
+						{
+							clearComponentStates();	//clear all the components and component states TODO probably do this on a component-by-component basis
+							getView().setUpdated(false);	//TODO fix hack; add a table listener and have the view listen to that
+						};
+					});
+		}
 	}
 
 		//TableModel delegations

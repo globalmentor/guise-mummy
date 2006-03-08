@@ -2,8 +2,7 @@ package com.guiseframework.model;
 
 import java.util.List;
 
-import com.guiseframework.event.ListListener;
-import com.guiseframework.event.ListSelectionListener;
+import com.guiseframework.event.*;
 import com.guiseframework.validator.ValidationException;
 
 /**A model for selecting one or more values from a list.
@@ -13,7 +12,7 @@ When the state of a value (besides its selection, such as its enabled status) ch
 @param <V> The type of values contained in the model.
 @author Garret Wilson
 */
-public interface ListSelectModel<V> extends SelectModel<V>, List<V>
+public interface ListSelectModel<V> extends SelectModel<V>, List<V>, ListListenable<V>
 {
 
 	/**@return The selection policy for this model.*/
