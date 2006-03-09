@@ -9,6 +9,7 @@ import com.guiseframework.GuiseSession;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**A bound property object that reports all property change events to the current session.
+This class postpones events if Guise is processing component controller events.
 @author Garret Wilson
 */
 public class GuiseBoundPropertyObject extends BoundPropertyObject
