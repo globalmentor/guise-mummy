@@ -14,6 +14,7 @@ import javax.xml.parsers.*;
 
 import static java.util.Collections.*;
 
+import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.event.PostponedEvent;
 import com.garretwilson.io.BOMInputStreamReader;
 import com.garretwilson.lang.ObjectUtilities;
