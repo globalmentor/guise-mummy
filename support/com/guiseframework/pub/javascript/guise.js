@@ -89,6 +89,14 @@ var TAB_CLASS_SUFFIX="-tab";
 /**The class suffix of a decorator.*/
 //TODO del var DECORATOR_CLASS_PREFIX="-decorator";
 
+/**The prefix for Guise state-related attributes, which shouldn't be removed when elements are synchronized.*/
+var GUISE_STATE_ATTRIBUTE_PREFIX="guiseState";
+
+/**The state attribute for width.*/
+var GUISE_STATE_WIDTH_ATTRIBUTE=GUISE_STATE_ATTRIBUTE_PREFIX+"width";
+/**The state attribute for height.*/
+var GUISE_STATE_HEIGHT_ATTRIBUTE=GUISE_STATE_ATTRIBUTE_PREFIX+"height";
+
 /**The enumeration of recognized styles.*/
 var STYLES=
 {
@@ -1692,7 +1700,8 @@ alert(exception);
 				{
 					if(attributeName!="style"	//don't remove local styles, because they may be used by Guise (with frames, for instance)
 							&& attributeName!="onclick"	//don't remove the onclick attribute, because we may be using it for Safari to prevent a default action
-							&& attributeName!="hideFocus")	//don't remove the IE hideFocus attribute, because we're using it to fix the IE6 lack of CSS outline: none support
+							&& attributeName!="hideFocus"	//don't remove the IE hideFocus attribute, because we're using it to fix the IE6 lack of CSS outline: none support
+							&& !attributeName.startsWith(GUISE_STATE_ATTRIBUTE_PREFIX))	//don't remove Guise state attributes
 					{
 //TODO del alert("ready to remove "+oldElement.nodeName+" attribute "+oldAttributeName+" with current value "+oldAttributeValue);
 						oldElement.removeAttribute(oldAttributeName);	//remove the attribute normally (apparently no action will take place if performed on IE-specific attributes such as element.start)
@@ -1762,8 +1771,15 @@ alert(exception);
 							}
 						}
 					}
-					if(valueChanged)	//if the old element has a different (or no) value for this attribute (Firefox maintains different values for element.getAttribute(attributeName) and element[attributeName]) (note also that using setAttribute() IE will sometimes throw an error if button.style is changed, for instance)
+					if(valueChanged && attributeName=="src")	//if a "src" attribute changed (e.g. img.src), make sure that the new src is not a relative URL form of the current src, which would cause IE6 to needlessly reload the image
 					{
+						if(attributeValue.startsWith("/") && location.protocol+"//"+location.host+attributeValue==oldAttributeValue)	//if the new value is just the relative form of the old value
+						{
+							valueChanged=false;	//keep the old value to prevent IE6 from reloading the image
+						}
+					}
+					if(valueChanged)	//if the old element has a different (or no) value for this attribute (Firefox maintains different values for element.getAttribute(attributeName) and element[attributeName]) (note also that using setAttribute() IE will sometimes throw an error if button.style is changed, for instance)
+					{					
 	//TODO del alert("updating "+element.nodeName+" attribute "+attributeName+" from value "+oldElement[attributeName]+" to new value "+attributeValue);
 						if(attributeName.indexOf(":")>0)	//if this is a namespaced attribute, we must use the DOM, because Firefox 1.5 won't allow the indexed notation for such attributes
 						{
@@ -2928,6 +2944,8 @@ alert("scroll");
 }
 */
 
+var testImages=new Array();	//TODO test caching
+
 /**Initializes a node and all its children, adding the correct listeners.
 @param node The node to initialize.
 */
@@ -3000,6 +3018,13 @@ function initializeNode(node)
 						}
 						break;
 					case "img":
+						var testImage=new Image();	//TODO test caching
+						testImage.src=node.src;
+						testImages.add(testImage);
+//TODO del						alert("found image src: "+node.src);
+					
+					
+					
 						var rolloverSrc=node.getAttribute("guise:rolloverSrc");	//get the image rollover, if there is one
 						if(rolloverSrc!=null)	//if the image has a rollover TODO use a constant
 						{
@@ -3776,6 +3801,11 @@ function onSliderThumbDragBegin(event)
 //TODO del alert("thumb offsetWidth: "+thumb.offsetWidth+" offsetHeight: "+thumb.offsetHeight);
 		var slider=getAncestorElementByClassName(thumb, STYLES.SLIDER_CONTROL);	//find the slider
 		var track=getAncestorElementByClassName(thumb, STYLES.SLIDER_CONTROL_TRACK);	//find the slider track
+		
+		
+//TODO find out why the slider track gets constantly reloaded in IE6
+//TODO we need to make sure the slider is fully loaded (which may not be as relevant once IE6 no longer constantly reloads images)		
+		
 		var positionID=slider.id+".position";	//TODO use constant
 		var positionInput=document.getElementById(positionID);	//get the position element		
 		if(slider && track && positionInput)	//if we found the slider and the slider track
@@ -3787,7 +3817,7 @@ function onSliderThumbDragBegin(event)
 			{
 				dragState.allowY=false;	//only allow horizontal dragging
 				var min=0;	//calculate the minimum
-				var max=track.offsetWidth-thumb.width+1;	//calculate the maximum
+				var max=track.offsetWidth-thumb[GUISE_STATE_WIDTH_ATTRIBUTE]+1;	//calculate the maximum
 				dragState.minX=min;	//set the minimum
 				dragState.maxX=max;	//set the maximum
 			}
@@ -3795,7 +3825,7 @@ function onSliderThumbDragBegin(event)
 			{
 				dragState.allowX=false;	//only allow vertical dragging
 				var min=0;	//calculate the minimum
-				var max=track.offsetHeight-thumb.height+1;	//calculate the maximum
+				var max=track.offsetHeight-thumb[GUISE_STATE_HEIGHT_ATTRIBUTE]+1;	//calculate the maximum
 				dragState.minY=min;	//set the minimum
 				dragState.maxY=max;	//set the maximum
 			}
@@ -3817,6 +3847,12 @@ function onSliderThumbDragBegin(event)
 //TODO del alert("new position: "+position);
 						positionInput.value=position.toString();	//put the position in the value
 //TODO del						var test="coordinate: "+coordinate+" min: "+min+" coordinate-min: "+(coordinate-min)+" position: "+position;
+/*TODO fix; this has been mostly fixed by preventing IE6 from reloading the images, but it has been seen once in Firefox after that
+if(isNaN(position))	//TODO del; fixed; change to assertion
+{
+	alert("track.offsetWidth: "+track.offsetWidth+" thumb[GUISE_STATE_WIDTH_ATTRIBUTE]: "+thumb[GUISE_STATE_WIDTH_ATTRIBUTE]+" max: "+max+" coordinate: "+coordinate+" min: "+min+" coordinate-min: "+(coordinate-min)+" span: "+span+" position: "+position);
+}
+*/
 						var ajaxRequest=new FormAJAXEvent(new Parameter(positionInput.name, position.toString()));	//create a new form request with the control name and value
 						guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 					};
@@ -3836,7 +3872,7 @@ function onSliderThumbDragBegin(event)
 
 /**Updates the representation of a slider based upon the slider's model value.
 The slider is only updated if the slider is not in the sliding state (i.e. the user is not manually moving the slider).
-This implementation also sets the thumb.width and thumb.height to work around a Mozilla bug that doesn't properly calculate thumb.offsetWidth and thumb.offsetHeight if the thumb is partially outside the track.
+This implementation also sets the thumb[GUISE_STATE_WIDTH_ATTRIBUTE] and thumb[GUISE_STATE_HEIGHT_ATTRIBUTE] to work around a Mozilla bug that doesn't properly calculate thumb.offsetWidth and thumb.offsetHeight if the thumb is partially outside the track.
 @param slider The slider element.
 */
 function updateSlider(slider)	//TODO maybe rename to updateSliderView
@@ -3873,13 +3909,13 @@ function updateSlider(slider)	//TODO maybe rename to updateSliderView
 	var positionInput=document.getElementById(positionID);	//get the position element
 	if(track && thumb && positionInput)	//if we found the slider track and thumb
 	{
-		if(typeof thumb.width=="undefined")	//if we haven't defined the thumb width
+		if(typeof thumb[GUISE_STATE_WIDTH_ATTRIBUTE]=="undefined")	//if we haven't defined the thumb width
 		{
-			thumb.width=thumb.offsetWidth;	//set the thumb width so that it won't change later with the Mozilla bug if the thumb is partially outside the track
+			thumb[GUISE_STATE_WIDTH_ATTRIBUTE]=thumb.offsetWidth;	//set the thumb width so that it won't change later with the Mozilla bug if the thumb is partially outside the track
 		}
-		if(typeof thumb.height=="undefined")	//if we haven't defined the thumb height
+		if(typeof thumb[GUISE_STATE_HEIGHT_ATTRIBUTE]=="undefined")	//if we haven't defined the thumb height
 		{
-			thumb.height=thumb.offsetHeight;	//set the thumb height so that it won't change later with the Mozilla bug if the thumb is partially outside the track
+			thumb[GUISE_STATE_HEIGHT_ATTRIBUTE]=thumb.offsetHeight;	//set the thumb height so that it won't change later with the Mozilla bug if the thumb is partially outside the track
 		}
 		var position=positionInput.value ? parseFloat(positionInput.value) : 0;	//get the position TODO make sure this logic is in synch with whether server code will always provide a value, even for null
 		var isHorizontal=hasClassName(track, STYLES.AXIS_X);	//see if this is a horizontal slider
@@ -3888,12 +3924,12 @@ function updateSlider(slider)	//TODO maybe rename to updateSliderView
 			var min=0;	//calculate the minimum
 //TODO del alert("track width: "+track.offsetWidth);
 //TODO del alert("thumb width: "+thumb.offsetWidth);
-			var max=track.offsetWidth-thumb.width+1;	//calculate the maximum
+			var max=track.offsetWidth-thumb[GUISE_STATE_WIDTH_ATTRIBUTE]+1;	//calculate the maximum
 		}
 		else	//if this is a vertical slider
 		{
 			var min=0;	//calculate the minimum
-			var max=track.offsetHeight-thumb.height+1;	//calculate the maximum
+			var max=track.offsetHeight-thumb[GUISE_STATE_HEIGHT_ATTRIBUTE]+1;	//calculate the maximum
 			position=1.0-position;	//take into account that the vertical slider origin is the opposite of the graphics origin
 		}
 		var span=max-min;	//find the available range of the values
@@ -3901,6 +3937,16 @@ function updateSlider(slider)	//TODO maybe rename to updateSliderView
 //TODO del when works alert("new coordinate for "+slider.id+" is "+newCoordinate);
 		if(isHorizontal)	//if this is a horizontal slider
 		{	//TODO fix; the compiled version on IE once gave an "invalid argument" error here
+		
+/*TODO del; this was probably being caused from the IE6 image reloading problem combined with removing the thumb spans when synchronizing earlier
+		
+if(isNaN(newCoordinate))
+{
+	alert("track width: "+track.offsetWidth+"thumb width: "+thumb[GUISE_STATE_WIDTH_ATTRIBUTE]);
+	alert("position: "+position+" span: "+span+" min: "+min);
+
+}
+*/		
 			thumb.style.left=newCoordinate+"px";	//update the horizontal position of the slider
 		}
 		else	//if this is a vertical slider
