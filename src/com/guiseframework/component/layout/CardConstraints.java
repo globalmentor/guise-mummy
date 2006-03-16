@@ -12,7 +12,7 @@ import com.guiseframework.component.Control;
 import com.guiseframework.model.DefaultLabelModel;
 import com.guiseframework.model.LabelModel;
 
-/**Constraints on individual component card layout.
+/**Constraints on an individual component in a card layout.
 @author Garret Wilson
 */
 public class CardConstraints extends AbstractConstraints implements LabelModel

@@ -219,12 +219,6 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 			/**@return The physical index of the day of the week relative to the first day of the week.*/
 			public int getIndex() {return index;}
 
-		/**@return <code>true</code> if this model has label information, such as an icon or a label string.*/
-		public boolean hasLabel()
-		{
-			return true;	//a week day table column always has a label
-		}
-
 		/**Determines the text of the label.
 		This version returns a representation of the day of the week if no label is specified.
 		@return The label text, or <code>null</code> if there is no label text.

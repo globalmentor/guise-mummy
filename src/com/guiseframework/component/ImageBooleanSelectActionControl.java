@@ -10,24 +10,24 @@ import com.guiseframework.GuiseSession;
 import com.guiseframework.model.DefaultValueModel;
 import com.guiseframework.model.ValueModel;
 
-/**Image control that can be selected and generates actions.
+/**Image control that can be selected and generates actions, storing a Boolean value in its model representing the selected state.
 @author Garret Wilson
 */
-public class ImageSelectActionControl extends AbstractSelectActionControl<ImageSelectActionControl>
+public class ImageBooleanSelectActionControl extends AbstractBooleanSelectActionControl<ImageBooleanSelectActionControl>
 {
 
 	/**The image bound property.*/
-	public final static String IMAGE_PROPERTY=getPropertyName(ImageSelectActionControl.class, "image");
+	public final static String IMAGE_PROPERTY=getPropertyName(ImageBooleanSelectActionControl.class, "image");
 	/**The image resource key bound property.*/
-	public final static String IMAGE_RESOURCE_KEY_PROPERTY=getPropertyName(ImageSelectActionControl.class, "imageResourceKey");
+	public final static String IMAGE_RESOURCE_KEY_PROPERTY=getPropertyName(ImageBooleanSelectActionControl.class, "imageResourceKey");
 	/**The rollover image bound property.*/
-	public final static String ROLLOVER_IMAGE_PROPERTY=getPropertyName(ImageSelectActionControl.class, "rolloverImage");
+	public final static String ROLLOVER_IMAGE_PROPERTY=getPropertyName(ImageBooleanSelectActionControl.class, "rolloverImage");
 	/**The rollover image resource key bound property.*/
-	public final static String ROLLOVER_IMAGE_RESOURCE_KEY_PROPERTY=getPropertyName(ImageSelectActionControl.class, "rolloverImageResourceKey");
+	public final static String ROLLOVER_IMAGE_RESOURCE_KEY_PROPERTY=getPropertyName(ImageBooleanSelectActionControl.class, "rolloverImageResourceKey");
 	/**The selected image bound property.*/
-	public final static String SELECTED_IMAGE_PROPERTY=getPropertyName(ImageSelectActionControl.class, "selectedImage");
+	public final static String SELECTED_IMAGE_PROPERTY=getPropertyName(ImageBooleanSelectActionControl.class, "selectedImage");
 	/**The selected image resource key bound property.*/
-	public final static String SELECTED_IMAGE_RESOURCE_KEY_PROPERTY=getPropertyName(ImageSelectActionControl.class, "selectedImageResourceKey");
+	public final static String SELECTED_IMAGE_RESOURCE_KEY_PROPERTY=getPropertyName(ImageBooleanSelectActionControl.class, "selectedImageResourceKey");
 
 	/**The image URI, or <code>null</code> if there is no image URI.*/
 	private URI image=null;
@@ -183,7 +183,7 @@ public class ImageSelectActionControl extends AbstractSelectActionControl<ImageS
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public ImageSelectActionControl(final GuiseSession session)
+	public ImageBooleanSelectActionControl(final GuiseSession session)
 	{
 		this(session, (String)null);	//construct the component, indicating that a default ID should be used
 	}
@@ -194,7 +194,7 @@ public class ImageSelectActionControl extends AbstractSelectActionControl<ImageS
 	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public ImageSelectActionControl(final GuiseSession session, final String id)
+	public ImageBooleanSelectActionControl(final GuiseSession session, final String id)
 	{
 		this(session, id, new DefaultValueModel<Boolean>(session, Boolean.class, Boolean.FALSE));	//construct the class with a default model
 	}
@@ -204,7 +204,7 @@ public class ImageSelectActionControl extends AbstractSelectActionControl<ImageS
 	@param model The component data model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	*/
-	public ImageSelectActionControl(final GuiseSession session, final ValueModel<Boolean> model)
+	public ImageBooleanSelectActionControl(final GuiseSession session, final ValueModel<Boolean> model)
 	{
 		this(session, null, model);	//construct the component, indicating that a default ID should be used
 	}
@@ -216,7 +216,7 @@ public class ImageSelectActionControl extends AbstractSelectActionControl<ImageS
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public ImageSelectActionControl(final GuiseSession session, final String id, final ValueModel<Boolean> model)
+	public ImageBooleanSelectActionControl(final GuiseSession session, final String id, final ValueModel<Boolean> model)
 	{
 		super(session, id, model);	//construct the parent class
 	}

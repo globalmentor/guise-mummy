@@ -24,16 +24,16 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 
 		/**Sets the URI of the icon.
 		This is a bound property of type <code>URI</code>.
-		@param newLabelIcon The new URI of the icon.
+		@param newIcon The new URI of the icon.
 		@see #ICON_PROPERTY
 		*/
-		public void setIcon(final URI newLabelIcon)
+		public void setIcon(final URI newIcon)
 		{
-			if(!ObjectUtilities.equals(icon, newLabelIcon))	//if the value is really changing
+			if(!ObjectUtilities.equals(icon, newIcon))	//if the value is really changing
 			{
-				final URI oldLabelIcon=icon;	//get the old value
-				icon=newLabelIcon;	//actually change the value
-				firePropertyChange(ICON_PROPERTY, oldLabelIcon, newLabelIcon);	//indicate that the value changed
+				final URI oldIcon=icon;	//get the old value
+				icon=newIcon;	//actually change the value
+				firePropertyChange(ICON_PROPERTY, oldIcon, newIcon);	//indicate that the value changed
 			}			
 		}
 

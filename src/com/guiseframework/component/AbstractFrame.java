@@ -140,7 +140,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 		/**@return The related component such as a popup source, or <code>null</code> if the frame is not related to another component.*/
 		public Component<?> getRelatedComponent() {return relatedComponent;}
 
-		/**Sets the related component
+		/**Sets the related component.
 		This is a bound property.
 		@param newRelatedComponent The new related component, or <code>null</code> if the frame is not related to another component.
 		@see Frame#RELATED_COMPONENT_PROPERTY 

@@ -54,6 +54,7 @@ public class HomePanel extends DefaultNavigationPanel
 		final SelectLink selectLink=new SelectLink(session);
 		selectLink.setLabel("This is a select link");
 		selectLink.setToggle(true);
+		selectLink.setSelectedIcon(URI.create("guise/images/accept.gif"));
 		contentPanel.add(selectLink);
 		
 /*TODO del		
@@ -209,12 +210,13 @@ Debug.trace("list control changed value to", newValue);
 		flash.setPreferredHeight(new Extent(474));
 		contentPanel.add(flash);
 */
-    final ImageSelectActionControl imageAction=new ImageSelectActionControl(session);
+/*TODO del
+    final ImageBooleanSelectActionControl imageAction=new ImageBooleanSelectActionControl(session);
     imageAction.setImage(URI.create("http://www.garretwilson.com/photos/2000/february/cowcalf.jpg"));
     imageAction.setRolloverImage(URI.create("slider-thumb.gif"));
     contentPanel.add(imageAction);
-
-
+*/
+		
 		final Text testText=new Text(session);
 		testText.setTextContentType(XHTML_FRAGMENT_CONTENT_TYPE);
 //TODO bring back		testText.getModel().setTextResourceKey("test.html");

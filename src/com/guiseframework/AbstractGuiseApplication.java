@@ -23,6 +23,7 @@ import com.guiseframework.component.ApplicationFrame;
 import com.guiseframework.component.Component;
 import com.guiseframework.component.DefaultApplicationFrame;
 import com.guiseframework.component.DefaultNavigationPanel;
+import com.guiseframework.component.SelectLink;
 import com.guiseframework.component.kit.ComponentKit;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.controller.*;
@@ -265,47 +266,69 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	/**Determines the controller class appropriate for the given component class.
 	A controller class is located by individually looking up the component class hiearchy for registered controllers.
 	@param componentClass The class of component for which a controller should be returned.
+	@param allowDefault Whether a default controller for the component class should be accepted.
 	@return A class of controller to control the given component class, or <code>null</code> if no controller is registered.
 	*/
 	@SuppressWarnings("unchecked")	//we programmatically check the super classes and implemented interfaces to make sure they are component classes before casts
-	protected Class<? extends Controller> getControllerClass(final Class<? extends Component> componentClass)
+	protected Class<? extends Controller> getControllerClass(final Class<? extends Component> componentClass, final boolean allowDefault)	//TODO create a better algorithm that finds all matches and sorts them as to interface/class and distance from Component.class
 	{
 		Class<? extends Controller> controllerClass=getRegisteredControllerClass(componentClass);	//see if there is a controller class registered for this component type
-		if(controllerClass==null)	//if we couldn't find a controller for this class, check the immediate interfaces
+		if(controllerClass==null)	//if we couldn't find a controller for this class, check the immediate interfaces (except the Component interface)
 		{
+//TODO del Debug.trace("no luck for", componentClass);
 			for(final Class<?> classInterface:componentClass.getInterfaces())	//look at each implemented interface
 			{
-				if(Component.class.isAssignableFrom(classInterface))	//if the class interface is a component
+				if(Component.class.isAssignableFrom(classInterface) && !Component.class.equals(classInterface))	//if the class interface is a component, but is not Component.class
 				{
 					controllerClass=getRegisteredControllerClass((Class<? extends Component>)classInterface);	//check the immediate interface
 					if(controllerClass!=null)	//if we found a controller class
 					{
+//					TODO del 						Debug.trace("found controller class", controllerClass, "from immediate interface", classInterface);
 						break;	//stop looking at the interfaces
 					}
 				}					
 			}
+		}
+		else
+		{
+//		TODO del Debug.trace("one was registered for", componentClass, ":", controllerClass);			
 		}
 		if(controllerClass==null)	//if we still didn't find a controller for this class, check up the class hierarchy
 		{
 			final Class<?> superClass=componentClass.getSuperclass();	//get the super class of the component
 			if(superClass!=null && Component.class.isAssignableFrom(superClass))	//if the super class is a component
 			{
-				controllerClass=getControllerClass((Class<? extends Component>)superClass);	//check the super class
+//			TODO del 				Debug.trace("checking up the controller hierarchy for", superClass);
+				controllerClass=getControllerClass((Class<? extends Component>)superClass, false);	//check the super class
+
+/*TODO del
+				if(controllerClass!=null)	//TODO del
+				{
+					Debug.trace("found controller class", controllerClass);
+				}
+*/
+
 			}
 		}
 		if(controllerClass==null)	//if we couldn't find a controller for this class, check the up the interfaces hierarchy
 		{
 			for(final Class<?> classInterface:componentClass.getInterfaces())	//look at each implemented interface; this results in duplicated checking of immediate interfaces, but the algorithm is more straightforward and this will only happen once for each controller installation
 			{
-				if(Component.class.isAssignableFrom(classInterface))	//if the class interface is a component
+				if(Component.class.isAssignableFrom(classInterface) && !Component.class.equals(classInterface))	//if the class interface is a component, but is not Component.class
 				{
-					controllerClass=getControllerClass((Class<? extends Component>)classInterface);	//check the interface
+//				TODO del 					Debug.trace("checking up the interface hierarchy for", classInterface);
+					controllerClass=getControllerClass((Class<? extends Component>)classInterface, false);	//check the interface
 					if(controllerClass!=null)	//if we found a controller class
 					{
+//					TODO del 						Debug.trace("found controller class", controllerClass, "from super interface", classInterface);
 						break;	//stop looking at the interfaces
 					}
 				}					
 			}
+		}
+		if(controllerClass==null && allowDefault)	//if we couldn't find a controller for this class, as a last resort use a controller for Component.class, if there is one
+		{
+			controllerClass=getRegisteredControllerClass(Component.class);	//see if there is a registered controller for Component.class			
 		}
 		return controllerClass;	//show which if any controller class we found
 	}
@@ -320,7 +343,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	public <C extends Component<?>> Controller<? extends GuiseContext, ? super C> getController(final C component)
 	{
 		Class<? extends Component> componentClass=component.getClass();	//get the component class
-		final Class<? extends Controller> controllerClass=getControllerClass(componentClass);	//walk the hierarchy to see if there is a controller class registered for this component type
+		final Class<? extends Controller> controllerClass=getControllerClass(componentClass, true);	//walk the hierarchy to see if there is a controller class registered for this component type
 		if(controllerClass!=null)	//if we found a controller class
 		{
 			try
@@ -362,17 +385,18 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	/**Determines the view class appropriate for the given component class.
 	A view class is located by individually looking up the component class hiearchy for registered views.
 	@param componentClass The class of component for which a view should be returned.
+	@param allowDefault Whether a default view for the component class should be accepted.
 	@return A class of view for the given component class, or <code>null</code> if no view is registered.
 	*/
 	@SuppressWarnings("unchecked")	//we programmatically check the super classes and implemented interfaces to make sure they are component classes before casts
-	protected Class<? extends View> getViewClass(final Class<? extends Component> componentClass)
+	protected Class<? extends View> getViewClass(final Class<? extends Component> componentClass, final boolean allowDefault)	//TODO create a better algorithm that finds all matches and sorts them as to interface/class and distance from Component.class
 	{
 		Class<? extends View> viewClass=getRegisteredViewClass(componentClass);	//see if there is a view class registered for this component type
 		if(viewClass==null)	//if we couldn't find a view for this class, check the immediate interfaces
 		{
 			for(final Class<?> classInterface:componentClass.getInterfaces())	//look at each implemented interface
 			{
-				if(Component.class.isAssignableFrom(classInterface))	//if the class interface is a component
+				if(Component.class.isAssignableFrom(classInterface) && !Component.class.equals(classInterface))	//if the class interface is a component, but is not Component.class
 				{
 					viewClass=getRegisteredViewClass((Class<? extends Component>)classInterface);	//check the immediate interface
 					if(viewClass!=null)	//if we found a view class
@@ -387,22 +411,26 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			final Class<?> superClass=componentClass.getSuperclass();	//get the super class of the component
 			if(superClass!=null && Component.class.isAssignableFrom(superClass))	//if the super class is a component
 			{
-				viewClass=getViewClass((Class<? extends Component>)superClass);	//check the super class
+				viewClass=getViewClass((Class<? extends Component>)superClass, false);	//check the super class
 			}
 		}
 		if(viewClass==null)	//if we couldn't find a view for this class, check up the interface hierarchy
 		{
 			for(final Class<?> classInterface:componentClass.getInterfaces())	//look at each implemented interface; this results in duplicated checking of immediate interfaces, but the algorithm is more straightforward and this will only happen once for each view installation
 			{
-				if(Component.class.isAssignableFrom(classInterface))	//if the class interface is a component
+				if(Component.class.isAssignableFrom(classInterface) && !Component.class.equals(classInterface))	//if the class interface is a component, but is not Component.class
 				{
-					viewClass=getViewClass((Class<? extends Component>)classInterface);	//check the interface
+					viewClass=getViewClass((Class<? extends Component>)classInterface, false);	//check the interface
 					if(viewClass!=null)	//if we found a view class
 					{
 						break;	//stop looking at the interfaces
 					}
 				}					
 			}
+		}
+		if(viewClass==null && allowDefault)	//if we couldn't find a view for this class, as a last resort use a view for Component.class, if there is one
+		{
+			viewClass=getRegisteredViewClass(Component.class);	//see if there is a registered view for Component.class			
 		}
 		return viewClass;	//show which if any view class we found
 	}
@@ -417,7 +445,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	public <C extends Component<?>> View<? extends GuiseContext, ? super C> getView(final C component)
 	{
 		Class<? extends Component> componentClass=component.getClass();	//get the component class
-		final Class<? extends View> viewClass=getViewClass(componentClass);	//walk the hierarchy to see if there is a view class registered for this component type
+		final Class<? extends View> viewClass=getViewClass(componentClass, true);	//walk the hierarchy to see if there is a view class registered for this component type
 		if(viewClass!=null)	//if we found a view class
 		{
 			try

@@ -2993,7 +2993,7 @@ function initializeNode(node)
 						}
 						break;
 					case "button":
-						if(elementClassNames.contains("button-body"))	//if this is a Guise button TODO use constant; check
+						if(elementClassNames.contains("buttonControl"))	//if this is a Guise button TODO use constant
 						{
 							eventManager.addEvent(node, "click", onButtonClick, false);	//listen for button clicks
 							if(isSafari)	//if this is Safari TODO fix better

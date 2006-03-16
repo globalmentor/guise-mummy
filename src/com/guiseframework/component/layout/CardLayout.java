@@ -210,6 +210,9 @@ public class CardLayout extends AbstractLayout<CardConstraints> implements Value
 				throw new ValidationException(format(getSession().getStringResource(VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE), newValue.toString()), newValue);						
 			}
 			selectedIndex=-1;	//uncache the selected index
+					
+			//TODO check for Activable and call setActive()---maybe
+			
 			getValueModel().setValue(newValue);	//set the new value normally
 		}
 	}
