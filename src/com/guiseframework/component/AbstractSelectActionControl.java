@@ -1,20 +1,18 @@
 package com.guiseframework.component;
 
+import static com.garretwilson.lang.ObjectUtilities.*;
+
 import java.net.URI;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
-import com.guiseframework.validator.*;
 
-/**Selectable action control that stores a Boolean value in its model representing the selected state.
-The selected property and the Boolean value will be kept synchronized.
-When the value and/or changes, separate property change events for both {@link ValueModel#VALUE_PROPERTY} and for {@link Selectable#SELECTED_PROPERTY} will be fired.
-A validator requiring a non-<code>null</code> value is automatically installed.
+/**Abstract selectable action control.
 @author Garret Wilson
 */
-public abstract class AbstractBooleanSelectActionControl<C extends SelectActionControl<C> & ActionValueControl<Boolean, C>> extends AbstractActionValueControl<Boolean, C> implements SelectActionControl<C>
+public abstract class AbstractSelectActionControl<C extends SelectActionControl<C>> extends AbstractActionControl<C> implements SelectActionControl<C>
 {
 
 	/**Whether this control automatically sets or toggles the selection state when the action occurs.*/
@@ -38,29 +36,26 @@ public abstract class AbstractBooleanSelectActionControl<C extends SelectActionC
 			}
 		}
 
-	/**Returns whether the component is selected.
-	This implementation returns the value of the value model.
-	@return Whether the component is selected.
-	*/
-	public boolean isSelected() {return Boolean.TRUE.equals(getValue());}
+	/**Whether the component is selected.*/
+	private boolean selected=false;
 
-	/**Sets whether the component is selected.
-	This is a bound property of type <code>Boolean</code>.
-	This implementation delegates to he value model.
-	@param newSelected <code>true</code> if the component should be selected, else <code>false</code>.
-	@see #SELECTED_PROPERTY
-	*/
-	public void setSelected(final boolean newSelected)
-	{
-		try
+		/**@return Whether the component is selected.*/
+		public boolean isSelected() {return selected;}
+
+		/**Sets whether the component is selected.
+		This is a bound property of type <code>Boolean</code>.
+		@param newSelected <code>true</code> if the component should be selected, else <code>false</code>.
+		@see #SELECTED_PROPERTY
+		*/
+		public void setSelected(final boolean newSelected)
 		{
-			setValue(Boolean.valueOf(newSelected));	//update the value model
+			if(selected!=newSelected)	//if the value is really changing
+			{
+				final boolean oldSelected=selected;	//get the current value
+				selected=newSelected;	//update the value
+				firePropertyChange(SELECTED_PROPERTY, Boolean.valueOf(oldSelected), Boolean.valueOf(newSelected));
+			}
 		}
-		catch(final ValidationException validationException)	//if there is a validation error
-		{
-			throw new AssertionError(validationException);	//TODO improve
-		}
-	}
 
 	/**The selected icon URI, or <code>null</code> if there is no selected icon URI.*/
 	private URI selectedIcon=null;
@@ -170,24 +165,48 @@ public abstract class AbstractBooleanSelectActionControl<C extends SelectActionC
 	/**Session, ID, and model constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
+	@param actionModel The component action model.
 	@exception NullPointerException if the given session and/or model is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractBooleanSelectActionControl(final GuiseSession session, final String id, final ValueModel<Boolean> model)
+	public AbstractSelectActionControl(final GuiseSession session, final String id, final ActionModel actionModel)
 	{
-		super(session, id, model);	//construct the parent class
-		setValidator(new ValueRequiredValidator<Boolean>(session));	//install a value-required validator
-		addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Boolean>()	//listen for the value changing
-				{
-					public void propertyChange(final GuisePropertyChangeEvent<Boolean> propertyChangeEvent)	//if the value changes
-					{
-						final Boolean oldValue=propertyChangeEvent.getOldValue();	//get the old value
-						final Boolean newValue=propertyChangeEvent.getNewValue();	//get the new value
-						firePropertyChange(SELECTED_PROPERTY, oldValue!=null ? oldValue : Boolean.FALSE, newValue!=null ? newValue : Boolean.FALSE);	//fire an identical property change event for the "selected" property, except that the selected property doesn't allow null
-					}			
-				});
-		addActionListener(new AbstractSelectActionControl.SelectActionListener(this));	//listen for an action and set the selected state accordingly
+		super(session, id, actionModel);	//construct the parent class
+		addActionListener(new SelectActionListener(this));	//listen for an action and set the selected state accordingly
 	}
+
+	/**An action listener that selects a select action listener if auto-select is turned on, toggling the select status if necessary.
+	@author Garret Wilson
+	*/
+	public static class SelectActionListener implements ActionListener
+	{
+		
+		/**The control to select.*/
+		protected final SelectActionControl<?> selectActionControl;
+		
+		/**Select action control constructor.
+		@param selectActionControl The control to select when the action occurs.
+		@exception NullPointerException if the given select action control is <code>null</code>.
+		*/
+		public SelectActionListener(final SelectActionControl<?> selectActionControl)
+		{
+			this.selectActionControl=checkNull(selectActionControl, "Select action control cannot be null.");
+		}
+		
+		/**Called when an action is initiated.
+		This implementation auto-selects the select action control if auto-select is turned on, toggling if appropriate.
+		@param actionEvent The event indicating the source of the action.
+		@see SelectActionControl#isAutoSelect()
+		@see SelectActionControl#isToggle()
+		@see SelectActionControl#setSelected(boolean)
+		*/
+		public void actionPerformed(final ActionEvent actionEvent)	//if an action occurs
+		{
+			if(selectActionControl.isAutoSelect())	//if we should automatically select the control
+			{
+				selectActionControl.setSelected(selectActionControl.isToggle() ? !selectActionControl.isSelected() : true);	//if we should toggle, switch the selected state; otherwise, just switch to the selected state
+			}
+		}
+	}	
 
 }

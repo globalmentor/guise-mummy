@@ -1,12 +1,14 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ObjectUtilities.checkNull;
+import static com.garretwilson.lang.ObjectUtilities.*;
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.guiseframework.GuiseSession;
-import com.guiseframework.model.DefaultActionModel;
-import com.guiseframework.model.ValueModel;
-import com.guiseframework.validator.ValidationException;
-import com.guiseframework.validator.Validator;
+import com.guiseframework.model.*;
+import com.guiseframework.validator.*;
 
 /**Abstract implementation of an action control containing a value.
 @author Garret Wilson
@@ -42,6 +44,48 @@ public abstract class AbstractActionValueControl<V, C extends ActionValueControl
 			}			
 		}
 
+	/**The map of icons keyed to values.*/
+	private final Map<V, URI> valueIconMap=new HashMap<V, URI>();
+		
+		/**Retrieves the icon associated with a given value.
+		@param value The value for which an associated icon should be returned, or <code>null</code> to retrieve the icon associated with the <code>null</code> value.
+		@return The value icon URI, or <code>null</code> if the value has no associated icon URI.
+		*/
+		public URI getValueIcon(final V value) {return valueIconMap.get(value);}
+
+		/**Sets the URI of the icon associated with a value.
+		This method fires a property change event for the changed icon if its value changes.
+		@param value The value with which the icon should be associated, or <code>null</code> if the icon should be associated with the <code>null</code> value.
+		@param newValueIcon The new URI of the value icon.
+		@see #VALUE_ICON_PROPERTY
+		*/
+		public void setValueIcon(final V value, final URI newValueIcon)
+		{
+			final URI oldValueIcon=valueIconMap.put(value, newValueIcon);	//store the new value
+			firePropertyChange(VALUE_ICON_PROPERTY, oldValueIcon, newValueIcon);	//indicate that the value changed (which will only fire the event if the value actually changed)
+		}
+
+	/**The map of icon resource keys keyed to values.*/
+	private final Map<V, String> valueIconResourceKeyMap=new HashMap<V, String>();
+		
+		/**Retrieves the icon resource key associated with a given value.
+		@param value The value for which an associated icon resource key should be returned, or <code>null</code> to retrieve the icon resource key associated with the <code>null</code> value.
+		@return The value icon resource key, or <code>null</code> if the value has no associated icon resource.
+		*/
+		public String getValueIconResourceKey(final V value) {return valueIconResourceKeyMap.get(value);}
+
+		/**Sets the resource key of the icon associated with a value.
+		This method fires a property change event for the changed icon resource key if its value changes.
+		@param value The value with which the icon resource key should be associated, or <code>null</code> if the icon resource key should be associated with the <code>null</code> value.
+		@param newValueIconResourceKey The new value icon resource key.
+		@see #VALUE_ICON_RESOURCE_KEY_PROPERTY
+		*/
+		public void setValueIconResourceKey(final V value, final String newValueIconResourceKey)
+		{
+			final String oldValueIconResourceKey=valueIconResourceKeyMap.put(value, newValueIconResourceKey);	//store the new value
+			firePropertyChange(VALUE_ICON_RESOURCE_KEY_PROPERTY, oldValueIconResourceKey, newValueIconResourceKey);	//indicate that the value changed (which will only fire the event if the value actually changed)
+		}
+		
 	/**Session, ID, and model constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.

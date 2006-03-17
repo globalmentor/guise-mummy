@@ -4,7 +4,6 @@ import java.net.URI;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
-import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 
 /**Selectable action value control for which the selected state is distinct from the contained value.
@@ -13,6 +12,27 @@ import com.guiseframework.model.*;
 */
 public abstract class AbstractSelectActionValueControl<V, C extends SelectActionControl<C> & ActionValueControl<V, C>> extends AbstractActionValueControl<V, C> implements SelectActionControl<C>
 {
+
+	/**Whether this control automatically sets or toggles the selection state when the action occurs.*/
+	private boolean autoSelect=true;
+
+		/**@return Whether this control automatically sets or toggles the selection state when the action occurs.*/
+		public boolean isAutoSelect() {return autoSelect;}
+
+		/**Sets whether this control automatically sets or toggles the selection state when the action occurs.
+		This is a bound property of type <code>Boolean</code>.
+		@param newAutoSelect <code>true</code> if the control should automatically set or toggle the selection state when an action occurs, or <code>false</code> if no selection occurs automatically.
+		@see #AUTO_SELECT_PROPERTY
+		*/
+		public void setAutoSelect(final boolean newAutoSelect)
+		{
+			if(autoSelect!=newAutoSelect)	//if the value is really changing
+			{
+				final boolean oldAutoSelect=autoSelect;	//get the current value
+				autoSelect=newAutoSelect;	//update the value
+				firePropertyChange(AUTO_SELECT_PROPERTY, Boolean.valueOf(oldAutoSelect), Boolean.valueOf(newAutoSelect));
+			}
+		}
 
 	/**Whether the component is selected.*/
 	private boolean selected=false;
@@ -98,6 +118,48 @@ public abstract class AbstractSelectActionValueControl<V, C extends SelectAction
 			}
 		}
 
+	/**The unselected icon URI, or <code>null</code> if there is no unselected icon URI.*/
+	private URI unselectedIcon=null;
+
+		/**@return The unselected icon URI, or <code>null</code> if there is no unselected icon URI.*/
+		public URI getUnselectedIcon() {return unselectedIcon;}
+
+		/**Sets the URI of the unselected icon.
+		This is a bound property of type <code>URI</code>.
+		@param newUnselectedIcon The new URI of the unselected icon.
+		@see #UNSELECTED_ICON_PROPERTY
+		*/
+		public void setUnselectedIcon(final URI newUnselectedIcon)
+		{
+			if(!ObjectUtilities.equals(unselectedIcon, newUnselectedIcon))	//if the value is really changing
+			{
+				final URI oldUnselectedIcon=unselectedIcon;	//get the old value
+				unselectedIcon=newUnselectedIcon;	//actually change the value
+				firePropertyChange(UNSELECTED_ICON_PROPERTY, oldUnselectedIcon, newUnselectedIcon);	//indicate that the value changed
+			}			
+		}
+
+	/**The unselected icon URI resource key, or <code>null</code> if there is no unselected icon URI resource specified.*/
+	private String unselectedIconResourceKey=null;
+
+		/**@return The unselected icon URI resource key, or <code>null</code> if there is no unselected icon URI resource specified.*/
+		public String getUnselectedIconResourceKey() {return unselectedIconResourceKey;}
+
+		/**Sets the key identifying the URI of the unselected icon in the resources.
+		This is a bound property.
+		@param newUnselectedIconResourceKey The new unselected icon URI resource key.
+		@see #UNSELECTED_ICON_RESOURCE_KEY_PROPERTY
+		*/
+		public void setUnselectedIconResourceKey(final String newUnselectedIconResourceKey)
+		{
+			if(!ObjectUtilities.equals(unselectedIconResourceKey, newUnselectedIconResourceKey))	//if the value is really changing
+			{
+				final String oldUnselectedIconResourceKey=unselectedIconResourceKey;	//get the old value
+				unselectedIconResourceKey=newUnselectedIconResourceKey;	//actually change the value
+				firePropertyChange(UNSELECTED_ICON_RESOURCE_KEY_PROPERTY, oldUnselectedIconResourceKey, newUnselectedIconResourceKey);	//indicate that the value changed
+			}
+		}
+
 	/**Session, ID, and model constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
@@ -108,13 +170,7 @@ public abstract class AbstractSelectActionValueControl<V, C extends SelectAction
 	public AbstractSelectActionValueControl(final GuiseSession session, final String id, final ValueModel<V> model)
 	{
 		super(session, id, model);	//construct the parent class
-		addActionListener(new ActionListener()	//listen for an action and set the selected state accordingly
-				{		
-					public void actionPerformed(final ActionEvent actionEvent)	//if an action occurs
-					{
-						setSelected(isToggle() ? !isSelected() : true);	//if we should toggle, switch the selected state; otherwise, just switch to the selected state
-					}
-				});
+		addActionListener(new AbstractSelectActionControl.SelectActionListener(this));	//listen for an action and set the selected state accordingly
 	}
 
 }

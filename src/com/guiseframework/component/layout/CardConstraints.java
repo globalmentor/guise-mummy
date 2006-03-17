@@ -7,15 +7,12 @@ import java.net.URI;
 import javax.mail.internet.ContentType;
 
 import com.guiseframework.GuiseSession;
-
-import com.guiseframework.component.Control;
-import com.guiseframework.model.DefaultLabelModel;
-import com.guiseframework.model.LabelModel;
+import com.guiseframework.model.*;
 
 /**Constraints on an individual component in a card layout.
 @author Garret Wilson
 */
-public class CardConstraints extends AbstractConstraints implements LabelModel
+public class CardConstraints extends AbstractConstraints implements LabelModel, Enableable
 {
 
 	/**The label model used by this component.*/
@@ -36,7 +33,7 @@ public class CardConstraints extends AbstractConstraints implements LabelModel
 		/**Sets whether the the card is enabled for selection.
 		This is a bound property of type <code>Boolean</code>.
 		@param newEnabled <code>true</code> if the corresponding card can be selected.
-		@see Control#ENABLED_PROPERTY
+		@see #ENABLED_PROPERTY
 		*/
 		public void setEnabled(final boolean newEnabled)
 		{
@@ -44,7 +41,7 @@ public class CardConstraints extends AbstractConstraints implements LabelModel
 			{
 				final boolean oldEnabled=enabled;	//get the old value
 				enabled=newEnabled;	//actually change the value
-				firePropertyChange(Control.ENABLED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newEnabled));	//indicate that the value changed
+				firePropertyChange(ENABLED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newEnabled));	//indicate that the value changed
 			}			
 		}
 

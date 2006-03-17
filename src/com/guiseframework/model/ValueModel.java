@@ -11,10 +11,10 @@ import com.guiseframework.validator.*;
 public interface ValueModel<V> extends Model
 {
 
-	/**The value bound property.*/
-	public final static String VALUE_PROPERTY=getPropertyName(ValueModel.class, "value");
 	/**The validator bound property.*/
 	public final static String VALIDATOR_PROPERTY=getPropertyName(ValueModel.class, "validator");
+	/**The value bound property.*/
+	public final static String VALUE_PROPERTY=getPropertyName(ValueModel.class, "value");
 
 	/**@return Whether the model's value is editable and the corresponding control will allow the the user to change the value.*/
 //TODO del	public boolean isEditable();
@@ -45,7 +45,7 @@ public interface ValueModel<V> extends Model
 
 	/**Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators.
 	No validation occurs.
-	@see ValueModel#VALUE_PROPERTY
+	@see #VALUE_PROPERTY
 	*/
 	public void clearValue();
 
