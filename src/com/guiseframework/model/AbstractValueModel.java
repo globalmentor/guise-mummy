@@ -51,23 +51,16 @@ public abstract class AbstractValueModel<V> extends AbstractModel implements Val
 		this.valueClass=checkNull(valueClass, "Value class cannot be null.");	//store the value class
 	}
 
-	/**Determines whether the contents of this model are valid.
+	/**Determines whether the value of this model is valid.
 	This version delegates to the validator, if one is installed.
-	@return Whether the contents of this model are valid.
+	@return Whether the value of this model is valid.
 	@see #getValidator()
 	@see #getValue()
 	*/
-	public boolean isValid()
+	public boolean isValidValue()
 	{
-		if(super.isValid())	//if the super class thinks we're valid
-		{
-			final Validator<V> validator=getValidator();	//get the current validator
-			return validator!=null ? validator.isValid(getValue()) : true;	//if we have a validator, make sure it thinks the value is valid
-		}
-		else	//if the super class doesn't think we're valid
-		{
-			return false;	//indicate that we're not valid
-		}
+		final Validator<V> validator=getValidator();	//get the current validator
+		return validator!=null ? validator.isValid(getValue()) : true;	//if we have a validator, make sure it thinks the value is valid
 	}
 
 	/**Validates the value of this model, throwing an exception if the model is not valid.

@@ -8,6 +8,7 @@ import com.guiseframework.GuiseSession;
 
 /**An abstract implementation of a composite component that can contain multiple components.
 Every child component must be added or removed using {@link #addComponent(Component)} and {@link #removeComponent(Component)}, although other actions may take place.
+The component's validity is updated whenever a child comonent is added or removed from the component.
 @author Garret Wilson
 */
 public abstract class AbstractMultipleCompositeComponent<C extends CompositeComponent<C>> extends AbstractCompositeComponent<C>
@@ -29,8 +30,10 @@ public abstract class AbstractMultipleCompositeComponent<C extends CompositeComp
 	*/
 	protected void addComponent(final Component<?> component)
 	{
+		super.addComponent(component);	//initialize the child component as needed
 		idComponentMap.put(component.getID(), component);	//add this component to the map
 		component.setParent(this);	//tell the component who its parent is
+		updateValid();	//update the valid status
 	}
 
 	/**Removes a child component.
@@ -40,8 +43,10 @@ public abstract class AbstractMultipleCompositeComponent<C extends CompositeComp
 	*/
 	protected void removeComponent(final Component<?> component)
 	{
+		super.removeComponent(component);	//uninitialize the child component as needed
 		idComponentMap.remove(component.getID());	//remove this component from the map
 		component.setParent(null);	//tell the component it no longer has a parent
+		updateValid();	//update the valid status
 	}
 
 	/**Retrieves the child component with the given ID.

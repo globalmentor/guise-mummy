@@ -4,23 +4,18 @@ import static com.garretwilson.lang.ClassUtilities.*;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Locale;
-import java.util.MissingResourceException;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.garretwilson.util.Debug;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.converter.*;
-import com.guiseframework.event.AbstractGuisePropertyChangeListener;
-import com.guiseframework.event.GuisePropertyChangeEvent;
 import com.guiseframework.model.*;
 import com.guiseframework.validator.Validator;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.guiseframework.model.ValueModel.VALIDATOR_PROPERTY;
 
 /**Control to accept text input from the user representing a particular value type.
 This control keeps track of literal text entered by the user, distinct from the value stored in the model.
+The component valid status is updated before any literal text change event is fired. 
 Default converters are available for the following types:
 <ul>
 	<li><code>char[]</code></li>
@@ -39,8 +34,6 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 	public final static String COLUMN_COUNT_PROPERTY=getPropertyName(AbstractTextControl.class, "columnCount");
 	/**The text literal bound property.*/
 	public final static String TEXT_PROPERTY=getPropertyName(AbstractTextControl.class, "text");
-	/**The valid bound property.*/
-//TODO del	public final static String VALID_PROPERTY=getPropertyName(AbstractTextControl.class, "valid");
 
 	/**The estimated number of columns requested to be visible, or -1 if no column count is specified.*/
 	private int columnCount=-1;
@@ -103,34 +96,10 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 			{
 				final String oldText=text;	//get the old value
 				text=newText;	//actually change the value
+				updateValid();	//update the valid status before firing the text change property so that any listeners will know the valid status
 				firePropertyChange(TEXT_PROPERTY, oldText, newText);	//indicate that the value changed
-				
-//TODO fix				updateValid();	//TODO testing; comment
 			}			
 		}
-
-	/**Whether the text literal value represents a valid value for the model.*/
-//TODO del	private boolean valid=true;
-
-		/**@return Whether the text literal value represents a valid value for the model.*/
-//TODO del		public boolean isValid() {return valid;}
-
-		/**Sets whether the text literal value represents a valid value for the value model.
-		This is a bound property of type <code>Boolean</code>.
-		@param newValid <code>true</code> if the text literal and model value should be considered valid.
-		@see #VALID_PROPERTY
-		*/
-/*TODO del
-		public void setValid(final boolean newValid)
-		{
-			if(valid!=newValid)	//if the value is really changing
-			{
-				final boolean oldValid=valid;	//get the current value
-				valid=newValid;	//update the value
-				firePropertyChange(VALID_PROPERTY, Boolean.valueOf(oldValid), Boolean.valueOf(newValid));
-			}
-		}
-*/
 
 	/**The property change listener that updates the text in response to a property changing.*/
 	private final PropertyChangeListener updateTextPropertyChangeListener;
@@ -233,20 +202,15 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 		}									
 	}
 
-	/**Determines whether the models of this component and all of its child components are valid.
-	This version in addition to default functionality checks to make sure the literal text representation matches the value.
-	@return Whether the models of this component and all of its child components are valid.
-	*/
-	public boolean isValid()	//TODO
+	/**Checks the state of the component for validity.
+	This version in addition to default functionality checks to make sure the literal text can be converted to a valid value.
+	@return <code>true</code> if the component and all children passes all validity tests, else <code>false</code>.
+	*/ 
+	protected boolean determineValid()
 	{
-//TODO also use the converter to make sure the converted text is valid
-		if(!super.isValid())	//if the super class is valid, check the validity of the text
+		if(!super.determineValid())	//if we don't pass the default validity checks
 		{
-			return false;	//this class isn't valid
-		}
-		if(!getValueModel().isValid())	//if the value model isn't valid
-		{
-			return false;	//the control isn't valid
+			return false;	//the component isn't valid
 		}
 		try
 		{
@@ -262,42 +226,8 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 			return false;	//either the literal isn't valid or its converted value is not valid
 		}
 		return true;	//the values passed all validity checks
-//TODO del when works, but update comment		return super.isValid() && getConverter().isValidLiteral(getText());	//if this component is valid, make sure the literal value is valid, too (due to rounding, the displayed text may not represent the exact value as the literal)
 	}
-
-/*TODO fix
-	protected boolean determineValidity()
-	{
-		try
-		{
-			final V value=getConverter().convertLiteral(getText());	//see if the literal text can correctly be converted
-			final Validator<V> validator=getModel().getValidator();	//see if there is a validator installed
-			if(validator!=null)	//if there is a validator installed
-			{
-				validator.validate(value);	//validate the value represented by the literal text
-			}
-		}
-		catch(final ComponentException componentException)	//if there is a component error
-		{
-			return false;	//either the literal isn't valid or its converted value is not valid
-		}
-		return true;	//the values passed all validity checks
-	}
-*/
 	
-	/**Updates whether the control is valid based upon its current UI state.
-	This version checks to see if the current literal text can be converted to a valid value.
-	@see #getText()
-	@see #isValid()
-	@see #setValid(boolean)
-	*/
-/*TODO fix
-	protected void updateValid()
-	{
-		setValid(determineValidity());
-	}
-*/
-
 	/**Validates the model of this component and all child components.
 	The component will be updated with error information.
 	This version also validates the literal text.

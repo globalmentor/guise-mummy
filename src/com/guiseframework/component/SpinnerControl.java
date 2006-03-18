@@ -31,4 +31,5 @@ public abstract class SpinnerControl<V> extends AbstractContainer<SpinnerControl
 		super(session, id, layout/*TODO fix, model*/);	//construct the parent class
 	}
 
+//TODO fix to use one of new abstract composite component classes; make sure determineValid() is implemented correctly and that updateValid() is called at the appropriate time
 }

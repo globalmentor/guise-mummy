@@ -27,12 +27,4 @@ public interface Model extends PropertyBindable
 	/**@return The Guise session that owns this model.*/
 	public GuiseSession getSession();
 
-	/**@return Whether the contents of this model are valid.*/
-	public boolean isValid();	//TODO del if not needed
-
-	/**Validates the contents of this model, throwing an exception if the model is not valid.
-	@exception ValidationException if the contents of this model are not valid.	
-	*/
-//TODO del	public void validate() throws ValidationException;
-
 }

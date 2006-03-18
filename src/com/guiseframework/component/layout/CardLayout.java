@@ -42,9 +42,6 @@ public class CardLayout extends AbstractLayout<CardConstraints> implements Value
 		/**@return The value model used by this component.*/
 		protected ValueModel<Component<?>> getValueModel() {return valueModel;}
 
-	/**@return Whether the contents of this model are valid.*/
-	public boolean isValid() {return true;}	//TODO del if not needed
-
 	/**The lazily-created listener of constraint property changes.*/
 //TODO del if not needed	private CardConstraintsPropertyChangeListener cardConstraintsPropertyChangeListener=null;
 
@@ -261,6 +258,11 @@ public class CardLayout extends AbstractLayout<CardConstraints> implements Value
 	@see #VALIDATOR_PROPERTY
 	*/
 	public void setValidator(final Validator<Component<?>> newValidator) {getValueModel().setValidator(newValidator);}
+
+	/**Determines whether the value of this model is valid.
+	@return Whether the value of this model is valid.
+	*/
+	public boolean isValidValue() {return getValueModel().isValidValue();}
 
 	/**Validates the value of this model, throwing an exception if the model is not valid.
 	@exception ValidationException if the value of this model is not valid.	

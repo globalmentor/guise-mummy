@@ -24,7 +24,4 @@ public interface ValueControl<V, C extends ValueControl<V, C>> extends Control<C
 	*/
 	public void setEditable(final boolean newEditable);
 
-	/**@return The value model used by this component.*/
-//TODO del	public ValueModel<V> getValueModel();
-
 }

@@ -31,10 +31,12 @@ public abstract class AbstractSingleCompositeComponent<C extends CompositeCompon
 				component=newComponent;	//actually change the value
 				if(oldComponent!=null)	//if there was an old component
 				{
+					super.removeComponent(component);	//uninitialize the old component as needed
 					oldComponent.setParent(null);	//tell the old component it no longer has a parent
 				}
 				if(newComponent!=null)	//if there is a new component
 				{
+					super.addComponent(component);	//initialize the new component as needed
 					newComponent.setParent(this);	//tell the component who its parent is					
 				}
 //TODO fix				firePropertyChange(CHECK_TYPE_PROPERTY, oldComponent, newComponent);	//indicate that the value changed

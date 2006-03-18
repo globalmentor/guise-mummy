@@ -42,27 +42,6 @@ public class TreeControl extends AbstractCompositeStateComponent<TreeNodeModel<?
 			}			
 		}
 
-	/**Whether the state of the control represents valid user input.*/
-	private boolean valid=true;
-
-		/**@return Whether the state of the control represents valid user input.*/
-		public boolean isValid() {return valid;}	//TODO important fix; currently out-of-synch with component
-
-		/**Sets whether the state of the control represents valid user input
-		This is a bound property of type <code>Boolean</code>.
-		@param newValid <code>true</code> if user input should be considered valid
-		@see Control#VALID_PROPERTY
-		*/
-		public void setValid(final boolean newValid)
-		{
-			if(valid!=newValid)	//if the value is really changing
-			{
-				final boolean oldValid=valid;	//get the current value
-				valid=newValid;	//update the value
-				firePropertyChange(VALID_PROPERTY, Boolean.valueOf(oldValid), Boolean.valueOf(newValid));
-			}
-		}
-
 	/**The map of tree node representation strategies for classes.*/
 	private final Map<Class<?>, ValueRepresentationStrategy<?>> classTreeNodeRepresentationStrategyMap=new ConcurrentHashMap<Class<?>, ValueRepresentationStrategy<?>>();
 

@@ -11,8 +11,9 @@ import com.guiseframework.model.*;
 import com.guiseframework.validator.*;
 
 /**Abstract implementation of an action control containing a value.
-@author Garret Wilson
+The component valid status is updated before a change in the {@link #VALUE_PROPERTY} or the {@link #VALIDATOR_PROPERTY} is fired. 
 @param <V> The type of value the control represents.
+@author Garret Wilson
 */
 public abstract class AbstractActionValueControl<V, C extends ActionValueControl<V, C>> extends AbstractActionControl<C> implements ActionValueControl<V, C>
 {
@@ -41,7 +42,7 @@ public abstract class AbstractActionValueControl<V, C extends ActionValueControl
 				final boolean oldEditable=editable;	//get the old value
 				editable=newEditable;	//actually change the value
 				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
-			}			
+			}
 		}
 
 	/**The map of icons keyed to values.*/
@@ -98,6 +99,34 @@ public abstract class AbstractActionValueControl<V, C extends ActionValueControl
 		super(session, id, new DefaultActionModel(session));	//construct the parent class with a default action model TODO add an action model parameter
 		this.valueModel=checkNull(valueModel, "Value model cannot be null.");	//save the table model
 		this.valueModel.addPropertyChangeListener(getRepeaterPropertyChangeListener());	//listen an repeat all property changes of the value model
+	}
+
+	/**Reports that a bound property has changed.
+	This version first updates the valid status if the value is reported as being changed.
+	@param propertyName The name of the property being changed.
+	@param oldValue The old property value.
+	@param newValue The new property value.
+	*/
+	protected <VV> void firePropertyChange(final String propertyName, final VV oldValue, final VV newValue)
+	{
+		if(VALUE_PROPERTY.equals(propertyName) || VALIDATOR_PROPERTY.equals(propertyName))	//if the value property or the validator property is being reported as changed
+		{
+			updateValid();	//update the valid status based upon the new property, so that any listeners will know whether the new property is valid
+		}
+		super.firePropertyChange(propertyName, oldValue, newValue);	//fire the property change event normally
+	}
+
+	/**Checks the state of the component for validity.
+	This version checks the validity of the value model.
+	@return <code>true</code> if the component and all children passes all validity tests, else <code>false</code>.
+	*/ 
+	protected boolean determineValid()
+	{
+		if(!super.determineValid())	//if we don't pass the default validity checks
+		{
+			return false;	//the component isn't valid
+		}
+		return getValueModel().isValidValue();	//the component is valid if the value model has a valid value
 	}
 
 	/**Validates the model of this component and all child components.
@@ -158,6 +187,11 @@ public abstract class AbstractActionValueControl<V, C extends ActionValueControl
 	@see #VALIDATOR_PROPERTY
 	*/
 	public void setValidator(final Validator<V> newValidator) {getValueModel().setValidator(newValidator);}
+
+	/**Determines whether the value of this model is valid.
+	@return Whether the value of this model is valid.
+	*/
+	public boolean isValidValue() {return getValueModel().isValidValue();}
 
 	/**Validates the value of this model, throwing an exception if the model is not valid.
 	@exception ValidationException if the value of this model is not valid.	

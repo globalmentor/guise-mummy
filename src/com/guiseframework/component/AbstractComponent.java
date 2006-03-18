@@ -9,7 +9,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.mail.internet.ContentType;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.garretwilson.util.Debug;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.effect.*;
 import com.guiseframework.component.layout.*;
@@ -20,7 +19,6 @@ import com.guiseframework.controller.Controller;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
 import com.guiseframework.model.*;
-import com.guiseframework.style.AbstractColor;
 import com.guiseframework.style.Color;
 import com.guiseframework.view.View;
 
@@ -465,6 +463,44 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 				firePropertyChange(PREFERRED_HEIGHT_PROPERTY, oldPreferredHeight, newPreferredHeight);	//indicate that the value changed
 			}			
 		}
+
+		/**Whether the state of the component and all child component represents valid user input.*/
+		private boolean valid=true;
+
+			/**@return Whether the state of the component and all child components represents valid user input.*/
+			public boolean isValid() {return valid;}
+
+			/**Sets whether the state of the component and all child components represents valid user input
+			This is a bound property of type <code>Boolean</code>.
+			@param newValid <code>true</code> if user input of this component and all child components should be considered valid
+			@see #VALID_PROPERTY
+			*/
+			protected void setValid(final boolean newValid)
+			{
+				if(valid!=newValid)	//if the value is really changing
+				{
+					final boolean oldValid=valid;	//get the current value
+					valid=newValid;	//update the value
+					firePropertyChange(VALID_PROPERTY, Boolean.valueOf(oldValid), Boolean.valueOf(newValid));
+				}
+			}
+
+			/**Rechecks user input validity of this component and all child components, and updates the valid state.
+			@see #setValid(boolean)
+			*/ 
+			protected void updateValid()
+			{
+				setValid(determineValid());	//update the vailidity after rechecking it
+			}
+
+			/**Checks the state of the component for validity.
+			This version returns <code>true</code>.
+			@return <code>true</code> if the component and all children passes all validity tests, else <code>false</code>.
+			*/ 
+			protected boolean determineValid()
+			{
+				return true;	//default to being valid
+			}
 
 	/**The controller installed in this component.*/
 	private Controller<? extends GuiseContext, ? super C> controller;
@@ -1100,24 +1136,6 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		final String descriptionResource=getSession().getStringResource(resourceKey);	//get the description resource
 	}
 */
-
-	/**Determines whether the models of this component and all of its child components are valid.
-	This version checks to ensure the component's model is valid.
-	@return Whether the models of this component and all of its child components are valid.
-	*/
-	public boolean isValid()	//TODO remove this method to Control and integrate it into functionality there
-	{
-		return true;	//TODO eventually remove this method
-/*TODO decide whether this is needed, now that we've refactored information into the component
-		if(!getController().isValid())	//if the controller isn't valid
-		{
-			return false;	//although the model may be valid, its view representation is not
-		}
-*/
-//TODO del		return true;	//indicate that this component is valid
-//TODO del Debug.trace("###checking to see if model is valid for", getID(), getModel().isValid());
-//TODO del		return getModel().isValid();	//return whether the model is valid
-	}
 
 	/**Validates the model of this component and all child components.
 	The component will be updated with error information.

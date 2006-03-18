@@ -21,9 +21,6 @@ public class CardConstraints extends AbstractConstraints implements LabelModel, 
 		/**@return The label model used by this component.*/
 		protected LabelModel getLabelModel() {return labelModel;}
 
-	/**@return Whether the contents of this model are valid.*/
-	public boolean isValid() {throw new UnsupportedOperationException("Constraints does not currently support isValid().");}	//TODO del
-
 	/**Whether the card is enabled for selection.*/
 	private boolean enabled=true;
 

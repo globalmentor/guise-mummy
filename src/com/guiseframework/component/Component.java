@@ -7,8 +7,6 @@ import java.util.*;
 import javax.mail.internet.ContentType;
 
 import com.garretwilson.beans.PropertyBindable;
-import com.garretwilson.text.TextConstants;
-import com.garretwilson.text.xml.xhtml.XHTMLConstants;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.component.layout.Constraints;
@@ -95,6 +93,8 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public final static String PREFERRED_WIDTH_PROPERTY=getPropertyName(Component.class, "preferredWidth");
 	/**The bound property of the component style ID.*/
 	public final static String STYLE_ID_PROPERTY=getPropertyName(Component.class, "styleID");
+	/**The valid bound property.*/
+	public final static String VALID_PROPERTY=getPropertyName(Component.class, "valid");
 	/**The bound property of the view.*/
 	public final static String VIEW_PROPERTY=getPropertyName(Component.class, "view");
 	/**The bound property of whether the component is visible.*/
@@ -559,7 +559,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	*/
 	public void initialize();
 
-	/**@return Whether the models of this component and all of its child components are valid.*/
+	/**@return Whether the state of the component and all child components represents valid user input.*/
 	public boolean isValid();
 
 	/**Validates the model of this component and all child components.

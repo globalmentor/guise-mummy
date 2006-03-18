@@ -1,12 +1,36 @@
 package com.guiseframework.component;
 
+import java.beans.PropertyChangeListener;
+
 import com.guiseframework.GuiseSession;
+import com.guiseframework.event.AbstractGuisePropertyChangeListener;
+import com.guiseframework.event.GuisePropertyChangeEvent;
 
 /**An abstract implementation of a composite component.
+Every child component must be added or removed using {@link #addComponent(Component)} and {@link #removeComponent(Component)}, although other actions may take place.
 @author Garret Wilson
 */
 public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>> extends AbstractComponent<C> implements CompositeComponent<C>
 {
+
+	/**The lazily-created property change listener to listen for changes in valid status and call {@link #childComponentValidPropertyChanged(Component, boolean, boolean)}.*/
+	private PropertyChangeListener validChangeListener=null;
+
+	/**The lazily-created property change listener to listen for changes in valid status and cal {@link #childComponentValidPropertyChanged(Component, boolean, boolean)}.*/
+	private PropertyChangeListener getValidChangeListener()
+	{
+		if(validChangeListener==null)	//if there is no valid change listener
+		{
+			validChangeListener=new AbstractGuisePropertyChangeListener<Boolean>()	//create a new valid change listener
+					{
+						public void propertyChange(GuisePropertyChangeEvent<Boolean> propertyChangeEvent)	//if the component's valid status changes
+						{
+							childComponentValidPropertyChanged((Component<?>)propertyChangeEvent.getSource(), propertyChangeEvent.getOldValue().booleanValue(), propertyChangeEvent.getNewValue().booleanValue());	//notify this component that a child component's valid status changed
+						}
+					};
+		}
+		return validChangeListener;	//return the valid change listener
+	}
 
 	/**Session and ID constructor.
 	@param session The Guise session that owns this component.
@@ -21,24 +45,61 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 		super(session, id);	//construct the parent class
 	}
 
-	/**Determines whether this component and all of its child components are valid.
-	This version returns <code>true</code> if all its child components are valid.
-	@return Whether this component and all of its child components are valid.
+	/**Adds a child component.
+	This version installs a listener for the component's valid status.
+	Any class that overrides this method must call this version.
+	@param component The component to add to this component.
 	*/
-	public boolean isValid()	//TODO reconcile this design with the new control isValid() semantics
+	protected void addComponent(final Component<?> component)
 	{
-		if(!super.isValid())	//if the component doesn't pass the default checks
-		{
-			return false;	//this component isn't valid
-		}
+		component.addPropertyChangeListener(Component.VALID_PROPERTY, getValidChangeListener());	//listen for changes in the component's valid status and update this component's valid status in response
+	}
+
+	/**Removes a child component.
+	This version uninstalls a listener for the component's valid status.
+	Any class that overrides this method must call this version.
+	@param component The component to remove from this component.
+	*/
+	protected void removeComponent(final Component<?> component)
+	{
+		component.removePropertyChangeListener(Component.VALID_PROPERTY, getValidChangeListener());	//stop listening for changes in the component's valid status
+	}
+
+	/**Called when the {@link Component#VALID_PROPERTY} of a child compoenent changes.
+	Every child version should call this version.
+	This version updates the composite component's valid state by calling {@link #updateValid()}.
+	@param childComponent The child component the valid property of which changed.
+	@param oldValid The old valid property.
+	@param newValid The new valid property.
+	*/
+	protected void childComponentValidPropertyChanged(final Component<?> childComponent, final boolean oldValid, final boolean newValid)
+	{
+		updateValid();	//update this composite component's valid state		
+	}
+
+	/**Checks the state of the component for validity.
+	This version calls {@link #determineChildrenValid()}.
+	@return <code>true</code> if the component and all relevant children passes all validity tests, else <code>false</code>.
+	*/ 
+	protected boolean determineValid()
+	{
+		return super.determineValid() && determineChildrenValid();	//determine if the super class and children are valid 
+	}
+
+	/**Checks the state of the component for validity.
+	This version checks all child components for validity.
+	@return <code>true</code> if the relevant children pass all validity tests.
+	*/ 
+	protected boolean determineChildrenValid()
+	{
 		for(final Component<?> childComponent:this)	//for each child component
 		{
-			if(!childComponent.isValid())	//if this child component isn't valid
+			if(!childComponent.isValid())	//if this child component is not valid
 			{
-				return false;	//indicate that this component is consequently not valid
+				return false;	//the composite component should not be considered valid
 			}
 		}
-		return true;	//indicate that all child components are valid
+		return true;	//all children are valid
 	}
 
 	/**Validates the this component and all child components.

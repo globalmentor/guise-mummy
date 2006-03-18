@@ -101,6 +101,27 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
 				});
 	}
 
+	/**Called when the {@link Component#VALID_PROPERTY} of a child compoenent changes.
+	This version updates the error status of the child component's contraints if those constraints implement {@link TaskCardConstraints}.
+	@param childComponent The child component the valid property of which changed.
+	@param oldValid The old valid property.
+	@param newValid The new valid property.
+	*/
+	protected void childComponentValidPropertyChanged(final Component<?> childComponent, final boolean oldValid, final boolean newValid)
+	{
+		super.childComponentValidPropertyChanged(childComponent, oldValid, newValid);	//call the parent version
+		final Constraints constraints=childComponent.getConstraints();	//get the child component constraints
+		if(constraints instanceof TaskCardConstraints)	//if these are task card constraints
+		{
+			final TaskCardConstraints taskCardConstraints=((TaskCardConstraints)constraints);	//get the constraints as task card constraints
+			if(taskCardConstraints.getTaskStatus()!=null)	//if the task is started
+			{
+				taskCardConstraints.setTaskStatus(newValid ? TaskStatus.INCOMPLETE : TaskStatus.ERROR);	//update the task status based upon the new valid state
+			}
+		}
+	}
+
+
 	/**Sets the new selected card.
 	This version validates the input on the currently selected card as needed.
 	@param newValue The new selected card.

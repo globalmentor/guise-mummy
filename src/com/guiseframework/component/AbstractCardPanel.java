@@ -13,7 +13,7 @@ import com.guiseframework.model.*;
 import com.guiseframework.validator.*;
 
 /**An abstract panel with a card layout.
-The panel's model reflects the currently selected component, if any.
+The component valid status is updated before a change in the {@link #VALUE_PROPERTY} or the {@link #VALIDATOR_PROPERTY} is fired. 
 @author Garret Wilson
 @see CardLayout
 */
@@ -27,7 +27,7 @@ public abstract class AbstractCardPanel<C extends Panel<C> & CardControl<C>> ext
 
 		/**@return The list select model used by this component.*/
 //TODO del		protected ListSelectModel<Component<?>> getListSelectModel() {return listSelectModel;}
-
+	
 	/**@return The layout definition for the container.*/
 	public CardLayout getLayout() {return (CardLayout)super.getLayout();}
 
@@ -50,27 +50,6 @@ public abstract class AbstractCardPanel<C extends Panel<C> & CardControl<C>> ext
 				editable=newEditable;	//actually change the value
 				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
 			}			
-		}
-
-	/**Whether the state of the control represents valid user input.*/
-	private boolean valid=true;
-
-		/**@return Whether the state of the control represents valid user input.*/
-		public boolean isValid() {return valid;}
-
-		/**Sets whether the state of the control represents valid user input
-		This is a bound property of type <code>Boolean</code>.
-		@param newValid <code>true</code> if user input should be considered valid
-		@see Control#VALID_PROPERTY
-		*/
-		public void setValid(final boolean newValid)
-		{
-			if(valid!=newValid)	//if the value is really changing
-			{
-				final boolean oldValid=valid;	//get the current value
-				valid=newValid;	//update the value
-				firePropertyChange(VALID_PROPERTY, Boolean.valueOf(oldValid), Boolean.valueOf(newValid));
-			}
 		}
 
 	/**The strategy used to generate a component to represent each value in the model.*/
@@ -147,6 +126,54 @@ public abstract class AbstractCardPanel<C extends Panel<C> & CardControl<C>> ext
 */
 	}
 
+	/**Reports that a bound property has changed.
+	This version first updates the valid status if the value is reported as being changed.
+	@param propertyName The name of the property being changed.
+	@param oldValue The old property value.
+	@param newValue The new property value.
+	*/
+	protected <VV> void firePropertyChange(final String propertyName, final VV oldValue, final VV newValue)
+	{
+		if(VALUE_PROPERTY.equals(propertyName) || VALIDATOR_PROPERTY.equals(propertyName))	//if the value property or the validator property is being reported as changed
+		{
+			updateValid();	//update the valid status based upon the new property, so that any listeners will know whether the new property is valid
+		}
+		super.firePropertyChange(propertyName, oldValue, newValue);	//fire the property change event normally
+	}
+
+	/**Checks the state of the component for validity.
+	This version only checks the validity of the selected card.
+	@return <code>true</code> if the relevant children pass all validity tests.
+	*/ 
+	protected boolean determineChildrenValid()
+	{
+		final Component selectedComponent=getValue();	//get the selected card
+		return selectedComponent==null || selectedComponent.isValid();	//the children will only be invalid if the selected card is invalid
+	}
+
+	
+	/**Validates the model of this component and all child components.
+	The component will be updated with error information.
+	This version validates the associated model.
+	@exception ComponentExceptions if there was one or more validation error.
+	*/
+/*TODO fix
+	public void validate() throws ComponentExceptions
+	{
+		super.validate();	//validate the parent class
+		try
+		{
+			getValueModel().validateValue();	//validate the value model
+		}
+		catch(final ComponentException componentException)	//if there is a component error
+		{
+			componentException.setComponent(this);	//make sure the exception knows to which component it relates
+			addError(componentException);	//add this error to the component
+			throw new ComponentExceptions(componentException);	//throw a new component exception list exception
+		}
+	}
+*/
+	
 		//ValueModel delegations
 
 	/**@return The default value.*/
@@ -187,6 +214,11 @@ public abstract class AbstractCardPanel<C extends Panel<C> & CardControl<C>> ext
 	@see #VALIDATOR_PROPERTY
 	*/
 	public void setValidator(final Validator<Component<?>> newValidator) {getLayout().setValidator(newValidator);}
+
+	/**Determines whether the value of this model is valid.
+	@return Whether the value of this model is valid.
+	*/
+	public boolean isValidValue() {return getLayout().isValidValue();}
 
 	/**Validates the value of this model, throwing an exception if the model is not valid.
 	@exception ValidationException if the value of this model is not valid.	

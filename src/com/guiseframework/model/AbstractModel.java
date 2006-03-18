@@ -10,7 +10,6 @@ import javax.mail.internet.ContentType;
 
 import com.guiseframework.GuiseSession;
 import com.guiseframework.event.*;
-import com.guiseframework.validator.ValidationException;
 
 /**A base abstract class implementing helpful functionality for models.
 @author Garret Wilson
@@ -30,20 +29,6 @@ public abstract class AbstractModel extends GuiseBoundPropertyObject implements 
 	public AbstractModel(final GuiseSession session)
 	{
 		super(session);	//construct the parent class
-	}
-
-	/**Determines whether the contents of this model are valid.
-	This version returns <code>true</code>.
-	@return Whether the contents of this model are valid.
-	*/
-	public boolean isValid() {return true;}
-
-	/**Validates the contents of this model, throwing an exception if the model is not valid.
-	This version performs no action.
-	@exception ValidationException if the contents of this model are not valid.	
-	*/
-	public void validate() throws ValidationException
-	{
 	}
 
 	/**Determines the plain text form of the given text, based upon its content type.

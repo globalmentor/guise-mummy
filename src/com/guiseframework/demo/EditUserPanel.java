@@ -118,12 +118,11 @@ public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser>
 		return Arrays.equals(passwordControl.getValue(), passwordVerificationControl.getValue());	//see if the passwords match
 	}
 
-	/**Determines whether the models of this component and all of its child components are valid.
+	/**Checks the state of the component for validity.
 	This version ensures the entered passwords match.
-	@return Whether the models of this component and all of its child components are valid.
-	@see #isPasswordMatch()
-	*/
-	public boolean isValid()
+	@return <code>true</code> if the component and all children passes all validity tests, else <code>false</code>.
+	*/ 
+	protected boolean determineValid()
 	{
 		return super.isValid() && isPasswordMatch();	//add a check for password validity
 	}
