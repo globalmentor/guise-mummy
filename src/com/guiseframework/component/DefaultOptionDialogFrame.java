@@ -15,11 +15,19 @@ import com.guiseframework.validator.ValidationException;
 /**Default implementation of a frame for communication of an option such as "OK" or "Cancel".
 An option frame defaults to a single composite child panel with a row of options along the bottom.
 The contents of an option dialog frame should be accessed by {@link #getOptionContent()} and {@link #setOptionContent(Component)}.
+The labels and icons are accessed from the resources using resouce keys
+	<code>frame.dialog.options.<var>option</var>.label</code> and <code>frame.dialog.options.<var>option</var>.icon</code>,
+	respectively, where <var>option</var> represents the option enum value such as "OK".
 @author Garret Wilson
 */
 public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultOptionDialogFrame.Option, DefaultOptionDialogFrame>
 {
 
+	/**The resource key format pattern for each option label.*/
+	public final static String FRAME_DIALOG_OPTION_LABEL_RESOURCE_KEY_FORMAT_PATTERN="frame.dialog.option.{0}.label";
+	/**The resource key format pattern for each option icon.*/
+	public final static String FRAME_DIALOG_OPTION_ICON_RESOURCE_KEY_FORMAT_PATTERN="frame.dialog.option.{0}.icon";
+	
 	/**The options which can be returned from this frame.
 	The option ordinals represent the order in which they should be presented.
 	*/
@@ -238,12 +246,11 @@ public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultO
 		final GuiseSession session=getSession();	//get the session
 		final Option[] sortedOptions=options.toArray(new Option[options.size()]);	//convert the collection to an array
 		sort(sortedOptions);	//sort the array
-//TODO del		final Option[] sortedOptions=getSorted(options);	//sort the options
 		for(final Option option:sortedOptions)	//for each option
 		{
 			final Button button=new Button(session);	//create a new button
-			button.setLabelResourceKey(MessageFormat.format("frame.dialog.options.{0}.label", option.toString()));	//set the option action label
-			button.setIconResourceKey(MessageFormat.format("frame.dialog.options.{0}.icon", option.toString()));	//set the option action icon
+			button.setLabelResourceKey(MessageFormat.format(FRAME_DIALOG_OPTION_LABEL_RESOURCE_KEY_FORMAT_PATTERN, option.toString()));	//set the option action label
+			button.setIconResourceKey(MessageFormat.format(FRAME_DIALOG_OPTION_ICON_RESOURCE_KEY_FORMAT_PATTERN, option.toString()));	//set the option action icon
 			button.addActionListener(new ActionListener()	//listen for the action being performed
 					{
 						public void actionPerformed(final ActionEvent actionEvent)	//if the action is performed
