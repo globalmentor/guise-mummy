@@ -7,6 +7,7 @@ import java.beans.PropertyChangeListener;
 import java.util.*;
 
 import com.guiseframework.GuiseSession;
+import com.guiseframework.component.layout.CardConstraints;
 import com.guiseframework.component.layout.CardLayout;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
@@ -539,20 +540,67 @@ public abstract class AbstractCardPanel<C extends Panel<C> & CardControl<C>> ext
 	}
 */
 
+	/**Convenience method to determine whether a card is displayed based upon its associated constraints.
+	@return Whether the card is displayed or has no representation, taking up no space.
+	@exception IllegalStateException if the given component has no associated constraints.
+	@see CardConstraints#isDisplayed()
+	*/
+	public boolean isDisplayed(final Component<?> component)
+	{
+		final CardConstraints cardConstraints=getLayout().getConstraints(component);	//get constraints of the component
+		if(cardConstraints==null)	//if there are no constraints
+		{
+			throw new IllegalStateException("Component "+component+" has no associated constraints.");
+		}
+		return cardConstraints.isDisplayed();	//return the displayed status of the constraints
+	}
+
+	/**Sets a card displayed or not displayed.
+	This convenience method changes the displayed status of the component's associated constraints.
+	@param component The component for which the card should be displayed or not displayed.
+	@param newDisplayed <code>true</code> if the card should be displayed.
+	@exception IllegalStateException if the given component has no associated constraints.
+	@see CardConstraints#setDisplayed(boolean)
+	*/
+	public void setDisplayed(final Component<?> component, final boolean newDisplayed)
+	{
+		final CardConstraints cardConstraints=getLayout().getConstraints(component);	//get constraints of the component
+		if(cardConstraints==null)	//if there are no constraints
+		{
+			throw new IllegalStateException("Component "+component+" has no associated constraints.");
+		}
+		cardConstraints.setDisplayed(newDisplayed);	//change the displayed status of the constraints
+	}
+
+	/**Convenience method to determine whether a card is enabled based upon its associated constraints.
+	@return Whether the card is enabled and can receive user input.
+	@exception IllegalStateException if the given component has no associated constraints.
+	@see CardConstraints#isEnabled()
+	*/
+	public boolean isEnabled(final Component<?> component)
+	{
+		final CardConstraints cardConstraints=getLayout().getConstraints(component);	//get constraints of the component
+		if(cardConstraints==null)	//if there are no constraints
+		{
+			throw new IllegalStateException("Component "+component+" has no associated constraints.");
+		}
+		return cardConstraints.isEnabled();	//return the enabled status of the constraints
+	}
+
 	/**Enables or disables a card.
-	This convenience method looks up card layout constraints for the given component and changes the enabled status of those constraints.
+	This convenience method changes the enabled status of the component's associated constraints.
 	@param component The component for which the card should be enabled or disabled.
 	@param newEnabled <code>true</code> if the card can be selected.
-	@see CardLayout.Constraints#setEnabled(boolean)
+	@exception IllegalStateException if the given component has no associated constraints.
+	@see CardConstraints#setEnabled(boolean)
 	*/
-/*TODO del if not wanted
 	public void setEnabled(final Component<?> component, final boolean newEnabled)
 	{
-		final CardLayout.Constraints constraints=getLayout().getConstraints(component);	//get the card constraints for this component
-		if(constraints!=null)	//if there are constraints for this component
+		final CardConstraints cardConstraints=getLayout().getConstraints(component);	//get constraints of the component
+		if(cardConstraints==null)	//if there are no constraints
 		{
-			constraints.setEnabled(newEnabled);	//change the enabled status of the constraints
+			throw new IllegalStateException("Component "+component+" has no associated constraints.");
 		}
+		cardConstraints.setEnabled(newEnabled);	//change the enabled status of the constraints
 	}
-*/
 }

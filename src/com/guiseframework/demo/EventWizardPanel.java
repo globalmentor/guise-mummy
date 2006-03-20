@@ -4,7 +4,10 @@ import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.coupler.ActionCardCoupler;
+import com.guiseframework.event.AbstractGuisePropertyChangeListener;
 import com.guiseframework.event.ActionListener;
+import com.guiseframework.event.GuisePropertyChangeEvent;
+import com.guiseframework.model.DefaultValueModel;
 import com.guiseframework.validator.RegularExpressionStringValidator;
 import com.guiseframework.validator.ValueRequiredValidator;
 
@@ -32,7 +35,7 @@ public class EventWizardPanel extends DefaultNavigationPanel
 		final LayoutPanel personalTab=new LayoutPanel(session, new RegionLayout(session));
 				//Personal wizard cards
 		final SequenceCardPanel personalCardPanel=new SequenceCardPanel(session);
-		final Panel<?> personalCard1=new PersonalNamePanel(session);
+		final PersonalNamePanel personalCard1=new PersonalNamePanel(session);
 		personalCard1.setConstraints(new TaskCardConstraints(session));
 		personalCardPanel.add(personalCard1);
 		final Panel<?> personalCard2=new PersonalAgePanel(session);
@@ -42,6 +45,14 @@ public class EventWizardPanel extends DefaultNavigationPanel
 		personalCard3.setConstraints(new TaskCardConstraints(session));
 		personalCardPanel.add(personalCard3);		
 		personalTab.add(personalCardPanel, new RegionConstraints(session, Region.CENTER));
+			//listen for the age checkbox changing
+		personalCard1.getAgeCheckControl().addPropertyChangeListener(CheckControl.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Boolean>()
+				{
+					public void propertyChange(GuisePropertyChangeEvent<Boolean> propertyChangeEvent)	//if the age checkbox changes
+					{
+						personalCardPanel.setDisplayed(personalCard2, propertyChangeEvent.getNewValue());	//show or hide the age panel based upon the state of the age checkbox
+					}			
+				});
 				//Personal wizard links
 		final LayoutPanel personalLinkPanel=new LayoutPanel(session);
 		final Link personalLink10=new Link(session);
@@ -195,6 +206,13 @@ public class EventWizardPanel extends DefaultNavigationPanel
 	*/
 	protected static class PersonalNamePanel extends LayoutPanel
 	{
+
+		/**The check control for providing age.*/
+		private final CheckControl ageCheckControl;
+
+			/**@return The check control for providing age.*/
+			public CheckControl getAgeCheckControl() {return ageCheckControl;}
+
 		/**Session constructor.
 		@param session The Guise session that owns this component.
 		@exception NullPointerException if the given session is <code>null</code>.
@@ -216,6 +234,10 @@ public class EventWizardPanel extends DefaultNavigationPanel
 			lastNameTextControl.setLabel("Last Name");
 			lastNameTextControl.setValidator(new RegularExpressionStringValidator(session, "\\S+.*", true));
 			add(lastNameTextControl);
+				//age checkbox
+			ageCheckControl=new CheckControl(session, new DefaultValueModel<Boolean>(session, Boolean.class, Boolean.TRUE));
+			ageCheckControl.setLabel("I want to tell you my age");
+			add(ageCheckControl);
 		}
 	}
 

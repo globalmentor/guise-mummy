@@ -878,7 +878,7 @@ if(valid==null)
 		/**Sets whether the component is displayed or has no representation, taking up no space.
 		This is a bound property of type <code>Boolean</code>.
 		@param newDisplayed <code>true</code> if the component should be displayed, else <code>false</code> if the component should take up no space.
-		@see Component#DISPLAYED_PROPERTY
+		@see #DISPLAYED_PROPERTY
 		@see #setVisible(boolean)
 		*/
 		public void setDisplayed(final boolean newDisplayed)

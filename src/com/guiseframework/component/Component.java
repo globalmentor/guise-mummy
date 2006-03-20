@@ -18,8 +18,7 @@ import com.guiseframework.controller.ControlEvent;
 import com.guiseframework.controller.Controller;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
-import com.guiseframework.model.LabelModel;
-import com.guiseframework.model.Model;
+import com.guiseframework.model.*;
 import com.guiseframework.style.Color;
 import com.guiseframework.view.View;
 
@@ -36,7 +35,7 @@ If a developer must hide sensitive data, the developer should remove the compone
 <p>For widest platform support the general {@link #ROUNDED_CORNER_RADIUS_EXTENT} constant should be used whenever possible when requesting rounded corners.</p> 
 @author Garret Wilson
 */
-public interface Component<C extends Component<C>> extends PropertyBindable, LabelModel
+public interface Component<C extends Component<C>> extends PropertyBindable, LabelModel, Displayable
 {
 
 	/**The bound property of the background color.*/
@@ -61,8 +60,6 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public final static String DESCRIPTION_CONTENT_TYPE_PROPERTY=getPropertyName(Component.class, "descriptionContentType");
 	/**The description resource key bound property.*/
 	public final static String DESCRIPTION_RESOURCE_KEY_PROPERTY=getPropertyName(Component.class, "descriptionResourceKey");
-	/**The bound property of whether the component is displayed or has no representation, taking up no space.*/
-	public final static String DISPLAYED_PROPERTY=getPropertyName(Component.class, "displayed");
 	/**The bound property of whether the component has dragging enabled.*/
 	public final static String DRAG_ENABLED_PROPERTY=getPropertyName(Component.class, "dragEnabled");
 	/**The bound property of whether the component has dropping enabled.*/

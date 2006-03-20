@@ -167,11 +167,25 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
 		return getPrevious()!=null;	//see if there is a previous component
 	}
 
-	/**@return The previous component in the sequence, or <code>null</code> if there is no previous component in the sequence.*/
+	/**Determines the previous component in the sequence.
+	Components that are not displayed or not enabled based upon their associated constraints are skipped.
+	@return The previous component in the sequence, or <code>null</code> if there is no previous component in the sequence.
+	*/
 	public Component<?> getPrevious()
 	{
 		final int selectedIndex=getSelectedIndex();	//get the selected index
-		return selectedIndex>0 ? get(selectedIndex-1) : null;	//see whether there is a selected index greater than the minimum selected index, zero		
+		if(selectedIndex>=0)	//if a card is selected
+		{
+			for(int i=selectedIndex-1; i>=0; --i)	//for each previous card
+			{
+				final Component<?> card=get(i);	//get this card
+				if(isDisplayed(card) && isEnabled(card))	//if the card is displayed and enabled
+				{
+					return card;	//return this card
+				}
+			}
+		}
+		return null;	//indicate that there is no previous card
 	}
 
 	/**Determines if there is a next step in the sequence.
@@ -183,11 +197,27 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
 		return getNext()!=null;	//see if there is a next component
 	}
 
-	/**@return The next component in the sequence, or <code>null</code> if there is no next component in the sequence.*/
+	/**Determines the next component in the sequence.
+	Components that are not displayed or not enabled based upon their associated constraints are skipped.
+	@return The next component in the sequence, or <code>null</code> if there is no next component in the sequence.
+	*/
 	public Component<?> getNext()
 	{
 		final int selectedIndex=getSelectedIndex();	//get the selected index
-		return selectedIndex>=0 && selectedIndex<size()-1 ? get(selectedIndex+1) : null;	//see whether there is a selected index less than the maximum selected index
+		if(selectedIndex>=0)	//if a card is selected
+		{
+			final int cardCount=size();	//find out how many cards there are
+			for(int i=selectedIndex+1; i<cardCount; ++i)	//for each next card
+			{
+				final Component<?> card=get(i);	//get this card
+				if(isDisplayed(card))	//if the card is displayed
+//TODO decide; currently we need to get disabled cards so that we can enable them				if(isDisplayed(card) && isEnabled(card))	//if the card is displayed and enabled
+				{
+					return card;	//return this card
+				}
+			}
+		}
+		return null;	//indicate that there is no next card
 	}
 
 	/**Goes to the previous step in the sequence.
@@ -196,7 +226,8 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
 	*/
 	public void goPrevious()
 	{
-		if(hasPrevious())	//if there is a previous step
+		final Component<?> previousCard=getPrevious();	//get the previous card
+		if(previousCard!=null)	//if there is a previous card
 		{
 			try
 			{
@@ -205,7 +236,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
 //				try
 				{
 //					selectedCard.validate();	//validate the selected card
-					setSelectedIndexes(getSelectedIndex()-1);	//advance to the previous index
+					setValue(previousCard);	//select the previous card
 				}
 //				catch(final ComponentExceptions componentException)
 				{

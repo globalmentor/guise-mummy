@@ -12,7 +12,7 @@ import com.guiseframework.model.*;
 /**Constraints on an individual component in a card layout.
 @author Garret Wilson
 */
-public class CardConstraints extends AbstractConstraints implements LabelModel, Enableable
+public class CardConstraints extends AbstractConstraints implements LabelModel, Displayable, Enableable
 {
 
 	/**The label model used by this component.*/
@@ -20,6 +20,27 @@ public class CardConstraints extends AbstractConstraints implements LabelModel, 
 
 		/**@return The label model used by this component.*/
 		protected LabelModel getLabelModel() {return labelModel;}
+
+	/**Whether the card is displayed or has no representation, taking up no space.*/
+	private boolean displayed=true;
+
+		/**@return Whether the card is displayed or has no representation, taking up no space.*/
+		public boolean isDisplayed() {return displayed;}
+
+		/**Sets whether the card is displayed or has no representation, taking up no space.
+		This is a bound property of type <code>Boolean</code>.
+		@param newDisplayed <code>true</code> if the card should be displayed, else <code>false</code> if the card should take up no space.
+		@see #DISPLAYED_PROPERTY
+		*/
+		public void setDisplayed(final boolean newDisplayed)
+		{
+			if(displayed!=newDisplayed)	//if the value is really changing
+			{
+				final boolean oldDisplayed=displayed;	//get the current value
+				displayed=newDisplayed;	//update the value
+				firePropertyChange(DISPLAYED_PROPERTY, Boolean.valueOf(oldDisplayed), Boolean.valueOf(newDisplayed));
+			}
+		}
 
 	/**Whether the card is enabled for selection.*/
 	private boolean enabled=true;

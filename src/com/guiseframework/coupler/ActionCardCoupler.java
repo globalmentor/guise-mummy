@@ -7,17 +7,17 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Constraints;
 import com.guiseframework.component.layout.TaskCardConstraints;
 import com.guiseframework.event.*;
-import com.guiseframework.model.Enableable;
-import com.guiseframework.model.Selectable;
-import com.guiseframework.model.TaskStatus;
+import com.guiseframework.model.*;
 import com.guiseframework.validator.ValidationException;
 
 /**Associates an action control with a card in a card control.
 When the action is initiated, the specified card within the card control will be selected.
 When the associated card is selected, if the action implements {@link Selectable} the action will be selected.
-If the action implements {@link SelectActionControl} its auto-select status will be turned off when installed.
+If the card's constraints implement {@link Displayable}, the action will be displayed based upon the card constraints' displayed status.
+If the card's constraints implement {@link Enableable}, the action will be enabled based upon the card constraints' enabled status.
 If a card's constraints implement {@link TaskCardConstraints} and the action implements {@link ActionValueControl} and represents a {@link TaskStatus} value,
 	the action's contained value will reflect any changes in the card constraints task status.
+If the action implements {@link SelectActionControl} its auto-select status will be turned off when installed.
 This coupler is only functional when the given card is contained within a {@link CardControl}.
 @author Garret Wilson
 */
@@ -47,12 +47,21 @@ public class ActionCardCoupler extends GuiseBoundPropertyObject	//TODO listen fo
 			}		
 		};
 
+	/**The property change listener to listen for the card displayed status changing and change the action accordingly.*/
+	private final GuisePropertyChangeListener<Boolean> displayedChangeListener=new AbstractGuisePropertyChangeListener<Boolean>()
+		{
+			public void propertyChange(final GuisePropertyChangeEvent<Boolean> propertyChangeEvent)	//if the displayed status changes
+			{
+				updateDisplayed(propertyChangeEvent.getNewValue().booleanValue());	//update the action with the new displayed status
+			}
+		};
+
 	/**The property change listener to listen for the card enabled status changing and reflect that value in the action.*/
 	private final GuisePropertyChangeListener<Boolean> enabledChangeListener=new AbstractGuisePropertyChangeListener<Boolean>()
 		{
-			public void propertyChange(final GuisePropertyChangeEvent<Boolean> propertyChangeEvent)	//if the task status changes
+			public void propertyChange(final GuisePropertyChangeEvent<Boolean> propertyChangeEvent)	//if the enabled status changes
 			{
-				updateEnabled(propertyChangeEvent.getNewValue());	//update the action with the new enabled status
+				updateEnabled(propertyChangeEvent.getNewValue().booleanValue());	//update the action with the new enabled status
 			}
 		};
 
@@ -105,6 +114,7 @@ public class ActionCardCoupler extends GuiseBoundPropertyObject	//TODO listen fo
 				}
 				firePropertyChange(ACTION_PROPERTY, oldAction, newAction);	//indicate that the value changed
 				updateSelectedCard();	//update the action control based upon the selected card
+				updateDisplayed();	//update the displayed status based upon the selected card
 				updateEnabled();	//update the enabled status based upon the selected card
 				updateTaskStatus();	//update the task status based upon the selected card
 			}			
@@ -141,6 +151,7 @@ public class ActionCardCoupler extends GuiseBoundPropertyObject	//TODO listen fo
 				setCardConstraints(newCard!=null ? newCard.getConstraints() : null);	//update the card constraints
 				firePropertyChange(CARD_PROPERTY, oldCard, newCard);	//indicate that the value changed
 				updateSelectedCard();	//update the action control based upon the selected card
+				updateDisplayed();	//update the displayed status based upon the selected card
 				updateEnabled();	//update the enabled status based upon the selected card
 				updateTaskStatus();	//update the task status based upon the selected card
 			}			
@@ -186,6 +197,10 @@ public class ActionCardCoupler extends GuiseBoundPropertyObject	//TODO listen fo
 			if(cardConstraints!=newCardConstraints)	//if the value is really changing
 			{
 				final Constraints oldCardConstraints=cardConstraints;	//get the old value
+				if(oldCardConstraints instanceof Displayable)	//if the old constraints were displayable
+				{
+					oldCardConstraints.removePropertyChangeListener(Displayable.DISPLAYED_PROPERTY, displayedChangeListener);	//stop listening for changes in displayed status
+				}
 				if(oldCardConstraints instanceof Enableable)	//if the old constraints were enableable
 				{
 					oldCardConstraints.removePropertyChangeListener(Enableable.ENABLED_PROPERTY, enabledChangeListener);	//stop listening for changes in enabled status
@@ -195,6 +210,10 @@ public class ActionCardCoupler extends GuiseBoundPropertyObject	//TODO listen fo
 					oldCardConstraints.removePropertyChangeListener(TaskCardConstraints.TASK_STATUS_PROPERTY, taskStatusChangeListener);	//stop listening for changes in task status
 				}
 				cardConstraints=newCardConstraints;	//update the value				
+				if(newCardConstraints instanceof Displayable)	//if the new constraints are displayable
+				{
+					newCardConstraints.addPropertyChangeListener(Displayable.DISPLAYED_PROPERTY, displayedChangeListener);	//listen for changes in displayed status 
+				}
 				if(newCardConstraints instanceof Enableable)	//if the new constraints are enableable
 				{
 					newCardConstraints.addPropertyChangeListener(Enableable.ENABLED_PROPERTY, enabledChangeListener);	//listen for changes in enabled status 
@@ -254,6 +273,33 @@ public class ActionCardCoupler extends GuiseBoundPropertyObject	//TODO listen fo
 		}
 		catch(final ValidationException validationException)	//if the card can't be selected, just ignore the error and assume that the card control reported the error
 		{
+		}
+	}
+
+	/**Updates the action with the current displayed status based upon the constraints of the connected card.
+	If no action control is connected to this coupler, no action occurs.
+	If no card with {@link Displayable} constraints is connected to this coupler, no action occurs.
+	This method calls {@link #updateDisplayed(boolean)}.
+	*/
+	protected void updateDisplayed()
+	{
+		final Constraints constraints=getCardConstraints();	//get the card constraints, if any
+		if(constraints instanceof Displayable)	//if the constraints are displayable
+		{
+			updateEnabled(((Displayable)constraints).isDisplayed());	//update the displayed status of the action
+		}
+	}
+
+	/**Updates the action with the current displayed status.
+	If no action control is connected to this coupler, no action occurs.
+	@param displayed The new displayed status.
+	*/
+	protected void updateDisplayed(final boolean displayed)
+	{
+		final ActionControl<?> action=getAction();	//get the action
+		if(action!=null)	//if there is an action
+		{
+			action.setDisplayed(displayed);	//update the action's displayed status
 		}
 	}
 
