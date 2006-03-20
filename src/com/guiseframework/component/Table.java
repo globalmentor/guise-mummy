@@ -7,7 +7,6 @@ import java.util.concurrent.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.guiseframework.GuiseSession;
-import com.guiseframework.component.Control.Status;
 import com.guiseframework.converter.AbstractStringLiteralConverter;
 import com.guiseframework.converter.ConversionException;
 import com.guiseframework.converter.Converter;
@@ -103,12 +102,13 @@ public class Table extends AbstractCompositeStateComponent<TableModel.Cell<?>, T
 		}
 
 		/**Checks the user input status of the control.
-		This version returns <code>null</code>.
+		If the component has errors, the status is determined to be {@link Status#ERROR}.
+		Otherwise, this version returns <code>null</code>.
 		@return The current user input status of the control.
 		*/ 
 		protected Status determineStatus()
 		{
-			return null;	//default to no status to report
+			return hasErrors() ? Status.ERROR : null;	//default to no status to report unless there are errors
 		}
 
 		/**Rechecks user input validity of this component and all child components, and updates the valid state.

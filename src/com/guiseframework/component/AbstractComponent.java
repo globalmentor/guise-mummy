@@ -1,5 +1,6 @@
 package com.guiseframework.component;
 
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -9,6 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.mail.internet.ContentType;
 
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.util.Debug;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.effect.*;
 import com.guiseframework.component.layout.*;
@@ -464,43 +466,91 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			}			
 		}
 
-		/**Whether the state of the component and all child component represents valid user input.*/
-		private boolean valid=true;
+	/**Whether the valid property has been initialized.
+	Updating validity in a super constructor can sometimes call {@link #determineValid()} before subclass variables are initialized,
+	especially in containers that add and/or remove children in the super constructor before subclasses have a chance to create class variables in their constructors,
+	so this implementation of valid is lazily-initialized only when needed. The value is always initialized when being read or being set,
+	and the {@link #updateValid()} method only calls {@link #determineValid()} if the valid property is initialized or there is at least one listener for the {@link #VALID_PROPERTY}.
+	*/ 
+	private boolean validInitialized=false;
 
-			/**@return Whether the state of the component and all child components represents valid user input.*/
-			public boolean isValid() {return valid;}
+	/**Whether the state of the component and all child component represents valid user input.
+	Updating validity in a super constructor can sometimes call {@link #determineValid()} before subclass variables are initialized,
+	especially in containers that add and/or remove children in the super constructor before subclasses have a chance to create class variables in their constructors,
+	so this implementation of valid is lazily-initialized only when needed. The value is always initialized when being read or being set,
+	and the {@link #updateValid()} method only calls {@link #determineValid()} if the valid property is initialized or there is at least one listener for the {@link #VALID_PROPERTY}.
+	*/
+	private Boolean valid=null;	//start with an uninitialized valid property
 
-			/**Sets whether the state of the component and all child components represents valid user input
-			This is a bound property of type <code>Boolean</code>.
-			@param newValid <code>true</code> if user input of this component and all child components should be considered valid
-			@see #VALID_PROPERTY
-			*/
-			protected void setValid(final boolean newValid)
+		/**Determines whether the state of the component and all child components represents valid user input.
+		This implementation initializes the valid property if needed.
+		@return Whether the state of the component and all child components represents valid user input.
+		*/
+		public boolean isValid()
+		{
+			if(valid==null)	//if valid is not yet initialized TODO eliminate race condition
 			{
-				if(valid!=newValid)	//if the value is really changing
-				{
-					final boolean oldValid=valid;	//get the current value
-					valid=newValid;	//update the value
-					firePropertyChange(VALID_PROPERTY, Boolean.valueOf(oldValid), Boolean.valueOf(newValid));
-				}
+//TODO del Debug.traceStack("ready to call determineValid() for the first time from inside isValid()");
+				valid=Boolean.TRUE;	//initialize valid to an arbitrary value so that if determineValid() calls isValid() there won't be inifinite recursion
+				valid=Boolean.valueOf(determineValid());	//determine validity
 			}
+			return valid.booleanValue();	//return the valid state
+		}
 
-			/**Rechecks user input validity of this component and all child components, and updates the valid state.
-			@see #setValid(boolean)
-			*/ 
-			protected void updateValid()
+/*TODO del		
+		public void addPropertyChangeListener(final String propertyName, final PropertyChangeListener listener)
+		{
+			if(VALID_PROPERTY.equals(propertyName))
 			{
+				Debug.traceStack("we have a new validity listener:", listener);
+			}
+			super.addPropertyChangeListener(propertyName, listener);
+		}
+*/
+		
+		/**Sets whether the state of the component and all child components represents valid user input
+		This is a bound property of type <code>Boolean</code>.
+		This implementation initializes the valid property if needed.
+		@param newValid <code>true</code> if user input of this component and all child components should be considered valid
+		@see #VALID_PROPERTY
+		*/
+		protected void setValid(final boolean newValid)
+		{
+			final boolean oldValid=isValid();	//get the current value
+			if(oldValid!=newValid)	//if the value is really changing
+			{
+				final Boolean booleanNewValid=Boolean.valueOf(newValid);	//get the BOolean form of the new value
+				valid=booleanNewValid;	//update the value
+				firePropertyChange(VALID_PROPERTY, Boolean.valueOf(oldValid), booleanNewValid);
+			}
+		}
+
+		/**Rechecks user input validity of this component and all child components, and updates the valid state.
+		This implementation only updates the valid property if the property is already initialized or there is at least one listener to the {@link #VALID_PROPERTY}.
+		@see #setValid(boolean)
+		*/ 
+		protected void updateValid()
+		{
+			if(valid!=null || hasListeners(VALID_PROPERTY))	//if valid is initialized or there is a listener for the valid property
+			{
+/*TODO del
+if(valid==null)
+{
+	Debug.traceStack("ready to call determineValid() for the first time from inside updateValid()");	
+}
+*/
 				setValid(determineValid());	//update the vailidity after rechecking it
 			}
+		}
 
-			/**Checks the state of the component for validity.
-			This version returns <code>true</code>.
-			@return <code>true</code> if the component and all children passes all validity tests, else <code>false</code>.
-			*/ 
-			protected boolean determineValid()
-			{
-				return true;	//default to being valid
-			}
+		/**Checks the state of the component for validity.
+		This version returns <code>true</code>.
+		@return <code>true</code> if the component and all children passes all validity tests, else <code>false</code>.
+		*/ 
+		protected boolean determineValid()
+		{
+			return true;	//default to being valid
+		}
 
 	/**The controller installed in this component.*/
 	private Controller<? extends GuiseContext, ? super C> controller;
@@ -579,7 +629,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		*/
 		public void addError(final Throwable error) {errorList.add(error);
 		
-getView().setUpdated(false);	//TODO fix hack; make the view listen for error changes		
+//TODO del; may be fixed by AbstractControl version getView().setUpdated(false);	//TODO fix hack; make the view listen for error changes
 		
 		}
 
@@ -588,7 +638,7 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		*/
 		public void addErrors(final Collection<? extends Throwable> errors) {errorList.addAll(errors);
 		
-getView().setUpdated(false);	//TODO fix hack; make the view listen for error changes		
+//TODO del; may be fixed by AbstractControl version getView().setUpdated(false);	//TODO fix hack; make the view listen for error changes		
 		
 		}
 
@@ -597,14 +647,14 @@ getView().setUpdated(false);	//TODO fix hack; make the view listen for error cha
 		*/
 		public void removeError(final Throwable error) {errorList.remove(error);
 		
-		getView().setUpdated(false);	//TODO fix hack; make the view listen for error changes		
+//TODO del; may be fixed by AbstractControl version getView().setUpdated(false);	//TODO fix hack; make the view listen for error changes		
 		
 		}
 
 		/**Clears all errors associated with this component.*/
 		public void clearErrors() {errorList.clear();
 		
-		getView().setUpdated(false);	//TODO fix hack; make the view listen for error changes		
+//TODO del; may be fixed by AbstractControl version getView().setUpdated(false);	//TODO fix hack; make the view listen for error changes		
 		
 		}
 

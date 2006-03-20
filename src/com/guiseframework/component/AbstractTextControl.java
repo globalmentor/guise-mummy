@@ -32,6 +32,8 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 
 	/**The column count bound property.*/
 	public final static String COLUMN_COUNT_PROPERTY=getPropertyName(AbstractTextControl.class, "columnCount");
+	/**The provisional text literal bound property.*/
+	public final static String PROVISIONAL_TEXT_PROPERTY=getPropertyName(AbstractTextControl.class, "provisionalText");
 	/**The text literal bound property.*/
 	public final static String TEXT_PROPERTY=getPropertyName(AbstractTextControl.class, "text");
 
@@ -79,6 +81,29 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 			}
 		}
 
+	/**The provisional text literal value, or <code>null</code> if there is no provisional literal value.*/
+	private String provisionalText;
+
+		/**@return The provisional text literal value, or <code>null</code> if there is no provisional literal value.*/
+		public String getProvisionalText() {return provisionalText;}
+
+		/**Sets the provisional text literal value.
+		This method updates the valid status before firing a change event.
+		This is a bound property.
+		@param newProvisionalText The provisional text literal value.
+		@see #PROVISIONAL_TEXT_PROPERTY
+		*/
+		public void setProvisionalText(final String newProvisionalText)
+		{
+			if(!ObjectUtilities.equals(provisionalText, newProvisionalText))	//if the value is really changing (compare their values, rather than identity)
+			{
+				final String oldProvisionalText=provisionalText;	//get the old value
+				provisionalText=newProvisionalText;	//actually change the value
+				updateValid();	//update the valid status before firing the text change property so that any listeners will know the valid status
+				firePropertyChange(PROVISIONAL_TEXT_PROPERTY, oldProvisionalText, newProvisionalText);	//indicate that the value changed
+			}			
+		}
+
 	/**The text literal value displayed in the control, or <code>null</code> if there is no literal value.*/
 	private String text;
 
@@ -86,7 +111,8 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 		public String getText() {return text;}
 
 		/**Sets the text literal value displayed in the control.
-		This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method.
+		This method updates the provisional text to match and updates the valid status if needed.
+		This is a bound property.
 		@param newText The text literal value displayed in the control.
 		@see #TEXT_PROPERTY
 		*/
@@ -96,7 +122,13 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 			{
 				final String oldText=text;	//get the old value
 				text=newText;	//actually change the value
-				updateValid();	//update the valid status before firing the text change property so that any listeners will know the valid status
+				final String oldProvisionalText=getProvisionalText();	//get the current provisional text
+				final boolean provisionalTextAlreadyMatched=ObjectUtilities.equals(text, getProvisionalText());	//see if the provisional text already matches our new text value
+				setProvisionalText(text);	//update the provisional text before firing a text change property so that the valid state will be updated 
+				if(provisionalTextAlreadyMatched)	//if the provisional text already matched the new text, it didn't update validity, so we need to do that here
+				{
+					updateValid();	//update the valid status before firing the text change property so that any listeners will know the valid status; this will also update the status, which is important because the text and provisional text values are now the same					
+				}
 				firePropertyChange(TEXT_PROPERTY, oldText, newText);	//indicate that the value changed
 			}			
 		}
@@ -204,7 +236,9 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 
 	/**Checks the state of the component for validity.
 	This version in addition to default functionality checks to make sure the literal text can be converted to a valid value.
+	The provisional text is checked for validity, because it represents the latest available input from the user.
 	@return <code>true</code> if the component and all children passes all validity tests, else <code>false</code>.
+	@see #getProvisionalText()
 	*/ 
 	protected boolean determineValid()
 	{
@@ -214,7 +248,7 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 		}
 		try
 		{
-			final V value=getConverter().convertLiteral(getText());	//see if the literal text can correctly be converted
+			final V value=getConverter().convertLiteral(getProvisionalText());	//see if the provisional literal text can correctly be converted
 			final Validator<V> validator=getValidator();	//see if there is a validator installed
 			if(validator!=null)	//if there is a validator installed
 			{
@@ -232,13 +266,14 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 	}
 
 	/**Checks the user input status of the control.
-	This version checks to see if the literal text can be converted to a valid value.
-	If the literal text cannot be converted, the status determined to be {@link Status#ERROR}.
-	If the literal text can be converted but the converted value is invalid,
-		the status is determined to be {@link Status#WARNING} unless the converted value is the same as the control value,
+	This version checks to see if the provisional literal text can be converted to a valid value.
+	If the provisional literal text cannot be converted, the status is determined to be {@link Status#ERROR}.
+	If the provisional literal text can be converted but the converted value is invalid,
+		the status is determined to be {@link Status#WARNING} unless the provisional text is the same as the literal text,
 		in which case the status is determined to be {@link Status#ERROR}.
 	The default value, even if invalid, is considered valid.
 	@return The current user input status of the control.
+	@see #getProvisionalText()
 	*/ 
 	protected Status determineStatus()
 	{
@@ -247,15 +282,16 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 		{
 			try
 			{
-				final V value=getConverter().convertLiteral(getText());	//see if the literal text can correctly be converted
+				final String provisionalText=getProvisionalText();	//get the provisional literal text
+				final V value=getConverter().convertLiteral(provisionalText);	//see if the provisional literal text can correctly be converted
 				if(!ObjectUtilities.equals(value, getDefaultValue()))	//don't count the value as invalid if it is equal to the default value
 				{
 					final Validator<V> validator=getValidator();	//see if there is a validator installed
 					if(validator!=null)	//if there is a validator installed
 					{
-						if(!validator.isValid(value))	//if the value represented by the literal text is not valid
+						if(!validator.isValid(value))	//if the value represented by the provisional literal text is not valid
 						{
-							if(ObjectUtilities.equals(value, getValue()))	//if the invalid value is equal to the current value
+							if(ObjectUtilities.equals(provisionalText, getText()))	//if the invalid provisional literal text is equal to the current literal test
 							{
 								status=Status.ERROR;	//the invalid value has already been committed, so mark it as an error
 							}
@@ -267,7 +303,7 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 					}
 				}
 			}
-			catch(final ConversionException conversionException)	//if we can't convert the literal text to a value
+			catch(final ConversionException conversionException)	//if we can't convert the provisional literal text to a value
 			{
 				status=Status.ERROR;	//conversion problems are errors
 			}

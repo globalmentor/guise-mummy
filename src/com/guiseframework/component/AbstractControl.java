@@ -1,5 +1,7 @@
 package com.guiseframework.component;
 
+import java.util.Collection;
+
 import com.guiseframework.GuiseSession;
 import com.guiseframework.model.DefaultLabelModel;
 import com.guiseframework.model.LabelModel;
@@ -61,24 +63,64 @@ public abstract class AbstractControl<C extends Control<C>> extends AbstractComp
 		}
 
 		/**Checks the user input status of the control.
-		This version returns <code>null</code>.
+		If the component has errors, the status is determined to be {@link Status#ERROR}.
+		Otherwise, this version returns <code>null</code>.
 		@return The current user input status of the control.
 		*/ 
 		protected Status determineStatus()
 		{
-			return null;	//default to no status to report
+			return hasErrors() ? Status.ERROR : null;	//default to no status to report unless there are errors
 		}
 
-		/**Rechecks user input validity of this component and all child components, and updates the valid state.
-		This version also updates the status.
-		@see #setValid(boolean)
-		@see #updateStatus()
-		*/ 
-		protected void updateValid()
-		{
-			super.updateValid();	//update validity normally
-			updateStatus();	//update user input status
-		}
+	/**Rechecks user input validity of this component and all child components, and updates the valid state.
+	This version also updates the status.
+	@see #setValid(boolean)
+	@see #updateStatus()
+	*/ 
+	protected void updateValid()
+	{
+		super.updateValid();	//update validity normally
+		updateStatus();	//update user input status
+	}
+
+	/**Adds an error to the component.
+	This version updates the status.
+	@param error The error to add.
+	*/
+	public void addError(final Throwable error)
+	{
+		super.addError(error);	//add the error normally
+		updateStatus();	//update the status
+	}
+
+	/**Adds errors to the component.
+	This version updates the status.
+	@param errors The errors to add.
+	*/
+	public void addErrors(final Collection<? extends Throwable> errors)
+	{
+		super.addErrors(errors);	//add the errors normally
+		updateStatus();	//update the status
+	}
+
+	/**Removes a specific error from this component.
+	This version updates the status.
+	@param error The error to remove.
+	*/
+	public void removeError(final Throwable error)
+	{
+		super.removeError(error);	//remove the error normally
+		updateStatus();	//update the status
+	}
+
+	/**Clears all errors associated with this component.
+	This version updates the status.
+	*/
+	public void clearErrors()
+	{
+		super.clearErrors();	//clear errors normally
+		updateStatus();	//update the status
+	}
 
 	/**Session and ID constructor.
 	@param session The Guise session that owns this component.
