@@ -61,21 +61,23 @@ public class EventWizardPanel extends DefaultNavigationPanel
 		final LayoutPanel personalButtonPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));
 		final Button personalPreviousButton=new Button(session);
 		personalPreviousButton.setLabel("Previous");
-		personalPreviousButton.addActionListener(new ActionListener(){
-			public void actionPerformed(com.guiseframework.event.ActionEvent actionEvent)
-			{
-				personalCardPanel.goPrevious();
-			};
-		});
+		personalPreviousButton.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(com.guiseframework.event.ActionEvent actionEvent)
+					{
+						personalCardPanel.goPrevious();
+					};
+				});
 		personalButtonPanel.add(personalPreviousButton);
 		final Button personalNextButton=new Button(session);
 		personalNextButton.setLabel("Next");
-		personalNextButton.addActionListener(new ActionListener(){
-			public void actionPerformed(com.guiseframework.event.ActionEvent actionEvent)
-			{
-				personalCardPanel.goNext();
-			};
-		});
+		personalNextButton.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(com.guiseframework.event.ActionEvent actionEvent)
+					{
+						personalCardPanel.goNext();
+					};
+				});
 		personalButtonPanel.add(personalNextButton);
 		personalTab.add(personalButtonPanel, new RegionConstraints(session, Region.PAGE_END));
 		new ActionCardCoupler(session, personalLink10, personalCard1);
@@ -110,21 +112,23 @@ public class EventWizardPanel extends DefaultNavigationPanel
 		final LayoutPanel businessButtonPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));
 		final Button businessPreviousButton=new Button(session);
 		businessPreviousButton.setLabel("Previous");
-		businessPreviousButton.addActionListener(new ActionListener(){
-			public void actionPerformed(com.guiseframework.event.ActionEvent actionEvent)
-			{
-				businessCardPanel.goPrevious();
-			};
-		});
+		businessPreviousButton.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(com.guiseframework.event.ActionEvent actionEvent)
+					{
+						businessCardPanel.goPrevious();
+					};
+				});
 		businessButtonPanel.add(businessPreviousButton);
 		final Button businessNextButton=new Button(session);
 		businessNextButton.setLabel("Next");
-		businessNextButton.addActionListener(new ActionListener(){
-			public void actionPerformed(com.guiseframework.event.ActionEvent actionEvent)
-			{
-				businessCardPanel.goNext();
-			};
-		});
+		businessNextButton.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(com.guiseframework.event.ActionEvent actionEvent)
+					{
+						businessCardPanel.goNext();
+					};
+				});
 		businessButtonPanel.add(businessNextButton);
 		businessTab.add(businessButtonPanel, new RegionConstraints(session, Region.PAGE_END));
 		new ActionCardCoupler(session, businessLink20, businessCard1);
@@ -152,21 +156,23 @@ public class EventWizardPanel extends DefaultNavigationPanel
 		final LayoutPanel eventButtonPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));
 		final Button eventPreviousButton=new Button(session);
 		eventPreviousButton.setLabel("Previous");
-		eventPreviousButton.addActionListener(new ActionListener(){
-			public void actionPerformed(com.guiseframework.event.ActionEvent actionEvent)
-			{
-				eventCardPanel.goPrevious();
-			};
-		});
+		eventPreviousButton.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(com.guiseframework.event.ActionEvent actionEvent)
+					{
+						eventCardPanel.goPrevious();
+					};
+				});
 		eventButtonPanel.add(eventPreviousButton);
 		final Button eventNextButton=new Button(session);
 		eventNextButton.setLabel("Next");
-		eventNextButton.addActionListener(new ActionListener(){
-			public void actionPerformed(com.guiseframework.event.ActionEvent actionEvent)
-			{
-				eventCardPanel.goNext();
-			};
-		});
+		eventNextButton.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(com.guiseframework.event.ActionEvent actionEvent)
+					{
+						eventCardPanel.goNext();
+					};
+				});
 		eventButtonPanel.add(eventNextButton);
 		eventTab.add(eventButtonPanel, new RegionConstraints(session, Region.PAGE_END));
 		new ActionCardCoupler(session, eventLink30, eventCard1);

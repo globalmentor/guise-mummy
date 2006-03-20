@@ -10,6 +10,22 @@ import com.guiseframework.model.Enableable;
 public interface Control<C extends Control<C>> extends Component<C>, Enableable
 {
 
+	/**The input status of a control.*/
+	public enum Status
+	{
+		/**The input is provisionally incorrect.*/
+		WARNING,
+		
+		/**The input is incorrect.*/
+		ERROR;
+	}
+
 	/**The editable bound property.*/
 	public final static String EDITABLE_PROPERTY=getPropertyName(Control.class, "editable");	//TODO decide if this should be moved down to ValueControl
+	/**The status bound property.*/
+	public final static String STATUS_PROPERTY=getPropertyName(Control.class, "status");
+
+	/**@return The status of the current user input, or <code>null</code> if there is no status to report.*/
+	public Status getStatus();
+
 }

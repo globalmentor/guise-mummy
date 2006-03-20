@@ -6,7 +6,10 @@ Copyright (c) 2005-2006 GlobalMentor, Inc.
 <request>
 	<init/>	<!--initializes the page, requesting all frames to be resent-->
 	<events>	<!--the list of events (zero or more)-->
-		<form exhaustive="true|false">	<!--information resulting from form changes, analogous to that in an HTTP POST; exhaustive indicates whether the event contains values for all form controls (defaults to false)-->
+		<form	<!--information resulting from form changes, analogous to that in an HTTP POST-->
+			exhaustive="true|false"	<!--indicates whether the event contains values for all form controls (defaults to false)-->
+			provisional="true|false"	<!--indicates whether the value is a provisional value that has not yet been accepted by the user (defaults to false)-->
+		>
 			<control name="">	<!--a control change (zero or more)-->
 				<!--the value of the control (putting the value into an attribute could corrupt the value because of XML attribute canonicalization rules-->
 			</control>
@@ -957,10 +960,12 @@ function InitAJAXEvent()
 
 /**A class encapsulating form information for an AJAX request.
 @param parameter: An optional parameter with which to initialize the request.
+@param provisional: (optional) Indicates whether the value is a provisional value that has not yet been accepted by the user (defaults to false).
 var parameters: The list of parameters.
+var provisional: Indicates whether the value is a provisional value that has not yet been accepted by the user.
 @see Parameter
 */
-function FormAJAXEvent(parameter)
+function FormAJAXEvent(parameter, provisional)
 {
 	this.parameters=new Array();	//create the parameter array
 	if(!FormAJAXEvent.prototype._initialized)
@@ -980,6 +985,7 @@ function FormAJAXEvent(parameter)
 	{
 		this.addParameter(parameter);	//add this parameter to the request
 	}
+	this.provisional=Boolean(provisional);	//get a normal boolean version of the provisional status, assuming false
 }
 
 //Action AJAX Event
@@ -1252,7 +1258,7 @@ function GuiseAJAX()
 		GuiseAJAX.prototype.RequestElement=
 			{
 				REQUEST: "request", EVENTS: "events",
-				FORM: "form", CONTROL: "control", NAME: "name", VALUE: "value",
+				FORM: "form", PROVISIONAL: "provisional", CONTROL: "control", NAME: "name", VALUE: "value",
 				ACTION: "action", COMPONENT: "component", COMPONENT_ID: "componentID", TARGET_ID: "targetID", ACTION_ID: "actionID",
 				DROP: "drop", SOURCE: "source", TARGET: "target", VIEWPORT: "viewport", MOUSE: "mouse", ID: "id", X: "x", Y: "y", WIDTH: "width", HEIGHT: "height",
 				INIT: "init"
@@ -1342,7 +1348,8 @@ function GuiseAJAX()
 		*/
 		GuiseAJAX.prototype._appendFormAJAXEvent=function(stringBuilder, ajaxFormRequest)
 		{
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.FORM);	//<form>
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.FORM,	//<form
+					new Parameter(this.RequestElement.PROVISIONAL, ajaxFormRequest.provisional));	//provisional="provisional">
 			var parameters=ajaxFormRequest.parameters;	//get the parameters
 			if(parameters.length>0)	//if there are parameters
 			{
@@ -1405,21 +1412,21 @@ function GuiseAJAX()
 					new Parameter(this.RequestElement.X, ajaxMouseEvent.viewportBounds.x),	//x="viewportBounds.x"
 					new Parameter(this.RequestElement.Y, ajaxMouseEvent.viewportBounds.y),	//y="viewportBounds.y"
 					new Parameter(this.RequestElement.WIDTH, ajaxMouseEvent.viewportBounds.width),	//width="viewportBounds.width"
-					new Parameter(this.RequestElement.HEIGHT, ajaxMouseEvent.viewportBounds.height))	//height="viewportBounds.height">
+					new Parameter(this.RequestElement.HEIGHT, ajaxMouseEvent.viewportBounds.height));	//height="viewportBounds.height">
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.VIEWPORT);	//</viewport>
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.COMPONENT,	//<component
 					new Parameter(this.RequestElement.ID, ajaxMouseEvent.componentID),	//id="componentID"
 					new Parameter(this.RequestElement.X, ajaxMouseEvent.componentBounds.x),	//x="componentBounds.x"
 					new Parameter(this.RequestElement.Y, ajaxMouseEvent.componentBounds.y),	//y="componentBounds.y"
 					new Parameter(this.RequestElement.WIDTH, ajaxMouseEvent.componentBounds.width),	//width="componentBounds.width"
-					new Parameter(this.RequestElement.HEIGHT, ajaxMouseEvent.componentBounds.height))	//height="componentBounds.height">
+					new Parameter(this.RequestElement.HEIGHT, ajaxMouseEvent.componentBounds.height));	//height="componentBounds.height">
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.COMPONENT);	//</component>
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.TARGET,	//<target
 					new Parameter(this.RequestElement.ID, ajaxMouseEvent.targetID),	//id="targetID"
 					new Parameter(this.RequestElement.X, ajaxMouseEvent.targetBounds.x),	//x="targetBounds.x"
 					new Parameter(this.RequestElement.Y, ajaxMouseEvent.targetBounds.y),	//y="targetBounds.y"
 					new Parameter(this.RequestElement.WIDTH, ajaxMouseEvent.targetBounds.width),	//width="targetBounds.width"
-					new Parameter(this.RequestElement.HEIGHT, ajaxMouseEvent.targetBounds.height))	//height="targetBounds.height">
+					new Parameter(this.RequestElement.HEIGHT, ajaxMouseEvent.targetBounds.height));	//height="targetBounds.height">
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.TARGET);	//</target>
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE, new Parameter(this.RequestElement.X, ajaxMouseEvent.mousePosition.x), new Parameter(this.RequestElement.Y, ajaxMouseEvent.mousePosition.y));	//<mouse x="x" y="y">
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.MOUSE);	//</mouse>
@@ -1756,8 +1763,19 @@ alert(exception);
 						}
 					}
 				}
+				else if(attributeName=="guise:patchType")	//ignore the guise:patchType attribute TODO check; use a constant
+				{
+				}
 				else	//for any other attribute
 				{
+					if(attributeName=="value")	//if this is the value attribute
+					{
+						var patchType=element.getAttribute("guise:patchType");	//get the patch type TODO use a constant
+						if(patchType=="novalue")	//if we should ignore the value attribute
+						{
+							continue;	//go to the next attribute
+						}
+					}
 					var oldAttributeValue=oldElement[attributeName];	//get the old attribute value
 					var valueChanged=oldAttributeValue!=attributeValue;	//see if the value is really changing
 					if(valueChanged)	//if the value is changing, see if we have to do fixes for IE6 (if the value hasn't changed, that means there were no fixes before and no fixes afterwards; we may want to categorically do fixes in the future if we add attribute-based selectors)
@@ -2944,8 +2962,6 @@ alert("scroll");
 }
 */
 
-var testImages=new Array();	//TODO test caching
-
 /**Initializes a node and all its children, adding the correct listeners.
 @param node The node to initialize.
 */
@@ -3018,14 +3034,7 @@ function initializeNode(node)
 						}
 						break;
 					case "img":
-						var testImage=new Image();	//TODO test caching
-						testImage.src=node.src;
-						testImages.add(testImage);
-//TODO del						alert("found image src: "+node.src);
-					
-					
-					
-						var rolloverSrc=node.getAttribute("guise:rolloverSrc");	//get the image rollover, if there is one
+						var rolloverSrc=node.getAttribute("guise:rolloverSrc");	//get the image rollover, if there is one TODO use a constant
 						if(rolloverSrc!=null)	//if the image has a rollover TODO use a constant
 						{
 							guise.loadImage(rolloverSrc);	//preload the image
@@ -3044,6 +3053,7 @@ function initializeNode(node)
 							case "password":
 								eventManager.addEvent(node, "change", onTextInputChange, false);
 								eventManager.addEvent(node, "keypress", onTextInputKeyPress, false);
+								eventManager.addEvent(node, "keyup", onTextInputKeyUp, false);
 								break;
 							case "checkbox":
 							case "radio":
@@ -3269,6 +3279,7 @@ test.add(dummy);
 
 /**Called when a key is pressed in a text input.
 This implementation checks to see if the Enter/Return key was pressed, and if so commits the input by sending it to the server.
+If Enter/Return was not pressed, send the current value as a provisional value.
 @param event The object describing the event.
 */
 function onTextInputKeyPress(event)
@@ -3278,8 +3289,8 @@ function onTextInputKeyPress(event)
 	{
 		if(AJAX_ENABLED)	//if AJAX is enabled
 		{
-			var textInput=event.currentTarget;	//get the control in which text changed
 		//TODO del alert("an input changed! "+textInput.id);
+			var textInput=event.currentTarget;	//get the control in which text changed
 			var ajaxRequest=new FormAJAXEvent(new Parameter(textInput.name, textInput.value));	//create a new form request with the control name and value
 			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 			event.stopPropagation();	//tell the event to stop bubbling
@@ -3288,6 +3299,22 @@ function onTextInputKeyPress(event)
 		else	//TODO submit the form
 		{
 		}
+	}
+}
+
+/**Called when a key is raised in a text input.
+This implementation sends the current text input value as a provisional value.
+@param event The object describing the event.
+*/
+function onTextInputKeyUp(event)
+{
+	var charCode=event.charCode;	//get the code of the entered character
+	if(AJAX_ENABLED)	//if AJAX is enabled
+	{
+	//TODO del alert("an input changed! "+textInput.id);
+		var textInput=event.currentTarget;	//get the control in which text changed
+		var ajaxRequest=new FormAJAXEvent(new Parameter(textInput.name, textInput.value), true);	//create a new provisional form request with the control name and value
+		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request, but allow this event to be processed normally
 	}
 }
 

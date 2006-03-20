@@ -23,5 +23,4 @@ public interface ValueControl<V, C extends ValueControl<V, C>> extends Control<C
 	@see #EDITABLE_PROPERTY
 	*/
 	public void setEditable(final boolean newEditable);
-
 }

@@ -973,7 +973,9 @@ Debug.trace("now have frames: ", frames.size());
 						final Element eventElement=(Element)eventNode;	//cast the node to an element
 						if("form".equals(eventNode.getNodeName()))	//if this is a form event TODO use a constant
 						{
-							final FormControlEvent formSubmitEvent=new FormControlEvent(false);	//create a new form submission event TODO get the exhaustive indication from the element
+							final boolean exhaustive=Boolean.valueOf(eventElement.getAttribute("exhaustive")).booleanValue();	//get the exhaustive indication TODO use a constant
+							final boolean provisional=Boolean.valueOf(eventElement.getAttribute("provisional")).booleanValue();	//get the provisional indication TODO use a constant
+							final FormControlEvent formSubmitEvent=new FormControlEvent(exhaustive, provisional);	//create a new form submission event
 							final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
 							final List<Node> controlNodes=(List<Node>)XPath.evaluatePathExpression(eventNode, AJAX_REQUEST_CONTROL_XPATH_EXPRESSION);	//get all the control settings
 							for(final Node controlNode:controlNodes)	//for each control node

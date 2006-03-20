@@ -218,14 +218,61 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 			final Validator<V> validator=getValidator();	//see if there is a validator installed
 			if(validator!=null)	//if there is a validator installed
 			{
-				validator.validate(value);	//validate the value represented by the literal text
+				if(!validator.isValid(value))	//if the value represented by the literal text is not valid
+				{
+					return false;	//the converted value isn't valid
+				}
 			}
 		}
-		catch(final ComponentException componentException)	//if there is a component error
+		catch(final ConversionException conversionException)	//if we can't convert the literal text to a value
 		{
-			return false;	//either the literal isn't valid or its converted value is not valid
+			return false;	//the literal isn't valid
 		}
 		return true;	//the values passed all validity checks
+	}
+
+	/**Checks the user input status of the control.
+	This version checks to see if the literal text can be converted to a valid value.
+	If the literal text cannot be converted, the status determined to be {@link Status#ERROR}.
+	If the literal text can be converted but the converted value is invalid,
+		the status is determined to be {@link Status#WARNING} unless the converted value is the same as the control value,
+		in which case the status is determined to be {@link Status#ERROR}.
+	The default value, even if invalid, is considered valid.
+	@return The current user input status of the control.
+	*/ 
+	protected Status determineStatus()
+	{
+		Status status=super.determineStatus();	//do the defualt status checks
+		if(status==null)	//if no status is reported
+		{
+			try
+			{
+				final V value=getConverter().convertLiteral(getText());	//see if the literal text can correctly be converted
+				if(!ObjectUtilities.equals(value, getDefaultValue()))	//don't count the value as invalid if it is equal to the default value
+				{
+					final Validator<V> validator=getValidator();	//see if there is a validator installed
+					if(validator!=null)	//if there is a validator installed
+					{
+						if(!validator.isValid(value))	//if the value represented by the literal text is not valid
+						{
+							if(ObjectUtilities.equals(value, getValue()))	//if the invalid value is equal to the current value
+							{
+								status=Status.ERROR;	//the invalid value has already been committed, so mark it as an error
+							}
+							else	//if the invalid valud isn't equal to the current value
+							{
+								status=Status.WARNING;	//the invalid value hasn't been committed; mark it as a warning
+							}
+						}
+					}
+				}
+			}
+			catch(final ConversionException conversionException)	//if we can't convert the literal text to a value
+			{
+				status=Status.ERROR;	//conversion problems are errors
+			}
+		}
+		return status;	//return the determined status
 	}
 	
 	/**Validates the model of this component and all child components.

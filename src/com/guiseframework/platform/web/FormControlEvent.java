@@ -19,20 +19,36 @@ public class FormControlEvent implements ControlEvent
 		/**@return Whether this event represents all components on the form.*/
 		public final boolean isExhaustive() {return exhaustive;}
 
+	/**Whether the values in this event are provisional.*/
+	private final boolean provisional;
+
+		/**@return Whether the values in this event are provisional.*/
+		public final boolean isProvisional() {return provisional;}
+
 	/**The map of parameter lists.*/
 	private final ListMap<String, Object> parameterListMap=new ArrayListHashMap<String, Object>();
 
 		/**@return The map of parameter lists.*/
 		public ListMap<String, Object> getParameterListMap() {return parameterListMap;}
 
-	/**Constructor that indicates whether the event is exhaustive.
+	/**Constructor that indicates non-provisional exhaustive values.
 	@param exhaustive Whether this event represents all components on the form.
 	*/
 	public FormControlEvent(final boolean exhaustive)
 	{
-		this.exhaustive=exhaustive;
+		this(exhaustive, false);	//construct the class, indicate
 	}
-		
+
+	/**Constructor that indicates whether the event is exhaustive.
+	@param exhaustive Whether this event represents all components on the form.
+	@param provisional Whether the values in this event are provisional.
+	*/
+	public FormControlEvent(final boolean exhaustive, final boolean provisional)
+	{
+		this.exhaustive=exhaustive;
+		this.provisional=provisional;
+	}
+
 	/**@return A string representation of this event.*/
 	public String toString()
 	{

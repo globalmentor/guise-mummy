@@ -3,6 +3,7 @@ package com.guiseframework.component;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.guiseframework.GuiseSession;
+import com.guiseframework.component.Control.Status;
 import com.guiseframework.model.ValueModel;
 import com.guiseframework.validator.ValidationException;
 import com.guiseframework.validator.Validator;
@@ -62,6 +63,55 @@ public abstract class AbstractDialogFrame<V, C extends DialogFrame<V, C>> extend
 				enabled=newEnabled;	//actually change the value
 				firePropertyChange(ENABLED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newEnabled));	//indicate that the value changed
 			}			
+		}
+
+	/**The status of the current user input, or <code>null</code> if there is no status to report.*/
+	private Status status=null;
+
+		/**@return The status of the current user input, or <code>null</code> if there is no status to report.*/
+		public Status getStatus() {return status;}
+
+		/**Sets the status of the current user input.
+		This is a bound property.
+		@param newStatus The new status of the current user input, or <code>null</code> if there is no status to report.
+		@see #STATUS_PROPERTY
+		*/
+		protected void setStatus(final Status newStatus)
+		{
+			if(status!=newStatus)	//if the value is really changing
+			{
+				final Status oldStatus=status;	//get the current value
+				status=newStatus;	//update the value
+				firePropertyChange(STATUS_PROPERTY, oldStatus, newStatus);
+			}
+		}
+
+		/**Rechecks user input status of this component, and updates the status.
+		@see #setStatus(Control.Status)
+		*/ 
+		protected void updateStatus()
+		{
+			setStatus(determineStatus());	//update the status after rechecking it
+		}
+
+		/**Checks the user input status of the control.
+		This version returns <code>null</code>.
+		@return The current user input status of the control.
+		*/ 
+		protected Status determineStatus()
+		{
+			return null;	//default to no status to report
+		}
+
+		/**Rechecks user input validity of this component and all child components, and updates the valid state.
+		This version also updates the status.
+		@see #setValid(boolean)
+		@see #updateStatus()
+		*/ 
+		protected void updateValid()
+		{
+			super.updateValid();	//update validity normally
+			updateStatus();	//update user input status
 		}
 
 	/**Session, ID, model, and component constructor.
