@@ -1,8 +1,6 @@
 package com.guiseframework;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.Principal;
 import java.util.*;
@@ -13,9 +11,9 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.event.ModalNavigationListener;
+import com.guiseframework.model.Notification;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.text.CharacterEncodingConstants.UTF_8;
 
 /**Represents a session with a user.
 A Swing-based client application may have only one session, while a web server application will likely have multiple sessions.
@@ -464,5 +462,10 @@ public interface GuiseSession extends PropertyBindable
 	@see #initialize()
 	*/
 	public void destroy();
+
+	/**Notifies the user of the given notification information.
+	@param notification The notification information to relay.
+	*/
+	public void notify(final Notification notification);
 
 }

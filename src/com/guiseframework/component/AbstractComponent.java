@@ -404,10 +404,10 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 
 		/**Sets the component notification.
 		This is a bound property.
-		The notification is also fired as a {@link NotificationEvent} on this component and on every parent.
+		The notification is also fired as a {@link NotificationEvent} on this component if a new notification is given.
+		Parents are expected to refire the notification event up the hierarchy.
 		@param newNotification The notification for the component, or <code>null</code> if no notification is associated with this component.
 		@see #NOTIFICATION_PROPERTY
-		@see #fireNotified(Notification)
 		*/
 		public void setNotification(final Notification newNotification)
 		{
@@ -417,7 +417,10 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 				notification=newNotification;	//actually change the value
 //TODO del unless status is promoted to Component				updateStatus();	//update the status before firing the notification event so that the status will already be updated for the listeners to access
 				firePropertyChange(NOTIFICATION_PROPERTY, oldNotification, newNotification);	//indicate that the value changed
-				fireNotified(newNotification);	//fire a notification event here and up the hierarchy
+				if(newNotification!=null)	//if a new notification is provided
+				{
+					fireNotified(newNotification);	//fire a notification event here and up the hierarchy
+				}
 			}			
 		}
 		
@@ -1170,11 +1173,13 @@ if(valid==null)
 	/**Validates the user input of this component and all child components.
 	The component will be updated with error information.
 	This version clears all notifications.
+	This version calls {@link #updateValid()}.
 	@return The current state of {@link #isValid()} as a convenience.
 	*/
 	public boolean validate()
 	{
 		setNotification(null);	//clear any notification
+		updateValid();	//manually update the current component validity
 		return isValid();	//return the current valid state
 	}
 
@@ -1182,11 +1187,10 @@ if(valid==null)
 	This method should not normally be called directly by applications.
 	This method delegates to the installed controller.
 	@param event The event to be processed.
-	@exception ComponentExceptions if there was a component-related error processing the event.
 	@see #getController()
 	@see GuiseContext.State#PROCESS_EVENT
 	*/
-	public void processEvent(final ControlEvent event) throws ComponentExceptions
+	public void processEvent(final ControlEvent event)
 	{
 		getController().processEvent(getThis(), event);	//tell the controller to process the event
 	}
@@ -1503,22 +1507,26 @@ if(valid==null)
 	}
 
 	/**Fires an event to all registered notification listeners with the new notification information.
-	If this component has a parent, the event is also sent to the parent component to fire.
-	This method is used by the framework and should not be called directly by application code.
-	@param notification The notification to send to the events.
+	Parents are expected to refire the notification event up the hierarchy.
+	@param notification The notification to send to the notification listeners.
 	@exception NullPointerException if the given notification is <code>null</code>.
 	@see NotificationListener
 	@see NotificationEvent
 	*/
-	public void fireNotified(final Notification notification)
+	protected void fireNotified(final Notification notification)
 	{
-		final NotificationEvent notificationEvent=new NotificationEvent(getSession(), getThis(), notification);	//create a new event
+		fireNotified(new NotificationEvent(getSession(), getThis(), notification));	//create and fire a new notification event
+	}
+
+	/**Fires an event to all registered notification listeners with the new notification information.
+	Parents are expected to refire the notification event up the hierarchy.
+	@param notificationEvent The notification event to send to the notification listeners.
+	@exception NullPointerException if the given notification event is <code>null</code>.
+	@see NotificationListener
+	*/
+	protected void fireNotified(final NotificationEvent notificationEvent)
+	{
 		getSession().queueEvent(new PostponedNotificationEvent(getEventListenerManager(), notificationEvent));	//tell the Guise session to queue the event
-		final CompositeComponent<?> parent=getParent();	//get the parent component
-		if(parent!=null)	//if there is a parent component
-		{
-			parent.fireNotified(notification);	//tell the parent to fire the event to its listeners
-		}
 	}
 
 	/**@return A hash code value for the object.*/
@@ -1547,6 +1555,17 @@ if(valid==null)
 			stringBuilder.append(' ').append('[').append(id).append(']');	//append the ID
 		}
 		return stringBuilder.toString();	//return the string builder
+	}
+
+	/**Notifies the user of the given notification information.
+	The notification is stored in this component using {@link #setNotification(Notification)}, which fires appropriate notification events.
+	This method calls {@link GuiseSession#notify(Notification)}.
+	@param notification The notification information to relay.
+	*/
+	public void notify(final Notification notification)
+	{
+		setNotification(notification);	//store the notification, firing notification events
+		getSession().notify(notification);	//notify the user directly
 	}
 
 	/**An abstract implementation of a strategy for showing and hiding flyovers in response to mouse events.

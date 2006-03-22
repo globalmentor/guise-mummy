@@ -299,10 +299,10 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 
 	/**Sets the component notification.
 	This is a bound property.
-	The notification is also fired as a {@link NotificationEvent} on this component and on every parent.
+	The notification is also fired as a {@link NotificationEvent} on this component if a new notification is given.
+	Parents are expected to refire the notification event up the hierarchy.
 	@param newNotification The notification for the component, or <code>null</code> if no notification is associated with this component.
 	@see #NOTIFICATION_PROPERTY
-	@see #fireNotified(Notification)
 	*/
 	public void setNotification(final Notification newNotification);
 
@@ -557,11 +557,10 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	This method should not normally be called directly by applications.
 	This method delegates to the installed controller.
 	@param event The event to be processed.
-	@exception ComponentExceptions if there was a component-related error processing the event.
 	@see #getController()
 	@see GuiseContext.State#PROCESS_EVENT
 	*/
-	public void processEvent(final ControlEvent event) throws ComponentExceptions;
+	public void processEvent(final ControlEvent event);
 
 	/**Updates the view of this component.
 	This method should not normally be called directly by applications.
@@ -611,15 +610,22 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	*/
 	public void fireMouseExited(final Rectangle componentBounds, final Rectangle viewportBounds, final Point mousePosition);
 
-	/**Fires an event to all registered notification listeners with the new notification information.
-	If this component has a parent, the event is also sent to the parent component to fire.
-	This method is used by the framework and should not be called directly by application code.
-	@param notification The notification to send to the events.
-	@exception NullPointerException if the given notification is <code>null</code>.
-	@see NotificationListener
-	@see NotificationEvent
+	/**Adds a notification listener.
+	@param notificationListener The notification listener to add.
 	*/
-	public void fireNotified(final Notification notification);
+	public void addNotificationListener(final NotificationListener notificationListener);
+
+	/**Removes a notification listener.
+	@param notificationListener The notification listener to remove.
+	*/
+	public void removeNotificationListener(final NotificationListener notificationListener);
+
+	/**Notifies the user of the given notification information.
+	The notification is stored in this component using {@link #setNotification(Notification)}, which fires appropriate notification events.
+	This method calls {@link GuiseSession#notify(Notification)}.
+	@param notification The notification information to relay.
+	*/
+	public void notify(final Notification notification);
 
 	/**A strategy for showing and hiding flyovers in response to mouse events.
 	@param <S> The type of component for which this object is to control flyovers.

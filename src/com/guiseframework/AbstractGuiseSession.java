@@ -28,6 +28,7 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.event.*;
+import com.guiseframework.model.Notification;
 
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -1318,5 +1319,18 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 		{
 			updateContextStates();	//update the context states when a context state changes
 		}
+	}
+
+	/**Notifies the user of the given notification information.
+	@param notification The notification information to relay.
+	*/
+	public void notify(final Notification notification)
+	{
+		final Text text=new Text(this);	//create a new text component
+		text.setText(notification.getMessage());	//set the text
+		text.setTextResourceKey(notification.getMessageResourceKey());	//set the text resource key
+		final DefaultOptionDialogFrame optionDialogFrame=new DefaultOptionDialogFrame(this, text, DefaultOptionDialogFrame.Option.OK);	//create a dialog with an OK button
+		optionDialogFrame.setLabel(notification.getSeverity().toString());	//TODO improve title; load from resources
+		optionDialogFrame.open();	//show the dialog		
 	}
 }

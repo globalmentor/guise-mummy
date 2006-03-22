@@ -854,7 +854,7 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 		string=string.replace(/&/g, "&amp;");	//encode '&' first
 		string=string.replace(/</g, "&lt;");	//encode '<'
 		string=string.replace(/>/g, "&gt;");	//encode '>'
-		string=string.replace(/"/g, "&quot;");	//encode '\"'
+		string=string.replace(/\"/g, "&quot;");	//encode '\"'
 		return string;	//return the encoded string
 	},
 
@@ -1689,6 +1689,7 @@ alert(exception);
 		*/ 
 		GuiseAJAX.prototype._synchronizeElement=function(oldElement, element)
 		{
+			var elementName=element.nodeName;	//save the element name
 //TODO del alert("ready to synchronize element "+oldElement.nodeName+" with ID: "+oldElement.id+" against element "+element.nodeName+" with ID: "+element.getAttribute("id"));
 				//remove any attributes the old element has that are not in the new element
 			var oldAttributes=oldElement.attributes;	//get the old element's attributes
@@ -1820,16 +1821,16 @@ alert(exception);
 			{
 				oldElement.style["visibility"]="";	//remove the visibility style
 			}
-/*TODO del when works
-			if(isClassNameModified)	//if we changed the class name
+
+				//perform special-case attribute manipulations for certain elements
+			if(elementName=="input")	//input checkboxes and radio buttons do not updated the checked state correctly based upon the "checked" attribute
 			{
-				if(typeof guiseIE6Fix!="undefined")	//if we have IE6 fix routines loaded
+				var inputType=element.getAttribute("type");	//get the input type
+				if(inputType=="radio" || inputType=="checkbox")	//if this is a radio button or a checkbox
 				{
-					guiseIE6Fix.fixElementClassName(oldElement);	//fix the class name of this element
+					oldElement.checked=element.getAttribute("checked")=="checked";	//update the checked state based upon the new specified checked attribute
 				}
 			}
-*/
-			var elementName=element.nodeName;	//save the element name
 			
 				//patch in the new child element hierarchy
 			if(elementName=="textarea")	//if this is a text area, do special-case value changing (restructuring won't work in IE and Mozilla) TODO check for other similar types TODO use a constant

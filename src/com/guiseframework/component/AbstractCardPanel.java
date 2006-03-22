@@ -142,7 +142,7 @@ public abstract class AbstractCardPanel<C extends Panel<C> & CardControl<C>> ext
 		super.firePropertyChange(propertyName, oldValue, newValue);	//fire the property change event normally
 	}
 
-	/**Checks the state of the component for validity.
+	/**Checks the state of child components for validity.
 	This version only checks the validity of the selected card.
 	@return <code>true</code> if the relevant children pass all validity tests.
 	*/ 
@@ -152,28 +152,15 @@ public abstract class AbstractCardPanel<C extends Panel<C> & CardControl<C>> ext
 		return selectedComponent==null || selectedComponent.isValid();	//the children will only be invalid if the selected card is invalid
 	}
 
-	
-	/**Validates the model of this component and all child components.
-	The component will be updated with error information.
-	This version validates the associated model.
-	@exception ComponentExceptions if there was one or more validation error.
+	/**Validates the user input of child components.
+	This version only validates the selected card.
+	@return <code>true</code> if all child validations return <code>true</code>.
 	*/
-/*TODO fix
-	public void validate() throws ComponentExceptions
+	public boolean validateChildren()
 	{
-		super.validate();	//validate the parent class
-		try
-		{
-			getValueModel().validateValue();	//validate the value model
-		}
-		catch(final ComponentException componentException)	//if there is a component error
-		{
-			componentException.setComponent(this);	//make sure the exception knows to which component it relates
-			addError(componentException);	//add this error to the component
-			throw new ComponentExceptions(componentException);	//throw a new component exception list exception
-		}
+		final Component selectedComponent=getValue();	//get the selected card
+		return selectedComponent!=null ? selectedComponent.validate() : false;	//only validate the selected card if there is one
 	}
-*/
 	
 		//ValueModel delegations
 

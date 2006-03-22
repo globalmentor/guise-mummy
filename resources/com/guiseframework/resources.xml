@@ -23,6 +23,8 @@
 	<!-- Guise validators -->
 	<entry key="validator.value.required.message">Value required.</entry>
 	<entry key="validator.invalid.value.message">Invalid value: "{0}".</entry>
+	<!-- general validation errors -->
+	<entry key="validation.false.message">One or more values you entered are invalid.</entry>
 
 	<!-- components -->
 

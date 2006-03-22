@@ -470,15 +470,7 @@ Debug.info("content type:", request.getContentType());
 						if(formSubmitEvent.getParameterListMap().size()>0)	//only query the view if there were submitted values---especially important for radio buttons and checkboxes, which must assume a value of false if nothing is submitted for them, thereby updating the model
 						{
 							guiseContext.setState(GuiseContext.State.PROCESS_EVENT);	//update the context state for processing an event
-							try
-							{
-								navigationPanel.processEvent(formSubmitEvent);		//tell the panel to process the event
-							}
-							catch(final ComponentExceptions componentExceptions)	//if there were any component errors while processing the event
-							{
-								//TODO improve after ComponentExceptions are removed
-								navigationPanel.setNotification(new Notification(componentExceptions.iterator().next()));	//store the validation error(s) so that the panel can report them to the user
-							}
+							navigationPanel.processEvent(formSubmitEvent);		//tell the panel to process the event
 						}
 						guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view; make the change now in case queued model changes want to navigate, and an error was thrown when updating the model) TODO see if this comment is relevant after new local-error-catching changes above
 						if(!ObjectUtilities.equals(oldPrincipal, guiseSession.getPrincipal()))	//if the principal has changed after updating the model
@@ -599,24 +591,8 @@ Debug.info("content type:", request.getContentType());
 					guiseContext.setState(GuiseContext.State.PROCESS_EVENT);	//update the context state for processing an event
 					for(final Component<?> component:requestedComponents)	//for each requested component
 					{
-						try
-						{
 Debug.trace("ready to process event", controlEvent, "for component", component);
-							component.processEvent(controlEvent);		//tell the component to process the event
-						}
-						catch(final ComponentExceptions componentExceptions)	//if there were any component errors while processing the event
-						{
-/*TODO fix dirtying on errors
-							for(final ComponentException componentException:componentExceptions)	//for each validation exception
-							{
-								final Component<?> affectedComponent=componentException.getComponent();	//see if this error is for a component
-								if(affectedComponent!=null)	//if this component exception was for a specific component
-								{
-									affectedComponents.add(affectedComponent);	//add this component to our list of affected components
-								}
-							}
-*/
-						}
+						component.processEvent(controlEvent);		//tell the component to process the event
 					}
 					guiseContext.setState(GuiseContext.State.INACTIVE);	//deactivate the context so that any model update events will be generated
 				}					

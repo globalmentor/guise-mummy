@@ -1,5 +1,6 @@
 package com.guiseframework.component;
 
+import static com.guiseframework.GuiseResourceConstants.VALIDATION_FALSE_MESSAGE_RESOURCE_KEY;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.CardLayout;
 import com.guiseframework.component.layout.Constraints;
@@ -7,6 +8,7 @@ import com.guiseframework.component.layout.TaskCardConstraints;
 import com.guiseframework.event.AbstractGuisePropertyChangeListener;
 import com.guiseframework.event.GuisePropertyChangeEvent;
 import com.guiseframework.model.Enableable;
+import com.guiseframework.model.Notification;
 import com.guiseframework.model.TaskStatus;
 import com.guiseframework.validator.AbstractValidator;
 import com.guiseframework.validator.ValidationException;
@@ -275,12 +277,12 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
 				}
 				else	//if the current card doesn't validate
 				{
-					//TODO improve; inform user
 					final Constraints constraints=selectedCard.getConstraints();	//get the current card constraints
 					if(constraints instanceof TaskCardConstraints)	//if these are task card constraints
 					{
 						((TaskCardConstraints)constraints).setTaskStatus(TaskStatus.ERROR);	//set the task status to error
 					}
+					getSession().notify(new Notification(null, VALIDATION_FALSE_MESSAGE_RESOURCE_KEY, Notification.Severity.ERROR));	//indicate that there was a validation error
 				}				
 			}
 			catch(final ValidationException validationException)
@@ -362,6 +364,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
 						{
 							((TaskCardConstraints)constraints).setTaskStatus(TaskStatus.ERROR);	//set the task status to error
 						}
+						getSession().notify(new Notification(null, VALIDATION_FALSE_MESSAGE_RESOURCE_KEY, Notification.Severity.ERROR));	//indicate that there was a validation error
 						return false;	//don't go forward
 					}									
 				}
