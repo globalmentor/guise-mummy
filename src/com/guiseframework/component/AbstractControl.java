@@ -1,10 +1,8 @@
 package com.guiseframework.component;
 
-import java.util.Collection;
-
+import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
-import com.guiseframework.model.DefaultLabelModel;
-import com.guiseframework.model.LabelModel;
+import com.guiseframework.model.*;
 
 /**An abstract implementation of a model component that allows user interaction to modify the model.
 @author Garret Wilson
@@ -63,13 +61,25 @@ public abstract class AbstractControl<C extends Control<C>> extends AbstractComp
 		}
 
 		/**Checks the user input status of the control.
-		If the component has errors, the status is determined to be {@link Status#ERROR}.
+		If the component has a notification of {@link Notification.Severity#WARNING}, the status is determined to be {@link Status#WARNING}.
+		If the component has a notification of {@link Notification.Severity#ERROR}, the status is determined to be {@link Status#ERROR}.
 		Otherwise, this version returns <code>null</code>.
 		@return The current user input status of the control.
 		*/ 
 		protected Status determineStatus()
 		{
-			return hasErrors() ? Status.ERROR : null;	//default to no status to report unless there are errors
+			final Notification notification=getNotification();	//get the current notification
+			if(notification!=null)	//if there is a notification
+			{
+				switch(notification.getSeverity())	//see how severe the notification is
+				{
+					case WARN:
+						return Status.WARNING;
+					case ERROR:
+						return Status.ERROR;
+				}
+			}
+			return null;	//default to no status to report
 		}
 
 	/**Rechecks user input validity of this component and all child components, and updates the valid state.
@@ -83,43 +93,20 @@ public abstract class AbstractControl<C extends Control<C>> extends AbstractComp
 		updateStatus();	//update user input status
 	}
 
-	/**Adds an error to the component.
-	This version updates the status.
-	@param error The error to add.
+	/**Sets the component notification.
+	This version updates the component status if the notification changes.
+	This is a bound property.
+	@param newNotification The notification for the component, or <code>null</code> if no notification is associated with this component.
+	@see #NOTIFICATION_PROPERTY
 	*/
-	public void addError(final Throwable error)
+	public void setNotification(final Notification newNotification)
 	{
-		super.addError(error);	//add the error normally
-		updateStatus();	//update the status
-	}
-
-	/**Adds errors to the component.
-	This version updates the status.
-	@param errors The errors to add.
-	*/
-	public void addErrors(final Collection<? extends Throwable> errors)
-	{
-		super.addErrors(errors);	//add the errors normally
-		updateStatus();	//update the status
-	}
-
-	/**Removes a specific error from this component.
-	This version updates the status.
-	@param error The error to remove.
-	*/
-	public void removeError(final Throwable error)
-	{
-		super.removeError(error);	//remove the error normally
-		updateStatus();	//update the status
-	}
-
-	/**Clears all errors associated with this component.
-	This version updates the status.
-	*/
-	public void clearErrors()
-	{
-		super.clearErrors();	//clear errors normally
-		updateStatus();	//update the status
+		final Notification oldNotification=getNotification();	//get the old notification
+		super.setNotification(newNotification);	//update the old notification normally
+		if(!ObjectUtilities.equals(oldNotification, newNotification))	//if the notification changed
+		{
+			updateStatus();	//update the status			
+		}
 	}
 
 	/**Session and ID constructor.

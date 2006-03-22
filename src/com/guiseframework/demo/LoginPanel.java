@@ -6,6 +6,7 @@ import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
+import com.guiseframework.model.Notification;
 import com.guiseframework.validator.*;
 
 /**Login Guise demonstration panel.
@@ -72,15 +73,13 @@ public class LoginPanel extends DefaultNavigationPanel
 								else	//if the password doesn't match
 								{
 									final ValidationException validationException=new ValidationException(passwordControl, "Invalid password");	//create an invalid password exception for the password control
-									idControl.addError(validationException);	//indicate that the ID control has a validation exception
-									addError(validationException);	//tell the panel the error so that it can be reported to the user									
+									idControl.setNotification(new Notification(validationException));	//indicate that the ID control has a validation exception
 								}
 							}
 							else	//if the user ID is not valid
 							{
 								final ValidationException validationException=new ValidationException(idControl, "Invalid user ID");	//create an invalid user ID exception for the ID control
-								idControl.addError(validationException);	//indicate that the ID control has a validation exception
-								addError(validationException);	//tell the panel the error so that it can be reported to the user
+								idControl.setNotification(new Notification(validationException));	//indicate that the ID control has a validation exception
 							}
 						}
 					}

@@ -78,8 +78,8 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public final static String NAME_PROPERTY=getPropertyName(Component.class, "name");
 	/**The bound property of whether the component has tooltips enabled.*/
 	public final static String TOOLTIP_ENABLED_PROPERTY=getPropertyName(Component.class, "tooltipEnabled");
-	/**The bound property of the model.*/
-//TODO del if not needed	public final static String MODEL_PROPERTY=getPropertyName(Component.class, "model");
+	/**The bound property of the notification.*/
+	public final static String NOTIFICATION_PROPERTY=getPropertyName(Component.class, "notification");
 	/**The opacity bound property.*/
 	public final static String OPACITY_PROPERTY=getPropertyName(Component.class, "opacity");
 	/**The orientation bound property.*/
@@ -294,6 +294,18 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	*/
 //TODO del if not needed	public Color<?> determineColor();
 
+	/**@return The notification associated with the component, or <code>null</code> if no notification is associated with this component.*/
+	public Notification getNotification();
+
+	/**Sets the component notification.
+	This is a bound property.
+	The notification is also fired as a {@link NotificationEvent} on this component and on every parent.
+	@param newNotification The notification for the component, or <code>null</code> if no notification is associated with this component.
+	@see #NOTIFICATION_PROPERTY
+	@see #fireNotified(Notification)
+	*/
+	public void setNotification(final Notification newNotification);
+
 	/**@return The opacity of the entire component in the range (0.0-1.0), with a default of 1.0.*/
 	public float getOpacity();
 
@@ -346,30 +358,6 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	@exception NullPointerException if the given view is <code>null</code>.
 	*/
 	public void setView(final View<? extends GuiseContext, ? super C> newView);
-
-	/**@return An iterable interface to all errors associated with this component.*/
-	public Iterable<Throwable> getErrors();
-
-	/**@return <code>true</code> if there is at least one error associated with this component.*/
-	public boolean hasErrors();
-
-	/**Adds an error to the component.
-	@param error The error to add.
-	*/
-	public void addError(final Throwable error);
-
-	/**Adds errors to the component.
-	@param errors The errors to add.
-	*/
-	public void addErrors(final Collection<? extends Throwable> errors);
-
-	/**Removes a specific error from this component.
-	@param error The error to remove.
-	*/
-	public void removeError(final Throwable error);
-
-	/**Clears all errors associated with this component.*/
-	public void clearErrors();
 
 	/**@return The component identifier.*/
 	public String getID();
@@ -559,11 +547,11 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	/**@return Whether the state of the component and all child components represents valid user input.*/
 	public boolean isValid();
 
-	/**Validates the model of this component and all child components.
+	/**Validates the user input of this component and all child components.
 	The component will be updated with error information.
-	@exception ComponentExceptions if there was one or more validation error.
+	@return The current state of {@link #isValid()} as a convenience.
 	*/
-	public void validate() throws ComponentExceptions;
+	public boolean validate();
 
 	/**Processes an event for the component.
 	This method should not normally be called directly by applications.
@@ -602,6 +590,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public boolean hasMouseListeners();
 
 	/**Fires a mouse entered event to all registered mouse listeners.
+	This method is used by the framework and should not be called directly by application code.
 	@param componentBounds The absolute bounds of the component.
 	@param viewportBounds The absolute bounds of the viewport.
 	@param mousePosition The position of the mouse relative to the viewport.
@@ -612,6 +601,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public void fireMouseEntered(final Rectangle componentBounds, final Rectangle viewportBounds, final Point mousePosition);
 
 	/**Fires a mouse exited event to all registered mouse listeners.
+	This method is used by the framework and should not be called directly by application code.
 	@param componentBounds The absolute bounds of the component.
 	@param viewportBounds The absolute bounds of the viewport.
 	@param mousePosition The position of the mouse relative to the viewport.
@@ -620,6 +610,16 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	@see MouseEvent
 	*/
 	public void fireMouseExited(final Rectangle componentBounds, final Rectangle viewportBounds, final Point mousePosition);
+
+	/**Fires an event to all registered notification listeners with the new notification information.
+	If this component has a parent, the event is also sent to the parent component to fire.
+	This method is used by the framework and should not be called directly by application code.
+	@param notification The notification to send to the events.
+	@exception NullPointerException if the given notification is <code>null</code>.
+	@see NotificationListener
+	@see NotificationEvent
+	*/
+	public void fireNotified(final Notification notification);
 
 	/**A strategy for showing and hiding flyovers in response to mouse events.
 	@param <S> The type of component for which this object is to control flyovers.

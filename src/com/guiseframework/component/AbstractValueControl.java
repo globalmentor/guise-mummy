@@ -119,24 +119,24 @@ public abstract class AbstractValueControl<V, C extends ValueControl<V, C>> exte
 		return getValueModel().isValidValue();	//the component is valid if the value model has a valid value
 	}
 	
-	/**Validates the model of this component and all child components.
+	/**Validates the user input of this component and all child components.
 	The component will be updated with error information.
-	This version validates the associated model.
-	@exception ComponentExceptions if there was one or more validation error.
+	This version validates the associated value model.
+	@return The current state of {@link #isValid()} as a convenience.
 	*/
-	public void validate() throws ComponentExceptions
+	public boolean validate()
 	{
 		super.validate();	//validate the parent class
 		try
 		{
 			getValueModel().validateValue();	//validate the value model
 		}
-		catch(final ComponentException componentException)	//if there is a component error
+		catch(final ValidationException validationException)	//if there is a validation error
 		{
-			componentException.setComponent(this);	//make sure the exception knows to which component it relates
-			addError(componentException);	//add this error to the component
-			throw new ComponentExceptions(componentException);	//throw a new component exception list exception
+//TODO del			componentException.setComponent(this);	//make sure the exception knows to which component it relates
+			setNotification(new Notification(validationException));	//add notification of this error to the component
 		}
+		return isValid();	//return the current valid state
 	}
 
 		//ValueModel delegations

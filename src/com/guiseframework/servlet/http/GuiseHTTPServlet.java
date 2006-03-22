@@ -64,6 +64,7 @@ import com.guiseframework.controller.text.xml.xhtml.*;
 import com.guiseframework.geometry.*;
 import com.guiseframework.model.FileItemResourceImport;
 import com.guiseframework.model.Model;
+import com.guiseframework.model.Notification;
 import com.guiseframework.platform.web.*;
 import com.guiseframework.validator.*;
 import com.guiseframework.view.text.xml.xhtml.XHTMLApplicationFrameView;
@@ -475,7 +476,8 @@ Debug.info("content type:", request.getContentType());
 							}
 							catch(final ComponentExceptions componentExceptions)	//if there were any component errors while processing the event
 							{
-								navigationPanel.addErrors(componentExceptions);	//store the validation error(s) so that the panel can report them to the user
+								//TODO improve after ComponentExceptions are removed
+								navigationPanel.setNotification(new Notification(componentExceptions.iterator().next()));	//store the validation error(s) so that the panel can report them to the user
 							}
 						}
 						guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view; make the change now in case queued model changes want to navigate, and an error was thrown when updating the model) TODO see if this comment is relevant after new local-error-catching changes above

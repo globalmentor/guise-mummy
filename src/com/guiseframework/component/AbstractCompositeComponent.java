@@ -102,51 +102,19 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 		return true;	//all children are valid
 	}
 
-	/**Validates the this component and all child components.
+	/**Validates the user input of this component and all child components.
 	The component will be updated with error information.
 	This version validates the this component and all child components.
-	@exception ComponentExceptions if there was one or more validation error.
+	@return The current state of {@link #isValid()} as a convenience.
 	*/
-	public void validate() throws ComponentExceptions
+	public boolean validate()
 	{
-		ComponentExceptions componentExceptions=null;	//we'll store any component exceptions here and keep going
-		try
-		{
-			super.validate();	//validate the component normally
-		}
-		catch(final ComponentExceptions superComponentExceptions)	//if the super version returns an error
-		{
-			if(componentExceptions==null)	//if this is our first component exception
-			{
-				componentExceptions=superComponentExceptions;	//store the exception and continue processing events with other child components
-			}
-			else	//if we already have component exceptions
-			{
-				componentExceptions.addAll(superComponentExceptions);	//add all the exceptions to the exception we already have
-			}
-		}
+		super.validate();	//validate the component normally
 		for(final Component<?> childComponent:this)	//for each child component
 		{
-			try
-			{
-				childComponent.validate();	//validate the child
-			}
-			catch(final ComponentExceptions childComponentExceptions)	//if a child returns an error
-			{
-				if(componentExceptions==null)	//if this is our first component exception
-				{
-					componentExceptions=childComponentExceptions;	//store the exception and continue processing events with other child components
-				}
-				else	//if we already have component exceptions
-				{
-					componentExceptions.addAll(childComponentExceptions);	//add all the child component exceptions to the exception we already have
-				}
-			}
+			childComponent.validate();	//validate the child
 		}
-		if(componentExceptions!=null)	//if we encountered one or more component exceptions
-		{
-			throw componentExceptions;	//throw the exception, which may contain multiple exceptions
-		}
+		return isValid();	//return the current valid state
 	}
 
 }

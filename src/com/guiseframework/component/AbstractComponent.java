@@ -1,6 +1,5 @@
 package com.guiseframework.component;
 
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -16,8 +15,7 @@ import com.guiseframework.component.effect.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.component.transfer.*;
 import com.guiseframework.context.GuiseContext;
-import com.guiseframework.controller.ControlEvent;
-import com.guiseframework.controller.Controller;
+import com.guiseframework.controller.*;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
 import com.guiseframework.model.*;
@@ -26,7 +24,7 @@ import com.guiseframework.view.View;
 
 import static com.garretwilson.lang.CharSequenceUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.text.TextUtilities.isText;
+import static com.garretwilson.text.TextUtilities.*;
 import static com.garretwilson.util.ArrayUtilities.*;
 import static com.guiseframework.GuiseResourceConstants.*;
 
@@ -397,6 +395,31 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 				setCornerArcSize(corner, newCornerArcSize);	//set this corner arc size
 			}
 		}
+
+	/**The notification associated with the component, or <code>null</code> if no notification is associated with this component.*/
+	private Notification notification=null;
+
+		/**@return The notification associated with the component, or <code>null</code> if no notification is associated with this component.*/
+		public Notification getNotification() {return notification;}
+
+		/**Sets the component notification.
+		This is a bound property.
+		The notification is also fired as a {@link NotificationEvent} on this component and on every parent.
+		@param newNotification The notification for the component, or <code>null</code> if no notification is associated with this component.
+		@see #NOTIFICATION_PROPERTY
+		@see #fireNotified(Notification)
+		*/
+		public void setNotification(final Notification newNotification)
+		{
+			if(!ObjectUtilities.equals(notification, newNotification))	//if the value is really changing
+			{
+				final Notification oldNotification=notification;	//get the old value
+				notification=newNotification;	//actually change the value
+//TODO del unless status is promoted to Component				updateStatus();	//update the status before firing the notification event so that the status will already be updated for the listeners to access
+				firePropertyChange(NOTIFICATION_PROPERTY, oldNotification, newNotification);	//indicate that the value changed
+				fireNotified(newNotification);	//fire a notification event here and up the hierarchy
+			}			
+		}
 		
 	/**The opacity of the entire component in the range (0.0-1.0), with a default of 1.0.*/
 	private float opacity=1.0f;
@@ -613,49 +636,6 @@ if(valid==null)
 				oldView.installed(getThis());	//tell the new view it's being installed
 				firePropertyChange(VIEW_PROPERTY, oldView, newView);	//indicate that the value changed				
 			}
-		}
-
-	/**The thread-safe list of errors.*/
-	private final List<Throwable> errorList=new CopyOnWriteArrayList<Throwable>();
-
-		/**@return An iterable interface to all errors associated with this component.*/
-		public Iterable<Throwable> getErrors() {return errorList;}
-
-		/**@return <code>true</code> if there is at least one error associated with this component.*/
-		public boolean hasErrors() {return !errorList.isEmpty();}
-
-		/**Adds an error to the component.
-		@param error The error to add.
-		*/
-		public void addError(final Throwable error) {errorList.add(error);
-		
-//TODO del; may be fixed by AbstractControl version getView().setUpdated(false);	//TODO fix hack; make the view listen for error changes
-		
-		}
-
-		/**Adds errors to the component.
-		@param errors The errors to add.
-		*/
-		public void addErrors(final Collection<? extends Throwable> errors) {errorList.addAll(errors);
-		
-//TODO del; may be fixed by AbstractControl version getView().setUpdated(false);	//TODO fix hack; make the view listen for error changes		
-		
-		}
-
-		/**Removes a specific error from this component.
-		@param error The error to remove.
-		*/
-		public void removeError(final Throwable error) {errorList.remove(error);
-		
-//TODO del; may be fixed by AbstractControl version getView().setUpdated(false);	//TODO fix hack; make the view listen for error changes		
-		
-		}
-
-		/**Clears all errors associated with this component.*/
-		public void clearErrors() {errorList.clear();
-		
-//TODO del; may be fixed by AbstractControl version getView().setUpdated(false);	//TODO fix hack; make the view listen for error changes		
-		
 		}
 
 	/**The component identifier*/
@@ -1187,13 +1167,15 @@ if(valid==null)
 	}
 */
 
-	/**Validates the model of this component and all child components.
+	/**Validates the user input of this component and all child components.
 	The component will be updated with error information.
-	@exception ComponentExceptions if there was one or more validation error.
+	This version clears all notifications.
+	@return The current state of {@link #isValid()} as a convenience.
 	*/
-	public void validate() throws ComponentExceptions
+	public boolean validate()
 	{
-		clearErrors();	//clear all errors TODO check
+		setNotification(null);	//clear any notification
+		return isValid();	//return the current valid state
 	}
 
 	/**Processes an event for the component.
@@ -1502,6 +1484,41 @@ if(valid==null)
 			default:
 				throw new IllegalArgumentException("Unsupported axis: "+axis);
 		}	
+	}
+
+	/**Adds a notification listener.
+	@param notificationListener The notification listener to add.
+	*/
+	public void addNotificationListener(final NotificationListener notificationListener)
+	{
+		getEventListenerManager().add(NotificationListener.class, notificationListener);	//add the listener
+	}
+
+	/**Removes a notification listener.
+	@param notificationListener The notification listener to remove.
+	*/
+	public void removeNotificationListener(final NotificationListener notificationListener)
+	{
+		getEventListenerManager().remove(NotificationListener.class, notificationListener);	//remove the listener
+	}
+
+	/**Fires an event to all registered notification listeners with the new notification information.
+	If this component has a parent, the event is also sent to the parent component to fire.
+	This method is used by the framework and should not be called directly by application code.
+	@param notification The notification to send to the events.
+	@exception NullPointerException if the given notification is <code>null</code>.
+	@see NotificationListener
+	@see NotificationEvent
+	*/
+	public void fireNotified(final Notification notification)
+	{
+		final NotificationEvent notificationEvent=new NotificationEvent(getSession(), getThis(), notification);	//create a new event
+		getSession().queueEvent(new PostponedNotificationEvent(getEventListenerManager(), notificationEvent));	//tell the Guise session to queue the event
+		final CompositeComponent<?> parent=getParent();	//get the parent component
+		if(parent!=null)	//if there is a parent component
+		{
+			parent.fireNotified(notification);	//tell the parent to fire the event to its listeners
+		}
 	}
 
 	/**@return A hash code value for the object.*/

@@ -2,14 +2,9 @@ package com.guiseframework.demo;
 
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
-import com.guiseframework.component.layout.CardConstraints;
-import com.guiseframework.component.layout.CardLayout;
-import com.guiseframework.component.layout.Flow;
-import com.guiseframework.component.layout.FlowLayout;
-import com.guiseframework.component.layout.RegionLayout;
-import com.guiseframework.event.ActionEvent;
-import com.guiseframework.event.ActionListener;
-import com.guiseframework.validator.IntegerRangeValidator;
+import com.guiseframework.component.layout.*;
+import com.guiseframework.event.*;
+import com.guiseframework.validator.*;
 
 /**Multiplication Table Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
@@ -53,9 +48,8 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 					{
 						if(tabbedPanel.size()<MAX_TAB_COUNT)	//if we don't have too many tabs
 						{
-							try
+							if(maxFactorControl.validate())	//validate the count control to make sure the value is correct, showing an error if not
 							{
-								maxFactorControl.validate();	//validate the count control to make sure the value is correct
 								final int maxFactor=maxFactorControl.getValue().intValue();	//find out how many factors to display
 								final Component<?> tab=createMultiplicationTableTab(maxFactor);	//create a multiplication table with the desired maximum factor
 								tabbedPanel.add(tab, new CardConstraints(session, String.valueOf(maxFactor)));	//add the tab to the tabbed panel
@@ -64,9 +58,6 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 									maxFactorControl.setEnabled(false);	//disable the count control
 									addButton.setEnabled(false);	//disable the add button
 								}
-							}
-							catch (ComponentExceptions e)
-							{
 							}
 						}
 					}

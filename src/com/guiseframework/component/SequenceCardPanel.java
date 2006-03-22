@@ -264,9 +264,8 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
 			{
 				final Component<?> selectedCard=getSelectedValue();	//get the selected card
 				assert selectedCard!=null : "No card selected, even though getNext() should have returned null if no card is selected.";
-				try
+				if(selectedCard.validate())	//validate the selected card; if the selected card is valid
 				{
-					selectedCard.validate();	//validate the selected card
 					final Constraints nextCardConstraints=nextCard.getConstraints();	//get the next card's constraints
 					if(nextCardConstraints instanceof Enableable)	//if the next card constraints is enableable
 					{
@@ -274,7 +273,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
 					}
 					setValue(nextCard);	//select the next card
 				}
-				catch(final ComponentExceptions componentException)	//if the current card doesn't validate
+				else	//if the current card doesn't validate
 				{
 					//TODO improve; inform user
 					final Constraints constraints=selectedCard.getConstraints();	//get the current card constraints
@@ -356,11 +355,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
 				}
 				if(newIndex>selectedIndex)	//if we're advancing forward in the sequence
 				{
-					try
-					{
-						currentCard.validate();	//validate the currently selected card
-					}
-					catch(final ComponentExceptions componentException)	//if the current card doesn't validate
+					if(!currentCard.validate())	//validate the currently selected card; if the currently selected card doesn't validate
 					{
 						final Constraints constraints=currentCard.getConstraints();	//get the current card constraints
 						if(constraints instanceof TaskCardConstraints)	//if these are task card constraints
@@ -374,6 +369,5 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
 			return true;	//the new card passed all the tests
 		}
 	}
-
 
 }

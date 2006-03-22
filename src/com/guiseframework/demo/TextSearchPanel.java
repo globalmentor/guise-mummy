@@ -8,13 +8,9 @@ import javax.mail.internet.ContentType;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
-import com.guiseframework.event.AbstractGuisePropertyChangeListener;
-import com.guiseframework.event.GuisePropertyChangeEvent;
-import com.guiseframework.model.ResourceImport;
-import com.guiseframework.model.ValueModel;
-import com.guiseframework.validator.AbstractValidator;
-import com.guiseframework.validator.ResourceImportValidator;
-import com.guiseframework.validator.ValidationException;
+import com.guiseframework.event.*;
+import com.guiseframework.model.*;
+import com.guiseframework.validator.*;
 
 /**Text Search Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
@@ -142,7 +138,7 @@ public class TextSearchPanel extends DefaultNavigationPanel
 						}
 						catch(final IOException ioException)	//if there is an I/O error
 						{
-							resourceImportControl.addError(ioException);	//add it to the resource import control for display to the user
+							resourceImportControl.setNotification(new Notification(ioException));	//add it to the resource import control for display to the user
 						}
 					}
 				});

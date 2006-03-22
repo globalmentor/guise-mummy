@@ -9,6 +9,7 @@ import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.converter.*;
 import com.guiseframework.model.*;
+import com.guiseframework.validator.ValidationException;
 import com.guiseframework.validator.Validator;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
@@ -311,14 +312,14 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 		return status;	//return the determined status
 	}
 	
-	/**Validates the model of this component and all child components.
+	/**Validates the user input of this component and all child components.
 	The component will be updated with error information.
 	This version also validates the literal text.
-	@exception ComponentExceptions if there was one or more validation error.
+	@return The current state of {@link #isValid()} as a convenience.
 	*/
-	public void validate() throws ComponentExceptions
+	public boolean validate()
 	{
-		super.validate();	//validate the super class TODO accumulate errors
+		super.validate();	//validate the super class
 		try
 		{
 			final V value=getConverter().convertLiteral(getText());	//see if the literal text can correctly be converted
@@ -328,11 +329,16 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 				validator.validate(value);	//validate the value represented by the literal text
 			}
 		}
-		catch(final ComponentException componentException)	//if there is a component error
+		catch(final ConversionException conversionException)	//if there is a conversion error
 		{
-			componentException.setComponent(this);	//make sure the exception knows to which component it relates
-			addError(componentException);	//add this error to the component
-			throw new ComponentExceptions(componentException);	//throw a new component exception list exception
+//TODO del			componentException.setComponent(this);	//make sure the exception knows to which component it relates
+			setNotification(new Notification(conversionException));	//add notificaiton of this error to the component
 		}
+		catch(final ValidationException validationException)	//if there is a validation error
+		{
+//TODO del			componentException.setComponent(this);	//make sure the exception knows to which component it relates
+			setNotification(new Notification(validationException));	//add notificaiton of this error to the component
+		}
+		return isValid();	//return the current valid state
 	}
 }

@@ -66,4 +66,10 @@ public interface TreeNodeModel<V> extends ValueModel<V>, Iterable<TreeNodeModel<
 	*/
 //TODO fix	public TreeModel getTreeModel();
 
+	/**Returns the zero-based depth of the node within in its tree.
+	This result represents the number of levels above this node needed to reach the root node.
+	@return The zero-based depth of this node from the root.
+	*/
+	public int getDepth();
+
 }

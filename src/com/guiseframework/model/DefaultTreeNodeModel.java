@@ -160,4 +160,13 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 //TODO del or move		setEditable(false);	//default to not being editable
 	}
 
+	/**Returns the zero-based depth of the node within in its tree.
+	This result represents the number of levels above this node needed to reach the root node.
+	@return The zero-based depth of this node from the root.
+	*/
+	public int getDepth()
+	{
+		final TreeNodeModel<?> parentNode=getParent();	//get the parent node
+		return parentNode!=null ? parentNode.getDepth()+1 : 0;	//if there is a parent node, this node's depth is one more than the parent's; otherwise, this is the root node with depth zero
+	}
 }

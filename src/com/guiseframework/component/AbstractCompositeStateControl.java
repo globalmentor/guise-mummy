@@ -2,13 +2,14 @@ package com.guiseframework.component;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
-import com.guiseframework.component.layout.Layout;
 import com.guiseframework.model.Notification;
 
-/**An abstract implementation of a container that is also a control.
+/**An abstract implementation of a composite control that represents the state of its child components.
+@param <T> The type of object being represented.
+@param <S> The component state of each object.
 @author Garret Wilson
 */
-public abstract class AbstractContainerControl<C extends Container<C> & Control<C>> extends AbstractContainer<C> implements Control<C>
+public abstract class AbstractCompositeStateControl<T, S extends AbstractCompositeStateComponent.ComponentState, C extends CompositeComponent<C> & Control<C>> extends AbstractCompositeStateComponent<T, S, C> implements Control<C>	//TODO fire events when component states are added or removed so that AJAX updates can be sent
 {
 
 	/**Whether the control is enabled and can receive user input.*/
@@ -110,15 +111,15 @@ public abstract class AbstractContainerControl<C extends Container<C> & Control<
 		}
 	}
 
-	/**Session, ID, and layout constructor.
+	/**Session and ID constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param layout The layout definition for the container.
-	@exception NullPointerException if the given session, and/or layout is <code>null</code>.
+	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception IllegalStateException if no controller is registered for this component type.
 	*/
-	public AbstractContainerControl(final GuiseSession session, final String id, final Layout layout)
+	public AbstractCompositeStateControl(final GuiseSession session, final String id)
 	{
-		super(session, id, layout);	//construct the parent class
+		super(session, id);	//construct the parent class
 	}
 }
