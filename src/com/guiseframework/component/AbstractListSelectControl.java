@@ -70,7 +70,7 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 		super(session, id);	//construct the parent class
 		this.valueRepresentationStrategy=checkNull(valueRepresentationStrategy, "Value representation strategy cannot be null.");
 		this.listSelectModel=checkNull(listSelectModel, "List select model cannot be null.");	//save the list select model
-		this.listSelectModel.addPropertyChangeListener(getRepeaterPropertyChangeListener());	//listen and repeat all property changes of the value model
+		this.listSelectModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the value model
 		this.listSelectModel.addListListener(new ListListener<V>()	//install a repeater list listener to listen to the decorated model
 				{
 					public void listModified(final ListEvent<V> listEvent)	//if the list is modified

@@ -85,7 +85,7 @@ public abstract class AbstractCardPanel<C extends Panel<C> & CardControl<C>> ext
 	protected AbstractCardPanel(final GuiseSession session, final String id, final CardLayout layout)
 	{
 		super(session, id, layout);	//construct the parent class
-		layout.addPropertyChangeListener(getRepeaterPropertyChangeListener());	//listen an repeat all property changes of the card layout value model TODO make sure the card constraint values are passed on, too---right now they probably aren't as the property change event subclass isn't recognized in the repeater listener class
+		layout.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen an repeat all property changes of the card layout value model TODO make sure the card constraint values are passed on, too---right now they probably aren't as the property change event subclass isn't recognized in the repeater listener class
 		layout.addPropertyChangeListener(CardLayout.VALUE_PROPERTY, new PropertyChangeListener()	//listen for the value changing
 				{
 					public void propertyChange(final PropertyChangeEvent propertyChangeEvent)	//if the value changes

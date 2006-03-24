@@ -123,7 +123,7 @@ public class CardConstraints extends AbstractConstraints implements LabelModel, 
 	{
 		super(session);	//construct the parent class 
 		this.labelModel=checkNull(labelModel, "Label model cannot be null.");	//save the label model
-		this.labelModel.addPropertyChangeListener(getRepeaterPropertyChangeListener());	//listen and repeat all property changes of the label model
+		this.labelModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the label model
 		this.enabled=enabled;	//save the enabled state
 	}
 

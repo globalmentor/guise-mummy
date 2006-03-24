@@ -6,7 +6,7 @@ import com.guiseframework.GuiseSession;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-/**The base class for all Guise events.
+/**The base class for custom Guise events.
 @author Garret Wilson
 */
 public abstract class AbstractGuiseEvent extends EventObject implements GuiseEvent

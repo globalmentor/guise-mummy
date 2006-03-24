@@ -55,7 +55,7 @@ public abstract class AbstractConverter<V, L> extends GuiseBoundPropertyObject i
 		}
 
 	/**The invalid value message text resource key, or <code>null</code> if there is no invalid value message text resource specified.*/
-	private String invalidValueMessageResourceKey=CONVERTER_INVALID_VALUE_MESSAGE_RESOURCE;
+	private String invalidValueMessageResourceKey=CONVERTER_INVALID_VALUE_MESSAGE_RESOURCE_KEY;
 
 		/**@return The invalid value message text resource key, or <code>null</code> if there is no invalid value message text resource specified.*/
 		public String getInvalidValueMessageResourceKey() {return invalidValueMessageResourceKey;}

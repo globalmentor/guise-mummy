@@ -231,7 +231,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	{
 		super(session, id);	//construct the parent class
 		this.tableModel=checkNull(tableModel, "Table model cannot be null.");	//save the table model
-		this.tableModel.addPropertyChangeListener(getRepeaterPropertyChangeListener());	//listen and repeat all property changes of the table model
+		this.tableModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the table model
 			//TODO listen to and repeat table model events
 		for(final TableColumnModel<?> column:tableModel.getColumns())	//install a default cell representation strategy for each column
 		{

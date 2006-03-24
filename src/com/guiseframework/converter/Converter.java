@@ -11,7 +11,7 @@ import com.guiseframework.GuiseSession;
 @param <V> The value type this converter supports.
 @param <L> The literal type of the lexical form of the value.
 @author Garret Wilson
-@see GuiseResourceConstants#CONVERTER_INVALID_VALUE_MESSAGE_RESOURCE
+@see GuiseResourceConstants#CONVERTER_INVALID_VALUE_MESSAGE_RESOURCE_KEY
 */
 public interface Converter<V, L> extends PropertyBindable
 {

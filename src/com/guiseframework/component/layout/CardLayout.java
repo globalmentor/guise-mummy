@@ -212,7 +212,7 @@ public class CardLayout extends AbstractLayout<CardConstraints> implements Value
 			}
 			if(newValue!=null && !container.contains(newValue))	//if there is a new component that isn't contained in the container
 			{
-				throw new ValidationException(format(getSession().getStringResource(VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE), newValue.toString()), newValue);						
+				throw new ValidationException(format(getSession().getStringResource(VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE_KEY), newValue.toString()), newValue);						
 			}
 			selectedIndex=-1;	//uncache the selected index
 			if(oldValue instanceof Activable)	//if the old value is activable

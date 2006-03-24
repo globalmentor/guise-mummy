@@ -103,7 +103,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
 				});
 	}
 
-	/**Called when the {@link Component#VALID_PROPERTY} of a child compoenent changes.
+	/**Called when the {@link Component#VALID_PROPERTY} of a child component changes.
 	This version updates the error status of the child component's contraints if those constraints implement {@link TaskCardConstraints}.
 	@param childComponent The child component the valid property of which changed.
 	@param oldValid The old valid property.

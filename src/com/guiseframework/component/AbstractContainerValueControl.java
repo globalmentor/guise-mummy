@@ -35,7 +35,7 @@ public abstract class AbstractContainerValueControl<V, C extends Container<C> & 
 	{
 		super(session, id, layout);	//construct the parent class
 		this.valueModel=checkNull(valueModel, "Value model cannot be null.");	//save the table model
-		this.valueModel.addPropertyChangeListener(getRepeaterPropertyChangeListener());	//listen an repeat all property changes of the value model
+		this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen an repeat all property changes of the value model
 	}
 
 	/**Reports that a bound property has changed.

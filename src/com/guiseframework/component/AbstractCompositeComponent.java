@@ -29,7 +29,28 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 					{
 						public void propertyChange(GuisePropertyChangeEvent<Boolean> propertyChangeEvent)	//if the child component's valid status changes
 						{
+								//TODO do we want to update valid here?
 							childComponentValidPropertyChanged((Component<?>)propertyChangeEvent.getSource(), propertyChangeEvent.getOldValue().booleanValue(), propertyChangeEvent.getNewValue().booleanValue());	//notify this component that a child component's valid status changed
+						}
+					};
+		}
+		return validChangeListener;	//return the valid change listener
+	}
+
+	/**The lazily-created property change listener to listen for changes in visible and display status and update the valid status in response.*/
+	private PropertyChangeListener displayVisibleChangeListener=null;
+
+	/**The lazily-created property change listener to listen for changes in visible and display status and update the valid status in response.*/
+	private PropertyChangeListener getDisplayVisibleChangeListener()
+	{
+		if(displayVisibleChangeListener==null)	//if there is no display/visible change listener
+		{
+			displayVisibleChangeListener=new AbstractGuisePropertyChangeListener<Boolean>()	//create a new display/visible change listener
+					{
+						public void propertyChange(GuisePropertyChangeEvent<Boolean> propertyChangeEvent)	//if the child component's display or visible status changes
+						{
+							//TODO maybe add a flag to prevent infinite loops
+							updateValid();	//update this composite component's valid state, because the validity of this component only depends on displayed, visible child components
 						}
 					};
 		}
@@ -75,7 +96,9 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	*/
 	protected void addComponent(final Component<?> component)
 	{
-		component.addPropertyChangeListener(Component.VALID_PROPERTY, getValidChangeListener());	//listen for changes in the component's valid status and update this component's valid status in response
+		component.addPropertyChangeListener(DISPLAYED_PROPERTY, getDisplayVisibleChangeListener());	//listen for changes in the component's displayed status and update this component's valid status in response
+		component.addPropertyChangeListener(VALID_PROPERTY, getValidChangeListener());	//listen for changes in the component's valid status and update this component's valid status in response
+		component.addPropertyChangeListener(VISIBLE_PROPERTY, getDisplayVisibleChangeListener());	//listen for changes in the component's visible status and update this component's valid status in response
 		component.addNotificationListener(getNotificationListener());	//listen for component notifications and refire the notification events in response
 	}
 
@@ -86,11 +109,13 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	*/
 	protected void removeComponent(final Component<?> component)
 	{
-		component.removePropertyChangeListener(Component.VALID_PROPERTY, getValidChangeListener());	//stop listening for changes in the component's valid status
+		component.removePropertyChangeListener(DISPLAYED_PROPERTY, getDisplayVisibleChangeListener());	//stop listening for changes in the component's displayed status
+		component.removePropertyChangeListener(VALID_PROPERTY, getValidChangeListener());	//stop listening for changes in the component's valid status
+		component.removePropertyChangeListener(VISIBLE_PROPERTY, getDisplayVisibleChangeListener());	//stop listening for changes in the component's visible status
 		component.removeNotificationListener(getNotificationListener());	//stop listening for component notifications
 	}
 
-	/**Called when the {@link Component#VALID_PROPERTY} of a child compoenent changes.
+	/**Called when the {@link Component#VALID_PROPERTY} of a child component changes.
 	Every child version should call this version.
 	This version updates the composite component's valid state by calling {@link #updateValid()}.
 	@param childComponent The child component the valid property of which changed.
@@ -102,7 +127,7 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 		updateValid();	//update this composite component's valid state		
 	}
 
-	/**Called when a child fires a NotificationEvthe {@link Component#VALID_PROPERTY} of a child compoenent changes.
+	/**Called when a child fires a NotificationEvent {@link Component#VALID_PROPERTY} of a child component changes.
 	Every child version should call this version.
 	This version updates the composite component's valid state by calling {@link #updateValid()}.
 	@param childComponent The child component the valid property of which changed.
@@ -127,13 +152,14 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 
 	/**Checks the state of child components for validity.
 	This version checks all child components for validity.
+	Children that are not visible or not displayed are not taken into account.
 	@return <code>true</code> if the relevant children pass all validity tests.
 	*/ 
 	protected boolean determineChildrenValid()
 	{
 		for(final Component<?> childComponent:this)	//for each child component
 		{
-			if(!childComponent.isValid())	//if this child component is not valid
+			if(childComponent.isDisplayed() && childComponent.isValid() && !childComponent.isValid())	//if this child component is displayed and visible, but not valid
 			{
 				return false;	//the composite component should not be considered valid
 			}

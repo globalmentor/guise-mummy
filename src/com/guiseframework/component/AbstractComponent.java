@@ -1119,7 +1119,7 @@ if(valid==null)
 //TODO del when works			this.id=getVariableName(getClass());	//create an ID by transforming the simple class name to a variable name
 		}
 		this.labelModel=checkNull(labelModel, "Label model cannot be null.");	//save the label model
-		this.labelModel.addPropertyChangeListener(getRepeaterPropertyChangeListener());	//listen and repeat all property changes of the label model
+		this.labelModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the label model
 		controller=session.getApplication().getController(getThis());	//ask the application for a controller
 		if(controller==null)	//if we couldn't find a controller
 		{

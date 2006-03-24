@@ -7,6 +7,7 @@ import java.util.concurrent.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.guiseframework.GuiseSession;
+import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 
 /**A tree control.
@@ -14,12 +15,23 @@ import com.guiseframework.model.*;
 */
 public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>, TreeControl.TreeNodeComponentState, TreeControl> implements TreeModel
 {
-	
+
 	/**The tree model used by this component.*/
 	private final TreeModel treeModel;
 
 		/**@return The tree model used by this component.*/
 		protected TreeModel getTreeModel() {return treeModel;}
+
+	/**A listener to listen for changes in properties of tree nodes in the model and re-fire them as coming from this component.*/
+	private final TreeNodePropertyChangeListener<Object> treeNodePropertyChangeListener=new TreeNodePropertyChangeListener<Object>()
+		{
+			public void propertyChange(final TreeNodePropertyChangeEvent<Object> treeNodePropertyChangeEvent)	//if the model fires a tree node property change event
+			{
+					//create a copy of the property change event indicating this control as the source
+				final TreeNodePropertyChangeEvent<Object> repeatTreeNodePropertyChangeEvent=new TreeNodePropertyChangeEvent<Object>(this, treeNodePropertyChangeEvent.getTreeNode(), treeNodePropertyChangeEvent.getPropertyName(), treeNodePropertyChangeEvent.getOldValue(), treeNodePropertyChangeEvent.getNewValue()); 
+				fireTreeNodePropertyChange(repeatTreeNodePropertyChangeEvent);	//repeat the event to this control's listener
+			}		
+		};
 
 	/**The map of tree node representation strategies for classes.*/
 	private final Map<Class<?>, ValueRepresentationStrategy<?>> classTreeNodeRepresentationStrategyMap=new ConcurrentHashMap<Class<?>, ValueRepresentationStrategy<?>>();
@@ -126,12 +138,42 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	{
 		super(session, id);	//construct the parent class
 		this.treeModel=checkNull(treeModel, "Tree model cannot be null.");	//save the tree model
-		this.treeModel.addPropertyChangeListener(getRepeaterPropertyChangeListener());	//listen and repeat all property changes of the tree model
+		this.treeModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the tree model
+		this.treeModel.addTreeNodePropertyChangeListener(treeNodePropertyChangeListener);	//listen and repeat all property changes of the tree nodes in the tree model
 			//TODO listen for and repeat tree model-specific events
 		setTreeNodeRepresentationStrategy(Object.class, new DefaultValueRepresentationStrategy<Object>(session));	//create a default representation strategy and set it as the default by associating it with the Object class
 		setTreeNodeRepresentationStrategy(LabelModel.class, new LabelModelRepresentationStrategy(session));	//create and associate a label model representation strategy
 //TODO fix		setTreeNodeRepresentationStrategy(MessageModel.class, new MessageModelRepresentationStrategy(session));	//create and associate a message model representation strategy
 		setTreeNodeRepresentationStrategy(TextModel.class, new TextModelRepresentationStrategy(session));	//create and associate a text model representation strategy
+	}
+
+	/**Adds a tree node property change listener.
+	@param treeNodePropertyChangeListener The tree node property change listener to add.
+	*/
+	public void addTreeNodePropertyChangeListener(final TreeNodePropertyChangeListener<?> treeNodePropertyChangeListener)
+	{
+		getEventListenerManager().add(TreeNodePropertyChangeListener.class, treeNodePropertyChangeListener);	//add the listener
+	}
+
+	/**Removes a tree node property change listener.
+	@param treeNodePropertyChangeListener The tree node property change listener to remove.
+	*/
+	public void removeTreeNodePropertyChangeListener(final TreeNodePropertyChangeListener<?> treeNodePropertyChangeListener)
+	{
+		getEventListenerManager().remove(TreeNodePropertyChangeListener.class, treeNodePropertyChangeListener);	//remove the listener
+	}
+
+	/**Fires a tree node property change event to all registered tree node property change listeners.
+	@param treeNodePropertyChangeEvent The tree node property change event representing the property change of the tree node.
+	@see TreeNodePropertyChangeListener
+	@see TreeNodePropertyChangeEvent
+	*/
+	protected void fireTreeNodePropertyChange(final TreeNodePropertyChangeEvent<Object> treeNodePropertyChangeEvent)
+	{
+		if(getEventListenerManager().hasListeners(TreeNodePropertyChangeListener.class))	//if there are tree node property change listeners registered
+		{
+			getSession().queueEvent(new PostponedTreeNodePropertyChangeEvent<Object>(getEventListenerManager(), treeNodePropertyChangeEvent));	//tell the Guise session to queue the event
+		}
 	}
 
 		//TreeModel delegations

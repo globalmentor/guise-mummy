@@ -52,7 +52,7 @@ public abstract class AbstractValidator<V> extends GuiseBoundPropertyObject impl
 		}
 
 	/**The invalid value message text resource key, or <code>null</code> if there is no invalid value message text resource specified.*/
-	private String invalidValueMessageResourceKey=VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE;
+	private String invalidValueMessageResourceKey=VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE_KEY;
 
 		/**@return The invalid value message text resource key, or <code>null</code> if there is no invalid value message text resource specified.*/
 		public String getInvalidValueMessageResourceKey() {return invalidValueMessageResourceKey;}
@@ -103,7 +103,7 @@ public abstract class AbstractValidator<V> extends GuiseBoundPropertyObject impl
 		{
 			if(value==null && isValueRequired())	//if the value is invalid because it didn't mean the required requirement
 			{
-				throw new ValidationException(getSession().getStringResource(VALIDATOR_VALUE_REQUIRED_MESSAGE_RESOURCE), value);				
+				throw new ValidationException(getSession().getStringResource(VALIDATOR_VALUE_REQUIRED_MESSAGE_RESOURCE_KEY), value);				
 			}
 			else	//for all other invalid values
 			{

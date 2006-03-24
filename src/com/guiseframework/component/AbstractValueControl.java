@@ -88,7 +88,7 @@ public abstract class AbstractValueControl<V, C extends ValueControl<V, C>> exte
 	{
 		super(session, id, labelModel);	//construct the parent class
 		this.valueModel=checkNull(valueModel, "Value model cannot be null.");	//save the value model
-		this.valueModel.addPropertyChangeListener(getRepeaterPropertyChangeListener());	//listen and repeat all property changes of the value model
+		this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the value model
 	}
 
 	/**Reports that a bound property has changed.

@@ -11,7 +11,7 @@ import com.guiseframework.GuiseSession;
 The invalid value message should be in the form "Invalid value: '{0}'.", where "{0}" represents the invalid value.
 @param <V> The value type this validator supports.
 @author Garret Wilson
-@see GuiseResourceConstants#VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE
+@see GuiseResourceConstants#VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE_KEY
 */
 public interface Validator<V> extends PropertyBindable
 {

@@ -3,6 +3,7 @@ package com.guiseframework.model;
 import static com.garretwilson.lang.ClassUtilities.*;
 
 /**A node in a tree model.
+Property change events on one tree node will be bubbled up the hierarchy, with the source indicating the tree node on which the proeprty change occurred.
 @author Garret Wilson
 @param <V> The type of value contained in the tree node.
 */
