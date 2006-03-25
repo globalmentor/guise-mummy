@@ -2,6 +2,7 @@ package com.guiseframework.test;
 
 import java.net.URI;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import com.garretwilson.util.Debug;
@@ -11,6 +12,9 @@ import com.guiseframework.Bookmark.Parameter;
 import com.guiseframework.component.*;
 import com.guiseframework.component.effect.*;
 import com.guiseframework.component.layout.*;
+import com.guiseframework.converter.ConversionException;
+import com.guiseframework.converter.DateStringLiteralConverter;
+import com.guiseframework.converter.DateStringLiteralStyle;
 import com.guiseframework.demo.DemoUser;
 import com.guiseframework.demo.EditUserPanel;
 import com.guiseframework.event.*;
@@ -51,6 +55,72 @@ public class HomePanel extends DefaultNavigationPanel
 		final LayoutPanel contentPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE)); 
 
 		
+/*TODO del		
+		
+		final Date now=new Date();
+		final DateStringLiteralConverter shortDateConverter=new DateStringLiteralConverter(session, DateStringLiteralStyle.SHORT);
+		final DateStringLiteralConverter mediumDateConverter=new DateStringLiteralConverter(session, DateStringLiteralStyle.MEDIUM);
+		final DateStringLiteralConverter longDateConverter=new DateStringLiteralConverter(session, DateStringLiteralStyle.LONG);
+		final DateStringLiteralConverter fullDateConverter=new DateStringLiteralConverter(session, DateStringLiteralStyle.FULL);
+		
+try
+{
+Debug.trace("short date:", shortDateConverter.convertValue(now));
+Debug.trace("medium date:", mediumDateConverter.convertValue(now));
+Debug.trace("long date:", longDateConverter.convertValue(now));
+Debug.trace("full date:", fullDateConverter.convertValue(now));
+}
+catch(final ConversionException conversionException)
+{
+	Debug.error(conversionException);
+}
+try
+{
+Debug.trace("converting 3/24/06");
+Debug.trace(shortDateConverter.convertLiteral("3/24/06"));
+}
+catch(final ConversionException conversionException)
+{
+	Debug.error(conversionException);
+}
+try
+{
+Debug.trace("converting 03/24/06");
+Debug.trace(shortDateConverter.convertLiteral("03/24/06"));
+}
+catch(final ConversionException conversionException)
+{
+	Debug.error(conversionException);
+}
+try
+{
+Debug.trace("converting 3/24/2006");
+Debug.trace(shortDateConverter.convertLiteral("3/24/2006"));
+}
+catch(final ConversionException conversionException)
+{
+	Debug.error(conversionException);
+}
+try
+{
+Debug.trace("converting 3-24-06");
+Debug.trace(shortDateConverter.convertLiteral("3-24-06"));
+}
+catch(final ConversionException conversionException)
+{
+	Debug.error(conversionException);
+}
+try
+{
+Debug.trace("converting 3-24-2006");
+Debug.trace(shortDateConverter.convertLiteral("3-24-2006"));
+}
+catch(final ConversionException conversionException)
+{
+	Debug.error(conversionException);
+}
+*/
+
 		final SelectLink selectLink=new SelectLink(session);
 		selectLink.setLabel("This is a select link");
 		selectLink.setToggle(true);

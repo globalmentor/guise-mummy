@@ -565,6 +565,12 @@ if(valid==null)
 	Debug.traceStack("ready to call determineValid() for the first time from inside updateValid()");	
 }
 */
+/*TODO del
+				final boolean newValid=determineValid();
+Debug.trace("ready to set valid in", this, "to", newValid);
+				setValid(newValid);	//update the vailidity after rechecking it
+Debug.trace("now valid of", this, "is", isValid());
+*/
 				setValid(determineValid());	//update the vailidity after rechecking it
 			}
 		}

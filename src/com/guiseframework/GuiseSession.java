@@ -11,6 +11,8 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.event.ModalNavigationListener;
+import com.guiseframework.event.NavigationEvent;
+import com.guiseframework.event.NavigationListener;
 import com.guiseframework.model.Notification;
 
 import static com.garretwilson.lang.ClassUtilities.*;
@@ -352,6 +354,7 @@ public interface GuiseSession extends PropertyBindable
 	This method does not actually cause navigation to occur.
 	If the given navigation path is the same as the current navigation path, no action occurs.
 	@param navigationPath The navigation path relative to the application context path.
+		@exception NullPointerException if the given navigation path is <code>null</code>.		
 	@exception IllegalArgumentException if the provided path is absolute.
 	@exception IllegalArgumentException if the navigation path is not recognized (e.g. there is no panel bound to the navigation path).
 	@see #navigate(String)
@@ -371,6 +374,19 @@ public interface GuiseSession extends PropertyBindable
 	@param bookmark The bookmark relative to the current navigation path, or <code>null</code> if there should be no bookmark.
 	*/
 	public void setBookmark(final Bookmark bookmark);
+
+	/**Sets the new navigation path and bookmark, firing a navigation event if appropriate.
+	If the navigation path and/or bookmark has changed, this method fires an event to all {@link NavigationListener}s in the component hierarchy, with the session as the source of the {@link NavigationEvent}.
+	This method calls {@link #setNavigationPath(String)} and {@link #setBookmark(Bookmark)}.  
+	@param navigationPath The navigation path relative to the application context path.
+	@param bookmark The bookmark for which navigation should occur at this navigation path, or <code>null</code> if there is no bookmark involved in navigation.
+	@param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
+	@exception NullPointerException if the given navigation path is <code>null</code>.
+	@see #setNavigationPath(String)
+	@see #setBookmark(Bookmark)
+	@see #getApplicationFrame()
+	*/
+	public void setNavigation(final String navigationPath, final Bookmark bookmark, final URI referrerURI);
 
 	/**@return The requested navigation, or <code>null</code> if no navigation has been requested.*/
 	public Navigation getRequestedNavigation();

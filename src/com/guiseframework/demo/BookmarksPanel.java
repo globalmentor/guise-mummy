@@ -4,17 +4,16 @@ import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
-import com.guiseframework.event.AbstractGuisePropertyChangeListener;
-import com.guiseframework.event.GuisePropertyChangeEvent;
+import com.guiseframework.event.*;
 import com.guiseframework.model.ValueModel;
 import com.guiseframework.validator.ValidationException;
 
 /**Bookmark Guise demonstration panel.
-Copyright © 2005 GlobalMentor, Inc.
+Copyright © 2005-2006 GlobalMentor, Inc.
 Demonstrates saving bookmarks and updating state based upon bookmark navigation.
 @author Garret Wilson
 */
-public class BookmarksPanel extends DefaultNavigationPanel
+public class BookmarksPanel extends DefaultNavigationPanel implements NavigationListener
 {
 
 	/**The number of tabs.*/
@@ -53,12 +52,13 @@ public class BookmarksPanel extends DefaultNavigationPanel
 		add(tabbedPanel);
 	}
 
-	/**Called when navigation occurs to the given navigation path and/or bookmark.
-	@param navigationPath The navigation path relative to the application context path.
-	@param bookmark The bookmark for which navigation should occur at this navigation path, or <code>null</code> if there is no bookmark involved in navigation.
+	/**Called when navigation occurs.
+	This implementation updates the tab in response to a new bookmark navigation.
+	@param navigationEvent The event indicating navigation details.
 	*/
-	public void navigated(final String navigationPath, final Bookmark bookmark)	//update the tab in response to a new bookmark navigation
+	public void navigated(final NavigationEvent navigationEvent)
 	{
+		final Bookmark bookmark=navigationEvent.getBookmark();	//get the bookmark, if any, from the navigation event
 		final String bookmarkedStepString=bookmark!=null ? bookmark.getParameterValue("step") : null;	//see if there is a bookmark "step" parameter
 		final int stepIndex=bookmarkedStepString!=null ? Integer.valueOf(bookmarkedStepString) : 0;	//see which step to go to, depending on the bookmark (if any)
 		if(stepIndex>=0 && stepIndex<TAB_COUNT)	//if the tab index is within range

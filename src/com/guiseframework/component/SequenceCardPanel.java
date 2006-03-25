@@ -1,6 +1,8 @@
 package com.guiseframework.component;
 
 import static com.guiseframework.GuiseResourceConstants.VALIDATION_FALSE_MESSAGE_RESOURCE_KEY;
+
+import com.garretwilson.util.Debug;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.CardLayout;
 import com.guiseframework.component.layout.Constraints;
@@ -266,6 +268,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
 			{
 				final Component<?> selectedCard=getSelectedValue();	//get the selected card
 				assert selectedCard!=null : "No card selected, even though getNext() should have returned null if no card is selected.";
+//TODO del Debug.trace("ready to validate selected card");
 				if(selectedCard.validate())	//validate the selected card; if the selected card is valid
 				{
 					final Constraints nextCardConstraints=nextCard.getConstraints();	//get the next card's constraints

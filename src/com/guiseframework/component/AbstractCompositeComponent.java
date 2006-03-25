@@ -2,6 +2,7 @@ package com.guiseframework.component;
 
 import java.beans.PropertyChangeListener;
 
+import com.garretwilson.util.Debug;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.event.AbstractGuisePropertyChangeListener;
 import com.guiseframework.event.GuisePropertyChangeEvent;
@@ -147,35 +148,40 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	*/ 
 	protected boolean determineValid()
 	{
-		return super.determineValid() && determineChildrenValid();	//determine if the super class and children are valid 
+		return super.determineValid() && determineChildrenValid();	//determine if the super class and children are valid
 	}
 
 	/**Checks the state of child components for validity.
-	This version checks all child components for validity.
+	This version checks all child components for validity using the current {@link Component#isValid()}; child component are not asked to update their valid state.
 	Children that are not visible or not displayed are not taken into account.
 	@return <code>true</code> if the relevant children pass all validity tests.
 	*/ 
 	protected boolean determineChildrenValid()
 	{
+//TODO fix Debug.trace("ready to determine children valid in", this);
 		for(final Component<?> childComponent:this)	//for each child component
 		{
-			if(childComponent.isDisplayed() && childComponent.isValid() && !childComponent.isValid())	//if this child component is displayed and visible, but not valid
+//TODO del Debug.trace("in", this, "child", childComponent, "is valid", childComponent.isValid());			
+			if(childComponent.isDisplayed() && childComponent.isVisible() && !childComponent.isValid())	//if this child component is displayed and visible, but not valid
 			{
+//TODO del Debug.trace("in", this, "found non-valid child", childComponent);
 				return false;	//the composite component should not be considered valid
 			}
 		}
+//	TODO fix Debug.trace("in", this, "child", "all children are valid");
 		return true;	//all children are valid
 	}
 
 	/**Validates the user input of this component and all child components.
 	The component will be updated with error information.
-	This version validates the this component and all child components.
+	This version first calls {@link #validateChildren()} so that all children will be validated before checks are performed on this component.
 	@return The current state of {@link #isValid()} as a convenience.
 	*/
 	public boolean validate()
 	{
-		super.validate();	//validate the component normally
 		validateChildren();	//validate all children
+		super.validate();	//validate the component normally
+//TODO del Debug.trace("in panel", this, "ready to return", isValid(), "for isValid()");
 		return isValid();	//return the current valid state
 	}
 

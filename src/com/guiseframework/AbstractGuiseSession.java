@@ -998,6 +998,7 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 		This method does not actually cause navigation to occur.
 		If the given navigation path is the same as the current navigation path, no action occurs.
 		@param navigationPath The navigation path relative to the application context path.
+		@exception NullPointerException if the given navigation path is <code>null</code>.		
 		@exception IllegalArgumentException if the provided path is absolute.
 		@exception IllegalArgumentException if the navigation path is not recognized (e.g. there is no panel bound to the navigation path).
 		@see #navigate(String)
@@ -1007,7 +1008,7 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 		*/
 		public void setNavigationPath(final String navigationPath)
 		{
-			if(!ObjectUtilities.equals(this.navigationPath, navigationPath))	//if the navigation path is really changing
+			if(!ObjectUtilities.equals(this.navigationPath, checkNull(navigationPath, "Navigation path cannot be null.")))	//if the navigation path is really changing
 			{
 				if(getApplication().getNavigationPanelClass(navigationPath)==null)	//if no panel is bound to the given navigation path
 				{
@@ -1040,6 +1041,51 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 			}
 		}	
 
+		/**Sets the new navigation path and bookmark, firing a navigation event if appropriate.
+		If the navigation path and/or bookmark has changed, this method fires an event to all {@link NavigationListener}s in the component hierarchy, with the session as the source of the {@link NavigationEvent}.
+		This method calls {@link #setNavigationPath(String)} and {@link #setBookmark(Bookmark)}.  
+		@param navigationPath The navigation path relative to the application context path.
+		@param bookmark The bookmark for which navigation should occur at this navigation path, or <code>null</code> if there is no bookmark involved in navigation.
+		@param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
+		@exception NullPointerException if the given navigation path is <code>null</code>.
+		@see #setNavigationPath(String)
+		@see #setBookmark(Bookmark)
+		@see #getApplicationFrame()
+		*/
+		public void setNavigation(final String navigationPath, final Bookmark bookmark, final URI referrerURI)
+		{
+				//if the navigation path or the bookmark is changing
+			if(!ObjectUtilities.equals(this.navigationPath, navigationPath)	//see if the navigation path is changing (the old navigation path will be null if this session has not yet navigated anywhere; don't call getNavigationPath(), which might throw an exception)
+					|| !ObjectUtilities.equals(this.bookmark, bookmark))	//see if the bookmark is changing
+			{
+				setNavigationPath(navigationPath);	//make sure the Guise session has the correct navigation path
+				setBookmark(bookmark);	//make sure the Guise session has the correct bookmark
+				final NavigationEvent navigationEvent=new NavigationEvent(this, this, navigationPath, bookmark, referrerURI);	//create a navigation event with the session as the source of the event
+				fireNavigated(getApplicationFrame(), navigationEvent);	//fire a navigation event to all components in the application frame hierarchy
+			}			
+		}
+
+		/**Fires a {@link NavigationEvent} to all {@link NavigationListener}s in the given component hierarchy.
+		@param component The component to which the navigation event should be fired, along with all children, if the component or any children implement {@link NavigationListener}.
+		@param navigationEvent The navigation event to fire.
+		@see NavigationListener
+		@see NavigationEvent 
+		*/
+		protected void fireNavigated(final Component<?> component, final NavigationEvent navigationEvent)
+		{
+			if(component instanceof NavigationListener)	//if the component is a navigation listener
+			{
+				((NavigationListener)component).navigated(navigationEvent);	//fire the event to the component
+			}
+			if(component instanceof CompositeComponent)	//if the component is a composite component
+			{
+				for(final Component<?> childComponent:(CompositeComponent<?>)component)	//for every child component
+				{
+					fireNavigated(childComponent, navigationEvent);	//fire the event to the child component if possible
+				}
+			}			
+		}
+		
 	/**The requested navigation, or <code>null</code> if no navigation has been requested.*/
 	private Navigation requestedNavigation=null;
 
@@ -1141,7 +1187,7 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 		{
 			requestedNavigation=new ModalNavigation(getApplication().resolveURI(createPathURI(getNavigationPath())), getApplication().resolveURI(checkNull(uri, "URI cannot be null.")), modalListener);	//resolve the URI against the application context path
 		}		
-
+		
 	/**The object that listenes for context state changes and updates the set of context states in response.*/
 	private final ContextStateListener contextStateListener=new ContextStateListener();
 

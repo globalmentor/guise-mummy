@@ -434,38 +434,10 @@ Debug.info("content type:", request.getContentType());
 							{
 								throw new HTTPMovedTemporarilyException(modalNavigationURI);	//redirect to the modal navigation location				
 							}
-						}
-/*TODO del if not needed
-							//update the frame's referrer
-						final String referrer=getReferer(request);	//see if the request has a referrer
-						if(referrer!=null && navigationPanel.getReferrerURI()==null)	//if the request indicates a referrer, but the navigation frame has not yet been updated with a referrer
-						{
-							final URI plainReferrerURI=getPlainURI(URI.create(referrer));	//get a plain URI version of the referrer
-							if(!plainReferrerURI.equals(getPlainURI(requestURI)))	//if we aren't being referred from ourselves
-							{
-								navigationPanel.setReferrerURI(plainReferrerURI);	//update the frame's referrer URI
-							}
-						}
-*/
-						
-						boolean isNavigation=true;	//TODO fix; workaround for initial IllegalStateException for navigation path not initialized
-						try
-						{
-							isNavigation=!navigationPath.equals(guiseSession.getNavigationPath()) || !ObjectUtilities.equals(bookmark, guiseSession.getBookmark());	//we're navigating if the navigation path or the bookmark changes
-						}
-						catch(final IllegalStateException illegalStateException)	//TODO fix
-						{
-							isNavigation=true;
-						}
-						
-						
-						
-						guiseSession.setNavigationPath(navigationPath);	//make sure the Guise session has the correct navigation path
-						guiseSession.setBookmark(bookmark);	//make sure the Guise session has the correct bookmark
-						if(isNavigation)	//if we are navigating to a different navigation path and/or bookmark
-						{
-							navigationPanel.navigated(navigationPath, bookmark);	//tell the navigation panel that navigation has occurred
-						}
+						}						
+						final String referrer=getReferer(request);	//get the request referrer, if any
+						final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
+						guiseSession.setNavigation(navigationPath, bookmark, referrerURI);	//set the session navigation, firing any navigation events if appropriate
 						final Principal oldPrincipal=guiseSession.getPrincipal();	//get the old principal
 						if(formSubmitEvent.getParameterListMap().size()>0)	//only query the view if there were submitted values---especially important for radio buttons and checkboxes, which must assume a value of false if nothing is submitted for them, thereby updating the model
 						{
