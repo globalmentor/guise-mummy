@@ -205,8 +205,8 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 				layout.setContainer(this);	//tell the new layout which container owns it
 				for(final Component<?> childComponent:this)	//for each child component
 				{
-					childComponent.setConstraints(null);	//TODO improve
-					newLayout.getConstraints(childComponent);
+//TODO del when works---why are we setting the constraints to null? maybe they were already compatible					childComponent.setConstraints(null);	//TODO improve
+					newLayout.getConstraints(childComponent);	//make sure the constraints of all components are compatible with the layout TODO do we even need to do this? why not wait until later? but this may be OK---perhaps we can assume that if components are installed before the layout, they will be used with this layout and not another
 //TODO del when works					newLayout.setConstraints(childComponent, newLayout.createDefaultConstraints());	//
 				}
 				firePropertyChange(LAYOUT_PROPERTY, oldLayout, newLayout);	//indicate that the value changed

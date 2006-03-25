@@ -149,7 +149,8 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 		{
 			throw new IllegalStateException("Layout does not have container.");
 		}
-		final Constraints constraints=getConstraints(component);	//get the component constraints, installing appropriate constraints if necessary
+//TODO del		final Constraints constraints=getConstraints(component);	//get the component constraints, installing appropriate constraints if necessary
+		final Constraints constraints=component.getConstraints();	//get the component constraints, ignoring whether they are appropriate for this layout, because the components may be added with constraints for another layout before that layout is installed
 		if(constraints!=null)	//if there are constraints
 		{
 			componentConstraintsChanged(component, null, constraints);	//act as if the component changed from no constraints to its current constraints, adding a listener to those constraints

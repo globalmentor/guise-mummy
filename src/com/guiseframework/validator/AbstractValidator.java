@@ -21,7 +21,22 @@ public abstract class AbstractValidator<V> extends GuiseBoundPropertyObject impl
 
 		/**@return Whether the value must be non-<code>null</code> in order to be considered valid.*/
 		public boolean isValueRequired() {return valueRequired;} 
-
+		
+		/**Sets whether the value must be non-<code>null</code> in order to be considered valid.
+		This is a bound property of type <code>Boolean</code>.
+		@param newValueRequired <code>true</code> if the value must be non-<code>null</code> in order to be considered valid.
+		@see #VALUE_REQUIRED_PROPERTY
+		*/
+		public void setValueRequired(final boolean newValueRequired)
+		{
+			if(valueRequired!=newValueRequired)	//if the value is really changing
+			{
+				final boolean oldValueRequired=valueRequired;	//get the current value
+				valueRequired=newValueRequired;	//update the value
+				firePropertyChange(VALUE_REQUIRED_PROPERTY, Boolean.valueOf(oldValueRequired), Boolean.valueOf(newValueRequired));
+			}
+		}
+		
 	/**The invalid value message text, or <code>null</code> if there is no message text.*/
 	private String invalidValueMessage=null;
 

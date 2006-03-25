@@ -7,30 +7,30 @@
 	xmlns:validator="java:com.guiseframework.validator."
 	xmlns:demo="java:com.guiseframework.demo."
 >
-	<demo:TemperatureConversionPanel2 rdf:ID="temperatureConversionPanel">
+	<demo:TemperatureConversionPanel2 property:name="temperatureConversionPanel">
 		<property:layout><layout:FlowLayout><property:flow>LINE</property:flow></layout:FlowLayout></property:layout>
 		<property:label>Guise&#x2122; Demonstration: Temperature Conversion</property:label>
 		<property:children rdf:parseType="Collection">
-			<component:LayoutPanel rdf:ID="inputPanel">
+			<component:LayoutPanel property:name="inputPanel">
 				<property:layout><layout:FlowLayout><property:flow>PAGE</property:flow></layout:FlowLayout></property:layout>
 				<property:children rdf:parseType="Collection">
-					<component:TextControl rdf:ID="temperatureInput" property:valueClass="java.lang.Float" property:label="Input Temperature">
+					<component:TextControl property:name="temperatureInput" property:valueClass="java.lang.Float" property:label="Input Temperature">
 						<property:validator><validator:ValueRequiredValidator/></property:validator>
 					</component:TextControl>
-					<component:TextControl rdf:ID="temperatureOutput" property:valueClass="java.lang.Float" property:label="Output Temperature" property:editable="false"/>
+					<component:TextControl property:name="temperatureOutput" property:valueClass="java.lang.Float" property:label="Output Temperature" property:editable="false"/>
 				</property:children>
 			</component:LayoutPanel>
-			<component:LayoutPanel rdf:ID="conversionPanel">
+			<component:LayoutPanel property:name="conversionPanel">
 				<property:layout><layout:FlowLayout><property:flow>PAGE</property:flow></layout:FlowLayout></property:layout>
 				<property:children rdf:parseType="Collection">
-					<component:GroupPanel rdf:ID="scalePanel" property:label="Input Scale">
+					<component:GroupPanel property:name="scalePanel" property:label="Input Scale">
 						<property:layout><layout:FlowLayout><property:flow>PAGE</property:flow></layout:FlowLayout></property:layout>
 						<property:children rdf:parseType="Collection">
-							<component:CheckControl rdf:ID="celsiusCheckControl" property:checkType="ELLIPSE" property:label="Calsius"/>
-							<component:CheckControl rdf:ID="fahrenheitCheckControl" property:checkType="ELLIPSE" property:label="Fahrenheit"/>
+							<component:CheckControl property:name="celsiusCheckControl" property:checkType="ELLIPSE" property:label="Calsius"/>
+							<component:CheckControl property:name="fahrenheitCheckControl" property:checkType="ELLIPSE" property:label="Fahrenheit"/>
 						</property:children>
 					</component:GroupPanel>
-					<component:Button rdf:ID="conversionButton" property:label="Convert"/>
+					<component:Button property:name="conversionButton" property:label="Convert"/>
 				</property:children>
 			</component:LayoutPanel>
 		</property:children>

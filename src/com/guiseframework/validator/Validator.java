@@ -20,6 +20,8 @@ public interface Validator<V> extends PropertyBindable
 	public final static String INVALID_VALUE_MESSAGE_PROPERTY=getPropertyName(Validator.class, "invalidValueMessage");
 	/**The invalid value message resource key bound property.*/
 	public final static String INVALID_VALUE_MESSAGE_RESOURCE_KEY_PROPERTY=getPropertyName(Validator.class, "invalidValueMessageResourceKey");
+	/**The value required bound property.*/
+	public final static String VALUE_REQUIRED_PROPERTY=getPropertyName(Validator.class, "valueRequired");
 
 	/**Determines the text of the invalid value message.
 	If a message is specified, it will be used; otherwise, a value will be loaded from the resources if possible.

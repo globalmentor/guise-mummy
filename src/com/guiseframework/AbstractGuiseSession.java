@@ -61,12 +61,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		/**@return The application frame.*/
 		public ApplicationFrame<?> getApplicationFrame() {return applicationFrame;}
 
-	/**The processor that converts RDF to Guise objects.*/
-	private final PLOOPProcessor guiseRDFProcessor;
-
-		/**@return The processor that converts RDF to Guise objects.*/
-		private PLOOPProcessor getGuiseRDFProcessor() {return guiseRDFProcessor;}
-
 	/**The non-thread-safe document builder that parses XML documents for input to RDF.*/
 	private final DocumentBuilder documentBuilder;
 
@@ -660,8 +654,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		{
 			throw new AssertionError(parserConfigurationException);
 		}	
-		guiseRDFProcessor=new PLOOPProcessor(this);	//create a new Guise RDF processor, which is thread-safe, passing the Guise session to use as a default constructor argument
-		guiseRDFProcessor.setNameProperty("name");	//indicate that components can be named using setName() TODO use a constant
 		this.environment=new DefaultGuiseEnvironment();	//create a default environment
 		this.locale=application.getDefaultLocale();	//default to the application locale
 		this.orientation=Orientation.getOrientation(locale);	//set the orientation default based upon the locale
@@ -832,7 +824,8 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 				final RDFResource componentResource=RDFUtilities.getResourceByType(rdf, componentResourceTypeURI);	//try to locate the description of the given component
 				if(componentResource!=null)	//if there is a resource description of a matching type
 				{
-					getGuiseRDFProcessor().initializeObject(component, componentResource);	//initialize the component from this resource
+					final PLOOPProcessor ploopProcessor=new PLOOPProcessor(this);	//create a new PLOOP processor, passing the Guise session to use as a default constructor argument					
+					ploopProcessor.initializeObject(component, componentResource);	//initialize the component from this resource
 					component.initialize();	//initialize the component
 				}
 				else	//if there is no resource of the appropriate type

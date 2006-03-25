@@ -1,0 +1,53 @@
+<rdf:RDF
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:property="http://ploop.org/namespaces/property#"
+	xmlns:component="java:com.guiseframework.component."
+	xmlns:layout="java:com.guiseframework.component.layout."
+	xmlns:model="java:com.guiseframework.model."
+	xmlns:validator="java:com.guiseframework.validator."
+	xmlns:demo="java:com.guiseframework.demo."
+>
+	<demo:EventWizardPanel2>
+		<property:layout><layout:FlowLayout property:flow="PAGE"/></property:layout>
+		<property:label>Guise\u2122 Demonstration: Event Wizard</property:label>
+		<property:children rdf:parseType="Collection">
+			<component:Heading property:level="0" property:label="Event Planner Wizard"/>
+			<!-- personal tab -->			
+			<component:LayoutPanel>
+				<property:layout><layout:RegionLayout/></property:layout>
+				<property:children rdf:parseType="Collection">
+					<component:SequenceCardPanel>	<!-- cards -->
+						<property:constraints><layout:RegionConstraints property:region="CENTER"/></property:constraints>
+						<property:children rdf:parseType="Collection">
+							<component:LayoutPanel rdf:nodeID="personalNamePanel"/>
+						</property:children>
+					</component:SequenceCardPanel>					
+					<component:LayoutPanel>	<!-- links -->
+						<property:constraints><layout:RegionConstraints property:region="LINE_START"/></property:constraints>
+						<property:children rdf:parseType="Collection">
+							<component:Link property:label="1. Personal"/>
+							<component:TaskStatusSelectLink property:label="Name"/>
+							<component:TaskStatusSelectLink property:label="Age"/>
+							<component:TaskStatusSelectLink property:label="Email"/>
+						</property:children>
+					</component:LayoutPanel>
+				</property:children>
+			</component:LayoutPanel>
+		</property:children>
+	</demo:EventWizardPanel2>
+
+	<component:LayoutPanel rdf:nodeID="personalNamePanel" property:name="personalNamePanel">
+		<property:constraints><layout:TaskCardConstraints/></property:constraints>
+		<property:children rdf:parseType="Collection">
+			<component:Heading property:level="1" property:label="Personal Information: Name"/>
+			<component:TextControl property:valueClass="java.lang.String" property:label="First Name">
+				<property:validator><validator:RegularExpressionStringValidator property:pattern="\S+.*" property:valueRequired="true"/></property:validator>
+			</component:TextControl>
+			<component:TextControl property:valueClass="java.lang.String" property:label="Last Name">
+				<property:validator><validator:RegularExpressionStringValidator property:pattern="\S+.*" property:valueRequired="true"/></property:validator>
+			</component:TextControl>
+			<component:CheckControl property:name="ageCheckControl" property:label="I want to tell you my age"/>
+		</property:children>
+	</component:LayoutPanel>
+
+</rdf:RDF>
