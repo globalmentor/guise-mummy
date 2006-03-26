@@ -7,7 +7,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import com.guiseframework.GuiseSession;
 
 /**A default node in a tree model.
-Property change events on one tree node will be bubbled up the hierarchy, with the source indicating the tree node on which the proeprty change occurred.
+Property change events on one tree node will be bubbled up the hierarchy, with the source indicating the tree node on which the property change occurred.
 @author Garret Wilson
 @param <V> The type of value contained in the tree node.
 */
@@ -43,6 +43,13 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 
 	/**@return An iterator to contained tree nodes.*/
 	public Iterator<TreeNodeModel<?>> iterator() {return treeNodeList.iterator();}
+
+	/**Determines whether this node could be considered a leaf node.
+	This method may return <code>false</code> even if it currently has no children, if it intends to load them later and there is no way to know ahead of time if there will be children.
+	This implementation returns the opposite value of {@link #hasChildren()}.
+	@return <code>true</code> if this is a leaf node, else <code>false</code> if this node should not be considered a leaf.
+	*/
+	public boolean isLeaf() {return !hasChildren();}
 
 	/**@return Whether this tree node has children. This implementation delegates to the tree node list.*/
 	public boolean hasChildren() {return !treeNodeList.isEmpty();}
@@ -81,6 +88,15 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 		treeNode.removePropertyChangeListener(getForwardPropertyChangeListener());	//stop listen for property changes to bubble up the hierarchy
 		treeNodeList.remove(treeNode);	//remove the tree node to the list
 		treeNode.setParent(null);	//tell the tree node it no longer has a parent
+	}
+
+	/**Removes all of the child tree nodes from this tree node.*/
+	public void clear()
+	{
+		for(final TreeNodeModel<?> treeNode:this)	//for each child tree node
+		{
+			remove(treeNode);	//remove this component
+		}
 	}
 
 	/**The parent of this node, or <code>null</code> if this node has no parent.*/

@@ -129,29 +129,29 @@ catch(final ConversionException conversionException)
 
 		final TreeControl tree=new TreeControl(session);
 		final TreeNodeModel<String> treeNode1=new DefaultTreeNodeModel<String>(session, String.class, "Node 1");
-		treeNode1.setExpanded(true);
+//TODO del		treeNode1.setExpanded(true);
 		final TreeNodeModel<String> treeNode11=new DefaultTreeNodeModel<String>(session, String.class, "Node 1.1");
-		treeNode11.setExpanded(true);
+//	TODO del		treeNode11.setExpanded(true);
 		treeNode1.add(treeNode11);
 		final TreeNodeModel<String> treeNode111=new DefaultTreeNodeModel<String>(session, String.class, "Node 1.1.1");
-		treeNode111.setExpanded(true);
+//	TODO del		treeNode111.setExpanded(true);
 		treeNode11.add(treeNode111);
 		final TreeNodeModel<String> treeNode112=new DefaultTreeNodeModel<String>(session, String.class, "Node 1.1.2");
-		treeNode112.setExpanded(true);
+//	TODO del		treeNode112.setExpanded(true);
 		treeNode11.add(treeNode112);
 		final TreeNodeModel<String> treeNode113=new DefaultTreeNodeModel<String>(session, String.class, "Node 1.1.3");
-		treeNode1.setExpanded(true);
+//	TODO del		treeNode1.setExpanded(true);
 		treeNode113.add(treeNode113);
 		final TreeNodeModel<String> treeNode12=new DefaultTreeNodeModel<String>(session, String.class, "Node 1.2");
-		treeNode12.setExpanded(true);
+//	TODO del		treeNode12.setExpanded(true);
 		treeNode1.add(treeNode12);
 		final TreeNodeModel<String> treeNode13=new DefaultTreeNodeModel<String>(session, String.class, "Node 1.3");
-		treeNode13.setExpanded(true);
+//	TODO del		treeNode13.setExpanded(true);
 		treeNode1.add(treeNode13);
 		final TreeNodeModel<String> treeNode2=new DefaultTreeNodeModel<String>(session, String.class, "Node 2");
-		treeNode12.setExpanded(true);
+//	TODO del		treeNode12.setExpanded(true);
 		final TreeNodeModel<String> treeNode3=new DefaultTreeNodeModel<String>(session, String.class, "Node 3");
-		treeNode3.setExpanded(true);
+//	TODO del		treeNode3.setExpanded(true);
 
 		tree.getRootNode().add(treeNode1);
 		tree.getRootNode().add(treeNode2);
