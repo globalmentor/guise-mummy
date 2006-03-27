@@ -1,6 +1,8 @@
 package com.guiseframework.test;
 
 import java.net.URI;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -56,7 +58,23 @@ public class HomePanel extends DefaultNavigationPanel
 
 		
 /*TODO del		
+
 		
+Debug.trace("testing date");
+
+final DateFormat dateFormat=DateFormat.getDateInstance(DateFormat.SHORT);	//create a predefined date format instance
+Debug.trace("date format class:", dateFormat.getClass());
+Debug.trace("instance of simple date format?", dateFormat instanceof SimpleDateFormat);
+if(dateFormat instanceof SimpleDateFormat)
+{
+	final SimpleDateFormat simpleDateFormat=(SimpleDateFormat)dateFormat;
+	Debug.trace("pattern:", simpleDateFormat.toPattern());
+	Debug.trace("localized pattern:", simpleDateFormat.toLocalizedPattern());
+}
+
+
+
+
 		final Date now=new Date();
 		final DateStringLiteralConverter shortDateConverter=new DateStringLiteralConverter(session, DateStringLiteralStyle.SHORT);
 		final DateStringLiteralConverter mediumDateConverter=new DateStringLiteralConverter(session, DateStringLiteralStyle.MEDIUM);

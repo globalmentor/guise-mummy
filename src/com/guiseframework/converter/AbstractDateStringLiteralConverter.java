@@ -10,6 +10,7 @@ import com.guiseframework.GuiseSession;
 /**An object that can convert a date object from and to a string.
 This implementation caches a date format and only creates a new one if the locale has changed.
 This implementation synchronizes all conversions on the {@link DateFormat} object.
+This implementation ensures that all date formats use the "yyyy" rather than "yy" year format if possible.
 @param <V> The value type this converter supports.
 @author Garret Wilson
 */
@@ -160,6 +161,19 @@ public abstract class AbstractDateStringLiteralConverter<V> extends AbstractConv
 			else	//if neither a date style nor a time style is requested
 			{
 				throw new NullPointerException("Either a date style or a time style must be specified.");
+			}
+		}
+			//change the "yy" format to "yyyy" if possible
+		if(dateFormat instanceof SimpleDateFormat)	//if the new format is an instance of SimpleDateFormat TODO fix two-digit years for JVMs that do not return a SimpleDateFormat 
+		{
+			final SimpleDateFormat simpleDateFormat=(SimpleDateFormat)dateFormat;	//get the simple date format version
+			final String pattern=simpleDateFormat.toPattern();	//get the pattern being used
+			final int yyIndex=pattern.indexOf("yy");	//see if this pattern contains "yy" (i.e. the two-year designator)
+			if(yyIndex>=0 && (yyIndex>=pattern.length()-2 || pattern.charAt(yyIndex+2)!='y'))	//if there is only two 'y's in a row
+			{
+				final StringBuilder patternBuilder=new StringBuilder(pattern);	//create a pattern builder to change the "yy" to "yyyy"
+				patternBuilder.insert(yyIndex, "yy");	//change the "yy" to "yyyy"
+				simpleDateFormat.applyPattern(patternBuilder.toString());	//apply the new pattern
 			}
 		}
 		return dateFormat;	//return the date format we created

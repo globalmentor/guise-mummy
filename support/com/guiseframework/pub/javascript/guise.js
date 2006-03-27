@@ -3937,11 +3937,11 @@ function updateSlider(slider)	//TODO maybe rename to updateSliderView
 	var positionInput=document.getElementById(positionID);	//get the position element
 	if(track && thumb && positionInput)	//if we found the slider track and thumb
 	{
-		if(typeof thumb[GUISE_STATE_WIDTH_ATTRIBUTE]=="undefined")	//if we haven't defined the thumb width
+		if(typeof thumb[GUISE_STATE_WIDTH_ATTRIBUTE]=="undefined" || thumb[GUISE_STATE_WIDTH_ATTRIBUTE]==0)	//if we haven't defined the thumb width, or we defined it when the control wasn't visible and therefore the thumb width was zero
 		{
 			thumb[GUISE_STATE_WIDTH_ATTRIBUTE]=thumb.offsetWidth;	//set the thumb width so that it won't change later with the Mozilla bug if the thumb is partially outside the track
 		}
-		if(typeof thumb[GUISE_STATE_HEIGHT_ATTRIBUTE]=="undefined")	//if we haven't defined the thumb height
+		if(typeof thumb[GUISE_STATE_HEIGHT_ATTRIBUTE]=="undefined" || thumb[GUISE_STATE_HEIGHT_ATTRIBUTE]==0)	//if we haven't defined the thumb height, or we defined it when the control wasn't visible and therefore the thumb height was zero
 		{
 			thumb[GUISE_STATE_HEIGHT_ATTRIBUTE]=thumb.offsetHeight;	//set the thumb height so that it won't change later with the Mozilla bug if the thumb is partially outside the track
 		}
