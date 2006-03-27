@@ -304,4 +304,32 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 	}
 */
 
+	/**Returns a list of tabs.
+	This method along with {@link #setTabs()} provides a <code>tabs</code> property for alternate tabs access.
+	@return A list of tabs in order.
+	@see #iterator()
+	*/
+/*TODO del if not needed
+	public List<V> getTabs()
+	{
+		return getThis();	//return the control itself, which is a list of tabs
+	}
+*/
+
+	/**Sets the tabs in this control.
+	This method along with {@link #getTabs()} provides a <code>tabs</code> property for alternate tabs access.
+	@param tabs The new tabs for this tab control in order.
+	@see #clear()
+	@see #add(Object)
+	*/
+/*TODO del if not needed
+	public void setTabs(final List<V> tabs)
+	{
+		clear();	//remove all tabs from the control 
+		for(final V tab:tabs)	//for each child
+		{
+			add(tab);	//add this tab
+		}
+	}
+*/
 }

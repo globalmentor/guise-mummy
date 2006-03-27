@@ -8,7 +8,7 @@ import com.guiseframework.model.Notification;
 /**An abstract implementation of a container that is also a control.
 @author Garret Wilson
 */
-public abstract class AbstractContainerControl<C extends Container<C> & Control<C>> extends AbstractContainer<C> implements Control<C>
+public abstract class AbstractContainerControl<C extends ContainerControl<C>> extends AbstractContainer<C> implements ContainerControl<C>
 {
 
 	/**Whether the control is enabled and can receive user input.*/

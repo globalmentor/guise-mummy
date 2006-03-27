@@ -28,7 +28,7 @@ public class CardPanel extends AbstractCardPanel<CardPanel>
 	*/
 	public CardPanel(final GuiseSession session, final String id)
 	{
-		this(session, id, new CardLayout(session));	//default to flowing vertically
+		this(session, id, new CardLayout(session));	//construct the panel using a default layout
 	}
 
 	/**Session and layout constructor.

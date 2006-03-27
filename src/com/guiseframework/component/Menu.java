@@ -10,7 +10,7 @@ This component uses a {@link MenuModel} and a {@link MenuLayout}.
 @see MenuLayout
 @see MenuModel
 */
-public interface Menu<C extends Menu<C>> extends Container<C>, ActionControl<C>
+public interface Menu<C extends Menu<C>> extends ContainerControl<C>, ActionControl<C>
 {
 
 	/**The open bound property.*/

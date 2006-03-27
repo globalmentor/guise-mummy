@@ -1,6 +1,6 @@
 package com.guiseframework.component;
 
-import static com.guiseframework.GuiseResourceConstants.VALIDATION_FALSE_MESSAGE_RESOURCE_KEY;
+import static com.guiseframework.GuiseResourceConstants.*;
 
 import com.garretwilson.util.Debug;
 import com.guiseframework.GuiseSession;

@@ -5,7 +5,7 @@ import com.guiseframework.component.layout.CardConstraints;
 /**A card container that contains a list select model providing access to the cards.
 @author Garret Wilson
 */
-public interface CardControl<C extends CardControl<C>> extends CardContainer<C>, ListSelectControl<Component<?>, C>
+public interface CardControl<C extends CardControl<C>> extends CardContainer<C>, ContainerControl<C>, ListSelectControl<Component<?>, C>
 {
 	/**Convenience method to determine whether a card is displayed based upon its associated constraints.
 	@return Whether the card is displayed or has no representation, taking up no space.

@@ -266,7 +266,39 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 	@see #setSelectedIndexes(int[])
 	*/
 	public void removeSelectedIndexes(int... indexes) throws ValidationException {getListSelectModel().removeSelectedIndexes(indexes);}
+
+	/**Determines the displayed status of the first occurrence of a given value.
+	@param value The value for which the displayed status is to be determined.
+	@return <code>true</code> if the value is displayed, else <code>false</code>.
+	@exception IndexOutOfBoundsException if the given value does not occur in the model.
+	*/
+	public boolean isValueDisplayed(final V value) {return getListSelectModel().isValueDisplayed(value);}
+
+	/**Sets the displayed status of the first occurrence of a given value.
+	This is a bound value state property.
+	@param value The value to enable or disable.
+	@param newDisplayed Whether the value should be displayed.
+	@see ValuePropertyChangeEvent
+	@see #DISPLAYED_PROPERTY
+	*/
+	public void setValueDisplayed(final V value, final boolean newDisplayed) {getListSelectModel().setValueDisplayed(value, newDisplayed);}
+
+	/**Determines the displayed status of a given index.
+	@param index The index of the value for which the displayed status is to be determined.
+	@return <code>true</code> if the value at the given index is displayed, else <code>false</code>.
+	*/
+	public boolean isIndexDisplayed(final int index) {return getListSelectModel().isIndexDisplayed(index);}
 	
+	/**Sets the displayed status of a given index.
+	This is a bound value state property.
+	@param index The index of the value to enable or disable.
+	@param newDisplayed Whether the value at the given index should be displayed.
+	@see ValuePropertyChangeEvent
+	@see #DISPLAYED_PROPERTY
+	@exception IndexOutOfBoundsException if the given index is not within the range of the list.
+	*/
+	public void setIndexDisplayed(final int index, final boolean newDisplayed) {getListSelectModel().setIndexDisplayed(index, newDisplayed);}
+
 	/**Determines the enabled status of the first occurrence of a given value.
 	@param value The value for which the enabled status is to be determined.
 	@return <code>true</code> if the value is enabled, else <code>false</code>.

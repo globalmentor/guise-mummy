@@ -214,7 +214,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		}
 
 	/**Returns a list of children.
-	This method along with {@link #setChildren()} provides an <code>children</code> property for alternate children access.
+	This method along with {@link #setChildren()} provides a <code>children</code> property for alternate children access.
 	@return A list of container children in order.
 	@see #iterator()
 	*/
@@ -227,7 +227,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	}
 
 	/**Sets the children in this container.
-	This method along with {@link #getChildren()} provides an <code>children</code> property for alternate children access.
+	This method along with {@link #getChildren()} provides a <code>children</code> property for alternate children access.
 	@param children The new children for this container in order.
 	@see #clear()
 	@see #add(Component)

@@ -58,6 +58,38 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>, ListListena
 	@see #setSelectedIndexes(int[])
 	*/
 	public void removeSelectedIndexes(int... indexes) throws ValidationException;
+
+	/**Determines the displayed status of the first occurrence of a given value.
+	@param value The value for which the displayed status is to be determined.
+	@return <code>true</code> if the value is displayed, else <code>false</code>.
+	@exception IndexOutOfBoundsException if the given value does not occur in the model.
+	*/
+	public boolean isValueDisplayed(final V value);
+
+	/**Sets the displayed status of the first occurrence of a given value.
+	This is a bound value state property.
+	@param value The value to display.
+	@param newDisplayed Whether the value should be displayed.
+	@see ValuePropertyChangeEvent
+	@see ControlModel#DISPLAYED_PROPERTY
+	*/
+	public void setValueDisplayed(final V value, final boolean newDisplayed);	//TODO update comments after property firing is fixed 
+
+	/**Determines the displayed status of a given index.
+	@param index The index of the value for which the displayed status is to be determined.
+	@return <code>true</code> if the value at the given index is displayed, else <code>false</code>.
+	*/
+	public boolean isIndexDisplayed(final int index);
+	
+	/**Sets the displayed status of a given index.
+	This is a bound value state property.
+	@param index The index of the value to display.
+	@param newDisplayed Whether the value at the given index should be displayed.
+	@see ValuePropertyChangeEvent
+	@see ControlModel#DISPLAYED_PROPERTY
+	@exception IndexOutOfBoundsException if the given index is not within the range of the list.
+	*/
+	public void setIndexDisplayed(final int index, final boolean newDisplayed); 
 	
 	/**Determines the enabled status of the first occurrence of a given value.
 	@param value The value for which the enabled status is to be determined.

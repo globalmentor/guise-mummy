@@ -602,6 +602,68 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 		}
 	}
 
+	/**Determines the displayed status of the first occurrence of a given value.
+	@param value The value for which the displayed status is to be determined.
+	@return <code>true</code> if the value is displayed, else <code>false</code>.
+	@exception IndexOutOfBoundsException if the given value does not occur in the model.
+	*/
+	public boolean isValueDisplayed(final V value)
+	{
+		synchronized(this)	//don't allow the model to be changed while we look up the value in the array
+		{
+			return isIndexDisplayed(values.indexOf(value));	//find the value in the list and check its displayed status
+		}
+	}
+
+	/**Sets the displayed status of the first occurrence of a given value.
+	This is a bound value state property.
+	@param value The value to display.
+	@param newDisplayed Whether the value should be displayed.
+	@see ValuePropertyChangeEvent
+	@see ControlModel#DISPLAYED_PROPERTY
+	*/
+	public void setValueDisplayed(final V value, final boolean newDisplayed) 
+	{
+		synchronized(this)	//don't allow the model to be changed while we look up the value in the array
+		{
+			setIndexDisplayed(values.indexOf(value), newDisplayed);	//find the value in the list and set its displayed status
+		}		
+	}
+
+	/**Determines the displayed status of a given index.
+	@param index The index of the value for which the displayed status is to be determined.
+	@return <code>true</code> if the value at the given index is displayed, else <code>false</code>.
+	*/
+	public boolean isIndexDisplayed(final int index)
+	{
+		synchronized(this)	//don't allow the model to be changed while we access the value state
+		{
+			return valueStates.get(index).isDisplayed();	//return whether the state of this value is displayed
+		}
+	}
+	
+	/**Sets the displayed status of a given index.
+	This is a bound value state property.
+	@param index The index of the value to display.
+	@param newDisplayed Whether the value at the given index should be displayed.
+	@see ValuePropertyChangeEvent
+	@see ControlModel#DISPLAYED_PROPERTY
+	@exception IndexOutOfBoundsException if the given index is not within the range of the list.
+	*/
+	public void setIndexDisplayed(final int index, final boolean newDisplayed) 
+	{
+		synchronized(this)	//don't allow the the model to change while we update the displayed status
+		{
+			final ValueState valueState=valueStates.get(index);	//get the state of this value
+			final boolean oldDisplayed=valueState.isDisplayed();	//get the old displayed state
+			if(oldDisplayed!=newDisplayed)	//if the value is really changing
+			{
+				valueState.setDisplayed(newDisplayed);	//update the displayed state
+//TODO important fix after moving displayed from model to control				fireValuePropertyChange(values.get(index), ControlModel.DISPLAYED_PROPERTY, Boolean.valueOf(oldDisplayed), Boolean.valueOf(newDisplayed));	//indicate that the value state changed
+			}			
+		}
+	}
+	
 	/**Determines the enabled status of the first occurrence of a given value.
 	@param value The value for which the enabled status is to be determined.
 	@return <code>true</code> if the value is enabled, else <code>false</code>.
@@ -826,6 +888,17 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 			/**@return The model value.*/
 //	TODO del if not needed			public V getValue() {return value;}
 
+		/**Whether this value is displayed.*/
+		private boolean displayed=true;
+
+			/**@return Whether this value is displayed.*/
+			public boolean isDisplayed() {return displayed;}
+
+			/**Sets whether this value is displayed.
+			@param newDisplayed <code>true</code> if this value should be displayed.
+			*/
+			public void setDisplayed(final boolean newDisplayed) {displayed=newDisplayed;}
+		
 		/**Whether this value is enabled.*/
 		private boolean enabled=true;
 
@@ -863,6 +936,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 		public ValueState(/*TODO del if not needed final V value, */final ValueState valueState)
 		{
 			this();	//construct the class with the value
+			this.displayed=valueState.isDisplayed();	//copy the displayed state
 			this.enabled=valueState.isEnabled();	//copy the enabled state
 			this.selected=valueState.isSelected();	//copy the selected state
 		}

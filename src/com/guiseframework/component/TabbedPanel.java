@@ -11,7 +11,7 @@ The panel's value model reflects the currently selected component, if any.
 public class TabbedPanel extends AbstractCardPanel<TabbedPanel>
 {
 
-	/**Session constructor with a default vertical flow layout.
+	/**Session constructor.
 	@param session The Guise session that owns this component.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
@@ -20,7 +20,7 @@ public class TabbedPanel extends AbstractCardPanel<TabbedPanel>
 		this(session, (String)null);	//construct the component, indicating that a default ID should be used
 	}
 
-	/**Session and ID constructor with a default vertical flow layout.
+	/**Session and ID constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@exception NullPointerException if the given session is <code>null</code>.
@@ -28,7 +28,7 @@ public class TabbedPanel extends AbstractCardPanel<TabbedPanel>
 	*/
 	public TabbedPanel(final GuiseSession session, final String id)
 	{
-		this(session, id, new CardLayout(session));	//default to flowing vertically
+		this(session, id, new CardLayout(session));	//construct the panel using a default layout
 	}
 
 	/**Session and layout constructor.
