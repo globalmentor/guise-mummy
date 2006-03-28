@@ -1,8 +1,8 @@
 package com.guiseframework.component;
 
-import java.util.Set;
-
-import static com.garretwilson.lang.ObjectUtilities.*;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import static java.util.Collections.*;
 
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.*;
@@ -67,29 +67,47 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 		/**@return The container containing the options.*/
 		public Container<?> getOptionContainer() {return optionContainer;}
 
-	/**The set of available options.*/
-	private final Set<O> options;
+	/**The read-only list of available options in order.*/
+	private final List<O> options;
 
-		/**@return The set of available options.*/
-		public Set<O> getOptions() {return options;}
+		/**@return The read-only list of available options in order.*/
+		public List<O> getOptions() {return options;}
 
+	/**The map of components representing options.*/
+	private final Map<O, Component<?>> optionComponentMap=new ConcurrentHashMap<O, Component<?>>();
+
+		/**Returns the component that represents the specified option.
+		@param option The option for which a component should be returned.
+		@return The component, such as a button, that represents the given option, or <code>null</code> if there is no component that represents the given option.
+		*/
+		public Component<?> getOptionComponent(final O option) {return optionComponentMap.get(option);}
+		
 	/**Session, ID, model, component, and options constructor.
+	Duplicate options are ignored.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@param model The component data model.
 	@param component The component representing the content of the option dialog frame, or <code>null</code> if there is no content component.
-	@param options The set of available options.
+	@param options The available options.
 	@exception NullPointerException if the given session, model, and/or options is <code>null</code>.
 	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractOptionDialogFrame(final GuiseSession session, final String id, final ValueModel<O> model, final Component<?> component, final Set<O> options)
+	public AbstractOptionDialogFrame(final GuiseSession session, final String id, final ValueModel<O> model, final Component<?> component, final O... options)
 	{
 		super(session, id, model, new LayoutPanel(session, new RegionLayout(session)));	//construct the parent class using a layout panel as a container
-		this.options=checkNull(options, "Options cannot be null.");	//save the options
+		final List<O> optionList=new ArrayList<O>();	//create a list of options
+		for(final O option:options)	//put all the options in the list without duplicates
+		{
+			if(!optionList.contains(option))	//if this option isn't already in the list
+			{
+				optionList.add(option);	//add this option to the list
+			}
+		}
+		this.options=unmodifiableList(optionList);	//save the list of options without duplicates
 		setOptionContent(component);	//set the component, if there is one
 		optionContainer=createOptionContainer();	//create the option container
 		getContentContainer().add(optionContainer, new RegionConstraints(session, Region.PAGE_END));	//add the option container at the bottom
-		initializeOptionContainer(optionContainer, options);	//initialize the option container
+		initializeOptionContainer(optionContainer, this.options);	//initialize the option container
 	}
 
 	/**Creates a container for holding the options.
@@ -102,8 +120,23 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 	}
 
 	/**Initializes the option container with the available options.
+	Each component is added to the option container and to the map of option components.
 	@param optionContainer The container to the options.
 	@param options The available options.
 	*/
-	protected abstract void initializeOptionContainer(final Container<?> optionContainer, final Set<O> options);
+	protected void initializeOptionContainer(final Container<?> optionContainer, final List<O> options)
+	{
+		final GuiseSession session=getSession();	//get the session
+		for(final O option:options)	//for each option
+		{
+			final Component<?> optionComponent=createOptionComponent(option);	//create a component for this option
+			optionComponentMap.put(option, optionComponent);	//store this component in the map keyed to the component
+			optionContainer.add(optionComponent);	//add the component to the container
+		}
+	}
+
+	/**Creates a component to represent the given option.
+	@param option The option for which a component should be created.
+	*/
+	protected abstract Component<?> createOptionComponent(final O option);
 }

@@ -7,7 +7,7 @@ import com.guiseframework.converter.Converter;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**A label model that converts a value to a string for the label.
-If no label is explicitely set, the label will represent the given value converted to a string using the given converter.
+If no label is explicitly set, the label will represent the given value converted to a string using the given converter.
 @param <V> The type of value represented by the label.
 @author Garret Wilson
 */
@@ -40,7 +40,7 @@ public class ValueConverterLabelModel<V> extends DefaultLabelModel
 	}
 
 	/**Determines the text of the label.
-	This implementation converts the value if no label is explicitely specified.
+	This implementation converts the value if no label is explicitly specified.
 	@return The label text, or <code>null</code> if there is no label text.
 	@see #getLabel()
 	@see #getValue()

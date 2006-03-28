@@ -2,7 +2,11 @@ package com.guiseframework.component;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import com.guiseframework.GuiseSession;
+import com.guiseframework.event.AbstractGuisePropertyChangeListener;
 import com.guiseframework.model.*;
 import com.guiseframework.validator.ValidationException;
 import com.guiseframework.validator.Validator;
@@ -41,6 +45,15 @@ public abstract class AbstractValueControl<V, C extends ValueControl<V, C>> exte
 				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
 			}			
 		}
+
+	/**The property change listener that removes any notification in response to a property changing.*/
+	private final PropertyChangeListener clearNotificationPropertyChangeListener=new PropertyChangeListener()	//create a listener to update the text in response to a property changing
+			{
+				public void propertyChange(final PropertyChangeEvent propertyChangeEvent)	//if the property changes
+				{
+					setNotification(null);	//clear the notification
+				}
+			};
 
 	/**Session constructor with a default data model to represent a given type.
 	@param session The Guise session that owns this component.
@@ -89,6 +102,7 @@ public abstract class AbstractValueControl<V, C extends ValueControl<V, C>> exte
 		super(session, id, labelModel);	//construct the parent class
 		this.valueModel=checkNull(valueModel, "Value model cannot be null.");	//save the value model
 		this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the value model
+		addPropertyChangeListener(VALUE_PROPERTY, clearNotificationPropertyChangeListener);	//listen for the value changing, and clear the notification in response TODO this needs to be put in other value controls as well
 	}
 
 	/**Reports that a bound property has changed.

@@ -78,7 +78,7 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 				final Converter<V, String> oldConverter=converter;	//get the old value
 				converter=checkNull(newConverter, "Converter cannot be null.");	//actually change the value
 				firePropertyChange(CONVERTER_PROPERTY, oldConverter, newConverter);	//indicate that the value changed
-				updateText(getValue());	//update the text, now that we've installed a new converter
+				updateText();	//update the text, now that we've installed a new converter
 			}
 		}
 
@@ -135,7 +135,13 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 		}
 
 	/**The property change listener that updates the text in response to a property changing.*/
-	private final PropertyChangeListener updateTextPropertyChangeListener;
+	private final PropertyChangeListener updateTextPropertyChangeListener=new PropertyChangeListener()	//create a listener to update the text in response to a property changing
+			{
+				public void propertyChange(final PropertyChangeEvent propertyChangeEvent)	//if the property changes
+				{
+					updateText();	//update the text with the new value from the model
+				}
+			};
 
 	/**Session constructor with a default data model to represent a given type and a default converter.
 	@param session The Guise session that owns this component.
@@ -204,29 +210,22 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 	{
 		super(session, id, model);	//construct the parent class
 		this.converter=checkNull(converter, "Converter cannot be null");	//save the converter
-		updateText(model.getValue());	//initialize the text with the literal form of the initial model value
-		updateTextPropertyChangeListener=new PropertyChangeListener()	//create a listener to update the text in response to a property changing
-				{
-					public void propertyChange(final PropertyChangeEvent propertyChangeEvent)	//if the property changes
-					{
-						updateText(model.getValue());	//update the text with the value from the model
-					}
-				};
-		model.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, updateTextPropertyChangeListener);	//listen for the model changing value, and update the text in response
+		updateText();	//initialize the text with the literal form of the initial model value
+		addPropertyChangeListener(VALUE_PROPERTY, updateTextPropertyChangeListener);	//listen for the value changing, and update the text in response
 		session.addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, updateTextPropertyChangeListener);	//listen for the session locale changing, in case the converter is locale-dependent TODO allow for unregistration to prevent memory leaks
 	}
 
 	/**Updates the component text with literal form of the given value.
-	@param value The value to convert and store in the literal text property.
 	@see Converter#convertValue(Object)
+	@see #getValue()
 	@see #setText(String)
 	*/
-	protected void updateText(final V value)	//TODO remove the value parameter and just get it from the model
+	protected void updateText()
 	{
 		final Converter<V, String> converter=getConverter();	//get the current converter
 		try
 		{
-			final String newText=converter.convertValue(value);	//convert the value to text
+			final String newText=converter.convertValue(getValue());	//convert the value to text
 			setText(newText);	//convert the value to text
 		}
 		catch(final ConversionException conversionException)	//TODO fix better; decide what to do if there is an error here

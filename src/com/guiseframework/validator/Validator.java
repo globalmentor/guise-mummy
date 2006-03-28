@@ -5,6 +5,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 import java.util.MissingResourceException;
 
 import com.garretwilson.beans.PropertyBindable;
+import com.guiseframework.GuiseResourceConstants;
 import com.guiseframework.GuiseSession;
 
 /**Indicates an object that can determine whether a value is valid.
@@ -12,6 +13,7 @@ The invalid value message should be in the form "Invalid value: '{0}'.", where "
 @param <V> The value type this validator supports.
 @author Garret Wilson
 @see GuiseResourceConstants#VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE_KEY
+@see GuiseResourceConstants#VALIDATOR_VALUE_REQUIRED_MESSAGE_RESOURCE_KEY
 */
 public interface Validator<V> extends PropertyBindable
 {
@@ -20,6 +22,10 @@ public interface Validator<V> extends PropertyBindable
 	public final static String INVALID_VALUE_MESSAGE_PROPERTY=getPropertyName(Validator.class, "invalidValueMessage");
 	/**The invalid value message resource key bound property.*/
 	public final static String INVALID_VALUE_MESSAGE_RESOURCE_KEY_PROPERTY=getPropertyName(Validator.class, "invalidValueMessageResourceKey");
+	/**The value required message bound property.*/
+	public final static String VALUE_REQUIRED_MESSAGE_PROPERTY=getPropertyName(Validator.class, "valueRequiredMessage");
+	/**The value requiretd message resource key bound property.*/
+	public final static String VALUE_REQUIRED_MESSAGE_RESOURCE_KEY_PROPERTY=getPropertyName(Validator.class, "valueRequiredMessageResourceKey");
 	/**The value required bound property.*/
 	public final static String VALUE_REQUIRED_PROPERTY=getPropertyName(Validator.class, "valueRequired");
 
@@ -42,13 +48,34 @@ public interface Validator<V> extends PropertyBindable
 	public String getInvalidValueMessageResourceKey();
 
 	/**Sets the key identifying the text of the invalid value message in the resources.
-	This property defaults to {@link VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE}.
+	This property defaults to {@link GuiseResourceConstants#VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE_KEY}.
 	This is a bound property.
 	@param newInvalidValueMessageResourceKey The new invalid value message text resource key.
 	@see #INVALID_VALUE_MESSAGE_RESOURCE_KEY_PROPERTY
 	*/
 	public void setInvalidValueMessageResourceKey(final String newInvalidValueMessageResourceKey);
 
+	/**@return The value required message text, or <code>null</code> if there is no value required message text.*/
+	public String getValueRequiredMessage();
+
+	/**Sets the text of the value required message.
+	This is a bound property.
+	@param newValueRequiredMessage The new text of the value required message.
+	@see #VALUE_REQUIRED_VALUE_MESSAGE_PROPERTY
+	*/
+	public void setValueRequiredMessage(final String newValueRequiredMessage);
+
+	/**@return The value required message text resource key, or <code>null</code> if there is no value required message text resource specified.*/
+	public String getValueRequiredMessageResourceKey();
+
+	/**Sets the key identifying the text of the value required message in the resources.
+	This property defaults to {@link VALIDATOR_VALUE_REQUIRED_MESSAGE_RESOURCE_KEY}.
+	This is a bound property.
+	@param newValueRequiredMessageResourceKey The new value required message text resource key.
+	@see #VALUE_REQUIRED_MESSAGE_RESOURCE_KEY_PROPERTY
+	*/
+	public void setValueRequiredMessageResourceKey(final String newValueRequiredMessageResourceKey);
+	
 	/**@return The Guise session that owns this validator.*/
 	public GuiseSession getSession();
 

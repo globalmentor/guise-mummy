@@ -3,9 +3,8 @@ package com.guiseframework.validator;
 import static java.text.MessageFormat.*;
 import static com.guiseframework.GuiseResourceConstants.*;
 
-import java.util.MissingResourceException;
-
 import com.garretwilson.lang.ObjectUtilities;
+import com.guiseframework.GuiseResourceConstants;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.event.GuiseBoundPropertyObject;
 
@@ -37,24 +36,16 @@ public abstract class AbstractValidator<V> extends GuiseBoundPropertyObject impl
 			}
 		}
 		
-	/**The invalid value message text, or <code>null</code> if there is no message text.*/
+	/**The invalid value message text, or <code>null</code> if there is no invalid value message text.*/
 	private String invalidValueMessage=null;
 
-		/**Determines the text of the invalid value message.
-		If a message is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
-		@return The invalid value message text, or <code>null</code> if there is no invalid value message text.
-		@exception MissingResourceException if there was an error loading the value from the resources.
-		@see #getInvalidValueMessageResourceKey()
-		*/
-		public String getInvalidValueMessage() throws MissingResourceException
-		{
-			return getSession().determineString(invalidValueMessage, getInvalidValueMessageResourceKey());	//get the value or the resource, if available
-		}
+		/**@return The invalid value message text, or <code>null</code> if there is no invalid value message text.*/
+		public String getInvalidValueMessage() {return invalidValueMessage;}
 
 		/**Sets the text of the invalid value message.
 		This is a bound property.
 		@param newInvalidValueMessage The new text of the invalid value message.
-		@see Validator#INVALID_VALUE_MESSAGE_PROPERTY
+		@see #INVALID_VALUE_MESSAGE_PROPERTY
 		*/
 		public void setInvalidValueMessage(final String newInvalidValueMessage)
 		{
@@ -73,10 +64,10 @@ public abstract class AbstractValidator<V> extends GuiseBoundPropertyObject impl
 		public String getInvalidValueMessageResourceKey() {return invalidValueMessageResourceKey;}
 
 		/**Sets the key identifying the text of the invalid value message in the resources.
-		This property defaults to {@link VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE}.
+		This property defaults to {@link GuiseResourceConstants#VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE_KEY}.
 		This is a bound property.
 		@param newInvalidValueMessageResourceKey The new invalid value message text resource key.
-		@see Validator#INVALID_VALUE_MESSAGE_RESOURCE_KEY_PROPERTY
+		@see #INVALID_VALUE_MESSAGE_RESOURCE_KEY_PROPERTY
 		*/
 		public void setInvalidValueMessageResourceKey(final String newInvalidValueMessageResourceKey)
 		{
@@ -87,7 +78,50 @@ public abstract class AbstractValidator<V> extends GuiseBoundPropertyObject impl
 				firePropertyChange(INVALID_VALUE_MESSAGE_RESOURCE_KEY_PROPERTY, oldInvalidValueMessageResourceKey, newInvalidValueMessageResourceKey);	//indicate that the value changed
 			}
 		}
-		
+
+	/**The value required message text, or <code>null</code> if there is no value required message text.*/
+	private String valueRequiredMessage=null;
+
+		/**@return The value required message text, or <code>null</code> if there is no value required message text.*/
+		public String getValueRequiredMessage() {return valueRequiredMessage;}
+
+		/**Sets the text of the value required message.
+		This is a bound property.
+		@param newValueRequiredMessage The new text of the value required message.
+		@see #VALUE_REQUIRED_VALUE_MESSAGE_PROPERTY
+		*/
+		public void setValueRequiredMessage(final String newValueRequiredMessage)
+		{
+			if(!ObjectUtilities.equals(valueRequiredMessage, newValueRequiredMessage))	//if the value is really changing
+			{
+				final String oldValueRequiredMessage=valueRequiredMessage;	//get the old value
+				valueRequiredMessage=newValueRequiredMessage;	//actually change the value
+				firePropertyChange(VALUE_REQUIRED_MESSAGE_PROPERTY, oldValueRequiredMessage, newValueRequiredMessage);	//indicate that the value changed
+			}			
+		}
+
+	/**The value required message text resource key, or <code>null</code> if there is no value required message text resource specified.*/
+	private String valueRequiredMessageResourceKey=VALIDATOR_VALUE_REQUIRED_MESSAGE_RESOURCE_KEY;
+
+		/**@return The value required message text resource key, or <code>null</code> if there is no value required message text resource specified.*/
+		public String getValueRequiredMessageResourceKey() {return valueRequiredMessageResourceKey;}
+
+		/**Sets the key identifying the text of the value required message in the resources.
+		This property defaults to {@link GuiseResourceConstants#VALIDATOR_VALUE_REQUIRED_MESSAGE_RESOURCE_KEY}.
+		This is a bound property.
+		@param newValueRequiredMessageResourceKey The new value required message text resource key.
+		@see #VALUE_REQUIRED_MESSAGE_RESOURCE_KEY_PROPERTY
+		*/
+		public void setValueRequiredMessageResourceKey(final String newValueRequiredMessageResourceKey)
+		{
+			if(!ObjectUtilities.equals(valueRequiredMessageResourceKey, newValueRequiredMessageResourceKey))	//if the value is really changing
+			{
+				final String oldValueRequiredMessageResourceKey=valueRequiredMessageResourceKey;	//get the old value
+				valueRequiredMessageResourceKey=newValueRequiredMessageResourceKey;	//actually change the value
+				firePropertyChange(VALUE_REQUIRED_MESSAGE_RESOURCE_KEY_PROPERTY, oldValueRequiredMessageResourceKey, newValueRequiredMessageResourceKey);	//indicate that the value changed
+			}
+		}
+
 	/**Session constructor with no value required.
 	@param session The Guise session that owns this validator.
 	@exception NullPointerException if the given session is <code>null</code>.
@@ -118,11 +152,13 @@ public abstract class AbstractValidator<V> extends GuiseBoundPropertyObject impl
 		{
 			if(value==null && isValueRequired())	//if the value is invalid because it didn't mean the required requirement
 			{
-				throw new ValidationException(getSession().getStringResource(VALIDATOR_VALUE_REQUIRED_MESSAGE_RESOURCE_KEY), value);				
+				final String valueRequiredMessage=getSession().determineString(getValueRequiredMessage(), getValueRequiredMessageResourceKey());	//get the value required message to use
+				throw new ValidationException(valueRequiredMessage, value);				
 			}
 			else	//for all other invalid values
 			{
-				throw new ValidationException(format(getInvalidValueMessage(), toString(value)), value);
+				final String invalidValueMessage=getSession().determineString(getInvalidValueMessage(), getInvalidValueMessageResourceKey());	//get the invalid value message to use
+				throw new ValidationException(format(invalidValueMessage, toString(value)), value);	//format the message based upon the value
 			}
 		}
 	}

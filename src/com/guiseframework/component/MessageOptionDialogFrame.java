@@ -18,6 +18,7 @@ public class MessageOptionDialogFrame extends DefaultOptionDialogFrame
 		public Message getMessage() {return message;}
 
 	/**Session and options constructor with no message.
+	Duplicate options are ignored.
 	@param session The Guise session that owns this component.
 	@param options The available options.
 	@exception NullPointerException if the given session and/or options is <code>null</code>.
@@ -42,6 +43,7 @@ public class MessageOptionDialogFrame extends DefaultOptionDialogFrame
 */
 
 	/**Session, message, and options constructor.
+	Duplicate options are ignored.
 	@param session The Guise session that owns this component.
 	@param message The message to display in the frame, or <code>null</code> if no message should be displayed.
 	@param options The available options.
@@ -53,6 +55,7 @@ public class MessageOptionDialogFrame extends DefaultOptionDialogFrame
 	}
 
 	/**Session, ID, message, and options constructor.
+	Duplicate options are ignored.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@param message The message to display in the frame, or <code>null</code> if no message should be displayed.
@@ -66,6 +69,7 @@ public class MessageOptionDialogFrame extends DefaultOptionDialogFrame
 	}
 
 	/**Session, message model, and options constructor.
+	Duplicate options are ignored.
 	@param session The Guise session that owns this component.
 	@param messageModel The model of the message to display in the frame.
 	@param options The available options.
@@ -79,6 +83,7 @@ public class MessageOptionDialogFrame extends DefaultOptionDialogFrame
 */
 	
 	/**Session, ID, message model, and options constructor.
+	Duplicate options are ignored.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@param messageModel The model of the message to display in the frame.
@@ -94,6 +99,7 @@ public class MessageOptionDialogFrame extends DefaultOptionDialogFrame
 */
 
 	/**Session, message component, and options constructor.
+	Duplicate options are ignored.
 	@param session The Guise session that owns this component.
 	@param messageComponent The message component to display in the frame.
 	@param options The available options.
@@ -105,6 +111,7 @@ public class MessageOptionDialogFrame extends DefaultOptionDialogFrame
 	}
 
 	/**Session, ID, message component, and options constructor.
+	Duplicate options are ignored.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 	@param messageComponent The message component to display in the frame.

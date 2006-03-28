@@ -28,7 +28,7 @@ public abstract class AbstractControl<C extends Control<C>> extends AbstractComp
 				final boolean oldEnabled=enabled;	//get the old value
 				enabled=newEnabled;	//actually change the value
 				firePropertyChange(ENABLED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newEnabled));	//indicate that the value changed
-			}			
+			}
 		}
 
 	/**The status of the current user input, or <code>null</code> if there is no status to report.*/
