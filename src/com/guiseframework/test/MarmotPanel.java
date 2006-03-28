@@ -15,6 +15,7 @@ import com.guiseframework.component.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.Notification;
 import com.guiseframework.model.RDFObjectTreeNodeModel;
+import com.guiseframework.model.RDFResourceTreeNodeModel;
 import com.guiseframework.validator.ValidationException;
 
 /**Test panel for Marmot
@@ -65,7 +66,7 @@ public class MarmotPanel extends DefaultNavigationPanel
 							final URI repositoryURI=URI.create(repositoryURIString);
 							final Repository repository=new WebDAVRepository(repositoryURI);
 							
-							final Frame<?> frame=new DefaultFrame(session);
+//TODO fix							final Frame<?> frame=new DefaultFrame(session);
 							
 							
 //TODO fix							final TreeControl treeControl=new TreeControl(session);
@@ -99,12 +100,14 @@ catch(final ValidationException validationException)
 							frame.setContent(textArea);
 */
 							final TreeControl treeControl=new TreeControl(session);
+							treeControl.setTreeNodeRepresentationStrategy(RDFResource.class, new RDFResourceTreeNodeRepresentationStrategy(session));
+							treeControl.setTreeNodeRepresentationStrategy(RDFLiteral.class, new RDFLiteralTreeNodeRepresentationStrategy(session));
 							try
 							{
 									final List<RDFResource> rootResources=repository.getChildResourceDescriptions(repositoryURI);
 									for(final RDFResource resource:rootResources)
 									{
-										treeControl.getRootNode().add(new RDFObjectTreeNodeModel(session, null, resource));
+										treeControl.getRootNode().add(new RDFResourceTreeNodeModel(session, null, resource));
 									}
 							}
 							catch(final IOException ioException)
@@ -112,10 +115,11 @@ catch(final ValidationException validationException)
 								Debug.error(ioException);
 //							TODO del	getSession().notify(new Notification(ioException));	//TODO add component-level notify, maybe
 							}
+							add(treeControl);
 							
-							frame.setContent(treeControl);
+//TODO fix							frame.setContent(treeControl);
 							
-							frame.open();
+//TODO fix							frame.open();
 						}
 					}
 				});

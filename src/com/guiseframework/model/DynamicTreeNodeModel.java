@@ -10,8 +10,8 @@ import com.guiseframework.GuiseSession;
 <p><dfn>Predictive</dfn> dynamic tree nodes know before loading child nodes whether and how many child nodes there will be once children are loaded.</p>
 <p>A predictive dynamic tree node it must override {@link #hasChildren()} and return whether there would be children were children loaded.</p>
 <p>Property change events on one tree node will be bubbled up the hierarchy, with the source indicating the tree node on which the property change occurred.</p>
-@author Garret Wilson
 @param <V> The type of value contained in the tree node.
+@author Garret Wilson
 */
 public abstract class DynamicTreeNodeModel<V> extends DefaultTreeNodeModel<V>
 {
@@ -54,7 +54,7 @@ public abstract class DynamicTreeNodeModel<V> extends DefaultTreeNodeModel<V>
 
 	/**Determines whether this tree node has children.
 	If this is not a predictive tree node, this implementation first ensures that child nodes are loaded.
-	A predictive dynamic tree node it must override this method and return whether there would be children were children loaded.
+	A predictive dynamic tree node must override this method and return whether there would be children were children loaded.
 	@return Whether this tree node has children.
 	@exception IllegalStateException if child nodes are not loaded and this is a predictive dynamic tree node that has not overridden this method to return whether there would be child nodes were children loaded.
 	*/
