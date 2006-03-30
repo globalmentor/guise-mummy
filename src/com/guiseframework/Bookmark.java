@@ -1,20 +1,19 @@
 package com.guiseframework;
 
-import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
 
+import com.garretwilson.util.Debug;
 import com.garretwilson.util.NameValuePair;
 
 /**An identification of a saved state at a navigation point. The bookmark is relative to the navigation path.
 @author Garret Wilson
 */
-public class Bookmark
+public class Bookmark implements Cloneable
 {
 
 	/**The bookmark ID.*/
@@ -23,30 +22,42 @@ public class Bookmark
 		/**@return The bookmark ID.*/
 //TODO del		public String getID() {return id;}
 
+	/**The map of parameters keyd to parameter names. This map is not thread-safe, but it should never be modified by more than one thread because this is an immutable class.*/
+	private HashMap<String, Parameter> parameterMap=new HashMap<String, Parameter>();
+	
 	/**The array of parameters.*/
-	private final Parameter[] parameters;
+//TODO del	private final Parameter[] parameters;
 
 		/**@return A read-only list of parameters.*/
-		public List<Parameter> getParameters() {return unmodifiableList(asList(parameters));}	//return a read-only list of the parameters
+//TODO del		public List<Parameter> getParameters() {return unmodifiableList(asList(parameters));}	//return a read-only list of the parameters
 
+	/**@return A read-only set of parameters.*/
+	public Set<Parameter> getParameters() {return unmodifiableSet(new HashSet<Parameter>(parameterMap.values()));}	//return a read-only set of the parameters
+	
 	/**Returns the value associated with the first parameter of the given name.
 	@param parameterName The name of the parameter.
 	@return The value of the first parameter with the given name, or <code>null</code> if there is no parameter with the given name.
+	@exception NullPointerException if the given name is <code>null</code>.
 	*/
 	public String getParameterValue(final String parameterName)
 	{
+		final Parameter parameter=parameterMap.get(checkNull(parameterName, "Parameter name cannot be null."));	//get the requested parameter
+		return parameter!=null ? parameter.getValue() : null;	//return the parameter value, if there was a parameter
+/*TODO del when works
 		for(int i=0; i<parameters.length; ++i)	//for each parameter
 		{
 			final Parameter parameter=parameters[i];	//get a reference to this parameter
-			if(parameter.getName().equals(parameterName))	//if this parameter has the correct name (this parameter's name should never be null, but the requested parameter name might be null
+			if(parameterName.equals(parameter.getName()))	//if this parameter has the correct name
 			{
 				return parameter.getValue();	//return this parameter value
 			}
 		}
 		return null;	//indicate that no parameter with the given name was found
+*/
 	}
 		
 	/**ID and optional parameters constructor.
+	If there are parameters with duplicate names, only the first ones are used and the rest with the same name are ignored.
 	@param id The bookmark ID.
 	@param parameters The optional bookmark parameters.
 	@exception NullPointerException if the given ID and/or the parameters array is <code>null</code>.
@@ -54,13 +65,96 @@ public class Bookmark
 	public Bookmark(/*TODO del final String id, */final Parameter... parameters)
 	{
 //TODO del		this.id=checkNull(id, "ID cannot be null.");
-		this.parameters=checkNull(parameters, "Parameters cannot be null.");
+		for(final Parameter parameter:parameters)	//for each parameter
+		{
+			final String parameterName=parameter.getName();	//get the parameter name
+			if(!parameterMap.containsKey(parameterName))	//if this parameter is not already stored in the map
+			{
+				parameterMap.put(parameterName, parameter);	//store this parameter in the map
+			}
+		}
+		//TODO check duplicates
+//TODO del		this.parameters=checkNull(parameters, "Parameters cannot be null.");	//TODO maybe make a copy of these
+	}
+
+	/**Creates a new bookmark with the given parameter set to the given value.
+	If the named parameter does not exist, it will be added.
+	If this bookmark already contains a parameter with the given value, this bookmark will be returned.
+	@param name The parameter name.
+	@param value The parameter value.
+	@exception NullPointerException if the given name and/or value is <code>null</code>.
+	*/
+	public Bookmark setParameter(final String name, final String value)
+	{
+		if(value.equals(getParameterValue(name)))	//if this bookmark already has the given parameter name and value
+		{
+			return this;	//return this bookmark; it already has the correct values
+		}
+		final Parameter newParameter=new Parameter(name, value);	//create the new parameter with the new value
+		final Bookmark newBookmark=(Bookmark)clone();	//clone this bookmark
+		newBookmark.parameterMap.put(name, newParameter);	//store the new parameter in the new bookmark
+		return newBookmark;	//return our modified clone
+/*TODO del when works
+		final String currentValue=getParameterValue(name);	//get the current value for this parameter
+		if(value.equals(currentValue))	//if this bookmark already has the given parameter name and value
+		{
+			return this;	//return this bookmark; it already has the correct values
+		}
+		final Parameter newParameter=new Parameter(name, value);	//create the new parameter with the new value
+		final int parameterCount=parameters.length;	//see how many parameters there are
+		boolean addParameter=currentValue==null;	//we'll add a parameter if the parameter isn't present already
+		final int newParameterCount=addParameter ? parameterCount+1 : parameterCount;	//if we don't have the parameter currently, we'll have to add it
+		final Parameter[] newParameters=new Parameter[newParameterCount];
+		for(int i=parameterCount-1; i>=0; --i)	//for each parameter
+		{
+			final Parameter oldParameter=parameters[i];	//get the old parameter
+				//if we're changing a parameter and this is the one to change, copy the new parameter; otherwise, just use the old parameter
+			newParameters[i]=!addParameter && oldParameter.getName().equals(name) ? newParameter : oldParameter;
+		}
+		if(addParameter)	//if we should add a parameter
+		{
+			newParameters[]
+		}
+*/
+	}
+
+	/**Creates a new bookmark with the given parameter removed.
+	If this bookmark does not contains the given parameter, this bookmark will be returned.
+	@param name The parameter name.
+	@exception NullPointerException if the given name is <code>null</code>.
+	*/
+	public Bookmark removeParameter(final String name)
+	{
+		if(getParameterValue(name)==null)	//if this bookmark does not have given parameter name and value
+		{
+			return this;	//return this bookmark; it already has the parameter removed
+		}
+		final Bookmark newBookmark=(Bookmark)clone();	//clone this bookmark
+		newBookmark.parameterMap.remove(name);	//remove the parameter from the new bookmark
+		return newBookmark;	//return our modified clone
+	}
+
+	/**Creates a shallow clone of this object.*/
+	@SuppressWarnings("unchecked")	//we clone our internal hash map, so we know the generic return type
+	public Object clone()
+	{
+		try
+		{
+			final Bookmark clone=(Bookmark)super.clone();	//create a clone of the bookmark
+			clone.parameterMap=(HashMap<String, Parameter>)parameterMap.clone();	//clone the map of parameters
+			return clone;	//return the clone
+		}
+		catch(final CloneNotSupportedException cloneNotSupportedException)	//we support cloning in this class, so we should never get this exception
+		{
+			throw new AssertionError(cloneNotSupportedException);
+		}
 	}
 
 	/**@return A hash code value for the object.*/
 	public int hashCode()
 	{
-		return Arrays.hashCode(parameters);	//calculate a hash code from the parameters
+		return parameterMap.hashCode();	//return the hash code of the parameter map
+//TODO del		return Arrays.hashCode(parameters);	//calculate a hash code from the parameters
 //TODO fix		return ObjectUtilities.hashCode(id, Arrays.hashCode(parameters));	//calculate a hash code from the ID and the parameters
 	}
 
@@ -73,8 +167,9 @@ public class Bookmark
 	{
 		if(object instanceof Bookmark)	//if the given object is a bookmark
 		{
-			final Bookmark bookmark=(Bookmark)object;	//cast the object to a boomark
-			return Arrays.equals(parameters, bookmark.parameters);	//compare the ID and parameters
+//TODO del			final Bookmark bookmark=(Bookmark)object;	//cast the object to a boomark
+			return parameterMap.equals(((Bookmark)object).parameterMap);	//compare parameter maps
+//TODO del			return Arrays.equals(parameters, bookmark.parameters);	//compare the ID and parameters
 //TODO del			return getID().equals(bookmark.getID()) && Arrays.equals(parameters, bookmark.parameters);	//compare the ID and parameters
 		}
 		else	//if the given object is not a bookmark
@@ -83,7 +178,7 @@ public class Bookmark
 		}
 	}
 
-	/**@return A string representation of the bookmark suitable for use in a URI query, in the form "#<var>id</var>?<var>parameter1Name</var>=<var>parameter2Name</var>&amp;&hellip;".*/
+	/**@return A string representation of the bookmark suitable for use in a URI query, in the form "#<var>id</var>?<var>parameter1Name</var>=<var>parameter1Value</var>&amp;<var>parameter2Name</var>=<var>parameter2Value</var>&hellip;".*/
 	public String toString()
 	{
 		final StringBuilder bookmarkQueryStringBuilder=new StringBuilder();	//create a new string builder
@@ -94,8 +189,11 @@ public class Bookmark
 			bookmarkQueryStringBuilder.append(FRAGMENT_SEPARATOR).append(encode(bookmarkID));	//append #bookmarkID (encoded)
 		}
 */
-		if(parameters.length>0)	//if there are parameters
+//TODO del		if(parameters.length>0)	//if there are parameters
+		if(!parameterMap.isEmpty())	//if there are parameters
 		{
+			final Set<Parameter> parameterSet=getParameters();	//get the parameters
+			final Parameter[] parameters=parameterSet.toArray(new Parameter[parameterSet.size()]);	//create an array of parameters
 			bookmarkQueryStringBuilder.append(constructQuery((NameValuePair<String, String>[])parameters));	//append the parameters to the query string
 		}
 		return bookmarkQueryStringBuilder.toString();	//return the string we constructed

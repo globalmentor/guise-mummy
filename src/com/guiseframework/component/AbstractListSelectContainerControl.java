@@ -90,7 +90,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 		super(session, id, layout);	//construct the parent class
 		this.valueRepresentationStrategy=COMPONENT_REPRESENTATION_STRATEGY;	//use the shared component representation strategy
 		layout.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen an repeat all property changes of the card layout value model TODO make sure the card constraint values are passed on, too---right now they probably aren't as the property change event subclass isn't recognized in the repeater listener class
-		layout.addPropertyChangeListener(AbstractValueLayout.VALUE_PROPERTY, new PropertyChangeListener()	//listen for the value changing
+		addPropertyChangeListener(VALUE_PROPERTY, new PropertyChangeListener()	//listen for the value changing
 				{
 					public void propertyChange(final PropertyChangeEvent propertyChangeEvent)	//if the value changes
 					{

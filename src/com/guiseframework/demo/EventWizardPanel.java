@@ -36,14 +36,19 @@ public class EventWizardPanel extends DefaultNavigationPanel
 		final LayoutPanel wizardPanel=new LayoutPanel(session, new RegionLayout(session));
 				//wizard cards
 		final SequenceCardPanel wizardCardPanel=new SequenceCardPanel(session);
+		wizardCardPanel.setName("wizardCardPanel");
+		wizardCardPanel.setBookmarkEnabled(true);	//turn on bookmarks for the wizard
 		final PersonalNamePanel personalCard1=new PersonalNamePanel(session);
+		personalCard1.setName("personalCard1");
 		personalCard1.setConstraints(new TaskCardConstraints(session));
 		wizardCardPanel.add(personalCard1);
 		final Panel<?> personalCard2=new PersonalAgePanel(session);
+		personalCard2.setName("personalCard2");
 		personalCard2.setConstraints(new TaskCardConstraints(session));
 		wizardCardPanel.add(personalCard2);
 		final Panel<?> personalCard3=new PersonalEmailPanel(session);
 		personalCard3.setConstraints(new TaskCardConstraints(session));
+		personalCard3.setName("personalCard3");
 		wizardCardPanel.add(personalCard3);		
 			//listen for the age checkbox changing
 		personalCard1.getAgeCheckControl().addPropertyChangeListener(CheckControl.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Boolean>()
@@ -55,11 +60,14 @@ public class EventWizardPanel extends DefaultNavigationPanel
 				});
 		final Panel<?> businessCard1=new BusinessNamePanel(session);
 		businessCard1.setConstraints(new TaskCardConstraints(session));
+		businessCard1.setName("businessCard1");
 		wizardCardPanel.add(businessCard1);
 		final Panel<?> businessCard2=new BusinessAddressPanel(session);
 		businessCard2.setConstraints(new TaskCardConstraints(session));
+		businessCard2.setName("businessCard2");
 		wizardCardPanel.add(businessCard2);
 		final Panel<?> eventCard1=new EventNamePanel(session);
+		eventCard1.setName("eventCard1");
 		eventCard1.setConstraints(new TaskCardConstraints(session));
 		wizardCardPanel.add(eventCard1);
 		wizardPanel.add(wizardCardPanel, new RegionConstraints(session, Region.CENTER));

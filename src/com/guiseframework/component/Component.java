@@ -40,6 +40,8 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 
 	/**The bound property of the background color.*/
 	public final static String BACKGROUND_COLOR_PROPERTY=getPropertyName(Component.class, "backgroundColor");
+	/**The bound property of whether the component has bookmarks enabled.*/
+	public final static String BOOKMARK_ENABLED_PROPERTY=getPropertyName(Component.class, "bookmarkEnabled");
 	/**The bound property of the color.*/
 	public final static String COLOR_PROPERTY=getPropertyName(Component.class, "color");
 	/**The bound property of the layout constraints.*/
@@ -103,16 +105,14 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	/**The character used to combine hierarchical IDs.*/
 	public final static char ID_SEGMENT_DELIMITER='.';
 
-	/**@return The data model used by this component.*/
-//TODO del	public Model getModel();
-
-	/**@return The name of the component, not guaranteed to be unique and useful only for searching for components within a component sub-hierarchy, or <code>null</code> if the component has no name.*/
+	/**@return The name of the component, not guaranteed to be unique (but guaranteed not to be the empty string) and useful only for searching for components within a component sub-hierarchy, or <code>null</code> if the component has no name.*/
 	public String getName();
 
 	/**Sets the name of the component.
 	This is a bound property.
 	@param newName The new name of the component, or <code>null</code> if the component should have no name.
-	@see #NAME_PROPERTY 
+	@exception IllegalArgumentException if the given name is the empty string.
+	@see #NAME_PROPERTY
 	*/
 	public void setName(final String newName);
 

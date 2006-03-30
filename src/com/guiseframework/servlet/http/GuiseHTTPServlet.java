@@ -54,7 +54,6 @@ import com.garretwilson.text.xml.xpath.PathExpression;
 import com.garretwilson.text.xml.xpath.XPath;
 import com.garretwilson.util.*;
 import com.guiseframework.*;
-import com.guiseframework.Bookmark.Parameter;
 import com.guiseframework.component.*;
 import com.guiseframework.component.transfer.*;
 import com.guiseframework.context.GuiseContext;
@@ -415,11 +414,13 @@ Debug.info("content type:", request.getContentType());
 					
 					final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
 					
+Debug.trace("Before getting navivation panel, bookmark is", bookmark);
+					
 					final NavigationPanel<?> navigationPanel=guiseSession.getNavigationPanel(navigationPath);	//get the panel bound to the requested path
 					if(navigationPanel!=null)	//if we found a frame class for this address
 					{
 						guiseSession.getApplicationFrame().setContent(navigationPanel);	//place the navigation panel in the application frame
-						
+
 						setNoCache(response);	//TODO testing; fix; update method
 
 						final List<ControlEvent> controlEvents=getControlEvents(request);	//get all control events from the request
@@ -449,6 +450,47 @@ Debug.info("content type:", request.getContentType());
 						{
 							throw new HTTPMovedTemporarilyException(guiseContext.getNavigationURI());	//redirect to the same page, which will generate a new request with no POST parameters, which would likely change the principal again)
 						}
+						
+						
+						
+						
+//TODO testing new section; combine with AJAX section						
+/*TODO fix; combine						
+						
+						final Bookmark newBookmark=guiseSession.getBookmark();	//see if the bookmark has changed
+Debug.trace("after getting navigation panel, bookmark is", newBookmark);
+						final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
+						if(requestedNavigation!=null || !ObjectUtilities.equals(bookmark, newBookmark))	//if navigation is requested or the bookmark has changed, redirect the browser
+						{
+							final String redirectURIString;	//we'll determine where to direct to
+							if(requestedNavigation!=null)	//if navigation is requested
+							{
+								final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
+			//TODO del Debug.trace("navigation requested to", requestedNavigationURI);
+								guiseSession.clearRequestedNavigation();	//remove any navigation requests
+								if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
+								{
+									beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation)requestedNavigation);	//begin the modal navigation
+								}
+								redirectURIString=requestedNavigationURI.toString();	//we already have the destination URI
+							}
+							else	//if navigation is not requested, request a navigation to the new bookmark location
+							{
+								redirectURIString=request.getRequestURL().append(newBookmark).toString();	//save the string form of the constructed bookmark URI
+							}
+						}
+						if(requestedNavigation!=null)	//if navigation was requested (i.e. this isn't just a bookmark registration)
+						{
+Debug.trace("have new requested navigation:", requestedNavigation);
+							final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
+							//TODO fix to work with other viewports
+							throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
+						}
+*/
+						
+						
+						
+						
 						final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
 						if(requestedNavigation!=null)	//if navigation is requested
 						{
@@ -462,6 +504,7 @@ Debug.info("content type:", request.getContentType());
 							//TODO fix to work with other viewports
 							throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
 						}
+
 						synchronizeCookies(request, response, guiseSession);	//synchronize the cookies going out in the response; do this before anything is written back to the client
 						guiseSession.getApplicationFrame().updateView(guiseContext);		//tell the application frame to update its view
 					}
@@ -593,11 +636,6 @@ for(final Component<?> affectedComponent:affectedComponents)
 					}
 					else	//if navigation is not requested, request a navigation to the new bookmark location
 					{
-/*TODO del
-						final StringBuffer stringBuffer=request.getRequestURL();	//get the request URL
-						stringBuffer.append(createURIQuery(newBookmark));	//append a query representing the bookmark
-Debug.trace("created bookmark URI from request URL", request.getRequestURL(), "and", createURIQuery(newBookmark));
-*/
 						redirectURIString=request.getRequestURL().append(newBookmark).toString();	//save the string form of the constructed bookmark URI
 					}
 					//TODO ifAJAX()
@@ -1260,8 +1298,9 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	protected static Bookmark getBookmark(final HttpServletRequest request)
 	{
 		final String queryString=request.getQueryString();	//get the query string from the request
-		if(queryString!=null)	//if there is a query string
+		if(queryString!=null && queryString.length()>0)	//if there is a query string (Tomcat 5.5.16 returns an empty string for no query, even though the Java Servlet specification 2.4 says that it should return null)
 		{
+//TODO del Debug.trace("just got query string from request, length", queryString.length(), "content", queryString);
 			final NameValuePair<String, String>[] parameters=getParameters(queryString);	//get the parameters from the query string
 			final Bookmark.Parameter[] bookmarkParameters=new Bookmark.Parameter[parameters.length];	//create a new array of bookmark parameters
 			for(int i=parameters.length-1; i>=0; --i)	//for each parameter
@@ -1273,6 +1312,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 		}
 		else	//if there is no query string, there is no bookmark
 		{
+//TODO del Debug.trace("just got null query string from request");
 			return null;	//indicate that there is no bookmark information
 		}
 	}

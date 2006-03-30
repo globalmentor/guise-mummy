@@ -3,6 +3,7 @@ package com.guiseframework.component;
 import static com.guiseframework.GuiseResourceConstants.*;
 
 import com.garretwilson.util.Debug;
+import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.CardLayout;
 import com.guiseframework.component.layout.Constraints;
@@ -177,7 +178,20 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
 	*/
 	public Component<?> getPrevious()
 	{
-		final int selectedIndex=getSelectedIndex();	//get the selected index
+		final Component<?> selectedComponent=getSelectedValue();	//get the selected component
+		return selectedComponent!=null ? getPrevious(selectedComponent) : null;	//return the previous component of the selected component, or null if no component is selected
+	}
+
+	/**Determines the previous component in the sequence relative to the given component.
+	Components that are not displayed or not enabled based upon their associated constraints are skipped.
+	@param component The component the previous component to which should be found.
+	@return The previous component in the sequence, or <code>null</code> if there is no previous component in the sequence.
+	@exception NullPointerException if the given component is <code>null</code>.
+	*/
+	protected Component<?> getPrevious(final Component<?> component)
+	{
+			//TODO check for null and throw an exception instead of this lenient check
+		final int selectedIndex=indexOf(component);	//get the index of the given component
 		if(selectedIndex>=0)	//if a card is selected
 		{
 			for(int i=selectedIndex-1; i>=0; --i)	//for each previous card
@@ -319,6 +333,72 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
 				}
 			}
 		}		
+	}
+
+	/**Determines the component for navigation based upon the given bookmark parameter value.
+	This version finds the first previous enabled and displayed card, searching backwards from the requested card, if the requested card is not enabled and displayed.
+	This version chooses the first card if no card is requested.
+	@param bookmarkName The bookmark parameter value for which a component should be returned.
+	@return The child component indicated by the given bookmark parameter value, or <code>null</code> if the given bookmark name represents the <code>null</code> component value.
+	@exception NullPointerException if the given bookmark name is <code>null</code>.
+	*/
+/*TODO del when works
+	protected Component<?> getComponentByBookmarkName(final String bookmarkName)
+	{
+		Component<?> component=super.getComponentByBookmarkName(bookmarkName);	//get the requested component
+		if(component!=null)	//if a component was requested
+		{
+			if(!isDisplayed(component) || !isEnabled(component))	//if the component is not displayed or not enabled
+			{
+				component=getPrevious(component);	//get the previous component
+			}			
+		}
+		else	//if no component was requested
+		{
+			if(size()>0)	//if this panel has components
+			{
+				component=get(0);	//automatically choose the first card
+			}
+		}
+		return component;	//return the determined component 
+	}
+*/
+
+	/**Determines the component for navigation based upon the given bookmark.
+	This version finds the first previous enabled and displayed card, searching backwards from the requested card, if the requested card is not enabled and displayed.
+	This version chooses the first card if no card is requested.
+	@param bookmark The bookmark for which a component should be returned, or <code>null</code> if no bookmark is available.
+	@return The child component indicated by the given bookmark parameter value, or <code>null</code> if the given bookmark represents the <code>null</code> component value.
+	*/
+	protected Component<?> getComponent(final Bookmark bookmark)
+	{
+			//choose the first card if no card was specified
+		final String parameterValue;	//see if there is a parameter value
+		if(bookmark!=null)	//if there is a bookmark
+		{
+			final String parameterName=getName();	//use this component's name as the bookmark parameter name
+			parameterValue=parameterName!=null ? bookmark.getParameterValue(parameterName) : null;	//get the parameter value if there is a parameter name
+		}
+		else	//if there is no bookmark
+		{
+			parameterValue=null;	//there is no parameter value
+		}
+		if(parameterValue==null)	//if no parameter for this component was specified
+		{
+			if(size()>0)	//if this panel has components
+			{
+				return get(0);	//automatically choose the first card
+			}
+		}
+		Component<?> component=super.getComponent(bookmark);	//get the requested component normally
+		if(component!=null)	//if a component was requested
+		{
+			if(!isDisplayed(component) || !isEnabled(component))	//if the component is not displayed or not enabled
+			{
+				component=getPrevious(component);	//get the previous component
+			}			
+		}
+		return component;	//return the determined component 
 	}
 
 	/**A validator that validates cards before changing to new cards.

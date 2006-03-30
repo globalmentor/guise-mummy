@@ -53,21 +53,26 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**@return The label model used by this component.*/
 		protected LabelModel getLabelModel() {return labelModel;}
 
-	/**The name of the component, not guaranteed to be unique and useful only for searching for components within a component sub-hierarchy, or <code>null</code> if the component has no name.*/
+	/**The name of the component, not guaranteed to be unique (but guaranteed not to be the empty string) and useful only for searching for components within a component sub-hierarchy, or <code>null</code> if the component has no name.*/
 	private String name=null;
 
-		/**@return The name of the component, not guaranteed to be unique and useful only for searching for components within a component sub-hierarchy, or <code>null</code> if the component has no name.*/
+		/**@return The name of the component, not guaranteed to be unique (but guaranteed not to be the empty string) and useful only for searching for components within a component sub-hierarchy, or <code>null</code> if the component has no name.*/
 		public String getName() {return name;}
 
 		/**Sets the name of the component.
 		This is a bound property.
 		@param newName The new name of the component, or <code>null</code> if the component should have no name.
-		@see #NAME_PROPERTY 
+		@exception IllegalArgumentException if the given name is the empty string.
+		@see #NAME_PROPERTY
 		*/
 		public void setName(final String newName)
 		{
 			if(!ObjectUtilities.equals(name, newName))	//if the value is really changing
 			{
+				if(newName!=null && newName.length()==0)	//if the empty string was passed
+				{
+					throw new IllegalArgumentException("Name cannot be the empty string.");
+				}
 				final String oldName=name;	//get the old value
 				name=newName;	//actually change the value
 				firePropertyChange(NAME_PROPERTY, oldName, newName);	//indicate that the value changed
