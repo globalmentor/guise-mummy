@@ -8,6 +8,7 @@ import com.garretwilson.rdf.RDFLiteral;
 import com.garretwilson.rdf.RDFResource;
 import com.garretwilson.rdf.rdfs.RDFSUtilities;
 import com.garretwilson.util.Debug;
+import com.globalmentor.marmot.guise.repository.RepositoryResourceTreeNodeModel;
 import com.globalmentor.marmot.repository.Repository;
 import com.globalmentor.marmot.repository.webdav.WebDAVRepository;
 import com.guiseframework.GuiseSession;
@@ -107,7 +108,7 @@ catch(final ValidationException validationException)
 									final List<RDFResource> rootResources=repository.getChildResourceDescriptions(repositoryURI);
 									for(final RDFResource resource:rootResources)
 									{
-										treeControl.getRootNode().add(new RDFResourceTreeNodeModel(session, null, resource));
+										treeControl.getRootNode().add(new RepositoryResourceTreeNodeModel(session, repository, resource));
 									}
 							}
 							catch(final IOException ioException)

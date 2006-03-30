@@ -17,15 +17,24 @@ public class RDFLiteralTreeNodeModel extends DefaultTreeNodeModel<RDFLiteral> im
 
 	/**Session constructor with no initial value.
 	@param session The Guise session that owns this model.
-	@param rdfProperty The property of which this object is a resource, or <code>null</code> if this object should not be considered the object of any property.
 	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public RDFLiteralTreeNodeModel(final GuiseSession session, final RDFResource rdfProperty)
+	public RDFLiteralTreeNodeModel(final GuiseSession session)
 	{
-		this(session, rdfProperty, null);	//construct the class with a null initial value
+		this(session, null);	//construct the class with no initial value
 	}
 
 	/**Session and initial value constructor.
+	@param session The Guise session that owns this model.
+	@param initialValue The initial value, which will not be validated.
+	@exception NullPointerException if the given session is <code>null</code>.
+	*/
+	public RDFLiteralTreeNodeModel(final GuiseSession session, final RDFLiteral initialValue)
+	{
+		this(session, null, initialValue);	//construct the class with a null initial value
+	}
+
+	/**Session, property, and initial value constructor.
 	@param session The Guise session that owns this model.
 	@param rdfProperty The property of which this object is a resource, or <code>null</code> if this object should not be considered the object of any property.
 	@param initialValue The initial value, which will not be validated.
