@@ -76,6 +76,7 @@ public abstract class AbstractCardPanel<C extends Panel<C> & CardControl<C>> ext
 	protected void updateBookmark()
 	{
 //TODO del Debug.trace("ready to update bookmarks");
+Debug.trace("ready to update bookmarks, bookmarks enabled", isBookmarkEnabled(), "name", getName());
 		if(isBookmarkEnabled())	//if bookmarks are enabled
 		{
 			final String name=getName();	//get the component name

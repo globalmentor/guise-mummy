@@ -20,6 +20,9 @@ public abstract class AbstractMultipleCompositeComponent<C extends CompositeComp
 	/**@return Whether this component has children.*/
 	public boolean hasChildren() {return !idComponentMap.isEmpty();}
 
+	/**@return The number of child components in this composite component.*/
+	public int size() {return idComponentMap.size();}
+	
 	/**@return An iterator to child components.*/
 	public Iterator<Component<?>> iterator() {return idComponentMap.values().iterator();}
 

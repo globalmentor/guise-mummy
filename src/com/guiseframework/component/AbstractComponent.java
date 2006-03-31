@@ -9,7 +9,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.mail.internet.ContentType;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.garretwilson.util.Debug;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.effect.*;
 import com.guiseframework.component.layout.*;
@@ -1353,7 +1352,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	@param component The component that should be checked, along with its descendants, for out-of-date views.
 	@return The components with views needing to be updated. 
 	*/
-	public static Collection<Component<?>> getDirtyComponents(final Component<?> component)
+	public static List<Component<?>> getDirtyComponents(final Component<?> component)
 	{
 		return getDirtyComponents(component, new ArrayList<Component<?>>());	//gather dirty components and put them in a list
 	}
@@ -1362,10 +1361,10 @@ Debug.trace("now valid of", this, "is", isValid());
 	This method checks the given component and all descendant components.
 	If a given component is dirty, its child views will not be checked.
 	@param component The component that should be checked, along with its descendants, for out-of-date views.
-	@param dirtyComponents The collection that will be updated with more dirty components if any are found.
+	@param dirtyComponents The list that will be updated with more dirty components if any are found.
 	@return The components with views needing to be updated. 
 	*/
-	public static Collection<Component<?>> getDirtyComponents(final Component<?> component, final Collection<Component<?>> dirtyComponents)
+	public static List<Component<?>> getDirtyComponents(final Component<?> component, final List<Component<?>> dirtyComponents)
 	{
 		if(!component.getView().isUpdated())	//if this component's view isn't updated
 		{
@@ -1396,6 +1395,39 @@ Debug.trace("now valid of", this, "is", isValid());
 		}
 	}
 
+	/**Retrieves the the notifications of all components in a hierarchy.
+	This method checks the given component and all descendant components.
+	@param component The component from which, along with its descendants, notifications should be retrieved.
+	@return The notifications of all components in the hierarchy. 
+	*/
+	public static List<Notification> getNotifications(final Component<?> component)
+	{
+		return getNotifications(component, new ArrayList<Notification>());	//gather notifications and put them in a list
+	}
+
+	/**Retrieves the the notifications of all components in a hierarchy.
+	This method checks the given component and all descendant components.
+	@param component The component from which, along with its descendants, notifications should be retrieved.
+	@param notifications The list that will be updated with more dirty components if any are found.
+	@return The notifications of all components in the hierarchy. 
+	*/
+	public static List<Notification> getNotifications(final Component<?> component, final List<Notification> notifications)
+	{
+		final Notification notification=component.getNotification();	//get the component's notification, if any
+		if(notification!=null)	//if a notification is available
+		{
+			notifications.add(notification);	//add this notification to the list
+		}
+		if(component instanceof CompositeComponent)	//if the component is a composite component, check its children
+		{
+			for(final Component<?> childComponent:(CompositeComponent<?>)component)	//for each child component
+			{
+				getNotifications(childComponent, notifications);	//gather notifications from this child hierarchy
+			}
+		}
+		return notifications;
+	}
+	
 	/**Determines a URI value either explicitly set or stored in the resources.
 	If a value is explicitly specified, it will be used; otherwise, a value will be loaded from the resources if possible.
 	A resource will be retrieved first using an appended physical axis designator (".x" or ".y") based upon the given flow, if any.

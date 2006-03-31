@@ -827,6 +827,7 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 					final PLOOPProcessor ploopProcessor=new PLOOPProcessor(this);	//create a new PLOOP processor, passing the Guise session to use as a default constructor argument					
 					ploopProcessor.initializeObject(component, componentResource);	//initialize the component from this resource
 					component.initialize();	//initialize the component
+					ploopProcessor.getObjects(rdf);	//make sure all described Java objects in the RDF instance have been created
 				}
 				else	//if there is no resource of the appropriate type
 				{

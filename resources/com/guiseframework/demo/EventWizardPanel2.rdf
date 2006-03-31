@@ -2,6 +2,7 @@
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:property="http://ploop.org/namespaces/property#"
 	xmlns:component="java:com.guiseframework.component."
+	xmlns:coupler="java:com.guiseframework.coupler."
 	xmlns:layout="java:com.guiseframework.component.layout."
 	xmlns:model="java:com.guiseframework.model."
 	xmlns:validator="java:com.guiseframework.validator."
@@ -12,23 +13,48 @@
 		<property:label>Guise\u2122 Demonstration: Event Wizard</property:label>
 		<property:children rdf:parseType="Collection">
 			<component:Heading property:level="0" property:label="Event Planner Wizard"/>
-			<!-- personal tab -->			
 			<component:LayoutPanel>
 				<property:layout><layout:RegionLayout/></property:layout>
 				<property:children rdf:parseType="Collection">
-					<component:SequenceCardPanel>	<!-- cards -->
+					<component:SequenceCardPanel property:name="wizardCardPanel" property:bookmarkEnabled="true">	<!-- cards -->
 						<property:constraints><layout:RegionConstraints property:region="CENTER"/></property:constraints>
 						<property:children rdf:parseType="Collection">
 							<component:LayoutPanel rdf:nodeID="personalNamePanel"/>
+							<component:LayoutPanel rdf:nodeID="personalAgePanel"/>
+							<component:LayoutPanel rdf:nodeID="personalEmailPanel"/>
+							<component:LayoutPanel rdf:nodeID="businessNamePanel"/>
+							<component:LayoutPanel rdf:nodeID="businessAddressPanel"/>
+							<component:LayoutPanel rdf:nodeID="eventNamePanel"/>
 						</property:children>
 					</component:SequenceCardPanel>					
 					<component:LayoutPanel>	<!-- links -->
 						<property:constraints><layout:RegionConstraints property:region="LINE_START"/></property:constraints>
 						<property:children rdf:parseType="Collection">
-							<component:Link property:label="1. Personal"/>
-							<component:TaskStatusSelectLink property:label="Name"/>
-							<component:TaskStatusSelectLink property:label="Age"/>
-							<component:TaskStatusSelectLink property:label="Email"/>
+							<component:Link rdf:nodeID="personalLink10" property:label="1. Personal"/>
+							<component:TaskStatusSelectLink rdf:nodeID="personalLink11" property:label="Name"/>
+							<component:TaskStatusSelectLink rdf:nodeID="personalLink12" property:label="Age"/>
+							<component:TaskStatusSelectLink rdf:nodeID="personalLink13" property:label="Email"/>
+							<component:Link rdf:nodeID="personalLink20" property:label="2. Business"/>
+							<component:TaskStatusSelectLink rdf:nodeID="personalLink21" property:label="Name"/>
+							<component:TaskStatusSelectLink rdf:nodeID="personalLink22" property:label="Address"/>
+							<component:Link rdf:nodeID="personalLink30" property:label="3. Event"/>
+							<component:TaskStatusSelectLink rdf:nodeID="personalLink31" property:label="Name"/>
+						</property:children>
+					</component:LayoutPanel>
+					<component:TabContainerControl rdf:nodeID="wizardTabContainerControl" property:axis="LINE">	<!-- tabs -->
+						<property:constraints><layout:RegionConstraints property:region="PAGE_START"/></property:constraints>
+						<property:children rdf:parseType="Collection">
+							<component:Label rdf:nodeID="personalTabLabel" property:label="Personal"/>
+							<component:Label rdf:nodeID="businessTabLabel" property:label="Business"/>
+							<component:Label rdf:nodeID="eventTabLabel" property:label="Event"/>
+						</property:children>
+					</component:TabContainerControl>
+					<component:LayoutPanel>	<!-- buttons -->
+						<property:layout><layout:FlowLayout property:flow="LINE"/></property:layout>
+						<property:constraints><layout:RegionConstraints property:region="PAGE_END"/></property:constraints>
+						<property:children rdf:parseType="Collection">
+							<component:Button property:name="previousButton" property:label="Previous"/>
+							<component:Button property:name="nextButton" property:label="Next"/>
 						</property:children>
 					</component:LayoutPanel>
 				</property:children>
@@ -46,8 +72,133 @@
 			<component:TextControl property:valueClass="java.lang.String" property:label="Last Name">
 				<property:validator><validator:RegularExpressionStringValidator property:pattern="\S+.*" property:valueRequired="true"/></property:validator>
 			</component:TextControl>
-			<component:CheckControl property:name="ageCheckControl" property:label="I want to tell you my age"/>
+			<component:CheckControl property:name="ageCheckControl" property:label="I want to tell you my age">
+				<property:value rdf:datatype="java:java.lang.Boolean">true</property:value>
+			</component:CheckControl>
 		</property:children>
 	</component:LayoutPanel>
 
+	<component:LayoutPanel rdf:nodeID="personalAgePanel" property:name="personalAgePanel">
+		<property:constraints><layout:TaskCardConstraints/></property:constraints>
+		<property:children rdf:parseType="Collection">
+			<component:Heading property:level="1" property:label="Personal Information: Age"/>
+			<component:TextControl property:valueClass="java.lang.Integer" property:label="Age">
+				<property:validator><validator:ValueRequiredValidator/></property:validator>
+			</component:TextControl>
+		</property:children>
+	</component:LayoutPanel>
+
+	<component:LayoutPanel rdf:nodeID="personalEmailPanel" property:name="personalEmailPanel">
+		<property:constraints><layout:TaskCardConstraints/></property:constraints>
+		<property:children rdf:parseType="Collection">
+			<component:Heading property:level="1" property:label="Personal Information: Email"/>
+			<component:TextControl property:valueClass="java.lang.String" property:label="Email">
+				<property:validator><validator:RegularExpressionStringValidator property:pattern=".+@.+\.[a-z]+" property:valueRequired="true"/></property:validator>
+			</component:TextControl>
+		</property:children>
+	</component:LayoutPanel>
+
+	<component:LayoutPanel rdf:nodeID="businessNamePanel" property:name="businessNamePanel">
+		<property:constraints><layout:TaskCardConstraints/></property:constraints>
+		<property:children rdf:parseType="Collection">
+			<component:Heading property:level="1" property:label="Business Information: Name"/>
+			<component:TextControl property:valueClass="java.lang.String" property:label="Business Name">
+				<property:validator><validator:RegularExpressionStringValidator property:pattern="\S+.*" property:valueRequired="true"/></property:validator>
+			</component:TextControl>
+		</property:children>
+	</component:LayoutPanel>
+
+	<component:LayoutPanel rdf:nodeID="businessAddressPanel" property:name="businessAddressPanel">
+		<property:constraints><layout:TaskCardConstraints/></property:constraints>
+		<property:children rdf:parseType="Collection">
+			<component:Heading property:level="1" property:label="Business Information: Address"/>
+			<component:TextAreaControl property:valueClass="java.lang.String" property:rowCount="4" property:columnCount="40" property:label="Business Address">
+				<property:validator><validator:RegularExpressionStringValidator property:pattern="\S+.*" property:valueRequired="true"/></property:validator>
+			</component:TextAreaControl>
+		</property:children>
+	</component:LayoutPanel>
+
+	<component:LayoutPanel rdf:nodeID="eventNamePanel" property:name="eventNamePanel">
+		<property:constraints><layout:TaskCardConstraints/></property:constraints>
+		<property:children rdf:parseType="Collection">
+			<component:Heading property:level="1" property:label="Event Information: Name"/>
+			<component:TextControl property:valueClass="java.lang.String" property:label="Event Name">
+				<property:validator><validator:RegularExpressionStringValidator property:pattern="\S+.*" property:valueRequired="true"/></property:validator>
+			</component:TextControl>
+		</property:children>
+	</component:LayoutPanel>
+
+	<!-- wizard link couplers -->
+	<coupler:ActionCardCoupler>
+		<property:action rdf:nodeID="personalLink10"/>
+		<property:card rdf:nodeID="personalNamePanel"/>
+	</coupler:ActionCardCoupler>
+
+	<coupler:ActionCardCoupler>
+		<property:action rdf:nodeID="personalLink11"/>
+		<property:card rdf:nodeID="personalNamePanel"/>
+	</coupler:ActionCardCoupler>
+
+	<coupler:ActionCardCoupler>
+		<property:action rdf:nodeID="personalLink12"/>
+		<property:card rdf:nodeID="personalAgePanel"/>
+	</coupler:ActionCardCoupler>
+
+	<coupler:ActionCardCoupler>
+		<property:action rdf:nodeID="personalLink13"/>
+		<property:card rdf:nodeID="personalEmailPanel"/>
+	</coupler:ActionCardCoupler>
+
+	<coupler:ActionCardCoupler>
+		<property:action rdf:nodeID="personalLink20"/>
+		<property:card rdf:nodeID="businessNamePanel"/>
+	</coupler:ActionCardCoupler>
+
+	<coupler:ActionCardCoupler>
+		<property:action rdf:nodeID="personalLink21"/>
+		<property:card rdf:nodeID="businessNamePanel"/>
+	</coupler:ActionCardCoupler>
+
+	<coupler:ActionCardCoupler>
+		<property:action rdf:nodeID="personalLink22"/>
+		<property:card rdf:nodeID="businessAddressPanel"/>
+	</coupler:ActionCardCoupler>
+
+	<coupler:ActionCardCoupler>
+		<property:action rdf:nodeID="personalLink30"/>
+		<property:card rdf:nodeID="eventNamePanel"/>
+	</coupler:ActionCardCoupler>
+
+	<coupler:ActionCardCoupler>
+		<property:action rdf:nodeID="personalLink31"/>
+		<property:card rdf:nodeID="eventNamePanel"/>
+	</coupler:ActionCardCoupler>
+
+	<!-- wizard tab couplers -->
+	<coupler:ListSelectCardCoupler>
+		<property:listSelect rdf:nodeID="wizardTabContainerControl"/>
+		<property:value rdf:nodeID="personalTabLabel"/>
+		<property:cards rdf:parseType="Collection">
+			<component:LayoutPanel rdf:nodeID="personalNamePanel"/>
+			<component:LayoutPanel rdf:nodeID="personalAgePanel"/>
+			<component:LayoutPanel rdf:nodeID="personalEmailPanel"/>
+		</property:cards>
+	</coupler:ListSelectCardCoupler>
+
+	<coupler:ListSelectCardCoupler>
+		<property:listSelect rdf:nodeID="wizardTabContainerControl"/>
+		<property:value rdf:nodeID="businessTabLabel"/>
+		<property:cards rdf:parseType="Collection">
+			<component:LayoutPanel rdf:nodeID="businessNamePanel"/>
+			<component:LayoutPanel rdf:nodeID="businessAddressPanel"/>
+		</property:cards>
+	</coupler:ListSelectCardCoupler>
+
+	<coupler:ListSelectCardCoupler>
+		<property:listSelect rdf:nodeID="wizardTabContainerControl"/>
+		<property:value rdf:nodeID="eventTabLabel"/>
+		<property:cards rdf:parseType="Collection">
+			<component:LayoutPanel rdf:nodeID="eventNamePanel"/>		
+		</property:cards>
+	</coupler:ListSelectCardCoupler>
 </rdf:RDF>

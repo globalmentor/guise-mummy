@@ -64,9 +64,6 @@ public interface Container<C extends Container<C>> extends CompositeComponent<C>
 	*/
 	public Component<?> remove(final int index);
 
-	/**@return The number of child components in this container.*/
-	public int size();
-
 	/**@return Whether this container contains no child components.*/
 	public boolean isEmpty();
 

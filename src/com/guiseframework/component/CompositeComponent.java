@@ -11,6 +11,9 @@ public interface CompositeComponent<C extends CompositeComponent<C>> extends Com
 	/**@return Whether this component has children.*/
 	public boolean hasChildren();
 
+	/**@return The number of child components in this composite component.*/
+	public int size();
+
 	/**Retrieves the child component with the given ID.
 	@param id The ID of the component to return.
 	@return The child component with the given ID, or <code>null</code> if there is no child component with the given ID. 

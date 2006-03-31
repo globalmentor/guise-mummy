@@ -2,6 +2,8 @@ package com.guiseframework.component;
 
 import static com.guiseframework.GuiseResourceConstants.*;
 
+import java.util.List;
+
 import com.garretwilson.util.Debug;
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseSession;
@@ -278,33 +280,24 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
 		final Component<?> nextCard=getNext();	//get the next card
 		if(nextCard!=null)	//if there is a next card
 		{
-			try
-			{
-				final Component<?> selectedCard=getSelectedValue();	//get the selected card
-				assert selectedCard!=null : "No card selected, even though getNext() should have returned null if no card is selected.";
+			final Component<?> selectedCard=getSelectedValue();	//get the selected card
+			assert selectedCard!=null : "No card selected, even though getNext() should have returned null if no card is selected.";
 //TODO del Debug.trace("ready to validate selected card");
-				if(selectedCard.validate())	//validate the selected card; if the selected card is valid
+			if(validate())	//validate this panel; if everything, including the selected card, is valid
+			{
+				final Constraints nextCardConstraints=nextCard.getConstraints();	//get the next card's constraints
+				if(nextCardConstraints instanceof Enableable)	//if the next card constraints is enableable
 				{
-					final Constraints nextCardConstraints=nextCard.getConstraints();	//get the next card's constraints
-					if(nextCardConstraints instanceof Enableable)	//if the next card constraints is enableable
-					{
-						((Enableable)nextCardConstraints).setEnabled(true);	//enable the next card constraints
-					}
+					((Enableable)nextCardConstraints).setEnabled(true);	//enable the next card constraints
+				}
+				try
+				{
 					setValue(nextCard);	//select the next card
 				}
-				else	//if the current card doesn't validate
+				catch(final ValidationException validationException)
 				{
-					final Constraints constraints=selectedCard.getConstraints();	//get the current card constraints
-					if(constraints instanceof TaskCardConstraints)	//if these are task card constraints
-					{
-						((TaskCardConstraints)constraints).setTaskStatus(TaskStatus.ERROR);	//set the task status to error
-					}
-					getSession().notify(new Notification(null, VALIDATION_FALSE_MESSAGE_RESOURCE_KEY, Notification.Severity.ERROR));	//indicate that there was a validation error
-				}				
-			}
-			catch(final ValidationException validationException)
-			{
-//				throw new AssertionError(validationException);	//TODO improve
+//					throw new AssertionError(validationException);	//TODO improve
+				}
 			}
 		}
 	}
@@ -335,34 +328,43 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
 		}		
 	}
 
-	/**Determines the component for navigation based upon the given bookmark parameter value.
-	This version finds the first previous enabled and displayed card, searching backwards from the requested card, if the requested card is not enabled and displayed.
-	This version chooses the first card if no card is requested.
-	@param bookmarkName The bookmark parameter value for which a component should be returned.
-	@return The child component indicated by the given bookmark parameter value, or <code>null</code> if the given bookmark name represents the <code>null</code> component value.
-	@exception NullPointerException if the given bookmark name is <code>null</code>.
+	/**Validates the user input of this component and all child components.
+	The component will be updated with error information.
+	If the component doesn't validate and there is a selected card the constraints of which implement {@link TaskCardConstraints}, the task status of those constraints will be
+		set to {@link TaskStatus#ERROR}.
+	The user is also notified of any error, using this component's notification, the first notification in the selected card hierarchy, or a default message.
+	@return The current state of {@link #isValid()} as a convenience.
 	*/
-/*TODO del when works
-	protected Component<?> getComponentByBookmarkName(final String bookmarkName)
+	public boolean validate()
 	{
-		Component<?> component=super.getComponentByBookmarkName(bookmarkName);	//get the requested component
-		if(component!=null)	//if a component was requested
+		if(!super.validate())	//validate the component normally; if the component does not validate
 		{
-			if(!isDisplayed(component) || !isEnabled(component))	//if the component is not displayed or not enabled
+			Notification notification=getNotification();	//see if this panel has any notification
+			final Component<?> selectedCard=getValue();	//get the selected card
+			if(selectedCard!=null)	//if there is a selected card
 			{
-				component=getPrevious(component);	//get the previous component
-			}			
-		}
-		else	//if no component was requested
-		{
-			if(size()>0)	//if this panel has components
-			{
-				component=get(0);	//automatically choose the first card
+				final Constraints constraints=selectedCard.getConstraints();	//get the current card constraints
+				if(constraints instanceof TaskCardConstraints)	//if these are task card constraints
+				{
+					((TaskCardConstraints)constraints).setTaskStatus(TaskStatus.ERROR);	//set the task status to error
+				}
+				if(notification==null)	//if we don't have a notification
+				{
+					final List<Notification> notifications=getNotifications(selectedCard);	//get the notifications from the card
+					if(!notifications.isEmpty())	//if there are notifications
+					{
+						notification=notifications.get(0);	//use the first notification
+					}
+				}
 			}
+			if(notification==null)	//if we didn't find a custom notification
+			{
+				notification=new Notification(null, VALIDATION_FALSE_MESSAGE_RESOURCE_KEY, Notification.Severity.ERROR);	//use a general validation notification
+			}
+			getSession().notify(notification);	//indicate that there was a validation error
 		}
-		return component;	//return the determined component 
+		return isValid();	//return the current valid state
 	}
-*/
 
 	/**Determines the component for navigation based upon the given bookmark.
 	This version finds the first previous enabled and displayed card, searching backwards from the requested card, if the requested card is not enabled and displayed.
@@ -440,14 +442,8 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
 				}
 				if(newIndex>selectedIndex)	//if we're advancing forward in the sequence
 				{
-					if(!currentCard.validate())	//validate the currently selected card; if the currently selected card doesn't validate
+					if(!SequenceCardPanel.this.validate())	//validate the panel; if anything, including the currently selected card, doesn't validate
 					{
-						final Constraints constraints=currentCard.getConstraints();	//get the current card constraints
-						if(constraints instanceof TaskCardConstraints)	//if these are task card constraints
-						{
-							((TaskCardConstraints)constraints).setTaskStatus(TaskStatus.ERROR);	//set the task status to error
-						}
-						getSession().notify(new Notification(null, VALIDATION_FALSE_MESSAGE_RESOURCE_KEY, Notification.Severity.ERROR));	//indicate that there was a validation error
 						return false;	//don't go forward
 					}									
 				}

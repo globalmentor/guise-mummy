@@ -63,6 +63,15 @@ public class TabContainerControl extends AbstractListSelectContainerControl<TabC
 			}
 		}
 
+	/**Session constructor with default {@link Flow#LINE} axis orientation.
+	@param session The Guise session that owns this component.
+	@exception NullPointerException if the given session is <code>null</code>.
+	*/
+	public TabContainerControl(final GuiseSession session)
+	{
+		this(session, Flow.LINE);	//default to line axis orientation
+	}
+
 	/**Session and axis constructor.
 	@param session The Guise session that owns this component.
 	@param axis The axis along which the tabs are oriented.
