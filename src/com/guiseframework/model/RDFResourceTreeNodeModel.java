@@ -31,7 +31,8 @@ public class RDFResourceTreeNodeModel extends DynamicTreeNodeModel<RDFResource> 
 		}
 		else	//if child nodes are not loaded
 		{
-			return getValue().getPropertyCount()>0;	//there are children if there are resource properties
+			final RDFResource rdfResource=getValue();	//get the resource we represent
+			return rdfResource!=null ? rdfResource.getPropertyCount()>0 : false;	//there are children if there is a resource with resource properties
 		}
 	}
 

@@ -3,6 +3,7 @@ package com.guiseframework.model;
 import java.io.IOException;
 import java.util.Iterator;
 
+import com.garretwilson.util.Debug;
 import com.guiseframework.GuiseSession;
 
 /**A node in a tree model that can dynamically load its children when needed.
@@ -13,7 +14,7 @@ import com.guiseframework.GuiseSession;
 @param <V> The type of value contained in the tree node.
 @author Garret Wilson
 */
-public abstract class DynamicTreeNodeModel<V> extends DefaultTreeNodeModel<V>
+public abstract class DynamicTreeNodeModel<V> extends DefaultTreeNodeModel<V>	//TODO update all the caches when the resource value changes
 {
 
 	/**Whether this tree node is predictive, knowing before it loads its child nodes whether and how many child nodes there will be.*/
@@ -28,14 +29,35 @@ public abstract class DynamicTreeNodeModel<V> extends DefaultTreeNodeModel<V>
 		/**@return Whether the child nodes have been loaded.*/
 		public boolean isChildNodesLoaded() {return childNodesLoaded;}
 
+	/**Sets whether the node is expanded, showing its children, if any.
+	This version ensures that child nodes are loaded or unloaded before expansion or collapsing occurs.
+	This is a bound property of type <code>Boolean</code>.
+	@param newExpanded <code>true</code> if the node is expanded
+	@see #EXPANDED_PROPERTY
+	*/
+	public void setExpanded(final boolean newExpanded)
+	{
+		if(newExpanded!=isExpanded());	//if the expansion state is changing
+		{
+			if(newExpanded)	//if the tree node is expanding
+			{
+				ensureChildNodesLoaded();	//make sure children have been loaded				
+			}
+			else	//if the tree node is collapsing
+			{
+				unloadChildNodes();	//unload child nodes, if any
+			}
+		}
+		super.setExpanded(newExpanded);	//expand or collapse normally
+	}
+
 	/**Retrieves an iterator to contained tree nodes.
-	This version ensures that child nodes are loaded before returning the iterator.
 	@return An iterator to contained tree nodes.
 	@see #ensureChildNodesLoaded()
 	*/
 	public Iterator<TreeNodeModel<?>> iterator()
 	{
-		ensureChildNodesLoaded();	//make sure children have been loaded
+//TODO del; we shouldn't load children unless actually requested to, such as when opening		ensureChildNodesLoaded();	//make sure children have been loaded
 		return super.iterator();	//return the iterator to child nodes
 	}
 
@@ -67,7 +89,7 @@ public abstract class DynamicTreeNodeModel<V> extends DefaultTreeNodeModel<V>
 				throw new IllegalStateException("Predictive dynamic tree nodes must override hasChildren() and, if children are not loaded, return whether there would be child nodes were the children loaded.");
 			}
 		}
-		if(!isPredictive())	//if this is not a predictive dynamic tree node
+		if(!isPredictive())	//if this is not a predictive dynamic tree node TODO fix; this will probably result in recursive reloading, until all nodes are loaded, negating the purpose of dynamic tree nodes
 		{
 			ensureChildNodesLoaded();	//make sure child nodes are loaded
 		}
@@ -104,6 +126,7 @@ public abstract class DynamicTreeNodeModel<V> extends DefaultTreeNodeModel<V>
 	*/
 	public void ensureChildNodesLoaded()
 	{
+//TODO del Debug.trace("ensuring child nodes loaded for resource", getValue(), "isChildNodesLoaded()", isChildNodesLoaded());
 		if(!isChildNodesLoaded()) //if the children are not yet loaded
 		{
 			childNodesLoaded=true;  //show that we've loaded the child nodes (this is done before the actual loading so that future calls to getChildCount() won't cause reloading)

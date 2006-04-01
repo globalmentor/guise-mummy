@@ -23,7 +23,7 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 		/**Sets whether the node is expanded, showing its children, if any.
 		This is a bound property of type <code>Boolean</code>.
 		@param newExpanded <code>true</code> if the node is expanded
-		@see TreeNodeModel#EXPANDED_PROPERTY
+		@see #EXPANDED_PROPERTY
 		*/
 		public void setExpanded(final boolean newExpanded)
 		{
