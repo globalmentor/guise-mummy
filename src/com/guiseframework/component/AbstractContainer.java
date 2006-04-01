@@ -2,14 +2,10 @@ package com.guiseframework.component;
 
 import java.util.*;
 
-import static com.garretwilson.util.CollectionUtilities.*;
-
 import com.garretwilson.util.ReverseIterator;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.*;
-import com.guiseframework.event.ContainerEvent;
-import com.guiseframework.event.ContainerListener;
-import com.guiseframework.event.PostponedContainerEvent;
+import com.guiseframework.event.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
@@ -218,12 +214,9 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@return A list of container children in order.
 	@see #iterator()
 	*/
-	@SuppressWarnings("unchecked")	//a cast is needed because a generic wildcard list cannot be created
 	public List<Component<?>> getChildren()
 	{
-		final List<Component<?>> children=(List<Component<?>>)new ArrayList<Component>(size());	//create a list of child components---we already know how many
-		addAll(children, iterator());	//add all our children to the list
-		return children;	//return the list of children
+		return new ArrayList<Component<?>>(getComponentList());	//create and return a copy of the list
 	}
 
 	/**Sets the children in this container.

@@ -1,7 +1,6 @@
 package com.guiseframework.model;
 
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.guiseframework.GuiseSession;
@@ -179,6 +178,31 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 //TODO del or move		setEditable(false);	//default to not being editable
 	}
 
+	/**Returns a list of children.
+	This method along with {@link #setChildren()} provides a <code>children</code> property for alternate children access.
+	@return A list of tree node children in order.
+	@see #iterator()
+	*/
+	public List<TreeNodeModel<?>> getChildren()
+	{
+		return new ArrayList<TreeNodeModel<?>>(getTreeNodeList());	//create and return a copy of the list
+	}
+
+	/**Sets the children in this container.
+	This method along with {@link #getChildren()} provides a <code>children</code> property for alternate children access.
+	@param treeNodes The new children of this tree node in order.
+	@see #clear()
+	@see #add(TreeNodeModel)
+	*/
+	public void setChildren(final List<TreeNodeModel<?>> treeNodes)
+	{
+		clear();	//remove all children from the tree node
+		for(final TreeNodeModel<?> treeNode:treeNodes)	//for each child
+		{
+			add(treeNode);	//add this child
+		}
+	}
+	
 	/**Returns the zero-based depth of the node within in its tree.
 	This result represents the number of levels above this node needed to reach the root node.
 	@return The zero-based depth of this node from the root.
