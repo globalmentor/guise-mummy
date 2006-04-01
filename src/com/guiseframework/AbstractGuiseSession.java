@@ -733,27 +733,7 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 		{
 			throw new IllegalStateException(invocationTargetException);
 		}
-		final String descriptionFilename=addExtension(getLocalName(panelClass), RDF_EXTENSION);	//create a name in the form ClassName.rdf
-		//TODO del Debug.trace("Trying to load description file:", descriptionFilename);
-		final InputStream descriptionInputStream=panelClass.getResourceAsStream(descriptionFilename);	//get an input stream to the description file
-		if(descriptionInputStream!=null)	//if we have a description file
-		{
-			try
-			{
-				try
-				{
-					initializeComponent(panel, descriptionInputStream);	//initialize the panel
-				}
-				finally
-				{
-					descriptionInputStream.close();	//always close the description input stream for good measure
-				}
-			}
-			catch(final IOException ioException)	//if there is an I/O exception
-			{
-				throw new AssertionError(ioException);	//TODO fix better
-			}		
-		}		
+		initializeComponent(panel);	//initialize the navigation panel from an RDF description, if possible
 		return panel;	//return the panel
 	}
 	
@@ -772,6 +752,50 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 		return navigationPathPanelMap.remove(path);	//uncache the panel
 	}
 	
+	/**Initializes a component, optionally with a description in an RDF resource file.
+	This method first tries to load a PLOOP RDF description of the component in an RDF file in the classpath in the same directory with the same name as the class file, with an <code>.rdf</code> extension.
+	That is, for the class <code>MyComponent.class</code> this method first tries to load <code>MyComponent.rdf</code> from the same directory in the classpath.
+	If this is successful, the component is initialized from this RDF description.
+	This implementation calls {@link #initializeComponent(Component, InputStream)}.
+	The component's {@link Component#initialize()} is called whether there is an RDF description.
+	This method synchronizes on {@link #getDocumentBuilder()}.
+	@param component The component to initialize.
+	@exception MissingResourceException if no resource could be found associated with the given key.
+	@exception IllegalArgumentException if the RDF description does not provide a resource description of the same type as the specified component.
+	@exception IllegalStateException if the given component has already been initialized.
+	@see Component#initialize()
+	@see <a href="http://www.ploop.org/">PLOOP</a>
+	*/
+	public void initializeComponent(final Component<?> component)
+	{
+		final Class<?> componentClass=component.getClass();	//get the class of the component
+		final String descriptionFilename=addExtension(getLocalName(componentClass), RDF_EXTENSION);	//create a name in the form ClassName.rdf
+		//TODO del Debug.trace("Trying to load description file:", descriptionFilename);
+		final InputStream descriptionInputStream=componentClass.getResourceAsStream(descriptionFilename);	//get an input stream to the description file
+		if(descriptionInputStream!=null)	//if we have a description file
+		{
+			try
+			{
+				try
+				{
+					initializeComponent(component, descriptionInputStream);	//initialize the component from the description, calling the initialize() method in the process
+				}
+				finally
+				{
+					descriptionInputStream.close();	//always close the description input stream for good measure
+				}
+			}
+			catch(final IOException ioException)	//if there is an I/O exception
+			{
+				throw new AssertionError(ioException);	//TODO fix better
+			}		
+		}
+		else	//if there is no description file
+		{
+			component.initialize();	//call the initialize() method manually
+		}
+	}
+
 	/**Initializes a component with a description in an RDF resource file.
 	This method calls {@link Component#initialize()} after initializing the component from the description.
 	This implementation calls {@link #initializeComponent(Component, InputStream)}.
@@ -827,7 +851,7 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 					final PLOOPProcessor ploopProcessor=new PLOOPProcessor(this);	//create a new PLOOP processor, passing the Guise session to use as a default constructor argument					
 					ploopProcessor.initializeObject(component, componentResource);	//initialize the component from this resource
 					component.initialize();	//initialize the component
-					ploopProcessor.getObjects(rdf);	//make sure all described Java objects in the RDF instance have been created
+					final List<Object> objects=ploopProcessor.getObjects(rdf);	//make sure all described Java objects in the RDF instance have been created
 				}
 				else	//if there is no resource of the appropriate type
 				{
@@ -856,6 +880,16 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 			throw new AssertionError(invocationTargetException);	//TODO fix better
 		}
 	}
+
+	/**Initializes all components in a hierarchy in depth-first order.
+	@param component The parent of the component tree to initialize.
+	*/
+/*TODO fix
+	protected static void initializeComponents(final Component<?> component)
+	{
+		
+	}
+*/
 	
 	/**The stack of modal navigation points.*/
 	private final List<ModalNavigation> modalNavigationStack=synchronizedList(new ArrayList<ModalNavigation>());

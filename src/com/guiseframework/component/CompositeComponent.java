@@ -20,4 +20,10 @@ public interface CompositeComponent<C extends CompositeComponent<C>> extends Com
 	*/
 	public Component<?> getComponent(final String id);	//TODO perhaps remove; the speed may not be sufficient to outweigh the overhead; this is only a single-level search, anyway
 
+	/**Retrieves the first component in the hierarchy with the given name.
+	This method checks this component and all descendant components.
+	@return The first component with the given name, or <code>null</code> if this component and all descendant components do not have the given name. 
+	*/
+	public Component<?> getComponentByName(final String name);
+
 }

@@ -100,6 +100,22 @@ public interface GuiseSession extends PropertyBindable
 	*/
 	public void setOrientation(final Orientation newOrientation);
 
+	/**Initializes a component, optionally with a description in an RDF resource file.
+	This method first tries to load a PLOOP RDF description of the component in an RDF file with the same name as the class file in the same directory, with an <code>.rdf</code> extension.
+	That is, for the class <code>MyComponent.class</code> this method first tries to load <code>MyComponent.rdf</code> from the same directory.
+	If this is successful, the component is initialized from this RDF description.
+	This implementation calls {@link #initializeComponent(Component, InputStream)}.
+	The component's {@link Component#initialize()} is called whether there is an RDF description.
+	This method synchronizes on {@link #getDocumentBuilder()}.
+	@param component The component to initialize.
+	@exception MissingResourceException if no resource could be found associated with the given key.
+	@exception IllegalArgumentException if the RDF description does not provide a resource description of the same type as the specified component.
+	@exception IllegalStateException if the given component has already been initialized.
+	@see Component#initialize()
+	@see <a href="http://www.ploop.org/">PLOOP</a>
+	*/
+	public void initializeComponent(final Component<?> component);
+	
 	/**Initializes a component with a description in an RDF resource file.
 	This method calls {@link Component#initialize()} after initializing the component from the description.
 	This implementation calls {@link #initializeComponent(Component, InputStream)}.

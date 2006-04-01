@@ -10,7 +10,7 @@
 >
 	<demo:EventWizardPanel2>
 		<property:layout><layout:FlowLayout property:flow="PAGE"/></property:layout>
-		<property:label>Guise\u2122 Demonstration: Event Wizard</property:label>
+		<property:label>Guise&#x2122; Demonstration: Event Wizard</property:label>
 		<property:children rdf:parseType="Collection">
 			<component:Heading property:level="0" property:label="Event Planner Wizard"/>
 			<component:LayoutPanel>

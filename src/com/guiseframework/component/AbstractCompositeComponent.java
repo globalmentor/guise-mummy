@@ -201,4 +201,13 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 		return result;	//return whether all child components validated
 	}
 
+	/**Retrieves the first component in the hierarchy with the given name.
+	This method checks this component and all descendant components.
+	@return The first component with the given name, or <code>null</code> if this component and all descendant components do not have the given name. 
+	*/
+	public Component<?> getComponentByName(final String name)
+	{
+		return getComponentByName(this, name);	//search the component hierarchy for a component with the given name
+	}
+	
 }

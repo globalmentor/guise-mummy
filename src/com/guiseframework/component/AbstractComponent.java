@@ -1324,7 +1324,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	/**Retrieves a component with the given name.
 	This method checks the given component and all descendant components.
 	@param component The component that should be checked, along with its descendants, for the given name.
-	@return The first component with the given ID, or <code>null</code> if this component and all descendant components do not have the given name. 
+	@return The first component with the given name, or <code>null</code> if this component and all descendant components do not have the given name. 
 	*/
 	public static Component<?> getComponentByName(final Component<?> component, final String name)
 	{

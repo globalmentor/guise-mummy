@@ -15,7 +15,7 @@ import com.guiseframework.validator.ValueRequiredValidator;
 /**Event wizard Guise demonstration panel.
 Copyright © 2006 GlobalMentor, Inc.
 Demonstrates sequence card panels, task card constraints, task status select links,
- action card couplers, and link select card couplers.
+	action card couplers, and link select card couplers.
 @author Garret Wilson
 */
 public class EventWizardPanel extends DefaultNavigationPanel

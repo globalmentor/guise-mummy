@@ -6,9 +6,10 @@ import com.guiseframework.event.AbstractGuisePropertyChangeListener;
 import com.guiseframework.event.ActionListener;
 import com.guiseframework.event.GuisePropertyChangeEvent;
 
-/**Event wizard Guise demonstration panel.
+/**Event wizard Guise demonstration panel using PLOOP+RDF+XML.
 Copyright © 2006 GlobalMentor, Inc.
-Demonstrates tabbed panels, tab controls, and card panels. 
+Demonstrates sequence card panels, task card constraints, task status select links,
+	action card couplers, and link select card couplers.
 @author Garret Wilson
 */
 public class EventWizardPanel2 extends DefaultNavigationPanel
