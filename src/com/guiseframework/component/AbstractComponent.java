@@ -166,7 +166,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		*/
 		public void setInfoContentType(final ContentType newInfoContentType)
 		{
-			checkNull(newInfoContentType, "Content type cannot be null.");
+			checkInstance(newInfoContentType, "Content type cannot be null.");
 			if(infoContentType!=newInfoContentType)	//if the value is really changing
 			{
 				final ContentType oldInfoContentType=infoContentType;	//get the old value
@@ -236,7 +236,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		*/
 		public void setDescriptionContentType(final ContentType newDescriptionContentType)
 		{
-			checkNull(newDescriptionContentType, "Content type cannot be null.");
+			checkInstance(newDescriptionContentType, "Content type cannot be null.");
 			if(descriptionContentType!=newDescriptionContentType)	//if the value is really changing
 			{
 				final ContentType oldDescriptionContentType=descriptionContentType;	//get the old value
@@ -378,9 +378,9 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		*/
 		public void setCornerArcSize(final Corner corner, final Dimensions newCornerArcSize)
 		{
-			final int cornerOrdinal=checkNull(corner, "Corner cannot be null").ordinal();	//get the ordinal of the corner
+			final int cornerOrdinal=checkInstance(corner, "Corner cannot be null").ordinal();	//get the ordinal of the corner
 			final Dimensions oldCornerArcSize=cornerArcSizes[cornerOrdinal];	//get the old value
-			if(!ObjectUtilities.equals(oldCornerArcSize, checkNull(newCornerArcSize, "Corner arc size cannot be null")))	//if the value is really changing
+			if(!ObjectUtilities.equals(oldCornerArcSize, checkInstance(newCornerArcSize, "Corner arc size cannot be null")))	//if the value is really changing
 			{
 				cornerArcSizes[cornerOrdinal]=newCornerArcSize;	//actually change the value
 				firePropertyChange(CORNER_ARC_SIZE_PROPERTIES[cornerOrdinal], oldCornerArcSize, newCornerArcSize);	//indicate that the value changed
@@ -605,7 +605,7 @@ Debug.trace("now valid of", this, "is", isValid());
 			if(newController!=controller)	//if the value is really changing
 			{
 				final Controller<? extends GuiseContext, ? super C> oldController=controller;	//get a reference to the old value
-				controller=checkNull(newController, "Controller cannot be null.");	//actually change values
+				controller=checkInstance(newController, "Controller cannot be null.");	//actually change values
 				firePropertyChange(CONTROLLER_PROPERTY, oldController, newController);	//indicate that the value changed				
 			}
 		}
@@ -638,7 +638,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		*/
 		public void setView(final View<? extends GuiseContext, ? super C> newView)
 		{
-			if(newView!=checkNull(view, "View cannot be null"))	//if the value is really changing
+			if(newView!=checkInstance(view, "View cannot be null"))	//if the value is really changing
 			{
 				final View<? extends GuiseContext, ? super C> oldView=view;	//get a reference to the old value
 				if(oldView!=null)	//if a view has been installed
@@ -1128,7 +1128,7 @@ Debug.trace("now valid of", this, "is", isValid());
 			this.id=getSession().generateComponentID();	//ask the session to generate a new ID
 //TODO del when works			this.id=getVariableName(getClass());	//create an ID by transforming the simple class name to a variable name
 		}
-		this.labelModel=checkNull(labelModel, "Label model cannot be null.");	//save the label model
+		this.labelModel=checkInstance(labelModel, "Label model cannot be null.");	//save the label model
 		this.labelModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the label model
 		controller=session.getApplication().getController(getThis());	//ask the application for a controller
 		if(controller==null)	//if we couldn't find a controller
@@ -1690,7 +1690,7 @@ Debug.trace("now valid of", this, "is", isValid());
 			*/
 			public void setTetherBearing(final BigDecimal newTetherBearing)
 			{
-				if(!tetherBearing.equals(checkNull(newTetherBearing, "Tether bearing cannot be null.")))	//if the value is really changing
+				if(!tetherBearing.equals(checkInstance(newTetherBearing, "Tether bearing cannot be null.")))	//if the value is really changing
 				{
 					final BigDecimal oldTetherBearing=tetherBearing;	//get the current value
 					tetherBearing=CompassPoint.checkBearing(newTetherBearing);	//update the value
@@ -1723,7 +1723,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		*/
 		public AbstractFlyoverStrategy(final S component)
 		{
-			this.component=checkNull(component, "Component cannot be null.");			
+			this.component=checkInstance(component, "Component cannot be null.");			
 		}
 
 		/**Called when the mouse enters the source.

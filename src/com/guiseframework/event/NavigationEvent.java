@@ -41,7 +41,7 @@ public class NavigationEvent extends AbstractGuiseEvent
 	public NavigationEvent(final GuiseSession session, final Object source, final String navigationPath, final Bookmark bookmark, final URI referrerURI)
 	{
 		super(session, source);	//construct the parent class
-		this.navigationPath=checkNull(navigationPath, "Navigation path cannot be null.");
+		this.navigationPath=checkInstance(navigationPath, "Navigation path cannot be null.");
 		this.bookmark=bookmark;
 		this.referrerURI=referrerURI;
 	}

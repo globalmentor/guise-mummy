@@ -24,7 +24,7 @@ public class ReferenceConstraints extends AbstractConstraints
 	public ReferenceConstraints(final GuiseSession session, final String id)
 	{
 		super(session);	//construct the parent class
-		this.id=checkNull(id, "ID cannot be null");	//save the ID
+		this.id=checkInstance(id, "ID cannot be null");	//save the ID
 	}
 
 }

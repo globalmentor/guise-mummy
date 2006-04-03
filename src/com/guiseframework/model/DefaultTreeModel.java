@@ -41,7 +41,7 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel
 		*/
 		public void setRootNode(final TreeNodeModel<?> newRootNode)
 		{
-			if(!ObjectUtilities.equals(rootNode, checkNull(newRootNode, "Root node cannot be null.")))	//if the value is really changing
+			if(!ObjectUtilities.equals(rootNode, checkInstance(newRootNode, "Root node cannot be null.")))	//if the value is really changing
 			{
 				final TreeNodeModel<?> oldRootNode=rootNode;	//get the old value
 				oldRootNode.removePropertyChangeListener(treeNodePropertyChangeListener);	//stop listening for bubbled property change events from tree nodes in the old hierarchy

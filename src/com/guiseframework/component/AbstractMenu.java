@@ -106,7 +106,7 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 	public AbstractMenu(final GuiseSession session, final String id, final MenuLayout layout, final ActionModel actionModel)
 	{
 		super(session, id, layout);	//construct the parent class
-		this.actionModel=checkNull(actionModel, "Action model cannot be null.");	//save the action model
+		this.actionModel=checkInstance(actionModel, "Action model cannot be null.");	//save the action model
 		this.actionModel.addActionListener(new ActionListener()	//create an action repeater to forward events to this component's listeners TODO create a common method to create a forwarding listener, if we can
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the action is performed

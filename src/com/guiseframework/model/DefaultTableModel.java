@@ -105,7 +105,7 @@ public class DefaultTableModel extends AbstractTableModel
 	@SuppressWarnings("unchecked")	//as generics are only one-deep for class objects, we must cast the generic type of the default table column model class
 	public static <C> TableColumnModel<C>[] createDefaultColumns(final GuiseSession session, final Class<C> valueClass, final String... columnNames)
 	{
-		checkNull(session, "Session cannot be null.");
+		checkInstance(session, "Session cannot be null.");
 		final DefaultTableColumnModel<C>[] columns=createArray((Class<DefaultTableColumnModel<C>>)(Object)DefaultTableColumnModel.class, columnNames.length);	//create an array of default table columns TODO find out why we need the double-cast
 		for(int i=columns.length-1; i>=0; --i)	//for each column
 		{

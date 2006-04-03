@@ -187,7 +187,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		*/
 		public <T extends Constraints> void setLayout(final Layout<T> newLayout)
 		{
-			if(layout!=checkNull(newLayout, "Layout cannot be null."))	//if the value is really changing
+			if(layout!=checkInstance(newLayout, "Layout cannot be null."))	//if the value is really changing
 			{
 /*TODO testing
 				if(size()!=0)	//if this container has children
@@ -244,7 +244,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	public AbstractContainer(final GuiseSession session, final String id, final Layout<?> layout)
 	{
 		super(session, id);	//construct the parent class
-		this.layout=checkNull(layout, "Layout cannot be null.");	//save the layout
+		this.layout=checkInstance(layout, "Layout cannot be null.");	//save the layout
 		layout.setContainer(this);	//tell the layout which container owns it
 	}
 

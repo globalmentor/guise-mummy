@@ -30,7 +30,7 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 		*/
 		public void setFlow(final Flow newFlow)
 		{
-			if(flow!=checkNull(newFlow, "Flow cannot be null."))	//if the value is really changing
+			if(flow!=checkInstance(newFlow, "Flow cannot be null."))	//if the value is really changing
 			{
 				final Flow oldFlow=flow;	//get the old value
 				flow=newFlow;	//actually change the value
@@ -46,7 +46,7 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 	public AbstractFlowLayout(final GuiseSession session, final Flow flow)
 	{
 		super(session);	//construct the parent class
-		this.flow=checkNull(flow, "Flow cannot be null.");	//store the flow
+		this.flow=checkInstance(flow, "Flow cannot be null.");	//store the flow
 	}
 
 }

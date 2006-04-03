@@ -125,7 +125,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			if(!ObjectUtilities.equals(environment, newEnvironment))	//if the value is really changing (compare their values, rather than identity)
 			{
 				final GuiseEnvironment oldEnvironment=environment;	//get the old value
-				environment=checkNull(newEnvironment, "Guise session environment cannot be null.");	//actually change the value
+				environment=checkInstance(newEnvironment, "Guise session environment cannot be null.");	//actually change the value
 				firePropertyChange(ENVIRONMENT_PROPERTY, oldEnvironment, newEnvironment);	//indicate that the value changed
 			}
 		}
@@ -173,7 +173,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			if(!ObjectUtilities.equals(locale, newLocale))	//if the value is really changing (compare their values, rather than identity)
 			{
 				final Locale oldLocale=locale;	//get the old value
-				locale=checkNull(newLocale, "Guise session locale cannot be null.");	//actually change the value
+				locale=checkInstance(newLocale, "Guise session locale cannot be null.");	//actually change the value
 				releaseResourceBundle();	//release the resource bundle, as the new locale may indicate that new resources should be used
 				firePropertyChange(LOCALE_PROPERTY, oldLocale, newLocale);	//indicate that the value changed
 				setOrientation(Orientation.getOrientation(locale));	//update the orientation based upon the new locale
@@ -239,7 +239,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		{
 			if(!ObjectUtilities.equals(orientation, newOrientation))	//if the value is really changing
 			{
-				final Orientation oldOrientation=checkNull(orientation, "Orientation cannot be null");	//get the old value
+				final Orientation oldOrientation=checkInstance(orientation, "Orientation cannot be null");	//get the old value
 				orientation=newOrientation;	//actually change the value
 				firePropertyChange(ORIENTATION_PROPERTY, oldOrientation, newOrientation);	//indicate that the value changed
 			}
@@ -673,7 +673,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	*/
 	public NavigationPanel<?> getNavigationPanel(final String path)
 	{
-		if(isAbsolutePath(checkNull(path, "Path cannot be null")))	//if the path is absolute
+		if(isAbsolutePath(checkInstance(path, "Path cannot be null")))	//if the path is absolute
 		{
 			throw new IllegalArgumentException("Navigation path cannot be absolute: "+path);
 		}
@@ -745,7 +745,7 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 	*/
 	public NavigationPanel<?> releaseNavigationPanel(final String path)
 	{
-		if(isAbsolutePath(checkNull(path, "Path cannot be null")))	//if the path is absolute
+		if(isAbsolutePath(checkInstance(path, "Path cannot be null")))	//if the path is absolute
 		{
 			throw new IllegalArgumentException("Bound navigation path cannot be absolute: "+path);
 		}
@@ -900,7 +900,7 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 		*/
 		protected void pushModalNavigation(final ModalNavigation modalNavigation)
 		{
-			modalNavigationStack.add(checkNull(modalNavigation, "Modal navigation cannot be null."));	//push the modal navigation onto the top of the stack (the end of the list)
+			modalNavigationStack.add(checkInstance(modalNavigation, "Modal navigation cannot be null."));	//push the modal navigation onto the top of the stack (the end of the list)
 		}
 
 		/**@return The modal navigation on the top of the stack, or <code>null</code> if there are no modal navigations.*/
@@ -1036,7 +1036,7 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 		*/
 		public void setNavigationPath(final String navigationPath)
 		{
-			if(!ObjectUtilities.equals(this.navigationPath, checkNull(navigationPath, "Navigation path cannot be null.")))	//if the navigation path is really changing
+			if(!ObjectUtilities.equals(this.navigationPath, checkInstance(navigationPath, "Navigation path cannot be null.")))	//if the navigation path is really changing
 			{
 				if(getApplication().getNavigationPanelClass(navigationPath)==null)	//if no panel is bound to the given navigation path
 				{
@@ -1171,7 +1171,7 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 		*/
 		public void navigate(final URI uri, final String viewportID)
 		{
-			requestedNavigation=new Navigation(getApplication().resolveURI(createPathURI(getNavigationPath())), getApplication().resolveURI(checkNull(uri, "URI cannot be null.")), viewportID);	//resolve the URI against the application context path
+			requestedNavigation=new Navigation(getApplication().resolveURI(createPathURI(getNavigationPath())), getApplication().resolveURI(checkInstance(uri, "URI cannot be null.")), viewportID);	//resolve the URI against the application context path
 		}
 
 		/**Requests modal navigation to the specified path.
@@ -1213,7 +1213,7 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 		*/
 		public void navigateModal(final URI uri, final ModalNavigationListener modalListener)
 		{
-			requestedNavigation=new ModalNavigation(getApplication().resolveURI(createPathURI(getNavigationPath())), getApplication().resolveURI(checkNull(uri, "URI cannot be null.")), modalListener);	//resolve the URI against the application context path
+			requestedNavigation=new ModalNavigation(getApplication().resolveURI(createPathURI(getNavigationPath())), getApplication().resolveURI(checkInstance(uri, "URI cannot be null.")), modalListener);	//resolve the URI against the application context path
 		}		
 		
 	/**The object that listenes for context state changes and updates the set of context states in response.*/

@@ -94,7 +94,7 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 		*/
 		public void setLabelContentType(final ContentType newLabelTextContentType)
 		{
-			checkNull(newLabelTextContentType, "Content type cannot be null.");
+			checkInstance(newLabelTextContentType, "Content type cannot be null.");
 			if(labelContentType!=newLabelTextContentType)	//if the value is really changing
 			{
 				final ContentType oldLabelTextContentType=labelContentType;	//get the old value

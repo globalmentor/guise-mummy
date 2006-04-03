@@ -30,7 +30,7 @@ public abstract class AbstractActionControl<C extends ActionControl<C>> extends 
 	public AbstractActionControl(final GuiseSession session, final String id, final ActionModel actionModel)
 	{
 		super(session, id);	//construct the parent class
-		this.actionModel=checkNull(actionModel, "Action model cannot be null.");	//save the action model
+		this.actionModel=checkInstance(actionModel, "Action model cannot be null.");	//save the action model
 		this.actionModel.addActionListener(new ActionListener()	//create an action repeater to forward events to this component's listeners
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the action is performed

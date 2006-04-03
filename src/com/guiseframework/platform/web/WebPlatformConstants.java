@@ -16,15 +16,27 @@ public class WebPlatformConstants
 	/**The base path for serving Guise resources.*/
 	public final static String GUISE_PUBLIC_RESOURCE_BASE_PATH="/guise/";
 
+	/**The application-relative path for all guise public resources.*/
+	public final static String GUISE_PUBLIC_PATH="guise/";
+
 		//CSS
 
+	/**The path of public stylesheets, relative to the application.*/
+	public final static String GUISE_PUBLIC_STYLESHEETS_PATH=GUISE_PUBLIC_PATH+"stylesheets/";
 	/**The path of the Guise CSS stylesheet, relative to the application.*/
-	public final static String GUISE_CSS_STYLESHEET_PATH="guise/stylesheets/guise.css";
+	public final static String GUISE_CSS_STYLESHEET_PATH=GUISE_PUBLIC_STYLESHEETS_PATH+"guise.css";
 
+		//Images
+	
+	/**The path of public images, relative to the application.*/
+//TODO del; coordinate with GuiseConstants	public final static String GUISE_PUBLIC_IMAGES_PATH=GUISE_PUBLIC_PATH+"images/";
+	
 		//JavaScript
 	
+	/**The path of public JavaScript files, relative to the application.*/
+	public final static String GUISE_PUBLIC_JAVASCRIPT_PATH=GUISE_PUBLIC_PATH+"javascript/";
 	/**The path of the Guise JavaScript file, relative to the application.*/
-	public final static String GUISE_JAVASCRIPT_PATH="guise/javascript/guise.js";
+	public final static String GUISE_JAVASCRIPT_PATH=GUISE_PUBLIC_JAVASCRIPT_PATH+"guise.js";
 
 		//images
 	

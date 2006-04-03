@@ -73,7 +73,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 			if(valueRepresentationStrategy!=newValueRepresentationStrategy)	//if the value is really changing
 			{
 				final ValueRepresentationStrategy<Component<?>> oldValueRepresentationStrategy=valueRepresentationStrategy;	//get the old value
-				valueRepresentationStrategy=checkNull(newValueRepresentationStrategy, "Value representation strategy cannot be null.");	//actually change the value
+				valueRepresentationStrategy=checkInstance(newValueRepresentationStrategy, "Value representation strategy cannot be null.");	//actually change the value
 				firePropertyChange(VALUE_REPRESENTATION_STRATEGY_PROPERTY, oldValueRepresentationStrategy, newValueRepresentationStrategy);	//indicate that the value changed
 			}
 		}

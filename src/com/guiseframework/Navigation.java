@@ -48,8 +48,8 @@ public class Navigation
 	*/
 	public Navigation(final URI oldNavigationURI, final URI newNavigationURI, final String viewportID)
 	{
-		checkNull(oldNavigationURI, "Old navigation URI cannot be null.");
-		checkNull(newNavigationURI, "New navigation URI cannot be null.");
+		checkInstance(oldNavigationURI, "Old navigation URI cannot be null.");
+		checkInstance(newNavigationURI, "New navigation URI cannot be null.");
 		if(!oldNavigationURI.isAbsolute() && !isAbsolutePath(oldNavigationURI))	//make sure the old navigation URI has an absolute path or is itself absolute
 		{
 			throw new IllegalArgumentException("Old navigation URI must have an absolute path: "+oldNavigationURI);

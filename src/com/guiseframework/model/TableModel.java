@@ -95,7 +95,7 @@ public interface TableModel extends Model	//TODO maybe specify row count to be a
 		public Cell(final int rowIndex, final TableColumnModel<C> column)
 		{
 			this.rowIndex=rowIndex;
-			this.column=checkNull(column, "Column cannot be null.");
+			this.column=checkInstance(column, "Column cannot be null.");
 		}
 
     /**Determines whether the given object is equal to this object.

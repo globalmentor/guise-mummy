@@ -48,7 +48,7 @@ public abstract class AbstractValueModel<V> extends AbstractModel implements Val
 	public AbstractValueModel(final GuiseSession session, final Class<V> valueClass)
 	{
 		super(session);	//construct the parent class
-		this.valueClass=checkNull(valueClass, "Value class cannot be null.");	//store the value class
+		this.valueClass=checkInstance(valueClass, "Value class cannot be null.");	//store the value class
 	}
 
 	/**Determines whether the value of this model is valid.

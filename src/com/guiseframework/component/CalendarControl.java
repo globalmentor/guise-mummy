@@ -94,7 +94,7 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 		*/
 		public void setDate(final Date newDate)
 		{
-			if(!date.equals(checkNull(newDate, "Date cannot be null.")))	//if the value is really changing
+			if(!date.equals(checkInstance(newDate, "Date cannot be null.")))	//if the value is really changing
 			{
 				final Date oldDate=date;	//get the old value
 				date=(Date)newDate.clone();	//clone the new date and actually change the value

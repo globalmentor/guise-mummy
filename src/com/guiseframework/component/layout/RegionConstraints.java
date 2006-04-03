@@ -49,7 +49,7 @@ public class RegionConstraints extends AbstractConstraints
 	public RegionConstraints(final GuiseSession session, final Region region, final Extent preferredWidth, final Extent preferredHeight)
 	{
 		super(session);	//construct the parent class
-		this.region=checkNull(region, "Region cannot be null.");
+		this.region=checkInstance(region, "Region cannot be null.");
 		this.preferredWidth=preferredWidth;
 		this.preferredHeight=preferredHeight;
 	}

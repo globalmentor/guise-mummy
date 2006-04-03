@@ -73,8 +73,8 @@ public class HTTPServletGuiseContext extends AbstractXMLGuiseContext
 	public HTTPServletGuiseContext(final GuiseSession session, final HttpServletRequest request, final HttpServletResponse response)
 	{
 		super(session);	//construct the parent class
-		this.request=checkNull(request, "Request cannot be null.");
-		this.response=checkNull(response, "Response cannot be null.");
+		this.request=checkInstance(request, "Request cannot be null.");
+		this.response=checkInstance(response, "Response cannot be null.");
 //TODO decide if we want this to include parameters or not		this.navigationURI=URI.create(request.getRequestURL().toString());	//create the absolute navigation URI from the HTTP requested URL
 		this.navigationURI=HttpServletUtilities.getRequestURI(request);	//get the absolute navigation URI from the HTTP requested URL
 /*TODO del when not needed

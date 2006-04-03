@@ -40,9 +40,9 @@ public class MouseEvent extends AbstractGuiseEvent
 	public MouseEvent(final GuiseSession session, final Object source, final Rectangle sourceBounds, final Rectangle viewportBounds, final Point mousePosition)
 	{
 		super(session, source);	//construct the parent class
-		this.sourceBounds=checkNull(sourceBounds, "Source bounds cannot be null");
-		this.viewportBounds=checkNull(viewportBounds, "Viewport bounds cannot be null");
-		this.mousePosition=checkNull(mousePosition, "Mouse position cannot be null");
+		this.sourceBounds=checkInstance(sourceBounds, "Source bounds cannot be null");
+		this.viewportBounds=checkInstance(viewportBounds, "Viewport bounds cannot be null");
+		this.mousePosition=checkInstance(mousePosition, "Mouse position cannot be null");
 	}
 
 }

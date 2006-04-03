@@ -230,7 +230,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	public Table(final GuiseSession session, final String id, final TableModel tableModel)
 	{
 		super(session, id);	//construct the parent class
-		this.tableModel=checkNull(tableModel, "Table model cannot be null.");	//save the table model
+		this.tableModel=checkInstance(tableModel, "Table model cannot be null.");	//save the table model
 		this.tableModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the table model
 			//TODO listen to and repeat table model events
 		for(final TableColumnModel<?> column:tableModel.getColumns())	//install a default cell representation strategy for each column
@@ -398,8 +398,8 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		*/
 		public DefaultCellRepresentationStrategy(final GuiseSession session, final Converter<V, String> converter)
 		{
-			this.session=checkNull(session, "Session cannot be null.");	//save the session
-			this.converter=checkNull(converter, "Converter cannot be null.");	//save the converter
+			this.session=checkInstance(session, "Session cannot be null.");	//save the session
+			this.converter=checkInstance(converter, "Converter cannot be null.");	//save the converter
 		}
 
 		/**Creates a component for the given cell.
@@ -482,9 +482,9 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		public DefaultCellMessage(final GuiseSession session, final String id, final TableModel tableModel, final TableModel.Cell<C> cell, final Converter<? super C, String> converter)
 		{
 			super(session, id);	//construct the parent class
-			this.tableModel=checkNull(tableModel, "Table model cannot be null.");
-			this.cell=checkNull(cell, "Cell cannot be null.");
-			this.converter=checkNull(converter, "Converter cannot be null.");
+			this.tableModel=checkInstance(tableModel, "Table model cannot be null.");
+			this.cell=checkInstance(cell, "Cell cannot be null.");
+			this.converter=checkInstance(converter, "Converter cannot be null.");
 		}
 
 		/**Determines the message text of the cell.
@@ -539,8 +539,8 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		*/
 		public DefaultCellValueModel(final GuiseSession session, final TableModel model, final TableModel.Cell<C> cell)
 		{
-			super(session, checkNull(cell, "Cell cannot be null.").getColumn().getValueClass());	//construct the parent class
-			this.model=checkNull(model, "Table model cannot be null.");
+			super(session, checkInstance(cell, "Cell cannot be null.").getColumn().getValueClass());	//construct the parent class
+			this.model=checkInstance(model, "Table model cannot be null.");
 			this.cell=cell;
 		}
 

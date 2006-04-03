@@ -76,7 +76,7 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 			if(converter!=newConverter)	//if the value is really changing
 			{
 				final Converter<V, String> oldConverter=converter;	//get the old value
-				converter=checkNull(newConverter, "Converter cannot be null.");	//actually change the value
+				converter=checkInstance(newConverter, "Converter cannot be null.");	//actually change the value
 				firePropertyChange(CONVERTER_PROPERTY, oldConverter, newConverter);	//indicate that the value changed
 				updateText();	//update the text, now that we've installed a new converter
 			}
@@ -209,7 +209,7 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 	public AbstractTextControl(final GuiseSession session, final String id, final ValueModel<V> model, final Converter<V, String> converter)
 	{
 		super(session, id, model);	//construct the parent class
-		this.converter=checkNull(converter, "Converter cannot be null");	//save the converter
+		this.converter=checkInstance(converter, "Converter cannot be null");	//save the converter
 		updateText();	//initialize the text with the literal form of the initial model value
 		addPropertyChangeListener(VALUE_PROPERTY, updateTextPropertyChangeListener);	//listen for the value changing, and update the text in response
 		session.addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, updateTextPropertyChangeListener);	//listen for the session locale changing, in case the converter is locale-dependent TODO allow for unregistration to prevent memory leaks

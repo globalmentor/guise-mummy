@@ -40,7 +40,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 		*/
 		protected void setState(final State newState)
 		{
-			if(state!=checkNull(newState, "State cannot be null."))	//if the value is really changing
+			if(state!=checkInstance(newState, "State cannot be null."))	//if the value is really changing
 			{
 				final State oldState=state;	//get the old value
 				state=newState;	//actually change the value

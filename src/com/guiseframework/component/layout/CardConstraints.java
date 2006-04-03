@@ -80,7 +80,7 @@ public class CardConstraints extends ControlConstraints implements LabelModel, D
 	public CardConstraints(final GuiseSession session, final LabelModel labelModel, final boolean enabled)
 	{
 		super(session, enabled);	//construct the parent class 
-		this.labelModel=checkNull(labelModel, "Label model cannot be null.");	//save the label model
+		this.labelModel=checkInstance(labelModel, "Label model cannot be null.");	//save the label model
 		this.labelModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the label model
 	}
 

@@ -26,7 +26,7 @@ public abstract class AbstractModelGroup<M extends Model> implements ModelGroup<
 	*/
 	public boolean contains(final Model model)
 	{
-		return modelSet.contains(checkNull(model, "Model cannot be null."));	//see if the set of models contains this model TODO check for class cast exception
+		return modelSet.contains(checkInstance(model, "Model cannot be null."));	//see if the set of models contains this model TODO check for class cast exception
 	}
 
 	/**Adds a model to the group.
@@ -49,7 +49,7 @@ public abstract class AbstractModelGroup<M extends Model> implements ModelGroup<
 	*/
 	protected void addImpl(final M model)
 	{
-		modelSet.add(checkNull(model, "Model cannot be null."));	//add this model to the model set
+		modelSet.add(checkInstance(model, "Model cannot be null."));	//add this model to the model set
 	}
 
 	/**Removes a model from the group.
@@ -72,7 +72,7 @@ public abstract class AbstractModelGroup<M extends Model> implements ModelGroup<
 	*/
 	protected void removeImpl(final M model)
 	{
-		modelSet.remove(checkNull(model, "Model cannot be null."));	//remove this model from the model set
+		modelSet.remove(checkInstance(model, "Model cannot be null."));	//remove this model from the model set
 	}
 
 	/**Model constructor.

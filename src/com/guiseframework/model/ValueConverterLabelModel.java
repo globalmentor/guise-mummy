@@ -36,7 +36,7 @@ public class ValueConverterLabelModel<V> extends DefaultLabelModel
 	{
 		super(session);	//construct the parent
 		this.value=value;	//save the value
-		this.converter=checkNull(converter, "Converter cannot be null.");	//save the converter		
+		this.converter=checkInstance(converter, "Converter cannot be null.");	//save the converter		
 	}
 
 	/**Determines the text of the label.

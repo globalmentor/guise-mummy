@@ -60,7 +60,7 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 		*/
 		public void setAxis(final Flow newAxis)
 		{
-			if(axis!=checkNull(newAxis, "Flow axis cannot be null."))	//if the value is really changing
+			if(axis!=checkInstance(newAxis, "Flow axis cannot be null."))	//if the value is really changing
 			{
 				final Flow oldAxis=axis;	//get the old value
 				axis=newAxis;	//actually change the value
@@ -85,7 +85,7 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 			if(converter!=newConverter)	//if the value is really changing
 			{
 				final Converter<V, String> oldConverter=converter;	//get the old value
-				converter=checkNull(newConverter, "Converter cannot be null.");	//actually change the value
+				converter=checkInstance(newConverter, "Converter cannot be null.");	//actually change the value
 				firePropertyChange(CONVERTER_PROPERTY, oldConverter, newConverter);	//indicate that the value changed
 			}
 		}
@@ -332,8 +332,8 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 	public SliderControl(final GuiseSession session, final String id, final ValueModel<V> model, final Converter<V, String> converter, final Flow axis)
 	{
 		super(session, id, model);	//construct the parent class
-		this.converter=checkNull(converter, "Converter cannot be null");	//save the converter
-		this.axis=checkNull(axis, "Flow axis cannot be null.");
+		this.converter=checkInstance(converter, "Converter cannot be null");	//save the converter
+		this.axis=checkInstance(axis, "Flow axis cannot be null.");
 	}
 	
 }

@@ -25,7 +25,7 @@ public class LocaleLabelModel extends DefaultLabelModel
 	public LocaleLabelModel(final GuiseSession session, final Locale locale)
 	{
 		super(session);	//construct the parent class
-		this.locale=checkNull(locale, "Locale cannot be null");	//save the locale
+		this.locale=checkInstance(locale, "Locale cannot be null");	//save the locale
 	}
 
 	/**Determines the text of the label.

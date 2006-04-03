@@ -100,7 +100,7 @@ public abstract class AbstractValueControl<V, C extends ValueControl<V, C>> exte
 	public AbstractValueControl(final GuiseSession session, final String id, final LabelModel labelModel, final ValueModel<V> valueModel)
 	{
 		super(session, id, labelModel);	//construct the parent class
-		this.valueModel=checkNull(valueModel, "Value model cannot be null.");	//save the value model
+		this.valueModel=checkInstance(valueModel, "Value model cannot be null.");	//save the value model
 		this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the value model
 		addPropertyChangeListener(VALUE_PROPERTY, clearNotificationPropertyChangeListener);	//listen for the value changing, and clear the notification in response TODO this needs to be put in other value controls as well
 	}

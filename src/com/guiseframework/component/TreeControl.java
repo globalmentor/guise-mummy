@@ -137,7 +137,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	public TreeControl(final GuiseSession session, final String id, final TreeModel treeModel)
 	{
 		super(session, id);	//construct the parent class
-		this.treeModel=checkNull(treeModel, "Tree model cannot be null.");	//save the tree model
+		this.treeModel=checkInstance(treeModel, "Tree model cannot be null.");	//save the tree model
 		this.treeModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the tree model
 		this.treeModel.addTreeNodePropertyChangeListener(treeNodePropertyChangeListener);	//listen and repeat all property changes of the tree nodes in the tree model
 			//TODO listen for and repeat tree model-specific events
@@ -245,7 +245,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		*/
 		public AbstractValueRepresentationStrategy(final GuiseSession session)
 		{
-			this.session=checkNull(session, "Session cannot be null");	//save the session
+			this.session=checkInstance(session, "Session cannot be null");	//save the session
 		}
 
 		/**Determines an identifier for the given object.

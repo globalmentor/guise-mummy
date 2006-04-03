@@ -66,7 +66,7 @@ public class Message extends AbstractComponent<Message>
 		*/
 		public void setMessageContentType(final ContentType newMessageContentType)
 		{
-			checkNull(newMessageContentType, "Content type cannot be null.");
+			checkInstance(newMessageContentType, "Content type cannot be null.");
 			if(messageContentType!=newMessageContentType)	//if the value is really changing
 			{
 				final ContentType oldMessageContentType=messageContentType;	//get the old value

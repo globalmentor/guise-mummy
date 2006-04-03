@@ -155,7 +155,7 @@ public abstract class AbstractDialogFrame<V, C extends DialogFrame<V, C>> extend
 	public AbstractDialogFrame(final GuiseSession session, final String id, final ValueModel<V> valueModel, final Component<?> component)
 	{
 		super(session, id, component);	//construct the parent class
-		this.valueModel=checkNull(valueModel, "Value model cannot be null.");	//save the table model
+		this.valueModel=checkInstance(valueModel, "Value model cannot be null.");	//save the table model
 		this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen an repeat all property changes of the value model
 		setModal(true);	//default to being a modal frame
 		setMovable(true);	//default to being movable

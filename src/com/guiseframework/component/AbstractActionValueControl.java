@@ -97,7 +97,7 @@ public abstract class AbstractActionValueControl<V, C extends ActionValueControl
 	public AbstractActionValueControl(final GuiseSession session, final String id, final ValueModel<V> valueModel)
 	{
 		super(session, id, new DefaultActionModel(session));	//construct the parent class with a default action model TODO add an action model parameter
-		this.valueModel=checkNull(valueModel, "Value model cannot be null.");	//save the table model
+		this.valueModel=checkInstance(valueModel, "Value model cannot be null.");	//save the table model
 		this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen an repeat all property changes of the value model
 	}
 

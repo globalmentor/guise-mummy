@@ -37,7 +37,7 @@ public abstract class AbstractRegularExpressionValidator<V> extends AbstractVali
 	*/
 	public AbstractRegularExpressionValidator(final GuiseSession session, final String regularExpression, final boolean valueRequired)
 	{
-		this(session, Pattern.compile(checkNull(regularExpression, "Regular expression cannot be null.")), valueRequired);	//compile the regular expression into a pattern and construct the class
+		this(session, Pattern.compile(checkInstance(regularExpression, "Regular expression cannot be null.")), valueRequired);	//compile the regular expression into a pattern and construct the class
 	}
 
 	/**Constructs a string regular expression validator from a regular expression pattern, without requiring a non-<code>null</code> value.
@@ -59,7 +59,7 @@ public abstract class AbstractRegularExpressionValidator<V> extends AbstractVali
 	public AbstractRegularExpressionValidator(final GuiseSession session, final Pattern pattern, final boolean valueRequired)
 	{
 		super(session, valueRequired);	//construct the parent class
-		this.pattern=checkNull(pattern, "Regular expression pattern cannot be null.");	//save the pattern
+		this.pattern=checkInstance(pattern, "Regular expression pattern cannot be null.");	//save the pattern
 	}
 
 	/**Returns a string representation of the given value so that it may be validated against the regular expression.

@@ -52,7 +52,7 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 			if(valueRepresentationStrategy!=newValueRepresentationStrategy)	//if the value is really changing
 			{
 				final ValueRepresentationStrategy<V> oldValueRepresentationStrategy=valueRepresentationStrategy;	//get the old value
-				valueRepresentationStrategy=checkNull(newValueRepresentationStrategy, "Value representation strategy cannot be null.");	//actually change the value
+				valueRepresentationStrategy=checkInstance(newValueRepresentationStrategy, "Value representation strategy cannot be null.");	//actually change the value
 				firePropertyChange(VALUE_REPRESENTATION_STRATEGY_PROPERTY, oldValueRepresentationStrategy, newValueRepresentationStrategy);	//indicate that the value changed
 			}
 		}
@@ -68,8 +68,8 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 	public AbstractListSelectControl(final GuiseSession session, final String id, final ListSelectModel<V> listSelectModel, final ValueRepresentationStrategy<V> valueRepresentationStrategy)
 	{
 		super(session, id);	//construct the parent class
-		this.valueRepresentationStrategy=checkNull(valueRepresentationStrategy, "Value representation strategy cannot be null.");
-		this.listSelectModel=checkNull(listSelectModel, "List select model cannot be null.");	//save the list select model
+		this.valueRepresentationStrategy=checkInstance(valueRepresentationStrategy, "Value representation strategy cannot be null.");
+		this.listSelectModel=checkInstance(listSelectModel, "List select model cannot be null.");	//save the list select model
 		this.listSelectModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the value model
 		this.listSelectModel.addListListener(new ListListener<V>()	//install a repeater list listener to listen to the decorated model
 				{
@@ -581,8 +581,8 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 		*/
 		public DefaultValueRepresentationStrategy(final GuiseSession session, final Converter<VV, String> converter)
 		{
-			this.session=checkNull(session, "Session cannot be null");	//save the session
-			this.converter=checkNull(converter, "Converter cannot be null.");	//save the converter
+			this.session=checkInstance(session, "Session cannot be null");	//save the session
+			this.converter=checkInstance(converter, "Converter cannot be null.");	//save the converter
 		}
 
 		/**Creates a component for the given list value.

@@ -101,8 +101,8 @@ public class Rectangle
 	*/
 	public Rectangle(final Point position, final Dimensions size)
 	{
-		this.position=checkNull(position, "Position cannot be null.");
-		this.size=checkNull(size, "Size cannot be null.");
+		this.position=checkInstance(position, "Position cannot be null.");
+		this.size=checkInstance(size, "Size cannot be null.");
 		if(size.getDepth().getValue()!=0)	//if the depth is not zero
 		{
 			throw new IllegalArgumentException("A rectangle cannot have a depth.");

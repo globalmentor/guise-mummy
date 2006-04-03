@@ -89,7 +89,7 @@ public class Extent
 			throw new IllegalArgumentException("Degree must be positive.");
 		}
 		this.value=value;	//save the value
-		this.unit=checkNull(unit, "Unit cannot be null.");	//save the unit
+		this.unit=checkInstance(unit, "Unit cannot be null.");	//save the unit
 		this.degree=degree;	//save the degree		
 	}
 

@@ -102,8 +102,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		{
 			throw new IllegalStateException("Application already installed.");
 		}
-		checkNull(container, "Container cannot be null");
-		checkNull(basePath, "Application base path cannot be null");
+		checkInstance(container, "Container cannot be null");
+		checkInstance(basePath, "Application base path cannot be null");
 		if(!isAbsolutePath(basePath) || !isContainerPath(basePath))	//if the path doesn't begin and end with a slash
 		{
 			throw new IllegalArgumentException("Application base path "+basePath+" does not begin and end with a path separator.");
@@ -148,7 +148,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			if(!ObjectUtilities.equals(defaultLocale, newDefaultLocale))	//if the value is really changing (compare their values, rather than identity)
 			{
 				final Locale oldLocale=defaultLocale;	//get the old value
-				defaultLocale=checkNull(newDefaultLocale, "Guise application default locale cannot be null.");	//actually change the value
+				defaultLocale=checkInstance(newDefaultLocale, "Guise application default locale cannot be null.");	//actually change the value
 				firePropertyChange(DEFAULT_LOCALE_PROPERTY, oldLocale, newDefaultLocale);	//indicate that the value changed
 			}
 		}
@@ -486,7 +486,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			{
 				throw new IllegalArgumentException("Bound navigation path cannot be absolute: "+path);
 			}
-			return navigationPathPanelBindingMap.put(checkNull(path, "Path cannot be null."), checkNull(panelClass, "Type cannot be null."));	//store the binding
+			return navigationPathPanelBindingMap.put(checkInstance(path, "Path cannot be null."), checkInstance(panelClass, "Type cannot be null."));	//store the binding
 		}
 
 		/**Determines the class of panel bound to the given application context-relative path.
@@ -546,7 +546,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	*/
 	public URI resolveURI(final URI uri)
 	{
-		return URI.create(getBasePath()).resolve(checkNull(uri, "URI cannot be null."));	//create a URI from the application base path and resolve the given path against it
+		return URI.create(getBasePath()).resolve(checkInstance(uri, "URI cannot be null."));	//create a URI from the application base path and resolve the given path against it
 	}
 
 	/**Changes an absolute path to an application-relative path.

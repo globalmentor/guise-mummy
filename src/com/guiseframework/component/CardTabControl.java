@@ -138,7 +138,7 @@ public class CardTabControl extends TabControl<Component<?>>
 		*/
 		public CardRepresentationStrategy(final CardLayout cardLayout)
 		{
-			this.cardLayout=checkNull(cardLayout, "Card layout cannot be null");	//save the card layout
+			this.cardLayout=checkInstance(cardLayout, "Card layout cannot be null");	//save the card layout
 		}
 
 		/**Creates a component for the given list value.

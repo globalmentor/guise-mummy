@@ -61,7 +61,7 @@ public abstract class AbstractNumberStringLiteralConverter<V extends Number> ext
 	public AbstractNumberStringLiteralConverter(final GuiseSession session, final Style style, final Currency currency)
 	{
 		super(session);	//construct the parent class
-		this.style=checkNull(style, "Style cannot be null");	//save the style
+		this.style=checkInstance(style, "Style cannot be null");	//save the style
 		if(currency!=null && style!=Style.CURRENCY)	//if a currency is provided for a non-currency style
 		{
 			throw new IllegalArgumentException("A specific currency is only relevant for the currency representation style.");

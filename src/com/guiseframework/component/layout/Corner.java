@@ -36,8 +36,8 @@ public enum Corner
 	*/
 	private Corner(final Flow.End lineEnd, final Flow.End pageEnd)
 	{
-		this.lineEnd=checkNull(lineEnd, "Line end cannot be null.");
-		this.pageEnd=checkNull(pageEnd, "Page end cannot be null.");
+		this.lineEnd=checkInstance(lineEnd, "Line end cannot be null.");
+		this.pageEnd=checkInstance(pageEnd, "Page end cannot be null.");
 	}
 
 	/**The corners in [line][page] order.*/

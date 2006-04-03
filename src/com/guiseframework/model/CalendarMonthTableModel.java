@@ -62,7 +62,7 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 		*/
 		public void setDate(final Date newDate)
 		{
-			if(!date.equals(checkNull(newDate, "Date cannot be null.")))	//if the value is really changing
+			if(!date.equals(checkInstance(newDate, "Date cannot be null.")))	//if the value is really changing
 			{
 				final Date oldDate=date;	//get the old value
 				date=(Date)newDate.clone();	//clone the new date and actually change the value
@@ -89,7 +89,7 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 			if(columnLabelDateStyle!=newColumnLabelStyle)	//if the value is really changing
 			{
 				final DateStringLiteralStyle oldColumnLabelStyle=columnLabelDateStyle;	//get the old value
-				columnLabelDateStyle=checkNull(newColumnLabelStyle, "Column label style cannot be null.");	//actually change the value
+				columnLabelDateStyle=checkInstance(newColumnLabelStyle, "Column label style cannot be null.");	//actually change the value
 				updateColumnLabelDateFormat();	//update the column label date format object based upon the new style
 				firePropertyChange(COLUMN_LABEL_DATE_STYLE_PROPERTY, oldColumnLabelStyle, newColumnLabelStyle);	//indicate that the value changed
 			}
@@ -160,7 +160,7 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 		{
 			addColumn(new WeekDayTableColumnModel(session, i));	//add a new week day table column
 		}
-		this.date=checkNull(date, "Date cannot be null");
+		this.date=checkInstance(date, "Date cannot be null");
 		updateModel();	//update the model to match the initial month calendar
 			//TODO important: this is a memory leak---make sure we uninstall the listener when the session goes away
 		session.addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, new AbstractGuisePropertyChangeListener<Locale>()	//listen for the session locale changing

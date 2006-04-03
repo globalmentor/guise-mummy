@@ -27,7 +27,7 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 	public AbstractRDFObjectTreeNodeRepresentationStrategy(final GuiseSession session, final RDFXMLifier rdfXMLifier)
 	{
 		super(session);	//construct the parent
-		xmlifier=checkNull(rdfXMLifier, "RDF XMLifier cannot be null."); //save the XMLifier we'll use for generating labels
+		xmlifier=checkInstance(rdfXMLifier, "RDF XMLifier cannot be null."); //save the XMLifier we'll use for generating labels
 	}
 
 	/**Creates a component to represent the given tree node.

@@ -50,7 +50,7 @@ public class DefaultTextModel extends AbstractModel implements TextModel
 		*/
 		public void setTextContentType(final ContentType newTextContentType)
 		{
-			checkNull(newTextContentType, "Content type cannot be null.");
+			checkInstance(newTextContentType, "Content type cannot be null.");
 			if(textContentType!=newTextContentType)	//if the value is really changing
 			{
 				final ContentType oldTextContentType=textContentType;	//get the old value

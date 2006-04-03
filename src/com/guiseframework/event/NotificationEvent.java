@@ -26,7 +26,7 @@ public class NotificationEvent extends AbstractGuiseEvent
 	public NotificationEvent(final GuiseSession session, final Object source, final Notification notification)
 	{
 		super(session, source);	//construct the parent class
-		this.notification=checkNull(notification, "Notification must be provided.");
+		this.notification=checkInstance(notification, "Notification must be provided.");
 	}
 
 }

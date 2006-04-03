@@ -28,6 +28,6 @@ public class ModalNavigation extends Navigation
 	public ModalNavigation(final URI oldNavigationURI, final URI newNavigationURI, final ModalNavigationListener modalListener)
 	{
 		super(oldNavigationURI, newNavigationURI);	//construct the parent class
-		this.modalListener=checkNull(modalListener, "Modal listener cannot be null.");
+		this.modalListener=checkInstance(modalListener, "Modal listener cannot be null.");
 	}
 }

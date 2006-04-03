@@ -75,10 +75,10 @@ public class Orientation
 	*/
 	public Orientation(final Axis lineAxis, final Flow.Direction lineDirection, final Flow.Direction pageDirection)
 	{
-		axes[Flow.LINE.ordinal()]=checkNull(lineAxis, "Line axis cannot be null.");	//set the line axis
+		axes[Flow.LINE.ordinal()]=checkInstance(lineAxis, "Line axis cannot be null.");	//set the line axis
 		axes[Flow.PAGE.ordinal()]=lineAxis==Axis.X ? Axis.Y : Axis.X;	//the page axis will be the perpendicular axis
-		directions[Flow.LINE.ordinal()]=checkNull(lineDirection, "Line direction cannot be null.");	//set the line direction
-		directions[Flow.PAGE.ordinal()]=checkNull(pageDirection, "Page direction cannot be null.");	//set the page direction
+		directions[Flow.LINE.ordinal()]=checkInstance(lineDirection, "Line direction cannot be null.");	//set the line direction
+		directions[Flow.PAGE.ordinal()]=checkInstance(pageDirection, "Page direction cannot be null.");	//set the page direction
 	}
 
 	/**Retrieves the default orientation for a particular locale.

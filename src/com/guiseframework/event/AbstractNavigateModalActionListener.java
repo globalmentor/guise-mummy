@@ -36,7 +36,7 @@ public class AbstractNavigateModalActionListener extends AbstractNavigateActionL
 	public AbstractNavigateModalActionListener(final URI navigationURI, final ModalNavigationListener modalListener)
 	{
 		super(navigationURI);	//construct the parent class
-		this.modalListener=checkNull(modalListener, "Modal listeners cannot be null");
+		this.modalListener=checkInstance(modalListener, "Modal listeners cannot be null");
 	}
 
 }

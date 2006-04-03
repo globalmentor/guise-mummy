@@ -190,7 +190,7 @@ public abstract class AbstractSelectActionControl<C extends SelectActionControl<
 		*/
 		public SelectActionListener(final SelectActionControl<?> selectActionControl)
 		{
-			this.selectActionControl=checkNull(selectActionControl, "Select action control cannot be null.");
+			this.selectActionControl=checkInstance(selectActionControl, "Select action control cannot be null.");
 		}
 		
 		/**Called when an action is initiated.

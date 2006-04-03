@@ -73,7 +73,7 @@ public class Text extends AbstractContainer<Text> implements TextModel
 	public Text(final GuiseSession session, final String id, final TextModel textModel)
 	{
 		super(session, id, new ReferenceLayout(session));	//construct the parent class
-		this.textModel=checkNull(textModel, "Text model cannot be null.");	//save the text model
+		this.textModel=checkInstance(textModel, "Text model cannot be null.");	//save the text model
 		this.textModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the text model
 	}
 

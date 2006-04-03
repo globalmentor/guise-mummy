@@ -39,8 +39,8 @@ public class LayoutConstraintsPropertyChangeEvent<T extends Constraints, V> exte
 	public LayoutConstraintsPropertyChangeEvent(final Layout<T> source, final Component<?> component, final T constraints, final String propertyName, final V oldValue, V newValue)
 	{
 		super(source, propertyName, oldValue, newValue);	//construct the parent class
-		this.component=checkNull(component, "Component cannot be null.");	//TODO remove checkNull(), as this is now checked in the call to getSession()
-		this.constraints=checkNull(constraints, "Constraints cannot be null.");
+		this.component=checkInstance(component, "Component cannot be null.");	//TODO remove checkNull(), as this is now checked in the call to getSession()
+		this.constraints=checkInstance(constraints, "Constraints cannot be null.");
 	}
 
 }

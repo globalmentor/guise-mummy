@@ -49,7 +49,7 @@ public abstract class AbstractNavigateActionListener implements ActionListener
 	*/
 	public AbstractNavigateActionListener(final URI navigationURI, final String viewportID)
 	{
-		this.navigationURI=checkNull(navigationURI, "Navigation URI cannot be null.");
+		this.navigationURI=checkInstance(navigationURI, "Navigation URI cannot be null.");
 		this.viewportID=viewportID;
 	}
 

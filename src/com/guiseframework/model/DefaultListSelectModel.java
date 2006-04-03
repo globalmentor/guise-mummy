@@ -874,7 +874,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 		selectedIndexSet=new SynchronizedSetDecorator<Integer>(new TreeSet<Integer>(), this);	//create a sorted set synchronized on this object
 		values=new SynchronizedListDecorator<V>(new ArrayList<V>(), this);	//create a value list synchronized on this object
 		valueStates=new SynchronizedListDecorator<ValueState>(new ArrayList<ValueState>(), this);	//create a value state list synchronized on this object
-		this.selectionPolicy=checkNull(listSelectionStrategy, "Selection policy cannot be null.");
+		this.selectionPolicy=checkInstance(listSelectionStrategy, "Selection policy cannot be null.");
 	}
 
 	/**An encapsulation of the state of a value in the model.

@@ -40,8 +40,8 @@ public abstract class AbstractModel extends GuiseBoundPropertyObject implements 
 	*/
 	public static String getPlainText(final String text, final ContentType contentType)	//TODO del or move
 	{
-		checkNull(text, "Text cannot be null");
-		checkNull(contentType, "Content Type cannot be null.");
+		checkInstance(text, "Text cannot be null");
+		checkInstance(contentType, "Content Type cannot be null.");
 		if(!isText(contentType))	//if the new content type is not a text content type
 		{
 			throw new IllegalArgumentException("Content type "+contentType+" is not a text content type.");

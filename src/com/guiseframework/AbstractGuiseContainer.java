@@ -40,8 +40,8 @@ public abstract class AbstractGuiseContainer	implements GuiseContainer
 	*/
 	protected void installApplication(final AbstractGuiseApplication application, final String basePath)
 	{
-		checkNull(application, "Application cannot be null");
-		checkNull(basePath, "Application base path cannot be null");
+		checkInstance(application, "Application cannot be null");
+		checkInstance(basePath, "Application base path cannot be null");
 		synchronized(applicationMap)	//synchronize installations so that we can check the existence of the base path in the container
 		{
 			if(applicationMap.get(basePath)!=null)	//if there is already an application installed at the given base path
@@ -60,7 +60,7 @@ public abstract class AbstractGuiseContainer	implements GuiseContainer
 	*/
 	protected void uninstallApplication(final AbstractGuiseApplication application)
 	{
-		checkNull(application, "Application cannot be null");
+		checkInstance(application, "Application cannot be null");
 		final String basePath=application.getBasePath();	//get the application's base path
 		if(basePath==null || application.getContainer()!=this)	//if the application has no bsae path or has a different container than this class
 		{
@@ -84,7 +84,7 @@ public abstract class AbstractGuiseContainer	implements GuiseContainer
 	*/
 	public AbstractGuiseContainer(final String basePath)
 	{
-		checkNull(basePath, "Application base path cannot be null");
+		checkInstance(basePath, "Application base path cannot be null");
 		if(!isAbsolutePath(basePath) || !isContainerPath(basePath))	//if the path doesn't begin and end with a slash
 		{
 			throw new IllegalArgumentException("Container base path "+basePath+" does not begin and ends with a path separator.");
@@ -118,7 +118,7 @@ public abstract class AbstractGuiseContainer	implements GuiseContainer
 	*/
 	public URI resolveURI(final URI uri)
 	{
-		return URI.create(getBasePath()).resolve(checkNull(uri, "URI cannot be null."));	//create a URI from the container base path and resolve the given path against it
+		return URI.create(getBasePath()).resolve(checkInstance(uri, "URI cannot be null."));	//create a URI from the container base path and resolve the given path against it
 	}
 
 	/**Determines if the application has a resource available stored at the given resource path.

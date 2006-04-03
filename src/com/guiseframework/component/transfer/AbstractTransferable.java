@@ -42,6 +42,6 @@ public abstract class AbstractTransferable<T extends Component<?>> implements Tr
 	*/
 	public AbstractTransferable(final T source)
 	{
-		this.source=checkNull(source, "Source cannot be null.");
+		this.source=checkInstance(source, "Source cannot be null.");
 	}
 }

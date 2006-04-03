@@ -79,4 +79,6 @@
 	<entry key="flyover.frame.tether.image.NWbW">guise/images/flyover-frame-tether-NWbW.gif</entry>
 	<entry key="flyover.frame.tether.image.NWbN">guise/images/flyover-frame-tether-NWbN.gif</entry>
 
+	<!-- icons -->
+	<entry key="image.icon">guise/images/icons/image.gif</entry>
 </properties>

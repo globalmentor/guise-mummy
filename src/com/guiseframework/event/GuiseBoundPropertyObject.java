@@ -26,7 +26,7 @@ public class GuiseBoundPropertyObject extends BoundPropertyObject
 	*/
 	public GuiseBoundPropertyObject(final GuiseSession session)
 	{
-		this.session=checkNull(session, "Session cannot be null");	//save the session
+		this.session=checkInstance(session, "Session cannot be null");	//save the session
 	}
 
 	/**Reports that a bound property has changed. This method can be called	when a bound property has changed and it will send the appropriate property change event to any registered property change listeners.

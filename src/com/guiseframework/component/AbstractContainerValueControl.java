@@ -34,7 +34,7 @@ public abstract class AbstractContainerValueControl<V, C extends ContainerContro
 	public AbstractContainerValueControl(final GuiseSession session, final String id, final Layout layout, final ValueModel<V> valueModel)
 	{
 		super(session, id, layout);	//construct the parent class
-		this.valueModel=checkNull(valueModel, "Value model cannot be null.");	//save the table model
+		this.valueModel=checkInstance(valueModel, "Value model cannot be null.");	//save the table model
 		this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen an repeat all property changes of the value model
 	}
 

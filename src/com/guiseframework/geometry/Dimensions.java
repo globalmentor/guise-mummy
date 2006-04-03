@@ -89,9 +89,9 @@ public class Dimensions
 		{
 			throw new IllegalArgumentException("Depth dimension degree must be 1.");
 		}
-		this.width=checkNull(width, "Width cannot be null.");
-		this.height=checkNull(height, "Height cannot be null.");
-		this.depth=checkNull(depth, "Depth cannot be null.");
+		this.width=checkInstance(width, "Width cannot be null.");
+		this.height=checkInstance(height, "Height cannot be null.");
+		this.depth=checkInstance(depth, "Depth cannot be null.");
 		this.hashCode=ObjectUtilities.hashCode(width, height, depth);	//precalculate the hash code
 	}
 

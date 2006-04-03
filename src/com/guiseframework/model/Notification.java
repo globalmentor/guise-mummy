@@ -164,7 +164,7 @@ public class Notification
 	*/
 	public Notification(final String message, final String messageResourceKey, final ContentType messageContentType, final Severity severity, final Throwable error)
 	{
-		this.severity=checkNull(severity, "A severity must be specified.");
+		this.severity=checkInstance(severity, "A severity must be specified.");
 		this.message=message;
 		this.messageResourceKey=messageResourceKey;
 		if(!isText(messageContentType))	//if the new content type is not a text content type

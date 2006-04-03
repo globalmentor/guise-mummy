@@ -59,7 +59,7 @@ public abstract class AbstractStringLiteralConverter<V> extends AbstractConverte
 	@SuppressWarnings("unchecked")	//we check the value class before generic casting
 	public static <VV> Converter<VV, String> getInstance(final GuiseSession session, final Class<VV> valueClass)
 	{
-		checkNull(valueClass, "Value class cannot be null.");
+		checkInstance(valueClass, "Value class cannot be null.");
 		if(char[].class.equals(valueClass))	//char[]
 		{
 			return (Converter<VV, String>)new CharArrayStringLiteralConverter(session);

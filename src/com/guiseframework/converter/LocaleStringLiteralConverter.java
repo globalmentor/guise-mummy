@@ -27,7 +27,7 @@ public class LocaleStringLiteralConverter extends AbstractConverter<Locale, Stri
 	public LocaleStringLiteralConverter(final GuiseSession session, final LocaleStringLiteralStyle style)
 	{
 		super(session);	//construct the parent class
-		this.style=checkNull(style, "Locale style cannot be null.");
+		this.style=checkInstance(style, "Locale style cannot be null.");
 	}
 
 	/**Converts a value from the value space to a literal value in the lexical space.

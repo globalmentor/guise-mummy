@@ -53,7 +53,7 @@ public abstract class AbstractFlyoverFrame<C extends FlyoverFrame<C>> extends Ab
 		public void setTetherBearing(BigDecimal newTetherBearing)
 		{
 //TODO del Debug.trace("setting flyover tether bearing to", newTetherBearing);
-			checkNull(newTetherBearing, "Tether bearing cannot be null.");
+			checkInstance(newTetherBearing, "Tether bearing cannot be null.");
 			final Set<CompassPoint> tetherBearingCompassPoints=getTetherBearingCompassPoints();	//get the tether bearing compass points available
 			if(!tetherBearingCompassPoints.isEmpty())	//if some tether bearings are supported TOOD fix; right now, if there are no compass points then all bearings are supported
 			{
@@ -108,7 +108,7 @@ public abstract class AbstractFlyoverFrame<C extends FlyoverFrame<C>> extends Ab
 			if(tetherBearing!=tetherBearingCompassPoints)	//if the value is really changing
 			{
 				final Set<CompassPoint> oldTetherBearingCompassPoints=tetherBearingCompassPoints;	//get the current value
-				tetherBearingCompassPoints=checkNull(newTetherBearingCompassPoints, "Tether bearing compass points cannot be null.");	//update the value
+				tetherBearingCompassPoints=checkInstance(newTetherBearingCompassPoints, "Tether bearing compass points cannot be null.");	//update the value
 				firePropertyChange(TETHER_BEARING_PROPERTY, oldTetherBearingCompassPoints, newTetherBearingCompassPoints);
 			}
 		}

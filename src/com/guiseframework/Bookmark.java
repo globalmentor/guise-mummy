@@ -41,7 +41,7 @@ public class Bookmark implements Cloneable
 	*/
 	public String getParameterValue(final String parameterName)
 	{
-		final Parameter parameter=parameterMap.get(checkNull(parameterName, "Parameter name cannot be null."));	//get the requested parameter
+		final Parameter parameter=parameterMap.get(checkInstance(parameterName, "Parameter name cannot be null."));	//get the requested parameter
 		return parameter!=null ? parameter.getValue() : null;	//return the parameter value, if there was a parameter
 /*TODO del when works
 		for(int i=0; i<parameters.length; ++i)	//for each parameter
@@ -212,7 +212,7 @@ public class Bookmark implements Cloneable
 		*/
 		public Parameter(final String name, final String value)
 		{
-			super(checkNull(name, "Parameter name cannot be null."), checkNull(value, "Parameter value cannot be null."));	//construct the parent class
+			super(checkInstance(name, "Parameter name cannot be null."), checkInstance(value, "Parameter value cannot be null."));	//construct the parent class
 		}		
 	}
 }

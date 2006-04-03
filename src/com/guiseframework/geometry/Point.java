@@ -85,9 +85,9 @@ public class Point
 	*/
 	public Point(final Extent x, final Extent y, final Extent z)	//TODO maybe check the degree
 	{
-		this.x=checkNull(x, "X coordinate cannot be null.");
-		this.y=checkNull(y, "Y coordinate cannot be null.");
-		this.z=checkNull(z, "Z coordinate cannot be null.");
+		this.x=checkInstance(x, "X coordinate cannot be null.");
+		this.y=checkInstance(y, "Y coordinate cannot be null.");
+		this.z=checkInstance(z, "Z coordinate cannot be null.");
 	}
 
 

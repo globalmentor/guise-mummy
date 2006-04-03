@@ -157,7 +157,7 @@ public class CheckControl extends AbstractValueControl<Boolean, CheckControl>
 	public CheckControl(final GuiseSession session, final String id, final LabelModel labelModel, final ValueModel<Boolean> valueModel, final CheckType checkType)
 	{
 		super(session, id, labelModel, valueModel);	//construct the parent class
-		this.checkType=checkNull(checkType, "Check type cannot be null");	//save the check type
+		this.checkType=checkInstance(checkType, "Check type cannot be null");	//save the check type
 	}
 
 }

@@ -25,8 +25,8 @@ public abstract class AbstractGuiseEvent extends EventObject implements GuiseEve
 	*/
 	public AbstractGuiseEvent(final GuiseSession session, final Object source)
 	{
-		super(checkNull(source, "Event source object cannot be null"));	//construct the parent class
-		this.session=checkNull(session, "Session cannot be null");	//save the session
+		super(checkInstance(source, "Event source object cannot be null"));	//construct the parent class
+		this.session=checkInstance(session, "Session cannot be null");	//save the session
 	}
 
 }

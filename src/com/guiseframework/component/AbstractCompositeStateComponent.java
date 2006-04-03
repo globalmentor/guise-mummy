@@ -105,7 +105,7 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 		*/
 		public ComponentState(final Component<?> component)
 		{
-			this.component=checkNull(component, "Component cannot be null.");
+			this.component=checkInstance(component, "Component cannot be null.");
 		}
 	}
 

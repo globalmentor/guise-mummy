@@ -122,7 +122,7 @@ public class MessageOptionDialogFrame extends DefaultOptionDialogFrame
 	public MessageOptionDialogFrame(final GuiseSession session, final String id, final Message messageComponent, final Option... options)
 	{
 		super(session, id, messageComponent, options);	//construct the parent class
-		this.message=checkNull(messageComponent, "Message component cannot be null");
+		this.message=checkInstance(messageComponent, "Message component cannot be null");
 		setPreferredWidth(new Extent(25, Extent.Unit.EM));	//set the default preferred size
 		setPreferredHeight(new Extent(10, Extent.Unit.EM));
 	}

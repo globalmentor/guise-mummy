@@ -34,7 +34,7 @@ public class TabContainerControl extends AbstractListSelectContainerControl<TabC
 		*/
 		public void setAxis(final Flow newAxis)
 		{
-			if(axis!=checkNull(newAxis, "Flow axis cannot be null."))	//if the value is really changing
+			if(axis!=checkInstance(newAxis, "Flow axis cannot be null."))	//if the value is really changing
 			{
 				final Flow oldAxis=axis;	//get the old value
 				axis=newAxis;	//actually change the value
@@ -142,7 +142,7 @@ public class TabContainerControl extends AbstractListSelectContainerControl<TabC
 	public TabContainerControl(final GuiseSession session, final String id, final TabLayout layout, final Flow axis, final int maxTabCount)
 	{
 		super(session, id, layout);	//construct the parent class, using the card layout's value model
-		this.axis=checkNull(axis, "Flow axis cannot be null.");
+		this.axis=checkInstance(axis, "Flow axis cannot be null.");
 		this.maxTabCount=maxTabCount;	//save the maximum tab count
 	}
 
