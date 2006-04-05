@@ -1,4 +1,4 @@
-package com.guiseframework.servlet.http;
+package com.guiseframework.platform.web;
 
 import java.io.*;
 import java.net.URI;

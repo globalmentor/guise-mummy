@@ -13,17 +13,28 @@ import com.guiseframework.model.*;
 public class RDFResourceTreeNodeRepresentationStrategy extends AbstractRDFObjectTreeNodeRepresentationStrategy<RDFResource>
 {
 
-	/**Whether the reference URI should be included.*/
+	/**Whether the resource reference URI should be included.*/
 	private boolean resourceReferenceURIIncluded=true;
 
-		/**@return Whether the reference URI should be included.*/
+		/**@return Whether the resource reference URI should be included.*/
 		protected boolean isResourceReferenceURIIncluded() {return resourceReferenceURIIncluded;}
 
-		/**Sets whether the reference URI should be included.
-		@param referenceURIIncluded Whether the reference URI should be included.
+		/**Sets whether the resource reference URI should be included.
+		@param referenceURIIncluded Whether the resource reference URI should be included.
 		*/
 		protected void setResourceReferenceURIIncluded(final boolean referenceURIIncluded) {this.resourceReferenceURIIncluded=referenceURIIncluded;}
-	
+
+	/**Whether the resource type should be included.*/
+	private boolean resourceTypeIncluded=true;
+
+		/**@return Whether the resource type should be included.*/
+		protected boolean isResourceTypeIncluded() {return resourceTypeIncluded;}
+
+		/**Sets whether the resource type should be included.
+		@param resourceTypeIncluded Whether the resource type should be included.
+		*/
+		protected void setResourceTypeIncluded(final boolean resourceTypeIncluded) {this.resourceTypeIncluded=resourceTypeIncluded;}
+		
 	/**Session constructor with a default RDF XMLifier.
 	@param session The Guise session that owns this representation strategy.
 	@exception NullPointerException if the given session is <code>null</code>.
@@ -60,7 +71,7 @@ public class RDFResourceTreeNodeRepresentationStrategy extends AbstractRDFObject
 		final RDFLiteral label=getLabel(value);	//get the label of the resource
 		final boolean hasProperty=stringBuilder.length()>0;	//see if we have property information
 		boolean hasPredicateToken=false;	//we'll note whether we ever have something to represent the predicate of the statement
-		if(type!=null) //if we have a type
+		if(isResourceTypeIncluded() && type!=null) //if we should indicate the resource type and we have a type
 		{
 			if(hasProperty && !hasPredicateToken) //if we had a property but no predicate representation
 				stringBuilder.append(':'); //append a colon to separate the property from the rest

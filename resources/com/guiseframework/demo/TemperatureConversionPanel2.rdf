@@ -8,11 +8,11 @@
 	xmlns:demo="java:com.guiseframework.demo."
 >
 	<demo:TemperatureConversionPanel2 property:name="temperatureConversionPanel">
-		<property:layout><layout:FlowLayout><property:flow>LINE</property:flow></layout:FlowLayout></property:layout>
+		<property:layout><layout:FlowLayout property:flow="LINE"/></property:layout>
 		<property:label>Guise&#x2122; Demonstration: Temperature Conversion</property:label>
 		<property:children rdf:parseType="Collection">
 			<component:LayoutPanel property:name="inputPanel">
-				<property:layout><layout:FlowLayout><property:flow>PAGE</property:flow></layout:FlowLayout></property:layout>
+				<property:layout><layout:FlowLayout property:flow="PAGE"/></property:layout>
 				<property:children rdf:parseType="Collection">
 					<component:TextControl property:name="temperatureInput" property:valueClass="java.lang.Float" property:label="Input Temperature">
 						<property:validator><validator:ValueRequiredValidator/></property:validator>
@@ -21,10 +21,10 @@
 				</property:children>
 			</component:LayoutPanel>
 			<component:LayoutPanel property:name="conversionPanel">
-				<property:layout><layout:FlowLayout><property:flow>PAGE</property:flow></layout:FlowLayout></property:layout>
+				<property:layout><layout:FlowLayout property:flow="PAGE"/></property:layout>
 				<property:children rdf:parseType="Collection">
 					<component:GroupPanel property:name="scalePanel" property:label="Input Scale">
-						<property:layout><layout:FlowLayout><property:flow>PAGE</property:flow></layout:FlowLayout></property:layout>
+						<property:layout><layout:FlowLayout property:flow="PAGE"/></property:layout>
 						<property:children rdf:parseType="Collection">
 							<component:CheckControl property:name="celsiusCheckControl" property:checkType="ELLIPSE" property:label="Calsius"/>
 							<component:CheckControl property:name="fahrenheitCheckControl" property:checkType="ELLIPSE" property:label="Fahrenheit"/>

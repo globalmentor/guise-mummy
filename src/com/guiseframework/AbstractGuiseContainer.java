@@ -78,7 +78,7 @@ public abstract class AbstractGuiseContainer	implements GuiseContainer
 	}
 
 	/**Container base path constructor.
-	@param basePath The base path of the container.
+	@param basePath The base path of the container, an absolute path that ends with a slash ('/'), indicating the base path of the application base paths.
 	@exception NullPointerException if the base path is <code>null</code>.
 	@exception IllegalArgumentException if the base path is not absolute and does not end with a slash ('/') character.
 	*/
@@ -87,7 +87,7 @@ public abstract class AbstractGuiseContainer	implements GuiseContainer
 		checkInstance(basePath, "Application base path cannot be null");
 		if(!isAbsolutePath(basePath) || !isContainerPath(basePath))	//if the path doesn't begin and end with a slash
 		{
-			throw new IllegalArgumentException("Container base path "+basePath+" does not begin and ends with a path separator.");
+			throw new IllegalArgumentException("Container base path "+basePath+" does not begin and end with a path separator.");
 		}
 		this.basePath=basePath;	//store the base path
 	}
