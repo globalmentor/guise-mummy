@@ -16,7 +16,7 @@ import static com.guiseframework.GuiseResourceConstants.*;
 
 /**A layout that manages the selection of child components, only one of which can be selected at a time.
 The layout maintains its own value model that maintains the current selected component.
-If a child component implements {@link Activable} the child component is set as active when selected and set as inactive when the child component is unselected.
+If a child component implements {@link Activeable} the child component is set as active when selected and set as inactive when the child component is unselected.
 @param <T> The type of layout constraints associated with each component.
 @author Garret Wilson
 */
@@ -87,7 +87,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	Called immediately after a component is added to the associated container.
 	This method is called by the associated container, and should not be called directly by application code.
 	This version selects a component if none is selected.
-	This version updates the new component's active status if the component implements {@link Activable}.
+	This version updates the new component's active status if the component implements {@link Activeable}.
 	@param component The component to add to the layout.
 	@exception IllegalStateException if this layout has not yet been installed into a container.
 	*/
@@ -104,9 +104,9 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 			{
 			}
 		}
-		if(component instanceof Activable)	//if the component is activable
+		if(component instanceof Activeable)	//if the component is activable
 		{
-			((Activable)component).setActive(getValue()==component);	//if the card is not the selected card, tell it that it is not active
+			((Activeable)component).setActive(getValue()==component);	//if the card is not the selected card, tell it that it is not active
 		}
 	}
 
@@ -173,7 +173,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	If a validator is installed, the value will first be validated before the current value is changed.
 	Validation always occurs if a validator is installed, even if the value is not changing.
 	This version makes sure that the given component is contained in the container, and resets the cached selected index so that it can be recalculated.
-	This version updates the active status of the old and new components if the implement {@link Activable}.
+	This version updates the active status of the old and new components if the implement {@link Activeable}.
 	@param newValue The input value of the model.
 	@exception ValidationException if the provided value is not valid.
 	@see #getValidator()
@@ -194,14 +194,14 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 				throw new ValidationException(format(getSession().getStringResource(VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE_KEY), newValue.toString()), newValue);						
 			}
 			selectedIndex=-1;	//uncache the selected index
-			if(oldValue instanceof Activable)	//if the old value is activable
+			if(oldValue instanceof Activeable)	//if the old value is activable
 			{
-				((Activable)oldValue).setActive(false);	//tell the old card it is no longer active
+				((Activeable)oldValue).setActive(false);	//tell the old card it is no longer active
 			}
 			getValueModel().setValue(newValue);	//set the new value normally
-			if(newValue instanceof Activable)	//if the new value is activable
+			if(newValue instanceof Activeable)	//if the new value is activable
 			{
-				((Activable)newValue).setActive(true);	//tell the new card it is active
+				((Activeable)newValue).setActive(true);	//tell the new card it is active
 			}
 		}
 	}

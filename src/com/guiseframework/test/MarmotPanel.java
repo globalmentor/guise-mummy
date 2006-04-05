@@ -8,9 +8,15 @@ import com.garretwilson.rdf.RDFLiteral;
 import com.garretwilson.rdf.RDFResource;
 import com.garretwilson.rdf.rdfs.RDFSUtilities;
 import com.garretwilson.util.Debug;
+import com.globalmentor.marmot.DefaultMarmotSession;
+import com.globalmentor.marmot.MarmotSession;
 import com.globalmentor.marmot.guise.repository.RepositoryResourceTreeNodeModel;
+import com.globalmentor.marmot.guise.repository.RepositoryResourceTreeNodeRepresentationStrategy;
 import com.globalmentor.marmot.repository.Repository;
 import com.globalmentor.marmot.repository.webdav.WebDAVRepository;
+import com.globalmentor.marmot.resource.DefaultResourceKit;
+import com.globalmentor.marmot.resource.folder.FolderResourceKit;
+import com.globalmentor.marmot.resource.image.ImageResourceKit;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.event.*;
@@ -54,6 +60,10 @@ public class MarmotPanel extends DefaultNavigationPanel
 			throw new AssertionError(validationException);
 		}
 		add(textInput);
+
+		final MarmotSession marmotSession=new DefaultMarmotSession(new DefaultResourceKit());
+		marmotSession.registerResourceKit(new ImageResourceKit());
+		marmotSession.registerResourceKit(new FolderResourceKit());
 		
 		final Button addButton=new Button(session);
 		addButton.setLabel("Add");
@@ -101,7 +111,7 @@ catch(final ValidationException validationException)
 							frame.setContent(textArea);
 */
 							final TreeControl treeControl=new TreeControl(session);
-							treeControl.setTreeNodeRepresentationStrategy(RDFResource.class, new RDFResourceTreeNodeRepresentationStrategy(session));
+							treeControl.setTreeNodeRepresentationStrategy(RDFResource.class, new RepositoryResourceTreeNodeRepresentationStrategy(session, marmotSession));
 							treeControl.setTreeNodeRepresentationStrategy(RDFLiteral.class, new RDFLiteralTreeNodeRepresentationStrategy(session));
 							try
 							{

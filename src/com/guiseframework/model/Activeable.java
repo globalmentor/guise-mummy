@@ -5,11 +5,11 @@ import static com.garretwilson.lang.ClassUtilities.*;
 /**An object that can be set active or inactive.
 @author Garret Wilson
 */
-public interface Activable
+public interface Activeable
 {
 
 	/**The active bound property.*/
-	public final static String ACTIVE_PROPERTY=getPropertyName(Activable.class, "active");
+	public final static String ACTIVE_PROPERTY=getPropertyName(Activeable.class, "active");
 
 	/**@return Whether the object is active.*/
 	public boolean isActive();

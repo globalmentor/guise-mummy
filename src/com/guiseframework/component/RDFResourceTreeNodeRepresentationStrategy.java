@@ -7,12 +7,23 @@ import static com.garretwilson.rdf.rdfs.RDFSUtilities.*;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.model.*;
 
-/**An tree node representation strategy representing an RDF resource.
+/**A tree node representation strategy representing an RDF resource.
 @author Garret Wilson
 */
 public class RDFResourceTreeNodeRepresentationStrategy extends AbstractRDFObjectTreeNodeRepresentationStrategy<RDFResource>
 {
 
+	/**Whether the reference URI should be included.*/
+	private boolean resourceReferenceURIIncluded=true;
+
+		/**@return Whether the reference URI should be included.*/
+		protected boolean isResourceReferenceURIIncluded() {return resourceReferenceURIIncluded;}
+
+		/**Sets whether the reference URI should be included.
+		@param referenceURIIncluded Whether the reference URI should be included.
+		*/
+		protected void setResourceReferenceURIIncluded(final boolean referenceURIIncluded) {this.resourceReferenceURIIncluded=referenceURIIncluded;}
+	
 	/**Session constructor with a default RDF XMLifier.
 	@param session The Guise session that owns this representation strategy.
 	@exception NullPointerException if the given session is <code>null</code>.
@@ -67,7 +78,7 @@ public class RDFResourceTreeNodeRepresentationStrategy extends AbstractRDFObject
 			stringBuilder.append(label);		//append the text of the label
 			hasPredicateToken=true;	//show that we have something to represent the predicate
 		} 
-		if(value.getReferenceURI()!=null) //if there is no label and this is not a blank node resource
+		if(isResourceReferenceURIIncluded() && value.getReferenceURI()!=null) //if we should indicate the reference URI this is not a blank node resource
 		{
 			if(hasProperty && !hasPredicateToken) //if we had a property but no predicate representation
 				stringBuilder.append(':'); //append a colon to separate the property from the rest

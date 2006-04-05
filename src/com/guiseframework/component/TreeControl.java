@@ -192,15 +192,23 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 			/**@return Whether the component is for a tree node that was editable when the component was created.*/
 			public boolean isEditable() {return editable;}
 
+		/**Whether the component is for a tree node that was expanded when the component was created.*/
+//TODO del		private final boolean expanded;
+
+			/**@return Whether the component is for a tree node that was expanded when the component was created.*/
+//		TODO del			public boolean isExpanded() {return expanded;}
+			
 		/**Constructor
 		@param component The component for a tree node.
 		@param editable Whether the component is for a tree node that was editable when the component was created.
+		@param expanded Whether the component is for a tree node that was expanded when the component was created.
 		@exception NullPointerException if the given component is <code>null</code>.
 		*/
-		public TreeNodeComponentState(final Component<?> component, final boolean editable)
+		public TreeNodeComponentState(final Component<?> component, final boolean editable/*TODO del, final boolean expanded*/)
 		{
 			super(component);	//construct the parent class
 			this.editable=editable;
+//		TODO del			this.expanded=expanded;
 		}
 	}
 

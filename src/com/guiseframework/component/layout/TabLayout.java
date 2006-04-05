@@ -6,7 +6,7 @@ import com.guiseframework.model.*;
 /**A layout that manages child components as a series of tabs.
 Only one child component is visible at a time.
 The tab layout maintains its own value model that maintains the current selected component.
-If a tab implements {@link Activable} the tab is set as active when selected and set as inactive when the tab is unselected.
+If a tab implements {@link Activeable} the tab is set as active when selected and set as inactive when the tab is unselected.
 @author Garret Wilson
 */
 public class TabLayout extends AbstractValueLayout<ControlConstraints>

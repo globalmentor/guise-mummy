@@ -2,6 +2,7 @@ package com.guiseframework.component;
 
 import static com.guiseframework.GuiseResourceConstants.*;
 
+import java.io.IOException;
 import java.util.List;
 
 import com.garretwilson.util.Debug;
@@ -12,6 +13,7 @@ import com.guiseframework.component.layout.Constraints;
 import com.guiseframework.component.layout.TaskCardConstraints;
 import com.guiseframework.event.AbstractGuisePropertyChangeListener;
 import com.guiseframework.event.GuisePropertyChangeEvent;
+import com.guiseframework.model.Commitable;
 import com.guiseframework.model.Enableable;
 import com.guiseframework.model.Notification;
 import com.guiseframework.model.TaskStatus;
@@ -23,7 +25,7 @@ If any card has constraints of {@link TaskCardConstraints}, this class will upda
 @author Garret Wilson
 @see CardLayout
 */
-public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
+public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> implements Commitable
 {
 
 	/**Session constructor.
@@ -285,18 +287,26 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
 //TODO del Debug.trace("ready to validate selected card");
 			if(validate())	//validate this panel; if everything, including the selected card, is valid
 			{
-				final Constraints nextCardConstraints=nextCard.getConstraints();	//get the next card's constraints
-				if(nextCardConstraints instanceof Enableable)	//if the next card constraints is enableable
-				{
-					((Enableable)nextCardConstraints).setEnabled(true);	//enable the next card constraints
-				}
 				try
 				{
-					setValue(nextCard);	//select the next card
+					commit();	//commit this panel
+					final Constraints nextCardConstraints=nextCard.getConstraints();	//get the next card's constraints
+					if(nextCardConstraints instanceof Enableable)	//if the next card constraints is enableable
+					{
+						((Enableable)nextCardConstraints).setEnabled(true);	//enable the next card constraints
+					}
+					try
+					{
+						setValue(nextCard);	//select the next card
+					}
+					catch(final ValidationException validationException)
+					{
+	//					throw new AssertionError(validationException);	//TODO improve
+					}
 				}
-				catch(final ValidationException validationException)
+				catch(final IOException ioException)	//if there is a problem commiting the result
 				{
-//					throw new AssertionError(validationException);	//TODO improve
+					getSession().notify(new Notification(ioException));	//notify the user
 				}
 			}
 		}
@@ -364,6 +374,20 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel>
 			getSession().notify(notification);	//indicate that there was a validation error
 		}
 		return isValid();	//return the current valid state
+	}
+
+	/**Commits the data.
+	This version commits the selected card if there is a selected card and it implements {@link Commitable}.
+	Subclass versions should call this version.
+	@throws IOException if there is an error committing data.
+	*/
+	public void commit() throws IOException
+	{
+		final Component<?> selectedCard=getSelectedValue();	//get the selected card
+		if(selectedCard instanceof Commitable)	//if the selected card is committable
+		{
+			((Commitable)selectedCard).commit();	//tell the card to commit itself
+		}
 	}
 
 	/**Determines the component for navigation based upon the given bookmark.

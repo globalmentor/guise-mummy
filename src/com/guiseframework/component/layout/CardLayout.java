@@ -6,7 +6,7 @@ import com.guiseframework.model.*;
 /**A layout that manages child components as an ordered stack of cards.
 Only one child component is visible at a time.
 The card layout maintains its own value model that maintains the current selected card.
-If a card implements {@link Activable} the card is set as active when selected and set as inactive when the card is unselected.
+If a card implements {@link Activeable} the card is set as active when selected and set as inactive when the card is unselected.
 @author Garret Wilson
 */
 public class CardLayout extends AbstractValueLayout<CardConstraints>

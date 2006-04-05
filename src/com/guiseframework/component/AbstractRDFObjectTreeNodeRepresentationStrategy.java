@@ -49,7 +49,7 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 		{
 			final GuiseSession session=getSession();	//get the session
 			final String id=treeControl.createID(getID(treeNode.getValue()));	//get the ID from the value TODO don't get the ID from the value, as this can change if edited
-			final Label label=new Label(getSession(), getID(value));	//create a new label
+			final Label label=new Label(getSession(), getID(value), createLabelModel(treeControl, model, treeNode));	//create a new label using the created label model TODO always create a label model, not just if there is a value
 			final String labelText=buildLabelText(new StringBuilder(), treeControl, model, treeNode, value).toString();	//construct the label text
 			label.setLabel(labelText);	//set the label's text
 			return label;	//return the label
@@ -58,6 +58,18 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 		{
 			return null;	//don't return a component
 		}
+	}
+
+	/**Creates a label model for the representation label.
+	@param <N> The type of value contained in the node.
+	@param treeControl The component containing the model.
+	@param model The model containing the value.
+	@param treeNode The node containing the value. 
+	@return The label model to use for the label.
+	*/
+	protected <N extends V> LabelModel createLabelModel(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode)
+	{
+		return new DefaultLabelModel(getSession());	//return a default label model
 	}
 
 	/**Builds the label to be used for a tree node.
@@ -70,7 +82,7 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 	@param value The value contained in the node.
 	@return The string builder used to construct the label. 
 	*/
-	protected <N extends V> StringBuilder buildLabelText(final StringBuilder stringBuilder, final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final N value)
+	protected <N extends V> StringBuilder buildLabelText(final StringBuilder stringBuilder, final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final N value)	//TODO later put this method hierarchy in a custom label model
 	{
 		if(treeNode instanceof RDFObjectTreeNodeModel)	//if the tree node is an RDF object tree node
 		{
