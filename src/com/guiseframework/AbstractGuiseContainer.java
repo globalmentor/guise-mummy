@@ -4,18 +4,23 @@ import java.io.InputStream;
 import java.net.URI;
 import java.security.Principal;
 import java.util.*;
+import static java.util.Collections.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.servlet.http.HttpSession;
+
+import com.garretwilson.util.DecoratorReverseMap;
+import com.garretwilson.util.ReverseMap;
+import com.guiseframework.platform.web.HTTPGuiseSessionManager;
+
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.net.URIUtilities.createPathURI;
-import static com.garretwilson.net.URIUtilities.isAbsolutePath;
-import static com.garretwilson.net.URIUtilities.isContainerPath;
+import static com.garretwilson.net.URIUtilities.*;
 
 /**An abstract base class for a Guise instance.
 This implementation only works with Guise applications that descend from {@link AbstractGuiseApplication}.
 @author Garret Wilson
 */
-public abstract class AbstractGuiseContainer	implements GuiseContainer
+public abstract class AbstractGuiseContainer implements GuiseContainer
 {
 
 	/**The base path of the container.*/
@@ -29,6 +34,53 @@ public abstract class AbstractGuiseContainer	implements GuiseContainer
 
 	/**The thread-safe map of Guise applications keyed to application base paths.*/
 	private final Map<String, AbstractGuiseApplication> applicationMap=new ConcurrentHashMap<String, AbstractGuiseApplication>();
+
+	/**The thread-safe reverse map of thread groups for Guise sessions.*/
+//TODO del	private final ReverseMap<GuiseSession, ThreadGroup> sessionThreadGroupReverseMap=new DecoratorReverseMap<GuiseSession, ThreadGroup>(new ConcurrentHashMap<GuiseSession, ThreadGroup>(), new ConcurrentHashMap<ThreadGroup, GuiseSession>());
+
+	/**Determines the thread group to use for the given session.
+	This method must not be called for a session that has not yet been added to the container.
+	@param guiseSession The session for which a thread group is requested.
+	@return The thread group to use for the given session.
+	@exception IllegalStateException if the given session has not yet been associated with a thread group because it has not yet been added to the container.
+	*/
+/*TODO del
+	protected ThreadGroup getThreadGroup(final GuiseSession guiseSession)
+	{
+		final ThreadGroup threadGroup=sessionThreadGroupReverseMap.get(guiseSession);	//retrieve the thread group associated with the given session
+		if(threadGroup==null)	//if there is no thread group for this session
+		{
+			throw new IllegalStateException("Guise session "+guiseSession+" not yet associated with a thread group.");
+		}
+		return threadGroup;	//return the thread group
+	}
+*/
+	
+	/**Adds and initializes a Guise session.
+	This version creates a thread group for the session.
+	@param guiseSession The Guise session to add.
+	@see GuiseSession#initialize()
+	*/
+	protected void addGuiseSession(final GuiseSession guiseSession)
+	{
+/*TODO del
+		final ThreadGroup threadGroup=new ThreadGroup("Guise Session Thread Group "+guiseSession.toString());	//create a new thread group for the session TODO improve name
+		sessionThreadGroupReverseMap.put(guiseSession, threadGroup);	//associate the thread group with the Guise session and vice versa
+*/
+		Guise.getInstance().addGuiseSession(guiseSession);	//add the Guise session to Guise
+		guiseSession.initialize();	//let the Guise session know it's being initialized so that it can listen to the application
+	}
+
+	/**Removes and destroys a Guise session.
+	@param guiseSession The Guise session to remove.
+	@see GuiseSession#destroy() 
+	*/
+	protected void removeGuiseSession(final GuiseSession guiseSession)
+	{
+		guiseSession.destroy();	//let the Guise session know it's being destroyed so that it can clean up and release references to the application
+//TODO del		sessionThreadGroupReverseMap.remove(guiseSession);	//remove the association between the session and the thread group
+		Guise.getInstance().removeGuiseSession(guiseSession);	//remove the Guise session from Guise
+	}
 
 	/**Installs the given application at the given base path.
 	@param application The application to install.

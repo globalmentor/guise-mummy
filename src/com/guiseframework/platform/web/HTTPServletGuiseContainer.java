@@ -119,7 +119,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 			if(guiseSession==null)	//if no Guise session is associated with the given HTTP session
 			{
 Debug.trace("+++creating Guise session", httpSession.getId());
-				guiseSession=guiseApplication.createSession();	//create a new Guise session
+				guiseSession=guiseApplication.createSession();	//ask the application to create a new Guise session
 				final GuiseEnvironment environment=guiseSession.getEnvironment();	//get the new session's environment
 				final Cookie[] cookies=httpRequest.getCookies();	//get the cookies in the request
 				if(cookies!=null)	//if a cookie array was returned
@@ -135,13 +135,32 @@ Debug.trace("+++creating Guise session", httpSession.getId());
 					}
 				}
 				initializeUserAgentEnvironment(environment, httpRequest);	//initialize the user agent information
-				guiseSession.initialize();	//let the Guise session know it's being initializes so that it can listen to the application
+				addGuiseSession(guiseSession);	//add and initialize the Guise session
 				final Locale[] clientAcceptedLanguages=getAcceptedLanguages(httpRequest);	//get all languages accepted by the client
 				guiseSession.requestLocale(asList(clientAcceptedLanguages));	//ask the Guise session to change to one of the accepted locales, if the application supports one
 				guiseSessionMap.put(httpSession, guiseSession);	//associate the Guise session with the HTTP session
 			}
 			return guiseSession;	//return the Guise session
 		}
+	}
+
+	/**Removes the Guise session for the given HTTP session.
+	This method can only be accessed by classes in the same package.
+	This method should only be called by HTTP Guise session manager.
+	@param httpSession The HTTP session which should be removed along with its corresponding Guise session. 
+	@return The Guise session previously associated with the provided HTTP session, or <code>null</code> if no Guise session was associated with the given HTTP session.
+	@see HTTPGuiseSessionManager
+	*/
+	protected GuiseSession removeGuiseSession(final HttpSession httpSession)
+	{
+Debug.trace("+++removing Guise session", httpSession.getId());
+		GuiseSession guiseSession=guiseSessionMap.remove(httpSession);	//remove the HTTP session and Guise session association
+		if(guiseSession!=null)	//if there is a Guise session associated with the HTTP session
+		{
+			removeGuiseSession(guiseSession);	//remove the Guise session
+//TODO del			guiseSession.destroy();	//let the Guise session know it's being destroyed so that it can clean up and release references to the application
+		}
+		return guiseSession;	//return the associated Guise session
 	}
 
 	/**The pattern for matching the Firefox user agent. The entire version number is the first matching group.*/
@@ -221,24 +240,6 @@ Debug.trace("user agent name:", userAgentName, "with version", userAgentVersion,
 				environment.setProperty(GuiseEnvironment.USER_AGENT_VERSION_NUMBERS_PROPERTY, userAgentVersionNumbers);	//store the user agent version numbers
 			}
 		}			
-	}
-
-	/**Removes the Guise session for the given HTTP session.
-	This method can only be accessed by classes in the same package.
-	This method should only be called by HTTP Guise session manager.
-	@param httpSession The HTTP session which should be removed along with its corresponding Guise session. 
-	@return The Guise session previously associated with the provided HTTP session, or <code>null</code> if no Guise session was associated with the given HTTP session.
-	@see HTTPGuiseSessionManager
-	*/
-	protected GuiseSession removeGuiseSession(final HttpSession httpSession)
-	{
-Debug.trace("+++removing Guise session", httpSession.getId());
-		GuiseSession guiseSession=guiseSessionMap.remove(httpSession);	//remove the HTTP session and Guise session association
-		if(guiseSession!=null)	//if there is a Guise session associated with the HTTP session
-		{
-			guiseSession.destroy();	//let the Guise session know it's being destroyed so that it can clean up and release references to the application
-		}
-		return guiseSession;	//return the associated Guise session
 	}
 
 	/**Determines if the container has a resource available stored at the given resource path.

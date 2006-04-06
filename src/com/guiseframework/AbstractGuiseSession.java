@@ -661,6 +661,30 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		this.applicationFrame.open();	//open the application frame
 	}
 
+	/**Determines if there is a panel bound to the given appplication context-relative path.
+	This class synchronizes on {@link #navigationPathPanelMap}.
+	@param path The appplication context-relative path within the Guise container context.
+	@return <code>true</code> if there is a panel bound to the given path, or <code>false</code> if no panel is bound to the given path.
+	@exception NullPointerException if the path is <code>null</code>.
+	@exception IllegalArgumentException if the provided path is absolute.
+	*/
+	public boolean hasNavigationPanel(final String path)
+	{
+		if(isAbsolutePath(checkInstance(path, "Path cannot be null")))	//if the path is absolute
+		{
+			throw new IllegalArgumentException("Navigation path cannot be absolute: "+path);
+		}
+			//see if we have a cached panel
+		synchronized(navigationPathPanelMap)	//don't allow the map to be modified while we access it
+		{
+			if(navigationPathPanelMap.get(path)!=null)	//if we have a panel cached at this navigation path
+			{
+				return true;	//we have a navigation panel at that path
+			}
+		}
+		return getApplication().getNavigationPanelClass(path)!=null;	//see if we know the class to use for creating an application panel at this path
+	}
+
 	/**Retrieves the panel bound to the given appplication context-relative path.
 	If a panel has already been created and cached, it will be be returned; otherwise, one will be created and cached. 
 	The panel will be given an ID of a modified form of the path.
@@ -680,7 +704,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		NavigationPanel panel;	//we'll store the panel here, either a cached panel or a created panel
 		synchronized(navigationPathPanelMap)	//don't allow the map to be modified while we access it
 		{
-			panel=navigationPathPanelMap.get(path);	//get the bound panel type, if any
+			panel=navigationPathPanelMap.get(path);	//get cached panel, if any
 			if(panel==null)	//if no panel is cached
 			{
 				final Class<? extends NavigationPanel> panelClass=getApplication().getNavigationPanelClass(path);	//see which panel we should show for this path

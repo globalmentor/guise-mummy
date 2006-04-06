@@ -1,8 +1,7 @@
 package com.guiseframework.platform.web;
 
 import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.*;
 import java.security.Principal;
 import java.util.*;
 
@@ -18,8 +17,7 @@ import org.xml.sax.SAXException;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 
-import com.garretwilson.io.ContentTypeConstants;
-import com.garretwilson.io.FileUtilities;
+import com.garretwilson.io.*;
 import com.garretwilson.lang.ObjectUtilities;
 
 import static com.garretwilson.io.ContentTypeUtilities.*;
@@ -34,8 +32,7 @@ import static com.garretwilson.text.xml.XMLConstants.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
 import com.garretwilson.security.Nonce;
-import com.garretwilson.text.xml.xpath.PathExpression;
-import com.garretwilson.text.xml.xpath.XPath;
+import com.garretwilson.text.xml.xpath.*;
 import com.garretwilson.util.*;
 import com.guiseframework.*;
 import com.guiseframework.component.*;
@@ -44,7 +41,6 @@ import com.guiseframework.controller.*;
 import com.guiseframework.controller.text.xml.xhtml.*;
 import com.guiseframework.geometry.*;
 import com.guiseframework.model.FileItemResourceImport;
-import com.guiseframework.platform.web.*;
 import com.guiseframework.view.text.xml.xhtml.XHTMLApplicationFrameView;
 
 import static com.garretwilson.util.LocaleUtilities.*;
@@ -365,42 +361,43 @@ Debug.info("session ID", guiseSession.getHTTPSession().getId());	//TODO del
 Debug.info("content length:", request.getContentLength());
 Debug.info("content type:", request.getContentType());
 */
-		final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, request, response);	//create a new Guise context
-		synchronized(guiseSession)	//don't allow other session contexts to be active at the same time
+		if(!serviceGuiseRequest(request, response, guiseContainer, guiseApplication, guiseSession))	//service this Guise request; if this wasn't meant for Guise
 		{
-			guiseSession.setContext(guiseContext);	//set the context for this session
-			try
+			super.doGet(request, response);	//let the default functionality take over
+		}
+	}
+	
+	/**Services a Guise request.
+  If this is a request for a Guise navigation path, a Guise context will be assigned to the Guise session while the request is processed.
+  @param request The HTTP request.
+  @param response The HTTP response.
+  @param guiseContainer The Guise container.
+  @param guiseApplication The Guise application.
+  @param guiseSession The Guise session.
+  @return <code>true</code> if this request was for Guise components, else <code>false</code> if no navigation panel was found at the given location.
+  @exception ServletException if there is a problem servicing the request.
+  @exception IOException if there is an error reading or writing data.
+  */
+	public boolean serviceGuiseRequest(final HttpServletRequest request, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final AbstractGuiseApplication guiseApplication, final GuiseSession guiseSession) throws ServletException, IOException
+	{
+		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request		
+		final String contentTypeString=request.getContentType();	//get the request content type
+		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
+		final boolean isAJAX=contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType);	//see if this is a Guise AJAX request
+		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
+		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
+		final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
+		if(guiseSession.hasNavigationPanel(navigationPath))	//if we have a panel bound to the requested path
+		{
+			final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, request, response);	//create a new Guise context
+			synchronized(guiseSession)	//don't allow other session contexts to be active at the same time
 			{
-//TODO del Debug.trace("before getting requested URI, application base path is:", guiseApplication.getBasePath());
-				final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request		
-				final String contentTypeString=request.getContentType();	//get the request content type
-				final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
-				if(contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType))	//if this is a Guise AJAX request
+					
+				guiseSession.setContext(guiseContext);	//set the context for this session
+				try
 				{
-					serviceAJAX(request, response, guiseContainer, guiseApplication, guiseSession, guiseContext);	//service this AJAX request
-				}
-				else	//if this is a normal request
-				{
-//TODO del Debug.trace("raw path info", rawPathInfo);
-//TODO del Debug.trace("Referrer:", getReferer(request));
-					assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
-					final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
-					
-					final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
-					
-Debug.trace("Before getting navivation panel, bookmark is", bookmark);
-					
-					final NavigationPanel<?> navigationPanel=guiseSession.getNavigationPanel(navigationPath);	//get the panel bound to the requested path
-					if(navigationPanel!=null)	//if we found a frame class for this address
+					if(!isAJAX)	//if this is not an AJAX request, see if we need to enforce modal navigation (only do this after we find a navigation panel, as this request might be for a stylesheet or some other non-panel resource, which shouldn't be redirected)
 					{
-						guiseSession.getApplicationFrame().setContent(navigationPanel);	//place the navigation panel in the application frame
-
-						setNoCache(response);	//TODO testing; fix; update method
-
-						final List<ControlEvent> controlEvents=getControlEvents(request);	//get all control events from the request
-						final FormControlEvent formSubmitEvent=(FormControlEvent)controlEvents.get(0);	//get the form submit event TODO fix, combine with AJAX code
-
-							//before actually changing the navigation path, check to see if we're in the middle of modal navigation (only do this after we find a navigation panel, as this request might be for a stylesheet or some other non-panel resource, which shouldn't be redirected)
 						final ModalNavigation modalNavigation=guiseSession.getModalNavigation();	//see if we are currently doing modal navigation
 						if(modalNavigation!=null)	//if we are currently in the middle of modal navigation, make sure the correct panel was requested
 						{
@@ -409,308 +406,252 @@ Debug.trace("Before getting navivation panel, bookmark is", bookmark);
 							{
 								throw new HTTPMovedTemporarilyException(modalNavigationURI);	//redirect to the modal navigation location				
 							}
-						}						
-						final String referrer=getReferer(request);	//get the request referrer, if any
-						final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
-						guiseSession.setNavigation(navigationPath, bookmark, referrerURI);	//set the session navigation, firing any navigation events if appropriate
-						final Principal oldPrincipal=guiseSession.getPrincipal();	//get the old principal
-						if(formSubmitEvent.getParameterListMap().size()>0)	//only query the view if there were submitted values---especially important for radio buttons and checkboxes, which must assume a value of false if nothing is submitted for them, thereby updating the model
-						{
-							guiseContext.setState(GuiseContext.State.PROCESS_EVENT);	//update the context state for processing an event
-							navigationPanel.processEvent(formSubmitEvent);		//tell the panel to process the event
 						}
-						guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view; make the change now in case queued model changes want to navigate, and an error was thrown when updating the model) TODO see if this comment is relevant after new local-error-catching changes above
-						if(!ObjectUtilities.equals(oldPrincipal, guiseSession.getPrincipal()))	//if the principal has changed after updating the model
+					}		
+		//TODO fix to recognize navigation, bookmark, and principal changes when the navigation panel is created		final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
+					final Bookmark oldBookmark=guiseSession.getBookmark();	//get the original bookmark
+					final Principal oldPrincipal=guiseSession.getPrincipal();	//get the old principal
+					final NavigationPanel navigationPanel=guiseSession.getNavigationPanel(navigationPath);	//get the panel bound to the requested path
+					if(navigationPanel!=null)	//if we found a panel class for this address
+					{
+						final ApplicationFrame<?> applicationFrame=guiseSession.getApplicationFrame();	//get the application frame
+						final List<ControlEvent> controlEvents=getControlEvents(request);	//get all control events from the request
+						if(isAJAX)	//if this is an AJAX request
 						{
-							throw new HTTPMovedTemporarilyException(guiseContext.getNavigationURI());	//redirect to the same page, which will generate a new request with no POST parameters, which would likely change the principal again)
+							guiseContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type
+							guiseContext.writeElementBegin(null, "response");	//<response>	//TODO use a constant, decide on a namespace
 						}
-						
-						
-						
-						
-//TODO testing new section; combine with AJAX section						
-/*TODO fix; combine						
-						
-						final Bookmark newBookmark=guiseSession.getBookmark();	//see if the bookmark has changed
-Debug.trace("after getting navigation panel, bookmark is", newBookmark);
-						final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
-						if(requestedNavigation!=null || !ObjectUtilities.equals(bookmark, newBookmark))	//if navigation is requested or the bookmark has changed, redirect the browser
+						else	//if this is not an AJAX request
 						{
-							final String redirectURIString;	//we'll determine where to direct to
-							if(requestedNavigation!=null)	//if navigation is requested
+							applicationFrame.setContent(navigationPanel);	//place the navigation panel in the application frame
+							setNoCache(response);	//TODO testing; fix; update method				
+							final String referrer=getReferer(request);	//get the request referrer, if any
+							final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
+							guiseSession.setNavigation(navigationPath, oldBookmark, referrerURI);	//set the session navigation, firing any navigation events if appropriate
+						}
+						for(final ControlEvent controlEvent:controlEvents)	//for each control event
+						{
+							final Set<Frame<?>> removedFrames=new HashSet<Frame<?>>();	//create a set of frames so that we can know which ones were removed TODO testing
+							CollectionUtilities.addAll(removedFrames, guiseSession.getFrameIterator());	//get all the current frames; we'll determine which ones were removed, later TODO improve all this
+							
+							final Set<Component<?>> requestedComponents=new HashSet<Component<?>>();	//create a set of component that were identified in the request
+							if(controlEvent instanceof FormControlEvent)	//if this is a form submission
 							{
-								final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
-			//TODO del Debug.trace("navigation requested to", requestedNavigationURI);
-								guiseSession.clearRequestedNavigation();	//remove any navigation requests
-								if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
+								final FormControlEvent formControlEvent=(FormControlEvent)controlEvent;	//get the form control event
+								if(formControlEvent.isExhaustive())	//if this is an exhaustive form submission (such as a POST submission)
 								{
-									beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation)requestedNavigation);	//begin the modal navigation
+									if(formControlEvent.getParameterListMap().size()>0)	//only process the event if there were submitted values---especially important for radio buttons and checkboxes, which must assume a value of false if nothing is submitted for them, thereby updating the model
+									{
+										requestedComponents.add(navigationPanel);	//we'll give the event to the entire navigation panel
+									}
 								}
-								redirectURIString=requestedNavigationURI.toString();	//we already have the destination URI
+								else	//if this is only a partial form submission
+								{
+									final ListMap<String, Object> parameterListMap=formControlEvent.getParameterListMap();	//get the request parameter map
+									for(final Map.Entry<String, List<Object>> parameterListMapEntry:parameterListMap.entrySet())	//for each entry in the map of parameter lists
+									{
+										final String parameterName=parameterListMapEntry.getKey();	//get the parameter name
+				
+										if(parameterName.equals(XHTMLApplicationFrameView.getActionInputID(applicationFrame)) && parameterListMapEntry.getValue().size()>0)	//if this parameter is for an action
+										{
+											final Component<?> actionComponent=getComponentByID(guiseSession, parameterListMapEntry.getValue().get(0).toString());	//get an action component
+											if(actionComponent!=null)	//if we found an action component
+											{
+												requestedComponents.add(actionComponent);	//add it to the list of requested components
+											}
+										}
+										else	//if this parameter is not a special action parameter
+										{
+											//TODO don't re-update nested components (less important for controls, which don't have nested components) 
+							//TODO del Debug.trace("looking for component with name", parameterName);
+											getControlsByName(guiseSession, parameterName, requestedComponents);	//TODO comment; tidy
+				//TODO del; test new method; tidy; comment							getControlsByName(guiseContext, navigationPanel, parameterName, requestedComponents);	//get all components identified by this name
+										}
+									}
+								}
 							}
-							else	//if navigation is not requested, request a navigation to the new bookmark location
+							else if(controlEvent instanceof ComponentControlEvent)	//if this event is bound for a specific component
 							{
-								redirectURIString=request.getRequestURL().append(newBookmark).toString();	//save the string form of the constructed bookmark URI
+			//TODO del Debug.trace("this is a control event; looking for component with ID", ((ComponentControlEvent)controlEvent).getComponentID());
+								final Component<?> component=getComponentByID(guiseSession, ((ComponentControlEvent)controlEvent).getComponentID());	//get the target component from its ID
+								if(component!=null)	//if there is a target component
+								{
+			//TODO del Debug.trace("got component", component);
+									requestedComponents.add(component);	//add the component to the set of requested components
+								}
 							}
-						}
-						if(requestedNavigation!=null)	//if navigation was requested (i.e. this isn't just a bookmark registration)
-						{
-Debug.trace("have new requested navigation:", requestedNavigation);
-							final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
-							//TODO fix to work with other viewports
-							throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
-						}
-*/
-						
-						
-						
-						
-						final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
-						if(requestedNavigation!=null)	//if navigation is requested
-						{
-							final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
-//TODO del Debug.trace("navigation requested to", requestedNavigationURI);
-							guiseSession.clearRequestedNavigation();	//remove any navigation requests
-							if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
+							if(!requestedComponents.isEmpty())	//if components were requested
 							{
-								beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation)requestedNavigation);	//begin the modal navigation
+								guiseContext.setState(GuiseContext.State.PROCESS_EVENT);	//update the context state for processing an event
+								for(final Component<?> component:requestedComponents)	//for each requested component
+								{
+			Debug.trace("ready to process event", controlEvent, "for component", component);
+									component.processEvent(controlEvent);		//tell the component to process the event
+								}
+								guiseContext.setState(GuiseContext.State.INACTIVE);	//deactivate the context so that any model update events will be generated
+							}					
+			/*TODO del
+			Debug.trace("we now have affected components:", affectedComponents.size());
+			for(final Component<?> affectedComponent:affectedComponents)
+			{
+				Debug.trace("affected component:", affectedComponent);
+			}
+			*/
+							final Bookmark newBookmark=guiseSession.getBookmark();	//see if the bookmark has changed
+							final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
+							if(requestedNavigation!=null || !ObjectUtilities.equals(oldBookmark, newBookmark))	//if navigation is requested or the bookmark has changed, redirect the browser
+							{
+								final String redirectURIString;	//we'll determine where to direct to
+								if(requestedNavigation!=null)	//if navigation is requested
+								{
+									final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
+				//TODO del Debug.trace("navigation requested to", requestedNavigationURI);
+									guiseSession.clearRequestedNavigation();	//remove any navigation requests
+									if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
+									{
+										beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation)requestedNavigation);	//begin the modal navigation
+									}
+									redirectURIString=requestedNavigationURI.toString();	//we already have the destination URI
+								}
+								else	//if navigation is not requested, request a navigation to the new bookmark location
+								{
+									redirectURIString=request.getRequestURL().append(newBookmark).toString();	//save the string form of the constructed bookmark URI
+								}
+								if(isAJAX)	//if this is an AJAX request
+								{
+									guiseContext.writeElementBegin(null, "navigate");	//<navigate>	//TODO use a constant
+									if(requestedNavigation!=null)	//if navigation was requested (i.e. this isn't just a bookmark registration)
+									{
+										final String viewportID=requestedNavigation.getViewportID();	//get the requested viewport ID
+										if(viewportID!=null)	//if a viewport was requested
+										{
+											guiseContext.writeAttribute(null, "viewportID", viewportID);	//specify the viewport ID TODO use a constant
+										}
+									}
+									guiseContext.write(redirectURIString);	//write the navigation URI
+									guiseContext.writeElementEnd(null, "navigate");	//</navigate>
+								}
+								else	//if this is not an AJAX request
+								{
+									throw new HTTPMovedTemporarilyException(URI.create(redirectURIString));	//redirect to the new navigation location TODO fix to work with other viewports						
+								}
+			//TODO if !AJAX						throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
+								//TODO store a flag or something---if we're navigating, we probably should flush the other queued events
 							}
-							//TODO fix to work with other viewports
-							throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
-						}
-
-						synchronizeCookies(request, response, guiseSession);	//synchronize the cookies going out in the response; do this before anything is written back to the client
-						guiseSession.getApplicationFrame().updateView(guiseContext);		//tell the application frame to update its view
-					}
-					else	//if we have no panel type for this address
-					{
-						super.doGet(request, response);	//let the default functionality take over					
-					}
-				}
-			}
-			finally
-			{
-				guiseContext.setState(GuiseContext.State.INACTIVE);	//always deactivate the context			
-				guiseSession.setContext(null);	//remove this context from the session
-			}
-		}
-	}
-
-	/**Services an AJAX request.
-  @param request The HTTP request.
-  @param response The HTTP response.
-  @param guiseContainer The Guise container.
-  @param guiseApplication The Guise application.
-  @param guiseSession The Guise session.
-  @param guiseContext The Guise context.
-  @exception ServletException if there is a problem servicing the request.
-  @exception IOException if there is an error reading or writing data.
-  */
-	public void serviceAJAX(final HttpServletRequest request, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final AbstractGuiseApplication guiseApplication, final GuiseSession guiseSession, final HTTPServletGuiseContext guiseContext) throws ServletException, IOException
-	{
-		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request		
-		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
-		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
-		final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
-//TODO del		final String navigationPath=rawPathInfo.substring(1, rawPathInfo.length()-AJAX_URI_SUFFIX.length());	//remove the beginning slash and the AJAX suffix
-/*TODO del when works
-		if(Debug.isDebug() && Debug.getReportLevels().contains(Debug.ReportLevel.INFO))	//indicate the parameters if information tracing is turned on
-		{
-			Debug.info("Received AJAX parameters:");
-			final ListMap<Object, Object> parameterListMap=guiseContext.getParameterListMap();	//get the request parameter map
-			for(final Map.Entry<Object, List<Object>> parameterListMapEntry:parameterListMap.entrySet())	//for each entry in the map of parameter lists
-			{
-				Debug.info("Key:", parameterListMapEntry.getKey(), "Value:", ArrayUtilities.toString(parameterListMapEntry.getValue().toArray()));				
-			}
-		}
-*/
-//	TODO del			final String navigationPath=(String)guiseContext.getParameterListMap().getItem("navigationPath");	//TODO decode param value
-		final NavigationPanel navigationPanel=guiseSession.getNavigationPanel(navigationPath);	//get the panel bound to the requested path
-		if(navigationPanel!=null)	//if we found a panel class for this address
-		{
-			final ApplicationFrame<?> applicationFrame=guiseSession.getApplicationFrame();	//get the application frame
-			final Bookmark oldBookmark=guiseSession.getBookmark();	//get the original bookmark
 			
-			final List<ControlEvent> controlEvents=getControlEvents(request);	//get all control events from the request
-			guiseContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type
-			guiseContext.writeElementBegin(null, "response");	//<response>	//TODO use a constant, decide on a namespace
-			for(final ControlEvent controlEvent:controlEvents)	//for each control event
-			{
-				final Set<Frame<?>> removedFrames=new HashSet<Frame<?>>();	//create a set of frames so that we can know which ones were removed TODO testing
-				CollectionUtilities.addAll(removedFrames, guiseSession.getFrameIterator());	//get all the current frames; we'll determine which ones were removed, later TODO improve all this
-				
-				final Set<Component<?>> requestedComponents=new HashSet<Component<?>>();	//create a set of component that were identified in the request
-				if(controlEvent instanceof FormControlEvent)	//if this is a form submission
-				{
-					final FormControlEvent formSubmitEvent=(FormControlEvent)controlEvent;	//get the form submit event
-					final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the request parameter map
-					for(final Map.Entry<String, List<Object>> parameterListMapEntry:parameterListMap.entrySet())	//for each entry in the map of parameter lists
-					{
-						final String parameterName=parameterListMapEntry.getKey();	//get the parameter name
-
-						if(parameterName.equals(XHTMLApplicationFrameView.getActionInputID(applicationFrame)) && parameterListMapEntry.getValue().size()>0)	//if this parameter is for an action
-						{
-							final Component<?> actionComponent=getComponentByID(guiseSession, parameterListMapEntry.getValue().get(0).toString());	//get an action component
-							if(actionComponent!=null)	//if we found an action component
+							
+							
+							
+							if(!ObjectUtilities.equals(oldPrincipal, guiseSession.getPrincipal()))	//if the principal has changed after updating the model
 							{
-								requestedComponents.add(actionComponent);	//add it to the list of requested components
+								if(isAJAX)	//if this is an AJAX request
+								{
+									guiseContext.writeElementBegin(null, "reload", true);	//<reload>	//TODO use a constant
+									guiseContext.writeElementEnd(null, "reload");	//</reload>
+										//TODO break
+								}
+								else	//if this is not an AJAX request
+								{
+									throw new HTTPMovedTemporarilyException(guiseContext.getNavigationURI());	//redirect to the same page, which will generate a new request with no POST parameters, which would likely change the principal again)
+								}
+							}
+							
+							
+								//TODO this is not guaranteed to work here (although it works on Tomcat), because content has already been written to the server; change the context so that it collects everything into a StringBuilder before sending it back
+								//TODO move this to the bottom of the processing, as cookies only need to be updated before they go back
+							synchronizeCookies(request, response, guiseSession);	//synchronize the cookies going out in the response; do this before anything is written back to the client
+							
+							guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view
+							if(isAJAX)	//if this is an AJAX request
+							{
+								final Collection<Component<?>> dirtyComponents=getDirtyComponents(guiseSession);	//get all dirty components in all the session frames
+				
+								CollectionUtilities.removeAll(removedFrames, guiseSession.getFrameIterator());	//remove all the ending frames, leaving us the frames that were removed TODO improve all this
+				//TODO fix					dirtyComponents.addAll(frames);	//add all the frames that were removed
+								
+								Debug.trace("we now have dirty components:", dirtyComponents.size());
+								for(final Component<?> affectedComponent:dirtyComponents)
+								{
+									Debug.trace("affected component:", affectedComponent);
+								}
+								if(dirtyComponents.contains(applicationFrame))	//if the application frame itself was affected, we might as well reload the page
+								{
+									guiseContext.writeElementBegin(null, "reload", true);	//<reload>	//TODO use a constant
+									guiseContext.writeElementEnd(null, "reload");	//</reload>
+								}
+								else	//if the application frame wasn't affected
+								{
+									for(final Component<?> dirtyComponent:dirtyComponents)	//for each component affected by this update cycle
+									{
+				//TODO fix							if(dirtyComponent.isVisible())	//if the component is visible
+										guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
+				//TODO fix							else	//if the component is not visible, remove the component's elements
+										guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
+										guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
+										dirtyComponent.updateView(guiseContext);		//tell the component to update its view
+										guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "patch");	//</xhtml:patch>
+									}
+									for(final Frame<?> frame:removedFrames)	//for each removed frame
+									{
+										guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "remove");	//<xhtml:remove>	//TODO use a constant TODO don't use the XHTML namespace if we can help it								
+										guiseContext.writeAttribute(null, "id", frame.getID());	//TODO fix
+				//TODO del Debug.trace("Sending message to remove frame:", frame.getID());
+										guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "remove");	//</xhtml:remove>							
+									}
+									if(controlEvent instanceof InitControlEvent)	//if this is an initialization event TODO maybe just dirty all the frames so this happens automatically
+									{
+											//close all the flyover frames to get rid of stuck flyover frames, such as those left from refreshing the page during flyover TODO fix; this is a workaround to keep refreshing the page from leaving stuck flyover frames; maybe do something better
+										final Iterator<Frame<?>> flyoverFrameIterator=guiseSession.getFrameIterator();	//get an iterator to all the frames
+										while(flyoverFrameIterator.hasNext())	//while there are more frames
+										{
+											final Frame<?> frame=flyoverFrameIterator.next();	//get the next frame
+											if(frame instanceof FlyoverFrame)	//if this is a flyover frame
+											{
+												frame.close();	//close all flyover frames
+											}
+										}
+											//send back any open frames
+										final Iterator<Frame<?>> frameIterator=guiseSession.getFrameIterator();	//get an iterator to all the frames
+										while(frameIterator.hasNext())	//while there are more frames
+										{
+											final Frame<?> frame=frameIterator.next();	//get the next frame
+											if(frame!=guiseSession.getApplicationFrame())	//don't send back the application frame
+											{
+												guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
+					//							TODO fix							else	//if the component is not visible, remove the component's elements
+												guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
+												frame.updateView(guiseContext);		//tell the component to update its view
+												guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "patch");	//</xhtml:patch>
+											}
+										}
+									}
+								}
+							}
+							else	//if this is not an AJAX request
+							{
+								applicationFrame.updateView(guiseContext);		//tell the application frame to update its view						
 							}
 						}
-						else	//if this parameter is not a special action parameter
+						if(isAJAX)	//if this is an AJAX request
 						{
-							//TODO don't re-update nested components (less important for controls, which don't have nested components) 
-			//TODO del Debug.trace("looking for component with name", parameterName);
-							getControlsByName(guiseSession, parameterName, requestedComponents);	//TODO comment; tidy
-//TODO del; test new method; tidy; comment							getControlsByName(guiseContext, navigationPanel, parameterName, requestedComponents);	//get all components identified by this name
+							guiseContext.writeElementEnd(null, "response");	//</response>
 						}
 					}
 				}
-				else if(controlEvent instanceof ComponentControlEvent)	//if this event is bound for a specific component
+				finally
 				{
-//TODO del Debug.trace("this is a control event; looking for component with ID", ((ComponentControlEvent)controlEvent).getComponentID());
-					final Component<?> component=getComponentByID(guiseSession, ((ComponentControlEvent)controlEvent).getComponentID());	//get the target component from its ID
-					if(component!=null)	//if there is a target component
-					{
-//TODO del Debug.trace("got component", component);
-						requestedComponents.add(component);	//add the component to the set of requested components
-					}					
-				}
-				if(!requestedComponents.isEmpty())	//if components were requested
-				{
-					guiseContext.setState(GuiseContext.State.PROCESS_EVENT);	//update the context state for processing an event
-					for(final Component<?> component:requestedComponents)	//for each requested component
-					{
-Debug.trace("ready to process event", controlEvent, "for component", component);
-						component.processEvent(controlEvent);		//tell the component to process the event
-					}
-					guiseContext.setState(GuiseContext.State.INACTIVE);	//deactivate the context so that any model update events will be generated
-				}					
-/*TODO del
-Debug.trace("we now have affected components:", affectedComponents.size());
-for(final Component<?> affectedComponent:affectedComponents)
-{
-	Debug.trace("affected component:", affectedComponent);
-}
-*/
-				final Bookmark newBookmark=guiseSession.getBookmark();	//see if the bookmark has changed
-				final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
-				if(requestedNavigation!=null || !ObjectUtilities.equals(oldBookmark, newBookmark))	//if navigation is requested or the bookmark has changed, redirect the browser
-				{
-					final String redirectURIString;	//we'll determine where to direct to
-					if(requestedNavigation!=null)	//if navigation is requested
-					{
-						final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
-	//TODO del Debug.trace("navigation requested to", requestedNavigationURI);
-						guiseSession.clearRequestedNavigation();	//remove any navigation requests
-						if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
-						{
-							beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation)requestedNavigation);	//begin the modal navigation
-						}
-						redirectURIString=requestedNavigationURI.toString();	//we already have the destination URI
-					}
-					else	//if navigation is not requested, request a navigation to the new bookmark location
-					{
-						redirectURIString=request.getRequestURL().append(newBookmark).toString();	//save the string form of the constructed bookmark URI
-					}
-					//TODO ifAJAX()
-					guiseContext.writeElementBegin(null, "navigate");	//<navigate>	//TODO use a constant
-					if(requestedNavigation!=null)	//if navigation was requested (i.e. this isn't just a bookmark registration)
-					{
-						final String viewportID=requestedNavigation.getViewportID();	//get the requested viewport ID
-						if(viewportID!=null)	//if a viewport was requested
-						{
-							guiseContext.writeAttribute(null, "viewportID", viewportID);	//specify the viewport ID TODO use a constant
-						}
-					}
-					guiseContext.write(redirectURIString);	//write the navigation URI
-					guiseContext.writeElementEnd(null, "navigate");	//</navigate>
-//TODO if !AJAX						throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
-					//TODO store a flag or something---if we're navigating, we probably should flush the other queued events
-				}
-
-				
-				final Collection<Component<?>> dirtyComponents=getDirtyComponents(guiseSession);	//get all dirty components in all the session frames 
-
-				CollectionUtilities.removeAll(removedFrames, guiseSession.getFrameIterator());	//remove all the ending frames, leaving us the frames that were removed TODO improve all this
-//TODO fix					dirtyComponents.addAll(frames);	//add all the frames that were removed
-/*TODO del
-					if(controlEvent instanceof InitControlEvent)	//if this is an initialization event
-					{
-Debug.trace("found init event; currently have frame count:", frames.size());
-						CollectionUtilities.addAll(frames, guiseSession.getFrameIterator());	//get all the current frames so that the page can have the most up-to-date frame information
-Debug.trace("now have frames: ", frames.size());
-					}
-*/
-				
-				Debug.trace("we now have dirty components:", dirtyComponents.size());
-				for(final Component<?> affectedComponent:dirtyComponents)
-				{
-					Debug.trace("affected component:", affectedComponent);
-				}
-				
-					//TODO this is not guaranteed to work here (although it works on Tomcat), because content has already been written to the server; change the context so that it collects everything into a StringBuilder before sending it back
-					//TODO move this to the bottom of the processing, as cookies only need to be updated before they go back
-				synchronizeCookies(request, response, guiseSession);	//synchronize the cookies going out in the response; do this before anything is written back to the client
-				
-				if(dirtyComponents.contains(applicationFrame))	//if the application frame itself was affected, we might as well reload the page
-				{
-					guiseContext.writeElementBegin(null, "reload", true);	//<reload>	//TODO use a constant
-					guiseContext.writeElementEnd(null, "reload");	//</reload>						
-				}
-				else	//if the application frame wasn't affected
-				{
-					guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view
-					for(final Component<?> dirtyComponent:dirtyComponents)	//for each component affected by this update cycle
-					{
-//TODO fix							if(dirtyComponent.isVisible())	//if the component is visible
-						guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
-//TODO fix							else	//if the component is not visible, remove the component's elements
-						guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
-						guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
-						dirtyComponent.updateView(guiseContext);		//tell the component to update its view
-						guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "patch");	//</xhtml:patch>
-					}
-					for(final Frame<?> frame:removedFrames)	//for each removed frame
-					{
-						guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "remove");	//<xhtml:remove>	//TODO use a constant TODO don't use the XHTML namespace if we can help it								
-						guiseContext.writeAttribute(null, "id", frame.getID());	//TODO fix
-//TODO del Debug.trace("Sending message to remove frame:", frame.getID());
-						guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "remove");	//</xhtml:remove>							
-					}
-					if(controlEvent instanceof InitControlEvent)	//if this is an initialization event TODO maybe just dirty all the frames so this happens automatically
-					{
-							//close all the flyover frames to get rid of stuck flyover frames, such as those left from refreshing the page during flyover TODO fix; this is a workaround to keep refreshing the page from leaving stuck flyover frames; maybe do something better
-						final Iterator<Frame<?>> flyoverFrameIterator=guiseSession.getFrameIterator();	//get an iterator to all the frames
-						while(flyoverFrameIterator.hasNext())	//while there are more frames
-						{
-							final Frame<?> frame=flyoverFrameIterator.next();	//get the next frame
-							if(frame instanceof FlyoverFrame)	//if this is a flyover frame
-							{
-								frame.close();	//close all flyover frames
-							}
-						}
-							//send back any open frames
-						final Iterator<Frame<?>> frameIterator=guiseSession.getFrameIterator();	//get an iterator to all the frames
-						while(frameIterator.hasNext())	//while there are more frames
-						{
-							final Frame<?> frame=frameIterator.next();	//get the next frame
-							if(frame!=guiseSession.getApplicationFrame())	//don't send back the application frame
-							{
-								guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
-	//							TODO fix							else	//if the component is not visible, remove the component's elements
-								guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
-								frame.updateView(guiseContext);		//tell the component to update its view
-								guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "patch");	//</xhtml:patch>
-							}
-						}
-					}
+					guiseContext.setState(GuiseContext.State.INACTIVE);	//always deactivate the context			
+					guiseSession.setContext(null);	//remove this context from the session
 				}
 			}
-			guiseContext.setState(GuiseContext.State.INACTIVE);	//deactivate the context so that any model update events will be generated			
-			guiseContext.writeElementEnd(null, "response");	//</response>
+			return true;	//show that we processed the Guise request
+		}
+		else	//if there was no navigation panel at the given path
+		{
+			return false;	//indicate that this was not a Guise component-related request
 		}
 	}
-
+	
 	/**Synchronizes the cookies in a request with the environment properties in a Guise session.
   Any cookies missing from the request will be added from the environment to the response.
   @param request The HTTP request.

@@ -34,7 +34,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		};
 
 	/**The map of tree node representation strategies for classes.*/
-	private final Map<Class<?>, ValueRepresentationStrategy<?>> classTreeNodeRepresentationStrategyMap=new ConcurrentHashMap<Class<?>, ValueRepresentationStrategy<?>>();
+	private final Map<Class<?>, TreeNodeRepresentationStrategy<?>> classTreeNodeRepresentationStrategyMap=new ConcurrentHashMap<Class<?>, TreeNodeRepresentationStrategy<?>>();
 
 	/**Installs the given tree node representation strategy to produce representation components for the given value class.
 	@param <V> The type of value to represent.
@@ -43,9 +43,9 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	@return The representation strategy previously associated with the given value type.
 	*/	
 	@SuppressWarnings("unchecked")	//we check the generic types before putting them in the map, so it's fine to cast the retrieved values
-	public <V> ValueRepresentationStrategy<? super V> setTreeNodeRepresentationStrategy(final Class<V> valueClass, ValueRepresentationStrategy<V> treeNodeRepresentationStrategy)
+	public <V> TreeNodeRepresentationStrategy<? super V> setTreeNodeRepresentationStrategy(final Class<V> valueClass, TreeNodeRepresentationStrategy<V> treeNodeRepresentationStrategy)
 	{
-		return (ValueRepresentationStrategy<? super V>)classTreeNodeRepresentationStrategyMap.put(valueClass, treeNodeRepresentationStrategy);	//associate the strategy with the value class in the map
+		return (TreeNodeRepresentationStrategy<? super V>)classTreeNodeRepresentationStrategyMap.put(valueClass, treeNodeRepresentationStrategy);	//associate the strategy with the value class in the map
 	}
 
 	/**Returns the given tree node representation strategy assigned to produce representation components for the given value class.
@@ -55,13 +55,13 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	@return The strategy for generating components to represent values of the given type, or <code>null</code> if there is no associated representation strategy.
 	*/	
 	@SuppressWarnings("unchecked")	//we check the generic types before putting them in the map, so it's fine to cast the retrieved values
-	public <V> ValueRepresentationStrategy<? super V> getTreeNodeRepresentationStrategy(final Class<V> valueClass)
+	public <V> TreeNodeRepresentationStrategy<? super V> getTreeNodeRepresentationStrategy(final Class<V> valueClass)
 	{
-		ValueRepresentationStrategy<? super V> treeNodeRepresentationStrategy=(ValueRepresentationStrategy<? super V>)classTreeNodeRepresentationStrategyMap.get(valueClass);	//get the strategy linked to the value class in the map
+		TreeNodeRepresentationStrategy<? super V> treeNodeRepresentationStrategy=(TreeNodeRepresentationStrategy<? super V>)classTreeNodeRepresentationStrategyMap.get(valueClass);	//get the strategy linked to the value class in the map
 			//TODO instead of directly trying Object.class, work up the hierarchy
 		if(treeNodeRepresentationStrategy==null && !Object.class.equals(valueClass))	//if there is no associated representation strategy and this isn't the object class
 		{
-			treeNodeRepresentationStrategy=(ValueRepresentationStrategy<? super V>)classTreeNodeRepresentationStrategyMap.get(Object.class);	//get the default strategy (the one associated with Object.class)			
+			treeNodeRepresentationStrategy=(TreeNodeRepresentationStrategy<? super V>)classTreeNodeRepresentationStrategyMap.get(Object.class);	//get the default strategy (the one associated with Object.class)			
 		}
 		return treeNodeRepresentationStrategy;	//return the tree node representation strategy
 	}
@@ -142,9 +142,9 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		this.treeModel.addTreeNodePropertyChangeListener(treeNodePropertyChangeListener);	//listen and repeat all property changes of the tree nodes in the tree model
 			//TODO listen for and repeat tree model-specific events
 		setTreeNodeRepresentationStrategy(Object.class, new DefaultValueRepresentationStrategy<Object>(session));	//create a default representation strategy and set it as the default by associating it with the Object class
-		setTreeNodeRepresentationStrategy(LabelModel.class, new LabelModelRepresentationStrategy(session));	//create and associate a label model representation strategy
+		setTreeNodeRepresentationStrategy(LabelModel.class, new LabelModelTreeNodeRepresentationStrategy(session));	//create and associate a label model representation strategy
 //TODO fix		setTreeNodeRepresentationStrategy(MessageModel.class, new MessageModelRepresentationStrategy(session));	//create and associate a message model representation strategy
-		setTreeNodeRepresentationStrategy(TextModel.class, new TextModelRepresentationStrategy(session));	//create and associate a text model representation strategy
+		setTreeNodeRepresentationStrategy(TextModel.class, new TextModelTreeNodeRepresentationStrategy(session));	//create and associate a text model representation strategy
 	}
 
 	/**Adds a tree node property change listener.
@@ -212,12 +212,12 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		}
 	}
 
-	/**A strategy for generating components to represent tree node model values.
+	/**A strategy for generating components to represent tree node models.
 	The component ID should reflect a unique identifier for the tree node.
 	@param <V> The type of value the strategy is to represent.
 	@author Garret Wilson
 	*/
-	public interface ValueRepresentationStrategy<V>
+	public interface TreeNodeRepresentationStrategy<V>
 	{
 		/**Creates a component to represent the given tree node.
 		@param <N> The type of value contained in the node.
@@ -238,7 +238,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	@see Object#hashCode() 
 	@author Garret Wilson
 	*/
-	public static abstract class AbstractValueRepresentationStrategy<V> implements ValueRepresentationStrategy<V>
+	public static abstract class AbstractTreeNodeRepresentationStrategy<V> implements TreeNodeRepresentationStrategy<V>
 	{
 
 		/**The Guise session that owns this representation strategy.*/
@@ -251,7 +251,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		@param session The Guise session that owns this representation strategy.
 		@exception NullPointerException if the given session is <code>null</code>.
 		*/
-		public AbstractValueRepresentationStrategy(final GuiseSession session)
+		public AbstractTreeNodeRepresentationStrategy(final GuiseSession session)
 		{
 			this.session=checkInstance(session, "Session cannot be null");	//save the session
 		}
@@ -278,7 +278,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	@see Object#hashCode() 
 	@author Garret Wilson
 	*/
-	public static class DefaultValueRepresentationStrategy<V> extends AbstractValueRepresentationStrategy<V>
+	public static class DefaultValueRepresentationStrategy<V> extends AbstractTreeNodeRepresentationStrategy<V>
 	{
 
 		/**Session constructor.
@@ -340,14 +340,14 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	@see Label
 	@author Garret Wilson
 	*/
-	public static class LabelModelRepresentationStrategy extends AbstractValueRepresentationStrategy<LabelModel>
+	public static class LabelModelTreeNodeRepresentationStrategy extends AbstractTreeNodeRepresentationStrategy<LabelModel>
 	{
 
 		/**Session constructor.
 		@param session The Guise session that owns this representation strategy.
 		@exception NullPointerException if the given session is <code>null</code>.
 		*/
-		public LabelModelRepresentationStrategy(final GuiseSession session)
+		public LabelModelTreeNodeRepresentationStrategy(final GuiseSession session)
 		{
 			super(session);	//construct the parent class
 		}
@@ -374,14 +374,14 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	@see Message
 	@author Garret Wilson
 	*/
-	public static class TextModelRepresentationStrategy extends AbstractValueRepresentationStrategy<TextModel>
+	public static class TextModelTreeNodeRepresentationStrategy extends AbstractTreeNodeRepresentationStrategy<TextModel>
 	{
 
 		/**Session constructor.
 		@param session The Guise session that owns this representation strategy.
 		@exception NullPointerException if the given session is <code>null</code>.
 		*/
-		public TextModelRepresentationStrategy(final GuiseSession session)
+		public TextModelTreeNodeRepresentationStrategy(final GuiseSession session)
 		{
 			super(session);	//construct the parent class
 		}

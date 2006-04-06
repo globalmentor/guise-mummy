@@ -7,6 +7,9 @@ import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.garretwilson.util.DecoratorReverseMap;
+import com.garretwilson.util.ReverseMap;
+
 import static com.garretwilson.io.InputStreamUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
 
@@ -82,6 +85,43 @@ public class Guise
 		return resource;	//return whatever resource we found
 	}
 
+	/**The thread-safe reverse map of thread groups for Guise sessions.*/
+	private final ReverseMap<GuiseSession, ThreadGroup> sessionThreadGroupReverseMap=new DecoratorReverseMap<GuiseSession, ThreadGroup>(new ConcurrentHashMap<GuiseSession, ThreadGroup>(), new ConcurrentHashMap<ThreadGroup, GuiseSession>());
+
+	/**Determines the thread group to use for the given session.
+	This method must not be called for a session that has not yet been added.
+	@param guiseSession The session for which a thread group is requested.
+	@return The thread group to use for the given session.
+	@exception IllegalStateException if the given session has not yet been associated with a thread group because it has not yet been added.
+	*/
+	ThreadGroup getThreadGroup(final GuiseSession guiseSession)
+	{
+		final ThreadGroup threadGroup=sessionThreadGroupReverseMap.get(guiseSession);	//retrieve the thread group associated with the given session
+		if(threadGroup==null)	//if there is no thread group for this session
+		{
+			throw new IllegalStateException("Guise session "+guiseSession+" not yet associated with a thread group.");
+		}
+		return threadGroup;	//return the thread group
+	}
+
+	/**Adds a Guise session and creates an associated thread group.
+	This method creates a thread group for the session.
+	@param guiseSession The Guise session to add.
+	*/
+	void addGuiseSession(final GuiseSession guiseSession)
+	{
+		final ThreadGroup threadGroup=new ThreadGroup("Guise Session Thread Group "+guiseSession.toString());	//create a new thread group for the session TODO improve name
+		sessionThreadGroupReverseMap.put(guiseSession, threadGroup);	//associate the thread group with the Guise session and vice versa
+	}
+
+	/**Removes a Guise session and associated thread group.
+	@param guiseSession The Guise session to remove.
+	*/
+	void removeGuiseSession(final GuiseSession guiseSession)
+	{
+		sessionThreadGroupReverseMap.remove(guiseSession);	//remove the association between the session and the thread group
+	}
+	
 	/**Private default constructor.
 	@see #getInstance()
 	*/

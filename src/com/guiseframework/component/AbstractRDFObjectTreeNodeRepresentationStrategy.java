@@ -10,7 +10,7 @@ import com.guiseframework.model.*;
 @param <V> The type of value the strategy is to represent.
 @author Garret Wilson
 */
-public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends RDFObject> extends TreeControl.AbstractValueRepresentationStrategy<V>
+public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends RDFObject> extends TreeControl.AbstractTreeNodeRepresentationStrategy<V>
 {
 
 	/**The RDF XMLifier to use for creating labels.*/
