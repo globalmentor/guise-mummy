@@ -474,8 +474,9 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 							}
 						}
 					}		
+					final Bookmark navigationBookmark=getBookmark(request);	//get the bookmark from this request
 		//TODO fix to recognize navigation, bookmark, and principal changes when the navigation panel is created		final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
-					final Bookmark oldBookmark=guiseSession.getBookmark();	//get the original bookmark
+					final Bookmark oldBookmark=isAJAX ? guiseSession.getBookmark() : navigationBookmark;	//get the original bookmark, which will be the one requested in navigation (which we'll soon set) if this is a normal HTTP GET/POST
 					final Principal oldPrincipal=guiseSession.getPrincipal();	//get the old principal
 					final NavigationPanel navigationPanel=guiseSession.getNavigationPanel(navigationPath);	//get the panel bound to the requested path
 					if(navigationPanel!=null)	//if we found a panel class for this address
@@ -493,7 +494,7 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 							setNoCache(response);	//TODO testing; fix; update method				
 							final String referrer=getReferer(request);	//get the request referrer, if any
 							final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
-							guiseSession.setNavigation(navigationPath, oldBookmark, referrerURI);	//set the session navigation, firing any navigation events if appropriate
+							guiseSession.setNavigation(navigationPath, navigationBookmark, referrerURI);	//set the session navigation, firing any navigation events if appropriate
 						}
 						for(final ControlEvent controlEvent:controlEvents)	//for each control event
 						{
@@ -565,7 +566,7 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 			*/
 							final Bookmark newBookmark=guiseSession.getBookmark();	//see if the bookmark has changed
 							final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
-							if(requestedNavigation!=null || !ObjectUtilities.equals(oldBookmark, newBookmark))	//if navigation is requested or the bookmark has changed, redirect the browser
+							if(requestedNavigation!=null || !ObjectUtilities.equals(navigationBookmark, newBookmark))	//if navigation is requested or the bookmark has changed, redirect the browser
 							{
 								final String redirectURIString;	//we'll determine where to direct to
 								if(requestedNavigation!=null)	//if navigation is requested
