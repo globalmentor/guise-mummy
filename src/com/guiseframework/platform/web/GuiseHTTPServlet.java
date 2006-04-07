@@ -19,9 +19,11 @@ import static com.garretwilson.net.URIUtilities.*;
 
 import com.garretwilson.io.*;
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.ThreadUtilities;
 
 import static com.garretwilson.io.ContentTypeUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.ThreadUtilities.*;
 
 import com.garretwilson.net.http.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
@@ -168,9 +170,6 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		{
 			throw new ServletException(fileNotFoundException);
 		}
-		
-		
-		
 		setReadOnly(true);	//make this servlet read-only
 		//TODO turn off directory listings, and/or fix them
 		try
@@ -270,10 +269,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 							try
 							{
 								final Class<?> specifiedClass=Class.forName(className);	//load the class for the specified name
-
-								
-//TODO bring back for JDK 5 when backwards-compatibility isn't needed								final Class<? extends NavigationPanel> navigationFrameClass=specifiedClass.asSubclass(Frame.class);	//cast the specified class to a frame class just to make sure it's the correct type
-								final Class<? extends DefaultNavigationPanel> navigationPanelClass=(Class<? extends DefaultNavigationPanel>)specifiedClass;	//cast the specified class to a panel class just to make sure it's the correct type
+								final Class<? extends NavigationPanel> navigationPanelClass=specifiedClass.asSubclass(NavigationPanel.class);	//cast the specified class to a navigation panel class just to make sure it's the correct type
 								guiseApplication.bindNavigationPanel(path, navigationPanelClass);	//cast the class to a panel class and bind it to the path in the Guise application
 							}
 							catch(final ClassNotFoundException classNotFoundException)
@@ -354,16 +350,86 @@ Debug.trace("raw path info:", rawPathInfo);
 			}
 		}		
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
-		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
+		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
 		final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
 /*TODO del
 Debug.info("session ID", guiseSession.getHTTPSession().getId());	//TODO del
 Debug.info("content length:", request.getContentLength());
 Debug.info("content type:", request.getContentType());
 */
-		if(!serviceGuiseRequest(request, response, guiseContainer, guiseApplication, guiseSession))	//service this Guise request; if this wasn't meant for Guise
+		final GuiseSessionThreadGroup guiseSessionThreadGroup=Guise.getInstance().getThreadGroup(guiseSession);	//get the thread group for this session
+		final GuiseSessionRunnable guiseSessionRunnable=new GuiseSessionRunnable(request, response, guiseContainer, guiseApplication, guiseSession);	//create a runnable instance to service the Guise request
+		call(guiseSessionThreadGroup, guiseSessionRunnable);	//call the runnable in a new thread inside the thread group
+		if(guiseSessionRunnable.servletException!=null)
+		{
+			throw guiseSessionRunnable.servletException;
+		}
+		if(guiseSessionRunnable.ioException!=null)
+		{
+			throw guiseSessionRunnable.ioException;
+		}
+		if(!guiseSessionRunnable.isGuiseRequest)
+//TODO del		if(!serviceGuiseRequest(request, response, guiseContainer, guiseApplication, guiseSession))	//service this Guise request; if this wasn't meant for Guise
 		{
 			super.doGet(request, response);	//let the default functionality take over
+		}
+	}
+
+	/**The runnable class that services an HTTP request.
+	@author Garret Wilson
+	*/
+	protected class GuiseSessionRunnable implements Runnable
+	{
+		private final HttpServletRequest request;
+		private final HttpServletResponse response;
+		private final HTTPServletGuiseContainer guiseContainer;
+		private final GuiseApplication guiseApplication;
+		private final GuiseSession guiseSession;
+
+		public ServletException servletException=null;
+		public IOException ioException=null;
+		public boolean isGuiseRequest=false;
+		
+		/**Constructor.
+	  @param request The HTTP request.
+	  @param response The HTTP response.
+	  @param guiseContainer The Guise container.
+	  @param guiseApplication The Guise application.
+	  @param guiseSession The Guise session.
+		*/
+		public GuiseSessionRunnable(final HttpServletRequest request, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession)
+		{
+			this.request=request;
+			this.response=response;
+			this.guiseContainer=guiseContainer;
+			this.guiseApplication=guiseApplication;
+			this.guiseSession=guiseSession;
+		}
+
+		/**Actually services the Guise request.
+		@see GuiseHTTPServlet#serviceGuiseRequest(HttpServletRequest, HttpServletResponse, HTTPServletGuiseContainer, GuiseApplication, GuiseSession)
+		*/
+		public void run()
+		{
+			try
+			{
+/*TODO del				
+				
+Debug.trace("ready to service Guise request with session", guiseSession);
+Debug.trace("Guise thinks we're in session", Guise.getInstance().getGuiseSession());
+Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().getGuiseSession()));
+
+*/
+				isGuiseRequest=serviceGuiseRequest(request, response, guiseContainer, guiseApplication, guiseSession);
+			}
+			catch(final ServletException servletException)
+			{
+				this.servletException=servletException;
+			}
+			catch(final IOException ioException)
+			{
+				this.ioException=ioException;
+			}
 		}
 	}
 	
@@ -378,7 +444,7 @@ Debug.info("content type:", request.getContentType());
   @exception ServletException if there is a problem servicing the request.
   @exception IOException if there is an error reading or writing data.
   */
-	public boolean serviceGuiseRequest(final HttpServletRequest request, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final AbstractGuiseApplication guiseApplication, final GuiseSession guiseSession) throws ServletException, IOException
+	private boolean serviceGuiseRequest(final HttpServletRequest request, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession) throws ServletException, IOException
 	{
 		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request		
 		final String contentTypeString=request.getContentType();	//get the request content type

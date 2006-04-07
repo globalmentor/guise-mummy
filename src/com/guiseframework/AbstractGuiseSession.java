@@ -55,11 +55,22 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		/**@return The Guise application to which this session belongs.*/
 		public GuiseApplication getApplication() {return application;}
 
-	/**The application frame.*/
-	private final ApplicationFrame<?> applicationFrame;
+	/**The application frame, initialized during {@link #initialize()}.*/
+	private ApplicationFrame<?> applicationFrame=null;
 
-		/**@return The application frame.*/
-		public ApplicationFrame<?> getApplicationFrame() {return applicationFrame;}
+		/**Returns the application frame, which is available after {@link #initialize()} has been called.
+		This method must not be called before initialization has occurred.
+		@return The application frame.
+		@exception IllegalStateException if this session has not yet been initialized.
+		*/
+		public ApplicationFrame<?> getApplicationFrame()
+		{
+			if(applicationFrame==null)	//if this session has not yet been initialized
+			{
+				throw new IllegalStateException("Guise session "+this+" has not yet been initialized and therefore has no application frame.");
+			}
+			return applicationFrame;	//return the application frame
+		}
 
 	/**The non-thread-safe document builder that parses XML documents for input to RDF.*/
 	private final DocumentBuilder documentBuilder;
@@ -639,6 +650,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	/**Guise application constructor.
 	The session local will initially be set to the locale of the associated Guise application.
+	No operation must be performed inside the constructor that would require the presence of the Guise session within this thread group.
 	@param application The Guise application to which this session belongs.
 	*/
 	public AbstractGuiseSession(final GuiseApplication application)
@@ -657,8 +669,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		this.environment=new DefaultGuiseEnvironment();	//create a default environment
 		this.locale=application.getDefaultLocale();	//default to the application locale
 		this.orientation=Orientation.getOrientation(locale);	//set the orientation default based upon the locale
-		this.applicationFrame=application.createApplicationFrame(this);	//create the application frame
-		this.applicationFrame.open();	//open the application frame
 	}
 
 	/**Determines if there is a panel bound to the given appplication context-relative path.
@@ -1345,6 +1355,8 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 	*/
 	public void initialize()
 	{
+		this.applicationFrame=application.createApplicationFrame(this);	//create the application frame
+		this.applicationFrame.open();	//open the application frame
 			//TODO check active state
 		getApplication().addPropertyChangeListener(GuiseApplication.RESOURCE_BUNDLE_BASE_NAME_PROPERTY, resourceBundleReleasePropertyValueChangeListener);	//when the application changes its resource bundle base name, release the resource bundle		
 	}

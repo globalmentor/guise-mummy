@@ -100,14 +100,14 @@ public interface GuiseApplication extends PropertyBindable
 	@exception NullPointerException if the path and/or the panel is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public Class<? extends DefaultNavigationPanel> bindNavigationPanel(final String path, final Class<? extends DefaultNavigationPanel> panelClass);
+	public Class<? extends NavigationPanel> bindNavigationPanel(final String path, final Class<? extends NavigationPanel> panelClass);
 
 	/**Determines the class of panel bound to the given application context-relative path.
 	@param path The address for which a panel should be retrieved.
 	@return The type of panel bound to the given path, or <code>null</code> if no panel is bound to the path. 
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public Class<? extends DefaultNavigationPanel> getNavigationPanelClass(final String path);
+	public Class<? extends NavigationPanel> getNavigationPanelClass(final String path);
 
 	/**Determines if there is a panel class bound to the given appplication context-relative path.
 	@param path The appplication context-relative path within the Guise container context.

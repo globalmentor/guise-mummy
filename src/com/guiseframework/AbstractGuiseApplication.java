@@ -16,14 +16,9 @@ import com.garretwilson.net.URIUtilities;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.util.LocaleUtilities.*;
-import static com.guiseframework.GuiseResourceConstants.*;
 
 import com.garretwilson.util.Debug;
-import com.guiseframework.component.ApplicationFrame;
-import com.guiseframework.component.Component;
-import com.guiseframework.component.DefaultApplicationFrame;
-import com.guiseframework.component.DefaultNavigationPanel;
-import com.guiseframework.component.SelectLink;
+import com.guiseframework.component.*;
 import com.guiseframework.component.kit.ComponentKit;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.controller.*;
@@ -470,7 +465,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 //TODO how do we keep the general public from changing the frame bindings?
 
 	/**The synchronized map binding panel types to appplication context-relative absolute paths.*/
-	private final Map<String, Class<? extends DefaultNavigationPanel>> navigationPathPanelBindingMap=synchronizedMap(new HashMap<String, Class<? extends DefaultNavigationPanel>>());
+	private final Map<String, Class<? extends NavigationPanel>> navigationPathPanelBindingMap=synchronizedMap(new HashMap<String, Class<? extends NavigationPanel>>());
 
 		/**Binds a panel type to a particular application context-relative path.
 		Any existing binding for the given context-relative path is replaced.
@@ -480,7 +475,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		@exception NullPointerException if the path and/or the panel is <code>null</code>.
 		@exception IllegalArgumentException if the provided path is absolute.
 		*/
-		public Class<? extends DefaultNavigationPanel> bindNavigationPanel(final String path, final Class<? extends DefaultNavigationPanel> panelClass)
+		public Class<? extends NavigationPanel> bindNavigationPanel(final String path, final Class<? extends NavigationPanel> panelClass)
 		{
 			if(isAbsolutePath(path))	//if the path is absolute
 			{
@@ -494,7 +489,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		@return The type of panel bound to the given path, or <code>null</code> if no panel is bound to the path. 
 		@exception IllegalArgumentException if the provided path is absolute.
 		*/
-		public Class<? extends DefaultNavigationPanel> getNavigationPanelClass(final String path)
+		public Class<? extends NavigationPanel> getNavigationPanelClass(final String path)
 		{
 			if(isAbsolutePath(path))	//if the path is absolute
 			{

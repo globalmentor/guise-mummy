@@ -19,7 +19,7 @@ import static com.garretwilson.text.CharacterConstants.*;
 There will only be one instance of Guise per JVM.
 @author Garret Wilson
 */
-public class Guise
+public final class Guise
 {
 
 	/**The name of Guise.*/
@@ -32,7 +32,7 @@ public class Guise
 	public final static String PUBLIC_RESOURCE_BASE_PATH="pub/";
 
 	/**The identifier of this build.*/
-	public final static String BUILD_ID="2006-04-05";
+	public final static String BUILD_ID="2006-04-06";
 	
 	/**The singleton instance of Guise.*/
 	private static Guise instance=null;
@@ -85,24 +85,8 @@ public class Guise
 		return resource;	//return whatever resource we found
 	}
 
-	/**The thread-safe reverse map of thread groups for Guise sessions.*/
-	private final ReverseMap<GuiseSession, ThreadGroup> sessionThreadGroupReverseMap=new DecoratorReverseMap<GuiseSession, ThreadGroup>(new ConcurrentHashMap<GuiseSession, ThreadGroup>(), new ConcurrentHashMap<ThreadGroup, GuiseSession>());
-
-	/**Determines the thread group to use for the given session.
-	This method must not be called for a session that has not yet been added.
-	@param guiseSession The session for which a thread group is requested.
-	@return The thread group to use for the given session.
-	@exception IllegalStateException if the given session has not yet been associated with a thread group because it has not yet been added.
-	*/
-	ThreadGroup getThreadGroup(final GuiseSession guiseSession)
-	{
-		final ThreadGroup threadGroup=sessionThreadGroupReverseMap.get(guiseSession);	//retrieve the thread group associated with the given session
-		if(threadGroup==null)	//if there is no thread group for this session
-		{
-			throw new IllegalStateException("Guise session "+guiseSession+" not yet associated with a thread group.");
-		}
-		return threadGroup;	//return the thread group
-	}
+	/**The thread-safe map of Guise session thread groups for Guise sessions.*/
+	private final Map<GuiseSession, GuiseSessionThreadGroup> sessionThreadGroupMap=new ConcurrentHashMap<GuiseSession, GuiseSessionThreadGroup>();
 
 	/**Adds a Guise session and creates an associated thread group.
 	This method creates a thread group for the session.
@@ -110,8 +94,8 @@ public class Guise
 	*/
 	void addGuiseSession(final GuiseSession guiseSession)
 	{
-		final ThreadGroup threadGroup=new ThreadGroup("Guise Session Thread Group "+guiseSession.toString());	//create a new thread group for the session TODO improve name
-		sessionThreadGroupReverseMap.put(guiseSession, threadGroup);	//associate the thread group with the Guise session and vice versa
+		final GuiseSessionThreadGroup threadGroup=new GuiseSessionThreadGroup(guiseSession);	//create a new thread group for the session
+		sessionThreadGroupMap.put(guiseSession, threadGroup);	//associate the thread group with the Guise session and vice versa
 	}
 
 	/**Removes a Guise session and associated thread group.
@@ -119,7 +103,57 @@ public class Guise
 	*/
 	void removeGuiseSession(final GuiseSession guiseSession)
 	{
-		sessionThreadGroupReverseMap.remove(guiseSession);	//remove the association between the session and the thread group
+		sessionThreadGroupMap.remove(guiseSession);	//remove the association between the session and the thread group
+	}
+
+	/**Determines the thread group to use for the given session.
+	This method must not be called for a session that has not yet been added.
+	@param guiseSession The session for which a thread group is requested.
+	@return The thread group to use for the given session.
+	@exception IllegalStateException if the given session has not yet been associated with a thread group because it has not yet been added.
+	*/
+	public final GuiseSessionThreadGroup getThreadGroup(final GuiseSession guiseSession)
+	{
+		final GuiseSessionThreadGroup threadGroup=sessionThreadGroupMap.get(guiseSession);	//retrieve the thread group associated with the given session
+		if(threadGroup==null)	//if there is no thread group for this session
+		{
+			throw new IllegalStateException("Guise session "+guiseSession+" not yet associated with a Guise thread group.");
+		}
+		return threadGroup;	//return the thread group
+	}
+
+	/**Retrieves the Guise session information for the current thread.
+	This method calls {@link #getGuiseSession(Thread)} with the current thread.
+	@return The Guise session for the current thread.
+	@exception IllegalStateException if the current thread is not associated with any Guise session.
+	*/
+	public final GuiseSession getGuiseSession()
+	{
+		final Thread currentThread=Thread.currentThread();	//get the current thread
+		final GuiseSession guiseSession=getGuiseSession(currentThread);	//get the session for the current thread
+		if(guiseSession==null)	//if there is no Guise session for the current thread
+		{
+			throw new IllegalStateException("Current thread "+currentThread+" is not associated associated with any Guise session.");
+		}
+		return guiseSession;	//return the session for the current thread
+	}
+
+	/**Retrieves the Guise session information for the given thread.
+	All thread groups up the hierarchy are searched for an instance of {@link GuiseSessionThreadGroup}.
+	@return The Guise session for the given thread, or <code>null</code> if the given thread is not.
+	*/
+	private final GuiseSession getGuiseSession(final Thread thread)
+	{
+		ThreadGroup threadGroup=thread.getThreadGroup();	//get the thread's thread group
+		while(threadGroup!=null)	//stop looking if we run out of thread groups
+		{
+			if(threadGroup instanceof GuiseSessionThreadGroup)	//if this is a Guise session thread group
+			{
+				return ((GuiseSessionThreadGroup)threadGroup).getGuiseSession();	//return the session from the thread group
+			}
+			threadGroup=threadGroup.getParent();	//check this thread group's parent thread group
+		}
+		return null;	//we were unable to find a Guise session thread group
 	}
 	
 	/**Private default constructor.

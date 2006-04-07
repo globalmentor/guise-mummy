@@ -4,16 +4,10 @@ import java.io.InputStream;
 import java.net.URI;
 import java.security.Principal;
 import java.util.*;
-import static java.util.Collections.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.servlet.http.HttpSession;
-
-import com.garretwilson.util.DecoratorReverseMap;
-import com.garretwilson.util.ReverseMap;
-import com.guiseframework.platform.web.HTTPGuiseSessionManager;
-
 import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.lang.ThreadUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
 
 /**An abstract base class for a Guise instance.
@@ -58,28 +52,41 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	
 	/**Adds and initializes a Guise session.
 	This version creates a thread group for the session.
+	Initialization will occur inside the appropriate session thread group.
 	@param guiseSession The Guise session to add.
 	@see GuiseSession#initialize()
 	*/
 	protected void addGuiseSession(final GuiseSession guiseSession)
 	{
-/*TODO del
-		final ThreadGroup threadGroup=new ThreadGroup("Guise Session Thread Group "+guiseSession.toString());	//create a new thread group for the session TODO improve name
-		sessionThreadGroupReverseMap.put(guiseSession, threadGroup);	//associate the thread group with the Guise session and vice versa
-*/
-		Guise.getInstance().addGuiseSession(guiseSession);	//add the Guise session to Guise
-		guiseSession.initialize();	//let the Guise session know it's being initialized so that it can listen to the application
+		final Guise guise=Guise.getInstance();	//get the Guise instance
+		guise.addGuiseSession(guiseSession);	//add the Guise session to Guise
+		final GuiseSessionThreadGroup guiseSessionThreadGroup=guise.getThreadGroup(guiseSession);	//get the thread group for this session
+		call(guiseSessionThreadGroup, new Runnable()	//initialize the Guise session in its own thread group
+				{
+					public void run()
+					{
+						guiseSession.initialize();	//let the Guise session know it's being initialized so that it can listen to the application
+					}
+				});
 	}
 
 	/**Removes and destroys a Guise session.
+	Destruction will occur inside the appropriate session thread group.
 	@param guiseSession The Guise session to remove.
 	@see GuiseSession#destroy() 
 	*/
 	protected void removeGuiseSession(final GuiseSession guiseSession)
 	{
-		guiseSession.destroy();	//let the Guise session know it's being destroyed so that it can clean up and release references to the application
-//TODO del		sessionThreadGroupReverseMap.remove(guiseSession);	//remove the association between the session and the thread group
-		Guise.getInstance().removeGuiseSession(guiseSession);	//remove the Guise session from Guise
+		final Guise guise=Guise.getInstance();	//get the Guise instance
+		final GuiseSessionThreadGroup guiseSessionThreadGroup=guise.getThreadGroup(guiseSession);	//get the thread group for this session
+		call(guiseSessionThreadGroup, new Runnable()	//destroy the Guise session in its own thread group
+				{
+					public void run()
+					{
+						guiseSession.destroy();	//let the Guise session know it's being destroyed so that it can clean up and release references to the application
+					}
+				});
+		guise.removeGuiseSession(guiseSession);	//remove the Guise session from Guise
 	}
 
 	/**Installs the given application at the given base path.
