@@ -20,6 +20,12 @@ public interface ListSelectControl<V, C extends ListSelectControl<V, C>> extends
 	*/
 	public void setValueRepresentationStrategy(final ValueRepresentationStrategy<V> newValueRepresentationStrategy);
 
+	/**Retrieves the component for the given value.
+	@param value The value for which a representation component should be returned.
+	@return The child component representing the given value.
+	*/
+	public Component<?> getComponent(final V value);
+
 	/**@return The strategy used to generate a component to represent each value in the model.*/
 //TODO del when works	public ValueRepresentationStrategy<V, R> getValueRepresentationStrategy();
 
@@ -65,12 +71,5 @@ public interface ListSelectControl<V, C extends ListSelectControl<V, C>> extends
 		@return A new component to represent the given value.
 		*/
 		public Component<?> createComponent(final ListSelectModel<VV> model, final VV value, final int index, final boolean selected, final boolean focused);
-
-		/**Determines an identier for the given object.
-		@param value The value for which an identifier should be returned.
-		@return A string identifying the value, or <code>null</code> if the provided value is <code>null</code>.
-		@see Component#getID()
-		*/
-		public String getID(final VV value);	//TODO del this method and keep the components around in the controller
 	}
 }

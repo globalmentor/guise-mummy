@@ -48,8 +48,7 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 		if(value!=null)	//if there is value
 		{
 			final GuiseSession session=getSession();	//get the session
-			final String id=treeControl.createID(getID(treeNode.getValue()));	//get the ID from the value TODO don't get the ID from the value, as this can change if edited
-			final Label label=new Label(getSession(), getID(value), createLabelModel(treeControl, model, treeNode));	//create a new label using the created label model TODO always create a label model, not just if there is a value
+			final Label label=new Label(getSession(), createLabelModel(treeControl, model, treeNode));	//create a new label using the created label model TODO always create a label model, not just if there is a value
 			final String labelText=buildLabelText(new StringBuilder(), treeControl, model, treeNode, value).toString();	//construct the label text
 			label.setLabel(labelText);	//set the label's text
 			return label;	//return the label

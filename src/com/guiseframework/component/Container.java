@@ -9,9 +9,10 @@ import com.guiseframework.component.layout.Constraints;
 import com.guiseframework.event.ContainerListener;
 
 /**Component that allows for addition and removal of child components.
+A container is iterable over its child components, and can be used in short <code>for(:)</code> form. 
 @author Garret Wilson
 */
-public interface Container<C extends Container<C>> extends CompositeComponent<C>
+public interface Container<C extends Container<C>> extends CompositeComponent<C>, Iterable<Component<?>>
 {
 
 	/**The bound property of the layout.*/

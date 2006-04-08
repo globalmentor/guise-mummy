@@ -156,17 +156,6 @@ public class CardTabControl extends TabControl<Component<?>>
 			? new Label(getCardLayout().getSession(), getCardLayout().getConstraints(value))	//generate a label using the the card layout constraints as the label model
 			: new Label(getCardLayout().getSession());	//otherwise return an empty label
 		}
-
-		/**Determines an identifier for the given object.
-		This implementation returns the card component's ID.
-		@param value The value for which an identifier should be returned.
-		@return A string identifying the value, or <code>null</code> if the provided value is <code>null</code>.
-		@see Component#getID()
-		*/
-		public String getID(final Component<?> value)
-		{
-			return value!=null ? value.getID() : null;	//use the card component's ID, if a card component was given
-		}
 	}
 
 }

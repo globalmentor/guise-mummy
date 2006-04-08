@@ -209,6 +209,9 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 			}			
 		}
 
+	/**@return An iterator to child components.*/
+	public Iterator<Component<?>> iterator() {return getComponentList().iterator();}
+
 	/**Returns a list of children.
 	This method along with {@link #setChildren()} provides a <code>children</code> property for alternate children access.
 	@return A list of container children in order.

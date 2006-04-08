@@ -1141,7 +1141,7 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 			}
 			if(component instanceof CompositeComponent)	//if the component is a composite component
 			{
-				for(final Component<?> childComponent:(CompositeComponent<?>)component)	//for every child component
+				for(final Component<?> childComponent:((CompositeComponent<?>)component).getChildren())	//for every child component
 				{
 					fireNavigated(childComponent, navigationEvent);	//fire the event to the child component if possible
 				}

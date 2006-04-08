@@ -105,7 +105,7 @@ public class RDFResourceTreeNodeModel extends DynamicTreeNodeModel<RDFResource> 
 
 	/**Dynamically determines whether this node is a leaf.
 	This version determines if resource properties are included and there are properties, or if resource children are included and there are children.
-	This version ignores RDF type properties. 
+	This version ignores RDF type properties and properties of an {@link RDFListResource}. 
 	@return Whether this node should be considered a leaf with no children.
 	*/
 	protected boolean determineLeaf()
@@ -113,7 +113,7 @@ public class RDFResourceTreeNodeModel extends DynamicTreeNodeModel<RDFResource> 
 		final RDFResource rdfResource=getValue();	//get the resource
 		if(rdfResource!=null)	//if we have a resource
 		{
-			if(isResourcePropertiesIncluded())	//if resource properties are included
+			if(isResourcePropertiesIncluded() && !(rdfResource instanceof RDFListResource))	//if resource properties are included (ignore properties of an RDF list resource, because they will not be shown)
 			{
 				for(final RDFPropertyValuePair rdfPropertyValuePair:rdfResource.getProperties())	//look at all properties
 				{
@@ -138,6 +138,7 @@ public class RDFResourceTreeNodeModel extends DynamicTreeNodeModel<RDFResource> 
 	}
 
 	/**Dynamically determines children.
+	This version ignores RDF type properties and properties of an {@link RDFListResource}. 
 	@return The dynamically loaded list of children.
 	*/
 	protected List<TreeNodeModel<?>> determineChildren()
@@ -146,7 +147,7 @@ public class RDFResourceTreeNodeModel extends DynamicTreeNodeModel<RDFResource> 
 		if(rdfResource!=null)	//if we have a resource
 		{
 			final List<TreeNodeModel<?>> children=new ArrayList<TreeNodeModel<?>>();	//create a list to hold the children
-			if(isResourcePropertiesIncluded())	//if resource properties are included
+			if(isResourcePropertiesIncluded() && !(rdfResource instanceof RDFListResource))	//if resource properties are included (don't show properties of an RDF list resource
 			{
 				for(final RDFPropertyValuePair rdfPropertyValuePair:rdfResource.getProperties())	//look at all properties
 				{

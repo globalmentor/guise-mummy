@@ -159,7 +159,7 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	protected boolean determineChildrenValid()
 	{
 //TODO fix Debug.trace("ready to determine children valid in", this);
-		for(final Component<?> childComponent:this)	//for each child component
+		for(final Component<?> childComponent:getChildren())	//for each child component
 		{
 //TODO del Debug.trace("in", this, "child", childComponent, "is valid", childComponent.isValid());			
 			if(childComponent.isDisplayed() && childComponent.isVisible() && !childComponent.isValid())	//if this child component is displayed and visible, but not valid
@@ -191,7 +191,7 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	public boolean validateChildren()
 	{
 		boolean result=true;	//start by assuming all child components will validate 
-		for(final Component<?> childComponent:this)	//for each child component
+		for(final Component<?> childComponent:getChildren())	//for each child component
 		{
 			if(!childComponent.validate())	//validate the child; if it doesn't validate
 			{

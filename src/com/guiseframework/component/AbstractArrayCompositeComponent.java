@@ -55,8 +55,8 @@ public abstract class AbstractArrayCompositeComponent<C extends CompositeCompone
 		return oldComponent;	//return the component previously at the given index
 	}
 		
-	/**@return An iterator to contained components.*/
-	public Iterator<Component<?>> iterator()
+	/**@return An iterable to contained components.*/
+	public Iterable<Component<?>> getChildren()
 	{
 		final List<Component<?>> componentList=new ArrayList<Component<?>>(componentArray.length);	//create a list of components that is large enough to hold all components if we need to
 		for(int i=componentArray.length-1; i>=0; --i)	//for each component
@@ -67,7 +67,7 @@ public abstract class AbstractArrayCompositeComponent<C extends CompositeCompone
 				componentList.add(component);	//add the component to our list
 			}
 		}
-		return componentList.iterator();	//return an iterator to our list of components
+		return componentList;	//return our list of components
 	}
 
 	/**@return Whether this component has children.*/

@@ -1,11 +1,17 @@
 package com.guiseframework.test;
 
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 
+import com.garretwilson.model.ResourceModel;
 import com.garretwilson.rdf.RDFLiteral;
 import com.garretwilson.rdf.RDFResource;
+import com.garretwilson.rdf.RDFUtilities;
+import com.garretwilson.rdf.maqro.Activity;
+import com.garretwilson.rdf.maqro.ActivityModelIOKit;
 import com.garretwilson.rdf.rdfs.RDFSUtilities;
 import com.garretwilson.util.Debug;
 import com.globalmentor.marmot.DefaultMarmotSession;
@@ -135,5 +141,24 @@ catch(final ValidationException validationException)
 					}
 				});
 		add(addButton);
+/*TODO del
+		try
+		{
+			final ActivityModelIOKit activityModelIOKit=new ActivityModelIOKit();
+			final ResourceModel<Activity> activityResourceModel=activityModelIOKit.load(new FileInputStream("D:\\projects\\marmot\\example\\Activities\\test.maqro"), URI.create("file:/D:/projects/marmot/example/Activities/"));
+			final Activity activity=activityResourceModel.getResource();
+//TODO del			Debug.trace(RDFUtilities.toString(activity));
+			final TreeControl treeControl=new TreeControl(session);
+			treeControl.setTreeNodeRepresentationStrategy(RDFResource.class, new RDFResourceTreeNodeRepresentationStrategy(session));
+			treeControl.setTreeNodeRepresentationStrategy(RDFLiteral.class, new RDFLiteralTreeNodeRepresentationStrategy(session));
+			treeControl.getRootNode().add(new RDFResourceTreeNodeModel(session, activity));
+			add(treeControl);
+		}
+		catch(final IOException ioException)
+		{
+			throw new AssertionError(ioException);
+		}
+*/
 	}
+
 }

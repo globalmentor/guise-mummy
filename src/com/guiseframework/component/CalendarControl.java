@@ -441,12 +441,10 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 			final int calendarMonth=calendar.get(Calendar.MONTH);	//get the month of the calendar
 			final Date date=model.getCellValue(rowIndex, column);	//get the date for this cell
 			final long time=date.getTime();	//get the time of the cell in milliseconds
-			final String id=table.createID("time"+Long.toHexString(time));	//create an ID for the new component
-//TODO del when works			final Calendar calendar=Calendar.getInstance(getSession().getLocale());	//create a calendar TODO cache the calendar and only change it if the locale has changed
 			calendar.setTime(date);	//set the time of the calendar to that of the cell
 			if(calendar.get(Calendar.MONTH)==calendarMonth)	//if this date is within the month
 			{
-				final Link link=new Link(session, id);	//create a link for this cell
+				final Link link=new Link(session);	//create a link for this cell
 				final String dayOfMonthString=Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));	//create a string using the day of the month
 				link.setLabel(dayOfMonthString);	//set the label of the link to the day of the month
 				final Validator<Date> validator=CalendarControl.this.getValidator();	//get the calendar control model's validator
@@ -475,7 +473,7 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 			}
 			else	//if the date is outside the month
 			{
-				return new Label(session, id);	//return a blank label for the cell
+				return new Label(session);	//return a blank label for the cell
 			}
 		}
 	}

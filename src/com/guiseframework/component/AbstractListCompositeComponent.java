@@ -40,8 +40,8 @@ public abstract class AbstractListCompositeComponent<C extends CompositeComponen
 		super.removeComponent(component);	//do the default removal
 	}
 
-	/**@return An iterator to contained components.*/
-	public Iterator<Component<?>> iterator() {return componentList.iterator();}
+	/**@return An iterable to contained components.*/
+	public Iterable<Component<?>> getChildren() {return componentList;}
 
 	/**@return Whether this component has children. This implementation delegates to the component list.*/
 	public boolean hasChildren() {return !componentList.isEmpty();}

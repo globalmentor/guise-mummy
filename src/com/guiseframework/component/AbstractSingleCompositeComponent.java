@@ -1,6 +1,8 @@
 package com.guiseframework.component;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import com.garretwilson.util.*;
 import com.guiseframework.GuiseSession;
@@ -46,8 +48,17 @@ public abstract class AbstractSingleCompositeComponent<C extends CompositeCompon
 	/**@return Whether this component has children.*/
 	public boolean hasChildren() {return component!=null;}
 
-	/**@return An iterator to child components.*/
-	public Iterator<Component<?>> iterator() {return component!=null ? new ObjectIterator<Component<?>>(component) : new EmptyIterator<Component<?>>();}
+	/**@return An iterable to child components.*/
+	public Iterable<Component<?>> getChldren()	//TODO make this more efficient
+	{
+		final List<Component<?>> components=new ArrayList<Component<?>>();	//create a list of components
+		if(component!=null)	//if we have a component
+		{
+			components.add(component);	//add this component to the list
+		}
+		return components;	//return the components
+//TODO del		return component!=null ? new ObjectIterator<Component<?>>(component) : new EmptyIterator<Component<?>>();
+	}
 
 	/**Retrieves the child component with the given ID.
 	@param id The ID of the component to return.

@@ -1,6 +1,5 @@
 package com.guiseframework.component;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -81,9 +80,9 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@param <T> The type of value contained in the cells of the column.
 	@param rowIndex The zero-based cell row index.
 	@param column The cell column.
-	@exception IOException if there is an error updating the cell view.
+	@return The child component representing the given cell.
 	*/
-	public <T> void verifyCellComponent(final int rowIndex, final TableColumnModel<T> column) throws IOException
+	public <T> Component<?> verifyCellComponent(final int rowIndex, final TableColumnModel<T> column)
 	{
 		final TableModel tableModel=getTableModel();	//get the table model
 		final boolean editable=isEditable() && column.isEditable();	//see if the cell is editable (a cell is only editable if both its table and column are editable)
@@ -92,10 +91,11 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		if(cellComponentState==null || cellComponentState.isEditable()!=editable)	//if there is no component for this cell, or the component has a different editable status
 		{
 			final Component<?> valueComponent=getCellRepresentationStrategy(column).createComponent(this, tableModel, rowIndex, column, editable, false, false);	//create a new component for the cell
-			valueComponent.setParent(this);	//tell this component that this table component is its parent
+//TODO del			valueComponent.setParent(this);	//tell this component that this table component is its parent
 			cellComponentState=new CellComponentState(valueComponent, editable);	//create a new component state for the cell's component and metadata
 			putComponentState(cell, cellComponentState);	//store the component state in the map for next time
 		}
+		return cellComponentState.getComponent();	//return the representation component
 	}
 
 	/**Session, value class, and column names constructor with a default ID and default data model.
@@ -404,7 +404,6 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 
 		/**Creates a component for the given cell.
 		This implementation returns a message with string value of the given value using the object's <code>toString()</code> method.
-		The label's ID is set to the hexadecimal representation of the object's hash code appended to the word "hash".
 		@param <C> The type of value contained in the column.
 		@param table The component containing the model.
 		@param model The model containing the value.
@@ -426,23 +425,21 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 				return (Component<?>)model.getCellValue(cell);	//return the value as a component TODO find a way to update the cached component if it changes
 			}
 			final int columnIndex=model.getColumnIndex(column);	//get the logical index of the given column
-			final String idSegment=new StringBuilder("cell-").append(rowIndex).append('-').append(columnIndex).toString();	//generate an ID for this row and column
-			final String id=table.createID(idSegment);	//create an ID for the new component
 			if(editable)	//if the component should be editable
 			{
 				final ValueModel<C> valueModel=new DefaultCellValueModel<C>(session, model, cell);	//create a new value model for the cell
 				if(Boolean.class.isAssignableFrom(valueClass))	//if the value class is subclass of Boolean
 				{
-					return new CheckControl(session, id, (ValueModel<Boolean>)(Object)valueModel);	//create a new check control for the Boolean value model TODO find out why JDK 1.5.0_03 requires the intermediate Object cast
+					return new CheckControl(session, (ValueModel<Boolean>)(Object)valueModel);	//create a new check control for the Boolean value model TODO find out why JDK 1.5.0_03 requires the intermediate Object cast
 				}
 				else	//for all other values
 				{
-					return new TextControl<C>(session, id, valueModel);	//generate a text input control for the value model
+					return new TextControl<C>(session, valueModel);	//generate a text input control for the value model
 				}
 			}
 			else	//if the component should not be editable, return a message component
 			{
-				return new DefaultCellMessage<C>(session, id, model, cell, getConverter());	//create a message component containing a message model representing the value's string value				
+				return new DefaultCellMessage<C>(session, model, cell, getConverter());	//create a message component containing a message model representing the value's string value				
 			}
 		}
 	}
@@ -473,15 +470,14 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 
 		/**Constructs a default message for a cell.
 		@param session The Guise session that owns this model.
-		@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
 		@param tableModel The table model of the cell.
 		@param cell The cell being represented.
 		@param converter The converter to use for displaying the value as a string.
 		@exception NullPointerException if the given session, table model and/or cell is <code>null</code>.
 		*/
-		public DefaultCellMessage(final GuiseSession session, final String id, final TableModel tableModel, final TableModel.Cell<C> cell, final Converter<? super C, String> converter)
+		public DefaultCellMessage(final GuiseSession session, final TableModel tableModel, final TableModel.Cell<C> cell, final Converter<? super C, String> converter)
 		{
-			super(session, id);	//construct the parent class
+			super(session);	//construct the parent class
 			this.tableModel=checkInstance(tableModel, "Table model cannot be null.");
 			this.cell=checkInstance(cell, "Cell cannot be null.");
 			this.converter=checkInstance(converter, "Converter cannot be null.");

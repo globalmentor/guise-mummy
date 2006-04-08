@@ -78,6 +78,16 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 			}
 		}
 
+	/**Retrieves the component for the given object.
+	This version returns the given component to fulfill the interface contract of {@link ListSelectControl}.
+	@param object The object for which a representation component should be returned.
+	@return The child component representing the given object, or <code>null</code> if there is no component representing the given object.
+	*/
+	public Component<?> getComponent(final Component<?> object)
+	{
+		return object;	//return the given component
+	}
+
 	/**Session, ID, and layout constructor.
 	@param session The Guise session that owns this component.
 	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
@@ -644,17 +654,6 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 		public Component<?> createComponent(final ListSelectModel<Component<?>> model, final Component<?> value, final int index, final boolean selected, final boolean focused)
 		{
 			return value;	//return the component to represent itself
-		}
-
-		/**Determines an identier for the given object.
-		This implementation returns the component value ID.
-		@param value The value for which an identifier should be returned.
-		@return A string identifying the value, or <code>null</code> if the provided value is <code>null</code>.
-		@see Component#getID()
-		*/
-		public String getID(final Component<?> value)
-		{
-			return value!=null ? value.getID() : null;	//return the component's ID
 		}
 	}
 	

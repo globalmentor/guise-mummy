@@ -1309,7 +1309,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		}
 		else if(component instanceof CompositeComponent)	//if this component doesn't have the correct ID, but it is a composite component
 		{
-			for(final Component<?> childComponent:(CompositeComponent<?>)component)	//for each child component
+			for(final Component<?> childComponent:((CompositeComponent<?>)component).getChildren())	//for each child component
 			{
 				final Component<?> matchingComponent=getComponentByID(childComponent, id);	//see if we can find a component in this tree
 				if(matchingComponent!=null)	//if we found a matching component
@@ -1334,7 +1334,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		}
 		else if(component instanceof CompositeComponent)	//if this component doesn't have the correct name, but it is a composite component
 		{
-			for(final Component<?> childComponent:(CompositeComponent<?>)component)	//for each child component
+			for(final Component<?> childComponent:((CompositeComponent<?>)component).getChildren())	//for each child component
 			{
 				final Component<?> matchingComponent=getComponentByName(childComponent, name);	//see if we can find a component in this tree
 				if(matchingComponent!=null)	//if we found a matching component
@@ -1372,7 +1372,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		}
 		else if(component instanceof CompositeComponent)	//if the component's view is updated, check its children if it has any
 		{
-			for(final Component<?> childComponent:(CompositeComponent<?>)component)	//for each child component
+			for(final Component<?> childComponent:((CompositeComponent<?>)component).getChildren())	//for each child component
 			{
 				getDirtyComponents(childComponent, dirtyComponents);	//gather dirty components in this child hierarchy
 			}
@@ -1388,7 +1388,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		component.getView().setUpdated(newUpdated);	//change the updated status of this component's view
 		if(component instanceof CompositeComponent)	//if the component is a composite component
 		{
-			for(final Component<?> childComponent:(CompositeComponent<?>)component)	//for each child component
+			for(final Component<?> childComponent:((CompositeComponent<?>)component).getChildren())	//for each child component
 			{
 				setUpdated(childComponent, newUpdated);	//changed the updated status for this child's hierarchy
 			}
@@ -1420,7 +1420,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		}
 		if(component instanceof CompositeComponent)	//if the component is a composite component, check its children
 		{
-			for(final Component<?> childComponent:(CompositeComponent<?>)component)	//for each child component
+			for(final Component<?> childComponent:((CompositeComponent<?>)component).getChildren())	//for each child component
 			{
 				getNotifications(childComponent, notifications);	//gather notifications from this child hierarchy
 			}

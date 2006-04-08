@@ -2,14 +2,16 @@ package com.guiseframework.component;
 
 /**A component that can contain other components.
 A composite component may contain other components, but only a {@link Container} allows for custom addition and removal of child components.
-A composite component is iterable over its child components, and can be used in short <code>for(:)</code> form. 
 @author Garret Wilson
 */
-public interface CompositeComponent<C extends CompositeComponent<C>> extends Component<C>, Iterable<Component<?>>
+public interface CompositeComponent<C extends CompositeComponent<C>> extends Component<C>
 {
 
 	/**@return Whether this component has children.*/
 	public boolean hasChildren();
+
+	/**@return An iterable to child components.*/
+	public Iterable<Component<?>> getChildren();
 
 	/**@return The number of child components in this composite component.*/
 	public int size();

@@ -24,7 +24,10 @@ public abstract class AbstractMultipleCompositeComponent<C extends CompositeComp
 	public int size() {return idComponentMap.size();}
 	
 	/**@return An iterator to child components.*/
-	public Iterator<Component<?>> iterator() {return idComponentMap.values().iterator();}
+//TODO del when works	public Iterator<Component<?>> iterator() {return idComponentMap.values().iterator();}
+
+	/**@return An iterable to child components.*/
+	public Iterable<Component<?>> getChildren() {return idComponentMap.values();}
 
 	/**Adds a child component.
 	This version adds the component to the component map.

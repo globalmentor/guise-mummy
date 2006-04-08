@@ -862,7 +862,7 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 		}
 		if(component instanceof CompositeComponent)
 		{
-			for(final Component<?> childComponent:(CompositeComponent<?>)component)
+			for(final Component<?> childComponent:((CompositeComponent<?>)component).getChildren())
 			{
 				getControlsByName(childComponent, name, componentSet);
 //TODO fix				getControlsByName(context, childComponent, name, componentSet);
