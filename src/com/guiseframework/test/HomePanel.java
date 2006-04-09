@@ -7,6 +7,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.garretwilson.util.Debug;
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseSession;
@@ -239,9 +241,9 @@ catch(final ConversionException conversionException)
 		outputTextControl.setLabel("Double the Number");	//add a label to the text output control
 		outputTextControl.setEditable(false);	//set the text output control to read-only so that the user cannot modify it
 		inputPanel.add(outputTextControl);	//add the output control to the input panel
-		inputTextControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Float>()
+		inputTextControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Float>()
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<Float> propertyChangeEvent)
+					public void propertyChange(final GenericPropertyChangeEvent<Float> propertyChangeEvent)
 					{
 						final Float newValue=propertyChangeEvent.getNewValue();	//get the new value
 						try
@@ -272,9 +274,9 @@ catch(final ConversionException conversionException)
 		listControl.add(new Float(10));
 		listControl.add(new Float(20));
 		listControl.add(new Float(30));
-		listControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Float>()
+		listControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Float>()
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<Float> propertyChangeEvent)
+					public void propertyChange(final GenericPropertyChangeEvent<Float> propertyChangeEvent)
 					{
 						final Float newValue=propertyChangeEvent.getNewValue();	//get the new value
 						try
@@ -609,9 +611,9 @@ Debug.trace("list control changed value to", newValue);
 		
 		final TextControl<String> textInput=new TextControl<String>(String.class);	//create a text input control
 		textInput.setLabel("This is the text input label.");
-		textInput.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<String>()
+		textInput.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<String>()
 				{
-					public void propertyChange(GuisePropertyChangeEvent<String> propertyChangeEvent)
+					public void propertyChange(GenericPropertyChangeEvent<String> propertyChangeEvent)
 					{
 						testLabel.setLabel(propertyChangeEvent.getNewValue());
 						if(frame!=null)
@@ -681,9 +683,9 @@ Debug.trace("list control changed value to", newValue);
 		image.setDragEnabled(true);
 		horizontalPanel.add(image);
 
-		sliderModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Integer>()
+		sliderModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Integer>()
 				{
-					public void propertyChange(GuisePropertyChangeEvent<Integer> propertyChangeEvent)
+					public void propertyChange(GenericPropertyChangeEvent<Integer> propertyChangeEvent)
 					{
 						final Integer newValue=propertyChangeEvent.getNewValue();	//get the new value
 						if(newValue!=null)	//if there is a new value
@@ -823,9 +825,9 @@ Debug.trace("list control changed value to", newValue);
 Debug.trace("tabbed panel", tabbedPanel, "has view", tabbedPanel.getView());
 Debug.trace("card tab control", remoteTabControl, "has view", remoteTabControl.getView());
 
-		checkbox.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Boolean>()
+		checkbox.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>()
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<Boolean> propertyChangeEvent)
+					public void propertyChange(final GenericPropertyChangeEvent<Boolean> propertyChangeEvent)
 					{
 						final Boolean newValue=propertyChangeEvent.getNewValue();	//get the new value
 //TODO del						testButton.setDisplayed(newValue);	//update the button enabled state

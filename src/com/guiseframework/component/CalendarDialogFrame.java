@@ -2,8 +2,8 @@ package com.guiseframework.component;
 
 import java.util.Date;
 
-import com.guiseframework.event.AbstractGuisePropertyChangeListener;
-import com.guiseframework.event.GuisePropertyChangeEvent;
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.model.DefaultValueModel;
 import com.guiseframework.model.ValueModel;
 import com.guiseframework.validator.ValidationException;
@@ -62,9 +62,9 @@ public class CalendarDialogFrame extends AbstractDialogFrame<Date, CalendarDialo
 				throw new AssertionError(validationException);	//TODO fix
 			}
 		}
-		calendarControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Date>()	//listen for the calendar control value changing
+		calendarControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Date>()	//listen for the calendar control value changing
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<Date> propertyChangeEvent)	//if the calendar control value changed
+					public void propertyChange(final GenericPropertyChangeEvent<Date> propertyChangeEvent)	//if the calendar control value changed
 					{
 						try
 						{

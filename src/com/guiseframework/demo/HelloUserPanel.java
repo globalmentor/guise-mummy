@@ -1,8 +1,9 @@
 package com.guiseframework.demo;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
-import com.guiseframework.event.*;
 import com.guiseframework.model.ValueModel;
 import com.guiseframework.validator.RegularExpressionStringValidator;
 
@@ -30,9 +31,9 @@ public class HelloUserPanel extends DefaultNavigationPanel
 		userInput.setLabel("What's your name?");	//add a label to the text input control
 		userInput.setInfo("Enter a name that does not start with whitespace.");	//add advisory information that may be shown as a tooltip
 		userInput.setValidator(new RegularExpressionStringValidator("\\S+.*", true));	//require at least a single non-whitespace character followed by any other characters
-		userInput.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<String>()
+		userInput.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<String>()
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<String> propertyValueChangeEvent)
+					public void propertyChange(final GenericPropertyChangeEvent<String> propertyValueChangeEvent)
 					{
 						final String user=propertyValueChangeEvent.getNewValue();	//get the name the user entered
 						helloUserLabel.setLabel("Hello, "+user+"!");	//update the label

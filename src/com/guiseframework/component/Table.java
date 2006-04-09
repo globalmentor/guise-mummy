@@ -5,6 +5,8 @@ import java.util.concurrent.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.converter.*;
 import com.guiseframework.event.*;
@@ -149,9 +151,9 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		{
 			installDefaultCellRepresentationStrategy(column);	//create and install a default representation strategy for this column
 		}
-		getSession().addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, new AbstractGuisePropertyChangeListener<Locale>()	//listen for the session locale changing
+		getSession().addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, new AbstractGenericPropertyChangeListener<Locale>()	//listen for the session locale changing
 				{
-					public void propertyChange(GuisePropertyChangeEvent<Locale> propertyChangeEvent)	//if the locale changes
+					public void propertyChange(GenericPropertyChangeEvent<Locale> propertyChangeEvent)	//if the locale changes
 					{
 						clearComponentStates();	//clear all the components and component states in case they are locale-related TODO probably transfer this up to the abstract composite state class
 					}			

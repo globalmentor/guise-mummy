@@ -1,12 +1,12 @@
 package com.guiseframework.demo;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.coupler.ActionCardCoupler;
 import com.guiseframework.coupler.ListSelectCardCoupler;
-import com.guiseframework.event.AbstractGuisePropertyChangeListener;
 import com.guiseframework.event.ActionListener;
-import com.guiseframework.event.GuisePropertyChangeEvent;
 import com.guiseframework.model.DefaultValueModel;
 import com.guiseframework.validator.RegularExpressionStringValidator;
 import com.guiseframework.validator.ValueRequiredValidator;
@@ -49,9 +49,9 @@ public class EventWizardPanel extends DefaultNavigationPanel
 		personalEmailPanel.setName("personalEmailPanel");
 		wizardCardPanel.add(personalEmailPanel);		
 			//listen for the age checkbox changing
-		personalNamePanel.getAgeCheckControl().addPropertyChangeListener(CheckControl.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Boolean>()
+		personalNamePanel.getAgeCheckControl().addPropertyChangeListener(CheckControl.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>()
 				{
-					public void propertyChange(GuisePropertyChangeEvent<Boolean> propertyChangeEvent)	//if the age checkbox changes
+					public void propertyChange(GenericPropertyChangeEvent<Boolean> propertyChangeEvent)	//if the age checkbox changes
 					{
 						wizardCardPanel.setDisplayed(personalAgePanel, propertyChangeEvent.getNewValue());	//show or hide the age panel based upon the state of the age checkbox
 					}			

@@ -4,6 +4,7 @@ import java.beans.PropertyChangeListener;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.garretwilson.beans.GenericPropertyChangeListener;
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.event.*;
 
@@ -296,11 +297,11 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 	}
 
 	/**Opens the frame as modal and installs the given property change listener to listen for the mode changing.
-	This is a convenience method that adds the mode change listener using {@link #addPropertyChangeListener(String, PropertyChangeListener)} and then calls {@link #open(boolean)} with a value of <code>true</code>.
+	This is a convenience method that adds the {@link ModalComponent#MODE_PROPERTY} change listener using {@link #addPropertyChangeListener(String, PropertyChangeListener)} and then calls {@link #open(boolean)} with a value of <code>true</code>.
 	@param modeChangeListener The mode property change listener to add.
 	@see ModalComponent#MODE_PROPERTY 
 	*/
-	public void open(final GuisePropertyChangeListener<Mode> modeChangeListener)
+	public void open(final GenericPropertyChangeListener<Mode> modeChangeListener)
 	{
 		addPropertyChangeListener(MODE_PROPERTY, modeChangeListener);	//add the mode property change listener
 		open(true);	//open modally

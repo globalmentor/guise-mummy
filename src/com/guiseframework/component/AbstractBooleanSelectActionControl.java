@@ -2,8 +2,9 @@ package com.guiseframework.component;
 
 import java.net.URI;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 import com.guiseframework.validator.*;
 
@@ -174,9 +175,9 @@ public abstract class AbstractBooleanSelectActionControl<C extends SelectActionC
 	{
 		super(valueModel);	//construct the parent class
 		setValidator(new ValueRequiredValidator<Boolean>());	//install a value-required validator
-		addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Boolean>()	//listen for the value changing
+		addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>()	//listen for the value changing
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<Boolean> propertyChangeEvent)	//if the value changes
+					public void propertyChange(final GenericPropertyChangeEvent<Boolean> propertyChangeEvent)	//if the value changes
 					{
 						final Boolean oldValue=propertyChangeEvent.getOldValue();	//get the old value
 						final Boolean newValue=propertyChangeEvent.getNewValue();	//get the new value

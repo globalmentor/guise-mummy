@@ -5,9 +5,10 @@ import java.util.regex.*;
 
 import javax.mail.internet.ContentType;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
-import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 import com.guiseframework.validator.*;
 
@@ -77,9 +78,9 @@ public class TextSearchPanel extends DefaultNavigationPanel
 		textAreaControl.setEditable(false);	//don't allow the text area control to be edited
 
 		//listen for the value of the resource import changing
-		resourceImportControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<ResourceImport>()
+		resourceImportControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<ResourceImport>()
 				{
-					public void propertyChange(GuisePropertyChangeEvent<ResourceImport> propertyChangeEvent)
+					public void propertyChange(GenericPropertyChangeEvent<ResourceImport> propertyChangeEvent)
 					{
 						try
 						{

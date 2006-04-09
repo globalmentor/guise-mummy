@@ -8,7 +8,7 @@ import com.guiseframework.validator.ValidationException;
 /**A model for selecting one or more values from a list.
 The model must be thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this interface.
 When the selection is changed, a {@link com.guiseframework.event.ListSelectionEvent} is fired.
-When the state of a value (besides its selection, such as its enabled status) changes, a {@link com.garretwilson.beans.PropertyValueChangeEvent} event is fired referencing the value the state of which has changed.
+When the state of a value (besides its selection, such as its enabled status) changes, a {@link com.garretwilson.beans.GenericPropertyChangeEvent} event is fired referencing the value the state of which has changed.
 @param <V> The type of values contained in the model.
 @author Garret Wilson
 */

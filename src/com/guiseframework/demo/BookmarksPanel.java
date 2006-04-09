@@ -1,5 +1,7 @@
 package com.guiseframework.demo;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.Bookmark;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
@@ -37,9 +39,9 @@ public class BookmarksPanel extends DefaultNavigationPanel implements Navigation
 			tabbedPanel.add(tab, new CardConstraints("Step "+i));	//add the panel with a label			
 		}
 			//save a new bookmark ever time the tab changes
-		tabbedPanel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Component<?>>()	//listen for the tab changing
+		tabbedPanel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Component<?>>()	//listen for the tab changing
 				{
-					public void propertyChange(GuisePropertyChangeEvent<Component<?>> propertyChangeEvent)	//if the tab changes
+					public void propertyChange(GenericPropertyChangeEvent<Component<?>> propertyChangeEvent)	//if the tab changes
 					{
 						final String bookmarkID="step"+(tabbedPanel.getSelectedIndex());	//create the bookmark ID
 						final Bookmark bookmark=new Bookmark(new Bookmark.Parameter("step", Integer.toString(tabbedPanel.getSelectedIndex())));	//create a new bookmark

@@ -5,9 +5,10 @@ import static com.guiseframework.GuiseResourceConstants.*;
 import java.io.IOException;
 import java.util.List;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.Bookmark;
 import com.guiseframework.component.layout.*;
-import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 import com.guiseframework.validator.*;
 
@@ -33,9 +34,9 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	{
 		super(layout);	//construct the parent class
 		setValidator(new SequenceCardValidator());	//TODO comment
-		addPropertyChangeListener(VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Component<?>>()
+		addPropertyChangeListener(VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Component<?>>()
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<Component<?>> propertyChangeEvent)	//if the selected card changes
+					public void propertyChange(final GenericPropertyChangeEvent<Component<?>> propertyChangeEvent)	//if the selected card changes
 					{
 						final Component<?> oldCard=propertyChangeEvent.getOldValue();
 						final Component<?> newCard=propertyChangeEvent.getNewValue();	//TODO comment all this

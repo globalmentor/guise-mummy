@@ -2,6 +2,7 @@ package com.guiseframework.component.layout;
 
 import java.beans.PropertyChangeEvent;
 
+import com.garretwilson.beans.*;
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.component.Component;
 import com.guiseframework.component.Container;
@@ -29,16 +30,16 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 		}
 
 	/**The lazily-created listener of component constraints changes.*/
-	private GuisePropertyChangeListener<Constraints> componentConstraintsChangeListener=null;
+	private GenericPropertyChangeListener<Constraints> componentConstraintsChangeListener=null;
 
 		/**@return The lazily-created listener of component constraints changes.*/
-		protected GuisePropertyChangeListener<Constraints> getComponentConstraintsChangeListener()
+		protected GenericPropertyChangeListener<Constraints> getComponentConstraintsChangeListener()
 		{
 			if(componentConstraintsChangeListener==null)	//if we haven't yet created a property change listener for the component constraints property
 			{
-				componentConstraintsChangeListener=new AbstractGuisePropertyChangeListener<Constraints>()	//create a property change listener to listen for the component constraints property changing
+				componentConstraintsChangeListener=new AbstractGenericPropertyChangeListener<Constraints>()	//create a property change listener to listen for the component constraints property changing
 						{
-							public void propertyChange(final GuisePropertyChangeEvent<Constraints> propertyChangeEvent)	//if a component's constraints property changes
+							public void propertyChange(final GenericPropertyChangeEvent<Constraints> propertyChangeEvent)	//if a component's constraints property changes
 							{
 									//indicate that the component's constraints changed, and update the constraints property listener
 								componentConstraintsChanged((Component<?>)propertyChangeEvent.getSource(), propertyChangeEvent.getOldValue(), propertyChangeEvent.getNewValue());
@@ -228,14 +229,14 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 	@author Garret Wilson
 	@see LayoutConstraintsPropertyChangeEvent
 	*/
-	protected class ConstraintsPropertyChangeListener extends AbstractGuisePropertyChangeListener<Object>	//TODO important fix; when a LayoutConstraintsPropertyChangeEvent is refired by the component, it won't be the correct type 
+	protected class ConstraintsPropertyChangeListener extends AbstractGenericPropertyChangeListener<Object>	//TODO important fix; when a LayoutConstraintsPropertyChangeEvent is refired by the component, it won't be the correct type 
 	{
 
 		/**Called when a bound property is changed.
 		This implementation fires a {@link LayoutConstraintsPropertyChangeEvent} indicating the constraints and associated component. 
 		@param propertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
 		*/
-		public void propertyChange(final GuisePropertyChangeEvent<Object> propertyChangeEvent)
+		public void propertyChange(final GenericPropertyChangeEvent<Object> propertyChangeEvent)
 		{
 			final Class<? extends T> constraintsClass=getConstraintsClass();	//get the type of constraints we expect			
 			final Constraints constraints=(Constraints)propertyChangeEvent.getSource();	//get the constraints for which a property changed

@@ -4,9 +4,10 @@ import static com.garretwilson.lang.ClassUtilities.*;
 
 import java.beans.PropertyChangeListener;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.component.*;
-import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 import com.guiseframework.validator.ValidationException;
 
@@ -28,9 +29,9 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler
 	public final static String VALUE_PROPERTY=getPropertyName(ListSelectCardCoupler.class, "value");
 
 	/**The property change listener to listen for the value property of the list select control changing.*/
-	private final PropertyChangeListener listSelectValueChangeListener=new AbstractGuisePropertyChangeListener<V>()
+	private final PropertyChangeListener listSelectValueChangeListener=new AbstractGenericPropertyChangeListener<V>()
 	{
-		public void propertyChange(final GuisePropertyChangeEvent<V> propertyChangeEvent)	//if the list select value changed
+		public void propertyChange(final GenericPropertyChangeEvent<V> propertyChangeEvent)	//if the list select value changed
 		{
 			final V newValue=propertyChangeEvent.getNewValue();	//get the new selected value
 			if(newValue!=null && ObjectUtilities.equals(newValue, getValue()))	//if the connected value was selected

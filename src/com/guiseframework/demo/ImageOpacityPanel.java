@@ -2,10 +2,11 @@ package com.guiseframework.demo;
 
 import java.net.URI;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.converter.*;
-import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 import com.guiseframework.validator.DecimalRangeValidator;
 
@@ -33,9 +34,9 @@ public class ImageOpacityPanel extends DefaultNavigationPanel
 			//value model shared among slider controls and text control
 		final ValueModel<Float> sliderModel=new DefaultValueModel<Float>(Float.class, 1.0f);	//default to 1.0
 		sliderModel.setValidator(new DecimalRangeValidator<Float>(0.0f, 1.0f, 0.01f));	//set a range validator for the model
-		sliderModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Float>()	//listen for value changes
+		sliderModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Float>()	//listen for value changes
 				{
-					public void propertyChange(GuisePropertyChangeEvent<Float> propertyValueChangeEvent)	//if the opacity value changes
+					public void propertyChange(GenericPropertyChangeEvent<Float> propertyValueChangeEvent)	//if the opacity value changes
 					{
 						final Float newValue=propertyValueChangeEvent.getNewValue();	//get the new value
 						if(newValue!=null)	//if there is a new value

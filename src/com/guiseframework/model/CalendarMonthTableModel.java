@@ -8,12 +8,12 @@ import static com.garretwilson.lang.IntegerUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.util.CalendarConstants.*;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.garretwilson.util.Debug;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.converter.AbstractDateStringLiteralConverter;
 import com.guiseframework.converter.DateStringLiteralStyle;
-import com.guiseframework.event.AbstractGuisePropertyChangeListener;
-import com.guiseframework.event.GuisePropertyChangeEvent;
 
 /**A table model representing the days of a calendar month.
 Each cell contains a {@link Date} value.
@@ -159,9 +159,9 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 		this.date=checkInstance(date, "Date cannot be null");
 		updateModel();	//update the model to match the initial month calendar
 			//TODO important: this is a memory leak---make sure we uninstall the listener when the session goes away
-		getSession().addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, new AbstractGuisePropertyChangeListener<Locale>()	//listen for the session locale changing
+		getSession().addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, new AbstractGenericPropertyChangeListener<Locale>()	//listen for the session locale changing
 				{
-					public void propertyChange(GuisePropertyChangeEvent<Locale> propertyChangeEvent)	//if the locale changes
+					public void propertyChange(final GenericPropertyChangeEvent<Locale> propertyChangeEvent)	//if the locale changes
 					{
 						updateModel();	//update the model based upon the new locale
 					}			

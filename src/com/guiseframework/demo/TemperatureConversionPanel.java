@@ -1,5 +1,8 @@
 package com.guiseframework.demo;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
+import com.garretwilson.beans.GenericPropertyChangeListener;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
@@ -33,9 +36,9 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 		temperatureInput=new TextControl<Float>(Float.class);	//create a text input control to receive a float
 		temperatureInput.setLabel("Input Temperature");	//add a label to the text input control
 		temperatureInput.setValidator(new ValueRequiredValidator<Float>());	//install a validator requiring a value
-		temperatureInput.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Float>()	//listen for temperature changes
+		temperatureInput.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Float>()	//listen for temperature changes
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<Float> propertyChangeEvent)	//if the input temperature changes
+					public void propertyChange(final GenericPropertyChangeEvent<Float> propertyChangeEvent)	//if the input temperature changes
 					{
 						convertTemperature();	//convert the temperature						
 					}
@@ -72,9 +75,9 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 		conversionPanel.add(scalePanel);	//add the scale panel to the conversion panel
 
 			//create a listener to listen for check control changes and update the temperature immediately (e.g. with AJAX on the web platform)
-		final GuisePropertyChangeListener<Boolean> checkControlListener=new AbstractGuisePropertyChangeListener<Boolean>()
+		final GenericPropertyChangeListener<Boolean> checkControlListener=new AbstractGenericPropertyChangeListener<Boolean>()
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<Boolean> propertyChangeEvent)
+					public void propertyChange(final GenericPropertyChangeEvent<Boolean> propertyChangeEvent)
 					{
 						if(propertyChangeEvent.getNewValue())	//if this check control was selected
 						{

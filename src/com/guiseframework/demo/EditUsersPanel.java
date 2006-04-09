@@ -2,6 +2,8 @@ package com.guiseframework.demo;
 
 import java.util.*;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
@@ -135,9 +137,9 @@ public class EditUsersPanel extends DefaultNavigationPanel
 								//create a confirmation dialog
 							final MessageOptionDialogFrame confirmationDialog=new MessageOptionDialogFrame("Are you sure you want to remove user "+user.getFirstName()+" "+user.getLastName()+"?",
 									MessageOptionDialogFrame.Option.YES, MessageOptionDialogFrame.Option.NO);	//present "yes" and "no" options to the user
-							confirmationDialog.open(new AbstractGuisePropertyChangeListener<Mode>()	//ask for confirmation
+							confirmationDialog.open(new AbstractGenericPropertyChangeListener<Mode>()	//ask for confirmation
 									{		
-										public void propertyChange(final GuisePropertyChangeEvent<Mode> propertyChangeEvent)	//when the modal dialog mode changes
+										public void propertyChange(final GenericPropertyChangeEvent<Mode> propertyChangeEvent)	//when the modal dialog mode changes
 										{
 												//if the message dialog is no longer modal and the selected option is "yes"
 											if(confirmationDialog.getMode()==null && confirmationDialog.getValue()==MessageOptionDialogFrame.Option.YES)

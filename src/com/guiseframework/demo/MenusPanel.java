@@ -1,5 +1,7 @@
 package com.guiseframework.demo;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
@@ -92,9 +94,9 @@ public class MenusPanel extends DefaultNavigationPanel
 		accordionMenuPanel.setLabel("Accordion Menu");
 		final CheckControl rolloverOpenCheckbox=new CheckControl();	//accordion rollover open enabled
 		rolloverOpenCheckbox.setLabel("Enable accordion menu rollover open.");
-		rolloverOpenCheckbox.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Boolean>()
+		rolloverOpenCheckbox.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>()
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<Boolean> propertyChangeEvent)
+					public void propertyChange(final GenericPropertyChangeEvent<Boolean> propertyChangeEvent)
 					{
 						continentsMenu.setRolloverOpenEnabled(propertyChangeEvent.getNewValue().booleanValue());	//update the accordion submenu rollover open enabled option
 						messageMenu.setRolloverOpenEnabled(propertyChangeEvent.getNewValue().booleanValue());	//update the accordion submenu rollover open enabled option

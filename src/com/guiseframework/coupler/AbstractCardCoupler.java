@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static java.util.Collections.*;
 
+import com.garretwilson.beans.*;
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
@@ -34,45 +35,45 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 	private boolean updatingSelected=false;
 	
 	/**The property change listener to listen for the selected card changing.*/
-	private final GuisePropertyChangeListener<Component<?>> selectedCardChangeListener=new AbstractGuisePropertyChangeListener<Component<?>>()
+	private final GenericPropertyChangeListener<Component<?>> selectedCardChangeListener=new AbstractGenericPropertyChangeListener<Component<?>>()
 		{
-			public void propertyChange(final GuisePropertyChangeEvent<Component<?>> propertyChangeEvent)	//if the selected card changes
+			public void propertyChange(final GenericPropertyChangeEvent<Component<?>> propertyChangeEvent)	//if the selected card changes
 			{
 				updateSelected();	//update the selected status
 			}		
 		};
 
 	/**The property change listener to listen for the card displayed status changing and change the action accordingly.*/
-	private final GuisePropertyChangeListener<Boolean> displayedChangeListener=new AbstractGuisePropertyChangeListener<Boolean>()
+	private final GenericPropertyChangeListener<Boolean> displayedChangeListener=new AbstractGenericPropertyChangeListener<Boolean>()
 		{
-			public void propertyChange(final GuisePropertyChangeEvent<Boolean> propertyChangeEvent)	//if the displayed status changes
+			public void propertyChange(final GenericPropertyChangeEvent<Boolean> propertyChangeEvent)	//if the displayed status changes
 			{
 				updateDisplayed();	//update the displayed status based upon all the cards
 			}
 		};
 
 	/**The property change listener to listen for the card enabled status changing and reflect that value in the action.*/
-	private final GuisePropertyChangeListener<Boolean> enabledChangeListener=new AbstractGuisePropertyChangeListener<Boolean>()
+	private final GenericPropertyChangeListener<Boolean> enabledChangeListener=new AbstractGenericPropertyChangeListener<Boolean>()
 		{
-			public void propertyChange(final GuisePropertyChangeEvent<Boolean> propertyChangeEvent)	//if the enabled status changes
+			public void propertyChange(final GenericPropertyChangeEvent<Boolean> propertyChangeEvent)	//if the enabled status changes
 			{
 				updateEnabled();	//update the enabled status based upon all the cards
 			}
 		};
 
 	/**The property change listener to listen for the card task status changing and reflect that value in the action.*/
-	private final GuisePropertyChangeListener<TaskStatus> taskStatusChangeListener=new AbstractGuisePropertyChangeListener<TaskStatus>()
+	private final GenericPropertyChangeListener<TaskStatus> taskStatusChangeListener=new AbstractGenericPropertyChangeListener<TaskStatus>()
 		{
-			public void propertyChange(final GuisePropertyChangeEvent<TaskStatus> propertyChangeEvent)	//if the task status changes
+			public void propertyChange(final GenericPropertyChangeEvent<TaskStatus> propertyChangeEvent)	//if the task status changes
 			{
 				updateTaskStatus();	//update the task status based upon all the cards
 			}
 		};
 
 	/**The property change listener to listen for card constraints changing.*/
-	private final GuisePropertyChangeListener<Constraints> constraintsChangeListener=new AbstractGuisePropertyChangeListener<Constraints>()
+	private final GenericPropertyChangeListener<Constraints> constraintsChangeListener=new AbstractGenericPropertyChangeListener<Constraints>()
 		{
-			public void propertyChange(final GuisePropertyChangeEvent<Constraints> propertyChangeEvent)	//if the constrants change
+			public void propertyChange(final GenericPropertyChangeEvent<Constraints> propertyChangeEvent)	//if the constrants change
 			{
 				final Constraints oldCardConstraints=propertyChangeEvent.getOldValue();	//get the old card constraints
 				if(oldCardConstraints!=null)	//if there were old card constraints

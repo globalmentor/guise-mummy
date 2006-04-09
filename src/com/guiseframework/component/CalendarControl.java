@@ -6,6 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.garretwilson.beans.*;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.Table.CellRepresentationStrategy;
 import com.guiseframework.component.layout.Flow;
@@ -110,10 +111,10 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 	}
 
 	/**The property change listener that updates the calendars when a property changes.*/
-	protected final GuisePropertyChangeListener<?> updateModelPropertyChangeListener;
+	protected final GenericPropertyChangeListener<?> updateModelPropertyChangeListener;
 
 	/**The property change listener that updates the visible dates if the year is different than the last one.*/
-	protected final GuisePropertyChangeListener<Integer> yearPropertyChangeListener;
+	protected final GenericPropertyChangeListener<Integer> yearPropertyChangeListener;
 
 	/**Value model constructor.
 	@param valueModel The component value model.
@@ -137,9 +138,9 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 		monthListControl.setValueRepresentationStrategy(new ListControl.DefaultValueRepresentationStrategy<Date>(monthConverter));	//install a month representation strategy
 		controlContainer.add(monthListControl);	//add the month list control
 			//create a year property change listener before we update the year control
-		yearPropertyChangeListener=new AbstractGuisePropertyChangeListener<Integer>()	//create a property change listener to listen for the year changing
+		yearPropertyChangeListener=new AbstractGenericPropertyChangeListener<Integer>()	//create a property change listener to listen for the year changing
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<Integer> propertyChangeEvent)	//if the selected year changed
+					public void propertyChange(final GenericPropertyChangeEvent<Integer> propertyChangeEvent)	//if the selected year changed
 					{
 						final Integer newYear=propertyChangeEvent.getNewValue();	//get the new selected year
 						if(newYear!=null)	//if a new year was selected (a null value can be sent when the model is cleared)
@@ -168,26 +169,26 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 */
 		updateYearControl();	//create and install an appropriate year control
 		updateCalendars();	//update the calendars
-		updateModelPropertyChangeListener=new AbstractGuisePropertyChangeListener<Object>()	//create a property change listener to update the calendars
+		updateModelPropertyChangeListener=new AbstractGenericPropertyChangeListener<Object>()	//create a property change listener to update the calendars
 		{
-			public void propertyChange(final GuisePropertyChangeEvent<Object> propertyChangeEvent)	//if the model value value changed
+			public void propertyChange(final GenericPropertyChangeEvent<Object> propertyChangeEvent)	//if the model value value changed
 			{
 				updateCalendars();	//update the calendars based upon the new selected date
 			}
 		};
 		valueModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, updateModelPropertyChangeListener);	//update the calendars if the selected date changes
-		valueModel.addPropertyChangeListener(ValueModel.VALIDATOR_PROPERTY, new AbstractGuisePropertyChangeListener<Validator>()	//create a property change listener to listen for our validator changing, so that we can update the date control if needed
+		valueModel.addPropertyChangeListener(ValueModel.VALIDATOR_PROPERTY, new AbstractGenericPropertyChangeListener<Validator>()	//create a property change listener to listen for our validator changing, so that we can update the date control if needed
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<Validator> propertyChangeEvent)	//if the model's validator changed
+					public void propertyChange(final GenericPropertyChangeEvent<Validator> propertyChangeEvent)	//if the model's validator changed
 					{
 						updateYearControl();	//update the year control (e.g. a drop-down list) to match the new validator (e.g. a range validator), if any
 					}
 				});
 			//TODO important: this is a memory leak---make sure we uninstall the listener when the session goes away
 		getSession().addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, updateModelPropertyChangeListener);	//update the calendars if the locale changes
-		monthListControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Date>()	//create a property change listener to listen for the month changing
+		monthListControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Date>()	//create a property change listener to listen for the month changing
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<Date> propertyChangeEvent)	//if the selected month changed
+					public void propertyChange(final GenericPropertyChangeEvent<Date> propertyChangeEvent)	//if the selected month changed
 					{
 						final Date newDate=propertyChangeEvent.getNewValue();	//get the new selected date
 						if(newDate!=null)	//if a new month was selected (a null value can be sent when the model is cleared)

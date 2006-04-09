@@ -1,9 +1,9 @@
 package com.guiseframework.demo;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.component.*;
-import com.guiseframework.event.AbstractGuisePropertyChangeListener;
 import com.guiseframework.event.ActionListener;
-import com.guiseframework.event.GuisePropertyChangeEvent;
 
 /**Event wizard Guise demonstration panel using PLOOP+RDF+XML.
 Copyright © 2006 GlobalMentor, Inc.
@@ -20,9 +20,9 @@ public class EventWizardPanel2 extends DefaultNavigationPanel
 		final SequenceCardPanel wizardCardPanel=(SequenceCardPanel)getComponentByName(this, "wizardCardPanel");
 		final Panel<?> personalAgePanel=(Panel<?>)getComponentByName(this, "personalAgePanel");
 		final CheckControl ageCheckControl=(CheckControl)getComponentByName(this, "ageCheckControl");
-		ageCheckControl.addPropertyChangeListener(CheckControl.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Boolean>()
+		ageCheckControl.addPropertyChangeListener(CheckControl.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>()
 				{
-					public void propertyChange(GuisePropertyChangeEvent<Boolean> propertyChangeEvent)	//if the age checkbox changes
+					public void propertyChange(GenericPropertyChangeEvent<Boolean> propertyChangeEvent)	//if the age checkbox changes
 					{
 						wizardCardPanel.setDisplayed(personalAgePanel, propertyChangeEvent.getNewValue());	//show or hide the age panel based upon the state of the age checkbox
 					}			

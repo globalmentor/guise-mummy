@@ -2,10 +2,9 @@ package com.guiseframework.component;
 
 import java.beans.PropertyChangeListener;
 
-import com.guiseframework.event.AbstractGuisePropertyChangeListener;
-import com.guiseframework.event.GuisePropertyChangeEvent;
-import com.guiseframework.event.NotificationEvent;
-import com.guiseframework.event.NotificationListener;
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
+import com.guiseframework.event.*;
 
 /**An abstract implementation of a composite component.
 Every child component must be added or removed using {@link #addComponent(Component)} and {@link #removeComponent(Component)}, although other actions may take place.
@@ -24,9 +23,9 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	{
 		if(validChangeListener==null)	//if there is no valid change listener
 		{
-			validChangeListener=new AbstractGuisePropertyChangeListener<Boolean>()	//create a new valid change listener
+			validChangeListener=new AbstractGenericPropertyChangeListener<Boolean>()	//create a new valid change listener
 					{
-						public void propertyChange(GuisePropertyChangeEvent<Boolean> propertyChangeEvent)	//if the child component's valid status changes
+						public void propertyChange(GenericPropertyChangeEvent<Boolean> propertyChangeEvent)	//if the child component's valid status changes
 						{
 								//TODO do we want to update valid here?
 							childComponentValidPropertyChanged((Component<?>)propertyChangeEvent.getSource(), propertyChangeEvent.getOldValue().booleanValue(), propertyChangeEvent.getNewValue().booleanValue());	//notify this component that a child component's valid status changed
@@ -44,9 +43,9 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	{
 		if(displayVisibleChangeListener==null)	//if there is no display/visible change listener
 		{
-			displayVisibleChangeListener=new AbstractGuisePropertyChangeListener<Boolean>()	//create a new display/visible change listener
+			displayVisibleChangeListener=new AbstractGenericPropertyChangeListener<Boolean>()	//create a new display/visible change listener
 					{
-						public void propertyChange(GuisePropertyChangeEvent<Boolean> propertyChangeEvent)	//if the child component's display or visible status changes
+						public void propertyChange(GenericPropertyChangeEvent<Boolean> propertyChangeEvent)	//if the child component's display or visible status changes
 						{
 							//TODO maybe add a flag to prevent infinite loops
 							updateValid();	//update this composite component's valid state, because the validity of this component only depends on displayed, visible child components

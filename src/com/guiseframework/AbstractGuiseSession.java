@@ -15,7 +15,7 @@ import javax.xml.parsers.*;
 
 import static java.util.Collections.*;
 
-import com.garretwilson.beans.BoundPropertyObject;
+import com.garretwilson.beans.*;
 import com.garretwilson.event.PostponedEvent;
 import com.garretwilson.io.BOMInputStreamReader;
 import com.garretwilson.lang.ObjectUtilities;
@@ -270,12 +270,12 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		/**The property value change listener that, in response to a change in value, releases the resource bundle.
 		@see #releaseResourceBundle()
 		*/
-		private final GuisePropertyChangeListener<String> resourceBundleReleasePropertyValueChangeListener=new AbstractGuisePropertyChangeListener<String>()
+		private final GenericPropertyChangeListener<String> resourceBundleReleasePropertyValueChangeListener=new AbstractGenericPropertyChangeListener<String>()
 			{
 				/**Called when a bound property is changed.
 				@param propertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
 				*/
-				public void propertyChange(final GuisePropertyChangeEvent<String> propertyChangeEvent)
+				public void propertyChange(final GenericPropertyChangeEvent<String> propertyChangeEvent)
 				{
 					releaseResourceBundle();	//release the resource bundle, as the new locale may indicate that new resources should be used					
 				}
@@ -1344,12 +1344,12 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	/**The class that listens for context state changes and updates the context state set in response.
 	@author Garret Wilson
 	*/
-	protected class ContextStateListener extends AbstractGuisePropertyChangeListener<GuiseContext.State>
+	protected class ContextStateListener extends AbstractGenericPropertyChangeListener<GuiseContext.State>
 	{
 		/**Called when a bound property is changed.
 		@param propertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
 		*/
-		public void propertyChange(final GuisePropertyChangeEvent<GuiseContext.State> propertyChangeEvent)
+		public void propertyChange(final GenericPropertyChangeEvent<GuiseContext.State> propertyChangeEvent)
 		{
 			updateContextStates();	//update the context states when a context state changes
 		}

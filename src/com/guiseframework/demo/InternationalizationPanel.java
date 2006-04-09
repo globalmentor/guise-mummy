@@ -2,12 +2,13 @@ package com.guiseframework.demo;
 
 import java.util.*;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.converter.Converter;
 import com.guiseframework.converter.DateStringLiteralConverter;
 import com.guiseframework.converter.DateStringLiteralStyle;
-import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 import com.guiseframework.validator.ValidationException;
 
@@ -59,9 +60,9 @@ public class InternationalizationPanel extends DefaultNavigationPanel
 				}		
 			}
 				//install a value change listener to listen for language selection
-			checkControl.addPropertyChangeListener(CheckControl.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Boolean>()
+			checkControl.addPropertyChangeListener(CheckControl.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>()
 					{
-						public void propertyChange(final GuisePropertyChangeEvent<Boolean> propertyChangeEvent)	//when the language check changes
+						public void propertyChange(final GenericPropertyChangeEvent<Boolean> propertyChangeEvent)	//when the language check changes
 						{
 							if(Boolean.TRUE.equals(propertyChangeEvent.getNewValue()))	//if this language is being set
 							{

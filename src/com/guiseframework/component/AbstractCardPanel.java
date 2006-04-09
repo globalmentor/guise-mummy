@@ -1,11 +1,11 @@
 package com.guiseframework.component;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.garretwilson.util.Debug;
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.CardLayout;
-import com.guiseframework.event.AbstractGuisePropertyChangeListener;
-import com.guiseframework.event.GuisePropertyChangeEvent;
 import com.guiseframework.event.NavigationEvent;
 import com.guiseframework.event.NavigationListener;
 import com.guiseframework.validator.ValidationException;
@@ -57,9 +57,9 @@ public abstract class AbstractCardPanel<C extends Panel<C> & CardControl<C>> ext
 	protected AbstractCardPanel(final CardLayout layout)
 	{
 		super(layout);	//construct the parent class
-		addPropertyChangeListener(VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Component<?>>()	//listen for the value changing and set bookmarks in response
+		addPropertyChangeListener(VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Component<?>>()	//listen for the value changing and set bookmarks in response
 				{
-					public void propertyChange(final GuisePropertyChangeEvent<Component<?>> propertyChangeEvent)	//if the value changes
+					public void propertyChange(final GenericPropertyChangeEvent<Component<?>> propertyChangeEvent)	//if the value changes
 					{
 //TODO del Debug.trace("value changed to ", propertyChangeEvent.getNewValue(), "and ready to update bookmark");
 						updateBookmark();	//update the bookmark, now that the property has changed

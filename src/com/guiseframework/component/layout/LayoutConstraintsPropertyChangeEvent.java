@@ -2,8 +2,8 @@ package com.guiseframework.component.layout;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.component.Component;
-import com.guiseframework.event.GuisePropertyChangeEvent;
 
 /**An event indicating that a property of layout constraints changed.
 The source is always the layout object. The component and constraints are also provided.
@@ -11,7 +11,7 @@ The source is always the layout object. The component and constraints are also p
 @param <V> The type of property value.
 @author Garret Wilson
 */
-public class LayoutConstraintsPropertyChangeEvent<T extends Constraints, V> extends GuisePropertyChangeEvent<V>	//TODO maybe cast the source to a layout in the class if needed by a use case
+public class LayoutConstraintsPropertyChangeEvent<T extends Constraints, V> extends GenericPropertyChangeEvent<V>	//TODO maybe cast the source to a layout in the class if needed by a use case
 {
 
 	/**The component for which a constraint value changed.*/

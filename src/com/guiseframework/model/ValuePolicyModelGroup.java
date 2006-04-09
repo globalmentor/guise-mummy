@@ -2,7 +2,7 @@ package com.guiseframework.model;
 
 import java.beans.PropertyChangeEvent;
 
-import com.guiseframework.event.*;
+import com.garretwilson.beans.*;
 
 /**An abstract implementation of a group of value models implementing a value policy across several models, such as mutual exclusion.
 When value models are added to the list, the group adds itself as a property value change listeners to the model, listening for changes in the value.
@@ -10,7 +10,7 @@ When value models are added to the list, the group adds itself as a property val
 @author Garret Wilson.
 @see com.guiseframework.model.ValueModel
 */
-public abstract class ValuePolicyModelGroup<V> extends AbstractModelGroup<ValueModel<V>> implements GuisePropertyChangeListener<V>
+public abstract class ValuePolicyModelGroup<V> extends AbstractModelGroup<ValueModel<V>> implements GenericPropertyChangeListener<V>
 {
 
 	/**Actual implementation of adding a model to the group.
@@ -37,12 +37,12 @@ public abstract class ValuePolicyModelGroup<V> extends AbstractModelGroup<ValueM
 	This not-generics version calls the generic version, creating a new event if necessary.
 	No checks are made at compile time to ensure the given event actually supports the given generic type.
 	@param propertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
-	@see GuisePropertyChangeListener#propertyChange(GuisePropertyChangeEvent)
+	@see GenericPropertyChangeListener#propertyChange(GenericPropertyChangeEvent)
 	*/
 	@SuppressWarnings("unchecked")
 	public final void propertyChange(final PropertyChangeEvent propertyChangeEvent)
 	{
-		final GuisePropertyChangeEvent<V> guisePropertyChangeEvent=AbstractGuisePropertyChangeListener.getGuisePropertyChangeEvent(propertyChangeEvent);	//create a genericized event object
+		final GenericPropertyChangeEvent<V> guisePropertyChangeEvent=AbstractGenericPropertyChangeListener.getGenericPropertyChangeEvent(propertyChangeEvent);	//create a genericized event object
 		propertyChange(guisePropertyChangeEvent);	//call the generic version of the method with the genericized event object
 	}
 
