@@ -103,38 +103,11 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 			}
 		}
 
-	/**Session constructor with a default data model.
-	@param session The Guise session that owns this component.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public CalendarControl(final GuiseSession session)
+	/**Default constructor with a default data model.*/
+	public CalendarControl()
 	{
-		this(session, (String)null);	//construct the component, indicating that a default ID should be used		
+		this(new DefaultValueModel<Date>(Date.class));	//construct the class with a default value model
 	}
-
-	/**Session and ID constructor with a default data model.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public CalendarControl(final GuiseSession session, final String id)
-	{
-		this(session, id, new DefaultValueModel<Date>(session, Date.class));	//construct the class with a default value model
-	}
-
-	/**Session and model constructor.
-	@param session The Guise session that owns this component.
-	@param model The component data model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	*/
-	public CalendarControl(final GuiseSession session, final ValueModel<Date> model)
-	{
-		this(session, null, model);	//construct the component, indicating that a default ID should be used		
-	}
-
-//TODO del	protected final GuisePropertyChangeListener<CalendarMonthTableModel, Calendar> calendarChangeListener;
-//TODO del	protected final ActionListener<CalendarMonthTableModel> calendarActionListener;
 
 	/**The property change listener that updates the calendars when a property changes.*/
 	protected final GuisePropertyChangeListener<?> updateModelPropertyChangeListener;
@@ -142,29 +115,26 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 	/**The property change listener that updates the visible dates if the year is different than the last one.*/
 	protected final GuisePropertyChangeListener<Integer> yearPropertyChangeListener;
 
-	/**Session, ID, and model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
-	@exception NullPointerException if the given session, and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	/**Value model constructor.
+	@param valueModel The component value model.
+	@exception NullPointerException if the given value model is <code>null</code>.
 	*/
-	public CalendarControl(final GuiseSession session, final String id, final ValueModel<Date> model)
+	public CalendarControl(final ValueModel<Date> valueModel)
 	{
-		super(session, id, new FlowLayout(session, Flow.PAGE), model);	//construct the parent class flowing along the page
-		final Date selectedDate=model.getValue();	//get the selected date
+		super(new FlowLayout(Flow.PAGE), valueModel);	//construct the parent class flowing along the page
+		final Date selectedDate=valueModel.getValue();	//get the selected date
 		date=selectedDate!=null ? selectedDate : new Date();	//set the currently visible date to the selected date, or the current date if no date is selected
-		controlContainer=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create the control panel
+		controlContainer=new LayoutPanel(new FlowLayout(Flow.LINE));	//create the control panel
 		add(controlContainer);	//add the control panel
-		calendarContainer=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create the calendar panel
+		calendarContainer=new LayoutPanel(new FlowLayout(Flow.LINE));	//create the calendar panel
 		add(calendarContainer);	//add the calendar panel
-		monthListControl=new ListControl<Date>(session, Date.class, new SingleListSelectionPolicy<Date>());	//create a list control allowing only single selections of a month
+		monthListControl=new ListControl<Date>(Date.class, new SingleListSelectionPolicy<Date>());	//create a list control allowing only single selections of a month
 //TODO fix if needed		monthListControl.setStyleID("month");	//TODO use a constant
 		monthListControl.setLabel("Month");	//set the month control label TODO get from resources
-		monthListControl.setValidator(new ValueRequiredValidator<Date>(session));	//require a locale to be selected in the list control
+		monthListControl.setValidator(new ValueRequiredValidator<Date>());	//require a locale to be selected in the list control
 		monthListControl.setRowCount(1);	//make this a drop-down list
-		final Converter<Date, String> monthConverter=new DateStringLiteralConverter(session, DateStringLiteralStyle.MONTH_OF_YEAR);	//get a converter to display the month of the year
-		monthListControl.setValueRepresentationStrategy(new ListControl.DefaultValueRepresentationStrategy<Date>(session, monthConverter));	//install a month representation strategy
+		final Converter<Date, String> monthConverter=new DateStringLiteralConverter(DateStringLiteralStyle.MONTH_OF_YEAR);	//get a converter to display the month of the year
+		monthListControl.setValueRepresentationStrategy(new ListControl.DefaultValueRepresentationStrategy<Date>(monthConverter));	//install a month representation strategy
 		controlContainer.add(monthListControl);	//add the month list control
 			//create a year property change listener before we update the year control
 		yearPropertyChangeListener=new AbstractGuisePropertyChangeListener<Integer>()	//create a property change listener to listen for the year changing
@@ -174,7 +144,7 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 						final Integer newYear=propertyChangeEvent.getNewValue();	//get the new selected year
 						if(newYear!=null)	//if a new year was selected (a null value can be sent when the model is cleared)
 						{
-							final Calendar calendar=Calendar.getInstance(session.getLocale());	//create a new calendar
+							final Calendar calendar=Calendar.getInstance(getSession().getLocale());	//create a new calendar
 							calendar.setTime(getDate());	//set the calendar date to our currently displayed date
 							if(calendar.get(Calendar.YEAR)!=newYear)	//if the currently visible date is in another year
 							{
@@ -193,7 +163,7 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 //TODO del			final Date maxDate=calendar.getTime();	//the current date will be the maximum date
 //TODO del			calendar.set(1940, 0, 1);	//set the calendar to the first day of 1940
 //TODO del			final Date minDate=calendar.getTime();	//the first day of 1940 will be the minimum date
-			model.setValidator(new DateRangeValidator(session, minDate, maxDate));	//restrict the date range
+			model.setValidator(new DateRangeValidator(minDate, maxDate));	//restrict the date range
 		}
 */
 		updateYearControl();	//create and install an appropriate year control
@@ -205,8 +175,8 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 				updateCalendars();	//update the calendars based upon the new selected date
 			}
 		};
-		model.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, updateModelPropertyChangeListener);	//update the calendars if the selected date changes
-		model.addPropertyChangeListener(ValueModel.VALIDATOR_PROPERTY, new AbstractGuisePropertyChangeListener<Validator>()	//create a property change listener to listen for our validator changing, so that we can update the date control if needed
+		valueModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, updateModelPropertyChangeListener);	//update the calendars if the selected date changes
+		valueModel.addPropertyChangeListener(ValueModel.VALIDATOR_PROPERTY, new AbstractGuisePropertyChangeListener<Validator>()	//create a property change listener to listen for our validator changing, so that we can update the date control if needed
 				{
 					public void propertyChange(final GuisePropertyChangeEvent<Validator> propertyChangeEvent)	//if the model's validator changed
 					{
@@ -214,7 +184,7 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 					}
 				});
 			//TODO important: this is a memory leak---make sure we uninstall the listener when the session goes away
-		session.addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, updateModelPropertyChangeListener);	//update the calendars if the locale changes
+		getSession().addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, updateModelPropertyChangeListener);	//update the calendars if the locale changes
 		monthListControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Date>()	//create a property change listener to listen for the month changing
 				{
 					public void propertyChange(final GuisePropertyChangeEvent<Date> propertyChangeEvent)	//if the selected month changed
@@ -222,10 +192,10 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 						final Date newDate=propertyChangeEvent.getNewValue();	//get the new selected date
 						if(newDate!=null)	//if a new month was selected (a null value can be sent when the model is cleared)
 						{
-							final Calendar newCalendar=Calendar.getInstance(session.getLocale());	//create a new calendar
+							final Calendar newCalendar=Calendar.getInstance(getSession().getLocale());	//create a new calendar
 							newCalendar.setTime(newDate);	//set the new calendar date to the newly selected month
 							final int newMonth=newCalendar.get(Calendar.MONTH);	//get the new requested month
-							final Calendar calendar=Calendar.getInstance(session.getLocale());	//create a new calendar
+							final Calendar calendar=Calendar.getInstance(getSession().getLocale());	//create a new calendar
 							calendar.setTime(getDate());	//set the calendar date to our currently displayed date
 							if(calendar.get(Calendar.MONTH)!=newMonth)	//if the currently visible date is in another month
 							{
@@ -243,8 +213,7 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 	*/
 	protected void updateYearControl()
 	{
-		final GuiseSession session=getSession();	//get a reference to the session
-		final Locale locale=session.getLocale();	//get the current locale
+		final Locale locale=getSession().getLocale();	//get the current locale
 		if(yearControl!=null)	//if there is a year control already in use
 		{
 			controlContainer.remove(yearControl);	//remove our year control TODO later use controlContainer.replace() when that method is available
@@ -274,21 +243,21 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 		}
 		if(minYear>=0 && maxYear>=0 && maxYear-minYear<100)	//if there is a minimum year and maximum year specified, use a drop-down control
 		{
-			final ListControl<Integer> yearListControl=new ListControl<Integer>(session, Integer.class, new SingleListSelectionPolicy<Integer>());	//create a list control allowing only single selections
+			final ListControl<Integer> yearListControl=new ListControl<Integer>(Integer.class, new SingleListSelectionPolicy<Integer>());	//create a list control allowing only single selections
 			yearListControl.setRowCount(1);	//make the list control a drop-down list
 			for(int year=minYear; year<=maxYear; ++year)	//for each valid year
 			{
 				yearListControl.add(new Integer(year));	//add this year to the choices
 			}
-			yearListControl.setValidator(new ValueRequiredValidator<Integer>(session));	//require a value in the year drop-down
+			yearListControl.setValidator(new ValueRequiredValidator<Integer>());	//require a value in the year drop-down
 			yearControl=yearListControl;	//use the year list control for the year control
 		}
 		else	//if minimum and maximum years are not specified, use a standard text control TODO update to use a spinner control as well, and auto-update the value once four characters are entered 
 		{
-			final TextControl<Integer> yearTextControl=new TextControl<Integer>(session, Integer.class);	//create a text control to select the year
+			final TextControl<Integer> yearTextControl=new TextControl<Integer>(Integer.class);	//create a text control to select the year
 			yearTextControl.setMaximumLength(4);	//TODO testing
 			yearTextControl.setColumnCount(4);	//TODO testing
-			yearTextControl.setValidator(new IntegerRangeValidator(session, new Integer(1800), new Integer(2100), new Integer(1), true));	//restrict the range of the year TODO improve; don't arbitrarily restrict the range		
+			yearTextControl.setValidator(new IntegerRangeValidator(new Integer(1800), new Integer(2100), new Integer(1), true));	//restrict the range of the year TODO improve; don't arbitrarily restrict the range		
 			yearControl=yearTextControl;	//use the year text control for the year control
 		}
 		assert yearControl!=null : "Failed to create a year control";
@@ -327,8 +296,7 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 			try
 			{
 //TODO del		Debug.trace("*** Updating calendars");
-				final GuiseSession session=getSession();	//get the current session
-				final Locale locale=session.getLocale();	//get the current locale
+				final Locale locale=getSession().getLocale();	//get the current locale
 				final boolean localeChanged=!locale.equals(oldLocale);	//see if the locale changed		
 				final Calendar calendar;	//determine which calendar to use
 				final Date date=getDate();	//get the visible date
@@ -380,9 +348,9 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 					final CellRepresentationStrategy<Date> dayRepresentationStrategy=createDayRepresentationStrategy();	//create a strategy for representing the days in the month calendar cells
 					for(int monthIndex=0; monthIndex<getMonthCount(); ++monthIndex)	//for each month
 					{
-						final CalendarMonthTableModel calendarMonthTableModel=new CalendarMonthTableModel(session, monthCalendar.getTime());	//create a table model for this month
+						final CalendarMonthTableModel calendarMonthTableModel=new CalendarMonthTableModel(monthCalendar.getTime());	//create a table model for this month
 						calendarMonthTableModel.setColumnLabelDateStyle(DateStringLiteralStyle.DAY_OF_WEEK_SHORT);	//show the short day of the week in each column
-						final Table calendarMonthTable=new Table(session, calendarMonthTableModel);	//create a table to hold the calendar month
+						final Table calendarMonthTable=new Table(calendarMonthTableModel);	//create a table to hold the calendar month
 						for(final TableColumnModel<?> tableColumn:calendarMonthTable.getTableModel().getColumns())	//for each table column
 						{
 							calendarMonthTable.setCellRepresentationStrategy((TableColumnModel<Date>)tableColumn, dayRepresentationStrategy);	//install the representation strategy for this column
@@ -435,7 +403,6 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 		@SuppressWarnings("unchecked")	//we check the type of the column value class, so the casts are safe
 		public <C extends Date> Component<?> createComponent(final Table table, final TableModel model, final int rowIndex, final TableColumnModel<C> column, final boolean editable, final boolean selected, final boolean focused)
 		{
-			final GuiseSession session=getSession();	//get the session
 			final Calendar calendar=Calendar.getInstance(getSession().getLocale());	//create a calendar TODO cache the calendar and only change it if the locale has changed
 			calendar.setTime(getDate());	//set the calendar date to the date of the calendar
 			final int calendarMonth=calendar.get(Calendar.MONTH);	//get the month of the calendar
@@ -444,7 +411,7 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 			calendar.setTime(date);	//set the time of the calendar to that of the cell
 			if(calendar.get(Calendar.MONTH)==calendarMonth)	//if this date is within the month
 			{
-				final Link link=new Link(session);	//create a link for this cell
+				final Link link=new Link();	//create a link for this cell
 				final String dayOfMonthString=Integer.toString(calendar.get(Calendar.DAY_OF_MONTH));	//create a string using the day of the month
 				link.setLabel(dayOfMonthString);	//set the label of the link to the day of the month
 				final Validator<Date> validator=CalendarControl.this.getValidator();	//get the calendar control model's validator
@@ -473,7 +440,7 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 			}
 			else	//if the date is outside the month
 			{
-				return new Label(session);	//return a blank label for the cell
+				return new Label();	//return a blank label for the cell
 			}
 		}
 	}

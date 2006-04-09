@@ -1,6 +1,5 @@
 package com.guiseframework.component;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.Flow;
 import com.guiseframework.converter.AbstractStringLiteralConverter;
 import com.guiseframework.model.*;
@@ -84,211 +83,92 @@ public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
 			}			
 		}
 
-	/**Session and model constructor.
-	@param session The Guise session that owns this component.
-	@param model The component data model.
-	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given session, model, and/or axis is <code>null</code>.
-	*/
-	public TabControl(final GuiseSession session, final ListSelectModel<V> model, final Flow axis)
-	{
-		this(session, null, model, axis);	//construct the class, indicating that a default ID should be generated
-	}
-
-	/**Session, model, and maximum tab count constructor.
-	@param session The Guise session that owns this component.
-	@param model The component data model.
-	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given session, model, and/or axis is <code>null</code>.
-	*/
-	public TabControl(final GuiseSession session, final ListSelectModel<V> model, final Flow axis, final int maxTabCount)
-	{
-		this(session, null, model, axis, maxTabCount);	//construct the class, indicating that a default ID should be generated
-	}
-
-	/**Session, model, and value representation strategy constructor.
-	@param session The Guise session that owns this component.
-	@param model The component data model.
-	@param valueRepresentationStrategy The strategy to create label models to represent this model's values.
-	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given session, model, value representation strategy, and/or axis is <code>null</code>.
-	*/
-	public TabControl(final GuiseSession session, final ListSelectModel<V> model, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final Flow axis)
-	{
-		this(session, null, model, valueRepresentationStrategy, axis);	//construct the class, indicating that a default ID should be generated
-	}
-
-	/**Session, model, value representation strategy, and maximum count constructor.
-	@param session The Guise session that owns this component.
-	@param model The component data model.
-	@param valueRepresentationStrategy The strategy to create label models to represent this model's values.
-	@param axis The axis along which the tabs are oriented.
-	@param maxTabCount The requested number of visible rows, or -1 if no row count is specified.
-	@exception NullPointerException if the given session, model, value representation strategy, and/or axis is <code>null</code>.
-	*/
-	public TabControl(final GuiseSession session, final ListSelectModel<V> model, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final Flow axis, final int maxTabCount)
-	{
-		this(session, null, model, valueRepresentationStrategy, axis, maxTabCount);	//construct the class, indicating that a default ID should be generated
-	}
-		
-	/**Session constructor with a default data model to represent a given type with multiple selection.
-	@param session The Guise session that owns this component.
+	/**Value class and axis constructor with a default data model to represent a given type.
 	@param valueClass The class indicating the type of value held in the model.
 	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given session, value class, and/or axis is <code>null</code>.
+	@exception NullPointerException if the given value class and/or axis is <code>null</code>.
 	*/
-	public TabControl(final GuiseSession session, final Class<V> valueClass, final Flow axis)
+	public TabControl(final Class<V> valueClass, final Flow axis)
 	{
-		this(session, null, valueClass, axis);	//construct the component, indicating that a default ID should be used
+		this(new DefaultListSelectModel<V>(valueClass), axis);	//construct the class with a default model TODO probably use a single list selection strategy
 	}
 
-	/**Session and maximum tab count constructor with a default data model to represent a given type with multiple selection.
-	@param session The Guise session that owns this component.
+	/**Value class, axis, and maximum tab count constructor with a default data model to represent a given type with multiple selection.
 	@param valueClass The class indicating the type of value held in the model.
 	@param axis The axis along which the tabs are oriented.
 	@param maxTabCount The requested number of visible rows, or -1 if no row count is specified.
-	@exception NullPointerException if the given session, value class, and/or axis is <code>null</code>.
+	@exception NullPointerException if the given value class and/or axis is <code>null</code>.
 	*/
-	public TabControl(final GuiseSession session, final Class<V> valueClass, final Flow axis, final int maxTabCount)
+	public TabControl(final Class<V> valueClass, final Flow axis, final int maxTabCount)
 	{
-		this(session, null, valueClass, axis, maxTabCount);	//construct the component, indicating the maximum tab count and that a default ID should be used
+		this(new DefaultListSelectModel<V>(valueClass), axis, maxTabCount);	//construct the class with a default model and the maximum tab count
 	}
 
-	/**Session and selection strategy constructor with a default data model to represent a given type.
-	@param session The Guise session that owns this component.
+	/**Value class, selection strategy, and axis constructor with a default data model to represent a given type.
 	@param valueClass The class indicating the type of value held in the model.
 	@param selectionStrategy The strategy for selecting values in the model.
 	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given session, value class, selection strategy, and/or axis is <code>null</code>.
+	@exception NullPointerException if the given value class, selection strategy, and/or axis is <code>null</code>.
 	*/
-	public TabControl(final GuiseSession session, final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy, final Flow axis)
+	public TabControl(final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy, final Flow axis)
 	{
-		this(session, null, valueClass, selectionStrategy, axis);	//construct the component, indicating that a default ID should be used
+		this(new DefaultListSelectModel<V>(valueClass, selectionStrategy), axis);	//construct the class with a default model
 	}
 
-	/**Session, selection strategy, and maximum tab count constructor with a default data model to represent a given type.
-	@param session The Guise session that owns this component.
-	@param valueClass The class indicating the type of value held in the model.
-	@param selectionStrategy The strategy for selecting values in the model.
-	@param axis The axis along which the tabs are oriented.
-	@param maxTabCount The requested number of visible rows, or -1 if no row count is specified.
-	@exception NullPointerException if the given session, value class, selection strategy, and/or axis is <code>null</code>.
-	*/
-	public TabControl(final GuiseSession session, final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy, final Flow axis, final int maxTabCount)
-	{
-		this(session, null, valueClass, selectionStrategy, axis, maxTabCount);	//construct the component, indicating the maximum tab count and that a default ID should be used
-	}
-
-	/**Session and ID constructor with a default data model to represent a given type with multiple selection.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param valueClass The class indicating the type of value held in the model.
-	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given session, value class, and/or axis is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public TabControl(final GuiseSession session, final String id, final Class<V> valueClass, final Flow axis)
-	{
-		this(session, id, new DefaultListSelectModel<V>(session, valueClass), axis);	//construct the class with a default model
-	}
-
-	/**Session, ID, and maximum tab count constructor with a default data model to represent a given type with multiple selection.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param valueClass The class indicating the type of value held in the model.
-	@param axis The axis along which the tabs are oriented.
-	@param maxTabCount The requested number of visible rows, or -1 if no row count is specified.
-	@exception NullPointerException if the given session, value class, and/or axis is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public TabControl(final GuiseSession session, final String id, final Class<V> valueClass, final Flow axis, final int maxTabCount)
-	{
-		this(session, id, new DefaultListSelectModel<V>(session, valueClass), axis, maxTabCount);	//construct the class with a default model and the maximum tab count
-	}
-
-	/**Session and ID constructor with a default data model to represent a given type.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param valueClass The class indicating the type of value held in the model.
-	@param selectionStrategy The strategy for selecting values in the model.
-	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given session, value class, selection strategy, and/or axis is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public TabControl(final GuiseSession session, final String id, final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy, final Flow axis)
-	{
-		this(session, id, new DefaultListSelectModel<V>(session, valueClass, selectionStrategy), axis);	//construct the class with a default model
-	}
-
-	/**Session, ID, and maximum tab count constructor with a default data model to represent a given type.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Value class, selection strategy, axis, and maximum tab count constructor with a default data model to represent a given type.
 	@param valueClass The class indicating the type of value held in the model.
 	@param selectionStrategy The strategy for selecting values in the model.
 	@param axis The axis along which the tabs are oriented.
 	@param maxTabCount The requested number of visible tabs, or -1 if no maximum tab count is specified.
-	@exception NullPointerException if the given session, value class, selection strategy, and/or axis is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given value class, selection strategy, and/or axis is <code>null</code>.
 	*/
-	public TabControl(final GuiseSession session, final String id, final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy, final Flow axis, final int maxTabCount)
+	public TabControl(final Class<V> valueClass, final ListSelectionPolicy<V> selectionStrategy, final Flow axis, final int maxTabCount)
 	{
-		this(session, id, new DefaultListSelectModel<V>(session, valueClass, selectionStrategy), axis, maxTabCount);	//construct the class with a default model and the maximum tab count
+		this(new DefaultListSelectModel<V>(valueClass, selectionStrategy), axis, maxTabCount);	//construct the class with a default model and the maximum tab count
 	}
 
-	/**Session, ID, and model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
+	/**List select model and axis constructor.
+	@param listSelectModel The component list select model.
 	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given session, model and/or axis is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given list select model and/or axis is <code>null</code>.
 	*/
-	public TabControl(final GuiseSession session, final String id, final ListSelectModel<V> model, final Flow axis)
+	public TabControl(final ListSelectModel<V> listSelectModel, final Flow axis)
 	{
-		this(session, id, model, axis, -1);	//construct the class with no maximum tab count
+		this(listSelectModel, axis, -1);	//construct the class with no maximum tab count
 	}
 
-	/**Session, ID, model, and maximumn tab count constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
+	/**List select model, axis, and maximum tab count constructor.
+	@param listSelectModel The component list select model.
 	@param axis The axis along which the tabs are oriented.
 	@param maxTabCount The requested number of visible tabs, or -1 if no maximum tab count is specified.
-	@exception NullPointerException if the given session, model, and/or axis is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given list select model and/or axis is <code>null</code>.
 	*/
-	public TabControl(final GuiseSession session, final String id, final ListSelectModel<V> model, final Flow axis, final int maxTabCount)
+	public TabControl(final ListSelectModel<V> listSelectModel, final Flow axis, final int maxTabCount)
 	{
-		this(session, id, model, new DefaultValueRepresentationStrategy<V>(session, AbstractStringLiteralConverter.getInstance(session, model.getValueClass())), axis, maxTabCount);	//construct the class with a default representation strategy
+		this(listSelectModel, new DefaultValueRepresentationStrategy<V>(AbstractStringLiteralConverter.getInstance(listSelectModel.getValueClass())), axis, maxTabCount);	//construct the class with a default representation strategy
 	}
 
-	/**Session, ID, model, and value representation strategy constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
+	/**List select model, value representation strategy, and axis constructor.
+	@param listSelectModel The component list select model.
 	@param valueRepresentationStrategy The strategy to create label models to represent this model's values.
 	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given session, model, value representation strategy, and/or axis is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given list select model, value representation strategy, and/or axis is <code>null</code>.
 	*/
-	public TabControl(final GuiseSession session, final String id, final ListSelectModel<V> model, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final Flow axis)
+	public TabControl(final ListSelectModel<V> listSelectModel, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final Flow axis)
 	{
-		this(session, id, model, valueRepresentationStrategy, axis, -1);	//construct the class with no maximum tab count
+		this(listSelectModel, valueRepresentationStrategy, axis, -1);	//construct the class with no maximum tab count
 	}
 
-	/**Session, ID, model, value representation strategy, and maximum tab count constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
+	/**List select model, value representation strategy, axis, and maximum tab count constructor.
+	@param listSelectModel The component list select model.
 	@param valueRepresentationStrategy The strategy to create label models to represent this model's values.
 	@param axis The axis along which the tabs are oriented.
 	@param maxTabCount The requested number of visible tabs, or -1 if no maximum tab count is specified.
-	@exception NullPointerException if the given session, model, value representation strategy, and/or axis is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given list select model, value representation strategy, and/or axis is <code>null</code>.
 	*/
-	public TabControl(final GuiseSession session, final String id, final ListSelectModel<V> model, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final Flow axis, final int maxTabCount)
+	public TabControl(final ListSelectModel<V> listSelectModel, final ValueRepresentationStrategy<V> valueRepresentationStrategy, final Flow axis, final int maxTabCount)
 	{
-		super(session, id, model, valueRepresentationStrategy);	//construct the parent class
+		super(listSelectModel, valueRepresentationStrategy);	//construct the parent class
 		this.axis=checkInstance(axis, "Flow axis cannot be null.");
 		this.maxTabCount=maxTabCount;	//save the maximum tab count
 	}

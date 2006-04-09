@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.xml.parsers.*;
 
@@ -20,7 +21,6 @@ import com.garretwilson.io.BOMInputStreamReader;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.rdf.*;
 import com.garretwilson.rdf.ploop.PLOOPProcessor;
-import com.garretwilson.text.xml.XMLUtilities;
 import com.garretwilson.util.CollectionUtilities;
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.ResourceBundleUtilities;
@@ -80,43 +80,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	/**The cache of navigation panel types keyed to appplication context-relative paths.*/
 	private final Map<String, NavigationPanel> navigationPathPanelMap=synchronizedMap(new HashMap<String, NavigationPanel>());
-
-		/**Binds a frame to a particular appplication context-relative path.
-		Any existing binding for the given context-relative path is replaced.
-		@param path The appplication context-relative path to which the frame should be bound.
-		@param frame The frame to bind to this particular context-relative path.
-		@return The frame previously bound to the given context-relative path, or <code>null</code> if no frame was previously bound to the path.
-		@exception NullPointerException if the path and/or the frame is null.
-		@exception IllegalArgumentException if the provided path is absolute.
-		*/
-/*TODO del if not needed
-		protected Frame bindNavigationFrame(final String path, final Frame frame)
-		{
-			if(isAbsolutePath(path))	//if the path is absolute
-			{
-				throw new IllegalArgumentException("Bound navigation path cannot be absolute: "+path);
-			}
-			return navigationPathFrameBindingMap.put(checkNull(path, "Path cannot be null."), checkNull(frame, "Bound frame cannot be null."));	//store the binding
-		}
-*/
-
-		/**Removes the binding a frame from a particular appplication context-relative path.
-		If no frame is bound to the given navigation path, no action occurs.
-		@param path The appplication context-relative path to which the frame should be bound.
-		@return The frame previously bound to the given context-relative path, or <code>null</code> if no frame was previously bound to the path.
-		@exception NullPointerException if the path is null.
-		@exception IllegalArgumentException if the provided path is absolute.
-		*/
-/*TODO del if not needed
-		protected Frame unbindNavigationFrame(final String path)
-		{
-			if(isAbsolutePath(path))	//if the path is absolute
-			{
-				throw new IllegalArgumentException("Bound navigation path cannot be absolute: "+path);
-			}
-			return navigationPathFrameBindingMap.remove(checkNull(path, "Path cannot be null."));	//remove the binding
-		}
-*/
 
 	/**The user local environment.*/
 	private GuiseEnvironment environment;
@@ -720,8 +683,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 				final Class<? extends NavigationPanel> panelClass=getApplication().getNavigationPanelClass(path);	//see which panel we should show for this path
 				if(panelClass!=null)	//if we found a panel class for this path
 				{
-					final String panelID=XMLUtilities.createName(path);	//convert the path to a valid ID TODO use a Guise-specific routine or, better yet, bind an ID with the panel
-					panel=createNavigationPanel(panelClass, panelID);	//create the panel
+//TODO del					final String panelID=XMLUtilities.createName(path);	//convert the path to a valid ID TODO use a Guise-specific routine or, better yet, bind an ID with the panel
+					panel=createNavigationPanel(panelClass);	//create the panel
 					navigationPathPanelMap.put(path, panel);	//bind the panel to the path, caching it for next time
 				}
 			}
@@ -731,29 +694,16 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	/**Creates the panel for the given class.
 	@param panelClass The class representing the panel to create.
-	@param panelID The ID to assign to the panel.
 	@return The created panel.
-	@exception IllegalStateException if the panel class does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
+	@exception IllegalStateException if the panel class does not provide a default constructor, is an interface, is abstract, or throws an exception during instantiation.
 	*/
-	protected NavigationPanel<?> createNavigationPanel(final Class<? extends NavigationPanel> panelClass, final String panelID)
+	protected NavigationPanel<?> createNavigationPanel(final Class<? extends NavigationPanel> panelClass)
 	{
 		NavigationPanel panel;	//we'll store the panel here
 		try
 		{
-			try
-			{
-//TODO del Debug.trace("***ready to create navigation panel for path", path);
-Debug.trace("***ready to create navigation panel for ID", panelID);
-				panel=panelClass.getConstructor(GuiseSession.class, String.class).newInstance(this, panelID);	//find the Guise session and ID constructor and create an instance of the class
-			}
-			catch(final NoSuchMethodException noSuchMethodException)	//if there was no Guise session and string ID constructor
-			{
-				panel=panelClass.getConstructor(GuiseSession.class).newInstance(this);	//use the Guise session constructor if there is one					
-			}
-		}
-		catch(final NoSuchMethodException noSuchMethodException)	//if the constructor could not be found
-		{
-			throw new IllegalStateException(noSuchMethodException);
+			Debug.trace("***ready to create navigation panel for class", panelClass);
+			panel=panelClass.newInstance();	//use the Guise session constructor if there is one					
 		}
 		catch(final IllegalAccessException illegalAccessException)	//if the constructor is not visible
 		{
@@ -762,10 +712,6 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 		catch(final InstantiationException instantiationException)	//if the class is an interface or is abstract
 		{
 			throw new IllegalStateException(instantiationException);
-		}
-		catch(final InvocationTargetException invocationTargetException)	//if the constructor throws an exception
-		{
-			throw new IllegalStateException(invocationTargetException);
 		}
 		initializeComponent(panel);	//initialize the navigation panel from an RDF description, if possible
 		return panel;	//return the panel
@@ -987,7 +933,7 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 		{
 			//TODO release the navigation panel, maybe, just in case
 			pushModalNavigation(modalNavigation);	//push the modal navigation onto the top of the modal navigation stack
-			modalNavigation.getModalListener().modalBegan(new ModalEvent(this, modalNavigationPanel));
+			modalNavigation.getModalListener().modalBegan(new ModalEvent(modalNavigationPanel));
 		}
 
 		/**Ends modal interaction for a particular modal panel.
@@ -1035,7 +981,7 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 			releaseNavigationPanel(navigationPath);	//release the panel associated with this navigation path
 			if(modalNavigation!=null)	//if we if we ended modality for the panel
 			{
-				modalNavigation.getModalListener().modalEnded(new ModalEvent(this, modalNavigationPanel));	//send an event to the modal listener
+				modalNavigation.getModalListener().modalEnded(new ModalEvent(modalNavigationPanel));	//send an event to the modal listener
 			}
 			return modalNavigation!=null;	//return whether we ended modality
 		}
@@ -1122,7 +1068,7 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 			{
 				setNavigationPath(navigationPath);	//make sure the Guise session has the correct navigation path
 				setBookmark(bookmark);	//make sure the Guise session has the correct bookmark
-				final NavigationEvent navigationEvent=new NavigationEvent(this, this, navigationPath, bookmark, referrerURI);	//create a navigation event with the session as the source of the event
+				final NavigationEvent navigationEvent=new NavigationEvent(this, navigationPath, bookmark, referrerURI);	//create a navigation event with the session as the source of the event
 				fireNavigated(getApplicationFrame(), navigationEvent);	//fire a navigation event to all components in the application frame hierarchy
 			}			
 		}
@@ -1355,7 +1301,7 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 	*/
 	public void initialize()
 	{
-		this.applicationFrame=application.createApplicationFrame(this);	//create the application frame
+		this.applicationFrame=application.createApplicationFrame();	//create the application frame
 		this.applicationFrame.open();	//open the application frame
 			//TODO check active state
 		getApplication().addPropertyChangeListener(GuiseApplication.RESOURCE_BUNDLE_BASE_NAME_PROPERTY, resourceBundleReleasePropertyValueChangeListener);	//when the application changes its resource bundle base name, release the resource bundle		
@@ -1372,40 +1318,18 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 	}
 
 	/**The variable used to generate unique component IDs.*/
-	private long componentIDCounter=0;
+	private final AtomicLong idCounter=new AtomicLong(0);
 
-		/**@return A new component ID appropriate for using with a new component.*/
-		public String generateComponentID()
+		/**Generates a new ID string unique to this session.
+		This ID is appropriate for being used in a new component, for example.
+		The ID will begin with a letter and be composed only of letters and numbers.
+		@return A new ID unique to this session.
+		*/
+		public String generateID()
 		{
-			final long counter;
-			synchronized(this)	//don't allow other threads to modify the counter while we're modifying it
-			{
-				counter=++componentIDCounter;	//increment the component ID counter and retrieve the resulting value
-			}
+			final long counter=idCounter.incrementAndGet();	//atomically get the next counter value
 			return "id"+Long.toHexString(counter);	//create an ID from the counter
 		}	
-
-	/**Reports that a bound property has changed. This method can be called	when a bound property has changed and it will send the appropriate property change event to any registered property change listeners.
-	This version fires a property change event even if no listeners are attached, so that the Guise session can be notified of the event.
-	No event is fired if old and new are both <code>null</code> or are both non-<code>null</code> and equal according to the {@link Object#equals(java.lang.Object)} method.
-	This method delegates actual firing of the event to {@link #firePropertyChange(PropertyChangeEvent)}.
-	@param propertyName The name of the property being changed.
-	@param oldValue The old property value.
-	@param newValue The new property value.
-	@see #firePropertyChange(PropertyChangeEvent)
-	@see #hasListeners(String)
-	@see PropertyValueChangeEvent
-	@see PropertyValueChangeListener
-	*/
-/*TODO del; no longer needed now that unconditional firing isn't necessary
-	protected <V> void firePropertyChange(final String propertyName, V oldValue, final V newValue)	//TODO probably remove this method, now that we don't need unconditional firing anymore
-	{
-		if(!ObjectUtilities.equals(oldValue, newValue))	//if the values are different
-		{					
-			firePropertyChange(new PropertyValueChangeEvent<V>(this, propertyName, oldValue, newValue));	//create and fire a genericized subclass of a property change event
-		}
-	}
-*/
 
 	/**Reports that a bound property has changed.
 	This implementation delegates to the Guise session to fire or postpone the property change event.
@@ -1436,10 +1360,10 @@ Debug.trace("***ready to create navigation panel for ID", panelID);
 	*/
 	public void notify(final Notification notification)
 	{
-		final Text text=new Text(this);	//create a new text component
+		final Text text=new Text();	//create a new text component
 		text.setText(notification.getMessage());	//set the text
 		text.setTextResourceKey(notification.getMessageResourceKey());	//set the text resource key
-		final DefaultOptionDialogFrame optionDialogFrame=new DefaultOptionDialogFrame(this, text, DefaultOptionDialogFrame.Option.OK);	//create a dialog with an OK button
+		final DefaultOptionDialogFrame optionDialogFrame=new DefaultOptionDialogFrame(text, DefaultOptionDialogFrame.Option.OK);	//create a dialog with an OK button
 		optionDialogFrame.setLabel(notification.getSeverity().toString());	//TODO improve title; load from resources
 		optionDialogFrame.open();	//show the dialog		
 	}

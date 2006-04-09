@@ -5,8 +5,6 @@ import static java.text.MessageFormat.*;
 import java.text.*;
 import java.util.*;
 
-import com.guiseframework.GuiseSession;
-
 /**An object that can convert a date object from and to a string.
 This implementation caches a date format and only creates a new one if the locale has changed.
 This implementation synchronizes all conversions on the {@link DateFormat} object.
@@ -52,15 +50,13 @@ public abstract class AbstractDateStringLiteralConverter<V> extends AbstractConv
 		return dateFormat;	//return the date format
 	}
 
-	/**Session, date style, and time style constructor.
-	@param session The Guise session that owns this converter.
+	/**Date style and time style constructor.
 	@param dateStyle The date representation style, or <code>null</code> if the date should not be represented.
 	@param timeStyle The time representation style, or <code>null</code> if the time should not be represented.
-	@exception NullPointerException if the given session and/or both the date style and time style is <code>null</code>.
+	@exception NullPointerException if both the given date style and time style are <code>null</code>.
 	*/
-	public AbstractDateStringLiteralConverter(final GuiseSession session, final DateStringLiteralStyle dateStyle, final TimeStringLiteralStyle timeStyle)
+	public AbstractDateStringLiteralConverter(final DateStringLiteralStyle dateStyle, final TimeStringLiteralStyle timeStyle)
 	{
-		super(session);	//construct the parent class
 		if(dateStyle==null && timeStyle==null)	//if neither a date style or a time style is specified
 		{
 			throw new NullPointerException("Either a date style or a time style must be specified.");

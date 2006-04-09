@@ -7,8 +7,6 @@ import static com.garretwilson.text.TextUtilities.*;
 import javax.mail.internet.ContentType;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.GuiseSession;
-import com.guiseframework.model.*;
 
 /**A message component showing the message and any label.
 The message only supports text content types, including:
@@ -100,45 +98,18 @@ public class Message extends AbstractComponent<Message>
 			}
 		}
 
-	/**Session constructor with a default model.
-	@param session The Guise session that owns this component.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public Message(final GuiseSession session)
+	/**Default constructor.*/
+	public Message()
 	{
-		this(session, (String)null);	//construct the component, indicating that a default ID should be used
 	}
 
-	/**Session and ID constructor with a default data model.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	/**Message model constructor.
+	@param messageModel The component message model.
+	@exception NullPointerException if the given message model is <code>null</code>.
 	*/
-	public Message(final GuiseSession session, final String id)
+/*TODO fix
+	public Message(final MessageModel messageModel)
 	{
-		this(session, id, new DefaultModel(session));	//construct the class with a default model
 	}
-
-	/**Session and model constructor.
-	@param session The Guise session that owns this component.
-	@param model The component data model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	*/
-	public Message(final GuiseSession session, final Model model)
-	{
-		this(session, null, model);	//construct the class, indicating that a default ID should be used
-	}
-
-	/**Session, ID, and model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public Message(final GuiseSession session, final String id, final Model model)
-	{
-		super(session, id/*TODO add message model, model*/);	//construct the parent class
-	}
+*/
 }

@@ -1,6 +1,5 @@
 package com.guiseframework.component;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.model.*;
 
 import static com.garretwilson.lang.ClassUtilities.*;
@@ -47,116 +46,68 @@ public class CheckControl extends AbstractValueControl<Boolean, CheckControl>
 			}			
 		}
 
-	/**Session constructor with a default boolean data model and a default rectangle check type.
-	@param session The Guise session that owns this component.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public CheckControl(final GuiseSession session)
+	/**Default constructor with a default label model, a default value model, and default rectangle check type.*/
+	public CheckControl()
 	{
-		this(session, (String)null);	//construct the component, indicating that a default ID should be used
+		this(new DefaultValueModel<Boolean>(Boolean.class, Boolean.FALSE));	//construct the class with a value model
 	}
 
-	/**Session constructor with a default boolean data model.
-	@param session The Guise session that owns this component.
+	/**Check type constructor with a default label model and value model.
 	@param checkType The type of check area presented to the user.
-	@exception NullPointerException if the given session and/or check type is <code>null</code>.
+	@exception NullPointerException if the given check type is <code>null</code>.
 	*/
-	public CheckControl(final GuiseSession session, final CheckType checkType)
+	public CheckControl(final CheckType checkType)
 	{
-		this(session, null, checkType);	//construct the component, indicating that a default ID should be used
+		this(new DefaultValueModel<Boolean>(Boolean.class, Boolean.FALSE), checkType);	//construct the class with a default value model
 	}
 
-	/**Session and ID constructor with a default boolean data model and default rectangle check type.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public CheckControl(final GuiseSession session, final String id)
-	{
-		this(session, id, new DefaultValueModel<Boolean>(session, Boolean.class, Boolean.FALSE));	//construct the class with a default model
-	}
-
-	/**Session, ID, and check type constructor with a default boolean data model.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param checkType The type of check area presented to the user.
-	@exception NullPointerException if the given session and/or check type is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public CheckControl(final GuiseSession session, final String id, final CheckType checkType)
-	{
-		this(session, id, new DefaultValueModel<Boolean>(session, Boolean.class, Boolean.FALSE), checkType);	//construct the class with a default model
-	}
-
-	/**Session and label model constructor with a default rectangle check type.
-	@param session The Guise session that owns this component.
+	/**Label model constructor with a default rectangle check type.
 	@param labelModel The component label model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
+	@exception NullPointerException if the given label model is <code>null</code>.
 	*/
-	public CheckControl(final GuiseSession session, final LabelModel labelModel)
+	public CheckControl(final LabelModel labelModel)
 	{
-		this(session, labelModel, new DefaultValueModel<Boolean>(session, Boolean.class, Boolean.FALSE));	//construct the class, indicating that a default ID and a default value model should be used
+		this(labelModel, new DefaultValueModel<Boolean>(Boolean.class, Boolean.FALSE));	//construct the class, indicating that a default value model should be used
 	}
 
-	/**Session and value model constructor with a default rectangle check type.
-	@param session The Guise session that owns this component.
-	@param valueModel The component value model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	*/
-	public CheckControl(final GuiseSession session, final ValueModel<Boolean> valueModel)
-	{
-		this(session, new DefaultLabelModel(session), valueModel);	//construct the class, indicating that a default ID and a default label model should be used
-	}
-
-	/**Session, label model, and value model constructor with a default rectangle check type.
-	@param session The Guise session that owns this component.
+	/**Label model and value model constructor with a default rectangle check type.
 	@param labelModel The component label model.
 	@param valueModel The component value model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
+	@exception NullPointerException if the given label model and/or value model is <code>null</code>.
 	*/
-	public CheckControl(final GuiseSession session, final LabelModel labelModel, final ValueModel<Boolean> valueModel)
+	public CheckControl(final LabelModel labelModel, final ValueModel<Boolean> valueModel)
 	{
-		this(session, null, labelModel, valueModel, CheckType.RECTANGLE);	//construct the class, indicating that a default ID should be used and that the check type should be rectangle
+		this(labelModel, valueModel, CheckType.RECTANGLE);	//construct the class, indicating that the check type should be rectangle
 	}
 
-	/**Session, ID, and model constructor with a default rectangle check type.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	/**Value model constructor with a default rectangle check type.
+	@param valueModel The component value model.
+	@exception NullPointerException if the given value model is <code>null</code>.
 	*/
-	public CheckControl(final GuiseSession session, final String id, final ValueModel<Boolean> model)
+	public CheckControl(final ValueModel<Boolean> valueModel)
 	{
-		this(session, id, model, CheckType.RECTANGLE);	//construct the class with a rectangle check type
+		this(valueModel, CheckType.RECTANGLE);	//construct the class with a rectangle check type
 	}
 
-	/**Session, ID, model, and check type constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Value model and check type constructor.
 	@param valueModel The component value model.
 	@param checkType The type of check area presented to the user.
-	@exception NullPointerException if the given session, model, and/or check type is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given value model and/or check type is <code>null</code>.
 	*/
-	public CheckControl(final GuiseSession session, final String id, final ValueModel<Boolean> valueModel, final CheckType checkType)
+	public CheckControl(final ValueModel<Boolean> valueModel, final CheckType checkType)
 	{
-		this(session, id, new DefaultLabelModel(session), valueModel, checkType);	//construct the class with a default label model
+		this(new DefaultLabelModel(), valueModel, checkType);	//construct the class with a default label model
 	}
 
-	/**Session, ID, model, and check type constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Label model, value model and check type constructor.
 	@param labelModel The component label model.
 	@param valueModel The component value model.
 	@param checkType The type of check area presented to the user.
-	@exception NullPointerException if the given session, model, and/or check type is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given value model, label model, and/or check type is <code>null</code>.
 	*/
-	public CheckControl(final GuiseSession session, final String id, final LabelModel labelModel, final ValueModel<Boolean> valueModel, final CheckType checkType)
+	public CheckControl(final LabelModel labelModel, final ValueModel<Boolean> valueModel, final CheckType checkType)
 	{
-		super(session, id, labelModel, valueModel);	//construct the parent class
+		super(labelModel, valueModel);	//construct the parent class
 		this.checkType=checkInstance(checkType, "Check type cannot be null");	//save the check type
 	}
 

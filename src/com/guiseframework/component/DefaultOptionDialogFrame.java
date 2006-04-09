@@ -2,7 +2,6 @@ package com.guiseframework.component;
 
 import java.text.MessageFormat;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.event.ActionEvent;
 import com.guiseframework.event.ActionListener;
 import com.guiseframework.model.*;
@@ -41,108 +40,48 @@ public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultO
 		CANCEL
 	}
 
-	/**Session and options constructor.
+	/**Options constructor.
 	Duplicate options are ignored.
-	@param session The Guise session that owns this component.
 	@param options The available options.
-	@exception NullPointerException if the given session and/or options is <code>null</code>.
+	@exception NullPointerException if the given options is <code>null</code>.
 	*/
-	public DefaultOptionDialogFrame(final GuiseSession session, final Option... options)
+	public DefaultOptionDialogFrame(final Option... options)
 	{
-		this(session, (String)null, options);	//construct the component, indicating that a default ID should be used
+		this(new DefaultValueModel<Option>(Option.class), options);	//use a default value model
 	}
 
-	/**Session, component, and options constructor.
+	/**Component and options constructor.
 	Duplicate options are ignored.
-	@param session The Guise session that owns this component.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
 	@param options The available options.
-	@exception NullPointerException if the given session and/or options is <code>null</code>.
+	@exception NullPointerException if the given options is <code>null</code>.
 	*/
-	public DefaultOptionDialogFrame(final GuiseSession session, final Component<?> component, final Option... options)
+	public DefaultOptionDialogFrame(final Component<?> component, final Option... options)
 	{
-		this(session, (String)null, component, options);	//construct the component, indicating that a default ID should be used
+		this(new DefaultValueModel<Option>(Option.class), component, options);	//use a default value model
 	}
 
-	/**Session, model, and options constructor.
+	/**Value model, and options constructor.
 	Duplicate options are ignored.
-	@param session The Guise session that owns this component.
-	@param model The component data model.
+	@param valueModel The frame value  model.
 	@param options The available options.
-	@exception NullPointerException if the given session and/or options is <code>null</code>.
+	@exception NullPointerException if the given value model and or options is <code>null</code>.
 	*/
-	public DefaultOptionDialogFrame(final GuiseSession session, final ValueModel<Option> model, final Option... options)
+	public DefaultOptionDialogFrame(final ValueModel<Option> valueModel, final Option... options)
 	{
-		this(session, (String)null, model, options);	//construct the component, indicating that a default ID should be used
+		this(valueModel, null, options);	//default to no component
 	}
 
-	/**Session, model, component, and options constructor.
+	/**Value model, component, and options constructor.
 	Duplicate options are ignored.
-	@param session The Guise session that owns this component.
-	@param model The component data model.
-	@param component The single child component, or <code>null</code> if this frame should have no child component.
-	@param options The available options.
-	@exception NullPointerException if the given session and/or options is <code>null</code>.
-	*/
-	public DefaultOptionDialogFrame(final GuiseSession session, final ValueModel<Option> model, final Component<?> component, final Option... options)
-	{
-		this(session, (String)null, model, component, options);	//construct the component, indicating that a default ID should be used
-	}
-
-	/**Session, ID, and options constructor.
-	Duplicate options are ignored.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param options The available options.
-	@exception NullPointerException if the given session and/or options is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public DefaultOptionDialogFrame(final GuiseSession session, final String id, final Option... options)
-	{
-		this(session, id, new DefaultValueModel<Option>(session, Option.class), options);	//use a default value model
-	}
-
-	/**Session, ID, component, and options constructor.
-	Duplicate options are ignored.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param component The single child component, or <code>null</code> if this frame should have no child component.
-	@param options The available options.
-	@exception NullPointerException if the given session and/or options is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public DefaultOptionDialogFrame(final GuiseSession session, final String id, final Component<?> component, final Option... options)
-	{
-		this(session, id, new DefaultValueModel<Option>(session, Option.class), component, options);	//use a default value model
-	}
-
-	/**Session, ID, model, and options constructor.
-	Duplicate options are ignored.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
-	@param options The available options.
-	@exception NullPointerException if the given session, model, and or options is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public DefaultOptionDialogFrame(final GuiseSession session, final String id, final ValueModel<Option> model, final Option... options)
-	{
-		this(session, id, model, null, options);	//default to no component
-	}
-
-	/**Session, ID, model, component, and options constructor.
-	Duplicate options are ignored.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
+	@param valueModel The frame value model.
 	@param component The component representing the content of the option dialog frame, or <code>null</code> if there is no content component.
 	@param options The available options.
-	@exception NullPointerException if the given session, model, and/or options is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given value model and/or options is <code>null</code>.
 	*/
-	public DefaultOptionDialogFrame(final GuiseSession session, final String id, final ValueModel<Option> model, final Component<?> component, final Option... options)
+	public DefaultOptionDialogFrame(final ValueModel<Option> valueModel, final Component<?> component, final Option... options)
 	{
-		super(session, id, model, component, options);	//construct the parent class
+		super(valueModel, component, options);	//construct the parent class
 	}
 
 	/**Creates a component to represent the given option.
@@ -151,8 +90,7 @@ public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultO
 	*/
 	protected Component<?> createOptionComponent(final Option option)
 	{
-		final GuiseSession session=getSession();	//get the session
-		final Button button=new Button(session);	//create a new button
+		final Button button=new Button();	//create a new button
 		final String optionString=option.toString();	//get the string form of the option
 		button.setLabelResourceKey(MessageFormat.format(FRAME_DIALOG_OPTION_LABEL_RESOURCE_KEY_FORMAT_PATTERN, optionString));	//set the option action label
 		button.setIconResourceKey(MessageFormat.format(FRAME_DIALOG_OPTION_ICON_RESOURCE_KEY_FORMAT_PATTERN, optionString));	//set the option action icon

@@ -4,7 +4,6 @@ import com.garretwilson.rdf.*;
 
 import static com.garretwilson.rdf.RDFUtilities.*;
 import static com.garretwilson.rdf.rdfs.RDFSUtilities.*;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.model.*;
 
 /**A tree node representation strategy representing an RDF resource.
@@ -35,23 +34,19 @@ public class RDFResourceTreeNodeRepresentationStrategy extends AbstractRDFObject
 		*/
 		protected void setResourceTypeIncluded(final boolean resourceTypeIncluded) {this.resourceTypeIncluded=resourceTypeIncluded;}
 		
-	/**Session constructor with a default RDF XMLifier.
-	@param session The Guise session that owns this representation strategy.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public RDFResourceTreeNodeRepresentationStrategy(final GuiseSession session)
+	/**Default constructor with a default RDF XMLifier.*/
+	public RDFResourceTreeNodeRepresentationStrategy()
 	{
-		this(session, new RDFXMLifier());	//create the class with a default RDF XMLifier
+		this(new RDFXMLifier());	//create the class with a default RDF XMLifier
 	}
 
-	/**Session and RDF XMLifier constructor.
-	@param session The Guise session that owns this representation strategy.
+	/**RDF XMLifier constructor.
 	@param rdfXMLifier The RDF XMLifier to use for creating labels.
-	@exception NullPointerException if the given session and/or RDF XMLifier is <code>null</code>.
+	@exception NullPointerException if the given RDF XMLifier is <code>null</code>.
 	*/
-	public RDFResourceTreeNodeRepresentationStrategy(final GuiseSession session, final RDFXMLifier rdfXMLifier)
+	public RDFResourceTreeNodeRepresentationStrategy(final RDFXMLifier rdfXMLifier)
 	{
-		super(session, rdfXMLifier);	//construct the parent
+		super(rdfXMLifier);	//construct the parent
 	}
 
 	/**Builds the label to be used for a tree node.

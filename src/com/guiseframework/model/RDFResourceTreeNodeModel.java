@@ -9,8 +9,6 @@ import com.garretwilson.rdf.*;
 
 import static com.garretwilson.rdf.RDFConstants.*;
 
-import com.guiseframework.GuiseSession;
-
 /**A tree node model that represents an RDF resource.
 <p>Any properties will be dynamically loaded</p>
 <p>This class has special support for RDF lists, the contents of which are by default displayed as children of the given resource.</p>
@@ -72,34 +70,27 @@ public class RDFResourceTreeNodeModel extends DynamicTreeNodeModel<RDFResource> 
 			}
 		}
 		
-	/**Session constructor with no initial value.
-	@param session The Guise session that owns this model.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public RDFResourceTreeNodeModel(final GuiseSession session)
+	/**Default constructor with no initial value.*/
+	public RDFResourceTreeNodeModel()
 	{
-		this(session, null);	//construct the class with no initial value
+		this(null);	//construct the class with no initial value
 	}
 
-	/**Session and initial value constructor.
-	@param session The Guise session that owns this model.
+	/**Initial value constructor.
 	@param initialValue The initial value, which will not be validated.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public RDFResourceTreeNodeModel(final GuiseSession session, final RDFResource initialValue)
+	public RDFResourceTreeNodeModel(final RDFResource initialValue)
 	{
-		this(session, null, initialValue);	//construct the class with a null initial value
+		this(null, initialValue);	//construct the class with a null initial value
 	}
 
-	/**Session, property, and initial value constructor.
-	@param session The Guise session that owns this model.
+	/**Property and initial value constructor.
 	@param rdfProperty The property of which this object is a resource, or <code>null</code> if this object should not be considered the object of any property.
 	@param initialValue The initial value, which will not be validated.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public RDFResourceTreeNodeModel(final GuiseSession session, final RDFResource rdfProperty, final RDFResource initialValue)
+	public RDFResourceTreeNodeModel(final RDFResource rdfProperty, final RDFResource initialValue)
 	{
-		super(session, RDFResource.class, initialValue);	//construct the parent class
+		super(RDFResource.class, initialValue);	//construct the parent class
 		property=rdfProperty; //save the property of which this resource is the object
 	}
 
@@ -197,7 +188,7 @@ public class RDFResourceTreeNodeModel extends DynamicTreeNodeModel<RDFResource> 
 	*/ 
 	protected RDFLiteralTreeNodeModel createRDFLiteralTreeNode(final RDFResource rdfProperty, final RDFLiteral rdfLiteral)
 	{
-		return new RDFLiteralTreeNodeModel(getSession(), rdfProperty, rdfLiteral);	//create a new tree node to represent the property and value
+		return new RDFLiteralTreeNodeModel(rdfProperty, rdfLiteral);	//create a new tree node to represent the property and value
 	}
 
 	/**Creates a child node to represent a property object resource and optional property.
@@ -207,7 +198,7 @@ public class RDFResourceTreeNodeModel extends DynamicTreeNodeModel<RDFResource> 
 	*/ 
 	protected RDFResourceTreeNodeModel createRDFResourceTreeNode(final RDFResource rdfProperty, final RDFResource rdfResource)
 	{			
-		return new RDFResourceTreeNodeModel(getSession(), rdfProperty, rdfResource);	//create a new tree node to represent the property and value
+		return new RDFResourceTreeNodeModel(rdfProperty, rdfResource);	//create a new tree node to represent the property and value
 	}
 
 }

@@ -1,7 +1,6 @@
 package com.guiseframework.component;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.GuiseSession;
 
 /**Abstract implementation of a modal frame.
 @param <R> The type of modal result this modal frame produces.
@@ -31,16 +30,12 @@ public abstract class AbstractModalFrame<R, C extends ModalFrame<R, C>> extends 
 			}
 		}
 
-	/**Session, ID, and component constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Component constructor.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractModalFrame(final GuiseSession session, final String id, final Component<?> component)
+	public AbstractModalFrame(final Component<?> component)
 	{
-		super(session, id, component);	//construct the parent class
+		super(component);	//construct the parent class
 	}
 
 	/**Ends this frame's modal interaction and navigates either to the previous modal navigation or to this frame's referring URI, if any.

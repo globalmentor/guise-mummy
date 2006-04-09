@@ -2,7 +2,6 @@ package com.guiseframework.coupler;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
@@ -78,24 +77,19 @@ public class ActionCardCoupler extends AbstractCardCoupler
 			}			
 		}
 
-	/**Session constructor.
-	@param session The Guise session that owns these constraints.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public ActionCardCoupler(final GuiseSession session)
+	/**Default constructor.*/
+	public ActionCardCoupler()
 	{
-		this(session, null);	//construct the class with no action or card
+		this(null);	//construct the class with no action or card
 	}
 	
-	/**Session, action, and cards constructor.
-	@param session The Guise session that owns these constraints.
+	/**Action and cards constructor.
 	@param actionControl The new action to connect to the card, or <code>null</code> if the action should not be coupled with a card.
 	@param cards The new cards to connect, if any.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public ActionCardCoupler(final GuiseSession session, final ActionControl<?> actionControl, final Component<?>... cards)
+	public ActionCardCoupler(final ActionControl<?> actionControl, final Component<?>... cards)
 	{
-		super(session, cards);	//construct the parent class
+		super(cards);	//construct the parent class
 		setAction(actionControl);	//set the action control
 	}
 	

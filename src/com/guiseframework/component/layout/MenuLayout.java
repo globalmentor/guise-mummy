@@ -1,7 +1,5 @@
 package com.guiseframework.component.layout;
 
-import com.guiseframework.GuiseSession;
-
 /**A layout for a menu that flows along an axis.
 @author Garret Wilson
 */
@@ -11,14 +9,13 @@ public class MenuLayout extends AbstractFlowLayout<MenuConstraints>	//TODO proba
 	/**@return The class representing the type of constraints appropriate for this layout.*/
 	public Class<? extends MenuConstraints> getConstraintsClass() {return MenuConstraints.class;}
 
-	/**Session and flow constructor.
-	@param session The Guise session that owns this layout.
+	/**Flow constructor.
 	@param flow The logical axis (line or page) along which information is flowed.
-	@exception NullPointerException if the axis is <code>null</code>.
+	@exception NullPointerException if the flow axis is <code>null</code>.
 	*/
-	public MenuLayout(final GuiseSession session, final Flow flow)
+	public MenuLayout(final Flow flow)
 	{
-		super(session, flow);	//construct the parent class
+		super(flow);	//construct the parent class
 	}
 
 	/**Creates default constraints for the container.
@@ -27,7 +24,7 @@ public class MenuLayout extends AbstractFlowLayout<MenuConstraints>	//TODO proba
 	*/
 	public MenuConstraints createDefaultConstraints()
 	{
-		return new MenuConstraints(getSession());	//return a default constraints object
+		return new MenuConstraints();	//return a default constraints object
 	}
 
 }

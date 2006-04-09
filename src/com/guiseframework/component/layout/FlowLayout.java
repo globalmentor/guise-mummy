@@ -1,7 +1,5 @@
 package com.guiseframework.component.layout;
 
-import com.guiseframework.GuiseSession;
-
 /**A layout that flows information along an axis.
 @author Garret Wilson
 */
@@ -11,23 +9,19 @@ public class FlowLayout extends AbstractFlowLayout<FlowConstraints>
 	/**@return The class representing the type of constraints appropriate for this layout.*/
 	public Class<? extends FlowConstraints> getConstraintsClass() {return FlowConstraints.class;}
 
-	/**Session constructor with {@link Flow#PAGE} layout.
-	@param session The Guise session that owns this layout.
-	@exception NullPointerException if the axis is <code>null</code>.
-	*/
-	public FlowLayout(final GuiseSession session)
+	/**Default constructor with {@link Flow#PAGE} layout.*/
+	public FlowLayout()
 	{
-		this(session, Flow.PAGE);	//construct the class with page flow layout
+		this(Flow.PAGE);	//construct the class with page flow layout
 	}
 
-	/**Session and flow constructor.
-	@param session The Guise session that owns this layout.
+	/**Flow constructor.
 	@param flow The logical axis (line or page) along which information is flowed.
-	@exception NullPointerException if the axis is <code>null</code>.
+	@exception NullPointerException if the flow axis is <code>null</code>.
 	*/
-	public FlowLayout(final GuiseSession session, final Flow flow)
+	public FlowLayout(final Flow flow)
 	{
-		super(session, flow);	//construct the parent class
+		super(flow);	//construct the parent class
 	}
 
 	/**Creates default constraints for the container.
@@ -36,6 +30,6 @@ public class FlowLayout extends AbstractFlowLayout<FlowConstraints>
 	*/
 	public FlowConstraints createDefaultConstraints()
 	{
-		return new FlowConstraints(getSession());	//return a default constraints object
+		return new FlowConstraints();	//return a default constraints object
 	}
 }

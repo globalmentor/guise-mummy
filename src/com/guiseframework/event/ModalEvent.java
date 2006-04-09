@@ -1,6 +1,5 @@
 package com.guiseframework.event;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.ModalNavigationPanel;
 
 /**An event indicating that a component changed modes.
@@ -15,14 +14,13 @@ public class ModalEvent extends AbstractGuiseEvent
 		return (ModalNavigationPanel<?, ?>)super.getSource();	//cast the event to the appropriate type
 	}
 
-	/**Session and source constructor.
-	@param session The Guise session in which this event was generated.
+	/**Source constructor.
 	@param source The object on which the event initially occurred.
-	@exception NullPointerException if the given session and/or source is <code>null</code>.
+	@exception NullPointerException if the given source is <code>null</code>.
 	*/
-	public ModalEvent(final GuiseSession session, final ModalNavigationPanel<?, ?> source)
+	public ModalEvent(final ModalNavigationPanel<?, ?> source)
 	{
-		super(session, source);	//construct the parent class
+		super(source);	//construct the parent class
 	}
 
 }

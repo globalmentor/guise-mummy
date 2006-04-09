@@ -37,24 +37,12 @@ import com.guiseframework.validator.ValidationException;
 public class MarmotPanel extends DefaultNavigationPanel
 {
 
-	/**Guise session constructor.
-	@param session The Guise session that owns this panel.
-	*/
-	public MarmotPanel(final GuiseSession session)
-	{
-		this(session, null);	//construct the component, indicating that a default ID should be used
-	}
-
-	/**ID constructor.
-	@param session The Guise session that owns this panel.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	*/
+	/**Default constructor.*/
 	public MarmotPanel(final GuiseSession session, final String id)
 	{
-		super(session, id);	//construct the parent
 		setLabel("Marmot Test");	//set the panel label
 
-		final TextControl<String> textInput=new TextControl<String>(session, String.class);	//create a text input control
+		final TextControl<String> textInput=new TextControl<String>(String.class);	//create a text input control
 		textInput.setLabel("WebDAV Repository");
 		textInput.setColumnCount(40);
 		try
@@ -71,7 +59,7 @@ public class MarmotPanel extends DefaultNavigationPanel
 		marmotSession.registerResourceKit(new ImageResourceKit());
 		marmotSession.registerResourceKit(new FolderResourceKit());
 		
-		final Button addButton=new Button(session);
+		final Button addButton=new Button();
 		addButton.setLabel("Add");
 		addButton.addActionListener(new ActionListener()
 				{
@@ -116,15 +104,15 @@ catch(final ValidationException validationException)
 }
 							frame.setContent(textArea);
 */
-							final TreeControl treeControl=new TreeControl(session);
-							treeControl.setTreeNodeRepresentationStrategy(RDFResource.class, new RepositoryResourceTreeNodeRepresentationStrategy(session, marmotSession));
-							treeControl.setTreeNodeRepresentationStrategy(RDFLiteral.class, new RDFLiteralTreeNodeRepresentationStrategy(session));
+							final TreeControl treeControl=new TreeControl();
+							treeControl.setTreeNodeRepresentationStrategy(RDFResource.class, new RepositoryResourceTreeNodeRepresentationStrategy(marmotSession));
+							treeControl.setTreeNodeRepresentationStrategy(RDFLiteral.class, new RDFLiteralTreeNodeRepresentationStrategy());
 							try
 							{
 									final List<RDFResource> rootResources=repository.getChildResourceDescriptions(repositoryURI);
 									for(final RDFResource resource:rootResources)
 									{
-										treeControl.getRootNode().add(new RepositoryResourceTreeNodeModel(session, repository, resource));
+										treeControl.getRootNode().add(new RepositoryResourceTreeNodeModel(repository, resource));
 									}
 							}
 							catch(final IOException ioException)

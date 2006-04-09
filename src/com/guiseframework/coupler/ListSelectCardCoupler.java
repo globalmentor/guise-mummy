@@ -5,7 +5,6 @@ import static com.garretwilson.lang.ClassUtilities.*;
 import java.beans.PropertyChangeListener;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
@@ -114,25 +113,20 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler
 			}			
 		}
 		
-	/**Session constructor.
-	@param session The Guise session that owns these constraints.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public ListSelectCardCoupler(final GuiseSession session)
+	/**Default constructor.*/
+	public ListSelectCardCoupler()
 	{
-		this(session, null, null);	//construct the class with no list select control, value, or cards
+		this(null, null);	//construct the class with no list select control, value, or cards
 	}
 	
-	/**Session, list select, value, and cards constructor.
-	@param session The Guise session that owns these constraints.
+	/**List select, value, and cards constructor.
 	@param listSelect The list select control to connect to the cards, or <code>null</code> if there is no control coupled with the cards.
 	@param value The value in the list to indicate the cards should be selected, or <code>null</code> if there is no value to indicate selection.
 	@param cards The new cards to connect, if any.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public ListSelectCardCoupler(final GuiseSession session, final ListSelectControl<V, ?> listSelect, final V value, final Component<?>... cards)
+	public ListSelectCardCoupler(final ListSelectControl<V, ?> listSelect, final V value, final Component<?>... cards)
 	{
-		super(session, cards);	//construct the parent class
+		super(cards);	//construct the parent class
 		setListSelect(listSelect);	//set the list select control
 		setValue(value);	//set the value
 	}

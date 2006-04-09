@@ -4,8 +4,6 @@ import java.util.Locale;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import com.guiseframework.GuiseSession;
-
 /**A label model that provides a localized version of a locale name.
 @author Garret Wilson
 */
@@ -19,12 +17,10 @@ public class LocaleLabelModel extends DefaultLabelModel
 		public Locale getLocale() {return locale;}
 
 	/**Constructs a label model indicating the locale to represent.
-	@param session The Guise session that owns this model.
-	@exception NullPointerException if the given session and/or locale is <code>null</code>.
+	@exception NullPointerException if the given locale is <code>null</code>.
 	*/
-	public LocaleLabelModel(final GuiseSession session, final Locale locale)
+	public LocaleLabelModel(final Locale locale)
 	{
-		super(session);	//construct the parent class
 		this.locale=checkInstance(locale, "Locale cannot be null");	//save the locale
 	}
 

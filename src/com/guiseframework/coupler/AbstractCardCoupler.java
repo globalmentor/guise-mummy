@@ -10,7 +10,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static java.util.Collections.*;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
@@ -217,14 +216,11 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 		}
 	}
 
-	/**Session and card constructor.
-	@param session The Guise session that owns these constraints.
+	/**Card constructor.
 	@param cards The new cards to connect, if any.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public AbstractCardCoupler(final GuiseSession session, final Component<?>... cards)
+	public AbstractCardCoupler(final Component<?>... cards)
 	{
-		super(session);	//construct the parent class
 		setCards(asList(cards));	//set the cards
 	}
 

@@ -6,7 +6,6 @@ import java.net.URI;
 
 import javax.mail.internet.ContentType;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.model.*;
 
 /**Constraints on an individual component in a card layout.
@@ -21,65 +20,54 @@ public class CardConstraints extends ControlConstraints implements LabelModel, D
 		/**@return The label model used by this component.*/
 		protected LabelModel getLabelModel() {return labelModel;}
 
-	/**Session constructor.
-	@param session The Guise session that owns this model.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public CardConstraints(final GuiseSession session)
+	/**Default constructor.*/
+	public CardConstraints()
 	{
-		this(session, true);	//construct the class with no label
+		this(true);	//construct the class, defaulting to enabled
 	}
 
-	/**Session and enabled constructor.
-	@param session The Guise session that owns this model.
+	/**Enabled constructor.
 	@param enabled Whether the card is enabled.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public CardConstraints(final GuiseSession session, final boolean enabled)
+	public CardConstraints(final boolean enabled)
 	{
-		this(session, (String)null, enabled);	//construct the class with no label
+		this((String)null, enabled);	//construct the class with no label
 	}
 
-	/**Session and label constructor.
-	@param session The Guise session that owns this model.
+	/**Label constructor.
 	@param label The text of the label.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public CardConstraints(final GuiseSession session, final String label)
+	public CardConstraints(final String label)
 	{
-		this(session, label, true);	//construct the class, defaulting to enabled
+		this(label, true);	//construct the class, defaulting to enabled
 	}
 
-	/**Session, label, and enabled constructor.
-	@param session The Guise session that owns this model.
+	/**Label and enabled constructor.
 	@param label The text of the label.
 	@param enabled Whether the card is enabled.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public CardConstraints(final GuiseSession session, final String label, final boolean enabled)
+	public CardConstraints(final String label, final boolean enabled)
 	{
-		this(session, new DefaultLabelModel(session, label), enabled);	//construct the class with a default label model
+		this(new DefaultLabelModel(label), enabled);	//construct the class with a default label model
 	}
 
-	/**Session and label model.
-	@param session The Guise session that owns this model.
+	/**Label model constructor.
 	@param labelModel The label model representing the card label.
-	@exception NullPointerException if the given session and/or label model is <code>null</code>.
+	@exception NullPointerException if the given label model is <code>null</code>.
 	*/
-	public CardConstraints(final GuiseSession session, final LabelModel labelModel)
+	public CardConstraints(final LabelModel labelModel)
 	{
-		this(session, labelModel, true);	//construct the class, defaulting to enabled
+		this(labelModel, true);	//construct the class, defaulting to enabled
 	}
 
-	/**Session, label model, and enabled constructor.
-	@param session The Guise session that owns this model.
+	/**Label model, and enabled constructor.
 	@param labelModel The label model representing the card label.
 	@param enabled Whether the card is enabled.
-	@exception NullPointerException if the given session and/or label model is <code>null</code>.
+	@exception NullPointerException if the given label model is <code>null</code>.
 	*/
-	public CardConstraints(final GuiseSession session, final LabelModel labelModel, final boolean enabled)
+	public CardConstraints(final LabelModel labelModel, final boolean enabled)
 	{
-		super(session, enabled);	//construct the parent class 
+		super(enabled);	//construct the parent class 
 		this.labelModel=checkInstance(labelModel, "Label model cannot be null.");	//save the label model
 		this.labelModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the label model
 	}

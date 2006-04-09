@@ -1,6 +1,5 @@
 package com.guiseframework.component;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.CardLayout;
 import com.guiseframework.component.layout.Flow;
 import com.guiseframework.model.*;
@@ -14,107 +13,48 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 public class CardTabControl extends TabControl<Component<?>>
 {
 
-	/**Session and model constructor.
-	@param session The Guise session that owns this component.
+	/**Card control and axis constructor.
 	@param cardControl The card control to be controlled.
 	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given session, model, and/or axis is <code>null</code>.
+	@exception NullPointerException if the given card control and/or axis is <code>null</code>.
 	*/
-	public CardTabControl(final GuiseSession session, final CardControl<?> cardControl, final Flow axis)
+	public CardTabControl(final CardControl<?> cardControl, final Flow axis)
 	{
-		this(session, null, cardControl, axis);	//construct the class, indicating that a default ID should be generated
+		this(cardControl, axis, -1);	//construct the class with no maximum tab count
 	}
 
-	/**Session, model, and maximum tab count constructor.
-	@param session The Guise session that owns this component.
-	@param cardControl The card control to be controlled.
-	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given session, model, and/or axis is <code>null</code>.
-	*/
-	public CardTabControl(final GuiseSession session, final CardControl<?> cardControl, final Flow axis, final int maxTabCount)
-	{
-		this(session, null, cardControl, axis, maxTabCount);	//construct the class, indicating that a default ID should be generated
-	}
-
-	/**Session, model, and value representation strategy constructor.
-	@param session The Guise session that owns this component.
-	@param cardControl The card control to be controlled.
-	@param valueRepresentationStrategy The strategy to create label models to represent this model's values.
-	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given session, model, value representation strategy, and/or axis is <code>null</code>.
-	*/
-	public CardTabControl(final GuiseSession session, final CardControl<?> cardControl, final ValueRepresentationStrategy<Component<?>> valueRepresentationStrategy, final Flow axis)
-	{
-		this(session, null, cardControl, valueRepresentationStrategy, axis);	//construct the class, indicating that a default ID should be generated
-	}
-
-	/**Session, model, value representation strategy, and maximum count constructor.
-	@param session The Guise session that owns this component.
-	@param cardControl The card control to be controlled.
-	@param valueRepresentationStrategy The strategy to create label models to represent this model's values.
-	@param axis The axis along which the tabs are oriented.
-	@param maxTabCount The requested number of visible rows, or -1 if no row count is specified.
-	@exception NullPointerException if the given session, model, value representation strategy, and/or axis is <code>null</code>.
-	*/
-	public CardTabControl(final GuiseSession session, final CardControl<?> cardControl, final ValueRepresentationStrategy<Component<?>> valueRepresentationStrategy, final Flow axis, final int maxTabCount)
-	{
-		this(session, null, cardControl, valueRepresentationStrategy, axis, maxTabCount);	//construct the class, indicating that a default ID should be generated
-	}
-		
-	/**Session, ID, and model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param cardControl The card control to be controlled.
-	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given session, model and/or axis is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public CardTabControl(final GuiseSession session, final String id, final CardControl<?> cardControl, final Flow axis)
-	{
-		this(session, id, cardControl, axis, -1);	//construct the class with no maximum tab count
-	}
-
-	/**Session, ID, model, and maximumn tab count constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Card control, axis, and maximum tab count constructor.
 	@param cardControl The card control to be controlled.
 	@param axis The axis along which the tabs are oriented.
 	@param maxTabCount The requested number of visible tabs, or -1 if no maximum tab count is specified.
-	@exception NullPointerException if the given session, model, and/or axis is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given card control and/or axis is <code>null</code>.
 	*/
-	public CardTabControl(final GuiseSession session, final String id, final CardControl<?> cardControl, final Flow axis, final int maxTabCount)
+	public CardTabControl(final CardControl<?> cardControl, final Flow axis, final int maxTabCount)
 	{
-		this(session, id, cardControl, new CardRepresentationStrategy(cardControl.getLayout()), axis, maxTabCount);	//construct the class with a default representation strategy
+		this(cardControl, new CardRepresentationStrategy(cardControl.getLayout()), axis, maxTabCount);	//construct the class with a default representation strategy
 	}
 
-	/**Session, ID, model, and value representation strategy constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Card control, value representation strategy, and axis  constructor.
 	@param cardControl The card control to be controlled.
 	@param valueRepresentationStrategy The strategy to create label models to represent this model's values.
 	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given session, model, value representation strategy, and/or axis is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given card control, value representation strategy, and/or axis is <code>null</code>.
 	*/
-	public CardTabControl(final GuiseSession session, final String id, final CardControl<?> cardControl, final ValueRepresentationStrategy<Component<?>> valueRepresentationStrategy, final Flow axis)
+	public CardTabControl(final CardControl<?> cardControl, final ValueRepresentationStrategy<Component<?>> valueRepresentationStrategy, final Flow axis)
 	{
-		this(session, id, cardControl, valueRepresentationStrategy, axis, -1);	//construct the class with no maximum tab count
+		this(cardControl, valueRepresentationStrategy, axis, -1);	//construct the class with no maximum tab count
 	}
 
-	/**Session, ID, model, value representation strategy, and maximum tab count constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Card control, value representation strategy, axis, and maximum tab count constructor.
 	@param cardControl The card control to be controlled.
 	@param valueRepresentationStrategy The strategy to create label models to represent this model's values.
 	@param axis The axis along which the tabs are oriented.
 	@param maxTabCount The requested number of visible tabs, or -1 if no maximum tab count is specified.
-	@exception NullPointerException if the given session, model, value representation strategy, and/or axis is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given card control, value representation strategy, and/or axis is <code>null</code>.
 	*/
-	public CardTabControl(final GuiseSession session, final String id, final CardControl<?> cardControl, final ValueRepresentationStrategy<Component<?>> valueRepresentationStrategy, final Flow axis, final int maxTabCount)
+	public CardTabControl(final CardControl<?> cardControl, final ValueRepresentationStrategy<Component<?>> valueRepresentationStrategy, final Flow axis, final int maxTabCount)
 	{
-		super(session, id, cardControl, valueRepresentationStrategy, axis, maxTabCount);	//construct the parent class using the card container's model
+		super(cardControl, valueRepresentationStrategy, axis, maxTabCount);	//construct the parent class using the card container's model
 	}
 
 	/**A value representation strategy for representing cards.
@@ -153,8 +93,8 @@ public class CardTabControl extends TabControl<Component<?>>
 		public Label createComponent(final ListSelectModel<Component<?>> model, final Component<?> value, final int index, final boolean selected, final boolean focused)
 		{
 			return value!=null	//if there is a value
-			? new Label(getCardLayout().getSession(), getCardLayout().getConstraints(value))	//generate a label using the the card layout constraints as the label model
-			: new Label(getCardLayout().getSession());	//otherwise return an empty label
+			? new Label(getCardLayout().getConstraints(value))	//generate a label using the the card layout constraints as the label model
+			: new Label();	//otherwise return an empty label
 		}
 	}
 

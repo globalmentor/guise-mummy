@@ -3,7 +3,6 @@ package com.guiseframework.component;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.garretwilson.rdf.*;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.model.*;
 
 /**An abstract tree node representation strategy representing an RDF object.
@@ -19,14 +18,12 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 	  /**@return The RDF XMLifier to use for creating labels.*/
 		public RDFXMLifier getXMLifier() {return xmlifier;}
 
-	/**Session and RDF XMLifier constructor.
-	@param session The Guise session that owns this representation strategy.
+	/**RDF XMLifier constructor.
 	@param rdfXMLifier The RDF XMLifier to use for creating labels.
-	@exception NullPointerException if the given session and/or RDF XMLifier is <code>null</code>.
+	@exception NullPointerException if the given RDF XMLifier is <code>null</code>.
 	*/
-	public AbstractRDFObjectTreeNodeRepresentationStrategy(final GuiseSession session, final RDFXMLifier rdfXMLifier)
+	public AbstractRDFObjectTreeNodeRepresentationStrategy(final RDFXMLifier rdfXMLifier)
 	{
-		super(session);	//construct the parent
 		xmlifier=checkInstance(rdfXMLifier, "RDF XMLifier cannot be null."); //save the XMLifier we'll use for generating labels
 	}
 
@@ -47,8 +44,7 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 		final N value=treeNode.getValue();	//get the current value
 		if(value!=null)	//if there is value
 		{
-			final GuiseSession session=getSession();	//get the session
-			final Label label=new Label(getSession(), createLabelModel(treeControl, model, treeNode));	//create a new label using the created label model TODO always create a label model, not just if there is a value
+			final Label label=new Label(createLabelModel(treeControl, model, treeNode));	//create a new label using the created label model TODO always create a label model, not just if there is a value
 			final String labelText=buildLabelText(new StringBuilder(), treeControl, model, treeNode, value).toString();	//construct the label text
 			label.setLabel(labelText);	//set the label's text
 			return label;	//return the label
@@ -68,7 +64,7 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 	*/
 	protected <N extends V> LabelModel createLabelModel(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode)
 	{
-		return new DefaultLabelModel(getSession());	//return a default label model
+		return new DefaultLabelModel();	//return a default label model
 	}
 
 	/**Builds the label to be used for a tree node.

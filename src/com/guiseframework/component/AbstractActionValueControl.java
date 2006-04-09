@@ -6,7 +6,6 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.model.*;
 import com.guiseframework.validator.*;
 
@@ -87,16 +86,13 @@ public abstract class AbstractActionValueControl<V, C extends ActionValueControl
 			firePropertyChange(VALUE_ICON_RESOURCE_KEY_PROPERTY, oldValueIconResourceKey, newValueIconResourceKey);	//indicate that the value changed (which will only fire the event if the value actually changed)
 		}
 		
-	/**Session, ID, and model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Value model constructor.
 	@param valueModel The component value model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given value model is <code>null</code>.
 	*/
-	public AbstractActionValueControl(final GuiseSession session, final String id, final ValueModel<V> valueModel)
+	public AbstractActionValueControl(final ValueModel<V> valueModel)
 	{
-		super(session, id, new DefaultActionModel(session));	//construct the parent class with a default action model TODO add an action model parameter
+		super(new DefaultActionModel());	//construct the parent class with a default action model TODO add an action model parameter
 		this.valueModel=checkInstance(valueModel, "Value model cannot be null.");	//save the table model
 		this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen an repeat all property changes of the value model
 	}

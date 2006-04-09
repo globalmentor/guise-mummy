@@ -2,7 +2,6 @@ package com.guiseframework.component;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.Layout;
 import com.guiseframework.model.Notification;
 import com.guiseframework.model.ValueModel;
@@ -23,17 +22,14 @@ public abstract class AbstractContainerValueControl<V, C extends ContainerContro
 		/**@return The value model used by this component.*/
 		protected ValueModel<V> getValueModel() {return valueModel;}
 
-	/**Session, ID, layout, and value model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Layout and value model constructor.
 	@param layout The layout definition for the container.
-	@param valueModel The component data model.
-	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@param valueModel The component value model.
+	@exception NullPointerException if the given layout and/or value model is <code>null</code>.
 	*/
-	public AbstractContainerValueControl(final GuiseSession session, final String id, final Layout layout, final ValueModel<V> valueModel)
+	public AbstractContainerValueControl(final Layout layout, final ValueModel<V> valueModel)
 	{
-		super(session, id, layout);	//construct the parent class
+		super(layout);	//construct the parent class
 		this.valueModel=checkInstance(valueModel, "Value model cannot be null.");	//save the table model
 		this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen an repeat all property changes of the value model
 	}

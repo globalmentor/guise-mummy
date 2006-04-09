@@ -2,23 +2,12 @@ package com.guiseframework.converter;
 
 import static java.text.MessageFormat.*;
 
-import com.guiseframework.GuiseSession;
-
 /**A converter that converts an <code>Integer</code> from and to a string literal.
 @author Garret Wilson
 @see Integer
 */
 public class IntegerStringLiteralConverter extends AbstractStringLiteralConverter<Integer>
 {
-
-	/**Session constructor with no value required.
-	@param session The Guise session that owns this converter.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public IntegerStringLiteralConverter(final GuiseSession session)
-	{
-		super(session);	//construct the parent class
-	}
 
 	/**Converts a literal representation of a value from the lexical space into a value in the value space.
 	@param literal The literal value in the lexical space to convert.

@@ -3,7 +3,6 @@ package com.guiseframework.component;
 import java.net.URI;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.model.*;
 
 /**Selectable action value control for which the selected state is distinct from the contained value.
@@ -160,16 +159,13 @@ public abstract class AbstractSelectActionValueControl<V, C extends SelectAction
 			}
 		}
 
-	/**Session, ID, and model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	/**Value model constructor.
+	@param valueModel The component value model.
+	@exception NullPointerException if the given value model is <code>null</code>.
 	*/
-	public AbstractSelectActionValueControl(final GuiseSession session, final String id, final ValueModel<V> model)
+	public AbstractSelectActionValueControl(final ValueModel<V> valueModel)
 	{
-		super(session, id, model);	//construct the parent class
+		super(valueModel);	//construct the parent class
 		addActionListener(new AbstractSelectActionControl.SelectActionListener(this));	//listen for an action and set the selected state accordingly
 	}
 

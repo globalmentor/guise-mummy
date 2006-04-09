@@ -3,7 +3,6 @@ package com.guiseframework.model;
 import javax.mail.internet.ContentType;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.GuiseSession;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.text.TextUtilities.*;
@@ -83,14 +82,5 @@ public class DefaultTextModel extends AbstractModel implements TextModel
 				firePropertyChange(TEXT_RESOURCE_KEY_PROPERTY, oldTextResourceKey, newTextResourceKey);	//indicate that the value changed
 			}
 		}
-
-	/**Session constructor.
-	@param session The Guise session that owns this model.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public DefaultTextModel(final GuiseSession session)
-	{
-		super(session);	//construct the parent class
-	}
 
 }

@@ -1,18 +1,13 @@
 package com.guiseframework.component;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-
-import com.garretwilson.util.*;
-import com.guiseframework.GuiseSession;
 
 /**An abstract implementation of a composite component that can contain a single component.
 @author Garret Wilson
 */
 public abstract class AbstractSingleCompositeComponent<C extends CompositeComponent<C>> extends AbstractCompositeComponent<C>	//TODO del class if we don't need
 {
-
 
 	/**The child component, or <code>null</code> if this component does not contain a child component.*/
 	private Component<?> component=null;
@@ -67,19 +62,6 @@ public abstract class AbstractSingleCompositeComponent<C extends CompositeCompon
 	public Component<?> getComponent(final String id)
 	{
 		return component!=null && component.getID().equals(id) ? component : null;	//return the component if it has the given ID
-	}
-
-	/**Session and ID constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	@exception IllegalStateException if no controller is registered for this component type.
-	@exception IllegalStateException if no view is registered for this component type.
-	*/
-	public AbstractSingleCompositeComponent(final GuiseSession session, final String id)
-	{
-		super(session, id);	//construct the parent class
 	}
 
 }

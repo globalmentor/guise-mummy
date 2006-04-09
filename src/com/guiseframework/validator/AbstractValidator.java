@@ -5,7 +5,6 @@ import static com.guiseframework.GuiseResourceConstants.*;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseResourceConstants;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.event.GuiseBoundPropertyObject;
 
 /**An abstract implementation of an object that can determine whether a value is valid.
@@ -122,23 +121,17 @@ public abstract class AbstractValidator<V> extends GuiseBoundPropertyObject impl
 			}
 		}
 
-	/**Session constructor with no value required.
-	@param session The Guise session that owns this validator.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public AbstractValidator(final GuiseSession session)
+	/**Default constructor with no value required.*/
+	public AbstractValidator()
 	{
-		this(session, false);	//construct the class and don't required non-null values
+		this(false);	//construct the class and don't required non-null values
 	}
 
-	/**Session and value required constructor.
-	@param session The Guise session that owns this validator.
+	/**Value required constructor.
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public AbstractValidator(final GuiseSession session, final boolean valueRequired)
+	public AbstractValidator(final boolean valueRequired)
 	{
-		super(session);	//construct the parent class
 		this.valueRequired=valueRequired;	//save the value required specification
 	}
 

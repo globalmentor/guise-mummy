@@ -5,8 +5,6 @@ import java.util.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.util.LocaleUtilities.*;
 
-import com.guiseframework.GuiseSession;
-
 /**An object that can convert a locale to a string using the current locale.
 This implementation does not support conversion of a literal value to a locale.
 @author Garret Wilson
@@ -19,14 +17,12 @@ public class LocaleStringLiteralConverter extends AbstractConverter<Locale, Stri
 		/**@return The locale representation style.*/
 		public LocaleStringLiteralStyle getStyle() {return style;}
 
-	/**Session and locale style constructor.
-	@param session The Guise session that owns this converter.
+	/**Locale style constructor.
 	@param style The locale representation style.
-	@exception NullPointerException if the given session and/or locale style is <code>null</code>.
+	@exception NullPointerException if the given locale style is <code>null</code>.
 	*/
-	public LocaleStringLiteralConverter(final GuiseSession session, final LocaleStringLiteralStyle style)
+	public LocaleStringLiteralConverter(final LocaleStringLiteralStyle style)
 	{
-		super(session);	//construct the parent class
 		this.style=checkInstance(style, "Locale style cannot be null.");
 	}
 

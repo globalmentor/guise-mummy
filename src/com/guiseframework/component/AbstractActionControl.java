@@ -4,7 +4,6 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 
 import java.util.Iterator;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.event.*;
 import com.guiseframework.model.ActionModel;
 
@@ -20,16 +19,12 @@ public abstract class AbstractActionControl<C extends ActionControl<C>> extends 
 		/**@return The action model used by this component.*/
 		protected ActionModel getActionModel() {return actionModel;}
 
-	/**Session, ID, and model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Action model constructor.
 	@param actionModel The component action model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given action model is <code>null</code>.
 	*/
-	public AbstractActionControl(final GuiseSession session, final String id, final ActionModel actionModel)
+	public AbstractActionControl(final ActionModel actionModel)
 	{
-		super(session, id);	//construct the parent class
 		this.actionModel=checkInstance(actionModel, "Action model cannot be null.");	//save the action model
 		this.actionModel.addActionListener(new ActionListener()	//create an action repeater to forward events to this component's listeners
 				{
@@ -71,7 +66,7 @@ public abstract class AbstractActionControl<C extends ActionControl<C>> extends 
 	{
 		if(getEventListenerManager().hasListeners(ActionListener.class))	//if there are action listeners registered
 		{
-			final ActionEvent actionEvent=new ActionEvent(getSession(), this);	//create a new action event
+			final ActionEvent actionEvent=new ActionEvent(this);	//create a new action event
 			getSession().queueEvent(new PostponedActionEvent(getEventListenerManager(), actionEvent));	//tell the Guise session to queue the event
 		}
 	}

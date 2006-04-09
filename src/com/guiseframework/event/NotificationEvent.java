@@ -2,7 +2,6 @@ package com.guiseframework.event;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.model.Notification;
 
 /**An event indicating there should be a notification message of some event or state.
@@ -17,15 +16,14 @@ public class NotificationEvent extends AbstractGuiseEvent
 		/**@return The notification information.*/
 		private final Notification getNotification() {return notification;}
 
-	/**Session, source, and notification  constructor.
-	@param session The Guise session in which this event was generated.
+	/**Source and notification  constructor.
 	@param source The object on which the event initially occurred.
 	@param notification The notification information.
-	@exception NullPointerException if the given session, source, and/or notification is <code>null</code>.
+	@exception NullPointerException if the given source and/or notification is <code>null</code>.
 	*/
-	public NotificationEvent(final GuiseSession session, final Object source, final Notification notification)
+	public NotificationEvent(final Object source, final Notification notification)
 	{
-		super(session, source);	//construct the parent class
+		super(source);	//construct the parent class
 		this.notification=checkInstance(notification, "Notification must be provided.");
 	}
 

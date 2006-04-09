@@ -1,7 +1,5 @@
 package com.guiseframework.validator;
 
-import com.guiseframework.GuiseSession;
-
 /**An abstract implementation of a range validator that handles comparable values.
 The step value is considered relative either to the minimum value, if available, the maximum value, if available, or zero, in that order or priority.
 @param <V> The value type this validator supports.
@@ -11,17 +9,15 @@ The step value is considered relative either to the minimum value, if available,
 public abstract class AbstractComparableRangeValidator<V extends Comparable<V>> extends AbstractRangeValidator<V>
 {
 	
-	/**Session, minimum, maximum, step, and value required constructor.
-	@param session The Guise session that owns this validator.
+	/**Minimum, maximum, step, and value required constructor.
 	@param minimum The minimum value, inclusive, or <code>null</code> if the range has no lower bound.
 	@param maximum The maximum value, inclusive, or <code>null</code> if the range has no upper bound.
 	@param step The step amount, or <code>null</code> if the range has no increment value specified.
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public AbstractComparableRangeValidator(final GuiseSession session, final V minimum, final V maximum, final V step, final boolean valueRequired)
+	public AbstractComparableRangeValidator(final V minimum, final V maximum, final V step, final boolean valueRequired)
 	{
-		super(session, minimum, maximum, step, valueRequired);	//construct the parent class
+		super(minimum, maximum, step, valueRequired);	//construct the parent class
 	}
 
 	/**Determines whether a given value is within the specified range.

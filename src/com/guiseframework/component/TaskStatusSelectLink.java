@@ -2,7 +2,6 @@ package com.guiseframework.component;
 
 import java.text.MessageFormat;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.model.*;
 
 /**Selectable link that stores a task status.
@@ -25,46 +24,19 @@ public class TaskStatusSelectLink extends ValueSelectLink<TaskStatus>
 	/**The resource key format pattern for each task status.*/
 	public final static String TASK_STATUS_ICON_RESOURCE_KEY_FORMAT_PATTERN="task.status.{0}.icon";
 
-	/**Session constructor with a default data model to represent a given type.
-	@param session The Guise session that owns this component.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public TaskStatusSelectLink(final GuiseSession session)
+	/**Default constructor with a default data model.*/
+	public TaskStatusSelectLink()
 	{
-		this(session, (String)null);	//construct the component, indicating that a default ID should be used
-	}
-
-	/**Session, and model constructor.
-	@param session The Guise session that owns this component.
-	@param model The component data model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	*/
-	public TaskStatusSelectLink(final GuiseSession session, final ValueModel<TaskStatus> model)
-	{
-		this(session, null, model);	//construct the component, indicating that a default ID should be used				
-	}
-
-	/**Session and ID constructor with a default data model to represent a given type.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the given session <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public TaskStatusSelectLink(final GuiseSession session, final String id)
-	{
-		this(session, id, new DefaultValueModel<TaskStatus>(session, TaskStatus.class));	//construct the class with a default model
+		this(new DefaultValueModel<TaskStatus>(TaskStatus.class));	//construct the class with a default model
 	}
 	
-	/**Session, ID, and model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	/**Value model constructor.
+	@param valueModel The component value model.
+	@exception NullPointerException if the given value model is <code>null</code>.
 	*/
-	public TaskStatusSelectLink(final GuiseSession session, final String id, final ValueModel<TaskStatus> model)
+	public TaskStatusSelectLink(final ValueModel<TaskStatus> valueModel)
 	{
-		super(session, id, model);	//construct the parent class
+		super(valueModel);	//construct the parent class
 		setSelectedIconResourceKey(SELECT_ACTION_SELECTED_ICON_RESOURCE_KEY);
 		setUnselectedIconResourceKey(SELECT_ACTION_UNSELECTED_ICON_RESOURCE_KEY);
 		setValueIconResourceKey(null, MessageFormat.format(TASK_STATUS_ICON_RESOURCE_KEY_FORMAT_PATTERN, ""));	//set the icon resource for no task status

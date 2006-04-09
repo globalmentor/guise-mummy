@@ -3,7 +3,6 @@ package com.guiseframework.component;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.model.Notification;
 import com.guiseframework.model.ValueModel;
 import com.guiseframework.validator.ValidationException;
@@ -144,17 +143,14 @@ public abstract class AbstractDialogFrame<V, C extends DialogFrame<V, C>> extend
 		}
 	}
 
-	/**Session, ID, model, and component constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param valueModel The component data model.
+	/**Value model, and component constructor.
+	@param valueModel The frame value model.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given value model is <code>null</code>.
 	*/
-	public AbstractDialogFrame(final GuiseSession session, final String id, final ValueModel<V> valueModel, final Component<?> component)
+	public AbstractDialogFrame(final ValueModel<V> valueModel, final Component<?> component)
 	{
-		super(session, id, component);	//construct the parent class
+		super(component);	//construct the parent class
 		this.valueModel=checkInstance(valueModel, "Value model cannot be null.");	//save the table model
 		this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen an repeat all property changes of the value model
 		setModal(true);	//default to being a modal frame

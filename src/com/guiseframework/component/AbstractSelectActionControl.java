@@ -5,7 +5,6 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import java.net.URI;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 
@@ -162,16 +161,13 @@ public abstract class AbstractSelectActionControl<C extends SelectActionControl<
 			}
 		}
 
-	/**Session, ID, and model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Action model constructor.
 	@param actionModel The component action model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given action model is <code>null</code>.
 	*/
-	public AbstractSelectActionControl(final GuiseSession session, final String id, final ActionModel actionModel)
+	public AbstractSelectActionControl(final ActionModel actionModel)
 	{
-		super(session, id, actionModel);	//construct the parent class
+		super(actionModel);	//construct the parent class
 		addActionListener(new SelectActionListener(this));	//listen for an action and set the selected state accordingly
 	}
 

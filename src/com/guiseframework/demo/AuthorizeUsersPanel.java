@@ -3,7 +3,6 @@ package com.guiseframework.demo;
 import java.io.IOException;
 import java.util.*;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.context.GuiseContext;
@@ -29,37 +28,35 @@ public class AuthorizeUsersPanel extends DefaultNavigationPanel
 		//the table/list select model
 	private final UserAuthorizationTableModel userAuthorizationModel;
 
-	/**Guise session constructor.
-	@param session The Guise session that owns this panel.
-	*/
-	public AuthorizeUsersPanel(final GuiseSession session)
+	/**Default constructor.*/
+	public AuthorizeUsersPanel()
 	{
-		super(session, new FlowLayout(session, Flow.PAGE));	//construct the parent class flowing vertically
+		super(new FlowLayout(Flow.PAGE));	//construct the parent class flowing vertically
 		setLabel("Guise\u2122 Demonstration: Authorize Users");	//set the panel title	
 
 			//create the table columns
-		idColumn=new DefaultTableColumnModel<String>(session, String.class, "ID");	//ID
-		lastNameColumn=new DefaultTableColumnModel<String>(session, String.class, "Last Name");	//last name
-		firstNameColumn=new DefaultTableColumnModel<String>(session, String.class, "First Name");	//first name
-		emailColumn=new DefaultTableColumnModel<String>(session, String.class, "Email");	//email
+		idColumn=new DefaultTableColumnModel<String>(String.class, "ID");	//ID
+		lastNameColumn=new DefaultTableColumnModel<String>(String.class, "Last Name");	//last name
+		firstNameColumn=new DefaultTableColumnModel<String>(String.class, "First Name");	//first name
+		emailColumn=new DefaultTableColumnModel<String>(String.class, "Email");	//email
 		emailColumn.setEditable(true);	//allow the email column to be edited
-		emailColumn.setValidator(new RegularExpressionStringValidator(session, ".+@.+\\.[a-z]+", true));	//require an email in the correct format
-		authorizedColumn=new DefaultTableColumnModel<Boolean>(session, Boolean.class, "Authorized");	//authorized
+		emailColumn.setValidator(new RegularExpressionStringValidator(".+@.+\\.[a-z]+", true));	//require an email in the correct format
+		authorizedColumn=new DefaultTableColumnModel<Boolean>(Boolean.class, "Authorized");	//authorized
 		authorizedColumn.setEditable(true);	//allow the authorized column to be edited
 			//create and initialize the table model
-		userAuthorizationModel=new UserAuthorizationTableModel(session, idColumn, lastNameColumn, firstNameColumn, emailColumn, authorizedColumn);	//create the table model
+		userAuthorizationModel=new UserAuthorizationTableModel(idColumn, lastNameColumn, firstNameColumn, emailColumn, authorizedColumn);	//create the table model
 			//create the table
-		final Table userAuthorizationTable=new Table(session, userAuthorizationModel);	//create the table component
+		final Table userAuthorizationTable=new Table(userAuthorizationModel);	//create the table component
 		userAuthorizationTable.setLabel("User Authorizations");	//give the table a label
 		add(userAuthorizationTable);	//add the user authorization table to the panel
 			//apply button
-		final Button applyButton=new Button(session);	//create a button for applying the values
+		final Button applyButton=new Button();	//create a button for applying the values
 		applyButton.setLabel("Apply");	//set the button label
 		applyButton.addActionListener(new ActionListener()	//listen for the apply button
 				{					
 					public void actionPerformed(ActionEvent actionEvent)
 					{
-						final MessageOptionDialogFrame messageDialog=new MessageOptionDialogFrame(session,	//create a new message dialog
+						final MessageOptionDialogFrame messageDialog=new MessageOptionDialogFrame(	//create a new message dialog
 								"The use of AJAX in Guise makes the \"Apply\" button unnecessary, because changes take place live. This button would only be useful if AJAX were disabled.",
 								MessageOptionDialogFrame.Option.OK);	//show the OK button
 						messageDialog.setLabel("Note on the \"Apply\" button.");	//set the message dialog label
@@ -96,13 +93,11 @@ public class AuthorizeUsersPanel extends DefaultNavigationPanel
 	protected class UserAuthorizationTableModel extends AbstractListSelectTableModel<DemoUser>
 	{
 		/**Constructs a demo user list select table model indicating the type of values it can hold, using a default multiple selection strategy.
-		@param session The Guise session that owns this model.
 		@param columns The models representing the table columns.
-		@exception NullPointerException if the given session is <code>null</code>.
 		*/
-		public UserAuthorizationTableModel(final GuiseSession session, final TableColumnModel<?>... columns)
+		public UserAuthorizationTableModel(final TableColumnModel<?>... columns)
 		{
-			super(session, DemoUser.class, columns);	//construct the parent class with the class representing users
+			super(DemoUser.class, columns);	//construct the parent class with the class representing users
 		}
 
 		/**Returns the value's property for the given column.

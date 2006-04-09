@@ -3,7 +3,6 @@ package com.guiseframework.converter;
 import java.util.MissingResourceException;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.event.GuiseBoundPropertyObject;
 
 import static com.guiseframework.GuiseResourceConstants.*;
@@ -15,15 +14,6 @@ import static com.guiseframework.GuiseResourceConstants.*;
 */
 public abstract class AbstractConverter<V, L> extends GuiseBoundPropertyObject implements Converter<V, L>
 {
-
-	/**Session constructor.
-	@param session The Guise session that owns this converter.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public AbstractConverter(final GuiseSession session)
-	{
-		super(session);
-	}
 
 	/**The invalid value message text, or <code>null</code> if there is no message text.*/
 	private String invalidValueMessage=null;

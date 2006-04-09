@@ -3,7 +3,6 @@ package com.guiseframework.component;
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.Flow;
 import com.guiseframework.component.layout.TabLayout;
 
@@ -63,85 +62,40 @@ public class TabContainerControl extends AbstractListSelectContainerControl<TabC
 			}
 		}
 
-	/**Session constructor with default {@link Flow#LINE} axis orientation.
-	@param session The Guise session that owns this component.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public TabContainerControl(final GuiseSession session)
+	/**Default constructor with default {@link Flow#LINE} axis orientation.*/
+	public TabContainerControl()
 	{
-		this(session, Flow.LINE);	//default to line axis orientation
+		this(Flow.LINE);	//default to line axis orientation
 	}
 
-	/**Session and axis constructor.
-	@param session The Guise session that owns this component.
+	/**Axis constructor.
 	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given session and/or axis is <code>null</code>.
+	@exception NullPointerException if the given axis is <code>null</code>.
 	*/
-	public TabContainerControl(final GuiseSession session, final Flow axis)
+	public TabContainerControl(final Flow axis)
 	{
-		this(session, (String)null, axis);	//construct the panel, indicating that a default ID should be used
+		this(new TabLayout(), axis);	//construct the panel using a default layout
 	}
 	
-	/**Session, layout, and axis constructor.
-	@param session The Guise session that owns this component.
+	/**Layout and axis constructor.
 	@param layout The layout definition for the container.
 	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given session, layout, and/or axis is <code>null</code>.
+	@exception NullPointerException if the given layout, and/or axis is <code>null</code>.
 	*/
-	public TabContainerControl(final GuiseSession session, final TabLayout layout, final Flow axis)
+	public TabContainerControl(final TabLayout layout, final Flow axis)
 	{
-		this(session, null, layout, axis);	//construct the panel, indicating that a default ID should be used
+		this(layout, axis, -1);	//construct the class with no maximum tab count		
 	}
 	
-	/**Session, layout, axis, and maximum tab count constructor.
-	@param session The Guise session that owns this component.
+	/**Layout, axis, and maximum tab count constructor.
 	@param layout The layout definition for the container.
 	@param axis The axis along which the tabs are oriented.
 	@param maxTabCount The requested number of visible tabs, or -1 if no maximum tab count is specified.
-	@exception NullPointerException if the given session, layout, and/or axis is <code>null</code>.
+	@exception NullPointerException if the given layout and/or axis is <code>null</code>.
 	*/
-	public TabContainerControl(final GuiseSession session, final TabLayout layout, final Flow axis, final int maxTabCount)
+	public TabContainerControl(final TabLayout layout, final Flow axis, final int maxTabCount)
 	{
-		this(session, null, layout, axis, maxTabCount);	//construct the panel, indicating that a default ID should be used
-	}	
-	
-	/**Session, ID, and axis constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given session and/or axis is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public TabContainerControl(final GuiseSession session, final String id, final Flow axis)
-	{
-		this(session, id, new TabLayout(session), axis);	//construct the panel using a default layout
-	}
-	
-	/**Session, ID, layout, and axis constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param layout The layout definition for the container.
-	@param axis The axis along which the tabs are oriented.
-	@exception NullPointerException if the given session, layout, and/or axis is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public TabContainerControl(final GuiseSession session, final String id, final TabLayout layout, final Flow axis)
-	{
-		this(session, id, layout, axis, -1);	//construct the class with no maximum tab count		
-	}
-	
-	/**Session, ID, layout, axis, and maximum tab count constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param layout The layout definition for the container.
-	@param axis The axis along which the tabs are oriented.
-	@param maxTabCount The requested number of visible tabs, or -1 if no maximum tab count is specified.
-	@exception NullPointerException if the given session, layout, and/or axis is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public TabContainerControl(final GuiseSession session, final String id, final TabLayout layout, final Flow axis, final int maxTabCount)
-	{
-		super(session, id, layout);	//construct the parent class, using the card layout's value model
+		super(layout);	//construct the parent class, using the card layout's value model
 		this.axis=checkInstance(axis, "Flow axis cannot be null.");
 		this.maxTabCount=maxTabCount;	//save the maximum tab count
 	}

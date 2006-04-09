@@ -1,7 +1,6 @@
 package com.guiseframework.component;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.model.*;
 
 /**An abstract implementation of a model component that allows user interaction to modify the model.
@@ -109,27 +108,19 @@ public abstract class AbstractControl<C extends Control<C>> extends AbstractComp
 		}
 	}
 
-	/**Session and ID constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public AbstractControl(final GuiseSession session, final String id)
+	/**Default constructor with a default label model.*/
+	public AbstractControl()
 	{
-		this(session, id, new DefaultLabelModel(session));	//construct the class with a default label model
+		this(new DefaultLabelModel());	//construct the class with a default label model
 	}
 
-	/**Session and ID constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Label model constructor.
 	@param labelModel The component label model.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given label model is <code>null</code>.
 	*/
-	public AbstractControl(final GuiseSession session, final String id, final LabelModel labelModel)
+	public AbstractControl(final LabelModel labelModel)
 	{
-		super(session, id, labelModel);	//construct the parent class
+		super(labelModel);	//construct the parent class
 	}
 
 }

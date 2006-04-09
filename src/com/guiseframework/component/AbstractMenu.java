@@ -4,7 +4,6 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 
 import java.util.Iterator;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.ActionEvent;
 import com.guiseframework.event.ActionListener;
@@ -95,17 +94,14 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 			}
 		}
 
-	/**Session, ID, and layout, and model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Menu layout and action model constructor.
 	@param layout The layout definition for the container.
 	@param actionModel The component action model.
-	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given layout and/or action model is <code>null</code>.
 	*/
-	public AbstractMenu(final GuiseSession session, final String id, final MenuLayout layout, final ActionModel actionModel)
+	public AbstractMenu(final MenuLayout layout, final ActionModel actionModel)
 	{
-		super(session, id, layout);	//construct the parent class
+		super(layout);	//construct the parent class
 		this.actionModel=checkInstance(actionModel, "Action model cannot be null.");	//save the action model
 		this.actionModel.addActionListener(new ActionListener()	//create an action repeater to forward events to this component's listeners TODO create a common method to create a forwarding listener, if we can
 				{
@@ -147,7 +143,7 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 	{
 		if(getEventListenerManager().hasListeners(ActionListener.class))	//if there are action listeners registered
 		{
-			final ActionEvent actionEvent=new ActionEvent(getSession(), this);	//create a new action event
+			final ActionEvent actionEvent=new ActionEvent(this);	//create a new action event
 			getSession().queueEvent(new PostponedActionEvent(getEventListenerManager(), actionEvent));	//tell the Guise session to queue the event
 		}
 	}

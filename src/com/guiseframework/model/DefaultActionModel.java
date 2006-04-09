@@ -2,7 +2,6 @@ package com.guiseframework.model;
 
 import java.util.Iterator;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.event.*;
 
 /**A default implementation of a button model.
@@ -42,18 +41,15 @@ public class DefaultActionModel extends AbstractModel implements ActionModel
 	{
 		if(getEventListenerManager().hasListeners(ActionListener.class))	//if there are action listeners registered
 		{
-			final ActionEvent actionEvent=new ActionEvent(getSession(), this);	//create a new action event
+			final ActionEvent actionEvent=new ActionEvent(this);	//create a new action event
 			getSession().queueEvent(new PostponedActionEvent(getEventListenerManager(), actionEvent));	//tell the Guise session to queue the event
 		}
 	}
 
-	/**Session constructor.
-	@param session The Guise session that owns this model.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public DefaultActionModel(final GuiseSession session)
+	/**Default constructor.*/
+	public DefaultActionModel()
 	{
-		super(session);	//construct the parent class
+		super();	//construct the parent class
 	}
 
 }

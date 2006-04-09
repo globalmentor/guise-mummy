@@ -1,6 +1,5 @@
 package com.guiseframework.component.effect;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.event.GuiseBoundPropertyObject;
 
 /**An abstract implementation of a component effect.
@@ -35,24 +34,18 @@ public abstract class AbstractEffect extends GuiseBoundPropertyObject implements
 			}
 		}
 
-	/**Session constructor with no delay.
-	@param session The Guise session that owns this effect.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public AbstractEffect(final GuiseSession session)
+	/**Default constructor with no delay.*/
+	public AbstractEffect()
 	{
-		this(session, 0);	//construct the effect with no delay
+		this(0);	//construct the effect with no delay
 	}
 
-	/**Session and delay constructor.
-	@param session The Guise session that owns this effect.
+	/**Delay constructor.
 	@param delay The delay in milliseconds.
-	@exception NullPointerException if the given session is <code>null</code>.
 	@exception IllegalArgumentException if the given delay is negative.
 	*/
-	public AbstractEffect(final GuiseSession session, final int delay)
+	public AbstractEffect(final int delay)
 	{
-		super(session);	//construct the parent class
 		if(delay<0)	//if the delay is negative
 		{
 			throw new IllegalArgumentException("Delay "+delay+" cannot be negative.");

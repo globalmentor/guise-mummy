@@ -37,24 +37,13 @@ public class HomePanel extends DefaultNavigationPanel
 	private TestFrame frame=null;
 	final Label testLabel;
 
-	/**Guise session constructor.
-	@param session The Guise session that owns this panel.
-	*/
-	public HomePanel(final GuiseSession session)
+	/**Default constructor.*/
+	public HomePanel()
 	{
-		this(session, null);	//construct the component, indicating that a default ID should be used
-	}
-
-	/**ID constructor.
-	@param session The Guise session that owns this panel.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	*/
-	public HomePanel(final GuiseSession session, final String id)
-	{
-		super(session, id, new RegionLayout(session));	//construct the parent using a region layout
+		super(new RegionLayout());	//construct the parent using a region layout
 		setLabel("Home Panel Test");	//set the panel label
 
-		final LayoutPanel contentPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE)); 
+		final LayoutPanel contentPanel=new LayoutPanel(new FlowLayout(Flow.PAGE)); 
 
 		
 /*TODO del		
@@ -76,10 +65,10 @@ if(dateFormat instanceof SimpleDateFormat)
 
 
 		final Date now=new Date();
-		final DateStringLiteralConverter shortDateConverter=new DateStringLiteralConverter(session, DateStringLiteralStyle.SHORT);
-		final DateStringLiteralConverter mediumDateConverter=new DateStringLiteralConverter(session, DateStringLiteralStyle.MEDIUM);
-		final DateStringLiteralConverter longDateConverter=new DateStringLiteralConverter(session, DateStringLiteralStyle.LONG);
-		final DateStringLiteralConverter fullDateConverter=new DateStringLiteralConverter(session, DateStringLiteralStyle.FULL);
+		final DateStringLiteralConverter shortDateConverter=new DateStringLiteralConverter(DateStringLiteralStyle.SHORT);
+		final DateStringLiteralConverter mediumDateConverter=new DateStringLiteralConverter(DateStringLiteralStyle.MEDIUM);
+		final DateStringLiteralConverter longDateConverter=new DateStringLiteralConverter(DateStringLiteralStyle.LONG);
+		final DateStringLiteralConverter fullDateConverter=new DateStringLiteralConverter(DateStringLiteralStyle.FULL);
 		
 try
 {
@@ -139,36 +128,36 @@ catch(final ConversionException conversionException)
 }
 */
 
-		final SelectLink selectLink=new SelectLink(session);
+		final SelectLink selectLink=new SelectLink();
 		selectLink.setLabel("This is a select link");
 		selectLink.setToggle(true);
 		selectLink.setSelectedIcon(URI.create("guise/images/accept.gif"));
 		contentPanel.add(selectLink);
 
-		final TreeControl tree=new TreeControl(session);
-		final TreeNodeModel<String> treeNode1=new DefaultTreeNodeModel<String>(session, String.class, "Node 1");
+		final TreeControl tree=new TreeControl();
+		final TreeNodeModel<String> treeNode1=new DefaultTreeNodeModel<String>(String.class, "Node 1");
 //TODO del		treeNode1.setExpanded(true);
-		final TreeNodeModel<String> treeNode11=new DefaultTreeNodeModel<String>(session, String.class, "Node 1.1");
+		final TreeNodeModel<String> treeNode11=new DefaultTreeNodeModel<String>(String.class, "Node 1.1");
 //	TODO del		treeNode11.setExpanded(true);
 		treeNode1.add(treeNode11);
-		final TreeNodeModel<String> treeNode111=new DefaultTreeNodeModel<String>(session, String.class, "Node 1.1.1");
+		final TreeNodeModel<String> treeNode111=new DefaultTreeNodeModel<String>(String.class, "Node 1.1.1");
 //	TODO del		treeNode111.setExpanded(true);
 		treeNode11.add(treeNode111);
-		final TreeNodeModel<String> treeNode112=new DefaultTreeNodeModel<String>(session, String.class, "Node 1.1.2");
+		final TreeNodeModel<String> treeNode112=new DefaultTreeNodeModel<String>(String.class, "Node 1.1.2");
 //	TODO del		treeNode112.setExpanded(true);
 		treeNode11.add(treeNode112);
-		final TreeNodeModel<String> treeNode113=new DefaultTreeNodeModel<String>(session, String.class, "Node 1.1.3");
+		final TreeNodeModel<String> treeNode113=new DefaultTreeNodeModel<String>(String.class, "Node 1.1.3");
 //	TODO del		treeNode1.setExpanded(true);
 		treeNode113.add(treeNode113);
-		final TreeNodeModel<String> treeNode12=new DefaultTreeNodeModel<String>(session, String.class, "Node 1.2");
+		final TreeNodeModel<String> treeNode12=new DefaultTreeNodeModel<String>(String.class, "Node 1.2");
 //	TODO del		treeNode12.setExpanded(true);
 		treeNode1.add(treeNode12);
-		final TreeNodeModel<String> treeNode13=new DefaultTreeNodeModel<String>(session, String.class, "Node 1.3");
+		final TreeNodeModel<String> treeNode13=new DefaultTreeNodeModel<String>(String.class, "Node 1.3");
 //	TODO del		treeNode13.setExpanded(true);
 		treeNode1.add(treeNode13);
-		final TreeNodeModel<String> treeNode2=new DefaultTreeNodeModel<String>(session, String.class, "Node 2");
+		final TreeNodeModel<String> treeNode2=new DefaultTreeNodeModel<String>(String.class, "Node 2");
 //	TODO del		treeNode12.setExpanded(true);
-		final TreeNodeModel<String> treeNode3=new DefaultTreeNodeModel<String>(session, String.class, "Node 3");
+		final TreeNodeModel<String> treeNode3=new DefaultTreeNodeModel<String>(String.class, "Node 3");
 //	TODO del		treeNode3.setExpanded(true);
 
 		tree.getRootNode().add(treeNode1);
@@ -177,24 +166,24 @@ catch(final ConversionException conversionException)
 		contentPanel.add(tree);		
 		
 /*TODO del		
-    final GroupPanel cardPanelPanel=new GroupPanel(session, new FlowLayout(session, Flow.PAGE));    //create a panel flowing vertically
+    final GroupPanel cardPanelPanel=new GroupPanel(new FlowLayout(Flow.PAGE));    //create a panel flowing vertically
     cardPanelPanel.setLabelText("CardTabControl associated with CardPanel");
             //CardPanel
-    final CardPanel cardPanel=new CardPanel(session);   //create a card panel
+    final CardPanel cardPanel=new CardPanel();   //create a card panel
                 //page 1
-    final Panel<?> cardPanelPage1=new LayoutPanel(session); //create a panel to serve as the page
-    final Heading cardPanelPage1Heading=new Heading(session, 0);    //create a top-level heading
+    final Panel<?> cardPanelPage1=new LayoutPanel(); //create a panel to serve as the page
+    final Heading cardPanelPage1Heading=new Heading(0);    //create a top-level heading
     cardPanelPage1Heading.setLabelText("This is page 1.");   //set the text of the heading
     cardPanelPage1.add(cardPanelPage1Heading);  //add the heading to the page
-    cardPanel.add(cardPanelPage1, new CardLayout.Constraints(new DefaultLabelModel(session, "Page 1")));    //add the panel with a label
+    cardPanel.add(cardPanelPage1, new CardLayout.Constraints(new DefaultLabelModel("Page 1")));    //add the panel with a label
                 //page 2
-    final Panel<?> cardPanelPage2=new LayoutPanel(session); //create a panel to serve as the page
-    final Heading cardPanelPage2Heading=new Heading(session, 0);    //create a top-level heading
+    final Panel<?> cardPanelPage2=new LayoutPanel(); //create a panel to serve as the page
+    final Heading cardPanelPage2Heading=new Heading(0);    //create a top-level heading
     cardPanelPage2Heading.setLabelText("This is page 2.");   //set the text of the heading
     cardPanelPage2.add(cardPanelPage2Heading);  //add the heading to the page
-    cardPanel.add(cardPanelPage2, new CardLayout.Constraints(new DefaultLabelModel(session, "Page 2")));    //add the panel with a label
+    cardPanel.add(cardPanelPage2, new CardLayout.Constraints(new DefaultLabelModel("Page 2")));    //add the panel with a label
             //CardTabControl
-    final CardTabControl cardPanelTabControl=new CardTabControl(session, cardPanel, Flow.LINE); //create a horizontal card tab control to control the existing card panel
+    final CardTabControl cardPanelTabControl=new CardTabControl(cardPanel, Flow.LINE); //create a horizontal card tab control to control the existing card panel
     cardPanelPanel.add(cardPanelTabControl);    //place the tab control above the card panel to illustrate common usage
     cardPanelPanel.add(cardPanel);
     cardPanel.getLayout().getConstraints(cardPanelPage2).setEnabled(Boolean.FALSE);
@@ -203,11 +192,11 @@ catch(final ConversionException conversionException)
 */
 		
 /*TODO del		
-		final CalendarMonthTableModel calendarMonthTableModel=new CalendarMonthTableModel(session);
-		final Table calendarMonthTable=new Table(session, calendarMonthTableModel);
+		final CalendarMonthTableModel calendarMonthTableModel=new CalendarMonthTableModel();
+		final Table calendarMonthTable=new Table(calendarMonthTableModel);
 		contentPanel.add(calendarMonthTable);
 		
-		final CalendarControl calendarControl=new CalendarControl(session);
+		final CalendarControl calendarControl=new CalendarControl();
 		contentPanel.add(calendarControl);
 		
 		
@@ -228,12 +217,12 @@ catch(final ConversionException conversionException)
 		
 		
 		//input panel
-		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE));	//create the input panel flowing vertically
+		final LayoutPanel inputPanel=new LayoutPanel(new FlowLayout(Flow.PAGE));	//create the input panel flowing vertically
 		inputPanel.setBackgroundColor(RGBColor.AQUA_MARINE);
-		final TextControl<Float> inputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
+		final TextControl<Float> inputTextControl=new TextControl<Float>(Float.class);	//create a text input control to receive a float
 		inputTextControl.setMaximumLength(5);
 		inputTextControl.setLabel("Input Number");	//add a label to the text input control
-		inputTextControl.setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
+		inputTextControl.setValidator(new ValueRequiredValidator<Float>());	//install a validator requiring a value
 		inputTextControl.setBackgroundColor(RGBColor.DARK_GOLDEN_ROD);
 
 		inputTextControl.setDescription("This is a description of the first text control.");
@@ -246,7 +235,7 @@ catch(final ConversionException conversionException)
 		
 		inputPanel.add(inputTextControl);	//add the input control to the input panel
 		
-		final TextControl<Float> outputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
+		final TextControl<Float> outputTextControl=new TextControl<Float>(Float.class);	//create a text input control to display the result
 		outputTextControl.setLabel("Double the Number");	//add a label to the text output control
 		outputTextControl.setEditable(false);	//set the text output control to read-only so that the user cannot modify it
 		inputPanel.add(outputTextControl);	//add the output control to the input panel
@@ -265,7 +254,7 @@ catch(final ConversionException conversionException)
 						}							
 					}
 				});
-		final CheckControl checkbox=new CheckControl(session, "checkbox");
+		final CheckControl checkbox=new CheckControl();
 		checkbox.setLabel("Enable the button \u278A");
 		try
 		{
@@ -277,7 +266,7 @@ catch(final ConversionException conversionException)
 		}										
 		inputPanel.add(checkbox);
 		
-		final ListControl<Float> listControl=new ListControl<Float>(session, Float.class, new SingleListSelectionPolicy<Float>());	//create a list control allowing only single selections
+		final ListControl<Float> listControl=new ListControl<Float>(Float.class, new SingleListSelectionPolicy<Float>());	//create a list control allowing only single selections
 		listControl.setLabel("Pick a Number");	//set the list control label
 		listControl.setRowCount(5);
 		listControl.add(new Float(10));
@@ -305,13 +294,13 @@ Debug.trace("list control changed value to", newValue);
 		contentPanel.add(inputPanel);	//add the input panel to the temperature panel
 		
 		
-		testLabel=new Label(session, "testLabel");
+		testLabel=new Label();
 		testLabel.setDragEnabled(true);
 		testLabel.setStyleID("title");
 		testLabel.setLabel("This is label text from the model.");
 		
 		
-		final Object testCookie=session.getEnvironment().getProperty("testCookie");
+		final Object testCookie=getSession().getEnvironment().getProperty("testCookie");
 		if(testCookie instanceof String)
 		{
 			testLabel.setLabel((String)testCookie);
@@ -323,35 +312,35 @@ Debug.trace("list control changed value to", newValue);
 		
 		
 /*TODO del
-		final Flash flash=new Flash(session);
+		final Flash flash=new Flash();
 		flash.setFlashURI(URI.create("test.swf"));
 		flash.setPreferredWidth(new Extent(564));
 		flash.setPreferredHeight(new Extent(474));
 		contentPanel.add(flash);
 */
 /*TODO del
-    final ImageBooleanSelectActionControl imageAction=new ImageBooleanSelectActionControl(session);
+    final ImageBooleanSelectActionControl imageAction=new ImageBooleanSelectActionControl();
     imageAction.setImage(URI.create("http://www.garretwilson.com/photos/2000/february/cowcalf.jpg"));
     imageAction.setRolloverImage(URI.create("slider-thumb.gif"));
     contentPanel.add(imageAction);
 */
 		
-		final Text testText=new Text(session);
+		final Text testText=new Text();
 		testText.setTextContentType(XHTML_FRAGMENT_CONTENT_TYPE);
 //TODO bring back		testText.getModel().setTextResourceKey("test.html");
 		testText.setText("this is <strong>good</strong> stuff");
 		
-		final Label boundLabel=new Label(session);
+		final Label boundLabel=new Label();
 		boundLabel.setLabel("Button");
 		boundLabel.setDescription("This is button flyover.");
 		boundLabel.setFlyoverEnabled(true);	//turn on flyovers
-		testText.add(boundLabel, new ReferenceConstraints(session, "boundComponent"));
+		testText.add(boundLabel, new ReferenceConstraints("boundComponent"));
 
 		contentPanel.add(testText);
 		
-		final LayoutPanel buttonPanel=new LayoutPanel(session, "testButtonPanel", new FlowLayout(session, Flow.LINE));	//create a panel flowing horizontally
+		final LayoutPanel buttonPanel=new LayoutPanel(new FlowLayout(Flow.LINE));	//create a panel flowing horizontally
 
-		final Button testButton=new Button(session, "testButton");
+		final Button testButton=new Button();
 		testButton.setLabel("Click here to go to the 'Hello World' demo.");
 		testButton.setDescription("This is the hello world button.");
 /*TODO fix
@@ -366,7 +355,7 @@ Debug.trace("list control changed value to", newValue);
 		testButton.addActionListener(new NavigateActionListener("helloworld"));
 		buttonPanel.add(testButton);	//add a new button
 		
-		final Button testButton2=new Button(session, "testButton2");
+		final Button testButton2=new Button();
 		testButton2.setLabel("Click this button to change the text.");
 		testButton2.addActionListener(new ActionListener()
 				{
@@ -388,12 +377,12 @@ Debug.trace("list control changed value to", newValue);
 						{
 							columnNames[columnIndex]=Integer.toString(columnIndex);	//generate the column name
 						}
-						final Table multiplicationTable=new Table(session, Integer.class, multiplicationTableData, columnNames);	//create the table component
+						final Table multiplicationTable=new Table(Integer.class, multiplicationTableData, columnNames);	//create the table component
 						multiplicationTable.setLabelText("Multiplication Table");	//give the table a label
 */
 
-					  final DefaultOptionDialogFrame myDialog=new DefaultOptionDialogFrame(session, DefaultOptionDialogFrame.Option.OK);    //show the OK button
-						final Heading heading=new Heading(session, 0);
+					  final DefaultOptionDialogFrame myDialog=new DefaultOptionDialogFrame(DefaultOptionDialogFrame.Option.OK);    //show the OK button
+						final Heading heading=new Heading(0);
 
 						heading.setLabel("Delete Dialog");
 
@@ -401,12 +390,12 @@ Debug.trace("list control changed value to", newValue);
 
 						myDialog.open();
 						
-						session.getEnvironment().setProperty("testCookie", "This is a successful cookie value.");
+						getSession().getEnvironment().setProperty("testCookie", "This is a successful cookie value.");
 						
 /*TODO bring back
-						final Label label=new Label(session, new DefaultLabelModel(session, "Are you sure?"));
+						final Label label=new Label(new DefaultLabelModel("Are you sure?"));
 						
-						final DefaultOptionDialogFrame confirmDialog=new DefaultOptionDialogFrame(session, label, DefaultOptionDialogFrame.Option.OK, DefaultOptionDialogFrame.Option.CANCEL);
+						final DefaultOptionDialogFrame confirmDialog=new DefaultOptionDialogFrame(label, DefaultOptionDialogFrame.Option.OK, DefaultOptionDialogFrame.Option.CANCEL);
 						confirmDialog.setLabelText("Confirm your choice");
 						confirmDialog.setPreferredWidth(new Extent(20, Extent.Unit.EM));
 						confirmDialog.setPreferredHeight(new Extent(10, Extent.Unit.EM));
@@ -425,14 +414,14 @@ Debug.trace("list control changed value to", newValue);
 					}
 				});
 		buttonPanel.add(testButton2);	//add a new button
-		final Link testLink=new Link(session);
+		final Link testLink=new Link();
 		testLink.setLabel("This is a link.");
 		testLink.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
 
-						session.getEnvironment().removeProperty("testCookie");
+						getSession().getEnvironment().removeProperty("testCookie");
 
 						testLabel.setLabel("The link works.");
 
@@ -441,7 +430,7 @@ Debug.trace("list control changed value to", newValue);
 					}
 				});
 		buttonPanel.add(testLink);	//add a new button
-		final Link modalLink=new Link(session);
+		final Link modalLink=new Link();
 		modalLink.setLabel("Test modal.");
 		modalLink.addActionListener(new ActionListener()
 				{
@@ -463,25 +452,25 @@ Debug.trace("list control changed value to", newValue);
 				});
 		buttonPanel.add(modalLink);	//add a new button
 		
-		final Link helloLink=new Link(session);
+		final Link helloLink=new Link();
 		helloLink.setLabel("More Hello World.");
 		helloLink.addActionListener(new NavigateActionListener("helloworld"));
 		buttonPanel.add(helloLink);	//add the link
 
-		final Link frameLink=new Link(session);
+		final Link frameLink=new Link();
 		frameLink.setLabel("Frame");
 		frameLink.setDescription("This is a flyover for the frame link.");
 		frameLink.setFlyoverEnabled(true);	//turn on flyovers
 		frameLink.getFlyoverStrategy().setPreferredWidth(new Extent(15, Extent.Unit.EM));
 		frameLink.getFlyoverStrategy().setPreferredHeight(new Extent(10, Extent.Unit.EM));
-//TODO del		frameLink.getFlyoverStrategy().setOpenEffect(new OpacityFadeEffect(session, 1500));	//TODO testing openEffect
+//TODO del		frameLink.getFlyoverStrategy().setOpenEffect(new OpacityFadeEffect(1500));	//TODO testing openEffect
 		frameLink.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
 						if(frame==null)
 						{
-							frame=new TestFrame(session);
+							frame=new TestFrame();
 							frame.setLabel("Test Frame");
 						}
 	Debug.trace("ready to set frame visible");
@@ -490,20 +479,20 @@ Debug.trace("list control changed value to", newValue);
 				});
 		buttonPanel.add(frameLink);
 
-		final Link modalFrameLink=new Link(session);
+		final Link modalFrameLink=new Link();
 		modalFrameLink.setLabel("Modal Frame");
 		modalFrameLink.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
-						final DefaultDialogFrame<Boolean> dialog=new DefaultDialogFrame<Boolean>(session, Boolean.class);
+						final DefaultDialogFrame<Boolean> dialog=new DefaultDialogFrame<Boolean>(Boolean.class);
 						dialog.setLabel("Test Dialog");
 						
-						final TextControl<Float> inputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
+						final TextControl<Float> inputTextControl=new TextControl<Float>(Float.class);	//create a text input control to receive a float
 						inputTextControl.setLabel("Input Number");	//add a label to the text input control
-						inputTextControl.setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
+						inputTextControl.setValidator(new ValueRequiredValidator<Float>());	//install a validator requiring a value
 						((Container<?>)dialog.getContent()).add(inputTextControl);	//add the input control to the input panel
-						final TextControl<Float> outputTextControl=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
+						final TextControl<Float> outputTextControl=new TextControl<Float>(Float.class);	//create a text input control to display the result
 						outputTextControl.setLabel("Double the Number");	//add a label to the text output control
 						((Container<?>)dialog.getContent()).add(outputTextControl);	//add the output control to the input panel
 						
@@ -518,39 +507,39 @@ Debug.trace("list control changed value to", newValue);
 		
 
 		
-		final LayoutPanel linkPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create a panel flowing horizontally
+		final LayoutPanel linkPanel=new LayoutPanel(new FlowLayout(Flow.LINE));	//create a panel flowing horizontally
 		
-		final Link nearbyLink=new Link(session);
+		final Link nearbyLink=new Link();
 		nearbyLink.setLabel("Inside");
 		nearbyLink.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
-						session.navigate(URI.create("http://www.cnn.com"));
+						getSession().navigate(URI.create("http://www.cnn.com"));
 					}
 				});
 		linkPanel.add(nearbyLink);
 		
-		final Link popupLink=new Link(session);
+		final Link popupLink=new Link();
 		popupLink.setLabel("Popup");
 		popupLink.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
-						session.navigate(URI.create("http://www.cnn.com"), "another");
+						getSession().navigate(URI.create("http://www.cnn.com"), "another");
 					}
 				});
 		linkPanel.add(popupLink);
 	
 		contentPanel.add(linkPanel);
 		
-		final Link listenerPopupLink=new Link(session);
+		final Link listenerPopupLink=new Link();
 		listenerPopupLink.setLabel("Popup from NavigateActionListener");
 		listenerPopupLink.addActionListener(new NavigateActionListener(URI.create("http://www.about.com"), "another"));
 		linkPanel.add(listenerPopupLink);
 		
 		
-		final CheckControl check3=new CheckControl(session);	
+		final CheckControl check3=new CheckControl();	
 		check3.setCheckType(CheckControl.CheckType.ELLIPSE);
 		check3.setLabel("Third, disconnected check");
 		contentPanel.add(check3);
@@ -558,9 +547,9 @@ Debug.trace("list control changed value to", newValue);
 		
 		
 		
-		final LayoutPanel bookmarkPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create a panel flowing horizontally
+		final LayoutPanel bookmarkPanel=new LayoutPanel(new FlowLayout(Flow.LINE));	//create a panel flowing horizontally
 
-		final Link bookmark1Link=new Link(session);
+		final Link bookmark1Link=new Link();
 		bookmark1Link.setLabel("Bookmark1");
 		bookmark1Link.addActionListener(new ActionListener()
 				{
@@ -571,7 +560,7 @@ Debug.trace("list control changed value to", newValue);
 				});
 		bookmarkPanel.add(bookmark1Link);
 
-		final Link bookmark2Link=new Link(session);
+		final Link bookmark2Link=new Link();
 		bookmark2Link.setLabel("Bookmark2");
 		bookmark2Link.addActionListener(new ActionListener()
 				{
@@ -582,7 +571,7 @@ Debug.trace("list control changed value to", newValue);
 				});
 		bookmarkPanel.add(bookmark2Link);
 
-		final Link bookmark3Link=new Link(session);
+		final Link bookmark3Link=new Link();
 		bookmark3Link.setLabel("Go Bookmark3");
 		bookmark3Link.addActionListener(new ActionListener()
 				{
@@ -596,29 +585,29 @@ Debug.trace("list control changed value to", newValue);
 		contentPanel.add(bookmarkPanel);	//add the bookmark panel to the panel
 		
 		
-		final LayoutPanel sliderPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));
+		final LayoutPanel sliderPanel=new LayoutPanel(new FlowLayout(Flow.LINE));
 
 		
-		final ValueModel<Integer> sliderModel=new DefaultValueModel<Integer>(session, Integer.class, 100);	//default to 100
-		sliderModel.setValidator(new IntegerRangeValidator(session, 0, 100));	//set a range validator for the model
+		final ValueModel<Integer> sliderModel=new DefaultValueModel<Integer>(Integer.class, 100);	//default to 100
+		sliderModel.setValidator(new IntegerRangeValidator(0, 100));	//set a range validator for the model
 		
-		final SliderControl<Integer> horizontalSlider=new SliderControl<Integer>(session, sliderModel, Flow.LINE);
+		final SliderControl<Integer> horizontalSlider=new SliderControl<Integer>(sliderModel, Flow.LINE);
 		horizontalSlider.setLabel("Slider Value");
 		horizontalSlider.setThumbImage(URI.create("slider-thumb.gif"));
 		horizontalSlider.setTrackImage(URI.create("slider-track.gif"));
 		sliderPanel.add(horizontalSlider);
 
-		final SliderControl<Integer> verticalSlider=new SliderControl<Integer>(session, sliderModel, Flow.PAGE);
+		final SliderControl<Integer> verticalSlider=new SliderControl<Integer>(sliderModel, Flow.PAGE);
 		verticalSlider.setLabel("Slider Value");
 		sliderPanel.add(verticalSlider);
 		
-		final TextControl<Integer> sliderInput=new TextControl<Integer>(session, sliderModel);	//create a text input control
+		final TextControl<Integer> sliderInput=new TextControl<Integer>(sliderModel);	//create a text input control
 		sliderInput.setLabel("Slider Value");
 		sliderPanel.add(sliderInput);
 
 		contentPanel.add(sliderPanel);	//add the slider panel to the panel
 		
-		final TextControl<String> textInput=new TextControl<String>(session, "textInput", String.class);	//create a text input control
+		final TextControl<String> textInput=new TextControl<String>(String.class);	//create a text input control
 		textInput.setLabel("This is the text input label.");
 		textInput.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<String>()
 				{
@@ -637,17 +626,17 @@ Debug.trace("list control changed value to", newValue);
 	
 	
 	
-		final LayoutPanel horizontalPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create a panel flowing horizontally
+		final LayoutPanel horizontalPanel=new LayoutPanel(new FlowLayout(Flow.LINE));	//create a panel flowing horizontally
 	
 	
-		final GroupPanel booleanPanel=new GroupPanel(session, new FlowLayout(session, Flow.PAGE));	//create a panel flowing vertically
+		final GroupPanel booleanPanel=new GroupPanel(new FlowLayout(Flow.PAGE));	//create a panel flowing vertically
 //		booleanPanel.setDragEnabled(true);
 		booleanPanel.setLabel("Check one of these");
-		final CheckControl check1=new CheckControl(session, "check1");
+		final CheckControl check1=new CheckControl();
 		check1.setCheckType(CheckControl.CheckType.ELLIPSE);
 		check1.setLabel("First check");
 		booleanPanel.add(check1);	
-		final CheckControl check2=new CheckControl(session, "check2");	
+		final CheckControl check2=new CheckControl();	
 		check2.setCheckType(CheckControl.CheckType.ELLIPSE);
 		check2.setLabel("Second check");
 //		check2.getModel().setEnabled(false);	//TODO fix
@@ -659,18 +648,18 @@ Debug.trace("list control changed value to", newValue);
 	
 		horizontalPanel.add(booleanPanel);
 
-		final Button testButtona=new Button(session, "testButton");
+		final Button testButtona=new Button();
 		testButtona.setLabel("Nuther button.");
 //		testButtona.setDragEnabled(true);
 		horizontalPanel.add(testButtona);	//add a new button
 /*TODO fix		
-		final Panel booleanPanela=new Panel(session, new FlowLayout(Axis.Y));	//create a panel flowing vertically
+		final Panel booleanPanela=new Panel(new FlowLayout(Axis.Y));	//create a panel flowing vertically
 		booleanPanela.setLabelText("Check one of these");
-		final CheckControl check1a=new CheckControl(session, "check1");
+		final CheckControl check1a=new CheckControl("check1");
 		check1a.setCheckType(CheckControl.CheckType.ELLIPSE);
 		check1a.setLabelText("First check");
 		booleanPanela.add(check1a);	
-		final CheckControl check2a=new CheckControl(session, "check2");	
+		final CheckControl check2a=new CheckControl("check2");	
 		check2a.setCheckType(CheckControl.CheckType.ELLIPSE);
 		check2a.setLabelText("Second check");
 		booleanPanela.add(check2a);	
@@ -681,7 +670,7 @@ Debug.trace("list control changed value to", newValue);
 		horizontalPanel.add(booleanPanela);
 */
 		
-		final Image image=new Image(session);
+		final Image image=new Image();
 		image.setImage(URI.create("http://www.garretwilson.com/photos/2000/february/cowcalf.jpg"));
 /*TODO fix
 		image.setLabelText("Cow and Calf");
@@ -709,16 +698,16 @@ Debug.trace("list control changed value to", newValue);
 		contentPanel.add(horizontalPanel);
 		
 /*TODO del		
-		final Heading resourceHeading=new Heading(session, 2);
+		final Heading resourceHeading=new Heading(2);
 		resourceHeading.getModel().setLabelResourceKey("test.resource");
 		add(resourceHeading);
 */
 
-		final Label afterImageLabel=new Label(session);
+		final Label afterImageLabel=new Label();
 		afterImageLabel.setLabel("This is a lot of text. ;alsjfd ;lkjas ;ljag ;lkjas g;lkajg; laksgj akjlshf lkjashd flkjsdhlksahlsadkhj asldkhjf ;sgdh a;lgkh a;glkha s;dglh asgd;");
 		contentPanel.add(afterImageLabel);
 
-		final ListControl<String> listSelectControl=new ListControl<String>(session, String.class, new SingleListSelectionPolicy<String>());
+		final ListControl<String> listSelectControl=new ListControl<String>(String.class, new SingleListSelectionPolicy<String>());
 		listSelectControl.setLabel("Choose an option.");
 		listSelectControl.add("The first option");
 //TODO fix		listSelectControl.getModel().add(null);
@@ -727,20 +716,20 @@ Debug.trace("list control changed value to", newValue);
 		listSelectControl.add("The fourth option");
 		
 /*TODO fix
-		listSelectControl.setValueRepresentationStrategy(new ListControl.DefaultValueRepresentationStrategy<String>(session)
+		listSelectControl.setValueRepresentationStrategy(new ListControl.DefaultValueRepresentationStrategy<String>()
 				{
 					public Label createComponent(final ListSelectModel<String> model, final String value, final int index, final boolean selected, final boolean focused)
 					{
 						return value!=null	//if there is a value
 								? super.createComponent(model, value, index, selected, focused)	//return the default component
-								: new Label(session, new DefaultLabelModel(session, "-"));	//return a component with the custom representation
+								: new Label(new DefaultLabelModel("-"));	//return a component with the custom representation
 					}
 				});
 */
 		
 		contentPanel.add(listSelectControl);
 
-		final TextAreaControl textAreaControl=new TextAreaControl(session, 25, 100, true);
+		final TextAreaControl textAreaControl=new TextAreaControl(25, 100, true);
 		textAreaControl.setLabel("Type some text.");
 /*TODO bring back
 		try
@@ -752,10 +741,10 @@ Debug.trace("list control changed value to", newValue);
 			throw new AssertionError(e);
 		}
 */
-		textAreaControl.setValidator(new RegularExpressionStringValidator(session, ".{0,10}", true));
+		textAreaControl.setValidator(new RegularExpressionStringValidator(".{0,10}", true));
 		contentPanel.add(textAreaControl);
 /*TODO del
-		final Text text=new Text(session);
+		final Text text=new Text();
 		//TODO del text.getModel().setText("This is some cool text! This is some text\nand some more on another line.\n\nSkipping two lines down, we find a line that is really long, is really, really, ;lkjas;lfk alkg; ;alkghj;alg lkjahq glkjh flkjhasdflkjhasdfl kjhasdf lkjh lkadhf lkshd flksadhf lksadhlskdqah slhjfg sd long. This is some text\nand some more on another line.\n\nSkipping two lines down, we find a line that is really long, is really, really, ;lkjas;lfk alkg; ;alkghj;alg lkjahq glkjh flkjhasdflkjhasdfl kjhasdf lkjh lkadhf lkshd flksadhf lksadhlskdqah slhjfg sd long.");
 		text.getModel().setTextResourceKey("sample.html");
 		text.getModel().setTextContentType(TextModel.XHTML_CONTENT_TYPE);
@@ -773,7 +762,7 @@ Debug.trace("list control changed value to", newValue);
 				multiplicationTableData[row][column]=new Integer(row*column);
 			}
 		}
-		final Table multiplicationTable=new Table(session, Integer.class, multiplicationTableData, "0", "1");
+		final Table multiplicationTable=new Table(Integer.class, multiplicationTableData, "0", "1");
 		multiplicationTable.setLabel("Multiplication Table");
 		for(final TableColumnModel<?> column:multiplicationTable.getColumns())
 		{
@@ -781,38 +770,38 @@ Debug.trace("list control changed value to", newValue);
 		}
 		contentPanel.add(multiplicationTable);
 
-		final TreeControl treeControl=new TreeControl(session);
-		final TreeNodeModel<String> firstItem=new DefaultTreeNodeModel<String>(session, String.class, "First Item");
-		firstItem.add(new DefaultTreeNodeModel<String>(session, String.class, "Sub Item A"));
-		firstItem.add(new DefaultTreeNodeModel<String>(session, String.class, "Sub Item B"));
+		final TreeControl treeControl=new TreeControl();
+		final TreeNodeModel<String> firstItem=new DefaultTreeNodeModel<String>(String.class, "First Item");
+		firstItem.add(new DefaultTreeNodeModel<String>(String.class, "Sub Item A"));
+		firstItem.add(new DefaultTreeNodeModel<String>(String.class, "Sub Item B"));
 		treeControl.getRootNode().add(firstItem);
-		treeControl.getRootNode().add(new DefaultTreeNodeModel<String>(session, String.class, "Second Item"));
-		treeControl.getRootNode().add(new DefaultTreeNodeModel<String>(session, String.class, "Third Item"));
+		treeControl.getRootNode().add(new DefaultTreeNodeModel<String>(String.class, "Second Item"));
+		treeControl.getRootNode().add(new DefaultTreeNodeModel<String>(String.class, "Third Item"));
 
 		contentPanel.add(treeControl);
 
-		final TabbedPanel tabbedPanel=new TabbedPanel(session);
+		final TabbedPanel tabbedPanel=new TabbedPanel();
 		//input panel
-		final LayoutPanel temperaturePanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE));	//create the input panel flowing vertically
-		final TextControl<Float> temperatureInput=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
+		final LayoutPanel temperaturePanel=new LayoutPanel(new FlowLayout(Flow.PAGE));	//create the input panel flowing vertically
+		final TextControl<Float> temperatureInput=new TextControl<Float>(Float.class);	//create a text input control to receive a float
 		temperatureInput.setLabel("Input Temperature");	//add a label to the text input control
-		temperatureInput.setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
+		temperatureInput.setValidator(new ValueRequiredValidator<Float>());	//install a validator requiring a value
 		temperaturePanel.add(temperatureInput);	//add the input control to the input panel
-		final TextControl<Float> temperatureOutput=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
+		final TextControl<Float> temperatureOutput=new TextControl<Float>(Float.class);	//create a text input control to display the result
 		temperatureOutput.setLabel("Output Temperature");	//add a label to the text output control
 		temperatureOutput.setEditable(false);	//set the text output control to read-only so that the user cannot modify it
 		temperaturePanel.add(temperatureOutput);	//add the output control to the input panel
-		tabbedPanel.add(temperaturePanel, new CardConstraints(session, "Temperature"));
+		tabbedPanel.add(temperaturePanel, new CardConstraints("Temperature"));
 	
-		final LayoutPanel helloPanel=new LayoutPanel(session);
-		final Heading helloWorldHeading=new Heading(session, 0);	//create a top-level heading
+		final LayoutPanel helloPanel=new LayoutPanel();
+		final Heading helloWorldHeading=new Heading(0);	//create a top-level heading
 		helloWorldHeading.setLabel("Hello World!");	//set the text of the heading, using its model
 		helloPanel.add(helloWorldHeading);
-		tabbedPanel.add(helloPanel, new CardConstraints(session, "Hello"));
+		tabbedPanel.add(helloPanel, new CardConstraints("Hello"));
 		
 		contentPanel.add(tabbedPanel);
 
-		final TabControl<String> stringTabControl=new TabControl<String>(session, String.class, Flow.LINE);
+		final TabControl<String> stringTabControl=new TabControl<String>(String.class, Flow.LINE);
 		stringTabControl.add("First tab");
 		stringTabControl.add("Second tab");
 		stringTabControl.add("Third tab");
@@ -828,7 +817,7 @@ Debug.trace("list control changed value to", newValue);
 
 		
 		
-		final CardTabControl remoteTabControl=new CardTabControl(session, tabbedPanel, Flow.LINE);
+		final CardTabControl remoteTabControl=new CardTabControl(tabbedPanel, Flow.LINE);
 		contentPanel.add(remoteTabControl);
 
 Debug.trace("tabbed panel", tabbedPanel, "has view", tabbedPanel.getView());
@@ -851,59 +840,59 @@ Debug.trace("now tab enabled is", remoteTabControl.isValueEnabled(helloPanel));
 				});
 
 
-		add(contentPanel, new RegionConstraints(session, Region.CENTER));	//add the content panel in the center
+		add(contentPanel, new RegionConstraints(Region.CENTER));	//add the content panel in the center
 
-		add(createMenu(session, Flow.LINE), new RegionConstraints(session, Region.PAGE_START));	//add the pulldown menu at the top
+		add(createMenu(Flow.LINE), new RegionConstraints(Region.PAGE_START));	//add the pulldown menu at the top
 
-//TODO fix		add(createMenu(session, Orientation.Flow.PAGE), RegionLayout.LINE_START_CONSTRAINTS);	//add the menu at the left
+//TODO fix		add(createMenu(Orientation.Flow.PAGE), RegionLayout.LINE_START_CONSTRAINTS);	//add the menu at the left
 
-		add(createAccordionMenu(session, Flow.PAGE), new RegionConstraints(session, Region.LINE_START));	//add the menu at the left
+		add(createAccordionMenu(Flow.PAGE), new RegionConstraints(Region.LINE_START));	//add the menu at the left
 	}
 
-	protected DropMenu createMenu(final GuiseSession session, final Flow flow)
+	protected DropMenu createMenu(final Flow flow)
 	{
-		final DropMenu menu=new DropMenu(session, flow);
+		final DropMenu menu=new DropMenu(flow);
 
-		final DropMenu fileMenu=new DropMenu(session, "fileMenu", Flow.PAGE);
+		final DropMenu fileMenu=new DropMenu(Flow.PAGE);
 		fileMenu.setLabel("File");
-		final Link openMenuLink=new Link(session, "openMenuItem");
+		final Link openMenuLink=new Link();
 		openMenuLink.setLabel("Open");
 		fileMenu.add(openMenuLink);
-		final Link closeMenuLink=new Link(session, "closeMenuItem");
+		final Link closeMenuLink=new Link();
 		closeMenuLink.setLabel("Close");
 		fileMenu.add(closeMenuLink);
 		menu.add(fileMenu);
 
-		final DropMenu editMenu=new DropMenu(session, "editMenu", Flow.PAGE);
+		final DropMenu editMenu=new DropMenu(Flow.PAGE);
 		editMenu.setLabel("Edit");
-		final Link copyMenuLink=new Link(session, "copyMenuItem");
+		final Link copyMenuLink=new Link();
 		copyMenuLink.setLabel("Copy");
 		editMenu.add(copyMenuLink);
-		final Link cutMenuLink=new Link(session, "cutMenuItem");
+		final Link cutMenuLink=new Link();
 		cutMenuLink.setLabel("Cut");
 		editMenu.add(cutMenuLink);
-		final Link pasteMenuLink=new Link(session, "pasteMenuItem");
+		final Link pasteMenuLink=new Link();
 		pasteMenuLink.setLabel("Paste");
 		editMenu.add(pasteMenuLink);
 		menu.add(editMenu);
 
-		final DropMenu windowMenu=new DropMenu(session, "windowMenu", Flow.PAGE);
+		final DropMenu windowMenu=new DropMenu(Flow.PAGE);
 		windowMenu.setLabel("Window");
 
-		final DropMenu arrangeMenu=new DropMenu(session, "arrangeMenu", Flow.PAGE);
+		final DropMenu arrangeMenu=new DropMenu(Flow.PAGE);
 		arrangeMenu.setLabel("Arrange");
 		
-		final Link tileMenuLink=new Link(session, "tileMenuItem");
+		final Link tileMenuLink=new Link();
 		tileMenuLink.setLabel("Tile");
 		arrangeMenu.add(tileMenuLink);
-		final Link cascadeMenuLink=new Link(session, "cascadeMenuItem");
+		final Link cascadeMenuLink=new Link();
 		cascadeMenuLink.setLabel("Cascade");
 		arrangeMenu.add(cascadeMenuLink);
 		windowMenu.add(arrangeMenu);
 		menu.add(windowMenu);
 
 			//GlobalMentor
-		final Link globalmentorLink=new Link(session);
+		final Link globalmentorLink=new Link();
 		globalmentorLink.setLabel("GlobalMentor");
 		globalmentorLink.addActionListener(new NavigateActionListener(URI.create("http://www.globalmentor.com/")));
 		menu.add(globalmentorLink);
@@ -912,23 +901,23 @@ Debug.trace("now tab enabled is", remoteTabControl.isValueEnabled(helloPanel));
 	}
 
 
-	protected AccordionMenu createAccordionMenu(final GuiseSession session, final Flow flow)
+	protected AccordionMenu createAccordionMenu(final Flow flow)
 	{
-		final AccordionMenu menu=new AccordionMenu(session, flow);
+		final AccordionMenu menu=new AccordionMenu(flow);
 
-		final AccordionMenu fileMenu=new AccordionMenu(session, Flow.PAGE);
+		final AccordionMenu fileMenu=new AccordionMenu(Flow.PAGE);
 		fileMenu.setLabel("File");
-		final Link openMenuLink=new Link(session);
+		final Link openMenuLink=new Link();
 		openMenuLink.setLabel("Open");
 		fileMenu.add(openMenuLink);
-		final Link closeMenuLink=new Link(session);
+		final Link closeMenuLink=new Link();
 		closeMenuLink.setLabel("Close");
 		fileMenu.add(closeMenuLink);
 		menu.add(fileMenu);
 
-		final AccordionMenu editMenu=new AccordionMenu(session, Flow.PAGE);
+		final AccordionMenu editMenu=new AccordionMenu(Flow.PAGE);
 		editMenu.setLabel("Edit");
-		final Message message1=new Message(session);
+		final Message message1=new Message();
 		message1.setMessage("This is a message to show.");
 		editMenu.add(message1);
 		menu.add(editMenu);
@@ -941,9 +930,9 @@ Debug.trace("now tab enabled is", remoteTabControl.isValueEnabled(helloPanel));
 					}
 				});
 
-		final AccordionMenu stuffMenu=new AccordionMenu(session, Flow.PAGE);
+		final AccordionMenu stuffMenu=new AccordionMenu(Flow.PAGE);
 		stuffMenu.setLabel("Stuff");
-		final Message message2=new Message(session);
+		final Message message2=new Message();
 		message2.setMessage("This is a message to show.");
 		stuffMenu.add(message2);
 		menu.add(stuffMenu);
@@ -955,17 +944,16 @@ Debug.trace("now tab enabled is", remoteTabControl.isValueEnabled(helloPanel));
 	{
 		protected final Label label;
 		
-		public TestFrame(final GuiseSession session)
+		public TestFrame()
 		{
-			super(session);
-//TODO del			final LayoutPanel contentPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE)); 
-			label=new Label(session);
+//TODO del			final LayoutPanel contentPanel=new LayoutPanel(new FlowLayout(Flow.PAGE)); 
+			label=new Label();
 			label.setLabel("This is frame content");
 			setContent(label);
 /*TODO del; testing scrolled flyovers			
 			contentPanel.add(label);
 			
-			final Text text=new Text(session);
+			final Text text=new Text();
 			text.getModel().setText("This is some text. It is added so that it will make the frame wrap and keep going."
 					+" This is some text. It is added so that it will make the frame wrap and keep going."
 					+" This is some text. It is added so that it will make the frame wrap and keep going."
@@ -979,7 +967,7 @@ Debug.trace("now tab enabled is", remoteTabControl.isValueEnabled(helloPanel));
 			);
 			contentPanel.add(text);
 
-			final Link frameLink=new Link(session);
+			final Link frameLink=new Link();
 			frameLink.setLabelText("Frame");
 			frameLink.getModel().setDescription("This is a flyover for the frame link.");
 			frameLink.setFlyoverEnabled(true);	//turn on flyovers
@@ -987,7 +975,7 @@ Debug.trace("now tab enabled is", remoteTabControl.isValueEnabled(helloPanel));
 			frameLink.getFlyoverStrategy().setPreferredHeight(new Extent(10, Extent.Unit.EM));
 			contentPanel.add(frameLink);
 
-			final Text otherText=new Text(session);
+			final Text otherText=new Text();
 			otherText.getModel().setText("This is some text. It is added so that it will make the frame wrap and keep going."
 					+" This is some text. It is added so that it will make the frame wrap and keep going."
 			);

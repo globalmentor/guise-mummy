@@ -42,169 +42,139 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport>
 		/**@return The maximum content length to accept, or -1 if there is no limit to the content length.*/
 		public long getMaxContentLength() {return maxContentLength;}
 
-	/**Session constructor.
-	@param session The Guise session that owns this validator.
-	*/
+	/**Default constructor.*/
 	public ResourceImportValidator(final GuiseSession session)
 	{
-		this(session, -1);	//accept any content type, extension, and content length, and don't require a value
+		this(-1);	//accept any content type, extension, and content length, and don't require a value
 	}
 
-	/**Session and maximum content length constructor.
-	@param session The Guise session that owns this validator.
+	/**Maximum content length constructor.
 	@param maxContentLength The maximum content length to accept, or -1 if there is no limit to the content length.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public ResourceImportValidator(final GuiseSession session, final long maxContentLength)
+	public ResourceImportValidator(final long maxContentLength)
 	{
-		this(session, maxContentLength, false);	//accept any content type and extension, and don't require a value
+		this(maxContentLength, false);	//accept any content type and extension, and don't require a value
 	}
 
-	/**Session, maximum content length, and value required constructor.
-	@param session The Guise session that owns this validator.
+	/**Maximum content length and value required constructor.
 	@param maxContentLength The maximum content length to accept, or -1 if there is no limit to the content length.
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public ResourceImportValidator(final GuiseSession session, final long maxContentLength, final boolean valueRequired)
+	public ResourceImportValidator(final long maxContentLength, final boolean valueRequired)
 	{
-		this(session, null, null, maxContentLength, valueRequired);	//accept any content type and extension
+		this(null, null, maxContentLength, valueRequired);	//accept any content type and extension
 	}
 
-	/**Session, and accepted content types constructor.
-	@param session The Guise session that owns this validator.
+	/**Accepted content types constructor.
 	@param acceptedContentTypes The accepted content types, each of which can have the special wildcard ("*") subtype, or <code>null</code> if all content types are accepted.	
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public ResourceImportValidator(final GuiseSession session, final Set<ContentType> acceptedContentTypes)
+	public ResourceImportValidator(final Set<ContentType> acceptedContentTypes)
 	{
-		this(session, acceptedContentTypes, false);	//don't require a value
+		this(acceptedContentTypes, false);	//don't require a value
 	}
 
-	/**Session, and accepted content type constructor.
-	@param session The Guise session that owns this validator.
+	/**Accepted content type constructor.
 	@param acceptedContentType The single accepted content types.	
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public ResourceImportValidator(final GuiseSession session, final ContentType acceptedContentType)
+	public ResourceImportValidator(final ContentType acceptedContentType)
 	{
-		this(session, acceptedContentType, false);	//don't require a value
+		this(acceptedContentType, false);	//don't require a value
 	}
 
-	/**Session, accepted content type, and value required constructor.
-	@param session The Guise session that owns this validator.
+	/**Accepted content type, and value required constructor.
 	@param acceptedContentType The single accepted content types.	
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public ResourceImportValidator(final GuiseSession session, final ContentType acceptedContentType, final boolean valueRequired)
+	public ResourceImportValidator(final ContentType acceptedContentType, final boolean valueRequired)
 	{
-		this(session, createHashSet(acceptedContentType), valueRequired);	//pass a hash set with the single accepted content type
+		this(createHashSet(acceptedContentType), valueRequired);	//pass a hash set with the single accepted content type
 	}
 
-	/**Session, accepted content types, and value required constructor.
-	@param session The Guise session that owns this validator.
+	/**Accepted content types and value required constructor.
 	@param acceptedContentTypes The accepted content types, each of which can have the special wildcard ("*") subtype, or <code>null</code> if all content types are accepted.	
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public ResourceImportValidator(final GuiseSession session, final Set<ContentType> acceptedContentTypes, final boolean valueRequired)
+	public ResourceImportValidator(final Set<ContentType> acceptedContentTypes, final boolean valueRequired)
 	{
-		this(session, acceptedContentTypes, -1, valueRequired);	//accept any content length
+		this(acceptedContentTypes, -1, valueRequired);	//accept any content length
 	}
 
-	/**Session, accepted content types, and maximum content length constructor.
-	@param session The Guise session that owns this validator.
+	/**Accepted content types and maximum content length constructor.
 	@param acceptedContentTypes The accepted content types, each of which can have the special wildcard ("*") subtype, or <code>null</code> if all content types are accepted.	
 	@param maxContentLength The maximum content length to accept, or -1 if there is no limit to the content length.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public ResourceImportValidator(final GuiseSession session, final Set<ContentType> acceptedContentTypes, final long maxContentLength)
+	public ResourceImportValidator(final Set<ContentType> acceptedContentTypes, final long maxContentLength)
 	{
-		this(session, acceptedContentTypes, null, maxContentLength, false);	//accept any content types and don't require a value		
+		this(acceptedContentTypes, null, maxContentLength, false);	//accept any content types and don't require a value		
 	}
 
-	/**Session, accepted content type, and maximum content length constructor.
-	@param session The Guise session that owns this validator.
-	@param acceptedContentType The single accepted content types.	
+	/**Accepted content type and maximum content length constructor.
+	@param acceptedContentType The single accepted content type.
 	@param maxContentLength The maximum content length to accept, or -1 if there is no limit to the content length.
-	@exception NullPointerException if the given session and/or accepted content type is <code>null</code>.
 	*/
-	public ResourceImportValidator(final GuiseSession session, final ContentType acceptedContentType, final long maxContentLength)
+	public ResourceImportValidator(final ContentType acceptedContentType, final long maxContentLength)
 	{
-		this(session, acceptedContentType, maxContentLength, false);	//don't require a value
+		this(acceptedContentType, maxContentLength, false);	//don't require a value
 	}
 
-	/**Session, accepted content type, maximum content length, and value required constructor.
-	@param session The Guise session that owns this validator.
-	@param acceptedContentType The single accepted content types.	
+	/**Accepted content type, maximum content length, and value required constructor.
+	@param acceptedContentType The single accepted content type.
 	@param maxContentLength The maximum content length to accept, or -1 if there is no limit to the content length.
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
-	@exception NullPointerException if the given session and/or content type is <code>null</code>.
 	*/
-	public ResourceImportValidator(final GuiseSession session, final ContentType acceptedContentType, final long maxContentLength, final boolean valueRequired)
+	public ResourceImportValidator(final ContentType acceptedContentType, final long maxContentLength, final boolean valueRequired)
 	{		
-		this(session, createHashSet(acceptedContentType), maxContentLength, valueRequired);	//pass a hash set with the single accepted content type
+		this(createHashSet(acceptedContentType), maxContentLength, valueRequired);	//pass a hash set with the single accepted content type
 	}
 
-	/**Session, accepted content types, maximum content length, and value required constructor.
-	@param session The Guise session that owns this validator.
+	/**Accepted content types, maximum content length, and value required constructor.
 	@param acceptedContentTypes The accepted content types, each of which can have the special wildcard ("*") subtype, or <code>null</code> if all content types are accepted.	
 	@param maxContentLength The maximum content length to accept, or -1 if there is no limit to the content length.
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public ResourceImportValidator(final GuiseSession session, final Set<ContentType> acceptedContentTypes, final long maxContentLength, final boolean valueRequired)
+	public ResourceImportValidator(final Set<ContentType> acceptedContentTypes, final long maxContentLength, final boolean valueRequired)
 	{
-		this(session, acceptedContentTypes, null, maxContentLength, valueRequired);	//accept any content types
+		this(acceptedContentTypes, null, maxContentLength, valueRequired);	//accept any content types
 	}
 
-	/**Session, accepted content types, and accepted extensions constructor.
-	@param session The Guise session that owns this validator.
+	/**Accepted content types, and accepted extensions constructor.
 	@param acceptedContentTypes The accepted content types, each of which can have the special wildcard ("*") subtype, or <code>null</code> if all content types are accepted.	
 	@param acceptedExtensions The accepted filename extensions, or <code>null</code> if all filename extensions are accepted.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public ResourceImportValidator(final GuiseSession session, final Set<ContentType> acceptedContentTypes, final Set<String> acceptedExtensions)
+	public ResourceImportValidator(final Set<ContentType> acceptedContentTypes, final Set<String> acceptedExtensions)
 	{
-		this(session, acceptedContentTypes, acceptedExtensions, false);	//accept any content length and don't require a value
+		this(acceptedContentTypes, acceptedExtensions, false);	//accept any content length and don't require a value
 	}
 
-	/**Session, accepted content types, accepted extensions, and value required constructor.
-	@param session The Guise session that owns this validator.
+	/**Accepted content types, accepted extensions, and value required constructor.
 	@param acceptedContentTypes The accepted content types, each of which can have the special wildcard ("*") subtype, or <code>null</code> if all content types are accepted.	
 	@param acceptedExtensions The accepted filename extensions, or <code>null</code> if all filename extensions are accepted.
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public ResourceImportValidator(final GuiseSession session, final Set<ContentType> acceptedContentTypes, final Set<String> acceptedExtensions, final boolean valueRequired)
+	public ResourceImportValidator(final Set<ContentType> acceptedContentTypes, final Set<String> acceptedExtensions, final boolean valueRequired)
 	{
-		this(session, acceptedContentTypes, acceptedExtensions, -1, valueRequired);	//accept any content length
+		this(acceptedContentTypes, acceptedExtensions, -1, valueRequired);	//accept any content length
 	}
 
-	/**Session, accepted content types, accepted extensions, and maximum content length constructor.
-	@param session The Guise session that owns this validator.
+	/**Accepted content types, accepted extensions, and maximum content length constructor.
 	@param acceptedContentTypes The accepted content types, each of which can have the special wildcard ("*") subtype, or <code>null</code> if all content types are accepted.	
 	@param acceptedExtensions The accepted filename extensions, or <code>null</code> if all filename extensions are accepted.
 	@param maxContentLength The maximum content length to accept, or -1 if there is no limit to the content length.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public ResourceImportValidator(final GuiseSession session, final Set<ContentType> acceptedContentTypes, final Set<String> acceptedExtensions, final long maxContentLength)
+	public ResourceImportValidator(final Set<ContentType> acceptedContentTypes, final Set<String> acceptedExtensions, final long maxContentLength)
 	{
-		this(session, acceptedContentTypes, acceptedExtensions, maxContentLength, false);	//don't require a value
+		this(acceptedContentTypes, acceptedExtensions, maxContentLength, false);	//don't require a value
 	}
 
-	/**Session, accepted content types, accepted extensions, maximum content length, and value required constructor.
-	@param session The Guise session that owns this validator.
+	/**Accepted content types, accepted extensions, maximum content length, and value required constructor.
 	@param acceptedContentTypes The accepted content types, each of which can have the special wildcard ("*") subtype, or <code>null</code> if all content types are accepted.	
 	@param acceptedExtensions The accepted filename extensions, or <code>null</code> if all filename extensions are accepted.
 	@param maxContentLength The maximum content length to accept, or -1 if there is no limit to the content length.
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public ResourceImportValidator(final GuiseSession session, final Set<ContentType> acceptedContentTypes, final Set<String> acceptedExtensions, final long maxContentLength, final boolean valueRequired)
+	public ResourceImportValidator(final Set<ContentType> acceptedContentTypes, final Set<String> acceptedExtensions, final long maxContentLength, final boolean valueRequired)
 	{
-		super(session, valueRequired);	//construct the parent class
+		super(valueRequired);	//construct the parent class
 		this.acceptedContentTypes=acceptedContentTypes!=null ? unmodifiableSet(new HashSet<ContentType>(acceptedContentTypes)) : null;	//create a read-only copy of the content types passed
 		this.acceptedExtensions=acceptedExtensions!=null ? unmodifiableSet(new HashSet<String>(acceptedExtensions)) : null;	//create a read-only copy of the extensions passed
 		this.maxContentLength=maxContentLength;

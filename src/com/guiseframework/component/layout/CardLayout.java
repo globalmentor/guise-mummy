@@ -1,6 +1,5 @@
 package com.guiseframework.component.layout;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.model.*;
 
 /**A layout that manages child components as an ordered stack of cards.
@@ -20,16 +19,7 @@ public class CardLayout extends AbstractValueLayout<CardConstraints>
 	*/
 	public CardConstraints createDefaultConstraints()
 	{
-		return new CardConstraints(getSession());	//create constraints with a default label model
-	}
-
-	/**Session constructor.
-	@param session The Guise session that owns this layout.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public CardLayout(final GuiseSession session)
-	{
-		super(session);	//construct the parent class
+		return new CardConstraints();	//create constraints with a default label model
 	}
 
 }

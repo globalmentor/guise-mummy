@@ -3,8 +3,6 @@ package com.guiseframework.component;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.guiseframework.GuiseSession;
-
 /**Abstract implementation of a composite component that keeps track of its child components in sequence.
 Iterating over child components is thread safe.
 @author Garret Wilson
@@ -45,16 +43,5 @@ public abstract class AbstractListCompositeComponent<C extends CompositeComponen
 
 	/**@return Whether this component has children. This implementation delegates to the component list.*/
 	public boolean hasChildren() {return !componentList.isEmpty();}
-
-	/**Session and ID constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the given session, layout, and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public AbstractListCompositeComponent(final GuiseSession session, final String id)
-	{
-		super(session, id);	//construct the parent class
-	}
 
 }

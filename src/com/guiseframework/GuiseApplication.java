@@ -6,7 +6,6 @@ import java.util.Locale;
 import java.util.Set;
 
 import com.garretwilson.beans.PropertyBindable;
-import com.garretwilson.net.URIUtilities;
 import com.guiseframework.component.*;
 import com.guiseframework.component.kit.ComponentKit;
 import com.guiseframework.context.GuiseContext;
@@ -126,10 +125,9 @@ public interface GuiseApplication extends PropertyBindable
 	public GuiseSession createSession();
 
 	/**Creates a frame for the application.
-	@param session The Guise session that will own the application frame.
 	@return A new frame for the application.
 	*/
-	public ApplicationFrame<?> createApplicationFrame(final GuiseSession session);
+	public ApplicationFrame<?> createApplicationFrame();
 
 	/**Reports the base path of the application.
 	The base path is an absolute path that ends with a slash ('/'), indicating the base path of the navigation panels.

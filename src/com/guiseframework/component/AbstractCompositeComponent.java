@@ -2,8 +2,6 @@ package com.guiseframework.component;
 
 import java.beans.PropertyChangeListener;
 
-import com.garretwilson.util.Debug;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.event.AbstractGuisePropertyChangeListener;
 import com.guiseframework.event.GuisePropertyChangeEvent;
 import com.guiseframework.event.NotificationEvent;
@@ -75,19 +73,6 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 					};
 		}
 		return notificationListener;	//return the notification listener
-	}
-
-	/**Session and ID constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	@exception IllegalStateException if no controller is registered for this component type.
-	@exception IllegalStateException if no view is registered for this component type.
-	*/
-	public AbstractCompositeComponent(final GuiseSession session, final String id)
-	{
-		super(session, id);	//construct the parent class
 	}
 
 	/**Adds a child component.

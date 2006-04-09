@@ -6,7 +6,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.Component;
 import com.guiseframework.component.Container;
 import com.guiseframework.model.*;
@@ -145,14 +144,10 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 		this.selectedIndex=-1;	//always uncache the selected index, because the index of the selected component might have changed
 	}
 
-	/**Session constructor.
-	@param session The Guise session that owns this layout.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public AbstractValueLayout(final GuiseSession session)
+	/**Default constructor.*/
+	public AbstractValueLayout()
 	{
-		super(session);	//construct the parent class
-		this.valueModel=(ValueModel<Component<?>>)new DefaultValueModel<Component>(session, Component.class);	//create a new value model
+		this.valueModel=(ValueModel<Component<?>>)new DefaultValueModel<Component>(Component.class);	//create a new value model
 		this.valueModel.addPropertyChangeListener(new PropertyChangeListener()	//create a listener to listen for the value model changing a property value
 				{
 					public void propertyChange(final PropertyChangeEvent propertyChangeEvent)	//if the value model changes a property value

@@ -1,7 +1,6 @@
 package com.guiseframework.component;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.model.*;
 
 /**A heading component.
@@ -37,71 +36,37 @@ public class Heading extends AbstractComponent<Heading>
 			}			
 		}
 
-	/**Session constructor with a default model.
-	@param session The Guise session that owns this component.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public Heading(final GuiseSession session)
+	/**Default constructor with a default label model.*/
+	public Heading()
 	{
-		this(session, null);	//construct the component, indicating that a default ID should be used
+		this(NO_HEADING_LEVEL);	//construct the class with a default model with no heading level
 	}
 
-	/**Session constructor with a default model with the given heading level.
-	@param session The Guise session that owns this component.
+	/**Heading level constructor with a default label model.
 	@param level The zero-based level of the heading, or {@link #NO_HEADING_LEVEL} if no level is specified.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public Heading(final GuiseSession session, final int level)
+	public Heading(final int level)
 	{
-		this(session, null, level);	//construct the component, indicating that a default ID and the given heading level should be used
+		this(new DefaultLabelModel(), level);	//construct the class with a default model
 	}
 
-	/**Session and ID constructor with a default data model.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	/**Label model constructor.
+	@param labelModel The component label model.
+	@exception NullPointerException if the given label model is <code>null</code>.
 	*/
-	public Heading(final GuiseSession session, final String id)
+	public Heading(final LabelModel labelModel)
 	{
-		this(session, id, NO_HEADING_LEVEL);	//construct the class with a default model with no heading level
+		this(labelModel, NO_HEADING_LEVEL);	//construct the class with no heading level
 	}
 
-	/**Session, ID, and heading level.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Label model and level constructor.
+	@param labelModel The component label model.
 	@param level The zero-based level of the heading, or {@link #NO_HEADING_LEVEL} if no level is specified.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given session label model is <code>null</code>.
 	*/
-	public Heading(final GuiseSession session, final String id, final int level)
+	public Heading(final LabelModel labelModel, final int level)
 	{
-		this(session, id, new DefaultModel(session), level);	//construct the class with a default model
-	}
-
-	/**Session, ID, and model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public Heading(final GuiseSession session, final String id, final Model model)
-	{
-		this(session, id, model, NO_HEADING_LEVEL);	//construct the class with no heading level
-	}
-
-	/**Session, ID, model, and level constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
-	@param level The zero-based level of the heading, or {@link #NO_HEADING_LEVEL} if no level is specified.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public Heading(final GuiseSession session, final String id, final Model model, final int level)
-	{
-		super(session, id/*TODO add label model, model*/);	//construct the parent class
+		super(labelModel);	//construct the parent class
 		this.level=level;	//save the level
 	}
 }

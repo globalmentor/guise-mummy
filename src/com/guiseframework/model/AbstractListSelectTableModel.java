@@ -8,7 +8,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.garretwilson.util.CollectionUtilities;
 import com.garretwilson.util.SynchronizedListDecorator;
-import com.guiseframework.GuiseSession;
 
 /**An abstract implementation of a table model representing selectable list values.
 The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class. 
@@ -67,27 +66,25 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 	private final List<ValueModel<Object>[]> valueModelRowArrays;
 
 	/**Constructs a list select table model indicating the type of values it can hold, using a default multiple selection strategy.
-	@param session The Guise session that owns this model.
 	@param valueClass The class indicating the type of values held in the model.
 	@param columns The models representing the table columns.
-	@exception NullPointerException if the given session and/or class object is <code>null</code>.
+	@exception NullPointerException if the given value class is <code>null</code>.
 	*/
-	public AbstractListSelectTableModel(final GuiseSession session, final Class<V> valueClass, final TableColumnModel<?>... columns)
+	public AbstractListSelectTableModel(final Class<V> valueClass, final TableColumnModel<?>... columns)
 	{
-		this(session, valueClass, new MultipleListSelectionPolicy<V>(), columns);	//construct the class with a multiple selection strategy
+		this(valueClass, new MultipleListSelectionPolicy<V>(), columns);	//construct the class with a multiple selection strategy
 	}
 
 	/**Constructs a list select table model indicating the type of values it can hold.
 	The selection strategy is not added as a listener to this model but is rather notified manually so that the event won't be delayed and/or sent out of order
-	@param session The Guise session that owns this model.
 	@param valueClass The class indicating the type of values held in the model.
 	@param listSelectionStrategy The strategy for selecting values in the model.
 	@param columns The models representing the table columns.
-	@exception NullPointerException if the given session, class object, and/or selection strategy is <code>null</code>.
+	@exception NullPointerException if the given value class and/or selection strategy is <code>null</code>.
 	*/
-	public AbstractListSelectTableModel(final GuiseSession session, final Class<V> valueClass, final ListSelectionPolicy<V> listSelectionStrategy, final TableColumnModel<?>... columns)
+	public AbstractListSelectTableModel(final Class<V> valueClass, final ListSelectionPolicy<V> listSelectionStrategy, final TableColumnModel<?>... columns)
 	{
-		super(session, valueClass, listSelectionStrategy);	//construct the parent class
+		super(valueClass, listSelectionStrategy);	//construct the parent class
 		CollectionUtilities.addAll(logicalTableColumnModels, columns);	//add all the columns to our logical list of table columns
 		CollectionUtilities.addAll(tableColumnModels, columns);	//add all the columns to our list of table columns
 		valueModelRowArrays=new SynchronizedListDecorator<ValueModel<Object>[]>(new ArrayList<ValueModel<Object>[]>(), this);	//create a list of value model arrays, synchronizing all access on this object

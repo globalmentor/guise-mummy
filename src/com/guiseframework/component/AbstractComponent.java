@@ -9,7 +9,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.mail.internet.ContentType;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.effect.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.component.transfer.*;
@@ -21,7 +20,6 @@ import com.guiseframework.model.*;
 import com.guiseframework.style.Color;
 import com.guiseframework.view.View;
 
-import static com.garretwilson.lang.CharSequenceUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.text.TextUtilities.*;
 import static com.garretwilson.util.ArrayUtilities.*;
@@ -34,7 +32,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 {
 
 	/**Extra characters allowed in the ID, verified for URI safeness.*/
-	protected final static String ID_EXTRA_CHARACTERS="-_.";
+//TODO del	protected final static String ID_EXTRA_CHARACTERS="-_.";
 
 	/**The object managing event listeners.*/
 	private final EventListenerManager eventListenerManager=new EventListenerManager();
@@ -75,7 +73,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 				final String oldName=name;	//get the old value
 				name=newName;	//actually change the value
 				firePropertyChange(NAME_PROPERTY, oldName, newName);	//indicate that the value changed
-			}			
+			}
 		}
 
 	/**@return The icon URI, or <code>null</code> if there is no icon URI.*/
@@ -656,18 +654,6 @@ Debug.trace("now valid of", this, "is", isValid());
 
 		/**@return The component identifier.*/
 		public String getID() {return id;}
-
-		/**Creates an ID by combining this component's ID and the the given ID segment.
-		This implementation combines this component's ID with the ID segment using '.' as a delimiter.
-		@param idSegment The ID segment, which must itself be a valid ID, to include in the full ID.
-		@return An ID appropriate for a child component of this component.
-		@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-		@see Component#ID_SEGMENT_DELIMITER
-		*/
-		public String createID(final String idSegment)
-		{
-			return getID()+ID_SEGMENT_DELIMITER+checkValidComponentID(idSegment);	//make sure the ID segment is a valid ID and combine it with this component's ID
-		}
 		
 	/**The internationalization orientation of the component's contents, or <code>null</code> if the default orientation should be used.*/
 	private Orientation orientation=null;
@@ -721,33 +707,6 @@ Debug.trace("now valid of", this, "is", isValid());
 				orientation=newOrientation;	//actually change the value
 				firePropertyChange(ORIENTATION_PROPERTY, oldOrientation, newOrientation);	//indicate that the value changed
 			}
-		}
-
-		/**Determines if the given string is a valid component ID.
-		A valid component ID begins with a letter and is composed only of letters, digits, and/or the characters '-' and '_'.
-		@param string The string to check for component identifier compliance.
-		@return <code>true</code> if the string is a valid component ID, else <code>false</code>.
-		@exception NullPointerException if the given string is <code>null</code>.
-		*/ 		
-		public static boolean isValidComponentID(final String string)
-		{
-			return string.length()>0 && Character.isLetter(string.charAt(0)) && isLettersDigitsCharacters(string, ID_EXTRA_CHARACTERS);	//make sure the string has characters; that the first character is a letter; and that the remaining characters are letters, digits, and/or the extra ID characters
-		}
-
-		/**Checks to ensure that the given string is a valid component identifier, throwing an exception if not.
-		@param string The string to check for component identifier compliance.
-		@return The component identifier after being checked for compliance.
-		@exception IllegalArgumentException if the given string is not a valid component ID.
-		@exception NullPointerException if the given string is <code>null</code>.
-		@see #isValidComponentID(String)
-		*/
-		public static String checkValidComponentID(final String string)
-		{
-			if(!isValidComponentID(string))	//if the string is not a valid component ID
-			{
-				throw new IllegalArgumentException("Invalid component ID: \""+string+"\".");
-			}
-			return string;	//return the string; it passed the test
 		}
 
 	/**The parent of this component, or <code>null</code> if this component does not have a parent.*/
@@ -1094,43 +1053,27 @@ Debug.trace("now valid of", this, "is", isValid());
 			return false;	//indicate that no data could be imported
 		}
 
-	/**Session and ID constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	/**Default constructor.
 	@exception IllegalStateException if no controller is registered for this component type.
 	@exception IllegalStateException if no view is registered for this component type.
 	*/
-	public AbstractComponent(final GuiseSession session, final String id)
+	public AbstractComponent()
 	{
-		this(session, id, new DefaultLabelModel(session));	//construct the component with a default label model
+		this(new DefaultLabelModel());	//construct the component with a default label model
 	}
 
-	/**Session, ID, and label model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Label model constructor.
 	@param labelModel The component label model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given model is <code>null</code>.
 	@exception IllegalStateException if no controller is registered for this component type.
 	@exception IllegalStateException if no view is registered for this component type.
 	*/
-	public AbstractComponent(final GuiseSession session, final String id, final LabelModel labelModel)
+	public AbstractComponent(final LabelModel labelModel)
 	{
-		super(session);	//construct the parent class
-		if(id!=null)	//if an ID was provided
-		{
-			this.id=checkValidComponentID(id);	//save the ID, checking for compliance
-		}
-		else	//if an ID was not provided
-		{
-			this.id=getSession().generateComponentID();	//ask the session to generate a new ID
-//TODO del when works			this.id=getVariableName(getClass());	//create an ID by transforming the simple class name to a variable name
-		}
+		this.id=getSession().generateID();	//ask the session to generate a new ID
 		this.labelModel=checkInstance(labelModel, "Label model cannot be null.");	//save the label model
 		this.labelModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the label model
-		controller=session.getApplication().getController(getThis());	//ask the application for a controller
+		controller=getSession().getApplication().getController(getThis());	//ask the application for a controller
 		if(controller==null)	//if we couldn't find a controller
 		{
 			throw new IllegalStateException("No registered controller for "+getClass().getName());	//TODO use a better error
@@ -1260,7 +1203,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	{
 		if(hasMouseListeners())	//if there are mouse listeners registered
 		{
-			final MouseEvent mouseEvent=new MouseEvent(getSession(), getThis(), componentBounds, viewportBounds, mousePosition);	//create a new mouse event
+			final MouseEvent mouseEvent=new MouseEvent(getThis(), componentBounds, viewportBounds, mousePosition);	//create a new mouse event
 			getSession().queueEvent(new PostponedMouseEvent(getEventListenerManager(), mouseEvent, PostponedMouseEvent.EventType.ENTERED));	//tell the Guise session to queue the event
 		}
 	}
@@ -1277,7 +1220,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	{
 		if(hasMouseListeners())	//if there are mouse listeners registered
 		{
-			final MouseEvent mouseEvent=new MouseEvent(getSession(), getThis(), componentBounds, viewportBounds, mousePosition);	//create a new mouse event
+			final MouseEvent mouseEvent=new MouseEvent(getThis(), componentBounds, viewportBounds, mousePosition);	//create a new mouse event
 			getSession().queueEvent(new PostponedMouseEvent(getEventListenerManager(), mouseEvent, PostponedMouseEvent.EventType.EXITED));	//tell the Guise session to queue the event
 		}
 	}
@@ -1558,7 +1501,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	*/
 	protected void fireNotified(final Notification notification)
 	{
-		fireNotified(new NotificationEvent(getSession(), getThis(), notification));	//create and fire a new notification event
+		fireNotified(new NotificationEvent(getThis(), notification));	//create and fire a new notification event
 	}
 
 	/**Fires an event to all registered notification listeners with the new notification information.
@@ -1842,10 +1785,9 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 		protected FlyoverFrame<?> createFrame()
 		{
 			final S component=getComponent();	//get the component
-			final GuiseSession session=component.getSession();	//get the session
-			final FlyoverFrame<?> frame=new DefaultFlyoverFrame(session);	//create a default frame
+			final FlyoverFrame<?> frame=new DefaultFlyoverFrame();	//create a default frame
 			frame.setRelatedComponent(getComponent());	//tell the flyover frame with which component it is related
-			final Message message=new Message(session);	//create a new message
+			final Message message=new Message();	//create a new message
 			message.setMessageContentType(component.getDescriptionContentType());	//set the appropriate message content
 			message.setMessage(component.getDescription());	//set the appropriate message text
 			message.setMessageResourceKey(component.getDescriptionResourceKey());	//set the appropriate message text resource			

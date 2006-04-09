@@ -5,7 +5,6 @@ import java.util.concurrent.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 
@@ -95,54 +94,26 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		return treeNodeComponentState.getComponent();	//return the representation component
 	}
 
-	/**Session constructor with a default data model.
-	@param session The Guise session that owns this component.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public TreeControl(final GuiseSession session)
+	/**Default constructor with a default tree model.*/
+	public TreeControl()
 	{
-		this(session, (String)null);	//construct the component, indicating that a default ID should be used
+		this(new DefaultTreeModel());	//construct the class with a default model
 	}
 
-	/**Session and ID constructor with a default data model.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	/**Tree model constructor.
+	@param treeModel The component tree model.
+	@exception NullPointerException if the given tree model is <code>null</code>.
 	*/
-	public TreeControl(final GuiseSession session, final String id)
+	public TreeControl(final TreeModel treeModel)
 	{
-		this(session, id, new DefaultTreeModel(session));	//construct the class with a default model
-	}
-
-	/**Session and model constructor.
-	@param session The Guise session that owns this component.
-	@param model The component data model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	*/
-	public TreeControl(final GuiseSession session, final TreeModel model)
-	{
-		this(session, null, model);	//construct the component, indicating that a default ID should be used
-	}
-
-	/**Session, ID, and model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param treeModel The component data model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public TreeControl(final GuiseSession session, final String id, final TreeModel treeModel)
-	{
-		super(session, id);	//construct the parent class
 		this.treeModel=checkInstance(treeModel, "Tree model cannot be null.");	//save the tree model
 		this.treeModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the tree model
 		this.treeModel.addTreeNodePropertyChangeListener(treeNodePropertyChangeListener);	//listen and repeat all property changes of the tree nodes in the tree model
 			//TODO listen for and repeat tree model-specific events
-		setTreeNodeRepresentationStrategy(Object.class, new DefaultValueRepresentationStrategy<Object>(session));	//create a default representation strategy and set it as the default by associating it with the Object class
-		setTreeNodeRepresentationStrategy(LabelModel.class, new LabelModelTreeNodeRepresentationStrategy(session));	//create and associate a label model representation strategy
+		setTreeNodeRepresentationStrategy(Object.class, new DefaultValueRepresentationStrategy<Object>());	//create a default representation strategy and set it as the default by associating it with the Object class
+		setTreeNodeRepresentationStrategy(LabelModel.class, new LabelModelTreeNodeRepresentationStrategy());	//create and associate a label model representation strategy
 //TODO fix		setTreeNodeRepresentationStrategy(MessageModel.class, new MessageModelRepresentationStrategy(session));	//create and associate a message model representation strategy
-		setTreeNodeRepresentationStrategy(TextModel.class, new TextModelTreeNodeRepresentationStrategy(session));	//create and associate a text model representation strategy
+		setTreeNodeRepresentationStrategy(TextModel.class, new TextModelTreeNodeRepresentationStrategy());	//create and associate a text model representation strategy
 	}
 
 	/**Adds a tree node property change listener.
@@ -236,21 +207,6 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	*/
 	public static abstract class AbstractTreeNodeRepresentationStrategy<V> implements TreeNodeRepresentationStrategy<V>
 	{
-
-		/**The Guise session that owns this representation strategy.*/
-		private final GuiseSession session;
-
-			/**@return The Guise session that owns this representation strategy.*/
-			public GuiseSession getSession() {return session;}
-
-		/**Session constructor.
-		@param session The Guise session that owns this representation strategy.
-		@exception NullPointerException if the given session is <code>null</code>.
-		*/
-		public AbstractTreeNodeRepresentationStrategy(final GuiseSession session)
-		{
-			this.session=checkInstance(session, "Session cannot be null");	//save the session
-		}
 	}
 
 	/**A default tree node representation strategy.
@@ -261,16 +217,6 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	*/
 	public static class DefaultValueRepresentationStrategy<V> extends AbstractTreeNodeRepresentationStrategy<V>
 	{
-
-		/**Session constructor.
-		@param session The Guise session that owns this representation strategy.
-		@exception NullPointerException if the given session is <code>null</code>.
-		*/
-		public DefaultValueRepresentationStrategy(final GuiseSession session)
-		{
-			super(session);	//construct the parent class
-		}
-
 		/**Creates a component to represent the given tree node.
 		This implementation returns a label with string value of the given value using the object's <code>toString()</code> method.
 		@param <N> The type of value contained in the node.
@@ -285,17 +231,16 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		@SuppressWarnings("unchecked")
 		public <N extends V> Component<?> createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
 		{
-			final GuiseSession session=getSession();	//get the session
 			if(editable)	//if the component should be editable
 			{
 				final Class<N> valueClass=treeNode.getValueClass();	//get the value class of the column
 				if(Boolean.class.isAssignableFrom(valueClass))	//if the value class is subclass of Boolean
 				{
-					return new CheckControl(session, (ValueModel<Boolean>)(Object)treeNode);	//create a new check control for the Boolean value model TODO find out why JDK 1.5.0_03 requires the intermediate Object cast
+					return new CheckControl((ValueModel<Boolean>)(Object)treeNode);	//create a new check control for the Boolean value model TODO find out why JDK 1.5.0_03 requires the intermediate Object cast
 				}
 				else	//for all other values
 				{
-					return new TextControl<N>(session, treeNode);	//generate a text input control for the value model
+					return new TextControl<N>(treeNode);	//generate a text input control for the value model
 				}
 			}
 			else	//if the component should not be editable, return a label component
@@ -303,7 +248,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 				final N value=treeNode.getValue();	//get the current value
 				if(value!=null)	//if there is value
 				{
-					final Label label=new Label(getSession());	//create a new label
+					final Label label=new Label();	//create a new label
 					label.setLabel(value.toString());	//generate a label containing the value's string value
 					return label;	//return the label
 				}
@@ -322,15 +267,6 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	public static class LabelModelTreeNodeRepresentationStrategy extends AbstractTreeNodeRepresentationStrategy<LabelModel>
 	{
 
-		/**Session constructor.
-		@param session The Guise session that owns this representation strategy.
-		@exception NullPointerException if the given session is <code>null</code>.
-		*/
-		public LabelModelTreeNodeRepresentationStrategy(final GuiseSession session)
-		{
-			super(session);	//construct the parent class
-		}
-
 		/**Creates a label to represent the given tree node.
 		@param <N> The type of value contained in the node.
 		@param treeControl The component containing the model.
@@ -343,8 +279,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		*/
 		public <N extends LabelModel> Label createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
 		{
-			final GuiseSession session=getSession();	//get the session
-			return new Label(session, treeNode.getValue());	//return a label from the label model
+			return new Label(treeNode.getValue());	//return a label from the label model
 		}
 	}
 
@@ -354,15 +289,6 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	*/
 	public static class TextModelTreeNodeRepresentationStrategy extends AbstractTreeNodeRepresentationStrategy<TextModel>
 	{
-
-		/**Session constructor.
-		@param session The Guise session that owns this representation strategy.
-		@exception NullPointerException if the given session is <code>null</code>.
-		*/
-		public TextModelTreeNodeRepresentationStrategy(final GuiseSession session)
-		{
-			super(session);	//construct the parent class
-		}
 
 		/**Creates a text component to represent the given tree node.
 		@param <N> The type of value contained in the node.
@@ -376,8 +302,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		*/
 		public <N extends TextModel> Text createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
 		{
-			final GuiseSession session=getSession();	//get the session
-			return new Text(session, treeNode.getValue());	//return a message from the message model
+			return new Text(treeNode.getValue());	//return a message from the message model
 		}
 	}
 

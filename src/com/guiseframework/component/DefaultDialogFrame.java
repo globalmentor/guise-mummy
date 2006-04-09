@@ -1,6 +1,5 @@
 package com.guiseframework.component;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.model.DefaultValueModel;
 import com.guiseframework.model.ValueModel;
 
@@ -11,96 +10,42 @@ import com.guiseframework.model.ValueModel;
 public class DefaultDialogFrame<V> extends AbstractDialogFrame<V, DefaultDialogFrame<V>>
 {
 
-	/**Session constructor.
-	@param session The Guise session that owns this component.
+	/**Value class constructor.
 	@param valueClass The class indicating the type of value held in the model.
-	@exception NullPointerException if the given session and/or value class is <code>null</code>.
+	@exception NullPointerException if the given value class is <code>null</code>.
 	*/
-	public DefaultDialogFrame(final GuiseSession session, final Class<V> valueClass)
+	public DefaultDialogFrame(final Class<V> valueClass)
 	{
-		this(session, (String)null, valueClass);	//construct the component, indicating that a default ID should be used
+		this(new DefaultValueModel<V>(valueClass));	//use a default value model
 	}
 
-	/**Session and component constructor.
-	@param session The Guise session that owns this component.
+	/**Value class and component constructor.
 	@param valueClass The class indicating the type of value held in the model.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
-	@exception NullPointerException if the given session and/or value class is <code>null</code>.
+	@exception NullPointerException if the given value class is <code>null</code>.
 	*/
-	public DefaultDialogFrame(final GuiseSession session, final Class<V> valueClass, final Component<?> component)
+	public DefaultDialogFrame(final Class<V> valueClass, final Component<?> component)
 	{
-		this(session, (String)null, valueClass, component);	//construct the component, indicating that a default ID should be used
+		this(new DefaultValueModel<V>(valueClass), component);	//use a default value model
 	}
 
-	/**Session and model constructor.
-	@param session The Guise session that owns this component.
-	@param model The component data model.
-	@exception NullPointerException if the given session is <code>null</code>.
+	/**Value model constructor.
+	@param valueModel The component value model.
+	@exception NullPointerException if the given value model is <code>null</code>.
 	*/
-	public DefaultDialogFrame(final GuiseSession session, final ValueModel<V> model)
+	public DefaultDialogFrame(final ValueModel<V> valueModel)
 	{
-		this(session, (String)null, model);	//construct the component, indicating that a default ID should be used
+		this(valueModel, new LayoutPanel());	//default to a layout panel
 	}
 
-	/**Session, model, and component constructor.
-	@param session The Guise session that owns this component.
-	@param model The component data model.
+	/**Value model and component constructor.
+	@param valueModel The component value model.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
-	@exception NullPointerException if the given session is <code>null</code>.
+	@exception NullPointerException if the given value model is <code>null</code>.
 	*/
-	public DefaultDialogFrame(final GuiseSession session, final ValueModel<V> model, final Component<?> component)
+	public DefaultDialogFrame(final ValueModel<V> valueModel, final Component<?> component)
 	{
-		this(session, (String)null, model, component);	//construct the component, indicating that a default ID should be used
-	}
-
-	/**Session and ID constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param valueClass The class indicating the type of value held in the model.
-	@exception NullPointerException if the given session and/or value class is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public DefaultDialogFrame(final GuiseSession session, final String id, final Class<V> valueClass)
-	{
-		this(session, id, new DefaultValueModel<V>(session, valueClass));	//use a default value model
-	}
-
-	/**Session, ID, and component constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param valueClass The class indicating the type of value held in the model.
-	@param component The single child component, or <code>null</code> if this frame should have no child component.
-	@exception NullPointerException if the given session and/or value class is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public DefaultDialogFrame(final GuiseSession session, final String id, final Class<V> valueClass, final Component<?> component)
-	{
-		this(session, id, new DefaultValueModel<V>(session, valueClass), component);	//use a default value model
-	}
-
-	/**Session, ID, and model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public DefaultDialogFrame(final GuiseSession session, final String id, final ValueModel<V> model)
-	{
-		this(session, id, model, new LayoutPanel(session));	//default to a layout panel
-	}
-
-	/**Session, ID, model, and component constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
-	@param component The single child component, or <code>null</code> if this frame should have no child component.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public DefaultDialogFrame(final GuiseSession session, final String id, final ValueModel<V> model, final Component<?> component)
-	{
-		super(session, id, model, component);	//construct the parent class
+		super(valueModel, component);	//construct the parent class
 	}
 
 }

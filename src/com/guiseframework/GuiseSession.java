@@ -489,8 +489,12 @@ public interface GuiseSession extends PropertyBindable
 	*/
 	public void navigateModal(final URI uri, final ModalNavigationListener modalListener);
 
-	/**@return A new component ID appropriate for using with a new component.*/
-	public String generateComponentID();
+	/**Generates a new ID string unique to this session.
+	This ID is appropriate for being used in a new component, for example.
+	The ID will begin with a letter and be composed only of letters and numbers.
+	@return A new ID unique to this session.
+	*/
+	public String generateID();
 
 	/**Called when the session is initialized.
 	@exception IllegalStateException if the session is already initialized.

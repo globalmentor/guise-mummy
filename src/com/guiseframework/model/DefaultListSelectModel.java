@@ -6,7 +6,6 @@ import static java.util.Collections.*;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.*;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.event.*;
 import com.guiseframework.validator.ValidationException;
 import com.guiseframework.validator.Validator;
@@ -810,7 +809,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	{
 		if(getEventListenerManager().hasListeners(ListListener.class))	//if there are appropriate listeners registered
 		{
-			final ListEvent<V> listEvent=new ListEvent<V>(getSession(), this, index, addedElement, removedElement);	//create a new event
+			final ListEvent<V> listEvent=new ListEvent<V>(this, index, addedElement, removedElement);	//create a new event
 			getSession().queueEvent(new PostponedListEvent<V>(getEventListenerManager(), listEvent));	//tell the Guise session to queue the event
 		}
 	}
@@ -825,7 +824,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	{
 		if(getEventListenerManager().hasListeners(ListSelectionListener.class))	//if there are appropriate listeners registered
 		{
-			final ListSelectionEvent<V> selectionEvent=new ListSelectionEvent<V>(getSession(), this, addedIndex, removedIndex);	//create a new event
+			final ListSelectionEvent<V> selectionEvent=new ListSelectionEvent<V>(this, addedIndex, removedIndex);	//create a new event
 			getSession().queueEvent(new PostponedListSelectionEvent<V>(getEventListenerManager(), selectionEvent));	//tell the Guise session to queue the event
 		}
 	}
@@ -852,25 +851,23 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	}
 
 	/**Constructs a list select model indicating the type of values it can hold, using a default multiple selection strategy.
-	@param session The Guise session that owns this model.
 	@param valueClass The class indicating the type of values held in the model.
-	@exception NullPointerException if the given session and/or class object is <code>null</code>.
+	@exception NullPointerException if the given value class is <code>null</code>.
 	*/
-	public DefaultListSelectModel(final GuiseSession session, final Class<V> valueClass)
+	public DefaultListSelectModel(final Class<V> valueClass)
 	{
-		this(session, valueClass, new MultipleListSelectionPolicy<V>());	//construct the class with a multiple selection strategy
+		this(valueClass, new MultipleListSelectionPolicy<V>());	//construct the class with a multiple selection strategy
 	}
 
 	/**Constructs a list select model indicating the type of values it can hold.
 	The selection strategy is not added as a listener to this model but is rather notified manually so that the event won't be delayed and/or sent out of order
-	@param session The Guise session that owns this model.
 	@param valueClass The class indicating the type of values held in the model.
 	@param listSelectionStrategy The strategy for selecting values in the model.
-	@exception NullPointerException if the given session, class object, and/or selection strategy is <code>null</code>.
+	@exception NullPointerException if the given value class and/or selection strategy is <code>null</code>.
 	*/
-	public DefaultListSelectModel(final GuiseSession session, final Class<V> valueClass, final ListSelectionPolicy<V> listSelectionStrategy)
+	public DefaultListSelectModel(final Class<V> valueClass, final ListSelectionPolicy<V> listSelectionStrategy)
 	{
-		super(session, valueClass);	//construct the parent class
+		super(valueClass);	//construct the parent class
 		selectedIndexSet=new SynchronizedSetDecorator<Integer>(new TreeSet<Integer>(), this);	//create a sorted set synchronized on this object
 		values=new SynchronizedListDecorator<V>(new ArrayList<V>(), this);	//create a value list synchronized on this object
 		valueStates=new SynchronizedListDecorator<ValueState>(new ArrayList<ValueState>(), this);	//create a value state list synchronized on this object

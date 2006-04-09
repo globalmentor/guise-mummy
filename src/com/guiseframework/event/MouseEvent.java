@@ -2,7 +2,6 @@ package com.guiseframework.event;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.geometry.*;
 
 /**An event providing mouse information.
@@ -29,17 +28,16 @@ public class MouseEvent extends AbstractGuiseEvent
 		/**@return The position of the mouse relative to the viewport.*/
 		public Point getMousePosition() {return mousePosition;}
 
-	/**Session and source constructor.
-	@param session The Guise session in which this event was generated.
+	/**Source constructor.
 	@param source The object on which the event initially occurred.
 	@param sourceBounds The absolute bounds of the event source.
 	@param viewportBounds The absolute bounds of the viewport.
 	@param mousePosition The position of the mouse relative to the viewport.
-	@exception NullPointerException if the given session, source, source bounds, viewport bounds and/or mouse position is <code>null</code>.
+	@exception NullPointerException if the given source, source bounds, viewport bounds and/or mouse position is <code>null</code>.
 	*/
-	public MouseEvent(final GuiseSession session, final Object source, final Rectangle sourceBounds, final Rectangle viewportBounds, final Point mousePosition)
+	public MouseEvent(final Object source, final Rectangle sourceBounds, final Rectangle viewportBounds, final Point mousePosition)
 	{
-		super(session, source);	//construct the parent class
+		super(source);	//construct the parent class
 		this.sourceBounds=checkInstance(sourceBounds, "Source bounds cannot be null");
 		this.viewportBounds=checkInstance(viewportBounds, "Viewport bounds cannot be null");
 		this.mousePosition=checkInstance(mousePosition, "Mouse position cannot be null");

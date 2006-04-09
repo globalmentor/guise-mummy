@@ -2,7 +2,6 @@ package com.guiseframework.demo;
 
 import java.util.Arrays;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
@@ -18,40 +17,38 @@ Demonstrates on-the-fly validation, on-the-fly error reporting,
 public class LoginPanel extends DefaultNavigationPanel
 {
 
-	/**Guise session constructor.
-	@param session The Guise session that owns this panel.
-	*/
-	public LoginPanel(final GuiseSession session)
+	/**Default constructor.*/
+	public LoginPanel()
 	{
-		super(session, new RegionLayout(session));	//construct the parent class, using a region layout
+		super(new RegionLayout());	//construct the parent class, using a region layout
 		setLabel("Guise\u2122 Demonstration: Login");	//set the panel title
 		
-		final LayoutPanel loginPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE));	//create the authorization panel flowing vertically
+		final LayoutPanel loginPanel=new LayoutPanel(new FlowLayout(Flow.PAGE));	//create the authorization panel flowing vertically
 		
 			//heading
-		final Heading heading=new Heading(session, 0);	//create a top-level heading
+		final Heading heading=new Heading(0);	//create a top-level heading
 		heading.setLabel("Login");	//set the text of the heading, using its model
 		loginPanel.add(heading);	//add the heading to the panel
 
-		final LayoutPanel userPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create the user panel flowing horizontally
+		final LayoutPanel userPanel=new LayoutPanel(new FlowLayout(Flow.LINE));	//create the user panel flowing horizontally
 
 			//ID
-		final TextControl<String> idControl=new TextControl<String>(session, String.class);	//create the ID input control
+		final TextControl<String> idControl=new TextControl<String>(String.class);	//create the ID input control
 		idControl.setLabel("User ID *");	//set the ID control label
-		idControl.setValidator(new RegularExpressionStringValidator(session, ".+", true));	//require at least a single character
+		idControl.setValidator(new RegularExpressionStringValidator(".+", true));	//require at least a single character
 		userPanel.add(idControl);	//add the ID control to the panel
 
 			//password
-		final TextControl<char[]> passwordControl=new TextControl<char[]>(session, char[].class);	//create the password input control
+		final TextControl<char[]> passwordControl=new TextControl<char[]>(char[].class);	//create the password input control
 		passwordControl.setLabel("Password *");	//set the password control label
 		passwordControl.setMasked(true);	//mask the password input
-		passwordControl.setValidator(new RegularExpressionCharArrayValidator(session, ".+", true));	//require at least a single character
+		passwordControl.setValidator(new RegularExpressionCharArrayValidator(".+", true));	//require at least a single character
 		userPanel.add(passwordControl);	//add the password control to the panel
 
 		loginPanel.add(userPanel);	//add the user panel to the login panel
 
 			//login button
-		final Button loginButton=new Button(session);	//create a button for logging in
+		final Button loginButton=new Button();	//create a button for logging in
 		loginButton.setLabel("Log in");	//set the button label
 		loginButton.addActionListener(new ActionListener()	//when the login button is pressed
 				{
@@ -61,14 +58,14 @@ public class LoginPanel extends DefaultNavigationPanel
 						{
 							final char[] password=passwordControl.getValue();	//get the password entered by the user
 							passwordControl.resetValue();	//reset the password value so that it won't be available on subsequent accesses
-							final DemoApplication demoApplication=(DemoApplication)session.getApplication();	//get a reference to the demo application
+							final DemoApplication demoApplication=(DemoApplication)getSession().getApplication();	//get a reference to the demo application
 							final DemoUser user=demoApplication.getPrincipal(idControl.getValue());	//get the user by ID
 							if(user!=null)	//if a valid user was entered
 							{
 								if(Arrays.equals(user.getPassword(), password))	//if the entered password matches that of the user
 								{
-									session.setPrincipal(user);	//log in the user
-									session.navigate(DemoApplication.RESTRICTED_PANEL_NAVIGATION_PATH);	//navigate to the restricted panel
+									getSession().setPrincipal(user);	//log in the user
+									getSession().navigate(DemoApplication.RESTRICTED_PANEL_NAVIGATION_PATH);	//navigate to the restricted panel
 								}
 								else	//if the password doesn't match
 								{
@@ -88,6 +85,5 @@ public class LoginPanel extends DefaultNavigationPanel
 	
 		add(loginPanel);	//add the panel to the panel in the default center
 	}
-
 
 }

@@ -11,7 +11,6 @@ import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.util.ArrayUtilities.*;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.transfer.*;
 
 /**An image component that displays an associated label and description, if present.
@@ -141,24 +140,9 @@ public class Image extends AbstractComponent<Image>
 			}			
 		}
 
-	/**Session constructor.
-	@param session The Guise session that owns this component.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public Image(final GuiseSession session)
+	/**Default constructor.*/
+	public Image()
 	{
-		this(session, null);	//construct the component, indicating that a default ID should be used
-	}
-
-	/**Session and ID constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public Image(final GuiseSession session, final String id)
-	{
-		super(session, id);	//construct the parent class
 		addExportStrategy(DEFAULT_EXPORT_STRATEGY);	//install a default export strategy 
 	}
 

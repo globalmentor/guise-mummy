@@ -1,6 +1,5 @@
 package com.guiseframework.demo;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.event.AbstractGuisePropertyChangeListener;
 import com.guiseframework.event.ActionListener;
@@ -14,14 +13,6 @@ Demonstrates sequence card panels, task card constraints, task status select lin
 */
 public class EventWizardPanel2 extends DefaultNavigationPanel
 {
-
-	/**Guise session constructor.
-	@param session The Guise session that owns this panel.
-	*/
-	public EventWizardPanel2(final GuiseSession session)
-	{
-		super(session);	//construct the parent class
-	}
 
 	/**Initializes the component after construction.*/
 	public void initialize()

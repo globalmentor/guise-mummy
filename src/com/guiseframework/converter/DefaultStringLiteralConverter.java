@@ -1,7 +1,5 @@
 package com.guiseframework.converter;
 
-import com.guiseframework.GuiseSession;
-
 /**A converter that converts any object to a string literal using its {@link Object#toString()} method.
 This class cannot convert from a literal to the supported object, and considers all non-<code>null</code> literal representations invalid.
 @param <V> The value type this converter supports.
@@ -9,15 +7,6 @@ This class cannot convert from a literal to the supported object, and considers 
 */
 public class DefaultStringLiteralConverter<V> extends AbstractStringLiteralConverter<V>
 {
-
-	/**Session constructor.
-	@param session The Guise session that owns this converter.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public DefaultStringLiteralConverter(final GuiseSession session)
-	{
-		super(session);	//construct the parent class
-	}
 
 	/**Converts a literal representation of a value from the lexical space into a value in the value space.
 	This version throws a conversion exception if the literal is not <code>null</code>.

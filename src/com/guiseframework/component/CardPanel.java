@@ -1,6 +1,5 @@
 package com.guiseframework.component;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.CardLayout;
 
 /**A panel with a card layout.
@@ -11,45 +10,18 @@ The panel's value model reflects the currently selected component, if any.
 public class CardPanel extends AbstractCardPanel<CardPanel>
 {
 
-	/**Session constructor.
-	@param session The Guise session that owns this component.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public CardPanel(final GuiseSession session)
+	/**Default constructor.*/
+	public CardPanel()
 	{
-		this(session, (String)null);	//construct the component, indicating that a default ID should be used
+		this(new CardLayout());	//construct the panel using a default layout
 	}
 
-	/**Session and ID constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public CardPanel(final GuiseSession session, final String id)
-	{
-		this(session, id, new CardLayout(session));	//construct the panel using a default layout
-	}
-
-	/**Session and layout constructor.
-	@param session The Guise session that owns this component.
+	/**Layout constructor.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given session and/or layout is <code>null</code>.
+	@exception NullPointerException if the layout is <code>null</code>.
 	*/
-	public CardPanel(final GuiseSession session, final CardLayout layout)
+	protected CardPanel(final CardLayout layout)
 	{
-		this(session, null, layout);	//construct the component with the layout, indicating that a default ID should be used
-	}
-
-	/**Session, ID, and layout constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param layout The layout definition for the container.
-	@exception NullPointerException if the given session and/or layout is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	protected CardPanel(final GuiseSession session, final String id, final CardLayout layout)
-	{
-		super(session, id, layout);	//construct the parent class
+		super(layout);	//construct the parent class
 	}
 }

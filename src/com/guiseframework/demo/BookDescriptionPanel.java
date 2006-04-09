@@ -2,7 +2,6 @@ package com.guiseframework.demo;
 
 import java.net.URI;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.Extent;
@@ -30,19 +29,17 @@ Demonstrates image description visibility, flyover frames,
 public class BookDescriptionPanel extends DefaultNavigationPanel
 {
 
-	/**Guise session constructor.
-	@param session The Guise session that owns this panel.
-	*/
-	public BookDescriptionPanel(final GuiseSession session)
+	/**Default constructor.*/
+	public BookDescriptionPanel()
 	{
-		super(session, new FlowLayout(session, Flow.PAGE));	//construct the parent class flowing vertically
+		super(new FlowLayout(Flow.PAGE));	//construct the parent class flowing vertically
 		setLabel("Guise\u2122 Demonstration: Book Descriptions");	//set the panel title
 
 			//book panel
-		final GroupPanel bookPanel=new GroupPanel(session, new FlowLayout(session, Flow.LINE));	//create the book panel flowing horizontally
+		final GroupPanel bookPanel=new GroupPanel(new FlowLayout(Flow.LINE));	//create the book panel flowing horizontally
 		bookPanel.setLabel("Mouse over a Book");	//set the book panel label
 
-		final Image book1=new Image(session);	//_The Great Philosophers_
+		final Image book1=new Image();	//_The Great Philosophers_
 		book1.setImage(URI.create("http://www.garretwilson.com/books/reviews/greatphilosophers_small.jpg"));	//set the URI
 		book1.setDescriptionContentType(XHTML_CONTENT_TYPE);	//use an XHTML description
 		book1.setDescription(	//set the description
@@ -69,7 +66,7 @@ public class BookDescriptionPanel extends DefaultNavigationPanel
 
 		bookPanel.add(book1);	//add the image to the book panel
 
-		final Image book2=new Image(session);	//_The Supreme Court_
+		final Image book2=new Image();	//_The Supreme Court_
 		book2.setImage(URI.create("http://www.garretwilson.com/books/reviews/supremecourt_small.jpg"));	//set the URI
 		book2.setDescriptionContentType(XHTML_CONTENT_TYPE);	//use an XHTML description
 		book2.setDescription(	//set the description
@@ -89,7 +86,7 @@ public class BookDescriptionPanel extends DefaultNavigationPanel
 		book2.setFlyoverEnabled(true);	//enable flyovers		
 		bookPanel.add(book2);	//add the image to the book panel
 
-		final Image book3=new Image(session);	//_Uncertain Identities_
+		final Image book3=new Image();	//_Uncertain Identities_
 		book3.setImage(URI.create("http://www.garretwilson.com/books/reviews/uncertainidentities_small.jpg"));	//set the URI
 		book3.setDescriptionContentType(XHTML_CONTENT_TYPE);	//use an XHTML description
 		book3.setDescription(	//set the description

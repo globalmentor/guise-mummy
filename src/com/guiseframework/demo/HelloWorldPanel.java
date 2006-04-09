@@ -1,6 +1,5 @@
 package com.guiseframework.demo;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.RegionLayout;
 
@@ -12,15 +11,13 @@ Demonstrates navigation panels, region layouts, and headings.
 public class HelloWorldPanel extends DefaultNavigationPanel
 {
 
-	/**Guise session constructor.
-	@param session The Guise session that owns this panel.
-	*/
-	public HelloWorldPanel(final GuiseSession session)
+	/**Default constructor.*/
+	public HelloWorldPanel()
 	{
-		super(session, new RegionLayout(session));	//construct the parent class, using a region layout
+		super(new RegionLayout());	//construct the parent class, using a region layout
 		setLabel("Guise\u2122 Demonstration: Hello World");	//set the panel title
 		
-		final Heading helloWorldHeading=new Heading(session, 0);	//create a top-level heading
+		final Heading helloWorldHeading=new Heading(0);	//create a top-level heading
 		helloWorldHeading.setLabel("Hello World!");	//set the text of the heading, using its model
 		add(helloWorldHeading);	//add the heading to the panel in the default center
 	}

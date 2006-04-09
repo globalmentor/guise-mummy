@@ -1,6 +1,5 @@
 package com.guiseframework.model;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.validator.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
@@ -41,13 +40,12 @@ public abstract class AbstractValueModel<V> extends AbstractModel implements Val
 		public Class<V> getValueClass() {return valueClass;}
 
 	/**Constructs a value model indicating the type of value it can hold.
-	@param session The Guise session that owns this model.
 	@param valueClass The class indicating the type of value held in the model.
-	@exception NullPointerException if the given session and/or class object is <code>null</code>.
+	@exception NullPointerException if the given value class is <code>null</code>.
 	*/
-	public AbstractValueModel(final GuiseSession session, final Class<V> valueClass)
+	public AbstractValueModel(final Class<V> valueClass)
 	{
-		super(session);	//construct the parent class
+		super();	//construct the parent class
 		this.valueClass=checkInstance(valueClass, "Value class cannot be null.");	//store the value class
 	}
 

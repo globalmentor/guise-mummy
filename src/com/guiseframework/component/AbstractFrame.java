@@ -4,11 +4,8 @@ import java.beans.PropertyChangeListener;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.effect.Effect;
-import com.guiseframework.event.ActionEvent;
-import com.guiseframework.event.ActionListener;
-import com.guiseframework.event.GuisePropertyChangeListener;
+import com.guiseframework.event.*;
 
 /**Abstract implementation of a frame.
 @author Garret Wilson
@@ -251,16 +248,12 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 		}
 	}
 
-	/**Session, ID, and component constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Component constructor.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractFrame(final GuiseSession session, final String id, final Component<?> component)
+	public AbstractFrame(final Component<?> component)
 	{
-		super(session, id, FrameComponent.values());	//construct the parent class
+		super(FrameComponent.values());	//construct the parent class
 		closeActionListener=new ActionListener()	//create an action listener for closing
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the close action is initiated
@@ -269,7 +262,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 					}
 				};
 		setComponent(FrameComponent.CONTENT_COMPONENT, component);	//set the component directly, because child classes may prevent the setContent() method from changing the component 
-		final Link closeButton=new Link(session);	//create a close action control
+		final Link closeButton=new Link();	//create a close action control
 		closeButton.setIconResourceKey(CLOSE_ICON_RESOURCE_KEY);	//indicate to the close action control the resource key for its icon
 		setCloseActionControl(closeButton);	//set the close action control
 	}

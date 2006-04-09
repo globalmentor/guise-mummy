@@ -6,7 +6,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.*;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
@@ -88,16 +87,13 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 		return object;	//return the given component
 	}
 
-	/**Session, ID, and layout constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Layout constructor.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given session and/or layout is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given layout is <code>null</code>.
 	*/
-	protected AbstractListSelectContainerControl(final GuiseSession session, final String id, final AbstractValueLayout layout)
+	protected AbstractListSelectContainerControl(final AbstractValueLayout layout)
 	{
-		super(session, id, layout);	//construct the parent class
+		super(layout);	//construct the parent class
 		this.valueRepresentationStrategy=COMPONENT_REPRESENTATION_STRATEGY;	//use the shared component representation strategy
 		layout.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen an repeat all property changes of the card layout value model TODO make sure the card constraint values are passed on, too---right now they probably aren't as the property change event subclass isn't recognized in the repeater listener class
 		addPropertyChangeListener(VALUE_PROPERTY, new PropertyChangeListener()	//listen for the value changing
@@ -450,7 +446,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 		super.fireContainerModified(index, addedComponent, removedComponent);	//fire the container modified event normally
 		if(getEventListenerManager().hasListeners(ListListener.class))	//if there are appropriate listeners registered
 		{
-			final ListEvent<Component<?>> listEvent=new ListEvent<Component<?>>(getSession(), this, index, addedComponent, removedComponent);	//create a new event
+			final ListEvent<Component<?>> listEvent=new ListEvent<Component<?>>(this, index, addedComponent, removedComponent);	//create a new event
 			getSession().queueEvent(new PostponedListEvent<Component<?>>(getEventListenerManager(), listEvent));	//tell the Guise session to queue the event
 		}
 	}
@@ -465,7 +461,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	{
 		if(getEventListenerManager().hasListeners(ListSelectionListener.class))	//if there are appropriate listeners registered
 		{
-			final ListSelectionEvent<Component<?>> selectionEvent=new ListSelectionEvent<Component<?>>(getSession(), this, addedIndex, removedIndex);	//create a new event
+			final ListSelectionEvent<Component<?>> selectionEvent=new ListSelectionEvent<Component<?>>(this, addedIndex, removedIndex);	//create a new event
 			getSession().queueEvent(new PostponedListSelectionEvent<Component<?>>(getEventListenerManager(), selectionEvent));	//tell the Guise session to queue the event
 		}
 	}

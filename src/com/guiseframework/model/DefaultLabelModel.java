@@ -8,7 +8,6 @@ import java.net.URI;
 import javax.mail.internet.ContentType;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.GuiseSession;
 
 /**A default implementation of a model for an identifier such as text and/or an icon.
 @author Garret Wilson
@@ -128,23 +127,18 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 			}
 		}
 
-	/**Session constructor.
-	@param session The Guise session that owns this model.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public DefaultLabelModel(final GuiseSession session)
+	/**Default constructor.*/
+	public DefaultLabelModel()
 	{
-		this(session, null);	//construct the class with no label
+		this(null);	//construct the class with no label
 	}
 
-	/**Session and label constructor.
-	@param session The Guise session that owns this model.
+	/**Label constructor.
 	@param label The text of the label.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public DefaultLabelModel(final GuiseSession session, final String label)
+	public DefaultLabelModel(final String label)
 	{
-		super(session);	//construct the parent class
+		super();	//construct the parent class
 		this.label=label;	//save the label
 	}
 }

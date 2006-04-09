@@ -1,6 +1,5 @@
 package com.guiseframework.model;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.validator.Validator;
 
 /**The default implementation of a column in a table.
@@ -113,38 +112,23 @@ public class DefaultTableColumnModel<V> extends DefaultLabelModel implements Tab
 	}
 */
 	
-	/**Session, value class, and label constructor.
-	@param session The Guise session that owns this column.
+	/**Value class constructor.
 	@param valueClass The class indicating the type of values held in the model.
-	@param labelText The text of the label.
-	@exception NullPointerException if the given session, and/or value class is <code>null</code>.
+	@exception NullPointerException if the given value class is <code>null</code>.
 	*/
-	public DefaultTableColumnModel(final GuiseSession session, final Class<V> valueClass, final String label)
+	public DefaultTableColumnModel(final Class<V> valueClass)
 	{
-		this(session, null, valueClass, label);	//construct the class indicating that a default ID should be generated
-	}
-
-	/**Session, ID, and value class constructor.
-	@param session The Guise session that owns this column.
-	@param valueClass The class indicating the type of values held in the model.
-	@exception NullPointerException if the given session, and/or value class is <code>null</code>.
-	*/
-	public DefaultTableColumnModel(final GuiseSession session, final Class<V> valueClass)
-	{
-		this(session, valueClass, null);	//construct the class with no label
+		this(valueClass, null);	//construct the class with no label
 	}
 	
-	/**Session, ID, value class, and label constructor.
-	@param session The Guise session that owns this column.
-	@param id The column identifier, or <code>null</code> if a default column identifier should be generated.
+	/**Value class and label constructor.
 	@param valueClass The class indicating the type of values held in the model.
 	@param labelText The text of the label.
-	@exception NullPointerException if the given session, and/or value class is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given value class is <code>null</code>.
 	*/
-	public DefaultTableColumnModel(final GuiseSession session, final String id, final Class<V> valueClass, final String labelText)
+	public DefaultTableColumnModel(final Class<V> valueClass, final String labelText)
 	{
-		super(session);	//construct the parent class
+		super();	//construct the parent class
 		this.valueClass=valueClass;	//save the value class
 		setLabel(labelText);	//save the label text
 	}

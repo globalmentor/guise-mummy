@@ -1,7 +1,6 @@
 package com.guiseframework.component;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.Layout;
 
 /**Abstract implementation of a modal navigation panel.
@@ -32,16 +31,13 @@ public abstract class AbstractModalNavigationPanel<R, C extends ModalNavigationP
 			}
 		}
 
-	/**Session, ID, and layout constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Layout constructor.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given session and/or layout, is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given layout, is <code>null</code>.
 	*/
-	public AbstractModalNavigationPanel(final GuiseSession session, final String id, final Layout layout)
+	public AbstractModalNavigationPanel(final Layout layout)
 	{
-		super(session, id, layout);	//construct the parent class
+		super(layout);	//construct the parent class
 	}
 	/**Ends this navigation panel's modal interaction and navigates either to the previous modal navigation or to this navigation panel's referring URI, if any.
 	@param result The result of this navigation panel's modal interaction, or <code>null</code> if no result is given.

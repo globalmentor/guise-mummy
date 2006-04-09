@@ -1,15 +1,8 @@
 package com.guiseframework.component.layout;
 
 import java.beans.PropertyChangeEvent;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
-
-import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.lang.ObjectUtilities;
-import com.garretwilson.util.Debug;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.Component;
 import com.guiseframework.component.Container;
 import com.guiseframework.event.*;
@@ -205,15 +198,6 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 			component.setConstraints(constraints);	//associate the new constraints with this component			
 		}
 		return constraintsClass.cast(constraints);	//return the constraints, casting them to the correct type, because we've verified that they are of the correct type
-	}
-
-	/**Session constructor.
-	@param session The Guise session that owns this layout.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public AbstractLayout(final GuiseSession session)
-	{
-		super(session);	//construct the parent class
 	}
 
 	/**Reports that the bound property of a component's constraints has changed.

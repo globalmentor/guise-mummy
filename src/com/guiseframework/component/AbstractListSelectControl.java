@@ -2,7 +2,6 @@ package com.guiseframework.component;
 
 import java.util.*;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.converter.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
@@ -78,17 +77,13 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 		return valueComponentState.getComponent();	//return the representation component
 	}
 
-	/**Session, ID, model, and value representation strategy constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param listSelectModel The component data model.
+	/**List select model, and value representation strategy constructor.
+	@param listSelectModel The component list select model.
 	@param valueRepresentationStrategy The strategy to create controls to represent this model's values.
-	@exception NullPointerException if the given session, model, and/or value representation strategy is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given list select model and/or value representation strategy is <code>null</code>.
 	*/
-	public AbstractListSelectControl(final GuiseSession session, final String id, final ListSelectModel<V> listSelectModel, final ValueRepresentationStrategy<V> valueRepresentationStrategy)
+	public AbstractListSelectControl(final ListSelectModel<V> listSelectModel, final ValueRepresentationStrategy<V> valueRepresentationStrategy)
 	{
-		super(session, id);	//construct the parent class
 		this.valueRepresentationStrategy=checkInstance(valueRepresentationStrategy, "Value representation strategy cannot be null.");
 		this.listSelectModel=checkInstance(listSelectModel, "List select model cannot be null.");	//save the list select model
 		this.listSelectModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the value model
@@ -105,6 +100,13 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 					{
 						fireSelectionChanged(selectionEvent.getAddedElement(), selectionEvent.getRemovedElement());	//repeat the event, indicating the component as the source of the event
 					}		
+				});
+		addListListener(new ListListener<V>()	//listen for list changes
+				{
+					public void listModified(final ListEvent<V> listEvent)	//if list is modified
+					{
+						clearComponentStates();	//clear all the components and component states TODO probably do this on a component-by-component basis
+					};
 				});
 	}
 
@@ -395,7 +397,7 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 	{
 		if(getEventListenerManager().hasListeners(ListListener.class))	//if there are appropriate listeners registered
 		{
-			final ListEvent<V> listEvent=new ListEvent<V>(getSession(), this, index, addedElement, removedElement);	//create a new event
+			final ListEvent<V> listEvent=new ListEvent<V>(this, index, addedElement, removedElement);	//create a new event
 			getSession().queueEvent(new PostponedListEvent<V>(getEventListenerManager(), listEvent));	//tell the Guise session to queue the event
 		}
 	}
@@ -410,7 +412,7 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 	{
 		if(getEventListenerManager().hasListeners(ListSelectionListener.class))	//if there are appropriate listeners registered
 		{
-			final ListSelectionEvent<V> selectionEvent=new ListSelectionEvent<V>(getSession(), this, addedIndex, removedIndex);	//create a new event
+			final ListSelectionEvent<V> selectionEvent=new ListSelectionEvent<V>(this, addedIndex, removedIndex);	//create a new event
 			getSession().queueEvent(new PostponedListSelectionEvent<V>(getEventListenerManager(), selectionEvent));	//tell the Guise session to queue the event
 		}
 	}
@@ -586,36 +588,26 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 	public static class DefaultValueRepresentationStrategy<VV> implements ValueRepresentationStrategy<VV>
 	{
 
-		/**The Guise session that owns this representation strategy.*/
-		private final GuiseSession session;
-
-			/**@return The Guise session that owns this representation strategy.*/
-			public GuiseSession getSession() {return session;}
-
 		/**The converter to use for displaying the value as a string.*/
 		private final Converter<VV, String> converter;
 			
 			/**@return The converter to use for displaying the value as a string.*/
 			public Converter<VV, String> getConverter() {return converter;}
 
-		/**Session constructor with a default converter.
+		/**Default constructor with a default converter.
 		This implementation uses a {@link DefaultStringLiteralConverter}.
-		@param session The Guise session that owns this representation strategy.
-		@exception NullPointerException if the given session is <code>null</code>.
 		*/
-		public DefaultValueRepresentationStrategy(final GuiseSession session)
+		public DefaultValueRepresentationStrategy()
 		{
-			this(session, new DefaultStringLiteralConverter<VV>(session));	//construct the class with a default string literal converter
+			this(new DefaultStringLiteralConverter<VV>());	//construct the class with a default string literal converter
 		}
 
-		/**Session constructor.
-		@param session The Guise session that owns this representation strategy.
+		/**Converter constructor.
 		@param converter The converter to use for displaying the value as a string.
-		@exception NullPointerException if the given session is <code>null</code>.
+		@exception NullPointerException if the given converter is <code>null</code>.
 		*/
-		public DefaultValueRepresentationStrategy(final GuiseSession session, final Converter<VV, String> converter)
+		public DefaultValueRepresentationStrategy(final Converter<VV, String> converter)
 		{
-			this.session=checkInstance(session, "Session cannot be null");	//save the session
 			this.converter=checkInstance(converter, "Converter cannot be null.");	//save the converter
 		}
 
@@ -631,8 +623,7 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 		*/
 		public Label createComponent(final ListSelectModel<VV> model, final VV value, final int index, final boolean selected, final boolean focused)
 		{
-			final GuiseSession session=getSession();	//get the session
-			return new Label(session, new ValueConverterLabelModel<VV>(session, value, getConverter()));	//create a label that will convert the value to a string
+			return new Label(new ValueConverterLabelModel<VV>(value, getConverter()));	//create a label that will convert the value to a string
 		}
 	}
 

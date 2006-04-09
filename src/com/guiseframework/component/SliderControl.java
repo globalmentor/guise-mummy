@@ -7,14 +7,12 @@ import java.net.URI;
 import java.util.MissingResourceException;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.converter.AbstractStringLiteralConverter;
 import com.guiseframework.converter.Converter;
 import com.guiseframework.model.DefaultValueModel;
 import com.guiseframework.model.ValueModel;
 import com.guiseframework.validator.ValidationException;
-
 
 /**A value control that represents its value by a slider.
 If a thumb or track image resource key is set, a resource will be retrieved first using an appended physical axis designator (".x" or ".y").
@@ -232,106 +230,47 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 			}
 		}
 
-	/**Session, model, and axis constructor with a default converter.
-	@param session The Guise session that owns this component.
-	@param model The component data model.
-	@param axis The axis along which the slider is oriented.
-	@exception NullPointerException if the given session, model, and/or axis is <code>null</code>.
-	*/
-	public SliderControl(final GuiseSession session, final ValueModel<V> model, final Flow axis)
-	{
-		this(session, null, model, axis);	//construct the component, indicating that a default ID should be used
-	}
-
-	
-	/**Session, model, converter, and axis constructor.
-	@param session The Guise session that owns this component.
-	@param model The component data model.
-	@param converter The string literal value converter for this component.
-	@param axis The axis along which the slider is oriented.
-	@exception NullPointerException if the given session, model, converter, and/or axis is <code>null</code>.
-	*/
-	public SliderControl(final GuiseSession session, final ValueModel<V> model, final Converter<V, String> converter, final Flow axis)
-	{
-		this(session, null, model, converter, axis);	//construct the component, indicating that a default ID should be used
-	}
-	
-	/**Session and axis constructor with a default data model to represent a given type and a default converter.
-	@param session The Guise session that owns this component.
+	/**Value class and axis constructor with a default data model to represent a given type and a default converter.
 	@param valueClass The class indicating the type of value held in the model.
 	@param axis The axis along which the slider is oriented.
-	@exception NullPointerException if the given session, value class, and/or axis is <code>null</code>.
+	@exception NullPointerException if the value class and/or axis is <code>null</code>.
 	*/
-	public SliderControl(final GuiseSession session, final Class<V> valueClass, final Flow axis)
+	public SliderControl(final Class<V> valueClass, final Flow axis)
 	{
-		this(session, null, valueClass, axis);	//construct the component, indicating that a default ID should be used
+		this(new DefaultValueModel<V>(valueClass), axis);	//construct the class with a default model
 	}
 
-	/**Session, converter, and axis constructor with a default data model to represent a given type.
-	@param session The Guise session that owns this component.
+	/**Value class, converter and axis constructor with a default value model to represent a given type.
 	@param valueClass The class indicating the type of value held in the model.
 	@param converter The string literal value converter for this component.
 	@param axis The axis along which the slider is oriented.
-	@exception NullPointerException if the given session, value class, converter, and/or axis is <code>null</code>.
+	@exception NullPointerException if the given value class, converter, and/or axis is <code>null</code>.
 	*/
-	public SliderControl(final GuiseSession session, final Class<V> valueClass, final Converter<V, String> converter, final Flow axis)
+	public SliderControl(final Class<V> valueClass, final Converter<V, String> converter, final Flow axis)
 	{
-		this(session, null, valueClass, converter, axis);	//construct the component, indicating that a default ID should be used
+		this(new DefaultValueModel<V>(valueClass), converter, axis);	//construct the class with a default model
 	}
 	
-	/**Session, ID and axis constructor with a default data model to represent a given type and a default converter.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param valueClass The class indicating the type of value held in the model.
+	/**Value model and axis constructor with a default converter.
+	@param valueModel The component value model.
 	@param axis The axis along which the slider is oriented.
-	@exception NullPointerException if the given session, value class, and/or axis is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public SliderControl(final GuiseSession session, final String id, final Class<V> valueClass, final Flow axis)
-	{
-		this(session, id, new DefaultValueModel<V>(session, valueClass), axis);	//construct the class with a default model
-	}
-
-	/**Session, ID, converter, and axis constructor with a default data model to represent a given type.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param valueClass The class indicating the type of value held in the model.
-	@param converter The string literal value converter for this component.
-	@param axis The axis along which the slider is oriented.
-	@exception NullPointerException if the given session, value class, converter, and/or axis is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public SliderControl(final GuiseSession session, final String id, final Class<V> valueClass, final Converter<V, String> converter, final Flow axis)
-	{
-		this(session, id, new DefaultValueModel<V>(session, valueClass), converter, axis);	//construct the class with a default model
-	}
-	
-	/**Session, ID, model, and axis constructor with a default converter.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
-	@param axis The axis along which the slider is oriented.
-	@exception NullPointerException if the given session, model, and/or axis is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given value model and/or axis is <code>null</code>.
 	@exception IllegalArgumentException if no default converter is available for the given model's value class.
 	*/
-	public SliderControl(final GuiseSession session, final String id, final ValueModel<V> model, final Flow axis)
+	public SliderControl(final ValueModel<V> valueModel, final Flow axis)
 	{
-		this(session, id, model, AbstractStringLiteralConverter.getInstance(session, model.getValueClass()), axis);	//construct the class with a default converter
+		this(valueModel, AbstractStringLiteralConverter.getInstance(valueModel.getValueClass()), axis);	//construct the class with a default converter
 	}
 
-	/**Session, ID, model, and axis constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
+	/**Value model, converter, and axis constructor.
+	@param valueModel The component value model.
 	@param converter The string literal value converter for this component.
 	@param axis The axis along which the slider is oriented.
-	@exception NullPointerException if the given session, model, converter, and/or axis is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given value model, converter, and/or axis is <code>null</code>.
 	*/
-	public SliderControl(final GuiseSession session, final String id, final ValueModel<V> model, final Converter<V, String> converter, final Flow axis)
+	public SliderControl(final ValueModel<V> valueModel, final Converter<V, String> converter, final Flow axis)
 	{
-		super(session, id, model);	//construct the parent class
+		super(valueModel);	//construct the parent class
 		this.converter=checkInstance(converter, "Converter cannot be null");	//save the converter
 		this.axis=checkInstance(axis, "Flow axis cannot be null.");
 	}

@@ -1,6 +1,5 @@
 package com.guiseframework.demo;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
@@ -19,14 +18,6 @@ public class TemperatureConversionPanel2 extends DefaultNavigationPanel
 	private TextControl<Float> temperatureOutput;
 	private CheckControl celsiusCheckControl;
 	private CheckControl fahrenheitCheckControl;
-
-	/**Guise session constructor.
-	@param session The Guise session that owns this panel.
-	*/
-	public TemperatureConversionPanel2(final GuiseSession session)
-	{
-		super(session);	//construct the parent class
-	}
 
 	/**Initializes the component after construction.*/
 	public void initialize()

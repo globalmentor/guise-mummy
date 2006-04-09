@@ -139,31 +139,27 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 		columnLabelDateFormat=AbstractDateStringLiteralConverter.createDateFormat(getColumnLabelDateStyle(), null, getSession().getLocale());	//create a new date format based upon the style and locale		
 	}
 
-	/**Session constructor for current month using the session locale.
-	@param session The Guise session that owns this model.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public CalendarMonthTableModel(final GuiseSession session)
+	/**Default constructor for current month using the current date.*/
+	public CalendarMonthTableModel()
 	{
-		this(session, new Date());	//construct the class using the current date
+		this(new Date());	//construct the class using the current date
 	}
 
-	/**Session and date constructor.
-	@param session The Guise session that owns this model.
+	/**Date constructor.
 	@param date The date this calendar is to represent.
-	@exception NullPointerException if the given session and/or date is <code>null</code>.
+	@exception NullPointerException if the given date is <code>null</code>.
 	*/
-	public CalendarMonthTableModel(final GuiseSession session, final Date date)	//TODO decide if we want to allow a calendar with another locale to be set, because right now we change calendars automatically
+	public CalendarMonthTableModel(final Date date)	//TODO decide if we want to allow a calendar with another locale to be set, because right now we change calendars automatically
 	{
-		super(session);	//construct the parent class
+		super();	//construct the parent class
 		for(int i=0; i<WEEK_DAY_COUNT; ++i)	//for each week day index (the indices are constant, regardless of with which day of the week the locale starts)
 		{
-			addColumn(new WeekDayTableColumnModel(session, i));	//add a new week day table column
+			addColumn(new WeekDayTableColumnModel(i));	//add a new week day table column
 		}
 		this.date=checkInstance(date, "Date cannot be null");
 		updateModel();	//update the model to match the initial month calendar
 			//TODO important: this is a memory leak---make sure we uninstall the listener when the session goes away
-		session.addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, new AbstractGuisePropertyChangeListener<Locale>()	//listen for the session locale changing
+		getSession().addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, new AbstractGuisePropertyChangeListener<Locale>()	//listen for the session locale changing
 				{
 					public void propertyChange(GuisePropertyChangeEvent<Locale> propertyChangeEvent)	//if the locale changes
 					{
@@ -238,15 +234,13 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 			return label;	//return the label for this column
 		}
 
-		/**Session constructor.
-		@param session The Guise session that owns this column.
+		/**Day-of-week constructor.
 		@param index The physical index of the day of the week relative to the first day of the week.
-		@exception NullPointerException if the given session is <code>null</code>.
 		@exception IllegalArgumentException if the given index is less than zero, or greater than or equal to the number of days in a week.
 		*/
-		public WeekDayTableColumnModel(final GuiseSession session, final int index)
+		public WeekDayTableColumnModel(final int index)
 		{
-			super(session, Date.class);	//construct the parent class
+			super(Date.class);	//construct the parent class
 			this.index=checkIndexBounds(index, 0, WEEK_DAY_COUNT);	//make sure the index is within bounds
 		}		
 	}

@@ -1,21 +1,10 @@
 package com.guiseframework.converter;
 
-import com.guiseframework.GuiseSession;
-
 /**A converter that converts a <code>String</code> from and to a string literal.
 @author Garret Wilson
 */
 public class StringStringLiteralConverter extends AbstractStringLiteralConverter<String>
 {
-
-	/**Session constructor with no value required.
-	@param session The Guise session that owns this converter.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public StringStringLiteralConverter(final GuiseSession session)
-	{
-		super(session);	//construct the parent class
-	}
 
 	/**Converts a literal representation of a value from the lexical space into a value in the value space.
 	This version returns the literal itself.

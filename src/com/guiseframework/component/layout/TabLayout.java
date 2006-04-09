@@ -1,6 +1,5 @@
 package com.guiseframework.component.layout;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.model.*;
 
 /**A layout that manages child components as a series of tabs.
@@ -20,16 +19,7 @@ public class TabLayout extends AbstractValueLayout<ControlConstraints>
 	*/
 	public ControlConstraints createDefaultConstraints()
 	{
-		return new ControlConstraints(getSession());	//create constraints
-	}
-
-	/**Session constructor.
-	@param session The Guise session that owns this layout.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public TabLayout(final GuiseSession session)
-	{
-		super(session);	//construct the parent class
+		return new ControlConstraints();	//create constraints
 	}
 
 }

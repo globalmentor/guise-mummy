@@ -4,7 +4,6 @@ import java.net.URI;
 
 import javax.mail.internet.ContentType;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.component.transfer.*;
@@ -19,33 +18,31 @@ Demonstrates images, drag enabling, drop enabling,
 public class DropDetailsPanel extends DefaultNavigationPanel
 {
 
-	/**Guise session constructor.
-	@param session The Guise session that owns this panel.
-	*/
-	public DropDetailsPanel(final GuiseSession session)
+	/**Default constructor.*/
+	public DropDetailsPanel()
 	{
-		super(session, new FlowLayout(session, Flow.PAGE));	//construct the parent class flowing vertically
+		super(new FlowLayout(Flow.PAGE));	//construct the parent class flowing vertically
 		setLabel("Guise\u2122 Demonstration: Drop Details");	//set the panel title
 
 			//flag panel
-		final GroupPanel flagPanel=new GroupPanel(session, new FlowLayout(session, Flow.LINE));	//create the flag panel flowing horizontally
+		final GroupPanel flagPanel=new GroupPanel(new FlowLayout(Flow.LINE));	//create the flag panel flowing horizontally
 		flagPanel.setLabel("Drag a Flag");	//set the flag panel label				
-		final Image usFlag=new Image(session);	//US flag
+		final Image usFlag=new Image();	//US flag
 		usFlag.setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/us-flag.gif"));	//set the URI
 		usFlag.setLabel("USA");	//set the label
 		usFlag.setDragEnabled(true);	//enable dragging for the image
 		flagPanel.add(usFlag);	//add the image to the flag panel
-		final Image frFlag=new Image(session);	//France flag
+		final Image frFlag=new Image();	//France flag
 		frFlag.setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/fr-flag.gif"));	//set the URI
 		frFlag.setLabel("France");	//set the label
 		frFlag.setDragEnabled(true);	//enable dragging for the image
 		flagPanel.add(frFlag);	//add the image to the flag panel
-		final Image inFlag=new Image(session);	//India flag
+		final Image inFlag=new Image();	//India flag
 		inFlag.setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/in-flag.gif"));	//set the URI
 		inFlag.setLabel("India");	//set the label
 		inFlag.setDragEnabled(true);	//enable dragging for the image
 		flagPanel.add(inFlag);	//add the image to the flag panel
-		final Image irFlag=new Image(session);	//Iran flag
+		final Image irFlag=new Image();	//Iran flag
 		irFlag.setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/ir-flag.gif"));	//set the URI
 		irFlag.setLabel("Iran");	//set the label
 		irFlag.setDragEnabled(true);	//enable dragging for the image
@@ -53,12 +50,12 @@ public class DropDetailsPanel extends DefaultNavigationPanel
 		add(flagPanel);	//add the flag panel to the panel
 
 			//label panel
-		final GroupPanel labelPanel=new GroupPanel(session, new FlowLayout(session, Flow.LINE));	//create the label panel flowing horizontally
+		final GroupPanel labelPanel=new GroupPanel(new FlowLayout(Flow.LINE));	//create the label panel flowing horizontally
 		labelPanel.setLabel("Drag a Label");	//set the label panel label
 		final String[] partsOfSpeech=new String[]{"Noun", "Verb", "Ajective", "Adverb", "Pronoun", "Preposition", "Conjunction", "Interjection"};
 		for(final String partOfSpeech:partsOfSpeech)	//for each label string
 		{
-			final Label label=new Label(session);	//create a label label
+			final Label label=new Label();	//create a label label
 			label.setLabel(partOfSpeech);	//set the label text
 			label.setDragEnabled(true);	//enable dragging for the label
 			labelPanel.add(label);	//add the label to the label panel			
@@ -66,14 +63,14 @@ public class DropDetailsPanel extends DefaultNavigationPanel
 		add(labelPanel);	//add the label panel to the panel
 
 			//default text area
-		final TextAreaControl defaultTextArea=new TextAreaControl(session, 5, 80);	//create a text area control
+		final TextAreaControl defaultTextArea=new TextAreaControl(5, 80);	//create a text area control
 		defaultTextArea.setLabel("Drop Here for Built-In Drop Functionality");	//set the label of the text area
 		defaultTextArea.setEditable(false);	//don't allow the text area control to be edited
 		defaultTextArea.setDropEnabled(true);	//allow dropping on the text area
 		add(defaultTextArea);	//add the default drop text area control to the panel
 
 			//details text area
-		final TextAreaControl detailsTextArea=new TextAreaControl(session, 15, 80);	//create a text area control
+		final TextAreaControl detailsTextArea=new TextAreaControl(15, 80);	//create a text area control
 		detailsTextArea.setLabel("Drop Here for Drop Details");	//set the label of the text area
 		detailsTextArea.setEditable(false);	//don't allow the text area control to be edited
 		detailsTextArea.setDropEnabled(true);	//allow dropping on the text area

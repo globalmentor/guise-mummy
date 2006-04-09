@@ -1,7 +1,6 @@
 package com.guiseframework.demo;
 
 import com.guiseframework.Bookmark;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
@@ -21,23 +20,21 @@ public class BookmarksPanel extends DefaultNavigationPanel implements Navigation
 
 	private final TabbedPanel tabbedPanel;
 	
-	/**Guise session constructor.
-	@param session The Guise session that owns this panel.
-	*/
-	public BookmarksPanel(final GuiseSession session)
+	/**Default constructor.*/
+	public BookmarksPanel()
 	{
-		super(session, new FlowLayout(session, Flow.PAGE));	//construct the parent class flowing vertically
+		super(new FlowLayout(Flow.PAGE));	//construct the parent class flowing vertically
 		setLabel("Guise\u2122 Demonstration: Bookmarks");	//set the panel title	
 
 				//TabbedPanel
-		tabbedPanel=new TabbedPanel(session);	//create a tabbed panel
+		tabbedPanel=new TabbedPanel();	//create a tabbed panel
 		for(int i=0; i<TAB_COUNT; ++i)	//for each tab
 		{
-			final Panel<?> tab=new LayoutPanel(session);	//create a panel to serve as the page
-			final Heading tabHeading=new Heading(session, 0);	//create a top-level heading
+			final Panel<?> tab=new LayoutPanel();	//create a panel to serve as the page
+			final Heading tabHeading=new Heading(0);	//create a top-level heading
 			tabHeading.setLabel("This is step "+i+".");	//set the text of the heading
 			tab.add(tabHeading);	//add the heading to the tab
-			tabbedPanel.add(tab, new CardConstraints(session, "Step "+i));	//add the panel with a label			
+			tabbedPanel.add(tab, new CardConstraints("Step "+i));	//add the panel with a label			
 		}
 			//save a new bookmark ever time the tab changes
 		tabbedPanel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Component<?>>()	//listen for the tab changing
@@ -46,7 +43,7 @@ public class BookmarksPanel extends DefaultNavigationPanel implements Navigation
 					{
 						final String bookmarkID="step"+(tabbedPanel.getSelectedIndex());	//create the bookmark ID
 						final Bookmark bookmark=new Bookmark(new Bookmark.Parameter("step", Integer.toString(tabbedPanel.getSelectedIndex())));	//create a new bookmark
-						session.setBookmark(bookmark);	//save this state by setting a bookmark
+						getSession().setBookmark(bookmark);	//save this state by setting a bookmark
 					}						
 				});
 		add(tabbedPanel);

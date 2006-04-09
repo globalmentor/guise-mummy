@@ -2,7 +2,6 @@ package com.guiseframework.demo;
 
 import java.util.*;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
@@ -21,16 +20,14 @@ Demonstrates list controls with default representation, thread-safe select model
 public class EditUsersPanel extends DefaultNavigationPanel
 {
 
-	/**Guise session constructor.
-	@param session The Guise session that owns this panel.
-	*/
-	public EditUsersPanel(final GuiseSession session)
+	/**Default constructor.*/
+	public EditUsersPanel()
 	{
-		super(session, new FlowLayout(session, Flow.LINE));	//construct the parent class flowing horizontally
+		super(new FlowLayout(Flow.LINE));	//construct the parent class flowing horizontally
 		setLabel("Guise\u2122 Demonstration: Edit Users");	//set the panel title	
 
-		final ListControl<DemoUser> userListControl=new ListControl<DemoUser>(session, DemoUser.class, new SingleListSelectionPolicy<DemoUser>());	//create a list control allowing only single selections
-		userListControl.setValidator(new ValueRequiredValidator<DemoUser>(session));	//require a value to be selected
+		final ListControl<DemoUser> userListControl=new ListControl<DemoUser>(DemoUser.class, new SingleListSelectionPolicy<DemoUser>());	//create a list control allowing only single selections
+		userListControl.setValidator(new ValueRequiredValidator<DemoUser>());	//require a value to be selected
 		userListControl.setLabel("Users");	//set the list control label
 		userListControl.setRowCount(8);	//request eight visible rows in the list
 		final List<DemoUser> applicationUserList=((DemoApplication)getSession().getApplication()).getUsers();	//get the application's list of users
@@ -44,15 +41,15 @@ public class EditUsersPanel extends DefaultNavigationPanel
 			Collections.sort(userListControl);	//sort the user list model (each user implements Comparable)
 		}
 		
-		final LayoutPanel buttonPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));	//create the button panel flowing horizontally
+		final LayoutPanel buttonPanel=new LayoutPanel(new FlowLayout(Flow.LINE));	//create the button panel flowing horizontally
 			//add button
-		final Button addButton=new Button(session);	//create the add button
+		final Button addButton=new Button();	//create the add button
 		addButton.setLabel("Add User");	//set the text of the add button
 		addButton.addActionListener(new ActionListener()	//if the add button was pressed
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
-						session.navigateModal(DemoApplication.EDIT_USER_PANEL_NAVIGATION_PATH, new ModalNavigationListener()	//navigate modally to the edit user panel
+						getSession().navigateModal(DemoApplication.EDIT_USER_PANEL_NAVIGATION_PATH, new ModalNavigationListener()	//navigate modally to the edit user panel
 								{
 									public void modalBegan(final ModalEvent modalEvent)	//when modal editing begins
 									{
@@ -84,7 +81,7 @@ public class EditUsersPanel extends DefaultNavigationPanel
 				});
 		buttonPanel.add(addButton);	//add the button to the button panel
 			//edit button	
-		final Button editButton=new Button(session);	//create the edit button
+		final Button editButton=new Button();	//create the edit button
 		editButton.setLabel("Edit");	//set the text of the edit button
 		editButton.addActionListener(new ActionListener()	//if the edit button was pressed
 				{
@@ -93,7 +90,7 @@ public class EditUsersPanel extends DefaultNavigationPanel
 						final DemoUser user=userListControl.getSelectedValue();	//get the selected user
 						if(user!=null)	//if a user is selected
 						{
-							session.navigateModal(DemoApplication.EDIT_USER_PANEL_NAVIGATION_PATH, new ModalNavigationListener()	//navigate modally to the edit user panel
+							getSession().navigateModal(DemoApplication.EDIT_USER_PANEL_NAVIGATION_PATH, new ModalNavigationListener()	//navigate modally to the edit user panel
 									{
 										public void modalBegan(final ModalEvent modalEvent)	//when modal editing begins
 										{
@@ -125,7 +122,7 @@ public class EditUsersPanel extends DefaultNavigationPanel
 				});
 		buttonPanel.add(editButton);	//add the button to the button panel
 			//remove button	
-		final Button removeButton=new Button(session);	//create the remove button
+		final Button removeButton=new Button();	//create the remove button
 		removeButton.setLabel("Remove");	//set the text of the remove button
 		removeButton.addActionListener(new ActionListener()	//if the remove button was pressed
 				{
@@ -136,7 +133,7 @@ public class EditUsersPanel extends DefaultNavigationPanel
 						{
 							final DemoUser user=userListControl.get(selectedIndex);	//get the selected user
 								//create a confirmation dialog
-							final MessageOptionDialogFrame confirmationDialog=new MessageOptionDialogFrame(session, "Are you sure you want to remove user "+user.getFirstName()+" "+user.getLastName()+"?",
+							final MessageOptionDialogFrame confirmationDialog=new MessageOptionDialogFrame("Are you sure you want to remove user "+user.getFirstName()+" "+user.getLastName()+"?",
 									MessageOptionDialogFrame.Option.YES, MessageOptionDialogFrame.Option.NO);	//present "yes" and "no" options to the user
 							confirmationDialog.open(new AbstractGuisePropertyChangeListener<Mode>()	//ask for confirmation
 									{		

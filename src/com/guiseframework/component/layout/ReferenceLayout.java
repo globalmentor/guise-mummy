@@ -2,7 +2,6 @@ package com.guiseframework.component.layout;
 
 import java.util.*;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.Component;
 
 /**A layout for components bound to component references such as IDs.
@@ -26,14 +25,6 @@ public class ReferenceLayout extends AbstractLayout<ReferenceConstraints>
 
 	/**@return The class representing the type of constraints appropriate for this layout.*/
 	public Class<? extends ReferenceConstraints> getConstraintsClass() {return ReferenceConstraints.class;}
-
-	/**Session constructor.
-	@param session The Guise session that owns this layout.
-	*/
-	public ReferenceLayout(final GuiseSession session)
-	{
-		super(session);	//construct the parent class
-	}
 
 	/**Indicates that the constraints for a component have changed.
 	This method is also called when the component is first added to the layout.

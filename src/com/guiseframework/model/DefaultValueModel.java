@@ -1,7 +1,6 @@
 package com.guiseframework.model;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.validator.*;
 
 /**A default implementation of a model representing a value.
@@ -78,24 +77,22 @@ public class DefaultValueModel<V> extends AbstractValueModel<V>
 
 	/**Constructs a value model indicating the type of value it can hold.
 	The default value is set to <code>null</code>.
-	@param session The Guise session that owns this model.
 	@param valueClass The class indicating the type of value held in the model.
-	@exception NullPointerException if the given session and/or class object is <code>null</code>.
+	@exception NullPointerException if the given value class is <code>null</code>.
 	*/
-	public DefaultValueModel(final GuiseSession session, final Class<V> valueClass)
+	public DefaultValueModel(final Class<V> valueClass)
 	{
-		this(session, valueClass, null);	//construct the class with a null default value
+		this(valueClass, null);	//construct the class with a null default value
 	}
 
 	/**Constructs a value model indicating the type of value it can hold, along with an initial value.
-	@param session The Guise session that owns this model.
 	@param valueClass The class indicating the type of value held in the model.
 	@param defaultValue The default value, which will not be validated.
-	@exception NullPointerException if the given session and/or class object is <code>null</code>.
+	@exception NullPointerException if the given value class is <code>null</code>.
 	*/
-	public DefaultValueModel(final GuiseSession session, final Class<V> valueClass, final V defaultValue)
+	public DefaultValueModel(final Class<V> valueClass, final V defaultValue)
 	{
-		super(session, valueClass);	//construct the parent class
+		super(valueClass);	//construct the parent class
 		this.defaultValue=defaultValue;	//save the default value
 		this.value=defaultValue;	//set the value to the default value
 	}

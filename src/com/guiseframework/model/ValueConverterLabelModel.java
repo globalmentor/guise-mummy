@@ -1,6 +1,5 @@
 package com.guiseframework.model;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.converter.ConversionException;
 import com.guiseframework.converter.Converter;
 
@@ -26,15 +25,13 @@ public class ValueConverterLabelModel<V> extends DefaultLabelModel
 		/**@return The converter to use for displaying the value as a string.*/
 		public Converter<V, String> getConverter() {return converter;}
 
-	/**Session, value, and converter constructor.
-	@param session The Guise session that owns this model.
+	/**Value and converter constructor.
 	@param value The value to represent as a label.
 	@param converter The converter to use for displaying the value as a string.
-	@exception NullPointerException if the given session and/or converter is <code>null</code>.
+	@exception NullPointerException if the given converter is <code>null</code>.
 	*/
-	public ValueConverterLabelModel(final GuiseSession session, final V value, final Converter<V, String> converter)
+	public ValueConverterLabelModel(final V value, final Converter<V, String> converter)
 	{
-		super(session);	//construct the parent
 		this.value=value;	//save the value
 		this.converter=checkInstance(converter, "Converter cannot be null.");	//save the converter		
 	}

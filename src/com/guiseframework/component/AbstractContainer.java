@@ -3,7 +3,6 @@ package com.guiseframework.component;
 import java.util.*;
 
 import com.garretwilson.util.ReverseIterator;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 
@@ -237,16 +236,12 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		}
 	}
 
-	/**Session, ID, and layout constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Layout constructor.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given session, and/or layout is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given layout is <code>null</code>.
 	*/
-	public AbstractContainer(final GuiseSession session, final String id, final Layout<?> layout)
+	public AbstractContainer(final Layout<?> layout)
 	{
-		super(session, id);	//construct the parent class
 		this.layout=checkInstance(layout, "Layout cannot be null.");	//save the layout
 		layout.setContainer(this);	//tell the layout which container owns it
 	}
@@ -276,7 +271,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	*/
 	protected void fireContainerModified(final int index, final Component<?> addedComponent, final Component<?> removedComponent)
 	{
-		final ContainerEvent containerEvent=new ContainerEvent(getSession(), getThis(), index, addedComponent, removedComponent);	//create a new event
+		final ContainerEvent containerEvent=new ContainerEvent(getThis(), index, addedComponent, removedComponent);	//create a new event
 		getSession().queueEvent(new PostponedContainerEvent(getEventListenerManager(), containerEvent));	//tell the Guise session to queue the event
 	}
 

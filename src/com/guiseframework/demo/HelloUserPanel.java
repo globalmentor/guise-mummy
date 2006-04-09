@@ -1,6 +1,5 @@
 package com.guiseframework.demo;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
@@ -17,22 +16,20 @@ Demonstrates flow layouts, hidden components, text controls, control labels,
 public class HelloUserPanel extends DefaultNavigationPanel
 {
 
-	/**Guise session constructor.
-	@param session The Guise session that owns this panel.
-	*/
-	public HelloUserPanel(final GuiseSession session)
+	/**Default constructor.*/
+	public HelloUserPanel()
 	{
-		super(session, new FlowLayout(session, Flow.PAGE));	//construct the parent class flowing vertically
+		super(new FlowLayout(Flow.PAGE));	//construct the parent class flowing vertically
 		setLabel("Guise\u2122 Demonstration: Hello User");	//set the panel title	
 
-		final Label helloUserLabel=new Label(session);	//create a label
+		final Label helloUserLabel=new Label();	//create a label
 		helloUserLabel.setVisible(false);	//don't show the label initially
 		add(helloUserLabel);	//add the label to the panel
 		
-		final TextControl<String> userInput=new TextControl<String>(session, String.class);	//create a text input control to retrieve a string
+		final TextControl<String> userInput=new TextControl<String>(String.class);	//create a text input control to retrieve a string
 		userInput.setLabel("What's your name?");	//add a label to the text input control
 		userInput.setInfo("Enter a name that does not start with whitespace.");	//add advisory information that may be shown as a tooltip
-		userInput.setValidator(new RegularExpressionStringValidator(session, "\\S+.*", true));	//require at least a single non-whitespace character followed by any other characters
+		userInput.setValidator(new RegularExpressionStringValidator("\\S+.*", true));	//require at least a single non-whitespace character followed by any other characters
 		userInput.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<String>()
 				{
 					public void propertyChange(final GuisePropertyChangeEvent<String> propertyValueChangeEvent)

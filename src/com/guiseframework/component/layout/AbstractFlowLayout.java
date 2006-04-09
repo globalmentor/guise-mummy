@@ -3,7 +3,6 @@ package com.guiseframework.component.layout;
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.Component;
 
 /**A layout that flows information along an axis.
@@ -38,14 +37,12 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 			}
 		}
 
-	/**Session and flow constructor.
-	@param session The Guise session that owns this layout.
+	/**Flow constructor.
 	@param flow The logical axis (line or page) along which information is flowed.
-	@exception NullPointerException if the axis is <code>null</code>.
+	@exception NullPointerException if the flow axis is <code>null</code>.
 	*/
-	public AbstractFlowLayout(final GuiseSession session, final Flow flow)
+	public AbstractFlowLayout(final Flow flow)
 	{
-		super(session);	//construct the parent class
 		this.flow=checkInstance(flow, "Flow cannot be null.");	//store the flow
 	}
 

@@ -74,24 +74,20 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel
 		}
 */
 
-	/**Session constructor with a dummy root tree node.
-	@param session The Guise session that owns this model.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public DefaultTreeModel(final GuiseSession session)
+	/**Default constructor with a dummy root tree node.*/
+	public DefaultTreeModel()
 	{
-		this(session, new DummyTreeNodeModel(session));	//create a dummy root node
+		this(new DummyTreeNodeModel());	//create a dummy root node
 	}
 
-	/**Session constructor.
+	/**Root node constructor.
 	@param session The Guise session that owns this model.
 	@param rootNode The root node of the tree model.
-	@exception NullPointerException if the given session is <code>null</code>.
+	@exception NullPointerException if the given root node is <code>null</code>.
 	*/
-	public DefaultTreeModel(final GuiseSession session, final TreeNodeModel<?> rootNode)
+	public DefaultTreeModel(final TreeNodeModel<?> rootNode)
 	{
-		super(session);	//construct the parent class
-		this.rootNode=rootNode;	//save the root node
+		this.rootNode=checkInstance(rootNode, "Root node cannot be null.");	//save the root node
 		this.rootNode.addPropertyChangeListener(treeNodePropertyChangeListener);	//start listening for bubbled property change events from tree nodes
 		if(rootNode instanceof DummyTreeNodeModel)	//if a dummy tree node model is being used
 		{

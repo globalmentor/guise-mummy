@@ -50,16 +50,13 @@ public abstract class AbstractCardPanel<C extends Panel<C> & CardControl<C>> ext
 			}
 		}
 	
-	/**Session, ID, and layout constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Layout constructor.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given session and/or layout is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given layout is <code>null</code>.
 	*/
-	protected AbstractCardPanel(final GuiseSession session, final String id, final CardLayout layout)
+	protected AbstractCardPanel(final CardLayout layout)
 	{
-		super(session, id, layout);	//construct the parent class
+		super(layout);	//construct the parent class
 		addPropertyChangeListener(VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Component<?>>()	//listen for the value changing and set bookmarks in response
 				{
 					public void propertyChange(final GuisePropertyChangeEvent<Component<?>> propertyChangeEvent)	//if the value changes

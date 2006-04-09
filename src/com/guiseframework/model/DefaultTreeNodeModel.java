@@ -3,8 +3,6 @@ package com.guiseframework.model;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.guiseframework.GuiseSession;
-
 /**A default node in a tree model.
 Property change events on one tree node will be bubbled up the hierarchy, with the source indicating the tree node on which the property change occurred.
 @author Garret Wilson
@@ -157,24 +155,22 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 */
 
 	/**Constructs a tree node model indicating the type of value it can hold.
-	@param session The Guise session that owns this model.
 	@param valueClass The class indicating the type of value held in the model.
-	@exception NullPointerException if the given session and/or class object is <code>null</code>.
+	@exception NullPointerException if the given value class is <code>null</code>.
 	*/
-	public DefaultTreeNodeModel(final GuiseSession session, final Class<V> valueClass)
+	public DefaultTreeNodeModel(final Class<V> valueClass)
 	{
-		this(session, valueClass, null);	//construct the class with a null initial value
+		this(valueClass, null);	//construct the class with a null initial value
 	}
 
 	/**Constructs a tree node model indicating the type of value it can hold, along with an initial value.
-	@param session The Guise session that owns this model.
 	@param valueClass The class indicating the type of value held in the model.
 	@param initialValue The initial value, which will not be validated.
-	@exception NullPointerException if the given session and/or class object is <code>null</code>.
+	@exception NullPointerException if the given value class is <code>null</code>.
 	*/
-	public DefaultTreeNodeModel(final GuiseSession session, final Class<V> valueClass, final V initialValue)
+	public DefaultTreeNodeModel(final Class<V> valueClass, final V initialValue)
 	{
-		super(session, valueClass, initialValue);	//construct the parent class
+		super(valueClass, initialValue);	//construct the parent class
 //TODO del or move		setEditable(false);	//default to not being editable
 	}
 

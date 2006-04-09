@@ -48,12 +48,11 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	/**Creates a frame for the application.
 	This implementation returns a default application frame.
-	@param session The Guise session that will own the application frame.
 	@return A new frame for the application.
 	*/
-	public ApplicationFrame<?> createApplicationFrame(final GuiseSession session)
+	public ApplicationFrame<?> createApplicationFrame()
 	{
-		return new DefaultApplicationFrame(session);	//return an instance of the default application frame 
+		return new DefaultApplicationFrame();	//return an instance of the default application frame 
 	}
 		
 	/**The base path of the application, or <code>null</code> if the application is not yet installed.*/

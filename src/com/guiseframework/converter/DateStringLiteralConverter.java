@@ -3,8 +3,6 @@ package com.guiseframework.converter;
 import java.text.*;
 import java.util.*;
 
-import com.guiseframework.GuiseSession;
-
 /**An object that can convert a date/time from and to a string.
 This implementation caches a date format and only creates a new one if the locale has changed.
 This implementation synchronizes all conversions on the {@link DateFormat} object.
@@ -13,25 +11,23 @@ This implementation synchronizes all conversions on the {@link DateFormat} objec
 public class DateStringLiteralConverter extends AbstractDateStringLiteralConverter<Date>
 {
 
-	/**Session and date style constructor with no time style.
-	@param session The Guise session that owns this converter.
+	/**Date style constructor with no time style.
 	@param dateStyle The date representation style, or <code>null</code> if the date should not be represented.
-	@exception NullPointerException if the given session and/or date style is <code>null</code>.
+	@exception NullPointerException if the given date style is <code>null</code>.
 	*/
-	public DateStringLiteralConverter(final GuiseSession session, final DateStringLiteralStyle dateStyle)
+	public DateStringLiteralConverter(final DateStringLiteralStyle dateStyle)
 	{
-		this(session, dateStyle, null);	//construct the class with no time style
+		this(dateStyle, null);	//construct the class with no time style
 	}
 
-	/**Session, date style, and time style constructor.
-	@param session The Guise session that owns this converter.
+	/**Date style and time style constructor.
 	@param dateStyle The date representation style, or <code>null</code> if the date should not be represented.
 	@param timeStyle The time representation style, or <code>null</code> if the time should not be represented.
-	@exception NullPointerException if the given session and/or both the date style and time style is <code>null</code>.
+	@exception NullPointerException if both the given date style and time style are <code>null</code>.
 	*/
-	public DateStringLiteralConverter(final GuiseSession session, final DateStringLiteralStyle dateStyle, final TimeStringLiteralStyle timeStyle)
+	public DateStringLiteralConverter(final DateStringLiteralStyle dateStyle, final TimeStringLiteralStyle timeStyle)
 	{
-		super(session, dateStyle, timeStyle);	//construct the parent class
+		super(dateStyle, timeStyle);	//construct the parent class
 	}
 
 	/**Converts a value from the value space to a literal value in the lexical space.

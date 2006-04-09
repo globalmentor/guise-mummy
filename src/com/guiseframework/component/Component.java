@@ -103,7 +103,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public final static Dimensions ROUNDED_CORNER_ARC_SIZE=new Dimensions(0.25, 0.25, Extent.Unit.EM);
 	
 	/**The character used to combine hierarchical IDs.*/
-	public final static char ID_SEGMENT_DELIMITER='.';
+//TODO del	public final static char ID_SEGMENT_DELIMITER='.';
 
 	/**@return The name of the component, not guaranteed to be unique (but guaranteed not to be the empty string) and useful only for searching for components within a component sub-hierarchy, or <code>null</code> if the component has no name.*/
 	public String getName();
@@ -361,14 +361,6 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 
 	/**@return The component identifier.*/
 	public String getID();
-
-	/**Creates an ID by combining this component's ID and the the given ID segment.
-	@param idSegment The ID segment, which must itself be a valid ID, to include in the full ID.
-	@return An ID appropriate for a child component of this component.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	@see Component#ID_SEGMENT_DELIMITER
-	*/
-	public String createID(final String idSegment);
 
 	/**Returns this component's requested orientation.
 	To resolve the orientation up the hierarchy, {@link #getComponentOrientation()} should be used.

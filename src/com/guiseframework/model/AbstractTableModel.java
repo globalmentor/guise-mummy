@@ -5,7 +5,6 @@ import static java.util.Collections.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.garretwilson.util.CollectionUtilities;
-import com.guiseframework.GuiseSession;
 
 /**An abstract implementation of a table model.
 The table model is editable by default.
@@ -48,14 +47,12 @@ public abstract class AbstractTableModel extends AbstractModel implements TableM
 		logicalTableColumnModels.clear();	//clear the logical columns		
 	}
 	
-	/**Session constructor.
-	@param session The Guise session that owns this model.
+	/**Columns constructor.
 	@param columns The models representing the table columns.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public AbstractTableModel(final GuiseSession session, final TableColumnModel<?>... columns)
+	public AbstractTableModel(final TableColumnModel<?>... columns)
 	{
-		super(session);	//construct the parent class
+		super();	//construct the parent class
 		CollectionUtilities.addAll(tableColumnModels, columns);	//add all the columns to our list of table columns
 		CollectionUtilities.addAll(logicalTableColumnModels, columns);	//add all the columns to our logical list of table columns
 	}

@@ -8,7 +8,6 @@ import java.util.MissingResourceException;
 
 import javax.mail.internet.ContentType;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.event.*;
 
 /**A base abstract class implementing helpful functionality for models.
@@ -22,13 +21,9 @@ public abstract class AbstractModel extends GuiseBoundPropertyObject implements 
 		/**@return The object managing event listeners.*/
 		protected EventListenerManager getEventListenerManager() {return eventListenerManager;}
 
-	/**Session constructor.
-	@param session The Guise session that owns this model.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public AbstractModel(final GuiseSession session)
+	/**Default constructor.*/
+	public AbstractModel()
 	{
-		super(session);	//construct the parent class
 	}
 
 	/**Determines the plain text form of the given text, based upon its content type.

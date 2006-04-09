@@ -2,7 +2,6 @@ package com.guiseframework.component;
 
 import java.util.Date;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.event.AbstractGuisePropertyChangeListener;
 import com.guiseframework.event.GuisePropertyChangeEvent;
 import com.guiseframework.model.DefaultValueModel;
@@ -29,70 +28,29 @@ public class CalendarDialogFrame extends AbstractDialogFrame<Date, CalendarDialo
 		throw new UnsupportedOperationException("Cannot change content component of "+getClass());
 	}
 
-	/**Session constructor.
-	@param session The Guise session that owns this component.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public CalendarDialogFrame(final GuiseSession session)
+	/**Default constructor with no date.*/
+	public CalendarDialogFrame()
 	{
-		this(session, (String)null);	//construct the component, indicating that a default ID should be used
+		this((Date)null);	//construct the class with no default date
 	}
 
-	/**Session and default date constructor.
-	@param session The Guise session that owns this component.
+	/**Default date constructor.
 	@param defaultDate The default selected date, or <code>null</code> if there is no default selected date.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public CalendarDialogFrame(final GuiseSession session, final Date defaultDate)
+	public CalendarDialogFrame(final Date defaultDate)
 	{
-		this(session, (String)null, defaultDate);	//construct the component, indicating that a default ID should be used
+		this(new DefaultValueModel<Date>(Date.class, defaultDate));	//use a default value model
 	}
 
-	/**Session and model constructor.
-	@param session The Guise session that owns this component.
-	@param model The component data model.
-	@exception NullPointerException if the given session is <code>null</code>.
+	/**Value model constructor.
+	@param valueModel The component value model.
+	@exception NullPointerException if the given model is <code>null</code>.
 	*/
-	public CalendarDialogFrame(final GuiseSession session, final ValueModel<Date> model)
+	public CalendarDialogFrame(final ValueModel<Date> valueModel)
 	{
-		this(session, (String)null, model);	//construct the component, indicating that a default ID should be used
-	}
-
-	/**Session and ID constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public CalendarDialogFrame(final GuiseSession session, final String id)
-	{
-		this(session, id, (Date)null);	//construct the class with no default date
-	}
-
-	/**Session, ID, and default date constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param defaultDate The default selected date, or <code>null</code> if there is no default selected date.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public CalendarDialogFrame(final GuiseSession session, final String id, final Date defaultDate)
-	{
-		this(session, id, new DefaultValueModel<Date>(session, Date.class, defaultDate));	//use a default value model
-	}
-
-	/**Session, ID, model, and component constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public CalendarDialogFrame(final GuiseSession session, final String id, final ValueModel<Date> model)
-	{
-		super(session, id, model, new CalendarControl(session));	//construct the parent class with a calendar control
+		super(valueModel, new CalendarControl());	//construct the parent class with a calendar control
 		final CalendarControl calendarControl=getContent();	//get a reference to the calendar control content component
-		final Date defaultDate=model.getDefaultValue();	//see if there is a default date
+		final Date defaultDate=valueModel.getDefaultValue();	//see if there is a default date
 		if(defaultDate!=null)	//if there is a default date
 		{
 			try

@@ -4,7 +4,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import static java.util.Collections.*;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.model.ValueModel;
 
@@ -56,7 +55,7 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 			}
 			if(newOptionContent!=null)	//if a new content component is given
 			{
-				contentsContainer.add(newOptionContent, new RegionConstraints(getSession(), Region.CENTER));	//add the component to the center of the container
+				contentsContainer.add(newOptionContent, new RegionConstraints(Region.CENTER));	//add the component to the center of the container
 			}
 		}
 	}
@@ -82,19 +81,16 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 		*/
 		public Component<?> getOptionComponent(final O option) {return optionComponentMap.get(option);}
 		
-	/**Session, ID, model, component, and options constructor.
+	/**Value model, component, and options constructor.
 	Duplicate options are ignored.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param model The component data model.
+	@param valueModel The frame value model.
 	@param component The component representing the content of the option dialog frame, or <code>null</code> if there is no content component.
 	@param options The available options.
-	@exception NullPointerException if the given session, model, and/or options is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given value model and/or options is <code>null</code>.
 	*/
-	public AbstractOptionDialogFrame(final GuiseSession session, final String id, final ValueModel<O> model, final Component<?> component, final O... options)
+	public AbstractOptionDialogFrame(final ValueModel<O> valueModel, final Component<?> component, final O... options)
 	{
-		super(session, id, model, new LayoutPanel(session, new RegionLayout(session)));	//construct the parent class using a layout panel as a container
+		super(valueModel, new LayoutPanel(new RegionLayout()));	//construct the parent class using a layout panel as a container
 		final List<O> optionList=new ArrayList<O>();	//create a list of options
 		for(final O option:options)	//put all the options in the list without duplicates
 		{
@@ -106,7 +102,7 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 		this.options=unmodifiableList(optionList);	//save the list of options without duplicates
 		setOptionContent(component);	//set the component, if there is one
 		optionContainer=createOptionContainer();	//create the option container
-		getContentContainer().add(optionContainer, new RegionConstraints(session, Region.PAGE_END));	//add the option container at the bottom
+		getContentContainer().add(optionContainer, new RegionConstraints(Region.PAGE_END));	//add the option container at the bottom
 		initializeOptionContainer(optionContainer, this.options);	//initialize the option container
 	}
 
@@ -116,7 +112,7 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 	*/
 	protected Container<?> createOptionContainer()
 	{
-		return new LayoutPanel(getSession(), new FlowLayout(getSession(), Flow.LINE));	//create a horizontal layout panel
+		return new LayoutPanel(new FlowLayout(Flow.LINE));	//create a horizontal layout panel
 	}
 
 	/**Initializes the option container with the available options.
@@ -126,7 +122,6 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 	*/
 	protected void initializeOptionContainer(final Container<?> optionContainer, final List<O> options)
 	{
-		final GuiseSession session=getSession();	//get the session
 		for(final O option:options)	//for each option
 		{
 			final Component<?> optionComponent=createOptionComponent(option);	//create a component for this option

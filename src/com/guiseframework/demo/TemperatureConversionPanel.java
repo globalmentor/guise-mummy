@@ -1,6 +1,5 @@
 package com.guiseframework.demo;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
@@ -23,19 +22,17 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 	private final CheckControl celsiusCheckControl;
 	private final CheckControl fahrenheitCheckControl;
 
-	/**Guise session constructor.
-	@param session The Guise session that owns this panel.
-	*/
-	public TemperatureConversionPanel(final GuiseSession session)
+	/**Default constructor.*/
+	public TemperatureConversionPanel()
 	{
-		super(session, new FlowLayout(session, Flow.LINE));	//construct the parent class flowing horizontally
+		super(new FlowLayout(Flow.LINE));	//construct the parent class flowing horizontally
 		setLabel("Guise\u2122 Demonstration: Temperature Conversion");	//set the panel title	
 
 			//input panel
-		final LayoutPanel inputPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE));	//create the input panel flowing vertically
-		temperatureInput=new TextControl<Float>(session, Float.class);	//create a text input control to receive a float
+		final LayoutPanel inputPanel=new LayoutPanel(new FlowLayout(Flow.PAGE));	//create the input panel flowing vertically
+		temperatureInput=new TextControl<Float>(Float.class);	//create a text input control to receive a float
 		temperatureInput.setLabel("Input Temperature");	//add a label to the text input control
-		temperatureInput.setValidator(new ValueRequiredValidator<Float>(session));	//install a validator requiring a value
+		temperatureInput.setValidator(new ValueRequiredValidator<Float>());	//install a validator requiring a value
 		temperatureInput.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Float>()	//listen for temperature changes
 				{
 					public void propertyChange(final GuisePropertyChangeEvent<Float> propertyChangeEvent)	//if the input temperature changes
@@ -44,19 +41,19 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 					}
 				});		
 		inputPanel.add(temperatureInput);	//add the input control to the input panel
-		temperatureOutput=new TextControl<Float>(session, Float.class);	//create a text input control to display the result
+		temperatureOutput=new TextControl<Float>(Float.class);	//create a text input control to display the result
 		temperatureOutput.setLabel("Output Temperature");	//add a label to the text output control
 		temperatureOutput.setEditable(false);	//set the text output control to read-only so that the user cannot modify it
 		inputPanel.add(temperatureOutput);	//add the output control to the input panel
 
 		add(inputPanel);	//add the input panel to the temperature panel
 
-		final LayoutPanel conversionPanel=new LayoutPanel(session, new FlowLayout(session, Flow.PAGE));	//create the right-hand panel flowing vertically
+		final LayoutPanel conversionPanel=new LayoutPanel(new FlowLayout(Flow.PAGE));	//create the right-hand panel flowing vertically
 			
 			//scale panel
-		final GroupPanel scalePanel=new GroupPanel(session, new FlowLayout(session, Flow.PAGE));	//create the scale panel flowing vertically
+		final GroupPanel scalePanel=new GroupPanel(new FlowLayout(Flow.PAGE));	//create the scale panel flowing vertically
 		scalePanel.setLabel("Input Scale");	//set the group panel label
-		celsiusCheckControl=new CheckControl(session, CheckControl.CheckType.ELLIPSE);	//create a check control for the Celsius scale, using an ellipse check are
+		celsiusCheckControl=new CheckControl(CheckControl.CheckType.ELLIPSE);	//create a check control for the Celsius scale, using an ellipse check are
 		celsiusCheckControl.setLabel("Celsius");	//set the label of the check to indicate the scale
 		try
 		{
@@ -67,7 +64,7 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 			throw new AssertionError(validationException);
 		}
 		scalePanel.add(celsiusCheckControl);	//add the Celsius check control to the panel	
-		fahrenheitCheckControl=new CheckControl(session, CheckControl.CheckType.ELLIPSE);	//create a check control for the Fahrenheit scale, using an ellipse check are
+		fahrenheitCheckControl=new CheckControl(CheckControl.CheckType.ELLIPSE);	//create a check control for the Fahrenheit scale, using an ellipse check are
 		fahrenheitCheckControl.setLabel("Fahrenheit");	//set the label of the check to indicate the scale
 		scalePanel.add(fahrenheitCheckControl);	//add the Fahrenheit check control to the panel	
 			//create a mutual exclusion policy group and add the Celsius and Fahrenheit check box boolean value models to get radio button functionality
@@ -90,7 +87,7 @@ public class TemperatureConversionPanel extends DefaultNavigationPanel
 		fahrenheitCheckControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, checkControlListener);	//listen for the Fahrenheit control changing
 		
 			//conversion button
-		final Button convertButton=new Button(session);	//create a button for initiating the conversion
+		final Button convertButton=new Button();	//create a button for initiating the conversion
 		convertButton.setLabel("Convert");	//set the button label
 		convertButton.addActionListener(new ActionListener()	//when the convert button is pressed
 				{

@@ -1,6 +1,5 @@
 package com.guiseframework.component;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.model.ActionModel;
 
 /**Abstract implementation of a button.
@@ -9,15 +8,12 @@ import com.guiseframework.model.ActionModel;
 public abstract class AbstractButtonControl<C extends ButtonControl<C>> extends AbstractActionControl<C> implements ButtonControl<C>
 {
 
-	/**Session, ID, and model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Action model constructor.
 	@param actionModel The component action model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given action model is <code>null</code>.
 	*/
-	public AbstractButtonControl(final GuiseSession session, final String id, final ActionModel actionModel)
+	public AbstractButtonControl(final ActionModel actionModel)
 	{
-		super(session, id, actionModel);	//construct the parent class
+		super(actionModel);	//construct the parent class
 	}
 }

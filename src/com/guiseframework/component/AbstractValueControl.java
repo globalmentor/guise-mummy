@@ -5,8 +5,6 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
-import com.guiseframework.GuiseSession;
-import com.guiseframework.event.AbstractGuisePropertyChangeListener;
 import com.guiseframework.model.*;
 import com.guiseframework.validator.ValidationException;
 import com.guiseframework.validator.Validator;
@@ -55,51 +53,32 @@ public abstract class AbstractValueControl<V, C extends ValueControl<V, C>> exte
 				}
 			};
 
-	/**Session constructor with a default data model to represent a given type.
-	@param session The Guise session that owns this component.
+	/**Value class constructor with a default data model to represent a given type.
 	@param valueClass The class indicating the type of value held in the model.
-	@exception NullPointerException if the given session and/or value class is <code>null</code>.
+	@exception NullPointerException if the given value class is <code>null</code>.
 	*/
-	public AbstractValueControl(final GuiseSession session, final Class<V> valueClass)
+	public AbstractValueControl(final Class<V> valueClass)
 	{
-		this(session, null, valueClass);	//construct the component, indicating that a default ID should be used
+		this(new DefaultValueModel<V>(valueClass));	//construct the class with a default value model
 	}
 
-	/**Session and ID constructor with a default data model to represent a given type.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param valueClass The class indicating the type of value held in the model.
-	@exception NullPointerException if the given session and/or value class is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public AbstractValueControl(final GuiseSession session, final String id, final Class<V> valueClass)
-	{
-		this(session, id, new DefaultValueModel<V>(session, valueClass));	//construct the class with a default model
-	}
-
-	/**Session, ID, and model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Value model constructor.
 	@param valueModel The component value model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given value model is <code>null</code>.
 	*/
-	public AbstractValueControl(final GuiseSession session, final String id, final ValueModel<V> valueModel)
+	public AbstractValueControl(final ValueModel<V> valueModel)
 	{
-		this(session, id, new DefaultLabelModel(session), valueModel);	//construct the class with a default label model
+		this(new DefaultLabelModel(), valueModel);	//construct the class with a default label model
 	}
 
-	/**Session, ID, and model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Label model and value model constructor.
 	@param labelModel The component label model.
 	@param valueModel The component value model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given label model and/or value model is <code>null</code>.
 	*/
-	public AbstractValueControl(final GuiseSession session, final String id, final LabelModel labelModel, final ValueModel<V> valueModel)
+	public AbstractValueControl(final LabelModel labelModel, final ValueModel<V> valueModel)
 	{
-		super(session, id, labelModel);	//construct the parent class
+		super(labelModel);	//construct the parent class
 		this.valueModel=checkInstance(valueModel, "Value model cannot be null.");	//save the value model
 		this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the value model
 		addPropertyChangeListener(VALUE_PROPERTY, clearNotificationPropertyChangeListener);	//listen for the value changing, and clear the notification in response TODO this needs to be put in other value controls as well

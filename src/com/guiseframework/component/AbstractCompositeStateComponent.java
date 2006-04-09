@@ -4,8 +4,6 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 
 import java.util.*;
 
-import com.guiseframework.GuiseSession;
-
 /**A composite component that represents the state of its child components.
 @param <T> The type of object being represented.
 @param <S> The component state of each object.
@@ -74,18 +72,6 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 			removeComponent(component);	//remove this component
 		}
 		componentStateMap.clear();	//remove all component states
-	}
-
-	/**Session and ID constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	@exception IllegalStateException if no controller is registered for this component type.
-	*/
-	public AbstractCompositeStateComponent(final GuiseSession session, final String id)
-	{
-		super(session, id);	//construct the parent class
 	}
 
 	/**An encapsulation of the state of a representation component.

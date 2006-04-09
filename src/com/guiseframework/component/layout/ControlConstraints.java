@@ -1,6 +1,5 @@
 package com.guiseframework.component.layout;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.model.*;
 
 /**Constraints on a component in a container control.
@@ -52,23 +51,17 @@ public class ControlConstraints extends AbstractConstraints implements Displayab
 			}			
 		}
 
-	/**Session constructor.
-	@param session The Guise session that owns this model.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public ControlConstraints(final GuiseSession session)
+	/**Default constructor.*/
+	public ControlConstraints()
 	{
-		this(session, true);	//construct the class with no label
+		this(true);	//construct the class with no label
 	}
 
-	/**Session and enabled constructor.
-	@param session The Guise session that owns this model.
+	/**Enabled constructor.
 	@param enabled Whether the component is enabled.
-	@exception NullPointerException if the given session is <code>null</code>.
 	*/
-	public ControlConstraints(final GuiseSession session, final boolean enabled)
+	public ControlConstraints(final boolean enabled)
 	{
-		super(session);	//construct the parent class 
 		this.enabled=enabled;	//save the enabled state
 	}
 

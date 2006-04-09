@@ -1,7 +1,5 @@
 package com.guiseframework.component;
 
-import com.guiseframework.GuiseSession;
-
 /**Abstract implementation of an application frame.
 @author Garret Wilson
 @see LayoutPanel
@@ -9,16 +7,12 @@ import com.guiseframework.GuiseSession;
 public abstract class AbstractApplicationFrame<C extends ApplicationFrame<C>> extends AbstractFrame<C> implements ApplicationFrame<C>
 {
 
-	/**Session, ID, and component constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Component constructor.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
 	*/
-	public AbstractApplicationFrame(final GuiseSession session, final String id, final Component<?> component)
+	public AbstractApplicationFrame(final Component<?> component)
 	{
-		super(session, id, component);	//construct the parent class
+		super(component);	//construct the parent class
 	}
 
 	/**Determines whether the frame should be allowed to close.

@@ -5,20 +5,11 @@ import static com.guiseframework.GuiseResourceConstants.*;
 import java.io.IOException;
 import java.util.List;
 
-import com.garretwilson.util.Debug;
 import com.guiseframework.Bookmark;
-import com.guiseframework.GuiseSession;
-import com.guiseframework.component.layout.CardLayout;
-import com.guiseframework.component.layout.Constraints;
-import com.guiseframework.component.layout.TaskCardConstraints;
-import com.guiseframework.event.AbstractGuisePropertyChangeListener;
-import com.guiseframework.event.GuisePropertyChangeEvent;
-import com.guiseframework.model.Commitable;
-import com.guiseframework.model.Enableable;
-import com.guiseframework.model.Notification;
-import com.guiseframework.model.TaskStatus;
-import com.guiseframework.validator.AbstractValidator;
-import com.guiseframework.validator.ValidationException;
+import com.guiseframework.component.layout.*;
+import com.guiseframework.event.*;
+import com.guiseframework.model.*;
+import com.guiseframework.validator.*;
 
 /**A card panel representing a sequence of cards.
 If any card has constraints of {@link TaskCardConstraints}, this class will update the task status based upon visited and validated status.
@@ -28,47 +19,20 @@ If any card has constraints of {@link TaskCardConstraints}, this class will upda
 public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> implements Commitable
 {
 
-	/**Session constructor.
-	@param session The Guise session that owns this component.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public SequenceCardPanel(final GuiseSession session)
+	/**Default constructor.*/
+	public SequenceCardPanel()
 	{
-		this(session, (String)null);	//construct the component, indicating that a default ID should be used
+		this(new CardLayout());	//default to flowing vertically
 	}
 
-	/**Session and ID constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public SequenceCardPanel(final GuiseSession session, final String id)
-	{
-		this(session, id, new CardLayout(session));	//default to flowing vertically
-	}
-
-	/**Session and layout constructor.
-	@param session The Guise session that owns this component.
+	/**Layout constructor.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given session and/or layout is <code>null</code>.
+	@exception NullPointerException if the given layout is <code>null</code>.
 	*/
-	public SequenceCardPanel(final GuiseSession session, final CardLayout layout)
+	protected SequenceCardPanel(final CardLayout layout)
 	{
-		this(session, null, layout);	//construct the component with the layout, indicating that a default ID should be used
-	}
-
-	/**Session, ID, and layout constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param layout The layout definition for the container.
-	@exception NullPointerException if the given session and/or layout is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	protected SequenceCardPanel(final GuiseSession session, final String id, final CardLayout layout)
-	{
-		super(session, id, layout);	//construct the parent class
-		setValidator(new SequenceCardValidator(session));	//TODO comment
+		super(layout);	//construct the parent class
+		setValidator(new SequenceCardValidator());	//TODO comment
 		addPropertyChangeListener(VALUE_PROPERTY, new AbstractGuisePropertyChangeListener<Component<?>>()
 				{
 					public void propertyChange(final GuisePropertyChangeEvent<Component<?>> propertyChangeEvent)	//if the selected card changes
@@ -433,13 +397,10 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	protected class SequenceCardValidator extends AbstractValidator<Component<?>>
 	{
 
-		/**Session constructor.
-		@param session The Guise session that owns this validator.
-		@exception NullPointerException if the given session is <code>null</code>.
-		*/
-		public SequenceCardValidator(final GuiseSession session)
+		/**Default constructor.*/
+		public SequenceCardValidator()
 		{
-			super(session, true);	//construct the parent class, indicating that values are required
+			super(true);	//construct the parent class, indicating that values are required
 		}		
 		
 		/**Determines whether a given value is valid.

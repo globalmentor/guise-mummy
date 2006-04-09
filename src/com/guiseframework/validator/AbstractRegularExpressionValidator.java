@@ -2,8 +2,6 @@ package com.guiseframework.validator;
 
 import java.util.regex.Pattern;
 
-import com.guiseframework.GuiseSession;
-
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**An abstract validator that can validate against regular expressions.
@@ -20,45 +18,41 @@ public abstract class AbstractRegularExpressionValidator<V> extends AbstractVali
 		public Pattern getPattern() {return pattern;}
 
 	/**Constructs a string regular expression validator from a regular expression string, without requiring a non-<code>null</code> value..
-	@param session The Guise session that owns this validator.
 	@param regularExpression The regular expression against which to validate string values.
-	@exception NullPointerException if the given session and/or regular expression is <code>null</code>.
+	@exception NullPointerException if the given regular expression is <code>null</code>.
 	*/
-	public AbstractRegularExpressionValidator(final GuiseSession session, final String regularExpression)
+	public AbstractRegularExpressionValidator(final String regularExpression)
 	{
-		this(session, regularExpression, false);	//construct the class without requiring a value
+		this(regularExpression, false);	//construct the class without requiring a value
 	}
 
 	/**Constructs a string regular expression validator from a regular expression string.
-	@param session The Guise session that owns this validator.
 	@param regularExpression The regular expression against which to validate string values.
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
-	@exception NullPointerException if the given session and/or regular expression is <code>null</code>.
+	@exception NullPointerException if the given regular expression is <code>null</code>.
 	*/
-	public AbstractRegularExpressionValidator(final GuiseSession session, final String regularExpression, final boolean valueRequired)
+	public AbstractRegularExpressionValidator(final String regularExpression, final boolean valueRequired)
 	{
-		this(session, Pattern.compile(checkInstance(regularExpression, "Regular expression cannot be null.")), valueRequired);	//compile the regular expression into a pattern and construct the class
+		this(Pattern.compile(checkInstance(regularExpression, "Regular expression cannot be null.")), valueRequired);	//compile the regular expression into a pattern and construct the class
 	}
 
 	/**Constructs a string regular expression validator from a regular expression pattern, without requiring a non-<code>null</code> value.
-	@param session The Guise session that owns this validator.
 	@param pattern The regular expression pattern against which to validate string values.
-	@exception NullPointerException if the given session and/or regular expression is <code>null</code>.
+	@exception NullPointerException if the given regular expression pattern is <code>null</code>.
 	*/
-	public AbstractRegularExpressionValidator(final GuiseSession session, final Pattern pattern)
+	public AbstractRegularExpressionValidator(final Pattern pattern)
 	{
-		this(session, pattern, false);	//construct the class without requiring a value
+		this(pattern, false);	//construct the class without requiring a value
 	}
 
 	/**Constructs a string regular expression validator from a regular expression pattern.
-	@param session The Guise session that owns this validator.
 	@param pattern The regular expression pattern against which to validate string values.
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
-	@exception NullPointerException if the given session and/or regular expression is <code>null</code>.
+	@exception NullPointerException if the given regular expression pattern is <code>null</code>.
 	*/
-	public AbstractRegularExpressionValidator(final GuiseSession session, final Pattern pattern, final boolean valueRequired)
+	public AbstractRegularExpressionValidator(final Pattern pattern, final boolean valueRequired)
 	{
-		super(session, valueRequired);	//construct the parent class
+		super(valueRequired);	//construct the parent class
 		this.pattern=checkInstance(pattern, "Regular expression pattern cannot be null.");	//save the pattern
 	}
 

@@ -8,8 +8,6 @@ import java.util.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.text.CharacterConstants.*;
 
-import com.guiseframework.GuiseSession;
-
 /**An abstract implementation an object that can convert a number from and to a string.
 If the currency style is chosen, care should be taken to indicate a specific constant currency unless it is desired that the currency type change whenever the locale changes. 
 This implementation caches a number format and only creates a new one if the locale has changed.
@@ -51,16 +49,14 @@ public abstract class AbstractNumberStringLiteralConverter<V extends Number> ext
 		return numberFormat;	//return the number format
 	}
 
-	/**Session, style, and currency constructor.
-	@param session The Guise session that owns this converter.
+	/**Style and currency constructor.
 	@param style The representation style.
 	@param currency The constant currency type to use, or <code>null</code> if currency representation is not requested or the currency should be dynamically determined by the locale.
-	@exception NullPointerException if the given session and/or style is <code>null</code>.
+	@exception NullPointerException if the given style is <code>null</code>.
 	@exception IllegalArgumentException if a currency is provided for a style other than {@link Style#CURRENCY}.
 	*/
-	public AbstractNumberStringLiteralConverter(final GuiseSession session, final Style style, final Currency currency)
+	public AbstractNumberStringLiteralConverter(final Style style, final Currency currency)
 	{
-		super(session);	//construct the parent class
 		this.style=checkInstance(style, "Style cannot be null");	//save the style
 		if(currency!=null && style!=Style.CURRENCY)	//if a currency is provided for a non-currency style
 		{

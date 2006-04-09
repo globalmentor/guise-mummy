@@ -4,7 +4,6 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 
 import javax.mail.internet.ContentType;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.ReferenceLayout;
 import com.guiseframework.model.*;
 
@@ -33,46 +32,19 @@ public class Text extends AbstractContainer<Text> implements TextModel
 	/**@return The layout definition for the text.*/
 	public ReferenceLayout getLayout() {return (ReferenceLayout)super.getLayout();}	//a text component can only have a reference layout
 
-	/**Session constructor with a default text model.
-	@param session The Guise session that owns this component.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public Text(final GuiseSession session)
+	/**Default constructor with a default text model.*/
+	public Text()
 	{
-		this(session, (String)null);	//construct the component, indicating that a default ID should be used
+		this(new DefaultTextModel());	//construct the class with a default text model
 	}
 
-	/**Session and ID constructor with a default text model.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@exception NullPointerException if the given session is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public Text(final GuiseSession session, final String id)
-	{
-		this(session, id, new DefaultTextModel(session));	//construct the class with a default model
-	}
-
-	/**Session and text model constructor.
-	@param session The Guise session that owns this component.
+	/**Text model constructor.
 	@param textModel The component text model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
+	@exception NullPointerException if the given text model is <code>null</code>.
 	*/
-	public Text(final GuiseSession session, final TextModel textModel)
+	public Text(final TextModel textModel)
 	{
-		this(session, null, textModel);	//construct the component, indicating that a default ID should be used
-	}
-
-	/**Session, ID, and text model constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
-	@param textModel The component text model.
-	@exception NullPointerException if the given session and/or model is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
-	*/
-	public Text(final GuiseSession session, final String id, final TextModel textModel)
-	{
-		super(session, id, new ReferenceLayout(session));	//construct the parent class
+		super(new ReferenceLayout());	//construct the parent class
 		this.textModel=checkInstance(textModel, "Text model cannot be null.");	//save the text model
 		this.textModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the text model
 	}

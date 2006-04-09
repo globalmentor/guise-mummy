@@ -7,8 +7,6 @@ import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.Guise;
 import com.guiseframework.GuiseSession;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
-
 /**A bound property object that reports all property change events to the current session.
 This class postpones events if Guise is processing component controller events.
 @author Garret Wilson
@@ -21,14 +19,10 @@ public class GuiseBoundPropertyObject extends BoundPropertyObject
 		/**@return The Guise session that owns this object.*/
 		public GuiseSession getSession() {return session;}
 
-	/**Session constructor.
-	@param session The Guise session that owns this object.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public GuiseBoundPropertyObject(final GuiseSession session)
+	/**Default constructor.*/
+	public GuiseBoundPropertyObject()
 	{
-//TODO del when works		this.session=checkInstance(session, "Session cannot be null");	//save the session
-		this.session=Guise.getInstance().getGuiseSession();	//get the current Guise session
+		this.session=Guise.getInstance().getGuiseSession();	//store a reference to the current Guise session
 	}
 
 	/**Reports that a bound property has changed. This method can be called	when a bound property has changed and it will send the appropriate property change event to any registered property change listeners.

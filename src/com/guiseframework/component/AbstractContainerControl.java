@@ -1,7 +1,6 @@
 package com.guiseframework.component;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.Layout;
 import com.guiseframework.model.Notification;
 
@@ -110,15 +109,12 @@ public abstract class AbstractContainerControl<C extends ContainerControl<C>> ex
 		}
 	}
 
-	/**Session, ID, and layout constructor.
-	@param session The Guise session that owns this component.
-	@param id The component identifier, or <code>null</code> if a default component identifier should be generated.
+	/**Layout constructor.
 	@param layout The layout definition for the container.
-	@exception NullPointerException if the given session, and/or layout is <code>null</code>.
-	@exception IllegalArgumentException if the given identifier is not a valid component identifier.
+	@exception NullPointerException if the given layout is <code>null</code>.
 	*/
-	public AbstractContainerControl(final GuiseSession session, final String id, final Layout layout)
+	public AbstractContainerControl(final Layout layout)
 	{
-		super(session, id, layout);	//construct the parent class
+		super(layout);	//construct the parent class
 	}
 }

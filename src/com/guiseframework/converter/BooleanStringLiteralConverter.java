@@ -2,23 +2,12 @@ package com.guiseframework.converter;
 
 import static java.text.MessageFormat.*;
 
-import com.guiseframework.GuiseSession;
-
 /**A converter that converts a <code>Boolean</code> from and to a string literal.
 @author Garret Wilson
 @see Boolean
 */
 public class BooleanStringLiteralConverter extends AbstractStringLiteralConverter<Boolean>
 {
-
-	/**Session constructor with no value required.
-	@param session The Guise session that owns this converter.
-	@exception NullPointerException if the given session is <code>null</code>.
-	*/
-	public BooleanStringLiteralConverter(final GuiseSession session)
-	{
-		super(session);	//construct the parent class
-	}
 
 	/**Converts a literal representation of a value from the lexical space into a value in the value space.
 	@param literal The literal value in the lexical space to convert.

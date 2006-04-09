@@ -1,6 +1,5 @@
 package com.guiseframework.demo;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.coupler.ActionCardCoupler;
@@ -21,34 +20,32 @@ Demonstrates sequence card panels, task card constraints, task status select lin
 public class EventWizardPanel extends DefaultNavigationPanel
 {
 
-	/**Guise session constructor.
-	@param session The Guise session that owns this panel.
-	*/
-	public EventWizardPanel(final GuiseSession session)
+	/**Default constructor.*/
+	public EventWizardPanel()
 	{
-		super(session, new FlowLayout(session, Flow.PAGE));	//construct the parent class flowing vertically
+		super(new FlowLayout(Flow.PAGE));	//construct the parent class flowing vertically
 		setLabel("Guise\u2122 Demonstration: Event Wizard");	//set the panel title	
 
-		final Heading heading=new Heading(session, 0);	//create a first-level heading
+		final Heading heading=new Heading(0);	//create a first-level heading
 		heading.setLabel("Event Planner Wizard");	//set the heading text
 		add(heading);	//add the heading to the panel
 
 			//wizard
-		final LayoutPanel wizardPanel=new LayoutPanel(session, new RegionLayout(session));
+		final LayoutPanel wizardPanel=new LayoutPanel(new RegionLayout());
 				//wizard cards
-		final SequenceCardPanel wizardCardPanel=new SequenceCardPanel(session);
+		final SequenceCardPanel wizardCardPanel=new SequenceCardPanel();
 		wizardCardPanel.setName("wizardCardPanel");
 		wizardCardPanel.setBookmarkEnabled(true);	//turn on bookmarks for the wizard
-		final PersonalNamePanel personalNamePanel=new PersonalNamePanel(session);
+		final PersonalNamePanel personalNamePanel=new PersonalNamePanel();
 		personalNamePanel.setName("personalCard1");
-		personalNamePanel.setConstraints(new TaskCardConstraints(session));
+		personalNamePanel.setConstraints(new TaskCardConstraints());
 		wizardCardPanel.add(personalNamePanel);
-		final Panel<?> personalAgePanel=new PersonalAgePanel(session);
+		final Panel<?> personalAgePanel=new PersonalAgePanel();
 		personalAgePanel.setName("personalAgePanel");
-		personalAgePanel.setConstraints(new TaskCardConstraints(session));
+		personalAgePanel.setConstraints(new TaskCardConstraints());
 		wizardCardPanel.add(personalAgePanel);
-		final Panel<?> personalEmailPanel=new PersonalEmailPanel(session);
-		personalEmailPanel.setConstraints(new TaskCardConstraints(session));
+		final Panel<?> personalEmailPanel=new PersonalEmailPanel();
+		personalEmailPanel.setConstraints(new TaskCardConstraints());
 		personalEmailPanel.setName("personalEmailPanel");
 		wizardCardPanel.add(personalEmailPanel);		
 			//listen for the age checkbox changing
@@ -59,64 +56,64 @@ public class EventWizardPanel extends DefaultNavigationPanel
 						wizardCardPanel.setDisplayed(personalAgePanel, propertyChangeEvent.getNewValue());	//show or hide the age panel based upon the state of the age checkbox
 					}			
 				});
-		final Panel<?> businessNamePanel=new BusinessNamePanel(session);
-		businessNamePanel.setConstraints(new TaskCardConstraints(session));
+		final Panel<?> businessNamePanel=new BusinessNamePanel();
+		businessNamePanel.setConstraints(new TaskCardConstraints());
 		businessNamePanel.setName("businessNamePane");
 		wizardCardPanel.add(businessNamePanel);
-		final Panel<?> businessAddressPanel=new BusinessAddressPanel(session);
-		businessAddressPanel.setConstraints(new TaskCardConstraints(session));
+		final Panel<?> businessAddressPanel=new BusinessAddressPanel();
+		businessAddressPanel.setConstraints(new TaskCardConstraints());
 		businessAddressPanel.setName("businessAddressPanel");
 		wizardCardPanel.add(businessAddressPanel);
-		final Panel<?> eventNamePanel=new EventNamePanel(session);
+		final Panel<?> eventNamePanel=new EventNamePanel();
 		eventNamePanel.setName("eventNamePanel");
-		eventNamePanel.setConstraints(new TaskCardConstraints(session));
+		eventNamePanel.setConstraints(new TaskCardConstraints());
 		wizardCardPanel.add(eventNamePanel);
-		wizardPanel.add(wizardCardPanel, new RegionConstraints(session, Region.CENTER));
+		wizardPanel.add(wizardCardPanel, new RegionConstraints(Region.CENTER));
 				//wizard links
-		final LayoutPanel wizardLinkPanel=new LayoutPanel(session);
-		final Link personalLink10=new Link(session);
+		final LayoutPanel wizardLinkPanel=new LayoutPanel();
+		final Link personalLink10=new Link();
 		personalLink10.setLabel("1. Personal");
 		wizardLinkPanel.add(personalLink10);		
-		final TaskStatusSelectLink personalLink11=new TaskStatusSelectLink(session);
+		final TaskStatusSelectLink personalLink11=new TaskStatusSelectLink();
 		personalLink11.setLabel("Name");
 		wizardLinkPanel.add(personalLink11);
-		final TaskStatusSelectLink personalLink12=new TaskStatusSelectLink(session);
+		final TaskStatusSelectLink personalLink12=new TaskStatusSelectLink();
 		personalLink12.setLabel("Age");
 		wizardLinkPanel.add(personalLink12);
-		final TaskStatusSelectLink personalLink13=new TaskStatusSelectLink(session);
+		final TaskStatusSelectLink personalLink13=new TaskStatusSelectLink();
 		personalLink13.setLabel("Email");
 		wizardLinkPanel.add(personalLink13);
-		final Link businessLink20=new Link(session);
+		final Link businessLink20=new Link();
 		businessLink20.setLabel("2. Business");
 		wizardLinkPanel.add(businessLink20);		
-		final TaskStatusSelectLink businessLink21=new TaskStatusSelectLink(session);
+		final TaskStatusSelectLink businessLink21=new TaskStatusSelectLink();
 		businessLink21.setLabel("Name");
 		wizardLinkPanel.add(businessLink21);
-		final TaskStatusSelectLink businessLink22=new TaskStatusSelectLink(session);
+		final TaskStatusSelectLink businessLink22=new TaskStatusSelectLink();
 		businessLink22.setLabel("Address");
 		wizardLinkPanel.add(businessLink22);
-		final Link eventLink30=new Link(session);
+		final Link eventLink30=new Link();
 		eventLink30.setLabel("3. Event");
 		wizardLinkPanel.add(eventLink30);		
-		final TaskStatusSelectLink eventLink31=new TaskStatusSelectLink(session);
+		final TaskStatusSelectLink eventLink31=new TaskStatusSelectLink();
 		eventLink31.setLabel("Name");
 		wizardLinkPanel.add(eventLink31);
-		wizardPanel.add(wizardLinkPanel, new RegionConstraints(session, Region.LINE_START));
+		wizardPanel.add(wizardLinkPanel, new RegionConstraints(Region.LINE_START));
 				//wizard tabs
-		final TabContainerControl wizardTabContainerControl=new TabContainerControl(session, Flow.LINE);
-		final Label personalTabLabel=new Label(session);
+		final TabContainerControl wizardTabContainerControl=new TabContainerControl(Flow.LINE);
+		final Label personalTabLabel=new Label();
 		personalTabLabel.setLabel("Personal");
 		wizardTabContainerControl.add(personalTabLabel);
-		final Label businessTabLabel=new Label(session);
+		final Label businessTabLabel=new Label();
 		businessTabLabel.setLabel("Business");
 		wizardTabContainerControl.add(businessTabLabel);
-		final Label eventTabLabel=new Label(session);
+		final Label eventTabLabel=new Label();
 		eventTabLabel.setLabel("Event");
 		wizardTabContainerControl.add(eventTabLabel);
-		wizardPanel.add(wizardTabContainerControl, new RegionConstraints(session, Region.PAGE_START));
+		wizardPanel.add(wizardTabContainerControl, new RegionConstraints(Region.PAGE_START));
 				//wizard buttons
-		final LayoutPanel wizardButtonPanel=new LayoutPanel(session, new FlowLayout(session, Flow.LINE));
-		final Button previousButton=new Button(session);
+		final LayoutPanel wizardButtonPanel=new LayoutPanel(new FlowLayout(Flow.LINE));
+		final Button previousButton=new Button();
 		previousButton.setLabel("Previous");
 		previousButton.addActionListener(new ActionListener()
 				{
@@ -126,7 +123,7 @@ public class EventWizardPanel extends DefaultNavigationPanel
 					};
 				});
 		wizardButtonPanel.add(previousButton);
-		final Button nextButton=new Button(session);
+		final Button nextButton=new Button();
 		nextButton.setLabel("Next");
 		nextButton.addActionListener(new ActionListener()
 				{
@@ -136,21 +133,21 @@ public class EventWizardPanel extends DefaultNavigationPanel
 					};
 				});
 		wizardButtonPanel.add(nextButton);
-		wizardPanel.add(wizardButtonPanel, new RegionConstraints(session, Region.PAGE_END));
+		wizardPanel.add(wizardButtonPanel, new RegionConstraints(Region.PAGE_END));
 				//wizard link couplers
-		new ActionCardCoupler(session, personalLink10, personalNamePanel);
-		new ActionCardCoupler(session, personalLink11, personalNamePanel);
-		new ActionCardCoupler(session, personalLink12, personalAgePanel);
-		new ActionCardCoupler(session, personalLink13, personalEmailPanel);
-		new ActionCardCoupler(session, businessLink20, businessNamePanel);
-		new ActionCardCoupler(session, businessLink21, businessNamePanel);
-		new ActionCardCoupler(session, businessLink22, businessAddressPanel);
-		new ActionCardCoupler(session, eventLink30, eventNamePanel);
-		new ActionCardCoupler(session, eventLink31, eventNamePanel);
+		new ActionCardCoupler(personalLink10, personalNamePanel);
+		new ActionCardCoupler(personalLink11, personalNamePanel);
+		new ActionCardCoupler(personalLink12, personalAgePanel);
+		new ActionCardCoupler(personalLink13, personalEmailPanel);
+		new ActionCardCoupler(businessLink20, businessNamePanel);
+		new ActionCardCoupler(businessLink21, businessNamePanel);
+		new ActionCardCoupler(businessLink22, businessAddressPanel);
+		new ActionCardCoupler(eventLink30, eventNamePanel);
+		new ActionCardCoupler(eventLink31, eventNamePanel);
 				//wizard tab couplers
-		new ListSelectCardCoupler<Component<?>>(session, wizardTabContainerControl, personalTabLabel, personalNamePanel, personalAgePanel, personalEmailPanel);
-		new ListSelectCardCoupler<Component<?>>(session, wizardTabContainerControl, businessTabLabel, businessNamePanel, businessAddressPanel);
-		new ListSelectCardCoupler<Component<?>>(session, wizardTabContainerControl, eventTabLabel, eventNamePanel);
+		new ListSelectCardCoupler<Component<?>>(wizardTabContainerControl, personalTabLabel, personalNamePanel, personalAgePanel, personalEmailPanel);
+		new ListSelectCardCoupler<Component<?>>(wizardTabContainerControl, businessTabLabel, businessNamePanel, businessAddressPanel);
+		new ListSelectCardCoupler<Component<?>>(wizardTabContainerControl, eventTabLabel, eventNamePanel);
 		add(wizardPanel);
 
 		wizardCardPanel.resetSequence();
@@ -168,29 +165,25 @@ public class EventWizardPanel extends DefaultNavigationPanel
 			/**@return The check control for providing age.*/
 			public CheckControl getAgeCheckControl() {return ageCheckControl;}
 
-		/**Session constructor.
-		@param session The Guise session that owns this component.
-		@exception NullPointerException if the given session is <code>null</code>.
-		*/
-		public PersonalNamePanel(final GuiseSession session)
+		/**Default constructor.*/
+		public PersonalNamePanel()
 		{
-			super(session);
 				//heading
-			final Heading heading=new Heading(session, 1);
+			final Heading heading=new Heading(1);
 			heading.setLabel("Personal Information: Name");
 			add(heading);
 				//first name
-			final TextControl<String> firstNameTextControl=new TextControl<String>(session, String.class);
+			final TextControl<String> firstNameTextControl=new TextControl<String>(String.class);
 			firstNameTextControl.setLabel("First Name");
-			firstNameTextControl.setValidator(new RegularExpressionStringValidator(session, "\\S+.*", true));
+			firstNameTextControl.setValidator(new RegularExpressionStringValidator("\\S+.*", true));
 			add(firstNameTextControl);
 				//last name
-			final TextControl<String> lastNameTextControl=new TextControl<String>(session, String.class);
+			final TextControl<String> lastNameTextControl=new TextControl<String>(String.class);
 			lastNameTextControl.setLabel("Last Name");
-			lastNameTextControl.setValidator(new RegularExpressionStringValidator(session, "\\S+.*", true));
+			lastNameTextControl.setValidator(new RegularExpressionStringValidator("\\S+.*", true));
 			add(lastNameTextControl);
 				//age checkbox
-			ageCheckControl=new CheckControl(session, new DefaultValueModel<Boolean>(session, Boolean.class, Boolean.TRUE));
+			ageCheckControl=new CheckControl(new DefaultValueModel<Boolean>(Boolean.class, Boolean.TRUE));
 			ageCheckControl.setLabel("I want to tell you my age");
 			add(ageCheckControl);
 		}
@@ -201,21 +194,17 @@ public class EventWizardPanel extends DefaultNavigationPanel
 	*/
 	protected static class PersonalAgePanel extends LayoutPanel
 	{
-		/**Session constructor.
-		@param session The Guise session that owns this component.
-		@exception NullPointerException if the given session is <code>null</code>.
-		*/
-		public PersonalAgePanel(final GuiseSession session)
+		/**Default constructor.*/
+		public PersonalAgePanel()
 		{
-			super(session);
 				//heading
-			final Heading heading=new Heading(session, 1);
+			final Heading heading=new Heading(1);
 			heading.setLabel("Personal Information: Age");
 			add(heading);
 				//age
-			final TextControl<Integer> ageTextControl=new TextControl<Integer>(session, Integer.class);
+			final TextControl<Integer> ageTextControl=new TextControl<Integer>(Integer.class);
 			ageTextControl.setLabel("Age");
-			ageTextControl.setValidator(new ValueRequiredValidator<Integer>(session));
+			ageTextControl.setValidator(new ValueRequiredValidator<Integer>());
 			add(ageTextControl);
 		}
 	}
@@ -225,21 +214,17 @@ public class EventWizardPanel extends DefaultNavigationPanel
 	*/
 	protected static class PersonalEmailPanel extends LayoutPanel
 	{
-		/**Session constructor.
-		@param session The Guise session that owns this component.
-		@exception NullPointerException if the given session is <code>null</code>.
-		*/
-		public PersonalEmailPanel(final GuiseSession session)
+		/**Default constructor.*/
+		public PersonalEmailPanel()
 		{
-			super(session);
 				//heading
-			final Heading heading=new Heading(session, 1);
+			final Heading heading=new Heading(1);
 			heading.setLabel("Personal Information: Email");
 			add(heading);
 				//email
-			final TextControl<String> emailTextControl=new TextControl<String>(session, String.class);
+			final TextControl<String> emailTextControl=new TextControl<String>(String.class);
 			emailTextControl.setLabel("Email");
-			emailTextControl.setValidator(new RegularExpressionStringValidator(session, ".+@.+\\.[a-z]+", true));
+			emailTextControl.setValidator(new RegularExpressionStringValidator(".+@.+\\.[a-z]+", true));
 			add(emailTextControl);
 		}
 	}
@@ -249,21 +234,17 @@ public class EventWizardPanel extends DefaultNavigationPanel
 	*/
 	protected static class BusinessNamePanel extends LayoutPanel
 	{
-		/**Session constructor.
-		@param session The Guise session that owns this component.
-		@exception NullPointerException if the given session is <code>null</code>.
-		*/
-		public BusinessNamePanel(final GuiseSession session)
+		/**Default constructor.*/
+		public BusinessNamePanel()
 		{
-			super(session);
 				//heading
-			final Heading heading=new Heading(session, 1);
+			final Heading heading=new Heading(1);
 			heading.setLabel("Business Information: Name");
 			add(heading);
 				//business name
-			final TextControl<String> nameTextControl=new TextControl<String>(session, String.class);
+			final TextControl<String> nameTextControl=new TextControl<String>(String.class);
 			nameTextControl.setLabel("Business Name");
-			nameTextControl.setValidator(new RegularExpressionStringValidator(session, "\\S+.*", true));
+			nameTextControl.setValidator(new RegularExpressionStringValidator("\\S+.*", true));
 			add(nameTextControl);
 		}
 	}
@@ -273,21 +254,17 @@ public class EventWizardPanel extends DefaultNavigationPanel
 	*/
 	protected static class BusinessAddressPanel extends LayoutPanel
 	{
-		/**Session constructor.
-		@param session The Guise session that owns this component.
-		@exception NullPointerException if the given session is <code>null</code>.
-		*/
-		public BusinessAddressPanel(final GuiseSession session)
+		/**Default constructor.*/
+		public BusinessAddressPanel()
 		{
-			super(session);
 				//heading
-			final Heading heading=new Heading(session, 1);
+			final Heading heading=new Heading(1);
 			heading.setLabel("Business Information: Address");
 			add(heading);
 				//business address
-			final TextAreaControl addressTextArea=new TextAreaControl(session, 4, 40);
+			final TextAreaControl addressTextArea=new TextAreaControl(4, 40);
 			addressTextArea.setLabel("Business Address");
-			addressTextArea.setValidator(new RegularExpressionStringValidator(session, "\\S+.*", true));
+			addressTextArea.setValidator(new RegularExpressionStringValidator("\\S+.*", true));
 			add(addressTextArea);
 		}
 	}
@@ -297,21 +274,17 @@ public class EventWizardPanel extends DefaultNavigationPanel
 	*/
 	protected static class EventNamePanel extends LayoutPanel
 	{
-		/**Session constructor.
-		@param session The Guise session that owns this component.
-		@exception NullPointerException if the given session is <code>null</code>.
-		*/
-		public EventNamePanel(final GuiseSession session)
+		/**Default constructor.*/
+		public EventNamePanel()
 		{
-			super(session);
 				//heading
-			final Heading heading=new Heading(session, 1);
+			final Heading heading=new Heading(1);
 			heading.setLabel("Event Information: Name");
 			add(heading);
 				//event name
-			final TextControl<String> nameTextControl=new TextControl<String>(session, String.class);
+			final TextControl<String> nameTextControl=new TextControl<String>(String.class);
 			nameTextControl.setLabel("Event Name");
-			nameTextControl.setValidator(new RegularExpressionStringValidator(session, "\\S+.*", true));
+			nameTextControl.setValidator(new RegularExpressionStringValidator("\\S+.*", true));
 			add(nameTextControl);
 		}
 	}
