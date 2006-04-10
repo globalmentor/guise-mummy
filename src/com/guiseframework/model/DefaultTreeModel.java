@@ -6,7 +6,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.event.*;
 
 /**A default implementation of a tree model.
@@ -118,10 +117,14 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel
 	*/
 	protected void fireTreeNodePropertyChange(final PropertyChangeEvent propertyChangeEvent)
 	{
-		if(getEventListenerManager().hasListeners(TreeNodePropertyChangeListener.class))	//if there are tree node property change listeners registered
+		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
+		if(eventListenerManager.hasListeners(TreeNodePropertyChangeListener.class))	//if there are tree node property change listeners registered
 		{
 			final TreeNodePropertyChangeEvent<Object> treeNodePropertyChangeEvent=new TreeNodePropertyChangeEvent<Object>(this, propertyChangeEvent);	//create a new tree node property change event
-			getSession().queueEvent(new PostponedTreeNodePropertyChangeEvent<Object>(getEventListenerManager(), treeNodePropertyChangeEvent));	//tell the Guise session to queue the event
+			for(final TreeNodePropertyChangeListener<Object> treeNodePropertyChangeListener:eventListenerManager.getListeners(TreeNodePropertyChangeListener.class))	//for each registered tree node property change listener
+			{
+				treeNodePropertyChangeListener.propertyChange(treeNodePropertyChangeEvent);
+			}
 		}
 	}
 

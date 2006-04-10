@@ -2,10 +2,12 @@ package com.guiseframework.model;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
+import com.garretwilson.beans.PropertyBindable;
+
 /**An object that can be enabled or disabled.
 @author Garret Wilson
 */
-public interface Enableable
+public interface Enableable extends PropertyBindable
 {
 
 	/**The enabled bound property.*/

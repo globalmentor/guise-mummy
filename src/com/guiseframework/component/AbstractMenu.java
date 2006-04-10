@@ -2,14 +2,8 @@ package com.guiseframework.component;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import java.util.Iterator;
-
 import com.guiseframework.component.layout.*;
-import com.guiseframework.event.ActionEvent;
-import com.guiseframework.event.ActionListener;
-import com.guiseframework.event.MouseEvent;
-import com.guiseframework.event.MouseListener;
-import com.guiseframework.event.PostponedActionEvent;
+import com.guiseframework.event.*;
 import com.guiseframework.geometry.Point;
 import com.guiseframework.geometry.Rectangle;
 import com.guiseframework.model.ActionModel;
@@ -107,7 +101,7 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the action is performed
 					{
-						fireAction();	//fire an action with this component as the source
+						fireActionPerformed();	//fire an action with this component as the source
 					}
 				});
 	}
@@ -129,17 +123,25 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 	}
 
 	/**@return all registered action listeners.*/
-	@SuppressWarnings("unchecked")
-	public Iterator<ActionListener> getActionListeners()
+	public Iterable<ActionListener> getActionListeners()
 	{
-		return (Iterator<ActionListener>)(Object)getEventListenerManager().getListeners(ActionListener.class);	//remove the listener TODO find out why we have to use the double cast for JDK 1.5 to compile
+		return getEventListenerManager().getListeners(ActionListener.class);	//remove the listener
 	}
 
-	/**Fires an action to all registered action listeners.
+	/**Performs the action.
+	This implementation delegates to the installed {@link ActionModel}.
+	*/
+	public void performAction()
+	{
+		getActionModel().performAction();	//delegate to the installed action model, which will fire an event which we will catch and queue for refiring
+	}
+
+	/**Fires an action event to all registered action listeners.
+	This implementation queues a postponed action event.
 	@see ActionListener
 	@see ActionEvent
 	*/
-	public void fireAction()
+	protected void fireActionPerformed()
 	{
 		if(getEventListenerManager().hasListeners(ActionListener.class))	//if there are action listeners registered
 		{

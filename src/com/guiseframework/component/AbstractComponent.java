@@ -26,6 +26,8 @@ import static com.garretwilson.util.ArrayUtilities.*;
 import static com.guiseframework.GuiseResourceConstants.*;
 
 /**An abstract implementation of a component.
+<p>A component should never fire a property event directly. It should rather create a postponed event and queue that event with the session.
+This implementation automatically handles postponed property change events when {@link #firePropertyChange(String, Object, Object)} or a related method is called.</p> 
 @author Garret Wilson
 */
 public abstract class AbstractComponent<C extends Component<C>> extends GuiseBoundPropertyObject implements Component<C>
@@ -44,10 +46,10 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 	@SuppressWarnings("unchecked")
 	protected final C getThis() {return (C)this;}
 
-	/**The label model used by this component.*/
+	/**The label model decorated by this component.*/
 	private final LabelModel labelModel;
 
-		/**@return The label model used by this component.*/
+		/**@return The label model decorated by this component.*/
 		protected LabelModel getLabelModel() {return labelModel;}
 
 	/**The name of the component, not guaranteed to be unique (but guaranteed not to be the empty string) and useful only for searching for components within a component sub-hierarchy, or <code>null</code> if the component has no name.*/
@@ -1185,10 +1187,9 @@ Debug.trace("now valid of", this, "is", isValid());
 	}
 
 	/**@return all registered mouse listeners.*/
-	@SuppressWarnings("unchecked")
-	public Iterator<MouseListener> getMouseListeners()
+	public Iterable<MouseListener> getMouseListeners()
 	{
-		return (Iterator<MouseListener>)getEventListenerManager().getListeners(MouseListener.class);	//remove the listener
+		return getEventListenerManager().getListeners(MouseListener.class);	//return the registered listeners
 	}
 
 	/**Fires a mouse entered event to all registered mouse listeners.

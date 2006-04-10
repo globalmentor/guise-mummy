@@ -24,19 +24,22 @@ public class TaskStatusSelectLink extends ValueSelectLink<TaskStatus>
 	/**The resource key format pattern for each task status.*/
 	public final static String TASK_STATUS_ICON_RESOURCE_KEY_FORMAT_PATTERN="task.status.{0}.icon";
 
-	/**Default constructor with a default data model.*/
+	/**Default constructor.*/
 	public TaskStatusSelectLink()
 	{
-		this(new DefaultValueModel<TaskStatus>(TaskStatus.class));	//construct the class with a default model
+		this(new DefaultLabelModel(), new DefaultActionModel(), new DefaultValueModel<TaskStatus>(TaskStatus.class), new DefaultEnableable());	//construct the class with default models
 	}
 	
-	/**Value model constructor.
+	/**Label model, action model, value model, and enableable object constructor.
+	@param labelModel The component label model.
+	@param actionModel The component action model.
 	@param valueModel The component value model.
-	@exception NullPointerException if the given value model is <code>null</code>.
+	@param enableable The enableable object in which to store enabled status.
+	@exception NullPointerException if the given label model, action model, and/or enableable object is <code>null</code>.
 	*/
-	public TaskStatusSelectLink(final ValueModel<TaskStatus> valueModel)
+	public TaskStatusSelectLink(final LabelModel labelModel, final ActionModel actionModel, final ValueModel<TaskStatus> valueModel, final Enableable enableable)
 	{
-		super(valueModel);	//construct the parent class
+		super(labelModel, actionModel, valueModel, enableable);	//construct the parent class		
 		setSelectedIconResourceKey(SELECT_ACTION_SELECTED_ICON_RESOURCE_KEY);
 		setUnselectedIconResourceKey(SELECT_ACTION_UNSELECTED_ICON_RESOURCE_KEY);
 		setValueIconResourceKey(null, MessageFormat.format(TASK_STATUS_ICON_RESOURCE_KEY_FORMAT_PATTERN, ""));	//set the icon resource for no task status

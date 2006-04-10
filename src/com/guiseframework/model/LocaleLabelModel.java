@@ -2,6 +2,9 @@ package com.guiseframework.model;
 
 import java.util.Locale;
 
+import com.guiseframework.Guise;
+import com.guiseframework.GuiseSession;
+
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**A label model that provides a localized version of a locale name.
@@ -9,6 +12,12 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 */
 public class LocaleLabelModel extends DefaultLabelModel
 {
+
+	/**The Guise session that owns this object.*/
+	private final GuiseSession session;
+
+		/**@return The Guise session that owns this object.*/
+		public GuiseSession getSession() {return session;}
 
 	/**The locale the label should represent.*/
 	private final Locale locale;
@@ -21,6 +30,7 @@ public class LocaleLabelModel extends DefaultLabelModel
 	*/
 	public LocaleLabelModel(final Locale locale)
 	{
+		this.session=Guise.getInstance().getGuiseSession();	//store a reference to the current Guise session
 		this.locale=checkInstance(locale, "Locale cannot be null");	//save the locale
 	}
 

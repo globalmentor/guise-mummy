@@ -3,12 +3,11 @@ package com.guiseframework.demo;
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.component.*;
-import com.guiseframework.event.ActionListener;
 
 /**Event wizard Guise demonstration panel using PLOOP+RDF+XML.
 Copyright © 2006 GlobalMentor, Inc.
 Demonstrates sequence card panels, task card constraints, task status select links,
-	action card couplers, and link select card couplers.
+	action card couplers, link select card couplers, and action prototypes.
 @author Garret Wilson
 */
 public class EventWizardPanel2 extends DefaultNavigationPanel
@@ -27,22 +26,11 @@ public class EventWizardPanel2 extends DefaultNavigationPanel
 						wizardCardPanel.setDisplayed(personalAgePanel, propertyChangeEvent.getNewValue());	//show or hide the age panel based upon the state of the age checkbox
 					}			
 				});
-		final Button previousButton=(Button)getComponentByName(this, "previousButton");
-		previousButton.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(com.guiseframework.event.ActionEvent actionEvent)
-					{
-						wizardCardPanel.goPrevious();
-					};
-				});
-		final Button nextButton=(Button)getComponentByName(this, "nextButton");
-		nextButton.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(com.guiseframework.event.ActionEvent actionEvent)
-					{
-						wizardCardPanel.goNext();
-					};
-				});
+		final LayoutPanel wizardButtonPanel=(LayoutPanel)getComponentByName(this, "wizardButtonPanel");
+		final Button previousButton=new Button(wizardCardPanel.getPreviousActionPrototype());
+		wizardButtonPanel.add(previousButton);
+		final Button nextButton=new Button(wizardCardPanel.getNextActionPrototype());
+		wizardButtonPanel.add(nextButton);
 		wizardCardPanel.resetSequence();
 	}
 

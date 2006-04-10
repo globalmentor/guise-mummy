@@ -159,14 +159,17 @@ public abstract class AbstractSelectActionValueControl<V, C extends SelectAction
 			}
 		}
 
-	/**Value model constructor.
+	/**Label model, action model, value model, and enableable object constructor.
+	@param labelModel The component label model.
+	@param actionModel The component action model.
 	@param valueModel The component value model.
-	@exception NullPointerException if the given value model is <code>null</code>.
+	@param enableable The enableable object in which to store enabled status.
+	@exception NullPointerException if the given label model, action model, and/or enableable object is <code>null</code>.
 	*/
-	public AbstractSelectActionValueControl(final ValueModel<V> valueModel)
+	public AbstractSelectActionValueControl(final LabelModel labelModel, final ActionModel actionModel, final ValueModel<V> valueModel, final Enableable enableable)
 	{
-		super(valueModel);	//construct the parent class
+		super(labelModel, actionModel, valueModel, enableable);	//construct the parent class
 		addActionListener(new AbstractSelectActionControl.SelectActionListener(this));	//listen for an action and set the selected state accordingly
 	}
-
+	
 }

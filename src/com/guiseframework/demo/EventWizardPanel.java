@@ -6,7 +6,6 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.coupler.ActionCardCoupler;
 import com.guiseframework.coupler.ListSelectCardCoupler;
-import com.guiseframework.event.ActionListener;
 import com.guiseframework.model.DefaultValueModel;
 import com.guiseframework.validator.RegularExpressionStringValidator;
 import com.guiseframework.validator.ValueRequiredValidator;
@@ -14,7 +13,7 @@ import com.guiseframework.validator.ValueRequiredValidator;
 /**Event wizard Guise demonstration panel.
 Copyright © 2006 GlobalMentor, Inc.
 Demonstrates sequence card panels, task card constraints, task status select links,
-	action card couplers, and link select card couplers.
+	action card couplers, link select card couplers, and action prototypes.
 @author Garret Wilson
 */
 public class EventWizardPanel extends DefaultNavigationPanel
@@ -113,25 +112,10 @@ public class EventWizardPanel extends DefaultNavigationPanel
 		wizardPanel.add(wizardTabContainerControl, new RegionConstraints(Region.PAGE_START));
 				//wizard buttons
 		final LayoutPanel wizardButtonPanel=new LayoutPanel(new FlowLayout(Flow.LINE));
-		final Button previousButton=new Button();
-		previousButton.setLabel("Previous");
-		previousButton.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(com.guiseframework.event.ActionEvent actionEvent)
-					{
-						wizardCardPanel.goPrevious();
-					};
-				});
+		wizardButtonPanel.setName("wizardButtonPanel");
+		final Button previousButton=new Button(wizardCardPanel.getPreviousActionPrototype());
 		wizardButtonPanel.add(previousButton);
-		final Button nextButton=new Button();
-		nextButton.setLabel("Next");
-		nextButton.addActionListener(new ActionListener()
-				{
-					public void actionPerformed(com.guiseframework.event.ActionEvent actionEvent)
-					{
-						wizardCardPanel.goNext();
-					};
-				});
+		final Button nextButton=new Button(wizardCardPanel.getNextActionPrototype());
 		wizardButtonPanel.add(nextButton);
 		wizardPanel.add(wizardButtonPanel, new RegionConstraints(Region.PAGE_END));
 				//wizard link couplers

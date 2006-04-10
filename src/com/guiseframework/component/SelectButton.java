@@ -8,19 +8,31 @@ import com.guiseframework.model.*;
 public class SelectButton extends AbstractSelectActionControl<SelectButton> implements SelectButtonControl<SelectButton>
 {
 
-	/**Default constructor with a default data model.*/
+	/**Default constructor.*/
 	public SelectButton()
 	{
-		this(new DefaultActionModel());	//construct the class with a default model
+		this(new DefaultLabelModel(), new DefaultActionModel(), new DefaultEnableable());	//construct the class with default models
 	}
 
-	/**Action model constructor.
+	/**Label model, action model, and enableable object constructor.
+	@param labelModel The component label model.
 	@param actionModel The component action model.
-	@exception NullPointerException if the given action model is <code>null</code>.
+	@param enableable The enableable object in which to store enabled status.
+	@exception NullPointerException if the given label model, action model, and/or enableable object is <code>null</code>.
 	*/
-	public SelectButton(final ActionModel actionModel)
+	public SelectButton(final LabelModel labelModel, final ActionModel actionModel, final Enableable enableable)
 	{
-		super(actionModel);	//construct the parent class
+		super(labelModel, actionModel, enableable);	//construct the parent class
 	}
+
+	/**Prototype constructor.
+	@param actionPrototype The prototype on which this component should be based.
+	*/
+/*TODO fix
+	public Button(final ActionPrototype actionPrototype)
+	{
+		this(actionPrototype, actionPrototype, actionPrototype);	//use the action prototype as every needed model
+	}
+*/
 
 }

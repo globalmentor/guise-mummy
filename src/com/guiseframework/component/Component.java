@@ -2,7 +2,6 @@ package com.guiseframework.component;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.*;
 
 import javax.mail.internet.ContentType;
 
@@ -27,12 +26,11 @@ import static com.garretwilson.lang.ClassUtilities.*;
 /**Base interface for all Guise components.
 Each component must provide either a Guise session constructor; or a Guise session and string ID constructor.
 Any component may contain other components, but only a {@link Container} allows for custom addition and removal of child components.
-A component is iterable over its child components, and can be used in short <code>for(:)</code> form.
 <p>A component takes up space regardless of whether it is set to be visible using {@link Component#setVisible(boolean)}.
 {@link Component#setDisplayed(boolean)} determines whether the component is displayed at all. If a component is not displayed, it takes up no space.
 If a component is not displayed, it is not visible regardless of whether it is set to be visible.
 If a developer must hide sensitive data, the developer should remove the component from its parent container altogether.</p>
-<p>For widest platform support the general {@link #ROUNDED_CORNER_RADIUS_EXTENT} constant should be used whenever possible when requesting rounded corners.</p> 
+<p>For widest platform support the general {@link #ROUNDED_CORNER_RADIUS_EXTENT} constant should be used whenever possible when requesting rounded corners.</p>
 @author Garret Wilson
 */
 public interface Component<C extends Component<C>> extends PropertyBindable, LabelModel, Displayable
@@ -575,7 +573,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public void removeMouseListener(final MouseListener mouseListener);
 
 	/**@return all registered mouse listeners.*/
-	public Iterator<MouseListener> getMouseListeners();
+	public Iterable<MouseListener> getMouseListeners();
 
 	/**@return <code>true</code> if there is one or more mouse listeners registered.*/
 	public boolean hasMouseListeners();

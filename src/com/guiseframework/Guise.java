@@ -7,9 +7,6 @@ import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.garretwilson.util.DecoratorReverseMap;
-import com.garretwilson.util.ReverseMap;
-
 import static com.garretwilson.io.InputStreamUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
 
@@ -32,7 +29,7 @@ public final class Guise
 	public final static String PUBLIC_RESOURCE_BASE_PATH="pub/";
 
 	/**The identifier of this build.*/
-	public final static String BUILD_ID="2006-04-09";
+	public final static String BUILD_ID="2006-04-09a";
 	
 	/**The singleton instance of Guise.*/
 	private static Guise instance=null;

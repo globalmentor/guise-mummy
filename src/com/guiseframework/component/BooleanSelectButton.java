@@ -9,19 +9,22 @@ A validator requiring a non-<code>null</code> value is automatically installed.
 public class BooleanSelectButton extends AbstractBooleanSelectActionControl<BooleanSelectButton> implements SelectButtonControl<BooleanSelectButton>
 {
 
-	/**Default constructor with a default value model.*/
+	/**Default constructor.*/
 	public BooleanSelectButton()
 	{
-		this(new DefaultValueModel<Boolean>(Boolean.class, Boolean.FALSE));	//construct the class with a default model
+		this(new DefaultLabelModel(), new DefaultActionModel(), new DefaultValueModel<Boolean>(Boolean.class, Boolean.FALSE), new DefaultEnableable());	//construct the class with default models
 	}
 
-	/**Value model constructor.
+	/**Label model, action model, value model, and enableable object constructor.
+	@param labelModel The component label model.
+	@param actionModel The component action model.
 	@param valueModel The component value model.
-	@exception NullPointerException if the given value model is <code>null</code>.
+	@param enableable The enableable object in which to store enabled status.
+	@exception NullPointerException if the given label model, action model, and/or enableable object is <code>null</code>.
 	*/
-	public BooleanSelectButton(final ValueModel<Boolean> valueModel)
+	public BooleanSelectButton(final LabelModel labelModel, final ActionModel actionModel, final ValueModel<Boolean> valueModel, final Enableable enableable)
 	{
-		super(valueModel);	//construct the parent class
+		super(labelModel, actionModel, valueModel, enableable);	//construct the parent class		
 	}
 
 }

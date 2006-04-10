@@ -1,13 +1,13 @@
-package com.guiseframework.model;
+package com.guiseframework.prototype;
 
 import com.guiseframework.event.*;
+import com.guiseframework.model.ActionModel;
 
-/**A default implementation of a button model.
+/**Contains prototype information for a control.
 @author Garret Wilson
 */
-public class DefaultActionModel extends AbstractModel implements ActionModel
+public class ActionPrototype extends AbstractEnableablePrototype implements ActionModel
 {
-
 	/**Adds an action listener.
 	@param actionListener The action listener to add.
 	*/

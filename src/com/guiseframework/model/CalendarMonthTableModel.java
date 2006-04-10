@@ -11,6 +11,7 @@ import static com.garretwilson.util.CalendarConstants.*;
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.garretwilson.util.Debug;
+import com.guiseframework.Guise;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.converter.AbstractDateStringLiteralConverter;
 import com.guiseframework.converter.DateStringLiteralStyle;
@@ -23,7 +24,13 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 {
 	
 //TODO switch to using calendar.getActualMaximum(calobject.DAY_OF_WEEK) or something to determine the days in the week, rather than a constant
-	
+
+	/**The Guise session that owns this object.*/
+	private final GuiseSession session;
+
+		/**@return The Guise session that owns this object.*/
+		public GuiseSession getSession() {return session;}
+
 	/**The column style bound property.*/
 	public final static String COLUMN_LABEL_DATE_STYLE_PROPERTY=getPropertyName(CalendarMonthTableModel.class, "columnLabelStyle");
 	/**The date bound property.*/
@@ -151,7 +158,7 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 	*/
 	public CalendarMonthTableModel(final Date date)	//TODO decide if we want to allow a calendar with another locale to be set, because right now we change calendars automatically
 	{
-		super();	//construct the parent class
+		this.session=Guise.getInstance().getGuiseSession();	//store a reference to the current Guise session
 		for(int i=0; i<WEEK_DAY_COUNT; ++i)	//for each week day index (the indices are constant, regardless of with which day of the week the locale starts)
 		{
 			addColumn(new WeekDayTableColumnModel(i));	//add a new week day table column

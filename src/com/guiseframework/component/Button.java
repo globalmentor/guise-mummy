@@ -1,28 +1,37 @@
 package com.guiseframework.component;
 
-import com.guiseframework.model.ActionModel;
-import com.guiseframework.model.DefaultActionModel;
+import com.guiseframework.model.*;
+import com.guiseframework.prototype.ActionPrototype;
 
 /**Control with an action model rendered as a button.
-If an image is specified, it will be used instead of the button label, if possible.
 @author Garret Wilson
 */
 public class Button extends AbstractButtonControl<Button>
 {
 
-	/**Default constructor with a default action model.*/
+	/**Default constructor.*/
 	public Button()
 	{
-		this(new DefaultActionModel());	//construct the class with a default model
+		this(new DefaultLabelModel(), new DefaultActionModel(), new DefaultEnableable());	//construct the class with default models
 	}
 
-	/**Action model constructor.
+	/**Label model, action model, and enableable object constructor.
+	@param labelModel The component label model.
 	@param actionModel The component action model.
-	@exception NullPointerException if the given action model is <code>null</code>.
+	@param enableable The enableable object in which to store enabled status.
+	@exception NullPointerException if the given label model, action model, and/or enableable object is <code>null</code>.
 	*/
-	public Button(final ActionModel actionModel)
+	public Button(final LabelModel labelModel, final ActionModel actionModel, final Enableable enableable)
 	{
-		super(actionModel);	//construct the parent class
+		super(labelModel, actionModel, enableable);	//construct the parent class
 	}
 
+	/**Prototype constructor.
+	@param actionPrototype The prototype on which this component should be based.
+	*/
+	public Button(final ActionPrototype actionPrototype)
+	{
+		this(actionPrototype, actionPrototype, actionPrototype);	//use the action prototype as every needed model
+	}
+	
 }

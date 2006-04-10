@@ -1,7 +1,7 @@
 package com.guiseframework.component;
 
-import com.guiseframework.model.ActionModel;
-import com.guiseframework.model.DefaultActionModel;
+import com.guiseframework.model.*;
+import com.guiseframework.prototype.ActionPrototype;
 
 /**Control with an action model rendered as a link.
 @author Garret Wilson
@@ -9,19 +9,29 @@ import com.guiseframework.model.DefaultActionModel;
 public class Link extends AbstractLinkControl<Link>
 {
 
-	/**Default constructor with a default data model.*/
+	/**Default constructor.*/
 	public Link()
 	{
-		this(new DefaultActionModel());	//construct the class with a default model
+		this(new DefaultLabelModel(), new DefaultActionModel(), new DefaultEnableable());	//construct the class with default models
 	}
 
-	/**Action model constructor.
+	/**Label model, action model, and enableable object constructor.
+	@param labelModel The component label model.
 	@param actionModel The component action model.
-	@exception NullPointerException if the given action model is <code>null</code>.
+	@param enableable The enableable object in which to store enabled status.
+	@exception NullPointerException if the given label model, action model, and/or enableable object is <code>null</code>.
 	*/
-	public Link(final ActionModel actionModel)
+	public Link(final LabelModel labelModel, final ActionModel actionModel, final Enableable enableable)
 	{
-		super(actionModel);	//construct the parent class
+		super(labelModel, actionModel, enableable);	//construct the parent class
+	}
+
+	/**Prototype constructor.
+	@param actionPrototype The prototype on which this component should be based.
+	*/
+	public Link(final ActionPrototype actionPrototype)
+	{
+		this(actionPrototype, actionPrototype, actionPrototype);	//use the action prototype as every needed model
 	}
 
 }

@@ -9,22 +9,25 @@ import com.guiseframework.model.*;
 public class ValueSelectButton<V> extends AbstractSelectActionValueControl<V, ValueSelectButton<V>> implements SelectButtonControl<ValueSelectButton<V>>
 {
 
-	/**Constructor with a default data model to represent a given type.
+	/**Value class constructor.
 	@param valueClass The class indicating the type of value held in the model.
 	@exception NullPointerException if the given value class is <code>null</code>.
 	*/
 	public ValueSelectButton(final Class<V> valueClass)
 	{
-		this(new DefaultValueModel<V>(valueClass));	//construct the class with a default model
-	}
-	
-	/**Value model constructor.
-	@param valueModel The component value model.
-	@exception NullPointerException if the given value model is <code>null</code>.
-	*/
-	public ValueSelectButton(final ValueModel<V> valueModel)
-	{
-		super(valueModel);	//construct the parent class
+		this(new DefaultLabelModel(), new DefaultActionModel(), new DefaultValueModel<V>(valueClass), new DefaultEnableable());	//construct the class with default models
 	}
 
+	/**Label model, action model, value model, and enableable object constructor.
+	@param labelModel The component label model.
+	@param actionModel The component action model.
+	@param valueModel The component value model.
+	@param enableable The enableable object in which to store enabled status.
+	@exception NullPointerException if the given label model, action model, and/or enableable object is <code>null</code>.
+	*/
+	public ValueSelectButton(final LabelModel labelModel, final ActionModel actionModel, final ValueModel<V> valueModel, final Enableable enableable)
+	{
+		super(labelModel, actionModel, valueModel, enableable);	//construct the parent class		
+	}
+	
 }

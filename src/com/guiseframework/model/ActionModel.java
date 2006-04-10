@@ -1,7 +1,5 @@
 package com.guiseframework.model;
 
-import java.util.Iterator;
-
 import com.guiseframework.event.*;
 
 /**A model for a potential action.
@@ -21,12 +19,11 @@ public interface ActionModel extends Model
 	public void removeActionListener(final ActionListener actionListener);
 
 	/**@return all registered action listeners.*/
-	public Iterator<ActionListener> getActionListeners();
+	public Iterable<ActionListener> getActionListeners();
 
-	/**Fires an action to all registered action listeners.
-	@see ActionListener
-	@see ActionEvent
+	/**Performs the action.
+	An {@link ActionEvent} is fired to all registered {@link ActionListener}s.
 	*/
-	public void fireAction();
+	public void performAction();
 
 }

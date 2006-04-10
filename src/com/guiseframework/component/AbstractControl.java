@@ -1,5 +1,7 @@
 package com.guiseframework.component;
 
+import static com.garretwilson.lang.ObjectUtilities.*;
+
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.model.*;
 
@@ -9,26 +11,11 @@ import com.guiseframework.model.*;
 public abstract class AbstractControl<C extends Control<C>> extends AbstractComponent<C> implements Control<C>
 {
 
-	/**Whether the control is enabled and can receive user input.*/
-	private boolean enabled=true;
+	/**The enableable object decorated by this component.*/
+	private final Enableable enableable;
 
-		/**@return Whether the control is enabled and can receive user input.*/
-		public boolean isEnabled() {return enabled;}
-
-		/**Sets whether the control is enabled and and can receive user input.
-		This is a bound property of type <code>Boolean</code>.
-		@param newEnabled <code>true</code> if the control should indicate and accept user input.
-		@see #ENABLED_PROPERTY
-		*/
-		public void setEnabled(final boolean newEnabled)
-		{
-			if(enabled!=newEnabled)	//if the value is really changing
-			{
-				final boolean oldEnabled=enabled;	//get the old value
-				enabled=newEnabled;	//actually change the value
-				firePropertyChange(ENABLED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newEnabled));	//indicate that the value changed
-			}
-		}
+		/**@return The enableable object decorated by this component.*/
+		protected Enableable getEnableable() {return enableable;}
 
 	/**The status of the current user input, or <code>null</code> if there is no status to report.*/
 	private Status status=null;
@@ -120,7 +107,34 @@ public abstract class AbstractControl<C extends Control<C>> extends AbstractComp
 	*/
 	public AbstractControl(final LabelModel labelModel)
 	{
-		super(labelModel);	//construct the parent class
+		this(labelModel, new DefaultEnableable());	//construct the class with a default enableable
 	}
+
+	/**Label model and enableable object constructor.
+	@param labelModel The component label model.
+	@param enableable The enableable object in which to store enabled status.
+	@exception NullPointerException if the given label model and/or enableable object is <code>null</code>.
+	*/
+	public AbstractControl(final LabelModel labelModel, final Enableable enableable)
+	{
+		super(labelModel);	//construct the parent class
+		this.enableable=checkInstance(enableable, "Enableable object cannot be null.");	//save the enableable object
+		if(enableable!=labelModel)	//if the enableable and the label model are two different objects TODO eventually just listen to specific events for each object
+		{
+			this.enableable.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the enableable object
+		}
+	}
+
+		//Enableable delegations
+	
+	/**@return Whether the control is enabled and can receive user input.*/
+	public boolean isEnabled() {return enableable.isEnabled();}
+
+	/**Sets whether the control is enabled and and can receive user input.
+	This is a bound property of type <code>Boolean</code>.
+	@param newEnabled <code>true</code> if the control should indicate and accept user input.
+	@see #ENABLED_PROPERTY
+	*/
+	public void setEnabled(final boolean newEnabled) {enableable.setEnabled(newEnabled);}
 
 }

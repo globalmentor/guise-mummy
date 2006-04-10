@@ -86,17 +86,20 @@ public abstract class AbstractActionValueControl<V, C extends ActionValueControl
 			firePropertyChange(VALUE_ICON_RESOURCE_KEY_PROPERTY, oldValueIconResourceKey, newValueIconResourceKey);	//indicate that the value changed (which will only fire the event if the value actually changed)
 		}
 		
-	/**Value model constructor.
+	/**Label model, action model, value model, and enableable object constructor.
+	@param labelModel The component label model.
+	@param actionModel The component action model.
 	@param valueModel The component value model.
-	@exception NullPointerException if the given value model is <code>null</code>.
+	@param enableable The enableable object in which to store enabled status.
+	@exception NullPointerException if the given label model, action model, and/or enableable object is <code>null</code>.
 	*/
-	public AbstractActionValueControl(final ValueModel<V> valueModel)
+	public AbstractActionValueControl(final LabelModel labelModel, final ActionModel actionModel, final ValueModel<V> valueModel, final Enableable enableable)
 	{
-		super(new DefaultActionModel());	//construct the parent class with a default action model TODO add an action model parameter
+		super(labelModel, actionModel, enableable);	//construct the parent class
 		this.valueModel=checkInstance(valueModel, "Value model cannot be null.");	//save the table model
 		this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen an repeat all property changes of the value model
 	}
-
+	
 	/**Reports that a bound property has changed.
 	This version first updates the valid status if the value is reported as being changed.
 	@param propertyName The name of the property being changed.

@@ -807,10 +807,14 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	*/
 	protected void fireListModified(final int index, final V addedElement, final V removedElement)
 	{
-		if(getEventListenerManager().hasListeners(ListListener.class))	//if there are appropriate listeners registered
+		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
+		if(eventListenerManager.hasListeners(ListListener.class))	//if there are appropriate listeners registered
 		{
 			final ListEvent<V> listEvent=new ListEvent<V>(this, index, addedElement, removedElement);	//create a new event
-			getSession().queueEvent(new PostponedListEvent<V>(getEventListenerManager(), listEvent));	//tell the Guise session to queue the event
+			for(final ListListener<V> listListener:eventListenerManager.getListeners(ListListener.class))	//for each list listener
+			{
+				listListener.listModified(listEvent);	//fire the list modified event
+			}
 		}
 	}
 
@@ -822,10 +826,14 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	*/
 	protected void fireSelectionChanged(final Integer addedIndex, final Integer removedIndex)
 	{
-		if(getEventListenerManager().hasListeners(ListSelectionListener.class))	//if there are appropriate listeners registered
+		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
+		if(eventListenerManager.hasListeners(ListSelectionListener.class))	//if there are appropriate listeners registered
 		{
 			final ListSelectionEvent<V> selectionEvent=new ListSelectionEvent<V>(this, addedIndex, removedIndex);	//create a new event
-			getSession().queueEvent(new PostponedListSelectionEvent<V>(getEventListenerManager(), selectionEvent));	//tell the Guise session to queue the event
+			for(final ListSelectionListener<V> listSelectionListener:eventListenerManager.getListeners(ListSelectionListener.class))	//for each list selection listener
+			{
+				listSelectionListener.listSelectionChanged(selectionEvent);	//fire the list selection event
+			}
 		}
 	}
 

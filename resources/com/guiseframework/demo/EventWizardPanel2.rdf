@@ -49,13 +49,9 @@
 							<component:Label rdf:nodeID="eventTabLabel" property:label="Event"/>
 						</property:children>
 					</component:TabContainerControl>
-					<component:LayoutPanel>	<!-- buttons -->
+					<component:LayoutPanel property:name="wizardButtonPanel">	<!-- buttons -->
 						<property:layout><layout:FlowLayout property:flow="LINE"/></property:layout>
 						<property:constraints><layout:RegionConstraints property:region="PAGE_END"/></property:constraints>
-						<property:children rdf:parseType="Collection">
-							<component:Button property:name="previousButton" property:label="Previous"/>
-							<component:Button property:name="nextButton" property:label="Next"/>
-						</property:children>
 					</component:LayoutPanel>
 				</property:children>
 			</component:LayoutPanel>

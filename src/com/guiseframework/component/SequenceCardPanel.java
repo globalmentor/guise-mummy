@@ -9,7 +9,10 @@ import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.Bookmark;
 import com.guiseframework.component.layout.*;
+import com.guiseframework.event.ActionEvent;
+import com.guiseframework.event.ActionListener;
 import com.guiseframework.model.*;
+import com.guiseframework.prototype.ActionPrototype;
 import com.guiseframework.validator.*;
 
 /**A card panel representing a sequence of cards.
@@ -19,6 +22,18 @@ If any card has constraints of {@link TaskCardConstraints}, this class will upda
 */
 public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> implements Commitable
 {
+
+	/**The prototype for the previous action.*/
+	private final ActionPrototype previousActionPrototype;
+
+		/**@return The prototype for the previous action.*/
+		public ActionPrototype getPreviousActionPrototype() {return previousActionPrototype;}
+
+	/**The prototype for the next action.*/
+	private final ActionPrototype nextActionPrototype;
+
+		/**@return The prototype for the next action.*/
+		public ActionPrototype getNextActionPrototype() {return nextActionPrototype;}
 
 	/**Default constructor.*/
 	public SequenceCardPanel()
@@ -33,6 +48,26 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	protected SequenceCardPanel(final CardLayout layout)
 	{
 		super(layout);	//construct the parent class
+			//previous action prototype
+		previousActionPrototype=new ActionPrototype();
+		previousActionPrototype.setLabel("Previous");	//TODO i18n
+		previousActionPrototype.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(final ActionEvent actionEvent)	//if the previous action is performed
+					{
+						goPrevious();	//go to the previous card
+					};
+				});
+			//next action prototype
+		nextActionPrototype=new ActionPrototype();
+		nextActionPrototype.setLabel("Next");	//TODO i18n
+		nextActionPrototype.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(final ActionEvent actionEvent)	//if the next action is performed
+					{
+						goNext();	//go to the previous card
+					};
+				});
 		setValidator(new SequenceCardValidator());	//TODO comment
 		addPropertyChangeListener(VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Component<?>>()
 				{
@@ -71,7 +106,9 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 								}
 							}
 						}
-					}		
+						previousActionPrototype.setEnabled(hasPrevious());	//enable or disable the previous action prototype
+						nextActionPrototype.setEnabled(hasNext());	//enable or disable the previous action prototype
+					}
 				});
 	}
 
