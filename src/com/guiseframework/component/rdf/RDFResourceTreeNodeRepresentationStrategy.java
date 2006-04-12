@@ -1,9 +1,11 @@
-package com.guiseframework.component;
+package com.guiseframework.component.rdf;
 
 import com.garretwilson.rdf.*;
 
 import static com.garretwilson.rdf.RDFUtilities.*;
 import static com.garretwilson.rdf.rdfs.RDFSUtilities.*;
+
+import com.guiseframework.component.TreeControl;
 import com.guiseframework.model.*;
 
 /**A tree node representation strategy representing an RDF resource.

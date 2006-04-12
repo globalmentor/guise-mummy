@@ -1,4 +1,4 @@
-package com.guiseframework.model;
+package com.guiseframework.model.rdf;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
@@ -6,21 +6,23 @@ import java.util.*;
 import static java.util.Collections.*;
 
 import com.garretwilson.rdf.*;
+import com.guiseframework.model.*;
 
 import static com.garretwilson.rdf.RDFConstants.*;
 
-/**A tree node model that represents an RDF resource.
+/**Abstract functionality for a tree node model that represents an RDF resource.
 <p>Any properties will be dynamically loaded</p>
 <p>This class has special support for RDF lists, the contents of which are by default displayed as children of the given resource.</p>
+@param <V> The type of value contained in the tree node.
 @author Garret Wilson
 */
-public class RDFResourceTreeNodeModel extends DynamicTreeNodeModel<RDFResource> implements RDFObjectTreeNodeModel<RDFResource>
+public abstract class AbstractRDFResourceTreeNodeModel<V extends RDFResource> extends DynamicTreeNodeModel<V> implements RDFObjectTreeNodeModel<V>
 {
 
 	/**The bound property of whether resource children are included in the node.*/
-	public final static String RESOURCE_CHILDREN_INCLUDED_PROPERTY=getPropertyName(RDFResourceTreeNodeModel.class, "resourceChildrenIncluded");
+	public final static String RESOURCE_CHILDREN_INCLUDED_PROPERTY=getPropertyName(AbstractRDFResourceTreeNodeModel.class, "resourceChildrenIncluded");
 	/**The bound property of whether resource properties are included in the node.*/
-	public final static String RESOURCE_PROPERTIES_INCLUDED_PROPERTY=getPropertyName(RDFResourceTreeNodeModel.class, "resourcePropertiesIncluded");
+	public final static String RESOURCE_PROPERTIES_INCLUDED_PROPERTY=getPropertyName(AbstractRDFResourceTreeNodeModel.class, "resourcePropertiesIncluded");
 	
 	/**The RDF property of which this RDF object is an object, or <code>null</code> if this object should not be considered the object of any property.*/
 	private final RDFResource property;
@@ -70,27 +72,31 @@ public class RDFResourceTreeNodeModel extends DynamicTreeNodeModel<RDFResource> 
 			}
 		}
 		
-	/**Default constructor with no initial value.*/
-	public RDFResourceTreeNodeModel()
+	/**Value class constructor with no initial value.
+	@param valueClass The class indicating the type of value held in the model.
+	*/
+	public AbstractRDFResourceTreeNodeModel(final Class<V> valueClass)
 	{
-		this(null);	//construct the class with no initial value
+		this(valueClass, null);	//construct the class with no initial value
 	}
 
 	/**Initial value constructor.
+	@param valueClass The class indicating the type of value held in the model.
 	@param initialValue The initial value, which will not be validated.
 	*/
-	public RDFResourceTreeNodeModel(final RDFResource initialValue)
+	public AbstractRDFResourceTreeNodeModel(final Class<V> valueClass, final V initialValue)
 	{
-		this(null, initialValue);	//construct the class with a null initial value
+		this(valueClass, null, initialValue);	//construct the class with no property
 	}
 
 	/**Property and initial value constructor.
+	@param valueClass The class indicating the type of value held in the model.
 	@param rdfProperty The property of which this object is a resource, or <code>null</code> if this object should not be considered the object of any property.
 	@param initialValue The initial value, which will not be validated.
 	*/
-	public RDFResourceTreeNodeModel(final RDFResource rdfProperty, final RDFResource initialValue)
+	public AbstractRDFResourceTreeNodeModel(final Class<V> valueClass, final RDFResource rdfProperty, final V initialValue)
 	{
-		super(RDFResource.class, initialValue);	//construct the parent class
+		super(valueClass, initialValue);	//construct the parent class
 		property=rdfProperty; //save the property of which this resource is the object
 	}
 
@@ -134,10 +140,10 @@ public class RDFResourceTreeNodeModel extends DynamicTreeNodeModel<RDFResource> 
 	*/
 	protected List<TreeNodeModel<?>> determineChildren()
 	{
+		final List<TreeNodeModel<?>> children=new ArrayList<TreeNodeModel<?>>();	//create a list to hold the children, even if we don't have any here, for child classes may add to this list
 		final RDFResource rdfResource=getValue();	//get the resource
 		if(rdfResource!=null)	//if we have a resource
 		{
-			final List<TreeNodeModel<?>> children=new ArrayList<TreeNodeModel<?>>();	//create a list to hold the children
 			if(isResourcePropertiesIncluded() && !(rdfResource instanceof RDFListResource))	//if resource properties are included (don't show properties of an RDF list resource
 			{
 				for(final RDFPropertyValuePair rdfPropertyValuePair:rdfResource.getProperties())	//look at all properties
@@ -173,15 +179,12 @@ public class RDFResourceTreeNodeModel extends DynamicTreeNodeModel<RDFResource> 
 					}
 				}
 			}
-			return children;	//return the children we determined
 		}
-		else	//if there is no resource
-		{
-			return emptyList();	//there are no children if there is no resource
-		}
+		return children;	//return the children we determined
 	}
 	
 	/**Creates a child node to represent a property object literal and optional property.
+	This version returns an {@link RDFLiteralTreeNodeModel}.
 	@param rdfProperty The property of which the object is a resource, or <code>null</code> if this object should not be considered the object of any property.
 	@param rdfLiteral The literal to represent in the new node.
 	@return A child node to represent the given property object literal.
@@ -192,11 +195,12 @@ public class RDFResourceTreeNodeModel extends DynamicTreeNodeModel<RDFResource> 
 	}
 
 	/**Creates a child node to represent a property object resource and optional property.
+	This version returns an {@link RDFResourceTreeNodeModel}.
 	@param rdfProperty The property of which the object is a resource, or <code>null</code> if this object should not be considered the object of any property.
 	@param rdfResource The resource to represent in the new node.
 	@return A child node to represent the given property object resource.
 	*/ 
-	protected RDFResourceTreeNodeModel createRDFResourceTreeNode(final RDFResource rdfProperty, final RDFResource rdfResource)
+	protected AbstractRDFResourceTreeNodeModel createRDFResourceTreeNode(final RDFResource rdfProperty, final RDFResource rdfResource)
 	{			
 		return new RDFResourceTreeNodeModel(rdfProperty, rdfResource);	//create a new tree node to represent the property and value
 	}

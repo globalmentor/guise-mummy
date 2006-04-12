@@ -1,9 +1,12 @@
-package com.guiseframework.component;
+package com.guiseframework.component.rdf;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.garretwilson.rdf.*;
+import com.guiseframework.component.Label;
+import com.guiseframework.component.TreeControl;
 import com.guiseframework.model.*;
+import com.guiseframework.model.rdf.RDFObjectTreeNodeModel;
 
 /**An abstract tree node representation strategy representing an RDF object.
 @param <V> The type of value the strategy is to represent.

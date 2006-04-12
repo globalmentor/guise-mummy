@@ -1,6 +1,7 @@
-package com.guiseframework.model;
+package com.guiseframework.model.rdf;
 
 import com.garretwilson.rdf.*;
+import com.guiseframework.model.DefaultTreeNodeModel;
 
 /**A tree node model that represents an RDF literal.
 @author Garret Wilson

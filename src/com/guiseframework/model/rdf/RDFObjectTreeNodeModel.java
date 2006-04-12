@@ -1,6 +1,7 @@
-package com.guiseframework.model;
+package com.guiseframework.model.rdf;
 
 import com.garretwilson.rdf.*;
+import com.guiseframework.model.TreeNodeModel;
 
 /**A tree node model that represents an object described in RDF.
 @param <V> The type of value contained in the tree node.

@@ -41,6 +41,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.text.CharacterEncodingConstants.*;
+import static com.garretwilson.text.xml.XMLUtilities.*;
 import static com.guiseframework.GuiseResourceConstants.*;
 
 /**An abstract implementation that keeps track of the components of a user session.
@@ -619,11 +620,9 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	public AbstractGuiseSession(final GuiseApplication application)
 	{
 		this.application=application;	//save the Guise instance
-		final DocumentBuilderFactory documentBuilderFactory=DocumentBuilderFactory.newInstance();	//create a document builder factory
-		documentBuilderFactory.setNamespaceAware(true);	//we must be aware of namespaces to work with RDF
 		try
 		{
-			documentBuilder=documentBuilderFactory.newDocumentBuilder();	//create a new document builder
+			documentBuilder=createDocumentBuilder(true);	//create a new namespace-aware document builder
 		}
 		catch(final ParserConfigurationException parserConfigurationException)	//if we can't find an XML parser
 		{

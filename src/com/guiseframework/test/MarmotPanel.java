@@ -25,10 +25,12 @@ import com.globalmentor.marmot.resource.folder.FolderResourceKit;
 import com.globalmentor.marmot.resource.image.ImageResourceKit;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
+import com.guiseframework.component.rdf.RDFLiteralTreeNodeRepresentationStrategy;
+import com.guiseframework.component.rdf.RDFResourceTreeNodeRepresentationStrategy;
 import com.guiseframework.event.*;
 import com.guiseframework.model.Notification;
-import com.guiseframework.model.RDFObjectTreeNodeModel;
-import com.guiseframework.model.RDFResourceTreeNodeModel;
+import com.guiseframework.model.rdf.RDFObjectTreeNodeModel;
+import com.guiseframework.model.rdf.RDFResourceTreeNodeModel;
 import com.guiseframework.validator.ValidationException;
 
 /**Test panel for Marmot
@@ -129,24 +131,23 @@ catch(final ValidationException validationException)
 					}
 				});
 		add(addButton);
-/*TODO del
+
 		try
 		{
 			final ActivityModelIOKit activityModelIOKit=new ActivityModelIOKit();
 			final ResourceModel<Activity> activityResourceModel=activityModelIOKit.load(new FileInputStream("D:\\projects\\marmot\\example\\Activities\\test.maqro"), URI.create("file:/D:/projects/marmot/example/Activities/"));
 			final Activity activity=activityResourceModel.getResource();
 //TODO del			Debug.trace(RDFUtilities.toString(activity));
-			final TreeControl treeControl=new TreeControl(session);
-			treeControl.setTreeNodeRepresentationStrategy(RDFResource.class, new RDFResourceTreeNodeRepresentationStrategy(session));
-			treeControl.setTreeNodeRepresentationStrategy(RDFLiteral.class, new RDFLiteralTreeNodeRepresentationStrategy(session));
-			treeControl.getRootNode().add(new RDFResourceTreeNodeModel(session, activity));
+			final TreeControl treeControl=new TreeControl();
+			treeControl.setTreeNodeRepresentationStrategy(RDFResource.class, new RDFResourceTreeNodeRepresentationStrategy());
+			treeControl.setTreeNodeRepresentationStrategy(RDFLiteral.class, new RDFLiteralTreeNodeRepresentationStrategy());
+			treeControl.getRootNode().add(new RDFResourceTreeNodeModel(activity));
 			add(treeControl);
 		}
 		catch(final IOException ioException)
 		{
 			throw new AssertionError(ioException);
 		}
-*/
 	}
 
 }
