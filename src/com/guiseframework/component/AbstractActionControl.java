@@ -95,25 +95,38 @@ public abstract class AbstractActionControl<C extends ActionControl<C>> extends 
 		return getEventListenerManager().getListeners(ActionListener.class);
 	}
 
-	/**Performs the action.
-	This implementation delegates to the installed {@link ActionModel}.
+	/**Performs the action with default force and default option.
+	An {@link ActionEvent} is fired to all registered {@link ActionListener}s.
+	This method delegates to {@link #performAction(int, int)}.
 	*/
 	public void performAction()
 	{
 		getActionModel().performAction();	//delegate to the installed action model, which will fire an event which we will catch and queue for refiring
 	}
 
+	/**Performs the action with the given force and option.
+	An {@link ActionEvent} is fired to all registered {@link ActionListener}s.
+	@param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
+	@param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button click.
+	*/
+	public void performAction(final int force, final int option)
+	{
+		getActionModel().performAction(force, option);	//delegate to the installed action model, which will fire an event which we will catch and queue for refiring
+	}
+
 	/**Fires an action event to all registered action listeners.
 	This method delegates to {@link #fireActionPerformed(ActionEvent)}.
+	@param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
+	@param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button click.
 	@see ActionListener
 	@see ActionEvent
 	*/
-	protected void fireActionPerformed()
+	protected void fireActionPerformed(final int force, final int option)
 	{
 		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
 		if(eventListenerManager.hasListeners(ActionListener.class))	//if there are action listeners registered
 		{
-			fireActionPerformed(new ActionEvent(this));	//create and fire a new action event
+			fireActionPerformed(new ActionEvent(this, force, option));	//create and fire a new action event
 		}
 	}
 

@@ -513,4 +513,9 @@ public interface GuiseSession extends PropertyBindable
 	*/
 	public void notify(final Notification notification);
 
+	/**Notifies the user of the given error.
+	This is a convenience method that delegates to {@link #notify(Notification)}.
+	@param error The error with which to notify the user.
+	*/
+	public void notify(final Throwable error);
 }

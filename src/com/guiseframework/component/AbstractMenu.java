@@ -101,7 +101,7 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the action is performed
 					{
-						fireActionPerformed();	//fire an action with this component as the source
+						fireActionPerformed(1, 0);	//fire an action with this component as the source
 					}
 				});
 	}
@@ -128,25 +128,49 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 		return getEventListenerManager().getListeners(ActionListener.class);	//remove the listener
 	}
 
-	/**Performs the action.
-	This implementation delegates to the installed {@link ActionModel}.
+	/**Performs the action with default force and default option.
+	An {@link ActionEvent} is fired to all registered {@link ActionListener}s.
+	This method delegates to {@link #performAction(int, int)}.
 	*/
 	public void performAction()
 	{
-		getActionModel().performAction();	//delegate to the installed action model, which will fire an event which we will catch and queue for refiring
+		performAction(1, 0);	//fire an event saying that the action has been performed with the default force and option
+	}
+
+	/**Performs the action with the given force and option.
+	An {@link ActionEvent} is fired to all registered {@link ActionListener}s.
+	@param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
+	@param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button click.
+	*/
+	public void performAction(final int force, final int option)
+	{
+		fireActionPerformed(force, option);	//fire an event saying that the action has been performed with the given force and option
 	}
 
 	/**Fires an action event to all registered action listeners.
-	This implementation queues a postponed action event.
+	This method delegates to {@link #fireActionPerformed(ActionEvent)}.
+	@param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
+	@param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button click.
 	@see ActionListener
 	@see ActionEvent
 	*/
-	protected void fireActionPerformed()
+	protected void fireActionPerformed(final int force, final int option)
 	{
-		if(getEventListenerManager().hasListeners(ActionListener.class))	//if there are action listeners registered
+		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
+		if(eventListenerManager.hasListeners(ActionListener.class))	//if there are action listeners registered
 		{
-			final ActionEvent actionEvent=new ActionEvent(this);	//create a new action event
-			getSession().queueEvent(new PostponedActionEvent(getEventListenerManager(), actionEvent));	//tell the Guise session to queue the event
+			fireActionPerformed(new ActionEvent(this, force, option));	//create and fire a new action event
+		}
+	}
+
+	/**Fires a given action event to all registered action listeners.
+	@param actionEvent The action event to fire.
+	*/
+	protected void fireActionPerformed(final ActionEvent actionEvent)
+	{
+		for(final ActionListener actionListener:getEventListenerManager().getListeners(ActionListener.class))	//for each action listener
+		{
+			actionListener.actionPerformed(actionEvent);	//dispatch the action to the listener
 		}
 	}
 

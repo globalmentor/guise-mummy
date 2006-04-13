@@ -1366,4 +1366,13 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		optionDialogFrame.setLabel(notification.getSeverity().toString());	//TODO improve title; load from resources
 		optionDialogFrame.open();	//show the dialog		
 	}
+
+	/**Notifies the user of the given error.
+	This is a convenience method that delegates to {@link #notify(Notification)}.
+	@param error The error with which to notify the user.
+	*/
+	public void notify(final Throwable error)
+	{
+		notify(new Notification(error));	//notify the user with a notification of the error
+	}
 }

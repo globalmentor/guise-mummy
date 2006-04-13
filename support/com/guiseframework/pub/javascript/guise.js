@@ -994,15 +994,18 @@ function FormAJAXEvent(parameter, provisional)
 @param componentID: The ID of the source component.
 @param targetID: The ID of the target element.
 @param actionID: The action identifier, or null if no particular action is indicated.
+@param option: The zero-based option indicating mouse buttons left, right, or middle in that order.
 var componentID: The ID of the source component.
 var targetID: The ID of the target element.
 var actionID: The action identifier, or null if no particular action is indicated.
+var option: The zero-based option indicating mouse buttons left, right, or middle in that order.
 */
-function ActionAJAXEvent(componentID, targetID, actionID)
+function ActionAJAXEvent(componentID, targetID, actionID, option)
 {
 	this.componentID=componentID;
 	this.targetID=targetID;
 	this.actionID=actionID;
+	this.option=option;
 }
 
 //Drop AJAX Event
@@ -1259,7 +1262,7 @@ function GuiseAJAX()
 			{
 				REQUEST: "request", EVENTS: "events",
 				FORM: "form", PROVISIONAL: "provisional", CONTROL: "control", NAME: "name", VALUE: "value",
-				ACTION: "action", COMPONENT: "component", COMPONENT_ID: "componentID", TARGET_ID: "targetID", ACTION_ID: "actionID",
+				ACTION: "action", COMPONENT: "component", COMPONENT_ID: "componentID", TARGET_ID: "targetID", ACTION_ID: "actionID", OPTION: "option",
 				DROP: "drop", SOURCE: "source", TARGET: "target", VIEWPORT: "viewport", MOUSE: "mouse", ID: "id", X: "x", Y: "y", WIDTH: "width", HEIGHT: "height",
 				INIT: "init"
 			};
@@ -1376,7 +1379,8 @@ function GuiseAJAX()
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.ACTION,	//<action>
 					new Parameter(this.RequestElement.COMPONENT_ID, ajaxActionEvent.componentID),	//componentID="componentID"
 					new Parameter(this.RequestElement.TARGET_ID, ajaxActionEvent.targetID),	//targetID="targetID"
-					new Parameter(this.RequestElement.ACTION_ID, ajaxActionEvent.actionID));	//actionID="actionID"
+					new Parameter(this.RequestElement.ACTION_ID, ajaxActionEvent.actionID),	//actionID="actionID"
+					new Parameter(this.RequestElement.OPTION, ajaxActionEvent.option));	//option="option"
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.ACTION);	//</action>
 			return stringBuilder;	//return the string builder
 		};
@@ -3101,6 +3105,8 @@ function initializeNode(node)
 */
 						case STYLES.ACTION:
 							eventManager.addEvent(node, "click", onActionClick, false);	//listen for a click on an action element
+							eventManager.addEvent(node, "contextmenu", onContextMenu, false);	//listen for a right click on an action element
+							//TODO see if we need to assign a default handler on Safari to prevent the default action
 							break;
 						case STYLES.DRAG_HANDLE:
 							eventManager.addEvent(node, "mousedown", onDragBegin, false);	//listen for mouse down on a drag handle
@@ -3512,11 +3518,40 @@ function onTabClick(event)	//TODO maybe refactor to use new action click
 	}
 }
 
-/**Called when an element marked as "action" is clicked.
+/**Called when an element marked as "action" is clicked with the left button.
 This method searches up the hierarchy to find the enclosing "component" element and sends an AJAX action event.
 @param event The object describing the event.
 */
 function onActionClick(event)
+{
+//TODO del alert("in action click");
+	var target=event.currentTarget;	//get the element on which the event was registered
+	var targetID=target.id;	//get the target ID
+	if(targetID)	//if the element has an ID (otherwise, we couldn't report the action)
+	{
+		var component=getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element TODO improve all this
+		if(component)	//if there is a component
+		{
+			var componentID=component.id;	//get the component ID
+			if(componentID)	//if there is a component ID
+			{
+				if(AJAX_ENABLED)	//if AJAX is enabled
+				{
+					var ajaxRequest=new ActionAJAXEvent(componentID, targetID, null, 0);	//create a new action request with no action ID and the default option
+					guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+					event.stopPropagation();	//tell the event to stop bubbling
+					event.preventDefault();	//prevent the default functionality from occurring
+				}
+			}
+		}
+	}
+}
+
+/**Called when an element marked as "action" is clicked with the right mouse button.
+This method searches up the hierarchy to find the enclosing "component" element and sends an AJAX action event.
+@param event The object describing the event.
+*/
+function onContextMenu(event)
 {
 	var target=event.currentTarget;	//get the element on which the event was registered
 	var targetID=target.id;	//get the target ID
@@ -3530,7 +3565,7 @@ function onActionClick(event)
 			{
 				if(AJAX_ENABLED)	//if AJAX is enabled
 				{
-					var ajaxRequest=new ActionAJAXEvent(componentID, targetID, null);	//create a new action request with no action ID
+					var ajaxRequest=new ActionAJAXEvent(componentID, targetID, null, 1);	//create a new action request with no action ID and the context option
 					guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 					event.stopPropagation();	//tell the event to stop bubbling
 					event.preventDefault();	//prevent the default functionality from occurring
@@ -3861,7 +3896,7 @@ function onSliderThumbDragBegin(event)
 			dragState.onDragBegin=function(element)	//when dragging begins, send a slideBegin action event
 					{
 						updateSlider(slider);	//update the slider view
-						var ajaxRequest=new ActionAJAXEvent(slider.id, thumb.id, "slideBegin");	//create a new action request for sliding begin TODO use a constant
+						var ajaxRequest=new ActionAJAXEvent(slider.id, thumb.id, "slideBegin", 0);	//create a new action request for sliding begin TODO use a constant TODO why are we sending an event back here?
 						guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 					}
 			dragState.onDrag=function(element, x, y)	//when dragging occurs, update the slider value
@@ -3886,7 +3921,7 @@ if(isNaN(position))	//TODO del; fixed; change to assertion
 					};
 			dragState.onDragEnd=function(element)	//when dragging ends, update the slider view to make sure it is synchronized with the updated value
 					{
-						var ajaxRequest=new ActionAJAXEvent(slider.id, thumb.id, "slideEnd");	//create a new action request for sliding end TODO use a constant
+						var ajaxRequest=new ActionAJAXEvent(slider.id, thumb.id, "slideEnd", 0);	//create a new action request for sliding end TODO use a constant	//why are we sending back an action event here?
 						guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 						updateSlider(slider);	//update the slider view
 					}

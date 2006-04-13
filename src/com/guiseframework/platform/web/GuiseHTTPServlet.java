@@ -966,7 +966,8 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 							{
 								final String targetID=eventElement.getAttribute("targetID");	//get the ID of the target element TODO use a constant
 								final String actionID=eventElement.getAttribute("actionID");	//get the action identifier TODO use a constant								
-								final ActionControlEvent actionControlEvent=new ActionControlEvent(componentID, targetID, actionID);	//create a new action control event
+								final int option=Integer.parseInt(eventElement.getAttribute("option"));	//TODO tidy; improve; check for errors; comment
+								final ActionControlEvent actionControlEvent=new ActionControlEvent(componentID, targetID, actionID, option);	//create a new action control event
 								controlEventList.add(actionControlEvent);	//add the event to the list
 							}
 						}
