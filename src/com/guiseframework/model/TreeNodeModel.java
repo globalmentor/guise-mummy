@@ -7,7 +7,7 @@ Property change events on one tree node will be bubbled up the hierarchy, with t
 @author Garret Wilson
 @param <V> The type of value contained in the tree node.
 */
-public interface TreeNodeModel<V> extends ValueModel<V>, Iterable<TreeNodeModel<?>>
+public interface TreeNodeModel<V> extends ActionModel, ValueModel<V>, Iterable<TreeNodeModel<?>>
 {
 
 	/**The expanded bound property.*/

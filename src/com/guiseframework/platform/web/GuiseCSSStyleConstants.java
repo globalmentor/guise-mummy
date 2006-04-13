@@ -130,6 +130,10 @@ public class GuiseCSSStyleConstants
 	/**The CSS class for vertical flow layout children.*/
 	public final static String LAYOUT_FLOW_Y_CHILD_CLASS="layout-flow-y-child";
 
+		//action
+	/**A component that can send back an action.*/
+	public final static String ACTION_CLASS="action";
+
 		//mouse
 	/**A component that listens for mouse events.*/
 	public final static String MOUSE_LISTENER_CLASS="mouseListener";

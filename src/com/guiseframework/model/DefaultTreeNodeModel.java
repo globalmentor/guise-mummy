@@ -3,13 +3,29 @@ package com.guiseframework.model;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.guiseframework.event.ActionEvent;
+import com.guiseframework.event.ActionListener;
+import com.guiseframework.event.EventListenerManager;
+
 /**A default node in a tree model.
-Property change events on one tree node will be bubbled up the hierarchy, with the source indicating the tree node on which the property change occurred.
+Property change events and action events on one tree node will be bubbled up the hierarchy, with the source indicating the tree node on which the property change occurred.
 @author Garret Wilson
 @param <V> The type of value contained in the tree node.
 */
 public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements TreeNodeModel<V>
 {
+
+	/**An action listener to forward along events received unmodified.*/ 
+	private final ActionListener forwardActionListener=new ActionListener()	//create an action listener to listen for actions
+			{
+				public void actionPerformed(final ActionEvent actionEvent)	//if an action is performed
+				{
+					fireActionPerformed(actionEvent);	//forward the action event unmodified					
+				}
+			};
+
+		/**@return An action listener to forward along events received unmodified.*/ 
+		protected ActionListener getForwardActionListener() {return forwardActionListener;}
 
 	/**Whether the node is expanded, showing its children, if any.*/
 	private boolean expanded=false;
@@ -70,6 +86,7 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 		treeNodeList.add(treeNode);	//add the tree node to the list
 		treeNode.setParent(this);	//tell the tree node who its parent is
 		treeNode.addPropertyChangeListener(getForwardPropertyChangeListener());	//listen for property changes and bubble them up the hierarchy
+		treeNode.addActionListener(getForwardActionListener());	//listen for action events and bubble them up the hierarchy
 	}
 
 	/**Removes a child tree node from this tree node.
@@ -82,7 +99,8 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 		{
 			throw new IllegalArgumentException("Tree node "+treeNode+" is not child of tree node "+this+".");
 		}
-		treeNode.removePropertyChangeListener(getForwardPropertyChangeListener());	//stop listen for property changes to bubble up the hierarchy
+		treeNode.removePropertyChangeListener(getForwardPropertyChangeListener());	//stop listening for property changes to bubble up the hierarchy
+		treeNode.removeActionListener(getForwardActionListener());	//stop listening for action events and bubble them up the hierarchy
 		treeNodeList.remove(treeNode);	//remove the tree node to the list
 		treeNode.setParent(null);	//tell the tree node it no longer has a parent
 	}
@@ -208,4 +226,62 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 		final TreeNodeModel<?> parentNode=getParent();	//get the parent node
 		return parentNode!=null ? parentNode.getDepth()+1 : 0;	//if there is a parent node, this node's depth is one more than the parent's; otherwise, this is the root node with depth zero
 	}
+
+	//ActionModel support
+
+	/**Adds an action listener.
+	@param actionListener The action listener to add.
+	*/
+	public void addActionListener(final ActionListener actionListener)
+	{
+		getEventListenerManager().add(ActionListener.class, actionListener);	//add the listener
+	}
+
+	/**Removes an action listener.
+	@param actionListener The action listener to remove.
+	*/
+	public void removeActionListener(final ActionListener actionListener)
+	{
+		getEventListenerManager().remove(ActionListener.class, actionListener);	//remove the listener
+	}
+
+	/**@return all registered action listeners.*/
+	public Iterable<ActionListener> getActionListeners()
+	{
+		return getEventListenerManager().getListeners(ActionListener.class);	//remove the listener
+	}
+
+	/**Performs the action.
+	An {@link ActionEvent} is fired to all registered {@link ActionListener}s.
+	*/
+	public void performAction()
+	{
+		fireActionPerformed();	//fire an event saying that the action has been performed
+	}
+
+	/**Fires an action event to all registered action listeners.
+	This method delegates to {@link #fireActionPerformed(ActionEvent)}.
+	@see ActionListener
+	@see ActionEvent
+	*/
+	protected void fireActionPerformed()
+	{
+		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
+		if(eventListenerManager.hasListeners(ActionListener.class))	//if there are action listeners registered
+		{
+			fireActionPerformed(new ActionEvent(this));	//create and fire a new action event
+		}
+	}
+
+	/**Fires a given action event to all registered action listeners.
+	@param actionEvent The action event to fire.
+	*/
+	protected void fireActionPerformed(final ActionEvent actionEvent)
+	{
+		for(final ActionListener actionListener:getEventListenerManager().getListeners(ActionListener.class))	//for each action listener
+		{
+			actionListener.actionPerformed(actionEvent);	//dispatch the action to the listener
+		}
+	}
+
 }

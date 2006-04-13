@@ -31,6 +31,16 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 			}		
 		};
 
+	/**An action listener to repeat copies of events received, using this component as the source.*/ 
+	private ActionListener repeatActionListener=new ActionListener()
+			{
+				public void actionPerformed(final ActionEvent actionEvent)	//if an action was performed
+				{
+					final ActionEvent repeatActionEvent=new ActionEvent(TreeControl.this, actionEvent);	//copy the action event with this class as its source
+					fireActionPerformed(repeatActionEvent);	//fire the repeated action
+				}
+			};
+
 	/**The map of tree node representation strategies for classes.*/
 	private final Map<Class<?>, TreeNodeRepresentationStrategy<?>> classTreeNodeRepresentationStrategyMap=new ConcurrentHashMap<Class<?>, TreeNodeRepresentationStrategy<?>>();
 
@@ -41,7 +51,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	@return The representation strategy previously associated with the given value type.
 	*/	
 	@SuppressWarnings("unchecked")	//we check the generic types before putting them in the map, so it's fine to cast the retrieved values
-	public <V> TreeNodeRepresentationStrategy<? super V> setTreeNodeRepresentationStrategy(final Class<V> valueClass, TreeNodeRepresentationStrategy<V> treeNodeRepresentationStrategy)
+	public <V> TreeNodeRepresentationStrategy<? super V> setTreeNodeRepresentationStrategy(final Class<V> valueClass, TreeNodeRepresentationStrategy<? super V> treeNodeRepresentationStrategy)
 	{
 		return (TreeNodeRepresentationStrategy<? super V>)classTreeNodeRepresentationStrategyMap.put(valueClass, treeNodeRepresentationStrategy);	//associate the strategy with the value class in the map
 	}
@@ -109,6 +119,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		this.treeModel=checkInstance(treeModel, "Tree model cannot be null.");	//save the tree model
 		this.treeModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the tree model
 		this.treeModel.addTreeNodePropertyChangeListener(treeNodePropertyChangeListener);	//listen and repeat all property changes of the tree nodes in the tree model
+		this.treeModel.addActionListener(repeatActionListener);	//listen and repeat all actions of the tree model
 			//TODO listen for and repeat tree model-specific events
 		setTreeNodeRepresentationStrategy(Object.class, new DefaultValueRepresentationStrategy<Object>());	//create a default representation strategy and set it as the default by associating it with the Object class
 		setTreeNodeRepresentationStrategy(LabelModel.class, new LabelModelTreeNodeRepresentationStrategy());	//create and associate a label model representation strategy
@@ -347,4 +358,62 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		}
 	}
 */
+
+		//ActionModel support
+
+	/**Adds an action listener.
+	@param actionListener The action listener to add.
+	*/
+	public void addActionListener(final ActionListener actionListener)
+	{
+		getEventListenerManager().add(ActionListener.class, actionListener);	//add the listener
+	}
+
+	/**Removes an action listener.
+	@param actionListener The action listener to remove.
+	*/
+	public void removeActionListener(final ActionListener actionListener)
+	{
+		getEventListenerManager().remove(ActionListener.class, actionListener);	//remove the listener
+	}
+
+	/**@return all registered action listeners.*/
+	public Iterable<ActionListener> getActionListeners()
+	{
+		return getEventListenerManager().getListeners(ActionListener.class);	//remove the listener
+	}
+
+	/**Performs the action.
+	An {@link ActionEvent} is fired to all registered {@link ActionListener}s.
+	*/
+	public void performAction()
+	{
+		fireActionPerformed();	//fire an event saying that the action has been performed
+	}
+
+	/**Fires an action event to all registered action listeners.
+	This method delegates to {@link #fireActionPerformed(ActionEvent)}.
+	@see ActionListener
+	@see ActionEvent
+	*/
+	protected void fireActionPerformed()
+	{
+		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
+		if(eventListenerManager.hasListeners(ActionListener.class))	//if there are action listeners registered
+		{
+			fireActionPerformed(new ActionEvent(this));	//create and fire a new action event
+		}
+	}
+
+	/**Fires a given action event to all registered action listeners.
+	@param actionEvent The action event to fire.
+	*/
+	protected void fireActionPerformed(final ActionEvent actionEvent)
+	{
+		for(final ActionListener actionListener:getEventListenerManager().getListeners(ActionListener.class))	//for each action listener
+		{
+			actionListener.actionPerformed(actionEvent);	//dispatch the action to the listener
+		}
+	}
+
 }

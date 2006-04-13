@@ -35,7 +35,8 @@ public class RDFLiteralTreeNodeRepresentationStrategy extends AbstractRDFObjectT
 	@param value The value contained in the node.
 	@return The string builder used to construct the label. 
 	*/
-	protected <N extends RDFLiteral> StringBuilder buildLabelText(final StringBuilder stringBuilder, final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final N value)
+//TODO fix	protected <N extends RDFLiteral> StringBuilder buildLabelText(final StringBuilder stringBuilder, final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final N value)
+	protected StringBuilder buildLabelText(final StringBuilder stringBuilder, final TreeControl treeControl, final TreeModel model, final TreeNodeModel<? extends RDFLiteral> treeNode, final RDFLiteral value)	//TODO later put this method hierarchy in a custom label model
 	{
 		super.buildLabelText(stringBuilder, treeControl, model, treeNode, value);	//do the default label text building
 		final boolean hasProperty=stringBuilder.length()>0;	//see if we have property information

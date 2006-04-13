@@ -18,13 +18,26 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel
 {
 
 	/**A listener to listen for changes in properties of tree nodes that have bubbled up the hierarchy and refire them as {@link TreeNodePropertyChangeEvent}s.*/
-	private final PropertyChangeListener treeNodePropertyChangeListener=new PropertyChangeListener()
+	private final PropertyChangeListener treeNodePropertyChangeListener=new PropertyChangeListener()	//TODO update this to match the repeat action listener
 		{
 			public void propertyChange(final PropertyChangeEvent propertyChangeEvent)	//if a tree node property changes
 			{
 				fireTreeNodePropertyChange(propertyChangeEvent);	//fire an event indicating that a tree node property changed
 			}		
 		};
+
+	/**An action listener to repeat copies of events received, using this component as the source.*/ 
+	private ActionListener repeatActionListener=new ActionListener()
+			{
+				public void actionPerformed(final ActionEvent actionEvent)	//if an action was performed
+				{
+					final ActionEvent repeatActionEvent=new ActionEvent(DefaultTreeModel.this, actionEvent);	//copy the action event with this class as its source
+					fireActionPerformed(repeatActionEvent);	//fire the repeated action
+				}
+			};
+
+		/**@return An action listener to repeat copies of events received, using this component as the source.*/ 
+//TODO del if not needed		protected ActionListener getRepeatActionListener() {return repeatActionListener;}
 
 	/**The rot node of the tree model.*/
 	private TreeNodeModel<?> rootNode;
@@ -44,8 +57,10 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel
 			{
 				final TreeNodeModel<?> oldRootNode=rootNode;	//get the old value
 				oldRootNode.removePropertyChangeListener(treeNodePropertyChangeListener);	//stop listening for bubbled property change events from tree nodes in the old hierarchy
+				oldRootNode.removeActionListener(repeatActionListener);	//stop listening for bubbled action events from tree nodes in the old hierarchy
 				rootNode=newRootNode;	//actually change the value
 				newRootNode.addPropertyChangeListener(treeNodePropertyChangeListener);	//start listening for bubbled property change events from tree nodes in the new hierarchy
+				newRootNode.addActionListener(repeatActionListener);	//start listening for bubbled action events from tree nodes in the new hierarchy
 				firePropertyChange(ROOT_NODE_PROPERTY, oldRootNode, newRootNode);	//indicate that the value changed
 			}			
 		}
@@ -88,11 +103,14 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel
 	{
 		this.rootNode=checkInstance(rootNode, "Root node cannot be null.");	//save the root node
 		this.rootNode.addPropertyChangeListener(treeNodePropertyChangeListener);	//start listening for bubbled property change events from tree nodes
+		this.rootNode.addActionListener(repeatActionListener);	//start listening for bubbled action events from tree nodes
 		if(rootNode instanceof DummyTreeNodeModel)	//if a dummy tree node model is being used
 		{
 			rootNode.setExpanded(true);	//expand the dummy root, as the root node itself will not normally be available to the user
 		}
 	}
+
+		//TODO replace tree node property change stuff with special targeted property change information 
 
 	/**Adds a tree node property change listener.
 	@param treeNodePropertyChangeListener The tree node property change listener to add.
@@ -125,6 +143,63 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel
 			{
 				treeNodePropertyChangeListener.propertyChange(treeNodePropertyChangeEvent);
 			}
+		}
+	}
+
+		//ActionModel support
+
+	/**Adds an action listener.
+	@param actionListener The action listener to add.
+	*/
+	public void addActionListener(final ActionListener actionListener)
+	{
+		getEventListenerManager().add(ActionListener.class, actionListener);	//add the listener
+	}
+
+	/**Removes an action listener.
+	@param actionListener The action listener to remove.
+	*/
+	public void removeActionListener(final ActionListener actionListener)
+	{
+		getEventListenerManager().remove(ActionListener.class, actionListener);	//remove the listener
+	}
+
+	/**@return all registered action listeners.*/
+	public Iterable<ActionListener> getActionListeners()
+	{
+		return getEventListenerManager().getListeners(ActionListener.class);	//remove the listener
+	}
+
+	/**Performs the action.
+	An {@link ActionEvent} is fired to all registered {@link ActionListener}s.
+	*/
+	public void performAction()
+	{
+		fireActionPerformed();	//fire an event saying that the action has been performed
+	}
+
+	/**Fires an action event to all registered action listeners.
+	This method delegates to {@link #fireActionPerformed(ActionEvent)}.
+	@see ActionListener
+	@see ActionEvent
+	*/
+	protected void fireActionPerformed()
+	{
+		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
+		if(eventListenerManager.hasListeners(ActionListener.class))	//if there are action listeners registered
+		{
+			fireActionPerformed(new ActionEvent(this));	//create and fire a new action event
+		}
+	}
+
+	/**Fires a given action event to all registered action listeners.
+	@param actionEvent The action event to fire.
+	*/
+	protected void fireActionPerformed(final ActionEvent actionEvent)
+	{
+		for(final ActionListener actionListener:getEventListenerManager().getListeners(ActionListener.class))	//for each action listener
+		{
+			actionListener.actionPerformed(actionEvent);	//dispatch the action to the listener
 		}
 	}
 

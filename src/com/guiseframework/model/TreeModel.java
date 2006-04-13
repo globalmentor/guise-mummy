@@ -7,7 +7,7 @@ import com.guiseframework.event.TreeNodePropertyChangeListener;
 /**A model for a tree of nodes.
 @author Garret Wilson
 */
-public interface TreeModel extends Model
+public interface TreeModel extends ActionModel
 {
 
 	/**The bound property of the root node.*/

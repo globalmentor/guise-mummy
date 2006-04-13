@@ -1,15 +1,16 @@
-package com.guiseframework.component.rdf;
+package com.guiseframework.component.rdf.maqro;
 
 import com.garretwilson.rdf.*;
+import com.garretwilson.rdf.maqro.Interaction;
 
-/**A default tree node representation strategy representing an RDF resource.
+/**A tree node representation strategy representing a MAQRO interaction.
 @author Garret Wilson
 */
-public class RDFResourceTreeNodeRepresentationStrategy extends AbstractRDFResourceTreeNodeRepresentationStrategy<RDFResource>
+public class InteractionTreeNodeRepresentationStrategy extends AbstractInteractionTreeNodeRepresentationStrategy<Interaction>
 {
 
 	/**Default constructor with a default RDF XMLifier.*/
-	public RDFResourceTreeNodeRepresentationStrategy()
+	public InteractionTreeNodeRepresentationStrategy()
 	{
 		this(new RDFXMLifier());	//create the class with a default RDF XMLifier
 	}
@@ -18,9 +19,8 @@ public class RDFResourceTreeNodeRepresentationStrategy extends AbstractRDFResour
 	@param rdfXMLifier The RDF XMLifier to use for creating labels.
 	@exception NullPointerException if the given RDF XMLifier is <code>null</code>.
 	*/
-	public RDFResourceTreeNodeRepresentationStrategy(final RDFXMLifier rdfXMLifier)
+	public InteractionTreeNodeRepresentationStrategy(final RDFXMLifier rdfXMLifier)
 	{
 		super(rdfXMLifier);	//construct the parent
 	}
-
 }

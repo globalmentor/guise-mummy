@@ -80,7 +80,8 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 	@param value The value contained in the node.
 	@return The string builder used to construct the label. 
 	*/
-	protected <N extends V> StringBuilder buildLabelText(final StringBuilder stringBuilder, final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final N value)	//TODO later put this method hierarchy in a custom label model
+//TODO fix	protected <N extends V> StringBuilder buildLabelText(final StringBuilder stringBuilder, final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final N value)	//TODO later put this method hierarchy in a custom label model
+	protected StringBuilder buildLabelText(final StringBuilder stringBuilder, final TreeControl treeControl, final TreeModel model, final TreeNodeModel<? extends V> treeNode, final V value)	//TODO later put this method hierarchy in a custom label model
 	{
 		if(treeNode instanceof RDFObjectTreeNodeModel)	//if the tree node is an RDF object tree node
 		{

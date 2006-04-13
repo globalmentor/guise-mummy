@@ -67,7 +67,8 @@ public abstract class AbstractActionControl<C extends ActionControl<C>> extends 
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the action is performed
 					{
-						fireActionPerformed();	//fire an action with this component as the source
+						final ActionEvent repeatActionEvent=new ActionEvent(AbstractActionControl.this, actionEvent);	//copy the action event with this class as its source
+						fireActionPerformed(repeatActionEvent);	//fire the repeated action
 					}
 				});
 	}
@@ -103,16 +104,27 @@ public abstract class AbstractActionControl<C extends ActionControl<C>> extends 
 	}
 
 	/**Fires an action event to all registered action listeners.
-	This implementation queues a postponed action event.
+	This method delegates to {@link #fireActionPerformed(ActionEvent)}.
 	@see ActionListener
 	@see ActionEvent
 	*/
 	protected void fireActionPerformed()
 	{
-		if(getEventListenerManager().hasListeners(ActionListener.class))	//if there are action listeners registered
+		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
+		if(eventListenerManager.hasListeners(ActionListener.class))	//if there are action listeners registered
 		{
-			final ActionEvent actionEvent=new ActionEvent(this);	//create a new action event
-			getSession().queueEvent(new PostponedActionEvent(getEventListenerManager(), actionEvent));	//tell the Guise session to queue the event
+			fireActionPerformed(new ActionEvent(this));	//create and fire a new action event
+		}
+	}
+
+	/**Fires a given action event to all registered action listeners.
+	@param actionEvent The action event to fire.
+	*/
+	protected void fireActionPerformed(final ActionEvent actionEvent)
+	{
+		for(final ActionListener actionListener:getEventListenerManager().getListeners(ActionListener.class))	//for each action listener
+		{
+			actionListener.actionPerformed(actionEvent);	//dispatch the action to the listener
 		}
 	}
 }
