@@ -23,7 +23,7 @@ This coupler can behave as if a single card or multiple cards are connected, fir
 If the card change results in the same card in the first position in the list, the {@link #CARD_PROPERTY} is not fired.
 @author Garret Wilson
 */
-public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen for the card control changing
+public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen for the card control changing; do something to keep card couplers from leaking memory
 {
 
 	/**The bound property of the connected card.*/

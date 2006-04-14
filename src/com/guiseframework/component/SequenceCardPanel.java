@@ -332,6 +332,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 			for(final Component<?> card:this)	//for each card
 			{
 				final Constraints constraints=card.getConstraints();	//get the card constraints
+					//TODO ask the layout to create constraints, because the card may not yet have constraints
 				if(constraints instanceof Enableable)	//if these constraints can be enabled or disabled
 				{
 					((Enableable)constraints).setEnabled(card==selectedCard);	//only the selected card should be enabled
