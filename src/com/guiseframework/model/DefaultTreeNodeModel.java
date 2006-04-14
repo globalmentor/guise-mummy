@@ -35,7 +35,7 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 
 		/**Sets whether the node is expanded, showing its children, if any.
 		This is a bound property of type <code>Boolean</code>.
-		@param newExpanded <code>true</code> if the node is expanded
+		@param newExpanded <code>true</code> if the node is expanded.
 		@see #EXPANDED_PROPERTY
 		*/
 		public void setExpanded(final boolean newExpanded)
@@ -47,6 +47,19 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 				firePropertyChange(EXPANDED_PROPERTY, Boolean.valueOf(oldExpanded), Boolean.valueOf(newExpanded));	//indicate that the value changed
 			}			
 		}
+
+		/**Sets whether all tree nodes, including this node, are expanded in this subtree.
+		@param newAllExpanded <code>true</code> if all the nodes in this tree should be expanded, or <code>false</code> if they should be collapsed.
+		@see #setExpanded(boolean)
+		*/
+		public void setAllExpanded(final boolean newAllExpanded)
+		{
+			setExpanded(newAllExpanded);	//set this node to be expanded
+			for(final TreeNodeModel<?> childTreeNode:this)	//for each child child tree node
+			{
+				childTreeNode.setAllExpanded(newAllExpanded);	//set this child tree node subtree expanded or contracted
+			}
+		}		
 
 	/**The list of child tree nodes.*/ 
 	private final List<TreeNodeModel<?>> treeNodeList=new CopyOnWriteArrayList<TreeNodeModel<?>>();

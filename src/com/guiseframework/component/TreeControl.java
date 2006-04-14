@@ -161,6 +161,11 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	/**@return The root node of the tree model.*/
 	public TreeNodeModel<?> getRootNode() {return getTreeModel().getRootNode();}
 
+	/**Sets whether all tree nodes are expanded.
+	@param newAllExpanded <code>true</code> if all the nodes should be expanded, or <code>false</code> if they should be collapsed.
+	*/
+	public void setAllExpanded(final boolean newAllExpanded) {getTreeModel().setAllExpanded(newAllExpanded);}
+
 	/**An encapsulation of a component for a tree node along with other metadata, such as whether the component was editable when created.
 	@author Garret Wilson
 	*/ 

@@ -52,25 +52,36 @@ public abstract class AbstractInteractionTreeNodeRepresentationStrategy<V extend
 		{
 			final Question question=(Question)parentValue;	//get the question
 			final FollowupEvaluation followupEvaluation=((AbstractInteractionTreeNodeModel<?>)treeNode).getFollowupEvaluation();	//get the followup evaluation, if any, associated with the RDF object
-			final String condition=followupEvaluation.getCondition();	//get the evaluation condition
+			final String condition=followupEvaluation!=null ? followupEvaluation.getCondition() : null;	//get the evaluation condition, if any
 			if(condition!=null)	//if the evaluation has a condition
 			{
 				final String[] conditionTokens=condition.split("\\s");	//split the condition on whitespace
 				if(conditionTokens.length>0)	//if there are condition tokens
 				{
 					final String conditionID=conditionTokens[conditionTokens.length-1];	//get the last condition token
-					final List<RDFResource> choices=question.getChoices();	//get the choices
-					if(choices!=null)	//if there are choices
+					if(Boolean.TRUE.toString().equals(conditionID))	//if the value is "true" TODO improve; check the expected response type
 					{
-						for(final RDFResource choiceResource:choices)	//for each choice
+						stringBuilder.append('[').append("Yes").append(']').append(' ');	//append "[Yes] "						
+					}
+					else if(Boolean.FALSE.toString().equals(conditionID))	//if the value is "false" TODO improve; check the expected response type
+					{
+						stringBuilder.append('[').append("No").append(']').append(' ');	//append "[No] "						
+					}
+					else	//if this is a condition for a choice-based question
+					{
+						final List<RDFResource> choices=question.getChoices();	//get the choices
+						if(choices!=null)	//if there are choices
 						{
-							if(choiceResource instanceof Dialogue	//if this is the choice dialog the condition mentioned
-									&& conditionID.equals(((Dialogue)choiceResource).getReferenceURI().toString())) 
+							for(final RDFResource choiceResource:choices)	//for each choice
 							{
-								final RDFLiteral choiceValue=((Dialogue)choiceResource).getValue();	//get the choice value
-								if(choiceValue!=null)	//if there is a choice value
+								if(choiceResource instanceof Dialogue	//if this is the choice dialog the condition mentioned
+										&& conditionID.equals(((Dialogue)choiceResource).getReferenceURI().toString())) 
 								{
-									stringBuilder.append('[').append(choiceValue).append(']').append(' ');	//append "[choice] "
+									final RDFLiteral choiceValue=((Dialogue)choiceResource).getValue();	//get the choice value
+									if(choiceValue!=null)	//if there is a choice value
+									{
+										stringBuilder.append('[').append(choiceValue).append(']').append(' ');	//append "[choice] "
+									}
 								}
 							}
 						}

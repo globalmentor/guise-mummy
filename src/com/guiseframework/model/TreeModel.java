@@ -26,6 +26,12 @@ public interface TreeModel extends ActionModel
 	*/
 //TODO bring back maybe	public void removeActionListener(final ActionListener<TreeModel> actionListener);
 
+	/**Sets whether all tree nodes are expanded.
+	This method delegates to the root node {@link TreeNodeModel#setAllExpanded(boolean)}.
+	@param newAllExpanded <code>true</code> if all the nodes should be expanded, or <code>false</code> if they should be collapsed.
+	*/
+	public void setAllExpanded(final boolean newAllExpanded);
+	
 	/**Adds a tree node property change listener.
 	@param treeNodePropertyChangeListener The tree node property change listener to add.
 	*/

@@ -110,6 +110,15 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel
 		}
 	}
 
+	/**Sets whether all tree nodes are expanded.
+	This method delegates to the root node {@link TreeNodeModel#setAllExpanded(boolean)}.
+	@param newAllExpanded <code>true</code> if all the nodes should be expanded, or <code>false</code> if they should be collapsed.
+	*/
+	public void setAllExpanded(final boolean newAllExpanded)
+	{
+		getRootNode().setAllExpanded(newAllExpanded);	//tell the root node to expand or collapse all its children
+	}
+
 		//TODO replace tree node property change stuff with special targeted property change information 
 
 	/**Adds a tree node property change listener.

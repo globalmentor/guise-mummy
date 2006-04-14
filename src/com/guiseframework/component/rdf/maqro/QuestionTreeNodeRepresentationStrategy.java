@@ -44,6 +44,10 @@ public class QuestionTreeNodeRepresentationStrategy extends AbstractInteractionT
 		super.buildLabelText(stringBuilder, treeControl, model, treeNode, value);	//do the default label text building
 		if(value!=null)	//if there is a value
 		{
+			if(stringBuilder.length()>0)	//if there already is content
+			{
+				stringBuilder.append(':').append(' ');	//add separater content
+			}
 			stringBuilder.append(value);	//TODO testing; improve
 		}
 //TODO del		super.buildLabelText(stringBuilder, treeControl, model, treeNode, value);	//do the default label text building

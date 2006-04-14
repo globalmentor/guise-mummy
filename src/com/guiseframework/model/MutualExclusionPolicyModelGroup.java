@@ -8,9 +8,10 @@ import com.guiseframework.validator.ValidationException;
 /**A group that ensures that only one boolean model in the group is set to <code>true</code> at the same time.
 This class is declared final because it represents a particular defined semantics, no more and no less.
 This allows controllers to make assumptions about models with only this listener, and offload mutual exclusion to client that have this capability built in.
+The current implementation will only update the selected model for models that are already a part of the group.
 @author Garret Wilson.
 */
-public final class MutualExclusionPolicyModelGroup extends ValuePolicyModelGroup<Boolean>
+public final class MutualExclusionPolicyModelGroup extends ValuePolicyModelGroup<Boolean>	//TODO improve class to update the selected model when models are added or removed
 {
 
 	/**Model constructor.
@@ -22,6 +23,12 @@ public final class MutualExclusionPolicyModelGroup extends ValuePolicyModelGroup
 		super(models);	//construct the parent class
 	}
 
+	/**The currently selected model.*/
+	private ValueModel<Boolean> selectedModel=null;
+
+		/**@return The currently selected model.*/
+		public ValueModel<Boolean> getSelectedModel() {return selectedModel;}
+
 	/**Called when the boolean model value is changed.
 	@param propertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
 	*/
@@ -30,6 +37,7 @@ public final class MutualExclusionPolicyModelGroup extends ValuePolicyModelGroup
 		if(Boolean.TRUE.equals(propertyChangeEvent.getNewValue()))	//if this model is changing to true, change the other models to false
 		{
 			final ValueModel<Boolean> source=(ValueModel<Boolean>)propertyChangeEvent.getSource();	//see which model changed TODO verify, improve cast
+			selectedModel=source;	//update the selected model
 			final Set<ValueModel<Boolean>> modelSet=getModelSet();	//get the set of models in the group
 			for(final ValueModel<Boolean> valueModel:modelSet)	//for each model in the group
 			{

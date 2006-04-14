@@ -18,11 +18,17 @@ public interface TreeNodeModel<V> extends ActionModel, ValueModel<V>, Iterable<T
 
 	/**Sets whether the node is expanded, showing its children, if any.
 	This is a bound property of type <code>Boolean</code>.
-	@param newExpanded <code>true</code> if the node is expanded
+	@param newExpanded <code>true</code> if the node is expanded.
 	@see #EXPANDED_PROPERTY
 	*/
 	public void setExpanded(final boolean newExpanded);
 
+	/**Sets whether all tree nodes, including this node, are expanded in this subtree.
+	@param newAllExpanded <code>true</code> if all the nodes in this tree should be expanded, or <code>false</code> if they should be collapsed.
+	@see #setExpanded(boolean)
+	*/
+	public void setAllExpanded(final boolean newAllExpanded);
+	
 	/**Determines whether this node could be considered a leaf node.
 	This method may return <code>false</code> even if it currently has no children, if it intends to load them later and there is no way to know ahead of time if there will be children.
 	@return <code>true</code> if this is a leaf node, else <code>false</code> if this node should not be considered a leaf.
