@@ -499,130 +499,145 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 						{
 							final Set<Frame<?>> removedFrames=new HashSet<Frame<?>>();	//create a set of frames so that we can know which ones were removed TODO testing
 							CollectionUtilities.addAll(removedFrames, guiseSession.getFrameIterator());	//get all the current frames; we'll determine which ones were removed, later TODO improve all this
-							
 							final Set<Component<?>> requestedComponents=new HashSet<Component<?>>();	//create a set of component that were identified in the request
-							if(controlEvent instanceof FormControlEvent)	//if this is a form submission
+							try
 							{
-								final FormControlEvent formControlEvent=(FormControlEvent)controlEvent;	//get the form control event
-								if(formControlEvent.isExhaustive())	//if this is an exhaustive form submission (such as a POST submission)
+								if(controlEvent instanceof FormControlEvent)	//if this is a form submission
 								{
-									if(formControlEvent.getParameterListMap().size()>0)	//only process the event if there were submitted values---especially important for radio buttons and checkboxes, which must assume a value of false if nothing is submitted for them, thereby updating the model
+									final FormControlEvent formControlEvent=(FormControlEvent)controlEvent;	//get the form control event
+									if(formControlEvent.isExhaustive())	//if this is an exhaustive form submission (such as a POST submission)
 									{
-										requestedComponents.add(navigationPanel);	//we'll give the event to the entire navigation panel
-									}
-								}
-								else	//if this is only a partial form submission
-								{
-									final ListMap<String, Object> parameterListMap=formControlEvent.getParameterListMap();	//get the request parameter map
-									for(final Map.Entry<String, List<Object>> parameterListMapEntry:parameterListMap.entrySet())	//for each entry in the map of parameter lists
-									{
-										final String parameterName=parameterListMapEntry.getKey();	//get the parameter name
-				
-										if(parameterName.equals(XHTMLApplicationFrameView.getActionInputID(applicationFrame)) && parameterListMapEntry.getValue().size()>0)	//if this parameter is for an action
+										if(formControlEvent.getParameterListMap().size()>0)	//only process the event if there were submitted values---especially important for radio buttons and checkboxes, which must assume a value of false if nothing is submitted for them, thereby updating the model
 										{
-											final Component<?> actionComponent=getComponentByID(guiseSession, parameterListMapEntry.getValue().get(0).toString());	//get an action component
-											if(actionComponent!=null)	//if we found an action component
+											requestedComponents.add(navigationPanel);	//we'll give the event to the entire navigation panel
+										}
+									}
+									else	//if this is only a partial form submission
+									{
+										final ListMap<String, Object> parameterListMap=formControlEvent.getParameterListMap();	//get the request parameter map
+										for(final Map.Entry<String, List<Object>> parameterListMapEntry:parameterListMap.entrySet())	//for each entry in the map of parameter lists
+										{
+											final String parameterName=parameterListMapEntry.getKey();	//get the parameter name
+					
+											if(parameterName.equals(XHTMLApplicationFrameView.getActionInputID(applicationFrame)) && parameterListMapEntry.getValue().size()>0)	//if this parameter is for an action
 											{
-												requestedComponents.add(actionComponent);	//add it to the list of requested components
+												final Component<?> actionComponent=getComponentByID(guiseSession, parameterListMapEntry.getValue().get(0).toString());	//get an action component
+												if(actionComponent!=null)	//if we found an action component
+												{
+													requestedComponents.add(actionComponent);	//add it to the list of requested components
+												}
+											}
+											else	//if this parameter is not a special action parameter
+											{
+												//TODO don't re-update nested components (less important for controls, which don't have nested components) 
+								//TODO del Debug.trace("looking for component with name", parameterName);
+												getControlsByName(guiseSession, parameterName, requestedComponents);	//TODO comment; tidy
+					//TODO del; test new method; tidy; comment							getControlsByName(guiseContext, navigationPanel, parameterName, requestedComponents);	//get all components identified by this name
 											}
 										}
-										else	//if this parameter is not a special action parameter
-										{
-											//TODO don't re-update nested components (less important for controls, which don't have nested components) 
-							//TODO del Debug.trace("looking for component with name", parameterName);
-											getControlsByName(guiseSession, parameterName, requestedComponents);	//TODO comment; tidy
-				//TODO del; test new method; tidy; comment							getControlsByName(guiseContext, navigationPanel, parameterName, requestedComponents);	//get all components identified by this name
-										}
 									}
 								}
-							}
-							else if(controlEvent instanceof ComponentControlEvent)	//if this event is bound for a specific component
-							{
-			//TODO del Debug.trace("this is a control event; looking for component with ID", ((ComponentControlEvent)controlEvent).getComponentID());
-								final Component<?> component=getComponentByID(guiseSession, ((ComponentControlEvent)controlEvent).getComponentID());	//get the target component from its ID
-								if(component!=null)	//if there is a target component
+								else if(controlEvent instanceof ComponentControlEvent)	//if this event is bound for a specific component
 								{
-			//TODO del Debug.trace("got component", component);
-									requestedComponents.add(component);	//add the component to the set of requested components
-								}
-							}
-							if(!requestedComponents.isEmpty())	//if components were requested
-							{
-								guiseContext.setState(GuiseContext.State.PROCESS_EVENT);	//update the context state for processing an event
-								for(final Component<?> component:requestedComponents)	//for each requested component
-								{
-			Debug.trace("ready to process event", controlEvent, "for component", component);
-									component.processEvent(controlEvent);		//tell the component to process the event
-								}
-								guiseContext.setState(GuiseContext.State.INACTIVE);	//deactivate the context so that any model update events will be generated
-							}					
-			/*TODO del
-			Debug.trace("we now have affected components:", affectedComponents.size());
-			for(final Component<?> affectedComponent:affectedComponents)
-			{
-				Debug.trace("affected component:", affectedComponent);
-			}
-			*/
-							final Bookmark newBookmark=guiseSession.getBookmark();	//see if the bookmark has changed
-							final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
-							if(requestedNavigation!=null || !ObjectUtilities.equals(navigationBookmark, newBookmark))	//if navigation is requested or the bookmark has changed, redirect the browser
-							{
-								final String redirectURIString;	//we'll determine where to direct to
-								if(requestedNavigation!=null)	//if navigation is requested
-								{
-									final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
-				//TODO del Debug.trace("navigation requested to", requestedNavigationURI);
-									guiseSession.clearRequestedNavigation();	//remove any navigation requests
-									if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
+				//TODO del Debug.trace("this is a control event; looking for component with ID", ((ComponentControlEvent)controlEvent).getComponentID());
+									final Component<?> component=getComponentByID(guiseSession, ((ComponentControlEvent)controlEvent).getComponentID());	//get the target component from its ID
+									if(component!=null)	//if there is a target component
 									{
-										beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation)requestedNavigation);	//begin the modal navigation
+				//TODO del Debug.trace("got component", component);
+										requestedComponents.add(component);	//add the component to the set of requested components
 									}
-									redirectURIString=requestedNavigationURI.toString();	//we already have the destination URI
 								}
-								else	//if navigation is not requested, request a navigation to the new bookmark location
+								if(!requestedComponents.isEmpty())	//if components were requested
 								{
-									redirectURIString=request.getRequestURL().append(newBookmark).toString();	//save the string form of the constructed bookmark URI
+									guiseContext.setState(GuiseContext.State.PROCESS_EVENT);	//update the context state for processing an event
+									for(final Component<?> component:requestedComponents)	//for each requested component
+									{
+				Debug.trace("ready to process event", controlEvent, "for component", component);
+										component.processEvent(controlEvent);		//tell the component to process the event
+									}
+									guiseContext.setState(GuiseContext.State.INACTIVE);	//deactivate the context so that any model update events will be generated
+								}					
+				/*TODO del
+				Debug.trace("we now have affected components:", affectedComponents.size());
+				for(final Component<?> affectedComponent:affectedComponents)
+				{
+					Debug.trace("affected component:", affectedComponent);
+				}
+				*/
+								final Bookmark newBookmark=guiseSession.getBookmark();	//see if the bookmark has changed
+								final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
+								if(requestedNavigation!=null || !ObjectUtilities.equals(navigationBookmark, newBookmark))	//if navigation is requested or the bookmark has changed, redirect the browser
+								{
+									final String redirectURIString;	//we'll determine where to direct to
+									if(requestedNavigation!=null)	//if navigation is requested
+									{
+										final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
+					//TODO del Debug.trace("navigation requested to", requestedNavigationURI);
+										guiseSession.clearRequestedNavigation();	//remove any navigation requests
+										if(requestedNavigation instanceof ModalNavigation)	//if modal navigation was requested
+										{
+											beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation)requestedNavigation);	//begin the modal navigation
+										}
+										redirectURIString=requestedNavigationURI.toString();	//we already have the destination URI
+									}
+									else	//if navigation is not requested, request a navigation to the new bookmark location
+									{
+										redirectURIString=request.getRequestURL().append(newBookmark).toString();	//save the string form of the constructed bookmark URI
+									}
+									if(isAJAX)	//if this is an AJAX request
+									{
+										guiseContext.writeElementBegin(null, "navigate");	//<navigate>	//TODO use a constant
+										if(requestedNavigation!=null)	//if navigation was requested (i.e. this isn't just a bookmark registration)
+										{
+											final String viewportID=requestedNavigation.getViewportID();	//get the requested viewport ID
+											if(viewportID!=null)	//if a viewport was requested
+											{
+												guiseContext.writeAttribute(null, "viewportID", viewportID);	//specify the viewport ID TODO use a constant
+											}
+										}
+										guiseContext.write(redirectURIString);	//write the navigation URI
+										guiseContext.writeElementEnd(null, "navigate");	//</navigate>
+									}
+									else	//if this is not an AJAX request
+									{
+										throw new HTTPMovedTemporarilyException(URI.create(redirectURIString));	//redirect to the new navigation location TODO fix to work with other viewports						
+									}
+				//TODO if !AJAX						throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
+									//TODO store a flag or something---if we're navigating, we probably should flush the other queued events
 								}
+				
+								
+								
+								
+								if(!ObjectUtilities.equals(oldPrincipal, guiseSession.getPrincipal()))	//if the principal has changed after updating the model
+								{
+									if(isAJAX)	//if this is an AJAX request
+									{
+										guiseContext.writeElementBegin(null, "reload", true);	//<reload>	//TODO use a constant
+										guiseContext.writeElementEnd(null, "reload");	//</reload>
+											//TODO break
+									}
+									else	//if this is not an AJAX request
+									{
+										throw new HTTPMovedTemporarilyException(guiseContext.getNavigationURI());	//redirect to the same page, which will generate a new request with no POST parameters, which would likely change the principal again)
+									}
+								}
+							}
+							catch(final RuntimeException runtimeException)	//if we run into any errors processing events
+							{
 								if(isAJAX)	//if this is an AJAX request
 								{
-									guiseContext.writeElementBegin(null, "navigate");	//<navigate>	//TODO use a constant
-									if(requestedNavigation!=null)	//if navigation was requested (i.e. this isn't just a bookmark registration)
-									{
-										final String viewportID=requestedNavigation.getViewportID();	//get the requested viewport ID
-										if(viewportID!=null)	//if a viewport was requested
-										{
-											guiseContext.writeAttribute(null, "viewportID", viewportID);	//specify the viewport ID TODO use a constant
-										}
-									}
-									guiseContext.write(redirectURIString);	//write the navigation URI
-									guiseContext.writeElementEnd(null, "navigate");	//</navigate>
+									Debug.error(runtimeException);	//log the error
+									//TODO send back the error
 								}
-								else	//if this is not an AJAX request
+								else	//if this is ano an AJAX request
 								{
-									throw new HTTPMovedTemporarilyException(URI.create(redirectURIString));	//redirect to the new navigation location TODO fix to work with other viewports						
+									throw runtimeException;	//pass the error back to the servlet TODO improve; pass to Guise
 								}
-			//TODO if !AJAX						throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
-								//TODO store a flag or something---if we're navigating, we probably should flush the other queued events
+								
 							}
-			
-							
-							
-							
-							if(!ObjectUtilities.equals(oldPrincipal, guiseSession.getPrincipal()))	//if the principal has changed after updating the model
-							{
-								if(isAJAX)	//if this is an AJAX request
-								{
-									guiseContext.writeElementBegin(null, "reload", true);	//<reload>	//TODO use a constant
-									guiseContext.writeElementEnd(null, "reload");	//</reload>
-										//TODO break
-								}
-								else	//if this is not an AJAX request
-								{
-									throw new HTTPMovedTemporarilyException(guiseContext.getNavigationURI());	//redirect to the same page, which will generate a new request with no POST parameters, which would likely change the principal again)
-								}
-							}
-							
-							
+								
+								
 								//TODO this is not guaranteed to work here (although it works on Tomcat), because content has already been written to the server; change the context so that it collects everything into a StringBuilder before sending it back
 								//TODO move this to the bottom of the processing, as cookies only need to be updated before they go back
 							synchronizeCookies(request, response, guiseSession);	//synchronize the cookies going out in the response; do this before anything is written back to the client
@@ -698,6 +713,11 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 								applicationFrame.updateView(guiseContext);		//tell the application frame to update its view						
 							}
 						}
+						
+						
+						
+						
+						
 						if(isAJAX)	//if this is an AJAX request
 						{
 							guiseContext.writeElementEnd(null, "response");	//</response>

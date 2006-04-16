@@ -5,6 +5,7 @@ import java.util.concurrent.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.garretwilson.util.Debug;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 
@@ -84,10 +85,13 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	public <T> Component<?> verifyTreeNodeComponent(final TreeNodeModel<T> treeNode)
 	{
 //TODO important fix		final boolean editable=treeNode.isEditable();	//see if the tree node is editable
+//TODO del Debug.trace("ready to verify tree node with value:", treeNode.getValue());
 		final boolean editable=false;	//TODO fix
 		TreeNodeComponentState treeNodeComponentState=getComponentState(treeNode);	//get the component information for this tree node
 		if(treeNodeComponentState==null || treeNodeComponentState.isEditable()!=editable)	//if there is no component for this tree node, or the component has a different editable status
 		{
+//TODO del Debug.trace("ready to create a component for type", treeNode.getValueClass(), "using strategy", getTreeNodeRepresentationStrategy(treeNode.getValueClass()).getClass());
+			
 				//TODO assert that there is a representation strategy, or otherwise check
 			final Component<?> valueComponent=getTreeNodeRepresentationStrategy(treeNode.getValueClass()).createComponent(this, getTreeModel(), treeNode, editable, false, false);	//create a new component for the tree node
 			if(valueComponent!=null)	//if a value component is given TODO see if this check occurs in the table controller TODO make sure this is the way we want to do this---why not just return a label with a null value?
@@ -101,6 +105,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		{
 			verifyTreeNodeComponent(childTreeNode);	//verify this child node tree
 		}
+//TODO important: fix; if the value is null, there will be no tree node compenent state created, which will throw a NullPointerException
 		return treeNodeComponentState.getComponent();	//return the representation component
 	}
 

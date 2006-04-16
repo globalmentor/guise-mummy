@@ -2,7 +2,6 @@ package com.guiseframework.model;
 
 import java.beans.PropertyChangeEvent;
 import java.util.*;
-import static java.util.Collections.*;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.*;
@@ -24,10 +23,10 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 {
 
 	/**The thread-safe sorted set of selected indices, synchronized on this model.*/
-	private final Set<Integer> selectedIndexSet;
+//TODO del	private final Set<Integer> selectedIndexSet;
 
 		/**@return The thread-safe sorted set of selected indices, synchronized on this model.*/
-		protected Set<Integer> getSelectedIndexSet() {return selectedIndexSet;}
+//TODO del		protected Set<Integer> getSelectedIndexSet() {return selectedIndexSet;}
 
 	/**The default value.*/
 	private final V defaultValue=null;
@@ -54,7 +53,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 		{
 			validator.validate(newValue);	//validate the new value, throwing an exception if anything is wrong
 		}
-		setSelectedValues(newValue);
+		setSelectedValues(newValue);	//TODO probably do something else that only selects the first value if there are duplicates
 	}
 
 	/**Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators.
@@ -67,8 +66,17 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 		synchronized(this)	//don't allow the list to be modified while we update the selections
 		{
 			oldSelectedValue=getSelectedValue();	//get the old selected value
-			getSelectedIndexSet().clear();	//remove all selected indices
-			newSelectedValue=getSelectedValue();	//find out the new selected value
+			int index=0;	//start at the first index
+			for(final ValueState valueState:valueStateList)	//for each value state
+			{
+				if(valueState.isSelected())	//if this value is selected
+				{
+					valueState.setSelected(false);	//unselect this index
+					fireSelectionChanged(null, index);	//notify listeners that an index was removed						
+				}					
+				++index;	//go to the next index
+			}
+			newSelectedValue=getSelectedValue();	//get the new selected value			
 		}
 		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, newSelectedValue);	//indicate that the value changed if needed		
 	}
@@ -84,23 +92,30 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 		clearValue();	//clear the value, as null is the default value
 	}
 
+	/**The list of value states, synchronized on this model.*/
+	private final List<ValueState> valueStateList;
+
 	/**The list of values, all access to which will be synchronized on this.*/
-	private final List<V> values;
+//TODO del when works	private final List<V> values;
 
 	/**The list of value states, all access to which will be synchronized on this.*/
-	private final List<ValueState> valueStates;
+//TODO del when works	private final List<ValueState> valueStates;
 
 	/**@return The number of values in the model.*/
-	public int size() {return values.size();}
+	public int size() {return valueStateList.size();}
 
 	/**@return Whether this model contains no values.*/
-	public boolean isEmpty() {return values.isEmpty();}
+	public boolean isEmpty() {return valueStateList.isEmpty();}
 
 	/**Determines whether this model contains the specified value.
 	@param value The value the presence of which to test.
 	@return <code>true</code> if this model contains the specified value.
 	*/
-	public boolean contains(final Object value) {return values.contains(value);}
+	public boolean contains(final Object value)
+	{
+		final Class<V> valueClass=getValueClass();	//get the value class
+		return valueClass.isInstance(value) ? valueStateList.contains(new ValueState(valueClass.cast(value))) : null;	//if the value is of the correct type, check our list of value states
+	}
 
 	/**@return A read-only iterator over the values in this model.*/
 //TODO fix; this can't be read-only because we want the list sortable	public Iterator<V> iterator() {return unmodifiableList(values).iterator();}	//TODO fix the synchronized list decorator to return a synchronized iterator
@@ -109,10 +124,19 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	//TODO important: fix---we need to be editable for sorting, but this messes up the association with the states
 	
 	/**@return An iterator over the values in this model.*/
-	public Iterator<V> iterator() {return values.iterator();}	//TODO fix the synchronized list decorator to return a synchronized iterator
+	public Iterator<V> iterator()
+	{
+		return listIterator();	//return the list iterator
+	}
 
 	/**@return An array containing all of the values in this model.*/
-	public Object[] toArray() {return values.toArray();}
+	public Object[] toArray()
+	{
+		synchronized(this)	//don't allow the list to be changed while we iterate the values
+		{
+			return toArray(createArray(getValueClass(), size()));	//create an array of the correct type and of the correct link and store the values in it before returning it
+		}
+	}
 
 	/**Returns an array containing all of the values in this model.
 	@param array The array into which the value of this collection are to be stored, if it is big enough; otherwise, a new array of the same runtime type is allocated for this purpose.
@@ -120,8 +144,40 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	@exception ArrayStoreException if the runtime type of the specified array is not a supertype of the runtime type of every value in this model.
 	@exception NullPointerException if the specified array is <code>null</code>.
 	*/
-	public <T> T[] toArray(final T[] array) {return values.toArray(array);}
+	@SuppressWarnings("unchecked")	//we use the component type of the array if we create a new array, so the cast is logically correct
+	public <T> T[] toArray(T[] array)
+	{
+		synchronized(this)	//don't allow the list to be changed while we iterate the values
+		{
+			final int size=size();	//get our size
+			final Class<T> arrayComponentType=(Class<T>)array.getClass().getComponentType();	//get the component type of the array
+			if(array.length<size)	//if the array isn't large enough for all our elements
+			{
+				array=createArray(arrayComponentType, size);	//create a new array of sufficient size				
+			}
+			int index=0;	//keep track of the index we're on
+			for(final ValueState valueState:valueStateList)	//for each value state
+			{
+				array[index]=arrayComponentType.cast(valueState.getValue());	//get the value at this index and cast it to the type of the array, if possible
+				++index;	//show that we're going to the next index
+			}
+			if(index<array.length)	//if we're not yet at the end of the array
+			{
+				array[index]=null;	//set the next element null, as the API specifies
+			}
+		}
+		return array;	//return the array, which now holds the information 
+	}
 
+
+	
+	
+	
+	
+	
+	
+	
+	
 	/**Appends the specified value to the end of this model.
 	This version delegates to {@link #add(int, Object)}.
 	@param value The value to be appended to this model.
@@ -131,28 +187,24 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	{
 		synchronized(this)	//don't allow the values to be changed while we check the size
 		{
-			add(values.size(), value);	//add the value to the end of the list TODO decide how to fire events outside the synchronized block
+			add(valueStateList.size(), value);	//add the value to the end of the list TODO decide how to fire events outside the synchronized block
 		}
 		return true;	//this operation always modifies the list
 	}
 
 	/**Removes the first occurrence in this model of the specified value. 
+	This version delegates to {@link #remove(int)}.
 	@param value The value to be removed from this model, if present.
 	@return <code>true</code> if this model contained the specified value.
 	*/
-	@SuppressWarnings("unchecked")	//we only cast the value if the list was modified, which implies the value was in the list, implying that that list is of the appropriate type or it wouldn't have been in the list to begin with
 	public boolean remove(final Object value)
 	{
 		synchronized(this)	//don't allow the list to be changed while we remove the item
 		{
-			final V oldSelectedValue=getSelectedValue();	//get the old selected value
-			final int index=values.indexOf(value);	//get the index of this value
+			final int index=indexOf(value);	//get the index of this value
 			if(index>=0)	//if there is a valid index
 			{
-				values.remove(index);	//remove this value
-				valueStates.remove(index);	//remove the corresponding value state
-				listModified(index, null, (V)value);	//indicate the value was removed from the index
-				firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed
+				remove(index);	//remove the given index
 				return true;	//indicate that the list was modified
 			}
 			else	//if this is not a valid index
@@ -168,7 +220,20 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	@exception NullPointerException if the specified collection is <code>null</code>.
 	@see #contains(Object)
 	*/
-	public boolean containsAll(final Collection<?> collection) {return values.containsAll(collection);}
+	public boolean containsAll(final Collection<?> collection)
+	{
+		synchronized(this)	//don't allow the list to be changed while we check each item in the collection
+		{
+			for(final Object object:collection)	//for each item in the collection
+			{
+				if(!contains(object))	//if we don't contain this object
+				{
+					return false;	//we don't contain all objects in the collection
+				}
+			}
+		}
+		return true;	//every object in the collection is in this list
+	}
 
 	/**Appends all of the values in the specified collection to the end of this model, in the order that they are returned by the specified collection's iterator.
 	@param collection The collection the values of which are to be added to this model.
@@ -180,7 +245,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	{
 		synchronized(this)	//don't allow the list to be changed while we check the size
 		{
-			return addAll(values.size(), collection);	//add all at the end TODO find out how we can fire events outside this synchronization block
+			return addAll(valueStateList.size(), collection);	//add all at the end TODO find out how we can fire events outside this synchronization block
 		}
 	}
 
@@ -191,24 +256,22 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	@exception NullPointerException if the specified collection is <code>null</code>.
 	@exception IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt; <code>size()</code>).
 	*/
-	public synchronized boolean addAll(final int index, final Collection<? extends V> collection)
+	public synchronized boolean addAll(int index, final Collection<? extends V> collection)
 	{
-		final boolean modified;	//keep track of whether the list was modified
+		boolean modified=false;	//keep track of whether the list was modified
+		final V oldSelectedValue, newSelectedValue;
 		synchronized(this)	//don't allow the list to be changed while we do the addition
 		{
-			final V oldSelectedValue=getSelectedValue();	//get the old selected value
-			modified=values.addAll(index, collection);	//add the values
-			if(modified)	//if the list was modified
+			oldSelectedValue=getSelectedValue();	//get the old selected value
+			for(final V value:collection)	//for each new value in the collection
 			{
-				int valueStateIndex=index;	//we'll start adding new states at the request4ed index
-				for(final V value:collection)	//for each new value
-				{
-					valueStates.add(valueStateIndex++, new ValueState());	//add a new value state corresponding to the aded value
-				}
-				listModified(-1, null, null);	//indicate a general list modification
-				firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
+				valueStateList.add(index++, new ValueState(value));	//add another value state at this index
+				modified=true;	//the list was modified
+				listModified(index, value, null);	//indicate the value was added at the given index
 			}
+			newSelectedValue=getSelectedValue();	//get the new selected value
 		}
+		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, newSelectedValue);	//indicate that the value changed if needed		
 		return modified;	//indicate whether the list was modified
 	}
 
@@ -221,17 +284,31 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	*/
 	public boolean removeAll(final Collection<?> collection)
 	{
-		throw new UnsupportedOperationException();	//TODO implement
-/*TODO fix
-		final V oldSelectedValue=getSelectedValue();	//get the old selected value
-		final boolean modified=values.removeAll(collection);	//remove the values
-		if(modified)	//if the list was modified
+		boolean modified=false;	//keep track of whether the list was modified
+		final V oldSelectedValue, newSelectedValue;
+		synchronized(this)	//don't allow the list to be changed while we do the addition
 		{
-			listModified(-1, null, null);	//indicate a general list modification
-			firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
+			oldSelectedValue=getSelectedValue();	//get the old selected value
+			int index=0;	//keep track of the index we're on
+			final Iterator<ValueState> valueStateIterator=valueStateList.iterator();	//get an iterator to value states
+			while(valueStateIterator.hasNext())	//while there are more value states
+			{
+				final V value=valueStateIterator.next().getValue();	//get the next value
+				if(collection.contains(value))	//if the collection contains this value
+				{
+					valueStateIterator.remove();	//remove this value state
+					modified=true;	//the list was modified
+					listModified(index, null, value);	//indicate the value was removed from the index
+				}
+				else	//if the collection doesn't contain this value
+				{
+					++index;	//show that we're going to the next index
+				}
+			}
+			newSelectedValue=getSelectedValue();	//get the new selected value
 		}
+		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, newSelectedValue);	//indicate that the value changed if needed		
 		return modified;	//indicate whether the list was modified
-*/
 	}
 
 	/**Retains only the values in this model that are contained in the specified collection.
@@ -243,31 +320,56 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	*/
 	public boolean retainAll(final Collection<?> collection)
 	{
-		throw new UnsupportedOperationException();	//TODO implement
-/*TODO fix
-		final V oldSelectedValue=getSelectedValue();	//get the old selected value
-		final boolean modified=values.retainAll(collection);	//remove values if needed
-		if(modified)	//if the list was modified
+		boolean modified=false;	//keep track of whether the list was modified
+		final V oldSelectedValue, newSelectedValue;
+		synchronized(this)	//don't allow the list to be changed while we do the addition
 		{
-			listModified(-1, null, null);	//indicate a general list modification
-			firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
+			oldSelectedValue=getSelectedValue();	//get the old selected value
+			int index=0;	//keep track of the index we're on
+			final Iterator<ValueState> valueStateIterator=valueStateList.iterator();	//get an iterator to value states
+			while(valueStateIterator.hasNext())	//while there are more value states
+			{
+				final V value=valueStateIterator.next().getValue();	//get the next value
+				if(!collection.contains(value))	//if the collection does not contain this value
+				{
+					valueStateIterator.remove();	//remove this value state
+					modified=true;	//the list was modified
+					listModified(index, null, value);	//indicate the value was removed from the index
+				}
+				else	//if the collection contains this value
+				{
+					++index;	//show that we're going to the next index
+				}
+			}
+			newSelectedValue=getSelectedValue();	//get the new selected value
 		}
+		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, newSelectedValue);	//indicate that the value changed if needed		
 		return modified;	//indicate whether the list was modified
-*/
 	}
 
 	/**Removes all of the values from this model.*/
 	public void clear()
 	{
-		final V oldSelectedValue;	//remember the original value selected
+		final V oldSelectedValue, newSelectedValue;
+		final boolean modified;
 		synchronized(this)	//don't allow the list to be changed while we clear the list
 		{
 			oldSelectedValue=getSelectedValue();	//get the old selected value
-			values.clear();	//clear the list
-			valueStates.clear();	//clear the value states
-			getSelectedIndexSet().clear();	//clear all selections
+			if(!valueStateList.isEmpty())	//if the list isn't already empty
+			{
+				valueStateList.clear();	//clear the list of value states
+				modified=true;	//show that we modified the list
+				newSelectedValue=getSelectedValue();	//get the new selected value			
+			}
+			else	//if the list was already empty
+			{
+				modified=false;	//nothing changed
+				newSelectedValue=oldSelectedValue;	//the selected value didn't change			
+			}
+		}
+		if(modified)	//if we were modified
+		{
 			fireListModified(-1, null, null);	//fire an event indicating that the list changed
-//TODO del; this will try to update the selections, which we already did			listModified(-1, null, null);	//indicate a general list modification (without more intricate synchornization, we can't know for sure if the list was modified, even checking the size beforehand, because of thread race conditions)
 			firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
 		}
 	}
@@ -277,7 +379,7 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	@return The value at the specified position in this model.
 	@throws IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
 	*/
-	public V get(final int index) {return values.get(index);}
+	public V get(final int index) {return valueStateList.get(index).getValue();}
 
 	/**Replaces the value at the specified position in this model with the specified value.
 	@param index The index of the value to replace.
@@ -288,14 +390,17 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	public V set(final int index, final V value)
 	{
 		final V oldValue;	//remember the old value at the given position
+		final V oldSelectedValue, newSelectedValue;
 		synchronized(this)	//prevent the list from being concurrently modified while we do the replacement
 		{
-			final V oldSelectedValue=getSelectedValue();	//get the old selected value
-			oldValue=values.set(index, value);	//set the value at the given index
-			valueStates.set(index, new ValueState(valueStates.get(index)));	//store a new value state at the same location with the new value but with the same state
-			listModified(index, oldValue, value);	//indicate that the value at the given index was replaced
-			firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
+			oldSelectedValue=getSelectedValue();	//get the old selected value
+			final ValueState oldValueState=valueStateList.get(index);	//get the old value state
+			oldValue=oldValueState.getValue();	//get the old value
+			valueStateList.set(index, new ValueState(value, oldValueState));	//update the value at the given index
+			newSelectedValue=getSelectedValue();	//get the new selected value			
 		}
+		listModified(index, oldValue, value);	//indicate that the value at the given index was replaced
+		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, newSelectedValue);	//indicate that the value changed if needed		
 		return oldValue;	//return the old value
 	}
 
@@ -306,14 +411,15 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	*/
 	public void add(final int index, final V value)
 	{
+		final V oldSelectedValue, newSelectedValue;
 		synchronized(this)	//don't allow the list to be modified while we add the value
 		{
-			final V oldSelectedValue=getSelectedValue();	//get the old selected value
-			values.add(index, value);	//add the value at the requested index
-			valueStates.add(index, new ValueState());	//add a corresponding value state at the same index
-			listModified(index, value, null);	//indicate the value was added at the given index
-			firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
+			oldSelectedValue=getSelectedValue();	//get the old selected value
+			valueStateList.add(index, new ValueState(value));	//add the value at the requested index
+			newSelectedValue=getSelectedValue();	//get the new selected value			
 		}
+		listModified(index, value, null);	//indicate the value was added at the given index
+		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, newSelectedValue);	//indicate that the value changed if needed		
 	}
 
 	/**Removes the value at the specified position in this model.
@@ -324,14 +430,31 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	public V remove(final int index)
 	{
 		final V oldValue;	//remember the original value at the given index
-		synchronized(this)	//don't allow the list to be modified while we add the value
+		final V oldSelectedValue, newSelectedValue;
+		synchronized(this)	//don't allow the list to be modified while we remove the value
 		{
-			final V oldSelectedValue=getSelectedValue();	//get the old selected value
-			oldValue=values.remove(index);	//remove the value at this index
-			valueStates.remove(index);	//remove the corresponding value state at the same index
-			listModified(index, null, oldValue);	//indicate the value was removed from the given index
-			firePropertyChange(VALUE_PROPERTY, oldSelectedValue, getSelectedValue());	//indicate that the value changed if needed		
+			oldSelectedValue=getSelectedValue();	//get the old selected value
+			final ValueState oldValueState=valueStateList.remove(index);	//remove the value state at the index
+			oldValue=oldValueState.getValue();	//remove the indicated value state from the list and get the value state's value
+			if(oldValueState.isSelected())	//if the removed value was selected
+			{
+				final int newSize=size();	//get the new size
+				if(newSize>0)	//if we have values left
+				{
+					assert index<=newSize : "Somehow we removed an index out of range, which should be possible.";
+					final int newSelectedIndex=index!=newSize ? index : index-1;	//determine the new selected index; if we just removed the last element, back up one index
+					final ValueState newSelectedIndexValueState=valueStateList.get(newSelectedIndex);	//get the value state at the new selected index
+					if(!newSelectedIndexValueState.isSelected())	//if the new index is not selected
+					{
+						newSelectedIndexValueState.setSelected(true);	//move the selection to the replacement index
+						fireSelectionChanged(newSelectedIndex, null);	//notify listeners that a selection was added						
+					}					
+				}
+			}
+			newSelectedValue=getSelectedValue();	//get the new selected value			
 		}
+		listModified(index, null, oldValue);	//indicate the value was removed from the given index
+		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, newSelectedValue);	//indicate that the value changed if needed		
 		return oldValue;	//return the value that was removed
 	}
 
@@ -339,23 +462,37 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	@param value The value for which to search.
 	@return The index in this model of the first occurrence of the specified value, or -1 if this model does not contain this value.
 	*/
-	public int indexOf(final Object value) {return values.indexOf(value);}
+	public int indexOf(final Object value)
+	{
+		final Class<V> valueClass=getValueClass();	//get the value class
+		return valueClass.isInstance(value) ? valueStateList.indexOf(new ValueState(valueClass.cast(value))) : null;	//if the value is of the correct type, check our list of value states
+	}
 
 	/**Returns the index in this model of the last occurrence of the specified value, or -1 if this model does not contain this value.
 	@param value The value for which to search.
 	@return The index in this model of the last occurrence of the specified vale, or -1 if this model does not contain this value.
 	*/
-	public int lastIndexOf(final Object value) {return values.lastIndexOf(value);}
+	public int lastIndexOf(final Object value)
+	{
+		final Class<V> valueClass=getValueClass();	//get the value class
+		return valueClass.isInstance(value) ? valueStateList.lastIndexOf(new ValueState(valueClass.cast(value))) : null;	//if the value is of the correct type, check our list of value states
+	}
 
 	/**@return A read-only list iterator of the values in this model (in proper sequence).*/
-	public ListIterator<V> listIterator() {return values.listIterator();}	//TODO update the synchronized list decorator to return a synchronized list iterator
+	public ListIterator<V> listIterator()
+	{
+		return listIterator(0);	//return a list iterator starting at the first index
+	}
 
 	/**Returns a list iterator of the values in this model (in proper sequence), starting at the specified position in this model.
 	@param index The index of first value to be returned from the list iterator (by a call to the <code>next()</code> method).
 	@return A list iterator of the values in this model (in proper sequence), starting at the specified position in this model.
 	@exception IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt; <code>size()</code>).
 	*/
-	public ListIterator<V> listIterator(final int index) {return values.listIterator(index);}	//TODO update the synchronized list decorator to return a synchronized list iterator
+	public ListIterator<V> listIterator(final int index)
+	{
+		return new DefaultListIterator<V>(this, index);	//construct an iterator to this model
+	}
 
 	/**Returns a read-only view of the portion of this model between the specified <var>fromIndex</var>, inclusive, and <var>toIndex</var>, exclusive.
 	@param fromIndex The low endpoint (inclusive) of the sub-list.
@@ -363,7 +500,9 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	@return A view of the specified range within this model.
 	@throws IndexOutOfBoundsException for an illegal endpoint index value (<var>fromIndex</var> &lt; 0 || <var>toIndex</var> &gt; <code>size()</code> || <var>fromIndex</var> &gt; <var>toIndex</var>).
 	*/
-	public List<V> subList(final int fromIndex, final int toIndex) {return unmodifiableList(values).subList(fromIndex, toIndex);}
+	public List<V> subList(final int fromIndex, final int toIndex) {throw new UnsupportedOperationException("subList() not yet supported.");}	
+	
+//TODO fix	{return unmodifiableList(values).subList(fromIndex, toIndex);}
 
 	/**Replaces the first occurrence of the given value with its replacement.
 	This method ensures that another thread does not change the model while the search and replace operation occurs.
@@ -411,13 +550,21 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	*/
 	public int[] getSelectedIndexes()
 	{
-		final Set<Integer> selectedIndexSet=getSelectedIndexSet();	//get the set of selected indices
-		final Integer[] integerIndices;	//we'll initially get the selected indices as integers
-		synchronized(selectedIndexSet)	//don't allow the selection set to be changed while we calculate how many indices to allocate 
+		final List<Integer> selectedIndexes=new ArrayList<Integer>();	//create an array of integers
+		synchronized(this)	//don't allow the model to be changed while we search for selected indexes 
 		{
-			integerIndices=selectedIndexSet.toArray(new Integer[selectedIndexSet.size()]);	//create an array of integer selected indices
+
+			int index=0;	//start at the first index
+			for(final ValueState valueState:valueStateList)	//for each value state
+			{
+				if(valueState.isSelected())	//if this value is selected
+				{
+					selectedIndexes.add(new Integer(index));	//add this index to our list of selected indexes
+				}
+				++index;	//go to the next index
+			}
 		}
-		return toIntArray(integerIndices);	//return the integers as an array of ints
+		return toIntArray(selectedIndexes.toArray(new Integer[selectedIndexes.size()]));	//return the integers as an array of ints
 	}
 
 	/**Sets the selected indices.
@@ -446,36 +593,33 @@ if(validIndexCount==0)	//TODO add more thorough validation throughout; right now
 		validator.validate(null);	//validate the new value, throwing an exception if anything is wrong
 	}
 }
-			//TODO this method, along with the add and remove methods, need to collect added and/or removed indices and report them after all changes are done; better event classes should be created as well
 		final V oldSelectedValue, newSelectedValue;
-		synchronized(this)	//don't allow the list to be modified while we update the selections
+		synchronized(this)	//don't allow the model to be changed while we update the selected indexes 
 		{
 			indexes=getSelectionPolicy().getSetSelectedIndices(this, indexes);	//get the indices to set
 			oldSelectedValue=getSelectedValue();	//get the old selected value
-			final Set<Integer> selectedIndexSet=getSelectedIndexSet();	//get the set of selected indices
-			final Iterator<Integer> oldSelectedIndexIterator=selectedIndexSet.iterator();	//get an iterator to the old selected indices
-			while(oldSelectedIndexIterator.hasNext())	//while there are more old selected indices
+			int index=0;	//start at the first index
+			for(final ValueState valueState:valueStateList)	//for each value state
 			{
-				final Integer oldSelectedIndex=oldSelectedIndexIterator.next();	//get the next old selected index
-				if(ArrayUtilities.indexOf(indexes, oldSelectedIndex.intValue())<0)	//if the new set of indices doesn't have this old index
+				if(ArrayUtilities.contains(indexes, index))	//if this index should be selected
 				{
-					oldSelectedIndexIterator.remove();	//remove this old selected index
-					valueStates.get(oldSelectedIndex.intValue()).setSelected(false);	//unselect the corresponding value state
-				}
-			}
-			final int itemCount=size();	//find out how many items there are
-			for(final Integer index:indexes)	//for each index
-			{
-				if(index>=0 && index<itemCount)	//if the index is within the allowed range
-				{
-					if(selectedIndexSet.add(index))	//add this selection to the set; if the index was added
+					if(!valueState.isSelected())	//if this value is not selected
 					{
-						valueStates.get(index.intValue()).setSelected(true);	//select the corresponding value state
+						valueState.setSelected(true);	//select this index
 						fireSelectionChanged(index, null);	//notify listeners that an index was added						
-					}
+					}					
 				}
+				else	//if this index should not be selected
+				{
+					if(valueState.isSelected())	//if this value is selected
+					{
+						valueState.setSelected(false);	//unselect this index
+						fireSelectionChanged(null, index);	//notify listeners that an index was removed						
+					}					
+				}
+				++index;	//go to the next index
 			}
-			newSelectedValue=getSelectedValue();	//find out the new selected value
+			newSelectedValue=getSelectedValue();	//get the new selected value			
 		}
 		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, newSelectedValue);	//indicate that the value changed if needed		
 	}
@@ -494,15 +638,16 @@ if(validIndexCount==0)	//TODO add more thorough validation throughout; right now
 		{
 			indexes=getSelectionPolicy().getAddSelectedIndices(this, indexes);	//get the indices to add
 			oldSelectedValue=getSelectedValue();	//get the old selected value
-			final Set<Integer> selectedIndexSet=getSelectedIndexSet();	//get the set of selected indices
+//TODO del			final Set<Integer> selectedIndexSet=getSelectedIndexSet();	//get the set of selected indices
 			final int itemCount=size();	//find out how many items there are
-			for(final Integer index:indexes)	//for each index
+			for(final int index:indexes)	//for each index
 			{
 				if(index>=0 && index<itemCount)	//if the index is within the allowed range
 				{
-					if(selectedIndexSet.add(index))	//add this selection to the set; if the index was added
+					final ValueState valueState=valueStateList.get(index);	//get this value state
+					if(!valueState.isSelected())	//if this value is not selected
 					{
-						valueStates.get(index.intValue()).setSelected(true);	//select the corresponding value state
+						valueState.setSelected(true);	//select this index
 						fireSelectionChanged(index, null);	//notify listeners that an index was added						
 					}
 				}
@@ -526,15 +671,16 @@ if(validIndexCount==0)	//TODO add more thorough validation throughout; right now
 		{
 			indexes=getSelectionPolicy().getRemoveSelectedIndices(this, indexes);	//get the indices to remove
 			oldSelectedValue=getSelectedValue();	//get the old selected value
-			final Set<Integer> selectedIndexSet=getSelectedIndexSet();	//get the set of selected indices
+//TODO del			final Set<Integer> selectedIndexSet=getSelectedIndexSet();	//get the set of selected indices
 			final int itemCount=size();	//find out how many items there are
-			for(final Integer index:indexes)	//for each index
+			for(final int index:indexes)	//for each index
 			{
 				if(index>=0 && index<itemCount)	//if the index is within the allowed range
 				{
-					if(selectedIndexSet.remove(index))	//remove this selection from the set; if the index was removed
+					final ValueState valueState=valueStateList.get(index);	//get this value state
+					if(valueState.isSelected())	//if this value is selected
 					{
-						valueStates.get(index.intValue()).setSelected(false);	//unselect the corresponding value state
+						valueState.setSelected(false);	//unselect this index
 						fireSelectionChanged(null, index);	//notify listeners that an index was removed						
 					}
 				}
@@ -551,8 +697,17 @@ if(validIndexCount==0)	//TODO add more thorough validation throughout; right now
 	*/
 	public V getSelectedValue()
 	{
-		final V[] selectedValues=getSelectedValues();	//get the selected values
-		return selectedValues.length>0 ? selectedValues[0] : null;	//if there are values, return the first one
+		synchronized(this)	//don't allow the model to be changed while we determine the selections 
+		{
+			for(final ValueState valueState:valueStateList)	//for each value state
+			{
+				if(valueState.isSelected())	//if this value state is selected
+				{
+					return valueState.getValue();	//return the selected value
+				}
+			}
+		}
+		return null;	//no values are selected
 	}
 
 	/**Determines the selected values.
@@ -560,21 +715,24 @@ if(validIndexCount==0)	//TODO add more thorough validation throughout; right now
 	@see #getSelectedIndexes()
 	*/
 	public V[] getSelectedValues()
-	{		
+	{
+		final List<V> selectedValues;
 		synchronized(this)	//don't allow the model to be changed while we determine the selections 
 		{
-			final int[] selectedIndices=getSelectedIndexes();	//get the selected indices
-			final V[] selectedValues=createArray(getValueClass(), selectedIndices.length);	//create an array of selected objects
-			for(int i=selectedIndices.length-1; i>=0; --i)	//for each selected index
+			selectedValues=new ArrayList<V>();	//create a list to hold selections
+			for(final ValueState valueState:valueStateList)	//for each value state
 			{
-				selectedValues[i]=get(selectedIndices[i]);	//get the value from the model at this index
+				if(valueState.isSelected())	//if this value state is selected
+				{
+					selectedValues.add(valueState.getValue());	//add this selected value to the list
+				}
 			}
-			return selectedValues;	//return the selected values
 		}
+		return selectedValues.toArray(createArray(getValueClass(), selectedValues.size()));	//return the selected values as an array
 	}
 
 	/**Sets the selected values.
-	If a value occurs more than one time in the model, the first occurrence of the value will be selected.
+	If a value occurs more than one time in the model, all occurrences of the value will be selected.
 	Values that do not occur in the select model will be ignored.
 	@param values The values to select.
 	@exception ValidationException if the provided value is not valid.
@@ -590,14 +748,29 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 		validator.validate(null);	//validate the new value, throwing an exception if anything is wrong
 	}
 }
-		synchronized(this)	//don't allow the model to be changed while we determine the indices 
+		synchronized(this)	//don't allow the model to be changed while we update the selected values 
 		{
-			final int[] indices=new int[values.length];	//create a new array in which to hold the indices to select
-			for(int i=values.length-1; i>=0; --i)	//for each value
+			int index=0;	//start at the first index
+			for(final ValueState valueState:valueStateList)	//for each value state
 			{
-				indices[i]=indexOf(values[i]);	//get the index of this value, ignoring whether it is valid as its validity will be checked in setSelectedIndices()
+				if(ArrayUtilities.contains(values, valueState.getValue()))	//if this index should be selected
+				{
+					if(!valueState.isSelected())	//if this value is not selected
+					{
+						valueState.setSelected(true);	//select this index
+						fireSelectionChanged(index, null);	//notify listeners that an index was added						
+					}					
+				}
+				else	//if this index should not be selected
+				{
+					if(valueState.isSelected())	//if this value is selected
+					{
+						valueState.setSelected(false);	//unselect this index
+						fireSelectionChanged(null, index);	//notify listeners that an index was removed						
+					}					
+				}
+				++index;	//go to the next index
 			}
-			setSelectedIndexes(indices);	//select the indices
 		}
 	}
 
@@ -610,7 +783,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	{
 		synchronized(this)	//don't allow the model to be changed while we look up the value in the array
 		{
-			return isIndexDisplayed(values.indexOf(value));	//find the value in the list and check its displayed status
+			return isIndexEnabled(valueStateList.indexOf(new ValueState(value)));	//find the value in the list and check its enabled status
 		}
 	}
 
@@ -625,7 +798,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	{
 		synchronized(this)	//don't allow the model to be changed while we look up the value in the array
 		{
-			setIndexDisplayed(values.indexOf(value), newDisplayed);	//find the value in the list and set its displayed status
+			setIndexDisplayed(valueStateList.indexOf(new ValueState(value)), newDisplayed);	//find the value in the list and set its displayed status
 		}		
 	}
 
@@ -637,7 +810,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	{
 		synchronized(this)	//don't allow the model to be changed while we access the value state
 		{
-			return valueStates.get(index).isDisplayed();	//return whether the state of this value is displayed
+			return valueStateList.get(index).isDisplayed();	//return whether the state of this value is displayed
 		}
 	}
 	
@@ -653,7 +826,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	{
 		synchronized(this)	//don't allow the the model to change while we update the displayed status
 		{
-			final ValueState valueState=valueStates.get(index);	//get the state of this value
+			final ValueState valueState=valueStateList.get(index);	//get the state of this value
 			final boolean oldDisplayed=valueState.isDisplayed();	//get the old displayed state
 			if(oldDisplayed!=newDisplayed)	//if the value is really changing
 			{
@@ -672,7 +845,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	{
 		synchronized(this)	//don't allow the model to be changed while we look up the value in the array
 		{
-			return isIndexEnabled(values.indexOf(value));	//find the value in the list and check its enabled status
+			return isIndexEnabled(valueStateList.indexOf(new ValueState(value)));	//find the value in the list and check its enabled status
 		}
 	}
 
@@ -687,7 +860,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	{
 		synchronized(this)	//don't allow the model to be changed while we look up the value in the array
 		{
-			setIndexEnabled(values.indexOf(value), newEnabled);	//find the value in the list and set its enabled status
+			setIndexEnabled(valueStateList.indexOf(new ValueState(value)), newEnabled);	//find the value in the list and set its enabled status
 		}		
 	}
 
@@ -699,7 +872,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	{
 		synchronized(this)	//don't allow the model to be changed while we access the value state
 		{
-			return valueStates.get(index).isEnabled();	//return whether the state of this value is enabled
+			return valueStateList.get(index).isEnabled();	//return whether the state of this value is enabled
 		}
 	}
 	
@@ -715,7 +888,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	{
 		synchronized(this)	//don't allow the the model to change while we update the enabled status
 		{
-			final ValueState valueState=valueStates.get(index);	//get the state of this value
+			final ValueState valueState=valueStateList.get(index);	//get the state of this value
 			final boolean oldEnabled=valueState.isEnabled();	//get the old enabled state
 			if(oldEnabled!=newEnabled)	//if the value is really changing
 			{
@@ -766,6 +939,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	*/
 	protected void listModified(final int index, final V addedElement, final V removedElement)	//TODO fire selection change events if we need to
 	{
+/*TODO del if not needed, now that we use value states		
 			//TODO clear all selected indices and recalculate them from the value states
 		try
 		{
@@ -776,17 +950,6 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 			}
 			else if(index<0 || (addedElement==null && removedElement==null))	//if we don't have enough information about what exactly happened, remove all selected indexes TODO fix , but don't check for validation, because this could be coming from the clear() method 
 			{
-/*TODO fix
-				final Set<Integer> selectedIndexSet=getSelectedIndexSet();	//get the set of selected indices
-				final Iterator<Integer> oldSelectedIndexIterator=selectedIndexSet.iterator();	//get an iterator to the old selected indices
-				while(oldSelectedIndexIterator.hasNext())	//while there are more old selected indices
-				{
-					final Integer oldSelectedIndex=oldSelectedIndexIterator.next();	//get the next old selected index
-					oldSelectedIndexIterator.remove();	//remove this old selected index
-					valueStates.get(oldSelectedIndex.intValue()).setSelected(false);	//unselect the corresponding value state
-				}
-//TODO fix				setSelectedIndexes();	//clear all selections, as we don't know which values were added or removed
-*/
 				clearValue();	//clear all selections, as we don't know which values were added or removed
 //TODO fix; throws validation exception if value is required				setSelectedIndexes();	//clear all selections, as we don't know which values were added or removed
 			}
@@ -795,6 +958,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 		{
 			Debug.warn(validationException);	//TODO improve error handling
 		}
+*/
 		fireListModified(index, addedElement, removedElement);	//fire an event indicating that the list changed
 	}
 	
@@ -876,22 +1040,26 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	public DefaultListSelectModel(final Class<V> valueClass, final ListSelectionPolicy<V> listSelectionStrategy)
 	{
 		super(valueClass);	//construct the parent class
+		valueStateList=new SynchronizedListDecorator<ValueState>(new ArrayList<ValueState>(), this);	//create a value state list synchronized on this object
+/*TODO del
 		selectedIndexSet=new SynchronizedSetDecorator<Integer>(new TreeSet<Integer>(), this);	//create a sorted set synchronized on this object
 		values=new SynchronizedListDecorator<V>(new ArrayList<V>(), this);	//create a value list synchronized on this object
 		valueStates=new SynchronizedListDecorator<ValueState>(new ArrayList<ValueState>(), this);	//create a value state list synchronized on this object
+*/
 		this.selectionPolicy=checkInstance(listSelectionStrategy, "Selection policy cannot be null.");
 	}
 
 	/**An encapsulation of the state of a value in the model.
+	Value states are considered equal if the value they contain are equal.
 	@author Garret Wilson
 	*/ 
 	protected class ValueState	//TODO delete the value state; sorting can disassociate the values with the states
 	{
 		/**The model value*/
-//TODO del if not needed		private final V value;
+		private final V value;
 
 			/**@return The model value.*/
-//	TODO del if not needed			public V getValue() {return value;}
+			public V getValue() {return value;}
 
 		/**Whether this value is displayed.*/
 		private boolean displayed=true;
@@ -929,22 +1097,37 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 		/**Constructor
 		@param value The model value.
 		*/
-		public ValueState(/*TODO del if not needed final V value*/)
+		public ValueState(final V value)
 		{
-//		TODO del if not needed			this.value=value;
+			this.value=value;
 		}
 
 		/**State copy constructor
-		@param value The model value.
+		@param value The new model value.
 		@param valueState The existing state containing values to copy.
 		*/
-		public ValueState(/*TODO del if not needed final V value, */final ValueState valueState)
+		public ValueState(final V value, final ValueState valueState)
 		{
-			this();	//construct the class with the value
+			this(value);	//construct the class with the value
 			this.displayed=valueState.isDisplayed();	//copy the displayed state
 			this.enabled=valueState.isEnabled();	//copy the enabled state
 			this.selected=valueState.isSelected();	//copy the selected state
 		}
-	}
 
+		/**@return A hash code value for the object.*/
+		public int hashCode()
+		{
+			return value!=null ? value.hashCode() : 0;	//return the value's hash code, if there is a value
+		}
+
+		/**Indicates whether some other object is "equal to" this one.
+		This implementation returns whether the the objects contain equal values.
+		@param object The reference object with which to compare.
+		@return <code>true</code> if this object is equivalent to the given object.
+		*/
+		public boolean equals(final Object object)
+		{
+			return (object instanceof DefaultListSelectModel.ValueState) && ObjectUtilities.equals(getValue(), ((DefaultListSelectModel.ValueState)object).getValue()); 
+		}
+	}
 }

@@ -37,6 +37,7 @@ public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultO
 		RETRY,
 		FAIL,
 		STOP,
+		REMOVE,
 		CANCEL
 	}
 

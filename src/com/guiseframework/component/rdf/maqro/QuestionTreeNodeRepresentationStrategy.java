@@ -46,7 +46,7 @@ public class QuestionTreeNodeRepresentationStrategy extends AbstractInteractionT
 		{
 			if(stringBuilder.length()>0)	//if there already is content
 			{
-				stringBuilder.append(':').append(' ');	//add separater content
+				stringBuilder.append(' ');	//add separater content
 			}
 			stringBuilder.append(value);	//TODO testing; improve
 		}

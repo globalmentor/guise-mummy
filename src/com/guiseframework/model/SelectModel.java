@@ -34,7 +34,7 @@ public interface SelectModel<V> extends ValueModel<V>, Collection<V>
 	public V[] getSelectedValues();
 
 	/**Sets the selected values.
-	If a value occurs more than one time in the model, the first occurrence of the value will be selected.
+	If a value occurs more than one time in the model, all occurrences of the value will be selected.
 	Values that do not occur in the select model will be ignored.
 	This method delegates to the selection strategy.
 	@param values The values to select.

@@ -1,45 +1,52 @@
 package com.guiseframework.model.rdf.maqro;
 
-import java.util.*;
-
-import com.garretwilson.rdf.*;
 import com.garretwilson.rdf.maqro.*;
-import com.guiseframework.model.TreeNodeModel;
-import com.guiseframework.model.rdf.AbstractRDFResourceTreeNodeModel;
 
-/**A tree node model that represents a MAQRO question.
+/**A tree node model that represents a general interaction.
+@param <V> The type of value contained in the tree node.
 @author Garret Wilson
 */
-public class QuestionTreeNodeModel extends AbstractInteractionTreeNodeModel<Question>
+public class DefaultInteractionTreeNodeModel<V extends Interaction> extends AbstractInteractionTreeNodeModel<V>
 {
 
 	/**Default constructor with no initial value.*/
-	public QuestionTreeNodeModel()
+	public DefaultInteractionTreeNodeModel()
 	{
 		this(null);	//construct the class with no initial value
 	}
 
-	/**Initial value constructor.
-	@param initialValue The initial value, which will not be validated.
+	/**Value class constructor with no initial value.
+	@param valueClass The class indicating the type of value held in the model.
 	*/
-	public QuestionTreeNodeModel(final Question initialValue)
+	public DefaultInteractionTreeNodeModel(final Class<V> valueClass)
 	{
-		this(null, initialValue);	//construct the class with a null initial value
+		this(valueClass, null);	//construct the class with no initial value
 	}
 
-	/**Followup subject and initial value constructor.
+	/**Initial value constructor.
+	@param valueClass The class indicating the type of value held in the model.
+	@param initialValue The initial value, which will not be validated.
+	*/
+	public DefaultInteractionTreeNodeModel(final Class<V> valueClass, final V initialValue)
+	{
+		this(valueClass, null, initialValue);	//construct the class with no property
+	}
+
+	/**Property and initial value constructor.
+	@param valueClass The class indicating the type of value held in the model.
 	@param followupEvaluation The followup evaluation which considers this interaction a followup in this context, or <code>null</code> if there is no followup evaluation subject in this context.
 	@param initialValue The initial value, which will not be validated.
 	*/
-	public QuestionTreeNodeModel(final FollowupEvaluation followupEvaluation, final Question initialValue)
+	public DefaultInteractionTreeNodeModel(final Class<V> valueClass, final FollowupEvaluation followupEvaluation, final V initialValue)
 	{
-		super(Question.class, followupEvaluation, initialValue);	//construct the parent class
+		super(valueClass, followupEvaluation, initialValue);	//construct the parent class
 	}
 
 	/**Dynamically determines whether this node is a leaf.
 	This version determines if there is a followup evaluation with a followup interaction, or a followup interaction in a list of followups.
 	@return Whether this node should be considered a leaf with no children.
 	*/
+/*TODO del if not needed
 	protected boolean determineLeaf()
 	{
 		if(!super.determineLeaf())	//if the base class doesn't think this is a leaf
@@ -73,11 +80,13 @@ public class QuestionTreeNodeModel extends AbstractInteractionTreeNodeModel<Ques
 		}
 		return true;	//we couldn't find any followup interactions, so this is a leaf 
 	}
+*/
 
 	/**Dynamically determines children.
 	This version includes followup evaluation interactions and followups listed as general followups. 
 	@return The dynamically loaded list of children.
 	*/
+/*TODO del if not needed
 	protected List<TreeNodeModel<?>> determineChildren()
 	{
 		final List<TreeNodeModel<?>> children=super.determineChildren();	//determine the default children
@@ -119,29 +128,5 @@ public class QuestionTreeNodeModel extends AbstractInteractionTreeNodeModel<Ques
 		}
 		return children;	//return the determined children
 	}
-	
-	/**Creates a child node to represent an interaction and optional subject followup evaluation.
-	This version returns a {@link GroupTreeNodeModel} if the given resource is a {@link Group}.
-	This version returns a {@link QuestionTreeNodeModel} if the given resource is a {@link Question}.
-	Otherwise, this method delegates to {@link #createRDFResourceTreeNode(RDFResource, RDFResource)}.
-	@param followupEvaluation The followup evaluation which considers this interaction a followup in this context, or <code>null</code> if there is no followup evaluation subject in this context.
-	@param interaction The interaction to represent in the new node.
-	@return A child node to represent the given property object resource.
-	*/
-	protected AbstractRDFResourceTreeNodeModel createFollowupInteractionTreeNode(final FollowupEvaluation followupEvaluation, final Interaction interaction)
-	{
-		if(interaction instanceof Group)	//if the interaction is a group
-		{
-			return new GroupTreeNodeModel(followupEvaluation, (Group)interaction);	//create a group tree node model
-		}
-		else if(interaction instanceof Question)	//if the interaction is a question
-		{
-			return new QuestionTreeNodeModel(followupEvaluation, (Question)interaction);	//create a question tree node model
-		}
-		else	//if we don't have a specific type for this interaction
-		{
-			return new DefaultInteractionTreeNodeModel(interaction.getClass(), followupEvaluation, interaction);	//create a general interaction tree node TODO improve
-		}
-	}
-
+*/
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import com.garretwilson.rdf.*;
 import static com.garretwilson.rdf.dublincore.DCUtilities.*;
 import com.garretwilson.rdf.maqro.*;
+import com.garretwilson.util.Debug;
 
 import com.guiseframework.component.TreeControl;
 import com.guiseframework.component.rdf.AbstractRDFResourceTreeNodeRepresentationStrategy;
@@ -46,6 +47,7 @@ public abstract class AbstractInteractionTreeNodeRepresentationStrategy<V extend
 //TODO fix	protected <N extends V> StringBuilder buildLabelText(final StringBuilder stringBuilder, final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final N value)	//TODO fix public
 	protected StringBuilder buildLabelText(final StringBuilder stringBuilder, final TreeControl treeControl, final TreeModel model, final TreeNodeModel<? extends V> treeNode, final V value)	//TODO later put this method hierarchy in a custom label model
 	{
+//TODO del Debug.trace("building label text for type:", value.getClass());
 		final TreeNodeModel<?> parentTreeNode=treeNode.getParent();	//get the parent node
 		final Object parentValue=parentTreeNode!=null ? parentTreeNode.getValue() : null;	//get the parent value if any
 		if(treeNode instanceof AbstractInteractionTreeNodeModel && parentValue instanceof Question)	//if the tree node is an interaction tree node and there is a parent question

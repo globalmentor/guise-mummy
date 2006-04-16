@@ -54,6 +54,8 @@
 	<entry key="frame.dialog.option.FAIL.icon">guise/images/reject.gif</entry>
 	<entry key="frame.dialog.option.STOP.label">Stop</entry>
 	<entry key="frame.dialog.option.STOP.icon">guise/images/stop.gif</entry>
+	<entry key="frame.dialog.option.REMOVE.label">Remove</entry>
+	<entry key="frame.dialog.option.REMOVE.icon">guise/images/icons/remove.gif</entry>
 	<entry key="frame.dialog.option.CANCEL.label">Cancel</entry>
 	<entry key="frame.dialog.option.CANCEL.icon">guise/images/reject.gif</entry>
 

@@ -147,7 +147,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	/**Default constructor.*/
 	public AbstractValueLayout()
 	{
-		this.valueModel=(ValueModel<Component<?>>)new DefaultValueModel<Component>(Component.class);	//create a new value model
+		this.valueModel=(ValueModel<Component<?>>)(Object)new DefaultValueModel<Component>(Component.class);	//create a new value model
 		this.valueModel.addPropertyChangeListener(new PropertyChangeListener()	//create a listener to listen for the value model changing a property value
 				{
 					public void propertyChange(final PropertyChangeEvent propertyChangeEvent)	//if the value model changes a property value
