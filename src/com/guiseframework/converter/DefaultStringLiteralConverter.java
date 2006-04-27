@@ -5,7 +5,7 @@ This class cannot convert from a literal to the supported object, and considers 
 @param <V> The value type this converter supports.
 @author Garret Wilson
 */
-public class DefaultStringLiteralConverter<V> extends AbstractStringLiteralConverter<V>
+public class DefaultStringLiteralConverter<V> extends AbstractStringLiteralConverter<V>	//TODO improve to use reflection to see if the value class has a character sequence constructor; this will require a value class
 {
 
 	/**Converts a literal representation of a value from the lexical space into a value in the value space.

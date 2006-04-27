@@ -65,11 +65,13 @@ public class QuestionTreeNodeModel extends AbstractInteractionTreeNodeModel<Ques
 					}
 				}
 			}
+/*TODO del when works
 			final RDFListResource followupList=question.getFollowups();	//get the followups
 			if(followupList!=null && !followupList.isEmpty())	//if there are followups
 			{
 				return false;	//there is at least one followup, so this is not a leaf
 			}
+*/
 		}
 		return true;	//we couldn't find any followup interactions, so this is a leaf 
 	}
@@ -102,6 +104,7 @@ public class QuestionTreeNodeModel extends AbstractInteractionTreeNodeModel<Ques
 					}
 				}
 			}
+/*TODO del when works
 			final RDFListResource followupList=question.getFollowups();	//get the followups
 			if(followupList!=null)	//if there are followups
 			{
@@ -116,6 +119,7 @@ public class QuestionTreeNodeModel extends AbstractInteractionTreeNodeModel<Ques
 					}
 				}
 			}
+*/
 		}
 		return children;	//return the determined children
 	}

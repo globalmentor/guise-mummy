@@ -170,6 +170,7 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	}
 
 	/**Validates the user input of child components.
+	Children that are not visible or not displayed are not taken into account.
 	@return <code>true</code> if all child validations return <code>true</code>.
 	*/
 	public boolean validateChildren()
@@ -177,7 +178,7 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 		boolean result=true;	//start by assuming all child components will validate 
 		for(final Component<?> childComponent:getChildren())	//for each child component
 		{
-			if(!childComponent.validate())	//validate the child; if it doesn't validate
+			if(childComponent.isDisplayed() && childComponent.isVisible() && !childComponent.validate())	//if this child component is displayed and visible, but doesn't validate
 			{
 				result=false;	//the result will be false
 			}

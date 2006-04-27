@@ -9,6 +9,9 @@ import java.util.Locale;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
+import com.garretwilson.country.us.SSN;
+import com.garretwilson.iso.idcard.PAN;
+import com.garretwilson.iso.idcard.Product;
 import com.garretwilson.util.Debug;
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseSession;
@@ -26,6 +29,7 @@ import com.guiseframework.geometry.Extent;
 import com.guiseframework.model.*;
 import com.guiseframework.style.RGBColor;
 import com.guiseframework.validator.IntegerRangeValidator;
+import com.guiseframework.validator.PANValidator;
 import com.guiseframework.validator.RegularExpressionStringValidator;
 import com.guiseframework.validator.ValidationException;
 import com.guiseframework.validator.ValueRequiredValidator;
@@ -234,9 +238,8 @@ catch(final ConversionException conversionException)
 		inputTextControl.getFlyoverStrategy().setPreferredHeight(new Extent(10, Extent.Unit.EM));
 		
 //TODO del when works		inputTextControl.addMouseListener(new TextControl.DefaultFlyoverStrategy<TextControl>(inputTextControl));
-		
-		inputPanel.add(inputTextControl);	//add the input control to the input panel
-		
+
+
 		final TextControl<Float> outputTextControl=new TextControl<Float>(Float.class);	//create a text input control to display the result
 		outputTextControl.setLabel("Double the Number");	//add a label to the text output control
 		outputTextControl.setEditable(false);	//set the text output control to read-only so that the user cannot modify it
@@ -292,6 +295,14 @@ Debug.trace("list control changed value to", newValue);
 				});
 		inputPanel.add(listControl);
 
+		final TextControl<PAN> ccTextControl=new TextControl<PAN>(PAN.class);
+		ccTextControl.setLabel("Primary Account Number");	//add a label to the text input control
+		ccTextControl.setValidator(new PANValidator(Product.VISA, Product.MASTERCARD, Product.AMERICAN_EXPRESS));	//install a ID card product validator		
+		inputPanel.add(ccTextControl);
+
+		final TextControl<SSN> ssnTextControl=new TextControl<SSN>(SSN.class);
+		ssnTextControl.setLabel("SSN");	//add a label to the text input control
+		inputPanel.add(ssnTextControl);		
 
 		contentPanel.add(inputPanel);	//add the input panel to the temperature panel
 		

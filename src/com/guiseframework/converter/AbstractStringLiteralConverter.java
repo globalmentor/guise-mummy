@@ -4,6 +4,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
+import com.garretwilson.country.us.SSN;
+import com.garretwilson.iso.idcard.PAN;
+
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**An abstract implementation an object that can convert a value from and to a string.
@@ -37,6 +40,7 @@ public abstract class AbstractStringLiteralConverter<V> extends AbstractConverte
 		<li><code>java.util.Locale</code></li>
 		<li><code>java.lang.Long</code></li>
 		<li><code>java.lang.String</code></li>
+		<li>{@link PAN}</li>
 	</ul>
 	If the given type is not recognized, a default one-way value-to-literal converter will be returned that uses a value's {@link Object#toString()} method for generating values in the lexical space.
 	@param <VV> The type of value represented.
@@ -83,6 +87,14 @@ public abstract class AbstractStringLiteralConverter<V> extends AbstractConverte
 		else if(String.class.equals(valueClass))	//String
 		{
 			return (Converter<VV, String>)new StringStringLiteralConverter();
+		}
+		else if(PAN.class.equals(valueClass))	//PAN
+		{
+			return (Converter<VV, String>)new PANStringLiteralConverter();
+		}
+		else if(SSN.class.equals(valueClass))	//SSN
+		{
+			return (Converter<VV, String>)new SSNStringLiteralConverter();
 		}
 		else	//if we don't recognize the value class
 		{

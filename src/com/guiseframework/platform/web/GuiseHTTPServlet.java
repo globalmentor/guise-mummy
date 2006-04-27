@@ -33,9 +33,11 @@ import static com.garretwilson.text.xml.XMLConstants.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
 import com.garretwilson.security.Nonce;
+import com.garretwilson.text.xml.xhtml.XHTMLConstants;
 import com.garretwilson.text.xml.xpath.*;
 import com.garretwilson.util.*;
 import com.guiseframework.*;
+import com.guiseframework.Bookmark.Parameter;
 import com.guiseframework.component.*;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.controller.*;
@@ -449,6 +451,10 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 		final String contentTypeString=request.getContentType();	//get the request content type
 		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
 		final boolean isAJAX=contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType);	//see if this is a Guise AJAX request
+			//TODO verify; does this work with file uploads?
+			//this is a non-AJAX Guise POST if there is an XHTML action input ID field TODO add a better field; stop using a view
+		final boolean isGuisePOST=POST_METHOD.equals(request.getMethod()) && request.getParameter(XHTMLApplicationFrameView.getActionInputID(guiseSession.getApplicationFrame()))!=null;
+
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
 		final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
@@ -472,7 +478,7 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 								throw new HTTPMovedTemporarilyException(modalNavigationURI);	//redirect to the modal navigation location				
 							}
 						}
-					}		
+					}
 					final Bookmark navigationBookmark=getBookmark(request);	//get the bookmark from this request
 		//TODO fix to recognize navigation, bookmark, and principal changes when the navigation panel is created		final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
 					final Bookmark oldBookmark=isAJAX ? guiseSession.getBookmark() : navigationBookmark;	//get the original bookmark, which will be the one requested in navigation (which we'll soon set) if this is a normal HTTP GET/POST
@@ -481,7 +487,7 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 					if(navigationPanel!=null)	//if we found a panel class for this address
 					{
 						final ApplicationFrame<?> applicationFrame=guiseSession.getApplicationFrame();	//get the application frame
-						final List<ControlEvent> controlEvents=getControlEvents(request);	//get all control events from the request
+						final List<ControlEvent> controlEvents=getControlEvents(request, guiseSession);	//get all control events from the request
 						if(isAJAX)	//if this is an AJAX request
 						{
 							guiseContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type
@@ -489,16 +495,42 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 						}
 						else	//if this is not an AJAX request
 						{
+//TODO del Debug.trace("this is not AJAX, with method:", request.getMethod(), "content type", contentType, "guise POST?", isGuisePOST);
 							applicationFrame.setContent(navigationPanel);	//place the navigation panel in the application frame
 							setNoCache(response);	//TODO testing; fix; update method				
 							final String referrer=getReferer(request);	//get the request referrer, if any
 							final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
-							guiseSession.setNavigation(navigationPath, navigationBookmark, referrerURI);	//set the session navigation, firing any navigation events if appropriate
+								//see if there is non-Guise HTTP POST data, and if so, set that bookmark navigation temporarily
+								//a non-Guise form HTTP POST, get the servlet parameters (which will include the URL query information)
+							if(POST_METHOD.equals(request.getMethod()) && contentType!=null && APPLICATION_X_WWW_FORM_URLENCODED_CONTENT_TYPE.match(contentType) && !isGuisePOST)
+							{
+//TODO del Debug.trace("using servlet parameter methods");
+								final List<Bookmark.Parameter> bookmarkParameterList=new ArrayList<Bookmark.Parameter>();	//create a new list of bookmark parameters
+								final Iterator parameterEntryIterator=request.getParameterMap().entrySet().iterator();	//get an iterator to the parameter entries
+								while(parameterEntryIterator.hasNext())	//while there are more parameter entries
+								{
+									final Map.Entry parameterEntry=(Map.Entry)parameterEntryIterator.next();	//get the next parameter entry
+									final String parameterKey=(String)parameterEntry.getKey();	//get the parameter key
+									final String[] parameterValues=(String[])parameterEntry.getValue();	//get the parameter values
+									for(final String parameterValue:parameterValues)	//for each parameter value
+									{
+//TODO del Debug.trace("adding parameter bookmark:", parameterKey, parameterValue);
+										bookmarkParameterList.add(new Bookmark.Parameter(parameterKey, parameterValue));	//create a corresponding bookmark parameter
+									}
+								}
+								if(!bookmarkParameterList.isEmpty())	//if there are bookmark parameters
+								{
+									final Bookmark.Parameter[] bookmarkParameters=bookmarkParameterList.toArray(new Bookmark.Parameter[bookmarkParameterList.size()]);	//get an array of bookmark parameters
+									final Bookmark postBookmark=new Bookmark(bookmarkParameters);	//create a new bookmark to represent the POST information
+									guiseSession.setNavigation(navigationPath, postBookmark, referrerURI);	//set the session navigation to the POST bookmark information
+								}
+							}
+							guiseSession.setNavigation(navigationPath, navigationBookmark, referrerURI);	//set the session navigation with the navigation bookmark, firing any navigation events if appropriate
 						}
+						final Set<Frame<?>> removedFrames=new HashSet<Frame<?>>();	//create a set of frames so that we can know which ones were removed TODO testing
+						CollectionUtilities.addAll(removedFrames, guiseSession.getFrameIterator());	//get all the current frames; we'll determine which ones were removed, later TODO improve all this
 						for(final ControlEvent controlEvent:controlEvents)	//for each control event
 						{
-							final Set<Frame<?>> removedFrames=new HashSet<Frame<?>>();	//create a set of frames so that we can know which ones were removed TODO testing
-							CollectionUtilities.addAll(removedFrames, guiseSession.getFrameIterator());	//get all the current frames; we'll determine which ones were removed, later TODO improve all this
 							final Set<Component<?>> requestedComponents=new HashSet<Component<?>>();	//create a set of component that were identified in the request
 							try
 							{
@@ -565,6 +597,8 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 				}
 				*/
 								final Bookmark newBookmark=guiseSession.getBookmark();	//see if the bookmark has changed
+Debug.trace("navigation bookmark:", navigationBookmark);
+Debug.trace("new bookmark:", newBookmark);
 								final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
 								if(requestedNavigation!=null || !ObjectUtilities.equals(navigationBookmark, newBookmark))	//if navigation is requested or the bookmark has changed, redirect the browser
 								{
@@ -636,87 +670,90 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 								}
 								
 							}
-								
-								
-								//TODO this is not guaranteed to work here (although it works on Tomcat), because content has already been written to the server; change the context so that it collects everything into a StringBuilder before sending it back
-								//TODO move this to the bottom of the processing, as cookies only need to be updated before they go back
-							synchronizeCookies(request, response, guiseSession);	//synchronize the cookies going out in the response; do this before anything is written back to the client
-							
-							guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view
-							if(isAJAX)	//if this is an AJAX request
+
+							if(isAJAX && controlEvent instanceof InitControlEvent)	//if this is an AJAX initialization event TODO maybe just dirty all the frames so this happens automatically
 							{
-								final Collection<Component<?>> dirtyComponents=getDirtyComponents(guiseSession);	//get all dirty components in all the session frames
-				
-								CollectionUtilities.removeAll(removedFrames, guiseSession.getFrameIterator());	//remove all the ending frames, leaving us the frames that were removed TODO improve all this
-				//TODO fix					dirtyComponents.addAll(frames);	//add all the frames that were removed
-								
-								Debug.trace("we now have dirty components:", dirtyComponents.size());
-								for(final Component<?> affectedComponent:dirtyComponents)
+								guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view
+									//close all the flyover frames to get rid of stuck flyover frames, such as those left from refreshing the page during flyover TODO fix; this is a workaround to keep refreshing the page from leaving stuck flyover frames; maybe do something better
+								final Iterator<Frame<?>> flyoverFrameIterator=guiseSession.getFrameIterator();	//get an iterator to all the frames
+								while(flyoverFrameIterator.hasNext())	//while there are more frames
 								{
-									Debug.trace("affected component:", affectedComponent);
-								}
-								if(dirtyComponents.contains(applicationFrame))	//if the application frame itself was affected, we might as well reload the page
-								{
-									guiseContext.writeElementBegin(null, "reload", true);	//<reload>	//TODO use a constant
-									guiseContext.writeElementEnd(null, "reload");	//</reload>
-								}
-								else	//if the application frame wasn't affected
-								{
-									for(final Component<?> dirtyComponent:dirtyComponents)	//for each component affected by this update cycle
+									final Frame<?> frame=flyoverFrameIterator.next();	//get the next frame
+									if(frame instanceof FlyoverFrame)	//if this is a flyover frame
 									{
-				//TODO fix							if(dirtyComponent.isVisible())	//if the component is visible
+										frame.close();	//close all flyover frames
+									}
+								}
+									//send back any open frames
+								final Iterator<Frame<?>> frameIterator=guiseSession.getFrameIterator();	//get an iterator to all the frames
+								while(frameIterator.hasNext())	//while there are more frames
+								{
+									final Frame<?> frame=frameIterator.next();	//get the next frame
+									if(frame!=guiseSession.getApplicationFrame())	//don't send back the application frame
+									{
 										guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
-				//TODO fix							else	//if the component is not visible, remove the component's elements
+			//							TODO fix							else	//if the component is not visible, remove the component's elements
 										guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
-										guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
-										dirtyComponent.updateView(guiseContext);		//tell the component to update its view
+										frame.updateView(guiseContext);		//tell the component to update its view
 										guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "patch");	//</xhtml:patch>
 									}
-									for(final Frame<?> frame:removedFrames)	//for each removed frame
-									{
-										guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "remove");	//<xhtml:remove>	//TODO use a constant TODO don't use the XHTML namespace if we can help it								
-										guiseContext.writeAttribute(null, "id", frame.getID());	//TODO fix
-				//TODO del Debug.trace("Sending message to remove frame:", frame.getID());
-										guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "remove");	//</xhtml:remove>							
-									}
-									if(controlEvent instanceof InitControlEvent)	//if this is an initialization event TODO maybe just dirty all the frames so this happens automatically
-									{
-											//close all the flyover frames to get rid of stuck flyover frames, such as those left from refreshing the page during flyover TODO fix; this is a workaround to keep refreshing the page from leaving stuck flyover frames; maybe do something better
-										final Iterator<Frame<?>> flyoverFrameIterator=guiseSession.getFrameIterator();	//get an iterator to all the frames
-										while(flyoverFrameIterator.hasNext())	//while there are more frames
-										{
-											final Frame<?> frame=flyoverFrameIterator.next();	//get the next frame
-											if(frame instanceof FlyoverFrame)	//if this is a flyover frame
-											{
-												frame.close();	//close all flyover frames
-											}
-										}
-											//send back any open frames
-										final Iterator<Frame<?>> frameIterator=guiseSession.getFrameIterator();	//get an iterator to all the frames
-										while(frameIterator.hasNext())	//while there are more frames
-										{
-											final Frame<?> frame=frameIterator.next();	//get the next frame
-											if(frame!=guiseSession.getApplicationFrame())	//don't send back the application frame
-											{
-												guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
-					//							TODO fix							else	//if the component is not visible, remove the component's elements
-												guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
-												frame.updateView(guiseContext);		//tell the component to update its view
-												guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "patch");	//</xhtml:patch>
-											}
-										}
-									}
 								}
 							}
-							else	//if this is not an AJAX request
+							else	//if we don't need to update any views for these control events
 							{
-								applicationFrame.updateView(guiseContext);		//tell the application frame to update its view						
+								guiseContext.setState(GuiseContext.State.INACTIVE);	//deactivate the context so that any model update events will be generated								
 							}
 						}
+
 						
 						
+							//TODO this is not guaranteed to work here (although it works on Tomcat), because content has already been written to the server; change the context so that it collects everything into a StringBuilder before sending it back
+							//TODO move this to the bottom of the processing, as cookies only need to be updated before they go back
+						synchronizeCookies(request, response, guiseSession);	//synchronize the cookies going out in the response; do this before anything is written back to the client
 						
-						
+						guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view
+						if(isAJAX)	//if this is an AJAX request
+						{
+							final Collection<Component<?>> dirtyComponents=getDirtyComponents(guiseSession);	//get all dirty components in all the session frames
+			
+							CollectionUtilities.removeAll(removedFrames, guiseSession.getFrameIterator());	//remove all the ending frames, leaving us the frames that were removed TODO improve all this
+			//TODO fix					dirtyComponents.addAll(frames);	//add all the frames that were removed
+							
+							Debug.trace("we now have dirty components:", dirtyComponents.size());
+							for(final Component<?> affectedComponent:dirtyComponents)
+							{
+								Debug.trace("affected component:", affectedComponent);
+							}
+							if(dirtyComponents.contains(applicationFrame))	//if the application frame itself was affected, we might as well reload the page
+							{
+								guiseContext.writeElementBegin(null, "reload", true);	//<reload>	//TODO use a constant
+								guiseContext.writeElementEnd(null, "reload");	//</reload>
+							}
+							else	//if the application frame wasn't affected
+							{
+								for(final Component<?> dirtyComponent:dirtyComponents)	//for each component affected by this update cycle
+								{
+			//TODO fix							if(dirtyComponent.isVisible())	//if the component is visible
+									guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
+			//TODO fix							else	//if the component is not visible, remove the component's elements
+									guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
+									guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
+									dirtyComponent.updateView(guiseContext);		//tell the component to update its view
+									guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "patch");	//</xhtml:patch>
+								}
+								for(final Frame<?> frame:removedFrames)	//for each removed frame
+								{
+									guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "remove");	//<xhtml:remove>	//TODO use a constant TODO don't use the XHTML namespace if we can help it								
+									guiseContext.writeAttribute(null, "id", frame.getID());	//TODO fix
+			//TODO del Debug.trace("Sending message to remove frame:", frame.getID());
+									guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "remove");	//</xhtml:remove>							
+								}
+							}
+						}
+						else	//if this is not an AJAX request
+						{
+							applicationFrame.updateView(guiseContext);		//tell the application frame to update its view						
+						}
 						
 						if(isAJAX)	//if this is an AJAX request
 						{
@@ -939,10 +976,11 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 	
 	/**Retrieves control events from the HTTP request.
   @param request The HTTP request.
+	@param guiseSession The Guise session object.
   @exception ServletException if there is a problem servicing the request.
   @exception IOException if there is an error reading or writing data.
   */
-	protected List<ControlEvent> getControlEvents(final HttpServletRequest request) throws ServletException, IOException
+	protected List<ControlEvent> getControlEvents(final HttpServletRequest request, final GuiseSession guiseSession) throws ServletException, IOException
 	{
 		final List<ControlEvent> controlEventList=new ArrayList<ControlEvent>();	//create a new list for storing control events
 		final String contentTypeString=request.getContentType();	//get the request content type
@@ -1093,19 +1131,22 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 			else	//if this is normal application/x-www-form-urlencoded data
 			{
 				final boolean exhaustive=POST_METHOD.equals(request.getMethod());	//if this is an HTTP post, the form event is exhaustive of all controls on the form
-				final FormControlEvent formSubmitEvent=new FormControlEvent(exhaustive);	//create a new form submission event
-				final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
-				final Iterator parameterEntryIterator=request.getParameterMap().entrySet().iterator();	//get an iterator to the parameter entries
-				while(parameterEntryIterator.hasNext())	//while there are more parameter entries
-				{
-					final Map.Entry parameterEntry=(Map.Entry)parameterEntryIterator.next();	//get the next parameter entry
-					final String parameterKey=(String)parameterEntry.getKey();	//get the parameter key
-					final String[] parameterValues=(String[])parameterEntry.getValue();	//get the parameter values
-					final List<Object> parameterValueList=new ArrayList<Object>(parameterValues.length);	//create a list to hold the parameters
-					CollectionUtilities.addAll(parameterValueList, parameterValues);	//add all the parameter values to our list
-					parameterListMap.put(parameterKey, parameterValueList);	//store the the array of values as a list, keyed to the value
+				if(!exhaustive || request.getParameter(XHTMLApplicationFrameView.getActionInputID(guiseSession.getApplicationFrame()))!=null)	//if this is a POST, only use the data if it is a Guise POST
+				{				
+					final FormControlEvent formSubmitEvent=new FormControlEvent(exhaustive);	//create a new form submission event
+					final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
+					final Iterator parameterEntryIterator=request.getParameterMap().entrySet().iterator();	//get an iterator to the parameter entries
+					while(parameterEntryIterator.hasNext())	//while there are more parameter entries
+					{
+						final Map.Entry parameterEntry=(Map.Entry)parameterEntryIterator.next();	//get the next parameter entry
+						final String parameterKey=(String)parameterEntry.getKey();	//get the parameter key
+						final String[] parameterValues=(String[])parameterEntry.getValue();	//get the parameter values
+						final List<Object> parameterValueList=new ArrayList<Object>(parameterValues.length);	//create a list to hold the parameters
+						CollectionUtilities.addAll(parameterValueList, parameterValues);	//add all the parameter values to our list
+						parameterListMap.put(parameterKey, parameterValueList);	//store the the array of values as a list, keyed to the value
+					}
+					controlEventList.add(formSubmitEvent);	//add the event to the list
 				}
-				controlEventList.add(formSubmitEvent);	//add the event to the list
 			}
 		}
 		if(controlEventList.size()>0 && Debug.isDebug() && Debug.getReportLevels().contains(Debug.ReportLevel.INFO))	//indicate the parameters if information tracing is turned on
@@ -1293,7 +1334,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	}
 */
 
-	/**Extracts the bookmark contained in the given request.
+	/**Extracts the bookmark contained in the given request URL.
 	@param request The HTTP request object.
 	@return The bookmark represented by the request, or <code>null</code> if no bookmark is contained in the request.
 	*/
@@ -1318,4 +1359,71 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 			return null;	//indicate that there is no bookmark information
 		}
 	}	
+	
+	
+	/**Extracts the bookmark contained in the given request.
+	@param request The HTTP request object.
+	@param guiseSession The Guise session object.
+	@return The bookmark represented by the request, or <code>null</code> if no bookmark is contained in the request.
+	*/
+/*TODO del when works
+	protected static Bookmark getBookmark(final HttpServletRequest request, final GuiseSession guiseSession)
+	{
+//	TODO del Debug.trace("getting bookmark");
+		final List<Bookmark.Parameter> bookmarkParameterList=new ArrayList<Bookmark.Parameter>();	//create a new list of bookmark parameters
+
+		final String contentTypeString=request.getContentType();	//get the request content type
+		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
+//TODO del Debug.trace("content type", contentType);
+		final boolean isAJAX=contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType);	//see if this is a Guise AJAX request
+//	TODO del Debug.trace("isAJAX:", isAJAX);
+			//TODO verify; does this work with file uploads?
+			//this is a non-AJAX Guise POST if there is an XHTML action input ID field TODO add a better field; stop using a view
+		final boolean isGuisePOST=POST_METHOD.equals(request.getMethod()) && request.getParameter(XHTMLApplicationFrameView.getActionInputID(guiseSession.getApplicationFrame()))!=null;
+//	TODO del Debug.trace("isGuisePOST:", isGuisePOST);
+	//TODO del APPLICATION_X_WWW_FORM_URLENCODED_CONTENT_TYPE
+			//if this is an HTTP GET or a non-Guise form HTTP POST, get the servlet parameters (which will include the URL query information)
+		if(GET_METHOD.equals(request.getMethod()) || (POST_METHOD.equals(request.getMethod()) && contentType!=null && APPLICATION_X_WWW_FORM_URLENCODED_CONTENT_TYPE.match(contentType) && !isGuisePOST))
+		{
+//TODO del Debug.trace("using servlet parameter methods");
+			final Iterator parameterEntryIterator=request.getParameterMap().entrySet().iterator();	//get an iterator to the parameter entries
+			while(parameterEntryIterator.hasNext())	//while there are more parameter entries
+			{
+				final Map.Entry parameterEntry=(Map.Entry)parameterEntryIterator.next();	//get the next parameter entry
+				final String parameterKey=(String)parameterEntry.getKey();	//get the parameter key
+				final String[] parameterValues=(String[])parameterEntry.getValue();	//get the parameter values
+				for(final String parameterValue:parameterValues)	//for each parameter value
+				{
+//TODO del Debug.trace("adding parameter bookmark:", parameterKey, parameterValue);
+					bookmarkParameterList.add(new Bookmark.Parameter(parameterKey, parameterValue));	//create a corresponding bookmark parameter
+				}
+			}
+		}
+		else	//if this is some other access, just use the URL query information for the bookmark
+		{		
+			final String queryString=request.getQueryString();	//get the query string from the request
+			if(queryString!=null && queryString.length()>0)	//if there is a query string (Tomcat 5.5.16 returns an empty string for no query, even though the Java Servlet specification 2.4 says that it should return null)
+			{
+//TODO del 	Debug.trace("just got query string from request, length", queryString.length(), "content", queryString);
+				final NameValuePair<String, String>[] parameters=getParameters(queryString);	//get the parameters from the query string
+				final Bookmark.Parameter[] bookmarkParameters=new Bookmark.Parameter[parameters.length];	//create a new array of bookmark parameters
+				for(int i=parameters.length-1; i>=0; --i)	//for each parameter
+				{
+					final NameValuePair<String, String> parameter=parameters[i];	//get a reference to this parameter
+//TODO del 	Debug.trace("adding query bookmark:", parameter.getName(), parameter.getValue());
+					bookmarkParameterList.add(new Bookmark.Parameter(parameter.getName(), parameter.getValue()));	//create a corresponding bookmark parameter
+				}
+			}
+		}
+		if(!bookmarkParameterList.isEmpty())	//if there are bookmark parameters
+		{
+			final Bookmark.Parameter[] bookmarkParameters=bookmarkParameterList.toArray(new Bookmark.Parameter[bookmarkParameterList.size()]);	//get an array of bookmark parameters
+			return new Bookmark(bookmarkParameters);	//create and return a new bookmark from the parameters
+		}
+		else	//if there are no bookmark parameters
+		{
+			return null;	//indicate that there was no bookmark
+		}
+	}
+*/
 }
