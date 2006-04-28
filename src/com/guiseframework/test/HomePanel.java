@@ -12,6 +12,7 @@ import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.garretwilson.country.us.SSN;
 import com.garretwilson.iso.idcard.PAN;
 import com.garretwilson.iso.idcard.Product;
+import com.garretwilson.itu.TelephoneNumber;
 import com.garretwilson.util.Debug;
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseSession;
@@ -304,6 +305,10 @@ Debug.trace("list control changed value to", newValue);
 		ssnTextControl.setLabel("SSN");	//add a label to the text input control
 		inputPanel.add(ssnTextControl);		
 
+		final TextControl<TelephoneNumber> telTextControl=new TextControl<TelephoneNumber>(TelephoneNumber.class);
+		telTextControl.setLabel("Telephone Number");	//add a label to the text input control
+		inputPanel.add(telTextControl);		
+		
 		contentPanel.add(inputPanel);	//add the input panel to the temperature panel
 		
 		

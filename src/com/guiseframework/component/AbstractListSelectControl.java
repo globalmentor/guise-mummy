@@ -594,12 +594,14 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 			/**@return The converter to use for displaying the value as a string.*/
 			public Converter<VV, String> getConverter() {return converter;}
 
-		/**Default constructor with a default converter.
+		/**Value class constructor with a default converter.
 		This implementation uses a {@link DefaultStringLiteralConverter}.
+		@param valueClass The class indicating the type of value to convert.
+		@exception NullPointerException if the given value class is <code>null</code>.
 		*/
-		public DefaultValueRepresentationStrategy()
+		public DefaultValueRepresentationStrategy(final Class<VV> valueClass)
 		{
-			this(new DefaultStringLiteralConverter<VV>());	//construct the class with a default string literal converter
+			this(AbstractStringLiteralConverter.getInstance(valueClass));	//construct the class with the appropriate string literal converter
 		}
 
 		/**Converter constructor.

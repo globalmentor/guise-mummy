@@ -2,7 +2,6 @@ package com.guiseframework.model;
 
 import java.util.*;
 
-import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.util.ArrayUtilities.*;
 
 import com.garretwilson.util.CollectionUtilities;
@@ -76,7 +75,7 @@ public class DefaultTableModel extends AbstractTableModel
 					}
 					for(int columnIndex=columns.length-1; columnIndex>=0; --columnIndex)	//for each column, make sure the given value is of an allowed type
 					{
-						cast(columns[columnIndex].getValueClass(), values[columnIndex]);	//make sure this value can be cast to the column type
+						columns[columnIndex].getValueClass().cast(values[columnIndex]);	//make sure this value can be cast to the column type
 					}
 					final List<Object> valueList=new SynchronizedListDecorator<Object>(new ArrayList<Object>(values.length), this);	//create a list of value, synchronizing all access on this object
 					CollectionUtilities.addAll(valueList, values);	//add all this row's values to the list
@@ -122,7 +121,7 @@ public class DefaultTableModel extends AbstractTableModel
 		}
 		synchronized(this)	//don't allow others to change the table data while we access the values
 		{
-			return cast(column.getValueClass(), valueRowLists.get(rowIndex).get(columnIndex));	//get the value in the given row and column, cast to the appropriate type
+			return column.getValueClass().cast(valueRowLists.get(rowIndex).get(columnIndex));	//get the value in the given row and column, cast to the appropriate type
 		}
 	}
 

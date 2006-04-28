@@ -4,8 +4,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import com.garretwilson.country.us.SSN;
-import com.garretwilson.iso.idcard.PAN;
+import com.garretwilson.itu.TelephoneNumber;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
@@ -40,7 +39,7 @@ public abstract class AbstractStringLiteralConverter<V> extends AbstractConverte
 		<li><code>java.util.Locale</code></li>
 		<li><code>java.lang.Long</code></li>
 		<li><code>java.lang.String</code></li>
-		<li>{@link PAN}</li>
+		<li>{@link TelephoneNumber}</li>
 	</ul>
 	If the given type is not recognized, a default one-way value-to-literal converter will be returned that uses a value's {@link Object#toString()} method for generating values in the lexical space.
 	@param <VV> The type of value represented.
@@ -88,17 +87,13 @@ public abstract class AbstractStringLiteralConverter<V> extends AbstractConverte
 		{
 			return (Converter<VV, String>)new StringStringLiteralConverter();
 		}
-		else if(PAN.class.equals(valueClass))	//PAN
+		else if(TelephoneNumber.class.equals(valueClass))	//TelephoneNumber
 		{
-			return (Converter<VV, String>)new PANStringLiteralConverter();
-		}
-		else if(SSN.class.equals(valueClass))	//SSN
-		{
-			return (Converter<VV, String>)new SSNStringLiteralConverter();
+			return (Converter<VV, String>)new TelephoneNumberStringLiteralConverter();
 		}
 		else	//if we don't recognize the value class
 		{
-			return new DefaultStringLiteralConverter<VV>();	//return a default string literal converter
+			return new DefaultStringLiteralConverter<VV>(valueClass);	//return a default string literal converter
 		}
 	}
 

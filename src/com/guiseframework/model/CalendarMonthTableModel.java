@@ -193,7 +193,7 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 		final int offset=rowIndex*WEEK_DAY_COUNT+columnIndex+getDayOffset();	//find the absolute offset from the beginning, and then compensate for the first day of the month
 		final Calendar cellCalendar=getMonthCalendar();	//get a clone of the month calendar
 		cellCalendar.add(Calendar.DAY_OF_MONTH, offset);	//move the calendar day to the requested cell
-		return cast(column.getValueClass(), cellCalendar.getTime());	//return the calendar time representing the date of the cell
+		return column.getValueClass().cast(cellCalendar.getTime());	//return the calendar time representing the date of the cell
 	}
 
 	/**Sets the cell value at the given row and column.

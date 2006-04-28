@@ -45,7 +45,6 @@ public abstract class AbstractValueModel<V> extends AbstractModel implements Val
 	*/
 	public AbstractValueModel(final Class<V> valueClass)
 	{
-		super();	//construct the parent class
 		this.valueClass=checkInstance(valueClass, "Value class cannot be null.");	//store the value class
 	}
 
