@@ -9,6 +9,7 @@ import java.util.Locale;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
+import com.garretwilson.country.us.RTN;
 import com.garretwilson.country.us.SSN;
 import com.garretwilson.iso.idcard.PAN;
 import com.garretwilson.iso.idcard.Product;
@@ -308,7 +309,11 @@ Debug.trace("list control changed value to", newValue);
 		final TextControl<TelephoneNumber> telTextControl=new TextControl<TelephoneNumber>(TelephoneNumber.class);
 		telTextControl.setLabel("Telephone Number");	//add a label to the text input control
 		inputPanel.add(telTextControl);		
-		
+
+		final TextControl<RTN> rtnTextControl=new TextControl<RTN>(RTN.class);
+		rtnTextControl.setLabel("Routing Transit Number");	//add a label to the text input control
+		inputPanel.add(rtnTextControl);		
+
 		contentPanel.add(inputPanel);	//add the input panel to the temperature panel
 		
 		
