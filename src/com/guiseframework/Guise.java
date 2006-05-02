@@ -26,7 +26,7 @@ public final class Guise
 	public final static URI GUISE_WEB_URI=URI.create("http://www.guiseframework.com/");
 
 	/**The base path to Guise public resources.*/
-	public final static String PUBLIC_RESOURCE_BASE_PATH="public/";
+	public final static String PUBLIC_RESOURCE_BASE_PATH="pub/";
 
 	/**The identifier of this build.*/
 	public final static String BUILD_ID="2006-05-02";
@@ -37,7 +37,7 @@ public final class Guise
 	/**@return The singleton instance of Guise.*/
 	public static Guise getInstance()
 	{
-		if(instance==null)	//if Guise has not yet been created
+		if(instance==null)	//if Guise has not yet been created TODO make this concurrent-aware
 		{
 			instance=new Guise();	//create a new Guise
 		}
