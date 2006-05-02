@@ -528,7 +528,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		return resolveURI(createPathURI(path)).toString();	//create a URI for the given path, ensuring that the string only specifies a path, and resolve that URI
 	}
 
-	/**Resolves URI against the application base path.
+	/**Resolves a URI against the application base path.
 	Relative paths will be resolved relative to the application base path. Absolute paths will be considered already resolved, as will absolute URIs.
 	For an application base path "/path/to/application/", resolving "relative/path" will yield "/path/to/application/relative/path",
 	while resolving "/absolute/path" will yield "/absolute/path". Resolving "http://example.com/path" will yield "http://example.com/path".

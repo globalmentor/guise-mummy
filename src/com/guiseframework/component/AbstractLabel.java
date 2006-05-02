@@ -76,7 +76,8 @@ public abstract class AbstractLabel<C extends LabelComponent<C>> extends Abstrac
 			final LabelComponent source=getSource();	//get the source of the transfer
 			if(contentType.match(source.getLabelContentType()))	//if we have the content type requested
 			{
-				return source.getSession().determineString(source.getLabel(), source.getLabelResourceKey());	//return the label text
+				final String label=source.getLabel();	//get the label
+				return label!=null ? source.getSession().resolveString(source.getLabel()) : null;	//return the label text, if any
 			}
 			else	//if we don't support this content type
 			{

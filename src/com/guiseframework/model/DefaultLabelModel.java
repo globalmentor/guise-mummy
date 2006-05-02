@@ -15,15 +15,15 @@ import com.garretwilson.lang.ObjectUtilities;
 public class DefaultLabelModel extends AbstractModel implements LabelModel
 {
 
-	/**The icon URI, or <code>null</code> if there is no icon URI.*/
+	/**The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.*/
 	private URI icon=null;
 
-		/**@return The icon URI, or <code>null</code> if there is no icon URI.*/
+		/**@return The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.*/
 		public URI getIcon() {return icon;}
 
 		/**Sets the URI of the icon.
 		This is a bound property of type <code>URI</code>.
-		@param newIcon The new URI of the icon.
+		@param newIcon The new URI of the icon, which may be a resource URI.
 		@see #ICON_PROPERTY
 		*/
 		public void setIcon(final URI newIcon)
@@ -36,36 +36,15 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 			}			
 		}
 
-	/**The icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-	private String iconResourceKey=null;
-
-		/**@return The icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-		public String getIconResourceKey() {return iconResourceKey;}
-
-		/**Sets the key identifying the URI of the icon in the resources.
-		This is a bound property.
-		@param newIconResourceKey The new icon URI resource key.
-		@see #ICON_RESOURCE_KEY_PROPERTY
-		*/
-		public void setIconResourceKey(final String newIconResourceKey)
-		{
-			if(!ObjectUtilities.equals(iconResourceKey, newIconResourceKey))	//if the value is really changing
-			{
-				final String oldIconResourceKey=iconResourceKey;	//get the old value
-				iconResourceKey=newIconResourceKey;	//actually change the value
-				firePropertyChange(ICON_RESOURCE_KEY_PROPERTY, oldIconResourceKey, newIconResourceKey);	//indicate that the value changed
-			}
-		}
-
-	/**The label text, or <code>null</code> if there is no label text.*/
+	/**The label text, which may include a resource reference, or <code>null</code> if there is no label text.*/
 	private String label=null;
 
-		/**@return The label text, or <code>null</code> if there is no label text.*/
+		/**@return The label text, which may include a resource reference, or <code>null</code> if there is no label text.*/
 		public String getLabel() {return label;}
 
 		/**Sets the text of the label.
 		This is a bound property.
-		@param newLabelText The new text of the label.
+		@param newLabelText The new text of the label, which may include a resource reference.
 		@see #LABEL_PROPERTY
 		*/
 		public void setLabel(final String newLabelText)
@@ -104,27 +83,6 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 				labelContentType=newLabelTextContentType;	//actually change the value
 				firePropertyChange(LABEL_CONTENT_TYPE_PROPERTY, oldLabelTextContentType, newLabelTextContentType);	//indicate that the value changed
 			}			
-		}
-
-	/**The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-	private String labelResourceKey=null;
-	
-		/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-		public String getLabelResourceKey() {return labelResourceKey;}
-	
-		/**Sets the key identifying the text of the label in the resources.
-		This is a bound property.
-		@param newLabelTextResourceKey The new label text resource key.
-		@see #LABEL_RESOURCE_KEY_PROPERTY
-		*/
-		public void setLabelResourceKey(final String newLabelTextResourceKey)
-		{
-			if(!ObjectUtilities.equals(labelResourceKey, newLabelTextResourceKey))	//if the value is really changing
-			{
-				final String oldLabelTextResourceKey=labelResourceKey;	//get the old value
-				labelResourceKey=newLabelTextResourceKey;	//actually change the value
-				firePropertyChange(LABEL_RESOURCE_KEY_PROPERTY, oldLabelTextResourceKey, newLabelTextResourceKey);	//indicate that the value changed
-			}
 		}
 
 	/**Default constructor.*/

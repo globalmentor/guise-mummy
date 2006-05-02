@@ -13,15 +13,15 @@ import static com.garretwilson.text.TextUtilities.*;
 public class DefaultTextModel extends AbstractModel implements TextModel
 {
 
-	/**The text, or <code>null</code> if there is no text.*/
+	/**The text, which may include a resource reference, or <code>null</code> if there is no text.*/
 	private String text=null;
 
-		/**@return The text, or <code>null</code> if there is no text.*/
+		/**@return The text, which may include a resource reference, or <code>null</code> if there is no text.*/
 		public String getText() {return text;}
 
 		/**Sets the text.
 		This is a bound property.
-		@param newText The new text.
+		@param newText The new text, which may include a resource reference.
 		@see #TEXT_PROPERTY
 		*/
 		public void setText(final String newText)
@@ -60,27 +60,6 @@ public class DefaultTextModel extends AbstractModel implements TextModel
 				textContentType=newTextContentType;	//actually change the value
 				firePropertyChange(TEXT_CONTENT_TYPE_PROPERTY, oldTextContentType, newTextContentType);	//indicate that the value changed
 			}			
-		}
-
-	/**The text resource key, or <code>null</code> if there is no text resource specified.*/
-	private String textResourceKey=null;
-
-		/**@return The text resource key, or <code>null</code> if there is no text resource specified.*/
-		public String getTextResourceKey() {return textResourceKey;}
-
-		/**Sets the key identifying the text in the resources.
-		This is a bound property.
-		@param newTextResourceKey The new text resource key.
-		@see #TEXT_RESOURCE_KEY_PROPERTY
-		*/
-		public void setTextResourceKey(final String newTextResourceKey)
-		{
-			if(!ObjectUtilities.equals(textResourceKey, newTextResourceKey))	//if the value is really changing
-			{
-				final String oldTextResourceKey=textResourceKey;	//get the old value
-				textResourceKey=newTextResourceKey;	//actually change the value
-				firePropertyChange(TEXT_RESOURCE_KEY_PROPERTY, oldTextResourceKey, newTextResourceKey);	//indicate that the value changed
-			}
 		}
 
 }

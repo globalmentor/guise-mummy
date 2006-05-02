@@ -2,6 +2,8 @@ package com.guiseframework.component;
 
 import java.text.MessageFormat;
 
+import static com.garretwilson.net.URIConstants.*;
+import static com.garretwilson.net.URIUtilities.*;
 import com.guiseframework.event.ActionEvent;
 import com.guiseframework.event.ActionListener;
 import com.guiseframework.model.*;
@@ -93,8 +95,8 @@ public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultO
 	{
 		final Button button=new Button();	//create a new button
 		final String optionString=option.toString();	//get the string form of the option
-		button.setLabelResourceKey(MessageFormat.format(FRAME_DIALOG_OPTION_LABEL_RESOURCE_KEY_FORMAT_PATTERN, optionString));	//set the option action label
-		button.setIconResourceKey(MessageFormat.format(FRAME_DIALOG_OPTION_ICON_RESOURCE_KEY_FORMAT_PATTERN, optionString));	//set the option action icon
+		button.setLabel(getSession().createStringResourceReference(MessageFormat.format(FRAME_DIALOG_OPTION_LABEL_RESOURCE_KEY_FORMAT_PATTERN, optionString)));	//set the option action label
+		button.setIcon(createURI(RESOURCE_SCHEME, MessageFormat.format(FRAME_DIALOG_OPTION_ICON_RESOURCE_KEY_FORMAT_PATTERN, optionString)));	//set the option action icon
 		button.addActionListener(new ActionListener()	//listen for the action being performed
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the action is performed

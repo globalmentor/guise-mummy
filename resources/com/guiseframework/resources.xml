@@ -60,10 +60,10 @@
 	<entry key="frame.dialog.option.CANCEL.icon">guise/images/reject.gif</entry>
 
 	<!-- Slider -->
-	<entry key="slider.thumb.image.x">guise/images/slider-thumb-x.gif</entry>
-	<entry key="slider.thumb.image.y">guise/images/slider-thumb-y.gif</entry>
-	<entry key="slider.track.image.x">guise/images/slider-track-x.gif</entry>
-	<entry key="slider.track.image.y">guise/images/slider-track-y.gif</entry>
+	<entry key="slider.thumb.image.X">guise/images/slider-thumb-x.gif</entry>
+	<entry key="slider.thumb.image.Y">guise/images/slider-thumb-y.gif</entry>
+	<entry key="slider.track.image.X">guise/images/slider-track-x.gif</entry>
+	<entry key="slider.track.image.Y">guise/images/slider-track-y.gif</entry>
 
 	<!-- TreeNode -->
 	<entry key="tree.node.collapsed.image">guise/images/treenode-collapsed.gif</entry>

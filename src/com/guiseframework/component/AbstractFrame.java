@@ -1,8 +1,11 @@
 package com.guiseframework.component;
 
 import java.beans.PropertyChangeListener;
+import java.net.URI;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.net.URIConstants.*;
+import static com.garretwilson.net.URIUtilities.*;
 
 import com.garretwilson.beans.GenericPropertyChangeListener;
 import com.guiseframework.component.effect.Effect;
@@ -15,8 +18,8 @@ import com.guiseframework.event.*;
 public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumCompositeComponent<AbstractFrame.FrameComponent, C> implements Frame<C>
 {
 
-	/**The resource bundle key for the close image.*/
-	public final static String CLOSE_ICON_RESOURCE_KEY="frame.close.icon";
+	/**The resource URI for the close image.*/
+	public final static URI CLOSE_ICON_RESOURCE_URI=createURI(RESOURCE_SCHEME, "frame.close.icon");
 
 	/**The enumeration of frame components.*/
 	private enum FrameComponent{CONTENT_COMPONENT, CLOSE_ACTION_CONTROL};
@@ -264,7 +267,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 				};
 		setComponent(FrameComponent.CONTENT_COMPONENT, component);	//set the component directly, because child classes may prevent the setContent() method from changing the component 
 		final Link closeButton=new Link();	//create a close action control
-		closeButton.setIconResourceKey(CLOSE_ICON_RESOURCE_KEY);	//indicate to the close action control the resource key for its icon
+		closeButton.setIcon(CLOSE_ICON_RESOURCE_URI);	//indicate to the close action control the resource key for its icon
 		setCloseActionControl(closeButton);	//set the close action control
 	}
 

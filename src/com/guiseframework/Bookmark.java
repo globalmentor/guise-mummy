@@ -5,8 +5,11 @@ import static java.util.Collections.*;
 import java.util.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 
+import com.garretwilson.net.URIUtilities;
+import com.garretwilson.text.ArgumentSyntaxException;
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.NameValuePair;
 
@@ -55,7 +58,32 @@ public class Bookmark implements Cloneable
 		return null;	//indicate that no parameter with the given name was found
 */
 	}
-		
+
+	/**String constructor.
+	The string must be suitable for use as a URI query, in the form "?<var>parameter1Name</var>=<var>parameter1Value</var>&amp;<var>parameter2Name</var>=<var>parameter2Value</var>&hellip;".
+	The parameter names and values should be percent-encoded as required for URIs.
+	If there are parameters with duplicate names, only the first ones are used and the rest with the same name are ignored.
+	@param bookmark A string representation of the bookmark, beginning with '?'.
+	@exception NullPointerException if the given bookmark string is <code>null</code>.
+	@exception ArgumentSyntaxException if the bookmark does not begin with '?' or otherwise is not in the correct format.
+	*/
+	public Bookmark(final CharSequence bookmark) throws ArgumentSyntaxException
+	{
+		final int bookmarkLength=checkInstance(bookmark, "Bookmark string cannot be null.").length();	//get the length of the bookmark
+		if(bookmarkLength==0 || bookmark.charAt(0)!=QUERY_SEPARATOR)	//if the bookmark string does not begin with '?'
+		{
+			throw new ArgumentSyntaxException("Bookmark string "+bookmark+" must being with '?'.");
+		}
+		final NameValuePair<String, String>[] parameters=URIUtilities.getParameters(bookmark.subSequence(1, bookmarkLength).toString());	//get the parameters from the string following the query character
+		final Parameter[] bookmarkParameters=new Parameter[parameters.length];	//create a new array of bookmark parameters
+		for(int i=parameters.length-1; i>=0; --i)	//for each parameter
+		{
+			final NameValuePair<String, String> parameter=parameters[i];	//get a reference to this parameter
+			bookmarkParameters[i]=new Parameter(parameter.getName(), parameter.getValue());	//create a corresponding bookmark parameter
+		}
+		setParameters(bookmarkParameters);	//set the parameters
+	}
+	
 	/**ID and optional parameters constructor.
 	If there are parameters with duplicate names, only the first ones are used and the rest with the same name are ignored.
 	@param id The bookmark ID.
@@ -65,6 +93,16 @@ public class Bookmark implements Cloneable
 	public Bookmark(/*TODO del final String id, */final Parameter... parameters)
 	{
 //TODO del		this.id=checkNull(id, "ID cannot be null.");
+		setParameters(parameters);	//set the parameters
+	}
+
+	/**Sets bookmark parameters.
+	If there are parameters with duplicate names, only the first ones are used and the rest with the same name are ignored.
+	This method should only be called during constructor initialization.
+	@param parameters The optional bookmark parameters.
+	*/
+	protected void setParameters(final Parameter...parameters)
+	{
 		for(final Parameter parameter:parameters)	//for each parameter
 		{
 			final String parameterName=parameter.getName();	//get the parameter name
@@ -72,9 +110,7 @@ public class Bookmark implements Cloneable
 			{
 				parameterMap.put(parameterName, parameter);	//store this parameter in the map
 			}
-		}
-		//TODO check duplicates
-//TODO del		this.parameters=checkNull(parameters, "Parameters cannot be null.");	//TODO maybe make a copy of these
+		}		
 	}
 
 	/**Creates a new bookmark with the given parameter set to the given value.
@@ -94,28 +130,6 @@ public class Bookmark implements Cloneable
 		final Bookmark newBookmark=(Bookmark)clone();	//clone this bookmark
 		newBookmark.parameterMap.put(name, newParameter);	//store the new parameter in the new bookmark
 		return newBookmark;	//return our modified clone
-/*TODO del when works
-		final String currentValue=getParameterValue(name);	//get the current value for this parameter
-		if(value.equals(currentValue))	//if this bookmark already has the given parameter name and value
-		{
-			return this;	//return this bookmark; it already has the correct values
-		}
-		final Parameter newParameter=new Parameter(name, value);	//create the new parameter with the new value
-		final int parameterCount=parameters.length;	//see how many parameters there are
-		boolean addParameter=currentValue==null;	//we'll add a parameter if the parameter isn't present already
-		final int newParameterCount=addParameter ? parameterCount+1 : parameterCount;	//if we don't have the parameter currently, we'll have to add it
-		final Parameter[] newParameters=new Parameter[newParameterCount];
-		for(int i=parameterCount-1; i>=0; --i)	//for each parameter
-		{
-			final Parameter oldParameter=parameters[i];	//get the old parameter
-				//if we're changing a parameter and this is the one to change, copy the new parameter; otherwise, just use the old parameter
-			newParameters[i]=!addParameter && oldParameter.getName().equals(name) ? newParameter : oldParameter;
-		}
-		if(addParameter)	//if we should add a parameter
-		{
-			newParameters[]
-		}
-*/
 	}
 
 	/**Creates a new bookmark with the given parameter removed.
@@ -178,7 +192,11 @@ public class Bookmark implements Cloneable
 		}
 	}
 
-	/**@return A string representation of the bookmark suitable for use in a URI query, in the form "#<var>id</var>?<var>parameter1Name</var>=<var>parameter1Value</var>&amp;<var>parameter2Name</var>=<var>parameter2Value</var>&hellip;".*/
+	/**Returns a string representation of the bookmark.
+	The string is suitable for use as a URI query, in the form "?<var>parameter1Name</var>=<var>parameter1Value</var>&amp;<var>parameter2Name</var>=<var>parameter2Value</var>&hellip;".
+	Each name and value will be percent-encoded as appropriate for URIs.
+	@return A string representation of the bookmark suitable for use as a URI query.
+	*/
 	public String toString()
 	{
 		final StringBuilder bookmarkQueryStringBuilder=new StringBuilder();	//create a new string builder
@@ -189,12 +207,15 @@ public class Bookmark implements Cloneable
 			bookmarkQueryStringBuilder.append(FRAGMENT_SEPARATOR).append(encode(bookmarkID));	//append #bookmarkID (encoded)
 		}
 */
-//TODO del		if(parameters.length>0)	//if there are parameters
 		if(!parameterMap.isEmpty())	//if there are parameters
 		{
 			final Set<Parameter> parameterSet=getParameters();	//get the parameters
 			final Parameter[] parameters=parameterSet.toArray(new Parameter[parameterSet.size()]);	//create an array of parameters
 			bookmarkQueryStringBuilder.append(constructQuery((NameValuePair<String, String>[])parameters));	//append the parameters to the query string
+		}
+		else	//if there are no parameters
+		{
+			bookmarkQueryStringBuilder.append(QUERY_SEPARATOR);	//append the query prefix			
 		}
 		return bookmarkQueryStringBuilder.toString();	//return the string we constructed
 	}

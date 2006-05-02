@@ -74,32 +74,22 @@ public class CardConstraints extends ControlConstraints implements LabelModel, D
 
 		//LabelModel delegations
 
-	/**@return The icon URI, or <code>null</code> if there is no icon URI.*/
+	/**@return The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.*/
 	public URI getIcon() {return getLabelModel().getIcon();}
 
 	/**Sets the URI of the icon.
 	This is a bound property of type <code>URI</code>.
-	@param newLabelIcon The new URI of the icon.
+	@param newLabelIcon The new URI of the icon, which may be a resource URI.
 	@see #ICON_PROPERTY
 	*/
 	public void setIcon(final URI newLabelIcon) {getLabelModel().setIcon(newLabelIcon);}
 
-	/**@return The icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-	public String getIconResourceKey() {return getLabelModel().getIconResourceKey();}
-
-	/**Sets the key identifying the URI of the icon in the resources.
-	This is a bound property.
-	@param newIconResourceKey The new icon URI resource key.
-	@see #ICON_RESOURCE_KEY_PROPERTY
-	*/
-	public void setIconResourceKey(final String newIconResourceKey) {getLabelModel().setIconResourceKey(newIconResourceKey);}
-
-	/**@return The label text, or <code>null</code> if there is no label text.*/
+	/**@return The label text, which may include a resource reference, or <code>null</code> if there is no label text.*/
 	public String getLabel() {return getLabelModel().getLabel();}
 
 	/**Sets the text of the label.
 	This is a bound property.
-	@param newLabelText The new text of the label.
+	@param newLabelText The new text of the label, which may include a resource reference.
 	@see #LABEL_PROPERTY
 	*/
 	public void setLabel(final String newLabelText) {getLabelModel().setLabel(newLabelText);}
@@ -115,15 +105,5 @@ public class CardConstraints extends ControlConstraints implements LabelModel, D
 	@see #LABEL_CONTENT_TYPE_PROPERTY
 	*/
 	public void setLabelContentType(final ContentType newLabelTextContentType) {getLabelModel().setLabelContentType(newLabelTextContentType);}
-
-	/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-	public String getLabelResourceKey() {return getLabelModel().getLabelResourceKey();}
-
-	/**Sets the key identifying the text of the label in the resources.
-	This is a bound property.
-	@param newLabelTextResourceKey The new label text resource key.
-	@see #LABEL_RESOURCE_KEY_PROPERTY
-	*/
-	public void setLabelResourceKey(final String newLabelTextResourceKey) {getLabelModel().setLabelResourceKey(newLabelTextResourceKey);}
 
 }

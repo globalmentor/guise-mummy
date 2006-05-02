@@ -1,7 +1,6 @@
 package com.guiseframework.component;
 
 import java.io.IOException;
-import java.net.URI;
 
 import javax.mail.internet.ContentType;
 
@@ -58,8 +57,6 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public final static String DESCRIPTION_PROPERTY=getPropertyName(Component.class, "description");
 	/**The description content type bound property.*/
 	public final static String DESCRIPTION_CONTENT_TYPE_PROPERTY=getPropertyName(Component.class, "descriptionContentType");
-	/**The description resource key bound property.*/
-	public final static String DESCRIPTION_RESOURCE_KEY_PROPERTY=getPropertyName(Component.class, "descriptionResourceKey");
 	/**The bound property of whether the component has dragging enabled.*/
 	public final static String DRAG_ENABLED_PROPERTY=getPropertyName(Component.class, "dragEnabled");
 	/**The bound property of whether the component has dropping enabled.*/
@@ -72,8 +69,6 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public final static String INFO_PROPERTY=getPropertyName(Component.class, "info");
 	/**The info content type bound property.*/
 	public final static String INFO_CONTENT_TYPE_PROPERTY=getPropertyName(Component.class, "infoContentType");
-	/**The info resource key bound property.*/
-	public final static String INFO_RESOURCE_KEY_PROPERTY=getPropertyName(Component.class, "infoResourceKey");
 	/**The bound property of the component name.*/
 	public final static String NAME_PROPERTY=getPropertyName(Component.class, "name");
 	/**The bound property of whether the component has tooltips enabled.*/
@@ -114,58 +109,6 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	*/
 	public void setName(final String newName);
 
-	/**@return The label icon URI, or <code>null</code> if there is no icon URI.*/
-	public URI getIcon();
-
-	/**Sets the URI of the label icon.
-	This is a bound property of type <code>URI</code>.
-	@param newLabelIcon The new URI of the label icon.
-	@see #ICON_PROPERTY
-	*/
-	public void setIcon(final URI newLabelIcon);
-
-	/**@return The label icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-	public String getIconResourceKey();
-
-	/**Sets the key identifying the URI of the label icon in the resources.
-	This is a bound property.
-	@param newIconResourceKey The new label icon URI resource key.
-	@see #ICON_RESOURCE_KEY_PROPERTY
-	*/
-	public void setIconResourceKey(final String newIconResourceKey);
-
-	/**@return The label text, or <code>null</code> if there is no label text.*/
-	public String getLabel();
-
-	/**Sets the text of the label.
-	This is a bound property.
-	@param newLabelText The new text of the label.
-	@see #LABEL_PROPERTY
-	*/
-	public void setLabel(final String newLabelText);
-
-	/**@return The content type of the label text.*/
-	public ContentType getLabelContentType();
-
-	/**Sets the content type of the label text.
-	This is a bound property.
-	@param newLabelTextContentType The new label text content type.
-	@exception NullPointerException if the given content type is <code>null</code>.
-	@exception IllegalArgumentException if the given content type is not a text content type.
-	@see #LABEL_CONTENT_TYPE_PROPERTY
-	*/
-	public void setLabelContentType(final ContentType newLabelTextContentType);
-
-	/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-	public String getLabelResourceKey();
-
-	/**Sets the key identifying the text of the label in the resources.
-	This is a bound property.
-	@param newLabelTextResourceKey The new label text resource key.
-	@see #LABEL_RESOURCE_KEY_PROPERTY
-	*/
-	public void setLabelResourceKey(final String newLabelTextResourceKey);
-
 	/**@return The advisory information text, such as might appear in a tooltip, or <code>null</code> if there is no advisory information.*/
 	public String getInfo();
 
@@ -188,16 +131,6 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	*/
 	public void setInfoContentType(final ContentType newInfoContentType);
 
-	/**@return The advisory information text resource key, or <code>null</code> if there is no advisory information text resource specified.*/
-	public String getInfoResourceKey();
-
-	/**Sets the key identifying the text of the advisory information in the resources.
-	This is a bound property.
-	@param newInfoResourceKey The new advisory information text resource key.
-	@see #INFO_RESOURCE_KEY_PROPERTY
-	*/
-	public void setInfoResourceKey(final String newInfoResourceKey);
-
 	/**@return The description text, such as might appear in a flyover, or <code>null</code> if there is no description.*/
 	public String getDescription();
 
@@ -219,16 +152,6 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	@see #DESCRIPTION_CONTENT_TYPE_PROPERTY
 	*/
 	public void setDescriptionContentType(final ContentType newDescriptionContentType);
-
-	/**@return The description text resource key, or <code>null</code> if there is no description text resource specified.*/
-	public String getDescriptionResourceKey();
-
-	/**Sets the key identifying the text of the description in the resources.
-	This is a bound property.
-	@param newDescriptionResourceKey The new description text resource key.
-	@see #DESCRIPTION_RESOURCE_KEY_PROPERTY
-	*/
-	public void setDescriptionResourceKey(final String newDescriptionResourceKey);
 
 	/**@return The background color of the component, or <code>null</code> if no background color is specified for this component.*/
 	public Color<?> getBackgroundColor();

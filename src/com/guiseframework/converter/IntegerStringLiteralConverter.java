@@ -22,7 +22,7 @@ public class IntegerStringLiteralConverter extends AbstractStringLiteralConverte
 		}
 		catch(final NumberFormatException numberFormatException)	//if the string does not contain a valid Integer
 		{
-			throw new ConversionException(format(getInvalidValueMessage(), literal), literal);
+			throw new ConversionException(format(getSession().resolveString(getInvalidValueMessage()), literal), literal);
 		}
 	}
 }

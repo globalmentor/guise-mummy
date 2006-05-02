@@ -78,32 +78,22 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			}
 		}
 
-	/**@return The icon URI, or <code>null</code> if there is no icon URI.*/
+	/**@return The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.*/
 	public URI getIcon() {return getLabelModel().getIcon();}
 
 	/**Sets the URI of the icon.
 	This is a bound property of type <code>URI</code>.
-	@param newLabelIcon The new URI of the icon.
+	@param newLabelIcon The new URI of the icon, which may be a resource URI.
 	@see #ICON_PROPERTY
 	*/
 	public void setIcon(final URI newLabelIcon) {getLabelModel().setIcon(newLabelIcon);}
 
-	/**@return The icon URI resource key, or <code>null</code> if there is no icon URI resource specified.*/
-	public String getIconResourceKey() {return getLabelModel().getIconResourceKey();}
-
-	/**Sets the key identifying the URI of the icon in the resources.
-	This is a bound property.
-	@param newIconResourceKey The new icon URI resource key.
-	@see #ICON_RESOURCE_KEY_PROPERTY
-	*/
-	public void setIconResourceKey(final String newIconResourceKey) {getLabelModel().setIconResourceKey(newIconResourceKey);}
-
-	/**@return The label text, or <code>null</code> if there is no label text.*/
+	/**@return The label text, which may include a resource reference, or <code>null</code> if there is no label text.*/
 	public String getLabel() {return getLabelModel().getLabel();}
 
 	/**Sets the text of the label.
 	This is a bound property.
-	@param newLabelText The new text of the label.
+	@param newLabelText The new text of the label, which may include a resource reference.
 	@see #LABEL_PROPERTY
 	*/
 	public void setLabel(final String newLabelText) {getLabelModel().setLabel(newLabelText);}
@@ -119,16 +109,6 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 	@see #LABEL_CONTENT_TYPE_PROPERTY
 	*/
 	public void setLabelContentType(final ContentType newLabelTextContentType) {getLabelModel().setLabelContentType(newLabelTextContentType);}
-
-	/**@return The label text resource key, or <code>null</code> if there is no label text resource specified.*/
-	public String getLabelResourceKey() {return getLabelModel().getLabelResourceKey();}
-
-	/**Sets the key identifying the text of the label in the resources.
-	This is a bound property.
-	@param newLabelTextResourceKey The new label text resource key.
-	@see #LABEL_RESOURCE_KEY_PROPERTY
-	*/
-	public void setLabelResourceKey(final String newLabelTextResourceKey) {getLabelModel().setLabelResourceKey(newLabelTextResourceKey);}
 
 	/**The advisory information text, such as might appear in a tooltip, or <code>null</code> if there is no advisory information.*/
 	private String info=null;
@@ -179,27 +159,6 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			}			
 		}
 
-	/**The advisory information text resource key, or <code>null</code> if there is no advisory information text resource specified.*/
-	private String infoResourceKey=null;
-
-		/**@return The advisory information text resource key, or <code>null</code> if there is no advisory information text resource specified.*/
-		public String getInfoResourceKey() {return infoResourceKey;}
-
-		/**Sets the key identifying the text of the advisory information in the resources.
-		This is a bound property.
-		@param newInfoResourceKey The new advisory information text resource key.
-		@see #INFO_RESOURCE_KEY_PROPERTY
-		*/
-		public void setInfoResourceKey(final String newInfoResourceKey)
-		{
-			if(!ObjectUtilities.equals(infoResourceKey, newInfoResourceKey))	//if the value is really changing
-			{
-				final String oldInfoResourceKey=infoResourceKey;	//get the old value
-				infoResourceKey=newInfoResourceKey;	//actually change the value
-				firePropertyChange(INFO_RESOURCE_KEY_PROPERTY, oldInfoResourceKey, newInfoResourceKey);	//indicate that the value changed
-			}
-		}
-
 	/**The description text, such as might appear in a flyover, or <code>null</code> if there is no description.*/
 	private String description=null;
 
@@ -247,27 +206,6 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 				descriptionContentType=newDescriptionContentType;	//actually change the value
 				firePropertyChange(DESCRIPTION_CONTENT_TYPE_PROPERTY, oldDescriptionContentType, newDescriptionContentType);	//indicate that the value changed
 			}			
-		}
-
-	/**The description text resource key, or <code>null</code> if there is no description text resource specified.*/
-	private String descriptionResourceKey=null;
-
-		/**@return The description text resource key, or <code>null</code> if there is no description text resource specified.*/
-		public String getDescriptionResourceKey() {return descriptionResourceKey;}
-
-		/**Sets the key identifying the text of the description in the resources.
-		This is a bound property.
-		@param newDescriptionResourceKey The new description text resource key.
-		@see #DESCRIPTION_RESOURCE_KEY_PROPERTY
-		*/
-		public void setDescriptionResourceKey(final String newDescriptionResourceKey)
-		{
-			if(!ObjectUtilities.equals(descriptionResourceKey, newDescriptionResourceKey))	//if the value is really changing
-			{
-				final String oldDescriptionResourceKey=descriptionResourceKey;	//get the old value
-				descriptionResourceKey=newDescriptionResourceKey;	//actually change the value
-				firePropertyChange(DESCRIPTION_RESOURCE_KEY_PROPERTY, oldDescriptionResourceKey, newDescriptionResourceKey);	//indicate that the value changed
-			}
 		}
 
 	/**The background color of the component, or <code>null</code> if no background color is specified for this component.*/
@@ -1101,30 +1039,6 @@ Debug.trace("now valid of", this, "is", isValid());
 		initialized=true;	//show that this component has been initialized
 	}
 
-	/**Initializes the component with a description in an RDF resource file.
-	This method calls {@link #initialize()} after loading.
-	@param resourceKey The key to an RDF description resource file.
-	@exception MissingResourceException if no resource could be found associated with the given key.
-	*/
-/*TODO del if not used
-	public void initializeFromResource(final String resourceKey) throws MissingResourceException
-	{
-		final String descriptionResource=getSession().getStringResource(resourceKey);	//get the description resource
-	}
-*/
-
-	/**Initializes the component with a description in an RDF resource file.
-	This method calls {@link #initialize()} after loading.
-	@param resourceKey The key to an RDF description resource file.
-	@exception MissingResourceException if no resource could be found associated with the given key.
-	*/
-/*TODO del when works
-	public void initializeFromDescription(final String resourceKey) throws MissingResourceException
-	{
-		final String descriptionResource=getSession().getStringResource(resourceKey);	//get the description resource
-	}
-*/
-
 	/**Validates the user input of this component and all child components.
 	The component will be updated with error information.
 	This version clears all notifications.
@@ -1372,111 +1286,6 @@ Debug.trace("now valid of", this, "is", isValid());
 		return notifications;
 	}
 	
-	/**Determines a URI value either explicitly set or stored in the resources.
-	If a value is explicitly specified, it will be used; otherwise, a value will be loaded from the resources if possible.
-	A resource will be retrieved first using an appended physical axis designator (".x" or ".y") based upon the given flow, if any.
-	For example, if a thumb image resource key of "<var>image</var>" is requested, first a resource of "<var>image</var>.x" will be retrieved (for Western orientation and a line axis),
-	after which a resource for "<var>image</var>" will be retrieved if there is no resource for "<var>image</var>.x".
-	@param value The value explicitly set, which will override any resource.
-	@param resourceKey The key for looking up a resource if no value is explicitly set.
-	@param flow The flow for which a physical axis should be determined, or <code>null</code> if the flow is irrelevant.
-	@return The URI value, or <code>null</code> if there is no value available, neither explicitly set nor in the resources.
-	@exception MissingResourceException if there was an error loading the value from the resources.
-	*/
-	protected URI getURI(final URI value, final String resourceKey, final Flow flow) throws MissingResourceException
-	{
-		if(value!=null)	//if a value is provided
-		{
-			return value;	//return the specified value
-		}
-		else if(resourceKey!=null)	//if no value is provided, but if a resource key is provided
-		{
-			if(flow!=null)	//if a flow is specified
-			{
-				try
-				{
-					return getSession().getURIResource(resourceKey+getResourceKeyAxisSuffix(flow));	//get a specialized resource key for the physical axis of the given flow in relation to this component's orientation
-				}
-				catch(final MissingResourceException missingResourceException)	//ignore a missing axis resource and try the general resource
-				{
-				}
-			}
-			return getSession().getURIResource(resourceKey);	//lookup the value from the resources normally
-		}
-		else	//if neither a value nor a resource key are provided
-		{
-			return null;	//there is no value available
-		}
-	}
-
-	/**Determines a URI value either explicitly set or stored in the resources.
-	If a value is explicitly specified, it will be used; otherwise, a value will be loaded from the resources if possible.
-	A resource will be retrieved first using an appended bearing designator (".W", ".WbS", etc) based upon the given bearing, if any.
-	For example, with a bearing of 250 and a resource key of "myTether", a resource key will be requested using "myResource.WSW", "myResource.SWbW", "myResource.SW", etc.
-		until all compass points are exhausted, after which a resource key of "myResource" will be requested.
-	@param value The value explicitly set, which will override any resource.
-	@param resourceKey The key for looking up a resource if no value is explicitly set.
-	@param bearing The bearing to use in determining the resource key, or <code>null</code> if the bearing is irrelevant.
-	@return The URI value, or <code>null</code> if there is no value available, neither explicitly set nor in the resources.
-	@exception IllegalArgumentException if the given bearing is greater than 360.
-	@exception MissingResourceException if there was an error loading the value from the resources.
-	*/
-	protected URI getURI(final URI value, final String resourceKey, final BigDecimal bearing) throws MissingResourceException
-	{
-		if(value!=null)	//if a value is provided
-		{
-			return value;	//return the specified value
-		}
-		else if(resourceKey!=null)	//if no value is provided, but if a resource key is provided
-		{
-			if(bearing!=null)	//if a bearing was given
-			{
-				int ordinal=CompassPoint.getCompassPoint(bearing).ordinal();	//get the ordinal of the compass point nearest the bearing
-				final CompassPoint[] compassPoints=CompassPoint.values();	//get the compass point values
-				//TODO decide if the closest point algorithm should be removed, because it may result in the incorrect image for a particular bearing
-				do
-				{
-					final CompassPoint compassPoint=compassPoints[ordinal];	//get this compass point
-					try
-					{
-						return getSession().getURIResource(resourceKey+'.'+compassPoint.getAbbreviation());	//get a specialized resource key for the compass point abbreviation in the form resourceKey.abbreviation TODO use a constant
-					}
-					catch(final MissingResourceException missingResourceException)	//ignore all missing bearing-specific resources
-					{
-						--ordinal;	//try the previous compass point counter-clockwise
-					}						
-				}
-				while(ordinal>=0);	//keep looking for compass points until we reach north
-			}
-			return getSession().getURIResource(resourceKey);	//lookup the value from the resources normally
-		}
-		else	//if neither a value nor a resource key are provided
-		{
-			return null;	//there is no value available
-		}
-	}
-
-	/**Returns a resource key suffix representing the physical axis based upon the given flow relative to the component's orientation.
-	@param flow The flow for which a physical axis should be determined.
-	@return The appropriate resource key suffix for the given flow.
-	@see #RESOURCE_KEY_X_SUFFIX
-	@see #RESOURCE_KEY_Y_SUFFIX
-	*/ 
-	protected String getResourceKeyAxisSuffix(final Flow flow)
-	{
-		final Axis axis=getComponentOrientation().getAxis(flow);	//get the physical axis
-		switch(axis)
-		{
-			case X:
-				return RESOURCE_KEY_X_SUFFIX;
-			case Y:
-				return RESOURCE_KEY_Y_SUFFIX;
-			case Z:
-			default:
-				throw new IllegalArgumentException("Unsupported axis: "+axis);
-		}	
-	}
-
 	/**Adds a notification listener.
 	@param notificationListener The notification listener to add.
 	*/
@@ -1791,7 +1600,6 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 			final Message message=new Message();	//create a new message
 			message.setMessageContentType(component.getDescriptionContentType());	//set the appropriate message content
 			message.setMessage(component.getDescription());	//set the appropriate message text
-			message.setMessageResourceKey(component.getDescriptionResourceKey());	//set the appropriate message text resource			
 			frame.setContent(message);	//put the message in the frame
 			return frame;	//return the frame we created
 		}

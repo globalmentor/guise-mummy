@@ -40,7 +40,7 @@ public class MarmotPanel extends DefaultNavigationPanel
 {
 
 	/**Default constructor.*/
-	public MarmotPanel(final GuiseSession session, final String id)
+	public MarmotPanel()
 	{
 		setLabel("Marmot Test");	//set the panel label
 
@@ -131,7 +131,7 @@ catch(final ValidationException validationException)
 					}
 				});
 		add(addButton);
-
+/*TODO del
 		try
 		{
 			final ActivityModelIOKit activityModelIOKit=new ActivityModelIOKit();
@@ -148,6 +148,7 @@ catch(final ValidationException validationException)
 		{
 			throw new AssertionError(ioException);
 		}
+*/
 	}
 
 }

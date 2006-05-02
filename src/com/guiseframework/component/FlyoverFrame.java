@@ -12,8 +12,8 @@ import com.guiseframework.geometry.CompassPoint;
 /**A frame for flyovers.
 A flyover frame by default is nonmodal, immovable, and not resizable.
 When loading the tether image from the resources, a resource key will be generated based upon the compass point of the tether bearing.
-For example, with a tether bearing of 250 and a tether resource key of "myTether", a resource key will be requested using "myTether.WSW", "myTether.SWbW", "myTether.SW", etc.
-	until all compass points are exhausted, after which a resource key of "myTether" will be requested.
+For example, with a tether bearing of 250 and a tether resource key of "myTether", a resource key will be requested using "myTether.WSW",
+	after which a resource key of "myTether" will be requested if that resource is not available.
 <p>This implementation defaults to accepting tether bearings of:</p>
 <ul>
 	<li>{@link CompassPoint#NORTHEAST_BY_NORTH}</li>
@@ -36,8 +36,6 @@ public interface FlyoverFrame<C extends FlyoverFrame<C>> extends Frame<C>
 	public final static String TETHER_BEARING_COMPASS_POINTS_PROPERTY=getPropertyName(FlyoverFrame.class, "tetherBearingCompassPoints");
 	/**The tether image bound property.*/
 	public final static String TETHER_IMAGE_PROPERTY=getPropertyName(FlyoverFrame.class, "tetherImage");
-	/**The tether image resource key bound property.*/
-	public final static String TETHER_IMAGE_RESOURCE_KEY_PROPERTY=getPropertyName(FlyoverFrame.class, "tetherImageResourceKey");
 
 	/**@return The bearing of the tether in relation to the frame.*/
 	public BigDecimal getTetherBearing();
@@ -62,29 +60,13 @@ public interface FlyoverFrame<C extends FlyoverFrame<C>> extends Frame<C>
 	*/
 	public void setTetherBearingCompassPoints(final Set<CompassPoint> newTetherBearingCompassPoints);
 
-	/**Determines the URI of the tether image.
-	If an image is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
-	@return The tether image URI, or <code>null</code> if there is no tether image URI.
-	@exception MissingResourceException if there was an error loading the value from the resources.
-	@see #getTetherImageResourceKey()
-	*/
-	public URI getTetherImage() throws MissingResourceException;
+	/**@return The tether image URI, which may be a resource URI, or <code>null</code> if there is no tether image URI.*/
+	public URI getTetherImage();
 
 	/**Sets the URI of the tether image.
 	This is a bound property of type <code>URI</code>.
-	@param newTetherImage The new URI of the image.
+	@param newTetherImage The new URI of the image, which may be a resource URI.
 	@see #TETHER_IMAGE_PROPERTY
 	*/
 	public void setTetherImage(final URI newTetherImage);
-
-	/**@return The tether image URI resource key, or <code>null</code> if there is no tether image URI resource specified.*/
-	public String getTetherImageResourceKey();
-
-	/**Sets the key identifying the URI of the tether image in the resources.
-	This is a bound property.
-	@param newTetherImageResourceKey The new image URI resource key.
-	@see #TETHER_IMAGE_RESOURCE_KEY_PROPERTY
-	*/
-	public void setTetherImageResourceKey(final String newTetherImageResourceKey);
-
 }

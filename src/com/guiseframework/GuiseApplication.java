@@ -160,7 +160,7 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public String resolvePath(final String path);
 
-	/**Resolves URI against the application base path.
+	/**Resolves a URI against the application base path.
 	Relative paths will be resolved relative to the application base path. Absolute paths will be considered already resolved, as will absolute URIs.
 	For an application path "/path/to/application/", resolving "relative/path" will yield "/path/to/application/relative/path",
 	while resolving "/absolute/path" will yield "/absolute/path". Resolving "http://example.com/path" will yield "http://example.com/path".

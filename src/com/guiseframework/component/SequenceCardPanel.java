@@ -372,7 +372,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 			}
 			if(notification==null)	//if we didn't find a custom notification
 			{
-				notification=new Notification(null, VALIDATION_FALSE_MESSAGE_RESOURCE_KEY, Notification.Severity.ERROR);	//use a general validation notification
+				notification=new Notification(VALIDATION_FALSE_MESSAGE_RESOURCE_REFERENCE, Notification.Severity.ERROR);	//use a general validation notification
 			}
 			getSession().notify(notification);	//indicate that there was a validation error
 		}

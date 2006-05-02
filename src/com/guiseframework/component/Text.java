@@ -51,12 +51,12 @@ public class Text extends AbstractContainer<Text> implements TextModel
 
 		//TextModel delegates 
 
-	/**@return The text, or <code>null</code> if there is no text.*/
+	/**@return The text, which may include a resource reference, or <code>null</code> if there is no text.*/
 	public String getText() {return getTextModel().getText();}
 
 	/**Sets the text.
 	This is a bound property.
-	@param newText The new text.
+	@param newText The new text, which may include a resource reference.
 	@see #TEXT_PROPERTY
 	*/
 	public void setText(final String newText) {getTextModel().setText(newText);}
@@ -72,15 +72,5 @@ public class Text extends AbstractContainer<Text> implements TextModel
 	@see #TEXT_CONTENT_TYPE_PROPERTY
 	*/
 	public void setTextContentType(final ContentType newTextContentType) {getTextModel().setTextContentType(newTextContentType);}
-
-	/**@return The text resource key, or <code>null</code> if there is no text resource specified.*/
-	public String getTextResourceKey() {return getTextModel().getTextResourceKey();}
-
-	/**Sets the key identifying the text in the resources.
-	This is a bound property.
-	@param newTextResourceKey The new text resource key.
-	@see #TEXT_RESOURCE_KEY_PROPERTY
-	*/
-	public void setTextResourceKey(final String newTextResourceKey) {getTextModel().setTextResourceKey(newTextResourceKey);}
 
 }

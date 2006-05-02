@@ -25,18 +25,16 @@ public class Message extends AbstractComponent<Message>
 	public final static String MESSAGE_PROPERTY=getPropertyName(Message.class, "message");
 	/**The message content type bound property.*/
 	public final static String MESSAGE_CONTENT_TYPE_PROPERTY=getPropertyName(Message.class, "messageContentType");
-	/**The message resource key bound property.*/
-	public final static String MESSAGE_RESOURCE_KEY_PROPERTY=getPropertyName(Message.class, "messageResourceKey");
 
-	/**The message text, or <code>null</code> if there is no message text.*/
+	/**The message text, which may include a resource reference, or <code>null</code> if there is no message text.*/
 	private String message=null;
 
-		/**@return The message text, or <code>null</code> if there is no message text.*/
+		/**@return The message text, which may include a resource reference, or <code>null</code> if there is no message text.*/
 		public String getMessage() {return message;}
 
 		/**Sets the text of the message.
 		This is a bound property.
-		@param newMessage The new text of the message.
+		@param newMessage The new text of the message, which may include a resource reference.
 		@see #MESSAGE_PROPERTY
 		*/
 		public void setMessage(final String newMessage)
@@ -75,27 +73,6 @@ public class Message extends AbstractComponent<Message>
 				messageContentType=newMessageContentType;	//actually change the value
 				firePropertyChange(MESSAGE_CONTENT_TYPE_PROPERTY, oldMessageContentType, newMessageContentType);	//indicate that the value changed
 			}			
-		}
-
-	/**The message text resource key, or <code>null</code> if there is no message text resource specified.*/
-	private String messageResourceKey=null;
-
-		/**@return The message text resource key, or <code>null</code> if there is no message text resource specified.*/
-		public String getMessageResourceKey() {return messageResourceKey;}
-
-		/**Sets the key identifying the text of the message in the resources.
-		This is a bound property.
-		@param newMessageResourceKey The new message text resource key.
-		@see #MESSAGE_RESOURCE_KEY_PROPERTY
-		*/
-		public void setMessageResourceKey(final String newMessageResourceKey)
-		{
-			if(!ObjectUtilities.equals(messageResourceKey, newMessageResourceKey))	//if the value is really changing
-			{
-				final String oldMessageResourceKey=messageResourceKey;	//get the old value
-				messageResourceKey=newMessageResourceKey;	//actually change the value
-				firePropertyChange(MESSAGE_RESOURCE_KEY_PROPERTY, oldMessageResourceKey, newMessageResourceKey);	//indicate that the value changed
-			}
 		}
 
 	/**Default constructor.*/

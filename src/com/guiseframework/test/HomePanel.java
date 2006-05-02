@@ -14,6 +14,7 @@ import com.garretwilson.country.us.SSN;
 import com.garretwilson.iso.idcard.PAN;
 import com.garretwilson.iso.idcard.Product;
 import com.garretwilson.itu.TelephoneNumber;
+import com.garretwilson.text.TextUtilities;
 import com.garretwilson.util.Debug;
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseSession;
@@ -49,7 +50,7 @@ public class HomePanel extends DefaultNavigationPanel
 	public HomePanel()
 	{
 		super(new RegionLayout());	//construct the parent using a region layout
-		setLabel("Home Panel Test");	//set the panel label
+		setLabel("Home Panel Test with embedded resource text: "+TextUtilities.createControlString("menu.language.label"));	//set the panel label
 
 		final LayoutPanel contentPanel=new LayoutPanel(new FlowLayout(Flow.PAGE)); 
 

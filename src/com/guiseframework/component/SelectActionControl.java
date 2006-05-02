@@ -18,14 +18,10 @@ public interface SelectActionControl<C extends SelectActionControl<C>> extends A
 	public final static String AUTO_SELECT_PROPERTY=getPropertyName(SelectActionControl.class, "autoSelect");
 	/**The selected icon bound property.*/
 	public final static String SELECTED_ICON_PROPERTY=getPropertyName(SelectActionControl.class, "selectedIcon");
-	/**The selected icon resource key bound property.*/
-	public final static String SELECTED_ICON_RESOURCE_KEY_PROPERTY=getPropertyName(SelectActionControl.class, "selectedIconResourceKey");
 	/**The toggle bound property.*/
 	public final static String TOGGLE_PROPERTY=getPropertyName(SelectActionControl.class, "toggle");
 	/**The unselected icon bound property.*/
 	public final static String UNSELECTED_ICON_PROPERTY=getPropertyName(SelectActionControl.class, "unselectedIcon");
-	/**The unselected icon resource key bound property.*/
-	public final static String UNSELECTED_ICON_RESOURCE_KEY_PROPERTY=getPropertyName(SelectActionControl.class, "unselectedIconResourceKey");
 
 	/**@return Whether this control automatically sets or toggles the selection state when the action occurs.*/
 	public boolean isAutoSelect();
@@ -37,25 +33,15 @@ public interface SelectActionControl<C extends SelectActionControl<C>> extends A
 	*/
 	public void setAutoSelect(final boolean newAutoSelect);
 
-	/**@return The selected icon URI, or <code>null</code> if there is no selected icon URI.*/
+	/**@return The selected icon URI, which may be a resource URI, or <code>null</code> if there is no selected icon URI.*/
 	public URI getSelectedIcon();
 
 	/**Sets the URI of the selected icon.
 	This is a bound property of type <code>URI</code>.
-	@param newSelectedIcon The new URI of the selected icon.
+	@param newSelectedIcon The new URI of the selected icon, which may be a resource URI.
 	@see #SELECTED_ICON_PROPERTY
 	*/
 	public void setSelectedIcon(final URI newSelectedIcon);
-
-	/**@return The selected icon URI resource key, or <code>null</code> if there is no selected icon URI resource specified.*/
-	public String getSelectedIconResourceKey();
-
-	/**Sets the key identifying the URI of the selected icon in the resources.
-	This is a bound property.
-	@param newSelectedIconResourceKey The new selected icon URI resource key.
-	@see #SELECTED_ICON_RESOURCE_KEY_PROPERTY
-	*/
-	public void setSelectedIconResourceKey(final String newSelectedIconResourceKey);
 
 	/**@return Whether this control acts as a toggle, switching its value between <code>true</code> and <code>false</code>, or whether the action always sets the value to <code>true</code>.*/
 	public boolean isToggle();
@@ -67,24 +53,14 @@ public interface SelectActionControl<C extends SelectActionControl<C>> extends A
 	*/
 	public void setToggle(final boolean newToggle);
 
-	/**@return The unselected icon URI, or <code>null</code> if there is no unselected icon URI.*/
+	/**@return The unselected icon URI, which may be a resource URI, or <code>null</code> if there is no unselected icon URI.*/
 	public URI getUnselectedIcon();
 
 	/**Sets the URI of the unselected icon.
 	This is a bound property of type <code>URI</code>.
-	@param newUnselectedIcon The new URI of the unselected icon.
+	@param newUnselectedIcon The new URI of the unselected icon, which may be a resource URI.
 	@see #UNSELECTED_ICON_PROPERTY
 	*/
 	public void setUnselectedIcon(final URI newUnselectedIcon);
-
-	/**@return The unselected icon URI resource key, or <code>null</code> if there is no unselected icon URI resource specified.*/
-	public String getUnselectedIconResourceKey();
-
-	/**Sets the key identifying the URI of the unselected icon in the resources.
-	This is a bound property.
-	@param newUnselectedIconResourceKey The new unselected icon URI resource key.
-	@see #UNSELECTED_ICON_RESOURCE_KEY_PROPERTY
-	*/
-	public void setUnselectedIconResourceKey(final String newUnselectedIconResourceKey);
 
 }

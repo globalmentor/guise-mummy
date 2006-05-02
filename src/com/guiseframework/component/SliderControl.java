@@ -2,6 +2,8 @@ package com.guiseframework.component;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.net.URIConstants.*;
+import static com.garretwilson.net.URIUtilities.*;
 
 import java.net.URI;
 import java.util.MissingResourceException;
@@ -15,8 +17,8 @@ import com.guiseframework.model.ValueModel;
 import com.guiseframework.validator.ValidationException;
 
 /**A value control that represents its value by a slider.
-If a thumb or track image resource key is set, a resource will be retrieved first using an appended physical axis designator (".x" or ".y").
-For example, if a thumb image resource key of "thumb.image" is set, first a resource of "thumb.image.x" will be retrieved (for Western orientation and a line axis),
+If a thumb or track image resource key is set, a resource will be retrieved first using an appended physical axis designator (".X" or ".Y").
+For example, if a thumb image resource key of "thumb.image" is set, first a resource of "thumb.image.Y" will be retrieved (for Western orientation and a line axis),
 after which a resource for "thumb.image" will be retrieved if there is no resource for "thumb.image.x".
 @author Garret Wilson
 @param <V> The type of value the slider represents.
@@ -32,17 +34,13 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 	public final static String SLIDING_PROPERTY=getPropertyName(SliderControl.class, "sliding");
 	/**The thumb image bound property.*/
 	public final static String THUMB_IMAGE_PROPERTY=getPropertyName(SliderControl.class, "thumbImage");
-	/**The thumb image resource key bound property.*/
-	public final static String THUMB_IMAGE_RESOURCE_KEY_PROPERTY=getPropertyName(SliderControl.class, "thumbImageResourceKey");
 	/**The track image bound property.*/
 	public final static String TRACK_IMAGE_PROPERTY=getPropertyName(SliderControl.class, "trackImage");
-	/**The track image resource key bound property.*/
-	public final static String TRACK_IMAGE_RESOURCE_KEY_PROPERTY=getPropertyName(SliderControl.class, "trackImageResourceKey");
 
-	/**The base resource bundle key for the slider thumb image URI.*/
-	public final static String THUMB_IMAGE_RESOURCE_KEY="slider.thumb.image";
-	/**The base resource bundle key for the slider track image URI.*/
-	public final static String TRACK_IMAGE_RESOURCE_KEY="slider.track.image";
+	/**The base resource URI for the slider thumb image URI.*/
+	public final static URI THUMB_IMAGE_RESOURCE_URI=createURI(RESOURCE_SCHEME, "slider.thumb.image");
+	/**The base resource URI for the slider track image URI.*/
+	public final static URI TRACK_IMAGE_RESOURCE_URI=createURI(RESOURCE_SCHEME, "slider.track.image");
 
 	/**The flow axis.*/
 	private Flow axis;
@@ -109,23 +107,15 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 			}			
 		}
 
-	/**The thumb image URI, or <code>null</code> if there is no thumb image URI.*/
-	private URI thumbImage=null;
+	/**The thumb image URI, which may be a resource URI, or <code>null</code> if there is no thumb image URI.*/
+	private URI thumbImage=THUMB_IMAGE_RESOURCE_URI;
 
-		/**Determines the URI of the thumb image.
-		If an image is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
-		@return The thumb image URI, or <code>null</code> if there is no thumb image URI.
-		@exception MissingResourceException if there was an error loading the value from the resources.
-		@see #getThumbImageResourceKey()
-		*/
-		public URI getThumbImage() throws MissingResourceException
-		{
-			return getURI(thumbImage, getThumbImageResourceKey(), getAxis());	//get the value or the resource, if available, taking the flow axis into account
-		}
+		/**@return The thumb image URI, which may be a resource URI, or <code>null</code> if there is no thumb image URI.*/
+		public URI getThumbImage() {return thumbImage;}
 
 		/**Sets the URI of the thumb image.
 		This is a bound property of type <code>URI</code>.
-		@param newThumbImage The new URI of the image.
+		@param newThumbImage The new URI of the image, which may be a resource URI.
 		@see #THUMB_IMAGE_PROPERTY
 		*/
 		public void setThumbImage(final URI newThumbImage)
@@ -138,76 +128,26 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 			}			
 		}
 
-	/**The thumb image URI resource key, or <code>null</code> if there is no thumb image URI resource specified.*/
-	private String thumbImageResourceKey=THUMB_IMAGE_RESOURCE_KEY;
+	/**The track image URI, which may be a resource URI, or <code>null</code> if there is no track image URI.*/
+	private URI trackImage=TRACK_IMAGE_RESOURCE_URI;
 
-		/**@return The thumb image URI resource key, or <code>null</code> if there is no thumb image URI resource specified.*/
-		public String getThumbImageResourceKey() {return thumbImageResourceKey;}
+		/**@return The track image URI, which may be a resource URI, or <code>null</code> if there is no track image URI.*/
+		public URI getTrackImage() {return trackImage;}
 
-		/**Sets the key identifying the URI of the thumb image in the resources.
-		This is a bound property.
-		@param newThumbImageResourceKey The new image URI resource key.
-		@see #THUMB_IMAGE_RESOURCE_KEY_PROPERTY
+		/**Sets the URI of the track image.
+		This is a bound property of type <code>URI</code>.
+		@param newTrackImage The new URI of the image, which may be a resource URI.
+		@see #TRACK_IMAGE_PROPERTY
 		*/
-		public void setThumbImageResourceKey(final String newThumbImageResourceKey)
+		public void setTrackImage(final URI newTrackImage)
 		{
-			if(!ObjectUtilities.equals(thumbImageResourceKey, newThumbImageResourceKey))	//if the value is really changing
+			if(!ObjectUtilities.equals(trackImage, newTrackImage))	//if the value is really changing
 			{
-				final String oldThumbImageResourceKey=thumbImageResourceKey;	//get the old value
-				thumbImageResourceKey=newThumbImageResourceKey;	//actually change the value
-				firePropertyChange(THUMB_IMAGE_RESOURCE_KEY_PROPERTY, oldThumbImageResourceKey, newThumbImageResourceKey);	//indicate that the value changed
-			}
+				final URI oldTrackImage=trackImage;	//get the old value
+				trackImage=newTrackImage;	//actually change the value
+				firePropertyChange(TRACK_IMAGE_PROPERTY, oldTrackImage, newTrackImage);	//indicate that the value changed
+			}			
 		}
-
-		/**The track image URI, or <code>null</code> if there is no track image URI.*/
-		private URI trackImage=null;
-
-			/**Determines the URI of the track image.
-			If an image is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
-			@return The track image URI, or <code>null</code> if there is no track image URI.
-			@exception MissingResourceException if there was an error loading the value from the resources.
-			@see #getTrackImageResourceKey()
-			*/
-			public URI getTrackImage() throws MissingResourceException
-			{
-				return getURI(trackImage, getTrackImageResourceKey(), getAxis());	//get the value or the resource, if available, taking the flow axis into account
-			}
-
-			/**Sets the URI of the track image.
-			This is a bound property of type <code>URI</code>.
-			@param newTrackImage The new URI of the image.
-			@see #TRACK_IMAGE_PROPERTY
-			*/
-			public void setTrackImage(final URI newTrackImage)
-			{
-				if(!ObjectUtilities.equals(trackImage, newTrackImage))	//if the value is really changing
-				{
-					final URI oldTrackImage=trackImage;	//get the old value
-					trackImage=newTrackImage;	//actually change the value
-					firePropertyChange(TRACK_IMAGE_PROPERTY, oldTrackImage, newTrackImage);	//indicate that the value changed
-				}			
-			}
-
-		/**The track image URI resource key, or <code>null</code> if there is no track image URI resource specified.*/
-		private String trackImageResourceKey=TRACK_IMAGE_RESOURCE_KEY;
-
-			/**@return The track image URI resource key, or <code>null</code> if there is no track image URI resource specified.*/
-			public String getTrackImageResourceKey() {return trackImageResourceKey;}
-
-			/**Sets the key identifying the URI of the track image in the resources.
-			This is a bound property.
-			@param newTrackImageResourceKey The new image URI resource key.
-			@see #TRACK_IMAGE_RESOURCE_KEY_PROPERTY
-			*/
-			public void setTrackImageResourceKey(final String newTrackImageResourceKey)
-			{
-				if(!ObjectUtilities.equals(trackImageResourceKey, newTrackImageResourceKey))	//if the value is really changing
-				{
-					final String oldTrackImageResourceKey=trackImageResourceKey;	//get the old value
-					trackImageResourceKey=newTrackImageResourceKey;	//actually change the value
-					firePropertyChange(TRACK_IMAGE_RESOURCE_KEY_PROPERTY, oldTrackImageResourceKey, newTrackImageResourceKey);	//indicate that the value changed
-				}
-			}
 
 	/**Whether the slider is being slid.*/
 	private boolean sliding=false;

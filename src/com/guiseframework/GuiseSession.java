@@ -188,16 +188,6 @@ public interface GuiseSession extends PropertyBindable
 	*/
 	public String getStringResource(final String resourceKey, final String defaultValue) throws MissingResourceException;
 
-	/**Determines a string value either explicitly set or stored in the resources.
-	If a value is explicitly specified, it will be used; otherwise, a value will be loaded from the resources if possible.
-	@param value The value explicitly set, which will override any resource.
-	@param resourceKey The key for looking up a resource if no value is explicitly set.
-	@return The string value, or <code>null</code> if there is no value available, neither explicitly set nor in the resources.
-	@exception MissingResourceException if there was an error loading the value from the resources.
-	@see #getStringResource(String)
-	*/
-	public String determineString(final String value, final String resourceKey) throws MissingResourceException;
-
 	/**Retrieves a <code>Boolean</code> resource from the resource bundle.
 	If the given resource is a string, it will be interpreted according to the {@link Boolean#valueOf(java.lang.String)} rules.
 	This is a preferred convenience method for accessing the resources in the session's resource bundle.
@@ -277,16 +267,6 @@ public interface GuiseSession extends PropertyBindable
 	@see #getURIResource(String)
 	*/
 	public URI getURIResource(final String resourceKey, final URI defaultValue) throws MissingResourceException;
-
-	/**Determines a URI value either explicitly set or stored in the resources.
-	If a value is explicitly specified, it will be used; otherwise, a value will be loaded from the resources if possible.
-	@param value The value explicitly set, which will override any resource.
-	@param resourceKey The key for looking up a resource if no value is explicitly set.
-	@return The URI value, or <code>null</code> if there is no value available, neither explicitly set nor in the resources.
-	@exception MissingResourceException if there was an error loading the value from the resources.
-	@see #getURIResource(String)
-	*/
-	public URI determineURI(final URI value, final String resourceKey) throws MissingResourceException;
 
 	/**@return The current principal (e.g. logged-in user), or <code>null</code> if there is no principal authenticated for this session.*/
 	public Principal getPrincipal();
@@ -518,4 +498,40 @@ public interface GuiseSession extends PropertyBindable
 	@param error The error with which to notify the user.
 	*/
 	public void notify(final Throwable error);
+
+	/**Creates a string containing a reference to the given string resource key.
+	@param resourceKey The resource key to a string in the resources which could be retrieved using {@link #getStringResource(String)}.
+	@return A string containing a reference to the given resource key, which can be resolved using {@link #resolveString(String)}.
+	*/
+	public String createStringResourceReference(final String resourceKey);
+
+	/**Resolves a string by replacing any string references with a string from the resources.
+	A string reference begins with the Start of String control character (U+0098) and ends with a String Terminator control character (U+009C).
+	The string between these delimiters will be used to look up a string resource using {@link #getStringResource(String)}.
+	Strings retrieved from resources will be recursively resolved.
+	@param string The string to be resolved.
+	@return The resolved string with any string references replaced with the appropriate string from the resources.
+	@exception NullPointerException if the given string is <code>null</code>.
+	@exception IllegalArgumentException if a string reference has no ending String Terminator control character (U+009C).
+	@exception MissingResourceException if no resource could be found associated with a string reference.
+	@exception ClassCastException if the resource associated with a string reference is not an instance of <code>String</code>.
+	@see #getStringResource(String)
+	*/
+	public String resolveString(final String string) throws MissingResourceException;
+
+	/**Resolves a URI against the application base path, looking up the URI from the resources if necessary.
+	If the URI has the "resource" scheme, its scheme-specific part will be used to look up the actual URI using {@link #getURIResource(String)}.
+	If suffixes are given, they will be appended to the resource key in order, separated by '.'.
+	URIs retrieved from resources will be recursively resolved without suffixes.
+	Relative paths will be resolved relative to the application base path. Absolute paths will be considered already resolved, as will absolute URIs.
+	For an application base path "/path/to/application/", resolving "relative/path" will yield "/path/to/application/relative/path",
+	while resolving "/absolute/path" will yield "/absolute/path". Resolving "http://example.com/path" will yield "http://example.com/path".
+	@param uri The URI to be resolved.
+	@return The uri resolved against resources the application base path.
+	@exception NullPointerException if the given URI is <code>null</code>.
+	@exception MissingResourceException if no resource could be found associated with a string reference.
+	@see #getURIResource(String)
+	@see GuiseApplication#resolveURI(URI)
+	*/
+	public URI resolveURI(final URI uri, final String... suffixes) throws MissingResourceException;
 }

@@ -21,6 +21,7 @@ import com.garretwilson.io.BOMInputStreamReader;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.rdf.*;
 import com.garretwilson.rdf.ploop.PLOOPProcessor;
+import com.garretwilson.text.FormatUtilities;
 import com.garretwilson.util.CollectionUtilities;
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.ResourceBundleUtilities;
@@ -40,7 +41,10 @@ import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
+import static com.garretwilson.text.CharacterConstants.*;
 import static com.garretwilson.text.CharacterEncodingConstants.*;
+import static com.garretwilson.text.FormatUtilities.*;
+import static com.garretwilson.text.TextUtilities.*;
 import static com.garretwilson.text.xml.XMLUtilities.*;
 import static com.guiseframework.GuiseResourceConstants.*;
 
@@ -400,30 +404,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			}
 		}
 
-		/**Determines a string value either explicitly set or stored in the resources.
-		If a value is explicitly specified, it will be used; otherwise, a value will be loaded from the resources if possible.
-		@param value The value explicitly set, which will override any resource.
-		@param resourceKey The key for looking up a resource if no value is explicitly set.
-		@return The string value, or <code>null</code> if there is no value available, neither explicitly set nor in the resources.
-		@exception MissingResourceException if there was an error loading the value from the resources.
-		@see #getStringResource(String)
-		*/
-		public String determineString(final String value, final String resourceKey) throws MissingResourceException
-		{
-			if(value!=null)	//if a value is provided
-			{
-				return value;	//return the specified value
-			}
-			else if(resourceKey!=null)	//if no value is provided, but if a resource key is provided
-			{
-				return getStringResource(resourceKey);	//lookup the value from the resources 
-			}
-			else	//if neither a value nor a resource key are provided
-			{
-				return null;	//there is no value available
-			}
-		}
-
 		/**Retrieves a <code>Boolean</code> resource from the resource bundle.
 		If the given resource is a string, it will be interpreted according to the {@link Boolean#valueOf(java.lang.String)} rules.
 		This is a preferred convenience method for accessing the resources in the session's resource bundle.
@@ -564,30 +544,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			catch(final MissingResourceException missingResourceException)	//if no such resource is available
 			{
 				return defaultValue;	//return the specified default value
-			}
-		}
-
-		/**Determines a URI value either explicitly set or stored in the resources.
-		If a value is explicitly specified, it will be used; otherwise, a value will be loaded from the resources if possible.
-		@param value The value explicitly set, which will override any resource.
-		@param resourceKey The key for looking up a resource if no value is explicitly set.
-		@return The URI value, or <code>null</code> if there is no value available, neither explicitly set nor in the resources.
-		@exception MissingResourceException if there was an error loading the value from the resources.
-		@see #getURIResource(String)
-		*/
-		public URI determineURI(final URI value, final String resourceKey) throws MissingResourceException
-		{
-			if(value!=null)	//if a value is provided
-			{
-				return value;	//return the specified value
-			}
-			else if(resourceKey!=null)	//if no value is provided, but if a resource key is provided
-			{
-				return getURIResource(resourceKey);	//lookup the value from the resources 
-			}
-			else	//if neither a value nor a resource key are provided
-			{
-				return null;	//there is no value available
 			}
 		}
 
@@ -1360,8 +1316,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	public void notify(final Notification notification)
 	{
 		final Text text=new Text();	//create a new text component
-		text.setText(notification.getMessage());	//set the text
-		text.setTextResourceKey(notification.getMessageResourceKey());	//set the text resource key
+		text.setText(notification.getMessage());	//set the text, which may include a resource reference
 		final DefaultOptionDialogFrame optionDialogFrame=new DefaultOptionDialogFrame(text, DefaultOptionDialogFrame.Option.OK);	//create a dialog with an OK button
 		optionDialogFrame.setLabel(notification.getSeverity().toString());	//TODO improve title; load from resources
 		optionDialogFrame.open();	//show the dialog		
@@ -1375,4 +1330,108 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	{
 		notify(new Notification(error));	//notify the user with a notification of the error
 	}
+
+	/**Creates a string containing a reference to the given string resource key.
+	@param resourceKey The resource key to a string in the resources which could be retrieved using {@link #getStringResource(String)}.
+	@return A string containing a reference to the given resource key, which can be resolved using {@link #resolveString(String)}.
+	*/
+	public String createStringResourceReference(final String resourceKey)
+	{
+		return createControlString(resourceKey);	//return a control string for the given resource key
+	}
+
+	/**Resolves a string by replacing any string references with a string from the resources.
+	A string reference begins with the Start of String control character (U+0098) and ends with a String Terminator control character (U+009C).
+	The string between these delimiters will be used to look up a string resource using {@link #getStringResource(String)}.
+	Strings retrieved from resources will be recursively resolved.
+	@param string The string to be resolved.
+	@return The resolved string with any string references replaced with the appropriate string from the resources.
+	@exception NullPointerException if the given string is <code>null</code>.
+	@exception IllegalArgumentException if a string reference has no ending String Terminator control character (U+009C).
+	@exception MissingResourceException if no resource could be found associated with a string reference.
+	@exception ClassCastException if the resource associated with a string reference is not an instance of <code>String</code>.
+	@see #getStringResource(String)
+	*/
+	public String resolveString(final String string) throws MissingResourceException
+	{
+		int fromIndex=0;	//keep track of where we are in the string
+		int stringStartIndex=string.indexOf(START_OF_STRING_CHAR, fromIndex);	//see if there is a string reference in the string
+		if(stringStartIndex>=0)	//if there is a string reference
+		{
+			final StringBuilder stringBuilder=new StringBuilder();	//create a new string builder
+			do
+			{
+				if(stringStartIndex>fromIndex)	//if there is literal text to add
+				{
+					stringBuilder.append(string.substring(fromIndex, stringStartIndex));	//append the literal text
+				}
+				final int stringEndIndex=string.indexOf(STRING_TERMINATOR_CHAR, stringStartIndex+1);	//search for the end of the string
+				if(stringEndIndex<0)	//if there is no string terminator
+				{
+					throw new IllegalArgumentException("String reference missing String Terminator (U+009C).");
+				}
+				final String stringResourceKey=string.substring(stringStartIndex+1, stringEndIndex);	//get the string reference
+				final String stringResource=getStringResource(stringResourceKey);	//look up the string resource
+				stringBuilder.append(resolveString(stringResource));	//resolved and append the value of the string reference
+				fromIndex=stringEndIndex+1;	//show the new search location
+				stringStartIndex=string.indexOf(START_OF_STRING_CHAR, fromIndex);	//see if there is another string reference in the string
+			}
+			while(stringStartIndex>=0);	//keep building the string as long as there are more string references
+			final int length=string.length();	//get the string length
+			if(fromIndex<length)	//if there is remaining literal text
+			{
+				stringBuilder.append(string.substring(fromIndex, length));	//append the remaining				
+			}
+			return stringBuilder.toString();	//return the string we constructed
+		}
+		else	//if there is no string reference
+		{
+			return string;	//return the string as-is
+		}
+	}
+
+	/**Resolves a URI against the application base path, looking up the URI from the resources if necessary.
+	If the URI has the "resource" scheme, its scheme-specific part will be used to look up the actual URI using {@link #getURIResource(String)}.
+	If suffixes are given, they will be appended to the resource key in order, separated by '.'.
+	If no resource is associated with that resource key, a resource will be retrieved using the unadorned resource key.
+	URIs retrieved from resources will be recursively resolved without suffixes.
+	Relative paths will be resolved relative to the application base path. Absolute paths will be considered already resolved, as will absolute URIs.
+	For an application base path "/path/to/application/", resolving "relative/path" will yield "/path/to/application/relative/path",
+	while resolving "/absolute/path" will yield "/absolute/path". Resolving "http://example.com/path" will yield "http://example.com/path".
+	@param uri The URI to be resolved.
+	@return The uri resolved against resources the application base path.
+	@exception NullPointerException if the given URI is <code>null</code>.
+	@exception MissingResourceException if no resource could be found associated with a string reference.
+	@see #getURIResource(String)
+	@see GuiseApplication#resolveURI(URI)
+	*/
+	public URI resolveURI(final URI uri, final String... suffixes) throws MissingResourceException
+	{
+		if(RESOURCE_SCHEME.equals(uri.getScheme()))	//if this is a resource reference
+		{
+			final String resourceKey=uri.getSchemeSpecificPart();	//get the resource key from the URI
+			URI resourceURI=null;	//we'll try to determine the resource URI
+			if(suffixes.length>0)	//if there are suffixes
+			{
+				final String decoratedResourceKey=formatList(new StringBuilder(resourceKey).append('.'), '.', suffixes).toString();	//append the suffixes
+				try
+				{
+					resourceURI=getURIResource(decoratedResourceKey);	//look up the resource using the decorated resource key
+				}
+				catch(final MissingResourceException missingResourceException)	//if there is no resource associated with the decorated resource key, ignore the error and try again with the base resource key
+				{
+				}
+			}
+			if(resourceURI==null)	//if we haven't found a resource URI, yet
+			{
+				resourceURI=getURIResource(resourceKey);	//look up the resource using the plain resource key				
+			}
+			return resolveURI(resourceURI);	//recursively resolve the URI
+		}
+		else	//if this is not a resource reference
+		{
+			return getApplication().resolveURI(uri);	//ask the application to resolve this URI normally
+		}
+	}
+
 }

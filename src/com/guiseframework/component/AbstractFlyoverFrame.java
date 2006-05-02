@@ -2,20 +2,21 @@ package com.guiseframework.component;
 
 import java.math.BigDecimal;
 import java.net.URI;
-import java.util.MissingResourceException;
 import java.util.Set;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.geometry.CompassPoint;
 
 import static com.garretwilson.util.SetUtilities.*;
-
+import static com.garretwilson.net.URIConstants.*;
+import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**Abstract implementation of a frame for flyovers.
 A flyover frame by default is nonmodal, immovable, and not resizable.
-For example, with a tether bearing of 250 and a tether resource key of "myTether", a resource key will be requested using "myTether.WSW", "myTether.SWbW", "myTether.SW", etc.
-	until all relevant compass points are exhausted, after which a resource key of "myTether" will be requested.
+When loading the tether image from the resources, a resource key will be generated based upon the compass point of the tether bearing.
+For example, with a tether bearing of 250 and a tether resource key of "myTether", a resource key will be requested using "myTether.WSW",
+	after which a resource key of "myTether" will be requested if that resource is not available.
 <p>This implementation defaults to accepting tether bearings of:</p>
 <ul>
 	<li>{@link CompassPoint#NORTHEAST_BY_NORTH}</li>
@@ -31,9 +32,13 @@ For example, with a tether bearing of 250 and a tether resource key of "myTether
 */
 public abstract class AbstractFlyoverFrame<C extends FlyoverFrame<C>> extends AbstractFrame<C> implements FlyoverFrame<C>
 {
+/**TODO del comment if no longer accurate
+	For example, with a tether bearing of 250 and a tether resource key of "myTether", a resource key will be requested using "myTether.WSW", "myTether.SWbW", "myTether.SW", etc.
+	until all relevant compass points are exhausted, after which a resource key of "myTether" will be requested.
+*/
 
-	/**The base resource bundle key for the flyover tether image URI.*/
-	public final static String TETHER_IMAGE_RESOURCE_KEY="flyover.frame.tether.image";
+	/**The base resource URI for the flyover tether image URI.*/
+	public final static URI TETHER_IMAGE_RESOURCE_URI=createURI(RESOURCE_SCHEME, "flyover.frame.tether.image");
 
 	/**The bearing of the tether in relation to the frame.*/
 	private BigDecimal tetherBearing=CompassPoint.NORTHWEST_BY_WEST.getBearing();
@@ -111,24 +116,16 @@ public abstract class AbstractFlyoverFrame<C extends FlyoverFrame<C>> extends Ab
 				firePropertyChange(TETHER_BEARING_PROPERTY, oldTetherBearingCompassPoints, newTetherBearingCompassPoints);
 			}
 		}
-		
-	/**The tether image URI, or <code>null</code> if there is no tether image URI.*/
-	private URI tetherImage=null;
 
-		/**Determines the URI of the tether image.
-		If an image is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
-		@return The tether image URI, or <code>null</code> if there is no tether image URI.
-		@exception MissingResourceException if there was an error loading the value from the resources.
-		@see #getTetherImageResourceKey()
-		*/
-		public URI getTetherImage() throws MissingResourceException
-		{
-			return getURI(tetherImage, getTetherImageResourceKey(), getTetherBearing());	//get the value or the resource, if available, taking the tether bearing into account
-		}
+	/**The tether image URI, which may be a resource URI, or <code>null</code> if there is no tether image URI.*/
+	private URI tetherImage=TETHER_IMAGE_RESOURCE_URI;
+
+		/**@return The tether image URI, which may be a resource URI, or <code>null</code> if there is no tether image URI.*/
+		public URI getTetherImage() {return tetherImage;}
 
 		/**Sets the URI of the tether image.
 		This is a bound property of type <code>URI</code>.
-		@param newTetherImage The new URI of the image.
+		@param newTetherImage The new URI of the image, which may be a resource URI.
 		@see FlyoverFrame#TETHER_IMAGE_PROPERTY
 		*/
 		public void setTetherImage(final URI newTetherImage)
@@ -139,27 +136,6 @@ public abstract class AbstractFlyoverFrame<C extends FlyoverFrame<C>> extends Ab
 				tetherImage=newTetherImage;	//actually change the value
 				firePropertyChange(TETHER_IMAGE_PROPERTY, oldTetherImage, newTetherImage);	//indicate that the value changed
 			}			
-		}
-
-	/**The tether image URI resource key, or <code>null</code> if there is no tether image URI resource specified.*/
-	private String tetherImageResourceKey=TETHER_IMAGE_RESOURCE_KEY;
-
-		/**@return The tether image URI resource key, or <code>null</code> if there is no tether image URI resource specified.*/
-		public String getTetherImageResourceKey() {return tetherImageResourceKey;}
-
-		/**Sets the key identifying the URI of the tether image in the resources.
-		This is a bound property.
-		@param newTetherImageResourceKey The new image URI resource key.
-		@see FlyoverFrame#TETHER_IMAGE_RESOURCE_KEY_PROPERTY
-		*/
-		public void setTetherImageResourceKey(final String newTetherImageResourceKey)
-		{
-			if(!ObjectUtilities.equals(tetherImageResourceKey, newTetherImageResourceKey))	//if the value is really changing
-			{
-				final String oldTetherImageResourceKey=tetherImageResourceKey;	//get the old value
-				tetherImageResourceKey=newTetherImageResourceKey;	//actually change the value
-				firePropertyChange(TETHER_IMAGE_RESOURCE_KEY_PROPERTY, oldTetherImageResourceKey, newTetherImageResourceKey);	//indicate that the value changed
-			}
 		}
 
 	/**Component constructor.

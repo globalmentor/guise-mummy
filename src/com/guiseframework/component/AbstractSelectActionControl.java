@@ -56,15 +56,15 @@ public abstract class AbstractSelectActionControl<C extends SelectActionControl<
 			}
 		}
 
-	/**The selected icon URI, or <code>null</code> if there is no selected icon URI.*/
+	/**The selected icon URI, which may be a resource URI, or <code>null</code> if there is no selected icon URI.*/
 	private URI selectedIcon=null;
 
-		/**@return The selected icon URI, or <code>null</code> if there is no selected icon URI.*/
+		/**@return The selected icon URI, which may be a resource URI, or <code>null</code> if there is no selected icon URI.*/
 		public URI getSelectedIcon() {return selectedIcon;}
 
 		/**Sets the URI of the selected icon.
 		This is a bound property of type <code>URI</code>.
-		@param newSelectedIcon The new URI of the selected icon.
+		@param newSelectedIcon The new URI of the selected icon, which may be a resource URI.
 		@see #SELECTED_ICON_PROPERTY
 		*/
 		public void setSelectedIcon(final URI newSelectedIcon)
@@ -75,27 +75,6 @@ public abstract class AbstractSelectActionControl<C extends SelectActionControl<
 				selectedIcon=newSelectedIcon;	//actually change the value
 				firePropertyChange(SELECTED_ICON_PROPERTY, oldSelectedIcon, newSelectedIcon);	//indicate that the value changed
 			}			
-		}
-
-	/**The selected icon URI resource key, or <code>null</code> if there is no selected icon URI resource specified.*/
-	private String selectedIconResourceKey=null;
-
-		/**@return The selected icon URI resource key, or <code>null</code> if there is no selected icon URI resource specified.*/
-		public String getSelectedIconResourceKey() {return selectedIconResourceKey;}
-
-		/**Sets the key identifying the URI of the selected icon in the resources.
-		This is a bound property.
-		@param newSelectedIconResourceKey The new selected icon URI resource key.
-		@see #SELECTED_ICON_RESOURCE_KEY_PROPERTY
-		*/
-		public void setSelectedIconResourceKey(final String newSelectedIconResourceKey)
-		{
-			if(!ObjectUtilities.equals(selectedIconResourceKey, newSelectedIconResourceKey))	//if the value is really changing
-			{
-				final String oldSelectedIconResourceKey=selectedIconResourceKey;	//get the old value
-				selectedIconResourceKey=newSelectedIconResourceKey;	//actually change the value
-				firePropertyChange(SELECTED_ICON_RESOURCE_KEY_PROPERTY, oldSelectedIconResourceKey, newSelectedIconResourceKey);	//indicate that the value changed
-			}
 		}
 
 	/**Whether this control acts as a toggle, switching its value between <code>true</code> and <code>false</code>, or whether the action always sets the value to <code>true</code>.*/
@@ -119,15 +98,15 @@ public abstract class AbstractSelectActionControl<C extends SelectActionControl<
 			}
 		}
 
-	/**The unselected icon URI, or <code>null</code> if there is no unselected icon URI.*/
+	/**The unselected icon URI, which may be a resource URI, or <code>null</code> if there is no unselected icon URI.*/
 	private URI unselectedIcon=null;
 
-		/**@return The unselected icon URI, or <code>null</code> if there is no unselected icon URI.*/
+		/**@return The unselected icon URI, which may be a resource URI, or <code>null</code> if there is no unselected icon URI.*/
 		public URI getUnselectedIcon() {return unselectedIcon;}
 
 		/**Sets the URI of the unselected icon.
 		This is a bound property of type <code>URI</code>.
-		@param newUnselectedIcon The new URI of the unselected icon.
+		@param newUnselectedIcon The new URI of the unselected icon, which may be a resource URI.
 		@see #UNSELECTED_ICON_PROPERTY
 		*/
 		public void setUnselectedIcon(final URI newUnselectedIcon)
@@ -138,27 +117,6 @@ public abstract class AbstractSelectActionControl<C extends SelectActionControl<
 				unselectedIcon=newUnselectedIcon;	//actually change the value
 				firePropertyChange(UNSELECTED_ICON_PROPERTY, oldUnselectedIcon, newUnselectedIcon);	//indicate that the value changed
 			}			
-		}
-
-	/**The unselected icon URI resource key, or <code>null</code> if there is no unselected icon URI resource specified.*/
-	private String unselectedIconResourceKey=null;
-
-		/**@return The unselected icon URI resource key, or <code>null</code> if there is no unselected icon URI resource specified.*/
-		public String getUnselectedIconResourceKey() {return unselectedIconResourceKey;}
-
-		/**Sets the key identifying the URI of the unselected icon in the resources.
-		This is a bound property.
-		@param newUnselectedIconResourceKey The new unselected icon URI resource key.
-		@see #UNSELECTED_ICON_RESOURCE_KEY_PROPERTY
-		*/
-		public void setUnselectedIconResourceKey(final String newUnselectedIconResourceKey)
-		{
-			if(!ObjectUtilities.equals(unselectedIconResourceKey, newUnselectedIconResourceKey))	//if the value is really changing
-			{
-				final String oldUnselectedIconResourceKey=unselectedIconResourceKey;	//get the old value
-				unselectedIconResourceKey=newUnselectedIconResourceKey;	//actually change the value
-				firePropertyChange(UNSELECTED_ICON_RESOURCE_KEY_PROPERTY, oldUnselectedIconResourceKey, newUnselectedIconResourceKey);	//indicate that the value changed
-			}
 		}
 
 	/**Label model, action model, and enableable object constructor.

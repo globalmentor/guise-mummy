@@ -225,10 +225,8 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 		/**Determines the text of the label.
 		This version returns a representation of the day of the week if no label is specified.
 		@return The label text, or <code>null</code> if there is no label text.
-		@exception MissingResourceException if there was an error loading the value from the resources.
-		@see #getLabelResourceKey()
 		*/
-		public String getLabel() throws MissingResourceException
+		public String getLabel()
 		{
 			String label=super.getLabel();	//get the specified label
 			if(label==null)	//if no label is specified

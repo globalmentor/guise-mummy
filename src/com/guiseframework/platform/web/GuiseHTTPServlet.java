@@ -24,6 +24,7 @@ import static com.garretwilson.io.ContentTypeUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.lang.ThreadUtilities.*;
 
+import com.garretwilson.net.URIConstants;
 import com.garretwilson.net.http.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 
@@ -1344,14 +1345,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 		if(queryString!=null && queryString.length()>0)	//if there is a query string (Tomcat 5.5.16 returns an empty string for no query, even though the Java Servlet specification 2.4 says that it should return null)
 		{
 //TODO del Debug.trace("just got query string from request, length", queryString.length(), "content", queryString);
-			final NameValuePair<String, String>[] parameters=getParameters(queryString);	//get the parameters from the query string
-			final Bookmark.Parameter[] bookmarkParameters=new Bookmark.Parameter[parameters.length];	//create a new array of bookmark parameters
-			for(int i=parameters.length-1; i>=0; --i)	//for each parameter
-			{
-				final NameValuePair<String, String> parameter=parameters[i];	//get a reference to this parameter
-				bookmarkParameters[i]=new Bookmark.Parameter(parameter.getName(), parameter.getValue());	//create a corresponding bookmark parameter
-			}
-			return new Bookmark(bookmarkParameters);	//create a new bookmark from the parameters
+			return new Bookmark(String.valueOf(QUERY_SEPARATOR)+queryString);	//construct a new bookmark, preceding the string with a query indicator
 		}
 		else	//if there is no query string, there is no bookmark
 		{
@@ -1359,7 +1353,6 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 			return null;	//indicate that there is no bookmark information
 		}
 	}	
-	
 	
 	/**Extracts the bookmark contained in the given request.
 	@param request The HTTP request object.

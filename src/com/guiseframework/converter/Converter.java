@@ -2,8 +2,6 @@ package com.guiseframework.converter;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
-import java.util.MissingResourceException;
-
 import com.garretwilson.beans.PropertyBindable;
 import com.guiseframework.GuiseSession;
 
@@ -11,41 +9,24 @@ import com.guiseframework.GuiseSession;
 @param <V> The value type this converter supports.
 @param <L> The literal type of the lexical form of the value.
 @author Garret Wilson
-@see GuiseResourceConstants#CONVERTER_INVALID_VALUE_MESSAGE_RESOURCE_KEY
+@see GuiseResourceConstants#CONVERTER_INVALID_VALUE_MESSAGE_RESOURCE_REFERENCE
 */
 public interface Converter<V, L> extends PropertyBindable
 {
 
 	/**The invalid value message bound property.*/
 	public final static String INVALID_VALUE_MESSAGE_PROPERTY=getPropertyName(Converter.class, "invalidValueMessage");
-	/**The invalid value message resource key bound property.*/
-	public final static String INVALID_VALUE_MESSAGE_RESOURCE_KEY_PROPERTY=getPropertyName(Converter.class, "invalidValueMessageResourceKey");
 
-	/**Determines the text of the invalid value message.
-	If a message is specified, it will be used; otherwise, a value will be loaded from the resources if possible.
-	@return The invalid value message text, or <code>null</code> if there is no invalid value message text.
-	@exception MissingResourceException if there was an error loading the value from the resources.
-	@see #getInvalidValueMessageResourceKey()
-	*/
-	public String getInvalidValueMessage() throws MissingResourceException;
+	/**@return The invalid value message text, which may include a resource reference.*/
+	public String getInvalidValueMessage();
 
 	/**Sets the text of the invalid value message.
 	This is a bound property.
-	@param newInvalidValueMessage The new text of the invalid value message.
-	@see Converter#INVALID_VALUE_MESSAGE_PROPERTY
+	@param newInvalidValueMessage The new text of the invalid value message, which may include a resource reference.
+	@exception NullPointerException if the given message is <code>null</code>.
+	@see #INVALID_VALUE_MESSAGE_PROPERTY
 	*/
 	public void setInvalidValueMessage(final String newInvalidValueMessage);
-
-	/**@return The invalid value message text resource key, or <code>null</code> if there is no invalid value message text resource specified.*/
-	public String getInvalidValueMessageResourceKey();
-
-	/**Sets the key identifying the text of the invalid value message in the resources.
-	This property defaults to {@link CONVERTER_INVALID_VALUE_MESSAGE_RESOURCE}.
-	This is a bound property.
-	@param newInvalidValueMessageResourceKey The new invalid value message text resource key.
-	@see #INVALID_VALUE_MESSAGE_RESOURCE_KEY_PROPERTY
-	*/
-	public void setInvalidValueMessageResourceKey(final String newInvalidValueMessageResourceKey);
 
 	/**@return The Guise session that owns this converter.*/
 	public GuiseSession getSession();

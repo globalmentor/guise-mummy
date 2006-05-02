@@ -30,8 +30,6 @@ public class Image extends AbstractComponent<Image>
 	public final static String IMAGE_PROPERTY=getPropertyName(Image.class, "image");
 	/**The image opacity bound property.*/
 	public final static String IMAGE_OPACITY_PROPERTY=getPropertyName(Image.class, "imageOpacity");
-	/**The image resource key bound property.*/
-	public final static String IMAGE_RESOURCE_KEY_PROPERTY=getPropertyName(Image.class, "imageResourceKey");
 
 	/**The default export strategy for this component type.*/
 	protected final static ExportStrategy<Image> DEFAULT_EXPORT_STRATEGY=new ExportStrategy<Image>()
@@ -72,15 +70,15 @@ public class Image extends AbstractComponent<Image>
 			}
 		}
 
-	/**The image URI, or <code>null</code> if there is no image URI.*/
+	/**The image URI, which may be a resource URI, or <code>null</code> if there is no image URI.*/
 	private URI image=null;
 
-		/**@return The image URI, or <code>null</code> if there is no image URI.*/
+		/**@return The image URI, which may be a resource URI, or <code>null</code> if there is no image URI.*/
 		public URI getImage() {return image;}
 
 		/**Sets the URI of the image.
 		This is a bound property of type <code>URI</code>.
-		@param newImage The new URI of the image.
+		@param newImage The new URI of the image, which may be a resource URI.
 		@see #IMAGE_PROPERTY
 		*/
 		public void setImage(final URI newImage)
@@ -91,27 +89,6 @@ public class Image extends AbstractComponent<Image>
 				image=newImage;	//actually change the value
 				firePropertyChange(IMAGE_PROPERTY, oldImage, newImage);	//indicate that the value changed
 			}			
-		}
-
-	/**The image URI resource key, or <code>null</code> if there is no image URI resource specified.*/
-	private String imageResourceKey=null;
-
-		/**@return The image URI resource key, or <code>null</code> if there is no image URI resource specified.*/
-		public String getImageResourceKey() {return imageResourceKey;}
-
-		/**Sets the key identifying the URI of the image in the resources.
-		This is a bound property.
-		@param newImageResourceKey The new image URI resource key.
-		@see #IMAGE_RESOURCE_KEY_PROPERTY
-		*/
-		public void setImageResourceKey(final String newImageResourceKey)
-		{
-			if(!ObjectUtilities.equals(imageResourceKey, newImageResourceKey))	//if the value is really changing
-			{
-				final String oldImageResourceKey=imageResourceKey;	//get the old value
-				imageResourceKey=newImageResourceKey;	//actually change the value
-				firePropertyChange(IMAGE_RESOURCE_KEY_PROPERTY, oldImageResourceKey, newImageResourceKey);	//indicate that the value changed
-			}
 		}
 
 	/**The opacity of the image in the range (0.0-1.0), with a default of 1.0.*/
@@ -200,11 +177,12 @@ public class Image extends AbstractComponent<Image>
 			if(match(contentType, TEXT, URI_LIST_SUBTYPE))	//if this is a text/uri-list type
 			{
 				final URI imageURI=image.getImage();	//get the image URI
-				return imageURI!=null ? createURIList(imageURI) : null;	//return the image URI, if there is one
+				return imageURI!=null ? createURIList(image.getSession().resolveURI(imageURI)) : null;	//return the image URI, if there is one
 			}
 			else if(contentType.match(image.getLabelContentType()))	//if the label has the content type requested
 			{
-				return image.getSession().determineString(image.getLabel(), image.getLabelResourceKey());	//return the label text
+				final String label=image.getLabel();	//get the image label, if any
+				return label!=null ? image.getSession().resolveString(image.getLabel()) : null;	//return the resolved label text, if any
 			}
 			else	//if we don't support this content type
 			{
