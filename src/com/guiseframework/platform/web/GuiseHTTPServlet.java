@@ -69,8 +69,12 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	public final static String NAVIGATION_INIT_PARAMETER_PREFIX="navigation.";
 	/**The parameter, "class", used to identify the navigation frame class in the web application's init parameters.*/
 	public final static String NAVIGATION_CLASS_PARAMETER="class";
+	/**The parameter, "style", used to identify the navigation style in the web application's init parameters.*/
+	public final static String NAVIGATION_STYLE_PARAMETER="style";
 	/**The init parameter, "style", used to specify the style definition URIs.*/
 	public final static String STYLE_INIT_PARAMETER="style";
+	/**The init parameter, "theme", used to specify the theme URIs*/
+	public final static String THEME_INIT_PARAMETER="theme";
 
 	/**The context parameter of the data base directory.*/
 	public final static String DATA_BASE_DIRECTORY_CONTEXT_PARAMETER="dataBaseDirectory";
@@ -250,18 +254,21 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 			guiseApplication.setStyle(URI.create(styleString));	//create a locale from the default locale string and store it in the application (trimming whitespace just to be extra helpful)
 		}
 
-			//initialize navigation path/panel bindings
+			//initialize destinations
 		final Enumeration initParameterNames=servletConfig.getInitParameterNames();	//get the names of all init parameters
 		while(initParameterNames.hasMoreElements())	//while there are more initialization parameters
 		{
 			final String initParameterName=(String)initParameterNames.nextElement();	//get the next initialization parameter name
 			if(initParameterName.startsWith(NAVIGATION_INIT_PARAMETER_PREFIX))	//if this is a path/panel binding
 			{
+				final String path;
+				final Class<? extends NavigationPanel> navigationPanelClass;
+				final URI styleURI;
 				final String initParameterValue=servletConfig.getInitParameter(initParameterName);	//get this init parameter value
 				try
 				{
 					final URI pathPanelBindingURI=new URI(initParameterValue);	//create a URI from the panel binding expression
-					final String path=pathPanelBindingURI.getRawPath();	//extract the path from the URI
+					path=pathPanelBindingURI.getRawPath();	//extract the path from the URI
 					if(path!=null)	//if a path was specified
 					{
 						final ListMap<String, String> parameterListMap=getParameterMap(pathPanelBindingURI);	//get the URI parameters
@@ -271,8 +278,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 							try
 							{
 								final Class<?> specifiedClass=Class.forName(className);	//load the class for the specified name
-								final Class<? extends NavigationPanel> navigationPanelClass=specifiedClass.asSubclass(NavigationPanel.class);	//cast the specified class to a navigation panel class just to make sure it's the correct type
-								guiseApplication.bindNavigationPanel(path, navigationPanelClass);	//cast the class to a panel class and bind it to the path in the Guise application
+								navigationPanelClass=specifiedClass.asSubclass(NavigationPanel.class);	//cast the specified class to a navigation panel class just to make sure it's the correct type
 							}
 							catch(final ClassNotFoundException classNotFoundException)
 							{
@@ -282,6 +288,22 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 						else	//if no class name was specified
 						{
 							throw new IllegalArgumentException("The initialization parameter path/panel binding "+pathPanelBindingURI+" for "+initParameterName+" did not specify a class name.");												
+						}
+						final String style=parameterListMap.getItem(NAVIGATION_STYLE_PARAMETER);	//get the styleparameter
+						if(style!=null)	//if a style was specified
+						{
+							try
+							{
+								styleURI=new URI(style);	//convert the style to a URI
+							}
+							catch(final URISyntaxException uriSyntaxException)	//if the style URI was not in the correct format
+							{
+								throw new IllegalArgumentException("Invalid style URI "+style+" for "+initParameterName, uriSyntaxException);
+							}
+						}
+						else	//if no style was specified
+						{
+							styleURI=null;	//show that there is no style
 						}
 					}
 					else	//if no path was specified
@@ -293,6 +315,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 				{
 					throw new IllegalArgumentException("Incorrect initialization parameter path/panel class binding URI "+initParameterValue+" for "+initParameterName, uriSyntaxException);
 				}
+				final Destination destination=new DefaultDestination(path, navigationPanelClass, styleURI);	//create a new destination
+				guiseApplication.setDestination(path, destination);	//set the destination for this path				
 			}
 		}
 		return guiseApplication;	//return the created Guise application
@@ -459,9 +483,10 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
 		final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
-		if(guiseSession.hasNavigationPanel(navigationPath))	//if we have a panel bound to the requested path
+		final Destination destination=guiseApplication.getDestination(navigationPath);	//get the destination, if any, associated with the requested path
+		if(destination!=null)	//if we have a destination associated with the requested path
 		{
-			final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, request, response);	//create a new Guise context
+			final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, destination, request, response);	//create a new Guise context
 			synchronized(guiseSession)	//don't allow other session contexts to be active at the same time
 			{
 					
@@ -1176,7 +1201,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
   protected boolean exists(final URI resourceURI) throws IOException
   {
   	final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-  	if(guiseApplication.hasNavigationPath(guiseApplication.relativizeURI(resourceURI)))	//if the URI represents a valid navigation path
+  	if(guiseApplication.hasDestination(guiseApplication.relativizeURI(resourceURI)))	//if the URI represents a valid navigation path
   	{
   		return true;	//the navigation path exists
   	}

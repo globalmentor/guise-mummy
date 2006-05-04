@@ -30,6 +30,7 @@ import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.event.*;
 import com.guiseframework.model.Notification;
+import com.guiseframework.theme.Theme;
 
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -568,6 +569,28 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			}
 		}
 
+	/**The current session theme.*/
+	private Theme theme=new Theme();	//create a default theme URI
+
+		/**@return The current session theme.*/
+		public Theme getTheme() {return theme;}
+
+		/**Sets the current session theme.
+		This is a bound property.
+		@param newTheme The new session theme.
+		@exception NullPointerException if the given theme is <code>null</code>.
+		@see #THEME_PROPERTY
+		*/
+		public void setTheme(final Theme newTheme)
+		{
+			if(!ObjectUtilities.equals(theme, newTheme))	//if the value is really changing
+			{
+				final Theme oldTheme=theme;	//get the old value
+				theme=checkInstance(newTheme, "Guise session theme cannot be null.");	//actually change the value
+				firePropertyChange(THEME_PROPERTY, oldTheme, newTheme);	//indicate that the value changed
+			}
+		}
+
 	/**Guise application constructor.
 	The session local will initially be set to the locale of the associated Guise application.
 	No operation must be performed inside the constructor that would require the presence of the Guise session within this thread group.
@@ -596,6 +619,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@exception NullPointerException if the path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
+/*TODO del if not needed
 	public boolean hasNavigationPanel(final String path)
 	{
 		if(isAbsolutePath(checkInstance(path, "Path cannot be null")))	//if the path is absolute
@@ -612,6 +636,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		}
 		return getApplication().getNavigationPanelClass(path)!=null;	//see if we know the class to use for creating an application panel at this path
 	}
+*/
 
 	/**Retrieves the panel bound to the given appplication context-relative path.
 	If a panel has already been created and cached, it will be be returned; otherwise, one will be created and cached. 
@@ -635,11 +660,11 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			panel=navigationPathPanelMap.get(path);	//get cached panel, if any
 			if(panel==null)	//if no panel is cached
 			{
-				final Class<? extends NavigationPanel> panelClass=getApplication().getNavigationPanelClass(path);	//see which panel we should show for this path
-				if(panelClass!=null)	//if we found a panel class for this path
+				final Destination destination=getApplication().getDestination(path);	//get the destination for this path
+				if(destination!=null)	//if we found a destination for this path
 				{
 //TODO del					final String panelID=XMLUtilities.createName(path);	//convert the path to a valid ID TODO use a Guise-specific routine or, better yet, bind an ID with the panel
-					panel=createNavigationPanel(panelClass);	//create the panel
+					panel=createNavigationPanel(destination.getNavigationPanelClass());	//create the panel
 					navigationPathPanelMap.put(path, panel);	//bind the panel to the path, caching it for next time
 				}
 			}
@@ -963,7 +988,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@param navigationPath The navigation path relative to the application context path.
 		@exception NullPointerException if the given navigation path is <code>null</code>.		
 		@exception IllegalArgumentException if the provided path is absolute.
-		@exception IllegalArgumentException if the navigation path is not recognized (e.g. there is no panel bound to the navigation path).
+		@exception IllegalArgumentException if the navigation path is not recognized (e.g. there is no destination associated with the navigation path).
 		@see #navigate(String)
 		@see #navigate(URI)
 		@see #navigateModal(String, ModalNavigationListener)
@@ -973,7 +998,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		{
 			if(!ObjectUtilities.equals(this.navigationPath, checkInstance(navigationPath, "Navigation path cannot be null.")))	//if the navigation path is really changing
 			{
-				if(getApplication().getNavigationPanelClass(navigationPath)==null)	//if no panel is bound to the given navigation path
+				if(!getApplication().hasDestination(navigationPath))	//if no destination is associated with the given navigation path
 				{
 					throw new IllegalArgumentException("Unknown navigation path: "+navigationPath);
 				}

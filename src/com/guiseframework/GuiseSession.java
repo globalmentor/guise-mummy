@@ -32,6 +32,8 @@ public interface GuiseSession extends PropertyBindable
 	public final static String ORIENTATION_PROPERTY=getPropertyName(GuiseSession.class, "orientation");
 	/**The principal (e.g. user) bound property.*/
 	public final static String PRINCIPAL_PROPERTY=getPropertyName(GuiseSession.class, "principal");
+	/**The theme bound property.*/
+	public final static String THEME_PROPERTY=getPropertyName(GuiseSession.class, "theme");
 
 	/**@return The Guise application to which this session belongs.*/
 	public GuiseApplication getApplication();
@@ -302,7 +304,7 @@ public interface GuiseSession extends PropertyBindable
 	@exception NullPointerException if the path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public boolean hasNavigationPanel(final String path);
+//TODO del if not needed	public boolean hasNavigationPanel(final String path);
 	
 	/**Retrieves the panel bound to the given appplication context-relative path.
 	If a panel has already been created and cached, it will be be returned; otherwise, one will be created and cached. 
@@ -359,9 +361,9 @@ public interface GuiseSession extends PropertyBindable
 	This method does not actually cause navigation to occur.
 	If the given navigation path is the same as the current navigation path, no action occurs.
 	@param navigationPath The navigation path relative to the application context path.
-		@exception NullPointerException if the given navigation path is <code>null</code>.		
+	@exception NullPointerException if the given navigation path is <code>null</code>.		
 	@exception IllegalArgumentException if the provided path is absolute.
-	@exception IllegalArgumentException if the navigation path is not recognized (e.g. there is no panel bound to the navigation path).
+	@exception IllegalArgumentException if the navigation path is not recognized (e.g. there is no destination associated with the navigation path).
 	@see #navigate(String)
 	@see #navigate(URI)
 	@see #navigateModal(String, ModalNavigationListener)

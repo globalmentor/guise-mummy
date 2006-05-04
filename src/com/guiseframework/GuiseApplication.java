@@ -20,7 +20,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 public interface GuiseApplication extends PropertyBindable
 {
 
-	/**The locale bound property.*/
+	/**The default locale bound property.*/
 	public final static String DEFAULT_LOCALE_PROPERTY=getPropertyName(GuiseApplication.class, "defaultLocale");
 	/**The resource bundle base name bound property.*/
 	public final static String RESOURCE_BUNDLE_BASE_NAME_PROPERTY=getPropertyName(GuiseApplication.class, "resourceBundleBaseName");
@@ -91,30 +91,30 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public <C extends Component<?>> View<? extends GuiseContext, ? super C> getView(final C component);
 
-	/**Binds a panel type to a particular application context-relative path.
-	Any existing binding for the given context-relative path is replaced.
-	@param path The appplication context-relative path to which the panel should be bound.
-	@param panelClass The class of panel to render for this particular appplication context-relative path.
-	@return The panel previously bound to the given appplication context-relative path, or <code>null</code> if no panel was previously bound to the path.
-	@exception NullPointerException if the path and/or the panel is <code>null</code>.
+	/**Associates a destination with a particular application context-relative path.
+	Any existing desintation for the given context-relative path is replaced.
+	@param path The appplication context-relative path to which the destination should be associated.
+	@param destination The description of the destination at the appplication context-relative path.
+	@return The destination previously assiciated with the given appplication context-relative path, or <code>null</code> if no destination was previously associated with the path.
+	@exception NullPointerException if the path and/or the destination is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public Class<? extends NavigationPanel> bindNavigationPanel(final String path, final Class<? extends NavigationPanel> panelClass);
+	public Destination setDestination(final String path, final Destination destination);
 
-	/**Determines the class of panel bound to the given application context-relative path.
-	@param path The address for which a panel should be retrieved.
-	@return The type of panel bound to the given path, or <code>null</code> if no panel is bound to the path. 
+	/**Determines the destination associated with the given application context-relative path.
+	@param path The address for which a destination should be retrieved.
+	@return The destination associated with the given path, or <code>null</code> if no destination is associated with the path. 
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public Class<? extends NavigationPanel> getNavigationPanelClass(final String path);
+	public Destination getDestination(final String path);
 
-	/**Determines if there is a panel class bound to the given appplication context-relative path.
-	@param path The appplication context-relative path within the Guise container context.
-	@return <code>true</code> if there is a panel bound to the given path, or <code>false</code> if no panel is bound to the given path.
+	/**Determines if there is a destination associated with the given appplication context-relative path.
+	@param path The appplication context-relative path.
+	@return <code>true</code> if there is destination associated with the given path, or <code>false</code> if no destination is associated with the given path.
 	@exception NullPointerException if the path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public boolean hasNavigationPath(final String path);
+	public boolean hasDestination(final String path);
 
 	/**@return The Guise container into which this application is installed, or <code>null</code> if the application is not yet installed.*/
 	public GuiseContainer getContainer();

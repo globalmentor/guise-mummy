@@ -20,6 +20,7 @@ import com.garretwilson.text.xml.xpath.XPath;
 
 import static com.garretwilson.text.CharacterEncodingConstants.*;
 import com.garretwilson.util.*;
+import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.context.text.xml.AbstractXMLGuiseContext;
@@ -66,13 +67,14 @@ public class HTTPServletGuiseContext extends AbstractXMLGuiseContext
 
 	/**Constructor.
 	@param session The Guise user session of which this context is a part.
+	@param destination The destination with which this context is associated.
 	@param request The HTTP servlet request.
 	@param response The HTTP servlet response.
-	@exception NullPointerException if the session, request or response is <code>null</code>.
+	@exception NullPointerException if the session, destination, request or response is <code>null</code>.
 	*/
-	public HTTPServletGuiseContext(final GuiseSession session, final HttpServletRequest request, final HttpServletResponse response)
+	public HTTPServletGuiseContext(final GuiseSession session, final Destination destination, final HttpServletRequest request, final HttpServletResponse response)
 	{
-		super(session);	//construct the parent class
+		super(session, destination);	//construct the parent class
 		this.request=checkInstance(request, "Request cannot be null.");
 		this.response=checkInstance(response, "Response cannot be null.");
 //TODO decide if we want this to include parameters or not		this.navigationURI=URI.create(request.getRequestURL().toString());	//create the absolute navigation URI from the HTTP requested URL

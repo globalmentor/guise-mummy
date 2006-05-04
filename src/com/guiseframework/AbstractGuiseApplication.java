@@ -22,6 +22,7 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.kit.ComponentKit;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.controller.*;
+import com.guiseframework.theme.Theme;
 import com.guiseframework.view.View;
 
 /**An abstract base class for a Guise application.
@@ -461,56 +462,60 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	}
 
 
-//TODO how do we keep the general public from changing the frame bindings?
+//TODO how do we keep the general public from changing the past/destination bindings?
 
-	/**The synchronized map binding panel types to appplication context-relative absolute paths.*/
-	private final Map<String, Class<? extends NavigationPanel>> navigationPathPanelBindingMap=synchronizedMap(new HashMap<String, Class<? extends NavigationPanel>>());
+	
+	
+	
+	/**The thread-safe map of destinations associated with application context-relative paths.*/
+	private final Map<String, Destination> pathDestinationMap=synchronizedMap(new HashMap<String, Destination>());
 
-		/**Binds a panel type to a particular application context-relative path.
-		Any existing binding for the given context-relative path is replaced.
-		@param path The appplication context-relative path to which the panel should be bound.
-		@param panelClass The class of panel to render for this particular appplication context-relative path.
-		@return The panel previously bound to the given appplication context-relative path, or <code>null</code> if no panel was previously bound to the path.
-		@exception NullPointerException if the path and/or the panel is <code>null</code>.
+		/**Associates a destination with a particular application context-relative path.
+		Any existing desintation for the given context-relative path is replaced.
+		@param path The appplication context-relative path to which the destination should be associated.
+		@param destination The description of the destination at the appplication context-relative path.
+		@return The destination previously assiciated with the given appplication context-relative path, or <code>null</code> if no destination was previously associated with the path.
+		@exception NullPointerException if the path and/or the destination is <code>null</code>.
 		@exception IllegalArgumentException if the provided path is absolute.
 		*/
-		public Class<? extends NavigationPanel> bindNavigationPanel(final String path, final Class<? extends NavigationPanel> panelClass)
+		public Destination setDestination(final String path, final Destination destination)
+		{
+			checkInstance(path, "Path cannot be null.");
+			if(isAbsolutePath(path))	//if the path is absolute
+			{
+				throw new IllegalArgumentException("Path cannot be absolute: "+path);
+			}
+			return pathDestinationMap.put(path, checkInstance(destination, "Destination cannot be null."));	//store the association
+		}
+	
+		/**Determines the destination associated with the given application context-relative path.
+		@param path The address for which a destination should be retrieved.
+		@return The destination associated with the given path, or <code>null</code> if no destination is associated with the path. 
+		@exception IllegalArgumentException if the provided path is absolute.
+		*/
+		public Destination getDestination(final String path)
 		{
 			if(isAbsolutePath(path))	//if the path is absolute
 			{
-				throw new IllegalArgumentException("Bound navigation path cannot be absolute: "+path);
+				throw new IllegalArgumentException("Path cannot be absolute: "+path);
 			}
-			return navigationPathPanelBindingMap.put(checkInstance(path, "Path cannot be null."), checkInstance(panelClass, "Type cannot be null."));	//store the binding
+			return pathDestinationMap.get(path);	//return the associated destination, if any
 		}
-
-		/**Determines the class of panel bound to the given application context-relative path.
-		@param path The address for which a panel should be retrieved.
-		@return The type of panel bound to the given path, or <code>null</code> if no panel is bound to the path. 
-		@exception IllegalArgumentException if the provided path is absolute.
-		*/
-		public Class<? extends NavigationPanel> getNavigationPanelClass(final String path)
-		{
-			if(isAbsolutePath(path))	//if the path is absolute
-			{
-				throw new IllegalArgumentException("Bound navigation path cannot be absolute: "+path);
-			}
-			return navigationPathPanelBindingMap.get(path);	//return the bound panel type, if any
-		}
-
-		/**Determines if there is a panel class bound to the given appplication context-relative path.
-		@param path The appplication context-relative path within the Guise container context.
-		@return <code>true</code> if there is a panel bound to the given path, or <code>false</code> if no panel is bound to the given path.
+	
+		/**Determines if there is a destination associated with the given appplication context-relative path.
+		@param path The appplication context-relative path.
+		@return <code>true</code> if there is destination associated with the given path, or <code>false</code> if no destination is associated with the given path.
 		@exception NullPointerException if the path is <code>null</code>.
 		@exception IllegalArgumentException if the provided path is absolute.
 		*/
-		public boolean hasNavigationPath(final String path)
+		public boolean hasDestination(final String path)
 		{
 			if(isAbsolutePath(path))	//if the path is absolute
 			{
-				throw new IllegalArgumentException("Navigation path cannot be absolute: "+path);
+				throw new IllegalArgumentException("Path cannot be absolute: "+path);
 			}
-			return getNavigationPanelClass(path)!=null;	//see if there is a panel class bound to this navigation path
-		}
+			return getDestination(path)!=null;	//see if there is a destination associated with this navigation path
+		}	
 
 	/**Resolves a relative or absolute path against the application base path.
 	Relative paths will be resolved relative to the application base path. Absolute paths will be be considered already resolved.
