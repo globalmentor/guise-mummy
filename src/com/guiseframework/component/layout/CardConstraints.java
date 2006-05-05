@@ -70,6 +70,7 @@ public class CardConstraints extends ControlConstraints implements LabelModel, D
 		super(enabled);	//construct the parent class 
 		this.labelModel=checkInstance(labelModel, "Label model cannot be null.");	//save the label model
 		this.labelModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the label model
+		this.labelModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the label model
 	}
 
 		//LabelModel delegations

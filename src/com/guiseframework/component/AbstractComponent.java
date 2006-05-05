@@ -499,7 +499,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		*/ 
 		protected void updateValid()
 		{
-			if(valid!=null || hasListeners(VALID_PROPERTY))	//if valid is initialized or there is a listener for the valid property
+			if(valid!=null || hasPropertyChangeListeners(VALID_PROPERTY))	//if valid is initialized or there is a listener for the valid property
 			{
 /*TODO del
 if(valid==null)
@@ -1013,6 +1013,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		this.id=getSession().generateID();	//ask the session to generate a new ID
 		this.labelModel=checkInstance(labelModel, "Label model cannot be null.");	//save the label model
 		this.labelModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the label model
+		this.labelModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the label model
 		controller=getSession().getApplication().getController(getThis());	//ask the application for a controller
 		if(controller==null)	//if we couldn't find a controller
 		{

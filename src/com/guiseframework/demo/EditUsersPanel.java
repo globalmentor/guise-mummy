@@ -1,5 +1,6 @@
 package com.guiseframework.demo;
 
+import java.beans.PropertyVetoException;
 import java.util.*;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
@@ -72,9 +73,8 @@ public class EditUsersPanel extends DefaultNavigationPanel
 											{
 												userListControl.setSelectedValues(newUser);	//select the new user
 											}
-											catch(final ValidationException validationException)	//we never expect a validation exception
+											catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
 											{
-												throw new AssertionError(validationException);
 											}
 										}
 									}
@@ -112,9 +112,8 @@ public class EditUsersPanel extends DefaultNavigationPanel
 												{
 													userListControl.setSelectedValues(newUser);	//select the edited user
 												}
-												catch(final ValidationException validationException)	//we never expect a validation exception
+												catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
 												{
-													throw new AssertionError(validationException);
 												}
 											}											
 										}

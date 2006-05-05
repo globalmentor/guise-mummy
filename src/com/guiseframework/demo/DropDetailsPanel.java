@@ -1,5 +1,6 @@
 package com.guiseframework.demo;
 
+import java.beans.PropertyVetoException;
 import java.net.URI;
 
 import javax.mail.internet.ContentType;
@@ -7,7 +8,6 @@ import javax.mail.internet.ContentType;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.component.transfer.*;
-import com.guiseframework.validator.ValidationException;
 
 /**Drop Details Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
@@ -99,9 +99,8 @@ public class DropDetailsPanel extends DefaultNavigationPanel
 						{
 							component.setValue(newContent.toString());	//update the text area contents
 						}
-						catch(final ValidationException validationException)	//we don't have a validator installed, so we don't expect validation exceptions
+						catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
 						{
-							throw new AssertionError(validationException);
 						}
 						return true;	//indicate that we imported the information
 					}

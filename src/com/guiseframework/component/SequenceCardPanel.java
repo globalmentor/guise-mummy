@@ -2,10 +2,12 @@ package com.guiseframework.component;
 
 import static com.guiseframework.GuiseResourceConstants.*;
 
+import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.List;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.AbstractGenericVetoableChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.Bookmark;
 import com.guiseframework.component.layout.*;
@@ -68,7 +70,8 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 						goNext();	//go to the previous card
 					};
 				});
-		setValidator(new SequenceCardValidator());	//TODO comment
+//TODO del		setValidator(new SequenceCardValidator());	//TODO comment
+		addVetoableChangeListener(VALUE_PROPERTY, new SequenceCardVetoableChangeListener());	//do validation as needed on card changes
 		addPropertyChangeListener(VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Component<?>>()
 				{
 					public void propertyChange(final GenericPropertyChangeEvent<Component<?>> propertyChangeEvent)	//if the selected card changes
@@ -267,13 +270,18 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 					//TODO improve; inform user
 				}				
 			}
-			catch(final ValidationException validationException)
+			catch(final PropertyVetoException propertyVetoException)
 			{
-//				throw new AssertionError(validationException);	//TODO improve
+//TODO fix				throw new AssertionError(validationException);	//TODO improve
 			}
 		}
 	}
 
+	/**Flag to indicate that the card is changing locally and has already been validated.
+	Prevents double validation by the vetoable change listener.
+	*/
+	private boolean alreadyValidated=false;
+	
 	/**Advances to the next step in the sequence.
 	If the current card passes validation, the next card is enabled before advancing.
 	If there is no next step, no action occurs.
@@ -289,27 +297,49 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 //TODO del Debug.trace("ready to validate selected card");
 			if(validate())	//validate this panel; if everything, including the selected card, is valid
 			{
-				try
-				{
-					commit();	//commit this panel
-					final Constraints nextCardConstraints=nextCard.getConstraints();	//get the next card's constraints
-					if(nextCardConstraints instanceof Enableable)	//if the next card constraints is enableable
-					{
-						((Enableable)nextCardConstraints).setEnabled(true);	//enable the next card constraints
-					}
-					try
-					{
-						setValue(nextCard);	//select the next card
-					}
-					catch(final ValidationException validationException)
-					{
-	//					throw new AssertionError(validationException);	//TODO improve
-					}
-				}
-				catch(final IOException ioException)	//if there is a problem commiting the result
-				{
-					getSession().notify(new Notification(ioException));	//notify the user
-				}
+					//show any notifications, anyway
+				final List<Notification> notifications=getNotifications(selectedCard);	//get the notifications from the card
+				final Runnable notifyCommitAdvance=new Runnable()	//create code for notifying, committing the card and advancing to the next card
+						{
+							/**Keep track of which notification we're on.*/
+							private int notificationIndex=0;
+							public void run()
+							{
+								if(notificationIndex<notifications.size())	//if there are more notifications
+								{
+									getSession().notify(notifications.get(notificationIndex++), this);	//notify of the current notification (advancing to the next one), specifying that this runnable should be called again
+								}
+								else	//if we are out of notifications
+								{
+									try
+									{
+										commit();	//commit this panel
+										final Constraints nextCardConstraints=nextCard.getConstraints();	//get the next card's constraints
+										if(nextCardConstraints instanceof Enableable)	//if the next card constraints is enableable
+										{
+											((Enableable)nextCardConstraints).setEnabled(true);	//enable the next card constraints
+										}
+										alreadyValidated=true;	//show that we've already validated the panel
+										try
+										{
+											setValue(nextCard);	//select the next card
+										}
+										catch(final PropertyVetoException propertyVetoException)	//if the change is vetoed, don't do anything special
+										{
+										}
+										finally
+										{
+											alreadyValidated=false;	//always unset our already validated flag
+										}
+									}
+									catch(final IOException ioException)	//if there is a problem commiting the result
+									{
+										getSession().notify(new Notification(ioException));	//notify the user
+									}
+								}
+							}
+						};
+				notifyCommitAdvance.run();	//run the notify/commit/advance runnable for as many notifications as there are
 			}
 		}
 	}
@@ -324,9 +354,9 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 			{
 				setSelectedIndexes(0);	//browse to the first index
 			}
-			catch(final ValidationException validationException)
+			catch(final PropertyVetoException propertyVetoException)
 			{
-				throw new AssertionError(validationException);	//TODO improve
+//TODO fix				throw new AssertionError(validationException);	//TODO improve
 			}
 			final Component<?> selectedCard=getValue();	//get the selected card
 			for(final Component<?> card:this)	//for each card
@@ -476,4 +506,42 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 		}
 	}
 
+
+	/**A vetoable property change listener validates cards before changing to new cards.
+	@author Garret Wilson
+	*/
+	protected class SequenceCardVetoableChangeListener extends AbstractGenericVetoableChangeListener<Component<?>>
+	{
+
+		/**Called when a constrained property is changed.
+		@param genericPropertyChangeEvent An event object describing the event source, the property that is changing, and its old and new values.
+		@exception PropertyVetoException if the recipient wishes the property change to be rolled back.
+		*/
+		public void vetoableChange(final GenericPropertyChangeEvent<Component<?>> genericPropertyChangeEvent) throws PropertyVetoException
+		{
+			if(!alreadyValidated)	//if we haven't already validated the card before this change
+			{
+				final Component<?> currentCard=genericPropertyChangeEvent.getOldValue();	//get the currently selected card
+				if(currentCard!=null)	//if there is a selected card, do validation if we need to
+				{
+					final int selectedIndex=indexOf(currentCard);	//get the index of the selected card
+					assert selectedIndex>=0 : "Expected selected card to be present in the container.";
+					final int newIndex=indexOf(genericPropertyChangeEvent.getNewValue());	//see what index the proposed new value has
+	/*TODO del
+					if(newIndex<0)	//if the new value isn't in the container TODO maybe put this in a default card panel validator
+					{
+						return false;	//we can't select a card not in the container
+					}
+	*/
+					if(newIndex>selectedIndex)	//if we're advancing forward in the sequence
+					{
+						if(!SequenceCardPanel.this.validate())	//validate the panel; if anything, including the currently selected card, doesn't validate
+						{
+							throw new PropertyVetoException(VALIDATION_FALSE_MESSAGE_RESOURCE_REFERENCE, genericPropertyChangeEvent);	//indicate that the old card didn't validate and the value shouldn't be changed
+						}									
+					}
+				}
+			}
+		}
+	}
 }

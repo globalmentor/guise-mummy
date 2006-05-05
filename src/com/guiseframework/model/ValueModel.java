@@ -2,6 +2,8 @@ package com.guiseframework.model;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
+import java.beans.PropertyVetoException;
+
 import com.guiseframework.validator.*;
 
 /**A model for user input of a value.
@@ -32,16 +34,17 @@ public interface ValueModel<V> extends Model
 	/**@return The input value, or <code>null</code> if there is no input value.*/
 	public V getValue();
 
-	/**Sets the input value.
+	/**Sets the new value.
 	This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method.
 	If a validator is installed, the value will first be validated before the current value is changed.
 	Validation always occurs if a validator is installed, even if the value is not changing.
-	@param newValue The input value of the model.
-	@exception ValidationException if the provided value is not valid.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
+	@param newValue The new value.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see #getValidator()
 	@see #VALUE_PROPERTY
 	*/
-	public void setValue(final V newValue) throws ValidationException;
+	public void setValue(final V newValue) throws PropertyVetoException;
 
 	/**Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators.
 	No validation occurs.

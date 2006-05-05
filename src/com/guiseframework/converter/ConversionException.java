@@ -1,12 +1,9 @@
 package com.guiseframework.converter;
 
-import com.guiseframework.component.Component;
-import com.guiseframework.component.ComponentException;
-
-/**Base exception class for all conversion errors.
+/**Exception representing a conversion error.
 @author Garret Wilson
 */
-public class ConversionException extends ComponentException
+public class ConversionException extends Exception
 {
 
 	/**The value being converted, which may be of any type, or <code>null</code> if the value being converted is not available.*/
@@ -20,16 +17,7 @@ public class ConversionException extends ComponentException
 	*/
 	public ConversionException()
 	{
-		this((Component<?>)null);	//construct the class with no component
-	}
-
-	/**Constructs a new exception with the given component and <code>null</code> as its detail message.
-	The cause is not initialized, and may subsequently be initialized by a call to {@link Throwable#initCause(java.lang.Throwable)}.
-	@param component The component for which validation failed, or <code>null</code> if the component is not known.
-	*/
-	public ConversionException(final Component<?> component)
-	{
-		this(component, (String)null);	//construct the class with no message
+		this((String)null);	//construct the class with no message
 	}
 
 	/**Constructs a new exception with the specified detail message.
@@ -41,16 +29,6 @@ public class ConversionException extends ComponentException
 		this(message, null);	//construct the class with the message and no value
 	}
 
-	/**Constructs a new exception with the specified component and detail message.
-	The cause is not initialized, and may subsequently be initialized by a call to {@link Throwable#initCause(java.lang.Throwable)}.
-	@param component The component for which validation failed, or <code>null</code> if the component is not known.
-	@param message The detail message. The detail message is saved for later retrieval by the {@link #getMessage()} method.
-	*/
-	public ConversionException(final Component<?> component, final String message)
-	{
-		this(component, message, null);	//construct the class with the message and no value
-	}
-
 	/**Constructs a new exception with the specified detail message and value object.
 	The cause is not initialized, and may subsequently be initialized by a call to {@link Throwable#initCause(java.lang.Throwable)}.
 	@param message The detail message. The detail message is saved for later retrieval by the {@link #getMessage()} method.
@@ -58,18 +36,15 @@ public class ConversionException extends ComponentException
 	*/
 	public ConversionException(final String message, final Object value)
 	{
-		this(null, message, value);	//construct the class without a component
+		this(message, null, value);	//construct the class with no cause
 	}
 
-	/**Constructs a new exception with the specified component, detail message, and value object.
-	The cause is not initialized, and may subsequently be initialized by a call to {@link Throwable#initCause(java.lang.Throwable)}.
-	@param component The component for which validation failed, or <code>null</code> if the component is not known.
-	@param message The detail message. The detail message is saved for later retrieval by the {@link #getMessage()} method.
-	@param value The value being converted, which may be of any type, or <code>null</code> if the value being converted is not available.
+	/**Constructs a new exception with the specified cause and a detail message of <code>(cause==null ? null : cause.toString())</code>.
+	@param cause The cause (which is saved for later retrieval by the {@link #getCause()} method), or <code>null</code> if the cause is nonexistent or unknown.
 	*/
-	public ConversionException(final Component<?> component, final String message, final Object value)
+	public ConversionException(final Throwable cause)
 	{
-		this(component, message, null, value);	//construct the class with no cause
+		this(cause!=null ? cause.toString() : null, cause);	//construct the class with a cause message, if possible
 	}
 
 	/**Constructs a new exception with the specified detail message and cause.
@@ -78,46 +53,18 @@ public class ConversionException extends ComponentException
 	*/
 	public ConversionException(final String message, final Throwable cause)
 	{
-		this(null, message, cause);	//construct the class without a component
+		this(message, cause, null);	//construct the class, indicating that no value is available
 	}
 
-	/**Constructs a new exception with the specified component, detail message, and cause.
-	@param component The component for which validation failed, or <code>null</code> if the component is not known.
-	@param message The detail message (which is saved for later retrieval by the {@link #getMessage()} method).
-	@param cause The cause (which is saved for later retrieval by the {@link #getCause()} method), or <code>null</code> if the cause is nonexistent or unknown.
-	*/
-	public ConversionException(final Component<?> component, final String message, final Throwable cause)
-	{
-		this(component, message, cause, null);	//construct the class, indicating that no value is available
-	}
-
-	/**Constructs a new exception with the specified component, detail message, cause, and value object.
-	@param component The component for which validation failed, or <code>null</code> if the component is not known.
+	/**Constructs a new exception with the specified detail message, cause, and value object.
 	@param message The detail message (which is saved for later retrieval by the {@link #getMessage()} method).
 	@param cause The cause (which is saved for later retrieval by the {@link #getCause()} method), or <code>null</code> if the cause is nonexistent or unknown.
 	@param value The value being converted, which may be of any type, or <code>null</code> if the value being converted is not available.
 	*/
-	public ConversionException(final Component<?> component, final String message, final Throwable cause, final Object value)
+	public ConversionException(final String message, final Throwable cause, final Object value)
 	{
-		super(component, message, cause);	//construct the parent class
+		super(message, cause);	//construct the parent class with the message and cause
 		this.value=value;	//save the value
-	}
-
-	/**Constructs a new exception with the specified cause and a detail message of <code>(cause==null ? null : cause.toString())</code>.
-	@param cause The cause (which is saved for later retrieval by the {@link #getCause()} method), or <code>null</code> if the cause is nonexistent or unknown.
-	*/
-	public ConversionException(final Throwable cause)
-	{
-		this((Component<?>)null, cause);	//construct the class without a component
-	}
-
-	/**Constructs a new exception with a component, the specified cause, and a detail message of <code>(cause==null ? null : cause.toString())</code>.
-	@param component The component for which validation failed, or <code>null</code> if the component is not known.
-	@param cause The cause (which is saved for later retrieval by the {@link #getCause()} method), or <code>null</code> if the cause is nonexistent or unknown.
-	*/
-	public ConversionException(final Component<?> component, final Throwable cause)
-	{
-		this(component, cause!=null ? cause.toString() : null, cause);	//construct the class with a cause message, if possible
 	}
 
 }

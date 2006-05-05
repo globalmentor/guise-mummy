@@ -1,5 +1,6 @@
 package com.guiseframework.component;
 
+import java.beans.PropertyVetoException;
 import java.util.*;
 
 import com.guiseframework.converter.*;
@@ -86,7 +87,8 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 	{
 		this.valueRepresentationStrategy=checkInstance(valueRepresentationStrategy, "Value representation strategy cannot be null.");
 		this.listSelectModel=checkInstance(listSelectModel, "List select model cannot be null.");	//save the list select model
-		this.listSelectModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the value model
+		this.listSelectModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the list select model
+		this.listSelectModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the list select model
 		this.listSelectModel.addListListener(new ListListener<V>()	//install a repeater list listener to listen to the decorated model
 				{
 					public void listModified(final ListEvent<V> listEvent)	//if the list is modified
@@ -170,12 +172,13 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 	This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method.
 	If a validator is installed, the value will first be validated before the current value is changed.
 	Validation always occurs if a validator is installed, even if the value is not changing.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param newValue The input value of the model.
-	@exception ValidationException if the provided value is not valid.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see #getValidator()
 	@see #VALUE_PROPERTY
 	*/
-	public void setValue(final V newValue) throws ValidationException {getListSelectModel().setValue(newValue);}
+	public void setValue(final V newValue) throws PropertyVetoException {getListSelectModel().setValue(newValue);}
 
 	/**Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators.
 	No validation occurs.
@@ -238,11 +241,12 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 	/**Sets the selected values.
 	If a value occurs more than one time in the model, all occurrences of the value will be selected.
 	Values that do not occur in the select model will be ignored.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	This method delegates to the selection strategy.
 	@param values The values to select.
-	@exception ValidationException if the provided value is not valid.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	*/
-	public void setSelectedValues(final V... values) throws ValidationException {getListSelectModel().setSelectedValues(values);}
+	public void setSelectedValues(final V... values) throws PropertyVetoException {getListSelectModel().setSelectedValues(values);}
 	
 		//ListSelectModel delegations
 
@@ -264,31 +268,34 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 	
 	/**Sets the selected indices.
 	Invalid and duplicate indices will be ignored.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to select.
-	@exception ValidationException if the provided value is not valid.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getSetSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedValues(V[])
 	@see #addSelectedIndexes(int...)
 	*/
-	public void setSelectedIndexes(int... indexes) throws ValidationException {getListSelectModel().setSelectedIndexes(indexes);}
+	public void setSelectedIndexes(int... indexes) throws PropertyVetoException {getListSelectModel().setSelectedIndexes(indexes);}
 	
 	/**Adds a selection at the given indices.
 	Any invalid indices will be ignored.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to add to the selection.
-	@exception ValidationException if the provided value is not valid.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getAddSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedIndexes(int[])
 	*/
-	public void addSelectedIndexes(int... indexes) throws ValidationException {getListSelectModel().addSelectedIndexes(indexes);}
+	public void addSelectedIndexes(int... indexes) throws PropertyVetoException {getListSelectModel().addSelectedIndexes(indexes);}
 	
 	/**Removes a selection at the given indices.
 	Any invalid indices will be ignored.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to remove from the selection.
-	@exception ValidationException if the provided value is not valid.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getRemoveSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedIndexes(int[])
 	*/
-	public void removeSelectedIndexes(int... indexes) throws ValidationException {getListSelectModel().removeSelectedIndexes(indexes);}
+	public void removeSelectedIndexes(int... indexes) throws PropertyVetoException {getListSelectModel().removeSelectedIndexes(indexes);}
 
 	/**Determines the displayed status of the first occurrence of a given value.
 	@param value The value for which the displayed status is to be determined.

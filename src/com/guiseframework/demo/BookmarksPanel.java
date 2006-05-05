@@ -1,5 +1,7 @@
 package com.guiseframework.demo;
 
+import java.beans.PropertyVetoException;
+
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.Bookmark;
@@ -7,7 +9,6 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.ValueModel;
-import com.guiseframework.validator.ValidationException;
 
 /**Bookmark Guise demonstration panel.
 Copyright © 2005-2006 GlobalMentor, Inc.
@@ -66,9 +67,8 @@ public class BookmarksPanel extends DefaultNavigationPanel implements Navigation
 			{
 				tabbedPanel.setSelectedIndexes(stepIndex);	//select the appropriate tab
 			}
-			catch(final ValidationException validationException)	//we should never encounter a validation problem selecting tabs
+			catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
 			{
-				throw new AssertionError(validationException);
 			}
 		}
 	}

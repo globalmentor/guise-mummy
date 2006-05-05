@@ -9,7 +9,7 @@ import com.garretwilson.text.xml.xhtml.XHTMLConstants;
 /**Base interface for all component models.
 @author Garret Wilson
 */
-public interface Model extends PropertyBindable
+public interface Model extends PropertyBindable, PropertyConstrainable
 {
 
 	/**A content type of <code>text/plain</code>.*/

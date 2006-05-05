@@ -2,6 +2,7 @@ package com.guiseframework.component;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import java.beans.PropertyVetoException;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -77,6 +78,7 @@ public abstract class AbstractActionValueControl<V, C extends ActionValueControl
 		super(labelModel, actionModel, enableable);	//construct the parent class
 		this.valueModel=checkInstance(valueModel, "Value model cannot be null.");	//save the table model
 		this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen an repeat all property changes of the value model
+		this.valueModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the value model
 	}
 	
 	/**Reports that a bound property has changed.
@@ -137,12 +139,13 @@ public abstract class AbstractActionValueControl<V, C extends ActionValueControl
 	This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method.
 	If a validator is installed, the value will first be validated before the current value is changed.
 	Validation always occurs if a validator is installed, even if the value is not changing.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param newValue The input value of the model.
-	@exception ValidationException if the provided value is not valid.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see #getValidator()
 	@see #VALUE_PROPERTY
 	*/
-	public void setValue(final V newValue) throws ValidationException {getValueModel().setValue(newValue);}
+	public void setValue(final V newValue) throws PropertyVetoException {getValueModel().setValue(newValue);}
 
 	/**Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators.
 	No validation occurs.

@@ -1,9 +1,9 @@
 package com.guiseframework.model;
 
+import java.beans.PropertyVetoException;
 import java.util.*;
 
 import com.garretwilson.beans.GenericPropertyChangeEvent;
-import com.guiseframework.validator.ValidationException;
 
 /**A group that ensures that only one boolean model in the group is set to <code>true</code> at the same time.
 This class is declared final because it represents a particular defined semantics, no more and no less.
@@ -47,9 +47,8 @@ public final class MutualExclusionPolicyModelGroup extends ValuePolicyModelGroup
 					{
 						valueModel.setValue(Boolean.FALSE);	//set the values of the other value models to false (which will fire other events, but will be ignored by this class because the value is false)
 					}
-					catch(final ValidationException validationException)	//if this model can't be set to false
+					catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
 					{
-						throw new AssertionError(validationException);
 					}
 				}
 			}

@@ -3,6 +3,8 @@ package com.guiseframework.coupler;
 import static com.garretwilson.lang.ClassUtilities.*;
 
 import static java.util.Arrays.*;
+
+import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -15,7 +17,6 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
-import com.guiseframework.validator.ValidationException;
 
 /**Abstract coupler to one or more cards in a {@link CardControl}.
 This coupler is only functional when the given card is contained within a {@link CardControl}.
@@ -228,9 +229,9 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 	/**Selects the first connected card that is displayed and enabled.
 	If no card is connected or the card has no parent card control, no action occurs.
 	This method calls {@link #selectCard(CardControl, Component)}.
-	@exception ValidationException if the appropriate card could not be selected.
+	@exception PropertyVetoException if the appropriate card could not be selected.
 	*/
-	protected void selectCard() throws ValidationException
+	protected void selectCard() throws PropertyVetoException
 	{
 		synchronized(this)	//prevent race conditions accessing updatingSelected
 		{
@@ -259,9 +260,9 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 	/**Selects the specified card.
 	@param The card control to use in selected the card.
 	@param card The card to select.
-	@exception ValidationException if the provided card could not be selected.
+	@exception PropertyVetoException if the provided card could not be selected.
 	*/
-	protected void selectCard(final CardControl<?> cardControl, final Component<?> card) throws ValidationException
+	protected void selectCard(final CardControl<?> cardControl, final Component<?> card) throws PropertyVetoException
 	{
 		cardControl.setValue(card);	//select the card
 	}	

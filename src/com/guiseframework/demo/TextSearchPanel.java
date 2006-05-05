@@ -1,5 +1,6 @@
 package com.guiseframework.demo;
 
+import java.beans.PropertyVetoException;
 import java.io.*;
 import java.util.regex.*;
 
@@ -129,9 +130,8 @@ public class TextSearchPanel extends DefaultNavigationPanel
 							{
 								textAreaControl.setValue(searchResults);	//show the search results in the text area
 							}
-							catch(final ValidationException validationException)	//we don't have a text area validator installed, so we never expect to get validation errors
+							catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
 							{
-								throw new AssertionError(validationException);
 							}
 						}
 						catch(final IOException ioException)	//if there is an I/O error

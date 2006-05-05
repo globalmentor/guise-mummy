@@ -1,5 +1,6 @@
 package com.guiseframework.demo;
 
+import java.beans.PropertyVetoException;
 import java.util.*;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
@@ -10,7 +11,6 @@ import com.guiseframework.converter.Converter;
 import com.guiseframework.converter.DateStringLiteralConverter;
 import com.guiseframework.converter.DateStringLiteralStyle;
 import com.guiseframework.model.*;
-import com.guiseframework.validator.ValidationException;
 
 /**Internationalization Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
@@ -54,9 +54,8 @@ public class InternationalizationPanel extends DefaultNavigationPanel
 				{
 					checkControl.setValue(Boolean.TRUE);	//select this check control
 				}
-				catch(final ValidationException validationException)	//there should be no problem selecting the model 
+				catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
 				{
-					throw new AssertionError(validationException);
 				}		
 			}
 				//install a value change listener to listen for language selection

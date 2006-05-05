@@ -1,5 +1,9 @@
 package com.guiseframework.model;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
+
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.validator.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
@@ -71,6 +75,25 @@ public abstract class AbstractValueModel<V> extends AbstractModel implements Val
 		{
 			validator.validate(getValue());	//validate the current value, throwing an exception if anything is wrong
 		}
+	}
+
+	/**Creates a property veto exception that represents a validation exception.
+	The validation exception will be accessible via {@link PropertyVetoException#getCause()}.
+	This is useful for converting a validation exception into a property veto exception in {@link ValueModel#setValue(Object)} if an installed validator deems a value invalid.
+	@param <VV> The type of property the change of which was vetoed because of invalidity.
+	@param source The source of the property change event.
+	@param validationException The validation exception that is the cause of the property veto.
+	@param propertyName The name of the property the change of which was vetoed.
+	@param oldValue The old value of the property.
+	@param newValue The new value of the property.
+	@return A property veto exception representing the validation error.
+	*/
+	public static <VV> PropertyVetoException createPropertyVetoException(final Object source, final ValidationException validationException, final String propertyName, final VV oldValue, final VV newValue)
+	{	
+		final PropertyChangeEvent propertyChangeEvent=new GenericPropertyChangeEvent<VV>(source, propertyName, oldValue, newValue);	//create a new property change event
+		final PropertyVetoException propertyVetoException=new PropertyVetoException(validationException.getMessage(), propertyChangeEvent);	//create a new property veto exception with the message from the validation exception
+		propertyVetoException.initCause(validationException);	//indicate the cause of the property veto exception
+		return propertyVetoException;	//return the new property veto exception
 	}
 
 }

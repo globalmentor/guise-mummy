@@ -1,5 +1,6 @@
 package com.guiseframework.demo;
 
+import java.beans.PropertyVetoException;
 import java.util.Date;
 import java.util.Locale;
 
@@ -66,9 +67,8 @@ public class CalendarsPanel extends DefaultNavigationPanel
 		{
 			localeListControl.setSelectedValues(getSession().getLocale());	//show the session locale selected
 		}
-		catch(final ValidationException validationException)	//any of the values can be selected, so we don't expect any errors
+		catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
 		{
-			throw new AssertionError(validationException);
 		}
 		localePanel.add(localeListControl);
 		sidePanel.add(localePanel);
@@ -92,9 +92,8 @@ public class CalendarsPanel extends DefaultNavigationPanel
 							{
 								embeddedDateTextControl.setValue(newDate);	//show the date in the text control
 							}
-							catch(final ValidationException validationException)	//no text control validator is installed, so there should be no validation errors
+							catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
 							{
-								throw new AssertionError(validationException);
 							}
 						}
 					}
@@ -129,9 +128,8 @@ public class CalendarsPanel extends DefaultNavigationPanel
 											{
 												popupDateTextControl.setValue(newDate);	//show the date in the text control
 											}
-											catch(final ValidationException validationException)	//no text control validator is installed, so there should be no validation errors
+											catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
 											{
-												throw new AssertionError(validationException);
 											}
 										}
 									}

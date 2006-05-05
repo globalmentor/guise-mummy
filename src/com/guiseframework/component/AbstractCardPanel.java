@@ -1,5 +1,7 @@
 package com.guiseframework.component;
 
+import java.beans.PropertyVetoException;
+
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.garretwilson.util.Debug;
@@ -8,7 +10,6 @@ import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.CardLayout;
 import com.guiseframework.event.NavigationEvent;
 import com.guiseframework.event.NavigationListener;
-import com.guiseframework.validator.ValidationException;
 
 /**An abstract panel with a card layout.
 The component valid status is updated before a change in the {@link #VALUE_PROPERTY} or the {@link #VALIDATOR_PROPERTY} is fired. 
@@ -118,7 +119,7 @@ Debug.trace("ready to update bookmarks, bookmarks enabled", isBookmarkEnabled(),
 					setValue(component);	//change to that component
 //TODO fix; doesn't work					updateBookmark();	//make sure our bookmark is correct, in case another bookmark sent us here---i.e. canonicize the bookmark
 				}
-				catch(final ValidationException validationException)
+				catch(final PropertyVetoException propertyVetoException)
 				{
 					//TODO fix errors
 				}

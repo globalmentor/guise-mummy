@@ -1336,24 +1336,54 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	}
 
 	/**Notifies the user of the given notification information.
+	This is a convenience method that delegates to {@link #notify(Notification, Runnable)}.
 	@param notification The notification information to relay.
 	*/
 	public void notify(final Notification notification)
+	{
+		notify(notification, null);	//notify the user with no post-notification action
+	}
+
+	/**Notifies the user of the given notification information, with optional logic to be executed after notification takes place.
+	@param notification The notification information to relay.
+	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
+	*/
+	public void notify(final Notification notification, final Runnable afterNotify)
 	{
 		final Text text=new Text();	//create a new text component
 		text.setText(notification.getMessage());	//set the text, which may include a resource reference
 		final DefaultOptionDialogFrame optionDialogFrame=new DefaultOptionDialogFrame(text, DefaultOptionDialogFrame.Option.OK);	//create a dialog with an OK button
 		optionDialogFrame.setLabel(notification.getSeverity().toString());	//TODO improve title; load from resources
-		optionDialogFrame.open();	//show the dialog		
+		optionDialogFrame.open(new AbstractGenericPropertyChangeListener<Mode>()	//show the dialog and listen for the frame closing
+				{
+					public void propertyChange(final GenericPropertyChangeEvent<Mode> genericPropertyChangeEvent)	//listen for the dialog mode changing
+					{
+						if(genericPropertyChangeEvent.getNewValue()==null && afterNotify!=null)	//if the dialog is now nonmodal and there is logic that should take place after notification
+						{
+							afterNotify.run();	//run the code that takes place after notification
+						}
+					}
+				}
+		);
 	}
 
 	/**Notifies the user of the given error.
-	This is a convenience method that delegates to {@link #notify(Notification)}.
+	This is a convenience method that delegates to {@link #notify(Throwable, Runnable)}.
 	@param error The error with which to notify the user.
 	*/
 	public void notify(final Throwable error)
 	{
-		notify(new Notification(error));	//notify the user with a notification of the error
+		notify(error, null);	//notify the user with no post-notification action
+	}
+
+	/**Notifies the user of the given error, with optional logic to be executed after notification takes place..
+	This is a convenience method that delegates to {@link #notify(Notification, Runnable)}.
+	@param error The error with which to notify the user.
+	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
+	*/
+	public void notify(final Throwable error, final Runnable afterNotify)
+	{
+		notify(new Notification(error), afterNotify);	//notify the user with a notification of the error
 	}
 
 	/**Creates a string containing a reference to the given string resource key.

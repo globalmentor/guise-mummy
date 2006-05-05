@@ -1,5 +1,6 @@
 package com.guiseframework.component;
 
+import java.beans.PropertyVetoException;
 import java.net.URI;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
@@ -56,9 +57,9 @@ public abstract class AbstractBooleanSelectActionControl<C extends SelectActionC
 		{
 			setValue(Boolean.valueOf(newSelected));	//update the value model
 		}
-		catch(final ValidationException validationException)	//if there is a validation error
+		catch(final PropertyVetoException propertyVetoException)	//if there is a validation error
 		{
-			throw new AssertionError(validationException);	//TODO improve
+//TODO decide what to do here; throwing an assertion error is not a good idea, because a validator could be installed and a property veto exception would be a valid result			throw new AssertionError(validationException);	//TODO improve
 		}
 	}
 

@@ -3,13 +3,13 @@ package com.guiseframework.coupler;
 import static com.garretwilson.lang.ClassUtilities.*;
 
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;
-import com.guiseframework.validator.ValidationException;
 
 /**Coupler that assocates a {@link ListSelectControl} with a card in a {@link CardControl}.
 @param <V> The type of values to select.
@@ -40,13 +40,13 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler
 				{
 					selectCard();	//select a connected card
 				}
-				catch(final ValidationException validationException)	//if the value can't be selected
+				catch(final PropertyVetoException propertyVetoException)	//if the value can't be selected
 				{
 					try
 					{
 						listSelect.setValue(propertyChangeEvent.getOldValue());	//go back to the old selected value, if we can
 					}
-					catch(final ValidationException validationException2)	//if the old value can't be selected, just ignore the error TODO improve
+					catch(final PropertyVetoException propertyVetoException2)	//if the old value can't be reselected, just ignore the error
 					{
 					}
 				}
@@ -180,7 +180,7 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler
 					listSelect.setValue(value);	//select the requested value
 //TODO why does this throw a ClassCastException?					listSelect.setSelectedValues(value);	//select the requested value
 				}
-				catch(final ValidationException validationException)	//if the value can't be selected, just ignore the error
+				catch(final PropertyVetoException propertyVetoException)	//if the value can't be selected, just ignore the error
 				{
 				}
 			}

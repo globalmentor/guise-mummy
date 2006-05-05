@@ -1,5 +1,6 @@
 package com.guiseframework.component;
 
+import java.beans.PropertyVetoException;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -146,6 +147,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	{
 		this.tableModel=checkInstance(tableModel, "Table model cannot be null.");	//save the table model
 		this.tableModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the table model
+		this.tableModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the table model
 			//TODO listen to and repeat table model events
 		for(final TableColumnModel<?> column:tableModel.getColumns())	//install a default cell representation strategy for each column
 		{
@@ -472,17 +474,26 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		public C getValue() {return getModel().getCellValue(getCell());}	//return the value from the table model
 
 		/**Sets the value in the cell.
-		@param newValue The value of the cell.
-		@exception ValidationException if the provided value is not valid.
+		If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
+		@param newValue The new value of the cell.
+		@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 		@see #getValidator()
-		@see ValueModel#VALUE_PROPERTY
+		@see #VALUE_PROPERTY
 		*/
-		public void setValue(final C newValue) throws ValidationException
+		public void setValue(final C newValue) throws PropertyVetoException
 		{
+			final C oldValue=getValue();	//get the old value
 			final Validator<C> validator=getValidator();	//get the currently installed validator, if there is one
 			if(validator!=null)	//if a validator is installed, always validate the value, even if it isn't changing, so that an initial value that may not be valid will throw an error when it's tried to be set to the same, but invalid, value
 			{
-				validator.validate(newValue);	//validate the new value, throwing an exception if anything is wrong
+				try
+				{
+					validator.validate(newValue);	//validate the new value, throwing an exception if anything is wrong
+				}
+				catch(final ValidationException validationException)	//if the new value doesn't pass validation
+				{
+					throw createPropertyVetoException(this, validationException, VALUE_PROPERTY, oldValue, newValue);	//throw a property veto exception representing the validation error
+				}					
 			}
 			getModel().setCellValue(getCell(), newValue);	//set the value in the table model
 		}

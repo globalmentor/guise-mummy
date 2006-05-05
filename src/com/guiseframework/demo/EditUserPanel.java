@@ -1,5 +1,6 @@
 package com.guiseframework.demo;
 
+import java.beans.PropertyVetoException;
 import java.util.Arrays;
 
 import com.guiseframework.component.*;
@@ -131,9 +132,9 @@ public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser>
 		super.validate();	//validate the component normally
 		if(!isPasswordMatch())	//if the password isn't valid
 		{
-			final ValidationException passwordValidationException=new ValidationException(EditUserPanel.this, "Passwords do not match");
-			passwordControl.setNotification(new Notification(passwordValidationException));	//add the error to each password control
-			passwordVerificationControl.setNotification(new Notification(passwordValidationException));
+			final Notification notification=new Notification("Passwords to not match", Notification.Severity.ERROR);	//create an error notification
+			passwordControl.setNotification(notification);	//add the error notification to each password control
+			passwordVerificationControl.setNotification(notification);
 		}
 		return isValid();	//return the current valid state
 	}
@@ -149,9 +150,9 @@ public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser>
 		{
 			idControl.setValue(id);	//set the user ID
 		}
-		catch(final ValidationException validationException)	//if the user information is invalid
+		catch(final PropertyVetoException propertyVetoException)	//if the user information is invalid
 		{
-			throw new IllegalArgumentException(validationException);
+			throw new IllegalArgumentException(propertyVetoException);
 		}		
 	}
 
@@ -172,9 +173,9 @@ public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser>
 			passwordVerificationControl.setValue(user.getPassword());
 			emailControl.setValue(user.getEmail());
 		}
-		catch(final ValidationException validationException)	//if the user information is invalid
+		catch(final PropertyVetoException propertyVetoException)	//if the user information is invalid
 		{
-			throw new IllegalArgumentException(validationException);
+			throw new IllegalArgumentException(propertyVetoException);
 		}
 	}
 

@@ -1,12 +1,13 @@
 package com.guiseframework.demo;
 
+import java.beans.PropertyVetoException;
+
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
-import com.guiseframework.validator.ValidationException;
 
 /**Menus Guise demonstration panel.
 Copyright © 2005 GlobalMentor, Inc.
@@ -119,9 +120,8 @@ public class MenusPanel extends DefaultNavigationPanel
 						{
 							continentsClickCountControl.setValue(new Integer(oldClickCount+1));	//update the number of clicks
 						}
-						catch(final ValidationException validationException)	//we don't have validators installed, so we don't expect validation problems
+						catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
 						{
-							throw new AssertionError(validationException);
 						}
 					}
 				});

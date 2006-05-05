@@ -123,6 +123,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	{
 		this.treeModel=checkInstance(treeModel, "Tree model cannot be null.");	//save the tree model
 		this.treeModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the tree model
+		this.treeModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the tree model
 		this.treeModel.addTreeNodePropertyChangeListener(treeNodePropertyChangeListener);	//listen and repeat all property changes of the tree nodes in the tree model
 		this.treeModel.addActionListener(repeatActionListener);	//listen and repeat all actions of the tree model
 			//TODO listen for and repeat tree model-specific events

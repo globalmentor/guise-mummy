@@ -2,10 +2,11 @@ package com.guiseframework.coupler;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
+import java.beans.PropertyVetoException;
+
 import com.guiseframework.component.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
-import com.guiseframework.validator.ValidationException;
 
 /**Associates an action control with a card in a card control.
 When the action is initiated, the first displayed and enabled specified card within the card control will be selected.
@@ -33,7 +34,7 @@ public class ActionCardCoupler extends AbstractCardCoupler
 					{
 						selectCard();	//select a connected card
 					}
-					catch(final ValidationException validationException)	//if the card can't be selected, just ignore the error and assume that the card control reported the error
+					catch(final PropertyVetoException propertyVetoException)	//if the card can't be selected, just ignore the error and assume that the card control reported the error
 					{
 					}
 				}
@@ -139,9 +140,9 @@ public class ActionCardCoupler extends AbstractCardCoupler
 				{
 					((ActionValueControl<TaskStatus, ?>)actionValueControl).setValue(taskStatus);	//update the action with the new task status
 				}
-				catch(final ValidationException validationException)
+				catch(final PropertyVetoException propertyVetoException)
 				{
-					throw new AssertionError(validationException);	//TODO improve
+//TODO improve					throw new AssertionError(validationException);	//TODO improve
 				}
 			}
 		}

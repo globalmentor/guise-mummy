@@ -1,9 +1,9 @@
 package com.guiseframework.model;
 
+import java.beans.PropertyVetoException;
 import java.util.List;
 
 import com.guiseframework.event.*;
-import com.guiseframework.validator.ValidationException;
 
 /**A model for selecting one or more values from a list.
 The model must be thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this interface.
@@ -33,31 +33,34 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>, ListListena
 	
 	/**Sets the selected indices.
 	Invalid and duplicate indices will be ignored.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to select.
-	@exception ValidationException if the provided value is not valid.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getSetSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedValues(V[])
 	@see #addSelectedIndexes(int...)
 	*/
-	public void setSelectedIndexes(int... indexes) throws ValidationException;
+	public void setSelectedIndexes(int... indexes) throws PropertyVetoException;
 	
 	/**Adds a selection at the given indices.
 	Any invalid indices will be ignored.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to add to the selection.
-	@exception ValidationException if the provided value is not valid.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getAddSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedIndexes(int[])
 	*/
-	public void addSelectedIndexes(int... indexes) throws ValidationException;
+	public void addSelectedIndexes(int... indexes) throws PropertyVetoException;
 	
 	/**Removes a selection at the given indices.
 	Any invalid indices will be ignored.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to remove from the selection.
-	@exception ValidationException if the provided value is not valid.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getRemoveSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedIndexes(int[])
 	*/
-	public void removeSelectedIndexes(int... indexes) throws ValidationException;
+	public void removeSelectedIndexes(int... indexes) throws PropertyVetoException;
 
 	/**Determines the displayed status of the first occurrence of a given value.
 	@param value The value for which the displayed status is to be determined.

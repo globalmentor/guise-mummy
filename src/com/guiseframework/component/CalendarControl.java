@@ -1,5 +1,6 @@
 package com.guiseframework.component;
 
+import java.beans.PropertyVetoException;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -271,9 +272,9 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 		{
 			yearControl.setValue(new Integer(year));	//show the selected year in the text box
 		}
-		catch(final ValidationException validationException)	//we should never have a problem selecting a year or a month
+		catch(final PropertyVetoException propertyVetoException)	//we should never have a problem selecting a year or a month
 		{
-			throw new AssertionError(validationException);
+			throw new AssertionError(propertyVetoException);
 		}
 		yearControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, yearPropertyChangeListener);	//listen for the year changing
 		controlContainer.add(yearControl);	//add the year text control		
@@ -336,9 +337,9 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 							}
 						}
 					}
-					catch(final ValidationException validationException)	//we should never have a problem selecting a year or a month
+					catch(final PropertyVetoException propertyVetoException)	//we should never have a problem selecting a year or a month
 					{
-						throw new AssertionError(validationException);
+						throw new AssertionError(propertyVetoException);
 					}
 				}
 				if(monthChanged)	//if the month needs updating
@@ -426,9 +427,9 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 									{
 										CalendarControl.this.setValue(date);	//change the control's value to the calendar for this cell
 									}
-									catch(final ValidationException validationException)
+									catch(final PropertyVetoException propertyVetoException)
 									{
-										throw new AssertionError(validationException);	//TODO fix to store the errors or something, because a validator could very well be installed in the control
+//TODO fix to store errors or something, because a validator could be installed										throw new AssertionError(validationException);	//TODO fix to store the errors or something, because a validator could very well be installed in the control
 									}
 								}
 							});

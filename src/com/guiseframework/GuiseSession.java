@@ -491,15 +491,29 @@ public interface GuiseSession extends PropertyBindable
 	public void destroy();
 
 	/**Notifies the user of the given notification information.
+	This is a convenience method that delegates to {@link #notify(Notification, Runnable)}.
 	@param notification The notification information to relay.
 	*/
 	public void notify(final Notification notification);
 
+	/**Notifies the user of the given notification information, with optional logic to be executed after notification takes place.
+	@param notification The notification information to relay.
+	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
+	*/
+	public void notify(final Notification notification, final Runnable afterNotify);
+
 	/**Notifies the user of the given error.
-	This is a convenience method that delegates to {@link #notify(Notification)}.
+	This is a convenience method that delegates to {@link #notify(Throwable, Runnable)}.
 	@param error The error with which to notify the user.
 	*/
 	public void notify(final Throwable error);
+
+	/**Notifies the user of the given error, with optional logic to be executed after notification takes place..
+	This is a convenience method that delegates to {@link #notify(Notification, Runnable)}.
+	@param error The error with which to notify the user.
+	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
+	*/
+	public void notify(final Throwable error, final Runnable afterNotify);
 
 	/**Creates a string containing a reference to the given string resource key.
 	@param resourceKey The resource key to a string in the resources which could be retrieved using {@link #getStringResource(String)}.

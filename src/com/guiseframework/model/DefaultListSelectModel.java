@@ -1,6 +1,7 @@
 package com.guiseframework.model;
 
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyVetoException;
 import java.util.*;
 
 import com.garretwilson.lang.ObjectUtilities;
@@ -41,17 +42,26 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 	This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method.
 	If a validator is installed, the value will first be validated before the current value is changed.
 	Validation always occurs if a validator is installed, even if the value is not changing.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param newValue The input value of the model.
-	@exception ValidationException if the provided value is not valid.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see #getValidator()
 	@see ValueModel#VALUE_PROPERTY
 	*/
-	public void setValue(final V newValue) throws ValidationException
+	public void setValue(final V newValue) throws PropertyVetoException
 	{
 		final Validator<V> validator=getValidator();	//get the currently installed validator, if there is one
 		if(validator!=null)	//if a validator is installed, always validate the value, even if it isn't changing, so that an initial value that may not be valid will throw an error when it's tried to be set to the same, but invalid, value
 		{
-			validator.validate(newValue);	//validate the new value, throwing an exception if anything is wrong
+			final V oldValue=getValue();	//get the currently selected value
+			try
+			{
+				validator.validate(newValue);	//validate the new value
+			}
+			catch(final ValidationException validationException)	//if the new value doesn't pass validation
+			{
+				throw createPropertyVetoException(this, validationException, VALUE_PROPERTY, oldValue, newValue);	//throw a property veto exception representing the validation error
+			}
 		}
 		setSelectedValues(newValue);	//TODO probably do something else that only selects the first value if there are duplicates
 	}
@@ -569,13 +579,14 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 
 	/**Sets the selected indices.
 	Invalid and duplicate indices will be ignored.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to select.
-	@exception ValidationException if the provided value is not valid.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getSetSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedValues(V[])
 	@see #addSelectedIndexes(int...)
 	*/
-	public void setSelectedIndexes(int... indexes) throws ValidationException
+	public void setSelectedIndexes(int... indexes) throws PropertyVetoException
 	{
 int validIndexCount=0;	//TODO fix validation hack
 for(int i=indexes.length-1; i>=0; --i)
@@ -590,7 +601,15 @@ if(validIndexCount==0)	//TODO add more thorough validation throughout; right now
 	final Validator<V> validator=getValidator();	//get the currently installed validator, if there is one
 	if(validator!=null)	//if a validator is installed, always validate the value, even if it isn't changing, so that an initial value that may not be valid will throw an error when it's tried to be set to the same, but invalid, value
 	{
-		validator.validate(null);	//validate the new value, throwing an exception if anything is wrong
+		final V oldValue=getValue();	//get the currently selected value
+		try
+		{
+			validator.validate(null);	//validate the new value
+		}
+		catch(final ValidationException validationException)	//if the new value doesn't pass validation
+		{
+			throw createPropertyVetoException(this, validationException, VALUE_PROPERTY, oldValue, null);	//throw a property veto exception representing the validation error
+		}
 	}
 }
 		final V oldSelectedValue, newSelectedValue;
@@ -626,12 +645,13 @@ if(validIndexCount==0)	//TODO add more thorough validation throughout; right now
 
 	/**Adds a selection at the given indices.
 	Any invalid indices will be ignored.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to add to the selection.
-	@exception ValidationException if the provided value is not valid.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getAddSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedIndexes(int[])
 	*/
-	public void addSelectedIndexes(int... indexes) throws ValidationException
+	public void addSelectedIndexes(int... indexes) throws PropertyVetoException
 	{
 		final V oldSelectedValue, newSelectedValue;
 		synchronized(this)	//don't allow the list to be modified while we update the selections
@@ -659,12 +679,13 @@ if(validIndexCount==0)	//TODO add more thorough validation throughout; right now
 
 	/**Removes a selection at the given indices.
 	Any invalid indices will be ignored.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to remove from the selection.
-	@exception ValidationException if the provided value is not valid.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getRemoveSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedIndexes(int[])
 	*/
-	public void removeSelectedIndexes(int... indexes) throws ValidationException
+	public void removeSelectedIndexes(int... indexes) throws PropertyVetoException
 	{
 		final V oldSelectedValue, newSelectedValue;
 		synchronized(this)	//don't allow the list to be modified while we update the selections
@@ -734,18 +755,27 @@ if(validIndexCount==0)	//TODO add more thorough validation throughout; right now
 	/**Sets the selected values.
 	If a value occurs more than one time in the model, all occurrences of the value will be selected.
 	Values that do not occur in the select model will be ignored.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param values The values to select.
-	@exception ValidationException if the provided value is not valid.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see #setSelectedIndexes(int[])
 	*/
-	public void setSelectedValues(final V... values) throws ValidationException
+	public void setSelectedValues(final V... values) throws PropertyVetoException
 	{
 if(values.length==0)	//TODO add more thorough validation throughout; right now we only check for null not being valid
 {
 	final Validator<V> validator=getValidator();	//get the currently installed validator, if there is one
 	if(validator!=null)	//if a validator is installed, always validate the value, even if it isn't changing, so that an initial value that may not be valid will throw an error when it's tried to be set to the same, but invalid, value
 	{
-		validator.validate(null);	//validate the new value, throwing an exception if anything is wrong
+		final V oldValue=getValue();	//get the currently selected value
+		try
+		{
+			validator.validate(null);	//validate the new value
+		}
+		catch(final ValidationException validationException)	//if the new value doesn't pass validation
+		{
+			throw createPropertyVetoException(this, validationException, VALUE_PROPERTY, oldValue, null);	//throw a property veto exception representing the validation error
+		}
 	}
 }
 		synchronized(this)	//don't allow the model to be changed while we update the selected values 
@@ -1013,7 +1043,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	*/
 	protected <P> void fireValuePropertyChange(final V value, final String propertyName, final P oldValue, final P newValue)
 	{
-		if(hasListeners(propertyName)) //if we have listeners registered for this property
+		if(hasPropertyChangeListeners(propertyName)) //if we have listeners registered for this property
 		{
 			if(!ObjectUtilities.equals(oldValue, newValue))	//if the values are different
 			{					

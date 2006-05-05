@@ -1,5 +1,6 @@
 package com.guiseframework.component;
 
+import java.beans.PropertyVetoException;
 import java.util.Date;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
@@ -57,9 +58,9 @@ public class CalendarDialogFrame extends AbstractDialogFrame<Date, CalendarDialo
 			{
 				calendarControl.setValue(defaultDate);	//select the default date TODO pass this to the calendar control as a default date
 			}
-			catch(final ValidationException validationException)
+			catch(final PropertyVetoException propertyVetoException)
 			{
-				throw new AssertionError(validationException);	//TODO fix
+//TODO fix				throw new AssertionError(validationException);	//TODO fix
 			}
 		}
 		calendarControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Date>()	//listen for the calendar control value changing
@@ -75,9 +76,9 @@ public class CalendarDialogFrame extends AbstractDialogFrame<Date, CalendarDialo
 								close();	//close the frame
 							}
 						}
-						catch(final ValidationException validationException)
+						catch(final PropertyVetoException propertyVetoException)
 						{
-							throw new AssertionError(validationException);	//TODO fix
+//TODO fix							throw new AssertionError(validationException);	//TODO fix
 						}
 					}
 				});

@@ -4,6 +4,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
 
 import com.guiseframework.model.*;
 import com.guiseframework.validator.ValidationException;
@@ -81,6 +82,7 @@ public abstract class AbstractValueControl<V, C extends ValueControl<V, C>> exte
 		super(labelModel);	//construct the parent class
 		this.valueModel=checkInstance(valueModel, "Value model cannot be null.");	//save the value model
 		this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the value model
+		this.valueModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the value model
 		addPropertyChangeListener(VALUE_PROPERTY, clearNotificationPropertyChangeListener);	//listen for the value changing, and clear the notification in response TODO this needs to be put in other value controls as well
 	}
 
@@ -140,16 +142,17 @@ public abstract class AbstractValueControl<V, C extends ValueControl<V, C>> exte
 	/**@return The input value, or <code>null</code> if there is no input value.*/
 	public V getValue() {return getValueModel().getValue();}
 
-	/**Sets the input value.
+	/**Sets the new value.
 	This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method.
 	If a validator is installed, the value will first be validated before the current value is changed.
 	Validation always occurs if a validator is installed, even if the value is not changing.
-	@param newValue The input value of the model.
-	@exception ValidationException if the provided value is not valid.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
+	@param newValue The new value.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see #getValidator()
 	@see #VALUE_PROPERTY
 	*/
-	public void setValue(final V newValue) throws ValidationException {getValueModel().setValue(newValue);}
+	public void setValue(final V newValue) throws PropertyVetoException {getValueModel().setValue(newValue);}
 
 	/**Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators.
 	No validation occurs.

@@ -1,12 +1,13 @@
 package com.guiseframework.demo;
 
+import java.beans.PropertyVetoException;
+
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.garretwilson.beans.GenericPropertyChangeListener;
 import com.guiseframework.component.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
-import com.guiseframework.validator.ValidationException;
 
 /**Temperature Conversion Guise demonstration panel using PLOOP+RDF+XML.
 Copyright © 2005-2006 GlobalMentor, Inc.
@@ -39,9 +40,8 @@ public class TemperatureConversionPanel2 extends DefaultNavigationPanel
 		{
 			celsiusCheckControl.setValue(Boolean.TRUE);	//default to converting from Celsius to Fahrenheit
 		}
-		catch(final ValidationException validationException)	//we have no validator installed in the check control model, so we don't expect changing its value ever to cause any problems
+		catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
 		{
-			throw new AssertionError(validationException);
 		}
 		fahrenheitCheckControl=(CheckControl)AbstractComponent.getComponentByName(this, "fahrenheitCheckControl");	//get the check control for the Fahrenheit scale
 			//create a mutual exclusion policy group and add the Celsius and Fahrenheit check box boolean value models to get radio button functionality
@@ -94,9 +94,8 @@ public class TemperatureConversionPanel2 extends DefaultNavigationPanel
 			{
 				temperatureOutput.setValue(new Float(outputValue));	//store the conversion result in the temperature output control
 			}
-			catch(final ValidationException validationException)	//we have no validator installed in the temperature output text control, so we don't expect changing its value ever to cause any problems
+			catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
 			{
-				throw new AssertionError(validationException);
 			}
 		}
 	}

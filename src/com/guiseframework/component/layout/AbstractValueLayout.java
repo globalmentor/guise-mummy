@@ -2,8 +2,7 @@ package com.guiseframework.component.layout;
 
 import static java.text.MessageFormat.*;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.beans.*;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.component.Component;
@@ -12,6 +11,7 @@ import com.guiseframework.model.*;
 import com.guiseframework.validator.*;
 
 import static com.guiseframework.GuiseResourceConstants.*;
+import static com.guiseframework.model.AbstractValueModel.createPropertyVetoException;
 
 /**A layout that manages the selection of child components, only one of which can be selected at a time.
 The layout maintains its own value model that maintains the current selected component.
@@ -62,12 +62,13 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 		}
 
 		/**Sets the index of the selected component.
+		If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 		@param newIndex The index of the selected component, or -1 if no component is selected.
 		@exception IllegalStateException if this layout has not yet been installed into a container.
 		@exception IndexOutOfBoundsException if the index is out of range.
-		@exception ValidationException if the component at the given index is not a valid component to select.
+		@exception PropertyVetoException if the component at the given index is not a valid compoment to select or the change has otherwise been vetoed.
 		*/
-		public void setSelectedIndex(final int newIndex) throws ValidationException
+		public void setSelectedIndex(final int newIndex) throws PropertyVetoException
 		{
 			final Container<?> container=getContainer();	//get the layout's container
 			if(container==null)	//if we haven't been installed into a container
@@ -99,7 +100,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 			{
 				setSelectedIndex(0);	//select the first component
 			}
-			catch(final ValidationException validationException)	//if we can't select the first component, don't do anything
+			catch(final PropertyVetoException propertyVetoException)	//if we can't select the first component, don't do anything
 			{
 			}
 		}
@@ -136,9 +137,9 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 			{
 				setValue(container.get(newSelectedComponentIndex));		//update the component value, throwing a validation exception if this index can't be selected
 			}				
-			catch(final ValidationException validationException)	//if we can't select the next component
+			catch(final PropertyVetoException propertyVetoException)	//if we can't select the next component
 			{
-				getValueModel().resetValue();	//reset the selected component value
+				getValueModel().resetValue();	//reset the selected component value TODO is there something better we can do here?
 			}
 		}
 		this.selectedIndex=-1;	//always uncache the selected index, because the index of the selected component might have changed
@@ -148,13 +149,8 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	public AbstractValueLayout()
 	{
 		this.valueModel=(ValueModel<Component<?>>)(Object)new DefaultValueModel<Component>(Component.class);	//create a new value model
-		this.valueModel.addPropertyChangeListener(new PropertyChangeListener()	//create a listener to listen for the value model changing a property value
-				{
-					public void propertyChange(final PropertyChangeEvent propertyChangeEvent)	//if the value model changes a property value
-					{
-						firePropertyChange(propertyChangeEvent.getPropertyName(), propertyChangeEvent.getOldValue(), propertyChangeEvent.getNewValue());	//forward the property change event, indicating this component as the event source
-					}			
-				});
+		this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the value model
+		this.valueModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the value model
 	}
 
 	/**@return The default value.*/
@@ -167,14 +163,15 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method.
 	If a validator is installed, the value will first be validated before the current value is changed.
 	Validation always occurs if a validator is installed, even if the value is not changing.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	This version makes sure that the given component is contained in the container, and resets the cached selected index so that it can be recalculated.
 	This version updates the active status of the old and new components if the implement {@link Activeable}.
 	@param newValue The input value of the model.
-	@exception ValidationException if the provided value is not valid.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see #getValidator()
 	@see #VALUE_PROPERTY
 	*/
-	public void setValue(final Component<?> newValue) throws ValidationException
+	public void setValue(final Component<?> newValue) throws PropertyVetoException
 	{
 		final Component<?> oldValue=getValue();	//get the old value
 		if(!ObjectUtilities.equals(oldValue, newValue))	//if a new component is given
@@ -186,7 +183,9 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 			}
 			if(newValue!=null && !container.contains(newValue))	//if there is a new component that isn't contained in the container
 			{
-				throw new ValidationException(format(getSession().getStringResource(VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE_REFERENCE), newValue.toString()), newValue);						
+					//create a custom validation exception
+				final ValidationException validationException=new ValidationException(format(getSession().getStringResource(VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE_REFERENCE), newValue.toString()), newValue);
+				throw createPropertyVetoException(this, validationException, VALUE_PROPERTY, oldValue, newValue);	//throw a property veto exception representing the validation error
 			}
 			selectedIndex=-1;	//uncache the selected index
 			if(oldValue instanceof Activeable)	//if the old value is activable

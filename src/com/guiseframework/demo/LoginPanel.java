@@ -69,14 +69,12 @@ public class LoginPanel extends DefaultNavigationPanel
 								}
 								else	//if the password doesn't match
 								{
-									final ValidationException validationException=new ValidationException(passwordControl, "Invalid password");	//create an invalid password exception for the password control
-									idControl.setNotification(new Notification(validationException));	//indicate that the ID control has a validation exception
+									idControl.setNotification(new Notification("Invalid password.", Notification.Severity.ERROR));	//indicate that the ID control has a validation error
 								}
 							}
 							else	//if the user ID is not valid
 							{
-								final ValidationException validationException=new ValidationException(idControl, "Invalid user ID");	//create an invalid user ID exception for the ID control
-								idControl.setNotification(new Notification(validationException));	//indicate that the ID control has a validation exception
+								idControl.setNotification(new Notification("Invalid user ID.", Notification.Severity.ERROR));	//indicate that the ID control has a validation exception
 							}
 						}
 					}

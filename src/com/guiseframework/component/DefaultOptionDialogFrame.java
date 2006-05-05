@@ -1,5 +1,6 @@
 package com.guiseframework.component;
 
+import java.beans.PropertyVetoException;
 import java.text.MessageFormat;
 
 import static com.garretwilson.net.URIConstants.*;
@@ -7,7 +8,6 @@ import static com.garretwilson.net.URIUtilities.*;
 import com.guiseframework.event.ActionEvent;
 import com.guiseframework.event.ActionListener;
 import com.guiseframework.model.*;
-import com.guiseframework.validator.ValidationException;
 
 /**Default implementation of a frame for communication of an option such as "OK" or "Cancel".
 An option frame defaults to a single composite child panel with a row of options along the bottom.
@@ -106,9 +106,9 @@ public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultO
 							DefaultOptionDialogFrame.this.setValue(option);	//chose this option
 							close();	//close the frame
 						}
-						catch(final ValidationException validationException)	//we don't expect a validation exception
+						catch(final PropertyVetoException propertyVetoException)	//we don't expect a validation exception
 						{
-							throw new AssertionError(validationException);
+//TODO fix							throw new AssertionError(validationException);
 						}	
 					}
 				});

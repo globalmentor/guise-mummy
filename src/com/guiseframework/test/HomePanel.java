@@ -1,5 +1,6 @@
 package com.guiseframework.test;
 
+import java.beans.PropertyVetoException;
 import java.net.URI;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -256,9 +257,8 @@ catch(final ConversionException conversionException)
 						{
 							outputTextControl.setValue(newValue*2);	//update the value
 						}
-						catch(final ValidationException validationException)	//we have no validator installed in the check control model, so we don't expect changing its value ever to cause any problems
+						catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
 						{
-							throw new AssertionError(validationException);
 						}							
 					}
 				});
@@ -268,9 +268,8 @@ catch(final ConversionException conversionException)
 		{
 			checkbox.setValue(Boolean.TRUE);
 		}
-		catch(final ValidationException validationException)	//we have no validator installed in the check control model, so we don't expect changing its value ever to cause any problems
+		catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
 		{
-			throw new AssertionError(validationException);
 		}										
 		inputPanel.add(checkbox);
 		
@@ -290,9 +289,8 @@ catch(final ConversionException conversionException)
 Debug.trace("list control changed value to", newValue);
 							outputTextControl.setValue(newValue!=null ? newValue*2 : null);	//update the value
 						}
-						catch(final ValidationException validationException)	//we have no validator installed in the check control model, so we don't expect changing its value ever to cause any problems
+						catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
 						{
-							throw new AssertionError(validationException);
 						}							
 					}
 				});
@@ -834,9 +832,8 @@ Debug.trace("list control changed value to", newValue);
 		{
 			stringTabControl.setSelectedValues("First tab");
 		}
-		catch (ValidationException e)
+		catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
 		{
-			throw new AssertionError(e);
 		}
 
 		

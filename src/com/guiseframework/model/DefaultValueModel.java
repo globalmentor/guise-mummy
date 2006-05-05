@@ -1,5 +1,7 @@
 package com.guiseframework.model;
 
+import java.beans.PropertyVetoException;
+
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.validator.*;
 
@@ -22,26 +24,35 @@ public class DefaultValueModel<V> extends AbstractValueModel<V>
 		/**@return The input value, or <code>null</code> if there is no input value.*/
 		public V getValue() {return value;}
 
-		/**Sets the input value.
+		/**Sets the new value.
 		This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method.
 		If a validator is installed, the value will first be validated before the current value is changed.
 		Validation always occurs if a validator is installed, even if the value is not changing.
-		@param newValue The input value of the model.
-		@exception ValidationException if the provided value is not valid.
+		If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
+		@param newValue The new value.
+		@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 		@see #getValidator()
-		@see ValueModel#VALUE_PROPERTY
+		@see #VALUE_PROPERTY
 		*/
-		public void setValue(final V newValue) throws ValidationException
+		public void setValue(final V newValue) throws PropertyVetoException
 		{
+			final V oldValue=value;	//get the old value
 			final Validator<V> validator=getValidator();	//get the currently installed validator, if there is one
 			if(validator!=null)	//if a validator is installed, always validate the value, even if it isn't changing, so that an initial value that may not be valid will throw an error when it's tried to be set to the same, but invalid, value
 			{
-				validator.validate(newValue);	//validate the new value, throwing an exception if anything is wrong
+				try
+				{
+					validator.validate(newValue);	//validate the new value
+				}
+				catch(final ValidationException validationException)	//if the new value doesn't pass validation
+				{
+					throw createPropertyVetoException(this, validationException, VALUE_PROPERTY, oldValue, newValue);	//throw a property veto exception representing the validation error
+				}
 			}
 			if(!ObjectUtilities.equals(value, newValue))	//if the value is really changing (compare their values, rather than identity)
 			{
-				final V oldValue=value;	//get the old value
-				value=newValue;	//actually change the value
+				fireVetoableChange(VALUE_PROPERTY, oldValue, newValue);	//notify vetoable change listeners of the impending change
+				value=newValue;	//actually change the value, of the change wasn't vetoed
 				firePropertyChange(VALUE_PROPERTY, oldValue, newValue);	//indicate that the value changed
 			}			
 		}

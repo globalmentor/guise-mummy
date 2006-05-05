@@ -214,7 +214,7 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 	*/
 	protected <V> void fireConstraintsPropertyChange(final Component<?> component, final T constraints, final String propertyName, final V oldValue, final V newValue)
 	{
-		if(hasListeners(propertyName)) //if we have listeners registered for this property
+		if(hasPropertyChangeListeners(propertyName)) //if we have listeners registered for this property
 		{
 			if(!ObjectUtilities.equals(oldValue, newValue))	//if the values are different
 			{					

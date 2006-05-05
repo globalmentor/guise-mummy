@@ -4,6 +4,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
 import java.util.*;
 
 import com.guiseframework.component.layout.*;
@@ -96,6 +97,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 		super(layout);	//construct the parent class
 		this.valueRepresentationStrategy=COMPONENT_REPRESENTATION_STRATEGY;	//use the shared component representation strategy
 		layout.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen an repeat all property changes of the card layout value model TODO make sure the card constraint values are passed on, too---right now they probably aren't as the property change event subclass isn't recognized in the repeater listener class
+		layout.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the card layout value model
 		addPropertyChangeListener(VALUE_PROPERTY, new PropertyChangeListener()	//listen for the value changing
 				{
 					public void propertyChange(final PropertyChangeEvent propertyChangeEvent)	//if the value changes
@@ -180,16 +182,17 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	/**@return The input value, or <code>null</code> if there is no input value.*/
 	public Component<?> getValue() {return getLayout().getValue();}
 
-	/**Sets the input value.
+	/**Sets the value.
 	This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method.
 	If a validator is installed, the value will first be validated before the current value is changed.
 	Validation always occurs if a validator is installed, even if the value is not changing.
-	@param newValue The input value of the model.
-	@exception ValidationException if the provided value is not valid.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
+	@param newValue The new value.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see #getValidator()
 	@see #VALUE_PROPERTY
 	*/
-	public void setValue(final Component<?> newValue) throws ValidationException {getLayout().setValue(newValue);}
+	public void setValue(final Component<?> newValue) throws PropertyVetoException {getLayout().setValue(newValue);}
 
 	/**Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators.
 	No validation occurs.
@@ -254,11 +257,12 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	/**Sets the selected values.
 	If a value occurs more than one time in the model, the first occurrence of the value will be selected.
 	Values that do not occur in the select model will be ignored.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	This method delegates to the selection strategy.
 	@param values The values to select.
-	@exception ValidationException if the provided value is not valid.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	*/
-	public void setSelectedValues(final Component<?>... values) throws ValidationException
+	public void setSelectedValues(final Component<?>... values) throws PropertyVetoException
 	{
 		setValue(values.length>0 ? values[0] : null);	//select the first or no value
 	}
@@ -290,25 +294,27 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	
 	/**Sets the selected indices.
 	Invalid and duplicate indices will be ignored.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to select.
-	@exception ValidationException if the provided value is not valid.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getSetSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedValues(V[])
 	@see #addSelectedIndexes(int...)
 	*/
-	public void setSelectedIndexes(final int... indexes) throws ValidationException
+	public void setSelectedIndexes(final int... indexes) throws PropertyVetoException
 	{
 		getLayout().setSelectedIndex(indexes.length>0 ? indexes[0] : -1);	//select the first index if there are indexes to select
 	}
 	
 	/**Adds a selection at the given indices.
 	Any invalid indices will be ignored.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to add to the selection.
-	@exception ValidationException if the provided value is not valid.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getAddSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedIndexes(int[])
 	*/
-	public void addSelectedIndexes(int... indexes) throws ValidationException
+	public void addSelectedIndexes(int... indexes) throws PropertyVetoException
 	{
 		if(getSelectedIndex()<0)	//only if there are no selected indexes
 		{
@@ -318,12 +324,13 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	
 	/**Removes a selection at the given indices.
 	Any invalid indices will be ignored.
+	If the value change is vetoed by the installed validator, the validation exception will be accessible via {@link PropertyVetoException#getCause()}.
 	@param indexes The indices to remove from the selection.
-	@exception ValidationException if the provided value is not valid.
+	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	@see ListSelectionPolicy#getRemoveSelectedIndices(ListSelectModel, int[])
 	@see #setSelectedIndexes(int[])
 	*/
-	public void removeSelectedIndexes(int... indexes) throws ValidationException
+	public void removeSelectedIndexes(int... indexes) throws PropertyVetoException
 	{
 		final int selectedIndex=getLayout().getSelectedIndex();	//get the selected index
 		for(int i=indexes.length-1; i>=0; --i)	//for each index index
