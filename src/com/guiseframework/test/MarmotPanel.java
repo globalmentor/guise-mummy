@@ -1,5 +1,6 @@
 package com.guiseframework.test;
 
+import java.beans.PropertyVetoException;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,9 +52,8 @@ public class MarmotPanel extends DefaultNavigationPanel
 		{
 			textInput.setValue("https://dav.globalmentor.com/public/");
 		}
-		catch(final ValidationException validationException)
+		catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
 		{
-			throw new AssertionError(validationException);
 		}
 		add(textInput);
 
