@@ -4,6 +4,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.regex.Pattern;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
@@ -31,12 +32,35 @@ Default converters are available for the following types:
 public class AbstractTextControl<V, C extends ValueControl<V, C>> extends AbstractValueControl<V, C>
 {
 
+	/**The auto commit pattern bound property.*/
+	public final static String AUTO_COMMIT_PATTERN_PROPERTY=getPropertyName(AbstractTextControl.class, "autoCommitPattern");
 	/**The column count bound property.*/
 	public final static String COLUMN_COUNT_PROPERTY=getPropertyName(AbstractTextControl.class, "columnCount");
 	/**The provisional text literal bound property.*/
 	public final static String PROVISIONAL_TEXT_PROPERTY=getPropertyName(AbstractTextControl.class, "provisionalText");
 	/**The text literal bound property.*/
 	public final static String TEXT_PROPERTY=getPropertyName(AbstractTextControl.class, "text");
+
+	/**The regular expression pattern that will cause the text automatically to be committed immediately, or <code>null</code> if text should not be committed during entry.*/
+	private Pattern autoCommitPattern=null;
+
+		/**@return The regular expression pattern that will cause the text automatically to be committed immediately, or <code>null</code> if text should not be committed during entry.*/
+		public Pattern getAutoCommitPattern() {return autoCommitPattern;}
+
+		/**Sets the The regular expression pattern that will cause the text automatically to be committed immediately.
+		This is a bound property.
+		@param newAutoCommitPattern The regular expression pattern that will cause the text automatically to be committed immediately, or <code>null</code> if text should not be committed during entry.
+		@see #AUTO_COMMIT_PATTERN_PROPERTY
+		*/
+		public void setAutoCommitPattern(final Pattern newAutoCommitPattern)
+		{
+			if(!ObjectUtilities.equals(autoCommitPattern, newAutoCommitPattern))	//if the value is really changing (compare their values, rather than identity)
+			{
+				final Pattern oldAutoCommitPattern=autoCommitPattern;	//get the old value
+				autoCommitPattern=newAutoCommitPattern;	//actually change the value
+				firePropertyChange(AUTO_COMMIT_PATTERN_PROPERTY, oldAutoCommitPattern, newAutoCommitPattern);	//indicate that the value changed
+			}
+		}
 
 	/**The estimated number of columns requested to be visible, or -1 if no column count is specified.*/
 	private int columnCount=-1;
@@ -102,7 +126,7 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 				provisionalText=newProvisionalText;	//actually change the value
 				updateValid();	//update the valid status before firing the text change property so that any listeners will know the valid status
 				firePropertyChange(PROVISIONAL_TEXT_PROPERTY, oldProvisionalText, newProvisionalText);	//indicate that the value changed
-			}			
+			}
 		}
 
 	/**The text literal value displayed in the control, or <code>null</code> if there is no literal value.*/
