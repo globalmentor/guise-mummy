@@ -2,9 +2,6 @@ package com.guiseframework.model;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.event.*;
 
@@ -14,10 +11,11 @@ If a dummy root node is used, it will automatically be set to an expanded state.
 @author Garret Wilson
 @see DummyTreeNodeModel
 */
-public class DefaultTreeModel extends AbstractModel implements TreeModel
+public class DefaultTreeModel extends AbstractModel implements TreeModel	//TODO why not descend from DefaultActionModel?
 {
 
 	/**A listener to listen for changes in properties of tree nodes that have bubbled up the hierarchy and refire them as {@link TreeNodePropertyChangeEvent}s.*/
+/*TODO del when works
 	private final PropertyChangeListener treeNodePropertyChangeListener=new PropertyChangeListener()	//TODO update this to match the repeat action listener
 		{
 			public void propertyChange(final PropertyChangeEvent propertyChangeEvent)	//if a tree node property changes
@@ -25,13 +23,14 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel
 				fireTreeNodePropertyChange(propertyChangeEvent);	//fire an event indicating that a tree node property changed
 			}		
 		};
+*/
 
 	/**An action listener to repeat copies of events received, using this component as the source.*/ 
 	private ActionListener repeatActionListener=new ActionListener()
 			{
 				public void actionPerformed(final ActionEvent actionEvent)	//if an action was performed
 				{
-					final ActionEvent repeatActionEvent=new ActionEvent(DefaultTreeModel.this, actionEvent);	//copy the action event with this class as its source
+					final ActionEvent repeatActionEvent=new ActionEvent(DefaultTreeModel.this, actionEvent);	//copy the action event with this class as its source, but keeping the same target if present
 					fireActionPerformed(repeatActionEvent);	//fire the repeated action
 				}
 			};
@@ -56,10 +55,12 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel
 			if(!ObjectUtilities.equals(rootNode, checkInstance(newRootNode, "Root node cannot be null.")))	//if the value is really changing
 			{
 				final TreeNodeModel<?> oldRootNode=rootNode;	//get the old value
-				oldRootNode.removePropertyChangeListener(treeNodePropertyChangeListener);	//stop listening for bubbled property change events from tree nodes in the old hierarchy
+//TODO del when works				oldRootNode.removePropertyChangeListener(treeNodePropertyChangeListener);	//stop listening for bubbled property change events from tree nodes in the old hierarchy
+				oldRootNode.removePropertyChangeListener(getRepeatPropertyChangeListener());	//stop listening for bubbled property change events from tree nodes in the old hierarchy
 				oldRootNode.removeActionListener(repeatActionListener);	//stop listening for bubbled action events from tree nodes in the old hierarchy
 				rootNode=newRootNode;	//actually change the value
-				newRootNode.addPropertyChangeListener(treeNodePropertyChangeListener);	//start listening for bubbled property change events from tree nodes in the new hierarchy
+//TODO del when works				newRootNode.addPropertyChangeListener(treeNodePropertyChangeListener);	//start listening for bubbled property change events from tree nodes in the new hierarchy
+				newRootNode.addPropertyChangeListener(getRepeatPropertyChangeListener());	//start listening for bubbled property change events from tree nodes in the new hierarchy
 				newRootNode.addActionListener(repeatActionListener);	//start listening for bubbled action events from tree nodes in the new hierarchy
 				firePropertyChange(ROOT_NODE_PROPERTY, oldRootNode, newRootNode);	//indicate that the value changed
 			}			
@@ -102,7 +103,8 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel
 	public DefaultTreeModel(final TreeNodeModel<?> rootNode)
 	{
 		this.rootNode=checkInstance(rootNode, "Root node cannot be null.");	//save the root node
-		this.rootNode.addPropertyChangeListener(treeNodePropertyChangeListener);	//start listening for bubbled property change events from tree nodes
+//TODO del when works		this.rootNode.addPropertyChangeListener(treeNodePropertyChangeListener);	//start listening for bubbled property change events from tree nodes
+		this.rootNode.addPropertyChangeListener(getRepeatPropertyChangeListener());	//start listening for bubbled property change events from tree nodes
 		this.rootNode.addActionListener(repeatActionListener);	//start listening for bubbled action events from tree nodes
 		if(rootNode instanceof DummyTreeNodeModel)	//if a dummy tree node model is being used
 		{
@@ -124,24 +126,29 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel
 	/**Adds a tree node property change listener.
 	@param treeNodePropertyChangeListener The tree node property change listener to add.
 	*/
+/*TODO del	
 	public void addTreeNodePropertyChangeListener(final TreeNodePropertyChangeListener<?> treeNodePropertyChangeListener)
 	{
 		getEventListenerManager().add(TreeNodePropertyChangeListener.class, treeNodePropertyChangeListener);	//add the listener
 	}
+*/
 
 	/**Removes a tree node property change listener.
 	@param treeNodePropertyChangeListener The tree node property change listener to remove.
 	*/
+/*TODO del
 	public void removeTreeNodePropertyChangeListener(final TreeNodePropertyChangeListener<?> treeNodePropertyChangeListener)
 	{
 		getEventListenerManager().remove(TreeNodePropertyChangeListener.class, treeNodePropertyChangeListener);	//remove the listener
 	}
+*/
 
 	/**Fires a tree node property change event to all registered tree node property change listeners.
 	@param propertyChangeEvent The property change event representing the property change of the tree node.
 	@see TreeNodePropertyChangeListener
 	@see TreeNodePropertyChangeEvent
 	*/
+/*TODO del
 	protected void fireTreeNodePropertyChange(final PropertyChangeEvent propertyChangeEvent)
 	{
 		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
@@ -154,6 +161,7 @@ public class DefaultTreeModel extends AbstractModel implements TreeModel
 			}
 		}
 	}
+*/
 
 		//ActionModel support
 

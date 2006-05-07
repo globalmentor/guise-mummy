@@ -5,11 +5,13 @@ import java.util.concurrent.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.garretwilson.beans.TargetedEvent;
 import com.garretwilson.util.Debug;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 
 /**A tree control.
+Property change events and action events on one tree node will be repeated to this object's listeners, with the tree node initiating the event accessible via {@link TargetedEvent#getTarget()}.
 @author Garret Wilson
 */
 public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>, TreeControl.TreeNodeComponentState, TreeControl> implements TreeModel
@@ -21,23 +23,12 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		/**@return The tree model used by this component.*/
 		protected TreeModel getTreeModel() {return treeModel;}
 
-	/**A listener to listen for changes in properties of tree nodes in the model and re-fire them as coming from this component.*/
-	private final TreeNodePropertyChangeListener<Object> treeNodePropertyChangeListener=new TreeNodePropertyChangeListener<Object>()
-		{
-			public void propertyChange(final TreeNodePropertyChangeEvent<Object> treeNodePropertyChangeEvent)	//if the model fires a tree node property change event
-			{
-					//create a copy of the property change event indicating this control as the source
-				final TreeNodePropertyChangeEvent<Object> repeatTreeNodePropertyChangeEvent=new TreeNodePropertyChangeEvent<Object>(this, treeNodePropertyChangeEvent.getTreeNode(), treeNodePropertyChangeEvent.getPropertyName(), treeNodePropertyChangeEvent.getOldValue(), treeNodePropertyChangeEvent.getNewValue()); 
-				fireTreeNodePropertyChange(repeatTreeNodePropertyChangeEvent);	//repeat the event to this control's listener
-			}		
-		};
-
-	/**An action listener to repeat copies of events received, using this component as the source.*/ 
+	/**An action listener to repeat copies of events received, using this component as the source.*/
 	private ActionListener repeatActionListener=new ActionListener()
 			{
 				public void actionPerformed(final ActionEvent actionEvent)	//if an action was performed
 				{
-					final ActionEvent repeatActionEvent=new ActionEvent(TreeControl.this, actionEvent);	//copy the action event with this class as its source
+					final ActionEvent repeatActionEvent=new ActionEvent(TreeControl.this, actionEvent);	//copy the action event with this class as its source, keeping the same target
 					fireActionPerformed(repeatActionEvent);	//fire the repeated action
 				}
 			};
@@ -124,42 +115,13 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		this.treeModel=checkInstance(treeModel, "Tree model cannot be null.");	//save the tree model
 		this.treeModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the tree model
 		this.treeModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the tree model
-		this.treeModel.addTreeNodePropertyChangeListener(treeNodePropertyChangeListener);	//listen and repeat all property changes of the tree nodes in the tree model
 		this.treeModel.addActionListener(repeatActionListener);	//listen and repeat all actions of the tree model
 			//TODO listen for and repeat tree model-specific events
 		setTreeNodeRepresentationStrategy(Object.class, new DefaultValueRepresentationStrategy<Object>());	//create a default representation strategy and set it as the default by associating it with the Object class
 		setTreeNodeRepresentationStrategy(LabelModel.class, new LabelModelTreeNodeRepresentationStrategy());	//create and associate a label model representation strategy
 //TODO fix		setTreeNodeRepresentationStrategy(MessageModel.class, new MessageModelRepresentationStrategy(session));	//create and associate a message model representation strategy
 		setTreeNodeRepresentationStrategy(TextModel.class, new TextModelTreeNodeRepresentationStrategy());	//create and associate a text model representation strategy
-	}
-
-	/**Adds a tree node property change listener.
-	@param treeNodePropertyChangeListener The tree node property change listener to add.
-	*/
-	public void addTreeNodePropertyChangeListener(final TreeNodePropertyChangeListener<?> treeNodePropertyChangeListener)
-	{
-		getEventListenerManager().add(TreeNodePropertyChangeListener.class, treeNodePropertyChangeListener);	//add the listener
-	}
-
-	/**Removes a tree node property change listener.
-	@param treeNodePropertyChangeListener The tree node property change listener to remove.
-	*/
-	public void removeTreeNodePropertyChangeListener(final TreeNodePropertyChangeListener<?> treeNodePropertyChangeListener)
-	{
-		getEventListenerManager().remove(TreeNodePropertyChangeListener.class, treeNodePropertyChangeListener);	//remove the listener
-	}
-
-	/**Fires a tree node property change event to all registered tree node property change listeners.
-	@param treeNodePropertyChangeEvent The tree node property change event representing the property change of the tree node.
-	@see TreeNodePropertyChangeListener
-	@see TreeNodePropertyChangeEvent
-	*/
-	protected void fireTreeNodePropertyChange(final TreeNodePropertyChangeEvent<Object> treeNodePropertyChangeEvent)
-	{
-		if(getEventListenerManager().hasListeners(TreeNodePropertyChangeListener.class))	//if there are tree node property change listeners registered
-		{
-			getSession().queueEvent(new PostponedTreeNodePropertyChangeEvent<Object>(getEventListenerManager(), treeNodePropertyChangeEvent));	//tell the Guise session to queue the event
-		}
+		addActionListener(new TreeNodeActionListener());	//listen for action events so that we can select nodes and/or pop up context menus
 	}
 
 		//TreeModel delegations
@@ -437,6 +399,54 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		for(final ActionListener actionListener:getEventListenerManager().getListeners(ActionListener.class))	//for each action listener
 		{
 			actionListener.actionPerformed(actionEvent);	//dispatch the action to the listener
+		}
+	}
+
+	/**The listener to listen for actions on a tree node to handle selections and context menus.
+	@author Garret Wilson
+	*/
+	private class TreeNodeActionListener implements ActionListener
+	{
+		/**Called when an action is initiated.
+		@param actionEvent The event indicating the source of the action.
+		*/
+		public void actionPerformed(final ActionEvent actionEvent)
+		{
+//TODO del Debug.trace("received action from source", actionEvent.getSource(), "for target", actionEvent.getTarget(), "with force", actionEvent.getForce(), "and option", actionEvent.getOption());
+			final Object target=actionEvent.getTarget();	//get the event target
+			if(target instanceof TreeNodeModel)	//if this action was on a tree node
+			{
+				final TreeNodeModel<?> treeNode=(TreeNodeModel<?>)target;	//get the tree node
+				
+/*TODO finish; this works so far
+				final Component<?> component=getComponent(treeNode);	//TODO testing
+				component.setBackgroundColor(RGBColor.BLUE);
+*/
+/*TODO fix
+				final Object value=treeNode.getValue();	//get the tree node value
+				if(value instanceof Interaction)	//if the tree node value is an interaction
+				{
+					final Interaction interaction=(Interaction)value;	//get the specified interaction
+					final TreeNodeModel<?> parentTreeNode=treeNode.getParent();	//get the parent tree node
+//TODO del Debug.trace("ready to edit; is there a parent?", parentTreeNode);
+					final Interaction contextInteraction=asInstance(parentTreeNode!=null ? parentTreeNode.getValue() : null, Interaction.class);	//get the parent's value, if any, which will be the context interaction
+//TODO del					final Question contextQuestion=asInstance(parentTreeNode!=null ? parentTreeNode.getValue() : null, Question.class);	//get the parent's value, if any, which will be the context question
+//TODO del Debug.trace("is there a context question?", contextQuestion);
+					final FollowupEvaluation followupEvaluation=treeNode instanceof AbstractInteractionTreeNodeModel ? ((AbstractInteractionTreeNodeModel<?>)treeNode).getFollowupEvaluation() : null;	//get the followup evaluation, if any
+					switch(actionEvent.getOption())	//see which option was requested
+					{
+						case 0:	//edit interaction
+							editInteraction(contextInteraction, followupEvaluation, interaction, false);	//edit the interaction, but don't add it anywhere
+							break;
+						case 1:	//add interaction
+							addInteraction(interaction, null);	//add a new interaction to this interaction
+							break;
+		//					addInteraction(null, null);	//add an interaction with no context question
+		
+					}
+				}
+*/
+			}
 		}
 	}
 

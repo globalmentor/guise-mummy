@@ -2,8 +2,6 @@ package com.guiseframework.model;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
-import com.guiseframework.event.TreeNodePropertyChangeListener;
-
 /**A model for a tree of nodes.
 @author Garret Wilson
 */
@@ -35,11 +33,11 @@ public interface TreeModel extends ActionModel
 	/**Adds a tree node property change listener.
 	@param treeNodePropertyChangeListener The tree node property change listener to add.
 	*/
-	public void addTreeNodePropertyChangeListener(final TreeNodePropertyChangeListener<?> treeNodePropertyChangeListener);
+//TODO del	public void addTreeNodePropertyChangeListener(final TreeNodePropertyChangeListener<?> treeNodePropertyChangeListener);
 
 	/**Removes a tree node property change listener.
 	@param treeNodePropertyChangeListener The tree node property change listener to remove.
 	*/
-	public void removeTreeNodePropertyChangeListener(final TreeNodePropertyChangeListener<?> treeNodePropertyChangeListener);
+//TODO del	public void removeTreeNodePropertyChangeListener(final TreeNodePropertyChangeListener<?> treeNodePropertyChangeListener);
 
 }

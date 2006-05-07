@@ -2,12 +2,14 @@ package com.guiseframework.model;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
+import com.garretwilson.beans.TargetedEvent;
+
 /**A node in a tree model.
-Property change events on one tree node will be bubbled up the hierarchy, with the source indicating the tree node on which the property change occurred.
+Property change events and action events on one tree node will be bubbled up the hierarchy, with the tree node initiating the event accessible via {@link TargetedEvent#getTarget()}.
 @author Garret Wilson
 @param <V> The type of value contained in the tree node.
 */
-public interface TreeNodeModel<V> extends ActionModel, ValueModel<V>, Iterable<TreeNodeModel<?>>
+public interface TreeNodeModel<V> extends ActionModel, ValueModel<V>, Selectable, Iterable<TreeNodeModel<?>>
 {
 
 	/**The expanded bound property.*/

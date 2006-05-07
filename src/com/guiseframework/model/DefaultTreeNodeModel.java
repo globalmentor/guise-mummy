@@ -3,29 +3,28 @@ package com.guiseframework.model;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.garretwilson.beans.TargetedEvent;
 import com.guiseframework.event.ActionEvent;
 import com.guiseframework.event.ActionListener;
 import com.guiseframework.event.EventListenerManager;
 
 /**A default node in a tree model.
-Property change events and action events on one tree node will be bubbled up the hierarchy, with the source indicating the tree node on which the property change occurred.
+Property change events and action events on one tree node will be bubbled up the hierarchy, with the tree node initiating the event accessible via {@link TargetedEvent#getTarget()}.
 @author Garret Wilson
 @param <V> The type of value contained in the tree node.
 */
 public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements TreeNodeModel<V>
 {
 
-	/**An action listener to forward along events received unmodified.*/ 
-	private final ActionListener forwardActionListener=new ActionListener()	//create an action listener to listen for actions
+	/**An action listener to repeat copies of events received, using this component as the source.*/
+	private ActionListener repeatActionListener=new ActionListener()
 			{
-				public void actionPerformed(final ActionEvent actionEvent)	//if an action is performed
+				public void actionPerformed(final ActionEvent actionEvent)	//if an action was performed
 				{
-					fireActionPerformed(actionEvent);	//forward the action event unmodified					
+					final ActionEvent repeatActionEvent=new ActionEvent(DefaultTreeNodeModel.this, actionEvent);	//copy the action event with this class as its source, keeping the same target
+					fireActionPerformed(repeatActionEvent);	//fire the repeated action
 				}
 			};
-
-		/**@return An action listener to forward along events received unmodified.*/ 
-		protected ActionListener getForwardActionListener() {return forwardActionListener;}
 
 	/**Whether the node is expanded, showing its children, if any.*/
 	private boolean expanded=false;
@@ -60,6 +59,27 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 				childTreeNode.setAllExpanded(newAllExpanded);	//set this child tree node subtree expanded or contracted
 			}
 		}		
+
+	/**Whether the tree node is selected.*/
+	private boolean selected=false;
+
+		/**@return Whether the tree node is selected.*/
+		public boolean isSelected() {return selected;}
+
+		/**Sets whether the tree node is selected.
+		This is a bound property of type <code>Boolean</code>.
+		@param newSelected <code>true</code> if the tree node should be selected, else <code>false</code>.
+		@see #SELECTED_PROPERTY
+		*/
+		public void setSelected(final boolean newSelected)
+		{
+			if(selected!=newSelected)	//if the value is really changing
+			{
+				final boolean oldSelected=selected;	//get the current value
+				selected=newSelected;	//update the value
+				firePropertyChange(SELECTED_PROPERTY, Boolean.valueOf(oldSelected), Boolean.valueOf(newSelected));
+			}
+		}
 
 	/**The list of child tree nodes.*/ 
 	private final List<TreeNodeModel<?>> treeNodeList=new CopyOnWriteArrayList<TreeNodeModel<?>>();
@@ -98,8 +118,9 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 		}
 		treeNodeList.add(treeNode);	//add the tree node to the list
 		treeNode.setParent(this);	//tell the tree node who its parent is
-		treeNode.addPropertyChangeListener(getForwardPropertyChangeListener());	//listen for property changes and bubble them up the hierarchy
-		treeNode.addActionListener(getForwardActionListener());	//listen for action events and bubble them up the hierarchy
+		treeNode.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the tree node
+		treeNode.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the tree node
+		treeNode.addActionListener(repeatActionListener);	//listen and repeat all actions of the tree node		
 	}
 
 	/**Removes a child tree node from this tree node.
@@ -112,8 +133,9 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 		{
 			throw new IllegalArgumentException("Tree node "+treeNode+" is not child of tree node "+this+".");
 		}
-		treeNode.removePropertyChangeListener(getForwardPropertyChangeListener());	//stop listening for property changes to bubble up the hierarchy
-		treeNode.removeActionListener(getForwardActionListener());	//stop listening for action events and bubble them up the hierarchy
+		treeNode.removePropertyChangeListener(getRepeatPropertyChangeListener());	//stop listening and repeating all property changes of the tree node
+		treeNode.removeVetoableChangeListener(getRepeatVetoableChangeListener());	//stop listening and repeating all vetoable changes of the tree node
+		treeNode.removeActionListener(repeatActionListener);	//stop listening and repeating all actions of the tree node
 		treeNodeList.remove(treeNode);	//remove the tree node to the list
 		treeNode.setParent(null);	//tell the tree node it no longer has a parent
 	}
@@ -123,7 +145,7 @@ public class DefaultTreeNodeModel<V> extends DefaultValueModel<V> implements Tre
 	{
 		for(final TreeNodeModel<?> treeNode:this)	//for each child tree node
 		{
-			remove(treeNode);	//remove this component
+			remove(treeNode);	//remove this tree node
 		}
 	}
 

@@ -355,10 +355,9 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	This is a bound value state property.
 	@param value The value to enable or disable.
 	@param newDisplayed Whether the value should be displayed.
-	@see ValuePropertyChangeEvent
 	@see #DISPLAYED_PROPERTY
 	*/
-	public void setValueDisplayed(final Component<?> value, final boolean newDisplayed) {getLayout().getConstraints(value).setDisplayed(newDisplayed);}
+	public void setValueDisplayed(final Component<?> value, final boolean newDisplayed) {getLayout().getConstraints(value).setDisplayed(newDisplayed);}	//TODO fix property change event
 
 	/**Determines the displayed status of a given index.
 	@param index The index of the value for which the displayed status is to be determined.
@@ -370,11 +369,10 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	This is a bound value state property.
 	@param index The index of the value to enable or disable.
 	@param newDisplayed Whether the value at the given index should be displayed.
-	@see ValuePropertyChangeEvent
 	@see #DISPLAYED_PROPERTY
 	@exception IndexOutOfBoundsException if the given index is not within the range of the list.
 	*/
-	public void setIndexDisplayed(final int index, final boolean newDisplayed) {setValueDisplayed(get(index), newDisplayed);}
+	public void setIndexDisplayed(final int index, final boolean newDisplayed) {setValueDisplayed(get(index), newDisplayed);}	//TODO fix property change event
 
 	/**Determines the enabled status of the first occurrence of a given value.
 	@param value The value for which the enabled status is to be determined.
@@ -387,10 +385,9 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	This is a bound value state property.
 	@param value The value to enable or disable.
 	@param newEnabled Whether the value should be enabled.
-	@see ValuePropertyChangeEvent
 	@see #ENABLED_PROPERTY
 	*/
-	public void setValueEnabled(final Component<?> value, final boolean newEnabled) {getLayout().getConstraints(value).setEnabled(newEnabled);}
+	public void setValueEnabled(final Component<?> value, final boolean newEnabled) {getLayout().getConstraints(value).setEnabled(newEnabled);}	//TODO fix property change event
 
 	/**Determines the enabled status of a given index.
 	@param index The index of the value for which the enabled status is to be determined.
@@ -402,11 +399,10 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	This is a bound value state property.
 	@param index The index of the value to enable or disable.
 	@param newEnabled Whether the value at the given index should be enabled.
-	@see ValuePropertyChangeEvent
 	@see #ENABLED_PROPERTY
 	@exception IndexOutOfBoundsException if the given index is not within the range of the list.
 	*/
-	public void setIndexEnabled(final int index, final boolean newEnabled) {setValueEnabled(get(index), newEnabled);}
+	public void setIndexEnabled(final int index, final boolean newEnabled) {setValueEnabled(get(index), newEnabled);}	//TODO fix property change event
 
 	/**Adds a list listener.
 	@param listListener The list listener to add.

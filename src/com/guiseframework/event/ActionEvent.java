@@ -100,7 +100,7 @@ public class ActionEvent extends AbstractGuiseEvent implements TargetedEvent
 	*/
 	public ActionEvent(final Object source, final int force, final int option)
 	{
-		this(source, source, force, option);	//construct the class with the same target as the object
+		this(source, source, force, option);	//construct the class with the same target as the source
 	}
 
 	/**Source, target, force, and option constructor.

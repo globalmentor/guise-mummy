@@ -1,6 +1,5 @@
 package com.guiseframework.model;
 
-import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.util.*;
 
@@ -821,10 +820,9 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	This is a bound value state property.
 	@param value The value to display.
 	@param newDisplayed Whether the value should be displayed.
-	@see ValuePropertyChangeEvent
-	@see ControlModel#DISPLAYED_PROPERTY
+	@see #DISPLAYED_PROPERTY
 	*/
-	public void setValueDisplayed(final V value, final boolean newDisplayed) 
+	public void setValueDisplayed(final V value, final boolean newDisplayed)	//TODO fix property change event 
 	{
 		synchronized(this)	//don't allow the model to be changed while we look up the value in the array
 		{
@@ -848,11 +846,10 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	This is a bound value state property.
 	@param index The index of the value to display.
 	@param newDisplayed Whether the value at the given index should be displayed.
-	@see ValuePropertyChangeEvent
-	@see ControlModel#DISPLAYED_PROPERTY
+	@see #DISPLAYED_PROPERTY
 	@exception IndexOutOfBoundsException if the given index is not within the range of the list.
 	*/
-	public void setIndexDisplayed(final int index, final boolean newDisplayed) 
+	public void setIndexDisplayed(final int index, final boolean newDisplayed)	//TODO fix property change event 
 	{
 		synchronized(this)	//don't allow the the model to change while we update the displayed status
 		{
@@ -883,10 +880,9 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	This is a bound value state property.
 	@param value The value to enable or disable.
 	@param newEnabled Whether the value should be enabled.
-	@see ValuePropertyChangeEvent
-	@see ControlModel#ENABLED_PROPERTY
+	@see #ENABLED_PROPERTY
 	*/
-	public void setValueEnabled(final V value, final boolean newEnabled) 
+	public void setValueEnabled(final V value, final boolean newEnabled)	//TODO fix property change event 
 	{
 		synchronized(this)	//don't allow the model to be changed while we look up the value in the array
 		{
@@ -910,11 +906,10 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	This is a bound value state property.
 	@param index The index of the value to enable or disable.
 	@param newEnabled Whether the value at the given index should be enabled.
-	@see ValuePropertyChangeEvent
-	@see ControlModel#ENABLED_PROPERTY
+	@see #ENABLED_PROPERTY
 	@exception IndexOutOfBoundsException if the given index is not within the range of the list.
 	*/
-	public void setIndexEnabled(final int index, final boolean newEnabled) 
+	public void setIndexEnabled(final int index, final boolean newEnabled)	//TODO fix property change event 
 	{
 		synchronized(this)	//don't allow the the model to change while we update the enabled status
 		{
@@ -1039,8 +1034,8 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 	@param propertyName The name of the property being changed.
 	@param oldValue The old property value.
 	@param newValue The new property value.
-	@see ValuePropertyChangeEvent
 	*/
+/*TODO fix to throw a targeted event if needed
 	protected <P> void fireValuePropertyChange(final V value, final String propertyName, final P oldValue, final P newValue)
 	{
 		if(hasPropertyChangeListeners(propertyName)) //if we have listeners registered for this property
@@ -1051,6 +1046,7 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 			}
 		}
 	}
+*/
 
 	/**Constructs a list select model indicating the type of values it can hold, using a default multiple selection strategy.
 	@param valueClass The class indicating the type of values held in the model.

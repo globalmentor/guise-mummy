@@ -73,10 +73,9 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>, ListListena
 	This is a bound value state property.
 	@param value The value to display.
 	@param newDisplayed Whether the value should be displayed.
-	@see ValuePropertyChangeEvent
-	@see ControlModel#DISPLAYED_PROPERTY
+	@see #DISPLAYED_PROPERTY
 	*/
-	public void setValueDisplayed(final V value, final boolean newDisplayed);	//TODO update comments after property firing is fixed 
+	public void setValueDisplayed(final V value, final boolean newDisplayed);	//TODO update comments after property firing is fixed	//TODO fix property change event 
 
 	/**Determines the displayed status of a given index.
 	@param index The index of the value for which the displayed status is to be determined.
@@ -88,11 +87,10 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>, ListListena
 	This is a bound value state property.
 	@param index The index of the value to display.
 	@param newDisplayed Whether the value at the given index should be displayed.
-	@see ValuePropertyChangeEvent
-	@see ControlModel#DISPLAYED_PROPERTY
+	@see #DISPLAYED_PROPERTY
 	@exception IndexOutOfBoundsException if the given index is not within the range of the list.
 	*/
-	public void setIndexDisplayed(final int index, final boolean newDisplayed); 
+	public void setIndexDisplayed(final int index, final boolean newDisplayed);	//TODO fix property change event 
 	
 	/**Determines the enabled status of the first occurrence of a given value.
 	@param value The value for which the enabled status is to be determined.
@@ -105,10 +103,9 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>, ListListena
 	This is a bound value state property.
 	@param value The value to enable or disable.
 	@param newEnabled Whether the value should be enabled.
-	@see ValuePropertyChangeEvent
 	@see #ENABLED_PROPERTY
 	*/
-	public void setValueEnabled(final V value, final boolean newEnabled); 
+	public void setValueEnabled(final V value, final boolean newEnabled);	//TODO fix property change event 
 
 	/**Determines the enabled status of a given index.
 	@param index The index of the value for which the enabled status is to be determined.
@@ -120,11 +117,10 @@ public interface ListSelectModel<V> extends SelectModel<V>, List<V>, ListListena
 	This is a bound value state property.
 	@param index The index of the value to enable or disable.
 	@param newEnabled Whether the value at the given index should be enabled.
-	@see ValuePropertyChangeEvent
 	@see #ENABLED_PROPERTY
 	@exception IndexOutOfBoundsException if the given index is not within the range of the list.
 	*/
-	public void setIndexEnabled(final int index, final boolean newEnabled); 
+	public void setIndexEnabled(final int index, final boolean newEnabled);	//TODO fix property change event 
 
 	/**Adds a list listener.
 	@param listListener The list listener to add.
