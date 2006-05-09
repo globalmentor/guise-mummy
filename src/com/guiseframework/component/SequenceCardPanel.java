@@ -67,7 +67,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the next action is performed
 					{
-						goNext();	//go to the previous card
+						goNext();	//go to the next card
 					};
 				});
 //TODO del		setValidator(new SequenceCardValidator());	//TODO comment

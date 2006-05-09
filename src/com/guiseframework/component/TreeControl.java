@@ -66,38 +66,40 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		return treeNodeRepresentationStrategy;	//return the tree node representation strategy
 	}
 
-	/**Ensures the component for a particular tree hierarchy exists.
-	This method is meant to be called primarily from the associated view.
-	This method recursively calls itself for all child nodes of the given tree node.
-	@param <T> The type of value contained in the tree node.
-	@param treeNode The tree node to verify.
-	@return The child component representing the given tree node.
+	/**Retrieves the component for the given object.
+	If no component yet exists for the given object, one will be created.
+	This version is provided to allow public access.
+	@param treeNode The object for which a representation component should be returned.
+	@return The child component representing the given object.
+	@exception IllegalArgumentException if the given object is not an appropriate object for a component to be created.
 	*/
-	public <T> Component<?> verifyTreeNodeComponent(final TreeNodeModel<T> treeNode)
+	public Component<?> getComponent(final TreeNodeModel<?> treeNode)
 	{
-//TODO important fix		final boolean editable=treeNode.isEditable();	//see if the tree node is editable
-//TODO del Debug.trace("ready to verify tree node with value:", treeNode.getValue());
+		return super.getComponent(treeNode);	//delegate to the parent version
+	}
+
+	/**Creates a component state to represent the given object.
+	This implementation delegates to {@link #createTypedComponentState(TreeNodeModel)}.
+	@param object The object with which the component state is to be associated.
+	@return The component state to represent the given object.
+	@exception IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
+	*/
+	protected TreeNodeComponentState createComponentState(final TreeNodeModel<?> treeNode)
+	{
+		return createTypedComponentState(treeNode);	//delegate to the typed version
+	}
+	
+	/**Creates a component state to represent the given object.
+	@param <T> The type of value contained in the tree node.
+	@param object The object with which the component state is to be associated.
+	@return The component state to represent the given object.
+	@exception IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
+	*/
+	private <T> TreeNodeComponentState createTypedComponentState(final TreeNodeModel<T> treeNode)
+	{
 		final boolean editable=false;	//TODO fix
-		TreeNodeComponentState treeNodeComponentState=getComponentState(treeNode);	//get the component information for this tree node
-		if(treeNodeComponentState==null || treeNodeComponentState.isEditable()!=editable)	//if there is no component for this tree node, or the component has a different editable status
-		{
-//TODO del Debug.trace("ready to create a component for type", treeNode.getValueClass(), "using strategy", getTreeNodeRepresentationStrategy(treeNode.getValueClass()).getClass());
-			
-				//TODO assert that there is a representation strategy, or otherwise check
-			final Component<?> valueComponent=getTreeNodeRepresentationStrategy(treeNode.getValueClass()).createComponent(this, getTreeModel(), treeNode, editable, false, false);	//create a new component for the tree node
-			if(valueComponent!=null)	//if a value component is given TODO see if this check occurs in the table controller TODO make sure this is the way we want to do this---why not just return a label with a null value?
-			{
-//TODO del				valueComponent.setParent(this);	//tell this component that this tree component is its parent
-				treeNodeComponentState=new TreeNodeComponentState(valueComponent, editable);	//create a new component state for the tree node's component and metadata
-				putComponentState(treeNode, treeNodeComponentState);	//store the component state in the map for next time
-			}
-		}
-		for(final TreeNodeModel<?> childTreeNode:treeNode)	//for each child tree node
-		{
-			verifyTreeNodeComponent(childTreeNode);	//verify this child node tree
-		}
-//TODO important: fix; if the value is null, there will be no tree node compenent state created, which will throw a NullPointerException
-		return treeNodeComponentState.getComponent();	//return the representation component
+		final Component<?> treeNodeComponent=getTreeNodeRepresentationStrategy(treeNode.getValueClass()).createComponent(this, getTreeModel(), treeNode, editable, false, false);	//create a new component for the tree node
+		return new TreeNodeComponentState(treeNodeComponent, editable);	//create a new component state for the tree node's component and metadata
 	}
 
 	/**Default constructor with a default tree model.*/
@@ -166,7 +168,6 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	}
 
 	/**A strategy for generating components to represent tree node models.
-	The component ID should reflect a unique identifier for the tree node.
 	@param <V> The type of value the strategy is to represent.
 	@author Garret Wilson
 	*/
@@ -180,7 +181,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		@param editable Whether values in this column are editable.
 		@param selected <code>true</code> if the value is selected.
 		@param focused <code>true</code> if the value has the focus.
-		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
+		@return A new component to represent the given value.
 		*/
 		public <N extends V> Component<?> createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused);
 	}
@@ -210,7 +211,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		@param editable Whether values in this column are editable.
 		@param selected <code>true</code> if the value is selected.
 		@param focused <code>true</code> if the value has the focus.
-		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
+		@return A new component to represent the given value.
 		*/
 		@SuppressWarnings("unchecked")
 		public <N extends V> Component<?> createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
@@ -238,7 +239,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 				}
 				else	//if there is no value
 				{
-					return null;	//don't return a component
+					return new Label();	//return a default label TODO improve this entire strategy
 				}
 			}
 		}
@@ -259,7 +260,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		@param editable Whether values in this column are editable.
 		@param selected <code>true</code> if the value is selected.
 		@param focused <code>true</code> if the value has the focus.
-		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
+		@return A new component to represent the given value.
 		*/
 		public <N extends LabelModel> Label createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
 		{
@@ -282,7 +283,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		@param editable Whether values in this column are editable.
 		@param selected <code>true</code> if the value is selected.
 		@param focused <code>true</code> if the value has the focus.
-		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
+		@return A new component to represent the given value.
 		*/
 		public <N extends TextModel> Text createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
 		{

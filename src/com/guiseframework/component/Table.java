@@ -1,17 +1,23 @@
 package com.guiseframework.component;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.util.*;
 import java.util.concurrent.*;
 
+import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.GuiseSession;
+import com.guiseframework.component.layout.Constraints;
+import com.guiseframework.component.layout.TaskCardConstraints;
 import com.guiseframework.converter.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
+import com.guiseframework.prototype.ActionPrototype;
 import com.guiseframework.validator.*;
 
 /**A table component.
@@ -20,11 +26,75 @@ import com.guiseframework.validator.*;
 public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Table.CellComponentState, Table> implements TableModel
 {
 
+	/**The display row count bound property.*/
+	public final static String DISPLAY_ROW_COUNT_PROPERTY=getPropertyName(Table.class, "displayRowCount");
+	/**The display row start index bound property.*/
+	public final static String DISPLAY_ROW_START_INDEX_PROPERTY=getPropertyName(Table.class, "displayRowStartIndex");
+
 	/**The table model used by this component.*/
 	private final TableModel tableModel;
 
 		/**@return The table model used by this component.*/
 		protected TableModel getTableModel() {return tableModel;}
+
+	/**The prototype for the previous action.*/
+	private final ActionPrototype previousActionPrototype;
+
+		/**@return The prototype for the previous action.*/
+		public ActionPrototype getPreviousActionPrototype() {return previousActionPrototype;}
+
+	/**The prototype for the next action.*/
+	private final ActionPrototype nextActionPrototype;
+
+		/**@return The prototype for the next action.*/
+		public ActionPrototype getNextActionPrototype() {return nextActionPrototype;}
+
+	/**The number of rows to display at one time, or -1 the row count is not restricted.*/
+	private int displayRowCount=-1;
+
+		/**@return The number of rows to display at one time, or -1 the row count is not restricted.*/
+		public int getDisplayRowCount() {return displayRowCount;}
+
+		/**Sets the number of rows to display at one time.
+		This is a bound property of type <code>Integer</code>.
+		@param newDisplayRowCount The number of rows to display at one time, or -1 the row count is not restricted.
+		@see #DISPLAY_ROW_COUNT_PROPERTY
+		*/
+		public void setDisplayRowCount(final int newDisplayRowCount)
+		{
+			if(displayRowCount!=newDisplayRowCount)	//if the value is really changing
+			{
+				final int oldDisplayRowCount=displayRowCount;	//get the old value
+				displayRowCount=newDisplayRowCount;	//actually change the value
+				firePropertyChange(DISPLAY_ROW_COUNT_PROPERTY, new Integer(oldDisplayRowCount), new Integer(newDisplayRowCount));	//indicate that the value changed
+			}			
+		}
+
+	/**The index of the first row to display.*/
+	private int displayRowStartIndex=0;
+
+		/**@return The index of the first row to display.*/
+		public int getDisplayRowStartIndex() {return displayRowStartIndex;}
+
+		/**Sets the index of the first row to display.
+		This is a bound property of type <code>Integer</code>.
+		@param newDisplayRowStartIndex The index of the first row to display.
+		@exception IndexOutOfBoundsException if the given index is less than zero.
+		@see #DISPLAY_ROW_START_INDEX_PROPERTY
+		*/
+		public void setDisplayRowStartIndex(final int newDisplayRowStartIndex)
+		{
+			if(newDisplayRowStartIndex<0)	//if the index is less than zero
+			{
+				throw new IndexOutOfBoundsException("Display row index cannot be be less than zero: "+newDisplayRowStartIndex);				
+			}
+			if(displayRowStartIndex!=newDisplayRowStartIndex)	//if the value is really changing
+			{
+				final int oldDisplayRowStartIndex=displayRowStartIndex;	//get the old value
+				displayRowStartIndex=newDisplayRowStartIndex;	//actually change the value
+				firePropertyChange(DISPLAY_ROW_START_INDEX_PROPERTY, new Integer(oldDisplayRowStartIndex), new Integer(newDisplayRowStartIndex));	//indicate that the value changed
+			}			
+		}
 
 	/**Whether the table is editable and the cells will allow the the user to change their values, if their respective columns are designated as editable as well.*/
 	private boolean editable=true;
@@ -46,6 +116,15 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
 			}			
 		}
+
+	/**The property change listener that updates prototype properties.*/
+	final protected PropertyChangeListener updatePrototypesPropertyChangeListener=new PropertyChangeListener()
+			{
+				public void propertyChange(final PropertyChangeEvent propertyChangeEvent)	//when the property changes
+				{
+					updatePrototypes();	//update the prototypes
+				}
+			};
 
 	/**The map of cell representation strategies for columns.*/
 	private final Map<TableColumnModel<?>, CellRepresentationStrategy<?>> columnCellRepresentationStrategyMap=new ConcurrentHashMap<TableColumnModel<?>, CellRepresentationStrategy<?>>();
@@ -73,12 +152,54 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		return (CellRepresentationStrategy<? super V>)columnCellRepresentationStrategyMap.get(column);	//return the strategy linked to the column in the map
 	}
 
+	/**Retrieves the component for the given object.
+	If no component yet exists for the given object, one will be created.
+	This version is provided to allow public access.
+	@param cell The object for which a representation component should be returned.
+	@return The child component representing the given object.
+	@exception IllegalArgumentException if the given object is not an appropriate object for a component to be created.
+	*/
+	public Component<?> getComponent(final TableModel.Cell<?> cell)
+	{
+		return super.getComponent(cell);	//delegate to the parent version
+	}
+
+	/**Creates a component state to represent the given object.
+	@param cell The object with which the component state is to be associated.
+	@return The component state to represent the given object.
+	@exception IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
+	*/
+	protected CellComponentState createComponentState(final TableModel.Cell<?> cell)
+	{
+		return createTypedComponentState(cell);	//delegate to the typed version
+	}
+
+	/**Creates a component state to represent the given object.
+	This implementation delegates to {@link #createTypedComponentState(com.guiseframework.model.TableModel.Cell)}.
+	@param <T> The type of value contained in the cell.
+	@param cell The object with which the component state is to be associated.
+	@return The component state to represent the given object.
+	@exception IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
+	*/
+	protected <T> CellComponentState createTypedComponentState(final TableModel.Cell<T> cell)
+	{
+		final TableModel tableModel=getTableModel();	//get the table model
+		final int rowIndex=cell.getRowIndex();	//get the row index
+		final TableColumnModel<T> column=cell.getColumn();	//get the cell column
+		final boolean editable=isEditable() && column.isEditable();	//see if the cell is editable (a cell is only editable if both its table and column are editable)
+//TODO del		final TableModel.Cell<T> cell=new TableModel.Cell<T>(rowIndex, column);	//create a cell object representing this row and column
+//TODO fix editable		if(cellComponentState==null || cellComponentState.isEditable()!=editable)	//if there is no component for this cell, or the component has a different editable status
+		final Component<?> valueComponent=getCellRepresentationStrategy(column).createComponent(this, tableModel, rowIndex, column, editable, false, false);	//create a new component for the cell
+		return new CellComponentState(valueComponent, editable);	//create a new component state for the cell's component and metadata
+	}
+
 	/**Ensures the component for a particular row and column exists.
 	@param <T> The type of value contained in the cells of the column.
 	@param rowIndex The zero-based cell row index.
 	@param column The cell column.
 	@return The child component representing the given cell.
 	*/
+/*TODO del when works
 	public <T> Component<?> verifyCellComponent(final int rowIndex, final TableColumnModel<T> column)
 	{
 		final TableModel tableModel=getTableModel();	//get the table model
@@ -94,6 +215,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		}
 		return cellComponentState.getComponent();	//return the representation component
 	}
+*/
 
 	/**Value class and column names constructor with a default data model.
 	@param <C> The type of values in all the cells in the table.
@@ -171,6 +293,81 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 							getView().setUpdated(false);	//TODO fix hack; add a table listener and have the view listen to that
 						};
 					});
+		}
+			//previous action prototype
+		previousActionPrototype=new ActionPrototype();
+		previousActionPrototype.setLabel("Previous");	//TODO i18n
+		previousActionPrototype.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(final ActionEvent actionEvent)	//if the previous action is performed
+					{
+						goPrevious();	//go to the previous set of rows
+					};
+				});
+			//next action prototype
+		nextActionPrototype=new ActionPrototype();
+		nextActionPrototype.setLabel("Next");	//TODO i18n
+		nextActionPrototype.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(final ActionEvent actionEvent)	//if the next action is performed
+					{
+						goNext();	//go to the next set of rows
+					};
+				});
+		addPropertyChangeListener(DISPLAY_ROW_COUNT_PROPERTY, updatePrototypesPropertyChangeListener);	//update the prorotypes when the display row count changes
+		addPropertyChangeListener(DISPLAY_ROW_START_INDEX_PROPERTY, updatePrototypesPropertyChangeListener);	//update the prorotypes when the display row start index changes
+		//TODO listen for the row count changing and update the prototypes in response
+		updatePrototypes();	//update the prototypes
+	}
+
+	/**Updates the state of the prototypes, such as previous and next.*/
+	protected void updatePrototypes()
+	{
+		final int displayRowCount=getDisplayRowCount();	//get the rows to display
+		if(displayRowCount>0)	//if this table is paged
+		{
+			final int displayRowStartIndex=getDisplayRowStartIndex();	//get the display row start index
+			previousActionPrototype.setEnabled(displayRowStartIndex>0);	//enable or disable the previous action prototype
+			nextActionPrototype.setEnabled(displayRowStartIndex+displayRowCount<getRowCount()-1);	//enable or disable the previous action prototype		
+		}
+		else	//if this table is not paged TODO decide if we later want to make these not displayed
+		{
+			previousActionPrototype.setEnabled(false);	//disable the previous action prototype
+			nextActionPrototype.setEnabled(false);	//disable the previous action prototype
+		}
+	}
+
+	/**Goes to the previous set of table rows if the display row count is restricted.
+	If the display row count is not restricted and the row start index is greater than zero, it is reset to zero.
+	@see #getDisplayRowStartIndex()
+	@see #getDisplayRowCount()
+	*/
+	public void goPrevious()
+	{
+		final int displayRowStartIndex=getDisplayRowStartIndex();	//get the display row start index
+		final int displayRowCount=getDisplayRowCount();	//get the rows to display
+		if(displayRowCount>0)	//if there is a valid display row count
+		{
+			setDisplayRowStartIndex(Math.max(displayRowStartIndex-displayRowCount, 0));	//go back a page, but not going below zero
+		}
+		else if(displayRowStartIndex>0)	//if the display row count is not restricted, but the first index is not zero
+		{
+			setDisplayRowStartIndex(0);	//go to the first row
+		}		
+	}
+
+	/**Goes to the next set of table rows if the display row count is restricted.
+	If the display row count is not restricted, nothing occurs.
+	@see #getDisplayRowStartIndex()
+	@see #getDisplayRowCount()
+	*/
+	public void goNext()
+	{
+		final int displayRowStartIndex=getDisplayRowStartIndex();	//get the display row start index
+		final int displayRowCount=getDisplayRowCount();	//get the rows to display
+		if(displayRowCount>0)	//if there is a valid display row count
+		{
+			setDisplayRowStartIndex(Math.min(displayRowStartIndex+displayRowCount, getRowCount()-displayRowCount));	//go forward a page, but not going past the last page
 		}
 	}
 
@@ -262,7 +459,6 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	}
 
 	/**A strategy for generating components to represent table cell model values.
-	The component ID should reflect a unique identifier for the cell.
 	@param <V> The type of value the strategy is to represent.
 	@author Garret Wilson
 	*/
@@ -286,7 +482,6 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	Component values will be represented as themselves.
 	For non-editable cells, a message component will be generated using the cell's value as its message.
 	Editable cells will be represented using a checkbox for boolean values and a text control for all other values.
-	The message's ID will be in the form "<var>tableID</var>.cell-<var>rowIndex</var>-<var>columnIndex</var>".
 	@param <V> The type of value the strategy is to represent.
 	@see Message
 	@see Converter

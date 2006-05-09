@@ -526,7 +526,24 @@ Debug.trace("list control changed value to", newValue);
 		contentPanel.add(buttonPanel);	//add the button panel to the panel
 
 		
+
 		
+		final Integer[][] testTableData;
+		final int rowCount=20;
+		final int columnCount=3;
+		testTableData=new Integer[rowCount][columnCount];
+		for(int rowIndex=0; rowIndex<rowCount; ++rowIndex)
+		{
+			for(int columnIndex=0; columnIndex<columnCount; ++columnIndex)
+			{
+				testTableData[rowIndex][columnIndex]=new Integer(rowIndex);
+			}
+		}
+		final Table pagedTable=new Table(Integer.class, testTableData, "Column1", "Column2", "Column3");
+		pagedTable.setDisplayRowCount(5);
+		contentPanel.add(pagedTable);
+		contentPanel.add(new Button(pagedTable.getPreviousActionPrototype()));
+		contentPanel.add(new Button(pagedTable.getNextActionPrototype()));
 
 		
 		final LayoutPanel linkPanel=new LayoutPanel(new FlowLayout(Flow.LINE));	//create a panel flowing horizontally

@@ -29,10 +29,10 @@ public class TextControl<V> extends AbstractTextControl<V, TextControl<V>>
 	/**Whether the user input text is masked to prevent viewing of the literal entered value.*/
 	private boolean masked=false;
 
-		/**@return Whether the user input text is masked to prevent viewing of the litereal entered value.*/
+		/**@return Whether the user input text is masked to prevent viewing of the literal entered value.*/
 		public boolean isMasked() {return masked;}
 
-		/**Sets whether the user input text is masked to prevent viewing of the litereal entered value.
+		/**Sets whether the user input text is masked to prevent viewing of the literal entered value.
 		This is a bound property of type <code>Boolean</code>.
 		@param newMasked <code>true</code> if the user input text should be masked.
 		@see #MASKED_PROPERTY

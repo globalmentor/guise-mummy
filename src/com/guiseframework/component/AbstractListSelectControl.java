@@ -48,34 +48,28 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 		}
 
 	/**Retrieves the component for the given object.
-	This version calls {@link #verifyValueComponent(Object)}.
+	If no component yet exists for the given object, one will be created.
+	This version is provided to allow public access.
 	@param value The object for which a representation component should be returned.
 	@return The child component representing the given object.
+	@exception IllegalArgumentException if the given object is not an appropriate object for a component to be created.
 	*/
 	public Component<?> getComponent(final V value)
 	{
-		return verifyValueComponent(value);	//verify and return the component for this object
+		return super.getComponent(value);	//delegate to the parent version
 	}
 
-	/**Ensures the component for a particular value exists.
-	This method is meant to be called primarily from the associated view.
-	@param value The value to verify, which may be <code>null</code>.
-	@return The child component representing the given component.
+	/**Creates a component state to represent the given object.
+	@param value The object with which the component state is to be associated.
+	@return The component state to represent the given object.
+	@exception IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
 	*/
-	public Component<?> verifyValueComponent(final V value)
+	protected ValueComponentState createComponentState(final V value)
 	{
-//	TODO important fix		final boolean editable=treeNode.isEditable();	//see if the tree node is editable
-		ValueComponentState valueComponentState=getComponentState(value);	//get the component information for this tree node
-		if(valueComponentState==null)	//if there is no component for this tree node, or the component has a different editable status
-		{
-				//TODO assert that there is a representation strategy, or otherwise check
-				//TODO improve and/or change parameters
-			final Component<?> valueComponent=getValueRepresentationStrategy().createComponent(this, value, -1, false, false);	//create a new component for the value
-//TODO del					valueComponent.setParent(this);	//tell this component that this tree component is its parent
-			valueComponentState=new ValueComponentState(valueComponent);	//create a new component state for the value's component and metadata
-			putComponentState(value, valueComponentState);	//store the component state in the map for next time
-		}
-		return valueComponentState.getComponent();	//return the representation component
+			//TODO assert that there is a representation strategy, or otherwise check
+			//TODO improve and/or change parameters
+		final Component<?> valueComponent=getValueRepresentationStrategy().createComponent(this, value, -1, false, false);	//create a new component for the value
+		return new ValueComponentState(valueComponent);	//create a new component state for the value's component and metadata
 	}
 
 	/**List select model, and value representation strategy constructor.

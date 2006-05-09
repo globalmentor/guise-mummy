@@ -9,7 +9,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 The model is thread-safe, synchronized on itself. Any iteration over values should include synchronization on the instance of this class. 
 @author Garret Wilson
 */
-public interface TableModel extends Model	//TODO maybe specify row count to be a bound property 
+public interface TableModel extends Model	//TODO maybe specify row count to be a bound property
 {
 
 	/**Determines the logical index of the given table column.

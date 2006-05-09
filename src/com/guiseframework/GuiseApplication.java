@@ -26,6 +26,8 @@ public interface GuiseApplication extends PropertyBindable
 	public final static String RESOURCE_BUNDLE_BASE_NAME_PROPERTY=getPropertyName(GuiseApplication.class, "resourceBundleBaseName");
 	/**The style bound property.*/
 	public final static String STYLE_PROPERTY=getPropertyName(GuiseApplication.class, "style");
+	/**The theme bound property.*/
+	public final static String THEME_PROPERTY=getPropertyName(GuiseApplication.class, "theme");
 
 	/**@return The application locale used by default if a new session cannot determine the users's preferred locale.*/
 	public Locale getDefaultLocale();

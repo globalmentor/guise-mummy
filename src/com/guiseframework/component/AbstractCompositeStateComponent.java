@@ -4,6 +4,8 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 
 import java.util.*;
 
+import com.guiseframework.component.TreeControl.TreeNodeComponentState;
+
 /**A composite component that represents the state of its child components.
 @param <T> The type of object being represented.
 @param <S> The component state of each object.
@@ -24,14 +26,24 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 		return componentStateMap.get(object);	//get the component state keyed to this object
 	}
 
-	/**Retrieves the component for the given object.
+	/**Retrieves a component state for the given object.
+	If no component yet exists for the given object, one will be created.
 	@param object The object for which a representation component should be returned.
-	@return The child component representing the given object, or <code>null</code> if there is no component representing the given object.
+	@return The state of the child component to represent the given object.
+	@exception IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
+	@see #getComponentState(Object)
+	@see #createComponentState(Object)
+	@see #putComponentState(Object, com.guiseframework.component.AbstractCompositeStateComponent.ComponentState)
 	*/
-	public Component<?> getComponent(final T object)
+	protected S determineComponentState(final T object)	//TODO make thread-safe
 	{
-		final S componentState=getComponentState(object);	//get the component state for this object
-		return componentState!=null ? componentState.getComponent() : null;	//get the component stored in the component state, if there is a component state
+		S componentState=getComponentState(object);	//get the component state for this object
+		if(componentState==null)	//if there is no component state
+		{
+			componentState=createComponentState(object);	//create a new component state for the object
+			putComponentState(object, componentState);	//store the component state in the map for next time			
+		}
+		return componentState;	//return the component state
 	}
 
 	/**Stores a child component state for the given object.
@@ -73,6 +85,24 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 		}
 		componentStateMap.clear();	//remove all component states
 	}
+
+	/**Retrieves the component for the given object.
+	If no component yet exists for the given object, one will be created.
+	@param object The object for which a representation component should be returned.
+	@return The child component representing the given object.
+	@exception IllegalArgumentException if the given object is not an appropriate object for a component to be created.
+	*/
+	protected Component<?> getComponent(final T object)
+	{
+		return determineComponentState(object).getComponent();	//get the component stored in the component state, creating one if needed
+	}
+
+	/**Creates a component state to represent the given object.
+	@param object The object with which the component state is to be associated.
+	@return The component state to represent the given object.
+	@exception IllegalArgumentException if the given object is not an appropriate object for a component state to be created.
+	*/
+	protected abstract S createComponentState(final T object);
 
 	/**An encapsulation of the state of a representation component.
 	@author Garret Wilson

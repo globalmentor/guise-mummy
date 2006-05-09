@@ -39,7 +39,7 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 	@param editable Whether values in this column are editable.
 	@param selected <code>true</code> if the value is selected.
 	@param focused <code>true</code> if the value has the focus.
-	@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
+	@return A new component to represent the given value.
 	*/
 	@SuppressWarnings("unchecked")
 	public <N extends V> Label createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
@@ -54,7 +54,7 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 		}
 		else	//if there is no value
 		{
-			return null;	//don't return a component
+			return new Label();	//return a default label TODO improve this entire strategy
 		}
 	}
 

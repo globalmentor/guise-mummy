@@ -196,6 +196,29 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			}
 		}
 
+	/**The application theme.*/
+//TODO fix	private Theme theme;
+
+		/**@return The application theme.*/
+//	TODO fix		public Theme getTheme() {return theme;}
+
+		/**Sets the theme of the application.
+		This is a bound property.
+		@param newTheme The new application theme.
+		@see #STYLE_PROPERTY
+		*/
+/*TODO fix
+		public void setStyle(final Theme newTheme)
+		{
+			if(!ObjectUtilities.equals(theme, newTheme))	//if the value is really changing
+			{
+				final Theme oldTheme=theme;	//get the old value
+				theme=newTheme;	//actually change the value
+				firePropertyChange(STYLE_PROPERTY, oldTheme, newTheme);	//indicate that the value changed
+			}
+		}
+*/
+
 	/**Default constructor.
 	This implementation sets the locale to the JVM default.
 	*/
