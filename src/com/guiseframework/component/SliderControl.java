@@ -2,13 +2,11 @@ package com.guiseframework.component;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.net.URIConstants.*;
-import static com.garretwilson.net.URIUtilities.*;
 
 import java.net.URI;
-import java.util.MissingResourceException;
 
 import com.garretwilson.lang.ObjectUtilities;
+import static com.guiseframework.Resources.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.converter.AbstractStringLiteralConverter;
 import com.guiseframework.converter.Converter;
@@ -38,9 +36,9 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 	public final static String TRACK_IMAGE_PROPERTY=getPropertyName(SliderControl.class, "trackImage");
 
 	/**The base resource URI for the slider thumb image URI.*/
-	public final static URI THUMB_IMAGE_RESOURCE_URI=createURI(RESOURCE_SCHEME, "theme.slider.thumb.image");
+	public final static URI THUMB_IMAGE_RESOURCE_URI=createURIResourceReference("theme.slider.thumb.image");
 	/**The base resource URI for the slider track image URI.*/
-	public final static URI TRACK_IMAGE_RESOURCE_URI=createURI(RESOURCE_SCHEME, "theme.slider.track.image");
+	public final static URI TRACK_IMAGE_RESOURCE_URI=createURIResourceReference("theme.slider.track.image");
 
 	/**The flow axis.*/
 	private Flow axis;

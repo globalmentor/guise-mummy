@@ -515,12 +515,6 @@ public interface GuiseSession extends PropertyBindable
 	*/
 	public void notify(final Throwable error, final Runnable afterNotify);
 
-	/**Creates a string containing a reference to the given string resource key.
-	@param resourceKey The resource key to a string in the resources which could be retrieved using {@link #getStringResource(String)}.
-	@return A string containing a reference to the given resource key, which can be resolved using {@link #resolveString(String)}.
-	*/
-	public String createStringResourceReference(final String resourceKey);
-
 	/**Resolves a string by replacing any string references with a string from the resources.
 	A string reference begins with the Start of String control character (U+0098) and ends with a String Terminator control character (U+009C).
 	The string between these delimiters will be used to look up a string resource using {@link #getStringResource(String)}.
@@ -531,6 +525,7 @@ public interface GuiseSession extends PropertyBindable
 	@exception IllegalArgumentException if a string reference has no ending String Terminator control character (U+009C).
 	@exception MissingResourceException if no resource could be found associated with a string reference.
 	@exception ClassCastException if the resource associated with a string reference is not an instance of <code>String</code>.
+	@see Resources#createStringResourceReference(String)
 	@see #getStringResource(String)
 	*/
 	public String resolveString(final String string) throws MissingResourceException;
@@ -546,6 +541,7 @@ public interface GuiseSession extends PropertyBindable
 	@return The uri resolved against resources the application base path.
 	@exception NullPointerException if the given URI is <code>null</code>.
 	@exception MissingResourceException if no resource could be found associated with a string reference.
+	@see Resources#createURIResourceReference(String)
 	@see #getURIResource(String)
 	@see GuiseApplication#resolveURI(URI)
 	*/

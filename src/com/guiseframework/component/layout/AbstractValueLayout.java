@@ -184,7 +184,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 			if(newValue!=null && !container.contains(newValue))	//if there is a new component that isn't contained in the container
 			{
 					//create a custom validation exception
-				final ValidationException validationException=new ValidationException(format(getSession().getStringResource(VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE_REFERENCE), newValue.toString()), newValue);
+				final ValidationException validationException=new ValidationException(format(getSession().resolveString(VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE_REFERENCE), newValue.toString()), newValue);
 				throw createPropertyVetoException(this, validationException, VALUE_PROPERTY, oldValue, newValue);	//throw a property veto exception representing the validation error
 			}
 			selectedIndex=-1;	//uncache the selected index

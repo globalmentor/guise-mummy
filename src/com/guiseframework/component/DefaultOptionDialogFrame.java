@@ -3,11 +3,10 @@ package com.guiseframework.component;
 import java.beans.PropertyVetoException;
 import java.text.MessageFormat;
 
-import static com.garretwilson.net.URIConstants.*;
-import static com.garretwilson.net.URIUtilities.*;
 import com.guiseframework.event.ActionEvent;
 import com.guiseframework.event.ActionListener;
 import com.guiseframework.model.*;
+import static com.guiseframework.Resources.*;
 
 /**Default implementation of a frame for communication of an option such as "OK" or "Cancel".
 An option frame defaults to a single composite child panel with a row of options along the bottom.
@@ -95,8 +94,8 @@ public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultO
 	{
 		final Button button=new Button();	//create a new button
 		final String optionString=option.toString();	//get the string form of the option
-		button.setLabel(getSession().createStringResourceReference(MessageFormat.format(OPTION_DIALOG_FRAME_LABEL_RESOURCE_KEY_FORMAT_PATTERN, optionString)));	//set the option action label
-		button.setIcon(createURI(RESOURCE_SCHEME, MessageFormat.format(OPTION_DIALOG_FRAME_ICON_RESOURCE_KEY_FORMAT_PATTERN, optionString)));	//set the option action icon
+		button.setLabel(createStringResourceReference(MessageFormat.format(OPTION_DIALOG_FRAME_LABEL_RESOURCE_KEY_FORMAT_PATTERN, optionString)));	//set the option action label
+		button.setIcon(createURIResourceReference(MessageFormat.format(OPTION_DIALOG_FRAME_ICON_RESOURCE_KEY_FORMAT_PATTERN, optionString)));	//set the option action icon
 		button.addActionListener(new ActionListener()	//listen for the action being performed
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the action is performed

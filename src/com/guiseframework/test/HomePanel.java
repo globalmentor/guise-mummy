@@ -19,6 +19,7 @@ import com.garretwilson.text.TextUtilities;
 import com.garretwilson.util.Debug;
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseSession;
+import com.guiseframework.Resources;
 import com.guiseframework.Bookmark.Parameter;
 import com.guiseframework.component.*;
 import com.guiseframework.component.effect.*;
@@ -51,7 +52,7 @@ public class HomePanel extends DefaultNavigationPanel
 	public HomePanel()
 	{
 		super(new RegionLayout());	//construct the parent using a region layout
-		setLabel("Home Panel Test with embedded resource text: "+TextUtilities.createControlString("menu.language.label"));	//set the panel label
+		setLabel("Home Panel Test with embedded resource text: "+Resources.createStringResourceReference("menu.language.label"));	//set the panel label
 
 		final LayoutPanel contentPanel=new LayoutPanel(new FlowLayout(Flow.PAGE)); 
 

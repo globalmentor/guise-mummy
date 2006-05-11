@@ -1,9 +1,8 @@
 <rdf:RDF
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:guise="http://guiseframework.com/namespaces/guise#"
-	xmlns:resourceKey="http://guiseframework.com/namespaces/resourceKey#"
+	xmlns:resources="http://guiseframework.com/namespaces/resource#"
 >
 	<guise:Resources>
-		<resourceKey:task.status..icon rdf:resource="guise/images/blank.gif"/>
 	</guise:Resources>
 </rdf:RDF>

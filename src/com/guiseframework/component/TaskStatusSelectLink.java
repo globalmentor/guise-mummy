@@ -3,8 +3,7 @@ package com.guiseframework.component;
 import java.net.URI;
 import java.text.MessageFormat;
 
-import static com.garretwilson.net.URIConstants.*;
-import static com.garretwilson.net.URIUtilities.*;
+import static com.guiseframework.Resources.*;
 import com.guiseframework.model.*;
 
 /**Selectable link that stores a task status.
@@ -20,9 +19,9 @@ public class TaskStatusSelectLink extends ValueSelectLink<TaskStatus>
 {
 	
 	/**The resource URI for the selected icon.*/
-	public final static URI SELECT_ACTION_SELECTED_ICON_RESOURCE_URI=createURI(RESOURCE_SCHEME, "theme.select.action.selected.icon");
+	public final static URI SELECT_ACTION_SELECTED_ICON_RESOURCE_URI=createURIResourceReference("theme.select.action.selected.icon");
 	/**The resource URI for the unselected icon.*/
-	public final static URI SELECT_ACTION_UNSELECTED_ICON_RESOURCE_URI=createURI(RESOURCE_SCHEME, "theme.select.action.unselected.icon");
+	public final static URI SELECT_ACTION_UNSELECTED_ICON_RESOURCE_URI=createURIResourceReference("theme.select.action.unselected.icon");
 
 	/**The resource key format pattern for each task status.*/
 	public final static String TASK_STATUS_ICON_RESOURCE_KEY_FORMAT_PATTERN="theme.task.status.{0}.icon";
@@ -45,11 +44,11 @@ public class TaskStatusSelectLink extends ValueSelectLink<TaskStatus>
 		super(labelModel, actionModel, valueModel, enableable);	//construct the parent class		
 		setSelectedIcon(SELECT_ACTION_SELECTED_ICON_RESOURCE_URI);
 		setUnselectedIcon(SELECT_ACTION_UNSELECTED_ICON_RESOURCE_URI);
-		setValueIcon(null, createURI(RESOURCE_SCHEME, MessageFormat.format(TASK_STATUS_ICON_RESOURCE_KEY_FORMAT_PATTERN, "")));	//set the icon resource for no task status
+		setValueIcon(null, createURIResourceReference(MessageFormat.format(TASK_STATUS_ICON_RESOURCE_KEY_FORMAT_PATTERN, "")));	//set the icon resource for no task status
 		for(final TaskStatus taskStatus:TaskStatus.values())	//for each task status
 		{
-			setValueIcon(taskStatus, createURI(RESOURCE_SCHEME, MessageFormat.format(TASK_STATUS_ICON_RESOURCE_KEY_FORMAT_PATTERN, taskStatus.toString())));	//set the icon resource for this task status
-		}	
+			setValueIcon(taskStatus, createURIResourceReference(MessageFormat.format(TASK_STATUS_ICON_RESOURCE_KEY_FORMAT_PATTERN, taskStatus.toString())));	//set the icon resource for this task status
+		}
 	}
 
 }

@@ -15,7 +15,4 @@
 	<!-- general validation errors -->
 	<entry key="validation.false.message">One or more values you entered are invalid.</entry>
 
-	<!-- icons -->
-	<entry key="image.icon">guise/images/icons/image.gif</entry>
-
 </properties>

@@ -4,10 +4,8 @@ import java.beans.PropertyChangeListener;
 import java.net.URI;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.net.URIConstants.*;
-import static com.garretwilson.net.URIUtilities.*;
-
 import com.garretwilson.beans.GenericPropertyChangeListener;
+import static com.guiseframework.Resources.*;
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.event.*;
 
@@ -19,7 +17,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 {
 
 	/**The resource URI for the close image.*/
-	public final static URI CLOSE_ICON_RESOURCE_URI=createURI(RESOURCE_SCHEME, "theme.frame.close.icon");
+	public final static URI CLOSE_ICON_RESOURCE_URI=createURIResourceReference("theme.frame.close.icon");
 
 	/**The enumeration of frame components.*/
 	private enum FrameComponent{CONTENT_COMPONENT, CLOSE_ACTION_CONTROL};

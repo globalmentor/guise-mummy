@@ -8,9 +8,8 @@ import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.geometry.CompassPoint;
 
 import static com.garretwilson.util.SetUtilities.*;
-import static com.garretwilson.net.URIConstants.*;
-import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.guiseframework.Resources.*;
 
 /**Abstract implementation of a frame for flyovers.
 A flyover frame by default is nonmodal, immovable, and not resizable.
@@ -38,7 +37,7 @@ public abstract class AbstractFlyoverFrame<C extends FlyoverFrame<C>> extends Ab
 */
 
 	/**The base resource URI for the flyover tether image URI.*/
-	public final static URI TETHER_IMAGE_RESOURCE_URI=createURI(RESOURCE_SCHEME, "theme.flyover.frame.tether.image");
+	public final static URI TETHER_IMAGE_RESOURCE_URI=createURIResourceReference("theme.flyover.frame.tether.image");
 
 	/**The bearing of the tether in relation to the frame.*/
 	private BigDecimal tetherBearing=CompassPoint.NORTHWEST_BY_WEST.getBearing();
