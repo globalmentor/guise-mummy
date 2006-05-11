@@ -1256,6 +1256,7 @@ Debug.trace("now valid of", this, "is", isValid());
 
 	/**Retrieves the the notifications of all components in a hierarchy.
 	This method checks the given component and all descendant components.
+	Children that are not visible and/or not displayed are not taken into account.
 	@param component The component from which, along with its descendants, notifications should be retrieved.
 	@return The notifications of all components in the hierarchy. 
 	*/
@@ -1266,6 +1267,7 @@ Debug.trace("now valid of", this, "is", isValid());
 
 	/**Retrieves the the notifications of all components in a hierarchy.
 	This method checks the given component and all descendant components.
+	Children that are not visible and/or not displayed are not taken into account.
 	@param component The component from which, along with its descendants, notifications should be retrieved.
 	@param notifications The list that will be updated with more dirty components if any are found.
 	@return The notifications of all components in the hierarchy. 
@@ -1281,7 +1283,10 @@ Debug.trace("now valid of", this, "is", isValid());
 		{
 			for(final Component<?> childComponent:((CompositeComponent<?>)component).getChildren())	//for each child component
 			{
-				getNotifications(childComponent, notifications);	//gather notifications from this child hierarchy
+				if(childComponent.isDisplayed() && childComponent.isVisible())	//if this child component is displayed and visible
+				{
+					getNotifications(childComponent, notifications);	//gather notifications from this child hierarchy
+				}
 			}
 		}
 		return notifications;

@@ -1,14 +1,23 @@
 package com.guiseframework;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.security.Principal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.garretwilson.io.IO;
+import com.garretwilson.net.http.HTTPResource;
+import com.garretwilson.rdf.RDFResourceIO;
+import com.guiseframework.platform.web.WebPlatformConstants;
+import com.guiseframework.theme.Theme;
+
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.lang.ThreadUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
+import static com.guiseframework.Guise.*;
 
 /**An abstract base class for a Guise instance.
 This implementation only works with Guise applications that descend from {@link AbstractGuiseApplication}.
@@ -17,15 +26,30 @@ This implementation only works with Guise applications that descend from {@link 
 public abstract class AbstractGuiseContainer implements GuiseContainer
 {
 
+	/**The base URI of the container.*/
+	private URI baseURI=null;
+
+		/**Reports the base URI of the container.
+		The base URI is an absolute URI that ends with the base path, which ends with a slash ('/').
+		@return The base URI representing the Guise container.
+		*/
+		public URI getBaseURI() {return baseURI;}
+
 	/**The base path of the container.*/
 	private String basePath=null;
 
 		/**Reports the base path of the container.
 		The base path is an absolute path that ends with a slash ('/'), indicating the base path of the application base paths.
-		@return The base path representing Guise container.
+		@return The base path representing the Guise container.
 		*/
 		public String getBasePath() {return basePath;}
 
+	/**I/O for loading themes.*/
+	private final static IO<Theme> themeIO=new RDFResourceIO<Theme>(Theme.class, GUISE_NAMESPACE_URI);	//create I/O for loading the theme
+
+		/**@return I/O for loading themes.*/
+		protected static IO<Theme> getThemeIO() {return themeIO;}
+		
 	/**The thread-safe map of Guise applications keyed to application base paths.*/
 	private final Map<String, AbstractGuiseApplication> applicationMap=new ConcurrentHashMap<String, AbstractGuiseApplication>();
 
@@ -90,6 +114,8 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	}
 
 	/**Installs the given application at the given base path.
+	This version loads the theme, if any.
+	If no theme is specified, the default theme will be loaded.
 	@param application The application to install.
 	@param basePath The base path at which the application is being installed.
 	@exception NullPointerException if either the application or base path is <code>null</code>.
@@ -110,6 +136,53 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 			application.install(this, basePath);	//tell the application it's being installed
 			applicationMap.put(basePath, application);	//install the application in the map
 		}
+
+		final URI defaultThemeURI=URI.create(application.getBasePath()+WebPlatformConstants.GUISE_THEME_PATH);	//determine the application-relative URI of the default theme TODO remove web platform dependency
+		
+			//load the theme; this is done now instead of when the application was initialized because only now does the application know its base path
+		final Theme oldTheme=application.getTheme();	//get the theme, if any
+		final URI oldThemeURI=oldTheme!=null ? oldTheme.getReferenceURI() : defaultThemeURI;	//get the old theme URI; if no theme is specified, use the the defaul theme
+//TODO del		final URI themeURI=application.getContainer().getBaseURI().resolve(application.resolveURI(oldThemeURI));	//resolve the theme URI against the Guise application and then against the container base URI TODO create a common method to do this
+		try
+		{
+			final Theme newTheme=loadApplicationTheme(application, oldThemeURI, defaultThemeURI);	//load the theme and any parent themes
+			application.setTheme(newTheme);	//update the application theme with the theme we just loaded
+		}
+		catch(final IOException ioException)	//if there is an I/O error
+		{
+			throw new AssertionError(ioException);	//TODO fix
+		}
+	}
+
+	/**Loads a theme from the given URI.
+	All relative URIs are considered relative to the application.
+	If the theme specifies no parent theme, the default parent theme will be assigned unless this theme is the default theme.
+	@param application The Guise application with which the theme is associated.
+	@param themeURI The URI of the theme to load.
+	@param defaultThemeURI The URI of the Guise default theme.
+	@return A theme with resolving parents loaded.
+	@throws IOException if there is an error loading the theme or one of its parents.
+	*/
+	protected Theme loadApplicationTheme(final GuiseApplication application, final URI themeURI, final URI defaultThemeURI) throws IOException
+	{
+		final InputStream themeInputStream=new BufferedInputStream(application.getInputStream(themeURI));	//get a buffered input stream to the theme; ask the application to get the input stream, so that the resource can be loaded directly if possible
+		try
+		{
+			final Theme theme=getThemeIO().read(themeInputStream, themeURI);
+				//TODO check for a specified parent theme
+			final URI absoluteThemeURI=getBaseURI().resolve(application.resolveURI(themeURI));	//resolve the theme URI against the Guise application and then against the container base URI TODO create a common method to do this
+			final URI absoluteDefaultThemeURI=getBaseURI().resolve(application.resolveURI(defaultThemeURI));	//resolve the default theme URI against the Guise application and then against the container base URI TODO create a common method to do this
+			if(!absoluteThemeURI.equals(absoluteDefaultThemeURI))	//if this is not the default theme, load the default theme
+			{
+				final Theme parentTheme=loadApplicationTheme(application, defaultThemeURI, defaultThemeURI);	//load the parent theme
+				theme.setParent(parentTheme);	//set the parent theme
+			}
+			return theme;	//return the theme
+		}
+		finally
+		{
+			themeInputStream.close();	//always close the theme input stream
+		}				
 	}
 
 	/**Uninstalls the given application.
@@ -136,19 +209,25 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 		}
 	}
 
-	/**Container base path constructor.
-	@param basePath The base path of the container, an absolute path that ends with a slash ('/'), indicating the base path of the application base paths.
-	@exception NullPointerException if the base path is <code>null</code>.
-	@exception IllegalArgumentException if the base path is not absolute and does not end with a slash ('/') character.
+	/**Container base URI constructor.
+	@param baseURI The base URI of the container, an absolute URI that ends with the base path, which ends with a slash ('/'), indicating the base path of the application base paths.
+	@exception NullPointerException if the base URI is <code>null</code>.
+	@exception IllegalArgumentException if the base URI is not absolute or does not end with a slash ('/') character.
 	*/
-	public AbstractGuiseContainer(final String basePath)
+	public AbstractGuiseContainer(final URI baseURI)
 	{
+		checkInstance(baseURI, "Application base URI cannot be null");
+		if(!isAbsolutePath(baseURI) || !isContainerPath(baseURI.getPath()))	//if the base URI isn't absolute and doesn't end with a slash
+		{
+			throw new IllegalArgumentException("Container base URI "+baseURI+" is not absolute and does not end with a path separator.");
+		}
+		this.baseURI=baseURI;	//store the base URI		
+		basePath=baseURI.getPath();	//store the base path
 		checkInstance(basePath, "Application base path cannot be null");
 		if(!isAbsolutePath(basePath) || !isContainerPath(basePath))	//if the path doesn't begin and end with a slash
 		{
 			throw new IllegalArgumentException("Container base path "+basePath+" does not begin and end with a path separator.");
-		}
-		this.basePath=basePath;	//store the base path
+		}		
 	}
 	
 	/**Resolves a relative or absolute path against the container base path.
@@ -189,14 +268,29 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	*/
 	protected abstract boolean hasResource(final String resourcePath);
 
-	/**Retrieves and input stream to the resource at the given path.
+	/**Retrieves an input stream to the resource at the given path.
 	The provided path is first normalized.
 	@param resourcePath A container-relative path to a resource in the resource storage area.
 	@return An input stream to the resource at the given resource path, or <code>null</code> if no resource exists at the given resource path.
 	@exception IllegalArgumentException if the given resource path is absolute.
 	@exception IllegalArgumentException if the given path is not a valid path.
 	*/
-	protected abstract InputStream getResourceAsStream(final String resourcePath);
+	protected abstract InputStream getResourceInputStream(final String resourcePath);
+
+	/**Retrieves an input stream to the entity at the given URI.
+	The URI is first resolved to the container base URI.
+	@param uri A URI to the entity; either absolute or relative to the container.
+	@return An input stream to the entity at the given resource URI.
+	@exception NullPointerException if the given URI is <code>null</code>.
+	@exception IOException if there was an error connecting to the entity at the given URI.
+	@see #getBaseURI()
+	*/
+	public InputStream getInputStream(final URI uri) throws IOException	//TODO fix to work with resource URIs by delegating to getResourceInputStream(); fix to send the session ID so a new Guise session will not be created
+	{
+			//TODO make sure this is an HTTP URI; update to work with resource URIs
+		final URI resolvedURI=getBaseURI().resolve(uri);	//resolve the URI against the container base URI
+		return new HTTPResource(resolvedURI).getInputStream();	//get an input stream to the URI
+	}
 
 	/**Looks up an application principal from the given ID.
 	This version delegates to the given Guise application.

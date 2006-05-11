@@ -38,9 +38,9 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 	public final static String TRACK_IMAGE_PROPERTY=getPropertyName(SliderControl.class, "trackImage");
 
 	/**The base resource URI for the slider thumb image URI.*/
-	public final static URI THUMB_IMAGE_RESOURCE_URI=createURI(RESOURCE_SCHEME, "slider.thumb.image");
+	public final static URI THUMB_IMAGE_RESOURCE_URI=createURI(RESOURCE_SCHEME, "theme.slider.thumb.image");
 	/**The base resource URI for the slider track image URI.*/
-	public final static URI TRACK_IMAGE_RESOURCE_URI=createURI(RESOURCE_SCHEME, "slider.track.image");
+	public final static URI TRACK_IMAGE_RESOURCE_URI=createURI(RESOURCE_SCHEME, "theme.slider.track.image");
 
 	/**The flow axis.*/
 	private Flow axis;

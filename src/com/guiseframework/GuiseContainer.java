@@ -1,5 +1,7 @@
 package com.guiseframework;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 
 /**The interface for a Guise container.
@@ -8,9 +10,15 @@ import java.net.URI;
 public interface GuiseContainer
 {
 
+	/**Reports the base URI of the container.
+	The base URI is an absolute URI that ends with the base path, which ends with a slash ('/').
+	@return The base URI representing the Guise container.
+	*/
+	public URI getBaseURI();
+
 	/**Reports the base path of the container.
 	The base path is an absolute path that ends with a slash ('/'), indicating the base path of the application base paths.
-	@return The base path representing Guise container.
+	@return The base path representing the Guise container.
 	*/
 	public String getBasePath();
 
@@ -36,5 +44,15 @@ public interface GuiseContainer
 	@see GuiseContainer#getBasePath()
 	*/
 	public URI resolveURI(final URI uri);
+
+	/**Retrieves an input stream to the entity at the given URI.
+	The URI is first resolved to the container base URI.
+	@param uri A URI to the entity; either absolute or relative to the container.
+	@return An input stream to the entity at the given resource URI.
+	@exception NullPointerException if the given URI is <code>null</code>.
+	@exception IOException if there was an error connecting to the entity at the given URI.
+	@see #getBaseURI()
+	*/
+	public InputStream getInputStream(final URI uri) throws IOException;
 
 }

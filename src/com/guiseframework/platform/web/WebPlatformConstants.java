@@ -5,7 +5,7 @@ import java.net.URI;
 /**Constant values for the Guise web platform.
 @author Garret Wilson
 */
-public class WebPlatformConstants
+public class WebPlatformConstants	//TODO move a lot of these constants to GuiseApplication
 {
 
 	/**The namespace of the Guise markup language to be used with XHTML.*/
@@ -22,9 +22,9 @@ public class WebPlatformConstants
 		//CSS
 
 	/**The path of public stylesheets, relative to the application.*/
-	public final static String GUISE_PUBLIC_STYLESHEETS_PATH=GUISE_PUBLIC_PATH+"stylesheets/";
+//TODO del if not needed	public final static String GUISE_PUBLIC_STYLESHEETS_PATH=GUISE_PUBLIC_PATH+"stylesheets/";
 	/**The path of the Guise CSS stylesheet, relative to the application.*/
-	public final static String GUISE_CSS_STYLESHEET_PATH=GUISE_PUBLIC_STYLESHEETS_PATH+"guise.css";
+//TODO del if not needed	public final static String GUISE_CSS_STYLESHEET_PATH=GUISE_PUBLIC_STYLESHEETS_PATH+"guise.css";
 
 		//Images
 	
@@ -37,6 +37,14 @@ public class WebPlatformConstants
 	public final static String GUISE_PUBLIC_JAVASCRIPT_PATH=GUISE_PUBLIC_PATH+"javascript/";
 	/**The path of the Guise JavaScript file, relative to the application.*/
 	public final static String GUISE_JAVASCRIPT_PATH=GUISE_PUBLIC_JAVASCRIPT_PATH+"guise.js";
+
+		//Themes
+	/**The path of public themes, relative to the application.*/
+	public final static String GUISE_PUBLIC_THEMES_PATH=GUISE_PUBLIC_PATH+"themes/";
+	/**The base path of the default Guise theme, relative to the application.*/
+	public final static String GUISE_BASE_THEME_PATH=GUISE_PUBLIC_THEMES_PATH+"guise/";
+	/**The path of the default Guise theme, relative to the application.*/
+	public final static String GUISE_THEME_PATH=GUISE_BASE_THEME_PATH+"guise.theme.rdf";	
 
 		//images
 	

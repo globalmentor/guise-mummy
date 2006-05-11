@@ -1,15 +1,15 @@
 package com.guiseframework;
 
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 import com.garretwilson.beans.PropertyBindable;
 import com.guiseframework.component.*;
 import com.guiseframework.component.kit.ComponentKit;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.controller.*;
+import com.guiseframework.theme.Theme;
 import com.guiseframework.view.View;
 
 import static com.garretwilson.lang.ClassUtilities.*;
@@ -61,6 +61,16 @@ public interface GuiseApplication extends PropertyBindable
 	@see #STYLE_PROPERTY
 	*/
 	public void setStyle(final URI newStyle);
+
+	/**@return The application theme.*/
+	public Theme getTheme();
+
+	/**Sets the theme of the application.
+	This is a bound property.
+	@param newTheme The new application theme.
+	@see #THEME_PROPERTY
+	*/
+	public void setTheme(final Theme newTheme);
 
 	/**Installs a component kit.
 	Later component kits take precedence over earlier-installed component kits.
@@ -221,13 +231,39 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public boolean hasResource(final String resourcePath);
 
-	/**Retrieves and input stream to the resource at the given path.
+	/**Retrieves an input stream to the resource at the given path.
 	The provided path is first normalized.
 	@param resourcePath An application-relative path to a resource in the application resource storage area.
 	@return An input stream to the resource at the given resource path, or <code>null</code> if no resource exists at the given resource path.
 	@exception IllegalArgumentException if the given resource path is absolute.
 	@exception IllegalArgumentException if the given path is not a valid path.
 	*/
-	public InputStream getResourceAsStream(final String resourcePath);
+	public InputStream getResourceInputStream(final String resourcePath);
+
+	/**Retrieves an input stream to the entity at the given URI.
+	The URI is first resolved to the application base path.
+	If this is a <code>resource:</code> URI representing a private resource, this method delegates to {@link #getResourceInputStream(String)}.
+	@param uri A URI to the entity; either absolute or relative to the application.
+	@return An input stream to the entity at the given resource URI.
+	@exception NullPointerException if the given URI is <code>null</code>.
+	@exception IOException if there was an error connecting to the entity at the given URI.
+	@see #resolveURI(URI)
+	*/
+	public InputStream getInputStream(final URI uri) throws IOException;
+
+	/**Retrieves a resource bundle for the given locale.
+	The resource bundle retrieved will allow hierarchical resolution in the following priority:
+	<ol>
+		<li>Any resource defined by the application.</li>
+		<li>Any resource defined by the theme.</li>
+		<li>Any resource defined by a parent theme, including the default theme.</li>
+		<li>Any resource defined by default by Guise.</li>
+	</ol>
+	@param locale The locale for which resources should be retrieved.
+	@return A resolving resource bundle based upon the locale.
+	@exception MissingResourceException if a resource bundle could not be loaded.
+	@see #getResourceBundleBaseName()
+	*/
+	public ResourceBundle getResourceBundle(final Locale locale);
 
 }

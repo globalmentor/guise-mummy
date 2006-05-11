@@ -19,7 +19,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 {
 
 	/**The resource URI for the close image.*/
-	public final static URI CLOSE_ICON_RESOURCE_URI=createURI(RESOURCE_SCHEME, "frame.close.icon");
+	public final static URI CLOSE_ICON_RESOURCE_URI=createURI(RESOURCE_SCHEME, "theme.frame.close.icon");
 
 	/**The enumeration of frame components.*/
 	private enum FrameComponent{CONTENT_COMPONENT, CLOSE_ACTION_CONTROL};

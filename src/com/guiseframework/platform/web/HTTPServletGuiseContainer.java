@@ -39,18 +39,19 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 	Because the Java Servlet architecture does not provide the context path to the servlet context, this method can only be called after the first request, which will provide the context path.
 	If no Guise container is associated with the servlet context, one is created.
 	@param servletContext The servlet context with which this container is associated.
-	@param contextPath The servlet context path, which is either the empty string or a path beginning but not ending with a slash ('/'), such as would be returned by {@link HttpServletRequest#getContextPath()}. 
+	@param baseURI The base URI of the container, an absolute URI that ends with the base path, which ends with a slash ('/'), indicating the base path of the application base paths.
 	@return The Guise container associated with the given servlet context.
-	@exception NullPointerException if the servlet contextr and/or the context path is <code>null</code>.
+	@exception NullPointerException if the servlet context and/or base URI is <code>null</code>.
+	@exception IllegalArgumentException if the base URI is not absolute or does not end with a slash ('/') character.
 	*/
-	public static HTTPServletGuiseContainer getGuiseContainer(final ServletContext servletContext, final String contextPath)
+	public static HTTPServletGuiseContainer getGuiseContainer(final ServletContext servletContext, final URI baseURI)
 	{
 		synchronized(servletContextGuiseContainerMap)	//don't allow the map to be used while we do the lookup
 		{
 			HTTPServletGuiseContainer guiseContainer=servletContextGuiseContainerMap.get(servletContext);	//get the Guise container for this servlet context
 			if(guiseContainer==null)	//if there is no Guise container
 			{
-				guiseContainer=new HTTPServletGuiseContainer(contextPath+PATH_SEPARATOR, servletContext);	//create a new Guise container for this servlet context, specifying the base path
+				guiseContainer=new HTTPServletGuiseContainer(baseURI, servletContext);	//create a new Guise container for this servlet context, specifying the base URI
 			}
 			return guiseContainer;	//return the Guise container
 		}
@@ -62,15 +63,15 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 		/**@return The servlet context with which this container is associated.*/
 		protected final ServletContext getServletContext() {return servletContext;}
 
-	/**Servlet context and ontainer base path constructor.
-	@param basePath The base path of the container, an absolute path that ends with a slash ('/'), indicating the base path of the application base paths.
+	/**Servlet contains and container base URI constructor.
+	@param baseURI The base URI of the container, an absolute URI that ends with the base path, which ends with a slash ('/'), indicating the base path of the application base paths.
 	@param servletContext The servlet context with which this container is associated.
-	@exception NullPointerException if the base path is <code>null</code>.
-	@exception IllegalArgumentException if the base path is not absolute and does not end with a slash ('/') character.
+	@exception NullPointerException if the base URI and/or servlet context is <code>null</code>.
+	@exception IllegalArgumentException if the base URI is not absolute or does not end with a slash ('/') character.
 	*/
-	public HTTPServletGuiseContainer(final String basePath, final ServletContext servletContext)
+	public HTTPServletGuiseContainer(final URI baseURI, final ServletContext servletContext)
 	{
-		super(basePath);	//construct the parent class
+		super(baseURI);	//construct the parent class
 		this.servletContext=checkInstance(servletContext, "Servlet context cannot be null.");
 	}
 
@@ -261,13 +262,13 @@ Debug.trace("user agent name:", userAgentName, "with version", userAgentVersion,
 		}
 	}
 
-	/**Retrieves and input stream to the resource at the given path.
+	/**Retrieves an input stream to the resource at the given path.
 	The provided path is first normalized.
 	@param resourcePath A container-relative path to a resource in the resource storage area.
 	@return An input stream to the resource at the given resource path, or <code>null</code> if no resource exists at the given resource path.
 	@exception IllegalArgumentException if the given resource path is absolute.
 	*/
-	protected InputStream getResourceAsStream(final String resourcePath)
+	protected InputStream getResourceInputStream(final String resourcePath)
 	{
 		return getServletContext().getResourceAsStream(getContextAbsoluteResourcePath(resourcePath));	//try to get an input stream to the resource
 	}

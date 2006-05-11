@@ -137,7 +137,7 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 
 	/**Checks the state of child components for validity.
 	This version checks all child components for validity using the current {@link Component#isValid()}; child component are not asked to update their valid state.
-	Children that are not visible or not displayed are not taken into account.
+	Children that are not visible and/or not displayed are not taken into account.
 	@return <code>true</code> if the relevant children pass all validity tests.
 	*/ 
 	protected boolean determineChildrenValid()
@@ -170,10 +170,10 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	}
 
 	/**Validates the user input of child components.
-	Children that are not visible or not displayed are not taken into account.
+	Children that are not visible and/or not displayed are not taken into account.
 	@return <code>true</code> if all child validations return <code>true</code>.
 	*/
-	public boolean validateChildren()
+	protected boolean validateChildren()
 	{
 		boolean result=true;	//start by assuming all child components will validate 
 		for(final Component<?> childComponent:getChildren())	//for each child component

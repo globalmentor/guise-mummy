@@ -1,6 +1,6 @@
 package com.guiseframework;
 
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.security.Principal;
 import java.util.*;
@@ -10,18 +10,24 @@ import static java.util.Collections.*;
 
 import com.garretwilson.beans.BoundPropertyObject;
 
+import com.garretwilson.io.IO;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.net.URIUtilities;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.util.LocaleUtilities.*;
+import static com.guiseframework.Guise.*;
+import static com.guiseframework.GuiseResourceConstants.*;
 
+import com.garretwilson.rdf.RDFResourceIO;
 import com.garretwilson.util.Debug;
+import com.garretwilson.util.ResourceBundleUtilities;
 import com.guiseframework.component.*;
 import com.guiseframework.component.kit.ComponentKit;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.controller.*;
+import com.guiseframework.platform.web.WebPlatformConstants;
 import com.guiseframework.theme.Theme;
 import com.guiseframework.view.View;
 
@@ -31,6 +37,12 @@ This implementation only works with Guise containers that descend from {@link Ab
 */
 public abstract class AbstractGuiseApplication extends BoundPropertyObject implements GuiseApplication
 {
+
+	/**I/O for loading resources.*/
+	private final static IO<Resources> resourcesIO=new RDFResourceIO<Resources>(Resources.class, GUISE_NAMESPACE_URI);
+
+		/**@return I/O for loading resources.*/
+		protected static IO<Resources> getResourcesIO() {return resourcesIO;}
 
 	/**The Guise container into which this application is installed, or <code>null</code> if the application is not yet installed.*/
 	private AbstractGuiseContainer container=null;
@@ -197,27 +209,25 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		}
 
 	/**The application theme.*/
-//TODO fix	private Theme theme;
+	private Theme theme;
 
 		/**@return The application theme.*/
-//	TODO fix		public Theme getTheme() {return theme;}
+		public Theme getTheme() {return theme;}
 
 		/**Sets the theme of the application.
 		This is a bound property.
 		@param newTheme The new application theme.
-		@see #STYLE_PROPERTY
+		@see #THEME_PROPERTY
 		*/
-/*TODO fix
-		public void setStyle(final Theme newTheme)
+		public void setTheme(final Theme newTheme)
 		{
 			if(!ObjectUtilities.equals(theme, newTheme))	//if the value is really changing
 			{
 				final Theme oldTheme=theme;	//get the old value
 				theme=newTheme;	//actually change the value
-				firePropertyChange(STYLE_PROPERTY, oldTheme, newTheme);	//indicate that the value changed
+				firePropertyChange(THEME_PROPERTY, oldTheme, newTheme);	//indicate that the value changed
 			}
 		}
-*/
 
 	/**Default constructor.
 	This implementation sets the locale to the JVM default.
@@ -645,21 +655,141 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		return container.hasResource(relativeApplicationPath+resourcePath);	//delegate to the container
 	}
 
-	/**Retrieves and input stream to the resource at the given path.
+	/**Retrieves an input stream to the resource at the given path.
 	The provided path is first normalized.
-	This implementation uses package access to delegate to {@link AbstractGuiseContainer#getResourceAsStream(String)}.
+	This implementation uses package access to delegate to {@link AbstractGuiseContainer#getResourceInputStream(String)}.
 	@param resourcePath An application-relative path to a resource in the application resource storage area.
 	@return An input stream to the resource at the given resource path, or <code>null</code> if no resource exists at the given resource path.
 	@exception IllegalArgumentException if the given resource path is absolute.
 	@exception IllegalArgumentException if the given path is not a valid path.
 	*/
-	public InputStream getResourceAsStream(final String resourcePath)
+	public InputStream getResourceInputStream(final String resourcePath)
 	{
 		checkInstalled();	//make sure we're installed
 		final String relativeApplicationPath=URIUtilities.relativizePath(getContainer().getBasePath(), getBasePath());	//get the application path relative to the container path 
-		return container.getResourceAsStream(relativeApplicationPath+resourcePath);	//delegate to the container
+		return container.getResourceInputStream(relativeApplicationPath+resourcePath);	//delegate to the container
 	}
 
+	/**Retrieves an input stream to the entity at the given URI.
+	The URI is first resolved to the application base path.
+	If the URI represents one of this application's public resources, this implementation will return an input stream directly from that resource if possible rather than issuing a separate server request.
+	@param uri A URI to the entity; either absolute or relative to the application.
+	@return An input stream to the entity at the given resource URI.
+	@exception NullPointerException if the given URI is <code>null</code>.
+	@exception IOException if there was an error connecting to the entity at the given URI.
+	@see #resolveURI(URI)
+	*/
+	public InputStream getInputStream(final URI uri) throws IOException	//TODO check for the resource: URI scheme
+	{
+/*TODO decide if we really want this
+		If this is a <code>resource:</code> URI representing a private resource, this method delegates to {@link #getResourceInputStream(String)}.
+		if(RESOURCE_SCHEME.equals(uri.getScheme()))	//if this is a resource reference URI
+		{
+			return getResourceInputStream(uri.get)
+		}
+*/
+		final GuiseContainer container=getContainer();	//get the container
+		final URI resolvedURI=resolveURI(uri);	//resolve the URI to the application		
+		final URI absoluteResolvedURI=container.getBaseURI().resolve(resolvedURI);	//resolve the URI against the container base URI
+		final URI publicResourcesBaseURI=container.getBaseURI().resolve(getBasePath()+WebPlatformConstants.GUISE_PUBLIC_PATH);	//TODO comment; use something non-web-specific
+		final URI resourceURI=publicResourcesBaseURI.relativize(absoluteResolvedURI);	//see if the absolute URI is in the application public path 
+		if(!resourceURI.isAbsolute())	//if the URI is relative to the application's public resources
+		{
+			return Guise.getInstance().getPublicResourceInputStream(PUBLIC_RESOURCE_BASE_PATH+resourceURI.getPath());	//return an input stream to the resource directly, rather than going through the server
+		}
+		else	//if the URI is not an application-relative resource URI
+		{		
+			return container.getInputStream(resolvedURI);	//resolve the URI to the application and delegate to the container
+		}
+	}
+
+	/**Retrieves a resource bundle for the given locale.
+	The resource bundle retrieved will allow hierarchical resolution in the following priority:
+	<ol>
+		<li>Any resource defined by the application.</li>
+		<li>Any resource defined by the theme.</li>
+		<li>Any resource defined by a parent theme, including the default theme.</li>
+		<li>Any resource defined by default by Guise.</li>
+	</ol>
+	@param locale The locale for which resources should be retrieved.
+	@return A resolving resource bundle based upon the locale.
+	@exception MissingResourceException if a resource bundle could not be loaded.
+	@see #getResourceBundleBaseName()
+	*/
+	public ResourceBundle getResourceBundle(final Locale locale)
+	{
+		final ClassLoader loader=getClass().getClassLoader();	//get our class loader
+			//default resources
+		ResourceBundle resourceBundle=ResourceBundleUtilities.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null);	//load the default resource bundle
+			//theme resources
+		final Theme theme=getTheme();	//get the theme, if any
+		if(theme!=null)	//if there is a theme
+		{
+			try
+			{
+				resourceBundle=getResourceBundle(theme, locale, resourceBundle);	//load any resources for this theme and resolving parents
+			}
+			catch(final IOException ioException)	//if there is an I/O error, convert it to a missing resource exception
+			{
+				throw (MissingResourceException)new MissingResourceException(ioException.getMessage(), null, null).initCause(ioException);	//TODO check to see if null is OK for arguments here
+			}
+		}
+			//application resources
+		final String resourceBundleBaseName=getResourceBundleBaseName();	//get the specified resource bundle base name
+		if(resourceBundleBaseName!=null && !resourceBundleBaseName.equals(DEFAULT_RESOURCE_BUNDLE_BASE_NAME))	//if a distinct resource bundle base name was specified
+		{
+			resourceBundle=ResourceBundleUtilities.getResourceBundle(resourceBundleBaseName, locale, loader, resourceBundle);	//load the new resource bundle, specifying the current resource bundle as the parent					
+		}
+		return resourceBundle;	//return the resource bundle
+	}
+
+	/**Retrieves a resource bundle from this theme and its resolving parents, if any.
+	If the theme does not specify a resource bundle, the given parent resource bundle will be returned.
+	@param theme The theme for which to load resources.
+	@param locale The locale for which resources should be retrieved.
+	@param parentResourceBundle The resource bundle to serve as the parent, or <code>null</code> if there is no parent resource bundle.
+	@return The resource bundle for the theme, with parent resource bundles loaded, or the parent resource bundle if the theme specifies no resources.
+	@exception IOException if there was an error loading a resource bundle.
+	*/
+	protected ResourceBundle getResourceBundle(final Theme theme, final Locale locale, ResourceBundle parentResourceBundle) throws IOException
+	{
+		final Theme parentTheme=theme.getParent();	//get the parent theme
+		if(parentTheme!=null)	//if there is a parent theme
+		{
+			parentResourceBundle=getResourceBundle(parentTheme, locale, parentResourceBundle);	//get the parent resource bundle first and use that as the parent
+		}
+		final URI resourcesURI=theme.getResourcesURI(locale);	//get the resources URI
+		if(resourcesURI!=null)	//if there are resources
+		{
+			return loadResourceBundle(resourcesURI, parentResourceBundle);	//load the resources
+		}		
+		else	//if the theme specifies no resources appropriate for this locale
+		{
+			return parentResourceBundle;	//return the parent resource bundle
+		}
+	}
+
+	/**Loads a resource bundle from the given URI.
+	@param resourceBundleURI The URI of the resource bundle to load.
+	@param parentResourceBundle The resource bundle to serve as the parent, or <code>null</code> if there is no parent resource bundle.
+	@return The loaded resource bundle.
+	@exception IOException if there was an error loading the resource bundle.
+	*/
+	protected ResourceBundle loadResourceBundle(final URI resourceBundleURI, ResourceBundle parentResourceBundle) throws IOException
+	{
+			//TODO make sure this is an RDF file; if not, load the properties from the properties file
+		final InputStream resourcesInputStream=new BufferedInputStream(getInputStream(resourceBundleURI));	//get a buffered input stream to the resources
+		try
+		{
+			final Resources resources=getResourcesIO().read(resourcesInputStream, resourceBundleURI);	//load the resources
+			return resources.toResourceBundle(parentResourceBundle);	//get a resource bundle from the resources, indicating the resolving parent
+		}
+		finally
+		{
+			resourcesInputStream.close();	//always close the resources input stream
+		}				
+	}
+	
 	/**Looks up a principal from the given ID.
 	This version returns <code>null</code>. 
 	@param id The ID of the principal.

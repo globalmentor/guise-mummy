@@ -233,9 +233,15 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		If this session does not yet have a resource bundle, one will be created based upon the current locale.
 		The returned resource bundle should only be used temporarily and should not be saved,
 		as the resource bundle may change if the session locale or the application resource bundle base name changes.
+		The resource bundle retrieved will allow hierarchical resolution in the following priority:
+		<ol>
+			<li>Any resource defined by the application.</li>
+			<li>Any resource defined by the theme.</li>
+			<li>Any resource defined by default by Guise.</li>
+		</ol>
 		@return The resource bundle containing the resources for this session, based upon the locale.
 		@exception MissingResourceException if no resource bundle for the application's specified base name can be found.
-		@see GuiseApplication#getResourceBundleBaseName()
+		@see GuiseApplication#getResourceBundle(Locale)
 		@see #getLocale()
 		@see #getStringResource(String)
 		@see #getStringResource(String, String)
@@ -251,18 +257,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			if(resourceBundle==null)	//if the resource bundle has not yet been loaded
 			{
 				final Locale locale=getLocale();	//get the current locale
-				final ClassLoader loader=getClass().getClassLoader();	//get our class loader
-				final ResourceBundle defaultResourceBundle=ResourceBundleUtilities.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null);	//load the default resource bundle
-				final String resourceBundleBaseName=getApplication().getResourceBundleBaseName();	//get the specified resource bundle base name
-				if(resourceBundleBaseName!=null && !resourceBundleBaseName.equals(DEFAULT_RESOURCE_BUNDLE_BASE_NAME))	//if a distinct resource bundle base name was specified
-				{
-					resourceBundle=ResourceBundleUtilities.getResourceBundle(resourceBundleBaseName, locale, loader, defaultResourceBundle);	//load the new resource bundle, specifying the default resource bundle as the parent					
-				}
-				else	//if no custom resource bundle was specified
-				{
-					resourceBundle=defaultResourceBundle;	//just use the default resource bundle
-				}
-//TODO del when works				resourceBundle=ResourceBundle.getBundle(getApplication().getResourceBundleBaseName(), getLocale());	//load a resource bundle appropriate for the locale
+				resourceBundle=getApplication().getResourceBundle(locale);	//ask the application for the resource bundle based upon the locale
 			}
 			return resourceBundle;	//return the resource bundle
 		}
@@ -339,7 +334,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@see #getResourceBundle()
 		@see #getStringResource(String, String)
 		*/
-		public String getStringResource(final String resourceKey) throws MissingResourceException
+		public String getStringResource(final String resourceKey) throws MissingResourceException	//TODO convert the resource to a string using toString()
 		{
 			try
 			{
@@ -352,7 +347,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 					final String applicationResourcePath=getApplication().getLocaleResourcePath(resourceKey, getLocale());	//try to get a locale-sensitive path to the resource
 					if(applicationResourcePath!=null)	//if there is a path to the resource
 					{
-						final InputStream inputStream=getApplication().getResourceAsStream(applicationResourcePath);	//get a stream to the resource
+						final InputStream inputStream=getApplication().getResourceInputStream(applicationResourcePath);	//get a stream to the resource
 						if(inputStream!=null)	//if we got a stream to the resource (we always should, as we already checked to see which path represents an existing resource)
 						{
 							try

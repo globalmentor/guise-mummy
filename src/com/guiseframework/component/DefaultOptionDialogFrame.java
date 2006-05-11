@@ -12,7 +12,7 @@ import com.guiseframework.model.*;
 /**Default implementation of a frame for communication of an option such as "OK" or "Cancel".
 An option frame defaults to a single composite child panel with a row of options along the bottom.
 The contents of an option dialog frame should be accessed by {@link #getOptionContent()} and {@link #setOptionContent(Component)}.
-The labels and icons are accessed from the resources using resouce keys
+The labels and icons are accessed from the resources using resource keys
 	<code>frame.dialog.options.<var>option</var>.label</code> and <code>frame.dialog.options.<var>option</var>.icon</code>,
 	respectively, where <var>option</var> represents the option enum value such as "OK".
 @author Garret Wilson
@@ -21,9 +21,9 @@ public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultO
 {
 
 	/**The resource key format pattern for each option label.*/
-	public final static String FRAME_DIALOG_OPTION_LABEL_RESOURCE_KEY_FORMAT_PATTERN="frame.dialog.option.{0}.label";
+	public final static String OPTION_DIALOG_FRAME_LABEL_RESOURCE_KEY_FORMAT_PATTERN="theme.option.dialog.frame.option.{0}.label";
 	/**The resource key format pattern for each option icon.*/
-	public final static String FRAME_DIALOG_OPTION_ICON_RESOURCE_KEY_FORMAT_PATTERN="frame.dialog.option.{0}.icon";
+	public final static String OPTION_DIALOG_FRAME_ICON_RESOURCE_KEY_FORMAT_PATTERN="theme.option.dialog.frame.option.{0}.icon";
 	
 	/**The options which can be returned from this frame.
 	The option ordinals represent the order in which they should be presented.
@@ -95,8 +95,8 @@ public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultO
 	{
 		final Button button=new Button();	//create a new button
 		final String optionString=option.toString();	//get the string form of the option
-		button.setLabel(getSession().createStringResourceReference(MessageFormat.format(FRAME_DIALOG_OPTION_LABEL_RESOURCE_KEY_FORMAT_PATTERN, optionString)));	//set the option action label
-		button.setIcon(createURI(RESOURCE_SCHEME, MessageFormat.format(FRAME_DIALOG_OPTION_ICON_RESOURCE_KEY_FORMAT_PATTERN, optionString)));	//set the option action icon
+		button.setLabel(getSession().createStringResourceReference(MessageFormat.format(OPTION_DIALOG_FRAME_LABEL_RESOURCE_KEY_FORMAT_PATTERN, optionString)));	//set the option action label
+		button.setIcon(createURI(RESOURCE_SCHEME, MessageFormat.format(OPTION_DIALOG_FRAME_ICON_RESOURCE_KEY_FORMAT_PATTERN, optionString)));	//set the option action icon
 		button.addActionListener(new ActionListener()	//listen for the action being performed
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the action is performed

@@ -18,13 +18,16 @@ import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 
 import com.garretwilson.io.*;
+import com.garretwilson.lang.ClassUtilities;
 import com.garretwilson.lang.ObjectUtilities;
 
 import static com.garretwilson.io.ContentTypeUtilities.*;
+import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.lang.ThreadUtilities.*;
 
 import com.garretwilson.net.URIConstants;
+import com.garretwilson.net.URIUtilities;
 import com.garretwilson.net.http.*;
 import static com.garretwilson.net.http.HTTPConstants.*;
 
@@ -33,6 +36,10 @@ import static com.garretwilson.text.CharacterConstants.*;
 import static com.garretwilson.text.xml.XMLConstants.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
+import com.garretwilson.rdf.RDFResourceIO;
+import com.garretwilson.rdf.RDFUtilities;
+import com.garretwilson.rdf.maqro.Activity;
+import com.garretwilson.rdf.maqro.MAQROUtilities;
 import com.garretwilson.security.Nonce;
 import com.garretwilson.text.xml.xhtml.XHTMLConstants;
 import com.garretwilson.text.xml.xpath.*;
@@ -45,9 +52,11 @@ import com.guiseframework.controller.*;
 import com.guiseframework.controller.text.xml.xhtml.*;
 import com.guiseframework.geometry.*;
 import com.guiseframework.model.FileItemResourceImport;
+import com.guiseframework.theme.Theme;
 import com.guiseframework.view.text.xml.xhtml.XHTMLApplicationFrameView;
 
 import static com.garretwilson.util.LocaleUtilities.*;
+import static com.guiseframework.Guise.*;
 import static com.guiseframework.platform.web.WebPlatformConstants.*;
 
 /**The servlet that controls a Guise web applications. 
@@ -248,10 +257,45 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		}
 
 			//initialize the style TODO allow for multiple styles
-		final String styleString=servletConfig.getInitParameter(STYLE_INIT_PARAMETER);	//get the style init parameter
+		final String styleString=servletConfig.getInitParameter(STYLE_INIT_PARAMETER);	//get the style init parameter, if any
 		if(styleString!=null)	//if a style is specified
 		{
 			guiseApplication.setStyle(URI.create(styleString));	//create a locale from the default locale string and store it in the application (trimming whitespace just to be extra helpful)
+		}
+
+			//initialize the theme
+		final String themeString=servletConfig.getInitParameter(THEME_INIT_PARAMETER);	//get the theme init parameter, if any
+		if(themeString!=null)	//if a theme is specified
+		{
+			guiseApplication.setTheme(new Theme(URI.create(themeString)));
+/*TODO del when works
+			try
+			{
+Debug.trace("creating theme URI from string:", themeString);
+				final URI themeURI=guiseApplication.resolveURI(URI.create(themeString));	//resolve the theme URI against the Guise application
+	Debug.trace("created theme URI:", themeURI);
+	Debug.trace("creating theme IO");
+				final IO<Theme> themeIO=new RDFResourceIO<Theme>(Theme.class, GUISE_NAMESPACE_URI);	//create I/O for loading the theme
+	Debug.trace("creating theme input stream");
+				final InputStream themeInputStream=new BufferedInputStream(new HTTPResource(themeURI).getInputStream());	//get a buffered input stream to the theme TODO maybe use some general loader
+				try
+				{
+//TODO fix					guiseApplication.setStyle(URI.create(styleString));	//create a locale from the default locale string and store it in the application (trimming whitespace just to be extra helpful)
+Debug.trace("loading theme");
+					final Theme theme=themeIO.read(themeInputStream, themeURI);
+Debug.trace(RDFUtilities.toString(theme));
+				}
+				finally
+				{
+					themeInputStream.close();	//always close the theme input stream
+				}
+				
+			}
+			catch(final IOException ioException)	//if there is an I/O error
+			{
+				throw new ServletException(ioException);
+			}
+*/
 		}
 
 			//initialize destinations
@@ -334,13 +378,24 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		super.init(request);	//do the default initialization
 		if(guiseContainer==null)	//if no container exists
 		{
-			guiseContainer=HTTPServletGuiseContainer.getGuiseContainer(getServletContext(), getContextPath());	//get a reference to the Guise container, creating it if needed
+			Debug.trace("context path", getContextPath());
+			final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request
+Debug.trace("requestURI", requestURI);
+			final URI containerBaseURI=changePath(requestURI, getContextPath()+PATH_SEPARATOR);	//determine the container base URI
+Debug.trace("containerURI", containerBaseURI);
+
+			guiseContainer=HTTPServletGuiseContainer.getGuiseContainer(getServletContext(), containerBaseURI);	//get a reference to the Guise container, creating it if needed
 		}
+		Debug.trace("initializing; container base URI:", guiseContainer.getBaseURI(), "container base path:", guiseContainer.getBasePath());
+		
+
+		
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container (which we just created if needed)
 		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
 		if(guiseApplication.getContainer()==null)	//if this application has not yet been installed (note that there is a race condition here if multiple HTTP requests attempt to access the application simultaneously, but the losing thread will simply throw an exception and not otherwise disturb the application functionality)
 		{
 			final String guiseApplicationContextPath=request.getContextPath()+request.getServletPath()+PATH_SEPARATOR;	//construct the Guise application context path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash
+Debug.trace("applicationContextPath", guiseApplicationContextPath);
 			guiseContainer.installApplication(guiseApplication, guiseApplicationContextPath);	//install the application			
 		}
 	}

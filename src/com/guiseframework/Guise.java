@@ -28,7 +28,7 @@ public final class Guise
 	public final static String PUBLIC_RESOURCE_BASE_PATH="pub/";
 
 	/**The identifier of this build.*/
-	public final static String BUILD_ID="2006-05-06";
+	public final static String BUILD_ID="2006-05-10";
 	
 		//Guise ontology
 	
@@ -66,6 +66,7 @@ public final class Guise
 	private Map<String, Reference<byte[]>> publicResourceMap=new ConcurrentHashMap<String, Reference<byte[]>>();
 
 	/**Retrieves a public resource keyed to its location.
+	Resources are cached for quick future retrieval.
 	Due to race conditions, a resource may initially be loaded more than once in this implementation before its final value is placed in the cache.
 	@param publicResourceKey The location of the resource.
 	@return The resource, or <code>null</code> if there is no such resource.
@@ -92,6 +93,33 @@ public final class Guise
 			}
 		}
 		return resource;	//return whatever resource we found
+	}
+
+	/**Retrieves an input stream to a public resource keyed to its location.
+	This method will use cached resources if possible, but will not cache new resources.
+	@param publicResourceKey The location of the resource.
+	@return An input stream to a resource, or <code>null</code> if there is no such resource.
+	@exception IllegalArgumentException if the resource key does not begin with the public resource path.
+	@exception IOException if there is an error loading the resource.
+	@see #PUBLIC_RESOURCE_BASE_PATH
+	*/
+	public InputStream getPublicResourceInputStream(final String publicResourceKey) throws IOException
+	{
+		final String key=normalizePath(publicResourceKey);	//normalize the resource key
+		if(!key.startsWith(PUBLIC_RESOURCE_BASE_PATH))	//if this isn't a public resource key
+		{
+			throw new IllegalArgumentException(publicResourceKey);
+		}
+		final Reference<byte[]> reference=publicResourceMap.get(key);	//get a reference to the resource
+		byte[] resource=reference!=null ? reference.get() : null;	//dereference the reference, if there is a reference
+		if(resource!=null)	//if the resource is already loaded
+		{
+			return new ByteArrayInputStream(resource);	//return an input stream to the cached resource
+		}
+		else	//if we haven't yet loaded the resource, or it has been dereferenced
+		{
+			return getClass().getResourceAsStream(key);	//get an input stream to the resource
+		}
 	}
 
 	/**The thread-safe map of Guise session thread groups for Guise sessions.*/

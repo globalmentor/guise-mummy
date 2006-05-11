@@ -6,17 +6,6 @@
 	<!-- general Guise labels -->
 	<entry key="error.label">Error</entry>
 
-	<!-- general Guise icons -->
-
-		<!-- TaskStatus icons -->
-	<entry key="task.status..icon">guise/images/blank.gif</entry> <!-- the icon for null status -->
-	<entry key="task.status.INCOMPLETE.icon">guise/images/question.gif</entry>
-	<entry key="task.status.ERROR.icon">guise/images/exclamation.gif</entry>
-	<entry key="task.status.PAUSED.icon">guise/images/stop.gif</entry>
-	<entry key="task.status.STOPPED.icon">guise/images/stop.gif</entry>
-	<entry key="task.status.CANCELED.icon">guise/images/stop.gif</entry>
-	<entry key="task.status.COMPLETE.icon">guise/images/accept.gif</entry>
-
 	<!-- Guise converters -->
 	<entry key="converter.invalid.value.message">Invalid value: "{0}".</entry>
 
@@ -26,61 +15,7 @@
 	<!-- general validation errors -->
 	<entry key="validation.false.message">One or more values you entered are invalid.</entry>
 
-	<!-- components -->
-
-	<!-- SelectActionControl selection icons -->
-	<entry key="select.action.unselected.icon">guise/images/blank.gif</entry>
-	<entry key="select.action.selected.icon">guise/images/hand_point_right.gif</entry>
-
-	<!-- Frame -->
-	<entry key="frame.close.icon">guise/images/frame-close.gif</entry>
-
-	<!-- Option Dialog Frame -->
-	<entry key="frame.dialog.option.OK.label">OK</entry>
-	<entry key="frame.dialog.option.OK.icon">guise/images/accept.gif</entry>
-	<entry key="frame.dialog.option.YES.label">Yes</entry>
-	<entry key="frame.dialog.option.YES.icon">guise/images/accept.gif</entry>
-	<entry key="frame.dialog.option.YES_ALL.label">Yes to All</entry>
-	<entry key="frame.dialog.option.YES_ALL.icon">guise/images/accept_multiple.gif</entry>
-	<entry key="frame.dialog.option.NO.label">No</entry>
-	<entry key="frame.dialog.option.NO.icon">guise/images/reject.gif</entry>
-	<entry key="frame.dialog.option.NO_ALL.label">No to All</entry>
-	<entry key="frame.dialog.option.NO_ALL.icon">guise/images/reject_multiple.gif</entry>
-	<entry key="frame.dialog.option.ABORT.label">Abort</entry>
-	<entry key="frame.dialog.option.ABORT.icon">guise/images/stop.gif</entry>
-	<entry key="frame.dialog.option.RETRY.label">Retry</entry>
-	<entry key="frame.dialog.option.RETRY.icon">guise/images/redo.gif</entry>
-	<entry key="frame.dialog.option.FAIL.label">Fail</entry>
-	<entry key="frame.dialog.option.FAIL.icon">guise/images/reject.gif</entry>
-	<entry key="frame.dialog.option.STOP.label">Stop</entry>
-	<entry key="frame.dialog.option.STOP.icon">guise/images/stop.gif</entry>
-	<entry key="frame.dialog.option.REMOVE.label">Remove</entry>
-	<entry key="frame.dialog.option.REMOVE.icon">guise/images/icons/remove.gif</entry>
-	<entry key="frame.dialog.option.CANCEL.label">Cancel</entry>
-	<entry key="frame.dialog.option.CANCEL.icon">guise/images/reject.gif</entry>
-
-	<!-- Slider -->
-	<entry key="slider.thumb.image.X">guise/images/slider-thumb-x.gif</entry>
-	<entry key="slider.thumb.image.Y">guise/images/slider-thumb-y.gif</entry>
-	<entry key="slider.track.image.X">guise/images/slider-track-x.gif</entry>
-	<entry key="slider.track.image.Y">guise/images/slider-track-y.gif</entry>
-
-	<!-- TreeNode -->
-	<entry key="tree.node.collapsed.image">guise/images/treenode-collapsed.gif</entry>
-	<entry key="tree.node.expanded.image">guise/images/treenode-expanded.gif</entry>
-	<entry key="tree.node.leaf.image">guise/images/treenode-leaf.gif</entry>
-
-	<!-- FlyoverFrame -->
-	<entry key="flyover.frame.tether.image">guise/images/flyover-frame-tether-SWbW.gif</entry>
-	<entry key="flyover.frame.tether.image.NEbN">guise/images/flyover-frame-tether-NEbN.gif</entry>
-	<entry key="flyover.frame.tether.image.NEbE">guise/images/flyover-frame-tether-NEbE.gif</entry>
-	<entry key="flyover.frame.tether.image.SEbE">guise/images/flyover-frame-tether-SEbE.gif</entry>
-	<entry key="flyover.frame.tether.image.SEbS">guise/images/flyover-frame-tether-SEbS.gif</entry>
-	<entry key="flyover.frame.tether.image.SWbS">guise/images/flyover-frame-tether-SWbS.gif</entry>
-	<entry key="flyover.frame.tether.image.SWbW">guise/images/flyover-frame-tether-SWbW.gif</entry>
-	<entry key="flyover.frame.tether.image.NWbW">guise/images/flyover-frame-tether-NWbW.gif</entry>
-	<entry key="flyover.frame.tether.image.NWbN">guise/images/flyover-frame-tether-NWbN.gif</entry>
-
 	<!-- icons -->
 	<entry key="image.icon">guise/images/icons/image.gif</entry>
+
 </properties>

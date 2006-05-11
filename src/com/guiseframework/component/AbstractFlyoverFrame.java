@@ -38,7 +38,7 @@ public abstract class AbstractFlyoverFrame<C extends FlyoverFrame<C>> extends Ab
 */
 
 	/**The base resource URI for the flyover tether image URI.*/
-	public final static URI TETHER_IMAGE_RESOURCE_URI=createURI(RESOURCE_SCHEME, "flyover.frame.tether.image");
+	public final static URI TETHER_IMAGE_RESOURCE_URI=createURI(RESOURCE_SCHEME, "theme.flyover.frame.tether.image");
 
 	/**The bearing of the tether in relation to the frame.*/
 	private BigDecimal tetherBearing=CompassPoint.NORTHWEST_BY_WEST.getBearing();
