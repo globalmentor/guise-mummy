@@ -6,7 +6,7 @@ import com.guiseframework.model.Enableable;
 /**Contains enableable prototype information, appropriate for a control, for example.
 @author Garret Wilson
 */
-public abstract class AbstractEnableablePrototype extends DefaultLabelModel implements Enableable
+public abstract class AbstractEnableablePrototype extends DefaultLabelModel implements Prototype, Enableable
 {
 	/**Whether the control is enabled and can receive user input.*/
 	private boolean enabled=true;

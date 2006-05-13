@@ -119,7 +119,7 @@ public abstract class AbstractControl<C extends Control<C>> extends AbstractComp
 	{
 		super(labelModel);	//construct the parent class
 		this.enableable=checkInstance(enableable, "Enableable object cannot be null.");	//save the enableable object
-		if(enableable!=labelModel)	//if the enableable and the label model are two different objects TODO eventually just listen to specific events for each object
+		if(enableable!=labelModel)	//if the enableable and the label model are two different objects (we don't want to repeat property change events twice) TODO eventually just listen to specific events for each object
 		{
 			this.enableable.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the enableable object
 		}

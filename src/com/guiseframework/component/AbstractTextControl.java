@@ -192,7 +192,7 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 	*/
 	public AbstractTextControl(final ValueModel<V> valueModel, final Converter<V, String> converter)
 	{
-		super(valueModel);	//construct the parent class
+		super(new DefaultLabelModel(), valueModel, new DefaultEnableable());	//construct the parent class
 		this.converter=checkInstance(converter, "Converter cannot be null");	//save the converter
 		updateText();	//initialize the text with the literal form of the initial model value
 		addPropertyChangeListener(VALUE_PROPERTY, updateTextPropertyChangeListener);	//listen for the value changing, and update the text in response

@@ -24,6 +24,48 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 		/**@return The action model used by this component.*/
 		protected ActionModel getActionModel() {return actionModel;}
 
+	/**Whether the icon is displayed.*/
+	private boolean iconDisplayed=true;
+
+		/**@return Whether the icon is displayed.*/
+		public boolean isIconDisplayed() {return iconDisplayed;}
+
+		/**Sets whether the icon is displayed.
+		This is a bound property of type <code>Boolean</code>.
+		@param newIconDisplayed <code>true</code> if the icon should be displayed, else <code>false</code> if the icon should not be displayed and take up no space.
+		@see #ICON_DISPLAYED_PROPERTY
+		*/
+		public void setIconDisplayed(final boolean newIconDisplayed)
+		{
+			if(iconDisplayed!=newIconDisplayed)	//if the value is really changing
+			{
+				final boolean oldIconDisplayed=iconDisplayed;	//get the current value
+				iconDisplayed=newIconDisplayed;	//update the value
+				firePropertyChange(ICON_DISPLAYED_PROPERTY, Boolean.valueOf(oldIconDisplayed), Boolean.valueOf(newIconDisplayed));
+			}
+		}
+
+	/**Whether the label is displayed.*/
+	private boolean labelDisplayed=true;
+
+		/**@return Whether the label is displayed.*/
+		public boolean isLabelDisplayed() {return labelDisplayed;}
+
+		/**Sets whether the label is displayed.
+		This is a bound property of type <code>Boolean</code>.
+		@param newLabelDisplayed <code>true</code> if the label should be displayed, else <code>false</code> if the label should not be displayed and take up no space.
+		@see #LABEL_DISPLAYED_PROPERTY
+		*/
+		public void setLabelDisplayed(final boolean newLabelDisplayed)
+		{
+			if(labelDisplayed!=newLabelDisplayed)	//if the value is really changing
+			{
+				final boolean oldLabelDisplayed=labelDisplayed;	//get the current value
+				labelDisplayed=newLabelDisplayed;	//update the value
+				firePropertyChange(LABEL_DISPLAYED_PROPERTY, Boolean.valueOf(oldLabelDisplayed), Boolean.valueOf(newLabelDisplayed));
+			}
+		}
+
 	/**Whether the menu is open.*/
 	private boolean open=true;
 

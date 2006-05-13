@@ -10,8 +10,7 @@ import static com.guiseframework.Resources.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.converter.AbstractStringLiteralConverter;
 import com.guiseframework.converter.Converter;
-import com.guiseframework.model.DefaultValueModel;
-import com.guiseframework.model.ValueModel;
+import com.guiseframework.model.*;
 import com.guiseframework.validator.ValidationException;
 
 /**A value control that represents its value by a slider.
@@ -208,7 +207,7 @@ public class SliderControl<V extends Number> extends AbstractValueControl<V, Sli
 	*/
 	public SliderControl(final ValueModel<V> valueModel, final Converter<V, String> converter, final Flow axis)
 	{
-		super(valueModel);	//construct the parent class
+		super(new DefaultLabelModel(), valueModel, new DefaultEnableable());	//construct the parent class
 		this.converter=checkInstance(converter, "Converter cannot be null");	//save the converter
 		this.axis=checkInstance(axis, "Flow axis cannot be null.");
 	}

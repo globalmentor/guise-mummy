@@ -20,7 +20,7 @@ public class ResourceImportControl extends AbstractValueControl<ResourceImport, 
 	*/
 	public ResourceImportControl(final ValueModel<ResourceImport> valueModel)
 	{
-		super(valueModel);	//construct the parent class
+		super(new DefaultLabelModel(), valueModel, new DefaultEnableable());	//construct the parent class
 	}
 
 }

@@ -17,41 +17,47 @@ public abstract class AbstractActionControl<C extends ActionControl<C>> extends 
 		/**@return The action model used by this component.*/
 		protected ActionModel getActionModel() {return actionModel;}
 
-	/**Action model constructor.
-	@param actionModel The component action model.
-	@exception NullPointerException if the given action model is <code>null</code>.
-	*/
-/*TODO del
-	public AbstractActionControl(final ActionModel actionModel)
-	{
-		this.actionModel=checkInstance(actionModel, "Action model cannot be null.");	//save the action model
-		this.actionModel.addActionListener(new ActionListener()	//create an action repeater to forward events to this component's listeners
-				{
-					public void actionPerformed(final ActionEvent actionEvent)	//if the action is performed
-					{
-						fireActionPerformed();	//fire an action with this component as the source
-					}
-				});
-	}
-*/
+	/**Whether the icon is displayed.*/
+	private boolean iconDisplayed=true;
 
-	/**Label model and enableable object constructor.
-	@param labelModel The component label model.
-	@param enableable The enableable object in which to store enabled status.
-	@exception NullPointerException if the given label model and/or enableable is <code>null</code>.
-	*/
-/*TODO del
-	public AbstractActionControl(final LabelModel labelModel, final Enableable enableable)
-	{
-		this(label)
-	}
-*/
+		/**@return Whether the icon is displayed.*/
+		public boolean isIconDisplayed() {return iconDisplayed;}
 
-	/**Default constructor.*/
-	public AbstractActionControl()
-	{
-		this(new DefaultLabelModel(), new DefaultActionModel(), new DefaultEnableable());	//construct the class with default models
-	}
+		/**Sets whether the icon is displayed.
+		This is a bound property of type <code>Boolean</code>.
+		@param newIconDisplayed <code>true</code> if the icon should be displayed, else <code>false</code> if the icon should not be displayed and take up no space.
+		@see #ICON_DISPLAYED_PROPERTY
+		*/
+		public void setIconDisplayed(final boolean newIconDisplayed)
+		{
+			if(iconDisplayed!=newIconDisplayed)	//if the value is really changing
+			{
+				final boolean oldIconDisplayed=iconDisplayed;	//get the current value
+				iconDisplayed=newIconDisplayed;	//update the value
+				firePropertyChange(ICON_DISPLAYED_PROPERTY, Boolean.valueOf(oldIconDisplayed), Boolean.valueOf(newIconDisplayed));
+			}
+		}
+
+	/**Whether the label is displayed.*/
+	private boolean labelDisplayed=true;
+
+		/**@return Whether the label is displayed.*/
+		public boolean isLabelDisplayed() {return labelDisplayed;}
+
+		/**Sets whether the label is displayed.
+		This is a bound property of type <code>Boolean</code>.
+		@param newLabelDisplayed <code>true</code> if the label should be displayed, else <code>false</code> if the label should not be displayed and take up no space.
+		@see #LABEL_DISPLAYED_PROPERTY
+		*/
+		public void setLabelDisplayed(final boolean newLabelDisplayed)
+		{
+			if(labelDisplayed!=newLabelDisplayed)	//if the value is really changing
+			{
+				final boolean oldLabelDisplayed=labelDisplayed;	//get the current value
+				labelDisplayed=newLabelDisplayed;	//update the value
+				firePropertyChange(LABEL_DISPLAYED_PROPERTY, Boolean.valueOf(oldLabelDisplayed), Boolean.valueOf(newLabelDisplayed));
+			}
+		}
 
 	/**Label model, action model, and enableable object constructor.
 	@param labelModel The component label model.

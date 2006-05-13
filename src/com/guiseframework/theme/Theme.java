@@ -64,24 +64,29 @@ public class Theme extends ClassTypedRDFResource
 		return getPropertyValues(XML_ONTOLOGY_NAMESPACE_URI, STYLE_PROPERTY_NAME, RDFResource.class); //return an iterable to style properties
 	}
 
+		//standard labels
+	public final static String LABEL_FIRST=createStringResourceReference("theme.label.first");
+	public final static String LABEL_LAST=createStringResourceReference("theme.label.last");
+	public final static String LABEL_NEXT=createStringResourceReference("theme.label.next");
+	public final static String LABEL_PREVIOUS=createStringResourceReference("theme.label.previous");
 		//standard icons
-	public final static URI ICON_ACCEPT_RESOURCE_REFERENCE=createURIResourceReference("theme.icon.accept");
-	public final static URI ICON_ACCEPT_MULTIPLE_RESOURCE_REFERENCE=createURIResourceReference("theme.icon.accept.multiple");
-	public final static URI ICON_EXCLAMATION_RESOURCE_REFERENCE=createURIResourceReference("theme.icon.exclamation");
-	public final static URI ICON_FIRST_RESOURCE_REFERENCE=createURIResourceReference("theme.icon.first");
-	public final static URI ICON_FOLDER_RESOURCE_REFERENCE=createURIResourceReference("theme.icon.folder");
-	public final static URI ICON_FOLDER_CLOSED_RESOURCE_REFERENCE=createURIResourceReference("theme.icon.folder.closed");
-	public final static URI ICON_FOLDER_OPEN_RESOURCE_REFERENCE=createURIResourceReference("theme.icon.folder.open");
-	public final static URI ICON_IMAGE_RESOURCE_REFERENCE=createURIResourceReference("theme.icon.image");
-	public final static URI ICON_INSERT_RESOURCE_REFERENCE=createURIResourceReference("theme.icon.insert");
-	public final static URI ICON_NEXT_RESOURCE_REFERENCE=createURIResourceReference("theme.icon.next");
-	public final static URI ICON_LAST_RESOURCE_REFERENCE=createURIResourceReference("theme.icon.last");
-	public final static URI ICON_PREVIOUS_RESOURCE_REFERENCE=createURIResourceReference("theme.icon.previous");
-	public final static URI ICON_QUESTION_RESOURCE_REFERENCE=createURIResourceReference("theme.icon.question");
-	public final static URI ICON_REDO_RESOURCE_REFERENCE=createURIResourceReference("theme.icon.redo");
-	public final static URI ICON_REMOVE_RESOURCE_REFERENCE=createURIResourceReference("theme.icon.remove");
-	public final static URI ICON_REJECT_RESOURCE_REFERENCE=createURIResourceReference("theme.icon.reject");
-	public final static URI ICON_REJECT_MULTIPLE_RESOURCE_REFERENCE=createURIResourceReference("theme.icon.reject.multiple");
-	public final static URI ICON_RESOURCE_RESOURCE_REFERENCE=createURIResourceReference("theme.icon.resource");
-	public final static URI ICON_STOP_RESOURCE_REFERENCE=createURIResourceReference("theme.icon.stop");
+	public final static URI ICON_ACCEPT=createURIResourceReference("theme.icon.accept");
+	public final static URI ICON_ACCEPT_MULTIPLE=createURIResourceReference("theme.icon.accept.multiple");
+	public final static URI ICON_EXCLAMATION=createURIResourceReference("theme.icon.exclamation");
+	public final static URI ICON_FIRST=createURIResourceReference("theme.icon.first");
+	public final static URI ICON_FOLDER=createURIResourceReference("theme.icon.folder");
+	public final static URI ICON_FOLDER_CLOSED=createURIResourceReference("theme.icon.folder.closed");
+	public final static URI ICON_FOLDER_OPEN=createURIResourceReference("theme.icon.folder.open");
+	public final static URI ICON_IMAGE=createURIResourceReference("theme.icon.image");
+	public final static URI ICON_INSERT=createURIResourceReference("theme.icon.insert");
+	public final static URI ICON_NEXT=createURIResourceReference("theme.icon.next");
+	public final static URI ICON_LAST=createURIResourceReference("theme.icon.last");
+	public final static URI ICON_PREVIOUS=createURIResourceReference("theme.icon.previous");
+	public final static URI ICON_QUESTION=createURIResourceReference("theme.icon.question");
+	public final static URI ICON_REDO=createURIResourceReference("theme.icon.redo");
+	public final static URI ICON_REMOVE=createURIResourceReference("theme.icon.remove");
+	public final static URI ICON_REJECT=createURIResourceReference("theme.icon.reject");
+	public final static URI ICON_REJECT_MULTIPLE=createURIResourceReference("theme.icon.reject.multiple");
+	public final static URI ICON_RESOURCE=createURIResourceReference("theme.icon.resource");
+	public final static URI ICON_STOP=createURIResourceReference("theme.icon.stop");
 }

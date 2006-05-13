@@ -530,7 +530,7 @@ Debug.trace("list control changed value to", newValue);
 
 		
 		final Integer[][] testTableData;
-		final int rowCount=20;
+		final int rowCount=19;
 		final int columnCount=3;
 		testTableData=new Integer[rowCount][columnCount];
 		for(int rowIndex=0; rowIndex<rowCount; ++rowIndex)
@@ -543,8 +543,19 @@ Debug.trace("list control changed value to", newValue);
 		final Table pagedTable=new Table(Integer.class, testTableData, "Column1", "Column2", "Column3");
 		pagedTable.setDisplayRowCount(5);
 		contentPanel.add(pagedTable);
-		contentPanel.add(new Button(pagedTable.getPreviousActionPrototype()));
-		contentPanel.add(new Button(pagedTable.getNextActionPrototype()));
+		final Button tableFirstButton=new Button(pagedTable.getFirstActionPrototype());
+		tableFirstButton.setLabelDisplayed(false);
+		final Button tablePreviousButton=new Button(pagedTable.getPreviousActionPrototype());
+		tablePreviousButton.setLabelDisplayed(false);
+		final Button tableNextButton=new Button(pagedTable.getNextActionPrototype());
+		tableNextButton.setLabelDisplayed(false);
+		final Button tableLastButton=new Button(pagedTable.getLastActionPrototype());
+		tableLastButton.setLabelDisplayed(false);
+		
+		contentPanel.add(tableFirstButton);
+		contentPanel.add(tablePreviousButton);
+		contentPanel.add(tableNextButton);
+		contentPanel.add(tableLastButton);
 
 		
 		final LayoutPanel linkPanel=new LayoutPanel(new FlowLayout(Flow.LINE));	//create a panel flowing horizontally
@@ -580,7 +591,7 @@ Debug.trace("list control changed value to", newValue);
 		
 		
 		final CheckControl check3=new CheckControl();	
-		check3.setCheckType(CheckControl.CheckType.ELLIPSE);
+//TODO del		check3.setCheckType(CheckControl.CheckType.ELLIPSE);
 		check3.setLabel("Third, disconnected check");
 		contentPanel.add(check3);
 		
@@ -673,11 +684,11 @@ Debug.trace("list control changed value to", newValue);
 //		booleanPanel.setDragEnabled(true);
 		booleanPanel.setLabel("Check one of these");
 		final CheckControl check1=new CheckControl();
-		check1.setCheckType(CheckControl.CheckType.ELLIPSE);
+//TODO del		check1.setCheckType(CheckControl.CheckType.ELLIPSE);
 		check1.setLabel("First check");
 		booleanPanel.add(check1);	
 		final CheckControl check2=new CheckControl();	
-		check2.setCheckType(CheckControl.CheckType.ELLIPSE);
+//TODO del		check2.setCheckType(CheckControl.CheckType.ELLIPSE);
 		check2.setLabel("Second check");
 //		check2.getModel().setEnabled(false);	//TODO fix
 		booleanPanel.add(check2);

@@ -3,7 +3,7 @@ package com.guiseframework.prototype;
 import com.guiseframework.event.*;
 import com.guiseframework.model.ActionModel;
 
-/**Contains prototype information for a control.
+/**Contains prototype information for an action control.
 @author Garret Wilson
 */
 public class ActionPrototype extends AbstractEnableablePrototype implements ActionModel

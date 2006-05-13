@@ -8,12 +8,11 @@ import java.util.concurrent.*;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.guiseframework.theme.Theme.*;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.GuiseSession;
-import com.guiseframework.component.layout.Constraints;
-import com.guiseframework.component.layout.TaskCardConstraints;
 import com.guiseframework.converter.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
@@ -37,6 +36,12 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		/**@return The table model used by this component.*/
 		protected TableModel getTableModel() {return tableModel;}
 
+	/**The prototype for the first action.*/
+	private final ActionPrototype firstActionPrototype;
+
+		/**@return The prototype for the first action.*/
+		public ActionPrototype getFirstActionPrototype() {return firstActionPrototype;}
+
 	/**The prototype for the previous action.*/
 	private final ActionPrototype previousActionPrototype;
 
@@ -48,6 +53,12 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 
 		/**@return The prototype for the next action.*/
 		public ActionPrototype getNextActionPrototype() {return nextActionPrototype;}
+
+	/**The prototype for the last action.*/
+	private final ActionPrototype lastActionPrototype;
+
+		/**@return The prototype for the last action.*/
+		public ActionPrototype getLastActionPrototype() {return lastActionPrototype;}
 
 	/**The number of rows to display at one time, or -1 the row count is not restricted.*/
 	private int displayRowCount=-1;
@@ -294,9 +305,21 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 						};
 					});
 		}
+			//first action prototype
+		firstActionPrototype=new ActionPrototype();
+		firstActionPrototype.setIcon(ICON_FIRST);
+		firstActionPrototype.setLabel(LABEL_FIRST);
+		firstActionPrototype.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(final ActionEvent actionEvent)	//if the first action is performed
+					{
+						goFirst();	//go to the first set of rows
+					};
+				});
 			//previous action prototype
 		previousActionPrototype=new ActionPrototype();
-		previousActionPrototype.setLabel("Previous");	//TODO i18n
+		previousActionPrototype.setIcon(ICON_PREVIOUS);
+		previousActionPrototype.setLabel(LABEL_PREVIOUS);
 		previousActionPrototype.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the previous action is performed
@@ -306,12 +329,24 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 				});
 			//next action prototype
 		nextActionPrototype=new ActionPrototype();
-		nextActionPrototype.setLabel("Next");	//TODO i18n
+		nextActionPrototype.setIcon(ICON_NEXT);
+		nextActionPrototype.setLabel(LABEL_NEXT);
 		nextActionPrototype.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the next action is performed
 					{
 						goNext();	//go to the next set of rows
+					};
+				});
+			//last action prototype
+		lastActionPrototype=new ActionPrototype();
+		lastActionPrototype.setIcon(ICON_LAST);
+		lastActionPrototype.setLabel(LABEL_LAST);
+		lastActionPrototype.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(final ActionEvent actionEvent)	//if the last action is performed
+					{
+						goLast();	//go to the last set of rows
 					};
 				});
 		addPropertyChangeListener(DISPLAY_ROW_COUNT_PROPERTY, updatePrototypesPropertyChangeListener);	//update the prorotypes when the display row count changes
@@ -327,14 +362,26 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		if(displayRowCount>0)	//if this table is paged
 		{
 			final int displayRowStartIndex=getDisplayRowStartIndex();	//get the display row start index
-			previousActionPrototype.setEnabled(displayRowStartIndex>0);	//enable or disable the previous action prototype
-			nextActionPrototype.setEnabled(displayRowStartIndex+displayRowCount<getRowCount()-1);	//enable or disable the previous action prototype		
+			final boolean isFirstDisplayed=displayRowStartIndex==0;	//see if the first index is shown
+			final boolean isLastDisplayed=displayRowStartIndex+displayRowCount>=getRowCount();	//see if the last index is shown
+			firstActionPrototype.setEnabled(!isFirstDisplayed);	//enable or disable the first action prototype
+			previousActionPrototype.setEnabled(!isFirstDisplayed);	//enable or disable the previous action prototype
+			nextActionPrototype.setEnabled(!isLastDisplayed);	//enable or disable the previous action prototype		
+			lastActionPrototype.setEnabled(!isLastDisplayed);	//enable or disable the last action prototype		
 		}
 		else	//if this table is not paged TODO decide if we later want to make these not displayed
 		{
+			firstActionPrototype.setEnabled(false);	//disable the first action prototype
 			previousActionPrototype.setEnabled(false);	//disable the previous action prototype
 			nextActionPrototype.setEnabled(false);	//disable the previous action prototype
+			lastActionPrototype.setEnabled(false);	//disable the last action prototype
 		}
+	}
+
+	/**Goes to the first set of table rows.*/
+	public void goFirst()
+	{
+		setDisplayRowStartIndex(0);	//go to the first index
 	}
 
 	/**Goes to the previous set of table rows if the display row count is restricted.
@@ -346,28 +393,49 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	{
 		final int displayRowStartIndex=getDisplayRowStartIndex();	//get the display row start index
 		final int displayRowCount=getDisplayRowCount();	//get the rows to display
-		if(displayRowCount>0)	//if there is a valid display row count
+		if(displayRowCount>0)	//if there is a valid display row count 
 		{
 			setDisplayRowStartIndex(Math.max(displayRowStartIndex-displayRowCount, 0));	//go back a page, but not going below zero
 		}
 		else if(displayRowStartIndex>0)	//if the display row count is not restricted, but the first index is not zero
 		{
 			setDisplayRowStartIndex(0);	//go to the first row
-		}		
+		}
 	}
 
 	/**Goes to the next set of table rows if the display row count is restricted.
-	If the display row count is not restricted, nothing occurs.
+	If the display row count is not restricted, or there are no rows, nothing occurs.
 	@see #getDisplayRowStartIndex()
 	@see #getDisplayRowCount()
 	*/
 	public void goNext()
 	{
+		if(getRowCount()>0)	//if there are rows (this check prevents us setting the -1 row, below)
+		{
+			final int displayRowStartIndex=getDisplayRowStartIndex();	//get the display row start index
+			final int displayRowCount=getDisplayRowCount();	//get the rows to display
+			final int nextDisplayRowStartIndex=displayRowStartIndex+displayRowCount;	//calculate the next index
+			if(displayRowCount>0 && nextDisplayRowStartIndex<getRowCount()-1)	//if there is a valid display row count and we can go forward
+			{
+				setDisplayRowStartIndex(nextDisplayRowStartIndex);	//go forward a page
+			}
+		}
+	}
+
+	/**Goes to the last set of table rows if the display row count is restricted.
+	If the display row count is not restricted, nothing occurs.
+	@see #getDisplayRowStartIndex()
+	@see #getDisplayRowCount()
+	*/
+	public void goLast()
+	{
 		final int displayRowStartIndex=getDisplayRowStartIndex();	//get the display row start index
 		final int displayRowCount=getDisplayRowCount();	//get the rows to display
 		if(displayRowCount>0)	//if there is a valid display row count
 		{
-			setDisplayRowStartIndex(Math.min(displayRowStartIndex+displayRowCount, getRowCount()-displayRowCount));	//go forward a page, but not going past the last page
+			final int rowCount=getRowCount();	//get the number of rows
+			final int lastPageRowCount=rowCount%displayRowCount;	//find out how many pages on the last page (which will be zero if the pages are evenly divisible by the display row count)
+			setDisplayRowStartIndex(Math.max(rowCount-(lastPageRowCount>0 ? lastPageRowCount : displayRowCount), 0));	//go to the last page, backing up a page if the pages are evenly divisible by the display row count, but not going below the first row
 		}
 	}
 

@@ -6,15 +6,14 @@ import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.List;
 
-import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
-import com.garretwilson.beans.AbstractGenericVetoableChangeListener;
-import com.garretwilson.beans.GenericPropertyChangeEvent;
+import com.garretwilson.beans.*;
 import com.guiseframework.Bookmark;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.ActionEvent;
 import com.guiseframework.event.ActionListener;
 import com.guiseframework.model.*;
 import com.guiseframework.prototype.ActionPrototype;
+import static com.guiseframework.theme.Theme.*;
 import com.guiseframework.validator.*;
 
 /**A card panel representing a sequence of cards.
@@ -52,7 +51,8 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 		super(layout);	//construct the parent class
 			//previous action prototype
 		previousActionPrototype=new ActionPrototype();
-		previousActionPrototype.setLabel("Previous");	//TODO i18n
+		previousActionPrototype.setIcon(ICON_PREVIOUS);
+		previousActionPrototype.setLabel(LABEL_PREVIOUS);
 		previousActionPrototype.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the previous action is performed
@@ -62,7 +62,8 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 				});
 			//next action prototype
 		nextActionPrototype=new ActionPrototype();
-		nextActionPrototype.setLabel("Next");	//TODO i18n
+		nextActionPrototype.setIcon(ICON_NEXT);
+		nextActionPrototype.setLabel(LABEL_NEXT);
 		nextActionPrototype.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the next action is performed
