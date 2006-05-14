@@ -33,9 +33,6 @@ This implementation automatically handles postponed property change events when 
 public abstract class AbstractComponent<C extends Component<C>> extends GuiseBoundPropertyObject implements Component<C>
 {
 
-	/**Extra characters allowed in the ID, verified for URI safeness.*/
-//TODO del	protected final static String ID_EXTRA_CHARACTERS="-_.";
-
 	/**The object managing event listeners.*/
 	private final EventListenerManager eventListenerManager=new EventListenerManager();
 

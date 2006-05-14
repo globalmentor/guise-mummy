@@ -1,16 +1,30 @@
 package com.guiseframework.style;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.*;
+
+import com.garretwilson.text.ArgumentSyntaxException;
+
 /**Encapsulates a color value of the sRGB color space.
 @author Garret Wilson
-@see http://www.w3.org/pub/WWW/Graphics/Color/sRGB.html
-@see http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnwebgen/html/X11_names.asp
-@see http://www.w3schools.com/html/html_colornames.asp
+@see <a href="http://www.w3.org/pub/WWW/Graphics/Color/sRGB.html">A Standard Default Color Space for the Internet - sRGB</a>
+@see <a href="http://www.w3.org/TR/css3-color/#svg-color">CSS 3 Color Module</a>
+@see <a href="http://en.wikipedia.org/wiki/X11_Color_Names">X11 color names</a>
+@see <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnwebgen/html/X11_names.asp">Colors By Name</a>
+@see <a href="http://www.w3schools.com/html/html_colornames.asp">HTML Color Names</a>
+@see <a href="http://www.w3.org/TR/css3-color/#svg-color">CSS 3 Color Module: SVG color keywords</a>
+@see <a href="http://www.w3.org/TR/SVG11/types.html#ColorKeywords">SVG 1.1: Recognized color keyword names</a>
+@see <a href="http://lists.w3.org/Archives/Public/www-svg/2002Apr/0052.html">Re: color names in SVG-1.0 conflict with /usr/lib/X11/rgb.txt</a>
 */
 public class RGBColor extends AbstractColor<RGBColor.Component>
 {
 
+	/**The shared map of RGB colors keyed to lowercase, non-delimited color names, for reading only.*/
+	private final static Map<String, RGBColor> namedColorMap;
+
 	/**A color component of sRGB.*/
-	public enum Component {ALPHA, RED, GREEN, BLUE;}
+	public enum Component{ALPHA, RED, GREEN, BLUE;}
 
 	/**Creates an opaque sRGB color from the specified sRGB color value.
 	Any alpha present is ignored and replaced with alpha of 0xFF.
@@ -106,6 +120,43 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 		return this;
 	}
 
+	/**A regular expression pattern matching <code>#<var>rgb</var></code>, with the first three groups representing the three RGB character sequences.*/
+	private final static Pattern RGB_PATTERN=Pattern.compile("#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])");
+	/**A regular expression pattern matching <code>#<var>rrggbb</var></code>, with the first three groups representing the three RGB character sequences.*/
+	private final static Pattern RRGGBB_PATTERN=Pattern.compile("#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})");
+	
+	/**Creates an RGB color from a string representation.
+	This representation can be in one of the following forms:
+	<ul>
+		<li><code><var>colorname</var></code>, one of the {@link <a href="http://www.w3schools.com/html/html_colornames.asp">HTML color names</a>}, which must be in all lowercase without delimiters, such as "aliceblue".</li>
+		<li><code>#<var>rgb</var></code>, with hexadecimal representation of color components without regard to case.</li>
+		<li><code>#<var>rrggbb</var></code>, with hexadecimal representation of color components without regard to case.</li>
+	</ul>
+	@param charSequence The character sequence representation of a color, either a lowercase name of a standard HTML color, or a three or six-digit hex code beginning with '#'. 
+	@return An RGB color object representing the color represented by the given string.
+	@exception NullPointerException if the given string is <code>null</code>.
+	@exception IllegalArgumentException if a color cannot be determined from the given string. 
+	*/
+	public static RGBColor valueOf(final CharSequence charSequence)
+	{
+		final Matcher rgbMatcher=RGB_PATTERN.matcher(charSequence);	//match against #rgb
+		if(rgbMatcher.matches())	//if the character sequence matches
+		{
+			return new RGBColor(Integer.parseInt(rgbMatcher.group(1), 16), Integer.parseInt(rgbMatcher.group(2), 16), Integer.parseInt(rgbMatcher.group(3), 16));	//extract the RGB values and return a new color
+		}
+		final Matcher rrggbbMatcher=RRGGBB_PATTERN.matcher(charSequence);	//match against #rrggbb
+		if(rrggbbMatcher.matches())	//if the character sequence matches
+		{
+			return new RGBColor(Integer.parseInt(rrggbbMatcher.group(1), 16), Integer.parseInt(rrggbbMatcher.group(2), 16), Integer.parseInt(rrggbbMatcher.group(3), 16));	//extract the RGB values and return a new color
+		}
+		final RGBColor namedColor=namedColorMap.get(charSequence.toString());	//try to look up a named color
+		if(namedColor!=null)	//if there is a matching color name
+		{
+			return namedColor;	//return the named color
+		}
+		throw new ArgumentSyntaxException("Character sequence "+charSequence+" does not represent a color.");
+	}
+
 	public final static RGBColor ALICE_BLUE=new RGBColor(0xF0F8FF);
 	public final static RGBColor ANTIQUE_WHITE=new RGBColor(0xFAEBD7);
 	public final static RGBColor AQUA=new RGBColor(0x00FFFF);
@@ -139,7 +190,7 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 	public final static RGBColor DARK_ORCHID=new RGBColor(0x9932CC);
 	public final static RGBColor DARK_RED=new RGBColor(0x8B0000);
 	public final static RGBColor DARK_SALMON=new RGBColor(0xE9967A);
-	public final static RGBColor DARK_SEAGREEN=new RGBColor(0x8FBC8F);
+	public final static RGBColor DARK_SEA_GREEN=new RGBColor(0x8FBC8F);
 	public final static RGBColor DARK_SLATE_BLUE=new RGBColor(0x483D8B);
 	public final static RGBColor DARK_SLATE_GRAY=new RGBColor(0x2F4F4F);
 	public final static RGBColor DARK_TURQUOISE=new RGBColor(0x00CED1);
@@ -162,8 +213,8 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 	public final static RGBColor GREEN_YELLOW=new RGBColor(0xADFF2F);
 	public final static RGBColor HONEY_DEW=new RGBColor(0xF0FFF0);
 	public final static RGBColor HOT_PINK=new RGBColor(0xFF69B4);
-	public final static RGBColor INDIAN_RED =new RGBColor(0xCD5C5C);
-	public final static RGBColor INDIGO =new RGBColor(0x4B0082);
+	public final static RGBColor INDIAN_RED=new RGBColor(0xCD5C5C);
+	public final static RGBColor INDIGO=new RGBColor(0x4B0082);
 	public final static RGBColor IVORY=new RGBColor(0xFFFFF0);
 	public final static RGBColor KHAKI=new RGBColor(0xF0E68C);
 	public final static RGBColor LAVENDER=new RGBColor(0xE6E6FA);
@@ -214,7 +265,7 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 	public final static RGBColor PALE_GREEN=new RGBColor(0x98FB98);
 	public final static RGBColor PALE_TURQUOISE=new RGBColor(0xAFEEEE);
 	public final static RGBColor PALE_VIOLET_RED=new RGBColor(0xD87093);
-	public final static RGBColor PAPAY_AWHIP=new RGBColor(0xFFEFD5);
+	public final static RGBColor PAPAYA_WHIP=new RGBColor(0xFFEFD5);
 	public final static RGBColor PEACH_PUFF=new RGBColor(0xFFDAB9);
 	public final static RGBColor PERU=new RGBColor(0xCD853F);
 	public final static RGBColor PINK=new RGBColor(0xFFC0CB);
@@ -227,8 +278,8 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 	public final static RGBColor SADDLE_BROWN=new RGBColor(0x8B4513);
 	public final static RGBColor SALMON=new RGBColor(0xFA8072);
 	public final static RGBColor SANDY_BROWN=new RGBColor(0xF4A460);
-	public final static RGBColor SEAG_REEN=new RGBColor(0x2E8B57);
-	public final static RGBColor SEAS_HELL=new RGBColor(0xFFF5EE);
+	public final static RGBColor SEA_GREEN=new RGBColor(0x2E8B57);
+	public final static RGBColor SEA_SHELL=new RGBColor(0xFFF5EE);
 	public final static RGBColor SIENNA=new RGBColor(0xA0522D);
 	public final static RGBColor SILVER=new RGBColor(0xC0C0C0);
 	public final static RGBColor SKY_BLUE=new RGBColor(0x87CEEB);
@@ -243,10 +294,161 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 	public final static RGBColor TOMATO=new RGBColor(0xFF6347);
 	public final static RGBColor TURQUOISE=new RGBColor(0x40E0D0);
 	public final static RGBColor VIOLET=new RGBColor(0xEE82EE);
-	public final static RGBColor VIOLETRED=new RGBColor(0xD02090);
+	public final static RGBColor VIOLET_RED=new RGBColor(0xD02090);
 	public final static RGBColor WHEAT=new RGBColor(0xF5DEB3);
 	public final static RGBColor WHITE=new RGBColor(0xFFFFFF);
 	public final static RGBColor WHITES_MOKE=new RGBColor(0xF5F5F5);
 	public final static RGBColor YELLOW=new RGBColor(0xFFFF00);
 	public final static RGBColor YELLOW_GREEN=new RGBColor(0x9ACD32);
+
+	static
+	{
+			//store the standard colors in the map, keyed to the lowercase name with no underscore
+		final Pattern underscorePattern=Pattern.compile("_");	//a pattern to match an underscore, so that it can be removed
+		namedColorMap=new HashMap<String, RGBColor>(143);	//create the map of colors
+		namedColorMap.put(underscorePattern.matcher("ALICE_BLUE").replaceAll("").toLowerCase(), ALICE_BLUE);
+		namedColorMap.put(underscorePattern.matcher("ANTIQUE_WHITE").replaceAll("").toLowerCase(), ANTIQUE_WHITE);
+		namedColorMap.put(underscorePattern.matcher("AQUA").replaceAll("").toLowerCase(), AQUA);
+		namedColorMap.put(underscorePattern.matcher("AQUA_MARINE").replaceAll("").toLowerCase(), AQUA_MARINE);
+		namedColorMap.put(underscorePattern.matcher("AZURE").replaceAll("").toLowerCase(), AZURE);
+		namedColorMap.put(underscorePattern.matcher("BEIGE").replaceAll("").toLowerCase(), BEIGE);
+		namedColorMap.put(underscorePattern.matcher("BISQUE").replaceAll("").toLowerCase(), BISQUE);
+		namedColorMap.put(underscorePattern.matcher("BLACK").replaceAll("").toLowerCase(), BLACK);
+		namedColorMap.put(underscorePattern.matcher("BLANCHE_DALMOND").replaceAll("").toLowerCase(), BLANCHE_DALMOND);
+		namedColorMap.put(underscorePattern.matcher("BLUE").replaceAll("").toLowerCase(), BLUE);
+		namedColorMap.put(underscorePattern.matcher("BLUE_VIOLET").replaceAll("").toLowerCase(), BLUE_VIOLET);
+		namedColorMap.put(underscorePattern.matcher("BROWN").replaceAll("").toLowerCase(), BROWN);
+		namedColorMap.put(underscorePattern.matcher("BURLY_WOOD").replaceAll("").toLowerCase(), BURLY_WOOD);
+		namedColorMap.put(underscorePattern.matcher("CADET_BLUE").replaceAll("").toLowerCase(), CADET_BLUE);
+		namedColorMap.put(underscorePattern.matcher("CHARTREUSE").replaceAll("").toLowerCase(), CHARTREUSE);
+		namedColorMap.put(underscorePattern.matcher("CHOCOLATE").replaceAll("").toLowerCase(), CHOCOLATE);
+		namedColorMap.put(underscorePattern.matcher("CORAL").replaceAll("").toLowerCase(), CORAL);
+		namedColorMap.put(underscorePattern.matcher("CORNFLOWER_BLUE").replaceAll("").toLowerCase(), CORNFLOWER_BLUE);
+		namedColorMap.put(underscorePattern.matcher("CORNSILK").replaceAll("").toLowerCase(), CORNSILK);
+		namedColorMap.put(underscorePattern.matcher("CRIMSON").replaceAll("").toLowerCase(), CRIMSON);
+		namedColorMap.put(underscorePattern.matcher("CYAN").replaceAll("").toLowerCase(), CYAN);
+		namedColorMap.put(underscorePattern.matcher("DARK_BLUE").replaceAll("").toLowerCase(), DARK_BLUE);
+		namedColorMap.put(underscorePattern.matcher("DARK_CYAN").replaceAll("").toLowerCase(), DARK_CYAN);
+		namedColorMap.put(underscorePattern.matcher("DARK_GOLDEN_ROD").replaceAll("").toLowerCase(), DARK_GOLDEN_ROD);
+		namedColorMap.put(underscorePattern.matcher("DARK_GRAY").replaceAll("").toLowerCase(), DARK_GRAY);
+		namedColorMap.put(underscorePattern.matcher("DARK_GREEN").replaceAll("").toLowerCase(), DARK_GREEN);
+		namedColorMap.put(underscorePattern.matcher("DARK_KHAKI").replaceAll("").toLowerCase(), DARK_KHAKI);
+		namedColorMap.put(underscorePattern.matcher("DARK_MAGENTA").replaceAll("").toLowerCase(), DARK_MAGENTA);
+		namedColorMap.put(underscorePattern.matcher("DARK_OLIVE_GREEN").replaceAll("").toLowerCase(), DARK_OLIVE_GREEN);
+		namedColorMap.put(underscorePattern.matcher("DARK_ORANGE").replaceAll("").toLowerCase(), DARK_ORANGE);
+		namedColorMap.put(underscorePattern.matcher("DARK_ORCHID").replaceAll("").toLowerCase(), DARK_ORCHID);
+		namedColorMap.put(underscorePattern.matcher("DARK_RED").replaceAll("").toLowerCase(), DARK_RED);
+		namedColorMap.put(underscorePattern.matcher("DARK_SALMON").replaceAll("").toLowerCase(), DARK_SALMON);
+		namedColorMap.put(underscorePattern.matcher("DARK_SEA_GREEN").replaceAll("").toLowerCase(), DARK_SEA_GREEN);
+		namedColorMap.put(underscorePattern.matcher("DARK_SLATE_BLUE").replaceAll("").toLowerCase(), DARK_SLATE_BLUE);
+		namedColorMap.put(underscorePattern.matcher("DARK_SLATE_GRAY").replaceAll("").toLowerCase(), DARK_SLATE_GRAY);
+		namedColorMap.put(underscorePattern.matcher("DARK_TURQUOISE").replaceAll("").toLowerCase(), DARK_TURQUOISE);
+		namedColorMap.put(underscorePattern.matcher("DARK_VIOLET").replaceAll("").toLowerCase(), DARK_VIOLET);
+		namedColorMap.put(underscorePattern.matcher("DEEP_PINK").replaceAll("").toLowerCase(), DEEP_PINK);
+		namedColorMap.put(underscorePattern.matcher("DEEP_SKY_BLUE").replaceAll("").toLowerCase(), DEEP_SKY_BLUE);
+		namedColorMap.put(underscorePattern.matcher("DIM_GRAY").replaceAll("").toLowerCase(), DIM_GRAY);
+		namedColorMap.put(underscorePattern.matcher("DODGER_BLUE").replaceAll("").toLowerCase(), DODGER_BLUE);
+		namedColorMap.put(underscorePattern.matcher("FELDSPAR").replaceAll("").toLowerCase(), FELDSPAR);
+		namedColorMap.put(underscorePattern.matcher("FIRE_BRICK").replaceAll("").toLowerCase(), FIRE_BRICK);
+		namedColorMap.put(underscorePattern.matcher("FLORAL_WHITE").replaceAll("").toLowerCase(), FLORAL_WHITE);
+		namedColorMap.put(underscorePattern.matcher("FOREST_GREEN").replaceAll("").toLowerCase(), FOREST_GREEN);
+		namedColorMap.put(underscorePattern.matcher("FUCHSIA").replaceAll("").toLowerCase(), FUCHSIA);
+		namedColorMap.put(underscorePattern.matcher("GAINSBORO").replaceAll("").toLowerCase(), GAINSBORO);
+		namedColorMap.put(underscorePattern.matcher("GHOST_WHITE").replaceAll("").toLowerCase(), GHOST_WHITE);
+		namedColorMap.put(underscorePattern.matcher("GOLD").replaceAll("").toLowerCase(), GOLD);
+		namedColorMap.put(underscorePattern.matcher("GOLDEN_ROD").replaceAll("").toLowerCase(), GOLDEN_ROD);
+		namedColorMap.put(underscorePattern.matcher("GRAY").replaceAll("").toLowerCase(), GRAY);
+		namedColorMap.put(underscorePattern.matcher("GREEN").replaceAll("").toLowerCase(), GREEN);
+		namedColorMap.put(underscorePattern.matcher("GREEN_YELLOW").replaceAll("").toLowerCase(), GREEN_YELLOW);
+		namedColorMap.put(underscorePattern.matcher("HONEY_DEW").replaceAll("").toLowerCase(), HONEY_DEW);
+		namedColorMap.put(underscorePattern.matcher("HOT_PINK").replaceAll("").toLowerCase(), HOT_PINK);
+		namedColorMap.put(underscorePattern.matcher("INDIAN_RED").replaceAll("").toLowerCase(), INDIAN_RED);
+		namedColorMap.put(underscorePattern.matcher("INDIGO").replaceAll("").toLowerCase(), INDIGO);
+		namedColorMap.put(underscorePattern.matcher("IVORY").replaceAll("").toLowerCase(), IVORY);
+		namedColorMap.put(underscorePattern.matcher("KHAKI").replaceAll("").toLowerCase(), KHAKI);
+		namedColorMap.put(underscorePattern.matcher("LAVENDER").replaceAll("").toLowerCase(), LAVENDER);
+		namedColorMap.put(underscorePattern.matcher("LAVENDER_BLUSH").replaceAll("").toLowerCase(), LAVENDER_BLUSH);
+		namedColorMap.put(underscorePattern.matcher("LAWN_GREEN").replaceAll("").toLowerCase(), LAWN_GREEN);
+		namedColorMap.put(underscorePattern.matcher("LEMON_CHIFFON").replaceAll("").toLowerCase(), LEMON_CHIFFON);
+		namedColorMap.put(underscorePattern.matcher("LIGHT_BLUE").replaceAll("").toLowerCase(), LIGHT_BLUE);
+		namedColorMap.put(underscorePattern.matcher("LIGHT_CORAL").replaceAll("").toLowerCase(), LIGHT_CORAL);
+		namedColorMap.put(underscorePattern.matcher("LIGHT_CYAN").replaceAll("").toLowerCase(), LIGHT_CYAN);
+		namedColorMap.put(underscorePattern.matcher("LIGHT_GOLDEN_ROD_YELLOW").replaceAll("").toLowerCase(), LIGHT_GOLDEN_ROD_YELLOW);
+		namedColorMap.put(underscorePattern.matcher("LIGHT_GREY").replaceAll("").toLowerCase(), LIGHT_GREY);
+		namedColorMap.put(underscorePattern.matcher("LIGHT_GREEN").replaceAll("").toLowerCase(), LIGHT_GREEN);
+		namedColorMap.put(underscorePattern.matcher("LIGHT_PINK").replaceAll("").toLowerCase(), LIGHT_PINK);
+		namedColorMap.put(underscorePattern.matcher("LIGHT_SALMON").replaceAll("").toLowerCase(), LIGHT_SALMON);
+		namedColorMap.put(underscorePattern.matcher("LIGHT_SEA_GREEN").replaceAll("").toLowerCase(), LIGHT_SEA_GREEN);
+		namedColorMap.put(underscorePattern.matcher("LIGHT_SKY_BLUE").replaceAll("").toLowerCase(), LIGHT_SKY_BLUE);
+		namedColorMap.put(underscorePattern.matcher("LIGHT_SLATE_BLUE").replaceAll("").toLowerCase(), LIGHT_SLATE_BLUE);
+		namedColorMap.put(underscorePattern.matcher("LIGHT_SLATE_GRAY").replaceAll("").toLowerCase(), LIGHT_SLATE_GRAY);
+		namedColorMap.put(underscorePattern.matcher("LIGHT_STEEL_BLUE").replaceAll("").toLowerCase(), LIGHT_STEEL_BLUE);
+		namedColorMap.put(underscorePattern.matcher("LIGHT_YELLOW").replaceAll("").toLowerCase(), LIGHT_YELLOW);
+		namedColorMap.put(underscorePattern.matcher("LIME").replaceAll("").toLowerCase(), LIME);
+		namedColorMap.put(underscorePattern.matcher("LIME_GREEN").replaceAll("").toLowerCase(), LIME_GREEN);
+		namedColorMap.put(underscorePattern.matcher("LINEN").replaceAll("").toLowerCase(), LINEN);
+		namedColorMap.put(underscorePattern.matcher("MAGENTA").replaceAll("").toLowerCase(), MAGENTA);
+		namedColorMap.put(underscorePattern.matcher("MAROON").replaceAll("").toLowerCase(), MAROON);
+		namedColorMap.put(underscorePattern.matcher("MEDIUM_AQUA_MARINE").replaceAll("").toLowerCase(), MEDIUM_AQUA_MARINE);
+		namedColorMap.put(underscorePattern.matcher("MEDIU_MBLUE").replaceAll("").toLowerCase(), MEDIU_MBLUE);
+		namedColorMap.put(underscorePattern.matcher("MEDIUM_ORCHID").replaceAll("").toLowerCase(), MEDIUM_ORCHID);
+		namedColorMap.put(underscorePattern.matcher("MEDIUM_PURPLE").replaceAll("").toLowerCase(), MEDIUM_PURPLE);
+		namedColorMap.put(underscorePattern.matcher("MEDIUM_SEA_GREEN").replaceAll("").toLowerCase(), MEDIUM_SEA_GREEN);
+		namedColorMap.put(underscorePattern.matcher("MEDIUM_SLATE_BLUE").replaceAll("").toLowerCase(), MEDIUM_SLATE_BLUE);
+		namedColorMap.put(underscorePattern.matcher("MEDIUM_SPRING_GREEN").replaceAll("").toLowerCase(), MEDIUM_SPRING_GREEN);
+		namedColorMap.put(underscorePattern.matcher("MEDIUM_TURQUOISE").replaceAll("").toLowerCase(), MEDIUM_TURQUOISE);
+		namedColorMap.put(underscorePattern.matcher("MEDIUM_VIOLET_RED").replaceAll("").toLowerCase(), MEDIUM_VIOLET_RED);
+		namedColorMap.put(underscorePattern.matcher("MIDNIGHT_BLUE").replaceAll("").toLowerCase(), MIDNIGHT_BLUE);
+		namedColorMap.put(underscorePattern.matcher("MINT_CREAM").replaceAll("").toLowerCase(), MINT_CREAM);
+		namedColorMap.put(underscorePattern.matcher("MISTY_ROSE").replaceAll("").toLowerCase(), MISTY_ROSE);
+		namedColorMap.put(underscorePattern.matcher("MOCCASIN").replaceAll("").toLowerCase(), MOCCASIN);
+		namedColorMap.put(underscorePattern.matcher("NAVAJO_WHITE").replaceAll("").toLowerCase(), NAVAJO_WHITE);
+		namedColorMap.put(underscorePattern.matcher("NAVY").replaceAll("").toLowerCase(), NAVY);
+		namedColorMap.put(underscorePattern.matcher("OLD_LACE").replaceAll("").toLowerCase(), OLD_LACE);
+		namedColorMap.put(underscorePattern.matcher("OLIVE").replaceAll("").toLowerCase(), OLIVE);
+		namedColorMap.put(underscorePattern.matcher("OLIVE_DRAB").replaceAll("").toLowerCase(), OLIVE_DRAB);
+		namedColorMap.put(underscorePattern.matcher("ORANGE").replaceAll("").toLowerCase(), ORANGE);
+		namedColorMap.put(underscorePattern.matcher("ORANGE_RED").replaceAll("").toLowerCase(), ORANGE_RED);
+		namedColorMap.put(underscorePattern.matcher("ORCHID").replaceAll("").toLowerCase(), ORCHID);
+		namedColorMap.put(underscorePattern.matcher("PALE_GOLDEN_ROD").replaceAll("").toLowerCase(), PALE_GOLDEN_ROD);
+		namedColorMap.put(underscorePattern.matcher("PALE_GREEN").replaceAll("").toLowerCase(), PALE_GREEN);
+		namedColorMap.put(underscorePattern.matcher("PALE_TURQUOISE").replaceAll("").toLowerCase(), PALE_TURQUOISE);
+		namedColorMap.put(underscorePattern.matcher("PALE_VIOLET_RED").replaceAll("").toLowerCase(), PALE_VIOLET_RED);
+		namedColorMap.put(underscorePattern.matcher("PAPAYA_WHIP").replaceAll("").toLowerCase(), PAPAYA_WHIP);
+		namedColorMap.put(underscorePattern.matcher("PEACH_PUFF").replaceAll("").toLowerCase(), PEACH_PUFF);
+		namedColorMap.put(underscorePattern.matcher("PERU").replaceAll("").toLowerCase(), PERU);
+		namedColorMap.put(underscorePattern.matcher("PINK").replaceAll("").toLowerCase(), PINK);
+		namedColorMap.put(underscorePattern.matcher("PLUM").replaceAll("").toLowerCase(), PLUM);
+		namedColorMap.put(underscorePattern.matcher("POWDER_BLUE").replaceAll("").toLowerCase(), POWDER_BLUE);
+		namedColorMap.put(underscorePattern.matcher("PURPLE").replaceAll("").toLowerCase(), PURPLE);
+		namedColorMap.put(underscorePattern.matcher("RED").replaceAll("").toLowerCase(), RED);
+		namedColorMap.put(underscorePattern.matcher("ROSY_BROWN").replaceAll("").toLowerCase(), ROSY_BROWN);
+		namedColorMap.put(underscorePattern.matcher("ROYAL_BLUE").replaceAll("").toLowerCase(), ROYAL_BLUE);
+		namedColorMap.put(underscorePattern.matcher("SADDLE_BROWN").replaceAll("").toLowerCase(), SADDLE_BROWN);
+		namedColorMap.put(underscorePattern.matcher("SALMON").replaceAll("").toLowerCase(), SALMON);
+		namedColorMap.put(underscorePattern.matcher("SANDY_BROWN").replaceAll("").toLowerCase(), SANDY_BROWN);
+		namedColorMap.put(underscorePattern.matcher("SEA_GREEN").replaceAll("").toLowerCase(), SEA_GREEN);
+		namedColorMap.put(underscorePattern.matcher("SEA_SHELL").replaceAll("").toLowerCase(), SEA_SHELL);
+		namedColorMap.put(underscorePattern.matcher("SIENNA").replaceAll("").toLowerCase(), SIENNA);
+		namedColorMap.put(underscorePattern.matcher("SILVER").replaceAll("").toLowerCase(), SILVER);
+		namedColorMap.put(underscorePattern.matcher("SKY_BLUE").replaceAll("").toLowerCase(), SKY_BLUE);
+		namedColorMap.put(underscorePattern.matcher("SLATE_BLUE").replaceAll("").toLowerCase(), SLATE_BLUE);
+		namedColorMap.put(underscorePattern.matcher("SLATE_GRAY").replaceAll("").toLowerCase(), SLATE_GRAY);
+		namedColorMap.put(underscorePattern.matcher("SNOW").replaceAll("").toLowerCase(), SNOW);
+		namedColorMap.put(underscorePattern.matcher("SPRING_GREEN").replaceAll("").toLowerCase(), SPRING_GREEN);
+		namedColorMap.put(underscorePattern.matcher("STEEL_BLUE").replaceAll("").toLowerCase(), STEEL_BLUE);
+		namedColorMap.put(underscorePattern.matcher("TAN").replaceAll("").toLowerCase(), TAN);
+		namedColorMap.put(underscorePattern.matcher("TEAL").replaceAll("").toLowerCase(), TEAL);
+		namedColorMap.put(underscorePattern.matcher("THISTLE").replaceAll("").toLowerCase(), THISTLE);
+		namedColorMap.put(underscorePattern.matcher("TOMATO").replaceAll("").toLowerCase(), TOMATO);
+		namedColorMap.put(underscorePattern.matcher("TURQUOISE").replaceAll("").toLowerCase(), TURQUOISE);
+		namedColorMap.put(underscorePattern.matcher("VIOLET").replaceAll("").toLowerCase(), VIOLET);
+		namedColorMap.put(underscorePattern.matcher("VIOLET_RED").replaceAll("").toLowerCase(), VIOLET_RED);
+		namedColorMap.put(underscorePattern.matcher("WHEAT").replaceAll("").toLowerCase(), WHEAT);
+		namedColorMap.put(underscorePattern.matcher("WHITE").replaceAll("").toLowerCase(), WHITE);
+		namedColorMap.put(underscorePattern.matcher("WHITES_MOKE").replaceAll("").toLowerCase(), WHITES_MOKE);
+		namedColorMap.put(underscorePattern.matcher("YELLOW").replaceAll("").toLowerCase(), YELLOW);
+		namedColorMap.put(underscorePattern.matcher("YELLOW_GREEN").replaceAll("").toLowerCase(), YELLOW_GREEN);
+	}
+
 }

@@ -12,7 +12,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.xml.parsers.*;
 
-
 import static java.util.Collections.*;
 
 import com.garretwilson.beans.*;
@@ -30,6 +29,7 @@ import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.event.*;
 import com.guiseframework.model.Notification;
+import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
 
 import org.w3c.dom.Document;
@@ -416,7 +416,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			final Object resource=getResource(resourceKey);	//retrieve a resource from the resource bundle
 			if(resource instanceof String)	//if the resource is a string
 			{
-				return Boolean.valueOf((String)resource);	//get the Boolean value of the resource string
+				return Boolean.valueOf(resolveString((String)resource));	//get the Boolean value of the resource string
 			}
 			else	//if the resource is not a string, assume it is a Boolean
 			{
@@ -446,6 +446,54 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 				return defaultValue;	//return the specified default value
 			}
 		}
+		
+		/**Retrieves a {@link Color} resource from the resource bundle.
+		If the given resource is a string, it will be converted to an {@link RGBColor}.
+		This is a preferred convenience method for accessing the resources in the session's resource bundle.
+		@param resourceKey The key of the resource to retrieve.
+		@return The resource associated with the specified resource key.
+		@exception NullPointerException if the provided resource key is <code>null</code>.
+		@exception MissingResourceException if no resource could be found associated with the given key.
+		@exception ClassCastException if the resource associated with the given key is not an instance of {@link String} or {@link Color}.
+		@exception IllegalArgumentException if a string is provided that is not a valid color.
+		@see #getResourceBundle()
+		@see #getColorResource(String, Color)
+		*/
+		public Color<?> getColorResource(final String resourceKey) throws MissingResourceException
+		{
+			final Object resource=getResource(resourceKey);	//retrieve a resource from the resource bundle
+			if(resource instanceof String)	//if the resource is a string
+			{
+				return RGBColor.valueOf(resolveString((String)resource));	//create a color from the resource string
+			}
+			else	//if the resource is not a string, assume it is a color
+			{
+				return (Color<?>)resource;	//return the resource as a color object, throwing a ClassCastException if it isn't an instance of Color
+			}
+		}
+
+		/**Retrieves a {@link Color} resource from the resource bundle, using a specified default if no such resource is available.
+		If the given resource is a string, it will be converted to an {@link RGBColor}.
+		This is a preferred convenience method for accessing the resources in the session's resource bundle.
+		@param resourceKey The key of the resource to retrieve.
+		@param defaultValue The default value to use if there is no resource associated with the given key.
+		@return The resource associated with the specified resource key or the default if none is available.
+		@exception NullPointerException if the provided resource key is <code>null</code>.
+		@exception ClassCastException if the resource associated with the given key is not an instance of {@link String} or {@link Color}.
+		@see #getResourceBundle()
+		@see #getColorResource(String)
+		*/
+		public Color<?> getColorResource(final String resourceKey, final Color<?> defaultValue) throws MissingResourceException
+		{
+			try
+			{
+				return getColorResource(resourceKey);	//try to load the color from the resources
+			}
+			catch(final MissingResourceException missingResourceException)	//if no such resource is available
+			{
+				return defaultValue;	//return the specified default value
+			}
+		}
 
 		/**Retrieves an <code>Integer</code> resource from the resource bundle.
 		If the given resource is a string, it will be interpreted according to the {@link Integer#valueOf(java.lang.String)} rules.
@@ -464,7 +512,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			final Object resource=getResource(resourceKey);	//retrieve a resource from the resource bundle
 			if(resource instanceof String)	//if the resource is a string
 			{
-				return Integer.valueOf((String)resource);	//get the Integer value of the resource string
+				return Integer.valueOf(resolveString((String)resource));	//get the Integer value of the resource string
 			}
 			else	//if the resource is not a string, assume it is an Integer
 			{
@@ -512,7 +560,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			final Object resource=getResource(resourceKey);	//retrieve a resource from the resource bundle
 			if(resource instanceof String)	//if the resource is a string
 			{
-				return URI.create((String)resource);	//create a URI from the resource string
+				return URI.create(resolveString((String)resource));	//create a URI from the resource string
 			}
 			else	//if the resource is not a string, assume it is a URI
 			{
@@ -527,7 +575,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@param defaultValue The default value to use if there is no resource associated with the given key.
 		@return The resource associated with the specified resource key or the default if none is available.
 		@exception NullPointerException if the provided resource key is <code>null</code>.
-		@exception ClassCastException if the resource associated with the given key is not an instance of <code>URI</code>.
+		@exception ClassCastException if the resource associated with the given key is not an instance of <code>String</code> or <code>URI</code>.
 		@see #getResourceBundle()
 		@see #getURIResource(String)
 		*/

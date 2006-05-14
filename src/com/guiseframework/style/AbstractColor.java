@@ -5,8 +5,8 @@ import java.util.Arrays;
 /**Abstract encapsulation of a color value.
 @param <C> The type of color component for this color space.
 @author Garret Wilson
-@see <a href="http://www.neuro.sfc.keio.ac.jp/~aly/polygon/info/color-space-faq.html">Color space FAQ</a>.
-@see <a href="http://www.color.org/">International Color Consortium</a>.
+@see <a href="http://www.neuro.sfc.keio.ac.jp/~aly/polygon/info/color-space-faq.html">Color Space FAQ</a>
+@see <a href="http://www.color.org/">International Color Consortium</a>
 */
 public abstract class AbstractColor<C extends Enum<?>> implements Color<C>
 {

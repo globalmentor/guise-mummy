@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.Locale;
 
 import com.garretwilson.rdf.*;
+import com.guiseframework.style.*;
 
 import static com.garretwilson.rdf.RDFUtilities.*;
 import static com.garretwilson.rdf.xpackage.XMLOntologyConstants.*;
@@ -63,6 +64,9 @@ public class Theme extends ClassTypedRDFResource
 	{
 		return getPropertyValues(XML_ONTOLOGY_NAMESPACE_URI, STYLE_PROPERTY_NAME, RDFResource.class); //return an iterable to style properties
 	}
+
+		//standard colors
+	public final static Color<?> COLOR_SELECTED_BACKGROUND=new ResourceColor("theme.color.selected.background");
 
 		//standard labels
 	public final static String LABEL_FIRST=createStringResourceReference("theme.label.first");

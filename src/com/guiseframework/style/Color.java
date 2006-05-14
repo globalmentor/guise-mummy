@@ -3,8 +3,8 @@ package com.guiseframework.style;
 /**Encapsulation of a color value.
 @param <C> The type of color component for this color space.
 @author Garret Wilson
-@see http://www.neuro.sfc.keio.ac.jp/~aly/polygon/info/color-space-faq.html
-@see http://www.color.org/
+@see <a href="http://www.neuro.sfc.keio.ac.jp/~aly/polygon/info/color-space-faq.html">Color Space FAQ</a>
+@see <a href="http://www.color.org/">International Color Consortium</a>
 */
 public interface Color<C extends Enum<?>>
 {
