@@ -197,6 +197,20 @@ Array.prototype.remove=function(index)
 	return this.splice(index, 1)[0];	//splice out the element and return it (note that this will not work on Netscape <4.06 or IE <=5.5; see http://www.samspublishing.com/articles/article.asp?p=30111&seqNum=3&rl=1)
 };
 
+/**Removes an item from the array.
+If the item is not contained in the array, no action is taken.
+@param item The item to be removed.
+@return The removed item.
+*/
+Array.prototype.removeItem=function(item)
+{
+	var index=this.indexOf(item);	//get the index of the item
+	if(index>=0)	//if the item is contained in the array
+	{
+		return this.remove(index);	//remove the item at the index
+	}
+};
+
 var EMPTY_ARRAY=new Array();	//a shared empty array TODO create methods to make this read-only
 
 //Document
@@ -745,6 +759,22 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 		}
 	},
 
+	/**Retrieves the CSS attribute name from the CSS style name.
+	This method converts "background-color" to "backgroundColor", for example.
+	@param cssStyleName The literal CSS style name name.
+	@return The attribute name expected in HTML DOM.
+	*/
+	getCSSAttributeName:function(cssStyleName)
+	{
+		switch(cssStyleName)	//see which CSS style name was given
+		{
+			case "background-color":
+				return "backgroundColor";
+			default:	//for all other style names, return the style name
+				return cssStyleName;
+		}
+	},
+
 	/**Sets the attribute value of an element, using namespaces if the DOM supports them.
 	@param element The element for which an attribute should be set.
 	@param namespaceURI The URI of the namespace.
@@ -1231,7 +1261,9 @@ function HTTPCommunicator()
 
 //GuiseAJAX
 
-/**A class encapsulating AJAX functionality for Guise.*/
+/**A class encapsulating AJAX functionality for Guise.
+This class has knowledge of com.guiseframework.js.Client, which is expected to be stored in a global variable named "guise".
+*/
 function GuiseAJAX()
 {
 
@@ -1573,6 +1605,20 @@ alert(exception);
 				finally
 				{
 					this.processingAJAXResponses=false;	//we are no longer processing AJAX responses
+					for(var oldElementID in guise.oldElementIDCursors)	//for each old element ID
+					{
+//TODO del alert("looking at old element ID: "+oldElementID);
+						var oldCursor=guise.oldElementIDCursors[oldElementID];	//get the old cursor
+//TODO del alert("old cursor: "+oldCursor);
+						var element=document.getElementById(oldElementID);	//get the old element in the document
+						if(element!=null)	//if this element is still in the document TODO make sure that these two checks ensure this is really an old cursor
+						{
+//TODO del alert("restoring old cursor for element: "+oldElementID+" which has cursor "+element.style.cursor);
+							delete guise.oldElementIDCursors[oldElementID];	//remove this old cursor from the array
+							element.style.cursor=oldCursor;	//set the cursor back to what it was
+//TODO del alert("element now has cursor: "+element.style.cursor);
+						}
+					}
 				}
 			}
 		};
@@ -1726,9 +1772,7 @@ alert(exception);
 				oldElement.value="";	//set the value to the empty string (setting the value to null will result in "null" being displayed in the input control on IE)
 			}
 				//patch in the new and changed attributes
-//TODO del when works			var isClassNameModified=false;	//keep track of whether we update the class name; if so, we'll need to do some fixes for IE6
-			var display=null;	//we'll record whatever display we use
-			var visibility=null;	//we'll record whatever visibility we use
+			var removableStyles=["backgroundColor", "color", "display", "visibility"];	//create a new array of styles to remove if not assigned, with the style name as the key
 			var attributes=element.attributes;	//get the new element's attributes
 			for(var i=attributes.length-1; i>=0; --i)	//for each attribute
 			{
@@ -1744,16 +1788,9 @@ alert(exception);
 						var styleComponents=styles[styleIndex].split(":");	//get a reference to this style and split out the property and value
 						if(styleComponents.length==2)	//we expect there to be a property and a value
 						{
-							var styleProperty=styleComponents[0].trim();	//get the trimmed style property
+							var styleProperty=DOMUtilities.getCSSAttributeName(styleComponents[0].trim());	//retrieve get the trimmed style property and get the HTML DOM attribute version
 							var styleValue=styleComponents[1].trim();	//get the trimmed style value
-							if(styleProperty=="display")	//if this is the display style
-							{
-								display=styleValue;	//save the display
-							}
-							else if(styleProperty=="visibility")	//if this is the visibility style
-							{
-								visibility=styleValue;	//save the visibility
-							}
+							removableStyles.removeItem(styleProperty);	//remove this style from the array of removable styles, indicating that we shouldn't remove this style
 							if(oldElement.style[styleProperty]!=styleValue)	//if the style is different	TODO check about removing a style
 							{
 //TODO del alert("ready to set element style "+styleProperty+" to value "+styleValue);
@@ -1817,15 +1854,16 @@ alert(exception);
 					}
 				}
 			}
-			if(display==null && oldElement.style["display"])	//if there was no display style in the new element but there is in the old element
+			for(var i=removableStyles.length-1; i>=0; --i)	//for each removable style that needs removed
 			{
-				oldElement.style["display"]="";	//remove the display style
+				var removableStyleName=removableStyles[i];	//get the removable style name
+//TODO del when works alert("looking at removable style "+removableStyleName+" with old value "+oldElement.style[removableStyleName]);
+				if(oldElement.style[removableStyleName])	//if this style was not in the new element but it was in the old element
+				{
+//TODO del when works alert("trying to remove style "+removableStyleName+" with old value "+oldElement.style[removableStyleName]);
+					oldElement.style[removableStyleName]="";	//remove the style from the old element
+				}				
 			}
-			if(visibility==null && oldElement.style["visibility"])	//if there was no visibility style in the new element but there is in the old element
-			{
-				oldElement.style["visibility"]="";	//remove the visibility style
-			}
-
 				//perform special-case attribute manipulations for certain elements
 			if(elementName=="input")	//input checkboxes and radio buttons do not updated the checked state correctly based upon the "checked" attribute
 			{
@@ -2008,6 +2046,10 @@ com.guiseframework.js.Client=function()
 	
 	/**The iframe that hides select elements in IE6; positioned right below the modal layer.*/
 	this._modalIFrame=null;
+
+	/**The map of cursors that have been temporarily changed, keyed to the ID of the element the cursor of which has been changed.
+	This is a tentative implementation, as blindly resetting the cursor after AJAX processing will prevent new cursors to be changed via AJAX.	*/
+	this.oldElementIDCursors=new Object();
 
 	if(!com.guiseframework.js.Client._initialized)
 	{
@@ -3351,32 +3393,6 @@ function onButtonClick(event)
 	{
 		if(element.id)	//if the button has an ID
 		{
-				//ask confirmations if needed
-			var childNodeList=element.childNodes;	//get all the child nodes of the element
-			var childNodeCount=childNodeList.length;	//find out how many children there are
-			for(var i=0; i<childNodeCount; ++i)	//for each child node
-			{
-				var childNode=childNodeList[i];	//get this child node
-				if(childNode.nodeType==Node.COMMENT_NODE && childNode.nodeValue)	//if this is a comment node
-				{
-					var commentValue=childNode.nodeValue;	//get the comment value
-					var delimiterIndex=commentValue.indexOf(':');	//get the delimiter index
-					if(delimiterIndex>=0)	//if there is a delimiter
-					{
-						var paramName=commentValue.substring(0, delimiterIndex);	//get the parameter name
-						var paramValue=commentValue.substring(delimiterIndex+1);	//get the parameter value
-						if(paramName="confirm")	//if this is a confirmation
-						{
-							if(!confirm(paramValue))	//ask for confirmation; if the user does not confirm
-							{
-								return;	//don't process the event further
-							}
-						}
-					}
-				}
-			}
-//TODO del			var form=getForm(element);	//get the form
-//TODO del			if(form && form.id)	//if there is a form with an ID
 			if(form.id)	//if the form has an ID
 			{
 				var actionInputID=form.id.replace(".form", ".input");	//determine the ID of the hidden action input TODO use a constant, or get these values using a better method
@@ -3423,38 +3439,20 @@ function onAction(event)
 		var componentID=component.id;	//get the component ID
 		if(componentID)	//if there is a component ID
 		{
-				//ask confirmations if needed
-			var childNodeList=target.childNodes;	//get all the child nodes of the element
-			var childNodeCount=childNodeList.length;	//find out how many children there are
-			for(var i=0; i<childNodeCount; ++i)	//for each child node
-			{
-				var childNode=childNodeList[i];	//get this child node
-				if(childNode.nodeType==Node.COMMENT_NODE && childNode.nodeValue)	//if this is a comment node
-				{
-					var commentValue=childNode.nodeValue;	//get the comment value
-					var delimiterIndex=commentValue.indexOf(':');	//get the delimiter index
-					if(delimiterIndex>=0)	//if there is a delimiter
-					{
-						var paramName=commentValue.substring(0, delimiterIndex);	//get the parameter name
-						var paramValue=commentValue.substring(delimiterIndex+1);	//get the parameter value
-						if(paramName="confirm")	//if this is a confirmation
-						{
-							if(!confirm(paramValue))	//ask for confirmation; if the user does not confirm
-							{
-								event.stopPropagation();	//tell the event to stop bubbling
-								event.preventDefault();	//prevent the default functionality from occurring
-								return;	//don't process the event further
-							}
-						}
-					}
-				}
-			}
 			var form=getForm(component);	//get the form
 			if(form && form.id)	//if there is a form with an ID
 			{
 				var actionInputID=form.id.replace(".form", ".input");	//determine the ID of the hidden action input TODO use a constant, or get these values using a better method
 				if(AJAX_ENABLED)	//if AJAX is enabled
 				{
+
+//TODO fix					target.parentNode.style.cursor="inherit";	//TODO testing
+//TODO fix					target.style.cursor="inherit";	//TODO testing
+//TODO fix					document.body.style.cursor="wait";	//TODO testing
+//TODO fix				alert("old cursor: "+target.style.cursor);
+					guise.oldElementIDCursors[target.id]=target.style.cursor;	//save the old cursor
+					target.style.cursor="wait";	//TODO testing
+
 					var ajaxRequest=new FormAJAXEvent(new Parameter(actionInputID, componentID));	//create a new form request with form's hidden action control and the action element ID
 					guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request			
 				}
@@ -3537,6 +3535,16 @@ function onActionClick(event)
 			{
 				if(AJAX_ENABLED)	//if AJAX is enabled
 				{
+/*TODO fix					
+					target.parentNode.style.cursor="inherit";	//TODO testing
+					target.style.cursor="inherit";	//TODO testing
+					document.body.style.cursor="wait";	//TODO testing
+*/
+/*TODO fix
+					guise.oldElementIDCursors[targetID]=target.style.cursor;	//save the old cursor
+					target.style.cursor="wait";	//TODO testing
+*/
+				
 					var ajaxRequest=new ActionAJAXEvent(componentID, targetID, null, 0);	//create a new action request with no action ID and the default option
 					guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 					event.stopPropagation();	//tell the event to stop bubbling

@@ -5,8 +5,13 @@ import java.util.concurrent.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.garretwilson.beans.TargetedEvent;
 import com.garretwilson.util.Debug;
+import com.guiseframework.converter.AbstractStringLiteralConverter;
+import com.guiseframework.converter.Converter;
+import com.guiseframework.converter.DefaultStringLiteralConverter;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 
@@ -50,9 +55,11 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 
 	/**Returns the given tree node representation strategy assigned to produce representation components for the given value class.
 	If there is no associated representation strategy, the default representation strategy (associated with the {@link Object} class) will be returned, if present.
+	If there is no representation strategy associated with the{@link Object} class, a default representation strategy will be created and installed for this type.
 	@param <V> The type of value to represent.
 	@param valueClass The class of value with which the strategy should be associated.
 	@return The strategy for generating components to represent values of the given type, or <code>null</code> if there is no associated representation strategy.
+	@see DefaultValueRepresentationStrategy
 	*/	
 	@SuppressWarnings("unchecked")	//we check the generic types before putting them in the map, so it's fine to cast the retrieved values
 	public <V> TreeNodeRepresentationStrategy<? super V> getTreeNodeRepresentationStrategy(final Class<V> valueClass)
@@ -61,7 +68,12 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 			//TODO instead of directly trying Object.class, work up the hierarchy
 		if(treeNodeRepresentationStrategy==null && !Object.class.equals(valueClass))	//if there is no associated representation strategy and this isn't the object class
 		{
-			treeNodeRepresentationStrategy=(TreeNodeRepresentationStrategy<? super V>)classTreeNodeRepresentationStrategyMap.get(Object.class);	//get the default strategy (the one associated with Object.class)			
+			treeNodeRepresentationStrategy=(TreeNodeRepresentationStrategy<? super V>)classTreeNodeRepresentationStrategyMap.get(Object.class);	//get the default strategy (the one associated with Object.class)
+			if(treeNodeRepresentationStrategy==null)	//if there is no representation strategy associated with Object.class
+			{
+				treeNodeRepresentationStrategy=new DefaultValueRepresentationStrategy<V>(valueClass);	//create a default representation strategy for this class
+				classTreeNodeRepresentationStrategyMap.put(valueClass, treeNodeRepresentationStrategy);	//store the representation strategy in the map for the next time; there is a race condition here, but it is benign as it will at worst create several duplicate value representation strategies
+			}
 		}
 		return treeNodeRepresentationStrategy;	//return the tree node representation strategy
 	}
@@ -119,10 +131,11 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		this.treeModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the tree model
 		this.treeModel.addActionListener(repeatActionListener);	//listen and repeat all actions of the tree model
 			//TODO listen for and repeat tree model-specific events
-		setTreeNodeRepresentationStrategy(Object.class, new DefaultValueRepresentationStrategy<Object>());	//create a default representation strategy and set it as the default by associating it with the Object class
+//TODO del		setTreeNodeRepresentationStrategy(Object.class, new DefaultValueRepresentationStrategy<Object>());	//create a default representation strategy and set it as the default by associating it with the Object class
 		setTreeNodeRepresentationStrategy(LabelModel.class, new LabelModelTreeNodeRepresentationStrategy());	//create and associate a label model representation strategy
 //TODO fix		setTreeNodeRepresentationStrategy(MessageModel.class, new MessageModelRepresentationStrategy(session));	//create and associate a message model representation strategy
 		setTreeNodeRepresentationStrategy(TextModel.class, new TextModelTreeNodeRepresentationStrategy());	//create and associate a text model representation strategy
+		addPropertyChangeListener(TreeNodeModel.SELECTED_PROPERTY, new TreeNodeSelectChangeListener());	//TODO comment
 		addActionListener(new TreeNodeActionListener());	//listen for action events so that we can select nodes and/or pop up context menus
 	}
 
@@ -202,6 +215,31 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	*/
 	public static class DefaultValueRepresentationStrategy<V> extends AbstractTreeNodeRepresentationStrategy<V>
 	{
+		/**The converter to use for displaying the value as a string.*/
+		private final Converter<V, String> converter;
+			
+			/**@return The converter to use for displaying the value as a string.*/
+			public Converter<V, String> getConverter() {return converter;}
+
+		/**Value class constructor with a default converter.
+		This implementation uses a {@link DefaultStringLiteralConverter}.
+		@param valueClass The class indicating the type of value to convert.
+		@exception NullPointerException if the given value class is <code>null</code>.
+		*/
+		public DefaultValueRepresentationStrategy(final Class<V> valueClass)
+		{
+			this(AbstractStringLiteralConverter.getInstance(valueClass));	//construct the class with the appropriate string literal converter
+		}
+
+		/**Converter constructor.
+		@param converter The converter to use for displaying the value as a string.
+		@exception NullPointerException if the given converter is <code>null</code>.
+		*/
+		public DefaultValueRepresentationStrategy(final Converter<V, String> converter)
+		{
+			this.converter=checkInstance(converter, "Converter cannot be null.");	//save the converter
+		}
+
 		/**Creates a component to represent the given tree node.
 		This implementation returns a label with string value of the given value using the object's <code>toString()</code> method.
 		@param <N> The type of value contained in the node.
@@ -230,17 +268,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 			}
 			else	//if the component should not be editable, return a label component
 			{
-				final N value=treeNode.getValue();	//get the current value
-				if(value!=null)	//if there is value
-				{
-					final Label label=new Label();	//create a new label
-					label.setLabel(value.toString());	//generate a label containing the value's string value
-					return label;	//return the label
-				}
-				else	//if there is no value
-				{
-					return new Label();	//return a default label TODO improve this entire strategy
-				}
+				return new SelectableLabel(new ValueConverterLabelModel<V>(treeNode.getValue(), getConverter()));	//create a label that will convert the value to a string
 			}
 		}
 	}
@@ -418,7 +446,13 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 			if(target instanceof TreeNodeModel)	//if this action was on a tree node
 			{
 				final TreeNodeModel<?> treeNode=(TreeNodeModel<?>)target;	//get the tree node
-				
+Debug.trace("selecting tree node", treeNode);
+				treeNode.setSelected(true);	//select the tree node
+/*TODO fix
+				final Component<?> component=getComponent(treeNode);	//TODO testing
+				component.setBackgroundColor(Theme.COLOR_SELECTED_BACKGROUND);
+*/
+
 /*TODO finish; this works so far
 				final Component<?> component=getComponent(treeNode);	//TODO testing
 				component.setBackgroundColor(RGBColor.BLUE);
@@ -447,6 +481,58 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 					}
 				}
 */
+			}
+		}
+	}
+
+	/**The listener to listen for tree node selection status and update the representation component status if possible.
+	This class also handles mutual exclusion selection.
+	@author Garret Wilson
+	*/
+	private class TreeNodeSelectChangeListener extends AbstractGenericPropertyChangeListener<Boolean>
+	{
+		/**Called when a bound property is changed.
+		@param genericPropertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
+		*/
+		public void propertyChange(GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent)
+		{
+			final Boolean newValue=genericPropertyChangeEvent.getNewValue();	//get the new value
+			if(newValue!=null)	//if we know the new selected value
+			{
+				final boolean newSelected=newValue.booleanValue();	//get the new boolean selected status
+				final Object target=genericPropertyChangeEvent.getTarget();	//get the event target
+				if(target instanceof TreeNodeModel)	//if this action was on a tree node
+				{
+					final TreeNodeModel<?> treeNode=(TreeNodeModel<?>)target;	//get the tree node
+						//update the associated component, if any
+					final TreeNodeComponentState componentState=getComponentState(treeNode);	//see if we have a component associated with this tree node
+					if(componentState!=null)	//if we have a component state
+					{
+						final Component<?> component=componentState.getComponent();	//get the representation component
+						if(component instanceof Selectable)	//if the component is selectable
+						{
+							((Selectable)component).setSelected(newSelected);	//update the representation component's selected status to match that of the tree node
+						}
+					}
+					if(newSelected)	//if the tree node is being selected
+					{
+						selectSingleTreeNode(getRootNode(), treeNode);	//implement mutual exclusion by making sure this is the only tree node selected
+					}
+				}
+			}
+		}
+
+		/**Unselects the given parent tree node and all its children, recursively, except for the given selected tree node.
+		This method is used to implement mutual exclusive selections.
+		@param treeNode The parent of the tree node to unselect.
+		@param selectedTreeNode The tree node to select exclusively. 
+		*/
+		private void selectSingleTreeNode(final TreeNodeModel<?> treeNode, final TreeNodeModel<?> selectedTreeNode)
+		{
+			treeNode.setSelected(treeNode==selectedTreeNode);	//select the tree node based upon whether it is the selected tree node
+			for(final TreeNodeModel<?> childTreeNode:treeNode)	//for each child tree node
+			{
+				selectSingleTreeNode(childTreeNode, selectedTreeNode);	//select or unselect this child recursively using mutual exclusion
 			}
 		}
 	}

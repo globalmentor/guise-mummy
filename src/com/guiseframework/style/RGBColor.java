@@ -9,7 +9,7 @@ import com.garretwilson.text.ArgumentSyntaxException;
 /**Encapsulates a color value of the sRGB color space.
 @author Garret Wilson
 @see <a href="http://www.w3.org/pub/WWW/Graphics/Color/sRGB.html">A Standard Default Color Space for the Internet - sRGB</a>
-@see <a href="http://www.w3.org/TR/css3-color/#svg-color">CSS 3 Color Module</a>
+@see <a href="http://www.w3.org/TR/css3-color/">CSS 3 Color Module</a>
 @see <a href="http://en.wikipedia.org/wiki/X11_Color_Names">X11 color names</a>
 @see <a href="http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnwebgen/html/X11_names.asp">Colors By Name</a>
 @see <a href="http://www.w3schools.com/html/html_colornames.asp">HTML Color Names</a>
@@ -132,6 +132,7 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 		<li><code>#<var>rgb</var></code>, with hexadecimal representation of color components without regard to case.</li>
 		<li><code>#<var>rrggbb</var></code>, with hexadecimal representation of color components without regard to case.</li>
 	</ul>
+	This method also recognizes the <code>transparent</code> color name as equivalent to rgba(0, 0, 0, 0), or black with zero alpha.
 	@param charSequence The character sequence representation of a color, either a lowercase name of a standard HTML color, or a three or six-digit hex code beginning with '#'. 
 	@return An RGB color object representing the color represented by the given string.
 	@exception NullPointerException if the given string is <code>null</code>.
@@ -142,7 +143,10 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 		final Matcher rgbMatcher=RGB_PATTERN.matcher(charSequence);	//match against #rgb
 		if(rgbMatcher.matches())	//if the character sequence matches
 		{
-			return new RGBColor(Integer.parseInt(rgbMatcher.group(1), 16), Integer.parseInt(rgbMatcher.group(2), 16), Integer.parseInt(rgbMatcher.group(3), 16));	//extract the RGB values and return a new color
+			final int rNibble=Integer.parseInt(rgbMatcher.group(1), 16);	//extract the four-bit RGB values
+			final int gNibble=Integer.parseInt(rgbMatcher.group(2), 16);
+			final int bNibble=Integer.parseInt(rgbMatcher.group(3), 16);
+			return new RGBColor(rNibble<<4+rNibble, gNibble<<4+gNibble, bNibble*4+bNibble);	//convert the RGB values to byte-byte sized and return a new color
 		}
 		final Matcher rrggbbMatcher=RRGGBB_PATTERN.matcher(charSequence);	//match against #rrggbb
 		if(rrggbbMatcher.matches())	//if the character sequence matches
@@ -156,6 +160,8 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 		}
 		throw new ArgumentSyntaxException("Character sequence "+charSequence+" does not represent a color.");
 	}
+
+	public final static RGBColor TRANSPARENT=new RGBColor(0x00000000, true);
 
 	public final static RGBColor ALICE_BLUE=new RGBColor(0xF0F8FF);
 	public final static RGBColor ANTIQUE_WHITE=new RGBColor(0xFAEBD7);
@@ -305,7 +311,9 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 	{
 			//store the standard colors in the map, keyed to the lowercase name with no underscore
 		final Pattern underscorePattern=Pattern.compile("_");	//a pattern to match an underscore, so that it can be removed
-		namedColorMap=new HashMap<String, RGBColor>(143);	//create the map of colors
+		namedColorMap=new HashMap<String, RGBColor>(144);	//create the map of colors
+		namedColorMap.put(underscorePattern.matcher("TRANSPARENT").replaceAll("").toLowerCase(), TRANSPARENT);
+
 		namedColorMap.put(underscorePattern.matcher("ALICE_BLUE").replaceAll("").toLowerCase(), ALICE_BLUE);
 		namedColorMap.put(underscorePattern.matcher("ANTIQUE_WHITE").replaceAll("").toLowerCase(), ANTIQUE_WHITE);
 		namedColorMap.put(underscorePattern.matcher("AQUA").replaceAll("").toLowerCase(), AQUA);

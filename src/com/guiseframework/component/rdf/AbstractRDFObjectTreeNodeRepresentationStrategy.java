@@ -4,6 +4,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.garretwilson.rdf.*;
 import com.guiseframework.component.Label;
+import com.guiseframework.component.SelectableLabel;
 import com.guiseframework.component.TreeControl;
 import com.guiseframework.model.*;
 import com.guiseframework.model.rdf.RDFObjectTreeNodeModel;
@@ -44,18 +45,12 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 	@SuppressWarnings("unchecked")
 	public <N extends V> Label createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
 	{
+			//TODO improve this entire strategy
 		final N value=treeNode.getValue();	//get the current value
-		if(value!=null)	//if there is value
-		{
-			final Label label=new Label(createLabelModel(treeControl, model, treeNode));	//create a new label using the created label model TODO always create a label model, not just if there is a value
-			final String labelText=buildLabelText(new StringBuilder(), treeControl, model, treeNode, value).toString();	//construct the label text
-			label.setLabel(labelText);	//set the label's text
-			return label;	//return the label
-		}
-		else	//if there is no value
-		{
-			return new Label();	//return a default label TODO improve this entire strategy
-		}
+		final Label label=new SelectableLabel(createLabelModel(treeControl, model, treeNode));	//create a new label using the created label model TODO always create a label model, not just if there is a value
+		final String labelText=buildLabelText(new StringBuilder(), treeControl, model, treeNode, value).toString();	//construct the label text
+		label.setLabel(labelText);	//set the label's text
+		return label;	//return the label
 	}
 
 	/**Creates a label model for the representation label.
