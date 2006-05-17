@@ -3,6 +3,7 @@ package com.guiseframework;
 import java.io.*;
 import java.lang.ref.*;
 import java.net.URI;
+import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -28,7 +29,7 @@ public final class Guise
 	public final static String PUBLIC_RESOURCE_BASE_PATH="pub/";
 
 	/**The identifier of this build.*/
-	public final static String BUILD_ID="2006-05-11";
+	public final static String BUILD_ID="2006-05-16";
 	
 		//Guise ontology
 	
@@ -93,6 +94,24 @@ public final class Guise
 			}
 		}
 		return resource;	//return whatever resource we found
+	}
+
+	/**Retrieves a URL to a public resource keyed to its location.
+	The URL allows connections to the resource.
+	@param publicResourceKey The location of the resource.
+	@return A URL to the resource, or <code>null</code> if there is no such resource.
+	@exception IllegalArgumentException if the resource key does not begin with the public resource path.
+	@exception IOException if there is an error loading the resource.
+	@see #PUBLIC_RESOURCE_BASE_PATH
+	*/
+	public URL getPublicResourceURL(final String publicResourceKey) throws IOException
+	{
+		final String key=normalizePath(publicResourceKey);	//normalize the resource key
+		if(!key.startsWith(PUBLIC_RESOURCE_BASE_PATH))	//if this isn't a public resource key
+		{
+			throw new IllegalArgumentException(publicResourceKey);
+		}
+		return getClass().getResource(key);	//get a URL to the resource
 	}
 
 	/**Retrieves an input stream to a public resource keyed to its location.

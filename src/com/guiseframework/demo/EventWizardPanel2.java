@@ -31,6 +31,8 @@ public class EventWizardPanel2 extends DefaultNavigationPanel
 		wizardButtonPanel.add(previousButton);
 		final Button nextButton=new Button(wizardCardPanel.getNextActionPrototype());
 		wizardButtonPanel.add(nextButton);
+		final Button finishButton=new Button(wizardCardPanel.getFinishActionPrototype());
+		wizardButtonPanel.add(finishButton);
 		wizardCardPanel.resetSequence();
 	}
 

@@ -45,12 +45,16 @@ public abstract class AbstractValueControl<V, C extends ValueControl<V, C>> exte
 			}			
 		}
 
-	/**The property change listener that removes any notification in response to a property changing.*/
-	private final PropertyChangeListener clearNotificationPropertyChangeListener=new PropertyChangeListener()	//create a listener to update the text in response to a property changing
+	/**The property change listener that updates validity and removes any notification in response to a property changing.
+	@see #setNotification(Notification)
+	@see #updateValid()
+	*/
+	private final PropertyChangeListener updateValidPropertyChangeListener=new PropertyChangeListener()
 			{
 				public void propertyChange(final PropertyChangeEvent propertyChangeEvent)	//if the property changes
 				{
 					setNotification(null);	//clear the notification
+					updateValid();	//update the valid status based upon the new property, so that any listeners will know whether the new property is valid
 				}
 			};
 
@@ -69,22 +73,8 @@ public abstract class AbstractValueControl<V, C extends ValueControl<V, C>> exte
 			this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the value model
 		}
 		this.valueModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the value model
-		addPropertyChangeListener(VALUE_PROPERTY, clearNotificationPropertyChangeListener);	//listen for the value changing, and clear the notification in response TODO this needs to be put in other value controls as well
-	}
-
-	/**Reports that a bound property has changed.
-	This version first updates the valid status if the value is reported as being changed.
-	@param propertyName The name of the property being changed.
-	@param oldValue The old property value.
-	@param newValue The new property value.
-	*/
-	protected <VV> void firePropertyChange(final String propertyName, final VV oldValue, final VV newValue)
-	{
-		if(VALUE_PROPERTY.equals(propertyName) || VALIDATOR_PROPERTY.equals(propertyName))	//if the value property or the validator property is being reported as changed
-		{
-			updateValid();	//update the valid status based upon the new property, so that any listeners will know whether the new property is valid
-		}
-		super.firePropertyChange(propertyName, oldValue, newValue);	//fire the property change event normally
+		addPropertyChangeListener(VALUE_PROPERTY, updateValidPropertyChangeListener);	//listen for the value changing, and clear the notification and update the validity in response TODO this needs to be put in other value controls as well
+		addPropertyChangeListener(VALIDATOR_PROPERTY, updateValidPropertyChangeListener);	//listen for the validator changing, and clear the notification and update the validity in response TODO this needs to be put in other value controls as well
 	}
 
 	/**Checks the state of the component for validity.

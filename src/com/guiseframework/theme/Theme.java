@@ -69,14 +69,17 @@ public class Theme extends ClassTypedRDFResource
 	public final static Color<?> COLOR_SELECTED_BACKGROUND=new ResourceColor("theme.color.selected.background");
 
 		//standard labels
+	public final static String LABEL_FINISH=createStringResourceReference("theme.label.finish");
 	public final static String LABEL_FIRST=createStringResourceReference("theme.label.first");
 	public final static String LABEL_LAST=createStringResourceReference("theme.label.last");
 	public final static String LABEL_NEXT=createStringResourceReference("theme.label.next");
 	public final static String LABEL_PREVIOUS=createStringResourceReference("theme.label.previous");
+	public final static String LABEL_SUBMIT=createStringResourceReference("theme.label.submit");
 		//standard icons
 	public final static URI ICON_ACCEPT=createURIResourceReference("theme.icon.accept");
 	public final static URI ICON_ACCEPT_MULTIPLE=createURIResourceReference("theme.icon.accept.multiple");
 	public final static URI ICON_EXCLAMATION=createURIResourceReference("theme.icon.exclamation");
+	public final static URI ICON_FINISH=createURIResourceReference("theme.icon.finish");
 	public final static URI ICON_FIRST=createURIResourceReference("theme.icon.first");
 	public final static URI ICON_FOLDER=createURIResourceReference("theme.icon.folder");
 	public final static URI ICON_FOLDER_CLOSED=createURIResourceReference("theme.icon.folder.closed");
@@ -93,4 +96,5 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI ICON_REJECT_MULTIPLE=createURIResourceReference("theme.icon.reject.multiple");
 	public final static URI ICON_RESOURCE=createURIResourceReference("theme.icon.resource");
 	public final static URI ICON_STOP=createURIResourceReference("theme.icon.stop");
+	public final static URI ICON_SUBMIT=createURIResourceReference("theme.icon.submit");
 }

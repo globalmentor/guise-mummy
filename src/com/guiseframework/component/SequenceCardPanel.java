@@ -36,6 +36,12 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 		/**@return The prototype for the next action.*/
 		public ActionPrototype getNextActionPrototype() {return nextActionPrototype;}
 
+	/**The prototype for the action to finish the sequence.*/
+	private final ActionPrototype finishActionPrototype;
+
+		/**@return The prototype for the action to finish the sequence.*/
+		public ActionPrototype getFinishActionPrototype() {return finishActionPrototype;}
+
 	/**Default constructor.*/
 	public SequenceCardPanel()
 	{
@@ -71,7 +77,17 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 						goNext();	//go to the next card
 					};
 				});
-//TODO del		setValidator(new SequenceCardValidator());	//TODO comment
+			//finish action prototype
+		finishActionPrototype=new ActionPrototype();
+		finishActionPrototype.setIcon(ICON_FINISH);
+		finishActionPrototype.setLabel(LABEL_FINISH);
+		finishActionPrototype.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(final ActionEvent actionEvent)	//if the finish action is performed
+					{
+						goFinish();	//finish the sequence
+					};
+				});
 		addVetoableChangeListener(VALUE_PROPERTY, new SequenceCardVetoableChangeListener());	//do validation as needed on card changes
 		addPropertyChangeListener(VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Component<?>>()
 				{
@@ -112,6 +128,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 						}
 						previousActionPrototype.setEnabled(hasPrevious());	//enable or disable the previous action prototype
 						nextActionPrototype.setEnabled(hasNext());	//enable or disable the previous action prototype
+						finishActionPrototype.setEnabled(!hasNext());	//enable or disable the finish action prototype
 					}
 				});
 	}
@@ -345,6 +362,48 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 		}
 	}
 
+	/**Finishes the sequence.
+	This method validates and commits the current card, and then calls {@link #finish()}.
+	If no card is selected, no action occurs.
+	*/
+	public void goFinish()
+	{
+		final Component<?> selectedCard=getSelectedValue();	//get the selected card
+		if(selectedCard!=null)	//if a card is selected
+		{
+			if(validate())	//validate this panel; if everything, including the selected card, is valid
+			{
+					//show any notifications, anyway
+				final List<Notification> notifications=getNotifications(selectedCard);	//get the notifications from the card
+				final Runnable notifyCommitAdvance=new Runnable()	//create code for notifying, committing the card and advancing to the next card
+						{
+							/**Keep track of which notification we're on.*/
+							private int notificationIndex=0;
+							public void run()
+							{
+								if(notificationIndex<notifications.size())	//if there are more notifications
+								{
+									getSession().notify(notifications.get(notificationIndex++), this);	//notify of the current notification (advancing to the next one), specifying that this runnable should be called again
+								}
+								else	//if we are out of notifications
+								{
+									try
+									{
+										commit();	//commit this panel
+										finish();	//finish the sequence
+									}
+									catch(final IOException ioException)	//if there is a problem commiting the result
+									{
+										getSession().notify(new Notification(ioException));	//notify the user
+									}
+								}
+							}
+						};
+				notifyCommitAdvance.run();	//run the notify/commit/advance runnable for as many notifications as there are
+			}
+		}
+	}
+
 	/**Resets the sequence by navigating to the first card and disabling all subsequent cards.*/
 	public void resetSequence()
 	{
@@ -424,6 +483,13 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 		}
 	}
 
+	/**Finishes the sequence.
+	This version does nothing.
+	*/
+	public void finish()
+	{
+	}
+
 	/**Determines the component for navigation based upon the given bookmark.
 	This version finds the first previous enabled and displayed card, searching backwards from the requested card, if the requested card is not enabled and displayed.
 	This version chooses the first card if no card is requested.
@@ -460,53 +526,6 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 		}
 		return component;	//return the determined component 
 	}
-
-	/**A validator that validates cards before changing to new cards.
-	@author Garret Wilson
-	*/
-	protected class SequenceCardValidator extends AbstractValidator<Component<?>>
-	{
-
-		/**Default constructor.*/
-		public SequenceCardValidator()
-		{
-			super(true);	//construct the parent class, indicating that values are required
-		}		
-		
-		/**Determines whether a given value is valid.
-		This version checks whether a value is provided if values are required.
-		Child classes should call this version as a convenience for checking non-<code>null</code> and required status.
-		@param value The value to validate.
-		@return <code>true</code> if a value is given or a value is not required, else <code>false</code>.
-		*/
-		public boolean isValid(final Component<?> value)
-		{
-			if(!super.isValid(value))	//if the card doesn't pass the default checks
-			{
-				return false;	//the card isn't valid
-			}
-			final Component<?> currentCard=getValue();	//get the currently selected card
-			if(currentCard!=null)	//if there is a selected card, do validation if we need to
-			{
-				final int selectedIndex=indexOf(currentCard);	//get the index of the selected card
-				assert selectedIndex>=0 : "Expected selected card to be present in the container.";
-				final int newIndex=indexOf(value);	//see what index the new value has
-				if(newIndex<0)	//if the new value isn't in the container TODO maybe put this in a default card panel validator
-				{
-					return false;	//we can't selecte a card not in the container
-				}
-				if(newIndex>selectedIndex)	//if we're advancing forward in the sequence
-				{
-					if(!SequenceCardPanel.this.validate())	//validate the panel; if anything, including the currently selected card, doesn't validate
-					{
-						return false;	//don't go forward
-					}									
-				}
-			}
-			return true;	//the new card passed all the tests
-		}
-	}
-
 
 	/**A vetoable property change listener validates cards before changing to new cards.
 	@author Garret Wilson

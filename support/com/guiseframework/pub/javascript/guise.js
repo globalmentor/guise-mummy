@@ -3450,8 +3450,8 @@ function onAction(event)
 //TODO fix					target.style.cursor="inherit";	//TODO testing
 //TODO fix					document.body.style.cursor="wait";	//TODO testing
 //TODO fix				alert("old cursor: "+target.style.cursor);
-					guise.oldElementIDCursors[target.id]=target.style.cursor;	//save the old cursor
-					target.style.cursor="wait";	//TODO testing
+					guise.oldElementIDCursors[componentID]=target.style.cursor;	//save the old cursor
+					component.style.cursor="wait";	//TODO testing
 
 					var ajaxRequest=new FormAJAXEvent(new Parameter(actionInputID, componentID));	//create a new form request with form's hidden action control and the action element ID
 					guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request			
@@ -3544,7 +3544,10 @@ function onActionClick(event)
 					guise.oldElementIDCursors[targetID]=target.style.cursor;	//save the old cursor
 					target.style.cursor="wait";	//TODO testing
 */
-				
+					guise.oldElementIDCursors[targetID]=target.style.cursor;	//save the old cursor
+					target.style.cursor="wait";	//TODO testing
+
+
 					var ajaxRequest=new ActionAJAXEvent(componentID, targetID, null, 0);	//create a new action request with no action ID and the default option
 					guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 					event.stopPropagation();	//tell the event to stop bubbling

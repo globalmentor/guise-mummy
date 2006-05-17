@@ -117,6 +117,8 @@ public class EventWizardPanel extends DefaultNavigationPanel
 		wizardButtonPanel.add(previousButton);
 		final Button nextButton=new Button(wizardCardPanel.getNextActionPrototype());
 		wizardButtonPanel.add(nextButton);
+		final Button finishButton=new Button(wizardCardPanel.getFinishActionPrototype());
+		wizardButtonPanel.add(finishButton);
 		wizardPanel.add(wizardButtonPanel, new RegionConstraints(Region.PAGE_END));
 				//wizard link couplers
 		new ActionCardCoupler(personalLink10, personalNamePanel);

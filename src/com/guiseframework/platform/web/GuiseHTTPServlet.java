@@ -20,6 +20,8 @@ import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.io.*;
 import com.garretwilson.lang.ClassUtilities;
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.model.DefaultResource;
+import com.garretwilson.model.Resource;
 
 import static com.garretwilson.io.ContentTypeUtilities.*;
 import static com.garretwilson.lang.ClassUtilities.*;
@@ -29,6 +31,7 @@ import static com.garretwilson.lang.ThreadUtilities.*;
 import com.garretwilson.net.URIConstants;
 import com.garretwilson.net.URIUtilities;
 import com.garretwilson.net.http.*;
+
 import static com.garretwilson.net.http.HTTPConstants.*;
 
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
@@ -414,10 +417,16 @@ Debug.trace("applicationContextPath", guiseApplicationContextPath);
 Debug.trace("raw path info:", rawPathInfo);
 		if(rawPathInfo.startsWith(GUISE_PUBLIC_RESOURCE_BASE_PATH))	//if this is a request for a public resource
 		{
+			super.doGet(request, response);	//go ahead and retrieve the resource immediately
+			return;	//don't try to see if there is a navigation path for this path
+/*TODO del when works
+Debug.trace("this is a Guse public resource:", rawPathInfo);
 			final String resourceKey=Guise.PUBLIC_RESOURCE_BASE_PATH+rawPathInfo.substring(GUISE_PUBLIC_RESOURCE_BASE_PATH.length());	//replace the beginning web base path to the resource base path
+Debug.trace("using resource key:", resourceKey);
 			final byte[] resource=Guise.getInstance().getPublicResource(resourceKey);	//load the resource
 			if(resource!=null)	//if the resource was found
 			{
+Debug.trace("found resource");
 				final ContentType contentType=FileUtilities.getMediaType(rawPathInfo);	//see what content type the resource is
 				if(contentType!=null)	//if we know the content type
 				{
@@ -429,7 +438,8 @@ Debug.trace("raw path info:", rawPathInfo);
 				response.getOutputStream().write(resource);	//write the resource
 				return;	//don't process this request further
 			}
-		}		
+*/
+		}
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
 		final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
@@ -1253,6 +1263,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
   @return <code>true</code> if the resource exists, else <code>false</code>.
 	@exception IOException if there is an error accessing the resource.
   */
+/*TODO del; moved
   protected boolean exists(final URI resourceURI) throws IOException
   {
   	final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
@@ -1265,6 +1276,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
   		return super.exists(resourceURI);	//see if a physical resource exists at the location
   	}
   }
+*/
 
 	/**Begins modal navigation based upon modal navigation information.
 	@param guiseApplication The Guise application.
@@ -1397,24 +1409,6 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 		}
 	}
 
-	/**Creates a URI query string from a bookmark in the form "#<var>id</var>?<var>parameter1Name</var>=<var>parameter2Name</var>&amp;&hellip;".
-	@param bookmark The bookmark from which a query should be constructed.
-	@return A query string representing the bookmark appropriate for appending to a URI.
-	*/
-/*TODO del	
-	protected static String createURIQuery(final Bookmark bookmark)
-	{
-		final StringBuilder bookmarkQueryStringBuilder=new StringBuilder();	//create a new string builder
-		final List<Bookmark.Parameter> parameterList=bookmark.getParameters();	//get the list of bookmarks parameters
-		if(!parameterList.isEmpty())	//if there are parameters
-		{
-			final Bookmark.Parameter[] parameters=parameterList.toArray(new Bookmark.Parameter[parameterList.size()]);	//get an array of parameters
-			bookmarkQueryStringBuilder.append(constructQuery((NameValuePair<String, String>[])parameters));	//append the parameters to the query string
-		}
-		return bookmarkQueryStringBuilder.toString();	//return the string we constructed
-	}
-*/
-
 	/**Extracts the bookmark contained in the given request URL.
 	@param request The HTTP request object.
 	@return The bookmark represented by the request, or <code>null</code> if no bookmark is contained in the request.
@@ -1433,70 +1427,118 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 			return null;	//indicate that there is no bookmark information
 		}
 	}	
-	
-	/**Extracts the bookmark contained in the given request.
-	@param request The HTTP request object.
-	@param guiseSession The Guise session object.
-	@return The bookmark represented by the request, or <code>null</code> if no bookmark is contained in the request.
-	*/
-/*TODO del when works
-	protected static Bookmark getBookmark(final HttpServletRequest request, final GuiseSession guiseSession)
-	{
-//	TODO del Debug.trace("getting bookmark");
-		final List<Bookmark.Parameter> bookmarkParameterList=new ArrayList<Bookmark.Parameter>();	//create a new list of bookmark parameters
 
-		final String contentTypeString=request.getContentType();	//get the request content type
-		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
-//TODO del Debug.trace("content type", contentType);
-		final boolean isAJAX=contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType);	//see if this is a Guise AJAX request
-//	TODO del Debug.trace("isAJAX:", isAJAX);
-			//TODO verify; does this work with file uploads?
-			//this is a non-AJAX Guise POST if there is an XHTML action input ID field TODO add a better field; stop using a view
-		final boolean isGuisePOST=POST_METHOD.equals(request.getMethod()) && request.getParameter(XHTMLApplicationFrameView.getActionInputID(guiseSession.getApplicationFrame()))!=null;
-//	TODO del Debug.trace("isGuisePOST:", isGuisePOST);
-	//TODO del APPLICATION_X_WWW_FORM_URLENCODED_CONTENT_TYPE
-			//if this is an HTTP GET or a non-Guise form HTTP POST, get the servlet parameters (which will include the URL query information)
-		if(GET_METHOD.equals(request.getMethod()) || (POST_METHOD.equals(request.getMethod()) && contentType!=null && APPLICATION_X_WWW_FORM_URLENCODED_CONTENT_TYPE.match(contentType) && !isGuisePOST))
+  /**Determines if the resource at a given URI exists.
+  This version adds checks to see if the URI represents a valid application navigation path.
+  This version adds support for Guise public resources.
+  @param resourceURI The URI of the requested resource.
+  @return <code>true</code> if the resource exists, else <code>false</code>.
+	@exception IOException if there is an error accessing the resource.
+	@see GuiseApplication#hasDestination(String)
+	@see #isPublicResourceURI(URI)
+  */
+  protected boolean exists(final URI resourceURI) throws IOException
+  {
+  	if(isPublicResourceURI(resourceURI))	//if this URI represents a Guise public resource
+  	{
+  		final String publicResourceKey=getPublicResourceKey(resourceURI);	//get the Guise public resource key
+  		return Guise.getInstance().getPublicResourceURL(publicResourceKey)!=null;	//see if there is a public resource for this key TODO add Guise.hasPublicResource()
+  	}
+  	final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
+  	if(guiseApplication.hasDestination(guiseApplication.relativizeURI(resourceURI)))	//if the URI represents a valid navigation path
+  	{
+  		return true;	//the navigation path exists
+  	}
+ 		return super.exists(resourceURI);	//see if a physical resource exists at the location, if we can't find a virtual resource (a Guise public resource or a navigation path component)
+  }
+
+	/**Determines the requested resource.
+  This version adds support for Guise public resources.
+	@param resourceURI The URI of the requested resource.
+  @return An object providing an encapsulation of the requested resource, but not necessarily the contents of the resource. 
+	@exception IllegalArgumentException if the given resource URI does not represent a valid resource.
+	@exception IOException if there is an error accessing the resource.
+	@see #isPublicResourceURI(URI)
+	@see #getPublicResourceKey(URI)
+	@see Guise#getPublicResourceURL(String)
+  */
+	protected HTTPServletResource getResource(final URI resourceURI) throws IllegalArgumentException, IOException
+	{
+//TODO del Debug.trace("getting resource for URI: ", resourceURI);
+  	if(isPublicResourceURI(resourceURI))	//if this URI represents a Guise public resource
+  	{
+  		final String publicResourceKey=getPublicResourceKey(resourceURI);	//get the Guise public resource key
+//  	TODO del Debug.trace("this is a public resource with key: ", publicResourceKey);
+			final URL publicResourceURL=Guise.getInstance().getPublicResourceURL(publicResourceKey);	//get a URL to the resource
+//		TODO del Debug.trace("found URL to resource: ", publicResourceURL);
+			final HTTPServletResource resource=new DefaultHTTPServletResource(resourceURI, publicResourceURL);	//create a new default resource with a URL to the public resource
+//		TODO del Debug.trace("constructed a resource with length:", resource.getContentLength(), "and last modified", resource.getLastModified());
+			return resource;
+  	}
+  	else	//if this is not a Guise public resource
+  	{
+  		return super.getResource(resourceURI);	//return a default resource
+  	}
+	}
+
+	/**Retrieves an input stream to the given resource.
+	This version compresses resources of type <code>text/css</code>.
+	This version processes resources of type <code>text/css</code> to work around IE6 bugs, if IE6 is the user agent.
+	@param resource The resource for which an input stream should be retrieved.
+	@return An input stream to the given resource.
+	@exception IOException Thrown if there is an error accessing the resource, such as a missing file or a resource that has no contents.
+	*/
+	protected InputStream getInputStream(final HTTPServletResource resource) throws IOException
+	{
+		final ContentType contentType=getContentType(resource);	//get the content type of the resource
+//	TODO del Debug.trace("got content type", contentType, "for resource", resource);
+		return super.getInputStream(resource);
+	}
+
+	/**Determines whether the given URI references a Guise public resource.
+	The URI references a public resource if the path, relative to the application base path, begins with {@value WebPlatformConstants#GUISE_PUBLIC_PATH}.
+	@param uri The reference URI, which is assumed to have this servlet's domain.
+	@return <code>true</code> if the given URI references a Guise public resource.
+	@exception NullPointerException if the given URI is <code>null</code>.
+	*/
+	public boolean isPublicResourceURI(final URI uri)
+	{
+		final String rawPath=uri.getRawPath();	//get the raw path of the URI
+		if(rawPath!=null)	//if there is a raw path
 		{
-//TODO del Debug.trace("using servlet parameter methods");
-			final Iterator parameterEntryIterator=request.getParameterMap().entrySet().iterator();	//get an iterator to the parameter entries
-			while(parameterEntryIterator.hasNext())	//while there are more parameter entries
-			{
-				final Map.Entry parameterEntry=(Map.Entry)parameterEntryIterator.next();	//get the next parameter entry
-				final String parameterKey=(String)parameterEntry.getKey();	//get the parameter key
-				final String[] parameterValues=(String[])parameterEntry.getValue();	//get the parameter values
-				for(final String parameterValue:parameterValues)	//for each parameter value
-				{
-//TODO del Debug.trace("adding parameter bookmark:", parameterKey, parameterValue);
-					bookmarkParameterList.add(new Bookmark.Parameter(parameterKey, parameterValue));	//create a corresponding bookmark parameter
-				}
-			}
+//		TODO del 	Debug.trace("is public resource URI?", uri);
+			final String applicationBasePath=getGuiseApplication().getBasePath();	//get the application base path
+//		TODO del Debug.trace("application base path", applicationBasePath);
+			final String relativePath=relativizePath(applicationBasePath, rawPath);	//relativize the raw path to the base path
+//		TODO del Debug.trace("relativePath", relativePath);
+			return relativePath.startsWith(GUISE_PUBLIC_PATH);	//see if the relative path starts with the Guise public resource base path
 		}
-		else	//if this is some other access, just use the URL query information for the bookmark
-		{		
-			final String queryString=request.getQueryString();	//get the query string from the request
-			if(queryString!=null && queryString.length()>0)	//if there is a query string (Tomcat 5.5.16 returns an empty string for no query, even though the Java Servlet specification 2.4 says that it should return null)
-			{
-//TODO del 	Debug.trace("just got query string from request, length", queryString.length(), "content", queryString);
-				final NameValuePair<String, String>[] parameters=getParameters(queryString);	//get the parameters from the query string
-				final Bookmark.Parameter[] bookmarkParameters=new Bookmark.Parameter[parameters.length];	//create a new array of bookmark parameters
-				for(int i=parameters.length-1; i>=0; --i)	//for each parameter
-				{
-					final NameValuePair<String, String> parameter=parameters[i];	//get a reference to this parameter
-//TODO del 	Debug.trace("adding query bookmark:", parameter.getName(), parameter.getValue());
-					bookmarkParameterList.add(new Bookmark.Parameter(parameter.getName(), parameter.getValue()));	//create a corresponding bookmark parameter
-				}
-			}
-		}
-		if(!bookmarkParameterList.isEmpty())	//if there are bookmark parameters
+		else	//if there is no raw path
 		{
-			final Bookmark.Parameter[] bookmarkParameters=bookmarkParameterList.toArray(new Bookmark.Parameter[bookmarkParameterList.size()]);	//get an array of bookmark parameters
-			return new Bookmark(bookmarkParameters);	//create and return a new bookmark from the parameters
-		}
-		else	//if there are no bookmark parameters
-		{
-			return null;	//indicate that there was no bookmark
+			return false;	//this is not a public resource URI
 		}
 	}
-*/
+
+	/**Determines the public resource key for the given URI.
+	The path of the given URI, relative to the application base path, must begin with {@value WebPlatformConstants#GUISE_PUBLIC_PATH}.
+	This path prefix will be replaced with {@value Guise#PUBLIC_RESOURCE_BASE_PATH}.
+	@param uri The URI of the public resource, which is assumed to have this servlet's domain.
+	@return The path to a Guise public resource.
+	@exception IllegalArgumentException if the raw path of the URI is <code>null</code> or does not start with {@value WebPlatformConstants#GUISE_PUBLIC_RESOURCE_BASE_PATH}.
+	*/
+	public String getPublicResourceKey(final URI uri)
+	{
+		final String rawPath=uri.getRawPath();	//get the raw path of the URI
+		if(rawPath==null)	//if the raw path is null
+		{
+			throw new IllegalArgumentException("Guise public resource URI "+uri+" has no path.");
+		}
+		final String applicationBasePath=getGuiseApplication().getBasePath();	//get the application base path
+		final String relativePath=relativizePath(applicationBasePath, rawPath);	//relativize the raw path to the base path
+		if(!relativePath.startsWith(GUISE_PUBLIC_PATH))	//if this isn't a public resource URI
+		{
+			throw new IllegalArgumentException("URI "+uri+ " does not identify a Guise public resource.");
+		}
+		return PUBLIC_RESOURCE_BASE_PATH+relativePath.substring(GUISE_PUBLIC_PATH.length());	//replace the beginning of the relative path with the resource base path
+	}
 }
