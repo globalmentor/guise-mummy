@@ -12,6 +12,7 @@ import javax.xml.parsers.*;
 
 import org.apache.commons.fileupload.*;
 import org.w3c.dom.*;
+import org.w3c.dom.css.CSSStyleSheet;
 import org.xml.sax.SAXException;
 
 import static com.garretwilson.net.URIConstants.*;
@@ -44,6 +45,9 @@ import com.garretwilson.rdf.RDFUtilities;
 import com.garretwilson.rdf.maqro.Activity;
 import com.garretwilson.rdf.maqro.MAQROUtilities;
 import com.garretwilson.security.Nonce;
+import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
+
+import com.garretwilson.text.xml.stylesheets.css.XMLCSSProcessor;
 import com.garretwilson.text.xml.xhtml.XHTMLConstants;
 import com.garretwilson.text.xml.xpath.*;
 import com.garretwilson.util.*;
@@ -55,9 +59,12 @@ import com.guiseframework.controller.*;
 import com.guiseframework.controller.text.xml.xhtml.*;
 import com.guiseframework.geometry.*;
 import com.guiseframework.model.FileItemResourceImport;
+import com.guiseframework.platform.web.css.CSSProcessor;
+import com.guiseframework.platform.web.css.CSSStylesheet;
 import com.guiseframework.theme.Theme;
 import com.guiseframework.view.text.xml.xhtml.XHTMLApplicationFrameView;
 
+import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static com.garretwilson.util.LocaleUtilities.*;
 import static com.guiseframework.Guise.*;
 import static com.guiseframework.platform.web.WebPlatformConstants.*;
@@ -1439,6 +1446,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
   */
   protected boolean exists(final URI resourceURI) throws IOException
   {
+Debug.trace("checking exists", resourceURI);
   	if(isPublicResourceURI(resourceURI))	//if this URI represents a Guise public resource
   	{
   		final String publicResourceKey=getPublicResourceKey(resourceURI);	//get the Guise public resource key
@@ -1465,20 +1473,131 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	protected HTTPServletResource getResource(final URI resourceURI) throws IllegalArgumentException, IOException
 	{
 //TODO del Debug.trace("getting resource for URI: ", resourceURI);
+		final HTTPServletResource resource;	//we'll create a resource for this resource URI
   	if(isPublicResourceURI(resourceURI))	//if this URI represents a Guise public resource
   	{
   		final String publicResourceKey=getPublicResourceKey(resourceURI);	//get the Guise public resource key
 //  	TODO del Debug.trace("this is a public resource with key: ", publicResourceKey);
 			final URL publicResourceURL=Guise.getInstance().getPublicResourceURL(publicResourceKey);	//get a URL to the resource
 //		TODO del Debug.trace("found URL to resource: ", publicResourceURL);
-			final HTTPServletResource resource=new DefaultHTTPServletResource(resourceURI, publicResourceURL);	//create a new default resource with a URL to the public resource
+			resource=new DefaultHTTPServletResource(resourceURI, publicResourceURL);	//create a new default resource with a URL to the public resource
 //		TODO del Debug.trace("constructed a resource with length:", resource.getContentLength(), "and last modified", resource.getLastModified());
-			return resource;
   	}
   	else	//if this is not a Guise public resource
   	{
-  		return super.getResource(resourceURI);	//return a default resource
+  		resource=super.getResource(resourceURI);	//return a default resource
   	}
+		final ContentType contentType=getContentType(resource);	//get the content type of the resource
+Debug.trace("got content type", contentType, "for resource", resource);
+		if(TEXT_CSS_CONTENT_TYPE.match(contentType))	//if this is a CSS stylesheet
+		{
+			return new CSSResource(resource);	//return a resource that does extra CSS processing
+		}
+		else	//if this not a resource for extra processing
+		{
+			return resource;	//return the resource without extra processing
+		}
+	}
+
+	/**A resource that represents a CSS file, decorating an existing resource.
+	This version compresses resources of type <code>text/css</code>.
+	This version processes resources of type <code>text/css</code> to work around IE6 bugs, if IE6 is the user agent.	
+	@author Garret Wilson
+	*/
+	protected static class CSSResource extends DefaultResource implements HTTPServletResource
+	{
+
+		/**The decorated resource.*/
+		private final HTTPServletResource resource;
+
+			/**@return The decorated resource.*/
+			protected HTTPServletResource getResource() {return resource;}
+
+		/**The bytes that constitute the resource, or <code>null</code> if no transformation has yet taken place.*/
+		private byte[] bytes=null;
+		
+		/**Returns a reference to the resource bytes.
+		@param request The HTTP request in response to which the bytes are being retrieved.
+		If the bytes are retrieved from the decorated resource if they haven't already been.
+		@return The bytes that constitute the resource.
+		@exception IOException if there is an error retrieving the bytes.
+		*/
+		protected byte[] getBytes(final HttpServletRequest request) throws IOException
+		{
+			synchronized(resource)
+			{
+				if(bytes==null)	//if no bytes are available
+				{
+					final InputStream inputStream=getResource().getInputStream(request);	//get an input stream to the resource
+					try
+					{
+						final CSSProcessor cssProcessor=new CSSProcessor();
+						final ParseReader cssReader=new ParseReader(new InputStreamReader(inputStream, UTF_8));
+						final CSSStylesheet cssStylesheet=cssProcessor.process(cssReader);	//parse the stylesheet
+			Debug.trace("just parsed stylesheet:", cssStylesheet);
+						bytes=cssStylesheet.toString().getBytes(UTF_8);
+Debug.trace("just got bytes");
+
+						final Map<String, Object> userAgentProperties=getUserAgentProperties(request);	//get the user agent properties for this request
+Debug.trace("user agent name:", userAgentProperties.get(USER_AGENT_NAME_PROPERTY));
+
+Debug.trace("user agent version number :", userAgentProperties.get(USER_AGENT_VERSION_NUMBER_PROPERTY));
+
+					}
+					catch(final IOException ioException)	//TODO del when works; log the error
+					{
+		Debug.error(ioException);
+						throw ioException;
+					}
+					finally
+					{
+						inputStream.close();	//always close the original input stream
+					}
+				}
+				return bytes;	//return the resource bytes
+			}			
+		}
+		
+		/**Returns the content length of the resource.
+		@param request The HTTP request in response to which the content length is being retrieved.
+		@return The content length of the resource.
+		@exception IOException if there is an error getting the length of the resource.
+		*/
+		public long getContentLength(final HttpServletRequest request) throws IOException
+		{
+			return getBytes(request).length;	//return the length of bytes
+		}
+
+		/**Determines the last modification time of the resource.
+		This version delegates to the decorated resource.
+		@param request The HTTP request in response to which the last modified time is being retrieved.
+		@return The time of last modification as the number of milliseconds since January 1, 1970 GMT.
+		@exception IOException if there is an error getting the last modified time.
+		*/
+		public long getLastModified(final HttpServletRequest request) throws IOException
+		{
+			return getResource().getLastModified(request);
+		}
+
+		/**Returns an input stream to the resource.
+		@param request The HTTP request in response to which the input stream is being retrieved.
+		@return The lazily-created input stream to the resource.
+		@exception IOException if there is an error getting an input stream to the resource.
+		*/
+		public InputStream getInputStream(final HttpServletRequest request) throws IOException
+		{
+			return new ByteArrayInputStream(getBytes(request));	//return an input stream to the bytes
+		}
+
+		/**HTTP servlet resource constructor.
+		@param resource The decorated HTTP servlet resource.
+		@exception IllegalArgumentException if the given resource is <code>null</code>.
+		*/
+		public CSSResource(final HTTPServletResource resource)
+		{
+			super(checkInstance(resource, "Resource cannot be null.").getReferenceURI());	//construct the parent class
+			this.resource=resource;	//save the decorated resource
+		}
 	}
 
 	/**Retrieves an input stream to the given resource.
@@ -1488,12 +1607,37 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	@return An input stream to the given resource.
 	@exception IOException Thrown if there is an error accessing the resource, such as a missing file or a resource that has no contents.
 	*/
+/*TODO del when works
 	protected InputStream getInputStream(final HTTPServletResource resource) throws IOException
 	{
+		final InputStream inputStream=super.getInputStream(resource);	//get the default input stream to the resource
 		final ContentType contentType=getContentType(resource);	//get the content type of the resource
-//	TODO del Debug.trace("got content type", contentType, "for resource", resource);
-		return super.getInputStream(resource);
+Debug.trace("got content type", contentType, "for resource", resource);
+		if(TEXT_CSS_CONTENT_TYPE.match(contentType))	//if this is a CSS stylesheet
+		{
+Debug.trace("this is CSS content");
+			try
+			{
+				final XMLCSSProcessor cssProcessor=new XMLCSSProcessor();
+				final Reader cssReader=new InputStreamReader(inputStream, UTF_8);
+				CSSStyleSheet cssStylesheet=cssProcessor.parseStyleSheet(cssReader, resource.getReferenceURI());	//parse the stylesheet
+	Debug.trace("just parsed stylesheet:", cssStylesheet);
+				return new ByteArrayInputStream(cssStylesheet.toString().getBytes(UTF_8));
+			}
+			catch(final Exception exception)
+			{
+Debug.error(exception);
+			}
+			finally
+			{
+Debug.trace("closing original input stream");
+				inputStream.close();	//always close the original input stream
+Debug.trace("closed original input stream");
+			}
+		}
+		return inputStream;	//return our input stream
 	}
+*/
 
 	/**Determines whether the given URI references a Guise public resource.
 	The URI references a public resource if the path, relative to the application base path, begins with {@value WebPlatformConstants#GUISE_PUBLIC_PATH}.

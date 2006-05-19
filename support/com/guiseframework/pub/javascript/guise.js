@@ -1558,10 +1558,29 @@ alert(exception);
 			if(!this.processingAJAXResponses)	//if we aren't processing AJAX responses TODO fix small race condition in determining whether processing is occurring
 			{
 				this.processingAJAXResponses=true;	//we are processing AJAX responses now
+					//pre-process the responses to check for a navigation request, so that we can skip updates and immediately navigate
+				for(var responseIndex=0; responseIndex<this.ajaxResponses.length; ++responseIndex)	//for each response
+				{
+					var childNodeList=this.ajaxResponses[responseIndex].documentElement.childNodes;	//get all the child nodes of the document element
+					var childNodeCount=childNodeList.length;	//find out how many children there are
+					for(var i=0; i<childNodeCount; ++i)	//for each child node
+					{
+						var childNode=childNodeList[i];	//get this child node
+						if(childNode.nodeType==Node.ELEMENT_NODE && elementName==this.ResponseElement.NAVIGATE)	//if this is a navigation element
+						{
+							var navigateURI=this._processNavigate(childNode);	//navigate to the specified request
+							if(navigateURI!=null)	//if a new navigation URI was requested
+							{
+								AJAX_ENABLED=false;	//turn off AJAX processing
+								window.location.href=navigateURI;	//go to the new location
+							}
+						}
+					}
+				}
 				var newHRef=null;	//we'll see if a new URI was requested at any point
 				try
 				{
-					while(this.ajaxResponses.length>0)	//while there are more AJAX responses TODO fix small race condition on adding responses
+					while(this.ajaxResponses.length>0 && newHRef==null)	//while there are more AJAX responses and no redirect has been requested TODO fix small race condition on adding responses
 					{
 						var responseDocument=this.ajaxResponses.dequeue();	//get this response
 						//TODO assert document element name is "response"
@@ -1587,7 +1606,7 @@ alert(exception);
 										{
 											newHRef=navigateURI;	//request navigation to the new URI
 										}
-										break;	//TODO decide whether we should continue processing events or not
+										break;
 									case this.ResponseElement.RELOAD:	//reload
 										window.location.reload();	//reload the page
 										return;	//stop processing events
@@ -1605,18 +1624,21 @@ alert(exception);
 				finally
 				{
 					this.processingAJAXResponses=false;	//we are no longer processing AJAX responses
-					for(var oldElementID in guise.oldElementIDCursors)	//for each old element ID
+					if(newHRef==null)	//if we're not going to a new page
 					{
-//TODO del alert("looking at old element ID: "+oldElementID);
-						var oldCursor=guise.oldElementIDCursors[oldElementID];	//get the old cursor
-//TODO del alert("old cursor: "+oldCursor);
-						var element=document.getElementById(oldElementID);	//get the old element in the document
-						if(element!=null)	//if this element is still in the document TODO make sure that these two checks ensure this is really an old cursor
+						for(var oldElementID in guise.oldElementIDCursors)	//for each old element ID
 						{
-//TODO del alert("restoring old cursor for element: "+oldElementID+" which has cursor "+element.style.cursor);
-							delete guise.oldElementIDCursors[oldElementID];	//remove this old cursor from the array
-							element.style.cursor=oldCursor;	//set the cursor back to what it was
-//TODO del alert("element now has cursor: "+element.style.cursor);
+	//TODO del alert("looking at old element ID: "+oldElementID);
+							var oldCursor=guise.oldElementIDCursors[oldElementID];	//get the old cursor
+	//TODO del alert("old cursor: "+oldCursor);
+							var element=document.getElementById(oldElementID);	//get the old element in the document
+							if(element!=null)	//if this element is still in the document TODO make sure that these two checks ensure this is really an old cursor
+							{
+	//TODO del alert("restoring old cursor for element: "+oldElementID+" which has cursor "+element.style.cursor);
+								delete guise.oldElementIDCursors[oldElementID];	//remove this old cursor from the array
+								element.style.cursor=oldCursor;	//set the cursor back to what it was
+	//TODO del alert("element now has cursor: "+element.style.cursor);
+							}
 						}
 					}
 				}

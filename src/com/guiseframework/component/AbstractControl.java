@@ -3,7 +3,6 @@ package com.guiseframework.component;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.garretwilson.util.Debug;
 import com.guiseframework.model.*;
 
 /**An abstract implementation of a model component that allows user interaction to modify the model.
@@ -120,10 +119,8 @@ public abstract class AbstractControl<C extends Control<C>> extends AbstractComp
 	{
 		super(labelModel);	//construct the parent class
 		this.enableable=checkInstance(enableable, "Enableable object cannot be null.");	//save the enableable object
-Debug.trace("constructing abstract control");
 		if(enableable!=labelModel)	//if the enableable and the label model are two different objects (we don't want to repeat property change events twice) TODO eventually just listen to specific events for each object
 		{
-Debug.trace("adding repeat property change listener to enableable model", this.enableable, "id", getID());
 			this.enableable.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the enableable object
 		}
 	}

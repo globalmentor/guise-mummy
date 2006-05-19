@@ -9,7 +9,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.mail.internet.ContentType;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.garretwilson.util.Debug;
 import com.guiseframework.component.effect.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.component.transfer.*;
@@ -24,7 +23,6 @@ import com.guiseframework.view.View;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.text.TextUtilities.*;
 import static com.garretwilson.util.ArrayUtilities.*;
-import static com.guiseframework.GuiseResourceConstants.*;
 
 /**An abstract implementation of a component.
 <p>A component should never fire a property event directly. It should rather create a postponed event and queue that event with the session.
@@ -1010,7 +1008,6 @@ Debug.trace("now valid of", this, "is", isValid());
 	{
 		this.id=getSession().generateID();	//ask the session to generate a new ID
 		this.labelModel=checkInstance(labelModel, "Label model cannot be null.");	//save the label model
-Debug.trace("adding repeat property change listener to label model", this.labelModel, "id", getID());
 		this.labelModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the label model
 		this.labelModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the label model
 		controller=getSession().getApplication().getController(getThis());	//ask the application for a controller
