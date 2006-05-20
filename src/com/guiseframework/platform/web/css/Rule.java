@@ -3,6 +3,7 @@ package com.guiseframework.platform.web.css;
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 
 import java.util.*;
+import static java.util.Collections.*;
 
 import com.garretwilson.util.NameValuePair;
 
@@ -23,6 +24,14 @@ public class Rule
 
 		/**@return The list of declarations.*/
 		public List<NameValuePair<String, String>> getDeclarations() {return declarations;}
+
+	/**Selectors constructor.
+	@param selectors any selectors to add to the rule.
+	*/
+	public Rule(final Selector... selectors)
+	{
+		addAll(this.selectors, selectors);	//add all the given selectors, if any
+	}
 
 	/**@return A string representation of this object.*/
 	public String toString()

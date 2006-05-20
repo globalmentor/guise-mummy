@@ -6,7 +6,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 This implementation represents the universal selector by an instance of a type selector with the type "*".
 @author Garret Wilson
 */
-public class TypeSelector implements SimpleSelector
+public class TypeSelector implements SimpleSelector, Comparable<TypeSelector>
 {
 
 	/**The name of the type to be selected.*/
@@ -44,4 +44,15 @@ public class TypeSelector implements SimpleSelector
 	{
 		return getTypeName();
 	}
+
+  /**Compares this object with the specified object for order.
+  This implementation compares type names.
+	Returns a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+	@param object The object to be compared.
+	@return A negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+	*/
+  public int compareTo(final TypeSelector object)
+  {
+  	return getTypeName().compareTo(object.getTypeName());	//compare type names
+  }
 }

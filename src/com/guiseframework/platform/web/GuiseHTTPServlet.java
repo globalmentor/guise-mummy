@@ -45,9 +45,10 @@ import com.garretwilson.rdf.RDFUtilities;
 import com.garretwilson.rdf.maqro.Activity;
 import com.garretwilson.rdf.maqro.MAQROUtilities;
 import com.garretwilson.security.Nonce;
+import com.garretwilson.servlet.http.HttpServletUtilities;
+
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 
-import com.garretwilson.text.xml.stylesheets.css.XMLCSSProcessor;
 import com.garretwilson.text.xml.xhtml.XHTMLConstants;
 import com.garretwilson.text.xml.xpath.*;
 import com.garretwilson.util.*;
@@ -59,8 +60,7 @@ import com.guiseframework.controller.*;
 import com.guiseframework.controller.text.xml.xhtml.*;
 import com.guiseframework.geometry.*;
 import com.guiseframework.model.FileItemResourceImport;
-import com.guiseframework.platform.web.css.CSSProcessor;
-import com.guiseframework.platform.web.css.CSSStylesheet;
+import com.guiseframework.platform.web.css.*;
 import com.guiseframework.theme.Theme;
 import com.guiseframework.view.text.xml.xhtml.XHTMLApplicationFrameView;
 
@@ -1531,18 +1531,21 @@ Debug.trace("got content type", contentType, "for resource", resource);
 					final InputStream inputStream=getResource().getInputStream(request);	//get an input stream to the resource
 					try
 					{
-						final CSSProcessor cssProcessor=new CSSProcessor();
+						final GuiseCSSProcessor cssProcessor=new GuiseCSSProcessor();
 						final ParseReader cssReader=new ParseReader(new InputStreamReader(inputStream, UTF_8));
 						final CSSStylesheet cssStylesheet=cssProcessor.process(cssReader);	//parse the stylesheet
-			Debug.trace("just parsed stylesheet:", cssStylesheet);
-						bytes=cssStylesheet.toString().getBytes(UTF_8);
-Debug.trace("just got bytes");
-
+//TODO del			Debug.trace("just parsed stylesheet:", cssStylesheet);
 						final Map<String, Object> userAgentProperties=getUserAgentProperties(request);	//get the user agent properties for this request
-Debug.trace("user agent name:", userAgentProperties.get(USER_AGENT_NAME_PROPERTY));
-
-Debug.trace("user agent version number :", userAgentProperties.get(USER_AGENT_VERSION_NUMBER_PROPERTY));
-
+						if(USER_AGENT_NAME_MSIE.equals(userAgentProperties.get(USER_AGENT_NAME_PROPERTY)))	//if this is IE
+						{
+							final Object version=userAgentProperties.get(USER_AGENT_VERSION_NUMBER_PROPERTY);	//get the version number
+							if(version instanceof Float && ((Float)version).floatValue()<7.0f)	//if this is IE 6 (lower than IE 7)
+							{
+								cssProcessor.fixIE6Stylesheet(cssStylesheet);
+//TODO del								Debug.trace("fixed stylesheet for IE6", cssStylesheet);
+							}
+						}
+						bytes=cssStylesheet.toString().getBytes(UTF_8);
 					}
 					catch(final IOException ioException)	//TODO del when works; log the error
 					{

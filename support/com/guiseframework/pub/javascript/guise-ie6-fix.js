@@ -1,17 +1,21 @@
 /**Guise(TM) IE6 bug-fix JavaScript routines
-Copyright (c) 2005 GlobalMentor, Inc.
+Copyright (c) 2005-2006 GlobalMentor, Inc.
 This file should be included after the main guise.js file and after all stylesheet references.
+If a stylesheet has already been fixed by the server, its first style selector text will be "guiseIE6Fix".
 */
-//TODO fix to work with pseudo-classes
+
+//TODO add support for pseudo elements
 
 /**A class for representing a selector for a single element (which can be a component in a nested element selector).
+This class can automatically determine if the element selector has already been fixed for IE6.
 @param selectorText The string form of the element selector.
 var selectorText The string form of the element selector.
-var ie6FixSelectorText The selector text to use in IE6.
-var ie6FixClassName The selector class to use in an element on IE6, or null if no special selector class is needed on IE6.
-var elementName The name of the element selected, or null if no element name was selected.
+var ie6FixSelectorText The selector text to use in IE6, in the form element.guiseIE6_-class1_-class2_-class3:pseudoClass, with the class selectors in alphabetical order.
+var ie6FixClassName The selector class to use in an element on IE6, in the form guiseIE6_-class1_-class2_-class3:pseudoClass, with the class selectors in alphabetical order, or null if no special selector class is needed on IE6.
+var elementName The name of the element selected, or null if no element name was selected; this name could be in proper case if loaded manually, or in uppercase if derived from IE stylesheet.
 var classes The classes selected by the selector.
 var pseudoClass The pseudo-class specified by the selector, or null if no pseudo-class was specified.
+var isMultipleClassSelector Whether this element selector selects on multiple classes.
 */
 function CSSElementSelector(selectorText)
 {
@@ -26,8 +30,9 @@ function CSSElementSelector(selectorText)
 	this.elementName=elementName ? elementName : null;	//if there was no element name (i.e. the string started with "."), the element name will be empty
 	if(this.classes.length>1)	//if there are multiple classes being selected
 	{
-		this.ie6FixClassName=GuiseIE6Fix.GUISE_IE6_CLASS_PREFIX+"-"+this.classes.join("-");	//create a new class in the form guiseIE6-class1-class2-class3
-		this.ie6FixSelectorText=elementName+"."+this.ie6FixClassName;	//create new selector text in the form elementName.guiseIE6-class1-class2-class3 (use the removed element name, which is never null)
+		this.classes.sort();	//sort the classes in alphabetical order
+		this.ie6FixClassName=GuiseIE6Fix.GUISE_IE6_FIX_CLASS_EXTENDED_PREFIX+this.classes.join(GuiseIE6Fix.GUISE_IE6_FIX_CLASS_DELIMITER);	//create a new class in the form guiseIE6_-class1_-class2_-class3
+		this.ie6FixSelectorText=elementName+"."+this.ie6FixClassName;	//create new selector text in the form elementName.guiseIE6_-class1_-class2_-class3 (use the removed element name, which is never null)
 		if(this.pseudoClass!=null)	//if there was a pseudo-class
 		{
 			this.ie6FixSelectorText+=":"+this.pseudoClass;	//append the pseudo-class to the IE6 fix selector
@@ -35,10 +40,38 @@ function CSSElementSelector(selectorText)
 	}
 	else	//if multiple classes are not being selected
 	{
-		this.ie6FixClassName=null;	//don't create a special IE 6 class
-		this.ie6FixSelectorText=this.selectorText;	//use the standard selector text
+		if(this.classes.length==1 && this.classes[0].startsWith(GuiseIE6Fix.GUISE_IE6_FIX_CLASS_EXTENDED_PREFIX))	//if there is a single class selected that has been fixed for IE6, do the reverse operation to get the original classes
+		{
+			this.ie6FixClassName=this.classes[0];	//the class is already fixed for IE6
+//TODO del alert("original fixed class name: "+this.ie6FixClassName);
+			this.ie6FixSelectorText=elementName+"."+this.ie6FixClassName;	//create new selector text in the form elementName.guiseIE6_-class1_-class2_-class3 (use the removed element name, which is never null)
+			if(this.pseudoClass!=null)	//if there was a pseudo-class
+			{
+				this.ie6FixSelectorText+=":"+this.pseudoClass;	//append the pseudo-class to the IE6 fix selector
+			}
+//TODO del alert("fix selector text: "+this.ie6FixSelectorText);
+			var className=this.ie6FixClassName.substring(GuiseIE6Fix.GUISE_IE6_FIX_CLASS_EXTENDED_PREFIX.length);	//remove the prepended identifier
+			this.classes=className.split(GuiseIE6Fix.GUISE_IE6_FIX_CLASS_DELIMITER);	//split out the original classes
+			for(var i=0; i<this.classes.length; ++i)
+			{
+//TODO del alert("found class: "+i+" is: "+this.classes[i]);
+			}
+			
+			this.selectorText=elementName+"."+this.classes.join(".");	//create the original selector text (use the removed element name, which is never null)
+			if(this.pseudoClass!=null)	//if there was a pseudo-class
+			{
+				this.selectorText+=":"+this.pseudoClass;	//append the pseudo-class to the original selector
+			}
+//TODO del alert("this has been Guise IE6 fixed; new selector text: "+this.selectorText);
+		}
+		else	//if this was not a fixed IE6 class
+		{
+			this.ie6FixClassName=null;	//don't create a special IE 6 class
+			this.ie6FixSelectorText=this.selectorText;	//use the standard selector text
+		}
+		this.hasMultipleClassSelector=this.classes.length>1;	//determine if the element selectors selects on multiple classes
 	}
-//alert("from "+selectorText+" derived
+
 	if(!CSSElementSelector.prototype._initialized)
 	{
 		CSSElementSelector.prototype._initialized=true;
@@ -50,7 +83,7 @@ function CSSElementSelector(selectorText)
 		*/
 		CSSElementSelector.prototype.selects=function(element, elementClassNames)
 		{
-			if(this.elementName!=null && this.elementName!=element.nodeName.toLowerCase())	//if this selector doesn't match the element name
+			if(this.elementName!=null && this.elementName.toLowerCase()!=element.nodeName.toLowerCase())	//if this selector doesn't match the element name
 				return false;	//the element name doesn't match
 			if(!elementClassNames)	//if no element class names have been calculated
 			{
@@ -87,7 +120,7 @@ function CSSSelector(selectorText)
 		var elementSelector=new CSSElementSelector(elementSelectors[elementSelectorIndex]);	//create an element selector object from this element selector string
 		this.elementSelectors[elementSelectorIndex]=elementSelector;	//save the element selector
 		ie6FixSelectorTexts.add(elementSelector.ie6FixSelectorText);	//save the IE6 selector text for this selector
-		if(elementSelector.classes.length>1)	//if this element selector selects on multiple classes
+		if(elementSelector.hasMultipleClassSelector)	//if this element selector selects on multiple classes
 		{
 			this.isMultipleClassSelector=true;	//show that this is a multiple-class selector
 		}
@@ -160,7 +193,7 @@ function GuiseIE6Fix(selectorText)
 			for(var classNameIndex=elementClassNames.length-1; classNameIndex>=0; --classNameIndex)	//for each class (looking backwards, so that item removal will not corrupt iteration)
 			{
 				var className=elementClassNames[classNameIndex];	//get a reference to this class name
-				if(className.startsWith(GuiseIE6Fix.GUISE_IE6_CLASS_PREFIX))	//if this is a special Guise IE6 fix class name
+				if(className.startsWith(GuiseIE6Fix.GUISE_IE6_FIX_CLASS_PREFIX))	//if this is a special Guise IE6 fix class name
 				{
 					elementClassNames.remove(classNameIndex);	//remove this special Guise IE6 fix class name
 					classNameModified=true;	//note the we modified the class name
@@ -173,9 +206,8 @@ function GuiseIE6Fix(selectorText)
 				for(var elementSelectorIndex=elementSelectors.length-1; elementSelectorIndex>=0; --elementSelectorIndex)	//for each element selector
 				{
 					var elementSelector=elementSelectors[elementSelectorIndex];	//get a reference to this element selector
-					if(elementSelector.selects(element, elementClassNames))	//if this element selector selects this element
+					if(elementSelector.hasMultipleClassSelector && elementSelector.selects(element, elementClassNames))	//if this element selector selects multiple classes and selects this element
 					{
-//TODO fix	alert("affected element "+element.nodeName+" id "+element.id+" with class "+element.className);
 						elementClassNames.add(elementSelector.ie6FixClassName);	//add the IE6 fix class for this selector
 						classNameModified=true;	//note the we modified the class name
 					}
@@ -189,46 +221,65 @@ function GuiseIE6Fix(selectorText)
 			return elementClassName;	//return the fixed class name
 		};
 
-
 		/**Fixes a stylesheet, and all its imported stylesheets.
 		@param stylesheet The styleheet to fix.
 		*/
 		GuiseIE6Fix.prototype._fixStylesheet=function(stylesheet)
 		{
-			var xmlHTTP=this.httpCommunicator.get(stylesheet.href);	//load this stylesheet
-			if(xmlHTTP.status==200)	//if we were able to load the stylesheet
+			var rules=stylesheet.cssRules ? stylesheet.cssRules : stylesheet.rules;	//get a reference to the stylesheet rules, compensating for IE
+			var guiseIE6Fixed=rules.length>0 && rules[0].selectorText==GuiseIE6Fix.GUISE_IE6_FIX_SELECTOR_TEXT;	//see if this stylesheet has already been fixed by the server
+			if(guiseIE6Fixed)	//if this stylesheet has already been fixed, go through all the styles and create multiple class selector objects as appropriate to be used for dynamic fixups
 			{
-				var stylesheetText=xmlHTTP.responseText;	//get the text of the stylesheet
-	//TODO del alert("finished communicating; stylesheet text: "+stylesheetText);
-				var noComments=stylesheetText.replace(/\/\*(.|[\r\n])*?\*\//gm, "");	//remove comments (see http://ostermiller.org/findcomment.html)
-	//TODO del alert("no comments: "+noComments);
-				var noDefinitions=noComments.replace(/\{(.|[\r\n])*?\}/gm, ",");	//replace definitions with commas
-	//TODO del alert("no definitions: "+noDefinitions);
-				var noImports=noDefinitions.replace(/@import.*;/gm, "");	//remove stylesheet imports
-//TODO del alert("no imports: "+noImports);
-				var selectors=noImports.split(/\s*,\s*/m);	//split out the selectors
-				var rules=stylesheet.cssRules ? stylesheet.cssRules : stylesheet.rules;	//get a reference to the stylesheet rules, compensating for IE
-				var selectorCount=selectors.length==1 && selectors[0].trim().length==0 ? 0 : selectors.length;	//compensate for the special case of no selectors, which would still leave us with one blank selector
-				if(selectorCount!=rules.length)	//if we don't recognize as many selectors as IE recognizes, we're in trouble
-				{
-					alert("We found selector count "+selectors.length+", but IE has rule count: "+rules.length);	//TODO fix
-					return;	//don't process this stylesheet further
-				}
+//TODO del alert("already been fixed; no need to reload");
 				for(var ruleIndex=0; ruleIndex<rules.length; ++ruleIndex)	//for each rule in this stylesheet
 				{
 					var rule=rules[ruleIndex];	//get a reference to this rule
-	//TODO fix					var selectorText=rule.selectorText;	//get the selector text
-					var selectorText=selectors[ruleIndex];	//get our own version of the selector text, because IE throws away some information for multiple-class selectors
-	//alert("looking at selector: "+selectorText);	
+					var selectorText=rule.selectorText;	//get the selector text from the stylesheet, which we can trust because it has been fixed
+//TODO del alert("looking at selector: "+selectorText);
 					var cssSelector=new CSSSelector(selectorText);	//create a selector from this selector text
 					if(cssSelector.isMultipleClassSelector)	//if this is a multi-class selector
 					{
-						var cssText=rule.style.cssText;	//get the text of the rule (even though Danny Goodman's _JavaScript Bible_, Fifth Edition says that IE doesn't support this property
-						if(cssText.length>0)	//if there is actually text for this rule (IE won't allow us to add a rule with no text, but an empty rule doesn't do anything anyway, so ignore it)
+//TODO del alert("adding multiple class selector: "+cssSelector.selectorText);
+						this.cssMultipleClassSelectors.add(cssSelector);	//add this selector to our list of multiple class selector; we don't need to change the stylesheet
+					}
+				}
+			}
+			else	//if we need to fix this stylesheet (which takes much longer from the client side, because we'll have to reload the stylesheet manually and process it)
+			{
+				var xmlHTTP=this.httpCommunicator.get(stylesheet.href);	//load this stylesheet
+				if(xmlHTTP.status==200)	//if we were able to load the stylesheet
+				{
+					var stylesheetText=xmlHTTP.responseText;	//get the text of the stylesheet
+		//TODO del alert("finished communicating; stylesheet text: "+stylesheetText);
+					var noComments=stylesheetText.replace(/\/\*(.|[\r\n])*?\*\//gm, "");	//remove comments (see http://ostermiller.org/findcomment.html)
+		//TODO del alert("no comments: "+noComments);
+					var noDefinitions=noComments.replace(/\{(.|[\r\n])*?\}/gm, ",");	//replace definitions with commas
+		//TODO del alert("no definitions: "+noDefinitions);
+					var noImports=noDefinitions.replace(/@import.*;/gm, "");	//remove stylesheet imports
+	//TODO del alert("no imports: "+noImports);
+					var selectors=noImports.split(/\s*,\s*/m);	//split out the selectors
+					var selectorCount=selectors.length==1 && selectors[0].trim().length==0 ? 0 : selectors.length;	//compensate for the special case of no selectors, which would still leave us with one blank selector
+					if(selectorCount!=rules.length)	//if we don't recognize as many selectors as IE recognizes, we're in trouble
+					{
+						alert("We found selector count "+selectors.length+", but IE has rule count: "+rules.length);	//TODO fix
+						return;	//don't process this stylesheet further
+					}
+					for(var ruleIndex=0; ruleIndex<rules.length; ++ruleIndex)	//for each rule in this stylesheet
+					{
+						var rule=rules[ruleIndex];	//get a reference to this rule
+		//TODO fix					var selectorText=rule.selectorText;	//get the selector text
+						var selectorText=selectors[ruleIndex];	//get our own version of the selector text, because IE throws away some information for multiple-class selectors
+		//alert("looking at selector: "+selectorText);	
+						var cssSelector=new CSSSelector(selectorText);	//create a selector from this selector text
+						if(cssSelector.isMultipleClassSelector)	//if this is a multi-class selector
 						{
-							this.cssMultipleClassSelectors.add(cssSelector);	//add this selector to our list of multiple class selector
-							stylesheet.removeRule(ruleIndex);	//remove the rule at this index (using an IE6-specific method)
-							stylesheet.addRule(cssSelector.ie6FixSelectorText, cssText, ruleIndex);	//add a new rule in its place with the new selector text (using an IE6-specific method)
+							var cssText=rule.style.cssText;	//get the text of the rule (even though Danny Goodman's _JavaScript Bible_, Fifth Edition says that IE doesn't support this property
+							if(cssText.length>0)	//if there is actually text for this rule (IE won't allow us to add a rule with no text, but an empty rule doesn't do anything anyway, so ignore it)
+							{
+								this.cssMultipleClassSelectors.add(cssSelector);	//add this selector to our list of multiple class selector
+								stylesheet.removeRule(ruleIndex);	//remove the rule at this index (using an IE6-specific method)
+								stylesheet.addRule(cssSelector.ie6FixSelectorText, cssText, ruleIndex);	//add a new rule in its place with the new selector text (using an IE6-specific method)
+							}
 						}
 					}
 				}
@@ -256,7 +307,16 @@ function GuiseIE6Fix(selectorText)
 
 };
 
+/**The selector text for indicating that a stylesheet has been fixed for IE6.*/
+GuiseIE6Fix.GUISE_IE6_FIX_SELECTOR_TEXT="guiseIE6Fix";
+
 /**The prefix for Guise IE6 fixup classes.*/
-GuiseIE6Fix.GUISE_IE6_CLASS_PREFIX="guiseIE6";
+GuiseIE6Fix.GUISE_IE6_FIX_CLASS_PREFIX="guiseIE6";
+
+/**The class delimiter for classes that have been fixed for IE6.*/
+GuiseIE6Fix.GUISE_IE6_FIX_CLASS_DELIMITER="_-";
+
+/**The extended prefix for Guise IE6 fixup classes, including the first delimiter.*/
+GuiseIE6Fix.GUISE_IE6_FIX_CLASS_EXTENDED_PREFIX=GuiseIE6Fix.GUISE_IE6_FIX_CLASS_PREFIX+GuiseIE6Fix.GUISE_IE6_FIX_CLASS_DELIMITER;
 
 var guiseIE6Fix=new GuiseIE6Fix();	//create and initialize the IE 6 fix routines

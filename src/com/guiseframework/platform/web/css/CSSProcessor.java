@@ -163,7 +163,7 @@ public class CSSProcessor
 	@param stylesheet The stylesheet being constructed.
 	@except IOException Thrown if there is an error reading the input, the input is invalid, or the end of the input was reached unexpectedly.
 	*/
-	protected void parseStylesheetContent(final ParseReader parseReader, final CSSStylesheet stylesheet) throws IOException
+	protected static void parseStylesheetContent(final ParseReader parseReader, final CSSStylesheet stylesheet) throws IOException
 	{
 		//the stylesheet strings we expect; make sure we put the AT_RULE_START after the other at-rule constants, because it represents an unknown at-rule
 		final String[] EXPECTED_STYLESHEET_STRINGS={MEDIA_RULE_SYMBOL, PAGE_RULE_SYMBOL, FONT_FACE_RULE_SYMBOL, AT_RULE_START, CDO, COMMENT_START, ""};

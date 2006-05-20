@@ -10,16 +10,28 @@ The first combinator of which will be ignored.
 @author Garret Wilson
 @see <a href="http://www.w3.org/TR/css3-selectors/">CSS 3 Selectors</a>
 */
-public class Selector extends ArrayList<NameValuePair<Combinator,List<SimpleSelector>>>
+public class Selector extends ArrayList<NameValuePair<Combinator, List<SimpleSelector>>>
 {
 
-	/**The list of simple selector sequences, each paired with a combinator, the first combinator of which will be ignored.*/ 
-//TODO del	private final List<NameValuePair<Combinator, List<SimpleSelector>>> simpleSelectorSequenceChain=new ArrayList<NameValuePair<Combinator,List<SimpleSelector>>>();
-
-		/**@return The list of simple selector sequences, each paired with a combinator, the first combinator of which will be <code>null</code>.*/ 
-//TODO del		public List<NameValuePair<Combinator, List<SimpleSelector>>> getSimpleSelectorSequenceChain() {return simpleSelectorSequenceChain;}
-
 //TODO add support for pseudo-elements
+
+	/**Default constructor.*/
+	public Selector()
+	{
+		this(null);	//construct the class with no type selector
+	}
+
+	/**Type selector constructor.
+	@param typeSelector The type selector to add, or <code>null</code> if this selector should have no type selector.*/
+	public Selector(final TypeSelector typeSelector)
+	{
+		if(typeSelector!=null)	//if a type selector is given
+		{
+			final List<SimpleSelector> simpleSelectorSequence=new ArrayList<SimpleSelector>();	//create a new list of simple selectors
+			simpleSelectorSequence.add(typeSelector);	//add the type selector to the sequence
+			add(new NameValuePair<Combinator, List<SimpleSelector>>(null, simpleSelectorSequence));	//add the selector sequence with no combinator
+		}
+	}
 
 	/**@return A string representation of the selector.*/
 	public String toString()

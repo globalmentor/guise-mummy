@@ -7,7 +7,7 @@ import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 /**A class simple selector.
 @author Garret Wilson
 */
-public class ClassSelector implements SimpleSelector
+public class ClassSelector implements SimpleSelector, Comparable<ClassSelector>
 {
 
 	/**The name of the class to be selected.*/
@@ -45,4 +45,15 @@ public class ClassSelector implements SimpleSelector
 	{
 		return new StringBuilder().append(CLASS_SELECTOR_DELIMITER).append(getClassName()).toString();
 	}
+
+  /**Compares this object with the specified object for order.
+	This implementation compares class names.
+	Returns a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+	@param object The object to be compared.
+	@return A negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+	*/
+  public int compareTo(final ClassSelector object)
+  {
+  	return getClassName().compareTo(object.getClassName());	//compare class names
+  }
 }

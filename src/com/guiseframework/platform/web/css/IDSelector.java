@@ -7,7 +7,7 @@ import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 /**An ID simple selector.
 @author Garret Wilson
 */
-public class IDSelector implements SimpleSelector
+public class IDSelector implements SimpleSelector, Comparable<IDSelector>
 {
 
 	/**The ID to be selected.*/
@@ -45,4 +45,15 @@ public class IDSelector implements SimpleSelector
 	{
 		return new StringBuilder().append(ID_SELECTOR_DELIMITER).append(getID()).toString();
 	}
+
+  /**Compares this object with the specified object for order.
+  This implementation compares IDs.
+	Returns a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+	@param object The object to be compared.
+	@return A negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+	*/
+  public int compareTo(final IDSelector object)
+  {
+  	return getID().compareTo(object.getID());	//compare IDs
+  }
 }

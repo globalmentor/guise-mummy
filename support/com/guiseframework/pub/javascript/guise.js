@@ -76,14 +76,6 @@ var XHTML_NAMESPACE_URI="http://www.w3.org/1999/xhtml";
 /**The class prefix of a menu.*/
 //TODO del when works var MENU_CLASS_PREFIX="menu-";
 
-/**The class prefix of a tree node.*/
-var TREE_NODE_CLASS_PREFIX="treeNode-";
-/**The class suffix of a collapsed tree node.*/
-var TREE_NODE_COLLAPSED_CLASS_SUFFIX="-collapsed";
-/**The class suffix of an expanded tree node.*/
-var TREE_NODE_EXPANDED_CLASS_SUFFIX="-expanded";
-/**The class suffix of a leaf tree node.*/
-//TODO del var TREE_NODE_LEAF_CLASS_SUFFIX="-leaf";
 /**The class suffix for a tab.*/
 var TAB_CLASS_SUFFIX="-tab";
 /**The class suffix for a selected tab.*/
@@ -3130,12 +3122,6 @@ function initializeNode(node)
 								break;
 						}
 						break;
-					case "li":
-						if(elementClassName && elementClassName.indexOf(TREE_NODE_CLASS_PREFIX)==0)	//if this is a tree node
-						{
-							eventManager.addEvent(node, "click", onTreeNodeClick, false);	//listen for clicks
-						}
-						break;
 					case "select":
 						eventManager.addEvent(node, "change", onSelectChange, false);
 /*TODO del
@@ -3656,61 +3642,6 @@ function onSelectChange(event)
 		event.stopPropagation();	//tell the event to stop bubbling
 	}
 }
-
-/**Called when a checkbox is activated.
-@param event The object describing the event.
-*/
-function onTreeNodeClick(event)
-{
-	if(AJAX_ENABLED)	//if AJAX is enabled
-	{
-		if(event.target.nodeName.toLowerCase()=="a")	//TODO fix; temporary hack for allowing links inside trees
-		{
-			return;
-		}
-		if(event.target.nodeName.toLowerCase()=="ul" && event.target.className==oldClassName && event.target.parentNode==treeNode)	//if the user clicked on the tree node's list of child nodes
-		{
-			return;	//don't toggle the list if the user clicked on the children
-		}
-		var treeNode=event.currentTarget;	//get tree node that owns the clicked element
-//TODO del alert("target of tree click: "+treeNode.nodeName);
-		event.stopPropagation();	//tell the event to stop bubbling
-		event.preventDefault();	//prevent the default functionality from occurring
-//TODO del	alert("ID of tree node: "+treeNode.lastChild.id);
-		var oldClassName=treeNode.className;	//get the class name of the tree node
-/*TODO del
-alert("target node name: "+event.target.nodeName);
-alert("target class name: "+event.target.className);
-alert("target parent is the tree node?: "+(event.target.parentNode==treeNode));
-alert("target parent node name: "+event.target.parentNode.nodeName);
-*/
-		var isCollapsed=oldClassName.indexOf(TREE_NODE_COLLAPSED_CLASS_SUFFIX)>=0;	//see if this tree node has a class name representing the collapsed state
-		var isExpanded=oldClassName.indexOf(TREE_NODE_EXPANDED_CLASS_SUFFIX)>=0;	//see if this tree node has a class name representing the expanded state
-		if(isCollapsed || isExpanded)	//if the tree node is collapsed or expanded (ignore leaf nodes)
-		{
-			var childNodeList=treeNode.childNodes;	//get all the child nodes of the element
-			for(var i=childNodeList.length-1; i>=0; --i)	//for each child node (the sub-list is probably the last one)
-			{
-				var childNode=childNodeList[i];	//get this child node
-				if(childNode.nodeType==Node.ELEMENT_NODE && childNode.nodeName.toLowerCase()=="ul" && childNode.className==oldClassName)	//if there is a child ul element with the same class name
-				{
-					if(isExpanded)	//if the tree node is expanded
-					{
-						var newClassName=oldClassName.replace(TREE_NODE_EXPANDED_CLASS_SUFFIX, TREE_NODE_COLLAPSED_CLASS_SUFFIX);	//convert from expanded to collapsed
-					}
-					else	//if the tree node is collapsed
-					{
-						var newClassName=oldClassName.replace(TREE_NODE_COLLAPSED_CLASS_SUFFIX, TREE_NODE_EXPANDED_CLASS_SUFFIX);	//convert from expanded to collapsed				
-					}
-					childNode.className=newClassName;	//update the child list class
-					treeNode.className=newClassName;	//update class of the the tree node itself to match
-					break;	//we've switched states, so stop looking for a tree child
-				}
-			}
-		}
-	}
-}
-
 
 /**A class encapsulating menu state.*/
 function MenuState()

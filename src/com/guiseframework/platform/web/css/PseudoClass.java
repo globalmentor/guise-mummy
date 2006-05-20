@@ -7,7 +7,7 @@ import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 /**A pseudo class simple selector.
 @author Garret Wilson
 */
-public class PseudoClass implements SimpleSelector
+public class PseudoClass implements SimpleSelector, Comparable<PseudoClass>
 {
 
 	/**The name of the pseudo class to be selected.*/
@@ -45,4 +45,15 @@ public class PseudoClass implements SimpleSelector
 	{
 		return new StringBuilder().append(PSEUDO_CLASS_DELIMITER).append(getPseudoClassName()).toString();
 	}
+
+  /**Compares this object with the specified object for order.
+  This implementation compares pseudo-class names.
+	Returns a negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+	@param object The object to be compared.
+	@return A negative integer, zero, or a positive integer as this object is less than, equal to, or greater than the specified object.
+	*/
+  public int compareTo(final PseudoClass object)
+  {
+  	return getPseudoClassName().compareTo(object.getPseudoClassName());	//compare pseudo-class names
+  }
 }
