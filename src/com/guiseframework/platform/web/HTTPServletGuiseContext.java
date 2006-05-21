@@ -65,6 +65,12 @@ public class HTTPServletGuiseContext extends AbstractXMLGuiseContext
 	/**The current content type of the output.*/
 	private ContentType outputContentType=createContentType(TEXT, PLAIN_SUBTYPE);	//default to text/plain
 
+	/**The string builder that holds the current content being collected.*/
+	private final StringBuilder stringBuilder=new StringBuilder();
+
+		/**@return The string builder that holds the current content being collected.*/
+		public StringBuilder getStringBuilder() {return stringBuilder;}
+
 	/**Constructor.
 	@param session The Guise user session of which this context is a part.
 	@param destination The destination with which this context is associated.
@@ -200,14 +206,6 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	protected void setState(final State newState)
 	{
 		super.setState(newState);
-	}
-
-	/**@return A writer for rendering text content.
-	@exception IOException if there is an error getting the writer.
-	*/
-	public Writer getWriter() throws IOException
-	{
-		return getResponse().getWriter();	//get the writer to the response
 	}
 
 	/**@return The character encoding currently used for the text output.*/

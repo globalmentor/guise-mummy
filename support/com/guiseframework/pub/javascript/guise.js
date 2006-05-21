@@ -1550,6 +1550,7 @@ alert(exception);
 			if(!this.processingAJAXResponses)	//if we aren't processing AJAX responses TODO fix small race condition in determining whether processing is occurring
 			{
 				this.processingAJAXResponses=true;	//we are processing AJAX responses now
+/*TODO del when works; the server now takes care of this
 					//pre-process the responses to check for a navigation request, so that we can skip updates and immediately navigate
 				for(var responseIndex=0; responseIndex<this.ajaxResponses.length; ++responseIndex)	//for each response
 				{
@@ -1569,6 +1570,7 @@ alert(exception);
 						}
 					}
 				}
+*/
 				var newHRef=null;	//we'll see if a new URI was requested at any point
 				try
 				{
@@ -2975,6 +2977,13 @@ This implementation installs listeners.
 */
 function onWindowLoad()
 {
+
+		//TODO fix; doesn't seem to work on IE6 or Firefox
+	guise.oldElementIDCursors[document.body.id]=document.body.style.cursor;	//save the old document body cursor; this will get reset after we receive the response from the AJAX initialization request
+	document.body.style.cursor="wait";	//TODO testing
+
+//TODO display a wait cursor until we initialize everything
+
 	eventManager.addEvent(window, "resize", onWindowResize, false);	//add a resize listener
 //TODO del	eventManager.addEvent(window, "scroll", onWindowScroll, false);	//add a scroll listener
 	eventManager.addEvent(window, "unload", onWindowUnload, false);	//do the appropriate uninitialization when the window unloads
@@ -3602,6 +3611,8 @@ function onCheckInputChange(event)
 	var checkInput=event.currentTarget;	//get the control that was listening for events (the target could be the check input's label, as occurs in Mozilla)
 	if(AJAX_ENABLED)	//if AJAX is enabled
 	{
+		guise.oldElementIDCursors[checkInput.id]=checkInput.style.cursor;	//save the old cursor
+		checkInput.style.cursor="wait";	//TODO testing
 		var ajaxRequest=new FormAJAXEvent(new Parameter(checkInput.name, checkInput.checked ? checkInput.value : ""));	//create a new form request with the control name and value
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		event.stopPropagation();	//tell the event to stop bubbling
