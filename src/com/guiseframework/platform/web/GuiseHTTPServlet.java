@@ -423,6 +423,7 @@ Debug.trace("applicationContextPath", guiseApplicationContextPath);
 	{
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 Debug.trace("raw path info:", rawPathInfo);
+
 		if(rawPathInfo.startsWith(GUISE_PUBLIC_RESOURCE_BASE_PATH))	//if this is a request for a public resource
 		{
 			super.doGet(request, response);	//go ahead and retrieve the resource immediately
@@ -843,16 +844,15 @@ Debug.trace("new bookmark:", newBookmark);
 					
 					if(isAJAX)	//if this is an AJAX request
 					{
-						guiseContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type
-						final Writer responseWriter=response.getWriter();	//get the writer to the response
-						responseWriter.write("<response>");	//<response>	//TODO use a constant, decide on a namespace
-						responseWriter.write(guiseContext.getStringBuilder().toString());	//write the content we collected in the context						
-						responseWriter.write("</response>");	//</response>
+						guiseContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type TODO verify UTF-8 in a consistent, elegant way
+						final StringBuilder stringBuilder=guiseContext.getStringBuilder();	//get the string builder collected output for this context
+						stringBuilder.insert(0, "<response>");	//prepend the response opening tag TODO use a constant, decide on a namespace
+						stringBuilder.append("</response>");	//append the response closing tag
 					}
-					else	//if this is not an AJAX request
-					{
-						response.getWriter().write(guiseContext.getStringBuilder().toString());	//write the content we collected in the context
-					}
+					final byte[] bytes=guiseContext.getStringBuilder().toString().getBytes(UTF_8);	//write the content we collected in the context as series of bytes encoded in UTF-8
+					final OutputStream outputStream=getCompressedOutputStream(request, response);	//get a compressed output stream, if possible
+					outputStream.write(bytes);	//write the bytes
+					outputStream.close();	//close the output stream, finishing writing the compressed contents (don't put this in a finally block, as it will attempt to write more data and raise another exception)						
 				}
 				finally
 				{
