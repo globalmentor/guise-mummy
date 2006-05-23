@@ -37,8 +37,9 @@ Copyright (c) 2005-2006 GlobalMentor, Inc.
 /*Guise AJAX Response Format, content type application/x-guise-ajax-response+xml
 <response>
 	<patch></patch>	<!--XML elements to be patched into the existing DOM tree.-->
-	<remove id=""/>	<!--ID of the XML element to be removed from the existing DOM tree.-->
-	<navigate>uri</navigate>	<!--URI of another page to which to navigate.-->
+	<attribute id="" name="" value=""></attribute>	<!--the new name and value of an attribute of an element with the given ID to be set (or removed if the value is null)-->
+	<remove id=""/>	<!--ID of the XML element to be removed from the existing DOM tree-->
+	<navigate>uri</navigate>	<!--URI of another page to which to navigate-->
 	<frame></frame>	<!--definition of a frame to show-->
 </response>
 */
@@ -1283,19 +1284,30 @@ function GuiseAJAX()
 
 		/**The enumeration of the names of the request elements.*/
 		GuiseAJAX.prototype.RequestElement=
-			{
-				REQUEST: "request", EVENTS: "events",
-				FORM: "form", PROVISIONAL: "provisional", CONTROL: "control", NAME: "name", VALUE: "value",
-				ACTION: "action", COMPONENT: "component", COMPONENT_ID: "componentID", TARGET_ID: "targetID", ACTION_ID: "actionID", OPTION: "option",
-				DROP: "drop", SOURCE: "source", TARGET: "target", VIEWPORT: "viewport", MOUSE: "mouse", ID: "id", X: "x", Y: "y", WIDTH: "width", HEIGHT: "height",
-				INIT: "init"
-			};
+				{
+					REQUEST: "request", EVENTS: "events",
+					FORM: "form", PROVISIONAL: "provisional", CONTROL: "control", NAME: "name", VALUE: "value",
+					ACTION: "action", COMPONENT: "component", COMPONENT_ID: "componentID", TARGET_ID: "targetID", ACTION_ID: "actionID", OPTION: "option",
+					DROP: "drop", SOURCE: "source", TARGET: "target", VIEWPORT: "viewport", MOUSE: "mouse", ID: "id", X: "x", Y: "y", WIDTH: "width", HEIGHT: "height",
+					INIT: "init"
+				};
 
 		/**The content type of a Guise AJAX response.*/
 		GuiseAJAX.prototype.RESPONSE_CONTENT_TYPE="application/x-guise-ajax-response+xml";
 
 		/**The enumeration of the names of the response elements.*/
-		GuiseAJAX.prototype.ResponseElement={RESPONSE: "response", PATCH: "patch", REMOVE: "remove", NAVIGATE: "navigate", VIEWPORT_ID: "viewportID", RELOAD: "reload"};
+		GuiseAJAX.prototype.ResponseElement=
+				{
+					RESPONSE: "response",
+					PATCH: "patch",
+					ATTRIBUTE: "attribute",
+					NAME: "name",
+					VALUE: "value",
+					REMOVE: "remove",
+					NAVIGATE: "navigate",
+					VIEWPORT_ID: "viewportID",
+					RELOAD: "reload"
+				};
 
 		/**Immediately sends or queues an AJAX request.
 		@param ajaxRequest The AJAX request to send.
@@ -1591,6 +1603,11 @@ alert(exception);
 									case this.ResponseElement.PATCH:	//patch
 										this._processPatch(childNode);	//patch the document with this patch information
 										break;
+/*TODO del when works
+									case this.ResponseElement.ATTRIBUTE:	//attribute
+										this._processAttribute(childNode);	//patch the document with this attribute information
+										break;
+*/
 									case this.ResponseElement.REMOVE:	//remove
 										this._processRemove(childNode);	//remove the elements from the document with this removal element
 										break;
@@ -1657,7 +1674,7 @@ alert(exception);
 			{
 				return navigateURI;	//report the requested location
 			}
-		}
+		};
 
 		/**Processes the AJAX patch response.
 		Only child elements with IDs will be processed.
@@ -1699,7 +1716,32 @@ alert(exception);
 				document.recalc();
 			}
 */
-		}
+		};
+
+		/**Processes the AJAX attribute response.
+		@param element The element representing attribute response.
+		*/ 
+		GuiseAJAX.prototype._processAttribute=function(element)
+		{
+			var id=element.getAttribute("id");	//get the element ID
+			var name=element.getAttribute(this.ResponseElement.NAME);	//get the attribute name
+			if(id && name)	//if an ID and name are given
+			{
+				var oldElement=document.getElementById(id);	//get the element in the document
+				if(oldElement)	//if we found the old element
+				{
+					if(name=="style")	//if this is the style attribute
+					{
+						var value=element.getAttribute(this.ResponseElement.VALUE);	//get the attribute value
+						this._synchronizeElementStyle(oldElement, value);	//update the element style attribute
+					}
+					else	//TODO fix for general attributes
+					{
+						alert("Support for attribute "+name+" not yet supported.");
+					}			
+				}
+			}
+		};
 
 		/**Processes the AJAX remove response.
 		@param element The element representing removal response.
@@ -1747,7 +1789,7 @@ alert(exception);
 				}
 			}
 */
-		}
+		};
 
 		/**Synchronizes an element hierarchy with its patch element.
 		@param oldElement The old version of the element.
@@ -1756,6 +1798,13 @@ alert(exception);
 		GuiseAJAX.prototype._synchronizeElement=function(oldElement, element)
 		{
 			var elementName=element.nodeName;	//save the element name
+
+			if(elementName==this.ResponseElement.ATTRIBUTE)	//if this is really an attribute patch
+			{
+				this._processAttribute(element);	//patch the element with this attribute information TODO now that we're doing this in the patch tree, there may be no need for the ID attribute; double-check
+				return;	//don't do synchronization patching
+			}
+
 //TODO del alert("ready to synchronize element "+oldElement.nodeName+" with ID: "+oldElement.id+" against element "+element.nodeName+" with ID: "+element.getAttribute("id"));
 				//remove any attributes the old element has that are not in the new element
 			var oldAttributes=oldElement.attributes;	//get the old element's attributes
@@ -1788,7 +1837,6 @@ alert(exception);
 				oldElement.value="";	//set the value to the empty string (setting the value to null will result in "null" being displayed in the input control on IE)
 			}
 				//patch in the new and changed attributes
-			var removableStyles=["backgroundColor", "color", "display", "visibility"];	//create a new array of styles to remove if not assigned, with the style name as the key
 			var attributes=element.attributes;	//get the new element's attributes
 			for(var i=attributes.length-1; i>=0; --i)	//for each attribute
 			{
@@ -1797,32 +1845,11 @@ alert(exception);
 				var attributeValue=attribute.nodeValue;	//get the attribute value
 				if(attributeName=="style")	//if this is a style attribute, we have to treat it differently, because neither Mozilla nor IE provide normal DOM access to the literal style attribute value
 				{
-//TODO fix with something else to give IE layout					oldElement["contentEditable"]=false;	//for IE 6, give the component "layout" so that things like opacity will work
-					var styles=attributeValue.split(";");	//split out the individual styles
-					for(var styleIndex=styles.length-1; styleIndex>=0; --styleIndex)	//for each style
-					{
-						var styleComponents=styles[styleIndex].split(":");	//get a reference to this style and split out the property and value
-						if(styleComponents.length==2)	//we expect there to be a property and a value
-						{
-							var styleProperty=DOMUtilities.getCSSAttributeName(styleComponents[0].trim());	//retrieve get the trimmed style property and get the HTML DOM attribute version
-							var styleValue=styleComponents[1].trim();	//get the trimmed style value
-							removableStyles.removeItem(styleProperty);	//remove this style from the array of removable styles, indicating that we shouldn't remove this style
-							if(oldElement.style[styleProperty]!=styleValue)	//if the style is different	TODO check about removing a style
-							{
-//TODO del alert("ready to set element style "+styleProperty+" to value "+styleValue);
-								oldElement.style[styleProperty]=styleValue;	//update this style
-/*TODO del
-								if(styleProperty=="className");	//if we're changing the class name
-								{
-									isClassNameModified=true;	//show that we changed the class name
-								}
-*/
-							}
-						}
-					}
+					//TODO remove clause with negative check
 				}
 				else if(attributeName=="guise:patchType")	//ignore the guise:patchType attribute TODO check; use a constant
 				{
+					//TODO remove clause with negative check
 				}
 				else	//for any other attribute
 				{
@@ -1870,16 +1897,7 @@ alert(exception);
 					}
 				}
 			}
-			for(var i=removableStyles.length-1; i>=0; --i)	//for each removable style that needs removed
-			{
-				var removableStyleName=removableStyles[i];	//get the removable style name
-//TODO del when works alert("looking at removable style "+removableStyleName+" with old value "+oldElement.style[removableStyleName]);
-				if(oldElement.style[removableStyleName])	//if this style was not in the new element but it was in the old element
-				{
-//TODO del when works alert("trying to remove style "+removableStyleName+" with old value "+oldElement.style[removableStyleName]);
-					oldElement.style[removableStyleName]="";	//remove the style from the old element
-				}				
-			}
+			this._synchronizeElementStyle(oldElement, element.getAttribute("style"));	//patch in the new style
 				//perform special-case attribute manipulations for certain elements
 			if(elementName=="input")	//input checkboxes and radio buttons do not updated the checked state correctly based upon the "checked" attribute
 			{
@@ -2030,6 +2048,44 @@ catch(e)
 			}
 		};
 
+		/**Synchronizes the literal style of an element.
+		@param oldElement The old version of the element.
+		@param attributeValue The new literal value of the style attribute, which may be null or the empty string.
+		*/ 
+		GuiseAJAX.prototype._synchronizeElementStyle=function(oldElement, attributeValue)
+		{
+			var removableStyles={"backgroundColor":true, "color":true, "display":true, "visibility":true};	//create a new map of styles to remove if not assigned, with the style name as the key
+			if(attributeValue)	//if there is a new style
+			{
+//TODO fix with something else to give IE layout					oldElement["contentEditable"]=false;	//for IE 6, give the component "layout" so that things like opacity will work
+				var styles=attributeValue.split(";");	//split out the individual styles
+				for(var styleIndex=styles.length-1; styleIndex>=0; --styleIndex)	//for each style
+				{
+					var styleComponents=styles[styleIndex].split(":");	//get a reference to this style and split out the property and value
+					if(styleComponents.length==2)	//we expect there to be a property and a value
+					{
+						var styleProperty=DOMUtilities.getCSSAttributeName(styleComponents[0].trim());	//retrieve get the trimmed style property and get the HTML DOM attribute version
+						var styleValue=styleComponents[1].trim();	//get the trimmed style value
+						delete removableStyles[styleProperty];	//remove this style from the map of removable styles, indicating that we shouldn't remove this style
+						if(oldElement.style[styleProperty]!=styleValue)	//if the style is different	TODO check about removing a style
+						{
+	//TODO del alert("ready to set element style "+styleProperty+" to value "+styleValue);
+							oldElement.style[styleProperty]=styleValue;	//update this style
+						}
+					}
+				}
+			}
+				//remove the removable styles that weren't assigned
+			for(var removableStyleName in removableStyles)	//for each removable style that needs removed
+			{
+//TODO del when works alert("looking at removable style "+removableStyleName+" with old value "+oldElement.style[removableStyleName]);
+				if(oldElement.style[removableStyleName])	//if this style was not in the new element but it was in the old element
+				{
+//TODO del when works alert("trying to remove style "+removableStyleName+" with old value "+oldElement.style[removableStyleName]);
+					oldElement.style[removableStyleName]="";	//remove the style from the old element
+				}				
+			}
+		};
 	}
 
 	this.httpCommunicator.setProcessHTTPResponse(this._createHTTPResponseCallback());	//set up our callback function for processing HTTP responses

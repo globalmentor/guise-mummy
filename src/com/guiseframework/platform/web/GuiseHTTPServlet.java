@@ -849,7 +849,9 @@ Debug.trace("new bookmark:", newBookmark);
 						stringBuilder.insert(0, "<response>");	//prepend the response opening tag TODO use a constant, decide on a namespace
 						stringBuilder.append("</response>");	//append the response closing tag
 					}
-					final byte[] bytes=guiseContext.getStringBuilder().toString().getBytes(UTF_8);	//write the content we collected in the context as series of bytes encoded in UTF-8
+					final StringBuilder stringBuilder=guiseContext.getStringBuilder();	//get the string builder collected output for this context
+//TODO del Debug.trace("response:", stringBuilder);
+					final byte[] bytes=stringBuilder.toString().getBytes(UTF_8);	//write the content we collected in the context as series of bytes encoded in UTF-8
 					final OutputStream outputStream=getCompressedOutputStream(request, response);	//get a compressed output stream, if possible
 					outputStream.write(bytes);	//write the bytes
 					outputStream.close();	//close the output stream, finishing writing the compressed contents (don't put this in a finally block, as it will attempt to write more data and raise another exception)						
