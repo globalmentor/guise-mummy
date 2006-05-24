@@ -782,6 +782,233 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 	},
 */
 
+
+
+
+	/**Retrieves the named ancestor element of the given node, starting at the node itself.
+	@param node The node the ancestor of which to find, or null if the search should not take place.
+	@param elementName The name of the element to find.
+	@return The named element in which the node lies, or null if the node is not within such a named element.
+	*/
+	getAncestorElementByName:function(node, elementName)
+	{
+		while(node && (node.nodeType!=Node.ELEMENT_NODE || node.nodeName.toLowerCase()!=elementName))	//while we haven't found the named element
+		{
+			node=node.parentNode;	//get the parent node
+		}
+		return node;	//return the element we found
+	},
+	
+	/**Retrieves the ancestor element with the given class of the given node, starting at the node itself. Multiple class names are supported.
+	@param node The node the ancestor of which to find, or null if the search should not take place.
+	@param className The name of the class for which to check, or a regular expression if a match should be found.
+	@return The element with the given class in which the node lies, or null if the node is not within such an element.
+	*/
+	getAncestorElementByClassName:function(node, className)
+	{
+		while(node)	//while we haven't reached the top of the hierarchy
+		{
+			if(node.nodeType==Node.ELEMENT_NODE && this.hasClassName(node, className))	//if this is an element and this class name is one of the class names
+			{
+				return node;	//this node has a matching class name; we'll use it
+			}
+			node=node.parentNode;	//try the parent node
+		}
+		return node;	//return whatever node we found
+	},
+	
+	/**Retrieves the descendant element with the given name and attributes, starting at the node itself.
+	Currently this function only accepts a single parameter specification.
+	@param node The node the descendant of which to find, or null if the search should not take place.
+	@param elementName The name of the element to find.
+	@param parameters (...) Zero or more parameters of type Parameter, each representing an attribute name and value that should be present (or, if the parameter value is null, an attribute that must not be present).
+	@return The element with the given name, or null if there is no such element descendant.
+	*/
+	getDescendantElementByName:function(node, elementName, parameters)
+	{
+		if(node)	//if we have a node
+		{
+			var argumentCount=arguments.length;	//find out how many arguments there are
+			if(node.nodeType==Node.ELEMENT_NODE && node.nodeName.toLowerCase()==elementName)	//if this is an element with the given name
+			{
+				var parametersMatch=true;	//start out assuming that the parameters match		
+				for(var i=2; i<argumentCount && parametersMatch; ++i)	//for each argument (not counting the first two), as long as all parameters match so far
+				{
+					var parameter=arguments[i];	//get this argument
+					if(node.getAttribute(parameter.name)!=parameter.value)	//if this attribute doesn't exist or doesn't have the correct value
+					{
+						parametersMatch=false;	//indicate that the parameters do not match
+					}
+				}
+				if(parametersMatch)	//if all the parameters match
+				{
+					return node;	//show that we found a matching element name and attribute(s)
+				}
+			}
+			var childNodeList=node.childNodes;	//get all the child nodes
+			var childNodeCount=childNodeList.length;	//find out how many children there are
+			for(var i=0; i<childNodeCount; ++i)	//for each child node
+			{
+				var childNode=childNodeList[i];	//get this child node
+				if(argumentCount==2)	//if there are only two arguments
+				{
+					var match=this.getDescendantElementByName(childNode, elementName);	//see if we can find the node in this branch
+				}
+				else	//if there are more arguments
+				{
+					var match=this.getDescendantElementByName(childNode, elementName, parameters);	//see if we can find the node in this branch TODO fix passing more than one parameter
+				}
+				if(match)	//if we found a match
+				{
+					return match;	//return it
+				}
+			}
+		}
+		return null;	//show that we didn't find a matching element
+	},
+	
+	/**Retrieves the descendant element with the given class of the given node, starting at the node itself. Multiple class names are supported.
+	@param node The node the descendant of which to find, or null if the search should not take place.
+	@param className The name of the class for which to check, or a regular expression if a match should be found.
+	@return The element with the given class for which the given node is a parent or itself, or null if there is no such element descendant.
+	*/
+	getDescendantElementByClassName:function(node, className)
+	{
+		if(node)	//if we have a node
+		{
+			if(node.nodeType==Node.ELEMENT_NODE && this.hasClassName(node, className))	//if this is an element with the given class name
+			{
+				return node;	//show that we found a matching element class name
+			}
+			var childNodeList=node.childNodes;	//get all the child nodes
+			var childNodeCount=childNodeList.length;	//find out how many children there are
+			for(var i=0; i<childNodeCount; ++i)	//for each child node
+			{
+				var childNode=childNodeList[i];	//get this child node
+				var match=this.getDescendantElementByClassName(childNode, className);	//see if we can find the node in this branch
+				if(match)	//if we found a match
+				{
+					return match;	//return it
+				}
+			}
+		}
+		return null;	//show that we didn't find a matching element
+	},
+
+	/**Determines whether the given node has the indicated ancestor, including the node itself in the search.
+	@param node The node the ancestor of which to find, or null if the search should not take place.
+	@param ancestor The ancestor to find.
+	@return true if the node or one of its ancestors is the given ancestor.
+	*/
+	hasAncestor:function(node, ancestor)
+	{
+		while(node)	//while we haven't ran out of nodes
+		{
+			if(node==ancestor)	//if this node is the ancestor
+			{
+				return true;	//show that there was such an ancestor
+			}
+			node=node.parentNode;	//go up one level
+		}
+		return false;	//indicate that we didn't find the given ancestor
+	},
+	
+	/**Determines whether the given element has the given class. Multiple class names are supported.
+	@param element The element that should be checked for class.
+	@param className The name of the class for which to check, or a regular expression if a match should be found.
+	@return true if one of the element's class names equals the given class name.
+	*/
+	hasClassName:function(element, className)
+	{
+		return this.getClassName(element, className)!=null;	//see if we can find a matching class name
+	},
+	
+	/**Returns the given element has the given class. Multiple class names are supported.
+	@param element The element that should be checked for class.
+	@param className The name of the class for which to check, or a regular expression if a match should be found.
+	@return The given class name, which will be the regular expression match if a regular expression is used, or null if there is no matching class name.
+	*/
+	getClassName:function(element, className)
+	{
+		var classNamesString=element.className;	//get the element's class names
+		var classNames=classNamesString ? classNamesString.split(/\s/) : EMPTY_ARRAY;	//split out the class names
+		var index=className instanceof RegExp ? classNames.indexOfMatch(className) : classNames.indexOf(className);	//get the index of the matching class name
+		return index>=0 ? classNames[index] : null;	//return the matching class name, if there is one
+	},
+	
+	/**Adds the given class name to the element's style class.
+	@param element The element that should be given a class.
+	@param className The name of the class to add.
+	*/
+	addClassName:function(element, className)
+	{
+		var classNamesString=element.className;	//get the element's class names
+		element.className=classNamesString ? classNamesString+" "+className : className;	//append the class name if there is a class name already
+	},
+	
+	/**Removes the given class name from the element's style class.
+	@param element The element that should have a class removed.
+	@param className The name of the class to remove.
+	*/
+	removeClassName:function(element, className)
+	{
+		var classNamesString=element.className;	//get the element's class names
+		var classNames=classNamesString ? classNamesString.split(/\s/) : EMPTY_ARRAY;	//split out the class names
+		for(var i=classNames.length-1; i>=0; --i)	//for each index (starting from the end so that we can remove indices at will)
+		{
+			if(classNames[i]==className)	//if this is a class name to remove
+			{
+				classNames.remove(i);	//remove this index
+			}
+		}
+		element.className=classNames.join(" ");	//join the remaining class names back together and assign them back to the element's class name
+	},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	/**Retrieves the immediate text nodes of the given node as a string.
+	@param node The node from which to retrieve text.
+	@return The text of the given node.
+	*/ 
+	getNodeText:function(node)
+	{
+		var childNodeList=node.childNodes;	//get all the child nodes of the node
+		var childNodeCount=childNodeList.length;	//find out how many children there are
+		if(childNodeCount>0)	//if there are child nodes
+		{
+			var stringBuilder=new StringBuilder();	//create a new string builder to construct the string
+			for(var i=0; i<childNodeCount; ++i)	//for each child node
+			{
+				var childNode=childNodeList[i];	//get this child node
+				if(childNode.nodeType==Node.TEXT_NODE)	//if this is a text node
+				{
+					stringBuilder.append(childNode.nodeValue);	//append this value			
+				}
+			}
+			return stringBuilder.toString();	//return the string we constructed
+		}
+		else	//if there are no child nodes
+		{
+			return "";	//return an empty string
+		}
+	},
+
 	/**Creates a string representation of the given node.
 	@param node The node to serialize.
 	@return A string representation of the given node.
@@ -1681,7 +1908,7 @@ alert(exception);
 		*/ 
 		GuiseAJAX.prototype._processNavigate=function(element)
 		{
-			var navigateURI=getText(element);	//report the requested location
+			var navigateURI=DOMUtilities.getNodeText(element);	//report the requested location
 			var viewportID=element.getAttribute(this.ResponseElement.VIEWPORT_ID);	//get the viewport ID, if there is one
 			if(viewportID!=null)	//if there is a viewport ID
 			{
@@ -1809,7 +2036,6 @@ alert(exception);
 */
 		};
 
-
 		/**The set of attribute names that should not be removed when synchronizing.*/
 		GuiseAJAX.prototype.NON_REMOVABLE_ATTRIBUTE_SET=
 		{
@@ -1834,13 +2060,13 @@ alert(exception);
 		GuiseAJAX.prototype._synchronizeElement=function(oldElement, element)
 		{
 			var elementName=element.nodeName;	//save the element name
-
+/*TODO del or salvage
 			if(elementName==this.ResponseElement.ATTRIBUTE)	//if this is really an attribute patch
 			{
 				this._processAttribute(element);	//patch the element with this attribute information TODO now that we're doing this in the patch tree, there may be no need for the ID attribute; double-check
 				return;	//don't do synchronization patching
 			}
-
+*/
 //TODO del alert("ready to synchronize element "+oldElement.nodeName+" with ID: "+oldElement.id+" against element "+element.nodeName+" with ID: "+element.getAttribute("id"));
 				//remove any attributes the old element has that are not in the new element
 			var oldAttributes=oldElement.attributes;	//get the old element's attributes
@@ -1930,7 +2156,7 @@ alert(exception);
 				//patch in the new child element hierarchy
 			if(elementName=="textarea")	//if this is a text area, do special-case value changing (restructuring won't work in IE and Mozilla) TODO check for other similar types TODO use a constant
 			{
-				oldElement.value=getText(element);	//set the new value to be the text of the new element
+				oldElement.value=DOMUtilities.getNodeText(element);	//set the new value to be the text of the new element
 			}
 			else	//for other elements, restructure the DOM tree normally
 			{
@@ -2165,7 +2391,7 @@ com.guiseframework.js.Client=function()
 			initializeNode(frame);	//initialize the new imported frame, installing the correct event handlers; do this before the frame is positioned, because initialization also fixes IE6 classes, which can affect position
 			this._initializeFramePosition(frame);	//initialize the frame's position
 		
-			var openEffectClassName=getClassName(frame, STYLES.OPEN_EFFECT_REGEXP);	//get the open effect specified for this frame
+			var openEffectClassName=DOMUtilities.getClassName(frame, STYLES.OPEN_EFFECT_REGEXP);	//get the open effect specified for this frame
 			var openEffect=null;	//we'll create an open effect if appropriate
 			if(openEffectClassName)	//if there is an open effect
 			{
@@ -2243,8 +2469,8 @@ com.guiseframework.js.Client=function()
 		//TODO del var debugString="";
 		//TODO del	var framePosition=new Point();	//we'll calculate the frame position; create an object rather than using primitives so that the internal function can access its variables via closure
 			var frameX, frameY;	//we'll calculate the frame position
-			var relatedComponentID=getInputParameter(frame, "relatedComponentID");	//get the related component ID, if any TODO use a constant
-			var relatedComponent=relatedComponentID ? document.getElementById(relatedComponentID) : null;	//get the related component, if there is one
+			var relatedComponentInput=DOMUtilities.getDescendantElementByName(frame, "input", new Parameter("name", "relatedComponentID"));	//get the input holding the related component ID
+			var relatedComponent=relatedComponentInput ? document.getElementById(relatedComponentInput.value) : null;	//get the related component, if there is one
 			if(relatedComponent)	//if there is a related component
 			{
 		//TODO del alert("found related component: "+relatedComponentID);
@@ -2252,7 +2478,7 @@ com.guiseframework.js.Client=function()
 		//TODO del debugString+="frameBounds: "+frameBounds.x+","+frameBounds.y+","+frameBounds.width+","+frameBounds.height+"\n";
 				var relatedComponentBounds=getElementBounds(relatedComponent);	//get the bounds of the related component
 		//TODO del debugString+="relatedComponentBounds: "+relatedComponentBounds.x+","+relatedComponentBounds.y+","+relatedComponentBounds.width+","+relatedComponentBounds.height+"\n";
-				var tether=getDescendantElementByClassName(frame, STYLES.FRAME_TETHER);	//get the frame tether, if there is one
+				var tether=DOMUtilities.getDescendantElementByClassName(frame, STYLES.FRAME_TETHER);	//get the frame tether, if there is one
 				if(tether)	//if there is a frame tether
 				{
 					var positionTether=function()	//create a function to position relative to the tether
@@ -2302,7 +2528,7 @@ com.guiseframework.js.Client=function()
 								frame.style.left=frameX+"px";	//set the frame's horizontal position
 								frame.style.top=frameY+"px";	//set the frame's vertical position
 							};
-					var tetherIMG=getDescendantElementByName(tether, "img");	//see if the tether has an image TODO use a constant
+					var tetherIMG=DOMUtilities.getDescendantElementByName(tether, "img");	//see if the tether has an image TODO use a constant
 					if(tetherIMG && (tetherIMG.offsetWidth<=0 || tetherIMG.offsetHeight<=0))	//if there is a tether image with an invalid width and/or height
 					{
 		//TODO del alert("tether image: "+tetherIMG.src+" not yet loaded; size "+tetherIMG.offsetWidth+","+tetherIMG.offsetHeight);
@@ -2358,7 +2584,7 @@ com.guiseframework.js.Client=function()
 			{
 				var frame=this.frames[i];	//get a reference to this frame
 				frame.style.zIndex=(i+1)*100;	//give the element the appropriate z-order
-				if(hasClassName(frame, "frameModal"))	//if this is a modal frame TODO use a constant
+				if(DOMUtilities.hasClassName(frame, "frameModal"))	//if this is a modal frame TODO use a constant
 				{
 					this.modalFrame=frame;	//indicate our last modal frame
 				}
@@ -2581,14 +2807,6 @@ function EventListener(currentTarget, eventType, fn, useCapture, createDecorator
 			{
 				event.charCode=event.which ? event.which : event.keyCode;	//use the NN4  key indication if available; otherwise, use the key code TODO make sure this is a key event, because NN4 uses event.which for mouse events, too			
 			}
-/*TODO del when works; this is probably incorrect
-				//fix event.data
-			if(!event.data)	//if there is no data
-			{
-				//TODO assert event.keyCode
-				event.data=event.keyCode;	//assign a W3C data property
-			}
-*/
 				//fix event.stopPropagation
 			if(!event.stopPropagation)	//if there is no method for stopping propagation TODO add workaround for Safari, which has this method but doesn't actually stop propagation
 			{
@@ -3131,7 +3349,7 @@ function initializeNode(node)
 				switch(elementName)	//see which element this is
 				{
 					case "a":
-						if(isIE && hasClassName(node, "imageSelectActionControl"))	//if this is IE (TODO check for IE6), which doesn't support the CSS outline: none property, create a workaround TODO use a constant; create something more general than just the image select action control
+						if(isIE && DOMUtilities.hasClassName(node, "imageSelectActionControl"))	//if this is IE (TODO check for IE6), which doesn't support the CSS outline: none property, create a workaround TODO use a constant; create something more general than just the image select action control
 						{
 							node.hideFocus="true";	//hide the focus on this element
 						}
@@ -3169,7 +3387,7 @@ function initializeNode(node)
 								//check for menu
 						if(elementClassNames.contains(STYLES.MENU))	//if this is a menu
 						{
-							var menu=getMenu(node);	//get the menu ancestor
+							var menu=DOMUtilities.getAncestorElementByClassName(node, STYLES.MENU_BODY);	//get the menu ancestor
 							if(menu)	//if there is a menu ancestor (i.e. this is not the root menu)
 							{
 //TODO del when works alert("for class "+className+" non-root menu: "+menu.id);
@@ -3185,7 +3403,7 @@ function initializeNode(node)
 						if(rolloverSrc!=null)	//if the image has a rollover TODO use a constant
 						{
 							guise.loadImage(rolloverSrc);	//preload the image
-							if(!hasClassName(node, STYLES.MOUSE_LISTENER))	//if this is not a mouse listener (which would get a onMouse listener registered, anyway)
+							if(!DOMUtilities.hasClassName(node, STYLES.MOUSE_LISTENER))	//if this is not a mouse listener (which would get a onMouse listener registered, anyway)
 							{
 								eventManager.addEvent(node, "mouseover", onMouse, false);	//listen for mouse over on a mouse listener
 								eventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener							
@@ -3325,8 +3543,6 @@ function uninitializeNode(node)	//TODO remove the node from the sorted list of d
 	eventManager.clearEvents(node);	//clear events for this node and descendants
 }
 
-//TODO del var test=new Array();
-
 var lastFocusedNode=null;
 
 /**Called when an element receives a focus event.
@@ -3340,10 +3556,10 @@ function onFocus(event)
 	
 //TODO del var dummy=currentTarget.nodeName+" "+currentTarget.id;
 
-		if(!hasAncestor(currentTarget, guise.modalFrame))	//if focus is trying to go to something outside the modal frame
+		if(!DOMUtilities.hasAncestor(currentTarget, guise.modalFrame))	//if focus is trying to go to something outside the modal frame
 		{
 //TODO fix alert("focus outside of frame");
-			if(hasAncestor(lastFocusedNode, guise.modalFrame))	//if we know the last focused node, and it was in the modal frame
+			if(DOMUtilities.hasAncestor(lastFocusedNode, guise.modalFrame))	//if we know the last focused node, and it was in the modal frame
 			{
 
 //TODO del dummy+=" changing to last focused "+lastFocusedNode.nodeName+" id "+lastFocusedNode.id;
@@ -3483,7 +3699,7 @@ function onButtonClick(event)
 {
 	var element=event.currentTarget;	//get the element on which the event was registered
 	var form=getForm(element);	//get the form
-	if(form && getDescendantElementByName(form, "input", new Parameter("type", "file")))	//if there is a file input element, we'll have to submit the entire page rather than using AJAX
+	if(form && DOMUtilities.getDescendantElementByName(form, "input", new Parameter("type", "file")))	//if there is a file input element, we'll have to submit the entire page rather than using AJAX
 	{
 		if(element.id)	//if the button has an ID
 		{
@@ -3527,7 +3743,7 @@ function onAction(event)
 {
 	var target=event.currentTarget;	//get the element on which the event was registered
 //TODO del alert("action on: "+element.nodeName);
-	var component=getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element TODO improve all this
+	var component=DOMUtilities.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element TODO improve all this
 	if(component)	//if there is a component
 	{
 		var componentID=component.id;	//get the component ID
@@ -3621,7 +3837,7 @@ function onActionClick(event)
 	var targetID=target.id;	//get the target ID
 	if(targetID)	//if the element has an ID (otherwise, we couldn't report the action)
 	{
-		var component=getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element TODO improve all this
+		var component=DOMUtilities.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element TODO improve all this
 		if(component)	//if there is a component
 		{
 			var componentID=component.id;	//get the component ID
@@ -3662,7 +3878,7 @@ function onContextMenu(event)
 	var targetID=target.id;	//get the target ID
 	if(targetID)	//if the element has an ID (otherwise, we couldn't report the action)
 	{
-		var component=getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element TODO improve all this
+		var component=DOMUtilities.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element TODO improve all this
 		if(component)	//if there is a component
 		{
 			var componentID=component.id;	//get the component ID
@@ -3696,7 +3912,7 @@ function onCheckInputChange(event)
 	}
 	else	//if AJAX is not enabled
 	{
-		if(getMenu(checkInput))	//if this check is inside a menu, submit the form so that menus will cause immediate reaction
+		if(DOMUtilities.getAncestorElementByClassName(checkInput, STYLES.MENU_BODY))	//if this check is inside a menu, submit the form so that menus will cause immediate reaction
 		{
 			var form=getForm(element);	//get the form
 			if(form)	//if there is a form
@@ -3810,7 +4026,7 @@ var menuState=new MenuState();	//create a new menu state object
 */
 function onMenuMouseOver(event)
 {
-	var menu=getDescendantElementByClassName(event.currentTarget, STYLES.MENU_CHILDREN);	//get the menu below us TODO use a constant
+	var menu=DOMUtilities.getDescendantElementByClassName(event.currentTarget, STYLES.MENU_CHILDREN);	//get the menu below us TODO use a constant
 	if(menu)	//if there is a menu below us
 	{
 		menuState.openMenu(menu);	//open this menu
@@ -3823,7 +4039,7 @@ function onMenuMouseOver(event)
 */
 function onMenuMouseOut(event)
 {
-	var menu=getDescendantElementByClassName(event.currentTarget, STYLES.MENU_CHILDREN);	//get the menu below us
+	var menu=DOMUtilities.getDescendantElementByClassName(event.currentTarget, STYLES.MENU_CHILDREN);	//get the menu below us
 	if(menu)	//if there is a menu below us
 	{
 		menuState.closeMenu(menu);	//close this menu
@@ -3843,7 +4059,7 @@ try
 		var dragHandle=event.target;	//get the target of the event
 			//TODO make sure this isn't the context mouse button
 //TODO del alert("checking to start drag");
-		var dragSource=getAncestorElementByClassName(dragHandle, STYLES.DRAG_SOURCE);	//determine which element to drag
+		var dragSource=DOMUtilities.getAncestorElementByClassName(dragHandle, STYLES.DRAG_SOURCE);	//determine which element to drag
 		if(dragSource)	//if there is a drag source
 		{
 //TODO del alert("found drag source: "+dragSource.nodeName);
@@ -3890,8 +4106,8 @@ function onDragEnd(event)
 		if(dropTarget)	//if the mouse was dropped over a drop target
 		{
 //TODO del when works alert("over drop target: "+dropTarget.nodeName);
-			var dragSourceComponent=getAncestorElementByClassName(dragState.dragSource, STYLES.COMPONENT);	//get the component element TODO improve all this; decide if we want the dropTarget style on the component element or the drop target subcomponent, and how we want to relate that to the component ID
-			var dropTargetComponent=getAncestorElementByClassName(dropTarget, STYLES.COMPONENT);	//get the component element TODO improve all this; decide if we want the dropTarget style on the component element or the drop target subcomponent, and how we want to relate that to the component ID
+			var dragSourceComponent=DOMUtilities.getAncestorElementByClassName(dragState.dragSource, STYLES.COMPONENT);	//get the component element TODO improve all this; decide if we want the dropTarget style on the component element or the drop target subcomponent, and how we want to relate that to the component ID
+			var dropTargetComponent=DOMUtilities.getAncestorElementByClassName(dropTarget, STYLES.COMPONENT);	//get the component element TODO improve all this; decide if we want the dropTarget style on the component element or the drop target subcomponent, and how we want to relate that to the component ID
 			if(dragSourceComponent && dropTargetComponent)	//if there source and target components
 			{
 				var ajaxRequest=new DropAJAXEvent(dragState, dragSourceComponent, dropTargetComponent, event);	//create a new AJAX drop event TODO probably remove the dragState parameter
@@ -3915,8 +4131,8 @@ function onSliderThumbDragBegin(event)
 				//TODO make sure this isn't the context mouse button
 		var thumb=event.currentTarget;	//get the target of the event
 //TODO del alert("thumb offsetWidth: "+thumb.offsetWidth+" offsetHeight: "+thumb.offsetHeight);
-		var slider=getAncestorElementByClassName(thumb, STYLES.SLIDER_CONTROL);	//find the slider
-		var track=getAncestorElementByClassName(thumb, STYLES.SLIDER_CONTROL_TRACK);	//find the slider track
+		var slider=DOMUtilities.getAncestorElementByClassName(thumb, STYLES.SLIDER_CONTROL);	//find the slider
+		var track=DOMUtilities.getAncestorElementByClassName(thumb, STYLES.SLIDER_CONTROL_TRACK);	//find the slider track
 		
 		
 //TODO find out why the slider track gets constantly reloaded in IE6
@@ -3926,7 +4142,7 @@ function onSliderThumbDragBegin(event)
 		var positionInput=document.getElementById(positionID);	//get the position element		
 		if(slider && track && positionInput)	//if we found the slider and the slider track
 		{
-			var isHorizontal=hasClassName(track, STYLES.AXIS_X);	//see if this is a horizontal slider
+			var isHorizontal=DOMUtilities.hasClassName(track, STYLES.AXIS_X);	//see if this is a horizontal slider
 			dragState=new DragState(thumb, event.clientX, event.clientY);	//create a new drag state
 			dragState.dragCopy=false;	//drag the actual element, not a copy
 			if(isHorizontal)	//if this is a horizontal slider
@@ -3993,12 +4209,12 @@ This implementation also sets the thumb[GUISE_STATE_WIDTH_ATTRIBUTE] and thumb[G
 */
 function updateSlider(slider)	//TODO maybe rename to updateSliderView
 {
-	if(hasClassName(slider, "sliding"))	//if the slider is not in a sliding state according to the server (i.e. the thumb is not being manually moved by the user) TODO use a constant
+	if(DOMUtilities.hasClassName(slider, "sliding"))	//if the slider is not in a sliding state according to the server (i.e. the thumb is not being manually moved by the user) TODO use a constant
 	{
 		return;	//don't update the slider while the server still thinks the slider is sliding
 	}
-	var track=getDescendantElementByClassName(slider, STYLES.SLIDER_CONTROL_TRACK);	//find the slider track
-	var thumb=getDescendantElementByClassName(slider, STYLES.SLIDER_CONTROL_THUMB);	//find the slider thumb
+	var track=DOMUtilities.getDescendantElementByClassName(slider, STYLES.SLIDER_CONTROL_TRACK);	//find the slider track
+	var thumb=DOMUtilities.getDescendantElementByClassName(slider, STYLES.SLIDER_CONTROL_THUMB);	//find the slider thumb
 	if(dragState && dragState.dragging && dragState.dragSource==thumb)	//if the slider thumb is being dragged (i.e. the browser things the slider is being dragged)
 	{
 		return;	//don't update the slider while a drag is occurring
@@ -4034,7 +4250,7 @@ function updateSlider(slider)	//TODO maybe rename to updateSliderView
 			thumb[GUISE_STATE_HEIGHT_ATTRIBUTE]=thumb.offsetHeight;	//set the thumb height so that it won't change later with the Mozilla bug if the thumb is partially outside the track
 		}
 		var position=positionInput.value ? parseFloat(positionInput.value) : 0;	//get the position TODO make sure this logic is in synch with whether server code will always provide a value, even for null
-		var isHorizontal=hasClassName(track, STYLES.AXIS_X);	//see if this is a horizontal slider
+		var isHorizontal=DOMUtilities.hasClassName(track, STYLES.AXIS_X);	//see if this is a horizontal slider
 		if(isHorizontal)	//if this is a horizontal slider
 		{
 			var min=0;	//calculate the minimum
@@ -4123,7 +4339,7 @@ function onMouse(event)
 			}
 		}
 	}
-	var component=getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element
+	var component=DOMUtilities.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element
 	if(component)	//if we know the component
 	{
 		var eventType;	//we'll determine the type of AJAX mouse event to send
@@ -4140,7 +4356,7 @@ function onMouse(event)
 			default:	//TODO assert an error or warning
 				return;				
 		}
-		if(hasClassName(target, STYLES.MOUSE_LISTENER))	//if this is a mouse listener, report the event
+		if(DOMUtilities.hasClassName(target, STYLES.MOUSE_LISTENER))	//if this is a mouse listener, report the event
 		{
 			var ajaxRequest=new MouseAJAXEvent(eventType, component, target, event);	//create a new AJAX mouse event
 			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
@@ -4154,189 +4370,14 @@ function onMouse(event)
 @param node The node the form of which to find, or null if the search should not take place.
 @return The form in which the node lies, or null if the node is not within a form.
 */
-function getForm(node)
+function getForm(node)	//TODO improve; currently this two-direction search is needed because some components, such as frames, can live outside forms; change this so that frames get added inside the form
 {
-	var form=getAncestorElementByName(node, "form");	//get the form ancestor
+	var form=DOMUtilities.getAncestorElementByName(node, "form");	//get the form ancestor
 	if(form==null)	//if there is no form ancestor (e.g. the node is a frame outside the form)
 	{
-		form=getDescendantElementByName(document.documentElement, "form");	//search the whole document for the form
+		form=DOMUtilities.getDescendantElementByName(document.documentElement, "form");	//search the whole document for the form
 	}
 	return form;	//return the form we found, if any
-}
-
-/**Retrieves the ancestor menu element of the node, starting at the node itself.
-@param node The node the ancestor of which to find, or null if the search should not take place.
-@return The menu ancestor, or null if there is no menu ancestor.
-*/
-function getMenu(node)	//TODO rename method when works
-{
-	return getAncestorElementByClassName(node, STYLES.MENU_BODY);	//TODO comment
-}
-
-/**Retrieves the named ancestor element of the given node, starting at the node itself.
-@param node The node the ancestor of which to find, or null if the search should not take place.
-@param elementName The name of the element to find.
-@return The named element in which the node lies, or null if the node is not within such a named element.
-*/
-function getAncestorElementByName(node, elementName)
-{
-	while(node && (node.nodeType!=Node.ELEMENT_NODE || node.nodeName.toLowerCase()!=elementName))	//while we haven't found the named element
-	{
-		node=node.parentNode;	//get the parent node
-	}
-	return node;	//return the element we found
-}
-
-/**Retrieves the ancestor element with the given class of the given node, starting at the node itself. Multiple class names are supported.
-@param node The node the ancestor of which to find, or null if the search should not take place.
-@param className The name of the class for which to check, or a regular expression if a match should be found.
-@return The element with the given class in which the node lies, or null if the node is not within such an element.
-*/
-function getAncestorElementByClassName(node, className)
-{
-	while(node)	//while we haven't reached the top of the hierarchy
-	{
-		if(node.nodeType==Node.ELEMENT_NODE && hasClassName(node, className))	//if this is an element and this class name is one of the class names
-		{
-			return node;	//this node has a matching class name; we'll use it
-		}
-		node=node.parentNode;	//try the parent node
-	}
-	return node;	//return whatever node we found
-}
-
-/**Retrieves the descendant element with the given name and attributes, starting at the node itself.
-Currently this function only accepts a single parameter specification.
-@param node The node the descendant of which to find, or null if the search should not take place.
-@param elementName The name of the element to find.
-@param parameters (...) Zero or more parameters of type Parameter, each representing an attribute name and value that should be present (or, if the parameter value is null, an attribute that must not be present).
-@return The element with the given name, or null if there is no such element descendant.
-*/
-function getDescendantElementByName(node, elementName, parameters)
-{
-	if(node)	//if we have a node
-	{
-		var argumentCount=arguments.length;	//find out how many arguments there are
-		if(node.nodeType==Node.ELEMENT_NODE && node.nodeName.toLowerCase()==elementName)	//if this is an element with the given name
-		{
-			var parametersMatch=true;	//start out assuming that the parameters match		
-			for(var i=2; i<argumentCount && parametersMatch; ++i)	//for each argument (not counting the first two), as long as all parameters match so far
-			{
-				var parameter=arguments[i];	//get this argument
-				if(node.getAttribute(parameter.name)!=parameter.value)	//if this attribute doesn't exist or doesn't have the correct value
-				{
-					parametersMatch=false;	//indicate that the parameters do not match
-				}
-			}
-			if(parametersMatch)	//if all the parameters match
-			{
-				return node;	//show that we found a matching element name and attribute(s)
-			}
-		}
-		var childNodeList=node.childNodes;	//get all the child nodes
-		var childNodeCount=childNodeList.length;	//find out how many children there are
-		for(var i=0; i<childNodeCount; ++i)	//for each child node
-		{
-			var childNode=childNodeList[i];	//get this child node
-			if(argumentCount==2)	//if there are only two arguments
-			{
-				var match=getDescendantElementByName(childNode, elementName);	//see if we can find the node in this branch
-			}
-			else	//if there are more arguments
-			{
-				var match=getDescendantElementByName(childNode, elementName, parameters);	//see if we can find the node in this branch TODO fix passing more than one parameter
-			}
-			if(match)	//if we found a match
-			{
-				return match;	//return it
-			}
-		}
-	}
-	return null;	//show that we didn't find a matching element
-}
-
-/**Retrieves the descendant element with the given class of the given node, starting at the node itself. Multiple class names are supported.
-@param node The node the descendant of which to find, or null if the search should not take place.
-@param className The name of the class for which to check, or a regular expression if a match should be found.
-@return The element with the given class for which the given node is a parent or itself, or null if there is no such element descendant.
-*/
-function getDescendantElementByClassName(node, className)
-{
-	if(node)	//if we have a node
-	{
-		if(node.nodeType==Node.ELEMENT_NODE && hasClassName(node, className))	//if this is an element with the given class name
-		{
-			return node;	//show that we found a matching element class name
-		}
-		var childNodeList=node.childNodes;	//get all the child nodes
-		var childNodeCount=childNodeList.length;	//find out how many children there are
-		for(var i=0; i<childNodeCount; ++i)	//for each child node
-		{
-			var childNode=childNodeList[i];	//get this child node
-			var match=getDescendantElementByClassName(childNode, className);	//see if we can find the node in this branch
-			if(match)	//if we found a match
-			{
-				return match;	//return it
-			}
-		}
-	}
-	return null;	//show that we didn't find a matching element
-}
-
-/**Determines whether the given element has the given class. Multiple class names are supported.
-@param element The element that should be checked for class.
-@param className The name of the class for which to check, or a regular expression if a match should be found.
-@return true if one of the element's class names equals the given class name.
-*/
-function hasClassName(element, className)
-{
-	return getClassName(element, className)!=null;	//see if we can find a matching class name
-/*TODO del when works
-	var classNamesString=element.className;	//get the element's class names
-	var classNames=classNamesString ? classNamesString.split(/\s/) : EMPTY_ARRAY;	//split out the class names
-	return className instanceof RegExp ? classNames.containsMatch(className) : classNames.contains(className);	//return whether this class name is one of the class names
-*/
-}
-
-/**Returns the given element has the given class. Multiple class names are supported.
-@param element The element that should be checked for class.
-@param className The name of the class for which to check, or a regular expression if a match should be found.
-@return The given class name, which will be the regular expression match if a regular expression is used, or null if there is no matching class name.
-*/
-function getClassName(element, className)
-{
-	var classNamesString=element.className;	//get the element's class names
-	var classNames=classNamesString ? classNamesString.split(/\s/) : EMPTY_ARRAY;	//split out the class names
-	var index=className instanceof RegExp ? classNames.indexOfMatch(className) : classNames.indexOf(className);	//get the index of the matching class name
-	return index>=0 ? classNames[index] : null;	//return the matching class name, if there is one
-}
-
-/**Adds the given class name to the element's style class.
-@param element The element that should be given a class.
-@param className The name of the class to add.
-*/
-function addClassName(element, className)
-{
-	var classNamesString=element.className;	//get the element's class names
-	element.className=classNamesString ? classNamesString+" "+className : className;	//append the class name if there is a class name already
-}
-
-/**Removes the given class name from the element's style class.
-@param element The element that should have a class removed.
-@param className The name of the class to remove.
-*/
-function removeClassName(element, className)
-{
-	var classNamesString=element.className;	//get the element's class names
-	var classNames=classNamesString ? classNamesString.split(/\s/) : EMPTY_ARRAY;	//split out the class names
-	for(var i=classNames.length-1; i>=0; --i)	//for each index (starting from the end so that we can remove indices at will)
-	{
-		if(classNames[i]==className)	//if this is a class name to remove
-		{
-			classNames.remove(i);	//remove this index
-		}
-	}
-	element.className=classNames.join(" ");	//join the remaining class names back together and assign them back to the element's class name
 }
 
 /**Adds the given class name to all a component's elements.
@@ -4350,7 +4391,7 @@ function addComponentClassName(element, className, componentID)
 	var id=element.id;	//get the element ID
 	if(id==componentID || (id && id.startsWith(componentID+"-")))	//if the element ID is the component ID or starts with the component ID TODO use a constant
 	{
-		addClassName(element, className);	//add the class to the element
+		DOMUtilities.addClassName(element, className);	//add the class to the element
 	}
 	var childNodeList=element.childNodes;	//get all the child nodes
 	var childNodeCount=childNodeList.length;	//find out how many children there are
@@ -4375,7 +4416,7 @@ function removeComponentClassName(element, className, componentID)
 	var id=element.id;	//get the element ID
 	if(id==componentID || (id && id.startsWith(componentID+"-")))	//if the element ID is the component ID or starts with the component ID TODO use a constant
 	{
-		removeClassName(element, className);	//add the class to the element
+		DOMUtilities.removeClassName(element, className);	//add the class to the element
 	}
 	var childNodeList=element.childNodes;	//get all the child nodes
 	var childNodeCount=childNodeList.length;	//find out how many children there are
@@ -4386,106 +4427,6 @@ function removeComponentClassName(element, className, componentID)
 		{
 			removeComponentClassName(childNode, className, componentID);	//add this class to the child component
 		}
-	}
-}
-
-/**Determines whether the given node has the indicated ancestor, including the node itself in the search.
-@param node The node the ancestor of which to find, or null if the search should not take place.
-@param ancestor The ancestor to find.
-@return true if the node or one of its ancestors is the given ancestor.
-*/
-function hasAncestor(node, ancestor)
-{
-	while(node)	//while we haven't ran out of nodes
-	{
-		if(node==ancestor)	//if this node is the ancestor
-		{
-			return true;	//show that there was such an ancestor
-		}
-		node=node.parentNode;	//go up one level
-	}
-	return false;	//indicate that we didn't find the given ancestor
-}
-
-/**Gets the indicated parameter from a direct child comment of the given node.
-@param node The node for a which a comment parameter should be found.
-@param parameterName The name of the parameter to find.
-@return The specified parameter value, or null if no such parameter is found.
-*/
-/*TODO del; IE doesn't allow comments to be cloned easily; replace action confirmation parameters with inputs
-function getCommentParameter(node, parameterName)	//TODO replace the action confirmation parameter code with this method
-{
-	var childNodeList=node.childNodes;	//get all the child nodes of the element
-	var childNodeCount=childNodeList.length;	//find out how many children there are
-	for(var i=0; i<childNodeCount; ++i)	//for each child node
-	{
-		var childNode=childNodeList[i];	//get this child node
-		if(childNode.nodeType==Node.COMMENT_NODE && childNode.nodeValue)	//if this is a comment node
-		{
-			var commentValue=childNode.nodeValue;	//get the comment value
-alert("looking at comment value: "+commentValue);
-			var delimiterIndex=commentValue.indexOf(':');	//get the delimiter index
-			if(delimiterIndex>=0)	//if there is a delimiter
-			{
-				var paramName=commentValue.substring(0, delimiterIndex);	//get the parameter name
-				if(paramName=parameterName)	//if this is the correct parameter
-				{
-					return commentValue.substring(delimiterIndex+1);	//return the parameter value
-				}
-			}
-		}
-	}
-	return null;	//indicate that the given parameter could not be found
-}
-*/
-
-/**Gets the indicated parameter from a direct child input of the given node.
-@param node The node for a which an input parameter should be found.
-@param parameterName The name of the parameter to find.
-@return The specified parameter value, or null if no such parameter is found.
-*/
-function getInputParameter(node, parameterName)	//TODO replace the action confirmation parameter code with this method
-{
-	var childNodeList=node.childNodes;	//get all the child nodes of the element
-	var childNodeCount=childNodeList.length;	//find out how many children there are
-	for(var i=0; i<childNodeCount; ++i)	//for each child node
-	{
-		var childNode=childNodeList[i];	//get this child node
-		if(childNode.nodeType==Node.ELEMENT_NODE && childNode.nodeName.toLowerCase()=="input")	//if this is an input node TODO maybe make sure it's hidden
-		{
-			if(childNode.name==parameterName)	//if this is the correct parameter
-			{
-				return childNode.value;	//return the value
-			}
-		}
-	}
-	return null;	//indicate that the given parameter could not be found
-}
-
-/**Retrieves the immediate text nodes of the given element as a string.
-@param element The element from which to retrieve text.
-@return The text of the given element.
-*/ 
-function getText(element)
-{
-	var childNodeList=element.childNodes;	//get all the child nodes of the element
-	var childNodeCount=childNodeList.length;	//find out how many children there are
-	if(childNodeCount>0)	//if there are child nodes
-	{
-		var stringBuilder=new StringBuilder();	//create a new string builder to construct the string
-		for(var i=0; i<childNodeCount; ++i)	//for each child node
-		{
-			var childNode=childNodeList[i];	//get this child node
-			if(childNode.nodeType==Node.TEXT_NODE)	//if this is a text node
-			{
-				stringBuilder.append(childNode.nodeValue);	//append this value			
-			}
-		}
-		return stringBuilder.toString();	//return the string we constructed
-	}
-	else	//if there are no child nodes
-	{
-		return "";	//return an empty string
 	}
 }
 
