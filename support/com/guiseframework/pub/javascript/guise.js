@@ -85,13 +85,15 @@ var TAB_CLASS_SUFFIX="-tab";
 /**The class suffix of a decorator.*/
 //TODO del var DECORATOR_CLASS_PREFIX="-decorator";
 
-/**The prefix for Guise state-related attributes, which shouldn't be removed when elements are synchronized.*/
+/**The prefix for Guise state-related attributes, which shouldn't be removed when elements are synchronized.
+When more states are added, the GuiseAJAX.prototype.NON_REMOVABLE_ATTRIBUTE_SET should be updated.
+*/
 var GUISE_STATE_ATTRIBUTE_PREFIX="guiseState";
 
 /**The state attribute for width.*/
-var GUISE_STATE_WIDTH_ATTRIBUTE=GUISE_STATE_ATTRIBUTE_PREFIX+"width";
+var GUISE_STATE_WIDTH_ATTRIBUTE=GUISE_STATE_ATTRIBUTE_PREFIX+"Width";
 /**The state attribute for height.*/
-var GUISE_STATE_HEIGHT_ATTRIBUTE=GUISE_STATE_ATTRIBUTE_PREFIX+"height";
+var GUISE_STATE_HEIGHT_ATTRIBUTE=GUISE_STATE_ATTRIBUTE_PREFIX+"Height";
 
 /**The enumeration of recognized styles.*/
 var STYLES=
@@ -217,7 +219,7 @@ if(typeof document.createElementNS=="undefined")	//if the document does not supp
 	*/
 	document.createElementNS=function(namespaceURI, qname)	//create an adapter function to call document.createElement()
 	{
-    return document.createElement(qname);	//create the element, ignoring the namespace
+    return document.createElement(qname);	//create the element, ignoring the namespace TODO does this use closure unnecessarily?
 	};
 }
 
@@ -230,7 +232,7 @@ if(typeof document.createAttributeNS=="undefined")	//if the document does not su
 	*/
 	document.createAttributeNS=function(namespaceURI, qname)	//create an adapter function to call document.createAttribute()
 	{
-    return document.createAttribute(qname);	//create the attribute, ignoring the namespace
+    return document.createAttribute(qname);	//create the attribute, ignoring the namespace TODO does this use closure unnecessarily?
 	};
 }
 
@@ -694,7 +696,7 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 		{
 			var onLoad=function()	//create a function to call the function after the image is loaded TODO fix this creates a race condition, because the image could finish loading before we can install our listener
 					{
-						eventManager.removeEvent(img, "d", onLoad, false);	//stop waiting for the img to load
+						eventManager.removeEvent(img, "load", onLoad, false);	//stop waiting for the img to load
 						fn();	//call the function
 //TODO del alert("img loaded after waiting!");	//TODO del
 					};
@@ -732,51 +734,16 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 		return depth;	//return the depth we calculated
 	},
 
-	/**Retrieves the HTML attribute name from the DOM attribute name.
-	This method converts "class" to "className", for example.
-	@param domAttributeName The literal DOM attribute name.
-	@return The attribute name expected in HTML.
-	*/
-	getHTMLAttributeName:function(domAttributeName)
-	{
-		switch(domAttributeName)	//see which DOM attribute name was given
-		{
-			case "class":
-				return "className";
-			case "maxlength":	//see http://www.quirksmode.org/bugreports/archives/2005/02/IE_setAttributemaxlength_5_on_input.html
-				return "maxLength";
-			case "readonly":
-				return "readOnly";
-			default:	//for all other class names, return the DOM attribute
-				return domAttributeName;
-		}
-	},
-
-	/**Retrieves the CSS attribute name from the CSS style name.
-	This method converts "background-color" to "backgroundColor", for example.
-	@param cssStyleName The literal CSS style name name.
-	@return The attribute name expected in HTML DOM.
-	*/
-	getCSSAttributeName:function(cssStyleName)
-	{
-		switch(cssStyleName)	//see which CSS style name was given
-		{
-			case "background-color":
-				return "backgroundColor";
-			default:	//for all other style names, return the style name
-				return cssStyleName;
-		}
-	},
-
 	/**Sets the attribute value of an element, using namespaces if the DOM supports them.
 	@param element The element for which an attribute should be set.
 	@param namespaceURI The URI of the namespace.
 	@param qname The qualified name of the attribute.
 	@param value The value of the attribute.
 	*/
-	setAttributeNS:function(element, namespaceURI, qname, value)
+/*TODO del; not used
+	setAttributeNS:function(element, namespaceURI, qname, value)	//TODO improve by initial assignment of function
 	{
-		var attribute=document.createAttributeNS(namesapceURI, qname);	//create the attribute
+		var attribute=document.createAttributeNS(namespaceURI, qname);	//create the attribute
 		attribute.nodeValue=value;	//set the value
 		if(element.setAttributeNodeNS instanceof Function)	//if this DOM supports setAttributeNodeNS
 		{
@@ -787,12 +754,14 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 			element.setAttributeNode(attribute);	//set the attribute with no namespace information
 		}
 	},
+*/
 
 	/**Copies the style attribute by parsing out the individual style declarations and applying them to the destination style.
 	This method is needed because the IE DOM does not allow the style attribute to be copied directly.
 	@param destinationElement The destination of the style information.
 	@param sourceElement The source of the style information.
 	*/
+/*TODO del; not used
 	copyStyleAttribute:function(destinationElement, sourceElement)
 	{
 		var style=sourceElement.getAttribute("style");	//get the source style attribute
@@ -811,6 +780,7 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 			}				
 		}
 	},
+*/
 
 	/**Creates a string representation of the given node.
 	@param node The node to serialize.
@@ -838,11 +808,15 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 				for(var i=0; i<attributeCount; ++i)	//for each attribute
 				{
 					var attribute=attributes[i];	//get this attribute
-					this.appendXMLAttribute(stringBuilder, attribute.nodeName, attribute.nodeValue);	//append this attribute
+					var attributeValue=attribute.nodeValue;	//get the attribute value
+					if(attributeValue!=null)	//if this attribute value is not null (IE6 can return null attribute values for HTML DOM attributes)
+					{
+						this.appendXMLAttribute(stringBuilder, attribute.nodeName, attributeValue);	//append this attribute
+					}
 				}
 				var childNodes=node.childNodes;	//get a list of child nodes
 				var childNodeCount=childNodes.length;	//find out how many child nodes there are
-				if(childNodeCount>0 || nodeName=="div" || nodeName=="span" || nodeName=="label")	//if there are children (special-case "div" and "span" for IE, which will drop them from the DOM if they are empty) TODO use constants; create separate maintainable array
+				if(childNodeCount>0 || this.NON_EMPTY_ELEMENT_SET[nodeName])	//if there are children, or the element cannot be serialized as an empty element (IE6, for instance, which will drop "div" and "span" from the DOM if they are empty)
 				{				
 					stringBuilder.append(">");	//>
 					for(var i=0; i<childNodeCount; ++i)	//for all of the child nodes
@@ -919,16 +893,12 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 	The attribute-value combination will be preceded by a space.
 	@param stringBuilder The string builder to hold the data.
 	@param attributeName The name of the XML attribute.
-	@param attributeValue The value of the XML attribute.
+	@param attributeValue The value of the XML attribute, which cannot be null.
 	@return A reference to the string builder.
 	*/ 
 	appendXMLAttribute:function(stringBuilder, attributeName, attributeValue)
 	{
-			//TODO assert attributeValue!=null, which will happen if we try to serialize an IE element; fix further up the call stack by representing null attributes
-		if(attributeValue!=null)	//if the attribute value is not null, which will happen if we try to serialize an IE element TODO testing; update API documentation
-		{
-			stringBuilder.append(" ").append(attributeName).append("=\"").append(this.encodeXML(attributeValue.toString())).append("\"");	//name="value"
-		}
+		stringBuilder.append(" ").append(attributeName).append("=\"").append(this.encodeXML(attributeValue.toString())).append("\"");	//name="value"
 		return stringBuilder;	//return the string builder
 	},
 
@@ -965,9 +935,46 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 		var classNamesString=element.getAttribute("class");	//get the element's class names
 		var classNames=classNamesString ? classNamesString.split(/\s/) : EMPTY_ARRAY;	//split out the class names
 		return className instanceof RegExp ? classNames.containsMatch(className) : classNames.contains(className);	//return whether this class name is one of the class names
+	},
+
+	/**Map of DOM attribute names keyed to HTML attribute names.
+	For example, the key "readOnly" yields "readonly".
+	Attribute names that do not change are not included in the map.
+	*/
+	DOM_ATTRIBUTE_NAME_MAP:
+	{
+		"className": "class",
+		"maxLength": "maxlength", //see http://www.quirksmode.org/bugreports/archives/2005/02/IE_setAttributemaxlength_5_on_input.html
+		"readOnly": "readonly"
+	},
+
+	/**Map of HTML attribute names keyed to DOM attribute names.
+	For example, the key "class" yields "className".
+	Attribute names that do not change are not included in the map. 
+	*/
+	HTML_ATTRIBUTE_NAME_MAP:
+	{
+		"class": "className",
+		"maxlength": "maxLength", //see http://www.quirksmode.org/bugreports/archives/2005/02/IE_setAttributemaxlength_5_on_input.html
+		"readonly": "readOnly"
+	},
+
+	/**Map of CSS attribute names keyed to CSS style names.
+	For example, the key "background-color" yields "backgroundColor".
+	Style names that do not change are not included in the map.
+	*/
+	CSS_ATTRIBUTE_NAME_MAP:
+	{
+		"background-color": "backgroundColor"
+	},
+
+	/**The set of names of elements that cannot be serialized as empty elements.*/
+	NON_EMPTY_ELEMENT_SET:
+	{
+		"div": true,
+		"span": true,
+		"label": true
 	}
-
-
 	
 };
 
@@ -1119,30 +1126,41 @@ function HTTPCommunicator()
 		{
 			this.processHTTPResponse=fn;	//save the function for processing HTTP responses
 		};
-		
-		/**@return A newly created XML HTTP request object.*/
-		HTTPCommunicator.prototype._createXMLHTTP=function()
+
+		if(window.XMLHttpRequest)	//if we can create an XML HTTP request (e.g. Mozilla)
+		{		
+			/**@return A newly created XML HTTP request object.*/
+			HTTPCommunicator.prototype._createXMLHTTP=function()
+			{
+				return new XMLHttpRequest();	//create a new XML HTTP request object
+			};
+		}
+		else if(window.ActiveXObject)	//if we can create ActiveX objects
 		{
-			if(window.XMLHttpRequest)	//if we can create an XML HTTP request (e.g. Mozilla)
+			var msXMLHTTPVersion;	//we'll determine the correct version of the ActiveX to use
+			for(var i=this.MSXMLHTTP_VERSIONS.length-1; i>=0; --i)	//for each available version
 			{
-				return new XMLHttpRequest();
-			}
-			else if(window.ActiveXObject)	//if we can create ActiveX objects
-			{
-				for(var i=this.MSXMLHTTP_VERSIONS.length-1; i>=0; --i)	//for each available version
+				try
 				{
-					try
-					{
-						return new ActiveXObject(this.MSXMLHTTP_VERSIONS[i]);	//try to create a new ActiveX object
-					}
-					catch(exception)	//ignore the errors
-					{
-					}
+					msXMLHTTPVersion=this.MSXMLHTTP_VERSIONS[i];	//get this version
+					new ActiveXObject(msXMLHTTPVersion);	//try to create a new ActiveX object
+					break;	//if we could create this ActiveX object, use it
+				}
+				catch(exception)	//ignore the errors
+				{
 				}
 			}
+			/**@return A newly created XML HTTP request object.*/
+			HTTPCommunicator.prototype._createXMLHTTP=function()
+			{
+				return new ActiveXObject(msXMLHTTPVersion);	//create a new ActiveX object, using closure to return the version determined to work
+			};
+		}
+		else	//if we can't create an XML HTTP request or an ActiveX object
+		{
 			throw new Error("XMLHTTP not available.");
 		};
-		
+
 		/**Performs an HTTP GET request.
 		@param uri The request URI.
 		@param query Query information for the URI of the GET request, or null if there is no query.
@@ -1791,6 +1809,24 @@ alert(exception);
 */
 		};
 
+
+		/**The set of attribute names that should not be removed when synchronizing.*/
+		GuiseAJAX.prototype.NON_REMOVABLE_ATTRIBUTE_SET=
+		{
+			"style":true,	//don't remove local styles, because they may be used by Guise (with frames, for instance)
+			"onclick":true,	//don't remove the onclick attribute, because we may be using it for Safari to prevent a default action
+			"hideFocus":true,	//don't remove the IE hideFocus attribute, because we're using it to fix the IE6 lack of CSS outline: none support
+			"guiseStateWidth":true,	//don't remove Guise state attributes
+			"guiseStateHeight":true
+		};
+
+		/**The set of attribute names that should not be copied literally when synchronizing.*/
+		GuiseAJAX.prototype.UNCOPIED_ATTRIBUTE_SET=
+		{
+			"style":true,	//if this is a style attribute, we have to treat it differently, because neither Mozilla nor IE provide normal DOM access to the literal style attribute value
+			"guise:patchType":true	//the guise:patchType attribute is used for patching information
+		};
+
 		/**Synchronizes an element hierarchy with its patch element.
 		@param oldElement The old version of the element.
 		@param element The element hierarchy to patch into the existing document.
@@ -1813,22 +1849,12 @@ alert(exception);
 				var oldAttribute=oldAttributes[i];	//get this attribute
 				var oldAttributeName=oldAttribute.nodeName;	//get the attribute name
 				var oldAttributeValue=oldAttribute.nodeValue;	//get the attribute value
-				var attributeName=oldAttributeName;
-				if(oldAttributeName=="readOnly")	//TODO fix for other misspelled attributes, such as className
-				{
-					attributeName="readonly";
-				}
+				var attributeName=DOMUtilities.DOM_ATTRIBUTE_NAME_MAP[oldAttributeName] || oldAttributeName;	//convert the attribute name to its standard DOM form, changing "readOnly" to "readonly", for example
 //TODO fix or del				if(attributeValue!=null && attributeValue.length>0 && !element.getAttribute(attributeName))	//if there is really an attribute value (IE provides all possible attributes, even with those with no value) and the new element doesn't have this attribute
-				if(element.getAttribute(attributeName)==null)	//if the new element doesn't have this attribute
+				if(element.getAttribute(attributeName)==null && !this.NON_REMOVABLE_ATTRIBUTE_SET[attributeName])	//if the new element doesn't have this attribute, and this isn't an attribute we shouldn't remove
 				{
-					if(attributeName!="style"	//don't remove local styles, because they may be used by Guise (with frames, for instance)
-							&& attributeName!="onclick"	//don't remove the onclick attribute, because we may be using it for Safari to prevent a default action
-							&& attributeName!="hideFocus"	//don't remove the IE hideFocus attribute, because we're using it to fix the IE6 lack of CSS outline: none support
-							&& !attributeName.startsWith(GUISE_STATE_ATTRIBUTE_PREFIX))	//don't remove Guise state attributes
-					{
 //TODO del alert("ready to remove "+oldElement.nodeName+" attribute "+oldAttributeName+" with current value "+oldAttributeValue);
-						oldElement.removeAttribute(oldAttributeName);	//remove the attribute normally (apparently no action will take place if performed on IE-specific attributes such as element.start)
-					}
+					oldElement.removeAttribute(oldAttributeName);	//remove the attribute normally (apparently no action will take place if performed on IE-specific attributes such as element.start)
 //TODO fix					i=0;	//TODO fix; temporary to get out of looking at all IE's attributes
 				}
 			}
@@ -1841,17 +1867,10 @@ alert(exception);
 			for(var i=attributes.length-1; i>=0; --i)	//for each attribute
 			{
 				var attribute=attributes[i];	//get this attribute
-				var attributeName=DOMUtilities.getHTMLAttributeName(attribute.nodeName);	//get the attribute name, compensating for special HTML attributes such as "className"
+				var attributeNodeName=attribute.nodeName;	//get the node name
+				var attributeName=DOMUtilities.HTML_ATTRIBUTE_NAME_MAP[attributeNodeName] || attributeNodeName;	//get the attribute name, compensating for special HTML attributes such as "className"
 				var attributeValue=attribute.nodeValue;	//get the attribute value
-				if(attributeName=="style")	//if this is a style attribute, we have to treat it differently, because neither Mozilla nor IE provide normal DOM access to the literal style attribute value
-				{
-					//TODO remove clause with negative check
-				}
-				else if(attributeName=="guise:patchType")	//ignore the guise:patchType attribute TODO check; use a constant
-				{
-					//TODO remove clause with negative check
-				}
-				else	//for any other attribute
+				if(!this.UNCOPIED_ATTRIBUTE_SET[attributeName])	//if this is not an attribute that shouldn't be copied
 				{
 					if(attributeName=="value")	//if this is the value attribute
 					{
@@ -2064,7 +2083,8 @@ catch(e)
 					var styleComponents=styles[styleIndex].split(":");	//get a reference to this style and split out the property and value
 					if(styleComponents.length==2)	//we expect there to be a property and a value
 					{
-						var styleProperty=DOMUtilities.getCSSAttributeName(styleComponents[0].trim());	//retrieve get the trimmed style property and get the HTML DOM attribute version
+						var styleToken=styleComponents[0].trim();	//trim the token
+						var styleProperty=DOMUtilities.CSS_ATTRIBUTE_NAME_MAP[styleToken] || styleToken;	//get the CSS DOM attribute version
 						var styleValue=styleComponents[1].trim();	//get the trimmed style value
 						delete removableStyles[styleProperty];	//remove this style from the map of removable styles, indicating that we shouldn't remove this style
 						if(oldElement.style[styleProperty]!=styleValue)	//if the style is different	TODO check about removing a style
@@ -2120,7 +2140,8 @@ com.guiseframework.js.Client=function()
 	this._modalIFrame=null;
 
 	/**The map of cursors that have been temporarily changed, keyed to the ID of the element the cursor of which has been changed.
-	This is a tentative implementation, as blindly resetting the cursor after AJAX processing will prevent new cursors to be changed via AJAX.	*/
+	This is a tentative implementation, as blindly resetting the cursor after AJAX processing will prevent new cursors to be changed via AJAX.
+	*/
 	this.oldElementIDCursors=new Object();
 
 	if(!com.guiseframework.js.Client._initialized)
@@ -3756,7 +3777,8 @@ function MenuState()
 			{
 				clearTimeout(timeout);	//clear the timeout
 			}
-			this._closeTimeout=window.setTimeout("menuState._closeMenus();", 500);	//TODO fix; use local function with closure; place variables in W3Compiler build script so they won't get mangled
+			var localThis=this;	//get a reference to this object to allow calling this via closure
+			this._closeTimeout=window.setTimeout(function(){localThis._closeMenus()}, 500);	//close the menu a split second later
 		};
 
 		/**Closes all menus immediately.*/

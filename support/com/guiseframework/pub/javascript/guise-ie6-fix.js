@@ -69,8 +69,8 @@ function CSSElementSelector(selectorText)
 			this.ie6FixClassName=null;	//don't create a special IE 6 class
 			this.ie6FixSelectorText=this.selectorText;	//use the standard selector text
 		}
-		this.hasMultipleClassSelector=this.classes.length>1;	//determine if the element selectors selects on multiple classes
 	}
+	this.isMultipleClassSelector=this.classes.length>1;	//determine if the element selectors selects on multiple classes
 
 	if(!CSSElementSelector.prototype._initialized)
 	{
@@ -113,14 +113,14 @@ function CSSSelector(selectorText)
 	this.selectorText=selectorText;	//save the selector text
 	var elementSelectors=selectorText.split(/\s/);
 	this.elementSelectors=new Array(elementSelectors.length);	//create a new array in which to hold each element selector object
-	var hasMultipleClassSelector=false;	//we'll determine if one of the element selectors selects on multiple classes
+	this.isMultipleClassSelector=false;	//we'll determine if one of the element selectors selects on multiple classes
 	var ie6FixSelectorTexts=new Array();	//create an array of IE6 selector text
 	for(var elementSelectorIndex=0; elementSelectorIndex<elementSelectors.length; ++elementSelectorIndex)
 	{
 		var elementSelector=new CSSElementSelector(elementSelectors[elementSelectorIndex]);	//create an element selector object from this element selector string
 		this.elementSelectors[elementSelectorIndex]=elementSelector;	//save the element selector
 		ie6FixSelectorTexts.add(elementSelector.ie6FixSelectorText);	//save the IE6 selector text for this selector
-		if(elementSelector.hasMultipleClassSelector)	//if this element selector selects on multiple classes
+		if(elementSelector.isMultipleClassSelector)	//if this element selector selects on multiple classes
 		{
 			this.isMultipleClassSelector=true;	//show that this is a multiple-class selector
 		}
@@ -206,7 +206,7 @@ function GuiseIE6Fix(selectorText)
 				for(var elementSelectorIndex=elementSelectors.length-1; elementSelectorIndex>=0; --elementSelectorIndex)	//for each element selector
 				{
 					var elementSelector=elementSelectors[elementSelectorIndex];	//get a reference to this element selector
-					if(elementSelector.hasMultipleClassSelector && elementSelector.selects(element, elementClassNames))	//if this element selector selects multiple classes and selects this element
+					if(elementSelector.isMultipleClassSelector && elementSelector.selects(element, elementClassNames))	//if this element selector selects multiple classes and selects this element
 					{
 						elementClassNames.add(elementSelector.ie6FixClassName);	//add the IE6 fix class for this selector
 						classNameModified=true;	//note the we modified the class name
