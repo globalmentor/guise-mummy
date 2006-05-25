@@ -1,5 +1,9 @@
 /*Guise(TM) JavaScript support routines
 Copyright (c) 2005-2006 GlobalMentor, Inc.
+
+This script expects the following variables to be defined:
+navigator.userAgentName The name of the user agent, such as "Firefox", "Mozilla", "MSIE", or "Opera".
+navigator.userAgentVersionNumber The version of the user agent stored as a number.
 */
 
 /*Guise AJAX Request Format, content type application/x-guise-ajax-request+xml
@@ -60,13 +64,13 @@ Guise will also automatically add and remove a "rollover" class to the component
 
 //TODO before sending a drop event, send a component update for the drop target so that its value will be updated; or otherwise make sure the value is synchronized
 
+/**See if the browser is IE6.*/
+var isUserAgentIE6=navigator.userAgentName=="MSIE" && navigator.userAgentVersionNumber<7;
+
 var AJAX_ENABLED=true;	//TODO allow this to be configured
 
-/**See if the browser is IE.*/
-var isIE=navigator.userAgent.indexOf("MSIE")>=0;	//TODO use a better variable; do better checks---this will be fooled by Opera maquerading as IE, for example
-
 /**See if the browser is Safari.*/
-var isSafari=navigator.userAgent.indexOf("Safari")>=0;	//TODO use a better variable; do better checks
+var isSafari=navigator.userAgent.indexOf("Safari")>=0;	//TODO use a better variable; do better checks; update Guise server routines to check for Safari
 
 /**The URI of the XHTML namespace.*/
 var XHTML_NAMESPACE_URI="http://www.w3.org/1999/xhtml";
@@ -481,6 +485,28 @@ String.prototype.hasSubstring=function(substring, index)
 	}
 	return true;	//show that the string matches
 }
+
+/**Splits a string and returns an associative array with the contents.
+Each the value of each key of the associative array will be set to true.
+Empty and null splits will be ignored.
+@param separator The optional separator string or regular expression; if no separator is provided, the entire string is placed in the set.
+@param limit The optional limit to the number of splits to be found.
+@return An associative array with they keys set to the elements of the split string.
+*/
+String.prototype.splitSet=function(separator, limit)
+{
+	var splitSet=new Object();	//create an associative array
+	var splits=this.split(separator, limit);	//split the string into an array
+	for(var i=splits.length-0; i>=0; --i)	//for each split
+	{
+		var split=splits[i];	//get this split
+		if(split)	//if this is a valid split
+		{
+			splitSet[split]=true;	//add this split to the set
+		}
+	}
+	return splitSet;	//return the set of splits
+};
 
 /**Trims the given string of whitespace.
 @see https://lists.latech.edu/pipermail/javascript/2004-May/007570.html
@@ -998,16 +1024,10 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 						this.appendXMLAttribute(stringBuilder, attribute.nodeName, attributeValue);	//append this attribute
 					}
 				}
-				var childNodes=node.childNodes;	//get a list of child nodes
-				var childNodeCount=childNodes.length;	//find out how many child nodes there are
-				if(childNodeCount>0 || this.NON_EMPTY_ELEMENT_SET[nodeName])	//if there are children, or the element cannot be serialized as an empty element (IE6, for instance, which will drop "div" and "span" from the DOM if they are empty)
+				if(node.childNodes.length>0 || this.NON_EMPTY_ELEMENT_SET[nodeName])	//if there are children, or the element cannot be serialized as an empty element (IE6, for instance, which will drop "div" and "span" from the DOM if they are empty)
 				{				
 					stringBuilder.append(">");	//>
-					for(var i=0; i<childNodeCount; ++i)	//for all of the child nodes
-					{
-						var childNode=childNodes[i];	//get a reference to this child node
-						this.appendNodeString(stringBuilder, childNode);	//append this child node
-					}
+					this.appendNodeContentString(stringBuilder, node);	//append this node's content
 					this.appendXMLEndTag(stringBuilder, nodeName);	//append the end tag
 				}
 				else	//if there are no children, create an empty element (otherwise, for elements like <input></input>, IE6 will see two elements)
@@ -1022,6 +1042,23 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 				this.appendXMLText(stringBuilder, node.nodeValue);	//append the node's text value
 				break;
 			//TODO add checks for other elements, such as CDATA
+		}
+		return stringBuilder;	//return the string builder
+	},
+
+	/**Appends a string representation of the given node's content.
+	@param stringBuilder The string builder to which a text representation of the node content should be appended.
+	@param node The node the content of which to serialize.
+	@return A reference to the string builder.
+	*/
+	appendNodeContentString:function(stringBuilder, node)
+	{
+		var childNodes=node.childNodes;	//get a list of child nodes
+		var childNodeCount=childNodes.length;	//find out how many child nodes there are
+		for(var i=0; i<childNodeCount; ++i)	//for all of the child nodes
+		{
+			var childNode=childNodes[i];	//get a reference to this child node
+			this.appendNodeString(stringBuilder, childNode);	//append this child node
 		}
 		return stringBuilder;	//return the string builder
 	},
@@ -2049,12 +2086,16 @@ alert(exception);
 					var valueChanged=oldAttributeValue!=attributeValue;	//see if the value is really changing
 					if(valueChanged)	//if the value is changing, see if we have to do fixes for IE6 (if the value hasn't changed, that means there were no fixes before and no fixes afterwards; we may want to categorically do fixes in the future if we add attribute-based selectors)
 					{
-						if(attributeName=="className");	//if we're changing the class name
+						if(attributeName=="className")	//if we're changing the class name
 						{
 							if(typeof guiseIE6Fix!="undefined")	//if we have IE6 fix routines loaded
 							{
-								attributeValue=guiseIE6Fix.getFixedElementClassName(oldElement, attributeValue);	//get the IE6 fixed form of the class name TODO make sure this is done last if we start doing CSS2 attribute-based selectors
-								valueChanged=oldAttributeValue!=attributeValue;	//check again to see if the value is really changing; maybe the value was originally different because we hadn't added the IE6 fixes
+								var fixedAttributeValue=guiseIE6Fix.getFixedElementClassName(oldElement, attributeValue);	//get the IE6 fixed form of the class name TODO make sure this is done last if we start doing CSS2 attribute-based selectors
+								valueChanged=fixedAttributeValue!=null;	//check again to see if the value is really changing; maybe the value was originally different because we hadn't added the IE6 fixes
+								if(valueChanged)	//if the fixed attribute value is any different from the proposed value
+								{
+									attributeValue=fixedAttributeValue;	//used the fixed class name
+								}
 							}
 						}
 					}
@@ -2177,6 +2218,12 @@ alert(exception);
 				{
 //TODO del alert("children are not compatible, old "+oldElement.nodeName+" with ID "+oldElement.id+" child node count: "+oldChildNodeCount+" new "+element.nodeName+" "+"with ID "+element.getAttribute("id")+" child node count "+childNodeCount+" (verify) "+element.childNodes.length);
 					DOMUtilities.removeChildren(oldElement);	//remove all the children from the old element and start from scratch
+/*TODO fix, if can improve IE6, but it probably won't help much, as most incompatible children may be single-child changes
+					if(isUserAgentIE6)	//if this is IE6, it will be much faster to use innerHTML to load the children
+					{
+						var innerHTML=DOMUtilities.DOMUtilities.appendNodeContentString(newStringBuilder, element);	//get the inner HTML to use
+					}
+*/
 //TODO del alert("incompatible old element now has children: "+oldElement.childNodes.length);
 				}
 				for(var i=0; i<childNodeCount; ++i)	//for each new child node
@@ -2562,7 +2609,7 @@ com.guiseframework.js.Client=function()
 				this._modalLayer.style.top="0px";
 				this._modalLayer.style.left="0px";
 				document.body.appendChild(this._modalLayer);	//add the modal layer to the document
-				if(isIE)	//if we're in IE, create a modal IFrame to keep select components from showing through; but don't do this in Mozilla, or it will keep the cursor from showing up for text inputs in absolutely positioned div elements above the IFrame
+				if(isUserAgentIE6)	//if we're in IE, create a modal IFrame to keep select components from showing through; but don't do this in Mozilla, or it will keep the cursor from showing up for text inputs in absolutely positioned div elements above the IFrame
 				{
 					this._modalIFrame=document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");	//create an IFrame TODO use a constant for the namespace
 					this._modalIFrame.src="about:blank";
@@ -3288,7 +3335,7 @@ function initializeNode(node)
 				switch(elementName)	//see which element this is
 				{
 					case "a":
-						if(isIE && DOMUtilities.hasClassName(node, "imageSelectActionControl"))	//if this is IE (TODO check for IE6), which doesn't support the CSS outline: none property, create a workaround TODO use a constant; create something more general than just the image select action control
+						if(isUserAgentIE6 && DOMUtilities.hasClassName(node, "imageSelectActionControl"))	//if this is IE6, which doesn't support the CSS outline: none property, create a workaround TODO use a constant; create something more general than just the image select action control
 						{
 							node.hideFocus="true";	//hide the focus on this element
 						}

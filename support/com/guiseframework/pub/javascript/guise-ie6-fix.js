@@ -78,20 +78,21 @@ function CSSElementSelector(selectorText)
 
 		/**Determines if the given element is selected by this element selector.
 		@param element The element to check.
-		@param elementClassNames The array of element class names, or null if they have not yet been calculated.
+		@param elementClassNameSet The optional associative array of element class name keys with true values; if not included, they will be calculated from the given element.
 		@return true if this selector selects the given element.
 		*/
-		CSSElementSelector.prototype.selects=function(element, elementClassNames)
+		CSSElementSelector.prototype.selects=function(element, elementClassNameSet)
 		{
 			if(this.elementName!=null && this.elementName.toLowerCase()!=element.nodeName.toLowerCase())	//if this selector doesn't match the element name
 				return false;	//the element name doesn't match
-			if(!elementClassNames)	//if no element class names have been calculated
+			if(!elementClassNameSet)	//if no element class names have been calculated
 			{
-				elementClassNames=element.className ? element.className.split(/\s/) : EMPTY_ARRAY;	//split out the class names
+				var elementClassName=element.className;	//get the element class name
+				elementClassNameSet=elementClassName ? elementClassName.splitSet(/\s/) : new Object();	//split out the class names into a set
 			}
 			for(var i=this.classes.length-1; i>=0; --i)	//for each class
 			{
-				if(!elementClassNames.contains(this.classes[i]))	//if this class name isn't included
+				if(!elementClassNameSet[this.classes[i]])	//if this class name isn't included
 				{
 					return false;	//this element is missing a class name
 				}
@@ -126,27 +127,6 @@ function CSSSelector(selectorText)
 		}
 	}
 	this.ie6FixSelectorText=ie6FixSelectorTexts.join(" ");	//join the element IE6 selector texts with spaces to get the overall IE6 selector text
-
-	if(!CSSSelector.prototype._initialized)
-	{
-		CSSSelector.prototype._initialized=true;
-
-		/**Determines whether the given element is included by the selector (i.e. it is part of the selection, if not the ultimate selection).
-		@param The element to check.
-		@return true if the given element is included in the selection path.
-		*/
-		CSSSelector.prototype.includes=function(element)
-		{
-			for(var i=this.elementSelectors.length-1; i>=0; --i)	//for each element selector
-			{
-				if(this.elementSelectors[i].selects(element))	//if the element is selected by this element selector
-				{
-					return true;	//the element is included in the selector
-				}
-			}
-			return false;	//indicate that no element selector matched the given element
-		};
-	}
 }
 
 /**
@@ -156,11 +136,9 @@ var cssMultiClassSelectors: An array of CSSSelector objects that include a multi
 function GuiseIE6Fix(selectorText)
 {
 
-	this.cssMultipleClassSelectors=new Array();	//create a new array of selectors
+	this.cssMultipleClassElementSelectors=new Array();	//create a new array of element selectors that select on multiple classes
 
 	//TODO del var selectorText="a b.c d.e.f .g";
-
-	this.httpCommunicator=new HTTPCommunicator();	//create a communicator to connect back to the server
 
 	if(!GuiseIE6Fix.prototype._initialized)
 	{
@@ -171,9 +149,8 @@ function GuiseIE6Fix(selectorText)
 		*/
 		GuiseIE6Fix.prototype.fixElementClassName=function(element)
 		{
-			var elementClassName=element.className;	//get the element's class name
-			var fixedElementClassName=this.getFixedElementClassName(element, elementClassName);	//get the fixed version of the class name
-			if(fixedElementClassName!=elementClassName)	//if the class name changed
+			var fixedElementClassName=this.getFixedElementClassName(element);	//get the fixed version of the class name
+			if(fixedElementClassName!=null)	//if the class name changed
 			{
 				element.className=fixedElementClassName;	//update the element class name
 //TODO fix alert("affected element "+element.nodeName+" id "+element.id+" with new class "+element.className);
@@ -182,43 +159,61 @@ function GuiseIE6Fix(selectorText)
 
 		/**Retrieves the fixed form of the element class name.
 		@param element The element to fix.
-		@param elementClassName The proposed class name of the element.
-		@return The fixed class name, which may or may not be different than the proposed class name.
+		@param elementClassName The optional proposed class name of the element; if no element name is provided, the element's current class name will be used.
+		@return The fixed class name, if different from the proposed class name, or null if the fixed element class name would be no different than the proposed class name.
 		*/
 		GuiseIE6Fix.prototype.getFixedElementClassName=function(element, elementClassName)
 		{
-			var classNameModified=false;	//we'll note whether we modifiy the class names
-			var elementClassNames=elementClassName ? elementClassName.split(/\s/) : EMPTY_ARRAY;	//split out the class names
-				//remove the IE6 fix classes, if any are already there
-			for(var classNameIndex=elementClassNames.length-1; classNameIndex>=0; --classNameIndex)	//for each class (looking backwards, so that item removal will not corrupt iteration)
+			if(typeof elementClassName=="undefined" || elementClassName==null)	//if no class name was provided
 			{
-				var className=elementClassNames[classNameIndex];	//get a reference to this class name
+				elementClassName=element.className;	//get the class name from the element
+			}
+			if(elementClassName=="")	//if there is no element class name, multiple selectors are irrelevent, so don't do any further checks
+			{
+				return null;	//indicate that there should be no changes
+			}
+			var classNameModified=false;	//we'll note whether we modifiy the class names
+			var elementClassNameSet=elementClassName.splitSet(/\s/);	//split out the class names into a set
+				//remove the IE6 fix classes, if any are already there
+			for(var className in elementClassNameSet)	//for each class name
+			{
 				if(className.startsWith(GuiseIE6Fix.GUISE_IE6_FIX_CLASS_PREFIX))	//if this is a special Guise IE6 fix class name
 				{
-					elementClassNames.remove(classNameIndex);	//remove this special Guise IE6 fix class name
+					delete elementClassNameSet[className];	//remove this special Guise IE6 fix class name
 					classNameModified=true;	//note the we modified the class name
 				}
 			}
-			for(var selectorIndex=this.cssMultipleClassSelectors.length-1; selectorIndex>=0; --selectorIndex)	//for each multiple class selector
+			var newClassNames=null;	//we'll create an array of new class names if we have to add fixed element selectors
+			for(var elementSelectorIndex=this.cssMultipleClassElementSelectors.length-1; elementSelectorIndex>=0; --elementSelectorIndex)	//for each multiple class element selector
 			{
-				var selector=this.cssMultipleClassSelectors[selectorIndex];	//get a reference to this selector
-				var elementSelectors=selector.elementSelectors;	//get the element selectors for this selector
-				for(var elementSelectorIndex=elementSelectors.length-1; elementSelectorIndex>=0; --elementSelectorIndex)	//for each element selector
+				var elementSelector=this.cssMultipleClassElementSelectors[elementSelectorIndex];	//get a reference to this element selector
+				if(elementSelector.selects(element, elementClassNameSet))	//if this element selector selects this element
 				{
-					var elementSelector=elementSelectors[elementSelectorIndex];	//get a reference to this element selector
-					if(elementSelector.isMultipleClassSelector && elementSelector.selects(element, elementClassNames))	//if this element selector selects multiple classes and selects this element
+					if(newClassNames==null)	//if there are no new class names
 					{
-						elementClassNames.add(elementSelector.ie6FixClassName);	//add the IE6 fix class for this selector
-						classNameModified=true;	//note the we modified the class name
+						newClassNames=new Array();	//create the array of new class names
 					}
+					newClassNames.add(elementSelector.ie6FixClassName);	//add the IE6 fix class for this selector						
+					classNameModified=true;	//note the we modified the class name
 				}
 			}
 			if(classNameModified)	//if we touched up the class names
 			{
-				elementClassName=elementClassNames.join(" ");	//join the class names back together and assign them back to the class name
+				if(newClassNames==null)	//if there are no new class names
+				{
+					newClassNames=new Array();	//create the array of new class names
+				}
+				for(var className in elementClassNameSet)	//for each remaining class name
+				{
+					newClassNames.add(className);	//add this class name to the array
+				}
+				return newClassNames.join(" ");	//join the new class names back together and return them
 //TODO fix alert("affected element "+element.nodeName+" id "+element.id+" with new class "+element.className);
 			}
-			return elementClassName;	//return the fixed class name
+			else	//if we didn't modify the class names
+			{
+				return null;	//indicate that nothing changed
+			}
 		};
 
 		/**Fixes a stylesheet, and all its imported stylesheets.
@@ -236,17 +231,26 @@ function GuiseIE6Fix(selectorText)
 					var rule=rules[ruleIndex];	//get a reference to this rule
 					var selectorText=rule.selectorText;	//get the selector text from the stylesheet, which we can trust because it has been fixed
 //TODO del alert("looking at selector: "+selectorText);
-					var cssSelector=new CSSSelector(selectorText);	//create a selector from this selector text
-					if(cssSelector.isMultipleClassSelector)	//if this is a multi-class selector
+					var selector=new CSSSelector(selectorText);	//create a selector from this selector text
+					if(selector.isMultipleClassSelector)	//if this is a multi-class selector
 					{
-//TODO del alert("adding multiple class selector: "+cssSelector.selectorText);
-						this.cssMultipleClassSelectors.add(cssSelector);	//add this selector to our list of multiple class selector; we don't need to change the stylesheet
+//TODO del alert("adding multiple class selector: "+selector.selectorText);
+						var elementSelectors=selector.elementSelectors;	//get the element selectors for this selector
+						for(var elementSelectorIndex=elementSelectors.length-1; elementSelectorIndex>=0; --elementSelectorIndex)	//for each element selector
+						{
+							var elementSelector=elementSelectors[elementSelectorIndex];	//get a reference to this element selector
+							if(elementSelector.isMultipleClassSelector)	//if this is a multi-class element selector
+							{
+								this.cssMultipleClassElementSelectors.add(elementSelector);	//add this element selector to our list of multiple class element selectors; we don't need to change the stylesheet
+							}
+						}
 					}
 				}
 			}
 			else	//if we need to fix this stylesheet (which takes much longer from the client side, because we'll have to reload the stylesheet manually and process it)
 			{
-				var xmlHTTP=this.httpCommunicator.get(stylesheet.href);	//load this stylesheet
+				var httpCommunicator=new HTTPCommunicator();	//create a communicator to connect back to the server
+				var xmlHTTP=httpCommunicator.get(stylesheet.href);	//load this stylesheet
 				if(xmlHTTP.status==200)	//if we were able to load the stylesheet
 				{
 					var stylesheetText=xmlHTTP.responseText;	//get the text of the stylesheet
@@ -270,15 +274,23 @@ function GuiseIE6Fix(selectorText)
 		//TODO fix					var selectorText=rule.selectorText;	//get the selector text
 						var selectorText=selectors[ruleIndex];	//get our own version of the selector text, because IE throws away some information for multiple-class selectors
 		//alert("looking at selector: "+selectorText);	
-						var cssSelector=new CSSSelector(selectorText);	//create a selector from this selector text
-						if(cssSelector.isMultipleClassSelector)	//if this is a multi-class selector
+						var selector=new CSSSelector(selectorText);	//create a selector from this selector text
+						if(selector.isMultipleClassSelector)	//if this is a multi-class selector
 						{
 							var cssText=rule.style.cssText;	//get the text of the rule (even though Danny Goodman's _JavaScript Bible_, Fifth Edition says that IE doesn't support this property
 							if(cssText.length>0)	//if there is actually text for this rule (IE won't allow us to add a rule with no text, but an empty rule doesn't do anything anyway, so ignore it)
 							{
-								this.cssMultipleClassSelectors.add(cssSelector);	//add this selector to our list of multiple class selector
+								var elementSelectors=selector.elementSelectors;	//get the element selectors for this selector
+								for(var elementSelectorIndex=elementSelectors.length-1; elementSelectorIndex>=0; --elementSelectorIndex)	//for each element selector
+								{
+									var elementSelector=elementSelectors[elementSelectorIndex];	//get a reference to this element selector
+									if(elementSelector.isMultipleClassSelector)	//if this is a multi-class element selector
+									{
+										this.cssMultipleClassElementSelectors.add(elementSelector);	//add this element selector to our list of multiple class element selectors
+									}
+								}
 								stylesheet.removeRule(ruleIndex);	//remove the rule at this index (using an IE6-specific method)
-								stylesheet.addRule(cssSelector.ie6FixSelectorText, cssText, ruleIndex);	//add a new rule in its place with the new selector text (using an IE6-specific method)
+								stylesheet.addRule(selector.ie6FixSelectorText, cssText, ruleIndex);	//add a new rule in its place with the new selector text (using an IE6-specific method)
 							}
 						}
 					}
