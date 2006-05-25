@@ -526,13 +526,22 @@ function StringBuilder(strings)
 	}
 }
 
-//Parameter
+//Map
 
-/**A class encapsulating a name and value.
-@param name: The name of the parameter, stored under this.name;
-@param value: The value of the parameter, stored under this.value;
+/**A class encapsulating keys and values.
+This is a convenience class for constructing an Object with a given set of keys and values, as the JavaScript shorthand notation does not allow non-literal key names.
+Values may be accessed in normal object[key]==value syntax. The constructor allows any number of key/value pairs as arguments.
+@param key: A key with which to associate a value.
+@param value: The value associated with the preceding key.
 */
-function Parameter(name, value) {this.name=name; this.value=value;}
+function Map(key, value)
+{
+	var argumentCount=arguments.length;	//find out how many arguments there are
+	for(var i=0; i+1<argumentCount; i+=2)	//for each key/value combination (counting by twos)
+	{
+		this[arguments[i]]=arguments[i+1];	//store the value keyed to the key
+	}
+}
 
 //Point
 
@@ -578,7 +587,7 @@ var authority The authority of the URI.
 var path The path of the URI.
 var query The query of the URI.
 var fragment The fragment of the URI.
-var parameters An array of parameters (which may be empty) each of type Parameter.
+var parameters An associative array of parameter name/value combinations.
 */
 function URI(uriString)
 {
@@ -587,41 +596,13 @@ function URI(uriString)
 		URI.prototype._initialized=true;
 
 		URI.prototype.URI_REGEXP=/^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/;	//the regular expression for parsing URIs, from http://www.ietf.org/rfc/rfc2396.txt
-
-		/**Determines first occurrence of a given parameter.
-		@param name The name of the parameter.
-		@return The first matching parameter (of type Parameter), or null if there is no such parameter.
-		*/
-		URI.prototype.getParameter=function(name)
-		{
-			var parameterCount=this.parameters.length;	//find out how many parameters there are
-			for(var i=0; i<parameterCount; ++i)	//for each parameter
-			{
-				var parameter=this.parameters[i];	//get a reference to this parameter
-				if(parameter.name==name)	//if this parameter name matches
-				{
-					return parameter;	//return this parameter
-				}
-			}
-			return null;	//indicate that no parameter matched
-		};
-
-		/**Determines the value of the first occurrence of a given parameter.
-		@param name The name of the parameter.
-		@return The value of the given parameter, or null if the parameter value is null or there is no such parameter.
-		*/
-		URI.prototype.getParameterValue=function(name)
-		{
-			var parameter=getParameter(name);	//get the requested parameter
-			return parameter!=null ? parameter.value : null;	//return the parameter value, or null if there is no such parameter
-		};
 	}
 	this.URI_REGEXP.test(uriString);	//split out the components of the URI using a regular expression
 	this.scheme=RegExp.$2;	//save the URI components
 	this.authority=RegExp.$4;
 	this.path=RegExp.$5;
 	this.query=RegExp.$7;
-	this.parameters=new Array();	//create a new array to hold parameters
+	this.parameters=new Object();	//create a new associative array to hold parameters
 	if(this.query)	//if a query is given
 	{
 		var queryComponents=this.query.split("&");	//split up the query components
@@ -631,7 +612,7 @@ function URI(uriString)
 			var parameterComponents=queryComponents[i].split("=");	//split out the parameter components
 			var parameterName=decodeURIComponent(parameterComponents[0]);	//get and decode the parameter name
 			var parameterValue=parameterComponents.length>1 ? decodeURIComponent(parameterComponents[1]) : null;	//get and decode the parameter value
-			this.parameters.add(new Parameter(parameterName, parameterValue));	//create and add a new parameter to the parameter array
+			this.parameters[parameterName]=parameterValue;	//store this parameter name/value combination
 		}
 	}
 	this.fragment=RegExp.$9;
@@ -818,26 +799,27 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 	},
 	
 	/**Retrieves the descendant element with the given name and attributes, starting at the node itself.
-	Currently this function only accepts a single parameter specification.
 	@param node The node the descendant of which to find, or null if the search should not take place.
 	@param elementName The name of the element to find.
-	@param parameters (...) Zero or more parameters of type Parameter, each representing an attribute name and value that should be present (or, if the parameter value is null, an attribute that must not be present).
+	@param parameters An associative array of name/value pairs, each representing an attribute name and value that should be present (or, if the parameter value is null, an attribute that must not be present), or null if no parameter matches are requested.
 	@return The element with the given name, or null if there is no such element descendant.
 	*/
 	getDescendantElementByName:function(node, elementName, parameters)
 	{
 		if(node)	//if we have a node
 		{
-			var argumentCount=arguments.length;	//find out how many arguments there are
 			if(node.nodeType==Node.ELEMENT_NODE && node.nodeName.toLowerCase()==elementName)	//if this is an element with the given name
 			{
 				var parametersMatch=true;	//start out assuming that the parameters match		
-				for(var i=2; i<argumentCount && parametersMatch; ++i)	//for each argument (not counting the first two), as long as all parameters match so far
+				if(parameters!=null)	//if parameters were provided
 				{
-					var parameter=arguments[i];	//get this argument
-					if(node.getAttribute(parameter.name)!=parameter.value)	//if this attribute doesn't exist or doesn't have the correct value
+					for(var parameterName in parameters)	//for each parameter
 					{
-						parametersMatch=false;	//indicate that the parameters do not match
+						if(node.getAttribute(parameterName)!=parameters[parameterName])	//if this attribute doesn't exist or doesn't have the correct value
+						{
+							parametersMatch=false;	//indicate that the parameters do not match
+							break;	//stop searching for a non-match
+						}
 					}
 				}
 				if(parametersMatch)	//if all the parameters match
@@ -850,14 +832,7 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 			for(var i=0; i<childNodeCount; ++i)	//for each child node
 			{
 				var childNode=childNodeList[i];	//get this child node
-				if(argumentCount==2)	//if there are only two arguments
-				{
-					var match=this.getDescendantElementByName(childNode, elementName);	//see if we can find the node in this branch
-				}
-				else	//if there are more arguments
-				{
-					var match=this.getDescendantElementByName(childNode, elementName, parameters);	//see if we can find the node in this branch TODO fix passing more than one parameter
-				}
+				var match=this.getDescendantElementByName(childNode, elementName, parameters);	//see if we can find the node in this branch
 				if(match)	//if we found a match
 				{
 					return match;	//return it
@@ -963,24 +938,6 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 		}
 		element.className=classNames.join(" ");	//join the remaining class names back together and assign them back to the element's class name
 	},
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	/**Retrieves the immediate text nodes of the given node as a string.
 	@param node The node from which to retrieve text.
@@ -1097,26 +1054,28 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 	If the value of a parameter is not a string, it will be converted to one.
 	@param stringBuilder The string builder to hold the data.
 	@param tagName The name of the XML tag.
-	@param parameters (...) Zero or more parameters of type Parameter.
+	@param attributes An associative array of name/value pairs representing attribute names and values, or null if no attributes are provided.
 	@return A reference to the string builder.
 	*/ 
-	appendXMLStartTag:function(stringBuilder, tagName, parameters)
+	appendXMLStartTag:function(stringBuilder, tagName, attributes)
 	{
 		stringBuilder.append("<").append(tagName);	//<tagName
-		var argumentCount=arguments.length;	//find out how many arguments there are
-		for(var i=2; i<argumentCount; ++i)	//for each argument (not counting the first two)
+		if(attributes!=null)	//if attributes are provided
 		{
-			var parameter=arguments[i];	//get this argument
-			if(parameter.value!=null)	//if a parameter value was given
+			for(var attributeName in attributes)	//for each attribute
 			{
-				this.appendXMLAttribute(stringBuilder, parameter.name, parameter.value);	//append the attribute
+				var attributeValue=attributes[attributeName];	//get this attribute value
+				if(attributeValue!=null)	//if an attribute value was given
+				{
+					this.appendXMLAttribute(stringBuilder, attributeName, attributeValue);	//append the attribute
+				}
 			}
 		}
 		return stringBuilder.append(">");	//>
 	},
 
 	/**Appends an XML attribute with the given name and value to the given string builder.
-	If the value of a parameter is not a string, it will be converted to one.
+	If the value of an attribute is not a string, it will be converted to one.
 	The attribute-value combination will be preceded by a space.
 	@param stringBuilder The string builder to hold the data.
 	@param attributeName The name of the XML attribute.
@@ -1216,31 +1175,17 @@ function InitAJAXEvent()
 //Form AJAX Event
 
 /**A class encapsulating form information for an AJAX request.
-@param parameter: An optional parameter with which to initialize the request.
-@param provisional: (optional) Indicates whether the value is a provisional value that has not yet been accepted by the user (defaults to false).
-var parameters: The list of parameters.
+@param parameters: An optional associative array of parameters with which to initialize the request.
+@param provisional: Optional indication of whether the value is a provisional value that has not yet been accepted by the user (defaults to false).
+var parameters: The associative array of parameters and values.
 var provisional: Indicates whether the value is a provisional value that has not yet been accepted by the user.
-@see Parameter
 */
-function FormAJAXEvent(parameter, provisional)
+function FormAJAXEvent(parameters, provisional)
 {
-	this.parameters=new Array();	//create the parameter array
+	this.parameters=parameters ? parameters : new Object();	//create a new associative array if not parameters were given
 	if(!FormAJAXEvent.prototype._initialized)
 	{
-		FormAJAXEvent.prototype._initialized=true;
-		
-		/**Adds a parameter to the form AJAX request.
-		@param parameter: The parameter to add.
-		@see Parameter
-		*/
-		FormAJAXEvent.prototype.addParameter=function(parameter)
-		{
-			this.parameters.add(parameter);	//add another parameter to the array
-		};
-	}
-	if(parameter)	//if a parameter was passed
-	{
-		this.addParameter(parameter);	//add this parameter to the request
+		FormAJAXEvent.prototype._initialized=true;		
 	}
 	this.provisional=Boolean(provisional);	//get a normal boolean version of the provisional status, assuming false
 }
@@ -1633,18 +1578,12 @@ function GuiseAJAX()
 		GuiseAJAX.prototype._appendFormAJAXEvent=function(stringBuilder, ajaxFormRequest)
 		{
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.FORM,	//<form
-					new Parameter(this.RequestElement.PROVISIONAL, ajaxFormRequest.provisional));	//provisional="provisional">
-			var parameters=ajaxFormRequest.parameters;	//get the parameters
-			if(parameters.length>0)	//if there are parameters
+					new Map(this.RequestElement.PROVISIONAL, ajaxFormRequest.provisional));	//provisional="provisional">
+			for(var parameterName in ajaxFormRequest.parameters)	//for each form parameter
 			{
-				var parameterStrings=new Array(parameters.length);	//create an array of parameter strings
-				for(var i=parameterStrings.length-1; i>=0; --i)	//for each parameter string
-				{
-					var parameter=parameters[i];	//get this parameter
-					DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.CONTROL, new Parameter(this.RequestElement.NAME, parameter.name));	//<control name="name">
-					DOMUtilities.appendXMLText(stringBuilder, parameter.value);	//append the parameter value
-					DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.CONTROL);	//</control>
-				}
+				DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.CONTROL, new Map(this.RequestElement.NAME, parameterName));	//<control name="parameterName">
+				DOMUtilities.appendXMLText(stringBuilder, ajaxFormRequest.parameters[parameterName]);	//append the parameter value
+				DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.CONTROL);	//</control>
 			}
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.FORM);	//</form>
 			return stringBuilder;	//return the string builder
@@ -1658,10 +1597,10 @@ function GuiseAJAX()
 		GuiseAJAX.prototype._appendActionAJAXEvent=function(stringBuilder, ajaxActionEvent)
 		{
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.ACTION,	//<action>
-					new Parameter(this.RequestElement.COMPONENT_ID, ajaxActionEvent.componentID),	//componentID="componentID"
-					new Parameter(this.RequestElement.TARGET_ID, ajaxActionEvent.targetID),	//targetID="targetID"
-					new Parameter(this.RequestElement.ACTION_ID, ajaxActionEvent.actionID),	//actionID="actionID"
-					new Parameter(this.RequestElement.OPTION, ajaxActionEvent.option));	//option="option"
+					new Map(this.RequestElement.COMPONENT_ID, ajaxActionEvent.componentID,	//componentID="componentID"
+							this.RequestElement.TARGET_ID, ajaxActionEvent.targetID,	//targetID="targetID"
+							this.RequestElement.ACTION_ID, ajaxActionEvent.actionID,	//actionID="actionID"
+							this.RequestElement.OPTION, ajaxActionEvent.option));	//option="option"
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.ACTION);	//</action>
 			return stringBuilder;	//return the string builder
 		};
@@ -1674,11 +1613,11 @@ function GuiseAJAX()
 		GuiseAJAX.prototype._appendDropAJAXEvent=function(stringBuilder, ajaxDropEvent)
 		{
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.DROP);	//<drop>
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.SOURCE, new Parameter(this.RequestElement.ID, ajaxDropEvent.dragSource.id));	//<source id="id">
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.SOURCE, new Map(this.RequestElement.ID, ajaxDropEvent.dragSource.id));	//<source id="id">
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.SOURCE);	//</source>
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.TARGET, new Parameter(this.RequestElement.ID, ajaxDropEvent.dropTarget.id));	//<target id="id">
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.TARGET, new Map(this.RequestElement.ID, ajaxDropEvent.dropTarget.id));	//<target id="id">
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.TARGET);	//</target>
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE, new Parameter(this.RequestElement.X, ajaxDropEvent.mousePosition.x), new Parameter(this.RequestElement.Y, ajaxDropEvent.mousePosition.y));	//<mouse x="x" y="y">
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE, new Map(this.RequestElement.X, ajaxDropEvent.mousePosition.x, this.RequestElement.Y, ajaxDropEvent.mousePosition.y));	//<mouse x="x" y="y">
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.MOUSE);	//</mouse>
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.DROP);	//</drop>
 			return stringBuilder;	//return the string builder
@@ -1694,26 +1633,26 @@ function GuiseAJAX()
 			DOMUtilities.appendXMLStartTag(stringBuilder, ajaxMouseEvent.eventType);	//<mouseXXX>
 //TODO del alert("ready to append viewport info: "+this.RequestElement.VIEWPORT+" x: "+ajaxMouseEvent.viewportBounds.x+" y: "+ajaxMouseEvent.viewportBounds.y+" width: "+ajaxMouseEvent.viewportBounds.width+" height: "+ajaxMouseEvent.viewportBounds.height);
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.VIEWPORT,	//<viewport
-					new Parameter(this.RequestElement.X, ajaxMouseEvent.viewportBounds.x),	//x="viewportBounds.x"
-					new Parameter(this.RequestElement.Y, ajaxMouseEvent.viewportBounds.y),	//y="viewportBounds.y"
-					new Parameter(this.RequestElement.WIDTH, ajaxMouseEvent.viewportBounds.width),	//width="viewportBounds.width"
-					new Parameter(this.RequestElement.HEIGHT, ajaxMouseEvent.viewportBounds.height));	//height="viewportBounds.height">
+					new Map(this.RequestElement.X, ajaxMouseEvent.viewportBounds.x,	//x="viewportBounds.x"
+							this.RequestElement.Y, ajaxMouseEvent.viewportBounds.y,	//y="viewportBounds.y"
+							this.RequestElement.WIDTH, ajaxMouseEvent.viewportBounds.width,	//width="viewportBounds.width"
+							this.RequestElement.HEIGHT, ajaxMouseEvent.viewportBounds.height));	//height="viewportBounds.height">
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.VIEWPORT);	//</viewport>
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.COMPONENT,	//<component
-					new Parameter(this.RequestElement.ID, ajaxMouseEvent.componentID),	//id="componentID"
-					new Parameter(this.RequestElement.X, ajaxMouseEvent.componentBounds.x),	//x="componentBounds.x"
-					new Parameter(this.RequestElement.Y, ajaxMouseEvent.componentBounds.y),	//y="componentBounds.y"
-					new Parameter(this.RequestElement.WIDTH, ajaxMouseEvent.componentBounds.width),	//width="componentBounds.width"
-					new Parameter(this.RequestElement.HEIGHT, ajaxMouseEvent.componentBounds.height));	//height="componentBounds.height">
+					new Map(this.RequestElement.ID, ajaxMouseEvent.componentID,	//id="componentID"
+							this.RequestElement.X, ajaxMouseEvent.componentBounds.x,	//x="componentBounds.x"
+							this.RequestElement.Y, ajaxMouseEvent.componentBounds.y,	//y="componentBounds.y"
+							this.RequestElement.WIDTH, ajaxMouseEvent.componentBounds.width,	//width="componentBounds.width"
+							this.RequestElement.HEIGHT, ajaxMouseEvent.componentBounds.height));	//height="componentBounds.height">
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.COMPONENT);	//</component>
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.TARGET,	//<target
-					new Parameter(this.RequestElement.ID, ajaxMouseEvent.targetID),	//id="targetID"
-					new Parameter(this.RequestElement.X, ajaxMouseEvent.targetBounds.x),	//x="targetBounds.x"
-					new Parameter(this.RequestElement.Y, ajaxMouseEvent.targetBounds.y),	//y="targetBounds.y"
-					new Parameter(this.RequestElement.WIDTH, ajaxMouseEvent.targetBounds.width),	//width="targetBounds.width"
-					new Parameter(this.RequestElement.HEIGHT, ajaxMouseEvent.targetBounds.height));	//height="targetBounds.height">
+					new Map(this.RequestElement.ID, ajaxMouseEvent.targetID,	//id="targetID"
+							this.RequestElement.X, ajaxMouseEvent.targetBounds.x,	//x="targetBounds.x"
+							this.RequestElement.Y, ajaxMouseEvent.targetBounds.y,	//y="targetBounds.y"
+							this.RequestElement.WIDTH, ajaxMouseEvent.targetBounds.width,	//width="targetBounds.width"
+							this.RequestElement.HEIGHT, ajaxMouseEvent.targetBounds.height));	//height="targetBounds.height">
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.TARGET);	//</target>
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE, new Parameter(this.RequestElement.X, ajaxMouseEvent.mousePosition.x), new Parameter(this.RequestElement.Y, ajaxMouseEvent.mousePosition.y));	//<mouse x="x" y="y">
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE, new Map(this.RequestElement.X, ajaxMouseEvent.mousePosition.x, this.RequestElement.Y, ajaxMouseEvent.mousePosition.y));	//<mouse x="x" y="y">
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.MOUSE);	//</mouse>
 			DOMUtilities.appendXMLEndTag(stringBuilder, ajaxMouseEvent.eventType);	//</mouseXXX>
 			return stringBuilder;	//return the string builder
@@ -2469,7 +2408,7 @@ com.guiseframework.js.Client=function()
 		//TODO del var debugString="";
 		//TODO del	var framePosition=new Point();	//we'll calculate the frame position; create an object rather than using primitives so that the internal function can access its variables via closure
 			var frameX, frameY;	//we'll calculate the frame position
-			var relatedComponentInput=DOMUtilities.getDescendantElementByName(frame, "input", new Parameter("name", "relatedComponentID"));	//get the input holding the related component ID
+			var relatedComponentInput=DOMUtilities.getDescendantElementByName(frame, "input", new Map("name", "relatedComponentID"));	//get the input holding the related component ID
 			var relatedComponent=relatedComponentInput ? document.getElementById(relatedComponentInput.value) : null;	//get the related component, if there is one
 			if(relatedComponent)	//if there is a related component
 			{
@@ -3650,7 +3589,7 @@ function onTextInputKeyPress(event)
 		{
 		//TODO del alert("an input changed! "+textInput.id);
 			var textInput=event.currentTarget;	//get the control in which text changed
-			var ajaxRequest=new FormAJAXEvent(new Parameter(textInput.name, textInput.value));	//create a new form request with the control name and value
+			var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value));	//create a new form request with the control name and value
 			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 			event.stopPropagation();	//tell the event to stop bubbling
 			event.preventDefault();	//prevent the default functionality from occurring
@@ -3672,7 +3611,7 @@ function onTextInputKeyUp(event)
 	{
 	//TODO del alert("an input changed! "+textInput.id);
 		var textInput=event.currentTarget;	//get the control in which text changed
-		var ajaxRequest=new FormAJAXEvent(new Parameter(textInput.name, textInput.value), true);	//create a new provisional form request with the control name and value
+		var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value), true);	//create a new provisional form request with the control name and value
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request, but allow this event to be processed normally
 	}
 }
@@ -3686,7 +3625,7 @@ function onTextInputChange(event)
 	{
 		var textInput=event.currentTarget;	//get the control in which text changed
 	//TODO del alert("an input changed! "+textInput.id);
-		var ajaxRequest=new FormAJAXEvent(new Parameter(textInput.name, textInput.value));	//create a new form request with the control name and value
+		var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value));	//create a new form request with the control name and value
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		event.stopPropagation();	//tell the event to stop bubbling
 	}
@@ -3699,7 +3638,7 @@ function onButtonClick(event)
 {
 	var element=event.currentTarget;	//get the element on which the event was registered
 	var form=getForm(element);	//get the form
-	if(form && DOMUtilities.getDescendantElementByName(form, "input", new Parameter("type", "file")))	//if there is a file input element, we'll have to submit the entire page rather than using AJAX
+	if(form && DOMUtilities.getDescendantElementByName(form, "input", new Map("type", "file")))	//if there is a file input element, we'll have to submit the entire page rather than using AJAX
 	{
 		if(element.id)	//if the button has an ID
 		{
@@ -3763,7 +3702,7 @@ function onAction(event)
 					guise.oldElementIDCursors[componentID]=target.style.cursor;	//save the old cursor
 					component.style.cursor="wait";	//TODO testing
 
-					var ajaxRequest=new FormAJAXEvent(new Parameter(actionInputID, componentID));	//create a new form request with form's hidden action control and the action element ID
+					var ajaxRequest=new FormAJAXEvent(new Map(actionInputID, componentID));	//create a new form request with form's hidden action control and the action element ID
 					guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request			
 				}
 				else	//if AJAX is not enabled, do a POST
@@ -3797,14 +3736,11 @@ function onTabClick(event)	//TODO maybe refactor to use new action click
 	if(href)	//if there is an href
 	{
 		var uri=new URI(href);	//create a URI from the href
-		if(uri.parameters.length>0)	//if there are parameters given
+		if(AJAX_ENABLED)	//if AJAX is enabled
 		{
-			var parameter=uri.parameters[0];	//get the first parameter
-			if(AJAX_ENABLED)	//if AJAX is enabled
-			{
-				var ajaxRequest=new FormAJAXEvent(parameter);	//create a new form request with the parameter
-				guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
-			}
+			var ajaxRequest=new FormAJAXEvent(uri.parameters);	//create a new form request with the URI parameters
+			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+		}
 /*TODO fix
 			else	//if AJAX is not enabled, do a POST
 			{
@@ -3820,9 +3756,8 @@ function onTabClick(event)	//TODO maybe refactor to use new action click
 				}
 			}
 */
-			event.stopPropagation();	//tell the event to stop bubbling
-			event.preventDefault();	//prevent the default functionality from occurring
-		}
+		event.stopPropagation();	//tell the event to stop bubbling
+		event.preventDefault();	//prevent the default functionality from occurring
 	}
 }
 
@@ -3906,7 +3841,7 @@ function onCheckInputChange(event)
 	{
 		guise.oldElementIDCursors[checkInput.id]=checkInput.style.cursor;	//save the old cursor
 		checkInput.style.cursor="wait";	//TODO testing
-		var ajaxRequest=new FormAJAXEvent(new Parameter(checkInput.name, checkInput.checked ? checkInput.value : ""));	//create a new form request with the control name and value
+		var ajaxRequest=new FormAJAXEvent(new Map(checkInput.name, checkInput.checked ? checkInput.value : ""));	//create a new form request with the control name and value
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		event.stopPropagation();	//tell the event to stop bubbling
 	}
@@ -3931,6 +3866,7 @@ function onSelectChange(event)
 	if(AJAX_ENABLED)	//if AJAX is enabled
 	{
 		var select=event.currentTarget;	//get the control to which the listener was listening
+		var selectName=select.name;	//get the name of the control
 	//TODO del alert("a select changed! "+select.id);
 		var options=select.options;	//get the select options
 		var ajaxRequest=new FormAJAXEvent();	//create a new form request
@@ -3939,7 +3875,7 @@ function onSelectChange(event)
 			var option=options[i];	//get this option
 			if(option.selected)	//if this option is selected
 			{
-				ajaxRequest.addParameter(new Parameter(select.name, option.value));	//add the control name and value as a parameter
+				ajaxRequest.parameters[selectName]=option.value;	//add the control name and value as a parameter
 			}
 		}
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
@@ -4185,7 +4121,7 @@ if(isNaN(position))	//TODO del; fixed; change to assertion
 	alert("track.offsetWidth: "+track.offsetWidth+" thumb[GUISE_STATE_WIDTH_ATTRIBUTE]: "+thumb[GUISE_STATE_WIDTH_ATTRIBUTE]+" max: "+max+" coordinate: "+coordinate+" min: "+min+" coordinate-min: "+(coordinate-min)+" span: "+span+" position: "+position);
 }
 */
-						var ajaxRequest=new FormAJAXEvent(new Parameter(positionInput.name, position.toString()));	//create a new form request with the control name and value
+						var ajaxRequest=new FormAJAXEvent(new Map(positionInput.name, position.toString()));	//create a new form request with the control name and value
 						guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 					};
 			dragState.onDragEnd=function(element)	//when dragging ends, update the slider view to make sure it is synchronized with the updated value
