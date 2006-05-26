@@ -1378,6 +1378,18 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		}
 	}
 
+	/**Creates a component to indicate Guise busy status.
+	@return A component to indicate Guise busy status.
+	@see Theme#ICON_BUSY
+	*/
+	public Component<?> createBusyComponent()
+	{
+		final Panel<?> busyPanel=new DefaultBusyPanel();	//create the default busy panel
+		final Frame<?> busyFrame=new DefaultFrame(busyPanel);	//create a frame for the busy panel
+		busyFrame.setTitleVisible(false);	//hide the frame title
+		return busyFrame;	//return the busy frame
+	}
+	
 	/**Notifies the user of the given notification information.
 	This is a convenience method that delegates to {@link #notify(Notification, Runnable)}.
 	@param notification The notification information to relay.

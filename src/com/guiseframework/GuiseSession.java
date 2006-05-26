@@ -13,6 +13,7 @@ import com.guiseframework.context.GuiseContext;
 import com.guiseframework.event.*;
 import com.guiseframework.model.Notification;
 import com.guiseframework.style.*;
+import com.guiseframework.theme.Theme;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
@@ -515,6 +516,12 @@ public interface GuiseSession extends PropertyBindable
 	@see #initialize()
 	*/
 	public void destroy();
+
+	/**Creates a component to indicate Guise busy status.
+	@return A component to indicate Guise busy status.
+	@see Theme#ICON_BUSY
+	*/
+	public Component<?> createBusyComponent();	//TODO maybe put this in GuiseApplication
 
 	/**Notifies the user of the given notification information.
 	This is a convenience method that delegates to {@link #notify(Notification, Runnable)}.

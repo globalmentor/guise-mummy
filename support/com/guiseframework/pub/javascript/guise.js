@@ -644,6 +644,83 @@ function URI(uriString)
 	this.fragment=RegExp.$9;
 }
 
+/**Global utilities for working with the screen.*/
+var GUIUtilities=
+{
+
+	/**Centers a node on the screen.
+	It is assumed that the node is already specified as absolutely positioned.
+	@param node The node to center.
+	*/
+	centerNode:function(node)
+	{
+		var viewportBounds=this.getViewportBounds();	//get the bounds of the viewport so that we can center the node
+		var x=viewportBounds.x+((viewportBounds.width-node.offsetWidth)/2);	//center the node horizontally
+		var y=viewportBounds.y+((viewportBounds.height-node.offsetHeight)/2);	//center the node vertically
+		node.style.left=x+"px";	//set the node's horizontal position
+		node.style.top=y+"px";	//set the node's vertical position
+	},
+
+	/**@return The coordinates that the page has scrolled.
+	@see http://www.quirksmode.org/viewport/compatibility.html 
+	*/
+	getScrollCoordinates:function()
+	{
+	/*TODO del
+	alert("window.pageXOffset: "+window.pageXOffset+"\n"+
+				"document.documentElement.scrollLeft: "+document.documentElement.scrollLeft+"\n"+
+				"document.body.scrollLeft: "+document.body.scrollLeft+"\n");
+	*/
+		var x, y;
+		if(typeof window.pageYOffset!="undefined") //if we know the page vertical offset (all browsers except IE)
+		{
+			x=window.pageXOffset;
+			y=window.pageYOffset;
+		}
+		else if(document.documentElement && document.documentElement.scrollTop)	//if we know the document's scroll position (IE 6 strict mode)
+		{
+			x=document.documentElement.scrollLeft;
+			y=document.documentElement.scrollTop;
+		}
+		else if(document.body)	//for all other IE modes
+		{
+			x=document.body.scrollLeft;
+			y=document.body.scrollTop;
+		}
+		return new Point(x, y);	//return the scrolling coordinates
+	},
+
+	/**@return A Rectangle containing the coordinates and size of the viewport.*/
+	getViewportBounds:function()
+	{
+		return new Rectangle(this.getScrollCoordinates(), this.getViewportSize());	//create a rectangle containing the coordinates and size of the viewport
+	},
+
+	/**@return The size of the viewport.
+	@see http://www.quirksmode.org/viewport/compatibility.html 
+	*/
+	getViewportSize:function()
+	{
+		var width=0, height=0;	//we'll determine the width and height
+		if(window.innerWidth && window.innerHeight)	//if the window knows its inner width and height
+		{
+			width=window.innerWidth;	//use the window's inner dimensions
+			height=window.innerHeight;
+		}
+		else if(document.documentElement && document.documentElement.clientWidth && document.documentElement.clientHeight)	//if the document element knows its dimensions (e.g. IE 6 in strict mode)
+		{
+			width=document.documentElement.clientWidth;	//use the document element's client width and height
+			height=document.documentElement.clientHeight;
+		}
+		else if(document.body)	//if there is a document body
+		{
+			width=document.body.clientWidth;	//use the document body's client width and height
+			height=document.body.clientHeight;
+		}
+		return new Size(width, height);	//return the size
+	}
+
+};
 
 /**Global utilities for working with the DOM.*/
 var DOMUtilities=
@@ -1291,7 +1368,7 @@ function MouseAJAXEvent(eventType, component, target, event)
 	this.componentBounds=getElementBounds(component);	//get the component bounds
 	this.targetID=target.id;	//save the target ID
 	this.targetBounds=getElementBounds(component);	//get the target bounds
-	this.viewportBounds=getViewportBounds();	//get the viewport bounds
+	this.viewportBounds=GUIUtilities.getViewportBounds();	//get the viewport bounds
 	this.mousePosition=new Point(event.clientX, event.clientY);	//save the mouse position
 }
 
@@ -2527,7 +2604,7 @@ com.guiseframework.js.Client=function()
 				}
 				else
 				{
-					var viewportBounds=getViewportBounds();	//get the bounds of the viewport so that we can center the frame
+					var viewportBounds=GUIUtilities.getViewportBounds();	//get the bounds of the viewport so that we can center the frame
 					if(relatedComponentBounds.x<viewportBounds.x+(viewportBounds.width/2))	//if the related component is on the left half of the screen
 					{
 						frameX=relatedComponentBounds.x+relatedComponentBounds.width;	//put the frame on the right side
@@ -2550,7 +2627,7 @@ com.guiseframework.js.Client=function()
 			}
 			else	//if this frame is not related to another component, center it
 			{
-				var viewportBounds=getViewportBounds();	//get the bounds of the viewport so that we can center the frame
+				var viewportBounds=GUIUtilities.getViewportBounds();	//get the bounds of the viewport so that we can center the frame
 				frameX=viewportBounds.x+((viewportBounds.width-frame.offsetWidth)/2);	//center the frame horizontally
 				frameY=viewportBounds.y+((viewportBounds.height-frame.offsetHeight)/2);	//center the frame vertically
 				frame.style.left=frameX+"px";	//set the frame's horizontal position
@@ -2646,7 +2723,7 @@ com.guiseframework.js.Client=function()
 		*/
 		
 			var pageSize=getPageSize();	//get the size of the page
-			var viewportSize=getViewportSize();	//get the size of the viewport
+			var viewportSize=GUIUtilities.getViewportSize();	//get the size of the viewport
 			this._modalLayer.style.width=Math.max(viewportSize.width, pageSize.width)+"px";	//update the size of the modal layer to the larger of the page and the viewport
 			this._modalLayer.style.height=Math.max(viewportSize.height, pageSize.height)+"px";
 		/*TODO fix
@@ -2671,6 +2748,27 @@ com.guiseframework.js.Client=function()
 				this._modalIFrame.style.width=this._modalLayer.style.width;
 				this._modalIFrame.style.height=this._modalLayer.style.height;
 				this._modalIFrame.style.display=oldModalIFrameDisplay;	//show the modal IFrame, if it was visible before
+			}
+		};
+
+		/*Sets the busy indicator visible or hidden.
+		@param busyVisible A boolean indication of whether the busy indicator should be visible.
+		*/
+		com.guiseframework.js.Client.prototype.setBusyVisible=function(busyVisible)
+		{
+			var form=getForm(document.documentElement);	//get the form
+			if(form && form.id)	//if there is a form with an ID
+			{
+				var busyID=form.id.replace(".form", ".busy");	//determine the ID of the busy element TODO use a constant, or get these values using a better method
+				var busyElement=document.getElementById(busyID);	//get the busy element
+				if(busyElement)	//if there is a busy element
+				{
+					busyElement.style.display=busyVisible ? "block" : "none";	//show or hide the busy information
+					if(busyVisible)	//TODO testing
+					{
+						GUIUtilities.centerNode(busyElement);
+					}
+				}
 			}
 		};
 
@@ -3258,12 +3356,30 @@ This implementation installs listeners.
 */
 function onWindowLoad()
 {
-
+	guise.setBusyVisible(true);	//turn on the busy indicator
 		//TODO fix; doesn't seem to work on IE6 or Firefox
 	guise.oldElementIDCursors[document.body.id]=document.body.style.cursor;	//save the old document body cursor; this will get reset after we receive the response from the AJAX initialization request
 	document.body.style.cursor="wait";	//TODO testing
 
+
+
+
+
+
+
+
+	window.setTimeout(function(){
+	
+	
+	
+
+
 //TODO display a wait cursor until we initialize everything
+
+	if(typeof guiseIE6Fix!="undefined")	//if we have IE6 fix routines loaded
+	{
+		guiseIE6Fix.fixStylesheets();	//fix all IE6 stylesheets
+	}
 
 	eventManager.addEvent(window, "resize", onWindowResize, false);	//add a resize listener
 //TODO del	eventManager.addEvent(window, "scroll", onWindowScroll, false);	//add a scroll listener
@@ -3278,8 +3394,18 @@ function onWindowLoad()
 	{
 		focusable.focus();	//focus on the node
 	}
-	guiseAJAX.sendAJAXRequest(new InitAJAXEvent());	//send an initialization AJAX request
+	guiseAJAX.sendAJAXRequest(new InitAJAXEvent());	//send an initialization AJAX request	
 //TODO del	alert("compatibility mode: "+document.compatMode);
+	guise.setBusyVisible(false);	//turn off the busy indicator
+
+
+
+
+
+}, 1);	//TODO testing
+
+
+
 }
 
 /**Called when the window unloads.
@@ -3289,7 +3415,9 @@ This implementation uninstalls all listeners.
 function onWindowUnload(event)
 {
 	AJAX_ENABLED=false;	//turn off AJAX
+//TODO fix or del	guise.setBusyVisible(true);	//turn on the busy indicator
 	eventManager.clearEvents();	//unload all events
+//TODO fix or del	guise.setBusyVisible(false);	//turn off the busy indicator
 }
 
 /**Called when the window resizes.
@@ -4539,7 +4667,7 @@ var originalElement=element;	//TODO del; testing
 function getElementFixedCoordinates(element)
 {
 	var absoluteCoordinates=getElementCoordinates(element);	//get the element's absolute coordinates
-	var scrollCoordinates=getScrollCoordinates();	//get the viewport's scroll coordinates
+	var scrollCoordinates=GUIUtilities.getScrollCoordinates();	//get the viewport's scroll coordinates
 	return new Point(absoluteCoordinates.x-scrollCoordinates.x, absoluteCoordinates.y-scrollCoordinates.y);	//compensate for viewport scrolling
 }
 
@@ -4576,66 +4704,6 @@ alert("document.body.scrollWidth: "+document.body.scrollWidth+"\n"+
 */	
 	return new Size(width, height);	//return the page size
 }
-
-/**@return The coordinates that the page has scrolled.
-@see http://www.quirksmode.org/viewport/compatibility.html 
-*/
-function getScrollCoordinates()
-{
-/*TODO del
-alert("window.pageXOffset: "+window.pageXOffset+"\n"+
-			"document.documentElement.scrollLeft: "+document.documentElement.scrollLeft+"\n"+
-			"document.body.scrollLeft: "+document.body.scrollLeft+"\n");
-*/
-	var x, y;
-	if(typeof window.pageYOffset!="undefined") //if we know the page vertical offset (all browsers except IE)
-	{
-		x=window.pageXOffset;
-		y=window.pageYOffset;
-	}
-	else if(document.documentElement && document.documentElement.scrollTop)	//if we know the document's scroll position (IE 6 strict mode)
-	{
-		x=document.documentElement.scrollLeft;
-		y=document.documentElement.scrollTop;
-	}
-	else if(document.body)	//for all other IE modes
-	{
-		x=document.body.scrollLeft;
-		y=document.body.scrollTop;
-	}
-	return new Point(x, y);	//return the scrolling coordinates
-}
-
-/**@return A Rectangle containing the coordinates and size of the viewport.*/
-function getViewportBounds()
-{
-	return new Rectangle(getScrollCoordinates(), getViewportSize());	//create a rectangle containing the coordinates and size of the viewport
-}
-
-/**@return The size of the viewport.
-@see http://www.quirksmode.org/viewport/compatibility.html 
-*/
-function getViewportSize()
-{
-	var width=0, height=0;	//we'll determine the width and height
-	if(window.innerWidth && window.innerHeight)	//if the window knows its inner width and height
-	{
-		width=window.innerWidth;	//use the window's inner dimensions
-		height=window.innerHeight;
-	}
-	else if(document.documentElement && document.documentElement.clientWidth && document.documentElement.clientHeight)	//if the document element knows its dimensions (e.g. IE 6 in strict mode)
-	{
-		width=document.documentElement.clientWidth;	//use the document element's client width and height
-		height=document.documentElement.clientHeight;
-	}
-	else if(document.body)	//if there is a document body
-	{
-		width=document.body.clientWidth;	//use the document body's client width and height
-		height=document.body.clientHeight;
-	}
-	return new Size(width, height);	//return the size
-}
-
 
 /**An abstract effect base class.
 Child classes should implement _doEffect() to perform the effect.

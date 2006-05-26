@@ -78,6 +78,7 @@ public class Theme extends ClassTypedRDFResource
 		//standard icons
 	public final static URI ICON_ACCEPT=createURIResourceReference("theme.icon.accept");
 	public final static URI ICON_ACCEPT_MULTIPLE=createURIResourceReference("theme.icon.accept.multiple");
+	public final static URI ICON_BUSY=createURIResourceReference("theme.icon.busy");
 	public final static URI ICON_EXCLAMATION=createURIResourceReference("theme.icon.exclamation");
 	public final static URI ICON_FINISH=createURIResourceReference("theme.icon.finish");
 	public final static URI ICON_FIRST=createURIResourceReference("theme.icon.first");

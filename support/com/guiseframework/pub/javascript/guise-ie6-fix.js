@@ -133,7 +133,7 @@ function CSSSelector(selectorText)
 
 var cssMultiClassSelectors: An array of CSSSelector objects that include a multiple class selection.
 */
-function GuiseIE6Fix(selectorText)
+function GuiseIE6Fix()
 {
 
 	this.cssMultipleClassElementSelectors=new Array();	//create a new array of element selectors that select on multiple classes
@@ -305,10 +305,21 @@ function GuiseIE6Fix(selectorText)
 			
 		};
 
-		/**Regular expression for matching individual element selector segments.*/
-//TODO del		GuiseIE6Fix.prototype.ELEMENT_SELECTOR_REGEXP=/\s*(\S+)\s*/g;
-	}
+		/**Fixes all stylesheets of the current document.
+		Must only be called once per loaded document.
+		*/
+		GuiseIE6Fix.prototype.fixStylesheets=function()
+		{
+			for(var stylesheetIndex=0; stylesheetIndex<document.styleSheets.length; ++stylesheetIndex)	//for each stylesheet
+			{
+				var stylesheet=document.styleSheets[stylesheetIndex];	//get a reference to this stylesheet
+		//TODO del alert("stylesheet: "+stylesheet.href);
+				this._fixStylesheet(stylesheet);	//fix this stylesheet
+			}
 
+		};
+	}
+/*TODO del when works
 		//fix stylesheets
 	for(var stylesheetIndex=0; stylesheetIndex<document.styleSheets.length; ++stylesheetIndex)	//for each stylesheet
 	{
@@ -316,6 +327,7 @@ function GuiseIE6Fix(selectorText)
 //TODO del alert("stylesheet: "+stylesheet.href);
 		this._fixStylesheet(stylesheet);	//fix this stylesheet
 	}
+*/
 
 };
 
