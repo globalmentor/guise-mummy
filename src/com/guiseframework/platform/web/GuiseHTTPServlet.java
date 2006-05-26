@@ -851,7 +851,7 @@ Debug.trace("new bookmark:", newBookmark);
 					}
 					final StringBuilder stringBuilder=guiseContext.getStringBuilder();	//get the string builder collected output for this context
 //TODO del Debug.trace("response:", stringBuilder);
-Debug.trace("response:", stringBuilder);
+//TODO del Debug.trace("response length:", stringBuilder.length());
 					final byte[] bytes=stringBuilder.toString().getBytes(UTF_8);	//write the content we collected in the context as series of bytes encoded in UTF-8
 					final OutputStream outputStream=getCompressedOutputStream(request, response);	//get a compressed output stream, if possible
 					outputStream.write(bytes);	//write the bytes

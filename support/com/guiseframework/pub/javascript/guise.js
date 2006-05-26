@@ -1375,6 +1375,20 @@ function MouseAJAXEvent(eventType, component, target, event)
 /**The available types of mouse events.*/
 MouseAJAXEvent.EventType={ENTER: "mouseEnter", EXIT: "mouseExit"};
 
+//AJAX Response
+
+/**A class encapsulating an AJAX response.
+@param document: The response XML document tree.
+@param size: The number of characters in the document.
+var document: The response XML document tree.
+var size: The number of characters in the document.
+*/
+function AJAXResponse(document, size)
+{
+	this.document=document;
+	this.size=size
+}
+
 //HTTP Communicator
 
 /**A class encapsulating HTTP communication functionality.
@@ -1570,7 +1584,7 @@ function GuiseAJAX()
 	/**The queue of AJAX HTTP request information objects.*/
 	this.ajaxRequests=new Array();
 
-	/**The queue of AJAX response XML DOM trees.*/
+	/**The queue of AJAX responses of type AJAXResponse.*/
 	this.ajaxResponses=new Array();
 
 	/**Whether we are currently processing AJAX requests.*/
@@ -1818,9 +1832,9 @@ alert("we returned, at least");
 					}
 					if(status==200)	//if everything went OK
 					{
-						if(xmlHTTP.responseXML && xmlHTTP.responseXML.documentElement)	//if we have XML (if there is no content or there is an error, IE sends back a document has a null xmlHTTP.responseXML.documentElement)
+						if(xmlHTTP.responseText && xmlHTTP.responseXML && xmlHTTP.responseXML.documentElement)	//if we have XML (if there is no content or there is an error, IE sends back a document has a null xmlHTTP.responseXML.documentElement)
 						{
-							thisGuiseAJAX.ajaxResponses.enqueue(xmlHTTP.responseXML);	//enqueue the response XML
+							thisGuiseAJAX.ajaxResponses.enqueue(new AJAXResponse(xmlHTTP.responseXML, xmlHTTP.responseText.length));	//enqueue the response
 							thisGuiseAJAX.processAJAXResponses();	//process enqueued AJAX responses
 	//TODO del						setTimeout("GuiseAJAX.prototype.processAJAXResponses();", 1);	//process the AJAX responses later		
 	//TODO del						thisGuiseAJAX.processAJAXRequests();	//make sure there are no waiting AJAX requests
@@ -1853,6 +1867,12 @@ alert(exception);
 
 		/**Processes responses from AJAX requests.
 		This routine should be called asynchronously from an event so that the DOM tree can be successfully updated.
+		Whether the busy indicator is shown depends on the the browser type and the size of the response.
+		This implementation shows the busy indicator for medium communication size on IE6, and on large communication sizes on all other browsers.
+		Typical response sizes include:
+		500-2000: Normal communication size; acceptable delay on IE6.
+		5000-10000: Medium communication size; perceptible delay on IE6.
+		20000-30000: Large communication size; unacceptable delay on IE6 without indicator. 
 		@see GuiseAJAX#ajaxResponses
 		*/
 		GuiseAJAX.prototype.processAJAXResponses=function()
@@ -1886,41 +1906,59 @@ alert(exception);
 				{
 					while(this.ajaxResponses.length>0 && newHRef==null)	//while there are more AJAX responses and no redirect has been requested TODO fix small race condition on adding responses
 					{
-						var responseDocument=this.ajaxResponses.dequeue();	//get this response
-						//TODO assert document element name is "response"
-						var childNodeList=responseDocument.documentElement.childNodes;	//get all the child nodes of the document element
-						var childNodeCount=childNodeList.length;	//find out how many children there are
-						for(var i=0; i<childNodeCount; ++i)	//for each child node
+						var ajaxResponse=this.ajaxResponses.dequeue();	//get this response
+						var responseDocument=ajaxResponse.document;	//get this response document
+						var showBusy=isUserAgentIE6 ? ajaxResponse.size>5000 : ajaxResponse.size>20000;	//see if we should show a busy indicator
+//TODO del; testirng						var showBusy=ajaxResponse.size>100;	//TODO del; testing
+						if(showBusy)	//if we should show a busy indicator
 						{
-							var childNode=childNodeList[i];	//get this child node
-							if(childNode.nodeType==Node.ELEMENT_NODE)	//if this is an element
+							guise.setBusyVisible(true);	//show a busy indicator
+//TODO fix for IE6; this doesn't work when set immediately window.setTimeout(function(){guise.setBusyVisible(true);}, 1);	
+						}
+						try
+						{
+							//TODO assert document element name is "response"
+							var childNodeList=responseDocument.documentElement.childNodes;	//get all the child nodes of the document element
+							var childNodeCount=childNodeList.length;	//find out how many children there are
+							for(var i=0; i<childNodeCount; ++i)	//for each child node
 							{
-								var elementName=childNode.nodeName;	//get this element name
-								switch(elementName)	//see which type of response this is
+								var childNode=childNodeList[i];	//get this child node
+								if(childNode.nodeType==Node.ELEMENT_NODE)	//if this is an element
 								{
-									case this.ResponseElement.PATCH:	//patch
-										this._processPatch(childNode);	//patch the document with this patch information
-										break;
-/*TODO del when works
-									case this.ResponseElement.ATTRIBUTE:	//attribute
-										this._processAttribute(childNode);	//patch the document with this attribute information
-										break;
-*/
-									case this.ResponseElement.REMOVE:	//remove
-										this._processRemove(childNode);	//remove the elements from the document with this removal element
-										break;
-									case this.ResponseElement.NAVIGATE:	//navigate
-										var navigateURI=this._processNavigate(childNode);	//navigate to the specified request
-										if(navigateURI!=null)	//if a new navigation URI was requested
-										{
-											newHRef=navigateURI;	//request navigation to the new URI
-										}
-										break;
-									case this.ResponseElement.RELOAD:	//reload
-										window.location.reload();	//reload the page
-										return;	//stop processing events
+									var elementName=childNode.nodeName;	//get this element name
+									switch(elementName)	//see which type of response this is
+									{
+										case this.ResponseElement.PATCH:	//patch
+											this._processPatch(childNode);	//patch the document with this patch information
+											break;
+	/*TODO del when works
+										case this.ResponseElement.ATTRIBUTE:	//attribute
+											this._processAttribute(childNode);	//patch the document with this attribute information
+											break;
+	*/
+										case this.ResponseElement.REMOVE:	//remove
+											this._processRemove(childNode);	//remove the elements from the document with this removal element
+											break;
+										case this.ResponseElement.NAVIGATE:	//navigate
+											var navigateURI=this._processNavigate(childNode);	//navigate to the specified request
+											if(navigateURI!=null)	//if a new navigation URI was requested
+											{
+												newHRef=navigateURI;	//request navigation to the new URI
+											}
+											break;
+										case this.ResponseElement.RELOAD:	//reload
+											window.location.reload();	//reload the page
+											return;	//stop processing events
+									}
 								}
 							}
+						}
+						finally
+						{
+							if(showBusy)	//if we are showing a busy indicator
+							{
+								guise.setBusyVisible(false);	//hide the busy indicator
+							}							
 						}
 						this.processAJAXRequests();	//make sure there are no waiting AJAX requests
 					}
@@ -2686,8 +2724,14 @@ com.guiseframework.js.Client=function()
 				this._modalLayer.style.top="0px";
 				this._modalLayer.style.left="0px";
 				document.body.appendChild(this._modalLayer);	//add the modal layer to the document
-				if(isUserAgentIE6)	//if we're in IE, create a modal IFrame to keep select components from showing through; but don't do this in Mozilla, or it will keep the cursor from showing up for text inputs in absolutely positioned div elements above the IFrame
+				if(isUserAgentIE6 && !this._modalIFrame)	//if we're in IE6 and we haven't found our modal IFrame, create a modal IFrame to keep select components from showing through; but don't do this in Mozilla, or it will keep the cursor from showing up for text inputs in absolutely positioned div elements above the IFrame
 				{
+					var form=getForm(document.documentElement);	//get the form
+					if(form && form.id)	//if there is a form with an ID
+					{
+						var modalIFrameID=form.id.replace(".form", ".modalIFrame");	//determine the ID of the modal IFrame TODO use a constant, or get these values using a better method
+						this._modalIFrame=document.getElementById(modalIFrameID);	//get the modal IFrame
+/*TODO del when works
 					this._modalIFrame=document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");	//create an IFrame TODO use a constant for the namespace
 					this._modalIFrame.src="about:blank";
 			//TODO del		modalIFrame.className="modalLayer";	//load the modal layer style
@@ -2700,6 +2744,8 @@ com.guiseframework.js.Client=function()
 					this._modalIFrame.style.left="0px";
 					this._modalIFrame.style.filter='progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0)';	//make the frame transparent (see http://dotnetjunkies.com/WebLog/jking/archive/2003/07/21/488.aspx )
 					document.body.appendChild(this._modalIFrame);	//add the modal IFrame to the document
+*/
+					}
 				}
 			}
 		

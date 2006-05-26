@@ -21,6 +21,10 @@
 <!ENTITY % xhtml-target.mod PUBLIC "-//W3C//ELEMENTS XHTML Target 1.0//EN" "http://www.w3.org/TR/xhtml-modularization/DTD/xhtml-target-1.mod">
 %xhtml-target.mod;
 
+<!--import XHTML 1.1 iframe module-->
+<!ENTITY % xhtml-iframe.mod PUBLIC "-//W3C//ELEMENTS XHTML Inline Frame Element 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-iframe-1.mod">
+%xhtml-iframe.mod;
+
 <!--add custom Guise attributes-->
 
 <!ATTLIST img

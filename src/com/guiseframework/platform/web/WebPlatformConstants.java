@@ -26,7 +26,14 @@ public class WebPlatformConstants	//TODO move a lot of these constants to GuiseA
 	/**The path of the Guise CSS stylesheet, relative to the application.*/
 //TODO del if not needed	public final static String GUISE_CSS_STYLESHEET_PATH=GUISE_PUBLIC_STYLESHEETS_PATH+"guise.css";
 
-		//Images
+		//documents
+	
+	/**The path of public documents, relative to the application.*/
+	public final static String GUISE_PUBLIC_DOCUMENTS_PATH=GUISE_PUBLIC_PATH+"documents/";
+	/**The base path of the empty HTML document, relative to the application.*/
+	public final static String GUISE_EMPTY_HTML_DOCUMENT_PATH=GUISE_PUBLIC_DOCUMENTS_PATH+"empty.html";
+
+		//images
 	
 	/**The path of public images, relative to the application.*/
 //TODO del; coordinate with GuiseConstants	public final static String GUISE_PUBLIC_IMAGES_PATH=GUISE_PUBLIC_PATH+"images/";
