@@ -117,6 +117,14 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 			if(guiseSession==null)	//if no Guise session is associated with the given HTTP session
 			{
 Debug.trace("+++creating Guise session", httpSession.getId());
+/*TODO del
+final Enumeration headerNames=httpRequest.getHeaderNames();	//TODO del
+while(headerNames.hasMoreElements())
+{
+	final String headerName=(String)headerNames.nextElement();
+	Debug.info("request header:", headerName, httpRequest.getHeader(headerName));
+}
+*/
 				guiseSession=guiseApplication.createSession();	//ask the application to create a new Guise session
 				final GuiseEnvironment environment=guiseSession.getEnvironment();	//get the new session's environment
 				final Cookie[] cookies=httpRequest.getCookies();	//get the cookies in the request
@@ -133,6 +141,14 @@ Debug.trace("+++creating Guise session", httpSession.getId());
 					}
 				}
 				environment.setProperties(getUserAgentProperties(httpRequest));	//initialize the Guise environment user agent information
+/*TODO del if can't be salvaged for Firefox
+					//The "Accept: application/x-shockwave-flash" header is only sent in the first request from IE.
+					//Unfortunately Firefox 1.5.0.3 doesn't send it at all.
+					//see http://www.sitepoint.com/article/techniques-unearthed
+					//see http://www.adobe.com/support/flash/releasenotes/player/rn_6.html
+				environment.setProperty(CONTENT_APPLICATION_SHOCKWAVE_FLASH_ACCEPTED_PROPERTY,	//content.application.shockwave.flash.accepted
+						Boolean.valueOf(isAcceptedContentType(httpRequest, APPLICATION_SHOCKWAVE_FLASH_CONTENT_TYPE, false)));	//see if Flash is installed
+*/
 				addGuiseSession(guiseSession);	//add and initialize the Guise session
 				final Locale[] clientAcceptedLanguages=getAcceptedLanguages(httpRequest);	//get all languages accepted by the client
 				guiseSession.requestLocale(asList(clientAcceptedLanguages));	//ask the Guise session to change to one of the accepted locales, if the application supports one

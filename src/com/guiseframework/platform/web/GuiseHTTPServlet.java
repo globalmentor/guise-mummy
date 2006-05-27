@@ -437,6 +437,7 @@ Debug.info("session ID", guiseSession.getHTTPSession().getId());	//TODO del
 Debug.info("content length:", request.getContentLength());
 Debug.info("content type:", request.getContentType());
 */
+//TODO del Debug.info("supports Flash: ", guiseSession.getEnvironment().getProperty(GuiseEnvironment.CONTENT_APPLICATION_SHOCKWAVE_FLASH_ACCEPTED_PROPERTY));
 		final GuiseSessionThreadGroup guiseSessionThreadGroup=Guise.getInstance().getThreadGroup(guiseSession);	//get the thread group for this session
 		final GuiseSessionRunnable guiseSessionRunnable=new GuiseSessionRunnable(request, response, guiseContainer, guiseApplication, guiseSession);	//create a runnable instance to service the Guise request
 		call(guiseSessionThreadGroup, guiseSessionRunnable);	//call the runnable in a new thread inside the thread group
