@@ -66,10 +66,10 @@ public class HTTPServletGuiseContext extends AbstractXMLGuiseContext
 	private ContentType outputContentType=createContentType(TEXT, PLAIN_SUBTYPE);	//default to text/plain
 
 	/**The string builder that holds the current content being collected.*/
-	private final StringBuilder stringBuilder=new StringBuilder();
+//TODO del when works	private final StringBuilder stringBuilder=new StringBuilder();
 
 		/**@return The string builder that holds the current content being collected.*/
-		public StringBuilder getStringBuilder() {return stringBuilder;}
+//TODO del when works		public StringBuilder getStringBuilder() {return stringBuilder;}
 
 	/**Constructor.
 	@param session The Guise user session of which this context is a part.

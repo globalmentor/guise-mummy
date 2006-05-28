@@ -1910,11 +1910,13 @@ alert(exception);
 						var responseDocument=ajaxResponse.document;	//get this response document
 						var showBusy=isUserAgentIE6 ? ajaxResponse.size>5000 : ajaxResponse.size>20000;	//see if we should show a busy indicator
 //TODO del; testirng						var showBusy=ajaxResponse.size>100;	//TODO del; testing
+/*TODO salvage if needed
 						if(showBusy)	//if we should show a busy indicator
 						{
 							guise.setBusyVisible(true);	//show a busy indicator
 //TODO fix for IE6; this doesn't work when set immediately window.setTimeout(function(){guise.setBusyVisible(true);}, 1);	
 						}
+*/
 						try
 						{
 							//TODO assert document element name is "response"
@@ -1926,6 +1928,7 @@ alert(exception);
 								if(childNode.nodeType==Node.ELEMENT_NODE)	//if this is an element
 								{
 									var elementName=childNode.nodeName;	//get this element name
+//TODO del alert("looking at response: "+elementName);
 									switch(elementName)	//see which type of response this is
 									{
 										case this.ResponseElement.PATCH:	//patch
@@ -1937,6 +1940,7 @@ alert(exception);
 											break;
 	*/
 										case this.ResponseElement.REMOVE:	//remove
+//TODO del alert("this is a remove");
 											this._processRemove(childNode);	//remove the elements from the document with this removal element
 											break;
 										case this.ResponseElement.NAVIGATE:	//navigate
@@ -1955,10 +1959,12 @@ alert(exception);
 						}
 						finally
 						{
+/*TODO salvage if needed
 							if(showBusy)	//if we are showing a busy indicator
 							{
 								guise.setBusyVisible(false);	//hide the busy indicator
-							}							
+							}
+*/
 						}
 						this.processAJAXRequests();	//make sure there are no waiting AJAX requests
 					}
@@ -2056,7 +2062,8 @@ alert(exception);
 
 		/**Processes the AJAX attribute response.
 		@param element The element representing attribute response.
-		*/ 
+		*/
+/*TODO del or salvage
 		GuiseAJAX.prototype._processAttribute=function(element)
 		{
 			var id=element.getAttribute("id");	//get the element ID
@@ -2078,6 +2085,7 @@ alert(exception);
 				}
 			}
 		};
+*/
 
 		/**Processes the AJAX remove response.
 		@param element The element representing removal response.
@@ -2095,7 +2103,6 @@ alert(exception);
 					if(guise.frames.contains(oldElement))	//if we're removing a frame
 					{
 //TODO fix alert("removing frame "+id);
-//TODO del alert("it's a frame");
 						guise.removeFrame(oldElement);	//remove the frame
 					}
 					else	//if we're removing any other node
@@ -2158,237 +2165,262 @@ alert(exception);
 				return;	//don't do synchronization patching
 			}
 */
-//TODO del alert("ready to synchronize element "+oldElement.nodeName+" with ID: "+oldElement.id+" against element "+element.nodeName+" with ID: "+element.getAttribute("id"));
-				//remove any attributes the old element has that are not in the new element
-			var oldAttributes=oldElement.attributes;	//get the old element's attributes
-			for(var i=oldAttributes.length-1; i>=0; --i)	//for each old attribute
+				//get the content hash attributes before we update the attributes
+			var oldElementContentHash=oldElement.getAttribute("guise:contentHash");	//get the old element's content hash, if any TODO use a constant
+			var newElementContentHash=element.getAttribute("guise:contentHash");	//get the new element's content hash, if any TODO use a constant
+
+			var oldElementAttributeHash=oldElement.getAttribute("guise:attributeHash");	//get the old element's attribute hash, if any TODO use a constant
+			var newElementAttributeHash=element.getAttribute("guise:attributeHash");	//get the new element's attribute hash, if any TODO use a constant
+			if(oldElementAttributeHash!=newElementAttributeHash)	//if the attribute hash values are different
 			{
-				var oldAttribute=oldAttributes[i];	//get this attribute
-				var oldAttributeName=oldAttribute.nodeName;	//get the attribute name
-				var oldAttributeValue=oldAttribute.nodeValue;	//get the attribute value
-				var attributeName=DOMUtilities.DOM_ATTRIBUTE_NAME_MAP[oldAttributeName] || oldAttributeName;	//convert the attribute name to its standard DOM form, changing "readOnly" to "readonly", for example
-//TODO fix or del				if(attributeValue!=null && attributeValue.length>0 && !element.getAttribute(attributeName))	//if there is really an attribute value (IE provides all possible attributes, even with those with no value) and the new element doesn't have this attribute
-				if(element.getAttribute(attributeName)==null && !this.NON_REMOVABLE_ATTRIBUTE_SET[attributeName])	//if the new element doesn't have this attribute, and this isn't an attribute we shouldn't remove
+	//TODO del alert("ready to synchronize element "+oldElement.nodeName+" with ID: "+oldElement.id+" against element "+element.nodeName+" with ID: "+element.getAttribute("id"));
+					//remove any attributes the old element has that are not in the new element
+				var oldAttributes=oldElement.attributes;	//get the old element's attributes
+				for(var i=oldAttributes.length-1; i>=0; --i)	//for each old attribute
 				{
-//TODO del alert("ready to remove "+oldElement.nodeName+" attribute "+oldAttributeName+" with current value "+oldAttributeValue);
-					oldElement.removeAttribute(oldAttributeName);	//remove the attribute normally (apparently no action will take place if performed on IE-specific attributes such as element.start)
-//TODO fix					i=0;	//TODO fix; temporary to get out of looking at all IE's attributes
-				}
-			}
-			if(oldElement.value && element.getAttribute("value")==null)	//if there is an old value but no value attribute present in the new element (IE 6 and Mozilla do not show "value" in the list of enumerated values)
-			{
-				oldElement.value="";	//set the value to the empty string (setting the value to null will result in "null" being displayed in the input control on IE)
-			}
-				//patch in the new and changed attributes
-			var attributes=element.attributes;	//get the new element's attributes
-			for(var i=attributes.length-1; i>=0; --i)	//for each attribute
-			{
-				var attribute=attributes[i];	//get this attribute
-				var attributeNodeName=attribute.nodeName;	//get the node name
-				var attributeName=DOMUtilities.HTML_ATTRIBUTE_NAME_MAP[attributeNodeName] || attributeNodeName;	//get the attribute name, compensating for special HTML attributes such as "className"
-				var attributeValue=attribute.nodeValue;	//get the attribute value
-				if(!this.UNCOPIED_ATTRIBUTE_SET[attributeName])	//if this is not an attribute that shouldn't be copied
-				{
-					if(attributeName=="value")	//if this is the value attribute
+					var oldAttribute=oldAttributes[i];	//get this attribute
+					var oldAttributeName=oldAttribute.nodeName;	//get the attribute name
+					var oldAttributeValue=oldAttribute.nodeValue;	//get the attribute value
+					var attributeName=DOMUtilities.DOM_ATTRIBUTE_NAME_MAP[oldAttributeName] || oldAttributeName;	//convert the attribute name to its standard DOM form, changing "readOnly" to "readonly", for example
+	//TODO fix or del				if(attributeValue!=null && attributeValue.length>0 && !element.getAttribute(attributeName))	//if there is really an attribute value (IE provides all possible attributes, even with those with no value) and the new element doesn't have this attribute
+					if(element.getAttribute(attributeName)==null && !this.NON_REMOVABLE_ATTRIBUTE_SET[attributeName])	//if the new element doesn't have this attribute, and this isn't an attribute we shouldn't remove
 					{
-						var patchType=element.getAttribute("guise:patchType");	//get the patch type TODO use a constant
-						if(patchType=="novalue")	//if we should ignore the value attribute
-						{
-							continue;	//go to the next attribute
-						}
+						//TODO see if there is a way to keep from removing all the non-null but empty default IE6 attributes
+	//TODO del alert("ready to remove "+oldElement.nodeName+" attribute "+oldAttributeName+" with current value "+oldAttributeValue);
+						oldElement.removeAttribute(oldAttributeName);	//remove the attribute normally (apparently no action will take place if performed on IE-specific attributes such as element.start)
+	//TODO fix					i=0;	//TODO fix; temporary to get out of looking at all IE's attributes
 					}
-					var oldAttributeValue=oldElement[attributeName];	//get the old attribute value
-					var valueChanged=oldAttributeValue!=attributeValue;	//see if the value is really changing
-					if(valueChanged)	//if the value is changing, see if we have to do fixes for IE6 (if the value hasn't changed, that means there were no fixes before and no fixes afterwards; we may want to categorically do fixes in the future if we add attribute-based selectors)
+				}
+				if(elementName!="button" && oldElement.value && element.getAttribute("value")==null)	//if there is an old value but no value attribute present in the new element (IE 6 and Mozilla do not show "value" in the list of enumerated values) (IE6 thinks that the value of a button is content, so ignore button values) TODO fix button values for non-IE6 browsers, maybe, but current button values are unused anyway because of the IE6 bug
+				{
+//TODO del alert("clearing value; old value was: "+oldElement.value);
+					oldElement.value="";	//set the value to the empty string (setting the value to null will result in "null" being displayed in the input control on IE)
+				}
+					//patch in the new and changed attributes
+				var attributes=element.attributes;	//get the new element's attributes
+				for(var i=attributes.length-1; i>=0; --i)	//for each attribute
+				{
+					var attribute=attributes[i];	//get this attribute
+					var attributeNodeName=attribute.nodeName;	//get the node name
+					var attributeName=DOMUtilities.HTML_ATTRIBUTE_NAME_MAP[attributeNodeName] || attributeNodeName;	//get the attribute name, compensating for special HTML attributes such as "className"
+					var attributeValue=attribute.nodeValue;	//get the attribute value
+					if(!this.UNCOPIED_ATTRIBUTE_SET[attributeName])	//if this is not an attribute that shouldn't be copied
 					{
-						if(attributeName=="className")	//if we're changing the class name
+						if(attributeName=="value")	//if this is the value attribute
 						{
-							if(typeof guiseIE6Fix!="undefined")	//if we have IE6 fix routines loaded
+							var patchType=element.getAttribute("guise:patchType");	//get the patch type TODO use a constant
+							if(patchType=="novalue")	//if we should ignore the value attribute
 							{
-								var fixedAttributeValue=guiseIE6Fix.getFixedElementClassName(oldElement, attributeValue);	//get the IE6 fixed form of the class name TODO make sure this is done last if we start doing CSS2 attribute-based selectors
-								valueChanged=fixedAttributeValue!=null;	//check again to see if the value is really changing; maybe the value was originally different because we hadn't added the IE6 fixes
-								if(valueChanged)	//if the fixed attribute value is any different from the proposed value
+								continue;	//go to the next attribute
+							}
+						}
+						var oldAttributeValue=oldElement[attributeName];	//get the old attribute value
+						var valueChanged=oldAttributeValue!=attributeValue;	//see if the value is really changing
+						if(valueChanged)	//if the value is changing, see if we have to do fixes for IE6 (if the value hasn't changed, that means there were no fixes before and no fixes afterwards; we may want to categorically do fixes in the future if we add attribute-based selectors)
+						{
+							if(attributeName=="className")	//if we're changing the class name
+							{
+								if(typeof guiseIE6Fix!="undefined")	//if we have IE6 fix routines loaded
 								{
-									attributeValue=fixedAttributeValue;	//used the fixed class name
+									var fixedAttributeValue=guiseIE6Fix.getFixedElementClassName(oldElement, attributeValue);	//get the IE6 fixed form of the class name TODO make sure this is done last if we start doing CSS2 attribute-based selectors
+
+
+//TODO fix errors update input elements alert("we try to change class name from "+attributeValue+" to "+fixedAttributeValue);
+
+									valueChanged=fixedAttributeValue!=null;	//check again to see if the value is really changing; maybe the value was originally different because we hadn't added the IE6 fixes
+									if(valueChanged)	//if the fixed attribute value is any different from the proposed value
+									{
+										attributeValue=fixedAttributeValue;	//used the fixed class name
+									}
 								}
 							}
 						}
+						if(valueChanged && attributeName=="src")	//if a "src" attribute changed (e.g. img.src), make sure that the new src is not a relative URL form of the current src, which would cause IE6 to needlessly reload the image
+						{
+							if(attributeValue.startsWith("/") && location.protocol+"//"+location.host+attributeValue==oldAttributeValue)	//if the new value is just the relative form of the old value
+							{
+								valueChanged=false;	//keep the old value to prevent IE6 from reloading the image
+							}
+						}
+						if(valueChanged)	//if the old element has a different (or no) value for this attribute (Firefox maintains different values for element.getAttribute(attributeName) and element[attributeName]) (note also that using setAttribute() IE will sometimes throw an error if button.style is changed, for instance)
+						{					
+//TODO del alert("updating "+element.nodeName+" attribute "+attributeName+" from value "+oldElement.getAttribute(attributeName)+" to new value "+attributeValue);
+							if(attributeName.indexOf(":")>0)	//if this is a namespaced attribute, we must use the DOM, because Firefox 1.5 won't allow the indexed notation for such attributes
+							{
+								oldElement.setAttribute(attributeName, attributeValue);	//update the old element's attribute; only use this method when we need to, because it may be slower on Firefox and does not work with certain DOM attributes
+							}
+							else	//if this is a normal attribute
+							{
+								oldElement[attributeName]=attributeValue;	//update the old element's attribute (this format works for Firefox where oldElement.setAttribute("value", attributeValue) does not)
+							}
+		//TODO: fix the Firefox problem of sending an onchange event for any elements that get updated from an Ajax request, but only later when the focus blurs
+		//TODO fix the focus problem if the user has focus on an element that gets changed in response to the event
+						}
 					}
-					if(valueChanged && attributeName=="src")	//if a "src" attribute changed (e.g. img.src), make sure that the new src is not a relative URL form of the current src, which would cause IE6 to needlessly reload the image
+				}
+				this._synchronizeElementStyle(oldElement, element.getAttribute("style"));	//patch in the new style
+					//perform special-case attribute manipulations for certain elements
+				if(elementName=="input")	//input checkboxes and radio buttons do not updated the checked state correctly based upon the "checked" attribute
+				{
+					var inputType=element.getAttribute("type");	//get the input type
+					if(inputType=="radio" || inputType=="checkbox")	//if this is a radio button or a checkbox
 					{
-						if(attributeValue.startsWith("/") && location.protocol+"//"+location.host+attributeValue==oldAttributeValue)	//if the new value is just the relative form of the old value
-						{
-							valueChanged=false;	//keep the old value to prevent IE6 from reloading the image
-						}
-					}
-					if(valueChanged)	//if the old element has a different (or no) value for this attribute (Firefox maintains different values for element.getAttribute(attributeName) and element[attributeName]) (note also that using setAttribute() IE will sometimes throw an error if button.style is changed, for instance)
-					{					
-	//TODO del alert("updating "+element.nodeName+" attribute "+attributeName+" from value "+oldElement[attributeName]+" to new value "+attributeValue);
-						if(attributeName.indexOf(":")>0)	//if this is a namespaced attribute, we must use the DOM, because Firefox 1.5 won't allow the indexed notation for such attributes
-						{
-							oldElement.setAttribute(attributeName, attributeValue);	//update the old element's attribute; only use this method when we need to, because it may be slower on Firefox and does not work with certain DOM attributes
-						}
-						else	//if this is a normal attribute
-						{
-							oldElement[attributeName]=attributeValue;	//update the old element's attribute (this format works for Firefox where oldElement.setAttribute("value", attributeValue) does not)
-						}
-	//TODO: fix the Firefox problem of sending an onchange event for any elements that get updated from an Ajax request, but only later when the focus blurs
-	//TODO fix the focus problem if the user has focus on an element that gets changed in response to the event
+						oldElement.checked=element.getAttribute("checked")=="checked";	//update the checked state based upon the new specified checked attribute
 					}
 				}
 			}
-			this._synchronizeElementStyle(oldElement, element.getAttribute("style"));	//patch in the new style
-				//perform special-case attribute manipulations for certain elements
-			if(elementName=="input")	//input checkboxes and radio buttons do not updated the checked state correctly based upon the "checked" attribute
+/*TODO del
+			if(oldElementContentHash==newElementContentHash)	//TODO del; testing
 			{
-				var inputType=element.getAttribute("type");	//get the input type
-				if(inputType=="radio" || inputType=="checkbox")	//if this is a radio button or a checkbox
-				{
-					oldElement.checked=element.getAttribute("checked")=="checked";	//update the checked state based upon the new specified checked attribute
-				}
+				alert("we think: "+DOMUtilities.getNodeString(oldElement));
+				alert("is the same as: "+DOMUtilities.getNodeString(element));
 			}
-			
-				//patch in the new child element hierarchy
-			if(elementName=="textarea")	//if this is a text area, do special-case value changing (restructuring won't work in IE and Mozilla) TODO check for other similar types TODO use a constant
+*/
+
+			if(oldElementContentHash!=newElementContentHash)	//if the content hash values are different
 			{
-				oldElement.value=DOMUtilities.getNodeText(element);	//set the new value to be the text of the new element
-			}
-			else	//for other elements, restructure the DOM tree normally
-			{
-				var oldChildNodeList=oldElement.childNodes;	//get all the child nodes of the old element
-				var oldChildNodeCount=oldChildNodeList.length;	//find out how many old children there are
-				var childNodeList=element.childNodes;	//get all the child nodes of the element
-				var childNodeCount=childNodeList.length;	//find out how many children there are
-				var isChildrenCompatible=true;	//start by assuming children are compatible; children will be compatible as long as the exiting children are of the same types and, if they are elements, of the same name
-				for(var i=0; i<oldChildNodeCount && i<childNodeCount && isChildrenCompatible; ++i)	//for each child node (as long as children are compatible)
+					//patch in the new child element hierarchy
+				if(elementName=="textarea")	//if this is a text area, do special-case value changing (restructuring won't work in IE and Mozilla) TODO check for other similar types TODO use a constant
 				{
-					var oldChildNode=oldChildNodeList[i];	//get the old child node
-					var childNode=childNodeList[i];	//get the new child node
-					if(oldChildNode.nodeType==childNode.nodeType)	//if these are the same type of nodes
-					{
-						if(childNode.nodeType==Node.ELEMENT_NODE)	//if this is an element, check the name and ID
-						{
-							
-							if(oldChildNode.nodeName.toLowerCase()!=childNode.nodeName.toLowerCase())	//if these are elements with different node names
-							{
-	//TODO del alert("found different node names; old: "+oldChildNode.nodeName+" and new: "+childNode.nodeName);
-								isChildrenCompatible=false;	//these child elements aren't compatible because they have different node name
-							}
-							else	//if the names are the same but the IDs are different, assume that the entire child should be replaced rather than synchronized---the event listeners would probably be different anyway
-							{
-								var oldChildID=oldChildNode.getAttribute("id");	//get the old child ID
-								var oldChildID=oldChildNode.id ? oldChildNode.id : null;	//normalize the ID because some browsers such as IE in HTML mode might return "" for a missing attribute rather than null
-								var childID=childNode.getAttribute("id");	//get the new child's ID
-//TODO del alert("comparing "+oldChildNode.nodeName+" IDs "+oldChildID+" "+typeof oldChildID+" and "+childID+" "+typeof childID);
-								if(oldChildID!=childID)	//if the IDs are different
-								{
-//TODO fix alert("IDs don't match: "+oldChildNode.nodeName+" IDs "+oldChildID+" "+typeof oldChildID+" and "+childID+" "+typeof childID);
-									isChildrenCompatible=false;	//these child elements aren't compatible because they have different IDs
-								}
-							}
-/*TODO maybe add this later to prevent shifting elements from creating duplicate IDs; it would be better to simply remove the child ID attribute, though
-							else	//if the names are the same
-							{
-								var oldChildID=oldChildNode.getAttribute("id");	//get the old child ID
-								var oldChildID=oldChildNode.id ? oldChildNode.id : null;	//normalize the ID because some browsers such as IE in HTML mode might return "" for a missing attribute rather than null
-								var childID=childNode.getAttribute("id");	//get the new child's ID
-//TODO del alert("comparing "+oldChildNode.nodeName+" IDs "+oldChildID+" "+typeof oldChildID+" and "+childID+" "+typeof childID);
-								if(oldChildID!=childID)	//if the IDs are different
-								{
-//TODO fix alert("IDs don't match: "+oldChildNode.nodeName+" IDs "+oldChildID+" "+typeof oldChildID+" and "+childID+" "+typeof childID);
-									isChildrenCompatible=false;	//these child elements aren't compatible because they have different IDs
-								}
-							}
-*/
-						}
-					}
-					else	//if the node types are different
-					{
-//TODO del alert("node types are different; old "+oldElement.nodeName+" with ID "+oldElement.id+" child node count: "+oldChildNodeCount+" new "+element.nodeName+" "+"with ID "+element.getAttribute("id")+" child: "+i+" of "+childNodeCount+" old node type: "+oldChildNode.nodeType+" new node type: "+childNode.nodeType);
-//TODO del alert("old node structure of parent is: "+DOMUtilities.getNodeString(oldElement));
-						isChildrenCompatible=false;	//these child nodes aren't compatible because they are of different types
-					}
+					oldElement.value=DOMUtilities.getNodeText(element);	//set the new value to be the text of the new element
 				}
-				
-/*TODO fix Firefox select hack; right now, this slows things down too much for IE
-				if(elementName=="select")	//TODO hack for Firefox select, which will allow the value of the selected option to be updated but not update that value shown in the drop-down list when the display changes
+				else	//for other elements, restructure the DOM tree normally
 				{
-					isChildrenCompatible=false;	//TODO testing
-				}
-*/
-				if(isChildrenCompatible)	//if the children are compatible
-				{
-						//remove superfluous old nodes
-					for(var i=oldChildNodeCount-1; i>=childNodeCount; --i)	//for each old child node that is not in the new node
-					{
-						var oldChildNode=oldChildNodeList[i];	//get this child node
-						uninitializeNode(oldChildNode);	//uninitialize the node tree
-//TODO del alert("removing old node: "+oldChildNodeList[i].nodeName);
-						oldElement.removeChild(oldChildNode);	//remove this old child
-						
-					}
-//TODO del alert("children are still compatible, old child node count: "+oldElement.childNodes.length+" new child node count "+childNodeCount);
-				}
-				else	//if children are not compatible
-				{
-//TODO del alert("children are not compatible, old "+oldElement.nodeName+" with ID "+oldElement.id+" child node count: "+oldChildNodeCount+" new "+element.nodeName+" "+"with ID "+element.getAttribute("id")+" child node count "+childNodeCount+" (verify) "+element.childNodes.length);
-					DOMUtilities.removeChildren(oldElement);	//remove all the children from the old element and start from scratch
-/*TODO fix, if can improve IE6, but it probably won't help much, as most incompatible children may be single-child changes
-					if(isUserAgentIE6)	//if this is IE6, it will be much faster to use innerHTML to load the children
-					{
-						var innerHTML=DOMUtilities.DOMUtilities.appendNodeContentString(newStringBuilder, element);	//get the inner HTML to use
-					}
-*/
-//TODO del alert("incompatible old element now has children: "+oldElement.childNodes.length);
-				}
-				for(var i=0; i<childNodeCount; ++i)	//for each new child node
-				{
-					var childNode=childNodeList[i];	//get this child node
-					oldChildNodeList=oldElement.childNodes;	//get the old child nodes all over again, as we may have removed some nodes before arriving here, and we may add some nodes later on
-					if(i<oldChildNodeList.length)	//if we already have an old child node
+					var oldChildNodeList=oldElement.childNodes;	//get all the child nodes of the old element
+					var oldChildNodeCount=oldChildNodeList.length;	//find out how many old children there are
+					var childNodeList=element.childNodes;	//get all the child nodes of the element
+					var childNodeCount=childNodeList.length;	//find out how many children there are
+					var isChildrenCompatible=true;	//start by assuming children are compatible; children will be compatible as long as the exiting children are of the same types and, if they are elements, of the same name
+					for(var i=0; i<oldChildNodeCount && i<childNodeCount && isChildrenCompatible; ++i)	//for each child node (as long as children are compatible)
 					{
 						var oldChildNode=oldChildNodeList[i];	//get the old child node
-						switch(childNode.nodeType)	//see which type of child node this is
+						var childNode=childNodeList[i];	//get the new child node
+						if(oldChildNode.nodeType==childNode.nodeType)	//if these are the same type of nodes
 						{
-							case Node.ELEMENT_NODE:	//element
-								this._synchronizeElement(oldChildNode, childNode);	//synchronize these elements
-								break;
-							case Node.COMMENT_NODE:	//comment
-							case Node.TEXT_NODE:	//text
-								oldChildNode.nodeValue=childNode.nodeValue;	//copy the text over to the old node
-								break;
-							//TODO add checks for other elements, such as CDATA
+							if(childNode.nodeType==Node.ELEMENT_NODE)	//if this is an element, check the name and ID
+							{
+								
+								if(oldChildNode.nodeName.toLowerCase()!=childNode.nodeName.toLowerCase())	//if these are elements with different node names
+								{
+		//TODO del alert("found different node names; old: "+oldChildNode.nodeName+" and new: "+childNode.nodeName);
+									isChildrenCompatible=false;	//these child elements aren't compatible because they have different node name
+								}
+								else	//if the names are the same but the IDs are different, assume that the entire child should be replaced rather than synchronized---the event listeners would probably be different anyway
+								{
+									var oldChildID=oldChildNode.getAttribute("id");	//get the old child ID
+									var oldChildID=oldChildNode.id ? oldChildNode.id : null;	//normalize the ID because some browsers such as IE in HTML mode might return "" for a missing attribute rather than null
+									var childID=childNode.getAttribute("id");	//get the new child's ID
+	//TODO del alert("comparing "+oldChildNode.nodeName+" IDs "+oldChildID+" "+typeof oldChildID+" and "+childID+" "+typeof childID);
+									if(oldChildID!=childID)	//if the IDs are different
+									{
+	//TODO fix alert("IDs don't match: "+oldChildNode.nodeName+" IDs "+oldChildID+" "+typeof oldChildID+" and "+childID+" "+typeof childID);
+										isChildrenCompatible=false;	//these child elements aren't compatible because they have different IDs
+									}
+								}
+	/*TODO maybe add this later to prevent shifting elements from creating duplicate IDs; it would be better to simply remove the child ID attribute, though
+								else	//if the names are the same
+								{
+									var oldChildID=oldChildNode.getAttribute("id");	//get the old child ID
+									var oldChildID=oldChildNode.id ? oldChildNode.id : null;	//normalize the ID because some browsers such as IE in HTML mode might return "" for a missing attribute rather than null
+									var childID=childNode.getAttribute("id");	//get the new child's ID
+	//TODO del alert("comparing "+oldChildNode.nodeName+" IDs "+oldChildID+" "+typeof oldChildID+" and "+childID+" "+typeof childID);
+									if(oldChildID!=childID)	//if the IDs are different
+									{
+	//TODO fix alert("IDs don't match: "+oldChildNode.nodeName+" IDs "+oldChildID+" "+typeof oldChildID+" and "+childID+" "+typeof childID);
+										isChildrenCompatible=false;	//these child elements aren't compatible because they have different IDs
+									}
+								}
+	*/
+							}
+						}
+						else	//if the node types are different
+						{
+	//TODO del alert("node types are different; old "+oldElement.nodeName+" with ID "+oldElement.id+" child node count: "+oldChildNodeCount+" new "+element.nodeName+" "+"with ID "+element.getAttribute("id")+" child: "+i+" of "+childNodeCount+" old node type: "+oldChildNode.nodeType+" new node type: "+childNode.nodeType);
+	//TODO del alert("old node structure of parent is: "+DOMUtilities.getNodeString(oldElement));
+							isChildrenCompatible=false;	//these child nodes aren't compatible because they are of different types
 						}
 					}
-					else	//if we're out of old child nodes, create a new one
+					
+	/*TODO fix Firefox select hack; right now, this slows things down too much for IE
+					if(elementName=="select")	//TODO hack for Firefox select, which will allow the value of the selected option to be updated but not update that value shown in the drop-down list when the display changes
 					{
-try
-{
-//TODO del alert("ready to clone node: "+DOMUtilities.getNodeString(childNode));
-//TODO del alert("ready to clone node");
-						var importedNode=document.importNode(childNode, true);	//create an import clone of the node
-//TODO del alert("imported node");
-							//TODO del; now inside importNode
-/*TODO del
-						if(!importedNode)	//TODO check and improve big IE hack
+						isChildrenCompatible=false;	//TODO testing
+					}
+	*/
+					if(isChildrenCompatible)	//if the children are compatible
+					{
+							//remove superfluous old nodes
+						for(var i=oldChildNodeCount-1; i>=childNodeCount; --i)	//for each old child node that is not in the new node
 						{
-//TODO del							alert("big problem importing node: "+DOMUtilities.getNodeString(childNode));	//TODO fix importnode
-							var dummyNode=document.createElement("div");	//create a dummy node
-//TODO fix							document.documentElement.appendChild(dummyNode);	//append the dummy node to the document
-							dummyNode.innerHTML=DOMUtilities.getNodeString(childNode);	//convert the child node to a string and assign it to the dummy node
-							importedNode=dummyNode.removeChild(dummyNode.childNodes[0]);	//remove the dummy node's first and only node, which is our new imported node
-//TODO fix							document.documentElement.removeChild(dummyNode);	//throw away the dummy node
+							var oldChildNode=oldChildNodeList[i];	//get this child node
+							uninitializeNode(oldChildNode);	//uninitialize the node tree
+	//TODO del alert("removing old node: "+oldChildNodeList[i].nodeName);
+							oldElement.removeChild(oldChildNode);	//remove this old child
+							
 						}
-*/
-//TODO del alert("ready to append node");
-						oldElement.appendChild(importedNode);	//append the imported node to the old element
-//TODO del alert("ready to initialize node");
-						initializeNode(importedNode);	//initialize the new imported node, installing the correct event handlers
-}
-catch(e)
-{
-	alert("error creating new child node: "+DOMUtilities.getNodeString(childNode));
-}
+	//TODO del alert("children are still compatible, old child node count: "+oldElement.childNodes.length+" new child node count "+childNodeCount);
+					}
+					else	//if children are not compatible
+					{
+	//TODO del alert("children are not compatible, old "+oldElement.nodeName+" with ID "+oldElement.id+" child node count: "+oldChildNodeCount+" new "+element.nodeName+" "+"with ID "+element.getAttribute("id")+" child node count "+childNodeCount+" (verify) "+element.childNodes.length);
+						DOMUtilities.removeChildren(oldElement);	//remove all the children from the old element and start from scratch
+	/*TODO fix, if can improve IE6, but it probably won't help much, as most incompatible children may be single-child changes
+						if(isUserAgentIE6)	//if this is IE6, it will be much faster to use innerHTML to load the children
+						{
+							var innerHTML=DOMUtilities.DOMUtilities.appendNodeContentString(newStringBuilder, element);	//get the inner HTML to use
+						}
+	*/
+	//TODO del alert("incompatible old element now has children: "+oldElement.childNodes.length);
+					}
+					for(var i=0; i<childNodeCount; ++i)	//for each new child node
+					{
+						var childNode=childNodeList[i];	//get this child node
+						oldChildNodeList=oldElement.childNodes;	//get the old child nodes all over again, as we may have removed some nodes before arriving here, and we may add some nodes later on
+						if(i<oldChildNodeList.length)	//if we already have an old child node
+						{
+							var oldChildNode=oldChildNodeList[i];	//get the old child node
+							switch(childNode.nodeType)	//see which type of child node this is
+							{
+								case Node.ELEMENT_NODE:	//element
+									this._synchronizeElement(oldChildNode, childNode);	//synchronize these elements
+									break;
+								case Node.COMMENT_NODE:	//comment
+								case Node.TEXT_NODE:	//text
+									oldChildNode.nodeValue=childNode.nodeValue;	//copy the text over to the old node
+									break;
+								//TODO add checks for other elements, such as CDATA
+							}
+						}
+						else	//if we're out of old child nodes, create a new one
+						{
+	try
+	{
+	//TODO del alert("ready to clone node: "+DOMUtilities.getNodeString(childNode));
+	//TODO del alert("ready to clone node");
+							var importedNode=document.importNode(childNode, true);	//create an import clone of the node
+	//TODO del alert("imported node");
+								//TODO del; now inside importNode
+	/*TODO del
+							if(!importedNode)	//TODO check and improve big IE hack
+							{
+	//TODO del							alert("big problem importing node: "+DOMUtilities.getNodeString(childNode));	//TODO fix importnode
+								var dummyNode=document.createElement("div");	//create a dummy node
+	//TODO fix							document.documentElement.appendChild(dummyNode);	//append the dummy node to the document
+								dummyNode.innerHTML=DOMUtilities.getNodeString(childNode);	//convert the child node to a string and assign it to the dummy node
+								importedNode=dummyNode.removeChild(dummyNode.childNodes[0]);	//remove the dummy node's first and only node, which is our new imported node
+	//TODO fix							document.documentElement.removeChild(dummyNode);	//throw away the dummy node
+							}
+	*/
+	//TODO del alert("ready to append node");
+							oldElement.appendChild(importedNode);	//append the imported node to the old element
+	//TODO del alert("ready to initialize node");
+							initializeNode(importedNode);	//initialize the new imported node, installing the correct event handlers
+	}
+	catch(e)
+	{
+		alert("error creating new child node: "+DOMUtilities.getNodeString(childNode));
+	}
+						}
 					}
 				}
 			}

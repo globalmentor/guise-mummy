@@ -703,8 +703,9 @@ Debug.trace("new bookmark:", newBookmark);
 								}
 								if(isAJAX)	//if this is an AJAX request
 								{
-									clear(guiseContext.getStringBuilder());	//clear all the response data (which at this point should only be navigation information, anyway)
+									guiseContext.clearText();	//clear all the response data (which at this point should only be navigation information, anyway)
 									guiseContext.writeElementBegin(null, "navigate");	//<navigate>	//TODO use a constant
+									guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
 									if(requestedNavigation!=null)	//if navigation was requested (i.e. this isn't just a bookmark registration)
 									{
 										final String viewportID=requestedNavigation.getViewportID();	//get the requested viewport ID
@@ -732,8 +733,9 @@ Debug.trace("new bookmark:", newBookmark);
 							{
 								if(isAJAX)	//if this is an AJAX request
 								{
-									clear(guiseContext.getStringBuilder());	//clear all the response data (which at this point should only be navigation information, anyway)
+									guiseContext.clearText();	//clear all the response data (which at this point should only be navigation information, anyway)
 									guiseContext.writeElementBegin(null, "reload", true);	//<reload>	//TODO use a constant
+									guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
 									guiseContext.writeElementEnd(null, "reload");	//</reload>
 									isNavigating=true;	//show that we're navigating, so there's no need to update views
 								}
@@ -780,6 +782,7 @@ Debug.trace("new bookmark:", newBookmark);
 									guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
 		//							TODO fix							else	//if the component is not visible, remove the component's elements
 									guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
+									guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
 									frame.updateView(guiseContext);		//tell the component to update its view
 									guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "patch");	//</xhtml:patch>
 								}
@@ -814,6 +817,7 @@ Debug.trace("new bookmark:", newBookmark);
 							if(dirtyComponents.contains(applicationFrame))	//if the application frame itself was affected, we might as well reload the page
 							{
 								guiseContext.writeElementBegin(null, "reload", true);	//<reload>	//TODO use a constant
+								guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
 								guiseContext.writeElementEnd(null, "reload");	//</reload>
 							}
 							else	//if the application frame wasn't affected
@@ -831,6 +835,7 @@ Debug.trace("new bookmark:", newBookmark);
 								for(final Frame<?> frame:removedFrames)	//for each removed frame
 								{
 									guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "remove");	//<xhtml:remove>	//TODO use a constant TODO don't use the XHTML namespace if we can help it								
+									guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
 									guiseContext.writeAttribute(null, "id", frame.getID());	//TODO fix
 			//TODO del Debug.trace("Sending message to remove frame:", frame.getID());
 									guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "remove");	//</xhtml:remove>							
@@ -843,17 +848,18 @@ Debug.trace("new bookmark:", newBookmark);
 						}
 					}
 					
+					String text=guiseContext.getText();	//get the text to output
 					if(isAJAX)	//if this is an AJAX request
 					{
 						guiseContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type TODO verify UTF-8 in a consistent, elegant way
-						final StringBuilder stringBuilder=guiseContext.getStringBuilder();	//get the string builder collected output for this context
-						stringBuilder.insert(0, "<response>");	//prepend the response opening tag TODO use a constant, decide on a namespace
-						stringBuilder.append("</response>");	//append the response closing tag
+						text="<response>"+text+"</response>";	//wrap the text in a response element
 					}
-					final StringBuilder stringBuilder=guiseContext.getStringBuilder();	//get the string builder collected output for this context
+//TODO del					final StringBuilder stringBuilder=guiseContext.getStringBuilder();	//get the string builder collected output for this context
 //TODO del Debug.trace("response:", stringBuilder);
 //TODO del Debug.trace("response length:", stringBuilder.length());
-					final byte[] bytes=stringBuilder.toString().getBytes(UTF_8);	//write the content we collected in the context as series of bytes encoded in UTF-8
+Debug.trace("response:", text);
+Debug.trace("response length:", text.length());
+					final byte[] bytes=text.getBytes(UTF_8);	//write the content we collected in the context as series of bytes encoded in UTF-8
 					final OutputStream outputStream=getCompressedOutputStream(request, response);	//get a compressed output stream, if possible
 					outputStream.write(bytes);	//write the bytes
 					outputStream.close();	//close the output stream, finishing writing the compressed contents (don't put this in a finally block, as it will attempt to write more data and raise another exception)						

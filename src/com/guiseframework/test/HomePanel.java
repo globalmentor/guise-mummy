@@ -765,6 +765,7 @@ Debug.trace("list control changed value to", newValue);
 		listSelectControl.add("The second option");
 		listSelectControl.add("The third option");
 		listSelectControl.add("The fourth option");
+		listSelectControl.setValidator(new ValueRequiredValidator<String>());
 		
 /*TODO fix
 		listSelectControl.setValueRepresentationStrategy(new ListControl.DefaultValueRepresentationStrategy<String>()
@@ -884,8 +885,10 @@ Debug.trace("card tab control", remoteTabControl, "has view", remoteTabControl.g
 //TODO bring back						testButton.getModel().setEnabled(newValue);	//update the button enabled state
 Debug.trace("ready to set tabbed panel enabled to", newValue);
 //TODO del						tabbedPanel.getLayout().getConstraints(helloPanel).setEnabled(newValue);	//TODO testing
+/*TODO del
 						remoteTabControl.setValueEnabled(helloPanel, newValue);	//TODO testing
 Debug.trace("now tab enabled is", remoteTabControl.isValueEnabled(helloPanel));
+*/
 					}
 				});
 
