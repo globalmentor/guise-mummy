@@ -2168,10 +2168,18 @@ alert(exception);
 				//get the content hash attributes before we update the attributes
 			var oldElementContentHash=oldElement.getAttribute("guise:contentHash");	//get the old element's content hash, if any TODO use a constant
 			var newElementContentHash=element.getAttribute("guise:contentHash");	//get the new element's content hash, if any TODO use a constant
+/*TODO del
+			if(oldElementContentHash==newElementContentHash)	//TODO del; testing
+			{
+				alert("we think: "+DOMUtilities.getNodeString(oldElement));
+				alert("is the same as: "+DOMUtilities.getNodeString(element));
+			}
+*/
 
 			var oldElementAttributeHash=oldElement.getAttribute("guise:attributeHash");	//get the old element's attribute hash, if any TODO use a constant
 			var newElementAttributeHash=element.getAttribute("guise:attributeHash");	//get the new element's attribute hash, if any TODO use a constant
-			if(oldElementAttributeHash!=newElementAttributeHash)	//if the attribute hash values are different
+			var isAttributesChanged=oldElementAttributeHash!=newElementAttributeHash;	//see if the attributes have changed (this doesn't count for the content hash attribute, which we'll check separately)
+			if(isAttributesChanged)	//if the attribute hash values are different
 			{
 	//TODO del alert("ready to synchronize element "+oldElement.nodeName+" with ID: "+oldElement.id+" against element "+element.nodeName+" with ID: "+element.getAttribute("id"));
 					//remove any attributes the old element has that are not in the new element
@@ -2279,6 +2287,17 @@ alert(exception);
 
 			if(oldElementContentHash!=newElementContentHash)	//if the content hash values are different
 			{
+				if(!isAttributesChanged)	//if the main attributes didn't change, we'll still need to update the content hash attribute, which isn't accounted for by the attribute hash attribute
+				{
+					if(newElementContentHash)	//if there is a content hash
+					{
+						oldElement.setAttribute("guise:contentHash", newElementContentHash);	//update the content hash attribute manually TODO use a constant
+					}
+					else	//if there is no longer a content hash
+					{
+						oldElement.removeAttribute("guise:contentHash");	//remove the content hash attribute TODO use a constant
+					}
+				}
 					//patch in the new child element hierarchy
 				if(elementName=="textarea")	//if this is a text area, do special-case value changing (restructuring won't work in IE and Mozilla) TODO check for other similar types TODO use a constant
 				{
@@ -2382,6 +2401,14 @@ alert(exception);
 							switch(childNode.nodeType)	//see which type of child node this is
 							{
 								case Node.ELEMENT_NODE:	//element
+/*TODO del
+									if(oldChildNode.id=="id1a-child")	//TODO del
+									{
+//TODO del										alert("ready to update old element: "+DOMUtilities.getNodeString(oldChildNode));
+										alert("ready to update old element: "+oldChildNode.getAttribute("guise:contentHash"));
+										alert("ready to update new element: "+childNode.getAttribute("guise:contentHash"));
+									}
+*/
 									this._synchronizeElement(oldChildNode, childNode);	//synchronize these elements
 									break;
 								case Node.COMMENT_NODE:	//comment

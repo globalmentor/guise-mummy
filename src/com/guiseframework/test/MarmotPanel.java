@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.List;
 
+import javax.mail.internet.ContentType;
+
 import com.garretwilson.model.ResourceModel;
 import com.garretwilson.rdf.RDFLiteral;
 import com.garretwilson.rdf.RDFResource;
@@ -28,6 +30,8 @@ import com.guiseframework.GuiseSession;
 import com.guiseframework.component.*;
 import com.guiseframework.component.rdf.RDFLiteralTreeNodeRepresentationStrategy;
 import com.guiseframework.component.rdf.RDFResourceTreeNodeRepresentationStrategy;
+import com.guiseframework.component.transfer.ImportStrategy;
+import com.guiseframework.component.transfer.Transferable;
 import com.guiseframework.event.*;
 import com.guiseframework.model.Notification;
 import com.guiseframework.model.rdf.RDFObjectTreeNodeModel;
@@ -107,6 +111,7 @@ catch(final ValidationException validationException)
 							frame.setContent(textArea);
 */
 							final TreeControl treeControl=new TreeControl();
+							treeControl.setTreeNodeDragEnabled(true);	//allow tree nodes to be dragged
 							treeControl.setTreeNodeRepresentationStrategy(RDFResource.class, new RepositoryResourceTreeNodeRepresentationStrategy(marmotSession));
 							treeControl.setTreeNodeRepresentationStrategy(RDFLiteral.class, new RDFLiteralTreeNodeRepresentationStrategy());
 							try
@@ -131,6 +136,45 @@ catch(final ValidationException validationException)
 					}
 				});
 		add(addButton);
+		
+		//details text area
+		final TextAreaControl detailsTextArea=new TextAreaControl(15, 80);	//create a text area control
+		detailsTextArea.setLabel("Drop Here for Drop Details");	//set the label of the text area
+		detailsTextArea.setEditable(false);	//don't allow the text area control to be edited
+		detailsTextArea.setDropEnabled(true);	//allow dropping on the text area
+		detailsTextArea.addImportStrategy(new ImportStrategy<TextAreaControl>()	//add a new import strategy for this component
+				{		
+					public boolean canImportTransfer(final TextAreaControl component, final Transferable<?> transferable)
+					{
+						return true;	//accept all import types
+					}
+					public boolean importTransfer(final TextAreaControl component, final Transferable<?> transferable)
+					{
+						final String oldContent=component.getValue();	//get the old text area control content
+						final StringBuilder newContent=new StringBuilder();	//create a string builder to collect our new information
+						if(oldContent!=null)	//if there is content already
+						{
+							newContent.append(oldContent);	//add the old content
+						}
+						newContent.append("Drop Source: ").append(transferable.getSource().getClass().getName()).append('\n');
+						for(final ContentType contentType:transferable.getContentTypes())	//for each content type
+						{
+							newContent.append("* Drop Content Type: ").append(contentType).append('\n');
+							newContent.append("  Drop Data: ").append(transferable.transfer(contentType)).append('\n');	//actually transfer the data
+						}
+						newContent.append('\n');
+						try
+						{
+							component.setValue(newContent.toString());	//update the text area contents
+						}
+						catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
+						{
+						}
+						return true;	//indicate that we imported the information
+					}
+				});
+		add(detailsTextArea);	//add the drop details text area control to the panel
+		
 /*TODO del
 		try
 		{

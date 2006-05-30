@@ -785,7 +785,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		/**@return Whether the component has dragging enabled.*/
 		public boolean isDragEnabled() {return dragEnabled;}
 
-		/**Sets whether the component is has dragging enabled.
+		/**Sets whether the component has dragging enabled.
 		This is a bound property of type <code>Boolean</code>.
 		@param newDragEnabled <code>true</code> if the component should allow dragging, else <code>false</code>.
 		@see Component#DRAG_ENABLED_PROPERTY
@@ -806,7 +806,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		/**@return Whether the component has dropping enabled.*/
 		public boolean isDropEnabled() {return dropEnabled;}
 
-		/**Sets whether the component is has dropping enabled.
+		/**Sets whether the component has dropping enabled.
 		This is a bound property of type <code>Boolean</code>.
 		@param newDropEnabled <code>true</code> if the component should allow dropping, else <code>false</code>.
 		@see Component#DROP_ENABLED_PROPERTY
@@ -974,7 +974,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		@param transferable The object to be transferred.
 		@return <code>true</code> if the given object was be imported.
 		*/
-		public boolean importTransfer(final Transferable transferable)
+		public boolean importTransfer(final Transferable<?> transferable)
 		{
 			for(final ImportStrategy<? super C> importStrategy:importStrategyList)	//for each importstrategy
 			{

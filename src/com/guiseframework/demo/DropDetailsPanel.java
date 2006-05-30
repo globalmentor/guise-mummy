@@ -76,11 +76,11 @@ public class DropDetailsPanel extends DefaultNavigationPanel
 		detailsTextArea.setDropEnabled(true);	//allow dropping on the text area
 		detailsTextArea.addImportStrategy(new ImportStrategy<TextAreaControl>()	//add a new import strategy for this component
 				{		
-					public boolean canImportTransfer(final TextAreaControl component, final Transferable<Component<?>> transferable)
+					public boolean canImportTransfer(final TextAreaControl component, final Transferable<?> transferable)
 					{
 						return true;	//accept all import types
 					}
-					public boolean importTransfer(final TextAreaControl component, final Transferable<Component<?>> transferable)
+					public boolean importTransfer(final TextAreaControl component, final Transferable<?> transferable)
 					{
 						final String oldContent=component.getValue();	//get the old text area control content
 						final StringBuilder newContent=new StringBuilder();	//create a string builder to collect our new information

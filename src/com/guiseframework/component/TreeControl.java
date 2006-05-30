@@ -3,12 +3,21 @@ package com.guiseframework.component;
 import java.util.*;
 import java.util.concurrent.*;
 
+import javax.mail.internet.ContentType;
+
+import static com.garretwilson.lang.ClassUtilities.getPropertyName;
 import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.util.ArrayUtilities.createArray;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.garretwilson.beans.TargetedEvent;
 import com.garretwilson.util.Debug;
+import com.guiseframework.component.AbstractLabel.DefaultTransferable;
+import com.guiseframework.component.transfer.AbstractObjectTransferable;
+import com.guiseframework.component.transfer.AbstractTransferable;
+import com.guiseframework.component.transfer.ExportStrategy;
+import com.guiseframework.component.transfer.Transferable;
 import com.guiseframework.converter.AbstractStringLiteralConverter;
 import com.guiseframework.converter.Converter;
 import com.guiseframework.converter.DefaultStringLiteralConverter;
@@ -22,11 +31,39 @@ Property change events and action events on one tree node will be repeated to th
 public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>, TreeControl.TreeNodeComponentState, TreeControl> implements TreeModel
 {
 
+	/**The bound property of whether the tree node components have dragging enabled.*/
+	public final static String TREE_NODE_DRAG_ENABLED_PROPERTY=getPropertyName(TreeControl.class, "treeNodeDragEnabled");
+
 	/**The tree model used by this component.*/
 	private final TreeModel treeModel;
 
 		/**@return The tree model used by this component.*/
 		protected TreeModel getTreeModel() {return treeModel;}
+
+	/**Whether the tree node components have dragging enabled.*/
+	private boolean treeNodeDragEnabled=false;
+
+		/**@return Whether the tree node component have dragging enabled.*/
+		public boolean isTreeNodeDragEnabled() {return treeNodeDragEnabled;}
+
+		/**Sets whether the tree node components have dragging enabled.
+		This is a bound property of type <code>Boolean</code>.
+		@param newTreeNodeDragEnabled <code>true</code> if each tree node component should allow dragging, else <code>false</code>.
+		@see #TREE_NODE_DRAG_ENABLED_PROPERTY
+		*/
+		public void setTreeNodeDragEnabled(final boolean newTreeNodeDragEnabled)
+		{
+			if(treeNodeDragEnabled!=newTreeNodeDragEnabled)	//if the value is really changing
+			{
+				final boolean oldTreeNodeDragEnabled=treeNodeDragEnabled;	//get the current value
+				treeNodeDragEnabled=newTreeNodeDragEnabled;	//update the value
+				for(final TreeNodeComponentState componentState:getComponentStates())	//for existing component states
+				{
+					componentState.getComponent().setDragEnabled(newTreeNodeDragEnabled);	//update the drag enabled state of this tree node's component
+				}
+				firePropertyChange(TREE_NODE_DRAG_ENABLED_PROPERTY, Boolean.valueOf(oldTreeNodeDragEnabled), Boolean.valueOf(newTreeNodeDragEnabled));
+			}
+		}
 
 	/**An action listener to repeat copies of events received, using this component as the source.*/
 	private ActionListener repeatActionListener=new ActionListener()
@@ -111,6 +148,22 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	{
 		final boolean editable=false;	//TODO fix
 		final Component<?> treeNodeComponent=getTreeNodeRepresentationStrategy(treeNode.getValueClass()).createComponent(this, getTreeModel(), treeNode, editable, false, false);	//create a new component for the tree node
+
+
+//TODO fix; decide how component, tree node, and tree node value will be distinguished		treeNodeComponent.addExportStrategy(new ExportStrategy<TreeNodeModel<T>>()
+//TODO fix				{
+					/**Exports data from the given tree node.
+					@param treeNode The tree nodefrom which data will be transferred.
+					@return The object to be transferred, or <code>null</code> if no data can be transferred.
+					*/
+/*TODO fix; decide how component, tree node, and tree node value will be distinguished
+					public Transferable<TreeNodeModel<T>> exportTransfer(final TreeNodeModel<T> treeNode)
+					{
+						return new DefaultTreeNodeTransferable<T>(treeNode, treeNode.getValueClass());	//return a default transferable for this component
+					}
+				};
+*/
+		treeNodeComponent.setDragEnabled(isTreeNodeDragEnabled());	//set the drag mode appropriately
 		return new TreeNodeComponentState(treeNodeComponent, editable);	//create a new component state for the tree node's component and metadata
 	}
 
@@ -534,6 +587,45 @@ Debug.trace("selecting tree node", treeNode);
 			{
 				selectSingleTreeNode(childTreeNode, selectedTreeNode);	//select or unselect this child recursively using mutual exclusion
 			}
+		}
+	}
+
+	/**The default transferable object for a tree node.
+	@param <V> The type of value contained in the tree node.
+	@author Garret Wilson
+	*/
+	protected static class DefaultTreeNodeTransferable<V> extends AbstractObjectTransferable<TreeNodeModel<V>, V>
+	{
+		/**Source and object class constructor.
+		@param source The source of the transferable data.
+		@param valueClass The class indicating the type of value held in the tree node.
+		@exception NullPointerException if the provided source and/or object class is <code>null</code>.
+		*/
+		public DefaultTreeNodeTransferable(final TreeNodeModel<V> source, final Class<V> valueClass)
+		{
+			super(source, valueClass);	//construct the parent class
+		}
+
+		/**Transfers data using the given content type.
+		@param contentType The type of data expected.
+		@return The transferred data, which may be <code>null</code>.
+		@exception IllegalArgumentException if the given content type is not supported.
+		*/
+		public Object transfer(final ContentType contentType)	//TODO allow for transferring the tree node itself
+		{
+			final TreeNodeModel<V> source=getSource();	//get the source of the transfer
+/*TODO verify the content type
+			if(contentType.match(source.getLabelContentType()))	//if we have the content type requested
+			{
+				final String label=source.getLabel();	//get the label
+				return label!=null ? source.getSession().resolveString(source.getLabel()) : null;	//return the label text, if any
+			}
+			else	//if we don't support this content type
+			{
+				throw new IllegalArgumentException("Content type not supported: "+contentType);
+			}
+*/
+			return source.getValue();	//return the tree node value
 		}
 	}
 

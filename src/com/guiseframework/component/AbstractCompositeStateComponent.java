@@ -4,8 +4,6 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 
 import java.util.*;
 
-import com.guiseframework.component.TreeControl.TreeNodeComponentState;
-
 /**A composite component that represents the state of its child components.
 @param <T> The type of object being represented.
 @param <S> The component state of each object.
@@ -16,6 +14,9 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 
 	/**The map of component state for each object.*/
 	private final Map<T, S> componentStateMap=new HashMap<T, S>();
+
+	/**@return An iterable of component states.*/
+	protected Iterable<S> getComponentStates() {return componentStateMap.values();}	//return the component state values TODO make thread safe
 
 	/**Retrieves a component state for the given object.
 	@param object The object for which a representation component should be returned.

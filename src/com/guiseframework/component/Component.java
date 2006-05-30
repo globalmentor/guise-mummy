@@ -374,7 +374,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	/**@return Whether the component has dragging enabled.*/
 	public boolean isDragEnabled();
 
-	/**Sets whether the component is has dragging enabled.
+	/**Sets whether the component has dragging enabled.
 	This is a bound property of type <code>Boolean</code>.
 	@param newDragEnabled <code>true</code> if the component should allow dragging, else <code>false</code>.
 	@see #DRAG_ENABLED_PROPERTY
@@ -384,7 +384,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	/**@return Whether the component has dropping enabled.*/
 	public boolean isDropEnabled();
 
-	/**Sets whether the component is has dropping enabled.
+	/**Sets whether the component has dropping enabled.
 	This is a bound property of type <code>Boolean</code>.
 	@param newDropEnabled <code>true</code> if the component should allow dropping, else <code>false</code>.
 	@see #DROP_ENABLED_PROPERTY
@@ -448,7 +448,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	@param transferable The object to be transferred.
 	@return <code>true</code> if the given object was be imported.
 	*/
-	public boolean importTransfer(final Transferable transferable);
+	public boolean importTransfer(final Transferable<?> transferable);
 
 	/**Initializes the component after construction.
 	This method can only be called once during the life of a component.
