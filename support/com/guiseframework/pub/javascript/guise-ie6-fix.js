@@ -251,6 +251,7 @@ function GuiseIE6Fix()
 					}
 				}
 			}
+/*TODO maybe delete altogether, now that we have server-side processing; if brought back, fix for missing stylesheet files and the errors thrown if there is no such file
 			else	//if we need to fix this stylesheet (which takes much longer from the client side, because we'll have to reload the stylesheet manually and process it)
 			{
 				var httpCommunicator=new HTTPCommunicator();	//create a communicator to connect back to the server
@@ -265,7 +266,9 @@ function GuiseIE6Fix()
 		//TODO del alert("no definitions: "+noDefinitions);
 					var noImports=noDefinitions.replace(/@import.*;/gm, "");	//remove stylesheet imports
 	//TODO del alert("no imports: "+noImports);
-					var selectors=noImports.split(/\s*,\s*/m);	//split out the selectors
+*/
+//TODO bring back					var selectors=noImports.split(/\s*,\s*/m);	//split out the selectors
+/*TODO maybe delete altogether, now that we have server-side processing; if brought back, fix for missing stylesheet files and the errors thrown if there is no such file
 					var selectorCount=selectors.length==1 && selectors[0].trim().length==0 ? 0 : selectors.length;	//compensate for the special case of no selectors, which would still leave us with one blank selector
 					if(selectorCount!=rules.length)	//if we don't recognize as many selectors as IE recognizes, we're in trouble
 					{
@@ -300,6 +303,7 @@ function GuiseIE6Fix()
 					}
 				}
 			}
+*/
 				//fix any imported stylesheets
 			for(var stylesheetIndex=0; stylesheetIndex<stylesheet.imports.length; ++stylesheetIndex)	//for each imported stylesheet
 			{

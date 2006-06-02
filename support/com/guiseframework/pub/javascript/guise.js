@@ -1497,7 +1497,7 @@ function HTTPCommunicator()
 		HTTPCommunicator.prototype._performRequest=function(method, uri, query, contentType)
 		{
 				//TODO assert this.xmlHTTP does not exist
-			this.xmlHTTP=HTTPCommunicator.prototype._createXMLHTTP();	//create an XML HTTP object
+			this.xmlHTTP=this._createXMLHTTP();	//create an XML HTTP object
 			var xmlHTTP=this.xmlHTTP;	//make a local copy of the XML HTTP request object
 			if(method=="GET" && query)	//if there is a query for the GET method
 			{
@@ -1515,13 +1515,13 @@ function HTTPCommunicator()
 //TODO del alert("posting with query: "+query);
 	//TODO del alert("posting with query: "+query);
 //TODO del				this.xmlHTTP.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");	//set the post content type
-xmlHTTP.setRequestHeader("x-content", query);	//TODO del; debugging
 				if(contentType)	//if a content type was given
 				{
 					xmlHTTP.setRequestHeader("Content-Type", contentType);	//set the post content type
 				}
 				if(query)	//if there is a post query
 				{
+//TODO del xmlHTTP.setRequestHeader("x-content", query);	//TODO del; debugging
 					content=query;	//use the query as the content
 				}	
 			}

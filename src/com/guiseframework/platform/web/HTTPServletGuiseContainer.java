@@ -8,6 +8,7 @@ import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.*;
 import java.security.Principal;
@@ -207,6 +208,35 @@ Debug.trace("+++removing Guise session", httpSession.getId());
 		return getServletContext().getResourceAsStream(getContextAbsoluteResourcePath(resourcePath));	//try to get an input stream to the resource
 	}
 
+	/**Retrieves an input stream to the entity at the given URI.
+	The URI is first resolved to the container base URI.
+	This version loads local resources directly through the servlet context.
+	@param uri A URI to the entity; either absolute or relative to the container.
+	@return An input stream to the entity at the given resource URI, or <code>null</code> if no entity exists at the given resource path..
+	@exception NullPointerException if the given URI is <code>null</code>.
+	@exception IOException if there was an error connecting to the entity at the given URI.
+	@see #getBaseURI()
+	*/
+	public InputStream getInputStream(final URI uri) throws IOException
+	{
+//TODO del Debug.trace("getting container input stream to URI", uri);
+		final URI baseURI=getBaseURI();	//get the base URI
+//	TODO del Debug.trace("base URI:", baseURI);
+		final URI absoluteResolvedURI=baseURI.resolve(uri);	//resolve the URI against the container base URI
+//	TODO del Debug.trace("resolved URI:", absoluteResolvedURI);
+		final URI relativeURI=baseURI.relativize(absoluteResolvedURI);	//see if the absolute URI is in the application public path
+//	TODO del Debug.trace("relative URI:", relativeURI);		
+		
+//TODO allow multiple base URIs; as a short-term fix, check HTTP and HTTPS variations 
+		
+		if(!relativeURI.isAbsolute())	//if the URI is relative to the container base URI, we can load it directly
+		{
+//TODO del Debug.trace("Loading directly from servlet: "+ROOT_PATH+relativeURI);
+			return getServletContext().getResourceAsStream(ROOT_PATH+relativeURI.toString());	//get an input stream through the servlet context (which may be null if there is no such resource)
+		}
+		return super.getInputStream(uri);	//if we can't get the resource locally, delegate to the super class
+	}	
+	
 	/**Determines the servlet context-relative absolute path of the given container-relative path.
 	The provided path is first normalized.
 	@param containerRelativeResourcePath A container-relative path to a resource in the resource storage area.

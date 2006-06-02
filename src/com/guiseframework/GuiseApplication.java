@@ -244,7 +244,7 @@ public interface GuiseApplication extends PropertyBindable
 	The URI is first resolved to the application base path.
 	If this is a <code>resource:</code> URI representing a private resource, this method delegates to {@link #getResourceInputStream(String)}.
 	@param uri A URI to the entity; either absolute or relative to the application.
-	@return An input stream to the entity at the given resource URI.
+	@return An input stream to the entity at the given resource URI, or <code>null</code> if no entity exists at the given resource path..
 	@exception NullPointerException if the given URI is <code>null</code>.
 	@exception IOException if there was an error connecting to the entity at the given URI.
 	@see #resolveURI(URI)

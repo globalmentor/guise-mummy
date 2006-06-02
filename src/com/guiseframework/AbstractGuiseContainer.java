@@ -281,12 +281,12 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	/**Retrieves an input stream to the entity at the given URI.
 	The URI is first resolved to the container base URI.
 	@param uri A URI to the entity; either absolute or relative to the container.
-	@return An input stream to the entity at the given resource URI.
+	@return An input stream to the entity at the given resource URI, or <code>null</code> if no entity exists at the given resource path..
 	@exception NullPointerException if the given URI is <code>null</code>.
 	@exception IOException if there was an error connecting to the entity at the given URI.
 	@see #getBaseURI()
 	*/
-	public InputStream getInputStream(final URI uri) throws IOException	//TODO fix to work with resource URIs by delegating to getResourceInputStream(); fix to send the session ID so a new Guise session will not be created; fix to access  publicly accessible information
+	public InputStream getInputStream(final URI uri) throws IOException	//TODO fix to work with resource URIs by delegating to getResourceInputStream()
 	{
 			//TODO make sure this is an HTTP URI; update to work with resource URIs
 		final URI resolvedURI=getBaseURI().resolve(uri);	//resolve the URI against the container base URI
@@ -294,9 +294,9 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 		{
 			return new HTTPResource(resolvedURI).getInputStream();	//get an input stream to the URI
 		}
-		catch(final HTTPNotFoundException httpNotFoundException)	//if the file was not found TODO update API to allow null for not found
+		catch(final HTTPNotFoundException httpNotFoundException)	//if the file was not found
 		{
-			return null;
+			return null;	//indicate that there is no file at this URI
 		}
 	}
 

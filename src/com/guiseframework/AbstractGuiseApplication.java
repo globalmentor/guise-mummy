@@ -674,7 +674,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	The URI is first resolved to the application base path.
 	If the URI represents one of this application's public resources, this implementation will return an input stream directly from that resource if possible rather than issuing a separate server request.
 	@param uri A URI to the entity; either absolute or relative to the application.
-	@return An input stream to the entity at the given resource URI.
+	@return An input stream to the entity at the given resource URI, or <code>null</code> if no entity exists at the given resource path..
 	@exception NullPointerException if the given URI is <code>null</code>.
 	@exception IOException if there was an error connecting to the entity at the given URI.
 	@see #resolveURI(URI)

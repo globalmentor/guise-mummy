@@ -426,14 +426,14 @@ Debug.trace("applicationContextPath", guiseApplicationContextPath);
 Debug.trace("raw path info:", rawPathInfo);
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
 		final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
-
+/*TODO del
 final Enumeration headerNames=request.getHeaderNames();	//TODO del
 while(headerNames.hasMoreElements())
 {
 	final String headerName=(String)headerNames.nextElement();
 	Debug.info("request header:", headerName, request.getHeader(headerName));
 }
-
+*/
 		if(rawPathInfo.startsWith(GUISE_PUBLIC_RESOURCE_BASE_PATH))	//if this is a request for a public resource
 		{
 			super.doGet(request, response);	//go ahead and retrieve the resource immediately
@@ -464,12 +464,12 @@ Debug.info("content type:", request.getContentType());
 		final GuiseSessionThreadGroup guiseSessionThreadGroup=Guise.getInstance().getThreadGroup(guiseSession);	//get the thread group for this session
 //	TODO del Debug.trace("creating runnable");
 		final GuiseSessionRunnable guiseSessionRunnable=new GuiseSessionRunnable(request, response, guiseContainer, guiseApplication, guiseSession);	//create a runnable instance to service the Guise request
-Debug.trace("calling runnable");
+//TODO del Debug.trace("calling runnable");
 		call(guiseSessionThreadGroup, guiseSessionRunnable);	//call the runnable in a new thread inside the thread group
-Debug.trace("done with the call");
+//TODO del Debug.trace("done with the call");
 		if(guiseSessionRunnable.servletException!=null)
 		{
-			Debug.trace("callling runnable");
+//TODO del			Debug.trace("callling runnable");
 			throw guiseSessionRunnable.servletException;
 		}
 		if(guiseSessionRunnable.ioException!=null)
@@ -477,7 +477,6 @@ Debug.trace("done with the call");
 			throw guiseSessionRunnable.ioException;
 		}
 		if(!guiseSessionRunnable.isGuiseRequest)
-//TODO del		if(!serviceGuiseRequest(request, response, guiseContainer, guiseApplication, guiseSession))	//service this Guise request; if this wasn't meant for Guise
 		{
 			super.doGet(request, response);	//let the default functionality take over
 		}
@@ -554,7 +553,7 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
   */
 	private boolean serviceGuiseRequest(final HttpServletRequest request, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession) throws ServletException, IOException
 	{
-Debug.trace("servicing Guise request");
+//TODO del Debug.trace("servicing Guise request");
 		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request		
 		final String contentTypeString=request.getContentType();	//get the request content type
 		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
@@ -575,7 +574,7 @@ Debug.trace("servicing Guise request");
 			synchronized(guiseSession)	//don't allow other session contexts to be active at the same time
 			{
 
-Debug.trace("setting context");
+//TODO del Debug.trace("setting context");
 				guiseSession.setContext(guiseContext);	//set the context for this session
 				try
 				{
@@ -598,7 +597,7 @@ Debug.trace("setting context");
 					final NavigationPanel navigationPanel=guiseSession.getNavigationPanel(navigationPath);	//get the panel bound to the requested path
 					assert navigationPanel!=null : "No navigation panel found, even though we found a valid destination.";
 					final ApplicationFrame<?> applicationFrame=guiseSession.getApplicationFrame();	//get the application frame
-Debug.trace("ready to get control events");
+//TODO del Debug.trace("ready to get control events");
 					final List<ControlEvent> controlEvents=getControlEvents(request, guiseSession);	//get all control events from the request
 Debug.trace("got control events");
 					if(isAJAX)	//if this is an AJAX request
@@ -1128,10 +1127,11 @@ Debug.trace("getting control events");
 				
 				
 				
-//TODO bring back				final DocumentBuilderFactory documentBuilderFactory=DocumentBuilderFactory.newInstance();	//create a document builder factory TODO create a shared document builder factory, maybe---but make sure it is used by only one thread			
-//TODO bring back				final DocumentBuilder documentBuilder=documentBuilderFactory.newDocumentBuilder();	//create a new document builder
-//TODO bring back				final Document document=documentBuilder.parse(request.getInputStream());	//read the document from the request
-				
+				final DocumentBuilderFactory documentBuilderFactory=DocumentBuilderFactory.newInstance();	//create a document builder factory TODO create a shared document builder factory, maybe---but make sure it is used by only one thread			
+				final DocumentBuilder documentBuilder=documentBuilderFactory.newDocumentBuilder();	//create a new document builder
+				final Document document=documentBuilder.parse(request.getInputStream());	//read the document from the request
+
+/*TODO del if not needed; IE6 SSL bug now worked around
 final Document document=getXML(request);
 //TODO del Debug.trace("got document:", XMLUtilities.toString(document));
 if(document==null)	//TODO fix; del
@@ -1140,8 +1140,7 @@ if(document==null)	//TODO fix; del
 	Debug.traceStack("error: unable to get document");
 	throw new AssertionError("unable to get document");
 }
-
-				
+*/			
 				
 				final List<Node> eventNodes=(List<Node>)XPath.evaluatePathExpression(document, AJAX_REQUEST_EVENTS_WILDCARD_XPATH_EXPRESSION);	//get all the events
 				for(final Node eventNode:eventNodes)	//for each event node
@@ -1240,7 +1239,6 @@ if(document==null)	//TODO fix; del
 					}
 				}
 			}
-/*TODO bring back
 			catch(final ParserConfigurationException parserConfigurationException)	//we don't expect parser configuration errors
 			{
 				throw new AssertionError(parserConfigurationException);
@@ -1249,7 +1247,6 @@ if(document==null)	//TODO fix; del
 			{
 				throw new AssertionError(saxException);	//TODO maybe change to throwing an IOException
 			}
-*/
 			catch(final IOException ioException)	//if there is an I/O exception
 			{
 				throw new AssertionError(ioException);	//TODO fix better
@@ -1480,7 +1477,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
   */
   protected boolean exists(final URI resourceURI) throws IOException
   {
-Debug.trace("checking exists", resourceURI);
+//TODO del Debug.trace("checking exists", resourceURI);
   	if(isPublicResourceURI(resourceURI))	//if this URI represents a Guise public resource
   	{
   		final String publicResourceKey=getPublicResourceKey(resourceURI);	//get the Guise public resource key
@@ -1522,7 +1519,7 @@ Debug.trace("checking exists", resourceURI);
   		resource=super.getResource(resourceURI);	//return a default resource
   	}
 		final ContentType contentType=getContentType(resource);	//get the content type of the resource
-Debug.trace("got content type", contentType, "for resource", resource);
+//TODO del Debug.trace("got content type", contentType, "for resource", resource);
 		if(TEXT_CSS_CONTENT_TYPE.match(contentType))	//if this is a CSS stylesheet
 		{
 			return new CSSResource(resource);	//return a resource that does extra CSS processing
