@@ -150,19 +150,17 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		final Component<?> treeNodeComponent=getTreeNodeRepresentationStrategy(treeNode.getValueClass()).createComponent(this, getTreeModel(), treeNode, editable, false, false);	//create a new component for the tree node
 
 
-//TODO fix; decide how component, tree node, and tree node value will be distinguished		treeNodeComponent.addExportStrategy(new ExportStrategy<TreeNodeModel<T>>()
-//TODO fix				{
+		treeNodeComponent.addExportStrategy(new ExportStrategy()	//TODO fix for generics with a separate method 
+				{
 					/**Exports data from the given tree node.
-					@param treeNode The tree nodefrom which data will be transferred.
-					@return The object to be transferred, or <code>null</code> if no data can be transferred.
+					@param component The component from which data will be transferred.
 					*/
-/*TODO fix; decide how component, tree node, and tree node value will be distinguished
-					public Transferable<TreeNodeModel<T>> exportTransfer(final TreeNodeModel<T> treeNode)
+					public Transferable<Component> exportTransfer(final Component component)
 					{
-						return new DefaultTreeNodeTransferable<T>(treeNode, treeNode.getValueClass());	//return a default transferable for this component
+						return new TreeNodeTransferable<T>(TreeControl.this, treeNode);	//return a default transferable for the tree and the tree node
 					}
-				};
-*/
+				});
+
 		treeNodeComponent.setDragEnabled(isTreeNodeDragEnabled());	//set the drag mode appropriately
 		return new TreeNodeComponentState(treeNodeComponent, editable);	//create a new component state for the tree node's component and metadata
 	}
@@ -590,43 +588,46 @@ Debug.trace("selecting tree node", treeNode);
 		}
 	}
 
-	/**The default transferable object for a tree node.
+	/**The transferable object for a tree node.
+	This transferable is able to transfer either the tree node itself or the object stored in the tree node. 
 	@param <V> The type of value contained in the tree node.
 	@author Garret Wilson
 	*/
-	protected static class DefaultTreeNodeTransferable<V> extends AbstractObjectTransferable<TreeNodeModel<V>, V>
+	protected static class TreeNodeTransferable<V> extends AbstractObjectTransferable<Component>	//TODO fix Component with another generic parameter
 	{
-		/**Source and object class constructor.
+
+		/**The tree node to transfer.*/
+		private final TreeNodeModel<V> treeNode;
+		
+		/**Source and tree node constructor.
 		@param source The source of the transferable data.
-		@param valueClass The class indicating the type of value held in the tree node.
-		@exception NullPointerException if the provided source and/or object class is <code>null</code>.
+		@param treeNode The tree node representing the transferred data.
+		@exception NullPointerException if the provided source and/or tree node is <code>null</code>.
 		*/
-		public DefaultTreeNodeTransferable(final TreeNodeModel<V> source, final Class<V> valueClass)
+		public TreeNodeTransferable(final TreeControl source, final TreeNodeModel<V> treeNode)
 		{
-			super(source, valueClass);	//construct the parent class
+			super(source, treeNode.getClass(), treeNode.getValueClass());	//construct the parent class, indicating support for transferring the tree node itself or the value contained in the tree node
+			this.treeNode=checkInstance(treeNode, "Tree node cannot be null.");
 		}
 
-		/**Transfers data using the given content type.
-		@param contentType The type of data expected.
-		@return The transferred data, which may be <code>null</code>.
-		@exception IllegalArgumentException if the given content type is not supported.
+		/**Transfers data of the given class.
+		This implementation returns subclasses.
+		@param <T> The type of object to be transferred.
+		@param objectClass The class of object to return.
+		@return The transferred data object, which may be <code>null</code>.
+		@exception IllegalArgumentException if the given class is not supported.
 		*/
-		public Object transfer(final ContentType contentType)	//TODO allow for transferring the tree node itself
+		public <T> T transfer(final Class<T> objectClass)
 		{
-			final TreeNodeModel<V> source=getSource();	//get the source of the transfer
-/*TODO verify the content type
-			if(contentType.match(source.getLabelContentType()))	//if we have the content type requested
+			if(objectClass.isAssignableFrom(treeNode.getValueClass()))	//if the value class can be cast to the object class
 			{
-				final String label=source.getLabel();	//get the label
-				return label!=null ? source.getSession().resolveString(source.getLabel()) : null;	//return the label text, if any
+				return objectClass.cast(treeNode.getValue());	//return the value of the tree node
 			}
-			else	//if we don't support this content type
+			else if(objectClass.isAssignableFrom(treeNode.getClass()))	//if the tree node class can be cast to the object class
 			{
-				throw new IllegalArgumentException("Content type not supported: "+contentType);
+				return objectClass.cast(treeNode);	//return the tree node itself				
 			}
-*/
-			return source.getValue();	//return the tree node value
+			throw new IllegalArgumentException("Transfer class not supported: "+objectClass);
 		}
 	}
-
 }

@@ -39,6 +39,7 @@ import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 import static com.garretwilson.text.CharacterConstants.*;
 import static com.garretwilson.text.xml.XMLConstants.*;
+import com.garretwilson.text.xml.XMLUtilities;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
 import com.garretwilson.rdf.RDFResourceIO;
@@ -423,6 +424,15 @@ Debug.trace("applicationContextPath", guiseApplicationContextPath);
 	{
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 Debug.trace("raw path info:", rawPathInfo);
+		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
+		final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
+
+final Enumeration headerNames=request.getHeaderNames();	//TODO del
+while(headerNames.hasMoreElements())
+{
+	final String headerName=(String)headerNames.nextElement();
+	Debug.info("request header:", headerName, request.getHeader(headerName));
+}
 
 		if(rawPathInfo.startsWith(GUISE_PUBLIC_RESOURCE_BASE_PATH))	//if this is a request for a public resource
 		{
@@ -431,6 +441,18 @@ Debug.trace("raw path info:", rawPathInfo);
 		}
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
+/*TODO del
+		
+				//TODO double-test AJAX
+Debug.trace("does navigation path exist?", navigationPath);
+  	if(!guiseApplication.hasDestination(navigationPath))	//if the URI doesn't represent a valid navigation path
+  	{
+Debug.trace("navigation path doesn't exist; doing normal get", navigationPath);
+			super.doGet(request, response);	//go ahead and retrieve the resource immediately
+			return;	//don't try to see if there is a navigation path for this path
+		}
+*/
+		
 		final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
 /*TODO del
 Debug.info("session ID", guiseSession.getHTTPSession().getId());	//TODO del
@@ -438,11 +460,16 @@ Debug.info("content length:", request.getContentLength());
 Debug.info("content type:", request.getContentType());
 */
 //TODO del Debug.info("supports Flash: ", guiseSession.getEnvironment().getProperty(GuiseEnvironment.CONTENT_APPLICATION_SHOCKWAVE_FLASH_ACCEPTED_PROPERTY));
+//TODO del Debug.trace("creating thread group");
 		final GuiseSessionThreadGroup guiseSessionThreadGroup=Guise.getInstance().getThreadGroup(guiseSession);	//get the thread group for this session
+//	TODO del Debug.trace("creating runnable");
 		final GuiseSessionRunnable guiseSessionRunnable=new GuiseSessionRunnable(request, response, guiseContainer, guiseApplication, guiseSession);	//create a runnable instance to service the Guise request
+Debug.trace("calling runnable");
 		call(guiseSessionThreadGroup, guiseSessionRunnable);	//call the runnable in a new thread inside the thread group
+Debug.trace("done with the call");
 		if(guiseSessionRunnable.servletException!=null)
 		{
+			Debug.trace("callling runnable");
 			throw guiseSessionRunnable.servletException;
 		}
 		if(guiseSessionRunnable.ioException!=null)
@@ -527,6 +554,7 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
   */
 	private boolean serviceGuiseRequest(final HttpServletRequest request, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession) throws ServletException, IOException
 	{
+Debug.trace("servicing Guise request");
 		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request		
 		final String contentTypeString=request.getContentType();	//get the request content type
 		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
@@ -541,10 +569,13 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 		final Destination destination=guiseApplication.getDestination(navigationPath);	//get the destination, if any, associated with the requested path
 		if(destination!=null)	//if we have a destination associated with the requested path
 		{
+//		TODO del Debug.trace("have destination; creating context");
 			final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, destination, request, response);	//create a new Guise context
+//		TODO del Debug.trace("got context");
 			synchronized(guiseSession)	//don't allow other session contexts to be active at the same time
 			{
 
+Debug.trace("setting context");
 				guiseSession.setContext(guiseContext);	//set the context for this session
 				try
 				{
@@ -567,7 +598,9 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 					final NavigationPanel navigationPanel=guiseSession.getNavigationPanel(navigationPath);	//get the panel bound to the requested path
 					assert navigationPanel!=null : "No navigation panel found, even though we found a valid destination.";
 					final ApplicationFrame<?> applicationFrame=guiseSession.getApplicationFrame();	//get the application frame
+Debug.trace("ready to get control events");
 					final List<ControlEvent> controlEvents=getControlEvents(request, guiseSession);	//get all control events from the request
+Debug.trace("got control events");
 					if(isAJAX)	//if this is an AJAX request
 					{
 /*TODO tidy when stringbuilder context works
@@ -854,7 +887,6 @@ Debug.trace("new bookmark:", newBookmark);
 						guiseContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type TODO verify UTF-8 in a consistent, elegant way
 						text="<response>"+text+"</response>";	//wrap the text in a response element
 					}
-//TODO del					final StringBuilder stringBuilder=guiseContext.getStringBuilder();	//get the string builder collected output for this context
 //TODO del Debug.trace("response:", text);
 //TODO del Debug.trace("response length:", text.length());
 					final byte[] bytes=text.getBytes(UTF_8);	//write the content we collected in the context as series of bytes encoded in UTF-8
@@ -1083,16 +1115,34 @@ Debug.trace("new bookmark:", newBookmark);
   */
 	protected List<ControlEvent> getControlEvents(final HttpServletRequest request, final GuiseSession guiseSession) throws ServletException, IOException
 	{
+Debug.trace("getting control events");
 		final List<ControlEvent> controlEventList=new ArrayList<ControlEvent>();	//create a new list for storing control events
 		final String contentTypeString=request.getContentType();	//get the request content type
 		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
 		if(contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType))	//if this is a Guise AJAX request
 		{
+//		TODO del Debug.trace("Guise AJAX request");
 			try
 			{
-				final DocumentBuilderFactory documentBuilderFactory=DocumentBuilderFactory.newInstance();	//create a document builder factory TODO create a shared document builder factory, maybe---but make sure it is used by only one thread			
-				final DocumentBuilder documentBuilder=documentBuilderFactory.newDocumentBuilder();	//create a new document builder
-				final Document document=documentBuilder.parse(request.getInputStream());	//read the document from the request
+
+				
+				
+				
+//TODO bring back				final DocumentBuilderFactory documentBuilderFactory=DocumentBuilderFactory.newInstance();	//create a document builder factory TODO create a shared document builder factory, maybe---but make sure it is used by only one thread			
+//TODO bring back				final DocumentBuilder documentBuilder=documentBuilderFactory.newDocumentBuilder();	//create a new document builder
+//TODO bring back				final Document document=documentBuilder.parse(request.getInputStream());	//read the document from the request
+				
+final Document document=getXML(request);
+//TODO del Debug.trace("got document:", XMLUtilities.toString(document));
+if(document==null)	//TODO fix; del
+{
+	
+	Debug.traceStack("error: unable to get document");
+	throw new AssertionError("unable to get document");
+}
+
+				
+				
 				final List<Node> eventNodes=(List<Node>)XPath.evaluatePathExpression(document, AJAX_REQUEST_EVENTS_WILDCARD_XPATH_EXPRESSION);	//get all the events
 				for(final Node eventNode:eventNodes)	//for each event node
 				{
@@ -1190,6 +1240,7 @@ Debug.trace("new bookmark:", newBookmark);
 					}
 				}
 			}
+/*TODO bring back
 			catch(final ParserConfigurationException parserConfigurationException)	//we don't expect parser configuration errors
 			{
 				throw new AssertionError(parserConfigurationException);
@@ -1198,6 +1249,7 @@ Debug.trace("new bookmark:", newBookmark);
 			{
 				throw new AssertionError(saxException);	//TODO maybe change to throwing an IOException
 			}
+*/
 			catch(final IOException ioException)	//if there is an I/O exception
 			{
 				throw new AssertionError(ioException);	//TODO fix better
@@ -1266,27 +1318,6 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 */
 		return controlEventList;	//return the list of control events
 	}
-
-  /**Determines if the resource at a given URI exists.
-  This version adds checks to see if the URI represents a valid application navigation path.
-  @param resourceURI The URI of the requested resource.
-  @return <code>true</code> if the resource exists, else <code>false</code>.
-	@exception IOException if there is an error accessing the resource.
-  */
-/*TODO del; moved
-  protected boolean exists(final URI resourceURI) throws IOException
-  {
-  	final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-  	if(guiseApplication.hasDestination(guiseApplication.relativizeURI(resourceURI)))	//if the URI represents a valid navigation path
-  	{
-  		return true;	//the navigation path exists
-  	}
-  	else	//if there is no navigation path
-  	{
-  		return super.exists(resourceURI);	//see if a physical resource exists at the location
-  	}
-  }
-*/
 
 	/**Begins modal navigation based upon modal navigation information.
 	@param guiseApplication The Guise application.
@@ -1544,7 +1575,7 @@ Debug.trace("got content type", contentType, "for resource", resource);
 							final Object version=userAgentProperties.get(USER_AGENT_VERSION_NUMBER_PROPERTY);	//get the version number
 							if(version instanceof Float && ((Float)version).floatValue()<7.0f)	//if this is IE 6 (lower than IE 7)
 							{
-								cssProcessor.fixIE6Stylesheet(cssStylesheet);
+								cssProcessor.fixIE6Stylesheet(cssStylesheet);	//fix this stylesheet for IE6
 //TODO del								Debug.trace("fixed stylesheet for IE6", cssStylesheet);
 							}
 						}

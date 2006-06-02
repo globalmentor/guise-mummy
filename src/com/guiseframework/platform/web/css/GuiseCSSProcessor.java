@@ -21,6 +21,16 @@ public class GuiseCSSProcessor extends CSSProcessor
 	/**The class delimiter for classes that have been fixed for IE6.*/
 	public final static String GUISE_IE6_FIX_CLASS_DELIMITER="_-";
 
+	/**The list of IE6 fix classes.
+	This map is populated by {@link #fixIE6Stylesheet(CSSStylesheet)}.
+	*/
+	private final List<IE6FixClass> ie6FixClasses=new ArrayList<IE6FixClass>();
+
+		/**The list of IE6 fix classes.
+		This map is populated by {@link #fixIE6Stylesheet(CSSStylesheet)}.
+		*/
+		public List<IE6FixClass> getIE6FixClasses() {return ie6FixClasses;}
+
 	/**Modifies a CSS stylesheet to allow workarounds with IE6 shortcomings.
 	An empty rule with the type selector {@link #GUISE_IE6_FIX_TYPE_SELECTOR} will be added as the first style for identification purposes.
 	For selectors that contain multiple class selectors, the class selectors will be combined to form a selector in the form element.guiseIE6_-class1_-class2_-class3:pseudoClass, with the class selectors in alphabetical order.
@@ -54,6 +64,7 @@ public class GuiseCSSProcessor extends CSSProcessor
 					}
 					if(classSelectors.size()>1)	//if there are more than one class selector, fix this selector for IE6
 					{
+						final List<SimpleSelector> unfixedSimpleSelectorSequence=new ArrayList<SimpleSelector>(simpleSelectorSequence);	//create a copy of the unfixed simple selector sequence
 						simpleSelectorSequence.clear();	//clear the sequence of simple selectors
 						if(typeSelector!=null)	//if there is a type selector
 						{
@@ -65,7 +76,9 @@ public class GuiseCSSProcessor extends CSSProcessor
 						{
 							ie6FixClassStringBuilder.append(GUISE_IE6_FIX_CLASS_DELIMITER).append(classSelector.getClassName());	//_-className							
 						}
-						simpleSelectorSequence.add(new ClassSelector(ie6FixClassStringBuilder.toString()));	//add a class selector for the fixed version of the multiple class selector
+						final String ie6FixClass=ie6FixClassStringBuilder.toString();	//get the fix class to use
+						ie6FixClasses.add(new IE6FixClass(unfixedSimpleSelectorSequence, ie6FixClass));	//add this IE6 fix class
+						simpleSelectorSequence.add(new ClassSelector(ie6FixClass));	//add a class selector for the fixed version of the multiple class selector
 						simpleSelectorSequence.addAll(otherSelectors);	//add all the remaining simple selectors
 					}
 				}
@@ -73,4 +86,36 @@ public class GuiseCSSProcessor extends CSSProcessor
 		}
 		stylesheet.getRules().add(0, new Rule(new Selector(GUISE_IE6_FIX_TYPE_SELECTOR)));	//prepend a new rule with a Guise IE6 fix selector as a flag
 	}
+
+
+	/**A specification for an IE6 fix class and the selectors that cause it to be added to an element's class list.
+	@author Garret Wilson
+	*/
+	public static class IE6FixClass
+	{
+		
+		/**The unfixed sequence of simple selectors that match an element (e.g. "div.class1.class2").*/
+		private final List<SimpleSelector> simpleSelectorSequence; 
+
+			/**@return The unfixed sequence of simple selectors that match an element (e.g. "div.class1.class2").*/
+			public List<SimpleSelector> getSimpleSelectorSequence() {return simpleSelectorSequence;} 
+
+		/**The class to add for fixing IE6 for multiple class selectors.*/
+		private final String fixClass;
+
+			/**@return The class to add for fixing IE6 for multiple class selectors.*/
+			public String getFixClass() {return fixClass;}
+	
+		/**Selectors and class constructor.
+		@param simpleSelectors The unfixed simple selectors that match an element (e.g. "div.class1.class2").
+		@param fixClass The class to add for fixing IE6 for multiple class selectors.
+		@exception NullPointerException if the selectors and/or the fix class is <code>null</code>.
+		*/
+		public IE6FixClass(final List<SimpleSelector> simpleSelectors, final String fixClass)
+		{
+			this.simpleSelectorSequence=new ArrayList<SimpleSelector>(checkInstance(simpleSelectors, "Simple selectors cannot be null."));
+			this.fixClass=checkInstance(fixClass, "Fix class cannot be null.");
+		}
+	}
+
 }

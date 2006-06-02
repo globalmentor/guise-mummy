@@ -183,25 +183,29 @@ function GuiseIE6Fix()
 					classNameModified=true;	//note the we modified the class name
 				}
 			}
-			var newClassNames=null;	//we'll create an array of new class names if we have to add fixed element selectors
+			var newClassNameSet=null;	//we'll create an associative array of new class names if we have to add fixed element selectors (we don't want to add fixed class names twice)
 			for(var elementSelectorIndex=this.cssMultipleClassElementSelectors.length-1; elementSelectorIndex>=0; --elementSelectorIndex)	//for each multiple class element selector
 			{
 				var elementSelector=this.cssMultipleClassElementSelectors[elementSelectorIndex];	//get a reference to this element selector
 				if(elementSelector.selects(element, elementClassNameSet))	//if this element selector selects this element
 				{
-					if(newClassNames==null)	//if there are no new class names
+					if(newClassNameSet==null)	//if there are no new class names
 					{
-						newClassNames=new Array();	//create the array of new class names
+						newClassNameSet=new Object();	//create the array of new class names
 					}
-					newClassNames.add(elementSelector.ie6FixClassName);	//add the IE6 fix class for this selector						
+					newClassNameSet[elementSelector.ie6FixClassName]=true;	//add the IE6 fix class for this selector						
 					classNameModified=true;	//note the we modified the class name
 				}
 			}
 			if(classNameModified)	//if we touched up the class names
 			{
-				if(newClassNames==null)	//if there are no new class names
+				var newClassNames=new Array();	//create an array for the new class names
+				if(newClassNameSet!=null)	//if there are new class names
 				{
-					newClassNames=new Array();	//create the array of new class names
+					for(var className in newClassNameSet)	//for each new class name
+					{
+						newClassNames.add(className);	//add this class name to the array
+					}
 				}
 				for(var className in elementClassNameSet)	//for each remaining class name
 				{

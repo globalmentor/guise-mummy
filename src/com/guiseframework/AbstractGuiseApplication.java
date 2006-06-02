@@ -688,11 +688,16 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			return getResourceInputStream(uri.get)
 		}
 */
+//TODO del Debug.trace("getting input stream to URI", uri);
 		final GuiseContainer container=getContainer();	//get the container
-		final URI resolvedURI=resolveURI(uri);	//resolve the URI to the application		
+		final URI resolvedURI=resolveURI(uri);	//resolve the URI to the application
+//	TODO del Debug.trace("resolved URI:", resolvedURI);
 		final URI absoluteResolvedURI=container.getBaseURI().resolve(resolvedURI);	//resolve the URI against the container base URI
+//	TODO del Debug.trace("absolute resolved URI:", absoluteResolvedURI);
 		final URI publicResourcesBaseURI=container.getBaseURI().resolve(getBasePath()+WebPlatformConstants.GUISE_PUBLIC_PATH);	//TODO comment; use something non-web-specific
-		final URI resourceURI=publicResourcesBaseURI.relativize(absoluteResolvedURI);	//see if the absolute URI is in the application public path 
+//	TODO del Debug.trace("publicResourcesBaseURI:", publicResourcesBaseURI);
+		final URI resourceURI=publicResourcesBaseURI.relativize(absoluteResolvedURI);	//see if the absolute URI is in the application public path
+//	TODO del Debug.trace("resourceURI:", resourceURI);		
 		if(!resourceURI.isAbsolute())	//if the URI is relative to the application's public resources
 		{
 			return Guise.getInstance().getPublicResourceInputStream(PUBLIC_RESOURCE_BASE_PATH+resourceURI.getPath());	//return an input stream to the resource directly, rather than going through the server

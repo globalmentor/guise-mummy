@@ -19,7 +19,7 @@ public interface ImportStrategy<C extends Component<?>>
 	/**Imports the given data into the given component.
 	@param component The component into which the object will be transferred.
 	@param transferable The object to be transferred.
-	@return <code>true</code> if the given object was be imported.
+	@return <code>true</code> if the given object was imported.
 	*/
 	public boolean importTransfer(final C component, final Transferable<?> transferable);
 }

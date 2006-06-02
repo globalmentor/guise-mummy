@@ -9,6 +9,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.garretwilson.io.IO;
+import com.garretwilson.net.http.HTTPNotFoundException;
 import com.garretwilson.net.http.HTTPResource;
 import com.garretwilson.rdf.RDFResourceIO;
 import com.guiseframework.platform.web.WebPlatformConstants;
@@ -285,11 +286,18 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	@exception IOException if there was an error connecting to the entity at the given URI.
 	@see #getBaseURI()
 	*/
-	public InputStream getInputStream(final URI uri) throws IOException	//TODO fix to work with resource URIs by delegating to getResourceInputStream(); fix to send the session ID so a new Guise session will not be created
+	public InputStream getInputStream(final URI uri) throws IOException	//TODO fix to work with resource URIs by delegating to getResourceInputStream(); fix to send the session ID so a new Guise session will not be created; fix to access  publicly accessible information
 	{
 			//TODO make sure this is an HTTP URI; update to work with resource URIs
 		final URI resolvedURI=getBaseURI().resolve(uri);	//resolve the URI against the container base URI
-		return new HTTPResource(resolvedURI).getInputStream();	//get an input stream to the URI
+		try
+		{
+			return new HTTPResource(resolvedURI).getInputStream();	//get an input stream to the URI
+		}
+		catch(final HTTPNotFoundException httpNotFoundException)	//if the file was not found TODO update API to allow null for not found
+		{
+			return null;
+		}
 	}
 
 	/**Looks up an application principal from the given ID.

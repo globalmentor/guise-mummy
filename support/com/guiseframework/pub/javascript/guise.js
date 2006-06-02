@@ -169,6 +169,12 @@ Array.prototype.indexOfMatch=function(regexp)
 	return -1;	//indicate that the object could not be found
 };
 
+/**Clears an array by removing every item at every index in the array.*/
+Array.prototype.clear=function()
+{
+	this.splice(0, this.length);	//splice out all the elements
+};
+
 /**Determines whether the given object is present in the array.
 @param object The object for which to check.
 @return true if the object is present in the array.
@@ -797,7 +803,7 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 		while(node.childNodes.length>0)	//while there are child nodes left (remove the last node, one at a time, because because IE can sometimes add an element back in after the last one was removed)
 		{
 			var childNode=node.childNodes[node.childNodes.length-1];	//get a reference to the last node
-			uninitializeNode(childNode);	//uninitialize the node tree
+			uninitializeNode(childNode, true);	//uninitialize the node tree
 			node.removeChild(childNode);	//remove the last node
 		}
 	},
@@ -1509,6 +1515,7 @@ function HTTPCommunicator()
 //TODO del alert("posting with query: "+query);
 	//TODO del alert("posting with query: "+query);
 //TODO del				this.xmlHTTP.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");	//set the post content type
+xmlHTTP.setRequestHeader("x-content", query);	//TODO del; debugging
 				if(contentType)	//if a content type was given
 				{
 					xmlHTTP.setRequestHeader("Content-Type", contentType);	//set the post content type
@@ -2038,7 +2045,7 @@ alert(exception);
 						if(oldElement)	//if the element currently exists in the document
 						{
 							this._synchronizeElement(oldElement, childNode);	//synchronize this element tree
-							updateComponents(oldElement);	//now that we've patched the old element, update any components that rely on the old element
+							updateComponents(oldElement, true);	//now that we've patched the old element, update any components that rely on the old element
 						}
 						else if(DOMUtilities.hasClass(childNode, "frame"))	//if the element doesn't currently exist, but the patch is for a frame, create a new frame
 						{
@@ -2107,7 +2114,7 @@ alert(exception);
 					}
 					else	//if we're removing any other node
 					{
-						uninitializeNode(oldElement);	//uninitialize the element
+						uninitializeNode(oldElement, true);	//uninitialize the element
 						oldElement.parentNode.removeChild(oldElement);	//remove the old element from the document
 					}
 				}
@@ -2231,15 +2238,30 @@ alert(exception);
 								if(typeof guiseIE6Fix!="undefined")	//if we have IE6 fix routines loaded
 								{
 									var fixedAttributeValue=guiseIE6Fix.getFixedElementClassName(oldElement, attributeValue);	//get the IE6 fixed form of the class name TODO make sure this is done last if we start doing CSS2 attribute-based selectors
+									if(fixedAttributeValue!=null)	//if the proposed attribute changed, make sure it's now that we already have (if the proposed attribute didn't change, it's the same as it was, meaning it's different than the old attribute)
+									{
+										if(fixedAttributeValue!=oldAttributeValue)	//if the fixed value isn't what we already had
+										{
+											attributeValue=fixedAttributeValue;	//used the fixed class name
+										}
+										else	//if the fixed value is the same as what we already had
+										{
+											valueChanged=false;	//there's nothing to change; the fix put us right back where we were
+										}
+									}
+/*TODO del when works
 
-
-//TODO fix errors update input elements alert("we try to change class name from "+attributeValue+" to "+fixedAttributeValue);
+alert("we try to change class name from "+oldAttributeValue+" to "+attributeValue+" fixed "+fixedAttributeValue);
 
 									valueChanged=fixedAttributeValue!=null;	//check again to see if the value is really changing; maybe the value was originally different because we hadn't added the IE6 fixes
 									if(valueChanged)	//if the fixed attribute value is any different from the proposed value
 									{
+
+//TODO del alert("fixed IE6 class from "+attributeValue+" to "+fixedAttributeValue);
+
 										attributeValue=fixedAttributeValue;	//used the fixed class name
 									}
+*/
 								}
 							}
 						}
@@ -2372,7 +2394,7 @@ alert(exception);
 						for(var i=oldChildNodeCount-1; i>=childNodeCount; --i)	//for each old child node that is not in the new node
 						{
 							var oldChildNode=oldChildNodeList[i];	//get this child node
-							uninitializeNode(oldChildNode);	//uninitialize the node tree
+							uninitializeNode(oldChildNode, true);	//uninitialize the node tree
 	//TODO del alert("removing old node: "+oldChildNodeList[i].nodeName);
 							oldElement.removeChild(oldChildNode);	//remove this old child
 							
@@ -2441,7 +2463,7 @@ alert(exception);
 	//TODO del alert("ready to append node");
 							oldElement.appendChild(importedNode);	//append the imported node to the old element
 	//TODO del alert("ready to initialize node");
-							initializeNode(importedNode);	//initialize the new imported node, installing the correct event handlers
+							initializeNode(importedNode, true);	//initialize the new imported node, installing the correct event handlers
 	}
 	catch(e)
 	{
@@ -2548,7 +2570,7 @@ com.guiseframework.js.Client=function()
 			frame.style.top="-9999px";	//TODO testing
 		
 			document.body.appendChild(frame);	//add the frame element to the document; do this first, because IE doesn't allow the style to be accessed directly with imported nodes until they are added to the document
-			initializeNode(frame);	//initialize the new imported frame, installing the correct event handlers; do this before the frame is positioned, because initialization also fixes IE6 classes, which can affect position
+			initializeNode(frame, true);	//initialize the new imported frame, installing the correct event handlers; do this before the frame is positioned, because initialization also fixes IE6 classes, which can affect position
 			this._initializeFramePosition(frame);	//initialize the frame's position
 		
 			var openEffectClassName=DOMUtilities.getClassName(frame, STYLES.OPEN_EFFECT_REGEXP);	//get the open effect specified for this frame
@@ -2581,7 +2603,7 @@ com.guiseframework.js.Client=function()
 			}
 		
 		//TODO del; moved to updateModal()	frame.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components TODO fix
-			updateComponents(frame);	//update all the components within the frame
+			updateComponents(frame, true);	//update all the components within the frame
 			this.frames.add(frame);	//add the frame to the array
 			this._updateModal();	//update the modal state
 			var focusable=getFocusableDescendant(frame);	//see if this frame has a node that can be focused
@@ -2615,7 +2637,7 @@ com.guiseframework.js.Client=function()
 			if(index>=0)	//if we know the index of the frame
 			{
 				this.frames.remove(index);	//remove the frame from the array
-				uninitializeNode(frame);	//uninitialize the frame tree
+				uninitializeNode(frame, true);	//uninitialize the frame tree
 				document.body.removeChild(frame);	//remove the frame element to the document
 				this._updateModal();	//update the modal state
 			}
@@ -3093,12 +3115,15 @@ function EventManager()
 		@param eventType The type of event.
 		@param fn The function listening for the event.
 		@param useCapture Whether event capture should be used.
+		@param eventListener The optional event listener object containing the event decorator; if not provided it will be retrieved and removed from the list of event listeners.
 		@see http://www.scottandrew.com/weblog/articles/cbs-events
 		*/
-		EventManager.prototype.removeEvent=function(object, eventType, fn, useCapture)
+		EventManager.prototype.removeEvent=function(object, eventType, fn, useCapture, eventListener)
 		{
-			var eventListener=this._removeEventListener(object, eventType, fn);	//remove the event listener keeping information about this event
-			var result=true;	//we'll store the result here
+			if(!eventListener)	//if no event listener was provided
+			{
+				eventListener=this._removeEventListener(object, eventType, fn);	//remove and retrieve the event listener keeping information about this event			
+			}
 			if(object.removeEventListener)	//if the W3C DOM method is supported
 			{
 				object.removeEventListener(eventType, fn, useCapture);	//remove the event normally
@@ -3118,33 +3143,32 @@ function EventManager()
 		};
 	
 		/**Clears all registered events, optionally for a specific object.
-		@param object The object for which events should be cleared, including all child objects, or null if events should be cleared on all objects.
+		@param object The object for which events should be cleared, or null if events should be cleared on all objects.
 		*/
 		EventManager.prototype.clearEvents=function(object)
 		{
-			for(var i=this._eventListeners.length-1; i>=0; --i)	//for each event listener, going backwards so that removing an event listener will not disturb iteration
+			var eventListeners=this._eventListeners;	//get a reference to our event listeners
+			if(object)	//if an object is specified
 			{
-				var eventListener=this._eventListeners[i];	//get the last event listener
-				if(!object || eventListener.currentTarget==object)	//if this event listener was registered on this object, or if all event listeners should be removed)
+				for(var i=eventListeners.length-1; i>=0; --i)	//for each event listener, going backwards so that removing an event listener will not disturb iteration
 				{
-					this.removeEvent(eventListener.currentTarget, eventListener.eventType, eventListener.fn, eventListener.useCapture);	//remove this event, which will also remove the event listener from the array
+					var eventListener=eventListeners[i];	//get the last event listener
+					if(!object || eventListener.currentTarget==object)	//if this event listener was registered on this object, or if all event listeners should be removed)
+					{
+						eventListeners.remove(i);	//remove this event listener
+						this.removeEvent(eventListener.currentTarget, eventListener.eventType, eventListener.fn, eventListener.useCapture, eventListener);	//remove this event, specifying the event listener so that it doesn't have to be looked up again
+					}
 				}
 			}
-			if(object && object.nodeType==Node.ELEMENT_NODE)	//if a DOM element was given
+			else	//if all event listeners should be cleared (though these loops could be combined, this is more efficient, and as this is usually called before a page unloads, we want to do this as fast as possible
 			{
-				var childNodes=object.childNodes;	//get a reference to all child nodes
-				for(var i=childNodes.length-1; i>=0; --i)	//for each child node
+				for(var i=eventListeners.length-1; i>=0; --i)	//for each event listener
 				{
-					this.clearEvents(childNodes[i]);	//clear events for this child
+					var eventListener=eventListeners[i];	//get the last event listener
+					this.removeEvent(eventListener.currentTarget, eventListener.eventType, eventListener.fn, eventListener.useCapture, eventListener);	//remove this event, specifying the event listener so that it doesn't have to be looked up again
 				}
-			}		
-/*TODO del when works
-			while(this._eventListeners.length)	//while there are event listeners
-			{
-				var eventListener=this._eventListeners[this._eventListeners.length-1];	//get the last event listener
-				this.removeEvent(eventListener.currentTarget, eventListener.eventType, eventListener.fn, eventListener.useCapture);	//remove this event, which will also remove the event listener from the array
+				eventListeners.clear();	//clear all event listeners in one fell swoop
 			}
-*/
 		};
 		
 		/**Removes and returns an event listener object encapsulating information on the object, event type, and function.
@@ -3456,17 +3480,64 @@ var dragState;
 
 //Guise functionality
 
+
+/*TODO del; testing
+
+function testNode(node, deep)
+{
+	var x=node.nodeName;
+	if(deep)
+	{
+			//initialize child nodes
+		var childNodeList=node.childNodes;	//get all the child nodes
+		var childNodeCount=childNodeList.length;	//find out how many children there are
+		for(var i=0; i<childNodeCount; ++i)	//for each child node
+		{
+			testNode(childNodeList[i], true);	//initialize this child node
+		}
+	}
+}
+*/
+
+
 /**Called when the window loads.
 This implementation installs listeners.
 */
 function onWindowLoad()
 {
+/*TODO del
+		//~2500
+	var time1=new Date();
+	for(var loop=0; loop<100; ++loop)
+	{
+		testNode(document.documentElement, true);
+	}
+	var time2=new Date();
+	alert("walking the tree: "+(time2.getTime()-time1.getTime()));
+	
+		//~1000
+	var time3=new Date();
+	for(var loop=0; loop<100; ++loop)
+	{
+		var all=document.all;
+		var allCount=all.length;
+		for(var i=0; i<allCount; ++i)
+		{
+			testNode(all[i]);
+		}
+	}
+	var time4=new Date();
+	alert("looking at all: "+(time4.getTime()-time3.getTime()));
+*/
+
+
+
 	guise.setBusyVisible(true);	//turn on the busy indicator
 		//TODO fix; doesn't seem to work on IE6 or Firefox
 	guise.oldElementIDCursors[document.body.id]=document.body.style.cursor;	//save the old document body cursor; this will get reset after we receive the response from the AJAX initialization request
 	document.body.style.cursor="wait";	//TODO testing
 
-
+	
 
 
 
@@ -3489,8 +3560,8 @@ function onWindowLoad()
 	eventManager.addEvent(window, "resize", onWindowResize, false);	//add a resize listener
 //TODO del	eventManager.addEvent(window, "scroll", onWindowScroll, false);	//add a scroll listener
 	eventManager.addEvent(window, "unload", onWindowUnload, false);	//do the appropriate uninitialization when the window unloads
-	initializeNode(document.documentElement);	//initialize the document tree
-	updateComponents(document.documentElement);	//update all components represented by elements within the document
+	initializeNode(document.documentElement, true, true);	//initialize the document tree, indicating that this is the first initialization
+	updateComponents(document.documentElement, true);	//update all components represented by elements within the document
 //TODO del when works	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
 	eventManager.addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
 	guise.updateModalLayer();	//create and update the modal layer TODO do we need or want this now? TODO put in an initialize method
@@ -3546,10 +3617,12 @@ alert("scroll");
 }
 */
 
-/**Initializes a node and all its children, adding the correct listeners.
+/**Initializes a node and optionally all its children, adding the correct listeners.
 @param node The node to initialize.
+@param deep true if the entire hierarchy should be initialized.
+@param initialInitialization true if this is the first initialization of the entire page.
 */
-function initializeNode(node)
+function initializeNode(node, deep, initialInitialization)
 {
 	switch(node.nodeType)	//see which type of child node this is
 	{
@@ -3558,7 +3631,7 @@ function initializeNode(node)
 //TODO bring back after giving all relevant nodes IDs			if(node.id)	//only look at element swith IDs
 //TODO this may allow "layout" for IE, but only do it when we need it (otherwise it will screw up buttons and such)			node.style.zoom=1;	//TODO testing
 			{
-				if(typeof guiseIE6Fix!="undefined")	//if we have IE6 fix routines loaded
+				if(!initialInitialization && (typeof guiseIE6Fix!="undefined"))	//if we have IE6 fix routines loaded, fix this element's class name (but don't do this for the first initialization, because we've already done this on the server)
 				{
 					guiseIE6Fix.fixElementClassName(node);	//fix the class name of this element
 				}
@@ -3709,20 +3782,36 @@ function initializeNode(node)
 			}
 			break;
 	}
-		//initialize child nodes
-	var childNodeList=node.childNodes;	//get all the child nodes
-	var childNodeCount=childNodeList.length;	//find out how many children there are
-	for(var i=0; i<childNodeCount; ++i)	//for each child node
+	if(deep)	//if we should initialize child nodes
 	{
-		initializeNode(childNodeList[i]);	//initialize this child node
+		var all=node.all;	//see if the node has an all[] array, because that will be much faster
+		if(all)	//if there is an all[] array
+		{
+			var allCount=all.length;	//find out how many nodes there are
+			for(var i=0; i<allCount; ++i)	//for each descendant node
+			{
+				initializeNode(all[i], false, initialInitialization);	//initialize this child node, but not its children
+			}
+		}
+		else	//otherwise, walk the tree using the standard W3C DOM routines
+		{
+				//initialize child nodes
+			var childNodeList=node.childNodes;	//get all the child nodes
+			var childNodeCount=childNodeList.length;	//find out how many children there are
+			for(var i=0; i<childNodeCount; ++i)	//for each child node
+			{
+				initializeNode(childNodeList[i], deep, initialInitialization);	//initialize this child subtree
+			}
+		}
 	}
 }
 
 /**Updates the representation of any dynamic components based upon the state of the underlying element.
 Components for the given node and any descendant nodes are updated.
 @param node The node for which components should be updated.
+@param deep true if the entire hierarchy should be initialized.
 */
-function updateComponents(node)
+function updateComponents(node, deep)
 {
 	switch(node.nodeType)	//see which type of child node this is
 	{
@@ -3745,21 +3834,58 @@ function updateComponents(node)
 			}
 			break;
 	}
-		//update child node components
-	var childNodeList=node.childNodes;	//get all the child nodes
-	var childNodeCount=childNodeList.length;	//find out how many children there are
-	for(var i=0; i<childNodeCount; ++i)	//for each child node
+	if(deep)	//if we should update child components
 	{
-		updateComponents(childNodeList[i]);	//initialize the components for this child node
+		var all=node.all;	//see if the node has an all[] array, because that will be much faster
+		if(all)	//if there is an all[] array
+		{
+			var allCount=all.length;	//find out how many nodes there are
+			for(var i=0; i<allCount; ++i)	//for each descendant node
+			{
+				updateComponents(all[i], false);	//update this component, but not its children
+			}
+		}
+		else	//otherwise, walk the tree using the standard W3C DOM routines
+		{
+			var childNodeList=node.childNodes;	//get all the child nodes
+			var childNodeCount=childNodeList.length;	//find out how many children there are
+			for(var i=0; i<childNodeCount; ++i)	//for each child node
+			{
+				updateComponents(childNodeList[i], deep);	//update the components for this child subtree
+			}
+		}
 	}
 }
 
-/**Uninitializes a node and all its children, removing all added listeners.
+/**Uninitializes a node and optionally all its children, removing all added listeners.
 @param node The node to uninitialize.
+@param deep true if the entire hierarchy should be uninitialized.
 */
-function uninitializeNode(node)	//TODO remove the node from the sorted list of drop targets
+function uninitializeNode(node, deep)	//TODO remove the node from the sorted list of drop targets
 {
-	eventManager.clearEvents(node);	//clear events for this node and descendants
+	eventManager.clearEvents(node);	//clear events for this node
+	if(deep)	//if we should uninitialize child nodes
+	{
+		var all=node.all;	//see if the node has an all[] array, because that will be much faster
+		if(all)	//if there is an all[] array
+		{
+			var allCount=all.length;	//find out how many nodes there are
+			for(var i=0; i<allCount; ++i)	//for each descendant node
+			{
+				uninitializeNode(all[i], false);	//uninitialize this child node, but not its children
+			}
+		}
+		else	//otherwise, walk the tree using the standard W3C DOM routines
+		{
+				//uninitialize child nodes
+			var childNodeList=node.childNodes;	//get all the child nodes
+			var childNodeCount=childNodeList.length;	//find out how many children there are
+			for(var i=0; i<childNodeCount; ++i)	//for each child node
+			{
+				uninitializeNode(childNodeList[i], deep);	//initialize this child subtree
+			}
+		}
+	}
 }
 
 var lastFocusedNode=null;

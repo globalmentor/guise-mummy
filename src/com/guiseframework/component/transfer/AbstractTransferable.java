@@ -1,8 +1,9 @@
 package com.guiseframework.component.transfer;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
-
 import javax.mail.internet.ContentType;
+
+import static com.garretwilson.lang.ClassUtilities.*;
+import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**An abstract object that can be transferred, such as between components using drag and drop.
 @param <S> The source of the transfer.
@@ -32,6 +33,18 @@ public abstract class AbstractTransferable<S> implements Transferable<S>
 			}
 		}
 		return false;	//indicate that there is no matching content type
+	}
+
+	/**Transfers data of the given class.
+	This implementation delegates to {@link #transfer(ContentType)}.
+	@param <T> The type of object to be transferred.
+	@param objectClass The class of object to return.
+	@return The transferred data object, which may be <code>null</code>.
+	@exception IllegalArgumentException if the given class is not supported.
+	*/
+	public <T> T transfer(final Class<T> objectClass)
+	{
+		return objectClass.cast(transfer(getObjectContentType(objectClass)));	//transfer the object based upon the content type and cast it to the class type
 	}
 
 	/**Source constructor.

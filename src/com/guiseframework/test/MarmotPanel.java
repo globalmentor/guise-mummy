@@ -112,6 +112,21 @@ catch(final ValidationException validationException)
 */
 							final TreeControl treeControl=new TreeControl();
 							treeControl.setTreeNodeDragEnabled(true);	//allow tree nodes to be dragged
+							treeControl.setDropEnabled(true);	//TODO testing
+							treeControl.addImportStrategy(new ImportStrategy<TreeControl>()	//add a new import strategy for this component
+									{		
+										public boolean canImportTransfer(final TreeControl component, final Transferable<?> transferable)
+										{
+											return true;	//accept all import types
+										}
+										public boolean importTransfer(final TreeControl component, final Transferable<?> transferable)
+										{
+Debug.trace("!!got an import from component:", component);											
+											return true;
+										}
+									});
+							
+							
 							treeControl.setTreeNodeRepresentationStrategy(RDFResource.class, new RepositoryResourceTreeNodeRepresentationStrategy(marmotSession));
 							treeControl.setTreeNodeRepresentationStrategy(RDFLiteral.class, new RDFLiteralTreeNodeRepresentationStrategy());
 							try
@@ -157,6 +172,7 @@ catch(final ValidationException validationException)
 							newContent.append(oldContent);	//add the old content
 						}
 						newContent.append("Drop Source: ").append(transferable.getSource().getClass().getName()).append('\n');
+						newContent.append("Content count: ").append(transferable.getContentTypes().length).append('\n');
 						for(final ContentType contentType:transferable.getContentTypes())	//for each content type
 						{
 							newContent.append("* Drop Content Type: ").append(contentType).append('\n');

@@ -27,4 +27,12 @@ public interface Transferable<S>
 	@exception IllegalArgumentException if the given content type is not supported.
 	*/
 	public Object transfer(final ContentType contentType);
+
+	/**Transfers data of the given class.
+	@param <T> The type of object to be transferred.
+	@param objectClass The class of object to return.
+	@return The transferred data object, which may be <code>null</code>.
+	@exception IllegalArgumentException if the given class is not supported.
+	*/
+	public <T> T transfer(final Class<T> objectClass);
 }
