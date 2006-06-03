@@ -2231,6 +2231,7 @@ alert(exception);
 						}
 						var oldAttributeValue=oldElement[attributeName];	//get the old attribute value
 						var valueChanged=oldAttributeValue!=attributeValue;	//see if the value is really changing
+/*TODO del unless we want to fix external-toGuise stylesheets
 						if(valueChanged)	//if the value is changing, see if we have to do fixes for IE6 (if the value hasn't changed, that means there were no fixes before and no fixes afterwards; we may want to categorically do fixes in the future if we add attribute-based selectors)
 						{
 							if(attributeName=="className")	//if we're changing the class name
@@ -2249,22 +2250,10 @@ alert(exception);
 											valueChanged=false;	//there's nothing to change; the fix put us right back where we were
 										}
 									}
-/*TODO del when works
-
-alert("we try to change class name from "+oldAttributeValue+" to "+attributeValue+" fixed "+fixedAttributeValue);
-
-									valueChanged=fixedAttributeValue!=null;	//check again to see if the value is really changing; maybe the value was originally different because we hadn't added the IE6 fixes
-									if(valueChanged)	//if the fixed attribute value is any different from the proposed value
-									{
-
-//TODO del alert("fixed IE6 class from "+attributeValue+" to "+fixedAttributeValue);
-
-										attributeValue=fixedAttributeValue;	//used the fixed class name
-									}
-*/
 								}
 							}
 						}
+*/
 						if(valueChanged && attributeName=="src")	//if a "src" attribute changed (e.g. img.src), make sure that the new src is not a relative URL form of the current src, which would cause IE6 to needlessly reload the image
 						{
 							if(attributeValue.startsWith("/") && location.protocol+"//"+location.host+attributeValue==oldAttributeValue)	//if the new value is just the relative form of the old value
@@ -3552,10 +3541,12 @@ function onWindowLoad()
 
 //TODO display a wait cursor until we initialize everything
 
+/*TODO del unless we want to fix external-toGuise stylesheets
 	if(typeof guiseIE6Fix!="undefined")	//if we have IE6 fix routines loaded
 	{
 		guiseIE6Fix.fixStylesheets();	//fix all IE6 stylesheets
 	}
+*/
 
 	eventManager.addEvent(window, "resize", onWindowResize, false);	//add a resize listener
 //TODO del	eventManager.addEvent(window, "scroll", onWindowScroll, false);	//add a scroll listener
@@ -3631,10 +3622,12 @@ function initializeNode(node, deep, initialInitialization)
 //TODO bring back after giving all relevant nodes IDs			if(node.id)	//only look at element swith IDs
 //TODO this may allow "layout" for IE, but only do it when we need it (otherwise it will screw up buttons and such)			node.style.zoom=1;	//TODO testing
 			{
+/*TODO del unless we want to fix external-toGuise stylesheets			
 				if(!initialInitialization && (typeof guiseIE6Fix!="undefined"))	//if we have IE6 fix routines loaded, fix this element's class name (but don't do this for the first initialization, because we've already done this on the server)
 				{
 					guiseIE6Fix.fixElementClassName(node);	//fix the class name of this element
 				}
+*/
 				var elementName=node.nodeName.toLowerCase();	//get the element name
 				var elementClassName=node.className;	//get the element class name
 				var elementClassNames=elementClassName ? elementClassName.split(/\s/) : EMPTY_ARRAY;	//split out the class names
