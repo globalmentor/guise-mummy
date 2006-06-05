@@ -4836,6 +4836,25 @@ function getElementCoordinates(element)	//TODO make sure this method correctly c
 {
 var originalElement=element;	//TODO del; testing
 	var x=0, y=0;
+	if(element.currentStyle)	//compensate for negative margins on IE6, which apparently is only affective on the immediate element (primarily frames); if IE7 fixes this bug we'll have to check for quirks mode (which we use with IE6 but not on IE7), or as a last resort check specifically for IE6
+	{
+		if(element.currentStyle.marginLeft)	//if there is a left margin
+		{
+			var marginLeft=parseInt(element.currentStyle.marginLeft);	//parse the margin left value, which may be a string in the form XXpx
+			if(marginLeft && marginLeft<0)	//if there is a negative margin (and not some keyword)
+			{
+				x-=marginLeft;	//compensate for negative left margin
+			}
+		}
+		if(element.currentStyle.marginTop)	//if there is a top margin
+		{
+			var marginTop=parseInt(element.currentStyle.marginTop);	//parse the margin top value, which may be a string in the form XXpx
+			if(marginTop && marginTop<0)	//if there is a negative margin (and not some keyword)
+			{
+				y-=marginTop;	//compensate for negative top margin
+			}
+		}
+	}
 	if(element.offsetParent)	//if element.offsetParent is supported
 	{
 //TODO del alert("using calculated element position");
