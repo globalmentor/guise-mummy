@@ -28,6 +28,7 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.event.*;
+import com.guiseframework.model.InformationLevel;
 import com.guiseframework.model.Notification;
 import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
@@ -60,6 +61,21 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 		/**@return The Guise application to which this session belongs.*/
 		public GuiseApplication getApplication() {return application;}
+
+	/**The writer for writing to the log file.*/
+	private Writer logWriter;
+
+		/**@return The writer for writing to the log file, which may not be thread-safe.*/
+		public Writer getLogWriter() {return logWriter;}
+
+		/**Sets the log writer.
+		@param logWriter The writer for writing to the log file, which may not be thread-safe.
+		@exception NullPointerException if the given log writer is <code>null</code>.
+		*/
+		public void setLogWriter(final Writer logWriter)
+		{
+			this.logWriter=checkInstance(logWriter, "Log writer cannot be null.");
+		}
 
 	/**The application frame, initialized during {@link #initialize()}.*/
 	private ApplicationFrame<?> applicationFrame=null;
@@ -653,6 +669,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		this.environment=new DefaultGuiseEnvironment();	//create a default environment
 		this.locale=application.getDefaultLocale();	//default to the application locale
 		this.orientation=Orientation.getOrientation(locale);	//set the orientation default based upon the locale
+		logWriter=new OutputStreamWriter(System.err);	//default to logging to the error output; this will be replaced after the session is created
 	}
 
 	/**Determines if there is a panel bound to the given appplication context-relative path.
@@ -1069,12 +1086,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			if(!ObjectUtilities.equals(this.bookmark, bookmark))	//if the bookmark is really changing
 			{
 				this.bookmark=bookmark;	//change the bookmark TODO fire an event, but make sure that doesn't make the page reload
+				log(null, "guise-bookmark", bookmark!=null ? bookmark.toString() : null, null, null);	//TODO improve; use a constant
 			}
 		}	
 
 		/**Sets the new navigation path and bookmark, firing a navigation event if appropriate.
 		If the navigation path and/or bookmark has changed, this method fires an event to all {@link NavigationListener}s in the component hierarchy, with the session as the source of the {@link NavigationEvent}.
 		This method calls {@link #setNavigationPath(String)} and {@link #setBookmark(Bookmark)}.  
+		This implementation logs the navigation change.
 		@param navigationPath The navigation path relative to the application context path.
 		@param bookmark The bookmark for which navigation should occur at this navigation path, or <code>null</code> if there is no bookmark involved in navigation.
 		@param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
@@ -1091,6 +1110,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			{
 				setNavigationPath(navigationPath);	//make sure the Guise session has the correct navigation path
 				setBookmark(bookmark);	//make sure the Guise session has the correct bookmark
+				final Map<String, Object> logParameters=new HashMap<String, Object>();	//create a map for our log parameters
+				logParameters.put("bookmark", bookmark);	//bookmark TODO use a constant
+				logParameters.put("referrerURI", referrerURI);	//referrer URI TODO use a constant
+				log(null, "guise-navigate", null, logParameters, null);	//TODO improve; use a constant
 				final NavigationEvent navigationEvent=new NavigationEvent(this, navigationPath, bookmark, referrerURI);	//create a navigation event with the session as the source of the event
 				fireNavigated(getApplicationFrame(), navigationEvent);	//fire a navigation event to all components in the application frame hierarchy
 			}			
@@ -1389,6 +1412,43 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		busyFrame.setTitleVisible(false);	//hide the frame title
 		return busyFrame;	//return the busy frame
 	}
+
+	/**Logs the given session-related information with a default log level of {@link InformationLevel#LOG}.
+	This is a convenience method that delegates to {@link #log(InformationLevel, String, String, String, Map, CharSequence)}.
+	@param subject The log subject identification, or <code>null</code> if there is no related subject.
+	@param predicate The log predicate identification, or <code>null</code> if there is no related predicate.
+	@param object The log object identification, or <code>null</code> if there is no related object.
+	@param parameters The map of log parameters, or <code>null</code> if there are no parameters.
+	@param comment The log comment, or <code>null</code> if there is no log comment.
+	@exception NullPointerException if the given log level is <code>null</code>.
+	*/
+	public void log(final String subject, final String predicate, final String object, final Map<?, ?> parameters, final CharSequence comment)
+	{
+		log(InformationLevel.LOG, subject, predicate, object, parameters, comment);	//log the information with LOG level
+	}
+
+	/**Logs the given session-related information.
+	@param level The log information level.
+	@param subject The log subject identification, or <code>null</code> if there is no related subject.
+	@param predicate The log predicate identification, or <code>null</code> if there is no related predicate.
+	@param object The log object identification, or <code>null</code> if there is no related object.
+	@param parameters The map of log parameters, or <code>null</code> if there are no parameters.
+	@param comment The log comment, or <code>null</code> if there is no log comment.
+	@exception NullPointerException if the given log level is <code>null</code>.
+	*/
+	public void log(final InformationLevel level, final String subject, final String predicate, final String object, final Map<?, ?> parameters, final CharSequence comment)
+	{
+		final Writer logWriter=getLogWriter();	//get the log writer
+		try
+		{
+			Log.log(logWriter, level, getNavigationPath(), subject, predicate, object, parameters, comment);	//write the log information to the file
+			logWriter.flush();	//flush the log information
+		}
+		catch(final IOException ioException)	//if there is a log error
+		{
+			Debug.error(ioException);	//log the error in the debug log
+		}
+	}	
 	
 	/**Notifies the user of the given notification information.
 	This is a convenience method that delegates to {@link #notify(Notification, Runnable)}.

@@ -3,6 +3,7 @@ package com.guiseframework.platform.web;
 import java.io.*;
 import java.net.*;
 import java.security.Principal;
+import java.text.DateFormat;
 import java.util.*;
 
 import javax.mail.internet.ContentType;
@@ -25,6 +26,7 @@ import com.garretwilson.model.DefaultResource;
 import com.garretwilson.model.Resource;
 
 import static com.garretwilson.io.ContentTypeUtilities.*;
+import static com.garretwilson.io.FileUtilities.*;
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.lang.StringBuilderUtilities.*;
@@ -39,6 +41,8 @@ import static com.garretwilson.net.http.HTTPConstants.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 import static com.garretwilson.text.CharacterConstants.*;
 import static com.garretwilson.text.xml.XMLConstants.*;
+
+import com.garretwilson.text.W3CDateFormat;
 import com.garretwilson.text.xml.XMLUtilities;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
@@ -47,6 +51,7 @@ import com.garretwilson.rdf.RDFUtilities;
 import com.garretwilson.rdf.maqro.Activity;
 import com.garretwilson.rdf.maqro.MAQROUtilities;
 import com.garretwilson.security.Nonce;
+import com.garretwilson.servlet.ServletUtilities;
 import com.garretwilson.servlet.http.HttpServletUtilities;
 
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
@@ -98,7 +103,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	public final static String THEME_INIT_PARAMETER="theme";
 
 	/**The context parameter of the data base directory.*/
-	public final static String DATA_BASE_DIRECTORY_CONTEXT_PARAMETER="dataBaseDirectory";
+	public final static String DATA_BASE_DIRECTORY_CONTEXT_PARAMETER="dataBaseDirectory";	//TODO rename to dataDirectory
 
 	/**The content type of a Guise AJAX request, <code>application/x-guise-ajax-request</code>.*/
 	public final static ContentType GUISE_AJAX_REQUEST_CONTENT_TYPE=new ContentType(ContentTypeConstants.APPLICATION, ContentTypeConstants.EXTENSION_PREFIX+"guise-ajax-request"+ContentTypeConstants.SUBTYPE_SUFFIX_DELIMITER_CHAR+ContentTypeConstants.XML_SUBTYPE_SUFFIX, null);
@@ -112,42 +117,42 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	/**The minimum level of debug reporting for Guise.*/
 	protected final static Debug.ReportLevel DEBUG_LEVEL=Debug.ReportLevel.TRACE;	//TODO load this from an init parameter
 
-	/**@return The global HTTP servlet Guise instance.
-	This is a convenience method.
-	@see HTTPServletGuise#getInstance()
-	*/
-/*TODO fix
-	protected HTTPServletGuise getGuise()
-	{
-		return HTTPServletGuise.getInstance();	//return the global HTTP servlet Guise instance
-	}
-*/
-
 	/**Determines the debug log file.
 	@param context The servlet context from which to retrieve context parameters.
 	@return The file for debug logging.
-	@see com.garretwilson.servlet.ServletUtilities#getWebInfDirectory
-	@see #DATA_BASE_DIRECTORY_CONTEXT_PARAMETER
+	@see #getLogDirectory(ServletContext)
 	*/
-	public static File getDebugLogFile(final ServletContext context)
+	protected static File getDebugLogFile(final ServletContext context)
 	{
-		return new File(getDataBaseDirectory(context), "debug.log");	//TODO use a constant
+		final DateFormat logFilenameDateFormat=new W3CDateFormat(W3CDateFormat.Style.DATE);	//create a formatter for the log filename
+		final String logFilename=logFilenameDateFormat.format(new Date())+" debug.log";	//create a filename in the form "date debug.log" TODO use a constant
+		return new File(getLogDirectory(context), logFilename);	//TODO use a constant
 	}
 
 	/**Determines the data base directory, in this order:
 	<ol>
 		<li>The file for the value of the context parameter <code>dataBaseDirectory</code>.</li>
-		<li>The file for the real path to "/WEB-INF".</li>
+		<li>The file for the real path to "/WEB-INF/guise".</li>
 	</ol>
 	@param context The servlet context from which to retrieve context parameters.
 	@return The data base directory.
-	@see com.garretwilson.servlet.ServletUtilities#getWebInfDirectory
+	@see ServletUtilities#getWebInfDirectory(ServletContext)
 	@see #DATA_BASE_DIRECTORY_CONTEXT_PARAMETER
 	*/
-	public static File getDataBaseDirectory(final ServletContext context)
+	public static File getDataDirectory(final ServletContext context)
 	{
 		final String path=context.getInitParameter(DATA_BASE_DIRECTORY_CONTEXT_PARAMETER);	//get the context parameter
-		return path!=null ? new File(path) : getWebInfDirectory(context);	//return a file for the path, or the default WEB-INF-based path
+		return path!=null ? new File(path) : new File(getWebInfDirectory(context), "guise");	//return a file for the path, or the default WEB-INF-based path TODO use a constant
+	}
+
+	/**Determines the directory for log files.
+	@param context The servlet context from which to retrieve context parameters.
+	@return The directory for log files.
+	@see #getDataDirectory(ServletContext)
+	*/
+	public static File getLogDirectory(final ServletContext context)
+	{
+		return new File(getDataDirectory(context), "logs");	//TODO use a constant
 	}
 
 	/**The Guise container that owns the applications.*/
@@ -188,6 +193,14 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	public void init(final ServletConfig servletConfig) throws ServletException
 	{
 		super.init(servletConfig);	//do the default initialization
+		try
+		{
+			ensureDirectoryExists(getLogDirectory(getServletContext()));	//make sure the log directory exists
+		}
+		catch(final IOException ioException)	//if we can't create the log directory
+		{
+			throw new ServletException(ioException);
+		}
 		Debug.setMinimumReportLevel(DEBUG_LEVEL);	//set the level of reporting
 		try
 		{
@@ -423,7 +436,7 @@ Debug.trace("applicationContextPath", guiseApplicationContextPath);
 	public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
 	{
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
-Debug.trace("raw path info:", rawPathInfo);
+Debug.trace("method:", request.getMethod(), "raw path info:", rawPathInfo);
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
 		final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
 /*TODO del
@@ -553,8 +566,8 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
   */
 	private boolean serviceGuiseRequest(final HttpServletRequest request, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession) throws ServletException, IOException
 	{
-//TODO del Debug.trace("servicing Guise request");
 		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request		
+//TODO del Debug.trace("servicing Guise request with request URI:", requestURI);
 		final String contentTypeString=request.getContentType();	//get the request content type
 		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
 		final boolean isAJAX=contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType);	//see if this is a Guise AJAX request
@@ -611,7 +624,7 @@ Debug.trace("got control events");
 					{
 //TODO del Debug.trace("this is not AJAX, with method:", request.getMethod(), "content type", contentType, "guise POST?", isGuisePOST);
 						applicationFrame.setContent(navigationPanel);	//place the navigation panel in the application frame
-						setNoCache(response);	//TODO testing; fix; update method				
+						setNoCache(request, response);	//make sure the response is not cached TODO should we do this for AJAX responses as well?				
 						final String referrer=getReferer(request);	//get the request referrer, if any
 						final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
 							//see if there is non-Guise HTTP POST data, and if so, set that bookmark navigation temporarily
@@ -639,6 +652,7 @@ Debug.trace("got control events");
 								guiseSession.setNavigation(navigationPath, postBookmark, referrerURI);	//set the session navigation to the POST bookmark information
 							}
 						}
+Debug.trace("ready to set navigation with new navigation path:", navigationPath);
 						guiseSession.setNavigation(navigationPath, navigationBookmark, referrerURI);	//set the session navigation with the navigation bookmark, firing any navigation events if appropriate
 					}
 					final Set<Frame<?>> removedFrames=new HashSet<Frame<?>>();	//create a set of frames so that we can know which ones were removed TODO testing
@@ -950,7 +964,7 @@ Debug.trace("new bookmark:", newBookmark);
 			}
 		}
 			//add new cookies from the environment to the response
-		for(final Map.Entry<String, Object> environmentPropertyEntry:environment.getProperties())	//iterate the environment properties so that new cookies can be added as needed
+		for(final Map.Entry<String, Object> environmentPropertyEntry:environment.getProperties().entrySet())	//iterate the environment properties so that new cookies can be added as needed
 		{
 			final String environmentPropertyName=environmentPropertyEntry.getKey();	//get the name of the environment property value
 			if(!cookieMap.containsKey(environmentPropertyName))	//if no cookie contains this environment variable

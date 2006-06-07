@@ -1,24 +1,29 @@
 package com.guiseframework.platform.web;
 
+import static com.garretwilson.io.FileUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.servlet.ServletConstants.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
+import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.*;
 import java.security.Principal;
+import java.text.DateFormat;
 import java.util.*;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+import com.garretwilson.net.URIUtilities;
+import com.garretwilson.text.W3CDateFormat;
 import com.garretwilson.util.Debug;
 import com.guiseframework.*;
+import com.guiseframework.model.InformationLevel;
 
 /**A Guise container for Guise HTTP servlets.
 There will be one servlet Guise container per {@link ServletContext}, which usually corresponds to a single web application on a JVM.
@@ -28,7 +33,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 {
 
 	/**The absolute path, relative to the servlet context, of the resources directory.*/
-	public final static String RESOURCES_DIRECTORY_PATH=ROOT_PATH+WEB_INF_DIRECTORY_NAME+PATH_SEPARATOR+"guise-application-resources"+PATH_SEPARATOR;
+	public final static String RESOURCES_DIRECTORY_PATH=ROOT_PATH+WEB_INF_DIRECTORY_NAME+PATH_SEPARATOR+"guise"+PATH_SEPARATOR+"resources"+PATH_SEPARATOR;	//TODO use constants; combine with other similar designations for the same path
 
 	/**The static, synchronized map of Guise containers keyed to servlet contexts.*/
 	private final static Map<ServletContext, HTTPServletGuiseContainer> servletContextGuiseContainerMap=synchronizedMap(new HashMap<ServletContext, HTTPServletGuiseContainer>());
@@ -127,6 +132,39 @@ while(headerNames.hasMoreElements())
 }
 */
 				guiseSession=guiseApplication.createSession();	//ask the application to create a new Guise session
+				final String relativeApplicationPath=relativizePath(getBasePath(), guiseApplication.getBasePath());	//get the application path relative to the container path
+				try
+				{
+					final File baseLogDirectory=GuiseHTTPServlet.getLogDirectory(getServletContext());	//get teh base log directory
+					final File logDirectory=new File(baseLogDirectory, relativeApplicationPath);	//get a subdirectory if needed; the File class allows a relative application path of ""
+					ensureDirectoryExists(logDirectory);	//make sure the log directory exists
+					final DateFormat logFilenameDateFormat=new W3CDateFormat(W3CDateFormat.Style.DATE);	//create a formatter for the log filename
+					final String logFilename=logFilenameDateFormat.format(new Date())+" session "+httpSession.getId()+".csv";	//create a filename in the form "date session sessionID.log" TODO use a constant
+					final File logFile=new File(logDirectory, logFilename);	//create a log file object
+					final boolean isNewLogFile=!logFile.exists();	//see if we're creating a new log file
+					final Writer logWriter=new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(logFile, true)), UTF_8);	//create a buffered UTF-8 log writer, appending if the file already exists
+					if(isNewLogFile)	//if this is a new log file
+					{
+						Log.logHeaders(logWriter);	//log the headers to the log writer
+					}
+					guiseSession.setLogWriter(logWriter);	//tell the session to use the new log writer
+					final Map<String, Object> logParameters=new HashMap<String, Object>();	//create a map for our log parameters
+					logParameters.put("id", httpSession.getId());	//session ID
+					logParameters.put("creationTime", new Date(httpSession.getCreationTime()));	//session creation time
+					logParameters.put("isNew", Boolean.valueOf(httpSession.isNew()));	//session is new
+					logParameters.put("lastAccessedTime", new Date(httpSession.getLastAccessedTime()));	//session last accessed time
+					logParameters.put("maxInactiveInterval", new Integer(httpSession.getMaxInactiveInterval()));	//session max inactive interval
+					Log.log(logWriter, InformationLevel.LOG, null, null, "guise-session-create", null, logParameters, null);	//TODO improve; use a constant
+					logWriter.flush();	//flush the log information
+				}
+				catch(final UnsupportedEncodingException unsupportedEncodingException)	//we should always support UTF-8
+				{
+					throw new AssertionError(unsupportedEncodingException);					
+				}
+				catch(final IOException ioException)	//we have a problem if we can't create a file TODO improve; we would go on now, but we would have a problem when we try to close the standard error stream; what needs to be done is to create a better default stream, and then recover from this error
+				{
+					throw new AssertionError(ioException);
+				}
 				final GuiseEnvironment environment=guiseSession.getEnvironment();	//get the new session's environment
 				final Cookie[] cookies=httpRequest.getCookies();	//get the cookies in the request
 				if(cookies!=null)	//if a cookie array was returned
@@ -150,6 +188,16 @@ while(headerNames.hasMoreElements())
 				environment.setProperty(CONTENT_APPLICATION_SHOCKWAVE_FLASH_ACCEPTED_PROPERTY,	//content.application.shockwave.flash.accepted
 						Boolean.valueOf(isAcceptedContentType(httpRequest, APPLICATION_SHOCKWAVE_FLASH_CONTENT_TYPE, false)));	//see if Flash is installed
 */
+					//log the environment variables
+				try
+				{
+					Log.log(guiseSession.getLogWriter(), InformationLevel.LOG, null, "guise-session-environment", null, null, environment.getProperties(), null);	//TODO improve; use a constant
+					guiseSession.getLogWriter().flush();	//flush the log information
+				}
+				catch(final IOException ioException)	//we have a problem if we can't write to the file TODO improve; we would go on now, but we would have a problem when we try to close the standard error stream; what needs to be done is to create a better default stream, and then recover from this error
+				{
+					throw new AssertionError(ioException);
+				}
 				addGuiseSession(guiseSession);	//add and initialize the Guise session
 				final Locale[] clientAcceptedLanguages=getAcceptedLanguages(httpRequest);	//get all languages accepted by the client
 				guiseSession.requestLocale(asList(clientAcceptedLanguages));	//ask the Guise session to change to one of the accepted locales, if the application supports one
@@ -172,8 +220,37 @@ Debug.trace("+++removing Guise session", httpSession.getId());
 		GuiseSession guiseSession=guiseSessionMap.remove(httpSession);	//remove the HTTP session and Guise session association
 		if(guiseSession!=null)	//if there is a Guise session associated with the HTTP session
 		{
-			removeGuiseSession(guiseSession);	//remove the Guise session
-//TODO del			guiseSession.destroy();	//let the Guise session know it's being destroyed so that it can clean up and release references to the application
+			try
+			{
+					//TODO refactor and consolidate; prevent code duplication
+				final Map<String, Object> logParameters=new HashMap<String, Object>();	//create a map for our log parameters
+				logParameters.put("id", httpSession.getId());	//session ID
+				logParameters.put("creationTime", new Date(httpSession.getCreationTime()));	//session creation time
+				logParameters.put("isNew", Boolean.valueOf(httpSession.isNew()));	//session is new
+				logParameters.put("lastAccessedTime", new Date(httpSession.getLastAccessedTime()));	//session last accessed time
+				logParameters.put("maxInactiveInterval", new Integer(httpSession.getMaxInactiveInterval()));	//session max inactive interval
+				try
+				{
+					Log.log(guiseSession.getLogWriter(), InformationLevel.LOG, null, null, "guise-session-destroy", null, logParameters, null);	//TODO improve; use a constant
+					guiseSession.getLogWriter().flush();	//flush the log information
+				}
+				catch(final IOException ioException)	//we have a problem if we can't write to the file TODO improve; we would go on now, but we would have a problem when we try to close the standard error stream; what needs to be done is to create a better default stream, and then recover from this error
+				{
+					throw new AssertionError(ioException);
+				}
+				removeGuiseSession(guiseSession);	//remove the Guise session
+			}
+			finally
+			{
+				try
+				{
+					guiseSession.getLogWriter().close();	//always close the log writer
+				}
+				catch(final IOException ioException)	//if there is an I/O error
+				{
+					Debug.error(ioException);	//log the error
+				}
+			}
 		}
 		return guiseSession;	//return the associated Guise session
 	}

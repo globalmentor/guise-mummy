@@ -1,6 +1,6 @@
 package com.guiseframework;
 
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.security.Principal;
 import java.util.*;
@@ -11,6 +11,7 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.event.*;
+import com.guiseframework.model.InformationLevel;
 import com.guiseframework.model.Notification;
 import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
@@ -37,6 +38,15 @@ public interface GuiseSession extends PropertyBindable
 
 	/**@return The Guise application to which this session belongs.*/
 	public GuiseApplication getApplication();
+
+	/**@return The writer for writing to the log file, which may not be thread-safe.*/
+	public Writer getLogWriter();
+
+	/**Sets the log writer.
+	@param logWriter The writer for writing to the log file, which may not be thread-safe.
+	@exception NullPointerException if the given log writer is <code>null</code>.
+	*/
+	public void setLogWriter(final Writer logWriter);
 
 	/**@return The application frame.*/
 	public ApplicationFrame<?> getApplicationFrame();
@@ -522,6 +532,28 @@ public interface GuiseSession extends PropertyBindable
 	@see Theme#ICON_BUSY
 	*/
 	public Component<?> createBusyComponent();	//TODO maybe put this in GuiseApplication
+
+	/**Logs the given session-related information with a default log level of {@link InformationLevel#LOG}.
+	This is a convenience method that delegates to {@link #log(InformationLevel, String, String, String, Map, CharSequence)}.
+	@param subject The log subject identification, or <code>null</code> if there is no related subject.
+	@param predicate The log predicate identification, or <code>null</code> if there is no related predicate.
+	@param object The log object identification, or <code>null</code> if there is no related object.
+	@param parameters The map of log parameters, or <code>null</code> if there are no parameters.
+	@param comment The log comment, or <code>null</code> if there is no log comment.
+	@exception NullPointerException if the given log level is <code>null</code>.
+	*/
+	public void log(final String subject, final String predicate, final String object, final Map<?, ?> parameters, final CharSequence comment);
+
+	/**Logs the given session-related information.
+	@param level The log information level.
+	@param subject The log subject identification, or <code>null</code> if there is no related subject.
+	@param predicate The log predicate identification, or <code>null</code> if there is no related predicate.
+	@param object The log object identification, or <code>null</code> if there is no related object.
+	@param parameters The map of log parameters, or <code>null</code> if there are no parameters.
+	@param comment The log comment, or <code>null</code> if there is no log comment.
+	@exception NullPointerException if the given log level is <code>null</code>.
+	*/
+	public void log(final InformationLevel level, final String subject, final String predicate, final String object, final Map<?, ?> parameters, final CharSequence comment);
 
 	/**Notifies the user of the given notification information.
 	This is a convenience method that delegates to {@link #notify(Notification, Runnable)}.
