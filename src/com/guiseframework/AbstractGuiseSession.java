@@ -1407,10 +1407,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	*/
 	public Component<?> createBusyComponent()
 	{
+		return new DefaultBusyPanel();	//create the default busy panel
+/*TODO del when works
 		final Panel<?> busyPanel=new DefaultBusyPanel();	//create the default busy panel
 		final Frame<?> busyFrame=new DefaultFrame(busyPanel);	//create a frame for the busy panel
+		busyFrame.setStyleID("busy");	//TODO use a constant from new common style ID class
 		busyFrame.setTitleVisible(false);	//hide the frame title
 		return busyFrame;	//return the busy frame
+*/
 	}
 
 	/**Logs the given session-related information with a default log level of {@link InformationLevel#LOG}.

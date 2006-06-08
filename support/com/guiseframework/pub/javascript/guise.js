@@ -663,6 +663,7 @@ var GUIUtilities=
 		var viewportBounds=this.getViewportBounds();	//get the bounds of the viewport so that we can center the node
 		var x=viewportBounds.x+((viewportBounds.width-node.offsetWidth)/2);	//center the node horizontally
 		var y=viewportBounds.y+((viewportBounds.height-node.offsetHeight)/2);	//center the node vertically
+//TODO del alert("with viewport width: "+viewportBounds.width+" and node width: "+node.offsetWidth+" setting x: "+x);
 		node.style.left=x+"px";	//set the node's horizontal position
 		node.style.top=y+"px";	//set the node's vertical position
 	},
@@ -2530,11 +2531,20 @@ com.guiseframework.js.Client=function()
 	/**The current topmost modal frame, or null if there is no modal frame.*/
 	this.modalFrame=null;
 
+	/**The current flyover frame, or null if there is no flyover frame.*/
+	this.flyoverFrame=null;
+
 	/**The layer that allows modality by blocking user interaction to elements below.*/
 	this._modalLayer=null;
 	
-	/**The iframe that hides select elements in IE6; positioned right below the modal layer.*/
+	/**The iframe that hides select elements from modal frames in IE6; positioned right below the modal layer.*/
 	this._modalIFrame=null;
+
+	/**The iframe that hides select elements from flyover frames in IE6; positioned right below the flyover.*/
+	this._flyoverIFrame=null;
+
+	/**The current busy element, or null if there is no busy element.*/
+	this._busyElement=null;
 
 	/**The map of cursors that have been temporarily changed, keyed to the ID of the element the cursor of which has been changed.
 	This is a tentative implementation, as blindly resetting the cursor after AJAX processing will prevent new cursors to be changed via AJAX.
@@ -2751,6 +2761,7 @@ com.guiseframework.js.Client=function()
 		{
 			var frameCount=this.frames.length;	//find out how many frames there are
 			this.modalFrame=null;	//start out presuming there is no modal frame
+			this.flyoverFrame=null;	//start out presuming there is no flyover frame
 			for(var i=0; i<frameCount; ++i)	//update the z-orders
 			{
 				var frame=this.frames[i];	//get a reference to this frame
@@ -2758,6 +2769,10 @@ com.guiseframework.js.Client=function()
 				if(DOMUtilities.hasClassName(frame, "frameModal"))	//if this is a modal frame TODO use a constant
 				{
 					this.modalFrame=frame;	//indicate our last modal frame
+				}
+				if(DOMUtilities.hasClassName(frame, "flyoverFrame"))	//if this is a flyover frame TODO use a constant
+				{
+					this.flyoverFrame=frame;	//indicate our last flyover frame
 				}
 			}
 			if(this.modalFrame!=null)	//if there is a modal frame
@@ -2779,6 +2794,37 @@ com.guiseframework.js.Client=function()
 					this._modalIFrame.style.display="none";	//hide the modal iframe
 				}
 			}
+			if(isUserAgentIE6)	//if we're in IE6
+			{
+				if(!this._flyoverIFrame)	//if we haven't found our flyover IFrame
+				{
+					var form=getForm(document.documentElement);	//get the form
+					if(form && form.id)	//if there is a form with an ID
+					{
+						var flyoverIFrameID=form.id.replace(".form", ".flyoverIFrame");	//determine the ID of the flyover IFrame TODO use a constant, or get these values using a better method
+						this._flyoverIFrame=document.getElementById(flyoverIFrameID);	//get the flyover IFrame
+					}
+				}
+				var flyoverIFrame=this._flyoverIFrame;	//get the flyover IFrame
+				if(flyoverIFrame)	//if we know the flyover IFrame
+				{
+					if(this.flyoverFrame!=null)	//if there is a flyover frame
+					{
+					
+						var flyoverFrameBounds=getElementExternalBounds(this.flyoverFrame);	//get the flyover frame bounds
+						flyoverIFrame.style.left=flyoverFrameBounds.x;	//update the bounds of the IFrame to match that of the flyover frame
+						flyoverIFrame.style.top=flyoverFrameBounds.y;
+						flyoverIFrame.style.width=flyoverFrameBounds.width;
+						flyoverIFrame.style.height=flyoverFrameBounds.height;
+						flyoverIFrame.style.zIndex=this.flyoverFrame.style.zIndex-1;	//place the flyover iframe directly behind the flyover frame (a frame shouldn't be modal and a flyover both at the same time)
+						flyoverIFrame.style.display="block";	//make the flyover IFrame visible
+					}
+					else	//if there is no flyover frame
+					{
+						flyoverIFrame.style.display="none";	//hide the flyover iframe
+					}
+				}
+			}
 		};
 
 		/**Updates the size of the modal layer, creating it if necessary.*/
@@ -2794,27 +2840,16 @@ com.guiseframework.js.Client=function()
 				this._modalLayer.style.top="0px";
 				this._modalLayer.style.left="0px";
 				document.body.appendChild(this._modalLayer);	//add the modal layer to the document
-				if(isUserAgentIE6 && !this._modalIFrame)	//if we're in IE6 and we haven't found our modal IFrame, create a modal IFrame to keep select components from showing through; but don't do this in Mozilla, or it will keep the cursor from showing up for text inputs in absolutely positioned div elements above the IFrame
+				if(isUserAgentIE6)	//if we're in IE6
 				{
-					var form=getForm(document.documentElement);	//get the form
-					if(form && form.id)	//if there is a form with an ID
+					if(!this._modalIFrame)	//if we haven't found our modal IFrame, get the modal IFrame to keep select components from showing through; but don't do this in Mozilla, or it will keep the cursor from showing up for text inputs in absolutely positioned div elements above the IFrame
 					{
-						var modalIFrameID=form.id.replace(".form", ".modalIFrame");	//determine the ID of the modal IFrame TODO use a constant, or get these values using a better method
-						this._modalIFrame=document.getElementById(modalIFrameID);	//get the modal IFrame
-/*TODO del when works
-					this._modalIFrame=document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");	//create an IFrame TODO use a constant for the namespace
-					this._modalIFrame.src="about:blank";
-			//TODO del		modalIFrame.className="modalLayer";	//load the modal layer style
-			//TODO del; allows select elements to shine through		modalIFrame.allowTransparency="true";
-					this._modalIFrame.frameBorder="0";
-			//TODO del or fix		modalIFrame.style.backgroundColor="transparent";
-					this._modalIFrame.style.display="none";
-					this._modalIFrame.style.position="absolute";
-					this._modalIFrame.style.top="0px";
-					this._modalIFrame.style.left="0px";
-					this._modalIFrame.style.filter='progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0)';	//make the frame transparent (see http://dotnetjunkies.com/WebLog/jking/archive/2003/07/21/488.aspx )
-					document.body.appendChild(this._modalIFrame);	//add the modal IFrame to the document
-*/
+						var form=getForm(document.documentElement);	//get the form
+						if(form && form.id)	//if there is a form with an ID
+						{
+							var modalIFrameID=form.id.replace(".form", ".modalIFrame");	//determine the ID of the modal IFrame TODO use a constant, or get these values using a better method
+							this._modalIFrame=document.getElementById(modalIFrameID);	//get the modal IFrame
+						}
 					}
 				}
 			}
@@ -2824,9 +2859,17 @@ com.guiseframework.js.Client=function()
 			var oldModalIFrameDisplay=null;	//get the old modal IFrame display if we need to
 			if(this._modalIFrame)	//if we have a modal IFrame
 			{
-				oldModalIFrameDisplay=this._modalIFrame.style.display;	//get the current display status of the modal layer
-				this._modalIFrame.style.display="none";	//make sure the modal layer is hidden, because having it visible will interfere with the page/viewport size calculations
+				oldModalIFrameDisplay=this._modalIFrame.style.display;	//get the current display status of the modal IFrame
+				this._modalIFrame.style.display="none";	//make sure the modal IFrame is hidden, because having it visible will interfere with the page/viewport size calculations
 			}
+/*TODO del
+			var oldFlyoverIFrameDisplay=null;	//get the old flyover IFrame display if we need to
+			if(this._flyoverIFrame)	//if we have a flyover IFrame
+			{
+				oldFlyoverIFrameDisplay=this._flyoverIFrame.style.display;	//get the current display status of the flyover IFrame
+				this._flyoverIFrame.style.display="none";	//make sure the flyover IFrame is hidden, because having it visible will interfere with the page/viewport size calculations
+			}
+*/
 		
 		/*TODO del; doesn't work instantanously with IE
 			modalLayer.style.width="0px";	//don't let the size of the modal layer get in the way of the size calculations
@@ -2861,10 +2904,18 @@ com.guiseframework.js.Client=function()
 			this._modalLayer.style.display=oldModalLayerDisplay;	//show the modal layer, if it was visible before
 			if(this._modalIFrame)	//if we have a modal IFrame
 			{
-				this._modalIFrame.style.width=this._modalLayer.style.width;
+				this._modalIFrame.style.width=this._modalLayer.style.width;	//update the size of the IFrame to match that of the modal layer
 				this._modalIFrame.style.height=this._modalLayer.style.height;
 				this._modalIFrame.style.display=oldModalIFrameDisplay;	//show the modal IFrame, if it was visible before
 			}
+/*TODO del
+			if(this._flyoverIFrame)	//if we have a flyover IFrame
+			{
+				this._flyoverIFrame.style.width=this._modalLayer.style.width;	//update the size of the IFrame to match that of the modal layer
+				this._flyoverIFrame.style.height=this._modalLayer.style.height;
+				this._flyoverIFrame.style.display=oldFlyoverIFrameDisplay;	//show the flyover IFrame, if it was visible before
+			}
+*/
 		};
 
 		/*Sets the busy indicator visible or hidden.
@@ -2872,17 +2923,54 @@ com.guiseframework.js.Client=function()
 		*/
 		com.guiseframework.js.Client.prototype.setBusyVisible=function(busyVisible)
 		{
-			var form=getForm(document.documentElement);	//get the form
-			if(form && form.id)	//if there is a form with an ID
+			if(!this._busyElement)	//if we haven't found the busy element
 			{
-				var busyID=form.id.replace(".form", ".busy");	//determine the ID of the busy element TODO use a constant, or get these values using a better method
-				var busyElement=document.getElementById(busyID);	//get the busy element
-				if(busyElement)	//if there is a busy element
+				var form=getForm(document.documentElement);	//get the form
+				if(form && form.id)	//if there is a form with an ID
 				{
-					busyElement.style.display=busyVisible ? "block" : "none";	//show or hide the busy information
-					if(busyVisible)	//TODO testing
+					var busyID=form.id.replace(".form", ".busy");	//determine the ID of the busy element TODO use a constant, or get these values using a better method
+					this._busyElement=document.getElementById(busyID);	//get the busy element
+				}
+			}
+			var busyElement=this._busyElement;	//get the busy element
+			if(busyElement)	//if there is a busy element
+			{
+				if(busyVisible)	//if we're going to show the busy element
+				{
+					busyElement.style.zIndex=9001;	//give the element an arbitrarily high z-index value so that it will appear in front of other components TODO calculate the highest z-order
+					busyElement.style.left="-9999px";	//place the busy element off the screen before we display and center it; it will need to be displayed before we can determine its size
+					busyElement.style.top="-9999px";
+				}
+				var newBusyDisplay=busyVisible ? "block" : "none";	//get the new show or hide status for the busy information
+				busyElement.style.display=newBusyDisplay;	//show or hide the busy information
+				if(busyVisible)	//TODO testing
+				{
+					GUIUtilities.centerNode(busyElement);
+				}
+				if(isUserAgentIE6)	//if we're in IE6, prepare the flyover frame TODO consolidate duplicate code
+				{
+					if(!this._flyoverIFrame)	//if we haven't found our flyover IFrame
 					{
-						GUIUtilities.centerNode(busyElement);
+						var form=getForm(document.documentElement);	//get the form
+						if(form && form.id)	//if there is a form with an ID
+						{
+							var flyoverIFrameID=form.id.replace(".form", ".flyoverIFrame");	//determine the ID of the flyover IFrame TODO use a constant, or get these values using a better method
+							this._flyoverIFrame=document.getElementById(flyoverIFrameID);	//get the flyover IFrame
+						}
+					}
+					var flyoverIFrame=this._flyoverIFrame;	//get the flyover IFrame
+					if(flyoverIFrame)	//if we know the flyover IFrame
+					{
+						if(busyVisible)	//if we are now showing the busy information
+						{							
+							var flyoverFrameBounds=getElementExternalBounds(busyElement);	//get the flyover frame bounds
+							flyoverIFrame.style.left=flyoverFrameBounds.x;	//update the bounds of the IFrame to match that of the flyover frame
+							flyoverIFrame.style.top=flyoverFrameBounds.y;
+							flyoverIFrame.style.width=flyoverFrameBounds.width;
+							flyoverIFrame.style.height=flyoverFrameBounds.height;
+							flyoverIFrame.style.zIndex=busyElement.style.zIndex-1;	//place the flyover iframe directly behind the flyover frame (a frame shouldn't be modal and a flyover both at the same time)
+						}
+						flyoverIFrame.style.display=newBusyDisplay;	//show or hide the flyover IFrame
 					}
 				}
 			}
@@ -4817,6 +4905,39 @@ function getFocusableDescendant(node)
 	return null;	//indicate that no focusable node could be found
 }
 
+/**Retrieves the absolute bounds of the given element, including any negative margins.
+This method is not currently guaranteed to work on non-IE browsers.
+@param The element the bounds of which to find.
+@return A Rectangle containing the coordinates and external size of the element.
+*/
+function getElementExternalBounds(element)
+{
+	var point=getElementCoordinates(element);	//get the coordinates
+	var size=new Size(element.offsetWidth, element.offsetHeight);
+	if(element.currentStyle)	//compensate for negative margins on IE6, which apparently is only effective on the immediate element (primarily frames); if IE7 fixes this bug we'll have to check for quirks mode (which we use with IE6 but not on IE7), or as a last resort check specifically for IE6
+	{
+		if(element.currentStyle.marginLeft)	//if there is a left margin
+		{
+			var marginLeft=parseInt(element.currentStyle.marginLeft);	//parse the margin left value, which may be a string in the form XXpx
+			if(marginLeft && marginLeft<0)	//if there is a negative margin (and not some keyword)
+			{
+				point.x+=marginLeft;	//compensate for negative left margin
+			}
+		}
+		if(element.currentStyle.marginTop)	//if there is a top margin
+		{
+			var marginTop=parseInt(element.currentStyle.marginTop);	//parse the margin top value, which may be a string in the form XXpx
+			if(marginTop && marginTop<0)	//if there is a negative margin (and not some keyword)
+			{
+				point.y+=marginTop;	//compensate for negative top margin
+			}
+		}
+	}
+	//TODO check to see if the size compensates for negative margins or not
+	return new Rectangle(point, size);	//create a rectangle containing the coordinates and size of the element
+}
+
+
 /**Retrieves the absolute bounds of the given element.
 @param The element the bounds of which to find.
 @return A Rectangle containing the coordinates and size of the element.
@@ -4836,7 +4957,7 @@ function getElementCoordinates(element)	//TODO make sure this method correctly c
 {
 var originalElement=element;	//TODO del; testing
 	var x=0, y=0;
-	if(element.currentStyle)	//compensate for negative margins on IE6, which apparently is only affective on the immediate element (primarily frames); if IE7 fixes this bug we'll have to check for quirks mode (which we use with IE6 but not on IE7), or as a last resort check specifically for IE6
+	if(element.currentStyle)	//compensate for negative margins on IE6, which apparently is only effective on the immediate element (primarily frames); if IE7 fixes this bug we'll have to check for quirks mode (which we use with IE6 but not on IE7), or as a last resort check specifically for IE6
 	{
 		if(element.currentStyle.marginLeft)	//if there is a left margin
 		{

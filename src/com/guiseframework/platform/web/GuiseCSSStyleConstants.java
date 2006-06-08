@@ -34,6 +34,8 @@ public class GuiseCSSStyleConstants
 	public final static String AXIS_Y_CLASS="axisY";
 	/**The CSS class indicating the Z axis.*/
 	public final static String AXIS_Z_CLASS="axisZ";
+	/**The CSS class indicating a busy component.*/
+//TODO transfer to common style ID class	public final static String BUSY_CLASS="busy";
 	/**The CSS class indicating left-to-right line direction.*/
 	public final static String DIR_LTR_CLASS="dirLTR";
 	/**The CSS class indicating right-to-left line direction.*/
