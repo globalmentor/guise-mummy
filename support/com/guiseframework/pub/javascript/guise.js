@@ -2045,7 +2045,7 @@ alert(exception);
 						var oldElement=document.getElementById(id);	//get the old element
 						if(oldElement)	//if the element currently exists in the document
 						{
-							this._synchronizeElement(oldElement, childNode);	//synchronize this element tree
+							this._synchronizeElement(oldElement, childNode, true);	//synchronize this element tree, indicating that this is the root of a synchronization subtree
 							updateComponents(oldElement, true);	//now that we've patched the old element, update any components that rely on the old element
 						}
 						else if(DOMUtilities.hasClass(childNode, "frame"))	//if the element doesn't currently exist, but the patch is for a frame, create a new frame
@@ -2159,11 +2159,25 @@ alert(exception);
 			"guise:patchType":true	//the guise:patchType attribute is used for patching information
 		};
 
+		/**Invalidates the content of all ancestor elements by removing the "guise:contentHash" attribute up the hierarchy.
+		@param element The element the ancestors of which will have their ancestors invalidated.
+		*/
+		GuiseAJAX.prototype.invalidateAncestorContent=function(element)
+		{
+			var parentNode=element.parentNode;	//get the element's parent
+			if(parentNode!=null && parentNode.nodeType==Node.ELEMENT_NODE && parentNode.nodeName.toLowerCase()!="table")	//if there is a parent element (IE6 crashes if we even check an attribute of TABLE)
+			{
+				parentNode.removeAttribute("guise:contentHash");	//indicate that the children have changed TODO use a constant
+				this.invalidateAncestorContent(parentNode);	//invalidate the rest of the ancestors
+			}
+		};
+
 		/**Synchronizes an element hierarchy with its patch element.
 		@param oldElement The old version of the element.
 		@param element The element hierarchy to patch into the existing document.
-		*/ 
-		GuiseAJAX.prototype._synchronizeElement=function(oldElement, element)
+		@param isRoot Whether this is the top level element of a synchronization (optional); defaults to false.
+		*/
+		GuiseAJAX.prototype._synchronizeElement=function(oldElement, element, isRoot)
 		{
 			var elementName=element.nodeName;	//save the element name
 /*TODO del or salvage
@@ -2189,6 +2203,10 @@ alert(exception);
 			var isAttributesChanged=oldElementAttributeHash!=newElementAttributeHash;	//see if the attributes have changed (this doesn't count for the content hash attribute, which we'll check separately)
 			if(isAttributesChanged)	//if the attribute hash values are different
 			{
+				if(isRoot)	//if this is the root of the synchronization
+				{
+					guiseAJAX.invalidateAncestorContent(oldElement);	//indicate that the ancestors now have different content
+				}
 	//TODO del alert("ready to synchronize element "+oldElement.nodeName+" with ID: "+oldElement.id+" against element "+element.nodeName+" with ID: "+element.getAttribute("id"));
 					//remove any attributes the old element has that are not in the new element
 				var oldAttributes=oldElement.attributes;	//get the old element's attributes
@@ -2308,6 +2326,10 @@ alert(exception);
 					else	//if there is no longer a content hash
 					{
 						oldElement.removeAttribute("guise:contentHash");	//remove the content hash attribute TODO use a constant
+					}
+					if(isRoot)	//if this is the root of the synchronization
+					{
+						guiseAJAX.invalidateAncestorContent(oldElement);	//indicate that the ancestors now have different content
 					}
 				}
 					//patch in the new child element hierarchy
@@ -4098,6 +4120,7 @@ function onTextInputKeyUp(event)
 	{
 	//TODO del alert("an input changed! "+textInput.id);
 		var textInput=event.currentTarget;	//get the control in which text changed
+			//TODO decide if we need to remove the attribute hash attribute
 		var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value), true);	//create a new provisional form request with the control name and value
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request, but allow this event to be processed normally
 	}
@@ -4111,6 +4134,8 @@ function onTextInputChange(event)
 	if(AJAX_ENABLED)	//if AJAX is enabled
 	{
 		var textInput=event.currentTarget;	//get the control in which text changed
+		textInput.removeAttribute("guise:attributeHash");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+		guiseAJAX.invalidateAncestorContent(textInput);	//indicate that the ancestors now have different content
 	//TODO del alert("an input changed! "+textInput.id);
 		var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value));	//create a new form request with the control name and value
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
@@ -4324,6 +4349,8 @@ function onContextMenu(event)
 function onCheckInputChange(event)
 {
 	var checkInput=event.currentTarget;	//get the control that was listening for events (the target could be the check input's label, as occurs in Mozilla)
+	checkInput.removeAttribute("guise:attributeHash");	//the checked status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+	guiseAJAX.invalidateAncestorContent(checkInput);	//indicate that the ancestors now have different content
 	if(AJAX_ENABLED)	//if AJAX is enabled
 	{
 		guise.oldElementIDCursors[checkInput.id]=checkInput.style.cursor;	//save the old cursor
@@ -4353,6 +4380,7 @@ function onSelectChange(event)
 	if(AJAX_ENABLED)	//if AJAX is enabled
 	{
 		var select=event.currentTarget;	//get the control to which the listener was listening
+//TODO del		select.removeAttribute("guise:contentHash");	//indicate that the select's children have changed TODO use a constant
 		var selectName=select.name;	//get the name of the control
 	//TODO del alert("a select changed! "+select.id);
 		var options=select.options;	//get the select options
@@ -4362,6 +4390,9 @@ function onSelectChange(event)
 			var option=options[i];	//get this option
 			if(option.selected)	//if this option is selected
 			{
+				option.removeAttribute("guise:attributeHash");	//the option selected status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+				guiseAJAX.invalidateAncestorContent(option);	//indicate that the ancestors now have different content
+					//TODO dirty the unselected option
 				ajaxRequest.parameters[selectName]=option.value;	//add the control name and value as a parameter
 			}
 		}
