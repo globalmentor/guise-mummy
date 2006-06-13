@@ -1438,7 +1438,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		final Writer logWriter=getLogWriter();	//get the log writer
 		try
 		{
-			Log.log(logWriter, level, getNavigationPath(), subject, predicate, object, parameters, comment);	//write the log information to the file
+			Log.log(logWriter, level, navigationPath, subject, predicate, object, parameters, comment);	//write the log information to the file; get the navigation path directly in case it hasn't yet been initialized and it still null so that an exception won't be thrown
 			logWriter.flush();	//flush the log information
 		}
 		catch(final IOException ioException)	//if there is a log error

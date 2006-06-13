@@ -134,7 +134,7 @@ public class CalendarMonthTableModel extends AbstractTableModel	//TODO set the m
 		}
 //TODO del Debug.trace("day offset", dayOffset);
 		rowCount=(int)Math.ceil((monthCalendar.getActualMaximum(Calendar.DAY_OF_MONTH)-dayOffset)/(double)WEEK_DAY_COUNT);	//find out how many partial rows are used, taking into account the day offset
-		Debug.trace("row count", rowCount);
+//TODO del Debug.trace("row count", rowCount);
 		updateColumnLabelDateFormat();	//update the date format object for formatting column labels
 	}
 

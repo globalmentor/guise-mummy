@@ -4217,6 +4217,7 @@ function onAction(event)
 					var ajaxRequest=new FormAJAXEvent(new Map(actionInputID, componentID));	//create a new form request with form's hidden action control and the action element ID
 					guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request			
 				}
+/*TODO fix; distinguish between !AJAX_ENABLED and AJAX_SUSPENDED; also fix bug on server where an exhaustive post may clear information on non-displayed cards
 				else	//if AJAX is not enabled, do a POST
 				{
 					var actionInput=document.getElementById(actionInputID);	//get the action input
@@ -4230,6 +4231,7 @@ function onAction(event)
 						actionInput.value=null;	//remove the indication of which action was activated
 					}
 				}
+*/
 				event.stopPropagation();	//tell the event to stop bubbling
 				event.preventDefault();	//prevent the default functionality from occurring
 			}
@@ -4359,6 +4361,7 @@ function onCheckInputChange(event)
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		event.stopPropagation();	//tell the event to stop bubbling
 	}
+/*TODO fix; distinguish between !AJAX_ENABLED and AJAX_SUSPENDED; also fix bug on server where an exhaustive post may clear information on non-displayed cards
 	else	//if AJAX is not enabled
 	{
 		if(DOMUtilities.getAncestorElementByClassName(checkInput, STYLES.MENU_BODY))	//if this check is inside a menu, submit the form so that menus will cause immediate reaction
@@ -4370,6 +4373,7 @@ function onCheckInputChange(event)
 			}
 		}
 	}
+*/
 }
 
 /**Called when a select control changes.

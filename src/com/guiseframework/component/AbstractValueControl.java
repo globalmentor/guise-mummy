@@ -79,6 +79,7 @@ public abstract class AbstractValueControl<V, C extends ValueControl<V, C>> exte
 
 	/**Checks the state of the component for validity.
 	This version checks the validity of the value model.
+	This version performs no additional checks if the control is disabled. 
 	@return <code>true</code> if the component and all children passes all validity tests, else <code>false</code>.
 	*/ 
 	protected boolean determineValid()
@@ -87,25 +88,29 @@ public abstract class AbstractValueControl<V, C extends ValueControl<V, C>> exte
 		{
 			return false;	//the component isn't valid
 		}
-		return getValueModel().isValidValue();	//the component is valid if the value model has a valid value
+		return !isEnabled() || getValueModel().isValidValue();	//the component is valid if the value model has a valid value (don't check the value model if the control is not enabled)
 	}
 	
 	/**Validates the user input of this component and all child components.
 	The component will be updated with error information.
 	This version validates the associated value model.
+	This version performs no additional checks if the control is disabled. 
 	@return The current state of {@link #isValid()} as a convenience.
 	*/
 	public boolean validate()
 	{
 		super.validate();	//validate the parent class
-		try
+		if(isEnabled())	//if the control is enabled
 		{
-			getValueModel().validateValue();	//validate the value model
-		}
-		catch(final ValidationException validationException)	//if there is a validation error
-		{
-//TODO del			componentException.setComponent(this);	//make sure the exception knows to which component it relates
-			setNotification(new Notification(validationException));	//add notification of this error to the component
+			try
+			{
+				getValueModel().validateValue();	//validate the value model
+			}
+			catch(final ValidationException validationException)	//if there is a validation error
+			{
+	//TODO del			componentException.setComponent(this);	//make sure the exception knows to which component it relates
+				setNotification(new Notification(validationException));	//add notification of this error to the component
+			}
 		}
 		return isValid();	//return the current valid state
 	}

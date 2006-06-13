@@ -221,6 +221,7 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 	/**Checks the state of the component for validity.
 	This version in addition to default functionality checks to make sure the literal text can be converted to a valid value.
 	The provisional text is checked for validity, because it represents the latest available input from the user.
+	This version performs no additional checks if the control is disabled. 
 	@return <code>true</code> if the component and all children passes all validity tests, else <code>false</code>.
 	@see #getProvisionalText()
 	*/ 
@@ -230,21 +231,24 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 		{
 			return false;	//the component isn't valid
 		}
-		try
+		if(isEnabled())	//if the control is enabled
 		{
-			final V value=getConverter().convertLiteral(getProvisionalText());	//see if the provisional literal text can correctly be converted
-			final Validator<V> validator=getValidator();	//see if there is a validator installed
-			if(validator!=null)	//if there is a validator installed
+			try
 			{
-				if(!validator.isValid(value))	//if the value represented by the literal text is not valid
+				final V value=getConverter().convertLiteral(getProvisionalText());	//see if the provisional literal text can correctly be converted
+				final Validator<V> validator=getValidator();	//see if there is a validator installed
+				if(validator!=null)	//if there is a validator installed
 				{
-					return false;	//the converted value isn't valid
+					if(!validator.isValid(value))	//if the value represented by the literal text is not valid
+					{
+						return false;	//the converted value isn't valid
+					}
 				}
 			}
-		}
-		catch(final ConversionException conversionException)	//if we can't convert the literal text to a value
-		{
-			return false;	//the literal isn't valid
+			catch(final ConversionException conversionException)	//if we can't convert the literal text to a value
+			{
+				return false;	//the literal isn't valid
+			}
 		}
 		return true;	//the values passed all validity checks
 	}
@@ -298,29 +302,33 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 	/**Validates the user input of this component and all child components.
 	The component will be updated with error information.
 	This version also validates the literal text.
+	This version performs no additional checks if the control is disabled. 
 	@return The current state of {@link #isValid()} as a convenience.
 	*/
 	public boolean validate()
 	{
 		super.validate();	//validate the super class
-		try
+		if(isEnabled())	//if the control is enabled
 		{
-			final V value=getConverter().convertLiteral(getText());	//see if the literal text can correctly be converted
-			final Validator<V> validator=getValidator();	//see if there is a validator installed
-			if(validator!=null)	//if there is a validator installed
+			try
 			{
-				validator.validate(value);	//validate the value represented by the literal text
+				final V value=getConverter().convertLiteral(getText());	//see if the literal text can correctly be converted
+				final Validator<V> validator=getValidator();	//see if there is a validator installed
+				if(validator!=null)	//if there is a validator installed
+				{
+					validator.validate(value);	//validate the value represented by the literal text
+				}
 			}
-		}
-		catch(final ConversionException conversionException)	//if there is a conversion error
-		{
-//TODO del			componentException.setComponent(this);	//make sure the exception knows to which component it relates
-			setNotification(new Notification(conversionException));	//add notificaiton of this error to the component
-		}
-		catch(final ValidationException validationException)	//if there is a validation error
-		{
-//TODO del			componentException.setComponent(this);	//make sure the exception knows to which component it relates
-			setNotification(new Notification(validationException));	//add notificaiton of this error to the component
+			catch(final ConversionException conversionException)	//if there is a conversion error
+			{
+	//TODO del			componentException.setComponent(this);	//make sure the exception knows to which component it relates
+				setNotification(new Notification(conversionException));	//add notificaiton of this error to the component
+			}
+			catch(final ValidationException validationException)	//if there is a validation error
+			{
+	//TODO del			componentException.setComponent(this);	//make sure the exception knows to which component it relates
+				setNotification(new Notification(validationException));	//add notificaiton of this error to the component
+			}
 		}
 		return isValid();	//return the current valid state
 	}
