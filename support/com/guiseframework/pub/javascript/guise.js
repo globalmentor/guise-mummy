@@ -298,6 +298,11 @@ if(isSafari || (typeof document.importNode=="undefined"))	//if the document does
 				dummyNode.innerHTML="<table><tbody><tr>"+nodeString+"</tr></tbody></table>";	//create the tbody and put the row inside it
 				importedNode=dummyNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0];	//return the tr's first and only node, which is our new imported node; do not actually remove the node, which will cause an error on IE TODO see the failure to remove the node causes any long-term problems
 			}
+			else if(elementName=="option")	//if this is a select option
+			{
+				dummyNode.innerHTML="<select>"+nodeString+"</select>";	//create the select and put the option inside it
+				importedNode=dummyNode.childNodes[0].childNodes[0];	//return the select's first and only node, which is our new imported node; do not actually remove the node, which will cause an error on IE TODO see the failure to remove the node causes any long-term problems
+			}
 			else	//if this is not a table row
 			{
 //TODO fix							document.documentElement.appendChild(dummyNode);	//append the dummy node to the document
