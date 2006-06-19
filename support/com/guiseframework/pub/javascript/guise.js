@@ -5259,7 +5259,6 @@ function OpacityFadeEffect(element, delay)	//extends AbstractEffect
 
 //TODO testing OpacityFadeEffect.prototype=new AbstractEffect();	//OpacityFadeEffect extends AbstractEffect
 
-
 function debug(text)
 {
 	var dymamicContent="javascript:document.write('<html><body>"+DOMUtilities.encodeXML(text)+"</body></html>');"	//create JavaScript for writing the dynamic content

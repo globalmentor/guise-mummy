@@ -38,6 +38,7 @@ import com.garretwilson.net.http.*;
 
 import static com.garretwilson.net.http.HTTPConstants.*;
 
+import static com.garretwilson.servlet.http.HttpServletConstants.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 import static com.garretwilson.text.CharacterConstants.*;
 import static com.garretwilson.text.xml.XMLConstants.*;
@@ -84,7 +85,6 @@ This implementation only works with Guise applications that descend from {@link 
 */
 public class GuiseHTTPServlet extends DefaultHTTPServlet
 {
-
 	/**The init parameter, "applicationClass", used to specify the application class.*/
 	public final static String APPLICATION_CLASS_INIT_PARAMETER="applicationClass";
 	/**The init parameter, "defaultLocale", used to specify the default locale.*/
@@ -941,7 +941,7 @@ Debug.trace("new bookmark:", newBookmark);
 			{
 				final String cookieName=cookie.getName();	//get the name of this cookie
 //TODO del Debug.trace("Looking at cookie", cookieName, "with value", cookie.getValue());
-				if(!"jsessionid".equalsIgnoreCase(cookieName))	//ignore the session ID TODO use a constant
+				if(!SESSION_ID_COOKIE_NAME.equals(cookieName))	//ignore the session ID
 				{
 //TODO del Debug.trace("Removing cookie", cookieName);
 					final String environmentPropertyValue=asInstance(environment.getProperty(cookieName), String.class);	//see if there is a string environment property value for this cookie's name

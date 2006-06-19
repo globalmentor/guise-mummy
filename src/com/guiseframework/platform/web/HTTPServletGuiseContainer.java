@@ -5,6 +5,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.servlet.ServletConstants.*;
+import static com.garretwilson.servlet.http.HttpServletConstants.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static java.util.Arrays.*;
@@ -19,7 +20,6 @@ import java.util.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import com.garretwilson.net.URIUtilities;
 import com.garretwilson.text.W3CDateFormat;
 import com.garretwilson.util.Debug;
 import com.guiseframework.*;
@@ -173,7 +173,7 @@ while(headerNames.hasMoreElements())
 					{
 						final String cookieName=cookie.getName();	//get the name of this cookie
 //					TODO del Debug.trace("Looking at cookie", cookieName, "with value", cookie.getValue());
-						if(!"jsessionid".equalsIgnoreCase(cookieName))	//ignore the session ID TODO use a constant; testing
+						if(!SESSION_ID_COOKIE_NAME.equals(cookieName))	//ignore the session ID
 						{
 							environment.setProperty(cookieName, decode(cookie.getValue()));	//put this cookie's decoded value into the session's environment
 						}

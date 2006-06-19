@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.garretwilson.beans.*;
+import com.garretwilson.util.Debug;
 import com.guiseframework.Bookmark;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.ActionEvent;
@@ -23,6 +24,12 @@ If any card has constraints of {@link TaskCardConstraints}, this class will upda
 */
 public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> implements Commitable
 {
+
+	/**The current transition in the sequence, or <code>null</code> if no transition is occurring.*/
+	private SequenceTransition transition=null;
+
+		/**@return The current transition in the sequence, or <code>null</code> if no transition is occurring.*/
+		public SequenceTransition getTransition() {return transition;}
 
 	/**The prototype for the previous action.*/
 	private final ActionPrototype previousActionPrototype;
@@ -271,27 +278,36 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	*/
 	public void goPrevious()
 	{
-		final Component<?> previousCard=getPrevious();	//get the previous card
-		if(previousCard!=null)	//if there is a previous card
+		final SequenceTransition oldTransition=transition;	//save the current transition
+		transition=SequenceTransition.PREVIOUS;	//indicate the current transition
+		try
 		{
-			try
+			final Component<?> previousCard=getPrevious();	//get the previous card
+			if(previousCard!=null)	//if there is a previous card
 			{
-				final Component<?> selectedCard=getSelectedValue();	//get the selected card
-				assert selectedCard!=null : "No card selected, even though hasPrevious() should have returned false if no card is selected.";
-//				try
+				try
 				{
-//					selectedCard.validate();	//validate the selected card
-					setValue(previousCard);	//select the previous card
+					final Component<?> selectedCard=getSelectedValue();	//get the selected card
+					assert selectedCard!=null : "No card selected, even though hasPrevious() should have returned false if no card is selected.";
+	//				try
+					{
+	//					selectedCard.validate();	//validate the selected card
+						setValue(previousCard);	//select the previous card
+					}
+	//				catch(final ComponentExceptions componentException)
+					{
+						//TODO improve; inform user
+					}				
 				}
-//				catch(final ComponentExceptions componentException)
+				catch(final PropertyVetoException propertyVetoException)
 				{
-					//TODO improve; inform user
-				}				
+	//TODO fix				throw new AssertionError(validationException);	//TODO improve
+				}
 			}
-			catch(final PropertyVetoException propertyVetoException)
-			{
-//TODO fix				throw new AssertionError(validationException);	//TODO improve
-			}
+		}
+		finally
+		{
+			transition=oldTransition;	//restore the old transition (usually null)
 		}
 	}
 
@@ -307,58 +323,67 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	*/
 	public void goNext()
 	{
-		final Component<?> nextCard=getNext();	//get the next card
-		if(nextCard!=null)	//if there is a next card
+Debug.trace("ready to go next");
+		final SequenceTransition oldTransition=transition;	//save the current transition
+		transition=SequenceTransition.NEXT;	//indicate the current transition
+		try
 		{
-			final Component<?> selectedCard=getSelectedValue();	//get the selected card
-			assert selectedCard!=null : "No card selected, even though getNext() should have returned null if no card is selected.";
-//TODO del Debug.trace("ready to validate selected card");
-			if(validate())	//validate this panel; if everything, including the selected card, is valid
+			final Component<?> nextCard=getNext();	//get the next card
+			if(nextCard!=null)	//if there is a next card
 			{
-					//show any notifications, anyway
-				final List<Notification> notifications=getNotifications(selectedCard);	//get the notifications from the card
-				final Runnable notifyCommitAdvance=new Runnable()	//create code for notifying, committing the card and advancing to the next card
-						{
-							/**Keep track of which notification we're on.*/
-							private int notificationIndex=0;
-							public void run()
+//			TODO del Debug.trace("got next card; ready to get selected card");
+				final Component<?> selectedCard=getSelectedValue();	//get the selected card
+				assert selectedCard!=null : "No card selected, even though getNext() should have returned null if no card is selected.";
+//			TODO del Debug.trace("ready to validate selected card");
+				if(validate())	//validate this panel; if everything, including the selected card, is valid
+				{
+//				TODO del Debug.trace("card validated");
+						//show any notifications, anyway
+					final List<Notification> notifications=getNotifications(selectedCard);	//get the notifications from the card
+					final Runnable notifyCommitAdvance=new Runnable()	//create code for notifying, committing the card and advancing to the next card
 							{
-								if(notificationIndex<notifications.size())	//if there are more notifications
+								/**Keep track of which notification we're on.*/
+								private int notificationIndex=0;
+								public void run()
 								{
-									getSession().notify(notifications.get(notificationIndex++), this);	//notify of the current notification (advancing to the next one), specifying that this runnable should be called again
-								}
-								else	//if we are out of notifications
-								{
-									try
+									if(notificationIndex<notifications.size())	//if there are more notifications
 									{
-										commit();	//commit this panel
-										final Constraints nextCardConstraints=nextCard.getConstraints();	//get the next card's constraints
-										if(nextCardConstraints instanceof Enableable)	//if the next card constraints is enableable
-										{
-											((Enableable)nextCardConstraints).setEnabled(true);	//enable the next card constraints
-										}
-										alreadyValidated=true;	//show that we've already validated the panel
+										getSession().notify(notifications.get(notificationIndex++), this);	//notify of the current notification (advancing to the next one), specifying that this runnable should be called again
+									}
+									else	//if we are out of notifications
+									{
 										try
 										{
+//										TODO del Debug.trace("ready to set next card");
 											setValue(nextCard);	//select the next card
 										}
 										catch(final PropertyVetoException propertyVetoException)	//if the change is vetoed, don't do anything special
 										{
+//										TODO del Debug.warn(propertyVetoException);
 										}
 										finally
 										{
-											alreadyValidated=false;	//always unset our already validated flag
+											transition=oldTransition;	//restore the old transition (usually null)
 										}
 									}
-									catch(final IOException ioException)	//if there is a problem commiting the result
-									{
-										getSession().notify(new Notification(ioException));	//notify the user
-									}
 								}
-							}
-						};
-				notifyCommitAdvance.run();	//run the notify/commit/advance runnable for as many notifications as there are
+							};
+//						TODO del Debug.trace("ready to do notify/commit/advance");
+					notifyCommitAdvance.run();	//run the notify/commit/advance runnable for as many notifications as there are
+				}
+				else	//if the card didn't validate
+				{
+					transition=oldTransition;	//restore the old transition (usually null)					
+				}
 			}
+			else	//if there is no next card
+			{
+				transition=oldTransition;	//restore the old transition (usually null)					
+			}
+		}
+		finally
+		{
+//TODO del			transition=oldTransition;	//restore the old transition (usually null)
 		}
 	}
 
@@ -368,39 +393,49 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	*/
 	public void goFinish()
 	{
-		final Component<?> selectedCard=getSelectedValue();	//get the selected card
-		if(selectedCard!=null)	//if a card is selected
+			//TODO fix transition; right now it won't be set properly if we have a notification
+		final SequenceTransition oldTransition=transition;	//save the current transition
+		transition=SequenceTransition.NEXT;	//indicate the current transition
+		try
 		{
-			if(validate())	//validate this panel; if everything, including the selected card, is valid
+			final Component<?> selectedCard=getSelectedValue();	//get the selected card
+			if(selectedCard!=null)	//if a card is selected
 			{
-					//show any notifications, anyway
-				final List<Notification> notifications=getNotifications(selectedCard);	//get the notifications from the card
-				final Runnable notifyCommitAdvance=new Runnable()	//create code for notifying, committing the card and advancing to the next card
-						{
-							/**Keep track of which notification we're on.*/
-							private int notificationIndex=0;
-							public void run()
+				if(validate())	//validate this panel; if everything, including the selected card, is valid
+				{
+						//show any notifications, anyway
+					final List<Notification> notifications=getNotifications(selectedCard);	//get the notifications from the card
+					final Runnable notifyCommitAdvance=new Runnable()	//create code for notifying, committing the card and advancing to the next card
 							{
-								if(notificationIndex<notifications.size())	//if there are more notifications
+								/**Keep track of which notification we're on.*/
+								private int notificationIndex=0;
+								public void run()
 								{
-									getSession().notify(notifications.get(notificationIndex++), this);	//notify of the current notification (advancing to the next one), specifying that this runnable should be called again
-								}
-								else	//if we are out of notifications
-								{
-									try
+									if(notificationIndex<notifications.size())	//if there are more notifications
 									{
-										commit();	//commit this panel
-										finish();	//finish the sequence
+										getSession().notify(notifications.get(notificationIndex++), this);	//notify of the current notification (advancing to the next one), specifying that this runnable should be called again
 									}
-									catch(final IOException ioException)	//if there is a problem commiting the result
+									else	//if we are out of notifications
 									{
-										getSession().notify(new Notification(ioException));	//notify the user
+										try
+										{
+											commit();	//commit this panel
+											finish();	//finish the sequence
+										}
+										catch(final IOException ioException)	//if there is a problem commiting the result
+										{
+											getSession().notify(new Notification(ioException));	//notify the user
+										}
 									}
 								}
-							}
-						};
-				notifyCommitAdvance.run();	//run the notify/commit/advance runnable for as many notifications as there are
+							};
+					notifyCommitAdvance.run();	//run the notify/commit/advance runnable for as many notifications as there are
+				}
 			}
+		}
+		finally
+		{
+			transition=oldTransition;	//restore the old transition (usually null)
 		}
 	}
 
@@ -528,6 +563,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	}
 
 	/**A vetoable property change listener validates cards before changing to new cards.
+	When {@link SequenceTransition#NEXT} occurs, validation is assumed to have already occurred and it not performed again.
 	@author Garret Wilson
 	*/
 	protected class SequenceCardVetoableChangeListener extends AbstractGenericVetoableChangeListener<Component<?>>
@@ -539,28 +575,94 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 		*/
 		public void vetoableChange(final GenericPropertyChangeEvent<Component<?>> genericPropertyChangeEvent) throws PropertyVetoException
 		{
-			if(!alreadyValidated)	//if we haven't already validated the card before this change
+//		TODO del Debug.trace("validating vetoable change");
+			final Component<?> currentCard=genericPropertyChangeEvent.getOldValue();	//get the currently selected card
+			if(currentCard!=null)	//if there is a selected card, do validation if we need to
 			{
-				final Component<?> currentCard=genericPropertyChangeEvent.getOldValue();	//get the currently selected card
-				if(currentCard!=null)	//if there is a selected card, do validation if we need to
+				final int selectedIndex=indexOf(currentCard);	//get the index of the selected card
+//			TODO del Debug.trace("selected index:", selectedIndex);
+				assert selectedIndex>=0 : "Expected selected card to be present in the container.";
+				final Component<?> newCard=genericPropertyChangeEvent.getNewValue();	//get the new card
+				final int newIndex=indexOf(newCard);	//see what index the proposed new value has
+//			TODO del Debug.trace("new index:", newIndex);
+/*TODO del
+				if(newIndex<0)	//if the new value isn't in the container TODO maybe put this in a default card panel validator
 				{
-					final int selectedIndex=indexOf(currentCard);	//get the index of the selected card
-					assert selectedIndex>=0 : "Expected selected card to be present in the container.";
-					final int newIndex=indexOf(genericPropertyChangeEvent.getNewValue());	//see what index the proposed new value has
-	/*TODO del
-					if(newIndex<0)	//if the new value isn't in the container TODO maybe put this in a default card panel validator
+					return false;	//we can't select a card not in the container
+				}
+*/
+				final int indexDelta=newIndex-selectedIndex;	//get the relative index
+//			TODO del Debug.trace("index delta:", indexDelta);
+				final SequenceTransition transition=getTransition();	//get thet current transition
+//			TODO del Debug.trace("current transition:", transition);
+				if(transition!=SequenceTransition.NEXT && transition!=SequenceTransition.PREVIOUS && !isEnabled(newCard))	//if the new card is not enabled (with exceptions for the previous and next buttons)
+				{
+					throw new PropertyVetoException("Card not enabled.", genericPropertyChangeEvent);	//indicate that the new card isn't enabled and the value shouldn't be changed TODO i18n
+				}
+				final boolean needsValidationCommit;	//we'll find out whether we should validate the card; going forward always gets validation; going backwards only gets validation if there is any subsequent card that is enabled
+				if(newIndex>selectedIndex)	//if we're advancing forward in the sequence
+				{
+					needsValidationCommit=true;	//we always validate going forwards
+				}
+				else	//if we're going backwards in the sequence (or staying put)
+				{
+					boolean hasNextCard=false;	//we'll see if there is a next card TODO see if we can combine this code with getNext() eventually
+					final int cardCount=size();	//find out how many cards there are
+					for(int i=selectedIndex+1; i<cardCount; ++i)	//for each next card
 					{
-						return false;	//we can't select a card not in the container
-					}
-	*/
-					if(newIndex>selectedIndex)	//if we're advancing forward in the sequence
-					{
-						if(!SequenceCardPanel.this.validate())	//validate the panel; if anything, including the currently selected card, doesn't validate
+						final Component<?> card=get(i);	//get this card
+						if(isDisplayed(card) && isEnabled(card))	//if the card is displayed and enabled
 						{
-							throw new PropertyVetoException(VALIDATION_FALSE_MESSAGE_RESOURCE_REFERENCE, genericPropertyChangeEvent);	//indicate that the old card didn't validate and the value shouldn't be changed
-						}									
+							hasNextCard=true;	//show that we have a next card
+							break;	//stop looking for a next card
+						}
+					}
+					needsValidationCommit=hasNextCard;	//we need validation if we have a next card
+				}
+				if(needsValidationCommit)	//if we need to validate and commit
+				{
+//				TODO del Debug.trace("need to validate and commit; ready to validate");
+					if(transition==SequenceTransition.NEXT || validate())	//validate this panel (unless this is a "next" transition, meaning validation already occurred); if everything, including the selected card, is valid
+					{
+//					TODO del Debug.trace("validated; ready to check canTransition if needed");
+						if(!(currentCard instanceof SequenceTransitionable) || ((SequenceTransitionable)currentCard).canTransition(indexDelta))	//if the current card is sequence transitionable, see if it OKs the transition
+						{
+							try
+							{
+//							TODO del Debug.trace("can transition; ready to commit");
+								commit();	//commit this panel
+//							TODO del Debug.trace("committed; ready to set enabled if supported");
+								final Constraints newCardConstraints=newCard.getConstraints();	//get the new card's constraints
+								if(newCardConstraints instanceof Enableable)	//if the new card constraints is enableable
+								{
+									((Enableable)newCardConstraints).setEnabled(true);	//enable the new card constraints
+								}
+//							TODO del Debug.trace("enabled");
+							}
+							catch(final IOException ioException)	//if there is a problem commiting the result
+							{
+								getSession().notify(new Notification(ioException));	//notify the user
+								throw new PropertyVetoException(ioException.getMessage(), genericPropertyChangeEvent);	//indicate that the card value shouldn't be changed
+							}
+						}
+						else	//if the card denies transition
+						{
+							throw new PropertyVetoException("Card denied transition.", genericPropertyChangeEvent);	//indicate that the card didn't allow transition TODO i18n
+						}
+					}
+					else	//if the panel doesn't validate
+					{
+						throw new PropertyVetoException(VALIDATION_FALSE_MESSAGE_RESOURCE_REFERENCE, genericPropertyChangeEvent);	//indicate that the old card didn't validate and the value shouldn't be changed
+					}						
+				}
+				else	//if we don't need to validate and commit
+				{
+					if(currentCard instanceof SequenceTransitionable && !((SequenceTransitionable)currentCard).canTransition(indexDelta))	//if the current card is sequence transitionable and denies transition
+					{
+						throw new PropertyVetoException("Card denied transition.", genericPropertyChangeEvent);	//indicate that the card didn't allow transition TODO i18n						
 					}
 				}
+//TODO del Debug.trace("vetoable change seemed to go OK");
 			}
 		}
 	}
