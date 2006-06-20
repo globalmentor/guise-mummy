@@ -1,5 +1,6 @@
 package com.guiseframework.component;
 
+import static com.garretwilson.lang.ClassUtilities.getPropertyName;
 import static com.guiseframework.GuiseResourceConstants.*;
 
 import java.beans.PropertyVetoException;
@@ -25,11 +26,35 @@ If any card has constraints of {@link TaskCardConstraints}, this class will upda
 public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> implements Commitable
 {
 
+	/**The bound property of whether the transitions are enabled.*/
+	public final static String TRANSITION_ENABLED_PROPERTY=getPropertyName(SequenceCardPanel.class, "transitionEnabled");
+
 	/**The current transition in the sequence, or <code>null</code> if no transition is occurring.*/
 	private SequenceTransition transition=null;
 
 		/**@return The current transition in the sequence, or <code>null</code> if no transition is occurring.*/
 		public SequenceTransition getTransition() {return transition;}
+
+	/**Whether transitions are enabled, so that changing selected cards will cause the appropriate validate/commit functionality.*/
+	private boolean transitionEnabled=true;
+
+		/**@return Whether transitions are enabled, so that changing selected cards will cause the appropriate validate/commit functionality.*/
+		public boolean isTransitionEnabled() {return transitionEnabled;}
+
+		/**Sets Whether transitions are enabled, so that changing selected cards will cause the appropriate validate/commit functionality.
+		This is a bound property of type <code>Boolean</code>.
+		@param newTransitionEnabled <code>true</code> if transitions are enabled, so that changing selected cards will cause the appropriate validate/commit functionality.
+		@see #TRANSITION_ENABLED_PROPERTY
+		*/
+		public void setTransitionEnabled(final boolean newTransitionEnabled)
+		{
+			if(transitionEnabled!=newTransitionEnabled)	//if the value is really changing
+			{
+				final boolean oldTransitionEnabled=transitionEnabled;	//get the current value
+				transitionEnabled=newTransitionEnabled;	//update the value
+				firePropertyChange(TRANSITION_ENABLED_PROPERTY, Boolean.valueOf(oldTransitionEnabled), Boolean.valueOf(newTransitionEnabled));
+			}
+		}
 
 	/**The prototype for the previous action.*/
 	private final ActionPrototype previousActionPrototype;
@@ -322,7 +347,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	*/
 	public void goNext()
 	{
-Debug.trace("ready to go next");
+//TODO del Debug.trace("ready to go next");
 		final SequenceTransition oldTransition=transition;	//save the current transition
 		transition=SequenceTransition.NEXT;	//indicate the current transition
 		try
@@ -330,49 +355,66 @@ Debug.trace("ready to go next");
 			final Component<?> nextCard=getNext();	//get the next card
 			if(nextCard!=null)	//if there is a next card
 			{
-//			TODO del Debug.trace("got next card; ready to get selected card");
-				final Component<?> selectedCard=getSelectedValue();	//get the selected card
-				assert selectedCard!=null : "No card selected, even though getNext() should have returned null if no card is selected.";
-//			TODO del Debug.trace("ready to validate selected card");
-				if(validate())	//validate this panel; if everything, including the selected card, is valid
+				if(isTransitionEnabled())	//if transitions are enabled
 				{
-//				TODO del Debug.trace("card validated");
-						//show any notifications, anyway
-					final List<Notification> notifications=getNotifications(selectedCard);	//get the notifications from the card
-					final Runnable notifyCommitAdvance=new Runnable()	//create code for notifying, committing the card and advancing to the next card
-							{
-								/**Keep track of which notification we're on.*/
-								private int notificationIndex=0;
-								public void run()
+//				TODO del Debug.trace("got next card; ready to get selected card");
+					final Component<?> selectedCard=getSelectedValue();	//get the selected card
+					assert selectedCard!=null : "No card selected, even though getNext() should have returned null if no card is selected.";
+//				TODO del Debug.trace("ready to validate selected card");
+					if(validate())	//validate this panel; if everything, including the selected card, is valid
+					{
+	//				TODO del Debug.trace("card validated");
+							//show any notifications, anyway
+						final List<Notification> notifications=getNotifications(selectedCard);	//get the notifications from the card
+						final Runnable notifyCommitAdvance=new Runnable()	//create code for notifying, committing the card and advancing to the next card
 								{
-									if(notificationIndex<notifications.size())	//if there are more notifications
+									/**Keep track of which notification we're on.*/
+									private int notificationIndex=0;
+									public void run()
 									{
-										getSession().notify(notifications.get(notificationIndex++), this);	//notify of the current notification (advancing to the next one), specifying that this runnable should be called again
+										if(notificationIndex<notifications.size())	//if there are more notifications
+										{
+											getSession().notify(notifications.get(notificationIndex++), this);	//notify of the current notification (advancing to the next one), specifying that this runnable should be called again
+										}
+										else	//if we are out of notifications
+										{
+											try
+											{
+	//										TODO del Debug.trace("ready to set next card");
+												setValue(nextCard);	//select the next card
+											}
+											catch(final PropertyVetoException propertyVetoException)	//if the change is vetoed, don't do anything special
+											{
+	//										TODO del Debug.warn(propertyVetoException);
+											}
+											finally
+											{
+												transition=oldTransition;	//restore the old transition (usually null)
+											}
+										}
 									}
-									else	//if we are out of notifications
-									{
-										try
-										{
-//										TODO del Debug.trace("ready to set next card");
-											setValue(nextCard);	//select the next card
-										}
-										catch(final PropertyVetoException propertyVetoException)	//if the change is vetoed, don't do anything special
-										{
-//										TODO del Debug.warn(propertyVetoException);
-										}
-										finally
-										{
-											transition=oldTransition;	//restore the old transition (usually null)
-										}
-									}
-								}
-							};
-//						TODO del Debug.trace("ready to do notify/commit/advance");
-					notifyCommitAdvance.run();	//run the notify/commit/advance runnable for as many notifications as there are
+								};
+	//						TODO del Debug.trace("ready to do notify/commit/advance");
+						notifyCommitAdvance.run();	//run the notify/commit/advance runnable for as many notifications as there are
+					}
+					else	//if the card didn't validate
+					{
+						transition=oldTransition;	//restore the old transition (usually null)					
+					}
 				}
-				else	//if the card didn't validate
+				else	//if transitions aren't enabled
 				{
-					transition=oldTransition;	//restore the old transition (usually null)					
+					try
+					{
+						setValue(nextCard);	//select the next card
+					}
+					catch(final PropertyVetoException propertyVetoException)	//if the change is vetoed, don't do anything special
+					{
+					}
+					finally
+					{
+						transition=oldTransition;	//restore the old transition (usually null)
+					}
 				}
 			}
 			else	//if there is no next card
@@ -400,6 +442,7 @@ Debug.trace("ready to go next");
 			final Component<?> selectedCard=getSelectedValue();	//get the selected card
 			if(selectedCard!=null)	//if a card is selected
 			{
+					//TODO decide if we want to disable validation if transitions are disabled
 				if(validate())	//validate this panel; if everything, including the selected card, is valid
 				{
 						//show any notifications, anyway
@@ -574,94 +617,97 @@ Debug.trace("ready to go next");
 		*/
 		public void vetoableChange(final GenericPropertyChangeEvent<Component<?>> genericPropertyChangeEvent) throws PropertyVetoException
 		{
-//		TODO del Debug.trace("validating vetoable change");
-			final Component<?> currentCard=genericPropertyChangeEvent.getOldValue();	//get the currently selected card
-			if(currentCard!=null)	//if there is a selected card, do validation if we need to
+			if(isTransitionEnabled())	//if transitions are enabled
 			{
-				final int selectedIndex=indexOf(currentCard);	//get the index of the selected card
-//			TODO del Debug.trace("selected index:", selectedIndex);
-				assert selectedIndex>=0 : "Expected selected card to be present in the container.";
-				final Component<?> newCard=genericPropertyChangeEvent.getNewValue();	//get the new card
-				final int newIndex=indexOf(newCard);	//see what index the proposed new value has
-//			TODO del Debug.trace("new index:", newIndex);
-/*TODO del
-				if(newIndex<0)	//if the new value isn't in the container TODO maybe put this in a default card panel validator
+	//		TODO del Debug.trace("validating vetoable change");
+				final Component<?> currentCard=genericPropertyChangeEvent.getOldValue();	//get the currently selected card
+				if(currentCard!=null)	//if there is a selected card, do validation if we need to
 				{
-					return false;	//we can't select a card not in the container
-				}
-*/
-				final int indexDelta=newIndex-selectedIndex;	//get the relative index
-//			TODO del Debug.trace("index delta:", indexDelta);
-				final SequenceTransition transition=getTransition();	//get thet current transition
-//			TODO del Debug.trace("current transition:", transition);
-				if(transition!=SequenceTransition.NEXT && transition!=SequenceTransition.PREVIOUS && !isEnabled(newCard))	//if the new card is not enabled (with exceptions for the previous and next buttons)
-				{
-					throw new PropertyVetoException("Card not enabled.", genericPropertyChangeEvent);	//indicate that the new card isn't enabled and the value shouldn't be changed TODO i18n
-				}
-				final boolean needsValidationCommit;	//we'll find out whether we should validate the card; going forward always gets validation; going backwards only gets validation if there is any subsequent card that is enabled
-				if(newIndex>selectedIndex)	//if we're advancing forward in the sequence
-				{
-					needsValidationCommit=true;	//we always validate going forwards
-				}
-				else	//if we're going backwards in the sequence (or staying put)
-				{
-					boolean hasNextCard=false;	//we'll see if there is a next card TODO see if we can combine this code with getNext() eventually
-					final int cardCount=size();	//find out how many cards there are
-					for(int i=selectedIndex+1; i<cardCount; ++i)	//for each next card
+					final int selectedIndex=indexOf(currentCard);	//get the index of the selected card
+	//			TODO del Debug.trace("selected index:", selectedIndex);
+					assert selectedIndex>=0 : "Expected selected card to be present in the container.";
+					final Component<?> newCard=genericPropertyChangeEvent.getNewValue();	//get the new card
+					final int newIndex=indexOf(newCard);	//see what index the proposed new value has
+	//			TODO del Debug.trace("new index:", newIndex);
+	/*TODO del
+					if(newIndex<0)	//if the new value isn't in the container TODO maybe put this in a default card panel validator
 					{
-						final Component<?> card=get(i);	//get this card
-						if(isDisplayed(card) && isEnabled(card))	//if the card is displayed and enabled
-						{
-							hasNextCard=true;	//show that we have a next card
-							break;	//stop looking for a next card
-						}
+						return false;	//we can't select a card not in the container
 					}
-					needsValidationCommit=hasNextCard;	//we need validation if we have a next card
-				}
-				if(needsValidationCommit)	//if we need to validate and commit
-				{
-//				TODO del Debug.trace("need to validate and commit; ready to validate");
-					if(transition==SequenceTransition.NEXT || validate())	//validate this panel (unless this is a "next" transition, meaning validation already occurred); if everything, including the selected card, is valid
+	*/
+					final int indexDelta=newIndex-selectedIndex;	//get the relative index
+	//			TODO del Debug.trace("index delta:", indexDelta);
+					final SequenceTransition transition=getTransition();	//get thet current transition
+	//			TODO del Debug.trace("current transition:", transition);
+					if(transition!=SequenceTransition.NEXT && transition!=SequenceTransition.PREVIOUS && !isEnabled(newCard))	//if the new card is not enabled (with exceptions for the previous and next buttons)
 					{
-//					TODO del Debug.trace("validated; ready to check canTransition if needed");
-						if(!(currentCard instanceof SequenceTransitionable) || ((SequenceTransitionable)currentCard).canTransition(indexDelta))	//if the current card is sequence transitionable, see if it OKs the transition
+						throw new PropertyVetoException("Card not enabled.", genericPropertyChangeEvent);	//indicate that the new card isn't enabled and the value shouldn't be changed TODO i18n
+					}
+					final boolean needsValidationCommit;	//we'll find out whether we should validate the card; going forward always gets validation; going backwards only gets validation if there is any subsequent card that is enabled
+					if(newIndex>selectedIndex)	//if we're advancing forward in the sequence
+					{
+						needsValidationCommit=true;	//we always validate going forwards
+					}
+					else	//if we're going backwards in the sequence (or staying put)
+					{
+						boolean hasNextCard=false;	//we'll see if there is a next card TODO see if we can combine this code with getNext() eventually
+						final int cardCount=size();	//find out how many cards there are
+						for(int i=selectedIndex+1; i<cardCount; ++i)	//for each next card
 						{
-							try
+							final Component<?> card=get(i);	//get this card
+							if(isDisplayed(card) && isEnabled(card))	//if the card is displayed and enabled
 							{
-//							TODO del Debug.trace("can transition; ready to commit");
-								commit();	//commit this panel
-//							TODO del Debug.trace("committed; ready to set enabled if supported");
-								final Constraints newCardConstraints=newCard.getConstraints();	//get the new card's constraints
-								if(newCardConstraints instanceof Enableable)	//if the new card constraints is enableable
+								hasNextCard=true;	//show that we have a next card
+								break;	//stop looking for a next card
+							}
+						}
+						needsValidationCommit=hasNextCard;	//we need validation if we have a next card
+					}
+					if(needsValidationCommit)	//if we need to validate and commit
+					{
+	//				TODO del Debug.trace("need to validate and commit; ready to validate");
+						if(transition==SequenceTransition.NEXT || validate())	//validate this panel (unless this is a "next" transition, meaning validation already occurred); if everything, including the selected card, is valid
+						{
+	//					TODO del Debug.trace("validated; ready to check canTransition if needed");
+							if(!(currentCard instanceof SequenceTransitionable) || ((SequenceTransitionable)currentCard).canTransition(indexDelta))	//if the current card is sequence transitionable, see if it OKs the transition
+							{
+								try
 								{
-									((Enableable)newCardConstraints).setEnabled(true);	//enable the new card constraints
+	//							TODO del Debug.trace("can transition; ready to commit");
+									commit();	//commit this panel
+	//							TODO del Debug.trace("committed; ready to set enabled if supported");
+									final Constraints newCardConstraints=newCard.getConstraints();	//get the new card's constraints
+									if(newCardConstraints instanceof Enableable)	//if the new card constraints is enableable
+									{
+										((Enableable)newCardConstraints).setEnabled(true);	//enable the new card constraints
+									}
+	//							TODO del Debug.trace("enabled");
 								}
-//							TODO del Debug.trace("enabled");
+								catch(final IOException ioException)	//if there is a problem commiting the result
+								{
+									getSession().notify(new Notification(ioException));	//notify the user
+									throw new PropertyVetoException(ioException.getMessage(), genericPropertyChangeEvent);	//indicate that the card value shouldn't be changed
+								}
 							}
-							catch(final IOException ioException)	//if there is a problem commiting the result
+							else	//if the card denies transition
 							{
-								getSession().notify(new Notification(ioException));	//notify the user
-								throw new PropertyVetoException(ioException.getMessage(), genericPropertyChangeEvent);	//indicate that the card value shouldn't be changed
+								throw new PropertyVetoException("Card denied transition.", genericPropertyChangeEvent);	//indicate that the card didn't allow transition TODO i18n
 							}
 						}
-						else	//if the card denies transition
+						else	//if the panel doesn't validate
 						{
-							throw new PropertyVetoException("Card denied transition.", genericPropertyChangeEvent);	//indicate that the card didn't allow transition TODO i18n
+							throw new PropertyVetoException(VALIDATION_FALSE_MESSAGE_RESOURCE_REFERENCE, genericPropertyChangeEvent);	//indicate that the old card didn't validate and the value shouldn't be changed
+						}						
+					}
+					else	//if we don't need to validate and commit
+					{
+						if(currentCard instanceof SequenceTransitionable && !((SequenceTransitionable)currentCard).canTransition(indexDelta))	//if the current card is sequence transitionable and denies transition
+						{
+							throw new PropertyVetoException("Card denied transition.", genericPropertyChangeEvent);	//indicate that the card didn't allow transition TODO i18n						
 						}
 					}
-					else	//if the panel doesn't validate
-					{
-						throw new PropertyVetoException(VALIDATION_FALSE_MESSAGE_RESOURCE_REFERENCE, genericPropertyChangeEvent);	//indicate that the old card didn't validate and the value shouldn't be changed
-					}						
+	//TODO del Debug.trace("vetoable change seemed to go OK");
 				}
-				else	//if we don't need to validate and commit
-				{
-					if(currentCard instanceof SequenceTransitionable && !((SequenceTransitionable)currentCard).canTransition(indexDelta))	//if the current card is sequence transitionable and denies transition
-					{
-						throw new PropertyVetoException("Card denied transition.", genericPropertyChangeEvent);	//indicate that the card didn't allow transition TODO i18n						
-					}
-				}
-//TODO del Debug.trace("vetoable change seemed to go OK");
 			}
 		}
 	}

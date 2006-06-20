@@ -98,4 +98,6 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI ICON_RESOURCE=createURIResourceReference("theme.icon.resource");
 	public final static URI ICON_STOP=createURIResourceReference("theme.icon.stop");
 	public final static URI ICON_SUBMIT=createURIResourceReference("theme.icon.submit");
+		//standard messages
+	public final static String MESSAGE_BUSY=createStringResourceReference("theme.message.busy");
 }

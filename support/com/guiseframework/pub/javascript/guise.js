@@ -2573,6 +2573,9 @@ com.guiseframework.js.Client=function()
 	/**The current busy element, or null if there is no busy element.*/
 	this._busyElement=null;
 
+	/**Whether the busy indicator is visible.*/
+	this._isBusyVisible=false;
+
 	/**The map of cursors that have been temporarily changed, keyed to the ID of the element the cursor of which has been changed.
 	This is a tentative implementation, as blindly resetting the cursor after AJAX processing will prevent new cursors to be changed via AJAX.
 	*/
@@ -2950,54 +2953,58 @@ com.guiseframework.js.Client=function()
 		*/
 		com.guiseframework.js.Client.prototype.setBusyVisible=function(busyVisible)
 		{
-			if(!this._busyElement)	//if we haven't found the busy element
+			if(busyVisible!=this._isBusyVisible)	//if the busy visibility is changing
 			{
-				var form=getForm(document.documentElement);	//get the form
-				if(form && form.id)	//if there is a form with an ID
+				this._isBusyVisible=busyVisible;	//update the busy indicator flag
+				if(!this._busyElement)	//if we haven't found the busy element
 				{
-					var busyID=form.id.replace(".form", ".busy");	//determine the ID of the busy element TODO use a constant, or get these values using a better method
-					this._busyElement=document.getElementById(busyID);	//get the busy element
-				}
-			}
-			var busyElement=this._busyElement;	//get the busy element
-			if(busyElement)	//if there is a busy element
-			{
-				if(busyVisible)	//if we're going to show the busy element
-				{
-					busyElement.style.zIndex=9001;	//give the element an arbitrarily high z-index value so that it will appear in front of other components TODO calculate the highest z-order
-					busyElement.style.left="-9999px";	//place the busy element off the screen before we display and center it; it will need to be displayed before we can determine its size
-					busyElement.style.top="-9999px";
-				}
-				var newBusyDisplay=busyVisible ? "block" : "none";	//get the new show or hide status for the busy information
-				busyElement.style.display=newBusyDisplay;	//show or hide the busy information
-				if(busyVisible)	//TODO testing
-				{
-					GUIUtilities.centerNode(busyElement);
-				}
-				if(isUserAgentIE6)	//if we're in IE6, prepare the flyover frame TODO consolidate duplicate code
-				{
-					if(!this._flyoverIFrame)	//if we haven't found our flyover IFrame
+					var form=getForm(document.documentElement);	//get the form
+					if(form && form.id)	//if there is a form with an ID
 					{
-						var form=getForm(document.documentElement);	//get the form
-						if(form && form.id)	//if there is a form with an ID
-						{
-							var flyoverIFrameID=form.id.replace(".form", ".flyoverIFrame");	//determine the ID of the flyover IFrame TODO use a constant, or get these values using a better method
-							this._flyoverIFrame=document.getElementById(flyoverIFrameID);	//get the flyover IFrame
-						}
+						var busyID=form.id.replace(".form", ".busy");	//determine the ID of the busy element TODO use a constant, or get these values using a better method
+						this._busyElement=document.getElementById(busyID);	//get the busy element
 					}
-					var flyoverIFrame=this._flyoverIFrame;	//get the flyover IFrame
-					if(flyoverIFrame)	//if we know the flyover IFrame
+				}
+				var busyElement=this._busyElement;	//get the busy element
+				if(busyElement)	//if there is a busy element
+				{
+					if(busyVisible)	//if we're going to show the busy element
 					{
-						if(busyVisible)	//if we are now showing the busy information
-						{							
-							var flyoverFrameBounds=getElementExternalBounds(busyElement);	//get the flyover frame bounds
-							flyoverIFrame.style.left=flyoverFrameBounds.x;	//update the bounds of the IFrame to match that of the flyover frame
-							flyoverIFrame.style.top=flyoverFrameBounds.y;
-							flyoverIFrame.style.width=flyoverFrameBounds.width;
-							flyoverIFrame.style.height=flyoverFrameBounds.height;
-							flyoverIFrame.style.zIndex=busyElement.style.zIndex-1;	//place the flyover iframe directly behind the flyover frame (a frame shouldn't be modal and a flyover both at the same time)
+						busyElement.style.zIndex=9001;	//give the element an arbitrarily high z-index value so that it will appear in front of other components TODO calculate the highest z-order
+						busyElement.style.left="-9999px";	//place the busy element off the screen before we display and center it; it will need to be displayed before we can determine its size
+						busyElement.style.top="-9999px";
+					}
+					var newBusyDisplay=busyVisible ? "block" : "none";	//get the new show or hide status for the busy information
+					busyElement.style.display=newBusyDisplay;	//show or hide the busy information
+					if(busyVisible)	//TODO testing
+					{
+						GUIUtilities.centerNode(busyElement);
+					}
+					if(isUserAgentIE6)	//if we're in IE6, prepare the flyover frame TODO consolidate duplicate code
+					{
+						if(!this._flyoverIFrame)	//if we haven't found our flyover IFrame
+						{
+							var form=getForm(document.documentElement);	//get the form
+							if(form && form.id)	//if there is a form with an ID
+							{
+								var flyoverIFrameID=form.id.replace(".form", ".flyoverIFrame");	//determine the ID of the flyover IFrame TODO use a constant, or get these values using a better method
+								this._flyoverIFrame=document.getElementById(flyoverIFrameID);	//get the flyover IFrame
+							}
 						}
-						flyoverIFrame.style.display=newBusyDisplay;	//show or hide the flyover IFrame
+						var flyoverIFrame=this._flyoverIFrame;	//get the flyover IFrame
+						if(flyoverIFrame)	//if we know the flyover IFrame
+						{
+							if(busyVisible)	//if we are now showing the busy information
+							{							
+								var flyoverFrameBounds=getElementExternalBounds(busyElement);	//get the flyover frame bounds
+								flyoverIFrame.style.left=flyoverFrameBounds.x;	//update the bounds of the IFrame to match that of the flyover frame
+								flyoverIFrame.style.top=flyoverFrameBounds.y;
+								flyoverIFrame.style.width=flyoverFrameBounds.width;
+								flyoverIFrame.style.height=flyoverFrameBounds.height;
+								flyoverIFrame.style.zIndex=busyElement.style.zIndex-1;	//place the flyover iframe directly behind the flyover frame (a frame shouldn't be modal and a flyover both at the same time)
+							}
+							flyoverIFrame.style.display=newBusyDisplay;	//show or hide the flyover IFrame
+						}
 					}
 				}
 			}
@@ -3635,59 +3642,44 @@ function onWindowLoad()
 */
 
 
+		
 
-	guise.setBusyVisible(true);	//turn on the busy indicator
-		//TODO fix; doesn't seem to work on IE6 or Firefox
-	guise.oldElementIDCursors[document.body.id]=document.body.style.cursor;	//save the old document body cursor; this will get reset after we receive the response from the AJAX initialization request
-	document.body.style.cursor="wait";	//TODO testing
-
+	var initFunction=function()	//create a function for initializing the document
+	{		
+	//TODO display a wait cursor until we initialize everything
 	
+	/*TODO del unless we want to fix external-toGuise stylesheets
+		if(typeof guiseIE6Fix!="undefined")	//if we have IE6 fix routines loaded
+		{
+			guiseIE6Fix.fixStylesheets();	//fix all IE6 stylesheets
+		}
+	*/
+		eventManager.addEvent(window, "resize", onWindowResize, false);	//add a resize listener
+	//TODO del	eventManager.addEvent(window, "scroll", onWindowScroll, false);	//add a scroll listener
+		eventManager.addEvent(window, "unload", onWindowUnload, false);	//do the appropriate uninitialization when the window unloads
+		initializeNode(document.documentElement, true, true);	//initialize the document tree, indicating that this is the first initialization
+		updateComponents(document.documentElement, true);	//update all components represented by elements within the document
+	//TODO del when works	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
+		eventManager.addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
+		guise.updateModalLayer();	//create and update the modal layer TODO do we need or want this now? TODO put in an initialize method
+		var focusable=getFocusableDescendant(document.documentElement);	//see if the document has a node that can be focused
+		if(focusable)	//if we found a focusable node
+		{
+			focusable.focus();	//focus on the node
+		}
+		guiseAJAX.sendAJAXRequest(new InitAJAXEvent());	//send an initialization AJAX request	
+	//TODO del	alert("compatibility mode: "+document.compatMode);
+		guise.setBusyVisible(false);	//turn off the busy indicator	
+	};
 
-
-
-
-
-
-	window.setTimeout(function(){
-	
-	
-	
-
-
-//TODO display a wait cursor until we initialize everything
-
-/*TODO del unless we want to fix external-toGuise stylesheets
-	if(typeof guiseIE6Fix!="undefined")	//if we have IE6 fix routines loaded
+	if(document.bodyLength && document.bodyLength>60000)	//if the body length is over 60,000 (as indicated by the custom Guise variable), show a busy indicator
 	{
-		guiseIE6Fix.fixStylesheets();	//fix all IE6 stylesheets
+		guise.setBusyVisible(true);	//turn on the busy indicator
+			//TODO fix; doesn't seem to work on IE6 or Firefox
+		guise.oldElementIDCursors[document.body.id]=document.body.style.cursor;	//save the old document body cursor; this will get reset after we receive the response from the AJAX initialization request
+		document.body.style.cursor="wait";	//TODO testing	
 	}
-*/
-
-	eventManager.addEvent(window, "resize", onWindowResize, false);	//add a resize listener
-//TODO del	eventManager.addEvent(window, "scroll", onWindowScroll, false);	//add a scroll listener
-	eventManager.addEvent(window, "unload", onWindowUnload, false);	//do the appropriate uninitialization when the window unloads
-	initializeNode(document.documentElement, true, true);	//initialize the document tree, indicating that this is the first initialization
-	updateComponents(document.documentElement, true);	//update all components represented by elements within the document
-//TODO del when works	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
-	eventManager.addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
-	guise.updateModalLayer();	//create and update the modal layer TODO do we need or want this now? TODO put in an initialize method
-	var focusable=getFocusableDescendant(document.documentElement);	//see if the document has a node that can be focused
-	if(focusable)	//if we found a focusable node
-	{
-		focusable.focus();	//focus on the node
-	}
-	guiseAJAX.sendAJAXRequest(new InitAJAXEvent());	//send an initialization AJAX request	
-//TODO del	alert("compatibility mode: "+document.compatMode);
-	guise.setBusyVisible(false);	//turn off the busy indicator
-
-
-
-
-
-}, 1);	//TODO testing
-
-
-
+	window.setTimeout(initFunction, 1);	//run the init function in a separate thread
 }
 
 /**Called when the window unloads.
