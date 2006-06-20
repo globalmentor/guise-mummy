@@ -78,7 +78,7 @@ public class DefaultValueModel<V> extends AbstractValueModel<V>
 		public void resetValue()
 		{
 			final V defaultValue=getDefaultValue();	//get the default value
-			if(!ObjectUtilities.equals(value, getDefaultValue()))	//if the value is really changing (compare their values, rather than identity)
+			if(!ObjectUtilities.equals(value, defaultValue))	//if the value is really changing (compare their values, rather than identity)
 			{
 				final V oldValue=value;	//get the old value
 				value=defaultValue;	//actually change the value

@@ -777,8 +777,10 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 		}
 	}
 }
+		final V oldSelectedValue, newSelectedValue;
 		synchronized(this)	//don't allow the model to be changed while we update the selected values 
 		{
+			oldSelectedValue=getSelectedValue();	//get the old selected value
 			int index=0;	//start at the first index
 			for(final ValueState valueState:valueStateList)	//for each value state
 			{
@@ -800,7 +802,9 @@ if(values.length==0)	//TODO add more thorough validation throughout; right now w
 				}
 				++index;	//go to the next index
 			}
+			newSelectedValue=getSelectedValue();	//find out the new selected value
 		}
+		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, newSelectedValue);	//indicate that the value changed if needed		
 	}
 
 	/**Determines the displayed status of the first occurrence of a given value.

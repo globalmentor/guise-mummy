@@ -160,7 +160,6 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 		}
 	}
 
-
 	/**Sets the new selected card.
 	This version validates the input on the currently selected card as needed.
 	@param newValue The new selected card.
