@@ -29,7 +29,7 @@ public final class Guise
 	public final static String PUBLIC_RESOURCE_BASE_PATH="pub/";
 
 	/**The identifier of this build.*/
-	public final static String BUILD_ID="2006-06-20";
+	public final static String BUILD_ID="2006-06-22";
 	
 		//Guise ontology
 	

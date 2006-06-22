@@ -138,6 +138,36 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		this.basePath=null;	//remove the base path
 	}
 
+	/**The read-only list of locales supported by the application, with the first locale the default used if a new session cannot determine the users's preferred locale.*/
+//TODO fix	private List<Locale> locales;
+
+		/**@return The read-only list of locales supported by the application, with the first locale the default used if a new session cannot determine the users's preferred locale.*/
+//TODO fix		public List<Locale> getLocales() {return locales;}
+	
+		/**Sets the list of supported locales.
+		This is a bound property.
+		@param newLocales The new default application locale.
+		@exception NullPointerException if the given list of locales is <code>null</code>.
+		@exception IllegalArgumentException if the given list of locales is empty.
+		@see #LOCALES_PROPERTY
+		*/
+/*TODO fix
+		public void setLocales(final List<Locale> newLocales)
+		{
+			checkInstance(newLocales, "Guise application locales cannot be null.");	//make sure the list is not null
+			if(newLocales.isEmpty())	//if there are no locales given
+			{
+				throw new IllegalArgumentException("Guise application must support at least one locale.");
+			}
+			if(!locales.equals(newLocales))	//if the value is really changing
+			{
+				final List<Locale> oldLocales=locales;	//get the old value
+				locales=unmodifiableList(new ArrayList<Locale>(newLocales));	//create an unmodifiable copy of the locales
+				firePropertyChange(LOCALES_PROPERTY, oldLocales, newLocales);	//indicate that the value changed
+			}
+		}
+*/
+	
 	/**The application locale used by default if a new session cannot determine the users's preferred locale.*/
 	private Locale defaultLocale;
 

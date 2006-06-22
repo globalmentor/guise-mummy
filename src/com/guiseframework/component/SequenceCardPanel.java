@@ -359,6 +359,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 				{
 //				TODO del Debug.trace("got next card; ready to get selected card");
 					final Component<?> selectedCard=getSelectedValue();	//get the selected card
+//TODO del Debug.trace("got next card", nextCard, "selected card", selectedCard);
 					assert selectedCard!=null : "No card selected, even though getNext() should have returned null if no card is selected.";
 //				TODO del Debug.trace("ready to validate selected card");
 					if(validate())	//validate this panel; if everything, including the selected card, is valid
@@ -617,7 +618,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 		*/
 		public void vetoableChange(final GenericPropertyChangeEvent<Component<?>> genericPropertyChangeEvent) throws PropertyVetoException
 		{
-			if(isTransitionEnabled())	//if transitions are enabled
+			if(isTransitionEnabled() && genericPropertyChangeEvent.getNewValue()!=getValue())	//if transitions are enabled and the index is really changing (the VetoableChangeListener contract says that if a change is vetoed this method will be called again with a reverse change, and we don't want to validate in those circumstances)
 			{
 	//		TODO del Debug.trace("validating vetoable change");
 				final Component<?> currentCard=genericPropertyChangeEvent.getOldValue();	//get the currently selected card
@@ -628,7 +629,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 					assert selectedIndex>=0 : "Expected selected card to be present in the container.";
 					final Component<?> newCard=genericPropertyChangeEvent.getNewValue();	//get the new card
 					final int newIndex=indexOf(newCard);	//see what index the proposed new value has
-	//			TODO del Debug.trace("new index:", newIndex);
+//TODO del					Debug.trace("selected index", selectedIndex, "new index", newIndex, "current selected index", getSelectedIndex());
 	/*TODO del
 					if(newIndex<0)	//if the new value isn't in the container TODO maybe put this in a default card panel validator
 					{

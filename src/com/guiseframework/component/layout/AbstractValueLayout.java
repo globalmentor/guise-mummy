@@ -5,6 +5,7 @@ import static java.text.MessageFormat.*;
 import java.beans.*;
 
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.util.Debug;
 import com.guiseframework.component.Component;
 import com.guiseframework.component.Container;
 import com.guiseframework.model.*;
@@ -54,8 +55,16 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 				final Component<?> selectedComponent=getValue();	//get the selected component
 				if(selectedComponent!=null)	//if a component is selected, we'll need to update the selected index
 				{
-					selectedIndex=getContainer().indexOf(selectedComponent);	//update the selected index with the index in the container of the selected component
-					assert selectedIndex>=0 : "Selected component "+selectedComponent+" is not in the container.";
+					final int newSelectedIndex=getContainer().indexOf(selectedComponent);	//update the selected index with the index in the container of the selected component
+					assert newSelectedIndex>=0 : "Selected component "+selectedComponent+" is not in the container.";
+					if(isSettingValue)	//we're setting the value, return the selected index without updating the variable, as a VetoablePropertyListener might be calling this method before the value is actually changed, so we want to leave the selected index uncached until after the value is actually changed
+					{
+						return newSelectedIndex;	//return the new selected index
+					}
+					else	//if we're not in the middle of setting the value
+					{
+						selectedIndex=newSelectedIndex;	//update the cached selected index; we'll return it later
+					}
 				}
 			}
 			return selectedIndex;	//return the selected index, which we've verified is up-to-date
@@ -159,6 +168,9 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	/**@return The input value, or <code>null</code> if there is no input value.*/
 	public Component<?> getValue() {return getValueModel().getValue();}
 
+	/**The flat that indicates whether we are in the middle of setting the value.*/
+	private boolean isSettingValue=false;
+	
 	/**Sets the input value.
 	This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method.
 	If a validator is installed, the value will first be validated before the current value is changed.
@@ -187,12 +199,20 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 				final ValidationException validationException=new ValidationException(format(getSession().resolveString(VALIDATOR_INVALID_VALUE_MESSAGE_RESOURCE_REFERENCE), newValue.toString()), newValue);
 				throw createPropertyVetoException(this, validationException, VALUE_PROPERTY, oldValue, newValue);	//throw a property veto exception representing the validation error
 			}
-			selectedIndex=-1;	//uncache the selected index
 			if(oldValue instanceof Activeable)	//if the old value is activable
 			{
 				((Activeable)oldValue).setActive(false);	//tell the old card it is no longer active
 			}
-			getValueModel().setValue(newValue);	//set the new value normally
+			isSettingValue=true;	//indicate that we're setting the value
+			try
+			{
+				selectedIndex=-1;	//uncache the selected index
+				getValueModel().setValue(newValue);	//set the new value normally
+			}
+			finally
+			{
+				isSettingValue=false;	//indicate that we're no longer setting the value
+			}
 			if(newValue instanceof Activeable)	//if the new value is activable
 			{
 				((Activeable)newValue).setActive(true);	//tell the new card it is active
