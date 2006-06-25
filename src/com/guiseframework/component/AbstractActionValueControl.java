@@ -129,6 +129,16 @@ public abstract class AbstractActionValueControl<V, C extends ActionValueControl
 		return isValid();	//return the current valid state
 	}
 
+	/**Resets the control to its default value.
+	This version resets the control value.
+	@see #resetValue()
+	*/
+	public void reset()
+	{
+		super.reset();	//reset normally
+		resetValue();	//reset the control value
+	}
+
 	/**@return The default value.*/
 	public V getDefaultValue() {return getValueModel().getDefaultValue();}
 

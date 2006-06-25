@@ -332,4 +332,14 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 		}
 		return isValid();	//return the current valid state
 	}
+
+	/**Resets the control to its default value.
+	This version updates the text to match the new value.
+	@see #updateText()
+	*/
+	public void reset()
+	{
+		super.reset();	//reset normally
+		updateText();	//update the text to match the new value
+	}
 }

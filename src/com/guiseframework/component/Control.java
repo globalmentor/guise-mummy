@@ -28,4 +28,7 @@ public interface Control<C extends Control<C>> extends Component<C>, Enableable
 	/**@return The status of the current user input, or <code>null</code> if there is no status to report.*/
 	public Status getStatus();
 
+	/**Resets the control to its default value.*/
+	public void reset();
+
 }

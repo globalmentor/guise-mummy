@@ -109,4 +109,13 @@ public abstract class AbstractCompositeStateControl<T, S extends AbstractComposi
 			updateStatus();	//update the status			
 		}
 	}
+
+	/**Resets the control to its default value.
+	This version clears any notification.
+	@see #setNotification(Notification)
+	*/
+	public void reset()
+	{
+		setNotification(null);	//clear any notification
+	}
 }

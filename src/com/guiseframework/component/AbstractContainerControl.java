@@ -109,6 +109,15 @@ public abstract class AbstractContainerControl<C extends ContainerControl<C>> ex
 		}
 	}
 
+	/**Resets the control to its default value.
+	This version clears any notification.
+	@see #setNotification(Notification)
+	*/
+	public void reset()
+	{
+		setNotification(null);	//clear any notification
+	}
+
 	/**Layout constructor.
 	@param layout The layout definition for the container.
 	@exception NullPointerException if the given layout is <code>null</code>.
