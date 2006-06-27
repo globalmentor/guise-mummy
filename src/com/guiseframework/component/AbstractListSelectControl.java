@@ -159,6 +159,16 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 		return isValid();	//return the current valid state
 	}
 
+	/**Resets the control to its default value.
+	This version resets the control value.
+	@see #resetValue()
+	*/
+	public void reset()
+	{
+		super.reset();	//reset normally
+		resetValue();	//reset the control value
+	}
+
 		//ValueModel delegations
 
 	/**@return The default value.*/

@@ -135,7 +135,7 @@ while(headerNames.hasMoreElements())
 				final String relativeApplicationPath=relativizePath(getBasePath(), guiseApplication.getBasePath());	//get the application path relative to the container path
 				try
 				{
-					final File baseLogDirectory=GuiseHTTPServlet.getLogDirectory(getServletContext());	//get teh base log directory
+					final File baseLogDirectory=GuiseHTTPServlet.getLogDirectory(getServletContext());	//get the base log directory
 					final File logDirectory=new File(baseLogDirectory, relativeApplicationPath);	//get a subdirectory if needed; the File class allows a relative application path of ""
 					ensureDirectoryExists(logDirectory);	//make sure the log directory exists
 					final DateFormat logFilenameDateFormat=new W3CDateFormat(W3CDateFormat.Style.DATE);	//create a formatter for the log filename

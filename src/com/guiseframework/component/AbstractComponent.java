@@ -26,7 +26,8 @@ import static com.garretwilson.util.ArrayUtilities.*;
 
 /**An abstract implementation of a component.
 <p>A component should never fire a property event directly. It should rather create a postponed event and queue that event with the session.
-This implementation automatically handles postponed property change events when {@link #firePropertyChange(String, Object, Object)} or a related method is called.</p> 
+This implementation automatically handles postponed property change events when {@link #firePropertyChange(String, Object, Object)} or a related method is called.</p>
+<p>Property changes to a component's constraints are repeated with the component as the source and the constraints as the target.</p> 
 @author Garret Wilson
 */
 public abstract class AbstractComponent<C extends Component<C>> extends GuiseBoundPropertyObject implements Component<C>
@@ -278,14 +279,22 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		@param newConstraints The layout constraints describing individual component layout information, or <code>null</code> if no constraints have been specified for this component.
 		@see #CONSTRAINTS_PROPERTY
 		*/
-		public void setConstraints(final Constraints newConstraints)
+		public void setConstraints(final Constraints newConstraints)	//TODO see if any of the specialized components throw constraints property changes as well
 		{
 			if(constraints!=newConstraints)	//if the value is really changing
 			{
 				final Constraints oldConstraints=constraints;	//get the old value
+				if(oldConstraints!=null)	//if there were old constraints
+				{
+					oldConstraints.removePropertyChangeListener(getRepeatPropertyChangeListener());	//stop repeating constraints property change events
+				}
 				constraints=newConstraints;	//actually change the value
+				if(newConstraints!=null)	//if there are new constraints
+				{
+					newConstraints.addPropertyChangeListener(getRepeatPropertyChangeListener());	//repeat constraints property change events
+				}
 				firePropertyChange(CONSTRAINTS_PROPERTY, oldConstraints, newConstraints);	//indicate that the value changed
-			}			
+			}
 		}
 
 	/**The array of dimensions each defining a corner arc by two radiuses.*/

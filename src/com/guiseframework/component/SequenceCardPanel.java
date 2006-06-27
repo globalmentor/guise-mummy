@@ -3,6 +3,7 @@ package com.guiseframework.component;
 import static com.garretwilson.lang.ClassUtilities.getPropertyName;
 import static com.guiseframework.GuiseResourceConstants.*;
 
+import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.List;
@@ -74,6 +75,35 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 		/**@return The prototype for the action to finish the sequence.*/
 		public ActionPrototype getFinishActionPrototype() {return finishActionPrototype;}
 
+	/**The listener that ensures making a card displayed doesn't create an invalid gap in a sequence of valid cards.*/
+	private PropertyChangeListener cardDisplayedChangeListener=new AbstractGenericPropertyChangeListener<Boolean>()	//create a new display change listener
+	{
+		public void propertyChange(final GenericPropertyChangeEvent<Boolean> propertyChangeEvent)	//if the child component's display status changes (we're really listening for the constraint's displayable status, which we'll check later)
+		{
+			if(isTransitionEnabled() && Boolean.TRUE.equals(propertyChangeEvent.getNewValue()))	//if transitions are turned on and the card is being displayed
+			{
+				final Object target=propertyChangeEvent.getTarget();	//get the target of the event
+				if(target instanceof ControlConstraints)	//if this is control constraints changing
+				{
+//TODO del if not needed					final ControlConstraints controlConstraints=(ControlConstraints)target;	//get the control constraints target
+					final int currentIndex=getSelectedIndex();	//get the currently selected index
+					if(currentIndex>=0)	//if a card is selected
+					{
+						final Component<?> card=(Component<?>)propertyChangeEvent.getSource();	//get the card source of the event
+						final int cardIndex=indexOf(card);	//get the index of the card
+						if(cardIndex>currentIndex)	//if this card is in front of the current card
+						{
+							for(int i=size()-1; i>=cardIndex; --i)	//for each card (including the one that changed) after the current card
+							{
+								setEnabled(get(i), false);	//disable this component
+							}
+						}
+					}
+				}
+			}
+		}
+	};
+		
 	/**Default constructor.*/
 	public SequenceCardPanel()
 	{
@@ -125,44 +155,69 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 				{
 					public void propertyChange(final GenericPropertyChangeEvent<Component<?>> propertyChangeEvent)	//if the selected card changes
 					{
-						final Component<?> oldCard=propertyChangeEvent.getOldValue();
-						final Component<?> newCard=propertyChangeEvent.getNewValue();	//TODO comment all this
-						if(oldCard!=null)	//if there was an old card
+						if(isTransitionEnabled())	//if transitions are enabled
 						{
-							final Constraints constraints=oldCard.getConstraints();
-							if(constraints instanceof TaskCardConstraints)
+							final Component<?> oldCard=propertyChangeEvent.getOldValue();
+							final Component<?> newCard=propertyChangeEvent.getNewValue();	//TODO comment all this
+							if(oldCard!=null)	//if there was an old card
 							{
-								final TaskCardConstraints taskCardConstraints=(TaskCardConstraints)constraints;
-								if(taskCardConstraints.getTaskStatus()==TaskStatus.ERROR && oldCard.isValid())	//if there was an error but the old card is now valid
+								final Constraints constraints=oldCard.getConstraints();
+								if(constraints instanceof TaskCardConstraints)
 								{
-									taskCardConstraints.setTaskStatus(TaskStatus.INCOMPLETE);
+									final TaskCardConstraints taskCardConstraints=(TaskCardConstraints)constraints;
+									if(taskCardConstraints.getTaskStatus()==TaskStatus.ERROR && oldCard.isValid())	//if there was an error but the old card is now valid
+									{
+										taskCardConstraints.setTaskStatus(TaskStatus.INCOMPLETE);
+									}
+									final int oldIndex=indexOf(oldCard);	//get the index of the old card
+									assert oldIndex>=0 : "Expected old card to be present in the container.";
+									final int newIndex=indexOf(newCard);	//see what index the new value has
+									if(newIndex>oldIndex)	//if we advanced to a new card
+									{
+										taskCardConstraints.setTaskStatus(TaskStatus.COMPLETE);	//show that the old task is complete
+									}
 								}
-								final int oldIndex=indexOf(oldCard);	//get the index of the old card
-								assert oldIndex>=0 : "Expected old card to be present in the container.";
-								final int newIndex=indexOf(newCard);	//see what index the new value has
-								if(newIndex>oldIndex)	//if we advanced to a new card
+							}						
+							if(newCard!=null)	//if there is a new card
+							{
+								final Constraints constraints=newCard.getConstraints();
+								if(constraints instanceof TaskCardConstraints)
 								{
-									taskCardConstraints.setTaskStatus(TaskStatus.COMPLETE);	//show that the old task is complete
+									final TaskCardConstraints taskCardConstraints=(TaskCardConstraints)constraints;
+									if(taskCardConstraints.getTaskStatus()==null)
+									{
+										taskCardConstraints.setTaskStatus(TaskStatus.INCOMPLETE);
+									}
 								}
 							}
-						}						
-						if(newCard!=null)	//if there is a new card
-						{
-							final Constraints constraints=newCard.getConstraints();
-							if(constraints instanceof TaskCardConstraints)
-							{
-								final TaskCardConstraints taskCardConstraints=(TaskCardConstraints)constraints;
-								if(taskCardConstraints.getTaskStatus()==null)
-								{
-									taskCardConstraints.setTaskStatus(TaskStatus.INCOMPLETE);
-								}
-							}
+							previousActionPrototype.setEnabled(hasPrevious());	//enable or disable the previous action prototype
+							nextActionPrototype.setEnabled(hasNext());	//enable or disable the previous action prototype
+							finishActionPrototype.setEnabled(!hasNext());	//enable or disable the finish action prototype
 						}
-						previousActionPrototype.setEnabled(hasPrevious());	//enable or disable the previous action prototype
-						nextActionPrototype.setEnabled(hasNext());	//enable or disable the previous action prototype
-						finishActionPrototype.setEnabled(!hasNext());	//enable or disable the finish action prototype
 					}
 				});
+	}
+
+	/**Adds a child component.
+	This version installs a listener for the component's displayed status.
+	Any class that overrides this method must call this version.
+	@param component The component to add to this component.
+	*/
+	protected void addComponent(final Component<?> component)
+	{
+		super.addComponent(component);	//initialize the child component as needed
+		component.addPropertyChangeListener(DISPLAYED_PROPERTY, cardDisplayedChangeListener);	//listen for changes in the component's displayed status and make sure the sequence is disabled as needed
+	}
+
+	/**Removes a child component.
+	This version uninstalls a listener for the component's displayed status.
+	Any class that overrides this method must call this version.
+	@param component The component to remove from this component.
+	*/
+	protected void removeComponent(final Component<?> component)
+	{
+		component.removePropertyChangeListener(DISPLAYED_PROPERTY, cardDisplayedChangeListener);	//stop listening for changes in the component's displayed status
+		super.removeComponent(component);	//uninitialize the child component as needed
 	}
 
 	/**Called when the {@link Component#VALID_PROPERTY} of a child component changes.

@@ -117,6 +117,9 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	/**The minimum level of debug reporting for Guise.*/
 	protected final static Debug.ReportLevel DEBUG_LEVEL=Debug.ReportLevel.TRACE;	//TODO load this from an init parameter
 
+	/**The cached log file, or null if it has not yet been initialized.*/
+	private static File logFile=null;
+
 	/**Determines the debug log file.
 	@param context The servlet context from which to retrieve context parameters.
 	@return The file for debug logging.
@@ -124,10 +127,17 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	*/
 	protected static File getDebugLogFile(final ServletContext context)
 	{
-		final DateFormat logFilenameDateFormat=new W3CDateFormat(W3CDateFormat.Style.DATE);	//create a formatter for the log filename
-		final String logFilename=logFilenameDateFormat.format(new Date())+" debug.log";	//create a filename in the form "date debug.log" TODO use a constant
-		return new File(getLogDirectory(context), logFilename);	//TODO use a constant
+		if(logFile==null)	//if no log file has been determined
+		{
+			final DateFormat logFilenameDateFormat=new W3CDateFormat(W3CDateFormat.Style.DATE);	//create a formatter for the log filename
+			final String logFilename=logFilenameDateFormat.format(new Date())+" debug.log";	//create a filename in the form "date debug.log" TODO use a constant
+			logFile=new File(getLogDirectory(context), logFilename);	//TODO use a constant
+		}
+		return logFile;	//return the log file
 	}
+
+	/**The cached data directory, or null if it has not yet been initialized.*/
+	private static File dataDirectory=null;
 
 	/**Determines the data base directory, in this order:
 	<ol>
@@ -138,11 +148,28 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	@return The data base directory.
 	@see ServletUtilities#getWebInfDirectory(ServletContext)
 	@see #DATA_BASE_DIRECTORY_CONTEXT_PARAMETER
+	@exception IllegalStateException thrown if no data directory was specified and the real path to <code>WEB-INF</code> could not be determined.
 	*/
 	public static File getDataDirectory(final ServletContext context)
 	{
-		final String path=context.getInitParameter(DATA_BASE_DIRECTORY_CONTEXT_PARAMETER);	//get the context parameter
-		return path!=null ? new File(path) : new File(getWebInfDirectory(context), "guise");	//return a file for the path, or the default WEB-INF-based path TODO use a constant
+		if(dataDirectory==null)	//if the data directory has not been determined
+		{
+			final String path=context.getInitParameter(DATA_BASE_DIRECTORY_CONTEXT_PARAMETER);	//get the context parameter
+			if(path!=null)	//if there is a data directory path
+			{
+				dataDirectory=new File(path);	//use the path for the data directory
+			}
+			else	//if there is no data directory path
+			{
+				final File webInfDirectory=getWebInfDirectory(context);	//get the WEB-INF directory
+				if(webInfDirectory==null)	//if we can't get the WEB-INF directory
+				{
+					throw new IllegalStateException(DATA_BASE_DIRECTORY_CONTEXT_PARAMETER+" init parameter not specified and real path to WEB-INF directory not available.");
+				}
+				dataDirectory=new File(webInfDirectory, "guise");	//use a default WEB-INF-based path TODO use a constant
+			}
+		}
+		return dataDirectory;	//return the data directory
 	}
 
 	/**Determines the directory for log files.

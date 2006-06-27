@@ -19,7 +19,7 @@ If the action implements {@link SelectActionControl} its auto-select status will
 This coupler is only functional when the given card is contained within a {@link CardControl}.
 @author Garret Wilson
 */
-public class ActionCardCoupler extends AbstractCardCoupler
+public class ActionCardCoupler extends AbstractCardCoupler	//TODO now that constraints throw repeated events, see if we need to do this complicated listening for constraints
 {
 
 	/**The bound property of the action.*/
