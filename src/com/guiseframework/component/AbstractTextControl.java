@@ -4,6 +4,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
 import java.util.regex.Pattern;
 
 import com.garretwilson.lang.ObjectUtilities;
@@ -197,6 +198,13 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 		updateText();	//initialize the text with the literal form of the initial model value
 		addPropertyChangeListener(VALUE_PROPERTY, updateTextPropertyChangeListener);	//listen for the value changing, and update the text in response
 		getSession().addPropertyChangeListener(GuiseSession.LOCALE_PROPERTY, updateTextPropertyChangeListener);	//listen for the session locale changing, in case the converter is locale-dependent TODO allow for unregistration to prevent memory leaks
+	}
+
+//TODO important; remove this hack and make work with models, compensating for delayed listeners somehow; right now this results in the text being updated twice; once immediately when the value changes, and another when the value property change listener is fired (with delayed events)
+	public void setValue(final V newValue) throws PropertyVetoException
+	{
+		super.setValue(newValue);
+		updateText();	//update the text with the new value from the model
 	}
 
 	/**Updates the component text with literal form of the given value.

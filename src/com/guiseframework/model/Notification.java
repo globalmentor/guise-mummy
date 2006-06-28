@@ -5,6 +5,8 @@ import static com.garretwilson.text.TextUtilities.*;
 
 import javax.mail.internet.ContentType;
 
+import com.guiseframework.Guise;
+
 /**A notification to the user of some event or state, such as an error or invalid user input.
 @author Garret Wilson
 */
@@ -161,4 +163,9 @@ public class Notification
 		this.error=error;
 	}
 
+	/**@return A string representation of this notification.*/
+	public String toString()
+	{
+		return getSeverity()+": "+AbstractModel.getPlainText(Guise.getInstance().getGuiseSession().resolveString(getMessage()), getMessageContentType());	//severity: message (resolve the message and get its plain text form)
+	}
 }

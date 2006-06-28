@@ -48,6 +48,21 @@ public interface GuiseSession extends PropertyBindable
 	*/
 	public void setLogWriter(final Writer logWriter);
 
+	/**Reports the base URI of the session.
+	The base URI is an absolute URI that ends with the base path of the application, which ends with a slash ('/').
+	The session base URI may be different for different sessions, and may not be equal to the application base path resolved to the container's base URI.
+	@return The base URI representing the Guise session.
+	*/
+	public URI getBaseURI();
+
+	/**Sets the base URI of the session.
+	The raw path of the base URI must be equal to the application base path.
+	@param baseURI The new base URI of the session.
+	@exception NullPointerException if the given base URI is <code>null</code>.
+	@exception IllegalArgumentException if the raw path of the given base URI is not equal to the application base path.
+	*/
+	public void setBaseURI(final URI baseURI);
+
 	/**@return The application frame.*/
 	public ApplicationFrame<?> getApplicationFrame();
 

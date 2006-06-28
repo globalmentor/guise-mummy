@@ -73,8 +73,7 @@ public abstract class AbstractCardPanel<C extends Panel<C> & CardControl<C>> ext
 	*/
 	protected void updateBookmark()
 	{
-//TODO del Debug.trace("ready to update bookmarks");
-Debug.trace("ready to update bookmarks, bookmarks enabled", isBookmarkEnabled(), "name", getName());
+//TODO del Debug.trace("ready to update bookmarks, bookmarks enabled", isBookmarkEnabled(), "name", getName());
 		if(isBookmarkEnabled())	//if bookmarks are enabled
 		{
 			final String name=getName();	//get the component name
@@ -111,12 +110,17 @@ Debug.trace("ready to update bookmarks, bookmarks enabled", isBookmarkEnabled(),
 		if(isBookmarkEnabled())	//if bookmarks are enabled
 		{
 			final Bookmark bookmark=navigationEvent.getBookmark();	//get the navigation bookmark, if any
+//TODO del Debug.trace("card panel ready to change to bookmark:", bookmark, "old component", getValue(), "old index", getSelectedIndex());
 			final Component<?> component=getComponent(bookmark);	//get the component from the bookmark
+//TODO del Debug.trace("new component:", component, "new index", indexOf(component));
 			if(component!=null && isEnabled(component) && isDisplayed(component))	//if an enabled, displayed component is specified
 			{
 				try
 				{
 					setValue(component);	//change to that component
+					
+					//TODO fix a way to force the bookmark if a null bookmark was sent
+					
 //TODO fix; doesn't work					updateBookmark();	//make sure our bookmark is correct, in case another bookmark sent us here---i.e. canonicize the bookmark
 				}
 				catch(final PropertyVetoException propertyVetoException)
@@ -182,6 +186,7 @@ Debug.trace("ready to update bookmarks, bookmarks enabled", isBookmarkEnabled(),
 				}
 			}
 		}
+//TODO del Debug.trace("keeping component we already have");
 		return getValue();	//if no bookmark was specified for this component, keep the same component we current have
 	}
 

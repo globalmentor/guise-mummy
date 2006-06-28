@@ -631,6 +631,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	*/
 	protected Component<?> getComponent(final Bookmark bookmark)
 	{
+/*TODO del if not wanted; why did we put this in in the first place? will improving AbstractCardPanel to update the URL help, so that we will always have the correct bookmark?
 			//choose the first card if no card was specified
 		final String parameterValue;	//see if there is a parameter value
 		if(bookmark!=null)	//if there is a bookmark
@@ -649,6 +650,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 				return get(0);	//automatically choose the first card
 			}
 		}
+*/
 		Component<?> component=super.getComponent(bookmark);	//get the requested component normally
 		if(component!=null)	//if a component was requested
 		{

@@ -1277,7 +1277,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	@param notifications The list that will be updated with more dirty components if any are found.
 	@return The notifications of all components in the hierarchy. 
 	*/
-	public static List<Notification> getNotifications(final Component<?> component, final List<Notification> notifications)
+	protected static List<Notification> getNotifications(final Component<?> component, final List<Notification> notifications)
 	{
 		final Notification notification=component.getNotification();	//get the component's notification, if any
 		if(notification!=null)	//if a notification is available

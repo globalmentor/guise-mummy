@@ -77,6 +77,34 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			this.logWriter=checkInstance(logWriter, "Log writer cannot be null.");
 		}
 
+	/**The base URI of the session.*/
+	private URI baseURI;
+
+		/**Reports the base URI of the session.
+		The base URI is an absolute URI that ends with the base path of the application, which ends with a slash ('/').
+		The session base URI may be different for different sessions, and may not be equal to the application base path resolved to the container's base URI.
+		@return The base URI representing the Guise session.
+		*/
+		public URI getBaseURI() {return baseURI;}
+
+		/**Sets the base URI of the session.
+		The raw path of the base URI must be equal to the application base path.
+		@param baseURI The new base URI of the session.
+		@exception NullPointerException if the given base URI is <code>null</code>.
+		@exception IllegalArgumentException if the raw path of the given base URI is not equal to the application base path.
+		*/
+		public void setBaseURI(final URI baseURI)
+		{
+			if(!this.baseURI.equals(checkInstance(baseURI, "Session base URI cannot be null.")))	//if a new base URI is given
+			{
+				if(!baseURI.getRawPath().equals(getApplication().getBasePath()))	//if the path of the base URI is not the application base path
+				{
+					throw new IllegalArgumentException("Session base URI path "+baseURI.getRawPath()+" does not equal application base path "+getApplication().getBasePath());				
+				}
+				this.baseURI=baseURI;	//save the new base URI
+			}
+		}
+
 	/**The application frame, initialized during {@link #initialize()}.*/
 	private ApplicationFrame<?> applicationFrame=null;
 
@@ -658,6 +686,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	public AbstractGuiseSession(final GuiseApplication application)
 	{
 		this.application=application;	//save the Guise instance
+		this.baseURI=application.getContainer().getBaseURI().resolve(application.getBasePath());	//default to a base URI calculated from the application base path resolved to the container's base URI
 		try
 		{
 			documentBuilder=createDocumentBuilder(true);	//create a new namespace-aware document builder
@@ -1104,12 +1133,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public void setNavigation(final String navigationPath, final Bookmark bookmark, final URI referrerURI)
 		{
+//TODO del Debug.trace("setting naviation; navigation path:", navigationPath, "bookmark:", bookmark, "referrerURI:", referrerURI);
 				//if the navigation path or the bookmark is changing
 			if(!ObjectUtilities.equals(this.navigationPath, navigationPath)	//see if the navigation path is changing (the old navigation path will be null if this session has not yet navigated anywhere; don't call getNavigationPath(), which might throw an exception)
 					|| !ObjectUtilities.equals(this.bookmark, bookmark))	//see if the bookmark is changing
 			{
 				setNavigationPath(navigationPath);	//make sure the Guise session has the correct navigation path
 				setBookmark(bookmark);	//make sure the Guise session has the correct bookmark
+//TODO del Debug.trace("changed to new bookmark:", getBookmark());
 				final Map<String, Object> logParameters=new HashMap<String, Object>();	//create a map for our log parameters
 				logParameters.put("bookmark", bookmark);	//bookmark TODO use a constant
 				logParameters.put("referrerURI", referrerURI);	//referrer URI TODO use a constant

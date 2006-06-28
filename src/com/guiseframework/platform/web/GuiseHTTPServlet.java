@@ -633,6 +633,7 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 					final Bookmark navigationBookmark=getBookmark(request);	//get the bookmark from this request
 		//TODO fix to recognize navigation, bookmark, and principal changes when the navigation panel is created		final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
 					final Bookmark oldBookmark=isAJAX ? guiseSession.getBookmark() : navigationBookmark;	//get the original bookmark, which will be the one requested in navigation (which we'll soon set) if this is a normal HTTP GET/POST
+//TODO del Debug.trace("navigation bookmark:", navigationBookmark, "old bookmark:", oldBookmark);
 					final Principal oldPrincipal=guiseSession.getPrincipal();	//get the old principal
 					final NavigationPanel navigationPanel=guiseSession.getNavigationPanel(navigationPath);	//get the panel bound to the requested path
 					assert navigationPanel!=null : "No navigation panel found, even though we found a valid destination.";
@@ -679,7 +680,7 @@ Debug.trace("got control events");
 								guiseSession.setNavigation(navigationPath, postBookmark, referrerURI);	//set the session navigation to the POST bookmark information
 							}
 						}
-Debug.trace("ready to set navigation with new navigation path:", navigationPath);
+//TODO del Debug.trace("ready to set navigation with new navigation path:", navigationPath, "navigation bookmark:", navigationBookmark, "referrerURI:", referrerURI);
 						guiseSession.setNavigation(navigationPath, navigationBookmark, referrerURI);	//set the session navigation with the navigation bookmark, firing any navigation events if appropriate
 					}
 					final Set<Frame<?>> removedFrames=new HashSet<Frame<?>>();	//create a set of frames so that we can know which ones were removed TODO testing
@@ -753,8 +754,7 @@ Debug.trace("ready to set navigation with new navigation path:", navigationPath)
 			}
 			*/
 							final Bookmark newBookmark=guiseSession.getBookmark();	//see if the bookmark has changed
-Debug.trace("navigation bookmark:", navigationBookmark);
-Debug.trace("new bookmark:", newBookmark);
+//TODO del Debug.trace("navigation bookmark:", navigationBookmark, "new bookmark", newBookmark);
 							final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
 							if(requestedNavigation!=null || !ObjectUtilities.equals(navigationBookmark, newBookmark))	//if navigation is requested or the bookmark has changed, redirect the browser
 							{

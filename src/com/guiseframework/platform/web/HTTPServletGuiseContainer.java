@@ -131,7 +131,12 @@ while(headerNames.hasMoreElements())
 	Debug.info("request header:", headerName, httpRequest.getHeader(headerName));
 }
 */
+				final URI requestURI=URI.create(httpRequest.getRequestURL().toString());	//get the URI of the current request
+				final URI sessionBaseURI=requestURI.resolve(guiseApplication.getBasePath());	//resolve the application base path to the request URI
 				guiseSession=guiseApplication.createSession();	//ask the application to create a new Guise session
+//TODO del Debug.trace("default session base URI:", guiseSession.getBaseURI());
+				guiseSession.setBaseURI(sessionBaseURI);	//update the base URI to the one specified by the request, in case we can create a session from different URLs
+//TODO del Debug.trace("new session base URI:", guiseSession.getBaseURI());
 				final String relativeApplicationPath=relativizePath(getBasePath(), guiseApplication.getBasePath());	//get the application path relative to the container path
 				try
 				{
