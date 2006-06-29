@@ -190,10 +190,10 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 									}
 								}
 							}
-							previousActionPrototype.setEnabled(hasPrevious());	//enable or disable the previous action prototype
-							nextActionPrototype.setEnabled(hasNext());	//enable or disable the previous action prototype
-							finishActionPrototype.setEnabled(!hasNext());	//enable or disable the finish action prototype
 						}
+						previousActionPrototype.setEnabled(hasPrevious());	//enable or disable the previous action prototype
+						nextActionPrototype.setEnabled(hasNext());	//enable or disable the previous action prototype
+						finishActionPrototype.setEnabled(!hasNext());	//enable or disable the finish action prototype
 					}
 				});
 	}

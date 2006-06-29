@@ -1845,7 +1845,9 @@ alert("we returned, at least");
 					}
 					if(status==200)	//if everything went OK
 					{
-						if(xmlHTTP.responseText && xmlHTTP.responseXML && xmlHTTP.responseXML.documentElement)	//if we have XML (if there is no content or there is an error, IE sends back a document has a null xmlHTTP.responseXML.documentElement)
+//TODO del if not needed						if(AJAX_ENABLED	//if AJAX is enabled (if a user browsers to a page in Mozilla and the old page sent a request, AJAX_ENABLED will be undefined by now; check it so that Mozilla won't throw an exception accessing AJAXResponse, which doesn't exist either)
+						if((typeof AJAXResponse)!="undefined"	//if the page scope hasn't disappeared (if a user browsers to a page in Mozilla and the old page sent a request, AJAXResponse will be undefined here)
+							&& xmlHTTP.responseText && xmlHTTP.responseXML && xmlHTTP.responseXML.documentElement)	//if we have XML (if there is no content or there is an error, IE sends back a document has a null xmlHTTP.responseXML.documentElement)
 						{
 							thisGuiseAJAX.ajaxResponses.enqueue(new AJAXResponse(xmlHTTP.responseXML, xmlHTTP.responseText.length));	//enqueue the response
 							thisGuiseAJAX.processAJAXResponses();	//process enqueued AJAX responses
@@ -1872,6 +1874,7 @@ alert("we returned, at least");
 				{
 					//TODO log a warning
 alert(exception);
+alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 					AJAX_ENABLED=false;	//stop further AJAX communication
 					throw exception;	//TODO testing
 				}

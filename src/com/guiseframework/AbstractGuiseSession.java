@@ -1339,7 +1339,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		public synchronized void queueEvent(final PostponedEvent<?> postponedEvent)
 		{
 			final GuiseContext context=getContext();	//get the current context
-			if(context!=null && (context.getState()==GuiseContext.State.PROCESS_EVENT))	//if the context is processing an event
+//TODO fix; decide if we want to allow delayed events			if(context!=null && (context.getState()==GuiseContext.State.PROCESS_EVENT))	//if the context is processing an event
+			if(false)	//TODO fix; testing
 			{
 				queuedModelEventList.add(postponedEvent);	//add the postponed event to our list of postponed events					
 			}

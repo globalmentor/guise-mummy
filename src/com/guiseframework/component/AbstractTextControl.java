@@ -201,11 +201,13 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 	}
 
 //TODO important; remove this hack and make work with models, compensating for delayed listeners somehow; right now this results in the text being updated twice; once immediately when the value changes, and another when the value property change listener is fired (with delayed events)
+/*TODO fix; temporarily removing delayed events
 	public void setValue(final V newValue) throws PropertyVetoException
 	{
 		super.setValue(newValue);
 		updateText();	//update the text with the new value from the model
 	}
+*/
 
 	/**Updates the component text with literal form of the given value.
 	@see Converter#convertValue(Object)

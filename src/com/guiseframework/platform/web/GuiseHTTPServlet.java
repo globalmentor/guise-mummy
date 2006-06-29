@@ -633,7 +633,7 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 					final Bookmark navigationBookmark=getBookmark(request);	//get the bookmark from this request
 		//TODO fix to recognize navigation, bookmark, and principal changes when the navigation panel is created		final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
 					final Bookmark oldBookmark=isAJAX ? guiseSession.getBookmark() : navigationBookmark;	//get the original bookmark, which will be the one requested in navigation (which we'll soon set) if this is a normal HTTP GET/POST
-//TODO del Debug.trace("navigation bookmark:", navigationBookmark, "old bookmark:", oldBookmark);
+//TODO del Debug.trace("navigation bookmark:", navigationBookmark, "old bookmark:", oldBookmark, "session bookmark:", guiseSession.getBookmark(), "is AJAX:", isAJAX);
 					final Principal oldPrincipal=guiseSession.getPrincipal();	//get the old principal
 					final NavigationPanel navigationPanel=guiseSession.getNavigationPanel(navigationPath);	//get the panel bound to the requested path
 					assert navigationPanel!=null : "No navigation panel found, even though we found a valid destination.";
