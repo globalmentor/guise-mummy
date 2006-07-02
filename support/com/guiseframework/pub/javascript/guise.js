@@ -3673,6 +3673,17 @@ function onWindowLoad()
 		guiseAJAX.sendAJAXRequest(new InitAJAXEvent());	//send an initialization AJAX request	
 	//TODO del	alert("compatibility mode: "+document.compatMode);
 		guise.setBusyVisible(false);	//turn off the busy indicator	
+			//remove the init IFrame shield
+		var form=getForm(document.documentElement);	//get the form
+		if(form && form.id)	//if there is a form with an ID
+		{
+			var initIFrameID=form.id.replace(".form", ".initIFrame");	//determine the ID of the init IFrame TODO use a constant, or get these values using a better method
+			var initIFrame=document.getElementById(initIFrameID);	//get the init IFrame
+			if(initIFrame)	//if there is an initialization IFrame
+			{
+				initIFrame.parentNode.removeChild(initIFrame);	//remove the init IFrame from the document; we don't need it anymore
+			}
+		}
 	};
 
 	if(document.bodyLength && document.bodyLength>60000)	//if the body length is over 60,000 (as indicated by the custom Guise variable), show a busy indicator
