@@ -138,6 +138,7 @@ while(headerNames.hasMoreElements())
 				guiseSession.setBaseURI(sessionBaseURI);	//update the base URI to the one specified by the request, in case we can create a session from different URLs
 //TODO del Debug.trace("new session base URI:", guiseSession.getBaseURI());
 				final String relativeApplicationPath=relativizePath(getBasePath(), guiseApplication.getBasePath());	//get the application path relative to the container path
+/*TODO bring back logging after testing log out-of-memory error
 				try
 				{
 					final File baseLogDirectory=GuiseHTTPServlet.getLogDirectory(getServletContext());	//get the base log directory
@@ -170,6 +171,7 @@ while(headerNames.hasMoreElements())
 				{
 					throw new AssertionError(ioException);
 				}
+*/
 				final GuiseEnvironment environment=guiseSession.getEnvironment();	//get the new session's environment
 				final Cookie[] cookies=httpRequest.getCookies();	//get the cookies in the request
 				if(cookies!=null)	//if a cookie array was returned
@@ -193,6 +195,7 @@ while(headerNames.hasMoreElements())
 				environment.setProperty(CONTENT_APPLICATION_SHOCKWAVE_FLASH_ACCEPTED_PROPERTY,	//content.application.shockwave.flash.accepted
 						Boolean.valueOf(isAcceptedContentType(httpRequest, APPLICATION_SHOCKWAVE_FLASH_CONTENT_TYPE, false)));	//see if Flash is installed
 */
+/*TODO bring back logging after testing log out-of-memory error
 					//log the environment variables
 				try
 				{
@@ -203,6 +206,7 @@ while(headerNames.hasMoreElements())
 				{
 					throw new AssertionError(ioException);
 				}
+*/
 				addGuiseSession(guiseSession);	//add and initialize the Guise session
 				final Locale[] clientAcceptedLanguages=getAcceptedLanguages(httpRequest);	//get all languages accepted by the client
 				guiseSession.requestLocale(asList(clientAcceptedLanguages));	//ask the Guise session to change to one of the accepted locales, if the application supports one
@@ -227,6 +231,7 @@ Debug.trace("+++removing Guise session", httpSession.getId());
 		{
 			try
 			{
+/*TODO bring back logging after testing log out-of-memory error
 					//TODO refactor and consolidate; prevent code duplication
 				final Map<String, Object> logParameters=new HashMap<String, Object>();	//create a map for our log parameters
 				logParameters.put("id", httpSession.getId());	//session ID
@@ -243,10 +248,12 @@ Debug.trace("+++removing Guise session", httpSession.getId());
 				{
 					throw new AssertionError(ioException);
 				}
+*/
 				removeGuiseSession(guiseSession);	//remove the Guise session
 			}
 			finally
 			{
+/*TODO bring back logging after testing log out-of-memory error
 				try
 				{
 					guiseSession.getLogWriter().close();	//always close the log writer
@@ -255,6 +262,7 @@ Debug.trace("+++removing Guise session", httpSession.getId());
 				{
 					Debug.error(ioException);	//log the error
 				}
+*/
 			}
 		}
 		return guiseSession;	//return the associated Guise session

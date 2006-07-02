@@ -1467,6 +1467,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	*/
 	public void log(final InformationLevel level, final String subject, final String predicate, final String object, final Map<?, ?> parameters, final CharSequence comment)
 	{
+/*TODO fix; bring back after testing out-of-memory error
 		final Writer logWriter=getLogWriter();	//get the log writer
 		try
 		{
@@ -1477,6 +1478,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		{
 			Debug.error(ioException);	//log the error in the debug log
 		}
+*/
 	}	
 	
 	/**Notifies the user of the given notification information.
