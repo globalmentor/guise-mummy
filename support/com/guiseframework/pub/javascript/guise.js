@@ -3665,11 +3665,6 @@ function onWindowLoad()
 	//TODO del when works	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
 		eventManager.addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
 		guise.updateModalLayer();	//create and update the modal layer TODO do we need or want this now? TODO put in an initialize method
-		var focusable=getFocusableDescendant(document.documentElement);	//see if the document has a node that can be focused
-		if(focusable)	//if we found a focusable node
-		{
-			focusable.focus();	//focus on the node
-		}
 		guiseAJAX.sendAJAXRequest(new InitAJAXEvent());	//send an initialization AJAX request	
 	//TODO del	alert("compatibility mode: "+document.compatMode);
 		guise.setBusyVisible(false);	//turn off the busy indicator	
@@ -3683,6 +3678,11 @@ function onWindowLoad()
 			{
 				initIFrame.parentNode.removeChild(initIFrame);	//remove the init IFrame from the document; we don't need it anymore
 			}
+		}
+		var focusable=getFocusableDescendant(document.documentElement);	//see if the document has a node that can be focused
+		if(focusable)	//if we found a focusable node
+		{
+			focusable.focus();	//focus on the node
 		}
 	};
 

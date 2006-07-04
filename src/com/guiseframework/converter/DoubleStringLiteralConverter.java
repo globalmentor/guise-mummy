@@ -2,15 +2,15 @@ package com.guiseframework.converter;
 
 import java.util.Currency;
 
-/**A converter that converts a <code>Float</code> from and to a string literal.
+/**A converter that converts a <code>Double</code> from and to a string literal.
 @author Garret Wilson
-@see Float
+@see Double
 */
-public class FloatStringLiteralConverter extends AbstractNumberStringLiteralConverter<Float>
+public class DoubleStringLiteralConverter extends AbstractNumberStringLiteralConverter<Double>
 {
 
 	/**Default constructor with a default number style.*/
-	public FloatStringLiteralConverter()
+	public DoubleStringLiteralConverter()
 	{
 		this(Style.NUMBER);	//construct the class with a default number style
 	}
@@ -20,7 +20,7 @@ public class FloatStringLiteralConverter extends AbstractNumberStringLiteralConv
 	@param style The representation style.
 	@exception NullPointerException if the given style is <code>null</code>.
 	*/
-	public FloatStringLiteralConverter(final Style style)
+	public DoubleStringLiteralConverter(final Style style)
 	{
 		this(style, null);	//construct the class using a dynamic default currency for the locale
 	}
@@ -31,7 +31,7 @@ public class FloatStringLiteralConverter extends AbstractNumberStringLiteralConv
 	@exception NullPointerException if the given style is <code>null</code>.
 	@exception IllegalArgumentException if a currency is provided for a style other than {@link Style#CURRENCY}.
 	*/
-	public FloatStringLiteralConverter(final Style style, final Currency currency)
+	public DoubleStringLiteralConverter(final Style style, final Currency currency)
 	{
 		super(style, currency);	//construct the parent class
 	}
@@ -41,12 +41,12 @@ public class FloatStringLiteralConverter extends AbstractNumberStringLiteralConv
 	@return The converted value in the value space, or <code>null</code> if the given literal is <code>null</code>.
 	@exception ConversionException if the literal value cannot be converted.
 	*/
-	public Float convertLiteral(final String literal) throws ConversionException
+	public Double convertLiteral(final String literal) throws ConversionException
 	{
 		final Number number=parseNumber(literal);	//parse a number from the literal value
 		if(number!=null)	//if there is a number
 		{
-			return number instanceof Float ? (Float)number : new Float(number.floatValue());	//convert the number to a float object if necessary
+			return number instanceof Double ? (Double)number : new Double(number.doubleValue());	//convert the number to a double object if necessary
 		}
 		else	//if there is no number
 		{

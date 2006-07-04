@@ -146,12 +146,14 @@ public abstract class AbstractDialogFrame<V, C extends DialogFrame<V, C>> extend
 	}
 
 	/**Resets the control to its default value.
-	This version clears any notification.
+	This version clears any notification and resets the control value.
 	@see #setNotification(Notification)
+	@see #resetValue()
 	*/
 	public void reset()
 	{
 		setNotification(null);	//clear any notification
+		resetValue();	//reset the control value
 	}
 
 	/**Value model, and component constructor.

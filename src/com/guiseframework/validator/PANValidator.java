@@ -1,5 +1,7 @@
 package com.guiseframework.validator;
 
+import static java.util.Collections.unmodifiableSet;
+import static com.garretwilson.lang.ClassUtilities.getPropertyName;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.util.CollectionUtilities.*;
 
@@ -21,11 +23,47 @@ PANs for unknown products are considered invalid.
 public class PANValidator extends AbstractValidator<PAN>
 {
 
-	/**The set of valid products, thread-safe only for reading.*/
-	private final Set<Product> validProducts=new HashSet<Product>();
+	/**The valid products bound property.*/
+	public final static String VALID_PRODUCTS_PROPERTY=getPropertyName(PANValidator.class, "validProducts");
 
+	/**The read-only set of valid products.*/
+	private Set<Product> validProducts;
+
+		/**@return The read-only set of valid products.*/
+		public Set<Product> getValidProducts() {return validProducts;} 
+		
+		/**Sets the PAN products that the validator considers valid.
+		This is a bound property.
+		@param newValidProducts The set of valid products.
+		@exception NullPointerException if the given set of valid products is <code>null</code>.
+		@see #VALID_PRODUCTS_PROPERTY
+		*/
+		public void setValidProducts(final Set<Product> newValidProducts)
+		{
+			if(!validProducts.equals(checkInstance(newValidProducts, "Valid products cannot be null.")))	//if the value is really changing
+			{
+				final Set<Product> oldValidProducts=validProducts;	//get the current value
+				this.validProducts=unmodifiableSet(new HashSet<Product>(newValidProducts));	//create a new unmodifiable copy set of valid products
+				firePropertyChange(VALID_PRODUCTS_PROPERTY, oldValidProducts, validProducts);
+			}
+		}
+	
+		/**Sets the PAN products that the validator considers valid.
+		This is a bound property.
+		This implementation delegates to {@link #setValidProducts(Set)}
+		@param validProducts The products that are allowed, if any.
+		@exception NullPointerException if the given array of valid products is <code>null</code>.
+		@see #VALID_PRODUCTS_PROPERTY
+		*/
+		public void setValidProducts(final Product... validProducts)
+		{
+			final Set<Product> validProductSet=new HashSet<Product>();	//create a new set of valid products
+			addAll(validProductSet, checkInstance(validProducts, "Valid products cannot be null."));	//add all the specified valid products to our set
+			setValidProducts(validProductSet);	//set the valid products
+		}
+	
 	/**Valid products constructor with no value required.
-	@param validProducts The products that are allowed.
+	@param validProducts The products that are allowed, if any.
 	@exception NullPointerException if the given array of valid products is <code>null</code>.
 	*/
 	public PANValidator(final Product... validProducts)
@@ -43,13 +81,15 @@ public class PANValidator extends AbstractValidator<PAN>
 
 	/**Value required and valid products constructor.
 	@param valueRequired Whether the value must be non-<code>null</code> in order to be considered valid.
-	@param validProducts The products that are allowed.
+	@param validProducts The products that are allowed, if any.
 	@exception NullPointerException if the given array of valid products is <code>null</code>.
 	*/
 	public PANValidator(final boolean valueRequired, final Product... validProducts)
 	{
 		super(valueRequired);	//construct the parent class
-		addAll(this.validProducts, checkInstance(validProducts, "Valid products must be specified"));	//add all the specified valid products to our set
+		final Set<Product> validProductSet=new HashSet<Product>();	//create a new set of valid products
+		addAll(validProductSet, checkInstance(validProducts, "Valid products cannot be null."));	//add all the specified valid products to our set
+		this.validProducts=unmodifiableSet(validProductSet);	//save the set of valid products
 	}
 
 	/**Determines whether a given PAN represents one of the supported products and is the correct length.
