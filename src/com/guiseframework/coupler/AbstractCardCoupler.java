@@ -228,7 +228,8 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 
 	/**Selects the first connected card that is displayed and enabled.
 	If no card is connected or the card has no parent card control, no action occurs.
-	This method calls {@link #selectCard(CardControl, Component)}.
+	If a selectable card is already selected, no action occurs.
+	This method calls {@link #isCardSelectable(Component)} and {@link #selectCard(CardControl, Component)}.
 	@exception PropertyVetoException if the appropriate card could not be selected.
 	*/
 	protected void selectCard() throws PropertyVetoException
@@ -240,21 +241,40 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 				final CardControl<?> cardControl=getCardControl();	//get the connected card card control
 				if(cardControl!=null)	//there a card control is connected
 				{
+					final Component<?> selectedCard=cardControl.getValue();	//get the current selected card value
+					if(cards.contains(selectedCard) && isCardSelectable(selectedCard))	//if a selectable card is already selected (without this check, moving to another tab that changes a card panel that is vetoed and changes back to the original tab, which would try to select the first in a series of cards, would create an endless loop)
+					{
+						return;	//an appropriate card is already selected; take no action
+					}
 					for(final Component<?> card:cards)	//for each card
 					{
-						final Constraints constraints=card.getConstraints();	//get the card constraints, if any
-						if(!(constraints instanceof Enableable) || ((Enableable)constraints).isEnabled())	//if the constraints indicate enabled
+						if(isCardSelectable(card))	//if this card can be selected
 						{
-							if(!(constraints instanceof Displayable) || ((Displayable)constraints).isDisplayed())	//if the constraints indicate displayed
-							{
-								selectCard(cardControl, card);	//select the card
-								break;	//only select the first card
-							}
+							selectCard(cardControl, card);	//select the card
+							break;	//only select the first card
 						}
 					}
 				}
 			}
 		}
+	}
+
+	/**Determines whether the given card is selectable.
+	This method ensures the card is enabled (if enableable) and displayed (if displayable).
+	@param card The card to check.
+	@return <code>true</code> if the card can be selected.
+	*/
+	protected boolean isCardSelectable(final Component<?> card)
+	{
+		final Constraints constraints=card.getConstraints();	//get the card constraints, if any
+		if(!(constraints instanceof Enableable) || ((Enableable)constraints).isEnabled())	//if the constraints indicate enabled
+		{
+			if(!(constraints instanceof Displayable) || ((Displayable)constraints).isDisplayed())	//if the constraints indicate displayed
+			{
+				return true;	//indicate that the card can be selected
+			}
+		}
+		return false;	//if the card doesn't pass the tests, it can't be selected
 	}
 
 	/**Selects the specified card.
