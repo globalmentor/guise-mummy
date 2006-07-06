@@ -1,6 +1,7 @@
 package com.guiseframework.platform.web;
 
 import static com.garretwilson.io.FileUtilities.*;
+import static com.garretwilson.javascript.JSON.appendAssociativeArrayValue;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
@@ -122,6 +123,8 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 			GuiseSession guiseSession=guiseSessionMap.get(httpSession);	//get the Guise session associated with the HTTP session
 			if(guiseSession==null)	//if no Guise session is associated with the given HTTP session
 			{
+	final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
+	Debug.info("memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
 Debug.trace("+++creating Guise session", httpSession.getId());
 /*TODO del
 final Enumeration headerNames=httpRequest.getHeaderNames();	//TODO del
@@ -211,6 +214,11 @@ while(headerNames.hasMoreElements())
 				final Locale[] clientAcceptedLanguages=getAcceptedLanguages(httpRequest);	//get all languages accepted by the client
 				guiseSession.requestLocale(asList(clientAcceptedLanguages));	//ask the Guise session to change to one of the accepted locales, if the application supports one
 				guiseSessionMap.put(httpSession, guiseSession);	//associate the Guise session with the HTTP session
+
+Debug.info("environment:", appendAssociativeArrayValue(new StringBuilder(), environment.getProperties()));	//TODO del
+Debug.info("memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
+			
+			
 			}
 			return guiseSession;	//return the Guise session
 		}
@@ -225,7 +233,7 @@ while(headerNames.hasMoreElements())
 	*/
 	protected GuiseSession removeGuiseSession(final HttpSession httpSession)
 	{
-Debug.trace("+++removing Guise session", httpSession.getId());
+Debug.trace("---removing Guise session", httpSession.getId());
 		GuiseSession guiseSession=guiseSessionMap.remove(httpSession);	//remove the HTTP session and Guise session association
 		if(guiseSession!=null)	//if there is a Guise session associated with the HTTP session
 		{
@@ -265,6 +273,9 @@ Debug.trace("+++removing Guise session", httpSession.getId());
 */
 			}
 		}
+
+final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
+Debug.info("memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
 		return guiseSession;	//return the associated Guise session
 	}
 

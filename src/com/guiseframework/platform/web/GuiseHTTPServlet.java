@@ -481,44 +481,40 @@ while(headerNames.hasMoreElements())
 		}
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-/*TODO del
-		
-				//TODO double-test AJAX
-Debug.trace("does navigation path exist?", navigationPath);
-  	if(!guiseApplication.hasDestination(navigationPath))	//if the URI doesn't represent a valid navigation path
-  	{
-Debug.trace("navigation path doesn't exist; doing normal get", navigationPath);
-			super.doGet(request, response);	//go ahead and retrieve the resource immediately
-			return;	//don't try to see if there is a navigation path for this path
-		}
-*/
-		
-		final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
-/*TODO del
-Debug.info("session ID", guiseSession.getHTTPSession().getId());	//TODO del
-Debug.info("content length:", request.getContentLength());
-Debug.info("content type:", request.getContentType());
-*/
-//TODO del Debug.info("supports Flash: ", guiseSession.getEnvironment().getProperty(GuiseEnvironment.CONTENT_APPLICATION_SHOCKWAVE_FLASH_ACCEPTED_PROPERTY));
-//TODO del Debug.trace("creating thread group");
-		final GuiseSessionThreadGroup guiseSessionThreadGroup=Guise.getInstance().getThreadGroup(guiseSession);	//get the thread group for this session
-//	TODO del Debug.trace("creating runnable");
-		final GuiseSessionRunnable guiseSessionRunnable=new GuiseSessionRunnable(request, response, guiseContainer, guiseApplication, guiseSession);	//create a runnable instance to service the Guise request
-//TODO del Debug.trace("calling runnable");
-		call(guiseSessionThreadGroup, guiseSessionRunnable);	//call the runnable in a new thread inside the thread group
-//TODO del Debug.trace("done with the call");
-		if(guiseSessionRunnable.servletException!=null)
+
+		if(guiseApplication.hasDestination(navigationPath))	//if we have a destination associated with the requested path
 		{
-//TODO del			Debug.trace("callling runnable");
-			throw guiseSessionRunnable.servletException;
+			final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
+	/*TODO del
+	Debug.info("session ID", guiseSession.getHTTPSession().getId());	//TODO del
+	Debug.info("content length:", request.getContentLength());
+	Debug.info("content type:", request.getContentType());
+	*/
+	//TODO del Debug.info("supports Flash: ", guiseSession.getEnvironment().getProperty(GuiseEnvironment.CONTENT_APPLICATION_SHOCKWAVE_FLASH_ACCEPTED_PROPERTY));
+	//TODO del Debug.trace("creating thread group");
+			final GuiseSessionThreadGroup guiseSessionThreadGroup=Guise.getInstance().getThreadGroup(guiseSession);	//get the thread group for this session
+	//	TODO del Debug.trace("creating runnable");
+			final GuiseSessionRunnable guiseSessionRunnable=new GuiseSessionRunnable(request, response, guiseContainer, guiseApplication, guiseSession);	//create a runnable instance to service the Guise request
+	//TODO del Debug.trace("calling runnable");
+			call(guiseSessionThreadGroup, guiseSessionRunnable);	//call the runnable in a new thread inside the thread group
+	//TODO del Debug.trace("done with the call");
+			if(guiseSessionRunnable.servletException!=null)
+			{
+	//TODO del			Debug.trace("callling runnable");
+				throw guiseSessionRunnable.servletException;
+			}
+			if(guiseSessionRunnable.ioException!=null)
+			{
+				throw guiseSessionRunnable.ioException;
+			}
+			if(!guiseSessionRunnable.isGuiseRequest)	//TODO do we even need this case now that we check before-hand?
+			{
+				super.doGet(request, response);	//let the default functionality take over
+			}
 		}
-		if(guiseSessionRunnable.ioException!=null)
+		else	//if there is no Guise destination for the requested path
 		{
-			throw guiseSessionRunnable.ioException;
-		}
-		if(!guiseSessionRunnable.isGuiseRequest)
-		{
-			super.doGet(request, response);	//let the default functionality take over
+			super.doGet(request, response);	//let the default functionality take over			
 		}
 	}
 
@@ -1433,8 +1429,8 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	{
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-		final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
-		return getGuiseContainer().isAuthorized(getGuiseApplication(), resourceURI, guiseSession.getPrincipal(), realm);	//delegate to the container, using the current Guise session
+//TODO del; we don't want to force a session here, in case this is a non-Guise resource		final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
+		return getGuiseContainer().isAuthorized(guiseApplication, resourceURI, principal, realm);	//delegate to the container, using the current Guise session
 	}
 
 	/**Determines if the given nonce is valid.
@@ -1443,7 +1439,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	@param nonce The nonce to check for validity.
 	@return <code>true</code> if the nonce is not valid.
 	*/
-	protected boolean isValid(final HttpServletRequest request, final Nonce nonce)
+	protected boolean isValid(final HttpServletRequest request, final Nonce nonce)	//TODO check to see if we want to force a session
 	{
 //	TODO del Debug.trace("ready to check validity of nonce; default validity", nonce);
 		if(!super.isValid(request, nonce))	//if the nonce doesn't pass the normal validity checks
@@ -1561,7 +1557,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
   	}
 		final ContentType contentType=getContentType(resource);	//get the content type of the resource
 //TODO del Debug.trace("got content type", contentType, "for resource", resource);
-		if(TEXT_CSS_CONTENT_TYPE.match(contentType))	//if this is a CSS stylesheet
+		if(contentType!=null && TEXT_CSS_CONTENT_TYPE.match(contentType))	//if this is a CSS stylesheet
 		{
 			return new CSSResource(resource);	//return a resource that does extra CSS processing
 		}
