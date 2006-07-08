@@ -8,6 +8,7 @@ import java.beans.PropertyVetoException;
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.util.Debug;
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;
 
@@ -28,6 +29,9 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler
 	/**The value bound property.*/
 	public final static String VALUE_PROPERTY=getPropertyName(ListSelectCardCoupler.class, "value");
 
+	/**The private flag to keep track of whether we are reverting the list select control to keep from re-reverting ad infinitum.*/
+	private boolean isRevertingListSelect=false;
+	
 	/**The property change listener to listen for the value property of the list select control changing.*/
 	private final PropertyChangeListener listSelectValueChangeListener=new AbstractGenericPropertyChangeListener<V>()
 	{
@@ -36,18 +40,29 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler
 			final V newValue=propertyChangeEvent.getNewValue();	//get the new selected value
 			if(newValue!=null && ObjectUtilities.equals(newValue, getValue()))	//if the connected value was selected
 			{
+//TODO del				Debug.trace("tab changed to", getListSelect().indexOf(newValue), " trying to select new card to match; is reverting list select?", isRevertingListSelect);
 				try
 				{
 					selectCard();	//select a connected card
 				}
 				catch(final PropertyVetoException propertyVetoException)	//if the value can't be selected
 				{
+					if(isRevertingListSelect)	//if we're reverting a previous change, we've went in a loop; break the loop TODO a better way might be to install a VetoableChangeListener and select the card there, so that if we couldn't select the new card we could veto the tab change rather than reverting to the old card
+					{
+						throw new AssertionError("Infinite loop detected in list select card coupler; it's likely that one of the cards isn't listed as part of the coupler and the change to a new card was vetoed, as was the reversion back to the non-included card.");
+					}
+					isRevertingListSelect=true;	//show that we're reverting the list select to its old value, so that we can detect infinite loops
+//TODO del Debug.trace("card change was vetoed; trying to revert to tab", getListSelect().indexOf(propertyChangeEvent.getOldValue()), "is reverting list select?", isRevertingListSelect);
 					try
 					{
 						listSelect.setValue(propertyChangeEvent.getOldValue());	//go back to the old selected value, if we can
 					}
 					catch(final PropertyVetoException propertyVetoException2)	//if the old value can't be reselected, just ignore the error
 					{
+					}
+					finally
+					{
+						isRevertingListSelect=false;	//show that we're finished reverting the list select to its old value							
 					}
 				}
 			}

@@ -13,6 +13,7 @@ import static java.util.Collections.*;
 
 import com.garretwilson.beans.*;
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.util.Debug;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
@@ -234,6 +235,7 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 	*/
 	protected void selectCard() throws PropertyVetoException
 	{
+//TODO del Debug.trace("ready to select new card for tab");
 		synchronized(this)	//prevent race conditions accessing updatingSelected
 		{
 			if(!updatingSelected)	//if we're not already updating the selected state (if we are, then this change could be in response to one of our cards being selected, and if we select a new card we could select the wrong one)
@@ -242,6 +244,16 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 				if(cardControl!=null)	//there a card control is connected
 				{
 					final Component<?> selectedCard=cardControl.getValue();	//get the current selected card value
+/*TODO del
+Debug.trace("seleted card is index", cardControl.indexOf(selectedCard), "is one of our cards?", cards.contains(selectedCard));
+if(!cards.contains(selectedCard))
+{
+	for(final Component<?> card:cards)	//for each card
+	{
+		Debug.trace("we have card:", cardControl.indexOf(card));
+	}
+}
+*/
 					if(cards.contains(selectedCard) && isCardSelectable(selectedCard))	//if a selectable card is already selected (without this check, moving to another tab that changes a card panel that is vetoed and changes back to the original tab, which would try to select the first in a series of cards, would create an endless loop)
 					{
 						return;	//an appropriate card is already selected; take no action
@@ -266,6 +278,7 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 	*/
 	protected boolean isCardSelectable(final Component<?> card)
 	{
+//TODO del Debug.trace("is card selectable?");
 		final Constraints constraints=card.getConstraints();	//get the card constraints, if any
 		if(!(constraints instanceof Enableable) || ((Enableable)constraints).isEnabled())	//if the constraints indicate enabled
 		{
@@ -273,6 +286,14 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 			{
 				return true;	//indicate that the card can be selected
 			}
+			else
+			{
+//			TODO del 				Debug.trace("card not displayed");
+			}
+		}
+		else
+		{
+//		TODO del 			Debug.trace("card not enabled");
 		}
 		return false;	//if the card doesn't pass the tests, it can't be selected
 	}
