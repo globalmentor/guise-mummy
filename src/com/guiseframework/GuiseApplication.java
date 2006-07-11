@@ -21,7 +21,9 @@ public interface GuiseApplication extends PropertyBindable
 {
 
 	/**The default locale bound property.*/
-	public final static String DEFAULT_LOCALE_PROPERTY=getPropertyName(GuiseApplication.class, "defaultLocale");
+//TODO del	public final static String DEFAULT_LOCALE_PROPERTY=getPropertyName(GuiseApplication.class, "defaultLocale");
+	/**The locales bound property.*/
+	public final static String LOCALES_PROPERTY=getPropertyName(GuiseApplication.class, "locales");
 	/**The resource bundle base name bound property.*/
 	public final static String RESOURCE_BUNDLE_BASE_NAME_PROPERTY=getPropertyName(GuiseApplication.class, "resourceBundleBaseName");
 	/**The style bound property.*/
@@ -30,17 +32,29 @@ public interface GuiseApplication extends PropertyBindable
 	public final static String THEME_PROPERTY=getPropertyName(GuiseApplication.class, "theme");
 
 	/**@return The application locale used by default if a new session cannot determine the users's preferred locale.*/
-	public Locale getDefaultLocale();
+//TODO del	public Locale getDefaultLocale();
 
 	/**Sets the application locale used by default if a new session cannot determine the users's preferred locale.
 	This is a bound property.
 	@param newDefaultLocale The new default application locale.
 	@see #DEFAULT_LOCALE_PROPERTY
 	*/
-	public void setDefaultLocale(final Locale newDefaultLocale);
+//TODO del	public void setDefaultLocale(final Locale newDefaultLocale);
 
 	/**@return The thread-safe set of locales supported by this application.*/
-	public Set<Locale> getSupportedLocales();
+//TODO del	public Set<Locale> getSupportedLocales();
+
+	/**@return The read-only non-empty list of locales supported by the application, with the first locale the default used if a new session cannot determine the users's preferred locale.*/
+	public List<Locale> getLocales();
+
+	/**Sets the list of supported locales.
+	This is a bound property.
+	@param newLocales The new supported application locales.
+	@exception NullPointerException if the given list of locales is <code>null</code>.
+	@exception IllegalArgumentException if the given list of locales is empty.
+	@see #LOCALES_PROPERTY
+	*/
+	public void setLocales(final List<Locale> newLocales);
 
 	/**@return The base name of the resource bundle to use for this application, or <code>null</code> if no custom resource bundle is specified for this application..*/
 	public String getResourceBundleBaseName();

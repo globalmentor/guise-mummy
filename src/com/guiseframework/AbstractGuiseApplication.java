@@ -6,6 +6,7 @@ import java.security.Principal;
 import java.util.*;
 import java.util.concurrent.*;
 
+import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
 import com.garretwilson.beans.BoundPropertyObject;
@@ -138,20 +139,19 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		this.basePath=null;	//remove the base path
 	}
 
-	/**The read-only list of locales supported by the application, with the first locale the default used if a new session cannot determine the users's preferred locale.*/
-//TODO fix	private List<Locale> locales;
+	/**The read-only non-empty list of locales supported by the application, with the first locale the default used if a new session cannot determine the users's preferred locale.*/
+	private List<Locale> locales;
 
-		/**@return The read-only list of locales supported by the application, with the first locale the default used if a new session cannot determine the users's preferred locale.*/
-//TODO fix		public List<Locale> getLocales() {return locales;}
+		/**@return The read-only non-empty list of locales supported by the application, with the first locale the default used if a new session cannot determine the users's preferred locale.*/
+		public List<Locale> getLocales() {return locales;}
 	
 		/**Sets the list of supported locales.
 		This is a bound property.
-		@param newLocales The new default application locale.
+		@param newLocales The new supported application locales.
 		@exception NullPointerException if the given list of locales is <code>null</code>.
 		@exception IllegalArgumentException if the given list of locales is empty.
 		@see #LOCALES_PROPERTY
 		*/
-/*TODO fix
 		public void setLocales(final List<Locale> newLocales)
 		{
 			checkInstance(newLocales, "Guise application locales cannot be null.");	//make sure the list is not null
@@ -163,16 +163,15 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			{
 				final List<Locale> oldLocales=locales;	//get the old value
 				locales=unmodifiableList(new ArrayList<Locale>(newLocales));	//create an unmodifiable copy of the locales
-				firePropertyChange(LOCALES_PROPERTY, oldLocales, newLocales);	//indicate that the value changed
+				firePropertyChange(LOCALES_PROPERTY, oldLocales, locales);	//indicate that the value changed
 			}
 		}
-*/
 	
 	/**The application locale used by default if a new session cannot determine the users's preferred locale.*/
-	private Locale defaultLocale;
+//TODO del	private Locale defaultLocale;
 
 		/**@return The application locale used by default if a new session cannot determine the users's preferred locale.*/
-		public Locale getDefaultLocale() {return defaultLocale;}
+//TODO del		public Locale getDefaultLocale() {return defaultLocale;}
 
 		/**Sets the application locale used by default if a new session cannot determine the users's preferred locale.
 		This is a bound property.
@@ -180,6 +179,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		@exception NullPointerException if the given locale is <code>null</code>.
 		@see GuiseApplication#DEFAULT_LOCALE_PROPERTY
 		*/
+/*TODO del
 		public void setDefaultLocale(final Locale newDefaultLocale)
 		{
 			if(!ObjectUtilities.equals(defaultLocale, newDefaultLocale))	//if the value is really changing (compare their values, rather than identity)
@@ -189,6 +189,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 				firePropertyChange(DEFAULT_LOCALE_PROPERTY, oldLocale, newDefaultLocale);	//indicate that the value changed
 			}
 		}
+*/
 
 	/**The thread-safe set of locales supported by this application.*/
 	private final Set<Locale> supportedLocales=new CopyOnWriteArraySet<Locale>();
@@ -272,7 +273,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	*/
 	public AbstractGuiseApplication(final Locale locale)
 	{
-		this.defaultLocale=locale;	//set the default locale
+//TODO del		this.defaultLocale=locale;	//set the default locale
+		locales=unmodifiableList(asList(locale));	//create an unmodifiable list of locales including only the default locale
 	}
 
 	/**The thread-safe list of installed component kits, with later registrations taking precedence*/

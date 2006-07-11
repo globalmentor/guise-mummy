@@ -214,7 +214,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public Locale requestLocale(final List<Locale> requestedLocales)
 		{
-			final Set<Locale> supportedLocales=getApplication().getSupportedLocales();	//get the application's supported locales	TODO maybe don't expose the whole set
+			final List<Locale> supportedLocales=getApplication().getLocales();	//get the application's supported locales
+//TODO del when works			final Set<Locale> supportedLocales=getApplication().getSupportedLocales();	//get the application's supported locales	TODO maybe don't expose the whole set
 			for(final Locale requestedLocale:requestedLocales)	//for each requested locale
 			{
 				Locale acceptedLocale=null;	//we'll determine if any variations of the requested locale is supported
@@ -696,7 +697,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			throw new AssertionError(parserConfigurationException);
 		}	
 		this.environment=new DefaultGuiseEnvironment();	//create a default environment
-		this.locale=application.getDefaultLocale();	//default to the application locale
+		this.locale=application.getLocales().get(0);	//default to the first application locale
+//TODO del when works		this.locale=application.getDefaultLocale();	//default to the application locale
 		this.orientation=Orientation.getOrientation(locale);	//set the orientation default based upon the locale
 		logWriter=new OutputStreamWriter(System.err);	//default to logging to the error output; this will be replaced after the session is created
 	}

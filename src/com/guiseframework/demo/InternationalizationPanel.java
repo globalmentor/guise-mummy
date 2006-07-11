@@ -14,9 +14,9 @@ import com.guiseframework.converter.DateStringLiteralStyle;
 import com.guiseframework.model.*;
 
 /**Internationalization Guise demonstration panel.
-Copyright © 2005 GlobalMentor, Inc.
+Copyright © 2005-2006 GlobalMentor, Inc.
 Demonstrates locale label models, date label models,
-	application default locale, application supported locales, menus,
+	application supported locales, current session locale, menus,
 	localized resource bundle resources, and localized resource files.
 @author Garret Wilson
 */
@@ -32,9 +32,8 @@ public class InternationalizationPanel extends DefaultNavigationPanel
 		super(new RegionLayout());	//construct the parent class, using a region layout
 		setLabel("Guise\u2122 Demonstration: Internationalization");	//set the panel title
 
-		final Locale defaultLocale=getSession().getApplication().getDefaultLocale();	//get the default application locale supported by the application
-
-		final Set<Locale> supportedLocales=getSession().getApplication().getSupportedLocales();	//get the locales supported by the application
+		final List<Locale> supportedLocales=getSession().getApplication().getLocales();	//get the locales supported by the application; the first one is the default
+		final Locale sessionLocale=getSession().getLocale();	//get the current session locale
 			//create a mutual exclusion policy group to only allow one language to be selected at one time
 		final ModelGroup<ValueModel<Boolean>> localeMutualExclusionPolicyModelGroup=new MutualExclusionPolicyModelGroup();
 		final DropMenu menu=new DropMenu(Flow.LINE);	//create a horizontal menu
@@ -49,7 +48,7 @@ public class InternationalizationPanel extends DefaultNavigationPanel
 				//create a check control, using the locale label model
 			final CheckControl checkControl=new CheckControl(localeLabelModel);
 			checkControl.setCheckType(CheckControl.CheckType.ELLIPSE);	//show the check as an ellipse
-			if(supportedLocale.equals(defaultLocale))	//if this is the default locale
+			if(supportedLocale.equals(sessionLocale))	//if this is the session locale
 			{
 				try
 				{

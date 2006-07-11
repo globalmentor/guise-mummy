@@ -4362,8 +4362,38 @@ function onContextMenu(event)
 function onCheckInputChange(event)
 {
 	var checkInput=event.currentTarget;	//get the control that was listening for events (the target could be the check input's label, as occurs in Mozilla)
-	checkInput.removeAttribute("guise:attributeHash");	//the checked status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
-	guiseAJAX.invalidateAncestorContent(checkInput);	//indicate that the ancestors now have different content
+
+	var invalidated=false;	//we'll keep track of whether we invalidate this checkInput	
+		//TODO change XHTML output to put everything under the main form, or this won't work with popups, because the check won't be in the form
+	var form=getForm(document.documentElement);	//get the form
+	if(form)	//if there is a form
+	{
+		var name=checkInput.name;	//get the name of the check
+		if(name)	//if we know the name of the check
+		{
+/*TODO del			
+		alert("name: "+name);
+		alert("list: "+form[name]);
+		alert("count: "+form[name].length);
+*/
+			var groupCheckInputs=form[name];	//get all the checkboxes/radio buttons in the form, because being mutually exclusive they all have changed values in the browser
+			if(groupCheckInputs && groupCheckInputs.length)	//if there is a group of checkboxes/radio buttons (independent checkboxes will not have groups, for examples)
+			{
+				invalidated=true;	//if we invalidate the group, we invalidate this checkbox, too
+				for(var i=groupCheckInputs.length-1; i>=0; --i)	//for each check
+				{
+					var groupCheckInput=groupCheckInputs[i];	//get this group check
+					groupCheckInput.removeAttribute("guise:attributeHash");	//the checked status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+					guiseAJAX.invalidateAncestorContent(groupCheckInput);	//indicate that the ancestors now have different content
+				}
+			}
+		}
+	}
+	if(!invalidated)	//if we didn't invalidate this checkbox
+	{
+		checkInput.removeAttribute("guise:attributeHash");	//the checked status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+		guiseAJAX.invalidateAncestorContent(checkInput);	//indicate that the ancestors now have different content
+	}
 	if(AJAX_ENABLED)	//if AJAX is enabled
 	{
 		guise.oldElementIDCursors[checkInput.id]=checkInput.style.cursor;	//save the old cursor

@@ -5,6 +5,7 @@ import java.net.*;
 import java.security.Principal;
 import java.text.DateFormat;
 import java.util.*;
+import static java.util.Arrays.*;
 
 import javax.mail.internet.ContentType;
 import javax.servlet.*;
@@ -88,9 +89,11 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	/**The init parameter, "applicationClass", used to specify the application class.*/
 	public final static String APPLICATION_CLASS_INIT_PARAMETER="applicationClass";
 	/**The init parameter, "defaultLocale", used to specify the default locale.*/
-	public final static String DEFAULT_LOCALE_INIT_PARAMETER="defaultLocale";
+//TODO del	public final static String DEFAULT_LOCALE_INIT_PARAMETER="defaultLocale";
 	/**The init parameter, "supportedLocales", used to specify the supported locales.*/
-	public final static String SUPPORTED_LOCALES_INIT_PARAMETER="supportedLocales";
+//TODO del	public final static String SUPPORTED_LOCALES_INIT_PARAMETER="supportedLocales";
+	/**The init parameter, "locales", used to specify the supported locales.*/
+	public final static String LOCALES_INIT_PARAMETER="locales";
 	/**The prefix, "navigation.", used to identify navigation definitions in the web application's init parameters.*/
 	public final static String NAVIGATION_INIT_PARAMETER_PREFIX="navigation.";
 	/**The parameter, "class", used to identify the navigation frame class in the web application's init parameters.*/
@@ -289,25 +292,29 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		}
 		guiseApplication.installComponentKit(new XHTMLComponentKit());	//create and install an XHTML controller kit
 			//initialize the supported locales
-		final String supportedLocalesString=servletConfig.getInitParameter(SUPPORTED_LOCALES_INIT_PARAMETER);	//get the supported locales init parameter
-		if(supportedLocalesString!=null)	//if supported locales are specified
+		final String localesString=servletConfig.getInitParameter(LOCALES_INIT_PARAMETER);	//get the supported locales init parameter
+		if(localesString!=null)	//if supported locales are specified
 		{
-			final String[] supportedLocaleStrings=supportedLocalesString.split(String.valueOf(COMMA_CHAR));	//split the string into separate locale strings
-			final Locale[] supportedLocales=new Locale[supportedLocaleStrings.length];	//create an array to hold the locales
-			for(int i=supportedLocaleStrings.length-1; i>=0; --i)	//for each supported locale string
+			final String[] localeString=localesString.split(String.valueOf(COMMA_CHAR));	//split the string into separate locale strings
+			final Locale[] locales=new Locale[localeString.length];	//create an array to hold the locales
+			for(int i=localeString.length-1; i>=0; --i)	//for each supported locale string
 			{
-				supportedLocales[i]=createLocale(supportedLocaleStrings[i].trim());	//create a locale for this specified locale (trimming whitespace just to be extra helpful)
+				locales[i]=createLocale(localeString[i].trim());	//create a locale for this specified locale (trimming whitespace just to be extra helpful)
 			}
+			guiseApplication.setLocales(asList(locales));	//set the application locales
+/*TODO del when works
 			guiseApplication.getSupportedLocales().clear();	//remove the application's currently supported locales
-			CollectionUtilities.addAll(guiseApplication.getSupportedLocales(), supportedLocales);	//add all supported locales to the application 
+			CollectionUtilities.addAll(guiseApplication.getSupportedLocales(), supportedLocales);	//add all supported locales to the application
+*/
 		}
+/*TODO del when works
 			//initialize the default locale
 		final String defaultLocaleString=servletConfig.getInitParameter(DEFAULT_LOCALE_INIT_PARAMETER);	//get the default locale init parameter
 		if(defaultLocaleString!=null)	//if a default locale is specified
 		{
 			guiseApplication.setDefaultLocale(createLocale(defaultLocaleString.trim()));	//create a locale from the default locale string and store it in the application (trimming whitespace just to be extra helpful)
 		}
-
+*/
 			//initialize the style TODO allow for multiple styles
 		final String styleString=servletConfig.getInitParameter(STYLE_INIT_PARAMETER);	//get the style init parameter, if any
 		if(styleString!=null)	//if a style is specified
