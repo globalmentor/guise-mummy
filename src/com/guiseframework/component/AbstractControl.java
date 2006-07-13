@@ -2,6 +2,8 @@ package com.guiseframework.component;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.model.*;
 
@@ -40,7 +42,7 @@ public abstract class AbstractControl<C extends Control<C>> extends AbstractComp
 
 		/**Rechecks user input status of this component, and updates the status.
 		@see #setStatus(Control.Status)
-		*/ 
+		*/
 		protected void updateStatus()
 		{
 			setStatus(determineStatus());	//update the status after rechecking it
@@ -50,19 +52,23 @@ public abstract class AbstractControl<C extends Control<C>> extends AbstractComp
 		If the component has a notification of {@link Notification.Severity#WARNING}, the status is determined to be {@link Status#WARNING}.
 		If the component has a notification of {@link Notification.Severity#ERROR}, the status is determined to be {@link Status#ERROR}.
 		Otherwise, this version returns <code>null</code>.
+		If the control is disabled <code>null</code> is returned.
 		@return The current user input status of the control.
 		*/ 
 		protected Status determineStatus()
 		{
-			final Notification notification=getNotification();	//get the current notification
-			if(notification!=null)	//if there is a notification
+			if(isEnabled())	//if the control is enabled
 			{
-				switch(notification.getSeverity())	//see how severe the notification is
+				final Notification notification=getNotification();	//get the current notification
+				if(notification!=null)	//if there is a notification
 				{
-					case WARN:
-						return Status.WARNING;
-					case ERROR:
-						return Status.ERROR;
+					switch(notification.getSeverity())	//see how severe the notification is
+					{
+						case WARN:
+							return Status.WARNING;
+						case ERROR:
+							return Status.ERROR;
+					}
 				}
 			}
 			return null;	//default to no status to report
@@ -132,6 +138,14 @@ public abstract class AbstractControl<C extends Control<C>> extends AbstractComp
 		{
 			this.enableable.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the enableable object
 		}
+		addPropertyChangeListener(ENABLED_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>()	//listen for the "enabled" property changing
+				{
+					public void propertyChange(GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent)	//if the "enabled" property changes
+					{
+						setNotification(null);	//clear any notification
+						updateValid();	//update the valid status, which depends on the enabled status					
+					}
+				});
 	}
 
 		//Enableable delegations

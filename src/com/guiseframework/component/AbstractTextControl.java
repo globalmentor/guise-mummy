@@ -270,13 +270,14 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 		the status is determined to be {@link Status#WARNING} unless the provisional text is the same as the literal text,
 		in which case the status is determined to be {@link Status#ERROR}.
 	The default value, even if invalid, is considered valid.
+	If the control is disabled no status is given.
 	@return The current user input status of the control.
 	@see #getProvisionalText()
 	*/ 
 	protected Status determineStatus()
 	{
 		Status status=super.determineStatus();	//do the defualt status checks
-		if(status==null)	//if no status is reported
+		if(status==null && isEnabled())	//if no status is reported and the control is enabled, check the validity of the text
 		{
 			try
 			{

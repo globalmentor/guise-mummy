@@ -63,6 +63,8 @@ public abstract class AbstractDialogFrame<V, C extends DialogFrame<V, C>> extend
 			{
 				final boolean oldEnabled=enabled;	//get the old value
 				enabled=newEnabled;	//actually change the value
+				setNotification(null);	//clear any notification
+				updateValid();	//update the valid status, which depends on the enabled status					
 				firePropertyChange(ENABLED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newEnabled));	//indicate that the value changed
 			}			
 		}

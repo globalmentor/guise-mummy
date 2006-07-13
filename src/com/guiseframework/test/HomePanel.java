@@ -881,6 +881,10 @@ Debug.trace("card tab control", remoteTabControl, "has view", remoteTabControl.g
 						final Boolean newValue=propertyChangeEvent.getNewValue();	//get the new value
 //TODO del						testButton.setDisplayed(newValue);	//update the button enabled state
 						testButton.setVisible(newValue);	//update the button enabled state
+						
+						
+						ssnTextControl.setEnabled(newValue);
+						
 //TODO del						testButton.setVisible(newValue);	//update the button enabled state
 //TODO bring back						testButton.getModel().setEnabled(newValue);	//update the button enabled state
 Debug.trace("ready to set tabbed panel enabled to", newValue);
