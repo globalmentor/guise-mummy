@@ -312,33 +312,52 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 	
 	/**Validates the user input of this component and all child components.
 	The component will be updated with error information.
-	This version also validates the literal text.
+	This version also validates the literal text, committing the text to the model if necessary.
 	This version performs no additional checks if the control is disabled. 
 	@return The current state of {@link #isValid()} as a convenience.
 	*/
 	public boolean validate()
 	{
-		super.validate();	//validate the super class
-		if(isEnabled())	//if the control is enabled
+		V newValue=null;	//we'll convert the literal value and store it here
+		Notification newValueNotification=null;	//if we have any problems converting the literal value, we'll store a notification here
+		if(isEnabled())	//if the control is enabled, make sure the value reflects the text value (i.e. make sure the value has been committed)
 		{
 			try
 			{
-				final V value=getConverter().convertLiteral(getText());	//see if the literal text can correctly be converted
-				final Validator<V> validator=getValidator();	//see if there is a validator installed
-				if(validator!=null)	//if there is a validator installed
-				{
-					validator.validate(value);	//validate the value represented by the literal text
-				}
+				newValue=getConverter().convertLiteral(getText());	//see if the literal text can correctly be converted
+				setValue(newValue);	//update the value, effectively committing the text (this will have no effect if the value isn't really changing)
 			}
 			catch(final ConversionException conversionException)	//if there is a conversion error
 			{
-	//TODO del			componentException.setComponent(this);	//make sure the exception knows to which component it relates
-				setNotification(new Notification(conversionException));	//add notificaiton of this error to the component
+				newValueNotification=new Notification(conversionException);	//indicate that there was a text conversion error
 			}
-			catch(final ValidationException validationException)	//if there is a validation error
+			catch(final PropertyVetoException propertyVetoException)	//if there is a veto
 			{
-	//TODO del			componentException.setComponent(this);	//make sure the exception knows to which component it relates
-				setNotification(new Notification(validationException));	//add notificaiton of this error to the component
+				final Throwable cause=propertyVetoException.getCause();	//get the cause of the veto, if any
+				newValueNotification=new Notification(cause!=null ? cause : propertyVetoException);	//indicate that there was a commit veto error
+			}
+		}
+		super.validate();	//validate the super class
+		if(isEnabled())	//if the control is enabled
+		{
+			if(newValueNotification!=null)	//if we have a text error already
+			{
+				setNotification(newValueNotification);	//the text conversion error will override other errors (the value may have been invalid, but we want to show that the text's invalidity takes precedence)
+			}
+			else	//if we converted the text to a value with no problems, make sure its value is valid TODO is validation of the new value already taken are of above through setting the value?
+			{
+				try
+				{
+					final Validator<V> validator=getValidator();	//see if there is a validator installed
+					if(validator!=null)	//if there is a validator installed
+					{
+						validator.validate(newValue);	//validate the value represented by the literal text
+					}
+				}
+				catch(final ValidationException validationException)	//if there is a validation error
+				{
+					setNotification(new Notification(validationException));	//add notificaiton of this error to the component
+				}
 			}
 		}
 		return isValid();	//return the current valid state
