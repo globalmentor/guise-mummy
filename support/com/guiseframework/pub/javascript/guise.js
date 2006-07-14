@@ -2491,6 +2491,18 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 	}
 						}
 					}
+					if(elementName=="select")	//if we just patched a select element, we must go back and make sure the correct options are selected, as IE6 will automatically select any newly added option, even if we didn't specify with the DOM that it should be selected
+					{
+						for(var i=childNodeList.length-1; i>=0; --i)	//for each select child node (use the list we already have, which has been dynamically updated throughout our changes)
+						{
+							var childNode=childNodeList[i];	//get the new child node
+							if(childNode.nodeType==Node.ELEMENT_NODE && childNode.nodeName=="option")	//if this is an option child
+							{
+								var oldChildNode=oldChildNodeList[i];	//get the old child node
+								oldChildNode.selected=childNode.getAttribute("selected")=="selected";	//update the selected state of this option
+							}
+						}
+					}
 				}
 			}
 		};
