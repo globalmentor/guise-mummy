@@ -765,7 +765,7 @@ Debug.trace("list control changed value to", newValue);
 		listSelectControl.add("The second option");
 		listSelectControl.add("The third option");
 		listSelectControl.add("The fourth option");
-		listSelectControl.setValidator(new ValueRequiredValidator<String>());
+//TODO bring back		listSelectControl.setValidator(new ValueRequiredValidator<String>());
 		
 /*TODO fix
 		listSelectControl.setValueRepresentationStrategy(new ListControl.DefaultValueRepresentationStrategy<String>()
