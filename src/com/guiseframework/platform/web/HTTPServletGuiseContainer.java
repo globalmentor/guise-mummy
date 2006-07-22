@@ -215,6 +215,7 @@ while(headerNames.hasMoreElements())
 				guiseSession.requestLocale(asList(clientAcceptedLanguages));	//ask the Guise session to change to one of the accepted locales, if the application supports one
 				guiseSessionMap.put(httpSession, guiseSession);	//associate the Guise session with the HTTP session
 
+Debug.info("user agent:", getUserAgent(httpRequest));
 Debug.info("environment:", appendAssociativeArrayValue(new StringBuilder(), environment.getProperties()));	//TODO del
 Debug.info("memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
 			

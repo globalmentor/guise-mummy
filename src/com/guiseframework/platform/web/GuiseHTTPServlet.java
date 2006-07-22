@@ -45,6 +45,7 @@ import static com.garretwilson.text.CharacterConstants.*;
 import static com.garretwilson.text.xml.XMLConstants.*;
 
 import com.garretwilson.text.W3CDateFormat;
+import com.garretwilson.text.elff.*;
 import com.garretwilson.text.xml.XMLUtilities;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
@@ -75,6 +76,7 @@ import com.guiseframework.view.text.xml.xhtml.XHTMLApplicationFrameView;
 
 import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static com.garretwilson.util.LocaleUtilities.*;
+import static com.garretwilson.util.UUIDUtilities.*;
 import static com.guiseframework.Guise.*;
 import static com.guiseframework.platform.web.WebPlatformConstants.*;
 
@@ -120,7 +122,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	/**The minimum level of debug reporting for Guise.*/
 	protected final static Debug.ReportLevel DEBUG_LEVEL=Debug.ReportLevel.TRACE;	//TODO load this from an init parameter
 
-	/**The cached log file, or null if it has not yet been initialized.*/
+	/**The cached debug log file, or null if it has not yet been initialized.*/
 	private static File logFile=null;
 
 	/**Determines the debug log file.
@@ -137,6 +139,60 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 			logFile=new File(getLogDirectory(context), logFilename);	//TODO use a constant
 		}
 		return logFile;	//return the log file
+	}
+
+	private static ELFF elff=null;
+
+	protected static ELFF getELFF()
+	{
+		return elff;
+	}
+	
+	/**The cached ELFF log file, or null if it has not yet been initialized.*/
+	private static File elffLogFile=null;
+
+	/**Determines the ELFF log file.
+	@param context The servlet context from which to retrieve context parameters.
+	@return The file for ELFF logging.
+	@see #getLogDirectory(ServletContext)
+	*/
+	protected static File getELFFLogFile(final ServletContext context)
+	{
+		if(elffLogFile==null)	//if no log file has been determined
+		{
+			final DateFormat logFilenameDateFormat=new W3CDateFormat(W3CDateFormat.Style.DATE);	//create a formatter for the log filename
+			final String logFilename=logFilenameDateFormat.format(new Date())+" elff.log";	//create a filename in the form "date elff.log" TODO use a constant
+			elffLogFile=new File(getLogDirectory(context), logFilename);	//TODO use a constant
+		}
+		return elffLogFile;	//return the log file
+	}
+
+	/**The cached ELFF log writer, or null if it has not yet been initialized.*/
+	private static Writer elffLogWriter=null;
+
+	/**Determines the ELFF writer.
+	@param context The servlet context from which to retrieve context parameters.
+	@return The writer for ELFF logging.
+	@exception IOException if there is an error creating the writer.
+	@see #getELFFLogFile(ServletContext)
+	*/
+	@SuppressWarnings("unchecked")
+	protected static Writer getELFFLogWriter(final ServletContext context) throws IOException
+	{
+		final File elffLogFile=getELFFLogFile(context);	//get the log file
+		synchronized(elffLogFile)	//TODO synhronize on something else when we start automatically generating new log files
+		{
+			if(elffLogWriter==null)	//if no log writer has been determined
+			{
+				final boolean elffLogFileExisted=elffLogFile.exists();	//see if the file already exists 
+				elffLogWriter=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(elffLogFile, true), UTF_8));	//create a buffered, appending writer to the file using UTF-8
+				if(!elffLogFileExisted)	//if we just created the log file
+				{
+					getELFF().logDirectives(elffLogWriter, new NameValuePair<String, String>(ELFF.SOFTWARE_DIRECTIVE, Guise.GUISE_NAME+' '+Guise.BUILD_ID));	//log the directives
+				}
+			}
+		}
+		return elffLogWriter;	//return the log writer		
 	}
 
 	/**The cached data directory, or null if it has not yet been initialized.*/
@@ -235,12 +291,21 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		try
 		{
 			Debug.setOutput(getDebugLogFile(getServletContext()));	//set the log file
+			Debug.log("initializing servlet", servletConfig.getServletName(), Guise.GUISE_NAME, Guise.BUILD_ID);
 		}
 		catch(final FileNotFoundException fileNotFoundException)	//if we can't find the debug file
 		{
 			throw new ServletException(fileNotFoundException);
 		}
 		setReadOnly(true);	//make this servlet read-only
+		if(elff==null)	//TODO fix ELFF; intialize elsewhere; make this per-application
+		{
+			elff=new ELFF(Field.DATE_FIELD, Field.TIME_FIELD, Field.CLIENT_IP_FIELD, Field.CLIENT_SERVER_USERNAME_FIELD, Field.CLIENT_SERVER_HOST_FIELD,
+					Field.CLIENT_SERVER_METHOD_FIELD, Field.CLIENT_SERVER_URI_STEM_FIELD, Field.CLIENT_SERVER_URI_QUERY_FIELD,
+					Field.SERVER_CLIENT_STATUS_FIELD, Field.CLIENT_SERVER_BYTES_FIELD, Field.CLIENT_SERVER_VERSION_FIELD,
+					Field.CLIENT_SERVER_USER_AGENT_HEADER_FIELD, Field.CLIENT_SERVER_COOKIE_HEADER_FIELD,
+					Field.CLIENT_SERVER_REFERER_HEADER_FIELD, Field.DCS_ID_FIELD);
+		}
 		//TODO turn off directory listings, and/or fix them
 		try
 		{
@@ -276,7 +341,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 			catch(final ClassNotFoundException classNotFoundException)	//if the application class cannot be found
 			{
 				throw new IllegalArgumentException("The initialization parameter specified application class "+guiseApplicationClassName+" could not be found.", classNotFoundException);						
-			}			
+			}
 			catch(final InstantiationException instantiationException)	//if the application class could not be instantiated
 			{
 				throw new IllegalArgumentException("The initialization parameter specified application class "+guiseApplicationClassName+" is an interface or an abstract class.", instantiationException);						
@@ -321,7 +386,6 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		{
 			guiseApplication.setStyle(URI.create(styleString));	//create a locale from the default locale string and store it in the application (trimming whitespace just to be extra helpful)
 		}
-
 			//initialize the theme
 		final String themeString=servletConfig.getInitParameter(THEME_INIT_PARAMETER);	//get the theme init parameter, if any
 		if(themeString!=null)	//if a theme is specified
@@ -471,6 +535,11 @@ Debug.trace("applicationContextPath", guiseApplicationContextPath);
 	{
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 Debug.trace("method:", request.getMethod(), "raw path info:", rawPathInfo);
+final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
+Debug.info("before service request: memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
+try
+{
+
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
 		final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
 /*TODO del
@@ -497,6 +566,47 @@ while(headerNames.hasMoreElements())
 	Debug.info("content length:", request.getContentLength());
 	Debug.info("content type:", request.getContentType());
 	*/
+			
+				//make sure the environment has the WebTrends ID
+			final GuiseEnvironment environment=guiseSession.getEnvironment();	//get the session's environment
+			if(!environment.hasProperty(ELFF.WEBTRENDS_ID_COOKIE_NAME))	//if the environment doesn't have a WebTrends ID
+			{
+				final StringBuilder webtrendsIDStringBuilder=new StringBuilder();	//create a string builder for creating a WebTrends ID
+				webtrendsIDStringBuilder.append(request.getRemoteAddr());	//IP address
+				webtrendsIDStringBuilder.append('-');	//-
+				webtrendsIDStringBuilder.append(System.currentTimeMillis());	//current time in milliseconds
+					//TODO fix ".XXX..."
+				webtrendsIDStringBuilder.append("::");	//::
+				final UUID uuid=UUID.randomUUID();	//create a new UUID
+				webtrendsIDStringBuilder.append(toHexString(uuid).toUpperCase());	//append the UUID in hex
+				environment.setProperty(ELFF.WEBTRENDS_ID_COOKIE_NAME, webtrendsIDStringBuilder.toString());	//store the WebTrends ID in the environment, which will be stored in the cookies eventually
+			}
+			if(GET_METHOD.equals(request.getMethod()))	//if this is a GET request, log it
+			{
+				final Writer elffLogWriter=getELFFLogWriter(getServletContext());	//get the ELFF log writer
+//TODO del				final ELFF elff=new ELFF(Field.DATE_FIELD, Field.TIME_FIELD);
+
+				final Date now=new Date();
+				final Entry entry=new Entry();
+				entry.setFieldValue(Field.DATE_FIELD, now);
+				entry.setFieldValue(Field.TIME_FIELD, now);
+				entry.setFieldValue(Field.CLIENT_IP_FIELD, request.getRemoteAddr());
+				entry.setFieldValue(Field.CLIENT_SERVER_USERNAME_FIELD, request.getRemoteUser());
+//TODO fix				entry.setFieldValue(Field.CLIENT_SERVER_HOST_FIELD, request.get
+				entry.setFieldValue(Field.CLIENT_SERVER_METHOD_FIELD, request.getMethod());
+				entry.setFieldValue(Field.CLIENT_SERVER_URI_STEM_FIELD, rawPathInfo);
+				entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, request.getQueryString());
+//TODO fix cs-status
+//TODO fix cs-bytes
+//TODO fix cs-version
+				entry.setFieldValue(Field.CLIENT_SERVER_USER_AGENT_HEADER_FIELD, getUserAgent(request));
+				entry.setFieldValue(Field.CLIENT_SERVER_COOKIE_HEADER_FIELD, asInstance(environment.getProperty(ELFF.WEBTRENDS_ID_COOKIE_NAME), String.class));	//store the WebTrends ID cookie as the cookie TODO decide if we want to get general cookies instead of just the WebTrends cookie 
+				entry.setFieldValue(Field.CLIENT_SERVER_REFERER_HEADER_FIELD, getReferer(request));
+				entry.setFieldValue(Field.DCS_ID_FIELD, "dcsqox7ki5aaz8ge1yzei27om_9k8x");	//TODO important: get real DCS ID from configuration
+//TODO fix dcs-id
+				getELFF().log(elffLogWriter, entry);	//write the entry
+			}
+
 	//TODO del Debug.info("supports Flash: ", guiseSession.getEnvironment().getProperty(GuiseEnvironment.CONTENT_APPLICATION_SHOCKWAVE_FLASH_ACCEPTED_PROPERTY));
 	//TODO del Debug.trace("creating thread group");
 			final GuiseSessionThreadGroup guiseSessionThreadGroup=Guise.getInstance().getThreadGroup(guiseSession);	//get the thread group for this session
@@ -523,6 +633,11 @@ while(headerNames.hasMoreElements())
 		{
 			super.doGet(request, response);	//let the default functionality take over			
 		}
+}
+finally
+{
+	Debug.info("after service request: memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());	
+}
 	}
 
 	/**The runnable class that services an HTTP request.
@@ -1192,7 +1307,9 @@ if(document==null)	//TODO fix; del
 					if(eventNode.getNodeType()==Node.ELEMENT_NODE)//if this is an event element
 					{
 						final Element eventElement=(Element)eventNode;	//cast the node to an element
-						if("form".equals(eventNode.getNodeName()))	//if this is a form event TODO use a constant
+						final String eventName=eventNode.getNodeName();	//get the event name
+Debug.info("AJAX event:", eventName);
+						if("form".equals(eventName))	//if this is a form event TODO use a constant
 						{
 							final boolean exhaustive=Boolean.valueOf(eventElement.getAttribute("exhaustive")).booleanValue();	//get the exhaustive indication TODO use a constant
 							final boolean provisional=Boolean.valueOf(eventElement.getAttribute("provisional")).booleanValue();	//get the provisional indication TODO use a constant
@@ -1211,7 +1328,7 @@ if(document==null)	//TODO fix; del
 							}
 							controlEventList.add(formSubmitEvent);	//add the event to the list
 						}
-						else if("action".equals(eventNode.getNodeName()))	//if this is an action event TODO use a constant
+						else if("action".equals(eventName))	//if this is an action event TODO use a constant
 						{
 							final String componentID=eventElement.getAttribute("componentID");	//get the ID of the component TODO use a constant
 							if(componentID!=null)	//if there is a component ID TODO add better event handling, to throw an error and send back that error
@@ -1232,7 +1349,7 @@ if(document==null)	//TODO fix; del
 							final DropControlEvent dropEvent=new DropControlEvent(dragSourceID, dropTargetID);	//create a new drop event
 							controlEventList.add(dropEvent);	//add the event to the list
 						}
-						else if("mouseEnter".equals(eventNode.getNodeName()) || "mouseExit".equals(eventNode.getNodeName()))	//if this is a mouse event TODO use a constant
+						else if("mouseEnter".equals(eventName) || "mouseExit".equals(eventName))	//if this is a mouse event TODO use a constant
 						{
 							try
 							{
