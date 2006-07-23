@@ -25,9 +25,15 @@
 <!ENTITY % xhtml-iframe.mod PUBLIC "-//W3C//ELEMENTS XHTML Inline Frame Element 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-iframe-1.mod">
 %xhtml-iframe.mod;
 
+<!--HTML attributes dropped in XHTML-->
+
+<!ATTLIST script
+  language    CDATA          #IMPLIED
+>
+
 <!--add custom Guise attributes-->
 
 <!ATTLIST img
   guise:originalSrc         %URI;          #IMPLIED
   guise:rolloverSrc         %URI;          #IMPLIED
-  >
+>

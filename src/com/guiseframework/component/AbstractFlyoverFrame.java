@@ -2,12 +2,14 @@ package com.guiseframework.component;
 
 import java.math.BigDecimal;
 import java.net.URI;
+import java.util.EnumSet;
 import java.util.Set;
+
+import static java.util.Collections.*;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.geometry.CompassPoint;
 
-import static com.garretwilson.util.SetUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.guiseframework.Resources.*;
 
@@ -147,7 +149,7 @@ public abstract class AbstractFlyoverFrame<C extends FlyoverFrame<C>> extends Ab
 		setMovable(false);	//default to being nonmovable
 		setResizable(false);	//default to not allowing resizing
 		setTitleVisible(false);	//don't show a title
-		tetherBearingCompassPoints=createEnumSet(CompassPoint.class,	//establish the default accepted tether bearings
+		tetherBearingCompassPoints=unmodifiableSet(EnumSet.of(	//establish the default accepted tether bearings
 				CompassPoint.NORTHEAST_BY_NORTH,
 				CompassPoint.NORTHEAST_BY_EAST,
 				CompassPoint.SOUTHEAST_BY_EAST,
@@ -155,7 +157,7 @@ public abstract class AbstractFlyoverFrame<C extends FlyoverFrame<C>> extends Ab
 				CompassPoint.SOUTHWEST_BY_SOUTH,
 				CompassPoint.SOUTHWEST_BY_WEST,
 				CompassPoint.NORTHWEST_BY_WEST,
-				CompassPoint.NORTHWEST_BY_NORTH);
+				CompassPoint.NORTHWEST_BY_NORTH));
 	}
 
 }

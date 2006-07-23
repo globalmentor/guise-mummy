@@ -46,6 +46,7 @@ import static com.garretwilson.text.xml.XMLConstants.*;
 
 import com.garretwilson.text.W3CDateFormat;
 import com.garretwilson.text.elff.*;
+import static com.garretwilson.text.elff.WebTrendsConstants.*;
 import com.garretwilson.text.xml.XMLUtilities;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
@@ -569,18 +570,21 @@ while(headerNames.hasMoreElements())
 			
 				//make sure the environment has the WebTrends ID
 			final GuiseEnvironment environment=guiseSession.getEnvironment();	//get the session's environment
-			if(!environment.hasProperty(ELFF.WEBTRENDS_ID_COOKIE_NAME))	//if the environment doesn't have a WebTrends ID
+			if(!environment.hasProperty(WEBTRENDS_ID_COOKIE_NAME))	//if the environment doesn't have a WebTrends ID
 			{
 				final StringBuilder webtrendsIDStringBuilder=new StringBuilder();	//create a string builder for creating a WebTrends ID
 				webtrendsIDStringBuilder.append(request.getRemoteAddr());	//IP address
 				webtrendsIDStringBuilder.append('-');	//-
 				webtrendsIDStringBuilder.append(System.currentTimeMillis());	//current time in milliseconds
-					//TODO fix ".XXX..."
+				//TODO fix nanonseconds if needed, but Java doesn't even offer this information
+/*TODO del; this is some sort of checksum, not a UUID
 				webtrendsIDStringBuilder.append("::");	//::
 				final UUID uuid=UUID.randomUUID();	//create a new UUID
 				webtrendsIDStringBuilder.append(toHexString(uuid).toUpperCase());	//append the UUID in hex
-				environment.setProperty(ELFF.WEBTRENDS_ID_COOKIE_NAME, webtrendsIDStringBuilder.toString());	//store the WebTrends ID in the environment, which will be stored in the cookies eventually
+*/
+				environment.setProperty(WEBTRENDS_ID_COOKIE_NAME, webtrendsIDStringBuilder.toString());	//store the WebTrends ID in the environment, which will be stored in the cookies eventually
 			}
+/*TODO del; moved
 			if(GET_METHOD.equals(request.getMethod()))	//if this is a GET request, log it
 			{
 				final Writer elffLogWriter=getELFFLogWriter(getServletContext());	//get the ELFF log writer
@@ -595,17 +599,32 @@ while(headerNames.hasMoreElements())
 //TODO fix				entry.setFieldValue(Field.CLIENT_SERVER_HOST_FIELD, request.get
 				entry.setFieldValue(Field.CLIENT_SERVER_METHOD_FIELD, request.getMethod());
 				entry.setFieldValue(Field.CLIENT_SERVER_URI_STEM_FIELD, rawPathInfo);
-				entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, request.getQueryString());
+				final List<NameValuePair<String, String>> queryParameters=new ArrayList<NameValuePair<String, String>>();	//create an array of parameters
+					//WT.js
+				final Boolean isJavaScriptSupported=asInstance(environment.getProperty(GuiseEnvironment.CONTENT_TEXT_JAVASCRIPT_SUPPORTED_PROPERTY), Boolean.class);	//see if the environment knows about Java
+				if(isJavaScriptSupported!=null)	//if JavaScript is supported
+				{
+						//WT.jv
+					queryParameters.add(new NameValuePair<String, String>(JAVASCRIPT_QUERY_ATTRIBUTE_NAME, WebTrendsYesNo.asYesNo(isJavaScriptSupported.booleanValue()).toString()));	//add WT.js as a query parameter
+					final String javascriptVersion=asInstance(environment.getProperty(GuiseEnvironment.CONTENT_TEXT_JAVASCRIPT_VERSION), String.class);	//get the JavaScript version
+					if(javascriptVersion!=null)	//if we know the JavaScript version
+					{
+						queryParameters.add(new NameValuePair<String, String>(JAVASCRIPT_VERSION_QUERY_ATTRIBUTE_NAME, javascriptVersion));	//add WT.jv as a query parameter						
+					}
+				}
+				
+//TODO fix				entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, request.getQueryString());
 //TODO fix cs-status
 //TODO fix cs-bytes
 //TODO fix cs-version
 				entry.setFieldValue(Field.CLIENT_SERVER_USER_AGENT_HEADER_FIELD, getUserAgent(request));
-				entry.setFieldValue(Field.CLIENT_SERVER_COOKIE_HEADER_FIELD, asInstance(environment.getProperty(ELFF.WEBTRENDS_ID_COOKIE_NAME), String.class));	//store the WebTrends ID cookie as the cookie TODO decide if we want to get general cookies instead of just the WebTrends cookie 
+				entry.setFieldValue(Field.CLIENT_SERVER_COOKIE_HEADER_FIELD, asInstance(environment.getProperty(WEBTRENDS_ID_COOKIE_NAME), String.class));	//store the WebTrends ID cookie as the cookie TODO decide if we want to get general cookies instead of just the WebTrends cookie 
 				entry.setFieldValue(Field.CLIENT_SERVER_REFERER_HEADER_FIELD, getReferer(request));
 				entry.setFieldValue(Field.DCS_ID_FIELD, "dcsqox7ki5aaz8ge1yzei27om_9k8x");	//TODO important: get real DCS ID from configuration
 //TODO fix dcs-id
 				getELFF().log(elffLogWriter, entry);	//write the entry
 			}
+*/
 
 	//TODO del Debug.info("supports Flash: ", guiseSession.getEnvironment().getProperty(GuiseEnvironment.CONTENT_APPLICATION_SHOCKWAVE_FLASH_ACCEPTED_PROPERTY));
 	//TODO del Debug.trace("creating thread group");
@@ -853,6 +872,82 @@ Debug.trace("got control events");
 			//TODO del Debug.trace("got component", component);
 									requestedComponents.add(component);	//add the component to the set of requested components
 								}
+							}
+							else if(controlEvent instanceof InitControlEvent)	//if this is an initialization event
+							{
+								final InitControlEvent initControlEvent=(InitControlEvent)controlEvent;	//get the init control event
+								final GuiseEnvironment environment=guiseSession.getEnvironment();	//get the session's environment
+								{	//set up the environment; put this in another scope so the variable names won't clash; we may move logging in the future
+									final String javascriptVersion=initControlEvent.getJavaScriptVersion();	//get the JavaScript version reported
+									if(javascriptVersion!=null)	//if JavaScript is supported
+									{
+										environment.setProperty(GuiseEnvironment.CONTENT_TEXT_JAVASCRIPT_SUPPORTED_PROPERTY, Boolean.TRUE);	//indicate that JavaScript is supported
+										environment.setProperty(GuiseEnvironment.CONTENT_TEXT_JAVASCRIPT_VERSION, javascriptVersion);	//indicate which JavaScript version supported
+									}
+									else	//if JavaScript isn't supported
+									{
+										environment.setProperty(GuiseEnvironment.CONTENT_TEXT_JAVASCRIPT_SUPPORTED_PROPERTY, Boolean.FALSE);	//indicate that JavaScript isn't supported
+									}
+								}
+									//log this page								
+								final Writer elffLogWriter=getELFFLogWriter(getServletContext());	//get the ELFF log writer
+//							TODO del				final ELFF elff=new ELFF(Field.DATE_FIELD, Field.TIME_FIELD);
+
+								final Date now=new Date();
+								final Entry entry=new Entry();
+								entry.setFieldValue(Field.DATE_FIELD, now);
+								entry.setFieldValue(Field.TIME_FIELD, now);
+								entry.setFieldValue(Field.CLIENT_IP_FIELD, request.getRemoteAddr());
+								entry.setFieldValue(Field.CLIENT_SERVER_USERNAME_FIELD, request.getRemoteUser());
+//							TODO fix				entry.setFieldValue(Field.CLIENT_SERVER_HOST_FIELD, request.get
+								entry.setFieldValue(Field.CLIENT_SERVER_METHOD_FIELD, GET_METHOD);	//log the GET method always for WebTrends
+//TODO del								entry.setFieldValue(Field.CLIENT_SERVER_METHOD_FIELD, request.getMethod());
+								entry.setFieldValue(Field.CLIENT_SERVER_URI_STEM_FIELD, rawPathInfo);
+								final List<NameValuePair<String, String>> queryParameters=new ArrayList<NameValuePair<String, String>>();	//create an array of parameters
+									//WT.bh
+								queryParameters.add(new NameValuePair<String, String>(BROWSING_HOUR_QUERY_ATTRIBUTE_NAME, Integer.toString(initControlEvent.getHour())));	//add WT.bh as a query parameter
+									//WT.sr
+								queryParameters.add(new NameValuePair<String, String>(BROWSER_SIZE_QUERY_ATTRIBUTE_NAME, Integer.toString(initControlEvent.getBrowserWidth())+"x"+Integer.toString(initControlEvent.getBrowserHeight())));	//add WT.bs as a query parameter
+									//WT.cd
+								queryParameters.add(new NameValuePair<String, String>(COLOR_DEPTH_QUERY_ATTRIBUTE_NAME, Integer.toString(initControlEvent.getColorDepth())));	//add WT.cd as a query parameter
+									//WT.jo
+								queryParameters.add(new NameValuePair<String, String>(JAVA_ENABLED_QUERY_ATTRIBUTE_NAME, WebTrendsYesNo.asYesNo(initControlEvent.isJavaEnabled()).toString()));	//add WT.jo as a query parameter
+									//WT.js
+								final Boolean isJavaScriptSupported=asInstance(environment.getProperty(GuiseEnvironment.CONTENT_TEXT_JAVASCRIPT_SUPPORTED_PROPERTY), Boolean.class);	//see if the environment knows about Java
+								if(isJavaScriptSupported!=null)	//if JavaScript is supported
+								{
+										//WT.jv
+									queryParameters.add(new NameValuePair<String, String>(JAVASCRIPT_QUERY_ATTRIBUTE_NAME, WebTrendsYesNo.asYesNo(isJavaScriptSupported.booleanValue()).toString()));	//add WT.js as a query parameter
+									final String javascriptVersion=asInstance(environment.getProperty(GuiseEnvironment.CONTENT_TEXT_JAVASCRIPT_VERSION), String.class);	//get the JavaScript version
+									if(javascriptVersion!=null)	//if we know the JavaScript version
+									{
+										queryParameters.add(new NameValuePair<String, String>(JAVASCRIPT_VERSION_QUERY_ATTRIBUTE_NAME, javascriptVersion));	//add WT.jv as a query parameter						
+									}
+								}
+									//WT.sr
+								queryParameters.add(new NameValuePair<String, String>(SCREEN_RESOLUTION_QUERY_ATTRIBUTE_NAME, Integer.toString(initControlEvent.getScreenWidth())+"x"+Integer.toString(initControlEvent.getScreenHeight())));	//add WT.sr as a query parameter
+									//WT.tz
+								queryParameters.add(new NameValuePair<String, String>(TIMEZONE_QUERY_ATTRIBUTE_NAME, Integer.toString(initControlEvent.getTimeZone())));	//add WT.tz as a query parameter
+									//WT.ul
+								queryParameters.add(new NameValuePair<String, String>(USER_LANGUAGE_QUERY_ATTRIBUTE_NAME, initControlEvent.getLanguage()));	//add WT.ul as a query parameter
+
+								final NameValuePair<String, String>[] queryParameterArray=(NameValuePair<String, String>[])queryParameters.toArray(new NameValuePair[queryParameters.size()]);	//put the query parameters into an array
+								entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, appendQueryParameters(request.getQueryString(), queryParameterArray));	//append the new parameters and set the log field
+//TODO del entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, request.getQueryString());
+								
+//							TODO fix				entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, request.getQueryString());
+//							TODO fix cs-status
+//							TODO fix cs-bytes
+//							TODO fix cs-version
+								entry.setFieldValue(Field.CLIENT_SERVER_USER_AGENT_HEADER_FIELD, getUserAgent(request));
+								final String webTrendsID=asInstance(environment.getProperty(WEBTRENDS_ID_COOKIE_NAME), String.class);	//get the WebTrends ID
+								entry.setFieldValue(Field.CLIENT_SERVER_COOKIE_HEADER_FIELD, webTrendsID!=null ? WEBTRENDS_ID_COOKIE_NAME+"="+webTrendsID : null);	//store the WebTrends ID cookie as the cookie TODO decide if we want to get general cookies instead of just the WebTrends cookie
+//TODO fix referer; this doesn't work in AJAX; we must store the referrer somewhere in the GET request
+								entry.setFieldValue(Field.CLIENT_SERVER_REFERER_HEADER_FIELD, getReferer(request));
+								entry.setFieldValue(Field.DCS_ID_FIELD, "dcsqox7ki5aaz8ge1yzei27om_9k8x");	//TODO important: get real DCS ID from configuration
+//							TODO fix dcs-id
+								getELFF().log(elffLogWriter, entry);	//write the entry
+								
 							}
 							if(!requestedComponents.isEmpty())	//if components were requested
 							{
@@ -1112,15 +1207,18 @@ Debug.trace("got control events");
 		for(final Map.Entry<String, Object> environmentPropertyEntry:environment.getProperties().entrySet())	//iterate the environment properties so that new cookies can be added as needed
 		{
 			final String environmentPropertyName=environmentPropertyEntry.getKey();	//get the name of the environment property value
-			if(!cookieMap.containsKey(environmentPropertyName))	//if no cookie contains this environment variable
+			if(!GuiseEnvironment.SYSTEM_PROPERTIES.contains(environmentPropertyName))	//ignore system environment properties
 			{
-				final String environmentPropertyValue=asInstance(environmentPropertyEntry.getValue(), String.class);	//get the environment property value as a string
-				if(environmentPropertyValue!=null)	//if there is a non-null environment property value
-				{									
-					final Cookie cookie=new Cookie(environmentPropertyName, encode(environmentPropertyValue));	//create a new cookie with the encoded property value
-					cookie.setPath(applicationBasePath);	//set the cookie path to the application base path
-					cookie.setMaxAge(Integer.MAX_VALUE);	//don't allow the cookie to expire for a very long time
-					response.addCookie(cookie);	//add the cookie to the response
+				if(!cookieMap.containsKey(environmentPropertyName))	//if no cookie contains this environment variable
+				{
+					final String environmentPropertyValue=asInstance(environmentPropertyEntry.getValue(), String.class);	//get the environment property value as a string
+					if(environmentPropertyValue!=null)	//if there is a non-null environment property value
+					{									
+						final Cookie cookie=new Cookie(environmentPropertyName, encode(environmentPropertyValue));	//create a new cookie with the encoded property value
+						cookie.setPath(applicationBasePath);	//set the cookie path to the application base path
+						cookie.setMaxAge(Integer.MAX_VALUE);	//don't allow the cookie to expire for a very long time
+						response.addCookie(cookie);	//add the cookie to the response
+					}
 				}
 			}
 		}		
@@ -1394,7 +1492,21 @@ Debug.info("AJAX event:", eventName);
 						}
 						else if("init".equals(eventNode.getNodeName()))	//if this is an initialization event TODO use a constant
 						{
-							final InitControlEvent initEvent=new InitControlEvent();	//create a new initialization event
+							final String hour=eventElement.getAttribute("hour");
+							final String timezone=eventElement.getAttribute("timezone");
+							final String language=eventElement.getAttribute("language");
+							final String colorDepth=eventElement.getAttribute("colorDepth");
+							final String screenWidth=eventElement.getAttribute("screenWidth");
+							final String screenHeight=eventElement.getAttribute("screenHeight");
+							final String browserWidth=eventElement.getAttribute("browserWidth");
+							final String browserHeight=eventElement.getAttribute("browserHeight");
+							final String javascriptVersion=eventElement.getAttribute("javascriptVersion");	//get the JavaScript version TODO use a constant
+							final String javaEnabled=eventElement.getAttribute("javaEnabled");
+							final InitControlEvent initEvent=new InitControlEvent(
+									hour.length()>0 ? Integer.parseInt(hour) : 0, timezone.length()>0 ? Integer.parseInt(timezone) : 0, language.length()>0 ? language : "en-US",
+									colorDepth.length()>0 ? Integer.parseInt(colorDepth) : 24, screenWidth.length()>0 ? Integer.parseInt(screenWidth) : 1024, screenHeight.length()>0 ? Integer.parseInt(screenHeight) : 768,
+									browserWidth.length()>0 ? Integer.parseInt(browserWidth) : 1024, browserHeight.length()>0 ? Integer.parseInt(browserHeight) : 768,
+									javascriptVersion.length()>0 ? javascriptVersion : null, javaEnabled.length()>0 ? Boolean.valueOf(javaEnabled) : false);	//create a new initialization event TODO check for NumberFormatException
 							controlEventList.add(initEvent);	//add the event to the list
 						}
 					}

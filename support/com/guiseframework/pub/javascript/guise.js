@@ -8,7 +8,18 @@ navigator.userAgentVersionNumber The version of the user agent stored as a numbe
 
 /*Guise AJAX Request Format, content type application/x-guise-ajax-request+xml
 <request>
-	<init/>	<!--initializes the page, requesting all frames to be resent-->
+	<init	<!--initializes the page, requesting all frames to be resent-->
+		jsVersion=""	<!--version of JavaScript upported by the browser-->
+		timezone=""
+		hour=""
+		language=""
+		colorDepth=""
+		screenWidth=""
+		screenHeight=""
+		javaEnabled=""
+		browserWidth=""
+		browserHeight=""
+	/>
 	<events>	<!--the list of events (zero or more)-->
 		<form	<!--information resulting from form changes, analogous to that in an HTTP POST-->
 			exhaustive="true|false"	<!--indicates whether the event contains values for all form controls (defaults to false)-->
@@ -1293,9 +1304,30 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 //Initialization AJAX Event
 
 /**A class indicating an initialization AJAX request.
+var jsVersion The version of JavaScript.
+var timezone=date.getTimezoneOffset();	//get the time zone offset
+var hour=date.getHours();	//get the current hours
+var language=navigator.language | navigator.userLanguage;	//get the user language
+var colorDepth=screen.colorDepth;	//get the color depth
+var screenWidth=screen.width;	//get the screen width
+var screenHeight=screen.height;	//get the screen height
+var javaEnabled=navigator.javaEnabled();	//see if java is enabled
+var browserWidth=document.body.offsetWidth;	//get the browser width
+var browserHeight=document.body.offsetHeight;	//get the browser height
 */
 function InitAJAXEvent()
 {
+	this.javascriptVersion=javascriptVersion;	//save the JavaScript version
+	var date=new Date();	//create a new date
+	this.timezone=date.getTimezoneOffset()/-60;	//get the time zone offset
+	this.hour=date.getHours();	//get the current hours
+	this.language=navigator.language || navigator.userLanguage;	//get the user language
+	this.colorDepth=screen.colorDepth;	//get the color depth
+	this.screenWidth=screen.width;	//get the screen width
+	this.screenHeight=screen.height;	//get the screen height
+	this.javaEnabled=navigator.javaEnabled();	//see if java is enabled
+	this.browserWidth=document.body.offsetWidth;	//get the browser width
+	this.browserHeight=document.body.offsetHeight;	//get the browser height
 }
 
 //Form AJAX Event
@@ -1806,7 +1838,17 @@ function GuiseAJAX()
 		*/
 		GuiseAJAX.prototype._appendInitAJAXEvent=function(stringBuilder, ajaxInitEvent)
 		{
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.INIT);	//<init>
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.INIT,	//<init
+					new Map("javascriptVersion", ajaxInitEvent.javascriptVersion,
+						"timezone", ajaxInitEvent.timezone,
+						"hour", ajaxInitEvent.hour,
+						"language", ajaxInitEvent.language,
+						"colorDepth", ajaxInitEvent.colorDepth,
+						"screenWidth", ajaxInitEvent.screenWidth,
+						"screenHeight", ajaxInitEvent.screenHeight,
+						"javaEnabled", Boolean(ajaxInitEvent.javaEnabled).toString(),
+						"browserWidth", ajaxInitEvent.browserWidth,
+						"browserHeight", ajaxInitEvent.browserHeight));
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.INIT);	//</init>
 			return stringBuilder;	//return the string builder
 		};
