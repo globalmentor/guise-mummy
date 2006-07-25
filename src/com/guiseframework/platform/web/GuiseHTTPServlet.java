@@ -91,10 +91,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 {
 	/**The init parameter, "applicationClass", used to specify the application class.*/
 	public final static String APPLICATION_CLASS_INIT_PARAMETER="applicationClass";
-	/**The init parameter, "defaultLocale", used to specify the default locale.*/
-//TODO del	public final static String DEFAULT_LOCALE_INIT_PARAMETER="defaultLocale";
-	/**The init parameter, "supportedLocales", used to specify the supported locales.*/
-//TODO del	public final static String SUPPORTED_LOCALES_INIT_PARAMETER="supportedLocales";
+	/**The init parameter, "debugReportLevel", used to specify the level of debug reporting for the JVM of type {@link Debug.ReportLevel}.*/
+	public final static String DEBUG_REPORT_LEVEL_INIT_PARAMETER="debugReportLevel";
 	/**The init parameter, "locales", used to specify the supported locales.*/
 	public final static String LOCALES_INIT_PARAMETER="locales";
 	/**The prefix, "navigation.", used to identify navigation definitions in the web application's init parameters.*/
@@ -120,8 +118,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	/**Whether debug is turned on for Guise.*/
 	protected final static boolean DEBUG=true;	//TODO load this from an init parameter
 
-	/**The minimum level of debug reporting for Guise.*/
-	protected final static Debug.ReportLevel DEBUG_LEVEL=Debug.ReportLevel.TRACE;	//TODO load this from an init parameter
+	/**The default level of debug reporting for Guise.*/
+	protected final static Debug.ReportLevel DEFAULT_DEBUG_REPORT_LEVEL=Debug.ReportLevel.TRACE;
 
 	/**The cached debug log file, or null if it has not yet been initialized.*/
 	private static File logFile=null;
@@ -288,7 +286,18 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		{
 			throw new ServletException(ioException);
 		}
-		Debug.setMinimumReportLevel(DEBUG_LEVEL);	//set the level of reporting
+		try
+		{
+			final String debugReportLevelString=servletConfig.getInitParameter(DEBUG_REPORT_LEVEL_INIT_PARAMETER);	//get name of the guise application class
+			if(debugReportLevelString!=null)	//if there is a debug report level specified
+			{
+				Debug.setMinimumReportLevel(Debug.ReportLevel.valueOf(debugReportLevelString));	//change the debug to the specified level
+			}
+		}
+		catch(final IllegalArgumentException illegalArgumentException)
+		{
+			throw new ServletException(illegalArgumentException);
+		}
 		try
 		{
 			Debug.setOutput(getDebugLogFile(getServletContext()));	//set the log file
@@ -936,6 +945,7 @@ Debug.trace("got control events");
 //TODO del entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, request.getQueryString());
 								
 //							TODO fix				entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, request.getQueryString());
+								entry.setFieldValue(Field.SERVER_CLIENT_STATUS_FIELD, new Integer(200));	//TODO fix with real HTTP status
 //							TODO fix cs-status
 //							TODO fix cs-bytes
 //							TODO fix cs-version
