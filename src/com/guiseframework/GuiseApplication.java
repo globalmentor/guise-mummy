@@ -99,6 +99,14 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public void uninstallComponentKit(final ComponentKit componentKit);
 
+	/**@return The identifier for logging to a Data Collection System such as WebTrends, or <code>null</code> if no DCS ID is known.*/
+	public String getDCSID();
+
+	/**Sets the Data Collection Server log identifier.
+	@param dcsID The identifier for logging to a Data Collection System such as WebTrends, or <code>null</code> if no DCS ID is known.
+	*/
+	public void setDCSID(final String dcsID);
+
 	/**Determines the controller appropriate for the given component.
 	A controller class is located by individually looking up the component class hiearchy for registered render strategies, at each checking all installed component kits.
 	@param <GC> The type of Guise context being used.

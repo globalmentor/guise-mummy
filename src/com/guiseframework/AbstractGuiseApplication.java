@@ -139,6 +139,17 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		this.basePath=null;	//remove the base path
 	}
 
+	/**The identifier for logging to a Data Collection System such as WebTrends, or <code>null</code> if no DCS ID is known.*/
+	private String dcsID=null;
+
+		/**@return The identifier for logging to a Data Collection System such as WebTrends, or <code>null</code> if no DCS ID is known.*/
+		public String getDCSID() {return dcsID;}
+
+		/**Sets the Data Collection Server log identifier.
+		@param dcsID The identifier for logging to a Data Collection System such as WebTrends, or <code>null</code> if no DCS ID is known.
+		*/
+		public void setDCSID(final String dcsID) {this.dcsID=dcsID;}
+
 	/**The read-only non-empty list of locales supported by the application, with the first locale the default used if a new session cannot determine the users's preferred locale.*/
 	private List<Locale> locales;
 

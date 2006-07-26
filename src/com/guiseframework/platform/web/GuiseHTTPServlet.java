@@ -105,6 +105,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	public final static String STYLE_INIT_PARAMETER="style";
 	/**The init parameter, "theme", used to specify the theme URIs*/
 	public final static String THEME_INIT_PARAMETER="theme";
+	/**The init parameter, "dcsID", used to specify the WebTrends or other Data Collection System logging identifier.*/
+	public final static String DCS_ID_PARAMETER="dcsID";
 
 	/**The context parameter of the data base directory.*/
 	public final static String DATA_BASE_DIRECTORY_CONTEXT_PARAMETER="dataBaseDirectory";	//TODO rename to dataDirectory
@@ -138,60 +140,6 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 			logFile=new File(getLogDirectory(context), logFilename);	//TODO use a constant
 		}
 		return logFile;	//return the log file
-	}
-
-	private static ELFF elff=null;
-
-	protected static ELFF getELFF()
-	{
-		return elff;
-	}
-	
-	/**The cached ELFF log file, or null if it has not yet been initialized.*/
-	private static File elffLogFile=null;
-
-	/**Determines the ELFF log file.
-	@param context The servlet context from which to retrieve context parameters.
-	@return The file for ELFF logging.
-	@see #getLogDirectory(ServletContext)
-	*/
-	protected static File getELFFLogFile(final ServletContext context)
-	{
-		if(elffLogFile==null)	//if no log file has been determined
-		{
-			final DateFormat logFilenameDateFormat=new W3CDateFormat(W3CDateFormat.Style.DATE);	//create a formatter for the log filename
-			final String logFilename=logFilenameDateFormat.format(new Date())+" elff.log";	//create a filename in the form "date elff.log" TODO use a constant
-			elffLogFile=new File(getLogDirectory(context), logFilename);	//TODO use a constant
-		}
-		return elffLogFile;	//return the log file
-	}
-
-	/**The cached ELFF log writer, or null if it has not yet been initialized.*/
-	private static Writer elffLogWriter=null;
-
-	/**Determines the ELFF writer.
-	@param context The servlet context from which to retrieve context parameters.
-	@return The writer for ELFF logging.
-	@exception IOException if there is an error creating the writer.
-	@see #getELFFLogFile(ServletContext)
-	*/
-	@SuppressWarnings("unchecked")
-	protected static Writer getELFFLogWriter(final ServletContext context) throws IOException
-	{
-		final File elffLogFile=getELFFLogFile(context);	//get the log file
-		synchronized(elffLogFile)	//TODO synhronize on something else when we start automatically generating new log files
-		{
-			if(elffLogWriter==null)	//if no log writer has been determined
-			{
-				final boolean elffLogFileExisted=elffLogFile.exists();	//see if the file already exists 
-				elffLogWriter=new BufferedWriter(new OutputStreamWriter(new FileOutputStream(elffLogFile, true), UTF_8));	//create a buffered, appending writer to the file using UTF-8
-				if(!elffLogFileExisted)	//if we just created the log file
-				{
-					getELFF().logDirectives(elffLogWriter, new NameValuePair<String, String>(ELFF.SOFTWARE_DIRECTIVE, Guise.GUISE_NAME+' '+Guise.BUILD_ID));	//log the directives
-				}
-			}
-		}
-		return elffLogWriter;	//return the log writer		
 	}
 
 	/**The cached data directory, or null if it has not yet been initialized.*/
@@ -308,14 +256,6 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 			throw new ServletException(fileNotFoundException);
 		}
 		setReadOnly(true);	//make this servlet read-only
-		if(elff==null)	//TODO fix ELFF; intialize elsewhere; make this per-application
-		{
-			elff=new ELFF(Field.DATE_FIELD, Field.TIME_FIELD, Field.CLIENT_IP_FIELD, Field.CLIENT_SERVER_USERNAME_FIELD, Field.CLIENT_SERVER_HOST_FIELD,
-					Field.CLIENT_SERVER_METHOD_FIELD, Field.CLIENT_SERVER_URI_STEM_FIELD, Field.CLIENT_SERVER_URI_QUERY_FIELD,
-					Field.SERVER_CLIENT_STATUS_FIELD, Field.CLIENT_SERVER_BYTES_FIELD, Field.CLIENT_SERVER_VERSION_FIELD,
-					Field.CLIENT_SERVER_USER_AGENT_HEADER_FIELD, Field.CLIENT_SERVER_COOKIE_HEADER_FIELD,
-					Field.CLIENT_SERVER_REFERER_HEADER_FIELD, Field.DCS_ID_FIELD);
-		}
 		//TODO turn off directory listings, and/or fix them
 		try
 		{
@@ -390,6 +330,11 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 			guiseApplication.setDefaultLocale(createLocale(defaultLocaleString.trim()));	//create a locale from the default locale string and store it in the application (trimming whitespace just to be extra helpful)
 		}
 */
+		final String dcsID=servletConfig.getInitParameter(DCS_ID_PARAMETER);	//get the DCS ID init parameter, if any
+		if(dcsID!=null)	//if a DCS ID is specified
+		{
+			guiseApplication.setDCSID(dcsID);	//set the application DCS ID			
+		}
 			//initialize the style TODO allow for multiple styles
 		final String styleString=servletConfig.getInitParameter(STYLE_INIT_PARAMETER);	//get the style init parameter, if any
 		if(styleString!=null)	//if a style is specified
@@ -593,48 +538,6 @@ while(headerNames.hasMoreElements())
 */
 				environment.setProperty(WEBTRENDS_ID_COOKIE_NAME, webtrendsIDStringBuilder.toString());	//store the WebTrends ID in the environment, which will be stored in the cookies eventually
 			}
-/*TODO del; moved
-			if(GET_METHOD.equals(request.getMethod()))	//if this is a GET request, log it
-			{
-				final Writer elffLogWriter=getELFFLogWriter(getServletContext());	//get the ELFF log writer
-//TODO del				final ELFF elff=new ELFF(Field.DATE_FIELD, Field.TIME_FIELD);
-
-				final Date now=new Date();
-				final Entry entry=new Entry();
-				entry.setFieldValue(Field.DATE_FIELD, now);
-				entry.setFieldValue(Field.TIME_FIELD, now);
-				entry.setFieldValue(Field.CLIENT_IP_FIELD, request.getRemoteAddr());
-				entry.setFieldValue(Field.CLIENT_SERVER_USERNAME_FIELD, request.getRemoteUser());
-//TODO fix				entry.setFieldValue(Field.CLIENT_SERVER_HOST_FIELD, request.get
-				entry.setFieldValue(Field.CLIENT_SERVER_METHOD_FIELD, request.getMethod());
-				entry.setFieldValue(Field.CLIENT_SERVER_URI_STEM_FIELD, rawPathInfo);
-				final List<NameValuePair<String, String>> queryParameters=new ArrayList<NameValuePair<String, String>>();	//create an array of parameters
-					//WT.js
-				final Boolean isJavaScriptSupported=asInstance(environment.getProperty(GuiseEnvironment.CONTENT_TEXT_JAVASCRIPT_SUPPORTED_PROPERTY), Boolean.class);	//see if the environment knows about Java
-				if(isJavaScriptSupported!=null)	//if JavaScript is supported
-				{
-						//WT.jv
-					queryParameters.add(new NameValuePair<String, String>(JAVASCRIPT_QUERY_ATTRIBUTE_NAME, WebTrendsYesNo.asYesNo(isJavaScriptSupported.booleanValue()).toString()));	//add WT.js as a query parameter
-					final String javascriptVersion=asInstance(environment.getProperty(GuiseEnvironment.CONTENT_TEXT_JAVASCRIPT_VERSION), String.class);	//get the JavaScript version
-					if(javascriptVersion!=null)	//if we know the JavaScript version
-					{
-						queryParameters.add(new NameValuePair<String, String>(JAVASCRIPT_VERSION_QUERY_ATTRIBUTE_NAME, javascriptVersion));	//add WT.jv as a query parameter						
-					}
-				}
-				
-//TODO fix				entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, request.getQueryString());
-//TODO fix cs-status
-//TODO fix cs-bytes
-//TODO fix cs-version
-				entry.setFieldValue(Field.CLIENT_SERVER_USER_AGENT_HEADER_FIELD, getUserAgent(request));
-				entry.setFieldValue(Field.CLIENT_SERVER_COOKIE_HEADER_FIELD, asInstance(environment.getProperty(WEBTRENDS_ID_COOKIE_NAME), String.class));	//store the WebTrends ID cookie as the cookie TODO decide if we want to get general cookies instead of just the WebTrends cookie 
-				entry.setFieldValue(Field.CLIENT_SERVER_REFERER_HEADER_FIELD, getReferer(request));
-				entry.setFieldValue(Field.DCS_ID_FIELD, "dcsqox7ki5aaz8ge1yzei27om_9k8x");	//TODO important: get real DCS ID from configuration
-//TODO fix dcs-id
-				getELFF().log(elffLogWriter, entry);	//write the entry
-			}
-*/
-
 	//TODO del Debug.info("supports Flash: ", guiseSession.getEnvironment().getProperty(GuiseEnvironment.CONTENT_APPLICATION_SHOCKWAVE_FLASH_ACCEPTED_PROPERTY));
 	//TODO del Debug.trace("creating thread group");
 			final GuiseSessionThreadGroup guiseSessionThreadGroup=Guise.getInstance().getThreadGroup(guiseSession);	//get the thread group for this session
@@ -898,10 +801,6 @@ Debug.trace("got control events");
 										environment.setProperty(GuiseEnvironment.CONTENT_TEXT_JAVASCRIPT_SUPPORTED_PROPERTY, Boolean.FALSE);	//indicate that JavaScript isn't supported
 									}
 								}
-									//log this page								
-								final Writer elffLogWriter=getELFFLogWriter(getServletContext());	//get the ELFF log writer
-//							TODO del				final ELFF elff=new ELFF(Field.DATE_FIELD, Field.TIME_FIELD);
-
 								final Date now=new Date();
 								final Entry entry=new Entry();
 								entry.setFieldValue(Field.DATE_FIELD, now);
@@ -954,10 +853,10 @@ Debug.trace("got control events");
 								entry.setFieldValue(Field.CLIENT_SERVER_COOKIE_HEADER_FIELD, webTrendsID!=null ? WEBTRENDS_ID_COOKIE_NAME+"="+webTrendsID : null);	//store the WebTrends ID cookie as the cookie TODO decide if we want to get general cookies instead of just the WebTrends cookie
 //TODO fix referer; this doesn't work in AJAX; we must store the referrer somewhere in the GET request
 								entry.setFieldValue(Field.CLIENT_SERVER_REFERER_HEADER_FIELD, getReferer(request));
-								entry.setFieldValue(Field.DCS_ID_FIELD, "dcsqox7ki5aaz8ge1yzei27om_9k8x");	//TODO important: get real DCS ID from configuration
+								entry.setFieldValue(Field.DCS_ID_FIELD, guiseApplication.getDCSID());	//get the DCS ID from the application, if there is a DCS ID
 //							TODO fix dcs-id
-								getELFF().log(elffLogWriter, entry);	//write the entry
-								
+									//log this page								
+								getGuiseContainer().getELFFLog(guiseApplication).log(entry);	//get the ELFF log writer for this application and log the entry
 							}
 							if(!requestedComponents.isEmpty())	//if components were requested
 							{
