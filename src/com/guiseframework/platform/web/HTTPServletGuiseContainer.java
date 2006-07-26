@@ -85,7 +85,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 			final ELFF elff=applicationELFFMap.get(guiseApplication);	//get the log for this application
 			if(elff==null)	//if there is no ELFF log, the application must not be installed in this container
 			{
-				throw new IllegalStateException("ELFF log not avaialble for Guise application; the Guise application is likely not installed in this container.");	//indicate that the ELFF log for the application couldn't be found
+				throw new IllegalStateException("ELFF log not avaialble for Guise application; the Guise application is likely not installed in the container: "+guiseApplication);	//indicate that the ELFF log for the application couldn't be found
 			}
 			return elff;	//return the ELFF log for the application
 		}

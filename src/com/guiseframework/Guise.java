@@ -29,7 +29,7 @@ public final class Guise
 	public final static String PUBLIC_RESOURCE_BASE_PATH="pub/";
 
 	/**The identifier of this build.*/
-	public final static String BUILD_ID="2006-07-25";
+	public final static String BUILD_ID="2006-07-25a";
 	
 		//Guise ontology
 	
@@ -156,10 +156,17 @@ public final class Guise
 
 	/**Removes a Guise session and associated thread group.
 	@param guiseSession The Guise session to remove.
+	@exception IllegalStateException if the given Guise session is not recognized.
 	*/
 	void removeGuiseSession(final GuiseSession guiseSession)
 	{
-		sessionThreadGroupMap.remove(guiseSession);	//remove the association between the session and the thread group
+		final GuiseSessionThreadGroup guiseSessionThreadGroup=sessionThreadGroupMap.remove(guiseSession);	//remove the association between the session and the thread group, retrieving a reference to the thread group
+		if(guiseSessionThreadGroup==null)	//if there was no thread group associated with this session
+		{
+			throw new IllegalStateException("Unrecognized Guise session; no thread group registered for session: "+guiseSession);
+		}
+			//TODO maybe interrupt the thread group first as a safety precaution to make sure it can be destroyed, but when we reach here there shouldn't be any session-related threads running
+		guiseSessionThreadGroup.destroy();	//destroy the thread group (otherwise it would continue to maintain a reference to the Guise session, causing a memory leak)
 	}
 
 	/**Determines the thread group to use for the given session.
