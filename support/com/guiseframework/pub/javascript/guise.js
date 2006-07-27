@@ -2545,8 +2545,24 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 							{
 								var oldChildNode=oldChildNodeList[i];	//get the old child node
 //TODO del alert("setting index "+i+" selected: "+(childNode.getAttribute("selected")=="selected"));
-
-								oldChildNode.selected=childNode.getAttribute("selected")=="selected";	//update the selected state of this option
+//TODO del; we need an even more elaborate IE6 workaround								oldChildNode.selected=childNode.getAttribute("selected")=="selected";	//update the selected state of this option
+										//TODO maybe see if setting the new selected index could obviate this IE6 workaround workaround
+								var oldSelected=oldChildNode.selected;	//see whether this option is selected
+								var newSelected=childNode.getAttribute("selected")=="selected";	//see whether the option should be selected
+								if(oldSelected!=newSelected)	//if the option doesn't have the correct selected state
+								{
+									try
+									{
+										oldChildNode.selected=newSelected;	//update the selected state
+									}
+									catch(e)	//for some unknown reason, IE6 will sometimes change the selected state (e.g. from true to false) but then throw an exception: "Could not set the specified property. Unspecified error."; perhaps this is caused by hidden controls
+									{
+										if(oldChildNode.selected!=newSelected)	//they change probably succeeded, regardless of the error; if not, rethrow the error
+										{
+											throw e;	//rethrow the error if the change didn't work
+										}
+									}
+								}
 							}
 						}
 //TODO del alert("selected index after: "+oldElement.selectedIndex);
