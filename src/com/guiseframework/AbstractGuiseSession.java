@@ -128,8 +128,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		/**@return The non-thread-safe document builder that parses XML documents for input to RDF.*/
 		private DocumentBuilder getDocumentBuilder() {return documentBuilder;}
 
-	/**The cache of navigation panel types keyed to appplication context-relative paths.*/
-	private final Map<String, NavigationPanel> navigationPathPanelMap=synchronizedMap(new HashMap<String, NavigationPanel>());
+	/**The cache of components keyed to component destinations.*/
+	private final Map<ComponentDestination, Component> destinationComponentMap=synchronizedMap(new HashMap<ComponentDestination, Component>());
 
 	/**The user local environment.*/
 	private GuiseEnvironment environment;
@@ -729,52 +729,75 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	}
 */
 
-	/**Retrieves the panel bound to the given appplication context-relative path.
-	If a panel has already been created and cached, it will be be returned; otherwise, one will be created and cached. 
-	The panel will be given an ID of a modified form of the path.
-	This class synchronizes on {@link #navigationPathPanelMap}.
-	@param path The appplication context-relative path within the Guise container context.
-	@return The panel bound to the given path, or <code>null</code> if no panel is bound to the given path.
-	@exception NullPointerException if the path is <code>null</code>.
-	@exception IllegalArgumentException if the provided path is absolute.
-	@exception IllegalStateException if the panel class bound to the path does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
+	/**Retrieves the component bound to the given destination.
+	If a component has already been created and cached, it will be be returned; otherwise, one will be created and cached. 
+	This method synchronizes on {@link #destinationComponentMap}.
+	@param destination The destination for which a component should be returned.
+	@return The component bound to the given destination.
+	@exception NullPointerException if the destination is <code>null</code>.
+	@exception IllegalStateException if the component class bound to the destination does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
 	*/
-	public NavigationPanel<?> getNavigationPanel(final String path)
+	public Component<?> getDestinationComponent(final ComponentDestination destination)
 	{
-		if(isAbsolutePath(checkInstance(path, "Path cannot be null")))	//if the path is absolute
+		Component component;	//we'll store the component here, either a cached component or a created component
+		synchronized(destinationComponentMap)	//don't allow the map to be modified while we access it
 		{
-			throw new IllegalArgumentException("Navigation path cannot be absolute: "+path);
-		}
-		NavigationPanel panel;	//we'll store the panel here, either a cached panel or a created panel
-		synchronized(navigationPathPanelMap)	//don't allow the map to be modified while we access it
-		{
-			panel=navigationPathPanelMap.get(path);	//get cached panel, if any
-			if(panel==null)	//if no panel is cached
+			component=destinationComponentMap.get(destination);	//get cached component, if any
+			if(component==null)	//if no component is cached
 			{
-				final Destination destination=getApplication().getDestination(path);	//get the destination for this path
-				if(destination!=null)	//if we found a destination for this path
-				{
-//TODO del					final String panelID=XMLUtilities.createName(path);	//convert the path to a valid ID TODO use a Guise-specific routine or, better yet, bind an ID with the panel
-					panel=createNavigationPanel(destination.getNavigationPanelClass());	//create the panel
-					navigationPathPanelMap.put(path, panel);	//bind the panel to the path, caching it for next time
-				}
+//TODO maybe verify that this destination is actually associated with the navigation path for this application				final Destination destination=getApplication().getDestination(path);	//get the destination for this path
+				component=createComponent(destination.getComponentClass());	//create the component
+				destinationComponentMap.put(destination, component);	//bind the component to the path, caching it for next time
 			}
 		}
-		return panel;	//return the panel, or null if we couldn't find a panel
+		return component;	//return the panel, or null if we couldn't find a panel
 	}
 
-	/**Creates the panel for the given class.
-	@param panelClass The class representing the panel to create.
-	@return The created panel.
-	@exception IllegalStateException if the panel class does not provide a default constructor, is an interface, is abstract, or throws an exception during instantiation.
+	/**Releases the component bound to the given destination.
+	@param destination The destination for which any bound component should be released.
+	@return The component previously bound to the given destination, or <code>null</code> if no component was bound to the given destination.
+	@exception NullPointerException if the destination is <code>null</code>.
 	*/
-	protected NavigationPanel<?> createNavigationPanel(final Class<? extends NavigationPanel> panelClass)
+	public Component<?> releaseDestinationComponent(final ComponentDestination destination)
 	{
-		NavigationPanel panel;	//we'll store the panel here
+		return destinationComponentMap.remove(destination);	//uncache the component
+	}
+
+	/**Retrieves the component bound to the given appplication context-relative path.
+	This is a convenience method that retrieves the component associated with the component destination for the given navigation path.
+	This method calls {@link GuiseApplication#getDestination(String)}.
+	This method calls {@link #getDestinationComponent(ComponentDestination)}.
+	@param path The appplication context-relative path within the Guise container context.
+	@return The component bound to the given path. 
+	@exception NullPointerException if the path is <code>null</code>.
+	@exception IllegalArgumentException if the provided path is absolute.
+	@exception IllegalArgumentException if no component is appropriate to associated the given navigation path (i.e. the given navigation path is not associated with a component destination).
+	@exception IllegalStateException if the component class bound to the path does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
+	@see ComponentDestination
+	*/
+	public NavigationPanel<?> getNavigationPanel(final String path)	//TODO rename to getNavigationComponent()
+	{
+		final Destination destination=getApplication().getDestination(path);	//get the destination associated with the given path
+		if(!(destination instanceof ComponentDestination))	//if the destination is not a component destination
+		{
+			throw new IllegalArgumentException("Navigation path "+path+" does not designate a component destination.");
+		}
+		return (NavigationPanel<?>)getDestinationComponent((ComponentDestination)destination);	//return the component TODO remove the cast once a navigation panel is no longer assumed
+	}
+
+
+	/**Creates the component for the given class.
+	@param componentClass The class representing the component to create.
+	@return The created component.
+	@exception IllegalStateException if the component class does not provide a default constructor, is an interface, is abstract, or throws an exception during instantiation.
+	*/
+	protected Component<?> createComponent(final Class<? extends Component> componentClass)
+	{
+		Component component;	//we'll store the component here
 		try
 		{
-			Debug.trace("***ready to create navigation panel for class", panelClass);
-			panel=panelClass.newInstance();	//use the Guise session constructor if there is one					
+//TODO del			Debug.trace("***ready to create component for class", componentClass);
+			component=componentClass.newInstance();	//create a new instance of the component
 		}
 		catch(final IllegalAccessException illegalAccessException)	//if the constructor is not visible
 		{
@@ -784,23 +807,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		{
 			throw new IllegalStateException(instantiationException);
 		}
-		initializeComponent(panel);	//initialize the navigation panel from an RDF description, if possible
-		return panel;	//return the panel
-	}
-	
-	/**Releases the panel bound to the given appplication context-relative path.
-	@param path The appplication context-relative path within the Guise container context.
-	@return The panel previously bound to the given path, or <code>null</code> if no panel was bound to the given path.
-	@exception NullPointerException if the path is <code>null</code>.
-	@exception IllegalArgumentException if the provided path is absolute.
-	*/
-	public NavigationPanel<?> releaseNavigationPanel(final String path)
-	{
-		if(isAbsolutePath(checkInstance(path, "Path cannot be null")))	//if the path is absolute
-		{
-			throw new IllegalArgumentException("Bound navigation path cannot be absolute: "+path);
-		}
-		return navigationPathPanelMap.remove(path);	//uncache the panel
+		initializeComponent(component);	//initialize the component from an RDF description, if possible
+		return component;	//return the component
 	}
 	
 	/**Initializes a component, optionally with a description in an RDF resource file.
@@ -1017,42 +1025,48 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@return true if modality actually ended for the given panel.
 		@see #popModalNavigation()
 		@see Frame#getReferrerURI()
-		@see #releaseNavigationPanel(String)
+		@see #releaseDestinationComponent(String)
 		*/
 		public boolean endModalNavigation(final ModalNavigationPanel<?, ?> modalNavigationPanel)
 		{
 			final String navigationPath=getNavigationPath();	//get our current navigation path
+			final GuiseApplication application=getApplication();	//get the application
 			ModalNavigation modalNavigation=null;	//if we actually end modal navigation, we'll store the information here
-//TODO fix			URI navigationURI=modalPanel.getReferrerURI();	//in the worse case scenario, we'll want to go back to where the modal panel came from, if that's available
-			URI navigationURI=null;	//TODO fix
-			if(navigationPathPanelMap.get(navigationPath)==modalNavigationPanel)	//before we try to actually ending modality, make sure this panel is actually the one at our current navigation path
+			final Destination destination=application.getDestination(navigationPath);	//get the destination for this path TODO maybe add a GuiseSession.getDestination()
+			if(destination instanceof ComponentDestination)	//if we're at a component destination
 			{
-				synchronized(modalNavigationStack)	//don't allow anyone to to access the modal navigation stack while we access it
+				final ComponentDestination componentDestination=(ComponentDestination)destination;	//get the destination as a component destination
+				URI navigationURI=null;	//TODO fix
+	//TODO fix			URI navigationURI=modalPanel.getReferrerURI();	//in the worse case scenario, we'll want to go back to where the modal panel came from, if that's available
+				if(destinationComponentMap.get(componentDestination)==modalNavigationPanel)	//before we try to actually ending modality, make sure this panel is actually the one at our current destination
 				{
-					final ModalNavigation currentModalNavigation=peekModalNavigation();	//see which model navigation is on the top of the stack
-					if(currentModalNavigation!=null)	//if there is a modal navigation currently in use
+					synchronized(modalNavigationStack)	//don't allow anyone to to access the modal navigation stack while we access it
 					{
-						if(getApplication().resolvePath(navigationPath).equals(currentModalNavigation.getNewNavigationURI().getPath()))	//if we're navigating where we expect to be (if we somehow got to here at something other than the modal navigation path, we wouldn't want to remove the current navigation path)
+						final ModalNavigation currentModalNavigation=peekModalNavigation();	//see which model navigation is on the top of the stack
+						if(currentModalNavigation!=null)	//if there is a modal navigation currently in use
 						{
-							modalNavigation=popModalNavigation();	//end the current modal navigation
-							navigationURI=modalNavigation.getOldNavigationURI();	//we'll return to where the current modal navigation came from---that's a better choice
-							final ModalNavigation oldModalNavigation=peekModalNavigation();	//see which model navigation is next on the stack
-							if(oldModalNavigation!=null)	//if there is another modal navigation to go to
+							if(application.resolvePath(navigationPath).equals(currentModalNavigation.getNewNavigationURI().getPath()))	//if we're navigating where we expect to be (if we somehow got to here at something other than the modal navigation path, we wouldn't want to remove the current navigation path)
 							{
-								navigationURI=oldModalNavigation.getOldNavigationURI();	//we're forced to go to the navigation URI of the old modal navigation							
+								modalNavigation=popModalNavigation();	//end the current modal navigation
+								navigationURI=modalNavigation.getOldNavigationURI();	//we'll return to where the current modal navigation came from---that's a better choice
+								final ModalNavigation oldModalNavigation=peekModalNavigation();	//see which model navigation is next on the stack
+								if(oldModalNavigation!=null)	//if there is another modal navigation to go to
+								{
+									navigationURI=oldModalNavigation.getOldNavigationURI();	//we're forced to go to the navigation URI of the old modal navigation							
+								}
 							}
 						}
 					}
 				}
-			}
-			if(navigationURI!=null)	//if we know where to go now that modality has ended
-			{
-				navigate(navigationURI);	//navigate to the new URI
-			}
-			releaseNavigationPanel(navigationPath);	//release the panel associated with this navigation path
-			if(modalNavigation!=null)	//if we if we ended modality for the panel
-			{
-				modalNavigation.getModalListener().modalEnded(new ModalEvent(modalNavigationPanel));	//send an event to the modal listener
+				if(navigationURI!=null)	//if we know where to go now that modality has ended
+				{
+					navigate(navigationURI);	//navigate to the new URI
+				}
+				releaseDestinationComponent(componentDestination);	//release the component associated with this destination
+				if(modalNavigation!=null)	//if we if we ended modality for the panel
+				{
+					modalNavigation.getModalListener().modalEnded(new ModalEvent(modalNavigationPanel));	//send an event to the modal listener
+				}
 			}
 			return modalNavigation!=null;	//return whether we ended modality
 		}

@@ -358,24 +358,35 @@ public interface GuiseSession extends PropertyBindable
 	*/
 //TODO del if not needed	public boolean hasNavigationPanel(final String path);
 	
-	/**Retrieves the panel bound to the given appplication context-relative path.
-	If a panel has already been created and cached, it will be be returned; otherwise, one will be created and cached. 
-	The panel will be given an ID of a modified form of the path.
-	@param path The appplication context-relative path within the Guise container context.
-	@return The panel bound to the given path, or <code>null</code> if no panel is bound to the given path.
-	@exception NullPointerException if the path is null.
-	@exception IllegalArgumentException if the provided path is absolute.
-	@exception IllegalStateException if the panel class bound to the path does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
+	/**Retrieves the component bound to the given destination.
+	If a component has already been created and cached, it will be be returned; otherwise, one will be created and cached. 
+	@param destination The destination for which a component should be returned.
+	@return The component bound to the given destination.
+	@exception NullPointerException if the destination is <code>null</code>.
+	@exception IllegalStateException if the component class bound to the destination does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
 	*/
-	public NavigationPanel<?> getNavigationPanel(final String path);
-	
-	/**Releases the panel bound to the given appplication context-relative path.
+	public Component<?> getDestinationComponent(final ComponentDestination destination);
+
+	/**Releases the component bound to the given destination.
+	@param destination The destination for which any bound component should be released.
+	@return The component previously bound to the given destination, or <code>null</code> if no component was bound to the given destination.
+	@exception NullPointerException if the destination is <code>null</code>.
+	*/
+	public Component<?> releaseDestinationComponent(final ComponentDestination destination);
+
+	/**Retrieves the component bound to the given appplication context-relative path.
+	This is a convenience method that retrieves the component associated with the component destination for the given navigation path.
+	This method calls {@link GuiseApplication#getDestination(String)}.
+	This method calls {@link #getDestinationComponent(ComponentDestination)}.
 	@param path The appplication context-relative path within the Guise container context.
-	@return The panel previously bound to the given path, or <code>null</code> if no panel was bound to the given path.
+	@return The component bound to the given path. 
 	@exception NullPointerException if the path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
+	@exception IllegalArgumentException if no component is appropriate to associated the given navigation path (i.e. the given navigation path is not associated with a component destination).
+	@exception IllegalStateException if the component class bound to the path does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
+	@see ComponentDestination
 	*/
-	public NavigationPanel<?> releaseNavigationPanel(final String path);
+	public NavigationPanel<?> getNavigationPanel(final String path);
 
 	/**@return Whether the session is in a modal navigation state.*/
 	public boolean isModalNavigation();
@@ -399,7 +410,7 @@ public interface GuiseSession extends PropertyBindable
 	@param modalNavigationPanel The panel for which modal navigation state should be ended.
 	@return true if modality actually ended for the given panel.
 	@see Frame#getReferrerURI()
-	@see #releaseNavigationPanel(String)
+	@see #releaseDestinationComponent(String)
 	*/
 	public boolean endModalNavigation(final ModalNavigationPanel<?, ?> modalNavigationPanel);
 

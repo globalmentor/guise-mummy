@@ -437,7 +437,7 @@ Debug.trace(RDFUtilities.toString(theme));
 				{
 					throw new IllegalArgumentException("Incorrect initialization parameter path/panel class binding URI "+initParameterValue+" for "+initParameterName, uriSyntaxException);
 				}
-				final Destination destination=new DefaultDestination(path, navigationPanelClass, styleURI);	//create a new destination
+				final Destination destination=new ComponentDestination(path, navigationPanelClass, styleURI);	//create a new destination
 				guiseApplication.setDestination(path, destination);	//set the destination for this path				
 			}
 		}
@@ -655,8 +655,9 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
 		final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
 		final Destination destination=guiseApplication.getDestination(navigationPath);	//get the destination, if any, associated with the requested path
-		if(destination!=null)	//if we have a destination associated with the requested path
+		if(destination instanceof ComponentDestination)	//if we have a component destination associated with the requested path TODO add support for other types of destinations
 		{
+			final ComponentDestination componentDestination=(ComponentDestination)destination;	//get the destination as a component destination
 //		TODO del Debug.trace("have destination; creating context");
 			final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, destination, request, response);	//create a new Guise context
 //		TODO del Debug.trace("got context");
@@ -684,8 +685,8 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 					final Bookmark oldBookmark=isAJAX ? guiseSession.getBookmark() : navigationBookmark;	//get the original bookmark, which will be the one requested in navigation (which we'll soon set) if this is a normal HTTP GET/POST
 //TODO del Debug.trace("navigation bookmark:", navigationBookmark, "old bookmark:", oldBookmark, "session bookmark:", guiseSession.getBookmark(), "is AJAX:", isAJAX);
 					final Principal oldPrincipal=guiseSession.getPrincipal();	//get the old principal
-					final NavigationPanel navigationPanel=guiseSession.getNavigationPanel(navigationPath);	//get the panel bound to the requested path
-					assert navigationPanel!=null : "No navigation panel found, even though we found a valid destination.";
+					final Component<?> destinationComponent=guiseSession.getDestinationComponent(componentDestination);	//get the component bound to the requested destination
+					assert destinationComponent!=null : "No component found, even though we found a valid destination.";
 					final ApplicationFrame<?> applicationFrame=guiseSession.getApplicationFrame();	//get the application frame
 //TODO del Debug.trace("ready to get control events");
 					final List<ControlEvent> controlEvents=getControlEvents(request, guiseSession);	//get all control events from the request
@@ -700,7 +701,7 @@ Debug.trace("got control events");
 					else	//if this is not an AJAX request
 					{
 //TODO del Debug.trace("this is not AJAX, with method:", request.getMethod(), "content type", contentType, "guise POST?", isGuisePOST);
-						applicationFrame.setContent(navigationPanel);	//place the navigation panel in the application frame
+						applicationFrame.setContent(destinationComponent);	//place the component in the application frame
 						setNoCache(request, response);	//make sure the response is not cached TODO should we do this for AJAX responses as well?				
 						final String referrer=getReferer(request);	//get the request referrer, if any
 						final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
@@ -747,7 +748,7 @@ Debug.trace("got control events");
 								{
 									if(formControlEvent.getParameterListMap().size()>0)	//only process the event if there were submitted values---especially important for radio buttons and checkboxes, which must assume a value of false if nothing is submitted for them, thereby updating the model
 									{
-										requestedComponents.add(navigationPanel);	//we'll give the event to the entire navigation panel
+										requestedComponents.add(destinationComponent);	//we'll give the event to the entire destination component
 									}
 								}
 								else	//if this is only a partial form submission
@@ -1505,10 +1506,17 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	*/
 	protected void beginModalNavigation(final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ModalNavigation modalNavigation)
 	{
-		final ModalNavigationPanel<?, ?> modalPanel=(ModalNavigationPanel<?, ?>)guiseSession.getNavigationPanel(guiseApplication.relativizeURI(modalNavigation.getNewNavigationURI()));	//get the modal frame for this navigation path
-		if(modalPanel!=null)	//if we have a modal frame
+		final String navigationPath=guiseApplication.relativizeURI(modalNavigation.getNewNavigationURI());	//get the navigation path for the modal navigation
+		final Destination destination=guiseApplication.getDestination(navigationPath);	//get the destination for this path TODO maybe add a GuiseSession.getDestination()
+		if(destination instanceof ComponentDestination)	//if the destination is a component destination
 		{
-			guiseSession.beginModalNavigation(modalPanel, modalNavigation);
+			final ComponentDestination componentDestination=(ComponentDestination)destination;	//get the destination as a component destination
+			final Component<?> destinationComponent=guiseSession.getDestinationComponent(componentDestination);	//get the component for this destination
+			if(destinationComponent instanceof ModalNavigationPanel)	//if the component is a modal navigatoin panel, as we expect
+			{
+				final ModalNavigationPanel<?, ?> modalPanel=(ModalNavigationPanel<?, ?>)destinationComponent;	//get the destination component as a modal panel
+				guiseSession.beginModalNavigation(modalPanel, modalNavigation);	//begin modal navigation with the panel
+			}
 		}
 	}
 
