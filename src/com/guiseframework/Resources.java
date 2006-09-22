@@ -2,6 +2,7 @@ package com.guiseframework;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import com.garretwilson.rdf.*;
@@ -43,10 +44,11 @@ public class Resources extends ClassTypedRDFResource
 		super(referenceURI);  //construct the parent class
 	}
 
-	/**Creates a resource bundle with contents reflecting these resources.
+	/**Creates a map with contents reflecting these resources.
 	@param parent The parent resource bundle, or <code>null</code> if there should be no parent for resolving resources.
+	@return A map with contents reflecting the property/value pairs.
 	*/
-	public ResourceBundle toResourceBundle(final ResourceBundle parent)
+	public Map<String, Object> toMap()	//TODO transfer to RDFResource class
 	{
 		final HashMap<String, Object> resourceHashMap=new HashMap<String, Object>(getPropertyCount());	//create a new hash map with enough initial room for all properties
 		for(final RDFPropertyValuePair propertyValuePair:getProperties())	//for each resource property/value pair
@@ -72,7 +74,16 @@ public class Resources extends ClassTypedRDFResource
 				}				
 			}
 		}
-		return new HashMapResourceBundle(resourceHashMap, parent);	//create a new hash map resource bundle with the given parent and return it		
+		return resourceHashMap;	//return the map		
+	}
+
+	/**Creates a resource bundle with contents reflecting these resources.
+	@param parent The parent resource bundle, or <code>null</code> if there should be no parent for resolving resources.
+	@return A resource bundle with contents reflecting the property/value pairs, resolving to the given parent.
+	*/
+	public ResourceBundle toResourceBundle(final ResourceBundle parent)
+	{
+		return new HashMapResourceBundle(toMap(), parent);	//create a new hash map resource bundle with the given parent and return it		
 	}
 
 	/**Creates a string containing a reference to the given string resource key.

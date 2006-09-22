@@ -23,7 +23,9 @@ import static com.guiseframework.GuiseResourceConstants.*;
 
 import com.garretwilson.rdf.RDFResourceIO;
 import com.garretwilson.util.Debug;
+import com.garretwilson.util.HashMapResourceBundle;
 import com.garretwilson.util.ResourceBundleUtilities;
+import com.garretwilson.util.SoftValueHashMap;
 import com.guiseframework.component.*;
 import com.guiseframework.component.kit.ComponentKit;
 import com.guiseframework.context.GuiseContext;
@@ -817,6 +819,9 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		}
 	}
 
+	/**A synchronized cache of softly-referenced resource maps keyed to resource bundle URIs.*/
+	private final static Map<URI, Map<String, Object>> cachedResourceMapMap=synchronizedMap(new SoftValueHashMap<URI, Map<String, Object>>());
+
 	/**Loads a resource bundle from the given URI.
 	@param resourceBundleURI The URI of the resource bundle to load.
 	@param parentResourceBundle The resource bundle to serve as the parent, or <code>null</code> if there is no parent resource bundle.
@@ -825,17 +830,28 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	*/
 	protected ResourceBundle loadResourceBundle(final URI resourceBundleURI, ResourceBundle parentResourceBundle) throws IOException
 	{
-			//TODO make sure this is an RDF file; if not, load the properties from the properties file
-		final InputStream resourcesInputStream=new BufferedInputStream(getInputStream(resourceBundleURI));	//get a buffered input stream to the resources
-		try
+		Map<String, Object> resourceMap=cachedResourceMapMap.get(resourceBundleURI);	//see if we already have a map representing the resources in the bundle TODO first check to see if the file has changed
+		if(resourceMap==null)	//if there is no cached resource map; don't worry about the benign race condition, which at worst will cause the resource bundle to be loaded more than once; blocking would be less efficient
 		{
-			final Resources resources=getResourcesIO().read(resourcesInputStream, resourceBundleURI);	//load the resources
-			return resources.toResourceBundle(parentResourceBundle);	//get a resource bundle from the resources, indicating the resolving parent
+Debug.info("resource bundle cache miss for", resourceBundleURI);
+				//TODO make sure this is an RDF file; if not, load the properties from the properties file
+			final InputStream resourcesInputStream=new BufferedInputStream(getInputStream(resourceBundleURI));	//get a buffered input stream to the resources
+			try
+			{
+				final Resources resources=getResourcesIO().read(resourcesInputStream, resourceBundleURI);	//load the resources
+				resourceMap=resources.toMap();	//generate a map from the resources
+				cachedResourceMapMap.put(resourceBundleURI, resourceMap);	//cache the map for later
+			}
+			finally
+			{
+				resourcesInputStream.close();	//always close the resources input stream
+			}
 		}
-		finally
+		else	//TODO del
 		{
-			resourcesInputStream.close();	//always close the resources input stream
-		}				
+			Debug.info("resource bundle cache hit for", resourceBundleURI);			
+		}
+		return new HashMapResourceBundle(resourceMap, parentResourceBundle);	//create a new hash map resource bundle with resources and the given parent and return it		
 	}
 	
 	/**Looks up a principal from the given ID.
