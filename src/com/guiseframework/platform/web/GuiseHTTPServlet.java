@@ -489,7 +489,8 @@ Debug.trace("applicationContextPath", guiseApplicationContextPath);
 	public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
 	{
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
-Debug.trace("method:", request.getMethod(), "raw path info:", rawPathInfo);
+Debug.info("method:", request.getMethod(), "raw path info:", rawPathInfo);
+//TODO del Debug.info("user agent:", getUserAgent(request));
 final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
 Debug.info("before service request: memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
 try

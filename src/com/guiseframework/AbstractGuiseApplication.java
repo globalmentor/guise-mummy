@@ -833,7 +833,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		Map<String, Object> resourceMap=cachedResourceMapMap.get(resourceBundleURI);	//see if we already have a map representing the resources in the bundle TODO first check to see if the file has changed
 		if(resourceMap==null)	//if there is no cached resource map; don't worry about the benign race condition, which at worst will cause the resource bundle to be loaded more than once; blocking would be less efficient
 		{
-Debug.info("resource bundle cache miss for", resourceBundleURI);
+//TODO del Debug.info("resource bundle cache miss for", resourceBundleURI);
 				//TODO make sure this is an RDF file; if not, load the properties from the properties file
 			final InputStream resourcesInputStream=new BufferedInputStream(getInputStream(resourceBundleURI));	//get a buffered input stream to the resources
 			try
@@ -847,10 +847,12 @@ Debug.info("resource bundle cache miss for", resourceBundleURI);
 				resourcesInputStream.close();	//always close the resources input stream
 			}
 		}
+/*TODO del
 		else	//TODO del
 		{
 			Debug.info("resource bundle cache hit for", resourceBundleURI);			
 		}
+*/
 		return new HashMapResourceBundle(resourceMap, parentResourceBundle);	//create a new hash map resource bundle with resources and the given parent and return it		
 	}
 	

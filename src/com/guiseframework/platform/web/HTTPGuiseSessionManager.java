@@ -1,10 +1,15 @@
 package com.guiseframework.platform.web;
 
 import java.util.*;
+
 import static java.util.Collections.*;
 
 import javax.servlet.http.*;
 
+import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.servlet.http.HttpServletUtilities.*;
+
+import com.garretwilson.util.Debug;
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.GuiseSession;
 
@@ -20,6 +25,8 @@ public class HTTPGuiseSessionManager implements HttpSessionListener
 	/**The synchronized map of Guise containers keyed to HTTP sessions.*/
 	private static final Map<HttpSession, HTTPServletGuiseContainer> guiseContainerMap=synchronizedMap(new HashMap<HttpSession, HTTPServletGuiseContainer>());
 
+	private static HttpSession spiderSession=null;	//TODO fix to be separate for each application; testing
+	
 	/**Retrieves a session for the given HTTP session.
 	This method can only be accessed by classes in the same package.
 	@param guiseContainer The Guise container that owns the application. 
@@ -30,7 +37,29 @@ public class HTTPGuiseSessionManager implements HttpSessionListener
 	*/
 	protected static GuiseSession getGuiseSession(final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final HttpServletRequest httpRequest)
 	{
-		final HttpSession httpSession=httpRequest.getSession();	//get the current HTTP session from the HTTP request
+//TODO del Debug.trace("requested session ID: ", httpRequest.getRequestedSessionId());
+		HttpSession httpSession=httpRequest.getSession(false);	//get the current HTTP session from the HTTP request, if there is a session
+		if(httpSession==null)	//if there is no session yet for this request, we'll create one
+		{
+			final Map<String, Object> userAgentProperties=getUserAgentProperties(httpRequest);	//get user agent-related properties TODO have the method cache these in the request
+			final String userAgentName=asInstance(userAgentProperties.get(USER_AGENT_NAME_PROPERTY), String.class);	//get the user agent name
+			final boolean isSpider=UNSESSIONED_SPIDER_USER_AGENT_NAMES.contains(userAgentName);	//see if the user agent is a spider that does not support sessions
+				//if this isn't a spider, we have no existing spider session, or the existing spider session is almost expired, create a session
+			if(!isSpider || spiderSession==null || (spiderSession.getLastAccessedTime()-System.currentTimeMillis())/1000>spiderSession.getMaxInactiveInterval()-2)
+			{
+//TODO del Debug.info("creating session for user agent name", userAgentName);
+				httpSession=httpRequest.getSession(true);	//create a new HTTP session for the HTTP request
+				if(isSpider)	//if we just created a session for a spider
+				{
+					spiderSession=httpSession;	//store the spider session for future sharing
+				}
+			}
+			else	//if this is a spider and we have a spider session
+			{
+//TODO del Debug.info("using spider session for user agent name", userAgentName);
+				httpSession=spiderSession;	//use the spider session
+			}
+		}
 		guiseContainerMap.put(httpSession, guiseContainer);	//store our Guise container so we'll know with which container this session is associated (this servlet may serve many Guise applications in many Guise containers in the web application)
 		return guiseContainer.getGuiseSession(guiseApplication, httpRequest, httpSession);	//ask the Guise application for a Guise session corresponding to the HTTP session
 	}
