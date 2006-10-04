@@ -87,7 +87,7 @@ var isSafari=navigator.userAgent.indexOf("Safari")>=0;	//TODO use a better varia
 var XHTML_NAMESPACE_URI="http://www.w3.org/1999/xhtml";
 
 /**The URI of the GuiseML namespace.*/
-//TODO use var GUISE_ML_NAMESPACE_URI="http://guiseframework.com/id/ml#";
+var GUISE_ML_NAMESPACE_URI="http://guiseframework.com/id/ml#";
 
 /**The class prefix of a menu.*/
 //TODO del when works var MENU_CLASS_PREFIX="menu-";
@@ -1301,6 +1301,103 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 	
 };
 
+//add correct support for namespace-aware DOM methods
+if(document.documentElement.getAttributeNS)	//if this DOM supports element.getAttributeNS()
+{
+
+	/**Retrieves a namespaced attribute value from an element using the DOM element.getAttributeNS() method.
+	This method correctly returns the empty string ("") as specified by the DOM, regardless of whether the underlying implementation returns "" or null.
+	@param element The element the attribute value of which to retrieve.
+	@param namespaceURI The string designating the namespace of the attribute, or null for no namespace.
+	@param localName The local name of the attribute.
+	@return The value of the namespaced attribute, or "" if the attribute is not defined.
+	*/
+	DOMUtilities.getAttributeNS=function(element, namespaceURI, localName)
+	{
+		var value=element.getAttributeNS(namespaceURI, localName);	//get the attribute value
+		return value ? value : "";	//return "" instead of null
+	};
+}
+else	//if this DOM doesn't support element.getAttributeNS()
+{
+
+	/**Retrieves a namespaced attribute value from an element using the DOM element.getAttribute() method.
+	This method correctly returns the empty string ("") as specified by the DOM, regardless of whether the underlying implementation returns "" or null.
+	This implementation looks up the prefix from the given namespace; therefore only namespaces recognized by Guise are valid.
+	This version assumes that any non-null namespace is that designated by GUISE_ML_NAMESPACE_URI, for which the prefix "guise" will be used.
+	@param element The element the attribute value of which to retrieve.
+	@param namespaceURI The string designating the namespace of the attribute, or null for no namespace.
+	@param localName The local name of the attribute.
+	@return The value of the namespaced attribute, or "" if the attribute is not defined.
+	*/
+	DOMUtilities.getAttributeNS=function(element, namespaceURI, localName)
+	{
+		var value=element.getAttribute(namespaceURI!=null ? "guise:"+localName : localName);	//get the attribute value using the correct prefix TODO use a constant
+		return value ? value : "";	//return "" instead of null
+	};
+
+}
+
+if(document.documentElement.removeAttributeNS)	//if this DOM supports element.removeAttributeNS (such as Safari)
+{
+
+	/**Removes a namespaced attribute from an element using the DOM element.removeAttributeNS() method.
+	@param element The element the attribute of which to remove.
+	@param namespaceURI The string designating the namespace of the attribute, or null for no namespace.
+	@param localName The local name of the attribute.
+	*/
+	DOMUtilities.removeAttributeNS=function(element, namespaceURI, localName)
+	{
+		element.removeAttributeNS(namespaceURI, localName);	//remove the attribute
+	};
+}
+else	//if this DOM doesn't support element.getAttributeNS()
+{
+
+	/**Removes a namespaced attribute from an element using the DOM element.removeAttribute() method.
+	This implementation looks up the prefix from the given namespace; therefore only namespaces recognized by Guise are valid.
+	This version assumes that any non-null namespace is that designated by GUISE_ML_NAMESPACE_URI, for which the prefix "guise" will be used.
+	@param element The element the attribute of which to remove.
+	@param namespaceURI The string designating the namespace of the attribute, or null for no namespace.
+	@param localName The local name of the attribute.
+	*/
+	DOMUtilities.removeAttributeNS=function(element, namespaceURI, localName)
+	{
+		element.removeAttribute(namespaceURI!=null ? "guise:"+localName : localName);	//remove the attribute using the correct prefix TODO use a constant
+	};
+
+}
+
+if(document.documentElement.setAttributeNS)	//if this DOM supports element.setAttributeNS()
+{
+
+	/**Sets a namespaced attribute of an element using the DOM element.setAttributeNS() method.
+	@param element The element the attribute of which to set.
+	@param namespaceURI The string designating the namespace of the attribute, or null for no namespace.
+	@param qualifiedName The qualifiedName of the attribute.
+	@param value The new value of the attribute.
+	*/
+	DOMUtilities.setAttributeNS=function(element, namespaceURI, qualifiedName, value)
+	{
+		element.setAttributeNS(namespaceURI, qualifiedName, value);	//set the attribute value
+	};
+}
+else	//if this DOM doesn't support element.getAttributeNS()
+{
+
+	/**Removes a namespaced attribute from an element using the DOM element.removetAttribute() method.
+	@param element The element the attribute of which to set.
+	@param namespaceURI The string designating the namespace of the attribute, or null for no namespace.
+	@param qualifiedName The qualifiedName of the attribute.
+	*/
+	DOMUtilities.setAttributeNS=function(element, namespaceURI, qualifiedName, value)
+	{
+		element.setAttribute(qualifiedName, value);	//set the attribute value without using a namespace
+	};
+
+}
+
+
 //Initialization AJAX Event
 
 /**A class indicating an initialization AJAX request.
@@ -2217,7 +2314,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 			var parentNode=element.parentNode;	//get the element's parent
 			if(parentNode!=null && parentNode.nodeType==Node.ELEMENT_NODE && parentNode.nodeName.toLowerCase()!="table")	//if there is a parent element (IE6 crashes if we even check an attribute of TABLE)
 			{
-				parentNode.removeAttribute("guise:contentHash");	//indicate that the children have changed TODO use a constant
+				DOMUtilities.removeAttributeNS(parentNode, GUISE_ML_NAMESPACE_URI, "contentHash");	//indicate that the children have changed TODO use a constant
 				this.invalidateAncestorContent(parentNode);	//invalidate the rest of the ancestors
 			}
 		};
@@ -2238,8 +2335,8 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 			}
 */
 				//get the content hash attributes before we update the attributes
-			var oldElementContentHash=oldElement.getAttribute("guise:contentHash");	//get the old element's content hash, if any TODO use a constant
-			var newElementContentHash=element.getAttribute("guise:contentHash");	//get the new element's content hash, if any TODO use a constant
+			var oldElementContentHash=DOMUtilities.getAttributeNS(oldElement, GUISE_ML_NAMESPACE_URI, "contentHash");	//get the old element's content hash, if any TODO use a constant
+			var newElementContentHash=DOMUtilities.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "contentHash");	//get the new element's content hash, if any TODO use a constant
 /*TODO del
 			if(oldElementContentHash==newElementContentHash)	//TODO del; testing
 			{
@@ -2248,8 +2345,8 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 			}
 */
 
-			var oldElementAttributeHash=oldElement.getAttribute("guise:attributeHash");	//get the old element's attribute hash, if any TODO use a constant
-			var newElementAttributeHash=element.getAttribute("guise:attributeHash");	//get the new element's attribute hash, if any TODO use a constant
+			var oldElementAttributeHash=DOMUtilities.getAttributeNS(oldElement, GUISE_ML_NAMESPACE_URI, "attributeHash");	//get the old element's attribute hash, if any TODO use a constant
+			var newElementAttributeHash=DOMUtilities.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "attributeHash");	//get the new element's attribute hash, if any TODO use a constant
 			var isAttributesChanged=oldElementAttributeHash!=newElementAttributeHash;	//see if the attributes have changed (this doesn't count for the content hash attribute, which we'll check separately)
 			if(isAttributesChanged)	//if the attribute hash values are different
 			{
@@ -2292,7 +2389,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 					{
 						if(attributeName=="value")	//if this is the value attribute
 						{
-							var patchType=element.getAttribute("guise:patchType");	//get the patch type TODO use a constant
+							var patchType=DOMUtilities.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "patchType");	//get the patch type TODO use a constant
 							if(patchType=="novalue")	//if we should ignore the value attribute
 							{
 								continue;	//go to the next attribute
@@ -2371,11 +2468,11 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 				{
 					if(newElementContentHash)	//if there is a content hash
 					{
-						oldElement.setAttribute("guise:contentHash", newElementContentHash);	//update the content hash attribute manually TODO use a constant
+						DOMUtilities.setAttributeNS(oldElement, GUISE_ML_NAMESPACE_URI, "guise:contentHash", newElementContentHash);	//update the content hash attribute manually TODO use a constant
 					}
 					else	//if there is no longer a content hash
 					{
-						oldElement.removeAttribute("guise:contentHash");	//remove the content hash attribute TODO use a constant
+						DOMUtilities.removeAttributeNS(oldElement, GUISE_ML_NAMESPACE_URI, "contentHash");	//remove the content hash attribute TODO use a constant
 					}
 					if(isRoot)	//if this is the root of the synchronization
 					{
@@ -3882,8 +3979,8 @@ function initializeNode(node, deep, initialInitialization)
 						}
 						break;
 					case "img":
-						var rolloverSrc=node.getAttribute("guise:rolloverSrc");	//get the image rollover, if there is one TODO use a constant
-						if(rolloverSrc!=null)	//if the image has a rollover TODO use a constant
+						var rolloverSrc=DOMUtilities.getAttributeNS(node, GUISE_ML_NAMESPACE_URI, "rolloverSrc");	//get the image rollover, if there is one TODO use a constant
+						if(rolloverSrc)	//if the image has a rollover TODO use a constant; maybe use hasAttributeNS()
 						{
 							guise.loadImage(rolloverSrc);	//preload the image
 							if(!DOMUtilities.hasClassName(node, STYLES.MOUSE_LISTENER))	//if this is not a mouse listener (which would get a onMouse listener registered, anyway)
@@ -4222,7 +4319,7 @@ function onTextInputChange(event)
 	if(AJAX_ENABLED)	//if AJAX is enabled
 	{
 		var textInput=event.currentTarget;	//get the control in which text changed
-		textInput.removeAttribute("guise:attributeHash");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+		DOMUtilities.removeAttributeNS(textInput, GUISE_ML_NAMESPACE_URI, "attributeHash");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
 		guiseAJAX.invalidateAncestorContent(textInput);	//indicate that the ancestors now have different content
 	//TODO del alert("an input changed! "+textInput.id);
 		var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value));	//create a new form request with the control name and value
@@ -4460,7 +4557,7 @@ function onCheckInputChange(event)
 				for(var i=groupCheckInputs.length-1; i>=0; --i)	//for each check
 				{
 					var groupCheckInput=groupCheckInputs[i];	//get this group check
-					groupCheckInput.removeAttribute("guise:attributeHash");	//the checked status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+					DOMUtilities.removeAttributeNS(groupCheckInput, GUISE_ML_NAMESPACE_URI, "attributeHash");	//the checked status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
 					guiseAJAX.invalidateAncestorContent(groupCheckInput);	//indicate that the ancestors now have different content
 				}
 			}
@@ -4468,7 +4565,7 @@ function onCheckInputChange(event)
 	}
 	if(!invalidated)	//if we didn't invalidate this checkbox
 	{
-		checkInput.removeAttribute("guise:attributeHash");	//the checked status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+		DOMUtilities.removeAttributeNS(checkInput, GUISE_ML_NAMESPACE_URI, "attributeHash");	//the checked status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
 		guiseAJAX.invalidateAncestorContent(checkInput);	//indicate that the ancestors now have different content
 	}
 	if(AJAX_ENABLED)	//if AJAX is enabled
@@ -4512,7 +4609,7 @@ function onSelectChange(event)
 			var option=options[i];	//get this option
 			if(option.selected)	//if this option is selected
 			{
-				option.removeAttribute("guise:attributeHash");	//the option selected status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+				DOMUtilities.removeAttributeNS(option, GUISE_ML_NAMESPACE_URI, "attributeHash");	//the option selected status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
 				guiseAJAX.invalidateAncestorContent(option);	//indicate that the ancestors now have different content
 					//TODO dirty the unselected option
 				ajaxRequest.parameters[selectName]=option.value;	//add the control name and value as a parameter
@@ -4901,8 +4998,8 @@ function onMouse(event)
 	}
 	if(target.nodeName.toLowerCase()=="img")	//if this is an image, perform rollovers if needed
 	{
-		var rolloverSrc=target.getAttribute("guise:rolloverSrc");	//get the image rollover, if there is one
-		if(rolloverSrc!=null)	//if the image has a rollover TODO use a constant
+		var rolloverSrc=DOMUtilities.getAttributeNS(target, GUISE_ML_NAMESPACE_URI, "rolloverSrc");	//get the image rollover, if there is one
+		if(rolloverSrc)	//if the image has a rollover TODO use a constant; maybe use hasAttributeNS()
 		{
 			switch(event.type)	//see which type of mouse event this is
 			{
@@ -4910,7 +5007,7 @@ function onMouse(event)
 					target.src=rolloverSrc;	//switch to the rollover image
 					break;
 				case "mouseout":	//if we are rolling off the image TODO use a constant
-					target.src=target.getAttribute("guise:originalSrc");	//switch back to the original source TODO use a constant
+					target.src=DOMUtilities.getAttributeNS(target, GUISE_ML_NAMESPACE_URI, "originalSrc");	//switch back to the original source TODO use a constant
 					break;
 			}
 		}
