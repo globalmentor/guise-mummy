@@ -11,7 +11,7 @@ import com.garretwilson.util.HashMapResourceBundle;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
-import static com.garretwilson.rdf.RDFUtilities.*;
+//TODO bring back when RDFResource.getNamespaceURI() and RDFResource.getLocalName() are removed: import static com.garretwilson.rdf.RDFUtilities.*;
 import static com.garretwilson.text.TextUtilities.*;
 import static com.guiseframework.Guise.*;
 
@@ -55,9 +55,9 @@ public class Resources extends ClassTypedRDFResource
 		{
 			final RDFResource property=propertyValuePair.getProperty();	//get the property
 			final URI propertyURI=property.getReferenceURI();	//get the property URI
-			if(propertyURI!=null && RESOURCE_NAMESPACE_URI.equals(getNamespaceURI(propertyURI)))	//if this property is in the resourceKey namespace
+			if(propertyURI!=null && RESOURCE_NAMESPACE_URI.equals(RDFUtilities.getNamespaceURI(propertyURI)))	//if this property is in the resourceKey namespace
 			{
-				final String resourceKey=getLocalName(propertyURI);	//use the local name as the resource key
+				final String resourceKey=RDFUtilities.getLocalName(propertyURI);	//use the local name as the resource key
 				Object value=null;	//we'll store the resource value here
 				final RDFObject propertyValue=propertyValuePair.getValue();	//get the value
 				if(propertyValue instanceof RDFResource)	//if the property value is a resource
