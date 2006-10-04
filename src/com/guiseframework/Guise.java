@@ -29,7 +29,7 @@ public final class Guise
 	public final static String PUBLIC_RESOURCE_BASE_PATH="pub/";
 
 	/**The identifier of this build.*/
-	public final static String BUILD_ID="2006-09-28";
+	public final static String BUILD_ID="2006-10-04";
 	
 		//Guise ontology
 	
@@ -43,7 +43,7 @@ public final class Guise
 			//property names
 	/**The spine of a book. The local name of xeb:spine.*/
 //TODO fix	public final static String SPINE_PROPERTY_NAME="spine";
-	
+
 	/**The singleton instance of Guise.*/
 	private static Guise instance=null;
 
