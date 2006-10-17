@@ -3,10 +3,12 @@ package com.guiseframework;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
 
+import com.garretwilson.beans.BoundPropertyObject;
+
 /**Abstract implementation of a navigation point, its properties, and its restrictions.
 @author Garret Wilson
 */
-public abstract class AbstractDestination implements Destination
+public abstract class AbstractDestination extends BoundPropertyObject implements Destination
 {
 
 	/**The appplication context-relative path within the Guise container context, which does not begin with '/'.*/

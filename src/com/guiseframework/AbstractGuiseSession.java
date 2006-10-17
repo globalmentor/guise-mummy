@@ -907,7 +907,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 				final RDFResource componentResource=RDFUtilities.getResourceByType(rdf, componentResourceTypeURI);	//try to locate the description of the given component
 				if(componentResource!=null)	//if there is a resource description of a matching type
 				{
-					final PLOOPProcessor ploopProcessor=new PLOOPProcessor(this);	//create a new PLOOP processor, passing the Guise session to use as a default constructor argument					
+					final PLOOPProcessor ploopProcessor=new PLOOPProcessor(this);	//create a new PLOOP processor, passing the Guise session to use as a default constructor argument
 					ploopProcessor.initializeObject(component, componentResource);	//initialize the component from this resource
 					component.initialize();	//initialize the component
 					final List<Object> objects=ploopProcessor.getObjects(rdf);	//make sure all described Java objects in the RDF instance have been created

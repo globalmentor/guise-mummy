@@ -38,7 +38,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 {
 
 	/**The absolute path, relative to the servlet context, of the resources directory.*/
-	public final static String RESOURCES_DIRECTORY_PATH=ROOT_PATH+WEB_INF_DIRECTORY_NAME+PATH_SEPARATOR+"guise"+PATH_SEPARATOR+"resources"+PATH_SEPARATOR;	//TODO use constants; combine with other similar designations for the same path
+	public final static String RESOURCES_DIRECTORY_PATH=WEB_INF_DIRECTORY_PATH+"guise"+PATH_SEPARATOR+"resources"+PATH_SEPARATOR;	//TODO use constants; combine with other similar designations for the same path
 
 	/**The static, synchronized map of Guise containers keyed to servlet contexts.*/
 	private final static Map<ServletContext, HTTPServletGuiseContainer> servletContextGuiseContainerMap=synchronizedMap(new HashMap<ServletContext, HTTPServletGuiseContainer>());

@@ -549,14 +549,14 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	private final Map<String, Destination> pathDestinationMap=synchronizedMap(new HashMap<String, Destination>());
 
 		/**Associates a destination with a particular application context-relative path.
-		Any existing desintation for the given context-relative path is replaced.
+		Any existing destination for the given context-relative path is replaced.
 		@param path The appplication context-relative path to which the destination should be associated.
 		@param destination The description of the destination at the appplication context-relative path.
 		@return The destination previously assiciated with the given appplication context-relative path, or <code>null</code> if no destination was previously associated with the path.
 		@exception NullPointerException if the path and/or the destination is <code>null</code>.
 		@exception IllegalArgumentException if the provided path is absolute.
 		*/
-		public Destination setDestination(final String path, final Destination destination)
+		public Destination setDestination(final String path, final Destination destination)	//TODO check to make sure the path is the same as that indicated in the destination object
 		{
 			checkInstance(path, "Path cannot be null.");
 			if(isAbsolutePath(path))	//if the path is absolute
@@ -565,7 +565,21 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			}
 			return pathDestinationMap.put(path, checkInstance(destination, "Destination cannot be null."));	//store the association
 		}
-	
+
+		/**Associates multiple destinations with application context-relative paths.
+		Any existing destinations for the given context-relative path are replaced.
+		@param destinations The destinations to set.
+		@exception IllegalArgumentException if a provided path is absolute.
+		@see #setDestination(String, Destination)
+		*/
+		public void setDestinations(final List<Destination> destinations)
+		{
+			for(final Destination destination:destinations)	//for each destination
+			{
+				setDestination(destination.getPath(), destination);	//associate the destination with the path
+			}
+		}
+
 		/**Determines the destination associated with the given application context-relative path.
 		@param path The address for which a destination should be retrieved.
 		@return The destination associated with the given path, or <code>null</code> if no destination is associated with the path. 
