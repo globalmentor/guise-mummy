@@ -150,6 +150,12 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public Destination getDestination(final String path);
 
+	/**Returns an iterable of destinations.
+	Any changes to the iterable will not necessarily be reflected in the destinations available to the application.
+	@return An iterable to the application's destinations.
+	*/
+	public Iterable<Destination> getDestinations();
+
 	/**Determines if there is a destination associated with the given appplication context-relative path.
 	@param path The appplication context-relative path.
 	@return <code>true</code> if there is destination associated with the given path, or <code>false</code> if no destination is associated with the given path.

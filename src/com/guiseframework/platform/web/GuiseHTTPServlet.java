@@ -51,6 +51,7 @@ import static com.garretwilson.text.CharacterConstants.*;
 import static com.garretwilson.text.xml.XMLConstants.*;
 import static com.garretwilson.text.xml.XMLUtilities.createDocumentBuilder;
 
+import com.garretwilson.text.FormatUtilities;
 import com.garretwilson.text.W3CDateFormat;
 import com.garretwilson.text.elff.*;
 import static com.garretwilson.text.elff.WebTrendsConstants.*;
@@ -298,7 +299,6 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		if(guiseApplicationDescriptionPath!=null)	//if there is a Guise application description file specified
 		{
 //TODO del Debug.trace("found path to application description:", guiseApplicationDescriptionPath);
-Debug.trace("found path to application description:", guiseApplicationDescriptionPath);
 			final String normalizedGuiseApplicationDescriptionPath=normalizePath(guiseApplicationDescriptionPath);	//normalize the path
 			if(isAbsolutePath(normalizedGuiseApplicationDescriptionPath))	//if the given path is absolute
 			{
@@ -331,13 +331,29 @@ Debug.trace("found path to application description:", guiseApplicationDescriptio
 					{
 						throw new ServletException("Guise application description document did not describe a Guise application.");
 					}
+/*TODO del					
+Debug.trace("checking for categories");
+					for(final Destination destination:guiseApplication.getDestinations())	//for each destination
+					{
+						Debug.trace("looking at destination", destination.getPath());
+						for(final Category category:destination.getCategories())
+						{
+							Debug.trace("destination has category", category.getID());
+							for(final Category subcategory:category.getCategories())
+							{
+								Debug.trace("category has subcategory", subcategory.getID());
+							}
+						}
+					}
+*/
 				}
+/*TODO del
 				catch(Exception exception)
 				{
 					Debug.error(exception);
 					throw new ServletException(exception);
 				}
-/*TODO bring back
+*/
 				catch(final ParserConfigurationException parserConfigurationException)	//if we can't find an XML parser
 				{
 					throw new ServletException(parserConfigurationException);
@@ -354,7 +370,6 @@ Debug.trace("found path to application description:", guiseApplicationDescriptio
 				{
 					throw new ServletException(invocationTargetException);
 				}
-*/
 				finally
 				{
 					guiseApplicationDescriptionBufferedInputStream.close();	//always close the input stream
@@ -367,9 +382,6 @@ Debug.trace("found path to application description:", guiseApplicationDescriptio
 		}
 		else	//if no application description is specified, load the description from the web.xml init parameters TODO remove this after transition is complete
 		{
-
-Debug.trace("no application file specified; using web.xml init parameters");
-			
 			final String guiseApplicationClassName=servletConfig.getInitParameter(APPLICATION_CLASS_INIT_PARAMETER);	//get name of the guise application class
 			if(guiseApplicationClassName!=null)	//if there is a Guise application class name specified
 			{
@@ -506,6 +518,9 @@ Debug.trace("no application file specified; using web.xml init parameters");
 		return guiseApplication;	//return the created Guise application
 	}
 
+	/**The mutex that prevents two threads from trying to initialize the Guise container simultaneously.*/
+	private Object guiseContainerMutex=new Object();
+	
 	/**Initializes the servlet upon receipt of the first request.
 	This version initializes the reference to the Guise container.
 	This version installs the application into the container.
@@ -515,29 +530,39 @@ Debug.trace("no application file specified; using web.xml init parameters");
 	*/
 	public void init(final HttpServletRequest request) throws ServletException
 	{
+//TODO del Debug.trace("initializing servlet from request");
 		super.init(request);	//do the default initialization
-		if(guiseContainer==null)	//if no container exists
+		synchronized(guiseContainerMutex)	//if more than one request are coming in simultaneously, only look up the container for the first one (although multiple lookups should still retrieve the same container)
 		{
-			Debug.trace("context path", getContextPath());
-			final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request
-Debug.trace("requestURI", requestURI);
-			final URI containerBaseURI=changePath(requestURI, getContextPath()+PATH_SEPARATOR);	//determine the container base URI
-Debug.trace("containerURI", containerBaseURI);
-
-			guiseContainer=HTTPServletGuiseContainer.getGuiseContainer(getServletContext(), containerBaseURI);	//get a reference to the Guise container, creating it if needed
+//TODO del	Debug.trace("checking container");
+			if(guiseContainer==null)	//if no container exists
+			{
+//TODO del				Debug.trace("context path", getContextPath());
+				final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request
+//			TODO del	Debug.trace("requestURI", requestURI);
+				final URI containerBaseURI=changePath(requestURI, getContextPath()+PATH_SEPARATOR);	//determine the container base URI
+//			TODO del	Debug.trace("containerURI", containerBaseURI);
+	
+				guiseContainer=HTTPServletGuiseContainer.getGuiseContainer(getServletContext(), containerBaseURI);	//get a reference to the Guise container, creating it if needed
+//			TODO del	Debug.trace("guise container: ", guiseContainer, "for servlet context", getServletContext());
+					//install the application into the container
+				final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
+				final String guiseApplicationContextPath=request.getContextPath()+request.getServletPath()+PATH_SEPARATOR;	//construct the Guise application context path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash
+//			TODO delDebug.trace("ready to install application into container with context path", guiseApplicationContextPath);
+				guiseContainer.installApplication(guiseApplication, guiseApplicationContextPath);	//install the application			
+			}
 		}
-		Debug.trace("initializing; container base URI:", guiseContainer.getBaseURI(), "container base path:", guiseContainer.getBasePath());
-		
-
-		
+//	TODO del		Debug.trace("initializing; container base URI:", guiseContainer.getBaseURI(), "container base path:", guiseContainer.getBasePath());
+/*TODO del when works; now application is installed when container is retrieved
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container (which we just created if needed)
 		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
 		if(guiseApplication.getContainer()==null)	//if this application has not yet been installed (note that there is a race condition here if multiple HTTP requests attempt to access the application simultaneously, but the losing thread will simply throw an exception and not otherwise disturb the application functionality)
 		{
 			final String guiseApplicationContextPath=request.getContextPath()+request.getServletPath()+PATH_SEPARATOR;	//construct the Guise application context path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash
-Debug.trace("applicationContextPath", guiseApplicationContextPath);
+//		TODO delDebug.trace("ready to install application into container with context path", guiseApplicationContextPath);
 			guiseContainer.installApplication(guiseApplication, guiseApplicationContextPath);	//install the application			
 		}
+*/
 	}
 
 //TODO fix HEAD method servicing, probably by overriding serveResource()
@@ -551,12 +576,10 @@ Debug.trace("applicationContextPath", guiseApplicationContextPath);
 	public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
 	{
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
-Debug.info("method:", request.getMethod(), "raw path info:", rawPathInfo);
+//	TODO del Debug.info("method:", request.getMethod(), "raw path info:", rawPathInfo);
 //TODO del Debug.info("user agent:", getUserAgent(request));
-final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
-Debug.info("before service request: memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
-try
-{
+//	TODO del final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
+//	TODO del Debug.info("before service request: memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
 
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
 		final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
@@ -627,11 +650,6 @@ while(headerNames.hasMoreElements())
 		{
 			super.doGet(request, response);	//let the default functionality take over			
 		}
-}
-finally
-{
-	Debug.info("after service request: memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());	
-}
 	}
 
 	/**The runnable class that services an HTTP request.
@@ -875,36 +893,77 @@ Debug.trace("got control events");
 								entry.setFieldValue(Field.CLIENT_SERVER_METHOD_FIELD, GET_METHOD);	//log the GET method always for WebTrends
 //TODO del								entry.setFieldValue(Field.CLIENT_SERVER_METHOD_FIELD, request.getMethod());
 								entry.setFieldValue(Field.CLIENT_SERVER_URI_STEM_FIELD, rawPathInfo);
-								final List<NameValuePair<String, String>> queryParameters=new ArrayList<NameValuePair<String, String>>();	//create an array of parameters
+//TODO del								final List<NameValuePair<String, String>> queryParameters=new ArrayList<NameValuePair<String, String>>();	//create an array of parameters
+								final StringBuilder queryParametersStringBuilder=new StringBuilder(request.getQueryString());	//create a new string builder for adding the query parameters, starting with the current query string
+								if(queryParametersStringBuilder.length()>0)	//if we have an existing query string
+								{
+									queryParametersStringBuilder.append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//append '&' to separate the old parameters from the new ones
+								}
 									//WT.bh
-								queryParameters.add(new NameValuePair<String, String>(BROWSING_HOUR_QUERY_ATTRIBUTE_NAME, Integer.toString(initControlEvent.getHour())));	//add WT.bh as a query parameter
+								ELFF.appendURIQueryParameter(queryParametersStringBuilder, BROWSING_HOUR_QUERY_ATTRIBUTE_NAME, Integer.toString(initControlEvent.getHour())).append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//add WT.bh as a query parameter
 									//WT.sr
-								queryParameters.add(new NameValuePair<String, String>(BROWSER_SIZE_QUERY_ATTRIBUTE_NAME, Integer.toString(initControlEvent.getBrowserWidth())+"x"+Integer.toString(initControlEvent.getBrowserHeight())));	//add WT.bs as a query parameter
+								ELFF.appendURIQueryParameter(queryParametersStringBuilder, BROWSER_SIZE_QUERY_ATTRIBUTE_NAME, Integer.toString(initControlEvent.getBrowserWidth())+"x"+Integer.toString(initControlEvent.getBrowserHeight())).append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//add WT.bs as a query parameter
 									//WT.cd
-								queryParameters.add(new NameValuePair<String, String>(COLOR_DEPTH_QUERY_ATTRIBUTE_NAME, Integer.toString(initControlEvent.getColorDepth())));	//add WT.cd as a query parameter
+								ELFF.appendURIQueryParameter(queryParametersStringBuilder, COLOR_DEPTH_QUERY_ATTRIBUTE_NAME, Integer.toString(initControlEvent.getColorDepth())).append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//add WT.cd as a query parameter
 									//WT.jo
-								queryParameters.add(new NameValuePair<String, String>(JAVA_ENABLED_QUERY_ATTRIBUTE_NAME, WebTrendsYesNo.asYesNo(initControlEvent.isJavaEnabled()).toString()));	//add WT.jo as a query parameter
+								ELFF.appendURIQueryParameter(queryParametersStringBuilder, JAVA_ENABLED_QUERY_ATTRIBUTE_NAME, WebTrendsYesNo.asYesNo(initControlEvent.isJavaEnabled()).toString()).append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//add WT.jo as a query parameter
 									//WT.js
 								final Boolean isJavaScriptSupported=asInstance(environment.getProperty(GuiseEnvironment.CONTENT_TEXT_JAVASCRIPT_SUPPORTED_PROPERTY), Boolean.class);	//see if the environment knows about Java
 								if(isJavaScriptSupported!=null)	//if JavaScript is supported
 								{
 										//WT.jv
-									queryParameters.add(new NameValuePair<String, String>(JAVASCRIPT_QUERY_ATTRIBUTE_NAME, WebTrendsYesNo.asYesNo(isJavaScriptSupported.booleanValue()).toString()));	//add WT.js as a query parameter
+									ELFF.appendURIQueryParameter(queryParametersStringBuilder, JAVASCRIPT_QUERY_ATTRIBUTE_NAME, WebTrendsYesNo.asYesNo(isJavaScriptSupported.booleanValue()).toString()).append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//add WT.js as a query parameter
 									final String javascriptVersion=asInstance(environment.getProperty(GuiseEnvironment.CONTENT_TEXT_JAVASCRIPT_VERSION), String.class);	//get the JavaScript version
 									if(javascriptVersion!=null)	//if we know the JavaScript version
 									{
-										queryParameters.add(new NameValuePair<String, String>(JAVASCRIPT_VERSION_QUERY_ATTRIBUTE_NAME, javascriptVersion));	//add WT.jv as a query parameter						
+										ELFF.appendURIQueryParameter(queryParametersStringBuilder, JAVASCRIPT_VERSION_QUERY_ATTRIBUTE_NAME, javascriptVersion).append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//add WT.jv as a query parameter
 									}
 								}
 									//WT.sr
-								queryParameters.add(new NameValuePair<String, String>(SCREEN_RESOLUTION_QUERY_ATTRIBUTE_NAME, Integer.toString(initControlEvent.getScreenWidth())+"x"+Integer.toString(initControlEvent.getScreenHeight())));	//add WT.sr as a query parameter
+								ELFF.appendURIQueryParameter(queryParametersStringBuilder, SCREEN_RESOLUTION_QUERY_ATTRIBUTE_NAME, Integer.toString(initControlEvent.getScreenWidth())+"x"+Integer.toString(initControlEvent.getScreenHeight())).append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//add WT.sr as a query parameter
 									//WT.tz
-								queryParameters.add(new NameValuePair<String, String>(TIMEZONE_QUERY_ATTRIBUTE_NAME, Integer.toString(initControlEvent.getTimeZone())));	//add WT.tz as a query parameter
+								ELFF.appendURIQueryParameter(queryParametersStringBuilder, TIMEZONE_QUERY_ATTRIBUTE_NAME, Integer.toString(initControlEvent.getTimeZone())).append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//add WT.tz as a query parameter
 									//WT.ul
-								queryParameters.add(new NameValuePair<String, String>(USER_LANGUAGE_QUERY_ATTRIBUTE_NAME, initControlEvent.getLanguage()));	//add WT.ul as a query parameter
-
-								final NameValuePair<String, String>[] queryParameterArray=(NameValuePair<String, String>[])queryParameters.toArray(new NameValuePair[queryParameters.size()]);	//put the query parameters into an array
-								entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, appendQueryParameters(request.getQueryString(), queryParameterArray));	//append the new parameters and set the log field
+								ELFF.appendURIQueryParameter(queryParametersStringBuilder, USER_LANGUAGE_QUERY_ATTRIBUTE_NAME, initControlEvent.getLanguage()).append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//add WT.ul as a query parameter
+									//content groups and subgroups
+								final List<String> destinationCategoryIDs=new ArrayList<String>();	//we'll look for all the categories available
+								final List<String> destinationSubcategoryIDs=new ArrayList<String>();	//we'll look for all the subcategories available, in whatever category (because WebTrends doesn't distinguish among categories for subcategories)								
+								for(final Category category:destination.getCategories())	//look at each category
+								{
+//TODO del									Debug.trace("destination has category", category.getID());
+									final String categoryID=category.getID();	//get this category's ID
+									if(!destinationCategoryIDs.contains(categoryID))	//if this category hasn't yet been added TODO use an array set
+									{
+										destinationCategoryIDs.add(categoryID);	//note this category's ID
+									}
+									for(final Category subcategory:category.getCategories())	//look at each subcategory
+									{
+//TODO del										Debug.trace("category has subcategory", subcategory.getID());
+										final String subcategoryID=subcategory.getID();	//get this subcategory's ID
+										if(!destinationSubcategoryIDs.contains(subcategoryID))	//if this subcategory hasn't yet been added TODO use an array set
+										{
+											destinationSubcategoryIDs.add(subcategoryID);	//note this subcategory's ID (ignore all sub-subcategories, as WebTrends doesn't support them)
+										}
+									}
+								}
+									//WT.cg_n
+								if(!destinationCategoryIDs.isEmpty())	//if there are destination categories
+								{
+/*TODO fix									
+TODO: find out why sometimes ELFF can't be loaded because the application isn't installed into the container
+*/
+									ELFF.appendURIQueryParameter(queryParametersStringBuilder, CONTENT_GROUP_NAME_QUERY_ATTRIBUTE_NAME, destinationCategoryIDs.toArray(new String[destinationCategoryIDs.size()])).append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//add WT.cg_n as a query parameter
+										//WT.cg_s
+									if(!destinationSubcategoryIDs.isEmpty())	//if there are destination subcategories (there cannot be subcategories without categories, and moreover WebTrends documentation does not indicate that subcategories are allowed without categories)
+									{
+										ELFF.appendURIQueryParameter(queryParametersStringBuilder, CONTENT_SUBGROUP_NAME_QUERY_ATTRIBUTE_NAME, destinationSubcategoryIDs.toArray(new String[destinationSubcategoryIDs.size()])).append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//add WT.cg_s as a query parameter
+									}
+								}
+								queryParametersStringBuilder.delete(queryParametersStringBuilder.length()-1, queryParametersStringBuilder.length());	//remove the last parameter delimiter
+//TODO del Debug.trace("ready to log query:", queryParametersStringBuilder);
+//TODO del when works								final NameValuePair<String, String>[] queryParameterArray=(NameValuePair<String, String>[])queryParameters.toArray(new NameValuePair[queryParameters.size()]);	//put the query parameters into an array
+//TODO del when works								entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, appendQueryParameters(request.getQueryString(), queryParameterArray));	//append the new parameters and set the log field
+								entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, queryParametersStringBuilder.toString());	//set the log field to be the parameters we determined
 //TODO del entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, request.getQueryString());
 								
 //							TODO fix				entry.setFieldValue(Field.CLIENT_SERVER_URI_QUERY_FIELD, request.getQueryString());

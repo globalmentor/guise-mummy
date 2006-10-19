@@ -1,5 +1,7 @@
 package com.guiseframework;
 
+import java.util.List;
+
 import com.garretwilson.beans.PropertyBindable;
 
 /**Description of a navigation point, its properties, and its restrictions.
@@ -13,5 +15,13 @@ public interface Destination extends PropertyBindable
 
 	/**@return The style of this destination, or <code>null</code> if no destination-specific style is specified.*/
 //TODO del if not needed	public URI getStyle();
+
+	/**The read-only iterable of categories.*/
+	public Iterable<Category> getCategories();
+
+	/**Sets the categories.
+	@param categories The list of new categories.
+	*/
+	public void setCategories(final List<Category> categories);
 
 }

@@ -545,8 +545,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	
 	
 	
-	/**The thread-safe map of destinations associated with application context-relative paths.*/
-	private final Map<String, Destination> pathDestinationMap=synchronizedMap(new HashMap<String, Destination>());
+	/**The concurrent map of destinations associated with application context-relative paths.*/
+	private final Map<String, Destination> pathDestinationMap=new ConcurrentHashMap<String, Destination>();
 
 		/**Associates a destination with a particular application context-relative path.
 		Any existing destination for the given context-relative path is replaced.
@@ -572,7 +572,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		@exception IllegalArgumentException if a provided path is absolute.
 		@see #setDestination(String, Destination)
 		*/
-		public void setDestinations(final List<Destination> destinations)
+		public void setDestinations(final List<Destination> destinations)	//TODO clear existing destinations and update API
 		{
 			for(final Destination destination:destinations)	//for each destination
 			{
@@ -593,7 +593,16 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			}
 			return pathDestinationMap.get(path);	//return the associated destination, if any
 		}
-	
+
+		/**Returns an iterable of destinations.
+		Any changes to the iterable will not necessarily be reflected in the destinations available to the application.
+		@return An iterable to the application's destinations.
+		*/
+		public Iterable<Destination> getDestinations()
+		{
+			return pathDestinationMap.values();	//return
+		}
+		
 		/**Determines if there is a destination associated with the given appplication context-relative path.
 		@param path The appplication context-relative path.
 		@return <code>true</code> if there is destination associated with the given path, or <code>false</code> if no destination is associated with the given path.
@@ -606,7 +615,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			{
 				throw new IllegalArgumentException("Path cannot be absolute: "+path);
 			}
-			return getDestination(path)!=null;	//see if there is a destination associated with this navigation path
+			return pathDestinationMap.containsKey(path);	//see if there is a destination associated with this navigation path
 		}	
 
 	/**Resolves a relative or absolute path against the application base path.

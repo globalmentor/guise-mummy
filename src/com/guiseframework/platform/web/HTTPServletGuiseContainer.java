@@ -60,6 +60,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 			if(guiseContainer==null)	//if there is no Guise container
 			{
 				guiseContainer=new HTTPServletGuiseContainer(baseURI, servletContext);	//create a new Guise container for this servlet context, specifying the base URI
+				servletContextGuiseContainerMap.put(servletContext, guiseContainer);	//associate the Guise container with the servlet context
 			}
 			return guiseContainer;	//return the Guise container
 		}
