@@ -19,6 +19,7 @@ navigator.userAgentVersionNumber The version of the user agent stored as a numbe
 		javaEnabled=""
 		browserWidth=""
 		browserHeight=""
+		referrer=""
 	/>
 	<events>	<!--the list of events (zero or more)-->
 		<form	<!--information resulting from form changes, analogous to that in an HTTP POST-->
@@ -1411,6 +1412,7 @@ var screenHeight=screen.height;	//get the screen height
 var javaEnabled=navigator.javaEnabled();	//see if java is enabled
 var browserWidth=document.body.offsetWidth;	//get the browser width
 var browserHeight=document.body.offsetHeight;	//get the browser height
+var referrer=document.referrer;	//get the document referrer
 */
 function InitAJAXEvent()
 {
@@ -1425,6 +1427,7 @@ function InitAJAXEvent()
 	this.javaEnabled=navigator.javaEnabled();	//see if java is enabled
 	this.browserWidth=document.body.offsetWidth;	//get the browser width
 	this.browserHeight=document.body.offsetHeight;	//get the browser height
+	this.referrer=document.referrer;	//get the document referrer
 }
 
 //Form AJAX Event
@@ -1945,7 +1948,8 @@ function GuiseAJAX()
 						"screenHeight", ajaxInitEvent.screenHeight,
 						"javaEnabled", Boolean(ajaxInitEvent.javaEnabled).toString(),
 						"browserWidth", ajaxInitEvent.browserWidth,
-						"browserHeight", ajaxInitEvent.browserHeight));
+						"browserHeight", ajaxInitEvent.browserHeight,
+						"referrer", ajaxInitEvent.referrer));
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.INIT);	//</init>
 			return stringBuilder;	//return the string builder
 		};

@@ -1,5 +1,7 @@
 package com.guiseframework.platform.web;
 
+import java.net.URI;
+
 import com.guiseframework.controller.ControlEvent;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
@@ -70,6 +72,12 @@ public class InitControlEvent implements ControlEvent
 		/**@return Whether Java is enabled for the user.*/
 		public boolean isJavaEnabled() {return javaEnabled;}
 
+	/**The referring URI of the document, or <code>null</code> if there is no referrer.*/
+	private final URI referrerURI;
+
+		/**@return The referring URI of the document, or <code>null</code> if there is no referrer.*/
+		public URI getReferrerURI() {return referrerURI;}
+
 	/**Constructor.
 	@param hour The hour of the browser.
 	@param timezone The time zone offset from GMT.
@@ -81,11 +89,12 @@ public class InitControlEvent implements ControlEvent
 	@param browserHeight The height of the browser.
 	@param javascriptVersion The version of JavaScript supported by the client, or <code>null</code> if JavaScript is not supported.
 	@param javaEnabled Whether Java is enabled for the user.
+	@param referrerURI The referring URI of the document, or <code>null</code> if there is no referrer.
 	@exception NullPointerException if the given language is <code>null</code>.
 	*/
 	public InitControlEvent(final int hour, final int timezone, final String language,
 			final int colorDepth, final int screenWidth, final int screenHeight, final int browserWidth, final int browserHeight,
-			final String javascriptVersion, final boolean javaEnabled)
+			final String javascriptVersion, final boolean javaEnabled, final URI referrerURI)
 	{
 		this.hour=hour;
 		this.timezone=timezone;
@@ -97,5 +106,6 @@ public class InitControlEvent implements ControlEvent
 		this.browserHeight=browserHeight;
 		this.javascriptVersion=javascriptVersion;
 		this.javaEnabled=javaEnabled;
+		this.referrerURI=referrerURI;
 	}
 }

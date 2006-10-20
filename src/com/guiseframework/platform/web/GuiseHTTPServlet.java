@@ -974,8 +974,8 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 								entry.setFieldValue(Field.CLIENT_SERVER_USER_AGENT_HEADER_FIELD, getUserAgent(request));
 								final String webTrendsID=asInstance(environment.getProperty(WEBTRENDS_ID_COOKIE_NAME), String.class);	//get the WebTrends ID
 								entry.setFieldValue(Field.CLIENT_SERVER_COOKIE_HEADER_FIELD, webTrendsID!=null ? WEBTRENDS_ID_COOKIE_NAME+"="+webTrendsID : null);	//store the WebTrends ID cookie as the cookie TODO decide if we want to get general cookies instead of just the WebTrends cookie
-//TODO fix referer; this doesn't work in AJAX; we must store the referrer somewhere in the GET request
-								entry.setFieldValue(Field.CLIENT_SERVER_REFERER_HEADER_FIELD, getReferer(request));
+								final URI referrerURI=initControlEvent.getReferrerURI();	//get the initialization referrer URI
+								entry.setFieldValue(Field.CLIENT_SERVER_REFERER_HEADER_FIELD, referrerURI!=null ? referrerURI.toString() : null);	//store the referrer URI, if any
 								entry.setFieldValue(Field.DCS_ID_FIELD, guiseApplication.getDCSID());	//get the DCS ID from the application, if there is a DCS ID
 //							TODO fix dcs-id
 									//log this page								
@@ -1534,11 +1534,25 @@ Debug.info("AJAX event:", eventName);
 							final String browserHeight=eventElement.getAttribute("browserHeight");
 							final String javascriptVersion=eventElement.getAttribute("javascriptVersion");	//get the JavaScript version TODO use a constant
 							final String javaEnabled=eventElement.getAttribute("javaEnabled");
+							final String referrer=eventElement.getAttribute("referrer");
+							URI referrerURI=null;	//assume we can't get a referrer URI
+							if(referrer.length()>0)	//if there is a referrer
+							{
+								try
+								{
+									referrerURI=new URI(referrer);	//create a URI object from the referrer string
+								}
+								catch(final URISyntaxException uriSyntaxException)	//if there is a problem with the URI syntax
+								{
+									Debug.warn("Invalid referrer URI syntax: "+referrer);
+								}
+							}
 							final InitControlEvent initEvent=new InitControlEvent(
 									hour.length()>0 ? Integer.parseInt(hour) : 0, timezone.length()>0 ? Integer.parseInt(timezone) : 0, language.length()>0 ? language : "en-US",
 									colorDepth.length()>0 ? Integer.parseInt(colorDepth) : 24, screenWidth.length()>0 ? Integer.parseInt(screenWidth) : 1024, screenHeight.length()>0 ? Integer.parseInt(screenHeight) : 768,
 									browserWidth.length()>0 ? Integer.parseInt(browserWidth) : 1024, browserHeight.length()>0 ? Integer.parseInt(browserHeight) : 768,
-									javascriptVersion.length()>0 ? javascriptVersion : null, javaEnabled.length()>0 ? Boolean.valueOf(javaEnabled) : false);	//create a new initialization event TODO check for NumberFormatException
+									javascriptVersion.length()>0 ? javascriptVersion : null, javaEnabled.length()>0 ? Boolean.valueOf(javaEnabled) : false,
+											referrerURI);	//create a new initialization event TODO check for NumberFormatException
 							controlEventList.add(initEvent);	//add the event to the list
 						}
 					}

@@ -15,6 +15,8 @@ import javax.xml.parsers.*;
 import static com.garretwilson.io.ContentTypeConstants.*;
 import static com.garretwilson.io.ContentTypeUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
+import static com.garretwilson.net.URIUtilities.getPlainURI;
+import static com.garretwilson.servlet.http.HttpServletUtilities.getReferer;
 import static com.garretwilson.servlet.http.HttpServletUtilities.setContentLanguage;
 import static com.garretwilson.servlet.http.HttpServletUtilities.getAcceptedContentTypes;
 import static com.garretwilson.servlet.http.HttpServletUtilities.isAcceptedContentType;
@@ -84,6 +86,12 @@ public class HTTPServletGuiseContext extends AbstractXMLGuiseContext
 		/**@return The content type of the request, or <code>null</code> if no content type was specified.*/
 //	TODO del when not needed		protected ContentType getInputContentType() {return inputContentType;}
 
+	/**The URI of the referring location; this will only be valid upon initial navigatin.*/
+//TODO del if not needed	private final URI referrerURI;
+
+		/**@return The URI of the referring location; this will only be valid upon initial navigatin.*/
+//TODO del if not needed		public URI getReferrerURI() {return referrerURI;}
+		
 	/**Whether this context represents an AJAX request.*/
 	private final boolean isAJAX;
 
@@ -119,8 +127,10 @@ public class HTTPServletGuiseContext extends AbstractXMLGuiseContext
 		this.response=checkInstance(response, "Response cannot be null.");
 //TODO decide if we want this to include parameters or not		this.navigationURI=URI.create(request.getRequestURL().toString());	//create the absolute navigation URI from the HTTP requested URL
 		this.navigationURI=HttpServletUtilities.getRequestURI(request);	//get the absolute navigation URI from the HTTP requested URL
-
-		
+/*TODO del if not needed
+		final String referrer=getReferer(request);	//get the request referrer, if any
+		referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
+*/
 		final String contentTypeString=request.getContentType();	//get the request content type
 		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
 		isAJAX=contentType!=null && GuiseHTTPServlet.GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType);	//see if this is a Guise AJAX request

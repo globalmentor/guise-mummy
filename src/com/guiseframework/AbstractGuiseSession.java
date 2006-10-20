@@ -1163,7 +1163,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 				log(null, "guise-navigate", null, logParameters, null);	//TODO improve; use a constant
 				final NavigationEvent navigationEvent=new NavigationEvent(this, navigationPath, bookmark, referrerURI);	//create a navigation event with the session as the source of the event
 				fireNavigated(getApplicationFrame(), navigationEvent);	//fire a navigation event to all components in the application frame hierarchy
-			}			
+			}
 		}
 
 		/**Fires a {@link NavigationEvent} to all {@link NavigationListener}s in the given component hierarchy.

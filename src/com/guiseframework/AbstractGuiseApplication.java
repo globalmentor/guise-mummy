@@ -809,6 +809,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		}
 			//application resources
 		final String resourceBundleBaseName=getResourceBundleBaseName();	//get the specified resource bundle base name
+//TODO del Debug.trace("ready to load application resources; resource bundle base name:", resourceBundleBaseName);
 		if(resourceBundleBaseName!=null && !resourceBundleBaseName.equals(DEFAULT_RESOURCE_BUNDLE_BASE_NAME))	//if a distinct resource bundle base name was specified
 		{
 			resourceBundle=ResourceBundleUtilities.getResourceBundle(resourceBundleBaseName, locale, loader, resourceBundle);	//load the new resource bundle, specifying the current resource bundle as the parent					
