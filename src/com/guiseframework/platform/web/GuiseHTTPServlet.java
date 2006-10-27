@@ -736,7 +736,7 @@ Debug.trace("are the sessions equal?", guiseSession.equals(Guise.getInstance().g
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
 		final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
 		final Destination destination=guiseApplication.getDestination(navigationPath);	//get the destination, if any, associated with the requested path
-		if(destination instanceof ComponentDestination)	//if we have a component destination associated with the requested path TODO add support for other types of destinations
+		if(destination instanceof ComponentDestination)	//if we have a component destination associated with the requested path
 		{
 			final ComponentDestination componentDestination=(ComponentDestination)destination;	//get the destination as a component destination
 //		TODO del Debug.trace("have destination; creating context");
@@ -1197,10 +1197,65 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 			}
 			return true;	//show that we processed the Guise request
 		}
+		else if(destination instanceof RedirectDestination)	//if we have a component destination associated with the requested path
+		{
+			redirect(requestURI, guiseApplication, (RedirectDestination)destination);	//perform the redirect; this should never return
+			throw new AssertionError("Redirect not expected to allow processing to continue.");
+		}
 		else	//if there was no navigation panel at the given path
 		{
 			return false;	//indicate that this was not a Guise component-related request
 		}
+	}
+
+	/**Processes a redirect from a redirect destination.
+	This method will unconditionally throw an exception.
+	Under normal circumstances, an {@link HTTPRedirectException} will be thrown.
+	@param requestURI The requested URI.
+	@param guiseApplication The Guise application.
+	@param redirectDestination The destination indicating how and to where redirection should occur.
+	@throws HTTPRedirectException unconditionally to indicate how and to where redirection should occur.
+	*/
+	protected void redirect(final URI requestURI, final GuiseApplication guiseApplication, final RedirectDestination redirectDestination) throws HTTPRedirectException
+	{
+		final String redirectPath;	//the path to which direction should occur
+		if(redirectDestination instanceof ReferenceDestination)	//if the destination references another destination
+		{
+			redirectPath=((ReferenceDestination)redirectDestination).getDestination().getPath();	//get the path of the referenced destination			
+		}
+		else	//we don't yet support non-reference redirects
+		{
+			throw new AssertionError("Unsupported redirect destination type "+redirectDestination.getClass().getName());
+		}
+		final URI redirectURI=requestURI.resolve(guiseApplication.resolvePath(redirectPath));	//resolve the path to the application and resolve that against the request URI
+		if(redirectDestination instanceof TemporaryRedirectDestination)	//if this is a temporary redirect
+		{
+			throw new HTTPMovedTemporarilyException(redirectURI);	//redirect temporarily
+		}
+		else if(redirectDestination instanceof PermanentRedirectDestination)	//if this is a permanent redirect
+		{
+			throw new HTTPMovedPermanentlyException(redirectURI);	//redirect permanently
+		}
+		else	//if we don't recognize the type of redirect
+		{
+			throw new AssertionError("Unsupported redirect destination type "+redirectDestination.getClass().getName());			
+		}
+/*TODO del when works		
+		
+		if(redirectDestination instanceof TemporaryRedirectDestination)	//if this is a temporary redirect
+		{
+			if(redirectDestination instanceof ReferenceDestination)	//if the destination references another destination
+			{
+				redirectPath=((ReferenceDestination)redirectDestination).getDestination().getPath();	//get the path of the referenced destination			
+			}
+			else	//we don't yet support non-reference redirects
+			{
+				throw new AssertionError("Unsupported redirect destination type "+redirectDestination.getClass().getName());
+			}
+			throw new HTTPMovedTemporarilyException(requestURI.resolve(guiseApplication.resolvePath(redirectPath)));	//resolve the path to the application and resolve that against the request URI; then redirect
+		}
+*/
+//TODO del		Debug.trace("Just got redirect to ", destination);
 	}
 	
 	/**Synchronizes the cookies in a request with the environment properties in a Guise session.
