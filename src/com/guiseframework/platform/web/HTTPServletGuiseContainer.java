@@ -25,8 +25,7 @@ import javax.servlet.http.*;
 import com.garretwilson.text.W3CDateFormat;
 import com.garretwilson.text.elff.ELFF;
 import com.garretwilson.text.elff.Field;
-import com.garretwilson.util.Debug;
-import com.garretwilson.util.NameValuePair;
+import com.garretwilson.util.*;
 import com.guiseframework.*;
 import com.guiseframework.model.InformationLevel;
 
@@ -81,12 +80,11 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 		@exception IllegalStateException if there is no ELFF log associated with the given application and thus the application is not installed in this container.
 		*/
 		public ELFF getELFFLog(final GuiseApplication guiseApplication)
-		{
-			
+		{	
 			final ELFF elff=applicationELFFMap.get(guiseApplication);	//get the log for this application
 			if(elff==null)	//if there is no ELFF log, the application must not be installed in this container
 			{
-				throw new IllegalStateException("ELFF log not avaialble for Guise application; the Guise application is likely not installed in the container: "+guiseApplication);	//indicate that the ELFF log for the application couldn't be found
+				throw new IllegalStateException("ELFF log not available for Guise application; the Guise application is likely not installed in the container: "+guiseApplication);	//indicate that the ELFF log for the application couldn't be found
 			}
 			return elff;	//return the ELFF log for the application
 		}
@@ -112,10 +110,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 	{
 		try
 		{
-			final File baseLogDirectory=GuiseHTTPServlet.getLogDirectory(getServletContext());	//get the base log directory
-			final String relativeApplicationPath=relativizePath(getBasePath(), application.getBasePath());	//get the application path relative to the container path
-			final File logDirectory=new File(baseLogDirectory, relativeApplicationPath);	//get a subdirectory if needed; the File class allows a relative application path of ""
-			ensureDirectoryExists(logDirectory);	//make sure the log directory exists
+			final File logDirectory=application.getLogDirectory();	//get the application log directory
 			final DateFormat logFilenameDateFormat=new W3CDateFormat(W3CDateFormat.Style.DATE);	//create a formatter for the log filename
 			final String logFilename=logFilenameDateFormat.format(new Date())+" elff.log";	//create a filename in the form "date elff.log" TODO use a constant
 			final File logFile=new File(logDirectory, logFilename);	//create a log file object
@@ -134,15 +129,18 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 	
 	/**Installs the given application at the given context path.
 	This version is provided to expose the method to the servlet.
-	@param contextPath The context path at which the application is being installed.
-	@exception NullPointerException if either the application or context path is <code>null</code>.
+	@param basePath The base path at which the application is being installed.
+	@param homeDirectory The home directory of the application.
+	@param logDirectory The log directory of the application.
+	@exception NullPointerException if either the application, base path, home directory, and/or log directory is <code>null</code>.
 	@exception IllegalArgumentException if the context path is not absolute and does not end with a slash ('/') character.
 	@exception IllegalStateException if the application is already installed in some container.
 	@exception IllegalStateException if there is already an application installed in this container at the given context path.
+	@exception IOException if there is an I/O error when installing the application.
 	*/
-	protected void installApplication(final AbstractGuiseApplication application, final String contextPath)
+	protected void installApplication(final AbstractGuiseApplication application, final String basePath, final File homeDirectory, final File logDirectory) throws IOException
 	{
-		super.installApplication(application, contextPath);	//delegate to the parent class
+		super.installApplication(application, basePath, homeDirectory, logDirectory);	//delegate to the parent class
 		final Writer elffWriter=getELFFWriter(application);	//create an ELFF log writer for this application
 		final ELFF elff=new ELFF(elffWriter,	//create an ELFF log
 				Field.DATE_FIELD, Field.TIME_FIELD, Field.CLIENT_IP_FIELD, Field.CLIENT_SERVER_USERNAME_FIELD, Field.CLIENT_SERVER_HOST_FIELD,
@@ -152,14 +150,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 				Field.CLIENT_SERVER_REFERER_HEADER_FIELD, Field.DCS_ID_FIELD);
 		elff.setDirective(ELFF.SOFTWARE_DIRECTIVE, Guise.GUISE_NAME+' '+Guise.BUILD_ID);	//set the software directive of the ELFF log
 		applicationELFFMap.put(application, elff);	//store the ELFF log in the map
-		try
-		{
-			elff.logDirectives();	//log the directives of this log file
-		}
-		catch(final IOException ioException)	//if there is an I/O error
-		{
-			throw new AssertionError(ioException);	//TODO fix
-		}
+		elff.logDirectives();	//log the directives of this log file
 	}
 
 	/**Uninstalls the given application.
@@ -173,9 +164,15 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 		super.uninstallApplication(application);	//delegate to the parent class
 	}
 
-	/**The synchronized map of Guise sessions keyed to HTTP sessions.*/
-	private final Map<HttpSession, GuiseSession> guiseSessionMap=synchronizedMap(new HashMap<HttpSession, GuiseSession>());
+	/**The synchronized map of Guise sessions keyed to Guise applications and HTTP sessions (as a single HTTP session may be used across different Guise applications within one container).*/
+	private final Map<GuiseApplicationHTTPSessionKey, GuiseSession> httpSessionGuiseApplicationGuiseSessionMap=synchronizedMap(new HashMap<GuiseApplicationHTTPSessionKey, GuiseSession>());
 
+	/**The synchronized set map of Guise sessions associated with a single HTTP session (as there may be several Guise sessions in this container using the same HTTP session.
+	This set map is only accessed when a Guise session is being added or removed, so its being synchronized should not slow down normal HTTP requests.
+	The sets within the map are not synchronized, so all access to iterables of values should be synchronized on this set map.
+	*/
+	private final CollectionMap<HttpSession, GuiseSession, Set<GuiseSession>> httpSessionGuiseSessionSetMap=new SynchronizedCollectionMapDecorator<HttpSession, GuiseSession, Set<GuiseSession>>(new HashSetHashMap<HttpSession, GuiseSession>());
+	
 	/**Retrieves a Guise session for the given HTTP session.
 	A Guise session will be created if none is currently associated with the given HTTP session.
 	When a Guise session is first created, its locale will be updated to match the language, if any, accepted by the HTTP request.
@@ -189,29 +186,51 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 	*/
 	protected GuiseSession getGuiseSession(final GuiseApplication guiseApplication, final HttpServletRequest httpRequest, final HttpSession httpSession)
 	{
-		synchronized(guiseSessionMap)	//don't allow anyone to modify the map of sessions while we access it
+		final GuiseApplicationHTTPSessionKey sessionKey=new GuiseApplicationHTTPSessionKey(guiseApplication, httpSession);	//create a key for looking up a Guise session based upon the Guise application and the HTTP session
+		final boolean newGuiseSession;	//we'll determine whether we're creating a new Guise session
+		GuiseSession guiseSession;	//we'll retreive a Guise session one way or another
+		synchronized(httpSessionGuiseApplicationGuiseSessionMap)	//don't allow anyone to modify the map of sessions while we access it
 		{
-			GuiseSession guiseSession=guiseSessionMap.get(httpSession);	//get the Guise session associated with the HTTP session
-			if(guiseSession==null)	//if no Guise session is associated with the given HTTP session
+			guiseSession=httpSessionGuiseApplicationGuiseSessionMap.get(sessionKey);	//get the Guise session associated with the Guise application and HTTP session
+			newGuiseSession=guiseSession==null;	//if no Guise session is associated with the given HTTP session and Guise application, we'll create a Guise session
+			if(newGuiseSession)	//if we should create a new Guise session
 			{
-	final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
-	Debug.info("memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
-Debug.trace("+++creating Guise session", httpSession.getId());
-/*TODO del
-final Enumeration headerNames=httpRequest.getHeaderNames();	//TODO del
-while(headerNames.hasMoreElements())
-{
-	final String headerName=(String)headerNames.nextElement();
-	Debug.info("request header:", headerName, httpRequest.getHeader(headerName));
-}
-*/
+				final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
+				Debug.info("memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
+			Debug.trace("+++creating Guise session", httpSession.getId());
+				guiseSession=guiseApplication.createSession();	//ask the application to create a new Guise session
 				final URI requestURI=URI.create(httpRequest.getRequestURL().toString());	//get the URI of the current request
 				final URI sessionBaseURI=requestURI.resolve(guiseApplication.getBasePath());	//resolve the application base path to the request URI
-				guiseSession=guiseApplication.createSession();	//ask the application to create a new Guise session
-//TODO del Debug.trace("default session base URI:", guiseSession.getBaseURI());
 				guiseSession.setBaseURI(sessionBaseURI);	//update the base URI to the one specified by the request, in case we can create a session from different URLs
-//TODO del Debug.trace("new session base URI:", guiseSession.getBaseURI());
-				final String relativeApplicationPath=relativizePath(getBasePath(), guiseApplication.getBasePath());	//get the application path relative to the container path
+//TODO del if not needed				final String relativeApplicationPath=relativizePath(getBasePath(), guiseApplication.getBasePath());	//get the application path relative to the container path
+				final GuiseEnvironment environment=guiseSession.getEnvironment();	//get the new session's environment
+				final Cookie[] cookies=httpRequest.getCookies();	//get the cookies in the request
+				if(cookies!=null)	//if a cookie array was returned
+				{
+					for(final Cookie cookie:cookies)	//for each cookie in the request
+					{
+						final String cookieName=cookie.getName();	//get the name of this cookie
+//					TODO del Debug.trace("Looking at cookie", cookieName, "with value", cookie.getValue());
+						if(!SESSION_ID_COOKIE_NAME.equals(cookieName))	//ignore the session ID
+						{
+							environment.setProperty(cookieName, decode(cookie.getValue()));	//put this cookie's decoded value into the session's environment
+						}
+					}
+				}
+				environment.setProperties(getUserAgentProperties(httpRequest));	//initialize the Guise environment user agent information
+				addGuiseSession(guiseSession);	//add and initialize the Guise session
+				final Locale[] clientAcceptedLanguages=getAcceptedLanguages(httpRequest);	//get all languages accepted by the client
+				guiseSession.requestLocale(asList(clientAcceptedLanguages));	//ask the Guise session to change to one of the accepted locales, if the application supports one
+				httpSessionGuiseApplicationGuiseSessionMap.put(sessionKey, guiseSession);	//associate the Guise session with the Guise application and HTTP session
+			}
+		}
+		if(newGuiseSession)	//if we created a new Guise session, associate the Guise application with the new Guise session so that when the HTTP session expires we'll know which Guise sessions went with it (it is important to do this outside the synchronized block, because there are nested synchronizations when the HTTP session expires, but that won't happen until later so there's no need to synchronize now)
+		{		
+			httpSessionGuiseSessionSetMap.addItem(httpSession, guiseSession);	//indicate that this Guise session is for this HTTP setssion
+		}
+		return guiseSession;	//return the Guise session
+	}
+
 /*TODO bring back logging after testing log out-of-memory error
 				try
 				{
@@ -246,21 +265,6 @@ while(headerNames.hasMoreElements())
 					throw new AssertionError(ioException);
 				}
 */
-				final GuiseEnvironment environment=guiseSession.getEnvironment();	//get the new session's environment
-				final Cookie[] cookies=httpRequest.getCookies();	//get the cookies in the request
-				if(cookies!=null)	//if a cookie array was returned
-				{
-					for(final Cookie cookie:cookies)	//for each cookie in the request
-					{
-						final String cookieName=cookie.getName();	//get the name of this cookie
-//					TODO del Debug.trace("Looking at cookie", cookieName, "with value", cookie.getValue());
-						if(!SESSION_ID_COOKIE_NAME.equals(cookieName))	//ignore the session ID
-						{
-							environment.setProperty(cookieName, decode(cookie.getValue()));	//put this cookie's decoded value into the session's environment
-						}
-					}
-				}
-				environment.setProperties(getUserAgentProperties(httpRequest));	//initialize the Guise environment user agent information
 /*TODO del if can't be salvaged for Firefox
 					//The "Accept: application/x-shockwave-flash" header is only sent in the first request from IE.
 					//Unfortunately Firefox 1.5.0.3 doesn't send it at all.
@@ -281,75 +285,70 @@ while(headerNames.hasMoreElements())
 					throw new AssertionError(ioException);
 				}
 */
-				addGuiseSession(guiseSession);	//add and initialize the Guise session
-				final Locale[] clientAcceptedLanguages=getAcceptedLanguages(httpRequest);	//get all languages accepted by the client
-				guiseSession.requestLocale(asList(clientAcceptedLanguages));	//ask the Guise session to change to one of the accepted locales, if the application supports one
-				guiseSessionMap.put(httpSession, guiseSession);	//associate the Guise session with the HTTP session
 
-Debug.info("user agent:", getUserAgent(httpRequest));
-Debug.info("environment:", appendAssociativeArrayValue(new StringBuilder(), environment.getProperties()));	//TODO del
-Debug.info("memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
-			
-			
-			}
-			return guiseSession;	//return the Guise session
-		}
-	}
-
-	/**Removes the Guise session for the given HTTP session.
+	/**Removes the Guise sessions for the given HTTP session.
 	This method can only be accessed by classes in the same package.
 	This method should only be called by HTTP Guise session manager.
-	@param httpSession The HTTP session which should be removed along with its corresponding Guise session. 
-	@return The Guise session previously associated with the provided HTTP session, or <code>null</code> if no Guise session was associated with the given HTTP session.
+	@param httpSession The HTTP session which should be removed along with its corresponding Guise session.
+	@return The set of Guise sessions previously associated with the HTTP session.
 	@see HTTPGuiseSessionManager
 	*/
-	protected GuiseSession removeGuiseSession(final HttpSession httpSession)
+	protected Set<GuiseSession> removeGuiseSessions(final HttpSession httpSession)
 	{
-Debug.trace("---removing Guise session", httpSession.getId());
-		GuiseSession guiseSession=guiseSessionMap.remove(httpSession);	//remove the HTTP session and Guise session association
-		if(guiseSession!=null)	//if there is a Guise session associated with the HTTP session
+		final Set<GuiseSession> guiseSessions;	//we'll find all Guise sessions associated with the HTTP session
+		synchronized(httpSessionGuiseApplicationGuiseSessionMap)	//because it might be possible for a new HTTP request to revive the HTTP session and repopulate the HTTP session/Guise application->Guise session map, lock access to the map until we remove all the relevant entries
 		{
-			try
+			guiseSessions=httpSessionGuiseSessionSetMap.remove(httpSession);	//in one synchronized motion, remove and retrieve any Guise sessions associated with this HTTP session
+			if(guiseSessions==null)	//if there is no set of Guise sessions, there's nothing for us to do here
 			{
-/*TODO bring back logging after testing log out-of-memory error
-					//TODO refactor and consolidate; prevent code duplication
-				final Map<String, Object> logParameters=new HashMap<String, Object>();	//create a map for our log parameters
-				logParameters.put("id", httpSession.getId());	//session ID
-				logParameters.put("creationTime", new Date(httpSession.getCreationTime()));	//session creation time
-				logParameters.put("isNew", Boolean.valueOf(httpSession.isNew()));	//session is new
-				logParameters.put("lastAccessedTime", new Date(httpSession.getLastAccessedTime()));	//session last accessed time
-				logParameters.put("maxInactiveInterval", new Integer(httpSession.getMaxInactiveInterval()));	//session max inactive interval
-				try
-				{
-					Log.log(guiseSession.getLogWriter(), InformationLevel.LOG, null, null, "guise-session-destroy", null, logParameters, null);	//TODO improve; use a constant
-					guiseSession.getLogWriter().flush();	//flush the log information
-				}
-				catch(final IOException ioException)	//we have a problem if we can't write to the file TODO improve; we would go on now, but we would have a problem when we try to close the standard error stream; what needs to be done is to create a better default stream, and then recover from this error
-				{
-					throw new AssertionError(ioException);
-				}
-*/
-				removeGuiseSession(guiseSession);	//remove the Guise session
+				return emptySet();	//indicate that there were no Guise sessions
 			}
-			finally
+			for(final GuiseSession guiseSession:guiseSessions)	//look at all Guise sessions associated with this HTTP session
 			{
-/*TODO bring back logging after testing log out-of-memory error
-				try
-				{
-					guiseSession.getLogWriter().close();	//always close the log writer
-				}
-				catch(final IOException ioException)	//if there is an I/O error
-				{
-					Debug.error(ioException);	//log the error
-				}
-*/
+				final GuiseApplicationHTTPSessionKey sessionKey=new GuiseApplicationHTTPSessionKey(guiseSession.getApplication(), httpSession);	//create a key for looking up a Guise session based upon the Guise application and the HTTP session
+				httpSessionGuiseApplicationGuiseSessionMap.remove(sessionKey);	//remove the HTTP session and Guise session association
 			}
 		}
-
-final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
-Debug.info("memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
-		return guiseSession;	//return the associated Guise session
+		for(final GuiseSession guiseSession:guiseSessions)	//now that we've updated the relevant maps related to the HTTP session, we can uninitialize the Guise sessions at our leisure without blocking new HTTP requests
+		{
+Debug.trace("---removing Guise session", guiseSession, "associated with HTTP sesssion", httpSession.getId());
+			removeGuiseSession(guiseSession);	//remove the Guise session
+		}
+		return guiseSessions;	//return the Guise sessions
 	}
+
+	/*TODO bring back logging after testing log out-of-memory error
+	try
+	{
+			//TODO refactor and consolidate; prevent code duplication
+		final Map<String, Object> logParameters=new HashMap<String, Object>();	//create a map for our log parameters
+		logParameters.put("id", httpSession.getId());	//session ID
+		logParameters.put("creationTime", new Date(httpSession.getCreationTime()));	//session creation time
+		logParameters.put("isNew", Boolean.valueOf(httpSession.isNew()));	//session is new
+		logParameters.put("lastAccessedTime", new Date(httpSession.getLastAccessedTime()));	//session last accessed time
+		logParameters.put("maxInactiveInterval", new Integer(httpSession.getMaxInactiveInterval()));	//session max inactive interval
+		try
+		{
+			Log.log(guiseSession.getLogWriter(), InformationLevel.LOG, null, null, "guise-session-destroy", null, logParameters, null);	//TODO improve; use a constant
+			guiseSession.getLogWriter().flush();	//flush the log information
+		}
+		catch(final IOException ioException)	//we have a problem if we can't write to the file TODO improve; we would go on now, but we would have a problem when we try to close the standard error stream; what needs to be done is to create a better default stream, and then recover from this error
+		{
+			throw new AssertionError(ioException);
+		}
+	}
+	finally
+	{
+		try
+		{
+			guiseSession.getLogWriter().close();	//always close the log writer
+		}
+		catch(final IOException ioException)	//if there is an I/O error
+		{
+			Debug.error(ioException);	//log the error
+		}
+}
+*/
 
 	/**Determines if the container has a resource available stored at the given resource path.
 	The provided path is first normalized.
@@ -473,4 +472,18 @@ Debug.info("memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "f
 		return super.isAuthorized(application, resourceURI, principal, realm);	//delegate to the parent class
 	}
 
+	/**A key suitable for a hash map made up of a Guise application and an HTTP session.
+	@author Garret Wilson
+	*/
+	protected static class GuiseApplicationHTTPSessionKey extends AbstractProxyHashObject
+	{
+		/**Guise application and HTTP session constructor.
+		@param guiseApplication The Guise application providing part of the key.
+		@param httpSession The HTTP session providing part of the key.
+		*/
+		public GuiseApplicationHTTPSessionKey(final GuiseApplication guiseApplication, final HttpSession httpSession)
+		{
+			super(guiseApplication, httpSession);	//construct the parent class
+		}
+	}
 }

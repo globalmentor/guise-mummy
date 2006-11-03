@@ -26,10 +26,10 @@ public class FormControlEvent implements ControlEvent
 		public final boolean isProvisional() {return provisional;}
 
 	/**The map of parameter lists.*/
-	private final ListMap<String, Object> parameterListMap=new ArrayListHashMap<String, Object>();
+	private final CollectionMap<String, Object, List<Object>> parameterListMap=new ArrayListHashMap<String, Object>();
 
 		/**@return The map of parameter lists.*/
-		public ListMap<String, Object> getParameterListMap() {return parameterListMap;}
+		public CollectionMap<String, Object, List<Object>> getParameterListMap() {return parameterListMap;}
 
 	/**Constructor that indicates non-provisional exhaustive values.
 	@param exhaustive Whether this event represents all components on the form.
@@ -57,7 +57,7 @@ public class FormControlEvent implements ControlEvent
 		{
 			stringBuilder.append("(exhaustive) ");
 		}
-		final ListMap<String, Object> parameterListMap=getParameterListMap();	//get the request parameter map
+		final CollectionMap<String, Object, List<Object>> parameterListMap=getParameterListMap();	//get the request parameter map
 		for(final Map.Entry<String, List<Object>> parameterListMapEntry:parameterListMap.entrySet())	//for each entry in the map of parameter lists
 		{
 			stringBuilder.append("Key: ").append(parameterListMapEntry.getKey()).append(" Value: {");	//Key: key Value: {

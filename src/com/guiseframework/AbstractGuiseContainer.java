@@ -1,6 +1,7 @@
 package com.guiseframework;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -15,9 +16,11 @@ import com.garretwilson.rdf.RDFResourceIO;
 import com.guiseframework.platform.web.WebPlatformConstants;
 import com.guiseframework.theme.Theme;
 
+import static com.garretwilson.io.FileUtilities.ensureDirectoryExists;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.lang.ThreadUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
+import static com.garretwilson.servlet.ServletUtilities.getLogDirectory;
 import static com.guiseframework.Guise.*;
 
 /**An abstract base class for a Guise instance.
@@ -115,16 +118,20 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	}
 
 	/**Installs the given application at the given base path.
+	This version ensures the home and log directories exist.
 	This version loads the theme, if any.
 	If no theme is specified, the default theme will be loaded.
 	@param application The application to install.
 	@param basePath The base path at which the application is being installed.
-	@exception NullPointerException if either the application or base path is <code>null</code>.
+	@param homeDirectory The home directory of the application.
+	@param logDirectory The log directory of the application.
+	@exception NullPointerException if the application, base path, home directory, and/or log directory is <code>null</code>.
 	@exception IllegalArgumentException if the base path is not absolute and does not end with a slash ('/') character.
 	@exception IllegalStateException if the application is already installed in some container.
 	@exception IllegalStateException if there is already an application installed in this container at the given base path.
+	@exception IOException if there is an I/O error when installing the application.
 	*/
-	protected void installApplication(final AbstractGuiseApplication application, final String basePath)
+	protected void installApplication(final AbstractGuiseApplication application, final String basePath, final File homeDirectory, final File logDirectory) throws IOException
 	{
 		checkInstance(application, "Application cannot be null");
 		checkInstance(basePath, "Application base path cannot be null");
@@ -134,7 +141,9 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 			{
 				throw new IllegalStateException("Application already installed at base path "+basePath);
 			}
-			application.install(this, basePath);	//tell the application it's being installed
+			ensureDirectoryExists(homeDirectory);	//make sure the application home directory exists
+			ensureDirectoryExists(logDirectory);	//make sure the application log directory exists
+			application.install(this, basePath, homeDirectory, logDirectory);	//tell the application it's being installed
 			applicationMap.put(basePath, application);	//install the application in the map
 		}
 
@@ -144,15 +153,17 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 		final Theme oldTheme=application.getTheme();	//get the theme, if any
 		final URI oldThemeURI=oldTheme!=null ? oldTheme.getReferenceURI() : defaultThemeURI;	//get the old theme URI; if no theme is specified, use the the defaul theme
 //TODO del		final URI themeURI=application.getContainer().getBaseURI().resolve(application.resolveURI(oldThemeURI));	//resolve the theme URI against the Guise application and then against the container base URI TODO create a common method to do this
-		try
+//TODO fix		try
 		{
 			final Theme newTheme=loadApplicationTheme(application, oldThemeURI, defaultThemeURI);	//load the theme and any parent themes
 			application.setTheme(newTheme);	//update the application theme with the theme we just loaded
 		}
+/*TODO remove the application from the map if there is an error, maybe
 		catch(final IOException ioException)	//if there is an I/O error
 		{
 			throw new AssertionError(ioException);	//TODO fix
 		}
+*/
 	}
 
 	/**Loads a theme from the given URI.

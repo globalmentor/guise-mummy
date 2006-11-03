@@ -49,8 +49,11 @@ public class HTTPGuiseSessionManager implements HttpSessionListener
 			{
 //TODO del Debug.info("creating session for user agent name", userAgentName);
 				httpSession=httpRequest.getSession(true);	//create a new HTTP session for the HTTP request
+					//TODO is there a race condition here? could two requests requesting the same session happen concurrently?
+				guiseContainerMap.put(httpSession, guiseContainer);	//store our Guise container so we'll know with which container this session is associated (this servlet may serve many Guise applications in many Guise containers in the web application)
 				if(isSpider)	//if we just created a session for a spider
 				{
+//TODO del Debug.info("storing this session as a spider session");
 					spiderSession=httpSession;	//store the spider session for future sharing
 				}
 			}
@@ -60,7 +63,6 @@ public class HTTPGuiseSessionManager implements HttpSessionListener
 				httpSession=spiderSession;	//use the spider session
 			}
 		}
-		guiseContainerMap.put(httpSession, guiseContainer);	//store our Guise container so we'll know with which container this session is associated (this servlet may serve many Guise applications in many Guise containers in the web application)
 		return guiseContainer.getGuiseSession(guiseApplication, httpRequest, httpSession);	//ask the Guise application for a Guise session corresponding to the HTTP session
 	}
 	
@@ -86,8 +88,8 @@ public class HTTPGuiseSessionManager implements HttpSessionListener
 			if(guiseContainer!=null)	//if we know the Guise container associated with this HTTP request
 			{
 				guiseContainerMap.remove(httpSession);	//remove the association between this HTTP session and the container
-				final GuiseSession guiseSession=guiseContainer.removeGuiseSession(httpSession);	//remove the Guise session associated with the HTTP session in the application
-				assert guiseSession!=null : "Guise container associated with HTTP session unexpectedly did not have an associated Guise session.";
+				final Set<GuiseSession> guiseSessions=guiseContainer.removeGuiseSessions(httpSession);	//remove the Guise sessions associated with the HTTP session in the application
+				assert !guiseSessions.isEmpty() : "Guise container associated with HTTP session unexpectedly did not have any associated Guise sessions.";
 			}
 		}
 	}

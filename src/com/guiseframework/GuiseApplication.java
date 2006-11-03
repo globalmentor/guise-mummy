@@ -183,6 +183,20 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public String getBasePath();
 
+	/**Returns the home directory shared by all sessions of this application.
+	This value is not available before the application is installed.
+	@return The home directory of the application.
+	@exception IllegalStateException if the application has not yet been installed into a container. 
+	*/
+	public File getHomeDirectory();
+
+	/**Returns the log directory shared by all sessions of this application.
+	This value is not available before the application is installed.
+	@return The log directory of the application.
+	@exception IllegalStateException if the application has not yet been installed into a container. 
+	*/
+	public File getLogDirectory();
+
 	/**@return Whether this application has been installed into a container at some base path.
 	@see #getContainer()
 	@see #getBasePath()

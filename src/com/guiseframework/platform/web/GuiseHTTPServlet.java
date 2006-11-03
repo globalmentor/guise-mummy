@@ -105,8 +105,6 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	public final static String APPLICATION_INIT_PARAMETER="application";
 	/**The init parameter, "applicationClass", used to specify the application class.*/
 	public final static String APPLICATION_CLASS_INIT_PARAMETER="applicationClass";
-	/**The init parameter, "debugReportLevel", used to specify the level of debug reporting for the JVM of type {@link Debug.ReportLevel}.*/
-	public final static String DEBUG_REPORT_LEVEL_INIT_PARAMETER="debugReportLevel";
 	/**The init parameter, "locales", used to specify the supported locales.*/
 	public final static String LOCALES_INIT_PARAMETER="locales";
 	/**The prefix, "navigation.", used to identify navigation definitions in the web application's init parameters.*/
@@ -122,9 +120,6 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	/**The init parameter, "dcsID", used to specify the WebTrends or other Data Collection System logging identifier.*/
 	public final static String DCS_ID_PARAMETER="dcsID";
 
-	/**The context parameter of the data base directory.*/
-	public final static String DATA_BASE_DIRECTORY_CONTEXT_PARAMETER="dataBaseDirectory";	//TODO rename to dataDirectory
-
 	/**The content type of a Guise AJAX request, <code>application/x-guise-ajax-request</code>.*/
 	public final static ContentType GUISE_AJAX_REQUEST_CONTENT_TYPE=new ContentType(ContentTypeConstants.APPLICATION, ContentTypeConstants.EXTENSION_PREFIX+"guise-ajax-request"+ContentTypeConstants.SUBTYPE_SUFFIX_DELIMITER_CHAR+ContentTypeConstants.XML_SUBTYPE_SUFFIX, null);
 
@@ -133,74 +128,6 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 
 	/**Whether debug is turned on for Guise.*/
 	protected final static boolean DEBUG=true;	//TODO load this from an init parameter
-
-	/**The default level of debug reporting for Guise.*/
-	protected final static Debug.ReportLevel DEFAULT_DEBUG_REPORT_LEVEL=Debug.ReportLevel.TRACE;
-
-	/**The cached debug log file, or null if it has not yet been initialized.*/
-	private static File logFile=null;
-
-	/**Determines the debug log file.
-	@param context The servlet context from which to retrieve context parameters.
-	@return The file for debug logging.
-	@see #getLogDirectory(ServletContext)
-	*/
-	protected static File getDebugLogFile(final ServletContext context)
-	{
-		if(logFile==null)	//if no log file has been determined
-		{
-			final DateFormat logFilenameDateFormat=new W3CDateFormat(W3CDateFormat.Style.DATE);	//create a formatter for the log filename
-			final String logFilename=logFilenameDateFormat.format(new Date())+" debug.log";	//create a filename in the form "date debug.log" TODO use a constant
-			logFile=new File(getLogDirectory(context), logFilename);	//TODO use a constant
-		}
-		return logFile;	//return the log file
-	}
-
-	/**The cached data directory, or null if it has not yet been initialized.*/
-	private static File dataDirectory=null;
-
-	/**Determines the data base directory, in this order:
-	<ol>
-		<li>The file for the value of the context parameter <code>dataBaseDirectory</code>.</li>
-		<li>The file for the real path to "/WEB-INF/guise".</li>
-	</ol>
-	@param context The servlet context from which to retrieve context parameters.
-	@return The data base directory.
-	@see ServletUtilities#getWebInfDirectory(ServletContext)
-	@see #DATA_BASE_DIRECTORY_CONTEXT_PARAMETER
-	@exception IllegalStateException thrown if no data directory was specified and the real path to <code>WEB-INF</code> could not be determined.
-	*/
-	public static File getDataDirectory(final ServletContext context)
-	{
-		if(dataDirectory==null)	//if the data directory has not been determined
-		{
-			final String path=context.getInitParameter(DATA_BASE_DIRECTORY_CONTEXT_PARAMETER);	//get the context parameter
-			if(path!=null)	//if there is a data directory path
-			{
-				dataDirectory=new File(path);	//use the path for the data directory
-			}
-			else	//if there is no data directory path
-			{
-				final File webInfDirectory=getWebInfDirectory(context);	//get the WEB-INF directory
-				if(webInfDirectory==null)	//if we can't get the WEB-INF directory
-				{
-					throw new IllegalStateException(DATA_BASE_DIRECTORY_CONTEXT_PARAMETER+" init parameter not specified and real path to WEB-INF directory not available.");
-				}
-				dataDirectory=new File(webInfDirectory, "guise");	//use a default WEB-INF-based path TODO use a constant
-			}
-		}
-		return dataDirectory;	//return the data directory
-	}
-
-	/**Determines the directory for log files.
-	@param context The servlet context from which to retrieve context parameters.
-	@return The directory for log files.
-	@see #getDataDirectory(ServletContext)
-	*/
-	public static File getLogDirectory(final ServletContext context)
-	{
-		return new File(getDataDirectory(context), "logs");	//TODO use a constant
-	}
 
 	/**The Guise container that owns the applications.*/
 	private HTTPServletGuiseContainer guiseContainer=null;
@@ -234,41 +161,13 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	}
 		
 	/**Initializes the servlet.
-	@param servletConfig The servlet configuration. 
+	@param servletConfig The servlet configuration.
 	@exception ServletException if there is a problem initializing.
 	*/
 	public void init(final ServletConfig servletConfig) throws ServletException
 	{
 		super.init(servletConfig);	//do the default initialization
-		try
-		{
-			ensureDirectoryExists(getLogDirectory(getServletContext()));	//make sure the log directory exists
-		}
-		catch(final IOException ioException)	//if we can't create the log directory
-		{
-			throw new ServletException(ioException);
-		}
-		try
-		{
-			final String debugReportLevelString=servletConfig.getInitParameter(DEBUG_REPORT_LEVEL_INIT_PARAMETER);	//get name of the guise application class
-			if(debugReportLevelString!=null)	//if there is a debug report level specified
-			{
-				Debug.setMinimumReportLevel(Debug.ReportLevel.valueOf(debugReportLevelString));	//change the debug to the specified level
-			}
-		}
-		catch(final IllegalArgumentException illegalArgumentException)
-		{
-			throw new ServletException(illegalArgumentException);
-		}
-		try
-		{
-			Debug.setOutput(getDebugLogFile(getServletContext()));	//set the log file
-			Debug.log("initializing servlet", servletConfig.getServletName(), Guise.GUISE_NAME, Guise.BUILD_ID);
-		}
-		catch(final FileNotFoundException fileNotFoundException)	//if we can't find the debug file
-		{
-			throw new ServletException(fileNotFoundException);
-		}
+		Debug.log("initializing servlet", servletConfig.getServletName(), Guise.GUISE_NAME, Guise.BUILD_ID);
 		setReadOnly(true);	//make this servlet read-only
 		//TODO turn off directory listings, and/or fix them
 		try
@@ -465,7 +364,7 @@ Debug.trace("checking for categories");
 						path=pathPanelBindingURI.getRawPath();	//extract the path from the URI
 						if(path!=null)	//if a path was specified
 						{
-							final ListMap<String, String> parameterListMap=getParameterMap(pathPanelBindingURI);	//get the URI parameters
+							final CollectionMap<String, String, List<String>> parameterListMap=getParameterMap(pathPanelBindingURI);	//get the URI parameters
 							final String className=parameterListMap.getItem(NAVIGATION_CLASS_PARAMETER);	//get the class parameter
 							if(className!=null)	//if a class name was specified
 							{
@@ -540,16 +439,33 @@ Debug.trace("checking for categories");
 //TODO del				Debug.trace("context path", getContextPath());
 				final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request
 //			TODO del	Debug.trace("requestURI", requestURI);
-				final URI containerBaseURI=changePath(requestURI, getContextPath()+PATH_SEPARATOR);	//determine the container base URI
+				final String containerBasePath=getContextPath()+PATH_SEPARATOR;	//determine the base path of the container
+				final URI containerBaseURI=changePath(requestURI, containerBasePath);	//determine the container base URI
 //			TODO del	Debug.trace("containerURI", containerBaseURI);
 	
-				guiseContainer=HTTPServletGuiseContainer.getGuiseContainer(getServletContext(), containerBaseURI);	//get a reference to the Guise container, creating it if needed
+				final ServletContext servletContext=getServletContext();	//get the servlet context
+				guiseContainer=HTTPServletGuiseContainer.getGuiseContainer(servletContext, containerBaseURI);	//get a reference to the Guise container, creating it if needed
 //			TODO del	Debug.trace("guise container: ", guiseContainer, "for servlet context", getServletContext());
+//TODO del Debug.trace("installing application into guise container: ", guiseContainer, "for servlet context", getServletContext());
 					//install the application into the container
 				final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-				final String guiseApplicationContextPath=request.getContextPath()+request.getServletPath()+PATH_SEPARATOR;	//construct the Guise application context path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash
-//			TODO delDebug.trace("ready to install application into container with context path", guiseApplicationContextPath);
-				guiseContainer.installApplication(guiseApplication, guiseApplicationContextPath);	//install the application			
+						//"/contextPath" or "", "/servletPath" or ""
+				final String guiseApplicationBasePath=request.getContextPath()+request.getServletPath()+PATH_SEPARATOR;	//construct the Guise application base path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash
+				final String guiseApplicationRelativePath=relativizePath(containerBasePath, guiseApplicationBasePath);	//get the application path relative to the container path
+
+//TODO del Debug.trace("context path", request.getContextPath(), "servlet path", request.getServletPath(), "container base path", containerBasePath, "application base path", guiseApplicationBasePath, "application relative path", guiseApplicationRelativePath);
+				
+				final File guiseApplicationHomeDirectory=getDataDirectory(servletContext, DATA_DIRECTORY_INIT_PARAMETER, "guise/home/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
+				final File guiseApplicationLogDirectory=getDataDirectory(servletContext, LOG_DIRECTORY_INIT_PARAMETER, "guise/logs/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
+				//			TODO delDebug.trace("ready to install application into container with context path", guiseApplicationContextPath);
+				try
+				{
+					guiseContainer.installApplication(guiseApplication, guiseApplicationBasePath, guiseApplicationHomeDirectory, guiseApplicationLogDirectory);	//install the application
+				}
+				catch(final IOException ioException)	//if there is an I/O exception installing the application
+				{
+					throw new ServletException(ioException);
+				}
 			}
 		}
 //	TODO del		Debug.trace("initializing; container base URI:", guiseContainer.getBaseURI(), "container base path:", guiseContainer.getBasePath());
@@ -580,7 +496,7 @@ Debug.trace("checking for categories");
 //TODO del Debug.info("user agent:", getUserAgent(request));
 //	TODO del final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
 //	TODO del Debug.info("before service request: memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
-
+		
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
 		final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
 /*TODO del
@@ -598,11 +514,11 @@ while(headerNames.hasMoreElements())
 		}
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-
 		if(guiseApplication.hasDestination(navigationPath))	//if we have a destination associated with the requested path
 		{
 			final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
-	/*TODO del
+			
+/*TODO del
 	Debug.info("session ID", guiseSession.getHTTPSession().getId());	//TODO del
 	Debug.info("content length:", request.getContentLength());
 	Debug.info("content type:", request.getContentType());
@@ -834,7 +750,7 @@ Debug.trace("got control events");
 								}
 								else	//if this is only a partial form submission
 								{
-									final ListMap<String, Object> parameterListMap=formControlEvent.getParameterListMap();	//get the request parameter map
+									final CollectionMap<String, Object, List<Object>> parameterListMap=formControlEvent.getParameterListMap();	//get the request parameter map
 									for(final Map.Entry<String, List<Object>> parameterListMapEntry:parameterListMap.entrySet())	//for each entry in the map of parameter lists
 									{
 										final String parameterName=parameterListMapEntry.getKey();	//get the parameter name
@@ -1509,7 +1425,7 @@ Debug.info("AJAX event:", eventName);
 							final boolean exhaustive=Boolean.valueOf(eventElement.getAttribute("exhaustive")).booleanValue();	//get the exhaustive indication TODO use a constant
 							final boolean provisional=Boolean.valueOf(eventElement.getAttribute("provisional")).booleanValue();	//get the provisional indication TODO use a constant
 							final FormControlEvent formSubmitEvent=new FormControlEvent(exhaustive, provisional);	//create a new form submission event
-							final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
+							final CollectionMap<String, Object, List<Object>> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
 							final List<Node> controlNodes=(List<Node>)XPath.evaluatePathExpression(eventNode, AJAX_REQUEST_CONTROL_XPATH_EXPRESSION);	//get all the control settings
 							for(final Node controlNode:controlNodes)	//for each control node
 							{
@@ -1642,7 +1558,7 @@ Debug.info("AJAX event:", eventName);
 			if(FileUpload.isMultipartContent(request))	//if this is multipart/form-data content
 			{
 				final FormControlEvent formSubmitEvent=new FormControlEvent(true);	//create a new form submission event, indicating that the event is exhaustive
-				final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
+				final CollectionMap<String, Object, List<Object>> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
 				final DiskFileUpload diskFileUpload=new DiskFileUpload();	//create a file upload handler
 				diskFileUpload.setSizeMax(-1);	//don't reject anything
 				try	//try to parse the file items submitted in the request
@@ -1668,7 +1584,7 @@ Debug.info("AJAX event:", eventName);
 				if(!exhaustive || request.getParameter(XHTMLApplicationFrameView.getActionInputID(guiseSession.getApplicationFrame()))!=null)	//if this is a POST, only use the data if it is a Guise POST
 				{				
 					final FormControlEvent formSubmitEvent=new FormControlEvent(exhaustive);	//create a new form submission event
-					final ListMap<String, Object> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
+					final CollectionMap<String, Object, List<Object>> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
 					final Iterator parameterEntryIterator=request.getParameterMap().entrySet().iterator();	//get an iterator to the parameter entries
 					while(parameterEntryIterator.hasNext())	//while there are more parameter entries
 					{

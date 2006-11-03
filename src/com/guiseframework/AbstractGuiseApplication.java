@@ -79,6 +79,39 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		@return The base path representing the Guise application, or <code>null</code> if the application is not yet installed.
 		*/
 		public String getBasePath() {return basePath;}
+	
+	/**The home directory shared by all sessions of this application.*/	
+	private File homeDirectory=null;
+
+		/**Returns the home directory shared by all sessions of this application.
+		This value is not available before the application is installed.
+		@return The home directory of the application.
+		@exception IllegalStateException if the application has not yet been installed into a container. 
+		*/
+		public File getHomeDirectory()
+		{
+			checkInstalled();	//make sure the application has been installed (which will set the home directory)
+			assert homeDirectory!=null : "Home directory is null even though application is installed.";
+			return homeDirectory;	//return the home directory;
+		}
+
+	/**The log directory shared by all sessions of this application.*/	
+	private File logDirectory=null;
+
+		/**Returns the log directory shared by all sessions of this application.
+		This value is not available before the application is installed.
+		@return The log directory of the application.
+		@exception IllegalStateException if the application has not yet been installed into a container. 
+		*/
+		public File getLogDirectory()
+		{
+			checkInstalled();	//make sure the application has been installed (which will set the log directory)
+			assert logDirectory!=null : "Log directory is null even though application is installed.";
+			return logDirectory;	//return the log directory;
+		}
+
+	/**The hash code, which we'll update after installation. The value is only used after installation, so the initial value is irrelevant.*/
+//TODO del if not needed	private int hashCode=-1;
 
 	/**@return Whether this application has been installed into a container at some base path.
 	@see #getContainer()
@@ -102,11 +135,13 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	This method is only package-visible so that it can be accessed by {@link AbstractGuiseContainer}.
 	@param container The Guise container into which the application is being installed.
 	@param basePath The base path at which the application is being installed.
-	@exception NullPointerException if either the container or base path is <code>null</code>.
+	@param homeDirectory The home directory of the application.
+	@param logDirectory The log directory of the application.
+	@exception NullPointerException if the container, base path, home directory, and/or log directory is <code>null</code>.
 	@exception IllegalArgumentException if the context path is not absolute and does not end with a slash ('/') character.
 	@exception IllegalStateException if the application is already installed.
 	*/
-	void install(final AbstractGuiseContainer container, final String basePath)
+	void install(final AbstractGuiseContainer container, final String basePath, final File homeDirectory, final File logDirectory)
 	{
 		if(this.container!=null || this.basePath!=null)	//if we already have a container and/or a base path
 		{
@@ -120,6 +155,9 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		}
 		this.container=container;	//store the container
 		this.basePath=basePath;	//store the base path
+		this.homeDirectory=checkInstance(homeDirectory, "Home directory cannot be null.");
+		this.logDirectory=checkInstance(logDirectory, "Log directory cannot be null.");
+//TODO del if not needed		hashCode=ObjectUtilities.hashCode(container.getBaseURI(), basePath);	//create a hash code based upon the base URI of the container and the base path of the application
 	}
 
 	/**Uninstalls the application from the given container.
@@ -542,9 +580,6 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 //TODO how do we keep the general public from changing the past/destination bindings?
 
-	
-	
-	
 	/**The concurrent map of destinations associated with application context-relative paths.*/
 	private final Map<String, Destination> pathDestinationMap=new ConcurrentHashMap<String, Destination>();
 
@@ -921,5 +956,4 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	{
 		return true;	//default to authorizing access
 	}
-
 }
