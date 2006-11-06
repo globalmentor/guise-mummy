@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+import com.garretwilson.io.AsynchronousWriter;
 import com.garretwilson.text.W3CDateFormat;
 import com.garretwilson.text.elff.ELFF;
 import com.garretwilson.text.elff.Field;
@@ -114,7 +115,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 			final DateFormat logFilenameDateFormat=new W3CDateFormat(W3CDateFormat.Style.DATE);	//create a formatter for the log filename
 			final String logFilename=logFilenameDateFormat.format(new Date())+" elff.log";	//create a filename in the form "date elff.log" TODO use a constant
 			final File logFile=new File(logDirectory, logFilename);	//create a log file object
-			final Writer logWriter=new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(logFile, true)), UTF_8);	//create a buffered UTF-8 log writer, appending if the file already exists
+			final Writer logWriter=new AsynchronousWriter(new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(logFile, true)), UTF_8));	//create an asynchronous, buffered UTF-8 log writer, appending if the file already exists	
 			return logWriter;	//return the log writer
 		}
 		catch(final UnsupportedEncodingException unsupportedEncodingException)	//we should always support UTF-8
@@ -123,7 +124,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 		}
 		catch(final IOException ioException)	//we have a problem if we can't create a file TODO improve; we would go on now, but we would have a problem when we try to close the standard error stream; what needs to be done is to create a better default stream, and then recover from this error
 		{
-			throw new AssertionError(ioException);
+			throw new AssertionError(ioException);	//TODO fix; pass along IOException
 		}
 	}
 	

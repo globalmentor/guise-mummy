@@ -20,7 +20,6 @@ import static com.garretwilson.io.FileUtilities.ensureDirectoryExists;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.lang.ThreadUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
-import static com.garretwilson.servlet.ServletUtilities.getLogDirectory;
 import static com.guiseframework.Guise.*;
 
 /**An abstract base class for a Guise instance.
