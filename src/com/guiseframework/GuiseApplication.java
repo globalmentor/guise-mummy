@@ -5,6 +5,7 @@ import java.net.URI;
 import java.util.*;
 
 import com.garretwilson.beans.PropertyBindable;
+import com.garretwilson.io.IOOperation;
 import com.guiseframework.component.*;
 import com.guiseframework.component.kit.ComponentKit;
 import com.guiseframework.context.GuiseContext;
@@ -196,6 +197,17 @@ public interface GuiseApplication extends PropertyBindable
 	@exception IllegalStateException if the application has not yet been installed into a container. 
 	*/
 	public File getLogDirectory();
+
+	/**Retrieves a writer suitable for recording log information for the application.
+	The given base filename is appended with a representation of the current date.
+	If a log writer for the same date is available, it is returned; otherwise, a new log writer is created.
+	If the current date is a different day than that used for the current log writer for a given base filename, a new writer is created for the current date.
+	@param baseFilename The base filename (e.g. "base.log") that will be used in generating a log file for the current date (e.g. "base 2003-02-01.log").
+	@param initializer The encapsulation of any initialization that should be performed on any new writer, or <code>null</code> if no initialization is requested.
+	@param uninitializer The encapsulation of any uninitialization that should be performed on any new writer, or <code>null</code> if no uninitialization is requested.
+	@see GuiseApplication#getLogDirectory()
+	*/	
+	public Writer getLogWriter(final String baseFilename, /*TODO fix final CalendarResolution calendarResolution, */final IOOperation<Writer> initializer, final IOOperation<Writer> uninitializer) throws IOException;
 
 	/**@return Whether this application has been installed into a container at some base path.
 	@see #getContainer()

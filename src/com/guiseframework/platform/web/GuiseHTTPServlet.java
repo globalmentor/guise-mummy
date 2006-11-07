@@ -54,6 +54,7 @@ import static com.garretwilson.text.xml.XMLUtilities.createDocumentBuilder;
 import com.garretwilson.text.FormatUtilities;
 import com.garretwilson.text.W3CDateFormat;
 import com.garretwilson.text.elff.*;
+
 import static com.garretwilson.text.elff.WebTrendsConstants.*;
 import com.garretwilson.text.xml.XMLUtilities;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
@@ -152,12 +153,65 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 		/**@return The Guise application controlled by this servlet.*/
 		protected AbstractGuiseApplication getGuiseApplication() {return guiseApplication;}
 
+	/**The ELFF logger for this Guise application.*/
+	private final ELFF elff;
+
+		/**@return The ELFF logger for this application.*/
+		public ELFF getELFF() {return elff;}
+
+	/**The initializer for initializing ELFF writers.
+	This implementation writes the default directives along with the <code>Start-Date</code> directive.
+	*/
+	protected final IOOperation<Writer> elffWriterInitializer=new IOOperation<Writer>()
+	{
+
+		/**Performs an operation on the indicated object.
+		This implementation writes ELFF directives to the ELFF writer along with the <code>Start-Date</code> directive.
+		@param writer The ELFF writer to be initialized.
+		@throws IOException if there is an error during the operation.
+		@see ELFF#START_DATE_DIRECTIVE
+		*/
+		@SuppressWarnings("unchecked")	//we use a generic NameValuePair as a vararg
+		public void perform(final Writer writer) throws IOException
+		{
+			writer.write(getELFF().serializeDirectives());	//write the directives to the ELFF writer
+			writer.write(getELFF().serializeDirective(ELFF.START_DATE_DIRECTIVE, ELFF.createDateTimeFormat().format(new Date())));	//add the Start-Date directive with the current time
+			writer.flush();	//flush the directives to the writer
+		}
+	};
+
+	/**The uninitializer for uninitializing ELFF writers.
+	This implementation writes the <code>End-Date</code> directive.
+	*/
+	protected final IOOperation<Writer> elffWriterUninitializer=new IOOperation<Writer>()
+	{
+
+		/**Performs an operation on the indicated object.
+		This implementation writes the <code>End-Date</code> directive to the ELFF writer.
+		@param writer The ELFF writer to be uninitialized.
+		@throws IOException if there is an error during the operation.
+		@see ELFF#END_DATE_DIRECTIVE
+		*/
+		public void perform(final Writer writer) throws IOException
+		{
+			writer.write(getELFF().serializeDirective(ELFF.END_DATE_DIRECTIVE, ELFF.createDateTimeFormat().format(new Date())));	//add the End-Date directive with the current time
+			writer.flush();	//flush the directive to the writer
+		}
+	};
+
 	/**Default constructor.
 	Creates a single Guise application.
 	*/
 	public GuiseHTTPServlet()
 	{
 		Debug.setDebug(DEBUG);	//turn on debug if needed
+		elff=new ELFF(	//create an ELFF log
+				Field.DATE_FIELD, Field.TIME_FIELD, Field.CLIENT_IP_FIELD, Field.CLIENT_SERVER_USERNAME_FIELD, Field.CLIENT_SERVER_HOST_FIELD,
+				Field.CLIENT_SERVER_METHOD_FIELD, Field.CLIENT_SERVER_URI_STEM_FIELD, Field.CLIENT_SERVER_URI_QUERY_FIELD,
+				Field.SERVER_CLIENT_STATUS_FIELD, Field.CLIENT_SERVER_BYTES_FIELD, Field.CLIENT_SERVER_VERSION_FIELD,
+				Field.CLIENT_SERVER_USER_AGENT_HEADER_FIELD, Field.CLIENT_SERVER_COOKIE_HEADER_FIELD,
+				Field.CLIENT_SERVER_REFERER_HEADER_FIELD, Field.DCS_ID_FIELD);
+		elff.setDirective(ELFF.SOFTWARE_DIRECTIVE, Guise.GUISE_NAME+' '+Guise.BUILD_ID);	//set the software directive of the ELFF log
 	}
 		
 	/**Initializes the servlet.
@@ -904,8 +958,10 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 								final URI referrerURI=initControlEvent.getReferrerURI();	//get the initialization referrer URI
 								entry.setFieldValue(Field.CLIENT_SERVER_REFERER_HEADER_FIELD, referrerURI!=null ? referrerURI.toString() : null);	//store the referrer URI, if any
 								entry.setFieldValue(Field.DCS_ID_FIELD, guiseApplication.getDCSID());	//get the DCS ID from the application, if there is a DCS ID
-									//log this page								
-								getGuiseContainer().getELFFLog(guiseApplication).log(entry);	//get the ELFF log writer for this application and log the entry
+									//log this page
+								final Writer elffWriter=guiseApplication.getLogWriter("elff.log", elffWriterInitializer, elffWriterUninitializer);	//get the ELFF log writer for this application TODO use a constant
+								elffWriter.write(getELFF().serializeEntry(entry));	//serialize the ELFF entry to the ELFF writer
+								elffWriter.flush();	//flush the ELFF writer
 							}
 							if(!requestedComponents.isEmpty())	//if components were requested
 							{

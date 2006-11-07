@@ -1,34 +1,24 @@
 package com.guiseframework.platform.web;
 
-import static com.garretwilson.io.FileUtilities.*;
-import static com.garretwilson.javascript.JSON.appendAssociativeArrayValue;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.servlet.ServletConstants.*;
 import static com.garretwilson.servlet.http.HttpServletConstants.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
-import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
 import java.io.*;
 import java.net.*;
 import java.security.Principal;
-import java.text.DateFormat;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import com.garretwilson.io.AsynchronousWriter;
-import com.garretwilson.text.W3CDateFormat;
-import com.garretwilson.text.elff.ELFF;
-import com.garretwilson.text.elff.Field;
 import com.garretwilson.util.*;
 import com.guiseframework.*;
-import com.guiseframework.model.InformationLevel;
 
 /**A Guise container for Guise HTTP servlets.
 There will be one servlet Guise container per {@link ServletContext}, which usually corresponds to a single web application on a JVM.
@@ -72,24 +62,6 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 		/**@return The servlet context with which this container is associated.*/
 		protected final ServletContext getServletContext() {return servletContext;}
 
-	/**The thread-safe map of ELFF logs keyed to applications.*/
-	private final Map<GuiseApplication, ELFF> applicationELFFMap=new ConcurrentHashMap<GuiseApplication, ELFF>();
-
-		/**Retrieves an ELFF log for the given application.
-		@param guiseApplication The Guise application for which an ELFF log should be retrieved.
-		@return The ELFF log for the given application.
-		@exception IllegalStateException if there is no ELFF log associated with the given application and thus the application is not installed in this container.
-		*/
-		public ELFF getELFFLog(final GuiseApplication guiseApplication)
-		{	
-			final ELFF elff=applicationELFFMap.get(guiseApplication);	//get the log for this application
-			if(elff==null)	//if there is no ELFF log, the application must not be installed in this container
-			{
-				throw new IllegalStateException("ELFF log not available for Guise application; the Guise application is likely not installed in the container: "+guiseApplication);	//indicate that the ELFF log for the application couldn't be found
-			}
-			return elff;	//return the ELFF log for the application
-		}
-
 	/**Servlet contains and container base URI constructor.
 	@param baseURI The base URI of the container, an absolute URI that ends with the base path, which ends with a slash ('/'), indicating the base path of the application base paths.
 	@param servletContext The servlet context with which this container is associated.
@@ -102,32 +74,6 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 		this.servletContext=checkInstance(servletContext, "Servlet context cannot be null.");
 	}
 
-	/**Creates a writer to an ELFF log file appropriate for this application.
-	The current date is used to construct the file name. 
-	@param application The application for which an ELFF log should be created.
-	@return A writer to an ELFF log for this application.
-	*/
-	protected Writer getELFFWriter(final GuiseApplication application)
-	{
-		try
-		{
-			final File logDirectory=application.getLogDirectory();	//get the application log directory
-			final DateFormat logFilenameDateFormat=new W3CDateFormat(W3CDateFormat.Style.DATE);	//create a formatter for the log filename
-			final String logFilename=logFilenameDateFormat.format(new Date())+" elff.log";	//create a filename in the form "date elff.log" TODO use a constant
-			final File logFile=new File(logDirectory, logFilename);	//create a log file object
-			final Writer logWriter=new AsynchronousWriter(new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(logFile, true)), UTF_8));	//create an asynchronous, buffered UTF-8 log writer, appending if the file already exists	
-			return logWriter;	//return the log writer
-		}
-		catch(final UnsupportedEncodingException unsupportedEncodingException)	//we should always support UTF-8
-		{
-			throw new AssertionError(unsupportedEncodingException);					
-		}
-		catch(final IOException ioException)	//we have a problem if we can't create a file TODO improve; we would go on now, but we would have a problem when we try to close the standard error stream; what needs to be done is to create a better default stream, and then recover from this error
-		{
-			throw new AssertionError(ioException);	//TODO fix; pass along IOException
-		}
-	}
-	
 	/**Installs the given application at the given context path.
 	This version is provided to expose the method to the servlet.
 	@param basePath The base path at which the application is being installed.
@@ -142,16 +88,6 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 	protected void installApplication(final AbstractGuiseApplication application, final String basePath, final File homeDirectory, final File logDirectory) throws IOException
 	{
 		super.installApplication(application, basePath, homeDirectory, logDirectory);	//delegate to the parent class
-		final Writer elffWriter=getELFFWriter(application);	//create an ELFF log writer for this application
-		final ELFF elff=new ELFF(elffWriter,	//create an ELFF log
-				Field.DATE_FIELD, Field.TIME_FIELD, Field.CLIENT_IP_FIELD, Field.CLIENT_SERVER_USERNAME_FIELD, Field.CLIENT_SERVER_HOST_FIELD,
-				Field.CLIENT_SERVER_METHOD_FIELD, Field.CLIENT_SERVER_URI_STEM_FIELD, Field.CLIENT_SERVER_URI_QUERY_FIELD,
-				Field.SERVER_CLIENT_STATUS_FIELD, Field.CLIENT_SERVER_BYTES_FIELD, Field.CLIENT_SERVER_VERSION_FIELD,
-				Field.CLIENT_SERVER_USER_AGENT_HEADER_FIELD, Field.CLIENT_SERVER_COOKIE_HEADER_FIELD,
-				Field.CLIENT_SERVER_REFERER_HEADER_FIELD, Field.DCS_ID_FIELD);
-		elff.setDirective(ELFF.SOFTWARE_DIRECTIVE, Guise.GUISE_NAME+' '+Guise.BUILD_ID);	//set the software directive of the ELFF log
-		applicationELFFMap.put(application, elff);	//store the ELFF log in the map
-		elff.logDirectives();	//log the directives of this log file
 	}
 
 	/**Uninstalls the given application.
@@ -161,7 +97,6 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 	*/
 	protected void uninstallApplication(final AbstractGuiseApplication application)
 	{
-		applicationELFFMap.remove(application);	//remove the ELFF log from the map
 		super.uninstallApplication(application);	//delegate to the parent class
 	}
 

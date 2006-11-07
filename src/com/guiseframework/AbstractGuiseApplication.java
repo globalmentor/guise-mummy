@@ -3,29 +3,29 @@ package com.guiseframework;
 import java.io.*;
 import java.net.URI;
 import java.security.Principal;
+import java.text.DateFormat;
 import java.util.*;
-import java.util.concurrent.*;
-
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
+import java.util.concurrent.*;
 
 import com.garretwilson.beans.BoundPropertyObject;
-
-import com.garretwilson.io.IO;
+import com.garretwilson.io.*;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.net.URIUtilities;
+import com.garretwilson.rdf.RDFResourceIO;
+import com.garretwilson.text.W3CDateFormat;
+import com.garretwilson.util.*;
 
+import static com.garretwilson.io.FileUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
+import static com.garretwilson.text.CharacterEncodingConstants.*;
+import static com.garretwilson.util.CalendarUtilities.*;
 import static com.garretwilson.util.LocaleUtilities.*;
 import static com.guiseframework.Guise.*;
 import static com.guiseframework.GuiseResourceConstants.*;
 
-import com.garretwilson.rdf.RDFResourceIO;
-import com.garretwilson.util.Debug;
-import com.garretwilson.util.HashMapResourceBundle;
-import com.garretwilson.util.ResourceBundleUtilities;
-import com.garretwilson.util.SoftValueHashMap;
 import com.guiseframework.component.*;
 import com.guiseframework.component.kit.ComponentKit;
 import com.guiseframework.context.GuiseContext;
@@ -110,6 +110,59 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			return logDirectory;	//return the log directory;
 		}
 
+	/**The synchronized map of log writer infos keyed to log base filenames.*/
+	private final Map<String, LogWriterInfo> baseNameLogWriterInfoMap=synchronizedMap(new HashMap<String, LogWriterInfo>());
+
+	/**Retrieves a writer suitable for recording log information for the application.
+	This implementation returns an asynchronous writer that does not block for information to be written when receiving information.
+	The given base filename is appended with a representation of the current date.
+	If a log writer for the same date is available, it is returned; otherwise, a new log writer is created.
+	If the current date is a different day than that used for the current log writer for a given base filename, a new writer is created for the current date.
+	@param baseFilename The base filename (e.g. "base.log") that will be used in generating a log file for the current date (e.g. "base 2003-02-01.log").
+	@param initializer The encapsulation of any initialization that should be performed on any new writer, or <code>null</code> if no initialization is requested.
+	@param uninitializer The encapsulation of any uninitialization that should be performed on any new writer, or <code>null</code> if no uninitialization is requested.
+	@see GuiseApplication#getLogDirectory()
+	*/	
+	public Writer getLogWriter(final String baseFilename, /*TODO fix final CalendarResolution calendarResolution, */final IOOperation<Writer> initializer, final IOOperation<Writer> uninitializer) throws IOException
+	{
+		synchronized(baseNameLogWriterInfoMap)	//don't allow the map to be used while we look up a writer
+		{
+			LogWriterInfo logWriterInfo=baseNameLogWriterInfoMap.get(baseFilename);	//get the log writer info
+			if(logWriterInfo==null || System.currentTimeMillis()>=logWriterInfo.getExpireTime())	//if there is no log writer information, or this log writer has expired
+			{
+				if(logWriterInfo!=null && uninitializer!=null)	//if we have an old log writer and something to uninitialize it with
+				{
+					uninitializer.perform(logWriterInfo.getWriter());	//uninitialize the old log writer
+				}				
+				final File logDirectory=getLogDirectory();	//get the application log directory
+				final DateFormat logFilenameDateFormat=new W3CDateFormat(W3CDateFormat.Style.DATE);	//create a formatter for the log filename
+//TODO del; testing				final String logFilename=appendFilename(baseFilename, " "+logFilenameDateFormat.format(new Date())+" "+System.currentTimeMillis());	//create a filename in the form "baseFilename date.ext"
+				final String logFilename=appendFilename(baseFilename, " "+logFilenameDateFormat.format(new Date()));	//create a filename in the form "baseFilename date.ext"
+				final File logFile=new File(logDirectory, logFilename);	//create a log file object
+//TODO add a way to let the initializer know if this is a new log file or just a new writer				final boolean isNewLogFile=!logFile.exists();	//see if this is a new log file
+				try
+				{
+					final Writer logWriter=new AsynchronousWriter(new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(logFile, true)), UTF_8));	//create an asynchronous, buffered UTF-8 log writer, appending if the file already exists
+					final Calendar calendar=Calendar.getInstance();	//create a new default calendar for the current date and time
+					calendar.add(Calendar.DAY_OF_YEAR, 1);	//go to the next day to find out when this writer should expire
+					clearTime(calendar);	//clear the calendar's time, consentrating on just the date (i.e. set the writer to expire at midnight)					
+//TODO del; testing					logWriterInfo=new LogWriterInfo(logWriter, System.currentTimeMillis()+10000);					
+					logWriterInfo=new LogWriterInfo(logWriter, calendar.getTimeInMillis());	//encapsulate the writer and its expiration time
+					baseNameLogWriterInfoMap.put(baseFilename, logWriterInfo);	//replace the old writer with our new writer; the old writer will eventually be garbage collected and, under normal conditions, will close when it is finalized
+					if(initializer!=null)	//if we have something to initialize the new log writer with
+					{
+						initializer.perform(logWriter);	//initialize the new log writer
+					}
+				}
+				catch(final UnsupportedEncodingException unsupportedEncodingException)	//we should always support UTF-8
+				{
+					throw new AssertionError(unsupportedEncodingException);					
+				}
+			}
+			return logWriterInfo.getWriter();	//return the writer
+		}		
+	}
+		
 	/**The hash code, which we'll update after installation. The value is only used after installation, so the initial value is irrelevant.*/
 //TODO del if not needed	private int hashCode=-1;
 
@@ -955,5 +1008,34 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	protected boolean isAuthorized(final String applicationPath, final Principal principal, final String realm)
 	{
 		return true;	//default to authorizing access
+	}
+
+	/**Information about a log writer.
+	@author Garret Wilson
+	*/
+	private static class LogWriterInfo
+	{
+		/**The writer.*/
+		private final Writer writer;
+
+			/**@return The writer.*/
+			public Writer getWriter() {return writer;}
+
+		/**The time at which the writer expires.*/
+		private long expireTime;
+
+			/**@return The time at which the writer expires.*/
+			public long getExpireTime() {return expireTime;}
+
+		/**Writer and expire time constructor.
+		@param writer The writer.
+		@param expireTime The time at which the writer expires.
+		@exception NullPointerException if the given writer is <code>null</code>.
+		*/
+		public LogWriterInfo(final Writer writer, final long expireTime)
+		{
+			this.writer=checkInstance(writer, "Writer cannot be null.");
+			this.expireTime=expireTime;
+		}
 	}
 }
