@@ -204,7 +204,14 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	*/
 	public GuiseHTTPServlet()
 	{
-		Debug.setDebug(DEBUG);	//turn on debug if needed
+		try
+		{
+			Debug.setDebug(DEBUG);	//turn on debug if needed
+		}
+		catch(final IOException ioException)	//if we have a problem turning on debugging
+		{
+			throw new AssertionError(ioException);	//TODO improve
+		}
 		elff=new ELFF(	//create an ELFF log
 				Field.DATE_FIELD, Field.TIME_FIELD, Field.CLIENT_IP_FIELD, Field.CLIENT_SERVER_USERNAME_FIELD, Field.CLIENT_SERVER_HOST_FIELD,
 				Field.CLIENT_SERVER_METHOD_FIELD, Field.CLIENT_SERVER_URI_STEM_FIELD, Field.CLIENT_SERVER_URI_QUERY_FIELD,
