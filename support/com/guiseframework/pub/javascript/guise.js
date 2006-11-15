@@ -2138,20 +2138,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 					this.processingAJAXResponses=false;	//we are no longer processing AJAX responses
 					if(newHRef==null)	//if we're not going to a new page
 					{
-						for(var oldElementID in guise.oldElementIDCursors)	//for each old element ID
-						{
-	//TODO del alert("looking at old element ID: "+oldElementID);
-							var oldCursor=guise.oldElementIDCursors[oldElementID];	//get the old cursor
-	//TODO del alert("old cursor: "+oldCursor);
-							var element=document.getElementById(oldElementID);	//get the old element in the document
-							if(element!=null)	//if this element is still in the document TODO make sure that these two checks ensure this is really an old cursor
-							{
-	//TODO del alert("restoring old cursor for element: "+oldElementID+" which has cursor "+element.style.cursor);
-								delete guise.oldElementIDCursors[oldElementID];	//remove this old cursor from the array
-								element.style.cursor=oldCursor;	//set the cursor back to what it was
-	//TODO del alert("element now has cursor: "+element.style.cursor);
-							}
-						}
+						guise.resetTempCursors=function();	//reset the element cursors that were temporarily set just for this AJAX call
 					}
 				}
 			}
@@ -2765,6 +2752,46 @@ com.guiseframework.js.Client=function()
 	if(!com.guiseframework.js.Client._initialized)
 	{
 		com.guiseframework.js.Client._initialized=true;
+
+		/**Temporarily changes the cursor of an element, which will be reset after the next AJAX call.
+		The element must have an ID.
+		@param element The element the cursor of which to update.
+		@param cursor The name of the cursor (such as "wait") to use.
+		*/
+		com.guiseframework.js.Client.prototype.setElementTempCursor=function(element, cursor)
+		{
+			var elementID=elementID;	//get the element ID
+			if(elementID)	//if the element has an ID
+			{
+				if(!this.oldElementIDCursors[elementID])	//if we haven't already saved the previous cursor
+				{
+					this.oldElementIDCursors[elementID]=element.style.cursor;	//save the original cursor so that it can be reset after the next AJAX communication is finished
+				}
+				element.style.cursor=cursor;	//change the element's cursor
+			}
+		};
+
+		/**Resets all cursors that have been temporarily set during an AJAX call.
+		@see #setElementTempCursor()
+		*/
+		com.guiseframework.js.Client.prototype.resetTempCursors=function()
+		{
+			var oldElementIDCursors=this.oldElementIDCursors;	//get the map of old cursors
+			for(var oldElementID in oldElementIDCursors)	//for each old element ID
+			{
+//TODO del alert("looking at old element ID: "+oldElementID);
+				var oldCursor=oldElementIDCursors[oldElementID];	//get the old cursor
+//TODO del alert("old cursor: "+oldCursor);
+				var element=document.getElementById(oldElementID);	//get the old element in the document
+				if(element!=null)	//if this element is still in the document TODO make sure that these two checks ensure this is really an old cursor
+				{
+//TODO del alert("restoring old cursor for element: "+oldElementID+" which has cursor "+element.style.cursor);
+					delete oldElementIDCursors[oldElementID];	//remove this old cursor from the array
+					element.style.cursor=oldCursor;	//set the cursor back to what it was
+//TODO del alert("element now has cursor: "+element.style.cursor);
+				}
+			}
+		};
 
 		/**Adds a frame to the array of frames.
 		This implementation adds the frame to the document, initializes the frame, and updates the modal state.
@@ -3868,8 +3895,7 @@ function onWindowLoad()
 	{
 		guise.setBusyVisible(true);	//turn on the busy indicator
 			//TODO fix; doesn't seem to work on IE6 or Firefox
-		guise.oldElementIDCursors[document.body.id]=document.body.style.cursor;	//save the old document body cursor; this will get reset after we receive the response from the AJAX initialization request
-		document.body.style.cursor="wait";	//TODO testing	
+		guise.setElementTempCursor(document.body, "wait");	//change the document body cursor to "wait" until the AJAX initialization is finished
 	}
 	window.setTimeout(initFunction, 1);	//run the init function in a separate thread
 }
@@ -4400,8 +4426,7 @@ function onAction(event)
 //TODO fix					target.style.cursor="inherit";	//TODO testing
 //TODO fix					document.body.style.cursor="wait";	//TODO testing
 //TODO fix				alert("old cursor: "+target.style.cursor);
-					guise.oldElementIDCursors[componentID]=target.style.cursor;	//save the old cursor
-					component.style.cursor="wait";	//TODO testing
+					guise.setElementTempCursor(component, "wait");	//change the cursor to "wait" until the AJAX communication is finished
 
 					var ajaxRequest=new FormAJAXEvent(new Map(actionInputID, componentID));	//create a new form request with form's hidden action control and the action element ID
 					guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request			
@@ -4492,8 +4517,7 @@ function onActionClick(event)
 					guise.oldElementIDCursors[targetID]=target.style.cursor;	//save the old cursor
 					target.style.cursor="wait";	//TODO testing
 */
-					guise.oldElementIDCursors[targetID]=target.style.cursor;	//save the old cursor
-					target.style.cursor="wait";	//TODO testing
+					guise.setElementTempCursor(target, "wait");	//change the cursor to "wait" until the AJAX communication is finished
 
 
 					var ajaxRequest=new ActionAJAXEvent(componentID, targetID, null, 0);	//create a new action request with no action ID and the default option
@@ -4574,8 +4598,7 @@ function onCheckInputChange(event)
 	}
 	if(AJAX_ENABLED)	//if AJAX is enabled
 	{
-		guise.oldElementIDCursors[checkInput.id]=checkInput.style.cursor;	//save the old cursor
-		checkInput.style.cursor="wait";	//TODO testing
+		guise.setElementTempCursor(checkInput, "wait");	//change the cursor to "wait" until the AJAX communication is finished
 		var ajaxRequest=new FormAJAXEvent(new Map(checkInput.name, checkInput.checked ? checkInput.value : ""));	//create a new form request with the control name and value
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		event.stopPropagation();	//tell the event to stop bubbling
