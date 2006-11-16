@@ -2138,7 +2138,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 					this.processingAJAXResponses=false;	//we are no longer processing AJAX responses
 					if(newHRef==null)	//if we're not going to a new page
 					{
-						guise.resetTempCursors=function();	//reset the element cursors that were temporarily set just for this AJAX call
+						guise.restoreTempCursors();	//restore the element cursors that were temporarily set just for this AJAX call
 					}
 				}
 			}
@@ -2760,21 +2760,22 @@ com.guiseframework.js.Client=function()
 		*/
 		com.guiseframework.js.Client.prototype.setElementTempCursor=function(element, cursor)
 		{
-			var elementID=elementID;	//get the element ID
+			var elementID=element.id;	//get the element ID
 			if(elementID)	//if the element has an ID
 			{
-				if(!this.oldElementIDCursors[elementID])	//if we haven't already saved the previous cursor
+				var oldElementCursor=element.style.cursor;	//get the old element cursor
+				if(!this.oldElementIDCursors[elementID])	//if we haven't already saved the previous cursor (note that there is a small race condition here which is probably the reason that very quick AJAX responses combined with rapid activation of the same element will still result in a lingering new cursor)
 				{
-					this.oldElementIDCursors[elementID]=element.style.cursor;	//save the original cursor so that it can be reset after the next AJAX communication is finished
+					element.style.cursor=cursor;	//change the element's cursor
+					this.oldElementIDCursors[elementID]=oldElementCursor;	//save the original cursor so that it can be reset after the next AJAX communication is finished
 				}
-				element.style.cursor=cursor;	//change the element's cursor
 			}
 		};
 
-		/**Resets all cursors that have been temporarily set during an AJAX call.
+		/**Restores all cursors that have been temporarily set during an AJAX call.
 		@see #setElementTempCursor()
 		*/
-		com.guiseframework.js.Client.prototype.resetTempCursors=function()
+		com.guiseframework.js.Client.prototype.restoreTempCursors=function()
 		{
 			var oldElementIDCursors=this.oldElementIDCursors;	//get the map of old cursors
 			for(var oldElementID in oldElementIDCursors)	//for each old element ID
