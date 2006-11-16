@@ -2138,7 +2138,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 					this.processingAJAXResponses=false;	//we are no longer processing AJAX responses
 					if(newHRef==null)	//if we're not going to a new page
 					{
-						guise.restoreTempCursors();	//restore the element cursors that were temporarily set just for this AJAX call
+						guise.restoreTempElementCursors();	//restore the element cursors that were temporarily set just for this AJAX call
 					}
 				}
 			}
@@ -2763,11 +2763,12 @@ com.guiseframework.js.Client=function()
 			var elementID=element.id;	//get the element ID
 			if(elementID)	//if the element has an ID
 			{
+				var oldElementIDCursors=this.oldElementIDCursors;	//get the map of old element cursors
 				var oldElementCursor=element.style.cursor;	//get the old element cursor
-				if(!this.oldElementIDCursors[elementID])	//if we haven't already saved the previous cursor (note that there is a small race condition here which is probably the reason that very quick AJAX responses combined with rapid activation of the same element will still result in a lingering new cursor)
+				if(!(elementID in oldElementIDCursors))	//if we haven't already saved the previous cursor (note that there is a small race condition here with asynchronous events and AJAX responses)
 				{
 					element.style.cursor=cursor;	//change the element's cursor
-					this.oldElementIDCursors[elementID]=oldElementCursor;	//save the original cursor so that it can be reset after the next AJAX communication is finished
+					oldElementIDCursors[elementID]=oldElementCursor;	//save the original cursor so that it can be reset after the next AJAX communication is finished
 				}
 			}
 		};
@@ -2775,19 +2776,19 @@ com.guiseframework.js.Client=function()
 		/**Restores all cursors that have been temporarily set during an AJAX call.
 		@see #setElementTempCursor()
 		*/
-		com.guiseframework.js.Client.prototype.restoreTempCursors=function()
+		com.guiseframework.js.Client.prototype.restoreTempElementCursors=function()
 		{
 			var oldElementIDCursors=this.oldElementIDCursors;	//get the map of old cursors
 			for(var oldElementID in oldElementIDCursors)	//for each old element ID
 			{
 //TODO del alert("looking at old element ID: "+oldElementID);
 				var oldCursor=oldElementIDCursors[oldElementID];	//get the old cursor
+				delete oldElementIDCursors[oldElementID];	//immediately remove this old cursor from the map to reduce the race condition in which another thread could see that there is an existing cursor and not save it again
 //TODO del alert("old cursor: "+oldCursor);
 				var element=document.getElementById(oldElementID);	//get the old element in the document
-				if(element!=null)	//if this element is still in the document TODO make sure that these two checks ensure this is really an old cursor
+				if(element!=null)	//if this element is still in the document
 				{
 //TODO del alert("restoring old cursor for element: "+oldElementID+" which has cursor "+element.style.cursor);
-					delete oldElementIDCursors[oldElementID];	//remove this old cursor from the array
 					element.style.cursor=oldCursor;	//set the cursor back to what it was
 //TODO del alert("element now has cursor: "+element.style.cursor);
 				}
