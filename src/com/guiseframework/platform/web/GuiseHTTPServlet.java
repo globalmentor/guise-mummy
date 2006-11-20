@@ -104,22 +104,6 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 {
 	/**The init parameter, "application", used to specify the relative path to the application description file.*/
 	public final static String APPLICATION_INIT_PARAMETER="application";
-	/**The init parameter, "applicationClass", used to specify the application class.*/
-	public final static String APPLICATION_CLASS_INIT_PARAMETER="applicationClass";
-	/**The init parameter, "locales", used to specify the supported locales.*/
-	public final static String LOCALES_INIT_PARAMETER="locales";
-	/**The prefix, "navigation.", used to identify navigation definitions in the web application's init parameters.*/
-	public final static String NAVIGATION_INIT_PARAMETER_PREFIX="navigation.";
-	/**The parameter, "class", used to identify the navigation frame class in the web application's init parameters.*/
-	public final static String NAVIGATION_CLASS_PARAMETER="class";
-	/**The parameter, "style", used to identify the navigation style in the web application's init parameters.*/
-	public final static String NAVIGATION_STYLE_PARAMETER="style";
-	/**The init parameter, "style", used to specify the style definition URIs.*/
-	public final static String STYLE_INIT_PARAMETER="style";
-	/**The init parameter, "theme", used to specify the theme URIs*/
-	public final static String THEME_INIT_PARAMETER="theme";
-	/**The init parameter, "dcsID", used to specify the WebTrends or other Data Collection System logging identifier.*/
-	public final static String DCS_ID_PARAMETER="dcsID";
 
 	/**The content type of a Guise AJAX request, <code>application/x-guise-ajax-request</code>.*/
 	public final static ContentType GUISE_AJAX_REQUEST_CONTENT_TYPE=new ContentType(ContentTypeConstants.APPLICATION, ContentTypeConstants.EXTENSION_PREFIX+"guise-ajax-request"+ContentTypeConstants.SUBTYPE_SUFFIX_DELIMITER_CHAR+ContentTypeConstants.XML_SUBTYPE_SUFFIX, null);
@@ -340,139 +324,9 @@ Debug.trace("checking for categories");
 				throw new ServletException(ioException);
 			}		
 		}
-		else	//if no application description is specified, load the description from the web.xml init parameters TODO remove this after transition is complete
+		else	//if no application description is specified, indicate an error TODO allow Guise to support overlays in the future with default Guise applications
 		{
-			final String guiseApplicationClassName=servletConfig.getInitParameter(APPLICATION_CLASS_INIT_PARAMETER);	//get name of the guise application class
-			if(guiseApplicationClassName!=null)	//if there is a Guise application class name specified
-			{
-				try
-				{
-					guiseApplication=(AbstractGuiseApplication)Class.forName(guiseApplicationClassName).newInstance();	//create the Guise application from the specified class
-				}
-				catch(final ClassNotFoundException classNotFoundException)	//if the application class cannot be found
-				{
-					throw new IllegalArgumentException("The initialization parameter specified application class "+guiseApplicationClassName+" could not be found.", classNotFoundException);						
-				}
-				catch(final InstantiationException instantiationException)	//if the application class could not be instantiated
-				{
-					throw new IllegalArgumentException("The initialization parameter specified application class "+guiseApplicationClassName+" is an interface or an abstract class.", instantiationException);						
-				}			
-				catch(final IllegalAccessException illegalAccessException)	//if the application class constructor cannot be accessed
-				{
-					throw new IllegalArgumentException("The initialization parameter specified application class "+guiseApplicationClassName+" does not have an accessible constructor.", illegalAccessException);						
-				}			
-			}
-			else	//if no Guise application class was specified
-			{
-				guiseApplication=new DefaultGuiseApplication();	//create a default application
-			}
-				//initialize the supported locales
-			final String localesString=servletConfig.getInitParameter(LOCALES_INIT_PARAMETER);	//get the supported locales init parameter
-			if(localesString!=null)	//if supported locales are specified
-			{
-				final String[] localeString=localesString.split(String.valueOf(COMMA_CHAR));	//split the string into separate locale strings
-				final Locale[] locales=new Locale[localeString.length];	//create an array to hold the locales
-				for(int i=localeString.length-1; i>=0; --i)	//for each supported locale string
-				{
-					locales[i]=createLocale(localeString[i].trim());	//create a locale for this specified locale (trimming whitespace just to be extra helpful)
-				}
-				guiseApplication.setLocales(asList(locales));	//set the application locales
-	/*TODO del when works
-				guiseApplication.getSupportedLocales().clear();	//remove the application's currently supported locales
-				CollectionUtilities.addAll(guiseApplication.getSupportedLocales(), supportedLocales);	//add all supported locales to the application
-	*/
-			}
-	/*TODO del when works
-				//initialize the default locale
-			final String defaultLocaleString=servletConfig.getInitParameter(DEFAULT_LOCALE_INIT_PARAMETER);	//get the default locale init parameter
-			if(defaultLocaleString!=null)	//if a default locale is specified
-			{
-				guiseApplication.setDefaultLocale(createLocale(defaultLocaleString.trim()));	//create a locale from the default locale string and store it in the application (trimming whitespace just to be extra helpful)
-			}
-	*/
-			final String dcsID=servletConfig.getInitParameter(DCS_ID_PARAMETER);	//get the DCS ID init parameter, if any
-			if(dcsID!=null)	//if a DCS ID is specified
-			{
-				guiseApplication.setDCSID(dcsID);	//set the application DCS ID			
-			}
-				//initialize the style TODO allow for multiple styles
-			final String styleString=servletConfig.getInitParameter(STYLE_INIT_PARAMETER);	//get the style init parameter, if any
-			if(styleString!=null)	//if a style is specified
-			{
-				guiseApplication.setStyle(URI.create(styleString));	//create a locale from the default locale string and store it in the application (trimming whitespace just to be extra helpful)
-			}
-				//initialize the theme
-			final String themeString=servletConfig.getInitParameter(THEME_INIT_PARAMETER);	//get the theme init parameter, if any
-			if(themeString!=null)	//if a theme is specified
-			{
-				guiseApplication.setTheme(new Theme(URI.create(themeString)));
-			}
-	
-				//initialize destinations
-			final Enumeration initParameterNames=servletConfig.getInitParameterNames();	//get the names of all init parameters
-			while(initParameterNames.hasMoreElements())	//while there are more initialization parameters
-			{
-				final String initParameterName=(String)initParameterNames.nextElement();	//get the next initialization parameter name
-				if(initParameterName.startsWith(NAVIGATION_INIT_PARAMETER_PREFIX))	//if this is a path/panel binding
-				{
-					final String path;
-					final Class<? extends NavigationPanel> navigationPanelClass;
-					final URI styleURI;
-					final String initParameterValue=servletConfig.getInitParameter(initParameterName);	//get this init parameter value
-					try
-					{
-						final URI pathPanelBindingURI=new URI(initParameterValue);	//create a URI from the panel binding expression
-						path=pathPanelBindingURI.getRawPath();	//extract the path from the URI
-						if(path!=null)	//if a path was specified
-						{
-							final CollectionMap<String, String, List<String>> parameterListMap=getParameterMap(pathPanelBindingURI);	//get the URI parameters
-							final String className=parameterListMap.getItem(NAVIGATION_CLASS_PARAMETER);	//get the class parameter
-							if(className!=null)	//if a class name was specified
-							{
-								try
-								{
-									final Class<?> specifiedClass=Class.forName(className);	//load the class for the specified name
-									navigationPanelClass=specifiedClass.asSubclass(NavigationPanel.class);	//cast the specified class to a navigation panel class just to make sure it's the correct type
-								}
-								catch(final ClassNotFoundException classNotFoundException)
-								{
-									throw new IllegalArgumentException("The initialization parameter specified class "+className+" for path "+path+" could not be found.", classNotFoundException);						
-								}
-							}
-							else	//if no class name was specified
-							{
-								throw new IllegalArgumentException("The initialization parameter path/panel binding "+pathPanelBindingURI+" for "+initParameterName+" did not specify a class name.");												
-							}
-							final String style=parameterListMap.getItem(NAVIGATION_STYLE_PARAMETER);	//get the styleparameter
-							if(style!=null)	//if a style was specified
-							{
-								try
-								{
-									styleURI=new URI(style);	//convert the style to a URI
-								}
-								catch(final URISyntaxException uriSyntaxException)	//if the style URI was not in the correct format
-								{
-									throw new IllegalArgumentException("Invalid style URI "+style+" for "+initParameterName, uriSyntaxException);
-								}
-							}
-							else	//if no style was specified
-							{
-								styleURI=null;	//show that there is no style
-							}
-						}
-						else	//if no path was specified
-						{
-							throw new IllegalArgumentException("The initialization parameter path/panel binding "+pathPanelBindingURI+" for "+initParameterName+" did not specify a path.");												
-						}
-					}
-					catch(final URISyntaxException uriSyntaxException)	//if the parameter value was not in the correct format
-					{
-						throw new IllegalArgumentException("Incorrect initialization parameter path/panel class binding URI "+initParameterValue+" for "+initParameterName, uriSyntaxException);
-					}
-					final Destination destination=new ComponentDestination(path, navigationPanelClass, styleURI);	//create a new destination
-					guiseApplication.setDestination(path, destination);	//set the destination for this path				
-				}
-			}
+			throw new ServletException("web.xml missing Guise application init parameter \""+APPLICATION_INIT_PARAMETER+"\".");
 		}
 		guiseApplication.installComponentKit(new XHTMLComponentKit());	//create and install an XHTML controller kit
 		return guiseApplication;	//return the created Guise application
@@ -480,7 +334,7 @@ Debug.trace("checking for categories");
 
 	/**The mutex that prevents two threads from trying to initialize the Guise container simultaneously.*/
 	private Object guiseContainerMutex=new Object();
-	
+
 	/**Initializes the servlet upon receipt of the first request.
 	This version initializes the reference to the Guise container.
 	This version installs the application into the container.
