@@ -111,9 +111,6 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	/**The content type of a Guise AJAX response, <code>application/x-guise-ajax-response</code>.*/
 	public final static ContentType GUISE_AJAX_RESPONSE_CONTENT_TYPE=new ContentType(ContentTypeConstants.APPLICATION, ContentTypeConstants.EXTENSION_PREFIX+"guise-ajax-response"+ContentTypeConstants.SUBTYPE_SUFFIX_DELIMITER_CHAR+ContentTypeConstants.XML_SUBTYPE_SUFFIX, null);
 
-	/**Whether debug is turned on for Guise.*/
-	protected final static boolean DEBUG=true;	//TODO load this from an init parameter
-
 	/**The Guise container that owns the applications.*/
 	private HTTPServletGuiseContainer guiseContainer=null;
 
@@ -188,14 +185,6 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	*/
 	public GuiseHTTPServlet()
 	{
-		try
-		{
-			Debug.setDebug(DEBUG);	//turn on debug if needed
-		}
-		catch(final IOException ioException)	//if we have a problem turning on debugging
-		{
-			throw new AssertionError(ioException);	//TODO improve
-		}
 		elff=new ELFF(	//create an ELFF log
 				Field.DATE_FIELD, Field.TIME_FIELD, Field.CLIENT_IP_FIELD, Field.CLIENT_SERVER_USERNAME_FIELD, Field.CLIENT_SERVER_HOST_FIELD,
 				Field.CLIENT_SERVER_METHOD_FIELD, Field.CLIENT_SERVER_URI_STEM_FIELD, Field.CLIENT_SERVER_URI_QUERY_FIELD,
