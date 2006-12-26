@@ -12,6 +12,7 @@ import java.util.concurrent.*;
 import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.io.*;
 import com.garretwilson.lang.ObjectUtilities;
+import static com.garretwilson.lang.ThreadUtilities.*;
 import com.garretwilson.net.URIUtilities;
 import com.garretwilson.rdf.RDFResourceIO;
 import com.garretwilson.text.W3CDateFormat;
@@ -70,7 +71,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	{
 		return new DefaultApplicationFrame();	//return an instance of the default application frame 
 	}
-		
+
 	/**The base path of the application, or <code>null</code> if the application is not yet installed.*/
 	private String basePath=null;
 
@@ -142,7 +143,14 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 //TODO add a way to let the initializer know if this is a new log file or just a new writer				final boolean isNewLogFile=!logFile.exists();	//see if this is a new log file
 				try
 				{
-					final Writer logWriter=new AsynchronousWriter(new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(logFile, true)), UTF_8));	//create an asynchronous, buffered UTF-8 log writer, appending if the file already exists
+					final Writer writer=new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(logFile, true)), UTF_8);	//create a buffered UTF-8 log writer, appending if the file already exists
+					final ThreadGroup guiseSessionThreadGroup=Guise.getInstance().getGuiseSessionThreadGroup(Thread.currentThread());	//get the Guise session thread group
+					assert guiseSessionThreadGroup!=null : "Expected to be inside a Guise session thread group when application log writer was requested.";
+					final AsynchronousWriterRunnable asynchronousWriterRunnable=new AsynchronousWriterRunnable(writer);	//create a runnable for creating the new asynchronous writer
+					call(guiseSessionThreadGroup.getParent(), asynchronousWriterRunnable);	//create an asynchronous writer in the thread group above the Guise session thread group, because the asynchronous writer's thread will live past this session's thread group
+					final Writer logWriter=asynchronousWriterRunnable.getWriter();	//get the asynchronous writer that was created
+					assert logWriter!=null : "Asynchronous writer runnable did not create asynchronous writer as expected.";
+//TODO del when works					final Writer logWriter=new AsynchronousWriter(new OutputStreamWriter(new BufferedOutputStream(new FileOutputStream(logFile, true)), UTF_8));	//create an asynchronous, buffered UTF-8 log writer, appending if the file already exists
 					final Calendar calendar=Calendar.getInstance();	//create a new default calendar for the current date and time
 					calendar.add(Calendar.DAY_OF_YEAR, 1);	//go to the next day to find out when this writer should expire
 					clearTime(calendar);	//clear the calendar's time, consentrating on just the date (i.e. set the writer to expire at midnight)					
@@ -160,9 +168,39 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 				}
 			}
 			return logWriterInfo.getWriter();	//return the writer
-		}		
+		}
 	}
+
+	/**The runnable whose sole function is to create an asynchronous writer.
+	@author Garret Wilson
+	*/
+	private static class AsynchronousWriterRunnable implements Runnable	//create a runnable for creating the new asynchronous writer
+	{
+		/**The writer to be decorated.*/
+		private final Writer decoratedWriter;
 		
+		/**The writer that was created, or <code>null</code> if the writer has not yet been created.*/
+		private Writer writer=null;
+
+			/**@return The writer that was created, or <code>null</code> if the writer has not yet been created.*/
+			public Writer getWriter() {return writer;}
+
+		/**Constructs the class with a writer to decorate.
+		@param decoratedWriter The writer to decorate with an asynchronous writer.
+		@exception NullPointerException if the given writer is <code>null</code>.
+		*/
+		public AsynchronousWriterRunnable(final Writer decoratedWriter)
+		{
+			this.decoratedWriter=checkInstance(decoratedWriter, "Decorated writer cannot be null.");
+		}
+
+		/**Creates the writer.*/
+		public void run()
+		{
+			writer=new AsynchronousWriter(decoratedWriter);	//create an asynchronous writer based upon the decorated writer
+		}
+	};
+
 	/**The hash code, which we'll update after installation. The value is only used after installation, so the initial value is irrelevant.*/
 //TODO del if not needed	private int hashCode=-1;
 
@@ -215,6 +253,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	/**Uninstalls the application from the given container.
 	This method is only package-visible so that it can be accessed by {@link AbstractGuiseContainer}.
+	All log writers are closed.
 	@param container The Guise container into which the application is being installed.
 	@exception IllegalStateException if the application is not installed or is installed into another container.
 	*/
@@ -227,6 +266,21 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		if(this.container!=container)	//if we're installed into a different container
 		{
 			throw new IllegalStateException("Application installed into different container.");
+		}
+		synchronized(baseNameLogWriterInfoMap)	//don't allow the map to be used while we look up a writer
+		{
+			for(final LogWriterInfo logWriterInfo:baseNameLogWriterInfoMap.values())	//for each log writer info
+			{
+				try
+				{
+					logWriterInfo.getWriter().close();	//close this writer
+				}
+				catch(final IOException ioException)	//if there is an error closing the writer
+				{
+					Debug.warn(ioException);	//log the warning and continue
+				}
+			}
+			baseNameLogWriterInfoMap.clear();	//remove all log writer information
 		}
 		this.container=null;	//release the container
 		this.basePath=null;	//remove the base path

@@ -206,7 +206,7 @@ public interface GuiseApplication extends PropertyBindable
 	@param initializer The encapsulation of any initialization that should be performed on any new writer, or <code>null</code> if no initialization is requested.
 	@param uninitializer The encapsulation of any uninitialization that should be performed on any new writer, or <code>null</code> if no uninitialization is requested.
 	@see GuiseApplication#getLogDirectory()
-	*/	
+	*/
 	public Writer getLogWriter(final String baseFilename, /*TODO fix final CalendarResolution calendarResolution, */final IOOperation<Writer> initializer, final IOOperation<Writer> uninitializer) throws IOException;
 
 	/**@return Whether this application has been installed into a container at some base path.

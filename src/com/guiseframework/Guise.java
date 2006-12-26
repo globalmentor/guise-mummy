@@ -7,6 +7,8 @@ import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.garretwilson.util.Debug;
+
 import static com.garretwilson.io.InputStreamUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
 
@@ -29,7 +31,7 @@ public final class Guise
 	public final static String PUBLIC_RESOURCE_BASE_PATH="pub/";
 
 	/**The identifier of this build.*/
-	public final static String BUILD_ID="2006-11-16";
+	public final static String BUILD_ID="2006-12-26";
 
 		//Guise ontology
 	
@@ -165,7 +167,18 @@ public final class Guise
 		{
 			throw new IllegalStateException("Unrecognized Guise session; no thread group registered for session: "+guiseSession);
 		}
-			//TODO maybe interrupt the thread group first as a safety precaution to make sure it can be destroyed, but when we reach here there shouldn't be any session-related threads running
+
+/*TODO fix
+		//TODO maybe try to interrupt and join active threads in the thread group, preferably with a timeout; this is risky because we don't know the interruption policy of whatever threads have been started in the thread group, but if we let them run destroying the thread group will cause an exception because there are still active threads in the thread group, if the application session has started any new threads		
+Debug.trace("ready to destroy thread group", guiseSessionThreadGroup.getName(), "with active threads", guiseSessionThreadGroup.activeCount());
+final Thread[] activeThreads=new Thread[guiseSessionThreadGroup.activeCount()];
+guiseSessionThreadGroup.enumerate(activeThreads);
+		for(Thread activeThread:activeThreads)
+		{
+			Debug.trace("active thread:", activeThread.getName());
+		}
+*/
+			//TODO maybe interrupt the thread group first as a safety precaution to make sure it can be destroyed, but when we reach here there shouldn't be any session-related threads running (see comment above) 
 		guiseSessionThreadGroup.destroy();	//destroy the thread group (otherwise it would continue to maintain a reference to the Guise session, causing a memory leak)
 	}
 
@@ -203,22 +216,33 @@ public final class Guise
 
 	/**Retrieves the Guise session information for the given thread.
 	All thread groups up the hierarchy are searched for an instance of {@link GuiseSessionThreadGroup}.
-	@return The Guise session for the given thread, or <code>null</code> if the given thread is not.
+	@return The Guise session for the given thread, or <code>null</code> if the given thread is not in a Guise session thread group.
+	@see #getGuiseSessionThreadGroup(Thread)
 	*/
-	private final GuiseSession getGuiseSession(final Thread thread)
+	final GuiseSession getGuiseSession(final Thread thread)
+	{
+		final GuiseSessionThreadGroup guiseSessionThreadGroup=getGuiseSessionThreadGroup(thread);	//get the Guise session thread group the given thread is in
+		return guiseSessionThreadGroup!=null ? guiseSessionThreadGroup.getGuiseSession() : null;	//return the session from the thread group, if there is a Guise session thread group
+	}
+
+	/**Retrieves the Guise session thread group.
+	All thread groups up the hierarchy are searched for an instance of {@link GuiseSessionThreadGroup}.
+	@return The Guise session thread group for the given thread, or <code>null</code> if the given thread is not in a Guise session thread group.
+	*/
+	final GuiseSessionThreadGroup getGuiseSessionThreadGroup(final Thread thread)
 	{
 		ThreadGroup threadGroup=thread.getThreadGroup();	//get the thread's thread group
 		while(threadGroup!=null)	//stop looking if we run out of thread groups
 		{
 			if(threadGroup instanceof GuiseSessionThreadGroup)	//if this is a Guise session thread group
 			{
-				return ((GuiseSessionThreadGroup)threadGroup).getGuiseSession();	//return the session from the thread group
+				return ((GuiseSessionThreadGroup)threadGroup);	//return the Guise session thread group
 			}
 			threadGroup=threadGroup.getParent();	//check this thread group's parent thread group
 		}
 		return null;	//we were unable to find a Guise session thread group
 	}
-	
+
 	/**Private default constructor.
 	@see #getInstance()
 	*/
