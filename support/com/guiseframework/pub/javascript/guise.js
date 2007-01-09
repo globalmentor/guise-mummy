@@ -1,5 +1,5 @@
 /*Guise(TM) JavaScript support routines
-Copyright (c) 2005-2006 GlobalMentor, Inc.
+Copyright (c) 2005-2007 GlobalMentor, Inc.
 
 This script expects the following variables to be defined:
 navigator.userAgentName The name of the user agent, such as "Firefox", "Mozilla", "MSIE", or "Opera".
@@ -9,7 +9,7 @@ navigator.userAgentVersionNumber The version of the user agent stored as a numbe
 /*Guise AJAX Request Format, content type application/x-guise-ajax-request+xml
 <request>
 	<init	<!--initializes the page, requesting all frames to be resent-->
-		jsVersion=""	<!--version of JavaScript upported by the browser-->
+		jsVersion=""	<!--version of JavaScript supported by the browser-->
 		timezone=""
 		hour=""
 		language=""
@@ -70,8 +70,12 @@ See http://homepage.mac.com/igstudio/design/ulsmenus/vertical-uls-iframe.html .
 
 /**Rollovers
 For every component marked with the "mouseListener" class, Guise will send mouseover and mouseout events.
-Guise will also automatically add and remove a "rollover" class to the component and every subelement that is part of the component
+Guise will also automatically add and remove a "jsRollover" class to the component and every subelement that is part of the component
 (that is, every element that has a component ID-derived ID (i.e. "componentID-XXX") before sending the mouse event.
+This "jsRollover" class indicates that the rollover state is completely controlled by JavaScript, and will be set and unset
+independent of any server-side Guise rollover state.
+(When a mouse leaves an element, for example, the "jsRollover" class will usually be removed well before the associated Guise component
+is notified of the change in state.)
 */
 
 //TODO before sending a drop event, send a component update for the drop target so that its value will be updated; or otherwise make sure the value is synchronized
@@ -125,7 +129,7 @@ var STYLES=
 	DROP_TARGET: "dropTarget",
 	OPEN_EFFECT_REGEXP: /^openEffect-.+$/,
 	MOUSE_LISTENER: "mouseListener",
-	ROLLOVER: "rollover",
+	JS_ROLLOVER: "jsRollover",
 	SLIDER_CONTROL: "sliderControl",
 	SLIDER_CONTROL_THUMB: "sliderControl-thumb",
 	SLIDER_CONTROL_TRACK: "sliderControl-track",
@@ -2286,7 +2290,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 			"style":true,	//don't remove local styles, because they may be used by Guise (with frames, for instance)
 			"onclick":true,	//don't remove the onclick attribute, because we may be using it for Safari to prevent a default action
 			"hideFocus":true,	//don't remove the IE hideFocus attribute, because we're using it to fix the IE6 lack of CSS outline: none support
-			"guiseStateWidth":true,	//don't remove Guise state attributes
+			"guiseStateWidth":true,	//don't remove Guise state attributes TODO change to jsXXX
 			"guiseStateHeight":true
 		};
 
@@ -2297,6 +2301,21 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 			"guise:patchType":true	//the guise:patchType attribute is used for patching information
 		};
 
+		/**The set of class names that should not be removed when synchronizing.*/
+		GuiseAJAX.prototype.NON_REMOVABLE_CLASS_SET=
+		{
+			"jsRollover":true	//don't remove JavaScript-controlled clases
+		};
+
+		var nonRemovableClassArray=new Array();	//create a new array to hold the non-removable classes
+		for(var nonRemovableClass in GuiseAJAX.prototype.NON_REMOVABLE_CLASS_SET)	//for each non-removable class
+		{
+			nonRemovableClassArray.add(nonRemovableClass);	//add this non-removable class to the array
+		}
+
+		/**The regular expression matching any non-removable class.*/
+		GuiseAJAX.prototype.NON_REMOVABLE_CLASSES_REGEX=new RegExp(nonRemovableClassArray.join("|"));	//create a regular expression of all non-removable classes, separated by a regular expression union symbol
+		
 		/**Invalidates the content of all ancestor elements by removing the "guise:contentHash" attribute up the hierarchy.
 		@param element The element the ancestors of which will have their ancestors invalidated.
 		*/
@@ -2388,6 +2407,34 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 						}
 						var oldAttributeValue=oldElement[attributeName];	//get the old attribute value
 						var valueChanged=oldAttributeValue!=attributeValue;	//see if the value is really changing
+
+						if(valueChanged && attributeName=="className")	//if the class name value is changing, add back any non-removable classes as needed
+						{
+							if(oldAttributeValue.match(this.NON_REMOVABLE_CLASSES_REGEX))	//if the original class name had one of the non-removable classes (this is only to eliminate most cases in which there are no non-removable classes; because the regular expression has word boundary checking, this test may give some false positives because of substring matching)
+							{
+								var newAttributeValues=attributeValue.split(/\s/);	//we'll add back any of the missing non-removable attributes to this array; start with the attributes we already have
+								var existingNonRemovableClasses=new Object();	//create a set of the already-existing non-removable classes
+								for(var newAttributeValueIndex=newAttributeValues.length-1; newAttributeValueIndex>=0; --newAttributeValueIndex)	//for each new class
+								{
+									var newClass=newAttributeValues[newAttributeValueIndex];	//get the new class
+									if(this.NON_REMOVABLE_CLASS_SET[newClass])	//if this is a non-removable class
+									{
+										existingNonRemovableClasses[newClass]=true;	//show that we already have this non-removable class
+									}
+								}
+								var oldAttributeValues=oldAttributeValue.split(/\s/);	//split out all the old classes
+								for(var oldAttributeValueIndex=oldAttributeValues.length-1; oldAttributeValueIndex>=0; --oldAttributeValueIndex)	//for each old class
+								{
+									var oldClass=oldAttributeValues[oldAttributeValueIndex];	//get the old class
+									if(this.NON_REMOVABLE_CLASS_SET[oldClass] && !existingNonRemovableClasses[oldClass])	//if this is a non-removable class that was removed in the new value
+									{
+										newAttributeValues.add(oldClass);	//add the old class back to the array that will form the new class name
+									}
+								}
+								attributeValue=newAttributeValues.join(" ");	//join the attributes back together to create the new class name
+								valueChanged=oldAttributeValue!=attributeValue;	//check again to see if the value is really changing
+							}
+						}							
 /*TODO del unless we want to fix external-toGuise stylesheets
 						if(valueChanged)	//if the value is changing, see if we have to do fixes for IE6 (if the value hasn't changed, that means there were no fixes before and no fixes afterwards; we may want to categorically do fixes in the future if we add attribute-based selectors)
 						{
@@ -5049,11 +5096,11 @@ function onMouse(event)
 		{
 			case "mouseover":	//TODO use a constant
 				eventType=MouseAJAXEvent.EventType.ENTER;
-				addComponentClassName(component, STYLES.ROLLOVER, component.id);	//add the "rollover" style to all component elements
+				addComponentClassName(component, STYLES.JS_ROLLOVER, component.id);	//add the "jsRollover" style to all component elements
 				break;
 			case "mouseout":	//TODO use a constant
 				eventType=MouseAJAXEvent.EventType.EXIT;
-				removeComponentClassName(component, STYLES.ROLLOVER, component.id);	//remove the "rollover" style from all component elements
+				removeComponentClassName(component, STYLES.JS_ROLLOVER, component.id);	//remove the "jsRollover" style from all component elements
 				break;
 			default:	//TODO assert an error or warning
 				return;				
