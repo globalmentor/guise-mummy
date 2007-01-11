@@ -21,6 +21,8 @@ public class GuiseCSSStyleConstants
 	public final static String COMPONENT_DESCRIPTION_CLASS_SUFFIX="-description";
 	/**The CSS class suffix for the body part of a component.*/
 	public final static String COMPONENT_BODY_CLASS_SUFFIX="-body";
+	/**The CSS class suffix for the link part of a component.*/
+	public final static String COMPONENT_LINK_CLASS_SUFFIX="-link";
 	/**The CSS class suffix for a single child of a component.*/
 	public final static String COMPONENT_CHILD_CLASS_SUFFIX="-child";
 	/**The CSS class suffix for the list of children of a component.*/

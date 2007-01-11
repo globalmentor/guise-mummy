@@ -4012,7 +4012,7 @@ function initializeNode(node, deep, initialInitialization)
 						{
 							node.hideFocus="true";	//hide the focus on this element
 						}
-						if(elementClassNames.contains("actionControl"))	//if this is a Guise action TODO later look at *all* link clicks and do popups for certain ones
+						if(elementClassNames.contains("actionControl") || elementClassNames.contains("actionControl-link"))	//if this is a Guise action, or a link in an action control TODO later look at *all* link clicks and do popups for certain ones
 						{
 							if(!node.getAttribute("target"))	//if the link has no target (the target wouldn't work if we tried to take over the events; we can't just check for null because IE will always send back at least "")
 							{
