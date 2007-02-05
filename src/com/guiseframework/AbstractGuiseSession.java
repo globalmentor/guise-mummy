@@ -1206,7 +1206,21 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public void navigate(final String path)
 		{
-			navigate(path, null);	//navigate to the requested path with no bookmark
+			navigate(path, (Bookmark)null);	//navigate to the requested path with no bookmark
+		}
+
+		/**Requests navigation to the specified path in an identified viewport.
+		The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
+		Later requested navigation before navigation occurs will override this request.
+		@param path A path that is either relative to the application context path or is absolute.
+		@param viewportID The ID of the viewport in which navigation should occur, or <code>null</code> if navigation should occur in the current viewport.
+		@exception NullPointerException if the given path is <code>null</code>.
+		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
+		@see #navigate(URI, String)
+		*/
+		public void navigate(final String path, final String viewportID)
+		{
+			navigate(path, null, viewportID);	//navigate to the requested path in the viewport with no bookmark
 		}
 
 		/**Requests navigation to the specified path and bookmark.
@@ -1220,8 +1234,23 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public void navigate(final String path, final Bookmark bookmark)
 		{
+			navigate(path, bookmark, null);	//navigate to the requested path with no viewport ID
+		}
+
+		/**Requests navigation to the specified path and bookmark in an identified viewport.
+		The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
+		Later requested navigation before navigation occurs will override this request.
+		@param path A path that is either relative to the application context path or is absolute.
+		@param bookmark The bookmark at the given path, or <code>null</code> if no bookmark should be included in the navigation.
+		@param viewportID The ID of the viewport in which navigation should occur, or <code>null</code> if navigation should occur in the current viewport.
+		@exception NullPointerException if the given path is <code>null</code>.
+		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
+		@see #navigate(URI, String)
+		*/
+		public void navigate(final String path, final Bookmark bookmark, final String viewportID)
+		{
 			final String navigationPath=bookmark!=null ? path+bookmark.toString() : path;	//append the bookmark if needed
-			navigate(createPathURI(navigationPath));	//navigate to the requested URI, converting the path to a URI and verifying that it is only a path
+			navigate(createPathURI(navigationPath), viewportID);	//navigate to the requested URI, converting the path to a URI and verifying that it is only a path
 		}
 
 		/**Requests navigation to the specified URI.
