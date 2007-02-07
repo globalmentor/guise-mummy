@@ -361,10 +361,11 @@ Debug.trace("checking for categories");
 				
 				final File guiseApplicationHomeDirectory=getDataDirectory(servletContext, DATA_DIRECTORY_INIT_PARAMETER, "guise/home/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
 				final File guiseApplicationLogDirectory=getDataDirectory(servletContext, LOG_DIRECTORY_INIT_PARAMETER, "guise/logs/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
+				final File guiseApplicationTempDirectory=getDataDirectory(servletContext, TEMP_DIRECTORY_INIT_PARAMETER, "guise/temp/"+guiseApplicationRelativePath);	//get the explicitly defined data directory; if there is no data directory defined, use the default data directory with a subpath of "guise/home" plus the application relative path TODO use a constant
 				//			TODO delDebug.trace("ready to install application into container with context path", guiseApplicationContextPath);
 				try
 				{
-					guiseContainer.installApplication(guiseApplication, guiseApplicationBasePath, guiseApplicationHomeDirectory, guiseApplicationLogDirectory);	//install the application
+					guiseContainer.installApplication(guiseApplication, guiseApplicationBasePath, guiseApplicationHomeDirectory, guiseApplicationLogDirectory, guiseApplicationTempDirectory);	//install the application
 				}
 				catch(final IOException ioException)	//if there is an I/O exception installing the application
 				{
@@ -411,7 +412,7 @@ while(headerNames.hasMoreElements())
 	Debug.info("request header:", headerName, request.getHeader(headerName));
 }
 */
-		if(rawPathInfo.startsWith(GUISE_PUBLIC_RESOURCE_BASE_PATH))	//if this is a request for a public resource
+		if(navigationPath.startsWith(GuiseApplication.GUISE_PUBLIC_RESOURCE_BASE_PATH))	//if this is a request for a Guise public resource
 		{
 			super.doGet(request, response);	//go ahead and retrieve the resource immediately
 			return;	//don't try to see if there is a navigation path for this path
@@ -1686,15 +1687,15 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
   @return <code>true</code> if the resource exists, else <code>false</code>.
 	@exception IOException if there is an error accessing the resource.
 	@see GuiseApplication#hasDestination(String)
-	@see #isPublicResourceURI(URI)
+	@see #isGuisePublicResourceURI(URI)
   */
   protected boolean exists(final URI resourceURI) throws IOException
   {
 //TODO del Debug.trace("checking exists", resourceURI);
-  	if(isPublicResourceURI(resourceURI))	//if this URI represents a Guise public resource
+  	if(isGuisePublicResourceURI(resourceURI))	//if this URI represents a Guise public resource
   	{
-  		final String publicResourceKey=getPublicResourceKey(resourceURI);	//get the Guise public resource key
-  		return Guise.getInstance().getPublicResourceURL(publicResourceKey)!=null;	//see if there is a public resource for this key TODO add Guise.hasPublicResource()
+  		final String publicResourceKey=getGuisePublicResourceKey(resourceURI);	//get the Guise public resource key
+  		return Guise.getInstance().hasGuisePublicResourceURL(publicResourceKey);	//see if there is a public resource for this key
   	}
   	final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
   	if(guiseApplication.hasDestination(guiseApplication.relativizeURI(resourceURI)))	//if the URI represents a valid navigation path
@@ -1714,19 +1715,19 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
   @return An object providing an encapsulation of the requested resource, but not necessarily the contents of the resource. 
 	@exception IllegalArgumentException if the given resource URI does not represent a valid resource.
 	@exception IOException if there is an error accessing the resource.
-	@see #isPublicResourceURI(URI)
-	@see #getPublicResourceKey(URI)
-	@see Guise#getPublicResourceURL(String)
+	@see #isGuisePublicResourceURI(URI)
+	@see #getGuisePublicResourceKey(URI)
+	@see Guise#getGuisePublicResourceURL(String)
   */
 	protected HTTPServletResource getResource(final HttpServletRequest request, final URI resourceURI) throws IllegalArgumentException, IOException
 	{
 //TODO del Debug.trace("getting resource for URI: ", resourceURI);
 		final HTTPServletResource resource;	//we'll create a resource for this resource URI
-  	if(isPublicResourceURI(resourceURI))	//if this URI represents a Guise public resource
+  	if(isGuisePublicResourceURI(resourceURI))	//if this URI represents a Guise public resource
   	{
-  		final String publicResourceKey=getPublicResourceKey(resourceURI);	//get the Guise public resource key
+  		final String publicResourceKey=getGuisePublicResourceKey(resourceURI);	//get the Guise public resource key
 //  	TODO del Debug.trace("this is a public resource with key: ", publicResourceKey);
-			final URL publicResourceURL=Guise.getInstance().getPublicResourceURL(publicResourceKey);	//get a URL to the resource
+			final URL publicResourceURL=Guise.getInstance().getGuisePublicResourceURL(publicResourceKey);	//get a URL to the resource
 //		TODO del Debug.trace("found URL to resource: ", publicResourceURL);
 			resource=new DefaultHTTPServletResource(resourceURI, publicResourceURL);	//create a new default resource with a URL to the public resource
 //		TODO del Debug.trace("constructed a resource with length:", resource.getContentLength(), "and last modified", resource.getLastModified());
@@ -1844,52 +1845,13 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 		}
 	}
 	
-	/**Retrieves an input stream to the given resource.
-	This version compresses resources of type <code>text/css</code>.
-	This version processes resources of type <code>text/css</code> to work around IE6 bugs, if IE6 is the user agent.
-	@param resource The resource for which an input stream should be retrieved.
-	@return An input stream to the given resource.
-	@exception IOException Thrown if there is an error accessing the resource, such as a missing file or a resource that has no contents.
-	*/
-/*TODO del when works
-	protected InputStream getInputStream(final HTTPServletResource resource) throws IOException
-	{
-		final InputStream inputStream=super.getInputStream(resource);	//get the default input stream to the resource
-		final ContentType contentType=getContentType(resource);	//get the content type of the resource
-Debug.trace("got content type", contentType, "for resource", resource);
-		if(TEXT_CSS_CONTENT_TYPE.match(contentType))	//if this is a CSS stylesheet
-		{
-Debug.trace("this is CSS content");
-			try
-			{
-				final XMLCSSProcessor cssProcessor=new XMLCSSProcessor();
-				final Reader cssReader=new InputStreamReader(inputStream, UTF_8);
-				CSSStyleSheet cssStylesheet=cssProcessor.parseStyleSheet(cssReader, resource.getReferenceURI());	//parse the stylesheet
-	Debug.trace("just parsed stylesheet:", cssStylesheet);
-				return new ByteArrayInputStream(cssStylesheet.toString().getBytes(UTF_8));
-			}
-			catch(final Exception exception)
-			{
-Debug.error(exception);
-			}
-			finally
-			{
-Debug.trace("closing original input stream");
-				inputStream.close();	//always close the original input stream
-Debug.trace("closed original input stream");
-			}
-		}
-		return inputStream;	//return our input stream
-	}
-*/
-
 	/**Determines whether the given URI references a Guise public resource.
-	The URI references a public resource if the path, relative to the application base path, begins with {@value WebPlatformConstants#GUISE_PUBLIC_PATH}.
+	The URI references a public resource if the path, relative to the application base path, begins with {@value GuiseApplication#GUISE_PUBLIC_RESOURCE_BASE_PATH}.
 	@param uri The reference URI, which is assumed to have this servlet's domain.
 	@return <code>true</code> if the given URI references a Guise public resource.
 	@exception NullPointerException if the given URI is <code>null</code>.
 	*/
-	public boolean isPublicResourceURI(final URI uri)
+	public boolean isGuisePublicResourceURI(final URI uri)
 	{
 		final String rawPath=uri.getRawPath();	//get the raw path of the URI
 		if(rawPath!=null)	//if there is a raw path
@@ -1899,7 +1861,7 @@ Debug.trace("closed original input stream");
 //		TODO del Debug.trace("application base path", applicationBasePath);
 			final String relativePath=relativizePath(applicationBasePath, rawPath);	//relativize the raw path to the base path
 //		TODO del Debug.trace("relativePath", relativePath);
-			return relativePath.startsWith(GUISE_PUBLIC_PATH);	//see if the relative path starts with the Guise public resource base path
+			return relativePath.startsWith(GuiseApplication.GUISE_PUBLIC_RESOURCE_BASE_PATH);	//see if the relative path starts with the Guise public resource base path
 		}
 		else	//if there is no raw path
 		{
@@ -1907,14 +1869,18 @@ Debug.trace("closed original input stream");
 		}
 	}
 
-	/**Determines the public resource key for the given URI.
-	The path of the given URI, relative to the application base path, must begin with {@value WebPlatformConstants#GUISE_PUBLIC_PATH}.
-	This path prefix will be replaced with {@value Guise#PUBLIC_RESOURCE_BASE_PATH}.
+	/**Determines the Guise public resource key for the given URI.
+	The path of the given URI, relative to the application base path, must begin with {@value GuiseApplication#GUISE_PUBLIC_RESOURCE_BASE_PATH}.
+	This path prefix will be replaced with {@value Guise#GUISE_PUBLIC_RESOURCE_BASE_KEY}.
 	@param uri The URI of the public resource, which is assumed to have this servlet's domain.
-	@return The path to a Guise public resource.
-	@exception IllegalArgumentException if the raw path of the URI is <code>null</code> or does not start with {@value WebPlatformConstants#GUISE_PUBLIC_RESOURCE_BASE_PATH}.
+	@return The key to a Guise public resource.
+	@exception IllegalArgumentException if the raw path of the URI is <code>null</code> or does not start with {@value GuiseApplication#GUISE_PUBLIC_RESOURCE_BASE_PATH}.
+	@see Guise#hasGuisePublicResourceURL(String)
+	@see Guise#getGuisePublicResource(String)
+	@see Guise#getGuisePublicResourceInputStream(String)
+	@see Guise#getGuisePublicResourceURL(String)
 	*/
-	public String getPublicResourceKey(final URI uri)
+	public String getGuisePublicResourceKey(final URI uri)
 	{
 		final String rawPath=uri.getRawPath();	//get the raw path of the URI
 		if(rawPath==null)	//if the raw path is null
@@ -1923,10 +1889,10 @@ Debug.trace("closed original input stream");
 		}
 		final String applicationBasePath=getGuiseApplication().getBasePath();	//get the application base path
 		final String relativePath=relativizePath(applicationBasePath, rawPath);	//relativize the raw path to the base path
-		if(!relativePath.startsWith(GUISE_PUBLIC_PATH))	//if this isn't a public resource URI
+		if(!relativePath.startsWith(GuiseApplication.GUISE_PUBLIC_RESOURCE_BASE_PATH))	//if this isn't a public resource URI
 		{
 			throw new IllegalArgumentException("URI "+uri+ " does not identify a Guise public resource.");
 		}
-		return PUBLIC_RESOURCE_BASE_PATH+relativePath.substring(GUISE_PUBLIC_PATH.length());	//replace the beginning of the relative path with the resource base path
+		return GUISE_PUBLIC_RESOURCE_BASE_KEY+relativePath.substring(GuiseApplication.GUISE_PUBLIC_RESOURCE_BASE_PATH.length());	//replace the beginning of the relative path with the resource base path
 	}
 }

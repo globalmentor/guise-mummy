@@ -27,8 +27,8 @@ public final class Guise
 	/**The web address of Guise.*/
 	public final static URI GUISE_WEB_URI=URI.create("http://www.guiseframework.com/");
 
-	/**The base path to Guise public resources.*/
-	public final static String PUBLIC_RESOURCE_BASE_PATH="pub/";
+	/**The base key to Guise public resources bundled in the Guise distributable.*/
+	public final static String GUISE_PUBLIC_RESOURCE_BASE_KEY="pub/";
 
 	/**The identifier of this build.*/
 	public final static String BUILD_ID="2007-02-04";
@@ -68,21 +68,21 @@ public final class Guise
 	/**The cache of public resource references keyed to resource strings.*/
 	private Map<String, Reference<byte[]>> publicResourceMap=new ConcurrentHashMap<String, Reference<byte[]>>();
 
-	/**Retrieves a public resource keyed to its location.
+	/**Retrieves a Guise public resource keyed to its location.
 	Resources are cached for quick future retrieval.
 	Due to race conditions, a resource may initially be loaded more than once in this implementation before its final value is placed in the cache.
-	@param publicResourceKey The location of the resource.
+	@param guisePublicResourceKey The location of the resource.
 	@return The resource, or <code>null</code> if there is no such resource.
 	@exception IllegalArgumentException if the resource key does not begin with the public resource path.
 	@exception IOException if there is an error loading the resource.
-	@see #PUBLIC_RESOURCE_BASE_PATH
+	@see #GUISE_PUBLIC_RESOURCE_BASE_KEY
 	*/
-	public byte[] getPublicResource(final String publicResourceKey) throws IOException
+	public byte[] getGuisePublicResource(final String guisePublicResourceKey) throws IOException
 	{
-		final String key=normalizePath(publicResourceKey);	//normalize the resource key
-		if(!key.startsWith(PUBLIC_RESOURCE_BASE_PATH))	//if this isn't a public resource key
+		final String key=normalizePath(guisePublicResourceKey);	//normalize the resource key
+		if(!key.startsWith(GUISE_PUBLIC_RESOURCE_BASE_KEY))	//if this isn't a public resource key
 		{
-			throw new IllegalArgumentException(publicResourceKey);
+			throw new IllegalArgumentException(guisePublicResourceKey);
 		}
 		final Reference<byte[]> reference=publicResourceMap.get(key);	//get a reference to the resource
 		byte[] resource=reference!=null ? reference.get() : null;	//dereference the reference, if there is a reference
@@ -98,38 +98,51 @@ public final class Guise
 		return resource;	//return whatever resource we found
 	}
 
-	/**Retrieves a URL to a public resource keyed to its location.
+	/**Determines if a URL specifies an existing Guise public resource.
+	This version delegates to {@link #getGuisePublicResourceURL(String)}.
+	@param guisePublicResourceKey The location of the resource.
+	@return <code>true</code> if the URL references an existing Guise public resource, else <code>false</code>.
+	@exception IllegalArgumentException if the resource key does not begin with the public resource path.
+	@exception IOException if there is an error accessing the resource.
+	@see #GUISE_PUBLIC_RESOURCE_BASE_KEY
+	*/
+	public boolean hasGuisePublicResourceURL(final String guisePublicResourceKey) throws IOException
+	{
+		return getGuisePublicResourceURL(guisePublicResourceKey)!=null;	//see if there is actually a resource at the given location
+	}
+
+	/**Retrieves a URL to a Guise public resource keyed to its location.
 	The URL allows connections to the resource.
-	@param publicResourceKey The location of the resource.
+	@param guisePublicResourceKey The location of the resource.
 	@return A URL to the resource, or <code>null</code> if there is no such resource.
 	@exception IllegalArgumentException if the resource key does not begin with the public resource path.
 	@exception IOException if there is an error loading the resource.
-	@see #PUBLIC_RESOURCE_BASE_PATH
+	@see #GUISE_PUBLIC_RESOURCE_BASE_KEY
 	*/
-	public URL getPublicResourceURL(final String publicResourceKey) throws IOException
+	public URL getGuisePublicResourceURL(final String guisePublicResourceKey) throws IOException
 	{
-		final String key=normalizePath(publicResourceKey);	//normalize the resource key
-		if(!key.startsWith(PUBLIC_RESOURCE_BASE_PATH))	//if this isn't a public resource key
+		final String key=normalizePath(guisePublicResourceKey);	//normalize the resource key
+		if(!key.startsWith(GUISE_PUBLIC_RESOURCE_BASE_KEY))	//if this isn't a public resource key
 		{
-			throw new IllegalArgumentException(publicResourceKey);
+			throw new IllegalArgumentException(guisePublicResourceKey);
 		}
 		return getClass().getResource(key);	//get a URL to the resource
 	}
 
-	/**Retrieves an input stream to a public resource keyed to its location.
+	/**Retrieves an input stream to a Guise public resource keyed to its location.
 	This method will use cached resources if possible, but will not cache new resources.
-	@param publicResourceKey The location of the resource.
+	@param guisePublicResourceKey The location of the resource.
 	@return An input stream to a resource, or <code>null</code> if there is no such resource.
 	@exception IllegalArgumentException if the resource key does not begin with the public resource path.
 	@exception IOException if there is an error loading the resource.
-	@see #PUBLIC_RESOURCE_BASE_PATH
+	@see #GUISE_PUBLIC_RESOURCE_BASE_KEY
 	*/
-	public InputStream getPublicResourceInputStream(final String publicResourceKey) throws IOException
+	public InputStream getGuisePublicResourceInputStream(final String guisePublicResourceKey) throws IOException
 	{
-		final String key=normalizePath(publicResourceKey);	//normalize the resource key
-		if(!key.startsWith(PUBLIC_RESOURCE_BASE_PATH))	//if this isn't a public resource key
+		final String key=normalizePath(guisePublicResourceKey);	//normalize the resource key
+		if(!key.startsWith(GUISE_PUBLIC_RESOURCE_BASE_KEY))	//if this isn't a public resource key
 		{
-			throw new IllegalArgumentException(publicResourceKey);
+			throw new IllegalArgumentException(guisePublicResourceKey);
 		}
 		final Reference<byte[]> reference=publicResourceMap.get(key);	//get a reference to the resource
 		byte[] resource=reference!=null ? reference.get() : null;	//dereference the reference, if there is a reference

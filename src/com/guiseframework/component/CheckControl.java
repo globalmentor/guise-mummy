@@ -2,6 +2,7 @@ package com.guiseframework.component;
 
 import com.guiseframework.model.*;
 import com.guiseframework.prototype.ValuePrototype;
+import com.guiseframework.validator.ValueRequiredValidator;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
@@ -10,6 +11,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 If there is a {@link MutualExclusionPolicyModelGroup} value listener, indicating that this is a mutual exclusion control, a {@link CheckType#ELLIPSE} check type will be used.
 Otherwise, a {@link CheckType#RECTANGLE} check type will be used.</p>
 <p>The default model used by a check control defaults to a value of {@link Boolean#FALSE}, as a check control does not have the capability of indicating <code>null</code>.</p>
+<p>A check control automatically installs a {@link ValueRequiredValidator}, as a check control does not have the capability of indicating <code>null</code>.</p>
 @author Garret Wilson
 */
 public class CheckControl extends AbstractValueControl<Boolean, CheckControl> 
@@ -123,6 +125,7 @@ public class CheckControl extends AbstractValueControl<Boolean, CheckControl>
 	{
 		super(labelModel, valueModel, enableable);	//construct the parent class
 		this.checkType=checkType;	//save the check type
+		setValidator(new ValueRequiredValidator<Boolean>());	//require a value, as a check control cannot indicate the absence of a value
 	}
 
 	/**Prototype constructor.

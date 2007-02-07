@@ -79,15 +79,16 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 	@param basePath The base path at which the application is being installed.
 	@param homeDirectory The home directory of the application.
 	@param logDirectory The log directory of the application.
-	@exception NullPointerException if either the application, base path, home directory, and/or log directory is <code>null</code>.
+	@param tempDirectory The temprary directory of the application.
+	@exception NullPointerException if either the application, base path, home directory, log directory, and/or temprary directory is <code>null</code>.
 	@exception IllegalArgumentException if the context path is not absolute and does not end with a slash ('/') character.
 	@exception IllegalStateException if the application is already installed in some container.
 	@exception IllegalStateException if there is already an application installed in this container at the given context path.
 	@exception IOException if there is an I/O error when installing the application.
 	*/
-	protected void installApplication(final AbstractGuiseApplication application, final String basePath, final File homeDirectory, final File logDirectory) throws IOException
+	protected void installApplication(final AbstractGuiseApplication application, final String basePath, final File homeDirectory, final File logDirectory, final File tempDirectory) throws IOException
 	{
-		super.installApplication(application, basePath, homeDirectory, logDirectory);	//delegate to the parent class
+		super.installApplication(application, basePath, homeDirectory, logDirectory, tempDirectory);	//delegate to the parent class
 	}
 
 	/**Uninstalls the given application.

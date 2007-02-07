@@ -32,6 +32,23 @@ public interface GuiseApplication extends PropertyBindable
 	/**The theme bound property.*/
 	public final static String THEME_PROPERTY=getPropertyName(GuiseApplication.class, "theme");
 
+	/**The application-relative base path reserved for exclusive Guise use.*/
+	public final static String GUISE_RESERVED_BASE_PATH="guise/";
+	/**The application-relative base path to access all Guise public resources.*/
+	public final static String GUISE_PUBLIC_RESOURCE_BASE_PATH=GUISE_RESERVED_BASE_PATH+"resources/";
+	/**The application-relative base path to access all Guise temp files.*/
+	public final static String GUISE_PUBLIC_TEMP_BASE_PATH=GUISE_RESERVED_BASE_PATH+"temp/";
+	/**The base path of public documents, relative to the application.*/
+	public final static String GUISE_PUBLIC_DOCUMENTS_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH+"documents/";
+	/**The base path of public JavaScript files, relative to the application.*/
+	public final static String GUISE_PUBLIC_JAVASCRIPT_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH+"javascript/";
+	/**The base path of public themes, relative to the application.*/
+	public final static String GUISE_PUBLIC_THEMES_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH+"themes/";
+	/**The base path of the default Guise theme, relative to the application.*/
+	public final static String GUISE_BASE_THEME_PATH=GUISE_PUBLIC_THEMES_PATH+"guise/";
+	/**The path of the default Guise theme, relative to the application.*/
+	public final static String GUISE_THEME_PATH=GUISE_BASE_THEME_PATH+"guise.theme.rdf";
+
 	/**@return The application locale used by default if a new session cannot determine the users's preferred locale.*/
 //TODO del	public Locale getDefaultLocale();
 
@@ -198,6 +215,13 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public File getLogDirectory();
 
+	/**Returns the temprary directory shared by all sessions of this application.
+	This value is not available before the application is installed.
+	@return The temporary directory of the application.
+	@exception IllegalStateException if the application has not yet been installed into a container. 
+	*/
+	public File getTempDirectory();
+
 	/**Retrieves a writer suitable for recording log information for the application.
 	The given base filename is appended with a representation of the current date.
 	If a log writer for the same date is available, it is returned; otherwise, a new log writer is created.
@@ -312,6 +336,58 @@ public interface GuiseApplication extends PropertyBindable
 	@see #resolveURI(URI)
 	*/
 	public InputStream getInputStream(final URI uri) throws IOException;
+
+	/**Retrieves an input stream to the entity at the given path.
+	If the URI represents one of this application's public resources, this implementation will return an input stream directly from that resource if possible rather than issuing a separate server request.
+	@param path A path that is either relative to the application context path or is absolute.
+	@return An input stream to the entity at the given resource path, or <code>null</code> if no entity exists at the given resource path.
+	@exception NullPointerException if the given path is <code>null</code>.
+	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #getInputStream(URI)} should be used instead).
+	@exception IOException if there was an error connecting to the entity at the given path.
+	@see #getInputStream(URI)
+	*/
+	public InputStream getInputStream(final String path) throws IOException;
+
+	/**Retrieves an output stream to the entity at the given URI.
+	The URI is first resolved to the application base path.
+	This method supports write access to temporary public resources.
+	Write access to resources other than Guise public temporary files is currently unsupported. 
+	@param uri A URI to the entity; either absolute or relative to the application.
+	@return An output stream to the entity at the given resource URI.
+	@exception NullPointerException if the given URI is <code>null</code>.
+	@exception IOException if there was an error connecting to the entity at the given URI.
+	@exception FileNotFoundException if a URI to a temporary file was passed before the file was created using {@link #createTempPublicResource(String, String, boolean)}.
+	@see #resolveURI(URI)
+	@see #createTempPublicResource(String, String, boolean)
+	*/
+	public OutputStream getOutputStream(final URI uri) throws IOException;
+
+	/**Retrieves an output stream to the entity at the given path.
+	This method supports write access to temporary public resources.
+	Write access to resources other than Guise public temporary files is currently unsupported. 
+	@param path A path that is either relative to the application context path or is absolute.
+	@return An output stream to the entity at the given resource path.
+	@exception NullPointerException if the given path is <code>null</code>.
+	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #getOutputStream(URI)} should be used instead).
+	@exception IOException if there was an error connecting to the entity at the given URI.
+	@exception FileNotFoundException if a path to a temporary file was passed before the file was created using {@link #createTempPublicResource(String, String, boolean)}.
+	@see #getOutputStream(URI)
+	@see #createTempPublicResource(String, String, boolean)
+	*/
+	public OutputStream getOutputStream(final String path) throws IOException;
+
+	/**Creates a temporary resource available at a public application navigation path.
+	The file will be created in the application's temporary file directory.
+	If the resource is restricted to the current Guise session, the resource will be deleted when the current Guise session ends.
+	@param baseName The base filename to be used in generating the filename.
+	@param extension The extension to use for the temporary file.
+	@param sessionRestricted <code>true</code> if access to the temporary file should be restricted to the current Guise session.
+	@return A public application navigation path that can be used to access the resource.
+	@exception IllegalStateException if session restriction was requested and the current thread is not associated with any Guise session.
+	@exception IOException if there is a problem creating the public resource.
+	@see #getTempDirectory()
+	*/
+	public String createTempPublicResource(final String baseName, final String extension, final boolean sessionRestricted) throws IOException;
 
 	/**Retrieves a resource bundle for the given locale.
 	The resource bundle retrieved will allow hierarchical resolution in the following priority:

@@ -2,6 +2,7 @@ package com.guiseframework;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -13,7 +14,6 @@ import com.garretwilson.io.IO;
 import com.garretwilson.net.http.HTTPNotFoundException;
 import com.garretwilson.net.http.HTTPResource;
 import com.garretwilson.rdf.RDFResourceIO;
-import com.guiseframework.platform.web.WebPlatformConstants;
 import com.guiseframework.theme.Theme;
 
 import static com.garretwilson.io.FileUtilities.ensureDirectoryExists;
@@ -117,20 +117,21 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	}
 
 	/**Installs the given application at the given base path.
-	This version ensures the home and log directories exist.
+	This version ensures the home, log, and temp directories exist.
 	This version loads the theme, if any.
 	If no theme is specified, the default theme will be loaded.
 	@param application The application to install.
 	@param basePath The base path at which the application is being installed.
 	@param homeDirectory The home directory of the application.
 	@param logDirectory The log directory of the application.
-	@exception NullPointerException if the application, base path, home directory, and/or log directory is <code>null</code>.
+	@param tempDirectory The temporary directory of the application.
+	@exception NullPointerException if the application, base path, home directory, log directory, and/or temporary directory is <code>null</code>.
 	@exception IllegalArgumentException if the base path is not absolute and does not end with a slash ('/') character.
 	@exception IllegalStateException if the application is already installed in some container.
 	@exception IllegalStateException if there is already an application installed in this container at the given base path.
 	@exception IOException if there is an I/O error when installing the application.
 	*/
-	protected void installApplication(final AbstractGuiseApplication application, final String basePath, final File homeDirectory, final File logDirectory) throws IOException
+	protected void installApplication(final AbstractGuiseApplication application, final String basePath, final File homeDirectory, final File logDirectory, final File tempDirectory) throws IOException
 	{
 		checkInstance(application, "Application cannot be null");
 		checkInstance(basePath, "Application base path cannot be null");
@@ -142,25 +143,28 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 			}
 			ensureDirectoryExists(homeDirectory);	//make sure the application home directory exists
 			ensureDirectoryExists(logDirectory);	//make sure the application log directory exists
-			application.install(this, basePath, homeDirectory, logDirectory);	//tell the application it's being installed
+			ensureDirectoryExists(tempDirectory);	//make sure the application temporary directory exists
+			application.install(this, basePath, homeDirectory, logDirectory, tempDirectory);	//tell the application it's being installed
 			applicationMap.put(basePath, application);	//install the application in the map
 		}
 
-		final URI defaultThemeURI=URI.create(application.getBasePath()+WebPlatformConstants.GUISE_THEME_PATH);	//determine the application-relative URI of the default theme TODO remove web platform dependency
+		final URI defaultThemeURI=URI.create(application.getBasePath()+GuiseApplication.GUISE_THEME_PATH);	//determine the application-relative URI of the default theme TODO remove web platform dependency
 		
 			//load the theme; this is done now instead of when the application was initialized because only now does the application know its base path
 		final Theme oldTheme=application.getTheme();	//get the theme, if any
 		final URI oldThemeURI=oldTheme!=null ? oldTheme.getReferenceURI() : defaultThemeURI;	//get the old theme URI; if no theme is specified, use the the defaul theme
 //TODO del		final URI themeURI=application.getContainer().getBaseURI().resolve(application.resolveURI(oldThemeURI));	//resolve the theme URI against the Guise application and then against the container base URI TODO create a common method to do this
-//TODO fix		try
+//TODO fix		try	//try to load the new theme
 		{
 			final Theme newTheme=loadApplicationTheme(application, oldThemeURI, defaultThemeURI);	//load the theme and any parent themes
 			application.setTheme(newTheme);	//update the application theme with the theme we just loaded
 		}
-/*TODO remove the application from the map if there is an error, maybe
-		catch(final IOException ioException)	//if there is an I/O error
+/*TODO fix; the reason we don't do this already is because further accesses will access result in accessing a Guise application base path of null from the GuiseHTTPServlet---we need to do some better followup (such as uninstall the servlet, if possible) if installation does not succeed
+		catch(final IOException ioException)	//if there is an I/O error loading the theme
 		{
-			throw new AssertionError(ioException);	//TODO fix
+Debug.error("error; ready to uninstall application", ioException);
+			uninstallApplication(application);	//uninstall the application
+			throw ioException;	//rethrow the exception
 		}
 */
 	}
@@ -176,10 +180,15 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	*/
 	protected Theme loadApplicationTheme(final GuiseApplication application, final URI themeURI, final URI defaultThemeURI) throws IOException
 	{
-		final InputStream themeInputStream=new BufferedInputStream(application.getInputStream(themeURI));	//get a buffered input stream to the theme; ask the application to get the input stream, so that the resource can be loaded directly if possible
+		final InputStream themeInputStream=application.getInputStream(themeURI);	//ask the application to get the input stream, so that the resource can be loaded directly if possible
+		if(themeInputStream==null)	//if there is no such theme
+		{
+			throw new FileNotFoundException("Missing theme resource: "+themeURI);	//indicate that the theme cannot be found
+		}
+		final InputStream bufferedThemeInputStream=new BufferedInputStream(themeInputStream);	//get a buffered input stream to the theme
 		try
 		{
-			final Theme theme=getThemeIO().read(themeInputStream, themeURI);
+			final Theme theme=getThemeIO().read(bufferedThemeInputStream, themeURI);
 				//TODO check for a specified parent theme
 			final URI absoluteThemeURI=getBaseURI().resolve(application.resolveURI(themeURI));	//resolve the theme URI against the Guise application and then against the container base URI TODO create a common method to do this
 			final URI absoluteDefaultThemeURI=getBaseURI().resolve(application.resolveURI(defaultThemeURI));	//resolve the default theme URI against the Guise application and then against the container base URI TODO create a common method to do this
@@ -192,7 +201,7 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 		}
 		finally
 		{
-			themeInputStream.close();	//always close the theme input stream
+			bufferedThemeInputStream.close();	//always close the theme input stream
 		}				
 	}
 
