@@ -703,32 +703,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		logWriter=new OutputStreamWriter(System.err);	//default to logging to the error output; this will be replaced after the session is created
 	}
 
-	/**Determines if there is a panel bound to the given appplication context-relative path.
-	This class synchronizes on {@link #navigationPathPanelMap}.
-	@param path The appplication context-relative path within the Guise container context.
-	@return <code>true</code> if there is a panel bound to the given path, or <code>false</code> if no panel is bound to the given path.
-	@exception NullPointerException if the path is <code>null</code>.
-	@exception IllegalArgumentException if the provided path is absolute.
-	*/
-/*TODO del if not needed
-	public boolean hasNavigationPanel(final String path)
-	{
-		if(isAbsolutePath(checkInstance(path, "Path cannot be null")))	//if the path is absolute
-		{
-			throw new IllegalArgumentException("Navigation path cannot be absolute: "+path);
-		}
-			//see if we have a cached panel
-		synchronized(navigationPathPanelMap)	//don't allow the map to be modified while we access it
-		{
-			if(navigationPathPanelMap.get(path)!=null)	//if we have a panel cached at this navigation path
-			{
-				return true;	//we have a navigation panel at that path
-			}
-		}
-		return getApplication().getNavigationPanelClass(path)!=null;	//see if we know the class to use for creating an application panel at this path
-	}
-*/
-
 	/**Retrieves the component bound to the given destination.
 	If a component has already been created and cached, it will be be returned; otherwise, one will be created and cached. 
 	This method synchronizes on {@link #destinationComponentMap}.
@@ -775,16 +749,15 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@exception IllegalStateException if the component class bound to the path does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
 	@see ComponentDestination
 	*/
-	public NavigationPanel<?> getNavigationPanel(final String path)	//TODO rename to getNavigationComponent()
+	public Component<?> getNavigationComponent(final String path)
 	{
 		final Destination destination=getApplication().getDestination(path);	//get the destination associated with the given path
 		if(!(destination instanceof ComponentDestination))	//if the destination is not a component destination
 		{
 			throw new IllegalArgumentException("Navigation path "+path+" does not designate a component destination.");
 		}
-		return (NavigationPanel<?>)getDestinationComponent((ComponentDestination)destination);	//return the component TODO remove the cast once a navigation panel is no longer assumed
+		return getDestinationComponent((ComponentDestination)destination);	//return the component
 	}
-
 
 	/**Creates the component for the given class.
 	@param componentClass The class representing the component to create.

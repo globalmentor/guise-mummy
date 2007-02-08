@@ -349,15 +349,6 @@ public interface GuiseSession extends PropertyBindable
 	*/
 	public void queueEvent(final PostponedEvent<?> postponedEvent);
 
-	/**Determines if there is a panel bound to the given appplication context-relative path.
-	This class synchronizes on {@link #navigationPathPanelMap}.
-	@param path The appplication context-relative path within the Guise container context.
-	@return <code>true</code> if there is a panel bound to the given path, or <code>false</code> if no panel is bound to the given path.
-	@exception NullPointerException if the path is <code>null</code>.
-	@exception IllegalArgumentException if the provided path is absolute.
-	*/
-//TODO del if not needed	public boolean hasNavigationPanel(final String path);
-	
 	/**Retrieves the component bound to the given destination.
 	If a component has already been created and cached, it will be be returned; otherwise, one will be created and cached. 
 	@param destination The destination for which a component should be returned.
@@ -386,7 +377,7 @@ public interface GuiseSession extends PropertyBindable
 	@exception IllegalStateException if the component class bound to the path does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
 	@see ComponentDestination
 	*/
-	public NavigationPanel<?> getNavigationPanel(final String path);
+	public Component<?> getNavigationComponent(final String path);
 
 	/**@return Whether the session is in a modal navigation state.*/
 	public boolean isModalNavigation();
