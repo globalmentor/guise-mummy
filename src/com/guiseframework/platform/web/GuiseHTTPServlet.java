@@ -412,7 +412,7 @@ while(headerNames.hasMoreElements())
 	Debug.info("request header:", headerName, request.getHeader(headerName));
 }
 */
-		if(navigationPath.startsWith(GuiseApplication.GUISE_PUBLIC_RESOURCE_BASE_PATH))	//if this is a request for a Guise public resource
+		if(navigationPath.startsWith(GuiseApplication.GUISE_RESERVED_BASE_PATH))	//if this is a request for a Guise reserved path (e.g. a public resource or a temporary resource)
 		{
 			super.doGet(request, response);	//go ahead and retrieve the resource immediately
 			return;	//don't try to see if there is a navigation path for this path
@@ -421,7 +421,7 @@ while(headerNames.hasMoreElements())
 		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
 		if(guiseApplication.hasDestination(navigationPath))	//if we have a destination associated with the requested path
 		{
-			final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
+			final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
 			
 /*TODO del
 	Debug.info("session ID", guiseSession.getHTTPSession().getId());	//TODO del
@@ -1606,7 +1606,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	{
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-//TODO del; we don't want to force a session here, in case this is a non-Guise resource		final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
+//TODO del; we don't want to force a session here, in case this is a non-Guise resource		final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
 		return getGuiseContainer().isAuthorized(guiseApplication, resourceURI, principal, realm);	//delegate to the container, using the current Guise session
 	}
 
@@ -1626,7 +1626,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 		}
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-		final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
+		final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
 		final Principal guiseSessionPrincipal=guiseSession.getPrincipal();	//get the current principal of the Guise session
 		final String guiseSessionPrincipalID=guiseSessionPrincipal!=null ? guiseSessionPrincipal.getName() : null;	//get the current guise session principal ID
 //	TODO del Debug.trace("checking to see if nonce principal ID", getNoncePrincipalID(nonce), "matches Guise session principal ID", guiseSessionPrincipalID); 
@@ -1656,7 +1656,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 		{
 			final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 			final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-			final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieves the Guise session for this container and request
+			final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
 			guiseSession.setPrincipal(principal);	//set the new principal in the Guise session
 		}
 	}
@@ -1692,13 +1692,20 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
   protected boolean exists(final URI resourceURI) throws IOException
   {
 //TODO del Debug.trace("checking exists", resourceURI);
+  		//see if this is a Guise public resource
   	if(isGuisePublicResourceURI(resourceURI))	//if this URI represents a Guise public resource
   	{
   		final String publicResourceKey=getGuisePublicResourceKey(resourceURI);	//get the Guise public resource key
   		return Guise.getInstance().hasGuisePublicResourceURL(publicResourceKey);	//see if there is a public resource for this key
   	}
   	final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-  	if(guiseApplication.hasDestination(guiseApplication.relativizeURI(resourceURI)))	//if the URI represents a valid navigation path
+  	final String path=guiseApplication.relativizeURI(resourceURI);	//get the application-relative path
+  		//check for a temporary public resource
+  	if(guiseApplication.hasTempPublicResource(path))	//if the URI represents a valid temporary public resource
+  	{
+  		return true;	//the resource exists
+  	}
+  	if(guiseApplication.hasDestination(path))	//if the URI represents a valid navigation path
   	{
   		return true;	//the navigation path exists
   	}
@@ -1718,6 +1725,8 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	@see #isGuisePublicResourceURI(URI)
 	@see #getGuisePublicResourceKey(URI)
 	@see Guise#getGuisePublicResourceURL(String)
+	@see GuiseApplication#hasTempPublicResource(String)
+	@see GuiseApplication#getInputStream(String)
   */
 	protected HTTPServletResource getResource(final HttpServletRequest request, final URI resourceURI) throws IllegalArgumentException, IOException
 	{
@@ -1729,12 +1738,43 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 //  	TODO del Debug.trace("this is a public resource with key: ", publicResourceKey);
 			final URL publicResourceURL=Guise.getInstance().getGuisePublicResourceURL(publicResourceKey);	//get a URL to the resource
 //		TODO del Debug.trace("found URL to resource: ", publicResourceURL);
+			if(publicResourceURL==null)	//if there is no such resource
+			{
+				throw new HTTPNotFoundException("No such Guise public resource: "+resourceURI);
+			}
 			resource=new DefaultHTTPServletResource(resourceURI, publicResourceURL);	//create a new default resource with a URL to the public resource
 //		TODO del Debug.trace("constructed a resource with length:", resource.getContentLength(), "and last modified", resource.getLastModified());
   	}
-  	else	//if this is not a Guise public resource
+  	else	//if this is not a Guise public resource, see if it is a temporary public resource of the application
   	{
-  		resource=super.getResource(request, resourceURI);	//return a default resource
+  		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
+			final String applicationBasePath=guiseApplication.getBasePath();	//get the application base path
+  		final String rawPath=resourceURI.getRawPath();	//get the raw path of the requested resource
+			final String relativePath=rawPath!=null ? relativizePath(applicationBasePath, rawPath) : null;	//relativize the raw path to the base path
+			final String tempRelativePath=relativePath!=null && relativePath.startsWith(GuiseApplication.GUISE_PUBLIC_TEMP_BASE_PATH) ? relativePath : null;	//see if this is a path to a Guise temporary public resource
+			if(tempRelativePath!=null)	//if this is a path to a temporary public file
+			{
+				final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
+				final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request TODO see if we can request a session without forcing one to be created, if that's useful
+				final URL tempResourceURL;	//we'll store here the URL to the temporary resource
+				try
+				{
+					tempResourceURL=guiseApplication.getTempPublicResourceURL(relativePath, guiseSession);	//get a URL to the temporary resource, if there is one
+					if(tempResourceURL==null)	//if there is no such resource
+					{
+						throw new HTTPNotFoundException("No such Guise temporary resource: "+resourceURI);
+					}
+				}
+				catch(final IllegalStateException illegalStateException)	//if we cannot access the resource from the current session  
+				{
+					throw new HTTPForbiddenException(illegalStateException.getMessage(), illegalStateException);	//forbid the user from accessing the resource TODO should the Throwable constructor only use Throwable.getMessage() instead of the Throwable.toString()
+				}
+				resource=new DefaultHTTPServletResource(resourceURI, tempResourceURL);	//create a new default resource with a URL to the temporary resource
+			}
+	  	else	//if this is not a Guise public resource or a temporary resource, access the resource normally
+	  	{
+	  		resource=super.getResource(request, resourceURI);	//return a default resource
+	  	}
   	}
 		final ContentType contentType=getContentType(resource);	//get the content type of the resource
 //TODO del Debug.trace("got content type", contentType, "for resource", resource);

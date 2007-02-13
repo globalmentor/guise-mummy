@@ -1,7 +1,7 @@
 package com.guiseframework;
 
 import java.io.*;
-import java.net.URI;
+import java.net.*;
 import java.util.*;
 
 import com.garretwilson.beans.PropertyBindable;
@@ -263,7 +263,7 @@ public interface GuiseApplication extends PropertyBindable
 	For an application path "/path/to/application/", resolving "relative/path" will yield "/path/to/application/relative/path",
 	while resolving "/absolute/path" will yield "/absolute/path". Resolving "http://example.com/path" will yield "http://example.com/path".
 	@param uri The URI to be resolved.
-	@return The uri resolved against the application base path.
+	@return The URI resolved against the application base path.
 	@exception NullPointerException if the given URI is <code>null</code>.
 	@see #getBasePath()
 	@see #resolvePath(String)
@@ -328,10 +328,12 @@ public interface GuiseApplication extends PropertyBindable
 
 	/**Retrieves an input stream to the entity at the given URI.
 	The URI is first resolved to the application base path.
-	If this is a <code>resource:</code> URI representing a private resource, this method delegates to {@link #getResourceInputStream(String)}.
+	If the URI represents one of this application's public resources, this implementation will return an input stream directly from that resource if possible rather than issuing a separate server request.
+	This method supports read access to temporary public resources.
 	@param uri A URI to the entity; either absolute or relative to the application.
-	@return An input stream to the entity at the given resource URI, or <code>null</code> if no entity exists at the given resource path..
+	@return An input stream to the entity at the given resource URI, or <code>null</code> if no entity exists at the given resource path.
 	@exception NullPointerException if the given URI is <code>null</code>.
+	@exception IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made from the required session.
 	@exception IOException if there was an error connecting to the entity at the given URI.
 	@see #resolveURI(URI)
 	*/
@@ -339,10 +341,12 @@ public interface GuiseApplication extends PropertyBindable
 
 	/**Retrieves an input stream to the entity at the given path.
 	If the URI represents one of this application's public resources, this implementation will return an input stream directly from that resource if possible rather than issuing a separate server request.
+	This method supports read access to temporary public resources.
 	@param path A path that is either relative to the application context path or is absolute.
 	@return An input stream to the entity at the given resource path, or <code>null</code> if no entity exists at the given resource path.
 	@exception NullPointerException if the given path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #getInputStream(URI)} should be used instead).
+	@exception IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made from the required session.
 	@exception IOException if there was an error connecting to the entity at the given path.
 	@see #getInputStream(URI)
 	*/
@@ -355,8 +359,9 @@ public interface GuiseApplication extends PropertyBindable
 	@param uri A URI to the entity; either absolute or relative to the application.
 	@return An output stream to the entity at the given resource URI.
 	@exception NullPointerException if the given URI is <code>null</code>.
-	@exception IOException if there was an error connecting to the entity at the given URI.
+	@exception IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made from the required session.
 	@exception FileNotFoundException if a URI to a temporary file was passed before the file was created using {@link #createTempPublicResource(String, String, boolean)}.
+	@exception IOException if there was an error connecting to the entity at the given URI.
 	@see #resolveURI(URI)
 	@see #createTempPublicResource(String, String, boolean)
 	*/
@@ -369,8 +374,9 @@ public interface GuiseApplication extends PropertyBindable
 	@return An output stream to the entity at the given resource path.
 	@exception NullPointerException if the given path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #getOutputStream(URI)} should be used instead).
-	@exception IOException if there was an error connecting to the entity at the given URI.
+	@exception IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session, and the request was not made from the required session.
 	@exception FileNotFoundException if a path to a temporary file was passed before the file was created using {@link #createTempPublicResource(String, String, boolean)}.
+	@exception IOException if there was an error connecting to the entity at the given URI.
 	@see #getOutputStream(URI)
 	@see #createTempPublicResource(String, String, boolean)
 	*/
@@ -381,13 +387,34 @@ public interface GuiseApplication extends PropertyBindable
 	If the resource is restricted to the current Guise session, the resource will be deleted when the current Guise session ends.
 	@param baseName The base filename to be used in generating the filename.
 	@param extension The extension to use for the temporary file.
-	@param sessionRestricted <code>true</code> if access to the temporary file should be restricted to the current Guise session.
+	@param restrictionSession The Guise session to which access access to the temporary file should be restricted, or <code>null</code> if there should be no access restriction.
 	@return A public application navigation path that can be used to access the resource.
-	@exception IllegalStateException if session restriction was requested and the current thread is not associated with any Guise session.
+	@exception NullPointerException if the given base name and/or extension is <code>null</code>.
+	@exception IllegalArgumentException if the base name is the empty string.
 	@exception IOException if there is a problem creating the public resource.
 	@see #getTempDirectory()
+	@see #hasTempPublicResource(String)
 	*/
-	public String createTempPublicResource(final String baseName, final String extension, final boolean sessionRestricted) throws IOException;
+	public String createTempPublicResource(final String baseName, final String extension, final GuiseSession restrictionSession) throws IOException;
+
+	/**Determines whether this application has a temporary public resource at the given path.
+	@param path The application-relative path of the resource.
+	@return <code>true</code> if a temporary public resource exists at the given path.
+	@exception IOException if there was an error accessing the temporary public resource.
+	@see #createTempPublicResource(String, String, boolean)
+	*/
+	public boolean hasTempPublicResource(final String path) throws IOException;
+
+	/**Returns a URL to the temporary public resource at the given path.
+	The given URL represents internal access to the resource and should normally not be presented to users. 
+	@param path The application-relative path of the resource.
+	@param session The Guise session requesting the resource, or <code>null</code> if there is no session associated with the request.
+	@return A URL to the temporary public resource, or <code>null</code> if there is no such temporary public resource.
+	@exception IllegalStateException if a Guise public temporary resource was requested that requires a particular Guise session different from the given Guise session.
+	@exception IOException if there was an error accessing the temporary public resource.
+	@see #createTempPublicResource(String, String, boolean)
+	*/
+	public URL getTempPublicResourceURL(final String path, final GuiseSession guiseSession) throws IOException;
 
 	/**Retrieves a resource bundle for the given locale.
 	The resource bundle retrieved will allow hierarchical resolution in the following priority:

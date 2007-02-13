@@ -1290,7 +1290,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		{
 			requestedNavigation=new ModalNavigation(getApplication().resolveURI(createPathURI(getNavigationPath())), getApplication().resolveURI(checkInstance(uri, "URI cannot be null.")), modalListener);	//resolve the URI against the application context path
 		}		
-		
+
 	/**The object that listenes for context state changes and updates the set of context states in response.*/
 	private final ContextStateListener contextStateListener=new ContextStateListener();
 
@@ -1390,7 +1390,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			}
 		}
 
-
 	/**Called when the session is initialized.
 	@exception IllegalStateException if the session is already initialized.
 	@see #destroy()
@@ -1413,6 +1412,24 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		getApplication().removePropertyChangeListener(GuiseApplication.RESOURCE_BUNDLE_BASE_NAME_PROPERTY, resourceBundleReleasePropertyValueChangeListener);	//stop listening for the application to change its resource bundle base name				
 	}
 
+	/**Creates a temporary resource available at a public application navigation path but with access restricted to this session.
+	The file will be created in the application's temporary file directory.
+	If the resource is restricted to the current Guise session, the resource will be deleted when the current Guise session ends.
+	This is a convenience method that delegates to {@link GuiseApplication#createTempPublicResource(String, String, GuiseSession)}.
+	@param baseName The base filename to be used in generating the filename.
+	@param extension The extension to use for the temporary file.
+	@return A public application navigation path that can be used to access the resource only from this session.
+	@exception NullPointerException if the given base name and/or extension is <code>null</code>.
+	@exception IllegalArgumentException if the base name is the empty string.
+	@exception IOException if there is a problem creating the public resource.
+	@see GuiseApplication#createTempPublicResource(String, String, GuiseSession)
+	@see GuiseApplication#getTempDirectory()
+	*/
+	public String createTempPublicResource(final String baseName, final String extension) throws IOException
+	{
+		return getApplication().createTempPublicResource(baseName, extension, this);	//delegate to the application with a reference to this session
+	}
+	
 	/**The variable used to generate unique component IDs.*/
 	private final AtomicLong idCounter=new AtomicLong(0);
 

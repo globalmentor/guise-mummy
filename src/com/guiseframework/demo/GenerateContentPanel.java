@@ -64,8 +64,12 @@ public class GenerateContentPanel extends DefaultNavigationPanel
 						{
 							try
 							{
+									//see if we should restrict access to the current session
+								final boolean sessionRestricted=sessionRestrictedCheckControl.getValue().booleanValue();
 									//generate a temporary file, restricting access to the file to the current session if requested
-								final String tempPath=getSession().getApplication().createTempPublicResource("generated-text", "txt", sessionRestrictedCheckControl.getValue().booleanValue());
+									//if we knew ahead of time we would want access restriction to the current session,
+									//	we could call the convenience method getSession().createTempPublicResource("generated-text", "txt")
+								final String tempPath=getSession().getApplication().createTempPublicResource("generated-text", "txt", sessionRestricted ? getSession() : null);
 									//get a UTF-8 writer to the application-relative path to the temporary public resource
 								final Writer tempWriter=new BufferedWriter(new OutputStreamWriter(getSession().getApplication().getOutputStream(tempPath), "UTF-8"));
 								try
