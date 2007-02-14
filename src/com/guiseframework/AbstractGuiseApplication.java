@@ -66,6 +66,52 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		return new DefaultGuiseSession(this);	//create a new default Guise session
 	}
 
+	/**The concurrent map of Guise session info keyed to Guise sessions.*/
+	private final Map<GuiseSession, GuiseSessionInfo> guiseSessionInfoMap=new ConcurrentHashMap<GuiseSession, GuiseSessionInfo>();
+	
+	/**Registers a session with this application.
+	The Guise session has not yet been initialized when this method is called.
+	@param guiseSession The Guise session to register with this Guise application.
+	@exception IllegalStateException if the given session has alreaady been registered with this application.
+	*/
+	public void registerSession(final GuiseSession guiseSession)
+	{
+		if(guiseSessionInfoMap.containsKey(guiseSession))	//if we already have info for this session (there is a race condition here that would allow a session to be registered twice, but that would only prevent error-checking for conditions that logically shouldn't happen anyway, so it's not worth the synchronization overhead to prevent)
+		{
+			throw new IllegalStateException("Guise session "+guiseSession+" already registered with Guise application "+this);
+		}
+		guiseSessionInfoMap.put(guiseSession, new GuiseSessionInfo(guiseSession));	//add new Guise session information
+	}
+
+	/**Unregisters a session from this application.
+	The Guise session has already been uninitialized when this method is called. 
+	@param guiseSession The Guise session to unregister from this Guise application.
+	@exception IllegalStateException if the given session is not registered with this application.
+	*/
+	public void unregisterSession(final GuiseSession guiseSession)
+	{
+		final GuiseSessionInfo guiseSessionInfo=guiseSessionInfoMap.remove(guiseSession);	//remove the info for this Guise session
+		if(guiseSessionInfo==null)	//if there was no Guise session registered
+		{
+			throw new IllegalStateException("Guise session "+guiseSession+" not registered with Guise application "+this);
+		}
+		final List<TempFileInfo> tempFileInfos=guiseSessionInfo.getTempFileInfos();	//get the temp files registered with this application
+		synchronized(tempFileInfos)	//synchronize on the temp file infos for completeness (although no other threads should be accessing the list at this point
+		{
+			for(final TempFileInfo tempFileInfo:tempFileInfos)	//for each temporary file
+			{
+				final File tempFile=tempFileInfo.getTempFile();	//get the temporary file
+				if(tempFile.exists())	//if this file still exists
+				{
+					if(!tempFile.delete())	//delete the temporary file; if the file could not be deleted
+					{
+						Debug.warn("Could not delete temporary file "+tempFile+" associated with Guise session "+guiseSession);
+					}
+				}
+			}
+		}		
+	}
+
 	/**Creates a frame for the application.
 	This implementation returns a default application frame.
 	@return A new frame for the application.
@@ -1072,6 +1118,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@return A public application navigation path that can be used to access the resource.
 	@exception NullPointerException if the given base name and/or extension is <code>null</code>.
 	@exception IllegalArgumentException if the base name is the empty string.
+	@exception IllegalStateException if the given restriction session is not registered with this application.
 	@exception IOException if there is a problem creating the public resource.
 	@see #getTempDirectory()
 	@see #hasTempPublicResource(String)
@@ -1093,6 +1140,15 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		final TempFileInfo tempFileInfo=new TempFileInfo(tempFile, restrictionSession);	//create an object to keep track of the file
 //TODO del		final String path=GUISE_TEMP_BASE_PATH+filename;	//create a path for the temp resource under the Guise temp path
 		filenameTempFileInfoMap.put(filename, tempFileInfo);	//map the filename to the temp file info
+		if(restrictionSession!=null)	//if file access should be restricted to a session
+		{
+			final GuiseSessionInfo guiseSessionInfo=guiseSessionInfoMap.get(restrictionSession);	//get info for this session
+			if(guiseSessionInfo==null)	//if this Guise session isn't registered with this application
+			{
+				throw new IllegalStateException("Guise restriction session "+restrictionSession+" not registered with Guise application "+this);
+			}
+			guiseSessionInfo.getTempFileInfos().add(tempFileInfo);	//indicate that this temp file is associated with the given session
+		}
 		return GUISE_PUBLIC_TEMP_BASE_PATH+filename;	//create and return a path for the temp resource under the Guise temp path
 	}
 
@@ -1340,6 +1396,11 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			/**@return The session to which this temporary file is restricted, or <code>null</code> if this temporary file is not restricted to a session.*/
 			public GuiseSession getRestrictionSession() {return restrictionSession;}
 
+		/**Temporary file and restriction session constructor.
+		@param tempFile The file object representing the actual temprary file in the file system.
+		@param restrictionSession The session to which this temporary file is restricted, or <code>null</code> if this temporary file is not restricted to a session.
+		@exception NullPointerException if the given temporary file is <code>null</code>.
+		*/
 		public TempFileInfo(final File tempFile, final GuiseSession restrictionSession)
 		{
 			this.tempFile=checkInstance(tempFile, "Temporary file object cannot be null.");
@@ -1364,6 +1425,54 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		public String toString()
 		{
 			return getTempFile().toString();
+		}
+	}
+
+	/**Application-related information about a Guise session associated with this application.
+	@author Garret Wilson
+	*/
+	private static class GuiseSessionInfo
+	{
+
+		/**The Guise session to which the information relates.*/
+		private final GuiseSession guiseSession;
+
+			/**@return The Guise session to which the information relates.*/
+			public GuiseSession getGuiseSession() {return guiseSession;}
+
+		/**The synchronized list of information for all files associated with this session.*/
+		private final List<TempFileInfo> tempFileInfos=synchronizedList(new ArrayList<TempFileInfo>());
+
+			/**@return The synchronized list of information for all files associated with this session.*/
+			public List<TempFileInfo> getTempFileInfos() {return tempFileInfos;}
+
+		/**Guise session constructor.
+		@param guiseSession The Guise session to which the information relates.
+		@exception NullPointerException if the given Guise session is <code>null</code>.
+		*/
+		public GuiseSessionInfo(final GuiseSession guiseSession)
+		{
+			this.guiseSession=checkInstance(guiseSession, "Guise session cannot be null.");
+		}
+
+		/**@return A hash code for the object.*/
+		public int hashCode()
+		{
+			return getGuiseSession().hashCode();	//return the session's hash code
+		}
+
+		/**Determines whether this object is equal to another.
+		@return <code>true</code> if the other object is another info object for the same Guise session.
+		*/
+		public boolean equals(final Object object)
+		{
+			return object instanceof GuiseSessionInfo && getGuiseSession().equals(((GuiseSessionInfo)object).getGuiseSession());	//see if the other object is a Guise session info object for the same Guise session
+		}
+
+		/**@return A string version of this object.*/
+		public String toString()
+		{
+			return "Guise Session info: "+getGuiseSession().toString();
 		}
 	}
 }

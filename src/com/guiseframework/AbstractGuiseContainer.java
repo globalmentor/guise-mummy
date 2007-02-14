@@ -79,14 +79,17 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	
 	/**Adds and initializes a Guise session.
 	This version creates a thread group for the session.
+	The Guise session will be registered with the Guise application before it is initialized.
 	Initialization will occur inside the appropriate session thread group.
 	@param guiseSession The Guise session to add.
+	@see GuiseApplication#registerSession(GuiseSession)
 	@see GuiseSession#initialize()
 	*/
 	protected void addGuiseSession(final GuiseSession guiseSession)
 	{
 		final Guise guise=Guise.getInstance();	//get the Guise instance
 		guise.addGuiseSession(guiseSession);	//add the Guise session to Guise
+		guiseSession.getApplication().registerSession(guiseSession);	//register the session from the application
 		final GuiseSessionThreadGroup guiseSessionThreadGroup=guise.getThreadGroup(guiseSession);	//get the thread group for this session
 		call(guiseSessionThreadGroup, new Runnable()	//initialize the Guise session in its own thread group
 				{
@@ -98,9 +101,11 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	}
 
 	/**Removes and destroys a Guise session.
+	The Guise session will be unregistered from the Guise application after it is uninitialized.
 	Destruction will occur inside the appropriate session thread group.
 	@param guiseSession The Guise session to remove.
-	@see GuiseSession#destroy() 
+	@see GuiseSession#destroy()
+	@see GuiseApplication#unregisterSession(GuiseSession) 
 	*/
 	protected void removeGuiseSession(final GuiseSession guiseSession)
 	{
@@ -113,6 +118,7 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 						guiseSession.destroy();	//let the Guise session know it's being destroyed so that it can clean up and release references to the application
 					}
 				});
+		guiseSession.getApplication().unregisterSession(guiseSession);	//unregister the session from the application
 		guise.removeGuiseSession(guiseSession);	//remove the Guise session from Guise
 	}
 
@@ -210,7 +216,7 @@ Debug.error("error; ready to uninstall application", ioException);
 	@exception NullPointerException if the application is <code>null</code>.
 	@exception IllegalStateException if the application is not installed in this container.
 	*/
-	protected void uninstallApplication(final AbstractGuiseApplication application)
+	protected void uninstallApplication(final AbstractGuiseApplication application)	//TODO add a facility to unregister and remove all sessions associated with the application
 	{
 		checkInstance(application, "Application cannot be null");
 		final String basePath=application.getBasePath();	//get the application's base path

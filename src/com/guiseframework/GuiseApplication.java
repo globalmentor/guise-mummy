@@ -190,6 +190,20 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public GuiseSession createSession();
 
+	/**Registers a session with this application.
+	The Guise session has not yet been initialized when this method is called.
+	@param guiseSession The Guise session to register with this Guise application.
+	@exception IllegalStateException if the given session has alreaady been registered with this application.
+	*/
+	public void registerSession(final GuiseSession guiseSession);
+
+	/**Unregisters a session from this application.
+	The Guise session has already been uninitialized when this method is called. 
+	@param guiseSession The Guise session to unregister from this Guise application.
+	@exception IllegalStateException if the given session is not registered with this application.
+	*/
+	public void unregisterSession(final GuiseSession guiseSession);
+
 	/**Creates a frame for the application.
 	@return A new frame for the application.
 	*/
@@ -391,6 +405,7 @@ public interface GuiseApplication extends PropertyBindable
 	@return A public application navigation path that can be used to access the resource.
 	@exception NullPointerException if the given base name and/or extension is <code>null</code>.
 	@exception IllegalArgumentException if the base name is the empty string.
+	@exception IllegalStateException if the given restriction session is not registered with this application.
 	@exception IOException if there is a problem creating the public resource.
 	@see #getTempDirectory()
 	@see #hasTempPublicResource(String)
