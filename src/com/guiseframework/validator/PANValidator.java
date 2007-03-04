@@ -1,9 +1,8 @@
 package com.guiseframework.validator;
 
-import static java.util.Collections.unmodifiableSet;
-import static com.garretwilson.lang.ClassUtilities.getPropertyName;
+import static java.util.Collections.*;
+import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.util.CollectionUtilities.*;
 
 import java.util.HashSet;
 import java.util.Set;

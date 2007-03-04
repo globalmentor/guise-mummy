@@ -2,6 +2,8 @@ package com.guiseframework;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import java.util.regex.Pattern;
+
 /**Abstract implementation of a destination referencing another destination.
 @author Garret Wilson
 */
@@ -23,6 +25,17 @@ public abstract class AbstractReferenceDestination extends AbstractDestination i
 	public AbstractReferenceDestination(final String path, final Destination destination)
 	{
 		super(path);	//construct the parent class
+		this.destination=checkInstance(destination, "Destination cannot be null.");
+	}
+
+	/**Path pattern and referenced destination constructor.
+	@param pathPattern The pattern to match an appplication context-relative path within the Guise container context, which does not begin with '/'.
+	@param destination The referenced destination.
+	@exception NullPointerException if the path pattern and/or destination is <code>null</code>.
+	*/
+	public AbstractReferenceDestination(final Pattern pathPattern, final Destination destination)
+	{
+		super(pathPattern);	//construct the parent class
 		this.destination=checkInstance(destination, "Destination cannot be null.");
 	}
 }

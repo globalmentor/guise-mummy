@@ -143,25 +143,16 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public <C extends Component<?>> View<? extends GuiseContext, ? super C> getView(final C component);
 
-	/**Associates a destination with a particular application context-relative path.
-	Any existing destination for the given context-relative path is replaced.
-	@param path The appplication context-relative path to which the destination should be associated.
-	@param destination The description of the destination at the appplication context-relative path.
-	@return The destination previously assiciated with the given appplication context-relative path, or <code>null</code> if no destination was previously associated with the path.
-	@exception NullPointerException if the path and/or the destination is <code>null</code>.
-	@exception IllegalArgumentException if the provided path is absolute.
-	*/
-	public Destination setDestination(final String path, final Destination destination);
-
-	/**Associates multiple destinations with application context-relative paths.
-	Any existing destinations for the given context-relative path are replaced.
+	/**Associates multiple destinations with application context-relative paths or path patterns.
+	All destinations are first cleared.
+	Any existing destinations for the given context-relative paths are replaced.
 	@param destinations The destinations to set.
-	@exception IllegalArgumentException if a provided path is absolute.
-	@see #setDestination(String, Destination)
 	*/
 	public void setDestinations(final List<Destination> destinations);
 
 	/**Determines the destination associated with the given application context-relative path.
+	This method first checks for a destination that matches the exact path as given;
+	if no matching path is found, all destinations with path patterns are searched for a match.
 	@param path The address for which a destination should be retrieved.
 	@return The destination associated with the given path, or <code>null</code> if no destination is associated with the path. 
 	@exception IllegalArgumentException if the provided path is absolute.
@@ -175,6 +166,8 @@ public interface GuiseApplication extends PropertyBindable
 	public Iterable<Destination> getDestinations();
 
 	/**Determines if there is a destination associated with the given appplication context-relative path.
+	This method first checks for a destination that matches the exact path as given;
+	if no matching path is found, all destinations with path patterns are searched for a match.
 	@param path The appplication context-relative path.
 	@return <code>true</code> if there is destination associated with the given path, or <code>false</code> if no destination is associated with the given path.
 	@exception NullPointerException if the path is <code>null</code>.

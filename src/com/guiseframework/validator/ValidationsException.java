@@ -2,8 +2,6 @@ package com.guiseframework.validator;
 
 import java.util.*;
 
-import com.garretwilson.util.CollectionUtilities;
-
 /**Validation exception indicating that multiple validation errors occured.
 This exception can be caught and updated with new validation exceptions.
 @author Garret Wilson
@@ -19,7 +17,7 @@ public class ValidationsException extends Exception implements Collection<Valida
 	*/
 	public ValidationsException(final ValidationException... validationExceptions)
 	{
-		CollectionUtilities.addAll(validationExceptionList, validationExceptions);	//add all the provided exceptions to the list
+		Collections.addAll(validationExceptionList, validationExceptions);	//add all the provided exceptions to the list
 	}
 
   /**

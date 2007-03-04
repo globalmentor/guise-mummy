@@ -2,14 +2,17 @@ package com.guiseframework;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
-import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import com.garretwilson.beans.BoundPropertyObject;
+import com.garretwilson.lang.ObjectUtilities;
 
 /**Abstract implementation of a navigation point, its properties, and its restrictions.
+Destinations of identical types with identical paths and path patterns are considered equal.
 @author Garret Wilson
 */
 public abstract class AbstractDestination extends BoundPropertyObject implements Destination
@@ -29,11 +32,17 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 			this.categories=unmodifiableList(new ArrayList<Category>(categories));	//create a copy of the list and save the list
 		}
 
-	/**The appplication context-relative path within the Guise container context, which does not begin with '/'.*/
+	/**The appplication context-relative path within the Guise container context, which does not begin with '/', or <code>null</code> if there is no path specified for this destination.*/
 	private final String path;
 
-		/**@return The appplication context-relative path within the Guise container context, which does not begin with '/'.*/
+		/**@return The appplication context-relative path within the Guise container context, which does not begin with '/', or <code>null</code> if there is no path specified for this destination.*/
 		public String getPath() {return path;}
+
+	/**The pattern to match an appplication context-relative path within the Guise container context, which does not begin with '/', or <code>null</code> if there is no path pattern specified for this destination.*/
+	private final Pattern pathPattern;
+
+		/**@return The pattern to match an appplication context-relative path within the Guise container context, which does not begin with '/', or <code>null</code> if there is no path pattern specified for this destination.*/
+		public Pattern getPathPattern() {return pathPattern;}
 
 	/**Path constructor.
 	@param path The appplication context-relative path within the Guise container context, which does not begin with '/'.
@@ -47,5 +56,37 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 		{
 			throw new IllegalArgumentException("Navigation path cannot be absolute: "+path);
 		}
+		this.pathPattern=null;	//indicate that there is no path pattern
+	}
+
+	/**Path pattern constructor.
+	@param pathPattern The pattern to match an appplication context-relative path within the Guise container context, which does not begin with '/'.
+	@exception NullPointerException if the path pattern is <code>null</code>.
+	*/
+	public AbstractDestination(final Pattern pathPattern)
+	{
+		this.pathPattern=checkInstance(pathPattern, "Navigation path pattern cannot be null.");
+		this.path=null;	//indicate that there is no path
+	}
+
+	/**@return A hash code for this object.*/
+	public int hashCode()
+	{
+		return ObjectUtilities.hashCode(getPath(), getPathPattern());	//construct a hash code from the path and path pattern
+	}
+	
+	/**Determines if this destination is equivalent to the given object.
+	This implementation considers destinations of identical types with identical paths and path patterns to be equivalent.
+	@param object The object to compare to this object.
+	@return <code>true</code> if the given object is an equivalent destination.
+	*/
+	public boolean equals(final Object object)
+	{
+		if(getClass().isInstance(object))	//if the given object is an instance of this object's class
+		{
+			final Destination destination=(Destination)object;	//cast the object to a destination (which it must be, if it's the same type as this instance
+			return ObjectUtilities.equals(getPath(), destination.getPath()) && ObjectUtilities.equals(getPathPattern(), destination.getPathPattern());	//see if the paths and path patterns match 
+		}
+		return false;	//indicate that the objects don't match
 	}
 }

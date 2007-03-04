@@ -1,10 +1,10 @@
 package com.guiseframework.model;
 
 import java.util.*;
+import static java.util.Collections.*;
 
 import static com.garretwilson.util.ArrayUtilities.*;
 
-import com.garretwilson.util.CollectionUtilities;
 import com.garretwilson.util.SynchronizedListDecorator;
 
 /**The default implementation of a table model.
@@ -78,7 +78,7 @@ public class DefaultTableModel extends AbstractTableModel
 						columns[columnIndex].getValueClass().cast(values[columnIndex]);	//make sure this value can be cast to the column type
 					}
 					final List<Object> valueList=new SynchronizedListDecorator<Object>(new ArrayList<Object>(values.length), this);	//create a list of value, synchronizing all access on this object
-					CollectionUtilities.addAll(valueList, values);	//add all this row's values to the list
+					addAll(valueList, values);	//add all this row's values to the list
 					valueRowLists.add(valueList);	//add this row to the list of row lists
 				}
 			}

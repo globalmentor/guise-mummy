@@ -16,8 +16,6 @@ import static com.garretwilson.io.FileConstants.*;
 import com.garretwilson.lang.ObjectUtilities;
 import static com.garretwilson.lang.ThreadUtilities.*;
 import com.garretwilson.net.URIUtilities;
-import com.garretwilson.net.http.HTTPNotFoundException;
-import com.garretwilson.net.http.HTTPResource;
 import com.garretwilson.rdf.RDFResourceIO;
 import com.garretwilson.text.W3CDateFormat;
 import com.garretwilson.util.*;
@@ -751,44 +749,49 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	}
 
 
-//TODO how do we keep the general public from changing the past/destination bindings?
+	/**The concurrent list of destinations which have path patterns specified.*/
+	private final List<Destination> pathPatternDestinations=new CopyOnWriteArrayList<Destination>();	
 
 	/**The concurrent map of destinations associated with application context-relative paths.*/
 	private final Map<String, Destination> pathDestinationMap=new ConcurrentHashMap<String, Destination>();
 
-		/**Associates a destination with a particular application context-relative path.
-		Any existing destination for the given context-relative path is replaced.
-		@param path The appplication context-relative path to which the destination should be associated.
-		@param destination The description of the destination at the appplication context-relative path.
-		@return The destination previously assiciated with the given appplication context-relative path, or <code>null</code> if no destination was previously associated with the path.
-		@exception NullPointerException if the path and/or the destination is <code>null</code>.
-		@exception IllegalArgumentException if the provided path is absolute.
+		/**Registers a destination so that it can be matched against one or more paths.
+		Any existing destinations for the path or path pattern is replaced.
+		@param destination The description of the destination at the appplication context-relative path or path pattern.
+		@exception NullPointerException if the destination is <code>null</code>.
 		*/
-		public Destination setDestination(final String path, final Destination destination)	//TODO check to make sure the path is the same as that indicated in the destination object
+		public void addDestination(final Destination destination)
 		{
-			checkInstance(path, "Path cannot be null.");
-			if(isAbsolutePath(path))	//if the path is absolute
+			final String path=destination.getPath();	//get the destination's path, if there is one
+			if(path!=null)	//if this destination has a path
 			{
-				throw new IllegalArgumentException("Path cannot be absolute: "+path);
+				pathDestinationMap.put(path, destination);	//associate the destination with the path
 			}
-			return pathDestinationMap.put(path, checkInstance(destination, "Destination cannot be null."));	//store the association
+			else	//if the destination has no path
+			{
+				assert destination.getPathPattern()!=null : "Destination should have had either a path or a path pattern.";
+				pathPatternDestinations.add(destination);	//add this destination to the list of destinations with path patterns
+			}
 		}
 
-		/**Associates multiple destinations with application context-relative paths.
-		Any existing destinations for the given context-relative path are replaced.
+		/**Associates multiple destinations with application context-relative paths or path patterns.
+		All destinations are first cleared.
+		Any existing destinations for the given context-relative paths are replaced.
 		@param destinations The destinations to set.
-		@exception IllegalArgumentException if a provided path is absolute.
-		@see #setDestination(String, Destination)
 		*/
-		public void setDestinations(final List<Destination> destinations)	//TODO clear existing destinations and update API
+		public void setDestinations(final List<Destination> destinations)
 		{
+			pathDestinationMap.clear();	//clear the map of path/destination associations
+			pathPatternDestinations.clear();	//clear the list of path pattern destinations
 			for(final Destination destination:destinations)	//for each destination
 			{
-				setDestination(destination.getPath(), destination);	//associate the destination with the path
+				addDestination(destination);	//add this destination
 			}
 		}
 
 		/**Determines the destination associated with the given application context-relative path.
+		This method first checks for a destination that matches the exact path as given;
+		if no matching path is found, all destinations with path patterns are searched for a match.
 		@param path The address for which a destination should be retrieved.
 		@return The destination associated with the given path, or <code>null</code> if no destination is associated with the path. 
 		@exception IllegalArgumentException if the provided path is absolute.
@@ -799,7 +802,19 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			{
 				throw new IllegalArgumentException("Path cannot be absolute: "+path);
 			}
-			return pathDestinationMap.get(path);	//return the associated destination, if any
+			Destination destination=pathDestinationMap.get(path);	//get the destination associated with this path, if any
+			if(destination==null)	//if there is no destination for this exact path
+			{
+				for(final Destination pathPatternDestination:pathPatternDestinations)	//look at all the destinations with path patterns
+				{
+					if(pathPatternDestination.getPathPattern().matcher(path).matches())	//if this destination's pattern matches the given path
+					{
+						destination=pathPatternDestination;	//use this destination
+						break;	//stop looking at destinations with path patterns
+					}
+				}
+			}
+			return destination;	//return the destination we found, if any
 		}
 
 		/**Returns an iterable of destinations.
@@ -808,10 +823,15 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		*/
 		public Iterable<Destination> getDestinations()
 		{
-			return pathDestinationMap.values();	//return
+			final List<Destination> destinations=new ArrayList<Destination>(pathDestinationMap.size()+pathPatternDestinations.size());	//create a list large enough to hold all the path-mapped destinations and all the destinations with path patterns
+			destinations.addAll(pathDestinationMap.values());	//add the path destinations
+			destinations.addAll(pathPatternDestinations);	//add the path pattern destinations
+			return destinations;	//return our constructed list of all available destinations
 		}
-		
+
 		/**Determines if there is a destination associated with the given appplication context-relative path.
+		This method first checks for a destination that matches the exact path as given;
+		if no matching path is found, all destinations with path patterns are searched for a match.
 		@param path The appplication context-relative path.
 		@return <code>true</code> if there is destination associated with the given path, or <code>false</code> if no destination is associated with the given path.
 		@exception NullPointerException if the path is <code>null</code>.
@@ -823,7 +843,18 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			{
 				throw new IllegalArgumentException("Path cannot be absolute: "+path);
 			}
-			return pathDestinationMap.containsKey(path);	//see if there is a destination associated with this navigation path
+			if(pathDestinationMap.containsKey(path))	//see if there is a destination associated with this navigation path
+			{
+				return true;	//show that we found an exact match
+			}
+			for(final Destination pathPatternDestination:pathPatternDestinations)	//look at all the destinations with path patterns
+			{
+				if(pathPatternDestination.getPathPattern().matcher(path).matches())	//if this destination's pattern matches the given path
+				{
+					return true;	//show that we found a pattern match
+				}
+			}
+			return false;	//indicate we couldn't find an exact match or a pattern match
 		}	
 
 	/**Resolves a relative or absolute path against the application base path.

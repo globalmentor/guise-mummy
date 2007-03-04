@@ -7,12 +7,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.*;
+import static java.util.Collections.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.xml.parsers.*;
-
-import static java.util.Collections.*;
 
 import com.garretwilson.beans.*;
 import com.garretwilson.event.PostponedEvent;
@@ -20,10 +19,6 @@ import com.garretwilson.io.BOMInputStreamReader;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.rdf.*;
 import com.garretwilson.rdf.ploop.PLOOPProcessor;
-import com.garretwilson.text.FormatUtilities;
-import com.garretwilson.util.CollectionUtilities;
-import com.garretwilson.util.Debug;
-import com.garretwilson.util.ResourceBundleUtilities;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.context.GuiseContext;
@@ -1298,7 +1293,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		protected ContextStateListener getContextStateListener() {return contextStateListener;}
 
 	/**The unmodifiable set of all states of available Guise contexts.*/
-	private Set<GuiseContext.State> contextStateSet=CollectionUtilities.emptySet();
+	private Set<GuiseContext.State> contextStateSet=emptySet();
 
 		/**@return The unmodifiable set of all states of available Guise contexts.*/
 		public Set<GuiseContext.State> getContextStates() {return contextStateSet;}

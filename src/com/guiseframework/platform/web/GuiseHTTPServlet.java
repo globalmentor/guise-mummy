@@ -1,13 +1,13 @@
 package com.guiseframework.platform.web;
 
 import java.io.*;
-import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
+import java.lang.ref.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.*;
 import java.security.Principal;
 import java.text.DateFormat;
 import java.util.*;
+import static java.util.Collections.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Arrays.*;
@@ -1037,6 +1037,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 	@param requestURI The requested URI.
 	@param guiseApplication The Guise application.
 	@param redirectDestination The destination indicating how and to where redirection should occur.
+	@throws IllegalArgumentException if the referenced destination does not specify a path (instead specifying a path pattern, for example).
 	@throws HTTPRedirectException unconditionally to indicate how and to where redirection should occur.
 	*/
 	protected void redirect(final URI requestURI, final GuiseApplication guiseApplication, final RedirectDestination redirectDestination) throws HTTPRedirectException
@@ -1044,7 +1045,11 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 		final String redirectPath;	//the path to which direction should occur
 		if(redirectDestination instanceof ReferenceDestination)	//if the destination references another destination
 		{
-			redirectPath=((ReferenceDestination)redirectDestination).getDestination().getPath();	//get the path of the referenced destination			
+			redirectPath=((ReferenceDestination)redirectDestination).getDestination().getPath();	//get the path of the referenced destination TODO what if the referenced destination is itself a redirect? should we support that, too? probably
+			if(redirectPath==null)	//if there is no redirect path
+			{
+				throw new IllegalArgumentException("Redirect destination "+redirectDestination+" does not have a valid path.");
+			}
 		}
 		else	//we don't yet support non-reference redirects
 		{
@@ -1499,7 +1504,7 @@ Debug.info("AJAX event:", eventName);
 						final String parameterKey=(String)parameterEntry.getKey();	//get the parameter key
 						final String[] parameterValues=(String[])parameterEntry.getValue();	//get the parameter values
 						final List<Object> parameterValueList=new ArrayList<Object>(parameterValues.length);	//create a list to hold the parameters
-						CollectionUtilities.addAll(parameterValueList, parameterValues);	//add all the parameter values to our list
+						addAll(parameterValueList, parameterValues);	//add all the parameter values to our list
 						parameterListMap.put(parameterKey, parameterValueList);	//store the the array of values as a list, keyed to the value
 					}
 					controlEventList.add(formSubmitEvent);	//add the event to the list

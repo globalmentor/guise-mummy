@@ -4,8 +4,6 @@ import java.util.*;
 import static java.util.Collections.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.garretwilson.util.CollectionUtilities;
-
 /**An abstract implementation of a table model.
 The table model is editable by default.
 @author Garret Wilson
@@ -53,8 +51,8 @@ public abstract class AbstractTableModel extends AbstractModel implements TableM
 	public AbstractTableModel(final TableColumnModel<?>... columns)
 	{
 		super();	//construct the parent class
-		CollectionUtilities.addAll(tableColumnModels, columns);	//add all the columns to our list of table columns
-		CollectionUtilities.addAll(logicalTableColumnModels, columns);	//add all the columns to our logical list of table columns
+		addAll(tableColumnModels, columns);	//add all the columns to our list of table columns
+		addAll(logicalTableColumnModels, columns);	//add all the columns to our logical list of table columns
 	}
 
 	/**Returns the cell value for the given cell.

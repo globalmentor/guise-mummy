@@ -6,7 +6,6 @@ import static java.util.Collections.*;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.garretwilson.util.CollectionUtilities;
 import com.garretwilson.util.SynchronizedListDecorator;
 
 /**An abstract implementation of a table model representing selectable list values.
@@ -85,8 +84,8 @@ public abstract class AbstractListSelectTableModel<V> extends DefaultListSelectM
 	public AbstractListSelectTableModel(final Class<V> valueClass, final ListSelectionPolicy<V> listSelectionStrategy, final TableColumnModel<?>... columns)
 	{
 		super(valueClass, listSelectionStrategy);	//construct the parent class
-		CollectionUtilities.addAll(logicalTableColumnModels, columns);	//add all the columns to our logical list of table columns
-		CollectionUtilities.addAll(tableColumnModels, columns);	//add all the columns to our list of table columns
+		Collections.addAll(logicalTableColumnModels, columns);	//add all the columns to our logical list of table columns
+		Collections.addAll(tableColumnModels, columns);	//add all the columns to our list of table columns
 		valueModelRowArrays=new SynchronizedListDecorator<ValueModel<Object>[]>(new ArrayList<ValueModel<Object>[]>(), this);	//create a list of value model arrays, synchronizing all access on this object
 	}
 
