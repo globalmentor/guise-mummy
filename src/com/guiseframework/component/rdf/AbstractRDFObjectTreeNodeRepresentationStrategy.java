@@ -83,7 +83,7 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 			final RDFResource rdfProperty=((RDFObjectTreeNodeModel<?>)treeNode).getProperty();	//get the property, if any, associated with the RDF object
 			if(rdfProperty!=null)  //if object is the object of a property
 			{
-				stringBuilder.insert(0, getXMLifier().getLabel(rdfProperty)); //prepend "property"
+				stringBuilder.insert(0, getXMLifier().getLabel(rdfProperty.getReferenceURI())); //prepend "property"
 			}
 		}
 		return stringBuilder;	//return the string builder

@@ -75,7 +75,7 @@ public class AbstractRDFResourceTreeNodeRepresentationStrategy<V extends RDFReso
 				stringBuilder.append(':'); //append a colon to separate the property from the rest
 			if(hasPredicateToken) //if we had something to represent the predicate
 				stringBuilder.append(' '); //append a space to separate the rest
-			stringBuilder.append('(').append(getXMLifier().getLabel(type)).append(')'); //append "(type)"
+			stringBuilder.append('(').append(getXMLifier().getLabel(type.getReferenceURI())).append(')'); //append "(type)"
 			hasPredicateToken=true;	//show that we have something to represent the predicate
 		}
 		if(label!=null)	//if there is a label
@@ -93,7 +93,7 @@ public class AbstractRDFResourceTreeNodeRepresentationStrategy<V extends RDFReso
 				stringBuilder.append(':'); //append a colon to separate the property from the rest
 			if(hasPredicateToken) //if we had something to represent the predicate
 				stringBuilder.append(' '); //append a space to separate the rest
-			stringBuilder.append('[').append(getXMLifier().getLabel(value)).append(']');  //append "[referenceURI]" label
+			stringBuilder.append('[').append(getXMLifier().getLabel(value.getReferenceURI())).append(']');  //append "[referenceURI]" label
 			hasPredicateToken=true;	//show that we have something to represent the predicate
 		}
 		final RDFLiteral literalValue=getValue(value);	//get the literal rdf:value property value, if there is one
