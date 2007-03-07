@@ -39,14 +39,14 @@ public class AbstractRDFResourceTreeNodeRepresentationStrategy<V extends RDFReso
 	/**Default constructor with a default RDF XMLifier.*/
 	public AbstractRDFResourceTreeNodeRepresentationStrategy()
 	{
-		this(new RDFXMLifier());	//create the class with a default RDF XMLifier
+		this(new RDFXMLGenerator());	//create the class with a default RDF XMLifier
 	}
 
 	/**RDF XMLifier constructor.
 	@param rdfXMLifier The RDF XMLifier to use for creating labels.
 	@exception NullPointerException if the given RDF XMLifier is <code>null</code>.
 	*/
-	public AbstractRDFResourceTreeNodeRepresentationStrategy(final RDFXMLifier rdfXMLifier)
+	public AbstractRDFResourceTreeNodeRepresentationStrategy(final RDFXMLGenerator rdfXMLifier)
 	{
 		super(rdfXMLifier);	//construct the parent
 	}

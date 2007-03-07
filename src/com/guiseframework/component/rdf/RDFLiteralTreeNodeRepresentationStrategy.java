@@ -13,14 +13,14 @@ public class RDFLiteralTreeNodeRepresentationStrategy extends AbstractRDFObjectT
 	/**Default constructor with a default RDF XMLifier.*/
 	public RDFLiteralTreeNodeRepresentationStrategy()
 	{
-		this(new RDFXMLifier());	//create the class with a default RDF XMLifier
+		this(new RDFXMLGenerator());	//create the class with a default RDF XMLifier
 	}
 
 	/**RDF XMLifier constructor.
 	@param rdfXMLifier The RDF XMLifier to use for creating labels.
 	@exception NullPointerException if the given RDF XMLifier is <code>null</code>.
 	*/
-	public RDFLiteralTreeNodeRepresentationStrategy(final RDFXMLifier rdfXMLifier)
+	public RDFLiteralTreeNodeRepresentationStrategy(final RDFXMLGenerator rdfXMLifier)
 	{
 		super(rdfXMLifier);	//construct the parent
 	}

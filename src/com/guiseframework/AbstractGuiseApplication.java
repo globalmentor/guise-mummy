@@ -285,7 +285,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	}
 
 	/**Installs the application into the given container at the given base path.
-	This method is only package-visible so that it can be accessed by {@link AbstractGuiseContainer}.
+	This method is called by {@link GuiseContainer} and should not be called directly by applications.
 	@param container The Guise container into which the application is being installed.
 	@param basePath The base path at which the application is being installed.
 	@param homeDirectory The home directory of the application.
@@ -295,7 +295,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@exception IllegalArgumentException if the context path is not absolute and does not end with a slash ('/') character.
 	@exception IllegalStateException if the application is already installed.
 	*/
-	void install(final AbstractGuiseContainer container, final String basePath, final File homeDirectory, final File logDirectory, final File tempDirectory)
+	public void install(final AbstractGuiseContainer container, final String basePath, final File homeDirectory, final File logDirectory, final File tempDirectory)
 	{
 		if(this.container!=null || this.basePath!=null)	//if we already have a container and/or a base path
 		{
@@ -316,12 +316,12 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	}
 
 	/**Uninstalls the application from the given container.
-	This method is only package-visible so that it can be accessed by {@link AbstractGuiseContainer}.
 	All log writers are closed.
+	This method is called by {@link GuiseContainer} and should not be called directly by applications.
 	@param container The Guise container into which the application is being installed.
 	@exception IllegalStateException if the application is not installed or is installed into another container.
 	*/
-	void uninstall(final GuiseContainer container)
+	public void uninstall(final GuiseContainer container)
 	{
 		if(this.container==null)	//if we don't have a container
 		{

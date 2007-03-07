@@ -17,16 +17,16 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 {
 
 	/**The RDF XMLifier to use for creating labels.*/
-	private final RDFXMLifier xmlifier;
+	private final RDFXMLGenerator xmlifier;
 
 	  /**@return The RDF XMLifier to use for creating labels.*/
-		public RDFXMLifier getXMLifier() {return xmlifier;}
+		public RDFXMLGenerator getXMLifier() {return xmlifier;}
 
 	/**RDF XMLifier constructor.
 	@param rdfXMLifier The RDF XMLifier to use for creating labels.
 	@exception NullPointerException if the given RDF XMLifier is <code>null</code>.
 	*/
-	public AbstractRDFObjectTreeNodeRepresentationStrategy(final RDFXMLifier rdfXMLifier)
+	public AbstractRDFObjectTreeNodeRepresentationStrategy(final RDFXMLGenerator rdfXMLifier)
 	{
 		xmlifier=checkInstance(rdfXMLifier, "RDF XMLifier cannot be null."); //save the XMLifier we'll use for generating labels
 	}

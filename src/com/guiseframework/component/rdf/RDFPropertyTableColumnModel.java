@@ -27,7 +27,7 @@ public class RDFPropertyTableColumnModel<V extends RDFObject> extends DefaultTab
 	*/
 	public RDFPropertyTableColumnModel(final Class<V> valueClass, final URI propertyURI)
 	{
-		this(valueClass, propertyURI, new RDFXMLifier().getLabel(propertyURI));	//construct the class with a label appropriate for this property URI TODO use a shared RDF XMLifier
+		this(valueClass, propertyURI, new RDFXMLGenerator().getLabel(propertyURI));	//construct the class with a label appropriate for this property URI TODO use a shared RDF XMLifier
 	}
 	
 	/**Value class and label constructor.

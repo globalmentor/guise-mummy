@@ -12,14 +12,14 @@ public class InteractionTreeNodeRepresentationStrategy extends AbstractInteracti
 	/**Default constructor with a default RDF XMLifier.*/
 	public InteractionTreeNodeRepresentationStrategy()
 	{
-		this(new RDFXMLifier());	//create the class with a default RDF XMLifier
+		this(new RDFXMLGenerator());	//create the class with a default RDF XMLifier
 	}
 
 	/**RDF XMLifier constructor.
 	@param rdfXMLifier The RDF XMLifier to use for creating labels.
 	@exception NullPointerException if the given RDF XMLifier is <code>null</code>.
 	*/
-	public InteractionTreeNodeRepresentationStrategy(final RDFXMLifier rdfXMLifier)
+	public InteractionTreeNodeRepresentationStrategy(final RDFXMLGenerator rdfXMLifier)
 	{
 		super(rdfXMLifier);	//construct the parent
 	}

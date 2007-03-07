@@ -252,6 +252,27 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public void checkInstalled();
 
+	/**Installs the application into the given container at the given base path.
+	This method is called by {@link GuiseContainer} and should not be called directly by applications.
+	@param container The Guise container into which the application is being installed.
+	@param basePath The base path at which the application is being installed.
+	@param homeDirectory The home directory of the application.
+	@param logDirectory The log directory of the application.
+	@param tempDirectory The temporary directory of the application.
+	@exception NullPointerException if the container, base path, home directory, log directory, and/or temporary directory is <code>null</code>.
+	@exception IllegalArgumentException if the context path is not absolute and does not end with a slash ('/') character.
+	@exception IllegalStateException if the application is already installed.
+	*/
+	public void install(final AbstractGuiseContainer container, final String basePath, final File homeDirectory, final File logDirectory, final File tempDirectory);
+
+	/**Uninstalls the application from the given container.
+	All log writers are closed.
+	This method is called by {@link GuiseContainer} and should not be called directly by applications.
+	@param container The Guise container into which the application is being installed.
+	@exception IllegalStateException if the application is not installed or is installed into another container.
+	*/
+	public void uninstall(final GuiseContainer container);
+
 	/**Resolves a relative or absolute path against the application base path.
 	Relative paths will be resolved relative to the application base path. Absolute paths will be be considered already resolved.
 	For an application path "/path/to/application/", resolving "relative/path" will yield "/path/to/application/relative/path",
