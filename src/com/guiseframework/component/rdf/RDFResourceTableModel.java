@@ -14,12 +14,12 @@ and {@link #setCellValue(RDFResource, int, TableColumnModel, Object)} to handle 
 */
 public class RDFResourceTableModel extends AbstractListSelectTableModel<RDFResource>
 {
-	/**Constructs a demo user list select table model indicating the type of values it can hold, using a default multiple selection strategy.
+	/**Constructs a table model indicating the type of values it can hold, using a default multiple selection strategy.
 	@param columns The models representing the table columns.
 	*/
 	public RDFResourceTableModel(final TableColumnModel<?>... columns)
 	{
-		super(RDFResource.class, columns);	//construct the parent class with the class representing users
+		super(RDFResource.class, columns);	//construct the parent class
 	}
 
 	/**Returns the value's property for the given column.

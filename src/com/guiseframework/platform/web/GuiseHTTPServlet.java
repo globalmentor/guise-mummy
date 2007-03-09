@@ -253,6 +253,8 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 				final InputStream guiseApplicationDescriptionBufferedInputStream=new BufferedInputStream(guiseApplicationDescriptionInputStream);	//get a buffered input stream to the application description 
 				try
 				{
+					
+						//TODO change to use new PLOOPResourceIO
 					final DocumentBuilder documentBuilder=createDocumentBuilder(true);	//create a new namespace-aware document builder
 					final Document document=documentBuilder.parse(guiseApplicationDescriptionBufferedInputStream);	//parse the description document
 //				TODO del Debug.trace("application description:", XMLUtilities.toString(document));
