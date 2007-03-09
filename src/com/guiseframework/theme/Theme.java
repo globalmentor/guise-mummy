@@ -71,7 +71,10 @@ public class Theme extends ClassTypedRDFResource
 		//standard labels
 	public final static String LABEL_FINISH=createStringResourceReference("theme.label.finish");
 	public final static String LABEL_FIRST=createStringResourceReference("theme.label.first");
+	public final static String LABEL_HOME=createStringResourceReference("theme.label.home");
 	public final static String LABEL_LAST=createStringResourceReference("theme.label.last");
+	public final static String LABEL_LOGIN=createStringResourceReference("theme.label.login");
+	public final static String LABEL_LOGOUT=createStringResourceReference("theme.label.logout");
 	public final static String LABEL_NEXT=createStringResourceReference("theme.label.next");
 	public final static String LABEL_PREVIOUS=createStringResourceReference("theme.label.previous");
 	public final static String LABEL_SUBMIT=createStringResourceReference("theme.label.submit");
@@ -79,16 +82,21 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI ICON_ACCEPT=createURIResourceReference("theme.icon.accept");
 	public final static URI ICON_ACCEPT_MULTIPLE=createURIResourceReference("theme.icon.accept.multiple");
 	public final static URI ICON_BUSY=createURIResourceReference("theme.icon.busy");
+	public final static URI ICON_ENTER=createURIResourceReference("theme.icon.enter");
+	public final static URI ICON_EXIT=createURIResourceReference("theme.icon.exit");
 	public final static URI ICON_EXCLAMATION=createURIResourceReference("theme.icon.exclamation");
 	public final static URI ICON_FINISH=createURIResourceReference("theme.icon.finish");
 	public final static URI ICON_FIRST=createURIResourceReference("theme.icon.first");
 	public final static URI ICON_FOLDER=createURIResourceReference("theme.icon.folder");
 	public final static URI ICON_FOLDER_CLOSED=createURIResourceReference("theme.icon.folder.closed");
 	public final static URI ICON_FOLDER_OPEN=createURIResourceReference("theme.icon.folder.open");
+	public final static URI ICON_HOME=createURIResourceReference("theme.icon.home");
 	public final static URI ICON_IMAGE=createURIResourceReference("theme.icon.image");
 	public final static URI ICON_INSERT=createURIResourceReference("theme.icon.insert");
 	public final static URI ICON_NEXT=createURIResourceReference("theme.icon.next");
 	public final static URI ICON_LAST=createURIResourceReference("theme.icon.last");
+	public final static URI ICON_LOGIN=createURIResourceReference("theme.icon.login");
+	public final static URI ICON_LOGOUT=createURIResourceReference("theme.icon.logout");
 	public final static URI ICON_PREVIOUS=createURIResourceReference("theme.icon.previous");
 	public final static URI ICON_QUESTION=createURIResourceReference("theme.icon.question");
 	public final static URI ICON_REDO=createURIResourceReference("theme.icon.redo");
