@@ -419,6 +419,11 @@ while(headerNames.hasMoreElements())
 			super.doGet(request, response);	//go ahead and retrieve the resource immediately
 			return;	//don't try to see if there is a navigation path for this path
 		}
+		if("literal".equals(request.getParameter("guise-disposition")))	//if this request should bypass normal Guise processing TODO testing; use constants; document, or this could be a security risk if developers think that hiding resources with a destination is absolute
+		{
+			super.doGet(request, response);	//let the default functionality take over			
+			return;	//bypass Guise destination processing
+		}
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
 		if(guiseApplication.hasDestination(navigationPath))	//if we have a destination associated with the requested path
@@ -1690,13 +1695,14 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
   /**Determines if the resource at a given URI exists.
   This version adds checks to see if the URI represents a valid application navigation path.
   This version adds support for Guise public resources.
+	@param request The HTTP request in response to which which existence of the resource is being determined.
   @param resourceURI The URI of the requested resource.
   @return <code>true</code> if the resource exists, else <code>false</code>.
 	@exception IOException if there is an error accessing the resource.
 	@see GuiseApplication#hasDestination(String)
 	@see #isGuisePublicResourceURI(URI)
   */
-  protected boolean exists(final URI resourceURI) throws IOException
+  protected boolean exists(final HttpServletRequest request, final URI resourceURI) throws IOException
   {
 //TODO del Debug.trace("checking exists", resourceURI);
   		//see if this is a Guise public resource
@@ -1712,11 +1718,14 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
   	{
   		return true;	//the resource exists
   	}
-  	if(guiseApplication.hasDestination(path))	//if the URI represents a valid navigation path
-  	{
-  		return true;	//the navigation path exists
-  	}
- 		return super.exists(resourceURI);	//see if a physical resource exists at the location, if we can't find a virtual resource (a Guise public resource or a navigation path component)
+		if(!"literal".equals(request.getParameter("guise-disposition")))	//if this request shouldn't bypass normal Guise processing TODO testing; use constants; document, or this could be a security risk if developers think that hiding resources with a destination is absolute
+		{
+	  	if(guiseApplication.hasDestination(path))	//if the URI represents a valid navigation path
+	  	{
+	  		return true;	//the navigation path exists
+	  	}
+		}
+ 		return super.exists(request, resourceURI);	//see if a physical resource exists at the location, if we can't find a virtual resource (a Guise public resource or a navigation path component)
   }
 
   /**The thread-safe map of references to cached stylesheets fixed for IE6.*/ 
