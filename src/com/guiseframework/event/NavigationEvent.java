@@ -6,6 +6,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import com.guiseframework.Bookmark;
 
 /**An event indicating that navigation has occurred.
+The source of this event is the Guise session in which navigation occurred.
 @author Garret Wilson
 */
 public class NavigationEvent extends AbstractGuiseEvent
