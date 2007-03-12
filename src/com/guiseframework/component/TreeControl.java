@@ -31,6 +31,8 @@ Property change events and action events on one tree node will be repeated to th
 public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>, TreeControl.TreeNodeComponentState, TreeControl> implements TreeModel
 {
 
+	/**The bound property of whether the root node is displayed.*/
+	public final static String ROOT_NODE_DISPLAYED_PROPERTY=getPropertyName(TreeControl.class, "rootNodeDisplayed");
 	/**The bound property of whether the tree node components have dragging enabled.*/
 	public final static String TREE_NODE_DRAG_ENABLED_PROPERTY=getPropertyName(TreeControl.class, "treeNodeDragEnabled");
 
@@ -62,6 +64,35 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 					componentState.getComponent().setDragEnabled(newTreeNodeDragEnabled);	//update the drag enabled state of this tree node's component
 				}
 				firePropertyChange(TREE_NODE_DRAG_ENABLED_PROPERTY, Boolean.valueOf(oldTreeNodeDragEnabled), Boolean.valueOf(newTreeNodeDragEnabled));
+			}
+		}
+
+	/**Whether the root node is displayed.*/
+	private boolean rootNodeDisplayed=true;
+
+		/**@return Whether the root node is displayed.
+		@see #isDisplayed()
+		*/
+		public boolean isRootNodeDisplayed() {return rootNodeDisplayed;}
+
+		/**Sets whether the root node is displayed.
+		This is a bound property of type <code>Boolean</code>.
+		If the root is requested not to be displayed, the root is automatically expanded.
+		@param newRootNodeDisplayed <code>true</code> if the root node should be displayed, else <code>false</code>.
+		@see #ROOT_NODE_DISPLAYED_PROPERTY
+		@see TreeNodeModel#setExpanded(boolean)
+		*/
+		public void setRootNodeDisplayed(final boolean newRootNodeDisplayed)
+		{
+			if(rootNodeDisplayed!=newRootNodeDisplayed)	//if the value is really changing
+			{
+				final boolean oldRootNodeDisplayed=rootNodeDisplayed;	//get the current value
+				rootNodeDisplayed=newRootNodeDisplayed;	//update the value
+				firePropertyChange(ROOT_NODE_DISPLAYED_PROPERTY, Boolean.valueOf(oldRootNodeDisplayed), Boolean.valueOf(newRootNodeDisplayed));
+				if(!newRootNodeDisplayed)	//if the root is no longer displayed
+				{
+					getRootNode().setExpanded(true);	//expand the root node so that the children can be displayed
+				}
 			}
 		}
 

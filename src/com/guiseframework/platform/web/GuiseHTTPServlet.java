@@ -348,7 +348,7 @@ Debug.trace("checking for categories");
 				final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request
 //			TODO del	Debug.trace("requestURI", requestURI);
 				final String containerBasePath=getContextPath()+PATH_SEPARATOR;	//determine the base path of the container
-				final URI containerBaseURI=changePath(requestURI, containerBasePath);	//determine the container base URI
+				final URI containerBaseURI=changePath(requestURI, containerBasePath);	//determine the container base URI TODO important; convert to correctly use raw/non-raw paths
 //			TODO del	Debug.trace("containerURI", containerBaseURI);
 	
 				final ServletContext servletContext=getServletContext();	//get the servlet context

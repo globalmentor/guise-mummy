@@ -92,7 +92,7 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 	}
 
 	/**Label constructor.
-	@param label The text of the label.
+	@param label The text of the label, or <code>null</code> if there should be no label.
 	*/
 	public DefaultLabelModel(final String label)
 	{

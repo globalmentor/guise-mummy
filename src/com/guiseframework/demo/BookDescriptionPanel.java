@@ -56,7 +56,7 @@ public class BookDescriptionPanel extends DefaultNavigationPanel
 			" What results is a lively play that draws the reader into important philsophical issues and at the same time provides an insight into the experts doing the discussing.</p>"+
 			"</body>"+
 			"</html>");
-		book1.setDescriptionVisible(false);	//don't show the image description by the image
+		book1.setDescriptionDisplayed(false);	//don't show the image description by the image
 		book1.setFlyoverEnabled(true);	//enable flyovers
 			
 			//optional flyover specifications (use after setting flyoverEnabled to true, which installs a flyover strategy) 
@@ -82,7 +82,7 @@ public class BookDescriptionPanel extends DefaultNavigationPanel
 			"	In his many years at the Court, a certain spark has been lost. Although he tries to bring forth a flicker in his telling of its history, Rehnquist's Supreme Court never really shines.</p>"+
 			"</body>"+
 			"</html>");
-		book2.setDescriptionVisible(false);	//don't show the image description by the image
+		book2.setDescriptionDisplayed(false);	//don't show the image description by the image
 		book2.setFlyoverEnabled(true);	//enable flyovers		
 		bookPanel.add(book2);	//add the image to the book panel
 
@@ -102,7 +102,7 @@ public class BookDescriptionPanel extends DefaultNavigationPanel
 			" The anecdotal summaries given are important not because they persuade, but because they explain.</p>"+
 			"</body>"+
 			"</html>");
-		book3.setDescriptionVisible(false);	//don't show the image description by the image
+		book3.setDescriptionDisplayed(false);	//don't show the image description by the image
 		book3.setFlyoverEnabled(true);	//enable flyovers		
 		bookPanel.add(book3);	//add the image to the book panel
 

@@ -24,8 +24,8 @@ This component installs a default export strategy supporting export of the follo
 public class Image extends AbstractComponent<Image>
 {
 
-	/**The bound property of whether the description is visible.*/
-	public final static String DESCRIPTION_VISIBLE_PROPERTY=getPropertyName(Image.class, "descriptionVisible");
+	/**The bound property of whether the description is displayed.*/
+	public final static String DESCRIPTION_DISPLAYED_PROPERTY=getPropertyName(Image.class, "descriptionDisplayed");
 	/**The image bound property.*/
 	public final static String IMAGE_PROPERTY=getPropertyName(Image.class, "image");
 	/**The image opacity bound property.*/
@@ -47,26 +47,26 @@ public class Image extends AbstractComponent<Image>
 	/**The bound property of whether the component has image dragging enabled.*/
 //TODO del if not needed	public final static String IMAGE_DRAG_ENABLED_PROPERTY=getPropertyName(Image.class, "imageDragEnabled");
 
-	/**Whether the description is visible.*/
-	private boolean descriptionVisible=true;
+	/**Whether the description is displayed.*/
+	private boolean descriptionDisplayed=true;
 
-		/**@return Whether the description is visible.
+		/**@return Whether the description is displayed.
 		@see #isDisplayed()
 		*/
-		public boolean isDescriptionVisible() {return descriptionVisible;}
+		public boolean isDescriptionDisplayed() {return descriptionDisplayed;}
 
-		/**Sets whether the description is visible.
+		/**Sets whether the description is displayed.
 		This is a bound property of type <code>Boolean</code>.
-		@param newDescriptionVisible <code>true</code> if the description should be visible, else <code>false</code>.
-		@see #DESCRIPTION_VISIBLE_PROPERTY
+		@param newDescriptionDisplayed <code>true</code> if the description should be displayed, else <code>false</code>.
+		@see #DESCRIPTION_DISPLAYED_PROPERTY
 		*/
-		public void setDescriptionVisible(final boolean newDescriptionVisible)
+		public void setDescriptionDisplayed(final boolean newDescriptionDisplayed)
 		{
-			if(descriptionVisible!=newDescriptionVisible)	//if the value is really changing
+			if(descriptionDisplayed!=newDescriptionDisplayed)	//if the value is really changing
 			{
-				final boolean oldDescriptionVisible=descriptionVisible;	//get the current value
-				descriptionVisible=newDescriptionVisible;	//update the value
-				firePropertyChange(DESCRIPTION_VISIBLE_PROPERTY, Boolean.valueOf(oldDescriptionVisible), Boolean.valueOf(newDescriptionVisible));
+				final boolean oldDescriptionDisplayed=descriptionDisplayed;	//get the current value
+				descriptionDisplayed=newDescriptionDisplayed;	//update the value
+				firePropertyChange(DESCRIPTION_DISPLAYED_PROPERTY, Boolean.valueOf(oldDescriptionDisplayed), Boolean.valueOf(newDescriptionDisplayed));
 			}
 		}
 

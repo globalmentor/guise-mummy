@@ -9,6 +9,8 @@ import java.util.List;
 
 import javax.mail.internet.ContentType;
 
+import net.marmox.MarmoxMarmotSession;
+
 import com.garretwilson.model.ResourceModel;
 import com.garretwilson.rdf.RDFLiteral;
 import com.garretwilson.rdf.RDFResource;
@@ -17,7 +19,7 @@ import com.garretwilson.rdf.maqro.Activity;
 import com.garretwilson.rdf.maqro.ActivityModelIOKit;
 import com.garretwilson.rdf.rdfs.RDFSUtilities;
 import com.garretwilson.util.Debug;
-import com.globalmentor.marmot.DefaultMarmotSession;
+import com.globalmentor.marmot.AbstractMarmotSession;
 import com.globalmentor.marmot.MarmotSession;
 import com.globalmentor.marmot.guise.repository.RepositoryResourceTreeNodeModel;
 import com.globalmentor.marmot.guise.repository.RepositoryResourceTreeNodeRepresentationStrategy;
@@ -61,7 +63,8 @@ public class MarmotPanel extends DefaultNavigationPanel
 		}
 		add(textInput);
 
-		final MarmotSession marmotSession=new DefaultMarmotSession(new DefaultResourceKit());
+/*TODO fix		
+		final MarmoxMarmotSession marmotSession=new MarmoxMarmotSession(new DefaultResourceKit());
 		marmotSession.registerResourceKit(new ImageResourceKit());
 		marmotSession.registerResourceKit(new FolderResourceKit());
 		
@@ -76,6 +79,9 @@ public class MarmotPanel extends DefaultNavigationPanel
 						{
 							final URI repositoryURI=URI.create(repositoryURIString);
 							final Repository repository=new WebDAVRepository(repositoryURI);
+							
+							
+*/							
 							
 //TODO fix							final Frame<?> frame=new DefaultFrame(session);
 							
@@ -110,6 +116,8 @@ catch(final ValidationException validationException)
 }
 							frame.setContent(textArea);
 */
+		
+/*TODO fix
 							final TreeControl treeControl=new TreeControl();
 							treeControl.setTreeNodeDragEnabled(true);	//allow tree nodes to be dragged
 							treeControl.setDropEnabled(true);	//TODO testing
@@ -190,7 +198,7 @@ Debug.trace("!!got an import from component:", component);
 					}
 				});
 		add(detailsTextArea);	//add the drop details text area control to the panel
-		
+*/
 /*TODO del
 		try
 		{

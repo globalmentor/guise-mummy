@@ -21,7 +21,7 @@ public final class NavigateActionListener extends AbstractNavigateActionListener
 
 	/**Constructs a listener to navigate to the provided URI.
 	@param navigationURI The URI for navigation when the action occurs.
-	@exception NullPointerException if the given navigation URI is null.
+	@exception NullPointerException if the given navigation URI is <code>null</code>.
 	*/
 	public NavigateActionListener(final URI navigationURI)
 	{
@@ -31,7 +31,7 @@ public final class NavigateActionListener extends AbstractNavigateActionListener
 	/**Constructs a listener to navigate to the provided URI in the identified viewport.
 	@param navigationURI The URI for navigation when the action occurs.
 	@param viewportID The ID of the viewport in which navigation should occur, or <code>null</code> if navigation should occur in the current viewport.
-	@exception NullPointerException if the given navigation URI is null.
+	@exception NullPointerException if the given navigation URI is <code>null</code>.
 	*/
 	public NavigateActionListener(final URI navigationURI, final String viewportID)
 	{

@@ -124,7 +124,7 @@ public abstract class AbstractContainerControl<C extends ContainerControl<C>> ex
 	@param layout The layout definition for the container.
 	@exception NullPointerException if the given layout is <code>null</code>.
 	*/
-	public AbstractContainerControl(final Layout layout)
+	public AbstractContainerControl(final Layout<?> layout)
 	{
 		super(layout);	//construct the parent class
 	}

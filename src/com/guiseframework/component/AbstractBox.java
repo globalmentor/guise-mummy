@@ -12,7 +12,7 @@ public abstract class AbstractBox<C extends Box<C>> extends AbstractContainer<C>
 	@param layout The layout definition for the container.
 	@exception NullPointerException if the given layout is <code>null</code>.
 	*/
-	public AbstractBox(final Layout layout)
+	public AbstractBox(final Layout<?> layout)
 	{
 		super(layout);	//construct the parent class
 	}

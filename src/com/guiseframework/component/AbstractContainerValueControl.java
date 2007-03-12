@@ -29,7 +29,7 @@ public abstract class AbstractContainerValueControl<V, C extends ContainerContro
 	@param valueModel The component value model.
 	@exception NullPointerException if the given layout and/or value model is <code>null</code>.
 	*/
-	public AbstractContainerValueControl(final Layout layout, final ValueModel<V> valueModel)
+	public AbstractContainerValueControl(final Layout<?> layout, final ValueModel<V> valueModel)
 	{
 		super(layout);	//construct the parent class
 		this.valueModel=checkInstance(valueModel, "Value model cannot be null.");	//save the table model
