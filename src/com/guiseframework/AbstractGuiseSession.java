@@ -1530,9 +1530,9 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		text.setText(notification.getMessage());	//set the text, which may include a resource reference
 		final DefaultOptionDialogFrame optionDialogFrame=new DefaultOptionDialogFrame(text, DefaultOptionDialogFrame.Option.OK);	//create a dialog with an OK button
 		optionDialogFrame.setLabel(notification.getSeverity().toString());	//TODO improve title; load from resources
-		optionDialogFrame.open(new AbstractGenericPropertyChangeListener<Mode>()	//show the dialog and listen for the frame closing
+		optionDialogFrame.open(new AbstractGenericPropertyChangeListener<Frame.Mode>()	//show the dialog and listen for the frame closing
 				{
-					public void propertyChange(final GenericPropertyChangeEvent<Mode> genericPropertyChangeEvent)	//listen for the dialog mode changing
+					public void propertyChange(final GenericPropertyChangeEvent<Frame.Mode> genericPropertyChangeEvent)	//listen for the dialog mode changing
 					{
 						if(genericPropertyChangeEvent.getNewValue()==null && afterNotify!=null)	//if the dialog is now nonmodal and there is logic that should take place after notification
 						{

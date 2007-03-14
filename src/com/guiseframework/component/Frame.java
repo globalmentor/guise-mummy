@@ -12,7 +12,7 @@ import com.guiseframework.component.effect.Effect;
 <p>A frame like other components is by default visible, but is not actually shown until its {@link #open(boolean)} method is called.</p>
 @author Garret Wilson
 */
-public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalComponent<C>
+public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalComponent<Frame.Mode, C>
 {
 	/**The close action control bound property.*/
 	public final static String CLOSE_ACTION_CONTROL_PROPERTY=getPropertyName(Frame.class, "closeActionControl");
@@ -32,6 +32,12 @@ public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalC
 	public final static String STATE_PROPERTY=getPropertyName(Frame.class, "state");
 	/**The bound property of whether the title bar is visible.*/
 	public final static String TITLE_VISIBLE_PROPERTY=getPropertyName(Frame.class, "titleVisible");
+
+	/**The mode of this component; whether the frame is in exclusive interaction with the user.*/
+	public enum Mode implements com.guiseframework.component.Mode
+	{
+		EXCLUSIVE;
+	}
 
 	/**The state of the frame.*/
 	public enum State

@@ -4,9 +4,13 @@ import static com.garretwilson.lang.ClassUtilities.*;
 import com.guiseframework.model.*;
 
 /**A heading component.
+This component installs a default export strategy supporting export of the following content types:
+<ul>
+	<li>The label content type.</li>
+</ul>
 @author Garret Wilson
 */
-public class Heading extends AbstractComponent<Heading>
+public class Heading extends AbstractLabel<Heading>
 {
 
 	/**The heading level value indicating no heading level.*/

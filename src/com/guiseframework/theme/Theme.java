@@ -69,6 +69,10 @@ public class Theme extends ClassTypedRDFResource
 	public final static Color<?> COLOR_SELECTED_BACKGROUND=new ResourceColor("theme.color.selected.background");
 
 		//standard labels
+	public final static String LABEL_ACCEPT=createStringResourceReference("theme.label.accept");
+	public final static String LABEL_ADD=createStringResourceReference("theme.label.add");
+	public final static String LABEL_DELETE=createStringResourceReference("theme.label.delete");
+	public final static String LABEL_EDIT=createStringResourceReference("theme.label.edit");
 	public final static String LABEL_FINISH=createStringResourceReference("theme.label.finish");
 	public final static String LABEL_FIRST=createStringResourceReference("theme.label.first");
 	public final static String LABEL_HOME=createStringResourceReference("theme.label.home");
@@ -77,11 +81,16 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_LOGOUT=createStringResourceReference("theme.label.logout");
 	public final static String LABEL_NEXT=createStringResourceReference("theme.label.next");
 	public final static String LABEL_PREVIOUS=createStringResourceReference("theme.label.previous");
+	public final static String LABEL_REJECT=createStringResourceReference("theme.label.reject");
 	public final static String LABEL_SUBMIT=createStringResourceReference("theme.label.submit");
+	public final static String LABEL_SUBTRACT=createStringResourceReference("theme.label.subtract");
 		//standard icons
 	public final static URI ICON_ACCEPT=createURIResourceReference("theme.icon.accept");
 	public final static URI ICON_ACCEPT_MULTIPLE=createURIResourceReference("theme.icon.accept.multiple");
+	public final static URI ICON_ADD=createURIResourceReference("theme.icon.add");
 	public final static URI ICON_BUSY=createURIResourceReference("theme.icon.busy");
+	public final static URI ICON_DELETE=createURIResourceReference("theme.icon.delete");
+	public final static URI ICON_EDIT=createURIResourceReference("theme.icon.edit");
 	public final static URI ICON_ENTER=createURIResourceReference("theme.icon.enter");
 	public final static URI ICON_EXIT=createURIResourceReference("theme.icon.exit");
 	public final static URI ICON_EXCLAMATION=createURIResourceReference("theme.icon.exclamation");
@@ -106,6 +115,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI ICON_RESOURCE=createURIResourceReference("theme.icon.resource");
 	public final static URI ICON_STOP=createURIResourceReference("theme.icon.stop");
 	public final static URI ICON_SUBMIT=createURIResourceReference("theme.icon.submit");
+	public final static URI ICON_SUBTRACT=createURIResourceReference("theme.icon.subtract");
 		//standard messages
 	public final static String MESSAGE_BUSY=createStringResourceReference("theme.message.busy");
 }

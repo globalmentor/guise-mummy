@@ -136,9 +136,9 @@ public class EditUsersPanel extends DefaultNavigationPanel
 								//create a confirmation dialog
 							final MessageOptionDialogFrame confirmationDialog=new MessageOptionDialogFrame("Are you sure you want to remove user "+user.getFirstName()+" "+user.getLastName()+"?",
 									MessageOptionDialogFrame.Option.YES, MessageOptionDialogFrame.Option.NO);	//present "yes" and "no" options to the user
-							confirmationDialog.open(new AbstractGenericPropertyChangeListener<Mode>()	//ask for confirmation
+							confirmationDialog.open(new AbstractGenericPropertyChangeListener<Frame.Mode>()	//ask for confirmation
 									{		
-										public void propertyChange(final GenericPropertyChangeEvent<Mode> propertyChangeEvent)	//when the modal dialog mode changes
+										public void propertyChange(final GenericPropertyChangeEvent<Frame.Mode> propertyChangeEvent)	//when the modal dialog mode changes
 										{
 												//if the message dialog is no longer modal and the selected option is "yes"
 											if(confirmationDialog.getMode()==null && confirmationDialog.getValue()==MessageOptionDialogFrame.Option.YES)

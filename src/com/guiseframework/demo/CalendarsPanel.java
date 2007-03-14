@@ -117,9 +117,9 @@ public class CalendarsPanel extends DefaultNavigationPanel
 						calendarDialogFrame.setLabel("Select a date");
 						calendarDialogFrame.setRelatedComponent(calendarButton);	//associate the popup with the button
 						calendarDialogFrame.open();	//show the calendar popup
-						calendarDialogFrame.open(new AbstractGenericPropertyChangeListener<Mode>()	//ask for the date to be selected
+						calendarDialogFrame.open(new AbstractGenericPropertyChangeListener<Frame.Mode>()	//ask for the date to be selected
 								{		
-									public void propertyChange(final GenericPropertyChangeEvent<Mode> propertyChangeEvent)	//when the modal dialog mode changes
+									public void propertyChange(final GenericPropertyChangeEvent<Frame.Mode> propertyChangeEvent)	//when the modal dialog mode changes
 									{
 										final Date newDate=calendarDialogFrame.getValue();	//get the value of the frame's model
 										if(newDate!=null)	//if a new date was selected (i.e. the calendar dialog frame was not closed without a selection)

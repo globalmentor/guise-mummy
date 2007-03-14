@@ -7,7 +7,7 @@ import static com.garretwilson.util.ArrayUtilities.*;
 import com.guiseframework.component.transfer.*;
 import com.guiseframework.model.*;
 
-/**An abstract label component.
+/**A abstract component the label of which comprises the main content of the component.
 This component installs a default export strategy supporting export of the following content types:
 <ul>
 	<li>The label content type.</li>

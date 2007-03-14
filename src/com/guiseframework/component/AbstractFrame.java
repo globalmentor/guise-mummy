@@ -22,9 +22,6 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 	/**The enumeration of frame components.*/
 	private enum FrameComponent{CONTENT_COMPONENT, CLOSE_ACTION_CONTROL};
 
-	/**The default mode of an open, modal frame.*/
-	public final static Mode DEFAULT_MODAL_FRAME_MODE=new Mode(){};
-
 	/**The state of the frame.*/
 	private State state=State.CLOSED;
 
@@ -44,7 +41,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 				final State oldState=state;	//get the old value
 				state=newState;	//actually change the value
 				firePropertyChange(STATE_PROPERTY, oldState, newState);	//indicate that the value changed
-				setMode(isModal() && newState!=State.CLOSED ? DEFAULT_MODAL_FRAME_MODE : null);	//set the modal mode if we are open and modal
+				setMode(isModal() && newState!=State.CLOSED ? Mode.EXCLUSIVE : null);	//set exclusive modal mode if we are open and modal
 			}			
 		}
 
@@ -66,7 +63,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 				final boolean oldModal=modal;	//get the current value
 				modal=newModal;	//update the value
 				firePropertyChange(MODAL_PROPERTY, Boolean.valueOf(oldModal), Boolean.valueOf(newModal));
-				setMode(newModal && getState()!=State.CLOSED ? DEFAULT_MODAL_FRAME_MODE : null);	//set the modal mode if we are open and modal
+				setMode(newModal && getState()!=State.CLOSED ? Mode.EXCLUSIVE : null);	//set exclusive modal mode if we are open and modal
 			}
 		}
 
