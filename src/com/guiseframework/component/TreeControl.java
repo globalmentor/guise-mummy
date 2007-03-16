@@ -226,6 +226,22 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	/**@return The root node of the tree model.*/
 	public TreeNodeModel<?> getRootNode() {return getTreeModel().getRootNode();}
 
+	/**Sets the root node of the tree model.
+	If the this control requests that the root not be displayed, this implementation automatically expanded the root node after it is added.
+	This is a bound property.
+	@param newRootNode The new root node of the tree model.
+	@exception NullPointerException if the given root node is <code>null</code>.
+	@see #ROOT_NODE_PROPERTY
+	*/
+	public void setRootNode(final TreeNodeModel<?> newRootNode)
+	{
+		getTreeModel().setRootNode(newRootNode);	//delegate to the tree model
+		if(!isRootNodeDisplayed())	//if the root is not displayed
+		{
+			getRootNode().setExpanded(true);	//expand the root node so that the children can be displayed
+		}
+	}
+
 	/**Sets whether all tree nodes are expanded.
 	@param newAllExpanded <code>true</code> if all the nodes should be expanded, or <code>false</code> if they should be collapsed.
 	*/

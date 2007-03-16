@@ -14,6 +14,14 @@ public interface TreeModel extends ActionModel
 	/**@return The root node of the tree model.*/
 	public TreeNodeModel<?> getRootNode();
 
+	/**Sets the root node of the tree model.
+	This is a bound property.
+	@param newRootNode The new root node of the tree model.
+	@exception NullPointerException if the given root node is <code>null</code>.
+	@see #ROOT_NODE_PROPERTY
+	*/
+	public void setRootNode(final TreeNodeModel<?> newRootNode);
+
 	/**Adds an action listener.
 	@param actionListener The action listener to add.
 	*/
