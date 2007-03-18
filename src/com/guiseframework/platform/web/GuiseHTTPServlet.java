@@ -29,8 +29,6 @@ import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.io.*;
 import com.garretwilson.lang.ClassUtilities;
 import com.garretwilson.lang.ObjectUtilities;
-import com.garretwilson.model.DefaultResource;
-import com.garretwilson.model.Resource;
 
 import static com.garretwilson.io.ContentTypeUtilities.*;
 import static com.garretwilson.io.FileUtilities.*;
@@ -39,6 +37,8 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.lang.StringBuilderUtilities.*;
 import static com.garretwilson.lang.ThreadUtilities.*;
 
+import com.garretwilson.net.DefaultResource;
+import com.garretwilson.net.Resource;
 import com.garretwilson.net.URIConstants;
 import com.garretwilson.net.URIUtilities;
 import com.garretwilson.net.http.*;

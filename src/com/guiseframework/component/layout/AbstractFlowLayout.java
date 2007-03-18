@@ -3,8 +3,6 @@ package com.guiseframework.component.layout;
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import com.guiseframework.component.Component;
-
 /**A layout that flows information along an axis.
 @param <T> The type of layout constraints associated with each component.
 @author Garret Wilson
@@ -13,7 +11,7 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 {
 
 	/**The bound property of the flow.*/
-	public final static String FLOW_PROPERTY=getPropertyName(Component.class, "flow");
+	public final static String FLOW_PROPERTY=getPropertyName(AbstractFlowLayout.class, "flow");
 
 	/**The logical axis (line or page) along which information is flowed.*/
 	private Flow flow;

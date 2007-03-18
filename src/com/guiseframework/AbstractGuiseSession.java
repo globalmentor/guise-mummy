@@ -19,6 +19,7 @@ import com.garretwilson.io.BOMInputStreamReader;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.rdf.*;
 import com.garretwilson.rdf.ploop.PLOOPProcessor;
+import com.garretwilson.util.Debug;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.context.GuiseContext;
@@ -1526,6 +1527,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	*/
 	public void notify(final Notification notification, final Runnable afterNotify)
 	{
+		if(notification.getSeverity()==Notification.Severity.ERROR)	//if this is an error notification TODO improve to work with all notifications; this will entail adding a general public debug write method and translating between log report levels and notification severities
+		{
+			final Throwable throwable=notification.getError();	//get the error, if any
+			if(throwable!=null)	//if there is an error
+			{
+				Debug.error(throwable);	//produce a stack trace
+			}
+		}
 		final Text text=new Text();	//create a new text component
 		text.setText(notification.getMessage());	//set the text, which may include a resource reference
 		final DefaultOptionDialogFrame optionDialogFrame=new DefaultOptionDialogFrame(text, DefaultOptionDialogFrame.Option.OK);	//create a dialog with an OK button

@@ -21,10 +21,14 @@ Default converters are available for the following types:
 public class TextControl<V> extends AbstractTextControl<V, TextControl<V>>
 {
 
+	/**The line wrap bound property.*/
+	public final static String LINE_WRAP_PROPERTY=getPropertyName(TextControl.class, "lineWrap");
 	/**The masked bound property.*/
 	public final static String MASKED_PROPERTY=getPropertyName(TextControl.class, "masked");
 	/**The maximum length bound property.*/
 	public final static String MAXIMUM_LENGTH_PROPERTY=getPropertyName(TextControl.class, "maximumLength");
+	/**The row count bound property.*/
+	public final static String ROW_COUNT_PROPERTY=getPropertyName(TextControl.class, "rowCount");
 
 	/**Whether the user input text is masked to prevent viewing of the literal entered value.*/
 	private boolean masked=false;
@@ -68,6 +72,48 @@ public class TextControl<V> extends AbstractTextControl<V, TextControl<V>>
 			}			
 		}
 
+	/**Whether lines will be wrapped if needed in the view.*/
+	private boolean lineWrap;
+
+		/**@return Whether lines will be wrapped in the view if needed.*/
+		public boolean isLineWrap() {return lineWrap;}
+
+		/**Sets whether lines will be wrapped in the view if needed.
+		This is a bound property of type <code>Boolean</code>.
+		@param newLineWrap Whether lines should be wrapped in the view if needed.
+		@see #LINE_WRAP_PROPERTY 
+		*/
+		public void setLineWrap(final boolean newLineWrap)
+		{
+			if(lineWrap!=newLineWrap)	//if the value is really changing
+			{
+				final boolean oldLineWrap=lineWrap;	//get the old value
+				lineWrap=newLineWrap;	//actually change the value
+				firePropertyChange(LINE_WRAP_PROPERTY, oldLineWrap, newLineWrap);	//indicate that the value changed
+			}			
+		}
+
+	/**The estimated number of rows requested to be visible, or -1 if no row count is specified.*/
+	private int rowCount;
+
+		/**@return The estimated number of rows requested to be visible, or -1 if no row count is specified.*/
+		public int getRowCount() {return rowCount;}
+
+		/**Sets the estimated number of rows requested to be visible.
+		This is a bound property of type <code>Integer</code>.
+		@param newRowCount The new requested number of visible rows, or -1 if no row count is specified.
+		@see #ROW_COUNT_PROPERTY
+		*/
+		public void setRowCount(final int newRowCount)
+		{
+			if(rowCount!=newRowCount)	//if the value is really changing
+			{
+				final int oldRowCount=rowCount;	//get the old value
+				rowCount=newRowCount;	//actually change the value
+				firePropertyChange(ROW_COUNT_PROPERTY, new Integer(oldRowCount), new Integer(newRowCount));	//indicate that the value changed
+			}			
+		}
+
 	/**Value class constructor with a default data model to represent a given type and a default converter.
 	@param valueClass The class indicating the type of value held in the model.
 	@exception NullPointerException if the given value class is <code>null</code>.
@@ -75,6 +121,52 @@ public class TextControl<V> extends AbstractTextControl<V, TextControl<V>>
 	public TextControl(final Class<V> valueClass)
 	{
 		this(new DefaultValueModel<V>(valueClass));	//construct the class with a default model
+	}
+
+	/**Value class, row count, and column count constructor with a default converter.
+	@param valueClass The class indicating the type of value held in the model.
+	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
+	@param columnCount The requested number of visible columns, or -1 if no column count is specified.
+	@exception NullPointerException if the given value class is <code>null</code>.
+	*/
+	public TextControl(final Class<V> valueClass, final int rowCount, final int columnCount)
+	{
+		this(valueClass, rowCount, columnCount, true);	//default to line-wrapping		
+	}
+
+	/**Value class, row count, column count, and line wrap constructor with a default converter.
+	@param valueClass The class indicating the type of value held in the model.
+	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
+	@param columnCount The requested number of visible columns, or -1 if no column count is specified.
+	@param lineWrap Whether lines should be wrapped in the view if needed.
+	@exception NullPointerException if the given value class is <code>null</code>.
+	*/
+	public TextControl(final Class<V> valueClass, final int rowCount, final int columnCount, final boolean lineWrap)
+	{
+		this(new DefaultValueModel<V>(valueClass), rowCount, columnCount, lineWrap);	//construct the class with a default model		
+	}
+
+	/**Value model, row count, and column count constructor with a default converter.
+	@param valueModel The component value model.
+	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
+	@param columnCount The requested number of visible columns, or -1 if no column count is specified.
+	@exception NullPointerException if the given value model is <code>null</code>.
+	*/
+	public TextControl(final ValueModel<V> valueModel, final int rowCount, final int columnCount)
+	{
+		this(valueModel, rowCount, columnCount, true);	//default to line-wrapping
+	}
+
+	/**Value model, row count, column count, and line wrap constructor with a default converter.
+	@param valueModel The component value model.
+	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
+	@param columnCount The requested number of visible columns, or -1 if no column count is specified.
+	@param lineWrap Whether lines should be wrapped in the view if needed.
+	@exception NullPointerException if the given value model is <code>null</code>.
+	*/
+	public TextControl(final ValueModel<V> valueModel, final int rowCount, final int columnCount, final boolean lineWrap)
+	{
+		this(valueModel, AbstractStringLiteralConverter.getInstance(valueModel.getValueClass()), rowCount, columnCount, lineWrap);	//construct the class with a default converter		
 	}
 
 	/**Value model constructor with a default converter.
@@ -93,7 +185,23 @@ public class TextControl<V> extends AbstractTextControl<V, TextControl<V>>
 	*/
 	public TextControl(final ValueModel<V> valueModel, final Converter<V, String> converter)
 	{
+		this(valueModel, converter, 1, -1, true);	//construct the class with one row, defaulting to line wrap
+	}
+	
+	/**Value model, converter, row count, column count, and line wrap constructor.
+	@param valueModel The component value model.
+	@param converter The converter for this component.
+	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
+	@param columnCount The requested number of visible columns, or -1 if no column count is specified.
+	@param lineWrap Whether lines should be wrapped in the view if needed.
+	@exception NullPointerException if the given value model and/or converter is <code>null</code>.
+	*/
+	public TextControl(final ValueModel<V> valueModel, final Converter<V, String> converter, final int rowCount, final int columnCount, final boolean lineWrap)
+	{
 		super(valueModel, converter);	//construct the parent class
+		this.rowCount=rowCount;
+		setColumnCount(columnCount);
+		this.lineWrap=lineWrap;
 	}
 
 }

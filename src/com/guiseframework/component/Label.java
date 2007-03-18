@@ -18,11 +18,19 @@ public class Label extends AbstractLabel<Label>
 		this(new DefaultLabelModel());	//construct the class with a default label model
 	}
 
+	/**Label constructor.
+	@param label The text of the label, or <code>null</code> if there should be no label.
+	*/
+	public Label(final String label)
+	{
+		this(new DefaultLabelModel(label));	//construct the label with a default label model and the given label text
+	}
+
 	/**Label model constructor.
 	@param labelModel The component label model.
 	@exception NullPointerException if the given label model is <code>null</code>.
 	*/
-	public Label(LabelModel labelModel)
+	public Label(final LabelModel labelModel)
 	{
 		super(labelModel);	//construct the parent class
 	}
