@@ -70,6 +70,7 @@ public class Theme extends ClassTypedRDFResource
 
 		//standard labels
 	public final static String LABEL_ACCEPT=createStringResourceReference("theme.label.accept");
+	public final static String LABEL_ACCESS=createStringResourceReference("theme.label.access");
 	public final static String LABEL_ADD=createStringResourceReference("theme.label.add");
 	public final static String LABEL_DELETE=createStringResourceReference("theme.label.delete");
 	public final static String LABEL_EDIT=createStringResourceReference("theme.label.edit");
@@ -87,25 +88,38 @@ public class Theme extends ClassTypedRDFResource
 		//standard icons
 	public final static URI ICON_ACCEPT=createURIResourceReference("theme.icon.accept");
 	public final static URI ICON_ACCEPT_MULTIPLE=createURIResourceReference("theme.icon.accept.multiple");
+	public final static URI ICON_ACCESS=createURIResourceReference("theme.icon.access");
 	public final static URI ICON_ADD=createURIResourceReference("theme.icon.add");
 	public final static URI ICON_BUSY=createURIResourceReference("theme.icon.busy");
 	public final static URI ICON_DELETE=createURIResourceReference("theme.icon.delete");
+	public final static URI ICON_DOCUMENT=createURIResourceReference("theme.icon.document");
+	public final static URI ICON_DOCUMENT_CONTENT=createURIResourceReference("theme.icon.document.content");
+	public final static URI ICON_DOCUMENT_NEW=createURIResourceReference("theme.icon.document.new");
+	public final static URI ICON_DOCUMENT_PREVIEW=createURIResourceReference("theme.icon.document.preview");
+	public final static URI ICON_DOCUMENT_RICH_CONTENT=createURIResourceReference("theme.icon.document.rich.content");
+	public final static URI ICON_DOCUMENT_STACk=createURIResourceReference("theme.icon.document.stack");
 	public final static URI ICON_EDIT=createURIResourceReference("theme.icon.edit");
 	public final static URI ICON_ENTER=createURIResourceReference("theme.icon.enter");
 	public final static URI ICON_EXIT=createURIResourceReference("theme.icon.exit");
 	public final static URI ICON_EXCLAMATION=createURIResourceReference("theme.icon.exclamation");
+	public final static URI ICON_EYEGLASSES=createURIResourceReference("theme.icon.eyeglasses");
 	public final static URI ICON_FINISH=createURIResourceReference("theme.icon.finish");
 	public final static URI ICON_FIRST=createURIResourceReference("theme.icon.first");
 	public final static URI ICON_FOLDER=createURIResourceReference("theme.icon.folder");
 	public final static URI ICON_FOLDER_CLOSED=createURIResourceReference("theme.icon.folder.closed");
 	public final static URI ICON_FOLDER_OPEN=createURIResourceReference("theme.icon.folder.open");
+	public final static URI ICON_HIDE=createURIResourceReference("theme.icon.hide");
+	public final static URI ICON_HIERARCHY=createURIResourceReference("theme.icon.hierarchy");
 	public final static URI ICON_HOME=createURIResourceReference("theme.icon.home");
 	public final static URI ICON_IMAGE=createURIResourceReference("theme.icon.image");
 	public final static URI ICON_INSERT=createURIResourceReference("theme.icon.insert");
-	public final static URI ICON_NEXT=createURIResourceReference("theme.icon.next");
+	public final static URI ICON_KEY=createURIResourceReference("theme.icon.key");
 	public final static URI ICON_LAST=createURIResourceReference("theme.icon.last");
+	public final static URI ICON_LOCK_CLOSED=createURIResourceReference("theme.icon.lock.closed");
+	public final static URI ICON_LOCK_OPEN=createURIResourceReference("theme.icon.lock.open");
 	public final static URI ICON_LOGIN=createURIResourceReference("theme.icon.login");
 	public final static URI ICON_LOGOUT=createURIResourceReference("theme.icon.logout");
+	public final static URI ICON_NEXT=createURIResourceReference("theme.icon.next");
 	public final static URI ICON_PREVIOUS=createURIResourceReference("theme.icon.previous");
 	public final static URI ICON_QUESTION=createURIResourceReference("theme.icon.question");
 	public final static URI ICON_REDO=createURIResourceReference("theme.icon.redo");
@@ -116,6 +130,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI ICON_STOP=createURIResourceReference("theme.icon.stop");
 	public final static URI ICON_SUBMIT=createURIResourceReference("theme.icon.submit");
 	public final static URI ICON_SUBTRACT=createURIResourceReference("theme.icon.subtract");
+	public final static URI ICON_VIEW=createURIResourceReference("theme.icon.view");
 		//standard messages
 	public final static String MESSAGE_BUSY=createStringResourceReference("theme.message.busy");
 }

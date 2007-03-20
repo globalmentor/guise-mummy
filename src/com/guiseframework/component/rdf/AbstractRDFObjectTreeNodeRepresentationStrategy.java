@@ -3,6 +3,7 @@ package com.guiseframework.component.rdf;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.garretwilson.rdf.*;
+import com.garretwilson.util.Debug;
 import com.guiseframework.component.Label;
 import com.guiseframework.component.SelectableLabel;
 import com.guiseframework.component.TreeControl;

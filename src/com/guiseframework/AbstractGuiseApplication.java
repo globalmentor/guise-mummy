@@ -1251,7 +1251,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	{
 		final ClassLoader loader=getClass().getClassLoader();	//get our class loader
 			//default resources
-		ResourceBundle resourceBundle=ResourceBundleUtilities.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null);	//load the default resource bundle
+		ResourceBundle resourceBundle=ResourceBundleUtilities.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null, resourcesIO, Resources.RESOURCE_NAMESPACE_URI);	//load the default resource bundle
 			//theme resources
 		final Theme theme=getTheme();	//get the theme, if any
 		if(theme!=null)	//if there is a theme
@@ -1270,7 +1270,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 //TODO del Debug.trace("ready to load application resources; resource bundle base name:", resourceBundleBaseName);
 		if(resourceBundleBaseName!=null && !resourceBundleBaseName.equals(DEFAULT_RESOURCE_BUNDLE_BASE_NAME))	//if a distinct resource bundle base name was specified
 		{
-			resourceBundle=ResourceBundleUtilities.getResourceBundle(resourceBundleBaseName, locale, loader, resourceBundle);	//load the new resource bundle, specifying the current resource bundle as the parent					
+			resourceBundle=ResourceBundleUtilities.getResourceBundle(resourceBundleBaseName, locale, loader, resourceBundle, resourcesIO, Resources.RESOURCE_NAMESPACE_URI);	//load the new resource bundle, specifying the current resource bundle as the parent					
 		}
 		return resourceBundle;	//return the resource bundle
 	}
@@ -1321,7 +1321,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			try
 			{
 				final Resources resources=getResourcesIO().read(resourcesInputStream, resourceBundleURI);	//load the resources
-				resourceMap=resources.toMap();	//generate a map from the resources
+				resourceMap=ResourceBundleUtilities.toMap(resources, Resources.RESOURCE_NAMESPACE_URI);	//generate a map from the resources
 				cachedResourceMapMap.put(resourceBundleURI, resourceMap);	//cache the map for later
 			}
 			finally

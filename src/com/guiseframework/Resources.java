@@ -1,17 +1,12 @@
 package com.guiseframework;
 
 import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
 
 import com.garretwilson.rdf.*;
-import com.garretwilson.util.HashMapResourceBundle;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
-//TODO bring back when RDFResource.getNamespaceURI() and RDFResource.getLocalName() are removed: import static com.garretwilson.rdf.RDFUtilities.*;
 import static com.garretwilson.text.TextUtilities.*;
 import static com.guiseframework.Guise.*;
 
@@ -42,48 +37,6 @@ public class Resources extends ClassTypedRDFResource
 	public Resources(final URI referenceURI)
 	{
 		super(referenceURI);  //construct the parent class
-	}
-
-	/**Creates a map with contents reflecting these resources.
-	@param parent The parent resource bundle, or <code>null</code> if there should be no parent for resolving resources.
-	@return A map with contents reflecting the property/value pairs.
-	*/
-	public Map<String, Object> toMap()	//TODO transfer to RDFResource class
-	{
-		final HashMap<String, Object> resourceHashMap=new HashMap<String, Object>(getPropertyCount());	//create a new hash map with enough initial room for all properties
-		for(final RDFPropertyValuePair propertyValuePair:getProperties())	//for each resource property/value pair
-		{
-			final RDFResource property=propertyValuePair.getProperty();	//get the property
-			final URI propertyURI=property.getReferenceURI();	//get the property URI
-			if(propertyURI!=null && RESOURCE_NAMESPACE_URI.equals(RDFUtilities.getNamespaceURI(propertyURI)))	//if this property is in the resourceKey namespace
-			{
-				final String resourceKey=RDFUtilities.getLocalName(propertyURI);	//use the local name as the resource key
-				Object value=null;	//we'll store the resource value here
-				final RDFObject propertyValue=propertyValuePair.getValue();	//get the value
-				if(propertyValue instanceof RDFResource)	//if the property value is a resource
-				{
-					value=((RDFResource)propertyValue).getReferenceURI();	//use the reference URI, if any, as the value
-				}
-				else if(propertyValue instanceof RDFLiteral)	//if the property value is a literal
-				{
-					value=((RDFLiteral)propertyValue).getLexicalForm();	//use the lexical form of the literal as the value TODO maybe use the object instead
-				}
-				if(value!=null)	//if we found a value
-				{
-					resourceHashMap.put(resourceKey, value);	//store the resource key/value pair in the map
-				}				
-			}
-		}
-		return resourceHashMap;	//return the map		
-	}
-
-	/**Creates a resource bundle with contents reflecting these resources.
-	@param parent The parent resource bundle, or <code>null</code> if there should be no parent for resolving resources.
-	@return A resource bundle with contents reflecting the property/value pairs, resolving to the given parent.
-	*/
-	public ResourceBundle toResourceBundle(final ResourceBundle parent)
-	{
-		return new HashMapResourceBundle(toMap(), parent);	//create a new hash map resource bundle with the given parent and return it		
 	}
 
 	/**Creates a string containing a reference to the given string resource key.

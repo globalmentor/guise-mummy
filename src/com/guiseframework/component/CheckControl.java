@@ -1,5 +1,7 @@
 package com.guiseframework.component;
 
+import java.net.URI;
+
 import com.guiseframework.model.*;
 import com.guiseframework.prototype.ValuePrototype;
 import com.guiseframework.validator.ValueRequiredValidator;
@@ -63,6 +65,23 @@ public class CheckControl extends AbstractValueControl<Boolean, CheckControl>
 	public CheckControl(final CheckType checkType)
 	{
 		this(new DefaultValueModel<Boolean>(Boolean.class, Boolean.FALSE), checkType);	//construct the class with a default value model
+	}
+
+	/**Label constructor.
+	@param label The text of the label, or <code>null</code> if there should be no label.
+	*/
+	public CheckControl(final String label)
+	{
+		this(label, null);	//construct the label model with no icon		
+	}
+
+	/**Label and icon constructor.
+	@param label The text of the label, or <code>null</code> if there should be no label.
+	@param icon The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.
+	*/
+	public CheckControl(final String label, final URI icon)
+	{
+		this(new DefaultLabelModel(label, icon));	//construct the class, indicating that a default value model should be used
 	}
 
 	/**Label model constructor.

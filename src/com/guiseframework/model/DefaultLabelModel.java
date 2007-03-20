@@ -16,7 +16,7 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 {
 
 	/**The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.*/
-	private URI icon=null;
+	private URI icon;
 
 		/**@return The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.*/
 		public URI getIcon() {return icon;}
@@ -37,7 +37,7 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 		}
 
 	/**The label text, which may include a resource reference, or <code>null</code> if there is no label text.*/
-	private String label=null;
+	private String label;
 
 		/**@return The label text, which may include a resource reference, or <code>null</code> if there is no label text.*/
 		public String getLabel() {return label;}
@@ -96,7 +96,16 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 	*/
 	public DefaultLabelModel(final String label)
 	{
-		super();	//construct the parent class
+		this(label, null);	//construct the label model with no icon
+	}
+
+	/**Label and icon constructor.
+	@param label The text of the label, or <code>null</code> if there should be no label.
+	@param icon The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.
+	*/
+	public DefaultLabelModel(final String label, final URI icon)
+	{
 		this.label=label;	//save the label
+		this.icon=icon;	//save the icon
 	}
 }
