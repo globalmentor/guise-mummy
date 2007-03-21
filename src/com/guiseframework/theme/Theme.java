@@ -17,9 +17,6 @@ import static com.guiseframework.Resources.*;
 public class Theme extends ClassTypedRDFResource
 {
 
-	/**@return The namespace URI of the ontology defining the default type of this resource.*/
-	public URI getDefaultTypeNamespaceURI() {return GUISE_NAMESPACE_URI;}
-
 	/**The resources property name; the local name of <code>http://guiseframework.com/namespaces/guise#</code>.*/
 	public final static String RESOURCES_PROPERTY_NAME="resources";
 
@@ -37,7 +34,7 @@ public class Theme extends ClassTypedRDFResource
 	/**Default constructor.*/
 	public Theme()
 	{
-		super();	//construct the parent class
+		this(null);	//construct the class with no reference URI
 	}
 
 	/**Reference URI constructor.
@@ -45,7 +42,7 @@ public class Theme extends ClassTypedRDFResource
 	*/
 	public Theme(final URI referenceURI)
 	{
-		super(referenceURI);  //construct the parent class
+		super(referenceURI, GUISE_NAMESPACE_URI);  //construct the parent class
 	}
 
 	/**Retrieves the URI of resources for the given locale.

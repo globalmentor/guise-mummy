@@ -17,9 +17,6 @@ This implementation considers property value resources with reference URIs to es
 public class Resources extends ClassTypedRDFResource
 {
 
-	/**@return The namespace URI of the ontology defining the default type of this resource.*/
-	public URI getDefaultTypeNamespaceURI() {return GUISE_NAMESPACE_URI;}
-
 	/**The recommended prefix to the resource key ontology namespace.*/
 	public final static String RESOURCE_NAMESPACE_PREFIX="resource";
 	/**The URI to the resource key ontology namespace.*/
@@ -28,7 +25,7 @@ public class Resources extends ClassTypedRDFResource
 	/**Default constructor.*/
 	public Resources()
 	{
-		super();	//construct the parent class
+		this(null);	//construct the class with no reference URI
 	}
 
 	/**Reference URI constructor.
@@ -36,7 +33,7 @@ public class Resources extends ClassTypedRDFResource
 	*/
 	public Resources(final URI referenceURI)
 	{
-		super(referenceURI);  //construct the parent class
+		super(referenceURI, GUISE_NAMESPACE_URI);  //construct the parent class
 	}
 
 	/**Creates a string containing a reference to the given string resource key.
