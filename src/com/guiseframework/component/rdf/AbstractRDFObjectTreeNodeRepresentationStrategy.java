@@ -18,10 +18,10 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 {
 
 	/**The RDF XMLifier to use for creating labels.*/
-	private final RDFXMLGenerator xmlifier;
+	private final RDFXMLGenerator xmlGenerator;
 
 	  /**@return The RDF XMLifier to use for creating labels.*/
-		public RDFXMLGenerator getXMLifier() {return xmlifier;}
+		public RDFXMLGenerator getXMLGenerator() {return xmlGenerator;}
 
 	/**RDF XMLifier constructor.
 	@param rdfXMLifier The RDF XMLifier to use for creating labels.
@@ -29,7 +29,7 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 	*/
 	public AbstractRDFObjectTreeNodeRepresentationStrategy(final RDFXMLGenerator rdfXMLifier)
 	{
-		xmlifier=checkInstance(rdfXMLifier, "RDF XMLifier cannot be null."); //save the XMLifier we'll use for generating labels
+		xmlGenerator=checkInstance(rdfXMLifier, "RDF XMLifier cannot be null."); //save the XMLifier we'll use for generating labels
 	}
 
 	/**Creates a component to represent the given tree node.
@@ -84,7 +84,7 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 			final RDFResource rdfProperty=((RDFObjectTreeNodeModel<?>)treeNode).getProperty();	//get the property, if any, associated with the RDF object
 			if(rdfProperty!=null)  //if object is the object of a property
 			{
-				stringBuilder.insert(0, getXMLifier().getLabel(rdfProperty.getReferenceURI())); //prepend "property"
+				stringBuilder.insert(0, getXMLGenerator().getLabel(rdfProperty.getReferenceURI())); //prepend "property"
 			}
 		}
 		return stringBuilder;	//return the string builder
