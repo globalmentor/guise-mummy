@@ -307,7 +307,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		}
 			//first action prototype
 		firstActionPrototype=new ActionPrototype();
-		firstActionPrototype.setIcon(ICON_FIRST);
+		firstActionPrototype.setIcon(GLYPH_FIRST);
 		firstActionPrototype.setLabel(LABEL_FIRST);
 		firstActionPrototype.addActionListener(new ActionListener()
 				{
@@ -318,7 +318,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 				});
 			//previous action prototype
 		previousActionPrototype=new ActionPrototype();
-		previousActionPrototype.setIcon(ICON_PREVIOUS);
+		previousActionPrototype.setIcon(GLYPH_PREVIOUS);
 		previousActionPrototype.setLabel(LABEL_PREVIOUS);
 		previousActionPrototype.addActionListener(new ActionListener()
 				{
@@ -329,7 +329,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 				});
 			//next action prototype
 		nextActionPrototype=new ActionPrototype();
-		nextActionPrototype.setIcon(ICON_NEXT);
+		nextActionPrototype.setIcon(GLYPH_NEXT);
 		nextActionPrototype.setLabel(LABEL_NEXT);
 		nextActionPrototype.addActionListener(new ActionListener()
 				{
@@ -340,7 +340,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 				});
 			//last action prototype
 		lastActionPrototype=new ActionPrototype();
-		lastActionPrototype.setIcon(ICON_LAST);
+		lastActionPrototype.setIcon(GLYPH_LAST);
 		lastActionPrototype.setLabel(LABEL_LAST);
 		lastActionPrototype.addActionListener(new ActionListener()
 				{

@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Principal;
+import java.text.MessageFormat;
 import java.util.*;
 import static java.util.Collections.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -24,6 +25,7 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.event.*;
+import com.guiseframework.geometry.Extent;
 import com.guiseframework.model.InformationLevel;
 import com.guiseframework.model.Notification;
 import com.guiseframework.style.*;
@@ -45,6 +47,7 @@ import static com.garretwilson.text.FormatUtilities.*;
 import static com.garretwilson.text.TextUtilities.*;
 import static com.garretwilson.text.xml.XMLUtilities.*;
 import static com.guiseframework.GuiseResourceConstants.*;
+import static com.guiseframework.Resources.*;
 
 /**An abstract implementation that keeps track of the components of a user session.
 @author Garret Wilson
@@ -1466,7 +1469,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	/**Creates a component to indicate Guise busy status.
 	@return A component to indicate Guise busy status.
-	@see Theme#ICON_BUSY
+	@see Theme#GLYPH_BUSY
 	*/
 	public Component<?> createBusyComponent()
 	{
@@ -1527,7 +1530,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	*/
 	public void notify(final Notification notification, final Runnable afterNotify)
 	{
-		if(notification.getSeverity()==Notification.Severity.ERROR)	//if this is an error notification TODO improve to work with all notifications; this will entail adding a general public debug write method and translating between log report levels and notification severities
+		final Notification.Severity severity=notification.getSeverity();	//get the notification severity
+		if(severity==Notification.Severity.ERROR)	//if this is an error notification TODO improve to work with all notifications; this will entail adding a general public debug write method and translating between log report levels and notification severities
 		{
 			final Throwable throwable=notification.getError();	//get the error, if any
 			if(throwable!=null)	//if there is an error
@@ -1538,7 +1542,11 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		final Text text=new Text();	//create a new text component
 		text.setText(notification.getMessage());	//set the text, which may include a resource reference
 		final DefaultOptionDialogFrame optionDialogFrame=new DefaultOptionDialogFrame(text, DefaultOptionDialogFrame.Option.OK);	//create a dialog with an OK button
-		optionDialogFrame.setLabel(notification.getSeverity().toString());	//TODO improve title; load from resources
+		final String severityResourceKeyName=getResourceKeyName(severity);	//get the resource key name of the severity TODO actually create a method		
+		optionDialogFrame.setLabel(createStringResourceReference(MessageFormat.format(Notification.Severity.LABEL_RESOURCE_KEY_FORMAT_PATTERN, severityResourceKeyName)));	//set the label based upon the severity
+		optionDialogFrame.setIcon(createURIResourceReference(MessageFormat.format(Notification.Severity.GLYPH_RESOURCE_KEY_FORMAT_PATTERN, severityResourceKeyName)));	//set the icon based upon the severity
+		optionDialogFrame.setPreferredWidth(new Extent(0.33, Extent.Unit.RELATIVE));	//set the preferred dimensions
+		optionDialogFrame.setPreferredHeight(new Extent(0.33, Extent.Unit.RELATIVE));
 		optionDialogFrame.open(new AbstractGenericPropertyChangeListener<Frame.Mode>()	//show the dialog and listen for the frame closing
 				{
 					public void propertyChange(final GenericPropertyChangeEvent<Frame.Mode> genericPropertyChangeEvent)	//listen for the dialog mode changing

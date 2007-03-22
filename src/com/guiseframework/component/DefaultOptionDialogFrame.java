@@ -3,26 +3,29 @@ package com.guiseframework.component;
 import java.beans.PropertyVetoException;
 import java.text.MessageFormat;
 
+import com.guiseframework.Resources;
+import static com.guiseframework.Resources.*;
 import com.guiseframework.event.ActionEvent;
 import com.guiseframework.event.ActionListener;
 import com.guiseframework.model.*;
-import static com.guiseframework.Resources.*;
 
 /**Default implementation of a frame for communication of an option such as "OK" or "Cancel".
 An option frame defaults to a single composite child panel with a row of options along the bottom.
 The contents of an option dialog frame should be accessed by {@link #getOptionContent()} and {@link #setOptionContent(Component)}.
-The labels and icons are accessed from the resources using resource keys
-	<code>frame.dialog.options.<var>option</var>.label</code> and <code>frame.dialog.options.<var>option</var>.icon</code>,
-	respectively, where <var>option</var> represents the option enum value such as "OK".
+The labels and glyphs are accessed from the resources using resource keys
+	<code>frame.dialog.options.<var>option</var>.label</code> and <code>frame.dialog.options.<var>option</var>.glyph</code>,
+	respectively, where <var>option</var> represents the option enum value such as {@value DefaultOptionDialogFrame.Option#OK} in its
+	resource key form, "ok".
 @author Garret Wilson
+@see Resources#getResourceKeyName(Enum)
 */
 public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultOptionDialogFrame.Option, DefaultOptionDialogFrame>
 {
 
 	/**The resource key format pattern for each option label.*/
 	public final static String OPTION_DIALOG_FRAME_LABEL_RESOURCE_KEY_FORMAT_PATTERN="theme.option.dialog.frame.option.{0}.label";
-	/**The resource key format pattern for each option icon.*/
-	public final static String OPTION_DIALOG_FRAME_ICON_RESOURCE_KEY_FORMAT_PATTERN="theme.option.dialog.frame.option.{0}.icon";
+	/**The resource key format pattern for each option glyph.*/
+	public final static String OPTION_DIALOG_FRAME_GLYPH_RESOURCE_KEY_FORMAT_PATTERN="theme.option.dialog.frame.option.{0}.glyph";
 	
 	/**The options which can be returned from this frame.
 	The option ordinals represent the order in which they should be presented.
@@ -93,9 +96,9 @@ public class DefaultOptionDialogFrame extends AbstractOptionDialogFrame<DefaultO
 	protected Component<?> createOptionComponent(final Option option)
 	{
 		final Button button=new Button();	//create a new button
-		final String optionString=option.toString();	//get the string form of the option
-		button.setLabel(createStringResourceReference(MessageFormat.format(OPTION_DIALOG_FRAME_LABEL_RESOURCE_KEY_FORMAT_PATTERN, optionString)));	//set the option action label
-		button.setIcon(createURIResourceReference(MessageFormat.format(OPTION_DIALOG_FRAME_ICON_RESOURCE_KEY_FORMAT_PATTERN, optionString)));	//set the option action icon
+		final String optionResourceKeyName=getResourceKeyName(option);	//get the resource key form of the option
+		button.setLabel(createStringResourceReference(MessageFormat.format(OPTION_DIALOG_FRAME_LABEL_RESOURCE_KEY_FORMAT_PATTERN, optionResourceKeyName)));	//set the option action label
+		button.setIcon(createURIResourceReference(MessageFormat.format(OPTION_DIALOG_FRAME_GLYPH_RESOURCE_KEY_FORMAT_PATTERN, optionResourceKeyName)));	//set the option action icon
 		button.addActionListener(new ActionListener()	//listen for the action being performed
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the action is performed

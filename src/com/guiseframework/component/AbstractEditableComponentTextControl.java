@@ -197,7 +197,7 @@ Debug.trace("now edit control has value", editControl.getValue());
 				});
 			//accept action prototype
 		acceptActionPrototype=new ActionPrototype();
-		acceptActionPrototype.setIcon(Theme.ICON_ACCEPT);
+		acceptActionPrototype.setIcon(Theme.GLYPH_ACCEPT);
 		acceptActionPrototype.setLabel(Theme.LABEL_ACCEPT);
 		acceptActionPrototype.addActionListener(new ActionListener()
 				{
@@ -208,7 +208,7 @@ Debug.trace("now edit control has value", editControl.getValue());
 				});
 			//reject action prototype
 		rejectActionPrototype=new ActionPrototype();
-		rejectActionPrototype.setIcon(Theme.ICON_REJECT);
+		rejectActionPrototype.setIcon(Theme.GLYPH_REJECT);
 		rejectActionPrototype.setLabel(Theme.LABEL_REJECT);
 		rejectActionPrototype.addActionListener(new ActionListener()
 				{
@@ -219,7 +219,7 @@ Debug.trace("now edit control has value", editControl.getValue());
 				});
 			//delete action prototype
 		deleteActionPrototype=new ActionPrototype();
-		deleteActionPrototype.setIcon(Theme.ICON_DELETE);
+		deleteActionPrototype.setIcon(Theme.GLYPH_DELETE);
 		deleteActionPrototype.setLabel(Theme.LABEL_DELETE);
 		deleteActionPrototype.addActionListener(new ActionListener()
 				{
@@ -289,12 +289,12 @@ Debug.trace("now edit control has value", editControl.getValue());
 		editActionPrototype.setEnabled(isEditable && mode!=Mode.EDIT);	//only enable the edit prototype if we aren't editing
 		if(label==null)	//if there is currently no label
 		{
-			editActionPrototype.setIcon(Theme.ICON_ADD);	//show the add icon
+			editActionPrototype.setIcon(Theme.GLYPH_ADD);	//show the add icon
 			editActionPrototype.setLabel(Theme.LABEL_ADD);	//show the add label
 		}
 		else	//if there is a label
 		{
-			editActionPrototype.setIcon(Theme.ICON_EDIT);	//show the edit icon
+			editActionPrototype.setIcon(Theme.GLYPH_EDIT);	//show the edit icon
 			editActionPrototype.setLabel(Theme.LABEL_EDIT);	//show the edit label
 		}
 			//accept action prototype

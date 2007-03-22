@@ -6,6 +6,7 @@ import static com.garretwilson.text.TextUtilities.*;
 import javax.mail.internet.ContentType;
 
 import com.guiseframework.Guise;
+import com.guiseframework.Resources;
 
 /**A notification to the user of some event or state, such as an error or invalid user input.
 @author Garret Wilson
@@ -28,6 +29,17 @@ public class Notification
 		WARN,
 		/**Indicates an unexpected condition representing an error.*/
 		ERROR;
+
+		/**The resource key format pattern for each notification severity label, where {0} should be replaced with the resource key name of the severity.
+		@see Resources#getResourceKeyName(Enum)
+		*/
+		public final static String LABEL_RESOURCE_KEY_FORMAT_PATTERN="theme.notification.severity.{0}.label";
+
+		/**The resource key format pattern for each notification severity glyph, where {0} should be replaced with the resource key name of the severity.
+		@see Resources#getResourceKeyName(Enum)
+		*/
+		public final static String GLYPH_RESOURCE_KEY_FORMAT_PATTERN="theme.notification.severity.{0}.glyph";
+
 	};
 
 	/**The relevance of the notification to the application.

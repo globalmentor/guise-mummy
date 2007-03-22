@@ -33,7 +33,7 @@ public interface GuiseApplication extends PropertyBindable
 	public final static String THEME_PROPERTY=getPropertyName(GuiseApplication.class, "theme");
 
 	/**The application-relative base path reserved for exclusive Guise use.*/
-	public final static String GUISE_RESERVED_BASE_PATH="guise/";
+	public final static String GUISE_RESERVED_BASE_PATH="~guise/";
 	/**The application-relative base path to access all Guise public resources.*/
 	public final static String GUISE_PUBLIC_RESOURCE_BASE_PATH=GUISE_RESERVED_BASE_PATH+"resources/";
 	/**The application-relative base path to access all Guise temp files.*/

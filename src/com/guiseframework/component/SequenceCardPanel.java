@@ -119,7 +119,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 		super(layout);	//construct the parent class
 			//previous action prototype
 		previousActionPrototype=new ActionPrototype();
-		previousActionPrototype.setIcon(ICON_PREVIOUS);
+		previousActionPrototype.setIcon(GLYPH_PREVIOUS);
 		previousActionPrototype.setLabel(LABEL_PREVIOUS);
 		previousActionPrototype.addActionListener(new ActionListener()
 				{
@@ -130,7 +130,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 				});
 			//next action prototype
 		nextActionPrototype=new ActionPrototype();
-		nextActionPrototype.setIcon(ICON_NEXT);
+		nextActionPrototype.setIcon(GLYPH_NEXT);
 		nextActionPrototype.setLabel(LABEL_NEXT);
 		nextActionPrototype.addActionListener(new ActionListener()
 				{
@@ -141,7 +141,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 				});
 			//finish action prototype
 		finishActionPrototype=new ActionPrototype();
-		finishActionPrototype.setIcon(ICON_FINISH);
+		finishActionPrototype.setIcon(GLYPH_FINISH);
 		finishActionPrototype.setLabel(LABEL_FINISH);
 		finishActionPrototype.addActionListener(new ActionListener()
 				{

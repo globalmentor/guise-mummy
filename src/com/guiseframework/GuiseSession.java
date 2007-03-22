@@ -584,7 +584,7 @@ public interface GuiseSession extends PropertyBindable
 
 	/**Creates a component to indicate Guise busy status.
 	@return A component to indicate Guise busy status.
-	@see Theme#ICON_BUSY
+	@see Theme#GLYPH_BUSY
 	*/
 	public Component<?> createBusyComponent();	//TODO maybe put this in GuiseApplication
 
