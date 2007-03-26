@@ -69,16 +69,19 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_ACCEPT=createStringResourceReference("theme.label.accept");
 	public final static String LABEL_ACCESS=createStringResourceReference("theme.label.access");
 	public final static String LABEL_ADD=createStringResourceReference("theme.label.add");
+	public final static String LABEL_CANCEL=createStringResourceReference("theme.label.cancel");
 	public final static String LABEL_DELETE=createStringResourceReference("theme.label.delete");
 	public final static String LABEL_EDIT=createStringResourceReference("theme.label.edit");
 	public final static String LABEL_FINISH=createStringResourceReference("theme.label.finish");
 	public final static String LABEL_FIRST=createStringResourceReference("theme.label.first");
 	public final static String LABEL_HOME=createStringResourceReference("theme.label.home");
+	public final static String LABEL_JOIN=createStringResourceReference("theme.label.join");
 	public final static String LABEL_LAST=createStringResourceReference("theme.label.last");
 	public final static String LABEL_LOGIN=createStringResourceReference("theme.label.login");
 	public final static String LABEL_LOGOUT=createStringResourceReference("theme.label.logout");
 	public final static String LABEL_NEXT=createStringResourceReference("theme.label.next");
 	public final static String LABEL_PASSWORD=createStringResourceReference("theme.label.password");
+	public final static String LABEL_PASSWORD_VERIFICATION=createStringResourceReference("theme.label.password.verification");
 	public final static String LABEL_PREVIOUS=createStringResourceReference("theme.label.previous");
 	public final static String LABEL_REJECT=createStringResourceReference("theme.label.reject");
 	public final static String LABEL_SUBMIT=createStringResourceReference("theme.label.submit");
@@ -88,9 +91,11 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI GLYPH_ACCEPT=createURIResourceReference("theme.glyph.accept");
 	public final static URI GLYPH_ACCEPT_MULTIPLE=createURIResourceReference("theme.glyph.accept.multiple");
 	public final static URI GLYPH_ACCESS=createURIResourceReference("theme.glyph.access");
+	public final static URI GLYPH_ANIMATION=createURIResourceReference("theme.glyph.animation");
 	public final static URI GLYPH_ADD=createURIResourceReference("theme.glyph.add");
 	public final static URI GLYPH_BLANK=createURIResourceReference("theme.glyph.blank");
 	public final static URI GLYPH_BUSY=createURIResourceReference("theme.glyph.busy");
+	public final static URI GLYPH_CANCEL=createURIResourceReference("theme.glyph.cancel");
 	public final static URI GLYPH_DELETE=createURIResourceReference("theme.glyph.delete");
 	public final static URI GLYPH_DOCUMENT=createURIResourceReference("theme.glyph.document");
 	public final static URI GLYPH_DOCUMENT_CONTENT=createURIResourceReference("theme.glyph.document.content");
@@ -115,6 +120,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI GLYPH_IMAGE=createURIResourceReference("theme.glyph.image");
 	public final static URI GLYPH_INFO=createURIResourceReference("theme.glyph.info");
 	public final static URI GLYPH_INSERT=createURIResourceReference("theme.glyph.insert");
+	public final static URI GLYPH_JOIN=createURIResourceReference("theme.glyph.join");
 	public final static URI GLYPH_KEY=createURIResourceReference("theme.glyph.key");
 	public final static URI GLYPH_LAST=createURIResourceReference("theme.glyph.last");
 	public final static URI GLYPH_LOCK_CLOSED=createURIResourceReference("theme.glyph.lock.closed");
@@ -122,6 +128,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI GLYPH_LOGIN=createURIResourceReference("theme.glyph.login");
 	public final static URI GLYPH_LOGOUT=createURIResourceReference("theme.glyph.logout");
 	public final static URI GLYPH_NEXT=createURIResourceReference("theme.glyph.next");
+	public final static URI GLYPH_PASSWORD=createURIResourceReference("theme.glyph.password");
 	public final static URI GLYPH_POLYGON_CURVED=createURIResourceReference("theme.glyph.polygon.curved");
 	public final static URI GLYPH_POLYGON_POINTS=createURIResourceReference("theme.glyph.polygon.points");
 	public final static URI GLYPH_PREVIOUS=createURIResourceReference("theme.glyph.previous");
@@ -134,10 +141,12 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI GLYPH_STOP=createURIResourceReference("theme.glyph.stop");
 	public final static URI GLYPH_SUBMIT=createURIResourceReference("theme.glyph.submit");
 	public final static URI GLYPH_SUBTRACT=createURIResourceReference("theme.glyph.subtract");
+	public final static URI GLYPH_USER=createURIResourceReference("theme.glyph.user");
 	public final static URI GLYPH_VIEW=createURIResourceReference("theme.glyph.view");
 	public final static URI GLYPH_WARN=createURIResourceReference("theme.glyph.warn");
 		//standard messages
 	public final static String MESSAGE_BUSY=createStringResourceReference("theme.message.busy");
-	public final static String MESSAGE_INVALID_PASSWORD=createStringResourceReference("theme.message.invalid.password");
-	public final static String MESSAGE_INVALID_USER=createStringResourceReference("theme.message.invalid.user");
+	public final static String MESSAGE_PASSWORD_INVALID=createStringResourceReference("theme.message.password.invalid");
+	public final static String MESSAGE_PASSWORD_UNVERIFIED=createStringResourceReference("theme.message.password.unverified");
+	public final static String MESSAGE_USER_INVALID=createStringResourceReference("theme.message.user.invalid");
 }

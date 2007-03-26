@@ -99,7 +99,7 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler
 				updateSelected();	//update the control selection based upon the selected card
 				updateDisplayed();	//update the displayed status based upon the selected card
 				updateEnabled();	//update the enabled status based upon the selected card
-				updateTaskStatus();	//update the task status based upon the selected card
+				updateTaskState();	//update the task status based upon the selected card
 			}			
 		}
 
@@ -125,7 +125,7 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler
 				updateSelected();	//update the control selection based upon the selected card
 				updateDisplayed();	//update the displayed status based upon the selected card
 				updateEnabled();	//update the enabled status based upon the selected card
-				updateTaskStatus();	//update the task status based upon the selected card
+				updateTaskState();	//update the task status based upon the selected card
 			}			
 		}
 		

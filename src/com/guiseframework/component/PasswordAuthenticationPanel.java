@@ -1,22 +1,57 @@
 package com.guiseframework.component;
 
+import static com.garretwilson.lang.ClassUtilities.getPropertyName;
+
 import java.beans.PropertyVetoException;
+import java.util.Arrays;
 
 import com.guiseframework.component.layout.*;
-import com.guiseframework.theme.Theme;
+import com.guiseframework.model.Notification;
+import static com.guiseframework.theme.Theme.*;
 import com.guiseframework.validator.*;
 
-/**Panel to gather password authentication information.
+/**Panel to gather password authentication information and optionally verify the password.
+This panel defaults to not verifying the password.
 @author Garret Wilson
 */
-public class PasswordAuthenticationPanel extends LayoutPanel
+public class PasswordAuthenticationPanel extends AbstractPanel<PasswordAuthenticationPanel>
 {
+
+	/**The bound property of the password verification status.*/
+	public final static String PASSWORD_VERIFIED_PROPERTY=getPropertyName(PasswordAuthenticationPanel.class, "passwordVerified");
 
 	/**The username text control.*/
 	private final TextControl<String> usernameControl;
 
 	/**The password text control.*/
 	private final TextControl<char[]> passwordControl;
+
+	/**The password verification text control.*/
+	private final TextControl<char[]> passwordVerificationControl;
+	
+	/**Whether password verification is required, resulting in a separate password verification text input.*/
+	private boolean passwordVerified=false;
+
+		/**@return Whether password verification is required, resulting in a separate password verification text input.*/
+		public boolean isPasswordVerified() {return passwordVerified;}
+
+		/**Sets whether password verification is required
+		This is a bound property of type <code>Boolean</code>.
+		This method unconditionally clears the password verification control.
+		@param newPasswordVerified Whether password verification is required, resulting in a separate password verification text input.
+		@see #PASSWORD_VERIFIED_PROPERTY
+		*/
+		public void setPasswordVerified(final boolean newPasswordVerified)
+		{
+			if(passwordVerified!=newPasswordVerified)	//if the value is really changing
+			{
+				final boolean oldPasswordVerified=passwordVerified;	//get the current value
+				passwordVerified=newPasswordVerified;	//update the value
+				passwordVerificationControl.clearValue();	//always clear the password verification control, whatever the new value
+				update();	//update the other components that rely on this setting
+				firePropertyChange(PASSWORD_VERIFIED_PROPERTY, Boolean.valueOf(oldPasswordVerified), Boolean.valueOf(newPasswordVerified));
+			}
+		}
 
 	/**Default constructor with a default vertical flow layout.*/
 	public PasswordAuthenticationPanel()
@@ -34,17 +69,28 @@ public class PasswordAuthenticationPanel extends LayoutPanel
 
 			//username
 		usernameControl=new TextControl<String>(String.class);	//create the username text control
-		usernameControl.setLabel(Theme.LABEL_USERNAME);	//set the username control label
+		usernameControl.setLabel(LABEL_USERNAME);	//set the username control label
+		usernameControl.setIcon(GLYPH_USER);	//set the username control icon
 		usernameControl.setValidator(new RegularExpressionStringValidator(".+", true));	//require at least a single character
 		add(usernameControl);	//add the ID control to the panel
 
 			//password
 		passwordControl=new TextControl<char[]>(char[].class);	//create the password text control
-		passwordControl.setLabel(Theme.LABEL_PASSWORD);	//set the password control label
+		passwordControl.setLabel(LABEL_PASSWORD);	//set the password control label
+		passwordControl.setIcon(GLYPH_PASSWORD);	//set the password control icon
 		passwordControl.setMasked(true);	//mask the password input
 		passwordControl.setValidator(new RegularExpressionCharArrayValidator(".+", true));	//require at least a single character
 		add(passwordControl);	//add the password control to the panel
 
+			//password verification
+		passwordVerificationControl=new TextControl<char[]>(char[].class);	//create the password verification text control
+		passwordVerificationControl.setLabel(LABEL_PASSWORD);	//set the password verification control label
+		passwordVerificationControl.setIcon(GLYPH_PASSWORD);	//set the password verification control icon
+		passwordVerificationControl.setMasked(true);	//mask the password verification input
+		passwordVerificationControl.setValidator(new RegularExpressionCharArrayValidator(".+", true));	//require at least a single character
+		add(passwordVerificationControl);	//add the password verification control to the panel
+
+		update();	//update the state of the password verification control based upon our password verification setting
 	}
 
 	/**@return The current username entered, or <code>null</code> if there is no username entered.*/
@@ -76,4 +122,43 @@ public class PasswordAuthenticationPanel extends LayoutPanel
 	{
 		passwordControl.setValue(password);
 	}
+
+	/**Updates the state of the controls based upon current property settings.*/
+	protected void update()
+	{
+		passwordVerificationControl.setDisplayed(isPasswordVerified());	//only show the password verification if we should verify the password
+	}
+
+	/**@return <code>true</code> if both entered passwords are identical.*/ 
+	protected boolean isPasswordMatch()
+	{
+		return Arrays.equals(passwordControl.getValue(), passwordVerificationControl.getValue());	//see if the passwords match
+	}
+
+	/**Checks the state of the component for validity.
+	This version ensures the entered passwords match if password verification is enabled.
+	@return <code>true</code> if the component and all children passes all validity tests, else <code>false</code>.
+	*/ 
+	protected boolean determineValid()
+	{
+		return super.determineValid() && (!isPasswordVerified() || isPasswordMatch());	//add a check for password consistency if passwords are being verified 
+	}
+
+	/**Validates the user input of this component and all child components.
+	The component will be updated with error information.
+	This version adds errors for non-matching passwords if password verification is enabled.
+	@return The current state of {@link #isValid()} as a convenience.
+	*/
+	public boolean validate()
+	{
+		super.validate();	//validate the component normally
+		if(isPasswordVerified() && !isPasswordMatch())	//if we're verifying the password and it isn't valid
+		{
+			final Notification notification=new Notification(MESSAGE_PASSWORD_UNVERIFIED, Notification.Severity.ERROR);	//create an error notification
+			passwordControl.setNotification(notification);	//add the error notification to each password control
+			passwordVerificationControl.setNotification(notification);
+		}
+		return isValid();	//return the current valid state
+	}
+
 }

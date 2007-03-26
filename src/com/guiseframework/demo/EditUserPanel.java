@@ -132,7 +132,7 @@ public class EditUserPanel extends DefaultModalNavigationPanel<DemoUser>
 		super.validate();	//validate the component normally
 		if(!isPasswordMatch())	//if the password isn't valid
 		{
-			final Notification notification=new Notification("Passwords to not match", Notification.Severity.ERROR);	//create an error notification
+			final Notification notification=new Notification("Passwords do not match.", Notification.Severity.ERROR);	//create an error notification
 			passwordControl.setNotification(notification);	//add the error notification to each password control
 			passwordVerificationControl.setNotification(notification);
 		}

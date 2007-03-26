@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:guise="http://guiseframework.com/namespaces/guise#"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:resource="http://guiseframework.com/namespaces/resource#"
+>
+	<guise:Resources>
+		<dc:description>Default Guise™ Resources (en).</dc:description>
+		<dc:creator>Garret Wilson</dc:creator>
+
+		<!-- general Guise labels -->
+		<resource:error.label>Error</resource:error.label>
+	
+		<!-- Guise converters -->
+		<resource:converter.invalid.value.message>Invalid value: "{0}".</resource:converter.invalid.value.message>
+	
+		<!-- Guise validators -->
+		<resource:validator.value.required.message>Value required.</resource:validator.value.required.message>
+		<resource:validator.invalid.value.message>Invalid value: "{0}".</resource:validator.invalid.value.message>
+		<!-- general validation errors -->
+		<resource:validation.false.message>One or more values you entered are invalid.</resource:validation.false.message>
+
+
+		<!-- vCard -->
+		<resource:text.directory.vcard.family.name.label>Last</resource:text.directory.vcard.family.name.label>
+		<resource:text.directory.vcard.family.name.info>The last or family name. Separate multiple family names with commas.</resource:text.directory.vcard.family.name.info>
+		<resource:text.directory.vcard.given.name.label>First</resource:text.directory.vcard.given.name.label>
+		<resource:text.directory.vcard.given.name.info>The first or given name. Separate multiple given names with commas.</resource:text.directory.vcard.given.name.info>
+		<resource:text.directory.vcard.additional.name.label>Middle</resource:text.directory.vcard.additional.name.label>
+		<resource:text.directory.vcard.additional.name.info>The middle or additional name. Separate multiple additional names with commas.</resource:text.directory.vcard.additional.name.info>
+		<resource:text.directory.vcard.honorific.prefix.label>Prefix</resource:text.directory.vcard.honorific.prefix.label>
+		<resource:text.directory.vcard.honorific.prefix.info>Any honorific prefix. Separate multiple honorific prefixes with commas.</resource:text.directory.vcard.honorific.prefix.info>
+		<resource:text.directory.vcard.honorific.suffix.label>Suffix</resource:text.directory.vcard.honorific.suffix.label>
+		<resource:text.directory.vcard.honorific.suffix.info>Any honorific suffix. Separate multiple honorific suffixes with commas.</resource:text.directory.vcard.honorific.suffix.info>
+	
+	</guise:Resources>
+		
+</rdf:RDF>

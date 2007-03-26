@@ -20,15 +20,38 @@ import static com.guiseframework.theme.Theme.*;
 import com.guiseframework.validator.*;
 
 /**A card panel representing a sequence of cards.
-If any card has constraints of {@link TaskCardConstraints}, this class will update the task status based upon visited and validated status.
+If any card has constraints of {@link TaskCardConstraints}, this class will update the task state based upon visited and validated status.
 @author Garret Wilson
 @see CardLayout
 */
 public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> implements Commitable
 {
 
+	/**The bound property of the sequence state.*/
+	public final static String STATE_PROPERTY=getPropertyName(SequenceCardPanel.class, "state");
 	/**The bound property of whether the transitions are enabled.*/
 	public final static String TRANSITION_ENABLED_PROPERTY=getPropertyName(SequenceCardPanel.class, "transitionEnabled");
+
+	/**The current state of the sequence, or <code>null</code> if the sequence is not occurring.*/
+	private TaskState state=null;
+
+		/**@return The current state of the sequence, or <code>null</code> if the sequence is not occurring.*/
+		public TaskState getState() {return state;}
+
+		/**Sets the current state of the sequence.
+		This is a bound property.
+		@param newState The current state of the sequence, or <code>null</code> if the sequence is not occurring.
+		@see #STATE_PROPERTY
+		*/
+		protected void setState(final TaskState newState)
+		{
+			if(state!=newState)	//if the value is really changing
+			{
+				final TaskState oldState=state;	//get the current value
+				state=newState;	//update the value
+				firePropertyChange(STATE_PROPERTY, oldState, newState);
+			}
+		}
 
 	/**The current transition in the sequence, or <code>null</code> if no transition is occurring.*/
 	private SequenceTransition transition=null;
@@ -42,7 +65,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 		/**@return Whether transitions are enabled, so that changing selected cards will cause the appropriate validate/commit functionality.*/
 		public boolean isTransitionEnabled() {return transitionEnabled;}
 
-		/**Sets Whether transitions are enabled, so that changing selected cards will cause the appropriate validate/commit functionality.
+		/**Sets whether transitions are enabled, so that changing selected cards will cause the appropriate validate/commit functionality.
 		This is a bound property of type <code>Boolean</code>.
 		@param newTransitionEnabled <code>true</code> if transitions are enabled, so that changing selected cards will cause the appropriate validate/commit functionality.
 		@see #TRANSITION_ENABLED_PROPERTY
@@ -74,6 +97,12 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 
 		/**@return The prototype for the action to finish the sequence.*/
 		public ActionPrototype getFinishActionPrototype() {return finishActionPrototype;}
+
+	/**The prototype for the action to cancel the sequence.*/
+	private final ActionPrototype cancelActionPrototype;
+
+		/**@return The prototype for the action to cancel the sequence.*/
+		public ActionPrototype getCancelActionPrototype() {return cancelActionPrototype;}
 
 	/**The listener that ensures making a card displayed doesn't create an invalid gap in a sequence of valid cards.*/
 	private PropertyChangeListener cardDisplayedChangeListener=new AbstractGenericPropertyChangeListener<Boolean>()	//create a new display change listener
@@ -150,6 +179,17 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 						goFinish();	//finish the sequence
 					};
 				});
+			//cancel action prototype
+		cancelActionPrototype=new ActionPrototype();
+		cancelActionPrototype.setIcon(GLYPH_CANCEL);
+		cancelActionPrototype.setLabel(LABEL_CANCEL);
+		cancelActionPrototype.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(final ActionEvent actionEvent)	//if the cancel action is performed
+					{
+						goCancel();	//cancel the sequence
+					};
+				});
 		addVetoableChangeListener(VALUE_PROPERTY, new SequenceCardVetoableChangeListener());	//do validation as needed on card changes
 		addPropertyChangeListener(VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Component<?>>()
 				{
@@ -165,16 +205,16 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 								if(constraints instanceof TaskCardConstraints)
 								{
 									final TaskCardConstraints taskCardConstraints=(TaskCardConstraints)constraints;
-									if(taskCardConstraints.getTaskStatus()==TaskStatus.ERROR && oldCard.isValid())	//if there was an error but the old card is now valid
+									if(taskCardConstraints.getTaskState()==TaskState.ERROR && oldCard.isValid())	//if there was an error but the old card is now valid
 									{
-										taskCardConstraints.setTaskStatus(TaskStatus.INCOMPLETE);
+										taskCardConstraints.setTaskState(TaskState.INCOMPLETE);
 									}
 									final int oldIndex=indexOf(oldCard);	//get the index of the old card
 									assert oldIndex>=0 : "Expected old card to be present in the container.";
 									final int newIndex=indexOf(newCard);	//see what index the new value has
 									if(newIndex>oldIndex)	//if we advanced to a new card
 									{
-										taskCardConstraints.setTaskStatus(TaskStatus.COMPLETE);	//show that the old task is complete
+										taskCardConstraints.setTaskState(TaskState.COMPLETE);	//show that the old task is complete
 									}
 								}
 							}						
@@ -184,9 +224,9 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 								if(constraints instanceof TaskCardConstraints)
 								{
 									final TaskCardConstraints taskCardConstraints=(TaskCardConstraints)constraints;
-									if(taskCardConstraints.getTaskStatus()==null)
+									if(taskCardConstraints.getTaskState()==null)
 									{
-										taskCardConstraints.setTaskStatus(TaskStatus.INCOMPLETE);
+										taskCardConstraints.setTaskState(TaskState.INCOMPLETE);
 									}
 								}
 							}
@@ -233,9 +273,9 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 		if(constraints instanceof TaskCardConstraints)	//if these are task card constraints
 		{
 			final TaskCardConstraints taskCardConstraints=((TaskCardConstraints)constraints);	//get the constraints as task card constraints
-			if(taskCardConstraints.getTaskStatus()!=null)	//if the task is started
+			if(taskCardConstraints.getTaskState()!=null)	//if the task is started
 			{
-				taskCardConstraints.setTaskStatus(newValid ? TaskStatus.INCOMPLETE : TaskStatus.ERROR);	//update the task status based upon the new valid state
+				taskCardConstraints.setTaskState(newValid ? TaskState.INCOMPLETE : TaskState.ERROR);	//update the task status based upon the new valid state
 			}
 		}
 	}
@@ -487,6 +527,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	/**Finishes the sequence.
 	This method validates and commits the current card, and then calls {@link #finish()}.
 	If no card is selected, no action occurs.
+	The state is set to {@link TaskState#COMPLETE}.
 	*/
 	public void goFinish()
 	{
@@ -519,6 +560,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 										{
 											commit();	//commit this panel
 											finish();	//finish the sequence
+											setState(TaskState.COMPLETE);	//indicate that the sequence is finished
 										}
 										catch(final IOException ioException)	//if there is a problem commiting the result
 										{
@@ -537,7 +579,19 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 		}
 	}
 
-	/**Resets the sequence by navigating to the first card and disabling all subsequent cards.*/
+	/**Cancels the sequence.
+	This method calls {@link #cancel()}.
+	The state is set to {@link TaskState#CANCELED}.
+	*/
+	public void goCancel()
+	{
+		cancel();	//cancel the sequence
+		setState(TaskState.CANCELED);	//indicate that the sequence has been canceled
+	}
+
+	/**Resets the sequence by navigating to the first card and disabling all subsequent cards.
+	The state is set to {@link TaskState#INCOMPLETE}.
+	*/
 	public void resetSequence()
 	{
 		resetValue();	//reset the value so that changing the index won't trigger validation
@@ -561,13 +615,14 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 					((Enableable)constraints).setEnabled(card==selectedCard);	//only the selected card should be enabled
 				}
 			}
-		}		
+		}
+		setState(TaskState.INCOMPLETE);	//indicate that the sequence is started
 	}
 
 	/**Validates the user input of this component and all child components.
 	The component will be updated with error information.
 	If the component doesn't validate and there is a selected card the constraints of which implement {@link TaskCardConstraints}, the task status of those constraints will be
-		set to {@link TaskStatus#ERROR}.
+		set to {@link TaskState#ERROR}.
 	The user is also notified of any error, using this component's notification, the first notification in the selected card hierarchy, or a default message.
 	@return The current state of {@link #isValid()} as a convenience.
 	*/
@@ -582,7 +637,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 				final Constraints constraints=selectedCard.getConstraints();	//get the current card constraints
 				if(constraints instanceof TaskCardConstraints)	//if these are task card constraints
 				{
-					((TaskCardConstraints)constraints).setTaskStatus(TaskStatus.ERROR);	//set the task status to error
+					((TaskCardConstraints)constraints).setTaskState(TaskState.ERROR);	//set the task status to error
 				}
 				if(notification==null)	//if we don't have a notification
 				{
@@ -620,6 +675,13 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	This version does nothing.
 	*/
 	public void finish()
+	{
+	}
+
+	/**Cancels the sequence.
+	This version does nothing.
+	*/
+	public void cancel()
 	{
 	}
 

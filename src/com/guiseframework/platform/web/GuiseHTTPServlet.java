@@ -677,7 +677,12 @@ Debug.trace("got control events");
 //TODO del								entry.setFieldValue(Field.CLIENT_SERVER_METHOD_FIELD, request.getMethod());
 								entry.setFieldValue(Field.CLIENT_SERVER_URI_STEM_FIELD, rawPathInfo);
 //TODO del								final List<NameValuePair<String, String>> queryParameters=new ArrayList<NameValuePair<String, String>>();	//create an array of parameters
-								final StringBuilder queryParametersStringBuilder=new StringBuilder(request.getQueryString());	//create a new string builder for adding the query parameters, starting with the current query string
+								final StringBuilder queryParametersStringBuilder=new StringBuilder();	//create a new string builder for adding the query parameters
+								final String queryString=request.getQueryString();	//get the current query string
+								if(queryString!=null)	//if there is a query string
+								{
+									queryParametersStringBuilder.append(queryString);	//start with the current query string
+								}
 								if(queryParametersStringBuilder.length()>0)	//if we have an existing query string
 								{
 									queryParametersStringBuilder.append(QUERY_NAME_VALUE_PAIR_DELIMITER);	//append '&' to separate the old parameters from the new ones
@@ -1640,7 +1645,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	protected static Bookmark getBookmark(final HttpServletRequest request)
 	{
 		final String queryString=request.getQueryString();	//get the query string from the request
-		if(queryString!=null && queryString.length()>0)	//if there is a query string (Tomcat 5.5.16 returns an empty string for no query, even though the Java Servlet specification 2.4 says that it should return null)
+		if(queryString!=null && queryString.length()>0)	//if there is a query string (Tomcat 5.5.16 returns an empty string for no query, even though the Java Servlet specification 2.4 says that it should return null; this is fixed in Tomcat 6)
 		{
 //TODO del Debug.trace("just got query string from request, length", queryString.length(), "content", queryString);
 			return new Bookmark(String.valueOf(QUERY_SEPARATOR)+queryString);	//construct a new bookmark, preceding the string with a query indicator

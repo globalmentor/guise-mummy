@@ -64,11 +64,11 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 		};
 
 	/**The property change listener to listen for the card task status changing and reflect that value in the action.*/
-	private final GenericPropertyChangeListener<TaskStatus> taskStatusChangeListener=new AbstractGenericPropertyChangeListener<TaskStatus>()
+	private final GenericPropertyChangeListener<TaskState> taskStateChangeListener=new AbstractGenericPropertyChangeListener<TaskState>()
 		{
-			public void propertyChange(final GenericPropertyChangeEvent<TaskStatus> propertyChangeEvent)	//if the task status changes
+			public void propertyChange(final GenericPropertyChangeEvent<TaskState> propertyChangeEvent)	//if the task state changes
 			{
-				updateTaskStatus();	//update the task status based upon all the cards
+				updateTaskState();	//update the task state based upon all the cards
 			}
 		};
 
@@ -151,7 +151,7 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 				updateSelected();	//update the control selection based upon the selected card
 				updateDisplayed();	//update the displayed status based upon the selected card
 				updateEnabled();	//update the enabled status based upon the selected card
-				updateTaskStatus();	//update the task status based upon the selected card
+				updateTaskState();	//update the task state based upon the selected card
 			}			
 		}
 
@@ -196,7 +196,7 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 		}
 		if(constraints instanceof TaskCardConstraints)	//if the new constraints are task card constraints
 		{
-			constraints.addPropertyChangeListener(TaskCardConstraints.TASK_STATUS_PROPERTY, taskStatusChangeListener);	//listen for changes in task status 
+			constraints.addPropertyChangeListener(TaskCardConstraints.TASK_STATE_PROPERTY, taskStateChangeListener);	//listen for changes in task state 
 		}		
 	}
 
@@ -215,7 +215,7 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 		}
 		if(constraints instanceof TaskCardConstraints)	//if the old constraints were task card constraints
 		{
-			constraints.removePropertyChangeListener(TaskCardConstraints.TASK_STATUS_PROPERTY, taskStatusChangeListener);	//stop listening for changes in task status
+			constraints.removePropertyChangeListener(TaskCardConstraints.TASK_STATE_PROPERTY, taskStateChangeListener);	//stop listening for changes in task state
 		}
 	}
 
@@ -364,28 +364,28 @@ if(!cards.contains(selectedCard))
 	
 	/**Performs any needed updates based upon the current task status of the constraints of the connected cards.
 	This implementation uses the first available task status from the connected cards.
-	This method calls {@link #updateTaskStatus(TaskStatus)}.
+	This method calls {@link #updateTaskState(TaskState)}.
 	*/
-	protected void updateTaskStatus()
+	protected void updateTaskState()
 	{
-		TaskStatus taskStatus=null;
+		TaskState taskState=null;
 		for(final Component<?> card:cards)	//for each card
 		{
 			final Constraints constraints=card.getConstraints();	//get the card constraints, if any
-			if(constraints instanceof TaskCardConstraints)	//if the constraints indicate task status
+			if(constraints instanceof TaskCardConstraints)	//if the constraints indicate task state
 			{
-				taskStatus=((TaskCardConstraints)constraints).getTaskStatus();	//get the task status from the constraints
-				break;	//use the first available task status
+				taskState=((TaskCardConstraints)constraints).getTaskState();	//get the task state from the constraints
+				break;	//use the first available task state
 			}
 		}
-		updateTaskStatus(taskStatus);	//update the task status
+		updateTaskState(taskState);	//update the task state
 	}
 
-	/**Updates the current task status.
+	/**Updates the current task state.
 	This implementation does nothing.
-	@param taskStatus The new task status, or <code>null</code> if there is no task status.
+	@param taskState The new task state, or <code>null</code> if there is no task state.
 	*/
-	protected void updateTaskStatus(final TaskStatus taskStatus)
+	protected void updateTaskState(final TaskState taskState)
 	{
 	}
 

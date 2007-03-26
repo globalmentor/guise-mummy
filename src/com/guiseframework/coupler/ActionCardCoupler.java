@@ -13,8 +13,8 @@ When the action is initiated, the first displayed and enabled specified card wit
 When any of the the associated cards are selected, if the action implements {@link Selectable} the action will be selected.
 If the card's constraints implement {@link Displayable}, the action will be displayed based upon the card constraints' displayed status.
 If the card's constraints implement {@link Enableable}, the action will be enabled based upon the card constraints' enabled status.
-If a card's constraints implement {@link TaskCardConstraints} and the action implements {@link ActionValueControl} and represents a {@link TaskStatus} value,
-	the action's contained value will reflect any changes in the card constraints task status.
+If a card's constraints implement {@link TaskCardConstraints} and the action implements {@link ActionValueControl} and represents a {@link TaskState} value,
+	the action's contained value will reflect any changes in the card constraints task state.
 If the action implements {@link SelectActionControl} its auto-select status will be turned off when installed.
 This coupler is only functional when the given card is contained within a {@link CardControl}.
 @author Garret Wilson
@@ -74,7 +74,7 @@ public class ActionCardCoupler extends AbstractCardCoupler	//TODO now that const
 				updateSelected();	//update the control selection based upon the selected card
 				updateDisplayed();	//update the displayed status based upon the selected card
 				updateEnabled();	//update the enabled status based upon the selected card
-				updateTaskStatus();	//update the task status based upon the selected card
+				updateTaskState();	//update the task state based upon the selected card
 			}			
 		}
 
@@ -122,23 +122,23 @@ public class ActionCardCoupler extends AbstractCardCoupler	//TODO now that const
 		}
 	}
 
-	/**Updates the current task status.
-	If there is a connected action that implements {@link ActionValueControl} containing a {@link TaskStatus} value, the action's value will be updated.
+	/**Updates the current task state.
+	If there is a connected action that implements {@link ActionValueControl} containing a {@link TaskState} value, the action's value will be updated.
 	If no action is connected, no action occurs.
-	@param taskStatus The new task status, or <code>null</code> if there is no task status.
+	@param taskState The new task state, or <code>null</code> if there is no task state.
 	*/
 	@SuppressWarnings("unchecked")	//we check the type of value class contained in any ActionValueControl, so our cast is logically correct
-	protected void updateTaskStatus(final TaskStatus taskStatus)
+	protected void updateTaskState(final TaskState taskState)
 	{
 		final ActionControl<?> action=getAction();	//get the action
 		if(action instanceof ActionValueControl)	//if the action is also a value control
 		{
 			final ActionValueControl<?, ?> actionValueControl=(ActionValueControl<?, ?>)action;	//get the action as an action value control
-			if(TaskStatus.class.isAssignableFrom(actionValueControl.getValueClass()))	//if the action represents a task status
+			if(TaskState.class.isAssignableFrom(actionValueControl.getValueClass()))	//if the action represents a task state
 			{
 				try
 				{
-					((ActionValueControl<TaskStatus, ?>)actionValueControl).setValue(taskStatus);	//update the action with the new task status
+					((ActionValueControl<TaskState, ?>)actionValueControl).setValue(taskState);	//update the action with the new task state
 				}
 				catch(final PropertyVetoException propertyVetoException)
 				{
