@@ -1,6 +1,7 @@
 package com.guiseframework.component.text.directory.vcard;
 
 import java.beans.PropertyVetoException;
+import java.util.Collection;
 import java.util.Locale;
 
 import static com.garretwilson.text.FormatUtilities.*;
@@ -37,17 +38,17 @@ public class NamePanel extends AbstractPanel<NamePanel>
 		/**@return The additional name text field.*/
 		public TextControl<String> getAdditionalNameControl() {return additionalNameControl;}
 
-	/**The honorific prefix text field.*/
-	private final TextControl<String> honorificPrefixControl;
+	/**The honorific prefix list control.*/
+	private final ListControl<String> honorificPrefixControl;
 
-		/**@return The honorific prefix text field.*/
-		public TextControl<String> getHonorificPrefixControl() {return honorificPrefixControl;}
+		/**@return The honorific prefix list control.*/
+		public ListControl<String> getHonorificPrefixControl() {return honorificPrefixControl;}
 
-	/**The honorific suffix text field.*/
-	private final TextControl<String> honorificSuffixControl;
+	/**The honorific suffix list control.*/
+	private final ListControl<String> honorificSuffixControl;
 
-		/**@return The honorific suffix text field.*/
-		public TextControl<String> getHonorificSuffixControl() {return honorificSuffixControl;}
+		/**@return The honorific suffix list control.*/
+		public ListControl<String> getHonorificSuffixControl() {return honorificSuffixControl;}
 
 	/**The action for selecting the language of the name.*/
 //TODO fix	private final SelectLanguageAction selectLanguageAction;
@@ -66,8 +67,24 @@ public class NamePanel extends AbstractPanel<NamePanel>
 			familyNameControl.setValue(formatList(new StringBuilder(), VALUE_SEPARATOR_CHAR, name.getFamilyNames()).toString());
 			givenNameControl.setValue(formatList(new StringBuilder(), VALUE_SEPARATOR_CHAR, name.getGivenNames()).toString());
 			additionalNameControl.setValue(formatList(new StringBuilder(), VALUE_SEPARATOR_CHAR, name.getAdditionalNames()).toString());
-			honorificPrefixControl.setValue(formatList(new StringBuilder(), VALUE_SEPARATOR_CHAR, name.getHonorificPrefixes()).toString());
-			honorificSuffixControl.setValue(formatList(new StringBuilder(), VALUE_SEPARATOR_CHAR, name.getHonorificSuffixes()).toString());
+			final String[] honorificPrefixes=name.getHonorificPrefixes();	//get the existing values
+			for(final String honorifixPrefix:honorificPrefixes)	//for each existing value
+			{
+				if(!honorificPrefixControl.contains(honorifixPrefix))	//if the list doesn't contain this value
+				{
+					honorificPrefixControl.add(honorifixPrefix);	//add the value so that it can be selected
+				}
+			}
+			honorificPrefixControl.setSelectedValues(honorificPrefixes);	//select the correct values
+			final String[] honorificSuffixes=name.getHonorificSuffixes();	//get the existing values
+			for(final String honorifixSuffix:honorificSuffixes)	//for each existing value
+			{
+				if(!honorificPrefixControl.contains(honorifixSuffix))	//if the list doesn't contain this value
+				{
+					honorificPrefixControl.add(honorifixSuffix);	//add the value so that it can be selected
+				}
+			}
+			honorificSuffixControl.setSelectedValues(honorificSuffixes);	//select the correct values
 		//TODO fix		selectLanguageAction.setLocale(name.getLocale());
 		}
 		else	//if there is no name, clear the fields
@@ -84,17 +101,15 @@ public class NamePanel extends AbstractPanel<NamePanel>
 	/**@return An object representing the VCard name information entered, or <code>null</code> if no name was entered.*/
 	public Name getVCardName()
 	{
+			//get the values from the components
 		final String familyNameValue=familyNameControl.getValue();
 		final String givenNameValue=givenNameControl.getValue();
 		final String additionalNameValue=additionalNameControl.getValue();
-		final String honorificPrefixValue=honorificPrefixControl.getValue();
-		final String honorificSuffixValue=honorificSuffixControl.getValue();
-			//get the values from the components
 		final String[] familyNames=familyNameValue!=null ? familyNameValue.trim().split(String.valueOf(VALUE_SEPARATOR_CHAR)) : EMPTY_STRING_ARRAY;
 		final String[] givenNames=givenNameValue!=null ? givenNameValue.trim().split(String.valueOf(VALUE_SEPARATOR_CHAR)) : EMPTY_STRING_ARRAY;
 		final String[] additionalNames=additionalNameValue!=null ? additionalNameValue.trim().split(String.valueOf(VALUE_SEPARATOR_CHAR)) : EMPTY_STRING_ARRAY;
-		final String[] honorificPrefixes=honorificPrefixValue!=null ? honorificPrefixValue.trim().split(String.valueOf(VALUE_SEPARATOR_CHAR)) : EMPTY_STRING_ARRAY;
-		final String[] honorificSuffixes=honorificSuffixValue!=null ? honorificSuffixValue.trim().split(String.valueOf(VALUE_SEPARATOR_CHAR)) : EMPTY_STRING_ARRAY;
+		final String[] honorificPrefixes=honorificPrefixControl.getSelectedValues();
+		final String[] honorificSuffixes=honorificSuffixControl.getSelectedValues();
 //TODO fix		final Locale locale=selectLanguageAction.getLocale();
 		final Locale locale=null;
 			//if any part(s) of the name was given 
@@ -123,38 +138,42 @@ public class NamePanel extends AbstractPanel<NamePanel>
 		super(layout);	//construct the parent class
 
 			//honorific prefix
-		honorificPrefixControl=new TextControl<String>(String.class);
-		honorificPrefixControl.setLabel(createStringResourceReference("text.directory.vcard.honorific.prefix.label"));
-		honorificPrefixControl.setInfo(createStringResourceReference("text.directory.vcard.honorific.prefix.info"));
-		honorificPrefixControl.setColumnCount(4);
+		honorificPrefixControl=new ListControl<String>(String.class);
+		honorificPrefixControl.setRowCount(3);
+		honorificPrefixControl.setLabel(createStringResourceReference("text.directory.vcard.n.honorific.prefix.label"));
+		honorificPrefixControl.setInfo(createStringResourceReference("text.directory.vcard.n.honorific.prefix.info"));
+		final Collection<String> honoroficPrefixChoices=getSession().getResource("text.directory.vcard.n.honorific.prefix.choices");	//get choices from the resource
+		honorificPrefixControl.addAll(honoroficPrefixChoices);	//add the choices to the list control
 		add(honorificPrefixControl);
 
 			//family name
 		givenNameControl=new TextControl<String>(String.class);
-		givenNameControl.setLabel(createStringResourceReference("text.directory.vcard.given.name.label"));
-		givenNameControl.setInfo(createStringResourceReference("text.directory.vcard.given.name.info"));
+		givenNameControl.setLabel(createStringResourceReference("text.directory.vcard.n.given.name.label"));
+		givenNameControl.setInfo(createStringResourceReference("text.directory.vcard.n.given.name.info"));
 		givenNameControl.setColumnCount(8);
 		add(givenNameControl);
 
 			//additional name
 		additionalNameControl=new TextControl<String>(String.class);
-		additionalNameControl.setLabel(createStringResourceReference("text.directory.vcard.additional.name.label"));
-		additionalNameControl.setInfo(createStringResourceReference("text.directory.vcard.additional.name.info"));
+		additionalNameControl.setLabel(createStringResourceReference("text.directory.vcard.n.additional.name.label"));
+		additionalNameControl.setInfo(createStringResourceReference("text.directory.vcard.n.additional.name.info"));
 		additionalNameControl.setColumnCount(8);
 		add(additionalNameControl);
 	
 			//family name
 		familyNameControl=new TextControl<String>(String.class);
-		familyNameControl.setLabel(createStringResourceReference("text.directory.vcard.family.name.label"));
-		familyNameControl.setInfo(createStringResourceReference("text.directory.vcard.family.name.info"));
+		familyNameControl.setLabel(createStringResourceReference("text.directory.vcard.n.family.name.label"));
+		familyNameControl.setInfo(createStringResourceReference("text.directory.vcard.n.family.name.info"));
 		familyNameControl.setColumnCount(8);
 		add(familyNameControl);
 	
 			//honorific suffix
-		honorificSuffixControl=new TextControl<String>(String.class);
-		honorificSuffixControl.setLabel(createStringResourceReference("text.directory.vcard.honorific.suffix.label"));
-		honorificSuffixControl.setInfo(createStringResourceReference("text.directory.vcard.honorific.suffix.info"));
-		honorificSuffixControl.setColumnCount(4);
+		honorificSuffixControl=new ListControl<String>(String.class);
+		honorificSuffixControl.setRowCount(3);
+		honorificSuffixControl.setLabel(createStringResourceReference("text.directory.vcard.n.honorific.suffix.label"));
+		honorificSuffixControl.setInfo(createStringResourceReference("text.directory.vcard.n.honorific.suffix.info"));
+		final Collection<String> honoroficSuffixChoices=getSession().getResource("text.directory.vcard.n.honorific.suffix.choices");	//get choices from the resource
+		honorificSuffixControl.addAll(honoroficSuffixChoices);	//add the choices to the list control
 		add(honorificSuffixControl);
 	
 	

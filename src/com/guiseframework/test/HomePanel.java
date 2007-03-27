@@ -404,7 +404,7 @@ Debug.trace("list control changed value to", newValue);
 						multiplicationTable.setLabelText("Multiplication Table");	//give the table a label
 */
 
-					  final DefaultOptionDialogFrame myDialog=new DefaultOptionDialogFrame(DefaultOptionDialogFrame.Option.OK);    //show the OK button
+					  final NotificationOptionDialogFrame myDialog=new NotificationOptionDialogFrame(Notification.Option.OK);    //show the OK button
 						final Heading heading=new Heading(0);
 
 						heading.setLabel("Delete Dialog");

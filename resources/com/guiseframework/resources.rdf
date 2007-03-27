@@ -23,16 +23,31 @@
 
 
 		<!-- vCard -->
-		<resource:text.directory.vcard.family.name.label>Last</resource:text.directory.vcard.family.name.label>
-		<resource:text.directory.vcard.family.name.info>The last or family name. Separate multiple family names with commas.</resource:text.directory.vcard.family.name.info>
-		<resource:text.directory.vcard.given.name.label>First</resource:text.directory.vcard.given.name.label>
-		<resource:text.directory.vcard.given.name.info>The first or given name. Separate multiple given names with commas.</resource:text.directory.vcard.given.name.info>
-		<resource:text.directory.vcard.additional.name.label>Middle</resource:text.directory.vcard.additional.name.label>
-		<resource:text.directory.vcard.additional.name.info>The middle or additional name. Separate multiple additional names with commas.</resource:text.directory.vcard.additional.name.info>
-		<resource:text.directory.vcard.honorific.prefix.label>Prefix</resource:text.directory.vcard.honorific.prefix.label>
-		<resource:text.directory.vcard.honorific.prefix.info>Any honorific prefix. Separate multiple honorific prefixes with commas.</resource:text.directory.vcard.honorific.prefix.info>
-		<resource:text.directory.vcard.honorific.suffix.label>Suffix</resource:text.directory.vcard.honorific.suffix.label>
-		<resource:text.directory.vcard.honorific.suffix.info>Any honorific suffix. Separate multiple honorific suffixes with commas.</resource:text.directory.vcard.honorific.suffix.info>
+		<resource:text.directory.vcard.n.family.name.label>Last</resource:text.directory.vcard.n.family.name.label>
+		<resource:text.directory.vcard.n.family.name.info>The last or family name. Separate multiple family names with commas.</resource:text.directory.vcard.n.family.name.info>
+		<resource:text.directory.vcard.n.given.name.label>First</resource:text.directory.vcard.n.given.name.label>
+		<resource:text.directory.vcard.n.given.name.info>The first or given name. Separate multiple given names with commas.</resource:text.directory.vcard.n.given.name.info>
+		<resource:text.directory.vcard.n.additional.name.label>Middle</resource:text.directory.vcard.n.additional.name.label>
+		<resource:text.directory.vcard.n.additional.name.info>The middle or additional name. Separate multiple additional names with commas.</resource:text.directory.vcard.n.additional.name.info>
+		<resource:text.directory.vcard.n.honorific.prefix.label>Prefix</resource:text.directory.vcard.n.honorific.prefix.label>
+		<resource:text.directory.vcard.n.honorific.prefix.info>Any honorific prefix. Separate multiple honorific prefixes with commas.</resource:text.directory.vcard.n.honorific.prefix.info>
+		<resource:text.directory.vcard.n.honorific.prefix.choices rdf:parseType="Collection">
+			<rdf:Description rdf:value="Dr."/>
+			<rdf:Description rdf:value="Miss."/>
+			<rdf:Description rdf:value="Mr."/>
+			<rdf:Description rdf:value="Mrs."/>
+			<rdf:Description rdf:value="Ms."/>
+			<rdf:Description rdf:value="Prof."/>
+		</resource:text.directory.vcard.n.honorific.prefix.choices>
+		<resource:text.directory.vcard.n.honorific.suffix.label>Suffix</resource:text.directory.vcard.n.honorific.suffix.label>
+		<resource:text.directory.vcard.n.honorific.suffix.info>Any honorific suffix. Separate multiple honorific suffixes with commas.</resource:text.directory.vcard.n.honorific.suffix.info>
+		<resource:text.directory.vcard.n.honorific.suffix.choices rdf:parseType="Collection">
+			<rdf:Description rdf:value="I"/>
+			<rdf:Description rdf:value="II"/>
+			<rdf:Description rdf:value="III"/>
+			<rdf:Description rdf:value="Jr."/>
+			<rdf:Description rdf:value="Sr."/>
+		</resource:text.directory.vcard.n.honorific.suffix.choices>
 	
 	</guise:Resources>
 		

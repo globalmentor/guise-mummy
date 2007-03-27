@@ -6,7 +6,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Principal;
-import java.text.MessageFormat;
 import java.util.*;
 import static java.util.Collections.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -44,9 +43,7 @@ import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.text.CharacterConstants.*;
 import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static com.garretwilson.text.FormatUtilities.*;
-import static com.garretwilson.text.TextUtilities.*;
 import static com.garretwilson.text.xml.XMLUtilities.*;
-import static com.guiseframework.GuiseResourceConstants.*;
 import static com.guiseframework.Resources.*;
 
 /**An abstract implementation that keeps track of the components of a user session.
@@ -128,7 +125,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		private DocumentBuilder getDocumentBuilder() {return documentBuilder;}
 
 	/**The cache of components keyed to component destinations.*/
-	private final Map<ComponentDestination, Component> destinationComponentMap=synchronizedMap(new HashMap<ComponentDestination, Component>());
+	private final Map<ComponentDestination, Component<?>> destinationComponentMap=synchronizedMap(new HashMap<ComponentDestination, Component<?>>());
 
 	/**The user local environment.*/
 	private GuiseEnvironment environment;
@@ -712,7 +709,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	*/
 	public Component<?> getDestinationComponent(final ComponentDestination destination)
 	{
-		Component component;	//we'll store the component here, either a cached component or a created component
+		Component<?> component;	//we'll store the component here, either a cached component or a created component
 		synchronized(destinationComponentMap)	//don't allow the map to be modified while we access it
 		{
 			component=destinationComponentMap.get(destination);	//get cached component, if any
@@ -763,9 +760,9 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@return The created component.
 	@exception IllegalStateException if the component class does not provide a default constructor, is an interface, is abstract, or throws an exception during instantiation.
 	*/
-	protected Component<?> createComponent(final Class<? extends Component> componentClass)
+	protected Component<?> createComponent(final Class<? extends Component<?>> componentClass)
 	{
-		Component component;	//we'll store the component here
+		Component<?> component;	//we'll store the component here
 		try
 		{
 //TODO del			Debug.trace("***ready to create component for class", componentClass);
@@ -1514,17 +1511,52 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		}
 */
 	}	
-	
-	/**Notifies the user of the given notification information.
-	This is a convenience method that delegates to {@link #notify(Notification, Runnable)}.
-	@param notification The notification information to relay.
+
+	/**Notifies the user of one or more notifications to be presented in sequence.
+	This is a convenience method that delegates to {@link #notify(Runnable, Notification...)}.
+	@param notifications One or more notification informations to relay.
+	@exception NullPointerException if the given notifications is <code>null</code>.
+	@exception IllegalArgumentException if no notifications are given.
 	*/
-	public void notify(final Notification notification)
+	public void notify(final Notification... notifications)
 	{
-		notify(notification, null);	//notify the user with no post-notification action
+		notify(null, notifications);	//perform the notifications with no ending logic
+	}
+
+	/**Notifies the user of one or more notifications to be presented in sequence, with optional logic to be executed after all notifications have taken place.
+	If the selected option to any notification is fatal, the specified logic will not be performed.
+	This method delegates to {@link #notify(Notification, Runnable)}.
+	@param notifications One or more notification informations to relay.
+	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
+	@exception NullPointerException if the given notifications is <code>null</code>.
+	@exception IllegalArgumentException if no notifications are given.
+	*/
+	public void notify(final Runnable afterNotify, final Notification... notifications)
+	{
+		if(checkInstance(notifications, "Notifications cannot be null.").length==0)	//if no notifications were given
+		{
+			throw new IllegalArgumentException("No notifications were given.");
+		}
+		final Runnable enumerateNotifications=new Runnable()	//create code for notifying all notifications, including the extra one we were given
+		{
+			private int notificationIndex=0;	//start at the first notification
+			public void run()	//each time this logic is executed
+			{
+				if(notificationIndex<notifications.length)	//if there are more notifications
+				{
+					AbstractGuiseSession.this.notify(notifications[notificationIndex++], this);	//notify of the current notification (advancing to the next one), specifying that this runnable should be called again
+				}
+				else if(afterNotify!=null)	//if we're out of notifications and there's something we're supposed to run after all notifications are done
+				{
+					afterNotify.run();	//run whatever logic we're supposed to execute after notifications
+				}
+			}
+		};
+		enumerateNotifications.run();	//start enumerating the notifications
 	}
 
 	/**Notifies the user of the given notification information, with optional logic to be executed after notification takes place.
+	If the selected option is fatal, the specified logic will not be performed.
 	@param notification The notification information to relay.
 	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
 	*/
@@ -1541,10 +1573,11 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		}
 		final Text text=new Text();	//create a new text component
 		text.setText(notification.getMessage());	//set the text, which may include a resource reference
-		final DefaultOptionDialogFrame optionDialogFrame=new DefaultOptionDialogFrame(text, DefaultOptionDialogFrame.Option.OK);	//create a dialog with an OK button
+		final List<Notification.Option> notificationOptions=notification.getOptions();	//get the notification options
+		final NotificationOptionDialogFrame optionDialogFrame=new NotificationOptionDialogFrame(text, notificationOptions.toArray(new Notification.Option[notificationOptions.size()]));	//create a dialog with the notification options
 		final String severityResourceKeyName=getResourceKeyName(severity);	//get the resource key name of the severity TODO actually create a method		
-		optionDialogFrame.setLabel(createStringResourceReference(MessageFormat.format(Notification.Severity.LABEL_RESOURCE_KEY_FORMAT_PATTERN, severityResourceKeyName)));	//set the label based upon the severity
-		optionDialogFrame.setIcon(createURIResourceReference(MessageFormat.format(Notification.Severity.GLYPH_RESOURCE_KEY_FORMAT_PATTERN, severityResourceKeyName)));	//set the icon based upon the severity
+		optionDialogFrame.setLabel(severity.getLabel());	//set the label based upon the severity
+		optionDialogFrame.setIcon(severity.getGlyph());	//set the icon based upon the severity
 		optionDialogFrame.setPreferredWidth(new Extent(0.33, Extent.Unit.RELATIVE));	//set the preferred dimensions
 		optionDialogFrame.setPreferredHeight(new Extent(0.33, Extent.Unit.RELATIVE));
 		optionDialogFrame.open(new AbstractGenericPropertyChangeListener<Frame.Mode>()	//show the dialog and listen for the frame closing
@@ -1553,30 +1586,45 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 					{
 						if(genericPropertyChangeEvent.getNewValue()==null && afterNotify!=null)	//if the dialog is now nonmodal and there is logic that should take place after notification
 						{
-							afterNotify.run();	//run the code that takes place after notification
+							final Notification.Option option=optionDialogFrame.getValue();	//get the selected option, if any
+							if(option==null || !option.isFatal())	//if a fatal option wasn't selected
+							{
+								afterNotify.run();	//run the code that takes place after notification
+							}
 						}
 					}
 				}
 		);
 	}
 
-	/**Notifies the user of the given error.
-	This is a convenience method that delegates to {@link #notify(Throwable, Runnable)}.
-	@param error The error with which to notify the user.
+	/**Notifies the user of the given errors in sequence.
+	This is a convenience method that delegates to {@link #notify(Runnable, Throwable...)}.
+	@param errors The errors with which to notify the user.
+	@exception NullPointerException if the given errors is <code>null</code>.
+	@exception IllegalArgumentException if no errors are given.
 	*/
-	public void notify(final Throwable error)
-	{
-		notify(error, null);	//notify the user with no post-notification action
+	public void notify(final Throwable... errors)
+	{		
+		notify(null, errors);	//notify the user with no post-notification action
 	}
 
-	/**Notifies the user of the given error, with optional logic to be executed after notification takes place..
-	This is a convenience method that delegates to {@link #notify(Notification, Runnable)}.
+	/**Notifies the user of the given error in sequence, with optional logic to be executed after notification takes place.
+	If the selected option to any notification is fatal, the specified logic will not be performed.
+	This is a convenience method that delegates to {@link #notify(Runnable, Notification...)}.
 	@param error The error with which to notify the user.
 	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
+	@exception NullPointerException if the given errors is <code>null</code>.
+	@exception IllegalArgumentException if no errors are given.
 	*/
-	public void notify(final Throwable error, final Runnable afterNotify)
+	public void notify(final Runnable afterNotify, final Throwable... errors)
 	{
-		notify(new Notification(error), afterNotify);	//notify the user with a notification of the error
+		final int errorCount=checkInstance(errors, "Errors cannot be null").length;	//see how many errors there are (we'll let the other methods check for a non-empty array)
+		final Notification[] notifications=new Notification[errorCount];	//create an array of as many notifications as are errors
+		for(int i=0; i<errorCount; ++i)	//for each error
+		{
+			notifications[i]=new Notification(errors[i]);	//create a new notification for this error
+		}
+		notify(afterNotify, notifications);	//notify the user with the notifications of the errors
 	}
 
 	/**Resolves a string by replacing any string references with a string from the resources.

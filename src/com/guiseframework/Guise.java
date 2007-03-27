@@ -31,7 +31,7 @@ public final class Guise
 	public final static String GUISE_PUBLIC_RESOURCE_BASE_KEY="pub/";
 
 	/**The identifier of this build.*/
-	public final static String BUILD_ID="2007-03-22";
+	public final static String BUILD_ID="2007-03-26";
 
 		//Guise ontology
 	

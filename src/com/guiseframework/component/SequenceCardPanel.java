@@ -1,16 +1,16 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ClassUtilities.getPropertyName;
-import static com.guiseframework.GuiseResourceConstants.*;
-
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
 import java.io.IOException;
 import java.util.List;
 
 import com.garretwilson.beans.*;
+import static com.garretwilson.lang.ClassUtilities.*;
 import com.garretwilson.util.Debug;
+
 import com.guiseframework.Bookmark;
+import static com.guiseframework.GuiseResourceConstants.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.ActionEvent;
 import com.guiseframework.event.ActionListener;
@@ -462,36 +462,34 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	//				TODO del Debug.trace("card validated");
 							//show any notifications, anyway
 						final List<Notification> notifications=getNotifications(selectedCard);	//get the notifications from the card
-						final Runnable notifyCommitAdvance=new Runnable()	//create code for notifying, committing the card and advancing to the next card
+						final Runnable valueSetter=new Runnable()	//create code for notifying, committing the card and advancing to the next card
 								{
-									/**Keep track of which notification we're on.*/
-									private int notificationIndex=0;
 									public void run()
 									{
-										if(notificationIndex<notifications.size())	//if there are more notifications
+										try
 										{
-											getSession().notify(notifications.get(notificationIndex++), this);	//notify of the current notification (advancing to the next one), specifying that this runnable should be called again
+											setValue(nextCard);	//select the next card
 										}
-										else	//if we are out of notifications
+										catch(final PropertyVetoException propertyVetoException)	//if the change is vetoed, don't do anything special
 										{
-											try
-											{
-	//										TODO del Debug.trace("ready to set next card");
-												setValue(nextCard);	//select the next card
-											}
-											catch(final PropertyVetoException propertyVetoException)	//if the change is vetoed, don't do anything special
-											{
-	//										TODO del Debug.warn(propertyVetoException);
-											}
-											finally
-											{
-												transition=oldTransition;	//restore the old transition (usually null)
-											}
+//										TODO del Debug.warn(propertyVetoException);
+										}
+										finally
+										{
+											transition=oldTransition;	//restore the old transition (usually null)
 										}
 									}
 								};
 	//						TODO del Debug.trace("ready to do notify/commit/advance");
-						notifyCommitAdvance.run();	//run the notify/commit/advance runnable for as many notifications as there are
+						final int notificationCount=notifications.size();	//see how many notifications there are
+						if(notificationCount>0)	//if there is at least one notification
+						{
+							getSession().notify(valueSetter, notifications.toArray(new Notification[notifications.size()]));	//do the notification, followed by the value setting
+						}
+						else	//if there are no notifications
+						{
+							valueSetter.run();	//change the value right away with no notifications
+						}
 					}
 					else	//if the card didn't validate
 					{
@@ -544,32 +542,31 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 				{
 						//show any notifications, anyway
 					final List<Notification> notifications=getNotifications(selectedCard);	//get the notifications from the card
-					final Runnable notifyCommitAdvance=new Runnable()	//create code for notifying, committing the card and advancing to the next card
+					final Runnable finisher=new Runnable()	//create code for committing and finishing
 							{
-								/**Keep track of which notification we're on.*/
-								private int notificationIndex=0;
 								public void run()
 								{
-									if(notificationIndex<notifications.size())	//if there are more notifications
+									try
 									{
-										getSession().notify(notifications.get(notificationIndex++), this);	//notify of the current notification (advancing to the next one), specifying that this runnable should be called again
+										commit();	//commit this panel
+										finish();	//finish the sequence
+										setState(TaskState.COMPLETE);	//indicate that the sequence is finished
 									}
-									else	//if we are out of notifications
+									catch(final IOException ioException)	//if there is a problem commiting the result
 									{
-										try
-										{
-											commit();	//commit this panel
-											finish();	//finish the sequence
-											setState(TaskState.COMPLETE);	//indicate that the sequence is finished
-										}
-										catch(final IOException ioException)	//if there is a problem commiting the result
-										{
-											getSession().notify(new Notification(ioException));	//notify the user
-										}
+										getSession().notify(new Notification(ioException));	//notify the user
 									}
 								}
 							};
-					notifyCommitAdvance.run();	//run the notify/commit/advance runnable for as many notifications as there are
+					final int notificationCount=notifications.size();	//see how many notifications there are
+					if(notificationCount>0)	//if there is at least one notification
+					{
+						getSession().notify(finisher, notifications.toArray(new Notification[notifications.size()]));	//do the notification, followed by finishing
+					}
+					else	//if there are no notifications
+					{
+						finisher.run();	//finish right away with no notifications
+					}
 				}
 			}
 		}

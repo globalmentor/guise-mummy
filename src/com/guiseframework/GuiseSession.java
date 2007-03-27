@@ -3,20 +3,29 @@ package com.guiseframework;
 import java.io.*;
 import java.net.URI;
 import java.security.Principal;
+import java.text.MessageFormat;
 import java.util.*;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.event.PostponedEvent;
+import com.garretwilson.util.Debug;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.event.*;
+import com.guiseframework.geometry.Extent;
 import com.guiseframework.model.InformationLevel;
 import com.guiseframework.model.Notification;
 import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
 
 import static com.garretwilson.lang.ClassUtilities.*;
+import static com.garretwilson.lang.ObjectUtilities.checkInstance;
+import static com.guiseframework.Resources.createStringResourceReference;
+import static com.guiseframework.Resources.createURIResourceReference;
+import static com.guiseframework.Resources.getResourceKeyName;
 
 /**Represents a session with a user.
 A Swing-based client application may have only one session, while a web server application will likely have multiple sessions.
@@ -186,6 +195,31 @@ public interface GuiseSession extends PropertyBindable
 	@see #getURIResource(String, URI)
 	*/
 	public ResourceBundle getResourceBundle();
+
+	/**Retrieves an object resource from the resource bundle.
+	Every resource access method should eventually call this method.
+	This is a preferred convenience method for accessing the resources in the session's resource bundle.
+	This method involves an implicit cast that will throw a class cast exception after the method ends if the resource is not of the expected type.
+	@param resourceKey The key of the resource to retrieve.
+	@return The resource associated with the specified resource key.
+	@exception NullPointerException if the provided resource key is <code>null</code>.
+	@exception MissingResourceException if no resource could be found associated with the given key.
+	@see #getResourceBundle()
+	@see #getResource(String, Object)
+	*/
+	public <T> T getResource(final String resourceKey) throws MissingResourceException;
+
+	/**Retrieves an object resource from the resource bundle, using a specified default if no such resource is available.
+	This is a preferred convenience method for accessing the resources in the session's resource bundle.
+	This method involves an implicit cast that will throw a class cast exception after the method ends if the resource is not of the expected type.
+	@param resourceKey The key of the resource to retrieve.
+	@param defaultValue The default value to use if there is no resource associated with the given key.
+	@return The resource associated with the specified resource key or the default if none is available.
+	@exception NullPointerException if the provided resource key is <code>null</code>.
+	@see #getResourceBundle()
+	@see #getResource(String)
+	*/
+	public <T> T getResource(final String resourceKey, final T defaultValue) throws MissingResourceException;
 
 	/**Retrieves a string resource from the resource bundle.
 	If the resource cannot be found in the resource bundle, it will be loaded from the application's resources, if possible,
@@ -610,30 +644,48 @@ public interface GuiseSession extends PropertyBindable
 	*/
 	public void log(final InformationLevel level, final String subject, final String predicate, final String object, final Map<?, ?> parameters, final CharSequence comment);
 
-	/**Notifies the user of the given notification information.
-	This is a convenience method that delegates to {@link #notify(Notification, Runnable)}.
-	@param notification The notification information to relay.
+	/**Notifies the user of one or more notifications to be presented in sequence.
+	This is a convenience method that delegates to {@link #notify(Runnable, Notification...)}.
+	@param notifications One or more notification informations to relay.
+	@exception NullPointerException if the given notifications is <code>null</code>.
+	@exception IllegalArgumentException if no notifications are given.
 	*/
-	public void notify(final Notification notification);
+	public void notify(final Notification... notifications);
+
+	/**Notifies the user of one or more notifications to be presented in sequence, with optional logic to be executed after all notifications have taken place.
+	If the selected option to any notification is fatal, the specified logic will not be performed.
+	This method delegates to {@link #notify(Notification, Runnable)}.
+	@param notifications One or more notification informations to relay.
+	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
+	@exception NullPointerException if the given notifications is <code>null</code>.
+	@exception IllegalArgumentException if no notifications are given.
+	*/
+	public void notify(final Runnable afterNotify, final Notification... notifications);
 
 	/**Notifies the user of the given notification information, with optional logic to be executed after notification takes place.
+	If the selected option is fatal, the specified logic will not be performed.
 	@param notification The notification information to relay.
 	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
 	*/
 	public void notify(final Notification notification, final Runnable afterNotify);
 
-	/**Notifies the user of the given error.
-	This is a convenience method that delegates to {@link #notify(Throwable, Runnable)}.
-	@param error The error with which to notify the user.
+	/**Notifies the user of the given errors in sequence.
+	This is a convenience method that delegates to {@link #notify(Runnable, Throwable...)}.
+	@param errors The errors with which to notify the user.
+	@exception NullPointerException if the given errors is <code>null</code>.
+	@exception IllegalArgumentException if no errors are given.
 	*/
-	public void notify(final Throwable error);
+	public void notify(final Throwable... errors);
 
-	/**Notifies the user of the given error, with optional logic to be executed after notification takes place..
-	This is a convenience method that delegates to {@link #notify(Notification, Runnable)}.
+	/**Notifies the user of the given error in sequence, with optional logic to be executed after notification takes place.
+	If the selected option to any notification is fatal, the specified logic will not be performed.
+	This is a convenience method that delegates to {@link #notify(Runnable, Notification...)}.
 	@param error The error with which to notify the user.
 	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
+	@exception NullPointerException if the given errors is <code>null</code>.
+	@exception IllegalArgumentException if no errors are given.
 	*/
-	public void notify(final Throwable error, final Runnable afterNotify);
+	public void notify(final Runnable afterNotify, final Throwable... errors);
 
 	/**Resolves a string by replacing any string references with a string from the resources.
 	A string reference begins with the Start of String control character (U+0098) and ends with a String Terminator control character (U+009C).

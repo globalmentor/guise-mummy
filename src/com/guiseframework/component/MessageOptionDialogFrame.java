@@ -2,13 +2,13 @@ package com.guiseframework.component;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.geometry.Extent;
+import com.guiseframework.model.Notification;
 
 /**An option dialog frame displaying a message.
 @author Garret Wilson
 */
-public class MessageOptionDialogFrame extends DefaultOptionDialogFrame
+public class MessageOptionDialogFrame extends NotificationOptionDialogFrame
 {
 
 	/**The message displayed in the frame.*/
@@ -22,7 +22,7 @@ public class MessageOptionDialogFrame extends DefaultOptionDialogFrame
 	@param options The available options.
 	@exception NullPointerException if the given options is <code>null</code>.
 	*/
-	public MessageOptionDialogFrame(final Option... options)
+	public MessageOptionDialogFrame(final Notification.Option... options)
 	{
 		this((String)null, options);	//construct the component with no message				
 	}
@@ -33,7 +33,7 @@ public class MessageOptionDialogFrame extends DefaultOptionDialogFrame
 	@param options The available options.
 	@exception NullPointerException if the given options is <code>null</code>.
 	*/
-	public MessageOptionDialogFrame(final String message, final Option... options)
+	public MessageOptionDialogFrame(final String message, final Notification.Option... options)
 	{
 		this(createMessage(message), options);	//construct the component with a default message model
 	}
@@ -60,7 +60,7 @@ public class MessageOptionDialogFrame extends DefaultOptionDialogFrame
 	@param options The available options.
 	@exception NullPointerException if the given message component, and/or options is <code>null</code>.
 	*/
-	public MessageOptionDialogFrame(final Message messageComponent, final Option... options)
+	public MessageOptionDialogFrame(final Message messageComponent, final Notification.Option... options)
 	{
 		super(messageComponent, options);	//construct the parent class
 		this.message=checkInstance(messageComponent, "Message component cannot be null");

@@ -58,7 +58,7 @@ public class AuthorizeUsersPanel extends DefaultNavigationPanel
 					{
 						final MessageOptionDialogFrame messageDialog=new MessageOptionDialogFrame(	//create a new message dialog
 								"The use of AJAX in Guise makes the \"Apply\" button unnecessary, because changes take place live. This button would only be useful if AJAX were disabled.",
-								MessageOptionDialogFrame.Option.OK);	//show the OK button
+								Notification.Option.OK);	//show the OK button
 						messageDialog.setLabel("Note on the \"Apply\" button.");	//set the message dialog label
 						messageDialog.open(true);	//open the dialog modally
 					}

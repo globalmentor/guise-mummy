@@ -97,14 +97,14 @@ public class AbstractRDFResourceTreeNodeRepresentationStrategy<V extends RDFReso
 			stringBuilder.append('[').append(getXMLGenerator().getLabel(value.getReferenceURI())).append(']');  //append "[referenceURI]" label
 			hasPredicateToken=true;	//show that we have something to represent the predicate
 		}
-		final RDFLiteral literalValue=getValue(value);	//get the literal rdf:value property value, if there is one
-		if(literalValue!=null)	//if this resource has a literal value
+		final RDFObject literalValue=getValue(value);	//get the rdf:value property value, if there is one
+		if(literalValue instanceof RDFLiteral)	//if this resource has a literal value
 		{
 			if(hasProperty && !hasPredicateToken) //if we had a property but no predicate representation
 				stringBuilder.append(':'); //append a colon to separate the property from the rest
 			if(hasPredicateToken) //if we had something to represent the predicate
 				stringBuilder.append(' '); //append a space to separate the rest
-			stringBuilder.append('{').append(literalValue.getLexicalForm()).append('}');  //append "{lexicalForm}" label
+			stringBuilder.append('{').append(((RDFLiteral)literalValue).getLexicalForm()).append('}');  //append "{lexicalForm}" label
 			hasPredicateToken=true;	//show that we have something to represent the predicate				
 		}
 		return stringBuilder;	//return the string builder
