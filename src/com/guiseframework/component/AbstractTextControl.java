@@ -294,7 +294,7 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 							{
 								status=Status.ERROR;	//the invalid value has already been committed, so mark it as an error
 							}
-							else	//if the invalid valud isn't equal to the current value
+							else	//if the invalid value isn't equal to the current value
 							{
 								status=Status.WARNING;	//the invalid value hasn't been committed; mark it as a warning
 							}

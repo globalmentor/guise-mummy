@@ -20,30 +20,26 @@ public abstract class AbstractComparableRangeValidator<V extends Comparable<V>> 
 		super(minimum, maximum, step, valueRequired);	//construct the parent class
 	}
 
-	/**Determines whether a given value is within the specified range.
-	This version delgates to the super class version to determine whether <code>null</code> values are allowed.
+	/**Determines whether a given value is valid is within the specified range.
 	This version checks for minimum and maximum compliance, and delegates to {@link #isValidStep(Number, Number, Number)} for checking step compliance.
 	Child classes will normally not override this class and instead merely implement {@link #isValidStep(Number, Number, Number)}.
-	@param value The value to validate.
-	@return <code>true</code> if the value falls meets the range requirements and fulfills the required requirement, if any, else <code>false</code>.
+	@param value The value to validate, which may be <code>null</code>.
+	@exception ValidationException if the provided value is not valid.
 	*/
-	public boolean isValid(final V value)
+	public void validate(final V value) throws ValidationException
 	{
-		if(!super.isValid(value))	//if the value doesn't pass the default tests
-		{
-			return false;	//the value isn't valid
-		}
+		super.validate(value);	//do the default validation
 		if(value!=null)	//if there is a value (the super class has already checked for null compliance)
 		{
 			final V minimum=getMinimum();	//get the minimum value
 			if(minimum!=null && minimum.compareTo(value)>0)	//if the value is too small
 			{
-				return false;	//the value is too low
+				throwInvalidValueValidationException(value);	//the value is too low TODO add a custom error message, now that we can
 			}
 			final V maximum=getMaximum();	//get the maximum value
 			if(maximum!=null && maximum.compareTo(value)<0)	//if the value is too large
 			{
-				return false;	//the value is too high
+				throwInvalidValueValidationException(value);	//the value is too high TODO add a custom error message, now that we can
 			}
 			final V step=getStep();	//get the step value
 			if(step!=null)	//if a step is provided
@@ -51,11 +47,10 @@ public abstract class AbstractComparableRangeValidator<V extends Comparable<V>> 
 				final V base=minimum!=null ? minimum : (maximum!=null ? maximum : null);	//determine the base
 				if(!isValidStep(value, step, base))	//if the value is not a valid step away from the base
 				{
-					return false;	//the value is off step
+					throwInvalidValueValidationException(value);	//the value is off step TODO add a custom error message, now that we can
 				}
 			}
 		}
-		return true;	//the value passed all tests
 	}
 
 	/**Determines whether the given value falls on the correct step amount relative to the base value.

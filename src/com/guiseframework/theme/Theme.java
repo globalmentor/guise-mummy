@@ -149,4 +149,6 @@ public class Theme extends ClassTypedRDFResource
 	public final static String MESSAGE_PASSWORD_INVALID=createStringResourceReference("theme.message.password.invalid");
 	public final static String MESSAGE_PASSWORD_UNVERIFIED=createStringResourceReference("theme.message.password.unverified");
 	public final static String MESSAGE_USER_INVALID=createStringResourceReference("theme.message.user.invalid");
+	public final static String MESSAGE_USER_EXISTS=createStringResourceReference("theme.message.user.exists");
+	
 }

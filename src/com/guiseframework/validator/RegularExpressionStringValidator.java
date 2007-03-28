@@ -2,6 +2,8 @@ package com.guiseframework.validator;
 
 import java.util.regex.Pattern;
 
+import static com.garretwilson.lang.ObjectUtilities.*;
+
 /**A string validator that can validate against regular expressions.
 @author Garret Wilson
 */
@@ -14,7 +16,7 @@ public class RegularExpressionStringValidator extends AbstractRegularExpressionV
 	*/
 	public RegularExpressionStringValidator(final String regularExpression)
 	{
-		super(regularExpression);	//construct the parent class
+		this(regularExpression, false);	//construct the class without requiring a value
 	}
 
 	/**Constructs a string regular expression validator from a regular expression string.
@@ -24,7 +26,7 @@ public class RegularExpressionStringValidator extends AbstractRegularExpressionV
 	*/
 	public RegularExpressionStringValidator(final String regularExpression, final boolean valueRequired)
 	{
-		super(regularExpression, valueRequired);	//construct the parent class
+		this(Pattern.compile(checkInstance(regularExpression, "Regular expression cannot be null.")), valueRequired);	//compile the regular expression into a pattern and construct the class
 	}
 
 	/**Constructs a string regular expression validator from a regular expression pattern, without requiring a non-<code>null</code> value.
@@ -33,7 +35,7 @@ public class RegularExpressionStringValidator extends AbstractRegularExpressionV
 	*/
 	public RegularExpressionStringValidator(final Pattern pattern)
 	{
-		super(pattern);	//construct the parent class
+		this(pattern, false);	//construct the class without requiring a value
 	}
 
 	/**Constructs a string regular expression validator from a regular expression pattern.

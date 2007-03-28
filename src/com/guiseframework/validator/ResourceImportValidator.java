@@ -182,19 +182,16 @@ public class ResourceImportValidator extends AbstractValidator<ResourceImport>
 
 	/**Determines whether a given resource import meets the provided criteria.
 	This version delgates to the super class version to determine whether <code>null</code> values are allowed.
-	@param resourceImport The resource import to validate.
-	@return <code>true</code> if the resource import meets the criteria of this validator, else <code>false</code>.
+	@param resourceImport The resource import to validate, which may be <code>null</code>.
+	@exception ValidationException if the provided value is not valid.
 	@see #getAcceptedContentTypes()
 	@see #getAcceptedExtensions()
 	@see #getMaxContentLength()
 	*/
-	public boolean isValid(final ResourceImport resourceImport)
+	public void validate(final ResourceImport resourceImport) throws ValidationException
 	{
 Debug.trace("ready to validate resource import", resourceImport);
-		if(!super.isValid(resourceImport))	//if resource import doesn't pass the default checks (e.g. the value isn't present but is required)
-		{
-			return false;	//the resource import didn't pass the basic checks
-		}
+		super.validate(resourceImport);	//do the default validation
 		final Set<ContentType> acceptedContentTypes=getAcceptedContentTypes();	//get the accepted content types
 		if(acceptedContentTypes!=null)	//if we need to check the content types
 		{
@@ -211,7 +208,7 @@ Debug.trace("ready to validate resource import", resourceImport);
 			}
 			if(!isContentTypeMatch)	//if there was no content type match
 			{
-				return false;	//the resource import didn't pass the content type test
+				throwInvalidValueValidationException(resourceImport);	//the resource import didn't pass the content type test TODO add a custom message
 			}
 		}
 		final Set<String> acceptedExtensions=getAcceptedExtensions();	//get the accepted extensions
@@ -230,7 +227,7 @@ Debug.trace("ready to validate resource import", resourceImport);
 			}
 			if(!isExtensionMatch)	//if there was no extension match
 			{
-				return false;	//the resource import didn't pass the extension test
+				throwInvalidValueValidationException(resourceImport);	//the resource import didn't pass the extension test TODO add a custom message
 			}
 		}
 		final long maxContentLength=getMaxContentLength();	//get the maximum content length
@@ -239,10 +236,9 @@ Debug.trace("ready to validate resource import", resourceImport);
 			final long resourceContentLength=resourceImport.getContentLength();	//get the content length of the resource
 			if(resourceContentLength<0 && resourceContentLength>maxContentLength)	//if the resource content length is not within the allowed range
 			{
-				return false;	//the resource import didn't have an allowed size
+				throwInvalidValueValidationException(resourceImport);	//the resource import didn't have an allowed size TODO add a custom message
 			}
 		}
-		return true;	//indicate that the resource import passed all the validation tests
 	}
 
 	/**Retrieves a string representation of the given value appropriate for error messages.

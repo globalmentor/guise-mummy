@@ -71,7 +71,6 @@ public class PasswordAuthenticationPanel extends AbstractPanel<PasswordAuthentic
 		usernameControl=new TextControl<String>(String.class);	//create the username text control
 		usernameControl.setLabel(LABEL_USERNAME);	//set the username control label
 		usernameControl.setIcon(GLYPH_USER);	//set the username control icon
-		usernameControl.setValidator(new RegularExpressionStringValidator(".+", true));	//require at least a single character
 		add(usernameControl);	//add the ID control to the panel
 
 			//password
@@ -79,7 +78,6 @@ public class PasswordAuthenticationPanel extends AbstractPanel<PasswordAuthentic
 		passwordControl.setLabel(LABEL_PASSWORD);	//set the password control label
 		passwordControl.setIcon(GLYPH_PASSWORD);	//set the password control icon
 		passwordControl.setMasked(true);	//mask the password input
-		passwordControl.setValidator(new RegularExpressionCharArrayValidator(".+", true));	//require at least a single character
 		add(passwordControl);	//add the password control to the panel
 
 			//password verification
@@ -87,7 +85,6 @@ public class PasswordAuthenticationPanel extends AbstractPanel<PasswordAuthentic
 		passwordVerificationControl.setLabel(LABEL_PASSWORD);	//set the password verification control label
 		passwordVerificationControl.setIcon(GLYPH_PASSWORD);	//set the password verification control icon
 		passwordVerificationControl.setMasked(true);	//mask the password verification input
-		passwordVerificationControl.setValidator(new RegularExpressionCharArrayValidator(".+", true));	//require at least a single character
 		add(passwordVerificationControl);	//add the password verification control to the panel
 
 		update();	//update the state of the password verification control based upon our password verification setting
@@ -108,6 +105,20 @@ public class PasswordAuthenticationPanel extends AbstractPanel<PasswordAuthentic
 		usernameControl.setValue(username);
 	}
 
+	/**@return The validator for the username, or <code>null</code> if no validator is installed.*/
+	public Validator<String> getUsernameValidator()
+	{
+		return usernameControl.getValidator();
+	}
+
+	/**Sets the username validator.
+	@param newValidator The validator for the username, or <code>null</code> if no validator should be used.
+	*/
+	public void setUsernameValidator(final Validator<String> newValidator)
+	{
+		usernameControl.setValidator(newValidator);
+	}
+
 	/**@return The current password entered, or <code>null</code> if there is no password entered.*/
 	public char[] getPassword()
 	{
@@ -121,6 +132,21 @@ public class PasswordAuthenticationPanel extends AbstractPanel<PasswordAuthentic
 	public void setPassword(final char[] password) throws PropertyVetoException
 	{
 		passwordControl.setValue(password);
+	}
+
+	/**@return The validator for the password, or <code>null</code> if no validator is installed.*/
+	public Validator<char[]> getPasswordValidator()
+	{
+		return passwordControl.getValidator();
+	}
+
+	/**Sets the password validator.
+	@param newValidator The validator for the password, or <code>null</code> if no validator should be used.
+	*/
+	public void setPasswordValidator(final Validator<char[]> newValidator)
+	{
+		passwordControl.setValidator(newValidator);
+		passwordVerificationControl.setValidator(newValidator);	//install the validator into both password controls
 	}
 
 	/**Updates the state of the controls based upon current property settings.*/

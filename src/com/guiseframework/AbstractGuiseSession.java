@@ -1579,7 +1579,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		optionDialogFrame.setLabel(severity.getLabel());	//set the label based upon the severity
 		optionDialogFrame.setIcon(severity.getGlyph());	//set the icon based upon the severity
 		optionDialogFrame.setPreferredWidth(new Extent(0.33, Extent.Unit.RELATIVE));	//set the preferred dimensions
-		optionDialogFrame.setPreferredHeight(new Extent(0.33, Extent.Unit.RELATIVE));
+//TODO del		optionDialogFrame.setPreferredHeight(new Extent(0.33, Extent.Unit.RELATIVE));
 		optionDialogFrame.open(new AbstractGenericPropertyChangeListener<Frame.Mode>()	//show the dialog and listen for the frame closing
 				{
 					public void propertyChange(final GenericPropertyChangeEvent<Frame.Mode> genericPropertyChangeEvent)	//listen for the dialog mode changing

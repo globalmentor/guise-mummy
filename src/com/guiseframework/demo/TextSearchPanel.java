@@ -156,16 +156,13 @@ public class TextSearchPanel extends DefaultNavigationPanel
 			super(false);	//don't require non-null values
 		}
 
-		/**Determines whether a given regular expression value is syntactically correct.
+		/**Checks whether a given regular expression value is syntactically correct.
 		@param value The value to validate.
-		@return <code>true</code> if the string is a valid regular expression, else <code>false</code>.
+		@exception ValidationException if the provided value is not valid.
 		*/
-		public boolean isValid(final String value)
+		public void validate(final String value) throws ValidationException
 		{
-			if(!super.isValid(value))	//if this value doesn't pass the default checks (including checking for null if need be)
-			{
-				return false;	//report that the value isn't valid				
-			}
+			super.validate(value);	//perform the default validation, checking for null and throwing an exception if a value was required
 			if(value!=null)	//if a non-null value is given
 			{
 				try
@@ -174,11 +171,9 @@ public class TextSearchPanel extends DefaultNavigationPanel
 				}
 				catch(final PatternSyntaxException patternSyntaxException)	//if there was a syntax error
 				{
-					return false;	//the value is invalid
+					throwInvalidValueValidationException(value);	//indicate that the value was invalid
 				}
 			}
-			return true;	//indicate that the regular expression is either null or syntactically correct
 		}
-
 	}
 }

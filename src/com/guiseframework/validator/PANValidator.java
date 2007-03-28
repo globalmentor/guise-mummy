@@ -4,12 +4,9 @@ import static java.util.Collections.*;
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-import com.garretwilson.iso.idcard.IDCard;
-import com.garretwilson.iso.idcard.PAN;
-import com.garretwilson.iso.idcard.Product;
+import com.garretwilson.iso.idcard.*;
 import com.garretwilson.util.ArrayUtilities;
 
 /**A validator to validate a Primary Account Number (PAN) of an identification card
@@ -91,34 +88,30 @@ public class PANValidator extends AbstractValidator<PAN>
 		this.validProducts=unmodifiableSet(validProductSet);	//save the set of valid products
 	}
 
-	/**Determines whether a given PAN represents one of the supported products and is the correct length.
-	This version delgates to the super class version to determine whether <code>null</code> values are allowed.
+	/**Checks whether a given value is valid, and throws an exception if not.
+	This version determines whether a given PAN represents one of the supported products and is the correct length.
 	@param value The value to validate.
-	@return <code>true</code> if the PAN represents an allowed product and has the correct length.
+	@exception ValidationException if the provided value is not valid.
 	*/
-	public boolean isValid(final PAN value)
+	public void validate(final PAN value) throws ValidationException
 	{
-		if(!super.isValid(value))	//if the value doesn't pass the default checks
-		{
-			return false; //the PAN isn't valid
-		}
-		if(value!=null)	//if the value isn't null
+		super.validate(value);	//do the default validation
+		if(value!=null)	//if the value passed default validation checks and isn't null
 		{
 			final Product product=IDCard.getProduct(value);	//get the product for this PAN
 			if(product==null)	//if we don't know the product
 			{
-				return false;	//the PAN isn't valid to us
+				throwInvalidValueValidationException(value);	//the PAN isn't valid to us TODO create specific message
 			}
 			if(!validProducts.contains(product))	//if this isn't a supported product
 			{
-				return false;	//this isn't one of the values we accept
+				throwInvalidValueValidationException(value);	//this isn't one of the values we accept TODO create specific message
 			}
 			if(!ArrayUtilities.contains(product.getPANLengths(), value.toString().length()))	//if this product doesn't accept this PAN length
 			{
-				return false;	//indicate that the PAN is invalid for this product
+				throwInvalidValueValidationException(value);	//indicate that the PAN is invalid for this product TODO create specific message
 			}
 		}
-		return true;	//the PAN passed all tests
 	}
 
 }

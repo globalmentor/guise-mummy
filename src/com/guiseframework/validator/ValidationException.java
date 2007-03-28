@@ -1,7 +1,11 @@
 package com.guiseframework.validator;
 
+import com.guiseframework.Resources;
+
 /**Exception class for a validation error.
+The stored message may be a resource reference, which will be resolved at a later time when needed.
 @author Garret Wilson
+@see Resources#createStringResourceReference(String)
 */
 public class ValidationException extends Exception
 {
