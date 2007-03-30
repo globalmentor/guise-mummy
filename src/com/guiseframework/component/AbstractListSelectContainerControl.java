@@ -92,7 +92,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	@param layout The layout definition for the container.
 	@exception NullPointerException if the given layout is <code>null</code>.
 	*/
-	protected AbstractListSelectContainerControl(final AbstractValueLayout layout)
+	protected AbstractListSelectContainerControl(final AbstractValueLayout<?> layout)
 	{
 		super(layout);	//construct the parent class
 		this.valueRepresentationStrategy=COMPONENT_REPRESENTATION_STRATEGY;	//use the shared component representation strategy
@@ -160,7 +160,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	*/ 
 	protected boolean determineChildrenValid()
 	{
-		final Component selectedComponent=getValue();	//get the selected card
+		final Component<?> selectedComponent=getValue();	//get the selected card
 		return selectedComponent==null || selectedComponent.isValid();	//the children will only be invalid if the selected card is invalid
 	}
 
@@ -170,7 +170,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	*/
 	public boolean validateChildren()
 	{
-		final Component selectedComponent=getValue();	//get the selected card
+		final Component<?> selectedComponent=getValue();	//get the selected card
 		return selectedComponent!=null ? selectedComponent.validate() : false;	//only validate the selected card if there is one
 	}
 	

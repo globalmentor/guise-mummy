@@ -4,6 +4,7 @@ import com.garretwilson.beans.PropertyBindable;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.Component;
 import com.guiseframework.component.Container;
+import com.guiseframework.component.LayoutComponent;
 
 /**Contains layout information for a container.
 @param <T> The type of layout constraints associated with each component.
@@ -17,8 +18,8 @@ public interface Layout<T extends Constraints> extends PropertyBindable
 	/**@return The Guise session that owns this layout.*/
 	public GuiseSession getSession();
 
-	/**@return The container that owns this layout, or <code>null</code> if this layout has not been installed into a container.*/
-	public Container<?> getContainer();
+	/**@return The layout component that owns this layout, or <code>null</code> if this layout has not been installed into a layout component.*/
+	public LayoutComponent<?> getOwner();
 
 	/**@return The class representing the type of constraints appropriate for this layout.*/
 	public Class<? extends T> getConstraintsClass();
@@ -28,12 +29,12 @@ public interface Layout<T extends Constraints> extends PropertyBindable
 	A layout cannot be given a container if it is already installed in another container. Once a layout is installed in a container, it cannot be uninstalled.
 	A layout cannot be given a container unless that container already recognizes this layout as its layout.
 	If a layout is given the same container it already has, no action occurs.
-	@param newContainer The new container for this layout.
+	@param newLayoutComponent The new container for this layout.
 	@exception NullPointerException if the given container is <code>null</code>.
 	@exception IllegalStateException if a different container is provided and this layout already has a container.
 	@exception IllegalArgumentException if a different container is provided and the given container does not already recognize this layout as its layout.
 	*/
-	public void setContainer(final Container<?> newContainer);
+	public void setOwner(final LayoutComponent<?> newLayoutComponent);
 
 	/**Adds a component to the layout.
 	Called immediately after a component is added to the associated container.

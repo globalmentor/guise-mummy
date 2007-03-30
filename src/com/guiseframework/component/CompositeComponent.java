@@ -13,8 +13,8 @@ public interface CompositeComponent<C extends CompositeComponent<C>> extends Com
 	/**@return An iterable to child components.*/
 	public Iterable<Component<?>> getChildren();
 
-	/**@return The number of child components in this composite component.*/
-	public int size();
+	/**@return The number of child components.*/
+//TODO add if needed	public int getChildCount();
 
 	/**Retrieves the child component with the given ID.
 	@param id The ID of the component to return.

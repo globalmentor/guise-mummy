@@ -3,6 +3,7 @@ package com.guiseframework.component;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import java.util.*;
+import static java.util.Collections.*;
 
 /**A composite component that represents the state of its child components.
 @param <T> The type of object being represented.
@@ -13,11 +14,17 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 {
 
 	/**The map of component state for each object.*/
-	private final Map<T, S> componentStateMap=new HashMap<T, S>();
+	private final Map<T, S> componentStateMap=synchronizedMap(new HashMap<T, S>());
 
 	/**@return An iterable of component states.*/
-	protected Iterable<S> getComponentStates() {return componentStateMap.values();}	//return the component state values TODO make thread safe
-
+	protected Iterable<S> getComponentStates()
+	{
+		synchronized(componentStateMap)	//don't allow the map to be modified while we access it
+		{
+			return new ArrayList<S>(componentStateMap.values());	//copy the component state values and return them
+		}
+	}
+	
 	/**Retrieves a component state for the given object.
 	@param object The object for which a representation component should be returned.
 	@return The state of the child component to represent the given object, or <code>null</code> if there is no component for the given object.
@@ -36,13 +43,17 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 	@see #createComponentState(Object)
 	@see #putComponentState(Object, com.guiseframework.component.AbstractCompositeStateComponent.ComponentState)
 	*/
-	protected S determineComponentState(final T object)	//TODO make thread-safe
+	protected S determineComponentState(final T object)
 	{
-		S componentState=getComponentState(object);	//get the component state for this object
-		if(componentState==null)	//if there is no component state
+		S componentState;	//we'll find a component state and store it here
+		synchronized(componentStateMap)	//don't allow the map to be modified while we access it
 		{
-			componentState=createComponentState(object);	//create a new component state for the object
-			putComponentState(object, componentState);	//store the component state in the map for next time			
+			componentState=getComponentState(object);	//get the component state for this object
+			if(componentState==null)	//if there is no component state
+			{
+				componentState=createComponentState(object);	//create a new component state for the object
+				putComponentState(object, componentState);	//store the component state in the map for next time			
+			}
 		}
 		return componentState;	//return the component state
 	}
@@ -96,6 +107,29 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 	protected Component<?> getComponent(final T object)
 	{
 		return determineComponentState(object).getComponent();	//get the component stored in the component state, creating one if needed
+	}
+
+	/**Retrieves the object for the given component.
+	@param component The child component representing an object.
+	@param object The object for which a representation component should be returned.
+	@return The object the child component represents.
+	@exception NullPointerException if the given component is <code>null</code>.
+	@exception IllegalArgumentException if the given component does not represent any object.
+	*/
+	protected T getObject(final Component<?> component)
+	{
+		checkInstance(component, "Component cannot be null.");
+		synchronized(componentStateMap)	//don't allow the map to be modified while we access it
+		{
+			for(final Map.Entry<T, S> componentStateEntry:componentStateMap.entrySet())	//for all the map entries
+			{
+				if(componentStateEntry.getValue().getComponent()==component)	//if we found the component
+				{
+					return componentStateEntry.getKey();	//return the object being represented
+				}
+			}
+		}
+		throw new IllegalArgumentException("Component "+component+" not representing any object.");
 	}
 
 	/**Creates a component state to represent the given object.

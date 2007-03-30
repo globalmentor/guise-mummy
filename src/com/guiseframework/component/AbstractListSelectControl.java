@@ -1,8 +1,10 @@
 package com.guiseframework.component;
 
 import java.beans.PropertyVetoException;
+import java.lang.reflect.*;
 import java.util.*;
 
+import static com.garretwilson.lang.ClassUtilities.*;
 import com.guiseframework.converter.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
@@ -72,7 +74,7 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 		return new ValueComponentState(valueComponent);	//create a new component state for the value's component and metadata
 	}
 
-	/**List select model, and value representation strategy constructor.
+	/**List select model and value representation strategy constructor.
 	@param listSelectModel The component list select model.
 	@param valueRepresentationStrategy The strategy to create controls to represent this model's values.
 	@exception NullPointerException if the given list select model and/or value representation strategy is <code>null</code>.
@@ -591,20 +593,90 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 		}
 	}
 
-	/**A default list select value representation strategy.
-	A label component will be generated containing the default string representation of a value.
+	/**A list select value representation strategy that creates a component by converting the value to a label model.
+	The specified component class must have a constructor that takes a single {@link LabelModel} as an argument.
 	@param <VV> The type of value the strategy is to represent.
-	@see Label
 	@author Garret Wilson
 	*/
-	public static class DefaultValueRepresentationStrategy<VV> implements ValueRepresentationStrategy<VV>
+	public static class ConverterLabelModelValueRepresentationStrategy<VV> implements ValueRepresentationStrategy<VV>
 	{
-
+	
 		/**The converter to use for displaying the value as a string.*/
 		private final Converter<VV, String> converter;
 			
 			/**@return The converter to use for displaying the value as a string.*/
 			public Converter<VV, String> getConverter() {return converter;}
+
+		/**The component constructor that takes a single {@link LabelModel} argument.*/
+		private final Constructor<? extends Component<?>> componentLabelModelConstructor;
+
+		/**Value class constructor with a default converter.
+		This implementation uses a {@link DefaultStringLiteralConverter}.
+		@param valueClass The class indicating the type of value to convert.
+		@param componentClass The class of component to create.
+		@exception NullPointerException if the given value class and/or component class is <code>null</code>.
+		@exception IllegalArgumentException if the given component class does not have a constructor with a single {@link LabelModel} constructor.
+		*/
+		public ConverterLabelModelValueRepresentationStrategy(final Class<VV> valueClass, final Class<? extends Component<?>> componentClass)
+		{
+			this(componentClass, AbstractStringLiteralConverter.getInstance(valueClass));	//construct the class with the appropriate string literal converter
+		}
+
+		/**Converter constructor.
+		@param converter The converter to use for displaying the value as a string.
+		@param componentClass The class of component to create.
+		@exception NullPointerException if the given converter is <code>null</code>.
+		@exception IllegalArgumentException if the given component class does not have a constructor with a single {@link LabelModel} constructor.
+		*/
+		public ConverterLabelModelValueRepresentationStrategy(final Class<? extends Component<?>> componentClass, final Converter<VV, String> converter)
+		{
+			this.converter=checkInstance(converter, "Converter cannot be null.");	//save the converter
+			componentLabelModelConstructor=getCompatibleConstructor(checkInstance(componentClass, "Component class cannot be null."), LabelModel.class);	//get the constructor for the component
+			if(componentLabelModelConstructor==null)	//if there is no appropriate constructor
+			{
+				throw new IllegalArgumentException("Component class "+componentClass+" has no constructor with a single label model parameter.");
+			}
+		}
+
+		/**Creates a component for the given list value.
+		This implementation constructs a component from a label model that converts the value using the saved converter.
+		@param model The model containing the value.
+		@param value The value for which a component should be created.
+		@param index The index of the value within the list, or -1 if the value is not in the list (e.g. for representing no selection).
+		@param selected <code>true</code> if the value is selected.
+		@param focused <code>true</code> if the value has the focus.
+		@return A new component to represent the given value.
+		@see #getConverter()
+		*/
+		public Component<?> createComponent(final ListSelectModel<VV> model, final VV value, final int index, final boolean selected, final boolean focused)
+		{
+			try
+			{
+				return componentLabelModelConstructor.newInstance(new ValueConverterLabelModel<VV>(value, getConverter()));	//create a component that will convert the value to a string in a label model
+			}
+			catch(final InstantiationException instantiationException)
+			{
+				throw new AssertionError(instantiationException);
+			}
+			catch(final IllegalAccessException illegalAccessException)
+			{
+				throw new AssertionError(illegalAccessException);
+			}
+			catch(final InvocationTargetException invocationTargetException)
+			{
+				throw new AssertionError(invocationTargetException);
+			}
+		}
+	}
+	
+	/**A default list select value representation strategy that creates a {@link Label}.
+	A label component will be generated containing the default string representation of a value.
+	@param <VV> The type of value the strategy is to represent.
+	@see Label
+	@author Garret Wilson
+	*/
+	public static class DefaultValueRepresentationStrategy<VV> extends ConverterLabelModelValueRepresentationStrategy<VV>
+	{
 
 		/**Value class constructor with a default converter.
 		This implementation uses a {@link DefaultStringLiteralConverter}.
@@ -622,11 +694,11 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 		*/
 		public DefaultValueRepresentationStrategy(final Converter<VV, String> converter)
 		{
-			this.converter=checkInstance(converter, "Converter cannot be null.");	//save the converter
+			super(Label.class, converter);	//use a label to represent values
 		}
 
 		/**Creates a component for the given list value.
-		This implementation returns a label with the string value of the given value using the saved converter.
+		This version uses covariant types to specify that a {@link Label} is returned. 
 		@param model The model containing the value.
 		@param value The value for which a component should be created.
 		@param index The index of the value within the list, or -1 if the value is not in the list (e.g. for representing no selection).
@@ -637,8 +709,9 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 		*/
 		public Label createComponent(final ListSelectModel<VV> model, final VV value, final int index, final boolean selected, final boolean focused)
 		{
-			return new Label(new ValueConverterLabelModel<VV>(value, getConverter()));	//create a label that will convert the value to a string
+			return (Label)super.createComponent(model, value, index, selected, focused);	//construct the component normally and cast it to a Label
 		}
+
 	}
 
 }

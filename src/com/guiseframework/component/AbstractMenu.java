@@ -251,13 +251,21 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 	/**Adds a child component.
 	If this component is itself a menu, this version closes that menu. 
 	@param component The component to add to this component.
+	@return <code>true</code> if the child components changed as a result of the operation.
 	*/
-	protected void addComponent(final Component<?> component)
+	protected boolean addComponent(final Component<?> component)
 	{
-		super.addComponent(component);	//do the default adding
-		if(component instanceof Menu)	//if the component is a menu
+		if(super.addComponent(component))	//do the default adding; if a change occurred
 		{
-			((Menu<?>)component).setOpen(false);	//close the child menu
+			if(component instanceof Menu)	//if the component is a menu
+			{
+				((Menu<?>)component).setOpen(false);	//close the child menu
+			}
+			return true;	//indicate that the child components changed
+		}
+		else	//if the component list did not change
+		{
+			return false;	//indicate that the chidl components did not change
 		}
 	}
 

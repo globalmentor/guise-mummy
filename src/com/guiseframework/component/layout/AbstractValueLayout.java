@@ -8,6 +8,7 @@ import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.Debug;
 import com.guiseframework.component.Component;
 import com.guiseframework.component.Container;
+import com.guiseframework.component.LayoutComponent;
 import com.guiseframework.model.*;
 import com.guiseframework.validator.*;
 
@@ -15,6 +16,7 @@ import static com.guiseframework.GuiseResourceConstants.*;
 import static com.guiseframework.model.AbstractValueModel.createPropertyVetoException;
 
 /**A layout that manages the selection of child components, only one of which can be selected at a time.
+A value layout can only be used with a {@link Container} as its owner.
 The layout maintains its own value model that maintains the current selected component.
 If a child component implements {@link Activeable} the child component is set as active when selected and set as inactive when the child component is unselected.
 @param <T> The type of layout constraints associated with each component.
@@ -55,7 +57,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 				final Component<?> selectedComponent=getValue();	//get the selected component
 				if(selectedComponent!=null)	//if a component is selected, we'll need to update the selected index
 				{
-					final int newSelectedIndex=getContainer().indexOf(selectedComponent);	//update the selected index with the index in the container of the selected component
+					final int newSelectedIndex=getOwner().indexOf(selectedComponent);	//update the selected index with the index in the container of the selected component
 					assert newSelectedIndex>=0 : "Selected component "+selectedComponent+" is not in the container.";
 					if(isSettingValue)	//we're setting the value, return the selected index without updating the variable, as a VetoablePropertyListener might be calling this method before the value is actually changed, so we want to leave the selected index uncached until after the value is actually changed
 					{
@@ -79,7 +81,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 		*/
 		public void setSelectedIndex(final int newIndex) throws PropertyVetoException
 		{
-			final Container<?> container=getContainer();	//get the layout's container
+			final Container<?> container=getOwner();	//get the layout's container
 			if(container==null)	//if we haven't been installed into a container
 			{
 				throw new IllegalStateException("Layout does not have container.");
@@ -130,7 +132,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 		super.removeComponent(component);	//remove the component normally
 		if(component==getValue())	//if the selected component was removed
 		{
-			final Container<?> container=getContainer();	//get our container
+			final Container<?> container=getOwner();	//get our container
 			final int selectedIndex=container.indexOf(component);	//find the current index of the component that is being removed
 			final int containerSize=container.size();	//find out how many components are in the container
 			final int newSelectedComponentIndex;	//we'll determine the new selected index (that is, the index of the new selected component in this current state; it won't be the new selected index after removal)
@@ -152,6 +154,26 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 			}
 		}
 		this.selectedIndex=-1;	//always uncache the selected index, because the index of the selected component might have changed
+	}
+
+	/**@return The container that owns this layout, or <code>null</code> if this layout has not been installed into a container.*/
+	public Container<?> getOwner() {return (Container<?>)super.getOwner();}
+
+	/**Sets the container that owns this layout
+	This method is managed by containers, and normally should not be called by applications.
+//TODO del		A layout cannot be given a container if it is already installed in another container. Once a layout is installed in a container, it cannot be uninstalled.
+	A layout cannot be given a container if it is already installed in another container.
+	A layout cannot be given a container unless that container already recognizes this layout as its layout.
+	If a layout is given the same container it already has, no action occurs.
+	@param newOwner The new container for this layout.
+//TODO del		@exception NullPointerException if the given container is <code>null</code>.
+	@exception IllegalStateException if a different container is provided and this layout already has a container.
+	@exception ClassCastException if the given layout component is not a {@link Container}.
+	@exception IllegalArgumentException if a different container is provided and the given container does not already recognize this layout as its layout.
+	*/
+	public void setOwner(final LayoutComponent<?> newOwner)
+	{
+		super.setOwner((Container<?>)newOwner);	//make sure the new owner is a container
 	}
 
 	/**Default constructor.*/
@@ -188,7 +210,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 		final Component<?> oldValue=getValue();	//get the old value
 		if(!ObjectUtilities.equals(oldValue, newValue))	//if a new component is given
 		{
-			final Container<?> container=getContainer();	//get the layout's container
+			final Container<?> container=getOwner();	//get the layout's container
 			if(container==null)	//if we haven't been installed into a container
 			{
 				throw new IllegalStateException("Layout does not have container.");

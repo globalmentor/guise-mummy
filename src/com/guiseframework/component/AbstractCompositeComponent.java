@@ -77,27 +77,43 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	/**Adds a child component.
 	This version installs a listener for the component's valid status.
 	Any class that overrides this method must call this version.
+	The return value from this version has no significance.
 	@param component The component to add to this component.
+	@return <code>true</code> if the child components changed as a result of the operation.
+	@exception IllegalArgumentException if the component already has a parent.
 	*/
-	protected void addComponent(final Component<?> component)
+	protected boolean addComponent(final Component<?> component)
 	{
+		if(component.getParent()!=null)	//if this component has already been added to container
+		{
+			throw new IllegalArgumentException("Component "+component+" is already a member of a composite component, "+component.getParent()+".");
+		}
 		component.addPropertyChangeListener(DISPLAYED_PROPERTY, getDisplayVisibleChangeListener());	//listen for changes in the component's displayed status and update this component's valid status in response
 		component.addPropertyChangeListener(VALID_PROPERTY, getValidChangeListener());	//listen for changes in the component's valid status and update this component's valid status in response
 		component.addPropertyChangeListener(VISIBLE_PROPERTY, getDisplayVisibleChangeListener());	//listen for changes in the component's visible status and update this component's valid status in response
 		component.addNotificationListener(getNotificationListener());	//listen for component notifications and refire the notification events in response
+		return true;	//return true by default
 	}
 
 	/**Removes a child component.
 	This version uninstalls a listener for the component's valid status.
 	Any class that overrides this method must call this version.
+	The return value from this version has no sigificance
 	@param component The component to remove from this component.
+	@return <code>true</code> if the child components changed as a result of the operation.
+	@exception IllegalArgumentException if the component is not a member of this composite component.
 	*/
-	protected void removeComponent(final Component<?> component)
+	protected boolean removeComponent(final Component<?> component)
 	{
+		if(component.getParent()!=this)	//if this component is not a member of this container
+		{
+			throw new IllegalArgumentException("Component "+component+" is not member of composite component "+this+".");
+		}
 		component.removePropertyChangeListener(DISPLAYED_PROPERTY, getDisplayVisibleChangeListener());	//stop listening for changes in the component's displayed status
 		component.removePropertyChangeListener(VALID_PROPERTY, getValidChangeListener());	//stop listening for changes in the component's valid status
 		component.removePropertyChangeListener(VISIBLE_PROPERTY, getDisplayVisibleChangeListener());	//stop listening for changes in the component's visible status
 		component.removeNotificationListener(getNotificationListener());	//stop listening for component notifications
+		return true;	//return true by default
 	}
 
 	/**Called when the {@link Component#VALID_PROPERTY} of a child component changes.

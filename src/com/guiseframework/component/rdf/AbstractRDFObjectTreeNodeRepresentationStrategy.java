@@ -84,6 +84,7 @@ public abstract class AbstractRDFObjectTreeNodeRepresentationStrategy<V extends 
 			final RDFResource rdfProperty=((RDFObjectTreeNodeModel<?>)treeNode).getProperty();	//get the property, if any, associated with the RDF object
 			if(rdfProperty!=null)  //if object is the object of a property
 			{
+				assert rdfProperty.getReferenceURI()!=null : "RDF property has no reference URI.";
 				stringBuilder.insert(0, getXMLGenerator().getLabel(rdfProperty.getReferenceURI())); //prepend "property"
 			}
 		}

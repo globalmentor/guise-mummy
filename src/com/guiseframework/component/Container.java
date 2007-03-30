@@ -9,17 +9,42 @@ import com.guiseframework.component.layout.Constraints;
 import com.guiseframework.event.ContainerListener;
 
 /**Component that allows for addition and removal of child components.
-A container is iterable over its child components, and can be used in short <code>for(:)</code> form. 
+A layout component is iterable over its child components, and can be used in short <code>for(:)</code> form. 
 @author Garret Wilson
 */
-public interface Container<C extends Container<C>> extends CompositeComponent<C>, Iterable<Component<?>>
+public interface Container<C extends Container<C>> extends LayoutComponent<C>, Iterable<Component<?>>
 {
 
-	/**The bound property of the layout.*/
-	public final static String LAYOUT_PROPERTY=getPropertyName(Container.class, "layout");
+	/**@return The number of child components in this composite component.*/
+	public int size();
 
-	/**@return An iterator to contained components in reverse order.*/
-	public Iterator<Component<?>> reverseIterator();
+	/**@return Whether this container contains no child components.*/
+	public boolean isEmpty();
+
+	/**Determines whether this container contains the given component.
+	@param component The component to check.
+	@return <code>true</code> if this container contains the given component.
+	*/
+	public boolean contains(final Object component);
+
+	/**Returns the index in the container of the first occurrence of the specified component.
+	@param component The component the index of which should be returned.
+	@return The index in this container of the first occurrence of the specified component, or -1 if this container does not contain the given component.
+	*/
+	public int indexOf(final Object component);
+
+	/**Returns the index in this container of the last occurrence of the specified compoent.
+	@param component The component the last index of which should be returned.
+	@return The index in this container of the last occurrence of the specified component, or -1 if this container does not contain the given component.
+	*/
+	public int lastIndexOf(final Object component);
+
+  /**Returns the component at the specified index in the container.
+  @param index The index of component to return.
+	@return The component at the specified position in this container.
+	@exception IndexOutOfBoundsException if the index is out of range.
+	*/
+	public Component<?> get(int index);
 
 	/**Adds a component to the container with default constraints.
 	@param component The component to add.
@@ -65,39 +90,8 @@ public interface Container<C extends Container<C>> extends CompositeComponent<C>
 	*/
 	public Component<?> remove(final int index);
 
-	/**@return Whether this container contains no child components.*/
-	public boolean isEmpty();
-
-	/**Determines whether this container contains the given component.
-	@param component The component to check.
-	@return <code>true</code> if this container contains the given component.
-	*/
-	public boolean contains(final Object component);
-
-	/**Returns the index in the container of the first occurrence of the specified component.
-	@param component The component the index of which should be returned.
-	@return The index in this container of the first occurrence of the specified component, or -1 if this container does not contain the given component.
-	*/
-	public int indexOf(final Object component);
-
-	/**Returns the index in this container of the last occurrence of the specified compoent.
-	@param component The component the last index of which should be returned.
-	@return The index in this container of the last occurrence of the specified component, or -1 if this container does not contain the given component.
-	*/
-	public int lastIndexOf(final Object component);
-
-  /**Returns the component at the specified index in the container.
-  @param index The index of component to return.
-	@return The component at the specified position in this container.
-	@exception IndexOutOfBoundsException if the index is out of range.
-	*/
-	public Component<?> get(int index);
-
 	/**Removes all of the components from this container.*/
 	public void clear();
-
-	/**@return The layout definition for the container.*/
-	public Layout<?> getLayout();
 
 	/**Sets the layout definition for the container.
 	The layout definition can only be changed if the container currently has no child components.

@@ -6,6 +6,7 @@ import com.garretwilson.beans.*;
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.component.Component;
 import com.guiseframework.component.Container;
+import com.guiseframework.component.LayoutComponent;
 import com.guiseframework.event.*;
 
 /**Abstract implementation of layout information for a container.
@@ -69,27 +70,27 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 		}		
 	}
 
-	/**The container that owns this layout, or <code>null</code> if this layout has not been installed into a container.*/
-	private Container<?> container=null;
+	/**The layout component that owns this layout, or <code>null</code> if this layout has not been installed into a layout component.*/
+	private LayoutComponent<?> owner=null;
 
-		/**@return The container that owns this layout, or <code>null</code> if this layout has not been installed into a container.*/
-		public Container<?> getContainer() {return container;}
+		/**@return The layout component that owns this layout, or <code>null</code> if this layout has not been installed into a layout component.*/
+		public LayoutComponent<?> getOwner() {return owner;}
 
-		/**Sets the container that owns this layout
+		/**Sets the layout component that owns this layout
 		This method is managed by containers, and normally should not be called by applications.
 //TODO del		A layout cannot be given a container if it is already installed in another container. Once a layout is installed in a container, it cannot be uninstalled.
 		A layout cannot be given a container if it is already installed in another container.
 		A layout cannot be given a container unless that container already recognizes this layout as its layout.
 		If a layout is given the same container it already has, no action occurs.
-		@param newContainer The new container for this layout.
+		@param newOwner The new container for this layout.
 //TODO del		@exception NullPointerException if the given container is <code>null</code>.
 		@exception IllegalStateException if a different container is provided and this layout already has a container.
 		@exception IllegalArgumentException if a different container is provided and the given container does not already recognize this layout as its layout.
 		*/
-		public void setContainer(final Container<?> newContainer)
+		public void setOwner(final LayoutComponent<?> newOwner)
 		{
-			final Container<?> oldContainer=container;	//get the old component
-			if(oldContainer!=newContainer)	//if the component is really changing
+			final LayoutComponent<?> oldOwner=owner;	//get the old component
+			if(oldOwner!=newOwner)	//if the component is really changing
 			{
 /*TODO fix
 				checkNull(newContainer, "Container cannot be null.");
@@ -98,21 +99,21 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 					throw new IllegalStateException("Layout "+this+" already has container: "+oldContainer);
 				}
 */
-				if(newContainer!=null && newContainer.getLayout()!=this)	//if the container that is not really our owner
+				if(newOwner!=null && newOwner.getLayout()!=this)	//if the container that is not really our owner
 				{
-					throw new IllegalArgumentException("Provided container "+newContainer+" is not really owner of layout "+this);
+					throw new IllegalArgumentException("Provided container "+newOwner+" is not really owner of layout "+this);
 				}
-				if(oldContainer!=null)	//if there was an old container
+				if(oldOwner!=null)	//if there was an old container
 				{
-					for(final Component<?> childComponent:oldContainer)	//for each child component in the old container
+					for(final Component<?> childComponent:oldOwner.getChildren())	//for each child component in the old container
 					{
 						removeComponent(childComponent);	//remove the old component from the layout
 					}
 				}
-				container=newContainer;	//this is really our component; make a note of it
-				if(newContainer!=null)	//if there is a new container
+				owner=newOwner;	//this is really our component; make a note of it
+				if(newOwner!=null)	//if there is a new container
 				{
-					for(final Component<?> childComponent:newContainer)	//for each child component in the new container
+					for(final Component<?> childComponent:newOwner.getChildren())	//for each child component in the new container
 					{
 						addComponent(childComponent);	//add the new component to the layout
 					}
@@ -138,8 +139,8 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 	*/
 	public void addComponent(final Component<?> component)
 	{
-		final Container<?> container=getContainer();	//get the layout's container
-		if(container==null)	//if we haven't been installed into a container
+		final LayoutComponent<?> owner=getOwner();	//get the layout's owner
+		if(owner==null)	//if we haven't been installed into an owner
 		{
 			throw new IllegalStateException("Layout does not have container.");
 		}
@@ -159,8 +160,8 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 	*/
 	public void removeComponent(final Component<?> component)
 	{
-		final Container<?> container=getContainer();	//get the layout's container
-		if(container==null)	//if we haven't been installed into a container
+		final LayoutComponent<?> owner=getOwner();	//get the layout's owner
+		if(owner==null)	//if we haven't been installed into a owner
 		{
 			throw new IllegalStateException("Layout does not have container.");
 		}		
@@ -186,8 +187,8 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 	*/
 	public T getConstraints(final Component<?> component)
 	{
-		final Container<?> container=getContainer();	//get the layout's container
-		if(container==null)	//if we haven't been installed into a container
+		final LayoutComponent<?> layoutComponent=getOwner();	//get the layout's container
+		if(layoutComponent==null)	//if we haven't been installed into a container
 		{
 			throw new IllegalStateException("Layout does not have container.");
 		}
@@ -244,7 +245,7 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 			{
 				final T layoutConstraints=constraintsClass.cast(constraints);	//cast the constraints to this layout's type
 					//find the component for these constraints
-				for(final Component<?> childComponent:getContainer())	//for each child component in the container
+				for(final Component<?> childComponent:getOwner().getChildren())	//for each child component in the container
 				{
 					if(childComponent.getConstraints()==constraints)	//if this component was associated with the constraints
 					{

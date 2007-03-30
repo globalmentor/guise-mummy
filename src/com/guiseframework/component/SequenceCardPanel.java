@@ -242,22 +242,25 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	This version installs a listener for the component's displayed status.
 	Any class that overrides this method must call this version.
 	@param component The component to add to this component.
+	@return <code>true</code> if the child components changed as a result of the operation.
 	*/
-	protected void addComponent(final Component<?> component)
+	protected boolean addComponent(final Component<?> component)
 	{
-		super.addComponent(component);	//initialize the child component as needed
+		final boolean result=super.addComponent(component);	//initialize the child component as needed
 		component.addPropertyChangeListener(DISPLAYED_PROPERTY, cardDisplayedChangeListener);	//listen for changes in the component's displayed status and make sure the sequence is disabled as needed
+		return result;
 	}
 
 	/**Removes a child component.
 	This version uninstalls a listener for the component's displayed status.
 	Any class that overrides this method must call this version.
 	@param component The component to remove from this component.
+	@return <code>true</code> if the child components changed as a result of the operation.
 	*/
-	protected void removeComponent(final Component<?> component)
+	protected boolean removeComponent(final Component<?> component)
 	{
 		component.removePropertyChangeListener(DISPLAYED_PROPERTY, cardDisplayedChangeListener);	//stop listening for changes in the component's displayed status
-		super.removeComponent(component);	//uninitialize the child component as needed
+		return super.removeComponent(component);	//uninitialize the child component as needed
 	}
 
 	/**Called when the {@link Component#VALID_PROPERTY} of a child component changes.

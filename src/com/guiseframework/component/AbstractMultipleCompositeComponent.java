@@ -17,12 +17,6 @@ public abstract class AbstractMultipleCompositeComponent<C extends CompositeComp
 	/**@return Whether this component has children.*/
 	public boolean hasChildren() {return !idComponentMap.isEmpty();}
 
-	/**@return The number of child components in this composite component.*/
-	public int size() {return idComponentMap.size();}
-	
-	/**@return An iterator to child components.*/
-//TODO del when works	public Iterator<Component<?>> iterator() {return idComponentMap.values().iterator();}
-
 	/**@return An iterable to child components.*/
 	public Iterable<Component<?>> getChildren() {return idComponentMap.values();}
 
@@ -30,26 +24,49 @@ public abstract class AbstractMultipleCompositeComponent<C extends CompositeComp
 	This version adds the component to the component map.
 	Any class that overrides this method must call this version.
 	@param component The component to add to this component.
+	@return <code>true</code> if the child components changed as a result of the operation.
+	@exception IllegalArgumentException if the component already has a parent.
 	*/
-	protected void addComponent(final Component<?> component)
+	protected boolean addComponent(final Component<?> component)
 	{
-		super.addComponent(component);	//initialize the child component as needed
-		idComponentMap.put(component.getID(), component);	//add this component to the map
-		component.setParent(this);	//tell the component who its parent is
-		updateValid();	//update the valid status
+		if(idComponentMap.put(component.getID(), component)!=component)	//add this component to the map; if that resulted in a map change
+		{
+			super.addComponent(component);	//initialize the child component as needed
+			component.setParent(this);	//tell the component who its parent is
+			updateValid();	//update the valid status
+			return true;	//indicate that the components changed
+		}
+		else	//if the component was already in the map
+		{
+			return false;	//indicate that no components changed
+		}
 	}
 
 	/**Removes a child component.
 	This version removes the component from the component map.
 	Any class that overrides this method must call this version.
 	@param component The component to remove from this component.
+	@return <code>true</code> if the child components changed as a result of the operation.
+	@exception IllegalArgumentException if the component is not a member of this composite component.
 	*/
-	protected void removeComponent(final Component<?> component)
+	protected boolean removeComponent(final Component<?> component)
 	{
-		super.removeComponent(component);	//uninitialize the child component as needed
-		idComponentMap.remove(component.getID());	//remove this component from the map
-		component.setParent(null);	//tell the component it no longer has a parent
-		updateValid();	//update the valid status
+		final Component<?> removedComponent=idComponentMap.remove(component.getID());	//remove this component from the map
+		if(removedComponent!=null)	//if a component was removed
+		{
+			if(removedComponent!=component)	//if there was another component with the same ID
+			{
+				throw new IllegalStateException("Another component "+removedComponent+" stored with same ID "+component.getID()+" as component "+component);
+			}
+			super.removeComponent(component);	//uninitialize the child component as needed
+			component.setParent(null);	//tell the component it no longer has a parent
+			updateValid();	//update the valid status
+			return true;	//indicate that the child components changed
+		}
+		else	//if no component was removed
+		{
+			return false;	//there was no change
+		}
 	}
 
 	/**Retrieves the child component with the given ID.

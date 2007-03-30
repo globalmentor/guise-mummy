@@ -1,7 +1,7 @@
 package com.guiseframework.component.layout;
 
-import static com.garretwilson.lang.ClassUtilities.getPropertyName;
-import static com.garretwilson.lang.ObjectUtilities.checkInstance;
+import static com.garretwilson.lang.ClassUtilities.*;
+import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.guiseframework.component.Component;
 
@@ -99,7 +99,7 @@ public class RegionLayout extends AbstractLayout<RegionConstraints>
 	*/
 	public Component<?> getComponent(final Region region)	//TODO later use reverse maps or something similar for quicker lookup
 	{
-		for(final Component<?> childComponent:getContainer())	//for each child component in the container
+		for(final Component<?> childComponent:getOwner().getChildren())	//for each child component in the container
 		{
 			final RegionConstraints constraints=(RegionConstraints)getConstraints(childComponent);	//get the constraints for this component TODO use covariants on each subclass; update getConstraints() to ensure correct type
 			if(constraints.getRegion()==region)	//if this component is in the correct region

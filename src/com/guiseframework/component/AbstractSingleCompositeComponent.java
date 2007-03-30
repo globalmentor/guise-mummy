@@ -19,6 +19,7 @@ public abstract class AbstractSingleCompositeComponent<C extends CompositeCompon
 		This is a bound property.
 		@param newComponent The child component, or <code>null</code> if this component does not contain a child component.
 //TODO fix if needed		@see #CHECK_TYPE_PROPERTY 
+		@exception IllegalArgumentException if the component already has a parent.
 		*/
 		public void setComponent(final Component<?> newComponent)
 		{
