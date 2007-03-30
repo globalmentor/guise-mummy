@@ -23,6 +23,8 @@ public interface GuiseApplication extends PropertyBindable
 
 	/**The default locale bound property.*/
 //TODO del	public final static String DEFAULT_LOCALE_PROPERTY=getPropertyName(GuiseApplication.class, "defaultLocale");
+	/**The environment bound property.*/
+	public final static String ENVIRONMENT_PROPERTY=getPropertyName(GuiseApplication.class, "environment");
 	/**The locales bound property.*/
 	public final static String LOCALES_PROPERTY=getPropertyName(GuiseApplication.class, "locales");
 	/**The resource bundle base name bound property.*/
@@ -83,6 +85,18 @@ public interface GuiseApplication extends PropertyBindable
 	@see #RESOURCE_BUNDLE_BASE_NAME_PROPERTY
 	*/
 	public void setResourceBundleBaseName(final String newResourceBundleBaseName);
+
+	/**@return The application local environment.*/
+	public GuiseEnvironment getEnvironment();
+
+	/**Sets the application local environment.
+	This method will not normally be called directly from applications.
+	This is a bound property.
+	@param newEnvironment The new application local environment.
+	@exception NullPointerException if the given environment is <code>null</code>.
+	@see #ENVIRONMENT_PROPERTY
+	*/
+	public void setEnvironment(final GuiseEnvironment newEnvironment);
 
 	/**@return The absolute or application-relative URI of the application style, or <code>null</code> if the default style should be used.*/
 	public URI getStyle();

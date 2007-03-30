@@ -138,7 +138,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		This is a bound property.
 		@param newEnvironment The new user local environment.
 		@exception NullPointerException if the given environment is <code>null</code>.
-		@see GuiseSession#ENVIRONMENT_PROPERTY
+		@see #ENVIRONMENT_PROPERTY
 		*/
 		public void setEnvironment(final GuiseEnvironment newEnvironment)
 		{

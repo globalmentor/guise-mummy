@@ -55,6 +55,29 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		/**@return The Guise container into which this application is installed, or <code>null</code> if the application is not yet installed.*/
 		public GuiseContainer getContainer() {return container;}
 
+	/**The application local environment.*/
+	private GuiseEnvironment environment;
+
+		/**@return The application local environment.*/
+		public GuiseEnvironment getEnvironment() {return environment;}
+
+		/**Sets the application local environment.
+		This method will not normally be called directly from applications.
+		This is a bound property.
+		@param newEnvironment The new application local environment.
+		@exception NullPointerException if the given environment is <code>null</code>.
+		@see #ENVIRONMENT_PROPERTY
+		*/
+		public void setEnvironment(final GuiseEnvironment newEnvironment)
+		{
+			if(!ObjectUtilities.equals(environment, newEnvironment))	//if the value is really changing (compare their values, rather than identity)
+			{
+				final GuiseEnvironment oldEnvironment=environment;	//get the old value
+				environment=checkInstance(newEnvironment, "Guise session environment cannot be null.");	//actually change the value
+				firePropertyChange(ENVIRONMENT_PROPERTY, oldEnvironment, newEnvironment);	//indicate that the value changed
+			}
+		}
+		
 	/**Creates a new session for the application.
  	This version creates and returns a default session.
 	@return A new session for the application
@@ -488,6 +511,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	public AbstractGuiseApplication()
 	{
 		this(Locale.getDefault());	//construct the class with the JVM default locale
+		this.environment=new DefaultGuiseEnvironment();	//create a default environment
 	}
 
 	/**Locale constructor.

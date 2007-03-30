@@ -140,7 +140,9 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 				final URI sessionBaseURI=requestURI.resolve(guiseApplication.getBasePath());	//resolve the application base path to the request URI
 				guiseSession.setBaseURI(sessionBaseURI);	//update the base URI to the one specified by the request, in case we can create a session from different URLs
 //TODO del if not needed				final String relativeApplicationPath=relativizePath(getBasePath(), guiseApplication.getBasePath());	//get the application path relative to the container path
+					//TODO set up the session outside the synchronized block, maybe, to reduce the amount of time blocking other threads
 				final GuiseEnvironment environment=guiseSession.getEnvironment();	//get the new session's environment
+				environment.setProperties(guiseApplication.getEnvironment().getProperties());	//copy the application environment to the session environment
 				final Cookie[] cookies=httpRequest.getCookies();	//get the cookies in the request
 				if(cookies!=null)	//if a cookie array was returned
 				{

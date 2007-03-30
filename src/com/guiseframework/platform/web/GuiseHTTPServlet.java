@@ -107,6 +107,12 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	/**The init parameter, "application", used to specify the relative path to the application description file.*/
 	public final static String APPLICATION_INIT_PARAMETER="application";
 
+	/**The init parameter prefix, "guise-environment:", used to indicate a Guise environment property.*/
+	public final static String GUISE_ENVIRONMENT_INIT_PARAMETER_PREFIX="guise-environment:";
+	
+	/**The init parameter suffix, ".uri", used to indicate that a Guise environment property should be processed as a URI.*/
+	public final static String GUISE_ENVIRONMENT_URI_INIT_PARAMETER_SUFFIX=".uri";
+	
 	/**The content type of a Guise AJAX request, <code>application/x-guise-ajax-request</code>.*/
 	public final static ContentType GUISE_AJAX_REQUEST_CONTENT_TYPE=new ContentType(ContentTypeConstants.APPLICATION, ContentTypeConstants.EXTENSION_PREFIX+"guise-ajax-request"+ContentTypeConstants.SUBTYPE_SUFFIX_DELIMITER_CHAR+ContentTypeConstants.XML_SUBTYPE_SUFFIX, null);
 
@@ -229,6 +235,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	*/
 	protected AbstractGuiseApplication initGuiseApplication(final ServletConfig servletConfig) throws ServletException
 	{
+		final ServletContext servletContext=servletConfig.getServletContext();	//get the servlet context
 		final AbstractGuiseApplication guiseApplication;	//create the application and store it here
 		final String guiseApplicationDescriptionPath=servletConfig.getInitParameter(APPLICATION_INIT_PARAMETER);	//get name of the guise application description file
 		if(guiseApplicationDescriptionPath!=null)	//if there is a Guise application description file specified
@@ -243,7 +250,6 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 //		TODO del Debug.trace("determined absolute path to application description:", absoluteGuiseApplicationDescriptionPath);
 			try
 			{
-				final ServletContext servletContext=servletConfig.getServletContext();	//get the servlet context
 				final URL guiseApplicationDescriptionURL=servletContext.getResource(absoluteGuiseApplicationDescriptionPath);	//get the URL to the application description
 //			TODO del Debug.trace("found URL to application description", guiseApplicationDescriptionURL);
 				if(guiseApplicationDescriptionURL==null)	//if we can't find the resource
@@ -322,6 +328,34 @@ Debug.trace("checking for categories");
 			throw new ServletException("web.xml missing Guise application init parameter \""+APPLICATION_INIT_PARAMETER+"\".");
 		}
 		guiseApplication.installComponentKit(new XHTMLComponentKit());	//create and install an XHTML controller kit
+			//install configured environment properties
+		final GuiseEnvironment environment=guiseApplication.getEnvironment();	//get the application environment
+		final Enumeration<String> initParameterNames=(Enumeration<String>)servletContext.getInitParameterNames();	//get all the init parameter names from the servlet context, allowing all init parameters to be retrieved, even those stored externally
+		while(initParameterNames.hasMoreElements())	//while there are more init parameters
+		{
+			final String initParameterName=initParameterNames.nextElement();	//get the next init parameter
+			if(initParameterName.startsWith(GUISE_ENVIRONMENT_INIT_PARAMETER_PREFIX))	//if this is a Guise parameter specification
+			{
+				final String initParameterValue=servletContext.getInitParameter(initParameterName);	//get the value of the init parameter
+				if(initParameterValue!=null)	//if there is a value recorded (just in case the deployment description somehow managed on some platform to store a null value)
+				{
+					final String environmentPropertyName=initParameterName.substring(GUISE_ENVIRONMENT_INIT_PARAMETER_PREFIX.length());	//determine the name of the environment property
+					Object environmentPropertyValue=initParameterValue;	//we'll see if we need to change the value type
+					if(initParameterName.endsWith(GUISE_ENVIRONMENT_URI_INIT_PARAMETER_SUFFIX))	//if the init parameter name ends with ".uri", try to process it as a URI
+					{
+						try
+						{
+							environmentPropertyValue=new URI(initParameterValue);	//convert the string to a URI, if we can
+						}
+						catch(final URISyntaxException uriSyntaxException)	//if we couldn't parse the value as a URI
+						{
+							Debug.warn("Unable to process Guise environment property "+environmentPropertyName+" value "+environmentPropertyValue+" as a URI.");
+						}
+					}
+					environment.setProperty(environmentPropertyName, environmentPropertyValue);	//store the Guise environment property in the environment
+				}
+			}
+		}
 		return guiseApplication;	//return the created Guise application
 	}
 
