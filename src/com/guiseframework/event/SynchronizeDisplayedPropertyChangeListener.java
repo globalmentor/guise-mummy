@@ -9,7 +9,7 @@ by calling {@link Displayable#setDisplayed(boolean)} with any new value that it 
 If there is no {@link Displayable} event source or no new value for any given event, no action occurs.
 @author Garret Wilson
 */
-public class SynchronizeDisplayedPropertyChangeListener extends AbstractGenericPropertyChangeListener<Boolean>
+public class SynchronizeDisplayedPropertyChangeListener extends AbstractGenericPropertyChangeListener<Boolean>	//TODO turn this into a singleton
 {
 
 	/**Called when a bound property is changed.
