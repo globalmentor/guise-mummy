@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.garretwilson.io.IO;
 import com.garretwilson.net.http.HTTPNotFoundException;
 import com.garretwilson.net.http.HTTPResource;
-import com.garretwilson.rdf.RDFResourceIO;
+import com.garretwilson.rdf.TypedRDFResourceIO;
 import com.guiseframework.theme.Theme;
 
 import static com.garretwilson.io.FileUtilities.ensureDirectoryExists;
@@ -48,7 +48,7 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 		public String getBasePath() {return basePath;}
 
 	/**I/O for loading themes.*/
-	private final static IO<Theme> themeIO=new RDFResourceIO<Theme>(Theme.class, GUISE_NAMESPACE_URI);	//create I/O for loading the theme
+	private final static IO<Theme> themeIO=new TypedRDFResourceIO<Theme>(Theme.class, GUISE_NAMESPACE_URI);	//create I/O for loading the theme
 
 		/**@return I/O for loading themes.*/
 		protected static IO<Theme> getThemeIO() {return themeIO;}

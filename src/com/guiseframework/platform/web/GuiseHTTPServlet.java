@@ -62,7 +62,7 @@ import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
 import com.garretwilson.rdf.RDF;
 import com.garretwilson.rdf.RDFResource;
-import com.garretwilson.rdf.RDFResourceIO;
+import com.garretwilson.rdf.TypedRDFResourceIO;
 import com.garretwilson.rdf.RDFUtilities;
 import com.garretwilson.rdf.RDFXMLProcessor;
 import com.garretwilson.rdf.maqro.Activity;

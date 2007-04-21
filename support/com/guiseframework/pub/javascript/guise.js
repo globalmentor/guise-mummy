@@ -5278,6 +5278,7 @@ function getElementBounds(element)
 @return A Point containing the coordinates of the element.
 @see http://www.oreillynet.com/pub/a/javascript/excerpt/JSDHTMLCkbk_chap13/index6.html
 @see http://www.quirksmode.org/js/findpos.html
+@see http://blog.firetree.net/2005/07/04/javascript-find-position/
 */
 function getElementCoordinates(element)	//TODO make sure this method correctly calculates margins and padding, as Mozilla and IE both show slight variations for text, but not for images
 {
@@ -5341,6 +5342,47 @@ var originalElement=element;	//TODO del; testing
 			parent=parent.parentNode;		
 		}
 */
+
+
+/*TODO test
+		element=originalElement;
+		while(element!=null)	//TODO fix for scroll left
+		{
+			if(element.scrollLeft)
+			{
+//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
+				x-=element.scrollLeft;
+			}
+			if(element.scrollTop)
+			{
+//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
+				y-=element.scrollTop;
+			}
+			element=element.parentNode;		
+		}
+*/
+
+		var documentElement=document.documentElement;
+		element=originalElement.parentNode;
+		while(element!=documentElement)	//TODO fix for scroll left
+		{
+			var parentNode=element.parentNode;
+			if(isUserAgentIE6 && parentNode==documentElement)	//ignore the outermost element in IE6
+			{
+				break;
+			}
+			if(element.scrollLeft)
+			{
+//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
+				x-=element.scrollLeft;
+			}
+			if(element.scrollTop)
+			{
+//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
+				y-=element.scrollTop;
+			}
+			element=parentNode;
+		}
 	}
 	else if(element.x && element.y)	//if element.offsetParent is not supported by but element.x and element.y are supported (e.g. Navigator 4)
 	{

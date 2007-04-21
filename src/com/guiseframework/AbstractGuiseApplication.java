@@ -16,7 +16,7 @@ import static com.garretwilson.io.FileConstants.*;
 import com.garretwilson.lang.ObjectUtilities;
 import static com.garretwilson.lang.ThreadUtilities.*;
 import com.garretwilson.net.URIUtilities;
-import com.garretwilson.rdf.RDFResourceIO;
+import com.garretwilson.rdf.TypedRDFResourceIO;
 import com.garretwilson.text.W3CDateFormat;
 import com.garretwilson.util.*;
 
@@ -44,7 +44,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 {
 
 	/**I/O for loading resources.*/
-	private final static IO<Resources> resourcesIO=new RDFResourceIO<Resources>(Resources.class, GUISE_NAMESPACE_URI);
+	private final static IO<Resources> resourcesIO=new TypedRDFResourceIO<Resources>(Resources.class, GUISE_NAMESPACE_URI);
 
 		/**@return I/O for loading resources.*/
 		protected static IO<Resources> getResourcesIO() {return resourcesIO;}
