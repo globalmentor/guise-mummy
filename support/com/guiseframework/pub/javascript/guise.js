@@ -689,6 +689,211 @@ var GUIUtilities=
 		node.style.top=y+"px";	//set the node's vertical position
 	},
 
+	/**Retrieves the absolute bounds of the given element.
+	@param The element the bounds of which to find.
+	@return A Rectangle containing the coordinates and size of the element.
+	*/
+	getElementBounds:function(element)
+	{
+		return new Rectangle(this.getElementCoordinates(element), new Size(element.offsetWidth, element.offsetHeight));	//create a rectangle containing the coordinates and size of the element
+	},
+
+	/**Retrieves the absolute X and Y coordinates of the given element.
+	@param The element the coordinates of which to find.
+	@return A Point containing the coordinates of the element.
+	@see http://www.oreillynet.com/pub/a/javascript/excerpt/JSDHTMLCkbk_chap13/index6.html
+	@see http://www.quirksmode.org/js/findpos.html
+	@see http://blog.firetree.net/2005/07/04/javascript-find-position/
+	*/
+	getElementCoordinates:function(element)	//TODO make sure this method correctly calculates margins and padding, as Mozilla and IE both show slight variations for text, but not for images
+	{
+		var originalElement=element;	//keep track of which element was originally requested
+		var x=0, y=0;
+		if(element.currentStyle)	//compensate for negative margins on IE6, which apparently is only effective on the immediate element (primarily frames); if IE7 fixes this bug we'll have to check for quirks mode (which we use with IE6 but not on IE7), or as a last resort check specifically for IE6
+		{
+			if(element.currentStyle.marginLeft)	//if there is a left margin
+			{
+				var marginLeft=parseInt(element.currentStyle.marginLeft);	//parse the margin left value, which may be a string in the form XXpx
+				if(marginLeft && marginLeft<0)	//if there is a negative margin (and not some keyword)
+				{
+					x-=marginLeft;	//compensate for negative left margin
+				}
+			}
+			if(element.currentStyle.marginTop)	//if there is a top margin
+			{
+				var marginTop=parseInt(element.currentStyle.marginTop);	//parse the margin top value, which may be a string in the form XXpx
+				if(marginTop && marginTop<0)	//if there is a negative margin (and not some keyword)
+				{
+					y-=marginTop;	//compensate for negative top margin
+				}
+			}
+		}
+		if(element.offsetParent)	//if element.offsetParent is supported
+		{
+	//TODO del alert("using calculated element position");
+			while(element)	//while we have an element
+			{
+				x+=element.offsetLeft;	//add this element's offsets
+				y+=element.offsetTop;
+	/*TODO fix or del; apparently this code is not as good as the version below, although it doesn't seem to compensate for scrollLeft
+				if(element.scrollLeft)
+				{
+					x-=element.scrollLeft;
+				}
+				if(element.scrollTop)
+				{
+	//TODO del alert("element "+element.nodeName+" scroll top "+element.scrollTop);
+					y-=element.scrollTop;
+				}
+	*/
+				element=element.offsetParent;	//go to the element's parent offset
+			}
+	/*TODO fix for Mac
+	    if (navigator.userAgent.indexOf("Mac") != -1 && 
+	        typeof document.body.leftMargin != "undefined") {
+	        offsetLeft += document.body.leftMargin;
+	        offsetTop += document.body.topMargin;
+	    }
+	*/
+	/*TODO fix; this inappropriately adds in the viewport scroll position on IE but not on Mozilla---but this is needed for internal scrolled divs on IE; try to distinguish the two when internal scrolled divs are used
+			var parent=originalElement.parentNode;
+			while(parent!=document.documentElement)
+			{
+				if(parent.scrollTop)
+				{
+	//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
+					y-=parent.scrollTop;
+				}
+				parent=parent.parentNode;		
+			}
+	*/
+	
+	
+	/*TODO test
+			element=originalElement;
+			while(element!=null)	//TODO fix for scroll left
+			{
+				if(element.scrollLeft)
+				{
+	//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
+					x-=element.scrollLeft;
+				}
+				if(element.scrollTop)
+				{
+	//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
+					y-=element.scrollTop;
+				}
+				element=element.parentNode;		
+			}
+	*/
+	
+			var documentElement=document.documentElement;
+			element=originalElement.parentNode;
+			while(element!=documentElement)	//TODO fix for scroll left
+			{
+				var parentNode=element.parentNode;
+				if(isUserAgentIE6 && parentNode==documentElement)	//ignore the outermost element in IE6
+				{
+					break;
+				}
+				if(element.scrollLeft)
+				{
+	//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
+					x-=element.scrollLeft;
+				}
+				if(element.scrollTop)
+				{
+	//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
+					y-=element.scrollTop;
+				}
+				element=parentNode;
+			}
+		}
+		else if(element.x && element.y)	//if element.offsetParent is not supported by but element.x and element.y are supported (e.g. Navigator 4)
+		{
+			x=element.x;	//get the element's coordinates directly
+			y=element.y;
+		}
+		return new Point(x, y);	//return the point we calculated
+	},
+
+	/**Retrieves the absolute bounds of the given element, including any negative margins.
+	This method is not currently guaranteed to work on non-IE browsers.
+	@param The element the bounds of which to find.
+	@return A Rectangle containing the coordinates and external size of the element.
+	*/
+	getElementExternalBounds:function(element)
+	{
+		var point=this.getElementCoordinates(element);	//get the coordinates
+		var size=new Size(element.offsetWidth, element.offsetHeight);
+		if(element.currentStyle)	//compensate for negative margins on IE6, which apparently is only effective on the immediate element (primarily frames); if IE7 fixes this bug we'll have to check for quirks mode (which we use with IE6 but not on IE7), or as a last resort check specifically for IE6
+		{
+			if(element.currentStyle.marginLeft)	//if there is a left margin
+			{
+				var marginLeft=parseInt(element.currentStyle.marginLeft);	//parse the margin left value, which may be a string in the form XXpx
+				if(marginLeft && marginLeft<0)	//if there is a negative margin (and not some keyword)
+				{
+					point.x+=marginLeft;	//compensate for negative left margin
+				}
+			}
+			if(element.currentStyle.marginTop)	//if there is a top margin
+			{
+				var marginTop=parseInt(element.currentStyle.marginTop);	//parse the margin top value, which may be a string in the form XXpx
+				if(marginTop && marginTop<0)	//if there is a negative margin (and not some keyword)
+				{
+					point.y+=marginTop;	//compensate for negative top margin
+				}
+			}
+		}
+		//TODO check to see if the size compensates for negative margins or not
+		return new Rectangle(point, size);	//create a rectangle containing the coordinates and size of the element
+	},
+
+	/**Retrieves the X and Y coordinates of the given element relative to the viewport.
+	@param The element the coordinates of which to find.
+	@return A Point containing the coordinates of the element relative to the viewport.
+	*/
+	getElementFixedCoordinates:function(element)
+	{
+		var absoluteCoordinates=this.getElementCoordinates(element);	//get the element's absolute coordinates
+		var scrollCoordinates=this.getScrollCoordinates();	//get the viewport's scroll coordinates
+		return new Point(absoluteCoordinates.x-scrollCoordinates.x, absoluteCoordinates.y-scrollCoordinates.y);	//compensate for viewport scrolling
+	},
+
+	/**@return The size of the document, even if it is outside the viewport.
+	@see http://www.quirksmode.org/viewport/compatibility.html
+	*/
+	getPageSize:function()
+	{
+		var width=Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
+		var height=Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+	//	alert("width: "+width+" height: "+height);
+	/*TODO this is presented at http://www.quirksmode.org/viewport/compatibility.html, but doesn't correctly give the scroll width for Firefox
+		var width=0, height=0;	//we'll determine the width and height
+		var scrollHeight=document.body.scrollHeight;	//get the scroll height
+		var offsetHeight=document.body.offsetHeight;	//get the offset height
+		if(scrollHeight>offsetHeight)	//if the scroll height is larger
+		{
+			width=document.body.scrollWidth;	//use the scroll dimensions
+			height=document.body.scrollHeight;
+		}
+		else	//if the body offsets are larger (e.g. Explorer Mac and IE 6 strict)
+		{
+			width=document.body.offsetWidth;	//use the body offsets
+			height=document.body.offsetHeight;
+		}
+		return new Size(width, height);	//return the page size
+		
+	alert("document.body.scrollWidth: "+document.body.scrollWidth+"\n"+
+				"document.body.offsetWidth: "+document.body.offsetWidth+"\n"+
+				"document.body.clientWidth: "+document.body.clientWidth+"\n"+
+				"document.documentElement.scrollWidth: "+document.documentElement.scrollWidth+"\n"+
+				"document.documentElement.offsetWidth: "+document.documentElement.offsetWidth+"\n"+
+				"document.documentElement.clientWidth: "+document.documentElement.clientWidth+"\n")
+	*/	
+		return new Size(width, height);	//return the page size
+	},
+
 	/**@return The coordinates that the page has scrolled.
 	@see http://www.quirksmode.org/viewport/compatibility.html 
 	*/
@@ -1513,9 +1718,9 @@ function MouseAJAXEvent(eventType, component, target, event)
 */
 	this.eventType=eventType;	//save the event type
 	this.componentID=component.id;	//save the component ID
-	this.componentBounds=getElementBounds(component);	//get the component bounds
+	this.componentBounds=GUIUtilities.getElementBounds(component);	//get the component bounds
 	this.targetID=target.id;	//save the target ID
-	this.targetBounds=getElementBounds(component);	//get the target bounds
+	this.targetBounds=GUIUtilities.getElementBounds(component);	//get the target bounds
 	this.viewportBounds=GUIUtilities.getViewportBounds();	//get the viewport bounds
 	this.mousePosition=new Point(event.clientX, event.clientY);	//save the mouse position
 }
@@ -2362,7 +2567,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 			{
 				if(isRoot)	//if this is the root of the synchronization
 				{
-					guiseAJAX.invalidateAncestorContent(oldElement);	//indicate that the ancestors now have different content
+					this.invalidateAncestorContent(oldElement);	//indicate that the ancestors now have different content
 				}
 	//TODO del alert("ready to synchronize element "+oldElement.nodeName+" with ID: "+oldElement.id+" against element "+element.nodeName+" with ID: "+element.getAttribute("id"));
 					//remove any attributes the old element has that are not in the new element
@@ -2514,7 +2719,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 					}
 					if(isRoot)	//if this is the root of the synchronization
 					{
-						guiseAJAX.invalidateAncestorContent(oldElement);	//indicate that the ancestors now have different content
+						this.invalidateAncestorContent(oldElement);	//indicate that the ancestors now have different content
 					}
 				}
 					//patch in the new child element hierarchy
@@ -2755,6 +2960,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 var com=com||{}; com.guiseframework=com.guiseframework||{}; com.guiseframework.js=com.guiseframework.js||{};	//create the com.guiseframework.js package
 
 /**A class encapsulating JavaScript Guise client functionality for Guise.
+When the document is loaded the Client.onDocumentLoad() method should be called to create the appropriate modal layers and append them to the document.
 var frames The array of frame elements.
 var modalFrame The current topmost modal frame, or null if there is no modal frame.
 */
@@ -2799,6 +3005,31 @@ com.guiseframework.js.Client=function()
 	if(!com.guiseframework.js.Client._initialized)
 	{
 		com.guiseframework.js.Client._initialized=true;
+
+		/**Creates the appropriate modal layers and initializes document-related variables.
+		This method should be called when the document is loaded.
+		*/
+		com.guiseframework.js.Client.prototype.onDocumentLoad=function()
+		{
+				//create the modal layer
+			this._modalLayer=document.createElementNS("http://www.w3.org/1999/xhtml", "div");	//create a div TODO use a constant for the namespace
+			this._modalLayer.className="modalLayer";	//load the modal layer style
+	//TODO fix				oldModalLayerDisplayDisplay="none";
+			this._modalLayer.style.display="none";
+			this._modalLayer.style.position="absolute";
+			this._modalLayer.style.top="0px";
+			this._modalLayer.style.left="0px";
+			document.body.appendChild(this._modalLayer);	//add the modal layer to the document
+			if(isUserAgentIE6)	//if we're in IE6
+			{
+				var form=getForm(document.documentElement);	//get the form
+				if(form && form.id)	//if there is a form with an ID
+				{
+					var modalIFrameID=form.id.replace(".form", ".modalIFrame");	//determine the ID of the modal IFrame TODO use a constant, or get these values using a better method
+					this._modalIFrame=document.getElementById(modalIFrameID);	//get the modal IFrame
+				}
+			}
+		};
 
 		/**Temporarily changes the cursor of an element, which will be reset after the next AJAX call.
 		The element must have an ID.
@@ -2888,7 +3119,6 @@ com.guiseframework.js.Client=function()
 				frame.style.visibility="visible";	//go ahead and make the frame visible
 			}
 		
-		//TODO del; moved to updateModal()	frame.style.zIndex=256;	//give the element an arbitrarily high z-index value so that it will appear in front of other components TODO fix
 			updateComponents(frame, true);	//update all the components within the frame
 			this.frames.add(frame);	//add the frame to the array
 			this._updateModal();	//update the modal state
@@ -2942,9 +3172,9 @@ com.guiseframework.js.Client=function()
 			if(relatedComponent)	//if there is a related component
 			{
 		//TODO del alert("found related component: "+relatedComponentID);
-				var frameBounds=getElementBounds(frame);	//get the bounds of the frame
+				var frameBounds=GUIUtilities.getElementBounds(frame);	//get the bounds of the frame
 		//TODO del debugString+="frameBounds: "+frameBounds.x+","+frameBounds.y+","+frameBounds.width+","+frameBounds.height+"\n";
-				var relatedComponentBounds=getElementBounds(relatedComponent);	//get the bounds of the related component
+				var relatedComponentBounds=GUIUtilities.getElementBounds(relatedComponent);	//get the bounds of the related component
 		//TODO del debugString+="relatedComponentBounds: "+relatedComponentBounds.x+","+relatedComponentBounds.y+","+relatedComponentBounds.width+","+relatedComponentBounds.height+"\n";
 				var tether=DOMUtilities.getDescendantElementByClassName(frame, STYLES.FRAME_TETHER);	//get the frame tether, if there is one
 				if(tether)	//if there is a frame tether
@@ -2952,7 +3182,7 @@ com.guiseframework.js.Client=function()
 					var positionTether=function()	//create a function to position relative to the tether
 							{
 					//TODO del alert("found tether: "+tether.id);
-								var tetherBounds=getElementBounds(tether);	//get the bounds of the tether
+								var tetherBounds=GUIUtilities.getElementBounds(tether);	//get the bounds of the tether
 					//TODO del debugString+="tetherBounds: "+tetherBounds.x+","+tetherBounds.y+","+tetherBounds.width+","+tetherBounds.height+"\n";
 								var tetherX, tetherY, relatedComponentX, relatedComponentY;	//get the relevant tether anchor point and the relevant component point
 								if(tetherBounds.x<=frameBounds.x+8)	//if the tether is on the left side (use an arbitrary amount to account for variations in browser position calculations) TODO compare centers, which will be more accurate
@@ -3064,7 +3294,10 @@ com.guiseframework.js.Client=function()
 			}
 			if(this.modalFrame!=null)	//if there is a modal frame
 			{
-				this.updateModalLayer();	//always update the modal layer before it is shown, as IE may not always call resize to keep the modal layer updated
+				if(this._modalLayer.style.display=="none")	//if the modal layer is not shown, update it (don't update it if it's already shown, as this will cause flickering by the modal layer being turned on and off; this tactic will not compensate for a new frame making the entire size larger, however)
+				{
+					this.updateModalLayer();	//always update the modal layer before it is shown, as IE may not always call resize to keep the modal layer updated
+				}
 				this._modalLayer.style.zIndex=this.modalFrame.style.zIndex-1;	//place the modal layer directly behind the modal frame
 				this._modalLayer.style.display="block";	//make the modal layer visible
 				if(this._modalIFrame)	//if we have a modal IFrame
@@ -3098,7 +3331,7 @@ com.guiseframework.js.Client=function()
 					if(this.flyoverFrame!=null)	//if there is a flyover frame
 					{
 					
-						var flyoverFrameBounds=getElementExternalBounds(this.flyoverFrame);	//get the flyover frame bounds
+						var flyoverFrameBounds=GUIUtilities.getElementExternalBounds(this.flyoverFrame);	//get the flyover frame bounds
 						flyoverIFrame.style.left=flyoverFrameBounds.x;	//update the bounds of the IFrame to match that of the flyover frame
 						flyoverIFrame.style.top=flyoverFrameBounds.y;
 						flyoverIFrame.style.width=flyoverFrameBounds.width;
@@ -3117,30 +3350,6 @@ com.guiseframework.js.Client=function()
 		/**Updates the size of the modal layer, creating it if necessary.*/
 		com.guiseframework.js.Client.prototype.updateModalLayer=function()
 		{
-			if(this._modalLayer==null)	//if the modal layer has not yet been created
-			{
-				this._modalLayer=document.createElementNS("http://www.w3.org/1999/xhtml", "div");	//create a div TODO use a constant for the namespace
-				this._modalLayer.className="modalLayer";	//load the modal layer style
-//TODO fix				oldModalLayerDisplayDisplay="none";
-				this._modalLayer.style.display="none";
-				this._modalLayer.style.position="absolute";
-				this._modalLayer.style.top="0px";
-				this._modalLayer.style.left="0px";
-				document.body.appendChild(this._modalLayer);	//add the modal layer to the document
-				if(isUserAgentIE6)	//if we're in IE6
-				{
-					if(!this._modalIFrame)	//if we haven't found our modal IFrame, get the modal IFrame to keep select components from showing through; but don't do this in Mozilla, or it will keep the cursor from showing up for text inputs in absolutely positioned div elements above the IFrame
-					{
-						var form=getForm(document.documentElement);	//get the form
-						if(form && form.id)	//if there is a form with an ID
-						{
-							var modalIFrameID=form.id.replace(".form", ".modalIFrame");	//determine the ID of the modal IFrame TODO use a constant, or get these values using a better method
-							this._modalIFrame=document.getElementById(modalIFrameID);	//get the modal IFrame
-						}
-					}
-				}
-			}
-		
 			var oldModalLayerDisplay=this._modalLayer.style.display;	//get the current display status of the modal layer
 			this._modalLayer.style.display="none";	//make sure the modal layer is hidden, because having it visible will interfere with the page/viewport size calculations (setting the size to 0px will not give us immediate feedback in IE during resize)
 			var oldModalIFrameDisplay=null;	//get the old modal IFrame display if we need to
@@ -3168,7 +3377,7 @@ com.guiseframework.js.Client=function()
 			}
 		*/
 		
-			var pageSize=getPageSize();	//get the size of the page
+			var pageSize=GUIUtilities.getPageSize();	//get the size of the page
 			var viewportSize=GUIUtilities.getViewportSize();	//get the size of the viewport
 			this._modalLayer.style.width=Math.max(viewportSize.width, pageSize.width)+"px";	//update the size of the modal layer to the larger of the page and the viewport
 			this._modalLayer.style.height=Math.max(viewportSize.height, pageSize.height)+"px";
@@ -3253,7 +3462,7 @@ com.guiseframework.js.Client=function()
 						{
 							if(busyVisible)	//if we are now showing the busy information
 							{							
-								var flyoverFrameBounds=getElementExternalBounds(busyElement);	//get the flyover frame bounds
+								var flyoverFrameBounds=GUIUtilities.getElementExternalBounds(busyElement);	//get the flyover frame bounds
 								flyoverIFrame.style.left=flyoverFrameBounds.x;	//update the bounds of the IFrame to match that of the flyover frame
 								flyoverIFrame.style.top=flyoverFrameBounds.y;
 								flyoverIFrame.style.width=flyoverFrameBounds.width;
@@ -3286,7 +3495,7 @@ com.guiseframework.js.Client=function()
 			for(var i=this._dropTargets.length-1; i>=0; --i)	//for each drop target (which have been sorted by increasing element depth)
 			{
 				var dropTarget=this._dropTargets[i];	//get this drop target
-				var dropTargetCoordinates=getElementFixedCoordinates(dropTarget);	//get the coordinates of the drop target
+				var dropTargetCoordinates=GUIUtilities.getElementFixedCoordinates(dropTarget);	//get the coordinates of the drop target
 				if(x>=dropTargetCoordinates.x && y>=dropTargetCoordinates.y && x<dropTargetCoordinates.x+dropTarget.offsetWidth && y<dropTargetCoordinates.y+dropTarget.offsetHeight)	//if the coordinates are within the drop target area
 				{
 					return dropTarget;	//we've found the deepest drop target
@@ -3614,7 +3823,7 @@ function DragState(dragSource, mouseX, mouseY)
 
 	this.initialMouseFixedPosition=new Point(mouseX, mouseY);
 //TODO del alert("initial mouse fixed position X: "+mouseX+" Y: "+mouseY);
-	this.initialFixedPosition=getElementFixedCoordinates(dragSource);	//get the initial position of the drag source in fixed terms of the viewport
+	this.initialFixedPosition=GUIUtilities.getElementFixedCoordinates(dragSource);	//get the initial position of the drag source in fixed terms of the viewport
 	this.initialOffsetPosition=new Point(dragSource.offsetLeft, dragSource.offsetTop);	//get the offset position of the drag source
 
 	this.initialPosition=null;	//these will be updated when dragging is started
@@ -3625,7 +3834,7 @@ function DragState(dragSource, mouseX, mouseY)
 	this.maxX=null;	
 //TODO fix	this.initialPosition=new Point(dragSource.offsetLeft, dragSource.offsetTop);	//get the position of the drag source
 	
-//TODO fix	this.initialPosition=getElementFixedCoordinates(dragSource);	//get the position of the drag source
+//TODO fix	this.initialPosition=GUIUtilities.getElementFixedCoordinates(dragSource);	//get the position of the drag source
 /*TODO fix
 	this.mouseDeltaX=mouseX-this.initialPosition.x;	//calculate the mouse position relative to the drag source
 	this.mouseDeltaY=mouseY-this.initialPosition.y;
@@ -3784,7 +3993,7 @@ function DragState(dragSource, mouseX, mouseY)
 			var element;	//we'll determine which element to use
 			if(this.dragCopy)	//if we should make a copy of the element
 			{
-				this.initialPosition=getElementCoordinates(this.dragSource);	//get the absolute element coordinates, as we'll be positioning the element absolutely
+				this.initialPosition=GUIUtilities.getElementCoordinates(this.dragSource);	//get the absolute element coordinates, as we'll be positioning the element absolutely
 
 				element=this.dragSource.cloneNode(true);	//create a clone of the original element
 				this._cleanClone(element);	//clean the clone
@@ -3918,7 +4127,7 @@ function onWindowLoad()
 		updateComponents(document.documentElement, true);	//update all components represented by elements within the document
 	//TODO del when works	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
 		eventManager.addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
-		guise.updateModalLayer();	//create and update the modal layer TODO do we need or want this now? TODO put in an initialize method
+		guise.onDocumentLoad();	//create and update the modal layer
 		guiseAJAX.sendAJAXRequest(new InitAJAXEvent());	//send an initialization AJAX request	
 	//TODO del	alert("compatibility mode: "+document.compatMode);
 		guise.setBusyVisible(false);	//turn off the busy indicator	
@@ -5229,212 +5438,6 @@ function getFocusableDescendant(node)
 		}
 	}
 	return null;	//indicate that no focusable node could be found
-}
-
-/**Retrieves the absolute bounds of the given element, including any negative margins.
-This method is not currently guaranteed to work on non-IE browsers.
-@param The element the bounds of which to find.
-@return A Rectangle containing the coordinates and external size of the element.
-*/
-function getElementExternalBounds(element)
-{
-	var point=getElementCoordinates(element);	//get the coordinates
-	var size=new Size(element.offsetWidth, element.offsetHeight);
-	if(element.currentStyle)	//compensate for negative margins on IE6, which apparently is only effective on the immediate element (primarily frames); if IE7 fixes this bug we'll have to check for quirks mode (which we use with IE6 but not on IE7), or as a last resort check specifically for IE6
-	{
-		if(element.currentStyle.marginLeft)	//if there is a left margin
-		{
-			var marginLeft=parseInt(element.currentStyle.marginLeft);	//parse the margin left value, which may be a string in the form XXpx
-			if(marginLeft && marginLeft<0)	//if there is a negative margin (and not some keyword)
-			{
-				point.x+=marginLeft;	//compensate for negative left margin
-			}
-		}
-		if(element.currentStyle.marginTop)	//if there is a top margin
-		{
-			var marginTop=parseInt(element.currentStyle.marginTop);	//parse the margin top value, which may be a string in the form XXpx
-			if(marginTop && marginTop<0)	//if there is a negative margin (and not some keyword)
-			{
-				point.y+=marginTop;	//compensate for negative top margin
-			}
-		}
-	}
-	//TODO check to see if the size compensates for negative margins or not
-	return new Rectangle(point, size);	//create a rectangle containing the coordinates and size of the element
-}
-
-
-/**Retrieves the absolute bounds of the given element.
-@param The element the bounds of which to find.
-@return A Rectangle containing the coordinates and size of the element.
-*/
-function getElementBounds(element)
-{
-	return new Rectangle(getElementCoordinates(element), new Size(element.offsetWidth, element.offsetHeight));	//create a rectangle containing the coordinates and size of the element
-}
-
-/**Retrieves the absolute X and Y coordinates of the given element.
-@param The element the coordinates of which to find.
-@return A Point containing the coordinates of the element.
-@see http://www.oreillynet.com/pub/a/javascript/excerpt/JSDHTMLCkbk_chap13/index6.html
-@see http://www.quirksmode.org/js/findpos.html
-@see http://blog.firetree.net/2005/07/04/javascript-find-position/
-*/
-function getElementCoordinates(element)	//TODO make sure this method correctly calculates margins and padding, as Mozilla and IE both show slight variations for text, but not for images
-{
-var originalElement=element;	//TODO del; testing
-	var x=0, y=0;
-	if(element.currentStyle)	//compensate for negative margins on IE6, which apparently is only effective on the immediate element (primarily frames); if IE7 fixes this bug we'll have to check for quirks mode (which we use with IE6 but not on IE7), or as a last resort check specifically for IE6
-	{
-		if(element.currentStyle.marginLeft)	//if there is a left margin
-		{
-			var marginLeft=parseInt(element.currentStyle.marginLeft);	//parse the margin left value, which may be a string in the form XXpx
-			if(marginLeft && marginLeft<0)	//if there is a negative margin (and not some keyword)
-			{
-				x-=marginLeft;	//compensate for negative left margin
-			}
-		}
-		if(element.currentStyle.marginTop)	//if there is a top margin
-		{
-			var marginTop=parseInt(element.currentStyle.marginTop);	//parse the margin top value, which may be a string in the form XXpx
-			if(marginTop && marginTop<0)	//if there is a negative margin (and not some keyword)
-			{
-				y-=marginTop;	//compensate for negative top margin
-			}
-		}
-	}
-	if(element.offsetParent)	//if element.offsetParent is supported
-	{
-//TODO del alert("using calculated element position");
-		while(element)	//while we have an element
-		{
-			x+=element.offsetLeft;	//add this element's offsets
-			y+=element.offsetTop;
-/*TODO fix or del; apparently this code is not as good as the version below, although it doesn't seem to compensate for scrollLeft
-			if(element.scrollLeft)
-			{
-				x-=element.scrollLeft;
-			}
-			if(element.scrollTop)
-			{
-//TODO del alert("element "+element.nodeName+" scroll top "+element.scrollTop);
-				y-=element.scrollTop;
-			}
-*/
-			element=element.offsetParent;	//go to the element's parent offset
-		}
-/*TODO fix for Mac
-    if (navigator.userAgent.indexOf("Mac") != -1 && 
-        typeof document.body.leftMargin != "undefined") {
-        offsetLeft += document.body.leftMargin;
-        offsetTop += document.body.topMargin;
-    }
-*/
-/*TODO fix; this inappropriately adds in the viewport scroll position on IE but not on Mozilla---but this is needed for internal scrolled divs on IE; try to distinguish the two when internal scrolled divs are used
-		var parent=originalElement.parentNode;
-		while(parent!=document.documentElement)
-		{
-			if(parent.scrollTop)
-			{
-//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
-				y-=parent.scrollTop;
-			}
-			parent=parent.parentNode;		
-		}
-*/
-
-
-/*TODO test
-		element=originalElement;
-		while(element!=null)	//TODO fix for scroll left
-		{
-			if(element.scrollLeft)
-			{
-//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
-				x-=element.scrollLeft;
-			}
-			if(element.scrollTop)
-			{
-//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
-				y-=element.scrollTop;
-			}
-			element=element.parentNode;		
-		}
-*/
-
-		var documentElement=document.documentElement;
-		element=originalElement.parentNode;
-		while(element!=documentElement)	//TODO fix for scroll left
-		{
-			var parentNode=element.parentNode;
-			if(isUserAgentIE6 && parentNode==documentElement)	//ignore the outermost element in IE6
-			{
-				break;
-			}
-			if(element.scrollLeft)
-			{
-//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
-				x-=element.scrollLeft;
-			}
-			if(element.scrollTop)
-			{
-//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
-				y-=element.scrollTop;
-			}
-			element=parentNode;
-		}
-	}
-	else if(element.x && element.y)	//if element.offsetParent is not supported by but element.x and element.y are supported (e.g. Navigator 4)
-	{
-		x=element.x;	//get the element's coordinates directly
-		y=element.y;
-	}
-	return new Point(x, y);	//return the point we calculated
-}
-
-/**Retrieves the X and Y coordinates of the given element relative to the viewport.
-@param The element the coordinates of which to find.
-@return A Point containing the coordinates of the element relative to the viewport.
-*/
-function getElementFixedCoordinates(element)
-{
-	var absoluteCoordinates=getElementCoordinates(element);	//get the element's absolute coordinates
-	var scrollCoordinates=GUIUtilities.getScrollCoordinates();	//get the viewport's scroll coordinates
-	return new Point(absoluteCoordinates.x-scrollCoordinates.x, absoluteCoordinates.y-scrollCoordinates.y);	//compensate for viewport scrolling
-}
-
-/**@return The size of the document, even if it is outside the viewport.
-@see http://www.quirksmode.org/viewport/compatibility.html
-*/
-function getPageSize()
-{
-	var width=Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
-	var height=Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
-//	alert("width: "+width+" height: "+height);
-/*TODO this is presented at http://www.quirksmode.org/viewport/compatibility.html, but doesn't correctly give the scroll width for Firefox
-	var width=0, height=0;	//we'll determine the width and height
-	var scrollHeight=document.body.scrollHeight;	//get the scroll height
-	var offsetHeight=document.body.offsetHeight;	//get the offset height
-	if(scrollHeight>offsetHeight)	//if the scroll height is larger
-	{
-		width=document.body.scrollWidth;	//use the scroll dimensions
-		height=document.body.scrollHeight;
-	}
-	else	//if the body offsets are larger (e.g. Explorer Mac and IE 6 strict)
-	{
-		width=document.body.offsetWidth;	//use the body offsets
-		height=document.body.offsetHeight;
-	}
-	return new Size(width, height);	//return the page size
-	
-alert("document.body.scrollWidth: "+document.body.scrollWidth+"\n"+
-			"document.body.offsetWidth: "+document.body.offsetWidth+"\n"+
-			"document.body.clientWidth: "+document.body.clientWidth+"\n"+
-			"document.documentElement.scrollWidth: "+document.documentElement.scrollWidth+"\n"+
-			"document.documentElement.offsetWidth: "+document.documentElement.offsetWidth+"\n"+
-			"document.documentElement.clientWidth: "+document.documentElement.clientWidth+"\n")
-*/	
-	return new Size(width, height);	//return the page size
 }
 
 /**An abstract effect base class.

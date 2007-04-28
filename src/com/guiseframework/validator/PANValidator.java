@@ -16,7 +16,7 @@ The validator ensures that the PAN represents one of the allowed ID card product
 PANs for unknown products are considered invalid.
 @see IDCard
 */
-public class PANValidator extends AbstractValidator<PAN>
+public class PANValidator extends AbstractValidator<PAN>	//TODO add http://www.darkcoding.net/index.php/credit-card-numbers/ reference
 {
 
 	/**The valid products bound property.*/
