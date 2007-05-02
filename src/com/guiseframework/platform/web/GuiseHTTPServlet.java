@@ -39,6 +39,7 @@ import static com.garretwilson.lang.ThreadUtilities.*;
 
 import com.garretwilson.net.DefaultResource;
 import com.garretwilson.net.Resource;
+import com.garretwilson.net.ResourceIOException;
 import com.garretwilson.net.URIConstants;
 import com.garretwilson.net.URIUtilities;
 import com.garretwilson.net.http.*;
@@ -1759,7 +1760,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 								{
 									try
 									{
-										resourceExistsHolder.setObject(Boolean.valueOf(((ResourceDestination)destination).exists(path, bookmark, referrerURI)));	//ask the resource destination if the resource exists
+										resourceExistsHolder.setObject(Boolean.valueOf(((ResourceDestination)destination).exists(guiseSession, path, bookmark, referrerURI)));	//ask the resource destination if the resource exists
 									}
 									catch(final IOException ioException)	//if an exception is thrown
 									{
@@ -1870,11 +1871,11 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 									{
 										try
 										{
-											destinationResourceDescriptionHolder.setObject(resourceDestination.getResourceDescription(path, bookmark, referrerURI));	//ask the resource destination for the resource description
+											destinationResourceDescriptionHolder.setObject(resourceDestination.getResourceDescription(guiseSession, path, bookmark, referrerURI));	//ask the resource destination for the resource description
 										}
-										catch(final IOException ioException)	//if an exception is thrown
+										catch(final ResourceIOException resourceIOException)	//if an exception is thrown
 										{
-											throw new UndeclaredThrowableException(ioException);	//let it pass to the calling thread
+											throw new UndeclaredThrowableException(resourceIOException);	//let it pass to the calling thread
 										}
 									}
 								});
@@ -1882,9 +1883,9 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 					catch(final UndeclaredThrowableException undeclaredThrowableException)	//if an exception was thrown
 					{
 						final Throwable cause=undeclaredThrowableException.getCause();	//see what exception was thrown
-						if(cause instanceof IOException)	//if an IOException was thrown
+						if(cause instanceof ResourceIOException)	//if a ResourceIOException was thrown
 						{
-							throw ((IOException)cause);	//pass it on
+							throw HTTPException.createHTTPException((ResourceIOException)cause);	//pass back an equivalent HTTP exception
 						}
 						else	//we don't expect any other types of exceptions
 						{
@@ -2042,11 +2043,11 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 							{
 								try
 								{
-									inputStreamHolder.setObject(resourceDestination.getInputStream(navigationPath, bookmark, referrerURI));	//ask the resource destination for an input stream to the resource
+									inputStreamHolder.setObject(resourceDestination.getInputStream(guiseSession, navigationPath, bookmark, referrerURI));	//ask the resource destination for an input stream to the resource
 								}
-								catch(final IOException ioException)	//if an exception is thrown
+								catch(final ResourceIOException resourceIOException)	//if an exception is thrown
 								{
-									throw new UndeclaredThrowableException(ioException);	//let it pass to the calling thread
+									throw new UndeclaredThrowableException(resourceIOException);	//let it pass to the calling thread
 								}
 							}
 						});
@@ -2054,9 +2055,9 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 			catch(final UndeclaredThrowableException undeclaredThrowableException)	//if an exception was thrown
 			{
 				final Throwable cause=undeclaredThrowableException.getCause();	//see what exception was thrown
-				if(cause instanceof IOException)	//if an IOException was thrown
+				if(cause instanceof ResourceIOException)	//if a ResourceIOException was thrown
 				{
-					throw ((IOException)cause);	//pass it on
+					throw HTTPException.createHTTPException((ResourceIOException)cause);	//pass back an equivalent HTTP exception
 				}
 				else	//we don't expect any other types of exceptions
 				{

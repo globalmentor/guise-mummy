@@ -1180,20 +1180,10 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	*/
 	public String createTempPublicResource(String baseName, final String extension, final GuiseSession restrictionSession) throws IOException
 	{
-		if(checkInstance(baseName, "Base name cannot be null.").length()==0)	//if the base name is empty)
-		{
-			throw new IllegalArgumentException("Base name cannot be the empty string.");
-		}
-		if(baseName.length()<3)	//if the base name is under three characters long (the temp file creation API requires at least three characters)
-		{
-			baseName=baseName+"-temp";	//pad the base name to meet the requirements of File.createTempFile()
-		}
-		final File tempFile=File.createTempFile(baseName, new StringBuilder().append(EXTENSION_SEPARATOR).append(extension).toString(), getTempDirectory());	//create a temporary file in the application's temporary directory
-		tempFile.deleteOnExit();	//tell the file it should be deleted when the JVM exits
+		final File tempFile=createTempFile(baseName, checkInstance(extension, "Extension cannot be null."), getTempDirectory(), true);	//create a temporary file in the application's temporary directory, specifying that it should be deleted on JVM exit
 		final String filename=tempFile.getName();	//get the name of the file
 		assert filename.length()>0 : "Name of generated temporary file is missing.";
 		final TempFileInfo tempFileInfo=new TempFileInfo(tempFile, restrictionSession);	//create an object to keep track of the file
-//TODO del		final String path=GUISE_TEMP_BASE_PATH+filename;	//create a path for the temp resource under the Guise temp path
 		filenameTempFileInfoMap.put(filename, tempFileInfo);	//map the filename to the temp file info
 		if(restrictionSession!=null)	//if file access should be restricted to a session
 		{

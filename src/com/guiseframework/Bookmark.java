@@ -8,6 +8,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 
+import static com.garretwilson.lang.EnumUtilities.*;
 import com.garretwilson.net.URIUtilities;
 import com.garretwilson.text.ArgumentSyntaxException;
 import com.garretwilson.util.Debug;
@@ -235,5 +236,16 @@ public class Bookmark implements Cloneable
 		{
 			super(checkInstance(name, "Parameter name cannot be null."), checkInstance(value, "Parameter value cannot be null."));	//construct the parent class
 		}		
+
+		/**Constructor specifying the name and an enum value.
+		The value will be converted to a serialized form by changing the enum name to lowercase and replacing every '_' with '-'.
+		@param name The parameter name.
+		@param value The parameter value.
+		@exception NullPointerException if the given name and/or value is <code>null</code>.
+		*/
+		public <E extends Enum<E>> Parameter(final String name, final E value)
+		{
+			this(name, getSerializationName(value));	//get the serialized form of the enum and create the bookmark
+		}
 	}
 }

@@ -62,7 +62,7 @@ public class Resources extends ClassTypedRDFResource
 	}
 
 	/**Returns a form of the enum name appropriate for a resource key.
-	The name is converted to lowercaes and all underscore characters ('_') are replaced by a period ('.').
+	The name is converted to lowercaes and all underscore characters ('_') are replaced by periods ('.').
 	For example, <code>FILE_NOT_FOUND</code> would produce <code>file.not.found</code>.
 	@param e The enum instance to convert to a resource key.
 	@return A string representing the enum instance in a style appropriate for use as a resource key.
