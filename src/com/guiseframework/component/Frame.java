@@ -18,6 +18,8 @@ public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalC
 	public final static String CLOSE_ACTION_CONTROL_PROPERTY=getPropertyName(Frame.class, "closeActionControl");
 	/**The content bound property.*/
 	public final static String CONTENT_PROPERTY=getPropertyName(Frame.class, "content");
+	/**The bound property of the frame menu.*/
+	public final static String MENU_PROPERTY=getPropertyName(Frame.class, "menu");
 	/**The bound property of whether the frame is modal if and when it is open.*/
 	public final static String MODAL_PROPERTY=getPropertyName(Frame.class, "modal");
 	/**The bound property of whether the component is movable.*/
@@ -50,6 +52,15 @@ public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalC
 
 	/**@return The state of the frame.*/
 	public State getState();
+
+	/**@return The frame menu, or <code>null</code> if this frame does not have a menu.*/
+	public Menu<?> getMenu();
+
+	/**Sets the frame menu.
+	This is a bound property.
+	@param newMenu The frame menu, or <code>null</code> if this frame does not have a menu.
+	*/
+	public void setMenu(final Menu<?> newMenu);
 
 	/**@return Whether the frame is modal if and when it is open.*/
 	public boolean isModal();

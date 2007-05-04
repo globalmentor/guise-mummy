@@ -5,4 +5,5 @@ package com.guiseframework.component;
 */
 public interface ApplicationFrame<C extends ApplicationFrame<C>> extends Frame<C>
 {
+
 }

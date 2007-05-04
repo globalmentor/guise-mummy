@@ -187,4 +187,10 @@ public class PasswordAuthenticationPanel extends AbstractPanel<PasswordAuthentic
 		return isValid();	//return the current valid state
 	}
 
+	/**Clears the username and password values.*/
+	public void clearValues()
+	{
+		usernameControl.clearValue();	//clear the username value
+		passwordControl.clearValue();	//clear the password value
+	}
 }

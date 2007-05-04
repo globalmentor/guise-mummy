@@ -9,8 +9,15 @@
 		<dc:description>Default Guise™ Resources (en).</dc:description>
 		<dc:creator>Garret Wilson</dc:creator>
 
+		<!-- general application labels -->
+		<resource:application.name>Unnamed Guise™ Application</resource:application.name>
+		<resource:application.label>&#x0098;application.name&#x009C; &#x0098;application.version&#x009C;</resource:application.label>
+		<resource:application.description></resource:application.description>
+		<resource:application.copyright></resource:application.copyright>
+		<resource:application.version>0.0.0</resource:application.version>
+
 		<!-- general Guise labels -->
-		<resource:error.label>Error</resource:error.label>
+		<resource:error.label>Error</resource:error.label>	<!-- TODO move to Theme -->
 	
 		<!-- Guise converters -->
 		<resource:converter.invalid.value.message>Invalid value: "{0}".</resource:converter.invalid.value.message>
@@ -20,7 +27,6 @@
 		<resource:validator.invalid.value.message>Invalid value: "{0}".</resource:validator.invalid.value.message>
 		<!-- general validation errors -->
 		<resource:validation.false.message>One or more values you entered are invalid.</resource:validation.false.message>
-
 
 		<!-- vCard -->
 		<resource:text.directory.vcard.n.family.name.label>Last</resource:text.directory.vcard.n.family.name.label>

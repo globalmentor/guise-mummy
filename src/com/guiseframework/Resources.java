@@ -22,6 +22,13 @@ public class Resources extends ClassTypedRDFResource
 	/**The URI to the resource key ontology namespace.*/
 	public final static URI RESOURCE_NAMESPACE_URI=URI.create("http://guiseframework.com/namespaces/resource#");
 
+		//standard labels
+	public final static String APPLICATION_NAME=createStringResourceReference("application.name");
+	public final static String APPLICATION_LABEL=createStringResourceReference("application.label");
+	public final static String APPLICATION_DESCRIPTION=createStringResourceReference("application.description");
+	public final static String APPLICATION_COPYRIGHT=createStringResourceReference("application.copyright");
+	public final static String APPLICATION_VERSION=createStringResourceReference("application.version");
+
 	/**Default constructor.*/
 	public Resources()
 	{

@@ -65,7 +65,9 @@ public class Theme extends ClassTypedRDFResource
 		//standard colors
 	public final static Color<?> COLOR_SELECTED_BACKGROUND=new ResourceColor("theme.color.selected.background");
 
-		//standard labels
+		//standard theme labels
+	public final static String LABEL_ABOUT=createStringResourceReference("theme.label.about");
+	public final static String LABEL_ABOUT_X=createStringResourceReference("theme.label.about.x");
 	public final static String LABEL_ACCEPT=createStringResourceReference("theme.label.accept");
 	public final static String LABEL_ACCESS=createStringResourceReference("theme.label.access");
 	public final static String LABEL_ADD=createStringResourceReference("theme.label.add");
@@ -74,6 +76,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_EDIT=createStringResourceReference("theme.label.edit");
 	public final static String LABEL_FINISH=createStringResourceReference("theme.label.finish");
 	public final static String LABEL_FIRST=createStringResourceReference("theme.label.first");
+	public final static String LABEL_HELP=createStringResourceReference("theme.label.help");
 	public final static String LABEL_HOME=createStringResourceReference("theme.label.home");
 	public final static String LABEL_JOIN=createStringResourceReference("theme.label.join");
 	public final static String LABEL_LAST=createStringResourceReference("theme.label.last");
@@ -87,7 +90,8 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_SUBMIT=createStringResourceReference("theme.label.submit");
 	public final static String LABEL_SUBTRACT=createStringResourceReference("theme.label.subtract");
 	public final static String LABEL_USERNAME=createStringResourceReference("theme.label.username");
-		//standard icons
+		//standard theme icons
+	public final static URI GLYPH_ABOUT=createURIResourceReference("theme.glyph.about");
 	public final static URI GLYPH_ACCEPT=createURIResourceReference("theme.glyph.accept");
 	public final static URI GLYPH_ACCEPT_MULTIPLE=createURIResourceReference("theme.glyph.accept.multiple");
 	public final static URI GLYPH_ACCESS=createURIResourceReference("theme.glyph.access");
@@ -114,6 +118,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI GLYPH_FOLDER=createURIResourceReference("theme.glyph.folder");
 	public final static URI GLYPH_FOLDER_CLOSED=createURIResourceReference("theme.glyph.folder.closed");
 	public final static URI GLYPH_FOLDER_OPEN=createURIResourceReference("theme.glyph.folder.open");
+	public final static URI GLYPH_HELP=createURIResourceReference("theme.glyph.help");
 	public final static URI GLYPH_HIDE=createURIResourceReference("theme.glyph.hide");
 	public final static URI GLYPH_HIERARCHY=createURIResourceReference("theme.glyph.hierarchy");
 	public final static URI GLYPH_HOME=createURIResourceReference("theme.glyph.home");
@@ -144,7 +149,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI GLYPH_USER=createURIResourceReference("theme.glyph.user");
 	public final static URI GLYPH_VIEW=createURIResourceReference("theme.glyph.view");
 	public final static URI GLYPH_WARN=createURIResourceReference("theme.glyph.warn");
-		//standard messages
+		//standard theme messages
 	public final static String MESSAGE_BUSY=createStringResourceReference("theme.message.busy");
 	public final static String MESSAGE_PASSWORD_INVALID=createStringResourceReference("theme.message.password.invalid");
 	public final static String MESSAGE_PASSWORD_UNVERIFIED=createStringResourceReference("theme.message.password.unverified");

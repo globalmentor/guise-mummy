@@ -17,10 +17,10 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 {
 
 	/**The resource URI for the close image.*/
-	public final static URI CLOSE_ICON_RESOURCE_URI=createURIResourceReference("theme.frame.close.icon");
+	public final static URI CLOSE_ICON_RESOURCE_URI=createURIResourceReference("theme.frame.close.icon");	//TODO probably move this to Theme
 
 	/**The enumeration of frame components.*/
-	private enum FrameComponent{CONTENT_COMPONENT, CLOSE_ACTION_CONTROL};
+	private enum FrameComponent{CONTENT_COMPONENT, MENU_COMPONENT, CLOSE_ACTION_CONTROL};
 
 	/**The state of the frame.*/
 	private State state=State.CLOSED;
@@ -193,29 +193,46 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 			}			
 		}
 
-	/**The single child component, or <code>null</code> if this frame does not have a child component.*/
-//TODO del	private Component<?> content;
+	/**@return The content child component, or <code>null</code> if this frame does not have a content child component.
+	@see FrameComponent#CONTENT_COMPONENT
+	*/
+	public Component<?> getContent() {return getComponent(FrameComponent.CONTENT_COMPONENT);}
 
-		/**@return The content child component, or <code>null</code> if this frame does not have a content child component.
-		@see FrameComponent#CONTENT_COMPONENT
-		*/
-		public Component<?> getContent() {return getComponent(FrameComponent.CONTENT_COMPONENT);}
-
-		/**Sets the content child component.
-		This is a bound property.
-		@param newContent The content child component, or <code>null</code> if this frame does not have a content child component.
-		@see FrameComponent#CONTENT_COMPONENT
-		@see Frame#CONTENT_PROPERTY
-		*/
-		public void setContent(final Component<?> newContent)
+	/**Sets the content child component.
+	This is a bound property.
+	@param newContent The content child component, or <code>null</code> if this frame does not have a content child component.
+	@see FrameComponent#CONTENT_COMPONENT
+	@see Frame#CONTENT_PROPERTY
+	*/
+	public void setContent(final Component<?> newContent)
+	{
+		final Component<?> oldContent=setComponent(FrameComponent.CONTENT_COMPONENT, newContent);	//set the component
+		if(oldContent!=newContent)	//if the component really changed
 		{
-			final Component<?> oldContent=setComponent(FrameComponent.CONTENT_COMPONENT, newContent);	//set the component
-			if(oldContent!=newContent)	//if the component really changed
-			{
-				firePropertyChange(CONTENT_PROPERTY, oldContent, newContent);	//indicate that the value changed
-			}
+			firePropertyChange(CONTENT_PROPERTY, oldContent, newContent);	//indicate that the value changed
 		}
+	}
 
+	/**@return The frame menu, or <code>null</code> if this frame does not have a menu.
+	@see FrameComponent#MENU_COMPONENT
+	*/
+	public Menu<?> getMenu() {return (Menu<?>)getComponent(FrameComponent.MENU_COMPONENT);}
+
+	/**Sets the frame menu.
+	This is a bound property.
+	@param newMenu The frame menu, or <code>null</code> if this frame does not have a menu.
+	@see FrameComponent#MENU_COMPONENT
+	@see Frame#MENU_PROPERTY
+	*/
+	public void setMenu(final Menu<?> newMenu)
+	{
+		final Menu<?> oldMenu=(Menu<?>)setComponent(FrameComponent.MENU_COMPONENT, newMenu);	//set the component
+		if(oldMenu!=newMenu)	//if the component really changed
+		{
+			firePropertyChange(MENU_PROPERTY, oldMenu, newMenu);	//indicate that the value changed
+		}
+	}
+	
 	/**The action listener for closing the frame.*/
 	private final ActionListener closeActionListener;
 		
