@@ -27,6 +27,7 @@ import com.guiseframework.event.*;
 import com.guiseframework.geometry.Extent;
 import com.guiseframework.model.InformationLevel;
 import com.guiseframework.model.Notification;
+import com.guiseframework.prototype.ActionPrototype;
 import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
 
@@ -45,6 +46,7 @@ import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static com.garretwilson.text.FormatUtilities.*;
 import static com.garretwilson.text.xml.XMLUtilities.*;
 import static com.guiseframework.Resources.*;
+import static com.guiseframework.theme.Theme.*;
 
 /**An abstract implementation that keeps track of the components of a user session.
 @author Garret Wilson
@@ -675,6 +677,12 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			}
 		}
 
+	/**The action prototype for presenting application information.*/
+	private final ActionPrototype aboutApplicationActionPrototype;
+
+		/**@return The action prototype for presenting application information.*/
+		public ActionPrototype getAboutApplicationActionPrototype() {return aboutApplicationActionPrototype;}
+
 	/**Guise application constructor.
 	The session local will initially be set to the locale of the associated Guise application.
 	No operation must be performed inside the constructor that would require the presence of the Guise session within this thread group.
@@ -697,6 +705,23 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 //TODO del when works		this.locale=application.getDefaultLocale();	//default to the application locale
 		this.orientation=Orientation.getOrientation(locale);	//set the orientation default based upon the locale
 		logWriter=new OutputStreamWriter(System.err);	//default to logging to the error output; this will be replaced after the session is created
+			//about action prototype
+		aboutApplicationActionPrototype=new ActionPrototype();
+		aboutApplicationActionPrototype.setLabel(LABEL_ABOUT+' '+APPLICATION_NAME);
+		aboutApplicationActionPrototype.setIcon(GLYPH_ABOUT);
+		aboutApplicationActionPrototype.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(final ActionEvent actionEvent)
+					{
+						final AboutPanel aboutPanel=new AboutPanel();	//create a new about panel
+						aboutPanel.setNameLabel(APPLICATION_NAME);
+						aboutPanel.setVersionLabel(LABEL_VERSION+' '+APPLICATION_VERSION);
+						aboutPanel.setCopyrightLabel(APPLICATION_COPYRIGHT);
+						final Frame<?> aboutFrame=new NotificationOptionDialogFrame(aboutPanel, Notification.Option.OK);	//create an about frame
+						aboutFrame.setLabel(LABEL_ABOUT+' '+APPLICATION_NAME);	//set the title
+						aboutFrame.open(true);	//show the about dialog
+					}
+				});
 	}
 
 	/**Retrieves the component bound to the given destination.
@@ -1130,9 +1155,22 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 				logParameters.put("bookmark", bookmark);	//bookmark TODO use a constant
 				logParameters.put("referrerURI", referrerURI);	//referrer URI TODO use a constant
 				log(null, "guise-navigate", null, logParameters, null);	//TODO improve; use a constant
-				final NavigationEvent navigationEvent=new NavigationEvent(this, navigationPath, bookmark, referrerURI);	//create a navigation event with the session as the source of the event
-				fireNavigated(getApplicationFrame(), navigationEvent);	//fire a navigation event to all components in the application frame hierarchy
+				fireNavigated(referrerURI);	//fire a navigation event to the entire application frame hierarchy
 			}
+		}
+
+		/**Fires a {@link NavigationEvent} to all {@link NavigationListener}s in the session application frame hierarchy.
+		@param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
+		@see #getNavigationPath()
+		@see #getBookmark()
+		@see #getApplicationFrame()
+		@see NavigationListener
+		@see NavigationEvent 
+		*/
+		public void fireNavigated(final URI referrerURI)
+		{
+			final NavigationEvent navigationEvent=new NavigationEvent(this, getNavigationPath(), getBookmark(), referrerURI);	//create a navigation event with the session as the source of the event
+			fireNavigated(getApplicationFrame(), navigationEvent);	//fire a navigation event to all components in the application frame hierarchy			
 		}
 
 		/**Fires a {@link NavigationEvent} to all {@link NavigationListener}s in the given component hierarchy.

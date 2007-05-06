@@ -1,9 +1,9 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ClassUtilities.getPropertyName;
-
 import java.beans.PropertyVetoException;
 import java.util.Arrays;
+
+import static com.garretwilson.lang.ClassUtilities.*;
 
 import com.guiseframework.component.layout.*;
 import com.guiseframework.model.Notification;

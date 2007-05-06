@@ -838,7 +838,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 							final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
 							if(requestedNavigation!=null || !ObjectUtilities.equals(navigationBookmark, newBookmark))	//if navigation is requested or the bookmark has changed, redirect the browser
 							{
-								final String redirectURIString;	//we'll determine where to direct to
+								final URI redirectURI;	//we'll determine where to direct to; this may not be an absolute URI
 								if(requestedNavigation!=null)	//if navigation is requested
 								{
 									final URI requestedNavigationURI=requestedNavigation.getNewNavigationURI();
@@ -848,42 +848,45 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 									{
 										beginModalNavigation(guiseApplication, guiseSession, (ModalNavigation)requestedNavigation);	//begin the modal navigation
 									}
-									redirectURIString=requestedNavigationURI.toString();	//we already have the destination URI
+									redirectURI=requestedNavigationURI;	//we already have the destination URI
 								}
 								else	//if navigation is not requested, request a navigation to the new bookmark location
 								{
-									redirectURIString=request.getRequestURL().append(newBookmark).toString();	//save the string form of the constructed bookmark URI
+									redirectURI=URI.create(request.getRequestURL().append(newBookmark).toString());	//save the string form of the constructed bookmark URI
 								}
-								if(isAJAX)	//if this is an AJAX request
+								if(!requestURI.equals(requestURI.resolve(redirectURI)))	//resolve the redirect URI against the current URI to see if the navigation is really changing (i.e. they didn't request to go to where they already were)
 								{
-									guiseContext.clearText();	//clear all the response data (which at this point should only be navigation information, anyway)
-									guiseContext.writeElementBegin(null, "navigate");	//<navigate>	//TODO use a constant
-									guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
-									if(requestedNavigation!=null)	//if navigation was requested (i.e. this isn't just a bookmark registration)
+									if(isAJAX)	//if this is an AJAX request
 									{
-										final String viewportID=requestedNavigation.getViewportID();	//get the requested viewport ID
-										if(viewportID!=null)	//if a viewport was requested
+										guiseContext.clearText();	//clear all the response data (which at this point should only be navigation information, anyway)
+										guiseContext.writeElementBegin(null, "navigate");	//<navigate>	//TODO use a constant
+										guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
+										if(requestedNavigation!=null)	//if navigation was requested (i.e. this isn't just a bookmark registration)
 										{
-											guiseContext.writeAttribute(null, "viewportID", viewportID);	//specify the viewport ID TODO use a constant
+											final String viewportID=requestedNavigation.getViewportID();	//get the requested viewport ID
+											if(viewportID!=null)	//if a viewport was requested
+											{
+												guiseContext.writeAttribute(null, "viewportID", viewportID);	//specify the viewport ID TODO use a constant
+											}
 										}
+										guiseContext.write(redirectURI.toString());	//write the navigation URI
+										guiseContext.writeElementEnd(null, "navigate");	//</navigate>
+										isNavigating=true;	//show that we're going to navigate; process the other events to make sure the data model is up-to-date (and in case the navigation gets overridden)
 									}
-									guiseContext.write(redirectURIString);	//write the navigation URI
-									guiseContext.writeElementEnd(null, "navigate");	//</navigate>
-									isNavigating=true;	//show that we're going to navigate; process the other events to make sure the data model is up-to-date (and in case the navigation gets overridden)
+									else	//if this is not an AJAX request
+									{
+										throw new HTTPMovedTemporarilyException(redirectURI);	//redirect to the new navigation location TODO fix to work with other viewports						
+									}
+									//TODO if !AJAX						throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
+									//TODO store a flag or something---if we're navigating, we probably should flush the other queued events
 								}
-								else	//if this is not an AJAX request
-								{
-									throw new HTTPMovedTemporarilyException(URI.create(redirectURIString));	//redirect to the new navigation location TODO fix to work with other viewports						
-								}
-			//TODO if !AJAX						throw new HTTPMovedTemporarilyException(requestedNavigationURI);	//redirect to the new navigation location
-								//TODO store a flag or something---if we're navigating, we probably should flush the other queued events
 							}
-			
-							
-							
-							
 							if(!isNavigating && !ObjectUtilities.equals(oldPrincipal, guiseSession.getPrincipal()))	//if the principal has changed after updating the model (if we're navigating there's no need to reload)
 							{
+								if(!isNavigating)	//if we're not navigating to a new location, fire a navigation event anyway to indicate that the principal has changed
+								{
+									guiseSession.fireNavigated(requestURI);	//tell the session that navigation has essentially occurred again from the same URI so that it can update things based upon the new principal
+								}
 								if(isAJAX)	//if this is an AJAX request
 								{
 									guiseContext.clearText();	//clear all the response data (which at this point should only be navigation information, anyway)

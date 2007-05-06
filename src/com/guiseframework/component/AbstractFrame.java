@@ -2,16 +2,20 @@ package com.guiseframework.component;
 
 import java.beans.PropertyChangeListener;
 import java.net.URI;
+import java.util.List;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.beans.GenericPropertyChangeListener;
+
+import static com.guiseframework.GuiseResourceConstants.*;
 import static com.guiseframework.Resources.*;
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.event.*;
+import com.guiseframework.model.Notification;
 
 /**Abstract implementation of a frame.
+This implementation notifies the user when the frame does not validate in {@link #validate()}.
 @author Garret Wilson
-@see LayoutPanel
 */
 public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumCompositeComponent<AbstractFrame.FrameComponent, C> implements Frame<C>
 {
@@ -357,5 +361,36 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 //TODO del Debug.trace("ready to remove frame");
 		getSession().removeFrame(this);	//remove the frame from the session
 		setState(State.CLOSED);	//change the state
+	}
+
+	/**Validates the user input of this component and all child components.
+	The component will be updated with error information.
+	The user is also notified of any error, using this component's notification, the first notification in the content component, or a default message.
+	@return The current state of {@link #isValid()} as a convenience.
+	*/
+	public boolean validate()
+	{
+		if(!super.validate())	//validate the component normally; if the component does not validate
+		{
+			Notification notification=getNotification();	//see if this panel has any notification
+			if(notification==null)	//if we don't have a notification
+			{
+				final Component<?> contentComponent=getContent();	//get the content component
+				if(contentComponent!=null)	//if there is a content component
+				{
+					final List<Notification> notifications=getNotifications(contentComponent);	//get the notifications from the content component
+					if(!notifications.isEmpty())	//if there are notifications
+					{
+						notification=notifications.get(0);	//use the first notification
+					}
+				}
+			}
+			if(notification==null)	//if we didn't find a custom notification
+			{
+				notification=new Notification(VALIDATION_FALSE_MESSAGE_RESOURCE_REFERENCE, Notification.Severity.ERROR);	//use a general validation notification
+			}
+			getSession().notify(notification);	//indicate that there was a validation error
+		}
+		return isValid();	//return the current valid state
 	}
 }

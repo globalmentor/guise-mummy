@@ -68,7 +68,7 @@ public class Notification
 	/**The options which can be expected as responses for this notification.
 	The option ordinals represent the order in which they should be presented.
 	Some options such as {@link Option#ABORT}, {@link Option#STOP}, and {@link Option#CANCEL}, are <dfn>fatal</dfn>,
-	indicating that the user has actively expressed that an action be stopped permanently.
+		indicating that the user has actively expressed that an action be stopped permanently.
 	*/
 	public enum Option
 	{
@@ -79,7 +79,7 @@ public class Notification
 		NO_ALL(true),
 		ABORT(true),
 		RETRY(false),
-		FAIL(false),
+		FAIL(true),
 		STOP(true),
 		REMOVE(false),
 		CANCEL(true);

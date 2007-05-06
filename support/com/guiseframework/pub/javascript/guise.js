@@ -3086,7 +3086,12 @@ com.guiseframework.js.Client=function()
 			frame.style.left="-9999px";	//TODO testing; this works; maybe even remove the visibility changing
 			frame.style.top="-9999px";	//TODO testing
 		
+/*TODO del; doesn't fix IE auto frame size problem
+			var form=getForm(document.documentElement);	//get the form
 			document.body.appendChild(frame);	//add the frame element to the document; do this first, because IE doesn't allow the style to be accessed directly with imported nodes until they are added to the document
+*/
+			
+			document.body.appendChild(frame);	//add the frame element to the document; do this first, because IE doesn't allow the style to be accessed directly with imported nodes until they are added to the document			
 			initializeNode(frame, true);	//initialize the new imported frame, installing the correct event handlers; do this before the frame is positioned, because initialization also fixes IE6 classes, which can affect position
 			this._initializeFramePosition(frame);	//initialize the frame's position
 		

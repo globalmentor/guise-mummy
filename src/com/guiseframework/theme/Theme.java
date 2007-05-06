@@ -67,7 +67,6 @@ public class Theme extends ClassTypedRDFResource
 
 		//standard theme labels
 	public final static String LABEL_ABOUT=createStringResourceReference("theme.label.about");
-	public final static String LABEL_ABOUT_X=createStringResourceReference("theme.label.about.x");
 	public final static String LABEL_ACCEPT=createStringResourceReference("theme.label.accept");
 	public final static String LABEL_ACCESS=createStringResourceReference("theme.label.access");
 	public final static String LABEL_ADD=createStringResourceReference("theme.label.add");
@@ -90,6 +89,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_SUBMIT=createStringResourceReference("theme.label.submit");
 	public final static String LABEL_SUBTRACT=createStringResourceReference("theme.label.subtract");
 	public final static String LABEL_USERNAME=createStringResourceReference("theme.label.username");
+	public final static String LABEL_VERSION=createStringResourceReference("theme.label.version");
 		//standard theme icons
 	public final static URI GLYPH_ABOUT=createURIResourceReference("theme.glyph.about");
 	public final static URI GLYPH_ACCEPT=createURIResourceReference("theme.glyph.accept");

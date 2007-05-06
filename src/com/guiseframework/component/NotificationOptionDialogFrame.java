@@ -74,8 +74,11 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 					{
 						try
 						{
-							NotificationOptionDialogFrame.this.setValue(option);	//chose this option
-							close();	//close the frame
+							if(option.isFatal() || validate())	//if this is not a fatal option, first see if the frame validates
+							{
+								NotificationOptionDialogFrame.this.setValue(option);	//chose this option
+								close();	//close the frame
+							}
 						}
 						catch(final PropertyVetoException propertyVetoException)	//we don't expect a validation exception
 						{
@@ -85,5 +88,6 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 				});
 		return button;	//return the created button
 	}
-	
+
+
 }

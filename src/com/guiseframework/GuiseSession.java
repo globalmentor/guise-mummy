@@ -3,29 +3,21 @@ package com.guiseframework;
 import java.io.*;
 import java.net.URI;
 import java.security.Principal;
-import java.text.MessageFormat;
 import java.util.*;
 
-import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
-import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.event.PostponedEvent;
-import com.garretwilson.util.Debug;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.event.*;
-import com.guiseframework.geometry.Extent;
 import com.guiseframework.model.InformationLevel;
 import com.guiseframework.model.Notification;
+import com.guiseframework.prototype.ActionPrototype;
 import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.checkInstance;
-import static com.guiseframework.Resources.createStringResourceReference;
-import static com.guiseframework.Resources.createURIResourceReference;
-import static com.guiseframework.Resources.getResourceKeyName;
 
 /**Represents a session with a user.
 A Swing-based client application may have only one session, while a web server application will likely have multiple sessions.
@@ -366,6 +358,9 @@ public interface GuiseSession extends PropertyBindable
 	*/
 	public void setPrincipal(final Principal newPrincipal);
 
+	/**@return The action prototype for presenting application information.*/
+	public ActionPrototype getAboutApplicationActionPrototype();
+
 	/**@return The current context for this session, or <code>null</code> if there currently is no context.*/
 	public GuiseContext getContext();
 
@@ -482,6 +477,16 @@ public interface GuiseSession extends PropertyBindable
 	@see #getApplicationFrame()
 	*/
 	public void setNavigation(final String navigationPath, final Bookmark bookmark, final URI referrerURI);
+
+	/**Fires a {@link NavigationEvent} to all {@link NavigationListener}s in the session application frame hierarchy.
+	@param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
+	@see #getNavigationPath()
+	@see #getBookmark()
+	@see #getApplicationFrame()
+	@see NavigationListener
+	@see NavigationEvent 
+	*/
+	public void fireNavigated(final URI referrerURI);
 
 	/**@return The requested navigation, or <code>null</code> if no navigation has been requested.*/
 	public Navigation getRequestedNavigation();
