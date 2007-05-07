@@ -1,6 +1,7 @@
 package com.guiseframework.component;
 
 import com.guiseframework.model.*;
+import com.guiseframework.prototype.LabelPrototype;
 
 /**A label component.
 This component installs a default export strategy supporting export of the following content types:
@@ -33,6 +34,15 @@ public class Label extends AbstractLabel<Label>
 	public Label(final LabelModel labelModel)
 	{
 		super(labelModel);	//construct the parent class
+	}
+
+	/**Prototype constructor.
+	@param labelPrototype The prototype on which this component should be based.
+	@exception NullPointerException if the given prototype is <code>null</code>.
+	*/
+	public Label(final LabelPrototype labelPrototype)
+	{
+		this((LabelModel)labelPrototype);	//use the label prototype as the needed model
 	}
 
 }

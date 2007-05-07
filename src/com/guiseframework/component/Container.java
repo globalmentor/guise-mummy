@@ -1,12 +1,9 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ClassUtilities.*;
-
-import java.util.Iterator;
-
 import com.guiseframework.component.layout.Layout;
 import com.guiseframework.component.layout.Constraints;
 import com.guiseframework.event.ContainerListener;
+import com.guiseframework.prototype.Prototype;
 
 /**Component that allows for addition and removal of child components.
 A layout component is iterable over its child components, and can be used in short <code>for(:)</code> form. 
@@ -55,17 +52,7 @@ public interface Container<C extends Container<C>> extends LayoutComponent<C>, I
 	public boolean add(final Component<?> component);
 
 	/**Adds a component to the container along with constraints.
-	@param component The component to add.
-	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
-	@return <code>true</code> if this container changed as a result of the operation.
-	@exception IllegalArgumentException if the component already has a parent.
-	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
-	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
-	*/
-//TODO del; recomment main add method	public boolean add(final Component<?> component, final Layout.Constraints constraints);
-
-	/**Adds a component to the container along with constraints.
-	This is a convenience method that first set the constraints of the component. 
+	This is a convenience method that first sets the constraints of the component. 
 	@param component The component to add.
 	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
 	@return <code>true</code> if this container changed as a result of the operation.
@@ -74,6 +61,26 @@ public interface Container<C extends Container<C>> extends LayoutComponent<C>, I
 	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
 	*/
 	public boolean add(final Component<?> component, final Constraints constraints);
+
+	/**Adds a component based upon the given prototype to the container with default constraints.
+	@param prototype The prototype of the component to add.
+	@return The component created to represent the given prototype.
+	@exception IllegalArgumentException if no component can be created from the given prototype
+	@exception IllegalStateException if the installed layout does not support default constraints.
+	@see #createComponent(Prototype)
+	*/
+	public Component<?> add(final Prototype prototype);
+
+	/**Adds a component based upon the given prototype to the container along with constraints.
+	@param prototype The prototype of the component to add.
+	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
+	@return The component created to represent the given prototype.
+	@exception IllegalArgumentException if no component can be created from the given prototype
+	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
+	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
+	@see #createComponent(Prototype)
+	*/
+	public Component<?> add(final Prototype prototype, final Constraints constraints);
 
 	/**Removes a component from the container.
 	@param object The component to remove.

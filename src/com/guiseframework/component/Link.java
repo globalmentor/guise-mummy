@@ -63,6 +63,7 @@ public class Link extends AbstractLinkControl<Link>
 
 	/**Prototype constructor.
 	@param actionPrototype The prototype on which this component should be based.
+	@exception NullPointerException if the given prototype is <code>null</code>.
 	*/
 	public Link(final ActionPrototype actionPrototype)
 	{

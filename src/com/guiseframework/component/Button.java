@@ -28,6 +28,7 @@ public class Button extends AbstractButtonControl<Button>
 
 	/**Prototype constructor.
 	@param actionPrototype The prototype on which this component should be based.
+	@exception NullPointerException if the given prototype is <code>null</code>.
 	*/
 	public Button(final ActionPrototype actionPrototype)
 	{

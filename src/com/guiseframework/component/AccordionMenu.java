@@ -4,6 +4,7 @@ import com.guiseframework.component.layout.*;
 import com.guiseframework.event.ActionEvent;
 import com.guiseframework.event.ActionListener;
 import com.guiseframework.model.*;
+import com.guiseframework.prototype.MenuPrototype;
 
 /**A menu that collapses its children's children between its children, like an accordion.
 By default rollover open is disabled.
@@ -19,30 +20,37 @@ public class AccordionMenu extends AbstractMenu<AccordionMenu>
 	*/
 	public AccordionMenu(final Flow axis)
 	{
-		this(new DefaultActionModel(), axis);	//construct the class with a default model
+		this(new DefaultLabelModel(), new DefaultActionModel(), new DefaultEnableable(), axis);	//construct the class with default models
 	}
 
-	/**Action model and axis constructor.
+	/**Label model, action model, enableable, and menu layout constructor.
+	@param labelModel The component label model.
 	@param actionModel The component action model.
+	@param enableable The enableable object in which to store enabled status.
 	@param axis The axis along which the menu is oriented.
-	@exception NullPointerException if the given action model and/or axis is <code>null</code>.
+	@exception NullPointerException if the given label model, action model, enableable, and/or layout is <code>null</code>.
 	*/
-	public AccordionMenu(final ActionModel actionModel, final Flow axis)
+	public AccordionMenu(final LabelModel labelModel, final ActionModel actionModel, final Enableable enableable, final Flow axis)
 	{
-		super(new MenuLayout(axis), actionModel);	//construct the parent class
+		super(labelModel, actionModel, enableable, new MenuLayout(axis));	//construct the parent class
 		setRolloverOpenEnabled(false);	//default to not showing the menu as open upon rollover
+		addActionListener(new ActionListener()	//create an action listener to toggle the menu's open status
+		{
+			public void actionPerformed(final ActionEvent actionEvent)	//if the action is performed
+			{
+				setOpen(!isOpen());	//toggle the menu's open status
+			}
+		});
 	}
 
-	/**Performs the action with the given force and option.
-	An {@link ActionEvent} is fired to all registered {@link ActionListener}s.
-	This version toggles the menu's open status.
-	@param force The zero-based force, such as 0 for no force or 1 for an action initiated by from a mouse single click.
-	@param option The zero-based option, such as 0 for an event initiated by a mouse left button click or 1 for an event initiaged by a mouse right button click.
+	/**Prototype and axis constructor.
+	@param actionPrototype The prototype on which this component should be based.
+	@param axis The axis along which the menu is oriented.
+	@exception NullPointerException if the given prototype is <code>null</code>.
 	*/
-	public void performAction(final int force, final int option)
+	public AccordionMenu(final MenuPrototype menuPrototype, final Flow axis)
 	{
-		setOpen(!isOpen());	//toggle the menu's open status
-		super.performAction(force, option);	//do the default action performance
+		this(menuPrototype, menuPrototype, menuPrototype, axis);	//use the menu prototype as every needed model
 	}
-
+	
 }

@@ -1,7 +1,14 @@
 package com.guiseframework.component;
 
+import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
+import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.garretwilson.lang.ObjectUtilities;
+import static com.garretwilson.lang.ObjectUtilities.*;
 import com.guiseframework.component.layout.Layout;
+import com.guiseframework.model.DefaultEnableable;
+import com.guiseframework.model.DefaultLabelModel;
+import com.guiseframework.model.Enableable;
+import com.guiseframework.model.LabelModel;
 import com.guiseframework.model.Notification;
 
 /**An abstract implementation of a container that is also a control.
@@ -10,28 +17,11 @@ import com.guiseframework.model.Notification;
 public abstract class AbstractContainerControl<C extends ContainerControl<C>> extends AbstractContainer<C> implements ContainerControl<C>
 {
 
-	/**Whether the control is enabled and can receive user input.*/
-	private boolean enabled=true;
+	/**The enableable object decorated by this component.*/
+	private final Enableable enableable;
 
-		/**@return Whether the control is enabled and can receive user input.*/
-		public boolean isEnabled() {return enabled;}
-
-		/**Sets whether the control is enabled and and can receive user input.
-		This is a bound property of type <code>Boolean</code>.
-		@param newEnabled <code>true</code> if the control should indicate and accept user input.
-		@see #ENABLED_PROPERTY
-		*/
-		public void setEnabled(final boolean newEnabled)
-		{
-			if(enabled!=newEnabled)	//if the value is really changing
-			{
-				final boolean oldEnabled=enabled;	//get the old value
-				enabled=newEnabled;	//actually change the value
-				setNotification(null);	//clear any notification
-				updateValid();	//update the valid status, which depends on the enabled status					
-				firePropertyChange(ENABLED_PROPERTY, Boolean.valueOf(oldEnabled), Boolean.valueOf(newEnabled));	//indicate that the value changed
-			}			
-		}
+		/**@return The enableable object decorated by this component.*/
+		protected Enableable getEnableable() {return enableable;}
 
 	/**The status of the current user input, or <code>null</code> if there is no status to report.*/
 	private Status status=null;
@@ -120,12 +110,48 @@ public abstract class AbstractContainerControl<C extends ContainerControl<C>> ex
 		setNotification(null);	//clear any notification
 	}
 
-	/**Layout constructor.
+	/**Layout constructor with a default label model and enableable.
 	@param layout The layout definition for the container.
 	@exception NullPointerException if the given layout is <code>null</code>.
 	*/
 	public AbstractContainerControl(final Layout<?> layout)
 	{
-		super(layout);	//construct the parent class
+		this(new DefaultLabelModel(), new DefaultEnableable(), layout);	//construct the class with a default label model and enableable
 	}
+
+	/**Label model, enableable, and layout constructor.
+	@param labelModel The component label model.
+	@param enableable The enableable object in which to store enabled status.
+	@param layout The layout definition for the container.
+	@exception NullPointerException if the given label model, enableable, and/or layout is <code>null</code>.
+	*/
+	public AbstractContainerControl(final LabelModel labelModel, final Enableable enableable, final Layout<?> layout)
+	{
+		super(labelModel, layout);	//construct the parent class
+		this.enableable=checkInstance(enableable, "Enableable object cannot be null.");	//save the enableable object
+		if(enableable!=labelModel)	//if the enableable and the label model are two different objects (we don't want to repeat property change events twice) TODO eventually just listen to specific events for each object
+		{
+			this.enableable.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the enableable object
+		}
+		addPropertyChangeListener(ENABLED_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>()	//listen for the "enabled" property changing
+				{
+					public void propertyChange(GenericPropertyChangeEvent<Boolean> genericPropertyChangeEvent)	//if the "enabled" property changes
+					{
+						setNotification(null);	//clear any notification
+						updateValid();	//update the valid status, which depends on the enabled status					
+					}
+				});
+	}
+
+		//Enableable delegations
+	
+	/**@return Whether the control is enabled and can receive user input.*/
+	public boolean isEnabled() {return enableable.isEnabled();}
+
+	/**Sets whether the control is enabled and and can receive user input.
+	This is a bound property of type <code>Boolean</code>.
+	@param newEnabled <code>true</code> if the control should indicate and accept user input.
+	@see #ENABLED_PROPERTY
+	*/
+	public void setEnabled(final boolean newEnabled) {enableable.setEnabled(newEnabled);}
 }

@@ -1,6 +1,8 @@
 package com.guiseframework.component;
 
 import com.guiseframework.component.layout.*;
+import com.guiseframework.model.DefaultLabelModel;
+import com.guiseframework.model.LabelModel;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
@@ -121,12 +123,23 @@ public abstract class AbstractLayoutComponent<C extends LayoutComponent<C>> exte
 			}			
 		}
 
-	/**Layout constructor.
+	/**Layout constructor with a default label model.
 	@param layout The layout definition for the container.
 	@exception NullPointerException if the given layout is <code>null</code>.
 	*/
 	public AbstractLayoutComponent(final Layout<?> layout)
 	{
+		this(new DefaultLabelModel(), layout);	//construct the class with a default label model
+	}
+
+	/**Label model and layout constructor.
+	@param labelModel The component label model.
+	@param layout The layout definition for the container.
+	@exception NullPointerException if the given label model and/or layout is <code>null</code>.
+	*/
+	public AbstractLayoutComponent(final LabelModel labelModel, final Layout<?> layout)
+	{
+		super(labelModel);	//construct the parent class
 		this.layout=checkInstance(layout, "Layout cannot be null.");	//save the layout
 		layout.setOwner(this);	//tell the layout which container owns it
 	}

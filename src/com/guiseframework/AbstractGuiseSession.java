@@ -27,7 +27,7 @@ import com.guiseframework.event.*;
 import com.guiseframework.geometry.Extent;
 import com.guiseframework.model.InformationLevel;
 import com.guiseframework.model.Notification;
-import com.guiseframework.prototype.ActionPrototype;
+import com.guiseframework.prototype.*;
 import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
 

@@ -3,6 +3,8 @@ package com.guiseframework.component;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.guiseframework.model.LabelModel;
+
 /**An abstract implementation of a composite component that can contain multiple components.
 Every child component must be added or removed using {@link #addComponent(Component)} and {@link #removeComponent(Component)}, although other actions may take place.
 The component's validity is updated whenever a child comonent is added or removed from the component.
@@ -78,4 +80,12 @@ public abstract class AbstractMultipleCompositeComponent<C extends CompositeComp
 		return idComponentMap.get(id);	//return the component with the given ID
 	}
 
+	/**Label model constructor.
+	@param labelModel The component label model.
+	@exception NullPointerException if the given label model is <code>null</code>.
+	*/
+	public AbstractMultipleCompositeComponent(final LabelModel labelModel)
+	{
+		super(labelModel);	//construct the parent class
+	}
 }

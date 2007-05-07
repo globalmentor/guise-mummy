@@ -4,6 +4,9 @@ import java.util.*;
 
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
+import com.guiseframework.model.DefaultLabelModel;
+import com.guiseframework.model.LabelModel;
+import com.guiseframework.prototype.*;
 
 /**Abstract implementation of a container component.
 Iterating over child components is thread safe.
@@ -57,23 +60,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	}
 
 	/**Adds a component to the container along with constraints.
-	This is a convenience method that first set the constraints of the component. 
-	@param component The component to add.
-	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
-	@return <code>true</code> if this container changed as a result of the operation.
-	@exception IllegalArgumentException if the component already has a parent.
-	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
-	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
-	*/
-/*TODO del if needed
-	public boolean add(final Component<?> component, final Constraints constraints)
-	{
-		return super.add(component, constraints);	//add the component normally
-	}
-*/
-
-	/**Adds a component to the container along with constraints.
-	This is a convenience method that first set the constraints of the component. 
+	This is a convenience method that first sets the constraints of the component. 
 	@param component The component to add.
 	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
 	@return <code>true</code> if this container changed as a result of the operation.
@@ -85,6 +72,69 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	{
 		component.setConstraints(constraints);	//set the constraints in the component
 		return add(component);	//add the component, now that its constraints have been set
+	}
+
+	/**Adds a component based upon the given prototype to the container with default constraints.
+	This implementation delegates to {@link #add(Component)}.
+	@param prototype The prototype of the component to add.
+	@return The component created to represent the given prototype.
+	@exception IllegalArgumentException if no component can be created from the given prototype
+	@exception IllegalStateException if the installed layout does not support default constraints.
+	@see #createComponent(Prototype)
+	*/
+	public Component<?> add(final Prototype prototype)
+	{
+		final Component<?> component=createComponent(prototype);	//create a component from the prototype
+		add(component);	//add the component to the container
+		return component;	//return the component we created
+	}
+
+	/**Adds a component based upon the given prototype to the container along with constraints.
+	This implementation delegates to {@link #add(Component, Constraints)}.
+	@param prototype The prototype of the component to add.
+	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
+	@return The component created to represent the given prototype.
+	@exception IllegalArgumentException if no component can be created from the given prototype
+	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
+	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
+	@see #createComponent(Prototype)
+	*/
+	public Component<?> add(final Prototype prototype, final Constraints constraints)
+	{
+		final Component<?> component=createComponent(prototype);	//create a component from the prototype
+		add(component, constraints);	//add the component to the container
+		return component;	//return the component we created
+	}
+
+	/**Creates a component appropriate for the context of this component from the given prototype.
+	This implementation creates the following components, in order of priority:
+	<dl>
+		<dt>{@link ActionPrototype}</dt> <dd>{@link Button}</dd>
+		<dt>{@link LabelPrototype}</dt> <dd>{@link Label}</dd>	
+		<dt>{@link MenuPrototype}</dt> <dd>{@link DropMenu}</dd>	
+	</dl>
+	@param prototype The prototype of the component to create.
+	@return A new component based upon the given prototype.
+	@exception IllegalArgumentException if no component can be created from the given prototype
+	*/
+	public Component<?> createComponent(final Prototype prototype)
+	{
+		if(prototype instanceof ActionPrototype)	//action prototypes
+		{
+			return new Button((ActionPrototype)prototype);
+		}
+		else if(prototype instanceof LabelPrototype)	//label prototypes
+		{
+			return new Label((LabelPrototype)prototype);
+		}
+		else if(prototype instanceof MenuPrototype)	//menu prototypes
+		{
+			return new DropMenu((MenuPrototype)prototype, Flow.PAGE);
+		}
+		else	//if the prototype is unrecognized
+		{
+			throw new IllegalArgumentException("Undrecognized prototype: "+prototype.getClass());
+		}		
 	}
 
 	/**Removes a component from the container.
@@ -102,18 +152,6 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		fireContainerModified(index, null, component);	//indicate the component was removed from the index TODO promote
 		return result;	//return the result
 	}
-
-	/**Removes the child component at the specified position in this container.
-	@param index The index of the component to removed.
-	@return The value previously at the specified position.
-	@exception IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
-	*/
-/*TODO del
-	public Component<?> remove(final int index)
-	{
-		return super.remove(index);	//remove the component normally
-	}
-*/
 
 	/**Removes the child component at the specified position in this container.
 	@param index The index of the component to removed.
@@ -177,13 +215,23 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		super.setLayout(newLayout);	//delegate to the parent class
 	}
 
-	/**Layout constructor.
+	/**Layout constructor with a default label model.
 	@param layout The layout definition for the container.
 	@exception NullPointerException if the given layout is <code>null</code>.
 	*/
 	public AbstractContainer(final Layout<?> layout)
 	{
-		super(layout);	//construct the parent class
+		this(new DefaultLabelModel(), layout);	//construct the class with a default label model
+	}
+
+	/**Label model and layout constructor.
+	@param labelModel The component label model.
+	@param layout The layout definition for the container.
+	@exception NullPointerException if the given label model and/or layout is <code>null</code>.
+	*/
+	public AbstractContainer(final LabelModel labelModel, final Layout<?> layout)
+	{
+		super(labelModel, layout);	//construct the parent class
 	}
 
 	/**Adds a container listener.

@@ -110,21 +110,6 @@ public abstract class AbstractControl<C extends Control<C>> extends AbstractComp
 		setNotification(null);	//clear any notification
 	}
 
-	/**Default constructor with a default label model.*/
-	public AbstractControl()
-	{
-		this(new DefaultLabelModel());	//construct the class with a default label model
-	}
-
-	/**Label model constructor.
-	@param labelModel The component label model.
-	@exception NullPointerException if the given label model is <code>null</code>.
-	*/
-	public AbstractControl(final LabelModel labelModel)
-	{
-		this(labelModel, new DefaultEnableable());	//construct the class with a default enableable
-	}
-
 	/**Label model and enableable object constructor.
 	@param labelModel The component label model.
 	@param enableable The enableable object in which to store enabled status.

@@ -7,6 +7,9 @@ import com.guiseframework.event.*;
 import com.guiseframework.geometry.Point;
 import com.guiseframework.geometry.Rectangle;
 import com.guiseframework.model.ActionModel;
+import com.guiseframework.model.Enableable;
+import com.guiseframework.model.LabelModel;
+import com.guiseframework.prototype.*;
 
 /**An abstract menu component.
 This implementation initially closes any child menu added to this menu.
@@ -130,14 +133,16 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 			}
 		}
 
-	/**Menu layout and action model constructor.
-	@param layout The layout definition for the container.
+	/**Label model, action model, enableable, and menu layout constructor.
+	@param labelModel The component label model.
 	@param actionModel The component action model.
-	@exception NullPointerException if the given layout and/or action model is <code>null</code>.
+	@param enableable The enableable object in which to store enabled status.
+	@param layout The layout definition for the container.
+	@exception NullPointerException if the given label model, action model, enableable, and/or layout is <code>null</code>.
 	*/
-	public AbstractMenu(final MenuLayout layout, final ActionModel actionModel)
+	public AbstractMenu(final LabelModel labelModel, final ActionModel actionModel, final Enableable enableable, final MenuLayout layout)
 	{
-		super(layout);	//construct the parent class
+		super(labelModel, enableable, layout);	//construct the parent class
 		this.actionModel=checkInstance(actionModel, "Action model cannot be null.");	//save the action model
 		this.actionModel.addActionListener(new ActionListener()	//create an action repeater to forward events to this component's listeners TODO create a common method to create a forwarding listener, if we can
 				{
@@ -176,7 +181,7 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 	*/
 	public void performAction()
 	{
-		performAction(1, 0);	//fire an event saying that the action has been performed with the default force and option
+		getActionModel().performAction();	//delegate to the installed action model, which will fire an event which we will catch and queue for refiring
 	}
 
 	/**Performs the action with the given force and option.
@@ -186,7 +191,7 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 	*/
 	public void performAction(final int force, final int option)
 	{
-		fireActionPerformed(force, option);	//fire an event saying that the action has been performed with the given force and option
+		getActionModel().performAction(force, option);	//delegate to the installed action model, which will fire an event which we will catch and queue for refiring
 	}
 
 	/**Fires an action event to all registered action listeners.
@@ -267,6 +272,24 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 		{
 			return false;	//indicate that the chidl components did not change
 		}
+	}
+
+	/**Creates a component appropriate for the context of this component from the given prototype.
+	This implementation creates the following components, in order of priority:
+	<dl>
+		<dt>{@link ActionPrototype}</dt> <dd>{@link Link}</dd>
+	</dl>
+	@param prototype The prototype of the component to create.
+	@return A new component based upon the given prototype.
+	@exception IllegalArgumentException if no component can be created from the given prototype
+	*/
+	public Component<?> createComponent(final Prototype prototype)
+	{
+		if(prototype instanceof ActionPrototype)	//action prototypes
+		{
+			return new Link((ActionPrototype)prototype);
+		}
+		return super.createComponent(prototype);	//delegate to the parent class
 	}
 
 }

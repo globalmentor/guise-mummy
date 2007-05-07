@@ -3,6 +3,9 @@ package com.guiseframework.component;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import java.util.*;
+
+import com.guiseframework.model.LabelModel;
+
 import static java.util.Collections.*;
 
 /**A composite component that represents the state of its child components.
@@ -130,6 +133,15 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 			}
 		}
 		throw new IllegalArgumentException("Component "+component+" not representing any object.");
+	}
+
+	/**Label model constructor.
+	@param labelModel The component label model.
+	@exception NullPointerException if the given label model is <code>null</code>.
+	*/
+	public AbstractCompositeStateComponent(final LabelModel labelModel)
+	{
+		super(labelModel);	//construct the parent class
 	}
 
 	/**Creates a component state to represent the given object.

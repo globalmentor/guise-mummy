@@ -3,6 +3,8 @@ package com.guiseframework.component;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.guiseframework.model.LabelModel;
+
 /**Abstract implementation of a composite component that keeps track of its child components in sequence.
 Iterating over child components is thread safe.
 @author Garret Wilson
@@ -90,5 +92,14 @@ public abstract class AbstractListCompositeComponent<C extends CompositeComponen
 
 	/**@return Whether this component has children. This implementation delegates to the component list.*/
 	public boolean hasChildren() {return !componentList.isEmpty();}
+
+	/**Label model constructor.
+	@param labelModel The component label model.
+	@exception NullPointerException if the given label model is <code>null</code>.
+	*/
+	public AbstractListCompositeComponent(final LabelModel labelModel)
+	{
+		super(labelModel);	//construct the parent class
+	}
 
 }

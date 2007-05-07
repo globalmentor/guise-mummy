@@ -2,16 +2,22 @@ package com.guiseframework.component;
 
 import java.beans.PropertyChangeListener;
 import java.net.URI;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.beans.GenericPropertyChangeListener;
+import com.garretwilson.util.Debug;
+
+import static com.garretwilson.util.CollectionUtilities.*;
 
 import static com.guiseframework.GuiseResourceConstants.*;
 import static com.guiseframework.Resources.*;
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.event.*;
+import com.guiseframework.model.LabelModel;
 import com.guiseframework.model.Notification;
+import com.guiseframework.prototype.*;
 
 /**Abstract implementation of a frame.
 This implementation notifies the user when the frame does not validate in {@link #validate()}.
@@ -214,6 +220,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 		if(oldContent!=newContent)	//if the component really changed
 		{
 			firePropertyChange(CONTENT_PROPERTY, oldContent, newContent);	//indicate that the value changed
+			consumePrototypes();	//merge the produced prototypes of the new content
 		}
 	}
 
@@ -236,6 +243,53 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 			firePropertyChange(MENU_PROPERTY, oldMenu, newMenu);	//indicate that the value changed
 		}
 	}
+
+	/**The set of components that have been used to represent processed prototypes.*/
+	private Set<Component<?>> prototypeComponents=new CopyOnWriteArraySet<Component<?>>();
+	
+	/**Consumes and processes the produced prototypes of this frame and the current content, if either or both implement {@link PrototypeProducer}.
+	The produced prototypes will be integrated into the current menu and toolbar, if present.
+	@see #getMenu()
+	*/
+	public void consumePrototypes()	//TODO change to combine produced prototypes in producePrototypeInfos()
+	{
+			//TODO improve to only remove the components that were created for prototypes that no longer exist
+		for(final Component<?> component:prototypeComponents)	//for each prototype component
+		{
+			final CompositeComponent<?> parent=component.getParent();	//get this component's parent
+			if(parent instanceof Container)	//if the component is still installed into a container
+			{
+				((Container<?>)parent).remove(component);	//remove the component from its parent
+			}
+		}
+		final Set<PrototypeInfo> prototypeInfos=new TreeSet<PrototypeInfo>();	//create a sorted set of produced prototypes
+		if(this instanceof PrototypeProducer)	//if this frame produces prototypes
+		{
+			addAll(prototypeInfos, ((PrototypeProducer)this).producePrototypes());	//collect produced prototypes from the frame
+		}
+		final Component<?> content=getContent();	//get the current content
+		if(content instanceof PrototypeProducer)	//if the content produces prototypes
+		{
+			addAll(prototypeInfos, ((PrototypeProducer)content).producePrototypes());	//collect produced prototypes from the content
+		}
+		final Map<Prototype, Component<?>> menuPrototypeComponentMap=new HashMap<Prototype, Component<?>>();	//keep track of which menu components we create for which prototypes
+		final Menu<?> menu=getMenu();	//get the current menu
+		for(final PrototypeInfo prototypeInfo:prototypeInfos)	//for each produced prototype info
+		{
+			final Prototype prototype=prototypeInfo.getPrototype();	//get the prototype to add
+			if(prototypeInfo.isMenu() && menu!=null)	//if this is a menu prototype and we have a menu
+			{
+				final Prototype parentPrototype=prototypeInfo.getParentPrototype();	//get the prototype's parent, if any
+				final Component<?> parentComponent=parentPrototype!=null ? menuPrototypeComponentMap.get(parentPrototype) : menu;	//if there is a parent prototype, use the component that was created for the parent prototype
+				if(parentComponent instanceof Container)	//if there is a parent component that is a container
+				{
+					final Component<?> component=((Container<?>)parentComponent).add(prototype);	//add this prototype to the parent component
+					prototypeComponents.add(component);	//note that we created this component
+					menuPrototypeComponentMap.put(prototype, component);	//record temporarily the component we used to represent this prototype
+				}
+			}
+		}
+	}	
 	
 	/**The action listener for closing the frame.*/
 	private final ActionListener closeActionListener;

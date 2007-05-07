@@ -2,16 +2,14 @@ package com.guiseframework.prototype;
 
 import java.net.URI;
 
-import com.guiseframework.model.DefaultLabelModel;
-
-/**Contains abstract prototype information for a component.
+/**Contains prototype information for a label.
 @author Garret Wilson
 */
-public class AbstractPrototype extends DefaultLabelModel implements Prototype 
+public class LabelPrototype extends AbstractPrototype
 {
 
 	/**Default constructor.*/
-	public AbstractPrototype()
+	public LabelPrototype()
 	{
 		this(null);	//construct the class with no label
 	}
@@ -19,7 +17,7 @@ public class AbstractPrototype extends DefaultLabelModel implements Prototype
 	/**Label constructor.
 	@param label The text of the label, or <code>null</code> if there should be no label.
 	*/
-	public AbstractPrototype(final String label)
+	public LabelPrototype(final String label)
 	{
 		this(label, null);	//construct the label model with no icon
 	}
@@ -28,7 +26,7 @@ public class AbstractPrototype extends DefaultLabelModel implements Prototype
 	@param label The text of the label, or <code>null</code> if there should be no label.
 	@param icon The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.
 	*/
-	public AbstractPrototype(final String label, final URI icon)
+	public LabelPrototype(final String label, final URI icon)
 	{
 		super(label, icon);	//construct the parent class
 	}

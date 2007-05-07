@@ -1,6 +1,9 @@
 package com.guiseframework.component;
 
 import java.util.*;
+
+import com.guiseframework.model.*;
+
 import static java.util.Arrays.*;
 
 /**Abstract implementation of a composite component that keeps track of its child components at specific indices in an array.
@@ -81,13 +84,24 @@ public abstract class AbstractArrayCompositeComponent<C extends CompositeCompone
 		return false;	//all components in the array are null; we have no child components
 	}
 
-	/**Maximum component count constructor.
+
+	/**Maximum component count constructor with a default label model.
 	@param maxComponentCount The maximum number of child components to support.
 	*/
-	public AbstractArrayCompositeComponent(final int maxComponentCount)	//TODO check the range of the maximum component count
+	public AbstractArrayCompositeComponent(final int maxComponentCount)
 	{
+		this(new DefaultLabelModel(), maxComponentCount);	//construct the class with a default label model
+	}
+
+	/**Label model and maximum component count constructor.
+	@param labelModel The component label model.
+	@param maxComponentCount The maximum number of child components to support.
+	@exception NullPointerException if the given label model is <code>null</code>.
+	*/
+	public AbstractArrayCompositeComponent(final LabelModel labelModel, final int maxComponentCount)	//TODO check the range of the maximum component count
+	{
+		super(labelModel);	//construct the parent class
 		componentArray=new Component[maxComponentCount];	//create an array of components of the appropriate length
 		fill(componentArray, null);	//fill the array with nulls
 	}
-
 }

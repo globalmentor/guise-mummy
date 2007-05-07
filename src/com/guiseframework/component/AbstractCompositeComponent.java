@@ -5,6 +5,7 @@ import java.beans.PropertyChangeListener;
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.guiseframework.event.*;
+import com.guiseframework.model.LabelModel;
 
 /**An abstract implementation of a composite component.
 Every child component must be added or removed using {@link #addComponent(Component)} and {@link #removeComponent(Component)}, although other actions may take place.
@@ -114,6 +115,15 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 		component.removePropertyChangeListener(VISIBLE_PROPERTY, getDisplayVisibleChangeListener());	//stop listening for changes in the component's visible status
 		component.removeNotificationListener(getNotificationListener());	//stop listening for component notifications
 		return true;	//return true by default
+	}
+
+	/**Label model constructor.
+	@param labelModel The component label model.
+	@exception NullPointerException if the given label model is <code>null</code>.
+	*/
+	public AbstractCompositeComponent(final LabelModel labelModel)
+	{
+		super(labelModel);	//construct the parent class
 	}
 
 	/**Called when the {@link Component#VALID_PROPERTY} of a child component changes.
