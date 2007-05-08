@@ -40,6 +40,7 @@ import static com.garretwilson.lang.ThreadUtilities.*;
 import com.garretwilson.net.DefaultResource;
 import com.garretwilson.net.Resource;
 import com.garretwilson.net.ResourceIOException;
+import com.garretwilson.net.ResourceNotFoundException;
 import com.garretwilson.net.URIConstants;
 import com.garretwilson.net.URIUtilities;
 import com.garretwilson.net.http.*;
@@ -514,7 +515,11 @@ while(headerNames.hasMoreElements())
 			catch(final UndeclaredThrowableException undeclaredThrowableException)	//if an exception was thrown
 			{
 				final Throwable cause=undeclaredThrowableException.getCause();	//see what exception was thrown
-				if(cause instanceof IOException)	//if an IOException was thrown
+				if(cause instanceof ResourceNotFoundException)	//if a ResourceNotFoundException was thrown
+				{
+					HTTPException.createHTTPException((ResourceIOException)cause);	//pass back an equivalent HTTP exception
+				}
+				else if(cause instanceof IOException)	//if an IOException was thrown
 				{
 					throw ((IOException)cause);	//pass it on
 				}
@@ -554,6 +559,16 @@ while(headerNames.hasMoreElements())
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
 		final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
+		if(!isAJAX)	//if this is not an AJAX request, verify that the destination exists (doing this with AJAX requests would be too costly; we can assume that AJAX requests are for existing destinations)
+		{
+			final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
+			final String referrer=getReferer(request);	//get the request referrer, if any
+			final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
+			if(!destination.exists(guiseSession, navigationPath, bookmark, referrerURI))	//if this destination doesn't exist	
+			{
+				throw new HTTPNotFoundException("Path does not exist at Guise destination: "+navigationPath);
+			}
+		}
 		if(destination instanceof ComponentDestination)	//if we have a component destination associated with the requested path
 		{
 			final ComponentDestination componentDestination=(ComponentDestination)destination;	//get the destination as a component destination
@@ -1729,7 +1744,6 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
   */
   protected boolean exists(final HttpServletRequest request, final URI resourceURI) throws IOException
   {
-//TODO del Debug.trace("checking exists", resourceURI);
   		//see if this is a Guise public resource
   	if(isGuisePublicResourceURI(resourceURI))	//if this URI represents a Guise public resource
   	{
@@ -1743,51 +1757,49 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
   	{
   		return true;	//the resource exists
   	}
+Debug.trace("checking exists for", resourceURI);
 		final Destination destination=guiseApplication.getDestination(path);	//get the destination for the given path
   	if(destination!=null)	//if the URI represents a valid navigation path
   	{
-  		if(destination instanceof ResourceDestination)	//if this is a destination resource, we need to make sure there is actually a resource at that destination
-  		{  			
-	  		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
-	 			final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
-	 			final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
-				final String referrer=getReferer(request);	//get the request referrer, if any
-				final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer	 			
-	 			final ObjectHolder<Boolean> resourceExistsHolder=new ObjectHolder<Boolean>();	//create an object holder to receive the existence result
-				final GuiseSessionThreadGroup guiseSessionThreadGroup=Guise.getInstance().getThreadGroup(guiseSession);	//get the thread group for this session
-				try
-				{
-					call(guiseSessionThreadGroup, new Runnable()	//call the method in a new thread inside the thread group
+Debug.trace("this is a destination");
+  		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
+ 			final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
+ 			final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
+			final String referrer=getReferer(request);	//get the request referrer, if any
+			final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer	 			
+ 			final ObjectHolder<Boolean> resourceExistsHolder=new ObjectHolder<Boolean>();	//create an object holder to receive the existence result
+			final GuiseSessionThreadGroup guiseSessionThreadGroup=Guise.getInstance().getThreadGroup(guiseSession);	//get the thread group for this session
+			try
+			{
+				call(guiseSessionThreadGroup, new Runnable()	//call the method in a new thread inside the thread group
+						{
+							public void run()
 							{
-								public void run()
+								try
 								{
-									try
-									{
-										resourceExistsHolder.setObject(Boolean.valueOf(((ResourceDestination)destination).exists(guiseSession, path, bookmark, referrerURI)));	//ask the resource destination if the resource exists
-									}
-									catch(final IOException ioException)	//if an exception is thrown
-									{
-										throw new UndeclaredThrowableException(ioException);	//let it pass to the calling thread
-									}
+									resourceExistsHolder.setObject(Boolean.valueOf(destination.exists(guiseSession, path, bookmark, referrerURI)));	//ask the resource destination if the resource exists
 								}
-							});
-				}
-				catch(final UndeclaredThrowableException undeclaredThrowableException)	//if an exception was thrown
+								catch(final IOException ioException)	//if an exception is thrown
+								{
+									throw new UndeclaredThrowableException(ioException);	//let it pass to the calling thread
+								}
+							}
+						});
+			}
+			catch(final UndeclaredThrowableException undeclaredThrowableException)	//if an exception was thrown
+			{
+				final Throwable cause=undeclaredThrowableException.getCause();	//see what exception was thrown
+				if(cause instanceof IOException)	//if an IOException was thrown
 				{
-					final Throwable cause=undeclaredThrowableException.getCause();	//see what exception was thrown
-					if(cause instanceof IOException)	//if an IOException was thrown
-					{
-						throw ((IOException)cause);	//pass it on
-					}
-					else	//we don't expect any other types of exceptions
-					{
-						throw new AssertionError(cause);
-					}
+					throw ((IOException)cause);	//pass it on
 				}
-				assert resourceExistsHolder.getObject()!=null : "Return value from thread unexpectedly missing.";
-				return resourceExistsHolder.getObject().booleanValue();	//return whether the resource at the resource destination exists
-  		}
-  		return true;	//the navigation path exists for all other destinations
+				else	//we don't expect any other types of exceptions
+				{
+					throw new AssertionError(cause);
+				}
+			}
+			assert resourceExistsHolder.getObject()!=null : "Return value from thread unexpectedly missing.";
+			return resourceExistsHolder.getObject().booleanValue();	//return whether the resource at the resource destination exists
   	}
  		return super.exists(request, resourceURI);	//see if a physical resource exists at the location, if we can't find a virtual resource (a Guise public resource or a navigation path component)
   }

@@ -8,7 +8,7 @@ import com.guiseframework.model.Notification;
 /**An option dialog frame displaying a message.
 @author Garret Wilson
 */
-public class MessageOptionDialogFrame extends NotificationOptionDialogFrame
+public class MessageOptionDialogFrame extends NotificationOptionDialogFrame	//TODO del when possible; currently used in external projects
 {
 
 	/**The message displayed in the frame.*/

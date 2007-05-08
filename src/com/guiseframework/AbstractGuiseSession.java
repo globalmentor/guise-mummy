@@ -6,6 +6,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Principal;
+import java.text.MessageFormat;
+
+import static java.text.MessageFormat.*;
 import java.util.*;
 import static java.util.Collections.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -38,6 +41,7 @@ import static com.garretwilson.io.FileConstants.*;
 import static com.garretwilson.io.FileUtilities.*;
 import static com.garretwilson.io.WriterUtilities.*;
 import static com.garretwilson.lang.ClassUtilities.*;
+import static com.garretwilson.lang.CharSequenceUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
@@ -707,7 +711,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		logWriter=new OutputStreamWriter(System.err);	//default to logging to the error output; this will be replaced after the session is created
 			//about action prototype
 		aboutApplicationActionPrototype=new ActionPrototype();
-		aboutApplicationActionPrototype.setLabel(LABEL_ABOUT+' '+APPLICATION_NAME);
+		aboutApplicationActionPrototype.setLabel(LABEL_ABOUT_X+createStringValueReference(APPLICATION_NAME));
 		aboutApplicationActionPrototype.setIcon(GLYPH_ABOUT);
 		aboutApplicationActionPrototype.addActionListener(new ActionListener()
 				{
@@ -1563,7 +1567,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	/**Notifies the user of one or more notifications to be presented in sequence, with optional logic to be executed after all notifications have taken place.
 	If the selected option to any notification is fatal, the specified logic will not be performed.
-	This method delegates to {@link #notify(Notification, Runnable)}.
+	This implementation delegates to {@link #notify(Notification, Runnable)}.
 	@param notifications One or more notification informations to relay.
 	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
 	@exception NullPointerException if the given notifications is <code>null</code>.
@@ -1598,7 +1602,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@param notification The notification information to relay.
 	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
 	*/
-	public void notify(final Notification notification, final Runnable afterNotify)
+	protected void notify(final Notification notification, final Runnable afterNotify)
 	{
 		final Notification.Severity severity=notification.getSeverity();	//get the notification severity
 		if(severity==Notification.Severity.ERROR)	//if this is an error notification TODO improve to work with all notifications; this will entail adding a general public debug write method and translating between log report levels and notification severities
@@ -1609,15 +1613,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 				Debug.error(throwable);	//produce a stack trace
 			}
 		}
-		final Text text=new Text();	//create a new text component
-		text.setText(notification.getMessage());	//set the text, which may include a resource reference
-		final List<Notification.Option> notificationOptions=notification.getOptions();	//get the notification options
-		final NotificationOptionDialogFrame optionDialogFrame=new NotificationOptionDialogFrame(text, notificationOptions.toArray(new Notification.Option[notificationOptions.size()]));	//create a dialog with the notification options
-		final String severityResourceKeyName=getResourceKeyName(severity);	//get the resource key name of the severity TODO actually create a method		
+		final NotificationOptionDialogFrame optionDialogFrame=new NotificationOptionDialogFrame(notification);	//create a dialog from the notification
 		optionDialogFrame.setLabel(severity.getLabel());	//set the label based upon the severity
 		optionDialogFrame.setIcon(severity.getGlyph());	//set the icon based upon the severity
-		optionDialogFrame.setPreferredWidth(new Extent(0.33, Extent.Unit.RELATIVE));	//set the preferred dimensions
-//TODO del		optionDialogFrame.setPreferredHeight(new Extent(0.33, Extent.Unit.RELATIVE));
+		optionDialogFrame.setPreferredWidth(new Extent(0.33, Extent.Unit.RELATIVE));	//set the preferred dimensions		
 		optionDialogFrame.open(new AbstractGenericPropertyChangeListener<Frame.Mode>()	//show the dialog and listen for the frame closing
 				{
 					public void propertyChange(final GenericPropertyChangeEvent<Frame.Mode> genericPropertyChangeEvent)	//listen for the dialog mode changing
@@ -1665,10 +1664,15 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		notify(afterNotify, notifications);	//notify the user with the notifications of the errors
 	}
 
+	/**The set of string reference delimiters, <code>SOS</code> and <code>ST</code>.*/
+	private final static String STRING_REFERENCE_DELIMITERS=new StringBuilder().append(START_OF_STRING_CHAR).append(STRING_TERMINATOR_CHAR).toString();
+	
 	/**Resolves a string by replacing any string references with a string from the resources.
-	A string reference begins with the Start of String control character (U+0098) and ends with a String Terminator control character (U+009C).
+	A string reference begins with the Start of String (<code>SOS</code>) control character (U+0098) and ends with a String Terminator (<code>ST</code>) control character (U+009C).
 	The string between these delimiters will be used to look up a string resource using {@link #getStringResource(String)}.
 	Strings retrieved from resources will be recursively resolved.
+	<p>String references appearing between an <code>SOS</code>/<code>ST</code> pair that that begin with the character {@value Resources#STRING_VALUE_REFERENCE_PREFIX_CHAR}
+	will be considered string values and, after they are recursively resolved, will be applied as formatting arguments to the remaining resolved text using {@link MessageFormat#format(String, Object...)}.</p>
 	@param string The string to be resolved.
 	@return The resolved string with any string references replaced with the appropriate string from the resources.
 	@exception NullPointerException if the given string is <code>null</code>.
@@ -1676,10 +1680,13 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@exception MissingResourceException if no resource could be found associated with a string reference.
 	@exception ClassCastException if the resource associated with a string reference is not an instance of <code>String</code>.
 	@see Resources#createStringResourceReference(String)
+	@see Resources#createStringValueReference(String)
 	@see #getStringResource(String)
 	*/
 	public String resolveString(final String string) throws MissingResourceException
 	{
+//TODO add later if we create a Guise-specific parameter feature; for now we use {}		int parameterCount=0;	//keep track of how many parameters have appeared
+		List<String> argumentList=null;	//the lazily-created list of arguments
 		int fromIndex=0;	//keep track of where we are in the string
 		int stringStartIndex=string.indexOf(START_OF_STRING_CHAR, fromIndex);	//see if there is a string reference in the string
 		if(stringStartIndex>=0)	//if there is a string reference
@@ -1691,14 +1698,46 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 				{
 					stringBuilder.append(string.substring(fromIndex, stringStartIndex));	//append the literal text
 				}
-				final int stringEndIndex=string.indexOf(STRING_TERMINATOR_CHAR, stringStartIndex+1);	//search for the end of the string
-				if(stringEndIndex<0)	//if there is no string terminator
+				int terminatorsRemaining=1;	//we currently expect to find one more string terminator
+				int searchStartIndex=stringStartIndex+1;	//start searching after the SOS character
+				int stringEndIndex;	//we'll store here the end of the string reference
+				do
 				{
-					throw new IllegalArgumentException("String reference missing String Terminator (U+009C).");
+					stringEndIndex=charIndexOf(string, STRING_REFERENCE_DELIMITERS, searchStartIndex);	//search for the end of the string (or the beginning of another reference)
+					if(stringEndIndex<0)	//if there is no string delimiter (and therefore no string terminator)
+					{
+						throw new IllegalArgumentException("String reference missing String Terminator (U+009C).");
+					}
+					final char delimiter=string.charAt(stringEndIndex);	//get the delimiter we encountered
+					switch(string.charAt(stringEndIndex))	//see if we encountered a string terminator or another start of string
+					{
+						case STRING_TERMINATOR_CHAR:	//if we ended the string
+							--terminatorsRemaining;	//we have one less terminator left
+							break;
+						case START_OF_STRING_CHAR:	//if we started another string
+							++terminatorsRemaining;	//we have one more terminator left to find
+							break;
+						default:
+							throw new AssertionError("Unrecognized delimiter: "+delimiter);
+					}
+					searchStartIndex=stringEndIndex+1;	//if we need to search some more, we'll start searching immediately after the last delimiter
 				}
-				final String stringResourceKey=string.substring(stringStartIndex+1, stringEndIndex);	//get the string reference
-				final String stringResource=getStringResource(stringResourceKey);	//look up the string resource
-				stringBuilder.append(resolveString(stringResource));	//resolved and append the value of the string reference
+				while(terminatorsRemaining>0);	//keep searching until 
+				final String stringReference=string.substring(stringStartIndex+1, stringEndIndex);	//get the string reference
+				if(startsWith(stringReference, STRING_VALUE_REFERENCE_PREFIX_CHAR))	//if this is a value reference
+				{
+					final String stringValue=resolveString(stringReference.substring(1));	//resolve the actual reference (i.e. ignore the string value reference prefix character)
+					if(argumentList==null)	//if we don't yet have an argument list
+					{
+						argumentList=new ArrayList<String>();	//create a new argument list
+					}
+					argumentList.add(stringValue);	//add this string value to our argument list
+				}
+				else	//if this is not a value reference, it must be a resource reference
+				{
+					final String stringResource=getStringResource(stringReference);	//look up the string resource, using the reference as a resource key
+					stringBuilder.append(resolveString(stringResource));	//resolve and append the value of the string reference
+				}
 				fromIndex=stringEndIndex+1;	//show the new search location
 				stringStartIndex=string.indexOf(START_OF_STRING_CHAR, fromIndex);	//see if there is another string reference in the string
 			}
@@ -1706,9 +1745,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			final int length=string.length();	//get the string length
 			if(fromIndex<length)	//if there is remaining literal text
 			{
-				stringBuilder.append(string.substring(fromIndex, length));	//append the remaining				
+				stringBuilder.append(string.substring(fromIndex, length));	//append the remaining text
 			}
-			return stringBuilder.toString();	//return the string we constructed
+			String resolvedString=stringBuilder.toString();	//get the string we constructed
+			if(argumentList!=null)	//if we have string value arguments
+			{
+				resolvedString=format(resolvedString, (Object[])argumentList.toArray());	//use the string as a format pattern, formatted using the collected arguments
+			}
+			return resolvedString;	//return the string we resolved
 		}
 		else	//if there is no string reference
 		{

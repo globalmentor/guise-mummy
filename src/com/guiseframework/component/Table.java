@@ -728,10 +728,10 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		/**@return The validator for this model, or <code>null</code> if no validator is installed.*/
 		public Validator<C> getValidator() {return getCell().getColumn().getValidator();}	//return the validator from the column
 
-		/**Sets the validator. This version throws an exception, as the validator is read-only.
+		/**Sets the validator.
 		@param newValidator The validator for this model, or <code>null</code> if no validator should be used.
 		*/
-		public void setValidator(final Validator<C> newValidator) {throw new UnsupportedOperationException("Validator is read-only.");}
+		public void setValidator(final Validator<C> newValidator) {getCell().getColumn().setValidator(newValidator);}
 
 		/**@return The value from the table model cell, or <code>null</code> if there is no value in the cell.*/
 		public C getValue() {return getModel().getCellValue(getCell());}	//return the value from the table model

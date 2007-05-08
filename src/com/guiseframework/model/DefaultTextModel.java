@@ -14,7 +14,7 @@ public class DefaultTextModel extends AbstractModel implements TextModel
 {
 
 	/**The text, which may include a resource reference, or <code>null</code> if there is no text.*/
-	private String text=null;
+	private String text;
 
 		/**@return The text, which may include a resource reference, or <code>null</code> if there is no text.*/
 		public String getText() {return text;}
@@ -35,7 +35,7 @@ public class DefaultTextModel extends AbstractModel implements TextModel
 		}
 
 	/**The content type of the text.*/
-	private ContentType textContentType=PLAIN_TEXT_CONTENT_TYPE;
+	private ContentType textContentType;
 
 		/**@return The content type of the text.*/
 		public ContentType getTextContentType() {return textContentType;}
@@ -62,4 +62,33 @@ public class DefaultTextModel extends AbstractModel implements TextModel
 			}			
 		}
 
+	/**Default constructor.*/
+	public DefaultTextModel()
+	{
+		this(null);	//construct the class with no text
+	}
+
+	/**Text constructor with a default {@link Model#PLAIN_TEXT_CONTENT_TYPE} content type.
+	@param text The text, which may include a resource reference, or <code>null</code> if there is no text.
+	*/
+	public DefaultTextModel(final String text)
+	{
+		this(text, PLAIN_TEXT_CONTENT_TYPE);	//construct the class with a plain text content type
+	}
+
+	/**Text and content type constructor
+	@param text The text, which may include a resource reference, or <code>null</code> if there is no text.
+	@param textContentType The content type of the text.
+	@exception NullPointerException if the given content type is <code>null</code>.
+	@exception IllegalArgumentException if the given content type is not a text content type.
+	*/
+	public DefaultTextModel(final String text, final ContentType textContentType)
+	{
+		this.text=text;	//save the text
+		if(!isText(checkInstance(textContentType, "Content type cannot be null.")))	//if the content type is not a text content type
+		{
+			throw new IllegalArgumentException("Content type "+textContentType+" is not a text content type.");
+		}
+		this.textContentType=textContentType;	//save the text content type
+	}
 }

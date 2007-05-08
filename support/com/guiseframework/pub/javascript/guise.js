@@ -1206,6 +1206,44 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 		return null;	//show that we didn't find a matching element
 	},
 
+	/**Retrieves the computed style of a given node.
+	@param node The node to check.
+	@param property The name of the style to return.
+	@return The style value for the given property, or null if there is no such style defined.
+	@see http://www.quirksmode.org/dom/getstyles.html
+	@see http://ajaxian.com/archives/javascript-tip-watch-out-for
+	@see http://squidfingers.com/code/snippets/?id=getcssprop
+	@see http://developer.mozilla.org/en/docs/Gecko_DOM_Reference:Examples#Example_6:_getComputedStyle
+	*/
+	getComputedStyle:function(node, property)	//TODO later convert to checking the browser once before-hand when the function is first defined to speed things up 
+	{
+		var explicitStyle=node.style[property];	//get the explicit property, if any
+		if(explicitStyle)	//if there is a style explicitly set
+		{
+			return explicitStyle;	//return the explicit style
+		}
+		var currentStyle=node.currentStyle;	//see if there is a current style defined (IE)
+		if(currentStyle)	//if there is a current style
+		{
+			currentStyle[property];	//return the current style
+		}
+		var defaultView=document.defaultView;	//see if there is a document defaultView (Mozilla, Safari 1.3+
+		if(defaultView)	//if there is a defaultView
+		{
+			var computedStyleFunction=defaultView.getComputedStyle;	//get the computed style, if any
+			if(computedStyleFunction)	//if there is a computed style
+			{
+/*TODO del or use from http://ajaxian.com/archives/javascript-tip-watch-out-for
+				prop = prop.replace(/([A-Z])/g, \"-$1\");
+				prop = prop.toLowerCase();
+		return document.defaultView.getComputedStyle(element,\"\").getPropertyValue(prop);
+*/
+				return computedStyleFunction(node, null).getPropertyValue(property);	//get the computed style's property value
+			}
+		}
+		return null;	//indicate that we were unable to find a computed style
+	},
+
 	/**Determines whether the given node has the indicated ancestor, including the node itself in the search.
 	@param node The node the ancestor of which to find, or null if the search should not take place.
 	@param ancestor The ancestor to find.
@@ -3171,6 +3209,11 @@ com.guiseframework.js.Client=function()
 		{
 		//TODO del var debugString="";
 		//TODO del	var framePosition=new Point();	//we'll calculate the frame position; create an object rather than using primitives so that the internal function can access its variables via closure
+		
+//TODO del alert("initializing frame position, with width: "+DOMUtilities.getComputedStyle(frame, "width"));
+//TODO del			alert("initializing frame position, with explicit width: "+frame.width);
+//TODO del; fix alert("initializing frame position, with width: "+frame.currentStyle.width);
+		
 			var frameX, frameY;	//we'll calculate the frame position
 			var relatedComponentInput=DOMUtilities.getDescendantElementByName(frame, "input", new Map("name", "relatedComponentID"));	//get the input holding the related component ID
 			var relatedComponent=relatedComponentInput ? document.getElementById(relatedComponentInput.value) : null;	//get the related component, if there is one

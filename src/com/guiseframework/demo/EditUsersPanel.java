@@ -12,11 +12,11 @@ import com.guiseframework.model.*;
 import com.guiseframework.validator.*;
 
 /**Edit Users Guise demonstration panel.
-Copyright © 2005 GlobalMentor, Inc.
+Copyright © 2005-2007 GlobalMentor, Inc.
 Demonstrates list controls with default representation, thread-safe select model access,
 	sorting list control models, listening for select model list changes,
 	retrieving navigation panels, invoking modal panels, retrieving modal panel results,
-	disabled control models, message dialog frames,
+	disabled control models, notification dialog frames,
 	and accessing a custom Guise application.
 @author Garret Wilson
 */
@@ -134,13 +134,13 @@ public class EditUsersPanel extends DefaultNavigationPanel
 						{
 							final DemoUser user=userListControl.get(selectedIndex);	//get the selected user
 								//create a confirmation dialog
-							final MessageOptionDialogFrame confirmationDialog=new MessageOptionDialogFrame("Are you sure you want to remove user "+user.getFirstName()+" "+user.getLastName()+"?",
+							final NotificationOptionDialogFrame confirmationDialog=new NotificationOptionDialogFrame("Are you sure you want to remove user "+user.getFirstName()+" "+user.getLastName()+"?",
 									Notification.Option.YES, Notification.Option.NO);	//present "yes" and "no" options to the user
 							confirmationDialog.open(new AbstractGenericPropertyChangeListener<Frame.Mode>()	//ask for confirmation
 									{		
 										public void propertyChange(final GenericPropertyChangeEvent<Frame.Mode> propertyChangeEvent)	//when the modal dialog mode changes
 										{
-												//if the message dialog is no longer modal and the selected option is "yes"
+												//if the notification dialog is no longer modal and the selected option is "yes"
 											if(confirmationDialog.getMode()==null && confirmationDialog.getValue()==Notification.Option.YES)
 											{
 												userListControl.remove(selectedIndex);	//remove the user at the given index												

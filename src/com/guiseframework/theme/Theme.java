@@ -67,11 +67,13 @@ public class Theme extends ClassTypedRDFResource
 
 		//standard theme labels
 	public final static String LABEL_ABOUT=createStringResourceReference("theme.label.about");
+	public final static String LABEL_ABOUT_X=createStringResourceReference("theme.label.about.x");
 	public final static String LABEL_ACCEPT=createStringResourceReference("theme.label.accept");
 	public final static String LABEL_ACCESS=createStringResourceReference("theme.label.access");
 	public final static String LABEL_ADD=createStringResourceReference("theme.label.add");
 	public final static String LABEL_CANCEL=createStringResourceReference("theme.label.cancel");
 	public final static String LABEL_DELETE=createStringResourceReference("theme.label.delete");
+	public final static String LABEL_DELETE_X=createStringResourceReference("theme.label.delete.x");
 	public final static String LABEL_EDIT=createStringResourceReference("theme.label.edit");
 	public final static String LABEL_FINISH=createStringResourceReference("theme.label.finish");
 	public final static String LABEL_FIRST=createStringResourceReference("theme.label.first");
@@ -86,6 +88,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_PASSWORD_VERIFICATION=createStringResourceReference("theme.label.password.verification");
 	public final static String LABEL_PREVIOUS=createStringResourceReference("theme.label.previous");
 	public final static String LABEL_REJECT=createStringResourceReference("theme.label.reject");
+	public final static String LABEL_RESOURCE=createStringResourceReference("theme.label.resource");
 	public final static String LABEL_SUBMIT=createStringResourceReference("theme.label.submit");
 	public final static String LABEL_SUBTRACT=createStringResourceReference("theme.label.subtract");
 	public final static String LABEL_USERNAME=createStringResourceReference("theme.label.username");

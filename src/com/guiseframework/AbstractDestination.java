@@ -4,12 +4,14 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
 import static java.util.Collections.*;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.net.ResourceIOException;
 
 /**Abstract implementation of a navigation point, its properties, and its restrictions.
 Destinations of identical types with identical paths and path patterns are considered equal.
@@ -67,6 +69,21 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	{
 		this.pathPattern=checkInstance(pathPattern, "Navigation path pattern cannot be null.");
 		this.path=null;	//indicate that there is no path
+	}
+
+	/**Determines if the given location does indeed exist for this destination.
+	This version assumes that all paths exist at this destination and returns <code>true</code>.
+	@param session The current Guise Session. 
+	@param navigationPath The navigation path relative to the application context path.
+	@param bookmark The bookmark for which navigation should occur at this navigation path, or <code>null</code> if there is no bookmark involved in navigation.
+	@param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
+	@return Whether the requested path exists.
+	@exception NullPointerException if the given navigation path is <code>null</code>.
+	@exception ResourceIOException if there is an error accessing the resource.
+	*/
+	public boolean exists(final GuiseSession session, final String navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException
+	{
+		return true;	//make it easy for simple resource destinations by assuming the resource exists
 	}
 
 	/**@return A hash code for this object.*/

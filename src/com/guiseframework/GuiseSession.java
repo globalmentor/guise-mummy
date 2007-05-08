@@ -3,6 +3,7 @@ package com.guiseframework;
 import java.io.*;
 import java.net.URI;
 import java.security.Principal;
+import java.text.MessageFormat;
 import java.util.*;
 
 import com.garretwilson.beans.PropertyBindable;
@@ -659,7 +660,6 @@ public interface GuiseSession extends PropertyBindable
 
 	/**Notifies the user of one or more notifications to be presented in sequence, with optional logic to be executed after all notifications have taken place.
 	If the selected option to any notification is fatal, the specified logic will not be performed.
-	This method delegates to {@link #notify(Notification, Runnable)}.
 	@param notifications One or more notification informations to relay.
 	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
 	@exception NullPointerException if the given notifications is <code>null</code>.
@@ -672,7 +672,7 @@ public interface GuiseSession extends PropertyBindable
 	@param notification The notification information to relay.
 	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
 	*/
-	public void notify(final Notification notification, final Runnable afterNotify);
+//TODO del if not needed	public void notify(final Notification notification, final Runnable afterNotify);
 
 	/**Notifies the user of the given errors in sequence.
 	This is a convenience method that delegates to {@link #notify(Runnable, Throwable...)}.
@@ -693,9 +693,11 @@ public interface GuiseSession extends PropertyBindable
 	public void notify(final Runnable afterNotify, final Throwable... errors);
 
 	/**Resolves a string by replacing any string references with a string from the resources.
-	A string reference begins with the Start of String control character (U+0098) and ends with a String Terminator control character (U+009C).
+	A string reference begins with the Start of String (<code>SOS</code>) control character (U+0098) and ends with a String Terminator (<code>ST</code>) control character (U+009C).
 	The string between these delimiters will be used to look up a string resource using {@link #getStringResource(String)}.
 	Strings retrieved from resources will be recursively resolved.
+	<p>String references appearing between an <code>SOS</code>/<code>ST</code> pair that that begin with the character {@value Resources#STRING_VALUE_REFERENCE_PREFIX_CHAR}
+	will be considered string values and, after they are recursively resolved, will be applied as formatting arguments to the remaining resolved text using {@link MessageFormat#format(String, Object...)}.</p>
 	@param string The string to be resolved.
 	@return The resolved string with any string references replaced with the appropriate string from the resources.
 	@exception NullPointerException if the given string is <code>null</code>.
@@ -703,6 +705,7 @@ public interface GuiseSession extends PropertyBindable
 	@exception MissingResourceException if no resource could be found associated with a string reference.
 	@exception ClassCastException if the resource associated with a string reference is not an instance of <code>String</code>.
 	@see Resources#createStringResourceReference(String)
+	@see Resources#createStringValueReference(String)
 	@see #getStringResource(String)
 	*/
 	public String resolveString(final String string) throws MissingResourceException;

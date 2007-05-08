@@ -35,7 +35,26 @@ public class Text extends AbstractContainer<Text> implements TextModel
 	/**Default constructor with a default text model.*/
 	public Text()
 	{
-		this(new DefaultTextModel());	//construct the class with a default text model
+		this((String)null);	//construct the class with no text
+	}
+
+	/**Text constructor with a default {@link Model#PLAIN_TEXT_CONTENT_TYPE} content type.
+	@param text The text, which may include a resource reference, or <code>null</code> if there is no text.
+	*/
+	public Text(final String text)
+	{
+		this(text, PLAIN_TEXT_CONTENT_TYPE);	//construct the class with a plain text content type
+	}
+
+	/**Text and content type constructor
+	@param text The text, which may include a resource reference, or <code>null</code> if there is no text.
+	@param textContentType The content type of the text.
+	@exception NullPointerException if the given content type is <code>null</code>.
+	@exception IllegalArgumentException if the given content type is not a text content type.
+	*/
+	public Text(final String text, final ContentType textContentType)
+	{
+		this(new DefaultTextModel(text, textContentType));	//construct the class with a default text model using the given values
 	}
 
 	/**Text model constructor.

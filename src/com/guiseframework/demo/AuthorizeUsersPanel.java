@@ -11,9 +11,9 @@ import com.guiseframework.model.*;
 import com.guiseframework.validator.RegularExpressionStringValidator;
 
 /**Authorize Users Guise demonstration panel.
-Copyright © 2005 GlobalMentor, Inc.
+Copyright © 2005-2007 GlobalMentor, Inc.
 Demonstrates custom table models, editable string table cells, editable boolean table cells,
-	table column validators, tables, and modal message option dialog frames.
+	table column validators, tables, and the session notification mechanism.
 @author Garret Wilson
 */
 public class AuthorizeUsersPanel extends DefaultNavigationPanel
@@ -53,14 +53,13 @@ public class AuthorizeUsersPanel extends DefaultNavigationPanel
 		final Button applyButton=new Button();	//create a button for applying the values
 		applyButton.setLabel("Apply");	//set the button label
 		applyButton.addActionListener(new ActionListener()	//listen for the apply button
-				{					
+				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
-						final MessageOptionDialogFrame messageDialog=new MessageOptionDialogFrame(	//create a new message dialog
-								"The use of AJAX in Guise makes the \"Apply\" button unnecessary, because changes take place live. This button would only be useful if AJAX were disabled.",
-								Notification.Option.OK);	//show the OK button
-						messageDialog.setLabel("Note on the \"Apply\" button.");	//set the message dialog label
-						messageDialog.open(true);	//open the dialog modally
+						final Notification notification=new Notification(
+								"The use of AJAX in Guise makes the \"Apply\" button unnecessary, because changes take place live. "+
+								"This button would only be useful if AJAX were disabled.");	//create a new notification
+						getSession().notify(notification);	//tell the session to notify the user
 					}
 				});
 		add(applyButton);	//add the apply button to the panel

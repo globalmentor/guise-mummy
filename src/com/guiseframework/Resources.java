@@ -22,6 +22,9 @@ public class Resources extends ClassTypedRDFResource
 	/**The URI to the resource key ontology namespace.*/
 	public final static URI RESOURCE_NAMESPACE_URI=URI.create("http://guiseframework.com/namespaces/resource#");
 
+	/**The prefix character used to introduce string value refrences.*/
+	public final static char STRING_VALUE_REFERENCE_PREFIX_CHAR='=';
+
 		//standard labels
 	public final static String APPLICATION_NAME=createStringResourceReference("application.name");
 	public final static String APPLICATION_LABEL=createStringResourceReference("application.label");
@@ -55,6 +58,17 @@ public class Resources extends ClassTypedRDFResource
 	public final static String createStringResourceReference(final String resourceKey)
 	{
 		return createControlString(resourceKey);	//return a control string for the given resource key
+	}
+
+	/**Creates a string containing a value that can be used as an argument in formatting.
+	@param value The value to be used as an argument.
+	@return A string containing a reference to the given value, an ECMA-48 control string beginning with {@value #STRING_VALUE_REFERENCE_PREFIX_CHAR} with the given Value as its content.
+	@exception NullPointerException if the given value is <code>null</code>.
+	@see <a href="http://www.ecma-international.org/publications/standards/Ecma-048.htm">ECMA-48: Control Functions for Coded Character Sets</a>
+	*/
+	public final static String createStringValueReference(final String value)
+	{
+		return createControlString(new StringBuilder().append(STRING_VALUE_REFERENCE_PREFIX_CHAR).append(value).toString());	//return a control string for the given value prefixed by the value reference character
 	}
 
 	/**Creates a URI containing a reference to the given string resource key.
