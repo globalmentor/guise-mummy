@@ -22,7 +22,7 @@ public interface ResourceDestination extends Destination
 	@param session The current Guise Session. 
 	@param navigationPath The navigation path relative to the application context path.
 	@param bookmark The bookmark for which navigation should occur at this navigation path, or <code>null</code> if there is no bookmark involved in navigation.
-	@param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
+	@param referrerURI The URI of the referring component or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
 	@return A description of the resource.
 	@exception NullPointerException if the given navigation path is <code>null</code>.
 	@exception ResourceIOException if there is an error retrieving the resource description.
@@ -33,7 +33,7 @@ public interface ResourceDestination extends Destination
 	@param session The current Guise Session. 
 	@param navigationPath The navigation path relative to the application context path.
 	@param bookmark The bookmark for which navigation should occur at this navigation path, or <code>null</code> if there is no bookmark involved in navigation.
-	@param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
+	@param referrerURI The URI of the referring component or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
 	@return An input stream to the given resource.
 	@exception NullPointerException if the given navigation path is <code>null</code>.
 	@exception ResourceIOException Thrown if there is an error accessing the resource, such as a missing file.

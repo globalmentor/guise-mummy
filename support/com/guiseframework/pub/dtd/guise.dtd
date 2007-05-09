@@ -1,5 +1,5 @@
 <!-- Guise XHTML DTD -->
-<!-- Copyright (c) 2006 GlobalMentor, Inc. -->
+<!-- Copyright (c) 2006-2007 GlobalMentor, Inc. -->
 <!--
 	Public and System Identifiers:
 		PUBLIC "-//Guise//DTD XHTML Guise 1.0//EN"
@@ -28,12 +28,18 @@
 <!--HTML attributes dropped in XHTML-->
 
 <!ATTLIST script
-  language    CDATA          #IMPLIED
+  language    							CDATA          #IMPLIED
 >
 
 <!--add custom Guise attributes-->
 
-<!ATTLIST img
-  guise:originalSrc         %URI;          #IMPLIED
-  guise:rolloverSrc         %URI;          #IMPLIED
+<!ATTLIST div
+  guise:commands    				CDATA          #IMPLIED
 >
+
+<!ATTLIST img
+  guise:originalSrc					%URI;          #IMPLIED
+  guise:rolloverSrc					%URI;          #IMPLIED
+>
+
+<!--TODO: add guise:contentHash and guise:attributeHash to all elements-->

@@ -80,8 +80,11 @@ is notified of the change in state.)
 
 //TODO before sending a drop event, send a component update for the drop target so that its value will be updated; or otherwise make sure the value is synchronized
 
+/**See if the browser is IE.*/
+var isUserAgentIE=navigator.userAgentName=="MSIE";
+
 /**See if the browser is IE6.*/
-var isUserAgentIE6=navigator.userAgentName=="MSIE" && navigator.userAgentVersionNumber<7;
+var isUserAgentIE6=isUserAgentIE && navigator.userAgentVersionNumber<7;
 
 var AJAX_ENABLED=true;	//TODO allow this to be configured
 
@@ -2527,6 +2530,30 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 */
 		};
 
+		/**Invokes a command for a particular element.
+		@param element The element to which the command relates.
+		@param command The command to invoke.
+		*/ 
+		GuiseAJAX.prototype._invokeCommand=function(element, command)
+		{
+			if(/sendResources\((.+)\)/.test(command))	//if the command is sendResources(uri)
+			{
+				var destination=RegExp.$1;	//get the destination
+				var form=getForm(element);	//get the form
+				if(form)	//if we found the form
+				{
+					form.enctype="multipart/form-data";
+					if(isUserAgentIE)	//if we're in IE6/7
+					{
+						form.encoding="multipart/form-data";	//IE requires the "encoding" property to be used; see http://verens.com/archives/2005/07/06/ie-bugs-dynamically-creating-form-elements/					
+					}					
+					form.action=destination;	//indicate where the data should go
+					form.target="uploadIFrame";	//indicate that the output should be re-routed to our hidden IFrame
+					form.submit();	//submit the form
+				}
+			}
+		};
+
 		/**The set of attribute names that should not be removed when synchronizing.*/
 		GuiseAJAX.prototype.NON_REMOVABLE_ATTRIBUTE_SET=
 		{
@@ -2587,6 +2614,15 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 				return;	//don't do synchronization patching
 			}
 */
+
+			var newElementCommands=DOMUtilities.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "commands");	//get the new element's commands, if any TODO use a constant
+			if(newElementCommands)	//TODO fix; testing
+			{
+//TODO del				alert("commands: "+newElementCommands);
+				this._invokeCommand(oldElement, newElementCommands);	//invoke the command TODO parse the commands first
+				return;	//don't do further syncrhonization TODO later add options for full synchronization or not
+			}
+
 				//get the content hash attributes before we update the attributes
 			var oldElementContentHash=oldElement.getAttribute("guise:contentHash");	//get the old element's content hash, if any TODO use a constant
 			var newElementContentHash=DOMUtilities.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "contentHash");	//get the new element's content hash, if any TODO use a constant
@@ -3035,6 +3071,9 @@ com.guiseframework.js.Client=function()
 	/**Whether the busy indicator is visible.*/
 	this._isBusyVisible=false;
 
+	/**The hidden iframe target that receives the results of file uploads.*/
+	this._uploadIFrame=null;
+
 	/**The map of cursors that have been temporarily changed, keyed to the ID of the element the cursor of which has been changed.
 	This is a tentative implementation, as blindly resetting the cursor after AJAX processing will prevent new cursors to be changed via AJAX.
 	*/
@@ -3058,15 +3097,57 @@ com.guiseframework.js.Client=function()
 			this._modalLayer.style.top="0px";
 			this._modalLayer.style.left="0px";
 			document.body.appendChild(this._modalLayer);	//add the modal layer to the document
+
+				//create the upload IFrame
+				//@see http://blog.caboo.se/articles/2007/4/2/ajax-file-upload
+				//@see http://www.openjs.com/articles/ajax/ajax_file_upload/
+			this._uploadIFrame=document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");	//create an IFrame
+			this._uploadIFrame.id="uploadIFrame";	//set the ID of the frame so that we can do the IE fix later
+			this._uploadIFrame.name="uploadIFrame";
+			this._uploadIFrame.src="about:blank";	//TODO fix
+			this._uploadIFrame.width="100px";	//Safari will ignore the IFrame if it has a size of 0, according to http://blog.caboo.se/articles/2007/4/2/ajax-file-upload
+			this._uploadIFrame.height="100px";
+			this._uploadIFrame.frameBorder="0";	//remove the border; see http://msdn2.microsoft.com/en-us/library/ms533770.aspx
+			this._uploadIFrame.style.position="absolute";	//take the IFrame out of normal flow
+			this._uploadIFrame.style.left="-9999px";	//completely remove the IFrame from sight
+			this._uploadIFrame.style.top="-9999px";
+			document.body.appendChild(this._uploadIFrame);	//add the upload IFrame to the document
+			if(isUserAgentIE)	//if we're in IE6/7
+			{
+				window.frames["uploadIFrame"].name="uploadIFrame";	//because IE hasn't yet registered the name with the DOM, look up the frame by its ID and set its name again; see http://forums.digitalpoint.com/showthread.php?t=107314 and http://verens.com/archives/2005/07/06/ie-bugs-dynamically-creating-form-elements/
+			}
+//TODO del alert("current name: ", window.frames["uploadIFrame"].name);
+			
 			if(isUserAgentIE6)	//if we're in IE6
 			{
+				this._modalIFrame=document.getElementById("modalIFrame");	//get the modal IFrame
+/*TODO testing no form
 				var form=getForm(document.documentElement);	//get the form
 				if(form && form.id)	//if there is a form with an ID
 				{
 					var modalIFrameID=form.id.replace(".form", ".modalIFrame");	//determine the ID of the modal IFrame TODO use a constant, or get these values using a better method
 					this._modalIFrame=document.getElementById(modalIFrameID);	//get the modal IFrame
 				}
+*/
+				this._flyoverIFrame=document.getElementById("flyoverIFrame");	//get the flyover IFrame
+/*TODO testing no form
+				var form=getForm(document.documentElement);	//get the form
+				if(form && form.id)	//if there is a form with an ID
+				{
+					var flyoverIFrameID=form.id.replace(".form", ".flyoverIFrame");	//determine the ID of the flyover IFrame TODO use a constant, or get these values using a better method
+					this._flyoverIFrame=document.getElementById(flyoverIFrameID);	//get the flyover IFrame
+				}
+*/
 			}
+			this._busyElement=document.getElementById("busy");	//get the busy element
+/*TODO testing no frame
+			var form=getForm(document.documentElement);	//get the form
+			if(form && form.id)	//if there is a form with an ID
+			{
+				var busyID=form.id.replace(".form", ".busy");	//determine the ID of the busy element TODO use a constant, or get these values using a better method
+				this._busyElement=document.getElementById(busyID);	//get the busy element
+			}
+*/
 		};
 
 		/**Temporarily changes the cursor of an element, which will be reset after the next AJAX call.
@@ -3364,15 +3445,6 @@ com.guiseframework.js.Client=function()
 			}
 			if(isUserAgentIE6)	//if we're in IE6
 			{
-				if(!this._flyoverIFrame)	//if we haven't found our flyover IFrame
-				{
-					var form=getForm(document.documentElement);	//get the form
-					if(form && form.id)	//if there is a form with an ID
-					{
-						var flyoverIFrameID=form.id.replace(".form", ".flyoverIFrame");	//determine the ID of the flyover IFrame TODO use a constant, or get these values using a better method
-						this._flyoverIFrame=document.getElementById(flyoverIFrameID);	//get the flyover IFrame
-					}
-				}
 				var flyoverIFrame=this._flyoverIFrame;	//get the flyover IFrame
 				if(flyoverIFrame)	//if we know the flyover IFrame
 				{
@@ -3470,15 +3542,6 @@ com.guiseframework.js.Client=function()
 			if(busyVisible!=this._isBusyVisible)	//if the busy visibility is changing
 			{
 				this._isBusyVisible=busyVisible;	//update the busy indicator flag
-				if(!this._busyElement)	//if we haven't found the busy element
-				{
-					var form=getForm(document.documentElement);	//get the form
-					if(form && form.id)	//if there is a form with an ID
-					{
-						var busyID=form.id.replace(".form", ".busy");	//determine the ID of the busy element TODO use a constant, or get these values using a better method
-						this._busyElement=document.getElementById(busyID);	//get the busy element
-					}
-				}
 				var busyElement=this._busyElement;	//get the busy element
 				if(busyElement)	//if there is a busy element
 				{
@@ -3496,15 +3559,6 @@ com.guiseframework.js.Client=function()
 					}
 					if(isUserAgentIE6)	//if we're in IE6, prepare the flyover frame TODO consolidate duplicate code
 					{
-						if(!this._flyoverIFrame)	//if we haven't found our flyover IFrame
-						{
-							var form=getForm(document.documentElement);	//get the form
-							if(form && form.id)	//if there is a form with an ID
-							{
-								var flyoverIFrameID=form.id.replace(".form", ".flyoverIFrame");	//determine the ID of the flyover IFrame TODO use a constant, or get these values using a better method
-								this._flyoverIFrame=document.getElementById(flyoverIFrameID);	//get the flyover IFrame
-							}
-						}
 						var flyoverIFrame=this._flyoverIFrame;	//get the flyover IFrame
 						if(flyoverIFrame)	//if we know the flyover IFrame
 						{
@@ -4180,6 +4234,12 @@ function onWindowLoad()
 	//TODO del	alert("compatibility mode: "+document.compatMode);
 		guise.setBusyVisible(false);	//turn off the busy indicator	
 			//remove the init IFrame shield
+		var initIFrame=document.getElementById("initIFrame");	//get the init IFrame
+		if(initIFrame)	//if there is an initialization IFrame
+		{
+			initIFrame.parentNode.removeChild(initIFrame);	//remove the init IFrame from the document; we don't need it anymore
+		}
+/*TODO testing no form
 		var form=getForm(document.documentElement);	//get the form
 		if(form && form.id)	//if there is a form with an ID
 		{
@@ -4190,6 +4250,7 @@ function onWindowLoad()
 				initIFrame.parentNode.removeChild(initIFrame);	//remove the init IFrame from the document; we don't need it anymore
 			}
 		}
+*/
 		var focusable=getFocusableDescendant(document.documentElement);	//see if the document has a node that can be focused
 		if(focusable)	//if we found a focusable node
 		{
@@ -4670,6 +4731,7 @@ function onTextInputChange(event)
 function onButtonClick(event)
 {
 	var element=event.currentTarget;	//get the element on which the event was registered
+/*TODO fix for new upload techniques
 	var form=getForm(element);	//get the form
 	if(form && DOMUtilities.getDescendantElementByName(form, "input", new Map("type", "file")))	//if there is a file input element, we'll have to submit the entire page rather than using AJAX
 	{
@@ -4694,6 +4756,7 @@ function onButtonClick(event)
 		}
 	}
 	else	//if there is no file input element, we can submit the action via AJAX normally
+*/
 	{
 		onAction(event);	//process an action for the button
 	}
@@ -4721,25 +4784,26 @@ function onAction(event)
 		var componentID=component.id;	//get the component ID
 		if(componentID)	//if there is a component ID
 		{
-			var form=getForm(component);	//get the form
-			if(form && form.id)	//if there is a form with an ID
+			if(AJAX_ENABLED)	//if AJAX is enabled
 			{
-				var actionInputID=form.id.replace(".form", ".input");	//determine the ID of the hidden action input TODO use a constant, or get these values using a better method
-				if(AJAX_ENABLED)	//if AJAX is enabled
-				{
 
 //TODO fix					target.parentNode.style.cursor="inherit";	//TODO testing
 //TODO fix					target.style.cursor="inherit";	//TODO testing
 //TODO fix					document.body.style.cursor="wait";	//TODO testing
 //TODO fix				alert("old cursor: "+target.style.cursor);
-					guise.setElementTempCursor(component, "wait");	//change the cursor to "wait" until the AJAX communication is finished
+				guise.setElementTempCursor(component, "wait");	//change the cursor to "wait" until the AJAX communication is finished
 
-					var ajaxRequest=new FormAJAXEvent(new Map(actionInputID, componentID));	//create a new form request with form's hidden action control and the action element ID
-					guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request			
-				}
+//TODO testing no form					var ajaxRequest=new FormAJAXEvent(new Map(actionInputID, componentID));	//create a new form request with form's hidden action control and the action element ID
+				var ajaxRequest=new FormAJAXEvent(new Map(componentID, componentID));	//create a new form request with action element ID as the parameter and value
+				guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request			
+			}
 /*TODO fix; distinguish between !AJAX_ENABLED and AJAX_SUSPENDED; also fix bug on server where an exhaustive post may clear information on non-displayed cards
-				else	//if AJAX is not enabled, do a POST
+			else	//if AJAX is not enabled, do a POST
+			{
+				var form=getForm(component);	//get the form
+				if(form && form.id)	//if there is a form with an ID
 				{
+					var actionInputID=form.id.replace(".form", ".input");	//determine the ID of the hidden action input TODO use a constant, or get these values using a better method
 					var actionInput=document.getElementById(actionInputID);	//get the action input
 					if(actionInput)	//if there is an action input
 					{
@@ -4751,10 +4815,10 @@ function onAction(event)
 						actionInput.value=null;	//remove the indication of which action was activated
 					}
 				}
-*/
-				event.stopPropagation();	//tell the event to stop bubbling
-				event.preventDefault();	//prevent the default functionality from occurring
 			}
+*/
+			event.stopPropagation();	//tell the event to stop bubbling
+			event.preventDefault();	//prevent the default functionality from occurring
 		}
 	}
 }

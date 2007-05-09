@@ -19,6 +19,9 @@ import javax.servlet.http.*;
 import javax.xml.parsers.*;
 
 import org.apache.commons.fileupload.*;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.fileupload.util.Streams;
+import org.apache.commons.io.FilenameUtils;
 import org.w3c.dom.*;
 import org.w3c.dom.css.CSSStyleSheet;
 import org.xml.sax.SAXException;
@@ -27,6 +30,7 @@ import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 
 import com.garretwilson.io.*;
+import static com.garretwilson.io.OutputStreamUtilities.*;
 import com.garretwilson.lang.ClassUtilities;
 import com.garretwilson.lang.ObjectUtilities;
 
@@ -62,14 +66,12 @@ import static com.garretwilson.text.elff.WebTrendsConstants.*;
 import com.garretwilson.text.xml.XMLUtilities;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
-import com.garretwilson.rdf.RDF;
-import com.garretwilson.rdf.RDFResource;
-import com.garretwilson.rdf.TypedRDFResourceIO;
-import com.garretwilson.rdf.RDFUtilities;
-import com.garretwilson.rdf.RDFXMLProcessor;
+import com.garretwilson.rdf.*;
 import com.garretwilson.rdf.maqro.Activity;
 import com.garretwilson.rdf.maqro.MAQROUtilities;
 import com.garretwilson.rdf.ploop.PLOOPProcessor;
+import static com.garretwilson.rdf.xpackage.MIMEOntologyUtilities.*;
+import static com.garretwilson.rdf.xpackage.FileOntologyUtilities.*;
 import com.garretwilson.security.Nonce;
 import com.garretwilson.servlet.ServletUtilities;
 import com.garretwilson.servlet.http.HttpServletUtilities;
@@ -463,7 +465,6 @@ while(headerNames.hasMoreElements())
 		if(destination!=null)	//if we have a destination associated with the requested path
 		{
 			final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
-			
 /*TODO del
 	Debug.info("session ID", guiseSession.getHTTPSession().getId());	//TODO del
 	Debug.info("content length:", request.getContentLength());
@@ -488,7 +489,9 @@ while(headerNames.hasMoreElements())
 			}
 	//TODO del Debug.info("supports Flash: ", guiseSession.getEnvironment().getProperty(GuiseEnvironment.CONTENT_APPLICATION_SHOCKWAVE_FLASH_ACCEPTED_PROPERTY));
 
-			if(destination instanceof ResourceDestination)	//if this is a resource destination
+			
+			final String httpMethod=request.getMethod();	//get the current HTTP method being used
+			if(destination instanceof ResourceDestination && GET_METHOD.equals(httpMethod))	//if this is a resource read destination (but only if this is a GET request; the ResourceReadDestination may also be a ResourceWriteDestination)
 			{
 				super.doGet(request, response);	//let the default functionality take over, which will take care of accessing the resource destination by creating a specialized access resource
 				return;	//don't service the Guise request normally
@@ -559,7 +562,7 @@ while(headerNames.hasMoreElements())
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
 		final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
-		if(!isAJAX)	//if this is not an AJAX request, verify that the destination exists (doing this with AJAX requests would be too costly; we can assume that AJAX requests are for existing destinations)
+		if(!isAJAX && (GET_METHOD.equals(request.getMethod()) || !(destination instanceof ResourceWriteDestination)))	//if this is not an AJAX request, verify that the destination exists (doing this with AJAX requests would be too costly; we can assume that AJAX requests are for existing destinations) (but don't check if this is a POST to a ResourceWriteDestination, which probably won't exist; TODO clarify exist() semantics for ResourceWriteDestinations)
 		{
 			final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
 			final String referrer=getReferer(request);	//get the request referrer, if any
@@ -1039,6 +1042,63 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 				}
 			}
 //TODO del			return true;	//show that we processed the Guise request
+		}
+		else if(destination instanceof ResourceWriteDestination)	//if we should be writing to this destination
+		{
+			if(ServletFileUpload.isMultipartContent(request))	//if the request is multipart content, as we expect
+			{
+				final ResourceWriteDestination resourceWriteDestination=(ResourceWriteDestination)destination;	//get the destination for writing the resource
+				final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
+				final String referrer=getReferer(request);	//get the request referrer, if any
+				final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
+				try
+				{
+					final ServletFileUpload servletFileUpload=new ServletFileUpload();	//create a new servlet file upload object
+					final FileItemIterator itemIterator=servletFileUpload.getItemIterator(request);	//get an iterator to the file items
+					while(itemIterator.hasNext())	//while there are more items
+					{
+						final FileItemStream fileItemStream=itemIterator.next();	//get the current file item
+//TODO del if not needed						final String name=item.getFieldName();	//get 
+						if(!fileItemStream.isFormField())	//if this isn't a form field item, it's a file upload item for us to process
+						{
+							final RDFResource resourceDescription=new DefaultRDFResource();	//create a new resource description
+							final String itemContentType=fileItemStream.getContentType();	//get the item content type, if any
+							if(itemContentType!=null)	//if we know the item's content type
+							{
+								setContentType(resourceDescription, createContentType(itemContentType));	//set the resource's content type
+							}
+							final String itemName=fileItemStream.getName();	//get the item's name, if any
+							if(itemName!=null)	//if a name is specified
+							{
+								setName(resourceDescription, FilenameUtils.getName(itemName));	//specify the name provided to us (removing any extraneous path information a browser such as IE might have given)
+							}
+							final InputStream inputStream=new BufferedInputStream(fileItemStream.openStream());	//get an input stream to the item
+							try
+							{
+								final OutputStream outputStream=new BufferedOutputStream(resourceWriteDestination.getOutputStream(resourceDescription, guiseSession, navigationPath, bookmark, referrerURI));	//get an output stream to the destination
+								try
+								{
+									copy(inputStream, outputStream);	//copy the uploaded file to the destination
+								}
+								finally
+								{
+									outputStream.close();	//always close the output stream
+								}
+							}
+							finally
+							{
+								inputStream.close();	//always close the input stream
+							}
+						}
+					}
+				}
+				catch(final FileUploadException fileUploadException)	//if there was an upload exception
+				{
+						//TODO do something interesting with the error so that the ResourceCollectControl will learn of it
+					throw (IOException)new IOException(fileUploadException.getMessage()).initCause(fileUploadException);
+				}
+//TODO del if not needed				response.getOutputStream().write("testupload posted\n".getBytes());	//TODO del 
+			}
 		}
 		else if(destination instanceof RedirectDestination)	//if we have a component destination associated with the requested path
 		{
