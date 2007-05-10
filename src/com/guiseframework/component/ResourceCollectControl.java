@@ -3,6 +3,11 @@ package com.guiseframework.component;
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
 
+import java.util.*;
+import static java.util.Collections.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import static com.garretwilson.lang.ObjectUtilities.*;
 import com.guiseframework.Bookmark;
 import com.guiseframework.ResourceWriteDestination;
 import com.guiseframework.model.*;
@@ -13,6 +18,32 @@ The destination path should reference a registered {@link ResourceWriteDestinati
 */
 public class ResourceCollectControl extends AbstractControl<ResourceCollectControl>
 {
+
+	/**The bound property of the paths of the collected resources.*/
+	public final static String RESOURCE_PATHS_PROPERTY=getPropertyName(ResourceCollectControl.class, "resourcePaths");
+
+	/**The paths of the curently collected resources.*/
+	private List<String> resourcePaths=new CopyOnWriteArrayList<String>();
+
+		/**Returns the paths of the currently collected resources.
+		These paths are for identification only, and are not guaranteed to represent any location accessible from the application.
+		@return The the paths of the currently collected resources.
+		*/
+		public List<String> getResourcePaths() {return unmodifiableList(resourcePaths);}
+
+		/**Adds a new resource path.
+		This method changes a bound property of type {@link List} holding type {@link String}.
+		Manually adding a new resource path, depending on the platform, may not actually result in another resource being collected absent user intervention.
+		@param resourcePath The resource path to add.
+		@exception NullPointerException if the given resource path is <code>null</code>.
+		@see #RESOURCE_PATHS_PROPERTY
+		*/
+		public void addResourcePath(final String resourcePath)
+		{
+			resourcePaths.add(checkInstance(resourcePath, "Resource path cannot be null."));
+			final List<String> newList=unmodifiableList(new ArrayList<String>(resourcePaths));	//create an unmodifiable copy of the resource paths
+			firePropertyChange(RESOURCE_PATHS_PROPERTY, null, newList);	//indicate that the value changed			
+		}
 	
 	/**The destination path relative to the application context path, of <code>null</code> if no resources are currently being sent.*/
 	private String destinationPath=null;
@@ -23,12 +54,10 @@ public class ResourceCollectControl extends AbstractControl<ResourceCollectContr
 		public String getDestinationPath() {return destinationPath;}
 
 	/**The bookmark being used in sending the resources to the destination path, or <code>null</code> if there is no bookmark specified and/or no resources are currently being sent.*/
-	private Bookmark bookmark=null;
+	private Bookmark destinationBookmark=null;
 
-		/**Reports the bookmark relative to the current destination path.
-		@return The bookmark being used in sending the resources to the destination path, or <code>null</code> if there is no bookmark specified and/or no resources are currently being sent.
-		*/
-		public Bookmark getBookmark() {return bookmark;}	
+		/**@return The bookmark being used in sending the resources to the destination path, or <code>null</code> if there is no bookmark specified and/or no resources are currently being sent.*/
+		public Bookmark getDestinationBookmark() {return destinationBookmark;}	
 	
 	/**The bound property of whether the selected resources are being sent.*/
 	public final static String SENDING_PROPERTY=getPropertyName(ResourceCollectControl.class, "sending");
@@ -82,14 +111,15 @@ public class ResourceCollectControl extends AbstractControl<ResourceCollectContr
 
 	/**Sends collected resources to the given destination path using the given bookmark.
 	@param destinationPath The path representing the destination of the collected resources, or <code>null</code> if no resources are currently being sent.
-	@param bookmark The bookmark to be used in sending the resources to the destination path, or <code>null</code> if no bookmark should be used.
+	@param destinationBookmark The bookmark to be used in sending the resources to the destination path, or <code>null</code> if no bookmark should be used.
 	@exception NullPointerException if the given path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
+	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public void sendResources(final String destinationPath, final Bookmark bookmark)
+	public void sendResources(final String destinationPath, final Bookmark destinationBookmark)
 	{
-		this.destinationPath=checkPath(destinationPath);	//save the path
-		this.bookmark=bookmark;	//save the bookmark
+		this.destinationPath=checkRelativePath(destinationPath);	//save the path
+		this.destinationBookmark=destinationBookmark;	//save the bookmark
 		setSending(true);	//initiate sending
 	}
 }

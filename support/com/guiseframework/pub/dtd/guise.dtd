@@ -35,6 +35,7 @@
 
 <!ATTLIST div
   guise:commands    				CDATA          #IMPLIED
+  guise:patchType						CDATA          #IMPLIED
 >
 
 <!ATTLIST img
@@ -42,4 +43,9 @@
   guise:rolloverSrc					%URI;          #IMPLIED
 >
 
+<!ATTLIST input
+  guise:patchType						CDATA          #IMPLIED
+>
+
 <!--TODO: add guise:contentHash and guise:attributeHash to all elements-->
+<!--TODO: add guise:attributeHash to all elements-->

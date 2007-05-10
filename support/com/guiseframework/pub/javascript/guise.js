@@ -40,6 +40,12 @@ navigator.userAgentVersionNumber The version of the user agent stored as a numbe
 			targetID=""	<!--the ID of the target element on which the action occurred-->
 			actionID=""	<!--the action identifier-->
 		/>
+		<change	<!--a property change on a component-->
+			componentID="">	<!--the ID of the component-->
+			<property name=""	<!--the name of a property changing-->
+				<value></value>	<!--(zero or more) the new property; zero may signify null in some contexts--> 
+			</property>
+		</change>
 		<mouseEnter|mouseExit>	<!--a mouse event related to a component-->
 			<viewport x="" y="" width="" height=""/>	<!--information on the viewport (scroll position and size)-->
 			<component id="" x="" y="" width="" height=""/>	<!--information on the component that was the target of the mouse event (in absolute terms)-->
@@ -599,6 +605,21 @@ function Map(key, value)
 	}
 }
 
+//Set
+
+/**A class encapsulating keys mapped to the value true.
+This is a convenience class for constructing an Object with a given set of keys, as the JavaScript shorthand notation does not allow non-literal key names.
+Values may be tested in normal if(object[item]) syntax. The constructor allows any number of items as arguments.
+@param items: The items to store in the set.
+*/
+function Set(items)
+{
+	for(var i=arguments.length-1; i>=0; --i)	//for each item (order doesn't matter in a set)
+	{
+		this[arguments[i]]=true;	//store the item as a key with a value of true
+	}
+}
+
 //Point
 
 /**A class encapsulating a point.
@@ -1021,6 +1042,24 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 //TODO del alert("img loaded after waiting!");	//TODO del
 					};
 			eventManager.addEvent(img, "load", onLoad, false);	//register an event on the img to wait for it to load
+		}
+	},
+
+
+	/**Cleans a cloned node and all it chidren, removing its element IDs, for example, so that it can inserted into a document.*/
+	cleanNode:function(node)
+	{
+		if(node.nodeType==Node.ELEMENT_NODE)	//if this is an element
+		{
+			if(node.id)	//if this element has an ID
+			{
+				node.id=null;	//remove the ID
+			}
+		}
+		var childNodeList=node.childNodes;	//get all the child nodes
+		for(var i=childNodeList.length-1; i>=0; --i)	//for each child node
+		{
+			this.cleanNode(childNodeList[i]);	//clean this child node
 		}
 	},
 
@@ -1698,6 +1737,20 @@ function FormAJAXEvent(parameters, provisional)
 	this.provisional=Boolean(provisional);	//get a normal boolean version of the provisional status, assuming false
 }
 
+//Change AJAX Event
+
+/**A class encapsulating property change information for an AJAX request.
+@param componentID The ID of the source component.
+@param propertyMap An associative array of names of properties changing, keyed to a value or an array of values; null values are allowed.
+var componentID The ID of the source component.
+var properties An associative array of names of properties changing, keyed to a value or an array of values; null values are allowed.
+*/
+function ChangeAJAXEvent(componentID, properties)
+{
+	this.componentID=componentID;
+	this.properties=properties;
+}
+
 //Action AJAX Event
 
 /**A class encapsulating action information for an AJAX request.
@@ -2000,6 +2053,7 @@ function GuiseAJAX()
 				{
 					REQUEST: "request", EVENTS: "events",
 					FORM: "form", PROVISIONAL: "provisional", CONTROL: "control", NAME: "name", VALUE: "value",
+					CHANGE: "action", PROPERTY: "property",
 					ACTION: "action", COMPONENT: "component", COMPONENT_ID: "componentID", TARGET_ID: "targetID", ACTION_ID: "actionID", OPTION: "option",
 					DROP: "drop", SOURCE: "source", TARGET: "target", VIEWPORT: "viewport", MOUSE: "mouse", ID: "id", X: "x", Y: "y", WIDTH: "width", HEIGHT: "height",
 					INIT: "init"
@@ -2058,6 +2112,11 @@ function GuiseAJAX()
 						else if(ajaxRequest instanceof ActionAJAXEvent)	//if this is an action event
 						{
 							this._appendActionAJAXEvent(requestStringBuilder, ajaxRequest);	//append the action event
+						}
+						
+						else if(ajaxRequest instanceof ChangeAJAXEvent)	//if this is an change event
+						{
+							this._appendChangeAJAXEvent(requestStringBuilder, ajaxRequest);	//append the change event
 						}
 						else if(ajaxRequest instanceof DropAJAXEvent)	//if this is a drop event
 						{
@@ -2125,6 +2184,43 @@ function GuiseAJAX()
 							this.RequestElement.ACTION_ID, ajaxActionEvent.actionID,	//actionID="actionID"
 							this.RequestElement.OPTION, ajaxActionEvent.option));	//option="option"
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.ACTION);	//</action>
+			return stringBuilder;	//return the string builder
+		};
+
+		/**Appends an AJAX change event to a string builder.
+		@param stringBuilder The string builder collecting the request data.
+		@param ajaxChangeEvent The change event information to append.
+		@return The string builder.
+		*/
+		GuiseAJAX.prototype._appendChangeAJAXEvent=function(stringBuilder, ajaxChangeEvent)
+		{
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.CHANGE,	//<change>
+					new Map(this.RequestElement.COMPONENT_ID, ajaxActionEvent.componentID));	//componentID="componentID"
+			var properties=ajaxChangeEvent.properties;	//get the properties
+			for(var propertyName in properties)	//for each property
+			{
+				DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.PROPERTY,	//<property>
+						new Map(this.RequestElement.NAME, propertyName));	//name="name"
+				var value=properties[propertyName];	//get this property name
+				if(value instanceof Array)	//if the value is an array
+				{
+					var arrayLength=value.length;	//get the length of the array
+					for(var i=0; i<arrayLength; ++i)	//for each array element
+					{
+						DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.VALUE);	//<value>
+						DOMUtilities.appendXMLText(stringBuilder, value[i]);	//value[i]
+						DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.VALUE);	//</value>
+					}				
+				}
+				else if(value!=null)	//if the value is anything besides an array
+				{
+					DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.VALUE);	//<value>
+					DOMUtilities.appendXMLText(stringBuilder, value);	//value
+					DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.VALUE);	//</value>
+				}
+				DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.PROPERTY);	//</property>
+			}
+			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.CHANGE);	//</change>
 			return stringBuilder;	//return the string builder
 		};
 
@@ -2620,7 +2716,13 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 			{
 //TODO del				alert("commands: "+newElementCommands);
 				this._invokeCommand(oldElement, newElementCommands);	//invoke the command TODO parse the commands first
-				return;	//don't do further syncrhonization TODO later add options for full synchronization or not
+//TODO del if not needed				return;	//don't do further syncrhonization TODO later add options for full synchronization or not
+			}
+
+			var patchType=DOMUtilities.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "patchType");	//get the patch type TODO use a constant
+			if(patchType=="none")	//if we should not do any patching
+			{
+				return;	//stop synchronization
 			}
 
 				//get the content hash attributes before we update the attributes
@@ -2678,7 +2780,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 					{
 						if(attributeName=="value")	//if this is the value attribute
 						{
-							var patchType=DOMUtilities.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "patchType");	//get the patch type TODO use a constant
+//TODO del when works							var patchType=DOMUtilities.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "patchType");	//get the patch type TODO use a constant
 							if(patchType=="novalue")	//if we should ignore the value attribute
 							{
 								continue;	//go to the next attribute
@@ -2807,6 +2909,17 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 					var oldChildNodeCount=oldChildNodeList.length;	//find out how many old children there are
 					var childNodeList=element.childNodes;	//get all the child nodes of the element
 					var childNodeCount=childNodeList.length;	//find out how many children there are
+
+/*TODO del when works
+if(elementName=="select")
+{
+
+	alert("just assigned select child node count "+childNodeCount+" with old element ID "+oldElement.id);
+	alert("old node structure of select is: "+DOMUtilities.getNodeString(oldElement));
+	alert("new node structure of select is: "+DOMUtilities.getNodeString(element));
+}
+*/
+
 					var isChildrenCompatible=true;	//start by assuming children are compatible; children will be compatible as long as the exiting children are of the same types and, if they are elements, of the same name
 					for(var i=0; i<oldChildNodeCount && i<childNodeCount && isChildrenCompatible; ++i)	//for each child node (as long as children are compatible)
 					{
@@ -2819,7 +2932,8 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 								
 								if(oldChildNode.nodeName.toLowerCase()!=childNode.nodeName.toLowerCase())	//if these are elements with different node names
 								{
-		//TODO del alert("found different node names; old: "+oldChildNode.nodeName+" and new: "+childNode.nodeName);
+//alert("child" +i+" found different node names; old: "+oldChildNode.nodeName+" and new: "+childNode.nodeName);
+//alert("old node structure of parent is: "+DOMUtilities.getNodeString(oldElement));
 									isChildrenCompatible=false;	//these child elements aren't compatible because they have different node name
 								}
 								else	//if the names are the same but the IDs are different, assume that the entire child should be replaced rather than synchronized---the event listeners would probably be different anyway
@@ -2830,7 +2944,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 	//TODO del alert("comparing "+oldChildNode.nodeName+" IDs "+oldChildID+" "+typeof oldChildID+" and "+childID+" "+typeof childID);
 									if(oldChildID!=childID)	//if the IDs are different
 									{
-	//TODO fix alert("IDs don't match: "+oldChildNode.nodeName+" IDs "+oldChildID+" "+typeof oldChildID+" and "+childID+" "+typeof childID);
+//alert("child IDs don't match: "+oldChildNode.nodeName+" IDs "+oldChildID+" "+typeof oldChildID+" and "+childID+" "+typeof childID);
 										isChildrenCompatible=false;	//these child elements aren't compatible because they have different IDs
 									}
 								}
@@ -2889,6 +3003,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 	*/
 	//TODO del alert("incompatible old element now has children: "+oldElement.childNodes.length);
 					}
+					
 					for(var i=0; i<childNodeCount; ++i)	//for each new child node
 					{
 						var childNode=childNodeList[i];	//get this child node
@@ -2918,12 +3033,14 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 						}
 						else	//if we're out of old child nodes, create a new one
 						{
+//alert("we're out of new children at index: "+i+" out of node count "+childNodeCount);
+//alert("old node structure of parent is: "+DOMUtilities.getNodeString(oldElement));
 	try
 	{
 	//TODO del alert("ready to clone node: "+DOMUtilities.getNodeString(childNode));
 	//TODO del alert("ready to clone node");
 							var importedNode=document.importNode(childNode, true);	//create an import clone of the node
-	//TODO del alert("imported node");
+//alert("imported node: "+i+" out of node count "+childNodeCount);
 								//TODO del; now inside importNode
 	/*TODO del
 							if(!importedNode)	//TODO check and improve big IE hack
@@ -2936,10 +3053,12 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 	//TODO fix							document.documentElement.removeChild(dummyNode);	//throw away the dummy node
 							}
 	*/
-	//TODO del alert("ready to append node");
+//alert("ready to append node: "+i+" out of node count "+childNodeCount);
 							oldElement.appendChild(importedNode);	//append the imported node to the old element
+//alert("ready to initialize node: "+i+" out of node count "+childNodeCount);
 	//TODO del alert("ready to initialize node");
 							initializeNode(importedNode, true);	//initialize the new imported node, installing the correct event handlers
+//alert("initialized node: "+i+" out of node count "+childNodeCount);
 	}
 	catch(e)
 	{
@@ -3101,6 +3220,9 @@ com.guiseframework.js.Client=function()
 				//create the upload IFrame
 				//@see http://blog.caboo.se/articles/2007/4/2/ajax-file-upload
 				//@see http://www.openjs.com/articles/ajax/ajax_file_upload/
+				//@see http://sean.treadway.info/articles/2006/05/29/iframe-remoting-made-easy
+				//@see http://www.oreillynet.com/pub/a/javascript/2002/02/08/iframe.html
+				//@see http://www.quirksmode.org/dom/inputfile.html
 			this._uploadIFrame=document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");	//create an IFrame
 			this._uploadIFrame.id="uploadIFrame";	//set the ID of the frame so that we can do the IE fix later
 			this._uploadIFrame.name="uploadIFrame";
@@ -4097,8 +4219,8 @@ function DragState(dragSource, mouseX, mouseY)
 			{
 				this.initialPosition=GUIUtilities.getElementCoordinates(this.dragSource);	//get the absolute element coordinates, as we'll be positioning the element absolutely
 
-				element=this.dragSource.cloneNode(true);	//create a clone of the original element
-				this._cleanClone(element);	//clean the clone
+				element=this.dragSource.cloneNode(true);	//create a clone of the original element TODO be careful about this---probably use our own copy method, because IE will clone event handlers as well
+				DOMUtilities.cleanNode(element);	//clean the clone
 				//TODO clean the element better, removing drag handles and such
 	/*TODO add workaround to cover IE select controls, which are windowed and will appear over the dragged element
 				if(document.all)	//if this is IE	TODO add better check
@@ -4133,23 +4255,6 @@ function DragState(dragSource, mouseX, mouseY)
 			this.mouseDeltaY=this.initialMouseFixedPosition.y-this.initialPosition.y;
 //TODO del alert("initialXY: "+this.initialPosition.x+", "+this.initialPosition.y+" mouseXY: "+this.initialMouseFixedPosition.x+", "+this.initialMouseFixedPosition.y+" deltaXY: "+this.mouseDeltaX+", "+this.mouseDeltaY);
 			return element;	//return the cloned element
-		};
-
-		/**Cleans a cloned node, removing its element IDs, for example, so that it can inserted into a document.*/
-		DragState.prototype._cleanClone=function(elementClone)
-		{
-			if(elementClone.nodeType==Node.ELEMENT_NODE)	//if this is an element
-			{
-				if(elementClone.id)	//if this element has an ID
-				{
-					elementClone.id=null;	//remove the ID
-				}
-			}
-			var childNodeList=elementClone.childNodes;	//get all the child nodes
-			for(var i=childNodeList.length-1; i>=0; --i)	//for each child node
-			{
-				this._cleanClone(childNodeList[i]);	//clean this child nodethis child node
-			}
 		};
 	}
 }
@@ -4400,6 +4505,12 @@ function initializeNode(node, deep, initialInitialization)
 							case "checkbox":
 							case "radio":
 								eventManager.addEvent(node, "click", onCheckInputChange, false);
+								break;
+							case "file":
+								if(elementClassNames.contains("resourceCollectControl-body"))	//if this is a Guise resource collect control TODO maybe change to the reverse logic (i.e. not ResourceCollectControl)
+								{
+									eventManager.addEvent(node, "change", onFileInputChange, false);
+								}
 								break;
 						}
 						break;
@@ -4721,6 +4832,46 @@ function onTextInputChange(event)
 	//TODO del alert("an input changed! "+textInput.id);
 		var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value));	//create a new form request with the control name and value
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+		event.stopPropagation();	//tell the event to stop bubbling
+	}
+}
+
+/**Called when the contents of a file input.
+@param event The object describing the event.
+*/
+function onFileInputChange(event)
+{
+	if(AJAX_ENABLED)	//if AJAX is enabled
+	{
+		var fileInput=event.currentTarget;	//get the control in which the file changed
+		fileInput.removeAttribute("guise:attributeHash");	//the file is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+		guiseAJAX.invalidateAncestorContent(fileInput);	//indicate that the ancestors now have different content
+//TODO fix alert("file input changed to value: "+fileInput.value);
+		var fileInputValue=fileInput.value;	//get the new value
+		if(fileInputValue)	//if the value is changing to something interesting
+		{
+			var component=DOMUtilities.getAncestorElementByClassName(fileInput, STYLES.COMPONENT);	//get the component element
+			if(component)	//if there is a component
+			{
+				var componentID=component.id;	//get the component ID
+				if(componentID)	//if there is a component ID
+				{
+				
+//TODO go through and make sure no other file inputs have this value before we accept it						var previousSibling=fileInput.previousSibling
+				
+					var ajaxRequest=new FormAJAXEvent(new Map(componentID, fileInput.value));	//create a new form request with the control ID and value
+					guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+					var fileInputCopy=document.createElementNS("http://www.w3.org/1999/xhtml", "input");	//create a new input element; do *not* clone the element, because IE will clone the event handlers along with it
+					fileInputCopy.className=fileInput.className;
+					fileInputCopy.name=fileInput.name;
+					fileInputCopy.type=fileInput.type;
+					fileInputCopy.disabled=fileInput.disabled;
+					fileInput.style.display="none";	//hide the old file input
+					fileInput.parentNode.appendChild(fileInputCopy);	//insert the new file input after the existing one (now hidden) 
+					initializeNode(fileInputCopy, true);	//initialize the new imported file input copy, installing the correct event handlers
+				}
+			}
+		}
 		event.stopPropagation();	//tell the event to stop bubbling
 	}
 }

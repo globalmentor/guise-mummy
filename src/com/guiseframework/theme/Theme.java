@@ -74,6 +74,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_CANCEL=createStringResourceReference("theme.label.cancel");
 	public final static String LABEL_DELETE=createStringResourceReference("theme.label.delete");
 	public final static String LABEL_DELETE_X=createStringResourceReference("theme.label.delete.x");
+	public final static String LABEL_DOWNLOAD=createStringResourceReference("theme.label.download");
 	public final static String LABEL_EDIT=createStringResourceReference("theme.label.edit");
 	public final static String LABEL_FINISH=createStringResourceReference("theme.label.finish");
 	public final static String LABEL_FIRST=createStringResourceReference("theme.label.first");
@@ -91,6 +92,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_RESOURCE=createStringResourceReference("theme.label.resource");
 	public final static String LABEL_SUBMIT=createStringResourceReference("theme.label.submit");
 	public final static String LABEL_SUBTRACT=createStringResourceReference("theme.label.subtract");
+	public final static String LABEL_UPLOAD=createStringResourceReference("theme.label.upload");
 	public final static String LABEL_USERNAME=createStringResourceReference("theme.label.username");
 	public final static String LABEL_VERSION=createStringResourceReference("theme.label.version");
 		//standard theme icons
@@ -110,6 +112,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI GLYPH_DOCUMENT_PREVIEW=createURIResourceReference("theme.glyph.document.preview");
 	public final static URI GLYPH_DOCUMENT_RICH_CONTENT=createURIResourceReference("theme.glyph.document.rich.content");
 	public final static URI GLYPH_DOCUMENT_STACk=createURIResourceReference("theme.glyph.document.stack");
+	public final static URI GLYPH_DOWNLOAD=createURIResourceReference("theme.glyph.download");
 	public final static URI GLYPH_EDIT=createURIResourceReference("theme.glyph.edit");
 	public final static URI GLYPH_ENTER=createURIResourceReference("theme.glyph.enter");
 	public final static URI GLYPH_ERROR=createURIResourceReference("theme.glyph.error");
@@ -149,6 +152,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI GLYPH_STOP=createURIResourceReference("theme.glyph.stop");
 	public final static URI GLYPH_SUBMIT=createURIResourceReference("theme.glyph.submit");
 	public final static URI GLYPH_SUBTRACT=createURIResourceReference("theme.glyph.subtract");
+	public final static URI GLYPH_UPLOAD=createURIResourceReference("theme.glyph.upload");
 	public final static URI GLYPH_USER=createURIResourceReference("theme.glyph.user");
 	public final static URI GLYPH_VIEW=createURIResourceReference("theme.glyph.view");
 	public final static URI GLYPH_WARN=createURIResourceReference("theme.glyph.warn");
