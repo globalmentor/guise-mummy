@@ -651,6 +651,8 @@ public interface GuiseSession extends PropertyBindable
 	public void log(final InformationLevel level, final String subject, final String predicate, final String object, final Map<?, ?> parameters, final CharSequence comment);
 
 	/**Notifies the user of one or more notifications to be presented in sequence.
+	The notification's label and/or icon, if specified, will be used as the dialog title and icon, respectively;
+	if either is not specified, a label and/or icon based upon the notification's severity will be used.
 	This is a convenience method that delegates to {@link #notify(Runnable, Notification...)}.
 	@param notifications One or more notification informations to relay.
 	@exception NullPointerException if the given notifications is <code>null</code>.
@@ -660,6 +662,8 @@ public interface GuiseSession extends PropertyBindable
 
 	/**Notifies the user of one or more notifications to be presented in sequence, with optional logic to be executed after all notifications have taken place.
 	If the selected option to any notification is fatal, the specified logic will not be performed.
+	The notification's label and/or icon, if specified, will be used as the dialog title and icon, respectively;
+	if either is not specified, a label and/or icon based upon the notification's severity will be used.
 	@param notifications One or more notification informations to relay.
 	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
 	@exception NullPointerException if the given notifications is <code>null</code>.

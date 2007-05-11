@@ -42,7 +42,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 		This is a bound property.
 		@param newState The new state of the frame.
 		@exception NullPointerException if the given state is <code>null</code>.
-		@see Frame#STATE_PROPERTY 
+		@see Frame#STATE_PROPERTY
 		*/
 		protected void setState(final State newState)
 		{

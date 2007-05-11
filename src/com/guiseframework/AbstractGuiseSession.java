@@ -1556,6 +1556,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	/**Notifies the user of one or more notifications to be presented in sequence.
 	This is a convenience method that delegates to {@link #notify(Runnable, Notification...)}.
+	The notification's label and/or icon, if specified, will be used as the dialog title and icon, respectively;
+	if either is not specified, a label and/or icon based upon the notification's severity will be used.
 	@param notifications One or more notification informations to relay.
 	@exception NullPointerException if the given notifications is <code>null</code>.
 	@exception IllegalArgumentException if no notifications are given.
@@ -1567,6 +1569,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	/**Notifies the user of one or more notifications to be presented in sequence, with optional logic to be executed after all notifications have taken place.
 	If the selected option to any notification is fatal, the specified logic will not be performed.
+	The notification's label and/or icon, if specified, will be used as the dialog title and icon, respectively;
+	if either is not specified, a label and/or icon based upon the notification's severity will be used.
 	This implementation delegates to {@link #notify(Notification, Runnable)}.
 	@param notifications One or more notification informations to relay.
 	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
@@ -1599,6 +1603,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	/**Notifies the user of the given notification information, with optional logic to be executed after notification takes place.
 	If the selected option is fatal, the specified logic will not be performed.
+	The notification's label and/or icon, if specified, will be used as the dialog title and icon, respectively;
+	if either is not specified, a label and/or icon based upon the notification's severity will be used.
 	@param notification The notification information to relay.
 	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
 	*/
@@ -1614,8 +1620,22 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			}
 		}
 		final NotificationOptionDialogFrame optionDialogFrame=new NotificationOptionDialogFrame(notification);	//create a dialog from the notification
-		optionDialogFrame.setLabel(severity.getLabel());	//set the label based upon the severity
-		optionDialogFrame.setIcon(severity.getGlyph());	//set the icon based upon the severity
+		final String notificationLabel=notification.getLabel();	//get the notification's specified label, if any
+		if(notificationLabel!=null)	//if the notification specified a label
+		{
+			optionDialogFrame.setLabel(notificationLabel);	//set the label from the notification
+			optionDialogFrame.setLabelContentType(notification.getLabelContentType());	//set the label content type from the notification
+		}
+		else	//if the notification specified no label
+		{
+			optionDialogFrame.setLabel(severity.getLabel());	//set the label based upon the severity			
+		}
+		URI icon=notification.getIcon();	//get the notification's specified icon, if any
+		if(icon==null)	//if no icon was specified
+		{
+			icon=severity.getGlyph();	//set the icon based upon the severity
+		}		
+		optionDialogFrame.setIcon(icon);	//set the icon
 		optionDialogFrame.setPreferredWidth(new Extent(0.33, Extent.Unit.RELATIVE));	//set the preferred dimensions		
 		optionDialogFrame.open(new AbstractGenericPropertyChangeListener<Frame.Mode>()	//show the dialog and listen for the frame closing
 				{

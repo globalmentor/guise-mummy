@@ -47,7 +47,7 @@ public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalC
 		/**The frame is closed.*/
 		CLOSED,
 		/**The frame is open.*/
-		OPEN;		
+		OPEN;
 	}
 
 	/**@return The state of the frame.*/

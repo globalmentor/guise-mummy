@@ -19,7 +19,7 @@ public abstract class AbstractGuiseEvent extends EventObject
 		/**@return The Guise session in which this event was generated.*/
 		public GuiseSession getSession() {return session;}
 
-	/**Aource constructor.
+	/**Source constructor.
 	@param source The object on which the event initially occurred.
 	@exception NullPointerException if the given source is <code>null</code>.
 	*/

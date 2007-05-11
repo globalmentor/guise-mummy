@@ -6,7 +6,6 @@ import static com.garretwilson.text.FormatUtilities.*;
 import com.garretwilson.util.*;
 import com.guiseframework.controller.*;
 
-
 /**A control event indicating that a full or partial form submission occurred.
 @author Garret Wilson
 */

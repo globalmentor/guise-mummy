@@ -19,8 +19,8 @@ import javax.servlet.http.*;
 import javax.xml.parsers.*;
 
 import org.apache.commons.fileupload.*;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.FilenameUtils;
 import org.w3c.dom.*;
 import org.w3c.dom.css.CSSStyleSheet;
@@ -90,6 +90,7 @@ import com.guiseframework.controller.text.xml.xhtml.*;
 import com.guiseframework.event.NavigationEvent;
 import com.guiseframework.geometry.*;
 import com.guiseframework.model.FileItemResourceImport;
+import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.web.css.*;
 import com.guiseframework.theme.Theme;
 import com.guiseframework.view.text.xml.xhtml.XHTMLApplicationFrameView;
@@ -440,6 +441,7 @@ Debug.trace("checking for categories");
 	{
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 //	TODO del Debug.info("method:", request.getMethod(), "raw path info:", rawPathInfo);
+Debug.info("method:", request.getMethod(), "raw path info:", rawPathInfo);
 //TODO del Debug.info("user agent:", getUserAgent(request));
 //	TODO del final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
 //	TODO del Debug.info("before service request: memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
@@ -464,6 +466,7 @@ while(headerNames.hasMoreElements())
 		final Destination destination=guiseApplication.getDestination(navigationPath);	//try to get a destination associated with the requested path
 		if(destination!=null)	//if we have a destination associated with the requested path
 		{
+Debug.trace("found destination:", destination);
 			final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
 /*TODO del
 	Debug.info("session ID", guiseSession.getHTTPSession().getId());	//TODO del
@@ -506,6 +509,7 @@ while(headerNames.hasMoreElements())
 							{
 								try
 								{
+Debug.trace("ready to process guise request for destination", destination);
 									serviceGuiseRequest(request, response, guiseContainer, guiseApplication, guiseSession, destination);	//service the Guise request to the given destination
 								}
 								catch(final IOException ioException)	//if an exception is thrown
@@ -1054,40 +1058,71 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 				try
 				{
 					final ServletFileUpload servletFileUpload=new ServletFileUpload();	//create a new servlet file upload object
+/*TODO replace with our own progress events; this uses buffering, so all progress will have been finished on this server before the data is transferred to the remote server 					
+					final ProgressListener progressListener=new ProgressListener()
+					{
+						public void update(final long bytesRead, final long contentLength, final int itemNumber)	//every time we are updated
+						{
+Debug.trace("upload update: bytes read", bytesRead, "content length", contentLength, "item number", itemNumber);												
+						}										
+					};
+			servletFileUpload.setProgressListener(progressListener);	//listen for progress
+*/
+					
 					final FileItemIterator itemIterator=servletFileUpload.getItemIterator(request);	//get an iterator to the file items
 					while(itemIterator.hasNext())	//while there are more items
 					{
 						final FileItemStream fileItemStream=itemIterator.next();	//get the current file item
-//TODO del if not needed						final String name=item.getFieldName();	//get 
+//TODO del if not needed						final String name=item.getFieldName();	//get
 						if(!fileItemStream.isFormField())	//if this isn't a form field item, it's a file upload item for us to process
 						{
-							final RDFResource resourceDescription=new DefaultRDFResource();	//create a new resource description
-							final String itemContentType=fileItemStream.getContentType();	//get the item content type, if any
-							if(itemContentType!=null)	//if we know the item's content type
-							{
-								setContentType(resourceDescription, createContentType(itemContentType));	//set the resource's content type
-							}
 							final String itemName=fileItemStream.getName();	//get the item's name, if any
-							if(itemName!=null)	//if a name is specified
+							if(itemName!=null && itemName.length()>0)	//if a non-empty-string name is specified
 							{
+								
+								final String fieldName=fileItemStream.getFieldName();	//get the field name for this item
+								final Component<?> progressComponent=getComponentByID(guiseSession, fieldName);	//get the related component that will want to know progress
+								final RDFResource resourceDescription=new DefaultRDFResource();	//create a new resource description
+								final String itemContentType=fileItemStream.getContentType();	//get the item content type, if any
+								if(itemContentType!=null)	//if we know the item's content type
+								{
+									setContentType(resourceDescription, createContentType(itemContentType));	//set the resource's content type
+								}
 								setName(resourceDescription, FilenameUtils.getName(itemName));	//specify the name provided to us (removing any extraneous path information a browser such as IE might have given)
-							}
-							final InputStream inputStream=new BufferedInputStream(fileItemStream.openStream());	//get an input stream to the item
-							try
-							{
-								final OutputStream outputStream=new BufferedOutputStream(resourceWriteDestination.getOutputStream(resourceDescription, guiseSession, navigationPath, bookmark, referrerURI));	//get an output stream to the destination
+								
 								try
 								{
-									copy(inputStream, outputStream);	//copy the uploaded file to the destination
+									final InputStream inputStream=new BufferedInputStream(fileItemStream.openStream());	//get an input stream to the item
+									try
+									{
+		Debug.trace("ready to get output stream");
+										final OutputStream outputStream=new BufferedOutputStream(resourceWriteDestination.getOutputStream(resourceDescription, guiseSession, navigationPath, bookmark, referrerURI));	//get an output stream to the destination
+										try
+										{
+											if(progressComponent!=null)	//if we know the component that wants to know progress
+											{
+												progressComponent.processEvent(new ProgressControlEvent(fieldName, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting
+											}
+											copy(inputStream, outputStream);	//copy the uploaded file to the destination
+											if(progressComponent!=null)	//if we know the component that wants to know progress
+											{
+												progressComponent.processEvent(new ProgressControlEvent(fieldName, TaskState.COMPLETE, 0));	//indicate to the component that progress is finished
+											}
+										}
+										finally
+										{
+											outputStream.close();	//always close the output stream
+										}
+									}
+									finally
+									{
+										inputStream.close();	//always close the input stream
+									}
 								}
 								finally
 								{
-									outputStream.close();	//always close the output stream
+									servletFileUpload.setProgressListener(null);	//always stop listening for progress
 								}
-							}
-							finally
-							{
-								inputStream.close();	//always close the input stream
 							}
 						}
 					}
@@ -1533,6 +1568,12 @@ Debug.info("AJAX event:", eventName);
 											referrerURI);	//create a new initialization event TODO check for NumberFormatException
 							controlEventList.add(initEvent);	//add the event to the list
 						}
+						else if("ping".equals(eventNode.getNodeName()))	//if this is a ping event TODO use a constant
+						{
+							final PingControlEvent pingEvent=new PingControlEvent();	//create a new ping event
+Debug.trace("ping!");
+							controlEventList.add(pingEvent);	//add the event to the list
+						}
 					}
 				}
 			}
@@ -1552,18 +1593,19 @@ Debug.info("AJAX event:", eventName);
 		else	//if this is not a Guise AJAX request
 		{
 				//populate our parameter map
-			if(FileUpload.isMultipartContent(request))	//if this is multipart/form-data content
+			if(ServletFileUpload.isMultipartContent(request))	//if this is multipart/form-data content
 			{
 				final FormControlEvent formSubmitEvent=new FormControlEvent(true);	//create a new form submission event, indicating that the event is exhaustive
 				final CollectionMap<String, Object, List<Object>> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
-				final DiskFileUpload diskFileUpload=new DiskFileUpload();	//create a file upload handler
-				diskFileUpload.setSizeMax(-1);	//don't reject anything
+				final DiskFileItemFactory fileItemFactory=new DiskFileItemFactory();	//create a disk-based file item factory
+				fileItemFactory.setRepository(guiseSession.getApplication().getTempDirectory());	//store the temporary files in the session temporary directory
+				final ServletFileUpload servletFileUpload=new ServletFileUpload(fileItemFactory);	//create a new servlet file upload handler
+				servletFileUpload.setFileSizeMax(-1);	//don't reject anything
 				try	//try to parse the file items submitted in the request
 				{
-					final List fileItems=diskFileUpload.parseRequest(request);	//parse the request
-					for(final Object object:fileItems)	//look at each file item
+					final List<FileItem> fileItems=(List<FileItem>)servletFileUpload.parseRequest(request);	//parse the request
+					for(final FileItem fileItem:fileItems)	//look at each file item
 					{
-						final FileItem fileItem=(FileItem)object;	//cast the object to a file item
 						final String parameterKey=fileItem.getFieldName();	//the parameter key will always be the field name
 						final Object parameterValue=fileItem.isFormField() ? fileItem.getString() : new FileItemResourceImport(fileItem);	//if this is a form field, store it normally; otherwise, create a file item resource import object
 						parameterListMap.addItem(parameterKey, parameterValue);	//store the value in the parameters
@@ -1571,7 +1613,7 @@ Debug.info("AJAX event:", eventName);
 				}
 				catch(final FileUploadException fileUploadException)	//if there was an error parsing the files
 				{
-					throw new IllegalArgumentException("Couldn't parse multipart/form-data request.");
+					throw (IOException)new IOException(fileUploadException.getMessage()).initCause(fileUploadException);
 				}
 				controlEventList.add(formSubmitEvent);	//add the event to the list
 			}

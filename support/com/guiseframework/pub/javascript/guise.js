@@ -8,20 +8,21 @@ navigator.userAgentVersionNumber The version of the user agent stored as a numbe
 
 /*Guise AJAX Request Format, content type application/x-guise-ajax-request+xml
 <request>
-	<init	<!--initializes the page, requesting all frames to be resent-->
-		jsVersion=""	<!--version of JavaScript supported by the browser-->
-		timezone=""
-		hour=""
-		language=""
-		colorDepth=""
-		screenWidth=""
-		screenHeight=""
-		javaEnabled=""
-		browserWidth=""
-		browserHeight=""
-		referrer=""
-	/>
 	<events>	<!--the list of events (zero or more)-->
+		<init	<!--initializes the page, requesting all frames to be resent-->
+			jsVersion=""	<!--version of JavaScript supported by the browser-->
+			timezone=""
+			hour=""
+			language=""
+			colorDepth=""
+			screenWidth=""
+			screenHeight=""
+			javaEnabled=""
+			browserWidth=""
+			browserHeight=""
+			referrer=""
+		/>
+		<ping/> <!--pings the server to check for updates-->
 		<form	<!--information resulting from form changes, analogous to that in an HTTP POST-->
 			exhaustive="true|false"	<!--indicates whether the event contains values for all form controls (defaults to false)-->
 			provisional="true|false"	<!--indicates whether the value is a provisional value that has not yet been accepted by the user (defaults to false)-->
@@ -1719,6 +1720,13 @@ function InitAJAXEvent()
 	this.referrer=document.referrer;	//get the document referrer
 }
 
+//Ping AJAX Event
+
+/**A class indicating a ping AJAX request.*/
+function PingAJAXEvent()
+{
+}
+
 //Form AJAX Event
 
 /**A class encapsulating form information for an AJAX request.
@@ -2041,6 +2049,12 @@ function GuiseAJAX()
 	/**Whether we are currently processing AJAX responses.*/
 	this.processingAJAXResponses=false;
 
+	/**The hidden IFrame target that receives the results of file uploads, or null if the upload IFrame hasn't yet been created.*/
+	this._uploadIFrame=null;
+
+	/**The ping interval timer ID, or null if pinging is not enabled.*/
+	this._pingInterval=null;
+
 	if(!GuiseAJAX.prototype._initialized)
 	{
 		GuiseAJAX.prototype._initialized=true;
@@ -2056,7 +2070,8 @@ function GuiseAJAX()
 					CHANGE: "action", PROPERTY: "property",
 					ACTION: "action", COMPONENT: "component", COMPONENT_ID: "componentID", TARGET_ID: "targetID", ACTION_ID: "actionID", OPTION: "option",
 					DROP: "drop", SOURCE: "source", TARGET: "target", VIEWPORT: "viewport", MOUSE: "mouse", ID: "id", X: "x", Y: "y", WIDTH: "width", HEIGHT: "height",
-					INIT: "init"
+					INIT: "init",
+					PING: "ping"
 				};
 
 		/**The content type of a Guise AJAX response.*/
@@ -2075,6 +2090,71 @@ function GuiseAJAX()
 					VIEWPORT_ID: "viewportID",
 					RELOAD: "reload"
 				};
+
+		/**Creates a new IFrame for receiving the contents of a file upload.
+		If a file upload IFrame already exists, it will first be removed.
+		@see #removeUploadIFrame()
+		@see http://blog.caboo.se/articles/2007/4/2/ajax-file-upload
+		@see http://www.openjs.com/articles/ajax/ajax_file_upload/
+		@see http://sean.treadway.info/articles/2006/05/29/iframe-remoting-made-easy
+		@see http://www.oreillynet.com/pub/a/javascript/2002/02/08/iframe.html
+		@see http://www.quirksmode.org/dom/inputfile.html
+		*/
+		GuiseAJAX.prototype.createUploadIFrame=function()
+		{
+			this.removeUploadIFrame();	//first remove the current upload IFrame, if any
+			this._uploadIFrame=document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");	//create an IFrame
+			this._uploadIFrame.id="uploadIFrame";	//set the ID of the frame so that we can do the IE fix later
+			this._uploadIFrame.name="uploadIFrame";
+			this._uploadIFrame.src=GUISE_EMPTY_HTML_DOCUMENT_PATH;	//set the source to be an empty HTML document that won't create SSL messages of insecurity
+			this._uploadIFrame.width="100px";	//Safari will ignore the IFrame if it has a size of 0, according to http://blog.caboo.se/articles/2007/4/2/ajax-file-upload
+			this._uploadIFrame.height="100px";
+			this._uploadIFrame.frameBorder="0";	//remove the border; see http://msdn2.microsoft.com/en-us/library/ms533770.aspx
+			this._uploadIFrame.style.position="absolute";	//take the IFrame out of normal flow
+			this._uploadIFrame.style.left="-9999px";	//completely remove the IFrame from sight
+			this._uploadIFrame.style.top="-9999px";
+			document.body.appendChild(this._uploadIFrame);	//add the upload IFrame to the document
+			if(isUserAgentIE)	//if we're in IE6/7
+			{
+				window.frames["uploadIFrame"].name="uploadIFrame";	//because IE hasn't yet registered the name with the DOM, look up the frame by its ID and set its name again; see http://forums.digitalpoint.com/showthread.php?t=107314 and http://verens.com/archives/2005/07/06/ie-bugs-dynamically-creating-form-elements/
+			}
+		};
+
+		/**Removes the IFrame for receiving the contents of a file upload.
+		If no such IFrame exists, no action occurs.
+		*/
+		GuiseAJAX.prototype.removeUploadIFrame=function()
+		{
+			if(this._uploadIFrame!=null)	//if there is an IFrame
+			{
+				document.body.removeChild(this._uploadIFrame);	//remove the upload IFrame from the document
+				this._uploadIFrame=null;	//indicate that we no longer have an upload IFrame
+			}
+		};
+
+		/*Turns pinging on or off.
+		If pinging is already turned on or off, corresponding to the respective requested state, no action occurs.
+		@param pingEnabled Whether pinging should be turned on or off.
+		*/
+		GuiseAJAX.prototype.setPingEnabled=function(pingEnabled)
+		{
+			if(pingEnabled)	//if ping should be enabled
+			{
+				if(this._pingInterval==null)	//if the timer isn't already running
+				{
+					var localThis=this;	//save a reference to this object to allow calling this via closure
+					this._pingInterval=window.setInterval(function(){localThis.sendAJAXRequest(new PingAJAXEvent());}, 3000);	//send a ping event every so often TODO allow this to be configurable
+				}
+			}
+			else	//if ping is being disabled
+			{
+				if(this._pingInterval!=null)	//if we know the timer ID
+				{
+					window.clearInterval(this._pingInterval);	//clear the timer
+					this._pingInterval=null;	//remove the timer ID 
+				}
+			}
+		};
 
 		/**Immediately sends or queues an AJAX request.
 		@param ajaxRequest The AJAX request to send.
@@ -2129,6 +2209,10 @@ function GuiseAJAX()
 						else if(ajaxRequest instanceof InitAJAXEvent)	//if this is an initialization event
 						{
 							this._appendInitAJAXEvent(requestStringBuilder, ajaxRequest);	//append the init event
+						}
+						else if(ajaxRequest instanceof PingAJAXEvent)	//if this is a ping event
+						{
+							this._appendPingAJAXEvent(requestStringBuilder, ajaxRequest);	//append the ping event
 						}
 					}
 					DOMUtilities.appendXMLEndTag(requestStringBuilder, this.RequestElement.EVENTS);	//</events>
@@ -2297,6 +2381,18 @@ function GuiseAJAX()
 						"browserHeight", ajaxInitEvent.browserHeight,
 						"referrer", ajaxInitEvent.referrer));
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.INIT);	//</init>
+			return stringBuilder;	//return the string builder
+		};
+
+		/**Appends an AJAX ping event to a string builder.
+		@param stringBuilder The string builder collecting the request data.
+		@param ajaxPingEvent The ping event information to append.
+		@return The string builder.
+		*/
+		GuiseAJAX.prototype._appendPingAJAXEvent=function(stringBuilder, ajaxPingEvent)
+		{
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.PING);	//<ping>
+			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.PING);	//</ping>
 			return stringBuilder;	//return the string builder
 		};
 	
@@ -2634,10 +2730,21 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 		{
 			if(/sendResources\((.+)\)/.test(command))	//if the command is sendResources(uri)
 			{
+				var childNodeList=element.childNodes;	//get all the child nodes
+				for(var i=childNodeList.length-1; i>=0; --i)	//for each child node, going backwards
+				{
+					var childNode=childNodeList[i];	//get a reference to this child node
+					if(childNode.nodeType==Node.ELEMENT_NODE && childNode.nodeName.toLowerCase()=="input" && childNode.type=="file")	//if this is a file input element
+					{
+						childNode.disabled=true;	//don't allow the file input to be modifed during transfer
+						break;	//only disable the last file input
+					}
+				}
 				var destination=RegExp.$1;	//get the destination
 				var form=getForm(element);	//get the form
 				if(form)	//if we found the form
 				{
+					this.createUploadIFrame();	//create the upload IFrame
 					form.enctype="multipart/form-data";
 					if(isUserAgentIE)	//if we're in IE6/7
 					{
@@ -2646,7 +2753,15 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof AJAX_ENABLED));
 					form.action=destination;	//indicate where the data should go
 					form.target="uploadIFrame";	//indicate that the output should be re-routed to our hidden IFrame
 					form.submit();	//submit the form
+					guiseAJAX.setPingEnabled(true);	//turn on pinging
+
 				}
+			}
+			else if(/sendCompleted\(\)/.test(command))	//if the command is sendCompleted()
+			{
+				guiseAJAX.setPingEnabled(false);	//turn off pinging
+				alert("send completed!");
+				this.removeUploadIFrame();	//remove the upload IFrame
 			}
 		};
 
@@ -3178,10 +3293,10 @@ com.guiseframework.js.Client=function()
 	/**The layer that allows modality by blocking user interaction to elements below.*/
 	this._modalLayer=null;
 	
-	/**The iframe that hides select elements from modal frames in IE6; positioned right below the modal layer.*/
+	/**The IFrame that hides select elements from modal frames in IE6; positioned right below the modal layer.*/
 	this._modalIFrame=null;
 
-	/**The iframe that hides select elements from flyover frames in IE6; positioned right below the flyover.*/
+	/**The IFrame that hides select elements from flyover frames in IE6; positioned right below the flyover.*/
 	this._flyoverIFrame=null;
 
 	/**The current busy element, or null if there is no busy element.*/
@@ -3189,9 +3304,6 @@ com.guiseframework.js.Client=function()
 
 	/**Whether the busy indicator is visible.*/
 	this._isBusyVisible=false;
-
-	/**The hidden iframe target that receives the results of file uploads.*/
-	this._uploadIFrame=null;
 
 	/**The map of cursors that have been temporarily changed, keyed to the ID of the element the cursor of which has been changed.
 	This is a tentative implementation, as blindly resetting the cursor after AJAX processing will prevent new cursors to be changed via AJAX.
@@ -3217,29 +3329,6 @@ com.guiseframework.js.Client=function()
 			this._modalLayer.style.left="0px";
 			document.body.appendChild(this._modalLayer);	//add the modal layer to the document
 
-				//create the upload IFrame
-				//@see http://blog.caboo.se/articles/2007/4/2/ajax-file-upload
-				//@see http://www.openjs.com/articles/ajax/ajax_file_upload/
-				//@see http://sean.treadway.info/articles/2006/05/29/iframe-remoting-made-easy
-				//@see http://www.oreillynet.com/pub/a/javascript/2002/02/08/iframe.html
-				//@see http://www.quirksmode.org/dom/inputfile.html
-			this._uploadIFrame=document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");	//create an IFrame
-			this._uploadIFrame.id="uploadIFrame";	//set the ID of the frame so that we can do the IE fix later
-			this._uploadIFrame.name="uploadIFrame";
-			this._uploadIFrame.src="about:blank";	//TODO fix
-			this._uploadIFrame.width="100px";	//Safari will ignore the IFrame if it has a size of 0, according to http://blog.caboo.se/articles/2007/4/2/ajax-file-upload
-			this._uploadIFrame.height="100px";
-			this._uploadIFrame.frameBorder="0";	//remove the border; see http://msdn2.microsoft.com/en-us/library/ms533770.aspx
-			this._uploadIFrame.style.position="absolute";	//take the IFrame out of normal flow
-			this._uploadIFrame.style.left="-9999px";	//completely remove the IFrame from sight
-			this._uploadIFrame.style.top="-9999px";
-			document.body.appendChild(this._uploadIFrame);	//add the upload IFrame to the document
-			if(isUserAgentIE)	//if we're in IE6/7
-			{
-				window.frames["uploadIFrame"].name="uploadIFrame";	//because IE hasn't yet registered the name with the DOM, look up the frame by its ID and set its name again; see http://forums.digitalpoint.com/showthread.php?t=107314 and http://verens.com/archives/2005/07/06/ie-bugs-dynamically-creating-form-elements/
-			}
-//TODO del alert("current name: ", window.frames["uploadIFrame"].name);
-			
 			if(isUserAgentIE6)	//if we're in IE6
 			{
 				this._modalIFrame=document.getElementById("modalIFrame");	//get the modal IFrame
@@ -3331,8 +3420,8 @@ com.guiseframework.js.Client=function()
 			var form=getForm(document.documentElement);	//get the form
 			document.body.appendChild(frame);	//add the frame element to the document; do this first, because IE doesn't allow the style to be accessed directly with imported nodes until they are added to the document
 */
-			
-			document.body.appendChild(frame);	//add the frame element to the document; do this first, because IE doesn't allow the style to be accessed directly with imported nodes until they are added to the document			
+			var form=document.forms[0];	//get the form
+			form.appendChild(frame);	//add the frame element to the form, so that it can submit input type="file" correctly; do this first, because IE doesn't allow the style to be accessed directly with imported nodes until they are added to the document			
 			initializeNode(frame, true);	//initialize the new imported frame, installing the correct event handlers; do this before the frame is positioned, because initialization also fixes IE6 classes, which can affect position
 			this._initializeFramePosition(frame);	//initialize the frame's position
 		
@@ -3400,7 +3489,7 @@ com.guiseframework.js.Client=function()
 			{
 				this.frames.remove(index);	//remove the frame from the array
 				uninitializeNode(frame, true);	//uninitialize the frame tree
-				document.body.removeChild(frame);	//remove the frame element to the document
+				document.forms[0].removeChild(frame);	//remove the frame element to the document
 				this._updateModal();	//update the modal state
 			}
 		};
@@ -4283,7 +4372,6 @@ function testNode(node, deep)
 }
 */
 
-
 /**Called when the window loads.
 This implementation installs listeners.
 */
@@ -4378,7 +4466,8 @@ This implementation uninstalls all listeners.
 */
 function onWindowUnload(event)
 {
-	AJAX_ENABLED=false;	//turn off AJAX
+	AJAX_ENABLED=false;	//immediateyl turn off AJAX
+	guiseAJAX.setPingEnabled(false);	//turn off pinging
 //TODO fix or del	guise.setBusyVisible(true);	//turn on the busy indicator
 	eventManager.clearEvents();	//unload all events
 //TODO fix or del	guise.setBusyVisible(false);	//turn off the busy indicator

@@ -4,6 +4,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.beans.TargetedEvent;
 
 /**An event indicating an action should take place.
+@see ActionListener
 @author Garret Wilson
 */
 public class ActionEvent extends AbstractGuiseEvent implements TargetedEvent

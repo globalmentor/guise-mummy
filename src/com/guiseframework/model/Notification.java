@@ -17,7 +17,7 @@ import static com.guiseframework.Resources.*;
 A notification also allows certain options indicating response choices for the user when presented with the notification.
 @author Garret Wilson
 */
-public class Notification
+public class Notification extends DefaultLabelModel
 {
 
 	/**The severity of the notification.
@@ -141,7 +141,7 @@ public class Notification
 
 		/**@return The content type of the message text.*/
 		public ContentType getMessageContentType() {return messageContentType;}
-
+		
 	/**Error constructor with a {@link Severity#ERROR} severity and a <code>text/plain</code> content type.
 	If the error provides a message, it is used as the notification message; otherwise, the error's string value is used as the message.
 	@param error The associated error or exception.

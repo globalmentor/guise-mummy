@@ -7,6 +7,7 @@
 
 		example: <!DOCTYPE html PUBLIC "-//Guise//DTD XHTML Guise 1.0//EN" "http://www.guiseframework.org/guise/dtd/guise.dtd">
 
+@see http://www.w3.org/TR/xhtml-modularization/
 @see http://golem.ph.utexas.edu/DTD/xhtml11-target.dtd
 @see http://groups.yahoo.com/group/XHTML-L/message/1933
 @see http://www.w3.org/TR/xhtml-modularization/dtd_module_rules.html#s_dtd_module_rules

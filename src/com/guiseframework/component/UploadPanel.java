@@ -15,6 +15,7 @@ import com.guiseframework.component.layout.*;
 import com.guiseframework.event.ActionEvent;
 import com.guiseframework.event.ActionListener;
 import com.guiseframework.geometry.Extent;
+import com.guiseframework.model.TaskState;
 import com.guiseframework.prototype.ActionPrototype;
 
 /**Panel to collect resources and send them to the specified destination.
@@ -155,13 +156,20 @@ public class UploadPanel extends AbstractPanel<UploadPanel>
 						updateComponents();	//update the components in response
 					}
 				});
-		
+			//listen for the resource collection control changing its send state, and update the state of the components in response
+		resourceCollectControl.addPropertyChangeListener(ResourceCollectControl.SEND_STATE_PROPERTY, new AbstractGenericPropertyChangeListener<TaskState>()
+				{
+					public void propertyChange(final GenericPropertyChangeEvent<TaskState> genericPropertyChangeEvent)	//if the send state changes
+					{
+						updateComponents();	//update the components in response
+					}
+				});
 		add(controlPanel);
 	}
 
 	/**Updates the state of components.*/
 	protected void updateComponents()
 	{
-		uploadActionPrototype.setEnabled(!resourceCollectControl.getResourcePaths().isEmpty());	//only allow upload if there are collected resources
+		uploadActionPrototype.setEnabled(resourceCollectControl.getSendState()==null && !resourceCollectControl.getResourcePaths().isEmpty());	//only allow upload if the control is not sending and there are collected resources
 	}
 }
