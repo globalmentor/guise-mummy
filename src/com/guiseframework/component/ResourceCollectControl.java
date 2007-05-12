@@ -7,8 +7,10 @@ import java.util.*;
 import static java.util.Collections.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static com.garretwilson.io.FileUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.garretwilson.util.Debug;
 import com.guiseframework.Bookmark;
 import com.guiseframework.ResourceWriteDestination;
 import com.guiseframework.event.*;
@@ -68,6 +70,21 @@ public class ResourceCollectControl extends AbstractControl<ResourceCollectContr
 		public void addResourcePath(final String resourcePath)
 		{
 			resourcePaths.add(checkInstance(resourcePath, "Resource path cannot be null."));
+			final List<String> newList=unmodifiableList(new ArrayList<String>(resourcePaths));	//create an unmodifiable copy of the resource paths
+			firePropertyChange(RESOURCE_PATHS_PROPERTY, null, newList);	//indicate that the value changed			
+		}
+
+		/**Removes a resource path.
+		This method changes a bound property of type {@link List} holding type {@link String}.
+		This method is called by the framework and normally this should not be called directly from applications. 
+//TODO fix to actually tell the browser control that the path has changed		Manually adding a new resource path, depending on the platform, may not actually result in another resource being collected absent user intervention.
+		@param resourcePath The resource path to remove.
+		@exception NullPointerException if the given resource path is <code>null</code>.
+		@see #RESOURCE_PATHS_PROPERTY
+		*/
+		public void removeResourcePath(final String resourcePath)
+		{
+			resourcePaths.remove(checkInstance(resourcePath, "Resource path cannot be null."));
 			final List<String> newList=unmodifiableList(new ArrayList<String>(resourcePaths));	//create an unmodifiable copy of the resource paths
 			firePropertyChange(RESOURCE_PATHS_PROPERTY, null, newList);	//indicate that the value changed			
 		}
@@ -162,6 +179,23 @@ public class ResourceCollectControl extends AbstractControl<ResourceCollectContr
 	*/
 	public void fireProgressed(final String task, final TaskState taskState, final long value, final long maximumValue)
 	{
+Debug.trace("got progress of task", task, "and task state of", taskState);
+		//TODO put this stuff in a setProgress() method, and keep track of this information locally
+		if(task!=null && taskState==TaskState.COMPLETE)	//if we complete a file
+		{
+Debug.trace("going to look for task", task);
+			for(final String resourcePath:resourcePaths)	//look at the resource paths
+			{
+Debug.trace("looking at resource path", resourcePath);
+Debug.trace("filename is", getFilename(resourcePath));
+				if(getFilename(resourcePath).equals(task))	//if this resource path just finished TODO create a better way to check; this could result in inconsistencies if multiple paths have the same filename
+				{
+Debug.trace("ready to remove resource path", resourcePath);
+					removeResourcePath(resourcePath);	//remove this resource path
+					break;	//stop checking for matches
+				}
+			}
+		}
 		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
 		if(eventListenerManager.hasListeners(ProgressListener.class))	//if there are progress listeners registered
 		{

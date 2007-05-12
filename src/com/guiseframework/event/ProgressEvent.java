@@ -8,7 +8,7 @@ import com.guiseframework.model.TaskState;
 @author Garret Wilson
 @see ProgressListener
 */
-public class ProgressEvent extends AbstractGuiseEvent
+public class ProgressEvent extends AbstractGuiseEvent	//TODO later make this a TaskProgressEvent<T>, derived from ProgressEvent
 {
 
 	/**The task being performed, or <code>null</code> if not indicated.*/

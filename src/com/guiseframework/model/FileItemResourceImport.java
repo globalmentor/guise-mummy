@@ -5,7 +5,7 @@ import java.io.*;
 import javax.mail.internet.ContentType;
 
 import static com.garretwilson.io.ContentTypeUtilities.*;
-import static com.garretwilson.io.FileConstants.*;
+import static com.garretwilson.io.FileUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import org.apache.commons.fileupload.FileItem;
@@ -46,11 +46,7 @@ public class FileItemResourceImport implements ResourceImport
 		String name=fileItem.getName();	//get the name of the item
 		if(name!=null)	//if there is a filename
 		{
-			final int pathSeparatorIndex=name.lastIndexOf(FILE_PATH_SEPARATOR_CHARACTERS);	//see if there are any file path separator characters (unfortunately, this will strip away any backslash found in a Unix filename if the entire path was sent, but it's better to have a too-short filename in a rare case than one that includes the full Windows path)
-			if(pathSeparatorIndex>=0)	//if there is a path separator
-			{
-				name=name.substring(pathSeparatorIndex+1);	//remove everything but what comes after the last path separator
-			}
+			name=getFilename(name);	//make sure it is only a filename and not a complete path
 		}
 		simpleName=name;	//save the filename
 	}

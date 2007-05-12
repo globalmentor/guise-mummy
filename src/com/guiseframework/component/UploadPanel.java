@@ -9,6 +9,8 @@ import static com.garretwilson.lang.ClassUtilities.*;
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.util.Debug;
+
 import static com.garretwilson.net.URIUtilities.*;
 import com.guiseframework.Bookmark;
 import com.guiseframework.component.layout.*;
@@ -151,6 +153,7 @@ public class UploadPanel extends AbstractPanel<UploadPanel>
 				{
 					public void propertyChange(final GenericPropertyChangeEvent<List<String>> genericPropertyChangeEvent)	//if the list of resource path changes
 					{
+Debug.trace("ready to change resource path list");
 						resourcePathList.clear();	//remove the currently displayed resource paths
 						resourcePathList.addAll(genericPropertyChangeEvent.getNewValue());	//add all the new resource paths to the list
 						updateComponents();	//update the components in response

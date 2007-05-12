@@ -1069,6 +1069,7 @@ Debug.trace("upload update: bytes read", bytesRead, "content length", contentLen
 			servletFileUpload.setProgressListener(progressListener);	//listen for progress
 */
 					
+					final Set<Component<?>> progressComponents=new HashSet<Component<?>>();	//keep track of which components need to know about progress
 					final FileItemIterator itemIterator=servletFileUpload.getItemIterator(request);	//get an iterator to the file items
 					while(itemIterator.hasNext())	//while there are more items
 					{
@@ -1082,13 +1083,19 @@ Debug.trace("upload update: bytes read", bytesRead, "content length", contentLen
 								
 								final String fieldName=fileItemStream.getFieldName();	//get the field name for this item
 								final Component<?> progressComponent=getComponentByID(guiseSession, fieldName);	//get the related component that will want to know progress
+								if(!progressComponents.contains(progressComponent))	//if this is the first transfer for this component
+								{
+									progressComponents.add(progressComponent);	//add this progress component to our set of progress components so we can send finish events to them later
+									progressComponent.processEvent(new ProgressControlEvent(progressComponent.getID(), null, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting for all transfers
+								}
 								final RDFResource resourceDescription=new DefaultRDFResource();	//create a new resource description
 								final String itemContentType=fileItemStream.getContentType();	//get the item content type, if any
 								if(itemContentType!=null)	//if we know the item's content type
 								{
 									setContentType(resourceDescription, createContentType(itemContentType));	//set the resource's content type
 								}
-								setName(resourceDescription, FilenameUtils.getName(itemName));	//specify the name provided to us (removing any extraneous path information a browser such as IE might have given)
+								final String name=getFilename(itemName);	//removing any extraneous path information a browser such as IE or Opera might have given
+								setName(resourceDescription, name);	//specify the name provided to us 
 								
 								try
 								{
@@ -1101,12 +1108,13 @@ Debug.trace("upload update: bytes read", bytesRead, "content length", contentLen
 										{
 											if(progressComponent!=null)	//if we know the component that wants to know progress
 											{
-												progressComponent.processEvent(new ProgressControlEvent(fieldName, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting
+												progressComponent.processEvent(new ProgressControlEvent(progressComponent.getID(), name, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting for this file
 											}
 											copy(inputStream, outputStream);	//copy the uploaded file to the destination
+												//TODO catch and send errors here
 											if(progressComponent!=null)	//if we know the component that wants to know progress
 											{
-												progressComponent.processEvent(new ProgressControlEvent(fieldName, TaskState.COMPLETE, 0));	//indicate to the component that progress is finished
+												progressComponent.processEvent(new ProgressControlEvent(progressComponent.getID(), name, TaskState.COMPLETE, 0));	//indicate to the component that progress is finished for this file
 											}
 										}
 										finally
@@ -1125,6 +1133,10 @@ Debug.trace("upload update: bytes read", bytesRead, "content length", contentLen
 								}
 							}
 						}
+					}
+					for(final Component<?> progressComponent:progressComponents)	//for each component that was notfied of progress
+					{
+						progressComponent.processEvent(new ProgressControlEvent(progressComponent.getID(), null, TaskState.COMPLETE, 0));	//indicate to the component that progress is finished for all transfers
 					}
 				}
 				catch(final FileUploadException fileUploadException)	//if there was an upload exception
