@@ -92,6 +92,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_RESOURCE=createStringResourceReference("theme.label.resource");
 	public final static String LABEL_SUBMIT=createStringResourceReference("theme.label.submit");
 	public final static String LABEL_SUBTRACT=createStringResourceReference("theme.label.subtract");
+	public final static String LABEL_UNKNOWN=createStringResourceReference("theme.label.unknown");
 	public final static String LABEL_UPLOAD=createStringResourceReference("theme.label.upload");
 	public final static String LABEL_USERNAME=createStringResourceReference("theme.label.username");
 	public final static String LABEL_VERSION=createStringResourceReference("theme.label.version");

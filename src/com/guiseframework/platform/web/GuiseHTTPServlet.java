@@ -29,6 +29,8 @@ import org.xml.sax.SAXException;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 
+import com.garretwilson.event.ProgressEvent;
+import com.garretwilson.event.ProgressListener;
 import com.garretwilson.io.*;
 import static com.garretwilson.io.OutputStreamUtilities.*;
 import com.garretwilson.lang.ClassUtilities;
@@ -556,6 +558,7 @@ Debug.trace("ready to process guise request for destination", destination);
 	{
 		final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request		
 //TODO del Debug.trace("servicing Guise request with request URI:", requestURI);
+Debug.trace("servicing Guise request with request URI:", requestURI);
 		final String contentTypeString=request.getContentType();	//get the request content type
 		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
 		final boolean isAJAX=contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType);	//see if this is a Guise AJAX request
@@ -580,12 +583,14 @@ Debug.trace("ready to process guise request for destination", destination);
 		{
 			final ComponentDestination componentDestination=(ComponentDestination)destination;	//get the destination as a component destination
 //		TODO del Debug.trace("have destination; creating context");
+Debug.trace("have destination; creating context");
 			final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, destination, request, response);	//create a new Guise context
 //		TODO del Debug.trace("got context");
+Debug.trace("got context");
 			synchronized(guiseSession)	//don't allow other session contexts to be active at the same time
 			{
-
 //TODO del Debug.trace("setting context");
+Debug.trace("setting context");
 				guiseSession.setContext(guiseContext);	//set the context for this session
 				try
 				{
@@ -1058,17 +1063,6 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 				try
 				{
 					final ServletFileUpload servletFileUpload=new ServletFileUpload();	//create a new servlet file upload object
-/*TODO replace with our own progress events; this uses buffering, so all progress will have been finished on this server before the data is transferred to the remote server 					
-					final ProgressListener progressListener=new ProgressListener()
-					{
-						public void update(final long bytesRead, final long contentLength, final int itemNumber)	//every time we are updated
-						{
-Debug.trace("upload update: bytes read", bytesRead, "content length", contentLength, "item number", itemNumber);												
-						}										
-					};
-			servletFileUpload.setProgressListener(progressListener);	//listen for progress
-*/
-					
 					final Set<Component<?>> progressComponents=new HashSet<Component<?>>();	//keep track of which components need to know about progress
 					final FileItemIterator itemIterator=servletFileUpload.getItemIterator(request);	//get an iterator to the file items
 					while(itemIterator.hasNext())	//while there are more items
@@ -1086,6 +1080,7 @@ Debug.trace("upload update: bytes read", bytesRead, "content length", contentLen
 								if(!progressComponents.contains(progressComponent))	//if this is the first transfer for this component
 								{
 									progressComponents.add(progressComponent);	//add this progress component to our set of progress components so we can send finish events to them later
+Debug.trace("sending progress with no task for starting");
 									progressComponent.processEvent(new ProgressControlEvent(progressComponent.getID(), null, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting for all transfers
 								}
 								final RDFResource resourceDescription=new DefaultRDFResource();	//create a new resource description
@@ -1102,24 +1097,33 @@ Debug.trace("upload update: bytes read", bytesRead, "content length", contentLen
 									final InputStream inputStream=new BufferedInputStream(fileItemStream.openStream());	//get an input stream to the item
 									try
 									{
-		Debug.trace("ready to get output stream");
-										final OutputStream outputStream=new BufferedOutputStream(resourceWriteDestination.getOutputStream(resourceDescription, guiseSession, navigationPath, bookmark, referrerURI));	//get an output stream to the destination
+										final ProgressListener progressListener=new ProgressListener()	//listen for progress
+										{
+											public void progressed(ProgressEvent progressEvent)	//when progress has been made
+											{
+//Debug.trace("delta: ", progressEvent.getDelta(), "progress:", progressEvent.getValue());
+												progressComponent.processEvent(new ProgressControlEvent(progressComponent.getID(), name, TaskState.INCOMPLETE, progressEvent.getValue()));	//indicate to the component that progress is starting for this file
+											}
+										};
+										final ProgressOutputStream progressOutputStream=new ProgressOutputStream(resourceWriteDestination.getOutputStream(resourceDescription, guiseSession, navigationPath, bookmark, referrerURI));	//get an output stream to the destination; don't buffer the output stream (our copy method essentially does this) so that progress events will be accurate
 										try
 										{
 											if(progressComponent!=null)	//if we know the component that wants to know progress
 											{
 												progressComponent.processEvent(new ProgressControlEvent(progressComponent.getID(), name, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting for this file
 											}
-											copy(inputStream, outputStream);	//copy the uploaded file to the destination
+											progressOutputStream.addProgressListener(progressListener);	//start listening for progress events from the output stream
+											copy(inputStream, progressOutputStream);	//copy the uploaded file to the destination
+											progressOutputStream.removeProgressListener(progressListener);	//stop listening for progress events from the output stream
 												//TODO catch and send errors here
-											if(progressComponent!=null)	//if we know the component that wants to know progress
-											{
-												progressComponent.processEvent(new ProgressControlEvent(progressComponent.getID(), name, TaskState.COMPLETE, 0));	//indicate to the component that progress is finished for this file
-											}
 										}
 										finally
 										{
-											outputStream.close();	//always close the output stream
+											progressOutputStream.close();	//always close the output stream
+										}
+										if(progressComponent!=null)	//if we know the component that wants to know progress (send the progress event after the output stream is closed, because the output stream may buffer contents)
+										{
+											progressComponent.processEvent(new ProgressControlEvent(progressComponent.getID(), name, TaskState.COMPLETE, 0));	//indicate to the component that progress is finished for this file
 										}
 									}
 									finally

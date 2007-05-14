@@ -27,13 +27,13 @@ public class ProgressEvent extends AbstractGuiseEvent	//TODO later make this a T
 	private long value=-1;
 
 		/**@return The current progress, or <code>-1</code> if not known.*/
-		public float getValue() {return value;}
+		public long getValue() {return value;}
 
 	/**The goal, or <code>-1</code> if not known.*/
-	private float maximumValue=-1;
+	private long maximumValue=-1;
 
 		/**@return The goal, or <code>-1</code> if not known.*/
-		public float getMaximumValue() {return maximumValue;}
+		public long getMaximumValue() {return maximumValue;}
 
 	/**Task state constructor with no known value or maximum value.
 	@param source The object on which the event initially occurred.
@@ -101,11 +101,21 @@ public class ProgressEvent extends AbstractGuiseEvent	//TODO later make this a T
 	*/
 	public ProgressEvent(final Object source, final String task, final TaskState taskState, final long value, final long maximumValue)
 	{
-		super(source);	//let the parent class initialize
+		super(source);	//construct the parent class
 		this.task=task;
 		this.taskState=checkInstance(taskState, "Task state cannot be null.");
 		this.value=value;
 		this.maximumValue=maximumValue;
+	}
+
+	/**Source copy constructor.
+	@param source The object on which the event initially occurred.
+	@param progressEvent The existing progress event the values of which will be copied to this object.
+	@exception NullPointerException if the given progress event is <code>null</code>.
+	*/
+	public ProgressEvent(final Object source, final ProgressEvent progressEvent)
+	{
+		this(source, progressEvent.getTask(), progressEvent.getTaskState(), progressEvent.getValue(), progressEvent.getMaximumValue());	//construct the class with values from the given progress event
 	}
 
 }

@@ -1,7 +1,6 @@
 package com.guiseframework.component;
 
 import java.net.URI;
-import java.text.MessageFormat;
 
 import static com.guiseframework.Resources.*;
 
@@ -46,10 +45,10 @@ public class TaskStateSelectLink extends ValueSelectLink<TaskState>
 		super(labelModel, actionModel, valueModel, enableable);	//construct the parent class		
 		setSelectedIcon(SELECT_ACTION_SELECTED_GLYPH_RESOURCE_URI);
 		setUnselectedIcon(SELECT_ACTION_UNSELECTED_GLYPH_RESOURCE_URI);
-		setValueIcon(null, createURIResourceReference(MessageFormat.format(TaskState.GLYPH_RESOURCE_KEY_FORMAT_PATTERN, "")));	//set the icon resource for no task state
+		setValueIcon(null, TaskState.getNoGlyph());	//set the icon resource for no task state
 		for(final TaskState taskState:TaskState.values())	//for each task status
 		{
-			setValueIcon(taskState, createURIResourceReference(MessageFormat.format(TaskState.GLYPH_RESOURCE_KEY_FORMAT_PATTERN, Resources.getResourceKeyName(taskState))));	//set the icon resource for this task state
+			setValueIcon(taskState, taskState.getGlyph());	//set the icon resource for this task state
 		}
 	}
 

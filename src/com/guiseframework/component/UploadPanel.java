@@ -1,9 +1,8 @@
 package com.guiseframework.component;
 
-import static com.guiseframework.theme.Theme.*;
-
 import java.util.List;
 
+import static com.garretwilson.io.FileUtilities.getFilename;
 import static com.garretwilson.lang.ClassUtilities.*;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
@@ -14,11 +13,11 @@ import com.garretwilson.util.Debug;
 import static com.garretwilson.net.URIUtilities.*;
 import com.guiseframework.Bookmark;
 import com.guiseframework.component.layout.*;
-import com.guiseframework.event.ActionEvent;
-import com.guiseframework.event.ActionListener;
+import com.guiseframework.event.*;
 import com.guiseframework.geometry.Extent;
 import com.guiseframework.model.TaskState;
 import com.guiseframework.prototype.ActionPrototype;
+import static com.guiseframework.theme.Theme.*;
 
 /**Panel to collect resources and send them to the specified destination.
 The destination path must be set before upload is initiated, otherwise an {@link IllegalStateException} will be thrown.
@@ -84,6 +83,9 @@ public class UploadPanel extends AbstractPanel<UploadPanel>
 	/**The resource path list control.*/
 	private final ListControl<String> resourcePathList;
 
+	/**The label containing the current status.*/
+	private final Label currentStatusLabel;
+	
 	/**The resource collect control.*/
 	private final ResourceCollectControl resourceCollectControl;
 
@@ -122,12 +124,14 @@ public class UploadPanel extends AbstractPanel<UploadPanel>
 	public UploadPanel()
 	{
 		super(new FlowLayout(Flow.PAGE));	//construct the parent class
-	
 		resourcePathList=new ListControl<String>(String.class, RESOURCE_PATH_DISPLAY_COUNT);	//create a list in which to show the resource paths
 		resourcePathList.setEditable(false);	//don't allow the list to be edited
 		resourcePathList.setPreferredWidth(new Extent(30, Extent.Unit.EM));
 		add(resourcePathList);
 
+		currentStatusLabel=new Label();	//current status label
+		add(currentStatusLabel);
+		
 			//the horizontal panel of controls
 		final Panel<?> controlPanel=new LayoutPanel(new FlowLayout(Flow.LINE));
 		resourceCollectControl=new ResourceCollectControl();	//resource collector
@@ -153,7 +157,6 @@ public class UploadPanel extends AbstractPanel<UploadPanel>
 				{
 					public void propertyChange(final GenericPropertyChangeEvent<List<String>> genericPropertyChangeEvent)	//if the list of resource path changes
 					{
-Debug.trace("ready to change resource path list");
 						resourcePathList.clear();	//remove the currently displayed resource paths
 						resourcePathList.addAll(genericPropertyChangeEvent.getNewValue());	//add all the new resource paths to the list
 						updateComponents();	//update the components in response
@@ -167,6 +170,34 @@ Debug.trace("ready to change resource path list");
 						updateComponents();	//update the components in response
 					}
 				});
+			//listen for progress from the resource collect control and update the progress labels in response
+		resourceCollectControl.addProgressListener(new ProgressListener()
+				{
+					public void progressed(final ProgressEvent progressEvent)	//if progress occurs
+					{
+						final StringBuilder statusStringBuilder=new StringBuilder();	//build the status string
+						final String task=progressEvent.getTask();	//get the current task
+						if(task!=null)	//if there is a task
+						{
+							statusStringBuilder.append(task).append(':').append(' ');	//task:
+							final long value=progressEvent.getValue();	//get the current value
+							if(value>=0)	//if a valid value is given
+							{
+								statusStringBuilder.append(value);	//show the value
+							}
+							else	//if there is no value
+							{
+								statusStringBuilder.append(LABEL_UNKNOWN);	//indicate an unknown progress
+							}
+						}
+						else	//if there is no task, just show the task status
+						{
+							statusStringBuilder.append(progressEvent.getTaskState().getLabel());	//show the task status label
+						}
+						currentStatusLabel.setLabel(statusStringBuilder.toString());	//update the status
+						fireProgressed(new ProgressEvent(UploadPanel.this, progressEvent));	//refire the progress event using this panel as the source
+					}
+				});
 		add(controlPanel);
 	}
 
@@ -175,4 +206,32 @@ Debug.trace("ready to change resource path list");
 	{
 		uploadActionPrototype.setEnabled(resourceCollectControl.getSendState()==null && !resourceCollectControl.getResourcePaths().isEmpty());	//only allow upload if the control is not sending and there are collected resources
 	}
+
+	/**Adds a progress listener.
+	@param progressListener The progress listener to add.
+	*/
+	public void addProgressListener(final ProgressListener progressListener)
+	{
+		getEventListenerManager().add(ProgressListener.class, progressListener);	//add the listener
+	}
+
+	/**Removes an progress listener.
+	@param progressListener The progress listener to remove.
+	*/
+	public void removeProgressListener(final ProgressListener progressListener)
+	{
+		getEventListenerManager().remove(ProgressListener.class, progressListener);	//remove the listener
+	}
+
+	/**Fires a given progress event to all registered progress listeners.
+	@param progressEvent The progress event to fire.
+	*/
+	protected void fireProgressed(final ProgressEvent progressEvent)
+	{
+		for(final ProgressListener progressListener:getEventListenerManager().getListeners(ProgressListener.class))	//for each progress listener
+		{
+			progressListener.progressed(progressEvent);	//dispatch the progress event to the listener
+		}
+	}
+
 }
