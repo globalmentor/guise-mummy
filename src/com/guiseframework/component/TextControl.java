@@ -120,7 +120,27 @@ public class TextControl<V> extends AbstractTextControl<V, TextControl<V>>
 	*/
 	public TextControl(final Class<V> valueClass)
 	{
-		this(new DefaultValueModel<V>(valueClass));	//construct the class with a default model
+		this(valueClass, null);	//construct the class with a null default value
+	}
+
+	/**Value class and default value constructor with a default data model to represent a given type and a default converter.
+	@param valueClass The class indicating the type of value held in the model.
+	@param defaultValue The default value, which will not be validated.
+	@exception NullPointerException if the given value class is <code>null</code>.
+	*/
+	public TextControl(final Class<V> valueClass, final V defaultValue)
+	{
+		this(new DefaultValueModel<V>(valueClass, defaultValue));	//construct the class with a default model
+	}
+
+	/**Value class and column count constructor with one row and a default converter.
+	@param valueClass The class indicating the type of value held in the model.
+	@param columnCount The requested number of visible columns, or -1 if no column count is specified.
+	@exception NullPointerException if the given value class is <code>null</code>.
+	*/
+	public TextControl(final Class<V> valueClass, final int columnCount)
+	{
+		this(valueClass, 1, columnCount);	//construct the class with one row		
 	}
 
 	/**Value class, row count, and column count constructor with a default converter.
@@ -131,7 +151,30 @@ public class TextControl<V> extends AbstractTextControl<V, TextControl<V>>
 	*/
 	public TextControl(final Class<V> valueClass, final int rowCount, final int columnCount)
 	{
-		this(valueClass, rowCount, columnCount, true);	//default to line-wrapping		
+		this(valueClass, null, rowCount, columnCount);	//construct the class with a null default value		
+	}
+
+	/**Value class, defaultValue, and column count constructor with one row a default converter.
+	@param valueClass The class indicating the type of value held in the model.
+	@param defaultValue The default value, which will not be validated.
+	@param columnCount The requested number of visible columns, or -1 if no column count is specified.
+	@exception NullPointerException if the given value class is <code>null</code>.
+	*/
+	public TextControl(final Class<V> valueClass, final V defaultValue, final int columnCount)
+	{
+		this(valueClass, defaultValue, 1, columnCount);	//construct the class with one row		
+	}
+
+	/**Value class, defaultValue, row count, and column count constructor with a default converter.
+	@param valueClass The class indicating the type of value held in the model.
+	@param defaultValue The default value, which will not be validated.
+	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
+	@param columnCount The requested number of visible columns, or -1 if no column count is specified.
+	@exception NullPointerException if the given value class is <code>null</code>.
+	*/
+	public TextControl(final Class<V> valueClass, final V defaultValue, final int rowCount, final int columnCount)
+	{
+		this(valueClass, defaultValue, rowCount, columnCount, true);	//default to line-wrapping		
 	}
 
 	/**Value class, row count, column count, and line wrap constructor with a default converter.
@@ -143,7 +186,20 @@ public class TextControl<V> extends AbstractTextControl<V, TextControl<V>>
 	*/
 	public TextControl(final Class<V> valueClass, final int rowCount, final int columnCount, final boolean lineWrap)
 	{
-		this(new DefaultValueModel<V>(valueClass), rowCount, columnCount, lineWrap);	//construct the class with a default model		
+		this(valueClass, null, rowCount, columnCount, lineWrap);	//construct the class with a null default value
+	}
+
+	/**Value class, default value, row count, column count, and line wrap constructor with a default converter.
+	@param valueClass The class indicating the type of value held in the model.
+	@param defaultValue The default value, which will not be validated.
+	@param rowCount The requested number of visible rows, or -1 if no row count is specified.
+	@param columnCount The requested number of visible columns, or -1 if no column count is specified.
+	@param lineWrap Whether lines should be wrapped in the view if needed.
+	@exception NullPointerException if the given value class is <code>null</code>.
+	*/
+	public TextControl(final Class<V> valueClass, final V defaultValue, final int rowCount, final int columnCount, final boolean lineWrap)
+	{
+		this(new DefaultValueModel<V>(valueClass, defaultValue), rowCount, columnCount, lineWrap);	//construct the class with a default model
 	}
 
 	/**Value model, row count, and column count constructor with a default converter.

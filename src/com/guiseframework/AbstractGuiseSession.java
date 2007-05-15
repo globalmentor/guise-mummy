@@ -1555,9 +1555,11 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	}	
 
 	/**Notifies the user of one or more notifications to be presented in sequence.
-	This is a convenience method that delegates to {@link #notify(Runnable, Notification...)}.
 	The notification's label and/or icon, if specified, will be used as the dialog title and icon, respectively;
 	if either is not specified, a label and/or icon based upon the notification's severity will be used.
+	If the selected option to any notification is fatal, the remaining notifications will not be performed.
+	The absence of an option selection is considered fatal only if a fatal option was presented for a given notification.  
+	This is a convenience method that delegates to {@link #notify(Runnable, Notification...)}.
 	@param notifications One or more notification informations to relay.
 	@exception NullPointerException if the given notifications is <code>null</code>.
 	@exception IllegalArgumentException if no notifications are given.
@@ -1568,9 +1570,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	}
 
 	/**Notifies the user of one or more notifications to be presented in sequence, with optional logic to be executed after all notifications have taken place.
-	If the selected option to any notification is fatal, the specified logic will not be performed.
 	The notification's label and/or icon, if specified, will be used as the dialog title and icon, respectively;
 	if either is not specified, a label and/or icon based upon the notification's severity will be used.
+	If the selected option to any notification is fatal, the remaining notifications and the specified logic, if any, will not be performed.
+	The absence of an option selection is considered fatal only if a fatal option was presented for a given notification.  
 	This implementation delegates to {@link #notify(Notification, Runnable)}.
 	@param notifications One or more notification informations to relay.
 	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
@@ -1602,9 +1605,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	}
 
 	/**Notifies the user of the given notification information, with optional logic to be executed after notification takes place.
-	If the selected option is fatal, the specified logic will not be performed.
 	The notification's label and/or icon, if specified, will be used as the dialog title and icon, respectively;
 	if either is not specified, a label and/or icon based upon the notification's severity will be used.
+	If the selected option to any notification is fatal, the remaining notifications and the specified logic, if any, will not be performed.
+	The absence of an option selection is considered fatal only if a fatal option was presented for a given notification.  
 	@param notification The notification information to relay.
 	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.
 	*/
@@ -1643,11 +1647,26 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 					{
 						if(genericPropertyChangeEvent.getNewValue()==null && afterNotify!=null)	//if the dialog is now nonmodal and there is logic that should take place after notification
 						{
-							final Notification.Option option=optionDialogFrame.getValue();	//get the selected option, if any
-							if(option==null || !option.isFatal())	//if a fatal option wasn't selected
+							final Notification.Option selectedOption=optionDialogFrame.getValue();	//get the selected option, if any
+								//we'll determine if the user selection is fatal and therefore we should not perform the given logic
+							if(selectedOption!=null)	//if an option was selected
 							{
-								afterNotify.run();	//run the code that takes place after notification
+								if(selectedOption.isFatal())	//if a fatal option was selected
+								{
+									return;	//don't perform the given logic
+								}
 							}
+							else	//if no option was selected, determine if this should be considered fatal
+							{
+								for(final Notification.Option option:notification.getOptions())	//look at the given options; if there is a fatal option available, consider the absence of an option selected to be fatal
+								{
+									if(option.isFatal())	//if a fatal option is available
+									{
+										return;	//don't perform the given logic										
+									}
+								}
+							}
+							afterNotify.run();	//run the code that takes place after notification
 						}
 					}
 				}
@@ -1655,6 +1674,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	}
 
 	/**Notifies the user of the given errors in sequence.
+	If the selected option to any notification is fatal, the remaining notifications will not be performed.
+	The absence of an option selection is considered fatal only if a fatal option was presented for a given notification.  
 	This is a convenience method that delegates to {@link #notify(Runnable, Throwable...)}.
 	@param errors The errors with which to notify the user.
 	@exception NullPointerException if the given errors is <code>null</code>.
@@ -1666,7 +1687,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	}
 
 	/**Notifies the user of the given error in sequence, with optional logic to be executed after notification takes place.
-	If the selected option to any notification is fatal, the specified logic will not be performed.
+	If the selected option to any notification is fatal, the remaining notifications and the specified logic, if any, will not be performed.
+	The absence of an option selection is considered fatal only if a fatal option was presented for a given notification.  
 	This is a convenience method that delegates to {@link #notify(Runnable, Notification...)}.
 	@param error The error with which to notify the user.
 	@param afterNotify The code that executes after notification has taken place, or <code>null</code> if no action should be taken after notification.

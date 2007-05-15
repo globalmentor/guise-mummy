@@ -48,7 +48,7 @@ public class URIPathSegmentLinkPanel extends AbstractPanel<URIPathSegmentLinkPan
 					final boolean isPathURI=isPathURI(uri);	//see if the URI is just a path
 					if(!isPathURI)	//if the URI is not just a path
 					{
-						hrefStringBuilder.append(changePath(uri, null));	//initialize the href with a path-less URI TODO eventually encode
+						hrefStringBuilder.append(changeRawPath(uri, null));	//initialize the href with a path-less URI
 						add(new Link(decode(hrefStringBuilder.toString()), URI.create(isAbsolutePath ? hrefStringBuilder.toString()+PATH_SEPARATOR : hrefStringBuilder.toString())));	//add a link for the domain, adding a root path to the href if the URI has an absolute path
 					}
 					final StringTokenizer pathTokenizer=new StringTokenizer(uri.getRawPath(), String.valueOf(PATH_SEPARATOR), true);	//tokenize the raw path

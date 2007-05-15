@@ -388,8 +388,8 @@ Debug.trace("checking for categories");
 //TODO del				Debug.trace("context path", getContextPath());
 				final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request
 //			TODO del	Debug.trace("requestURI", requestURI);
-				final String containerBasePath=getContextPath()+PATH_SEPARATOR;	//determine the base path of the container
-				final URI containerBaseURI=changePath(requestURI, containerBasePath);	//determine the container base URI TODO important; convert to correctly use raw/non-raw paths
+				final String containerBasePath=getContextPath()+PATH_SEPARATOR;	//determine the base path of the container TODO important: determine if getContextPath() returns the raw path, as we want; otherwise, this will not work correctly for context paths with encoded path characters
+				final URI containerBaseURI=changeRawPath(requestURI, containerBasePath);	//determine the container base URI
 //			TODO del	Debug.trace("containerURI", containerBaseURI);
 	
 				final ServletContext servletContext=getServletContext();	//get the servlet context
