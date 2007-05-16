@@ -277,7 +277,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 		/**Retrieves a resource bundle to be used by this session.
 		One of the <code>getXXXResource()</code> should be used in preference to using this method directly.
-		If this session does not yet have a resource bundle, one will be created based upon the current locale.
+		If this session does not yet have a resource bundle, one will be created based upon the current theme and locale.
 		The returned resource bundle should only be used temporarily and should not be saved,
 		as the resource bundle may change if the session locale or the application resource bundle base name changes.
 		The resource bundle retrieved will allow hierarchical resolution in the following priority:
@@ -288,7 +288,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		</ol>
 		@return The resource bundle containing the resources for this session, based upon the locale.
 		@exception MissingResourceException if no resource bundle for the application's specified base name can be found.
-		@see GuiseApplication#getResourceBundle(Locale)
+		@see GuiseApplication#getResourceBundle(Theme, Locale)
+		@see #getTheme()
 		@see #getLocale()
 		@see #getStringResource(String)
 		@see #getStringResource(String, String)
@@ -304,7 +305,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			if(resourceBundle==null)	//if the resource bundle has not yet been loaded
 			{
 				final Locale locale=getLocale();	//get the current locale
-				resourceBundle=getApplication().getResourceBundle(locale);	//ask the application for the resource bundle based upon the locale
+				resourceBundle=getApplication().getResourceBundle(getTheme(), locale);	//ask the application for the resource bundle based upon the locale
 			}
 			return resourceBundle;	//return the resource bundle
 		}
@@ -660,7 +661,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		}
 
 	/**The current session theme.*/
-	private Theme theme=new Theme();	//create a default theme URI
+	private Theme theme;
 
 		/**@return The current session theme.*/
 		public Theme getTheme() {return theme;}
@@ -677,6 +678,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			{
 				final Theme oldTheme=theme;	//get the old value
 				theme=checkInstance(newTheme, "Guise session theme cannot be null.");	//actually change the value
+				releaseResourceBundle();	//release the resource bundle, as the new locale may indicate that new resources should be used
 				firePropertyChange(THEME_PROPERTY, oldTheme, newTheme);	//indicate that the value changed
 			}
 		}
@@ -705,6 +707,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			throw new AssertionError(parserConfigurationException);
 		}	
 		this.environment=new DefaultGuiseEnvironment();	//create a default environment
+		this.theme=application.getTheme();	//default to the application theme
 		this.locale=application.getLocales().get(0);	//default to the first application locale
 //TODO del when works		this.locale=application.getDefaultLocale();	//default to the application locale
 		this.orientation=Orientation.getOrientation(locale);	//set the orientation default based upon the locale

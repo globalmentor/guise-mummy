@@ -46,7 +46,7 @@ public class ComponentDestination extends AbstractDestination
 		}
 		
 	/**Path and component constructor with no style specified.
-	@param path The appplication context-relative path within the Guise container context, which does not begin with '/'.
+	@param path The application context-relative path within the Guise container context, which does not begin with '/'.
 	@param componentClass The class of the component to represent this destination.
 	@exception NullPointerException if the path and/or the component class is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
@@ -57,7 +57,7 @@ public class ComponentDestination extends AbstractDestination
 	}
 
 	/**Path, component, and style constructor.
-	@param path The appplication context-relative path within the Guise container context, which does not begin with '/'.
+	@param path The application context-relative path within the Guise container context, which does not begin with '/'.
 	@param componentClass The class of the component to represent this destination.
 	@param style The style of this destination, or <code>null</code> if no destination-specific style is specified.
 	@exception NullPointerException if the path and/or the component class is <code>null</code>.
@@ -71,7 +71,7 @@ public class ComponentDestination extends AbstractDestination
 	}
 	
 	/**Path pattern and component constructor with no style specified.
-	@param pathPattern The pattern to match an appplication context-relative path within the Guise container context, which does not begin with '/'.
+	@param pathPattern The pattern to match an application context-relative path within the Guise container context, which does not begin with '/'.
 	@param componentClass The class of the component to represent this destination.
 	@exception NullPointerException if the path pattern and/or the component class is <code>null</code>.
 	*/
@@ -81,7 +81,7 @@ public class ComponentDestination extends AbstractDestination
 	}
 
 	/**Path pattern, component, and style constructor.
-	@param pathPattern The pattern to match an appplication context-relative path within the Guise container context, which does not begin with '/'.
+	@param pathPattern The pattern to match an application context-relative path within the Guise container context, which does not begin with '/'.
 	@param componentClass The class of the component to represent this destination.
 	@param style The style of this destination, or <code>null</code> if no destination-specific style is specified.
 	@exception NullPointerException if the path pattern and/or the component class is <code>null</code>.

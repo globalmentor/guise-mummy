@@ -496,7 +496,7 @@ Debug.trace("found destination:", destination);
 
 			
 			final String httpMethod=request.getMethod();	//get the current HTTP method being used
-			if(destination instanceof ResourceDestination && GET_METHOD.equals(httpMethod))	//if this is a resource read destination (but only if this is a GET request; the ResourceReadDestination may also be a ResourceWriteDestination)
+			if(destination instanceof ResourceReadDestination && GET_METHOD.equals(httpMethod))	//if this is a resource read destination (but only if this is a GET request; the ResourceReadDestination may also be a ResourceWriteDestination)
 			{
 				super.doGet(request, response);	//let the default functionality take over, which will take care of accessing the resource destination by creating a specialized access resource
 				return;	//don't service the Guise request normally
@@ -966,6 +966,10 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 		//							TODO fix							else	//if the component is not visible, remove the component's elements
 									guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
 									guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
+									if(guiseApplication.isThemed())	//if the application applies themes
+									{
+										guiseSession.getTheme().apply(frame);	//make sure the theme has been applied
+									}
 									frame.updateView(guiseContext);		//tell the component to update its view
 									guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "patch");	//</xhtml:patch>
 								}
@@ -1012,6 +1016,10 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 			//TODO fix							else	//if the component is not visible, remove the component's elements
 									guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
 									guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
+									if(guiseApplication.isThemed())	//if the application applies themes
+									{
+										guiseSession.getTheme().apply(dirtyComponent);	//make sure the theme has been applied
+									}
 									dirtyComponent.updateView(guiseContext);		//tell the component to update its view
 									guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "patch");	//</xhtml:patch>
 								}
@@ -1027,6 +1035,10 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						}
 						else	//if this is not an AJAX request
 						{
+							if(guiseApplication.isThemed())	//if the application applies themes
+							{
+								guiseSession.getTheme().apply(applicationFrame);	//make sure the theme has been applied
+							}
 							applicationFrame.updateView(guiseContext);		//tell the application frame to update its view						
 						}
 					}
@@ -1937,7 +1949,7 @@ Debug.trace("this is a destination");
 	@see Guise#getGuisePublicResourceURL(String)
 	@see GuiseApplication#hasTempPublicResource(String)
 	@see GuiseApplication#getInputStream(String)
-	@see ResourceDestination
+	@see ResourceReadDestination
   */
 	protected HTTPServletResource getResource(final HttpServletRequest request, final URI resourceURI) throws IllegalArgumentException, IOException
 	{
@@ -1986,9 +1998,9 @@ Debug.trace("this is a destination");
 			{
 		  	final String path=guiseApplication.relativizeURI(resourceURI);	//get the application-relative path TODO is this correct? what if it's a different base URI than was created by the application? check all this---this may even be made redundant by code above; fix in exists() as well
 				final Destination destination=guiseApplication.getDestination(path);	//get the destination for the given path
-	  		if(destination instanceof ResourceDestination)	//if this is a request for a resource destination
+	  		if(destination instanceof ResourceReadDestination)	//if this is a request for a resource destination
 	  		{
-	  			final ResourceDestination resourceDestination=(ResourceDestination)destination;	//get the resource destination
+	  			final ResourceReadDestination resourceDestination=(ResourceReadDestination)destination;	//get the resource destination
 		  		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 		 			final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
 		 			final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
@@ -2145,7 +2157,7 @@ Debug.trace("this is a destination");
 
 	/**A resource that is accessed through a Guise session's resource destination.
 	@author Garret Wilson
-	@see ResourceDestination
+	@see ResourceReadDestination
 	*/
 	protected class DestinationResource extends AbstractDescriptionResource
 	{
@@ -2153,13 +2165,13 @@ Debug.trace("this is a destination");
 		final GuiseContainer guiseContainer;
 		final GuiseApplication guiseApplication;
 		final GuiseSession guiseSession;
-		final ResourceDestination resourceDestination;
+		final ResourceReadDestination resourceDestination;
 		final String navigationPath;
 		final Bookmark bookmark;
 		final URI referrerURI;
 
 		/**Returns an input stream to the resource.
-		This method delegates to {@link ResourceDestination#getInputStream(String, Bookmark, URI)}, providing the Guise session by running in a separate thread group.
+		This method delegates to {@link ResourceReadDestination#getInputStream(String, Bookmark, URI)}, providing the Guise session by running in a separate thread group.
 		@param request The HTTP request in response to which the input stream is being retrieved.
 		@return The input stream to the resource.
 		@exception IOException if there is an error getting an input stream to the resource.
@@ -2213,7 +2225,7 @@ Debug.trace("this is a destination");
 		@param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
 		@exception NullPointerException if the reference URI, resource description, Guise container, Guise application, Guise session, resource destination, navigation path, and/or bookmark is <code>null</code>.
 		*/
-		public DestinationResource(final URI referenceURI, final RDFResource resourceDescription, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ResourceDestination resourceDestination, final String navigationPath, final Bookmark bookmark, final URI referrerURI)
+		public DestinationResource(final URI referenceURI, final RDFResource resourceDescription, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ResourceReadDestination resourceDestination, final String navigationPath, final Bookmark bookmark, final URI referrerURI)
 		{
 			super(referenceURI, resourceDescription);	//construct the parent class
 			this.guiseContainer=checkInstance(guiseContainer, "Guise container cannot be null.");

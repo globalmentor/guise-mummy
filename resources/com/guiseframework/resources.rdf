@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rdf:RDF
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:guise="http://guiseframework.com/namespaces/guise#"
-	xmlns:dc="http://purl.org/dc/elements/1.1/"
 	xmlns:resource="http://guiseframework.com/namespaces/resource#"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
 >
-	<guise:Resources>
+	<resource:Resources>
 		<dc:description>Default Guise™ Resources (en).</dc:description>
 		<dc:creator>Garret Wilson</dc:creator>
 
@@ -55,6 +54,6 @@
 			<rdf:Description rdf:value="Sr."/>
 		</resource:text.directory.vcard.n.honorific.suffix.choices>
 	
-	</guise:Resources>
+	</resource:Resources>
 		
 </rdf:RDF>

@@ -1,12 +1,12 @@
 <rdf:RDF
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:theme="http://guiseframework.com/namespaces/theme#"
 	xmlns:xpackage="http://xpackage.org/namespaces/xpackage#"
 	xmlns:xlink="http://www.w3.org/1999/xlink"
 	xmlns:x="http://xpackage.org/namespaces/xml#"
-	xmlns:guise="http://guiseframework.com/namespaces/guise#"
 >
-	<guise:Theme>
+	<theme:Theme>
 		<x:style rdf:resource="sunflower.style.css"/>
-		<guise:resources rdf:resource="sunflower.resources.rdf"/>
-	</guise:Theme>
+		<theme:resources rdf:resource="sunflower.resources.rdf"/>
+	</theme:Theme>
 </rdf:RDF>

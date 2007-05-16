@@ -23,7 +23,7 @@ public interface ResourceWriteDestination extends Destination
 	@param session The current Guise Session. 
 	@param navigationPath The navigation path relative to the application context path.
 	@param bookmark The bookmark for this navigation path, or <code>null</code> if there is no bookmark involved in navigation.
-	@param referrerURI The URI of the referring componentel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
+	@param referrerURI The URI of the referring component or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
 	@return An output stream to the given resource.
 	@exception NullPointerException if the given navigation path is <code>null</code>.
 	@exception ResourceIOException Thrown if there is an error writing to the resource.

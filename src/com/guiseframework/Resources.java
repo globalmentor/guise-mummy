@@ -8,7 +8,6 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.text.TextUtilities.*;
-import static com.guiseframework.Guise.*;
 
 /**Guise resources description in RDF.
 This implementation considers property value resources with reference URIs to establish resource properties of type URI, using the resource's reference URI as the value.
@@ -22,7 +21,7 @@ public class Resources extends ClassTypedRDFResource
 	/**The URI to the resource key ontology namespace.*/
 	public final static URI RESOURCE_NAMESPACE_URI=URI.create("http://guiseframework.com/namespaces/resource#");
 
-	/**The prefix character used to introduce string value refrences.*/
+	/**The prefix character used to introduce string value references.*/
 	public final static char STRING_VALUE_REFERENCE_PREFIX_CHAR='=';
 
 		//standard labels
@@ -43,11 +42,11 @@ public class Resources extends ClassTypedRDFResource
 	*/
 	public Resources(final URI referenceURI)
 	{
-		super(referenceURI, GUISE_NAMESPACE_URI);  //construct the parent class
+		super(referenceURI, RESOURCE_NAMESPACE_URI);  //construct the parent class
 	}
 
 	/**Creates a string containing a reference to the given string resource key.
-	The string sresource reference is a control string according to ECMA-48, "Control Functions for Coded Character Sets", Section 5.6, "Control strings".
+	The string resource reference is a control string according to ECMA-48, "Control Functions for Coded Character Sets", Section 5.6, "Control strings".
 	A control string begins with the Start of String control character (U+0098) and ends with a String Terminator control character (U+009C).
 	ECMA-48 publication is also approved as ISO/IEC 6429.
 	@param resourceKey The resource key to a string in the resources which could be retrieved using {@link GuiseSession#getStringResource(String)}.

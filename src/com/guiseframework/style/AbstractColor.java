@@ -13,6 +13,9 @@ public abstract class AbstractColor<C extends Enum<?>> implements Color<C>
 	/**The color component values.*/
 	private final float[] values;
 
+		/**@return The color component values.*/
+		public float[] getValues() {return values.clone();}
+	
 	/**The precalculated hash code of the color.*/
 	private final int hashCode;
 

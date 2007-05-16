@@ -2809,7 +2809,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof GUISE_AJAX_ENABLED
 		/**The set of class names that should not be removed when synchronizing.*/
 		GuiseAJAX.prototype.NON_REMOVABLE_CLASS_SET=
 		{
-			"jsRollover":true	//don't remove JavaScript-controlled clases
+			"jsRollover":true	//don't remove JavaScript-controlled classes
 		};
 
 		var nonRemovableClassArray=new Array();	//create a new array to hold the non-removable classes

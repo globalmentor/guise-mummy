@@ -482,7 +482,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 */
 		
 		/**Sets whether the state of the component and all child components represents valid user input
-		This is a bound property of type <code>Boolean</code>.
+		This is a bound property of type {@link Boolean}.
 		This implementation initializes the valid property if needed.
 		@param newValid <code>true</code> if user input of this component and all child components should be considered valid
 		@see #VALID_PROPERTY
@@ -749,7 +749,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		public boolean isVisible() {return visible;}
 
 		/**Sets whether the component is visible.
-		This is a bound property of type <code>Boolean</code>.
+		This is a bound property of type {@link Boolean}.
 		@param newVisible <code>true</code> if the component should be visible, else <code>false</code>.
 		@see Component#VISIBLE_PROPERTY
 		@see #setDisplayed(boolean)
@@ -773,7 +773,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		public boolean isDisplayed() {return displayed;}
 
 		/**Sets whether the component is displayed or has no representation, taking up no space.
-		This is a bound property of type <code>Boolean</code>.
+		This is a bound property of type {@link Boolean}.
 		@param newDisplayed <code>true</code> if the component should be displayed, else <code>false</code> if the component should take up no space.
 		@see #DISPLAYED_PROPERTY
 		@see #setVisible(boolean)
@@ -795,7 +795,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		public boolean isDragEnabled() {return dragEnabled;}
 
 		/**Sets whether the component has dragging enabled.
-		This is a bound property of type <code>Boolean</code>.
+		This is a bound property of type {@link Boolean}.
 		@param newDragEnabled <code>true</code> if the component should allow dragging, else <code>false</code>.
 		@see Component#DRAG_ENABLED_PROPERTY
 		*/
@@ -816,7 +816,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		public boolean isDropEnabled() {return dropEnabled;}
 
 		/**Sets whether the component has dropping enabled.
-		This is a bound property of type <code>Boolean</code>.
+		This is a bound property of type {@link Boolean}.
 		@param newDropEnabled <code>true</code> if the component should allow dropping, else <code>false</code>.
 		@see Component#DROP_ENABLED_PROPERTY
 		*/
@@ -842,7 +842,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		/**Sets whether flyovers are enabled for this component.
 		Flyovers contain information from the component model's "description" property.
 		This implementation adds or removes a default flyover strategy if one is not already installed.
-		This is a bound property of type <code>Boolean</code>.
+		This is a bound property of type {@link Boolean}.
 		@param newFlyoverEnabled <code>true</code> if the component should display flyovers, else <code>false</code>.
 		@see #getDescription()
 		@see Component#FLYOVER_ENABLED_PROPERTY
@@ -918,7 +918,7 @@ Debug.trace("now valid of", this, "is", isValid());
 
 		/**Sets whether tooltips are enabled for this component.
 		Tooltips contain information from the component model's "info" property.
-		This is a bound property of type <code>Boolean</code>.
+		This is a bound property of type {@link Boolean}.
 		@param newTooltipEnabled <code>true</code> if the component should display tooltips, else <code>false</code>.
 		@see #getInfo()
 		@see Component#TOOLTIP_ENABLED_PROPERTY
@@ -933,11 +933,32 @@ Debug.trace("now valid of", this, "is", isValid());
 			}
 		}
 
+	/**Whether a theme has been applied to this component.*/
+	private boolean themeApplied=false;
+
+		/**@return Whether a theme has been applied to this component.*/
+		public boolean isThemeApplied() {return themeApplied;}
+
+		/**Sets whether a theme has been applied to this component.
+		This is a bound property of type {@link Boolean}.
+		@param newThemeApplied <code>true</code> if a theme has been applied to this component, else <code>false</code>.
+		@see #THEME_APPLIED_PROPERTY
+		*/
+		public void setThemeApplied(final boolean newThemeApplied)
+		{
+			if(themeApplied!=newThemeApplied)	//if the value is really changing
+			{
+				final boolean oldThemed=themeApplied;	//get the current value
+				themeApplied=newThemeApplied;	//update the value
+				firePropertyChange(THEME_APPLIED_PROPERTY, Boolean.valueOf(oldThemed), Boolean.valueOf(newThemeApplied));
+			}
+		}
+
 	/**The list of installed export strategies, from most recently added to earliest added.*/
 	private List<ExportStrategy<? super C>> exportStrategyList=new CopyOnWriteArrayList<ExportStrategy<? super C>>();
 
 		/**Adds an export strategy to the component.
-		The export strategy will take prececence over any compatible export strategy previously added.
+		The export strategy will take precedence over any compatible export strategy previously added.
 		@param exportStrategy The export strategy to add.
 		*/
 		public void addExportStrategy(final ExportStrategy<? super C> exportStrategy) {exportStrategyList.add(0, exportStrategy);}	//add the export strategy to the beginning of the list

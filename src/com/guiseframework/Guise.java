@@ -36,9 +36,9 @@ public final class Guise
 		//Guise ontology
 	
 	/**The recommended prefix to the Guise ontology namespace.*/
-	public final static String GUISE_NAMESPACE_PREFIX="guise";
+//TODO del if not needed	public final static String GUISE_NAMESPACE_PREFIX="guise";
 	/**The URI to the Guise ontology namespace.*/
-	public final static URI GUISE_NAMESPACE_URI=URI.create("http://guiseframework.com/namespaces/guise#");
+//TODO del if not needed	public final static URI GUISE_NAMESPACE_URI=URI.create("http://guiseframework.com/namespaces/guise#");
 
 	/**The singleton instance of Guise.*/
 	private static Guise instance=null;

@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rdf:RDF
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-	xmlns:guise="http://guiseframework.com/namespaces/guise#"
-	xmlns:resources="http://guiseframework.com/namespaces/resource#"
+	xmlns:resource="http://guiseframework.com/namespaces/resource#"
 >
-	<guise:Resources>
-	</guise:Resources>
+	<resource:Resources>
+	</resource:Resources>
 </rdf:RDF>

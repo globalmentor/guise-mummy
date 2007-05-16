@@ -13,10 +13,10 @@ import com.garretwilson.net.ResourceIOException;
 public interface Destination extends PropertyBindable
 {
 
-	/**@return The appplication context-relative path within the Guise container context, which does not begin with '/', or <code>null</code> if there is no path specified for this destination.*/
+	/**@return The application context-relative path within the Guise container context, which does not begin with '/', or <code>null</code> if there is no path specified for this destination.*/
 	public String getPath();
 
-	/**@return The pattern to match an appplication context-relative path within the Guise container context, which does not begin with '/', or <code>null</code> if there is no path pattern specified for this destination.*/
+	/**@return The pattern to match an application context-relative path within the Guise container context, which does not begin with '/', or <code>null</code> if there is no path pattern specified for this destination.*/
 	public Pattern getPathPattern();
 
 	/**The read-only iterable of categories.*/

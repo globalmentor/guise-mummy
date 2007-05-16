@@ -13,14 +13,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.garretwilson.io.IO;
 import com.garretwilson.net.http.HTTPNotFoundException;
 import com.garretwilson.net.http.HTTPResource;
+import com.garretwilson.rdf.RDFUtilities;
 import com.garretwilson.rdf.TypedRDFResourceIO;
-import com.guiseframework.theme.Theme;
+import com.garretwilson.util.Debug;
 
-import static com.garretwilson.io.FileUtilities.ensureDirectoryExists;
+import static com.garretwilson.io.FileUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.lang.ThreadUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
-import static com.guiseframework.Guise.*;
+
+import com.guiseframework.theme.Theme;
+import static com.guiseframework.theme.Theme.*;
 
 /**An abstract base class for a Guise instance.
 This implementation only works with Guise applications that descend from {@link AbstractGuiseApplication}.
@@ -48,7 +51,7 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 		public String getBasePath() {return basePath;}
 
 	/**I/O for loading themes.*/
-	private final static IO<Theme> themeIO=new TypedRDFResourceIO<Theme>(Theme.class, GUISE_NAMESPACE_URI);	//create I/O for loading the theme
+	private final static IO<Theme> themeIO=new TypedRDFResourceIO<Theme>(Theme.class, THEME_NAMESPACE_URI);	//create I/O for loading the theme
 
 		/**@return I/O for loading themes.*/
 		protected static IO<Theme> getThemeIO() {return themeIO;}
@@ -154,11 +157,15 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 			applicationMap.put(basePath, application);	//install the application in the map
 		}
 
-		final URI defaultThemeURI=URI.create(application.getBasePath()+GuiseApplication.GUISE_THEME_PATH);	//determine the application-relative URI of the default theme TODO remove web platform dependency
-		
+		final URI defaultThemeURI=URI.create(application.getBasePath()+GuiseApplication.GUISE_THEME_PATH);	//determine the application-relative URI of the default theme
 			//load the theme; this is done now instead of when the application was initialized because only now does the application know its base path
 		final Theme oldTheme=application.getTheme();	//get the theme, if any
-		final URI oldThemeURI=oldTheme!=null ? oldTheme.getReferenceURI() : defaultThemeURI;	//get the old theme URI; if no theme is specified, use the the defaul theme
+		final URI oldThemeURI=oldTheme!=null ? oldTheme.getReferenceURI() : defaultThemeURI;	//get the old theme URI; if no theme is specified, use the the default theme
+		if(oldThemeURI==null)	//if no URI was specified in whatever theme was specified originally TODO improve this---what if the theme was specified in-line? what about parent themes?
+		{
+			throw new IllegalStateException("Theme specified no URI.");
+		}
+		
 //TODO del		final URI themeURI=application.getContainer().getBaseURI().resolve(application.resolveURI(oldThemeURI));	//resolve the theme URI against the Guise application and then against the container base URI TODO create a common method to do this
 //TODO fix		try	//try to load the new theme
 		{
@@ -182,6 +189,7 @@ Debug.error("error; ready to uninstall application", ioException);
 	@param themeURI The URI of the theme to load.
 	@param defaultThemeURI The URI of the Guise default theme.
 	@return A theme with resolving parents loaded.
+	@exception NullPointerException if the given theme URI and/or default theme URI is <code>null</code>.
 	@throws IOException if there is an error loading the theme or one of its parents.
 	*/
 	protected Theme loadApplicationTheme(final GuiseApplication application, final URI themeURI, final URI defaultThemeURI) throws IOException
@@ -198,10 +206,18 @@ Debug.error("error; ready to uninstall application", ioException);
 				//TODO check for a specified parent theme
 			final URI absoluteThemeURI=getBaseURI().resolve(application.resolveURI(themeURI));	//resolve the theme URI against the Guise application and then against the container base URI TODO create a common method to do this
 			final URI absoluteDefaultThemeURI=getBaseURI().resolve(application.resolveURI(defaultThemeURI));	//resolve the default theme URI against the Guise application and then against the container base URI TODO create a common method to do this
-			if(!absoluteThemeURI.equals(absoluteDefaultThemeURI))	//if this is not the default theme, load the default theme
+			if(!absoluteThemeURI.equals(absoluteDefaultThemeURI))	//if this is not the default theme, load the default theme and set it as parent
 			{
-				final Theme parentTheme=loadApplicationTheme(application, defaultThemeURI, defaultThemeURI);	//load the parent theme
-				theme.setParent(parentTheme);	//set the parent theme
+				final Theme parentTheme=loadApplicationTheme(application, defaultThemeURI, defaultThemeURI);	//load the default theme
+				theme.setParent(parentTheme);	//set the default theme as the parent theme
+			}
+			try
+			{
+				theme.updateRules();	//update the theme rules
+			}
+			catch(final ClassNotFoundException classNotFoundException)	//if a class specified by a rule selector cannot be found
+			{
+				throw (IOException)new IOException(classNotFoundException.getMessage()).initCause(classNotFoundException);
 			}
 			return theme;	//return the theme
 		}

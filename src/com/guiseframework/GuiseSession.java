@@ -171,12 +171,19 @@ public interface GuiseSession extends PropertyBindable
 
 	/**Retrieves a resource bundle to be used by this session.
 	One of the <code>getXXXResource()</code> should be used in preference to using this method directly.
-	If this session does not yet have a resource bundle, one will be created based upon the current locale.
+	If this session does not yet have a resource bundle, one will be created based upon the current theme and locale.
 	The returned resource bundle should only be used temporarily and should not be saved,
 	as the resource bundle may change if the session locale or the application resource bundle base name changes.
+	The resource bundle retrieved will allow hierarchical resolution in the following priority:
+	<ol>
+		<li>Any resource defined by the application.</li>
+		<li>Any resource defined by the theme.</li>
+		<li>Any resource defined by default by Guise.</li>
+	</ol>
 	@return The resource bundle containing the resources for this session, based upon the locale.
 	@exception MissingResourceException if no resource bundle for the application's specified base name can be found.
-	@see GuiseApplication#getResourceBundleBaseName()
+	@see GuiseApplication#getResourceBundle(Theme, Locale)
+	@see #getTheme()
 	@see #getLocale()
 	@see #getStringResource(String)
 	@see #getStringResource(String, String)
@@ -358,6 +365,17 @@ public interface GuiseSession extends PropertyBindable
 	@see #PRINCIPAL_PROPERTY
 	*/
 	public void setPrincipal(final Principal newPrincipal);
+
+	/**@return The current session theme.*/
+	public Theme getTheme();
+
+	/**Sets the current session theme.
+	This is a bound property.
+	@param newTheme The new session theme.
+	@exception NullPointerException if the given theme is <code>null</code>.
+	@see #THEME_PROPERTY
+	*/
+	public void setTheme(final Theme newTheme);
 
 	/**@return The action prototype for presenting application information.*/
 	public ActionPrototype getAboutApplicationActionPrototype();

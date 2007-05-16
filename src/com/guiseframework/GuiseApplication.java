@@ -33,6 +33,8 @@ public interface GuiseApplication extends PropertyBindable
 	public final static String STYLE_PROPERTY=getPropertyName(GuiseApplication.class, "style");
 	/**The theme bound property.*/
 	public final static String THEME_PROPERTY=getPropertyName(GuiseApplication.class, "theme");
+	/**The bound property of whether this application applies themes.*/
+	public final static String THEMED_PROPERTY=getPropertyName(GuiseApplication.class, "themed");
 
 	/**The application-relative base path reserved for exclusive Guise use.*/
 	public final static String GUISE_RESERVED_BASE_PATH="~guise/";
@@ -98,6 +100,16 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public void setEnvironment(final GuiseEnvironment newEnvironment);
 
+	/**@return Whether the application applies themes.*/
+	public boolean isThemed();
+
+	/**Sets whether the application applies themes.
+	This is a bound property of type <code>Boolean</code>.
+	@param newThemed <code>true</code> if the application should apply themes, else <code>false</code>.
+	@see #THEMED_PROPERTY
+	*/
+	public void setThemed(final boolean newThemed);
+
 	/**@return The absolute or application-relative URI of the application style, or <code>null</code> if the default style should be used.*/
 	public URI getStyle();
 
@@ -108,12 +120,13 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public void setStyle(final URI newStyle);
 
-	/**@return The application theme.*/
+	/**@return The application theme, or <code>null</code> if the application has not yet been installed and no specific theme was indicated..*/
 	public Theme getTheme();
 
 	/**Sets the theme of the application.
 	This is a bound property.
 	@param newTheme The new application theme.
+	@exception NullPointerException if the given theme is <code>null</code>.
 	@see #THEME_PROPERTY
 	*/
 	public void setTheme(final Theme newTheme);
@@ -459,7 +472,7 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public URL getTempPublicResourceURL(final String path, final GuiseSession guiseSession) throws IOException;
 
-	/**Retrieves a resource bundle for the given locale.
+	/**Retrieves a resource bundle for the given theme in the given locale.
 	The resource bundle retrieved will allow hierarchical resolution in the following priority:
 	<ol>
 		<li>Any resource defined by the application.</li>
@@ -467,11 +480,12 @@ public interface GuiseApplication extends PropertyBindable
 		<li>Any resource defined by a parent theme, including the default theme.</li>
 		<li>Any resource defined by default by Guise.</li>
 	</ol>
+	@param theme The current theme in effect.
 	@param locale The locale for which resources should be retrieved.
 	@return A resolving resource bundle based upon the locale.
 	@exception MissingResourceException if a resource bundle could not be loaded.
 	@see #getResourceBundleBaseName()
 	*/
-	public ResourceBundle getResourceBundle(final Locale locale);
+	public ResourceBundle getResourceBundle(final Theme theme, final Locale locale);
 
 }

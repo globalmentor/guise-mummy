@@ -12,7 +12,6 @@ import java.util.concurrent.*;
 
 import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.io.*;
-import static com.garretwilson.io.FileConstants.*;
 import com.garretwilson.lang.ObjectUtilities;
 import static com.garretwilson.lang.ThreadUtilities.*;
 import com.garretwilson.net.URIUtilities;
@@ -30,6 +29,7 @@ import static com.guiseframework.Guise.*;
 import static com.guiseframework.GuiseResourceConstants.*;
 
 import com.guiseframework.component.*;
+import static com.guiseframework.Resources.*;
 import com.guiseframework.component.kit.ComponentKit;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.controller.*;
@@ -44,7 +44,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 {
 
 	/**I/O for loading resources.*/
-	private final static IO<Resources> resourcesIO=new TypedRDFResourceIO<Resources>(Resources.class, GUISE_NAMESPACE_URI);
+	private final static IO<Resources> resourcesIO=new TypedRDFResourceIO<Resources>(Resources.class, RESOURCE_NAMESPACE_URI);
 
 		/**@return I/O for loading resources.*/
 		protected static IO<Resources> getResourcesIO() {return resourcesIO;}
@@ -77,7 +77,28 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 				firePropertyChange(ENVIRONMENT_PROPERTY, oldEnvironment, newEnvironment);	//indicate that the value changed
 			}
 		}
-		
+
+	/**Whether the application applies themes.*/
+	private boolean themed=true;
+
+		/**@return Whether the application applies themes.*/
+		public boolean isThemed() {return themed;}
+
+		/**Sets whether the application applies themes.
+		This is a bound property of type <code>Boolean</code>.
+		@param newThemed <code>true</code> if the application should apply themes, else <code>false</code>.
+		@see #THEMED_PROPERTY
+		*/
+		public void setThemed(final boolean newThemed)
+		{
+			if(themed!=newThemed)	//if the value is really changing
+			{
+				final boolean oldThemed=themed;	//get the current value
+				themed=newThemed;	//update the value
+				firePropertyChange(THEMED_PROPERTY, Boolean.valueOf(oldThemed), Boolean.valueOf(newThemed));
+			}
+		}
+
 	/**Creates a new session for the application.
  	This version creates and returns a default session.
 	@return A new session for the application
@@ -484,15 +505,16 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			}
 		}
 
-	/**The application theme.*/
+	/**The application theme, or <code>null</code> if the application has not yet been installed and no specific theme was indicated.*/
 	private Theme theme;
 
-		/**@return The application theme.*/
+		/**@return The application theme, or <code>null</code> if the application has not yet been installed and no specific theme was indicated..*/
 		public Theme getTheme() {return theme;}
 
 		/**Sets the theme of the application.
 		This is a bound property.
 		@param newTheme The new application theme.
+		@exception NullPointerException if the given theme is <code>null</code>.
 		@see #THEME_PROPERTY
 		*/
 		public void setTheme(final Theme newTheme)
@@ -500,7 +522,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			if(!ObjectUtilities.equals(theme, newTheme))	//if the value is really changing
 			{
 				final Theme oldTheme=theme;	//get the old value
-				theme=newTheme;	//actually change the value
+				theme=checkInstance(newTheme, "Theme cannot be null.");	//actually change the value
 				firePropertyChange(THEME_PROPERTY, oldTheme, newTheme);	//indicate that the value changed
 			}
 		}
@@ -1248,7 +1270,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		return null;	//indicate we couldn't find a public temporary resource at the given path
 	}
 
-	/**Retrieves a resource bundle for the given locale.
+	/**Retrieves a resource bundle for the given theme in the given locale.
 	The resource bundle retrieved will allow hierarchical resolution in the following priority:
 	<ol>
 		<li>Any resource defined by the application.</li>
@@ -1256,28 +1278,25 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		<li>Any resource defined by a parent theme, including the default theme.</li>
 		<li>Any resource defined by default by Guise.</li>
 	</ol>
+	@param theme The current theme in effect.
 	@param locale The locale for which resources should be retrieved.
 	@return A resolving resource bundle based upon the locale.
 	@exception MissingResourceException if a resource bundle could not be loaded.
 	@see #getResourceBundleBaseName()
 	*/
-	public ResourceBundle getResourceBundle(final Locale locale)
+	public ResourceBundle getResourceBundle(final Theme theme, final Locale locale)
 	{
 		final ClassLoader loader=getClass().getClassLoader();	//get our class loader
 			//default resources
 		ResourceBundle resourceBundle=ResourceBundleUtilities.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null, resourcesIO, Resources.RESOURCE_NAMESPACE_URI);	//load the default resource bundle
 			//theme resources
-		final Theme theme=getTheme();	//get the theme, if any
-		if(theme!=null)	//if there is a theme
+		try
 		{
-			try
-			{
-				resourceBundle=getResourceBundle(theme, locale, resourceBundle);	//load any resources for this theme and resolving parents
-			}
-			catch(final IOException ioException)	//if there is an I/O error, convert it to a missing resource exception
-			{
-				throw (MissingResourceException)new MissingResourceException(ioException.getMessage(), null, null).initCause(ioException);	//TODO check to see if null is OK for arguments here
-			}
+			resourceBundle=getResourceBundle(theme, locale, resourceBundle);	//load any resources for this theme and resolving parents
+		}
+		catch(final IOException ioException)	//if there is an I/O error, convert it to a missing resource exception
+		{
+			throw (MissingResourceException)new MissingResourceException(ioException.getMessage(), null, null).initCause(ioException);	//TODO check to see if null is OK for arguments here
 		}
 			//application resources
 		final String resourceBundleBaseName=getResourceBundleBaseName();	//get the specified resource bundle base name

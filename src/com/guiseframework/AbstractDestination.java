@@ -34,20 +34,20 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 			this.categories=unmodifiableList(new ArrayList<Category>(categories));	//create a copy of the list and save the list
 		}
 
-	/**The appplication context-relative path within the Guise container context, which does not begin with '/', or <code>null</code> if there is no path specified for this destination.*/
+	/**The application context-relative path within the Guise container context, which does not begin with '/', or <code>null</code> if there is no path specified for this destination.*/
 	private final String path;
 
-		/**@return The appplication context-relative path within the Guise container context, which does not begin with '/', or <code>null</code> if there is no path specified for this destination.*/
+		/**@return The application context-relative path within the Guise container context, which does not begin with '/', or <code>null</code> if there is no path specified for this destination.*/
 		public String getPath() {return path;}
 
-	/**The pattern to match an appplication context-relative path within the Guise container context, which does not begin with '/', or <code>null</code> if there is no path pattern specified for this destination.*/
+	/**The pattern to match an application context-relative path within the Guise container context, which does not begin with '/', or <code>null</code> if there is no path pattern specified for this destination.*/
 	private final Pattern pathPattern;
 
-		/**@return The pattern to match an appplication context-relative path within the Guise container context, which does not begin with '/', or <code>null</code> if there is no path pattern specified for this destination.*/
+		/**@return The pattern to match an application context-relative path within the Guise container context, which does not begin with '/', or <code>null</code> if there is no path pattern specified for this destination.*/
 		public Pattern getPathPattern() {return pathPattern;}
 
 	/**Path constructor.
-	@param path The appplication context-relative path within the Guise container context, which does not begin with '/'.
+	@param path The application context-relative path within the Guise container context, which does not begin with '/'.
 	@exception NullPointerException if the path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
@@ -62,7 +62,7 @@ public abstract class AbstractDestination extends BoundPropertyObject implements
 	}
 
 	/**Path pattern constructor.
-	@param pathPattern The pattern to match an appplication context-relative path within the Guise container context, which does not begin with '/'.
+	@param pathPattern The pattern to match an application context-relative path within the Guise container context, which does not begin with '/'.
 	@exception NullPointerException if the path pattern is <code>null</code>.
 	*/
 	public AbstractDestination(final Pattern pathPattern)

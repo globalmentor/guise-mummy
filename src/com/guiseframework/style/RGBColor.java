@@ -26,6 +26,24 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 	/**A color component of sRGB.*/
 	public enum Component{ALPHA, RED, GREEN, BLUE;}
 
+	/**Creates an RGB color from the specified string representation.
+	This representation can be in one of the following forms:
+	<ul>
+		<li><code><var>colorname</var></code>, one of the {@link <a href="http://www.w3schools.com/html/html_colornames.asp">HTML color names</a>}, which must be in all lowercase without delimiters, such as "aliceblue".</li>
+		<li><code>#<var>rgb</var></code>, with hexadecimal representation of color components without regard to case.</li>
+		<li><code>#<var>rrggbb</var></code>, with hexadecimal representation of color components without regard to case.</li>
+	</ul>
+	This method also recognizes the <code>transparent</code> color name as equivalent to rgba(0, 0, 0, 0), or black with zero alpha.
+	In most instances, the {@link #valueOf(CharSequence)} static method is preferred for string-based construction, as it allows singleton instances of named RGB colors to be used.
+	@param charSequence The character sequence representation of a color, either a lowercase name of a standard HTML color, or a three or six-digit hex code beginning with '#'. 
+	@exception NullPointerException if the given string is <code>null</code>.
+	@exception IllegalArgumentException if a color cannot be determined from the given string. 
+	*/
+	public RGBColor(final CharSequence charSequence)	//TODO probably change back to a String constructor
+	{
+		super(valueOf(charSequence).getValues());	//create a new color and construct this class from the color values of that color TODO create another static function that obviates the need to construct another RGBColor if the values can be determined
+	}
+
 	/**Creates an opaque sRGB color from the specified sRGB color value.
 	Any alpha present is ignored and replaced with alpha of 0xFF.
 	@param rgb The color value composed of 8 bits each of red, green, and blue.
@@ -90,10 +108,22 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 		super(alpha, red, green, blue);	//construct the parent class
 	}
 
+	/**@return The red component value.*/
+	public float getRed()
+	{
+		return getComponent(Component.RED);	//return red component
+	}
+
 	/**@return The absolute red value at a depth of 8 bits.*/
 	public int getAbsoluteRed()
 	{
 		return getAbsoluteComponent(Component.RED, 8);	//return the absolute red component at 8 bits
+	}
+
+	/**@return The green component value.*/
+	public float getGreen()
+	{
+		return getComponent(Component.GREEN);	//return the green component
 	}
 
 	/**@return The absolute green value at a depth of 8 bits.*/
@@ -102,10 +132,22 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 		return getAbsoluteComponent(Component.GREEN, 8);	//return the absolute green component at 8 bits
 	}
 
+	/**@return The blue component value.*/
+	public float getBlue()
+	{
+		return getComponent(Component.BLUE);	//return the blue component
+	}
+
 	/**@return The absolute blue value at a depth of 8 bits.*/
 	public int getAbsoluteBlue()
 	{
 		return getAbsoluteComponent(Component.BLUE, 8);	//return the absolute blue component at 8 bits
+	}
+
+	/**@return The alpha component value.*/
+	public float getAlpha()
+	{
+		return getComponent(Component.ALPHA);	//return the alpha component
 	}
 
 	/**@return The absolute alpha value at a depth of 8 bits.*/
@@ -160,6 +202,7 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 		}
 		throw new ArgumentSyntaxException("Character sequence "+charSequence+" does not represent a color.");
 	}
+
 
 	public final static RGBColor TRANSPARENT=new RGBColor(0x00000000, true);
 

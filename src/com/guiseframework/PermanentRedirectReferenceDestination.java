@@ -9,7 +9,7 @@ public class PermanentRedirectReferenceDestination extends AbstractReferenceDest
 {
 
 	/**Path and referenced destination constructor.
-	@param path The appplication context-relative path within the Guise container context, which does not begin with '/'.
+	@param path The application context-relative path within the Guise container context, which does not begin with '/'.
 	@param destination The referenced destination.
 	@exception NullPointerException if the path and/or destination is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
@@ -20,7 +20,7 @@ public class PermanentRedirectReferenceDestination extends AbstractReferenceDest
 	}
 
 	/**Path pattern and referenced destination constructor.
-	@param pathPattern The pattern to match an appplication context-relative path within the Guise container context, which does not begin with '/'.
+	@param pathPattern The pattern to match an application context-relative path within the Guise container context, which does not begin with '/'.
 	@param destination The referenced destination.
 	@exception NullPointerException if the path pattern and/or destination is <code>null</code>.
 	*/

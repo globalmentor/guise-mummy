@@ -9,7 +9,7 @@ import com.garretwilson.rdf.RDFResource;
 /**A navigation point that retrieves a resource description and/or contents.
 @author Garret Wilson
 */
-public interface ResourceDestination extends Destination
+public interface ResourceReadDestination extends Destination
 {
 
 	/**Returns a description of the resource.

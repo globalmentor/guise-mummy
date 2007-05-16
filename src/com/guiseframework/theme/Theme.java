@@ -1,14 +1,22 @@
 package com.guiseframework.theme;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
-import java.util.Locale;
+import java.util.*;
+import static java.util.Collections.*;
 
 import com.garretwilson.rdf.*;
+import com.garretwilson.rdf.ploop.PLOOPProcessor;
+import com.garretwilson.util.*;
+
+import com.guiseframework.component.Component;
+import com.guiseframework.component.CompositeComponent;
 import com.guiseframework.style.*;
 
+import static com.garretwilson.lang.ClassUtilities.*;
+import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.rdf.RDFUtilities.*;
 import static com.garretwilson.rdf.xpackage.XMLOntologyConstants.*;
-import static com.guiseframework.Guise.*;
 import static com.guiseframework.Resources.*;
 
 /**Guise theme specification.
@@ -17,8 +25,30 @@ import static com.guiseframework.Resources.*;
 public class Theme extends ClassTypedRDFResource
 {
 
-	/**The resources property name; the local name of <code>http://guiseframework.com/namespaces/guise#</code>.*/
+	/**The recommended prefix to the theme ontology namespace.*/
+	public final static String THEME_NAMESPACE_PREFIX="theme";
+	/**The URI to the theme ontology namespace.*/
+	public final static URI THEME_NAMESPACE_URI=URI.create("http://guiseframework.com/namespaces/theme#");
+
+		//theme classes
+	/**The rule class name; the local name of <code>theme:Rule</code>.*/
+	public final static String RULE_CLASS_NAME="Rule";
+	/**The selector class name; the local name of <code>theme:Selector</code>.*/
+	public final static String SELECTOR_CLASS_NAME="Selector";
+	/**The template class name; the local name of <code>theme:Template</code>.*/
+	public final static String TEMPLATE_CLASS_NAME="Template";
+
+		//theme properties
+	/**The apply property name; the local name of <code>theme:apply</code>.*/
+	public final static String APPLY_PROPERTY_NAME="apply";
+	/**The class property name; the local name of <code>theme:class</code>.*/
+	public final static String CLASS_PROPERTY_NAME="class";
+	/**The resources property name; the local name of <code>theme:resources</code>.*/
 	public final static String RESOURCES_PROPERTY_NAME="resources";
+	/**The rules property name; the local name of <code>theme:rules</code>.*/
+	public final static String RULES_PROPERTY_NAME="rules";
+	/**The select property name; the local name of <code>theme:select</code>.*/
+	public final static String SELECT_PROPERTY_NAME="select";
 
 	/**The theme parent, or <code>null</code> if there is no resolving parent.*/
 	private Theme parent=null;
@@ -31,6 +61,35 @@ public class Theme extends ClassTypedRDFResource
 		*/
 		public void setParent(final Theme newParent) {parent=newParent;}	//TODO maybe remove and create custom ThemeIO
 
+	/**The map of sets of rules that have selectors selecting classes.*/
+	private final CollectionMap<Class<?>, Rule, Set<Rule>> classRuleMap=new HashSetHashMap<Class<?>, Rule>();	//TODO make this store a sorted set, and use a comparator based on order
+
+	/**Retrieves the set of rules that selects the class of the given component, including parent classes.
+	It is not guaranteed that the component will match all or any of the returned rules; only that the component's class matches the returned rules.
+	@param component The component for which class-selected rules should be returned.
+	@return A set of all rules that reference a class that selects the given component's class.
+	@exception NullPointerException if the given component is <code>null</code>.
+	*/
+	public Set<Rule> getClassRules(final Component<?> component)
+	{
+		final Class<?> componentClass=checkInstance(component, "Component cannot be null").getClass();	//get the component's class
+		Set<Rule> combinedRuleSet=null;	//we'll create the rule set only if needed
+		final Set<Class<?>> ancestorClasses=getAncestorClasses(componentClass, Component.class);	//get the class ancestor hierarchy of this class, up to Component TODO cache these
+		for(final Class<?> ancestorClass:ancestorClasses)	//for each ancestor class
+		{
+			final Set<Rule> ruleSet=classRuleMap.get(ancestorClass);	//try to get a rule for the component's ancestor class
+			if(ruleSet!=null)	//if we found a rule set
+			{
+				if(combinedRuleSet==null)	//if we haven't yet created the combined rule set
+				{
+					combinedRuleSet=new HashSet<Rule>();	//create a new hash set
+				}
+				combinedRuleSet.addAll(ruleSet);	//add all the rules for the ancestor class to the combined rule set
+			}
+		}
+		return combinedRuleSet!=null ? combinedRuleSet : (Set<Rule>)EMPTY_SET;	//return the combined set of rules we've found (Java won't allow emptySet() to be used in this context, but a warning here is better than alternate, less-efficient methods)
+	}
+
 	/**Default constructor.*/
 	public Theme()
 	{
@@ -42,7 +101,7 @@ public class Theme extends ClassTypedRDFResource
 	*/
 	public Theme(final URI referenceURI)
 	{
-		super(referenceURI, GUISE_NAMESPACE_URI);  //construct the parent class
+		super(referenceURI, THEME_NAMESPACE_URI);  //construct the parent class
 	}
 
 	/**Retrieves the URI of resources for the given locale.
@@ -50,8 +109,14 @@ public class Theme extends ClassTypedRDFResource
 	*/
 	public URI getResourcesURI(final Locale locale)
 	{
-		final RDFResource rdfResource=asResource(getPropertyValue(GUISE_NAMESPACE_URI, RESOURCES_PROPERTY_NAME));	//get the resources resource, if any
+		final RDFResource rdfResource=asResource(getPropertyValue(THEME_NAMESPACE_URI, RESOURCES_PROPERTY_NAME));	//get the resources resource, if any
 		return rdfResource!=null ? rdfResource.getReferenceURI() : null;	//return the resources URI TODO search based upon locale
+	}
+
+	/**@return The list of rules, or <code>null</code> if there is no rule list.*/
+	public RDFListResource getRules()
+	{
+		return asListResource(getPropertyValue(THEME_NAMESPACE_URI, RULES_PROPERTY_NAME));	//return the theme:rules list		
 	}
 
 	/**Retrieves an iterable to the XML style resources, represented by <code>x:style</code> properties.
@@ -60,6 +125,106 @@ public class Theme extends ClassTypedRDFResource
 	public Iterable<RDFResource> getStyles()
 	{
 		return getPropertyValues(XML_ONTOLOGY_NAMESPACE_URI, STYLE_PROPERTY_NAME, RDFResource.class); //return an iterable to style properties
+	}
+
+	/**Updates the internal maps of rules.
+	@exception ClassNotFoundException if one of the rules selects a class that cannot be found.
+	@see Selector#getSelectedClass()
+	*/
+	public void updateRules() throws ClassNotFoundException
+	{
+		final RDFListResource ruleList=getRules();	//get the theme:rules list
+		if(ruleList!=null)	//if there is a rule list
+		{
+			for(final RDFResource ruleResource:ruleList)	//for each resource in the list
+			{
+				if(ruleResource instanceof Rule)	//if this is really a rule
+				{
+					final Rule rule=(Rule)ruleResource;	//get the rule
+					final Selector selector=rule.getSelect();	//get what this rule selects
+					if(selector!=null)	//if we have a selector
+					{
+						final Class<?> selectedClass=selector.getSelectedClass();	//get the class selected by the selector
+						if(selectedClass!=null)	//if we have a selected class
+						{
+							classRuleMap.addItem(selectedClass, rule);	//add this rule to our map
+						}
+					}				
+				}
+			}
+		}
+	}
+
+	/**Applies this theme and its parents to the given component and any descendant components that have not yet had a theme applied.
+	Any parent theme is first applied to the component before this theme is applied.
+	Once a theme is applied to a component, it is marked as having a theme applied.
+	@param component The component to which this theme should be applied.
+	@exception NullPointerException if the given component is <code>null</code>.
+	@exception IllegalStateException if a class was specified and the indicated class cannot be found, or if a theme object a Java class the constructor of which throws an exception.
+	@see Component#isThemeApplied()
+	@see Component#setThemeApplied(boolean)
+	*/
+	public void apply(final Component<?> component)
+	{
+		apply(component, new PLOOPProcessor());	//apply the theme to the component using a new PLOOP processor
+	}
+
+	/**Applies this theme and its parents to the given component and any descendant components that have not yet had a theme applied.
+	Any parent theme is first applied to the component before this theme is applied.
+	Once a theme is applied to a component, it is marked as having a theme applied.
+	Providing a PLOOP processor allows consistency of referenced values across rule applications.
+	@param component The component to which this theme should be applied.
+	@exception NullPointerException if the given component is <code>null</code>.
+	@exception IllegalStateException if a class was specified and the indicated class cannot be found, or if a theme object a Java class the constructor of which throws an exception.
+	@see Component#isThemeApplied()
+	@see Component#setThemeApplied(boolean)
+	*/
+	protected void apply(final Component<?> component, final PLOOPProcessor ploopProcessor)
+	{
+		if(!checkInstance(component, "Component cannot be null").isThemeApplied())	//if no theme has yet been applied to this component
+		{
+			applyThemes(component, ploopProcessor);	//apply the theme to just this component
+			component.setThemeApplied(true);	//indicate that a theme has been applied to this component
+		}
+		if(component instanceof CompositeComponent)	//if this is a composite component
+		{
+			for(final Component<?> childComponent:((CompositeComponent<?>)component).getChildren())	//for each child component
+			{
+				apply(childComponent, ploopProcessor);	//apply the theme to this child component
+			}
+		}
+	}
+
+	/**Unconditionally applies this theme and its parents to the given component only.
+	Any parent theme is first applied to the component before this theme is applied.
+	Providing a PLOOP processor allows consistency of referenced values across rule applications.
+	@param component The component to which this theme should be applied.
+	@exception NullPointerException if the given component is <code>null</code>.
+	@exception IllegalStateException if a class was specified and the indicated class cannot be found, or if a theme object a Java class the constructor of which throws an exception.
+	*/
+	protected void applyThemes(final Component<?> component, final PLOOPProcessor ploopProcessor)
+	{
+		try
+		{
+			final Theme parent=getParent();	//get the parent theme
+			if(parent!=null)	//if there is a parent theme
+			{
+				parent.apply(component, ploopProcessor);	//apply the parent theme first
+			}
+			final Set<Rule> componentClassRules=getClassRules(component);	//get all the rules applying to the component class
+			for(final Rule rule:componentClassRules)	//for each rule
+			{
+				rule.apply(component, ploopProcessor);	//apply the rule to the component, if the rule is applicable
+			}
+		}
+		catch(final ClassNotFoundException classNotFoundException)
+		{
+			throw new IllegalStateException(classNotFoundException);
+		}
+		catch(final InvocationTargetException invocationTargetException)
+		{
+			throw new IllegalStateException(invocationTargetException);
+		}
 	}
 
 		//standard colors

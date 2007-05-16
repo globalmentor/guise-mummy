@@ -85,6 +85,8 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public final static String PREFERRED_WIDTH_PROPERTY=getPropertyName(Component.class, "preferredWidth");
 	/**The bound property of the component style ID.*/
 	public final static String STYLE_ID_PROPERTY=getPropertyName(Component.class, "styleID");
+	/**The bound property of whether a theme has been applied to this component.*/
+	public final static String THEME_APPLIED_PROPERTY=getPropertyName(Component.class, "themeApplied");
 	/**The valid bound property.*/
 	public final static String VALID_PROPERTY=getPropertyName(Component.class, "valid");
 	/**The bound property of the view.*/
@@ -351,7 +353,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public boolean isVisible();
 
 	/**Sets whether the component is visible.
-	This is a bound property of type <code>Boolean</code>.
+	This is a bound property of type {@link Boolean}.
 	@param newVisible <code>true</code> if the component should be visible, else <code>false</code>.
 	@see #VISIBLE_PROPERTY
 	@see #setDisplayed(boolean)
@@ -364,7 +366,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public boolean isDisplayed();
 
 	/**Sets whether the component is displayed or has no representation, taking up no space.
-	This is a bound property of type <code>Boolean</code>.
+	This is a bound property of type {@link Boolean}.
 	@param newDisplayed <code>true</code> if the component should be displayed, else <code>false</code> if the component should take up no space.
 	@see #DISPLAYED_PROPERTY
 	@see #setVisible(boolean)
@@ -375,7 +377,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public boolean isDragEnabled();
 
 	/**Sets whether the component has dragging enabled.
-	This is a bound property of type <code>Boolean</code>.
+	This is a bound property of type {@link Boolean}.
 	@param newDragEnabled <code>true</code> if the component should allow dragging, else <code>false</code>.
 	@see #DRAG_ENABLED_PROPERTY
 	*/
@@ -385,7 +387,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public boolean isDropEnabled();
 
 	/**Sets whether the component has dropping enabled.
-	This is a bound property of type <code>Boolean</code>.
+	This is a bound property of type {@link Boolean}.
 	@param newDropEnabled <code>true</code> if the component should allow dropping, else <code>false</code>.
 	@see #DROP_ENABLED_PROPERTY
 	*/
@@ -396,7 +398,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 
 	/**Sets whether flyovers are enabled for this component.
 	Flyovers contain information from the component model's "description" property.
-	This is a bound property of type <code>Boolean</code>.
+	This is a bound property of type {@link Boolean}.
 	@param newFlyoverEnabled <code>true</code> if the component should display flyovers, else <code>false</code>.
 	@see Model#getDescription()
 	@see #FLYOVER_ENABLED_PROPERTY
@@ -408,15 +410,25 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 
 	/**Sets whether tooltips are enabled for this component.
 	Tooltips contain information from the component model's "info" property.
-	This is a bound property of type <code>Boolean</code>.
+	This is a bound property of type {@link Boolean}.
 	@param newTooltipEnabled <code>true</code> if the component should display tooltips, else <code>false</code>.
 	@see Model#getInfo()
 	@see #TOOLTIP_ENABLED_PROPERTY
 	*/
 	public void setTooltipEnabled(final boolean newTooltipEnabled);
 
+	/**@return Whether a theme has been applied to this component.*/
+	public boolean isThemeApplied();
+
+	/**Sets whether a theme has been applied to this component.
+	This is a bound property of type {@link Boolean}.
+	@param newThemeApplied <code>true</code> if a theme has been applied to this component, else <code>false</code>.
+	@see #THEME_APPLIED_PROPERTY
+	*/
+	public void setThemeApplied(final boolean newThemeApplied);
+
 	/**Adds an export strategy to the component.
-	The export strategy will take prececence over any compatible export strategy previously added.
+	The export strategy will take precedence over any compatible export strategy previously added.
 	@param exportStrategy The export strategy to add.
 	*/
 	public void addExportStrategy(final ExportStrategy<? super C> exportStrategy);
