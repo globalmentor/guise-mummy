@@ -35,8 +35,8 @@ public interface GuiseSession extends PropertyBindable
 	public final static String ORIENTATION_PROPERTY=getPropertyName(GuiseSession.class, "orientation");
 	/**The principal (e.g. user) bound property.*/
 	public final static String PRINCIPAL_PROPERTY=getPropertyName(GuiseSession.class, "principal");
-	/**The theme bound property.*/
-	public final static String THEME_PROPERTY=getPropertyName(GuiseSession.class, "theme");
+	/**The theme URI bound property.*/
+	public final static String THEME_URI_PROPERTY=getPropertyName(GuiseSession.class, "themeURI");
 
 	/**@return The Guise application to which this session belongs.*/
 	public GuiseApplication getApplication();
@@ -181,8 +181,8 @@ public interface GuiseSession extends PropertyBindable
 		<li>Any resource defined by default by Guise.</li>
 	</ol>
 	@return The resource bundle containing the resources for this session, based upon the locale.
-	@exception MissingResourceException if no resource bundle for the application's specified base name can be found.
-	@see GuiseApplication#getResourceBundle(Theme, Locale)
+	@exception MissingResourceException if no resource bundle for the application's specified base name can be found or there was an error loading a resource bundle.
+	@see GuiseApplication#loadResourceBundle(Theme, Locale)
 	@see #getTheme()
 	@see #getLocale()
 	@see #getStringResource(String)
@@ -194,7 +194,7 @@ public interface GuiseSession extends PropertyBindable
 	@see #getURIResource(String)
 	@see #getURIResource(String, URI)
 	*/
-	public ResourceBundle getResourceBundle();
+	public ResourceBundle getResourceBundle() throws MissingResourceException;
 
 	/**Retrieves an object resource from the resource bundle.
 	Every resource access method should eventually call this method.
@@ -368,16 +368,26 @@ public interface GuiseSession extends PropertyBindable
 	*/
 	public void setPrincipal(final Principal newPrincipal);
 
-	/**@return The current session theme.*/
-	public Theme getTheme();
-
-	/**Sets the current session theme.
-	This is a bound property.
-	@param newTheme The new session theme.
-	@exception NullPointerException if the given theme is <code>null</code>.
-	@see #THEME_PROPERTY
+	/**Returns the current session theme.
+	If this session's theme has not yet been loaded, this method loads the theme.
+	@return The current session theme.
+	@exception IOException if there is an error loading the theme.
+	@see #getThemeURI()
 	*/
-	public void setTheme(final Theme newTheme);
+	public Theme getTheme() throws IOException;
+
+	/**@return The URI of the session theme, to be resolved against the application base path.*/
+	public URI getThemeURI();
+
+	/**Sets the URI of the session theme.
+	The current theme, if any, will be released and loaded the next time {@link #getTheme()} is called.
+	This is a bound property.
+	@param newThemeURI The URI of the new session theme.
+	@exception NullPointerException if the given theme URI is <code>null</code>.
+	@see #THEME_URI_PROPERTY
+	@see #getTheme()
+	*/
+	public void setThemeURI(final URI newThemeURI);
 
 	/**@return The action prototype for presenting application information.*/
 	public ActionPrototype getAboutApplicationActionPrototype();

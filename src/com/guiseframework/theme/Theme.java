@@ -104,13 +104,13 @@ public class Theme extends ClassTypedRDFResource
 		super(referenceURI, THEME_NAMESPACE_URI);  //construct the parent class
 	}
 
-	/**Retrieves the URI of resources for the given locale.
-	@return The URI to resources for the given locale, or <code>null</code> if no appropriate resources property could be found.
+	/**Retrieves the resources RDF resources in arbitrary order.
+	Each resource may indicate an external set of resources to load by providing a reference URI, as well as contain resource definitions.
+	@return The list of resources that indicate resources locations and/or contain resource definitions.
 	*/
-	public URI getResourcesURI(final Locale locale)
+	public Iterable<RDFObject> getResourcesObjects(final Locale locale)	//TODO use the locale to narrow down the resources
 	{
-		final RDFResource rdfResource=asResource(getPropertyValue(THEME_NAMESPACE_URI, RESOURCES_PROPERTY_NAME));	//get the resources resource, if any
-		return rdfResource!=null ? rdfResource.getReferenceURI() : null;	//return the resources URI TODO search based upon locale
+		return getPropertyValues(THEME_NAMESPACE_URI, RESOURCES_PROPERTY_NAME);	//return all the theme:resource properties
 	}
 
 	/**@return The list of rules, or <code>null</code> if there is no rule list.*/
@@ -133,6 +133,7 @@ public class Theme extends ClassTypedRDFResource
 	*/
 	public void updateRules() throws ClassNotFoundException
 	{
+Debug.trace("updating rules for theme", this);
 		final RDFListResource ruleList=getRules();	//get the theme:rules list
 		if(ruleList!=null)	//if there is a rule list
 		{
@@ -145,6 +146,7 @@ public class Theme extends ClassTypedRDFResource
 					if(selector!=null)	//if we have a selector
 					{
 						final Class<?> selectedClass=selector.getSelectedClass();	//get the class selected by the selector
+Debug.trace("selected class", selectedClass);
 						if(selectedClass!=null)	//if we have a selected class
 						{
 							classRuleMap.addItem(selectedClass, rule);	//add this rule to our map
@@ -209,7 +211,7 @@ public class Theme extends ClassTypedRDFResource
 			final Theme parent=getParent();	//get the parent theme
 			if(parent!=null)	//if there is a parent theme
 			{
-				parent.apply(component, ploopProcessor);	//apply the parent theme first
+				parent.applyThemes(component, ploopProcessor);	//first apply the ancestor hierarchy to this component
 			}
 			final Set<Rule> componentClassRules=getClassRules(component);	//get all the rules applying to the component class
 			for(final Rule rule:componentClassRules)	//for each rule

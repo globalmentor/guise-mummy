@@ -239,8 +239,8 @@ catch(final ConversionException conversionException)
 		inputTextControl.setDescription("This is a description of the first text control.");
 		inputTextControl.setFlyoverEnabled(true);	//turn on flyovers
 
-		inputTextControl.getFlyoverStrategy().setPreferredWidth(new Extent(15, Extent.Unit.EM));
-		inputTextControl.getFlyoverStrategy().setPreferredHeight(new Extent(10, Extent.Unit.EM));
+		inputTextControl.getFlyoverStrategy().setWidth(new Extent(15, Extent.Unit.EM));
+		inputTextControl.getFlyoverStrategy().setHeight(new Extent(10, Extent.Unit.EM));
 		
 //TODO del when works		inputTextControl.addMouseListener(new TextControl.DefaultFlyoverStrategy<TextControl>(inputTextControl));
 
@@ -484,8 +484,8 @@ Debug.trace("list control changed value to", newValue);
 		frameLink.setLabel("Frame");
 		frameLink.setDescription("This is a flyover for the frame link.");
 		frameLink.setFlyoverEnabled(true);	//turn on flyovers
-		frameLink.getFlyoverStrategy().setPreferredWidth(new Extent(15, Extent.Unit.EM));
-		frameLink.getFlyoverStrategy().setPreferredHeight(new Extent(10, Extent.Unit.EM));
+		frameLink.getFlyoverStrategy().setWidth(new Extent(15, Extent.Unit.EM));
+		frameLink.getFlyoverStrategy().setHeight(new Extent(10, Extent.Unit.EM));
 //TODO del		frameLink.getFlyoverStrategy().setOpenEffect(new OpacityFadeEffect(1500));	//TODO testing openEffect
 		frameLink.addActionListener(new ActionListener()
 				{

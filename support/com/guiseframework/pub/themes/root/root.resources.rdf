@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:resource="http://guiseframework.com/namespaces/resource#"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+>
+	<resource:Resources>
+		<dc:description>Root Guise™ theme resources (en).</dc:description>
+		<dc:creator>Garret Wilson</dc:creator>
+
+		<!-- Notification -->
+			<!-- notification severity -->
+		<resource:theme.notification.severity.trace.label>Trace</resource:theme.notification.severity.trace.label>
+		<resource:theme.notification.severity.trace.glyph rdf:resource="resource:theme.glyph.polygon.points"/>
+		<resource:theme.notification.severity.info.label>Info</resource:theme.notification.severity.info.label>
+		<resource:theme.notification.severity.info.glyph rdf:resource="resource:theme.glyph.info"/>
+		<resource:theme.notification.severity.log.label>Log</resource:theme.notification.severity.log.label>
+		<resource:theme.notification.severity.log.glyph rdf:resource="resource:theme.glyph.edit"/>
+		<resource:theme.notification.severity.warn.label>Warn</resource:theme.notification.severity.warn.label>
+		<resource:theme.notification.severity.warn.glyph rdf:resource="resource:theme.glyph.warn"/>
+		<resource:theme.notification.severity.error.label>Error</resource:theme.notification.severity.error.label>
+		<resource:theme.notification.severity.error.glyph rdf:resource="resource:theme.glyph.error"/>
+			<!-- notification option -->
+		<resource:theme.notification.option.ok.label>OK</resource:theme.notification.option.ok.label>
+		<resource:theme.notification.option.ok.glyph rdf:resource="resource:theme.glyph.accept"/>
+		<resource:theme.notification.option.yes.label>Yes</resource:theme.notification.option.yes.label>
+		<resource:theme.notification.option.yes.glyph rdf:resource="resource:theme.glyph.accept"/>
+		<resource:theme.notification.option.yes.all.label>Yes to All</resource:theme.notification.option.yes.all.label>
+		<resource:theme.notification.option.yes.all.glyph rdf:resource="resource:theme.glyph.accept.multiple"/>
+		<resource:theme.notification.option.no.label>No</resource:theme.notification.option.no.label>
+		<resource:theme.notification.option.no.glyph rdf:resource="resource:theme.glyph.reject"/>
+		<resource:theme.notification.option.no.all.label>No to All</resource:theme.notification.option.no.all.label>
+		<resource:theme.notification.option.no.all.glyph rdf:resource="resource:theme.glyph.reject.multiple"/>
+		<resource:theme.notification.option.abort.label>Abort</resource:theme.notification.option.abort.label>
+		<resource:theme.notification.option.abort.glyph rdf:resource="resource:theme.glyph.stop"/>
+		<resource:theme.notification.option.retry.label>Retry</resource:theme.notification.option.retry.label>
+		<resource:theme.notification.option.retry.glyph rdf:resource="resource:theme.glyph.retry"/>
+		<resource:theme.notification.option.fail.label>Fail</resource:theme.notification.option.fail.label>
+		<resource:theme.notification.option.fail.glyph rdf:resource="resource:theme.glyph.reject"/>
+		<resource:theme.notification.option.stop.label>Stop</resource:theme.notification.option.stop.label>
+		<resource:theme.notification.option.stop.glyph rdf:resource="resource:theme.glyph.stop"/>
+		<resource:theme.notification.option.remove.label>Remove</resource:theme.notification.option.remove.label>
+		<resource:theme.notification.option.remove.glyph rdf:resource="resource:theme.glyph.remove"/>
+		<resource:theme.notification.option.cancel.label>Cancel</resource:theme.notification.option.cancel.label>
+		<resource:theme.notification.option.cancel.glyph rdf:resource="resource:theme.glyph.cancel"/>
+
+		<!-- TaskState resources -->
+		<resource:theme.task.state..label>None</resource:theme.task.state..label>
+		<resource:theme.task.state..glyph rdf:resource="resource:theme.glyph.blank"/>	<!-- the glyph for null state -->
+		<resource:theme.task.state.initialize.label>Initialize</resource:theme.task.state.initialize.label>
+		<resource:theme.task.state.initialize.glyph rdf:resource="resource:theme.task.state.incomplete.glyph"/>
+		<resource:theme.task.state.incomplete.label>Incomplete</resource:theme.task.state.incomplete.label>
+		<resource:theme.task.state.incomplete.glyph rdf:resource="resource:theme.glyph.question"/>
+		<resource:theme.task.state.error.label>Error</resource:theme.task.state.error.label>
+		<resource:theme.task.state.error.glyph rdf:resource="resource:theme.glyph.error"/>
+		<resource:theme.task.state.paused.label>Paused</resource:theme.task.state.paused.label>
+		<resource:theme.task.state.paused.glyph rdf:resource="resource:theme.glyph.stop"/>
+		<resource:theme.task.state.stopped.label>Stopped</resource:theme.task.state.stopped.label>
+		<resource:theme.task.state.stopped.glyph rdf:resource="resource:theme.glyph.stop"/>
+		<resource:theme.task.state.canceled.label>Canceled</resource:theme.task.state.canceled.label>
+		<resource:theme.task.state.canceled.glyph rdf:resource="resource:theme.glyph.reject"/>
+		<resource:theme.task.state.complete.label>Complete</resource:theme.task.state.complete.label>
+		<resource:theme.task.state.complete.glyph rdf:resource="resource:theme.glyph.accept"/>
+
+		<!-- components -->
+	
+		<!-- Frame -->
+		<resource:theme.frame.close.icon rdf:resource="images/icons/frame-close.gif"/>
+		<!-- FlyoverFrame -->
+		<resource:theme.flyover.frame.tether.image rdf:resource="images/flyover-frame-tether-SWbW.gif"/>
+		<resource:theme.flyover.frame.tether.image.NEbN rdf:resource="images/flyover-frame-tether-NEbN.gif"/>
+		<resource:theme.flyover.frame.tether.image.NEbE rdf:resource="images/flyover-frame-tether-NEbE.gif"/>
+		<resource:theme.flyover.frame.tether.image.SEbE rdf:resource="images/flyover-frame-tether-SEbE.gif"/>
+		<resource:theme.flyover.frame.tether.image.SEbS rdf:resource="images/flyover-frame-tether-SEbS.gif"/>
+		<resource:theme.flyover.frame.tether.image.SWbS rdf:resource="images/flyover-frame-tether-SWbS.gif"/>
+		<resource:theme.flyover.frame.tether.image.SWbW rdf:resource="images/flyover-frame-tether-SWbW.gif"/>
+		<resource:theme.flyover.frame.tether.image.NWbW rdf:resource="images/flyover-frame-tether-NWbW.gif"/>
+		<resource:theme.flyover.frame.tether.image.NWbN rdf:resource="images/flyover-frame-tether-NWbN.gif"/>
+
+		<!-- SelectActionControl selection glyph icon images -->
+		<resource:theme.select.action.unselected.glyph rdf:resource="resource:theme.glyph.blank"/>
+		<resource:theme.select.action.selected.glyph rdf:resource="images/icons/glyphs/hand_point_right.gif"/>
+		<!-- Slider -->
+		<resource:theme.slider.thumb.image.X rdf:resource="images/slider-thumb-x.gif"/>
+		<resource:theme.slider.thumb.image.Y rdf:resource="images/slider-thumb-y.gif"/>
+		<resource:theme.slider.track.image.X rdf:resource="images/slider-track-x.gif"/>
+		<resource:theme.slider.track.image.Y rdf:resource="images/slider-track-y.gif"/>
+		<!-- TreeNode -->
+		<resource:theme.tree.node.collapsed.image rdf:resource="images/treenode-collapsed.gif"/>
+		<resource:theme.tree.node.expanded.image rdf:resource="images/treenode-expanded.gif"/>
+		<resource:theme.tree.node.leaf.image rdf:resource="images/treenode-leaf.gif"/>
+
+		<!-- standard colors -->
+		<resource:theme.color.main>black</resource:theme.color.main>
+		<resource:theme.color.main1>&#x0098;theme.color.main&#x009C;</resource:theme.color.main1>
+		<resource:theme.color.main2>&#x0098;theme.color.main&#x009C;</resource:theme.color.main2>
+		<resource:theme.color.subordinate>white</resource:theme.color.subordinate>
+		<resource:theme.color.subordinateA>&#x0098;theme.color.subordinate&#x009C;</resource:theme.color.subordinateA>
+		<resource:theme.color.subordinateB>&#x0098;theme.color.subordinate&#x009C;</resource:theme.color.subordinateB>
+		<resource:theme.color.subordinate1A>&#x0098;theme.color.subordinateA&#x009C;</resource:theme.color.subordinate1A>
+		<resource:theme.color.subordinate1B>&#x0098;theme.color.subordinateB&#x009C;</resource:theme.color.subordinate1B>
+		<resource:theme.color.subordinate2A>&#x0098;theme.color.subordinateA&#x009C;</resource:theme.color.subordinate2A>
+		<resource:theme.color.subordinate2B>&#x0098;theme.color.subordinateB&#x009C;</resource:theme.color.subordinate2B>
+		<resource:theme.color.neutralA>&#x0098;theme.color.main&#x009C;</resource:theme.color.neutralA>
+		<resource:theme.color.neutralB>&#x0098;theme.color.subordinate&#x009C;</resource:theme.color.neutralB>
+
+		<resource:theme.color.text>&#x0098;theme.color.neutralA&#x009C;</resource:theme.color.text>
+		<resource:theme.color.background>&#x0098;theme.color.neutralB&#x009C;</resource:theme.color.background>
+
+		<resource:theme.color.selected.background>royalblue</resource:theme.color.selected.background>
+
+		<!-- standard labels -->
+		<resource:theme.label.about>About</resource:theme.label.about>
+		<resource:theme.label.about.x>&#x0098;theme.label.about&#x009C; {0}</resource:theme.label.about.x>
+		<resource:theme.label.authentication>Authentication</resource:theme.label.authentication>
+		<resource:theme.label.accept>Accept</resource:theme.label.accept>
+		<resource:theme.label.access>Access</resource:theme.label.access>
+		<resource:theme.label.add>Add</resource:theme.label.add>
+		<resource:theme.label.cancel>Cancel</resource:theme.label.cancel>
+		<resource:theme.label.delete>Delete</resource:theme.label.delete>
+		<resource:theme.label.delete.x>&#x0098;theme.label.delete&#x009C; {0}</resource:theme.label.delete.x>
+		<resource:theme.label.download>Download</resource:theme.label.download>
+		<resource:theme.label.edit>Edit</resource:theme.label.edit>
+		<resource:theme.label.finish>Finish</resource:theme.label.finish>
+		<resource:theme.label.first>First</resource:theme.label.first>
+		<resource:theme.label.help>Help</resource:theme.label.help>
+		<resource:theme.label.home>Home</resource:theme.label.home>
+		<resource:theme.label.join>Join</resource:theme.label.join>
+		<resource:theme.label.last>Last</resource:theme.label.last>
+		<resource:theme.label.login>Log in</resource:theme.label.login>
+		<resource:theme.label.logout>Log out</resource:theme.label.logout>
+		<resource:theme.label.name>Name</resource:theme.label.name>
+		<resource:theme.label.next>Next</resource:theme.label.next>
+		<resource:theme.label.password>Password</resource:theme.label.password>
+		<resource:theme.label.password.verification>Password Verification</resource:theme.label.password.verification>
+		<resource:theme.label.previous>Previous</resource:theme.label.previous>
+		<resource:theme.label.reject>Reject</resource:theme.label.reject>
+		<resource:theme.label.rename>Rename</resource:theme.label.rename>
+		<resource:theme.label.rename.x>&#x0098;theme.label.rename&#x009C; {0}</resource:theme.label.rename.x>
+		<resource:theme.label.resource>Resource</resource:theme.label.resource>
+		<resource:theme.label.retry>Retry</resource:theme.label.retry>
+		<resource:theme.label.submit>Submit</resource:theme.label.submit>
+		<resource:theme.label.subtract>Subtract</resource:theme.label.subtract>
+		<resource:theme.label.unknown>Unknown</resource:theme.label.unknown>
+		<resource:theme.label.upload>Upload</resource:theme.label.upload>
+		<resource:theme.label.username>Username</resource:theme.label.username>
+		<resource:theme.label.version>Version</resource:theme.label.version>
+
+		<!-- standard glyph icon images -->
+		<resource:theme.glyph.about rdf:resource="resource:theme.glyph.info"/>
+		<resource:theme.glyph.accept rdf:resource="images/icons/glyphs/accept.gif"/>
+		<resource:theme.glyph.accept.multiple rdf:resource="images/icons/glyphs/accept_multiple.gif"/>
+		<resource:theme.glyph.access rdf:resource="resource:theme.glyph.key"/>
+		<resource:theme.glyph.add rdf:resource="images/icons/glyphs/add.gif"/>
+		<resource:theme.glyph.animation rdf:resource="images/icons/glyphs/animation.gif"/>
+		<resource:theme.glyph.blank rdf:resource="images/icons/glyphs/blank.gif"/>
+		<resource:theme.glyph.busy rdf:resource="images/icons/glyphs/busy.gif"/>
+		<resource:theme.glyph.cancel rdf:resource="resource:theme.glyph.reject"/>
+		<resource:theme.glyph.delete rdf:resource="images/icons/glyphs/delete.gif"/>
+		<resource:theme.glyph.document rdf:resource="images/icons/glyphs/document.gif"/>
+		<resource:theme.glyph.document.content rdf:resource="images/icons/glyphs/document_content.gif"/>
+		<resource:theme.glyph.document.new rdf:resource="images/icons/glyphs/document_new.gif"/>
+		<resource:theme.glyph.document.preview rdf:resource="images/icons/glyphs/document_preview.gif"/>
+		<resource:theme.glyph.document.rich.content rdf:resource="images/icons/glyphs/document_rich_content.gif"/>
+		<resource:theme.glyph.document.stack rdf:resource="images/icons/glyphs/document_stack.gif"/>
+		<resource:theme.glyph.download rdf:resource="images/icons/glyphs/download.gif"/>
+		<resource:theme.glyph.edit rdf:resource="images/icons/glyphs/edit.gif"/>
+		<resource:theme.glyph.enter rdf:resource="images/icons/glyphs/enter.gif"/>
+		<resource:theme.glyph.error rdf:resource="resource:theme.glyph.stop"/>
+		<resource:theme.glyph.exit rdf:resource="images/icons/glyphs/exit.gif"/>
+		<resource:theme.glyph.exclamation rdf:resource="images/icons/glyphs/exclamation.gif"/>
+		<resource:theme.glyph.eyeglasses rdf:resource="images/icons/glyphs/eyeglasses.gif"/>
+		<resource:theme.glyph.finish rdf:resource="resource:theme.glyph.submit"/>
+		<resource:theme.glyph.first rdf:resource="images/icons/glyphs/hand_point_left_boundary.gif"/>
+		<resource:theme.glyph.folder rdf:resource="images/icons/glyphs/folder.gif"/>
+		<resource:theme.glyph.folder.closed rdf:resource="resource:theme.glyph.folder"/>
+		<resource:theme.glyph.folder.open rdf:resource="images/icons/glyphs/folder_open.gif"/>
+		<resource:theme.glyph.help rdf:resource="resource:theme.glyph.question"/>
+		<resource:theme.glyph.hide rdf:resource="images/icons/glyphs/hide.gif"/>
+		<resource:theme.glyph.hierarchy rdf:resource="images/icons/glyphs/hierarchy.gif"/>
+		<resource:theme.glyph.home rdf:resource="images/icons/glyphs/home.gif"/>
+		<resource:theme.glyph.join rdf:resource="resource:theme.glyph.add"/>
+		<resource:theme.glyph.image rdf:resource="images/icons/glyphs/image.gif"/>
+		<resource:theme.glyph.info rdf:resource="images/icons/glyphs/info.gif"/>
+		<resource:theme.glyph.insert rdf:resource="images/icons/glyphs/insert.gif"/>
+		<resource:theme.glyph.key rdf:resource="images/icons/glyphs/key.gif"/>
+		<resource:theme.glyph.last rdf:resource="images/icons/glyphs/hand_point_right_boundary.gif"/>
+		<resource:theme.glyph.lock.closed rdf:resource="images/icons/glyphs/lock_closed.gif"/>
+		<resource:theme.glyph.lock.open rdf:resource="images/icons/glyphs/lock_open.gif"/>
+		<resource:theme.glyph.login rdf:resource="resource:theme.glyph.enter"/>
+		<resource:theme.glyph.logout rdf:resource="resource:theme.glyph.exit"/>
+		<resource:theme.glyph.next rdf:resource="images/icons/glyphs/hand_point_right.gif"/>
+		<resource:theme.glyph.password rdf:resource="resource:theme.glyph.key"/>
+		<resource:theme.glyph.polygon.curved rdf:resource="images/icons/glyphs/polygon_curved.gif"/>
+		<resource:theme.glyph.polygon.points rdf:resource="images/icons/glyphs/polygon_points.gif"/>
+		<resource:theme.glyph.previous rdf:resource="images/icons/glyphs/hand_point_left.gif"/>
+		<resource:theme.glyph.question rdf:resource="images/icons/glyphs/question.gif"/>
+		<resource:theme.glyph.redo rdf:resource="images/icons/glyphs/redo.gif"/>
+		<resource:theme.glyph.remove rdf:resource="images/icons/glyphs/remove.gif"/>
+		<resource:theme.glyph.rename rdf:resource="resource:theme.glyph.string.edit"/>
+		<resource:theme.glyph.reject rdf:resource="images/icons/glyphs/reject.gif"/>
+		<resource:theme.glyph.reject.multiple rdf:resource="images/icons/glyphs/reject_multiple.gif"/>
+		<resource:theme.glyph.resource rdf:resource="images/icons/glyphs/resource.gif"/>
+		<resource:theme.glyph.retry rdf:resource="images/icons/glyphs/retry.gif"/>
+		<resource:theme.glyph.stop rdf:resource="images/icons/glyphs/stop.gif"/>
+		<resource:theme.glyph.string.edit rdf:resource="images/icons/glyphs/string_edit.gif"/>
+		<resource:theme.glyph.submit rdf:resource="images/icons/glyphs/submit.gif"/>
+		<resource:theme.glyph.subtract rdf:resource="images/icons/glyphs/subtract.gif"/>
+		<resource:theme.glyph.upload rdf:resource="images/icons/glyphs/upload.gif"/>
+		<resource:theme.glyph.user rdf:resource="images/icons/glyphs/user.gif"/>
+		<resource:theme.glyph.view rdf:resource="resource:theme.glyph.eyeglasses"/>
+		<resource:theme.glyph.warn rdf:resource="resource:theme.glyph.exclamation"/>
+
+		<!-- standard messages -->
+		<resource:theme.message.busy>Please wait...</resource:theme.message.busy>
+		<resource:theme.message.password.invalid>Invalid password.</resource:theme.message.password.invalid>
+		<resource:theme.message.password.unverified>Passwords are different.</resource:theme.message.password.unverified>
+		<resource:theme.message.task.success>Task completed successfully.</resource:theme.message.task.success>
+		<resource:theme.message.user.invalid>Invalid user.</resource:theme.message.user.invalid>
+		<resource:theme.message.user.exists>User already exists.</resource:theme.message.user.exists>
+
+	</resource:Resources>
+
+</rdf:RDF>

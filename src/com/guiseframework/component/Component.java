@@ -1,6 +1,7 @@
 package com.guiseframework.component;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.mail.internet.ContentType;
 
@@ -73,16 +74,20 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public final static String NAME_PROPERTY=getPropertyName(Component.class, "name");
 	/**The bound property of whether the component has tooltips enabled.*/
 	public final static String TOOLTIP_ENABLED_PROPERTY=getPropertyName(Component.class, "tooltipEnabled");
+	/**The bound property of the font families.*/
+	public final static String FONT_FAMILIES_PROPERTY=getPropertyName(Component.class, "fontFamilies");
+	/**The bound property of the font size.*/
+	public final static String FONT_SIZE_PROPERTY=getPropertyName(Component.class, "fontSize");
 	/**The bound property of the notification.*/
 	public final static String NOTIFICATION_PROPERTY=getPropertyName(Component.class, "notification");
 	/**The opacity bound property.*/
 	public final static String OPACITY_PROPERTY=getPropertyName(Component.class, "opacity");
 	/**The orientation bound property.*/
 	public final static String ORIENTATION_PROPERTY=getPropertyName(Component.class, "orientation");
-	/**The preferred height bound property.*/
-	public final static String PREFERRED_HEIGHT_PROPERTY=getPropertyName(Component.class, "preferredHeight");
-	/**The preferred width bound property.*/
-	public final static String PREFERRED_WIDTH_PROPERTY=getPropertyName(Component.class, "preferredWidth");
+	/**The height bound property.*/
+	public final static String HEIGHT_PROPERTY=getPropertyName(Component.class, "height");
+	/**The width bound property.*/
+	public final static String WIDTH_PROPERTY=getPropertyName(Component.class, "width");
 	/**The bound property of the component style ID.*/
 	public final static String STYLE_ID_PROPERTY=getPropertyName(Component.class, "styleID");
 	/**The bound property of whether a theme has been applied to this component.*/
@@ -210,12 +215,25 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	*/
 	public void setCornerArcSize(final Dimensions newCornerArcSize);
 
-	/**Determines the foreground color to use for the component.
-	The color is determined by finding the first non-<code>null</code> color up the component hierarchy or the default color.
-	@return The foreground color to use for the component.
-	@see #getColor()
+	/**@return The prioritized list of font family names, or <code>null</code> if no font family names have been specified.*/
+	public List<String> getFontFamilies();
+
+	/**Sets the font families of the component
+	This is a bound property.
+	@param newFontFamilies The new prioritized list of font family names, or <code>null</code> if no font family names are specified.
+	@see #FONT_FAMILIES_PROPERTY 
 	*/
-//TODO del if not needed	public Color<?> determineColor();
+	public void setFontFamilies(final List<String> newFontFamilies);
+
+	/**@return The size of the font from baseline to baseline, or <code>null</code> if no font size has been specified.*/
+	public Extent getFontSize();
+
+	/**Sets the font size of the component
+	This is a bound property.
+	@param newFontSize The new size of the font from baseline to baseline, or <code>null</code> there is no font specified.
+	@see #FONT_SIZE_PROPERTY 
+	*/
+	public void setFontSize(final Extent newFontSize);
 
 	/**@return The notification associated with the component, or <code>null</code> if no notification is associated with this component.*/
 	public Notification getNotification();
@@ -240,25 +258,25 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	*/
 	public void setOpacity(final float newOpacity);
 
-	/**@return The preferred width of the component, or <code>null</code> if no preferred width has been specified.*/
-	public Extent getPreferredWidth();
+	/**@return The requested width of the component, or <code>null</code> if no preferred width has been specified.*/
+	public Extent getWidth();
 
-	/**Sets the preferred width of the component.
+	/**Sets the requested width of the component.
 	This is a bound property.
-	@param newPreferredWidth The new preferred width of the component, or <code>null</code> there is no width preference.
-	@see #PREFERRED_WIDTH_PROPERTY 
+	@param newWidth The new requested width of the component, or <code>null</code> there is no width preference.
+	@see #WIDTH_PROPERTY 
 	*/
-	public void setPreferredWidth(final Extent newPreferredWidth);
+	public void setWidth(final Extent newWidth);
 
-	/**@return The preferred height of the component, or <code>null</code> if no preferred height has been specified.*/
-	public Extent getPreferredHeight();
+	/**@return The requested height of the component, or <code>null</code> if no preferred height has been specified.*/
+	public Extent getHeight();
 
-	/**Sets the preferred height of the component.
+	/**Sets the requested height of the component.
 	This is a bound property.
-	@param newPreferredHeight The new preferred height of the component, or <code>null</code> there is no height preference.
-	@see #PREFERRED_HEIGHT_PROPERTY 
+	@param newHeight The new requested height of the component, or <code>null</code> there is no height preference.
+	@see #HEIGHT_PROPERTY 
 	*/
-	public void setPreferredHeight(final Extent newPreferredHeight);
+	public void setHeight(final Extent newHeight);
 
 	/**@return The controller installed in this component.*/
 	public Controller<? extends GuiseContext, ? super C> getController();
@@ -558,21 +576,21 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	*/
 	public interface FlyoverStrategy<S extends Component<?>> extends MouseListener
 	{
-		/**@return The preferred width of the flyover component, or <code>null</code> if no preferred width has been specified.*/
-		public Extent getPreferredWidth();
+		/**@return The requested width of the flyover component, or <code>null</code> if no preferred width has been specified.*/
+		public Extent getWidth();
 
-		/**Sets the preferred width of the flyover component.
-		@param newPreferredWidth The new preferred width of the flyover component, or <code>null</code> there is no width preference.
+		/**Sets the width of the flyover component.
+		@param newWidth The new requested width of the flyover component, or <code>null</code> there is no width preference.
 		*/
-		public void setPreferredWidth(final Extent newPreferredWidth);
+		public void setWidth(final Extent newWidth);
 
-		/**@return The preferred height of the flyover component, or <code>null</code> if no preferred height has been specified.*/
-		public Extent getPreferredHeight();
+		/**@return The requested height of the flyover component, or <code>null</code> if no preferred height has been specified.*/
+		public Extent getHeight();
 
-		/**Sets the preferred height of the flyover component.
-		@param newPreferredHeight The new preferred height of the flyover component, or <code>null</code> there is no height preference.
+		/**Sets the requested height of the flyover component.
+		@param newHeight The new requested height of the flyover component, or <code>null</code> there is no height preference.
 		*/
-		public void setPreferredHeight(final Extent newPreferredHeight);
+		public void setHeight(final Extent newHeight);
 
 		/**@return The style identifier of the flyover, or <code>null</code> if there is no style ID.*/
 		public String getStyleID();

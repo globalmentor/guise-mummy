@@ -15,6 +15,10 @@ import com.garretwilson.io.*;
 import com.garretwilson.lang.ObjectUtilities;
 import static com.garretwilson.lang.ThreadUtilities.*;
 import com.garretwilson.net.URIUtilities;
+import com.garretwilson.rdf.RDFListResource;
+import com.garretwilson.rdf.RDFObject;
+import com.garretwilson.rdf.RDFResource;
+import static com.garretwilson.rdf.RDFUtilities.*;
 import com.garretwilson.rdf.TypedRDFResourceIO;
 import com.garretwilson.text.W3CDateFormat;
 import com.garretwilson.util.*;
@@ -30,6 +34,8 @@ import static com.guiseframework.GuiseResourceConstants.*;
 
 import com.guiseframework.component.*;
 import static com.guiseframework.Resources.*;
+import static com.guiseframework.theme.Theme.THEME_NAMESPACE_URI;
+
 import com.guiseframework.component.kit.ComponentKit;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.controller.*;
@@ -42,6 +48,12 @@ This implementation only works with Guise containers that descend from {@link Ab
 */
 public abstract class AbstractGuiseApplication extends BoundPropertyObject implements GuiseApplication
 {
+
+	/**I/O for loading themes.*/
+	private final static IO<Theme> themeIO=new TypedRDFResourceIO<Theme>(Theme.class, THEME_NAMESPACE_URI);	//create I/O for loading the theme
+
+		/**@return I/O for loading themes.*/
+		protected static IO<Theme> getThemeIO() {return themeIO;}
 
 	/**I/O for loading resources.*/
 	private final static IO<Resources> resourcesIO=new TypedRDFResourceIO<Resources>(Resources.class, RESOURCE_NAMESPACE_URI);
@@ -505,25 +517,25 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			}
 		}
 
-	/**The application theme, or <code>null</code> if the application has not yet been installed and no specific theme was indicated.*/
-	private Theme theme;
+	/**The URI of the application theme, to be resolved against the application base path.*/
+	private URI themeURI=URI.create(GUISE_ROOT_THEME_PATH);
 
-		/**@return The application theme, or <code>null</code> if the application has not yet been installed and no specific theme was indicated..*/
-		public Theme getTheme() {return theme;}
+		/**@return The URI of the application theme, to be resolved against the application base path.*/
+		public URI getThemeURI() {return themeURI;}
 
-		/**Sets the theme of the application.
+		/**Sets the URI of the application theme.
 		This is a bound property.
-		@param newTheme The new application theme.
-		@exception NullPointerException if the given theme is <code>null</code>.
-		@see #THEME_PROPERTY
+		@param newThemeURI The URI of the new application theme.
+		@exception NullPointerException if the given theme URI is <code>null</code>.
+		@see #THEME_URI_PROPERTY
 		*/
-		public void setTheme(final Theme newTheme)
+		public void setThemeURI(final URI newThemeURI)
 		{
-			if(!ObjectUtilities.equals(theme, newTheme))	//if the value is really changing
+			if(!ObjectUtilities.equals(themeURI, newThemeURI))	//if the value is really changing
 			{
-				final Theme oldTheme=theme;	//get the old value
-				theme=checkInstance(newTheme, "Theme cannot be null.");	//actually change the value
-				firePropertyChange(THEME_PROPERTY, oldTheme, newTheme);	//indicate that the value changed
+				final URI oldThemeURI=themeURI;	//get the old value
+				themeURI=checkInstance(newThemeURI, "Theme URI cannot be null.");	//actually change the value
+				firePropertyChange(THEME_URI_PROPERTY, oldThemeURI, newThemeURI);	//indicate that the value changed
 			}
 		}
 
@@ -1281,23 +1293,16 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@param theme The current theme in effect.
 	@param locale The locale for which resources should be retrieved.
 	@return A resolving resource bundle based upon the locale.
-	@exception MissingResourceException if a resource bundle could not be loaded.
+	@exception IOException if there was an error loading a resource bundle.
 	@see #getResourceBundleBaseName()
 	*/
-	public ResourceBundle getResourceBundle(final Theme theme, final Locale locale)
+	public ResourceBundle loadResourceBundle(final Theme theme, final Locale locale) throws IOException
 	{
 		final ClassLoader loader=getClass().getClassLoader();	//get our class loader
 			//default resources
 		ResourceBundle resourceBundle=ResourceBundleUtilities.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null, resourcesIO, Resources.RESOURCE_NAMESPACE_URI);	//load the default resource bundle
 			//theme resources
-		try
-		{
-			resourceBundle=getResourceBundle(theme, locale, resourceBundle);	//load any resources for this theme and resolving parents
-		}
-		catch(final IOException ioException)	//if there is an I/O error, convert it to a missing resource exception
-		{
-			throw (MissingResourceException)new MissingResourceException(ioException.getMessage(), null, null).initCause(ioException);	//TODO check to see if null is OK for arguments here
-		}
+		resourceBundle=loadResourceBundle(theme, locale, resourceBundle);	//load any resources for this theme and resolving parents
 			//application resources
 		final String resourceBundleBaseName=getResourceBundleBaseName();	//get the specified resource bundle base name
 //TODO del Debug.trace("ready to load application resources; resource bundle base name:", resourceBundleBaseName);
@@ -1309,6 +1314,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	}
 
 	/**Retrieves a resource bundle from this theme and its resolving parents, if any.
+	If multiple resource bundles are specified in this theme, they will be chained in no particular order.
+	For each resource that provides both a reference URI and local definitions, the resources at the reference URI will be used as the resolving parent of the local definitions.
 	If the theme does not specify a resource bundle, the given parent resource bundle will be returned.
 	@param theme The theme for which to load resources.
 	@param locale The locale for which resources should be retrieved.
@@ -1316,22 +1323,33 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@return The resource bundle for the theme, with parent resource bundles loaded, or the parent resource bundle if the theme specifies no resources.
 	@exception IOException if there was an error loading a resource bundle.
 	*/
-	protected ResourceBundle getResourceBundle(final Theme theme, final Locale locale, ResourceBundle parentResourceBundle) throws IOException
+	protected ResourceBundle loadResourceBundle(final Theme theme, final Locale locale, final ResourceBundle parentResourceBundle) throws IOException
 	{
+		ResourceBundle resourceBundle=parentResourceBundle;	//at the end of the chain will be the parent resource bundle
 		final Theme parentTheme=theme.getParent();	//get the parent theme
 		if(parentTheme!=null)	//if there is a parent theme
 		{
-			parentResourceBundle=getResourceBundle(parentTheme, locale, parentResourceBundle);	//get the parent resource bundle first and use that as the parent
+			resourceBundle=loadResourceBundle(parentTheme, locale, parentResourceBundle);	//get the parent resource bundle first and use that as the parent
 		}
-		final URI resourcesURI=theme.getResourcesURI(locale);	//get the resources URI
-		if(resourcesURI!=null)	//if there are resources
+		for(final RDFObject resourcesObject:theme.getResourcesObjects(locale))	//for each resources object in the theme
 		{
-			return loadResourceBundle(resourcesURI, parentResourceBundle);	//load the resources
-		}		
-		else	//if the theme specifies no resources appropriate for this locale
-		{
-			return parentResourceBundle;	//return the parent resource bundle
+			if(resourcesObject instanceof RDFResource)	//if this is a RDFResource
+			{
+				final RDFResource resources=(RDFResource)resourcesObject;	//get the resource RDFResource
+				final URI resourcesURI=resources.getReferenceURI();	//get the resources reference URI if any
+				if(resourcesURI!=null)	//if there are external resources specified
+				{
+					resourceBundle=loadResourceBundle(resourcesURI, resourceBundle);	//load the resources and insert it into the chain
+				}		
+				final Map<String, Object> resourceMap=ResourceBundleUtilities.toMap(resources, Resources.RESOURCE_NAMESPACE_URI);	//generate a map from the local resources TODO cache this if possible
+				if(!resourceMap.isEmpty())	//if any resources are defined locally
+				{
+					resourceBundle=new HashMapResourceBundle(resourceMap, resourceBundle);	//create a new hash map resource bundle with resources and the given parent and insert it into the chain
+					
+				}
+			}
 		}
+		return resourceBundle;	//return the end of the resource bundle chain
 	}
 
 	/**A synchronized cache of softly-referenced resource maps keyed to resource bundle URIs.*/
@@ -1368,9 +1386,53 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			Debug.info("resource bundle cache hit for", resourceBundleURI);			
 		}
 */
-		return new HashMapResourceBundle(resourceMap, parentResourceBundle);	//create a new hash map resource bundle with resources and the given parent and return it		
+		return new HashMapResourceBundle(resourceMap, parentResourceBundle);	//create a new hash map resource bundle with resources and the given parent and return it
 	}
-	
+
+	/**Loads a theme from the given URI.
+	All relative URIs are considered relative to the application.
+	If the theme specifies no parent theme, the default parent theme will be assigned unless the theme is the default theme.
+	@param themeURI The URI of the theme to load.
+	@return A loaded theme with resolving parents loaded as well.
+	@exception NullPointerException if the given theme URI is <code>null</code>.
+	@throws IOException if there is an error loading the theme or one of its parents.
+	*/
+	public Theme loadTheme(final URI themeURI) throws IOException
+	{
+		final InputStream themeInputStream=getInputStream(themeURI);	//ask the application to get the input stream, so that the resource can be loaded directly if possible
+		if(themeInputStream==null)	//if there is no such theme
+		{
+			throw new FileNotFoundException("Missing theme resource: "+themeURI);	//indicate that the theme cannot be found
+		}
+		final InputStream bufferedThemeInputStream=new BufferedInputStream(themeInputStream);	//get a buffered input stream to the theme
+		try
+		{
+			final Theme theme=getThemeIO().read(bufferedThemeInputStream, themeURI);	//read this theme
+				//TODO check for a specified parent theme
+			final URI resolvedThemeURI=resolveURI(themeURI);	//resolve the theme URI against the application path
+			final URI rootThemeURI=URI.create(GUISE_ROOT_THEME_PATH);	//get the application-relative URI to the root theme
+			final URI resolvedRootThemeURI=resolveURI(rootThemeURI);	//get the resolved path URI to the root theme
+			if(!resolvedThemeURI.equals(resolvedRootThemeURI))	//if this is not the root theme, load the default theme and set it as parent
+			{
+				final Theme parentTheme=loadTheme(rootThemeURI);	//load the root theme
+				theme.setParent(parentTheme);	//set the default theme as the parent theme
+			}
+			try
+			{
+				theme.updateRules();	//update the theme rules
+			}
+			catch(final ClassNotFoundException classNotFoundException)	//if a class specified by a rule selector cannot be found
+			{
+				throw (IOException)new IOException(classNotFoundException.getMessage()).initCause(classNotFoundException);
+			}
+			return theme;	//return the theme
+		}
+		finally
+		{
+			bufferedThemeInputStream.close();	//always close the theme input stream
+		}				
+	}
+
 	/**Looks up a principal from the given ID.
 	This version returns <code>null</code>. 
 	@param id The ID of the principal.

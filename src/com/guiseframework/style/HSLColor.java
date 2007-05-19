@@ -3,6 +3,7 @@ package com.guiseframework.style;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.garretwilson.lang.IntegerUtilities.*;
 import com.garretwilson.text.ArgumentSyntaxException;
 
 /**Encapsulates a color value of the HSL color space.
@@ -16,6 +17,17 @@ public class HSLColor extends AbstractColor<HSLColor.Component>
 
 	/**A color component of HSL.*/
 	public enum Component{HUE, SATURATION, LIGHTNESS;}
+
+	/**Creates an HSL color with the specified hue in the range (0-359), and saturation, and lightness component values in the range (0.0-1.0).
+	@param hue The hue component as an integer value in the range (0-359).
+	@param saturation The saturation component in the range (0.0-1.0).
+	@param lightness The lightness component in the range (0.0-1.0).
+	@exception IllegalArgumentException if the hue is outside the range (0-359), and/or if one of the other values is outside the range (0.0-1.0).
+	*/
+	public HSLColor(final int hue, final double saturation, final double lightness)
+	{
+		this((double)checkRange(hue, 0, 359)/360.0, saturation, lightness);	//construct the hue to a relative amount and construct the class
+	}
 
 	/**Creates an HSL color with the specified hue, saturation, and lightness component values in the range (0.0-1.0).
 	@param hue The hue component.

@@ -119,8 +119,9 @@ public class HTTPServletGuiseContext extends AbstractXMLGuiseContext
 	@param request The HTTP servlet request.
 	@param response The HTTP servlet response.
 	@exception NullPointerException if the session, destination, request or response is <code>null</code>.
+	@exception IOException If there was an I/O error loading a needed resource.
 	*/
-	public HTTPServletGuiseContext(final GuiseSession session, final Destination destination, final HttpServletRequest request, final HttpServletResponse response)
+	public HTTPServletGuiseContext(final GuiseSession session, final Destination destination, final HttpServletRequest request, final HttpServletResponse response) throws IOException
 	{
 		super(session, destination);	//construct the parent class
 		this.request=checkInstance(request, "Request cannot be null.");

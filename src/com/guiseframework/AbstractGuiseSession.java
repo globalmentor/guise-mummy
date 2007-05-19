@@ -287,8 +287,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			<li>Any resource defined by default by Guise.</li>
 		</ol>
 		@return The resource bundle containing the resources for this session, based upon the locale.
-		@exception MissingResourceException if no resource bundle for the application's specified base name can be found.
-		@see GuiseApplication#getResourceBundle(Theme, Locale)
+		@exception MissingResourceException if no resource bundle for the application's specified base name can be found or there was an error loading a resource bundle.
+		@see GuiseApplication#loadResourceBundle(Theme, Locale)
 		@see #getTheme()
 		@see #getLocale()
 		@see #getStringResource(String)
@@ -300,12 +300,19 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@see #getURIResource(String)
 		@see #getURIResource(String, URI)
 		*/
-		public ResourceBundle getResourceBundle()
+		public ResourceBundle getResourceBundle() throws MissingResourceException
 		{
 			if(resourceBundle==null)	//if the resource bundle has not yet been loaded
 			{
 				final Locale locale=getLocale();	//get the current locale
-				resourceBundle=getApplication().getResourceBundle(getTheme(), locale);	//ask the application for the resource bundle based upon the locale
+				try
+				{
+					resourceBundle=getApplication().loadResourceBundle(getTheme(), locale);	//ask the application for the resource bundle based upon the locale
+				}
+				catch(final IOException ioException)	//if there is an I/O error, convert it to a missing resource exception
+				{
+					throw (MissingResourceException)new MissingResourceException(ioException.getMessage(), null, null).initCause(ioException);	//TODO check to see if null is OK for arguments here
+				}
 			}
 			return resourceBundle;	//return the resource bundle
 		}
@@ -662,26 +669,46 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			}
 		}
 
-	/**The current session theme.*/
-	private Theme theme;
+	/**The current session theme, or <code>null</code> if the theme has not been loaded.*/
+	private Theme theme=null;
 
-		/**@return The current session theme.*/
-		public Theme getTheme() {return theme;}
-
-		/**Sets the current session theme.
-		This is a bound property.
-		@param newTheme The new session theme.
-		@exception NullPointerException if the given theme is <code>null</code>.
-		@see #THEME_PROPERTY
+		/**Returns the current session theme.
+		If this session's theme has not yet been loaded, this method loads the theme.
+		@return The current session theme.
+		@exception IOException if there is an error loading the theme.
+		@see #getThemeURI()
 		*/
-		public void setTheme(final Theme newTheme)
+		public Theme getTheme() throws IOException
 		{
-			if(!ObjectUtilities.equals(theme, newTheme))	//if the value is really changing
+			if(theme==null)	//if there is no theme (this race condition is more or less benign, and will only result in the theme being loaded more than once initially)
 			{
-				final Theme oldTheme=theme;	//get the old value
-				theme=checkInstance(newTheme, "Guise session theme cannot be null.");	//actually change the value
-				releaseResourceBundle();	//release the resource bundle, as the new locale may indicate that new resources should be used
-				firePropertyChange(THEME_PROPERTY, oldTheme, newTheme);	//indicate that the value changed
+				theme=getApplication().loadTheme(getThemeURI());	//ask the application to load the theme
+			}
+			return theme;
+		}
+
+	/**The URI of the session theme, to be resolved against the application base path.*/
+	private URI themeURI;
+
+		/**@return The URI of the session theme, to be resolved against the application base path.*/
+		public URI getThemeURI() {return themeURI;}
+
+		/**Sets the URI of the session theme.
+		The current theme, if any, will be released and loaded the next time {@link #getTheme()} is called.
+		This is a bound property.
+		@param newThemeURI The URI of the new session theme.
+		@exception NullPointerException if the given theme URI is <code>null</code>.
+		@see #THEME_URI_PROPERTY
+		@see #getTheme()
+		*/
+		public void setThemeURI(final URI newThemeURI)
+		{
+			if(!ObjectUtilities.equals(themeURI, newThemeURI))	//if the value is really changing
+			{
+				final URI oldThemeURI=themeURI;	//get the old value
+				themeURI=checkInstance(newThemeURI, "Theme URI cannot be null.");	//actually change the value
+				theme=null;	//release our reference to the current theme
+				firePropertyChange(THEME_URI_PROPERTY, oldThemeURI, newThemeURI);	//indicate that the value changed
 			}
 		}
 
@@ -709,7 +736,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			throw new AssertionError(parserConfigurationException);
 		}	
 		this.environment=new DefaultGuiseEnvironment();	//create a default environment
-		this.theme=application.getTheme();	//default to the application theme
+		this.themeURI=application.getThemeURI();	//default to the application theme
 		this.locale=application.getLocales().get(0);	//default to the first application locale
 //TODO del when works		this.locale=application.getDefaultLocale();	//default to the application locale
 		this.orientation=Orientation.getOrientation(locale);	//set the orientation default based upon the locale
@@ -1645,7 +1672,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			icon=severity.getGlyph();	//set the icon based upon the severity
 		}		
 		optionDialogFrame.setIcon(icon);	//set the icon
-		optionDialogFrame.setPreferredWidth(new Extent(0.33, Extent.Unit.RELATIVE));	//set the preferred dimensions		
+		optionDialogFrame.setWidth(new Extent(0.33, Extent.Unit.RELATIVE));	//set the preferred dimensions		
 		optionDialogFrame.open(new AbstractGenericPropertyChangeListener<Frame.Mode>()	//show the dialog and listen for the frame closing
 				{
 					public void propertyChange(final GenericPropertyChangeEvent<Frame.Mode> genericPropertyChangeEvent)	//listen for the dialog mode changing

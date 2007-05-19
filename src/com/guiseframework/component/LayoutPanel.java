@@ -3,6 +3,7 @@ package com.guiseframework.component;
 import com.guiseframework.component.layout.*;
 
 /**A general panel with a default page flow layout.
+This class, which has no particular semantics, is used for laying out child components.
 @author Garret Wilson
 */
 public class LayoutPanel extends AbstractPanel<LayoutPanel>

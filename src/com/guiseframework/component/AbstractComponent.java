@@ -343,6 +343,48 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			}
 		}
 
+	/**The prioritized list of font family names, or <code>null</code> if no font family names have been specified.*/
+	private List<String> fontFamilies=null;
+
+		/**@return The prioritized list of font family names, or <code>null</code> if no font family names have been specified.*/
+		public List<String> getFontFamilies() {return fontFamilies;}
+
+		/**Sets the font families of the component
+		This is a bound property.
+		@param newFontFamilies The new prioritized list of font family names, or <code>null</code> if no font family names are specified.
+		@see Component#FONT_FAMILIES_PROPERTY 
+		*/
+		public void setFontFamilies(final List<String> newFontFamilies)
+		{
+			if(!ObjectUtilities.equals(fontFamilies, newFontFamilies))	//if the value is really changing
+			{
+				final List<String> oldFontFamilies=fontFamilies;	//get the old value
+				fontFamilies=newFontFamilies;	//actually change the value
+				firePropertyChange(FONT_FAMILIES_PROPERTY, oldFontFamilies, newFontFamilies);	//indicate that the value changed
+			}			
+		}
+
+	/**The size of the font from baseline to baseline, or <code>null</code> if no font size has been specified.*/
+	private Extent fontSize=null;
+
+		/**@return The size of the font from baseline to baseline, or <code>null</code> if no font size has been specified.*/
+		public Extent getFontSize() {return fontSize;}
+
+		/**Sets the font size of the component
+		This is a bound property.
+		@param newFontSize The new size of the font from baseline to baseline, or <code>null</code> there is no font specified.
+		@see Component#FONT_SIZE_PROPERTY 
+		*/
+		public void setFontSize(final Extent newFontSize)
+		{
+			if(!ObjectUtilities.equals(fontSize, newFontSize))	//if the value is really changing
+			{
+				final Extent oldFontSize=fontSize;	//get the old value
+				fontSize=newFontSize;	//actually change the value
+				firePropertyChange(FONT_SIZE_PROPERTY, oldFontSize, newFontSize);	//indicate that the value changed
+			}			
+		}
+		
 	/**The notification associated with the component, or <code>null</code> if no notification is associated with this component.*/
 	private Notification notification=null;
 
@@ -397,45 +439,45 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			}			
 		}
 
-	/**The preferred width of the component, or <code>null</code> if no preferred width has been specified.*/
-	private Extent preferredWidth=null;
+	/**The requested width of the component, or <code>null</code> if no preferred width has been specified.*/
+	private Extent width=null;
 
-		/**@return The preferred width of the component, or <code>null</code> if no preferred width has been specified.*/
-		public Extent getPreferredWidth() {return preferredWidth;}
+		/**@return The requested width of the component, or <code>null</code> if no preferred width has been specified.*/
+		public Extent getWidth() {return width;}
 
-		/**Sets the preferred width of the component.
+		/**Sets the requested width of the component.
 		This is a bound property.
-		@param newPreferredWidth The new preferred width of the component, or <code>null</code> there is no width preference.
-		@see Component#PREFERRED_WIDTH_PROPERTY 
+		@param newWidth The new requested width of the component, or <code>null</code> there is no width preference.
+		@see Component#WIDTH_PROPERTY 
 		*/
-		public void setPreferredWidth(final Extent newPreferredWidth)
+		public void setWidth(final Extent newWidth)
 		{
-			if(!ObjectUtilities.equals(preferredWidth, newPreferredWidth))	//if the value is really changing
+			if(!ObjectUtilities.equals(width, newWidth))	//if the value is really changing
 			{
-				final Extent oldPreferredWidth=preferredWidth;	//get the old value
-				preferredWidth=newPreferredWidth;	//actually change the value
-				firePropertyChange(PREFERRED_WIDTH_PROPERTY, oldPreferredWidth, newPreferredWidth);	//indicate that the value changed
+				final Extent oldWidth=width;	//get the old value
+				width=newWidth;	//actually change the value
+				firePropertyChange(WIDTH_PROPERTY, oldWidth, newWidth);	//indicate that the value changed
 			}			
 		}
 
-	/**The preferred height of the component, or <code>null</code> if no preferred height has been specified.*/
-	private Extent preferredHeight=null;
+	/**The requested height of the component, or <code>null</code> if no preferred height has been specified.*/
+	private Extent height=null;
 
-		/**@return The preferred height of the component, or <code>null</code> if no preferred height has been specified.*/
-		public Extent getPreferredHeight() {return preferredHeight;}
+		/**@return The requested height of the component, or <code>null</code> if no preferred height has been specified.*/
+		public Extent getHeight() {return height;}
 
-		/**Sets the preferred height of the component.
+		/**Sets the requested height of the component.
 		This is a bound property.
-		@param newPreferredHeight The new preferred height of the component, or <code>null</code> there is no height preference.
-		@see Component#PREFERRED_HEIGHT_PROPERTY 
+		@param newHeight The new requested height of the component, or <code>null</code> there is no height preference.
+		@see Component#HEIGHT_PROPERTY 
 		*/
-		public void setPreferredHeight(final Extent newPreferredHeight)
+		public void setHeight(final Extent newHeight)
 		{
-			if(!ObjectUtilities.equals(preferredHeight, newPreferredHeight))	//if the value is really changing
+			if(!ObjectUtilities.equals(height, newHeight))	//if the value is really changing
 			{
-				final Extent oldPreferredHeight=preferredHeight;	//get the old value
-				preferredHeight=newPreferredHeight;	//actually change the value
-				firePropertyChange(PREFERRED_HEIGHT_PROPERTY, oldPreferredHeight, newPreferredHeight);	//indicate that the value changed
+				final Extent oldHeight=height;	//get the old value
+				height=newHeight;	//actually change the value
+				firePropertyChange(HEIGHT_PROPERTY, oldHeight, newHeight);	//indicate that the value changed
 			}			
 		}
 
@@ -1408,39 +1450,37 @@ Debug.trace("now valid of", this, "is", isValid());
 			/**@return The component for which this object will control flyovers.*/
 			public S getComponent() {return component;}
 			
-		/**The preferred width of the flyover component, or <code>null</code> if no preferred width has been specified.*/
-		private Extent preferredWidth=null;
+		/**The requested width of the flyover component, or <code>null</code> if no preferred width has been specified.*/
+		private Extent width=null;
 
-			/**@return The preferred width of the flyover component, or <code>null</code> if no preferred width has been specified.*/
-			public Extent getPreferredWidth() {return preferredWidth;}
+			/**@return The requested width of the flyover component, or <code>null</code> if no preferred width has been specified.*/
+			public Extent getWidth() {return width;}
 
-			/**Sets the preferred width of the flyover component.
-			@param newPreferredWidth The new preferred width of the flyover component, or <code>null</code> there is no width preference.
+			/**Sets the requested width of the flyover component.
+			@param newWidth The new requested width of the flyover component, or <code>null</code> there is no width preference.
 			*/
-			public void setPreferredWidth(final Extent newPreferredWidth)
+			public void setWidth(final Extent newWidth)
 			{
-				if(!ObjectUtilities.equals(preferredWidth, newPreferredWidth))	//if the value is really changing
+				if(!ObjectUtilities.equals(width, newWidth))	//if the value is really changing
 				{
-					final Extent oldPreferredWidth=preferredWidth;	//get the old value
-					preferredWidth=newPreferredWidth;	//actually change the value
+					width=newWidth;	//actually change the value
 				}			
 			}
 
-		/**The preferred height of the flyover component, or <code>null</code> if no preferred height has been specified.*/
-		private Extent preferredHeight=null;
+		/**The requested height of the flyover component, or <code>null</code> if no preferred height has been specified.*/
+		private Extent height=null;
 
-			/**@return The preferred height of the flyover component, or <code>null</code> if no preferred height has been specified.*/
-			public Extent getPreferredHeight() {return preferredHeight;}
+			/**@return The requested height of the flyover component, or <code>null</code> if no preferred height has been specified.*/
+			public Extent getHeight() {return height;}
 
-			/**Sets the preferred height of the flyover component.
-			@param newPreferredHeight The new preferred height of the flyover component, or <code>null</code> there is no height preference.
+			/**Sets the requested height of the flyover component.
+			@param newHeight The new requested height of the flyover component, or <code>null</code> there is no height preference.
 			*/
-			public void setPreferredHeight(final Extent newPreferredHeight)
+			public void setHeight(final Extent newHeight)
 			{
-				if(!ObjectUtilities.equals(preferredHeight, newPreferredHeight))	//if the value is really changing
+				if(!ObjectUtilities.equals(height, newHeight))	//if the value is really changing
 				{
-					final Extent oldPreferredHeight=preferredHeight;	//get the old value
-					preferredHeight=newPreferredHeight;	//actually change the value
+					height=newHeight;	//actually change the value
 				}			
 			}
 			
@@ -1594,15 +1634,15 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 				{
 					flyoverFrame.setStyleID(styleID);	//set the style ID of the flyover
 				}
-				final Extent preferredWidth=getPreferredWidth();	//get the preferred width
-				if(preferredWidth!=null)	//if there is a preferred width
+				final Extent width=getWidth();	//get the requested width
+				if(width!=null)	//if there is a requested width
 				{
-					flyoverFrame.setPreferredWidth(preferredWidth);	//set the flyover preferred width
+					flyoverFrame.setWidth(width);	//set the flyover width
 				}
-				final Extent preferredHeight=getPreferredHeight();	//get the preferred height
-				if(preferredHeight!=null)	//if there is a preferred height
+				final Extent height=getHeight();	//get the requested height
+				if(height!=null)	//if there is a requested height
 				{
-					flyoverFrame.setPreferredHeight(preferredHeight);	//set the flyover preferred height
+					flyoverFrame.setHeight(height);	//set the flyover height
 				}
 				flyoverFrame.setTetherBearing(getTetherBearing());	//set the bearing of the tether
 //TODO fix				frame.getModel().setLabel("Flyover");

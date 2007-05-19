@@ -1,0 +1,1003 @@
+/*Root Guise Stylesheet Copyright © 2005-2007 GlobalMentor, Inc.
+@author Garret Wilson
+
+Styles:
+
+Component classes
+	.*-label The label part of a general component.
+	.*-body The main part of a general component.
+	.*-child A single child of a general component.
+	.*-children The list of children of a general component.
+	.*-error The error part of a general component.
+	.*-message Any message associated with a component.
+	.*-tabs The tabs section of a tabbed panel.
+	.*-tab A single tab of a tabbed panel.
+		Frames
+	.frameModal The frame is modal.
+		Flyover Frames
+	.*-tether The tether of a flyover frame.
+		Images
+	.*-caption The caption of the image, containing a label and/or a message.
+		Menus
+TODO del:	.*-open Indicates that the menu is open.
+		Sliders
+	.*-track The track of the slider
+	.*-thumb The thumb on the track of the slider.
+	.*-intervals The element the interval labels.
+	.*-interval A single interval label.
+		Tree nodes
+	.treeNode-* An element of a tree node.
+	.treeNode-collapsed A class indicating that a tree node is collapsed.
+	.treeNode-expanded A class indicating that a tree node is expanded.
+	.treeNode-leaf A class indicating that a tree node is a leaf node and is neither expanded nor collapsed.
+
+Component attributes: Styles indicate an attribute or a state of a component.
+	axisX A component (such as a menu or slider) that flows on the X axis.
+	axisY A component (such as a menu or slider) that flows on the Y axis.
+	bearN, bearNbE, etc. The bearing of a component or a subcomponent, such as the direction of a tether of a flyover frame.
+	dirLTR A component (such as a menu or slider) with left-to-right line direction.
+	dirRTL A component (such as a menu or slider) with right-to-left line direction.
+	disabled A component or subcomponent (such as a tab) is disabled.
+	invalid A component or subcomponent has invalid data or state.
+	open A component (such as a menu) is open.
+	rollover A component or subcomponent (such as a tab) is undergoing mouse rollover.
+	selected A component or subcomponent (such as a tab) is selected.
+
+Layout classes
+	.layout-flow-x Any enclosing element needed for a horizontal flow layout.
+	.layout-flow-x-child Children in a horizontal flow layout.
+	.layout-flow-y Any enclosing element needed for a vertical flow layout.
+	.layout-flow-y-child Children in a horizontal flow layout.
+	.layout-region Any enclosing element needed for region layout.
+	.layout-region-bottom An enclosing element for the bottom region layout.
+	.layout-region-center An enclosing element for the center region layout.
+	.layout-region-left An enclosing element for the left region layout.
+	.layout-region-right An enclosing element for the right region layout.
+	.layout-region-top An enclosing element for the top region layout.
+
+Drag and Drop classes
+	.dragable TODO fix
+	.dragHandle The element of a dragable component that acts as a handle for dragging.
+	.dragSource The element represents a drag source in a drag-and-drop operation.
+	.dropTarget The element represents a drop target in a drag-and-drop operation.
+*/
+
+/*IE6 fixes*/
+
+label
+{
+	zoom: 1;
+}
+
+/*Guise style classes*/
+
+a:focus
+{
+	outline: none;	/*don't show a dotted line around focused links (and images in clicked links); Guise currently uses hidefocus attribute for equivalent effect in IE*/
+}
+
+a img
+{
+	border-style: none;	
+}
+
+a label
+{
+	cursor: inherit;	/*inherit the cursor for any labels inside links*/
+/*TODO fix
+	background-color: transparent;
+	color: transparent;
+	font: inherit;
+*/
+}
+
+.action
+{
+	cursor: pointer;
+}
+
+/*link*/
+
+a.linkControl.disabled
+{
+	opacity: .50;
+	filter: alpha(opacity=50);	/*allow opacity to work in IE6*/
+	zoom: 1;	/*required for this filter to work in IE6*/
+}
+
+/*modal layer*/
+
+.modalLayer
+{
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 100%;
+	opacity: .33;
+	filter: alpha(opacity=33);	/*allow opacity to work in IE*/
+	background-color: transparent;	/*TODO why do we have two background colors?*/
+	background-color: #999999;
+	display: none;
+}
+
+/*components*/
+
+/*buttons*/
+.button
+{
+	display: block;
+	text-decoration: none;
+/*TODO fix
+	border-top: 1px solid #cecece;
+	border-bottom: 3px solid #4a4a4a;
+	border-left: 1px solid #cecece;
+	border-right: 3px solid #4a4a4a;
+*/
+}
+
+.button .button-decorator
+{
+	background-color: #CCCCCC;
+	padding: 0 0.4em;
+}
+
+.button:link
+{
+	color: black;
+}
+
+.button:visited
+{
+	color: black;
+}
+
+/*TODO fix
+a.button:link
+{
+	color: black;
+}
+
+a.button:visited
+{
+	color: black;
+}
+
+a.button:hover
+{
+	color: blue;
+}
+
+a.button:active
+{
+	color: blue;
+	border-bottom: 1px solid #cecece;
+	border-top: 3px solid #4a4a4a;
+	border-right: 1px solid #cecece;
+	border-left: 3px solid #4a4a4a;
+}
+*/
+
+.button-corner
+{
+	background-color: #CCCCCC;
+}
+
+/*TODO del when works
+
+.button span.cornerTop, .button span.cornerBottom{display:block;background: transparent}
+.button span.cornerTop span, .button span.cornerBottom span{display:block;height: 1px; overflow: hidden; background: #F5F5F5; font-size: 1px}
+.button span.corner1{margin: 0 5px}
+.button span.corner2{margin: 0 3px}
+.button span.corner3{margin: 0 2px}
+.button span.cornerTop span.corner4, .button span.cornerButton span.corner4{margin: 0 1px;height: 2px}
+*/
+
+/*frames*/
+
+.frame
+{
+	display: block;
+	background-color: #F5F5F5;
+	border-width: thin;
+	border-style: solid;
+	padding: 0em;
+	position: absolute;
+/*TODO fix; this prevents tethers; maybe transfer to body	overflow: hidden;*/
+}
+
+.frame-title
+{
+	color: white;
+	background-color: blue;
+	font-family: sans-serif;
+	font-size: smaller;
+	font-weight: bold;
+	position: relative;
+/*TODO del; this makes IE 6/7 corrupt the width: height: 1.5em;*/
+}
+
+.frame-title .frame-label
+{
+	cursor: inherit;	/*inherit the cursor on the title label for Mozilla, which does not do this automatically*/
+}
+
+.frame-titleControls
+{
+	display: inline;
+	position: absolute;
+	right: 0;
+}
+
+.frame-titleControls img
+{
+	display: inline;
+}
+
+/*TODO del; not currently used
+.frame-titleControls button
+{
+	display: inline;
+	padding: 0;
+	margin: 0;
+}
+*/
+
+.frame-body
+{
+	padding: 0.25em;
+	overflow: auto;
+/*TODO del; this makes IE 6/7 corrupt the size of the entire frame:
+	width: 100%;
+	height: 100%;
+*/
+}
+
+/**flyover frames*/
+
+.flyoverFrame-tether.bearNEbN
+{
+	position: absolute;
+	right: 0;
+	bottom: 100%;
+}
+
+.flyoverFrame-tether.bearNEbE
+{
+	position: absolute;
+	left: 100%;
+	top: 0;
+}
+
+.flyoverFrame-tether.bearSEbE
+{
+	position: absolute;
+	left: 100%;
+	bottom: 0;
+}
+
+.flyoverFrame-tether.bearSEbS
+{
+	position: absolute;
+	right: 0;
+	top: 100%;
+}
+
+.flyoverFrame-tether.bearSWbS
+{
+	position: absolute;
+	left: 0;
+	top: 100%;
+}
+
+.flyoverFrame-tether.bearSWbW
+{
+	position: absolute;
+	right: 100%;
+	bottom: 0;
+}
+
+.flyoverFrame-tether.bearNWbW
+{
+	position: absolute;
+	right: 100%;
+	top: 0;
+}
+
+.flyoverFrame-tether.bearNWbN
+{
+	position: absolute;
+	left: 0;
+	bottom: 100%;
+}
+
+.calendarDialogFrame
+{
+	width: 16em;
+	height: 16em;
+	/*TODO center the dialog frame contents*/
+}
+
+/*busy component*/
+
+.defaultBusyPanel
+{
+	width: 20em;
+	height: 15em;
+	background-color: white;
+}
+
+.defaultBusyPanel .layout-region
+{
+	width: 100%;
+	height: 100%;
+}
+
+.defaultBusyPanel label
+{
+	font-size: larger;
+	font-weight: bold;
+	width: 100%;
+}
+
+.defaultBusyPanel .layout-region-center
+{
+	text-align: center;
+	vertical-align: middle;
+}
+
+/*panels*/
+
+.panel-body
+{
+	display: block;
+	margin: 0em;
+	border: 0em;
+	padding: 0em;
+}
+
+.groupPanel-body
+{
+	display: block;
+	border-width: thin;
+	border-style: solid;
+	padding: 0.25em;
+}
+
+/*tab controls, tabbed panels, and card controls*/
+
+/*TODO add support for ol.tabControl-y-(ltr|rtl)*/
+
+ol.tabbedPanel-tabs
+{
+	border-bottom: 2px solid #999999;
+}
+
+ol.tabbedPanel-tabs,
+ol.tabContainerControl-body.axisX,
+ol.tabControl-body.axisX
+{
+	margin: 1em 0em 0em 0em;
+	padding: 0px;
+	z-index: 1;
+}
+
+li.tabbedPanel-tab,
+li.tabContainerControl-tab.axisX,
+li.tabControl-tab.axisX
+{
+	display: inline;
+	overflow: hidden;
+	list-style-type: none;
+}
+
+a.tabbedPanel-tab,
+a.tabContainerControl-tab.axisX,
+a.tabControl-tab.axisX
+{
+	color: black;
+	font-weight: bold;
+	font-family: Arial, sans-serif;
+	border-style: outset;
+	padding: 2px 5px 0px 5px;
+	margin: 0px;
+	text-decoration: none;
+}
+
+a.tabbedPanel-tab,
+a.tabContainerControl-tab.axisX,
+a.tabControl-tab.axisX
+{
+	background-color: #999999;
+	border-bottom: none;	
+}
+
+a.tabbedPanel-tab.disabled,
+a.tabContainerControl-tab.axisX.disabled,
+a.tabControl-tab.axisX.disabled
+{
+	background-color: #999999;
+	color: #CCCCCC;
+	border-bottom: 0;
+}
+
+a.tabbedPanel-tab.selected,
+a.tabContainerControl-tab.axisX.selected,
+a.tabControl-tab.axisX.selected
+{
+	background-color: #CCCCCC;
+	border-bottom: 3px solid #CCCCCC;
+}
+
+a.tabbedPanel-tab:visited,
+a.tabContainerControl-tab.axisX:visited,
+a.tabControl-tab.axisX:visited
+{
+	color: black;
+}
+
+a.tabbedPanel-tab:hover,
+a.tabContainerControl-tab.axisX:hover,
+a.tabControl-tab.axisX:hover
+{
+	background-color: #CCCCCC;
+	color: white;
+	border-color: inherit;
+}
+
+a.tabbedPanel-tab.disabled:hover,
+a.tabContainerControl-tab.axisX.disabled:hover,
+a.tabControl-tab.axisX.disabled:hover
+{
+	background-color: #999999;
+	color: #CCCCCC;
+	border-bottom: 0;
+}
+
+a.tabbedPanel-tab.selected:hover,
+a.tabContainerControl-tab.axisX.selected:hover,
+a.tabControl-tab.axisX.selected:hover
+{
+	background-color: #CCCCCC;
+	color: white;
+	border-color: inherit;
+	border-bottom: 3px solid #CCCCCC;
+}
+
+.cardPanel-body, .tabbedPanel-body
+{
+	background-color: #CCCCCC;
+	padding: 20px;
+/*	border-color: black;*/
+	border-style: outset;
+	z-index: 2;
+}
+
+.tabbedPanel-body
+{
+	border-top: none;
+}
+
+/*menus*/
+	/*drop menus*/
+
+.dropMenu	/**root menus*/
+{
+	background-color: #F5F5F5;
+	border: 1px solid #AAA;
+	margin: 0;
+	padding: 0;
+}
+
+.dropMenu .dropMenu	/**remove styles for non-root menus*/
+{
+	background-color: inherit;
+	border: 0;
+}
+
+.dropMenu-body
+{
+	border: 0;
+	margin: 0;
+	padding: 0;
+}
+
+.dropMenu.axisY
+{
+	position: relative;
+	width: 7em;
+}
+
+.dropMenu-body.axisY
+{
+	width: 7em;
+}
+
+.dropMenu.axisX .dropMenu.axisY,
+.dropMenu.axisX .dropMenu-body.axisY
+{
+	width: auto;	/*allow vertical menus within horizontal menus to be auto sized horizontally*/
+}
+
+.dropMenu-children
+{
+	margin: 0;
+	padding: 0;
+	width: 7em;
+	z-index: 1;
+}
+
+/*top-level vertical menus and vertical menus in general*/
+.dropMenu-children.axisY
+{
+		
+}
+
+.dropMenu-children .dropMenu-children.axisY
+{
+	position: absolute;
+	background-color: white;
+	border: 1px solid #AAA;
+	visibility: hidden;
+	z-index: 2;
+}
+
+.dropMenu-children.axisY.dirLTR .dropMenu-children.axisY.dirLTR
+{
+	top: 0;
+	left: 7em;
+}
+
+.dropMenu-children.axisY.dirRTL .dropMenu-children.axisY.dirRTL
+{
+	top: 0;
+	left: -7em;
+}
+
+.dropMenu-body	/**menu font styles*/
+{
+	font-family: arial, sans-serif;
+	font-size: small;
+}
+
+.dropMenu-body a, .dropMenu-body a:link, .dropMenu-body a:active	/*menu hovers*/
+{
+	display: block;	/*make the links fill up the entire menu item*/
+	text-decoration: none;
+	color: black;
+}
+
+/*add hovers to the entire menu items (preferred) and the links only (IE6)*/
+.dropMenu-body.axisX .layout-flow-x-child:hover,
+.dropMenu-body.axisY .layout-flow-y-child:hover
+{
+	background-color: #CCCCCC;
+}
+
+/*accordion menus*/
+
+.accordionMenu
+{
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	width: 8em;	
+}
+
+.accordionMenu-label
+{
+	_width: 100%;	/*TODO check hack for IE*/
+	display: block;
+	margin: 0;
+	background: #CCCCCC;
+	color: white;
+	border: 1px solid #AAA;
+}
+
+.accordionMenu-body .accordionMenu-body
+{
+	margin: 0;
+	padding: 0;
+	border: solid 1px #AAAAAA;
+}
+
+.accordionMenu-children
+{
+	margin-left: 0;
+	padding-left: 0;
+}
+
+.accordionMenu-child
+{
+	list-style-type: none;
+}
+
+/*slider controls*/
+
+/*TODO fix intervals
+.sliderControl-x-ltr-body, .sliderControl-x-rtl-body,
+.sliderControl-y-ltr-body, .sliderControl-y-rtl-body
+{
+	position: relative;
+}
+*/
+
+/*TODO del; testing intervals
+.sliderControl-x-ltr-body, .sliderControl-x-rtl-body,
+.sliderControl-y-ltr-body, .sliderControl-y-rtl-body
+{
+	border-width: thin;
+	border-style: solid;
+}
+*/
+
+/*TODO fix intervals
+.sliderControl-x-ltr-body, .sliderControl-x-rtl-body
+{
+	padding-bottom: 1em;	
+}
+*/
+
+/*TODO fix intervals
+.sliderControl-y-ltr-body
+{
+	float: left;
+	padding-right: 2em;
+}
+*/
+
+/*TODO fix intervals
+.sliderControl-y-rtl-body
+{
+	float: right;
+	padding-left: 2em;
+}
+*/
+
+.sliderControl-track
+{
+	position: relative;
+/*TODO del when works
+	background-color: #CCCCCC;
+	border-width: thin;
+	border-style: solid;
+*/
+	border: 0;
+	margin: 0;
+	padding: 0;
+}
+
+.sliderControl-track.axisX.dirLTR
+{
+	float: left;
+}
+
+.sliderControl-track.axisX.dirRTL
+{
+	float: right;
+}
+
+/*TODO del when works
+.sliderControl-x-ltr-track, .sliderControl-x-rtl-track
+{
+	width: 128px;
+	height: 16px;
+}
+
+.sliderControl-y-ltr-track, .sliderControl-y-rtl-track
+{
+	width: 16px;
+	height: 128px;
+}
+*/
+
+.sliderControl-thumb
+{
+	position: absolute;
+	left: 0;
+	top: 0;
+	border: 0;
+	margin: 0;
+	padding: 0;
+}
+
+.sliderControl-thumb:hover
+{
+/*TODO del when works; move logic to framework
+	background-color: #F5F5F5;
+*/
+}
+
+.sliderControl-intervals.axisY
+{
+	top: 0;
+}
+
+.sliderControl-intervals.axisY.dirLTR
+{
+	right: 0;
+}
+
+.sliderControl-intervals.axisY.dirRTL
+{
+	left: 0;
+}
+
+/*text controls*/
+.textControl-body.warning
+{
+	background-color: yellow;
+}
+
+.textControl-body.error
+{
+	background-color: red;
+}
+
+/*tree controls*/
+li.treeNode-child
+{
+	list-style-type: none;
+}
+
+.treeNode-body
+{
+	padding-left: 0;
+}
+
+.treeNode-body.collapsed
+{
+	margin-left: 0;	
+}
+
+.treeNode-body.expanded
+{
+	margin-left: 1em;	
+}
+
+.treeNode-children
+{
+	margin-left: 0;	
+	padding-left: 0;
+}
+
+/*TODO fix
+ul.treeNode-collapsed, ul.treeNode-expanded
+{
+	list-style-type: none;
+}
+
+ul.treeNode-collapsed
+{
+	display: none;
+}
+
+ul.treeNode-expanded
+{
+	display: block;
+}
+*/
+
+li.treeNode-collapsed, li.treeNode-expanded, li.treeNode-leaf
+{
+	/*setting margin-left in the list item and removing the margin in the enclosing list would improve clicking UI in IE, but produces undesirable results in rtl environments in IE but not in Mozilla (which assumes margin-left means margin-right in rtl environments)*/
+}
+
+/*TODO fix
+li.treeNode-collapsed
+{
+	list-style-image: url("../images/treenode-collapsed.gif");
+	cursor: pointer;
+}
+
+li.treeNode-expanded
+{
+	list-style-image: url("../images/treenode-expanded.gif");
+	cursor: pointer;
+}
+
+li.treeNode-leaf
+{
+	list-style-image: url("../images/treenode-leaf.gif");
+	cursor: auto;
+}
+*/
+
+/*general properties*/
+.dragHandle
+{
+	cursor: move;
+}
+
+/*general labels*/
+.label,
+.groupPanel-label,
+.listControl-label,
+.image-label,
+.message-label,
+.panel-label,
+.resourceImportControl-label,
+.sliderControl-label,
+.textAreaControl-label,
+.textControl-label
+{
+	font-family: sans-serif;
+	font-size: smaller;
+	font-weight: bold;
+}
+
+/*general errors*/
+.checkControl-error,
+.groupPanel-error,
+.listControl-error,
+.panel-error,
+.resourceImportControl-error,
+.sliderControl-error,
+.textAreaControl-error,
+.textControl-error
+{
+	color: red;
+	font-family: sans-serif;
+	font-size: x-small;
+}
+
+.checkControl-error,
+.listControl-label, .listControl-body, .listControl-error,
+.resourceImportControl-label, .resourceImportControl-body, .resourceImportControl-error,
+.sliderControl-error,
+.textAreaControl-label, .textAreaControl-body, .textAreaControl-error,
+.textControl-label, .textControl-body, .textControl-error
+{
+	display: block;
+}
+
+.checkControl-label, .checkControl-body,
+.image-label, .image-message
+{
+	display: inline;
+}
+
+.image-body
+{
+	display: block;
+}
+
+.license
+{
+	color: #CCCCCC;
+	font-size: xx-small;
+}
+
+/*elements*/
+
+head, body, body.applicationFrame, form
+{
+	margin: 0;
+	padding: 0;
+	border-width: 0;
+	border-style: none;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+}
+
+head, body, body.applicationFrame
+{
+	background-color: white;
+}
+
+form
+{
+	background-color: transparent;
+}
+
+caption
+{
+	font-size: larger;
+	font-weight: bold;
+}
+
+dt
+{
+	font-weight: bold;
+}
+
+table.table
+{
+	border-collapse: collapse;
+	border-style: solid;
+	border-width: thick;
+}
+
+table.table th, table.table td
+{
+	border-style: solid;
+	border-width: thin;
+}
+
+/*layout*/
+
+table.layout-region
+{
+	border-collapse: collapse;
+	border: 0;
+	margin: 0;
+	padding: 0;
+/*TODO fix
+	width: 100%;
+	height: 100%;
+*/
+}
+
+td.layout-region-left, td.layout-region-right
+{
+	vertical-align: top;
+	padding-left: 0.25em;
+	padding-right: 0.25em;	
+}
+
+/*TODO fix; doesn't work for frames in either Mozilla or IE, although each gives different results
+td.layout-region-center
+{
+	width: 100%;
+	height: 100%;	
+}
+*/
+
+td.layout-region-bottom
+{
+}
+
+/*TODO fix; this is really needed to allow nested region layouts, but it kills IE frames
+.frame table.layout-region
+{
+	position: relative;
+}
+*/
+
+.frame td.layout-region-center
+{
+	width: 100%;
+	height: 100%;
+}
+
+.frame td.layout-region-bottom
+{
+/*TODO del; test
+	background-color: red;
+	border-width: thin;
+	border-style: solid;
+*/
+/*TODO fix
+	display: block;
+	position: absolute;
+	bottom: 0;
+*/
+}
+
+td.layout-flow-x-child
+{
+	vertical-align: top;
+	padding-left: 0.25em;
+	padding-right: 0.25em;
+}
+
+.layout-flow-x-child	/*for children in a horizontal flow layout, give each child inline display*/
+{
+/*TODO del	display: inline;*/
+}
+
+.layout-flow-y-child	/*for children in a vertical flow layout, give each child block display*/
+{
+	display: block;
+	clear: both;
+	padding-top: 0.25em;
+	padding-bottom: 0.25em;
+}
+/*TODO fix
+a.component.control:hover
+{
+	color: green;
+}
+*/

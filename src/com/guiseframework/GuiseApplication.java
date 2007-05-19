@@ -31,8 +31,8 @@ public interface GuiseApplication extends PropertyBindable
 	public final static String RESOURCE_BUNDLE_BASE_NAME_PROPERTY=getPropertyName(GuiseApplication.class, "resourceBundleBaseName");
 	/**The style bound property.*/
 	public final static String STYLE_PROPERTY=getPropertyName(GuiseApplication.class, "style");
-	/**The theme bound property.*/
-	public final static String THEME_PROPERTY=getPropertyName(GuiseApplication.class, "theme");
+	/**The theme URI bound property.*/
+	public final static String THEME_URI_PROPERTY=getPropertyName(GuiseApplication.class, "themeURI");
 	/**The bound property of whether this application applies themes.*/
 	public final static String THEMED_PROPERTY=getPropertyName(GuiseApplication.class, "themed");
 
@@ -49,9 +49,9 @@ public interface GuiseApplication extends PropertyBindable
 	/**The base path of public themes, relative to the application.*/
 	public final static String GUISE_PUBLIC_THEMES_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH+"themes/";
 	/**The base path of the default Guise theme, relative to the application.*/
-	public final static String GUISE_BASE_THEME_PATH=GUISE_PUBLIC_THEMES_PATH+"guise/";
-	/**The path of the default Guise theme, relative to the application.*/
-	public final static String GUISE_THEME_PATH=GUISE_BASE_THEME_PATH+"guise.theme.rdf";
+	public final static String GUISE_ROOT_THEME_BASE_PATH=GUISE_PUBLIC_THEMES_PATH+"root/";
+	/**The path of the root Guise theme, relative to the application.*/
+	public final static String GUISE_ROOT_THEME_PATH=GUISE_ROOT_THEME_BASE_PATH+"root.theme.rdf";
 
 	/**@return The application locale used by default if a new session cannot determine the users's preferred locale.*/
 //TODO del	public Locale getDefaultLocale();
@@ -120,16 +120,16 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public void setStyle(final URI newStyle);
 
-	/**@return The application theme, or <code>null</code> if the application has not yet been installed and no specific theme was indicated..*/
-	public Theme getTheme();
+	/**@return The URI of the application theme, to be resolved against the application base path.*/
+	public URI getThemeURI();
 
-	/**Sets the theme of the application.
+	/**Sets the URI of the application theme.
 	This is a bound property.
-	@param newTheme The new application theme.
-	@exception NullPointerException if the given theme is <code>null</code>.
-	@see #THEME_PROPERTY
+	@param newThemeURI The URI of the new application theme.
+	@exception NullPointerException if the given theme URI is <code>null</code>.
+	@see #THEME_URI_PROPERTY
 	*/
-	public void setTheme(final Theme newTheme);
+	public void setThemeURI(final URI newThemeURI);
 
 	/**Installs a component kit.
 	Later component kits take precedence over earlier-installed component kits.
@@ -483,9 +483,19 @@ public interface GuiseApplication extends PropertyBindable
 	@param theme The current theme in effect.
 	@param locale The locale for which resources should be retrieved.
 	@return A resolving resource bundle based upon the locale.
-	@exception MissingResourceException if a resource bundle could not be loaded.
+	@exception IOException if there was an error loading a resource bundle.
 	@see #getResourceBundleBaseName()
 	*/
-	public ResourceBundle getResourceBundle(final Theme theme, final Locale locale);
+	public ResourceBundle loadResourceBundle(final Theme theme, final Locale locale) throws IOException;
+
+	/**Loads a theme from the given URI.
+	All relative URIs are considered relative to the application.
+	If the theme specifies no parent theme, the default parent theme will be assigned unless the theme is the default theme.
+	@param themeURI The URI of the theme to load.
+	@return A loaded theme with resolving parents loaded as well.
+	@exception NullPointerException if the given theme URI is <code>null</code>.
+	@throws IOException if there is an error loading the theme or one of its parents.
+	*/
+	public Theme loadTheme(final URI themeURI) throws IOException;
 
 }
