@@ -34,7 +34,7 @@ public class ResourceColor implements Color<RGBColor.Component>
 	@return The value of the requested color component.
 	@see GuiseSession#getColorResource(String)
 	*/
-  public float getComponent(final RGBColor.Component component)
+  public double getComponent(final RGBColor.Component component)
   {
   	return Guise.getInstance().getGuiseSession().getColorResource(getResourceKey()).asRGB().getComponent(component);	//delegate to a color from the resources
   }
@@ -48,9 +48,18 @@ public class ResourceColor implements Color<RGBColor.Component>
 	@see #getComponent(Enum)
 	@see GuiseSession#getColorResource(String)
 	*/
-  public int getAbsoluteComponent(final RGBColor.Component component, final int bitDepth)
+  public long getAbsoluteComponent(final RGBColor.Component component, final int bitDepth)
   {
   	return Guise.getInstance().getGuiseSession().getColorResource(getResourceKey()).asRGB().getAbsoluteComponent(component, bitDepth);	//delegate to a color from the resources  	
+  }
+
+	/**Returns the color in the HSL color space.
+	This implementation retrieves a color from the Guise session resources and delegates to that object.
+	@return The color in the HSL color space.
+	*/
+  public HSLColor asHSL()
+  {
+  	return Guise.getInstance().getGuiseSession().getColorResource(getResourceKey()).asHSL();	//delegate to a color from the resources
   }
 
 	/**Returns the color in the RGB color space.

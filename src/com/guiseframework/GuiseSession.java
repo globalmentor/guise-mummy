@@ -276,7 +276,7 @@ public interface GuiseSession extends PropertyBindable
 	public Boolean getBooleanResource(final String resourceKey, final Boolean defaultValue) throws MissingResourceException;
 
 	/**Retrieves a {@link Color} resource from the resource bundle.
-	If the given resource is a string, it will be converted to an {@link RGBColor}.
+	If the given resource is a string, it will be resolved and converted to a color using {@link AbstractColor#valueOf(CharSequence)}.
 	This is a preferred convenience method for accessing the resources in the session's resource bundle.
 	@param resourceKey The key of the resource to retrieve.
 	@return The resource associated with the specified resource key.
@@ -286,11 +286,12 @@ public interface GuiseSession extends PropertyBindable
 	@exception IllegalArgumentException if a string is provided that is not a valid color.
 	@see #getResourceBundle()
 	@see #getColorResource(String, Color)
+	@see AbstractColor#valueOf(CharSequence)
 	*/
 	public Color<?> getColorResource(final String resourceKey) throws MissingResourceException;
 
 	/**Retrieves a {@link Color} resource from the resource bundle, using a specified default if no such resource is available.
-	If the given resource is a string, it will be converted to an {@link RGBColor}.
+	If the given resource is a string, it will be resolved and converted to a color using {@link AbstractColor#valueOf(CharSequence)}.
 	This is a preferred convenience method for accessing the resources in the session's resource bundle.
 	@param resourceKey The key of the resource to retrieve.
 	@param defaultValue The default value to use if there is no resource associated with the given key.
@@ -299,6 +300,7 @@ public interface GuiseSession extends PropertyBindable
 	@exception ClassCastException if the resource associated with the given key is not an instance of {@link String} or {@link Color}.
 	@see #getResourceBundle()
 	@see #getColorResource(String)
+	@see AbstractColor#valueOf(CharSequence)
 	*/
 	public Color<?> getColorResource(final String resourceKey, final Color<?> defaultValue) throws MissingResourceException;
 

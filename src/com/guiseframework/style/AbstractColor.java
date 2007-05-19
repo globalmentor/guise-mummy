@@ -2,6 +2,8 @@ package com.guiseframework.style;
 
 import java.util.Arrays;
 
+import com.garretwilson.text.ArgumentSyntaxException;
+
 /**Abstract encapsulation of a color value.
 @param <C> The type of color component for this color space.
 @author Garret Wilson
@@ -10,23 +12,23 @@ import java.util.Arrays;
 */
 public abstract class AbstractColor<C extends Enum<?>> implements Color<C>
 {
-	/**The color component values.*/
-	private final float[] values;
+	/**The color component values, each within the range (0.0-1.0).*/
+	private final double[] values;
 
-		/**@return The color component values.*/
-		public float[] getValues() {return values.clone();}
+		/**@return The color component values, each within the range (0.0-1.0).*/
+		public double[] getValues() {return values.clone();}
 	
 	/**The precalculated hash code of the color.*/
 	private final int hashCode;
 
 	/**Constructs a color with the given components.
-	@param values The values of components of the color in the correct color space, in the order of the component ordinals.
+	@param values The values of components of the color in the correct color space, each within the range (0.0-1.0), in the order of the component ordinals.
 	@exception NullPointerException if the components is <code>null</code>.
 TODO fix	@exception IllegalArgumentException if the number of component values do not equal the number of components.
 	*/
-	public AbstractColor(final float... values)
+	public AbstractColor(final double... values)
 	{
-		this.values=new float[values.length];	//create a new array of values
+		this.values=new double[values.length];	//create a new array of values
 		for(int i=values.length-1; i>=0; --i)	//for each value
 		{
 			this.values[i]=checkComponentValue(values[i]);	//check and store this color component
@@ -39,7 +41,7 @@ TODO fix	@exception IllegalArgumentException if the number of component values d
 	@return The checked value.
 	@exception IllegalArgumentException if the given component is outside the range (0.0-1.0).
 	*/
-  protected static float checkComponentValue(final float value)
+  protected static double checkComponentValue(final double value)
   {
   	if(value<0.0f || value>1.0f)	//if this value is outside the color component range
   	{
@@ -52,7 +54,7 @@ TODO fix	@exception IllegalArgumentException if the number of component values d
 	@param component The color component for which a value should be retrieved.
 	@return The value of the requested color component.
 	*/
-  public float getComponent(final C component)
+  public double getComponent(final C component)
   {
   	return values[component.ordinal()];	//look up the color component in the array
   }
@@ -64,7 +66,7 @@ TODO fix	@exception IllegalArgumentException if the number of component values d
 	@return The absolute value of the requested color component at the given bit depth.
 	@see #getComponent(Enum)
 	*/
-  public int getAbsoluteComponent(final C component, final int bitDepth)
+  public long getAbsoluteComponent(final C component, final int bitDepth)
   {
   	return Math.round(getComponent(component)*((1<<bitDepth)-1));	//multiply the component value by the range of values at the given bit depth
   }
@@ -82,7 +84,46 @@ TODO fix	@exception IllegalArgumentException if the number of component values d
 	*/
 	public boolean equals(final Object object)
 	{
-		return object!=null && getClass().equals(object.getClass()) && Arrays.equals(values, ((AbstractColor)object).values);	//see if the classes and the component values are the same
+		return object!=null && getClass().equals(object.getClass()) && Arrays.equals(values, ((AbstractColor<?>)object).values);	//see if the classes and the component values are the same
 	}
 
+	/**Creates a color from a string representation.
+	This representation can be in one of the following forms:
+	<ul>
+		<li><code><var>colorname</var></code>, one of the {@link <a href="http://www.w3schools.com/html/html_colornames.asp">HTML color names</a>}, which must be in all lowercase without delimiters, such as "aliceblue".</li>
+		<li><code>#<var>rgb</var></code>, with hexadecimal representation of RGB color components without regard to case.</li>
+		<li><code>#<var>rrggbb</var></code>, with hexadecimal representation of RGB color components without regard to case.</li>
+		<li><code>rgb(<var>red</var>,<var>green</var>,<var>blue</var>)</code>, with decimal representation with a depth of eight bits (0-255).</li>
+		<li><code>rgb(<var>red</var>%,<var>green</var>%,<var>blue</var>%)</code>, with decimal component values multiplied by 100 (0.0-100.0%).</li>
+		<li><code>rgba(<var>red</var>,<var>green</var>,<var>blue</var>,<var>alpha</var>)</code>, with decimal representation with a depth of eight bits (0-255).</li>
+		<li><code>rgba(<var>red</var>%,<var>green</var>%,<var>blue</var>%,<var>alpha</var>%)</code>, with decimal component values multiplied by 100 (0.0%-100.0%).</li>
+		<li><code>hsl(<var>hue</var>,<var>saturation</var>,<var>lightness</var>)</code>, with decimal representation with a depth of eight bits (0-255).</li>
+		<li><code>hsl(<var>hue</var>%,<var>saturation</var>%,<var>lightness</var>%)</code>, with decimal component values multiplied by 100 (0.0-100.0%).</li>
+	</ul>
+	This method also recognizes the <code>transparent</code> color name as equivalent to <code>rgba(0, 0, 0, 0)</code>, or black with zero alpha.
+	@param charSequence The character sequence representation of a color. 
+	@return A color object representing the color represented by the given string.
+	@exception NullPointerException if the given string is <code>null</code>.
+	@exception IllegalArgumentException if a color cannot be determined from the given string.
+	@see HSLColor#valueOf(CharSequence) 
+	@see RGBColor#valueOf(CharSequence)
+	*/
+	public static Color<?> valueOf(final CharSequence charSequence)
+	{
+		try
+		{
+			return RGBColor.valueOf(charSequence);	//try to return an RGB color (perhaps the most common representation)
+		}
+		catch(final IllegalArgumentException illegalArgumentException)	//if we couldn't determine an RGB color
+		{
+			try
+			{
+				return HSLColor.valueOf(charSequence);	//try to return an HSL color
+			}
+			catch(final IllegalArgumentException illegalArgumentException2)	//if we couldn't determine an HSL color
+			{
+				throw new ArgumentSyntaxException("Character sequence "+charSequence+" does not represent a known color.");
+			}			
+		}
+	}
 }

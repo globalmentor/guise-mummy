@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.*;
 
+import static com.garretwilson.lang.MathUtilities.*;
 import com.garretwilson.text.ArgumentSyntaxException;
 
 /**Encapsulates a color value of the sRGB color space.
@@ -63,6 +64,7 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 	}
 
 	/**Creates an opaque sRGB color with the specified absolute red, green, and blue component values.
+	The alpha component will be set to its maximum (0xFF).
 	@param red The red component on an absolute scale in the range (0x00-0xFF).
 	@param green The green component on an absolute scale in the range (0x00-0xFF).
 	@param blue The blue component on an absolute scale in the range (0x00-0xFF).
@@ -70,7 +72,7 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 	*/
 	public RGBColor(final int red, final int green, final int blue)
 	{
-		this(red, green, blue, 1.0f);	//construct the color with full alpha
+		this(red, green, blue, 0xFF);	//construct the color with full alpha
 	}
 
 	/**Creates an sRGB color with the specified absolute red, green, blue, and alpha component values.
@@ -82,18 +84,19 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 	*/
 	public RGBColor(final int red, final int green, final int blue, final int alpha)
 	{
-		this((float)red/0xFF, (float)green/0xFF, (float)blue/0xFF, (float)alpha/0xFF);	//convert the components into relative amounts
+		this((double)red/0xFF, (double)green/0xFF, (double)blue/0xFF, (double)alpha/0xFF);	//convert the components into relative amounts
 	}
 
 	/**Creates an opaque sRGB color with the specified red, green, and blue component values.
+	The alpha component will be set to its maximum (1.0).
 	@param red The red component.
 	@param green The green component.
 	@param blue The blue component.
 	@exception IllegalArgumentException if one of the values is outside the range (0.0-1.0).
 	*/
-	public RGBColor(final float red, final float green, final float blue)
+	public RGBColor(final double red, final double green, final double blue)
 	{
-		this(red, green, blue, 1.0f);	//construct the color with full alpha
+		this(red, green, blue, 1.0);	//construct the color with full alpha
 	}
 
 	/**Creates an sRGB color with the specified red, green, blue, and alpha component values.
@@ -103,79 +106,155 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 	@param alpha The alpha component.
 	@exception IllegalArgumentException if one of the values is outside the range (0.0-1.0).
 	*/
-	public RGBColor(final float red, final float green, final float blue, final float alpha)
+	public RGBColor(final double red, final double green, final double blue, final double alpha)
 	{
 		super(alpha, red, green, blue);	//construct the parent class
 	}
 
 	/**@return The red component value.*/
-	public float getRed()
+	public double getRed()
 	{
 		return getComponent(Component.RED);	//return red component
 	}
 
 	/**@return The absolute red value at a depth of 8 bits.*/
-	public int getAbsoluteRed()
+	public int getAbsoluteRed8()
 	{
-		return getAbsoluteComponent(Component.RED, 8);	//return the absolute red component at 8 bits
+		return (int)getAbsoluteComponent(Component.RED, 8);	//return the absolute red component at 8 bits
 	}
 
 	/**@return The green component value.*/
-	public float getGreen()
+	public double getGreen()
 	{
 		return getComponent(Component.GREEN);	//return the green component
 	}
 
 	/**@return The absolute green value at a depth of 8 bits.*/
-	public int getAbsoluteGreen()
+	public int getAbsoluteGreen8()
 	{
-		return getAbsoluteComponent(Component.GREEN, 8);	//return the absolute green component at 8 bits
+		return (int)getAbsoluteComponent(Component.GREEN, 8);	//return the absolute green component at 8 bits
 	}
 
 	/**@return The blue component value.*/
-	public float getBlue()
+	public double getBlue()
 	{
 		return getComponent(Component.BLUE);	//return the blue component
 	}
 
 	/**@return The absolute blue value at a depth of 8 bits.*/
-	public int getAbsoluteBlue()
+	public int getAbsoluteBlue8()
 	{
-		return getAbsoluteComponent(Component.BLUE, 8);	//return the absolute blue component at 8 bits
+		return (int)getAbsoluteComponent(Component.BLUE, 8);	//return the absolute blue component at 8 bits
 	}
 
 	/**@return The alpha component value.*/
-	public float getAlpha()
+	public double getAlpha()
 	{
 		return getComponent(Component.ALPHA);	//return the alpha component
 	}
 
 	/**@return The absolute alpha value at a depth of 8 bits.*/
-	public int getAbsoluteAlpha()
+	public int getAbsoluteAlpha8()
 	{
-		return getAbsoluteComponent(Component.ALPHA, 8);	//return the absolute alpha component at 8 bits
+		return (int)getAbsoluteComponent(Component.ALPHA, 8);	//return the absolute alpha component at 8 bits
+	}
+
+	/**The double value representing 1/3.*/
+	private final static double ONE_THIRD=1.0d/3.0d;
+	/**The double value representing 2/3.*/
+	private final static double TWO_THIRDS=2.0d/3.0d;
+
+	/**Converts this RGB color to an HSL color.
+	@return The color in the HSL color space.
+	@see <a href="http://en.wikipedia.org/wiki/HSL_color_space">HSL color space: Converting to RGB</a>
+	@see <a href="http://www.easyrgb.com/math.php?MATH=M18#text18">EasyRGB RGB->HSL</a>
+	*/
+	public HSLColor asHSL()
+	{
+		final double red=getRed();	//get the RGB values
+		final double green=getGreen();
+		final double blue=getBlue();
+		final double hue, saturation, lightness;	//we'll calculate the HSL values
+		final double min=min(red, green, blue);	//get the minimum RGB component
+		final double max=max(red, green, blue);	//get the maximum RGB component
+		final double delta=max-min;	//get the delta RGB value
+		lightness=(max+min)/2;
+		if(delta==0)	//if there is no difference between the least and greatest RGB component values, this is gray with no chroma
+		{
+			hue=0;
+			saturation=0;
+		}
+		else	//calculate chromatic data
+		{
+			saturation=lightness<0.5 ? delta/(max+min) : delta/(2-(max+min));	//Wikipedia uses <=; easyRGB uses <; with zero-based values < makes more sense
+			double deltaRed=(((max-red)/6)+(delta/2))/delta;
+			double deltaGreen=(((max-green)/6)+(delta/2))/delta;
+			double deltaBlue=(((max-blue)/6)+(delta/2))/delta;
+			double tempHue;	//determine a temporary hue value and then normalize it
+			if(red==max)
+			{
+				tempHue=deltaBlue-deltaGreen;
+			}
+			else if(green==max)
+			{
+				tempHue=ONE_THIRD+deltaRed-deltaBlue;
+			}
+			else if(blue==max)
+			{
+				tempHue=TWO_THIRDS+deltaGreen-deltaRed;
+			}
+			else
+			{
+				throw new AssertionError("No color component matched maximum value "+max);
+			}
+			if(tempHue<0)	//normalize the hue value
+			{
+				hue=tempHue+1;
+			}
+			else if(tempHue>1)
+			{
+				hue=tempHue-1;
+			}
+			else	//if the hue is already normalized
+			{
+				hue=tempHue;	//use the hue as-is
+			}
+		}
+		return new HSLColor(hue, saturation, lightness);	//return the HSL color	
 	}
 
 	/**@return The color in the RGB color space.*/
 	public RGBColor asRGB()
 	{
-		return this;
+		return this;	//this color object is already an RGB color
 	}
 
 	/**A regular expression pattern matching <code>#<var>rgb</var></code>, with the first three groups representing the three RGB character sequences.*/
-	private final static Pattern RGB_PATTERN=Pattern.compile("#([0-9a-fA-F])([0-9a-fA-F])([0-9a-fA-F])");
+	private final static Pattern RGB_PATTERN=Pattern.compile("#(\\p{XDigit})(\\p{XDigit})(\\p{XDigit})");
 	/**A regular expression pattern matching <code>#<var>rrggbb</var></code>, with the first three groups representing the three RGB character sequences.*/
-	private final static Pattern RRGGBB_PATTERN=Pattern.compile("#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})");
-	
+	private final static Pattern RRGGBB_PATTERN=Pattern.compile("#(\\p{XDigit}{2})(\\p{XDigit}{2})(\\p{XDigit}{2})");
+	/**A regular expression pattern matching <code>rgb(<var>red</var>,<var>green</var>,<var>blue</var>)</code>, with the first three groups representing the three RGB character sequences.*/
+	private final static Pattern RGB_ABSOLUTE_FUNCTION_PATTERN=Pattern.compile("rgb\\((\\d{0,3}),\\s*(\\d{0,3}),\\s*(\\d{0,3})\\)");
+	/**A regular expression pattern matching <code>rgb(<var>red</var>%,<var>green</var>%,<var>blue</var>%)</code>, with the first three groups representing the three RGB character sequences.*/
+	private final static Pattern RGB_PERCENT_FUNCTION_PATTERN=Pattern.compile("rgb\\(([\\d\\.]+)%,\\s*([\\d\\.]+)%,\\s*([\\d\\.]+)%\\)");
+	/**A regular expression pattern matching <code>rgba(<var>red</var>,<var>green</var>,<var>blue</var>,<var>alpha</var>)</code>, with the first four groups representing the three RGB character sequences.*/
+	private final static Pattern RGBA_ABSOLUTE_FUNCTION_PATTERN=Pattern.compile("rgb\\((\\d{0,3}),\\s*(\\d{0,3}),\\s*(\\d{0,3}),\\s*(\\d{0,3})\\)");
+	/**A regular expression pattern matching <code>rgba(<var>red</var>,<var>green</var>%,<var>blue</var>%,<var>alpha</var>%)</code>, with the first four groups representing the three RGB character sequences.*/
+	private final static Pattern RGBA_PERCENT_FUNCTION_PATTERN=Pattern.compile("rgb\\(([\\d\\.]+)%,\\s*([\\d\\.]+)%,\\s*([\\d\\.]+)%,\\s*([\\d\\.]+)%\\)");
+
 	/**Creates an RGB color from a string representation.
 	This representation can be in one of the following forms:
 	<ul>
 		<li><code><var>colorname</var></code>, one of the {@link <a href="http://www.w3schools.com/html/html_colornames.asp">HTML color names</a>}, which must be in all lowercase without delimiters, such as "aliceblue".</li>
 		<li><code>#<var>rgb</var></code>, with hexadecimal representation of color components without regard to case.</li>
 		<li><code>#<var>rrggbb</var></code>, with hexadecimal representation of color components without regard to case.</li>
+		<li><code>rgb(<var>red</var>,<var>green</var>,<var>blue</var>)</code>, with decimal representation with a depth of eight bits (0-255).</li>
+		<li><code>rgb(<var>red</var>%,<var>green</var>%,<var>blue</var>%)</code>, with decimal component values multiplied by 100 (0.0-100.0%).</li>
+		<li><code>rgba(<var>red</var>,<var>green</var>,<var>blue</var>,<var>alpha</var>)</code>, with decimal representation with a depth of eight bits (0-255).</li>
+		<li><code>rgba(<var>red</var>%,<var>green</var>%,<var>blue</var>%,<var>alpha</var>%)</code>, with decimal component values multiplied by 100 (0.0%-100.0%).</li>
 	</ul>
-	This method also recognizes the <code>transparent</code> color name as equivalent to rgba(0, 0, 0, 0), or black with zero alpha.
-	@param charSequence The character sequence representation of a color, either a lowercase name of a standard HTML color, or a three or six-digit hex code beginning with '#'. 
+	This method also recognizes the <code>transparent</code> color name as equivalent to <code>rgba(0, 0, 0, 0)</code>, or black with zero alpha.
+	@param charSequence The character sequence representation of an RGB color. 
 	@return An RGB color object representing the color represented by the given string.
 	@exception NullPointerException if the given string is <code>null</code>.
 	@exception IllegalArgumentException if a color cannot be determined from the given string. 
@@ -200,9 +279,28 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 		{
 			return namedColor;	//return the named color
 		}
-		throw new ArgumentSyntaxException("Character sequence "+charSequence+" does not represent a color.");
+		final Matcher rgbAbsoluteFunctionMatcher=RGB_ABSOLUTE_FUNCTION_PATTERN.matcher(charSequence);	//match against rgb(r, g, b)
+		if(rgbAbsoluteFunctionMatcher.matches())	//if the character sequence matches
+		{
+			return new RGBColor(Integer.parseInt(rgbAbsoluteFunctionMatcher.group(1), 10), Integer.parseInt(rgbAbsoluteFunctionMatcher.group(2), 10), Integer.parseInt(rgbAbsoluteFunctionMatcher.group(3), 10));	//extract the RGB values and return a new color
+		}
+		final Matcher rgbPercentFunctionMatcher=RGB_PERCENT_FUNCTION_PATTERN.matcher(charSequence);	//match against rgb(r%, g%, b%)
+		if(rgbPercentFunctionMatcher.matches())	//if the character sequence matches
+		{
+			return new RGBColor(Double.parseDouble(rgbPercentFunctionMatcher.group(1))/100, Double.parseDouble(rgbPercentFunctionMatcher.group(2))/100, Double.parseDouble(rgbPercentFunctionMatcher.group(3))/100);	//extract the RGB values and return a new color
+		}
+		final Matcher rgbaAbsoluteFunctionMatcher=RGBA_ABSOLUTE_FUNCTION_PATTERN.matcher(charSequence);	//match against rgb(r, g, b, a)
+		if(rgbaAbsoluteFunctionMatcher.matches())	//if the character sequence matches
+		{
+			return new RGBColor(Integer.parseInt(rgbaAbsoluteFunctionMatcher.group(1), 10), Integer.parseInt(rgbaAbsoluteFunctionMatcher.group(2), 10), Integer.parseInt(rgbaAbsoluteFunctionMatcher.group(3), 10), Integer.parseInt(rgbaAbsoluteFunctionMatcher.group(4), 10));	//extract the RGBA values and return a new color
+		}
+		final Matcher rgbaPercentFunctionMatcher=RGBA_PERCENT_FUNCTION_PATTERN.matcher(charSequence);	//match against rgba(r%, g%, b%)
+		if(rgbaPercentFunctionMatcher.matches())	//if the character sequence matches
+		{
+			return new RGBColor(Double.parseDouble(rgbaPercentFunctionMatcher.group(1))/100, Double.parseDouble(rgbaPercentFunctionMatcher.group(2))/100, Double.parseDouble(rgbaPercentFunctionMatcher.group(3))/100, Double.parseDouble(rgbaPercentFunctionMatcher.group(4))/100);	//extract the RGBA values and return a new color
+		}
+		throw new ArgumentSyntaxException("Character sequence "+charSequence+" does not represent an RGB color.");
 	}
-
 
 	public final static RGBColor TRANSPARENT=new RGBColor(0x00000000, true);
 

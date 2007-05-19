@@ -496,7 +496,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		}
 		
 		/**Retrieves a {@link Color} resource from the resource bundle.
-		If the given resource is a string, it will be converted to an {@link RGBColor}.
+		If the given resource is a string, it will be resolved and converted to a color using {@link AbstractColor#valueOf(CharSequence)}.
 		This is a preferred convenience method for accessing the resources in the session's resource bundle.
 		@param resourceKey The key of the resource to retrieve.
 		@return The resource associated with the specified resource key.
@@ -506,13 +506,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@exception IllegalArgumentException if a string is provided that is not a valid color.
 		@see #getResourceBundle()
 		@see #getColorResource(String, Color)
+		@see AbstractColor#valueOf(CharSequence)
 		*/
 		public Color<?> getColorResource(final String resourceKey) throws MissingResourceException
 		{
 			final Object resource=getResource(resourceKey);	//retrieve a resource from the resource bundle
 			if(resource instanceof String)	//if the resource is a string
 			{
-				return RGBColor.valueOf(resolveString((String)resource));	//create a color from the resource string
+				return AbstractColor.valueOf(resolveString((String)resource));	//create a color from the resolved string
 			}
 			else	//if the resource is not a string, assume it is a color
 			{
@@ -521,7 +522,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		}
 
 		/**Retrieves a {@link Color} resource from the resource bundle, using a specified default if no such resource is available.
-		If the given resource is a string, it will be converted to an {@link RGBColor}.
+		If the given resource is a string, it will be resolved and converted to a color using {@link AbstractColor#valueOf(CharSequence)}.
 		This is a preferred convenience method for accessing the resources in the session's resource bundle.
 		@param resourceKey The key of the resource to retrieve.
 		@param defaultValue The default value to use if there is no resource associated with the given key.
@@ -530,6 +531,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@exception ClassCastException if the resource associated with the given key is not an instance of {@link String} or {@link Color}.
 		@see #getResourceBundle()
 		@see #getColorResource(String)
+		@see AbstractColor#valueOf(CharSequence)
 		*/
 		public Color<?> getColorResource(final String resourceKey, final Color<?> defaultValue) throws MissingResourceException
 		{
