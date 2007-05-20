@@ -443,7 +443,6 @@ Debug.trace("checking for categories");
 	{
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 //	TODO del Debug.info("method:", request.getMethod(), "raw path info:", rawPathInfo);
-Debug.info("method:", request.getMethod(), "raw path info:", rawPathInfo);
 //TODO del Debug.info("user agent:", getUserAgent(request));
 //	TODO del final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
 //	TODO del Debug.info("before service request: memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
@@ -511,7 +510,6 @@ Debug.trace("found destination:", destination);
 							{
 								try
 								{
-Debug.trace("ready to process guise request for destination", destination);
 									serviceGuiseRequest(request, response, guiseContainer, guiseApplication, guiseSession, destination);	//service the Guise request to the given destination
 								}
 								catch(final IOException ioException)	//if an exception is thrown
@@ -583,10 +581,8 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 		{
 			final ComponentDestination componentDestination=(ComponentDestination)destination;	//get the destination as a component destination
 //		TODO del Debug.trace("have destination; creating context");
-Debug.trace("have destination; creating context");
 			final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, destination, request, response);	//create a new Guise context
 //		TODO del Debug.trace("got context");
-Debug.trace("got context");
 			synchronized(guiseSession)	//don't allow other session contexts to be active at the same time
 			{
 //TODO del Debug.trace("setting context");
@@ -1092,7 +1088,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 								if(!progressComponents.contains(progressComponent))	//if this is the first transfer for this component
 								{
 									progressComponents.add(progressComponent);	//add this progress component to our set of progress components so we can send finish events to them later
-Debug.trace("sending progress with no task for starting");
+//Debug.trace("sending progress with no task for starting");
 									progressComponent.processEvent(new ProgressControlEvent(progressComponent.getID(), null, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting for all transfers
 								}
 								final RDFResource resourceDescription=new DefaultRDFResource();	//create a new resource description

@@ -14,7 +14,7 @@ import com.guiseframework.model.*;
 import com.guiseframework.validator.*;
 
 /**Text Search Guise demonstration panel.
-Copyright © 2005 GlobalMentor, Inc.
+Copyright © 2005-2007 GlobalMentor, Inc.
 Demonstrates resource input (file upload) controls, file upload content type and size validation,
 	manual component error specification, custom model validation, and text area controls.
 This demonstration assumes text files are encoded using the system default character encoding.
@@ -73,10 +73,10 @@ public class TextSearchPanel extends DefaultNavigationPanel
 		searchButton.setLabel("Search");	//set the button label
 		inputPanel.add(searchButton);	//add the search button to the input panel
 
-			//text area
-		final TextAreaControl textAreaControl=new TextAreaControl(25, 40);	//create a text area control 25 rows by 40 columns
-		textAreaControl.setLabel("Results");	//set the label of the text area
-		textAreaControl.setEditable(false);	//don't allow the text area control to be edited
+			//text
+		final TextControl<String> textControl=new TextControl<String>(String.class, 25, 40);	//create a text area 25 rows by 40 columns
+		textControl.setLabel("Results");	//set the label of the text area
+		textControl.setEditable(false);	//don't allow the text control to be edited
 
 		//listen for the value of the resource import changing
 		resourceImportControl.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<ResourceImport>()
@@ -128,10 +128,11 @@ public class TextSearchPanel extends DefaultNavigationPanel
 							}
 							try
 							{
-								textAreaControl.setValue(searchResults);	//show the search results in the text area
+								textControl.setValue(searchResults);	//show the search results in the text area
 							}
-							catch(final PropertyVetoException propertyVetoException)	//if the change was vetoed, ignore the exception
+							catch(final PropertyVetoException propertyVetoException)	//the change should never be vetoed
 							{
+								throw new AssertionError(propertyVetoException);
 							}
 						}
 						catch(final IOException ioException)	//if there is an I/O error
@@ -142,7 +143,7 @@ public class TextSearchPanel extends DefaultNavigationPanel
 				});
 
 		add(inputPanel);	//add the input panel to the panel
-		add(textAreaControl);	//add the text area control to the panel
+		add(textControl);	//add the text control to the panel
 	}
 
 	/**A pattern validator that can validate whether a regular expression has valid syntax, allowing <code>null</code> values.

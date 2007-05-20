@@ -103,6 +103,9 @@ var GUISE_AJAX_UPLOAD_PING_INTERVAL=3000;
 /**See if the browser is Safari.*/
 var isSafari=navigator.userAgent.indexOf("Safari")>=0;	//TODO use a better variable; do better checks; update Guise server routines to check for Safari
 
+/**This will later be updated to indicate if there is a resource import control on the form.*/
+var hasResourceImportControl=false;
+
 /**The URI of the XHTML namespace.*/
 var XHTML_NAMESPACE_URI="http://www.w3.org/1999/xhtml";
 
@@ -4625,6 +4628,10 @@ function initializeNode(node, deep, initialInitialization)
 								{
 									eventManager.addEvent(node, "change", onFileInputChange, false);
 								}
+								else if(elementClassNames.contains("resourceImportControl-body"))	//if this is a Guise resource import control, we'll later need to submit the form differently
+								{
+									hasResourceImportControl=true;	//we found a resource import control
+								}
 								break;
 						}
 						break;
@@ -5012,33 +5019,34 @@ function onFileInputChange(event)
 */
 function onButtonClick(event)
 {
-	var element=event.currentTarget;	//get the element on which the event was registered
-/*TODO fix for new upload techniques
-	var form=getForm(element);	//get the form
-	if(form && DOMUtilities.getDescendantElementByName(form, "input", new Map("type", "file")))	//if there is a file input element, we'll have to submit the entire page rather than using AJAX
+	if(hasResourceImportControl)	//if there is a resource import control on the page TODO later change this to submit normal AJAX actions, and send back a message to actually submit the page
 	{
-		if(element.id)	//if the button has an ID
+		var element=event.currentTarget;	//get the element on which the event was registered
+		var form=getForm(element);	//get the form
+		if(form)	//if we found the form
 		{
-			if(form.id)	//if the form has an ID
+			if(element.id)	//if the button has an ID
 			{
-				var actionInputID=form.id.replace(".form", ".input");	//determine the ID of the hidden action input TODO use a constant, or get these values using a better method
-				var actionInput=document.getElementById(actionInputID);	//get the action input
-				if(actionInput)	//if there is an action input
+				if(form.id)	//if the form has an ID
 				{
-					actionInput.value=element.id;	//indicate which action was activated
+					var actionInputID=form.id.replace(".form", ".input");	//determine the ID of the hidden action input TODO update this to use a constant non-form-relative value
+					var actionInput=document.getElementById(actionInputID);	//get the action input
+					if(actionInput)	//if there is an action input
+					{
+						actionInput.value=element.id;	//indicate which action was activated
+					}
+					form.submit();	//submit the form
+					if(actionInput)	//if there is an action input
+					{
+						actionInput.value=null;	//remove the indication of which action was activated
+					}
+					event.stopPropagation();	//tell the event to stop bubbling
+					event.preventDefault();	//prevent the default functionality from occurring
 				}
-				form.submit();	//submit the form
-				if(actionInput)	//if there is an action input
-				{
-					actionInput.value=null;	//remove the indication of which action was activated
-				}
-				event.stopPropagation();	//tell the event to stop bubbling
-				event.preventDefault();	//prevent the default functionality from occurring
 			}
 		}
 	}
-	else	//if there is no file input element, we can submit the action via AJAX normally
-*/
+	else	//if there is no resource import element, we can submit the action via AJAX normally
 	{
 		onAction(event);	//process an action for the button
 	}
@@ -5725,7 +5733,7 @@ function onMouse(event)
 function getForm(node)	//TODO improve; currently this two-direction search is needed because some components, such as frames, can live outside forms; change this so that frames get added inside the form
 {
 	var form=DOMUtilities.getAncestorElementByName(node, "form");	//get the form ancestor
-	if(form==null)	//if there is no form ancestor (e.g. the node is a frame outside the form)
+	if(form==null)	//if there is no form ancestor (e.g. the node is a frame outside the form) TODO remove all this (remove this entire function) because everything now goes inside the form
 	{
 		form=DOMUtilities.getDescendantElementByName(document.documentElement, "form");	//search the whole document for the form
 	}

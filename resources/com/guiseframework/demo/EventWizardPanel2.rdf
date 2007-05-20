@@ -31,14 +31,14 @@
 						<property:constraints><layout:RegionConstraints property:region="LINE_START"/></property:constraints>
 						<property:children rdf:parseType="Collection">
 							<component:Link rdf:nodeID="personalLink10" property:label="1. Personal"/>
-							<component:TaskStatusSelectLink rdf:nodeID="personalLink11" property:label="Name"/>
-							<component:TaskStatusSelectLink rdf:nodeID="personalLink12" property:label="Age"/>
-							<component:TaskStatusSelectLink rdf:nodeID="personalLink13" property:label="Email"/>
+							<component:TaskStateSelectLink rdf:nodeID="personalLink11" property:label="Name"/>
+							<component:TaskStateSelectLink rdf:nodeID="personalLink12" property:label="Age"/>
+							<component:TaskStateSelectLink rdf:nodeID="personalLink13" property:label="Email"/>
 							<component:Link rdf:nodeID="personalLink20" property:label="2. Business"/>
-							<component:TaskStatusSelectLink rdf:nodeID="personalLink21" property:label="Name"/>
-							<component:TaskStatusSelectLink rdf:nodeID="personalLink22" property:label="Address"/>
+							<component:TaskStateSelectLink rdf:nodeID="personalLink21" property:label="Name"/>
+							<component:TaskStateSelectLink rdf:nodeID="personalLink22" property:label="Address"/>
 							<component:Link rdf:nodeID="personalLink30" property:label="3. Event"/>
-							<component:TaskStatusSelectLink rdf:nodeID="personalLink31" property:label="Name"/>
+							<component:TaskStateSelectLink rdf:nodeID="personalLink31" property:label="Name"/>
 						</property:children>
 					</component:LayoutPanel>
 					<component:TabContainerControl rdf:nodeID="wizardTabContainerControl" property:axis="LINE">	<!-- tabs -->
