@@ -41,12 +41,16 @@ public class Theme extends ClassTypedRDFResource
 		//theme properties
 	/**The apply property name; the local name of <code>theme:apply</code>.*/
 	public final static String APPLY_PROPERTY_NAME="apply";
-	/**The class property name; the local name of <code>theme:class</code>.*/
-	public final static String CLASS_PROPERTY_NAME="class";
+	/**The component class property name; the local name of <code>theme:componentClass</code>.*/
+	public final static String COMPONENT_CLASS_PROPERTY_NAME="componentClass";
+	/**The declarations property name; the local name of <code>theme:declarations</code>.*/
+	public final static String DECLARATIONS_PROPERTY_NAME="declarations";
+	/**The not parent component class property name; the local name of <code>theme:notParentComponentClass</code>.*/
+	public final static String NOT_PARENT_COMPONENT_CLASS_PROPERTY_NAME="notParentComponentClass";
+	/**The parent component class property name; the local name of <code>theme:parentComponentClass</code>.*/
+	public final static String PARENT_COMPONENT_CLASS_PROPERTY_NAME="parentComponentClass";
 	/**The resources property name; the local name of <code>theme:resources</code>.*/
 	public final static String RESOURCES_PROPERTY_NAME="resources";
-	/**The rules property name; the local name of <code>theme:rules</code>.*/
-	public final static String RULES_PROPERTY_NAME="rules";
 	/**The select property name; the local name of <code>theme:select</code>.*/
 	public final static String SELECT_PROPERTY_NAME="select";
 
@@ -61,8 +65,8 @@ public class Theme extends ClassTypedRDFResource
 		*/
 		public void setParent(final Theme newParent) {parent=newParent;}	//TODO maybe remove and create custom ThemeIO
 
-	/**The map of sets of rules that have selectors selecting classes.*/
-	private final CollectionMap<Class<?>, Rule, Set<Rule>> classRuleMap=new HashSetHashMap<Class<?>, Rule>();	//TODO make this store a sorted set, and use a comparator based on order
+	/**The map of sets of rules that have selectors selecting component classes.*/
+	private final CollectionMap<Class<?>, Rule, Set<Rule>> componentClassRuleMap=new HashSetHashMap<Class<?>, Rule>();	//TODO make this store a sorted set, and use a comparator based on order
 
 	/**Retrieves the set of rules that selects the class of the given component, including parent classes.
 	It is not guaranteed that the component will match all or any of the returned rules; only that the component's class matches the returned rules.
@@ -77,7 +81,7 @@ public class Theme extends ClassTypedRDFResource
 		final Set<Class<?>> ancestorClasses=getAncestorClasses(componentClass, Component.class);	//get the class ancestor hierarchy of this class, up to Component TODO cache these
 		for(final Class<?> ancestorClass:ancestorClasses)	//for each ancestor class
 		{
-			final Set<Rule> ruleSet=classRuleMap.get(ancestorClass);	//try to get a rule for the component's ancestor class
+			final Set<Rule> ruleSet=componentClassRuleMap.get(ancestorClass);	//try to get a rule for the component's ancestor class
 			if(ruleSet!=null)	//if we found a rule set
 			{
 				if(combinedRuleSet==null)	//if we haven't yet created the combined rule set
@@ -113,10 +117,10 @@ public class Theme extends ClassTypedRDFResource
 		return getPropertyValues(THEME_NAMESPACE_URI, RESOURCES_PROPERTY_NAME);	//return all the theme:resource properties
 	}
 
-	/**@return The list of rules, or <code>null</code> if there is no rule list.*/
-	public RDFListResource getRules()
+	/**@return The list of declarations, or <code>null</code> if there is no rule list.*/
+	public RDFListResource getDeclarations()
 	{
-		return asListResource(getPropertyValue(THEME_NAMESPACE_URI, RULES_PROPERTY_NAME));	//return the theme:rules list		
+		return asListResource(getPropertyValue(THEME_NAMESPACE_URI, DECLARATIONS_PROPERTY_NAME));	//return the theme:declarations list		
 	}
 
 	/**Retrieves an iterable to the XML style resources, represented by <code>x:style</code> properties.
@@ -133,8 +137,8 @@ public class Theme extends ClassTypedRDFResource
 	*/
 	public void updateRules() throws ClassNotFoundException
 	{
-Debug.trace("updating rules for theme", this);
-		final RDFListResource ruleList=getRules();	//get the theme:rules list
+//Debug.trace("updating rules for theme", this);
+		final RDFListResource ruleList=getDeclarations();	//get the rule list
 		if(ruleList!=null)	//if there is a rule list
 		{
 			for(final RDFResource ruleResource:ruleList)	//for each resource in the list
@@ -145,11 +149,11 @@ Debug.trace("updating rules for theme", this);
 					final Selector selector=rule.getSelect();	//get what this rule selects
 					if(selector!=null)	//if we have a selector
 					{
-						final Class<?> selectedClass=selector.getSelectedClass();	//get the class selected by the selector
-Debug.trace("selected class", selectedClass);
-						if(selectedClass!=null)	//if we have a selected class
+						final Class<?> componentClass=selector.getComponentClass();	//get the component class selected by the selector
+//Debug.trace("selected class", selectedClass);
+						if(componentClass!=null)	//if we have a selected class
 						{
-							classRuleMap.addItem(selectedClass, rule);	//add this rule to our map
+							componentClassRuleMap.addItem(componentClass, rule);	//add this rule to our map
 						}
 					}				
 				}

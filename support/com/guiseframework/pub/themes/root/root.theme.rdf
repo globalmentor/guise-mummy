@@ -1,10 +1,80 @@
 <rdf:RDF
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:theme="http://guiseframework.com/namespaces/theme#"
+	xmlns:resource="http://guiseframework.com/namespaces/resource#"
+	xmlns:geometry="java:com.guiseframework.geometry."
+	xmlns:style="java:com.guiseframework.style."
+	xmlns:property="http://ploop.org/namespaces/property#"
 	xmlns:x="http://xpackage.org/namespaces/xml#"
 >
 	<theme:Theme>
 		<x:style rdf:resource="root.style.css"/>
-		<theme:resources rdf:resource="root.resources.rdf"/>
+
+		<theme:resources>
+			<resource:Resources rdf:about="root.resources.rdf">
+				<!-- standard colors -->
+				<resource:theme.color.main>black</resource:theme.color.main>
+				<resource:theme.color.main1>&#x0098;theme.color.main&#x009C;</resource:theme.color.main1>
+				<resource:theme.color.main2>&#x0098;theme.color.main&#x009C;</resource:theme.color.main2>
+				<resource:theme.color.subordinate>white</resource:theme.color.subordinate>
+				<resource:theme.color.subordinateA>&#x0098;theme.color.subordinate&#x009C;</resource:theme.color.subordinateA>
+				<resource:theme.color.subordinateB>&#x0098;theme.color.subordinate&#x009C;</resource:theme.color.subordinateB>
+				<resource:theme.color.subordinate1A>&#x0098;theme.color.subordinateA&#x009C;</resource:theme.color.subordinate1A>
+				<resource:theme.color.subordinate1B>&#x0098;theme.color.subordinateB&#x009C;</resource:theme.color.subordinate1B>
+				<resource:theme.color.subordinate2A>&#x0098;theme.color.subordinateA&#x009C;</resource:theme.color.subordinate2A>
+				<resource:theme.color.subordinate2B>&#x0098;theme.color.subordinateB&#x009C;</resource:theme.color.subordinate2B>
+				<resource:theme.color.neutralA>&#x0098;theme.color.main&#x009C;</resource:theme.color.neutralA>
+				<resource:theme.color.neutralB>&#x0098;theme.color.subordinate&#x009C;</resource:theme.color.neutralB>
+		
+				<resource:theme.color.text>&#x0098;theme.color.neutralA&#x009C;</resource:theme.color.text>
+				<resource:theme.color.background>&#x0098;theme.color.neutralB&#x009C;</resource:theme.color.background>
+
+				<resource:theme.color.menu>&#x0098;theme.color.subordinateB&#x009C;</resource:theme.color.menu>
+				<resource:theme.color.submenu>&#x0098;theme.color.background&#x009C;</resource:theme.color.submenu>
+		
+				<resource:theme.color.selected.background>royalblue</resource:theme.color.selected.background>
+			</resource:Resources>
+		</theme:resources>
+
+		<theme:declarations rdf:parseType="Collection">
+			<!--Frame-->
+			<theme:Rule>
+				<theme:select><theme:Selector theme:componentClass="com.guiseframework.component.Frame"/></theme:select>
+				<theme:apply>
+					<theme:Template>
+						<property:color><style:ResourceColor rdf:value="theme.color.text"/></property:color>
+						<property:backgroundColor><style:ResourceColor rdf:value="theme.color.background"/></property:backgroundColor>
+					</theme:Template>
+				</theme:apply>
+			</theme:Rule>
+			<!--Menu-->
+			<theme:Rule>	<!-- root menu -->
+				<theme:select><theme:Selector theme:componentClass="com.guiseframework.component.Menu" theme:notParentComponentClass="com.guiseframework.component.Menu"/></theme:select>
+				<theme:apply>
+					<theme:Template>
+						<property:backgroundColor><style:ResourceColor rdf:value="theme.color.menu"/></property:backgroundColor>
+					</theme:Template>
+				</theme:apply>
+			</theme:Rule>
+			<theme:Rule>	<!-- submenu -->
+				<theme:select><theme:Selector theme:componentClass="com.guiseframework.component.Menu" theme:parentComponentClass="com.guiseframework.component.Menu"/></theme:select>
+				<theme:apply>
+					<theme:Template>
+						<property:backgroundColor><style:ResourceColor rdf:value="theme.color.submenu"/></property:backgroundColor>
+						<property:borderColor><style:ResourceColor rdf:value="theme.color.neutralA"/></property:borderColor>
+					</theme:Template>
+				</theme:apply>
+			</theme:Rule>
+			<!--SectionPanel-->
+			<theme:Rule>
+				<theme:select><theme:Selector theme:componentClass="com.guiseframework.component.SectionPanel"/></theme:select>
+				<theme:apply>
+					<theme:Template>
+						<property:backgroundColor><style:ResourceColor rdf:value="theme.color.subordinateA"/></property:backgroundColor>
+					</theme:Template>
+				</theme:apply>
+			</theme:Rule>
+		</theme:declarations>
+
 	</theme:Theme>
 </rdf:RDF>

@@ -42,6 +42,7 @@ import com.guiseframework.GuiseEnvironment;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.context.text.xml.AbstractXMLGuiseContext;
+import com.guiseframework.context.text.xml.xhtml.XHTMLGuiseContext;
 import com.guiseframework.controller.ControlEvent;
 import com.guiseframework.model.FileItemResourceImport;
 import com.guiseframework.platform.web.css.CSSStylesheet;
@@ -59,7 +60,7 @@ import org.xml.sax.SAXException;
 The output stream defaults to <code>text/plain</code> encoded in <code>UTF-8</code>.
 @author Garret Wilson
 */
-public class HTTPServletGuiseContext extends AbstractXMLGuiseContext
+public class HTTPServletGuiseContext extends AbstractXMLGuiseContext implements XHTMLGuiseContext
 {
 
 	/**The HTTP servlet request.*/
@@ -98,11 +99,29 @@ public class HTTPServletGuiseContext extends AbstractXMLGuiseContext
 		/**@return Whether this context represents an AJAX request.*/
 		public boolean isAJAX() {return isAJAX;}
 
-	/**Whether the user agent is Microsoft IE6.*/
+	/**Whether the user agent is any version of Microsoft Internet Explorer.*/
+	private final boolean isUserAgentIE;
+
+		/**Determines whether the user agent is any version of Microsoft Internet Explorer.
+		This is a convenience method for checking the evironment user agent settings.
+		@return Whether the user agent is any version of Microsoft Internet Explorer.
+		*/
+		public boolean isUserAgentIE() {return isUserAgentIE;}
+
+	/**Whether the user agent is Microsoft Internet Explorer 6.x.*/
 	private final boolean isUserAgentIE6;
 
-		/**@return Whether the user agent is Microsoft IE6.*/
-		protected boolean isUserAgentIE6() {return isUserAgentIE6;}
+		/**Determines whether the user agent is Microsoft Internet Explorer 6.x.
+		This is a convenience method for checking the evironment user agent settings.
+		@return Whether the user agent is Microsoft Internet Explorer 6.x.
+		*/
+		public boolean isUserAgentIE6() {return isUserAgentIE6;}
+
+	/**Whether quirks mode is being used (only used with IE 6 in some configurations).*/
+	private final boolean isQuirksMode;
+
+		/**@return Whether quirks mode is being used (only used with IE 6 in some configurations).*/
+		public boolean isQuirksMode() {return isQuirksMode;}
 
 	/**The current content type of the output.*/
 	private ContentType outputContentType=createContentType(TEXT, PLAIN_SUBTYPE);	//default to text/plain
@@ -135,17 +154,23 @@ public class HTTPServletGuiseContext extends AbstractXMLGuiseContext
 		final String contentTypeString=request.getContentType();	//get the request content type
 		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
 		isAJAX=contentType!=null && GuiseHTTPServlet.GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType);	//see if this is a Guise AJAX request
+		boolean isUserAgentIE=false;	//we'll see if this is IE
 		boolean isUserAgentIE6=false;	//we'll see if this is IE6
 		final GuiseEnvironment environment=session.getEnvironment();	//get the environment
-		if(USER_AGENT_NAME_MSIE.equals(environment.getProperty(USER_AGENT_NAME_PROPERTY)))	//if this is IE
 		{
-			final Object userAgentVersionNumber=environment.getProperty(USER_AGENT_VERSION_NUMBER_PROPERTY);	//get the version number
-			if(userAgentVersionNumber instanceof Number && ((Number)userAgentVersionNumber).floatValue()<7.0f)	//if this is IE6
+			if(USER_AGENT_NAME_MSIE.equals(environment.getProperty(USER_AGENT_NAME_PROPERTY)))	//if this is IE
 			{
-				isUserAgentIE6=true;	//show that this is IE6
+				isUserAgentIE=true;	//show that this is IE
+				final Object userAgentVersionNumber=environment.getProperty(USER_AGENT_VERSION_NUMBER_PROPERTY);	//get the version number
+				if(userAgentVersionNumber instanceof Number && ((Number)userAgentVersionNumber).floatValue()<7.0f)	//if this is IE6
+				{
+					isUserAgentIE6=true;	//show that this is IE6
+				}
 			}
 		}
+		this.isUserAgentIE=isUserAgentIE;	//save the user agent determination
 		this.isUserAgentIE6=isUserAgentIE6;	//save the user agent determination
+		this.isQuirksMode=isUserAgentIE6 && !session.getApplication().isThemed();	//only use quirks mode for certain legacy (non-themed) applications using IE6
 
 /*TODO del
 Debug.trace("parameter names:", request.getParameterNames());	//TODO del when finished with dual mulipart+encoded content

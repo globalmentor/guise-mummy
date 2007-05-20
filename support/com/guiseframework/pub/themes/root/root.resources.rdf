@@ -90,25 +90,6 @@
 		<resource:theme.tree.node.expanded.image rdf:resource="images/treenode-expanded.gif"/>
 		<resource:theme.tree.node.leaf.image rdf:resource="images/treenode-leaf.gif"/>
 
-		<!-- standard colors -->
-		<resource:theme.color.main>black</resource:theme.color.main>
-		<resource:theme.color.main1>&#x0098;theme.color.main&#x009C;</resource:theme.color.main1>
-		<resource:theme.color.main2>&#x0098;theme.color.main&#x009C;</resource:theme.color.main2>
-		<resource:theme.color.subordinate>white</resource:theme.color.subordinate>
-		<resource:theme.color.subordinateA>&#x0098;theme.color.subordinate&#x009C;</resource:theme.color.subordinateA>
-		<resource:theme.color.subordinateB>&#x0098;theme.color.subordinate&#x009C;</resource:theme.color.subordinateB>
-		<resource:theme.color.subordinate1A>&#x0098;theme.color.subordinateA&#x009C;</resource:theme.color.subordinate1A>
-		<resource:theme.color.subordinate1B>&#x0098;theme.color.subordinateB&#x009C;</resource:theme.color.subordinate1B>
-		<resource:theme.color.subordinate2A>&#x0098;theme.color.subordinateA&#x009C;</resource:theme.color.subordinate2A>
-		<resource:theme.color.subordinate2B>&#x0098;theme.color.subordinateB&#x009C;</resource:theme.color.subordinate2B>
-		<resource:theme.color.neutralA>&#x0098;theme.color.main&#x009C;</resource:theme.color.neutralA>
-		<resource:theme.color.neutralB>&#x0098;theme.color.subordinate&#x009C;</resource:theme.color.neutralB>
-
-		<resource:theme.color.text>&#x0098;theme.color.neutralA&#x009C;</resource:theme.color.text>
-		<resource:theme.color.background>&#x0098;theme.color.neutralB&#x009C;</resource:theme.color.background>
-
-		<resource:theme.color.selected.background>royalblue</resource:theme.color.selected.background>
-
 		<!-- standard labels -->
 		<resource:theme.label.about>About</resource:theme.label.about>
 		<resource:theme.label.about.x>&#x0098;theme.label.about&#x009C; {0}</resource:theme.label.about.x>

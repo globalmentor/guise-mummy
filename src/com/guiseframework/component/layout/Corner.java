@@ -29,7 +29,7 @@ public enum Corner
 		/**The page end.*/
 		public Flow.End getPageEnd() {return pageEnd;}
 
-	/**Corner constructor.
+	/**Line and page end constructor.
 	@param lineEnd The line end.
 	@param pageEnd The page end.
 	@exception NullPointerException if the given line end and/or page end is <code>null</code>.

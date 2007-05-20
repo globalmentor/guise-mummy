@@ -9,7 +9,7 @@
 	xmlns:demo="java:com.guiseframework.demo."
 >
 	<demo:EventWizardPanel2>
-		<property:layout><layout:FlowLayout property:flow="PAGE"/></property:layout>
+		<property:layout><layout:FlowLayout property:flow="page"/></property:layout>
 		<property:label>Guise&#x2122; Demonstration: Event Wizard</property:label>
 		<property:children rdf:parseType="Collection">
 			<component:Heading property:level="0" property:label="Event Planner Wizard"/>
@@ -17,7 +17,7 @@
 				<property:layout><layout:RegionLayout/></property:layout>
 				<property:children rdf:parseType="Collection">
 					<component:SequenceCardPanel property:name="wizardCardPanel" property:bookmarkEnabled="true">	<!-- cards -->
-						<property:constraints><layout:RegionConstraints property:region="CENTER"/></property:constraints>
+						<property:constraints><layout:RegionConstraints property:region="center"/></property:constraints>
 						<property:children rdf:parseType="Collection">
 							<component:LayoutPanel rdf:nodeID="personalNamePanel"/>
 							<component:LayoutPanel rdf:nodeID="personalAgePanel"/>
@@ -28,7 +28,7 @@
 						</property:children>
 					</component:SequenceCardPanel>					
 					<component:LayoutPanel>	<!-- links -->
-						<property:constraints><layout:RegionConstraints property:region="LINE_START"/></property:constraints>
+						<property:constraints><layout:RegionConstraints property:region="line-start"/></property:constraints>
 						<property:children rdf:parseType="Collection">
 							<component:Link rdf:nodeID="personalLink10" property:label="1. Personal"/>
 							<component:TaskStateSelectLink rdf:nodeID="personalLink11" property:label="Name"/>
@@ -41,8 +41,8 @@
 							<component:TaskStateSelectLink rdf:nodeID="personalLink31" property:label="Name"/>
 						</property:children>
 					</component:LayoutPanel>
-					<component:TabContainerControl rdf:nodeID="wizardTabContainerControl" property:axis="LINE">	<!-- tabs -->
-						<property:constraints><layout:RegionConstraints property:region="PAGE_START"/></property:constraints>
+					<component:TabContainerControl rdf:nodeID="wizardTabContainerControl" property:axis="line">	<!-- tabs -->
+						<property:constraints><layout:RegionConstraints property:region="page-start"/></property:constraints>
 						<property:children rdf:parseType="Collection">
 							<component:Label rdf:nodeID="personalTabLabel" property:label="Personal"/>
 							<component:Label rdf:nodeID="businessTabLabel" property:label="Business"/>
@@ -50,8 +50,8 @@
 						</property:children>
 					</component:TabContainerControl>
 					<component:LayoutPanel property:name="wizardButtonPanel">	<!-- buttons -->
-						<property:layout><layout:FlowLayout property:flow="LINE"/></property:layout>
-						<property:constraints><layout:RegionConstraints property:region="PAGE_END"/></property:constraints>
+						<property:layout><layout:FlowLayout property:flow="line"/></property:layout>
+						<property:constraints><layout:RegionConstraints property:region="page-end"/></property:constraints>
 					</component:LayoutPanel>
 				</property:children>
 			</component:LayoutPanel>

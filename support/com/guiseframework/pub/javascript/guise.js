@@ -5386,7 +5386,7 @@ var menuState=new MenuState();	//create a new menu state object
 */
 function onMenuMouseOver(event)
 {
-	var menu=DOMUtilities.getDescendantElementByClassName(event.currentTarget, STYLES.MENU_CHILDREN);	//get the menu below us TODO use a constant
+	var menu=DOMUtilities.getDescendantElementByClassName(event.currentTarget, STYLES.MENU_BODY);	//get the menu below us
 	if(menu)	//if there is a menu below us
 	{
 		menuState.openMenu(menu);	//open this menu
@@ -5399,7 +5399,7 @@ function onMenuMouseOver(event)
 */
 function onMenuMouseOut(event)
 {
-	var menu=DOMUtilities.getDescendantElementByClassName(event.currentTarget, STYLES.MENU_CHILDREN);	//get the menu below us
+	var menu=DOMUtilities.getDescendantElementByClassName(event.currentTarget, STYLES.MENU_BODY);	//get the menu below us
 	if(menu)	//if there is a menu below us
 	{
 		menuState.closeMenu(menu);	//close this menu

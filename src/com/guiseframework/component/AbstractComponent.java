@@ -18,6 +18,7 @@ import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
 import com.guiseframework.model.*;
 import com.guiseframework.style.Color;
+import com.guiseframework.style.LineStyle;
 import com.guiseframework.view.View;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
@@ -205,6 +206,27 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			}			
 		}
 
+	/**The color of the component border, or <code>null</code> if the default border color should be used.*/
+	private Color<?> borderColor=null;
+
+		/**@return The color of the component border, or <code>null</code> if the default border color should be used.*/
+		public Color<?> getBorderColor() {return borderColor;}
+
+		/**Sets the color of the component border
+		This is a bound property.
+		@param newBorderColor The new color of the component border, or <code>null</code> if the default border color should be used.
+		@see Component#BORDER_COLOR_PROPERTY 
+		*/
+		public void setBorderColor(final Color<?> newBorderColor)
+		{
+			if(!ObjectUtilities.equals(borderColor, newBorderColor))	//if the value is really changing
+			{
+				final Color<?> oldBorderColor=borderColor;	//get the old value
+				borderColor=newBorderColor;	//actually change the value
+				firePropertyChange(BORDER_COLOR_PROPERTY, oldBorderColor, newBorderColor);	//indicate that the value changed
+			}			
+		}
+
 	/**The background color of the component, or <code>null</code> if no background color is specified for this component.*/
 	private Color<?> backgroundColor=null;
 
@@ -225,7 +247,139 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 				firePropertyChange(BACKGROUND_COLOR_PROPERTY, oldBackgroundColor, newBackgroundColor);	//indicate that the value changed
 			}			
 		}
+		
+	/**The array of border extents.*/
+	private Extent[] borderExtents=fill(new Extent[Border.values().length], null);
 
+	/**The properties corresponding to the border extents.*/
+	private final static String[] BORDER_EXTENT_PROPERTIES;
+
+		static
+		{
+			BORDER_EXTENT_PROPERTIES=new String[Border.values().length];	//create the array of properties and fill it with corresponding properties
+			BORDER_EXTENT_PROPERTIES[Border.LINE_NEAR.ordinal()]=BORDER_LINE_NEAR_EXTENT_PROPERTY;
+			BORDER_EXTENT_PROPERTIES[Border.LINE_FAR.ordinal()]=BORDER_LINE_FAR_EXTENT_PROPERTY;
+			BORDER_EXTENT_PROPERTIES[Border.PAGE_NEAR.ordinal()]=BORDER_PAGE_NEAR_EXTENT_PROPERTY;
+			BORDER_EXTENT_PROPERTIES[Border.PAGE_FAR.ordinal()]=BORDER_PAGE_FAR_EXTENT_PROPERTY;
+		}
+	
+		/**Returns the border extent of the indicated border.
+		@param border The border for which a border extent should be returned.
+		@return The border extent of the given border, or <code>null</code> if the default extent should be used.
+		*/
+		public Extent getBorderExtent(final Border border) {return borderExtents[border.ordinal()];}
+
+		/**Returns the border extent of the line near page near corner.
+		@return The border extent of the border, or <code>null</code> if the default extent should be used.
+		*/
+		public Extent BorderLineNearExtent() {return getBorderExtent(Border.LINE_NEAR);}
+
+		/**Returns the border extent of the line far page near corner.
+		@return The border extent of the border, or <code>null</code> if the default extent should be used.
+		*/
+		public Extent BorderLineFarExtent() {return getBorderExtent(Border.LINE_FAR);}
+
+		/**Returns the border extent of the line near page far corner.
+		@return The border extent of the border, or <code>null</code> if the default extent should be used.
+		*/
+		public Extent BorderPageNearExtent() {return getBorderExtent(Border.PAGE_NEAR);}
+
+		/**Returns the border extent of the line far page far corner.
+		@return The border extent of the border, or <code>null</code> if the default extent should be used.
+		*/
+		public Extent BorderPageFarExtent() {return getBorderExtent(Border.PAGE_FAR);}
+
+		/**Sets the border extent of a given border.
+		The border extent of each border represents a bound property.
+		@param border The border for which the border extent should be set.
+		@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
+		@exception NullPointerException if the given border and/or border extent is <code>null</code>. 
+		@see Component#BORDER_LINE_NEAR_EXTENT_PROPERTY
+		@see Component#BORDER_LINE_FAR_EXTENT_PROPERTY
+		@see Component#BORDER_PAGE_NEAR_EXTENT_PROPERTY
+		@see Component#BORDER_PAGE_FAR_EXTENT_PROPERTY
+		*/
+		public void setBorderExtent(final Border border, final Extent newBorderExtent)
+		{
+			final int borderOrdinal=checkInstance(border, "Border cannot be null").ordinal();	//get the ordinal of the border
+			final Extent oldBorderExtent=borderExtents[borderOrdinal];	//get the old value
+			if(!ObjectUtilities.equals(oldBorderExtent, checkInstance(newBorderExtent, "Border extent cannot be null")))	//if the value is really changing
+			{
+				borderExtents[borderOrdinal]=newBorderExtent;	//actually change the value
+				firePropertyChange(BORDER_EXTENT_PROPERTIES[borderOrdinal], oldBorderExtent, newBorderExtent);	//indicate that the value changed
+			}			
+		}
+
+		/**Sets the border extent of the line near border.
+		This is a bound property.
+		@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
+		@exception NullPointerException if the given border extent is <code>null</code>. 
+		@see Component#BORDER_LINE_NEAR_EXTENT_PROPERTY
+		*/
+		public void setBorderLineNearExtent(final Extent newBorderExtent) {setBorderExtent(Border.LINE_NEAR, newBorderExtent);}
+
+		/**Sets the border extent of the line far border.
+		This is a bound property.
+		@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
+		@exception NullPointerException if the given border extent is <code>null</code>. 
+		@see Component#BORDER_LINE_FAR_EXTENT_PROPERTY
+		*/
+		public void setBorderLineFarExtent(final Extent newBorderExtent) {setBorderExtent(Border.LINE_FAR, newBorderExtent);}
+
+		/**Sets the border extent of the page near border.
+		This is a bound property.
+		@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
+		@exception NullPointerException if the given border extent is <code>null</code>. 
+		@see Component#BORDER_PAGE_NEAR_EXTENT_PROPERTY
+		*/
+		public void setBorderPageNearExtent(final Extent newBorderExtent) {setBorderExtent(Border.PAGE_NEAR, newBorderExtent);}
+
+		/**Sets the border extent of the page far border.
+		This is a bound property.
+		@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
+		@exception NullPointerException if the given border extent is <code>null</code>. 
+		@see Component#BORDER_PAGE_FAR_EXTENT_PROPERTY
+		*/
+		public void setBorderPageFarExtent(final Extent newBorderExtent) {setBorderExtent(Border.PAGE_FAR, newBorderExtent);}
+
+		/**Sets the border extent of all borders.
+		The border extent of each border represents a bound property.
+		This is a convenience method that calls {@link #setBorderExtent(Border, Extent)} for each border.
+		@exception NullPointerException if the given border extent is <code>null</code>. 
+		@see Component#BORDER_LINE_NEAR_EXTENT_PROPERTY
+		@see Component#BORDER_LINE_FAR_EXTENT_PROPERTY
+		@see Component#BORDER_PAGE_NEAR_EXTENT_PROPERTY
+		@see Component#BORDER_PAGE_FAR_EXTENT_PROPERTY
+		*/
+		public void setBorderExtent(final Extent newBorderExtent)
+		{
+			for(final Border border:Border.values())	//for each border
+			{
+				setBorderExtent(border, newBorderExtent);	//set this border extent
+			}
+		}		
+		
+	/**The style of border of the component, or <code>null</code> if there should be no border.*/
+	private LineStyle borderStyle=null;
+
+		/**@return The style of border of the component, or <code>null</code> if there should be no border.*/
+		public LineStyle getBorderStyle() {return borderStyle;}
+
+		/**Sets the style of border of the component.
+		This is a bound property.
+		@param newBorderStyle The new style of border, or <code>null</code> if there should be no border.
+		@see Component#BORDER_STYLE_PROPERTY 
+		*/
+		public void setBorderStyle(final LineStyle newBorderStyle)
+		{
+			if(!ObjectUtilities.equals(borderStyle, newBorderStyle))	//if the value is really changing
+			{
+				final LineStyle oldBorderStyle=borderStyle;	//get the old value
+				borderStyle=newBorderStyle;	//actually change the value
+				firePropertyChange(BORDER_STYLE_PROPERTY, oldBorderStyle, newBorderStyle);	//indicate that the value changed
+			}			
+		}
+		
 	/**The foreground color of the component, or <code>null</code> if no foreground color is specified for this component.*/
 	private Color<?> color=null;
 
@@ -246,27 +400,6 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 				firePropertyChange(COLOR_PROPERTY, oldColor, newColor);	//indicate that the value changed
 			}			
 		}
-
-		/**Determines the foreground color to use for the component.
-		The color is determined by finding the first non-<code>null</code> color up the component hierarchy or the default color.
-		@return The foreground color to use for the component.
-		@see #getColor()
-		*/
-/*TODO del if not needed
-		public Color<?> determineColor()
-		{
-			Color<?> color=getColor();	//find this component's color
-			if(color==null)	//if we don't have a color, ask the parent
-			{
-				final CompositeComponent<?> parent=getParent();	//get the parent
-				if(parent!=null)	//if there is a parent
-				{
-					color=parent.determineColor();	//ask the parent to determine the color
-				}
-			}
-			return color!=null ? color : RGBColor.BLACK;	//return the default color if there is no specified color
-		}
-*/
 
 	/**The layout constraints describing individual component layout information, or <code>null</code> if no constraints have been specified for this component.*/
 	private Constraints constraints=null;
@@ -301,23 +434,52 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 	private Dimensions[] cornerArcSizes=fill(new Dimensions[Corner.values().length], Dimensions.ZERO_DIMENSIONS);
 
 	/**The properties corresponding to the corner arc sizes.*/
-	private final static String[] CORNER_ARC_SIZE_PROPERTIES=new String[]{CORNER_ARC_SIZE_LINE_NEAR_PAGE_NEAR_PROPERTY, CORNER_ARC_SIZE_LINE_FAR_PAGE_NEAR_PROPERTY, CORNER_ARC_SIZE_LINE_NEAR_PAGE_FAR_PROPERTY, CORNER_ARC_SIZE_LINE_FAR_PAGE_FAR_PROPERTY};
+	private final static String[] CORNER_ARC_SIZE_PROPERTIES;
 
+		static
+		{
+			CORNER_ARC_SIZE_PROPERTIES=new String[Corner.values().length];	//create the array of properties and fill it with corresponding properties
+			CORNER_ARC_SIZE_PROPERTIES[Corner.LINE_NEAR_PAGE_NEAR.ordinal()]=CORNER_LINE_NEAR_PAGE_NEAR_ARC_SIZE_PROPERTY;
+			CORNER_ARC_SIZE_PROPERTIES[Corner.LINE_FAR_PAGE_NEAR.ordinal()]=CORNER_LINE_FAR_PAGE_NEAR_ARC_SIZE_PROPERTY;
+			CORNER_ARC_SIZE_PROPERTIES[Corner.LINE_NEAR_PAGE_FAR.ordinal()]=CORNER_LINE_NEAR_PAGE_FAR_ARC_SIZE_PROPERTY;
+			CORNER_ARC_SIZE_PROPERTIES[Corner.LINE_FAR_PAGE_FAR.ordinal()]=CORNER_LINE_FAR_PAGE_FAR_ARC_SIZE_PROPERTY;
+		}
+	
 		/**Returns the arc size for the indicated corner.
 		@param corner The corner for which an arc size should be returned.
 		@return The dimensions indicating the two radiuses of the given corner arc, or dimensions of zero if the corner should not be rounded.
 		*/
 		public Dimensions getCornerArcSize(final Corner corner) {return cornerArcSizes[corner.ordinal()];}
-	
+
+		/**Returns the arc size for the line near page near corner.
+		@return The dimensions indicating the two radiuses of the corner arc, or dimensions of zero if the corner should not be rounded.
+		*/
+		public Dimensions getCornerLineNearPageNearArcSize() {return getCornerArcSize(Corner.LINE_NEAR_PAGE_NEAR);}
+
+		/**Returns the arc size for the line far page near corner.
+		@return The dimensions indicating the two radiuses of the corner arc, or dimensions of zero if the corner should not be rounded.
+		*/
+		public Dimensions getCornerLineFarPageNearArcSize() {return getCornerArcSize(Corner.LINE_FAR_PAGE_NEAR);}
+
+		/**Returns the arc size for the line near page far corner.
+		@return The dimensions indicating the two radiuses of the corner arc, or dimensions of zero if the corner should not be rounded.
+		*/
+		public Dimensions getCornerLineNearPageFarArcSize() {return getCornerArcSize(Corner.LINE_NEAR_PAGE_FAR);}
+
+		/**Returns the arc size for the line far page far corner.
+		@return The dimensions indicating the two radiuses of the corner arc, or dimensions of zero if the corner should not be rounded.
+		*/
+		public Dimensions getCornerLineFarPageFarArcSize() {return getCornerArcSize(Corner.LINE_FAR_PAGE_FAR);}
+
 		/**Sets the arc size of a given corner.
 		The radius of each corner represents a bound property.
 		@param corner The corner for which the arc size should be set.
 		@param newCornerArcSize The dimensions indicating the two radiuses of the corner, or dimensions of zero if the corner should not be rounded.
 		@exception NullPointerException if the given corner and/or arc size is <code>null</code>. 
-		@see Component#CORNER_ARC_SIZE_LINE_NEAR_PAGE_NEAR_PROPERTY
-		@see Component#CORNER_ARC_SIZE_LINE_FAR_PAGE_NEAR_PROPERTY
-		@see Component#CORNER_ARC_SIZE_LINE_NEAR_PAGE_FAR_PROPERTY
-		@see Component#CORNER_ARC_SIZE_LINE_FAR_PAGE_FAR_PROPERTY
+		@see Component#CORNER_LINE_NEAR_PAGE_NEAR_ARC_SIZE_PROPERTY
+		@see Component#CORNER_LINE_FAR_PAGE_NEAR_ARC_SIZE_PROPERTY
+		@see Component#CORNER_LINE_NEAR_PAGE_FAR_ARC_SIZE_PROPERTY
+		@see Component#CORNER_LINE_FAR_PAGE_FAR_ARC_SIZE_PROPERTY
 		*/
 		public void setCornerArcSize(final Corner corner, final Dimensions newCornerArcSize)
 		{
@@ -330,10 +492,47 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			}			
 		}
 
+		/**Sets the arc size of the line near page near corner.
+		This is a bound property.
+		@param newCornerArcSize The dimensions indicating the two radiuses of the corner, or dimensions of zero if the corner should not be rounded.
+		@exception NullPointerException if the given size is <code>null</code>. 
+		@see Component#CORNER_LINE_NEAR_PAGE_NEAR_ARC_SIZE_PROPERTY
+		*/
+		public void setCornerLineNearPageNearArcSize(final Dimensions newCornerArcSize) {setCornerArcSize(Corner.LINE_NEAR_PAGE_NEAR, newCornerArcSize);}
+
+		/**Sets the arc size of the line far page near corner.
+		This is a bound property.
+		@param newCornerArcSize The dimensions indicating the two radiuses of the corner, or dimensions of zero if the corner should not be rounded.
+		@exception NullPointerException if the given size is <code>null</code>. 
+		@see Component#CORNER_LINE_FAR_PAGE_NEAR_ARC_SIZE_PROPERTY
+		*/
+		public void setCornerLineFarPageNearArcSize(final Dimensions newCornerArcSize) {setCornerArcSize(Corner.LINE_FAR_PAGE_NEAR, newCornerArcSize);}
+
+		/**Sets the arc size of the line near page far corner.
+		This is a bound property.
+		@param newCornerArcSize The dimensions indicating the two radiuses of the corner, or dimensions of zero if the corner should not be rounded.
+		@exception NullPointerException if the given size is <code>null</code>. 
+		@see Component#CORNER_LINE_NEAR_PAGE_FAR_ARC_SIZE_PROPERTY
+		*/
+		public void setCornerLineNearPageFarArcSize(final Dimensions newCornerArcSize) {setCornerArcSize(Corner.LINE_NEAR_PAGE_FAR, newCornerArcSize);}
+
+		/**Sets the arc size of the line far page far corner.
+		This is a bound property.
+		@param newCornerArcSize The dimensions indicating the two radiuses of the corner, or dimensions of zero if the corner should not be rounded.
+		@exception NullPointerException if the given size is <code>null</code>. 
+		@see Component#CORNER_LINE_FAR_PAGE_FAR_ARC_SIZE_PROPERTY
+		*/
+		public void setCornerLineFarPageFarArcSize(final Dimensions newCornerArcSize) {setCornerArcSize(Corner.LINE_FAR_PAGE_FAR, newCornerArcSize);}
+
 		/**Sets the arc size of all corners.
+		The radius of each corner represents a bound property.
 		This is a convenience method that calls {@link #setCornerArcSize(Corner, Dimensions)} for each corner.
 		@param newCornerArcSize The dimensions indicating the two radiuses of the corners, or dimensions of zero if the corners should not be rounded.
 		@exception NullPointerException if the given arc size is <code>null</code>. 
+		@see Component#CORNER_LINE_NEAR_PAGE_NEAR_ARC_SIZE_PROPERTY
+		@see Component#CORNER_LINE_FAR_PAGE_NEAR_ARC_SIZE_PROPERTY
+		@see Component#CORNER_LINE_NEAR_PAGE_FAR_ARC_SIZE_PROPERTY
+		@see Component#CORNER_LINE_FAR_PAGE_FAR_ARC_SIZE_PROPERTY
 		*/
 		public void setCornerArcSize(final Dimensions newCornerArcSize)
 		{
