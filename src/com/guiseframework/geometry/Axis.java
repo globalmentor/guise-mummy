@@ -1,18 +1,19 @@
 package com.guiseframework.geometry;
 
-/**Indicates an axis; for example, a direction of layout.
+/**Indicates an absolute axis; for example, a direction of layout.
 @author Garret Wilson
+@see com.guiseframework.component.layout.Flow
 */
 public enum Axis
 {
 
-	/**Layout along the X axis.*/
+	/**The X axis.*/
 	X,
 
-	/**Layout along the Y axis.*/
+	/**The Y axis.*/
 	Y,
 
-	/**Layout along the Z axis.
+	/**The Z axis.
 	This value is currently unused.
 	*/
 	Z;

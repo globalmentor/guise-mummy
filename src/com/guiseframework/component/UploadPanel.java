@@ -126,7 +126,7 @@ public class UploadPanel extends AbstractPanel<UploadPanel>
 		super(new FlowLayout(Flow.PAGE));	//construct the parent class
 		resourcePathList=new ListControl<String>(String.class, RESOURCE_PATH_DISPLAY_COUNT);	//create a list in which to show the resource paths
 		resourcePathList.setEditable(false);	//don't allow the list to be edited
-		resourcePathList.setWidth(new Extent(30, Extent.Unit.EM));
+		resourcePathList.setLineExtent(new Extent(30, Extent.Unit.EM));
 		add(resourcePathList);
 
 		currentStatusLabel=new Label();	//current status label

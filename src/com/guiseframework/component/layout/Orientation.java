@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.geometry.Axis;
+import com.guiseframework.geometry.Side;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.util.LanguageConstants.*;
@@ -64,6 +65,45 @@ public class Orientation
 			return directions[flow.ordinal()];	//get the direction for this flow
 		}
 
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	/**The side for each border.*/
+	private final Side[] sides=new Side[4];
+
+		/**Determines the side for the particular border.
+		@param border The logical border.
+		@return The side for the specified border.
+		*/
+		public Side getSide(final Border border)
+		{
+			return sides[border.ordinal()];	//get the side for this border
+		}
+
+		/**Determines the border that appears on the given side.
+		@param side The side for which the border should be determined.
+		@return The border that appears on the given side.
+		*/
+		public Border getBorder(final Side side)
+		{
+			for(final Border border:Border.values())	//for each border
+			{
+				if(getSide(border)==side)	//if the border is on the requested side
+				{
+					return border;	//return this border
+				}
+			}
+			throw new IllegalArgumentException("Unsupported orientation side: "+side);	//hopefully they won't pass Side.FRONT or Side.BACK, because orientations don't support the Z axis
+		}
+		
 	/**The lazily-created set of right-to-left, top-to-bottom languages.*/
 	private static Set<String> rightToLeftTopToBottomLanguages;
 
@@ -79,6 +119,10 @@ public class Orientation
 		axes[Flow.PAGE.ordinal()]=lineAxis==Axis.X ? Axis.Y : Axis.X;	//the page axis will be the perpendicular axis
 		directions[Flow.LINE.ordinal()]=checkInstance(lineDirection, "Line direction cannot be null.");	//set the line direction
 		directions[Flow.PAGE.ordinal()]=checkInstance(pageDirection, "Page direction cannot be null.");	//set the page direction
+		sides[Border.LINE_NEAR.ordinal()]=lineAxis==Axis.X ? (lineDirection==Flow.Direction.INCREASING ? Side.LEFT : Side.RIGHT) : (lineDirection==Flow.Direction.INCREASING ? Side.TOP : Side.BOTTOM);
+		sides[Border.LINE_FAR.ordinal()]=lineAxis==Axis.X ? (lineDirection==Flow.Direction.INCREASING ? Side.RIGHT : Side.LEFT) : (lineDirection==Flow.Direction.INCREASING ? Side.BOTTOM : Side.TOP);
+		sides[Border.PAGE_NEAR.ordinal()]=lineAxis==Axis.X ? (pageDirection==Flow.Direction.INCREASING ? Side.TOP : Side.BOTTOM) : (pageDirection==Flow.Direction.INCREASING ? Side.LEFT : Side.RIGHT);
+		sides[Border.PAGE_FAR.ordinal()]=lineAxis==Axis.X ? (pageDirection==Flow.Direction.INCREASING ? Side.BOTTOM : Side.TOP) : (pageDirection==Flow.Direction.INCREASING ? Side.RIGHT : Side.LEFT);
 	}
 
 	/**Retrieves the default orientation for a particular locale.

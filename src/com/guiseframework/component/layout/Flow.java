@@ -1,7 +1,10 @@
 package com.guiseframework.component.layout;
 
+import com.guiseframework.geometry.Axis;
+
 /**Indicates a logical flow axis.
 @author Garret Wilson
+@see Axis
 */
 public enum Flow
 {
@@ -13,6 +16,7 @@ public enum Flow
 
 	/**The flow direction for a line or page, relative to the origin in the top, left-hand corner of the area.
 	@author Garret Wilson
+	@see End
 	*/
 	public enum Direction
 	{

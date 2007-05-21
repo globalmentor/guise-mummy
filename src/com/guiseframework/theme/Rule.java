@@ -9,6 +9,7 @@ import com.garretwilson.rdf.*;
 import com.garretwilson.rdf.ploop.PLOOPProcessor;
 
 import com.guiseframework.component.Component;
+
 import static com.guiseframework.theme.Theme.*;
 
 /**A rule for specifying part of a theme.

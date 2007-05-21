@@ -4,6 +4,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**The points at which the four logical flows end.
 @author Garret Wilson
+@see com.guiseframework.geometry.Side
 */
 public enum Border
 {

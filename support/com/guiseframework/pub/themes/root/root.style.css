@@ -62,6 +62,42 @@ Drag and Drop classes
 	.dropTarget The element represents a drop target in a drag-and-drop operation.
 */
 
+/*global presets to meet Guise theme default expectations*/
+
+table
+{
+	border-collapse: collapse;
+}
+
+/*remove borders, padding, and margins*/
+div, table, th, td, span
+{
+	border-style: none;
+	border: 0;
+	margin: 0;
+	padding: 0;
+}
+
+a:link
+{
+	text-decoration: none;
+}
+
+a:visited
+{
+	text-decoration: none;
+}
+
+a:hover
+{
+	text-decoration: none;
+}
+
+a:active
+{
+	text-decoration: none;
+}
+
 /*IE6 fixes*/
 
 label
@@ -847,7 +883,7 @@ li.treeNode-leaf
 .textControl-label
 {
 /*TODO del when new themes work	font-size: smaller;*/
-	font-weight: bold;
+/*TODO del when new themes work	font-size:	font-weight: bold;*/
 }
 
 /*general errors*/
@@ -916,11 +952,13 @@ form
 	background-color: transparent;
 }
 
+/*TODO transfer to new themes
 caption
 {
 	font-size: larger;
 	font-weight: bold;
 }
+*/
 
 dt
 {
@@ -930,14 +968,28 @@ dt
 table.table
 {
 	border-collapse: collapse;
+/*TODO del; new styles
 	border-style: solid;
 	border-width: thick;
+*/
 }
 
 table.table th, table.table td
 {
+/*TODO del; new styles
 	border-style: solid;
 	border-width: thin;
+*/
+}
+
+/*TODO del border/padding/margin stuff if new code at top works.*/
+table.table, table.table th, table.table td
+{
+	border-collapse: collapse;
+	border-style: none;
+	border: 0;
+	margin: 0;
+	padding: 0;
 }
 
 /*layout*/
@@ -954,12 +1006,14 @@ table.layout-region
 */
 }
 
+/*TODO del for new themes
 td.layout-region-left, td.layout-region-right
 {
 	vertical-align: top;
 	padding-left: 0.25em;
 	padding-right: 0.25em;	
 }
+*/
 
 /*TODO fix; doesn't work for frames in either Mozilla or IE, although each gives different results
 td.layout-region-center
@@ -1002,12 +1056,14 @@ td.layout-region-bottom
 */
 }
 
+/*TODO del for new themes
 td.layout-flow-x-child
 {
 	vertical-align: top;
 	padding-left: 0.25em;
 	padding-right: 0.25em;
 }
+*/
 
 .layout-flow-x-child	/*for children in a horizontal flow layout, give each child inline display*/
 {
@@ -1018,8 +1074,10 @@ td.layout-flow-x-child
 {
 	display: block;
 	clear: both;
+/*TODO del for new themes
 	padding-top: 0.25em;
 	padding-bottom: 0.25em;
+*/
 }
 /*TODO fix
 a.component.control:hover

@@ -31,6 +31,8 @@
 
 				<resource:theme.color.menu>&#x0098;theme.color.subordinateB&#x009C;</resource:theme.color.menu>
 				<resource:theme.color.submenu>&#x0098;theme.color.background&#x009C;</resource:theme.color.submenu>
+
+				<resource:theme.color.border>&#x0098;theme.color.neutralA&#x009C;</resource:theme.color.border>
 		
 				<resource:theme.color.selected.background>royalblue</resource:theme.color.selected.background>
 			</resource:Resources>
@@ -62,15 +64,6 @@
 					<theme:Template>
 						<property:backgroundColor><style:ResourceColor rdf:value="theme.color.submenu"/></property:backgroundColor>
 						<property:borderColor><style:ResourceColor rdf:value="theme.color.neutralA"/></property:borderColor>
-					</theme:Template>
-				</theme:apply>
-			</theme:Rule>
-			<!--SectionPanel-->
-			<theme:Rule>
-				<theme:select><theme:Selector theme:componentClass="com.guiseframework.component.SectionPanel"/></theme:select>
-				<theme:apply>
-					<theme:Template>
-						<property:backgroundColor><style:ResourceColor rdf:value="theme.color.subordinateA"/></property:backgroundColor>
 					</theme:Template>
 				</theme:apply>
 			</theme:Rule>

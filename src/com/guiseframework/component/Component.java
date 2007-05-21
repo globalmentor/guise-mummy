@@ -40,8 +40,14 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public final static String BACKGROUND_COLOR_PROPERTY=getPropertyName(Component.class, "backgroundColor");
 	/**The bound property of whether the component has bookmarks enabled.*/
 	public final static String BOOKMARK_ENABLED_PROPERTY=getPropertyName(Component.class, "bookmarkEnabled");
-	/**The bound property of the border color.*/
-	public final static String BORDER_COLOR_PROPERTY=getPropertyName(Component.class, "borderColor");
+	/**The bound property of the line near border color.*/
+	public final static String BORDER_LINE_NEAR_COLOR_PROPERTY=getPropertyName(Component.class, "borderLineNearColor");
+	/**The bound property of the line far border color.*/
+	public final static String BORDER_LINE_FAR_COLOR_PROPERTY=getPropertyName(Component.class, "borderLineFarColor");
+	/**The bound property of the page near border color.*/
+	public final static String BORDER_PAGE_NEAR_COLOR_PROPERTY=getPropertyName(Component.class, "borderPageNearColor");
+	/**The bound property of the page far border color.*/
+	public final static String BORDER_PAGE_FAR_COLOR_PROPERTY=getPropertyName(Component.class, "borderPageFarColor");	
 	/**The bound property of the line near border extent.*/
 	public final static String BORDER_LINE_NEAR_EXTENT_PROPERTY=getPropertyName(Component.class, "borderLineNearExtent");
 	/**The bound property of the line far border extent.*/
@@ -49,9 +55,15 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	/**The bound property of the page near border extent.*/
 	public final static String BORDER_PAGE_NEAR_EXTENT_PROPERTY=getPropertyName(Component.class, "borderPageNearExtent");
 	/**The bound property of the page far border extent.*/
-	public final static String BORDER_PAGE_FAR_EXTENT_PROPERTY=getPropertyName(Component.class, "borderPageFarExtent");	
-	/**The bound property of the border style.*/
-	public final static String BORDER_STYLE_PROPERTY=getPropertyName(Component.class, "borderStyle");
+	public final static String BORDER_PAGE_FAR_EXTENT_PROPERTY=getPropertyName(Component.class, "borderPageFarExtent");
+	/**The bound property of the line near border style.*/
+	public final static String BORDER_LINE_NEAR_STYLE_PROPERTY=getPropertyName(Component.class, "borderLineNearStyle");
+	/**The bound property of the line far border style.*/
+	public final static String BORDER_LINE_FAR_STYLE_PROPERTY=getPropertyName(Component.class, "borderLineFarStyle");
+	/**The bound property of the page near border style.*/
+	public final static String BORDER_PAGE_NEAR_STYLE_PROPERTY=getPropertyName(Component.class, "borderPageNearStyle");
+	/**The bound property of the page far border style.*/
+	public final static String BORDER_PAGE_FAR_STYLE_PROPERTY=getPropertyName(Component.class, "borderPageFarStyle");
 	/**The bound property of the color.*/
 	public final static String COLOR_PROPERTY=getPropertyName(Component.class, "color");
 	/**The bound property of the layout constraints.*/
@@ -88,16 +100,24 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public final static String FONT_FAMILIES_PROPERTY=getPropertyName(Component.class, "fontFamilies");
 	/**The bound property of the font size.*/
 	public final static String FONT_SIZE_PROPERTY=getPropertyName(Component.class, "fontSize");
+	/**The line extent (width in left-to-right top-to-bottom orientation) bound property.*/
+	public final static String LINE_EXTENT_PROPERTY=getPropertyName(Component.class, "lineExtent");
 	/**The bound property of the notification.*/
 	public final static String NOTIFICATION_PROPERTY=getPropertyName(Component.class, "notification");
 	/**The opacity bound property.*/
 	public final static String OPACITY_PROPERTY=getPropertyName(Component.class, "opacity");
 	/**The orientation bound property.*/
 	public final static String ORIENTATION_PROPERTY=getPropertyName(Component.class, "orientation");
-	/**The height bound property.*/
-	public final static String HEIGHT_PROPERTY=getPropertyName(Component.class, "height");
-	/**The width bound property.*/
-	public final static String WIDTH_PROPERTY=getPropertyName(Component.class, "width");
+	/**The bound property of the line near padding extent.*/
+	public final static String PADDING_LINE_NEAR_EXTENT_PROPERTY=getPropertyName(Component.class, "paddingLineNearExtent");
+	/**The bound property of the line far padding extent.*/
+	public final static String PADDING_LINE_FAR_EXTENT_PROPERTY=getPropertyName(Component.class, "paddingLineFarExtent");
+	/**The bound property of the page near padding extent.*/
+	public final static String PADDING_PAGE_NEAR_EXTENT_PROPERTY=getPropertyName(Component.class, "paddingPageNearExtent");
+	/**The bound property of the page far padding extent.*/
+	public final static String PADDING_PAGE_FAR_EXTENT_PROPERTY=getPropertyName(Component.class, "paddingPageFarExtent");
+	/**The page extent (height in left-to-right top-to-bottom orientation) bound property.*/
+	public final static String PAGE_EXTENT_PROPERTY=getPropertyName(Component.class, "pageExtent");
 	/**The bound property of the component style ID.*/
 	public final static String STYLE_ID_PROPERTY=getPropertyName(Component.class, "styleID");
 	/**The bound property of whether a theme has been applied to this component.*/
@@ -114,9 +134,6 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	/*The constant value representing a general rounded corner.*/
 	public final static Dimensions ROUNDED_CORNER_ARC_SIZE=new Dimensions(0.25, 0.25, Extent.Unit.EM);
 	
-	/**The character used to combine hierarchical IDs.*/
-//TODO del	public final static char ID_SEGMENT_DELIMITER='.';
-
 	/**@return The name of the component, not guaranteed to be unique (but guaranteed not to be the empty string) and useful only for searching for components within a component sub-hierarchy, or <code>null</code> if the component has no name.*/
 	public String getName();
 
@@ -182,39 +199,106 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	*/
 	public void setBackgroundColor(final Color<?> newBackgroundColor);
 
-	/**@return The color of the component border, or <code>null</code> if the default border color should be used.*/
-	public Color<?> getBorderColor();
+	/**Returns the border color of the indicated border.
+	@param border The border for which a border color should be returned.
+	@return The border color of the given border, or <code>null</code> if the default border color should be used.
+	*/
+	public Color<?> getBorderColor(final Border border);
 
-	/**Sets the color of the component border
+	/**Returns the border color of the line near page near corner.
+	@return The border color of the border, or <code>null</code> if the default border color should be used.
+	*/
+	public Color<?> BorderLineNearColor();
+
+	/**Returns the border color of the line far page near corner.
+	@return The border color of the border, or <code>null</code> if the default border color should be used.
+	*/
+	public Color<?> BorderLineFarColor();
+
+	/**Returns the border color of the line near page far corner.
+	@return The border color of the border, or <code>null</code> if the default border color should be used.
+	*/
+	public Color<?> BorderPageNearColor();
+
+	/**Returns the border color of the line far page far corner.
+	@return The border color of the border, or <code>null</code> if the default border color should be used.
+	*/
+	public Color<?> BorderPageFarColor();
+
+	/**Sets the border color of a given border.
+	The border color of each border represents a bound property.
+	@param border The border for which the border color should be set.
+	@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
+	@exception NullPointerException if the given border is <code>null</code>. 
+	@see Component#BORDER_LINE_NEAR_COLOR_PROPERTY
+	@see Component#BORDER_LINE_FAR_COLOR_PROPERTY
+	@see Component#BORDER_PAGE_NEAR_COLOR_PROPERTY
+	@see Component#BORDER_PAGE_FAR_COLOR_PROPERTY
+	*/
+	public void setBorderColor(final Border border, final Color<?> newBorderColor);
+
+	/**Sets the border COLOR of the line near border.
 	This is a bound property.
-	@param newBorderColor The new color of the component border, or <code>null</code> if the default border color should be used.
-	@see #BORDER_COLOR_PROPERTY 
+	@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
+	@see Component#BORDER_LINE_NEAR_COLOR_PROPERTY
+	*/
+	public void setBorderLineNearColor(final Color<?> newBorderColor);
+
+	/**Sets the border color of the line far border.
+	This is a bound property.
+	@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
+	@see Component#BORDER_LINE_FAR_COLOR_PROPERTY
+	*/
+	public void setBorderLineFarColor(final Color<?> newBorderColor);
+
+	/**Sets the border color of the page near border.
+	This is a bound property.
+	@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
+	@see Component#BORDER_PAGE_NEAR_COLOR_PROPERTY
+	*/
+	public void setBorderPageNearColor(final Color<?> newBorderColor);
+
+	/**Sets the border color of the page far border.
+	This is a bound property.
+	@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
+	@see Component#BORDER_PAGE_FAR_COLOR_PROPERTY
+	*/
+	public void setBorderPageFarColor(final Color<?> newBorderColor);
+
+	/**Sets the border color of all borders.
+	The border color of each border represents a bound property.
+	This is a convenience method that calls {@link #setBorderColor(Border, Color)} for each border.
+	@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
+	@see Component#BORDER_LINE_NEAR_COLOR_PROPERTY
+	@see Component#BORDER_LINE_FAR_COLOR_PROPERTY
+	@see Component#BORDER_PAGE_NEAR_COLOR_PROPERTY
+	@see Component#BORDER_PAGE_FAR_COLOR_PROPERTY
 	*/
 	public void setBorderColor(final Color<?> newBorderColor);
 	
 	/**Returns the border extent of the indicated border.
 	@param border The border for which a border extent should be returned.
-	@return The border extent of the given border, or <code>null</code> if the default extent should be used.
+	@return The border extent of the given border, or <code>null</code> if the default border extent should be used.
 	*/
 	public Extent getBorderExtent(final Border border);
 
 	/**Returns the border extent of the line near page near corner.
-	@return The border extent of the border, or <code>null</code> if the default extent should be used.
+	@return The border extent of the border, or <code>null</code> if the default border extent should be used.
 	*/
 	public Extent BorderLineNearExtent();
 
 	/**Returns the border extent of the line far page near corner.
-	@return The border extent of the border, or <code>null</code> if the default extent should be used.
+	@return The border extent of the border, or <code>null</code> if the default border extent should be used.
 	*/
 	public Extent BorderLineFarExtent();
 
 	/**Returns the border extent of the line near page far corner.
-	@return The border extent of the border, or <code>null</code> if the default extent should be used.
+	@return The border extent of the border, or <code>null</code> if the default border extent should be used.
 	*/
 	public Extent BorderPageNearExtent();
 
 	/**Returns the border extent of the line far page far corner.
-	@return The border extent of the border, or <code>null</code> if the default extent should be used.
+	@return The border extent of the border, or <code>null</code> if the default border extent should be used.
 	*/
 	public Extent BorderPageFarExtent();
 
@@ -222,7 +306,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	The border extent of each border represents a bound property.
 	@param border The border for which the border extent should be set.
 	@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
-	@exception NullPointerException if the given border and/or border extent is <code>null</code>. 
+	@exception NullPointerException if the given border is <code>null</code>. 
 	@see Component#BORDER_LINE_NEAR_EXTENT_PROPERTY
 	@see Component#BORDER_LINE_FAR_EXTENT_PROPERTY
 	@see Component#BORDER_PAGE_NEAR_EXTENT_PROPERTY
@@ -233,7 +317,6 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	/**Sets the border extent of the line near border.
 	This is a bound property.
 	@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
-	@exception NullPointerException if the given border extent is <code>null</code>. 
 	@see Component#BORDER_LINE_NEAR_EXTENT_PROPERTY
 	*/
 	public void setBorderLineNearExtent(final Extent newBorderExtent);
@@ -241,7 +324,6 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	/**Sets the border extent of the line far border.
 	This is a bound property.
 	@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
-	@exception NullPointerException if the given border extent is <code>null</code>. 
 	@see Component#BORDER_LINE_FAR_EXTENT_PROPERTY
 	*/
 	public void setBorderLineFarExtent(final Extent newBorderExtent);
@@ -249,7 +331,6 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	/**Sets the border extent of the page near border.
 	This is a bound property.
 	@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
-	@exception NullPointerException if the given border extent is <code>null</code>. 
 	@see Component#BORDER_PAGE_NEAR_EXTENT_PROPERTY
 	*/
 	public void setBorderPageNearExtent(final Extent newBorderExtent);
@@ -257,7 +338,6 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	/**Sets the border extent of the page far border.
 	This is a bound property.
 	@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
-	@exception NullPointerException if the given border extent is <code>null</code>. 
 	@see Component#BORDER_PAGE_FAR_EXTENT_PROPERTY
 	*/
 	public void setBorderPageFarExtent(final Extent newBorderExtent);
@@ -265,7 +345,7 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	/**Sets the border extent of all borders.
 	The border extent of each border represents a bound property.
 	This is a convenience method that calls {@link #setBorderExtent(Border, Extent)} for each border.
-	@exception NullPointerException if the given border extent is <code>null</code>. 
+	@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
 	@see Component#BORDER_LINE_NEAR_EXTENT_PROPERTY
 	@see Component#BORDER_LINE_FAR_EXTENT_PROPERTY
 	@see Component#BORDER_PAGE_NEAR_EXTENT_PROPERTY
@@ -273,13 +353,80 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	*/
 	public void setBorderExtent(final Extent newBorderExtent);
 	
-	/**@return The style of border of the component, or <code>null</code> if there should be no border.*/
-	public LineStyle getBorderStyle();
+	/**Returns the border style of the indicated border.
+	@param border The border for which a border style should be returned.
+	@return The border style of the given border, or <code>null</code> if there should be no border.
+	*/
+	public LineStyle getBorderStyle(final Border border);
 
-	/**Sets the style of border of the component.
+	/**Returns the border style of the line near page near corner.
+	@return The border style of the given border, or <code>null</code> if there should be no border.
+	*/
+	public LineStyle BorderLineNearStyle();
+
+	/**Returns the border style of the line far page near corner.
+	@return The border style of the given border, or <code>null</code> if there should be no border.
+	*/
+	public LineStyle BorderLineFarStyle();
+
+	/**Returns the border style of the line near page far corner.
+	@return The border style of the given border, or <code>null</code> if there should be no border.
+	*/
+	public LineStyle BorderPageNearStyle();
+
+	/**Returns the border style of the line far page far corner.
+	@return The border style of the given border, or <code>null</code> if there should be no border.
+	*/
+	public LineStyle BorderPageFarStyle();
+
+	/**Sets the border style of a given border.
+	The border style of each border represents a bound property.
+	@param border The border for which the border style should be set.
+	@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+	@exception NullPointerException if the given border is <code>null</code>. 
+	@see Component#BORDER_LINE_NEAR_STYLE_PROPERTY
+	@see Component#BORDER_LINE_FAR_STYLE_PROPERTY
+	@see Component#BORDER_PAGE_NEAR_STYLE_PROPERTY
+	@see Component#BORDER_PAGE_FAR_STYLE_PROPERTY
+	*/
+	public void setBorderStyle(final Border border, final LineStyle newBorderStyle);
+
+	/**Sets the border style of the line near border.
 	This is a bound property.
-	@param newBorderStyle The new style of border, or <code>null</code> if there should be no border.
-	@see #BORDER_STYLE_PROPERTY 
+	@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+	@see Component#BORDER_LINE_NEAR_STYLE_PROPERTY
+	*/
+	public void setBorderLineNearStyle(final LineStyle newBorderStyle);
+
+	/**Sets the border style of the line far border.
+	This is a bound property.
+	@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+	@see Component#BORDER_LINE_FAR_STYLE_PROPERTY
+	*/
+	public void setBorderLineFarStyle(final LineStyle newBorderStyle);
+
+	/**Sets the border style of the page near border.
+	This is a bound property.
+	@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+	@see Component#BORDER_PAGE_NEAR_STYLE_PROPERTY
+	*/
+	public void setBorderPageNearStyle(final LineStyle newBorderStyle);
+
+	/**Sets the border style of the page far border.
+	This is a bound property.
+	@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+	@see Component#BORDER_PAGE_FAR_STYLE_PROPERTY
+	*/
+	public void setBorderPageFarStyle(final LineStyle newBorderStyle);
+
+	/**Sets the border style of all borders.
+	The border style of each border represents a bound property.
+	This is a convenience method that calls {@link #setBorderStyle(Border, LineStyle)} for each border.
+	@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+	@see Component#BORDER_LINE_NEAR_STYLE_PROPERTY
+	@see Component#BORDER_LINE_FAR_STYLE_PROPERTY
+	@see Component#BORDER_PAGE_NEAR_STYLE_PROPERTY
+	@see Component#BORDER_PAGE_FAR_STYLE_PROPERTY
 	*/
 	public void setBorderStyle(final LineStyle newBorderStyle);
 
@@ -405,6 +552,16 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	*/
 	public void setFontSize(final Extent newFontSize);
 
+	/**@return The requested line extent (width in left-to-right top-to-bottom orientation) of the component, or <code>null</code> if no preferred line extent has been specified.*/
+	public Extent getLineExtent();
+
+	/**Sets the requested line extent (width in left-to-right top-to-bottom orientation) of the component.
+	This is a bound property.
+	@param newLineExtent The new requested line extent of the component, or <code>null</code> there is no line extent preference.
+	@see Component#LINE_EXTENT_PROPERTY 
+	*/
+	public void setLineExtent(final Extent newLineExtent);
+
 	/**@return The notification associated with the component, or <code>null</code> if no notification is associated with this component.*/
 	public Notification getNotification();
 
@@ -428,25 +585,92 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	*/
 	public void setOpacity(final float newOpacity);
 
-	/**@return The requested width of the component, or <code>null</code> if no preferred width has been specified.*/
-	public Extent getWidth();
-
-	/**Sets the requested width of the component.
-	This is a bound property.
-	@param newWidth The new requested width of the component, or <code>null</code> there is no width preference.
-	@see #WIDTH_PROPERTY 
+	/**Returns the padding extent of the indicated border.
+	@param border The border for which a padding extent should be returned.
+	@return The padding extent of the given border, or <code>null</code> if the default padding extent should be used.
 	*/
-	public void setWidth(final Extent newWidth);
+	public Extent getPaddingExtent(final Border border);
 
-	/**@return The requested height of the component, or <code>null</code> if no preferred height has been specified.*/
-	public Extent getHeight();
-
-	/**Sets the requested height of the component.
-	This is a bound property.
-	@param newHeight The new requested height of the component, or <code>null</code> there is no height preference.
-	@see #HEIGHT_PROPERTY 
+	/**Returns the padding extent of the line near page near corner.
+	@return The padding extent of the border, or <code>null</code> if the default padding extent should be used.
 	*/
-	public void setHeight(final Extent newHeight);
+	public Extent getPaddingLineNearExtent();
+
+	/**Returns the padding extent of the line far page near corner.
+	@return The padding extent of the border, or <code>null</code> if the default padding extent should be used.
+	*/
+	public Extent getPaddingLineFarExtent();
+
+	/**Returns the padding extent of the line near page far corner.
+	@return The padding extent of the border, or <code>null</code> if the default padding extent should be used.
+	*/
+	public Extent getPaddingPageNearExtent();
+
+	/**Returns the padding extent of the line far page far corner.
+	@return The padding extent of the border, or <code>null</code> if the default padding extent should be used.
+	*/
+	public Extent getPaddingPageFarExtent();
+
+	/**Sets the padding extent of a given border.
+	The padding extent of each border represents a bound property.
+	@param border The border for which the padding extent should be set.
+	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+	@exception NullPointerException if the given border is <code>null</code>. 
+	@see Component#PADDING_LINE_NEAR_EXTENT_PROPERTY
+	@see Component#PADDING_LINE_FAR_EXTENT_PROPERTY
+	@see Component#PADDING_PAGE_NEAR_EXTENT_PROPERTY
+	@see Component#PADDING_PAGE_FAR_EXTENT_PROPERTY
+	*/
+	public void setPaddingExtent(final Border border, final Extent newPaddingExtent);
+
+	/**Sets the padding extent of the line near border.
+	This is a bound property.
+	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+	@see Component#PADDING_LINE_NEAR_EXTENT_PROPERTY
+	*/
+	public void setPaddingLineNearExtent(final Extent newPaddingExtent);
+
+	/**Sets the padding extent of the line far border.
+	This is a bound property.
+	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+	@see Component#PADDING_LINE_FAR_EXTENT_PROPERTY
+	*/
+	public void setPaddingLineFarExtent(final Extent newPaddingExtent);
+
+	/**Sets the padding extent of the page near border.
+	This is a bound property.
+	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+	@see Component#PADDING_PAGE_NEAR_EXTENT_PROPERTY
+	*/
+	public void setPaddingPageNearExtent(final Extent newPaddingExtent);
+
+	/**Sets the padding extent of the page far border.
+	This is a bound property.
+	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+	@see Component#PADDING_PAGE_FAR_EXTENT_PROPERTY
+	*/
+	public void setPaddingPageFarExtent(final Extent newPaddingExtent);
+
+	/**Sets the padding extent of all borders.
+	The padding extent of each border represents a bound property.
+	This is a convenience method that calls {@link #setPaddingExtent(Border, Extent)} for each border.
+	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+	@see Component#PADDING_LINE_NEAR_EXTENT_PROPERTY
+	@see Component#PADDING_LINE_FAR_EXTENT_PROPERTY
+	@see Component#PADDING_PAGE_NEAR_EXTENT_PROPERTY
+	@see Component#PADDING_PAGE_FAR_EXTENT_PROPERTY
+	*/
+	public void setPaddingExtent(final Extent newPaddingExtent);
+
+	/**@return The requested page extent (height in left-to-right top-to-bottom orientation) of the component, or <code>null</code> if no preferred page extent has been specified.*/
+	public Extent getPageExtent();
+
+	/**Sets the requested page extent (height in left-to-right top-to-bottom orientation) of the component.
+	This is a bound property.
+	@param newPageExtent The new requested page extent of the component, or <code>null</code> there is no page extent preference.
+	@see Component#PAGE_EXTENT_PROPERTY 
+	*/
+	public void setPageExtent(final Extent newPageExtent);
 
 	/**@return The controller installed in this component.*/
 	public Controller<? extends GuiseContext, ? super C> getController();
@@ -746,21 +970,21 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	*/
 	public interface FlyoverStrategy<S extends Component<?>> extends MouseListener
 	{
-		/**@return The requested width of the flyover component, or <code>null</code> if no preferred width has been specified.*/
-		public Extent getWidth();
+		/**@return The requested line extent (width in left-to-right top-to-bottom orientation) of the flyover component, or <code>null</code> if no preferred line extent has been specified.*/
+		public Extent getLineExtent();
 
-		/**Sets the width of the flyover component.
-		@param newWidth The new requested width of the flyover component, or <code>null</code> there is no width preference.
+		/**Sets the requested line extent (width in left-to-right top-to-bottom orientation) of the flyover component.
+		@param newLineExtent The new requested line extent of the flyover component, or <code>null</code> there is no line extent preference.
 		*/
-		public void setWidth(final Extent newWidth);
+		public void setLineExtent(final Extent newLineExtent);
 
-		/**@return The requested height of the flyover component, or <code>null</code> if no preferred height has been specified.*/
-		public Extent getHeight();
+		/**@return The requested page extent (height in left-to-right top-to-bottom orientation) of the flyover component, or <code>null</code> if no preferred page extent has been specified.*/
+		public Extent getPageExtent();
 
-		/**Sets the requested height of the flyover component.
-		@param newHeight The new requested height of the flyover component, or <code>null</code> there is no height preference.
+		/**Sets the requested page extent (height in left-to-right top-to-bottom orientation) of the flyover component.
+		@param newPageExtent The new requested page extent of the flyover component, or <code>null</code> there is no page extent preference.
 		*/
-		public void setHeight(final Extent newHeight);
+		public void setPageExtent(final Extent newPageExtent);
 
 		/**@return The style identifier of the flyover, or <code>null</code> if there is no style ID.*/
 		public String getStyleID();

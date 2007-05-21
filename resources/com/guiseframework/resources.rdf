@@ -10,8 +10,9 @@
 
 		<!-- general application labels -->
 		<resource:application.name>Unnamed Guise™ Application</resource:application.name>
+		<resource:application.name.short>&#x0098;application.name&#x009C;</resource:application.name.short>
 		<resource:application.label>&#x0098;application.name&#x009C; &#x0098;application.version&#x009C;</resource:application.label>
-		<resource:application.description></resource:application.description>
+		<resource:application.description>This application uses the Guise™ framework.</resource:application.description>
 		<resource:application.copyright></resource:application.copyright>
 		<resource:application.version>0.0.0</resource:application.version>
 

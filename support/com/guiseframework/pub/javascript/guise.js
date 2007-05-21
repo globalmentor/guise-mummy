@@ -93,7 +93,7 @@ var isUserAgentIE=navigator.userAgentName=="MSIE";
 /**See if the browser is IE6.*/
 var isUserAgentIE6=isUserAgentIE && navigator.userAgentVersionNumber<7;
 
-/**Whether Guise AJAX communication is enabled. If this value is set to false, all AJAX communication will be stopped.*/
+/**Whether Guise AJAX communication is initially enabled.*/
 var GUISE_AJAX_ENABLED=true;
 /**The interval, in milliseconds, for pinging the server under normal conditions, or -1 if no pinging should occur.*/
 var GUISE_AJAX_PING_INTERVAL=60000;
@@ -2060,6 +2060,9 @@ function GuiseAJAX()
 	/**The hidden IFrame target that receives the results of file uploads, or null if the upload IFrame hasn't yet been created.*/
 	this._uploadIFrame=null;
 
+	/**Whether Guise AJAX communication is enabled.*/
+	this._enabled=GUISE_AJAX_ENABLED;
+
 	/**The ping interval timer ID, or null if pinging is not occuring.*/
 	this._pingIntervalID=null;
 
@@ -2143,6 +2146,30 @@ function GuiseAJAX()
 			}
 		};
 
+		/**Indicates whether AJAX communication is enabled.
+		@return Whether AJAX communication is enabled.
+		*/
+		GuiseAJAX.prototype.isEnabled=function()
+		{
+			return this._enabled;	//return whether AJAX functionality is enabled
+		};
+
+		/**Enables or disables AJAX communication.
+		If AJAX is disabled, all AJAX communication will immediately stop and pinging will be disabled.
+		@param enabled Whether AJAX communication should be enabled.
+		*/
+		GuiseAJAX.prototype.setEnabled=function(enabled)
+		{
+			if(this._enabled!=enabled)	//if the value is really changing
+			{ 
+				this._enabled=enabled;	//update the enabled status
+				if(!enabled)	//if AJAX has been disabled
+				{
+					guiseAJAX.setPingInterval(-1);	//turn off pinging
+				}				
+			}
+		};
+
 		/**Sets the interval for pinging the server.
 		If pinging is already occuring at the given interval, no action occurs.
 		@param pingInterval The new ping interval, in milleseconds, or -1 if pinging should not be enabled.
@@ -2170,7 +2197,7 @@ function GuiseAJAX()
 		*/
 		GuiseAJAX.prototype.sendAJAXRequest=function(ajaxRequest)
 		{
-			if(GUISE_AJAX_ENABLED)	//if AJAX is enabled
+			if(this.isEnabled())	//if AJAX is enabled
 			{
 				this.ajaxRequests.enqueue(ajaxRequest);	//enqueue the request info
 				this.processAJAXRequests();	//process any waiting requests now if we can
@@ -2235,7 +2262,7 @@ function GuiseAJAX()
 					{
 						//TODO log a warning
 //TODO fix alert(exception);
-						GUISE_AJAX_ENABLED=false;	//stop further AJAX communication
+						this.setEnabled(false);	//stop further AJAX communication
 					}						
 				}
 				finally
@@ -2439,7 +2466,7 @@ alert("we returned, at least");
 					}
 					if(status==200)	//if everything went OK
 					{
-//TODO del if not needed						if(GUISE_AJAX_ENABLED	//if AJAX is enabled (if a user browsers to a page in Mozilla and the old page sent a request, GUISE_AJAX_ENABLED will be undefined by now; check it so that Mozilla won't throw an exception accessing AJAXResponse, which doesn't exist either)
+//TODO del if not needed						if(guiseAJAX.isEnabled())	//if AJAX is enabled (if a user browsers to a page in Mozilla and the old page sent a request, GUISE_AJAX_ENABLED will be undefined by now; check it so that Mozilla won't throw an exception accessing AJAXResponse, which doesn't exist either)
 						if((typeof AJAXResponse)!="undefined"	//if the page scope hasn't disappeared (if a user browsers to a page in Mozilla and the old page sent a request, AJAXResponse will be undefined here)
 							&& xmlHTTP.responseText && xmlHTTP.responseXML && xmlHTTP.responseXML.documentElement)	//if we have XML (if there is no content or there is an error, IE sends back a document has a null xmlHTTP.responseXML.documentElement)
 						{
@@ -2468,8 +2495,8 @@ alert("we returned, at least");
 				{
 					//TODO log a warning
 alert(exception);
-alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof GUISE_AJAX_ENABLED));
-					GUISE_AJAX_ENABLED=false;	//stop further AJAX communication
+alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
+					this.setEnabled(false);	//stop further AJAX communication
 					throw exception;	//TODO testing
 				}
 			};
@@ -2504,7 +2531,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof GUISE_AJAX_ENABLED
 							var navigateURI=this._processNavigate(childNode);	//navigate to the specified request
 							if(navigateURI!=null)	//if a new navigation URI was requested
 							{
-								GUISE_AJAX_ENABLED=false;	//turn off AJAX processing
+								this.setEnabled(false);	//turn off AJAX processing
 								window.location.href=navigateURI;	//go to the new location
 							}
 						}
@@ -2580,7 +2607,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(typeof GUISE_AJAX_ENABLED
 					}
 					if(newHRef!=null)	//if navigation was requested
 					{
-						GUISE_AJAX_ENABLED=false;	//turn off AJAX processing
+						this.setEnabled(false);	//turn off AJAX processing
 						window.location.href=newHRef;	//go to the new location
 					}
 				}
@@ -4494,8 +4521,7 @@ This implementation uninstalls all listeners.
 */
 function onWindowUnload(event)
 {
-	GUISE_AJAX_ENABLED=false;	//immediateyl turn off AJAX
-	guiseAJAX.setPingInterval(-1);	//turn off pinging
+	guiseAJAX.setEnabled(false);	//immediately turn off AJAX communication
 //TODO fix or del	guise.setBusyVisible(true);	//turn on the busy indicator
 	eventManager.clearEvents();	//unload all events
 //TODO fix or del	guise.setBusyVisible(false);	//turn off the busy indicator
@@ -4908,7 +4934,7 @@ function onTextInputKeyPress(event)
 	var charCode=event.charCode;	//get the code of the entered character
 	if(charCode==13)	//if Enter/Return was pressed TODO use a constant
 	{
-		if(GUISE_AJAX_ENABLED)	//if AJAX is enabled
+		if(guiseAJAX.isEnabled())	//if AJAX is enabled
 		{
 		//TODO del alert("an input changed! "+textInput.id);
 			var textInput=event.currentTarget;	//get the control in which text changed
@@ -4930,7 +4956,7 @@ This implementation sends the current text input value as a provisional value.
 function onTextInputKeyUp(event)
 {
 	var charCode=event.charCode;	//get the code of the entered character
-	if(GUISE_AJAX_ENABLED)	//if AJAX is enabled
+	if(guiseAJAX.isEnabled())	//if AJAX is enabled
 	{
 	//TODO del alert("an input changed! "+textInput.id);
 		var textInput=event.currentTarget;	//get the control in which text changed
@@ -4945,7 +4971,7 @@ function onTextInputKeyUp(event)
 */
 function onTextInputChange(event)
 {
-	if(GUISE_AJAX_ENABLED)	//if AJAX is enabled
+	if(guiseAJAX.isEnabled())	//if AJAX is enabled
 	{
 		var textInput=event.currentTarget;	//get the control in which text changed
 		textInput.removeAttribute("guise:attributeHash");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
@@ -4962,7 +4988,7 @@ function onTextInputChange(event)
 */
 function onFileInputChange(event)
 {
-	if(GUISE_AJAX_ENABLED)	//if AJAX is enabled
+	if(guiseAJAX.isEnabled())	//if AJAX is enabled
 	{
 		var fileInput=event.currentTarget;	//get the control in which the file changed
 		fileInput.removeAttribute("guise:attributeHash");	//the file is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
@@ -5074,7 +5100,7 @@ function onAction(event)
 		var componentID=component.id;	//get the component ID
 		if(componentID)	//if there is a component ID
 		{
-			if(GUISE_AJAX_ENABLED)	//if AJAX is enabled
+			if(guiseAJAX.isEnabled())	//if AJAX is enabled
 			{
 
 //TODO fix					target.parentNode.style.cursor="inherit";	//TODO testing
@@ -5087,7 +5113,7 @@ function onAction(event)
 				var ajaxRequest=new FormAJAXEvent(new Map(componentID, componentID));	//create a new form request with action element ID as the parameter and value
 				guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request			
 			}
-/*TODO fix; distinguish between !GUISE_AJAX_ENABLED and AJAX_SUSPENDED; also fix bug on server where an exhaustive post may clear information on non-displayed cards
+/*TODO fix; distinguish between !guiseAJAX.isEnabled() and AJAX_SUSPENDED; also fix bug on server where an exhaustive post may clear information on non-displayed cards
 			else	//if AJAX is not enabled, do a POST
 			{
 				var form=getForm(component);	//get the form
@@ -5124,7 +5150,7 @@ function onTabClick(event)	//TODO maybe refactor to use new action click
 	if(href)	//if there is an href
 	{
 		var uri=new URI(href);	//create a URI from the href
-		if(GUISE_AJAX_ENABLED)	//if AJAX is enabled
+		if(guiseAJAX.isEnabled())	//if AJAX is enabled
 		{
 			var ajaxRequest=new FormAJAXEvent(uri.parameters);	//create a new form request with the URI parameters
 			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
@@ -5166,7 +5192,7 @@ function onActionClick(event)
 			var componentID=component.id;	//get the component ID
 			if(componentID)	//if there is a component ID
 			{
-				if(GUISE_AJAX_ENABLED)	//if AJAX is enabled
+				if(guiseAJAX.isEnabled())	//if AJAX is enabled
 				{
 /*TODO fix					
 					target.parentNode.style.cursor="inherit";	//TODO testing
@@ -5206,7 +5232,7 @@ function onContextMenu(event)
 			var componentID=component.id;	//get the component ID
 			if(componentID)	//if there is a component ID
 			{
-				if(GUISE_AJAX_ENABLED)	//if AJAX is enabled
+				if(guiseAJAX.isEnabled())	//if AJAX is enabled
 				{
 					var ajaxRequest=new ActionAJAXEvent(componentID, targetID, null, 1);	//create a new action request with no action ID and the context option
 					guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
@@ -5256,14 +5282,14 @@ function onCheckInputChange(event)
 		checkInput.removeAttribute("guise:attributeHash");	//the checked status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
 		guiseAJAX.invalidateAncestorContent(checkInput);	//indicate that the ancestors now have different content
 	}
-	if(GUISE_AJAX_ENABLED)	//if AJAX is enabled
+	if(guiseAJAX.isEnabled())	//if AJAX is enabled
 	{
 		guise.setElementTempCursor(checkInput, "wait");	//change the cursor to "wait" until the AJAX communication is finished
 		var ajaxRequest=new FormAJAXEvent(new Map(checkInput.name, checkInput.checked ? checkInput.value : ""));	//create a new form request with the control name and value
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		event.stopPropagation();	//tell the event to stop bubbling
 	}
-/*TODO fix; distinguish between !GUISE_AJAX_ENABLED and AJAX_SUSPENDED; also fix bug on server where an exhaustive post may clear information on non-displayed cards
+/*TODO fix; distinguish between !guiseAJAX.isEnabled() and AJAX_SUSPENDED; also fix bug on server where an exhaustive post may clear information on non-displayed cards
 	else	//if AJAX is not enabled
 	{
 		if(DOMUtilities.getAncestorElementByClassName(checkInput, STYLES.MENU_BODY))	//if this check is inside a menu, submit the form so that menus will cause immediate reaction
@@ -5283,7 +5309,7 @@ function onCheckInputChange(event)
 */
 function onSelectChange(event)
 {
-	if(GUISE_AJAX_ENABLED)	//if AJAX is enabled
+	if(guiseAJAX.isEnabled())	//if AJAX is enabled
 	{
 		var select=event.currentTarget;	//get the control to which the listener was listening
 //TODO del		select.removeAttribute("guise:contentHash");	//indicate that the select's children have changed TODO use a constant

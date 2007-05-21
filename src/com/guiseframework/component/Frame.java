@@ -8,16 +8,15 @@ import com.garretwilson.beans.GenericPropertyChangeListener;
 import com.guiseframework.component.effect.Effect;
 
 /**A root-level component such as a window or an HTML page.
+The frame's contents are specified using {@link #setContent(Component)}.
 <p>The title is specified by the frame model's label.</p>
 <p>A frame like other components is by default visible, but is not actually shown until its {@link #open(boolean)} method is called.</p>
 @author Garret Wilson
 */
-public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalComponent<Frame.Mode, C>
+public interface Frame<C extends Frame<C>> extends ContentComponent<C>, ModalComponent<Frame.Mode, C>
 {
 	/**The close action control bound property.*/
 	public final static String CLOSE_ACTION_CONTROL_PROPERTY=getPropertyName(Frame.class, "closeActionControl");
-	/**The content bound property.*/
-	public final static String CONTENT_PROPERTY=getPropertyName(Frame.class, "content");
 	/**The bound property of the frame menu.*/
 	public final static String MENU_PROPERTY=getPropertyName(Frame.class, "menu");
 	/**The bound property of whether the frame is modal if and when it is open.*/
@@ -131,16 +130,6 @@ public interface Frame<C extends Frame<C>> extends CompositeComponent<C>, ModalC
 	@see #CLOSE_ACTION_CONTROL_PROPERTY
 	*/
 	public void setCloseActionControl(final ActionControl<?> newCloseActionControl);
-
-	/**@return The content child component, or <code>null</code> if this frame does not have a content child component.*/
-	public Component<?> getContent();
-
-	/**Sets the content child component.
-	This is a bound property
-	@param newContent The content child component, or <code>null</code> if this frame does not have a content child component.
-	@see #CONTENT_PROPERTY
-	*/
-	public void setContent(final Component<?> newContent);
 
 	/**Opens the frame with the currently set modality.
 	Opening the frame registers the frame with the session.

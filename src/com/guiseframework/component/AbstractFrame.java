@@ -212,7 +212,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 	This is a bound property.
 	@param newContent The content child component, or <code>null</code> if this frame does not have a content child component.
 	@see FrameComponent#CONTENT_COMPONENT
-	@see Frame#CONTENT_PROPERTY
+	@see ContentComponent#CONTENT_PROPERTY
 	*/
 	public void setContent(final Component<?> newContent)
 	{

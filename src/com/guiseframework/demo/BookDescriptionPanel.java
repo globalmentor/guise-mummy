@@ -61,8 +61,8 @@ public class BookDescriptionPanel extends DefaultNavigationPanel
 			
 			//optional flyover specifications (use after setting flyoverEnabled to true, which installs a flyover strategy) 
 		book1.getFlyoverStrategy().setStyleID("bookFlyover");	//set the style ID to use for the flyover frame
-		book1.getFlyoverStrategy().setWidth(new Extent(30, Extent.Unit.EM));	//set the preferred flyover frame width
-		book1.getFlyoverStrategy().setHeight(new Extent(20, Extent.Unit.EM));	//set the preferred flyover frame height
+		book1.getFlyoverStrategy().setLineExtent(new Extent(30, Extent.Unit.EM));	//set the preferred flyover frame width
+		book1.getFlyoverStrategy().setPageExtent(new Extent(20, Extent.Unit.EM));	//set the preferred flyover frame height
 
 		bookPanel.add(book1);	//add the image to the book panel
 

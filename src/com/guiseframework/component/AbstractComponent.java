@@ -206,27 +206,6 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			}			
 		}
 
-	/**The color of the component border, or <code>null</code> if the default border color should be used.*/
-	private Color<?> borderColor=null;
-
-		/**@return The color of the component border, or <code>null</code> if the default border color should be used.*/
-		public Color<?> getBorderColor() {return borderColor;}
-
-		/**Sets the color of the component border
-		This is a bound property.
-		@param newBorderColor The new color of the component border, or <code>null</code> if the default border color should be used.
-		@see Component#BORDER_COLOR_PROPERTY 
-		*/
-		public void setBorderColor(final Color<?> newBorderColor)
-		{
-			if(!ObjectUtilities.equals(borderColor, newBorderColor))	//if the value is really changing
-			{
-				final Color<?> oldBorderColor=borderColor;	//get the old value
-				borderColor=newBorderColor;	//actually change the value
-				firePropertyChange(BORDER_COLOR_PROPERTY, oldBorderColor, newBorderColor);	//indicate that the value changed
-			}			
-		}
-
 	/**The background color of the component, or <code>null</code> if no background color is specified for this component.*/
 	private Color<?> backgroundColor=null;
 
@@ -247,6 +226,113 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 				firePropertyChange(BACKGROUND_COLOR_PROPERTY, oldBackgroundColor, newBackgroundColor);	//indicate that the value changed
 			}			
 		}
+
+	/**The array of border colors.*/
+	private Color<?>[] borderColors=fill(new Color[Border.values().length], null);
+
+	/**The properties corresponding to the border colors.*/
+	private final static String[] BORDER_COLOR_PROPERTIES;
+
+		static
+		{
+			BORDER_COLOR_PROPERTIES=new String[Border.values().length];	//create the array of properties and fill it with corresponding properties
+			BORDER_COLOR_PROPERTIES[Border.LINE_NEAR.ordinal()]=BORDER_LINE_NEAR_COLOR_PROPERTY;
+			BORDER_COLOR_PROPERTIES[Border.LINE_FAR.ordinal()]=BORDER_LINE_FAR_COLOR_PROPERTY;
+			BORDER_COLOR_PROPERTIES[Border.PAGE_NEAR.ordinal()]=BORDER_PAGE_NEAR_COLOR_PROPERTY;
+			BORDER_COLOR_PROPERTIES[Border.PAGE_FAR.ordinal()]=BORDER_PAGE_FAR_COLOR_PROPERTY;
+		}
+	
+		/**Returns the border color of the indicated border.
+		@param border The border for which a border color should be returned.
+		@return The border color of the given border, or <code>null</code> if the default border color should be used.
+		*/
+		public Color<?> getBorderColor(final Border border) {return borderColors[border.ordinal()];}
+
+		/**Returns the border color of the line near page near corner.
+		@return The border color of the border, or <code>null</code> if the default border color should be used.
+		*/
+		public Color<?> BorderLineNearColor() {return getBorderColor(Border.LINE_NEAR);}
+
+		/**Returns the border color of the line far page near corner.
+		@return The border color of the border, or <code>null</code> if the default border color should be used.
+		*/
+		public Color<?> BorderLineFarColor() {return getBorderColor(Border.LINE_FAR);}
+
+		/**Returns the border color of the line near page far corner.
+		@return The border color of the border, or <code>null</code> if the default border color should be used.
+		*/
+		public Color<?> BorderPageNearColor() {return getBorderColor(Border.PAGE_NEAR);}
+
+		/**Returns the border color of the line far page far corner.
+		@return The border color of the border, or <code>null</code> if the default border color should be used.
+		*/
+		public Color<?> BorderPageFarColor() {return getBorderColor(Border.PAGE_FAR);}
+
+		/**Sets the border color of a given border.
+		The border color of each border represents a bound property.
+		@param border The border for which the border color should be set.
+		@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
+		@exception NullPointerException if the given border is <code>null</code>. 
+		@see Component#BORDER_LINE_NEAR_COLOR_PROPERTY
+		@see Component#BORDER_LINE_FAR_COLOR_PROPERTY
+		@see Component#BORDER_PAGE_NEAR_COLOR_PROPERTY
+		@see Component#BORDER_PAGE_FAR_COLOR_PROPERTY
+		*/
+		public void setBorderColor(final Border border, final Color<?> newBorderColor)
+		{
+			final int borderOrdinal=checkInstance(border, "Border cannot be null").ordinal();	//get the ordinal of the border
+			final Color<?> oldBorderColor=borderColors[borderOrdinal];	//get the old value
+			if(!ObjectUtilities.equals(oldBorderColor, newBorderColor))	//if the value is really changing
+			{
+				borderColors[borderOrdinal]=newBorderColor;	//actually change the value
+				firePropertyChange(BORDER_COLOR_PROPERTIES[borderOrdinal], oldBorderColor, newBorderColor);	//indicate that the value changed
+			}			
+		}
+
+		/**Sets the border COLOR of the line near border.
+		This is a bound property.
+		@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
+		@see Component#BORDER_LINE_NEAR_COLOR_PROPERTY
+		*/
+		public void setBorderLineNearColor(final Color<?> newBorderColor) {setBorderColor(Border.LINE_NEAR, newBorderColor);}
+
+		/**Sets the border color of the line far border.
+		This is a bound property.
+		@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
+		@see Component#BORDER_LINE_FAR_COLOR_PROPERTY
+		*/
+		public void setBorderLineFarColor(final Color<?> newBorderColor) {setBorderColor(Border.LINE_FAR, newBorderColor);}
+
+		/**Sets the border color of the page near border.
+		This is a bound property.
+		@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
+		@see Component#BORDER_PAGE_NEAR_COLOR_PROPERTY
+		*/
+		public void setBorderPageNearColor(final Color<?> newBorderColor) {setBorderColor(Border.PAGE_NEAR, newBorderColor);}
+
+		/**Sets the border color of the page far border.
+		This is a bound property.
+		@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
+		@see Component#BORDER_PAGE_FAR_COLOR_PROPERTY
+		*/
+		public void setBorderPageFarColor(final Color<?> newBorderColor) {setBorderColor(Border.PAGE_FAR, newBorderColor);}
+
+		/**Sets the border color of all borders.
+		The border color of each border represents a bound property.
+		This is a convenience method that calls {@link #setBorderColor(Border, Color)} for each border.
+		@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
+		@see Component#BORDER_LINE_NEAR_COLOR_PROPERTY
+		@see Component#BORDER_LINE_FAR_COLOR_PROPERTY
+		@see Component#BORDER_PAGE_NEAR_COLOR_PROPERTY
+		@see Component#BORDER_PAGE_FAR_COLOR_PROPERTY
+		*/
+		public void setBorderColor(final Color<?> newBorderColor)
+		{
+			for(final Border border:Border.values())	//for each border
+			{
+				setBorderColor(border, newBorderColor);	//set this border color
+			}
+		}
 		
 	/**The array of border extents.*/
 	private Extent[] borderExtents=fill(new Extent[Border.values().length], null);
@@ -265,27 +351,27 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 	
 		/**Returns the border extent of the indicated border.
 		@param border The border for which a border extent should be returned.
-		@return The border extent of the given border, or <code>null</code> if the default extent should be used.
+		@return The border extent of the given border, or <code>null</code> if the default border extent should be used.
 		*/
 		public Extent getBorderExtent(final Border border) {return borderExtents[border.ordinal()];}
 
 		/**Returns the border extent of the line near page near corner.
-		@return The border extent of the border, or <code>null</code> if the default extent should be used.
+		@return The border extent of the border, or <code>null</code> if the default border extent should be used.
 		*/
 		public Extent BorderLineNearExtent() {return getBorderExtent(Border.LINE_NEAR);}
 
 		/**Returns the border extent of the line far page near corner.
-		@return The border extent of the border, or <code>null</code> if the default extent should be used.
+		@return The border extent of the border, or <code>null</code> if the default border extent should be used.
 		*/
 		public Extent BorderLineFarExtent() {return getBorderExtent(Border.LINE_FAR);}
 
 		/**Returns the border extent of the line near page far corner.
-		@return The border extent of the border, or <code>null</code> if the default extent should be used.
+		@return The border extent of the border, or <code>null</code> if the default border extent should be used.
 		*/
 		public Extent BorderPageNearExtent() {return getBorderExtent(Border.PAGE_NEAR);}
 
 		/**Returns the border extent of the line far page far corner.
-		@return The border extent of the border, or <code>null</code> if the default extent should be used.
+		@return The border extent of the border, or <code>null</code> if the default border extent should be used.
 		*/
 		public Extent BorderPageFarExtent() {return getBorderExtent(Border.PAGE_FAR);}
 
@@ -293,7 +379,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		The border extent of each border represents a bound property.
 		@param border The border for which the border extent should be set.
 		@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
-		@exception NullPointerException if the given border and/or border extent is <code>null</code>. 
+		@exception NullPointerException if the given border is <code>null</code>. 
 		@see Component#BORDER_LINE_NEAR_EXTENT_PROPERTY
 		@see Component#BORDER_LINE_FAR_EXTENT_PROPERTY
 		@see Component#BORDER_PAGE_NEAR_EXTENT_PROPERTY
@@ -303,7 +389,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		{
 			final int borderOrdinal=checkInstance(border, "Border cannot be null").ordinal();	//get the ordinal of the border
 			final Extent oldBorderExtent=borderExtents[borderOrdinal];	//get the old value
-			if(!ObjectUtilities.equals(oldBorderExtent, checkInstance(newBorderExtent, "Border extent cannot be null")))	//if the value is really changing
+			if(!ObjectUtilities.equals(oldBorderExtent, newBorderExtent))	//if the value is really changing
 			{
 				borderExtents[borderOrdinal]=newBorderExtent;	//actually change the value
 				firePropertyChange(BORDER_EXTENT_PROPERTIES[borderOrdinal], oldBorderExtent, newBorderExtent);	//indicate that the value changed
@@ -313,7 +399,6 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**Sets the border extent of the line near border.
 		This is a bound property.
 		@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
-		@exception NullPointerException if the given border extent is <code>null</code>. 
 		@see Component#BORDER_LINE_NEAR_EXTENT_PROPERTY
 		*/
 		public void setBorderLineNearExtent(final Extent newBorderExtent) {setBorderExtent(Border.LINE_NEAR, newBorderExtent);}
@@ -321,7 +406,6 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**Sets the border extent of the line far border.
 		This is a bound property.
 		@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
-		@exception NullPointerException if the given border extent is <code>null</code>. 
 		@see Component#BORDER_LINE_FAR_EXTENT_PROPERTY
 		*/
 		public void setBorderLineFarExtent(final Extent newBorderExtent) {setBorderExtent(Border.LINE_FAR, newBorderExtent);}
@@ -329,7 +413,6 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**Sets the border extent of the page near border.
 		This is a bound property.
 		@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
-		@exception NullPointerException if the given border extent is <code>null</code>. 
 		@see Component#BORDER_PAGE_NEAR_EXTENT_PROPERTY
 		*/
 		public void setBorderPageNearExtent(final Extent newBorderExtent) {setBorderExtent(Border.PAGE_NEAR, newBorderExtent);}
@@ -337,7 +420,6 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**Sets the border extent of the page far border.
 		This is a bound property.
 		@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
-		@exception NullPointerException if the given border extent is <code>null</code>. 
 		@see Component#BORDER_PAGE_FAR_EXTENT_PROPERTY
 		*/
 		public void setBorderPageFarExtent(final Extent newBorderExtent) {setBorderExtent(Border.PAGE_FAR, newBorderExtent);}
@@ -345,7 +427,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**Sets the border extent of all borders.
 		The border extent of each border represents a bound property.
 		This is a convenience method that calls {@link #setBorderExtent(Border, Extent)} for each border.
-		@exception NullPointerException if the given border extent is <code>null</code>. 
+		@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
 		@see Component#BORDER_LINE_NEAR_EXTENT_PROPERTY
 		@see Component#BORDER_LINE_FAR_EXTENT_PROPERTY
 		@see Component#BORDER_PAGE_NEAR_EXTENT_PROPERTY
@@ -357,27 +439,113 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			{
 				setBorderExtent(border, newBorderExtent);	//set this border extent
 			}
-		}		
+		}
 		
-	/**The style of border of the component, or <code>null</code> if there should be no border.*/
-	private LineStyle borderStyle=null;
+	/**The array of border styles.*/
+	private LineStyle[] borderStyles=fill(new LineStyle[Border.values().length], null);
 
-		/**@return The style of border of the component, or <code>null</code> if there should be no border.*/
-		public LineStyle getBorderStyle() {return borderStyle;}
+	/**The properties corresponding to the border styles.*/
+	private final static String[] BORDER_STYLE_PROPERTIES;
 
-		/**Sets the style of border of the component.
+		static
+		{
+			BORDER_STYLE_PROPERTIES=new String[Border.values().length];	//create the array of properties and fill it with corresponding properties
+			BORDER_STYLE_PROPERTIES[Border.LINE_NEAR.ordinal()]=BORDER_LINE_NEAR_STYLE_PROPERTY;
+			BORDER_STYLE_PROPERTIES[Border.LINE_FAR.ordinal()]=BORDER_LINE_FAR_STYLE_PROPERTY;
+			BORDER_STYLE_PROPERTIES[Border.PAGE_NEAR.ordinal()]=BORDER_PAGE_NEAR_STYLE_PROPERTY;
+			BORDER_STYLE_PROPERTIES[Border.PAGE_FAR.ordinal()]=BORDER_PAGE_FAR_STYLE_PROPERTY;
+		}
+	
+		/**Returns the border style of the indicated border.
+		@param border The border for which a border style should be returned.
+		@return The border style of the given border, or <code>null</code> if there should be no border.
+		*/
+		public LineStyle getBorderStyle(final Border border) {return borderStyles[border.ordinal()];}
+
+		/**Returns the border style of the line near page near corner.
+		@return The border style of the given border, or <code>null</code> if there should be no border.
+		*/
+		public LineStyle BorderLineNearStyle() {return getBorderStyle(Border.LINE_NEAR);}
+
+		/**Returns the border style of the line far page near corner.
+		@return The border style of the given border, or <code>null</code> if there should be no border.
+		*/
+		public LineStyle BorderLineFarStyle() {return getBorderStyle(Border.LINE_FAR);}
+
+		/**Returns the border style of the line near page far corner.
+		@return The border style of the given border, or <code>null</code> if there should be no border.
+		*/
+		public LineStyle BorderPageNearStyle() {return getBorderStyle(Border.PAGE_NEAR);}
+
+		/**Returns the border style of the line far page far corner.
+		@return The border style of the given border, or <code>null</code> if there should be no border.
+		*/
+		public LineStyle BorderPageFarStyle() {return getBorderStyle(Border.PAGE_FAR);}
+
+		/**Sets the border style of a given border.
+		The border style of each border represents a bound property.
+		@param border The border for which the border style should be set.
+		@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+		@exception NullPointerException if the given border is <code>null</code>. 
+		@see Component#BORDER_LINE_NEAR_STYLE_PROPERTY
+		@see Component#BORDER_LINE_FAR_STYLE_PROPERTY
+		@see Component#BORDER_PAGE_NEAR_STYLE_PROPERTY
+		@see Component#BORDER_PAGE_FAR_STYLE_PROPERTY
+		*/
+		public void setBorderStyle(final Border border, final LineStyle newBorderStyle)
+		{
+			final int borderOrdinal=checkInstance(border, "Border cannot be null").ordinal();	//get the ordinal of the border
+			final LineStyle oldBorderStyle=borderStyles[borderOrdinal];	//get the old value
+			if(!ObjectUtilities.equals(oldBorderStyle, newBorderStyle))	//if the value is really changing
+			{
+				borderStyles[borderOrdinal]=newBorderStyle;	//actually change the value
+				firePropertyChange(BORDER_STYLE_PROPERTIES[borderOrdinal], oldBorderStyle, newBorderStyle);	//indicate that the value changed
+			}			
+		}
+
+		/**Sets the border style of the line near border.
 		This is a bound property.
-		@param newBorderStyle The new style of border, or <code>null</code> if there should be no border.
-		@see Component#BORDER_STYLE_PROPERTY 
+		@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+		@see Component#BORDER_LINE_NEAR_STYLE_PROPERTY
+		*/
+		public void setBorderLineNearStyle(final LineStyle newBorderStyle) {setBorderStyle(Border.LINE_NEAR, newBorderStyle);}
+
+		/**Sets the border style of the line far border.
+		This is a bound property.
+		@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+		@see Component#BORDER_LINE_FAR_STYLE_PROPERTY
+		*/
+		public void setBorderLineFarStyle(final LineStyle newBorderStyle) {setBorderStyle(Border.LINE_FAR, newBorderStyle);}
+
+		/**Sets the border style of the page near border.
+		This is a bound property.
+		@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+		@see Component#BORDER_PAGE_NEAR_STYLE_PROPERTY
+		*/
+		public void setBorderPageNearStyle(final LineStyle newBorderStyle) {setBorderStyle(Border.PAGE_NEAR, newBorderStyle);}
+
+		/**Sets the border style of the page far border.
+		This is a bound property.
+		@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+		@see Component#BORDER_PAGE_FAR_STYLE_PROPERTY
+		*/
+		public void setBorderPageFarStyle(final LineStyle newBorderStyle) {setBorderStyle(Border.PAGE_FAR, newBorderStyle);}
+
+		/**Sets the border style of all borders.
+		The border style of each border represents a bound property.
+		This is a convenience method that calls {@link #setBorderStyle(Border, LineStyle)} for each border.
+		@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+		@see Component#BORDER_LINE_NEAR_STYLE_PROPERTY
+		@see Component#BORDER_LINE_FAR_STYLE_PROPERTY
+		@see Component#BORDER_PAGE_NEAR_STYLE_PROPERTY
+		@see Component#BORDER_PAGE_FAR_STYLE_PROPERTY
 		*/
 		public void setBorderStyle(final LineStyle newBorderStyle)
 		{
-			if(!ObjectUtilities.equals(borderStyle, newBorderStyle))	//if the value is really changing
+			for(final Border border:Border.values())	//for each border
 			{
-				final LineStyle oldBorderStyle=borderStyle;	//get the old value
-				borderStyle=newBorderStyle;	//actually change the value
-				firePropertyChange(BORDER_STYLE_PROPERTY, oldBorderStyle, newBorderStyle);	//indicate that the value changed
-			}			
+				setBorderStyle(border, newBorderStyle);	//set this border style
+			}
 		}
 		
 	/**The foreground color of the component, or <code>null</code> if no foreground color is specified for this component.*/
@@ -485,7 +653,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		{
 			final int cornerOrdinal=checkInstance(corner, "Corner cannot be null").ordinal();	//get the ordinal of the corner
 			final Dimensions oldCornerArcSize=cornerArcSizes[cornerOrdinal];	//get the old value
-			if(!ObjectUtilities.equals(oldCornerArcSize, checkInstance(newCornerArcSize, "Corner arc size cannot be null")))	//if the value is really changing
+			if(!ObjectUtilities.equals(oldCornerArcSize, checkInstance(newCornerArcSize, "Corner arc size cannot be null")))	//if the value is really changing TODO decide if null dimensions should be accepted
 			{
 				cornerArcSizes[cornerOrdinal]=newCornerArcSize;	//actually change the value
 				firePropertyChange(CORNER_ARC_SIZE_PROPERTIES[cornerOrdinal], oldCornerArcSize, newCornerArcSize);	//indicate that the value changed
@@ -583,7 +751,28 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 				firePropertyChange(FONT_SIZE_PROPERTY, oldFontSize, newFontSize);	//indicate that the value changed
 			}			
 		}
-		
+
+	/**The requested line extent (width in left-to-right top-to-bottom orientation) of the component, or <code>null</code> if no preferred line extent has been specified.*/
+	private Extent lineExtent=null;
+
+		/**@return The requested line extent (width in left-to-right top-to-bottom orientation) of the component, or <code>null</code> if no preferred line extent has been specified.*/
+		public Extent getLineExtent() {return lineExtent;}
+
+		/**Sets the requested line extent (width in left-to-right top-to-bottom orientation) of the component.
+		This is a bound property.
+		@param newLineExtent The new requested line extent of the component, or <code>null</code> there is no line extent preference.
+		@see Component#LINE_EXTENT_PROPERTY 
+		*/
+		public void setLineExtent(final Extent newLineExtent)
+		{
+			if(!ObjectUtilities.equals(lineExtent, newLineExtent))	//if the value is really changing
+			{
+				final Extent oldLineExtent=lineExtent;	//get the old value
+				lineExtent=newLineExtent;	//actually change the value
+				firePropertyChange(LINE_EXTENT_PROPERTY, oldLineExtent, newLineExtent);	//indicate that the value changed
+			}			
+		}
+
 	/**The notification associated with the component, or <code>null</code> if no notification is associated with this component.*/
 	private Notification notification=null;
 
@@ -638,45 +827,131 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			}			
 		}
 
-	/**The requested width of the component, or <code>null</code> if no preferred width has been specified.*/
-	private Extent width=null;
+	/**The array of padding extents.*/
+	private Extent[] paddingExtents=fill(new Extent[Border.values().length], null);
 
-		/**@return The requested width of the component, or <code>null</code> if no preferred width has been specified.*/
-		public Extent getWidth() {return width;}
+	/**The properties corresponding to the padding extents.*/
+	private final static String[] PADDING_EXTENT_PROPERTIES;
 
-		/**Sets the requested width of the component.
-		This is a bound property.
-		@param newWidth The new requested width of the component, or <code>null</code> there is no width preference.
-		@see Component#WIDTH_PROPERTY 
-		*/
-		public void setWidth(final Extent newWidth)
+		static
 		{
-			if(!ObjectUtilities.equals(width, newWidth))	//if the value is really changing
+			PADDING_EXTENT_PROPERTIES=new String[Border.values().length];	//create the array of properties and fill it with corresponding properties
+			PADDING_EXTENT_PROPERTIES[Border.LINE_NEAR.ordinal()]=PADDING_LINE_NEAR_EXTENT_PROPERTY;
+			PADDING_EXTENT_PROPERTIES[Border.LINE_FAR.ordinal()]=PADDING_LINE_FAR_EXTENT_PROPERTY;
+			PADDING_EXTENT_PROPERTIES[Border.PAGE_NEAR.ordinal()]=PADDING_PAGE_NEAR_EXTENT_PROPERTY;
+			PADDING_EXTENT_PROPERTIES[Border.PAGE_FAR.ordinal()]=PADDING_PAGE_FAR_EXTENT_PROPERTY;
+		}
+	
+		/**Returns the padding extent of the indicated border.
+		@param border The border for which a padding extent should be returned.
+		@return The padding extent of the given border, or <code>null</code> if the default padding extent should be used.
+		*/
+		public Extent getPaddingExtent(final Border border) {return paddingExtents[border.ordinal()];}
+
+		/**Returns the padding extent of the line near page near corner.
+		@return The padding extent of the border, or <code>null</code> if the default padding extent should be used.
+		*/
+		public Extent getPaddingLineNearExtent() {return getPaddingExtent(Border.LINE_NEAR);}
+
+		/**Returns the padding extent of the line far page near corner.
+		@return The padding extent of the border, or <code>null</code> if the default padding extent should be used.
+		*/
+		public Extent getPaddingLineFarExtent() {return getPaddingExtent(Border.LINE_FAR);}
+
+		/**Returns the padding extent of the line near page far corner.
+		@return The padding extent of the border, or <code>null</code> if the default padding extent should be used.
+		*/
+		public Extent getPaddingPageNearExtent() {return getPaddingExtent(Border.PAGE_NEAR);}
+
+		/**Returns the padding extent of the line far page far corner.
+		@return The padding extent of the border, or <code>null</code> if the default padding extent should be used.
+		*/
+		public Extent getPaddingPageFarExtent() {return getPaddingExtent(Border.PAGE_FAR);}
+
+		/**Sets the padding extent of a given border.
+		The padding extent of each border represents a bound property.
+		@param border The border for which the padding extent should be set.
+		@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+		@exception NullPointerException if the given border is <code>null</code>. 
+		@see Component#PADDING_LINE_NEAR_EXTENT_PROPERTY
+		@see Component#PADDING_LINE_FAR_EXTENT_PROPERTY
+		@see Component#PADDING_PAGE_NEAR_EXTENT_PROPERTY
+		@see Component#PADDING_PAGE_FAR_EXTENT_PROPERTY
+		*/
+		public void setPaddingExtent(final Border border, final Extent newPaddingExtent)
+		{
+			final int borderOrdinal=checkInstance(border, "Border cannot be null").ordinal();	//get the ordinal of the border
+			final Extent oldPaddingExtent=paddingExtents[borderOrdinal];	//get the old value
+			if(!ObjectUtilities.equals(oldPaddingExtent, newPaddingExtent))	//if the value is really changing
 			{
-				final Extent oldWidth=width;	//get the old value
-				width=newWidth;	//actually change the value
-				firePropertyChange(WIDTH_PROPERTY, oldWidth, newWidth);	//indicate that the value changed
+				paddingExtents[borderOrdinal]=newPaddingExtent;	//actually change the value
+				firePropertyChange(PADDING_EXTENT_PROPERTIES[borderOrdinal], oldPaddingExtent, newPaddingExtent);	//indicate that the value changed
 			}			
 		}
 
-	/**The requested height of the component, or <code>null</code> if no preferred height has been specified.*/
-	private Extent height=null;
-
-		/**@return The requested height of the component, or <code>null</code> if no preferred height has been specified.*/
-		public Extent getHeight() {return height;}
-
-		/**Sets the requested height of the component.
+		/**Sets the padding extent of the line near border.
 		This is a bound property.
-		@param newHeight The new requested height of the component, or <code>null</code> there is no height preference.
-		@see Component#HEIGHT_PROPERTY 
+		@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+		@see Component#PADDING_LINE_NEAR_EXTENT_PROPERTY
 		*/
-		public void setHeight(final Extent newHeight)
+		public void setPaddingLineNearExtent(final Extent newPaddingExtent) {setPaddingExtent(Border.LINE_NEAR, newPaddingExtent);}
+
+		/**Sets the padding extent of the line far border.
+		This is a bound property.
+		@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+		@see Component#PADDING_LINE_FAR_EXTENT_PROPERTY
+		*/
+		public void setPaddingLineFarExtent(final Extent newPaddingExtent) {setPaddingExtent(Border.LINE_FAR, newPaddingExtent);}
+
+		/**Sets the padding extent of the page near border.
+		This is a bound property.
+		@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+		@see Component#PADDING_PAGE_NEAR_EXTENT_PROPERTY
+		*/
+		public void setPaddingPageNearExtent(final Extent newPaddingExtent) {setPaddingExtent(Border.PAGE_NEAR, newPaddingExtent);}
+
+		/**Sets the padding extent of the page far border.
+		This is a bound property.
+		@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+		@see Component#PADDING_PAGE_FAR_EXTENT_PROPERTY
+		*/
+		public void setPaddingPageFarExtent(final Extent newPaddingExtent) {setPaddingExtent(Border.PAGE_FAR, newPaddingExtent);}
+
+		/**Sets the padding extent of all borders.
+		The padding extent of each border represents a bound property.
+		This is a convenience method that calls {@link #setPaddingExtent(Border, Extent)} for each border.
+		@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+		@see Component#PADDING_LINE_NEAR_EXTENT_PROPERTY
+		@see Component#PADDING_LINE_FAR_EXTENT_PROPERTY
+		@see Component#PADDING_PAGE_NEAR_EXTENT_PROPERTY
+		@see Component#PADDING_PAGE_FAR_EXTENT_PROPERTY
+		*/
+		public void setPaddingExtent(final Extent newPaddingExtent)
 		{
-			if(!ObjectUtilities.equals(height, newHeight))	//if the value is really changing
+			for(final Border border:Border.values())	//for each border
 			{
-				final Extent oldHeight=height;	//get the old value
-				height=newHeight;	//actually change the value
-				firePropertyChange(HEIGHT_PROPERTY, oldHeight, newHeight);	//indicate that the value changed
+				setPaddingExtent(border, newPaddingExtent);	//set this padding extent
+			}
+		}
+
+	/**The requested page extent (height in left-to-right top-to-bottom orientation) of the component, or <code>null</code> if no preferred page extent has been specified.*/
+	private Extent pageExtent=null;
+
+		/**@return The requested page extent (height in left-to-right top-to-bottom orientation) of the component, or <code>null</code> if no preferred page extent has been specified.*/
+		public Extent getPageExtent() {return pageExtent;}
+
+		/**Sets the requested page extent (height in left-to-right top-to-bottom orientation) of the component.
+		This is a bound property.
+		@param newPageExtent The new requested page extent of the component, or <code>null</code> there is no page extent preference.
+		@see Component#PAGE_EXTENT_PROPERTY 
+		*/
+		public void setPageExtent(final Extent newPageExtent)
+		{
+			if(!ObjectUtilities.equals(pageExtent, newPageExtent))	//if the value is really changing
+			{
+				final Extent oldPageExtent=pageExtent;	//get the old value
+				pageExtent=newPageExtent;	//actually change the value
+				firePropertyChange(PAGE_EXTENT_PROPERTY, oldPageExtent, newPageExtent);	//indicate that the value changed
 			}			
 		}
 
@@ -1649,37 +1924,37 @@ Debug.trace("now valid of", this, "is", isValid());
 			/**@return The component for which this object will control flyovers.*/
 			public S getComponent() {return component;}
 			
-		/**The requested width of the flyover component, or <code>null</code> if no preferred width has been specified.*/
-		private Extent width=null;
+		/**The requested line extent (width in left-to-right top-to-bottom orientation) of the flyover component, or <code>null</code> if no preferred line extent has been specified.*/
+		private Extent lineExtent=null;
 
-			/**@return The requested width of the flyover component, or <code>null</code> if no preferred width has been specified.*/
-			public Extent getWidth() {return width;}
+			/**@return The requested line extent (width in left-to-right top-to-bottom orientation) of the flyover component, or <code>null</code> if no preferred line extent has been specified.*/
+			public Extent getLineExtent() {return lineExtent;}
 
-			/**Sets the requested width of the flyover component.
-			@param newWidth The new requested width of the flyover component, or <code>null</code> there is no width preference.
+			/**Sets the requested line extent (width in left-to-right top-to-bottom orientation) of the flyover component.
+			@param newLineExtent The new requested line extent of the flyover component, or <code>null</code> there is no line extent preference.
 			*/
-			public void setWidth(final Extent newWidth)
+			public void setLineExtent(final Extent newLineExtent)
 			{
-				if(!ObjectUtilities.equals(width, newWidth))	//if the value is really changing
+				if(!ObjectUtilities.equals(lineExtent, newLineExtent))	//if the value is really changing
 				{
-					width=newWidth;	//actually change the value
+					lineExtent=newLineExtent;	//actually change the value
 				}			
 			}
 
-		/**The requested height of the flyover component, or <code>null</code> if no preferred height has been specified.*/
-		private Extent height=null;
+		/**The requested page extent (height in left-to-right top-to-bottom orientation) of the flyover component, or <code>null</code> if no preferred page extent has been specified.*/
+		private Extent pageExent=null;
 
-			/**@return The requested height of the flyover component, or <code>null</code> if no preferred height has been specified.*/
-			public Extent getHeight() {return height;}
+			/**@return The requested page extent (height in left-to-right top-to-bottom orientation) of the flyover component, or <code>null</code> if no preferred page extent has been specified.*/
+			public Extent getPageExtent() {return pageExent;}
 
-			/**Sets the requested height of the flyover component.
-			@param newHeight The new requested height of the flyover component, or <code>null</code> there is no height preference.
+			/**Sets the requested page extent (height in left-to-right top-to-bottom orientation) of the flyover component.
+			@param newPageExtent The new requested page extent of the flyover component, or <code>null</code> there is no page extent preference.
 			*/
-			public void setHeight(final Extent newHeight)
+			public void setPageExtent(final Extent newPageExtent)
 			{
-				if(!ObjectUtilities.equals(height, newHeight))	//if the value is really changing
+				if(!ObjectUtilities.equals(pageExent, newPageExtent))	//if the value is really changing
 				{
-					height=newHeight;	//actually change the value
+					pageExent=newPageExtent;	//actually change the value
 				}			
 			}
 			
@@ -1833,15 +2108,15 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 				{
 					flyoverFrame.setStyleID(styleID);	//set the style ID of the flyover
 				}
-				final Extent width=getWidth();	//get the requested width
-				if(width!=null)	//if there is a requested width
+				final Extent lineExtent=getLineExtent();	//get the requested width
+				if(lineExtent!=null)	//if there is a requested width
 				{
-					flyoverFrame.setWidth(width);	//set the flyover width
+					flyoverFrame.setLineExtent(lineExtent);	//set the flyover width
 				}
-				final Extent height=getHeight();	//get the requested height
-				if(height!=null)	//if there is a requested height
+				final Extent pageExtent=getPageExtent();	//get the requested height
+				if(pageExtent!=null)	//if there is a requested height
 				{
-					flyoverFrame.setHeight(height);	//set the flyover height
+					flyoverFrame.setPageExtent(pageExtent);	//set the flyover height
 				}
 				flyoverFrame.setTetherBearing(getTetherBearing());	//set the bearing of the tether
 //TODO fix				frame.getModel().setLabel("Flyover");

@@ -64,8 +64,8 @@ public class MessageOptionDialogFrame extends NotificationOptionDialogFrame	//TO
 	{
 		super(messageComponent, options);	//construct the parent class
 		this.message=checkInstance(messageComponent, "Message component cannot be null");
-		setWidth(new Extent(25, Extent.Unit.EM));	//set the default preferred size
-		setHeight(new Extent(10, Extent.Unit.EM));
+		setLineExtent(new Extent(25, Extent.Unit.EM));	//set the default preferred size
+		setPageExtent(new Extent(10, Extent.Unit.EM));
 	}
 
 	/**Creates a message component with a message.
