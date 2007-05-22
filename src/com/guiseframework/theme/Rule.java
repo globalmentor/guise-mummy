@@ -32,10 +32,12 @@ public class Rule extends ClassTypedRDFResource
 		super(referenceURI, THEME_NAMESPACE_URI);  //construct the parent class
 	}
 
-	/**@return This rule's select declaration, or <code>null</code> if this rule has no <code>theme:select</code> property or the value is not of the correct type.*/
-	public Selector getSelect()
+	/**@return This rule's select declaration, or <code>null</code> if this rule has no <code>theme:select</code> property.
+	@exception ClassCastException if the value of the <code>theme:select</code> property is not a {@link Selector}.
+	*/
+	public Selector getSelect() throws ClassCastException
 	{
-		return asInstance(getPropertyValue(THEME_NAMESPACE_URI, SELECT_PROPERTY_NAME), Selector.class);	//return the theme:select value if it is a Selector
+		return (PropertySelector)getPropertyValue(THEME_NAMESPACE_URI, SELECT_PROPERTY_NAME);	//return the theme:select value
 	}
 
 	/**@return This rule's apply declaration, or <code>null</code> if this rule has no <code>theme:apply</code> selector or the value is not of the correct type.*/

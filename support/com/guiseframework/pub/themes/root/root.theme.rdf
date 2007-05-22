@@ -41,7 +41,7 @@
 		<theme:declarations rdf:parseType="Collection">
 			<!--Frame-->
 			<theme:Rule>
-				<theme:select><theme:Selector theme:componentClass="com.guiseframework.component.Frame"/></theme:select>
+				<theme:select><theme:ClassSelector theme:class="com.guiseframework.component.Frame"/></theme:select>
 				<theme:apply>
 					<theme:Template>
 						<property:color><style:ResourceColor rdf:value="theme.color.text"/></property:color>
@@ -51,7 +51,20 @@
 			</theme:Rule>
 			<!--Menu-->
 			<theme:Rule>	<!-- root menu -->
-				<theme:select><theme:Selector theme:componentClass="com.guiseframework.component.Menu" theme:notParentComponentClass="com.guiseframework.component.Menu"/></theme:select>
+				<theme:select>
+					<theme:IntersectionSelector>
+						<theme:select><theme:ClassSelector theme:class="com.guiseframework.component.Menu"/></theme:select>
+						<theme:select>
+							<theme:NegationSelector>
+								<theme:select>
+									<theme:PropertySelector theme:property="parent">
+										<theme:select><theme:ClassSelector theme:class="com.guiseframework.component.Menu"/></theme:select>
+									</theme:PropertySelector>
+								</theme:select>
+							</theme:NegationSelector>
+						</theme:select>
+					</theme:IntersectionSelector>
+				</theme:select>
 				<theme:apply>
 					<theme:Template>
 						<property:backgroundColor><style:ResourceColor rdf:value="theme.color.menu"/></property:backgroundColor>
@@ -59,7 +72,16 @@
 				</theme:apply>
 			</theme:Rule>
 			<theme:Rule>	<!-- submenu -->
-				<theme:select><theme:Selector theme:componentClass="com.guiseframework.component.Menu" theme:parentComponentClass="com.guiseframework.component.Menu"/></theme:select>
+				<theme:select>
+					<theme:IntersectionSelector>
+						<theme:select><theme:ClassSelector theme:class="com.guiseframework.component.Menu"/></theme:select>
+						<theme:select>
+							<theme:PropertySelector theme:property="parent">
+								<theme:select><theme:ClassSelector theme:class="com.guiseframework.component.Menu"/></theme:select>
+							</theme:PropertySelector>
+						</theme:select>
+					</theme:IntersectionSelector>
+				</theme:select>
 				<theme:apply>
 					<theme:Template>
 						<property:backgroundColor><style:ResourceColor rdf:value="theme.color.submenu"/></property:backgroundColor>

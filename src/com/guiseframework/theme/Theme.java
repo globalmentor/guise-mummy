@@ -41,14 +41,12 @@ public class Theme extends ClassTypedRDFResource
 		//theme properties
 	/**The apply property name; the local name of <code>theme:apply</code>.*/
 	public final static String APPLY_PROPERTY_NAME="apply";
-	/**The component class property name; the local name of <code>theme:componentClass</code>.*/
-	public final static String COMPONENT_CLASS_PROPERTY_NAME="componentClass";
+	/**The class property name; the local name of <code>theme:class</code>.*/
+	public final static String CLASS_PROPERTY_NAME="class";
 	/**The declarations property name; the local name of <code>theme:declarations</code>.*/
 	public final static String DECLARATIONS_PROPERTY_NAME="declarations";
-	/**The not parent component class property name; the local name of <code>theme:notParentComponentClass</code>.*/
-	public final static String NOT_PARENT_COMPONENT_CLASS_PROPERTY_NAME="notParentComponentClass";
-	/**The parent component class property name; the local name of <code>theme:parentComponentClass</code>.*/
-	public final static String PARENT_COMPONENT_CLASS_PROPERTY_NAME="parentComponentClass";
+	/**The property property name; the local name of <code>theme:property</code>.*/
+	public final static String PROPERTY_PROPERTY_NAME="property";
 	/**The resources property name; the local name of <code>theme:resources</code>.*/
 	public final static String RESOURCES_PROPERTY_NAME="resources";
 	/**The select property name; the local name of <code>theme:select</code>.*/
@@ -133,32 +131,59 @@ public class Theme extends ClassTypedRDFResource
 
 	/**Updates the internal maps of rules.
 	@exception ClassNotFoundException if one of the rules selects a class that cannot be found.
-	@see Selector#getSelectedClass()
+	@see PropertySelector#getSelectClass()
 	*/
 	public void updateRules() throws ClassNotFoundException
 	{
 //Debug.trace("updating rules for theme", this);
-		final RDFListResource ruleList=getDeclarations();	//get the rule list
-		if(ruleList!=null)	//if there is a rule list
+		componentClassRuleMap.clear();	//clear the map of rules
+		final RDFListResource declarations=getDeclarations();	//get the declarations
+		if(declarations!=null)	//if there is a rule list
 		{
-			for(final RDFResource ruleResource:ruleList)	//for each resource in the list
+			for(final RDFResource declarationResource:declarations)	//for each resource in the list
 			{
-				if(ruleResource instanceof Rule)	//if this is really a rule
+				if(declarationResource instanceof Rule)	//if this is a rule
 				{
-					final Rule rule=(Rule)ruleResource;	//get the rule
+					final Rule rule=(Rule)declarationResource;	//get the rule
 					final Selector selector=rule.getSelect();	//get what this rule selects
-					if(selector!=null)	//if we have a selector
+					if(selector!=null)	//if there is a selector for this rule
 					{
-						final Class<?> componentClass=selector.getComponentClass();	//get the component class selected by the selector
-//Debug.trace("selected class", selectedClass);
-						if(componentClass!=null)	//if we have a selected class
-						{
-							componentClassRuleMap.addItem(componentClass, rule);	//add this rule to our map
-						}
-					}				
+						updateRules(rule, selector);	//update the rules with this selector
+					}
 				}
 			}
 		}
+	}
+
+	/**Updates the internal maps of rules based upon a selector and its subselectors.
+	Rules with {@link OperatorSelector}s will be updated recursively.
+	@param rule The rule with which the theme will be updated.
+	@param selector The selector which may result in the theme being updated with this rule.
+	@exception NullPointerException if the given rule and/or selector is <code>null</code>.
+	@exception ClassNotFoundException if one of the selectors selects a class that cannot be found.
+	@see PropertySelector#getSelectClass()
+	*/
+	protected void updateRules(final Rule rule, final Selector selector) throws ClassNotFoundException
+	{
+		checkInstance(rule, "Rule cannot be null.");
+		checkInstance(selector, "Selector cannot be null.");
+		if(selector instanceof ClassSelector)	//if this is a class selector
+		{
+			final Class<?> selectClass=((ClassSelector)selector).getSelectClass();	//get the class selected by the selector
+//Debug.trace("selected class", selectedClass);
+			if(selectClass!=null)	//if we have a selected class
+			{
+				componentClassRuleMap.addItem(selectClass, rule);	//add this rule to our map
+			}
+		}
+		else if(selector instanceof OperatorSelector)	//if this is an operator selector
+		{
+			for(final Selector subselector:((OperatorSelector)selector).getSelects())	//for each subselector
+			{
+				updateRules(rule, subselector);	//update the rules for each subselector
+			}
+		}
+		
 	}
 
 	/**Applies this theme and its parents to the given component and any descendant components that have not yet had a theme applied.
