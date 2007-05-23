@@ -223,6 +223,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_ABOUT_X=createStringResourceReference("theme.label.about.x");
 	public final static String LABEL_ACCEPT=createStringResourceReference("theme.label.accept");
 	public final static String LABEL_ACCESS=createStringResourceReference("theme.label.access");
+	public final static String LABEL_ACCESS_X=createStringResourceReference("theme.label.access.x");
 	public final static String LABEL_ADD=createStringResourceReference("theme.label.add");
 	public final static String LABEL_CANCEL=createStringResourceReference("theme.label.cancel");
 	public final static String LABEL_DELETE=createStringResourceReference("theme.label.delete");

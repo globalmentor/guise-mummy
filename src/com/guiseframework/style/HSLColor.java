@@ -4,6 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.garretwilson.lang.IntegerUtilities.*;
+import static com.garretwilson.lang.Numbers.*;
 import com.garretwilson.text.ArgumentSyntaxException;
 
 /**Encapsulates a color value of the HSL color space.
@@ -67,9 +68,6 @@ public class HSLColor extends AbstractColor<HSLColor.Component>
 		return getComponent(Component.LIGHTNESS);	//return the lightness component
 	}
 
-	/**The double value representing 1/3.*/
-	private final static double ONE_THIRD=1.0d/3.0d;
-
 	/**@return The color in the HSL color space.*/
 	public HSLColor asHSL()
 	{
@@ -95,9 +93,9 @@ public class HSLColor extends AbstractColor<HSLColor.Component>
 		{
 			final double q=lightness>=0.5 ? lightness*(1.0+saturation) : lightness+saturation-(lightness*saturation);
 			final double p=2.0*lightness-q;
-			red=getHueRGBComponent(hue+ONE_THIRD, p, q);
+			red=getHueRGBComponent(hue+ONE_THIRD_DOUBLE, p, q);
 			green=getHueRGBComponent(hue, p, q);
-			blue=getHueRGBComponent(hue-ONE_THIRD, p, q);
+			blue=getHueRGBComponent(hue-ONE_THIRD_DOUBLE, p, q);
 		}
 		return new RGBColor(red, green, blue);	//return a new RGB color from our values
 	}

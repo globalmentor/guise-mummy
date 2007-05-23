@@ -337,7 +337,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		}
 		
 	/**The array of border extents.*/
-	private Extent[] borderExtents=fill(new Extent[Border.values().length], null);
+	private Extent[] borderExtents=fill(new Extent[Border.values().length], Extent.ZERO_EXTENT1);
 
 	/**The properties corresponding to the border extents.*/
 	private final static String[] BORDER_EXTENT_PROPERTIES;
@@ -353,35 +353,35 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 	
 		/**Returns the border extent of the indicated border.
 		@param border The border for which a border extent should be returned.
-		@return The border extent of the given border, or <code>null</code> if the default border extent should be used.
+		@return The border extent of the given border.
 		*/
 		public Extent getBorderExtent(final Border border) {return borderExtents[border.ordinal()];}
 
 		/**Returns the border extent of the line near page near corner.
-		@return The border extent of the border, or <code>null</code> if the default border extent should be used.
+		@return The border extent of the given border.
 		*/
 		public Extent BorderLineNearExtent() {return getBorderExtent(Border.LINE_NEAR);}
 
 		/**Returns the border extent of the line far page near corner.
-		@return The border extent of the border, or <code>null</code> if the default border extent should be used.
+		@return The border extent of the given border.
 		*/
 		public Extent BorderLineFarExtent() {return getBorderExtent(Border.LINE_FAR);}
 
 		/**Returns the border extent of the line near page far corner.
-		@return The border extent of the border, or <code>null</code> if the default border extent should be used.
+		@return The border extent of the given border.
 		*/
 		public Extent BorderPageNearExtent() {return getBorderExtent(Border.PAGE_NEAR);}
 
 		/**Returns the border extent of the line far page far corner.
-		@return The border extent of the border, or <code>null</code> if the default border extent should be used.
+		@return The border extent of the given border.
 		*/
 		public Extent BorderPageFarExtent() {return getBorderExtent(Border.PAGE_FAR);}
 
 		/**Sets the border extent of a given border.
 		The border extent of each border represents a bound property.
 		@param border The border for which the border extent should be set.
-		@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
-		@exception NullPointerException if the given border is <code>null</code>. 
+		@param newBorderExtent The border extent.
+		@exception NullPointerException if the given border and/or border extent is <code>null</code>. 
 		@see Component#BORDER_LINE_NEAR_EXTENT_PROPERTY
 		@see Component#BORDER_LINE_FAR_EXTENT_PROPERTY
 		@see Component#BORDER_PAGE_NEAR_EXTENT_PROPERTY
@@ -391,7 +391,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		{
 			final int borderOrdinal=checkInstance(border, "Border cannot be null").ordinal();	//get the ordinal of the border
 			final Extent oldBorderExtent=borderExtents[borderOrdinal];	//get the old value
-			if(!ObjectUtilities.equals(oldBorderExtent, newBorderExtent))	//if the value is really changing
+			if(!oldBorderExtent.equals(checkInstance(newBorderExtent, "Border extent cannot be null.")))	//if the value is really changing
 			{
 				borderExtents[borderOrdinal]=newBorderExtent;	//actually change the value
 				firePropertyChange(BORDER_EXTENT_PROPERTIES[borderOrdinal], oldBorderExtent, newBorderExtent);	//indicate that the value changed
@@ -400,28 +400,32 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 
 		/**Sets the border extent of the line near border.
 		This is a bound property.
-		@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
+		@param newBorderExtent The border extent.
+		@exception NullPointerException if the given border extent is <code>null</code>.
 		@see Component#BORDER_LINE_NEAR_EXTENT_PROPERTY
 		*/
 		public void setBorderLineNearExtent(final Extent newBorderExtent) {setBorderExtent(Border.LINE_NEAR, newBorderExtent);}
 
 		/**Sets the border extent of the line far border.
 		This is a bound property.
-		@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
+		@param newBorderExtent The border extent.
+		@exception NullPointerException if the given border extent is <code>null</code>.
 		@see Component#BORDER_LINE_FAR_EXTENT_PROPERTY
 		*/
 		public void setBorderLineFarExtent(final Extent newBorderExtent) {setBorderExtent(Border.LINE_FAR, newBorderExtent);}
 
 		/**Sets the border extent of the page near border.
 		This is a bound property.
-		@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
+		@param newBorderExtent The border extent.
+		@exception NullPointerException if the given border extent is <code>null</code>.
 		@see Component#BORDER_PAGE_NEAR_EXTENT_PROPERTY
 		*/
 		public void setBorderPageNearExtent(final Extent newBorderExtent) {setBorderExtent(Border.PAGE_NEAR, newBorderExtent);}
 
 		/**Sets the border extent of the page far border.
 		This is a bound property.
-		@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
+		@param newBorderExtent The border extent.
+		@exception NullPointerException if the given border extent is <code>null</code>.
 		@see Component#BORDER_PAGE_FAR_EXTENT_PROPERTY
 		*/
 		public void setBorderPageFarExtent(final Extent newBorderExtent) {setBorderExtent(Border.PAGE_FAR, newBorderExtent);}
@@ -429,7 +433,8 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**Sets the border extent of all borders.
 		The border extent of each border represents a bound property.
 		This is a convenience method that calls {@link #setBorderExtent(Border, Extent)} for each border.
-		@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
+		@param newBorderExtent The border extent.
+		@exception NullPointerException if the given border extent is <code>null</code>.
 		@see Component#BORDER_LINE_NEAR_EXTENT_PROPERTY
 		@see Component#BORDER_LINE_FAR_EXTENT_PROPERTY
 		@see Component#BORDER_PAGE_NEAR_EXTENT_PROPERTY
@@ -444,7 +449,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		}
 		
 	/**The array of border styles.*/
-	private LineStyle[] borderStyles=fill(new LineStyle[Border.values().length], null);
+	private LineStyle[] borderStyles=fill(new LineStyle[Border.values().length], LineStyle.SOLID);
 
 	/**The properties corresponding to the border styles.*/
 	private final static String[] BORDER_STYLE_PROPERTIES;
@@ -460,35 +465,35 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 	
 		/**Returns the border style of the indicated border.
 		@param border The border for which a border style should be returned.
-		@return The border style of the given border, or <code>null</code> if there should be no border.
+		@return The border style of the given border.
 		*/
 		public LineStyle getBorderStyle(final Border border) {return borderStyles[border.ordinal()];}
 
 		/**Returns the border style of the line near page near corner.
-		@return The border style of the given border, or <code>null</code> if there should be no border.
+		@return The border style of the given border.
 		*/
 		public LineStyle BorderLineNearStyle() {return getBorderStyle(Border.LINE_NEAR);}
 
 		/**Returns the border style of the line far page near corner.
-		@return The border style of the given border, or <code>null</code> if there should be no border.
+		@return The border style of the given border.
 		*/
 		public LineStyle BorderLineFarStyle() {return getBorderStyle(Border.LINE_FAR);}
 
 		/**Returns the border style of the line near page far corner.
-		@return The border style of the given border, or <code>null</code> if there should be no border.
+		@return The border style of the given border.
 		*/
 		public LineStyle BorderPageNearStyle() {return getBorderStyle(Border.PAGE_NEAR);}
 
 		/**Returns the border style of the line far page far corner.
-		@return The border style of the given border, or <code>null</code> if there should be no border.
+		@return The border style of the given border.
 		*/
 		public LineStyle BorderPageFarStyle() {return getBorderStyle(Border.PAGE_FAR);}
 
 		/**Sets the border style of a given border.
 		The border style of each border represents a bound property.
 		@param border The border for which the border style should be set.
-		@param newBorderStyle The border style, or <code>null</code> if there should be no border.
-		@exception NullPointerException if the given border is <code>null</code>. 
+		@param newBorderStyle The border style.
+		@exception NullPointerException if the given border and/or border style is <code>null</code>. 
 		@see Component#BORDER_LINE_NEAR_STYLE_PROPERTY
 		@see Component#BORDER_LINE_FAR_STYLE_PROPERTY
 		@see Component#BORDER_PAGE_NEAR_STYLE_PROPERTY
@@ -498,7 +503,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		{
 			final int borderOrdinal=checkInstance(border, "Border cannot be null").ordinal();	//get the ordinal of the border
 			final LineStyle oldBorderStyle=borderStyles[borderOrdinal];	//get the old value
-			if(!ObjectUtilities.equals(oldBorderStyle, newBorderStyle))	//if the value is really changing
+			if(oldBorderStyle!=checkInstance(newBorderStyle, "Border style cannot be null."))	//if the value is really changing
 			{
 				borderStyles[borderOrdinal]=newBorderStyle;	//actually change the value
 				firePropertyChange(BORDER_STYLE_PROPERTIES[borderOrdinal], oldBorderStyle, newBorderStyle);	//indicate that the value changed
@@ -507,28 +512,32 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 
 		/**Sets the border style of the line near border.
 		This is a bound property.
-		@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+		@param newBorderStyle The border style.
+		@exception NullPointerException if the given border style is <code>null</code>.
 		@see Component#BORDER_LINE_NEAR_STYLE_PROPERTY
 		*/
 		public void setBorderLineNearStyle(final LineStyle newBorderStyle) {setBorderStyle(Border.LINE_NEAR, newBorderStyle);}
 
 		/**Sets the border style of the line far border.
 		This is a bound property.
-		@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+		@param newBorderStyle The border style.
+		@exception NullPointerException if the given border style is <code>null</code>.
 		@see Component#BORDER_LINE_FAR_STYLE_PROPERTY
 		*/
 		public void setBorderLineFarStyle(final LineStyle newBorderStyle) {setBorderStyle(Border.LINE_FAR, newBorderStyle);}
 
 		/**Sets the border style of the page near border.
 		This is a bound property.
-		@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+		@param newBorderStyle The border style.
+		@exception NullPointerException if the given border style is <code>null</code>.
 		@see Component#BORDER_PAGE_NEAR_STYLE_PROPERTY
 		*/
 		public void setBorderPageNearStyle(final LineStyle newBorderStyle) {setBorderStyle(Border.PAGE_NEAR, newBorderStyle);}
 
 		/**Sets the border style of the page far border.
 		This is a bound property.
-		@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+		@param newBorderStyle The border style.
+		@exception NullPointerException if the given border style is <code>null</code>.
 		@see Component#BORDER_PAGE_FAR_STYLE_PROPERTY
 		*/
 		public void setBorderPageFarStyle(final LineStyle newBorderStyle) {setBorderStyle(Border.PAGE_FAR, newBorderStyle);}
@@ -536,7 +545,8 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**Sets the border style of all borders.
 		The border style of each border represents a bound property.
 		This is a convenience method that calls {@link #setBorderStyle(Border, LineStyle)} for each border.
-		@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+		@param newBorderStyle The border style.
+		@exception NullPointerException if the given border style is <code>null</code>.
 		@see Component#BORDER_LINE_NEAR_STYLE_PROPERTY
 		@see Component#BORDER_LINE_FAR_STYLE_PROPERTY
 		@see Component#BORDER_PAGE_NEAR_STYLE_PROPERTY
@@ -775,6 +785,118 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			}			
 		}
 
+	/**The array of margin extents.*/
+	private Extent[] marginExtents=fill(new Extent[Border.values().length], Extent.ZERO_EXTENT1);
+
+	/**The properties corresponding to the margin extents.*/
+	private final static String[] MARGIN_EXTENT_PROPERTIES;
+
+		static
+		{
+			MARGIN_EXTENT_PROPERTIES=new String[Border.values().length];	//create the array of properties and fill it with corresponding properties
+			MARGIN_EXTENT_PROPERTIES[Border.LINE_NEAR.ordinal()]=MARGIN_LINE_NEAR_EXTENT_PROPERTY;
+			MARGIN_EXTENT_PROPERTIES[Border.LINE_FAR.ordinal()]=MARGIN_LINE_FAR_EXTENT_PROPERTY;
+			MARGIN_EXTENT_PROPERTIES[Border.PAGE_NEAR.ordinal()]=MARGIN_PAGE_NEAR_EXTENT_PROPERTY;
+			MARGIN_EXTENT_PROPERTIES[Border.PAGE_FAR.ordinal()]=MARGIN_PAGE_FAR_EXTENT_PROPERTY;
+		}
+	
+		/**Returns the margin extent of the indicated border.
+		@param border The border for which a margin extent should be returned.
+		@return The margin extent of the given border.
+		*/
+		public Extent getMarginExtent(final Border border) {return marginExtents[border.ordinal()];}
+
+		/**Returns the margin extent of the line near page near corner.
+		@return The margin extent of the given border.
+		*/
+		public Extent getMarginLineNearExtent() {return getMarginExtent(Border.LINE_NEAR);}
+
+		/**Returns the margin extent of the line far page near corner.
+		@return The margin extent of the given border.
+		*/
+		public Extent getMarginLineFarExtent() {return getMarginExtent(Border.LINE_FAR);}
+
+		/**Returns the margin extent of the line near page far corner.
+		@return The margin extent of the given border.
+		*/
+		public Extent getMarginPageNearExtent() {return getMarginExtent(Border.PAGE_NEAR);}
+
+		/**Returns the margin extent of the line far page far corner.
+		@return The margin extent of the given border.
+		*/
+		public Extent getMarginPageFarExtent() {return getMarginExtent(Border.PAGE_FAR);}
+
+		/**Sets the margin extent of a given border.
+		The margin extent of each border represents a bound property.
+		@param border The border for which the margin extent should be set.
+		@param newMarginExtent The margin extent.
+		@exception NullPointerException if the given border and/or margin extent is <code>null</code>. 
+		@see Component#MARGIN_LINE_NEAR_EXTENT_PROPERTY
+		@see Component#MARGIN_LINE_FAR_EXTENT_PROPERTY
+		@see Component#MARGIN_PAGE_NEAR_EXTENT_PROPERTY
+		@see Component#MARGIN_PAGE_FAR_EXTENT_PROPERTY
+		*/
+		public void setMarginExtent(final Border border, final Extent newMarginExtent)
+		{
+			final int borderOrdinal=checkInstance(border, "Border cannot be null").ordinal();	//get the ordinal of the border
+			final Extent oldMarginExtent=marginExtents[borderOrdinal];	//get the old value
+			if(!oldMarginExtent.equals(checkInstance(newMarginExtent, "margin extent cannot be null.")))	//if the value is really changing
+			{
+				marginExtents[borderOrdinal]=newMarginExtent;	//actually change the value
+				firePropertyChange(MARGIN_EXTENT_PROPERTIES[borderOrdinal], oldMarginExtent, newMarginExtent);	//indicate that the value changed
+			}			
+		}
+
+		/**Sets the margin extent of the line near border.
+		This is a bound property.
+		@param newMarginExtent The margin extent.
+		@exception NullPointerException if the given margin extent is <code>null</code>. 
+		@see Component#MARGIN_LINE_NEAR_EXTENT_PROPERTY
+		*/
+		public void setMarginLineNearExtent(final Extent newMarginExtent) {setMarginExtent(Border.LINE_NEAR, newMarginExtent);}
+
+		/**Sets the margin extent of the line far border.
+		This is a bound property.
+		@param newMarginExtent The margin extent, or <code>null</code> if the default margin extent should be used.
+		@exception NullPointerException if the given margin extent is <code>null</code>. 
+		@see Component#MARGIN_LINE_FAR_EXTENT_PROPERTY
+		*/
+		public void setMarginLineFarExtent(final Extent newMarginExtent) {setMarginExtent(Border.LINE_FAR, newMarginExtent);}
+
+		/**Sets the margin extent of the page near border.
+		This is a bound property.
+		@param newMarginExtent The margin extent, or <code>null</code> if the default margin extent should be used.
+		@exception NullPointerException if the given margin extent is <code>null</code>. 
+		@see Component#MARGIN_PAGE_NEAR_EXTENT_PROPERTY
+		*/
+		public void setMarginPageNearExtent(final Extent newMarginExtent) {setMarginExtent(Border.PAGE_NEAR, newMarginExtent);}
+
+		/**Sets the margin extent of the page far border.
+		This is a bound property.
+		@param newMarginExtent The margin extent, or <code>null</code> if the default margin extent should be used.
+		@exception NullPointerException if the given margin extent is <code>null</code>. 
+		@see Component#MARGIN_PAGE_FAR_EXTENT_PROPERTY
+		*/
+		public void setMarginPageFarExtent(final Extent newMarginExtent) {setMarginExtent(Border.PAGE_FAR, newMarginExtent);}
+
+		/**Sets the margin extent of all borders.
+		The margin extent of each border represents a bound property.
+		This is a convenience method that calls {@link #setMarginExtent(Border, Extent)} for each border.
+		@param newMarginExtent The margin extent.
+		@exception NullPointerException if the given margin extent is <code>null</code>. 
+		@see Component#MARGIN_LINE_NEAR_EXTENT_PROPERTY
+		@see Component#MARGIN_LINE_FAR_EXTENT_PROPERTY
+		@see Component#MARGIN_PAGE_NEAR_EXTENT_PROPERTY
+		@see Component#MARGIN_PAGE_FAR_EXTENT_PROPERTY
+		*/
+		public void setMarginExtent(final Extent newMarginExtent)
+		{
+			for(final Border border:Border.values())	//for each border
+			{
+				setMarginExtent(border, newMarginExtent);	//set this margin extent
+			}
+		}
+		
 	/**The notification associated with the component, or <code>null</code> if no notification is associated with this component.*/
 	private Notification notification=null;
 

@@ -25,11 +25,16 @@ public class FlowLayout extends AbstractFlowLayout<FlowConstraints>
 	}
 
 	/**Creates default constraints for the container.
+	The new flow constraints will use the default alignment specified by the layout.
 	@return New default constraints for the container.
 	@exception IllegalStateException if this layout does not support default constraints.
+	@see #getAlignment()
+	@see FlowConstraints#setAlignment(double)
 	*/
 	public FlowConstraints createDefaultConstraints()
 	{
-		return new FlowConstraints();	//return a default constraints object
+		final FlowConstraints flowConstraints=new FlowConstraints();	//create a default constraints object
+		flowConstraints.setAlignment(getAlignment());	//set the default alignment
+		return flowConstraints;	//return the new flow constraints
 	}
 }

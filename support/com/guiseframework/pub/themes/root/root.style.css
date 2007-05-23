@@ -70,10 +70,12 @@ table
 }
 
 /*remove borders, padding, and margins*/
-div, table, th, td, span
+a, div, img, label, table, th, td, span
 {
-	border-style: none;
 	border: 0;
+	border-style: none;
+	font-style: normal;
+	font-weight: normal;
 	margin: 0;
 	padding: 0;
 }
@@ -951,137 +953,3 @@ form
 {
 	background-color: transparent;
 }
-
-/*TODO transfer to new themes
-caption
-{
-	font-size: larger;
-	font-weight: bold;
-}
-*/
-
-dt
-{
-	font-weight: bold;
-}
-
-table.table
-{
-	border-collapse: collapse;
-/*TODO del; new styles
-	border-style: solid;
-	border-width: thick;
-*/
-}
-
-table.table th, table.table td
-{
-/*TODO del; new styles
-	border-style: solid;
-	border-width: thin;
-*/
-}
-
-/*TODO del border/padding/margin stuff if new code at top works.*/
-table.table, table.table th, table.table td
-{
-	border-collapse: collapse;
-	border-style: none;
-	border: 0;
-	margin: 0;
-	padding: 0;
-}
-
-/*layout*/
-
-table.layout-region
-{
-	border-collapse: collapse;
-	border: 0;
-	margin: 0;
-	padding: 0;
-/*TODO fix
-	width: 100%;
-	height: 100%;
-*/
-}
-
-/*TODO del for new themes
-td.layout-region-left, td.layout-region-right
-{
-	vertical-align: top;
-	padding-left: 0.25em;
-	padding-right: 0.25em;	
-}
-*/
-
-/*TODO fix; doesn't work for frames in either Mozilla or IE, although each gives different results
-td.layout-region-center
-{
-	width: 100%;
-	height: 100%;	
-}
-*/
-
-td.layout-region-bottom
-{
-}
-
-/*TODO fix; this is really needed to allow nested region layouts, but it kills IE frames
-.frame table.layout-region
-{
-	position: relative;
-}
-*/
-
-.frame td.layout-region-center
-{
-/*TODO del; this causes problems with menu widths and its absence doesn't seem to hurt anything
-	width: 100%;
-	height: 100%;
-*/
-}
-
-.frame td.layout-region-bottom
-{
-/*TODO del; test
-	background-color: red;
-	border-width: thin;
-	border-style: solid;
-*/
-/*TODO fix
-	display: block;
-	position: absolute;
-	bottom: 0;
-*/
-}
-
-/*TODO del for new themes
-td.layout-flow-x-child
-{
-	vertical-align: top;
-	padding-left: 0.25em;
-	padding-right: 0.25em;
-}
-*/
-
-.layout-flow-x-child	/*for children in a horizontal flow layout, give each child inline display*/
-{
-/*TODO del	display: inline;*/
-}
-
-.layout-flow-y-child	/*for children in a vertical flow layout, give each child block display*/
-{
-	display: block;
-	clear: both;
-/*TODO del for new themes
-	padding-top: 0.25em;
-	padding-bottom: 0.25em;
-*/
-}
-/*TODO fix
-a.component.control:hover
-{
-	color: green;
-}
-*/

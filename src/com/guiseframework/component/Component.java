@@ -93,6 +93,14 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	public final static String INFO_PROPERTY=getPropertyName(Component.class, "info");
 	/**The info content type bound property.*/
 	public final static String INFO_CONTENT_TYPE_PROPERTY=getPropertyName(Component.class, "infoContentType");
+	/**The bound property of the line near margin extent.*/
+	public final static String MARGIN_LINE_NEAR_EXTENT_PROPERTY=getPropertyName(Component.class, "marginLineNearExtent");
+	/**The bound property of the line far margin extent.*/
+	public final static String MARGIN_LINE_FAR_EXTENT_PROPERTY=getPropertyName(Component.class, "marginLineFarExtent");
+	/**The bound property of the page near margin extent.*/
+	public final static String MARGIN_PAGE_NEAR_EXTENT_PROPERTY=getPropertyName(Component.class, "marginPageNearExtent");
+	/**The bound property of the page far margin extent.*/
+	public final static String MARGIN_PAGE_FAR_EXTENT_PROPERTY=getPropertyName(Component.class, "marginPageFarExtent");
 	/**The bound property of the component name.*/
 	public final static String NAME_PROPERTY=getPropertyName(Component.class, "name");
 	/**The bound property of the font families.*/
@@ -277,35 +285,35 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	
 	/**Returns the border extent of the indicated border.
 	@param border The border for which a border extent should be returned.
-	@return The border extent of the given border, or <code>null</code> if the default border extent should be used.
+	@return The border extent of the given border.
 	*/
 	public Extent getBorderExtent(final Border border);
 
 	/**Returns the border extent of the line near page near corner.
-	@return The border extent of the border, or <code>null</code> if the default border extent should be used.
+	@return The border extent of the given border.
 	*/
 	public Extent BorderLineNearExtent();
 
 	/**Returns the border extent of the line far page near corner.
-	@return The border extent of the border, or <code>null</code> if the default border extent should be used.
+	@return The border extent of the given border.
 	*/
 	public Extent BorderLineFarExtent();
 
 	/**Returns the border extent of the line near page far corner.
-	@return The border extent of the border, or <code>null</code> if the default border extent should be used.
+	@return The border extent of the given border.
 	*/
 	public Extent BorderPageNearExtent();
 
 	/**Returns the border extent of the line far page far corner.
-	@return The border extent of the border, or <code>null</code> if the default border extent should be used.
+	@return The border extent of the given border.
 	*/
 	public Extent BorderPageFarExtent();
 
 	/**Sets the border extent of a given border.
 	The border extent of each border represents a bound property.
 	@param border The border for which the border extent should be set.
-	@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
-	@exception NullPointerException if the given border is <code>null</code>. 
+	@param newBorderExtent The border extent.
+	@exception NullPointerException if the given border and/or border extent is <code>null</code>. 
 	@see Component#BORDER_LINE_NEAR_EXTENT_PROPERTY
 	@see Component#BORDER_LINE_FAR_EXTENT_PROPERTY
 	@see Component#BORDER_PAGE_NEAR_EXTENT_PROPERTY
@@ -315,28 +323,32 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 
 	/**Sets the border extent of the line near border.
 	This is a bound property.
-	@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
+	@param newBorderExtent The border extent.
+	@exception NullPointerException if the given border extent is <code>null</code>.
 	@see Component#BORDER_LINE_NEAR_EXTENT_PROPERTY
 	*/
 	public void setBorderLineNearExtent(final Extent newBorderExtent);
 
 	/**Sets the border extent of the line far border.
 	This is a bound property.
-	@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
+	@param newBorderExtent The border extent.
+	@exception NullPointerException if the given border extent is <code>null</code>.
 	@see Component#BORDER_LINE_FAR_EXTENT_PROPERTY
 	*/
 	public void setBorderLineFarExtent(final Extent newBorderExtent);
 
 	/**Sets the border extent of the page near border.
 	This is a bound property.
-	@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
+	@param newBorderExtent The border extent.
+	@exception NullPointerException if the given border extent is <code>null</code>.
 	@see Component#BORDER_PAGE_NEAR_EXTENT_PROPERTY
 	*/
 	public void setBorderPageNearExtent(final Extent newBorderExtent);
 
 	/**Sets the border extent of the page far border.
 	This is a bound property.
-	@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
+	@param newBorderExtent The border extent.
+	@exception NullPointerException if the given border extent is <code>null</code>.
 	@see Component#BORDER_PAGE_FAR_EXTENT_PROPERTY
 	*/
 	public void setBorderPageFarExtent(final Extent newBorderExtent);
@@ -344,7 +356,8 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	/**Sets the border extent of all borders.
 	The border extent of each border represents a bound property.
 	This is a convenience method that calls {@link #setBorderExtent(Border, Extent)} for each border.
-	@param newBorderExtent The border extent, or <code>null</code> if the default border extent should be used.
+	@param newBorderExtent The border extent.
+	@exception NullPointerException if the given border extent is <code>null</code>.
 	@see Component#BORDER_LINE_NEAR_EXTENT_PROPERTY
 	@see Component#BORDER_LINE_FAR_EXTENT_PROPERTY
 	@see Component#BORDER_PAGE_NEAR_EXTENT_PROPERTY
@@ -354,35 +367,35 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	
 	/**Returns the border style of the indicated border.
 	@param border The border for which a border style should be returned.
-	@return The border style of the given border, or <code>null</code> if there should be no border.
+	@return The border style of the given border.
 	*/
 	public LineStyle getBorderStyle(final Border border);
 
 	/**Returns the border style of the line near page near corner.
-	@return The border style of the given border, or <code>null</code> if there should be no border.
+	@return The border style of the given border.
 	*/
 	public LineStyle BorderLineNearStyle();
 
 	/**Returns the border style of the line far page near corner.
-	@return The border style of the given border, or <code>null</code> if there should be no border.
+	@return The border style of the given border.
 	*/
 	public LineStyle BorderLineFarStyle();
 
 	/**Returns the border style of the line near page far corner.
-	@return The border style of the given border, or <code>null</code> if there should be no border.
+	@return The border style of the given border.
 	*/
 	public LineStyle BorderPageNearStyle();
 
 	/**Returns the border style of the line far page far corner.
-	@return The border style of the given border, or <code>null</code> if there should be no border.
+	@return The border style of the given border.
 	*/
 	public LineStyle BorderPageFarStyle();
 
 	/**Sets the border style of a given border.
 	The border style of each border represents a bound property.
 	@param border The border for which the border style should be set.
-	@param newBorderStyle The border style, or <code>null</code> if there should be no border.
-	@exception NullPointerException if the given border is <code>null</code>. 
+	@param newBorderStyle The border style.
+	@exception NullPointerException if the given border and/or border style is <code>null</code>. 
 	@see Component#BORDER_LINE_NEAR_STYLE_PROPERTY
 	@see Component#BORDER_LINE_FAR_STYLE_PROPERTY
 	@see Component#BORDER_PAGE_NEAR_STYLE_PROPERTY
@@ -392,28 +405,32 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 
 	/**Sets the border style of the line near border.
 	This is a bound property.
-	@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+	@param newBorderStyle The border style.
+	@exception NullPointerException if the given border style is <code>null</code>.
 	@see Component#BORDER_LINE_NEAR_STYLE_PROPERTY
 	*/
 	public void setBorderLineNearStyle(final LineStyle newBorderStyle);
 
 	/**Sets the border style of the line far border.
 	This is a bound property.
-	@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+	@param newBorderStyle The border style.
+	@exception NullPointerException if the given border style is <code>null</code>.
 	@see Component#BORDER_LINE_FAR_STYLE_PROPERTY
 	*/
 	public void setBorderLineFarStyle(final LineStyle newBorderStyle);
 
 	/**Sets the border style of the page near border.
 	This is a bound property.
-	@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+	@param newBorderStyle The border style.
+	@exception NullPointerException if the given border style is <code>null</code>.
 	@see Component#BORDER_PAGE_NEAR_STYLE_PROPERTY
 	*/
 	public void setBorderPageNearStyle(final LineStyle newBorderStyle);
 
 	/**Sets the border style of the page far border.
 	This is a bound property.
-	@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+	@param newBorderStyle The border style.
+	@exception NullPointerException if the given border style is <code>null</code>.
 	@see Component#BORDER_PAGE_FAR_STYLE_PROPERTY
 	*/
 	public void setBorderPageFarStyle(final LineStyle newBorderStyle);
@@ -421,7 +438,8 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	/**Sets the border style of all borders.
 	The border style of each border represents a bound property.
 	This is a convenience method that calls {@link #setBorderStyle(Border, LineStyle)} for each border.
-	@param newBorderStyle The border style, or <code>null</code> if there should be no border.
+	@param newBorderStyle The border style.
+	@exception NullPointerException if the given border style is <code>null</code>.
 	@see Component#BORDER_LINE_NEAR_STYLE_PROPERTY
 	@see Component#BORDER_LINE_FAR_STYLE_PROPERTY
 	@see Component#BORDER_PAGE_NEAR_STYLE_PROPERTY
@@ -560,6 +578,88 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	@see Component#LINE_EXTENT_PROPERTY 
 	*/
 	public void setLineExtent(final Extent newLineExtent);
+
+	/**Returns the margin extent of the indicated border.
+	@param border The border for which a margin extent should be returned.
+	@return The margin extent of the given border.
+	*/
+	public Extent getMarginExtent(final Border border);
+
+	/**Returns the margin extent of the line near page near corner.
+	@return The margin extent of the given border.
+	*/
+	public Extent getMarginLineNearExtent();
+
+	/**Returns the margin extent of the line far page near corner.
+	@return The margin extent of the given border.
+	*/
+	public Extent getMarginLineFarExtent();
+
+	/**Returns the margin extent of the line near page far corner.
+	@return The margin extent of the given border.
+	*/
+	public Extent getMarginPageNearExtent();
+
+	/**Returns the margin extent of the line far page far corner.
+	@return The margin extent of the given border.
+	*/
+	public Extent getMarginPageFarExtent();
+
+	/**Sets the margin extent of a given border.
+	The margin extent of each border represents a bound property.
+	@param border The border for which the margin extent should be set.
+	@param newMarginExtent The margin extent.
+	@exception NullPointerException if the given border and/or margin extent is <code>null</code>. 
+	@see Component#MARGIN_LINE_NEAR_EXTENT_PROPERTY
+	@see Component#MARGIN_LINE_FAR_EXTENT_PROPERTY
+	@see Component#MARGIN_PAGE_NEAR_EXTENT_PROPERTY
+	@see Component#MARGIN_PAGE_FAR_EXTENT_PROPERTY
+	*/
+	public void setMarginExtent(final Border border, final Extent newMarginExtent);
+
+	/**Sets the margin extent of the line near border.
+	This is a bound property.
+	@param newMarginExtent The margin extent.
+	@exception NullPointerException if the given margin extent is <code>null</code>. 
+	@see Component#MARGIN_LINE_NEAR_EXTENT_PROPERTY
+	*/
+	public void setMarginLineNearExtent(final Extent newMarginExtent);
+
+	/**Sets the margin extent of the line far border.
+	This is a bound property.
+	@param newMarginExtent The margin extent, or <code>null</code> if the default margin extent should be used.
+	@exception NullPointerException if the given margin extent is <code>null</code>. 
+	@see Component#MARGIN_LINE_FAR_EXTENT_PROPERTY
+	*/
+	public void setMarginLineFarExtent(final Extent newMarginExtent);
+
+	/**Sets the margin extent of the page near border.
+	This is a bound property.
+	@param newMarginExtent The margin extent, or <code>null</code> if the default margin extent should be used.
+	@exception NullPointerException if the given margin extent is <code>null</code>. 
+	@see Component#MARGIN_PAGE_NEAR_EXTENT_PROPERTY
+	*/
+	public void setMarginPageNearExtent(final Extent newMarginExtent);
+
+	/**Sets the margin extent of the page far border.
+	This is a bound property.
+	@param newMarginExtent The margin extent, or <code>null</code> if the default margin extent should be used.
+	@exception NullPointerException if the given margin extent is <code>null</code>. 
+	@see Component#MARGIN_PAGE_FAR_EXTENT_PROPERTY
+	*/
+	public void setMarginPageFarExtent(final Extent newMarginExtent);
+
+	/**Sets the margin extent of all borders.
+	The margin extent of each border represents a bound property.
+	This is a convenience method that calls {@link #setMarginExtent(Border, Extent)} for each border.
+	@param newMarginExtent The margin extent.
+	@exception NullPointerException if the given margin extent is <code>null</code>. 
+	@see Component#MARGIN_LINE_NEAR_EXTENT_PROPERTY
+	@see Component#MARGIN_LINE_FAR_EXTENT_PROPERTY
+	@see Component#MARGIN_PAGE_NEAR_EXTENT_PROPERTY
+	@see Component#MARGIN_PAGE_FAR_EXTENT_PROPERTY
+	*/
+	public void setMarginExtent(final Extent newMarginExtent);
 
 	/**@return The notification associated with the component, or <code>null</code> if no notification is associated with this component.*/
 	public Notification getNotification();

@@ -3,8 +3,8 @@ package com.guiseframework.component.layout;
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.component.Component;
+import com.guiseframework.component.LayoutComponent;
 import com.guiseframework.geometry.Extent;
 
 /**A layout that flows information along an axis.
@@ -14,6 +14,8 @@ import com.guiseframework.geometry.Extent;
 public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> extends AbstractLayout<T>
 {
 
+	/**The bound property of the alignment.*/
+	public final static String ALIGNMENT_PROPERTY=getPropertyName(AbstractFlowLayout.class, "alignment");
 	/**The bound property of the flow.*/
 	public final static String FLOW_PROPERTY=getPropertyName(AbstractFlowLayout.class, "flow");
 	/**The bound property of the gap after flowed components.*/
@@ -22,6 +24,41 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 	public final static String GAP_BEFORE_PROPERTY=getPropertyName(AbstractFlowLayout.class, "gapBefore");
 	/**The bound property of the gap between flowed components.*/
 	public final static String GAP_BETWEEN_PROPERTY=getPropertyName(AbstractFlowLayout.class, "gapBetween");
+
+	/**The default alignment of components perpendicular to the flow axis in terms relative to the beginning of the alignment axis.*/
+	private double alignment=0;
+
+		/**@return The default alignment of components perpendicular to the flow axis in terms relative to the beginning of the alignment axis.*/
+		public double getAlignment() {return alignment;}
+
+		/**Sets the default alignment of components perpendicular to the flow axis.
+		For example, in a left-to-right top-to-bottom orientation flowing along the {@link Flow#LINE} axis,
+		alignments of 0.0, 0.5, and 1.0 would be equivalent to what are commonly known as <dfn>left</dfn>, <dfn>center</dfn>, and <dfn>right</dfn> alignments, respectively. 
+		In the same orientation flowing along the {@link Flow#PAGE} axis,
+		alignments of 0.0, 0.5, and 1.0 would be equivalent to what are commonly known as <dfn>top</dfn>, <dfn>middle</dfn>, and <dfn>bottom</dfn> alignments, respectively. 
+		This method also acts as a convenience method by unconditionally updating the alignment of the flow constraints of any child components of this layout's owner.
+		This is a bound property of type {@link Double}.
+		@param newAlignment The alignment of components perpendicular to the flow axis in terms relative to the beginning of the alignment axis.
+		@see #ALIGNMENT_PROPERTY
+		@see FlowConstraints#setAlignment(double)
+		*/
+		public void setAlignment(final double newAlignment)
+		{
+			if(alignment!=newAlignment)	//if the value is really changing
+			{
+				final double oldAlignment=alignment;	//get the current value
+				alignment=newAlignment;	//update the value
+				firePropertyChange(ALIGNMENT_PROPERTY, Double.valueOf(oldAlignment), Double.valueOf(newAlignment));
+			}
+			final LayoutComponent<?> owner=getOwner();	//get the owner of this layout, if any
+			if(owner!=null)	//if this layout has an owner
+			{
+				for(final Component<?> component:getOwner().getChildren())	//for all child components of the owner
+				{
+					getConstraints(component).setAlignment(newAlignment);	//update this child component's constraints with the new alignment value
+				}
+			}
+		}
 
 	/**The logical axis (line or page) along which information is flowed.*/
 	private Flow flow;

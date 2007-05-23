@@ -96,6 +96,7 @@
 		<resource:theme.label.authentication>Authentication</resource:theme.label.authentication>
 		<resource:theme.label.accept>Accept</resource:theme.label.accept>
 		<resource:theme.label.access>Access</resource:theme.label.access>
+		<resource:theme.label.access.x>&#x0098;theme.label.access&#x009C; {0}</resource:theme.label.access.x>
 		<resource:theme.label.add>Add</resource:theme.label.add>
 		<resource:theme.label.cancel>Cancel</resource:theme.label.cancel>
 		<resource:theme.label.delete>Delete</resource:theme.label.delete>

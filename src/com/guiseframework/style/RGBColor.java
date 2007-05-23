@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.regex.*;
 
 import static com.garretwilson.lang.MathUtilities.*;
+import static com.garretwilson.lang.Numbers.*;
 import com.garretwilson.text.ArgumentSyntaxException;
 
 /**Encapsulates a color value of the sRGB color space.
@@ -159,11 +160,6 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 		return (int)getAbsoluteComponent(Component.ALPHA, 8);	//return the absolute alpha component at 8 bits
 	}
 
-	/**The double value representing 1/3.*/
-	private final static double ONE_THIRD=1.0d/3.0d;
-	/**The double value representing 2/3.*/
-	private final static double TWO_THIRDS=2.0d/3.0d;
-
 	/**Converts this RGB color to an HSL color.
 	@return The color in the HSL color space.
 	@see <a href="http://en.wikipedia.org/wiki/HSL_color_space">HSL color space: Converting to RGB</a>
@@ -197,11 +193,11 @@ public class RGBColor extends AbstractColor<RGBColor.Component>
 			}
 			else if(green==max)
 			{
-				tempHue=ONE_THIRD+deltaRed-deltaBlue;
+				tempHue=ONE_THIRD_DOUBLE+deltaRed-deltaBlue;
 			}
 			else if(blue==max)
 			{
-				tempHue=TWO_THIRDS+deltaGreen-deltaRed;
+				tempHue=TWO_THIRDS_DOUBLE+deltaGreen-deltaRed;
 			}
 			else
 			{
