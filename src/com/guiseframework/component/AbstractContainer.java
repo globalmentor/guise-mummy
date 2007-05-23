@@ -202,13 +202,13 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		}
 	}
 
-	/**Sets the layout definition for the container.
-//TODO fix		The layout definition can only be changed if the container currently has no child components.
+	/**Sets the layout definition for the component.
 	This is a bound property.
+	The layout is specified as not yet having a theme applied, as the specific theme rules applied to the layout may depend on the layout's owner.
 	@param newLayout The new layout definition for the container.
 	@exception NullPointerException if the given layout is <code>null</code>.
-//TODO fix		@exception IllegalStateException if a new layout is requested while this container has one or more children.
-	@see #LAYOUT_PROPERTY 
+	@see #LAYOUT_PROPERTY
+	@see #setThemeApplied(boolean) 
 	*/
 	public <T extends Constraints> void setLayout(final Layout<T> newLayout)
 	{

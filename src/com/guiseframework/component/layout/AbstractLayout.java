@@ -5,7 +5,6 @@ import java.beans.PropertyChangeEvent;
 import com.garretwilson.beans.*;
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.component.Component;
-import com.guiseframework.component.Container;
 import com.guiseframework.component.LayoutComponent;
 import com.guiseframework.event.*;
 

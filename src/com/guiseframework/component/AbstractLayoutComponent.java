@@ -1,8 +1,12 @@
 package com.guiseframework.component;
 
+import java.io.IOException;
+
+import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.model.DefaultLabelModel;
 import com.guiseframework.model.LabelModel;
+import com.guiseframework.theme.Theme;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
@@ -70,31 +74,6 @@ public abstract class AbstractLayoutComponent<C extends LayoutComponent<C>> exte
 		return true;	//indicate that the child components changed
 	}
 
-	/**Removes the child component at the specified position in this container.
-	@param index The index of the component to removed.
-	@return The value previously at the specified position.
-	@exception IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
-	*/
-/*TODO move elsewhere
-	protected Component<?> remove(final int index)
-	{
-		final Component<?> component=get(index);	//get the component at this index
-		remove(component);	//remove the component
-		return component;	//return the component that was removed
-	}
-*/
-
-	/**Removes all of the components from this container.*/
-/*TODO move elsewhere
-	protected void clear()
-	{
-		for(final Component<?> component:getChildren())	//for each component in the container
-		{
-			remove(component);	//remove this component
-		}
-	}
-*/
-
 	/**The layout definition for the component.*/
 	private Layout<?> layout;
 
@@ -103,9 +82,11 @@ public abstract class AbstractLayoutComponent<C extends LayoutComponent<C>> exte
 
 		/**Sets the layout definition for the component.
 		This is a bound property.
+		The layout is specified as not yet having a theme applied, as the specific theme rules applied to the layout may depend on the layout's owner.
 		@param newLayout The new layout definition for the container.
 		@exception NullPointerException if the given layout is <code>null</code>.
-		@see #LAYOUT_PROPERTY 
+		@see #LAYOUT_PROPERTY
+		@see #setThemeApplied(boolean) 
 		*/
 		protected <T extends Constraints> void setLayout(final Layout<T> newLayout)
 		{
@@ -119,8 +100,30 @@ public abstract class AbstractLayoutComponent<C extends LayoutComponent<C>> exte
 				{
 					newLayout.getConstraints(childComponent);	//make sure the constraints of all components are compatible with the layout TODO do we even need to do this? why not wait until later? but this may be OK---perhaps we can assume that if components are installed before the layout, they will be used with this layout and not another
 				}
+				setLayoutThemeApplied(false);	//indicate that the theme hasn't yet been set to this layout, as the specific rules applied may depend on the layout's owner
 				firePropertyChange(LAYOUT_PROPERTY, oldLayout, newLayout);	//indicate that the value changed
 			}			
+		}
+
+	/**Whether a theme has been applied to this component's layout.*/
+	private boolean layoutThemeApplied=false;
+
+		/**@return Whether a theme has been applied to this component's layout.*/
+		public boolean isLayoutThemeApplied() {return layoutThemeApplied;}
+
+		/**Sets whether a theme has been applied to this component's layout.
+		This is a bound property of type {@link Boolean}.
+		@param newLayoutThemeApplied <code>true</code> if a theme has been applied to this component's layout, else <code>false</code>.
+		@see #LAYOUT_THEME_APPLIED_PROPERTY
+		*/
+		public void setLayoutThemeApplied(final boolean newLayoutThemeApplied)
+		{
+			if(layoutThemeApplied!=newLayoutThemeApplied)	//if the value is really changing
+			{
+				final boolean oldLayoutThemeApplied=layoutThemeApplied;	//get the current value
+				layoutThemeApplied=newLayoutThemeApplied;	//update the value
+				firePropertyChange(LAYOUT_THEME_APPLIED_PROPERTY, Boolean.valueOf(oldLayoutThemeApplied), Boolean.valueOf(newLayoutThemeApplied));
+			}
 		}
 
 	/**Layout constructor with a default label model.
@@ -142,6 +145,46 @@ public abstract class AbstractLayoutComponent<C extends LayoutComponent<C>> exte
 		super(labelModel);	//construct the parent class
 		this.layout=checkInstance(layout, "Layout cannot be null.");	//save the layout
 		layout.setOwner(this);	//tell the layout which container owns it
+	}
+
+	/**Update's this component's theme.
+	This method checks whether a theme has been applied to this component.
+	If no theme has been applied to the component, the current session theme will be applied by delegating to {@link #applyTheme(Theme)}.
+	If the theme is successfully applied, this method updates the theme applied status.
+	This method is called recursively for any child components before applying any theme on the component itself,
+	to assure that child theme updates have already occured before theme updates occur for this component.
+	There is normally no need to override this method or to call this method directly by applications.
+	This version checks to see if the theme needs to be applied to the given layout.
+	@exception IOException if there was an error loading or applying the theme.
+	@see #applyTheme(Theme)
+	@see #isThemeApplied()
+	@see GuiseSession#getTheme()
+	*/
+	public void updateTheme() throws IOException
+	{
+		super.updateTheme();	//update the theme normally
+		if(!isLayoutThemeApplied())	//if the theme hasn't been applied to the layout (which also means that our version of applyTheme() hasn't been called, or it would have updated the layout theme applied status) 
+		{
+			applyTheme(getSession().getTheme());	//get the theme and apply it
+		}		
+	}
+
+	/**Applies a theme and its parents to this component.
+	The theme's rules will be applied to this component and any related objects.
+	Theme application occurs unconditionally, regardless of whether themes have been applied to this component before.
+	This method may be overridden to effectively override theme settings by ensuring state of important properties after theme application. 
+	There is normally no need to call this method directly by applications.
+	If the theme is successfully applied, this method updates the theme applied status.
+	This version applies the theme to the current layout and update's the layout theme applied status.
+	@param theme The theme to apply to the component.
+	@see #setThemeApplied(boolean)
+	@see #setLayoutThemeApplied(boolean)
+	*/
+	public void applyTheme(final Theme theme)
+	{
+		super.applyTheme(theme);	//apply the theme to this component normally
+		theme.apply(getLayout());	//apply the theme to the currently installed layout
+		setLayoutThemeApplied(true);	//indicate that we've applied the theme to the layout as well
 	}
 
 }

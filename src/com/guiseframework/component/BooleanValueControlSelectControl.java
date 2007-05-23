@@ -1,6 +1,7 @@
 package com.guiseframework.component;
 
 import java.beans.PropertyVetoException;
+import java.io.IOException;
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -14,6 +15,8 @@ import com.garretwilson.util.ArrayUtilities;
 import com.garretwilson.util.Debug;
 
 import static com.garretwilson.lang.IntegerUtilities.*;
+
+import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.converter.AbstractStringLiteralConverter;
 import com.guiseframework.event.ListEvent;
@@ -21,6 +24,7 @@ import com.guiseframework.event.ListListener;
 import com.guiseframework.event.ListSelectionEvent;
 import com.guiseframework.event.ListSelectionListener;
 import com.guiseframework.model.*;
+import com.guiseframework.theme.Theme;
 
 //TODO del when works public class ComponentListSelectControl<V, C extends LayoutComponent<C> & ListSelectControl<V, C>> extends AbstractListSelectControl<V, C> implements LayoutComponent<C>, ListSelectControl<V, C>
 
@@ -64,9 +68,11 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 
 		/**Sets the layout definition for the component.
 		This is a bound property.
+		The layout is specified as not yet having a theme applied, as the specific theme rules applied to the layout may depend on the layout's owner.
 		@param newLayout The new layout definition for the container.
 		@exception NullPointerException if the given layout is <code>null</code>.
 		@see #LAYOUT_PROPERTY 
+		@see #setThemeApplied(boolean) 
 		*/
 		protected <T extends Constraints> void setLayout(final Layout<T> newLayout)
 		{
@@ -80,8 +86,30 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 				{
 					newLayout.getConstraints(childComponent);	//make sure the constraints of all components are compatible with the layout TODO do we even need to do this? why not wait until later? but this may be OK---perhaps we can assume that if components are installed before the layout, they will be used with this layout and not another
 				}
+				setLayoutThemeApplied(false);	//indicate that the theme hasn't yet been set to this layout, as the specific rules applied may depend on the layout's owner
 				firePropertyChange(LAYOUT_PROPERTY, oldLayout, newLayout);	//indicate that the value changed
 			}			
+		}
+
+	/**Whether a theme has been applied to this component's layout.*/
+	private boolean layoutThemeApplied=false;
+
+		/**@return Whether a theme has been applied to this component's layout.*/
+		public boolean isLayoutThemeApplied() {return layoutThemeApplied;}
+
+		/**Sets whether a theme has been applied to this component's layout.
+		This is a bound property of type {@link Boolean}.
+		@param newLayoutThemeApplied <code>true</code> if a theme has been applied to this component's layout, else <code>false</code>.
+		@see #LAYOUT_THEME_APPLIED_PROPERTY
+		*/
+		public void setLayoutThemeApplied(final boolean newLayoutThemeApplied)
+		{
+			if(layoutThemeApplied!=newLayoutThemeApplied)	//if the value is really changing
+			{
+				final boolean oldLayoutThemeApplied=layoutThemeApplied;	//get the current value
+				layoutThemeApplied=newLayoutThemeApplied;	//update the value
+				firePropertyChange(LAYOUT_THEME_APPLIED_PROPERTY, Boolean.valueOf(oldLayoutThemeApplied), Boolean.valueOf(newLayoutThemeApplied));
+			}
 		}
 
 	/**Returns an iterable to child components.
@@ -363,6 +391,46 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 				synchronizingValuesFlag.set(false);	//indicate that we're finished synchronizing values
 			}
 		}
+	}
+
+	/**Update's this component's theme.
+	This method checks whether a theme has been applied to this component.
+	If no theme has been applied to the component, the current session theme will be applied by delegating to {@link #applyTheme(Theme)}.
+	If the theme is successfully applied, this method updates the theme applied status.
+	This method is called recursively for any child components before applying any theme on the component itself,
+	to assure that child theme updates have already occured before theme updates occur for this component.
+	There is normally no need to override this method or to call this method directly by applications.
+	This version checks to see if the theme needs to be applied to the given layout.
+	@exception IOException if there was an error loading or applying the theme.
+	@see #applyTheme(Theme)
+	@see #isThemeApplied()
+	@see GuiseSession#getTheme()
+	*/
+	public void updateTheme() throws IOException
+	{
+		super.updateTheme();	//update the theme normally
+		if(!isLayoutThemeApplied())	//if the theme hasn't been applied to the layout (which also means that our version of applyTheme() hasn't been called, or it would have updated the layout theme applied status) 
+		{
+			applyTheme(getSession().getTheme());	//get the theme and apply it
+		}		
+	}
+
+	/**Applies a theme and its parents to this component.
+	The theme's rules will be applied to this component and any related objects.
+	Theme application occurs unconditionally, regardless of whether themes have been applied to this component before.
+	This method may be overridden to effectively override theme settings by ensuring state of important properties after theme application. 
+	There is normally no need to call this method directly by applications.
+	If the theme is successfully applied, this method updates the theme applied status.
+	This version applies the theme to the current layout and update's the layout theme applied status.
+	@param theme The theme to apply to the component.
+	@see #setThemeApplied(boolean)
+	@see #setLayoutThemeApplied(boolean)
+	*/
+	public void applyTheme(final Theme theme)
+	{
+		super.applyTheme(theme);	//apply the theme to this component normally
+		theme.apply(getLayout());	//apply the theme to the currently installed layout
+		setLayoutThemeApplied(true);	//indicate that we've applied the theme to the layout as well
 	}
 
 }

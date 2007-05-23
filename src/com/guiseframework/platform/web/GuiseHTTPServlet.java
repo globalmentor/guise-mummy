@@ -964,7 +964,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 									guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
 									if(guiseApplication.isThemed())	//if the application applies themes
 									{
-										guiseSession.getTheme().apply(frame);	//make sure the theme has been applied
+										frame.updateTheme();	//make sure the theme has been applied to the frame
 									}
 									frame.updateView(guiseContext);		//tell the component to update its view
 									guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "patch");	//</xhtml:patch>
@@ -1014,7 +1014,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 									guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
 									if(guiseApplication.isThemed())	//if the application applies themes
 									{
-										guiseSession.getTheme().apply(dirtyComponent);	//make sure the theme has been applied
+										dirtyComponent.updateTheme();	//make sure the theme has been applied to the component
 									}
 									dirtyComponent.updateView(guiseContext);		//tell the component to update its view
 									guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "patch");	//</xhtml:patch>
@@ -1033,7 +1033,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						{
 							if(guiseApplication.isThemed())	//if the application applies themes
 							{
-								guiseSession.getTheme().apply(applicationFrame);	//make sure the theme has been applied
+								applicationFrame.updateTheme();	//make sure the theme has been applied to the entire application frame hierarchy
 							}
 							applicationFrame.updateView(guiseContext);		//tell the application frame to update its view						
 						}

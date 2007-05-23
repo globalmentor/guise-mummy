@@ -1,11 +1,14 @@
 package com.guiseframework.component;
 
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
+import com.guiseframework.GuiseSession;
 import com.guiseframework.event.*;
 import com.guiseframework.model.LabelModel;
+import com.guiseframework.theme.Theme;
 
 /**An abstract implementation of a composite component.
 Every child component must be added or removed using {@link #addComponent(Component)} and {@link #removeComponent(Component)}, although other actions may take place.
@@ -220,5 +223,26 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	{
 		return getComponentByName(this, name);	//search the component hierarchy for a component with the given name
 	}
-	
+
+	/**Update's this component's theme.
+	This method checks whether a theme has been applied to this component.
+	If no theme has been applied to the component, the current session theme will be applied by delegating to {@link #applyTheme(Theme)}.
+	This method is called recursively for any child components before applying any theme on the component itself,
+	to assure that child theme updates have already occured before theme updates occur for this component.
+	There is normally no need to override this method or to call this method directly by applications.
+	This version recursively calls the {@link #updateTheme()} method of all child components before updating this component's theme.
+	@exception IOException if there was an error loading or applying the theme.
+	@see #applyTheme(Theme)
+	@see #isThemeApplied()
+	@see GuiseSession#getTheme()
+	*/
+	public void updateTheme() throws IOException
+	{
+		for(final Component<?> childComponent:getChildren())	//for each child component
+		{
+			childComponent.updateTheme();	//tell the child component to update its theme
+		}
+		super.updateTheme();	//update the theme for this component
+	}
+
 }

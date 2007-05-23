@@ -5,7 +5,6 @@ import java.net.URI;
 
 import com.garretwilson.rdf.*;
 import com.garretwilson.rdf.ploop.PLOOPProcessor;
-import com.guiseframework.component.Component;
 
 import static com.guiseframework.theme.Theme.*;
 
@@ -29,16 +28,16 @@ public class Template extends ClassTypedRDFResource
 		super(referenceURI, THEME_NAMESPACE_URI);  //construct the parent class
 	}
 
-	/**Applies this template to a given component.
+	/**Applies this template to a given object.
 	Providing a PLOOP processor allows consistency of referenced values across template applications.
-	@param component The component to which this template will be applied.
-	@param ploopProcessor The PLOOP processor for setting component properties.
+	@param object The object to which this template will be applied.
+	@param ploopProcessor The PLOOP processor for setting object properties.
 	@exception ClassNotFoundException if a class was specified and the indicated class cannot be found.
 	@exception InvocationTargetException if the given RDF object indicates a Java class the constructor of which throws an exception.
 	*/
-	public void apply(final Component<?> component, final PLOOPProcessor ploopProcessor) throws ClassNotFoundException, InvocationTargetException
+	public void apply(final Object object, final PLOOPProcessor ploopProcessor) throws ClassNotFoundException, InvocationTargetException
 	{
-		ploopProcessor.initializeObject(component, this);	//initialize the component from the template
+		ploopProcessor.initializeObject(object, this);	//initialize the object from the template
 	}
 
 }

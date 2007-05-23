@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.mail.internet.ContentType;
 
 import com.garretwilson.lang.ObjectUtilities;
+import com.guiseframework.GuiseSession;
 import com.guiseframework.component.effect.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.component.transfer.*;
@@ -19,6 +20,7 @@ import com.guiseframework.geometry.*;
 import com.guiseframework.model.*;
 import com.guiseframework.style.Color;
 import com.guiseframework.style.LineStyle;
+import com.guiseframework.theme.Theme;
 import com.guiseframework.view.View;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
@@ -828,7 +830,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		}
 
 	/**The array of padding extents.*/
-	private Extent[] paddingExtents=fill(new Extent[Border.values().length], null);
+	private Extent[] paddingExtents=fill(new Extent[Border.values().length], Extent.ZERO_EXTENT1);
 
 	/**The properties corresponding to the padding extents.*/
 	private final static String[] PADDING_EXTENT_PROPERTIES;
@@ -844,35 +846,35 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 	
 		/**Returns the padding extent of the indicated border.
 		@param border The border for which a padding extent should be returned.
-		@return The padding extent of the given border, or <code>null</code> if the default padding extent should be used.
+		@return The padding extent of the given border.
 		*/
 		public Extent getPaddingExtent(final Border border) {return paddingExtents[border.ordinal()];}
 
 		/**Returns the padding extent of the line near page near corner.
-		@return The padding extent of the border, or <code>null</code> if the default padding extent should be used.
+		@return The padding extent of the given border.
 		*/
 		public Extent getPaddingLineNearExtent() {return getPaddingExtent(Border.LINE_NEAR);}
 
 		/**Returns the padding extent of the line far page near corner.
-		@return The padding extent of the border, or <code>null</code> if the default padding extent should be used.
+		@return The padding extent of the given border.
 		*/
 		public Extent getPaddingLineFarExtent() {return getPaddingExtent(Border.LINE_FAR);}
 
 		/**Returns the padding extent of the line near page far corner.
-		@return The padding extent of the border, or <code>null</code> if the default padding extent should be used.
+		@return The padding extent of the given border.
 		*/
 		public Extent getPaddingPageNearExtent() {return getPaddingExtent(Border.PAGE_NEAR);}
 
 		/**Returns the padding extent of the line far page far corner.
-		@return The padding extent of the border, or <code>null</code> if the default padding extent should be used.
+		@return The padding extent of the given border.
 		*/
 		public Extent getPaddingPageFarExtent() {return getPaddingExtent(Border.PAGE_FAR);}
 
 		/**Sets the padding extent of a given border.
 		The padding extent of each border represents a bound property.
 		@param border The border for which the padding extent should be set.
-		@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
-		@exception NullPointerException if the given border is <code>null</code>. 
+		@param newPaddingExtent The padding extent.
+		@exception NullPointerException if the given border and/or padding extent is <code>null</code>. 
 		@see Component#PADDING_LINE_NEAR_EXTENT_PROPERTY
 		@see Component#PADDING_LINE_FAR_EXTENT_PROPERTY
 		@see Component#PADDING_PAGE_NEAR_EXTENT_PROPERTY
@@ -882,7 +884,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		{
 			final int borderOrdinal=checkInstance(border, "Border cannot be null").ordinal();	//get the ordinal of the border
 			final Extent oldPaddingExtent=paddingExtents[borderOrdinal];	//get the old value
-			if(!ObjectUtilities.equals(oldPaddingExtent, newPaddingExtent))	//if the value is really changing
+			if(!oldPaddingExtent.equals(checkInstance(newPaddingExtent, "Padding extent cannot be null.")))	//if the value is really changing
 			{
 				paddingExtents[borderOrdinal]=newPaddingExtent;	//actually change the value
 				firePropertyChange(PADDING_EXTENT_PROPERTIES[borderOrdinal], oldPaddingExtent, newPaddingExtent);	//indicate that the value changed
@@ -891,7 +893,8 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 
 		/**Sets the padding extent of the line near border.
 		This is a bound property.
-		@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+		@param newPaddingExtent The padding extent.
+		@exception NullPointerException if the given padding extent is <code>null</code>. 
 		@see Component#PADDING_LINE_NEAR_EXTENT_PROPERTY
 		*/
 		public void setPaddingLineNearExtent(final Extent newPaddingExtent) {setPaddingExtent(Border.LINE_NEAR, newPaddingExtent);}
@@ -899,6 +902,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**Sets the padding extent of the line far border.
 		This is a bound property.
 		@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+		@exception NullPointerException if the given padding extent is <code>null</code>. 
 		@see Component#PADDING_LINE_FAR_EXTENT_PROPERTY
 		*/
 		public void setPaddingLineFarExtent(final Extent newPaddingExtent) {setPaddingExtent(Border.LINE_FAR, newPaddingExtent);}
@@ -906,6 +910,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**Sets the padding extent of the page near border.
 		This is a bound property.
 		@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+		@exception NullPointerException if the given padding extent is <code>null</code>. 
 		@see Component#PADDING_PAGE_NEAR_EXTENT_PROPERTY
 		*/
 		public void setPaddingPageNearExtent(final Extent newPaddingExtent) {setPaddingExtent(Border.PAGE_NEAR, newPaddingExtent);}
@@ -913,6 +918,7 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**Sets the padding extent of the page far border.
 		This is a bound property.
 		@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+		@exception NullPointerException if the given padding extent is <code>null</code>. 
 		@see Component#PADDING_PAGE_FAR_EXTENT_PROPERTY
 		*/
 		public void setPaddingPageFarExtent(final Extent newPaddingExtent) {setPaddingExtent(Border.PAGE_FAR, newPaddingExtent);}
@@ -920,7 +926,8 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		/**Sets the padding extent of all borders.
 		The padding extent of each border represents a bound property.
 		This is a convenience method that calls {@link #setPaddingExtent(Border, Extent)} for each border.
-		@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+		@param newPaddingExtent The padding extent.
+		@exception NullPointerException if the given padding extent is <code>null</code>. 
 		@see Component#PADDING_LINE_NEAR_EXTENT_PROPERTY
 		@see Component#PADDING_LINE_FAR_EXTENT_PROPERTY
 		@see Component#PADDING_PAGE_NEAR_EXTENT_PROPERTY
@@ -1464,9 +1471,9 @@ Debug.trace("now valid of", this, "is", isValid());
 		{
 			if(themeApplied!=newThemeApplied)	//if the value is really changing
 			{
-				final boolean oldThemed=themeApplied;	//get the current value
+				final boolean oldThemeApplied=themeApplied;	//get the current value
 				themeApplied=newThemeApplied;	//update the value
-				firePropertyChange(THEME_APPLIED_PROPERTY, Boolean.valueOf(oldThemed), Boolean.valueOf(newThemeApplied));
+				firePropertyChange(THEME_APPLIED_PROPERTY, Boolean.valueOf(oldThemeApplied), Boolean.valueOf(newThemeApplied));
 			}
 		}
 
@@ -1619,6 +1626,40 @@ Debug.trace("now valid of", this, "is", isValid());
 	{
 		final View<? super GC, ? super C> view=(View<? super GC, ? super C>)getView();	//get the view
 		view.update(context, getThis());	//tell the view to update
+	}
+
+	/**Update's this component's theme.
+	This method checks whether a theme has been applied to this component.
+	If no theme has been applied to the component, the current session theme will be applied by delegating to {@link #applyTheme(Theme)}.
+	This method is called recursively for any child components before applying any theme on the component itself,
+	to assure that child theme updates have already occured before theme updates occur for this component.
+	There is normally no need to override this method or to call this method directly by applications.
+	@exception IOException if there was an error loading or applying the theme.
+	@see #applyTheme(Theme)
+	@see #isThemeApplied()
+	@see GuiseSession#getTheme()
+	*/
+	public void updateTheme() throws IOException
+	{
+		if(!isThemeApplied())	//if no theme has been applied to this component
+		{
+			applyTheme(getSession().getTheme());	//get the theme and apply it
+		}		
+	}
+
+	/**Applies a theme and its parents to this component.
+	The theme's rules will be applied to this component and any related objects.
+	Theme application occurs unconditionally, regardless of whether themes have been applied to this component before.
+	This method may be overridden to effectively override theme settings by ensuring state of important properties after theme application. 
+	There is normally no need to call this method directly by applications.
+	If the theme is successfully applied, this method updates the theme applied status.
+	@param theme The theme to apply to the component.
+	@see #setThemeApplied(boolean)
+	*/
+	public void applyTheme(final Theme theme)
+	{
+		theme.apply(this);	//apply the theme to this component
+		setThemeApplied(true);	//indicate that the theme was successfully applied
 	}
 
 	/**Adds a mouse listener.
