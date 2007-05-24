@@ -2,6 +2,7 @@ package com.guiseframework.geometry;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.util.ArrayUtilities;
 
 /**A measurement such as a length, area, or volume.
 All zero extents are considered equal, regardless of the unit of measurement.
@@ -121,4 +122,9 @@ public class Extent
 		return false;	//the object did not match this extent
 	}
 
+	/**@return A string representation of this extent.*/
+	public String toString()
+	{
+		return ArrayUtilities.toString(new Object[]{getValue(), getUnit(), getDegree()});
+	}
 }

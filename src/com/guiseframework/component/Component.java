@@ -20,7 +20,6 @@ import com.guiseframework.theme.Theme;
 import com.guiseframework.view.View;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.checkInstance;
 
 /**Base interface for all Guise components.
 Each component must provide either a Guise session constructor; or a Guise session and string ID constructor.
@@ -212,22 +211,22 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	*/
 	public Color<?> getBorderColor(final Border border);
 
-	/**Returns the border color of the line near page near corner.
+	/**Returns the border color of the line near page near border.
 	@return The border color of the border, or <code>null</code> if the default border color should be used.
 	*/
 	public Color<?> BorderLineNearColor();
 
-	/**Returns the border color of the line far page near corner.
+	/**Returns the border color of the line far page near border.
 	@return The border color of the border, or <code>null</code> if the default border color should be used.
 	*/
 	public Color<?> BorderLineFarColor();
 
-	/**Returns the border color of the line near page far corner.
+	/**Returns the border color of the line near page far border.
 	@return The border color of the border, or <code>null</code> if the default border color should be used.
 	*/
 	public Color<?> BorderPageNearColor();
 
-	/**Returns the border color of the line far page far corner.
+	/**Returns the border color of the line far page far border.
 	@return The border color of the border, or <code>null</code> if the default border color should be used.
 	*/
 	public Color<?> BorderPageFarColor();
@@ -289,22 +288,22 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	*/
 	public Extent getBorderExtent(final Border border);
 
-	/**Returns the border extent of the line near page near corner.
+	/**Returns the border extent of the line near page near border.
 	@return The border extent of the given border.
 	*/
 	public Extent BorderLineNearExtent();
 
-	/**Returns the border extent of the line far page near corner.
+	/**Returns the border extent of the line far page near border.
 	@return The border extent of the given border.
 	*/
 	public Extent BorderLineFarExtent();
 
-	/**Returns the border extent of the line near page far corner.
+	/**Returns the border extent of the line near page far border.
 	@return The border extent of the given border.
 	*/
 	public Extent BorderPageNearExtent();
 
-	/**Returns the border extent of the line far page far corner.
+	/**Returns the border extent of the line far page far border.
 	@return The border extent of the given border.
 	*/
 	public Extent BorderPageFarExtent();
@@ -371,22 +370,22 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	*/
 	public LineStyle getBorderStyle(final Border border);
 
-	/**Returns the border style of the line near page near corner.
+	/**Returns the border style of the line near page near border.
 	@return The border style of the given border.
 	*/
 	public LineStyle BorderLineNearStyle();
 
-	/**Returns the border style of the line far page near corner.
+	/**Returns the border style of the line far page near border.
 	@return The border style of the given border.
 	*/
 	public LineStyle BorderLineFarStyle();
 
-	/**Returns the border style of the line near page far corner.
+	/**Returns the border style of the line near page far border.
 	@return The border style of the given border.
 	*/
 	public LineStyle BorderPageNearStyle();
 
-	/**Returns the border style of the line far page far corner.
+	/**Returns the border style of the line far page far border.
 	@return The border style of the given border.
 	*/
 	public LineStyle BorderPageFarStyle();
@@ -549,6 +548,50 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	*/
 	public void setCornerArcSize(final Dimensions newCornerArcSize);
 
+	/**Returns the extent of the indicated flow.
+	@param flow The flow for which an extent should be returned.
+	@return The extent of the given flow.
+	*/
+	public Extent getExtent(final Flow flow);
+
+	/**Returns the extent of the line flow.
+	In left-to-right top-to-bottom orientation, this is commonly known as the <dfn>width</dfn>.
+	@return The extent of the flow, or <code>null</code> if no preferred extent has been specified
+	*/
+	public Extent getLineExtent();
+
+	/**Returns the extent of the page flow.
+	In left-to-right top-to-bottom orientation, this is commonly known as the <dfn>height</dfn>.
+	@return The extent of the flow, or <code>null</code> if no preferred extent has been specified
+	*/
+	public Extent getPageExtent();
+
+	/**Sets the extent of a given flow.
+	The extent of each flow represents a bound property.
+	@param flow The flow for which the extent should be set.
+	@param newExtent The new requested extent of the component, or <code>null</code> there is no extent preference.
+	@exception NullPointerException if the given flow is <code>null</code>. 
+	@see Component#LINE_EXTENT_PROPERTY
+	@see Component#PAGE_EXTENT_PROPERTY
+	*/
+	public void setExtent(final Flow flow, final Extent newExtent);
+
+	/**Sets the extent of the line flow.
+	In left-to-right top-to-bottom orientation, this is commonly known as the <dfn>width</dfn>.
+	This is a bound property.
+	@param newExtent The new requested extent of the component, or <code>null</code> there is no extent preference.
+	@see Component#LINE_EXTENT_PROPERTY
+	*/
+	public void setLineExtent(final Extent newExtent);
+
+	/**Sets the extent of the page flow.
+	In left-to-right top-to-bottom orientation, this is commonly known as the <dfn>height</dfn>.
+	This is a bound property.
+	@param newExtent The new requested extent of the component, or <code>null</code> there is no extent preference.
+	@see Component#PAGE_EXTENT_PROPERTY
+	*/
+	public void setPageExtent(final Extent newExtent);
+
 	/**@return The prioritized list of font family names, or <code>null</code> if no font family names have been specified.*/
 	public List<String> getFontFamilies();
 
@@ -569,38 +612,28 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	*/
 	public void setFontSize(final Extent newFontSize);
 
-	/**@return The requested line extent (width in left-to-right top-to-bottom orientation) of the component, or <code>null</code> if no preferred line extent has been specified.*/
-	public Extent getLineExtent();
-
-	/**Sets the requested line extent (width in left-to-right top-to-bottom orientation) of the component.
-	This is a bound property.
-	@param newLineExtent The new requested line extent of the component, or <code>null</code> there is no line extent preference.
-	@see Component#LINE_EXTENT_PROPERTY 
-	*/
-	public void setLineExtent(final Extent newLineExtent);
-
 	/**Returns the margin extent of the indicated border.
 	@param border The border for which a margin extent should be returned.
 	@return The margin extent of the given border.
 	*/
 	public Extent getMarginExtent(final Border border);
 
-	/**Returns the margin extent of the line near page near corner.
+	/**Returns the margin extent of the line near page near border.
 	@return The margin extent of the given border.
 	*/
 	public Extent getMarginLineNearExtent();
 
-	/**Returns the margin extent of the line far page near corner.
+	/**Returns the margin extent of the line far page near border.
 	@return The margin extent of the given border.
 	*/
 	public Extent getMarginLineFarExtent();
 
-	/**Returns the margin extent of the line near page far corner.
+	/**Returns the margin extent of the line near page far border.
 	@return The margin extent of the given border.
 	*/
 	public Extent getMarginPageNearExtent();
 
-	/**Returns the margin extent of the line far page far corner.
+	/**Returns the margin extent of the line far page far border.
 	@return The margin extent of the given border.
 	*/
 	public Extent getMarginPageFarExtent();
@@ -690,22 +723,22 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	*/
 	public Extent getPaddingExtent(final Border border);
 
-	/**Returns the padding extent of the line near page near corner.
+	/**Returns the padding extent of the line near page near border.
 	@return The padding extent of the given border.
 	*/
 	public Extent getPaddingLineNearExtent();
 
-	/**Returns the padding extent of the line far page near corner.
+	/**Returns the padding extent of the line far page near border.
 	@return The padding extent of the given border.
 	*/
 	public Extent getPaddingLineFarExtent();
 
-	/**Returns the padding extent of the line near page far corner.
+	/**Returns the padding extent of the line near page far border.
 	@return The padding extent of the given border.
 	*/
 	public Extent getPaddingPageNearExtent();
 
-	/**Returns the padding extent of the line far page far corner.
+	/**Returns the padding extent of the line far page far border.
 	@return The padding extent of the given border.
 	*/
 	public Extent getPaddingPageFarExtent();
@@ -765,16 +798,6 @@ public interface Component<C extends Component<C>> extends PropertyBindable, Lab
 	@see Component#PADDING_PAGE_FAR_EXTENT_PROPERTY
 	*/
 	public void setPaddingExtent(final Extent newPaddingExtent);
-
-	/**@return The requested page extent (height in left-to-right top-to-bottom orientation) of the component, or <code>null</code> if no preferred page extent has been specified.*/
-	public Extent getPageExtent();
-
-	/**Sets the requested page extent (height in left-to-right top-to-bottom orientation) of the component.
-	This is a bound property.
-	@param newPageExtent The new requested page extent of the component, or <code>null</code> there is no page extent preference.
-	@see Component#PAGE_EXTENT_PROPERTY 
-	*/
-	public void setPageExtent(final Extent newPageExtent);
 
 	/**@return The controller installed in this component.*/
 	public Controller<? extends GuiseContext, ? super C> getController();

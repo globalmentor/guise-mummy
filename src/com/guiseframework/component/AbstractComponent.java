@@ -250,22 +250,22 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		*/
 		public Color<?> getBorderColor(final Border border) {return borderColors[border.ordinal()];}
 
-		/**Returns the border color of the line near page near corner.
+		/**Returns the border color of the line near page near border.
 		@return The border color of the border, or <code>null</code> if the default border color should be used.
 		*/
 		public Color<?> BorderLineNearColor() {return getBorderColor(Border.LINE_NEAR);}
 
-		/**Returns the border color of the line far page near corner.
+		/**Returns the border color of the line far page near border.
 		@return The border color of the border, or <code>null</code> if the default border color should be used.
 		*/
 		public Color<?> BorderLineFarColor() {return getBorderColor(Border.LINE_FAR);}
 
-		/**Returns the border color of the line near page far corner.
+		/**Returns the border color of the line near page far border.
 		@return The border color of the border, or <code>null</code> if the default border color should be used.
 		*/
 		public Color<?> BorderPageNearColor() {return getBorderColor(Border.PAGE_NEAR);}
 
-		/**Returns the border color of the line far page far corner.
+		/**Returns the border color of the line far page far border.
 		@return The border color of the border, or <code>null</code> if the default border color should be used.
 		*/
 		public Color<?> BorderPageFarColor() {return getBorderColor(Border.PAGE_FAR);}
@@ -357,22 +357,22 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		*/
 		public Extent getBorderExtent(final Border border) {return borderExtents[border.ordinal()];}
 
-		/**Returns the border extent of the line near page near corner.
+		/**Returns the border extent of the line near page near border.
 		@return The border extent of the given border.
 		*/
 		public Extent BorderLineNearExtent() {return getBorderExtent(Border.LINE_NEAR);}
 
-		/**Returns the border extent of the line far page near corner.
+		/**Returns the border extent of the line far page near border.
 		@return The border extent of the given border.
 		*/
 		public Extent BorderLineFarExtent() {return getBorderExtent(Border.LINE_FAR);}
 
-		/**Returns the border extent of the line near page far corner.
+		/**Returns the border extent of the line near page far border.
 		@return The border extent of the given border.
 		*/
 		public Extent BorderPageNearExtent() {return getBorderExtent(Border.PAGE_NEAR);}
 
-		/**Returns the border extent of the line far page far corner.
+		/**Returns the border extent of the line far page far border.
 		@return The border extent of the given border.
 		*/
 		public Extent BorderPageFarExtent() {return getBorderExtent(Border.PAGE_FAR);}
@@ -469,22 +469,22 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		*/
 		public LineStyle getBorderStyle(final Border border) {return borderStyles[border.ordinal()];}
 
-		/**Returns the border style of the line near page near corner.
+		/**Returns the border style of the line near page near border.
 		@return The border style of the given border.
 		*/
 		public LineStyle BorderLineNearStyle() {return getBorderStyle(Border.LINE_NEAR);}
 
-		/**Returns the border style of the line far page near corner.
+		/**Returns the border style of the line far page near border.
 		@return The border style of the given border.
 		*/
 		public LineStyle BorderLineFarStyle() {return getBorderStyle(Border.LINE_FAR);}
 
-		/**Returns the border style of the line near page far corner.
+		/**Returns the border style of the line near page far border.
 		@return The border style of the given border.
 		*/
 		public LineStyle BorderPageNearStyle() {return getBorderStyle(Border.PAGE_NEAR);}
 
-		/**Returns the border style of the line far page far corner.
+		/**Returns the border style of the line far page far border.
 		@return The border style of the given border.
 		*/
 		public LineStyle BorderPageFarStyle() {return getBorderStyle(Border.PAGE_FAR);}
@@ -722,6 +722,72 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			}
 		}
 
+	/**The array of component extents.*/
+	private Extent[] extents=fill(new Extent[Flow.values().length], null);
+
+	/**The properties corresponding to the component extents.*/
+	private final static String[] EXTENT_PROPERTIES;
+
+		static
+		{
+			EXTENT_PROPERTIES=new String[Flow.values().length];	//create the array of properties and fill it with corresponding properties
+			EXTENT_PROPERTIES[Flow.LINE.ordinal()]=LINE_EXTENT_PROPERTY;
+			EXTENT_PROPERTIES[Flow.PAGE.ordinal()]=PAGE_EXTENT_PROPERTY;
+		}
+
+		/**Returns the extent of the indicated flow.
+		@param flow The flow for which an extent should be returned.
+		@return The extent of the given flow.
+		*/
+		public Extent getExtent(final Flow flow) {return extents[flow.ordinal()];}
+
+		/**Returns the extent of the line flow.
+		In left-to-right top-to-bottom orientation, this is commonly known as the <dfn>width</dfn>.
+		@return The extent of the flow, or <code>null</code> if no preferred extent has been specified
+		*/
+		public Extent getLineExtent() {return getExtent(Flow.LINE);}
+
+		/**Returns the extent of the page flow.
+		In left-to-right top-to-bottom orientation, this is commonly known as the <dfn>height</dfn>.
+		@return The extent of the flow, or <code>null</code> if no preferred extent has been specified
+		*/
+		public Extent getPageExtent() {return getExtent(Flow.PAGE);}
+
+		/**Sets the extent of a given flow.
+		The extent of each flow represents a bound property.
+		@param flow The flow for which the extent should be set.
+		@param newExtent The new requested extent of the component, or <code>null</code> there is no extent preference.
+		@exception NullPointerException if the given flow is <code>null</code>. 
+		@see Component#LINE_EXTENT_PROPERTY
+		@see Component#PAGE_EXTENT_PROPERTY
+		*/
+		public void setExtent(final Flow flow, final Extent newExtent)
+		{
+			final int flowOrdinal=checkInstance(flow, "Flow cannot be null").ordinal();	//get the ordinal of the flow
+			final Extent oldExtent=extents[flowOrdinal];	//get the old value
+			if(!ObjectUtilities.equals(oldExtent, newExtent))	//if the value is really changing
+			{
+				extents[flowOrdinal]=newExtent;	//actually change the value
+				firePropertyChange(EXTENT_PROPERTIES[flowOrdinal], oldExtent, newExtent);	//indicate that the value changed
+			}			
+		}
+
+		/**Sets the extent of the line flow.
+		In left-to-right top-to-bottom orientation, this is commonly known as the <dfn>width</dfn>.
+		This is a bound property.
+		@param newExtent The new requested extent of the component, or <code>null</code> there is no extent preference.
+		@see Component#LINE_EXTENT_PROPERTY
+		*/
+		public void setLineExtent(final Extent newExtent) {setExtent(Flow.LINE, newExtent);}
+
+		/**Sets the extent of the page flow.
+		In left-to-right top-to-bottom orientation, this is commonly known as the <dfn>height</dfn>.
+		This is a bound property.
+		@param newExtent The new requested extent of the component, or <code>null</code> there is no extent preference.
+		@see Component#PAGE_EXTENT_PROPERTY
+		*/
+		public void setPageExtent(final Extent newExtent) {setExtent(Flow.PAGE, newExtent);}
+
 	/**The prioritized list of font family names, or <code>null</code> if no font family names have been specified.*/
 	private List<String> fontFamilies=null;
 
@@ -764,27 +830,6 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			}			
 		}
 
-	/**The requested line extent (width in left-to-right top-to-bottom orientation) of the component, or <code>null</code> if no preferred line extent has been specified.*/
-	private Extent lineExtent=null;
-
-		/**@return The requested line extent (width in left-to-right top-to-bottom orientation) of the component, or <code>null</code> if no preferred line extent has been specified.*/
-		public Extent getLineExtent() {return lineExtent;}
-
-		/**Sets the requested line extent (width in left-to-right top-to-bottom orientation) of the component.
-		This is a bound property.
-		@param newLineExtent The new requested line extent of the component, or <code>null</code> there is no line extent preference.
-		@see Component#LINE_EXTENT_PROPERTY 
-		*/
-		public void setLineExtent(final Extent newLineExtent)
-		{
-			if(!ObjectUtilities.equals(lineExtent, newLineExtent))	//if the value is really changing
-			{
-				final Extent oldLineExtent=lineExtent;	//get the old value
-				lineExtent=newLineExtent;	//actually change the value
-				firePropertyChange(LINE_EXTENT_PROPERTY, oldLineExtent, newLineExtent);	//indicate that the value changed
-			}			
-		}
-
 	/**The array of margin extents.*/
 	private Extent[] marginExtents=fill(new Extent[Border.values().length], Extent.ZERO_EXTENT1);
 
@@ -806,22 +851,22 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 		*/
 		public Extent getMarginExtent(final Border border) {return marginExtents[border.ordinal()];}
 
-		/**Returns the margin extent of the line near page near corner.
+		/**Returns the margin extent of the line near page near border.
 		@return The margin extent of the given border.
 		*/
 		public Extent getMarginLineNearExtent() {return getMarginExtent(Border.LINE_NEAR);}
 
-		/**Returns the margin extent of the line far page near corner.
+		/**Returns the margin extent of the line far page near border.
 		@return The margin extent of the given border.
 		*/
 		public Extent getMarginLineFarExtent() {return getMarginExtent(Border.LINE_FAR);}
 
-		/**Returns the margin extent of the line near page far corner.
+		/**Returns the margin extent of the line near page far border.
 		@return The margin extent of the given border.
 		*/
 		public Extent getMarginPageNearExtent() {return getMarginExtent(Border.PAGE_NEAR);}
 
-		/**Returns the margin extent of the line far page far corner.
+		/**Returns the margin extent of the line far page far border.
 		@return The margin extent of the given border.
 		*/
 		public Extent getMarginPageFarExtent() {return getMarginExtent(Border.PAGE_FAR);}
@@ -965,29 +1010,29 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			PADDING_EXTENT_PROPERTIES[Border.PAGE_NEAR.ordinal()]=PADDING_PAGE_NEAR_EXTENT_PROPERTY;
 			PADDING_EXTENT_PROPERTIES[Border.PAGE_FAR.ordinal()]=PADDING_PAGE_FAR_EXTENT_PROPERTY;
 		}
-	
+
 		/**Returns the padding extent of the indicated border.
 		@param border The border for which a padding extent should be returned.
 		@return The padding extent of the given border.
 		*/
 		public Extent getPaddingExtent(final Border border) {return paddingExtents[border.ordinal()];}
 
-		/**Returns the padding extent of the line near page near corner.
+		/**Returns the padding extent of the line near page near border.
 		@return The padding extent of the given border.
 		*/
 		public Extent getPaddingLineNearExtent() {return getPaddingExtent(Border.LINE_NEAR);}
 
-		/**Returns the padding extent of the line far page near corner.
+		/**Returns the padding extent of the line far page near border.
 		@return The padding extent of the given border.
 		*/
 		public Extent getPaddingLineFarExtent() {return getPaddingExtent(Border.LINE_FAR);}
 
-		/**Returns the padding extent of the line near page far corner.
+		/**Returns the padding extent of the line near page far border.
 		@return The padding extent of the given border.
 		*/
 		public Extent getPaddingPageNearExtent() {return getPaddingExtent(Border.PAGE_NEAR);}
 
-		/**Returns the padding extent of the line far page far corner.
+		/**Returns the padding extent of the line far page far border.
 		@return The padding extent of the given border.
 		*/
 		public Extent getPaddingPageFarExtent() {return getPaddingExtent(Border.PAGE_FAR);}
@@ -1061,27 +1106,6 @@ public abstract class AbstractComponent<C extends Component<C>> extends GuiseBou
 			{
 				setPaddingExtent(border, newPaddingExtent);	//set this padding extent
 			}
-		}
-
-	/**The requested page extent (height in left-to-right top-to-bottom orientation) of the component, or <code>null</code> if no preferred page extent has been specified.*/
-	private Extent pageExtent=null;
-
-		/**@return The requested page extent (height in left-to-right top-to-bottom orientation) of the component, or <code>null</code> if no preferred page extent has been specified.*/
-		public Extent getPageExtent() {return pageExtent;}
-
-		/**Sets the requested page extent (height in left-to-right top-to-bottom orientation) of the component.
-		This is a bound property.
-		@param newPageExtent The new requested page extent of the component, or <code>null</code> there is no page extent preference.
-		@see Component#PAGE_EXTENT_PROPERTY 
-		*/
-		public void setPageExtent(final Extent newPageExtent)
-		{
-			if(!ObjectUtilities.equals(pageExtent, newPageExtent))	//if the value is really changing
-			{
-				final Extent oldPageExtent=pageExtent;	//get the old value
-				pageExtent=newPageExtent;	//actually change the value
-				firePropertyChange(PAGE_EXTENT_PROPERTY, oldPageExtent, newPageExtent);	//indicate that the value changed
-			}			
 		}
 
 	/**Whether the valid property has been initialized.
@@ -2087,39 +2111,56 @@ Debug.trace("now valid of", this, "is", isValid());
 			/**@return The component for which this object will control flyovers.*/
 			public S getComponent() {return component;}
 			
-		/**The requested line extent (width in left-to-right top-to-bottom orientation) of the flyover component, or <code>null</code> if no preferred line extent has been specified.*/
-		private Extent lineExtent=null;
+		/**The array of flyover extents.*/
+		private Extent[] extents=fill(new Extent[Flow.values().length], null);
 
-			/**@return The requested line extent (width in left-to-right top-to-bottom orientation) of the flyover component, or <code>null</code> if no preferred line extent has been specified.*/
-			public Extent getLineExtent() {return lineExtent;}
-
-			/**Sets the requested line extent (width in left-to-right top-to-bottom orientation) of the flyover component.
-			@param newLineExtent The new requested line extent of the flyover component, or <code>null</code> there is no line extent preference.
+			/**Returns the extent of the indicated flow.
+			@param flow The flow for which an extent should be returned.
+			@return The extent of the given flow.
 			*/
-			public void setLineExtent(final Extent newLineExtent)
+			public Extent getExtent(final Flow flow) {return extents[flow.ordinal()];}
+
+			/**Returns the extent of the line flow.
+			In left-to-right top-to-bottom orientation, this is commonly known as the <dfn>width</dfn>.
+			@return The extent of the flow, or <code>null</code> if no preferred extent has been specified
+			*/
+			public Extent getLineExtent() {return getExtent(Flow.LINE);}
+
+			/**Returns the extent of the page flow.
+			In left-to-right top-to-bottom orientation, this is commonly known as the <dfn>height</dfn>.
+			@return The extent of the flow, or <code>null</code> if no preferred extent has been specified
+			*/
+			public Extent getPageExtent() {return getExtent(Flow.PAGE);}
+
+			/**Sets the extent of a given flow.
+			The extent of each flow represents a bound property.
+			@param flow The flow for which the extent should be set.
+			@param newExtent The new requested extent of the flyover, or <code>null</code> there is no extent preference.
+			@exception NullPointerException if the given flow is <code>null</code>. 
+			*/
+			public void setExtent(final Flow flow, final Extent newExtent)
 			{
-				if(!ObjectUtilities.equals(lineExtent, newLineExtent))	//if the value is really changing
+				final int flowOrdinal=checkInstance(flow, "Flow cannot be null").ordinal();	//get the ordinal of the flow
+				final Extent oldExtent=extents[flowOrdinal];	//get the old value
+				if(!ObjectUtilities.equals(oldExtent, newExtent))	//if the value is really changing
 				{
-					lineExtent=newLineExtent;	//actually change the value
+					extents[flowOrdinal]=newExtent;	//actually change the value
 				}			
 			}
 
-		/**The requested page extent (height in left-to-right top-to-bottom orientation) of the flyover component, or <code>null</code> if no preferred page extent has been specified.*/
-		private Extent pageExent=null;
-
-			/**@return The requested page extent (height in left-to-right top-to-bottom orientation) of the flyover component, or <code>null</code> if no preferred page extent has been specified.*/
-			public Extent getPageExtent() {return pageExent;}
-
-			/**Sets the requested page extent (height in left-to-right top-to-bottom orientation) of the flyover component.
-			@param newPageExtent The new requested page extent of the flyover component, or <code>null</code> there is no page extent preference.
+			/**Sets the extent of the line flow.
+			In left-to-right top-to-bottom orientation, this is commonly known as the <dfn>width</dfn>.
+			This is a bound property.
+			@param newExtent The new requested extent of the flyover, or <code>null</code> there is no extent preference.
 			*/
-			public void setPageExtent(final Extent newPageExtent)
-			{
-				if(!ObjectUtilities.equals(pageExent, newPageExtent))	//if the value is really changing
-				{
-					pageExent=newPageExtent;	//actually change the value
-				}			
-			}
+			public void setLineExtent(final Extent newExtent) {setExtent(Flow.LINE, newExtent);}
+
+			/**Sets the extent of the page flow.
+			In left-to-right top-to-bottom orientation, this is commonly known as the <dfn>height</dfn>.
+			This is a bound property.
+			@param newExtent The new requested extent of the flyover, or <code>null</code> there is no extent preference.
+			*/
+			public void setPageExtent(final Extent newExtent) {setExtent(Flow.PAGE, newExtent);}
 			
 		/**The style identifier of the flyover, or <code>null</code> if there is no style ID.*/
 		private String styleID=null;
