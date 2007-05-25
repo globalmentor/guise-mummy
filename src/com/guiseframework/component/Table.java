@@ -12,14 +12,21 @@ import static com.guiseframework.theme.Theme.*;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
+import com.garretwilson.util.Debug;
+import com.garretwilson.util.ReadWriteLockMap;
+import com.garretwilson.util.ReadWriteLockMapDecorator;
 import com.guiseframework.GuiseSession;
+import com.guiseframework.component.layout.Border;
 import com.guiseframework.converter.*;
 import com.guiseframework.event.*;
+import com.guiseframework.geometry.Extent;
 import com.guiseframework.model.*;
+import com.guiseframework.model.ui.AbstractUIModel;
 import com.guiseframework.prototype.ActionPrototype;
 import com.guiseframework.validator.*;
 
 /**A table component.
+<p>Property changes to a column's UI model are repeated with the component as the source and the column UI model as the target.</p> 
 @author Garret Wilson
 */
 public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Table.CellComponentState, Table> implements TableModel
@@ -228,6 +235,214 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	}
 */
 
+	/**The map of UI models for columns.*/
+	private final ReadWriteLockMap<TableColumnModel<?>, ColumnUIModel> columnUIModelMap=new ReadWriteLockMapDecorator<TableColumnModel<?>, ColumnUIModel>(new HashMap<TableColumnModel<?>, ColumnUIModel>());
+
+	/**Retrieves the UI model for the given column.
+	If no UI model yet exists for the given column, one will be created.
+	@param column The column for which a UI model should be returned.
+	@return The UI model for the given column.
+	@exception NullPointerException if the given column is <code>null</code>.
+	*/
+	protected ColumnUIModel determineColumnUIModel(final TableColumnModel<?> column)	//if we ever allow columns to be removed, automatically remove the corresponding UI model and remove its repeat property change listener
+	{
+		checkInstance(column, "Column cannot be null.");
+		ColumnUIModel columnUIModel;	//we'll find a column UI model and store it here
+		columnUIModelMap.readLock().lock();	//get a read lock to the column UI model map
+		try
+		{
+			columnUIModel=columnUIModelMap.get(column);	//try to get the column UI model
+		}
+		finally
+		{
+			columnUIModelMap.readLock().unlock();	//always release the read lock
+		}
+		if(columnUIModel==null)	//if there is as of yet no column UI model
+		{
+			columnUIModelMap.writeLock().lock();	//get a write lock to the map
+			try
+			{
+				columnUIModel=columnUIModelMap.get(column);	//try to get the column UI model again
+				if(columnUIModel==null)	//if there still is no column UI model
+				{
+					columnUIModel=new ColumnUIModel();	//create a new column UI model
+					columnUIModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//repeat constraints property change events
+					columnUIModelMap.put(column, columnUIModel);	//store the column UI model in the map
+				}
+			}
+			finally
+			{
+				columnUIModelMap.writeLock().unlock();	//always release the write lock
+			}			
+		}
+		return columnUIModel;	//return the column UI model we found
+	}
+	
+	/**Returns the padding extent of the indicated column border.
+	@param column The column for which a padding extent should be returned.
+	@param border The border for which a padding extent should be returned.
+	@return The padding extent of the given column border.
+	@exception NullPointerException if the given column is <code>null</code>.
+	*/
+	public Extent getColumnPaddingExtent(final TableColumnModel<?> column, final Border border) {return determineColumnUIModel(column).getPaddingExtent(border);}
+
+	/**Returns the padding extent of the column line near page near border.
+	@param column The column for which a padding extent should be returned.
+	@return The padding extent of the given column border.
+	@exception NullPointerException if the given column is <code>null</code>.
+	*/
+	public Extent getColumnPaddingLineNearExtent(final TableColumnModel<?> column) {return determineColumnUIModel(column).getPaddingLineNearExtent();}
+
+	/**Returns the padding extent of the column line far page near border.
+	@param column The column for which a padding extent should be returned.
+	@return The padding extent of the given column border.
+	@exception NullPointerException if the given column is <code>null</code>.
+	*/
+	public Extent getColumnPaddingLineFarExtent(final TableColumnModel<?> column) {return determineColumnUIModel(column).getPaddingLineFarExtent();}
+
+	/**Returns the padding extent of the column line near page far border.
+	@param column The column for which a padding extent should be returned.
+	@return The padding extent of the given column border.
+	@exception NullPointerException if the given column is <code>null</code>.
+	*/
+	public Extent getColumnPaddingPageNearExtent(final TableColumnModel<?> column) {return determineColumnUIModel(column).getPaddingPageNearExtent();}
+
+	/**Returns the padding extent of the column line far page far border.
+	@param column The column for which a padding extent should be returned.
+	@return The padding extent of the given column border.
+	@exception NullPointerException if the given column is <code>null</code>.
+	*/
+	public Extent getColumnPaddingPageFarExtent(final TableColumnModel<?> column) {return determineColumnUIModel(column).getPaddingPageFarExtent();}
+
+	/**Sets the padding extent of a given column border.
+	The padding extent of each column border represents a bound property.
+	@param column The column for which the padding extent should be set.
+	@param border The border for which the padding extent should be set.
+	@param newPaddingExtent The padding extent.
+	@exception NullPointerException if the given column, border and/or padding extent is <code>null</code>. 
+	@see ColumnUIModel#PADDING_LINE_NEAR_EXTENT_PROPERTY
+	@see ColumnUIModel#PADDING_LINE_FAR_EXTENT_PROPERTY
+	@see ColumnUIModel#PADDING_PAGE_NEAR_EXTENT_PROPERTY
+	@see ColumnUIModel#PADDING_PAGE_FAR_EXTENT_PROPERTY
+	*/
+	public void setColumnPaddingExtent(final TableColumnModel<?> column, final Border border, final Extent newPaddingExtent) {determineColumnUIModel(column).setPaddingExtent(border, newPaddingExtent);}
+
+	/**Sets the padding extent of the column line near border.
+	This is a bound property.
+	@param column The column for which the padding extent should be set.
+	@param newPaddingExtent The padding extent.
+	@exception NullPointerException if the given column and/or padding extent is <code>null</code>. 
+	@see ColumnUIModel#PADDING_LINE_NEAR_EXTENT_PROPERTY
+	*/
+	public void setColumnPaddingLineNearExtent(final TableColumnModel<?> column, final Extent newPaddingExtent) {determineColumnUIModel(column).setPaddingLineNearExtent(newPaddingExtent);}
+
+	/**Sets the padding extent of the column line far border.
+	This is a bound property.
+	@param column The column for which the padding extent should be set.
+	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+	@exception NullPointerException if the given column and/or padding extent is <code>null</code>. 
+	@see ColumnUIModel#PADDING_LINE_FAR_EXTENT_PROPERTY
+	*/
+	public void setColumnPaddingLineFarExtent(final TableColumnModel<?> column, final Extent newPaddingExtent) {determineColumnUIModel(column).setPaddingLineFarExtent(newPaddingExtent);}
+
+	/**Sets the padding extent of the column page near border.
+	This is a bound property.
+	@param column The column for which the padding extent should be set.
+	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+	@exception NullPointerException if the given columna and/or padding extent is <code>null</code>. 
+	@see ColumnUIModel#PADDING_PAGE_NEAR_EXTENT_PROPERTY
+	*/
+	public void setColumnPaddingPageNearExtent(final TableColumnModel<?> column, final Extent newPaddingExtent) {determineColumnUIModel(column).setPaddingPageNearExtent(newPaddingExtent);}
+
+	/**Sets the padding extent of the column page far border.
+	This is a bound property.
+	@param column The column for which the padding extent should be set.
+	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+	@exception NullPointerException if the given column and/or padding extent is <code>null</code>. 
+	@see ColumnUIModel#PADDING_PAGE_FAR_EXTENT_PROPERTY
+	*/
+	public void setColumnPaddingPageFarExtent(final TableColumnModel<?> column, final Extent newPaddingExtent) {determineColumnUIModel(column).setPaddingPageFarExtent(newPaddingExtent);}
+
+	/**Sets the padding extent of all borders of a column.
+	The padding extent of each column border represents a bound property.
+	@param column The column for which the padding extent should be set.
+	@param newPaddingExtent The padding extent.
+	@exception NullPointerException if the given column and/or padding extent is <code>null</code>. 
+	@see ColumnUIModel#PADDING_LINE_NEAR_EXTENT_PROPERTY
+	@see ColumnUIModel#PADDING_LINE_FAR_EXTENT_PROPERTY
+	@see ColumnUIModel#PADDING_PAGE_NEAR_EXTENT_PROPERTY
+	@see ColumnUIModel#PADDING_PAGE_FAR_EXTENT_PROPERTY
+	*/
+	public void setColumnPaddingExtent(final TableColumnModel<?> column, final Extent newPaddingExtent) {determineColumnUIModel(column).setPaddingExtent(newPaddingExtent);}
+	
+	/**Sets the padding extent of a all column borders of all columns.
+	The padding extent of each column border represents a bound property.
+	@param border The border for which the padding extent should be set.
+	@param newPaddingExtent The padding extent.
+	@exception NullPointerException if the border and/or padding extent is <code>null</code>. 
+	@see ColumnUIModel#PADDING_LINE_NEAR_EXTENT_PROPERTY
+	@see ColumnUIModel#PADDING_LINE_FAR_EXTENT_PROPERTY
+	@see ColumnUIModel#PADDING_PAGE_NEAR_EXTENT_PROPERTY
+	@see ColumnUIModel#PADDING_PAGE_FAR_EXTENT_PROPERTY
+	*/
+	public void setColumnPaddingExtent(final Border border, final Extent newPaddingExtent)
+	{
+		for(TableColumnModel<?> column:getColumns())	//for each column
+		{
+			determineColumnUIModel(column).setPaddingExtent(border, newPaddingExtent);	//set the padding extent of the border for this column
+		}
+	}
+
+	/**Sets the padding extent of the line near border of all columns.
+	This is a bound property.
+	@param newPaddingExtent The padding extent.
+	@exception NullPointerException if the given padding extent is <code>null</code>. 
+	@see ColumnUIModel#PADDING_LINE_NEAR_EXTENT_PROPERTY
+	*/
+	public void setColumnPaddingLineNearExtent(final Extent newPaddingExtent) {setPaddingExtent(Border.LINE_NEAR, newPaddingExtent);}
+
+	/**Sets the padding extent of the line far border of all columns.
+	This is a bound property.
+	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+	@exception NullPointerException if the given padding extent is <code>null</code>. 
+	@see ColumnUIModel#PADDING_LINE_FAR_EXTENT_PROPERTY
+	*/
+	public void setColumnPaddingLineFarExtent(final Extent newPaddingExtent) {setPaddingExtent(Border.LINE_FAR, newPaddingExtent);}
+
+	/**Sets the padding extent of the page near border of all columns.
+	This is a bound property.
+	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+	@exception NullPointerException if the given padding extent is <code>null</code>. 
+	@see ColumnUIModel#PADDING_PAGE_NEAR_EXTENT_PROPERTY
+	*/
+	public void setColumnPaddingPageNearExtent(final Extent newPaddingExtent) {setPaddingExtent(Border.PAGE_NEAR, newPaddingExtent);}
+
+	/**Sets the padding extent of the page far border of all columns.
+	This is a bound property.
+	@param newPaddingExtent The padding extent, or <code>null</code> if the default padding extent should be used.
+	@exception NullPointerException if the given padding extent is <code>null</code>. 
+	@see ColumnUIModel#PADDING_PAGE_FAR_EXTENT_PROPERTY
+	*/
+	public void setColumnPaddingPageFarExtent(final Extent newPaddingExtent) {setPaddingExtent(Border.PAGE_FAR, newPaddingExtent);}
+
+	/**Sets the padding extent of all borders of all columns.
+	The padding extent of each border represents a bound property.
+	This is a convenience method that calls {@link #setColumnPaddingExtent(Border, Extent)} for each border.
+	@param newPaddingExtent The padding extent.
+	@exception NullPointerException if the given padding extent is <code>null</code>. 
+	@see ColumnUIModel#PADDING_LINE_NEAR_EXTENT_PROPERTY
+	@see ColumnUIModel#PADDING_LINE_FAR_EXTENT_PROPERTY
+	@see ColumnUIModel#PADDING_PAGE_NEAR_EXTENT_PROPERTY
+	@see ColumnUIModel#PADDING_PAGE_FAR_EXTENT_PROPERTY
+	*/
+	public void setColumnPaddingExtent(final Extent newPaddingExtent)
+	{
+		for(final Border border:Border.values())	//for each border
+		{
+			setColumnPaddingExtent(border, newPaddingExtent);	//set this padding extent
+		}
+	}
+	
 	/**Value class and column names constructor with a default data model.
 	@param <C> The type of values in all the cells in the table.
 	@param valueClass The class indicating the type of values held in the model.
@@ -515,6 +730,13 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 			super(component);	//construct the parent class
 			this.editable=editable;
 		}
+	}
+
+	/**An encapsulation of the user interface-related model used for a column.
+	@author Garret Wilson
+	*/ 
+	protected static class ColumnUIModel extends AbstractUIModel
+	{
 	}
 
 	/**Installs a default cell representation strategy for the given column.
