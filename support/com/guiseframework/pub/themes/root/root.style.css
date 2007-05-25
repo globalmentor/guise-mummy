@@ -70,7 +70,7 @@ table
 }
 
 /*remove borders, padding, and margins*/
-a, div, img, label, table, th, td, span
+a, caption, div, img, label, table, th, td, span
 {
 	border: 0;
 	border-style: none;

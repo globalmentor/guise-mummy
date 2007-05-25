@@ -56,6 +56,22 @@ public interface UIModel extends Model, Displayable
 	public final static String LINE_EXTENT_PROPERTY=getPropertyName(UIModel.class, "lineExtent");
 	/**The page extent (height in left-to-right top-to-bottom orientation) bound property.*/
 	public final static String PAGE_EXTENT_PROPERTY=getPropertyName(UIModel.class, "pageExtent");
+	/**The bound property of the font families.*/
+	public final static String FONT_FAMILIES_PROPERTY=getPropertyName(UIModel.class, "fontFamilies");
+	/**The bound property of the font size.*/
+	public final static String FONT_SIZE_PROPERTY=getPropertyName(UIModel.class, "fontSize");
+	/**The bound property of the font style.*/
+	public final static String FONT_STYLE_PROPERTY=getPropertyName(UIModel.class, "fontStyle");
+	/**The bound property of the font weight.*/
+	public final static String FONT_WEIGHT_PROPERTY=getPropertyName(UIModel.class, "fontWeight");
+	/**The bound property of the label font families.*/
+	public final static String LABEL_FONT_FAMILIES_PROPERTY=getPropertyName(UIModel.class, "labelFontFamilies");
+	/**The bound property of the label font size.*/
+	public final static String LABEL_FONT_SIZE_PROPERTY=getPropertyName(UIModel.class, "labelFontSize");
+	/**The bound property of the label font style.*/
+	public final static String LABEL_FONT_STYLE_PROPERTY=getPropertyName(UIModel.class, "labelFontStyle");
+	/**The bound property of the label font weight.*/
+	public final static String LABEL_FONT_WEIGHT_PROPERTY=getPropertyName(UIModel.class, "labelFontWeight");
 	/**The bound property of the line near margin extent.*/
 	public final static String MARGIN_LINE_NEAR_EXTENT_PROPERTY=getPropertyName(UIModel.class, "marginLineNearExtent");
 	/**The bound property of the line far margin extent.*/
@@ -64,10 +80,6 @@ public interface UIModel extends Model, Displayable
 	public final static String MARGIN_PAGE_NEAR_EXTENT_PROPERTY=getPropertyName(UIModel.class, "marginPageNearExtent");
 	/**The bound property of the page far margin extent.*/
 	public final static String MARGIN_PAGE_FAR_EXTENT_PROPERTY=getPropertyName(UIModel.class, "marginPageFarExtent");
-	/**The bound property of the font families.*/
-	public final static String FONT_FAMILIES_PROPERTY=getPropertyName(UIModel.class, "fontFamilies");
-	/**The bound property of the font size.*/
-	public final static String FONT_SIZE_PROPERTY=getPropertyName(UIModel.class, "fontSize");
 	/**The opacity bound property.*/
 	public final static String OPACITY_PROPERTY=getPropertyName(UIModel.class, "opacity");
 	/**The bound property of the line near padding extent.*/
@@ -87,7 +99,17 @@ public interface UIModel extends Model, Displayable
 
 	/*The constant value representing a general rounded corner.*/
 	public final static Dimensions ROUNDED_CORNER_ARC_SIZE=new Dimensions(0.25, 0.25, Extent.Unit.EM);
-	
+
+	/**The normal font weight.
+	@see #setFontWeight(double)
+	*/
+	public final static double FONT_WEIGHT_NORMAL=0.5;
+
+	/**The bold font weight.
+	@see #setFontWeight(double)
+	*/
+	public final static double FONT_WEIGHT_BOLD=0.75;
+
 	/**@return The background color of the component, or <code>null</code> if no background color is specified for this component.*/
 	public Color<?> getBackgroundColor();
 
@@ -478,7 +500,7 @@ public interface UIModel extends Model, Displayable
 	/**@return The prioritized list of font family names, or <code>null</code> if no font family names have been specified.*/
 	public List<String> getFontFamilies();
 
-	/**Sets the font families of the component
+	/**Sets the font families of the component.
 	This is a bound property.
 	@param newFontFamilies The new prioritized list of font family names, or <code>null</code> if no font family names are specified.
 	@see #FONT_FAMILIES_PROPERTY 
@@ -488,12 +510,84 @@ public interface UIModel extends Model, Displayable
 	/**@return The size of the font from baseline to baseline, or <code>null</code> if no font size has been specified.*/
 	public Extent getFontSize();
 
-	/**Sets the font size of the component
+	/**Sets the font size of the component.
 	This is a bound property.
-	@param newFontSize The new size of the font from baseline to baseline, or <code>null</code> there is no font specified.
+	@param newFontSize The new size of the font from baseline to baseline, or <code>null</code> there is no font size specified.
 	@see #FONT_SIZE_PROPERTY 
 	*/
 	public void setFontSize(final Extent newFontSize);
+
+	/**@return The style of the font.*/
+	public FontStyle getFontStyle();
+
+	/**Sets the style of the font.
+	This is a bound property.
+	@param newFontStyle The style of the font.
+	@exception NullPointerException if the given font style is <code>null</code>.
+	@see #FONT_STYLE_PROPERTY
+	*/
+	public void setFontStyle(final FontStyle newFontStyle);
+
+	/**@return The weight of a font relative to a normal value of 0.5.*/
+	public double getFontWeight();
+
+	/**Sets the weight of the font.
+	The weight of a font relative to a normal value of 0.5.
+	A font weight of 0.75 is equivalent to a bold font.
+	It is recommended that the constant variables {@link #FONT_WEIGHT_NORMAL} and {@link #FONT_WEIGHT_BOLD} be used for the most compatibility across platforms.
+	This is a bound property of type {@link Double}.
+	@param newFontWeight The weight of a font relative to a normal value of 0.5.
+	@see #FONT_WEIGHT_PROPERTY
+	@see #FONT_WEIGHT_NORMAL
+	@see #FONT_WEIGHT_BOLD
+	*/
+	public void setFontWeight(final double newFontWeight);
+
+	/**@return The prioritized list of label font family names, or <code>null</code> if no label font family names have been specified.*/
+	public List<String> getLabelFontFamilies();
+
+	/**Sets the font families of the label.
+	This is a bound property.
+	@param newLabelFontFamilies The new prioritized list of label font family names, or <code>null</code> if no label font family names are specified.
+	@see #LABEL_FONT_FAMILIES_PROPERTY 
+	*/
+	public void setLabelFontFamilies(final List<String> newLabelFontFamilies);
+
+	/**@return The size of the label font from baseline to baseline, or <code>null</code> if no label font size has been specified.*/
+	public Extent getLabelFontSize();
+
+	/**Sets the label font size of the component.
+	This is a bound property.
+	@param newLabelFontSize The new size of the label font from baseline to baseline, or <code>null</code> there is no label font size specified.
+	@see #LABEL_FONT_SIZE_PROPERTY 
+	*/
+	public void setLabelFontSize(final Extent newLabelFontSize);
+
+	/**@return The style of the label font.*/
+	public FontStyle getLabelFontStyle();
+
+	/**Sets the style of the label font.
+	This is a bound property.
+	@param newLabelFontStyle The style of the label font.
+	@exception NullPointerException if the given label font style is <code>null</code>.
+	@see #LABEL_FONT_STYLE_PROPERTY
+	*/
+	public void setLabelFontStyle(final FontStyle newLabelFontStyle);
+
+	/**@return The weight of the label font relative to a normal value of 0.5.*/
+	public double getLabelFontWeight();
+
+	/**Sets the weight of the label font.
+	The weight of the label font relative to a normal value of 0.5.
+	A font weight of 0.75 is equivalent to a bold font.
+	It is recommended that the constant variables {@link #FONT_WEIGHT_NORMAL} and {@link #FONT_WEIGHT_BOLD} be used for the most compatibility across platforms.
+	This is a bound property of type {@link Double}.
+	@param newLabelFontWeight The weight of the label font relative to a normal value of 0.5.
+	@see #FONT_WEIGHT_PROPERTY
+	@see #FONT_WEIGHT_NORMAL
+	@see #FONT_WEIGHT_BOLD
+	*/
+	public void setLabelFontWeight(final double newLabelFontWeight);
 
 	/**Returns the margin extent of the indicated border.
 	@param border The border for which a margin extent should be returned.

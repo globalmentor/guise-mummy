@@ -7,6 +7,7 @@ import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
 import com.guiseframework.style.Color;
+import com.guiseframework.style.FontStyle;
 import com.guiseframework.style.LineStyle;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
@@ -575,7 +576,7 @@ public abstract class AbstractUIModel extends GuiseBoundPropertyObject implement
 		/**@return The prioritized list of font family names, or <code>null</code> if no font family names have been specified.*/
 		public List<String> getFontFamilies() {return fontFamilies;}
 
-		/**Sets the font families of the component
+		/**Sets the font families of the component.
 		This is a bound property.
 		@param newFontFamilies The new prioritized list of font family names, or <code>null</code> if no font family names are specified.
 		@see #FONT_FAMILIES_PROPERTY 
@@ -596,9 +597,9 @@ public abstract class AbstractUIModel extends GuiseBoundPropertyObject implement
 		/**@return The size of the font from baseline to baseline, or <code>null</code> if no font size has been specified.*/
 		public Extent getFontSize() {return fontSize;}
 
-		/**Sets the font size of the component
+		/**Sets the font size of the component.
 		This is a bound property.
-		@param newFontSize The new size of the font from baseline to baseline, or <code>null</code> there is no font specified.
+		@param newFontSize The new size of the font from baseline to baseline, or <code>null</code> there is no font size specified.
 		@see #FONT_SIZE_PROPERTY 
 		*/
 		public void setFontSize(final Extent newFontSize)
@@ -609,6 +610,144 @@ public abstract class AbstractUIModel extends GuiseBoundPropertyObject implement
 				fontSize=newFontSize;	//actually change the value
 				firePropertyChange(FONT_SIZE_PROPERTY, oldFontSize, newFontSize);	//indicate that the value changed
 			}			
+		}
+
+	/**The style of the font.*/
+	private FontStyle fontStyle=FontStyle.NORMAL;
+
+		/**@return The style of the font.*/
+		public FontStyle getFontStyle() {return fontStyle;}
+
+		/**Sets the style of the font.
+		This is a bound property.
+		@param newFontStyle The style of the font.
+		@exception NullPointerException if the given font style is <code>null</code>.
+		@see #FONT_STYLE_PROPERTY
+		*/
+		public void setFontStyle(final FontStyle newFontStyle)
+		{
+			if(fontStyle!=checkInstance(newFontStyle, "Font style cannot be null."))	//if the value is really changing
+			{
+				final FontStyle oldFontStyle=fontStyle;	//get the current value
+				fontStyle=newFontStyle;	//update the value
+				firePropertyChange(FONT_STYLE_PROPERTY, oldFontStyle, newFontStyle);
+			}
+		}
+
+	/**The weight of the font relative to a normal value of 0.5.*/
+	private double fontWeight=0.5;
+
+		/**@return The weight of the font relative to a normal value of 0.5.*/
+		public double getFontWeight() {return fontWeight;}
+
+		/**Sets the weight of the font.
+		The weight of the font relative to a normal value of 0.5.
+		A font weight of 0.75 is equivalent to a bold font.
+		It is recommended that the constant variables {@link #FONT_WEIGHT_NORMAL} and {@link #FONT_WEIGHT_BOLD} be used for the most compatibility across platforms.
+		This is a bound property of type {@link Double}.
+		@param newFontWeight The weight of the font relative to a normal value of 0.5.
+		@see #FONT_WEIGHT_PROPERTY
+		@see #FONT_WEIGHT_NORMAL
+		@see #FONT_WEIGHT_BOLD
+		*/
+		public void setFontWeight(final double newFontWeight)
+		{
+			if(fontWeight!=newFontWeight)	//if the value is really changing
+			{
+				final double oldFontWeight=fontWeight;	//get the current value
+				fontWeight=newFontWeight;	//update the value
+				firePropertyChange(FONT_WEIGHT_PROPERTY, Double.valueOf(oldFontWeight), Double.valueOf(newFontWeight));
+			}
+		}
+
+	/**The prioritized list of label font family names, or <code>null</code> if no label font family names have been specified.*/
+	private List<String> labelFontFamilies=null;
+
+		/**@return The prioritized list of label font family names, or <code>null</code> if no label font family names have been specified.*/
+		public List<String> getLabelFontFamilies() {return labelFontFamilies;}
+
+		/**Sets the font families of the label.
+		This is a bound property.
+		@param newLabelFontFamilies The new prioritized list of label font family names, or <code>null</code> if no label font family names are specified.
+		@see #LABEL_FONT_FAMILIES_PROPERTY 
+		*/
+		public void setLabelFontFamilies(final List<String> newLabelFontFamilies)
+		{
+			if(!ObjectUtilities.equals(labelFontFamilies, newLabelFontFamilies))	//if the value is really changing
+			{
+				final List<String> oldLabelFontFamilies=labelFontFamilies;	//get the old value
+				labelFontFamilies=newLabelFontFamilies;	//actually change the value
+				firePropertyChange(LABEL_FONT_FAMILIES_PROPERTY, oldLabelFontFamilies, newLabelFontFamilies);	//indicate that the value changed
+			}			
+		}
+
+	/**The size of the label font from baseline to baseline, or <code>null</code> if no label font size has been specified.*/
+	private Extent labelFontSize=null;
+
+		/**@return The size of the label font from baseline to baseline, or <code>null</code> if no label font size has been specified.*/
+		public Extent getLabelFontSize() {return labelFontSize;}
+
+		/**Sets the label font size of the component.
+		This is a bound property.
+		@param newLabelFontSize The new size of the label font from baseline to baseline, or <code>null</code> there is no label font size specified.
+		@see #LABEL_FONT_SIZE_PROPERTY 
+		*/
+		public void setLabelFontSize(final Extent newLabelFontSize)
+		{
+			if(!ObjectUtilities.equals(labelFontSize, newLabelFontSize))	//if the value is really changing
+			{
+				final Extent oldLabelFontSize=labelFontSize;	//get the old value
+				labelFontSize=newLabelFontSize;	//actually change the value
+				firePropertyChange(LABEL_FONT_SIZE_PROPERTY, oldLabelFontSize, newLabelFontSize);	//indicate that the value changed
+			}			
+		}
+
+	/**The style of the label font.*/
+	private FontStyle labelFontStyle=FontStyle.NORMAL;
+
+		/**@return The style of the label font.*/
+		public FontStyle getLabelFontStyle() {return labelFontStyle;}
+
+		/**Sets the style of the label font.
+		This is a bound property.
+		@param newLabelFontStyle The style of the label font.
+		@exception NullPointerException if the given label font style is <code>null</code>.
+		@see #LABEL_FONT_STYLE_PROPERTY
+		*/
+		public void setLabelFontStyle(final FontStyle newLabelFontStyle)
+		{
+			if(labelFontStyle!=checkInstance(newLabelFontStyle, "Label font style cannot be null."))	//if the value is really changing
+			{
+				final FontStyle oldLabelFontStyle=labelFontStyle;	//get the current value
+				labelFontStyle=newLabelFontStyle;	//update the value
+				firePropertyChange(LABEL_FONT_STYLE_PROPERTY, oldLabelFontStyle, newLabelFontStyle);
+			}
+		}
+		
+	/**The weight of the label font relative to a normal value of 0.5.*/
+	private double labelFontWeight=0.5;
+
+		/**@return The weight of the label font relative to a normal value of 0.5.*/
+		public double getLabelFontWeight() {return labelFontWeight;}
+
+		/**Sets the weight of the label font.
+		The weight of the label font relative to a normal value of 0.5.
+		A font weight of 0.75 is equivalent to a bold font.
+		It is recommended that the constant variables {@link #FONT_WEIGHT_NORMAL} and {@link #FONT_WEIGHT_BOLD} be used for the most compatibility across platforms.
+		This is a bound property of type {@link Double}.
+		@param newLabelFontWeight The weight of the label font relative to a normal value of 0.5.
+		@see #FONT_WEIGHT_PROPERTY
+		@see #FONT_WEIGHT_NORMAL
+		@see #FONT_WEIGHT_BOLD
+		*/
+		public void setLabelFontWeight(final double newLabelFontWeight)
+		{
+			if(labelFontWeight!=newLabelFontWeight)	//if the value is really changing
+			{
+				final double oldLabelFontWeight=labelFontWeight;	//get the current value
+				labelFontWeight=newLabelFontWeight;	//update the value
+				firePropertyChange(LABEL_FONT_WEIGHT_PROPERTY, Double.valueOf(oldLabelFontWeight), Double.valueOf(newLabelFontWeight));
+			}
 		}
 
 	/**The array of margin extents.*/

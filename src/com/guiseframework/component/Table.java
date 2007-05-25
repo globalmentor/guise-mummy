@@ -6,12 +6,15 @@ import java.beans.PropertyVetoException;
 import java.util.*;
 import java.util.concurrent.*;
 
+import javax.swing.plaf.ComponentUI;
+
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.guiseframework.theme.Theme.*;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
+import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.ReadWriteLockMap;
 import com.garretwilson.util.ReadWriteLockMapDecorator;
@@ -22,7 +25,9 @@ import com.guiseframework.event.*;
 import com.guiseframework.geometry.Extent;
 import com.guiseframework.model.*;
 import com.guiseframework.model.ui.AbstractUIModel;
+import com.guiseframework.model.ui.UIModel;
 import com.guiseframework.prototype.ActionPrototype;
+import com.guiseframework.style.FontStyle;
 import com.guiseframework.validator.*;
 
 /**A table component.
@@ -240,11 +245,12 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 
 	/**Retrieves the UI model for the given column.
 	If no UI model yet exists for the given column, one will be created.
+	There is normally no need for applications to call this method directly.
 	@param column The column for which a UI model should be returned.
 	@return The UI model for the given column.
 	@exception NullPointerException if the given column is <code>null</code>.
 	*/
-	protected ColumnUIModel determineColumnUIModel(final TableColumnModel<?> column)	//if we ever allow columns to be removed, automatically remove the corresponding UI model and remove its repeat property change listener
+	public ColumnUIModel getColumnUIModel(final TableColumnModel<?> column)	//if we ever allow columns to be removed, automatically remove the corresponding UI model and remove its repeat property change listener
 	{
 		checkInstance(column, "Column cannot be null.");
 		ColumnUIModel columnUIModel;	//we'll find a column UI model and store it here
@@ -276,43 +282,170 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 			}			
 		}
 		return columnUIModel;	//return the column UI model we found
+	}	
+
+	/**Returns the label font families for a given column.
+	@param column The column for which the label font families should be returned.
+	@return The prioritized list of label font family names, or <code>null</code> if no label font family names have been specified.
+	@exception NullPointerException if the given column is <code>null</code>.
+	*/
+	public List<String> getColumnLabelFontFamilies(final TableColumnModel<?> column) {return getColumnUIModel(column).getLabelFontFamilies();}
+
+	/**Sets the font families of the label for a given column.
+	This is a bound property.
+	@param column The column for which the label font families should be set.
+	@param newLabelFontFamilies The new prioritized list of label font family names, or <code>null</code> if no label font family names are specified.
+	@exception NullPointerException if the given column is <code>null</code>.
+	@see ColumnUIModel#LABEL_FONT_FAMILIES_PROPERTY 
+	*/
+	public void setColumnLabelFontFamilies(final TableColumnModel<?> column, final List<String> newLabelFontFamilies) {getColumnUIModel(column).setLabelFontFamilies(newLabelFontFamilies);}
+
+	/**Sets the font families of the labels of all columns.
+	This is a bound property for each column.
+	@param newLabelFontFamilies The new prioritized list of label font family names, or <code>null</code> if no label font family names are specified.
+	@see ColumnUIModel#LABEL_FONT_FAMILIES_PROPERTY 
+	*/
+	public void setColumnLabelFontFamilies(final List<String> newLabelFontFamilies)
+	{
+		for(final TableColumnModel<?> column:getColumns())	//for each column
+		{
+			setColumnLabelFontFamilies(column, newLabelFontFamilies);	//set the label font families
+		}
 	}
 	
+	/**Returns the label font size for a given column.
+	@param column The column for which the label font size should be returned.
+	@return The size of the label font from baseline to baseline, or <code>null</code> if no label font size has been specified.
+	@exception NullPointerException if the given column is <code>null</code>.
+	*/
+	public Extent getColumnLabelFontSize(final TableColumnModel<?> column) {return getColumnUIModel(column).getLabelFontSize();}
+
+	/**Sets the label font size of a given column.
+	This is a bound property.
+	@param column The column for which the label font size should be set.
+	@param newLabelFontSize The new size of the label font from baseline to baseline, or <code>null</code> there is no label font size specified.
+	@exception NullPointerException if the given column is <code>null</code>.
+	@see ColumnUIModel#LABEL_FONT_SIZE_PROPERTY 
+	*/
+	public void setColumnLabelFontSize(final TableColumnModel<?> column, final Extent newLabelFontSize) {getColumnUIModel(column).setLabelFontSize(newLabelFontSize);}
+
+	/**Sets the label font size of all columns.
+	This is a bound property for each column.
+	@param newLabelFontSize The new size of the label font from baseline to baseline, or <code>null</code> there is no label font size specified.
+	@see ColumnUIModel#LABEL_FONT_SIZE_PROPERTY 
+	*/
+	public void setColumnLabelFontSize(final Extent newLabelFontSize)
+	{
+		for(final TableColumnModel<?> column:getColumns())	//for each column
+		{
+			setColumnLabelFontSize(column, newLabelFontSize);	//set the label font size
+		}
+	}
+	
+	/**Returns the label font style for a given column.
+	@param column The column for which the label font style should be returned.
+	@return The style of the label font.
+	@exception NullPointerException if the given column is <code>null</code>.
+	*/
+	public FontStyle getColumnLabelFontStyle(final TableColumnModel<?> column) {return getColumnUIModel(column).getLabelFontStyle();}
+
+	/**Sets the style of the label font for a given column.
+	This is a bound property.
+	@param column The column for which the label font size should be set.
+	@param newLabelFontStyle The style of the label font.
+	@exception NullPointerException if the given column and/or label font style is <code>null</code>.
+	@see ColumnUIModel#LABEL_FONT_STYLE_PROPERTY
+	*/
+	public void setColumnLabelFontStyle(final TableColumnModel<?> column, final FontStyle newLabelFontStyle) {getColumnUIModel(column).setLabelFontStyle(newLabelFontStyle);}
+
+	/**Sets the style of the label font for all columns.
+	This is a bound property of each column.
+	@param newLabelFontStyle The style of the label font.
+	@exception NullPointerException if the given label font style is <code>null</code>.
+	@see ColumnUIModel#LABEL_FONT_STYLE_PROPERTY
+	*/
+	public void setColumnLabelFontStyle(final FontStyle newLabelFontStyle)
+	{
+		for(final TableColumnModel<?> column:getColumns())	//for each column
+		{
+			setColumnLabelFontStyle(column, newLabelFontStyle);	//set the label font style
+		}
+	}
+	
+	/**Returns the label font weight for a given column.
+	@param column The column for which the label font weight should be returned.
+	@return The weight of the label font relative to a normal value of 0.5.
+	@exception NullPointerException if the given column is <code>null</code>.
+	*/
+	public double getColumnLabelFontWeight(final TableColumnModel<?> column) {return getColumnUIModel(column).getLabelFontWeight();}
+
+	/**Sets the weight of the label font of a given column.
+	The weight of the label font relative to a normal value of 0.5.
+	A font weight of 0.75 is equivalent to a bold font.
+	It is recommended that the constant variables {@link ComponentUIModel#FONT_WEIGHT_NORMAL} and {@link ComponentUIModel#FONT_WEIGHT_BOLD} be used for the most compatibility across platforms.
+	This is a bound property of type {@link Double}.
+	@param column The column for which the label font weight should be set.
+	@param newLabelFontWeight The weight of the label font relative to a normal value of 0.5.
+	@exception NullPointerException if the given column is <code>null</code>.
+	@see ComponentUIModel#FONT_WEIGHT_PROPERTY
+	@see ComponentUIModel#FONT_WEIGHT_NORMAL
+	@see ComponentUIModel#FONT_WEIGHT_BOLD
+	*/
+	public void setColumnLabelFontWeight(final TableColumnModel<?> column, final double newLabelFontWeight) {getColumnUIModel(column).setLabelFontWeight(newLabelFontWeight);}
+
+	/**Sets the weight of the label font of all columns.
+	The weight of the label font relative to a normal value of 0.5.
+	A font weight of 0.75 is equivalent to a bold font.
+	It is recommended that the constant variables {@link ComponentUIModel#FONT_WEIGHT_NORMAL} and {@link ComponentUIModel#FONT_WEIGHT_BOLD} be used for the most compatibility across platforms.
+	This is a bound property of type {@link Double}.
+	@param newLabelFontWeight The weight of the label font relative to a normal value of 0.5.
+	@see ComponentUIModel#FONT_WEIGHT_PROPERTY
+	@see ComponentUIModel#FONT_WEIGHT_NORMAL
+	@see ComponentUIModel#FONT_WEIGHT_BOLD
+	*/
+	public void setColumnLabelFontWeight(final double newLabelFontWeight)
+	{
+		for(final TableColumnModel<?> column:getColumns())	//for each column
+		{
+			setColumnLabelFontWeight(column, newLabelFontWeight);	//set the label font weight
+		}
+	}
+
 	/**Returns the padding extent of the indicated column border.
 	@param column The column for which a padding extent should be returned.
 	@param border The border for which a padding extent should be returned.
 	@return The padding extent of the given column border.
 	@exception NullPointerException if the given column is <code>null</code>.
 	*/
-	public Extent getColumnPaddingExtent(final TableColumnModel<?> column, final Border border) {return determineColumnUIModel(column).getPaddingExtent(border);}
+	public Extent getColumnPaddingExtent(final TableColumnModel<?> column, final Border border) {return getColumnUIModel(column).getPaddingExtent(border);}
 
 	/**Returns the padding extent of the column line near page near border.
 	@param column The column for which a padding extent should be returned.
 	@return The padding extent of the given column border.
 	@exception NullPointerException if the given column is <code>null</code>.
 	*/
-	public Extent getColumnPaddingLineNearExtent(final TableColumnModel<?> column) {return determineColumnUIModel(column).getPaddingLineNearExtent();}
+	public Extent getColumnPaddingLineNearExtent(final TableColumnModel<?> column) {return getColumnUIModel(column).getPaddingLineNearExtent();}
 
 	/**Returns the padding extent of the column line far page near border.
 	@param column The column for which a padding extent should be returned.
 	@return The padding extent of the given column border.
 	@exception NullPointerException if the given column is <code>null</code>.
 	*/
-	public Extent getColumnPaddingLineFarExtent(final TableColumnModel<?> column) {return determineColumnUIModel(column).getPaddingLineFarExtent();}
+	public Extent getColumnPaddingLineFarExtent(final TableColumnModel<?> column) {return getColumnUIModel(column).getPaddingLineFarExtent();}
 
 	/**Returns the padding extent of the column line near page far border.
 	@param column The column for which a padding extent should be returned.
 	@return The padding extent of the given column border.
 	@exception NullPointerException if the given column is <code>null</code>.
 	*/
-	public Extent getColumnPaddingPageNearExtent(final TableColumnModel<?> column) {return determineColumnUIModel(column).getPaddingPageNearExtent();}
+	public Extent getColumnPaddingPageNearExtent(final TableColumnModel<?> column) {return getColumnUIModel(column).getPaddingPageNearExtent();}
 
 	/**Returns the padding extent of the column line far page far border.
 	@param column The column for which a padding extent should be returned.
 	@return The padding extent of the given column border.
 	@exception NullPointerException if the given column is <code>null</code>.
 	*/
-	public Extent getColumnPaddingPageFarExtent(final TableColumnModel<?> column) {return determineColumnUIModel(column).getPaddingPageFarExtent();}
+	public Extent getColumnPaddingPageFarExtent(final TableColumnModel<?> column) {return getColumnUIModel(column).getPaddingPageFarExtent();}
 
 	/**Sets the padding extent of a given column border.
 	The padding extent of each column border represents a bound property.
@@ -325,7 +458,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@see ColumnUIModel#PADDING_PAGE_NEAR_EXTENT_PROPERTY
 	@see ColumnUIModel#PADDING_PAGE_FAR_EXTENT_PROPERTY
 	*/
-	public void setColumnPaddingExtent(final TableColumnModel<?> column, final Border border, final Extent newPaddingExtent) {determineColumnUIModel(column).setPaddingExtent(border, newPaddingExtent);}
+	public void setColumnPaddingExtent(final TableColumnModel<?> column, final Border border, final Extent newPaddingExtent) {getColumnUIModel(column).setPaddingExtent(border, newPaddingExtent);}
 
 	/**Sets the padding extent of the column line near border.
 	This is a bound property.
@@ -334,7 +467,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@exception NullPointerException if the given column and/or padding extent is <code>null</code>. 
 	@see ColumnUIModel#PADDING_LINE_NEAR_EXTENT_PROPERTY
 	*/
-	public void setColumnPaddingLineNearExtent(final TableColumnModel<?> column, final Extent newPaddingExtent) {determineColumnUIModel(column).setPaddingLineNearExtent(newPaddingExtent);}
+	public void setColumnPaddingLineNearExtent(final TableColumnModel<?> column, final Extent newPaddingExtent) {getColumnUIModel(column).setPaddingLineNearExtent(newPaddingExtent);}
 
 	/**Sets the padding extent of the column line far border.
 	This is a bound property.
@@ -343,7 +476,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@exception NullPointerException if the given column and/or padding extent is <code>null</code>. 
 	@see ColumnUIModel#PADDING_LINE_FAR_EXTENT_PROPERTY
 	*/
-	public void setColumnPaddingLineFarExtent(final TableColumnModel<?> column, final Extent newPaddingExtent) {determineColumnUIModel(column).setPaddingLineFarExtent(newPaddingExtent);}
+	public void setColumnPaddingLineFarExtent(final TableColumnModel<?> column, final Extent newPaddingExtent) {getColumnUIModel(column).setPaddingLineFarExtent(newPaddingExtent);}
 
 	/**Sets the padding extent of the column page near border.
 	This is a bound property.
@@ -352,7 +485,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@exception NullPointerException if the given columna and/or padding extent is <code>null</code>. 
 	@see ColumnUIModel#PADDING_PAGE_NEAR_EXTENT_PROPERTY
 	*/
-	public void setColumnPaddingPageNearExtent(final TableColumnModel<?> column, final Extent newPaddingExtent) {determineColumnUIModel(column).setPaddingPageNearExtent(newPaddingExtent);}
+	public void setColumnPaddingPageNearExtent(final TableColumnModel<?> column, final Extent newPaddingExtent) {getColumnUIModel(column).setPaddingPageNearExtent(newPaddingExtent);}
 
 	/**Sets the padding extent of the column page far border.
 	This is a bound property.
@@ -361,7 +494,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@exception NullPointerException if the given column and/or padding extent is <code>null</code>. 
 	@see ColumnUIModel#PADDING_PAGE_FAR_EXTENT_PROPERTY
 	*/
-	public void setColumnPaddingPageFarExtent(final TableColumnModel<?> column, final Extent newPaddingExtent) {determineColumnUIModel(column).setPaddingPageFarExtent(newPaddingExtent);}
+	public void setColumnPaddingPageFarExtent(final TableColumnModel<?> column, final Extent newPaddingExtent) {getColumnUIModel(column).setPaddingPageFarExtent(newPaddingExtent);}
 
 	/**Sets the padding extent of all borders of a column.
 	The padding extent of each column border represents a bound property.
@@ -373,7 +506,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@see ColumnUIModel#PADDING_PAGE_NEAR_EXTENT_PROPERTY
 	@see ColumnUIModel#PADDING_PAGE_FAR_EXTENT_PROPERTY
 	*/
-	public void setColumnPaddingExtent(final TableColumnModel<?> column, final Extent newPaddingExtent) {determineColumnUIModel(column).setPaddingExtent(newPaddingExtent);}
+	public void setColumnPaddingExtent(final TableColumnModel<?> column, final Extent newPaddingExtent) {getColumnUIModel(column).setPaddingExtent(newPaddingExtent);}
 	
 	/**Sets the padding extent of a all column borders of all columns.
 	The padding extent of each column border represents a bound property.
@@ -389,7 +522,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	{
 		for(TableColumnModel<?> column:getColumns())	//for each column
 		{
-			determineColumnUIModel(column).setPaddingExtent(border, newPaddingExtent);	//set the padding extent of the border for this column
+			getColumnUIModel(column).setPaddingExtent(border, newPaddingExtent);	//set the padding extent of the border for this column
 		}
 	}
 
@@ -399,7 +532,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@exception NullPointerException if the given padding extent is <code>null</code>. 
 	@see ColumnUIModel#PADDING_LINE_NEAR_EXTENT_PROPERTY
 	*/
-	public void setColumnPaddingLineNearExtent(final Extent newPaddingExtent) {setPaddingExtent(Border.LINE_NEAR, newPaddingExtent);}
+	public void setColumnPaddingLineNearExtent(final Extent newPaddingExtent) {setColumnPaddingExtent(Border.LINE_NEAR, newPaddingExtent);}
 
 	/**Sets the padding extent of the line far border of all columns.
 	This is a bound property.
@@ -407,7 +540,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@exception NullPointerException if the given padding extent is <code>null</code>. 
 	@see ColumnUIModel#PADDING_LINE_FAR_EXTENT_PROPERTY
 	*/
-	public void setColumnPaddingLineFarExtent(final Extent newPaddingExtent) {setPaddingExtent(Border.LINE_FAR, newPaddingExtent);}
+	public void setColumnPaddingLineFarExtent(final Extent newPaddingExtent) {setColumnPaddingExtent(Border.LINE_FAR, newPaddingExtent);}
 
 	/**Sets the padding extent of the page near border of all columns.
 	This is a bound property.
@@ -415,7 +548,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@exception NullPointerException if the given padding extent is <code>null</code>. 
 	@see ColumnUIModel#PADDING_PAGE_NEAR_EXTENT_PROPERTY
 	*/
-	public void setColumnPaddingPageNearExtent(final Extent newPaddingExtent) {setPaddingExtent(Border.PAGE_NEAR, newPaddingExtent);}
+	public void setColumnPaddingPageNearExtent(final Extent newPaddingExtent) {setColumnPaddingExtent(Border.PAGE_NEAR, newPaddingExtent);}
 
 	/**Sets the padding extent of the page far border of all columns.
 	This is a bound property.
@@ -423,7 +556,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@exception NullPointerException if the given padding extent is <code>null</code>. 
 	@see ColumnUIModel#PADDING_PAGE_FAR_EXTENT_PROPERTY
 	*/
-	public void setColumnPaddingPageFarExtent(final Extent newPaddingExtent) {setPaddingExtent(Border.PAGE_FAR, newPaddingExtent);}
+	public void setColumnPaddingPageFarExtent(final Extent newPaddingExtent) {setColumnPaddingExtent(Border.PAGE_FAR, newPaddingExtent);}
 
 	/**Sets the padding extent of all borders of all columns.
 	The padding extent of each border represents a bound property.
