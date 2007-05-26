@@ -1,8 +1,10 @@
 package com.guiseframework.component;
 
 import static com.garretwilson.lang.ClassUtilities.*;
+import static java.util.Collections.unmodifiableList;
 
 import java.beans.PropertyChangeListener;
+import java.util.Iterator;
 
 import com.garretwilson.beans.GenericPropertyChangeListener;
 import com.guiseframework.component.effect.Effect;
@@ -11,9 +13,10 @@ import com.guiseframework.component.effect.Effect;
 The frame's contents are specified using {@link #setContent(Component)}.
 <p>The title is specified by the frame model's label.</p>
 <p>A frame like other components is by default visible, but is not actually shown until its {@link #open(boolean)} method is called.</p>
+<p>A frame is a {@link FocusGroupComponent}, allowing descendant {@link FocusableComponent}s to have the focus.</p>
 @author Garret Wilson
 */
-public interface Frame<C extends Frame<C>> extends ContentComponent<C>, ModalComponent<Frame.Mode, C>
+public interface Frame<C extends Frame<C>> extends ContentComponent<C>, ModalComponent<Frame.Mode, C>, FocusGroupComponent<C>
 {
 	/**The close action control bound property.*/
 	public final static String CLOSE_ACTION_CONTROL_PROPERTY=getPropertyName(Frame.class, "closeActionControl");
@@ -132,7 +135,7 @@ public interface Frame<C extends Frame<C>> extends ContentComponent<C>, ModalCom
 	public void setCloseActionControl(final ActionControl<?> newCloseActionControl);
 
 	/**Opens the frame with the currently set modality.
-	Opening the frame registers the frame with the session.
+	Opening the frame registers the frame with the application frame.
 	If the frame is already open, no action occurs.
 	@see #getState() 
 	@see #STATE_PROPERTY

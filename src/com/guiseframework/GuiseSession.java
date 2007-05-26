@@ -80,21 +80,6 @@ public interface GuiseSession extends PropertyBindable
 	*/
 	public void setEnvironment(final GuiseEnvironment newEnvironment);
 
-	/**@return An iterator to all visible frames.*/
-	public Iterator<Frame<?>> getFrameIterator();
-
-	/**Adds a frame to the list of visible frames.
-	This method should usually only be called by the frames themselves.
-	@param frame The frame to add.
-	*/
-	public void addFrame(final Frame<?> frame);
-
-	/**Removes a frame from the list of visible frames.
-	This method should usually only be called by the frames themselves.
-	@param frame The frame to remove.
-	*/
-	public void removeFrame(final Frame<?> frame);
-
 	/**@return The current session locale.*/
 	public Locale getLocale();
 

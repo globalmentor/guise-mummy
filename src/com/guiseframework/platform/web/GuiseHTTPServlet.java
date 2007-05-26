@@ -656,7 +656,7 @@ Debug.trace("got control events");
 						guiseSession.setNavigation(navigationPath, navigationBookmark, referrerURI);	//set the session navigation with the navigation bookmark, firing any navigation events if appropriate
 					}
 					final Set<Frame<?>> removedFrames=new HashSet<Frame<?>>();	//create a set of frames so that we can know which ones were removed TODO testing
-					CollectionUtilities.addAll(removedFrames, guiseSession.getFrameIterator());	//get all the current frames; we'll determine which ones were removed, later TODO improve all this
+					CollectionUtilities.addAll(removedFrames, guiseSession.getApplicationFrame().getChildFrames().iterator());	//get all the current frames; we'll determine which ones were removed, later TODO improve all this
 					boolean isNavigating=false;	//we'll check this later to see if we're navigating so we won't have to update all the components
 					for(final ControlEvent controlEvent:controlEvents)	//for each control event
 					{
@@ -682,7 +682,7 @@ Debug.trace("got control events");
 				
 										if(parameterName.equals(XHTMLApplicationFrameView.getActionInputID(applicationFrame)) && parameterListMapEntry.getValue().size()>0)	//if this parameter is for an action
 										{
-											final Component<?> actionComponent=getComponentByID(guiseSession, parameterListMapEntry.getValue().get(0).toString());	//get an action component
+											final Component<?> actionComponent=AbstractComponent.getComponentByID(applicationFrame, parameterListMapEntry.getValue().get(0).toString());	//get an action component
 											if(actionComponent!=null)	//if we found an action component
 											{
 												requestedComponents.add(actionComponent);	//add it to the list of requested components
@@ -692,7 +692,7 @@ Debug.trace("got control events");
 										{
 											//TODO don't re-update nested components (less important for controls, which don't have nested components) 
 							//TODO del Debug.trace("looking for component with name", parameterName);
-											getControlsByName(guiseSession, parameterName, requestedComponents);	//TODO comment; tidy
+											getControlsByName(applicationFrame, parameterName, requestedComponents);	//TODO comment; tidy
 				//TODO del; test new method; tidy; comment							getControlsByName(guiseContext, navigationPanel, parameterName, requestedComponents);	//get all components identified by this name
 										}
 									}
@@ -701,7 +701,7 @@ Debug.trace("got control events");
 							else if(controlEvent instanceof ComponentControlEvent)	//if this event is bound for a specific component
 							{
 			//TODO del Debug.trace("this is a control event; looking for component with ID", ((ComponentControlEvent)controlEvent).getComponentID());
-								final Component<?> component=getComponentByID(guiseSession, ((ComponentControlEvent)controlEvent).getComponentID());	//get the target component from its ID
+								final Component<?> component=AbstractComponent.getComponentByID(applicationFrame, ((ComponentControlEvent)controlEvent).getComponentID());	//get the target component from its ID
 								if(component!=null)	//if there is a target component
 								{
 			//TODO del Debug.trace("got component", component);
@@ -942,7 +942,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						{
 							guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view
 								//close all the flyover frames to get rid of stuck flyover frames, such as those left from refreshing the page during flyover TODO fix; this is a workaround to keep refreshing the page from leaving stuck flyover frames; maybe do something better
-							final Iterator<Frame<?>> flyoverFrameIterator=guiseSession.getFrameIterator();	//get an iterator to all the frames
+							final Iterator<Frame<?>> flyoverFrameIterator=guiseSession.getApplicationFrame().getChildFrames().iterator();	//get an iterator to all the frames
 							while(flyoverFrameIterator.hasNext())	//while there are more frames
 							{
 								final Frame<?> frame=flyoverFrameIterator.next();	//get the next frame
@@ -952,7 +952,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 								}
 							}
 								//send back any open frames
-							final Iterator<Frame<?>> frameIterator=guiseSession.getFrameIterator();	//get an iterator to all the frames
+							final Iterator<Frame<?>> frameIterator=guiseSession.getApplicationFrame().getChildFrames().iterator();	//get an iterator to all the frames
 							while(frameIterator.hasNext())	//while there are more frames
 							{
 								final Frame<?> frame=frameIterator.next();	//get the next frame
@@ -987,9 +987,9 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						guiseContext.setState(GuiseContext.State.UPDATE_VIEW);	//update the context state for updating the view
 						if(isAJAX)	//if this is an AJAX request
 						{
-							final Collection<Component<?>> dirtyComponents=getDirtyComponents(guiseSession);	//get all dirty components in all the session frames
+							final Collection<Component<?>> dirtyComponents=AbstractComponent.getDirtyComponents(guiseSession.getApplicationFrame());	//get all dirty components
 			
-							CollectionUtilities.removeAll(removedFrames, guiseSession.getFrameIterator());	//remove all the ending frames, leaving us the frames that were removed TODO improve all this
+							CollectionUtilities.removeAll(removedFrames, guiseSession.getApplicationFrame().getChildFrames().iterator());	//remove all the ending frames, leaving us the frames that were removed TODO improve all this
 			//TODO fix					dirtyComponents.addAll(frames);	//add all the frames that were removed
 							
 							Debug.trace("we now have dirty components:", dirtyComponents.size());
@@ -1084,7 +1084,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 							{
 								
 								final String fieldName=fileItemStream.getFieldName();	//get the field name for this item
-								final Component<?> progressComponent=getComponentByID(guiseSession, fieldName);	//get the related component that will want to know progress
+								final Component<?> progressComponent=AbstractComponent.getComponentByID(guiseSession.getApplicationFrame(), fieldName);	//get the related component that will want to know progress
 								if(!progressComponents.contains(progressComponent))	//if this is the first transfer for this component
 								{
 									progressComponents.add(progressComponent);	//add this progress component to our set of progress components so we can send finish events to them later
@@ -1337,9 +1337,10 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 	If a given component is dirty, its child views will not be checked.
 	@param session The Guise session to check for dirty views.
 	*/
+/*TODO del
 	protected void getControlsByName(final GuiseSession session, final String name, final Set<Component<?>> componentSet)	//TODO comment; tidy
 	{
-		final Iterator<Frame<?>> frameIterator=session.getFrameIterator();	//get an iterator to session frames
+		final Iterator<Frame<?>> frameIterator=session.getApplicationFrame().getFrameIterator();	//get an iterator to session frames
 		while(frameIterator.hasNext())	//while there are more frames
 		{
 			final Frame<?> frame=frameIterator.next();	//get the next frame
@@ -1347,11 +1348,14 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 //TODO del			AbstractComponent.getDirtyComponents(frame, dirtyComponents);	//gather more dirty components
 		}
 	}
+*/
 
-	/*TODO comment
-	@param context Guise context information.
+	/**Retrieves all descendant controls that have a given name.
+	@param component The component to check, along with all descendants, for controls with the given name.
+	@param name The name for which to check.
+	@param componentSet The set of components collecting the controls.
 	*/
-	protected <T extends Component<?>> void getControlsByName(/*TODO fixfinal GuiseContext context, */final T component, final String name, final Set<Component<?>> componentSet)
+	protected <T extends Component<?>> void getControlsByName(final T component, final String name, final Set<Component<?>> componentSet)
 	{
 			//TODO check first that the component is a control; that should be much faster
 		final Controller<? extends GuiseContext, ?> controller=component.getController();
@@ -1391,10 +1395,11 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 	@param session The Guise session to check for dirty views.
 	@return The components with views needing to be updated. 
 	*/
+/*TODO del, now that all frames are children of the the application frame
 	public static Collection<Component<?>> getDirtyComponents(final GuiseSession session)
 	{
 		final ArrayList<Component<?>> dirtyComponents=new ArrayList<Component<?>>();	//create a new list to hold dirty components
-		final Iterator<Frame<?>> frameIterator=session.getFrameIterator();	//get an iterator to session frames
+		final Iterator<Frame<?>> frameIterator=session.getApplicationFrame().getFrameIterator();	//get an iterator to session frames
 		while(frameIterator.hasNext())	//while there are more frames
 		{
 			final Frame<?> frame=frameIterator.next();	//get the next frame
@@ -1402,15 +1407,17 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 		}
 		return dirtyComponents;	//return the dirty components we collected
 	}
+*/
 
 	/**Retrieves a component with the given ID.
 	This method searches the hierarchies of all frames in the session.
 	@param session The Guise session to check for the component.
 	@return The component with the given ID, or <code>null</code> if no component with the given ID could be found on any of the given frames. 
 	*/
+/*TODO del, now that all frames are children of the application frame
 	public static Component<?> getComponentByID(final GuiseSession session, final String id)
 	{
-		final Iterator<Frame<?>> frameIterator=session.getFrameIterator();	//get an iterator to session frames
+		final Iterator<Frame<?>> frameIterator=session.getApplicationFrame().getFrameIterator();	//get an iterator to session frames
 		while(frameIterator.hasNext())	//while there are more frames
 		{
 			final Frame<?> frame=frameIterator.next();	//get the next frame
@@ -1422,6 +1429,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 		}
 		return null;	//indicate that no such component could be found
 	}
+*/
 
 	private final PathExpression AJAX_REQUEST_EVENTS_WILDCARD_XPATH_EXPRESSION=new PathExpression("request", "events", "*");	//TODO use constants; comment 
 	private final PathExpression AJAX_REQUEST_CONTROL_XPATH_EXPRESSION=new PathExpression("control");	//TODO use constants; comment 

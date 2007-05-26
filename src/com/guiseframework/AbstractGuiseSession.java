@@ -156,30 +156,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			}
 		}
 	
-	/**The list of visible frames according to z-order.*/
-	private final List<Frame<?>> frameList=new CopyOnWriteArrayList<Frame<?>>();
-
-		/**@return An iterator to all visible frames.*/
-		public Iterator<Frame<?>> getFrameIterator() {return frameList.iterator();}
-	
-		/**Adds a frame to the list of visible frames.
-		This method should usually only be called by the frames themselves.
-		@param frame The frame to add.
-		*/
-		public void addFrame(final Frame<?> frame)
-		{
-			frameList.add(frame);	//add this frame to the list
-		}
-
-		/**Removes a frame from the list of visible frames.
-		This method should usually only be called by the frames themselves.
-		@param frame The frame to remove.
-		*/
-		public void removeFrame(final Frame<?> frame)
-		{
-			frameList.remove(frame);	//remove this frame from the list
-		}
-
 	/**The current session locale.*/
 	private Locale locale;
 

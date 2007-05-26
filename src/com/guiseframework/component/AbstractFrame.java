@@ -1,15 +1,20 @@
 package com.guiseframework.component;
 
 import java.beans.PropertyChangeListener;
+import java.beans.PropertyVetoException;
 import java.net.URI;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArraySet;
+import static java.util.Collections.*;
+import java.util.concurrent.*;
+
+import javax.naming.OperationNotSupportedException;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.beans.GenericPropertyChangeListener;
-import com.garretwilson.util.Debug;
-
 import static com.garretwilson.util.CollectionUtilities.*;
+
+import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.util.Debug;
 
 import static com.guiseframework.GuiseResourceConstants.*;
 import static com.guiseframework.Resources.*;
@@ -322,6 +327,54 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 		}
 	}
 
+	/**The focus strategy for this focus group.*/
+	private FocusStrategy focusStrategy=new DefaultFocusStrategy();
+
+		/**@return The focus strategy for this focus group.*/
+		public FocusStrategy getFocusStrategy() {return focusStrategy;}
+	
+		/**Sets the focus strategy.
+		This is a bound property
+		@param newFocusStrategy The focus strategy for this group.
+		@exception NullPointerException if the given focus strategy is <code>null</code>.
+		@see #FOCUS_STRATEGY_PROPERTY
+		*/
+		public void setFocusStrategy(final FocusStrategy newFocusStrategy)
+		{
+			if(!focusStrategy.equals(newFocusStrategy))	//if the value is really changing
+			{
+				final FocusStrategy oldFocusStrategy=focusStrategy;	//get the old value
+				focusStrategy=newFocusStrategy;	//actually change the value
+				firePropertyChange(FOCUS_STRATEGY_PROPERTY, oldFocusStrategy, newFocusStrategy);	//indicate that the value changed
+			}			
+		}
+
+	/**The component within this group that has the focus, or <code>null</code> if no component currently has the focus.*/ 
+	private FocusableComponent<?> focusedComponent=null;
+
+		/**Indicates the component within this group that has the focus.
+		The focused component may be another {@link FocusGroupComponent}, which in turn will have its own focus component.
+		@return The component within this group that has the focus, or <code>null</code> if no component currently has the focus.
+		*/ 
+		public FocusableComponent<?> getFocusedComponent() {return focusedComponent;}
+	
+		/**Sets the focused component within this group.
+		This is a bound property.
+		@param newFocusableComponent The component to receive the focus.
+		@exception PropertyVetoException if the given component is not a focusable component within this group, the component cannot receive the focus, or the focus change has otherwise been vetoed.
+		@see #getFocusStrategy()
+		@see #FOCUSED_COMPONENT_PROPERTY
+		*/
+		public void setFocusedComponent(final FocusableComponent<?> newFocusedComponent) throws PropertyVetoException 
+		{
+			if(!ObjectUtilities.equals(focusedComponent, newFocusedComponent))	//if the value is really changing
+			{
+				final FocusStrategy oldFocusedComponent=focusStrategy;	//get the old value
+				focusedComponent=newFocusedComponent;	//actually change the value
+				firePropertyChange(FOCUSED_COMPONENT_PROPERTY, oldFocusedComponent, newFocusedComponent);	//indicate that the value changed
+			}			
+		}
+
 	/**Component constructor.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
 	*/
@@ -342,7 +395,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 	}
 
 	/**Opens the frame with the currently set modality.
-	Opening the frame registers the frame with the session.
+	Opening the frame registers the frame with the application frame.
 	If the frame is already open, no action occurs.
 	@see #getState() 
 	@see Frame#STATE_PROPERTY
@@ -351,9 +404,13 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 	{
 		if(getState()==State.CLOSED)	//if the state is closed
 		{
-			getSession().addFrame(this);	//add the frame to the session
+			final ApplicationFrame<?> applicationFrame=getSession().getApplicationFrame();	//get the application frame
+			if(this!=applicationFrame)	//if this is not the application frame
+			{
+				getSession().getApplicationFrame().addChildFrame(this);	//add the frame to the application frame
+			}
 			setState(State.OPEN);	//change the state
-		}		
+		}
 	}
 
 	/**Opens the frame, specifying modality.
@@ -413,7 +470,11 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 	protected void closeImpl()
 	{
 //TODO del Debug.trace("ready to remove frame");
-		getSession().removeFrame(this);	//remove the frame from the session
+		final ApplicationFrame<?> applicationFrame=getSession().getApplicationFrame();	//get the application frame
+		if(this!=applicationFrame)	//if this is not the application frame
+		{
+			getSession().getApplicationFrame().removeChildFrame(this);	//remove the frame from the application frame
+		}
 		setState(State.CLOSED);	//change the state
 	}
 
@@ -447,4 +508,5 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 		}
 		return isValid();	//return the current valid state
 	}
+
 }

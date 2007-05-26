@@ -7,7 +7,7 @@ import com.guiseframework.geometry.*;
 /**An event providing mouse information.
 @author Garret Wilson
 */
-public class MouseEvent extends AbstractGuiseEvent
+public class MouseEvent extends AbstractInputEvent
 {
 
 	/**The absolute bounds of the event source.*/
@@ -33,11 +33,12 @@ public class MouseEvent extends AbstractGuiseEvent
 	@param sourceBounds The absolute bounds of the event source.
 	@param viewportBounds The absolute bounds of the viewport.
 	@param mousePosition The position of the mouse relative to the viewport.
-	@exception NullPointerException if the given source, source bounds, viewport bounds and/or mouse position is <code>null</code>.
+	@param keys The keys that were pressed when this event was generated.
+	@exception NullPointerException if the given source, source bounds, viewport bounds, mouse position, and/or keys is <code>null</code>.
 	*/
-	public MouseEvent(final Object source, final Rectangle sourceBounds, final Rectangle viewportBounds, final Point mousePosition)
+	public MouseEvent(final Object source, final Rectangle sourceBounds, final Rectangle viewportBounds, final Point mousePosition, final Key... keys)
 	{
-		super(source);	//construct the parent class
+		super(source, keys);	//construct the parent class
 		this.sourceBounds=checkInstance(sourceBounds, "Source bounds cannot be null");
 		this.viewportBounds=checkInstance(viewportBounds, "Viewport bounds cannot be null");
 		this.mousePosition=checkInstance(mousePosition, "Mouse position cannot be null");

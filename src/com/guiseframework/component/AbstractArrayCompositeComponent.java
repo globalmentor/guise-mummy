@@ -59,6 +59,15 @@ public abstract class AbstractArrayCompositeComponent<C extends CompositeCompone
 	/**@return An iterable to contained components.*/
 	public Iterable<Component<?>> getChildren()
 	{
+		return getChildList();	//create and return a list of children
+	}
+
+	/**Retrieves a list of all child components.
+	This method can be overridden to provide further child components to the returned list.
+	@return A list of child components.
+	*/
+	protected List<Component<?>> getChildList()
+	{
 		final List<Component<?>> componentList=new ArrayList<Component<?>>(componentArray.length);	//create a list of components that is large enough to hold all components if we need to
 		for(int i=componentArray.length-1; i>=0; --i)	//for each component
 		{
@@ -70,7 +79,7 @@ public abstract class AbstractArrayCompositeComponent<C extends CompositeCompone
 		}
 		return componentList;	//return our list of components
 	}
-
+	
 	/**@return Whether this component has children.*/
 	public boolean hasChildren()
 	{
@@ -83,7 +92,6 @@ public abstract class AbstractArrayCompositeComponent<C extends CompositeCompone
 		}
 		return false;	//all components in the array are null; we have no child components
 	}
-
 
 	/**Maximum component count constructor with a default label model.
 	@param maxComponentCount The maximum number of child components to support.

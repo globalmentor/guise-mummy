@@ -47,6 +47,9 @@ navigator.userAgentVersionNumber The version of the user agent stored as a numbe
 				<value></value>	<!--(zero or more) the new property; zero may signify null in some contexts--> 
 			</property>
 		</change>
+		<keyPressed|keyReleased	<!--a key pressed or released anywhere; currently only certain control keys are reported-->
+			code=""	<!--the code of the key pressed or released-->
+		/>
 		<mouseEnter|mouseExit>	<!--a mouse event related to a component-->
 			<viewport x="" y="" width="" height=""/>	<!--information on the viewport (scroll position and size)-->
 			<component id="" x="" y="" width="" height=""/>	<!--information on the component that was the target of the mouse event (in absolute terms)-->
@@ -1805,6 +1808,23 @@ function DropAJAXEvent(dragState, dragSource, dropTarget, event)
 	this.mousePosition=new Point(event.clientX, event.clientY);	//save the mouse position
 }
 
+//Key Down AJAX Event
+
+/**A class encapsulating key press or release information for an AJAX request.
+@param eventType: The type of key event; one of KeyAJAXEvent.EventType.
+@param code: The key code.
+var code: The key code
+var eventType: The type of key event; one of KeyAJAXEvent.EventType.
+*/
+function KeyAJAXEvent(eventType, code)
+{
+	this.eventType=eventType;	//save the event type
+	this.code=code;	//save the key code
+}
+
+/**The available types of key events.*/
+KeyAJAXEvent.EventType={PRESSED: "keyPressed", RELEASED: "keyReleased"};
+
 /**A class encapsulating mouse information for an AJAX request.
 @param eventType: The type of mouse event; one of MouseAJAXEvent.EventType.
 @param component: The target component.
@@ -1820,12 +1840,6 @@ var mousePosition: The position of the mouse relative to the viewport.
 */
 function MouseAJAXEvent(eventType, component, target, event)
 {
-/*TODO del if not needed
-	if(!MouseAJAXEvent.prototype._initialized)
-	{
-		MouseAJAXEvent.prototype._initialized=true;
-	}
-*/
 	this.eventType=eventType;	//save the event type
 	this.componentID=component.id;	//save the component ID
 	this.componentBounds=GUIUtilities.getElementBounds(component);	//get the component bounds
@@ -2083,7 +2097,9 @@ function GuiseAJAX()
 					FORM: "form", PROVISIONAL: "provisional", CONTROL: "control", NAME: "name", VALUE: "value",
 					CHANGE: "action", PROPERTY: "property",
 					ACTION: "action", COMPONENT: "component", COMPONENT_ID: "componentID", TARGET_ID: "targetID", ACTION_ID: "actionID", OPTION: "option",
-					DROP: "drop", SOURCE: "source", TARGET: "target", VIEWPORT: "viewport", MOUSE: "mouse", ID: "id", X: "x", Y: "y", WIDTH: "width", HEIGHT: "height",
+					DROP: "drop", SOURCE: "source", TARGET: "target", VIEWPORT: "viewport",
+					CODE: "code",
+					MOUSE: "mouse", ID: "id", X: "x", Y: "y", WIDTH: "width", HEIGHT: "height",
 					INIT: "init",
 					PING: "ping"
 				};
@@ -2229,7 +2245,6 @@ function GuiseAJAX()
 						{
 							this._appendActionAJAXEvent(requestStringBuilder, ajaxRequest);	//append the action event
 						}
-						
 						else if(ajaxRequest instanceof ChangeAJAXEvent)	//if this is an change event
 						{
 							this._appendChangeAJAXEvent(requestStringBuilder, ajaxRequest);	//append the change event
@@ -2237,6 +2252,10 @@ function GuiseAJAX()
 						else if(ajaxRequest instanceof DropAJAXEvent)	//if this is a drop event
 						{
 							this._appendDropAJAXEvent(requestStringBuilder, ajaxRequest);	//append the drop event
+						}
+						else if(ajaxRequest instanceof KeyAJAXEvent)	//if this is a key event
+						{
+							this._appendKeyAJAXEvent(requestStringBuilder, ajaxRequest);	//append the key event
 						}
 						else if(ajaxRequest instanceof MouseAJAXEvent)	//if this is a mouse event
 						{
@@ -2359,6 +2378,19 @@ function GuiseAJAX()
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE, new Map(this.RequestElement.X, ajaxDropEvent.mousePosition.x, this.RequestElement.Y, ajaxDropEvent.mousePosition.y));	//<mouse x="x" y="y">
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.MOUSE);	//</mouse>
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.DROP);	//</drop>
+			return stringBuilder;	//return the string builder
+		};
+
+		/**Appends an AJAX key event to a string builder.
+		@param stringBuilder The string builder collecting the request data.
+		@param ajaxKeyEvent The key event information to append.
+		@return The string builder.
+		*/
+		GuiseAJAX.prototype._appendKeyAJAXEvent=function(stringBuilder, ajaxKeyEvent)
+		{
+			DOMUtilities.appendXMLStartTag(stringBuilder, ajaxKeyEvent.eventType,	//<keyXXX
+					new Map(this.RequestElement.CODE, ajaxKeyEvent.code));	//code="code"
+			DOMUtilities.appendXMLEndTag(stringBuilder, ajaxKeyEvent.eventType);	//</keyXXX>
 			return stringBuilder;	//return the string builder
 		};
 
@@ -4476,6 +4508,8 @@ function onWindowLoad()
 		updateComponents(document.documentElement, true);	//update all components represented by elements within the document
 	//TODO del when works	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
 		eventManager.addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
+		eventManager.addEvent(document.documentElement, "keydown", onKey, false);	//listen for key down anywhere in window so that we can send key events back to the server (IE doesn't work correctly with key events registered on the window or document)
+		eventManager.addEvent(document.documentElement, "keyup", onKey, false);	//listen for key up anywhere in window so that we can send key events back to the server (IE doesn't work correctly with key events registered on the window or document)
 		guise.onDocumentLoad();	//create and update the modal layer
 		guiseAJAX.sendAJAXRequest(new InitAJAXEvent());	//send an initialization AJAX request	
 	//TODO del	alert("compatibility mode: "+document.compatMode);
@@ -4642,7 +4676,8 @@ function initializeNode(node, deep, initialInitialization)
 							case "text":
 							case "password":
 								eventManager.addEvent(node, "change", onTextInputChange, false);
-								eventManager.addEvent(node, "keypress", onTextInputKeyPress, false);
+//TODO del; doesn't work across browsers								eventManager.addEvent(node, "keypress", onTextInputKeyPress, false);
+								eventManager.addEvent(node, "keydown", onTextInputKeyDown, false);
 								eventManager.addEvent(node, "keyup", onTextInputKeyUp, false);
 								break;
 							case "checkbox":
@@ -4926,9 +4961,10 @@ test.add(dummy);
 
 /**Called when a key is pressed in a text input.
 This implementation checks to see if the Enter/Return key was pressed, and if so commits the input by sending it to the server.
-If Enter/Return was not pressed, send the current value as a provisional value.
 @param event The object describing the event.
+@see http://support.microsoft.com/kb/298498
 */
+/*TODO del when works
 function onTextInputKeyPress(event)
 {
 	var charCode=event.charCode;	//get the code of the entered character
@@ -4948,6 +4984,115 @@ function onTextInputKeyPress(event)
 		}
 	}
 }
+*/
+
+/**Useful key codes.
+@see http://www.quirksmode.org/js/keys.html
+@see http://www.quirksmode.org/dom/w3c_events.html
+*/
+var KEY_CODE=
+{
+	ALT: 18,
+	BACKSPACE: 8,
+	CONTROL: 17,
+	DELETE: 46,
+	DOWN: 40,
+	END: 35,
+	ENTER: 13,
+	ESCAPE: 27,
+	F1: 112,
+	F2: 113,
+	F3: 114,
+	F4: 115,
+	F5: 116,
+	F6: 117,
+	F7: 118,
+	F8: 119,
+	F9: 120,
+	F10: 121,
+	F11: 122,
+	F12: 123,
+	HOME: 36,
+	LEFT: 37,
+	PAGE_UP: 33,
+	PAGE_DOWN: 34,
+	RIGHT: 39,
+	TAB: 9,	
+	UP: 38
+};
+
+/**The key codes that are recognized globally and sent to the server as key events.*/
+var REPORTED_KEY_CODES=[KEY_CODE.ENTER, KEY_CODE.ESCAPE];
+
+/**The key codes that are canceled globally, whether or not they are reported.*/
+var CANCELED_KEY_CODES=[];
+
+/**Called when a key is pressed in a text input.
+This implementation checks to see if the Enter key was pressed, and if so commits the input by sending it to the server and canceling the default action.
+The Enter keypress is allowed to bubble so that it may be reported to the server.
+@param event The object describing the event.
+@see http://www.quirksmode.org/js/keys.html
+@see http://support.microsoft.com/kb/298498
+@see #onKey()
+*/
+function onTextInputKeyDown(event)
+{
+	var keyCode=event.keyCode;	//get the code of the pressed key
+	if(keyCode==13)	//if Enter/Return was pressed TODO use a constant
+	{
+		if(guiseAJAX.isEnabled())	//if AJAX is enabled
+		{
+		//TODO del alert("an input changed! "+textInput.id);
+			var textInput=event.currentTarget;	//get the control in which text changed
+			var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value));	//create a new form request with the control name and value
+			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+			event.preventDefault();	//prevent the default functionality from occurring, but allow it to keep bubbling so that it can be reported back to the server
+/*TODO del
+			event.stopPropagation();	//tell the event to stop bubbling
+			event.preventDefault();	//prevent the default functionality from occurring
+*/
+		}
+		else	//TODO submit the form
+		{
+		}
+	}
+}
+
+/**Called when a key is pressed or released generally.
+If any control character is pressed, it is sent to the server as a key event and its default action is canceled.
+@param event The object describing the event.
+@see REPORTED_KEY_CODES
+@see http://www.quirksmode.org/js/keys.html
+*/
+function onKey(event)
+{
+	if(guiseAJAX.isEnabled())	//if AJAX is enabled
+	{
+		var keyCode=event.keyCode;	//get the code of the pressed key
+		if(REPORTED_KEY_CODES.contains(keyCode))	//if this is a code to report
+		{
+			var eventType;	//we'll determine the type of AJAX key event to send
+			switch(event.type)	//see which type of mouse event this is
+			{
+				case "keydown":
+					eventType=KeyAJAXEvent.EventType.PRESSED;
+					break;
+				case "keydown":
+					eventType=KeyAJAXEvent.EventType.RELEASED;
+					break;
+				default:	//TODO assert an error or warning
+					return;				
+			}
+			var ajaxRequest=new KeyAJAXEvent(eventType, keyCode);	//create a new AJAX key event
+			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+		}
+		if(CANCELED_KEY_CODES.contains(keyCode))	//if this is a code to canceled
+		{
+			event.stopPropagation();	//tell the event to stop bubbling
+			event.preventDefault();	//prevent the default functionality from occurring
+		}
+	}
+}
 
 /**Called when a key is raised in a text input.
 This implementation sends the current text input value as a provisional value.
@@ -4955,7 +5100,6 @@ This implementation sends the current text input value as a provisional value.
 */
 function onTextInputKeyUp(event)
 {
-	var charCode=event.charCode;	//get the code of the entered character
 	if(guiseAJAX.isEnabled())	//if AJAX is enabled
 	{
 	//TODO del alert("an input changed! "+textInput.id);
@@ -4964,6 +5108,25 @@ function onTextInputKeyUp(event)
 		var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value), true);	//create a new provisional form request with the control name and value
 		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request, but allow this event to be processed normally
 	}
+}
+
+/**Called when a key is pressed anywhere in the document.
+@param event The object describing the event.
+*/
+function onKeyDown(event)
+{
+	var keyCode=event.keyCode;	//get the code of the pressed key
+	alert("key code down: "+keyCode);
+/*TODO fix
+	if(guiseAJAX.isEnabled())	//if AJAX is enabled
+	{
+	//TODO del alert("an input changed! "+textInput.id);
+		var textInput=event.currentTarget;	//get the control in which text changed
+			//TODO decide if we need to remove the attribute hash attribute
+		var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value), true);	//create a new provisional form request with the control name and value
+		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request, but allow this event to be processed normally
+	}
+*/
 }
 
 /**Called when the contents of a text input or a text area changes.
