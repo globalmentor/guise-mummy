@@ -4,8 +4,6 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
-import com.guiseframework.geometry.Point;
-import com.guiseframework.geometry.Rectangle;
 import com.guiseframework.model.ActionModel;
 import com.guiseframework.model.Enableable;
 import com.guiseframework.model.LabelModel;
@@ -151,6 +149,25 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 						fireActionPerformed(1, 0);	//fire an action with this component as the source
 					}
 				});
+		addMouseListener(new MouseListener()	//listen for the mouse over the menu
+				{
+					/**Called when the mouse enters the target.
+					@param mouseEvent The event providing mouse information
+					*/
+					public void mouseEntered(final MouseEnterEvent mouseEvent)
+					{
+						setRollover(true);	//turn on the rollover state						
+					}
+		
+					/**Called when the mouse exits the target.
+					@param mouseEvent The event providing mouse information
+					*/
+					public void mouseExited(final MouseExitEvent mouseEvent)
+					{
+						setRollover(false);	//turn off the rollover state						
+					}
+
+				});
 	}
 
 	/**Adds an action listener.
@@ -219,38 +236,6 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 		{
 			actionListener.actionPerformed(actionEvent);	//dispatch the action to the listener
 		}
-	}
-
-	/**Fires a mouse entered event to all registered mouse listeners.
-	This implementation first sets the rollover state to <code>true</code>.
-	@param componentBounds The absolute bounds of the component.
-	@param viewportBounds The absolute bounds of the viewport.
-	@param mousePosition The position of the mouse relative to the viewport.
-	@exception NullPointerException if one or more of the arguments are <code>null</code>.
-	@see MouseListener
-	@see MouseEvent
-	@see #setRollover(boolean)
-	*/
-	public void fireMouseEntered(final Rectangle componentBounds, final Rectangle viewportBounds, final Point mousePosition)
-	{
-		setRollover(true);	//turn on the rollover state
-		super.fireMouseEntered(componentBounds, viewportBounds, mousePosition);	//fire the event normally
-	}
-
-	/**Fires a mouse exited event to all registered mouse listeners.
-	This implementation first sets the rollover state to <code>false</code>.
-	@param componentBounds The absolute bounds of the component.
-	@param viewportBounds The absolute bounds of the viewport.
-	@param mousePosition The position of the mouse relative to the viewport.
-	@exception NullPointerException if one or more of the arguments are <code>null</code>.
-	@see MouseListener
-	@see MouseEvent
-	@see #setRollover(boolean)
-	*/
-	public void fireMouseExited(final Rectangle componentBounds, final Rectangle viewportBounds, final Point mousePosition)
-	{
-		setRollover(false);	//turn off the rollover state
-		super.fireMouseExited(componentBounds, viewportBounds, mousePosition);	//fire the event normally
 	}
 
 	/**Adds a child component.

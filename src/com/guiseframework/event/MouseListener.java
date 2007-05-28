@@ -5,14 +5,15 @@ package com.guiseframework.event;
 */
 public interface MouseListener extends GuiseEventListener
 {
-	/**Called when the mouse enters the source.
-	@param mouseEvent The event providing mouse information
-	*/
-	public void mouseEntered(final MouseEvent mouseEvent);
 
-	/**Called when the mouse exits the source.
+	/**Called when the mouse enters the target.
 	@param mouseEvent The event providing mouse information
 	*/
-	public void mouseExited(final MouseEvent mouseEvent);
+	public void mouseEntered(final MouseEnterEvent mouseEvent);
+
+	/**Called when the mouse exits the target.
+	@param mouseEvent The event providing mouse information
+	*/
+	public void mouseExited(final MouseExitEvent mouseEvent);
 
 }

@@ -8,6 +8,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.mail.internet.ContentType;
 
+import com.garretwilson.beans.TargetedEvent;
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.effect.*;
@@ -837,6 +838,96 @@ Debug.trace("now valid of", this, "is", isValid());
 		view.update(context, getThis());	//tell the view to update
 	}
 
+	/**Dispatches an input event to this component and all child components, if any.
+	If this is a {@link FocusedInputEvent} the event will be directed towards the focused component, if any.
+	This version fires all events that are not consumed.
+	@param inputEvent The input event to dispatch.
+	@see #fireInputEvent(InputEvent)
+	@see InputEvent#isConsumed()
+	@see TargetedEvent
+	*/
+	public void dispatchInputEvent(final InputEvent inputEvent)
+	{
+		if(!inputEvent.isConsumed())	//if the input has not been consumed
+		{
+			fireInputEvent(inputEvent);	//fire the event to any listeners
+		}
+	}
+
+	/**Fire the given even to all registered listeners, if any.
+	If the event is consumed further processing should cease.
+	@param inputEvent The input event to fire.
+	@see InputEvent#isConsumed()
+	@see MouseEvent
+	*/
+	public void fireInputEvent(final InputEvent inputEvent)
+	{
+		if(inputEvent instanceof MouseEvent)	//if this is a mouse event
+		{
+			if(hasMouseListeners())	//if there are mouse listeners registered
+			{
+				if(inputEvent instanceof MouseEnterEvent)	//if this is a mouse enter event
+				{
+					final MouseEnterEvent mouseEnterEvent=new MouseEnterEvent(this, (MouseEnterEvent)inputEvent);	//create a new mouse event copy indicating that this component is the source
+					for(final MouseListener mouseListener:getMouseListeners())	//for each mouse listener
+					{
+						if(mouseEnterEvent.isConsumed())	//if the event copy has been consumed
+						{
+							inputEvent.consume();	//consume the original event
+							return;	//stop further processing
+						}
+						mouseListener.mouseEntered(mouseEnterEvent);	//fire the mouse event
+					}
+				}
+				else if(inputEvent instanceof MouseExitEvent)	//if this is a mouse exit event
+				{
+					final MouseExitEvent mouseExitEvent=new MouseExitEvent(this, (MouseExitEvent)inputEvent);	//create a new mouse event copy indicating that this component is the source
+					for(final MouseListener mouseListener:getMouseListeners())	//for each mouse listener
+					{
+						if(mouseExitEvent.isConsumed())	//if the event copy has been consumed
+						{
+							inputEvent.consume();	//consume the original event
+							return;	//stop further processing
+						}
+						mouseListener.mouseExited(mouseExitEvent);	//fire the mouse event
+					}
+				}
+			}
+		}
+		else if(inputEvent instanceof KeyEvent)	//if this is a key event
+		{
+			if(hasKeyListeners())	//if there are key listeners registered
+			{
+				if(inputEvent instanceof KeyPressEvent)	//if this is a key press event
+				{
+					final KeyPressEvent keyPressEvent=new KeyPressEvent(this, (KeyPressEvent)inputEvent);	//create a new key event copy indicating that this component is the source
+					for(final KeyListener keyListener:getKeyListeners())	//for each key listener
+					{
+						if(keyPressEvent.isConsumed())	//if the event copy has been consumed
+						{
+							inputEvent.consume();	//consume the original event
+							return;	//stop further processing
+						}
+						keyListener.keyPressed(keyPressEvent);	//fire the key event
+					}
+				}
+				if(inputEvent instanceof KeyReleaseEvent)	//if this is a key release event
+				{
+					final KeyReleaseEvent keyReleaseEvent=new KeyReleaseEvent(this, (KeyReleaseEvent)inputEvent);	//create a new key event copy indicating that this component is the source
+					for(final KeyListener keyListener:getKeyListeners())	//for each key listener
+					{
+						if(keyReleaseEvent.isConsumed())	//if the event copy has been consumed
+						{
+							inputEvent.consume();	//consume the original event
+							return;	//stop further processing
+						}
+						keyListener.keyReleased(keyReleaseEvent);	//fire the key event
+					}
+				}
+			}
+		}
+	}
+
 	/**Update's this component's theme.
 	This method checks whether a theme has been applied to this component.
 	If no theme has been applied to the component, the current session theme will be applied by delegating to {@link #applyTheme(Theme)}.
@@ -871,6 +962,34 @@ Debug.trace("now valid of", this, "is", isValid());
 		setThemeApplied(true);	//indicate that the theme was successfully applied
 	}
 
+	/**Adds a key listener.
+	@param keyListener The key listener to add.
+	*/
+	public void addKeyListener(final KeyListener keyListener)
+	{
+		getEventListenerManager().add(KeyListener.class, keyListener);	//add the listener
+	}
+
+	/**Removes a key listener.
+	@param keyListener The key listener to remove.
+	*/
+	public void removeKeyListener(final KeyListener keyListener)
+	{
+		getEventListenerManager().remove(KeyListener.class, keyListener);	//remove the listener
+	}
+
+	/**@return <code>true</code> if there is one or more key listeners registered.*/
+	public boolean hasKeyListeners()
+	{
+		return getEventListenerManager().hasListeners(KeyListener.class);	//return whether there are key listeners registered
+	}
+
+	/**@return all registered key listeners.*/
+	protected Iterable<KeyListener> getKeyListeners()
+	{
+		return getEventListenerManager().getListeners(KeyListener.class);	//return the registered listeners
+	}
+	
 	/**Adds a mouse listener.
 	@param mouseListener The mouse listener to add.
 	*/
@@ -894,7 +1013,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	}
 
 	/**@return all registered mouse listeners.*/
-	public Iterable<MouseListener> getMouseListeners()
+	protected Iterable<MouseListener> getMouseListeners()
 	{
 		return getEventListenerManager().getListeners(MouseListener.class);	//return the registered listeners
 	}
@@ -907,14 +1026,19 @@ Debug.trace("now valid of", this, "is", isValid());
 	@see MouseListener
 	@see MouseEvent
 	*/
+/*TODO del if not needed
 	public void fireMouseEntered(final Rectangle componentBounds, final Rectangle viewportBounds, final Point mousePosition)
 	{
 		if(hasMouseListeners())	//if there are mouse listeners registered
 		{
-			final MouseEvent mouseEvent=new MouseEvent(getThis(), componentBounds, viewportBounds, mousePosition);	//create a new mouse event
-			getSession().queueEvent(new PostponedMouseEvent(getEventListenerManager(), mouseEvent, PostponedMouseEvent.EventType.ENTERED));	//tell the Guise session to queue the event
+			final MouseEnterEvent mouseEnterEvent=new MouseEnterEvent(getThis(), componentBounds, viewportBounds, mousePosition);	//create a new mouse event
+			for(final MouseListener mouseListener:getMouseListeners())	//for each mouse listener
+			{
+				mouseListener.mouseEntered(mouseEnterEvent);	//fire the mouse entered event
+			}
 		}
 	}
+*/
 
 	/**Fires a mouse exited event to all registered mouse listeners.
 	@param componentBounds The absolute bounds of the component.
@@ -924,14 +1048,19 @@ Debug.trace("now valid of", this, "is", isValid());
 	@see MouseListener
 	@see MouseEvent
 	*/
+/*TODO del if not needed
 	public void fireMouseExited(final Rectangle componentBounds, final Rectangle viewportBounds, final Point mousePosition)
 	{
 		if(hasMouseListeners())	//if there are mouse listeners registered
 		{
-			final MouseEvent mouseEvent=new MouseEvent(getThis(), componentBounds, viewportBounds, mousePosition);	//create a new mouse event
-			getSession().queueEvent(new PostponedMouseEvent(getEventListenerManager(), mouseEvent, PostponedMouseEvent.EventType.EXITED));	//tell the Guise session to queue the event
+			final MouseExitEvent mouseExitEvent=new MouseExitEvent(getThis(), componentBounds, viewportBounds, mousePosition);	//create a new mouse event
+			for(final MouseListener mouseListener:getMouseListeners())	//for each mouse listener
+			{
+				mouseListener.mouseExited(mouseExitEvent);	//fire the mouse entered event
+			}
 		}
 	}
+*/
 
 	/**Determines the root parent of the given component.
 	@param component The component for which the root should be found.
@@ -1292,12 +1421,12 @@ Debug.trace("now valid of", this, "is", isValid());
 			this.component=checkInstance(component, "Component cannot be null.");			
 		}
 
-		/**Called when the mouse enters the source.
+		/**Called when the mouse enters the target.
 		This implementation opens the flyover.
 		@param mouseEvent The event providing mouse information
 		@see #openFlyover()
 		*/
-		public void mouseEntered(final MouseEvent mouseEvent)
+		public void mouseEntered(final MouseEnterEvent mouseEvent)
 		{
 /*TODO del when works
 Debug.trace("source bounds:", mouseEvent.getSourceBounds());
@@ -1333,7 +1462,7 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 		@param mouseEvent The event providing mouse information
 		@see #closeFlyover()
 		*/
-		public void mouseExited(final MouseEvent mouseEvent)
+		public void mouseExited(final MouseExitEvent mouseEvent)
 		{
 			closeFlyover();	//close the flyover if it is open
 		}

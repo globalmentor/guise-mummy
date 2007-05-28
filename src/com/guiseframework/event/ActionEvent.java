@@ -4,8 +4,9 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.beans.TargetedEvent;
 
 /**An event indicating an action should take place.
-@see ActionListener
+The event target indicates the component that originally initiated the action.
 @author Garret Wilson
+@see ActionListener
 */
 public class ActionEvent extends AbstractGuiseEvent implements TargetedEvent
 {
@@ -130,7 +131,8 @@ public class ActionEvent extends AbstractGuiseEvent implements TargetedEvent
 
 	/**Copy constructor that specifies a different source.
 	@param source The object on which the event initially occurred.
-	@exception NullPointerException if the given source is <code>null</code>.
+	@param actionEvent The event the properties of which will be copied.
+	@exception NullPointerException if the given source and/or event is <code>null</code>.
 	*/
 	public ActionEvent(final Object source, final ActionEvent actionEvent)
 	{

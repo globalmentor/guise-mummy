@@ -37,7 +37,7 @@ public abstract class AbstractApplicationFrame<C extends ApplicationFrame<C>> ex
 			addComponent(frame);	//add the frame as a child of this component
 			try
 			{
-				setFocusedComponent(frame);	//set the new frame as the focus component
+				setInputFocusedComponent(frame);	//set the new frame as the focus component
 			}
 			catch(final PropertyVetoException propertyVetoException)	//if we can't focus on the new frame, ignore the error
 			{
@@ -58,13 +58,13 @@ public abstract class AbstractApplicationFrame<C extends ApplicationFrame<C>> ex
 			}
 			frameList.remove(frame);	//remove this frame from the list
 			removeComponent(frame);	//remove the frame as a child of this component
-			final FocusableComponent<?> oldFocusedComponent=getFocusedComponent();	//get the focused component
+			final InputFocusableComponent<?> oldFocusedComponent=getInputFocusedComponent();	//get the focused component
 			if(frame==oldFocusedComponent)	//if we just removed the focused component
 			{
-				final FocusableComponent<?> newFocusedComponent=frameList.isEmpty() ? null : frameList.get(frameList.size()-1);	//if we have more frames, set the focus to the last one TODO important fix race condition in finding the last frame
+				final InputFocusableComponent<?> newFocusedComponent=frameList.isEmpty() ? null : frameList.get(frameList.size()-1);	//if we have more frames, set the focus to the last one TODO important fix race condition in finding the last frame
 				try
 				{
-					setFocusedComponent(newFocusedComponent);	//set the new frame as the focus component
+					setInputFocusedComponent(newFocusedComponent);	//set the new frame as the focus component
 				}
 				catch(final PropertyVetoException propertyVetoException)	//if we can't focus on the new frame
 				{

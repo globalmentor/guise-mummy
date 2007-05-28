@@ -1,11 +1,9 @@
 package com.guiseframework.component;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.mail.internet.ContentType;
 
-import com.garretwilson.beans.PropertyBindable;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.component.layout.*;
@@ -16,7 +14,6 @@ import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
 import com.guiseframework.model.*;
 import com.guiseframework.model.ui.UIModel;
-import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
 import com.guiseframework.view.View;
 
@@ -346,6 +343,21 @@ public interface Component<C extends Component<C>> extends UIModel, LabelModel
 	*/
 	public void updateTheme() throws IOException;
 
+	/**Dispatches an input event to this component and all child components, if any.
+	If this is a {@link FocusedInputEvent} the event will be directed towards the focused component, if any.
+	@param inputEvent The input event to dispatch.
+	@see InputEvent#isConsumed()
+	@see #fireInputEvent(InputEvent)
+	*/
+	public void dispatchInputEvent(final InputEvent inputEvent);
+
+	/**Fire the given even to all registered listeners, if any.
+	If the event is consumed further processing should cease.
+	@param inputEvent The input event to fire.
+	@see InputEvent#isConsumed()
+	*/
+	public void fireInputEvent(final InputEvent inputEvent);
+
 	/**Applies a theme and its parents to this component.
 	The theme's rules will be applied to this component and any related objects.
 	Theme application occurs unconditionally, regardless of whether themes have been applied to this component before.
@@ -356,6 +368,19 @@ public interface Component<C extends Component<C>> extends UIModel, LabelModel
 	@see #setThemeApplied(boolean)
 	*/
 	public void applyTheme(final Theme theme);
+
+	/**Adds a key listener.
+	@param keyListener The key listener to add.
+	*/
+	public void addKeyListener(final KeyListener keyListener);
+
+	/**Removes a key listener.
+	@param keyListener The key listener to remove.
+	*/
+	public void removeKeyListener(final KeyListener keyListener);
+
+	/**@return <code>true</code> if there is one or more key listeners registered.*/
+	public boolean hasKeyListeners();
 
 	/**Adds a mouse listener.
 	@param mouseListener The mouse listener to add.
@@ -368,7 +393,7 @@ public interface Component<C extends Component<C>> extends UIModel, LabelModel
 	public void removeMouseListener(final MouseListener mouseListener);
 
 	/**@return all registered mouse listeners.*/
-	public Iterable<MouseListener> getMouseListeners();
+//TODO del if not needed	public Iterable<MouseListener> getMouseListeners();
 
 	/**@return <code>true</code> if there is one or more mouse listeners registered.*/
 	public boolean hasMouseListeners();
@@ -382,7 +407,7 @@ public interface Component<C extends Component<C>> extends UIModel, LabelModel
 	@see MouseListener
 	@see MouseEvent
 	*/
-	public void fireMouseEntered(final Rectangle componentBounds, final Rectangle viewportBounds, final Point mousePosition);
+//TODO del if not needed	public void fireMouseEntered(final Rectangle componentBounds, final Rectangle viewportBounds, final Point mousePosition);
 
 	/**Fires a mouse exited event to all registered mouse listeners.
 	This method is used by the framework and should not be called directly by application code.
@@ -393,7 +418,7 @@ public interface Component<C extends Component<C>> extends UIModel, LabelModel
 	@see MouseListener
 	@see MouseEvent
 	*/
-	public void fireMouseExited(final Rectangle componentBounds, final Rectangle viewportBounds, final Point mousePosition);
+//TODO del if not needed	public void fireMouseExited(final Rectangle componentBounds, final Rectangle viewportBounds, final Point mousePosition);
 
 	/**Adds a notification listener.
 	@param notificationListener The notification listener to add.

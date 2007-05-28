@@ -4,12 +4,13 @@ import java.util.*;
 
 import static com.garretwilson.text.FormatUtilities.*;
 import com.garretwilson.util.*;
+import com.guiseframework.context.GuiseContext;
 import com.guiseframework.controller.*;
 
 /**A control event indicating that a full or partial form submission occurred.
 @author Garret Wilson
 */
-public class FormControlEvent implements ControlEvent
+public class FormControlEvent extends AbstractControlEvent
 {
 
 	/**Whether this event represents all components on the form.*/
@@ -31,19 +32,25 @@ public class FormControlEvent implements ControlEvent
 		public CollectionMap<String, Object, List<Object>> getParameterListMap() {return parameterListMap;}
 
 	/**Constructor that indicates non-provisional exhaustive values.
+	@param context The context in which this control event was produced.
 	@param exhaustive Whether this event represents all components on the form.
+	@exception NullPointerException if the given context is <code>null</code>.
 	*/
-	public FormControlEvent(final boolean exhaustive)
+	public FormControlEvent(final GuiseContext context, final boolean exhaustive)
 	{
-		this(exhaustive, false);	//construct the class, indicate
+		this(context, exhaustive, false);	//construct the class, indicating these values are not provisional
 	}
 
 	/**Constructor that indicates whether the event is exhaustive.
+	@param context The context in which this control event was produced.
 	@param exhaustive Whether this event represents all components on the form.
 	@param provisional Whether the values in this event are provisional.
+	@param context The context in which this control event was produced.
+	@exception NullPointerException if the given context is <code>null</code>.
 	*/
-	public FormControlEvent(final boolean exhaustive, final boolean provisional)
+	public FormControlEvent(final GuiseContext context, final boolean exhaustive, final boolean provisional)
 	{
+		super(context);	//construct the parent class
 		this.exhaustive=exhaustive;
 		this.provisional=provisional;
 	}

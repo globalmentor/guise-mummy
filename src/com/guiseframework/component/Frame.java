@@ -13,10 +13,10 @@ import com.guiseframework.component.effect.Effect;
 The frame's contents are specified using {@link #setContent(Component)}.
 <p>The title is specified by the frame model's label.</p>
 <p>A frame like other components is by default visible, but is not actually shown until its {@link #open(boolean)} method is called.</p>
-<p>A frame is a {@link FocusGroupComponent}, allowing descendant {@link FocusableComponent}s to have the focus.</p>
+<p>A frame is a {@link InputFocusGroupComponent}, allowing descendant {@link InputFocusableComponent}s to have the focus.</p>
 @author Garret Wilson
 */
-public interface Frame<C extends Frame<C>> extends ContentComponent<C>, ModalComponent<Frame.Mode, C>, FocusGroupComponent<C>
+public interface Frame<C extends Frame<C>> extends ContentComponent<C>, ModalComponent<Frame.Mode, C>, InputFocusGroupComponent<C>
 {
 	/**The close action control bound property.*/
 	public final static String CLOSE_ACTION_CONTROL_PROPERTY=getPropertyName(Frame.class, "closeActionControl");

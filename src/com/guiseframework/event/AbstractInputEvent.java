@@ -12,6 +12,17 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 public abstract class AbstractInputEvent extends AbstractGuiseEvent implements InputEvent
 {
 
+	/**Whether the input associated with this event has been consumed.*/
+	private boolean consumed=false;
+
+		/**@return Whether the input associated with this event has been consumed.*/
+		public boolean isConsumed() {return consumed;}
+
+		/**Consumes the input associated with this event.
+		The event is marked as consumed so that other listeners will be on notice not to consume the input.
+		*/
+		public void consume() {consumed=true;}
+
 	/**The keys that were pressed when this event was generated.*/ 
 	private final Set<Key> keys;
 
@@ -35,7 +46,16 @@ public abstract class AbstractInputEvent extends AbstractGuiseEvent implements I
 	{
 		return getKeys().contains(Key.CONTROL_LEFT) || getKeys().contains(Key.CONTROL_RIGHT);	//see if a Control key is included in the key set
 	}
-		
+
+	/**Determines whether a Shift key was pressed when this event was generated.
+	@return <code>true</code> if one of the Shift keys were pressed when this event was generated.
+	@see #getKeys()
+	*/
+	public boolean hasShiftKey()
+	{
+		return getKeys().contains(Key.SHIFT_LEFT) || getKeys().contains(Key.SHIFT_RIGHT);	//see if a Shift key is included in the key set
+	}
+
 	/**Source constructor.
 	@param source The object on which the event initially occurred.
 	@param keys The keys that were pressed when this event was generated.

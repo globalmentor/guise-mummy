@@ -11,6 +11,8 @@ import javax.naming.OperationNotSupportedException;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.beans.GenericPropertyChangeListener;
+import com.garretwilson.beans.TargetedEvent;
+
 import static com.garretwilson.util.CollectionUtilities.*;
 
 import com.garretwilson.lang.ObjectUtilities;
@@ -327,51 +329,51 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 		}
 	}
 
-	/**The focus strategy for this focus group.*/
-	private FocusStrategy focusStrategy=new DefaultFocusStrategy();
+	/**The input focus strategy for this input focus group.*/
+	private InputFocusStrategy inputFocusStrategy=new DefaultInputFocusStrategy();
 
-		/**@return The focus strategy for this focus group.*/
-		public FocusStrategy getFocusStrategy() {return focusStrategy;}
+		/**@return The input focus strategy for this input focus group.*/
+		public InputFocusStrategy getInputFocusStrategy() {return inputFocusStrategy;}
 	
-		/**Sets the focus strategy.
+		/**Sets the input focus strategy.
 		This is a bound property
-		@param newFocusStrategy The focus strategy for this group.
-		@exception NullPointerException if the given focus strategy is <code>null</code>.
-		@see #FOCUS_STRATEGY_PROPERTY
+		@param newInputFocusStrategy The input focus strategy for this group.
+		@exception NullPointerException if the given input focus strategy is <code>null</code>.
+		@see #INPUT_FOCUS_STRATEGY_PROPERTY
 		*/
-		public void setFocusStrategy(final FocusStrategy newFocusStrategy)
+		public void setInputFocusStrategy(final InputFocusStrategy newInputFocusStrategy)
 		{
-			if(!focusStrategy.equals(newFocusStrategy))	//if the value is really changing
+			if(!inputFocusStrategy.equals(newInputFocusStrategy))	//if the value is really changing
 			{
-				final FocusStrategy oldFocusStrategy=focusStrategy;	//get the old value
-				focusStrategy=newFocusStrategy;	//actually change the value
-				firePropertyChange(FOCUS_STRATEGY_PROPERTY, oldFocusStrategy, newFocusStrategy);	//indicate that the value changed
+				final InputFocusStrategy oldInputFocusStrategy=inputFocusStrategy;	//get the old value
+				inputFocusStrategy=newInputFocusStrategy;	//actually change the value
+				firePropertyChange(INPUT_FOCUS_STRATEGY_PROPERTY, oldInputFocusStrategy, newInputFocusStrategy);	//indicate that the value changed
 			}			
 		}
 
-	/**The component within this group that has the focus, or <code>null</code> if no component currently has the focus.*/ 
-	private FocusableComponent<?> focusedComponent=null;
+	/**The component within this group that has the input focus, or <code>null</code> if no component currently has the input focus.*/ 
+	private InputFocusableComponent<?> inputFocusedComponent=null;
 
-		/**Indicates the component within this group that has the focus.
-		The focused component may be another {@link FocusGroupComponent}, which in turn will have its own focus component.
-		@return The component within this group that has the focus, or <code>null</code> if no component currently has the focus.
+		/**Indicates the component within this group that has the input focus.
+		The focused component may be another {@link InputFocusGroupComponent}, which in turn will have its own focused component.
+		@return The component within this group that has the input focus, or <code>null</code> if no component currently has the input focus.
 		*/ 
-		public FocusableComponent<?> getFocusedComponent() {return focusedComponent;}
+		public InputFocusableComponent<?> getInputFocusedComponent() {return inputFocusedComponent;}
 	
-		/**Sets the focused component within this group.
+		/**Sets the focused component within this input focus group.
 		This is a bound property.
-		@param newFocusableComponent The component to receive the focus.
-		@exception PropertyVetoException if the given component is not a focusable component within this group, the component cannot receive the focus, or the focus change has otherwise been vetoed.
-		@see #getFocusStrategy()
-		@see #FOCUSED_COMPONENT_PROPERTY
+		@param newInputFocusedComponent The component to receive the input focus.
+		@exception PropertyVetoException if the given component is not a focusable component within this input focus group, the component cannot receive the input focus, or the input focus change has otherwise been vetoed.
+		@see #getInputFocusStrategy()
+		@see #INPUT_FOCUSED_COMPONENT_PROPERTY
 		*/
-		public void setFocusedComponent(final FocusableComponent<?> newFocusedComponent) throws PropertyVetoException 
+		public void setInputFocusedComponent(final InputFocusableComponent<?> newInputFocusedComponent) throws PropertyVetoException 
 		{
-			if(!ObjectUtilities.equals(focusedComponent, newFocusedComponent))	//if the value is really changing
+			if(!ObjectUtilities.equals(inputFocusedComponent, newInputFocusedComponent))	//if the value is really changing
 			{
-				final FocusStrategy oldFocusedComponent=focusStrategy;	//get the old value
-				focusedComponent=newFocusedComponent;	//actually change the value
-				firePropertyChange(FOCUSED_COMPONENT_PROPERTY, oldFocusedComponent, newFocusedComponent);	//indicate that the value changed
+				final InputFocusStrategy oldInputFocusedComponent=inputFocusStrategy;	//get the old value
+				inputFocusedComponent=newInputFocusedComponent;	//actually change the value
+				firePropertyChange(INPUT_FOCUSED_COMPONENT_PROPERTY, oldInputFocusedComponent, newInputFocusedComponent);	//indicate that the value changed
 			}			
 		}
 
@@ -507,6 +509,43 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 			getSession().notify(notification);	//indicate that there was a validation error
 		}
 		return isValid();	//return the current valid state
+	}
+
+	/**Dispatches an input event to this component and all child components, if any.
+	If this is a {@link FocusedInputEvent} the event will be directed towards the focused component, if any.
+	This version fires any unconsumed {@link FocusedInputEvent} and then, if the event is still unconsumed, dispatches the event to the focused component, if any.
+	Other events are dispatched normally.
+	@param inputEvent The input event to dispatch.
+	@see #fireInputEvent(InputEvent)
+	@see InputEvent#isConsumed()
+	@see FocusedInputEvent
+	*/
+	public void dispatchInputEvent(final InputEvent inputEvent)
+	{
+//Debug.trace("in frame", this, "with label", getLabel(), "ready to dispatch input event");
+		if(inputEvent instanceof FocusedInputEvent)	//if this is a focused input event
+		{
+//Debug.trace("this is an input event");
+			if(!inputEvent.isConsumed())	//if the input has not been consumed
+			{
+//Debug.trace("in frame", this, "with label", getLabel(), "firing unconsumed focused input event", inputEvent);
+				fireInputEvent(inputEvent);	//fire the event to any listeners
+			}
+			if(!inputEvent.isConsumed())	//if the input has still not been consumed
+			{
+//Debug.trace("in frame", this, "with label", getLabel(), "event still not consumed", inputEvent);
+				final Component<?> inputFocusedComponent=getInputFocusedComponent();	//get the component with the input focus
+//Debug.trace("input focused component:", inputFocusedComponent);
+				if(inputFocusedComponent!=null)	//if we have a focused component in this group
+				{
+					inputFocusedComponent.dispatchInputEvent(inputEvent);	//have the input focused component dispatch the event
+				}
+			}
+		}
+		else	//if this is not a focused input event
+		{
+			super.dispatchInputEvent(inputEvent);	//dispatch the event normally
+		}
 	}
 
 }

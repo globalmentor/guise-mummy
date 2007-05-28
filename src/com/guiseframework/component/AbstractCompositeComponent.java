@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
 import com.garretwilson.beans.GenericPropertyChangeEvent;
+import com.garretwilson.beans.TargetedEvent;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.event.*;
 import com.guiseframework.model.LabelModel;
@@ -243,6 +244,54 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 			childComponent.updateTheme();	//tell the child component to update its theme
 		}
 		super.updateTheme();	//update the theme for this component
+	}
+
+	/**Dispatches an input event to this component and all child components, if any.
+	If this is a {@link FocusedInputEvent} the event will be directed towards the focused component, if any.
+	After default dispatching, this version dispatches the event to all child components as long as the vent has not been consumed.
+	Targeted events are only dispatched to the target ancestor hierarchy.
+	@param inputEvent The input event to dispatch.
+	@see #fireInputEvent(InputEvent)
+	@see InputEvent#isConsumed()
+	@see TargetedEvent
+	@see MouseEvent
+	*/
+	public void dispatchInputEvent(final InputEvent inputEvent)
+	{
+		super.dispatchInputEvent(inputEvent);	//do the default dispatching
+		if(!inputEvent.isConsumed() && inputEvent instanceof TargetedEvent)	//if this is a targeted event that hasn't been consumed, find the target's parent that is a child of this component, if any
+		{
+			final Object target=((TargetedEvent)inputEvent).getTarget();	//get the event target
+			if(target!=this && target instanceof Component)	//if the target is a component other than this component
+			{
+				Component<?> targetAncestor=(Component<?>)target;	//get the target as a component; we'll consider the target ancestor of itself
+				do
+				{
+					final CompositeComponent<?> parent=targetAncestor.getParent();	//get the target ancestor's parent
+					if(parent==this)	//if we are the target ancestor's immediate parent
+					{
+						targetAncestor.dispatchInputEvent(inputEvent);	//dispatch the event to the target's ancestor, which is this component's child
+						break;	//targeted events only go to the target event's ancestor tree
+					}
+					else	//if we still haven't found the child that is the target's ancestor
+					{
+						targetAncestor=parent;	//walk up the chain
+					}
+				}
+				while(targetAncestor!=null);	//keep going until we run out of ancestors, which means that we're not in the target branch at all
+			}
+		}
+		else	//if this is not a targeted event, dispatch the event to all child components
+		{
+			for(final Component<?> childComponent:getChildren())	//for each child component
+			{
+				if(inputEvent.isConsumed())	//if the event has been consumed
+				{
+					return;	//stop further processing
+				}
+				childComponent.dispatchInputEvent(inputEvent);	//dispatch the event to this child components
+			}				
+		}
 	}
 
 }

@@ -47,10 +47,16 @@ navigator.userAgentVersionNumber The version of the user agent stored as a numbe
 				<value></value>	<!--(zero or more) the new property; zero may signify null in some contexts--> 
 			</property>
 		</change>
-		<keyPressed|keyReleased	<!--a key pressed or released anywhere; currently only certain control keys are reported-->
+		<keyPress|keyRelease	<!--a key pressed or released anywhere; currently only certain control keys are reported-->
 			code=""	<!--the code of the key pressed or released-->
+			altKey="true|false"	<!--whether the Alt key was pressed-->
+			controlKey="true|false"	<!--whether the Control key was pressed-->
+			shiftKey="true|false"	<!--whether the Shift key was pressed-->
 		/>
-		<mouseEnter|mouseExit>	<!--a mouse event related to a component-->
+		<mouseEnter|mouseExit	<!--a mouse event related to a component-->
+			altKey="true|false"	<!--whether the Alt key was pressed-->
+			controlKey="true|false"	<!--whether the Control key was pressed-->
+			shiftKey="true|false">	<!--whether the Shift key was pressed-->
 			<viewport x="" y="" width="" height=""/>	<!--information on the viewport (scroll position and size)-->
 			<component id="" x="" y="" width="" height=""/>	<!--information on the component that was the target of the mouse event (in absolute terms)-->
 			<target id="" x="" y="" width="" height=""/>	<!--information on the element that was the target of the mouse event (in absolute terms)-->
@@ -1813,23 +1819,36 @@ function DropAJAXEvent(dragState, dragSource, dropTarget, event)
 /**A class encapsulating key press or release information for an AJAX request.
 @param eventType: The type of key event; one of KeyAJAXEvent.EventType.
 @param code: The key code.
+@param altKey: Whether the Alt key was pressed.
+@param controlKey: Whether the Control key was pressed.
+@param shiftKey: Whether the Shift key was pressed.
 var code: The key code
 var eventType: The type of key event; one of KeyAJAXEvent.EventType.
+var altKey: Whether the Alt key was pressed.
+var controlKey: Whether the Control key was pressed.
+var shiftKey: Whether the Shift key was pressed.
 */
-function KeyAJAXEvent(eventType, code)
+function KeyAJAXEvent(eventType, code, altKey, controlKey, shiftKey)
 {
 	this.eventType=eventType;	//save the event type
 	this.code=code;	//save the key code
+	this.altKey=altKey;	//save the key modifiers
+	this.controlKey=controlKey;
+	this.shiftKey=shiftKey;
 }
 
 /**The available types of key events.*/
-KeyAJAXEvent.EventType={PRESSED: "keyPressed", RELEASED: "keyReleased"};
+KeyAJAXEvent.EventType={PRESS: "keyPress", RELEASE: "keyRelease"};
 
 /**A class encapsulating mouse information for an AJAX request.
 @param eventType: The type of mouse event; one of MouseAJAXEvent.EventType.
 @param component: The target component.
 @param target: The element indicating the target of the event.
-@param event: The W3C event object associated with the drop.
+@param x: The horizontal position of the mouse, in absolute terms.
+@param y: The vertical position of the mouse, in absolute terms.
+@param altKey: Whether the Alt key was pressed.
+@param controlKey: Whether the Control key was pressed.
+@param shiftKey: Whether the Shift key was pressed.
 var eventType: The type of mouse event; one of MouseAJAXEvent.EventType.
 var componentID: The ID of the target component.
 var componentBounds: The rectangle of the component.
@@ -1837,8 +1856,11 @@ var targetID: The ID of the target element.
 var targetBounds: The rectangle of the target element.
 var viewportBounds: the absolute bounds of the viewport.
 var mousePosition: The position of the mouse relative to the viewport.
+var altKey: Whether the Alt key was pressed.
+var controlKey: Whether the Control key was pressed.
+var shiftKey: Whether the Shift key was pressed.
 */
-function MouseAJAXEvent(eventType, component, target, event)
+function MouseAJAXEvent(eventType, component, target, x, y, altKey, controlKey, shiftKey)
 {
 	this.eventType=eventType;	//save the event type
 	this.componentID=component.id;	//save the component ID
@@ -1846,7 +1868,10 @@ function MouseAJAXEvent(eventType, component, target, event)
 	this.targetID=target.id;	//save the target ID
 	this.targetBounds=GUIUtilities.getElementBounds(component);	//get the target bounds
 	this.viewportBounds=GUIUtilities.getViewportBounds();	//get the viewport bounds
-	this.mousePosition=new Point(event.clientX, event.clientY);	//save the mouse position
+	this.mousePosition=new Point(x, y);	//save the mouse position
+	this.altKey=altKey;	//save the key modifiers
+	this.controlKey=controlKey;
+	this.shiftKey=shiftKey;
 }
 
 /**The available types of mouse events.*/
@@ -2098,7 +2123,7 @@ function GuiseAJAX()
 					CHANGE: "action", PROPERTY: "property",
 					ACTION: "action", COMPONENT: "component", COMPONENT_ID: "componentID", TARGET_ID: "targetID", ACTION_ID: "actionID", OPTION: "option",
 					DROP: "drop", SOURCE: "source", TARGET: "target", VIEWPORT: "viewport",
-					CODE: "code",
+					CODE: "code", ALT_KEY: "altKey", CONTROL_KEY: "controlKey", SHIFT_KEY: "shiftKey",
 					MOUSE: "mouse", ID: "id", X: "x", Y: "y", WIDTH: "width", HEIGHT: "height",
 					INIT: "init",
 					PING: "ping"
@@ -2389,7 +2414,10 @@ function GuiseAJAX()
 		GuiseAJAX.prototype._appendKeyAJAXEvent=function(stringBuilder, ajaxKeyEvent)
 		{
 			DOMUtilities.appendXMLStartTag(stringBuilder, ajaxKeyEvent.eventType,	//<keyXXX
-					new Map(this.RequestElement.CODE, ajaxKeyEvent.code));	//code="code"
+					new Map(this.RequestElement.CODE, ajaxKeyEvent.code,	//code="code"
+							this.RequestElement.ALT_KEY, ajaxKeyEvent.altKey,	//altKey="altKey"
+							this.RequestElement.CONTROL_KEY, ajaxKeyEvent.controlKey,	//controlKey="controlKey"
+							this.RequestElement.SHIFT_KEY, ajaxKeyEvent.shiftKey));	//shiftKey="shiftKey"
 			DOMUtilities.appendXMLEndTag(stringBuilder, ajaxKeyEvent.eventType);	//</keyXXX>
 			return stringBuilder;	//return the string builder
 		};
@@ -2401,8 +2429,12 @@ function GuiseAJAX()
 		*/
 		GuiseAJAX.prototype._appendMouseAJAXEvent=function(stringBuilder, ajaxMouseEvent)
 		{
-			DOMUtilities.appendXMLStartTag(stringBuilder, ajaxMouseEvent.eventType);	//<mouseXXX>
+			DOMUtilities.appendXMLStartTag(stringBuilder, ajaxMouseEvent.eventType,	//<mouseXXX>
 //TODO del alert("ready to append viewport info: "+this.RequestElement.VIEWPORT+" x: "+ajaxMouseEvent.viewportBounds.x+" y: "+ajaxMouseEvent.viewportBounds.y+" width: "+ajaxMouseEvent.viewportBounds.width+" height: "+ajaxMouseEvent.viewportBounds.height);
+					new Map(this.RequestElement.CODE, ajaxKeyEvent.code,	//code="code"
+							this.RequestElement.ALT_KEY, ajaxKeyEvent.altKey,	//altKey="altKey"
+							this.RequestElement.CONTROL_KEY, ajaxKeyEvent.controlKey,	//controlKey="controlKey"
+							this.RequestElement.SHIFT_KEY, ajaxKeyEvent.shiftKey));	//shiftKey="shiftKey"
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.VIEWPORT,	//<viewport
 					new Map(this.RequestElement.X, ajaxMouseEvent.viewportBounds.x,	//x="viewportBounds.x"
 							this.RequestElement.Y, ajaxMouseEvent.viewportBounds.y,	//y="viewportBounds.y"
@@ -4986,7 +5018,7 @@ function onTextInputKeyPress(event)
 }
 */
 
-/**Useful key codes.
+/**Key codes.
 @see http://www.quirksmode.org/js/keys.html
 @see http://www.quirksmode.org/dom/w3c_events.html
 */
@@ -5017,6 +5049,7 @@ var KEY_CODE=
 	PAGE_UP: 33,
 	PAGE_DOWN: 34,
 	RIGHT: 39,
+	SHIFT: 16,
 	TAB: 9,	
 	UP: 38
 };
@@ -5075,15 +5108,15 @@ function onKey(event)
 			switch(event.type)	//see which type of mouse event this is
 			{
 				case "keydown":
-					eventType=KeyAJAXEvent.EventType.PRESSED;
+					eventType=KeyAJAXEvent.EventType.PRESS;
 					break;
 				case "keydown":
-					eventType=KeyAJAXEvent.EventType.RELEASED;
+					eventType=KeyAJAXEvent.EventType.RELEASE;
 					break;
 				default:	//TODO assert an error or warning
 					return;				
 			}
-			var ajaxRequest=new KeyAJAXEvent(eventType, keyCode);	//create a new AJAX key event
+			var ajaxRequest=new KeyAJAXEvent(eventType, keyCode, Boolean(event.altKey), Boolean(event.ctrlKey), Boolean(event.shiftKey));	//create a new AJAX key event
 			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		}
 		if(CANCELED_KEY_CODES.contains(keyCode))	//if this is a code to canceled
@@ -5907,7 +5940,7 @@ function onMouse(event)
 		}
 		if(DOMUtilities.hasClassName(target, STYLES.MOUSE_LISTENER))	//if this is a mouse listener, report the event
 		{
-			var ajaxRequest=new MouseAJAXEvent(eventType, component, target, event);	//create a new AJAX mouse event
+			var ajaxRequest=new MouseAJAXEvent(eventType, component, target, event.clientX, event.clientY, Boolean(event.altKey), Boolean(event.ctrlKey), Boolean(event.shiftKey));	//create a new AJAX mouse event
 			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 			event.stopPropagation();	//tell the event to stop bubbling
 			event.preventDefault();	//prevent the default functionality from occurring
