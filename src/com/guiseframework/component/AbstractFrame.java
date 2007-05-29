@@ -20,8 +20,12 @@ import com.garretwilson.util.Debug;
 
 import static com.guiseframework.GuiseResourceConstants.*;
 import static com.guiseframework.Resources.*;
+import static com.guiseframework.theme.Theme.*;
+
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.event.*;
+import com.guiseframework.input.Input;
+import com.guiseframework.input.InputStrategy;
 import com.guiseframework.model.LabelModel;
 import com.guiseframework.model.Notification;
 import com.guiseframework.prototype.*;
@@ -32,9 +36,6 @@ This implementation notifies the user when the frame does not validate in {@link
 */
 public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumCompositeComponent<AbstractFrame.FrameComponent, C> implements Frame<C>
 {
-
-	/**The resource URI for the close image.*/
-	public final static URI CLOSE_ICON_RESOURCE_URI=createURIResourceReference("theme.frame.close.icon");	//TODO probably move this to Theme
 
 	/**The enumeration of frame components.*/
 	private enum FrameComponent{CONTENT_COMPONENT, MENU_COMPONENT, CLOSE_ACTION_CONTROL};
@@ -319,7 +320,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 		{
 			if(oldCloseActionControl!=null)	//if we had an old close action
 			{
-				oldCloseActionControl.removeActionListener(closeActionListener);	//remove the close action listener from the old control
+				oldCloseActionControl.removeActionListener(closeActionListener);	//remove the close action listener from the old control (this will have no effect if we are using our default control, which had a listener to the prototype rather than to the control itself)
 			}
 			if(newCloseActionControl!=null)	//if we have a new close action
 			{
@@ -377,6 +378,12 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 			}			
 		}
 
+	/**The action prototype for closing the frame.*/
+	private final ActionPrototype closeActionPrototype;
+
+		/**@return The action prototype closing the frame.*/
+		public ActionPrototype getCloseActionPrototype() {return closeActionPrototype;}
+		
 	/**Component constructor.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
 	*/
@@ -387,13 +394,19 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the close action is initiated
 					{
+Debug.trace("the close action listener was invoked; ready to close frame", this);
 						close();	//close the frame
 					}
 				};
 		setComponent(FrameComponent.CONTENT_COMPONENT, component);	//set the component directly, because child classes may prevent the setContent() method from changing the component 
-		final Link closeButton=new Link();	//create a close action control
-		closeButton.setIcon(CLOSE_ICON_RESOURCE_URI);	//indicate to the close action control the resource key for its icon
-		setCloseActionControl(closeButton);	//set the close action control
+
+			//close action prototype
+		closeActionPrototype=new ActionPrototype(LABEL_CLOSE, GLYPH_CLOSE);	//create the prototype for the close action
+		closeActionPrototype.addActionListener(closeActionListener);	//close the frame when the close action is performed
+			//default close action control
+		final Link closeActionControl=new Link(closeActionPrototype);	//create a close action control from the prototype
+		closeActionControl.setLabelDisplayed(false);	//don't display the label
+		setComponent(FrameComponent.CLOSE_ACTION_CONTROL, closeActionControl);	//set our default close action control; don't use setCloseActionControl(), as this will result in the action listener being installed twice TODO maybe just remove the listener altogether, and require the new control be created from the prototype
 	}
 
 	/**Opens the frame with the currently set modality.
@@ -514,6 +527,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 	/**Dispatches an input event to this component and all child components, if any.
 	If this is a {@link FocusedInputEvent} the event will be directed towards the focused component, if any.
 	This version fires any unconsumed {@link FocusedInputEvent} and then, if the event is still unconsumed, dispatches the event to the focused component, if any.
+	If a focused event is still not consumed, it is fired to any local listeners and then sent to the installed input strategy, if any, if the event is still not consumed.
 	Other events are dispatched normally.
 	@param inputEvent The input event to dispatch.
 	@see #fireInputEvent(InputEvent)
@@ -522,8 +536,8 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 	*/
 	public void dispatchInputEvent(final InputEvent inputEvent)
 	{
-//Debug.trace("in frame", this, "with label", getLabel(), "ready to dispatch input event");
-		if(inputEvent instanceof FocusedInputEvent)	//if this is a focused input event
+//Debug.trace("in frame", this, "with label", getLabel(), "ready to dispatch input event", inputEvent);
+		if(inputEvent instanceof FocusedInputEvent)	//if this is a focused input event, do special processing instead of the default processing, which will entail reproducing some of the core dispatching functionality from parent classes to keep from sending the event to all the children 
 		{
 //Debug.trace("this is an input event");
 			if(!inputEvent.isConsumed())	//if the input has not been consumed
@@ -539,6 +553,32 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 				if(inputFocusedComponent!=null)	//if we have a focused component in this group
 				{
 					inputFocusedComponent.dispatchInputEvent(inputEvent);	//have the input focused component dispatch the event
+				}
+				if(!inputEvent.isConsumed())	//if the input has not been consumed by any focused children
+				{
+		//Debug.trace("event is not consumed by focused children; ready to fire it to listeners");
+					fireInputEvent(inputEvent);	//fire the event to any listeners
+		//Debug.trace("firing finised");
+					if(!inputEvent.isConsumed())	//if the input has still not been consumed
+					{
+		//Debug.trace("event is not still not consumed; checking input strategy");
+						final InputStrategy inputStrategy=getInputStrategy();	//get our input strategy, if any
+						if(inputStrategy!=null)	//if we have an input strategy
+						{
+		//Debug.trace("got input strategy");
+							final Input input=inputEvent.getInput();	//get the event's input, if any
+							if(input!=null)	//if the event has input
+							{
+		//Debug.trace("got input for this event:", input);
+								if(inputStrategy.input(input))	//send the input to the input strategy; if the input was consumed
+								{
+		//Debug.trace("our input strategy consumed the input", input, "in frame", this);
+									inputEvent.consume();	//mark the event as consumed
+//Debug.trace("input consumed:", input);
+								}
+							}
+						}
+					}
 				}
 			}
 		}

@@ -248,7 +248,7 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 
 	/**Dispatches an input event to this component and all child components, if any.
 	If this is a {@link FocusedInputEvent} the event will be directed towards the focused component, if any.
-	After default dispatching, this version dispatches the event to all child components as long as the vent has not been consumed.
+	This version dispatches the event to all child components as long as the event has not been consumed, and then performs default processing.
 	Targeted events are only dispatched to the target ancestor hierarchy.
 	@param inputEvent The input event to dispatch.
 	@see #fireInputEvent(InputEvent)
@@ -258,9 +258,10 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	*/
 	public void dispatchInputEvent(final InputEvent inputEvent)
 	{
-		super.dispatchInputEvent(inputEvent);	//do the default dispatching
+//Debug.trace("in composite component", this, "ready to do default dispatching of input event", inputEvent);
 		if(!inputEvent.isConsumed() && inputEvent instanceof TargetedEvent)	//if this is a targeted event that hasn't been consumed, find the target's parent that is a child of this component, if any
 		{
+//Debug.trace("this is a targeted event");
 			final Object target=((TargetedEvent)inputEvent).getTarget();	//get the event target
 			if(target!=this && target instanceof Component)	//if the target is a component other than this component
 			{
@@ -283,6 +284,7 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 		}
 		else	//if this is not a targeted event, dispatch the event to all child components
 		{
+//Debug.trace("this is an unconsumed non-targeted event; ready to send to children");
 			for(final Component<?> childComponent:getChildren())	//for each child component
 			{
 				if(inputEvent.isConsumed())	//if the event has been consumed
@@ -291,7 +293,13 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 				}
 				childComponent.dispatchInputEvent(inputEvent);	//dispatch the event to this child components
 			}				
+//Debug.trace("finishing sending event to children");
 		}
+		if(!inputEvent.isConsumed())	//if the event has not been consumed
+		{
+//Debug.trace("event still not consumed, ready to do ultra-default dispatching");
+			super.dispatchInputEvent(inputEvent);	//do the default dispatching
+		}	
 	}
 
 }

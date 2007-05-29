@@ -10,6 +10,7 @@ import javax.mail.internet.ContentType;
 
 import com.garretwilson.beans.TargetedEvent;
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.util.Debug;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.effect.*;
 import com.guiseframework.component.layout.*;
@@ -18,6 +19,8 @@ import com.guiseframework.context.GuiseContext;
 import com.guiseframework.controller.*;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
+import com.guiseframework.input.Input;
+import com.guiseframework.input.InputStrategy;
 import com.guiseframework.model.*;
 import com.guiseframework.model.ui.AbstractUIModel;
 import com.guiseframework.theme.Theme;
@@ -234,6 +237,27 @@ public abstract class AbstractComponent<C extends Component<C>> extends Abstract
 					newConstraints.addPropertyChangeListener(getRepeatPropertyChangeListener());	//repeat constraints property change events
 				}
 				firePropertyChange(CONSTRAINTS_PROPERTY, oldConstraints, newConstraints);	//indicate that the value changed
+			}
+		}
+
+	/**The strategy for processing input, or <code>null</code> if this component has no input strategy.*/
+	private InputStrategy inputStrategy=null;
+
+		/**@return The strategy for processing input, or <code>null</code> if this component has no input strategy.*/
+		public InputStrategy getInputStrategy() {return inputStrategy;}
+
+		/**Sets the strategy for processing input.
+		This is a bound property.
+		@param newInputStrategy The new strategy for processing input, or <code>null</code> if this component is to have no input strategy.
+		@see #INPUT_STRATEGY_PROPERTY
+		*/
+		public void setInputStrategy(final InputStrategy newInputStrategy)
+		{
+			if(!ObjectUtilities.equals(inputStrategy, newInputStrategy))	//if the value is really changing
+			{
+				final InputStrategy oldInputStrategy=inputStrategy;	//get the current value
+				inputStrategy=newInputStrategy;	//update the value
+				firePropertyChange(INPUT_STRATEGY_PROPERTY, oldInputStrategy, newInputStrategy);
 			}
 		}
 
@@ -841,16 +865,41 @@ Debug.trace("now valid of", this, "is", isValid());
 	/**Dispatches an input event to this component and all child components, if any.
 	If this is a {@link FocusedInputEvent} the event will be directed towards the focused component, if any.
 	This version fires all events that are not consumed.
+	If an input event is still not consumed after firing, its input is processed by the installed input strategy, if any.
 	@param inputEvent The input event to dispatch.
 	@see #fireInputEvent(InputEvent)
+	@see #getInputStrategy()
+	@see InputStrategy#input(Input)
 	@see InputEvent#isConsumed()
 	@see TargetedEvent
 	*/
 	public void dispatchInputEvent(final InputEvent inputEvent)
 	{
+//Debug.trace("in component", this, "ready to do default dispatching of input event", inputEvent);		
 		if(!inputEvent.isConsumed())	//if the input has not been consumed
 		{
+//Debug.trace("event is not consumed; ready to fire it to listeners");
 			fireInputEvent(inputEvent);	//fire the event to any listeners
+//Debug.trace("firing finised");
+			if(!inputEvent.isConsumed())	//if the input has still not been consumed
+			{
+//Debug.trace("event is not still not consumed; checking input strategy");
+				final InputStrategy inputStrategy=getInputStrategy();	//get our input strategy, if any
+				if(inputStrategy!=null)	//if we have an input strategy
+				{
+//Debug.trace("got input strategy");
+					final Input input=inputEvent.getInput();	//get the event's input, if any
+					if(input!=null)	//if the event has input
+					{
+//Debug.trace("got input for this event:", input);
+						if(inputStrategy.input(input))	//send the input to the input strategy; if the input was consumed
+						{
+//Debug.trace("our input strategy consumed the input");
+							inputEvent.consume();	//mark the event as consumed
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -858,39 +907,25 @@ Debug.trace("now valid of", this, "is", isValid());
 	If the event is consumed further processing should cease.
 	@param inputEvent The input event to fire.
 	@see InputEvent#isConsumed()
+	@see CommandEvent
+	@see KeyEvent
 	@see MouseEvent
 	*/
 	public void fireInputEvent(final InputEvent inputEvent)
 	{
-		if(inputEvent instanceof MouseEvent)	//if this is a mouse event
+		if(inputEvent instanceof CommandEvent)	//if this is a command event
 		{
-			if(hasMouseListeners())	//if there are mouse listeners registered
+			if(hasCommandListeners())	//if there are command listeners registered
 			{
-				if(inputEvent instanceof MouseEnterEvent)	//if this is a mouse enter event
+				final CommandEvent commandEvent=new CommandEvent(this, (CommandEvent)inputEvent);	//create a new command event copy indicating that this component is the source
+				for(final CommandListener commandListener:getCommandListeners())	//for each command listener
 				{
-					final MouseEnterEvent mouseEnterEvent=new MouseEnterEvent(this, (MouseEnterEvent)inputEvent);	//create a new mouse event copy indicating that this component is the source
-					for(final MouseListener mouseListener:getMouseListeners())	//for each mouse listener
+					if(commandEvent.isConsumed())	//if the event copy has been consumed
 					{
-						if(mouseEnterEvent.isConsumed())	//if the event copy has been consumed
-						{
-							inputEvent.consume();	//consume the original event
-							return;	//stop further processing
-						}
-						mouseListener.mouseEntered(mouseEnterEvent);	//fire the mouse event
+						inputEvent.consume();	//consume the original event
+						return;	//stop further processing
 					}
-				}
-				else if(inputEvent instanceof MouseExitEvent)	//if this is a mouse exit event
-				{
-					final MouseExitEvent mouseExitEvent=new MouseExitEvent(this, (MouseExitEvent)inputEvent);	//create a new mouse event copy indicating that this component is the source
-					for(final MouseListener mouseListener:getMouseListeners())	//for each mouse listener
-					{
-						if(mouseExitEvent.isConsumed())	//if the event copy has been consumed
-						{
-							inputEvent.consume();	//consume the original event
-							return;	//stop further processing
-						}
-						mouseListener.mouseExited(mouseExitEvent);	//fire the mouse event
-					}
+					commandListener.commanded(commandEvent);	//fire the command event
 				}
 			}
 		}
@@ -922,6 +957,38 @@ Debug.trace("now valid of", this, "is", isValid());
 							return;	//stop further processing
 						}
 						keyListener.keyReleased(keyReleaseEvent);	//fire the key event
+					}
+				}
+			}
+		}
+		else if(inputEvent instanceof MouseEvent)	//if this is a mouse event
+		{
+			if(hasMouseListeners())	//if there are mouse listeners registered
+			{
+				if(inputEvent instanceof MouseEnterEvent)	//if this is a mouse enter event
+				{
+					final MouseEnterEvent mouseEnterEvent=new MouseEnterEvent(this, (MouseEnterEvent)inputEvent);	//create a new mouse event copy indicating that this component is the source
+					for(final MouseListener mouseListener:getMouseListeners())	//for each mouse listener
+					{
+						if(mouseEnterEvent.isConsumed())	//if the event copy has been consumed
+						{
+							inputEvent.consume();	//consume the original event
+							return;	//stop further processing
+						}
+						mouseListener.mouseEntered(mouseEnterEvent);	//fire the mouse event
+					}
+				}
+				else if(inputEvent instanceof MouseExitEvent)	//if this is a mouse exit event
+				{
+					final MouseExitEvent mouseExitEvent=new MouseExitEvent(this, (MouseExitEvent)inputEvent);	//create a new mouse event copy indicating that this component is the source
+					for(final MouseListener mouseListener:getMouseListeners())	//for each mouse listener
+					{
+						if(mouseExitEvent.isConsumed())	//if the event copy has been consumed
+						{
+							inputEvent.consume();	//consume the original event
+							return;	//stop further processing
+						}
+						mouseListener.mouseExited(mouseExitEvent);	//fire the mouse event
 					}
 				}
 			}
@@ -962,6 +1029,34 @@ Debug.trace("now valid of", this, "is", isValid());
 		setThemeApplied(true);	//indicate that the theme was successfully applied
 	}
 
+	/**Adds a command listener.
+	@param commandListener The command listener to add.
+	*/
+	public void addCommandListener(final CommandListener commandListener)
+	{
+		getEventListenerManager().add(CommandListener.class, commandListener);	//add the listener
+	}
+
+	/**Removes a command listener.
+	@param commandListener The command listener to remove.
+	*/
+	public void removeCommandListener(final CommandListener commandListener)
+	{
+		getEventListenerManager().remove(CommandListener.class, commandListener);	//remove the listener
+	}
+
+	/**@return <code>true</code> if there is one or more command listeners registered.*/
+	public boolean hasCommandListeners()
+	{
+		return getEventListenerManager().hasListeners(CommandListener.class);	//return whether there are command listeners registered
+	}
+
+	/**@return all registered command listeners.*/
+	protected Iterable<CommandListener> getCommandListeners()
+	{
+		return getEventListenerManager().getListeners(CommandListener.class);	//return the registered listeners
+	}
+	
 	/**Adds a key listener.
 	@param keyListener The key listener to add.
 	*/

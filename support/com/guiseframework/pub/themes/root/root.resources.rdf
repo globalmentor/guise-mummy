@@ -64,8 +64,6 @@
 
 		<!-- components -->
 	
-		<!-- Frame -->
-		<resource:theme.frame.close.icon rdf:resource="images/icons/frame-close.gif"/>
 		<!-- FlyoverFrame -->
 		<resource:theme.flyover.frame.tether.image rdf:resource="images/flyover-frame-tether-SWbW.gif"/>
 		<resource:theme.flyover.frame.tether.image.NEbN rdf:resource="images/flyover-frame-tether-NEbN.gif"/>
@@ -99,6 +97,7 @@
 		<resource:theme.label.access.x>&#x0098;theme.label.access&#x009C; {0}</resource:theme.label.access.x>
 		<resource:theme.label.add>Add</resource:theme.label.add>
 		<resource:theme.label.cancel>Cancel</resource:theme.label.cancel>
+		<resource:theme.label.close>Close</resource:theme.label.close>
 		<resource:theme.label.delete>Delete</resource:theme.label.delete>
 		<resource:theme.label.delete.x>&#x0098;theme.label.delete&#x009C; {0}</resource:theme.label.delete.x>
 		<resource:theme.label.download>Download</resource:theme.label.download>
@@ -138,6 +137,7 @@
 		<resource:theme.glyph.blank rdf:resource="images/icons/glyphs/blank.gif"/>
 		<resource:theme.glyph.busy rdf:resource="images/icons/glyphs/busy.gif"/>
 		<resource:theme.glyph.cancel rdf:resource="resource:theme.glyph.reject"/>
+		<resource:theme.glyph.close rdf:resource="images/icons/glyphs/close.gif"/>
 		<resource:theme.glyph.delete rdf:resource="images/icons/glyphs/delete.gif"/>
 		<resource:theme.glyph.document rdf:resource="images/icons/glyphs/document.gif"/>
 		<resource:theme.glyph.document.content rdf:resource="images/icons/glyphs/document_content.gif"/>

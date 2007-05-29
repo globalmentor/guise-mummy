@@ -1,9 +1,11 @@
 package com.guiseframework.event;
 
+import com.guiseframework.input.Key;
+
 /**An abstract event providing information on a keyboard key event.
 @author Garret Wilson
 */
-public abstract class AbstractKeyEvent extends AbstractFocusedInputEvent implements KeyEvent
+public abstract class AbstractKeyEvent extends AbstractFocusedGestureInputEvent implements KeyEvent
 {
 
 	/**The key that was pressed.*/

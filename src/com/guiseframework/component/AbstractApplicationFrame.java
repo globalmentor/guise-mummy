@@ -1,14 +1,17 @@
 package com.guiseframework.component;
 
-import static java.util.Collections.*;
-
 import java.beans.PropertyVetoException;
+import static java.util.Collections.*;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.guiseframework.input.*;
+
 /**Abstract implementation of an application frame.
+<p>This implementation binds the command {@link ProcessCommand#CONTINUE} to the key input {@link Key#ENTER},
+as well as the command {@link ProcessCommand#ABORT} to the key input {@link Key#ESCAPE}.</p>
 @author Garret Wilson
 @see LayoutPanel
 */
@@ -80,6 +83,10 @@ public abstract class AbstractApplicationFrame<C extends ApplicationFrame<C>> ex
 	public AbstractApplicationFrame(final Component<?> component)
 	{
 		super(component);	//construct the parent class
+		final BindingInputStrategy bindingInputStrategy=new BindingInputStrategy(getInputStrategy());	//create a new input strategy based upon the current input strategy (if any)
+		bindingInputStrategy.bind(new KeyInput(Key.ENTER), new CommandInput(ProcessCommand.CONTINUE));	//map the Enter key to the "continue" command
+		bindingInputStrategy.bind(new KeyInput(Key.ESCAPE), new CommandInput(ProcessCommand.ABORT));	//map the Escape key to the "abort" command
+		setInputStrategy(bindingInputStrategy);	//switch to our new input strategy
 	}
 
 	/**Determines whether the frame should be allowed to close.

@@ -4,6 +4,9 @@ import java.io.IOException;
 
 import javax.mail.internet.ContentType;
 
+import com.garretwilson.beans.TargetedEvent;
+import static com.garretwilson.lang.ClassUtilities.*;
+
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.component.layout.*;
@@ -12,12 +15,11 @@ import com.guiseframework.context.GuiseContext;
 import com.guiseframework.controller.*;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
+import com.guiseframework.input.InputStrategy;
 import com.guiseframework.model.*;
 import com.guiseframework.model.ui.UIModel;
 import com.guiseframework.theme.Theme;
 import com.guiseframework.view.View;
-
-import static com.garretwilson.lang.ClassUtilities.*;
 
 /**Base interface for all Guise components.
 Each component must provide either a Guise session constructor; or a Guise session and string ID constructor.
@@ -54,6 +56,8 @@ public interface Component<C extends Component<C>> extends UIModel, LabelModel
 	public final static String INFO_PROPERTY=getPropertyName(Component.class, "info");
 	/**The info content type bound property.*/
 	public final static String INFO_CONTENT_TYPE_PROPERTY=getPropertyName(Component.class, "infoContentType");
+	/**The input strategy bound property.*/
+	public final static String INPUT_STRATEGY_PROPERTY=getPropertyName(Component.class, "inputStrategy");
 	/**The bound property of the component name.*/
 	public final static String NAME_PROPERTY=getPropertyName(Component.class, "name");
 	/**The bound property of the notification.*/
@@ -131,6 +135,16 @@ public interface Component<C extends Component<C>> extends UIModel, LabelModel
 	@see #CONSTRAINTS_PROPERTY
 	*/
 	public void setConstraints(final Constraints newConstraints);
+
+	/**@return The strategy for processing input, or <code>null</code> if this component has no input strategy.*/
+	public InputStrategy getInputStrategy();
+
+	/**Sets the strategy for processing input.
+	This is a bound property.
+	@param newInputStrategy The new strategy for processing input, or <code>null</code> if this component is to have no input strategy.
+	@see #INPUT_STRATEGY_PROPERTY
+	*/
+	public void setInputStrategy(final InputStrategy newInputStrategy);
 
 	/**@return The notification associated with the component, or <code>null</code> if no notification is associated with this component.*/
 	public Notification getNotification();
@@ -345,9 +359,14 @@ public interface Component<C extends Component<C>> extends UIModel, LabelModel
 
 	/**Dispatches an input event to this component and all child components, if any.
 	If this is a {@link FocusedInputEvent} the event will be directed towards the focused component, if any.
+	This version fires all events that are not consumed.
+	If an input event is still not consumed after firing, its input is processed by the installed input strategy, if any.
 	@param inputEvent The input event to dispatch.
-	@see InputEvent#isConsumed()
 	@see #fireInputEvent(InputEvent)
+	@see #getInputStrategy()
+	@see InputStrategy#input(Input)
+	@see InputEvent#isConsumed()
+	@see TargetedEvent
 	*/
 	public void dispatchInputEvent(final InputEvent inputEvent);
 
@@ -368,6 +387,19 @@ public interface Component<C extends Component<C>> extends UIModel, LabelModel
 	@see #setThemeApplied(boolean)
 	*/
 	public void applyTheme(final Theme theme);
+
+	/**Adds a command listener.
+	@param commandListener The command listener to add.
+	*/
+	public void addCommandListener(final CommandListener commandListener);
+
+	/**Removes a command listener.
+	@param commandListener The command listener to remove.
+	*/
+	public void removeCommandListener(final CommandListener commandListener);
+
+	/**@return <code>true</code> if there is one or more command listeners registered.*/
+	public boolean hasCommandListeners();
 
 	/**Adds a key listener.
 	@param keyListener The key listener to add.

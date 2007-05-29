@@ -1,4 +1,4 @@
-package com.guiseframework.event;
+package com.guiseframework.input;
 
 /**A key on a keyboard.
 The Unicode code point to which a particular key corresponds vary according to keyboard layout.

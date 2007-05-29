@@ -12,6 +12,8 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.event.*;
+import com.guiseframework.input.Input;
+import com.guiseframework.input.InputStrategy;
 import com.guiseframework.model.InformationLevel;
 import com.guiseframework.model.Notification;
 import com.guiseframework.prototype.ActionPrototype;
@@ -29,6 +31,8 @@ public interface GuiseSession extends PropertyBindable
 
 	/**The environment bound property.*/
 	public final static String ENVIRONMENT_PROPERTY=getPropertyName(GuiseSession.class, "environment");
+	/**The input strategy bound property.*/
+	public final static String INPUT_STRATEGY_PROPERTY=getPropertyName(GuiseSession.class, "inputStrategy");
 	/**The locale bound property.*/
 	public final static String LOCALE_PROPERTY=getPropertyName(GuiseSession.class, "locale");
 	/**The orientation bound property.*/
@@ -79,6 +83,22 @@ public interface GuiseSession extends PropertyBindable
 	@see #ENVIRONMENT_PROPERTY
 	*/
 	public void setEnvironment(final GuiseEnvironment newEnvironment);
+
+	/**@return The strategy for processing input.*/
+	public InputStrategy getInputStrategy();
+
+	/**Sets the strategy for processing input.
+	A default input strategy is installed that, if replaced, should be set as the parent of the new input strategy.
+	To handle new types of input, a new input strategy should create the appropriate {@link InputEvent} and dispatch it via the application frame;
+	if the event is not consumed, it should be passed to the parent input strategy. 
+	This is a bound property.
+	@param newInputStrategy The new strategy for processing input.
+	@exception NullPointerException if the given input strategy is <code>null</code>. 
+	@see #INPUT_STRATEGY_PROPERTY
+	@see GuiseSession#getApplicationFrame()
+	@see Component#dispatchInputEvent(InputEvent)
+	*/
+	public void setInputStrategy(final InputStrategy newInputStrategy);
 
 	/**@return The current session locale.*/
 	public Locale getLocale();
@@ -642,6 +662,21 @@ public interface GuiseSession extends PropertyBindable
 	@see Theme#GLYPH_BUSY
 	*/
 	public Component<?> createBusyComponent();	//TODO maybe put this in GuiseApplication
+
+	/**Processes input such as a keystroke, a mouse click, or a command.
+	A new {@link InputEvent} will be created and dispatched via the application frame.	
+	If an input event is still not consumed after dispatching, its input is processed by the installed input strategy, if any.
+	@param input The input to process.
+	@return <code>true</code> if the input was consumed and should not be processed further.
+	@exception NullPointerException if the given input is <code>null</code>.
+	@exception IllegalArgumentException if input was given that this session does not know how to process.
+	@see GuiseSession#getApplicationFrame()
+	@see Component#dispatchInputEvent(InputEvent)
+	@see #getInputStrategy()
+	@see InputStrategy#input(Input)
+	@see InputEvent#isConsumed()
+	*/
+	public boolean input(final Input input);
 
 	/**Logs the given session-related information with a default log level of {@link InformationLevel#LOG}.
 	This is a convenience method that delegates to {@link #log(InformationLevel, String, String, String, Map, CharSequence)}.

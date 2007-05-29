@@ -1,18 +1,18 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
-
 import java.beans.PropertyVetoException;
 
 import com.garretwilson.lang.ObjectUtilities;
-import com.guiseframework.model.Notification;
-import com.guiseframework.model.ValueModel;
-import com.guiseframework.validator.ValidationException;
-import com.guiseframework.validator.Validator;
+import static com.garretwilson.lang.ObjectUtilities.*;
+
+import com.guiseframework.input.*;
+import com.guiseframework.model.*;
+import com.guiseframework.validator.*;
 
 /**Abstract implementation of a frame meant for communication of a value.
 A dialog frame by default is modal and movable but not resizable.
 The component valid status is updated before a change in the {@link #VALUE_PROPERTY} or the {@link #VALIDATOR_PROPERTY} is fired. 
+<p>This implementation binds the action {@link #getCloseActionPrototype()} to the command {@link ProcessCommand#CONTINUE}.</p>
 @param <V> The value to be communicated.
 @author Garret Wilson
 */
@@ -172,6 +172,9 @@ public abstract class AbstractDialogFrame<V, C extends DialogFrame<V, C>> extend
 		setModal(true);	//default to being a modal frame
 		setMovable(true);	//default to being movable
 		setResizable(false);	//default to not allowing resizing
+		final BindingInputStrategy bindingInputStrategy=new BindingInputStrategy(getInputStrategy());	//create a new input strategy based upon the current input strategy (if any)
+		bindingInputStrategy.bind(new CommandInput(ProcessCommand.ABORT), getCloseActionPrototype());	//map the "abort" command to the close action
+		setInputStrategy(bindingInputStrategy);	//switch to our new input strategy
 	}
 
 	/**Reports that a bound property has changed.

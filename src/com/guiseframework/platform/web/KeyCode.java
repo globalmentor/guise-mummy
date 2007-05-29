@@ -5,7 +5,7 @@ import static java.util.Collections.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import com.guiseframework.event.Key;
+import com.guiseframework.input.Key;
 
 /**A key on a keyboard as reported by a browser's Event.keyCode.
 @author Garret Wilson

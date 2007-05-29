@@ -11,7 +11,6 @@ import java.text.MessageFormat;
 import static java.text.MessageFormat.*;
 import java.util.*;
 import static java.util.Collections.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.xml.parsers.*;
@@ -28,8 +27,8 @@ import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.Extent;
-import com.guiseframework.model.InformationLevel;
-import com.guiseframework.model.Notification;
+import com.guiseframework.input.*;
+import com.guiseframework.model.*;
 import com.guiseframework.prototype.*;
 import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
@@ -155,7 +154,28 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 				firePropertyChange(ENVIRONMENT_PROPERTY, oldEnvironment, newEnvironment);	//indicate that the value changed
 			}
 		}
-	
+
+	/**The strategy for processing input, or <code>null</code> if this session has no input strategy.*/
+	private InputStrategy inputStrategy=null;
+
+		/**@return The strategy for processing input, or <code>null</code> if this session has no input strategy.*/
+		public InputStrategy getInputStrategy() {return inputStrategy;}
+
+		/**Sets the strategy for processing input.
+		This is a bound property.
+		@param newInputStrategy The new strategy for processing input, or <code>null</code> if this session is to have no input strategy.
+		@see #INPUT_STRATEGY_PROPERTY
+		*/
+		public void setInputStrategy(final InputStrategy newInputStrategy)
+		{
+			if(!ObjectUtilities.equals(inputStrategy, newInputStrategy))	//if the value is really changing
+			{
+				final InputStrategy oldInputStrategy=inputStrategy;	//get the current value
+				inputStrategy=newInputStrategy;	//update the value
+				firePropertyChange(INPUT_STRATEGY_PROPERTY, oldInputStrategy, newInputStrategy);
+			}
+		}
+
 	/**The current session locale.*/
 	private Locale locale;
 
@@ -1521,6 +1541,63 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	public Component<?> createBusyComponent()
 	{
 		return new DefaultBusyPanel();	//create the default busy panel
+	}
+
+	/**Processes input such as a keystroke, a mouse click, or a command.
+	A new {@link InputEvent} will be created and dispatched via the application frame.	
+	If an input event is still not consumed after dispatching, its input is processed by the installed input strategy, if any.
+	@param input The input to process.
+	@return <code>true</code> if the input was consumed and should not be processed further.
+	@exception NullPointerException if the given input is <code>null</code>.
+	@exception IllegalArgumentException if input was given that this session does not know how to process.
+	@see #createInputEvent(Input)
+	@see GuiseSession#getApplicationFrame()
+	@see Component#dispatchInputEvent(InputEvent)
+	@see #getInputStrategy()
+	@see InputStrategy#input(Input)
+	@see InputEvent#isConsumed()
+	*/
+	public boolean input(final Input input)
+	{
+		final InputEvent inputEvent=createInputEvent(input);	//create an input event from the input
+		if(!inputEvent.isConsumed())	//if the input has not been consumed (the event could be created as consumed, preventing further processing)
+		{
+			getApplicationFrame().dispatchInputEvent(inputEvent);	//dispatch the input event to the application frame
+			if(!inputEvent.isConsumed())	//if the input has still not been consumed
+			{
+				final InputStrategy inputStrategy=getInputStrategy();	//get our input strategy, if any
+				if(inputStrategy!=null)	//if we have an input strategy
+				{
+					return inputStrategy.input(input);	//send the input to the input strategy and return whether it was consumed
+				}
+			}
+		}
+		return true;	//indicate that the event was consumed
+	}
+
+	/**Creates an input event for the given input.
+	@param input The input to process.
+	@return An event to represent the given input.
+	@exception NullPointerException if the given input is <code>null</code>.
+	@exception IllegalArgumentException if an unknown input type was given.
+	@see KeyInput
+	@see CommandInput
+	*/
+	protected InputEvent createInputEvent(final Input input)
+	{
+		final InputEvent inputEvent;	//create an input event from the input
+		if(input instanceof KeyInput)	//if this is key input
+		{
+			return new KeyPressEvent(this, (KeyInput)input);	//return a key press event
+		}
+		else if(input instanceof CommandInput)	//if this is command input
+		{
+			return new CommandEvent(this, (CommandInput)input);	//return a command event
+		}
+		else	//if we don't recognize the event
+		{
+			throw new IllegalArgumentException("Unrecognized input: "+input);
+		}
 	}
 
 	/**Logs the given session-related information with a default log level of {@link InformationLevel#LOG}.

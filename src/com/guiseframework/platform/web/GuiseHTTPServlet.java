@@ -91,6 +91,7 @@ import com.guiseframework.controller.*;
 import com.guiseframework.controller.text.xml.xhtml.*;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
+import com.guiseframework.input.Key;
 import com.guiseframework.model.FileItemResourceImport;
 import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.web.css.*;
@@ -1006,7 +1007,6 @@ Debug.trace("got control events");
 						}
 						else if(requestEvent instanceof InputEvent)	//if this is an input event
 						{
-Debug.trace("got input event; ready to dispatch");
 							guiseContext.setState(GuiseContext.State.PROCESS_EVENT);	//update the context state for processing an event
 							applicationFrame.dispatchInputEvent((InputEvent)requestEvent);	//tell the application frame to dispatch the input event
 							guiseContext.setState(GuiseContext.State.INACTIVE);	//deactivate the context so that any model update events will be generated
@@ -1185,7 +1185,6 @@ Debug.trace("got input event; ready to dispatch");
 								guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "remove");	//<xhtml:remove>	//TODO use a constant TODO don't use the XHTML namespace if we can help it								
 								guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
 								guiseContext.writeAttribute(null, "id", frame.getID());	//TODO fix
-		//TODO del Debug.trace("Sending message to remove frame:", frame.getID());
 								guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "remove");	//</xhtml:remove>							
 							}
 						}
@@ -1572,6 +1571,7 @@ Debug.info("AJAX event:", eventName);
 						}
 						else if("keyPress".equals(eventName) || "keyRelease".equals(eventName))	//if this is a key event TODO use a constant
 						{
+Debug.trace("ready to parse a key event:", eventName);
 							final int code=Integer.parseInt(eventElement.getAttribute("code"));	//get the key code TODO use a constant
 							final Set<Key> keys=EnumSet.noneOf(Key.class);	//we'll find any keys that were pressed
 							if(Boolean.valueOf(eventElement.getAttribute("altKey")).booleanValue())	//if Alt was pressed TODO use a constant
@@ -1600,7 +1600,6 @@ Debug.info("AJAX event:", eventName);
 								throw new IllegalArgumentException("Unrecognized key event: "+eventName);
 							}
 							requestEventList.add(keyEvent);	//add the event to the list
-//TODO del Debug.trace("mouse event; targetXY:", targetX, targetY, "viewportXY:", viewportX, viewportY, "mouseXY:", mouseX, mouseY);
 						}
 						else if("mouseEnter".equals(eventName) || "mouseExit".equals(eventName))	//if this is a mouse event TODO use a constant
 						{

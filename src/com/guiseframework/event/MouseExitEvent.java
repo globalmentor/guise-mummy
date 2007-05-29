@@ -2,6 +2,7 @@ package com.guiseframework.event;
 
 import com.guiseframework.geometry.Point;
 import com.guiseframework.geometry.Rectangle;
+import com.guiseframework.input.Key;
 
 /**An event providing mouse information of a mouse exiting a target.
 @author Garret Wilson

@@ -482,6 +482,23 @@ if(typeof Node=="undefined")	//if no Node type is defined (e.g. IE), create one 
 	var Node={ELEMENT_NODE: 1, ATTRIBUTE_NODE: 2, TEXT_NODE: 3, CDATA_SECTION_NODE: 4, ENTITY_REFERENCE_NODE: 5, ENTITY_NODE: 6, PROCESSING_INSTRUCTION_NODE: 7, COMMENT_NODE: 8, DOCUMENT_NODE: 9, DOCUMENT_TYPE_NODE: 10, DOCUMENT_FRAGMENT_NODE: 11, NOTATION_NODE: 12};
 }
 
+//Array
+
+/**Creates a new function that functions exactly as does the original function,
+except that it provides the given variable to appear as "this" to the new function.
+@param newThis The variable to appear as "this" when the function is called.
+@return A new function bound to the given this.
+@see http://www.prototypejs.org/api/function/bind
+*/
+Function.prototype.bind=function(newThis)
+{
+	var originalFunction=this;	//save a reference to this function instance to allow calling this via closure
+	return function()	//create and send back a new function
+	{
+		originalFunction.apply(newThis, arguments);	//the new function will call the original function with whatever arguments are given, but using the given this instead of whatever this is passed when the function is called
+	};
+};
+
 //String
 
 /**Determines whether this string is in all lowercase.
@@ -568,7 +585,7 @@ String.prototype.splitSet=function(separator, limit)
 String.prototype.trim=function()
 {
 	return this.replace(/^\s+|\s+$/g, "");	//replace beginning and ending whitespace with nothing
-}
+};
 
 //StringBuilder
 
@@ -2028,6 +2045,7 @@ function HTTPCommunicator()
 			catch(e)
 			{
 //TODO fix---why does this occur?				alert("error loading content: "+e);
+			
 			}
 			if(!asynchronous)	//if we're communicating synchronously
 			{
@@ -2431,10 +2449,10 @@ function GuiseAJAX()
 		{
 			DOMUtilities.appendXMLStartTag(stringBuilder, ajaxMouseEvent.eventType,	//<mouseXXX>
 //TODO del alert("ready to append viewport info: "+this.RequestElement.VIEWPORT+" x: "+ajaxMouseEvent.viewportBounds.x+" y: "+ajaxMouseEvent.viewportBounds.y+" width: "+ajaxMouseEvent.viewportBounds.width+" height: "+ajaxMouseEvent.viewportBounds.height);
-					new Map(this.RequestElement.CODE, ajaxKeyEvent.code,	//code="code"
-							this.RequestElement.ALT_KEY, ajaxKeyEvent.altKey,	//altKey="altKey"
-							this.RequestElement.CONTROL_KEY, ajaxKeyEvent.controlKey,	//controlKey="controlKey"
-							this.RequestElement.SHIFT_KEY, ajaxKeyEvent.shiftKey));	//shiftKey="shiftKey"
+					new Map(this.RequestElement.CODE, ajaxMouseEvent.code,	//code="code"
+							this.RequestElement.ALT_KEY, ajaxMouseEvent.altKey,	//altKey="altKey"
+							this.RequestElement.CONTROL_KEY, ajaxMouseEvent.controlKey,	//controlKey="controlKey"
+							this.RequestElement.SHIFT_KEY, ajaxMouseEvent.shiftKey));	//shiftKey="shiftKey"
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.VIEWPORT,	//<viewport
 					new Map(this.RequestElement.X, ajaxMouseEvent.viewportBounds.x,	//x="viewportBounds.x"
 							this.RequestElement.Y, ajaxMouseEvent.viewportBounds.y,	//y="viewportBounds.y"
@@ -2524,9 +2542,10 @@ alert("we returned, at least");
 					{
 						status=xmlHTTP.status;	//get the status
 					}
-					catch(e)	//if there is a problem getting the status, don't do anything TODO fix this hack to get around Firefox problem when the form is submitted right before an AJAX request occurs; investigate turning off Enter-based submission, too
+					catch(e)	//if there is a problem getting the status, don't do anything; on Firefox, either the server went down (this would also happen if the form were to be submitted right before an AJAX request occurs or if an AJAX request were to be made during key event processing)
 					{
-						return;
+						thisGuiseAJAX.setEnabled(false);	//stop further AJAX communication
+						return;	//don't do further processing; the page is probably reloading, anyway
 					}
 					if(status==200)	//if everything went OK
 					{
@@ -2610,7 +2629,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 						var ajaxResponse=this.ajaxResponses.dequeue();	//get this response
 						var responseDocument=ajaxResponse.document;	//get this response document
 						var showBusy=isUserAgentIE6 ? ajaxResponse.size>5000 : ajaxResponse.size>20000;	//see if we should show a busy indicator
-//TODO del; testirng						var showBusy=ajaxResponse.size>100;	//TODO del; testing
+//TODO del; testing						var showBusy=ajaxResponse.size>100;	//TODO del; testing
 /*TODO salvage if needed
 						if(showBusy)	//if we should show a busy indicator
 						{
@@ -4600,7 +4619,7 @@ This implementation updates the modal layer.
 function onWindowResize(event)
 {
 	//TODO work around IE bug that stops calling onWindowResize after a couple of maximization/minimization cycles
-	window.setTimeout(function(){guise.updateModalLayer();}, 1);	//update the modal layer later, because during resize IE won't allow us to hide the modal layer and have the correct size update instantaneously; use closure to make sure the this variable is correctly passed to the function
+	window.setTimeout(guise.updateModalLayer.bind(guise), 1);	//update the modal layer later, because during resize IE won't allow us to hide the modal layer and have the correct size update instantaneously
 }
 
 /**Called when the window scrolls.
@@ -5117,7 +5136,7 @@ function onKey(event)
 					return;				
 			}
 			var ajaxRequest=new KeyAJAXEvent(eventType, keyCode, Boolean(event.altKey), Boolean(event.ctrlKey), Boolean(event.shiftKey));	//create a new AJAX key event
-			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+			window.setTimeout(function(){guiseAJAX.sendAJAXRequest(ajaxRequest);}, 1);	//send the AJAX request later; in Firefox 2.0.0.3, sending the request from within the key event will cause the AJAX response to disappear 
 		}
 		if(CANCELED_KEY_CODES.contains(keyCode))	//if this is a code to canceled
 		{
@@ -5575,8 +5594,7 @@ function MenuState()
 			{
 				clearTimeout(timeout);	//clear the timeout
 			}
-			var localThis=this;	//get a reference to this object to allow calling this via closure
-			this._closeTimeout=window.setTimeout(function(){localThis._closeMenus()}, 500);	//close the menu a split second later
+			this._closeTimeout=window.setTimeout(this._closeMenus.bind(this), 500);	//close the menu a split second later
 		};
 
 		/**Closes all menus immediately.*/

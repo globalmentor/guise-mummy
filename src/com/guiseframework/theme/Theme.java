@@ -226,6 +226,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_ACCESS_X=createStringResourceReference("theme.label.access.x");
 	public final static String LABEL_ADD=createStringResourceReference("theme.label.add");
 	public final static String LABEL_CANCEL=createStringResourceReference("theme.label.cancel");
+	public final static String LABEL_CLOSE=createStringResourceReference("theme.label.close");
 	public final static String LABEL_DELETE=createStringResourceReference("theme.label.delete");
 	public final static String LABEL_DELETE_X=createStringResourceReference("theme.label.delete.x");
 	public final static String LABEL_DOWNLOAD=createStringResourceReference("theme.label.download");
@@ -263,6 +264,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI GLYPH_BLANK=createURIResourceReference("theme.glyph.blank");
 	public final static URI GLYPH_BUSY=createURIResourceReference("theme.glyph.busy");
 	public final static URI GLYPH_CANCEL=createURIResourceReference("theme.glyph.cancel");
+	public final static URI GLYPH_CLOSE=createURIResourceReference("theme.glyph.close");
 	public final static URI GLYPH_DELETE=createURIResourceReference("theme.glyph.delete");
 	public final static URI GLYPH_DOCUMENT=createURIResourceReference("theme.glyph.document");
 	public final static URI GLYPH_DOCUMENT_CONTENT=createURIResourceReference("theme.glyph.document.content");

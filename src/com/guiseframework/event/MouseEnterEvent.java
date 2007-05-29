@@ -1,6 +1,7 @@
 package com.guiseframework.event;
 
 import com.guiseframework.geometry.*;
+import com.guiseframework.input.Key;
 
 /**An event providing mouse information of a mouse entering a target.
 @author Garret Wilson
