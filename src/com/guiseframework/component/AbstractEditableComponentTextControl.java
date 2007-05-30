@@ -6,16 +6,19 @@ import java.beans.PropertyVetoException;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
-import com.garretwilson.beans.GenericPropertyChangeEvent;
+import com.garretwilson.beans.*;
 import com.garretwilson.util.Debug;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
+import com.guiseframework.input.*;
 import com.guiseframework.prototype.*;
 import com.guiseframework.theme.Theme;
 
 /**Control that allows some component text property to be edited in-place.
 Editing can be started by calling {@link #setMode(AbstractEditableComponentTextControl.Mode)} with {@link Mode#EDIT}.
+<p>This class binds a single left mouse click input to {@link #getEditActionPrototype()},
+the command {@link ProcessCommand#CONTINUE} to {@link #getAcceptActionPrototype()},
+and the command {@link ProcessCommand#ABORT} to {@link #getRejectActionPrototype()}.</p>
 @param <EC> The type of component being edited.
 @author Garret Wilson
 */
@@ -243,6 +246,12 @@ Debug.trace("now edit control has value", editControl.getValue());
 					}
 				});		
 		update();	//update the component to initialize the child components and prototypes
+
+		final BindingInputStrategy bindingInputStrategy=new BindingInputStrategy(getInputStrategy());	//create a new input strategy based upon the current input strategy (if any)
+		bindingInputStrategy.bind(new MouseClickInput(MouseButton.LEFT, 1), editActionPrototype);	//map a single mouse click to the edit action prototype
+		bindingInputStrategy.bind(new CommandInput(ProcessCommand.ABORT), rejectActionPrototype);	//map the "abort" command to the reject action prototype
+		bindingInputStrategy.bind(new CommandInput(ProcessCommand.CONTINUE), acceptActionPrototype);	//map the "continue" command to the accept action prototype
+		setInputStrategy(bindingInputStrategy);	//switch to our new input strategy
 	}
 
 	/**Initiates editing.*/

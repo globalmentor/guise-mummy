@@ -880,7 +880,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	*/
 	public void dispatchInputEvent(final InputEvent inputEvent)
 	{
-Debug.trace("in component", this, "ready to do default dispatching of input event", inputEvent);		
+//TODO del Debug.trace("in component", this, "ready to do default dispatching of input event", inputEvent);		
 		if(!inputEvent.isConsumed())	//if the input has not been consumed
 		{
 //Debug.trace("event is not consumed; ready to fire it to listeners");
@@ -914,7 +914,7 @@ Debug.trace("in component", this, "ready to do default dispatching of input even
 	@exception NullPointerException if the given event is <code>null</code>.
 	@see InputEvent#isConsumed()
 	@see CommandEvent
-	@see KeyEvent
+	@see KeyboardEvent
 	@see MouseEvent
 	*/
 	public void fireInputEvent(final InputEvent inputEvent)
@@ -935,14 +935,14 @@ Debug.trace("in component", this, "ready to do default dispatching of input even
 				}
 			}
 		}
-		else if(inputEvent instanceof KeyEvent)	//if this is a key event
+		else if(inputEvent instanceof KeyboardEvent)	//if this is a keyboard event
 		{
 			if(hasKeyListeners())	//if there are key listeners registered
 			{
 				if(inputEvent instanceof KeyPressEvent)	//if this is a key press event
 				{
 					final KeyPressEvent keyPressEvent=new KeyPressEvent(this, (KeyPressEvent)inputEvent);	//create a new key event copy indicating that this component is the source
-					for(final KeyListener keyListener:getKeyListeners())	//for each key listener
+					for(final KeyboardListener keyListener:getKeyListeners())	//for each key listener
 					{
 						if(keyPressEvent.isConsumed())	//if the event copy has been consumed
 						{
@@ -955,7 +955,7 @@ Debug.trace("in component", this, "ready to do default dispatching of input even
 				if(inputEvent instanceof KeyReleaseEvent)	//if this is a key release event
 				{
 					final KeyReleaseEvent keyReleaseEvent=new KeyReleaseEvent(this, (KeyReleaseEvent)inputEvent);	//create a new key event copy indicating that this component is the source
-					for(final KeyListener keyListener:getKeyListeners())	//for each key listener
+					for(final KeyboardListener keyListener:getKeyListeners())	//for each key listener
 					{
 						if(keyReleaseEvent.isConsumed())	//if the event copy has been consumed
 						{
@@ -971,7 +971,20 @@ Debug.trace("in component", this, "ready to do default dispatching of input even
 		{
 			if(hasMouseListeners())	//if there are mouse listeners registered
 			{
-				if(inputEvent instanceof MouseEnterEvent)	//if this is a mouse enter event
+				if(inputEvent instanceof MouseClickEvent)	//if this is a mouse click event
+				{
+					final MouseClickEvent mouseClickEvent=new MouseClickEvent(this, (MouseClickEvent)inputEvent);	//create a new mouse event copy indicating that this component is the source
+					for(final MouseListener mouseListener:getMouseListeners())	//for each mouse listener
+					{
+						if(mouseClickEvent.isConsumed())	//if the event copy has been consumed
+						{
+							inputEvent.consume();	//consume the original event
+							return;	//stop further processing
+						}
+						mouseListener.mouseClicked(mouseClickEvent);	//fire the mouse event
+					}
+				}
+				else if(inputEvent instanceof MouseEnterEvent)	//if this is a mouse enter event
 				{
 					final MouseEnterEvent mouseEnterEvent=new MouseEnterEvent(this, (MouseEnterEvent)inputEvent);	//create a new mouse event copy indicating that this component is the source
 					for(final MouseListener mouseListener:getMouseListeners())	//for each mouse listener
@@ -1066,29 +1079,29 @@ Debug.trace("in component", this, "ready to do default dispatching of input even
 	/**Adds a key listener.
 	@param keyListener The key listener to add.
 	*/
-	public void addKeyListener(final KeyListener keyListener)
+	public void addKeyListener(final KeyboardListener keyListener)
 	{
-		getEventListenerManager().add(KeyListener.class, keyListener);	//add the listener
+		getEventListenerManager().add(KeyboardListener.class, keyListener);	//add the listener
 	}
 
 	/**Removes a key listener.
 	@param keyListener The key listener to remove.
 	*/
-	public void removeKeyListener(final KeyListener keyListener)
+	public void removeKeyListener(final KeyboardListener keyListener)
 	{
-		getEventListenerManager().remove(KeyListener.class, keyListener);	//remove the listener
+		getEventListenerManager().remove(KeyboardListener.class, keyListener);	//remove the listener
 	}
 
 	/**@return <code>true</code> if there is one or more key listeners registered.*/
 	public boolean hasKeyListeners()
 	{
-		return getEventListenerManager().hasListeners(KeyListener.class);	//return whether there are key listeners registered
+		return getEventListenerManager().hasListeners(KeyboardListener.class);	//return whether there are key listeners registered
 	}
 
 	/**@return all registered key listeners.*/
-	protected Iterable<KeyListener> getKeyListeners()
+	protected Iterable<KeyboardListener> getKeyListeners()
 	{
-		return getEventListenerManager().getListeners(KeyListener.class);	//return the registered listeners
+		return getEventListenerManager().getListeners(KeyboardListener.class);	//return the registered listeners
 	}
 	
 	/**Adds a mouse listener.
@@ -1396,7 +1409,7 @@ Debug.trace("in component", this, "ready to do default dispatching of input even
 	@param <S> The type of component for which this object is to control flyovers.
 	@author Garret Wilson
 	*/
-	public static abstract class AbstractFlyoverStrategy<S extends Component<?>> implements FlyoverStrategy<S>
+	public static abstract class AbstractFlyoverStrategy<S extends Component<?>> extends MouseAdapter implements FlyoverStrategy<S>
 	{
 		/**The component for which this object will control flyovers.*/
 		private final S component;

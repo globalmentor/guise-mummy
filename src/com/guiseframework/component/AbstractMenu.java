@@ -149,7 +149,7 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 						fireActionPerformed(1, 0);	//fire an action with this component as the source
 					}
 				});
-		addMouseListener(new MouseListener()	//listen for the mouse over the menu
+		addMouseListener(new MouseAdapter()	//listen for the mouse over the menu
 				{
 					/**Called when the mouse enters the target.
 					@param mouseEvent The event providing mouse information

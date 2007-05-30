@@ -6,7 +6,7 @@ import com.guiseframework.geometry.*;
 /**An event providing mouse information.
 @author Garret Wilson
 */
-public interface MouseEvent extends InputEvent, TargetedEvent
+public interface MouseEvent extends GestureInputEvent, TargetedEvent
 {
 
 	/**@return The absolute bounds of the event target.*/

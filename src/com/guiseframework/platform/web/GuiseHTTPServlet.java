@@ -1595,7 +1595,7 @@ Debug.info("AJAX event:", eventName);
 							{
 								keys.add(Key.SHIFT_LEFT);	//note the Shift key
 							}							
-							final KeyEvent keyEvent;
+							final KeyboardEvent keyEvent;
 							if("keyPress".equals(eventName))	//if this is a key press event TODO use a constant
 							{
 								keyEvent=new KeyPressEvent(guiseContext, KeyCode.valueOf(code).getKey(), keys.toArray(new Key[keys.size()]));	//create a new key press event
@@ -1610,7 +1610,7 @@ Debug.info("AJAX event:", eventName);
 							}
 							requestEventList.add(keyEvent);	//add the event to the list
 						}
-						else if("mouseEnter".equals(eventName) || "mouseExit".equals(eventName))	//if this is a mouse event TODO use a constant
+						else if("mouseClick".equals(eventName) || "mouseEnter".equals(eventName) || "mouseExit".equals(eventName))	//if this is a mouse event TODO use a constant
 						{
 							final Node componentNode=XPath.getNode(eventNode, AJAX_REQUEST_COMPONENT_XPATH_EXPRESSION);	//get the component node
 							final String componentID=((Element)componentNode).getAttribute("id");	//TODO tidy; improve; comment
@@ -1656,7 +1656,17 @@ Debug.info("AJAX event:", eventName);
 								if(component!=null)	//if there is a target component
 								{
 									final MouseEvent mouseEvent;
-									if("mouseEnter".equals(eventName))	//if this is a mouse enter event TODO use a constant
+									if("mouseClick".equals(eventName))	//if this is a mouse click event TODO use a constant
+									{
+										final int buttonCode=Integer.parseInt(eventElement.getAttribute("button"));	//get the button code TODO use a constant
+										final int clickCount=Integer.parseInt(eventElement.getAttribute("clickCount"));	//get the click count TODO use a constant
+										mouseEvent=new MouseClickEvent(guiseContext, component, new Rectangle(componentX, componentY, componentWidth, componentHeight),
+												new Rectangle(viewportX, viewportY, viewportWidth, viewportHeight),
+												new Point(mouseX, mouseY),
+												Button.valueOf(buttonCode).getMouseButton(), clickCount,
+												keys.toArray(new Key[keys.size()]));	//create a new mouse enter event
+									}
+									else if("mouseEnter".equals(eventName))	//if this is a mouse enter event TODO use a constant
 									{
 										mouseEvent=new MouseEnterEvent(guiseContext, component, new Rectangle(componentX, componentY, componentWidth, componentHeight),
 												new Rectangle(viewportX, viewportY, viewportWidth, viewportHeight),

@@ -1580,19 +1580,24 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@return An event to represent the given input.
 	@exception NullPointerException if the given input is <code>null</code>.
 	@exception IllegalArgumentException if an unknown input type was given.
-	@see KeyInput
 	@see CommandInput
+	@see KeystrokeInput
+	@see MouseClickInput
 	*/
 	protected InputEvent createInputEvent(final Input input)
 	{
 		final InputEvent inputEvent;	//create an input event from the input
-		if(input instanceof KeyInput)	//if this is key input
-		{
-			return new KeyPressEvent(this, (KeyInput)input);	//return a key press event
-		}
-		else if(input instanceof CommandInput)	//if this is command input
+		if(input instanceof CommandInput)	//if this is command input
 		{
 			return new CommandEvent(this, (CommandInput)input);	//return a command event
+		}
+		else if(input instanceof KeystrokeInput)	//if this is keystroke input
+		{
+			return new KeyPressEvent(this, (KeystrokeInput)input);	//return a key press event
+		}
+		else if(input instanceof MouseClickInput)	//if this is mouse click input
+		{
+			return new MouseClickEvent(this, (MouseClickInput)input);	//return a mouse click event
 		}
 		else	//if we don't recognize the event
 		{

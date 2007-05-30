@@ -6,9 +6,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.guiseframework.Guise;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.model.ActionModel;
+import com.guiseframework.model.Enableable;
 
 /**An input strategy based upon input bindings between input and other input or actions.
-Typical uses include binding {@link CommandInput} to {@link KeyInput}, or binding an {@link ActionModel} to {@link CommandInput}. 
+Typical uses include binding {@link CommandInput} to {@link KeystrokeInput}, or binding an {@link ActionModel} to {@link CommandInput}. 
 There must be a {@link GuiseSession} in effect when this {@link #input(Input)} is called for this input strategy.
 @author Garret Wilson
 */
@@ -19,7 +20,7 @@ public class BindingInputStrategy extends AbstractInputStrategy
 	private final Map<Input, Object> bindings=new ConcurrentHashMap<Input, Object>();
 
 	/**Indicates whether the given input is bound.
-	@param input The input that may be bound, such as {@link KeyInput} or {@link CommandInput}.
+	@param input The input that may be bound, such as {@link KeystrokeInput} or {@link CommandInput}.
 	@return <code>true</code> if a binding exists for the given input, else <code>false</code>.
 	*/
 	public boolean isBound(final Input input)
@@ -29,7 +30,7 @@ public class BindingInputStrategy extends AbstractInputStrategy
 
 	/**Binds the given input to other input.
 	If the given input is already bound, the old binding will be replaced.
-	@param input The input to be bound, such as {@link KeyInput}.
+	@param input The input to be bound, such as {@link KeystrokeInput}.
 	@param targetInput The target input, such as {@link CommandInput}.
 	*/
 	public void bind(final Input input, final Input targetInput)
@@ -74,6 +75,7 @@ public class BindingInputStrategy extends AbstractInputStrategy
 	If the input is not consumed by this input strategy, it is sent to the parent input strategy, if any, for processing.
 	If input is bound to the given input, the input is delegated to {@link GuiseSession#input(Input)} and considered to be consumed.
 	If an action is bound to the given input, the action is performed and the input is considered to be consumed.
+	If a bound action implements {@link Enableable} and is not enabled, the action is not performed and the input is not considered to be consumed.
 	@param input The input to process.
 	@return <code>true</code> if the input was consumed and should not be processed further.
 	@exception NullPointerException if the given input is <code>null</code>.
@@ -91,7 +93,12 @@ public class BindingInputStrategy extends AbstractInputStrategy
 			}
 			else if(targetObject instanceof ActionModel)	//if the target is an action
 			{
-				((ActionModel)targetObject).performAction();	//perform the action
+				final ActionModel actionModel=((ActionModel)targetObject);	//get the action model
+				if(actionModel instanceof Enableable && !((Enableable)actionModel).isEnabled())	//if the action model is enableable but not enabled
+				{
+					return false;	//don't perform the action or consume the input
+				}
+				actionModel.performAction();	//perform the action
 			}
 			else	//if we don't recognize the target object, something's wrong, because we control everything that's stored in the map
 			{

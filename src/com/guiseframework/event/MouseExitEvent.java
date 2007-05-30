@@ -1,8 +1,7 @@
 package com.guiseframework.event;
 
-import com.guiseframework.geometry.Point;
-import com.guiseframework.geometry.Rectangle;
-import com.guiseframework.input.Key;
+import com.guiseframework.geometry.*;
+import com.guiseframework.input.*;
 
 /**An event providing mouse information of a mouse exiting a target.
 @author Garret Wilson
@@ -46,6 +45,12 @@ public class MouseExitEvent extends AbstractMouseEvent
 	public MouseExitEvent(final Object source, final MouseExitEvent mouseExitEvent)
 	{
 		this(source, mouseExitEvent.getTarget(), mouseExitEvent.getTargetBounds(), mouseExitEvent.getViewportBounds(), mouseExitEvent.getMousePosition(), mouseExitEvent.getKeys().toArray(new Key[mouseExitEvent.getKeys().size()]));	//construct the class with the same target		
+	}
+
+	/**@return The input associated with this event, or <code>null</code> if there is no input associated with this event.*/
+	public MouseInput getInput()
+	{
+		return null;	//TODO implement mouse exit input
 	}
 
 }

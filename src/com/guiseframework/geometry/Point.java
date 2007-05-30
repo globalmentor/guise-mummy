@@ -9,6 +9,9 @@ import com.garretwilson.lang.ObjectUtilities;
 public class Point
 {
 
+	/**A predefined point with zero coordinates.*/
+	public final static Point ORIGIN_POINT=new Point(0, 0);
+	
 	/**The X coordinate.*/
 	private final Extent x;
 

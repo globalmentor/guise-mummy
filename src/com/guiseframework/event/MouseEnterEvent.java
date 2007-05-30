@@ -1,7 +1,7 @@
 package com.guiseframework.event;
 
 import com.guiseframework.geometry.*;
-import com.guiseframework.input.Key;
+import com.guiseframework.input.*;
 
 /**An event providing mouse information of a mouse entering a target.
 @author Garret Wilson
@@ -45,6 +45,12 @@ public class MouseEnterEvent extends AbstractMouseEvent
 	public MouseEnterEvent(final Object source, final MouseEnterEvent mouseEnterEvent)
 	{
 		this(source, mouseEnterEvent.getTarget(), mouseEnterEvent.getTargetBounds(), mouseEnterEvent.getViewportBounds(), mouseEnterEvent.getMousePosition(), mouseEnterEvent.getKeys().toArray(new Key[mouseEnterEvent.getKeys().size()]));	//construct the class with the same target		
+	}
+
+	/**@return The input associated with this event, or <code>null</code> if there is no input associated with this event.*/
+	public MouseInput getInput()
+	{
+		return null;	//TODO implement mouse enter input
 	}
 
 }

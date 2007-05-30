@@ -10,6 +10,9 @@ import com.garretwilson.lang.ObjectUtilities;
 public class Rectangle
 {
 
+	/**A predefined rectangle with zero size on the zero plane.*/
+	public final static Rectangle EMPTY_RECTANGLE=new Rectangle(0, 0, 0, 0);
+
 	/**The position of the upper-left corner of the rectangle.*/
 	private final Point position;
 

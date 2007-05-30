@@ -1,11 +1,12 @@
 package com.guiseframework.input;
 
 import com.garretwilson.lang.ObjectUtilities;
+import static com.garretwilson.lang.ObjectUtilities.*;
 
-/**An encapsulation of keyboard input.
+/**An encapsulation of key stroke input.
 @author Garret Wilson
 */
-public class KeyInput extends AbstractGestureInput
+public class KeystrokeInput extends AbstractGestureInput implements KeyboardInput
 {
 
 	/**The key that was pressed.*/
@@ -17,12 +18,12 @@ public class KeyInput extends AbstractGestureInput
 	/**Key and keys constructor.
 	@parma key The key that was pressed.
 	@param keys The keys that were pressed when this input occurred.
-	@exception NullPointerException if the given keys is <code>null</code>.
+	@exception NullPointerException if the given key and/or keys is <code>null</code>.
 	*/
-	public KeyInput(final Key key, final Key... keys)
+	public KeystrokeInput(final Key key, final Key... keys)
 	{
 		super(keys);	//construct the parent class
-		this.key=key;	//save the key
+		this.key=checkInstance(key, "Key cannot be null.");	//save the key
 	}
 
 	/**Returns the hash code of this object.
@@ -41,10 +42,10 @@ public class KeyInput extends AbstractGestureInput
 	*/
 	public boolean equals(final Object object)
 	{
-		return super.equals(object) && getKey()==((KeyInput)object).getKey();	//if the default checks pass, the object is key input; compare keys
+		return super.equals(object) && getKey()==((KeystrokeInput)object).getKey();	//if the default checks pass, the object is of the correct type; compare keys
 	}
 
-	/**@return A string representation of this hash object.*/
+	/**@return A string representation of this object.*/
 	public String toString()
 	{
 		return getKey().toString()+' '+super.toString();	//add the key representation to the string

@@ -410,12 +410,12 @@ public interface Component<C extends Component<C>> extends UIModel, LabelModel
 	/**Adds a key listener.
 	@param keyListener The key listener to add.
 	*/
-	public void addKeyListener(final KeyListener keyListener);
+	public void addKeyListener(final KeyboardListener keyListener);
 
 	/**Removes a key listener.
 	@param keyListener The key listener to remove.
 	*/
-	public void removeKeyListener(final KeyListener keyListener);
+	public void removeKeyListener(final KeyboardListener keyListener);
 
 	/**@return <code>true</code> if there is one or more key listeners registered.*/
 	public boolean hasKeyListeners();

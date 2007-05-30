@@ -3,10 +3,9 @@ package com.guiseframework.event;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.guiseframework.geometry.*;
-import com.guiseframework.input.GestureInput;
 import com.guiseframework.input.Key;
 
-/**An abstract event providing mouse information.
+/**An abstract event providing mouse input information.
 @author Garret Wilson
 */
 public abstract class AbstractMouseEvent extends AbstractGestureInputEvent implements MouseEvent
@@ -55,12 +54,6 @@ public abstract class AbstractMouseEvent extends AbstractGestureInputEvent imple
 		this.targetBounds=checkInstance(targetBounds, "Target bounds cannot be null");
 		this.viewportBounds=checkInstance(viewportBounds, "Viewport bounds cannot be null");
 		this.mousePosition=checkInstance(mousePosition, "Mouse position cannot be null");
-	}
-
-	/**@return The input associated with this event, or <code>null</code> if there is no input associated with this event.*/
-	public GestureInput getInput()
-	{
-		return null;	//TODO implement mouse input
 	}
 
 }

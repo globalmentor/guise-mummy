@@ -56,15 +56,18 @@ navigator.userAgentVersionNumber The version of the user agent stored as a numbe
 			controlKey="true|false"	<!--whether the Control key was pressed-->
 			shiftKey="true|false"	<!--whether the Shift key was pressed-->
 		/>
-		<mouseEnter|mouseExit	<!--a mouse event related to a component-->
+		<mouseEnter|mouseExit|mouseClick	<!--a mouse event related to a component-->
 			altKey="true|false"	<!--whether the Alt key was pressed-->
 			controlKey="true|false"	<!--whether the Control key was pressed-->
-			shiftKey="true|false">	<!--whether the Shift key was pressed-->
+			shiftKey="true|false"	<!--whether the Shift key was pressed-->
+			button="buttonCode"	<!--the code of the button that was clicked, or -1 if no button was clicked-->
+			clickCount="clickCount"	<!--the number of clicks, such as 1 for single click or 2 for double click, or 0 if no button was clicked-->
+		>
 			<viewport x="" y="" width="" height=""/>	<!--information on the viewport (scroll position and size)-->
 			<component id="" x="" y="" width="" height=""/>	<!--information on the component that was the target of the mouse event (in absolute terms)-->
 			<target id="" x="" y="" width="" height=""/>	<!--information on the element that was the target of the mouse event (in absolute terms)-->
 			<mouse x="" y=""/>	<!--the mouse information at the time of the drop (in fixed terms)-->
-		</mouseEnter|mouseExit>
+		</mouseEnter|mouseExit|mouseClick>
 	</events>
 </request>
 */
@@ -144,6 +147,53 @@ var GUISE_STATE_ATTRIBUTE_PREFIX="guiseState";
 var GUISE_STATE_WIDTH_ATTRIBUTE=GUISE_STATE_ATTRIBUTE_PREFIX+"Width";
 /**The state attribute for height.*/
 var GUISE_STATE_HEIGHT_ATTRIBUTE=GUISE_STATE_ATTRIBUTE_PREFIX+"Height";
+
+/**Key codes.
+@see http://www.quirksmode.org/js/keys.html
+@see http://www.quirksmode.org/dom/w3c_events.html
+*/
+var KEY_CODE=
+{
+	ALT: 18,
+	BACKSPACE: 8,
+	CONTROL: 17,
+	DELETE: 46,
+	DOWN: 40,
+	END: 35,
+	ENTER: 13,
+	ESCAPE: 27,
+	F1: 112,
+	F2: 113,
+	F3: 114,
+	F4: 115,
+	F5: 116,
+	F6: 117,
+	F7: 118,
+	F8: 119,
+	F9: 120,
+	F10: 121,
+	F11: 122,
+	F12: 123,
+	HOME: 36,
+	LEFT: 37,
+	PAGE_UP: 33,
+	PAGE_DOWN: 34,
+	RIGHT: 39,
+	SHIFT: 16,
+	TAB: 9,	
+	UP: 38
+};
+
+/**Mouse buttons as defined by the W3C and as normalized here.
+@see http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-MouseEvent
+@see http://www.quirksmode.org/dom/w3c_events.html
+*/
+var MOUSE_BUTTON=
+{
+	LEFT: 0,
+	MIDDLE: 1,
+	RIGHT: 2
+};
 
 /**The enumeration of recognized styles.*/
 var STYLES=
@@ -1880,6 +1930,8 @@ KeyAJAXEvent.EventType={PRESS: "keyPress", RELEASE: "keyRelease"};
 @param altKey: Whether the Alt key was pressed.
 @param controlKey: Whether the Control key was pressed.
 @param shiftKey: Whether the Shift key was pressed.
+@param button: The optional W3C code for the button that was clicked (defaults to -1).
+@param clickCount: The optional number of clicks, such as 1 for single click or 2 for double-click (defaults to 0).
 var eventType: The type of mouse event; one of MouseAJAXEvent.EventType.
 var componentID: The ID of the target component.
 var componentBounds: The rectangle of the component.
@@ -1890,8 +1942,10 @@ var mousePosition: The position of the mouse relative to the viewport.
 var altKey: Whether the Alt key was pressed.
 var controlKey: Whether the Control key was pressed.
 var shiftKey: Whether the Shift key was pressed.
+@param button: The W3C code for the button that was clicked, or -1 if no button was clicked.
+@param clickCount: The number of clicks, such as 1 for single click or 2 for double-click, or 0 if no button was clicked.
 */
-function MouseAJAXEvent(eventType, component, target, x, y, altKey, controlKey, shiftKey)
+function MouseAJAXEvent(eventType, component, target, x, y, altKey, controlKey, shiftKey, button, clickCount)
 {
 	this.eventType=eventType;	//save the event type
 	this.componentID=component.id;	//save the component ID
@@ -1903,10 +1957,12 @@ function MouseAJAXEvent(eventType, component, target, x, y, altKey, controlKey, 
 	this.altKey=altKey;	//save the key modifiers
 	this.controlKey=controlKey;
 	this.shiftKey=shiftKey;
+	this.button=typeof button!="undefined" ? button : -1;	//save the button, or -1 if no button was given
+	this.clickCount=clickCount||0;	//save the click count, or 0 if no button wasl clicked
 }
 
 /**The available types of mouse events.*/
-MouseAJAXEvent.EventType={ENTER: "mouseEnter", EXIT: "mouseExit"};
+MouseAJAXEvent.EventType={CLICK: "mouseClick", ENTER: "mouseEnter", EXIT: "mouseExit"};
 
 //AJAX Response
 
@@ -2157,7 +2213,7 @@ function GuiseAJAX()
 					DROP: "drop", SOURCE: "source", TARGET: "target", VIEWPORT: "viewport",
 					FOCUS: "focus",
 					CODE: "code", ALT_KEY: "altKey", CONTROL_KEY: "controlKey", SHIFT_KEY: "shiftKey",
-					MOUSE: "mouse", ID: "id", X: "x", Y: "y", WIDTH: "width", HEIGHT: "height",
+					MOUSE: "mouse", ID: "id", X: "x", Y: "y", WIDTH: "width", HEIGHT: "height", BUTTON: "button", CLICK_COUNT: "clickCount",
 					INIT: "init",
 					PING: "ping"
 				};
@@ -2484,7 +2540,9 @@ function GuiseAJAX()
 					new Map(this.RequestElement.CODE, ajaxMouseEvent.code,	//code="code"
 							this.RequestElement.ALT_KEY, ajaxMouseEvent.altKey,	//altKey="altKey"
 							this.RequestElement.CONTROL_KEY, ajaxMouseEvent.controlKey,	//controlKey="controlKey"
-							this.RequestElement.SHIFT_KEY, ajaxMouseEvent.shiftKey));	//shiftKey="shiftKey"
+							this.RequestElement.SHIFT_KEY, ajaxMouseEvent.shiftKey,	//shiftKey="shiftKey"
+							this.RequestElement.BUTTON, ajaxMouseEvent.button,	//button="button"
+							this.RequestElement.CLICK_COUNT, ajaxMouseEvent.clickCount));	//clickCount="clickCount"
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.VIEWPORT,	//<viewport
 					new Map(this.RequestElement.X, ajaxMouseEvent.viewportBounds.x,	//x="viewportBounds.x"
 							this.RequestElement.Y, ajaxMouseEvent.viewportBounds.y,	//y="viewportBounds.y"
@@ -2610,8 +2668,8 @@ alert("we returned, at least");
 				{
 					//TODO log a warning
 alert(exception);
-alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
-					this.setEnabled(false);	//stop further AJAX communication
+alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(thisGuiseAJAX.isEnabled()));
+					thisGuiseAJAX.setEnabled(false);	//stop further AJAX communication
 					throw exception;	//TODO testing
 				}
 			};
@@ -4102,6 +4160,27 @@ function EventListener(currentTarget, eventType, fn, useCapture, createDecorator
 							};
 				}
 			}
+/*TODO this doesn't seem to be possible; IE doesn't let use change event.button
+			if(isUserAgentIE)	//if this is an IE browser, change the event button to match the W3C's definition; see http://www.quirksmode.org/dom/w3c_events.html
+			{
+				var button=event.button;	//get the button pressed
+				if(typeof button!="undefined")	//if there is a button variable
+				{
+					if(button&1)	//if this was the left button
+					{
+						event.button=MOUSE_BUTTON.LEFT;
+					}
+					else if(button&2)	//if this was the right button
+					{
+						event.button=MOUSE_BUTTON.RIGHT;
+					}
+					else if(button&4)	//if this was the middle button
+					{
+						event.button=MOUSE_BUTTON.MIDDLE;
+					}
+				}
+			}
+*/
 			//TODO update clientX and clientY as per _DHTML Utopia_ page 90.
 			switch(event.type)	//for special types of events
 			{
@@ -4593,6 +4672,7 @@ function onWindowLoad()
 		eventManager.addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
 		eventManager.addEvent(document.documentElement, "keydown", onKey, false);	//listen for key down anywhere in the document so that we can send key events back to the server (IE doesn't work correctly with key events registered on the window or document)
 		eventManager.addEvent(document.documentElement, "keyup", onKey, false);	//listen for key up anywhere in the document so that we can send key events back to the server (IE doesn't work correctly with key events registered on the window or document)
+		eventManager.addEvent(document.documentElement, "click", onClick, false);	//listen for mouse clicks bubbling up from anywhere (that we haven't dealt with specifically and canceled) in the document so that we can report clicks back to the server
 		guise.onDocumentLoad();	//create and update the modal layer
 		guiseAJAX.sendAJAXRequest(new InitAJAXEvent());	//send an initialization AJAX request	
 	//TODO del	alert("compatibility mode: "+document.compatMode);
@@ -4700,7 +4780,7 @@ function initializeNode(node, deep, initialInitialization)
 							if(!node.getAttribute("target"))	//if the link has no target (the target wouldn't work if we tried to take over the events; we can't just check for null because IE will always send back at least "")
 							{
 								eventManager.addEvent(node, "click", onLinkClick, false);	//listen for anchor clicks
-								if(isSafari)	//if this is Safari TODO fix better
+								if(isSafari)	//if this is Safari TODO fix better; this may have been fixed in Safari 2.0.4; see http://developer.yahoo.com/yui/docs/YAHOO.util.Event.html
 								{
 									node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
 								}
@@ -4799,6 +4879,7 @@ function initializeNode(node, deep, initialInitialization)
 						break;
 					case "textarea":
 						eventManager.addEvent(node, "change", onTextInputChange, false);
+						eventManager.addEvent(node, "keydown", onTextInputKeyDown, false);	//commit the text area on Enter TODO decide whether we want real-time checking with onTextInpuKeyUp, which would be very expensive for text areas
 						break;
 				}
 				for(var i=elementClassNames.length-1; i>=0; --i)	//for each class name
@@ -4950,7 +5031,7 @@ var lastFocusedNode=null;
 */
 function onFocus(event)
 {
-	var target=event.target;	//get the control receiving the focus
+	var target=event.target;	//get the element receiving the focus
 	if(target!=lastFocusedNode)	//if the focus is really changing (Firefox seems to send multiple focus events for some elements, such as buttons)
 	{
 		if(guise.modalFrame!=null)	//if there is a modal frame
@@ -5003,7 +5084,6 @@ function onFocus(event)
 			}
 		}
 	}
-//TODO see if variable check fixes things	event.stopPropagation();	//tell the event to stop bubbling, because on Firefox, the event will bubble, but only in some circumstances; here we
 }
 
 /**Called when a key is pressed in a text input.
@@ -5032,42 +5112,6 @@ function onTextInputKeyPress(event)
 	}
 }
 */
-
-/**Key codes.
-@see http://www.quirksmode.org/js/keys.html
-@see http://www.quirksmode.org/dom/w3c_events.html
-*/
-var KEY_CODE=
-{
-	ALT: 18,
-	BACKSPACE: 8,
-	CONTROL: 17,
-	DELETE: 46,
-	DOWN: 40,
-	END: 35,
-	ENTER: 13,
-	ESCAPE: 27,
-	F1: 112,
-	F2: 113,
-	F3: 114,
-	F4: 115,
-	F5: 116,
-	F6: 117,
-	F7: 118,
-	F8: 119,
-	F9: 120,
-	F10: 121,
-	F11: 122,
-	F12: 123,
-	HOME: 36,
-	LEFT: 37,
-	PAGE_UP: 33,
-	PAGE_DOWN: 34,
-	RIGHT: 39,
-	SHIFT: 16,
-	TAB: 9,	
-	UP: 38
-};
 
 /**The key codes that are recognized globally and sent to the server as key events.*/
 var REPORTED_KEY_CODES=[KEY_CODE.ENTER, KEY_CODE.ESCAPE];
@@ -5511,6 +5555,54 @@ function onCheckInputChange(event)
 		}
 	}
 */
+}
+
+/**Called when the mouse clicks any element.
+The event will be reported to the server using a MouseAJAXEvent of type MouseAJAXEvent.EventType.CLICK.
+@param event The object describing the event.
+*/
+function onClick(event)
+{
+	var target=event.target;	//get the element being clicked 
+	if(target.nodeType==Node.ELEMENT_NODE)	//if the event occurred on an element
+	{
+		var targetNodeName=target.nodeName.toLowerCase();	//get the name of the target
+		if(targetNodeName=="input" && target.type=="file")	//if a file input was clicked
+		{
+			return;	//let the browser handle mouse clicks on a file input TODO add checks for other things			
+		}
+	}
+	var component=DOMUtilities.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element
+	if(component)	//if there is a component
+	{
+		var componentID=component.id;	//get the component ID
+		if(componentID)	//if there is a component ID
+		{
+			if(guiseAJAX.isEnabled())	//if AJAX is enabled
+			{
+				var button=event.button;	//get the button pressed
+				if(isUserAgentIE)	//if this is an IE browser, change the event button to match the W3C's definition; see http://www.quirksmode.org/dom/w3c_events.html
+				{
+					if(button&1)	//if this was the left button
+					{
+						button=MOUSE_BUTTON.LEFT;
+					}
+					else if(button&2)	//if this was the right button
+					{
+						button=MOUSE_BUTTON.RIGHT;
+					}
+					else if(button&4)	//if this was the middle button
+					{
+						button=MOUSE_BUTTON.MIDDLE;
+					}
+				}
+				var ajaxRequest=new MouseAJAXEvent(MouseAJAXEvent.EventType.CLICK, component, target, event.clientX, event.clientY, Boolean(event.altKey), Boolean(event.ctrlKey), Boolean(event.shiftKey), button, 1);	//create a new AJAX mouse event
+				guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+				event.stopPropagation();	//tell the event to stop bubbling
+				event.preventDefault();	//prevent the default functionality from occurring
+			}
+		}
+	}
 }
 
 /**Called when a select control changes.

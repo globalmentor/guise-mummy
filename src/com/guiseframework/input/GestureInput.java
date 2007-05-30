@@ -2,7 +2,6 @@ package com.guiseframework.input;
 
 import java.util.Set;
 
-
 /**An encapsulation of user input from a gesture.
 @author Garret Wilson
 */

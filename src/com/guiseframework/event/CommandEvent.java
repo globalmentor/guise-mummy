@@ -31,7 +31,7 @@ public class CommandEvent extends AbstractFocusedInputEvent
 	/**Command input constructor.
 	@param source The object on which the event initially occurred.
 	@param commandInput The command input the properties of which will be copied.
-	@exception NullPointerException if the given source and/or command input is <code>null</code>.
+	@exception NullPointerException if the given source and/or input is <code>null</code>.
 	*/
 	public CommandEvent(final Object source, final CommandInput commandInput)
 	{

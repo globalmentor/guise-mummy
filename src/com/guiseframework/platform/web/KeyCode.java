@@ -7,7 +7,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.guiseframework.input.Key;
 
-/**A key on a keyboard as reported by a browser's Event.keyCode.
+/**A key on a keyboard as reported by a browser's Event.keyCode property.
 @author Garret Wilson
 */
 public enum KeyCode
@@ -53,7 +53,7 @@ public enum KeyCode
 		/**@return The key this key code represents.*/
 		public Key getKey() {return key;} 
 
-	/**Code constructor.
+	/**Code and key constructor.
 	@param code The code reported by the browser.
 	@param key The key this key code represents.
 	@exception NullPointerException if the given key is <code>null</code>.

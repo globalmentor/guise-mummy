@@ -1,19 +1,19 @@
 package com.guiseframework.event;
 
-/**An abstract key listener providing default method implementations.
+/**An object that listens for keyboard events.
 @author Garret Wilson
 */
-public abstract class KeyAdapter implements KeyListener
+public interface KeyboardListener extends GuiseEventListener
 {
 
 	/**Called when a key is pressed.
 	@param keyEvent The event providing key information
 	*/
-	public void keyPressed(final KeyPressEvent keyEvent) {}
+	public void keyPressed(final KeyPressEvent keyPressEvent);
 
 	/**Called when a key is released.
 	@param keyEvent The event providing key information
 	*/
-	public void keyReleased(final KeyReleaseEvent keyEvent) {}
+	public void keyReleased(final KeyReleaseEvent keyReleaseEvent);
 
 }

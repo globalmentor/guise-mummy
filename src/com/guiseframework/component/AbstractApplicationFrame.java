@@ -84,8 +84,8 @@ public abstract class AbstractApplicationFrame<C extends ApplicationFrame<C>> ex
 	{
 		super(component);	//construct the parent class
 		final BindingInputStrategy bindingInputStrategy=new BindingInputStrategy(getInputStrategy());	//create a new input strategy based upon the current input strategy (if any)
-		bindingInputStrategy.bind(new KeyInput(Key.ENTER), new CommandInput(ProcessCommand.CONTINUE));	//map the Enter key to the "continue" command
-		bindingInputStrategy.bind(new KeyInput(Key.ESCAPE), new CommandInput(ProcessCommand.ABORT));	//map the Escape key to the "abort" command
+		bindingInputStrategy.bind(new KeystrokeInput(Key.ENTER), new CommandInput(ProcessCommand.CONTINUE));	//map the Enter key to the "continue" command
+		bindingInputStrategy.bind(new KeystrokeInput(Key.ESCAPE), new CommandInput(ProcessCommand.ABORT));	//map the Escape key to the "abort" command
 		setInputStrategy(bindingInputStrategy);	//switch to our new input strategy
 	}
 
