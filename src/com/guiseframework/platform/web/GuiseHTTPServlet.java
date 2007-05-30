@@ -1569,9 +1569,18 @@ Debug.info("AJAX event:", eventName);
 							final DropControlEvent dropEvent=new DropControlEvent(guiseContext, dragSourceID, dropTargetID);	//create a new drop event
 							requestEventList.add(dropEvent);	//add the event to the list
 						}
+						else if("focus".equals(eventName))	//if this is a focus event TODO use a constant
+						{
+							final String componentID=eventElement.getAttribute("componentID");	//get the ID of the component TODO use a constant
+							if(componentID!=null)	//if there is a component ID TODO add better event handling, to throw an error and send back that error
+							{
+								final FocusControlEvent focusControlEvent=new FocusControlEvent(guiseContext, componentID);	//create a new focus control event
+								requestEventList.add(focusControlEvent);	//add the event to the list
+							}
+						}
 						else if("keyPress".equals(eventName) || "keyRelease".equals(eventName))	//if this is a key event TODO use a constant
 						{
-Debug.trace("ready to parse a key event:", eventName);
+//Debug.trace("ready to parse a key event:", eventName);
 							final int code=Integer.parseInt(eventElement.getAttribute("code"));	//get the key code TODO use a constant
 							final Set<Key> keys=EnumSet.noneOf(Key.class);	//we'll find any keys that were pressed
 							if(Boolean.valueOf(eventElement.getAttribute("altKey")).booleanValue())	//if Alt was pressed TODO use a constant

@@ -47,6 +47,9 @@ navigator.userAgentVersionNumber The version of the user agent stored as a numbe
 				<value></value>	<!--(zero or more) the new property; zero may signify null in some contexts--> 
 			</property>
 		</change>
+		<focus	<!--a focus change-->
+			componentID=""	<!--the ID of the component-->
+		/>
 		<keyPress|keyRelease	<!--a key pressed or released anywhere; currently only certain control keys are reported-->
 			code=""	<!--the code of the key pressed or released-->
 			altKey="true|false"	<!--whether the Alt key was pressed-->
@@ -1831,6 +1834,17 @@ function DropAJAXEvent(dragState, dragSource, dropTarget, event)
 	this.mousePosition=new Point(event.clientX, event.clientY);	//save the mouse position
 }
 
+//Focus AJAX Event
+
+/**A class encapsulating focus information for an AJAX request.
+@param componentID: The ID of the component receiving focus.
+var componentID: The ID of the component receiving focus.
+*/
+function FocusAJAXEvent(componentID)
+{
+	this.componentID=componentID;
+}
+
 //Key Down AJAX Event
 
 /**A class encapsulating key press or release information for an AJAX request.
@@ -2141,6 +2155,7 @@ function GuiseAJAX()
 					CHANGE: "action", PROPERTY: "property",
 					ACTION: "action", COMPONENT: "component", COMPONENT_ID: "componentID", TARGET_ID: "targetID", ACTION_ID: "actionID", OPTION: "option",
 					DROP: "drop", SOURCE: "source", TARGET: "target", VIEWPORT: "viewport",
+					FOCUS: "focus",
 					CODE: "code", ALT_KEY: "altKey", CONTROL_KEY: "controlKey", SHIFT_KEY: "shiftKey",
 					MOUSE: "mouse", ID: "id", X: "x", Y: "y", WIDTH: "width", HEIGHT: "height",
 					INIT: "init",
@@ -2296,6 +2311,10 @@ function GuiseAJAX()
 						{
 							this._appendDropAJAXEvent(requestStringBuilder, ajaxRequest);	//append the drop event
 						}
+						else if(ajaxRequest instanceof FocusAJAXEvent)	//if this is a focus event
+						{
+							this._appendFocusAJAXEvent(requestStringBuilder, ajaxRequest);	//append the focus event
+						}
 						else if(ajaxRequest instanceof KeyAJAXEvent)	//if this is a key event
 						{
 							this._appendKeyAJAXEvent(requestStringBuilder, ajaxRequest);	//append the key event
@@ -2421,6 +2440,19 @@ function GuiseAJAX()
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE, new Map(this.RequestElement.X, ajaxDropEvent.mousePosition.x, this.RequestElement.Y, ajaxDropEvent.mousePosition.y));	//<mouse x="x" y="y">
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.MOUSE);	//</mouse>
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.DROP);	//</drop>
+			return stringBuilder;	//return the string builder
+		};
+
+		/**Appends an AJAX focus event to a string builder.
+		@param stringBuilder The string builder collecting the request data.
+		@param ajaxFocusEvent The focus event information to append.
+		@return The string builder.
+		*/
+		GuiseAJAX.prototype._appendFocusAJAXEvent=function(stringBuilder, ajaxFocusEvent)
+		{
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.FOCUS,	//<focus>
+					new Map(this.RequestElement.COMPONENT_ID, ajaxFocusEvent.componentID));	//componentID="componentID"
+			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.FOCUS);	//</focus>
 			return stringBuilder;	//return the string builder
 		};
 
@@ -4559,8 +4591,8 @@ function onWindowLoad()
 		updateComponents(document.documentElement, true);	//update all components represented by elements within the document
 	//TODO del when works	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
 		eventManager.addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
-		eventManager.addEvent(document.documentElement, "keydown", onKey, false);	//listen for key down anywhere in window so that we can send key events back to the server (IE doesn't work correctly with key events registered on the window or document)
-		eventManager.addEvent(document.documentElement, "keyup", onKey, false);	//listen for key up anywhere in window so that we can send key events back to the server (IE doesn't work correctly with key events registered on the window or document)
+		eventManager.addEvent(document.documentElement, "keydown", onKey, false);	//listen for key down anywhere in the document so that we can send key events back to the server (IE doesn't work correctly with key events registered on the window or document)
+		eventManager.addEvent(document.documentElement, "keyup", onKey, false);	//listen for key up anywhere in the document so that we can send key events back to the server (IE doesn't work correctly with key events registered on the window or document)
 		guise.onDocumentLoad();	//create and update the modal layer
 		guiseAJAX.sendAJAXRequest(new InitAJAXEvent());	//send an initialization AJAX request	
 	//TODO del	alert("compatibility mode: "+document.compatMode);
@@ -4800,13 +4832,7 @@ function initializeNode(node, deep, initialInitialization)
 				}
 				if(node.focus)	//if this element can receive the focus
 				{
-/*TODO fix
-					if(node.nodeName=="a")
-					{
-						alert("listening for focus on a");
-					}
-*/
-					eventManager.addEvent(node, "focus", onFocus, false);	//listen for focus events
+					eventManager.addEvent(node, "focus", onFocus, false);	//listen for focus events; we must do this specifically for each node, because focus events don't focus correctly
 				}
 			}
 			break;
@@ -4919,95 +4945,65 @@ function uninitializeNode(node, deep)	//TODO remove the node from the sorted lis
 
 var lastFocusedNode=null;
 
-/**Called when an element receives a focus event.
+/**Called when any element receives the focus.
 @param event The object containing event information.
 */
 function onFocus(event)
 {
-	var currentTarget=event.currentTarget;	//get the control receiving the focus
-	if(guise.modalFrame!=null)	//if there is a modal frame
+	var target=event.target;	//get the control receiving the focus
+	if(target!=lastFocusedNode)	//if the focus is really changing (Firefox seems to send multiple focus events for some elements, such as buttons)
 	{
-	
-//TODO del var dummy=currentTarget.nodeName+" "+currentTarget.id;
-
-		if(!DOMUtilities.hasAncestor(currentTarget, guise.modalFrame))	//if focus is trying to go to something outside the modal frame
+		if(guise.modalFrame!=null)	//if there is a modal frame
 		{
-//TODO fix alert("focus outside of frame");
-			if(DOMUtilities.hasAncestor(lastFocusedNode, guise.modalFrame))	//if we know the last focused node, and it was in the modal frame
+			if(!DOMUtilities.hasAncestor(target, guise.modalFrame))	//if focus is trying to go to something outside the modal frame
 			{
-
-//TODO del dummy+=" changing to last focused "+lastFocusedNode.nodeName+" id "+lastFocusedNode.id;
-
-				lastFocusedNode.focus();	//focus back on the last focused node
-
-
-			}
-			else	//if we don't know the last focused node
-			{
-				var focusable=getFocusableDescendant(guise.modalFrame);	//see if the modal frame has a node that can be focused
-				if(focusable)	//if we found a focusable node
+				if(DOMUtilities.hasAncestor(lastFocusedNode, guise.modalFrame))	//if we know the last focused node, and it was in the modal frame
 				{
-//TODO del dummy+=" changing to first focusable "+focusable.nodeName+" id "+focusable.id;
-					try
+					lastFocusedNode.focus();	//focus back on the last focused node
+				}
+				else	//if we don't know the last focused node, or it wasn't in the modal frame
+				{
+					var focusable=getFocusableDescendant(guise.modalFrame);	//see if the modal frame has a node that can be focused TODO this will go away when Guise has better focus support in its component model
+					if(focusable)	//if we found a focusable node
 					{
-						focusable.focus();	//focus on the node
-					}						
-					catch(e)	//TODO fix
+						try
+						{
+							focusable.focus();	//focus on the node
+						}						
+						catch(e)	//TODO fix
+						{
+	/*TODO fix
+							alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" style: "+focusable.style+" class: "+focusable.className+" visibility: "+focusable.style.visibility+" display: "+focusable.style.display+" disabled: "+focusable.style.disabled);
+				alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" current visibility: "+focusable.currentStyle.visibility+" current display: "+focusable.currentStyle.display+" current disabled: "+focusable.currentStyle.disabled);
+				alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" runtime visibility: "+focusable.runtimeStyle.visibility+" runtime display: "+focusable.runtimeStyle.display+" runtime disabled: "+focusable.runtimeStyle.disabled);
+				alert("error trying to focus element great-grandparent: "+DOMUtilities.getNodeString(focusable.parentNode.parentNode.parentNode));
+	*/
+						}
+					}
+					else	//if we can't find a focusable node on the modal frame
 					{
-/*TODO fix
-						alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" style: "+focusable.style+" class: "+focusable.className+" visibility: "+focusable.style.visibility+" display: "+focusable.style.display+" disabled: "+focusable.style.disabled);
-			alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" current visibility: "+focusable.currentStyle.visibility+" current display: "+focusable.currentStyle.display+" current disabled: "+focusable.currentStyle.disabled);
-			alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" runtime visibility: "+focusable.runtimeStyle.visibility+" runtime display: "+focusable.runtimeStyle.display+" runtime disabled: "+focusable.runtimeStyle.disabled);
-			alert("error trying to focus element great-grandparent: "+DOMUtilities.getNodeString(focusable.parentNode.parentNode.parentNode));
-*/
+	//TODO fix for IE					currentTarget.blur();	//don't allow the element to get the focus, even though we don't know what to focus
 					}
 				}
-				else	//if we can't find a focusable node on the modal frame
+				return;	//don't process the focus event any further
+			}
+		}
+		lastFocusedNode=target;	//this is an allowed focus that isn't outside of a modal frame; keep track of what was last focused
+		var component=DOMUtilities.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element
+		if(component)	//if there is a component
+		{
+			var componentID=component.id;	//get the component ID
+			if(componentID)	//if there is a component ID
+			{
+				if(guiseAJAX.isEnabled())	//if AJAX is enabled
 				{
-//TODO fix for IE					currentTarget.blur();	//don't allow the element to get the focus, even though we don't know what to focus
+					var ajaxRequest=new FocusAJAXEvent(componentID);	//create a new focus request
+					guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 				}
 			}
-/*TODO del 
-test.add(dummy);
-
-	if(test.length==8)
-	{
-		test.add("done");
-		modalFrame=null;
-		for(var i=0; i<test.length; ++i)
-		{
-			alert(test[i]);
 		}
 	}
-*/
-			return;	//don't process the focus event any further
-		}
-/*TODO del
-
-test.add(dummy);
-
-	if(test.length==8)
-	{
-		test.add("done");
-		modalFrame=null;
-		for(var i=0; i<test.length; ++i)
-		{
-			alert(test[i]);
-		}
-	}
-*/
-	}
-	lastFocusedNode=currentTarget;	//see what was last focused
-/*TODO fix
-	if(modalFrame==null && test.length>10)
-	{
-		test.add("done");
-		for(var i=0; i<test.length; ++i)
-		{
-			alert(test[i]);
-		}
-	}
-*/
+//TODO see if variable check fixes things	event.stopPropagation();	//tell the event to stop bubbling, because on Firefox, the event will bubble, but only in some circumstances; here we
 }
 
 /**Called when a key is pressed in a text input.
@@ -5077,38 +5073,7 @@ var KEY_CODE=
 var REPORTED_KEY_CODES=[KEY_CODE.ENTER, KEY_CODE.ESCAPE];
 
 /**The key codes that are canceled globally, whether or not they are reported.*/
-var CANCELED_KEY_CODES=[];
-
-/**Called when a key is pressed in a text input.
-This implementation checks to see if the Enter key was pressed, and if so commits the input by sending it to the server and canceling the default action.
-The Enter keypress is allowed to bubble so that it may be reported to the server.
-@param event The object describing the event.
-@see http://www.quirksmode.org/js/keys.html
-@see http://support.microsoft.com/kb/298498
-@see #onKey()
-*/
-function onTextInputKeyDown(event)
-{
-	var keyCode=event.keyCode;	//get the code of the pressed key
-	if(keyCode==13)	//if Enter/Return was pressed TODO use a constant
-	{
-		if(guiseAJAX.isEnabled())	//if AJAX is enabled
-		{
-		//TODO del alert("an input changed! "+textInput.id);
-			var textInput=event.currentTarget;	//get the control in which text changed
-			var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value));	//create a new form request with the control name and value
-			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
-			event.preventDefault();	//prevent the default functionality from occurring, but allow it to keep bubbling so that it can be reported back to the server
-/*TODO del
-			event.stopPropagation();	//tell the event to stop bubbling
-			event.preventDefault();	//prevent the default functionality from occurring
-*/
-		}
-		else	//TODO submit the form
-		{
-		}
-	}
-}
+var CANCELED_KEY_CODES=[KEY_CODE.ENTER];
 
 /**Called when a key is pressed or released generally.
 If any control character is pressed, it is sent to the server as a key event and its default action is canceled.
@@ -5118,6 +5083,19 @@ If any control character is pressed, it is sent to the server as a key event and
 */
 function onKey(event)
 {
+	var keyCode=event.keyCode;	//get the code of the pressed key
+	if(keyCode==KEY_CODE.ENTER)	//if Enter was pressed
+	{
+		var target=event.target;	//get the node on which the event occurred
+		if(target.nodeType==Node.ELEMENT_NODE)	//if the event occurred on an element
+		{
+			var targetNodeName=target.nodeName.toLowerCase();	//get the name of the target
+			if(targetNodeName=="button" || (targetNodeName=="input" && (target.type=="button" || target.type=="file")))	//if Enter was pressed on a button
+			{
+				return;	//let the browser handle Enter on a button TODO add checks for other things			
+			}
+		}
+	}
 	if(guiseAJAX.isEnabled())	//if AJAX is enabled
 	{
 		var keyCode=event.keyCode;	//get the code of the pressed key
@@ -5146,39 +5124,55 @@ function onKey(event)
 	}
 }
 
+/**Called when a key is pressed in a text input.
+This implementation checks to see if the Enter key was pressed, and if so commits the input by sending it to the server and canceling the default action.
+The Enter keypress is allowed to bubble so that it may be reported to the server.
+@param event The object describing the event.
+@see http://www.quirksmode.org/js/keys.html
+@see http://support.microsoft.com/kb/298498
+@see #onKey()
+*/
+function onTextInputKeyDown(event)
+{
+	var keyCode=event.keyCode;	//get the code of the pressed key
+	if(keyCode==KEY_CODE.ENTER)	//if Enter/Return was pressed
+	{
+		if(guiseAJAX.isEnabled())	//if AJAX is enabled
+		{
+		//TODO del alert("an input changed! "+textInput.id);
+			var textInput=event.currentTarget;	//get the control in which text changed
+			var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value));	//create a new form request with the control name and value
+			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+			event.preventDefault();	//prevent the default functionality from occurring, but allow it to keep bubbling so that it can be reported back to the server
+/*TODO del
+			event.stopPropagation();	//tell the event to stop bubbling
+			event.preventDefault();	//prevent the default functionality from occurring
+*/
+		}
+		else	//TODO submit the form
+		{
+		}
+	}
+}
+
 /**Called when a key is raised in a text input.
-This implementation sends the current text input value as a provisional value.
+This implementation sends the current text input value as a provisional value if the pressed key was not the Enter key.
 @param event The object describing the event.
 */
 function onTextInputKeyUp(event)
 {
-	if(guiseAJAX.isEnabled())	//if AJAX is enabled
-	{
-	//TODO del alert("an input changed! "+textInput.id);
-		var textInput=event.currentTarget;	//get the control in which text changed
-			//TODO decide if we need to remove the attribute hash attribute
-		var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value), true);	//create a new provisional form request with the control name and value
-		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request, but allow this event to be processed normally
-	}
-}
-
-/**Called when a key is pressed anywhere in the document.
-@param event The object describing the event.
-*/
-function onKeyDown(event)
-{
 	var keyCode=event.keyCode;	//get the code of the pressed key
-	alert("key code down: "+keyCode);
-/*TODO fix
-	if(guiseAJAX.isEnabled())	//if AJAX is enabled
+	if(keyCode!=KEY_CODE.ENTER)	//if Enter was pressed, don't do anything for raising the Enter key; we already committed the input in onTextInputKeyDown().
 	{
-	//TODO del alert("an input changed! "+textInput.id);
-		var textInput=event.currentTarget;	//get the control in which text changed
-			//TODO decide if we need to remove the attribute hash attribute
-		var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value), true);	//create a new provisional form request with the control name and value
-		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request, but allow this event to be processed normally
+		if(guiseAJAX.isEnabled())	//if AJAX is enabled
+		{
+		//TODO del alert("an input changed! "+textInput.id);
+			var textInput=event.currentTarget;	//get the control in which text changed
+				//TODO decide if we need to remove the attribute hash attribute
+			var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value), true);	//create a new provisional form request with the control name and value
+			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request, but allow this event to be processed normally
+		}
 	}
-*/
 }
 
 /**Called when the contents of a text input or a text area changes.

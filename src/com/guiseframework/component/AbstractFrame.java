@@ -24,8 +24,6 @@ import static com.guiseframework.theme.Theme.*;
 
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.event.*;
-import com.guiseframework.input.Input;
-import com.guiseframework.input.InputStrategy;
 import com.guiseframework.model.LabelModel;
 import com.guiseframework.model.Notification;
 import com.guiseframework.prototype.*;
@@ -522,70 +520,6 @@ Debug.trace("the close action listener was invoked; ready to close frame", this)
 			getSession().notify(notification);	//indicate that there was a validation error
 		}
 		return isValid();	//return the current valid state
-	}
-
-	/**Dispatches an input event to this component and all child components, if any.
-	If this is a {@link FocusedInputEvent} the event will be directed towards the focused component, if any.
-	This version fires any unconsumed {@link FocusedInputEvent} and then, if the event is still unconsumed, dispatches the event to the focused component, if any.
-	If a focused event is still not consumed, it is fired to any local listeners and then sent to the installed input strategy, if any, if the event is still not consumed.
-	Other events are dispatched normally.
-	@param inputEvent The input event to dispatch.
-	@see #fireInputEvent(InputEvent)
-	@see InputEvent#isConsumed()
-	@see FocusedInputEvent
-	*/
-	public void dispatchInputEvent(final InputEvent inputEvent)
-	{
-//Debug.trace("in frame", this, "with label", getLabel(), "ready to dispatch input event", inputEvent);
-		if(inputEvent instanceof FocusedInputEvent)	//if this is a focused input event, do special processing instead of the default processing, which will entail reproducing some of the core dispatching functionality from parent classes to keep from sending the event to all the children 
-		{
-//Debug.trace("this is an input event");
-			if(!inputEvent.isConsumed())	//if the input has not been consumed
-			{
-//Debug.trace("in frame", this, "with label", getLabel(), "firing unconsumed focused input event", inputEvent);
-				fireInputEvent(inputEvent);	//fire the event to any listeners
-			}
-			if(!inputEvent.isConsumed())	//if the input has still not been consumed
-			{
-//Debug.trace("in frame", this, "with label", getLabel(), "event still not consumed", inputEvent);
-				final Component<?> inputFocusedComponent=getInputFocusedComponent();	//get the component with the input focus
-//Debug.trace("input focused component:", inputFocusedComponent);
-				if(inputFocusedComponent!=null)	//if we have a focused component in this group
-				{
-					inputFocusedComponent.dispatchInputEvent(inputEvent);	//have the input focused component dispatch the event
-				}
-				if(!inputEvent.isConsumed())	//if the input has not been consumed by any focused children
-				{
-		//Debug.trace("event is not consumed by focused children; ready to fire it to listeners");
-					fireInputEvent(inputEvent);	//fire the event to any listeners
-		//Debug.trace("firing finised");
-					if(!inputEvent.isConsumed())	//if the input has still not been consumed
-					{
-		//Debug.trace("event is not still not consumed; checking input strategy");
-						final InputStrategy inputStrategy=getInputStrategy();	//get our input strategy, if any
-						if(inputStrategy!=null)	//if we have an input strategy
-						{
-		//Debug.trace("got input strategy");
-							final Input input=inputEvent.getInput();	//get the event's input, if any
-							if(input!=null)	//if the event has input
-							{
-		//Debug.trace("got input for this event:", input);
-								if(inputStrategy.input(input))	//send the input to the input strategy; if the input was consumed
-								{
-		//Debug.trace("our input strategy consumed the input", input, "in frame", this);
-									inputEvent.consume();	//mark the event as consumed
-//Debug.trace("input consumed:", input);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		else	//if this is not a focused input event
-		{
-			super.dispatchInputEvent(inputEvent);	//dispatch the event normally
-		}
 	}
 
 }

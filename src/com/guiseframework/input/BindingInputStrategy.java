@@ -18,6 +18,15 @@ public class BindingInputStrategy extends AbstractInputStrategy
 	/**The thread-safe map of bindings between input and other input or actions. The bound object is either of type {@link Input} or of type {@link ActionModel}.*/
 	private final Map<Input, Object> bindings=new ConcurrentHashMap<Input, Object>();
 
+	/**Indicates whether the given input is bound.
+	@param input The input that may be bound, such as {@link KeyInput} or {@link CommandInput}.
+	@return <code>true</code> if a binding exists for the given input, else <code>false</code>.
+	*/
+	public boolean isBound(final Input input)
+	{
+		return bindings.containsKey(input);	//see if anything is bound to this input
+	}
+
 	/**Binds the given input to other input.
 	If the given input is already bound, the old binding will be replaced.
 	@param input The input to be bound, such as {@link KeyInput}.

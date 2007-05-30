@@ -863,19 +863,24 @@ Debug.trace("now valid of", this, "is", isValid());
 	}
 
 	/**Dispatches an input event to this component and all child components, if any.
-	If this is a {@link FocusedInputEvent} the event will be directed towards the focused component, if any.
+	If this is a {@link FocusedInputEvent}, the event will be directed towards the branch in which lies the focused component of any {@link InputFocusGroupComponent} ancestor of this component (or this component, if it is a focus group).
+	If this is instead a {@link TargetedEvent}, the event will be directed towards the branch in which lies the target component of the event.
+	Otherwise, the event will be dispatched to all child components.
+	Only after the event has been dispatched to any children will the event be fired to any event listeners and then passed to the installed input strategy, if any.
+	Once the event is consumed, no further processing takes place.
 	This version fires all events that are not consumed.
-	If an input event is still not consumed after firing, its input is processed by the installed input strategy, if any.
 	@param inputEvent The input event to dispatch.
+	@exception NullPointerException if the given event is <code>null</code>.
+	@see TargetedEvent
+	@see FocusedInputEvent
+	@see InputEvent#isConsumed()
 	@see #fireInputEvent(InputEvent)
 	@see #getInputStrategy()
 	@see InputStrategy#input(Input)
-	@see InputEvent#isConsumed()
-	@see TargetedEvent
 	*/
 	public void dispatchInputEvent(final InputEvent inputEvent)
 	{
-//Debug.trace("in component", this, "ready to do default dispatching of input event", inputEvent);		
+Debug.trace("in component", this, "ready to do default dispatching of input event", inputEvent);		
 		if(!inputEvent.isConsumed())	//if the input has not been consumed
 		{
 //Debug.trace("event is not consumed; ready to fire it to listeners");
@@ -906,6 +911,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	/**Fire the given even to all registered listeners, if any.
 	If the event is consumed further processing should cease.
 	@param inputEvent The input event to fire.
+	@exception NullPointerException if the given event is <code>null</code>.
 	@see InputEvent#isConsumed()
 	@see CommandEvent
 	@see KeyEvent

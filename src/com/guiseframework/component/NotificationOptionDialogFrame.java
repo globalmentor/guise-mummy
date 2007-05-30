@@ -5,17 +5,24 @@ import java.beans.PropertyVetoException;
 import javax.mail.internet.ContentType;
 
 import com.guiseframework.event.*;
+import com.guiseframework.input.BindingInputStrategy;
+import com.guiseframework.input.CommandInput;
+import com.guiseframework.input.ProcessCommand;
 import com.guiseframework.model.*;
 import com.guiseframework.model.Notification.Option;
 
 /**Default implementation of a frame for communication of an option such as "OK" or "Cancel".
 An option frame defaults to a single composite child panel with a row of options along the bottom.
 The contents of an option dialog frame should be accessed by {@link #getOptionContent()} and {@link #setOptionContent(Component)}.
+<p>This class binds the command {@link ProcessCommand#CONTINUE} to the button for the first non-fatal option.</p>
 @author Garret Wilson
 */
 public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Notification.Option, NotificationOptionDialogFrame>
 {
-	
+
+	/**Our input strategy for mapping the "continue" command to the first non-fatal option. As the options are created in the parent contructor, we'll have to lazily create this instance.*/
+	private BindingInputStrategy bindingInputStrategy=null;
+
 	/**Options constructor.
 	Duplicate options are ignored.
 	@param options The available options.
@@ -103,6 +110,11 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 	*/
 	protected Component<?> createOptionComponent(final Option option)
 	{
+		if(bindingInputStrategy==null)	//if we haven't yet created our input strategy (we have to use lazy creation because this method is called from the parent constructor)
+		{
+			bindingInputStrategy=new BindingInputStrategy(getInputStrategy());	//create a new input strategy based upon the current input strategy (if any)
+			setInputStrategy(bindingInputStrategy);	//switch to our new input strategy; we'll add bindings later
+		}
 		final Button button=new Button();	//create a new button
 		button.setLabel(option.getLabel());	//set the option action label
 		button.setIcon(option.getGlyph());	//set the option action icon
@@ -124,6 +136,15 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 						}	
 					}
 				});
+
+		final CommandInput continueCommandInput=new CommandInput(ProcessCommand.CONTINUE);	//create a command for continue
+		if(!bindingInputStrategy.isBound(continueCommandInput))	//if the continue command isn't yet bound to anything
+		{
+			if(!option.isFatal())	//if this is not a fatal option
+			{
+				bindingInputStrategy.bind(continueCommandInput, button);	//map the "continue" command to the option button
+			}
+		}
 		return button;	//return the created button
 	}
 

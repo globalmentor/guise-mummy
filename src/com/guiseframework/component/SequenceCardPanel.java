@@ -98,6 +98,12 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 		/**@return The prototype for the action to finish the sequence.*/
 		public ActionPrototype getFinishActionPrototype() {return finishActionPrototype;}
 
+	/**The prototype for the continue action, which delegates to {@link #goNext()} or {@link #goFinish()}, depending on the state of {@link #hasNext()}.*/
+	private final ActionPrototype continueActionPrototype;
+
+		/**@return The prototype for the next action, which delegates to {@link #goNext()} or {@link #goFinish()}, depending on the state of {@link #hasNext()}..*/
+		public ActionPrototype getContinueActionPrototype() {return continueActionPrototype;}
+
 	/**The prototype for the action to cancel the sequence.*/
 	private final ActionPrototype cancelActionPrototype;
 
@@ -147,9 +153,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	{
 		super(layout);	//construct the parent class
 			//previous action prototype
-		previousActionPrototype=new ActionPrototype();
-		previousActionPrototype.setIcon(GLYPH_PREVIOUS);
-		previousActionPrototype.setLabel(LABEL_PREVIOUS);
+		previousActionPrototype=new ActionPrototype(LABEL_PREVIOUS, GLYPH_PREVIOUS);
 		previousActionPrototype.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the previous action is performed
@@ -158,9 +162,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 					};
 				});
 			//next action prototype
-		nextActionPrototype=new ActionPrototype();
-		nextActionPrototype.setIcon(GLYPH_NEXT);
-		nextActionPrototype.setLabel(LABEL_NEXT);
+		nextActionPrototype=new ActionPrototype(LABEL_NEXT, GLYPH_NEXT);
 		nextActionPrototype.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the next action is performed
@@ -169,9 +171,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 					};
 				});
 			//finish action prototype
-		finishActionPrototype=new ActionPrototype();
-		finishActionPrototype.setIcon(GLYPH_FINISH);
-		finishActionPrototype.setLabel(LABEL_FINISH);
+		finishActionPrototype=new ActionPrototype(LABEL_FINISH, GLYPH_FINISH);
 		finishActionPrototype.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the finish action is performed
@@ -179,10 +179,24 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 						goFinish();	//finish the sequence
 					};
 				});
+			//continue action prototype
+		continueActionPrototype=new ActionPrototype(LABEL_NEXT, GLYPH_NEXT);
+		continueActionPrototype.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(final ActionEvent actionEvent)	//if the next action is performed
+					{
+						if(hasNext())	//if there is a next card
+						{
+							goNext();	//go to the next card
+						}
+						else	//if there is no next card
+						{
+							goFinish();	//finish the sequence
+						}
+					};
+				});
 			//cancel action prototype
-		cancelActionPrototype=new ActionPrototype();
-		cancelActionPrototype.setIcon(GLYPH_CANCEL);
-		cancelActionPrototype.setLabel(LABEL_CANCEL);
+		cancelActionPrototype=new ActionPrototype(LABEL_CANCEL, GLYPH_CANCEL);
 		cancelActionPrototype.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the cancel action is performed
@@ -232,8 +246,21 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 							}
 						}
 						previousActionPrototype.setEnabled(hasPrevious());	//enable or disable the previous action prototype
-						nextActionPrototype.setEnabled(hasNext());	//enable or disable the previous action prototype
-						finishActionPrototype.setEnabled(!hasNext());	//enable or disable the finish action prototype
+						final boolean hasNext=hasNext();	//see if we can go forward
+						nextActionPrototype.setEnabled(hasNext);	//enable or disable the previous action prototype
+						finishActionPrototype.setEnabled(!hasNext);	//enable or disable the finish action prototype
+						if(hasNext)	//if there is a next TODO replace this with a proxy action prototype
+						{
+							continueActionPrototype.setLabel(nextActionPrototype.getLabel());	//copy the next action prototype properties
+							continueActionPrototype.setIcon(nextActionPrototype.getIcon());
+							continueActionPrototype.setEnabled(nextActionPrototype.isEnabled());
+						}
+						else	//if there is no next
+						{
+							continueActionPrototype.setLabel(finishActionPrototype.getLabel());	//copy the finish action prototype properties
+							continueActionPrototype.setIcon(finishActionPrototype.getIcon());
+							continueActionPrototype.setEnabled(finishActionPrototype.isEnabled());
+						}
 					}
 				});
 	}

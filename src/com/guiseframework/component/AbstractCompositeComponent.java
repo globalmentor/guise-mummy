@@ -3,11 +3,15 @@ package com.guiseframework.component;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 
-import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
-import com.garretwilson.beans.GenericPropertyChangeEvent;
-import com.garretwilson.beans.TargetedEvent;
+import com.garretwilson.beans.*;
+import com.garretwilson.util.Debug;
+
+import static com.garretwilson.lang.ObjectUtilities.*;
+
 import com.guiseframework.GuiseSession;
 import com.guiseframework.event.*;
+import com.guiseframework.input.Input;
+import com.guiseframework.input.InputStrategy;
 import com.guiseframework.model.LabelModel;
 import com.guiseframework.theme.Theme;
 
@@ -247,59 +251,105 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	}
 
 	/**Dispatches an input event to this component and all child components, if any.
-	If this is a {@link FocusedInputEvent} the event will be directed towards the focused component, if any.
-	This version dispatches the event to all child components as long as the event has not been consumed, and then performs default processing.
-	Targeted events are only dispatched to the target ancestor hierarchy.
+	If this is a {@link FocusedInputEvent}, the event will be directed towards the branch in which lies the focused component of any {@link InputFocusGroupComponent} ancestor of this component (or this component, if it is a focus group).
+	If this is instead a {@link TargetedEvent}, the event will be directed towards the branch in which lies the target component of the event.
+	Otherwise, the event will be dispatched to all child components.
+	Only after the event has been dispatched to any children will the event be fired to any event listeners and then passed to the installed input strategy, if any.
+	Once the event is consumed, no further processing takes place.
+	This version dispatches the event to child component(s) depending on whether the event is focused, targeted, or neither, and then performs default processing.
 	@param inputEvent The input event to dispatch.
+	@exception NullPointerException if the given event is <code>null</code>.
+	@see TargetedEvent
+	@see FocusedInputEvent
+	@see #dispatchInputEvent(InputEvent, Component)
+	@see InputEvent#isConsumed()
+	@see #fireInputEvent(InputEvent)
+	@see #getInputStrategy()
+	@see InputStrategy#input(Input)
+	*/
+	public void dispatchInputEvent(final InputEvent inputEvent)
+	{
+//Debug.trace("in composite component", this, "ready to do default dispatching of input event", inputEvent);
+		if(!inputEvent.isConsumed())	//if the input has not been consumed
+		{
+			if(inputEvent instanceof FocusedInputEvent)	//if this is a focused input event, the target will be the focused child of the focus group ancestor of this component (or this component, if this component is a focused group)
+			{
+//Debug.trace("this is a focused event");
+				Component<?> component=this;	//start with this component
+				do
+				{
+					if(component instanceof InputFocusGroupComponent)	//if we found a focus group
+					{
+//Debug.trace("component", component, "is the focus group");
+						final InputFocusGroupComponent<?> focusGroup=(InputFocusGroupComponent<?>)component;	//get the focus group
+						final InputFocusableComponent<?> focusedComponent=focusGroup.getInputFocusedComponent();	//get the focused component
+						if(focusedComponent!=null)	//if there is a focused component
+						{
+//Debug.trace("ready to dispatch to focused component", focusedComponent);
+							dispatchInputEvent(inputEvent, focusedComponent);	//dispatch the event to the focused component
+//Debug.trace("done dispatching to focused component", focusedComponent);
+						}
+						break;
+					}
+					else	//if we didn't find a focus group
+					{
+						component=component.getParent();	//walk up the tree
+					}
+				}
+				while(component!=null);	//keep looking until we run out of components
+			}
+			else if(inputEvent instanceof TargetedEvent)	//if this is a targeted event
+			{
+//Debug.trace("this is a targeted event");
+				final Object targetObject=((TargetedEvent)inputEvent).getTarget();	//get the event target
+				if(targetObject instanceof Component)	//if the target is a component other than any focus target we might have used earlier
+				{
+					dispatchInputEvent(inputEvent, (Component<?>)targetObject);	//dispatch the event to the event target						
+				}
+			}
+			else	//if this wasn't a focused or targeted event, dispatch the event to all child components
+			{
+//Debug.trace("this is an unconsumed non-targeted event; ready to send to children");
+				for(final Component<?> childComponent:getChildren())	//for each child component
+				{
+					if(inputEvent.isConsumed())	//if the event has been consumed
+					{
+						return;	//stop further processing
+					}
+					childComponent.dispatchInputEvent(inputEvent);	//dispatch the event to this child components
+				}				
+//Debug.trace("finishing sending event to children");
+			}
+			if(!inputEvent.isConsumed())	//if the event has not been consumed
+			{
+//Debug.trace("event still not consumed, ready to do default dispatching");
+				super.dispatchInputEvent(inputEvent);	//do the default dispatching
+			}	
+		}
+	}
+
+	/**Dispatches an input event to the specified target child hierarchy.
+	If the given target is not a descendant of this component, or if the target is this component, no action occurs.
+	@param inputEvent The input event to dispatch.
+	@param target The target indicating the child hierarchy to which this event should be directed.
+	@exception NullPointerException if the given event and/or target is <code>null</code>.
 	@see #fireInputEvent(InputEvent)
 	@see InputEvent#isConsumed()
 	@see TargetedEvent
 	@see MouseEvent
 	*/
-	public void dispatchInputEvent(final InputEvent inputEvent)
+	protected void dispatchInputEvent(final InputEvent inputEvent, Component<?> target)
 	{
-//Debug.trace("in composite component", this, "ready to do default dispatching of input event", inputEvent);
-		if(!inputEvent.isConsumed() && inputEvent instanceof TargetedEvent)	//if this is a targeted event that hasn't been consumed, find the target's parent that is a child of this component, if any
+		checkInstance(target, "Target cannot be null");
+		while(target!=null && target!=this)	//keep going until we reach this component or run out of ancestors, the latter of which means that this component is not in the target branch at all
 		{
-//Debug.trace("this is a targeted event");
-			final Object target=((TargetedEvent)inputEvent).getTarget();	//get the event target
-			if(target!=this && target instanceof Component)	//if the target is a component other than this component
+			final CompositeComponent<?> parent=target.getParent();	//get the target ancestor's parent
+			if(parent==this)	//if we are the target ancestor's immediate parent
 			{
-				Component<?> targetAncestor=(Component<?>)target;	//get the target as a component; we'll consider the target ancestor of itself
-				do
-				{
-					final CompositeComponent<?> parent=targetAncestor.getParent();	//get the target ancestor's parent
-					if(parent==this)	//if we are the target ancestor's immediate parent
-					{
-						targetAncestor.dispatchInputEvent(inputEvent);	//dispatch the event to the target's ancestor, which is this component's child
-						break;	//targeted events only go to the target event's ancestor tree
-					}
-					else	//if we still haven't found the child that is the target's ancestor
-					{
-						targetAncestor=parent;	//walk up the chain
-					}
-				}
-				while(targetAncestor!=null);	//keep going until we run out of ancestors, which means that we're not in the target branch at all
+				target.dispatchInputEvent(inputEvent);	//dispatch the event to the target's ancestor, which is this component's child
 			}
+			target=parent;	//walk up the chain
 		}
-		else	//if this is not a targeted event, dispatch the event to all child components
-		{
-//Debug.trace("this is an unconsumed non-targeted event; ready to send to children");
-			for(final Component<?> childComponent:getChildren())	//for each child component
-			{
-				if(inputEvent.isConsumed())	//if the event has been consumed
-				{
-					return;	//stop further processing
-				}
-				childComponent.dispatchInputEvent(inputEvent);	//dispatch the event to this child components
-			}				
-//Debug.trace("finishing sending event to children");
-		}
-		if(!inputEvent.isConsumed())	//if the event has not been consumed
-		{
-//Debug.trace("event still not consumed, ready to do ultra-default dispatching");
-			super.dispatchInputEvent(inputEvent);	//do the default dispatching
-		}	
 	}
 
 }
