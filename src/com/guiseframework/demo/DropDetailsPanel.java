@@ -27,22 +27,22 @@ public class DropDetailsPanel extends DefaultNavigationPanel
 			//flag panel
 		final GroupPanel flagPanel=new GroupPanel(new FlowLayout(Flow.LINE));	//create the flag panel flowing horizontally
 		flagPanel.setLabel("Drag a Flag");	//set the flag panel label				
-		final Image usFlag=new Image();	//US flag
+		final Picture usFlag=new Picture();	//US flag
 		usFlag.setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/us-flag.gif"));	//set the URI
 		usFlag.setLabel("USA");	//set the label
 		usFlag.setDragEnabled(true);	//enable dragging for the image
 		flagPanel.add(usFlag);	//add the image to the flag panel
-		final Image frFlag=new Image();	//France flag
+		final Picture frFlag=new Picture();	//France flag
 		frFlag.setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/fr-flag.gif"));	//set the URI
 		frFlag.setLabel("France");	//set the label
 		frFlag.setDragEnabled(true);	//enable dragging for the image
 		flagPanel.add(frFlag);	//add the image to the flag panel
-		final Image inFlag=new Image();	//India flag
+		final Picture inFlag=new Picture();	//India flag
 		inFlag.setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/in-flag.gif"));	//set the URI
 		inFlag.setLabel("India");	//set the label
 		inFlag.setDragEnabled(true);	//enable dragging for the image
 		flagPanel.add(inFlag);	//add the image to the flag panel
-		final Image irFlag=new Image();	//Iran flag
+		final Picture irFlag=new Picture();	//Iran flag
 		irFlag.setImage(URI.create("http://www.cia.gov/cia/publications/factbook/flags/ir-flag.gif"));	//set the URI
 		irFlag.setLabel("Iran");	//set the label
 		irFlag.setDragEnabled(true);	//enable dragging for the image

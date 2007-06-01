@@ -721,7 +721,7 @@ Debug.trace("list control changed value to", newValue);
 		horizontalPanel.add(booleanPanela);
 */
 		
-		final Image image=new Image();
+		final Picture image=new Picture();
 		image.setImage(URI.create("http://www.garretwilson.com/photos/2000/february/cowcalf.jpg"));
 /*TODO fix
 		image.setLabelText("Cow and Calf");

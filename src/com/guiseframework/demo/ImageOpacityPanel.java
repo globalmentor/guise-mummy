@@ -25,7 +25,7 @@ public class ImageOpacityPanel extends DefaultNavigationPanel
 		setLabel("Guise\u2122 Demonstration: Image Opacity");	//set the panel title	
 
 			//image
-		final Image image=new Image();	//create the image control
+		final Picture image=new Picture();	//create the image control
 		image.setImage(URI.create("cowcalf.jpg"));	//reference an image in the root directory of the application
 		image.setLabel("Cow and Calf");
 		image.setDescription("A cow and her minutes-old calf. Use the sliders to change the opacity of the image.");
