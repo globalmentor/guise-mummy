@@ -15,13 +15,23 @@ public class FlowLayout extends AbstractFlowLayout<FlowConstraints>
 		this(Flow.PAGE);	//construct the class with page flow layout
 	}
 
-	/**Flow constructor.
+	/**Flow constructor with no wrapping.
 	@param flow The logical axis (line or page) along which information is flowed.
 	@exception NullPointerException if the flow axis is <code>null</code>.
 	*/
 	public FlowLayout(final Flow flow)
 	{
-		super(flow);	//construct the parent class
+		this(flow, false);	//construct the class with no wrapping
+	}
+
+	/**Flow and wrap constructor.
+	@param flow The logical axis (line or page) along which information is flowed.
+	@param wrapped Whether flowed children should be wrapped when the flow extent is reached.
+	@exception NullPointerException if the flow axis is <code>null</code>.
+	*/
+	public FlowLayout(final Flow flow, final boolean wrapped)
+	{
+		super(flow, wrapped);	//construct the parent class
 	}
 
 	/**Creates default constraints for the container.

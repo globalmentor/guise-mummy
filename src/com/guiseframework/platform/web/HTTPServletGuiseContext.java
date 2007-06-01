@@ -99,6 +99,15 @@ public class HTTPServletGuiseContext extends AbstractXMLGuiseContext implements 
 		/**@return Whether this context represents an AJAX request.*/
 		public boolean isAJAX() {return isAJAX;}
 
+	/**Whether the user agent is any version of Mozilla Firefox.*/
+	private final boolean isUserAgentFirefox;
+
+		/**Determines whether the user agent is any version of Mozilla Firefox.
+		This is a convenience method for checking the evironment user agent settings.
+		@return Whether the user agent is any version of Mozilla Firefox.
+		*/
+		public boolean isUserAgentFirefox() {return isUserAgentFirefox;}
+
 	/**Whether the user agent is any version of Microsoft Internet Explorer.*/
 	private final boolean isUserAgentIE;
 
@@ -154,11 +163,19 @@ public class HTTPServletGuiseContext extends AbstractXMLGuiseContext implements 
 		final String contentTypeString=request.getContentType();	//get the request content type
 		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
 		isAJAX=contentType!=null && GuiseHTTPServlet.GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType);	//see if this is a Guise AJAX request
-		boolean isUserAgentIE=false;	//we'll see if this is IE
-		boolean isUserAgentIE6=false;	//we'll see if this is IE6
 		final GuiseEnvironment environment=session.getEnvironment();	//get the environment
+		final String userAgentName=environment.getProperty(USER_AGENT_NAME_PROPERTY);	//get the name of the user agent
+		this.isUserAgentFirefox=USER_AGENT_NAME_FIREFOX.equals(userAgentName);	//see if this is Firefox
+		if(this.isUserAgentFirefox)	//if this is Firefox
 		{
-			if(USER_AGENT_NAME_MSIE.equals(environment.getProperty(USER_AGENT_NAME_PROPERTY)))	//if this is IE
+			this.isUserAgentIE=false;	//this can't be IE
+			this.isUserAgentIE6=false;	//this can't be IE6			
+		}
+		else	//if this is not firefox
+		{
+			boolean isUserAgentIE=false;	//we'll see if this is IE
+			boolean isUserAgentIE6=false;	//we'll see if this is IE6
+			if(USER_AGENT_NAME_MSIE.equals(userAgentName))	//if this is IE
 			{
 				isUserAgentIE=true;	//show that this is IE
 				final Object userAgentVersionNumber=environment.getProperty(USER_AGENT_VERSION_NUMBER_PROPERTY);	//get the version number
@@ -167,9 +184,9 @@ public class HTTPServletGuiseContext extends AbstractXMLGuiseContext implements 
 					isUserAgentIE6=true;	//show that this is IE6
 				}
 			}
+			this.isUserAgentIE=isUserAgentIE;	//save the user agent determination
+			this.isUserAgentIE6=isUserAgentIE6;	//save the user agent determination
 		}
-		this.isUserAgentIE=isUserAgentIE;	//save the user agent determination
-		this.isUserAgentIE6=isUserAgentIE6;	//save the user agent determination
 		this.isQuirksMode=isUserAgentIE6 && !session.getApplication().isThemed();	//only use quirks mode for certain legacy (non-themed) applications using IE6
 
 /*TODO del

@@ -15,7 +15,7 @@ public class MenuLayout extends AbstractFlowLayout<MenuConstraints>	//TODO proba
 	*/
 	public MenuLayout(final Flow flow)
 	{
-		super(flow);	//construct the parent class
+		super(flow, false);	//construct the parent class, specifying no wrapping
 	}
 
 	/**Creates default constraints for the container.

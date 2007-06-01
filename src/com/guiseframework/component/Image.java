@@ -56,7 +56,7 @@ public class Image extends AbstractComponent<Image>
 		public boolean isDescriptionDisplayed() {return descriptionDisplayed;}
 
 		/**Sets whether the description is displayed.
-		This is a bound property of type <code>Boolean</code>.
+		This is a bound property of type {@link Boolean}.
 		@param newDescriptionDisplayed <code>true</code> if the description should be displayed, else <code>false</code>.
 		@see #DESCRIPTION_DISPLAYED_PROPERTY
 		*/

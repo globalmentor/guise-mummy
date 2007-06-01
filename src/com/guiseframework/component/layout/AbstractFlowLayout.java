@@ -24,6 +24,8 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 	public final static String GAP_BEFORE_PROPERTY=getPropertyName(AbstractFlowLayout.class, "gapBefore");
 	/**The bound property of the gap between flowed components.*/
 	public final static String GAP_BETWEEN_PROPERTY=getPropertyName(AbstractFlowLayout.class, "gapBetween");
+	/**The bound property of whether wrapping occurs.*/
+	public final static String WRAPPED_PROPERTY=getPropertyName(AbstractFlowLayout.class, "wrapped");
 
 	/**The default alignment of components perpendicular to the flow axis in terms relative to the beginning of the alignment axis.*/
 	private double alignment=0;
@@ -148,6 +150,29 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 			}			
 		}
 
+	/**Whether flowed children are wrapped when the flow extent is reached.*/
+	private boolean wrapped;
+
+		/**@return Whether the description is displayed.
+		@see #isDisplayed()
+		*/
+		public boolean isWrapped() {return wrapped;}
+
+		/**Sets whether flowed children are wrapped when the flow extent is reached.
+		This is a bound property of type {@link Boolean}.
+		@param newWrapped Whether flowed children should be wrapped when the flow extent is reached.
+		@see #WRAPPED_PROPERTY
+		*/
+		public void setWrapped(final boolean newWrapped)
+		{
+			if(wrapped!=newWrapped)	//if the value is really changing
+			{
+				final boolean oldWrapped=wrapped;	//get the current value
+				wrapped=newWrapped;	//update the value
+				firePropertyChange(WRAPPED_PROPERTY, Boolean.valueOf(oldWrapped), Boolean.valueOf(newWrapped));
+			}
+		}
+
 	/**Sets the gap before, between, and after flowed components.
 	This is a convenience method that sets each of the gaps to the same value.
 	Each gap represents a bound property.
@@ -164,13 +189,15 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 		setGapAfter(newGap);
 	}
 
-	/**Flow constructor.
+	/**Flow and wrap constructor.
 	@param flow The logical axis (line or page) along which information is flowed.
+	@param wrapped Whether flowed children should be wrapped when the flow extent is reached.
 	@exception NullPointerException if the flow axis is <code>null</code>.
 	*/
-	public AbstractFlowLayout(final Flow flow)
+	public AbstractFlowLayout(final Flow flow, final boolean wrapped)
 	{
 		this.flow=checkInstance(flow, "Flow cannot be null.");	//store the flow
+		this.wrapped=wrapped;	//set the wrapped state
 	}
 
 }
