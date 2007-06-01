@@ -9,8 +9,6 @@ import java.util.List;
 
 import javax.mail.internet.ContentType;
 
-import net.marmox.MarmoxMarmotSession;
-
 import com.garretwilson.model.ResourceModel;
 import com.garretwilson.rdf.RDFLiteral;
 import com.garretwilson.rdf.RDFResource;
