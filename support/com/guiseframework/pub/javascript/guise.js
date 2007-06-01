@@ -102,9 +102,10 @@ is notified of the change in state.)
 
 //TODO before sending a drop event, send a component update for the drop target so that its value will be updated; or otherwise make sure the value is synchronized
 
+/**See if the browser is Firefox.*/
+var isUserAgentFirefox=navigator.userAgentName=="Firefox";
 /**See if the browser is IE.*/
 var isUserAgentIE=navigator.userAgentName=="MSIE";
-
 /**See if the browser is IE6.*/
 var isUserAgentIE6=isUserAgentIE && navigator.userAgentVersionNumber<7;
 
@@ -553,6 +554,15 @@ Function.prototype.bind=function(newThis)
 };
 
 //String
+
+/**Determines whether the given substring is present in the string.
+@param substring The substring for which to check.
+@return true if the substring is present in the string.
+*/
+String.prototype.contains=function(substring)
+{
+	return this.indexOf(substring)>=0;	//see if the substring is in the string
+};
 
 /**Determines whether this string is in all lowercase.
 @return true if the string is in all lowercase.
@@ -1151,6 +1161,19 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 		}
 	},
 
+	/**Removes a child node from its parent, if any, and then replaces it at the exact spot in the tree.
+	@param node The node to refresh.
+	*/
+	refreshNode:function(node)
+	{
+		var parentNode=node.parentNode;	//get the node's parent
+		if(parentNode!=null)	//if the node has a parent
+		{
+			var nextSibling=node.nextSibling;	//get the node's next sibling, if any
+			parentNode.insertBefore(parentNode.removeChild(node), nextSibling);	//remove the node and then insert it before its old next sibling (or at the end of the elements if there was no next sibling
+		}
+	},
+
 	/**Removes all children from the given node.
 	This implementation also unregistered any events for the node and all its children.
 	@param node The node the children of which to remove.
@@ -1258,6 +1281,25 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 			if(node.nodeType==Node.ELEMENT_NODE && this.hasClassName(node, className))	//if this is an element and this class name is one of the class names
 			{
 				return node;	//this node has a matching class name; we'll use it
+			}
+			node=node.parentNode;	//try the parent node
+		}
+		return node;	//return whatever node we found
+	},
+
+	/**Retrieves the ancestor element with the given style of the given node, starting at the node itself.
+	@param node The node the ancestor of which to find, or null if the search should not take place.
+	@param styleName The name of the style for which to check.
+	@param styleValue The name of the value for which to check.
+	@return The element with the given style value in which the node lies, or null if the node is not within such an element.
+	*/
+	getAncestorElementByStyle:function(node, styleName, styleValue)
+	{
+		while(node)	//while we haven't reached the top of the hierarchy
+		{
+			if(node.nodeType==Node.ELEMENT_NODE && node.style[styleName]==styleValue)	//if this is an element and it has the requested style
+			{
+				return node;	//this node has a matching style; we'll use it
 			}
 			node=node.parentNode;	//try the parent node
 		}
@@ -4831,6 +4873,21 @@ function initializeNode(node, deep, initialInitialization)
 								eventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener							
 							}
 //TODO del							alert("rollover source: "+node.getAttribute("guise:rolloverSrc"));
+						}
+						if(isUserAgentFirefox)	//if we're running Firefox, check for the inline-block layout bug that doesn't show images that have not yet been cached TODO fix for Firefox 3
+						{
+							if(node.offsetWidth==0 && node.offsetHeight==0)	//if this image has no dimensions
+							{
+								var inlineBlockAncestor=DOMUtilities.getAncestorElementByStyle(node, "display", "-moz-inline-box");	//see if there is a Mozilla inline-block element
+								if(inlineBlockAncestor)	//if there is a Mozilla inline-block element causing our problems
+								{
+									var inlineBlockAncestorParent=inlineBlockAncestor.parentNode;	//get *it's* parent so we can just replace all the children
+									if(inlineBlockAncestorParent)	//if we find its parent like we expect
+									{
+										DOMUtilities.refreshNode(inlineBlockAncestorParent);	//refresh the container element by removing it from the tree and putting it back
+									}
+								}
+							}
 						}
 						break;
 					case "input":

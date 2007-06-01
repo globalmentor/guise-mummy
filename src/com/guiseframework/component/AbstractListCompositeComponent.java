@@ -54,9 +54,14 @@ public abstract class AbstractListCompositeComponent<C extends CompositeComponen
 	Any class that overrides this method must call this version.
 	@param component The component to add to this component.
 	@return <code>true</code> if the child components changed as a result of the operation.
+	@exception IllegalArgumentException if the component already has a parent.
 	*/
 	protected boolean addComponent(final Component<?> component)
 	{
+		if(component.getParent()!=null)	//if this component has already been added to container; do this check before we add the component to the list, because the super class' version of this only comes after the component is added to the list
+		{
+			throw new IllegalArgumentException("Component "+component+" is already a member of a composite component, "+component.getParent()+".");
+		}
 		if(componentList.add(component))	//add the component to the list; if the component list changed
 		{
 			super.addComponent(component);	//do the default adding

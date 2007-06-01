@@ -31,6 +31,10 @@ public abstract class AbstractMultipleCompositeComponent<C extends CompositeComp
 	*/
 	protected boolean addComponent(final Component<?> component)
 	{
+		if(component.getParent()!=null)	//if this component has already been added to container; do this check before we try to add the component to the map, because setting the same mapping won't result in an error
+		{
+			throw new IllegalArgumentException("Component "+component+" is already a member of a composite component, "+component.getParent()+".");
+		}
 		if(idComponentMap.put(component.getID(), component)!=component)	//add this component to the map; if that resulted in a map change
 		{
 			super.addComponent(component);	//initialize the child component as needed
