@@ -46,7 +46,7 @@
 
 		<!-- TaskState resources -->
 		<resource:theme.task.state..label>None</resource:theme.task.state..label>
-		<resource:theme.task.state..glyph rdf:resource="resource:theme.glyph.blank"/>	<!-- the glyph for null state -->
+		<resource:theme.task.state..glyph rdf:resource="resource:theme.glyph.blank"/>
 		<resource:theme.task.state.initialize.label>Initialize</resource:theme.task.state.initialize.label>
 		<resource:theme.task.state.initialize.glyph rdf:resource="resource:theme.task.state.incomplete.glyph"/>
 		<resource:theme.task.state.incomplete.label>Incomplete</resource:theme.task.state.incomplete.label>
@@ -61,6 +61,20 @@
 		<resource:theme.task.state.canceled.glyph rdf:resource="resource:theme.glyph.reject"/>
 		<resource:theme.task.state.complete.label>Complete</resource:theme.task.state.complete.label>
 		<resource:theme.task.state.complete.glyph rdf:resource="resource:theme.glyph.accept"/>
+
+		<!-- View resources -->
+		<resource:theme.view..label>None</resource:theme.view..label>
+		<resource:theme.view..glyph rdf:resource="resource:theme.glyph.blank"/>
+		<resource:theme.view.list.label>List</resource:theme.view.list.label>
+		<resource:theme.view.list.glyph rdf:resource="resource:theme.glyph.list"/>
+		<resource:theme.view.sequence.label>Sequence</resource:theme.view.sequence.label>
+		<resource:theme.view.sequence.glyph rdf:resource="resource:theme.glyph.document.stack"/>
+		<resource:theme.view.thumbnails.label>Thumbnails</resource:theme.view.thumbnails.label>
+		<resource:theme.view.thumbnails.glyph rdf:resource="resource:theme.glyph.thumbnails"/>
+		<resource:theme.view.tree.label>Tree</resource:theme.view.tree.label>
+		<resource:theme.view.tree.glyph rdf:resource="resource:theme.glyph.tree"/>
+		<resource:theme.view.wysiwyg.label>WYSIWYG</resource:theme.view.wysiwyg.label>
+		<resource:theme.view.wysiwyg.glyph rdf:resource="resource:theme.glyph.document.rich.content"/>
 
 		<!-- components -->
 	
@@ -126,6 +140,7 @@
 		<resource:theme.label.upload>Upload</resource:theme.label.upload>
 		<resource:theme.label.username>Username</resource:theme.label.username>
 		<resource:theme.label.version>Version</resource:theme.label.version>
+		<resource:theme.label.view>View</resource:theme.label.view>
 
 		<!-- standard glyph icon images -->
 		<resource:theme.glyph.about rdf:resource="resource:theme.glyph.info"/>
@@ -167,12 +182,14 @@
 		<resource:theme.glyph.insert rdf:resource="images/icons/glyphs/insert.gif"/>
 		<resource:theme.glyph.key rdf:resource="images/icons/glyphs/key.gif"/>
 		<resource:theme.glyph.last rdf:resource="images/icons/glyphs/hand_point_right_boundary.gif"/>
+		<resource:theme.glyph.list rdf:resource="images/icons/glyphs/list.gif"/>
 		<resource:theme.glyph.lock.closed rdf:resource="images/icons/glyphs/lock_closed.gif"/>
 		<resource:theme.glyph.lock.open rdf:resource="images/icons/glyphs/lock_open.gif"/>
 		<resource:theme.glyph.login rdf:resource="resource:theme.glyph.enter"/>
 		<resource:theme.glyph.logout rdf:resource="resource:theme.glyph.exit"/>
 		<resource:theme.glyph.next rdf:resource="images/icons/glyphs/hand_point_right.gif"/>
 		<resource:theme.glyph.password rdf:resource="resource:theme.glyph.key"/>
+		<resource:theme.glyph.picture rdf:resource="images/icons/glyphs/picture.gif"/>
 		<resource:theme.glyph.polygon.curved rdf:resource="images/icons/glyphs/polygon_curved.gif"/>
 		<resource:theme.glyph.polygon.points rdf:resource="images/icons/glyphs/polygon_points.gif"/>
 		<resource:theme.glyph.previous rdf:resource="images/icons/glyphs/hand_point_left.gif"/>
@@ -188,6 +205,8 @@
 		<resource:theme.glyph.string.edit rdf:resource="images/icons/glyphs/string_edit.gif"/>
 		<resource:theme.glyph.submit rdf:resource="images/icons/glyphs/submit.gif"/>
 		<resource:theme.glyph.subtract rdf:resource="images/icons/glyphs/subtract.gif"/>
+		<resource:theme.glyph.thumbnails rdf:resource="images/icons/glyphs/thumbnails.gif"/>
+		<resource:theme.glyph.tree rdf:resource="resource:theme.glyph.tree.edit"/>
 		<resource:theme.glyph.upload rdf:resource="images/icons/glyphs/upload.gif"/>
 		<resource:theme.glyph.user rdf:resource="images/icons/glyphs/user.gif"/>
 		<resource:theme.glyph.view rdf:resource="resource:theme.glyph.eyeglasses"/>

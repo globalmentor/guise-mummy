@@ -254,6 +254,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_UPLOAD=createStringResourceReference("theme.label.upload");
 	public final static String LABEL_USERNAME=createStringResourceReference("theme.label.username");
 	public final static String LABEL_VERSION=createStringResourceReference("theme.label.version");
+	public final static String LABEL_VIEW=createStringResourceReference("theme.label.view");
 		//standard theme icons
 	public final static URI GLYPH_ABOUT=createURIResourceReference("theme.glyph.about");
 	public final static URI GLYPH_ACCEPT=createURIResourceReference("theme.glyph.accept");
@@ -294,12 +295,14 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI GLYPH_JOIN=createURIResourceReference("theme.glyph.join");
 	public final static URI GLYPH_KEY=createURIResourceReference("theme.glyph.key");
 	public final static URI GLYPH_LAST=createURIResourceReference("theme.glyph.last");
+	public final static URI GLYPH_LIST=createURIResourceReference("theme.glyph.list");
 	public final static URI GLYPH_LOCK_CLOSED=createURIResourceReference("theme.glyph.lock.closed");
 	public final static URI GLYPH_LOCK_OPEN=createURIResourceReference("theme.glyph.lock.open");
 	public final static URI GLYPH_LOGIN=createURIResourceReference("theme.glyph.login");
 	public final static URI GLYPH_LOGOUT=createURIResourceReference("theme.glyph.logout");
 	public final static URI GLYPH_NEXT=createURIResourceReference("theme.glyph.next");
 	public final static URI GLYPH_PASSWORD=createURIResourceReference("theme.glyph.password");
+	public final static URI GLYPH_PICTURE=createURIResourceReference("theme.glyph.picture");
 	public final static URI GLYPH_POLYGON_CURVED=createURIResourceReference("theme.glyph.polygon.curved");
 	public final static URI GLYPH_POLYGON_POINTS=createURIResourceReference("theme.glyph.polygon.points");
 	public final static URI GLYPH_PREVIOUS=createURIResourceReference("theme.glyph.previous");
@@ -315,6 +318,8 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI GLYPH_STRING_EDIT=createURIResourceReference("theme.glyph.string.edit");
 	public final static URI GLYPH_SUBMIT=createURIResourceReference("theme.glyph.submit");
 	public final static URI GLYPH_SUBTRACT=createURIResourceReference("theme.glyph.subtract");
+	public final static URI GLYPH_THUMBNAILS=createURIResourceReference("theme.glyph.thumbnails");
+	public final static URI GLYPH_TREE=createURIResourceReference("theme.glyph.tree");
 	public final static URI GLYPH_UPLOAD=createURIResourceReference("theme.glyph.upload");
 	public final static URI GLYPH_USER=createURIResourceReference("theme.glyph.user");
 	public final static URI GLYPH_VIEW=createURIResourceReference("theme.glyph.view");

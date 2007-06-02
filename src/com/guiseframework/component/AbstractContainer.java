@@ -2,6 +2,7 @@ package com.guiseframework.component;
 
 import java.util.*;
 
+import com.garretwilson.util.Debug;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.DefaultLabelModel;
@@ -112,6 +113,8 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		<dt>{@link ActionPrototype}</dt> <dd>{@link Button}</dd>
 		<dt>{@link LabelPrototype}</dt> <dd>{@link Label}</dd>	
 		<dt>{@link MenuPrototype}</dt> <dd>{@link DropMenu}</dd>	
+		<dt>{@link ValuePrototype}&lt;{@link Boolean}&gt;</dt> <dd>{@link CheckControl}</dd>	
+		<dt>{@link ValuePrototype}&lt;?&gt;</dt> <dd>{@link TextControl}</dd>	
 	</dl>
 	@param prototype The prototype of the component to create.
 	@return A new component based upon the given prototype.
@@ -131,11 +134,58 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		{
 			return new DropMenu((MenuPrototype)prototype, Flow.PAGE);
 		}
+		else if(prototype instanceof ValuePrototype)	//value prototypes
+		{
+			final Class<?> valueClass=((ValuePrototype<?>)prototype).getValueClass();	//get the type of value represented
+			if(Boolean.class.isAssignableFrom(valueClass))	//if a boolean value is represented
+			{
+				return new CheckControl((ValuePrototype<Boolean>)prototype);
+			}
+			else	//if the prototype is unrecognized
+			{
+				throw new IllegalArgumentException("Unrecognized prototype: "+prototype.getClass());
+			}		
+/*TODO finish
+			else	//for any other value type
+			{
+				return new TextControl<V>()
+			}
+*/
+		}
 		else	//if the prototype is unrecognized
 		{
-			throw new IllegalArgumentException("Undrecognized prototype: "+prototype.getClass());
+			throw new IllegalArgumentException("Unrecognized prototype: "+prototype.getClass());
 		}		
 	}
+
+	/**Creates a component appropriate for the context of this component from the given prototype.
+	This implementation creates the following components, in order of priority:
+	<dl>
+		<dt>{@link ActionPrototype}</dt> <dd>{@link Button}</dd>
+		<dt>{@link LabelPrototype}</dt> <dd>{@link Label}</dd>	
+		<dt>{@link MenuPrototype}</dt> <dd>{@link DropMenu}</dd>	
+		<dt>{@link ValuePrototype}&lt;{@link Boolean}&gt;</dt> <dd>{@link CheckControl}</dd>	
+		<dt>{@link ValuePrototype}&lt;?&gt;</dt> <dd>{@link TextControl}</dd>	
+	</dl>
+	@param prototype The prototype of the component to create.
+	@return A new component based upon the given prototype.
+	@exception IllegalArgumentException if no component can be created from the given prototype
+	*/
+/*TODO del if not needed
+	public <V> ValueControl<V, ?> createValueControl(final ValuePrototype<V> valuePrototype)
+	{
+		final Class<V> valueClass=valuePrototype.getValueClass();	//get the type of value represented
+		if(Boolean.class.isAssignableFrom(valueClass))	//if a boolean value is represented
+		{
+			return new CheckControl((ValuePrototype<Boolean>)valuePrototype);
+		}
+		else	//for any other value type
+		{
+			return new TextControl<V>()
+		}
+		
+	}
+*/
 
 	/**Removes a component from the container.
 	@param componentObject The component to remove.

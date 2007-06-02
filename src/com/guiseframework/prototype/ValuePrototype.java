@@ -108,23 +108,69 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 			}			
 		}
 
-	/**Constructs a value prototype indicating the type of value it can hold.
-	The default value is set to <code>null</code>.
+	/**Value class constructor with a <code>null</code> default value.
 	@param valueClass The class indicating the type of value held in the model.
 	@exception NullPointerException if the given value class is <code>null</code>.
 	*/
 	public ValuePrototype(final Class<V> valueClass)
 	{
-		this(valueClass, null);	//construct the class with a null default value
+		this(valueClass, (V)null);	//construct the class with a null default value
 	}
 
-	/**Constructs a value prototype indicating the type of value it can hold, along with an initial value.
+	/**Value class and default value constructor.
 	@param valueClass The class indicating the type of value held in the model.
 	@param defaultValue The default value, which will not be validated.
 	@exception NullPointerException if the given value class is <code>null</code>.
 	*/
 	public ValuePrototype(final Class<V> valueClass, final V defaultValue)
 	{
-		super(valueClass, defaultValue);	//construct the value model parent class
+		this(valueClass, defaultValue, null);	//construct the class with no label
 	}
+
+	/**Value class and label constructor with a <code>null</code> default value.
+	@param valueClass The class indicating the type of value held in the model.
+	@param label The text of the label, or <code>null</code> if there should be no label.
+	@exception NullPointerException if the given value class is <code>null</code>.
+	*/
+	public ValuePrototype(final Class<V> valueClass, final String label)
+	{
+		this(valueClass, null, label);	//construct the class with a null default value
+	}
+
+	/**Value class, default value, and label constructor.
+	@param valueClass The class indicating the type of value held in the model.
+	@param defaultValue The default value, which will not be validated.
+	@param label The text of the label, or <code>null</code> if there should be no label.
+	@exception NullPointerException if the given value class is <code>null</code>.
+	*/
+	public ValuePrototype(final Class<V> valueClass, final V defaultValue, final String label)
+	{
+		this(valueClass, defaultValue, label, null);	//construct the class with no icon
+	}
+
+	/**Value class, label, and icon constructor with a <code>null</code> default value.
+	@param valueClass The class indicating the type of value held in the model.
+	@param label The text of the label, or <code>null</code> if there should be no label.
+	@param icon The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.
+	@exception NullPointerException if the given value class is <code>null</code>.
+	*/
+	public ValuePrototype(final Class<V> valueClass, final String label, final URI icon)
+	{
+		this(valueClass, null, label, icon);	//construct the class with a null default value
+	}
+
+	/**Value class, default value, label, and icon constructor.
+	@param valueClass The class indicating the type of value held in the model.
+	@param defaultValue The default value, which will not be validated.
+	@param label The text of the label, or <code>null</code> if there should be no label.
+	@param icon The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.
+	@exception NullPointerException if the given value class is <code>null</code>.
+	*/
+	public ValuePrototype(final Class<V> valueClass, final V defaultValue, final String label, final URI icon)
+	{
+		super(valueClass, defaultValue);	//construct the value model parent class
+		this.label=label;	//save the label
+		this.icon=icon;	//save the icon
+	}
+
 }
