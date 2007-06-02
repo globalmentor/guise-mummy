@@ -24,7 +24,7 @@ import com.guiseframework.input.InputStrategy;
 import com.guiseframework.model.*;
 import com.guiseframework.model.ui.AbstractUIModel;
 import com.guiseframework.theme.Theme;
-import com.guiseframework.view.View;
+import com.guiseframework.viewer.Viewer;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.text.TextUtilities.*;
@@ -403,44 +403,44 @@ Debug.trace("now valid of", this, "is", isValid());
 			}
 		}
 
-	/**The view installed in this component.*/
-	private View<? extends GuiseContext, ? super C> view=null;
+	/**The viewer installed in this component.*/
+	private Viewer<? extends GuiseContext, ? super C> viewer=null;
 
-		/**@return The view installed in this component.
-		This implementation lazily creates a view if one has not yet been created, allowing view creation to be delayed so that appropriate properties such as layout may first be installed.
+		/**@return The viewer installed in this component.
+		This implementation lazily creates a viewer if one has not yet been created, allowing viewer creation to be delayed so that appropriate properties such as layout may first be installed.
 		*/
-		public View<? extends GuiseContext, ? super C> getView()
+		public Viewer<? extends GuiseContext, ? super C> getViewer()
 		{
-			if(view==null)	//if a view has not yet been created
+			if(viewer==null)	//if a viewer has not yet been created
 			{
-				view=getSession().getApplication().getView(getThis());	//ask the application for a view
-				if(view==null)	//if we couldn't find a view
+				viewer=getSession().getApplication().getViewer(getThis());	//ask the application for a view
+				if(viewer==null)	//if we couldn't find a viewer
 				{
-					throw new IllegalStateException("No registered view for "+getClass().getName());	//TODO use a better error
+					throw new IllegalStateException("No registered viewer for "+getClass().getName());
 				}
-				view.installed(getThis());	//tell the view it's being installed
+				viewer.installed(getThis());	//tell the viewer it's being installed
 			}
-			return view;	//return the view
+			return viewer;	//return the viewer
 		}
 
-		/**Sets the view used by this component.
+		/**Sets the viewer used by this component.
 		This is a bound property.
-		@param newView The new view to use.
-		@see Component#VIEW_PROPERTY
-		@exception NullPointerException if the given view is <code>null</code>.
+		@param newViewer The new viewer to use.
+		@see Component#VIEWER_PROPERTY
+		@exception NullPointerException if the given viewer is <code>null</code>.
 		*/
-		public void setView(final View<? extends GuiseContext, ? super C> newView)
+		public void setViewer(final Viewer<? extends GuiseContext, ? super C> newViewer)
 		{
-			if(newView!=checkInstance(view, "View cannot be null"))	//if the value is really changing
+			if(newViewer!=checkInstance(viewer, "Viewer cannot be null"))	//if the value is really changing
 			{
-				final View<? extends GuiseContext, ? super C> oldView=view;	//get a reference to the old value
+				final Viewer<? extends GuiseContext, ? super C> oldView=viewer;	//get a reference to the old value
 				if(oldView!=null)	//if a view has been installed
 				{
-					oldView.uninstalled(getThis());	//tell the old view it's being uninstalled
+					oldView.uninstalled(getThis());	//tell the old viewer it's being uninstalled
 				}
-				view=newView;	//actually change values
-				oldView.installed(getThis());	//tell the new view it's being installed
-				firePropertyChange(VIEW_PROPERTY, oldView, newView);	//indicate that the value changed				
+				viewer=newViewer;	//actually change values
+				oldView.installed(getThis());	//tell the new viewer it's being installed
+				firePropertyChange(VIEWER_PROPERTY, oldView, newViewer);	//indicate that the value changed				
 			}
 		}
 
@@ -853,13 +853,13 @@ Debug.trace("now valid of", this, "is", isValid());
 	This method delegates to the installed view
 	@param context Guise context information.
 	@exception IOException if there is an error updating the view.
-	@see #getView()
+	@see #getViewer()
 	@see GuiseContext.State#UPDATE_VIEW
 	*/
 	public <GC extends GuiseContext> void updateView(final GC context) throws IOException
 	{
-		final View<? super GC, ? super C> view=(View<? super GC, ? super C>)getView();	//get the view
-		view.update(context, getThis());	//tell the view to update
+		final Viewer<? super GC, ? super C> viewer=(Viewer<? super GC, ? super C>)getViewer();	//get the viewer
+		viewer.update(context, getThis());	//tell the viewer to update
 	}
 
 	/**Dispatches an input event to this component and all child components, if any.
@@ -1260,7 +1260,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	*/
 	public static List<Component<?>> getDirtyComponents(final Component<?> component, final List<Component<?>> dirtyComponents)
 	{
-		if(!component.getView().isUpdated())	//if this component's view isn't updated
+		if(!component.getViewer().isUpdated())	//if this component's view isn't updated
 		{
 			dirtyComponents.add(component);	//add this component to the list
 		}
@@ -1279,7 +1279,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	*/
 	public static void setUpdated(final Component<?> component, final boolean newUpdated)
 	{
-		component.getView().setUpdated(newUpdated);	//change the updated status of this component's view
+		component.getViewer().setUpdated(newUpdated);	//change the updated status of this component's view
 		if(component instanceof CompositeComponent)	//if the component is a composite component
 		{
 			for(final Component<?> childComponent:((CompositeComponent<?>)component).getChildren())	//for each child component

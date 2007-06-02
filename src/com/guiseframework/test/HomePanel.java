@@ -871,8 +871,8 @@ Debug.trace("list control changed value to", newValue);
 		final CardTabControl remoteTabControl=new CardTabControl(tabbedPanel, Flow.LINE);
 		contentPanel.add(remoteTabControl);
 
-Debug.trace("tabbed panel", tabbedPanel, "has view", tabbedPanel.getView());
-Debug.trace("card tab control", remoteTabControl, "has view", remoteTabControl.getView());
+Debug.trace("tabbed panel", tabbedPanel, "has view", tabbedPanel.getViewer());
+Debug.trace("card tab control", remoteTabControl, "has view", remoteTabControl.getViewer());
 
 		checkbox.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>()
 				{

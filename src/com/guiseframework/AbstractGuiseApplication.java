@@ -40,7 +40,7 @@ import com.guiseframework.component.kit.ComponentKit;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.controller.*;
 import com.guiseframework.theme.Theme;
-import com.guiseframework.view.View;
+import com.guiseframework.viewer.Viewer;
 
 /**An abstract base class for a Guise application.
 This implementation only works with Guise containers that descend from {@link AbstractGuiseContainer}.
@@ -704,93 +704,93 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		return null;	//show that we could not find a registered controller
 	}
 
-	/**Determines the view class registered for the given component class.
+	/**Determines the viewer class registered for the given component class.
 	This request is delegated to each component kit, with later-installed component kits taking precedence. 
 	@param componentClass The class of component that may be registered.
-	@return A class of view registered to render component of the specific class, or <code>null</code> if no view is registered.
+	@return A class of viewer registered to render component of the specific class, or <code>null</code> if no viewer is registered.
 	*/
-	protected Class<? extends View> getRegisteredViewClass(final Class<? extends Component> componentClass)
+	protected Class<? extends Viewer> getRegisteredViewerClass(final Class<? extends Component> componentClass)
 	{
 		for(final ComponentKit componentKit:componentKitList)	//for each component kit in our list
 		{
-			final Class<? extends View> viewClass=componentKit.getRegisteredViewClass(componentClass);	//ask the component kit for a registered view class for this component
-			if(viewClass!=null)	//if this component kit gave us a view class
+			final Class<? extends Viewer> viewerClass=componentKit.getRegisteredViewerClass(componentClass);	//ask the component kit for a registered viewer class for this component
+			if(viewerClass!=null)	//if this component kit gave us a viewer class
 			{
-				return viewClass;	//return the class
+				return viewerClass;	//return the class
 			}
 		}
-		return null;	//indicate that none of our installed component kits had a view class registered for the specified component class
+		return null;	//indicate that none of our installed component kits had a viewer class registered for the specified component class
 	}
 
-	/**Determines the view class appropriate for the given component class.
-	A view class is located by individually looking up the component class hiearchy for registered views.
-	@param componentClass The class of component for which a view should be returned.
-	@param allowDefault Whether a default view for the component class should be accepted.
-	@return A class of view for the given component class, or <code>null</code> if no view is registered.
+	/**Determines the viewer class appropriate for the given component class.
+	A viewer class is located by individually looking up the component class hiearchy for registered viewers.
+	@param componentClass The class of component for which a viewer should be returned.
+	@param allowDefault Whether a default viewer for the component class should be accepted.
+	@return A class of viewer for the given component class, or <code>null</code> if no viewer is registered.
 	*/
 	@SuppressWarnings("unchecked")	//we programmatically check the super classes and implemented interfaces to make sure they are component classes before casts
-	protected Class<? extends View> getViewClass(final Class<? extends Component> componentClass, final boolean allowDefault)	//TODO create a better algorithm that finds all matches and sorts them as to interface/class and distance from Component.class
+	protected Class<? extends Viewer> getViewerClass(final Class<? extends Component> componentClass, final boolean allowDefault)	//TODO create a better algorithm that finds all matches and sorts them as to interface/class and distance from Component.class
 	{
-		Class<? extends View> viewClass=getRegisteredViewClass(componentClass);	//see if there is a view class registered for this component type
-		if(viewClass==null)	//if we couldn't find a view for this class, check the immediate interfaces
+		Class<? extends Viewer> viewerClass=getRegisteredViewerClass(componentClass);	//see if there is a viewer class registered for this component type
+		if(viewerClass==null)	//if we couldn't find a viewer for this class, check the immediate interfaces
 		{
 			for(final Class<?> classInterface:componentClass.getInterfaces())	//look at each implemented interface
 			{
 				if(Component.class.isAssignableFrom(classInterface) && !Component.class.equals(classInterface))	//if the class interface is a component, but is not Component.class
 				{
-					viewClass=getRegisteredViewClass((Class<? extends Component>)classInterface);	//check the immediate interface
-					if(viewClass!=null)	//if we found a view class
+					viewerClass=getRegisteredViewerClass((Class<? extends Component>)classInterface);	//check the immediate interface
+					if(viewerClass!=null)	//if we found a view class
 					{
 						break;	//stop looking at the interfaces
 					}
 				}					
 			}
 		}
-		if(viewClass==null)	//if we still didn't find a view for this class, check up the class hierarchy
+		if(viewerClass==null)	//if we still didn't find a viewer for this class, check up the class hierarchy
 		{
 			final Class<?> superClass=componentClass.getSuperclass();	//get the super class of the component
 			if(superClass!=null && Component.class.isAssignableFrom(superClass))	//if the super class is a component
 			{
-				viewClass=getViewClass((Class<? extends Component>)superClass, false);	//check the super class
+				viewerClass=getViewerClass((Class<? extends Component>)superClass, false);	//check the super class
 			}
 		}
-		if(viewClass==null)	//if we couldn't find a view for this class, check up the interface hierarchy
+		if(viewerClass==null)	//if we couldn't find a viewer for this class, check up the interface hierarchy
 		{
-			for(final Class<?> classInterface:componentClass.getInterfaces())	//look at each implemented interface; this results in duplicated checking of immediate interfaces, but the algorithm is more straightforward and this will only happen once for each view installation
+			for(final Class<?> classInterface:componentClass.getInterfaces())	//look at each implemented interface; this results in duplicated checking of immediate interfaces, but the algorithm is more straightforward and this will only happen once for each viewer installation
 			{
 				if(Component.class.isAssignableFrom(classInterface) && !Component.class.equals(classInterface))	//if the class interface is a component, but is not Component.class
 				{
-					viewClass=getViewClass((Class<? extends Component>)classInterface, false);	//check the interface
-					if(viewClass!=null)	//if we found a view class
+					viewerClass=getViewerClass((Class<? extends Component>)classInterface, false);	//check the interface
+					if(viewerClass!=null)	//if we found a view class
 					{
 						break;	//stop looking at the interfaces
 					}
 				}					
 			}
 		}
-		if(viewClass==null && allowDefault)	//if we couldn't find a view for this class, as a last resort use a view for Component.class, if there is one
+		if(viewerClass==null && allowDefault)	//if we couldn't find a viewer for this class, as a last resort use a viewer for Component.class, if there is one
 		{
-			viewClass=getRegisteredViewClass(Component.class);	//see if there is a registered view for Component.class			
+			viewerClass=getRegisteredViewerClass(Component.class);	//see if there is a registered viewer for Component.class			
 		}
-		return viewClass;	//show which if any view class we found
+		return viewerClass;	//show which if any viewer class we found
 	}
 
-	/**Determines the view appropriate for the given component.
-	A view class is located by individually looking up the component class hiearchy for registered render strategies, at each checking all installed component kits.
+	/**Determines the viewer appropriate for the given component.
+	A viewer class is located by individually looking up the component class hiearchy for registered render strategies, at each checking all installed component kits.
 	@param <GC> The type of Guise context being used.
-	@param <C> The type of component for which a view is requested.
-	@param component The component for which a view should be returned.
-	@return A view to render the given component, or <code>null</code> if no view is registered.
+	@param <C> The type of component for which a viewer is requested.
+	@param component The component for which a viewer should be returned.
+	@return A viewer to render the given component, or <code>null</code> if no viewer is registered.
 	*/
-	public <C extends Component<?>> View<? extends GuiseContext, ? super C> getView(final C component)
+	public <C extends Component<?>> Viewer<? extends GuiseContext, ? super C> getViewer(final C component)
 	{
 		Class<? extends Component> componentClass=component.getClass();	//get the component class
-		final Class<? extends View> viewClass=getViewClass(componentClass, true);	//walk the hierarchy to see if there is a view class registered for this component type
-		if(viewClass!=null)	//if we found a view class
+		final Class<? extends Viewer> viewerClass=getViewerClass(componentClass, true);	//walk the hierarchy to see if there is a viewer class registered for this component type
+		if(viewerClass!=null)	//if we found a viewer class
 		{
 			try
 			{
-				return (View<? extends GuiseContext, ? super C>)viewClass.newInstance();	//return a new instance of the class
+				return (Viewer<? extends GuiseContext, ? super C>)viewerClass.newInstance();	//return a new instance of the class
 			}
 			catch (InstantiationException e)
 			{
@@ -803,7 +803,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 				throw new AssertionError(e);	//TODO fix
 			}
 		}
-		return null;	//show that we could not find a registered view
+		return null;	//show that we could not find a registered viewer
 	}
 
 

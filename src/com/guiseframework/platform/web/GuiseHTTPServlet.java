@@ -96,7 +96,7 @@ import com.guiseframework.model.FileItemResourceImport;
 import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.web.css.*;
 import com.guiseframework.theme.Theme;
-import com.guiseframework.view.text.xml.xhtml.XHTMLApplicationFrameView;
+import com.guiseframework.viewer.text.xml.xhtml.XHTMLApplicationFrameView;
 
 import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static com.garretwilson.util.LocaleUtilities.*;

@@ -11,7 +11,7 @@ import com.guiseframework.component.kit.ComponentKit;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.controller.*;
 import com.guiseframework.theme.Theme;
-import com.guiseframework.view.View;
+import com.guiseframework.viewer.Viewer;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
@@ -161,14 +161,14 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public <C extends Component<?>> Controller<? extends GuiseContext, ? super C> getController(final C component);
 
-	/**Determines the view appropriate for the given component.
-	A view class is located by individually looking up the component class hiearchy for registered render strategies, at each checking all installed component kits.
+	/**Determines the viewer appropriate for the given component.
+	A viewer class is located by individually looking up the component class hiearchy for registered render strategies, at each checking all installed component kits.
 	@param <GC> The type of Guise context being used.
-	@param <C> The type of component for which a view is requested.
-	@param component The component for which a view should be returned.
-	@return A view to render the given component, or <code>null</code> if no view is registered.
+	@param <C> The type of component for which a viewer is requested.
+	@param component The component for which a viewer should be returned.
+	@return A viewer to render the given component, or <code>null</code> if no viewer is registered.
 	*/
-	public <C extends Component<?>> View<? extends GuiseContext, ? super C> getView(final C component);
+	public <C extends Component<?>> Viewer<? extends GuiseContext, ? super C> getViewer(final C component);
 
 	/**Associates multiple destinations with application context-relative paths or path patterns.
 	All destinations are first cleared.

@@ -20,7 +20,7 @@ import com.guiseframework.input.InputStrategy;
 import com.guiseframework.model.*;
 import com.guiseframework.model.ui.UIModel;
 import com.guiseframework.theme.Theme;
-import com.guiseframework.view.View;
+import com.guiseframework.viewer.Viewer;
 
 /**Base interface for all Guise components.
 Each component must provide either a Guise session constructor; or a Guise session and string ID constructor.
@@ -69,8 +69,8 @@ public interface Component<C extends Component<C>> extends UIModel, LabelModel
 	public final static String THEME_APPLIED_PROPERTY=getPropertyName(Component.class, "themeApplied");
 	/**The valid bound property.*/
 	public final static String VALID_PROPERTY=getPropertyName(Component.class, "valid");
-	/**The bound property of the view.*/
-	public final static String VIEW_PROPERTY=getPropertyName(Component.class, "view");
+	/**The bound property of the viewer.*/
+	public final static String VIEWER_PROPERTY=getPropertyName(Component.class, "viewer");
 
 	/**@return The name of the component, not guaranteed to be unique (but guaranteed not to be the empty string) and useful only for searching for components within a component sub-hierarchy, or <code>null</code> if the component has no name.*/
 	public String getName();
@@ -171,15 +171,15 @@ public interface Component<C extends Component<C>> extends UIModel, LabelModel
 	public void setController(final Controller<? extends GuiseContext, ? super C> newController);
 
 	/**@return The view installed in this component.*/
-	public View<? extends GuiseContext, ? super C> getView();
+	public Viewer<? extends GuiseContext, ? super C> getViewer();
 
-	/**Sets the view used by this component.
+	/**Sets the viewer used by this component.
 	This is a bound property.
-	@param newView The new view to use.
-	@see #VIEW_PROPERTY
-	@exception NullPointerException if the given view is <code>null</code>.
+	@param newViewer The new viewer to use.
+	@see #VIEWER_PROPERTY
+	@exception NullPointerException if the given viewer is <code>null</code>.
 	*/
-	public void setView(final View<? extends GuiseContext, ? super C> newView);
+	public void setViewer(final Viewer<? extends GuiseContext, ? super C> newViewer);
 
 	/**@return The component identifier.*/
 	public String getID();
@@ -340,7 +340,7 @@ public interface Component<C extends Component<C>> extends UIModel, LabelModel
 	This method delegates to the installed view.
 	@param context Guise context information.
 	@exception IOException if there is an error updating the view.
-	@see #getView()
+	@see #getViewer()
 	@see GuiseContext.State#UPDATE_VIEW
 	*/
 	public <GC extends GuiseContext> void updateView(final GC context) throws IOException;

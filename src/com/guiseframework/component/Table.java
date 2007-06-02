@@ -649,7 +649,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 						public void listModified(final ListEvent<Object> listEvent)	//if the table list is modified
 						{
 							clearComponentStates();	//clear all the components and component states TODO probably do this on a component-by-component basis
-							getView().setUpdated(false);	//TODO fix hack; add a table listener and have the view listen to that
+							getViewer().setUpdated(false);	//TODO fix hack; add a table listener and have the view listen to that
 						};
 					});
 		}
