@@ -2,6 +2,7 @@ package com.guiseframework.component;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.garretwilson.util.Debug;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.ActionModel;
@@ -146,7 +147,7 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the action is performed
 					{
-						fireActionPerformed(1, 0);	//fire an action with this component as the source
+						fireActionPerformed(1, 0);	//fire an action with this component as the source TODO important---shouldn't we use a copy constructor, here?
 					}
 				});
 		addMouseListener(new MouseAdapter()	//listen for the mouse over the menu
@@ -156,7 +157,10 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 					*/
 					public void mouseEntered(final MouseEnterEvent mouseEvent)
 					{
-						setRollover(true);	//turn on the rollover state						
+						if(getParent() instanceof Menu)
+						{
+							setRollover(true);	//turn on the rollover state
+						}
 					}
 		
 					/**Called when the mouse exits the target.
@@ -164,7 +168,10 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 					*/
 					public void mouseExited(final MouseExitEvent mouseEvent)
 					{
-						setRollover(false);	//turn off the rollover state						
+						if(getParent() instanceof Menu)
+						{
+							setRollover(false);	//turn off the rollover state
+						}
 					}
 
 				});

@@ -881,6 +881,10 @@ Debug.trace("now valid of", this, "is", isValid());
 	public void dispatchInputEvent(final InputEvent inputEvent)
 	{
 //TODO del Debug.trace("in component", this, "ready to do default dispatching of input event", inputEvent);		
+		if(inputEvent instanceof TargetedEvent && !this.equals(((TargetedEvent)inputEvent).getTarget()))	//if this is a targeted event that is not bound for this component TODO document, if it works; later allow for registration of pre/target/post bubble listening
+		{
+			return;	//don't fire the event or pass it to the input strategy
+		}
 		if(!inputEvent.isConsumed())	//if the input has not been consumed
 		{
 //Debug.trace("event is not consumed; ready to fire it to listeners");

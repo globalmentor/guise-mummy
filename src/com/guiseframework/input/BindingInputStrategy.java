@@ -84,25 +84,25 @@ public class BindingInputStrategy extends AbstractInputStrategy
 	*/
 	public boolean input(final Input input)
 	{
-		final Object targetObject=bindings.get(input);	//get the target object bound to this input
-		if(targetObject!=null)	//if there is a target object
+		final Object boundObject=bindings.get(input);	//get the object bound to this input
+		if(boundObject!=null)	//if there is a bound object
 		{
-			if(targetObject instanceof Input)	//if the target is more input
+			if(boundObject instanceof Input)	//if the bound is more input
 			{
-				Guise.getInstance().getGuiseSession().input((Input)targetObject);	//send the input to the Guise session for further processing
+				Guise.getInstance().getGuiseSession().input((Input)boundObject);	//send the input to the Guise session for further processing
 			}
-			else if(targetObject instanceof ActionModel)	//if the target is an action
+			else if(boundObject instanceof ActionModel)	//if the bound object is an action
 			{
-				final ActionModel actionModel=((ActionModel)targetObject);	//get the action model
+				final ActionModel actionModel=((ActionModel)boundObject);	//get the action model
 				if(actionModel instanceof Enableable && !((Enableable)actionModel).isEnabled())	//if the action model is enableable but not enabled
 				{
 					return false;	//don't perform the action or consume the input
 				}
 				actionModel.performAction();	//perform the action
 			}
-			else	//if we don't recognize the target object, something's wrong, because we control everything that's stored in the map
+			else	//if we don't recognize the bound object, something's wrong, because we control everything that's stored in the map
 			{
-				throw new AssertionError("Unrecognized input binding: "+targetObject);
+				throw new AssertionError("Unrecognized input binding: "+boundObject);
 			}
 			return true;	//indicate that we consumed the input
 		}

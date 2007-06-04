@@ -9,6 +9,33 @@ navigator.userAgentVersionNumber The version of the user agent stored as a numbe
 /*Guise AJAX Request Format, content type application/x-guise-ajax-request+xml
 <request>
 	<events>	<!--the list of events (zero or more)-->
+		<action	<!--an action on a component-->
+			componentID=""	<!--the ID of the component-->
+			targetID=""	<!--the ID of the target element on which the action occurred-->
+			actionID=""	<!--the action identifier-->
+		/>
+		<change	<!--a property change on a component-->
+			componentID="">	<!--the ID of the component-->
+			<property name=""	<!--the name of a property changing-->
+				<value></value>	<!--(zero or more) the new property; zero may signify null in some contexts--> 
+			</property>
+		</change>
+		<drop>	<!--the end of a drag-and-drop operation-->
+			<source id=""/>	<!--the element that was the source of the drag and drop operation-->
+			<target id=""/>	<!--the element that was is the target of the drag and drop operation-->
+			<mouse x="" y=""/>	<!--the mouse information at the time of the drop-->
+		</drop>
+		<focus	<!--a focus change-->
+			componentID=""	<!--the ID of the component-->
+		/>
+		<form	<!--information resulting from form changes, analogous to that in an HTTP POST-->
+			exhaustive="true|false"	<!--indicates whether the event contains values for all form controls (defaults to false)-->
+			provisional="true|false"	<!--indicates whether the value is a provisional value that has not yet been accepted by the user (defaults to false)-->
+		>
+			<control name="">	<!--a control change (zero or more)-->
+				<!--the value of the control (putting the value into an attribute could corrupt the value because of XML attribute canonicalization rules-->
+			</control>
+		</form>
 		<init	<!--initializes the page, requesting all frames to be resent-->
 			jsVersion=""	<!--version of JavaScript supported by the browser-->
 			timezone=""
@@ -22,41 +49,17 @@ navigator.userAgentVersionNumber The version of the user agent stored as a numbe
 			browserHeight=""
 			referrer=""
 		/>
-		<ping/> <!--pings the server to check for updates-->
-		<form	<!--information resulting from form changes, analogous to that in an HTTP POST-->
-			exhaustive="true|false"	<!--indicates whether the event contains values for all form controls (defaults to false)-->
-			provisional="true|false"	<!--indicates whether the value is a provisional value that has not yet been accepted by the user (defaults to false)-->
-		>
-			<control name="">	<!--a control change (zero or more)-->
-				<!--the value of the control (putting the value into an attribute could corrupt the value because of XML attribute canonicalization rules-->
-			</control>
-		</form>
-		<drop>	<!--the end of a drag-and-drop operation-->
-			<source id=""/>	<!--the element that was the source of the drag and drop operation-->
-			<target id=""/>	<!--the element that was is the target of the drag and drop operation-->
-			<mouse x="" y=""/>	<!--the mouse information at the time of the drop-->
-		</drop>
-		<action	<!--an action on a component-->
-			componentID=""	<!--the ID of the component-->
-			targetID=""	<!--the ID of the target element on which the action occurred-->
-			actionID=""	<!--the action identifier-->
-		/>
-		<change	<!--a property change on a component-->
-			componentID="">	<!--the ID of the component-->
-			<property name=""	<!--the name of a property changing-->
-				<value></value>	<!--(zero or more) the new property; zero may signify null in some contexts--> 
-			</property>
-		</change>
-		<focus	<!--a focus change-->
-			componentID=""	<!--the ID of the component-->
-		/>
-		<keyPress|keyRelease	<!--a key pressed or released anywhere; currently only certain control keys are reported-->
+		<keypress|keyrelease	<!--a key pressed or released anywhere; currently only certain control keys are reported-->
 			code=""	<!--the code of the key pressed or released-->
 			altKey="true|false"	<!--whether the Alt key was pressed-->
 			controlKey="true|false"	<!--whether the Control key was pressed-->
 			shiftKey="true|false"	<!--whether the Shift key was pressed-->
 		/>
-		<mouseEnter|mouseExit|mouseClick	<!--a mouse event related to a component-->
+		<log> <!--sends debug information to the server-->
+			level=""	<!--the level of debug reporting-->
+			text	<!--the text to trace
+		</log>
+		<mouseenter|mouseexit|mouseclick	<!--a mouse event related to a component-->
 			altKey="true|false"	<!--whether the Alt key was pressed-->
 			controlKey="true|false"	<!--whether the Control key was pressed-->
 			shiftKey="true|false"	<!--whether the Shift key was pressed-->
@@ -68,6 +71,7 @@ navigator.userAgentVersionNumber The version of the user agent stored as a numbe
 			<target id="" x="" y="" width="" height=""/>	<!--information on the element that was the target of the mouse event (in absolute terms)-->
 			<mouse x="" y=""/>	<!--the mouse information at the time of the drop (in fixed terms)-->
 		</mouseEnter|mouseExit|mouseClick>
+		<ping/> <!--pings the server to check for updates-->
 	</events>
 </request>
 */
@@ -127,9 +131,6 @@ var XHTML_NAMESPACE_URI="http://www.w3.org/1999/xhtml";
 
 /**The URI of the GuiseML namespace.*/
 var GUISE_ML_NAMESPACE_URI="http://guiseframework.com/id/ml#";
-
-/**The class prefix of a menu.*/
-//TODO del when works var MENU_CLASS_PREFIX="menu-";
 
 /**The class suffix for a tab.*/
 var TAB_CLASS_SUFFIX="-tab";
@@ -214,13 +215,34 @@ var STYLES=
 	SLIDER_CONTROL: "sliderControl",
 	SLIDER_CONTROL_THUMB: "sliderControl-thumb",
 	SLIDER_CONTROL_TRACK: "sliderControl-track",
-	MENU: "dropMenu",
-	MENU_BODY: "dropMenu-body",
-	MENU_CHILDREN: "dropMenu-children",
 	FRAME_TETHER: "frame-tether"
 };
 
 //Array
+
+/**Returns an array representing the contents of the given object.
+This implementation recognizes other arrays and the arguments of a function;
+along with anything else that is iterable by virtue of having a length property and a [] access method.
+@param object The non-null object the contents of which to return as an array.
+@return An array containing the contents of the given object.
+@see http://www.prototypejs.org/api/array/from
+*/
+Array.from=function(object)
+{
+	if(object instanceof Array)	//if the object is an array
+	{
+		return object;
+	}
+	else	//otherwise, try to iterate using length and []
+	{
+		var array=new Array();	//create a new array
+		for(var i=0, length=object.length; i<length; ++i)	//for each element
+		{
+			array.add(object[i]);	//add this element to our array
+		}
+		return array;	//return the new array we created
+	}
+};
 
 /**An add() method for arrays, equivalent to Array.push().*/
 Array.prototype.add=Array.prototype.push;
@@ -1268,6 +1290,23 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 		}
 		return node;	//return the element we found
 	},
+
+	/**Retrieves all the ancestor elements, including the given element, if any, with the given class of the given node, starting at the node itself. Multiple class names are supported.
+	@param node The node the ancestor of which to find, or null if the search should not take place.
+	@param className The name of the class for which to check, or a regular expression if a match should be found.
+	@return A non-null array of elements with the given class in which the node lies.
+	*/
+	getAncestorElementsByClassName:function(node, className)
+	{
+		var ancestorElements=new Array();	//create a new array
+		var ancestorElement=this.getAncestorElementByClassName(node, className);	//get the first ancestor element
+		while(ancestorElement)	//while we're not out of ancestor elements
+		{
+			ancestorElements.add(ancestorElement);	//add this ancestor element
+			ancestorElement=this.getAncestorElementByClassName(ancestorElement.parentNode, className);	//get the next ancestor element
+		}
+		return ancestorElements;	//return the ancestor elements we found
+	},
 	
 	/**Retrieves the ancestor element with the given class of the given node, starting at the node itself. Multiple class names are supported.
 	@param node The node the ancestor of which to find, or null if the search should not take place.
@@ -1961,7 +2000,21 @@ function KeyAJAXEvent(eventType, code, altKey, controlKey, shiftKey)
 }
 
 /**The available types of key events.*/
-KeyAJAXEvent.EventType={PRESS: "keyPress", RELEASE: "keyRelease"};
+KeyAJAXEvent.EventType={PRESS: "keypress", RELEASE: "keyrelease"};
+
+//Log AJAX Event
+
+/**A class encapsulating debug information to send to the server.
+@param level The level of debug reporting.
+@param text The text to log.
+var level: The level of debug reporting.
+var text: The text to log.
+*/
+function LogAJAXEvent(level, text)
+{
+	this.level=level;
+	this.text=text;
+}
 
 /**A class encapsulating mouse information for an AJAX request.
 @param eventType: The type of mouse event; one of MouseAJAXEvent.EventType.
@@ -2004,7 +2057,7 @@ function MouseAJAXEvent(eventType, component, target, x, y, altKey, controlKey, 
 }
 
 /**The available types of mouse events.*/
-MouseAJAXEvent.EventType={CLICK: "mouseClick", ENTER: "mouseEnter", EXIT: "mouseExit"};
+MouseAJAXEvent.EventType={CLICK: "mouseclick", ENTER: "mouseenter", EXIT: "mouseexit"};
 
 //AJAX Response
 
@@ -2255,6 +2308,7 @@ function GuiseAJAX()
 					DROP: "drop", SOURCE: "source", TARGET: "target", VIEWPORT: "viewport",
 					FOCUS: "focus",
 					CODE: "code", ALT_KEY: "altKey", CONTROL_KEY: "controlKey", SHIFT_KEY: "shiftKey",
+					LOG: "log", LEVEL: "level",
 					MOUSE: "mouse", ID: "id", X: "x", Y: "y", WIDTH: "width", HEIGHT: "height", BUTTON: "button", CLICK_COUNT: "clickCount",
 					INIT: "init",
 					PING: "ping"
@@ -2337,7 +2391,7 @@ function GuiseAJAX()
 				this._enabled=enabled;	//update the enabled status
 				if(!enabled)	//if AJAX has been disabled
 				{
-					guiseAJAX.setPingInterval(-1);	//turn off pinging
+					this.setPingInterval(-1);	//turn off pinging
 				}				
 			}
 		};
@@ -2358,10 +2412,23 @@ function GuiseAJAX()
 				}
 				if(pingInterval>=0)	//if ping should be enabled
 				{
-					var localThis=this;	//save a reference to this object to allow calling this via closure
-					this._pingIntervalID=window.setInterval(function(){localThis.sendAJAXRequest(new PingAJAXEvent());}, pingInterval);	//send a ping event at the correct interval
+					this._pingIntervalID=window.setInterval(this.ping.bind(this), pingInterval);	//send a ping event at the correct interval
 				}
 			}
+		};
+
+		/**Sends a ping request to the server.*/
+		GuiseAJAX.prototype.ping=function()
+		{
+			this.sendAJAXRequest(new PingAJAXEvent());	//create and queue a new ping event
+		};
+
+		/**Sends a trace request to the server.
+		@param objects The objects to trace; the string versions of these objects will be combined into a single string separated by whitespace.
+		*/
+		GuiseAJAX.prototype.trace=function(objects)
+		{
+			this.sendAJAXRequest(new LogAJAXEvent("trace", Array.from(arguments).join(" ")));	//create and queue a new log event from the arguments
 		};
 
 		/**Immediately sends or queues an AJAX request.
@@ -2416,6 +2483,10 @@ function GuiseAJAX()
 						else if(ajaxRequest instanceof KeyAJAXEvent)	//if this is a key event
 						{
 							this._appendKeyAJAXEvent(requestStringBuilder, ajaxRequest);	//append the key event
+						}
+						else if(ajaxRequest instanceof LogAJAXEvent)	//if this is a log event
+						{
+							this._appendLogAJAXEvent(requestStringBuilder, ajaxRequest);	//append the log event
 						}
 						else if(ajaxRequest instanceof MouseAJAXEvent)	//if this is a mouse event
 						{
@@ -2567,6 +2638,20 @@ function GuiseAJAX()
 							this.RequestElement.CONTROL_KEY, ajaxKeyEvent.controlKey,	//controlKey="controlKey"
 							this.RequestElement.SHIFT_KEY, ajaxKeyEvent.shiftKey));	//shiftKey="shiftKey"
 			DOMUtilities.appendXMLEndTag(stringBuilder, ajaxKeyEvent.eventType);	//</keyXXX>
+			return stringBuilder;	//return the string builder
+		};
+
+		/**Appends an AJAX log event to a string builder.
+		@param stringBuilder The string builder collecting the request data.
+		@param ajaxLogEvent The log event information to append.
+		@return The string builder.
+		*/
+		GuiseAJAX.prototype._appendLogAJAXEvent=function(stringBuilder, ajaxLogEvent)
+		{
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.LOG,	//<log>
+					new Map(this.RequestElement.LEVEL, ajaxLogEvent.level));	//level="level"
+			DOMUtilities.appendXMLText(stringBuilder, ajaxLogEvent.text);	//text
+			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.LOG);	//</log>
 			return stringBuilder;	//return the string builder
 		};
 
@@ -3172,7 +3257,6 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(thisGuiseAJAX.isEnabled()
 						}
 						var oldAttributeValue=oldElement[attributeName];	//get the old attribute value
 						var valueChanged=oldAttributeValue!=attributeValue;	//see if the value is really changing
-
 						if(valueChanged && attributeName=="className")	//if the class name value is changing, add back any non-removable classes as needed
 						{
 							if(oldAttributeValue.match(this.NON_REMOVABLE_CLASSES_REGEX))	//if the original class name had one of the non-removable classes (this is only to eliminate most cases in which there are no non-removable classes; because the regular expression has word boundary checking, this test may give some false positives because of substring matching)
@@ -4847,21 +4931,6 @@ function initializeNode(node, deep, initialInitialization)
 							}
 						}
 						break;
-					case "div":
-								//check for menu
-						if(elementClassNames.contains(STYLES.MENU))	//if this is a menu
-						{
-							var menu=DOMUtilities.getAncestorElementByClassName(node, STYLES.MENU_BODY);	//get the menu ancestor
-							if(menu)	//if there is a menu ancestor (i.e. this is not the root menu)
-							{
-//TODO del when works alert("for class "+className+" non-root menu: "+menu.id);
-								eventManager.addEvent(node, "mouseover", onMenuMouseOver, false);
-								eventManager.addEvent(node, "mouseout", onMenuMouseOut, false);
-								break;
-							}
-//TODO del alert("found menu class: "+elementClassName);
-						}
-						break;
 					case "img":
 						var rolloverSrc=node.getAttribute("guise:rolloverSrc");	//get the image rollover, if there is one TODO use a constant
 						if(rolloverSrc)	//if the image has a rollover TODO use a constant; maybe use hasAttributeNS()
@@ -4957,8 +5026,11 @@ function initializeNode(node, deep, initialInitialization)
 							eventManager.addEvent(node, "mousedown", onDragBegin, false);	//listen for mouse down on a drag handle
 							break;
 						case STYLES.MOUSE_LISTENER:
-							eventManager.addEvent(node, "mouseover", onMouse, false);	//listen for mouse over on a mouse listener
-							eventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener
+							if(!DOMUtilities.getAncestorElementByClassName(node.parentNode, STYLES.MOUSE_LISTENER))	//make sure this is the root mouse listener, as we'll allow events to bubble
+							{
+								eventManager.addEvent(node, "mouseover", onMouse, false);	//listen for mouse over on a mouse listener
+								eventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener
+							}
 							break;
 						case STYLES.DROP_TARGET:
 							guise.addDropTarget(node);	//add this node to the list of drop targets
@@ -5691,105 +5763,6 @@ function onSelectChange(event)
 	}
 }
 
-/**A class encapsulating menu state.*/
-function MenuState()
-{
-
-	/**The menu currently open, or null if no menu is currently open.*/
-	this._openedMenu=null;	//TODO this currently works with two-deep nested menus; verify that it works on multiple levels; if not, we may need to use an array---or maybe using stopPropagation on the event will obviate the problem
-
-	this._closingMenus=new Array();	//create an array to keep track of closing menus
-
-	this._closeTimeout=null;	//show that we have no timer in use
-
-	if(!MenuState.prototype._initialized)
-	{
-		MenuState.prototype._initialized=true;
-
-		/**Opens a menu.
-		@param menu The menu to open.
-		*/
-		MenuState.prototype.openMenu=function(menu)
-		{
-			for(var i=this._closingMenus.length-1; i>=0; --i)	//look at all the menus set for closing, in reverse order
-			{
-				if(this._closingMenus[i]==menu)	//if this menu was scheduled for closing
-				{
-					this._closingMenus.remove(i);	//remove this menu from the closing list
-				}
-			}
-			if(this._openedMenu!=menu)	//if this menu wasn't already open
-			{
-				this._closeMenus();	//close all menus, if any, that were queued to be closed
-				menu.style.visibility="visible";	//show the menu
-				this._openedMenu=menu;	//show that this menu is open
-			}
-		};
-
-		/**Closes a menu.
-		@param menu The menu to close.
-		*/
-		MenuState.prototype.closeMenu=function(menu)
-		{
-			this._closingMenus.enqueue(menu);	//add this menu to the list of menus needing closing
-			var timeout=this._closeTimeout;	//get the current close timer
-			if(timeout)	//if there is a close timer
-			{
-				clearTimeout(timeout);	//clear the timeout
-			}
-			this._closeTimeout=window.setTimeout(this._closeMenus.bind(this), 500);	//close the menu a split second later
-		};
-
-		/**Closes all menus immediately.*/
-		MenuState.prototype._closeMenus=function()
-		{
-			var timeout=this._closeTimeout;	//get the current close timer
-			if(timeout)	//if there is a close timer
-			{
-				this._closeTimeout=null;	//remove the timeout
-				clearTimeout(timeout);	//clear the timeout, but leave it 
-			}
-			while(this._closingMenus.length>0)	//while there are menus to close
-			{
-				var menu=this._closingMenus.dequeue();	//get the next menu to close
-				menu.style.visibility="hidden";	//hide the menu
-				if(this._openedMenu==menu)	//if this was the last-opened menu
-				{
-					this._openedMenu=null;	//show that the menu is no longer open
-				}
-			}
-		};
-	}
-}
-
-var menuState=new MenuState();	//create a new menu state object
-
-/**Called when the mouse is over a menu.
-@param event The object describing the event.
-*/
-function onMenuMouseOver(event)
-{
-	var menu=DOMUtilities.getDescendantElementByClassName(event.currentTarget, STYLES.MENU_BODY);	//get the menu below us
-	if(menu)	//if there is a menu below us
-	{
-		menuState.openMenu(menu);	//open this menu
-		//TODO stop bubbling, and see if this changes the currently-opened-menu code
-	}
-}
-
-/**Called when the mouse is over a menu.
-@param event The object describing the event.
-*/
-function onMenuMouseOut(event)
-{
-	var menu=DOMUtilities.getDescendantElementByClassName(event.currentTarget, STYLES.MENU_BODY);	//get the menu below us
-	if(menu)	//if there is a menu below us
-	{
-		menuState.closeMenu(menu);	//close this menu
-		//TODO stop bubbling, and see if this changes the currently-opened-menu code
-	}
-}
-
 /**Called when dragging begins on a drag handle.
 @param event The object describing the event.
 */
@@ -6032,16 +6005,20 @@ if(isNaN(newCoordinate))
 	}
 }
 
+/**The set of component IDs for which the mouse is recorded as being over.*/
+var mouseOverComponentIDs=new Object();
+
 /**Called when the mouse enters or exits a mouse listener.
 If the current target element has a "mouseListener" class, the event will be reported to the server.
 @param event The object describing the event.
 */
 function onMouse(event)
 {
-	var relatedTarget=event.relatedTarget;	//get the related target
+	var target=event.target;	//get the target of the event
+	var relatedTarget=event.relatedTarget;	//see which element the mouse is going to or from
 	if(relatedTarget)	//if there is a related target, see if we should ignore the event
 	{
-		var ignoreEvent=event.currentTarget==relatedTarget;	//ignore the event if is generated by leaving the same element, as Mozilla does (TODO probably see if relatedTarget is a child of current target)
+		var ignoreEvent=target==relatedTarget;	//ignore the event if is generated by leaving the same element, as Mozilla does (TODO probably see if relatedTarget is a child of current target)
 		try
 		{
 			var dummy=relatedTarget.nodeName;	//try to get the event.relatedTarget.nodeName, which on Mozilla will fail on the events we should ignore
@@ -6054,17 +6031,6 @@ function onMouse(event)
 		{
 			return;	//ignore extraneous mouse events
 		}
-	}
-	var target=event.currentTarget;	//get the target of the event
-		//if the mouse is supposedly leaving the element, make sure it's not just moving to a child element, and vice versa (see http://www.quirksmode.org/js/events_mouse.html#mouseover)
-	var otherTarget=event.relatedTarget;	//see which element the mouse is going to or from
-	while(otherTarget && otherTarget!=document.documentElement)	//while we haven't reached the top of the DOM TODO find out why otherTarget can be null in IE
-	{
-		if(otherTarget==target)	//if the mouse is still over the original element
-		{
-			return;	//ignore the mouse exit event while it is still over this element
-		}
-		otherTarget=otherTarget.parentNode;	//check up the hierarchy TODO fix; IE gave an error here once, so maybe somehow otherTarget was null
 	}
 	if(target.nodeName.toLowerCase()=="img")	//if this is an image, perform rollovers if needed
 	{
@@ -6080,11 +6046,66 @@ function onMouse(event)
 					target.src=target.getAttribute("guise:originalSrc");	//switch back to the original source TODO use a constant
 					break;
 			}
+			event.stopPropagation();	//tell the event to stop bubbling
+			event.preventDefault();	//prevent the default functionality from occurring
+			return;	//don't send any AJAX event for the image rollover
 		}
 	}
-	var component=DOMUtilities.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element
-	if(component)	//if we know the component
+	var currentTarget=event.currentTarget;	//get the element on which this event listener was registered
+	var component=DOMUtilities.getAncestorElementByClassName(DOMUtilities.getAncestorElementByClassName(target, STYLES.MOUSE_LISTENER), STYLES.COMPONENT);	//we'll only report mouse in/out events to the top-most component that is the mouse listener
+	var otherComponent=DOMUtilities.getAncestorElementByClassName(DOMUtilities.getAncestorElementByClassName(relatedTarget, STYLES.MOUSE_LISTENER), STYLES.COMPONENT);	//get the component element of the other mouse listener
+	if(component && component!=otherComponent)	//if we know the component, and the mouse isn't simply moving around inside the same component TODO at some point remove the whole mouse listener class and record events for all components
 	{
+		var componentID=component.id;	//get the component ID
+		switch(event.type)	//see which type of mouse event this is
+		{
+			case "mouseover":	//if we are entering a component
+//guiseAJAX.trace("got mouse over component ID: ", componentID);
+				var ancestorComponents=DOMUtilities.getAncestorElementsByClassName(component, STYLES.COMPONENT);	//get an array of all ancestor components, including this component, in current-to-root order
+				for(var i=ancestorComponents.length-1; i>=0; --i)	//for each ancestor, from root to this one
+				{
+					var ancestorComponent=ancestorComponents[i];	//get this ancestor
+					if(DOMUtilities.hasAncestor(ancestorComponent, currentTarget))	//if we're not below the bottom mouse listener TODO eventually remove the special mouse listener concept and send everything back
+					{
+						var ancestorComponentID=ancestorComponent.id;	//get the ID of this ancestor
+						if(!mouseOverComponentIDs[ancestorComponentID])	//if we haven't already recorded the mouse as being over this ancestor
+						{
+							mouseOverComponentIDs[ancestorComponentID]=true;	//record the mouse as being over this ancestor					
+//guiseAJAX.trace("sending mouse over for component: ", ancestorComponentID);
+							var ajaxRequest=new MouseAJAXEvent(MouseAJAXEvent.EventType.ENTER, ancestorComponent, target, event.clientX, event.clientY, Boolean(event.altKey), Boolean(event.ctrlKey), Boolean(event.shiftKey));	//create a new AJAX mouse event for this ancestor
+							guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+							event.stopPropagation();	//tell the event to stop bubbling
+							event.preventDefault();	//prevent the default functionality from occurring
+						}
+					}
+				}
+				break;
+			case "mouseout":	//if we are leaving a component
+//guiseAJAX.trace("got mouse out of component ID: ", componentID);
+				delete mouseOverComponentIDs[componentID];	//indicate that the mouse is no longer over this component, even though it may now be over a child component					
+				if(!DOMUtilities.hasAncestor(otherComponent, component))	//if the mouse is supposedly leaving the component, make sure it's not just moving to a child element (see http://www.quirksmode.org/js/events_mouse.html#mouseover); if the mouse is really leaving this hierarchy
+				{
+					var ancestorComponents=DOMUtilities.getAncestorElementsByClassName(component, STYLES.COMPONENT);	//get an array of all ancestor components, including this component, in current-to-root order
+					for(var i=0, length=ancestorComponents.length; i<length; ++i)	//for each ancestor, from this one to root
+					{
+						var ancestorComponent=ancestorComponents[i];	//get this ancestor
+						if(DOMUtilities.hasAncestor(ancestorComponent, currentTarget))	//if we're not below the bottom mouse listener TODO eventually remove the special mouse listener concept and send everything back
+						{
+							var ancestorComponentID=ancestorComponent.id;	//get the ID of this ancestor
+							if(!mouseOverComponentIDs[ancestorComponentID])	//if the mouse isn't over this ancestor (if the mouse moved to another subtree, we would have made sure the parent is marked as having the mouse
+							{
+//guiseAJAX.trace("sending mouse exit for component: ", ancestorComponentID);
+								var ajaxRequest=new MouseAJAXEvent(MouseAJAXEvent.EventType.EXIT, ancestorComponent, target, event.clientX, event.clientY, Boolean(event.altKey), Boolean(event.ctrlKey), Boolean(event.shiftKey));	//create a new AJAX mouse event for this ancestor
+								guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+								event.stopPropagation();	//tell the event to stop bubbling
+								event.preventDefault();	//prevent the default functionality from occurring
+							}
+						}
+					}
+				}
+				break;
+		}
+/*TODO del when works
 		var eventType;	//we'll determine the type of AJAX mouse event to send
 		switch(event.type)	//see which type of mouse event this is
 		{
@@ -6099,13 +6120,14 @@ function onMouse(event)
 			default:	//TODO assert an error or warning
 				return;				
 		}
-		if(DOMUtilities.hasClassName(target, STYLES.MOUSE_LISTENER))	//if this is a mouse listener, report the event
+//TODO del; always send mouse listen events in a mouse listener hierarchy		if(DOMUtilities.hasClassName(target, STYLES.MOUSE_LISTENER))	//if this is a mouse listener, report the event
 		{
 			var ajaxRequest=new MouseAJAXEvent(eventType, component, target, event.clientX, event.clientY, Boolean(event.altKey), Boolean(event.ctrlKey), Boolean(event.shiftKey));	//create a new AJAX mouse event
 			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 			event.stopPropagation();	//tell the event to stop bubbling
 			event.preventDefault();	//prevent the default functionality from occurring
 		}
+*/
 	}	
 }
 

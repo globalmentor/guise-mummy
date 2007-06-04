@@ -517,55 +517,6 @@ a.tabControl-tab.axisX.selected:hover
 }
 
 /*menus*/
-	/*drop menus*/
-
-.dropMenu	/**root menus*/
-{
-/*TODO fix
-	background-color: #F5F5F5;
-	border: 1px solid #AAA;
-	margin: 0;
-	padding: 0;
-*/
-}
-
-.dropMenu .dropMenu	/**remove styles for non-root menus*/
-{
-/*TODO fix
-	background-color: inherit;
-	border: 0;
-*/
-}
-
-.dropMenu-body
-{
-/*TODO fix
-	border: 0;
-	margin: 0;
-	padding: 0;
-*/
-}
-
-.dropMenu.axisY
-{
-	position: relative;	
-	
-	
-/*TODO fix	position: relative;*/
-/*TODO del when works	width: 7em;*/
-	width: 7em;
-}
-
-.dropMenu-body.axisY
-{
-/*TODO del when works	width: 7em;*/
-}
-
-.dropMenu.axisX .dropMenu.axisY,
-.dropMenu.axisX .dropMenu-body.axisY
-{
-/*TODO del when works	width: auto;*/	/*allow vertical menus within horizontal menus to be auto sized horizontally*/
-}
 
 .dropMenu-children
 {
@@ -597,16 +548,17 @@ a.tabControl-tab.axisX.selected:hover
 /*testing*/
 .dropMenu-body .dropMenu-body.axisY
 {
-	position: absolute;
+/*del newmenu	position: absolute;*/
 /*TODO fix
 	background-color: white;
 	border: 1px solid #AAA;
 */
-	visibility: hidden;
+/*del newmenu	visibility: hidden;*/
 	z-index: 2;
+/*del newmenu
 	left: 0%;
 	top: 100%;
-	width: 100%;
+	width: 100%;*/
 }
 
 /*TODO fix

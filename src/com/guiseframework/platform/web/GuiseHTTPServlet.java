@@ -34,6 +34,7 @@ import com.garretwilson.event.ProgressListener;
 import com.garretwilson.io.*;
 import static com.garretwilson.io.OutputStreamUtilities.*;
 import com.garretwilson.lang.ClassUtilities;
+import static com.garretwilson.lang.EnumUtilities.*;
 import com.garretwilson.lang.ObjectUtilities;
 
 import static com.garretwilson.io.ContentTypeUtilities.*;
@@ -1205,8 +1206,8 @@ Debug.trace("got control events");
 					guiseContext.setOutputContentType(XML_CONTENT_TYPE);	//switch to the "text/xml" content type TODO verify UTF-8 in a consistent, elegant way
 					text="<response>"+text+"</response>";	//wrap the text in a response element
 				}
-//TODO del Debug.trace("response length:", text.length());
-//TODO del Debug.trace("response:", text);
+//Debug.trace("response length:", text.length());
+//Debug.trace("response:", text);
 				final byte[] bytes=text.getBytes(UTF_8);	//write the content we collected in the context as series of bytes encoded in UTF-8
 				final OutputStream outputStream=getCompressedOutputStream(request, response);	//get a compressed output stream, if possible
 				outputStream.write(bytes);	//write the bytes
@@ -1528,203 +1529,228 @@ if(document==null)	//TODO fix; del
 					{
 						final Element eventElement=(Element)eventNode;	//cast the node to an element
 						final String eventName=eventNode.getNodeName();	//get the event name
-Debug.info("AJAX event:", eventName);
-						if("form".equals(eventName))	//if this is a form event TODO use a constant
+						final AJAXEventType eventType=getSerializedEnum(AJAXEventType.class, eventName);	//get this event type, throwing an IllegalArgumentException if the event type is not recognized
+						if(eventType!=AJAXEventType.LOG)	//if this is not a log event (there's no use logging a log even)
 						{
-							final boolean exhaustive=Boolean.valueOf(eventElement.getAttribute("exhaustive")).booleanValue();	//get the exhaustive indication TODO use a constant
-							final boolean provisional=Boolean.valueOf(eventElement.getAttribute("provisional")).booleanValue();	//get the provisional indication TODO use a constant
-							final FormControlEvent formSubmitEvent=new FormControlEvent(guiseContext, exhaustive, provisional);	//create a new form submission event
-							final CollectionMap<String, Object, List<Object>> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
-							final List<Node> controlNodes=(List<Node>)XPath.evaluatePathExpression(eventNode, AJAX_REQUEST_CONTROL_XPATH_EXPRESSION);	//get all the control settings
-							for(final Node controlNode:controlNodes)	//for each control node
-							{
-								final Element controlElement=(Element)controlNode;	//get this control element
-								final String controlName=controlElement.getAttribute("name");	//get the control name TODO use a constant
-								if(controlName!=null && controlName.length()>0)	//if this control has a name
+							Debug.info("AJAX event:", eventType);							
+						}
+						switch(eventType)	//see which type of event this is
+						{
+							case ACTION:
 								{
-									final String controlValue=controlElement.getTextContent();	//get the control value
-									parameterListMap.addItem(controlName, controlValue);	//store the value in the parameters
+									final String componentID=eventElement.getAttribute("componentID");	//get the ID of the component TODO use a constant
+									if(componentID!=null)	//if there is a component ID TODO add better event handling, to throw an error and send back that error
+									{
+										final String targetID=eventElement.getAttribute("targetID");	//get the ID of the target element TODO use a constant
+										final String actionID=eventElement.getAttribute("actionID");	//get the action identifier TODO use a constant								
+										final int option=Integer.parseInt(eventElement.getAttribute("option"));	//TODO tidy; improve; check for errors; comment
+										final ActionControlEvent actionControlEvent=new ActionControlEvent(guiseContext, componentID, targetID, actionID, option);	//create a new action control event
+										requestEventList.add(actionControlEvent);	//add the event to the list
+									}
 								}
-							}
-							requestEventList.add(formSubmitEvent);	//add the event to the list
-						}
-						else if("action".equals(eventName))	//if this is an action event TODO use a constant
-						{
-							final String componentID=eventElement.getAttribute("componentID");	//get the ID of the component TODO use a constant
-							if(componentID!=null)	//if there is a component ID TODO add better event handling, to throw an error and send back that error
-							{
-								final String targetID=eventElement.getAttribute("targetID");	//get the ID of the target element TODO use a constant
-								final String actionID=eventElement.getAttribute("actionID");	//get the action identifier TODO use a constant								
-								final int option=Integer.parseInt(eventElement.getAttribute("option"));	//TODO tidy; improve; check for errors; comment
-								final ActionControlEvent actionControlEvent=new ActionControlEvent(guiseContext, componentID, targetID, actionID, option);	//create a new action control event
-								requestEventList.add(actionControlEvent);	//add the event to the list
-							}
-						}
-						else if("drop".equals(eventName))	//if this is a drop event TODO use a constant
-						{
-							final Node sourceNode=XPath.getNode(eventNode, AJAX_REQUEST_SOURCE_XPATH_EXPRESSION);	//get the source node
-							final String dragSourceID=((Element)sourceNode).getAttribute("id");	//TODO tidy; improve; comment
-							final Node targetNode=XPath.getNode(eventNode, AJAX_REQUEST_TARGET_XPATH_EXPRESSION);	//get the target node
-							final String dropTargetID=((Element)targetNode).getAttribute("id");	//TODO tidy; improve; comment
-							final DropControlEvent dropEvent=new DropControlEvent(guiseContext, dragSourceID, dropTargetID);	//create a new drop event
-							requestEventList.add(dropEvent);	//add the event to the list
-						}
-						else if("focus".equals(eventName))	//if this is a focus event TODO use a constant
-						{
-							final String componentID=eventElement.getAttribute("componentID");	//get the ID of the component TODO use a constant
-							if(componentID!=null)	//if there is a component ID TODO add better event handling, to throw an error and send back that error
-							{
-								final FocusControlEvent focusControlEvent=new FocusControlEvent(guiseContext, componentID);	//create a new focus control event
-								requestEventList.add(focusControlEvent);	//add the event to the list
-							}
-						}
-						else if("keyPress".equals(eventName) || "keyRelease".equals(eventName))	//if this is a key event TODO use a constant
-						{
-//Debug.trace("ready to parse a key event:", eventName);
-							final int code=Integer.parseInt(eventElement.getAttribute("code"));	//get the key code TODO use a constant
-							final Set<Key> keys=EnumSet.noneOf(Key.class);	//we'll find any keys that were pressed
-							if(Boolean.valueOf(eventElement.getAttribute("altKey")).booleanValue())	//if Alt was pressed TODO use a constant
-							{
-								keys.add(Key.ALT_LEFT);	//note the Alt key
-							}
-							if(Boolean.valueOf(eventElement.getAttribute("controlKey")).booleanValue())	//if Control was pressed TODO use a constant
-							{
-								keys.add(Key.CONTROL_LEFT);	//note the Control key
-							}
-							if(Boolean.valueOf(eventElement.getAttribute("shiftKey")).booleanValue())	//if Shiftwas pressed TODO use a constant
-							{
-								keys.add(Key.SHIFT_LEFT);	//note the Shift key
-							}							
-							final KeyboardEvent keyEvent;
-							if("keyPress".equals(eventName))	//if this is a key press event TODO use a constant
-							{
-								keyEvent=new KeyPressEvent(guiseContext, KeyCode.valueOf(code).getKey(), keys.toArray(new Key[keys.size()]));	//create a new key press event
-							}
-							else if("keyRelease".equals(eventName))	//if this is a key release event TODO use a constant
-							{
-								keyEvent=new KeyReleaseEvent(guiseContext, KeyCode.valueOf(code).getKey(), keys.toArray(new Key[keys.size()]));	//create a new key release event
-							}
-							else	//if we don't recognize the event
-							{
-								throw new IllegalArgumentException("Unrecognized key event: "+eventName);
-							}
-							requestEventList.add(keyEvent);	//add the event to the list
-						}
-						else if("mouseClick".equals(eventName) || "mouseEnter".equals(eventName) || "mouseExit".equals(eventName))	//if this is a mouse event TODO use a constant
-						{
-							final Node componentNode=XPath.getNode(eventNode, AJAX_REQUEST_COMPONENT_XPATH_EXPRESSION);	//get the component node
-							final String componentID=((Element)componentNode).getAttribute("id");	//TODO tidy; improve; comment
-							final int componentX=Integer.parseInt(((Element)componentNode).getAttribute("x"));	//TODO tidy; improve; check for errors; comment
-							final int componentY=Integer.parseInt(((Element)componentNode).getAttribute("y"));	//TODO tidy; improve; check for errors; comment
-							final int componentWidth=Integer.parseInt(((Element)componentNode).getAttribute("width"));	//TODO tidy; improve; check for errors; comment
-							final int componentHeight=Integer.parseInt(((Element)componentNode).getAttribute("height"));	//TODO tidy; improve; check for errors; comment
-
-							final Node targetNode=XPath.getNode(eventNode, AJAX_REQUEST_TARGET_XPATH_EXPRESSION);	//get the target node
-							final String targetID=((Element)targetNode).getAttribute("id");	//TODO tidy; improve; comment
-							final int targetX=Integer.parseInt(((Element)targetNode).getAttribute("x"));	//TODO tidy; improve; check for errors; comment
-							final int targetY=Integer.parseInt(((Element)targetNode).getAttribute("y"));	//TODO tidy; improve; check for errors; comment
-							final int targetWidth=Integer.parseInt(((Element)targetNode).getAttribute("width"));	//TODO tidy; improve; check for errors; comment
-							final int targetHeight=Integer.parseInt(((Element)targetNode).getAttribute("height"));	//TODO tidy; improve; check for errors; comment
-							
-							final Node viewportNode=XPath.getNode(eventNode, AJAX_REQUEST_VIEWPORT_XPATH_EXPRESSION);	//get the viewport node
-							final int viewportX=Integer.parseInt(((Element)viewportNode).getAttribute("x"));	//TODO tidy; improve; check for errors; comment
-							final int viewportY=Integer.parseInt(((Element)viewportNode).getAttribute("y"));	//TODO tidy; improve; check for errors; comment
-							final int viewportWidth=Integer.parseInt(((Element)viewportNode).getAttribute("width"));	//TODO tidy; improve; check for errors; comment
-							final int viewportHeight=Integer.parseInt(((Element)viewportNode).getAttribute("height"));	//TODO tidy; improve; check for errors; comment
-
-							final Node mouseNode=XPath.getNode(eventNode, AJAX_REQUEST_MOUSE_XPATH_EXPRESSION);	//get the mouse node
-							final int mouseX=Integer.parseInt(((Element)mouseNode).getAttribute("x"));	//TODO tidy; improve; check for errors; comment
-							final int mouseY=Integer.parseInt(((Element)mouseNode).getAttribute("y"));	//TODO tidy; improve; check for errors; comment
-
-							final Set<Key> keys=EnumSet.noneOf(Key.class);	//we'll find any keys that were pressed
-							if(Boolean.valueOf(eventElement.getAttribute("altKey")).booleanValue())	//if Alt was pressed TODO use a constant
-							{
-								keys.add(Key.ALT_LEFT);	//note the Alt key
-							}
-							if(Boolean.valueOf(eventElement.getAttribute("controlKey")).booleanValue())	//if Control was pressed TODO use a constant
-							{
-								keys.add(Key.CONTROL_LEFT);	//note the Control key
-							}
-							if(Boolean.valueOf(eventElement.getAttribute("shiftKey")).booleanValue())	//if Shiftwas pressed TODO use a constant
-							{
-								keys.add(Key.SHIFT_LEFT);	//note the Shift key
-							}
-							
-							if(componentID!=null)	//if there is a component ID TODO add better event handling, to throw an error and send back that error
-							{
-								final Component<?> component=AbstractComponent.getComponentByID(guiseSession.getApplicationFrame(), componentID);	//get the target component from its ID
-								if(component!=null)	//if there is a target component
+								break;
+							case DROP:
 								{
-									final MouseEvent mouseEvent;
-									if("mouseClick".equals(eventName))	//if this is a mouse click event TODO use a constant
-									{
-										final int buttonCode=Integer.parseInt(eventElement.getAttribute("button"));	//get the button code TODO use a constant
-										final int clickCount=Integer.parseInt(eventElement.getAttribute("clickCount"));	//get the click count TODO use a constant
-										mouseEvent=new MouseClickEvent(guiseContext, component, new Rectangle(componentX, componentY, componentWidth, componentHeight),
-												new Rectangle(viewportX, viewportY, viewportWidth, viewportHeight),
-												new Point(mouseX, mouseY),
-												Button.valueOf(buttonCode).getMouseButton(), clickCount,
-												keys.toArray(new Key[keys.size()]));	//create a new mouse enter event
-									}
-									else if("mouseEnter".equals(eventName))	//if this is a mouse enter event TODO use a constant
-									{
-										mouseEvent=new MouseEnterEvent(guiseContext, component, new Rectangle(componentX, componentY, componentWidth, componentHeight),
-												new Rectangle(viewportX, viewportY, viewportWidth, viewportHeight),
-												new Point(mouseX, mouseY), keys.toArray(new Key[keys.size()]));	//create a new mouse enter event
-									}
-									else if("mouseExit".equals(eventName))	//if this is a mouse exit event TODO use a constant
-									{
-										mouseEvent=new MouseExitEvent(guiseContext, component, new Rectangle(componentX, componentY, componentWidth, componentHeight),
-												new Rectangle(viewportX, viewportY, viewportWidth, viewportHeight),
-												new Point(mouseX, mouseY), keys.toArray(new Key[keys.size()]));	//create a new mouse exit event											
-									}
-									else	//if we don't recognize the event
-									{
-										throw new IllegalArgumentException("Unrecognized mouse event: "+eventName);
-									}
-									requestEventList.add(mouseEvent);	//add the event to the list
-//TODO del Debug.trace("mouse event; targetXY:", targetX, targetY, "viewportXY:", viewportX, viewportY, "mouseXY:", mouseX, mouseY);
+									final Node sourceNode=XPath.getNode(eventNode, AJAX_REQUEST_SOURCE_XPATH_EXPRESSION);	//get the source node
+									final String dragSourceID=((Element)sourceNode).getAttribute("id");	//TODO tidy; improve; comment
+									final Node targetNode=XPath.getNode(eventNode, AJAX_REQUEST_TARGET_XPATH_EXPRESSION);	//get the target node
+									final String dropTargetID=((Element)targetNode).getAttribute("id");	//TODO tidy; improve; comment
+									final DropControlEvent dropEvent=new DropControlEvent(guiseContext, dragSourceID, dropTargetID);	//create a new drop event
+									requestEventList.add(dropEvent);	//add the event to the list
 								}
-							}
-						}
-						else if("init".equals(eventName))	//if this is an initialization event TODO use a constant
-						{
-							final String hour=eventElement.getAttribute("hour");
-							final String timezone=eventElement.getAttribute("timezone");
-							final String language=eventElement.getAttribute("language");
-							final String colorDepth=eventElement.getAttribute("colorDepth");
-							final String screenWidth=eventElement.getAttribute("screenWidth");
-							final String screenHeight=eventElement.getAttribute("screenHeight");
-							final String browserWidth=eventElement.getAttribute("browserWidth");
-							final String browserHeight=eventElement.getAttribute("browserHeight");
-							final String javascriptVersion=eventElement.getAttribute("javascriptVersion");	//get the JavaScript version TODO use a constant
-							final String javaEnabled=eventElement.getAttribute("javaEnabled");
-							final String referrer=eventElement.getAttribute("referrer");
-							URI referrerURI=null;	//assume we can't get a referrer URI
-							if(referrer.length()>0)	//if there is a referrer
-							{
-								try
+								break;
+							case FOCUS:
 								{
-									referrerURI=new URI(referrer);	//create a URI object from the referrer string
+									final String componentID=eventElement.getAttribute("componentID");	//get the ID of the component TODO use a constant
+									if(componentID!=null)	//if there is a component ID TODO add better event handling, to throw an error and send back that error
+									{
+										final FocusControlEvent focusControlEvent=new FocusControlEvent(guiseContext, componentID);	//create a new focus control event
+										requestEventList.add(focusControlEvent);	//add the event to the list
+									}
 								}
-								catch(final URISyntaxException uriSyntaxException)	//if there is a problem with the URI syntax
+								break;
+							case FORM:
 								{
-									Debug.warn("Invalid referrer URI syntax: "+referrer);
+									final boolean exhaustive=Boolean.valueOf(eventElement.getAttribute("exhaustive")).booleanValue();	//get the exhaustive indication TODO use a constant
+									final boolean provisional=Boolean.valueOf(eventElement.getAttribute("provisional")).booleanValue();	//get the provisional indication TODO use a constant
+									final FormControlEvent formSubmitEvent=new FormControlEvent(guiseContext, exhaustive, provisional);	//create a new form submission event
+									final CollectionMap<String, Object, List<Object>> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
+									final List<Node> controlNodes=(List<Node>)XPath.evaluatePathExpression(eventNode, AJAX_REQUEST_CONTROL_XPATH_EXPRESSION);	//get all the control settings
+									for(final Node controlNode:controlNodes)	//for each control node
+									{
+										final Element controlElement=(Element)controlNode;	//get this control element
+										final String controlName=controlElement.getAttribute("name");	//get the control name TODO use a constant
+										if(controlName!=null && controlName.length()>0)	//if this control has a name
+										{
+											final String controlValue=controlElement.getTextContent();	//get the control value
+											parameterListMap.addItem(controlName, controlValue);	//store the value in the parameters
+										}
+									}
+									requestEventList.add(formSubmitEvent);	//add the event to the list
 								}
-							}
-							final InitControlEvent initEvent=new InitControlEvent(guiseContext,
-									hour.length()>0 ? Integer.parseInt(hour) : 0, timezone.length()>0 ? Integer.parseInt(timezone) : 0, language.length()>0 ? language : "en-US",
-									colorDepth.length()>0 ? Integer.parseInt(colorDepth) : 24, screenWidth.length()>0 ? Integer.parseInt(screenWidth) : 1024, screenHeight.length()>0 ? Integer.parseInt(screenHeight) : 768,
-									browserWidth.length()>0 ? Integer.parseInt(browserWidth) : 1024, browserHeight.length()>0 ? Integer.parseInt(browserHeight) : 768,
-									javascriptVersion.length()>0 ? javascriptVersion : null, javaEnabled.length()>0 ? Boolean.valueOf(javaEnabled) : false,
-											referrerURI);	//create a new initialization event TODO check for NumberFormatException
-							requestEventList.add(initEvent);	//add the event to the list
-						}
-						else if("ping".equals(eventName))	//if this is a ping event TODO use a constant
-						{
-							final PingControlEvent pingEvent=new PingControlEvent(guiseContext);	//create a new ping event
-Debug.trace("ping!");
-							requestEventList.add(pingEvent);	//add the event to the list
+								break;
+							case INIT:
+								{
+									final String hour=eventElement.getAttribute("hour");
+									final String timezone=eventElement.getAttribute("timezone");
+									final String language=eventElement.getAttribute("language");
+									final String colorDepth=eventElement.getAttribute("colorDepth");
+									final String screenWidth=eventElement.getAttribute("screenWidth");
+									final String screenHeight=eventElement.getAttribute("screenHeight");
+									final String browserWidth=eventElement.getAttribute("browserWidth");
+									final String browserHeight=eventElement.getAttribute("browserHeight");
+									final String javascriptVersion=eventElement.getAttribute("javascriptVersion");	//get the JavaScript version TODO use a constant
+									final String javaEnabled=eventElement.getAttribute("javaEnabled");
+									final String referrer=eventElement.getAttribute("referrer");
+									URI referrerURI=null;	//assume we can't get a referrer URI
+									if(referrer.length()>0)	//if there is a referrer
+									{
+										try
+										{
+											referrerURI=new URI(referrer);	//create a URI object from the referrer string
+										}
+										catch(final URISyntaxException uriSyntaxException)	//if there is a problem with the URI syntax
+										{
+											Debug.warn("Invalid referrer URI syntax: "+referrer);
+										}
+									}
+									final InitControlEvent initEvent=new InitControlEvent(guiseContext,
+											hour.length()>0 ? Integer.parseInt(hour) : 0, timezone.length()>0 ? Integer.parseInt(timezone) : 0, language.length()>0 ? language : "en-US",
+											colorDepth.length()>0 ? Integer.parseInt(colorDepth) : 24, screenWidth.length()>0 ? Integer.parseInt(screenWidth) : 1024, screenHeight.length()>0 ? Integer.parseInt(screenHeight) : 768,
+											browserWidth.length()>0 ? Integer.parseInt(browserWidth) : 1024, browserHeight.length()>0 ? Integer.parseInt(browserHeight) : 768,
+											javascriptVersion.length()>0 ? javascriptVersion : null, javaEnabled.length()>0 ? Boolean.valueOf(javaEnabled) : false,
+													referrerURI);	//create a new initialization event TODO check for NumberFormatException
+									requestEventList.add(initEvent);	//add the event to the list
+								}
+								break;
+							case KEYPRESS:
+							case KEYRELEASE:
+								{
+									final int code=Integer.parseInt(eventElement.getAttribute("code"));	//get the key code TODO use a constant
+									final Set<Key> keys=EnumSet.noneOf(Key.class);	//we'll find any keys that were pressed
+									if(Boolean.valueOf(eventElement.getAttribute("altKey")).booleanValue())	//if Alt was pressed TODO use a constant
+									{
+										keys.add(Key.ALT_LEFT);	//note the Alt key
+									}
+									if(Boolean.valueOf(eventElement.getAttribute("controlKey")).booleanValue())	//if Control was pressed TODO use a constant
+									{
+										keys.add(Key.CONTROL_LEFT);	//note the Control key
+									}
+									if(Boolean.valueOf(eventElement.getAttribute("shiftKey")).booleanValue())	//if Shiftwas pressed TODO use a constant
+									{
+										keys.add(Key.SHIFT_LEFT);	//note the Shift key
+									}							
+									final KeyboardEvent keyEvent;
+									switch(eventType)	//see which type of keypress this is
+									{
+										case KEYPRESS:
+											keyEvent=new KeyPressEvent(guiseContext, KeyCode.valueOf(code).getKey(), keys.toArray(new Key[keys.size()]));	//create a new key press event
+											break;
+										case KEYRELEASE:
+											keyEvent=new KeyReleaseEvent(guiseContext, KeyCode.valueOf(code).getKey(), keys.toArray(new Key[keys.size()]));	//create a new key release event
+											break;
+										default:
+											throw new AssertionError("Unrecognized key event type: "+eventType);
+									}
+									requestEventList.add(keyEvent);	//add the event to the list
+								}
+								break;
+							case LOG:
+								{
+									final Debug.ReportLevel reportLevel=getSerializedEnum(Debug.ReportLevel.class, eventElement.getAttribute("level"));	//get the report level
+									final String text=eventElement.getTextContent();	//get the log text
+									Debug.output(reportLevel, "Guise AJAX:", text);	//send this information to the debug output
+								}
+								break;
+							case MOUSECLICK:
+							case MOUSEENTER:
+							case MOUSEEXIT:
+								{
+									final Node componentNode=XPath.getNode(eventNode, AJAX_REQUEST_COMPONENT_XPATH_EXPRESSION);	//get the component node
+									final String componentID=((Element)componentNode).getAttribute("id");	//TODO tidy; improve; comment
+									final int componentX=Integer.parseInt(((Element)componentNode).getAttribute("x"));	//TODO tidy; improve; check for errors; comment
+									final int componentY=Integer.parseInt(((Element)componentNode).getAttribute("y"));	//TODO tidy; improve; check for errors; comment
+									final int componentWidth=Integer.parseInt(((Element)componentNode).getAttribute("width"));	//TODO tidy; improve; check for errors; comment
+									final int componentHeight=Integer.parseInt(((Element)componentNode).getAttribute("height"));	//TODO tidy; improve; check for errors; comment
+		
+									final Node targetNode=XPath.getNode(eventNode, AJAX_REQUEST_TARGET_XPATH_EXPRESSION);	//get the target node
+									final String targetID=((Element)targetNode).getAttribute("id");	//TODO tidy; improve; comment
+									final int targetX=Integer.parseInt(((Element)targetNode).getAttribute("x"));	//TODO tidy; improve; check for errors; comment
+									final int targetY=Integer.parseInt(((Element)targetNode).getAttribute("y"));	//TODO tidy; improve; check for errors; comment
+									final int targetWidth=Integer.parseInt(((Element)targetNode).getAttribute("width"));	//TODO tidy; improve; check for errors; comment
+									final int targetHeight=Integer.parseInt(((Element)targetNode).getAttribute("height"));	//TODO tidy; improve; check for errors; comment
+									
+									final Node viewportNode=XPath.getNode(eventNode, AJAX_REQUEST_VIEWPORT_XPATH_EXPRESSION);	//get the viewport node
+									final int viewportX=Integer.parseInt(((Element)viewportNode).getAttribute("x"));	//TODO tidy; improve; check for errors; comment
+									final int viewportY=Integer.parseInt(((Element)viewportNode).getAttribute("y"));	//TODO tidy; improve; check for errors; comment
+									final int viewportWidth=Integer.parseInt(((Element)viewportNode).getAttribute("width"));	//TODO tidy; improve; check for errors; comment
+									final int viewportHeight=Integer.parseInt(((Element)viewportNode).getAttribute("height"));	//TODO tidy; improve; check for errors; comment
+		
+									final Node mouseNode=XPath.getNode(eventNode, AJAX_REQUEST_MOUSE_XPATH_EXPRESSION);	//get the mouse node
+									final int mouseX=Integer.parseInt(((Element)mouseNode).getAttribute("x"));	//TODO tidy; improve; check for errors; comment
+									final int mouseY=Integer.parseInt(((Element)mouseNode).getAttribute("y"));	//TODO tidy; improve; check for errors; comment
+		
+									final Set<Key> keys=EnumSet.noneOf(Key.class);	//we'll find any keys that were pressed
+									if(Boolean.valueOf(eventElement.getAttribute("altKey")).booleanValue())	//if Alt was pressed TODO use a constant
+									{
+										keys.add(Key.ALT_LEFT);	//note the Alt key
+									}
+									if(Boolean.valueOf(eventElement.getAttribute("controlKey")).booleanValue())	//if Control was pressed TODO use a constant
+									{
+										keys.add(Key.CONTROL_LEFT);	//note the Control key
+									}
+									if(Boolean.valueOf(eventElement.getAttribute("shiftKey")).booleanValue())	//if Shiftwas pressed TODO use a constant
+									{
+										keys.add(Key.SHIFT_LEFT);	//note the Shift key
+									}
+									
+									if(componentID!=null)	//if there is a component ID TODO add better event handling, to throw an error and send back that error
+									{
+										final Component<?> component=AbstractComponent.getComponentByID(guiseSession.getApplicationFrame(), componentID);	//get the target component from its ID
+										if(component!=null)	//if there is a target component
+										{
+											final MouseEvent mouseEvent;
+											switch(eventType)	//see which type of event this is
+											{
+												case MOUSECLICK:
+													{
+														final int buttonCode=Integer.parseInt(eventElement.getAttribute("button"));	//get the button code TODO use a constant
+														final int clickCount=Integer.parseInt(eventElement.getAttribute("clickCount"));	//get the click count TODO use a constant
+														mouseEvent=new MouseClickEvent(guiseContext, component, new Rectangle(componentX, componentY, componentWidth, componentHeight),
+																new Rectangle(viewportX, viewportY, viewportWidth, viewportHeight),
+																new Point(mouseX, mouseY),
+																Button.valueOf(buttonCode).getMouseButton(), clickCount,
+																keys.toArray(new Key[keys.size()]));	//create a new mouse enter event
+													}
+													break;
+												case MOUSEENTER:
+													mouseEvent=new MouseEnterEvent(guiseContext, component, new Rectangle(componentX, componentY, componentWidth, componentHeight),
+															new Rectangle(viewportX, viewportY, viewportWidth, viewportHeight),
+															new Point(mouseX, mouseY), keys.toArray(new Key[keys.size()]));	//create a new mouse enter event
+													break;
+												case MOUSEEXIT:
+													mouseEvent=new MouseExitEvent(guiseContext, component, new Rectangle(componentX, componentY, componentWidth, componentHeight),
+															new Rectangle(viewportX, viewportY, viewportWidth, viewportHeight),
+															new Point(mouseX, mouseY), keys.toArray(new Key[keys.size()]));	//create a new mouse exit event
+													break;
+												default:
+													throw new AssertionError("Unrecognized mouse event type: "+eventType);
+											}
+//Debug.trace("mouse event bound for component", ((Component<?>)mouseEvent.getTarget()).getID());
+											requestEventList.add(mouseEvent);	//add the event to the list
+//Debug.trace("mouse event; targetXY:", targetX, targetY, "viewportXY:", viewportX, viewportY, "mouseXY:", mouseX, mouseY);
+										}
+									}
+								}
+								break;
+							case PING:
+								{
+									final PingControlEvent pingEvent=new PingControlEvent(guiseContext);	//create a new ping event
+									requestEventList.add(pingEvent);	//add the event to the list									
+								}
+								break;
+							default:
+								throw new IllegalArgumentException("Unrecognized event type: "+eventType);
 						}
 					}
 				}
