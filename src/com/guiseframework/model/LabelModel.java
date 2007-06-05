@@ -22,7 +22,7 @@ public interface LabelModel extends Model
 	public URI getIcon();
 
 	/**Sets the URI of the icon.
-	This is a bound property of type <code>URI</code>.
+	This is a bound property.
 	@param newIcon The new URI of the icon, which may be a resource URI.
 	@see #ICON_PROPERTY
 	*/

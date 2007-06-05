@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.geometry.Axis;
+import com.guiseframework.geometry.CompassPoint;
 import com.guiseframework.geometry.Side;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
@@ -31,6 +32,7 @@ public class Orientation
 		/**Determines the axis for the particular flow.
 		@param flow The flow (line or page).
 		@return The axis for the specified flow.
+		@exception NullPointerException if the given flow is <code>null</code>.
 		*/
 		public Axis getAxis(final Flow flow)
 		{
@@ -40,6 +42,7 @@ public class Orientation
 		/**Determines the flow (line or page) that is aligned to the given axis.
 		@param axis The axis for which flow should be determined.
 		@return The flow that is aligned to the given axis.
+		@exception NullPointerException if the given axis is <code>null</code>.
 		*/
 		public Flow getFlow(final Axis axis)
 		{
@@ -59,6 +62,7 @@ public class Orientation
 		/**Determines the direction of the particular flow.
 		@param flow The flow (line or page).
 		@return The direction of the specified flow.
+		@exception NullPointerException if the given flow is <code>null</code>.
 		*/
 		public Flow.Direction getDirection(final Flow flow)
 		{
@@ -66,22 +70,13 @@ public class Orientation
 		}
 
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 	/**The side for each border.*/
 	private final Side[] sides=new Side[4];
 
 		/**Determines the side for the particular border.
 		@param border The logical border.
 		@return The side for the specified border.
+		@exception NullPointerException if the given border is <code>null</code>.
 		*/
 		public Side getSide(final Border border)
 		{
@@ -91,6 +86,7 @@ public class Orientation
 		/**Determines the border that appears on the given side.
 		@param side The side for which the border should be determined.
 		@return The border that appears on the given side.
+		@exception NullPointerException if the given side is <code>null</code>.
 		*/
 		public Border getBorder(final Side side)
 		{
@@ -103,6 +99,77 @@ public class Orientation
 			}
 			throw new IllegalArgumentException("Unsupported orientation side: "+side);	//hopefully they won't pass Side.FRONT or Side.BACK, because orientations don't support the Z axis
 		}
+
+	/**Retrieves a cardinal compass point indicating the absolute direction based upon the given flow end.
+	Each, but not both, of the ends may be <code>null</code>.
+	@param lineEnd The end of the line flow, or <code>null</code> if a cardinal direction is requested and a page end is provided.
+	@param pageEnd The end of the page flow, or <code>null</code> if a cardinal direction is requested and a line end is provided.
+	@return The cardinal or ordinal compass point indicating the absolute direction of the given line and page end.
+	@exception NullPointerException if both the given line end and the given page end are <code>null</code>.
+	@see CompassPoint#NORTH
+	@see CompassPoint#EAST
+	@see CompassPoint#SOUTH
+	@see CompassPoint#WEST
+	*/
+	public CompassPoint getCompassPoint(final Flow flow, final Flow.End end)
+	{
+		final Axis axis=getAxis(flow);	//get the axis for the given flow
+		final Flow.Direction direction=getDirection(flow);	//get the direction of the given flow
+		switch(axis)	//see which axis this is
+		{
+			case X:
+				return direction==Flow.Direction.INCREASING ? (end==Flow.End.NEAR ? CompassPoint.WEST : CompassPoint.EAST) : (end==Flow.End.NEAR ? CompassPoint.EAST : CompassPoint.WEST);
+			case Y:
+				return direction==Flow.Direction.INCREASING ? (end==Flow.End.NEAR ? CompassPoint.NORTH : CompassPoint.SOUTH) : (end==Flow.End.NEAR ? CompassPoint.SOUTH: CompassPoint.NORTH);
+			default:
+				throw new AssertionError("Unrecognized axis: "+axis);
+		}
+	}
+
+	/**Retrieves a cardinal or ordinal compass point indicating the absolute direction based upon the given line and/or page ends.
+	Each, but not both, of the ends may be <code>null</code>.
+	@param lineEnd The end of the line flow, or <code>null</code> if a cardinal direction is requested and a page end is provided.
+	@param pageEnd The end of the page flow, or <code>null</code> if a cardinal direction is requested and a line end is provided.
+	@return The cardinal or ordinal compass point indicating the absolute direction of the given line and page end.
+	@exception NullPointerException if both the given line end and the given page end are <code>null</code>.
+	@see CompassPoint#NORTH
+	@see CompassPoint#NORTHEAST
+	@see CompassPoint#EAST
+	@see CompassPoint#SOUTHEAST
+	@see CompassPoint#SOUTH
+	@see CompassPoint#SOUTHWEST
+	@see CompassPoint#WEST
+	@see CompassPoint#NORTHWEST
+	*/
+	public CompassPoint getCompassPoint(final Flow.End lineEnd, final Flow.End pageEnd)
+	{
+		if(lineEnd!=null)	//if there is a line end
+		{
+			final CompassPoint lineCompassPoint=getCompassPoint(Flow.LINE, lineEnd);	//get the compass point for this line end
+			if(pageEnd!=null)	//if there is a page end
+			{
+				final CompassPoint pageCompassPoint=getCompassPoint(Flow.PAGE, pageEnd);	//return the compass point for this page end
+				final CompassPoint latitudeCompassPoint=getFlow(Axis.Y)==Flow.PAGE ? pageCompassPoint : lineCompassPoint;	//get the correct compass points for latitude and longitude
+				final CompassPoint longitudeCompassPoint=getFlow(Axis.Y)==Flow.PAGE ? pageCompassPoint : lineCompassPoint;
+				return CompassPoint.getOrdinalCompassPoint(latitudeCompassPoint, longitudeCompassPoint);	//return the ordinal compass point for these two cardinal compass points
+			}
+			else	//if there is no page end
+			{
+				return lineCompassPoint;	//return line compass point
+			}
+		}
+		else	//if there is no line end
+		{
+			if(pageEnd!=null)	//if there is a page end
+			{
+				return getCompassPoint(Flow.PAGE, pageEnd);	//return the compass point for this page end
+			}
+			else	//if both arguments are null
+			{
+				throw new NullPointerException("Line end and page end cannot both be null.");
+			}
+		}
+	}
 		
 	/**The lazily-created set of right-to-left, top-to-bottom languages.*/
 	private static Set<String> rightToLeftTopToBottomLanguages;

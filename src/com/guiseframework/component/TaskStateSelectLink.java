@@ -22,7 +22,7 @@ public class TaskStateSelectLink extends ValueSelectLink<TaskState>
 {
 	
 	/**The resource URI for the selected icon.*/
-	public final static URI SELECT_ACTION_SELECTED_GLYPH_RESOURCE_URI=createURIResourceReference("theme.select.action.selected.glyph");
+	public final static URI SELECT_ACTION_SELECTED_GLYPH_RESOURCE_URI=createURIResourceReference("theme.select.action.selected.glyph");	//TODO eventually remove these and use the defaults (make sure the defualts are set, using theme.glyph.selected)
 	/**The resource URI for the unselected icon.*/
 	public final static URI SELECT_ACTION_UNSELECTED_GLYPH_RESOURCE_URI=createURIResourceReference("theme.select.action.unselected.glyph");
 

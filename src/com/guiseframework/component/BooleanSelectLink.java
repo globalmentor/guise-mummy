@@ -1,6 +1,7 @@
 package com.guiseframework.component;
 
 import com.guiseframework.model.*;
+import com.guiseframework.prototype.ValuePrototype;
 
 /**Link that stores a Boolean value in its model representing the selected state.
 A validator requiring a non-<code>null</code> value is automatically installed.
@@ -27,4 +28,11 @@ public class BooleanSelectLink extends AbstractBooleanSelectActionControl<Boolea
 		super(labelModel, actionModel, valueModel, enableable);	//construct the parent class		
 	}
 
+	/**Prototype constructor.
+	@param valuePrototype The prototype on which this component should be based.
+	*/
+	public BooleanSelectLink(final ValuePrototype<Boolean> valuePrototype)
+	{
+		this(valuePrototype, new DefaultActionModel(), valuePrototype, valuePrototype);	//use the value prototype as every needed model except for the action model
+	}
 }

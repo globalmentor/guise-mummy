@@ -11,7 +11,7 @@ import com.guiseframework.model.*;
 /**Abstract selectable action control.
 @author Garret Wilson
 */
-public abstract class AbstractSelectActionControl<C extends SelectActionControl<C>> extends AbstractActionControl<C> implements SelectActionControl<C>
+public abstract class AbstractSelectActionControl<C extends SelectActionControl<C> & LabelDisplayableComponent<C>> extends AbstractActionControl<C> implements SelectActionControl<C>
 {
 
 	/**Whether this control automatically sets or toggles the selection state when the action occurs.*/

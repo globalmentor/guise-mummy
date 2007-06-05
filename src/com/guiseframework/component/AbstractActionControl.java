@@ -8,7 +8,7 @@ import com.guiseframework.model.*;
 /**Abstract control with an action model.
 @author Garret Wilson
 */
-public abstract class AbstractActionControl<C extends ActionControl<C>> extends AbstractControl<C> implements ActionControl<C>
+public abstract class AbstractActionControl<C extends ActionControl<C> & LabelDisplayableComponent<C>> extends AbstractControl<C> implements ActionControl<C>, LabelDisplayableComponent<C>
 {
 
 	/**The action model used by this component.*/
@@ -117,7 +117,7 @@ public abstract class AbstractActionControl<C extends ActionControl<C>> extends 
 	*/
 	public void performAction(final int force, final int option)
 	{
-		getActionModel().performAction(force, option);	//delegate to the installed action model, which will fire an event which we will catch and queue for refiring
+		getActionModel().performAction(force, option);	//delegate to the installed action model, which will fire an event which we will catch and refire
 	}
 
 	/**Fires an action event to all registered action listeners.

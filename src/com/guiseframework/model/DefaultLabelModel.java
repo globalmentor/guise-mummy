@@ -22,7 +22,7 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 		public URI getIcon() {return icon;}
 
 		/**Sets the URI of the icon.
-		This is a bound property of type <code>URI</code>.
+		This is a bound property.
 		@param newIcon The new URI of the icon, which may be a resource URI.
 		@see #ICON_PROPERTY
 		*/
@@ -33,7 +33,7 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 				final URI oldIcon=icon;	//get the old value
 				icon=newIcon;	//actually change the value
 				firePropertyChange(ICON_PROPERTY, oldIcon, newIcon);	//indicate that the value changed
-			}			
+			}
 		}
 
 	/**The label text, which may include a resource reference, or <code>null</code> if there is no label text.*/

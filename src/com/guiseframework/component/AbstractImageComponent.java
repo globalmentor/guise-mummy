@@ -11,6 +11,7 @@ import static com.garretwilson.util.ArrayUtilities.*;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.component.transfer.*;
+import com.guiseframework.model.LabelModel;
 
 /**An abstract implementation of an image component.
 This component installs a default export strategy supporting export of the following content types:
@@ -57,9 +58,13 @@ public abstract class AbstractImageComponent<C extends ImageComponent<C>> extend
 			}			
 		}
 
-	/**Default constructor.*/
-	public AbstractImageComponent()
+	/**Label model constructor.
+	@param labelModel The component label model.
+	@exception NullPointerException if the given label or model is <code>null</code>.
+	*/
+	public AbstractImageComponent(final LabelModel labelModel)
 	{
+		super(labelModel);	//construct the parent class
 		addExportStrategy((ExportStrategy<C>)DEFAULT_EXPORT_STRATEGY);	//install a default export strategy 
 	}
 

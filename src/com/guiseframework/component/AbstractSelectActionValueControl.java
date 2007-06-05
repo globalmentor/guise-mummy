@@ -9,7 +9,7 @@ import com.guiseframework.model.*;
 @param <V> The type of value the control represents.
 @author Garret Wilson
 */
-public abstract class AbstractSelectActionValueControl<V, C extends SelectActionControl<C> & ActionValueControl<V, C>> extends AbstractActionValueControl<V, C> implements SelectActionControl<C>
+public abstract class AbstractSelectActionValueControl<V, C extends SelectActionControl<C> & ActionValueControl<V, C> & LabelDisplayableComponent<C>> extends AbstractActionValueControl<V, C> implements SelectActionControl<C>
 {
 
 	/**Whether this control automatically sets or toggles the selection state when the action occurs.*/

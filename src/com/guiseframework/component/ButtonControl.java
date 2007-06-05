@@ -3,6 +3,6 @@ package com.guiseframework.component;
 /**An action control with button behavior, including a "push" user interface.
 @author Garret Wilson
 */
-public interface ButtonControl<C extends ButtonControl<C>> extends ActionControl<C>
+public interface ButtonControl<C extends ButtonControl<C>> extends ActionControl<C>, LabelDisplayableComponent<C>
 {
 }

@@ -22,7 +22,7 @@ import com.guiseframework.geometry.*;
 import com.guiseframework.input.Input;
 import com.guiseframework.input.InputStrategy;
 import com.guiseframework.model.*;
-import com.guiseframework.model.ui.AbstractUIModel;
+import com.guiseframework.model.ui.AbstractPresentationModel;
 import com.guiseframework.theme.Theme;
 import com.guiseframework.viewer.Viewer;
 
@@ -36,7 +36,7 @@ This implementation automatically handles postponed property change events when 
 <p>Property changes to a component's constraints are repeated with the component as the source and the constraints as the target.</p> 
 @author Garret Wilson
 */
-public abstract class AbstractComponent<C extends Component<C>> extends AbstractUIModel implements Component<C>
+public abstract class AbstractComponent<C extends Component<C>> extends AbstractPresentationModel implements Component<C>
 {
 
 	/**The object managing event listeners.*/
@@ -881,10 +881,6 @@ Debug.trace("now valid of", this, "is", isValid());
 	public void dispatchInputEvent(final InputEvent inputEvent)
 	{
 //TODO del Debug.trace("in component", this, "ready to do default dispatching of input event", inputEvent);		
-		if(inputEvent instanceof TargetedEvent && !this.equals(((TargetedEvent)inputEvent).getTarget()))	//if this is a targeted event that is not bound for this component TODO document, if it works; later allow for registration of pre/target/post bubble listening
-		{
-			return;	//don't fire the event or pass it to the input strategy
-		}
 		if(!inputEvent.isConsumed())	//if the input has not been consumed
 		{
 //Debug.trace("event is not consumed; ready to fire it to listeners");
@@ -923,6 +919,10 @@ Debug.trace("now valid of", this, "is", isValid());
 	*/
 	public void fireInputEvent(final InputEvent inputEvent)
 	{
+		if(inputEvent instanceof TargetedEvent && !this.equals(((TargetedEvent)inputEvent).getTarget()))	//if this is a targeted event that is not bound for this component TODO document, if it works; later allow for registration of pre/target/post bubble listening
+		{
+			return;	//don't fire the event
+		}
 		if(inputEvent instanceof CommandEvent)	//if this is a command event
 		{
 			if(hasCommandListeners())	//if there are command listeners registered

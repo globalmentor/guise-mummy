@@ -64,12 +64,7 @@ Drag and Drop classes
 
 /*global presets to meet Guise theme default expectations*/
 
-table
-{
-	border-collapse: collapse;
-}
-
-/*remove borders, padding, and margins*/
+/*remove borders, padding, and margins; initialize default fonts and colors*/
 a, caption, div, img, label, table, th, td, span
 {
 	border: 0;
@@ -78,6 +73,11 @@ a, caption, div, img, label, table, th, td, span
 	font-weight: normal;
 	margin: 0;
 	padding: 0;
+}
+
+a
+{
+	color: black;	
 }
 
 a:link
@@ -100,6 +100,12 @@ a:active
 	text-decoration: none;
 }
 
+body
+{
+	color: black;	
+	cursor: default;
+}
+
 /*IE6 fixes*/
 
 label
@@ -117,16 +123,6 @@ a:focus
 a img
 {
 	border-style: none;	
-}
-
-a label
-{
-	cursor: inherit;	/*inherit the cursor for any labels inside links*/
-/*TODO fix
-	background-color: transparent;
-	color: transparent;
-	font: inherit;
-*/
 }
 
 .action

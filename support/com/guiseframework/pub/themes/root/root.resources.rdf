@@ -90,8 +90,8 @@
 		<resource:theme.flyover.frame.tether.image.NWbN rdf:resource="images/flyover-frame-tether-NWbN.gif"/>
 
 		<!-- SelectActionControl selection glyph icon images -->
-		<resource:theme.select.action.unselected.glyph rdf:resource="resource:theme.glyph.blank"/>
-		<resource:theme.select.action.selected.glyph rdf:resource="images/icons/glyphs/hand_point_right.gif"/>
+		<resource:theme.select.action.unselected.glyph rdf:resource="resource:theme.glyph.blank"/>	<!-- TODO eventually remove these -->
+		<resource:theme.select.action.selected.glyph rdf:resource="resource:theme.glyph.selected"/>
 		<!-- Slider -->
 		<resource:theme.slider.thumb.image.X rdf:resource="images/slider-thumb-x.gif"/>
 		<resource:theme.slider.thumb.image.Y rdf:resource="images/slider-thumb-y.gif"/>
@@ -201,12 +201,14 @@
 		<resource:theme.glyph.reject.multiple rdf:resource="images/icons/glyphs/reject_multiple.gif"/>
 		<resource:theme.glyph.resource rdf:resource="images/icons/glyphs/resource.gif"/>
 		<resource:theme.glyph.retry rdf:resource="images/icons/glyphs/retry.gif"/>
+		<resource:theme.glyph.selected rdf:resource="images/icons/glyphs/hand_point_right.gif"/>
 		<resource:theme.glyph.stop rdf:resource="images/icons/glyphs/stop.gif"/>
 		<resource:theme.glyph.string.edit rdf:resource="images/icons/glyphs/string_edit.gif"/>
 		<resource:theme.glyph.submit rdf:resource="images/icons/glyphs/submit.gif"/>
 		<resource:theme.glyph.subtract rdf:resource="images/icons/glyphs/subtract.gif"/>
 		<resource:theme.glyph.thumbnails rdf:resource="images/icons/glyphs/thumbnails.gif"/>
 		<resource:theme.glyph.tree rdf:resource="resource:theme.glyph.tree.edit"/>
+		<resource:theme.glyph.unselected rdf:resource="resource:theme.glyph.blank"/>
 		<resource:theme.glyph.upload rdf:resource="images/icons/glyphs/upload.gif"/>
 		<resource:theme.glyph.user rdf:resource="images/icons/glyphs/user.gif"/>
 		<resource:theme.glyph.view rdf:resource="resource:theme.glyph.eyeglasses"/>
@@ -220,6 +222,24 @@
 		<resource:theme.message.user.invalid>Invalid user.</resource:theme.message.user.invalid>
 		<resource:theme.message.user.exists>User already exists.</resource:theme.message.user.exists>
 
+		<!-- standard cursors -->
+		<resource:theme.cursor.action rdf:resource="resource:theme.cursor.pointer"/>
+		<resource:theme.cursor.crosshair rdf:resource="cursors/crosshair.png"/>	<!-- some of these values do not specify actual files, but instead map to predefined cursor types TODO eventually add actual image files for completeness and cross-platform compatibility in the future -->
+		<resource:theme.cursor.default rdf:resource="cursors/default.png"/>
+		<resource:theme.cursor.help rdf:resource="cursors/help.png"/>
+		<resource:theme.cursor.move rdf:resource="cursors/move.png"/>
+		<resource:theme.cursor.pointer rdf:resource="cursors/pointer.png"/>
+		<resource:theme.cursor.progress rdf:resource="cursors/progress.png"/>
+		<resource:theme.cursor.resize.line.far rdf:resource="cursors/resize_line_far.png"/>
+		<resource:theme.cursor.resize.line.far.page.far rdf:resource="cursors/resize_line_far_page_far.png"/>
+		<resource:theme.cursor.resize.line.far.page.near rdf:resource="cursors/resize_line_far_page_near.png"/>
+		<resource:theme.cursor.resize.line.near rdf:resource="cursors/resize_line_near.png"/>
+		<resource:theme.cursor.resize.line.near.page.far rdf:resource="cursors/resize_line_near_page_far.png"/>
+		<resource:theme.cursor.resize.line.near.page.near rdf:resource="cursors/resize_line_near_page_near.png"/>
+		<resource:theme.cursor.resize.page.far rdf:resource="cursors/resize_page_far.png"/>
+		<resource:theme.cursor.resize.page.near rdf:resource="cursors/resize_page_near.png"/>
+		<resource:theme.cursor.text rdf:resource="cursors/text.png"/>
+		<resource:theme.cursor.wait rdf:resource="cursors/wait.png"/>
 	</resource:Resources>
 
 </rdf:RDF>

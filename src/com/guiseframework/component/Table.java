@@ -24,8 +24,8 @@ import com.guiseframework.converter.*;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.Extent;
 import com.guiseframework.model.*;
-import com.guiseframework.model.ui.AbstractUIModel;
-import com.guiseframework.model.ui.UIModel;
+import com.guiseframework.model.ui.AbstractPresentationModel;
+import com.guiseframework.model.ui.PresentationModel;
 import com.guiseframework.prototype.ActionPrototype;
 import com.guiseframework.style.FontStyle;
 import com.guiseframework.validator.*;
@@ -868,7 +868,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	/**An encapsulation of the user interface-related model used for a column.
 	@author Garret Wilson
 	*/ 
-	protected static class ColumnUIModel extends AbstractUIModel
+	protected static class ColumnUIModel extends AbstractPresentationModel
 	{
 	}
 

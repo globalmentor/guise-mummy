@@ -1,5 +1,6 @@
 package com.guiseframework.model.ui;
 
+import java.net.URI;
 import java.util.*;
 
 import com.garretwilson.lang.ObjectUtilities;
@@ -9,14 +10,15 @@ import com.guiseframework.geometry.*;
 import com.guiseframework.style.Color;
 import com.guiseframework.style.FontStyle;
 import com.guiseframework.style.LineStyle;
+import static com.guiseframework.theme.Theme.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.util.ArrayUtilities.*;
 
-/**An abstract implementation of a user interface model.
+/**An abstract implementation of presentation-related information.
 @author Garret Wilson
 */
-public abstract class AbstractUIModel extends GuiseBoundPropertyObject implements UIModel
+public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject implements PresentationModel
 {
 
 	/**The background color of the component, or <code>null</code> if no background color is specified for this component.*/
@@ -501,6 +503,28 @@ public abstract class AbstractUIModel extends GuiseBoundPropertyObject implement
 			for(final Corner corner:Corner.values())	//for each corner
 			{
 				setCornerArcSize(corner, newCornerArcSize);	//set this corner arc size
+			}
+		}
+
+	/**The cursor URI, which may be a resource URI.*/
+	private URI cursor=CURSOR_DEFAULT;
+
+		/**@return The cursor URI, which may be a resource URI.*/
+		public URI getCursor() {return cursor;}
+
+		/**Sets the URI of the cursor.
+		This is a bound property.
+		@param newCursor The new URI of the cursor, which may be a resource URI.
+		@exception NullPointerException if the given cursor URI is <code>null</code>.
+		@see #CURSOR_PROPERTY
+		*/
+		public void setCursor(final URI newCursor)
+		{
+			if(!cursor.equals(checkInstance(newCursor, "Cursor URI cannot be null.")))	//if the value is really changing
+			{
+				final URI oldCursor=cursor;	//get the old value
+				cursor=newCursor;	//actually change the value
+				firePropertyChange(CURSOR_PROPERTY, oldCursor, newCursor);	//indicate that the value changed
 			}
 		}
 
@@ -1093,7 +1117,7 @@ public abstract class AbstractUIModel extends GuiseBoundPropertyObject implement
 		}
 
 	/**Default constructor.*/
-	public AbstractUIModel()
+	public AbstractPresentationModel()
 	{
 		assert CORNER_ARC_SIZE_PROPERTIES.length==cornerArcSizes.length : "Number of available corners changed.";
 	}

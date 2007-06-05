@@ -281,6 +281,14 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 		{
 			return new Link((ActionPrototype)prototype);
 		}
+		else if(prototype instanceof ValuePrototype)	//value prototypes
+		{
+			final Class<?> valueClass=((ValuePrototype<?>)prototype).getValueClass();	//get the type of value represented
+			if(Boolean.class.isAssignableFrom(valueClass))	//if a boolean value is represented
+			{
+				return new BooleanSelectLink((ValuePrototype<Boolean>)prototype);	//TODO testing; add comment to method signature
+			}
+		}
 		return super.createComponent(prototype);	//delegate to the parent class
 	}
 

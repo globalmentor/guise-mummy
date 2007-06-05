@@ -314,12 +314,14 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI GLYPH_RENAME=createURIResourceReference("theme.glyph.rename");
 	public final static URI GLYPH_RESOURCE=createURIResourceReference("theme.glyph.resource");
 	public final static URI GLYPH_RETRY=createURIResourceReference("theme.glyph.retry");
+	public final static URI GLYPH_SELECTED=createURIResourceReference("theme.glyph.selected");
 	public final static URI GLYPH_STOP=createURIResourceReference("theme.glyph.stop");
 	public final static URI GLYPH_STRING_EDIT=createURIResourceReference("theme.glyph.string.edit");
 	public final static URI GLYPH_SUBMIT=createURIResourceReference("theme.glyph.submit");
 	public final static URI GLYPH_SUBTRACT=createURIResourceReference("theme.glyph.subtract");
 	public final static URI GLYPH_THUMBNAILS=createURIResourceReference("theme.glyph.thumbnails");
 	public final static URI GLYPH_TREE=createURIResourceReference("theme.glyph.tree");
+	public final static URI GLYPH_UNSELECTED=createURIResourceReference("theme.glyph.unselected");
 	public final static URI GLYPH_UPLOAD=createURIResourceReference("theme.glyph.upload");
 	public final static URI GLYPH_USER=createURIResourceReference("theme.glyph.user");
 	public final static URI GLYPH_VIEW=createURIResourceReference("theme.glyph.view");
@@ -331,5 +333,22 @@ public class Theme extends ClassTypedRDFResource
 	public final static String MESSAGE_TASK_SUCCESS=createStringResourceReference("theme.message.task.success");
 	public final static String MESSAGE_USER_INVALID=createStringResourceReference("theme.message.user.invalid");
 	public final static String MESSAGE_USER_EXISTS=createStringResourceReference("theme.message.user.exists");
+		//standard theme cursors
+	public final static URI CURSOR_CROSSHAIR=createURIResourceReference("theme.cursor.crosshair");
+	public final static URI CURSOR_DEFAULT=createURIResourceReference("theme.cursor.default");
+	public final static URI CURSOR_HELP=createURIResourceReference("theme.cursor.help");
+	public final static URI CURSOR_MOVE=createURIResourceReference("theme.cursor.move");
+	public final static URI CURSOR_POINTER=createURIResourceReference("theme.cursor.pointer");
+	public final static URI CURSOR_PROGRESS=createURIResourceReference("theme.cursor.progress");
+	public final static URI CURSOR_RESIZE_LINE_FAR=createURIResourceReference("theme.cursor.resize.line.far");
+	public final static URI CURSOR_RESIZE_LINE_FAR_PAGE_FAR=createURIResourceReference("theme.cursor.resize.line.far.page.far");
+	public final static URI CURSOR_RESIZE_LINE_FAR_PAGE_NEAR=createURIResourceReference("theme.cursor.resize.line.far.page.near");
+	public final static URI CURSOR_RESIZE_LINE_NEAR=createURIResourceReference("theme.cursor.resize.line.near");
+	public final static URI CURSOR_RESIZE_LINE_NEAR_PAGE_FAR=createURIResourceReference("theme.cursor.resize.line.near.page.far");
+	public final static URI CURSOR_RESIZE_LINE_NEAR_PAGE_NEAR=createURIResourceReference("theme.cursor.resize.line.near.page.near");
+	public final static URI CURSOR_RESIZE_PAGE_FAR=createURIResourceReference("theme.cursor.resize.page.far");
+	public final static URI CURSOR_RESIZE_PAGE_NEAR=createURIResourceReference("theme.cursor.resize.page.near");
+	public final static URI CURSOR_TEXT=createURIResourceReference("theme.cursor.text");
+	public final static URI CURSOR_WAIT=createURIResourceReference("theme.cursor.wait");
 	
 }

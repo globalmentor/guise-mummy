@@ -6,11 +6,12 @@ import java.net.URI;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.model.*;
+import com.guiseframework.prototype.ValuePrototype;
 
 /**Image control that can be selected and generates actions, storing a Boolean value in its model representing the selected state.
 @author Garret Wilson
 */
-public class ImageBooleanSelectActionControl extends AbstractBooleanSelectActionControl<ImageBooleanSelectActionControl>
+public class ImageBooleanSelectActionControl extends AbstractBooleanSelectActionControl<ImageBooleanSelectActionControl> implements ImageComponent<ImageBooleanSelectActionControl>		//TODO fix the inconsistency of this component implementing LabelDisplayableComponent
 {
 
 	/**The image bound property.*/
@@ -101,4 +102,11 @@ public class ImageBooleanSelectActionControl extends AbstractBooleanSelectAction
 		super(labelModel, actionModel, valueModel, enableable);	//construct the parent class		
 	}
 
+	/**Prototype constructor.
+	@param valuePrototype The prototype on which this component should be based.
+	*/
+	public ImageBooleanSelectActionControl(final ValuePrototype<Boolean> valuePrototype)
+	{
+		this(valuePrototype, new DefaultActionModel(), valuePrototype, valuePrototype);	//use the value prototype as every needed model except for the action model
+	}
 }

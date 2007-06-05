@@ -52,6 +52,8 @@ public interface GuiseApplication extends PropertyBindable
 	public final static String GUISE_ROOT_THEME_BASE_PATH=GUISE_PUBLIC_THEMES_PATH+"root/";
 	/**The path of the root Guise theme, relative to the application.*/
 	public final static String GUISE_ROOT_THEME_PATH=GUISE_ROOT_THEME_BASE_PATH+"root.theme.rdf";
+	/**The base path of the default Guise theme cursors, relative to the application.*/
+	public final static String GUISE_ROOT_THEME_CURSORS_PATH=GUISE_ROOT_THEME_BASE_PATH+"cursors/";
 
 	/**@return The application locale used by default if a new session cannot determine the users's preferred locale.*/
 //TODO del	public Locale getDefaultLocale();

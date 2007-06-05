@@ -18,7 +18,7 @@ import com.guiseframework.geometry.*;
 import com.guiseframework.input.Input;
 import com.guiseframework.input.InputStrategy;
 import com.guiseframework.model.*;
-import com.guiseframework.model.ui.UIModel;
+import com.guiseframework.model.ui.PresentationModel;
 import com.guiseframework.theme.Theme;
 import com.guiseframework.viewer.Viewer;
 
@@ -32,7 +32,7 @@ If a developer must hide sensitive data, the developer should remove the compone
 <p>For widest platform support the general {@link #ROUNDED_CORNER_RADIUS_EXTENT} constant should be used whenever possible when requesting rounded corners.</p>
 @author Garret Wilson
 */
-public interface Component<C extends Component<C>> extends UIModel, LabelModel
+public interface Component<C extends Component<C>> extends PresentationModel, LabelModel
 {
 
 	/**The bound property of whether the component has bookmarks enabled.*/
