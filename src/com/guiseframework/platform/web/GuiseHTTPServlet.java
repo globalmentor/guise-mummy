@@ -1115,22 +1115,26 @@ Debug.trace("got control events");
 						}
 							//send back any open frames
 						final Iterator<Frame<?>> frameIterator=guiseSession.getApplicationFrame().getChildFrames().iterator();	//get an iterator to all the frames
-						while(frameIterator.hasNext())	//while there are more frames
+						if(frameIterator.hasNext())	//if there are open frames
 						{
-							final Frame<?> frame=frameIterator.next();	//get the next frame
-							if(frame!=guiseSession.getApplicationFrame())	//don't send back the application frame
+							guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
+							guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
+							guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
+							do
 							{
-								guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
-	//							TODO fix							else	//if the component is not visible, remove the component's elements
-								guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
-								guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
-								if(guiseApplication.isThemed())	//if the application applies themes
+								final Frame<?> frame=frameIterator.next();	//get the next frame
+								if(frame!=guiseSession.getApplicationFrame())	//don't send back the application frame
 								{
-									frame.updateTheme();	//make sure the theme has been applied to the frame
+		//							TODO fix							else	//if the component is not visible, remove the component's elements
+									if(guiseApplication.isThemed())	//if the application applies themes
+									{
+										frame.updateTheme();	//make sure the theme has been applied to the frame
+									}
+									frame.updateView(guiseContext);		//tell the component to update its view
 								}
-								frame.updateView(guiseContext);		//tell the component to update its view
-								guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "patch");	//</xhtml:patch>
 							}
+							while(frameIterator.hasNext());	//keep sending back frames as long as there are more frames
+							guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "patch");	//</xhtml:patch>
 						}
 					}
 					else	//if we don't need to update any views for these control events
@@ -1167,18 +1171,21 @@ Debug.trace("got control events");
 						}
 						else	//if the application frame wasn't affected
 						{
-							for(final Component<?> dirtyComponent:dirtyComponents)	//for each component affected by this update cycle
+							if(!dirtyComponents.isEmpty())	//if components were affected by this update cycle
 							{
-		//TODO fix							if(dirtyComponent.isVisible())	//if the component is visible
 								guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "patch");	//<xhtml:patch>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
-		//TODO fix							else	//if the component is not visible, remove the component's elements
 								guiseContext.writeAttribute(null, ATTRIBUTE_XMLNS, XHTML_NAMESPACE_URI.toString());	//xmlns="http://www.w3.org/1999/xhtml"
 								guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
-								if(guiseApplication.isThemed())	//if the application applies themes
+								for(final Component<?> dirtyComponent:dirtyComponents)	//for each component affected by this update cycle
 								{
-									dirtyComponent.updateTheme();	//make sure the theme has been applied to the component
+			//TODO fix							if(dirtyComponent.isVisible())	//if the component is visible
+			//TODO fix							else	//if the component is not visible, remove the component's elements
+									if(guiseApplication.isThemed())	//if the application applies themes
+									{
+										dirtyComponent.updateTheme();	//make sure the theme has been applied to the component
+									}
+									dirtyComponent.updateView(guiseContext);		//tell the component to update its view
 								}
-								dirtyComponent.updateView(guiseContext);		//tell the component to update its view
 								guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "patch");	//</xhtml:patch>
 							}
 							for(final Frame<?> frame:removedFrames)	//for each removed frame

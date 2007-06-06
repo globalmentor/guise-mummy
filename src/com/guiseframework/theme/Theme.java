@@ -350,5 +350,10 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI CURSOR_RESIZE_PAGE_NEAR=createURIResourceReference("theme.cursor.resize.page.near");
 	public final static URI CURSOR_TEXT=createURIResourceReference("theme.cursor.text");
 	public final static URI CURSOR_WAIT=createURIResourceReference("theme.cursor.wait");
-	
+		//components
+	public final static URI SLIDER_THUMB_X_IMAGE=createURIResourceReference("theme.slider.thumb.x.image");
+	public final static URI SLIDER_THUMB_Y_IMAGE=createURIResourceReference("theme.slider.thumb.y.image");
+	public final static URI SLIDER_TRACK_X_IMAGE=createURIResourceReference("theme.slider.track.x.image");
+	public final static URI SLIDER_TRACK_Y_IMAGE=createURIResourceReference("theme.slider.track.x.image");
+
 }

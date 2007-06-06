@@ -644,8 +644,8 @@ Debug.trace("list control changed value to", newValue);
 		
 		final SliderControl<Integer> horizontalSlider=new SliderControl<Integer>(sliderModel, Flow.LINE);
 		horizontalSlider.setLabel("Slider Value");
-		horizontalSlider.setThumbImage(URI.create("slider-thumb.gif"));
-		horizontalSlider.setTrackImage(URI.create("slider-track.gif"));
+		horizontalSlider.setThumbXImage(URI.create("slider-thumb.gif"));
+		horizontalSlider.setTrackXImage(URI.create("slider-track.gif"));
 		sliderPanel.add(horizontalSlider);
 
 		final SliderControl<Integer> verticalSlider=new SliderControl<Integer>(sliderModel, Flow.PAGE);

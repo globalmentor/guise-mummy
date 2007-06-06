@@ -149,6 +149,7 @@ public class CheckControl extends AbstractValueControl<Boolean, CheckControl>
 
 	/**Prototype constructor.
 	@param valuePrototype The prototype on which this component should be based.
+	@exception NullPointerException if the given prototype is <code>null</code>.
 	*/
 	public CheckControl(final ValuePrototype<Boolean> valuePrototype)
 	{

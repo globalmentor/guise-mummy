@@ -78,7 +78,7 @@ navigator.userAgentVersionNumber The version of the user agent stored as a numbe
 
 /*Guise AJAX Response Format, content type application/x-guise-ajax-response+xml
 <response>
-	<patch></patch>	<!--XML elements to be patched into the existing DOM tree.-->
+	<patch></patch>	<!--XML element trees to be patched into the existing DOM tree.-->
 	<attribute id="" name="" value=""></attribute>	<!--the new name and value of an attribute of an element with the given ID to be set (or removed if the value is null)-->
 	<remove id=""/>	<!--ID of the XML element to be removed from the existing DOM tree-->
 	<navigate>uri</navigate>	<!--URI of another page to which to navigate-->
@@ -2948,6 +2948,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(thisGuiseAJAX.isEnabled()
 		*/ 
 		GuiseAJAX.prototype._processPatch=function(element)
 		{
+			var mozInlineBoxParentIDSet=null;	//we'll need to do special reflowing if Mozilla inline box children were updated; we'll lazily create and store a set of inline box parents if needed
 			var childNodes=element.childNodes;	//get all the child nodes of the element
 			var childNodeCount=childNodes.length;	//find out how many children there are
 			for(var i=0; i<childNodeCount; ++i)	//for each child node
@@ -2963,6 +2964,23 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(thisGuiseAJAX.isEnabled()
 						{
 							this._synchronizeElement(oldElement, childNode, true);	//synchronize this element tree, indicating that this is the root of a synchronization subtree
 							updateComponents(oldElement, true);	//now that we've patched the old element, update any components that rely on the old element
+							if(isUserAgentFirefox)	//if we're running Firefox and we just patched an element inside a Mozilla inline box, Firefox won't correctly update the flow so we'll have to do that manually TODO fix for Firefox 3
+							{
+									//TODO at some point we may need to check the patched descendants, too---this only works if the root of the patched tree or one of its ancestors was a Mozilla inline box
+								var mozInlineBoxAncestor=DOMUtilities.getAncestorElementByStyle(oldElement, "display", "-moz-inline-box");	//see if there is a Mozilla inline box element ancestor (including this element)
+								if(mozInlineBoxAncestor)	//if there is a Mozilla inline box element, we'll have to do special reflowing after all patching is done
+								{
+									var mozInlineBoxAncestorParent=mozInlineBoxAncestor.parentNode;	//get the inline box parent so we can just replace all the children
+									if(mozInlineBoxAncestorParent && mozInlineBoxAncestorParent.id)	//if we find its parent as we expect, and it has an ID
+									{
+										if(!mozInlineBoxParentIDSet)	//if we haven't yet created the set of inline box parents
+										{
+											mozInlineBoxParentIDSet=new Object();	//create a new set
+										}
+										mozInlineBoxParentIDSet[mozInlineBoxAncestorParent.id]=true;	//indicate that we have another parent node of an inline box
+									}
+								}
+							}
 						}
 						else if(DOMUtilities.hasClass(childNode, "frame"))	//if the element doesn't currently exist, but the patch is for a frame, create a new frame
 						{
@@ -2975,13 +2993,17 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(thisGuiseAJAX.isEnabled()
 					}
 				}
 			}
-			
-/*TODO testirng IE7			
-			if(document.recalc)
+			if(mozInlineBoxParentIDSet)	//if we have a set of inline box parent IDs to fix for Mozilla
 			{
-				document.recalc();
+				for(var mozInlineBoxParentID in mozInlineBoxParentIDSet)	//for each parent of a Mozilla inline box
+				{
+					var mozInlineBoxParent=document.getElementById(mozInlineBoxParentID);	//get the Mozilla inline box parent element
+					if(mozInlineBoxParent)	//if we have a parent to a Mozilla inline box that was updated
+					{
+						DOMUtilities.refreshNode(mozInlineBoxParent);	//refresh the Mozilla inline box container by removing it from the tree and putting it back
+					}
+				}
 			}
-*/
 		};
 
 		/**Processes the AJAX attribute response.
@@ -3471,7 +3493,7 @@ if(elementName=="select")
 	*/
 	//TODO del alert("incompatible old element now has children: "+oldElement.childNodes.length);
 					}
-					
+
 					for(var i=0; i<childNodeCount; ++i)	//for each new child node
 					{
 						var childNode=childNodeList[i];	//get this child node
@@ -3534,6 +3556,7 @@ if(elementName=="select")
 	}
 						}
 					}
+					
 					if(elementName=="select")	//if we just patched a select element, we must go back and make sure the correct options are selected, as IE6 will automatically select any newly added option, even if we didn't specify with the DOM that it should be selected
 					{
 
@@ -3569,7 +3592,7 @@ if(elementName=="select")
 //TODO del alert("selected index after: "+oldElement.selectedIndex);
 						
 					}
-				}
+				}				
 			}
 		};
 
@@ -4943,17 +4966,17 @@ function initializeNode(node, deep, initialInitialization)
 							}
 //TODO del							alert("rollover source: "+node.getAttribute("guise:rolloverSrc"));
 						}
-						if(isUserAgentFirefox)	//if we're running Firefox, check for the inline-block layout bug that doesn't show images that have not yet been cached TODO fix for Firefox 3
+						if(isUserAgentFirefox)	//if we're running Firefox, check for the inline box layout bug that doesn't show images that have not yet been cached TODO fix for Firefox 3
 						{
 							if(node.offsetWidth==0 && node.offsetHeight==0)	//if this image has no dimensions
 							{
-								var inlineBlockAncestor=DOMUtilities.getAncestorElementByStyle(node, "display", "-moz-inline-box");	//see if there is a Mozilla inline-block element
-								if(inlineBlockAncestor)	//if there is a Mozilla inline-block element causing our problems
+								var mozInlineBoxAncestor=DOMUtilities.getAncestorElementByStyle(node, "display", "-moz-inline-box");	//see if there is a Mozilla inline box element ancestor
+								if(mozInlineBoxAncestor)	//if there is a Mozilla inline box element causing our problems
 								{
-									var inlineBlockAncestorParent=inlineBlockAncestor.parentNode;	//get *it's* parent so we can just replace all the children
-									if(inlineBlockAncestorParent)	//if we find its parent like we expect
+									var mozInlineBoxAncestorParent=mozInlineBoxAncestor.parentNode;	//get *its* parent so we can just replace all the children
+									if(mozInlineBoxAncestorParent)	//if we find its parent like we expect
 									{
-										DOMUtilities.refreshNode(inlineBlockAncestorParent);	//refresh the container element by removing it from the tree and putting it back
+										DOMUtilities.refreshNode(mozInlineBoxAncestorParent);	//refresh the container element by removing it from the tree and putting it back
 									}
 								}
 							}
@@ -5908,7 +5931,14 @@ if(isNaN(position))	//TODO del; fixed; change to assertion
 					{
 						var ajaxRequest=new ActionAJAXEvent(slider.id, thumb.id, "slideEnd", 0);	//create a new action request for sliding end TODO use a constant	//why are we sending back an action event here?
 						guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
-						updateSlider(slider);	//update the slider view
+						if(guiseAJAX._mozInlineBoxesUpdated)	//TODO fix hack for Firefox 1/2; place in a better place; this is very specific to to one particular application
+						{
+//TODO important fix							window.location.reload();	//reload the page
+						}
+						else	//TODO fix hack; remove first part of if()
+						{
+							updateSlider(slider);	//update the slider view
+						}
 					}
 			dragState.beginDrag(event.clientX, event.clientY);	//begin dragging
 	//TODO del alert("drag state element: "+dragState.element.nodeName);
@@ -5925,7 +5955,7 @@ This implementation also sets the thumb[GUISE_STATE_WIDTH_ATTRIBUTE] and thumb[G
 */
 function updateSlider(slider)	//TODO maybe rename to updateSliderView
 {
-	if(DOMUtilities.hasClassName(slider, "sliding"))	//if the slider is not in a sliding state according to the server (i.e. the thumb is not being manually moved by the user) TODO use a constant
+	if(DOMUtilities.hasClassName(slider, "sliding"))	//if the slider is in a sliding state according to the server (i.e. the thumb is being manually moved by the user) TODO use a constant
 	{
 		return;	//don't update the slider while the server still thinks the slider is sliding
 	}

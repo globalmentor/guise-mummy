@@ -37,7 +37,7 @@ public class DropMenu extends AbstractMenu<DropMenu>
 	/**Prototype and axis constructor.
 	@param actionPrototype The prototype on which this component should be based.
 	@param axis The axis along which the menu is oriented.
-	@exception NullPointerException if the given prototype is <code>null</code>.
+	@exception NullPointerException if the given prototype and/or axis is <code>null</code>.
 	*/
 	public DropMenu(final MenuPrototype menuPrototype, final Flow axis)
 	{

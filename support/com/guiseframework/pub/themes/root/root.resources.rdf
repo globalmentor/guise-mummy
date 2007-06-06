@@ -93,10 +93,10 @@
 		<resource:theme.select.action.unselected.glyph rdf:resource="resource:theme.glyph.blank"/>	<!-- TODO eventually remove these -->
 		<resource:theme.select.action.selected.glyph rdf:resource="resource:theme.glyph.selected"/>
 		<!-- Slider -->
-		<resource:theme.slider.thumb.image.X rdf:resource="images/slider-thumb-x.gif"/>
-		<resource:theme.slider.thumb.image.Y rdf:resource="images/slider-thumb-y.gif"/>
-		<resource:theme.slider.track.image.X rdf:resource="images/slider-track-x.gif"/>
-		<resource:theme.slider.track.image.Y rdf:resource="images/slider-track-y.gif"/>
+		<resource:theme.slider.thumb.x.image rdf:resource="images/slider-thumb-x.gif"/>
+		<resource:theme.slider.thumb.y.image rdf:resource="images/slider-thumb-y.gif"/>
+		<resource:theme.slider.track.x.image rdf:resource="images/slider-track-x.gif"/>
+		<resource:theme.slider.track.y.image rdf:resource="images/slider-track-y.gif"/>
 		<!-- TreeNode -->
 		<resource:theme.tree.node.collapsed.image rdf:resource="images/treenode-collapsed.gif"/>
 		<resource:theme.tree.node.expanded.image rdf:resource="images/treenode-expanded.gif"/>

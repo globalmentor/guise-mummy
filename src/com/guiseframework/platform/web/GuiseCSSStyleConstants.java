@@ -15,6 +15,8 @@ public class GuiseCSSStyleConstants
 
 	//components
 	
+	/**The CSS class suffix for the layout of a layout component.*/
+	public final static String COMPONENT_LAYOUT_CLASS_SUFFIX="-layout";
 	/**The CSS class suffix for the label part of a component.*/
 	public final static String COMPONENT_LABEL_CLASS_SUFFIX="-label";
 	/**The CSS class suffix for the description part of a component.*/

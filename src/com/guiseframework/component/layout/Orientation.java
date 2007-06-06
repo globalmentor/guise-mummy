@@ -18,17 +18,27 @@ public class Orientation
 {
 
 	/**Left-to-right line, top-to-bottom page orientation (e.g. English).*/
-	public final static Orientation LEFT_TO_RIGHT_TOP_TO_BOTTOM=new Orientation(Axis.X, Flow.Direction.INCREASING, Flow.Direction.INCREASING);
+	public final static Orientation LEFT_TO_RIGHT_TOP_TO_BOTTOM=new Orientation(FlowOrientation.LEFT_TO_RIGHT, FlowOrientation.TOP_TO_BOTTOM);
 	
 	/**Right-to-left line, top-to-bottom page orientation (e.g. Arabic).*/
-	public final static Orientation RIGHT_TO_LEFT_TOP_TO_BOTTOM=new Orientation(Axis.X, Flow.Direction.DECREASING, Flow.Direction.INCREASING);
+	public final static Orientation RIGHT_TO_LEFT_TOP_TO_BOTTOM=new Orientation(FlowOrientation.RIGHT_TO_LEFT, FlowOrientation.TOP_TO_BOTTOM);
 
 	/**Top-to-bottom line, right-to-left page orientation (e.g. Chinese).*/
-	public final static Orientation TOP_TO_BOTTOM_RIGHT_TO_LEFT=new Orientation(Axis.Y, Flow.Direction.INCREASING, Flow.Direction.DECREASING);
+	public final static Orientation TOP_TO_BOTTOM_RIGHT_TO_LEFT=new Orientation(FlowOrientation.TOP_TO_BOTTOM, FlowOrientation.RIGHT_TO_LEFT);
 
-	/**The axis for each flow (line and page).*/
-	private final Axis[] axes=new Axis[2];
+	/**The orientation of each flow.*/
+	private final FlowOrientation[] orientations=new FlowOrientation[Flow.values().length];
 
+		/**Determines the orientation for the particular flow.
+		@param flow The flow (line or page).
+		@return The orientation for the specified flow.
+		@exception NullPointerException if the given flow is <code>null</code>.
+		*/
+		public FlowOrientation getOrientation(final Flow flow)
+		{
+			return orientations[flow.ordinal()];	//get the orientation for this flow
+		}
+		
 		/**Determines the axis for the particular flow.
 		@param flow The flow (line or page).
 		@return The axis for the specified flow.
@@ -36,7 +46,7 @@ public class Orientation
 		*/
 		public Axis getAxis(final Flow flow)
 		{
-			return axes[flow.ordinal()];	//get the axis for this flow
+			return getOrientation(flow).getAxis();	//get the axis of the flow orientation
 		}
 
 		/**Determines the flow (line or page) that is aligned to the given axis.
@@ -56,9 +66,6 @@ public class Orientation
 			throw new IllegalArgumentException("Unsupported orientation axis: "+axis);	//hopefully they won't pass Axis.Z, because orientations don't support the Z axis
 		}
 
-	/**The direction for each flow (line and page).*/
-	private final Flow.Direction[] directions=new Flow.Direction[2];
-
 		/**Determines the direction of the particular flow.
 		@param flow The flow (line or page).
 		@return The direction of the specified flow.
@@ -66,9 +73,8 @@ public class Orientation
 		*/
 		public Flow.Direction getDirection(final Flow flow)
 		{
-			return directions[flow.ordinal()];	//get the direction for this flow
+			return getOrientation(flow).getDirection();	//get the direction of the flow orientation
 		}
-
 		
 	/**The side for each border.*/
 	private final Side[] sides=new Side[4];
@@ -100,12 +106,11 @@ public class Orientation
 			throw new IllegalArgumentException("Unsupported orientation side: "+side);	//hopefully they won't pass Side.FRONT or Side.BACK, because orientations don't support the Z axis
 		}
 
-	/**Retrieves a cardinal compass point indicating the absolute direction based upon the given flow end.
-	Each, but not both, of the ends may be <code>null</code>.
-	@param lineEnd The end of the line flow, or <code>null</code> if a cardinal direction is requested and a page end is provided.
-	@param pageEnd The end of the page flow, or <code>null</code> if a cardinal direction is requested and a line end is provided.
-	@return The cardinal or ordinal compass point indicating the absolute direction of the given line and page end.
-	@exception NullPointerException if both the given line end and the given page end are <code>null</code>.
+	/**Retrieves a cardinal compass point indicating the absolute direction based upon the given flow and end.
+	@param flow The flow for which the compass point should be returned
+	@param end The end of the flow requested.
+	@return The cardinal compass point indicating the absolute direction of the given flow end.
+	@exception NullPointerException if the given flow and/or end is <code>null</code>.
 	@see CompassPoint#NORTH
 	@see CompassPoint#EAST
 	@see CompassPoint#SOUTH
@@ -113,17 +118,7 @@ public class Orientation
 	*/
 	public CompassPoint getCompassPoint(final Flow flow, final Flow.End end)
 	{
-		final Axis axis=getAxis(flow);	//get the axis for the given flow
-		final Flow.Direction direction=getDirection(flow);	//get the direction of the given flow
-		switch(axis)	//see which axis this is
-		{
-			case X:
-				return direction==Flow.Direction.INCREASING ? (end==Flow.End.NEAR ? CompassPoint.WEST : CompassPoint.EAST) : (end==Flow.End.NEAR ? CompassPoint.EAST : CompassPoint.WEST);
-			case Y:
-				return direction==Flow.Direction.INCREASING ? (end==Flow.End.NEAR ? CompassPoint.NORTH : CompassPoint.SOUTH) : (end==Flow.End.NEAR ? CompassPoint.SOUTH: CompassPoint.NORTH);
-			default:
-				throw new AssertionError("Unrecognized axis: "+axis);
-		}
+		return getOrientation(flow).getCompassPoint(end);	//return the compass point for this flow end
 	}
 
 	/**Retrieves a cardinal or ordinal compass point indicating the absolute direction based upon the given line and/or page ends.
@@ -149,7 +144,7 @@ public class Orientation
 			if(pageEnd!=null)	//if there is a page end
 			{
 				final CompassPoint pageCompassPoint=getCompassPoint(Flow.PAGE, pageEnd);	//return the compass point for this page end
-				final CompassPoint latitudeCompassPoint=getFlow(Axis.Y)==Flow.PAGE ? pageCompassPoint : lineCompassPoint;	//get the correct compass points for latitude and longitude
+				final CompassPoint latitudeCompassPoint=getFlow(Axis.X)==Flow.LINE ? lineCompassPoint : pageCompassPoint;	//get the correct compass points for latitude and longitude
 				final CompassPoint longitudeCompassPoint=getFlow(Axis.Y)==Flow.PAGE ? pageCompassPoint : lineCompassPoint;
 				return CompassPoint.getOrdinalCompassPoint(latitudeCompassPoint, longitudeCompassPoint);	//return the ordinal compass point for these two cardinal compass points
 			}
@@ -170,27 +165,41 @@ public class Orientation
 			}
 		}
 	}
-		
-	/**The lazily-created set of right-to-left, top-to-bottom languages.*/
-	private static Set<String> rightToLeftTopToBottomLanguages;
 
-	/**Constructor.
-	@param lineAxis The axis of lines in this orientation.
-	@param lineDirection The direction of lines.
-	@param pageDirection The direction of pages.
-	@exception NullPointerException if the line axis, line direction, and/or page direction is <code>null</code>.
+	/**Flow orientation constructor.
+	@param lineOrientation The orientation of the line.
+	@param pageOrientation The orientation of the page.
+	@exception NullPointerException if the line orientation and/or page orientation is <code>null</code>.
+	@exception IllegalArgumentException if the line orientation and/or page orientation uses the {@link Axis#Z} axis.
+	@exception IllegalArgumentException if both flow orientations specify the same axis.
 	*/
-	public Orientation(final Axis lineAxis, final Flow.Direction lineDirection, final Flow.Direction pageDirection)
+	public Orientation(final FlowOrientation lineOrientation, final FlowOrientation pageOrientation)
 	{
-		axes[Flow.LINE.ordinal()]=checkInstance(lineAxis, "Line axis cannot be null.");	//set the line axis
-		axes[Flow.PAGE.ordinal()]=lineAxis==Axis.X ? Axis.Y : Axis.X;	//the page axis will be the perpendicular axis
-		directions[Flow.LINE.ordinal()]=checkInstance(lineDirection, "Line direction cannot be null.");	//set the line direction
-		directions[Flow.PAGE.ordinal()]=checkInstance(pageDirection, "Page direction cannot be null.");	//set the page direction
+		orientations[Flow.LINE.ordinal()]=checkInstance(lineOrientation, "Line orientation cannot be null.");
+		if(lineOrientation.getAxis()==Axis.Z)	//if the line is flowing on the Z axis
+		{
+			throw new IllegalArgumentException("Lines cannot flow on the Z axis.");
+		}
+		orientations[Flow.PAGE.ordinal()]=checkInstance(pageOrientation, "Page orientation cannot be null.");
+		if(pageOrientation.getAxis()==Axis.Z)	//if the page is flowing on the Z axis
+		{
+			throw new IllegalArgumentException("Pages cannot flow on the Z axis.");
+		}
+		if(lineOrientation.getAxis()==pageOrientation.getAxis())	//if both axes are the same
+		{
+			throw new IllegalArgumentException("Line orientation and page orientation must use different axes.");
+		}
+		final Axis lineAxis=lineOrientation.getAxis();	//get the axis of the line
+		final Flow.Direction lineDirection=lineOrientation.getDirection();	//get the direction of the line flow
+		final Flow.Direction pageDirection=pageOrientation.getDirection();	//get the direction of the page flow
 		sides[Border.LINE_NEAR.ordinal()]=lineAxis==Axis.X ? (lineDirection==Flow.Direction.INCREASING ? Side.LEFT : Side.RIGHT) : (lineDirection==Flow.Direction.INCREASING ? Side.TOP : Side.BOTTOM);
 		sides[Border.LINE_FAR.ordinal()]=lineAxis==Axis.X ? (lineDirection==Flow.Direction.INCREASING ? Side.RIGHT : Side.LEFT) : (lineDirection==Flow.Direction.INCREASING ? Side.BOTTOM : Side.TOP);
 		sides[Border.PAGE_NEAR.ordinal()]=lineAxis==Axis.X ? (pageDirection==Flow.Direction.INCREASING ? Side.TOP : Side.BOTTOM) : (pageDirection==Flow.Direction.INCREASING ? Side.LEFT : Side.RIGHT);
 		sides[Border.PAGE_FAR.ordinal()]=lineAxis==Axis.X ? (pageDirection==Flow.Direction.INCREASING ? Side.BOTTOM : Side.TOP) : (pageDirection==Flow.Direction.INCREASING ? Side.RIGHT : Side.LEFT);
 	}
+
+	/**The lazily-created set of right-to-left, top-to-bottom languages.*/
+	private static Set<String> rightToLeftTopToBottomLanguages;
 
 	/**Retrieves the default orientation for a particular locale.
 	This method currently supports the following locales:
@@ -234,16 +243,9 @@ public class Orientation
 			return false;	//the objects aren't equal
 		}
 		final Orientation orientation=(Orientation)object;	//cast the object to an orientation
-		for(int axisIndex=axes.length-1; axisIndex>=0; --axisIndex)	//check each axis
+		for(int orientationIndex=orientations.length-1; orientationIndex>=0; --orientationIndex)	//check each flow orientation
 		{
-			if(axes[axisIndex]!=orientation.axes[axisIndex])	//if an axis doesn't match
-			{
-				return false;	//the objects aren't equal
-			}
-		}
-		for(int directionIndex=directions.length-1; directionIndex>=0; --directionIndex)	//check each direction
-		{
-			if(directions[directionIndex]!=orientation.directions[directionIndex])	//if an direction doesn't match
+			if(orientations[orientationIndex]!=orientation.orientations[orientationIndex])	//if a flow orientation doesn't match
 			{
 				return false;	//the objects aren't equal
 			}
@@ -254,6 +256,6 @@ public class Orientation
 	/**@return A hash code for the cell.*/
   public int hashCode()
   {
-  	return ObjectUtilities.hashCode(axes[0], axes[1], directions[0], directions[1]);	//generate a hash code
+  	return ObjectUtilities.hashCode((Object[])orientations);	//generate a hash code
   }
 }

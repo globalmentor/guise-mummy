@@ -3,7 +3,7 @@ package com.guiseframework.component;
 import com.guiseframework.component.layout.Layout;
 import com.guiseframework.component.layout.Constraints;
 import com.guiseframework.event.ContainerListener;
-import com.guiseframework.prototype.Prototype;
+import com.guiseframework.prototype.*;
 
 /**Component that allows for addition and removal of child components.
 A layout component is iterable over its child components, and can be used in short <code>for(:)</code> form. 

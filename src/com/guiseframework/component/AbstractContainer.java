@@ -8,6 +8,7 @@ import com.guiseframework.event.*;
 import com.guiseframework.model.DefaultLabelModel;
 import com.guiseframework.model.LabelModel;
 import com.guiseframework.prototype.*;
+import com.guiseframework.validator.RangeValidator;
 
 /**Abstract implementation of a container component.
 Iterating over child components is thread safe.
@@ -114,6 +115,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		<dt>{@link LabelPrototype}</dt> <dd>{@link Label}</dd>	
 		<dt>{@link MenuPrototype}</dt> <dd>{@link DropMenu}</dd>	
 		<dt>{@link ValuePrototype}&lt;{@link Boolean}&gt;</dt> <dd>{@link CheckControl}</dd>	
+		<dt>{@link ValuePrototype}&lt;{@link Number}&gt; with installed {@link RangeValidator}</dt> <dd>{@link SliderControl}</dd>	
 		<dt>{@link ValuePrototype}&lt;?&gt;</dt> <dd>{@link TextControl}</dd>	
 	</dl>
 	@param prototype The prototype of the component to create.
@@ -136,10 +138,15 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 		}
 		else if(prototype instanceof ValuePrototype)	//value prototypes
 		{
-			final Class<?> valueClass=((ValuePrototype<?>)prototype).getValueClass();	//get the type of value represented
+			final ValuePrototype<?> valuePrototype=(ValuePrototype<?>)prototype;	//get the value prototype
+			final Class<?> valueClass=valuePrototype.getValueClass();	//get the type of value represented
 			if(Boolean.class.isAssignableFrom(valueClass))	//if a boolean value is represented
 			{
 				return new CheckControl((ValuePrototype<Boolean>)prototype);
+			}
+			else if(Number.class.isAssignableFrom(valueClass) && valuePrototype.getValidator() instanceof RangeValidator)	//if a number range is represented
+			{
+				return new SliderControl<Number>((ValuePrototype<Number>)prototype, Flow.LINE);				
 			}
 			else	//if the prototype is unrecognized
 			{
