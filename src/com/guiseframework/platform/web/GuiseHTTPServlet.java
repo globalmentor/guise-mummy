@@ -97,7 +97,7 @@ import com.guiseframework.model.FileItemResourceImport;
 import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.web.css.*;
 import com.guiseframework.theme.Theme;
-import com.guiseframework.viewer.text.xml.xhtml.XHTMLApplicationFrameView;
+import com.guiseframework.viewer.text.xml.xhtml.XHTMLApplicationFrameViewer;
 
 import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static com.garretwilson.util.LocaleUtilities.*;
@@ -564,7 +564,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 		final boolean isAJAX=contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType);	//see if this is a Guise AJAX request
 			//TODO verify; does this work with file uploads?
 			//this is a non-AJAX Guise POST if there is an XHTML action input ID field TODO add a better field; stop using a view
-		final boolean isGuisePOST=POST_METHOD.equals(request.getMethod()) && request.getParameter(XHTMLApplicationFrameView.getActionInputID(guiseSession.getApplicationFrame()))!=null;
+		final boolean isGuisePOST=POST_METHOD.equals(request.getMethod()) && request.getParameter(XHTMLApplicationFrameViewer.getActionInputID(guiseSession.getApplicationFrame()))!=null;
 
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
@@ -733,7 +733,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
 		final boolean isAJAX=contentType!=null && GUISE_AJAX_REQUEST_CONTENT_TYPE.match(contentType);	//see if this is a Guise AJAX request
 		//this is a non-AJAX Guise POST if there is an XHTML action input ID field TODO add a better field; stop using a view
-		final boolean isGuisePOST=POST_METHOD.equals(request.getMethod()) && request.getParameter(XHTMLApplicationFrameView.getActionInputID(guiseSession.getApplicationFrame()))!=null;
+		final boolean isGuisePOST=POST_METHOD.equals(request.getMethod()) && request.getParameter(XHTMLApplicationFrameViewer.getActionInputID(guiseSession.getApplicationFrame()))!=null;
 		final HTTPServletGuiseContext guiseContext=new HTTPServletGuiseContext(guiseSession, componentDestination, request, response);	//create a new Guise context
 //		TODO del Debug.trace("got context");
 		synchronized(guiseSession)	//don't allow other session contexts to be active at the same time
@@ -836,7 +836,7 @@ Debug.trace("got control events");
 									{
 										final String parameterName=parameterListMapEntry.getKey();	//get the parameter name
 				
-										if(parameterName.equals(XHTMLApplicationFrameView.getActionInputID(applicationFrame)) && parameterListMapEntry.getValue().size()>0)	//if this parameter is for an action
+										if(parameterName.equals(XHTMLApplicationFrameViewer.getActionInputID(applicationFrame)) && parameterListMapEntry.getValue().size()>0)	//if this parameter is for an action
 										{
 											final Component<?> actionComponent=AbstractComponent.getComponentByID(applicationFrame, parameterListMapEntry.getValue().get(0).toString());	//get an action component
 											if(actionComponent!=null)	//if we found an action component
@@ -1798,7 +1798,7 @@ if(document==null)	//TODO fix; del
 			else	//if this is normal application/x-www-form-urlencoded data
 			{
 				final boolean exhaustive=POST_METHOD.equals(request.getMethod());	//if this is an HTTP post, the form event is exhaustive of all controls on the form
-				if(!exhaustive || request.getParameter(XHTMLApplicationFrameView.getActionInputID(guiseSession.getApplicationFrame()))!=null)	//if this is a POST, only use the data if it is a Guise POST
+				if(!exhaustive || request.getParameter(XHTMLApplicationFrameViewer.getActionInputID(guiseSession.getApplicationFrame()))!=null)	//if this is a POST, only use the data if it is a Guise POST
 				{				
 					final FormControlEvent formSubmitEvent=new FormControlEvent(guiseContext, exhaustive);	//create a new form submission event
 					final CollectionMap<String, Object, List<Object>> parameterListMap=formSubmitEvent.getParameterListMap();	//get the map of parameter lists
