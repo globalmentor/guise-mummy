@@ -1126,10 +1126,7 @@ Debug.trace("got control events");
 								if(frame!=guiseSession.getApplicationFrame())	//don't send back the application frame
 								{
 		//							TODO fix							else	//if the component is not visible, remove the component's elements
-									if(guiseApplication.isThemed())	//if the application applies themes
-									{
-										frame.updateTheme();	//make sure the theme has been applied to the frame
-									}
+									frame.updateProperties();	//make sure the frame's properties have been updated
 									frame.updateView(guiseContext);		//tell the component to update its view
 								}
 							}
@@ -1180,10 +1177,7 @@ Debug.trace("got control events");
 								{
 			//TODO fix							if(dirtyComponent.isVisible())	//if the component is visible
 			//TODO fix							else	//if the component is not visible, remove the component's elements
-									if(guiseApplication.isThemed())	//if the application applies themes
-									{
-										dirtyComponent.updateTheme();	//make sure the theme has been applied to the component
-									}
+									dirtyComponent.updateProperties();	//make sure the component's properties have been updated
 									dirtyComponent.updateView(guiseContext);		//tell the component to update its view
 								}
 								guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "patch");	//</xhtml:patch>
@@ -1199,10 +1193,7 @@ Debug.trace("got control events");
 					}
 					else	//if this is not an AJAX request
 					{
-						if(guiseApplication.isThemed())	//if the application applies themes
-						{
-							applicationFrame.updateTheme();	//make sure the theme has been applied to the entire application frame hierarchy
-						}
+						applicationFrame.updateProperties();	//make sure the application frame's properties have been updated for the entire hierarchy
 						applicationFrame.updateView(guiseContext);		//tell the application frame to update its view						
 					}
 				}

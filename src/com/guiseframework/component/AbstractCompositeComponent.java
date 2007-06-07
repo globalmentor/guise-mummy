@@ -229,25 +229,24 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 		return getComponentByName(this, name);	//search the component hierarchy for a component with the given name
 	}
 
-	/**Update's this component's theme.
-	This method checks whether a theme has been applied to this component.
-	If no theme has been applied to the component, the current session theme will be applied by delegating to {@link #applyTheme(Theme)}.
-	This method is called recursively for any child components before applying any theme on the component itself,
-	to assure that child theme updates have already occured before theme updates occur for this component.
+	/**Update's this object's properties.
+	This method checks whether properties have been updated for this object.
+	If this object's properties have not been updated, this method calls {@link #initializeProperties()}.
+	This method is called for any child components before initializing the properties of the component itself,
+	to assure that child property updates have already occured before property updates occur for this component.
 	There is normally no need to override this method or to call this method directly by applications.
-	This version recursively calls the {@link #updateTheme()} method of all child components before updating this component's theme.
-	@exception IOException if there was an error loading or applying the theme.
-	@see #applyTheme(Theme)
-	@see #isThemeApplied()
-	@see GuiseSession#getTheme()
+	This version recursively calls the {@link #updateProperties()} method of all child components before updating properties of this component.
+	@exception IOException if there was an error loading or setting properties.
+	@see #isPropertiesInitialized()
+	@see #initializeProperties()
 	*/
-	public void updateTheme() throws IOException
+	public void updateProperties() throws IOException
 	{
 		for(final Component<?> childComponent:getChildren())	//for each child component
 		{
-			childComponent.updateTheme();	//tell the child component to update its theme
+			childComponent.updateProperties();	//tell the child component to update its properties
 		}
-		super.updateTheme();	//update the theme for this component
+		super.updateProperties();	//update the properties for this component
 	}
 
 	/**Dispatches an input event to this component and all child components, if any.

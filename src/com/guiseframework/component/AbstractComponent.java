@@ -11,6 +11,7 @@ import javax.mail.internet.ContentType;
 import com.garretwilson.beans.TargetedEvent;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.Debug;
+import com.guiseframework.GuiseApplication;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.effect.*;
 import com.guiseframework.component.layout.*;
@@ -691,24 +692,24 @@ Debug.trace("now valid of", this, "is", isValid());
 				}			
 			}
 
-	/**Whether a theme has been applied to this component.*/
-	private boolean themeApplied=false;
+	/**Whether the properties of this component have been initialized.*/
+	private boolean propertiesInitialized=false;
 
-		/**@return Whether a theme has been applied to this component.*/
-		public boolean isThemeApplied() {return themeApplied;}
+		/**@return Whether the properties of this component have been initialized.*/
+		public boolean isPropertiesInitialized() {return propertiesInitialized;}
 
-		/**Sets whether a theme has been applied to this component.
+		/**Sets whether the properties of this component have been initialized.
 		This is a bound property of type {@link Boolean}.
-		@param newThemeApplied <code>true</code> if a theme has been applied to this component, else <code>false</code>.
-		@see #THEME_APPLIED_PROPERTY
+		@param newPropertiesInitialized <code>true</code> if the properties of this component have been initialized, else <code>false</code>.
+		@see #PROPERTIES_INITIALIZED_PROPERTY
 		*/
-		public void setThemeApplied(final boolean newThemeApplied)
+		public void setPropertiesInitialized(final boolean newPropertiesInitialized)
 		{
-			if(themeApplied!=newThemeApplied)	//if the value is really changing
+			if(propertiesInitialized!=newPropertiesInitialized)	//if the value is really changing
 			{
-				final boolean oldThemeApplied=themeApplied;	//get the current value
-				themeApplied=newThemeApplied;	//update the value
-				firePropertyChange(THEME_APPLIED_PROPERTY, Boolean.valueOf(oldThemeApplied), Boolean.valueOf(newThemeApplied));
+				final boolean oldPropertiesInitialized=propertiesInitialized;	//get the current value
+				propertiesInitialized=newPropertiesInitialized;	//update the value
+				firePropertyChange(PROPERTIES_INITIALIZED_PROPERTY, Boolean.valueOf(oldPropertiesInitialized), Boolean.valueOf(newPropertiesInitialized));
 			}
 		}
 
@@ -1018,23 +1019,50 @@ Debug.trace("now valid of", this, "is", isValid());
 		}
 	}
 
-	/**Update's this component's theme.
-	This method checks whether a theme has been applied to this component.
-	If no theme has been applied to the component, the current session theme will be applied by delegating to {@link #applyTheme(Theme)}.
-	This method is called recursively for any child components before applying any theme on the component itself,
-	to assure that child theme updates have already occured before theme updates occur for this component.
+	/**Update's this object's properties.
+	This method checks whether properties have been updated for this object.
+	If this object's properties have not been updated, this method calls {@link #initializeProperties()}.
+	This method is called for any child components before initializing the properties of the component itself,
+	to assure that child property updates have already occured before property updates occur for this component.
 	There is normally no need to override this method or to call this method directly by applications.
-	@exception IOException if there was an error loading or applying the theme.
-	@see #applyTheme(Theme)
-	@see #isThemeApplied()
-	@see GuiseSession#getTheme()
+	@exception IOException if there was an error loading or setting properties.
+	@see #isPropertiesInitialized()
+	@see #initializeProperties()
 	*/
-	public void updateTheme() throws IOException
+	public void updateProperties() throws IOException
 	{
-		if(!isThemeApplied())	//if no theme has been applied to this component
+		if(!isPropertiesInitialized())	//if this component's properties have not been initialized
+		{
+			initializeProperties();	//initialize this component's properties
+		}		
+	}
+
+	/**Initializes the properties of this component.
+	This includes loading and applying the current theme as well as loading any preferences.
+	Themes are only applied of the application is themed.
+	This method may be overridden to effectively override theme settings and preference loading by ensuring the state of important properties after the default operations have occurred. 
+	If properties are successfully updated, this method updates the properties initialized status.
+	@exception IOException if there was an error loading or setting properties.
+	@see GuiseApplication#isThemed()
+	@see #applyTheme(Theme)
+	@see #setPropertiesInitialized(boolean)
+	*/
+	public void initializeProperties() throws IOException
+	{
+		if(getSession().getApplication().isThemed())	//if the application applies themes
 		{
 			applyTheme(getSession().getTheme());	//get the theme and apply it
-		}		
+			setPropertiesInitialized(true);	//indicate that the properties were successfully initialized
+		}
+	}
+
+	/**Uninitializes the properties of this component.
+	This includes saving any preferences.
+	@exception IOException if there was an error uninitializing or saving properties.
+	*/
+	public void uninitializeProperties() throws IOException
+	{
+		setPropertiesInitialized(false);	//indicate that the properties were successfully uninitialized		
 	}
 
 	/**Applies a theme and its parents to this component.
@@ -1042,14 +1070,11 @@ Debug.trace("now valid of", this, "is", isValid());
 	Theme application occurs unconditionally, regardless of whether themes have been applied to this component before.
 	This method may be overridden to effectively override theme settings by ensuring state of important properties after theme application. 
 	There is normally no need to call this method directly by applications.
-	If the theme is successfully applied, this method updates the theme applied status.
 	@param theme The theme to apply to the component.
-	@see #setThemeApplied(boolean)
 	*/
 	public void applyTheme(final Theme theme)
 	{
 		theme.apply(this);	//apply the theme to this component
-		setThemeApplied(true);	//indicate that the theme was successfully applied
 	}
 
 	/**Adds a command listener.

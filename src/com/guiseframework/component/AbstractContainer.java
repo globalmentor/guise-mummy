@@ -265,7 +265,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@param newLayout The new layout definition for the container.
 	@exception NullPointerException if the given layout is <code>null</code>.
 	@see #LAYOUT_PROPERTY
-	@see #setThemeApplied(boolean) 
+	@see #setPropertiesInitialized(boolean) 
 	*/
 	public <T extends Constraints> void setLayout(final Layout<T> newLayout)
 	{

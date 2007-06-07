@@ -7,6 +7,7 @@ import javax.mail.internet.ContentType;
 import com.garretwilson.beans.TargetedEvent;
 import static com.garretwilson.lang.ClassUtilities.*;
 
+import com.guiseframework.GuiseApplication;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.component.layout.*;
@@ -65,8 +66,8 @@ public interface Component<C extends Component<C>> extends PresentationModel, La
 	public final static String NOTIFICATION_PROPERTY=getPropertyName(Component.class, "notification");
 	/**The orientation bound property.*/
 	public final static String ORIENTATION_PROPERTY=getPropertyName(Component.class, "orientation");
-	/**The bound property of whether a theme has been applied to this component.*/
-	public final static String THEME_APPLIED_PROPERTY=getPropertyName(Component.class, "themeApplied");
+	/**The bound property of whether the properties of this component have been initialized.*/
+	public final static String PROPERTIES_INITIALIZED_PROPERTY=getPropertyName(Component.class, "propertiesInitialized");
 	/**The valid bound property.*/
 	public final static String VALID_PROPERTY=getPropertyName(Component.class, "valid");
 	/**The bound property of the viewer.*/
@@ -265,15 +266,15 @@ public interface Component<C extends Component<C>> extends PresentationModel, La
 	*/
 	public void setFlyoverEnabled(final boolean newFlyoverEnabled);
 
-	/**@return Whether a theme has been applied to this component.*/
-	public boolean isThemeApplied();
+	/**@return Whether the properties of this component have been initialized.*/
+	public boolean isPropertiesInitialized();
 
-	/**Sets whether a theme has been applied to this component.
+	/**Sets whether the properties of this component have been initialized.
 	This is a bound property of type {@link Boolean}.
-	@param newThemeApplied <code>true</code> if a theme has been applied to this component, else <code>false</code>.
-	@see #THEME_APPLIED_PROPERTY
+	@param newPropertiesInitialized <code>true</code> if the properties of this component have been initialized, else <code>false</code>.
+	@see #PROPERTIES_INITIALIZED_PROPERTY
 	*/
-	public void setThemeApplied(final boolean newThemeApplied);
+	public void setPropertiesInitialized(final boolean newPropertiesInitialized);
 
 	/**Adds an export strategy to the component.
 	The export strategy will take precedence over any compatible export strategy previously added.
@@ -345,18 +346,44 @@ public interface Component<C extends Component<C>> extends PresentationModel, La
 	*/
 	public <GC extends GuiseContext> void updateView(final GC context) throws IOException;
 
-	/**Update's this component's theme.
-	This method checks whether a theme has been applied to this component.
-	If no theme has been applied to the component, the current session theme will be applied by delegating to {@link #applyTheme(Theme)}.
-	This method is called recursively for any child components before applying any theme on the component itself,
-	to assure that child theme updates have already occured before theme updates occur for this component.
+	/**Update's this object's properties.
+	This method checks whether properties have been updated for this object.
+	If this object's properties have not been updated, this method calls {@link #initializeProperties()}.
+	This method is called for any child components before initializing the properties of the component itself,
+	to assure that child property updates have already occured before property updates occur for this component.
 	There is normally no need to override this method or to call this method directly by applications.
-	@exception IOException if there was an error loading or applying the theme.
-	@see #applyTheme(Theme)
-	@see #isThemeApplied()
-	@see GuiseSession#getTheme()
+	@exception IOException if there was an error loading or setting properties.
+	@see #isPropertiesInitialized()
+	@see #initializeProperties()
 	*/
-	public void updateTheme() throws IOException;
+	public void updateProperties() throws IOException;
+
+	/**Initializes the properties of this component.
+	This includes loading and applying the current theme as well as loading any preferences.
+	Themes are only applied of the application is themed.
+	This method may be overridden to effectively override theme settings and preference loading by ensuring the state of important properties after the default operations have occurred. 
+	If properties are successfully updated, this method updates the properties initialized status.
+	@exception IOException if there was an error loading or setting properties.
+	@see GuiseApplication#isThemed()
+	@see #applyTheme(Theme)
+	@see #setPropertiesInitialized(boolean)
+	*/
+	public void initializeProperties() throws IOException;
+
+	/**Uninitializes the properties of this component.
+	This includes saving any preferences.
+	@exception IOException if there was an error uninitializing or saving properties.
+	*/
+	public void uninitializeProperties() throws IOException;
+
+	/**Applies a theme and its parents to this component.
+	The theme's rules will be applied to this component and any related objects.
+	Theme application occurs unconditionally, regardless of whether themes have been applied to this component before.
+	This method may be overridden to effectively override theme settings by ensuring state of important properties after theme application. 
+	There is normally no need to call this method directly by applications.
+	@param theme The theme to apply to the component.
+	*/
+	public void applyTheme(final Theme theme);
 
 	/**Dispatches an input event to this component and all child components, if any.
 	If this is a {@link FocusedInputEvent}, the event will be directed towards the branch in which lies the focused component of any {@link InputFocusGroupComponent} ancestor of this component (or this component, if it is a focus group).
@@ -382,17 +409,6 @@ public interface Component<C extends Component<C>> extends PresentationModel, La
 	@see InputEvent#isConsumed()
 	*/
 	public void fireInputEvent(final InputEvent inputEvent);
-
-	/**Applies a theme and its parents to this component.
-	The theme's rules will be applied to this component and any related objects.
-	Theme application occurs unconditionally, regardless of whether themes have been applied to this component before.
-	This method may be overridden to effectively override theme settings by ensuring state of important properties after theme application. 
-	There is normally no need to call this method directly by applications.
-	If the theme is successfully applied, this method updates the theme applied status.
-	@param theme The theme to apply to the component.
-	@see #setThemeApplied(boolean)
-	*/
-	public void applyTheme(final Theme theme);
 
 	/**Adds a command listener.
 	@param commandListener The command listener to add.
