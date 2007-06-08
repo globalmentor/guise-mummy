@@ -40,7 +40,17 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 {
 
 	/**The enumeration of frame components.*/
-	private enum FrameComponent{CONTENT_COMPONENT, MENU_COMPONENT, CLOSE_ACTION_CONTROL};
+	private enum FrameComponent
+	{
+		/**The component, if any, that comprises the content of the frame.*/
+		CONTENT_COMPONENT,
+		/**The menu, if any, of the frame.*/
+		MENU_COMPONENT,
+		/**The toolbar, if any, of the frame.*/
+		TOOLBAR_COMPONENT,
+		/**The control that provides a way of closing the frame.*/
+		CLOSE_ACTION_CONTROL;
+	};
 
 	/**The state of the frame.*/
 	private State state=State.CLOSED;
@@ -243,7 +253,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 	This is a bound property.
 	@param newMenu The frame menu, or <code>null</code> if this frame does not have a menu.
 	@see FrameComponent#MENU_COMPONENT
-	@see Frame#MENU_PROPERTY
+	@see #MENU_PROPERTY
 	*/
 	public void setMenu(final Menu<?> newMenu)
 	{
@@ -251,6 +261,26 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 		if(oldMenu!=newMenu)	//if the component really changed
 		{
 			firePropertyChange(MENU_PROPERTY, oldMenu, newMenu);	//indicate that the value changed
+		}
+	}
+
+	/**@return The frame toolbar, or <code>null</code> if this frame does not have a toolbar.
+	@see FrameComponent#TOOLBAR_COMPONENT
+	*/
+	public Toolbar getToolbar() {return (Toolbar)getComponent(FrameComponent.TOOLBAR_COMPONENT);}
+
+	/**Sets the frame toolbar.
+	This is a bound property.
+	@param newToolbar The frame toolbar, or <code>null</code> if this frame does not have a toolbar.
+	@see FrameComponent#TOOLBAR_COMPONENT
+	@see #TOOLBAR_PROPERTY
+	*/
+	public void setToolbar(final Toolbar newToolbar)
+	{
+		final Toolbar oldToolbar=(Toolbar)setComponent(FrameComponent.TOOLBAR_COMPONENT, newToolbar);	//set the component
+		if(oldToolbar!=newToolbar)	//if the component really changed
+		{
+			firePropertyChange(TOOLBAR_PROPERTY, oldToolbar, newToolbar);	//indicate that the value changed
 		}
 	}
 
@@ -291,9 +321,10 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 					prototypeComponentEntryIterator.remove();	//remove this mapping; we don't have this prototype info or corresponding component anymore
 				}
 			}
-			
 			final Map<Prototype, Component<?>> menuPrototypeComponentMap=new HashMap<Prototype, Component<?>>();	//keep track of which menu components we create for which prototypes
+//TODO del if not needed			final Map<Prototype, Component<?>> toolPrototypeComponentMap=new HashMap<Prototype, Component<?>>();	//keep track of which tool components we create for which prototypes
 			final Menu<?> menu=getMenu();	//get the current menu
+			final Toolbar toolbar=getToolbar();	//get the current toolbar
 			for(final PrototypeInfo prototypeInfo:prototypeInfos)	//for each produced prototype info
 			{
 				if(!prototypeInfoComponentMap.containsKey(prototypeInfo))	//if this is a prototype that we don't have
@@ -309,8 +340,14 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 						{
 							final Component<?> component=((Container<?>)parentComponent).add(prototype);	//add this prototype to the parent component
 							prototypeInfoComponentMap.put(prototypeInfo, component);	//note that we created this component to represent this prototype info
-							menuPrototypeComponentMap.put(prototype, component);	//record temporarily the component we used to represent this prototype
+							menuPrototypeComponentMap.put(prototype, component);	//record temporarily the component we used to represent this prototype for the menu
 						}
+					}
+					if(prototypeInfo.isTool() && toolbar!=null)	//if this is a tool prototype and we have a toolbar
+					{
+						final Component<?> component=toolbar.add(prototype);	//add this prototype to the toolbar
+						prototypeInfoComponentMap.put(prototypeInfo, component);	//note that we created this component to represent this prototype info
+//TODO del if not needed						toolPrototypeComponentMap.put(prototype, component);	//record temporarily the component we used to represent this prototype for the toolbar
 					}
 				}
 			}
@@ -434,7 +471,6 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the close action is initiated
 					{
-Debug.trace("the close action listener was invoked; ready to close frame", this);
 						close();	//close the frame
 					}
 				};

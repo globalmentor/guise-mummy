@@ -1,12 +1,10 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ClassUtilities.*;
-import static java.util.Collections.unmodifiableList;
-
 import java.beans.PropertyChangeListener;
-import java.util.Iterator;
 
 import com.garretwilson.beans.GenericPropertyChangeListener;
+import static com.garretwilson.lang.ClassUtilities.*;
+
 import com.guiseframework.component.effect.Effect;
 
 /**A root-level component such as a window or an HTML page.
@@ -36,6 +34,8 @@ public interface Frame<C extends Frame<C>> extends ContentComponent<C>, ModalCom
 	public final static String STATE_PROPERTY=getPropertyName(Frame.class, "state");
 	/**The bound property of whether the title bar is visible.*/
 	public final static String TITLE_VISIBLE_PROPERTY=getPropertyName(Frame.class, "titleVisible");
+	/**The bound property of the frame toolbar.*/
+	public final static String TOOLBAR_PROPERTY=getPropertyName(Frame.class, "toolbar");
 
 	/**The mode of this component; whether the frame is in exclusive interaction with the user.*/
 	public enum Mode implements com.guiseframework.component.Mode
@@ -61,6 +61,7 @@ public interface Frame<C extends Frame<C>> extends ContentComponent<C>, ModalCom
 	/**Sets the frame menu.
 	This is a bound property.
 	@param newMenu The frame menu, or <code>null</code> if this frame does not have a menu.
+	@see #MENU_PROPERTY
 	*/
 	public void setMenu(final Menu<?> newMenu);
 
@@ -113,6 +114,16 @@ public interface Frame<C extends Frame<C>> extends ContentComponent<C>, ModalCom
 	@see #TITLE_VISIBLE_PROPERTY
 	*/
 	public void setTitleVisible(final boolean newTitleVisible);
+
+	/**@return The frame toolbar, or <code>null</code> if this frame does not have a toolbar.*/
+	public Toolbar getToolbar();
+
+	/**Sets the frame toolbar.
+	This is a bound property.
+	@param newToolbar The frame toolbar, or <code>null</code> if this frame does not have a toolbar.
+	@see #TOOLBAR_PROPERTY
+	*/
+	public void setToolbar(final Toolbar newToolbar);
 
 	/**@return The effect used for opening the frame, or <code>null</code> if there is no open effect.*/
 	public Effect getOpenEffect();

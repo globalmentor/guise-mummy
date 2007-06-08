@@ -13,6 +13,7 @@ import javax.mail.internet.ContentType;
 import com.garretwilson.beans.TargetedEvent;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.rdf.RDFResource;
+import com.garretwilson.rdf.RDFUtilities;
 import com.garretwilson.rdf.ploop.PLOOPProcessor;
 import com.garretwilson.rdf.ploop.PLOOPRDFGenerator;
 import com.garretwilson.util.Debug;
@@ -29,6 +30,7 @@ import com.guiseframework.input.Input;
 import com.guiseframework.input.InputStrategy;
 import com.guiseframework.model.*;
 import com.guiseframework.model.ui.AbstractPresentationModel;
+import com.guiseframework.prototype.PrototypeConsumer;
 import com.guiseframework.theme.Theme;
 import com.guiseframework.viewer.Viewer;
 
@@ -1107,7 +1109,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		if(getSession().getApplication().isThemed())	//if the application applies themes
 		{
 			applyTheme(getSession().getTheme());	//get the theme and apply it
-			loadPreferences();	//load preferences
+//TODO fix; move to abstract component			loadPreferences();	//load preferences
 			setPropertiesInitialized(true);	//indicate that the properties were successfully initialized
 		}
 	}
@@ -1152,6 +1154,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		if(preferencePropertyIterator.hasNext())	//if there are preference properties
 		{
 			final RDFResource preferences=getSession().getPreferences(getClass());	//get existing preferences for this class
+//TODO del Debug.traceStack("ready to load preferences; view:", ((ResourceChildrenPanel)this).getView(), "thumbnail size:", ((ResourceChildrenPanel)this).getThumbnailSize(), "preferences", RDFUtilities.toString(preferences));
 			final PLOOPProcessor ploopProcessor=new PLOOPProcessor();	//create a new PLOOP processor for retrieving the properties
 			do	//for each property
 			{
@@ -1166,6 +1169,7 @@ Debug.trace("now valid of", this, "is", isValid());
 				}
 			}
 			while(preferencePropertyIterator.hasNext());	//keep saving properties while there are more preference properties
+//TODO del Debug.trace("loaded preferences; view:", ((ResourceChildrenPanel)this).getView(), "thumbnail size:", ((ResourceChildrenPanel)this).getThumbnailSize());
 		}
 	}
 
@@ -1195,6 +1199,7 @@ Debug.trace("now valid of", this, "is", isValid());
 				}
 			}
 			while(preferencePropertyIterator.hasNext());	//keep saving properties while there are more preference properties
+//TODO del Debug.trace("ready to save preferences; view:", ((ResourceChildrenPanel)this).getView(), "thumbnail size:", ((ResourceChildrenPanel)this).getThumbnailSize(), "preferences", RDFUtilities.toString(preferences));
 			session.setPreferences(componentClass, preferences);	//set the new preferences
 		}
 	}
@@ -1327,6 +1332,28 @@ Debug.trace("now valid of", this, "is", isValid());
 	}
 */
 
+	/**Searches up the component hierarchy (including this one) and tells the first prototype consumer to consume prototypes.
+	@param component The component on which to start the search for a prototype consumer.
+	@exception NullPointerException if the given component is <code>null</code>.
+	*/
+	public static void initiatePrototypeConsumption(Component<?> component)	//TODO improve prototype producer/consumer framework to allow consumers to be registered and send events when there is more information to publish
+	{
+		checkInstance(component, "Component cannot be null.");
+		do	//tell the first prototype consumer ancestor, if any, to consumer prototypes
+		{
+			if(component instanceof PrototypeConsumer)	//if this is a prototype consumer
+			{
+				((PrototypeConsumer)component).consumePrototypes();	//tell the prototype consumer to consumer the prototypes we produce
+				break;	//stop looking for a prototype consumer
+			}
+			else	//if this is not a prototype consumer
+			{
+				component=component.getParent();	//climb the tree
+			}
+		}
+		while(component!=null);	//keep looking for a prototype consumer until we run out of ancestors		
+	}
+	
 	/**Determines the root parent of the given component.
 	@param component The component for which the root should be found.
 	@return The root component (the component or ancestor which has no parent).

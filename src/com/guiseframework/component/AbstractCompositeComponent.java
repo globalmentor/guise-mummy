@@ -97,6 +97,15 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 		{
 			throw new IllegalArgumentException("Component "+component+" is already a member of a composite component, "+component.getParent()+".");
 		}
+		
+		try
+		{
+			component.loadPreferences();	//TODO fix; testing			
+		}
+		catch(final IOException ioException)
+		{
+			throw new AssertionError(ioException);
+		}
 		component.addPropertyChangeListener(DISPLAYED_PROPERTY, getDisplayVisibleChangeListener());	//listen for changes in the component's displayed status and update this component's valid status in response
 		component.addPropertyChangeListener(VALID_PROPERTY, getValidChangeListener());	//listen for changes in the component's valid status and update this component's valid status in response
 		component.addPropertyChangeListener(VISIBLE_PROPERTY, getDisplayVisibleChangeListener());	//listen for changes in the component's visible status and update this component's valid status in response
