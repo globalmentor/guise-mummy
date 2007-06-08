@@ -8,6 +8,8 @@ import java.util.*;
 
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.event.PostponedEvent;
+import com.garretwilson.rdf.DefaultRDFResource;
+import com.garretwilson.rdf.RDFResource;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.context.GuiseContext;
@@ -21,6 +23,7 @@ import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
 
 import static com.garretwilson.lang.ClassUtilities.*;
+import static com.garretwilson.lang.ObjectUtilities.checkInstance;
 
 /**Represents a session with a user.
 A Swing-based client application may have only one session, while a web server application will likely have multiple sessions.
@@ -53,6 +56,22 @@ public interface GuiseSession extends PropertyBindable
 	@exception NullPointerException if the given log writer is <code>null</code>.
 	*/
 	public void setLogWriter(final Writer logWriter);
+
+	/**Retrieves the saved preference properties for a given class.
+	@param objectClass The class for which preference properties should be returned.
+	@return The saved preference properties for the given class.
+	@exception NullPointerException if the given class is <code>null</code>.
+	@exception IOException if there was an error retrieving preferences.
+	*/
+	public RDFResource getPreferences(final Class<?> objectClass) throws IOException;
+
+	/**Saves preference properties for a given class.
+	@param objectClass The class for which preference properties should be saved.
+	@param preferences The preferences to save for the given class.
+	@exception NullPointerException if the given class and/or preferences is <code>null</code>.
+	@exception IOException if there was an error storing preferences.
+	*/
+	public void setPreferences(final Class<?> objectClass, final RDFResource preferences) throws IOException;
 
 	/**Reports the base URI of the session.
 	The base URI is an absolute URI that ends with the base path of the application, which ends with a slash ('/').

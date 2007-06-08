@@ -37,7 +37,7 @@ public class Template extends ClassTypedRDFResource
 	*/
 	public void apply(final Object object, final PLOOPProcessor ploopProcessor) throws ClassNotFoundException, InvocationTargetException
 	{
-		ploopProcessor.initializeObject(object, this);	//initialize the object from the template
+		ploopProcessor.setObjectProperties(object, this);	//initialize the object from the template
 	}
 
 }

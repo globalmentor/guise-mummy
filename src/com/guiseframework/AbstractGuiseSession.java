@@ -22,6 +22,8 @@ import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.rdf.*;
 import com.garretwilson.rdf.ploop.PLOOPProcessor;
 import com.garretwilson.util.Debug;
+import com.garretwilson.util.ReadWriteLockMap;
+import com.garretwilson.util.ReadWriteLockMapDecorator;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.context.GuiseContext;
@@ -131,6 +133,52 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 	/**The cache of components keyed to component destinations.*/
 	private final Map<ComponentDestination, Component<?>> destinationComponentMap=synchronizedMap(new HashMap<ComponentDestination, Component<?>>());
+
+	/**The map of preference resource descriptions keyed to classes. This is a temporary implementation that will later be replaced with a backing store based upon the current principal.*/
+	private final ReadWriteLockMap<Class<?>, RDFResource> classPreferencesMap=new ReadWriteLockMapDecorator<Class<?>, RDFResource>(new HashMap<Class<?>, RDFResource>());
+
+		/**Retrieves the saved preference properties for a given class.
+		@param objectClass The class for which preference properties should be returned.
+		@return The saved preference properties for the given class.
+		@exception NullPointerException if the given class is <code>null</code>.
+		@exception IOException if there was an error retrieving preferences.
+		*/
+		public RDFResource getPreferences(final Class<?> objectClass) throws IOException
+		{
+			RDFResource preferences=classPreferencesMap.get(checkInstance(objectClass, "Class cannot be null."));	//get the preferences stored in the map
+			if(preferences==null)	//if no preferences are stored in the map
+			{
+				preferences=new DefaultRDFResource();	//create a default set of preference properties				
+/*TODO del if we decide to store resource copies; change map to concurrent map
+				classPreferencesMap.writeLock().lock();	//get a write lock on the preferences map
+				try
+				{
+					preferences=classPreferencesMap.get(objectClass);	//try again to get the preferences stored in the map
+					if(preferences==null)	//if preferences are still not stored in the map
+					{
+						preferences=new DefaultRDFResource();	//create a default set of preference properties
+						classPreferencesMap.put(objectClass, preferences);	//store the preferences in the map
+					}
+				}
+				finally
+				{
+					classPreferencesMap.writeLock().unlock();	//always release the write lock on the preferences map
+				}
+*/
+			}
+			return preferences;	//return the preferences we found for this class
+		}
+
+		/**Saves preference properties for a given class.
+		@param objectClass The class for which preference properties should be saved.
+		@param preferences The preferences to save for the given class.
+		@exception NullPointerException if the given class and/or preferences is <code>null</code>.
+		@exception IOException if there was an error storing preferences.
+		*/
+		public void setPreferences(final Class<?> objectClass, final RDFResource preferences) throws IOException
+		{
+			classPreferencesMap.put(checkInstance(objectClass, "Class cannot be null."), new DefaultRDFResource(checkInstance(preferences, "Preferences cannot be null.")));	//store a copy of the preferences in the map
+		}
 
 	/**The user local environment.*/
 	private GuiseEnvironment environment;
@@ -934,7 +982,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 				if(componentResource!=null)	//if there is a resource description of a matching type
 				{
 					final PLOOPProcessor ploopProcessor=new PLOOPProcessor(this);	//create a new PLOOP processor, passing the Guise session to use as a default constructor argument
-					ploopProcessor.initializeObject(component, componentResource);	//initialize the component from this resource
+					ploopProcessor.setObjectProperties(component, componentResource);	//initialize the component from this resource
 					component.initialize();	//initialize the component
 					final List<Object> objects=ploopProcessor.getObjects(rdf);	//make sure all described Java objects in the RDF instance have been created
 				}
@@ -955,10 +1003,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		catch(final IOException ioException)	//if there is an I/O exception
 		{
 			throw new AssertionError(ioException);	//TODO fix better
-		}		
-		catch(final ClassNotFoundException classNotFoundTargetException)
-		{
-			throw new AssertionError(classNotFoundTargetException);	//TODO fix better
 		}		
 		catch(final InvocationTargetException invocationTargetException)
 		{

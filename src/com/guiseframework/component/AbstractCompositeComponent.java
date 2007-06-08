@@ -106,11 +106,13 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 
 	/**Removes a child component.
 	This version uninstalls a listener for the component's valid status.
+	This version unupdates the component's properties, saving any preferences.
 	Any class that overrides this method must call this version.
 	The return value from this version has no sigificance
 	@param component The component to remove from this component.
 	@return <code>true</code> if the child components changed as a result of the operation.
 	@exception IllegalArgumentException if the component is not a member of this composite component.
+	@see #unupdateProperties()
 	*/
 	protected boolean removeComponent(final Component<?> component)
 	{
@@ -118,6 +120,7 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 		{
 			throw new IllegalArgumentException("Component "+component+" is not member of composite component "+this+".");
 		}
+		component.unupdateProperties();	//ununpdate the component properties, saving any preferences
 		component.removePropertyChangeListener(DISPLAYED_PROPERTY, getDisplayVisibleChangeListener());	//stop listening for changes in the component's displayed status
 		component.removePropertyChangeListener(VALID_PROPERTY, getValidChangeListener());	//stop listening for changes in the component's valid status
 		component.removePropertyChangeListener(VISIBLE_PROPERTY, getDisplayVisibleChangeListener());	//stop listening for changes in the component's visible status
@@ -247,6 +250,25 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 			childComponent.updateProperties();	//tell the child component to update its properties
 		}
 		super.updateProperties();	//update the properties for this component
+	}
+
+	/**Saves this object's preferences and marks the properties as having not been initialized.
+	This method checks whether properties have been updated for this object.
+	If this object's properties have been updated, this method calls {@link #uninitializeProperties()}.
+	This method is called for any child components before initializing the properties of the component itself,
+	to assure that child property updates have already occured before property updates occur for this component.
+	There is normally no need to override this method or to call this method directly by applications.
+	This version recursively calls the {@link #unupdateProperties()} method of all child components before unupdating properties of this component.
+	@see #isPropertiesInitialized()
+	@see #uninitializeProperties()
+	*/
+	public void unupdateProperties()
+	{
+		for(final Component<?> childComponent:getChildren())	//for each child component
+		{
+			childComponent.unupdateProperties();	//tell the child component to unupdate its properties
+		}
+		super.unupdateProperties();	//unupdate the properties for this component
 	}
 
 	/**Dispatches an input event to this component and all child components, if any.

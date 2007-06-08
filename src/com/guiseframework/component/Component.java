@@ -73,6 +73,35 @@ public interface Component<C extends Component<C>> extends PresentationModel, La
 	/**The bound property of the viewer.*/
 	public final static String VIEWER_PROPERTY=getPropertyName(Component.class, "viewer");
 
+	/**Adds a property to be saved and loaded as a preference.
+	@param propertyName The property to store as a preference.
+	@see #loadPreferences()
+	@see #savePreferences()
+	*/
+	public void addPreferenceProperty(final String propertyName);
+
+	/**Determines whether the given property is saved and loaded as a preference.
+	@param propertyName The property to determine if it is stored as a preference.
+	@return <code>true</code> if the given property is saved and loaded as a preference.
+	@see #loadPreferences()
+	@see #savePreferences()
+	*/
+	public boolean isPreferenceProperty(final String propertyName);
+
+	/**Returns all properties stored as preferences.
+	@return An iterable of all properties saved and loaded as preferences.
+	@see #loadPreferences()
+	@see #savePreferences()
+	*/
+	public Iterable<String> getPreferenceProperties();
+
+	/**Removes a property from being saved and loaded as preferences.
+	@param propertyName The property that should no longer be stored as a preference.
+	@see #loadPreferences()
+	@see #savePreferences()
+	*/
+	public void removePreferenceProperty(final String propertyName);
+
 	/**@return The name of the component, not guaranteed to be unique (but guaranteed not to be the empty string) and useful only for searching for components within a component sub-hierarchy, or <code>null</code> if the component has no name.*/
 	public String getName();
 
@@ -358,6 +387,17 @@ public interface Component<C extends Component<C>> extends PresentationModel, La
 	*/
 	public void updateProperties() throws IOException;
 
+	/**Saves this object's preferences and marks the properties as having not been initialized.
+	This method checks whether properties have been updated for this object.
+	If this object's properties have been updated, this method calls {@link #uninitializeProperties()}.
+	This method is called for any child components before initializing the properties of the component itself,
+	to assure that child property updates have already occured before property updates occur for this component.
+	There is normally no need to override this method or to call this method directly by applications.
+	@see #isPropertiesInitialized()
+	@see #uninitializeProperties()
+	*/
+	public void unupdateProperties();
+
 	/**Initializes the properties of this component.
 	This includes loading and applying the current theme as well as loading any preferences.
 	Themes are only applied of the application is themed.
@@ -366,15 +406,17 @@ public interface Component<C extends Component<C>> extends PresentationModel, La
 	@exception IOException if there was an error loading or setting properties.
 	@see GuiseApplication#isThemed()
 	@see #applyTheme(Theme)
+	@see #loadPreferences()
 	@see #setPropertiesInitialized(boolean)
 	*/
 	public void initializeProperties() throws IOException;
 
 	/**Uninitializes the properties of this component.
 	This includes saving any preferences.
-	@exception IOException if there was an error uninitializing or saving properties.
+	@see #savePreferences()
+	@see #setPropertiesInitialized(boolean)
 	*/
-	public void uninitializeProperties() throws IOException;
+	public void uninitializeProperties();
 
 	/**Applies a theme and its parents to this component.
 	The theme's rules will be applied to this component and any related objects.
@@ -384,6 +426,18 @@ public interface Component<C extends Component<C>> extends PresentationModel, La
 	@param theme The theme to apply to the component.
 	*/
 	public void applyTheme(final Theme theme);
+
+	/**Loads the preferences for this component.
+	Any preferences returned from {@link #getPreferenceProperties()} will be loaded automatically.
+	@exception IOException if there is an error loading preferences.
+	*/
+	public void loadPreferences() throws IOException;
+
+	/**Saves the preferences for this component.
+	Any preferences returned from {@link #getPreferenceProperties()} will be saved automatically.
+	@exception IOException if there is an error saving preferences.
+	*/
+	public void savePreferences() throws IOException;
 
 	/**Dispatches an input event to this component and all child components, if any.
 	If this is a {@link FocusedInputEvent}, the event will be directed towards the branch in which lies the focused component of any {@link InputFocusGroupComponent} ancestor of this component (or this component, if it is a focus group).

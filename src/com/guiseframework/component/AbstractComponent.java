@@ -1,15 +1,20 @@
 package com.guiseframework.component;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.mail.internet.ContentType;
 
 import com.garretwilson.beans.TargetedEvent;
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.rdf.RDFResource;
+import com.garretwilson.rdf.ploop.PLOOPProcessor;
+import com.garretwilson.rdf.ploop.PLOOPRDFGenerator;
 import com.garretwilson.util.Debug;
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.GuiseSession;
@@ -49,6 +54,38 @@ public abstract class AbstractComponent<C extends Component<C>> extends Abstract
 	/**@return A reference to this instance, cast to the generic self type.*/
 	@SuppressWarnings("unchecked")
 	protected final C getThis() {return (C)this;}
+
+	/**The thread-safe set of properties saved and loaded as preferences.*/
+	private final Set<String> preferenceProperties=new CopyOnWriteArraySet<String>();
+
+		/**Adds a property to be saved and loaded as a preference.
+		@param propertyName The property to store as a preference.
+		@see #loadPreferences()
+		@see #savePreferences()
+		*/
+		public void addPreferenceProperty(final String propertyName) {preferenceProperties.add(propertyName);}
+
+		/**Determines whether the given property is saved and loaded as a preference.
+		@param propertyName The property to determine if it is stored as a preference.
+		@return <code>true</code> if the given property is saved and loaded as a preference.
+		@see #loadPreferences()
+		@see #savePreferences()
+		*/
+		public boolean isPreferenceProperty(final String propertyName) {return preferenceProperties.contains(propertyName);}
+
+		/**Returns all properties stored as preferences.
+		@return An iterable of all properties saved and loaded as preferences.
+		@see #loadPreferences()
+		@see #savePreferences()
+		*/
+		public Iterable<String> getPreferenceProperties() {return preferenceProperties;}
+
+		/**Removes a property from being saved and loaded as preferences.
+		@param propertyName The property that should no longer be stored as a preference.
+		@see #loadPreferences()
+		@see #savePreferences()
+		*/
+		public void removePreferenceProperty(final String propertyName) {preferenceProperties.remove(propertyName);}
 
 	/**The label model decorated by this component.*/
 	private final LabelModel labelModel;
@@ -1037,6 +1074,23 @@ Debug.trace("now valid of", this, "is", isValid());
 		}		
 	}
 
+	/**Saves this object's preferences and marks the properties as having not been initialized.
+	This method checks whether properties have been updated for this object.
+	If this object's properties have been updated, this method calls {@link #uninitializeProperties()}.
+	This method is called for any child components before initializing the properties of the component itself,
+	to assure that child property updates have already occured before property updates occur for this component.
+	There is normally no need to override this method or to call this method directly by applications.
+	@see #isPropertiesInitialized()
+	@see #uninitializeProperties()
+	*/
+	public void unupdateProperties()
+	{
+		if(isPropertiesInitialized())	//if this component's properties have been initialized
+		{
+			uninitializeProperties();	//uninitialize this component's properties
+		}		
+	}
+
 	/**Initializes the properties of this component.
 	This includes loading and applying the current theme as well as loading any preferences.
 	Themes are only applied of the application is themed.
@@ -1045,6 +1099,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	@exception IOException if there was an error loading or setting properties.
 	@see GuiseApplication#isThemed()
 	@see #applyTheme(Theme)
+	@see #loadPreferences()
 	@see #setPropertiesInitialized(boolean)
 	*/
 	public void initializeProperties() throws IOException
@@ -1052,16 +1107,26 @@ Debug.trace("now valid of", this, "is", isValid());
 		if(getSession().getApplication().isThemed())	//if the application applies themes
 		{
 			applyTheme(getSession().getTheme());	//get the theme and apply it
+			loadPreferences();	//load preferences
 			setPropertiesInitialized(true);	//indicate that the properties were successfully initialized
 		}
 	}
 
 	/**Uninitializes the properties of this component.
 	This includes saving any preferences.
-	@exception IOException if there was an error uninitializing or saving properties.
+	@see #savePreferences()
+	@see #setPropertiesInitialized(boolean)
 	*/
-	public void uninitializeProperties() throws IOException
+	public void uninitializeProperties()
 	{
+		try
+		{
+			savePreferences();	//save preferences
+		}
+		catch(final IOException ioException)	//if there was an error saving preferences
+		{
+			Debug.warn(ioException);	//log a warning			
+		}
 		setPropertiesInitialized(false);	//indicate that the properties were successfully uninitialized		
 	}
 
@@ -1075,6 +1140,63 @@ Debug.trace("now valid of", this, "is", isValid());
 	public void applyTheme(final Theme theme)
 	{
 		theme.apply(this);	//apply the theme to this component
+	}
+
+	/**Loads the preferences for this component.
+	Any preferences returned from {@link #getPreferenceProperties()} will be loaded automatically.
+	@exception IOException if there is an error loading preferences.
+	*/
+	public void loadPreferences() throws IOException
+	{
+		final Iterator<String> preferencePropertyIterator=getPreferenceProperties().iterator();	//get an iterator to all preferences properties
+		if(preferencePropertyIterator.hasNext())	//if there are preference properties
+		{
+			final RDFResource preferences=getSession().getPreferences(getClass());	//get existing preferences for this class
+			final PLOOPProcessor ploopProcessor=new PLOOPProcessor();	//create a new PLOOP processor for retrieving the properties
+			do	//for each property
+			{
+				final String propertyName=preferencePropertyIterator.next();	//get the name of the next property
+				try
+				{
+					ploopProcessor.setObjectProperty(this, preferences, propertyName);	//retrieve this property from the preferences
+				}
+				catch(final InvocationTargetException invocationTargetException)	//if there was an error accessing this resource
+				{
+					throw (IOException)new IOException(invocationTargetException.getMessage()).initCause(invocationTargetException);
+				}
+			}
+			while(preferencePropertyIterator.hasNext());	//keep saving properties while there are more preference properties
+		}
+	}
+
+	/**Saves the preferences for this component.
+	Any preferences returned from {@link #getPreferenceProperties()} will be saved automatically.
+	@exception IOException if there is an error saving preferences.
+	*/
+	public void savePreferences() throws IOException
+	{
+		final Iterator<String> preferencePropertyIterator=getPreferenceProperties().iterator();	//get an iterator to all preferences properties
+		if(preferencePropertyIterator.hasNext())	//if there are preference properties
+		{
+			final GuiseSession session=getSession();	//get the current session
+			final Class<?> componentClass=getClass();	//get this component's class
+			final RDFResource preferences=session.getPreferences(componentClass);	//get existing preferences for this class
+			final PLOOPRDFGenerator ploopRDFGenerator=new PLOOPRDFGenerator();	//create a new PLOOP RDF generator for storing the properties
+			do	//for each property
+			{
+				final String propertyName=preferencePropertyIterator.next();	//get the name of the next property
+				try
+				{
+					ploopRDFGenerator.setRDFResourceProperty(preferences, this, propertyName);	//store this property in the preferences
+				}
+				catch(final InvocationTargetException invocationTargetException)	//if there was an error accessing this resource
+				{
+					throw (IOException)new IOException(invocationTargetException.getMessage()).initCause(invocationTargetException);
+				}
+			}
+			while(preferencePropertyIterator.hasNext());	//keep saving properties while there are more preference properties
+			session.setPreferences(componentClass, preferences);	//set the new preferences
+		}
 	}
 
 	/**Adds a command listener.
