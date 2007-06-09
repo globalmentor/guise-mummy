@@ -23,7 +23,7 @@ import com.garretwilson.rdf.*;
 import com.garretwilson.rdf.ploop.PLOOPProcessor;
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.ReadWriteLockMap;
-import com.garretwilson.util.ReadWriteLockMapDecorator;
+import com.garretwilson.util.DecoratorReadWriteLockMap;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
 import com.guiseframework.context.GuiseContext;
@@ -135,7 +135,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	private final Map<ComponentDestination, Component<?>> destinationComponentMap=synchronizedMap(new HashMap<ComponentDestination, Component<?>>());
 
 	/**The map of preference resource descriptions keyed to classes. This is a temporary implementation that will later be replaced with a backing store based upon the current principal.*/
-	private final ReadWriteLockMap<Class<?>, RDFResource> classPreferencesMap=new ReadWriteLockMapDecorator<Class<?>, RDFResource>(new HashMap<Class<?>, RDFResource>());
+	private final ReadWriteLockMap<Class<?>, RDFResource> classPreferencesMap=new DecoratorReadWriteLockMap<Class<?>, RDFResource>(new HashMap<Class<?>, RDFResource>());
 
 		/**Retrieves the saved preference properties for a given class.
 		@param objectClass The class for which preference properties should be returned.

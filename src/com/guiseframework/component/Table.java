@@ -17,7 +17,7 @@ import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.Debug;
 import com.garretwilson.util.ReadWriteLockMap;
-import com.garretwilson.util.ReadWriteLockMapDecorator;
+import com.garretwilson.util.DecoratorReadWriteLockMap;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.Border;
 import com.guiseframework.converter.*;
@@ -241,7 +241,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 */
 
 	/**The map of UI models for columns.*/
-	private final ReadWriteLockMap<TableColumnModel<?>, ColumnUIModel> columnUIModelMap=new ReadWriteLockMapDecorator<TableColumnModel<?>, ColumnUIModel>(new HashMap<TableColumnModel<?>, ColumnUIModel>());
+	private final ReadWriteLockMap<TableColumnModel<?>, ColumnUIModel> columnUIModelMap=new DecoratorReadWriteLockMap<TableColumnModel<?>, ColumnUIModel>(new HashMap<TableColumnModel<?>, ColumnUIModel>());
 
 	/**Retrieves the UI model for the given column.
 	If no UI model yet exists for the given column, one will be created.

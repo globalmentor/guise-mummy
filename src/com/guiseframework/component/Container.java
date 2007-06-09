@@ -43,17 +43,29 @@ public interface Container<C extends Container<C>> extends LayoutComponent<C>, I
 	*/
 	public Component<?> get(int index);
 
-	/**Adds a component to the container with default constraints.
-	@param component The component to add.
+	/**Adds a component with default constraints to the container.
+	@param component The component to add to this container.
 	@return <code>true</code> if this container changed as a result of the operation.
 	@exception IllegalArgumentException if the component already has a parent.
 	@exception IllegalStateException if the installed layout does not support default constraints.
 	*/
 	public boolean add(final Component<?> component);
 
-	/**Adds a component to the container along with constraints.
+	/**Adds a component along with constraints to the container at the specified index.
 	This is a convenience method that first sets the constraints of the component. 
-	@param component The component to add.
+	@param index The index at which the component should be added.
+	@param component The component to add to this container.
+	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
+	@exception IllegalArgumentException if the component already has a parent.
+	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
+	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
+	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
+	*/
+	public void add(final int index, final Component<?> component, final Constraints constraints);
+
+	/**Adds a component along with constraints to the container.
+	This is a convenience method that first sets the constraints of the component. 
+	@param component The component to add to this container.
 	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
 	@return <code>true</code> if this container changed as a result of the operation.
 	@exception IllegalArgumentException if the component already has a parent.
@@ -61,6 +73,17 @@ public interface Container<C extends Container<C>> extends LayoutComponent<C>, I
 	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
 	*/
 	public boolean add(final Component<?> component, final Constraints constraints);
+
+	/**Adds a component based upon the given prototype to the container with default constraints at the specified index.
+	@param index The index at which the component should be added.
+	@param prototype The prototype of the component to add.
+	@return The component created to represent the given prototype.
+	@exception IllegalArgumentException if no component can be created from the given prototype
+	@exception IllegalStateException if the installed layout does not support default constraints.
+	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
+	@see #createComponent(Prototype)
+	*/
+	public Component<?> add(final int index, final Prototype prototype);
 
 	/**Adds a component based upon the given prototype to the container with default constraints.
 	@param prototype The prototype of the component to add.
@@ -70,6 +93,19 @@ public interface Container<C extends Container<C>> extends LayoutComponent<C>, I
 	@see #createComponent(Prototype)
 	*/
 	public Component<?> add(final Prototype prototype);
+
+	/**Adds a component based upon the given prototype to the container along with constraints at the specified index.
+	@param index The index at which the component should be added.
+	@param prototype The prototype of the component to add.
+	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
+	@return The component created to represent the given prototype.
+	@exception IllegalArgumentException if no component can be created from the given prototype
+	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
+	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
+	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
+	@see #createComponent(Prototype)
+	*/
+	public Component<?> add(final int index, final Prototype prototype, final Constraints constraints);
 
 	/**Adds a component based upon the given prototype to the container along with constraints.
 	@param prototype The prototype of the component to add.

@@ -295,6 +295,17 @@ public interface Component<C extends Component<C>> extends PresentationModel, La
 	*/
 	public void setFlyoverEnabled(final boolean newFlyoverEnabled);
 
+	/**@return The installed flyover strategy, or <code>null</code> if there is no flyover strategy installed.*/
+	public FlyoverStrategy<? super C> getFlyoverStrategy();
+
+	/**Sets the strategy for controlling flyovers.
+	The flyover strategy will be registered as a mouse listener for this component.
+	This is a bound property.
+	@param newFlyoverStrategy The new flyover strategy, or <code>null</code> if there is no flyover strategy installed.
+	@see #FLYOVER_STRATEGY_PROPERTY 
+	*/
+	public void setFlyoverStrategy(final FlyoverStrategy<? super C> newFlyoverStrategy);
+
 	/**@return Whether the properties of this component have been initialized.*/
 	public boolean isPropertiesInitialized();
 

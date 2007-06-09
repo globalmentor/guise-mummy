@@ -121,6 +121,7 @@
 		<resource:theme.label.help>Help</resource:theme.label.help>
 		<resource:theme.label.home>Home</resource:theme.label.home>
 		<resource:theme.label.join>Join</resource:theme.label.join>
+		<resource:theme.label.join.x>&#x0098;theme.label.join&#x009C; {0}</resource:theme.label.join.x>
 		<resource:theme.label.last>Last</resource:theme.label.last>
 		<resource:theme.label.login>Log in</resource:theme.label.login>
 		<resource:theme.label.logout>Log out</resource:theme.label.logout>

@@ -236,6 +236,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_HELP=createStringResourceReference("theme.label.help");
 	public final static String LABEL_HOME=createStringResourceReference("theme.label.home");
 	public final static String LABEL_JOIN=createStringResourceReference("theme.label.join");
+	public final static String LABEL_JOIN_X=createStringResourceReference("theme.label.join.x");
 	public final static String LABEL_LAST=createStringResourceReference("theme.label.last");
 	public final static String LABEL_LOGIN=createStringResourceReference("theme.label.login");
 	public final static String LABEL_LOGOUT=createStringResourceReference("theme.label.logout");

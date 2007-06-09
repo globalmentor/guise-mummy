@@ -2,7 +2,6 @@ package com.guiseframework.component;
 
 import java.util.*;
 
-import com.garretwilson.util.Debug;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.DefaultLabelModel;
@@ -35,7 +34,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	*/
 	public int indexOf(final Object component) {return super.indexOf(component);}
 
-	/**Returns the index in this container of the last occurrence of the specified compoent.
+	/**Returns the index in this container of the last occurrence of the specified component.
 	@param component The component the last index of which should be returned.
 	@return The index in this container of the last occurrence of the specified component, or -1 if this container does not contain the given component.
 	*/
@@ -48,22 +47,50 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	*/
 	public Component<?> get(final int index) {return super.get(index);}
 
-	/**Adds a component to the container with default constraints.
-	@param component The component to add.
+	/**Adds a child component with default constraints to the container at the specified index.
+	@param index The index at which the component should be added.
+	@param component The component to add to this container.
+	@exception IllegalArgumentException if the component already has a parent.
+	@exception IllegalStateException if the installed layout does not support default constraints.
+	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
+	*/
+	public void add(final int index, final Component<?> component)
+	{
+		addComponent(index, component);	//add the component normally
+		fireContainerModified(index, component, null);	//indicate the component was added at the index TODO promote
+	}
+
+	/**Adds a component with default constraints to the container.
+	@param component The component to add to this container.
 	@return <code>true</code> if this container changed as a result of the operation.
 	@exception IllegalArgumentException if the component already has a parent.
 	@exception IllegalStateException if the installed layout does not support default constraints.
 	*/
 	public boolean add(final Component<?> component)
 	{
-		final boolean result=addComponent(component);	//add the component normally
-		fireContainerModified(indexOf(component), component, null);	//indicate the component was added at the index TODO promote
-		return result;	//return the result
+		add(size(), component);	//add the component at the last index
+		return true;	//indicate that the container was modified
 	}
 
-	/**Adds a component to the container along with constraints.
+	/**Adds a component along with constraints to the container at the specified index.
 	This is a convenience method that first sets the constraints of the component. 
-	@param component The component to add.
+	@param index The index at which the component should be added.
+	@param component The component to add to this container.
+	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
+	@exception IllegalArgumentException if the component already has a parent.
+	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
+	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
+	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
+	*/
+	public void add(final int index, final Component<?> component, final Constraints constraints)
+	{
+		component.setConstraints(constraints);	//set the constraints in the component
+		add(index, component);	//add the component, now that its constraints have been set		
+	}
+
+	/**Adds a component along with constraints to the container.
+	This is a convenience method that first sets the constraints of the component. 
+	@param component The component to add to this container.
 	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
 	@return <code>true</code> if this container changed as a result of the operation.
 	@exception IllegalArgumentException if the component already has a parent.
@@ -74,6 +101,23 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	{
 		component.setConstraints(constraints);	//set the constraints in the component
 		return add(component);	//add the component, now that its constraints have been set
+	}
+
+	/**Adds a component based upon the given prototype to the container with default constraints at the specified index.
+	This implementation delegates to {@link #add(int, Component)}.
+	@param index The index at which the component should be added.
+	@param prototype The prototype of the component to add.
+	@return The component created to represent the given prototype.
+	@exception IllegalArgumentException if no component can be created from the given prototype
+	@exception IllegalStateException if the installed layout does not support default constraints.
+	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
+	@see #createComponent(Prototype)
+	*/
+	public Component<?> add(final int index, final Prototype prototype)
+	{
+		final Component<?> component=createComponent(prototype);	//create a component from the prototype
+		add(index, component);	//add the component to the container
+		return component;	//return the component we created
 	}
 
 	/**Adds a component based upon the given prototype to the container with default constraints.
@@ -88,6 +132,25 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	{
 		final Component<?> component=createComponent(prototype);	//create a component from the prototype
 		add(component);	//add the component to the container
+		return component;	//return the component we created
+	}
+
+	/**Adds a component based upon the given prototype to the container along with constraints at the specified index.
+	This implementation delegates to {@link #add(int, Component, Constraints)}.
+	@param index The index at which the component should be added.
+	@param prototype The prototype of the component to add.
+	@param constraints The constraints for the layout, or <code>null</code> if default constraints should be used.
+	@return The component created to represent the given prototype.
+	@exception IllegalArgumentException if no component can be created from the given prototype
+	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
+	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
+	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
+	@see #createComponent(Prototype)
+	*/
+	public Component<?> add(final int index, final Prototype prototype, final Constraints constraints)
+	{
+		final Component<?> component=createComponent(prototype);	//create a component from the prototype
+		add(index, component, constraints);	//add the component to the container
 		return component;	//return the component we created
 	}
 

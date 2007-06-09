@@ -245,14 +245,17 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 		}
 	}
 
-	/**Adds a child component.
+	/**Adds a child component at the specified index.
 	If this component is itself a menu, this version closes that menu. 
+	Any class that overrides this method must call this version.
+	@param index The index at which the component should be added.
 	@param component The component to add to this component.
 	@return <code>true</code> if the child components changed as a result of the operation.
+	@exception IllegalArgumentException if the component already has a parent.
 	*/
-	protected boolean addComponent(final Component<?> component)
+	protected boolean addComponent(final int index, final Component<?> component)
 	{
-		if(super.addComponent(component))	//do the default adding; if a change occurred
+		if(super.addComponent(index, component))	//do the default adding; if a change occurred
 		{
 			if(component instanceof Menu)	//if the component is a menu
 			{

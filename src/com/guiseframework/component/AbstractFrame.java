@@ -2,25 +2,15 @@ package com.guiseframework.component;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyVetoException;
-import java.net.URI;
 import java.util.*;
-import static java.util.Collections.*;
-import java.util.concurrent.*;
-
-import javax.naming.OperationNotSupportedException;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.beans.GenericPropertyChangeListener;
-import com.garretwilson.beans.TargetedEvent;
 
 import static com.garretwilson.util.CollectionUtilities.*;
 
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.Debug;
-import com.garretwilson.util.ReadWriteLockMap;
-import com.garretwilson.util.ReadWriteLockMapDecorator;
-import com.garretwilson.util.ReadWriteLockSet;
-import com.garretwilson.util.ReadWriteLockSetDecorator;
 
 import static com.guiseframework.GuiseResourceConstants.*;
 import static com.guiseframework.Resources.*;
@@ -28,7 +18,6 @@ import static com.guiseframework.theme.Theme.*;
 
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.event.*;
-import com.guiseframework.model.LabelModel;
 import com.guiseframework.model.Notification;
 import com.guiseframework.prototype.*;
 
@@ -284,78 +273,18 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 		}
 	}
 
-	/**The set of components that have been used to represent processed prototypes.*/
-//	private ReadWriteLockSet<Component<?>> prototypeComponents=new ReadWriteLockSetDecorator<Component<?>>(new HashSet<Component<?>>());
-
-	/**The map of components that have been used to represent processed prototypes, keyed to the prototypes they represent.*/
-	private ReadWriteLockMap<PrototypeInfo, Component<?>> prototypeInfoComponentMap=new ReadWriteLockMapDecorator<PrototypeInfo, Component<?>>(new HashMap<PrototypeInfo, Component<?>>());
+	/**The strategy for consuming prototypes.*/
+	private final DefaultMenuToolPrototypeConsumerStrategy prototypeConsumerStrategy=new DefaultMenuToolPrototypeConsumerStrategy();
 
 	/**Consumes and processes the produced prototypes of all known {@link PrototypeProducer}s.
 	This implementation consumes the produced prototypes of this frame and the current content, if either or both implement {@link PrototypeProducer}.
 	The produced prototypes will be integrated into the current menu and toolbar, if present.
 	@see #getMenu()
+	@see #getToolbar()
 	*/
 	public void consumePrototypes()	//TODO change to combine produced prototypes in producePrototype(), if we decide to make the frame a prototype producer as well
 	{
-		final Iterable<PrototypeInfo> prototypeInfos=gatherPrototypes();	//gather prototypes
-		final Set<PrototypeInfo> prototypeInfoSet=new HashSet<PrototypeInfo>();	//create a set to hold all the prototypes we gathered
-		addAll(prototypeInfoSet, prototypeInfos);	//add all of the prototypes to a set for quick lookup
-		prototypeInfoComponentMap.writeLock().lock();	//get a write lock to our prototype component map
-		try
-		{
-			final Iterator<Map.Entry<PrototypeInfo, Component<?>>> prototypeComponentEntryIterator=prototypeInfoComponentMap.entrySet().iterator();	//get an iterator to our current prototype/component mappings
-			while(prototypeComponentEntryIterator.hasNext())	//while there are more prototype/component mappings
-			{
-				final Map.Entry<PrototypeInfo, Component<?>> prototypeComponentEntry=prototypeComponentEntryIterator.next();	//get the next mapping
-				final PrototypeInfo prototypeInfo=prototypeComponentEntry.getKey();	//get the prototype info that was used
-
-//TODO bring back				if(!prototypeInfoSet.contains(prototypeInfo))	//if we no longer have this prototype info
-				if(true)	//TODO fix; currently if we don't remove everything, things won't get added in the correct order; improve to insert components in the correct order, which will probably involve walking the child list of the parent component to find a component for a prototype info we know about, and finding where the new component fits
-				{
-					final Component<?> component=prototypeComponentEntry.getValue();	//get the component representing the prototype
-					final CompositeComponent<?> parent=component.getParent();	//get this component's parent
-					if(parent instanceof Container)	//if the component is still installed in a container
-					{
-						((Container<?>)parent).remove(component);	//remove the component from its parent
-					}
-					prototypeComponentEntryIterator.remove();	//remove this mapping; we don't have this prototype info or corresponding component anymore
-				}
-			}
-			final Map<Prototype, Component<?>> menuPrototypeComponentMap=new HashMap<Prototype, Component<?>>();	//keep track of which menu components we create for which prototypes
-//TODO del if not needed			final Map<Prototype, Component<?>> toolPrototypeComponentMap=new HashMap<Prototype, Component<?>>();	//keep track of which tool components we create for which prototypes
-			final Menu<?> menu=getMenu();	//get the current menu
-			final Toolbar toolbar=getToolbar();	//get the current toolbar
-			for(final PrototypeInfo prototypeInfo:prototypeInfos)	//for each produced prototype info
-			{
-				if(!prototypeInfoComponentMap.containsKey(prototypeInfo))	//if this is a prototype that we don't have
-				{
-					final Prototype prototype=prototypeInfo.getPrototype();	//get the prototype to add
-					if(prototypeInfo.isMenu() && menu!=null)	//if this is a menu prototype and we have a menu
-					{
-						final Prototype parentPrototype=prototypeInfo.getParentPrototype();	//get the prototype's parent, if any
-						
-								//TODO; will we have to make two passes here, one to create the parents and another to create the children? perhaps multiple passes?
-						final Component<?> parentComponent=parentPrototype!=null ? menuPrototypeComponentMap.get(parentPrototype) : menu;	//if there is a parent prototype, use the component that was created for the parent prototype
-						if(parentComponent instanceof Container)	//if there is a parent component that is a container
-						{
-							final Component<?> component=((Container<?>)parentComponent).add(prototype);	//add this prototype to the parent component
-							prototypeInfoComponentMap.put(prototypeInfo, component);	//note that we created this component to represent this prototype info
-							menuPrototypeComponentMap.put(prototype, component);	//record temporarily the component we used to represent this prototype for the menu
-						}
-					}
-					if(prototypeInfo.isTool() && toolbar!=null)	//if this is a tool prototype and we have a toolbar
-					{
-						final Component<?> component=toolbar.add(prototype);	//add this prototype to the toolbar
-						prototypeInfoComponentMap.put(prototypeInfo, component);	//note that we created this component to represent this prototype info
-//TODO del if not needed						toolPrototypeComponentMap.put(prototype, component);	//record temporarily the component we used to represent this prototype for the toolbar
-					}
-				}
-			}
-		}
-		finally
-		{
-			prototypeInfoComponentMap.writeLock().unlock();	//always release the write lock to our prototype components			
-		}
+		prototypeConsumerStrategy.consumePrototypes(getMenu(), getToolbar(), gatherPrototypes());	//gather prototypes and consume them
 	}
 
 	/**Gathers prototypes from all known {@link PrototypeProducer}s.

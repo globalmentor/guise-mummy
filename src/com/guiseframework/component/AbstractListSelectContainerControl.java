@@ -533,13 +533,6 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	*/
 	public Component<?> set(final int index, final Component<?> value) {throw new UnsupportedOperationException("set(index, value) not yet supported");}
 
-	/**Inserts the specified value at the specified position in this model.
-	@param index The index at which the specified value is to be inserted.
-	@param value The value to be inserted.
-	@throws IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt; <code>size()</code>).
-	*/
-	public void add(final int index, final Component<?> value) {throw new UnsupportedOperationException("addAll(index, value) not yet supported");}
-
 	/**@return A read-only list iterator of the values in this model (in proper sequence).*/
 	public ListIterator<Component<?>> listIterator() {return getComponentList().listIterator();}
 

@@ -106,6 +106,14 @@ body
 	cursor: default;
 }
 
+/*Mozilla fixes*/
+
+label
+{
+	cursor: inherit;	/*by default inherit the cursor on labels for Mozilla, which does not do this automatically*/
+}
+
+
 /*IE6 fixes*/
 
 label
@@ -123,11 +131,6 @@ a:focus
 a img
 {
 	border-style: none;	
-}
-
-.action
-{
-	cursor: pointer;
 }
 
 /*link*/

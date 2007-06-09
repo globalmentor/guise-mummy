@@ -5719,9 +5719,10 @@ function onClick(event)
 	if(target.nodeType==Node.ELEMENT_NODE)	//if the event occurred on an element
 	{
 		var targetNodeName=target.nodeName.toLowerCase();	//get the name of the target
-		if(targetNodeName=="input" && target.type=="file")	//if a file input was clicked
+		if((targetNodeName=="input" && target.type=="file")	//if a file input was clicked
+			|| (targetNodeName=="label" && target.htmlFor))	//or if a label was clicked and the label was for a particular control TODO maybe process even these, once we completely implement server-push focusing
 		{
-			return;	//let the browser handle mouse clicks on a file input TODO add checks for other things			
+			return;	//let the browser handle these mouse clicks TODO add checks for other things			
 		}
 	}
 	var component=DOMUtilities.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element

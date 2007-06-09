@@ -26,6 +26,7 @@ public class Resources extends ClassTypedRDFResource
 
 		//standard labels
 	public final static String APPLICATION_NAME=createStringResourceReference("application.name");
+	public final static String APPLICATION_NAME_SHORT=createStringResourceReference("application.name.short");
 	public final static String APPLICATION_LABEL=createStringResourceReference("application.label");
 	public final static String APPLICATION_DESCRIPTION=createStringResourceReference("application.description");
 	public final static String APPLICATION_COPYRIGHT=createStringResourceReference("application.copyright");

@@ -707,7 +707,7 @@ Debug.trace("now valid of", this, "is", isValid());
 			The flyover strategy will be registered as a mouse listener for this component.
 			This is a bound property.
 			@param newFlyoverStrategy The new flyover strategy, or <code>null</code> if there is no flyover strategy installed.
-			@see Component#FLYOVER_STRATEGY_PROPERTY 
+			@see #FLYOVER_STRATEGY_PROPERTY 
 			*/
 			public void setFlyoverStrategy(final FlyoverStrategy<? super C> newFlyoverStrategy)
 			{
@@ -719,7 +719,7 @@ Debug.trace("now valid of", this, "is", isValid());
 						removeMouseListener(oldFlyoverStrategy);	//let the old flyover strategy stop listening for mouse events
 						if(oldFlyoverStrategy==defaultFlyoverStrategy)	//if the default flyover strategy was just uninstalled
 						{
-							defaultFlyoverStrategy=null;	//we don't need to keep around default flyover strategy
+							defaultFlyoverStrategy=null;	//we don't need to keep around the default flyover strategy
 						}
 					}
 					flyoverStrategy=newFlyoverStrategy;	//actually change the value
@@ -1759,14 +1759,12 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 			closeFlyover();	//close the flyover if it is open
 		}
 	}	
-	
-	/**The default strategy for showing and hiding flyovers in response to mouse events.
-//TODO del	This implementation uses flyover frames to represent flyovers.
-//TODO del	This implementation defaults to an opacity fade effect for opening with a 500 millisecond delay.
+
+	/**An abstract flyover strategy that uses flyover frames.
 	@param <S> The type of component for which this object is to control flyovers.
 	@author Garret Wilson
 	*/
-	public static class DefaultFlyoverStrategy<S extends Component<?>> extends AbstractFlyoverStrategy<S>
+	public static abstract class AbstractFlyoverFrameStrategy<S extends Component<?>> extends AbstractFlyoverStrategy<S>
 	{
 		/**The frame used for displaying flyovers.*/
 		private FlyoverFrame<?> flyoverFrame=null;
@@ -1775,7 +1773,7 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 		@param component The component for which this object will control flyovers.
 		@exception NullPointerException if the given component is <code>null</code>.
 		*/
-		public DefaultFlyoverStrategy(final S component)
+		public AbstractFlyoverFrameStrategy(final S component)
 		{
 			super(component);	//construct the parent class
 //TODO del			setOpenEffect(new OpacityFadeEffect(component.getSession(), 500));	//create a default open effect TODO use a constant
@@ -1823,6 +1821,28 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 				flyoverFrame.close();	//close the frame
 				flyoverFrame=null;	//release our reference to the frame
 			}			
+		}
+
+		/**@return A new frame for displaying flyover information.*/
+		protected abstract FlyoverFrame<?> createFrame();
+	}
+
+	/**The default strategy for showing and hiding flyovers in response to mouse events.
+//TODO del	This implementation uses flyover frames to represent flyovers.
+//TODO del	This implementation defaults to an opacity fade effect for opening with a 500 millisecond delay.
+	@param <S> The type of component for which this object is to control flyovers.
+	@author Garret Wilson
+	*/
+	public static class DefaultFlyoverStrategy<S extends Component<?>> extends AbstractFlyoverFrameStrategy<S>
+	{
+		/**Component constructor.
+		@param component The component for which this object will control flyovers.
+		@exception NullPointerException if the given component is <code>null</code>.
+		*/
+		public DefaultFlyoverStrategy(final S component)
+		{
+			super(component);	//construct the parent class
+//TODO del			setOpenEffect(new OpacityFadeEffect(component.getSession(), 500));	//create a default open effect TODO use a constant
 		}
 
 		/**@return A new frame for displaying flyover information.*/

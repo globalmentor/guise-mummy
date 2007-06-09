@@ -32,6 +32,7 @@
 				<resource:theme.color.menu>&#x0098;theme.color.subordinateB&#x009C;</resource:theme.color.menu>
 				<resource:theme.color.submenu>&#x0098;theme.color.background&#x009C;</resource:theme.color.submenu>
 				<resource:theme.color.toolbar>&#x0098;theme.color.menu&#x009C;</resource:theme.color.toolbar>
+				<resource:theme.color.link>royalblue</resource:theme.color.link>
 
 				<resource:theme.color.border>&#x0098;theme.color.neutralA&#x009C;</resource:theme.color.border>
 		

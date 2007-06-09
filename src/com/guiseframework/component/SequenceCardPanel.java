@@ -265,15 +265,17 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 				});
 	}
 
-	/**Adds a child component.
+	/**Adds a child component at the specified index.
 	This version installs a listener for the component's displayed status.
 	Any class that overrides this method must call this version.
+	@param index The index at which the component should be added.
 	@param component The component to add to this component.
 	@return <code>true</code> if the child components changed as a result of the operation.
+	@exception IllegalArgumentException if the component already has a parent.
 	*/
-	protected boolean addComponent(final Component<?> component)
+	protected boolean addComponent(final int index, final Component<?> component)
 	{
-		final boolean result=super.addComponent(component);	//initialize the child component as needed
+		final boolean result=super.addComponent(index, component);	//initialize the child component as needed
 		component.addPropertyChangeListener(DISPLAYED_PROPERTY, cardDisplayedChangeListener);	//listen for changes in the component's displayed status and make sure the sequence is disabled as needed
 		return result;
 	}

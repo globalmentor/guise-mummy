@@ -18,16 +18,17 @@ Iterating over child components is thread safe.
 public abstract class AbstractLayoutComponent<C extends LayoutComponent<C>> extends AbstractListCompositeComponent<C> implements LayoutComponent<C>
 {
 
-	/**Adds a component to the layout component with default constraints.
-	@param component The component to add.
+	/**Adds a child component at the specified index.
+	Any class that overrides this method must call this version.
+	@param index The index at which the component should be added.
+	@param component The component to add to this component.
 	@return <code>true</code> if the child components changed as a result of the operation.
 	@exception IllegalArgumentException if the component already has a parent.
 	@exception IllegalStateException if the installed layout does not support default constraints.
 	*/
-	protected boolean addComponent(final Component<?> component)
+	protected boolean addComponent(final int index, final Component<?> component)
 	{
-//TODO del when works		return add(component, null);	//add the component, indicating default constraints should be used
-		if(super.addComponent(component))	//add the component normally; if the child components changed
+		if(super.addComponent(index, component))	//add the component normally; if the child components changed
 		{
 			getLayout().addComponent(component);	//add the component to the layout
 	//TODO fix		fireContainerModified(indexOf(component), component, null);	//indicate the component was added at the index
