@@ -2,6 +2,7 @@ package com.guiseframework.component;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import java.io.IOException;
 import java.util.*;
 
 import com.guiseframework.model.LabelModel;
@@ -62,9 +63,11 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 	}
 
 	/**Stores a child component state for the given object.
+	The component's properties will be initialized immediately, as the component state is likely to be generated dynamically during component view update.
 	@param object The object with which the component state is associated.
 	@param componentState The child component state to represent the given object, or <code>null</code> if there is no component for the given object.
-	@return The child component that previously represented the given tree node, or <code>null</code> if there was previously no component for the given object.	
+	@return The child component that previously represented the given tree node, or <code>null</code> if there was previously no component for the given object.
+	@see Component#initializeProperties()
 	*/
 	protected S putComponentState(final T object, final S componentState)
 	{
@@ -73,7 +76,16 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 		{
 			removeComponent(oldComponentState.getComponent());	//remove the old component from the set of components
 		}
-		addComponent(componentState.getComponent());	//put the new component in the component set
+		final Component<?> component=componentState.getComponent();	//get the component state
+		addComponent(component);	//put the new component in the component set
+		try
+		{
+			component.initializeProperties();	//initialize the component properties
+		}
+		catch(final IOException ioException)	//if there is a problem initializing the properties
+		{
+			throw new IllegalStateException(ioException);	//TODO improve error
+		}
 		return oldComponentState;	//return whatever component state was previously in the map
 	}
 
