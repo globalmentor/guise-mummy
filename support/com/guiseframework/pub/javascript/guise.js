@@ -1,6 +1,11 @@
 /*Guise(TM) JavaScript support routines
 Copyright (c) 2005-2007 GlobalMentor, Inc.
 
+Dependencies:
+	javascript.js
+	dom.js
+	ajax.js
+
 This script expects the following variables to be defined:
 navigator.userAgentName The name of the user agent, such as "Firefox", "Mozilla", "MSIE", or "Opera".
 navigator.userAgentVersionNumber The version of the user agent stored as a number.
@@ -150,53 +155,6 @@ var GUISE_STATE_WIDTH_ATTRIBUTE=GUISE_STATE_ATTRIBUTE_PREFIX+"Width";
 /**The state attribute for height.*/
 var GUISE_STATE_HEIGHT_ATTRIBUTE=GUISE_STATE_ATTRIBUTE_PREFIX+"Height";
 
-/**Key codes.
-@see http://www.quirksmode.org/js/keys.html
-@see http://www.quirksmode.org/dom/w3c_events.html
-*/
-var KEY_CODE=
-{
-	ALT: 18,
-	BACKSPACE: 8,
-	CONTROL: 17,
-	DELETE: 46,
-	DOWN: 40,
-	END: 35,
-	ENTER: 13,
-	ESCAPE: 27,
-	F1: 112,
-	F2: 113,
-	F3: 114,
-	F4: 115,
-	F5: 116,
-	F6: 117,
-	F7: 118,
-	F8: 119,
-	F9: 120,
-	F10: 121,
-	F11: 122,
-	F12: 123,
-	HOME: 36,
-	LEFT: 37,
-	PAGE_UP: 33,
-	PAGE_DOWN: 34,
-	RIGHT: 39,
-	SHIFT: 16,
-	TAB: 9,	
-	UP: 38
-};
-
-/**Mouse buttons as defined by the W3C and as normalized here.
-@see http://www.w3.org/TR/DOM-Level-2-Events/events.html#Events-MouseEvent
-@see http://www.quirksmode.org/dom/w3c_events.html
-*/
-var MOUSE_BUTTON=
-{
-	LEFT: 0,
-	MIDDLE: 1,
-	RIGHT: 2
-};
-
 /**The enumeration of recognized styles.*/
 var STYLES=
 {
@@ -217,1645 +175,6 @@ var STYLES=
 	SLIDER_CONTROL_TRACK: "sliderControl-track",
 	FRAME_TETHER: "frame-tether"
 };
-
-//Array
-
-/**Returns an array representing the contents of the given object.
-This implementation recognizes other arrays and the arguments of a function;
-along with anything else that is iterable by virtue of having a length property and a [] access method.
-@param object The non-null object the contents of which to return as an array.
-@return An array containing the contents of the given object.
-@see http://www.prototypejs.org/api/array/from
-*/
-Array.from=function(object)
-{
-	if(object instanceof Array)	//if the object is an array
-	{
-		return object;
-	}
-	else	//otherwise, try to iterate using length and []
-	{
-		var array=new Array();	//create a new array
-		for(var i=0, length=object.length; i<length; ++i)	//for each element
-		{
-			array.add(object[i]);	//add this element to our array
-		}
-		return array;	//return the new array we created
-	}
-};
-
-/**An add() method for arrays, equivalent to Array.push().*/
-Array.prototype.add=Array.prototype.push;
-
-/**An enqueue() method for arrays, equivalent to Array.push().*/
-Array.prototype.enqueue=Array.prototype.push;
-
-/**A dequeue() method for arrays, equivalent to Array.shift().*/
-Array.prototype.dequeue=Array.prototype.shift;
-
-/**Determines the index of the first occurrence of a given object in the array.
-@param object The object to find in the array.
-@return The index of the object in the array, or -1 if the object is not in the array.
-*/
-Array.prototype.indexOf=function(object)
-{
-	var length=this.length;	//get the length of the array
-	for(var i=0; i<length; ++i)	//for each index
-	{
-		if(this[i]==object)	//if this object is the requested object
-		{
-			return i;	//return this index
-		}
-	}
-	return -1;	//indicate that the object could not be found
-};
-
-/**Determines the index of the first match of a given object in the array using object.toString() if the object isn't null.
-@param regexp The regular expression of the string version of the object to find in the array.
-@return The index of the matching object in the array, or -1 if a matching object is not in the array.
-*/
-Array.prototype.indexOfMatch=function(regexp)
-{
-	var length=this.length;	//get the length of the array
-	for(var i=0; i<length; ++i)	//for each index
-	{
-		var object=this[i];	//get a reference to this object
-		if(object!=null && object.toString().match(regexp))	//if this object isn't null and it matches the given regular expression
-		{
-			return i;	//return this index
-		}
-	}
-	return -1;	//indicate that the object could not be found
-};
-
-/**Clears an array by removing every item at every index in the array.*/
-Array.prototype.clear=function()
-{
-	this.splice(0, this.length);	//splice out all the elements
-};
-
-/**Determines whether the given object is present in the array.
-@param object The object for which to check.
-@return true if the object is present in the array.
-*/
-Array.prototype.contains=function(object)
-{
-	return this.indexOf(object)>=0;	//see if the object is in the array
-};
-
-/**Determines whether a match of the given regular expression is present in the array, using object.toString() if the object isn't null.
-@param regexp The regular expression of the string version of the object to find in the array.
-@return true if a matching object is present in the array.
-*/
-Array.prototype.containsMatch=function(regexp)
-{
-	return this.indexOfMatch(regexp)>=0;	//see if a matching object is in the array
-};
-
-/**Removes an item at the given index in the array.
-@param index The index at which the element should be removed.
-@return The element previously at the given index in the array.
-*/
-Array.prototype.remove=function(index)
-{
-	return this.splice(index, 1)[0];	//splice out the element and return it (note that this will not work on Netscape <4.06 or IE <=5.5; see http://www.samspublishing.com/articles/article.asp?p=30111&seqNum=3&rl=1)
-};
-
-/**Removes an item from the array.
-If the item is not contained in the array, no action is taken.
-@param item The item to be removed.
-@return The removed item.
-*/
-Array.prototype.removeItem=function(item)
-{
-	var index=this.indexOf(item);	//get the index of the item
-	if(index>=0)	//if the item is contained in the array
-	{
-		return this.remove(index);	//remove the item at the index
-	}
-};
-
-var EMPTY_ARRAY=new Array();	//a shared empty array TODO create methods to make this read-only
-
-//Document
-
-if(typeof document.createElementNS=="undefined")	//if the document does not support createElementNS(), create a substitute
-{
-	/**Create an element for the given namespace URI and qualified name using the document.createElement() method.
-	@param namespaceURI The URI of the namespace.
-	@param qname The qualified name of the element.
-	@return The new created element.
-	*/
-	document.createElementNS=function(namespaceURI, qname)	//create an adapter function to call document.createElement()
-	{
-    return document.createElement(qname);	//create the element, ignoring the namespace TODO does this use closure unnecessarily?
-	};
-}
-
-if(typeof document.createAttributeNS=="undefined")	//if the document does not support createAttributeNS(), create a substitute
-{
-	/**Create an attribute for the given namespace URI and qualified name using the document.createAttribute() method.
-	@param namespaceURI The URI of the namespace.
-	@param qname The qualified name of the attribute.
-	@return The new created attribute.
-	*/
-	document.createAttributeNS=function(namespaceURI, qname)	//create an adapter function to call document.createAttribute()
-	{
-    return document.createAttribute(qname);	//create the attribute, ignoring the namespace TODO does this use closure unnecessarily?
-	};
-}
-
-if(isSafari || (typeof document.importNode=="undefined"))	//if the document does not support document.importNode() (or this is Safari, which doesn't support importing XML into an XHTML DOM), create a substitute
-{
-
-	/**Imports a new node in the the document.
-	@param node The node to import.
-	@param deep Whether the entire hierarchy should be imported.
-	@return A new clone of the node with the document as its owner.
-	*/
-/*TODO fix
-	document.importNode=function(node, deep)	//create a function to manually import a node
-	{
-		try
-		{
-			var importedNode=this._importNode(node, deep);
-			return importedNode;
-		}
-		catch(e)
-		{
-			alert("error "+e+" importing node "+node.nodeName);
-
-//TODO fix			var nodeString=DOMUtilities.getNodeString(childNode);	//serialize the node
-		}
-	}
-*/
-
-	/**Imports a new node in the the document.
-	@param node The node to import.
-	@param deep Whether the entire hierarchy should be imported.
-	@return A new clone of the node with the document as its owner.
-	*/
-	document.importNode=function(node, deep)	//create a function to manually import a node
-	{
-		var importedNode=null;	//we'll create a new node and store it here
-
-		var nodeType=node.nodeType;	//get the type of the node
-		if(/*TODO bring back if doesn't work in IE isSafari && */deep	//if we should do a deep import, resort immediately to using innerHTML and a dummy node because of all the IE errors---and the Safari errors that make importing from walking the tree almost impossible
-				&& nodeType!=Node.TEXT_NODE)	//Safari seems to break when using innerHTML to import a text node of length 1---it's probably better to use the DOM to import text, anyway
-		{
-//TODO del							alert("big problem importing node: "+DOMUtilities.getNodeString(childNode));	//TODO fix importnode
-			var elementName=nodeType==Node.ELEMENT_NODE ? node.nodeName.toLowerCase() : null;	//get the name of the node to be imported, if it is an element
-			var dummyNode=document.createElement("div");	//create a dummy node
-			var nodeString=DOMUtilities.getNodeString(node);	//convert the child node to a string
-			if(elementName=="tr")	//if this is a table row
-			{
-				dummyNode.innerHTML="<table><tbody>"+nodeString+"</tbody></table>";	//create the tbody and put the row inside it
-				importedNode=dummyNode.childNodes[0].childNodes[0].childNodes[0];	//return the tbody's first and only node, which is our new imported node; do not actually remove the node, which will cause an error on IE TODO see the failure to remove the node causes any long-term problems
-			}
-			else if(elementName=="th" || elementName=="td")	//if this is a table header or cell
-			{
-				dummyNode.innerHTML="<table><tbody><tr>"+nodeString+"</tr></tbody></table>";	//create the tbody and put the row inside it
-				importedNode=dummyNode.childNodes[0].childNodes[0].childNodes[0].childNodes[0];	//return the tr's first and only node, which is our new imported node; do not actually remove the node, which will cause an error on IE TODO see the failure to remove the node causes any long-term problems
-			}
-			else if(elementName=="option")	//if this is a select option
-			{
-				dummyNode.innerHTML="<select>"+nodeString+"</select>";	//create the select and put the option inside it
-				importedNode=dummyNode.childNodes[0].childNodes[0];	//return the select's first and only node, which is our new imported node; do not actually remove the node, which will cause an error on IE TODO see the failure to remove the node causes any long-term problems
-			}
-			else	//if this is not a table row
-			{
-//TODO fix							document.documentElement.appendChild(dummyNode);	//append the dummy node to the document
-				dummyNode.innerHTML=nodeString;	//assign the string version of the node to the dummy node
-				if(dummyNode.childNodes.length!=1)	//we expect a single child node at the end of the operation
-				{
-					alert("Error importing node: "+nodeString);	//TODO assert
-					alert("Imported: "+dummyNode.innerHTML);
-				}
-				importedNode=dummyNode.removeChild(dummyNode.childNodes[0]);	//remove the dummy node's first and only node, which is our new imported node
-			}
-			return importedNode;
-		}
-		
-		switch(node.nodeType)	//see which type of child node this is
-		{
-			case Node.COMMENT_NODE:	//comment
-				importedNode=document.createCommentNode(node.nodeValue);	//create a new comment node with appropriate text
-				break;
-			case Node.ELEMENT_NODE:	//element
-				if(typeof node.namespaceURI!="undefined")	//if the node supports namespaces
-				{
-					importedNode=document.createElementNS(node.namespaceURI, node.nodeName);	//create a namespace-aware element
-				}
-				else	//if the node does not support namespaces
-				{
-					importedNode=document.createElement(node.nodeName);	//create a non-namespace-aware element
-				}
-/*TODO del; doesn't work
-				if(node.nodeName=="button")	//if this is a button (IE fails when trying to import a button with type="button")
-				{
-alert("importing a button");
-					var outerHTML=DOMUtilities.appendNodeString(new StringBuilder(), node).toString();	//serialize the node
-alert("using HTML: "+outerHTML);
-					document.body.appendChild(importedNode);	//append the element to the body just so outerHTML will work
-					importedNode.outerHTML=outerHTML;	//set the element's outer HTML to the string we constructed					
-					document.body.removeChild(importedNode);	//remove the element from the body
-				}
-				else	//for all other nodes
-*/
-				{
-					var attributes=node.attributes;	//get the element's attributes
-					var attributeCount=attributes.length;	//find out how many attributes there are
-					for(var i=0; i<attributeCount; ++i)	//for each attribute
-					{
-						var attribute=attributes[i];	//get this attribute
-						var attributeName=attribute.nodeName;	//get the attribute name
-						if(attributeName=="style")	//if this is the style attribute, it must be copied differently or it will throw an error on IE
-						{
-//TODO fix for Safari alert("ready to copy style attributes");
-//TODO fix for Safari 							DOMUtilities.copyStyleAttribute(importedNode, node);	//copy the style attribute
-						}
-						else	//for all other attributes
-						{
-	//TODO fix						try
-							{
-								var attributeValue=attribute.nodeValue;	//get the attribute value
-								if(importedNode.setAttributeNodeNS instanceof Function && typeof attribute.namespaceURI!="undefined")	//if the attribute supports namespaces
-								{
-									var importedAttribute=document.createAttributeNS(attribute.namespaceURI, attributeName);	//create a namespace-aware attribute
-									importedAttribute.nodeValue=attributeValue;	//set the attribute value
-									importedNode.setAttributeNodeNS(importedAttribute);	//set the attribute for the element						
-								}
-								else	//if the attribute does not support namespaces
-								{
-									var importedAttribute=document.createAttribute(attributeName);	//create a non-namespace-aware element
-									importedAttribute.nodeValue=attributeValue;	//set the attribute value TODO verify this works on Safari
-									importedNode.setAttributeNode(importedAttribute);	//set the attribute for the element
-								}
-							}	//TODO check; perhaps catch an exception here and return null or throw our own exception to improve IE "type" attribute error handling
-	//TODO fix						catch(exception)	//if there is an error copying the attribute (e.g. IE button type="button")
-							{
-	//TODO fix alert("error for "+node.nodeName+" adding attribute "+attributeName+"=\""+attributeValue+"\"");
-	//TODO fix							return null;
-							}
-						}
-					}
-					if(deep)	//if we should import deep
-					{
-						var childNodes=node.childNodes;	//get a list of child nodes
-						var childNodeCount=childNodes.length;	//find out how many child nodes there are
-	/*TODO fix
-						for(var i=0; i<childNodeCount; ++i)	//for all of the child nodes
-						{
-							var childNode=childNodes[i];	//get a reference to this child node
-							try
-							{
-								var childImportedNode=document.importNode(childNode, deep);
-							}
-							catch(exception)	//if there is an error importing the node (this is just a safety precaution in case future versions of IE still throw an exception on button.type and 
-							{
-								var childImportedNode=null;	//set the node to null
-							}
-							if(childImportedNode)	//if we imported the node correctly
-							{
-								importedNode.appendChild(childImportedNode);	//import and append the new child node
-							}
-							else	//if something went wrong importing the node (IE 6 will fail to add the button.type attribute, but will not throw an exception, leaving childImportedNode undefined
-							{
-								var nodeString=DOMUtilities.getNodeString(childNode);	//serialize the node
-								importedNode.innerHTML+=nodeString;	//append the node string to the element's inner HTML
-							}
-						}
-	*/
-						if(childNodeCount>0)	//if there are child nodes (IE will fail on importedNode.innerHTML="" for input type="text")
-						{
-							var innerHTMLStringBuilder=new StringBuilder();	//construct the inner HTML
-							for(var i=0; i<childNodeCount; ++i)	//for all of the child nodes
-							{
-								DOMUtilities.appendNodeString(innerHTMLStringBuilder, childNodes[i]);	//serialize the node and append it to the string builder
-							}
-	//TODO del alert("ready to add inner HTML: "+innerHTMLStringBuilder.toString());
-							importedNode.innerHTML=innerHTMLStringBuilder.toString();	//set the element's inner HTML to the string we constructed
-						}
-					}
-				}
-				break;
-			case Node.TEXT_NODE:	//text
-				importedNode=document.createTextNode(node.nodeValue);	//create a new text node with appropriate text
-				break;
-			default:
-				alert("Unknown node type: "+node.nodeType);
-				break;
-			//TODO add checks for other elements, such as CDATA
-		}
-		return importedNode;	//return the imported node
-	};
-}
-
-//Node
-
-if(typeof Node=="undefined")	//if no Node type is defined (e.g. IE), create one to give us constant node types
-{
-	var Node={ELEMENT_NODE: 1, ATTRIBUTE_NODE: 2, TEXT_NODE: 3, CDATA_SECTION_NODE: 4, ENTITY_REFERENCE_NODE: 5, ENTITY_NODE: 6, PROCESSING_INSTRUCTION_NODE: 7, COMMENT_NODE: 8, DOCUMENT_NODE: 9, DOCUMENT_TYPE_NODE: 10, DOCUMENT_FRAGMENT_NODE: 11, NOTATION_NODE: 12};
-}
-
-//Array
-
-/**Creates a new function that functions exactly as does the original function,
-except that it provides the given variable to appear as "this" to the new function.
-@param newThis The variable to appear as "this" when the function is called.
-@return A new function bound to the given this.
-@see http://www.prototypejs.org/api/function/bind
-*/
-Function.prototype.bind=function(newThis)
-{
-	var originalFunction=this;	//save a reference to this function instance to allow calling this via closure
-	return function()	//create and send back a new function
-	{
-		originalFunction.apply(newThis, arguments);	//the new function will call the original function with whatever arguments are given, but using the given this instead of whatever this is passed when the function is called
-	};
-};
-
-//String
-
-/**Determines whether the given substring is present in the string.
-@param substring The substring for which to check.
-@return true if the substring is present in the string.
-*/
-String.prototype.contains=function(substring)
-{
-	return this.indexOf(substring)>=0;	//see if the substring is in the string
-};
-
-/**Determines whether this string is in all lowercase.
-@return true if the string is in all lowercase.
-*/
-String.prototype.isLowerCase=function()
-{
-	return this==this.toLowerCase();	//see if this substring matches the same string in all lowercase
-};
-
-/**Determines whether this string is in all uppercase.
-@return true if the string is in all uppercase.
-*/
-String.prototype.isUpperCase=function()
-{
-	return this==this.toUpperCase();	//see if this substring matches the same string in all uppercase
-};
-
-/**Determines whether this string starts with the indicated substring.
-@param substring The string to check to see if it is at the beginning of this string.
-@return true if the given string is at the start of this string.
-*/
-String.prototype.startsWith=function(substring)
-{
-	return this.hasSubstring(substring, 0);	//see if this substring is at the beginning of the string
-};
-
-/**Determines whether this string ends with the indicated substring.
-@param substring The string to check to see if it is at the end of this string.
-@return true if the given string is at the end of this string.
-*/
-String.prototype.endsWith=function(substring)
-{
-	return this.hasSubstring(substring, this.length-substring.length);	//see if this substring is at the end of the string
-};
-
-/**Determines if this string has the given substring at the given index in the string.
-@param substring The substring to compare.
-@param index The index to compare.
-@return true if the given substring matches the characters as the given index of this string.
-*/
-String.prototype.hasSubstring=function(substring, index)
-{
-	var length=substring.length;	//get the length of the substring
-	if(index<0 || this.length<index+length)	//if the range doesn't fall within this string
-	{
-		return false;	//the substring can't start this string
-	}
-	for(var i=length-1; i>=0; --i)	//for each character in the substring
-	{
-		if(this.charAt(i+index)!=substring.charAt(i))	//if these characters don't match
-		{
-			return false;	//the substring doesn't match
-		}
-	}
-	return true;	//show that the string matches
-}
-
-/**Splits a string and returns an associative array with the contents.
-Each the value of each key of the associative array will be set to true.
-Empty and null splits will be ignored.
-@param separator The optional separator string or regular expression; if no separator is provided, the entire string is placed in the set.
-@param limit The optional limit to the number of splits to be found.
-@return An associative array with they keys set to the elements of the split string.
-*/
-String.prototype.splitSet=function(separator, limit)
-{
-	var splitSet=new Object();	//create an associative array
-	var splits=this.split(separator, limit);	//split the string into an array
-	for(var i=splits.length-0; i>=0; --i)	//for each split
-	{
-		var split=splits[i];	//get this split
-		if(split)	//if this is a valid split
-		{
-			splitSet[split]=true;	//add this split to the set
-		}
-	}
-	return splitSet;	//return the set of splits
-};
-
-/**Trims the given string of whitespace.
-@see https://lists.latech.edu/pipermail/javascript/2004-May/007570.html
-*/
-String.prototype.trim=function()
-{
-	return this.replace(/^\s+|\s+$/g, "");	//replace beginning and ending whitespace with nothing
-};
-
-//StringBuilder
-
-/**A class for concatenating string with more efficiency than using the additive operator.
-Inspired by Nicholas C. Zakas, _Professional JavaScript for Web Developers_, Wiley, 2005, p. 97.
-@param strings (...) Zero or more strings with which to initialize the string builder.
-*/
-function StringBuilder(strings)
-{
-	this._strings=new Array();	//create an array of strings
-	if(!StringBuilder.prototype._initialized)
-	{
-		StringBuilder.prototype._initialized=true;
-
-		/**Appends a string to the string builder.
-		@param string The string to append.
-		@return A reference to the string builder.
-		*/
-		StringBuilder.prototype.append=function(string)
-		{
-			this._strings.add(string);	//add this string to the array
-			return this;
-		};
-
-		/**@return A single string containing the contents of the string builder.*/
-		StringBuilder.prototype.toString=function()
-		{
-			return this._strings.join("");	//join with no separator and return the strings
-		};
-	}
-	var argumentCount=arguments.length;	//find out how many arguments there are
-	for(var i=0; i<argumentCount; ++i)	//for each argument
-	{
-		this.append(arguments[i]);	//append this string
-	}
-}
-
-//Map
-
-/**A class encapsulating keys and values.
-This is a convenience class for constructing an Object with a given set of keys and values, as the JavaScript shorthand notation does not allow non-literal key names.
-Values may be accessed in normal object[key]==value syntax. The constructor allows any number of key/value pairs as arguments.
-@param key: A key with which to associate a value.
-@param value: The value associated with the preceding key.
-*/
-function Map(key, value)
-{
-	var argumentCount=arguments.length;	//find out how many arguments there are
-	for(var i=0; i+1<argumentCount; i+=2)	//for each key/value combination (counting by twos)
-	{
-		this[arguments[i]]=arguments[i+1];	//store the value keyed to the key
-	}
-}
-
-//Set
-
-/**A class encapsulating keys mapped to the value true.
-This is a convenience class for constructing an Object with a given set of keys, as the JavaScript shorthand notation does not allow non-literal key names.
-Values may be tested in normal if(object[item]) syntax. The constructor allows any number of items as arguments.
-@param items: The items to store in the set.
-*/
-function Set(items)
-{
-	for(var i=arguments.length-1; i>=0; --i)	//for each item (order doesn't matter in a set)
-	{
-		this[arguments[i]]=true;	//store the item as a key with a value of true
-	}
-}
-
-//Point
-
-/**A class encapsulating a point.
-@param x: The X coordinate, stored under this.x;
-@param y: The Y coordinate, stored under this.y;
-*/
-function Point(x, y) {this.x=x; this.y=y;}
-
-//Rectangle
-
-/**A class encapsulating a rectangle.
-@param coordinates: The position of the top left corner of the rectangle, stored under this.coordinates.
-@param size: The size of the rectangle, stored under this.size.
-var x, y: The coordinates of the upper-left corner of the rectangle.
-var width, height: The dimensions of the rectangle.
-*/
-function Rectangle(coordinates, size)
-{
-	this.coordinates=coordinates;
-	this.x=coordinates.x;
-	this.y=coordinates.y;
-	this.size=size;
-	this.width=size.width;
-	this.height=size.height;
-}
-
-//Size
-
-/**A class encapsulating a size.
-@param width: The width, stored under this.width;
-@param height: The height coordinate, stored under this.height;
-*/
-function Size(width, height) {this.width=width; this.height=height;}
-
-//URI
-
-/**A class for parsing and encapsulting a URI according to RFC 2396, "Uniform Resource Identifiers (URI): Generic Syntax".
-@param uriString The string form of the URI.
-@see http://www.ietf.org/rfc/rfc2396.txt
-var scheme The scheme of the URI.
-var authority The authority of the URI.
-var path The path of the URI.
-var query The query of the URI.
-var fragment The fragment of the URI.
-var parameters An associative array of parameter name/value combinations.
-*/
-function URI(uriString)
-{
-	if(!URI.prototype._initialized)
-	{
-		URI.prototype._initialized=true;
-
-		URI.prototype.URI_REGEXP=/^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/;	//the regular expression for parsing URIs, from http://www.ietf.org/rfc/rfc2396.txt
-	}
-	this.URI_REGEXP.test(uriString);	//split out the components of the URI using a regular expression
-	this.scheme=RegExp.$2;	//save the URI components
-	this.authority=RegExp.$4;
-	this.path=RegExp.$5;
-	this.query=RegExp.$7;
-	this.parameters=new Object();	//create a new associative array to hold parameters
-	if(this.query)	//if a query is given
-	{
-		var queryComponents=this.query.split("&");	//split up the query components
-		var parameterCount=queryComponents.length;	//find out how many parameters there are
-		for(var i=0; i<parameterCount; ++i)	//for each parameter
-		{
-			var parameterComponents=queryComponents[i].split("=");	//split out the parameter components
-			var parameterName=decodeURIComponent(parameterComponents[0]);	//get and decode the parameter name
-			var parameterValue=parameterComponents.length>1 ? decodeURIComponent(parameterComponents[1]) : null;	//get and decode the parameter value
-			this.parameters[parameterName]=parameterValue;	//store this parameter name/value combination
-		}
-	}
-	this.fragment=RegExp.$9;
-}
-
-/**Global utilities for working with the screen.*/
-var GUIUtilities=
-{
-
-	/**Centers a node on the screen.
-	It is assumed that the node is already specified as absolutely positioned.
-	@param node The node to center.
-	*/
-	centerNode:function(node)
-	{
-		var viewportBounds=this.getViewportBounds();	//get the bounds of the viewport so that we can center the node
-		var x=viewportBounds.x+((viewportBounds.width-node.offsetWidth)/2);	//center the node horizontally
-		var y=viewportBounds.y+((viewportBounds.height-node.offsetHeight)/2);	//center the node vertically
-//TODO del alert("with viewport width: "+viewportBounds.width+" and node width: "+node.offsetWidth+" setting x: "+x);
-		node.style.left=x+"px";	//set the node's horizontal position
-		node.style.top=y+"px";	//set the node's vertical position
-	},
-
-	/**Retrieves the absolute bounds of the given element.
-	@param The element the bounds of which to find.
-	@return A Rectangle containing the coordinates and size of the element.
-	*/
-	getElementBounds:function(element)
-	{
-		return new Rectangle(this.getElementCoordinates(element), new Size(element.offsetWidth, element.offsetHeight));	//create a rectangle containing the coordinates and size of the element
-	},
-
-	/**Retrieves the absolute X and Y coordinates of the given element.
-	@param The element the coordinates of which to find.
-	@return A Point containing the coordinates of the element.
-	@see http://www.oreillynet.com/pub/a/javascript/excerpt/JSDHTMLCkbk_chap13/index6.html
-	@see http://www.quirksmode.org/js/findpos.html
-	@see http://blog.firetree.net/2005/07/04/javascript-find-position/
-	*/
-	getElementCoordinates:function(element)	//TODO make sure this method correctly calculates margins and padding, as Mozilla and IE both show slight variations for text, but not for images
-	{
-		var originalElement=element;	//keep track of which element was originally requested
-		var x=0, y=0;
-		if(element.currentStyle)	//compensate for negative margins on IE6, which apparently is only effective on the immediate element (primarily frames); if IE7 fixes this bug we'll have to check for quirks mode (which we use with IE6 but not on IE7), or as a last resort check specifically for IE6
-		{
-			if(element.currentStyle.marginLeft)	//if there is a left margin
-			{
-				var marginLeft=parseInt(element.currentStyle.marginLeft);	//parse the margin left value, which may be a string in the form XXpx
-				if(marginLeft && marginLeft<0)	//if there is a negative margin (and not some keyword)
-				{
-					x-=marginLeft;	//compensate for negative left margin
-				}
-			}
-			if(element.currentStyle.marginTop)	//if there is a top margin
-			{
-				var marginTop=parseInt(element.currentStyle.marginTop);	//parse the margin top value, which may be a string in the form XXpx
-				if(marginTop && marginTop<0)	//if there is a negative margin (and not some keyword)
-				{
-					y-=marginTop;	//compensate for negative top margin
-				}
-			}
-		}
-		if(element.offsetParent)	//if element.offsetParent is supported
-		{
-	//TODO del alert("using calculated element position");
-			while(element)	//while we have an element
-			{
-				x+=element.offsetLeft;	//add this element's offsets
-				y+=element.offsetTop;
-	/*TODO fix or del; apparently this code is not as good as the version below, although it doesn't seem to compensate for scrollLeft
-				if(element.scrollLeft)
-				{
-					x-=element.scrollLeft;
-				}
-				if(element.scrollTop)
-				{
-	//TODO del alert("element "+element.nodeName+" scroll top "+element.scrollTop);
-					y-=element.scrollTop;
-				}
-	*/
-				element=element.offsetParent;	//go to the element's parent offset
-			}
-	/*TODO fix for Mac
-	    if (navigator.userAgent.indexOf("Mac") != -1 && 
-	        typeof document.body.leftMargin != "undefined") {
-	        offsetLeft += document.body.leftMargin;
-	        offsetTop += document.body.topMargin;
-	    }
-	*/
-	/*TODO fix; this inappropriately adds in the viewport scroll position on IE but not on Mozilla---but this is needed for internal scrolled divs on IE; try to distinguish the two when internal scrolled divs are used
-			var parent=originalElement.parentNode;
-			while(parent!=document.documentElement)
-			{
-				if(parent.scrollTop)
-				{
-	//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
-					y-=parent.scrollTop;
-				}
-				parent=parent.parentNode;		
-			}
-	*/
-	
-	
-	/*TODO test
-			element=originalElement;
-			while(element!=null)	//TODO fix for scroll left
-			{
-				if(element.scrollLeft)
-				{
-	//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
-					x-=element.scrollLeft;
-				}
-				if(element.scrollTop)
-				{
-	//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
-					y-=element.scrollTop;
-				}
-				element=element.parentNode;		
-			}
-	*/
-	
-			var documentElement=document.documentElement;
-			element=originalElement.parentNode;
-			while(element!=documentElement)	//TODO fix for scroll left
-			{
-				var parentNode=element.parentNode;
-				if(isUserAgentIE6 && parentNode==documentElement)	//ignore the outermost element in IE6
-				{
-					break;
-				}
-				if(element.scrollLeft)
-				{
-	//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
-					x-=element.scrollLeft;
-				}
-				if(element.scrollTop)
-				{
-	//TODO fix alert("element "+parent.nodeName+" scroll top "+parent.scrollTop);
-					y-=element.scrollTop;
-				}
-				element=parentNode;
-			}
-		}
-		else if(element.x && element.y)	//if element.offsetParent is not supported by but element.x and element.y are supported (e.g. Navigator 4)
-		{
-			x=element.x;	//get the element's coordinates directly
-			y=element.y;
-		}
-		return new Point(x, y);	//return the point we calculated
-	},
-
-	/**Retrieves the absolute bounds of the given element, including any negative margins.
-	This method is not currently guaranteed to work on non-IE browsers.
-	@param The element the bounds of which to find.
-	@return A Rectangle containing the coordinates and external size of the element.
-	*/
-	getElementExternalBounds:function(element)
-	{
-		var point=this.getElementCoordinates(element);	//get the coordinates
-		var size=new Size(element.offsetWidth, element.offsetHeight);
-		if(element.currentStyle)	//compensate for negative margins on IE6, which apparently is only effective on the immediate element (primarily frames); if IE7 fixes this bug we'll have to check for quirks mode (which we use with IE6 but not on IE7), or as a last resort check specifically for IE6
-		{
-			if(element.currentStyle.marginLeft)	//if there is a left margin
-			{
-				var marginLeft=parseInt(element.currentStyle.marginLeft);	//parse the margin left value, which may be a string in the form XXpx
-				if(marginLeft && marginLeft<0)	//if there is a negative margin (and not some keyword)
-				{
-					point.x+=marginLeft;	//compensate for negative left margin
-				}
-			}
-			if(element.currentStyle.marginTop)	//if there is a top margin
-			{
-				var marginTop=parseInt(element.currentStyle.marginTop);	//parse the margin top value, which may be a string in the form XXpx
-				if(marginTop && marginTop<0)	//if there is a negative margin (and not some keyword)
-				{
-					point.y+=marginTop;	//compensate for negative top margin
-				}
-			}
-		}
-		//TODO check to see if the size compensates for negative margins or not
-		return new Rectangle(point, size);	//create a rectangle containing the coordinates and size of the element
-	},
-
-	/**Retrieves the X and Y coordinates of the given element relative to the viewport.
-	@param The element the coordinates of which to find.
-	@return A Point containing the coordinates of the element relative to the viewport.
-	*/
-	getElementFixedCoordinates:function(element)
-	{
-		var absoluteCoordinates=this.getElementCoordinates(element);	//get the element's absolute coordinates
-		var scrollCoordinates=this.getScrollCoordinates();	//get the viewport's scroll coordinates
-		return new Point(absoluteCoordinates.x-scrollCoordinates.x, absoluteCoordinates.y-scrollCoordinates.y);	//compensate for viewport scrolling
-	},
-
-	/**@return The size of the document, even if it is outside the viewport.
-	@see http://www.quirksmode.org/viewport/compatibility.html
-	*/
-	getPageSize:function()
-	{
-		var width=Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
-		var height=Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
-	//	alert("width: "+width+" height: "+height);
-	/*TODO this is presented at http://www.quirksmode.org/viewport/compatibility.html, but doesn't correctly give the scroll width for Firefox
-		var width=0, height=0;	//we'll determine the width and height
-		var scrollHeight=document.body.scrollHeight;	//get the scroll height
-		var offsetHeight=document.body.offsetHeight;	//get the offset height
-		if(scrollHeight>offsetHeight)	//if the scroll height is larger
-		{
-			width=document.body.scrollWidth;	//use the scroll dimensions
-			height=document.body.scrollHeight;
-		}
-		else	//if the body offsets are larger (e.g. Explorer Mac and IE 6 strict)
-		{
-			width=document.body.offsetWidth;	//use the body offsets
-			height=document.body.offsetHeight;
-		}
-		return new Size(width, height);	//return the page size
-		
-	alert("document.body.scrollWidth: "+document.body.scrollWidth+"\n"+
-				"document.body.offsetWidth: "+document.body.offsetWidth+"\n"+
-				"document.body.clientWidth: "+document.body.clientWidth+"\n"+
-				"document.documentElement.scrollWidth: "+document.documentElement.scrollWidth+"\n"+
-				"document.documentElement.offsetWidth: "+document.documentElement.offsetWidth+"\n"+
-				"document.documentElement.clientWidth: "+document.documentElement.clientWidth+"\n")
-	*/	
-		return new Size(width, height);	//return the page size
-	},
-
-	/**@return The coordinates that the page has scrolled.
-	@see http://www.quirksmode.org/viewport/compatibility.html 
-	*/
-	getScrollCoordinates:function()
-	{
-	/*TODO del
-	alert("window.pageXOffset: "+window.pageXOffset+"\n"+
-				"document.documentElement.scrollLeft: "+document.documentElement.scrollLeft+"\n"+
-				"document.body.scrollLeft: "+document.body.scrollLeft+"\n");
-	*/
-		var x, y;
-		if(typeof window.pageYOffset!="undefined") //if we know the page vertical offset (all browsers except IE)
-		{
-			x=window.pageXOffset;
-			y=window.pageYOffset;
-		}
-		else if(document.documentElement && document.documentElement.scrollTop)	//if we know the document's scroll position (IE 6 strict mode)
-		{
-			x=document.documentElement.scrollLeft;
-			y=document.documentElement.scrollTop;
-		}
-		else if(document.body)	//for all other IE modes
-		{
-			x=document.body.scrollLeft;
-			y=document.body.scrollTop;
-		}
-		return new Point(x, y);	//return the scrolling coordinates
-	},
-
-	/**@return A Rectangle containing the coordinates and size of the viewport.*/
-	getViewportBounds:function()
-	{
-		return new Rectangle(this.getScrollCoordinates(), this.getViewportSize());	//create a rectangle containing the coordinates and size of the viewport
-	},
-
-	/**@return The size of the viewport.
-	@see http://www.quirksmode.org/viewport/compatibility.html 
-	*/
-	getViewportSize:function()
-	{
-		var width=0, height=0;	//we'll determine the width and height
-		if(window.innerWidth && window.innerHeight)	//if the window knows its inner width and height
-		{
-			width=window.innerWidth;	//use the window's inner dimensions
-			height=window.innerHeight;
-		}
-		else if(document.documentElement && document.documentElement.clientWidth && document.documentElement.clientHeight)	//if the document element knows its dimensions (e.g. IE 6 in strict mode)
-		{
-			width=document.documentElement.clientWidth;	//use the document element's client width and height
-			height=document.documentElement.clientHeight;
-		}
-		else if(document.body)	//if there is a document body
-		{
-			width=document.body.clientWidth;	//use the document body's client width and height
-			height=document.body.clientHeight;
-		}
-		return new Size(width, height);	//return the size
-	}
-
-};
-
-/**Global utilities for working with the DOM.*/
-var DOMUtilities=
-{
-
-	/**Imports all the attributes from the source element into the destination element.
-	The destination element's original attributes will not be first removed.
-	@param destinationElement The element into which the attributes should be imported.
-	@param sourceElement The element from which the attributes should be imported.
-	*/
-/**TODO del when works
-	importAttributes:function(destinationElement, sourceElement)
-	{
-		var attributes=sourceElement.attributes;	//get the element's attributes
-		var attributeCount=attributes.length;	//find out how many attributes there are
-		for(var i=0; i<attributeCount; ++i)	//for each attribute
-		{
-			var attribute=attributes[i];	//get this attribute
-			if(document.createAttributeNS instanceof Function && typeof attribute.namespaceURI!="undefined")	//if the attribute supports namespaces
-			{
-				var importedAttribute=document.createAttributeNS(attribute.namespaceURI, attribute.nodeName);	//create a namespace-aware attribute
-				importedAttribute.nodeValue=attribute.nodeValue;	//set the attribute value
-				destinationElement.setAttributeNodeNS(importedAttribute);	//set the attribute for the element						
-			}
-			else	//if the attribute does not support namespaces
-			{
-			try
-			{
-alert("ready to create attribute: "+attribute.nodeName);
-				var importedAttribute=document.createAttribute(attribute.nodeName);	//create a non-namespace-aware element
-alert("ready to set value: "+attribute.nodeValue);
-				importedAttribute.nodeValue=attribute.nodeValue;	//set the attribute value TODO verify this works on Safari
-alert("ready set attribute node: "+attribute.nodeName);
-				destinationElement.setAttributeNode(importedAttribute);	//set the attribute for the element
-			}
-			catch(e)
-			{
-alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with value: "+attribute.nodeValue);
-			}
-				
-			}
-		}
-	},
-*/
-
-	/**Ensures that an IMG is loaded before calling a given function.
-	@param img The img element to load.
-	@param fn The function to call after the image is loaded.
-	*/
-	waitIMGLoaded:function(img, fn)
-	{
-		if(img.complete)	//if the image is loaded
-		{
-			fn();	//call the function directly
-		}
-		else	//if the image is not loaded
-		{
-			var onLoad=function()	//create a function to call the function after the image is loaded TODO fix this creates a race condition, because the image could finish loading before we can install our listener
-					{
-						eventManager.removeEvent(img, "load", onLoad, false);	//stop waiting for the img to load
-						fn();	//call the function
-//TODO del alert("img loaded after waiting!");	//TODO del
-					};
-			eventManager.addEvent(img, "load", onLoad, false);	//register an event on the img to wait for it to load
-		}
-	},
-
-
-	/**Cleans a cloned node and all it chidren, removing its element IDs, for example, so that it can inserted into a document.*/
-	cleanNode:function(node)
-	{
-		if(node.nodeType==Node.ELEMENT_NODE)	//if this is an element
-		{
-			if(node.id)	//if this element has an ID
-			{
-				node.id=null;	//remove the ID
-			}
-		}
-		var childNodeList=node.childNodes;	//get all the child nodes
-		for(var i=childNodeList.length-1; i>=0; --i)	//for each child node
-		{
-			this.cleanNode(childNodeList[i]);	//clean this child node
-		}
-	},
-
-	/**Removes a child node from its parent, if any, and then replaces it at the exact spot in the tree.
-	@param node The node to refresh.
-	*/
-	refreshNode:function(node)
-	{
-		var parentNode=node.parentNode;	//get the node's parent
-		if(parentNode!=null)	//if the node has a parent
-		{
-			var nextSibling=node.nextSibling;	//get the node's next sibling, if any
-			parentNode.insertBefore(parentNode.removeChild(node), nextSibling);	//remove the node and then insert it before its old next sibling (or at the end of the elements if there was no next sibling
-		}
-	},
-
-	/**Removes all children from the given node.
-	This implementation also unregistered any events for the node and all its children.
-	@param node The node the children of which to remove.
-	*/
-	removeChildren:function(node)
-	{
-		while(node.childNodes.length>0)	//while there are child nodes left (remove the last node, one at a time, because because IE can sometimes add an element back in after the last one was removed)
-		{
-			var childNode=node.childNodes[node.childNodes.length-1];	//get a reference to the last node
-			uninitializeNode(childNode, true);	//uninitialize the node tree
-			node.removeChild(childNode);	//remove the last node
-		}
-	},
-
-	/**Determines the document tree depth of the given element, returning a zero-level depth for the document node.
-	@param element The element for which a depth should be found.
-	@return The zero-based depth of the given element in the document, with a zero-level depth for the document node.
-	*/
-	getElementDepth:function(element)
-	{
-		var depth=-1;	//this element will be at least depth zero
-		do
-		{
-			element=element.parentNode;	//get the parent node
-			++depth;	//increase the depth
-		}
-		while(element);	//keep getting the parent node while there are ancestors left
-		return depth;	//return the depth we calculated
-	},
-
-	/**Sets the attribute value of an element, using namespaces if the DOM supports them.
-	@param element The element for which an attribute should be set.
-	@param namespaceURI The URI of the namespace.
-	@param qname The qualified name of the attribute.
-	@param value The value of the attribute.
-	*/
-/*TODO del; not used
-	setAttributeNS:function(element, namespaceURI, qname, value)	//TODO improve by initial assignment of function
-	{
-		var attribute=document.createAttributeNS(namespaceURI, qname);	//create the attribute
-		attribute.nodeValue=value;	//set the value
-		if(element.setAttributeNodeNS instanceof Function)	//if this DOM supports setAttributeNodeNS
-		{
-			element.setAttributeNodeNS(attribute);	//use a namespace-aware attribute setting function
-		}
-		else	//if the DOM isn't namespace aware
-		{
-			element.setAttributeNode(attribute);	//set the attribute with no namespace information
-		}
-	},
-*/
-
-	/**Copies the style attribute by parsing out the individual style declarations and applying them to the destination style.
-	This method is needed because the IE DOM does not allow the style attribute to be copied directly.
-	@param destinationElement The destination of the style information.
-	@param sourceElement The source of the style information.
-	*/
-/*TODO del; not used
-	copyStyleAttribute:function(destinationElement, sourceElement)
-	{
-		var style=sourceElement.getAttribute("style");	//get the source style attribute
-		if(style!=null)	//if there is a style attribute
-		{
-			var styles=style.split(";");	//split out the individual styles
-			for(var styleIndex=styles.length-1; styleIndex>=0; --styleIndex)	//for each style
-			{
-				var styleComponents=styles[styleIndex].split(":");	//get a reference to this style and split out the property and value
-				if(styleComponents.length==2)	//we expect there to be a property and a value
-				{
-					var styleProperty=styleComponents[0].trim();	//get the trimmed style property
-					var styleValue=styleComponents[1].trim();	//get the trimmed style value
-					destinationElement.style[styleProperty]=styleValue;	//copy this style TODO fix Safari; this causes a null value error in safari
-				}
-			}				
-		}
-	},
-*/
-
-
-
-
-	/**Retrieves the named ancestor element of the given node, starting at the node itself.
-	@param node The node the ancestor of which to find, or null if the search should not take place.
-	@param elementName The name of the element to find.
-	@return The named element in which the node lies, or null if the node is not within such a named element.
-	*/
-	getAncestorElementByName:function(node, elementName)
-	{
-		while(node && (node.nodeType!=Node.ELEMENT_NODE || node.nodeName.toLowerCase()!=elementName))	//while we haven't found the named element
-		{
-			node=node.parentNode;	//get the parent node
-		}
-		return node;	//return the element we found
-	},
-
-	/**Retrieves all the ancestor elements, including the given element, if any, with the given class of the given node, starting at the node itself. Multiple class names are supported.
-	@param node The node the ancestor of which to find, or null if the search should not take place.
-	@param className The name of the class for which to check, or a regular expression if a match should be found.
-	@return A non-null array of elements with the given class in which the node lies.
-	*/
-	getAncestorElementsByClassName:function(node, className)
-	{
-		var ancestorElements=new Array();	//create a new array
-		var ancestorElement=this.getAncestorElementByClassName(node, className);	//get the first ancestor element
-		while(ancestorElement)	//while we're not out of ancestor elements
-		{
-			ancestorElements.add(ancestorElement);	//add this ancestor element
-			ancestorElement=this.getAncestorElementByClassName(ancestorElement.parentNode, className);	//get the next ancestor element
-		}
-		return ancestorElements;	//return the ancestor elements we found
-	},
-	
-	/**Retrieves the ancestor element with the given class of the given node, starting at the node itself. Multiple class names are supported.
-	@param node The node the ancestor of which to find, or null if the search should not take place.
-	@param className The name of the class for which to check, or a regular expression if a match should be found.
-	@return The element with the given class in which the node lies, or null if the node is not within such an element.
-	*/
-	getAncestorElementByClassName:function(node, className)
-	{
-		while(node)	//while we haven't reached the top of the hierarchy
-		{
-			if(node.nodeType==Node.ELEMENT_NODE && this.hasClassName(node, className))	//if this is an element and this class name is one of the class names
-			{
-				return node;	//this node has a matching class name; we'll use it
-			}
-			node=node.parentNode;	//try the parent node
-		}
-		return node;	//return whatever node we found
-	},
-
-	/**Retrieves the ancestor element with the given style of the given node, starting at the node itself.
-	@param node The node the ancestor of which to find, or null if the search should not take place.
-	@param styleName The name of the style for which to check.
-	@param styleValue The name of the value for which to check.
-	@return The element with the given style value in which the node lies, or null if the node is not within such an element.
-	*/
-	getAncestorElementByStyle:function(node, styleName, styleValue)
-	{
-		while(node)	//while we haven't reached the top of the hierarchy
-		{
-			if(node.nodeType==Node.ELEMENT_NODE && node.style[styleName]==styleValue)	//if this is an element and it has the requested style
-			{
-				return node;	//this node has a matching style; we'll use it
-			}
-			node=node.parentNode;	//try the parent node
-		}
-		return node;	//return whatever node we found
-	},
-	
-	/**Retrieves the descendant element with the given name and attributes, starting at the node itself.
-	@param node The node the descendant of which to find, or null if the search should not take place.
-	@param elementName The name of the element to find.
-	@param parameters An associative array of name/value pairs, each representing an attribute name and value that should be present (or, if the parameter value is null, an attribute that must not be present), or null if no parameter matches are requested.
-	@return The element with the given name, or null if there is no such element descendant.
-	*/
-	getDescendantElementByName:function(node, elementName, parameters)
-	{
-		if(node)	//if we have a node
-		{
-			if(node.nodeType==Node.ELEMENT_NODE && node.nodeName.toLowerCase()==elementName)	//if this is an element with the given name
-			{
-				var parametersMatch=true;	//start out assuming that the parameters match		
-				if(parameters!=null)	//if parameters were provided
-				{
-					for(var parameterName in parameters)	//for each parameter
-					{
-						if(node.getAttribute(parameterName)!=parameters[parameterName])	//if this attribute doesn't exist or doesn't have the correct value
-						{
-							parametersMatch=false;	//indicate that the parameters do not match
-							break;	//stop searching for a non-match
-						}
-					}
-				}
-				if(parametersMatch)	//if all the parameters match
-				{
-					return node;	//show that we found a matching element name and attribute(s)
-				}
-			}
-			var childNodeList=node.childNodes;	//get all the child nodes
-			var childNodeCount=childNodeList.length;	//find out how many children there are
-			for(var i=0; i<childNodeCount; ++i)	//for each child node
-			{
-				var childNode=childNodeList[i];	//get this child node
-				var match=this.getDescendantElementByName(childNode, elementName, parameters);	//see if we can find the node in this branch
-				if(match)	//if we found a match
-				{
-					return match;	//return it
-				}
-			}
-		}
-		return null;	//show that we didn't find a matching element
-	},
-	
-	/**Retrieves the descendant element with the given class of the given node, starting at the node itself. Multiple class names are supported.
-	@param node The node the descendant of which to find, or null if the search should not take place.
-	@param className The name of the class for which to check, or a regular expression if a match should be found.
-	@return The element with the given class for which the given node is a parent or itself, or null if there is no such element descendant.
-	*/
-	getDescendantElementByClassName:function(node, className)
-	{
-		if(node)	//if we have a node
-		{
-			if(node.nodeType==Node.ELEMENT_NODE && this.hasClassName(node, className))	//if this is an element with the given class name
-			{
-				return node;	//show that we found a matching element class name
-			}
-			var childNodeList=node.childNodes;	//get all the child nodes
-			var childNodeCount=childNodeList.length;	//find out how many children there are
-			for(var i=0; i<childNodeCount; ++i)	//for each child node
-			{
-				var childNode=childNodeList[i];	//get this child node
-				var match=this.getDescendantElementByClassName(childNode, className);	//see if we can find the node in this branch
-				if(match)	//if we found a match
-				{
-					return match;	//return it
-				}
-			}
-		}
-		return null;	//show that we didn't find a matching element
-	},
-
-	/**Retrieves the computed style of a given node.
-	@param node The node to check.
-	@param property The name of the style to return.
-	@return The style value for the given property, or null if there is no such style defined.
-	@see http://www.quirksmode.org/dom/getstyles.html
-	@see http://ajaxian.com/archives/javascript-tip-watch-out-for
-	@see http://squidfingers.com/code/snippets/?id=getcssprop
-	@see http://developer.mozilla.org/en/docs/Gecko_DOM_Reference:Examples#Example_6:_getComputedStyle
-	*/
-	getComputedStyle:function(node, property)	//TODO later convert to checking the browser once before-hand when the function is first defined to speed things up 
-	{
-		var explicitStyle=node.style[property];	//get the explicit property, if any
-		if(explicitStyle)	//if there is a style explicitly set
-		{
-			return explicitStyle;	//return the explicit style
-		}
-		var currentStyle=node.currentStyle;	//see if there is a current style defined (IE)
-		if(currentStyle)	//if there is a current style
-		{
-			currentStyle[property];	//return the current style
-		}
-		var defaultView=document.defaultView;	//see if there is a document defaultView (Mozilla, Safari 1.3+
-		if(defaultView)	//if there is a defaultView
-		{
-			var computedStyleFunction=defaultView.getComputedStyle;	//get the computed style, if any
-			if(computedStyleFunction)	//if there is a computed style
-			{
-/*TODO del or use from http://ajaxian.com/archives/javascript-tip-watch-out-for
-				prop = prop.replace(/([A-Z])/g, \"-$1\");
-				prop = prop.toLowerCase();
-		return document.defaultView.getComputedStyle(element,\"\").getPropertyValue(prop);
-*/
-				return computedStyleFunction(node, null).getPropertyValue(property);	//get the computed style's property value
-			}
-		}
-		return null;	//indicate that we were unable to find a computed style
-	},
-
-	/**Determines whether the given node has the indicated ancestor, including the node itself in the search.
-	@param node The node the ancestor of which to find, or null if the search should not take place.
-	@param ancestor The ancestor to find.
-	@return true if the node or one of its ancestors is the given ancestor.
-	*/
-	hasAncestor:function(node, ancestor)
-	{
-		while(node)	//while we haven't ran out of nodes
-		{
-			if(node==ancestor)	//if this node is the ancestor
-			{
-				return true;	//show that there was such an ancestor
-			}
-			node=node.parentNode;	//go up one level
-		}
-		return false;	//indicate that we didn't find the given ancestor
-	},
-	
-	/**Determines whether the given element has the given class. Multiple class names are supported.
-	@param element The element that should be checked for class.
-	@param className The name of the class for which to check, or a regular expression if a match should be found.
-	@return true if one of the element's class names equals the given class name.
-	*/
-	hasClassName:function(element, className)
-	{
-		return this.getClassName(element, className)!=null;	//see if we can find a matching class name
-	},
-	
-	/**Returns the given element has the given class. Multiple class names are supported.
-	@param element The element that should be checked for class.
-	@param className The name of the class for which to check, or a regular expression if a match should be found.
-	@return The given class name, which will be the regular expression match if a regular expression is used, or null if there is no matching class name.
-	*/
-	getClassName:function(element, className)
-	{
-		var classNamesString=element.className;	//get the element's class names
-		var classNames=classNamesString ? classNamesString.split(/\s/) : EMPTY_ARRAY;	//split out the class names
-		var index=className instanceof RegExp ? classNames.indexOfMatch(className) : classNames.indexOf(className);	//get the index of the matching class name
-		return index>=0 ? classNames[index] : null;	//return the matching class name, if there is one
-	},
-	
-	/**Adds the given class name to the element's style class.
-	@param element The element that should be given a class.
-	@param className The name of the class to add.
-	*/
-	addClassName:function(element, className)
-	{
-		var classNamesString=element.className;	//get the element's class names
-		element.className=classNamesString ? classNamesString+" "+className : className;	//append the class name if there is a class name already
-	},
-	
-	/**Removes the given class name from the element's style class.
-	@param element The element that should have a class removed.
-	@param className The name of the class to remove.
-	*/
-	removeClassName:function(element, className)
-	{
-		var classNamesString=element.className;	//get the element's class names
-		var classNames=classNamesString ? classNamesString.split(/\s/) : EMPTY_ARRAY;	//split out the class names
-		for(var i=classNames.length-1; i>=0; --i)	//for each index (starting from the end so that we can remove indices at will)
-		{
-			if(classNames[i]==className)	//if this is a class name to remove
-			{
-				classNames.remove(i);	//remove this index
-			}
-		}
-		element.className=classNames.join(" ");	//join the remaining class names back together and assign them back to the element's class name
-	},
-
-	/**Retrieves the immediate text nodes of the given node as a string.
-	@param node The node from which to retrieve text.
-	@return The text of the given node.
-	*/ 
-	getNodeText:function(node)
-	{
-		var childNodeList=node.childNodes;	//get all the child nodes of the node
-		var childNodeCount=childNodeList.length;	//find out how many children there are
-		if(childNodeCount>0)	//if there are child nodes
-		{
-			var stringBuilder=new StringBuilder();	//create a new string builder to construct the string
-			for(var i=0; i<childNodeCount; ++i)	//for each child node
-			{
-				var childNode=childNodeList[i];	//get this child node
-				if(childNode.nodeType==Node.TEXT_NODE)	//if this is a text node
-				{
-					stringBuilder.append(childNode.nodeValue);	//append this value			
-				}
-			}
-			return stringBuilder.toString();	//return the string we constructed
-		}
-		else	//if there are no child nodes
-		{
-			return "";	//return an empty string
-		}
-	},
-
-	/**Creates a string representation of the given node.
-	@param node The node to serialize.
-	@return A string representation of the given node.
-	*/
-	getNodeString:function(node)
-	{
-		return this.appendNodeString(new StringBuilder(), node).toString();	//serialize the node and return its string representation
-	},
-
-	/**Appends a string representation of the given node.
-	@param stringBuilder The string builder to which a text representation of the node should be appended.
-	@param node The node to serialize.
-	@return A reference to the string builder.
-	*/
-	appendNodeString:function(stringBuilder, node)
-	{
-		switch(node.nodeType)	//see which type of node this is
-		{
-			case Node.ELEMENT_NODE:	//element
-				var nodeName=node.nodeName.toLowerCase();	//get the name of the node
-				stringBuilder.append("<").append(nodeName);	//<nodeName
-				var attributes=node.attributes;	//get the element's attributes
-				var attributeCount=attributes.length;	//find out how many attributes there are
-				for(var i=0; i<attributeCount; ++i)	//for each attribute
-				{
-					var attribute=attributes[i];	//get this attribute
-					var attributeValue=attribute.nodeValue;	//get the attribute value
-					if(attributeValue!=null)	//if this attribute value is not null (IE6 can return null attribute values for HTML DOM attributes)
-					{
-						this.appendXMLAttribute(stringBuilder, attribute.nodeName, attributeValue);	//append this attribute
-					}
-				}
-				if(node.childNodes.length>0 || this.NON_EMPTY_ELEMENT_SET[nodeName])	//if there are children, or the element cannot be serialized as an empty element (IE6, for instance, which will drop "div" and "span" from the DOM if they are empty)
-				{				
-					stringBuilder.append(">");	//>
-					this.appendNodeContentString(stringBuilder, node);	//append this node's content
-					this.appendXMLEndTag(stringBuilder, nodeName);	//append the end tag
-				}
-				else	//if there are no children, create an empty element (otherwise, for elements like <input></input>, IE6 will see two elements)
-				{
-					stringBuilder.append("/>");	///>
-				}
-				break;
-			case Node.COMMENT_NODE:	//comment
-				stringBuilder.append("<!--").append(node.nodeValue).append("-->");	//append the node's value with no changes TODO encode the sequence "--"
-				break;
-			case Node.TEXT_NODE:	//text
-				this.appendXMLText(stringBuilder, node.nodeValue);	//append the node's text value
-				break;
-			//TODO add checks for other elements, such as CDATA
-		}
-		return stringBuilder;	//return the string builder
-	},
-
-	/**Appends a string representation of the given node's content.
-	@param stringBuilder The string builder to which a text representation of the node content should be appended.
-	@param node The node the content of which to serialize.
-	@return A reference to the string builder.
-	*/
-	appendNodeContentString:function(stringBuilder, node)
-	{
-		var childNodes=node.childNodes;	//get a list of child nodes
-		var childNodeCount=childNodes.length;	//find out how many child nodes there are
-		for(var i=0; i<childNodeCount; ++i)	//for all of the child nodes
-		{
-			var childNode=childNodes[i];	//get a reference to this child node
-			this.appendNodeString(stringBuilder, childNode);	//append this child node
-		}
-		return stringBuilder;	//return the string builder
-	},
-
-	/**Encodes a string so that it may be used in XML by escaping XML-specific characters.
-	@param string The string to encode.
-	@return The XML-encoded string.
-	*/
-	encodeXML:function(string)
-	{
-		string=string.replace(/&/g, "&amp;");	//encode '&' first
-		string=string.replace(/</g, "&lt;");	//encode '<'
-		string=string.replace(/>/g, "&gt;");	//encode '>'
-		string=string.replace(/\"/g, "&quot;");	//encode '\"'
-		return string;	//return the encoded string
-	},
-
-	/**Encodes and appends XML text to the given string builder.
-	@param stringBuilder The string builder to hold the data.
-	@param text The text to encode and append.
-	@return A reference to the string builder.
-	*/ 
-	appendXMLText:function(stringBuilder, text)
-	{
-		return stringBuilder.append(this.encodeXML(text));	//encode and append the text, and return the string builder
-	},
-
-	/**Appends an XML start tag with the given name to the given string builder.
-	If the value of a parameter is null, that parameter will not be used.
-	If the value of a parameter is not a string, it will be converted to one.
-	@param stringBuilder The string builder to hold the data.
-	@param tagName The name of the XML tag.
-	@param attributes An associative array of name/value pairs representing attribute names and values, or null if no attributes are provided.
-	@return A reference to the string builder.
-	*/ 
-	appendXMLStartTag:function(stringBuilder, tagName, attributes)
-	{
-		stringBuilder.append("<").append(tagName);	//<tagName
-		if(attributes!=null)	//if attributes are provided
-		{
-			for(var attributeName in attributes)	//for each attribute
-			{
-				var attributeValue=attributes[attributeName];	//get this attribute value
-				if(attributeValue!=null)	//if an attribute value was given
-				{
-					this.appendXMLAttribute(stringBuilder, attributeName, attributeValue);	//append the attribute
-				}
-			}
-		}
-		return stringBuilder.append(">");	//>
-	},
-
-	/**Appends an XML attribute with the given name and value to the given string builder.
-	If the value of an attribute is not a string, it will be converted to one.
-	The attribute-value combination will be preceded by a space.
-	@param stringBuilder The string builder to hold the data.
-	@param attributeName The name of the XML attribute.
-	@param attributeValue The value of the XML attribute, which cannot be null.
-	@return A reference to the string builder.
-	*/ 
-	appendXMLAttribute:function(stringBuilder, attributeName, attributeValue)
-	{
-		stringBuilder.append(" ").append(attributeName).append("=\"").append(this.encodeXML(attributeValue.toString())).append("\"");	//name="value"
-		return stringBuilder;	//return the string builder
-	},
-
-	/**Appends an XML end tag with the given name to the given string builder.
-	@param stringBuilder The string builder to hold the data.
-	@param tagName The name of the XML tag.
-	@return A reference to the string builder.
-	*/
-	appendXMLEndTag:function(stringBuilder, tagName)
-	{
-		return stringBuilder.append("</").append(tagName).append(">");	//append the start tag
-	},
-
-	/**Appends an XML element containing text.
-	@param stringBuilder The string builder to hold the data.
-	@param tagName The name of the XML tag.
-	@param text The text to store in the element.
-	@return A reference to the string builder.
-	*/
-	appendXMLTextElement:function(stringBuilder, tagName, text)
-	{
-		this.appendXMLStartTag(stringBuilder, tagName);	//append the start tag
-		this.appendXMLText(stringBuilder, text);	//append the text
-		return this.appendXMLEndTag(stringBuilder, tagName);	//append the end tag
-	},
-
-	/**Determines whether the given element has the given class, using DOM methods. Multiple class names are supported.
-	@param element The element that should be checked for class.
-	@param className The name of the class for which to check, or a regular expression if a match should be found.
-	@return true if one of the element's class names equals the given class name.
-	*/
-	hasClass:function(element, className)
-	{
-		var classNamesString=element.getAttribute("class");	//get the element's class names
-		var classNames=classNamesString ? classNamesString.split(/\s/) : EMPTY_ARRAY;	//split out the class names
-		return className instanceof RegExp ? classNames.containsMatch(className) : classNames.contains(className);	//return whether this class name is one of the class names
-	},
-
-	/**Map of DOM attribute names keyed to HTML attribute names.
-	For example, the key "readOnly" yields "readonly".
-	Attribute names that do not change are not included in the map.
-	*/
-	DOM_ATTRIBUTE_NAME_MAP:
-	{
-		"className": "class",
-		"maxLength": "maxlength", //see http://www.quirksmode.org/bugreports/archives/2005/02/IE_setAttributemaxlength_5_on_input.html
-		"readOnly": "readonly"
-	},
-
-	/**Map of HTML attribute names keyed to DOM attribute names.
-	For example, the key "class" yields "className".
-	Attribute names that do not change are not included in the map. 
-	*/
-	HTML_ATTRIBUTE_NAME_MAP:
-	{
-		"class": "className",
-		"maxlength": "maxLength", //see http://www.quirksmode.org/bugreports/archives/2005/02/IE_setAttributemaxlength_5_on_input.html
-		"readonly": "readOnly"
-	},
-
-	/**Map of CSS attribute names keyed to CSS style names.
-	For example, the key "background-color" yields "backgroundColor".
-	Style names that do not change are not included in the map.
-	*/
-	CSS_ATTRIBUTE_NAME_MAP:
-	{
-		"background-color": "backgroundColor"
-	},
-
-	/**The set of names of elements that cannot be serialized as empty elements.*/
-	NON_EMPTY_ELEMENT_SET:
-	{
-		"div": true,
-		"span": true,
-		"label": true
-	}
-	
-};
-
-//add correct support for namespace-aware DOM methods
-//Safari 1.3.2 requires namespaced attribute access in XMLHTTPRequest XML responses but requires non-namespaced attribute access in the HTML DOM.
-if(document.documentElement.getAttributeNS)	//if this DOM supports element.getAttributeNS()
-{
-
-	/**Retrieves a namespaced attribute value from an element using the DOM element.getAttributeNS() method.
-	This method correctly returns the empty string ("") as specified by the DOM, regardless of whether the underlying implementation returns "" or null.
-	@param element The element the attribute value of which to retrieve.
-	@param namespaceURI The string designating the namespace of the attribute, or null for no namespace.
-	@param localName The local name of the attribute.
-	@return The value of the namespaced attribute, or "" if the attribute is not defined.
-	*/
-	DOMUtilities.getAttributeNS=function(element, namespaceURI, localName)
-	{
-		var value=element.getAttributeNS(namespaceURI, localName);	//get the attribute value
-		return value ? value : "";	//return "" instead of null
-	};
-}
-else	//if this DOM doesn't support element.getAttributeNS()
-{
-
-	/**Retrieves a namespaced attribute value from an element using the DOM element.getAttribute() method.
-	This method correctly returns the empty string ("") as specified by the DOM, regardless of whether the underlying implementation returns "" or null.
-	This implementation looks up the prefix from the given namespace; therefore only namespaces recognized by Guise are valid.
-	This version assumes that any non-null namespace is that designated by GUISE_ML_NAMESPACE_URI, for which the prefix "guise" will be used.
-	@param element The element the attribute value of which to retrieve.
-	@param namespaceURI The string designating the namespace of the attribute, or null for no namespace.
-	@param localName The local name of the attribute.
-	@return The value of the namespaced attribute, or "" if the attribute is not defined.
-	*/
-	DOMUtilities.getAttributeNS=function(element, namespaceURI, localName)
-	{
-		var value=element.getAttribute(namespaceURI!=null ? "guise:"+localName : localName);	//get the attribute value using the correct prefix TODO use a constant
-		return value ? value : "";	//return "" instead of null
-	};
-
-}
-
-if(document.documentElement.removeAttributeNS)	//if this DOM supports element.removeAttributeNS (such as Safari)
-{
-
-	/**Removes a namespaced attribute from an element using the DOM element.removeAttributeNS() method.
-	@param element The element the attribute of which to remove.
-	@param namespaceURI The string designating the namespace of the attribute, or null for no namespace.
-	@param localName The local name of the attribute.
-	*/
-	DOMUtilities.removeAttributeNS=function(element, namespaceURI, localName)
-	{
-		element.removeAttributeNS(namespaceURI, localName);	//remove the attribute
-	};
-}
-else	//if this DOM doesn't support element.removeAttributeNS()
-{
-
-	/**Removes a namespaced attribute from an element using the DOM element.removeAttribute() method.
-	This implementation looks up the prefix from the given namespace; therefore only namespaces recognized by Guise are valid.
-	This version assumes that any non-null namespace is that designated by GUISE_ML_NAMESPACE_URI, for which the prefix "guise" will be used.
-	@param element The element the attribute of which to remove.
-	@param namespaceURI The string designating the namespace of the attribute, or null for no namespace.
-	@param localName The local name of the attribute.
-	*/
-	DOMUtilities.removeAttributeNS=function(element, namespaceURI, localName)
-	{
-		element.removeAttribute(namespaceURI!=null ? "guise:"+localName : localName);	//remove the attribute using the correct prefix TODO use a constant
-	};
-
-}
-
-if(document.documentElement.setAttributeNS)	//if this DOM supports element.setAttributeNS()
-{
-
-	/**Sets a namespaced attribute of an element using the DOM element.setAttributeNS() method.
-	@param element The element the attribute of which to set.
-	@param namespaceURI The string designating the namespace of the attribute, or null for no namespace.
-	@param qualifiedName The qualifiedName of the attribute.
-	@param value The new value of the attribute.
-	*/
-	DOMUtilities.setAttributeNS=function(element, namespaceURI, qualifiedName, value)
-	{
-		element.setAttributeNS(namespaceURI, qualifiedName, value);	//set the attribute value
-	};
-}
-else	//if this DOM doesn't support element.setAttributeNS()
-{
-
-	/**Removes a namespaced attribute from an element using the DOM element.removetAttribute() method.
-	@param element The element the attribute of which to set.
-	@param namespaceURI The string designating the namespace of the attribute, or null for no namespace.
-	@param qualifiedName The qualifiedName of the attribute.
-	*/
-	DOMUtilities.setAttributeNS=function(element, namespaceURI, qualifiedName, value)
-	{
-		element.setAttribute(qualifiedName, value);	//set the attribute value without using a namespace
-	};
-
-}
 
 //Initialization AJAX Event
 
@@ -2071,189 +390,6 @@ function AJAXResponse(document, size)
 {
 	this.document=document;
 	this.size=size
-}
-
-//HTTP Communicator
-
-/**A class encapsulating HTTP communication functionality.
-This class creates a shared HTTPCommunicator.prototype.xmlHTTP variable, necessary for the onreadystate() callback function.
-function processHTTPResponse(): A reference to a function to call for asynchronous HTTP requests, or null if HTTP communication should be synchronous.
-*/
-function HTTPCommunicator()
-{
-	/**The reference to the current XMLHTTP request object, or null if no communication is occurring.*/
-	this.xmlHTTP=null;
-
-	/**The configured method for processing an HTTP response.*/
-	this.processHTTPResponse=null;
-
-	if(!HTTPCommunicator.prototype._initialized)
-	{
-		HTTPCommunicator.prototype._initialized=true;
-
-		/**@return true if the commmunicator is in the process of communicating.*/
-		HTTPCommunicator.prototype.isCommunicating=function() {return this.xmlHTTP!=null;};
-	
-		/**The enumeration of ready states for asynchronous XMLHTTP requests.*/
-		HTTPCommunicator.prototype.READY_STATE={UNINITIALIZED: 0, LOADING: 1, LOADED: 2, INTERACTIVE: 3, COMPLETED: 4};
-		
-		/**The versions of the Microsoft XML HTTP ActiveX objects, in increasing order of preference.
-		@see http://support.microsoft.com/?kbid=269238
-		*/
-		HTTPCommunicator.prototype.MSXMLHTTP_VERSIONS=["Microsoft.XMLHTTP", "MSXML2.XMLHTTP", "MSXML2.XMLHTTP.3.0", "MSXML2.XMLHTTP.4.0", "MSXML2.XMLHTTP.5.0", "MSXML2.XMLHTTP.6.0", "MSXML2.XMLHTTP.7.0"];
-		
-		/**Sets the callback method to use for processing an HTTP response.
-		When the provided method is called, the this variable will be set to this HTTP communicator.
-		@param fn The function to call when processing HTTP responses, or null if requests should be synchronous.
-		*/
-		HTTPCommunicator.prototype.setProcessHTTPResponse=function(fn)
-		{
-			this.processHTTPResponse=fn;	//save the function for processing HTTP responses
-		};
-
-		if(window.XMLHttpRequest)	//if we can create an XML HTTP request (e.g. Mozilla)
-		{		
-			/**@return A newly created XML HTTP request object.*/
-			HTTPCommunicator.prototype._createXMLHTTP=function()
-			{
-				return new XMLHttpRequest();	//create a new XML HTTP request object
-			};
-		}
-		else if(window.ActiveXObject)	//if we can create ActiveX objects
-		{
-			var msXMLHTTPVersion;	//we'll determine the correct version of the ActiveX to use
-			for(var i=this.MSXMLHTTP_VERSIONS.length-1; i>=0; --i)	//for each available version
-			{
-				try
-				{
-					msXMLHTTPVersion=this.MSXMLHTTP_VERSIONS[i];	//get this version
-					new ActiveXObject(msXMLHTTPVersion);	//try to create a new ActiveX object
-					break;	//if we could create this ActiveX object, use it
-				}
-				catch(exception)	//ignore the errors
-				{
-				}
-			}
-			/**@return A newly created XML HTTP request object.*/
-			HTTPCommunicator.prototype._createXMLHTTP=function()
-			{
-				return new ActiveXObject(msXMLHTTPVersion);	//create a new ActiveX object, using closure to return the version determined to work
-			};
-		}
-		else	//if we can't create an XML HTTP request or an ActiveX object
-		{
-			throw new Error("XMLHTTP not available.");
-		};
-
-		/**Performs an HTTP GET request.
-		@param uri The request URI.
-		@param query Query information for the URI of the GET request, or null if there is no query.
-		*/
-		HTTPCommunicator.prototype.get=function(uri, query)
-		{
-			return this._performRequest("GET", uri, query);	//perform a GET request
-		};
-		
-		/**Performs an HTTP POST request.
-		@param uri The request URI.
-		@param query Query information for the body of the POST request, or null if there is no query.
-		@param contentType The content type of the request, or null if no content type should be specified.
-		*/
-		HTTPCommunicator.prototype.post=function(uri, query, contentType)
-		{
-			return this._performRequest("POST", uri, query, contentType);	//perform a POST request
-		};
-	
-		/**Performs an HTTP request and returns the result.
-		@param The HTTP request method.
-		@param uri The request URI.
-		@param query Query information for the request, or null if there is no query.
-		@return The text of the response or, if the response provides an XML DOM tree, the XML document object; or null if the request is asynchronous.
-		@throws Exception if an error occurs performing the request.
-		@throws Number if the HTTP response code was not 200 (OK).
-		*/
-		HTTPCommunicator.prototype._performRequest=function(method, uri, query, contentType)
-		{
-				//TODO assert this.xmlHTTP does not exist
-			this.xmlHTTP=this._createXMLHTTP();	//create an XML HTTP object
-			var xmlHTTP=this.xmlHTTP;	//make a local copy of the XML HTTP request object
-			if(method=="GET" && query)	//if there is a query for the GET method
-			{
-				uri=uri+"?"+query;	//add the query to the URI
-			}
-			var asynchronous=Boolean(this.processHTTPResponse);	//see if we should make an asynchronous request
-			if(asynchronous)	//if we're making asynchronous requests
-			{
-				xmlHTTP.onreadystatechange=this._createOnReadyStateChangeCallback();	//create and assign a callback function for processing the response
-			}
-			xmlHTTP.open(method, uri, asynchronous);
-			var content=null;	//we'll create content if we need to
-			if(method=="POST")	//if this is the POST method
-			{
-//TODO del alert("posting with query: "+query);
-	//TODO del alert("posting with query: "+query);
-//TODO del				this.xmlHTTP.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");	//set the post content type
-				if(contentType)	//if a content type was given
-				{
-					xmlHTTP.setRequestHeader("Content-Type", contentType);	//set the post content type
-				}
-				if(query)	//if there is a post query
-				{
-//TODO del xmlHTTP.setRequestHeader("x-content", query);	//TODO del; debugging
-					content=query;	//use the query as the content
-				}	
-			}
-			try
-			{
-				xmlHTTP.send(content);	//send the request
-			}
-			catch(e)
-			{
-//TODO fix---why does this occur?				alert("error loading content: "+e);
-			
-			}
-			if(!asynchronous)	//if we're communicating synchronously
-			{
-				this._reportResponse();	//report the response immediately TODO maybe put this into an asynchrous call using setTimeout()
-				return xmlHTTP;	//TODO testing synchronous
-			}
-		};
-	
-		/**Creates a method for processing XML HTTP on ready state changes.
-		This method uses JavaScript closure to capture a reference to this class so that it will be present during later callback.
-		*/
-		HTTPCommunicator.prototype._createOnReadyStateChangeCallback=function()
-		{
-			var thisHTTPCommunicator=this;	//save this
-			/**A new function that captures this in the form of the thisHTTPCommunicator variable.
-			var thisHTTPCommunicator The captured reference to the HTTPCommunicator instance.
-			*/
-			return function()
-			{
-				if(thisHTTPCommunicator.xmlHTTP && thisHTTPCommunicator.xmlHTTP.readyState==thisHTTPCommunicator.READY_STATE.COMPLETED)	//if a transfer is completed
-				{
-					thisHTTPCommunicator._reportResponse();	//report the response
-				}
-			};
-		};
-	
-		/**Reports the response from the XML HTTP request object by calling the processHTTPResponse() callback method.
-		The reference to the XML HTTP request object is removed.
-		@see #processHTTPResponse()
-		*/
-		HTTPCommunicator.prototype._reportResponse=function()
-		{
-			if(this.xmlHTTP)	//if we have an XML HTTP request object
-			{
-				var xmlHTTP=this.xmlHTTP;	//make a local copy of the XML HTTP request object
-				this.xmlHTTP=null;	//remove the XML HTTP request object (Firefox only allows one asynchronous communication per object)
-				if(this.processHTTPResponse)	//if we have a method for processing responses
-				{
-					this.processHTTPResponse(xmlHTTP);	//process the response
-				}
-			}
-		};
-	}
 }
 
 //GuiseAJAX
@@ -2731,75 +867,58 @@ function GuiseAJAX()
 			return stringBuilder;	//return the string builder
 		};
 	
-		/**Creates a method for processing HTTP communication.
-		This method uses JavaScript closure to capture a reference to this class so that it will be present during later callback.
+		/**The callback method for processing HTTP communication.
+		@param xmlHTTP The XML HTTP object.
 		*/
-		GuiseAJAX.prototype._createHTTPResponseCallback=function()
+		GuiseAJAX.prototype._processHTTPResponse=function(xmlHTTP)
 		{
-			var thisGuiseAJAX=this;	//save this
-			/**A new function that captures this in the form of the thisGuiseAJAX variable.
-			@param xmlHTTP The XML HTTP object.
-			var this The HTTP communicator that calls this function.
-			var thisGuiseAJAX The captured reference to the GuiseAJAX instance.
-			*/ 
-			return function(xmlHTTP)
+			try
 			{
+				var status=0;
 				try
 				{
-		//TODO del alert("processing asynch result");
-/*TODO del
-alert("we returned, at least");
-	alert("ready state: "+xmlHTTP.readyState);
-	alert("got status: "+xmlHTTP.status);
-	alert("response text: "+xmlHTTP.responseText);
-	alert("response XML: "+xmlHTTP.responseXML);
-*/
-					var status=0;
-					try
-					{
-						status=xmlHTTP.status;	//get the status
-					}
-					catch(e)	//if there is a problem getting the status, don't do anything; on Firefox, either the server went down (this would also happen if the form were to be submitted right before an AJAX request occurs or if an AJAX request were to be made during key event processing)
-					{
-						thisGuiseAJAX.setEnabled(false);	//stop further AJAX communication
-						return;	//don't do further processing; the page is probably reloading, anyway
-					}
-					if(status==200)	//if everything went OK
-					{
-//TODO del if not needed						if(guiseAJAX.isEnabled())	//if AJAX is enabled (if a user browsers to a page in Mozilla and the old page sent a request, GUISE_AJAX_ENABLED will be undefined by now; check it so that Mozilla won't throw an exception accessing AJAXResponse, which doesn't exist either)
-						if((typeof AJAXResponse)!="undefined"	//if the page scope hasn't disappeared (if a user browsers to a page in Mozilla and the old page sent a request, AJAXResponse will be undefined here)
-							&& xmlHTTP.responseText && xmlHTTP.responseXML && xmlHTTP.responseXML.documentElement)	//if we have XML (if there is no content or there is an error, IE sends back a document has a null xmlHTTP.responseXML.documentElement)
-						{
-							thisGuiseAJAX.ajaxResponses.enqueue(new AJAXResponse(xmlHTTP.responseXML, xmlHTTP.responseText.length));	//enqueue the response
-							thisGuiseAJAX.processAJAXResponses();	//process enqueued AJAX responses
-	//TODO del						setTimeout("GuiseAJAX.prototype.processAJAXResponses();", 1);	//process the AJAX responses later		
-	//TODO del						thisGuiseAJAX.processAJAXRequests();	//make sure there are no waiting AJAX requests
-						}
-					}
-/*TODO del; XMLHTTPRequest automatically follows redirects
-					else if(status>=300 && status<400)	//if this is a redirect
-					{
-						var location=xmlHTTP.getResponseHeader("Location");	//get the Location header
-						if(location)
-						{
-							alert("redirect to: "+location);
-						}
-					}
-*/
-					else	//if there was an HTTP error TODO check for redirects
-					{
-				//TODO fix		throw xmlHTTP.status;	//throw the status code
-					}
+					status=xmlHTTP.status;	//get the status
 				}
-				catch(exception)	//if a problem occurred
+				catch(e)	//if there is a problem getting the status, don't do anything; on Firefox, either the server went down (this would also happen if the form were to be submitted right before an AJAX request occurs or if an AJAX request were to be made during key event processing)
 				{
-					//TODO log a warning
-alert(exception);
-alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(thisGuiseAJAX.isEnabled()));
-					thisGuiseAJAX.setEnabled(false);	//stop further AJAX communication
-					throw exception;	//TODO testing
+					this.setEnabled(false);	//stop further AJAX communication
+					return;	//don't do further processing; the page is probably reloading, anyway
 				}
-			};
+				if(status==200)	//if everything went OK
+				{
+//TODO del if not needed						if(guiseAJAX.isEnabled())	//if AJAX is enabled (if a user browsers to a page in Mozilla and the old page sent a request, GUISE_AJAX_ENABLED will be undefined by now; check it so that Mozilla won't throw an exception accessing AJAXResponse, which doesn't exist either)
+					if((typeof AJAXResponse)!="undefined"	//if the page scope hasn't disappeared (if a user browsers to a page in Mozilla and the old page sent a request, AJAXResponse will be undefined here)
+						&& xmlHTTP.responseText && xmlHTTP.responseXML && xmlHTTP.responseXML.documentElement)	//if we have XML (if there is no content or there is an error, IE sends back a document has a null xmlHTTP.responseXML.documentElement)
+					{
+						this.ajaxResponses.enqueue(new AJAXResponse(xmlHTTP.responseXML, xmlHTTP.responseText.length));	//enqueue the response
+						this.processAJAXResponses();	//process enqueued AJAX responses
+//TODO del						setTimeout("GuiseAJAX.prototype.processAJAXResponses();", 1);	//process the AJAX responses later		
+//TODO del						this.processAJAXRequests();	//make sure there are no waiting AJAX requests
+					}
+				}
+/*TODO del; XMLHTTPRequest automatically follows redirects
+				else if(status>=300 && status<400)	//if this is a redirect
+				{
+					var location=xmlHTTP.getResponseHeader("Location");	//get the Location header
+					if(location)
+					{
+						alert("redirect to: "+location);
+					}
+				}
+*/
+				else	//if there was an HTTP error TODO check for redirects
+				{
+			//TODO fix		throw xmlHTTP.status;	//throw the status code
+				}
+			}
+			catch(exception)	//if a problem occurred
+			{
+				//TODO log a warning
+alert(exception);
+alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
+				this.setEnabled(false);	//stop further AJAX communication
+				throw exception;	//TODO testing
+			}
 		};
 
 		/**Processes responses from AJAX requests.
@@ -2967,7 +1086,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(thisGuiseAJAX.isEnabled()
 							if(isUserAgentFirefox)	//if we're running Firefox and we just patched an element inside a Mozilla inline box, Firefox won't correctly update the flow so we'll have to do that manually TODO fix for Firefox 3
 							{
 									//TODO at some point we may need to check the patched descendants, too---this only works if the root of the patched tree or one of its ancestors was a Mozilla inline box
-								var mozInlineBoxAncestor=DOMUtilities.getAncestorElementByStyle(oldElement, "display", "-moz-inline-box");	//see if there is a Mozilla inline box element ancestor (including this element)
+								var mozInlineBoxAncestor=Node.getAncestorElementByStyle(oldElement, "display", "-moz-inline-box");	//see if there is a Mozilla inline box element ancestor (including this element)
 								if(mozInlineBoxAncestor)	//if there is a Mozilla inline box element, we'll have to do special reflowing after all patching is done
 								{
 									var mozInlineBoxAncestorParent=mozInlineBoxAncestor.parentNode;	//get the inline box parent so we can just replace all the children
@@ -3000,7 +1119,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(thisGuiseAJAX.isEnabled()
 					var mozInlineBoxParent=document.getElementById(mozInlineBoxParentID);	//get the Mozilla inline box parent element
 					if(mozInlineBoxParent)	//if we have a parent to a Mozilla inline box that was updated
 					{
-						DOMUtilities.refreshNode(mozInlineBoxParent);	//refresh the Mozilla inline box container by removing it from the tree and putting it back
+						Node.refresh(mozInlineBoxParent);	//refresh the Mozilla inline box container by removing it from the tree and putting it back
 					}
 				}
 			}
@@ -3099,20 +1218,17 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(thisGuiseAJAX.isEnabled()
 					}
 				}
 				var destination=RegExp.$1;	//get the destination
-				var form=getForm(element);	//get the form
-				if(form)	//if we found the form
+				var form=Node.getAncestorElementByName(element, "form");	//get the form ancestor
+				this.createUploadIFrame();	//create the upload IFrame
+				form.enctype="multipart/form-data";
+				if(isUserAgentIE)	//if we're in IE6/7
 				{
-					this.createUploadIFrame();	//create the upload IFrame
-					form.enctype="multipart/form-data";
-					if(isUserAgentIE)	//if we're in IE6/7
-					{
-						form.encoding="multipart/form-data";	//IE requires the "encoding" property to be used; see http://verens.com/archives/2005/07/06/ie-bugs-dynamically-creating-form-elements/					
-					}					
-					form.action=destination;	//indicate where the data should go
-					form.target="uploadIFrame";	//indicate that the output should be re-routed to our hidden IFrame
-					form.submit();	//submit the form
-					this.setPingInterval(GUISE_AJAX_UPLOAD_PING_INTERVAL);	//switch to pinging at the upload interval
-				}
+					form.encoding="multipart/form-data";	//IE requires the "encoding" property to be used; see http://verens.com/archives/2005/07/06/ie-bugs-dynamically-creating-form-elements/					
+				}					
+				form.action=destination;	//indicate where the data should go
+				form.target="uploadIFrame";	//indicate that the output should be re-routed to our hidden IFrame
+				form.submit();	//submit the form
+				this.setPingInterval(GUISE_AJAX_UPLOAD_PING_INTERVAL);	//switch to pinging at the upload interval
 			}
 			else if(/sendCompleted\(\)/.test(command))	//if the command is sendCompleted()
 			{
@@ -3202,7 +1318,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(thisGuiseAJAX.isEnabled()
 			}
 */
 
-			var newElementCommands=DOMUtilities.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "commands");	//get the new element's commands, if any TODO use a constant
+			var newElementCommands=Element.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "commands");	//get the new element's commands, if any TODO use a constant
 			if(newElementCommands)	//TODO fix; testing
 			{
 //TODO del				alert("commands: "+newElementCommands);
@@ -3210,7 +1326,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(thisGuiseAJAX.isEnabled()
 //TODO del if not needed				return;	//don't do further syncrhonization TODO later add options for full synchronization or not
 			}
 
-			var patchType=DOMUtilities.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "patchType");	//get the patch type TODO use a constant
+			var patchType=Element.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "patchType");	//get the patch type TODO use a constant
 			if(patchType=="none")	//if we should not do any patching
 			{
 				return;	//stop synchronization
@@ -3218,7 +1334,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(thisGuiseAJAX.isEnabled()
 
 				//get the content hash attributes before we update the attributes
 			var oldElementContentHash=oldElement.getAttribute("guise:contentHash");	//get the old element's content hash, if any TODO use a constant
-			var newElementContentHash=DOMUtilities.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "contentHash");	//get the new element's content hash, if any TODO use a constant
+			var newElementContentHash=Element.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "contentHash");	//get the new element's content hash, if any TODO use a constant
 /*TODO del
 			if(oldElementContentHash==newElementContentHash)	//TODO del; testing
 			{
@@ -3228,7 +1344,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(thisGuiseAJAX.isEnabled()
 */
 
 			var oldElementAttributeHash=oldElement.getAttribute("guise:attributeHash");	//get the old element's attribute hash, if any TODO use a constant
-			var newElementAttributeHash=DOMUtilities.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "attributeHash");	//get the new element's attribute hash, if any TODO use a constant
+			var newElementAttributeHash=Element.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "attributeHash");	//get the new element's attribute hash, if any TODO use a constant
 			var isAttributesChanged=oldElementAttributeHash!=newElementAttributeHash;	//see if the attributes have changed (this doesn't count for the content hash attribute, which we'll check separately)
 			if(isAttributesChanged)	//if the attribute hash values are different
 			{
@@ -3271,7 +1387,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(thisGuiseAJAX.isEnabled()
 					{
 						if(attributeName=="value")	//if this is the value attribute
 						{
-//TODO del when works							var patchType=DOMUtilities.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "patchType");	//get the patch type TODO use a constant
+//TODO del when works							var patchType=Element.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "patchType");	//get the patch type TODO use a constant
 							if(patchType=="novalue")	//if we should ignore the value attribute
 							{
 								continue;	//go to the next attribute
@@ -3637,7 +1753,7 @@ if(elementName=="select")
 		};
 	}
 
-	this.httpCommunicator.setProcessHTTPResponse(this._createHTTPResponseCallback());	//set up our callback function for processing HTTP responses
+	this.httpCommunicator.setProcessHTTPResponse(this._processHTTPResponse.bind(this));	//set up our callback function for processing HTTP responses
 
 }
 
@@ -3801,7 +1917,7 @@ com.guiseframework.js.Client=function()
 			initializeNode(frame, true);	//initialize the new imported frame, installing the correct event handlers; do this before the frame is positioned, because initialization also fixes IE6 classes, which can affect position
 			this._initializeFramePosition(frame);	//initialize the frame's position
 		
-			var openEffectClassName=DOMUtilities.getClassName(frame, STYLES.OPEN_EFFECT_REGEXP);	//get the open effect specified for this frame
+			var openEffectClassName=Element.getClassName(frame, STYLES.OPEN_EFFECT_REGEXP);	//get the open effect specified for this frame
 			var openEffect=null;	//we'll create an open effect if appropriate
 			if(openEffectClassName)	//if there is an open effect
 			{
@@ -3883,7 +1999,7 @@ com.guiseframework.js.Client=function()
 //TODO del; fix alert("initializing frame position, with width: "+frame.currentStyle.width);
 		
 			var frameX, frameY;	//we'll calculate the frame position
-			var relatedComponentInput=DOMUtilities.getDescendantElementByName(frame, "input", new Map("name", "relatedComponentID"));	//get the input holding the related component ID
+			var relatedComponentInput=Node.getDescendantElementByName(frame, "input", new Map("name", "relatedComponentID"));	//get the input holding the related component ID
 			var relatedComponent=relatedComponentInput ? document.getElementById(relatedComponentInput.value) : null;	//get the related component, if there is one
 			if(relatedComponent)	//if there is a related component
 			{
@@ -3892,7 +2008,7 @@ com.guiseframework.js.Client=function()
 		//TODO del debugString+="frameBounds: "+frameBounds.x+","+frameBounds.y+","+frameBounds.width+","+frameBounds.height+"\n";
 				var relatedComponentBounds=GUIUtilities.getElementBounds(relatedComponent);	//get the bounds of the related component
 		//TODO del debugString+="relatedComponentBounds: "+relatedComponentBounds.x+","+relatedComponentBounds.y+","+relatedComponentBounds.width+","+relatedComponentBounds.height+"\n";
-				var tether=DOMUtilities.getDescendantElementByClassName(frame, STYLES.FRAME_TETHER);	//get the frame tether, if there is one
+				var tether=Node.getDescendantElementByClassName(frame, STYLES.FRAME_TETHER);	//get the frame tether, if there is one
 				if(tether)	//if there is a frame tether
 				{
 					var positionTether=function()	//create a function to position relative to the tether
@@ -3942,7 +2058,7 @@ com.guiseframework.js.Client=function()
 								frame.style.left=frameX+"px";	//set the frame's horizontal position
 								frame.style.top=frameY+"px";	//set the frame's vertical position
 							};
-					var tetherIMG=DOMUtilities.getDescendantElementByName(tether, "img");	//see if the tether has an image TODO use a constant
+					var tetherIMG=Node.getDescendantElementByName(tether, "img");	//see if the tether has an image TODO use a constant
 					if(tetherIMG && (tetherIMG.offsetWidth<=0 || tetherIMG.offsetHeight<=0))	//if there is a tether image with an invalid width and/or height
 					{
 		//TODO del alert("tether image: "+tetherIMG.src+" not yet loaded; size "+tetherIMG.offsetWidth+","+tetherIMG.offsetHeight);
@@ -3999,11 +2115,11 @@ com.guiseframework.js.Client=function()
 			{
 				var frame=this.frames[i];	//get a reference to this frame
 				frame.style.zIndex=(i+1)*100;	//give the element the appropriate z-order
-				if(DOMUtilities.hasClassName(frame, "frameModal"))	//if this is a modal frame TODO use a constant
+				if(Element.hasClassName(frame, "frameModal"))	//if this is a modal frame TODO use a constant
 				{
 					this.modalFrame=frame;	//indicate our last modal frame
 				}
-				if(DOMUtilities.hasClassName(frame, "flyoverFrame"))	//if this is a flyover frame TODO use a constant
+				if(Element.hasClassName(frame, "flyoverFrame"))	//if this is a flyover frame TODO use a constant
 				{
 					this.flyoverFrame=frame;	//indicate our last flyover frame
 				}
@@ -4171,7 +2287,7 @@ com.guiseframework.js.Client=function()
 		com.guiseframework.js.Client.prototype.addDropTarget=function(element)
 		{
 			this._dropTargets.add(element);	//add this element to the list of drop targets
-			this._dropTargets.sort(function(element1, element2) {return DOMUtilities.getElementDepth(element1)-DOMUtilities.getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
+			this._dropTargets.sort(function(element1, element2) {return Node.getDepth(element1)-DOMUtilities.getDepth(element2);});	//sort the drop targets in increasing order of document depth
 		};
 
 		/**Determines the drop target at the given coordinates.
@@ -4209,565 +2325,8 @@ var guise=new com.guiseframework.js.Client();	//create a new global variable for
 /**The global object for AJAX communication with Guise.*/
 var guiseAJAX=new GuiseAJAX();
 
-/**A class maintaining event function information and optionally adapting an event to a W3C compliant version.
-<ul>
-	<li>charCode</li>
-</ul>
-A decorator will be created for the event function.
-@param currentTarget The object for which a listener should be added.
-@param eventType The type of event.
-@param fn The function to listen for the event.
-@param useCapture Whether event capture should be used.
-@param createDecorator Whether a decorator should be created to wrap the event function and ensure W3DC compliancy.
-var decorator The decorator created to wrap the event function and ensure W3C compliancy.
-*/
-function EventListener(currentTarget, eventType, fn, useCapture, createDecorator)
-{
-	this.currentTarget=currentTarget;
-	this.eventType=eventType;
-	this.fn=fn;
-	this.useCapture=useCapture;
-	if(!EventListener.prototype._initialized)
-	{
-		EventListener.prototype._initialized=true;
-
-		/**Creates an event function decorator to appropriately set up the event to be W3C compliant, including event.currentTarget support.
-		@param eventFunction The event function to be decorated.
-		@param currentTarget The node on which the event listener is to be registered.
-		*/
-		EventListener.prototype._createDecorator=function(eventFunction, currentTarget)
-		{
-			var eventListener=this;	//store the event listener so that it can be referenced later via closure
-			return function(event)	//create the decorator function
-			{
-				event=eventListener.getW3CEvent(event, currentTarget);	//make sure the event is a W3C-compliant event
-				eventFunction(event);	//call the event function with our new event information
-			}
-		};
-
-		/**Retrieves W3C event information in a cross-browser manner.
-		@param event The event information, or null if no event information is available (e.g. on IE).
-		@param currentTarget The current target (the node to which the event listener is bound), or null if the current target is not known.
-		@return A W3C-compliant event object.
-		*/
-		EventListener.prototype.getW3CEvent=function(event, currentTarget)
-		{
-		/*TODO del
-		alert("looking at event: "+event);
-		alert("looking at event target: "+event.target);
-		alert("looking at event src element: "+event.srcElement);
-		*/
-			if(!event)	//if no event was passed
-			{
-				if(window.event)	//if IE has provided an event object
-				{
-					event=window.event;	//switch to using the IE event
-				}
-				else	//if there is no IE event object
-				{
-					//TODO throw an assertion
-				}
-			}
-				//fix event.target
-			if(!event.target)	//if there is no target information
-			{
-				//TODO assert event.srcElement
-				event.target=event.srcElement;	//assign a W3C target property
-			}
-				//fix event.currentTarget
-			if(!event.currentTarget && currentTarget)	//if there is no current target information, but one was passed to us
-			{
-				event.currentTarget=currentTarget;	//assign a W3C current target property
-			}
-				//fix event.charCode
-			if(!event.charCode)	//if this event has no character code
-			{
-				event.charCode=event.which ? event.which : event.keyCode;	//use the NN4  key indication if available; otherwise, use the key code TODO make sure this is a key event, because NN4 uses event.which for mouse events, too			
-			}
-				//fix event.stopPropagation
-			if(!event.stopPropagation)	//if there is no method for stopping propagation TODO add workaround for Safari, which has this method but doesn't actually stop propagation
-			{
-				//TODO assert window.event && window.event.cancelBubble
-				if(window.event && typeof window.event.cancelBubble=="boolean")	//if there is a global event with a cancel bubble property (e.g. IE)
-				{
-					event.stopPropagation=function()	//create a new function to stop propagation
-							{
-								window.event.cancelBubble=true;	//stop bubbling the IE way
-							};
-				}
-			}
-				//fix event.preventDefault
-			if(!event.preventDefault)	//if there is no method for preventing the default functionality TODO add workaround for Safari, which has this method but doesn't actually prevent default functionality
-			{
-				//TODO assert window.event && window.event.returnValue
-		//TODO find out why IE returns "undefined" for window.event.returnValue, yet enumerates it in for:in		if(window.event && typeof window.event.returnValue=="boolean")	//if there is a global event with a return value property (e.g. IE)
-				if(window.event)	//if there is a global event with a return value property (e.g. IE)
-				{
-					event.preventDefault=function()	//create a new function to stop propagation
-							{
-								window.event.returnValue=false;	//prevent default functionality the IE way
-							};
-				}
-			}
-/*TODO this doesn't seem to be possible; IE doesn't let use change event.button
-			if(isUserAgentIE)	//if this is an IE browser, change the event button to match the W3C's definition; see http://www.quirksmode.org/dom/w3c_events.html
-			{
-				var button=event.button;	//get the button pressed
-				if(typeof button!="undefined")	//if there is a button variable
-				{
-					if(button&1)	//if this was the left button
-					{
-						event.button=MOUSE_BUTTON.LEFT;
-					}
-					else if(button&2)	//if this was the right button
-					{
-						event.button=MOUSE_BUTTON.RIGHT;
-					}
-					else if(button&4)	//if this was the middle button
-					{
-						event.button=MOUSE_BUTTON.MIDDLE;
-					}
-				}
-			}
-*/
-			//TODO update clientX and clientY as per _DHTML Utopia_ page 90.
-			switch(event.type)	//for special types of events
-			{
-				case "mouseover":
-					if(!event.relatedTarget && event.fromElement)	//if there is no related target information, but there is an IE fromElement property
-					{
-						event.relatedTarget=event.fromElement;	//use the fromElement property value
-					}
-					break;
-				case "mouseout":
-					if(!event.relatedTarget && event.toElement)	//if there is no related target information, but there is an IE toElement property
-					{
-						event.relatedTarget=event.toElement;	//use the toElement property value
-					}
-					break;
-			}
-			return event;	//return our event
-		};
-	}
-	this.decorator=createDecorator ? this._createDecorator(fn, currentTarget) : null;	//create the decorator function if we were asked to do so
-}
-
-
-/**A class that manages events.*/
-function EventManager()
-{
-	/**The array of event listeners.*/
-	this._eventListeners=new Array();
-
-	if(!EventManager.prototype._initialized)
-	{
-		EventManager.prototype._initialized=true;
-
-		/**Adds an event listener to an object.
-		@param object The object for which a listener should be added.
-		@param eventType The type of event.
-		@param fn The function to listen for the event.
-		@param useCapture Whether event capture should be used.
-		@see http://www.scottandrew.com/weblog/articles/cbs-events
-		*/
-		EventManager.prototype.addEvent=function(object, eventType, fn, useCapture)
-		{
-			var eventListener=null;	//we'll create an event listener and hold it here
-			var result=true;	//we'll store the result here
-			if(object.addEventListener)	//if the W3C DOM method is supported
-			{
-				object.addEventListener(eventType, fn, useCapture);	//add the event normally
-				eventListener=new EventListener(object, eventType, fn, useCapture, false);	//create an event listener to keep track of the information
-			}
-			else	//if the W3C version isn't available
-			{
-				var eventName="on"+eventType;	//create the event name
-				if(object.attachEvent)	//if we can use the IE version
-				{
-					eventListener=new EventListener(object, eventType, fn, useCapture, true);	//create an event listener with a decorator
-					result=object.attachEvent(eventName, eventListener.decorator);	//attach the function decorator
-				}
-				else	//if we can't use the IE version
-				{
-					eventListener=new EventListener(object, eventType, fn, useCapture, true);	//create an event listener with a decorator
-					object[eventName]=eventListener.decorator;	//use the object.onEvent property and our decorator
-				}
-			}
-			this._eventListeners.add(eventListener);	//add this listener to the list
-			return result;	//return the result
-		};
-
-		/**Removes an event listener from an object.
-		@param object The object for which a listener should be removed.
-		@param eventType The type of event.
-		@param fn The function listening for the event.
-		@param useCapture Whether event capture should be used.
-		@param eventListener The optional event listener object containing the event decorator; if not provided it will be retrieved and removed from the list of event listeners.
-		@see http://www.scottandrew.com/weblog/articles/cbs-events
-		*/
-		EventManager.prototype.removeEvent=function(object, eventType, fn, useCapture, eventListener)
-		{
-			if(!eventListener)	//if no event listener was provided
-			{
-				eventListener=this._removeEventListener(object, eventType, fn);	//remove and retrieve the event listener keeping information about this event			
-			}
-			if(object.removeEventListener)	//if the W3C DOM method is supported
-			{
-				object.removeEventListener(eventType, fn, useCapture);	//remove the event normally
-			}
-			else	//if the W3C version isn't available
-			{
-				var eventName="on"+eventType;	//create the event name
-				if(object.detachEvent)	//if we can use the IE version
-				{
-					result=eventListener!=null ? object.detachEvent(eventName, eventListener.decorator) : null;	//detach the function decorator, if there is one
-				}
-				else	//if we can't use the IE version
-				{
-					object[eventName]=null;	//use the object.onEvent property
-				}
-		  }
-		};
-	
-		/**Clears all registered events, optionally for a specific object.
-		@param object The object for which events should be cleared, or null if events should be cleared on all objects.
-		*/
-		EventManager.prototype.clearEvents=function(object)
-		{
-			var eventListeners=this._eventListeners;	//get a reference to our event listeners
-			if(object)	//if an object is specified
-			{
-				for(var i=eventListeners.length-1; i>=0; --i)	//for each event listener, going backwards so that removing an event listener will not disturb iteration
-				{
-					var eventListener=eventListeners[i];	//get the last event listener
-					if(!object || eventListener.currentTarget==object)	//if this event listener was registered on this object, or if all event listeners should be removed)
-					{
-						eventListeners.remove(i);	//remove this event listener
-						this.removeEvent(eventListener.currentTarget, eventListener.eventType, eventListener.fn, eventListener.useCapture, eventListener);	//remove this event, specifying the event listener so that it doesn't have to be looked up again
-					}
-				}
-			}
-			else	//if all event listeners should be cleared (though these loops could be combined, this is more efficient, and as this is usually called before a page unloads, we want to do this as fast as possible
-			{
-				for(var i=eventListeners.length-1; i>=0; --i)	//for each event listener
-				{
-					var eventListener=eventListeners[i];	//get the last event listener
-					this.removeEvent(eventListener.currentTarget, eventListener.eventType, eventListener.fn, eventListener.useCapture, eventListener);	//remove this event, specifying the event listener so that it doesn't have to be looked up again
-				}
-				eventListeners.clear();	//clear all event listeners in one fell swoop
-			}
-		};
-		
-		/**Removes and returns an event listener object encapsulating information on the object, event type, and function.
-		@param object The object for which a listener is listening.
-		@param eventType The type of event.
-		@param fn The function listening for the event.
-		@return The event listener or null if no matching event listener could be found.
-		*/
-		EventManager.prototype._removeEventListener=function(object, eventType, fn)
-		{
-			for(var i=this._eventListeners.length-1; i>=0; --i)	//for each event listener
-			{
-				var eventListener=this._eventListeners[i];	//get this event listener
-				if(eventListener.currentTarget==object && eventListener.eventType==eventType && eventListener.fn==fn)	//if this is the event listener
-				{
-					this._eventListeners.remove(i);	//remove this event listener
-					return eventListener;	//return this event listener
-				}
-			}
-			return null;	//indicate that we couldn't find a matching event listener
-		}
-	}
-}		
-
-/**Adds a function to be called when a window loads.
-@param func The function to listen for window loading.
-@see http://simon.incutio.com/archive/2004/05/26/addLoadEvent
-*/
-/*TODO transfer to EventManager and modify as fix for Safari
-function addLoadListener(func)
-{
-	var oldonload=window.onload;	//get the old function
-	if(typeof window.onload!="function")	//if there is no onload function
-	{
-		window.onload=func;	//use the given function
-	}
-	else	//if there is a window onload function
-	{
-		window.onload=function()	//create a new function
-				{
-					oldonload();	//call the old function using closure
-					func();	//call the new function
-				};
-	}
-}
-*/
-
-/**The single instance manager of events.*/
-var eventManager=new EventManager();
-
-/**A class encapsulating drag state.
-By default the drag state allows dragging along both axes.
-@param dragSource: The element to drag.
-@param mouseX The horizontal position of the mouse.
-@param mouseY The vertical position of the mouse.
-var dragging true if dragging is occurring, else false.
-var dragSource: The element to drag.
-var element: The actual element being dragged, which may or may not be the same element as the drag souce.
-var initialFixedPosition: The initial position of the drag source in fixed terms of the viewport.
-var initialOffsetPosition: The initial position of the drag source relative to the offset parent.
-var initialPosition: The initial position of the element in correct terms, fixed or offset; initialized when dragging starts.
-var dragCopy Whether a copy of the element should be dragged, rather than the original element. Defaults to true unless the element is absolute or fixed.
-var allowX: Whether dragging is allowed along the X axis (true by default).
-var allowY: Whether dragging is allowed along the Y axis (true by default).
-var minX: The minimum horizontal position, inclusive, in correct element terms, or null if there is no minumum horizontal position.
-var maxX: The maximum horizontal position, inclusive, in correct element terms, or null if there is no maximum horizontal position.
-var onBegin(element): The method called when dragging begins, or null if no additional action should be taken.
-var onDrag(element, x, y): The method called when dragging occurs, or null if no additional action should be taken. The coordinates are in terms of the element's position type.
-var onEnd(element): The method called when dragging ends, or null if no additional action should be taken.
-*/
-function DragState(dragSource, mouseX, mouseY)
-{
-	this.dragging=false;	//initially we are not dragging
-	this.dragSource=dragSource;
-
-	this.initialMouseFixedPosition=new Point(mouseX, mouseY);
-//TODO del alert("initial mouse fixed position X: "+mouseX+" Y: "+mouseY);
-	this.initialFixedPosition=GUIUtilities.getElementFixedCoordinates(dragSource);	//get the initial position of the drag source in fixed terms of the viewport
-	this.initialOffsetPosition=new Point(dragSource.offsetLeft, dragSource.offsetTop);	//get the offset position of the drag source
-
-	this.initialPosition=null;	//these will be updated when dragging is started
-	this.mouseDeltaX=0;
-	this.mouseDeltaY=0;
-
-	this.minX=null;
-	this.maxX=null;	
-//TODO fix	this.initialPosition=new Point(dragSource.offsetLeft, dragSource.offsetTop);	//get the position of the drag source
-	
-//TODO fix	this.initialPosition=GUIUtilities.getElementFixedCoordinates(dragSource);	//get the position of the drag source
-/*TODO fix
-	this.mouseDeltaX=mouseX-this.initialPosition.x;	//calculate the mouse position relative to the drag source
-	this.mouseDeltaY=mouseY-this.initialPosition.y;
-*/
-	if(dragSource.style)	//if the drag source has style specified
-	{
-		var style=dragSource.style;	//get the element style
-		this.dragCopy=style.position!="absolute" && style.position!="fixed";	//see if the drag source is already fixed or absolutely positioned; if so, we won't drag a copy	
-	}
-	else	//if this drag source has no style specified
-	{
-		this.dragCopy=true;	//default to dragging a copy
-	}
-	this.allowX=true;	//default to allowing dragging along the X axis
-	this.allowY=true;	//default to allowing dragging along the Y axis
-
-	if(!DragState.prototype._initialized)
-	{
-		DragState.prototype._initialized=true;
-
-		/**Begins the drag process.
-		@param mouseX The horizontal position of the mouse.
-		@param mouseY The vertical position of the mouse.
-		*/
-		DragState.prototype.beginDrag=function(mouseX, mouseY)
-		{		
-			this.element=this._getDragElement();	//create an element for dragging
-/*TODO del when works
-			this.width=this.element.offsetWidth;	//store the size of the element, because IE6 can sometimes reset the width and height to zero during AJAX calls for some unknown reason
-			this.height=this.element.offsetHeight;
-*/
-
-			this.drag(mouseX, mouseY);	//drag the element to the current mouse position
-			if(this.element!=this.dragSource)	//if we have a new element to drag
-			{
-				this.oldVisibility=this.dragSource.style.visibility;	//get the old visibility status				
-				this.dragSource.style.visibility="hidden";	//hide the original element
-				document.body.appendChild(this.element);	//add the element to the document
-			}
-/*TODO del after new stop default method
-			document.body.ondrag=function() {return false;};	//turn off IE drag event processing; see http://www.ditchnet.org/wp/2005/06/15/ajax-freakshow-drag-n-drop-events-2/
-			document.body.onselectstart=function() {return false;};
-*/
-//TODO del if not needed			drag(mouseX, mouseY);	//do a fake drag to make sure that the position of the element is within any ranges
-			this.dragging=true;	//show that we are dragging
-			eventManager.addEvent(document, "mousemove", onDrag, false);	//listen for mouse move anywhere in document (IE doesn't allow us to listen on the window), as dragging may end somewhere else besides a drop target
-			if(this.onDragBegin)	//if there is a function for beginning dragging
-			{
-				this.onDragBegin(this.element);	//call the dragging begin method
-			}
-		};
-
-		/*Drags the component to the location indicated by the mouse coordinates.
-		The mouse/component deltas are taken into consideration when calculating the new component position.
-		@param mouseX The horizontal position of the mouse.
-		@param mouseY The vertical position of the mouse.
-		*/
-		DragState.prototype.drag=function(mouseX, mouseY)
-		{
-//TODO fix alert("dragging mouse X: "+mouseX+" mouseY: "+mouseY+" deltaX: "+dragState.mouseDeltaX+" deltaY: "+dragState.mouseDeltaY);
-			var oldLeft=this.element.style.left;	//get the old left position
-			var oldTop=this.element.style.top;	//get the old top position
-/*TODO del when works
-			var oldX=typeof oldLeft!="undefined" && oldLeft.length>0 ? parseInt(oldLeft) : this.initialPosition.x;	//find the old coordinates
-			var oldY=typeof oldTop!="undefined" && oldTop.length>0 ? parseInt(oldTop) : this.initialPosition.y;
-*/
-			var oldX=oldLeft ? parseInt(oldLeft) : this.initialPosition.x;	//find the old coordinates
-			var oldY=oldTop ? parseInt(oldTop) : this.initialPosition.y;
-
-			var newX=oldX;	//we'll determine the new X and Y values
-			var newY=oldY;
-			if(this.allowX)	//if horizontal dragging is allowed
-			{
-				var onTrackY=this.allowY || (mouseY>=this.initialFixedPosition.y && mouseY<(this.initialFixedPosition.y+this.element.offsetHeight))	//see if the mouse is on the track vertically
-				if(onTrackY)	//if the mouse is on the track
-				{
-					newX=mouseX-dragState.mouseDeltaX;	//calculate the new left position
-				}
-				else	//if the mouse is off the track
-				{
-					newX=this.initialPosition.x;	//reset the horizontal position
-//TODO del alert("off track Y, mouse Y: "+mouseY+" deltaY: "+dragState.mouseDeltaY+" initialY: "+this.initialFixedPosition.y+" element height: "+this.element.offsetHeight);
-				}
-				if(this.minX!=null && newX<this.minX)	//if there is a minimum specified and the new position is below it
-				{
-					newX=this.minX;	//stop at the floor
-				}
-				else if(this.maxX!=null && newX>this.maxX)	//if there is a maximum specified and the new position is above it
-				{
-					newX=this.maxX;	//stop at the ceiling
-				}
-			}
-			if(this.allowY)	//if vertical dragging is allowed
-			{
-				var onTrackX=this.allowX || (mouseX>=this.initialFixedPosition.x && mouseX<(this.initialFixedPosition.x+this.element.offsetWidth))	//see if the mouse is on the track horizontally
-				if(onTrackX)	//if the mouse is on the track
-				{
-					newY=mouseY-dragState.mouseDeltaY;	//calculate the new top position
-				}
-				else	//if the mouse is off the track
-				{
-					newY=this.initialPosition.y;	//reset the vertical position
-//TODO del alert("off track X, mouse X: "+mouseX+" mouse delta X: "+dragState.mouseDeltaX);
-				}
-				if(this.minY!=null && newY<this.minY)	//if there is a minimum specified and the new position is below it
-				{
-					newY=this.minY;	//stop at the floor
-				}
-				else if(this.maxY!=null && newY>this.maxY)	//if there is a maximum specified and the new position is above it
-				{
-					newY=this.maxY;	//stop at the ceiling
-				}
-			}
-			if(newX!=oldX || newY!=oldY)	//if one of the coordinates has changed
-			{
-//TODO del alert("oldX: "+oldX+" oldY: "+oldY+" newX: "+newX+" newY: "+newY);
-				if(newX!=oldX)	//if the horizontal position has changed
-				{
-					this.element.style.left=newX.toString()+"px";	//update the horizontal position of the dragged element
-				}
-				if(newY!=oldY)	//if the horizontal position has changed
-				{
-					this.element.style.top=newY.toString()+"px";	//update the vertical position of the dragged element
-				}
-				if(this.onDrag)	//if there is a function for dragging
-				{
-					this.onDrag(this.element, newX, newY);	//call the dragging method
-				}
-			}
-		}
-	
-		/**Ends the drag process.*/
-		DragState.prototype.endDrag=function()
-		{
-			eventManager.removeEvent(document, "mousemove", onDrag, false);	//stop listening for mouse moves
-/*TODO del after new stop default method
-			document.body.ondrag=null;	//turn IE drag event processing back on
-			document.body.onselectstart=null;
-*/
-			if(this.element!=this.dragSource)	//if we have a different element that we're dragging
-			{
-				document.body.removeChild(this.element);	//remove the drag element
-				this.dragSource.style.visibility=this.oldVisibility;	//reset the original element's visibility status
-			}
-			this.dragging=false;	//show that we are no longer dragging
-			if(this.onDragEnd)	//if there is a function for ending dragging
-			{
-				this.onDragEnd(this.element);	//call the dragging end method
-			}
-//TODO del alert("ended drag, drag element offsetWidth: "+this.element.offsetWidth+" offsetHeight: "+this.element.offsetHeight);
-		};
-
-		/**@return An element appropriate for dragging, such as a clone of the original.*/
-		DragState.prototype._getDragElement=function()
-		{
-			var element;	//we'll determine which element to use
-			if(this.dragCopy)	//if we should make a copy of the element
-			{
-				this.initialPosition=GUIUtilities.getElementCoordinates(this.dragSource);	//get the absolute element coordinates, as we'll be positioning the element absolutely
-
-				element=this.dragSource.cloneNode(true);	//create a clone of the original element TODO be careful about this---probably use our own copy method, because IE will clone event handlers as well
-				DOMUtilities.cleanNode(element);	//clean the clone
-				//TODO clean the element better, removing drag handles and such
-	/*TODO add workaround to cover IE select controls, which are windowed and will appear over the dragged element
-				if(document.all)	//if this is IE	TODO add better check
-				{
-					var shimElement=document.createElement("iframe");	//create a shim iframe that can accept z-index changes so as to cover controls; see http://dotnetjunkies.com/WebLog/jking/archive/category/139.aspx and http://dev2dev.bea.com/pub/a/2005/04/portal_menus.html
-					shimElement.appendChild(element);	//place the real element inside the shim element
-					element=shimElement;	//use the shim element as the drag element
-				}
-	*/
-
-				element.style.left=(this.initialPosition.x).toString()+"px";	//initialize the horizontal position of the copy
-				element.style.top=(this.initialPosition.y).toString()+"px";	//initialize the vertical position of the copy
-				element.style.position="absolute";	//change the element's position to absolute TODO update the element's initial position
-				element.style.zIndex=9001;	//give the element an arbitrarily high z-index value so that it will appear in front of other components TODO calculate the highest z-order
-				//TODO make sure resizeable elements are the correct size
-
-			}
-			else	//if we should keep the same element
-			{
-				element=this.dragSource;	//drag the drag source itself
-				if(element.style && element.style.position=="fixed")	//if this is a fixed element
-				{
-					this.initialPosition=this.initialFixedPosition;	//used fixed coordinates
-				}
-				else	//if this is not a fixed element, or we don't know
-				{
-					this.initialPosition=this.initialOffsetPosition;	//the initial position is the offset position TODO check for fixed position, which would also mean using fixed coordinates
-				}
-			}
-//TODO del alert("element: "+element.nodeName+" class: "+element.className);
-			this.mouseDeltaX=this.initialMouseFixedPosition.x-this.initialPosition.x;	//calculate the mouse position relative to the drag source
-			this.mouseDeltaY=this.initialMouseFixedPosition.y-this.initialPosition.y;
-//TODO del alert("initialXY: "+this.initialPosition.x+", "+this.initialPosition.y+" mouseXY: "+this.initialMouseFixedPosition.x+", "+this.initialMouseFixedPosition.y+" deltaXY: "+this.mouseDeltaX+", "+this.mouseDeltaY);
-			return element;	//return the cloned element
-		};
-	}
-}
-
 /**The global drag state variable.*/
 var dragState;
-
-//Guise functionality
-
-
-/*TODO del; testing
-
-function testNode(node, deep)
-{
-	var x=node.nodeName;
-	if(deep)
-	{
-			//initialize child nodes
-		var childNodeList=node.childNodes;	//get all the child nodes
-		var childNodeCount=childNodeList.length;	//find out how many children there are
-		for(var i=0; i<childNodeCount; ++i)	//for each child node
-		{
-			testNode(childNodeList[i], true);	//initialize this child node
-		}
-	}
-}
-*/
 
 /**Called when the window loads.
 This implementation installs listeners.
@@ -4812,16 +2371,16 @@ function onWindowLoad()
 			guiseIE6Fix.fixStylesheets();	//fix all IE6 stylesheets
 		}
 	*/
-		eventManager.addEvent(window, "resize", onWindowResize, false);	//add a resize listener
-	//TODO del	eventManager.addEvent(window, "scroll", onWindowScroll, false);	//add a scroll listener
-		eventManager.addEvent(window, "unload", onWindowUnload, false);	//do the appropriate uninitialization when the window unloads
+		com.garretwilson.js.EventManager.addEvent(window, "resize", onWindowResize, false);	//add a resize listener
+	//TODO del	com.garretwilson.js.EventManager.addEvent(window, "scroll", onWindowScroll, false);	//add a scroll listener
+		com.garretwilson.js.EventManager.addEvent(window, "unload", onWindowUnload, false);	//do the appropriate uninitialization when the window unloads
 		initializeNode(document.documentElement, true, true);	//initialize the document tree, indicating that this is the first initialization
 		updateComponents(document.documentElement, true);	//update all components represented by elements within the document
 	//TODO del when works	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
-		eventManager.addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
-		eventManager.addEvent(document.documentElement, "keydown", onKey, false);	//listen for key down anywhere in the document so that we can send key events back to the server (IE doesn't work correctly with key events registered on the window or document)
-		eventManager.addEvent(document.documentElement, "keyup", onKey, false);	//listen for key up anywhere in the document so that we can send key events back to the server (IE doesn't work correctly with key events registered on the window or document)
-		eventManager.addEvent(document.documentElement, "click", onClick, false);	//listen for mouse clicks bubbling up from anywhere (that we haven't dealt with specifically and canceled) in the document so that we can report clicks back to the server
+		com.garretwilson.js.EventManager.addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
+		com.garretwilson.js.EventManager.addEvent(document.documentElement, "keydown", onKey, false);	//listen for key down anywhere in the document so that we can send key events back to the server (IE doesn't work correctly with key events registered on the window or document)
+		com.garretwilson.js.EventManager.addEvent(document.documentElement, "keyup", onKey, false);	//listen for key up anywhere in the document so that we can send key events back to the server (IE doesn't work correctly with key events registered on the window or document)
+		com.garretwilson.js.EventManager.addEvent(document.documentElement, "click", onClick, false);	//listen for mouse clicks bubbling up from anywhere (that we haven't dealt with specifically and canceled) in the document so that we can report clicks back to the server
 		guise.onDocumentLoad();	//create and update the modal layer
 		guiseAJAX.sendAJAXRequest(new InitAJAXEvent());	//send an initialization AJAX request	
 	//TODO del	alert("compatibility mode: "+document.compatMode);
@@ -4869,7 +2428,7 @@ function onWindowUnload(event)
 {
 	guiseAJAX.setEnabled(false);	//immediately turn off AJAX communication
 //TODO fix or del	guise.setBusyVisible(true);	//turn on the busy indicator
-	eventManager.clearEvents();	//unload all events
+	com.garretwilson.js.EventManager.clearEvents();	//unload all events
 //TODO fix or del	guise.setBusyVisible(false);	//turn off the busy indicator
 }
 
@@ -4920,7 +2479,7 @@ function initializeNode(node, deep, initialInitialization)
 				switch(elementName)	//see which element this is
 				{
 					case "a":
-						if(isUserAgentIE6 && DOMUtilities.hasClassName(node, "imageSelectActionControl"))	//if this is IE6, which doesn't support the CSS outline: none property, create a workaround TODO use a constant; create something more general than just the image select action control
+						if(isUserAgentIE6 && Element.hasClassName(node, "imageSelectActionControl"))	//if this is IE6, which doesn't support the CSS outline: none property, create a workaround TODO use a constant; create something more general than just the image select action control
 						{
 							node.hideFocus="true";	//hide the focus on this element
 						}
@@ -4928,7 +2487,7 @@ function initializeNode(node, deep, initialInitialization)
 						{
 							if(!node.getAttribute("target"))	//if the link has no target (the target wouldn't work if we tried to take over the events; we can't just check for null because IE will always send back at least "")
 							{
-								eventManager.addEvent(node, "click", onLinkClick, false);	//listen for anchor clicks
+								com.garretwilson.js.EventManager.addEvent(node, "click", onLinkClick, false);	//listen for anchor clicks
 								if(isSafari)	//if this is Safari TODO fix better; this may have been fixed in Safari 2.0.4; see http://developer.yahoo.com/yui/docs/YAHOO.util.Event.html
 								{
 									node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
@@ -4937,7 +2496,7 @@ function initializeNode(node, deep, initialInitialization)
 						}
 						else if(elementClassNames.containsMatch(/-tab$/))	//if this is a tab TODO use a constant TODO is this still used?
 						{
-							eventManager.addEvent(node, "click", onTabClick, false);	//listen for tab clicks
+							com.garretwilson.js.EventManager.addEvent(node, "click", onTabClick, false);	//listen for tab clicks
 							if(isSafari)	//if this is Safari TODO fix better
 							{
 								node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
@@ -4947,7 +2506,7 @@ function initializeNode(node, deep, initialInitialization)
 					case "button":
 						if(elementClassNames.contains("buttonControl"))	//if this is a Guise button TODO use constant
 						{
-							eventManager.addEvent(node, "click", onButtonClick, false);	//listen for button clicks
+							com.garretwilson.js.EventManager.addEvent(node, "click", onButtonClick, false);	//listen for button clicks
 							if(isSafari)	//if this is Safari TODO fix better
 							{
 								node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
@@ -4959,10 +2518,10 @@ function initializeNode(node, deep, initialInitialization)
 						if(rolloverSrc)	//if the image has a rollover TODO use a constant; maybe use hasAttributeNS()
 						{
 							guise.loadImage(rolloverSrc);	//preload the image
-							if(!DOMUtilities.hasClassName(node, STYLES.MOUSE_LISTENER))	//if this is not a mouse listener (which would get a onMouse listener registered, anyway)
+							if(!Element.hasClassName(node, STYLES.MOUSE_LISTENER))	//if this is not a mouse listener (which would get a onMouse listener registered, anyway)
 							{
-								eventManager.addEvent(node, "mouseover", onMouse, false);	//listen for mouse over on a mouse listener
-								eventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener							
+								com.garretwilson.js.EventManager.addEvent(node, "mouseover", onMouse, false);	//listen for mouse over on a mouse listener
+								com.garretwilson.js.EventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener							
 							}
 //TODO del							alert("rollover source: "+node.getAttribute("guise:rolloverSrc"));
 						}
@@ -4970,13 +2529,13 @@ function initializeNode(node, deep, initialInitialization)
 						{
 							if(node.offsetWidth==0 && node.offsetHeight==0)	//if this image has no dimensions
 							{
-								var mozInlineBoxAncestor=DOMUtilities.getAncestorElementByStyle(node, "display", "-moz-inline-box");	//see if there is a Mozilla inline box element ancestor
+								var mozInlineBoxAncestor=Node.getAncestorElementByStyle(node, "display", "-moz-inline-box");	//see if there is a Mozilla inline box element ancestor
 								if(mozInlineBoxAncestor)	//if there is a Mozilla inline box element causing our problems
 								{
 									var mozInlineBoxAncestorParent=mozInlineBoxAncestor.parentNode;	//get *its* parent so we can just replace all the children
 									if(mozInlineBoxAncestorParent)	//if we find its parent like we expect
 									{
-										DOMUtilities.refreshNode(mozInlineBoxAncestorParent);	//refresh the container element by removing it from the tree and putting it back
+										Node.refresh(mozInlineBoxAncestorParent);	//refresh the container element by removing it from the tree and putting it back
 									}
 								}
 							}
@@ -4987,19 +2546,19 @@ function initializeNode(node, deep, initialInitialization)
 						{
 							case "text":
 							case "password":
-								eventManager.addEvent(node, "change", onTextInputChange, false);
-//TODO del; doesn't work across browsers								eventManager.addEvent(node, "keypress", onTextInputKeyPress, false);
-								eventManager.addEvent(node, "keydown", onTextInputKeyDown, false);
-								eventManager.addEvent(node, "keyup", onTextInputKeyUp, false);
+								com.garretwilson.js.EventManager.addEvent(node, "change", onTextInputChange, false);
+//TODO del; doesn't work across browsers								com.garretwilson.js.EventManager.addEvent(node, "keypress", onTextInputKeyPress, false);
+								com.garretwilson.js.EventManager.addEvent(node, "keydown", onTextInputKeyDown, false);
+								com.garretwilson.js.EventManager.addEvent(node, "keyup", onTextInputKeyUp, false);
 								break;
 							case "checkbox":
 							case "radio":
-								eventManager.addEvent(node, "click", onCheckInputChange, false);
+								com.garretwilson.js.EventManager.addEvent(node, "click", onCheckInputChange, false);
 								break;
 							case "file":
 								if(elementClassNames.contains("resourceCollectControl-body"))	//if this is a Guise resource collect control TODO maybe change to the reverse logic (i.e. not ResourceCollectControl)
 								{
-									eventManager.addEvent(node, "change", onFileInputChange, false);
+									com.garretwilson.js.EventManager.addEvent(node, "change", onFileInputChange, false);
 								}
 								else if(elementClassNames.contains("resourceImportControl-body"))	//if this is a Guise resource import control, we'll later need to submit the form differently
 								{
@@ -5009,7 +2568,7 @@ function initializeNode(node, deep, initialInitialization)
 						}
 						break;
 					case "select":
-						eventManager.addEvent(node, "change", onSelectChange, false);
+						com.garretwilson.js.EventManager.addEvent(node, "change", onSelectChange, false);
 /*TODO del
 						var iframe=document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");	//TODO testing
 						iframe.src="about:blank";
@@ -5027,8 +2586,8 @@ function initializeNode(node, deep, initialInitialization)
 						
 						break;
 					case "textarea":
-						eventManager.addEvent(node, "change", onTextInputChange, false);
-						eventManager.addEvent(node, "keydown", onTextInputKeyDown, false);	//commit the text area on Enter TODO decide whether we want real-time checking with onTextInpuKeyUp, which would be very expensive for text areas
+						com.garretwilson.js.EventManager.addEvent(node, "change", onTextInputChange, false);
+						com.garretwilson.js.EventManager.addEvent(node, "keydown", onTextInputKeyDown, false);	//commit the text area on Enter TODO decide whether we want real-time checking with onTextInpuKeyUp, which would be very expensive for text areas
 						break;
 				}
 				for(var i=elementClassNames.length-1; i>=0; --i)	//for each class name
@@ -5037,35 +2596,35 @@ function initializeNode(node, deep, initialInitialization)
 					{
 /*TODO del
 						case "button":	//TODO testing; del
-							eventManager.addEvent(node, "click", onButtonClick, false);	//listen for button clicks
+							com.garretwilson.js.EventManager.addEvent(node, "click", onButtonClick, false);	//listen for button clicks
 							break;
 */
 						case STYLES.ACTION:
-							eventManager.addEvent(node, "click", onActionClick, false);	//listen for a click on an action element
-							eventManager.addEvent(node, "contextmenu", onContextMenu, false);	//listen for a right click on an action element
+							com.garretwilson.js.EventManager.addEvent(node, "click", onActionClick, false);	//listen for a click on an action element
+							com.garretwilson.js.EventManager.addEvent(node, "contextmenu", onContextMenu, false);	//listen for a right click on an action element
 							//TODO see if we need to assign a default handler on Safari to prevent the default action
 							break;
 						case STYLES.DRAG_HANDLE:
-							eventManager.addEvent(node, "mousedown", onDragBegin, false);	//listen for mouse down on a drag handle
+							com.garretwilson.js.EventManager.addEvent(node, "mousedown", onDragBegin, false);	//listen for mouse down on a drag handle
 							break;
 						case STYLES.MOUSE_LISTENER:
-							if(!DOMUtilities.getAncestorElementByClassName(node.parentNode, STYLES.MOUSE_LISTENER))	//make sure this is the root mouse listener, as we'll allow events to bubble
+							if(!Node.getAncestorElementByClassName(node.parentNode, STYLES.MOUSE_LISTENER))	//make sure this is the root mouse listener, as we'll allow events to bubble
 							{
-								eventManager.addEvent(node, "mouseover", onMouse, false);	//listen for mouse over on a mouse listener
-								eventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener
+								com.garretwilson.js.EventManager.addEvent(node, "mouseover", onMouse, false);	//listen for mouse over on a mouse listener
+								com.garretwilson.js.EventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener
 							}
 							break;
 						case STYLES.DROP_TARGET:
 							guise.addDropTarget(node);	//add this node to the list of drop targets
 							break;
 						case STYLES.SLIDER_CONTROL_THUMB:
-							eventManager.addEvent(node, "mousedown", onSliderThumbDragBegin, false);	//listen for mouse down on a slider thumb
+							com.garretwilson.js.EventManager.addEvent(node, "mousedown", onSliderThumbDragBegin, false);	//listen for mouse down on a slider thumb
 							break;
 					}
 				}
 				if(node.focus)	//if this element can receive the focus
 				{
-					eventManager.addEvent(node, "focus", onFocus, false);	//listen for focus events; we must do this specifically for each node, because focus events don't focus correctly
+					com.garretwilson.js.EventManager.addEvent(node, "focus", onFocus, false);	//listen for focus events; we must do this specifically for each node, because focus events don't focus correctly
 				}
 			}
 			break;
@@ -5151,7 +2710,7 @@ function updateComponents(node, deep)
 */
 function uninitializeNode(node, deep)	//TODO remove the node from the sorted list of drop targets
 {
-	eventManager.clearEvents(node);	//clear events for this node
+	com.garretwilson.js.EventManager.clearEvents(node);	//clear events for this node
 	if(deep)	//if we should uninitialize child nodes
 	{
 		var all=node.all;	//see if the node has an all[] array, because that will be much faster
@@ -5188,9 +2747,9 @@ function onFocus(event)
 	{
 		if(guise.modalFrame!=null)	//if there is a modal frame
 		{
-			if(!DOMUtilities.hasAncestor(target, guise.modalFrame))	//if focus is trying to go to something outside the modal frame
+			if(!Node.hasAncestor(target, guise.modalFrame))	//if focus is trying to go to something outside the modal frame
 			{
-				if(DOMUtilities.hasAncestor(lastFocusedNode, guise.modalFrame))	//if we know the last focused node, and it was in the modal frame
+				if(Node.hasAncestor(lastFocusedNode, guise.modalFrame))	//if we know the last focused node, and it was in the modal frame
 				{
 					lastFocusedNode.focus();	//focus back on the last focused node
 				}
@@ -5222,7 +2781,7 @@ function onFocus(event)
 			}
 		}
 		lastFocusedNode=target;	//this is an allowed focus that isn't outside of a modal frame; keep track of what was last focused
-		var component=DOMUtilities.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element
+		var component=Node.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element
 		if(component)	//if there is a component
 		{
 			var componentID=component.id;	//get the component ID
@@ -5402,7 +2961,7 @@ function onFileInputChange(event)
 		var fileInputValue=fileInput.value;	//get the new value
 		if(fileInputValue)	//if the value is changing to something interesting
 		{
-			var component=DOMUtilities.getAncestorElementByClassName(fileInput, STYLES.COMPONENT);	//get the component element
+			var component=Node.getAncestorElementByClassName(fileInput, STYLES.COMPONENT);	//get the component element
 			if(component)	//if there is a component
 			{
 				var componentID=component.id;	//get the component ID
@@ -5453,27 +3012,25 @@ function onButtonClick(event)
 	if(hasResourceImportControl)	//if there is a resource import control on the page TODO later change this to submit normal AJAX actions, and send back a message to actually submit the page
 	{
 		var element=event.currentTarget;	//get the element on which the event was registered
-		var form=getForm(element);	//get the form
-		if(form)	//if we found the form
+		if(element.id)	//if the button has an ID
 		{
-			if(element.id)	//if the button has an ID
+			var form=Node.getAncestorElementByName(element, "form");	//get the form ancestor
+			//assert form
+			if(form.id)	//if the form has an ID
 			{
-				if(form.id)	//if the form has an ID
+				var actionInputID=form.id.replace(".form", ".input");	//determine the ID of the hidden action input TODO update this to use a constant non-form-relative value
+				var actionInput=document.getElementById(actionInputID);	//get the action input
+				if(actionInput)	//if there is an action input
 				{
-					var actionInputID=form.id.replace(".form", ".input");	//determine the ID of the hidden action input TODO update this to use a constant non-form-relative value
-					var actionInput=document.getElementById(actionInputID);	//get the action input
-					if(actionInput)	//if there is an action input
-					{
-						actionInput.value=element.id;	//indicate which action was activated
-					}
-					form.submit();	//submit the form
-					if(actionInput)	//if there is an action input
-					{
-						actionInput.value=null;	//remove the indication of which action was activated
-					}
-					event.stopPropagation();	//tell the event to stop bubbling
-					event.preventDefault();	//prevent the default functionality from occurring
+					actionInput.value=element.id;	//indicate which action was activated
 				}
+				form.submit();	//submit the form
+				if(actionInput)	//if there is an action input
+				{
+					actionInput.value=null;	//remove the indication of which action was activated
+				}
+				event.stopPropagation();	//tell the event to stop bubbling
+				event.preventDefault();	//prevent the default functionality from occurring
 			}
 		}
 	}
@@ -5499,7 +3056,7 @@ function onAction(event)
 {
 	var target=event.currentTarget;	//get the element on which the event was registered
 //TODO del alert("action on: "+element.nodeName);
-	var component=DOMUtilities.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element TODO improve all this
+	var component=Node.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element TODO improve all this
 	if(component)	//if there is a component
 	{
 		var componentID=component.id;	//get the component ID
@@ -5591,7 +3148,7 @@ function onActionClick(event)
 	var targetID=target.id;	//get the target ID
 	if(targetID)	//if the element has an ID (otherwise, we couldn't report the action)
 	{
-		var component=DOMUtilities.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element TODO improve all this
+		var component=Node.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element TODO improve all this
 		if(component)	//if there is a component
 		{
 			var componentID=component.id;	//get the component ID
@@ -5631,7 +3188,7 @@ function onContextMenu(event)
 	var targetID=target.id;	//get the target ID
 	if(targetID)	//if the element has an ID (otherwise, we couldn't report the action)
 	{
-		var component=DOMUtilities.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element TODO improve all this
+		var component=Node.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element TODO improve all this
 		if(component)	//if there is a component
 		{
 			var componentID=component.id;	//get the component ID
@@ -5657,28 +3214,23 @@ function onCheckInputChange(event)
 	var checkInput=event.currentTarget;	//get the control that was listening for events (the target could be the check input's label, as occurs in Mozilla)
 
 	var invalidated=false;	//we'll keep track of whether we invalidate this checkInput	
-		//TODO change XHTML output to put everything under the main form, or this won't work with popups, because the check won't be in the form
-	var form=getForm(document.documentElement);	//get the form
-	if(form)	//if there is a form
+	var name=checkInput.name;	//get the name of the check
+	if(name)	//if we know the name of the check
 	{
-		var name=checkInput.name;	//get the name of the check
-		if(name)	//if we know the name of the check
-		{
 /*TODO del			
 		alert("name: "+name);
 		alert("list: "+form[name]);
 		alert("count: "+form[name].length);
 */
-			var groupCheckInputs=form[name];	//get all the checkboxes/radio buttons in the form, because being mutually exclusive they all have changed values in the browser
-			if(groupCheckInputs && groupCheckInputs.length)	//if there is a group of checkboxes/radio buttons (independent checkboxes will not have groups, for examples)
+		var groupCheckInputs=forms[0][name];	//get all the checkboxes/radio buttons in the form, because being mutually exclusive they all have changed values in the browser
+		if(groupCheckInputs && groupCheckInputs.length)	//if there is a group of checkboxes/radio buttons (independent checkboxes will not have groups, for examples)
+		{
+			invalidated=true;	//if we invalidate the group, we invalidate this checkbox, too
+			for(var i=groupCheckInputs.length-1; i>=0; --i)	//for each check
 			{
-				invalidated=true;	//if we invalidate the group, we invalidate this checkbox, too
-				for(var i=groupCheckInputs.length-1; i>=0; --i)	//for each check
-				{
-					var groupCheckInput=groupCheckInputs[i];	//get this group check
-					groupCheckInput.removeAttribute("guise:attributeHash");	//the checked status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
-					guiseAJAX.invalidateAncestorContent(groupCheckInput);	//indicate that the ancestors now have different content
-				}
+				var groupCheckInput=groupCheckInputs[i];	//get this group check
+				groupCheckInput.removeAttribute("guise:attributeHash");	//the checked status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+				guiseAJAX.invalidateAncestorContent(groupCheckInput);	//indicate that the ancestors now have different content
 			}
 		}
 	}
@@ -5697,7 +3249,7 @@ function onCheckInputChange(event)
 /*TODO fix; distinguish between !guiseAJAX.isEnabled() and AJAX_SUSPENDED; also fix bug on server where an exhaustive post may clear information on non-displayed cards
 	else	//if AJAX is not enabled
 	{
-		if(DOMUtilities.getAncestorElementByClassName(checkInput, STYLES.MENU_BODY))	//if this check is inside a menu, submit the form so that menus will cause immediate reaction
+		if(Node.getAncestorElementByClassName(checkInput, STYLES.MENU_BODY))	//if this check is inside a menu, submit the form so that menus will cause immediate reaction
 		{
 			var form=getForm(element);	//get the form
 			if(form)	//if there is a form
@@ -5725,7 +3277,7 @@ function onClick(event)
 			return;	//let the browser handle these mouse clicks TODO add checks for other things			
 		}
 	}
-	var component=DOMUtilities.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element
+	var component=Node.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element
 	if(component)	//if there is a component
 	{
 		var componentID=component.id;	//get the component ID
@@ -5799,7 +3351,7 @@ try
 		var dragHandle=event.target;	//get the target of the event
 			//TODO make sure this isn't the context mouse button
 //TODO del alert("checking to start drag");
-		var dragSource=DOMUtilities.getAncestorElementByClassName(dragHandle, STYLES.DRAG_SOURCE);	//determine which element to drag
+		var dragSource=Node.getAncestorElementByClassName(dragHandle, STYLES.DRAG_SOURCE);	//determine which element to drag
 		if(dragSource)	//if there is a drag source
 		{
 //TODO del alert("found drag source: "+dragSource.nodeName);
@@ -5846,8 +3398,8 @@ function onDragEnd(event)
 		if(dropTarget)	//if the mouse was dropped over a drop target
 		{
 //TODO del when works alert("over drop target: "+dropTarget.nodeName);
-			var dragSourceComponent=DOMUtilities.getAncestorElementByClassName(dragState.dragSource, STYLES.COMPONENT);	//get the component element TODO improve all this; decide if we want the dropTarget style on the component element or the drop target subcomponent, and how we want to relate that to the component ID
-			var dropTargetComponent=DOMUtilities.getAncestorElementByClassName(dropTarget, STYLES.COMPONENT);	//get the component element TODO improve all this; decide if we want the dropTarget style on the component element or the drop target subcomponent, and how we want to relate that to the component ID
+			var dragSourceComponent=Node.getAncestorElementByClassName(dragState.dragSource, STYLES.COMPONENT);	//get the component element TODO improve all this; decide if we want the dropTarget style on the component element or the drop target subcomponent, and how we want to relate that to the component ID
+			var dropTargetComponent=Node.getAncestorElementByClassName(dropTarget, STYLES.COMPONENT);	//get the component element TODO improve all this; decide if we want the dropTarget style on the component element or the drop target subcomponent, and how we want to relate that to the component ID
 			if(dragSourceComponent && dropTargetComponent)	//if there source and target components
 			{
 				var ajaxRequest=new DropAJAXEvent(dragState, dragSourceComponent, dropTargetComponent, event);	//create a new AJAX drop event TODO probably remove the dragState parameter
@@ -5871,8 +3423,8 @@ function onSliderThumbDragBegin(event)
 				//TODO make sure this isn't the context mouse button
 		var thumb=event.currentTarget;	//get the target of the event
 //TODO del alert("thumb offsetWidth: "+thumb.offsetWidth+" offsetHeight: "+thumb.offsetHeight);
-		var slider=DOMUtilities.getAncestorElementByClassName(thumb, STYLES.SLIDER_CONTROL);	//find the slider
-		var track=DOMUtilities.getAncestorElementByClassName(thumb, STYLES.SLIDER_CONTROL_TRACK);	//find the slider track
+		var slider=Node.getAncestorElementByClassName(thumb, STYLES.SLIDER_CONTROL);	//find the slider
+		var track=Node.getAncestorElementByClassName(thumb, STYLES.SLIDER_CONTROL_TRACK);	//find the slider track
 		
 		
 //TODO find out why the slider track gets constantly reloaded in IE6
@@ -5882,7 +3434,7 @@ function onSliderThumbDragBegin(event)
 		var positionInput=document.getElementById(positionID);	//get the position element		
 		if(slider && track && positionInput)	//if we found the slider and the slider track
 		{
-			var isHorizontal=DOMUtilities.hasClassName(track, STYLES.AXIS_X);	//see if this is a horizontal slider
+			var isHorizontal=Element.hasClassName(track, STYLES.AXIS_X);	//see if this is a horizontal slider
 			dragState=new DragState(thumb, event.clientX, event.clientY);	//create a new drag state
 			dragState.dragCopy=false;	//drag the actual element, not a copy
 			if(isHorizontal)	//if this is a horizontal slider
@@ -5956,12 +3508,12 @@ This implementation also sets the thumb[GUISE_STATE_WIDTH_ATTRIBUTE] and thumb[G
 */
 function updateSlider(slider)	//TODO maybe rename to updateSliderView
 {
-	if(DOMUtilities.hasClassName(slider, "sliding"))	//if the slider is in a sliding state according to the server (i.e. the thumb is being manually moved by the user) TODO use a constant
+	if(Element.hasClassName(slider, "sliding"))	//if the slider is in a sliding state according to the server (i.e. the thumb is being manually moved by the user) TODO use a constant
 	{
 		return;	//don't update the slider while the server still thinks the slider is sliding
 	}
-	var track=DOMUtilities.getDescendantElementByClassName(slider, STYLES.SLIDER_CONTROL_TRACK);	//find the slider track
-	var thumb=DOMUtilities.getDescendantElementByClassName(slider, STYLES.SLIDER_CONTROL_THUMB);	//find the slider thumb
+	var track=Node.getDescendantElementByClassName(slider, STYLES.SLIDER_CONTROL_TRACK);	//find the slider track
+	var thumb=Node.getDescendantElementByClassName(slider, STYLES.SLIDER_CONTROL_THUMB);	//find the slider thumb
 	if(dragState && dragState.dragging && dragState.dragSource==thumb)	//if the slider thumb is being dragged (i.e. the browser things the slider is being dragged)
 	{
 		return;	//don't update the slider while a drag is occurring
@@ -5997,7 +3549,7 @@ function updateSlider(slider)	//TODO maybe rename to updateSliderView
 			thumb[GUISE_STATE_HEIGHT_ATTRIBUTE]=thumb.offsetHeight;	//set the thumb height so that it won't change later with the Mozilla bug if the thumb is partially outside the track
 		}
 		var position=positionInput.value ? parseFloat(positionInput.value) : 0;	//get the position TODO make sure this logic is in synch with whether server code will always provide a value, even for null
-		var isHorizontal=DOMUtilities.hasClassName(track, STYLES.AXIS_X);	//see if this is a horizontal slider
+		var isHorizontal=Element.hasClassName(track, STYLES.AXIS_X);	//see if this is a horizontal slider
 		if(isHorizontal)	//if this is a horizontal slider
 		{
 			var min=0;	//calculate the minimum
@@ -6083,8 +3635,8 @@ function onMouse(event)
 		}
 	}
 	var currentTarget=event.currentTarget;	//get the element on which this event listener was registered
-	var component=DOMUtilities.getAncestorElementByClassName(DOMUtilities.getAncestorElementByClassName(target, STYLES.MOUSE_LISTENER), STYLES.COMPONENT);	//we'll only report mouse in/out events to the top-most component that is the mouse listener
-	var otherComponent=DOMUtilities.getAncestorElementByClassName(DOMUtilities.getAncestorElementByClassName(relatedTarget, STYLES.MOUSE_LISTENER), STYLES.COMPONENT);	//get the component element of the other mouse listener
+	var component=Node.getAncestorElementByClassName(Node.getAncestorElementByClassName(target, STYLES.MOUSE_LISTENER), STYLES.COMPONENT);	//we'll only report mouse in/out events to the top-most component that is the mouse listener
+	var otherComponent=Node.getAncestorElementByClassName(Node.getAncestorElementByClassName(relatedTarget, STYLES.MOUSE_LISTENER), STYLES.COMPONENT);	//get the component element of the other mouse listener
 	if(component && component!=otherComponent)	//if we know the component, and the mouse isn't simply moving around inside the same component TODO at some point remove the whole mouse listener class and record events for all components
 	{
 		var componentID=component.id;	//get the component ID
@@ -6092,11 +3644,11 @@ function onMouse(event)
 		{
 			case "mouseover":	//if we are entering a component
 //guiseAJAX.trace("got mouse over component ID: ", componentID);
-				var ancestorComponents=DOMUtilities.getAncestorElementsByClassName(component, STYLES.COMPONENT);	//get an array of all ancestor components, including this component, in current-to-root order
+				var ancestorComponents=Node.getAncestorElementsByClassName(component, STYLES.COMPONENT);	//get an array of all ancestor components, including this component, in current-to-root order
 				for(var i=ancestorComponents.length-1; i>=0; --i)	//for each ancestor, from root to this one
 				{
 					var ancestorComponent=ancestorComponents[i];	//get this ancestor
-					if(DOMUtilities.hasAncestor(ancestorComponent, currentTarget))	//if we're not below the bottom mouse listener TODO eventually remove the special mouse listener concept and send everything back
+					if(Node.hasAncestor(ancestorComponent, currentTarget))	//if we're not below the bottom mouse listener TODO eventually remove the special mouse listener concept and send everything back
 					{
 						var ancestorComponentID=ancestorComponent.id;	//get the ID of this ancestor
 						if(!mouseOverComponentIDs[ancestorComponentID])	//if we haven't already recorded the mouse as being over this ancestor
@@ -6114,13 +3666,13 @@ function onMouse(event)
 			case "mouseout":	//if we are leaving a component
 //guiseAJAX.trace("got mouse out of component ID: ", componentID);
 				delete mouseOverComponentIDs[componentID];	//indicate that the mouse is no longer over this component, even though it may now be over a child component					
-				if(!DOMUtilities.hasAncestor(otherComponent, component))	//if the mouse is supposedly leaving the component, make sure it's not just moving to a child element (see http://www.quirksmode.org/js/events_mouse.html#mouseover); if the mouse is really leaving this hierarchy
+				if(!Node.hasAncestor(otherComponent, component))	//if the mouse is supposedly leaving the component, make sure it's not just moving to a child element (see http://www.quirksmode.org/js/events_mouse.html#mouseover); if the mouse is really leaving this hierarchy
 				{
-					var ancestorComponents=DOMUtilities.getAncestorElementsByClassName(component, STYLES.COMPONENT);	//get an array of all ancestor components, including this component, in current-to-root order
+					var ancestorComponents=Node.getAncestorElementsByClassName(component, STYLES.COMPONENT);	//get an array of all ancestor components, including this component, in current-to-root order
 					for(var i=0, length=ancestorComponents.length; i<length; ++i)	//for each ancestor, from this one to root
 					{
 						var ancestorComponent=ancestorComponents[i];	//get this ancestor
-						if(DOMUtilities.hasAncestor(ancestorComponent, currentTarget))	//if we're not below the bottom mouse listener TODO eventually remove the special mouse listener concept and send everything back
+						if(Node.hasAncestor(ancestorComponent, currentTarget))	//if we're not below the bottom mouse listener TODO eventually remove the special mouse listener concept and send everything back
 						{
 							var ancestorComponentID=ancestorComponent.id;	//get the ID of this ancestor
 							if(!mouseOverComponentIDs[ancestorComponentID])	//if the mouse isn't over this ancestor (if the mouse moved to another subtree, we would have made sure the parent is marked as having the mouse
@@ -6151,7 +3703,7 @@ function onMouse(event)
 			default:	//TODO assert an error or warning
 				return;				
 		}
-//TODO del; always send mouse listen events in a mouse listener hierarchy		if(DOMUtilities.hasClassName(target, STYLES.MOUSE_LISTENER))	//if this is a mouse listener, report the event
+//TODO del; always send mouse listen events in a mouse listener hierarchy		if(Element.hasClassName(target, STYLES.MOUSE_LISTENER))	//if this is a mouse listener, report the event
 		{
 			var ajaxRequest=new MouseAJAXEvent(eventType, component, target, event.clientX, event.clientY, Boolean(event.altKey), Boolean(event.ctrlKey), Boolean(event.shiftKey));	//create a new AJAX mouse event
 			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
@@ -6160,20 +3712,6 @@ function onMouse(event)
 		}
 */
 	}	
-}
-
-/**Retrieves the ancestor form of the given node, starting at the node itself.
-@param node The node the form of which to find, or null if the search should not take place.
-@return The form in which the node lies, or null if the node is not within a form.
-*/
-function getForm(node)	//TODO improve; currently this two-direction search is needed because some components, such as frames, can live outside forms; change this so that frames get added inside the form
-{
-	var form=DOMUtilities.getAncestorElementByName(node, "form");	//get the form ancestor
-	if(form==null)	//if there is no form ancestor (e.g. the node is a frame outside the form) TODO remove all this (remove this entire function) because everything now goes inside the form
-	{
-		form=DOMUtilities.getDescendantElementByName(document.documentElement, "form");	//search the whole document for the form
-	}
-	return form;	//return the form we found, if any
 }
 
 /**Adds the given class name to all a component's elements.
@@ -6434,4 +3972,4 @@ function debug(text)
 	window.open(dymamicContent, "debug", "status=no,menubar=no,scrollbars=yes,resizable=no,width=800,height=600");
 }
 
-eventManager.addEvent(window, "load", onWindowLoad, false);	//do the appropriate initialization when the window loads
+com.garretwilson.js.EventManager.addEvent(window, "load", onWindowLoad, false);	//do the appropriate initialization when the window loads

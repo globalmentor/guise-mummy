@@ -10,26 +10,18 @@ import static java.util.Collections.*;
 
 import javax.mail.internet.ContentType;
 import javax.servlet.http.*;
-import javax.xml.parsers.*;
 
 import static com.garretwilson.io.ContentTypeConstants.*;
 import static com.garretwilson.io.ContentTypeUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.net.URIUtilities.getPlainURI;
-import static com.garretwilson.servlet.http.HttpServletUtilities.getReferer;
-import static com.garretwilson.servlet.http.HttpServletUtilities.setContentLanguage;
-import static com.garretwilson.servlet.http.HttpServletUtilities.getAcceptedContentTypes;
-import static com.garretwilson.servlet.http.HttpServletUtilities.isAcceptedContentType;
-import static com.garretwilson.servlet.http.HttpServletUtilities.getAcceptedLanguages;
+//import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 
 import com.garretwilson.io.ParseReader;
 import com.garretwilson.servlet.http.HttpServletUtilities;
 import com.garretwilson.text.CharacterEncoding;
 import static com.garretwilson.text.FormatUtilities.*;
-//TODO del if not needed import static com.garretwilson.text.xml.XMLConstants.*;
 import com.garretwilson.text.xml.QualifiedName;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
-import com.garretwilson.text.xml.xpath.XPath;
 
 import static com.garretwilson.text.CharacterEncodingConstants.*;
 
@@ -42,6 +34,7 @@ import com.guiseframework.GuiseEnvironment;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.context.text.xml.AbstractXMLGuiseContext;
+import com.guiseframework.context.text.xml.xhtml.AbstractXHTMLGuiseContext;
 import com.guiseframework.context.text.xml.xhtml.XHTMLGuiseContext;
 import com.guiseframework.controller.ControlEvent;
 import com.guiseframework.model.FileItemResourceImport;
@@ -60,7 +53,7 @@ import org.xml.sax.SAXException;
 The output stream defaults to <code>text/plain</code> encoded in <code>UTF-8</code>.
 @author Garret Wilson
 */
-public class HTTPServletGuiseContext extends AbstractXMLGuiseContext implements XHTMLGuiseContext
+public class HTTPServletGuiseContext extends AbstractXHTMLGuiseContext
 {
 
 	/**The HTTP servlet request.*/
@@ -196,7 +189,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 */
 		final ContentType defaultContentType=createContentType(outputContentType.getPrimaryType(), outputContentType.getSubType(), new NameValuePair<String, String>(CHARSET_PARAMETER, UTF_8));	//default to text/plain encoded in UTF-8
 		response.setContentType(defaultContentType.toString());	//initialize the default content type and encoding
-		setContentLanguage(response, session.getLocale());	//set the response content language
+		HttpServletUtilities.setContentLanguage(response, session.getLocale());	//set the response content language
 	}
 
 	/**Sets the current view interaction state of this context.
@@ -235,7 +228,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	*/
 	public ContentType[] getClientAcceptedContentTypes()
 	{
-		return getAcceptedContentTypes(getRequest());	//return the accepted content types from the request
+		return HttpServletUtilities.getAcceptedContentTypes(getRequest());	//return the accepted content types from the request
 	}
 
 	/**Determines if the client accepts the given content type.
@@ -255,7 +248,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	*/
 	public boolean isClientAcceptedContentType(final ContentType contentType, final boolean matchWildcards)
 	{
-		return isAcceptedContentType(getRequest(), contentType, matchWildcards);	//see if the client accepts the content type, matching wildcards if so requested
+		return HttpServletUtilities.isAcceptedContentType(getRequest(), contentType, matchWildcards);	//see if the client accepts the content type, matching wildcards if so requested
 	}
 
 	/**Returns a list of languages accepted by the client.
@@ -263,7 +256,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	*/
 	public Locale[] getClientAcceptedLanguages()
 	{
-		return getAcceptedLanguages(getRequest());	//return the accepted languages from the request
+		return HttpServletUtilities.getAcceptedLanguages(getRequest());	//return the accepted languages from the request
 	}
 
 	/**The map of soft references to IE6 fix class lists, keyed to style URIs.*/

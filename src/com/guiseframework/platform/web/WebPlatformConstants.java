@@ -32,7 +32,13 @@ public class WebPlatformConstants
 	/**The path of the empty HTML document, relative to the application.*/
 	public final static String GUISE_EMPTY_HTML_DOCUMENT_PATH=GuiseApplication.GUISE_PUBLIC_DOCUMENTS_PATH+"empty.html";
 
-	/**The path of the Guise JavaScript file, relative to the application.*/
+	/**The path of the JavaScript JavaScript file, relative to the application.*/
+	public final static String JAVASCRIPT_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"javascript.js";	
+	/**The path of the DOM JavaScript file, relative to the application.*/
+	public final static String DOM_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"dom.js";	
+	/**The path of the AJAX JavaScript file, relative to the application.*/
+	public final static String AJAX_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"ajax.js";	
+/**The path of the Guise JavaScript file, relative to the application.*/
 	public final static String GUISE_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"guise.js";	
 
 }
