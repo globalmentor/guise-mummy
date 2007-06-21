@@ -103,7 +103,7 @@ import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static com.garretwilson.util.LocaleUtilities.*;
 import static com.garretwilson.util.UUIDUtilities.*;
 import static com.guiseframework.Guise.*;
-import static com.guiseframework.platform.web.WebPlatformConstants.*;
+import static com.guiseframework.platform.web.GuiseWebPlatform.*;
 
 /**The servlet that controls a Guise web applications. 
 Only one Guise context will be active at one one time for a single session, so any Guise contexts that are not inactive can be assured that they will be the only context accessing the data.

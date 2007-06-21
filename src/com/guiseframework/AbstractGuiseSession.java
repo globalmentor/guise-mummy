@@ -31,6 +31,7 @@ import com.guiseframework.event.*;
 import com.guiseframework.geometry.Extent;
 import com.guiseframework.input.*;
 import com.guiseframework.model.*;
+import com.guiseframework.platform.GuisePlatform;
 import com.guiseframework.prototype.*;
 import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
@@ -181,27 +182,16 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		}
 
 	/**The user local environment.*/
-	private GuiseEnvironment environment;
+	private final GuiseEnvironment environment;
 
 		/**@return The user local environment.*/
 		public GuiseEnvironment getEnvironment() {return environment;}
 
-		/**Sets the user local environment.
-		This method will not normally be called directly from applications.
-		This is a bound property.
-		@param newEnvironment The new user local environment.
-		@exception NullPointerException if the given environment is <code>null</code>.
-		@see #ENVIRONMENT_PROPERTY
-		*/
-		public void setEnvironment(final GuiseEnvironment newEnvironment)
-		{
-			if(!ObjectUtilities.equals(environment, newEnvironment))	//if the value is really changing (compare their values, rather than identity)
-			{
-				final GuiseEnvironment oldEnvironment=environment;	//get the old value
-				environment=checkInstance(newEnvironment, "Guise session environment cannot be null.");	//actually change the value
-				firePropertyChange(ENVIRONMENT_PROPERTY, oldEnvironment, newEnvironment);	//indicate that the value changed
-			}
-		}
+	/**The platform on which Guise objects are depicted.*/
+	private final GuisePlatform platform;
+
+		/**@return The platform on which Guise objects are depicted.*/
+		public GuisePlatform getPlatform() {return platform;}
 
 	/**The strategy for processing input, or <code>null</code> if this session has no input strategy.*/
 	private InputStrategy inputStrategy=null;
@@ -762,14 +752,17 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		/**@return The action prototype for presenting application information.*/
 		public ActionPrototype getAboutApplicationActionPrototype() {return aboutApplicationActionPrototype;}
 
-	/**Guise application constructor.
+	/**Constructor.
 	The session local will initially be set to the locale of the associated Guise application.
 	No operation must be performed inside the constructor that would require the presence of the Guise session within this thread group.
 	@param application The Guise application to which this session belongs.
+	@param environment The initial environment of the session.
+	@param platform The platform on which this session's objects are depicted.
+	@exception NullPointerException if the given application, environment, and/or platform is <code>null</code>.
 	*/
-	public AbstractGuiseSession(final GuiseApplication application)
+	public AbstractGuiseSession(final GuiseApplication application, final GuiseEnvironment environment, final GuisePlatform platform)
 	{
-		this.application=application;	//save the Guise instance
+		this.application=checkInstance(application, "Application cannot be null.");	//save the application
 		this.baseURI=application.getContainer().getBaseURI().resolve(application.getBasePath());	//default to a base URI calculated from the application base path resolved to the container's base URI
 		try
 		{
@@ -779,7 +772,8 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		{
 			throw new AssertionError(parserConfigurationException);
 		}	
-		this.environment=new DefaultGuiseEnvironment();	//create a default environment
+		this.environment=checkInstance(environment, "Environment cannot be null.");	//save the environment
+		this.platform=checkInstance(platform, "Platform cannot be null.");	//save the platform
 		this.themeURI=application.getThemeURI();	//default to the application theme
 		this.locale=application.getLocales().get(0);	//default to the first application locale
 //TODO del when works		this.locale=application.getDefaultLocale();	//default to the application locale
@@ -1552,7 +1546,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		{
 			final long counter=idCounter.incrementAndGet();	//atomically get the next counter value
 			return "id"+Long.toHexString(counter);	//create an ID from the counter
-		}	
+		}
 
 	/**Reports that a bound property has changed.
 	This implementation delegates to the Guise session to fire or postpone the property change event.

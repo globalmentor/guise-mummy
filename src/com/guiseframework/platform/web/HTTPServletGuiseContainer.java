@@ -135,13 +135,9 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 				final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
 				Debug.info("memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
 			Debug.trace("+++creating Guise session", httpSession.getId());
-				guiseSession=guiseApplication.createSession();	//ask the application to create a new Guise session
-				final URI requestURI=URI.create(httpRequest.getRequestURL().toString());	//get the URI of the current request
-				final URI sessionBaseURI=requestURI.resolve(guiseApplication.getBasePath());	//resolve the application base path to the request URI
-				guiseSession.setBaseURI(sessionBaseURI);	//update the base URI to the one specified by the request, in case we can create a session from different URLs
 //TODO del if not needed				final String relativeApplicationPath=relativizePath(getBasePath(), guiseApplication.getBasePath());	//get the application path relative to the container path
 					//TODO set up the session outside the synchronized block, maybe, to reduce the amount of time blocking other threads
-				final GuiseEnvironment environment=guiseSession.getEnvironment();	//get the new session's environment
+				final GuiseEnvironment environment=new DefaultGuiseEnvironment();	//create a new environment
 				environment.setProperties(guiseApplication.getEnvironment().getProperties());	//copy the application environment to the session environment
 				final Cookie[] cookies=httpRequest.getCookies();	//get the cookies in the request
 				if(cookies!=null)	//if a cookie array was returned
@@ -157,6 +153,10 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 					}
 				}
 				environment.setProperties(getUserAgentProperties(httpRequest));	//initialize the Guise environment user agent information
+				guiseSession=guiseApplication.createSession(environment, new DefaultGuiseWebPlatform());	//ask the application to create a new Guise session for the given platform
+				final URI requestURI=URI.create(httpRequest.getRequestURL().toString());	//get the URI of the current request
+				final URI sessionBaseURI=requestURI.resolve(guiseApplication.getBasePath());	//resolve the application base path to the request URI
+				guiseSession.setBaseURI(sessionBaseURI);	//update the base URI to the one specified by the request, in case we can create a session from different URLs
 				addGuiseSession(guiseSession);	//add and initialize the Guise session
 				final Locale[] clientAcceptedLanguages=getAcceptedLanguages(httpRequest);	//get all languages accepted by the client
 				guiseSession.requestLocale(asList(clientAcceptedLanguages));	//ask the Guise session to change to one of the accepted locales, if the application supports one

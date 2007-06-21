@@ -3,11 +3,12 @@ package com.guiseframework.platform.web;
 import java.net.URI;
 
 import com.guiseframework.GuiseApplication;
+import com.guiseframework.platform.GuisePlatform;
 
-/**Constant values for the Guise web platform.
+/**The web platform for Guise.
 @author Garret Wilson
 */
-public class WebPlatformConstants
+public interface GuiseWebPlatform extends GuisePlatform
 {
 
 	/**The namespace of the Guise markup language to be used with XHTML.*/
@@ -28,17 +29,25 @@ public class WebPlatformConstants
 	public final static String ATTRIBUTE_CONTENT_HASH="contentHash";
 	/**The Guise attribute containing commands related to a specific element.*/
 	public final static String ATTRIBUTE_COMMANDS="commands";
-	
+
+	/**The path of the blank MP3 file, relative to the application.*/
+	public final static String BLANK_MP3_PATH=GuiseApplication.GUISE_PUBLIC_AUDIO_PATH+"blank.mp3";	
+
 	/**The path of the empty HTML document, relative to the application.*/
 	public final static String GUISE_EMPTY_HTML_DOCUMENT_PATH=GuiseApplication.GUISE_PUBLIC_DOCUMENTS_PATH+"empty.html";
 
-	/**The path of the JavaScript JavaScript file, relative to the application.*/
-	public final static String JAVASCRIPT_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"javascript.js";	
-	/**The path of the DOM JavaScript file, relative to the application.*/
-	public final static String DOM_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"dom.js";	
 	/**The path of the AJAX JavaScript file, relative to the application.*/
 	public final static String AJAX_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"ajax.js";	
-/**The path of the Guise JavaScript file, relative to the application.*/
+	/**The path of the DOM JavaScript file, relative to the application.*/
+	public final static String DOM_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"dom.js";	
+	/**The path of the Guise JavaScript file, relative to the application.*/
 	public final static String GUISE_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"guise.js";	
+	/**The path of the JavaScript JavaScript file, relative to the application.*/
+	public final static String JAVASCRIPT_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"javascript.js";	
+	/**The path of the SoundManager JavaScript file, relative to the application.*/
+	public final static String SOUNDMANAGER_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"soundmanager2.js";	
+
+	/**The path of the SoundManager Flash file, relative to the application.*/
+	public final static String SOUNDMANAGER_FLASH_PATH=GuiseApplication.GUISE_PUBLIC_FLASH_PATH+"soundmanager2.swf";	
 
 }

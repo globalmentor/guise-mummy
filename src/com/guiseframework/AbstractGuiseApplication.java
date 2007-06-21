@@ -39,6 +39,7 @@ import static com.guiseframework.theme.Theme.THEME_NAMESPACE_URI;
 import com.guiseframework.component.kit.ComponentKit;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.controller.*;
+import com.guiseframework.platform.GuisePlatform;
 import com.guiseframework.theme.Theme;
 import com.guiseframework.viewer.Viewer;
 
@@ -113,11 +114,14 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	/**Creates a new session for the application.
  	This version creates and returns a default session.
+	@param environment The initial environment of the session.
+	@param platform The platform on which this session's objects are depicted.
 	@return A new session for the application
+	@exception NullPointerException if the given environment and/or platform is <code>null</code>.
 	*/
-	public GuiseSession createSession()
+	public GuiseSession createSession(final GuiseEnvironment environment, final GuisePlatform platform)
 	{
-		return new DefaultGuiseSession(this);	//create a new default Guise session
+		return new DefaultGuiseSession(this, environment, platform);	//create a new default Guise session
 	}
 
 	/**The concurrent map of Guise session info keyed to Guise sessions.*/

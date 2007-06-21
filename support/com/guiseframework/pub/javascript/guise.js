@@ -5,10 +5,12 @@ Dependencies:
 	javascript.js
 	dom.js
 	ajax.js
+	soundmanager2.js
 
 This script expects the following variables to be defined:
 navigator.userAgentName The name of the user agent, such as "Firefox", "Mozilla", "MSIE", or "Opera".
 navigator.userAgentVersionNumber The version of the user agent stored as a number.
+GUISE_PUBLIC_RESOURCE_BASE_PATH The absolute base path of Guise public resources.
 */
 
 /*Guise AJAX Request Format, content type application/x-guise-ajax-request+xml
@@ -88,6 +90,7 @@ navigator.userAgentVersionNumber The version of the user agent stored as a numbe
 	<remove id=""/>	<!--ID of the XML element to be removed from the existing DOM tree-->
 	<navigate>uri</navigate>	<!--URI of another page to which to navigate-->
 	<frame></frame>	<!--definition of a frame to show-->
+	<javascript></javascript>	<!--JavaScript -->
 </response>
 */
 
@@ -482,7 +485,7 @@ function GuiseAJAX()
 			this._uploadIFrame=document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");	//create an IFrame
 			this._uploadIFrame.id="uploadIFrame";	//set the ID of the frame so that we can do the IE fix later
 			this._uploadIFrame.name="uploadIFrame";
-			this._uploadIFrame.src=GUISE_EMPTY_HTML_DOCUMENT_PATH;	//set the source to be an empty HTML document that won't create SSL messages of insecurity
+			this._uploadIFrame.src=GUISE_PUBLIC_RESOURCE_BASE_PATH+"documents/empty.html";	//set the source to be an empty HTML document that won't create SSL messages of insecurity
 			this._uploadIFrame.width="100px";	//Safari will ignore the IFrame if it has a size of 0, according to http://blog.caboo.se/articles/2007/4/2/ajax-file-upload
 			this._uploadIFrame.height="100px";
 			this._uploadIFrame.frameBorder="0";	//remove the border; see http://msdn2.microsoft.com/en-us/library/ms533770.aspx
@@ -3972,4 +3975,15 @@ function debug(text)
 	window.open(dymamicContent, "debug", "status=no,menubar=no,scrollbars=yes,resizable=no,width=800,height=600");
 }
 
+soundManager.url=GUISE_PUBLIC_RESOURCE_BASE_PATH+"flash/soundmanager2.swf"; //override default SoundManager SWF URL
+soundManager.nullURL=GUISE_PUBLIC_RESOURCE_BASE_PATH+"audio/blank.mp3"; //set the location of the blank MP3 file
+soundManager.debugMode=false;	//turn off SoundManager debugging
+soundManager.allowPolling=true;	//allow Flash to poll for status updates
+
 com.garretwilson.js.EventManager.addEvent(window, "load", onWindowLoad, false);	//do the appropriate initialization when the window loads
+
+soundManager.onload = function()	//TODO testing
+{
+  soundManager.createSound("desperado", "https://dav.globalmentor.com/public/desperado.mp3");
+  soundManager.play("desperado");
+}

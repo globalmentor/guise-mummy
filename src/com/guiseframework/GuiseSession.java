@@ -8,7 +8,6 @@ import java.util.*;
 
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.event.PostponedEvent;
-import com.garretwilson.rdf.DefaultRDFResource;
 import com.garretwilson.rdf.RDFResource;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
@@ -18,12 +17,12 @@ import com.guiseframework.input.Input;
 import com.guiseframework.input.InputStrategy;
 import com.guiseframework.model.InformationLevel;
 import com.guiseframework.model.Notification;
+import com.guiseframework.platform.GuisePlatform;
 import com.guiseframework.prototype.ActionPrototype;
 import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.checkInstance;
 
 /**Represents a session with a user.
 A Swing-based client application may have only one session, while a web server application will likely have multiple sessions.
@@ -32,8 +31,6 @@ A Swing-based client application may have only one session, while a web server a
 public interface GuiseSession extends PropertyBindable
 {
 
-	/**The environment bound property.*/
-	public final static String ENVIRONMENT_PROPERTY=getPropertyName(GuiseSession.class, "environment");
 	/**The input strategy bound property.*/
 	public final static String INPUT_STRATEGY_PROPERTY=getPropertyName(GuiseSession.class, "inputStrategy");
 	/**The locale bound property.*/
@@ -94,14 +91,8 @@ public interface GuiseSession extends PropertyBindable
 	/**@return The user local environment.*/
 	public GuiseEnvironment getEnvironment();
 
-	/**Sets the user local environment.
-	This method will not normally be called directly from applications.
-	This is a bound property.
-	@param newEnvironment The new user local environment.
-	@exception NullPointerException if the given environment is <code>null</code>.
-	@see #ENVIRONMENT_PROPERTY
-	*/
-	public void setEnvironment(final GuiseEnvironment newEnvironment);
+	/**@return The platform on which Guise objects are depicted.*/
+	public GuisePlatform getPlatform();
 
 	/**@return The strategy for processing input.*/
 	public InputStrategy getInputStrategy();

@@ -10,6 +10,7 @@ import com.guiseframework.component.*;
 import com.guiseframework.component.kit.ComponentKit;
 import com.guiseframework.context.GuiseContext;
 import com.guiseframework.controller.*;
+import com.guiseframework.platform.GuisePlatform;
 import com.guiseframework.theme.Theme;
 import com.guiseframework.viewer.Viewer;
 
@@ -42,8 +43,12 @@ public interface GuiseApplication extends PropertyBindable
 	public final static String GUISE_PUBLIC_RESOURCE_BASE_PATH=GUISE_RESERVED_BASE_PATH+"resources/";
 	/**The application-relative base path to access all Guise temp files.*/
 	public final static String GUISE_PUBLIC_TEMP_BASE_PATH=GUISE_RESERVED_BASE_PATH+"temp/";
+	/**The base path of public audio, relative to the application.*/
+	public final static String GUISE_PUBLIC_AUDIO_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH+"audio/";
 	/**The base path of public documents, relative to the application.*/
 	public final static String GUISE_PUBLIC_DOCUMENTS_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH+"documents/";
+	/**The base path of public Flash files, relative to the application.*/
+	public final static String GUISE_PUBLIC_FLASH_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH+"flash/";
 	/**The base path of public JavaScript files, relative to the application.*/
 	public final static String GUISE_PUBLIC_JAVASCRIPT_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH+"javascript/";
 	/**The base path of public themes, relative to the application.*/
@@ -208,9 +213,12 @@ public interface GuiseApplication extends PropertyBindable
 	public GuiseContainer getContainer();
 
 	/**Creates a new session for the application.
+	@param environment The initial environment of the session.
+	@param platform The platform on which this session's objects are depicted.
 	@return A new session for the application
+	@exception NullPointerException if the given environment and/or platform is <code>null</code>.
 	*/
-	public GuiseSession createSession();
+	public GuiseSession createSession(final GuiseEnvironment environment, final GuisePlatform platform);
 
 	/**Registers a session with this application.
 	The Guise session has not yet been initialized when this method is called.

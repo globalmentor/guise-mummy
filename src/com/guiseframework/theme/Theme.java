@@ -73,8 +73,8 @@ public class Theme extends ClassTypedRDFResource
 	{
 		final Class<?> objectClass=checkInstance(object, "Object cannot be null").getClass();	//get the object's class
 		Set<Rule> combinedRuleSet=null;	//we'll create the rule set only if needed
-		final Set<Class<?>> ancestorClasses=getAncestorClasses(objectClass);	//get the class ancestor hierarchy of this class TODO cache these
-		for(final Class<?> ancestorClass:ancestorClasses)	//for each ancestor class
+		final List<Class<?>> ancestorClasses=getAncestorClasses(objectClass);	//get the class ancestor hierarchy of this class TODO cache these
+		for(final Class<?> ancestorClass:ancestorClasses)	//for each ancestor class TODO iterate the list in the correct order; send back the rules in the correct order
 		{
 			final Set<Rule> ruleSet=classRuleMap.get(ancestorClass);	//try to get a rule for the object's ancestor class
 			if(ruleSet!=null)	//if we found a rule set
