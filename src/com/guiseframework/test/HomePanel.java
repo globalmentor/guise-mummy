@@ -21,6 +21,7 @@ import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseSession;
 import com.guiseframework.Resources;
 import com.guiseframework.Bookmark.Parameter;
+import com.guiseframework.audio.Audio;
 import com.guiseframework.component.*;
 import com.guiseframework.component.effect.*;
 import com.guiseframework.component.layout.*;
@@ -473,6 +474,22 @@ Debug.trace("list control changed value to", newValue);
 						);
 					}
 				});
+
+		final Button audioButton=new Button();
+		audioButton.setLabel("Audio");
+		audioButton.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent actionEvent)
+					{
+						final Audio audio=new Audio();
+						audio.setAudioURI(URI.create("https://dav.globalmentor.com/public/desperado.mp3"));
+						audio.start();
+					}
+				});
+		buttonPanel.add(audioButton);	//add a new button
+		
+		
+		
 		buttonPanel.add(modalLink);	//add a new button
 		
 		final Link helloLink=new Link();

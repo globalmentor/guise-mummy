@@ -32,6 +32,8 @@ import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.event.ProgressEvent;
 import com.garretwilson.event.ProgressListener;
 import com.garretwilson.io.*;
+import com.garretwilson.javascript.JSON;
+
 import static com.garretwilson.io.OutputStreamUtilities.*;
 import com.garretwilson.lang.ClassUtilities;
 import static com.garretwilson.lang.EnumUtilities.*;
@@ -95,6 +97,8 @@ import com.guiseframework.geometry.*;
 import com.guiseframework.input.Key;
 import com.guiseframework.model.FileItemResourceImport;
 import com.guiseframework.model.TaskState;
+import com.guiseframework.platform.GuisePlatform;
+import com.guiseframework.platform.PlatformEvent;
 import com.guiseframework.platform.web.css.*;
 import com.guiseframework.theme.Theme;
 import com.guiseframework.viewer.text.xml.xhtml.XHTMLApplicationFrameViewer;
@@ -816,9 +820,9 @@ Debug.trace("got control events");
 					final Set<Component<?>> requestedComponents=new HashSet<Component<?>>();	//create a set of component that were identified in the request
 					try
 					{
-						if(requestEvent instanceof ControlEvent)	//if this is a control event
+						if(requestEvent instanceof WebPlatformEvent)	//if this is a control event
 						{
-							final ControlEvent controlEvent=(ControlEvent)requestEvent;	//get the request event as a control event
+							final WebPlatformEvent controlEvent=(WebPlatformEvent)requestEvent;	//get the request event as a control event
 							if(controlEvent instanceof FormControlEvent)	//if this is a form submission
 							{
 								final FormControlEvent formControlEvent=(FormControlEvent)controlEvent;	//get the form control event
@@ -1190,6 +1194,24 @@ Debug.trace("got control events");
 								guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "remove");	//</xhtml:remove>							
 							}
 						}
+							//send any platform events
+						final GuiseWebPlatform platform=(GuiseWebPlatform)guiseSession.getPlatform();	//get the current platform
+						final Queue<PlatformEvent> sendEventQueue=platform.getSendEventQueue();	//get the queue for sending events
+						PlatformEvent platformEvent=sendEventQueue.poll();	//get any event to send to the platform
+						while(platformEvent!=null)	//while there are events to send to the platform
+						{
+							if(platformEvent instanceof WebCommandEvent)	//if this is a web command
+							{
+								final WebCommandEvent<?, ?> webCommandEvent=(WebCommandEvent<?, ?>)platformEvent;	//get the web command
+								guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "command");	//<xhtml:command>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
+								guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
+								guiseContext.writeAttribute(null, "objectID", platform.getDepictIDString(webCommandEvent.getDepictedObject().getID()));	//objectID="depictedObjectID" TODO use a constant
+								guiseContext.writeAttribute(null, "command", getSerializationName(webCommandEvent.getCommand()));	//command="webCommand" TODO use a constant
+								guiseContext.write(JSON.serialize(webCommandEvent.getParameters()));	//{parameters...}
+								guiseContext.writeElementEnd(XHTML_NAMESPACE_URI, "command");	//</xhtml:command>
+							}
+							platformEvent=sendEventQueue.poll();	//get the next event to send to the platform
+						}						
 					}
 					else	//if this is not an AJAX request
 					{

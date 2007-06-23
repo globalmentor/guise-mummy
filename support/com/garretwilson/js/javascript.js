@@ -271,6 +271,36 @@ function StringBuilder(strings)
 	}
 }
 
+//JSON
+
+/**A set of utilities for working with JSON.
+@see http://www.ietf.org/rfc/rfc4627.txt
+*/
+var JSON=
+{
+
+	/**The regular expression for testing JSON expressions.*/
+	_TEST_REGEXP:/[^,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t]/,
+
+	/**The regular expression for testing JSON expressions.*/
+	_REPLACE_REGEXP:/\"(\\.|[^\"\\])*\"/g,
+
+	/**Evaluates a JSON expression, returning the result of the expression.
+	@param json The JSON expression to evaluate.
+	@return The result of the JSON evaluation
+	@exception If the JSON expression contains more than the valid JSON subset or is otherwise invalid.
+	*/
+	evaluate:function(json)
+	{
+		if(this._TEST_REGEXP.test(json.replace(this._REPLACE_REGEXP, "")))	//if the JSON expression is invalid
+		{
+			throw "Invalid JSON expression: "+json;
+		}
+		return eval("("+json+")");	//evaluate and return the JSON expresion
+	}
+
+}
+
 //Map
 
 /**A class encapsulating keys and values.

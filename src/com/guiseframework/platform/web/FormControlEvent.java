@@ -10,7 +10,7 @@ import com.guiseframework.controller.*;
 /**A control event indicating that a full or partial form submission occurred.
 @author Garret Wilson
 */
-public class FormControlEvent extends AbstractControlEvent
+public class FormControlEvent extends AbstractWebPlatformEvent
 {
 
 	/**Whether this event represents all components on the form.*/

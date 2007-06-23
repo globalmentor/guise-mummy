@@ -20,6 +20,7 @@ import com.guiseframework.input.Input;
 import com.guiseframework.input.InputStrategy;
 import com.guiseframework.model.*;
 import com.guiseframework.model.ui.PresentationModel;
+import com.guiseframework.platform.web.WebPlatformEvent;
 import com.guiseframework.theme.Theme;
 import com.guiseframework.viewer.Viewer;
 
@@ -374,7 +375,7 @@ public interface Component<C extends Component<C>> extends PresentationModel, La
 	@see #getController()
 	@see GuiseContext.State#PROCESS_EVENT
 	*/
-	public void processEvent(final ControlEvent event);
+	public void processEvent(final WebPlatformEvent event);
 
 	/**Updates the view of this component.
 	This method should not normally be called directly by applications.

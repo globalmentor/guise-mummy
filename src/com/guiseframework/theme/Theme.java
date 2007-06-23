@@ -263,6 +263,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI GLYPH_ACCESS=createURIResourceReference("theme.glyph.access");
 	public final static URI GLYPH_ANIMATION=createURIResourceReference("theme.glyph.animation");
 	public final static URI GLYPH_ADD=createURIResourceReference("theme.glyph.add");
+	public final static URI GLYPH_AUDIO=createURIResourceReference("theme.glyph.audio");
 	public final static URI GLYPH_BLANK=createURIResourceReference("theme.glyph.blank");
 	public final static URI GLYPH_BUSY=createURIResourceReference("theme.glyph.busy");
 	public final static URI GLYPH_CANCEL=createURIResourceReference("theme.glyph.cancel");
@@ -301,6 +302,15 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI GLYPH_LOCK_OPEN=createURIResourceReference("theme.glyph.lock.open");
 	public final static URI GLYPH_LOGIN=createURIResourceReference("theme.glyph.login");
 	public final static URI GLYPH_LOGOUT=createURIResourceReference("theme.glyph.logout");
+	public final static URI GLYPH_MEDIA_ADVANCE=createURIResourceReference("theme.glyph.media.advance");
+	public final static URI GLYPH_MEDIA_NEXT=createURIResourceReference("theme.glyph.media.next");
+	public final static URI GLYPH_MEDIA_PAUSE=createURIResourceReference("theme.glyph.media.pause");
+	public final static URI GLYPH_MEDIA_PLAY=createURIResourceReference("theme.glyph.media.play");
+	public final static URI GLYPH_MEDIA_PREVIOUS=createURIResourceReference("theme.glyph.media.previous");
+	public final static URI GLYPH_MEDIA_RECEDE=createURIResourceReference("theme.glyph.media.recede");
+	public final static URI GLYPH_MEDIA_RECORD=createURIResourceReference("theme.glyph.media.record");
+	public final static URI GLYPH_MEDIA_STOP=createURIResourceReference("theme.glyph.media.stop");
+	public final static URI GLYPH_MUSIC=createURIResourceReference("theme.glyph.music");
 	public final static URI GLYPH_NEXT=createURIResourceReference("theme.glyph.next");
 	public final static URI GLYPH_PASSWORD=createURIResourceReference("theme.glyph.password");
 	public final static URI GLYPH_PICTURE=createURIResourceReference("theme.glyph.picture");

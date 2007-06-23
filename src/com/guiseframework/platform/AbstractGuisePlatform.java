@@ -2,6 +2,7 @@ package com.guiseframework.platform;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.garretwilson.lang.ClassUtilities.*;
@@ -28,7 +29,6 @@ public abstract class AbstractGuisePlatform implements GuisePlatform
 		{
 			return (Class<? extends Depictor<? super O>>)depictorMap.put(depictedObjectClass, depictorClass);	//register the depictor and return the old registration, if any
 		}
-
 	
 		/**Determines the depictor class registered for the given depicted object class.
 		@param <O> The type of registered depicted object class.
@@ -124,4 +124,15 @@ public abstract class AbstractGuisePlatform implements GuisePlatform
 			return depictIDCounter.incrementAndGet();	//atomically get the next counter value
 		}	
 
+	/**The thread-safe queue of events to be delivered to the platform.*/
+	private final Queue<PlatformEvent> sendEventQueue=new ConcurrentLinkedQueue<PlatformEvent>();
+
+		/**@return The thread-safe queue of events to be delivered to the platform.*/
+		public Queue<PlatformEvent> getSendEventQueue() {return sendEventQueue;}
+	
+		/**Offers an event to be sent to the platform.
+		@param event The event to be queued for sending.
+		@return <code>true</code> if the event was successfully queued for sending to the platform.
+		*/
+//TODO del if not needed		public boolean offerSendEvent(final PlatformEvent event) {return sendEventQueue.offer(event);}
 }

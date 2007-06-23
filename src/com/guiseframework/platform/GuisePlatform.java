@@ -1,6 +1,6 @@
 package com.guiseframework.platform;
 
-import static com.garretwilson.lang.ObjectUtilities.checkInstance;
+import java.util.Queue;
 
 /**The platform on which Guise objects are being depicted.
 @author Garret Wilson
@@ -33,5 +33,8 @@ public interface GuisePlatform
 	@exception NullPointerException if the given depicted object is <code>null</code>.
 	*/
 	public void unregisterDepictedObject(final DepictedObject depictedObject);
+
+	/**@return The thread-safe queue of events to be delivered to the platform.*/
+	public Queue<PlatformEvent> getSendEventQueue();
 
 }

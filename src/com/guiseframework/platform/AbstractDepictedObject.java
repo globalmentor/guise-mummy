@@ -30,6 +30,17 @@ public abstract class AbstractDepictedObject extends GuiseBoundPropertyObject im
 		final GuisePlatform platform=session.getPlatform();	//get the Guise platform
 		this.id=platform.generateDepictID();	//ask the platform to generate a new depict ID
 		this.depictor=platform.getDepictor(this);	//ask the platform for a depictor for the object
+		notifyDepictorInstalled(depictor);	//tell the the depictor it has been installed
 		platform.registerDepictedObject(this);	//register this depicted object with the platform
+	}
+
+	/**Notifies a depictor that it has been installed in this object.
+	@param <O> The type of depicted object expected by the depictor.
+	@param depictor The depictor that has been installed.
+	*/
+	@SuppressWarnings("unchecked")	//at this point we have to assume that the correct type of depictor has been registered for this object
+	private <O extends DepictedObject> void notifyDepictorInstalled(final Depictor<O> depictor)
+	{
+		depictor.installed((O)this);	//tell the depictor it has been installed		
 	}
 }

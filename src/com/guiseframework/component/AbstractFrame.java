@@ -55,10 +55,10 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 		*/
 		protected void setState(final State newState)
 		{
-			if(state!=checkInstance(newState, "State cannot be null."))	//if the value is really changing
+			if(state!=newState)	//if the value is really changing
 			{
 				final State oldState=state;	//get the old value
-				state=newState;	//actually change the value
+				state=checkInstance(newState, "State cannot be null.");	//actually change the value
 				firePropertyChange(STATE_PROPERTY, oldState, newState);	//indicate that the value changed
 				setMode(isModal() && newState!=State.CLOSED ? Mode.EXCLUSIVE : null);	//set exclusive modal mode if we are open and modal
 			}			

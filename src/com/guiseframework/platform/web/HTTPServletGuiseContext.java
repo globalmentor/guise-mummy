@@ -36,7 +36,6 @@ import com.guiseframework.context.GuiseContext;
 import com.guiseframework.context.text.xml.AbstractXMLGuiseContext;
 import com.guiseframework.context.text.xml.xhtml.AbstractXHTMLGuiseContext;
 import com.guiseframework.context.text.xml.xhtml.XHTMLGuiseContext;
-import com.guiseframework.controller.ControlEvent;
 import com.guiseframework.model.FileItemResourceImport;
 import com.guiseframework.platform.web.css.CSSStylesheet;
 import com.guiseframework.platform.web.css.ClassSelector;

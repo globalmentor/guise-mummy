@@ -16,9 +16,6 @@
 		<resource:application.copyright></resource:application.copyright>
 		<resource:application.version>0.0.0</resource:application.version>
 
-		<!-- general Guise labels -->
-		<resource:error.label>Error</resource:error.label>	<!-- TODO move to Theme -->
-	
 		<!-- Guise converters -->
 		<resource:converter.invalid.value.message>Invalid value: "{0}".</resource:converter.invalid.value.message>
 	

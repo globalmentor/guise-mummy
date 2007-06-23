@@ -50,4 +50,10 @@ public interface GuiseWebPlatform extends GuisePlatform
 	/**The path of the SoundManager Flash file, relative to the application.*/
 	public final static String SOUNDMANAGER_FLASH_PATH=GuiseApplication.GUISE_PUBLIC_FLASH_PATH+"soundmanager2.swf";	
 
+	/**Generates an ID for the given depicted object appropriate for using on the platform.
+	@param depictID The depict ID to be converted to a platform ID.
+	@return The form of the depict ID appropriate for using on the platform.
+	*/
+	public String getDepictIDString(final long depictID);
+
 }

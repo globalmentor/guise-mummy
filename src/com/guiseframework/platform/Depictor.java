@@ -2,6 +2,8 @@ package com.guiseframework.platform;
 
 import java.io.IOException;
 
+import com.guiseframework.GuiseSession;
+
 /**A strategy for depicting objects on some platform.
 @param <O> The type of object being depicted.
 @author Garret Wilson
@@ -10,6 +12,12 @@ public interface Depictor<O extends DepictedObject>
 {
 	/**The property indicating general depicted object changes.*/
 	public final static String GENERAL_PROPERTY="generalProperty";
+
+	/**@return The Guise session that owns this object.*/
+	public GuiseSession getSession();
+
+	/**@return The platform on which this depictor is depicting ojects.*/
+	public GuisePlatform getPlatform();
 
 	/**@return The object being depicted, or <code>null</code> if this depictor is not installed in a depicted object.*/
 	public O getDepictedObject();

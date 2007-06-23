@@ -3,14 +3,13 @@ package com.guiseframework.platform.web;
 import java.net.URI;
 
 import com.guiseframework.context.GuiseContext;
-import com.guiseframework.controller.AbstractControlEvent;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**A control event indicating that initialization should occur.
 @author Garret Wilson
 */
-public class InitControlEvent extends AbstractControlEvent
+public class InitControlEvent extends AbstractWebPlatformEvent
 {
 
 	/**The hour of the browser.*/

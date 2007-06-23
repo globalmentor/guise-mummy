@@ -1,12 +1,11 @@
 package com.guiseframework.platform.web;
 
 import com.guiseframework.context.GuiseContext;
-import com.guiseframework.controller.AbstractControlEvent;
 
 /**A control event for pinging the server.
 @author Garret Wilson
 */
-public class PingControlEvent extends AbstractControlEvent
+public class PingControlEvent extends AbstractWebPlatformEvent
 {
 
 	/**Context constructor.

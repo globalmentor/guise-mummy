@@ -6,6 +6,8 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.garretwilson.beans.PropertyBindable;
+import com.guiseframework.Guise;
+import com.guiseframework.GuiseSession;
 import com.guiseframework.event.*;
 
 /**An abstract strategy for depicting objects on some platform.
@@ -15,6 +17,15 @@ import com.guiseframework.event.*;
 public abstract class AbstractDepictor<O extends DepictedObject> implements Depictor<O>
 {
 
+	/**The Guise session that owns this object.*/
+	private final GuiseSession session;
+
+		/**@return The Guise session that owns this object.*/
+		public GuiseSession getSession() {return session;}
+
+		/**@return The platform on which this depictor is depicting ojects.*/
+		public GuisePlatform getPlatform() {return getSession().getPlatform();}
+		
 	/**The thread-safe list of properties that are to be ignored.*/
 	private final Set<String> ignoredProperties=new CopyOnWriteArraySet<String>(); 
 
@@ -88,6 +99,7 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	/**Default constructor.*/
 	public AbstractDepictor()
 	{
+		this.session=Guise.getInstance().getGuiseSession();	//store a reference to the current Guise session
 	}
 		
 	/**Called when the depictor is installed in a depicted object.

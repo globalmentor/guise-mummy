@@ -30,6 +30,7 @@ import com.guiseframework.input.Input;
 import com.guiseframework.input.InputStrategy;
 import com.guiseframework.model.*;
 import com.guiseframework.model.ui.AbstractPresentationModel;
+import com.guiseframework.platform.web.WebPlatformEvent;
 import com.guiseframework.prototype.PrototypeConsumer;
 import com.guiseframework.theme.Theme;
 import com.guiseframework.viewer.Viewer;
@@ -883,7 +884,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	@see #getController()
 	@see GuiseContext.State#PROCESS_EVENT
 	*/
-	public void processEvent(final ControlEvent event)
+	public void processEvent(final WebPlatformEvent event)
 	{
 		getController().processEvent(getThis(), event);	//tell the controller to process the event
 	}

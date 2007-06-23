@@ -23,7 +23,7 @@ public class CommandInput extends AbstractHashObject implements Input
 	public CommandInput(final Command command)
 	{
 		super(checkInstance(command, "Command cannot be null."));	//construct the parent class
-		this.command=command;	//save the name
+		this.command=command;	//save the command
 	}
 
 }

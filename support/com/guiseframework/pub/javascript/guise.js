@@ -90,7 +90,7 @@ GUISE_PUBLIC_RESOURCE_BASE_PATH The absolute base path of Guise public resources
 	<remove id=""/>	<!--ID of the XML element to be removed from the existing DOM tree-->
 	<navigate>uri</navigate>	<!--URI of another page to which to navigate-->
 	<frame></frame>	<!--definition of a frame to show-->
-	<javascript></javascript>	<!--JavaScript -->
+	<command objectID="" command="">parameters</command>	<!--a command with parameters encoded as JSON-->
 </response>
 */
 
@@ -459,15 +459,17 @@ function GuiseAJAX()
 		/**The enumeration of the names of the response elements.*/
 		GuiseAJAX.prototype.ResponseElement=
 				{
-					RESPONSE: "response",
-					PATCH: "patch",
 					ATTRIBUTE: "attribute",
+					COMMAND: "command",
 					NAME: "name",
-					VALUE: "value",
-					REMOVE: "remove",
 					NAVIGATE: "navigate",
-					VIEWPORT_ID: "viewportID",
-					RELOAD: "reload"
+					OBJECT_ID: "objectID",
+					PATCH: "patch",
+					RELOAD: "reload",
+					REMOVE: "remove",
+					RESPONSE: "response",
+					VALUE: "value",
+					VIEWPORT_ID: "viewportID"
 				};
 
 		/**Creates a new IFrame for receiving the contents of a file upload.
@@ -998,6 +1000,10 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 											this._processAttribute(childNode);	//patch the document with this attribute information
 											break;
 	*/
+										case this.ResponseElement.COMMAND:	//command
+//TODO del alert("this is a remove");
+											this._processCommand(childNode);
+											break;
 										case this.ResponseElement.REMOVE:	//remove
 //TODO del alert("this is a remove");
 											this._processRemove(childNode);	//remove the elements from the document with this removal element
@@ -1041,6 +1047,26 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 						guise.restoreTempElementCursors();	//restore the element cursors that were temporarily set just for this AJAX call
 					}
 				}
+			}
+		};
+
+		/**Processes the AJAX command response.
+		@param element The element representing the command response.
+		*/ 
+		GuiseAJAX.prototype._processCommand=function(element)
+		{
+			var objectID=element.getAttribute(this.ResponseElement.OBJECT_ID);	//get the object ID, if there is one
+				//assert objectID
+			var command=element.getAttribute(this.ResponseElement.COMMAND);	//get the command
+				//assert commandName
+			var parameters=JSON.evaluate(DOMUtilities.getNodeText(element));	//parse the parameters
+				//assert parameters
+//			alert("received command "+command+" for object "+objectID+" with audioURI "+parameters["audioURI"]);
+			switch(command)	//see which command this is
+			{
+				case "audio-start":
+					soundManager.play(objectID, parameters["audioURI"]);	//play the sound
+					break;
 			}
 		};
 
@@ -3981,9 +4007,10 @@ soundManager.debugMode=false;	//turn off SoundManager debugging
 soundManager.allowPolling=true;	//allow Flash to poll for status updates
 
 com.garretwilson.js.EventManager.addEvent(window, "load", onWindowLoad, false);	//do the appropriate initialization when the window loads
-
+/*TODO del
 soundManager.onload = function()	//TODO testing
 {
   soundManager.createSound("desperado", "https://dav.globalmentor.com/public/desperado.mp3");
   soundManager.play("desperado");
 }
+*/
