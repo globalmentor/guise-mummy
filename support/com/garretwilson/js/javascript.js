@@ -37,22 +37,25 @@ Array.prototype.enqueue=Array.prototype.push;
 /**A dequeue() method for arrays, equivalent to Array.shift().*/
 Array.prototype.dequeue=Array.prototype.shift;
 
-/**Determines the index of the first occurrence of a given object in the array.
-@param object The object to find in the array.
-@return The index of the object in the array, or -1 if the object is not in the array.
-*/
-Array.prototype.indexOf=function(object)
+if(typeof Array.prototype.indexOf=="undefined")	//defined in JavaScript 1.6
 {
-	var length=this.length;	//get the length of the array
-	for(var i=0; i<length; ++i)	//for each index
+	/**Determines the index of the first occurrence of a given object in the array.
+	@param object The object to find in the array.
+	@return The index of the object in the array, or -1 if the object is not in the array.
+	*/
+	Array.prototype.indexOf=function(object)
 	{
-		if(this[i]==object)	//if this object is the requested object
+		var length=this.length;	//get the length of the array
+		for(var i=0; i<length; ++i)	//for each index
 		{
-			return i;	//return this index
+			if(this[i]==object)	//if this object is the requested object
+			{
+				return i;	//return this index
+			}
 		}
-	}
-	return -1;	//indicate that the object could not be found
-};
+		return -1;	//indicate that the object could not be found
+	};
+}
 
 /**Determines the index of the first match of a given object in the array using object.toString() if the object isn't null.
 @param regexp The regular expression of the string version of the object to find in the array.
@@ -125,16 +128,43 @@ var EMPTY_ARRAY=new Array();	//a shared empty array TODO create methods to make 
 
 /**Creates a new function that functions exactly as does the original function,
 except that it provides the given variable to appear as "this" to the new function.
+Any other given arguments will be inserted before the actual arguments when the function is invoked.
 @param newThis The variable to appear as "this" when the function is called.
+@param extraArguments The new arguments, if any, to appear at the first of the arguments when the new function is called.
 @return A new function bound to the given this.
 @see http://www.prototypejs.org/api/function/bind
 */
-Function.prototype.bind=function(newThis)
+Function.prototype.bind=function()
 {
 	var originalFunction=this;	//save a reference to this function instance to allow calling this via closure
+	var extraArguments=Array.from(arguments);	//get the provided arguments
+	var newThis=extraArguments.shift();	//get the first argument, which provides the new this when calling the function, and leaving the remaining arguments to be passed to the function
 	return function()	//create and send back a new function
 	{
-		originalFunction.apply(newThis, arguments);	//the new function will call the original function with whatever arguments are given, but using the given this instead of whatever this is passed when the function is called
+		originalFunction.apply(newThis, extraArguments.length!=0 ? extraArguments.concat(Array.from(arguments)) : arguments);	//the new function will call the original function with the new arguments followed by whatever arguments are given, but using the given this instead of whatever this is passed when the function is called
+	};
+};
+
+/**Creates a new function that functions exactly as does the original function,
+except that it provides the given variable to appear as "this" to the new function.
+The original this present when the function is invoked will be inserted as the first argument.
+Any other given arguments will be inserted before the actual arguments when the function is invoked.
+@param newThis The variable to appear as "this" when the function is called.
+@param extraArguments The new arguments, if any, to appear at the first of the arguments when the new function is called.
+@return A new function bound to the given this.
+@see http://www.prototypejs.org/api/function/bind
+*/
+Function.prototype.bindOldThis=function()
+{
+	var originalFunction=this;	//save a reference to this function instance to allow calling this via closure
+	var extraArguments=Array.from(arguments);	//get the provided arguments
+	var newThis=extraArguments.shift();	//get the first argument, which provides the new this when calling the function, and leaving the remaining arguments to be passed to the function
+	return function()	//create and send back a new function
+	{
+		var actualArguments=Array.from(arguments);	//get the actual arguments as an array
+		var newArguments=extraArguments.length!=0 ? extraArguments.concat(actualArguments) : actualArguments;	//if extra arguments were supplied, use them at the front of the array
+		newArguments.unshift(this);	//insert the old this at the beginning of the arguments
+		originalFunction.apply(newThis, newArguments);	//the new function will call the original function with the new arguments followed by the new arguments, but using the given this instead of whatever this is passed when the function is called
 	};
 };
 

@@ -46,6 +46,11 @@ public interface Depictor<O extends DepictedObject>
 	*/
 	public void uninstalled(final O depictedObject);
 
+	/**Processes an event from the platform.
+	@param event The event to be processed.
+	*/
+	public void processEvent(final PlatformEvent event);
+
 	/**Depicts the depicted object.
 	The depiction will be marked as updated.
 	@exception IOException if there is an error updating the depiction.

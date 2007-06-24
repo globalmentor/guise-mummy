@@ -34,6 +34,12 @@ public interface GuisePlatform
 	*/
 	public void unregisterDepictedObject(final DepictedObject depictedObject);
 
+	/**Retrieves a depicted object that has been registered with the platform by the ID of the depicted object.
+	@param depictedObjectID The ID of the depicted object to retrieve.
+	@return The registered depicted object with the given ID, or <code>null</code> if there is no depicted object registered with this platform with the given ID.
+	*/
+	public DepictedObject getDepictedObject(final long depictedObjectID);
+
 	/**@return The thread-safe queue of events to be delivered to the platform.*/
 	public Queue<PlatformEvent> getSendEventQueue();
 

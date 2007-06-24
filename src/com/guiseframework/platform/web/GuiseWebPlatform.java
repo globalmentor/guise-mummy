@@ -56,4 +56,13 @@ public interface GuiseWebPlatform extends GuisePlatform
 	*/
 	public String getDepictIDString(final long depictID);
 
+	/**Returns the depicted object ID represented by the given platform-specific ID string.
+	@param depictIDString The platform-specific form of the depict ID.
+	@param depictID The depict ID to be converted to a platform ID.
+	@return The depict ID the platform-specific form represents.
+	@exception NullPointerException if the given string is <code>null</code>.
+	@exception IllegalArgumentException if the given string does not represent the correct string form of a depict ID on this platform.
+	*/
+	public long getDepictID(final String depictIDString);
+
 }

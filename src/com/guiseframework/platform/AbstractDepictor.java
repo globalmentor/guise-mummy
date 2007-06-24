@@ -8,7 +8,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import com.garretwilson.beans.PropertyBindable;
 import com.guiseframework.Guise;
 import com.guiseframework.GuiseSession;
+import com.guiseframework.controller.DropControlEvent;
 import com.guiseframework.event.*;
+import com.guiseframework.platform.web.WebPlatformEvent;
 
 /**An abstract strategy for depicting objects on some platform.
 @param <O> The type of object being depicted.
@@ -150,6 +152,13 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 		{
 			((ListListenable<Object>)depictedObject).removeListListener(CHANGE_LISTENER);	//stop listening for list changes
 		}
+	}
+
+	/**Processes an event from the platform.
+	@param event The event to be processed.
+	*/
+	public void processEvent(final PlatformEvent event)
+	{
 	}
 
 	/**Depicts the depicted object.

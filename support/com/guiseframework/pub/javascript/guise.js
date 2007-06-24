@@ -21,10 +21,10 @@ GUISE_PUBLIC_RESOURCE_BASE_PATH The absolute base path of Guise public resources
 			targetID=""	<!--the ID of the target element on which the action occurred-->
 			actionID=""	<!--the action identifier-->
 		/>
-		<change	<!--a property change on a component-->
-			componentID="">	<!--the ID of the component-->
-			<property name=""	<!--the name of a property changing-->
-				<value></value>	<!--(zero or more) the new property; zero may signify null in some contexts--> 
+		<change	<!--a property change on a depicted object-->
+			objectID="">	<!--the ID of the depicted object-->
+			<property name="">	<!--the name of a property changing; if the value is not an array, it will be present as the text of the element with no value child elements-->
+				<value></value>	<!--(for array values; zero or more) the new property value; zero may signify null in some contexts--> 
 			</property>
 		</change>
 		<drop>	<!--the end of a drag-and-drop operation-->
@@ -149,7 +149,7 @@ var TAB_CLASS_SUFFIX="-tab";
 //TODO del var DECORATOR_CLASS_PREFIX="-decorator";
 
 /**The prefix for Guise state-related attributes, which shouldn't be removed when elements are synchronized.
-When more states are added, the GuiseAJAX.prototype.NON_REMOVABLE_ATTRIBUTE_SET should be updated.
+When more states are added, the proto.NON_REMOVABLE_ATTRIBUTE_SET should be updated.
 */
 var GUISE_STATE_ATTRIBUTE_PREFIX="guiseState";
 
@@ -238,14 +238,14 @@ function FormAJAXEvent(parameters, provisional)
 //Change AJAX Event
 
 /**A class encapsulating property change information for an AJAX request.
-@param componentID The ID of the source component.
+@param objectID The ID of the depicted object.
 @param propertyMap An associative array of names of properties changing, keyed to a value or an array of values; null values are allowed.
-var componentID The ID of the source component.
+var objectID The ID of the depicted object.
 var properties An associative array of names of properties changing, keyed to a value or an array of values; null values are allowed.
 */
-function ChangeAJAXEvent(componentID, properties)
+function ChangeAJAXEvent(objectID, properties)
 {
-	this.componentID=componentID;
+	this.objectID=objectID;
 	this.properties=properties;
 }
 
@@ -395,12 +395,20 @@ function AJAXResponse(document, size)
 	this.size=size
 }
 
-//GuiseAJAX
 
-/**A class encapsulating AJAX functionality for Guise.
-This class has knowledge of com.guiseframework.js.Client, which is expected to be stored in a global variable named "guise".
+var com=com||{}; com.guiseframework=com.guiseframework||{}; com.guiseframework.js=com.guiseframework.js||{};	//create the com.guiseframework.js package
+
+/**The state of a task.
+@see com.guiseframework.model.TaskState
 */
-function GuiseAJAX()
+com.guiseframework.js.TaskState={INITIALIZE:"initialize", INCOMPLETE:"incomplete", ERROR:"error", PAUSED:"paused", STOPPED:"stopped", CANCELED:"canceled", COMPLETE:"complete"};
+
+//Guise
+
+/**A class encapsulating JavaScript and AJAX client functionality for Guise.
+When the document is loaded the onLoad() method should be called to create the appropriate modal layers and append them to the document.
+*/
+com.guiseframework.js.Guise=function()
 {
 
 	/**The object for communicating with Guise via AJAX.*/
@@ -430,19 +438,59 @@ function GuiseAJAX()
 	/**The current ping interval, in milleseconds, or -1 if pinging is not enabled.*/
 	this._pingInterval=-1;
 
-	if(!GuiseAJAX.prototype._initialized)
+	/**The array of drop targets, determined when the document is loaded. The drop targets are stored in increasing order of hierarchical depth.*/
+	this._dropTargets=new Array();
+
+	/**TODO del The array of original source images, keyed to 
+	this.originalImageSrcs=new Array();*/
+
+	/**The array of frame elements.*/
+	this._frames=new Array();
+
+	/**The current topmost modal frame, or null if there is no modal frame.*/
+	this._modalFrame=null;
+
+	/**The current flyover frame, or null if there is no flyover frame.*/
+	this.flyoverFrame=null;
+
+	/**The layer that allows modality by blocking user interaction to elements below.*/
+	this._modalLayer=null;
+	
+	/**The IFrame that hides select elements from modal frames in IE6; positioned right below the modal layer.*/
+	this._modalIFrame=null;
+
+	/**The IFrame that hides select elements from flyover frames in IE6; positioned right below the flyover.*/
+	this._flyoverIFrame=null;
+
+	/**The current busy element, or null if there is no busy element.*/
+	this._busyElement=null;
+
+	/**Whether the busy indicator is visible.*/
+	this._isBusyVisible=false;
+
+	/**The last known focused node, or null if no node was ever known to have been focused.*/
+	this._lastFocusedNode=null;
+
+	/**The map of cursors that have been temporarily changed, keyed to the ID of the element the cursor of which has been changed.
+	This is a tentative implementation, as blindly resetting the cursor after AJAX processing will prevent new cursors to be changed via AJAX.
+	*/
+	this.oldElementIDCursors=new Object();
+
+	var proto=com.guiseframework.js.Guise.prototype;	//get the prototype
+
+	if(!proto._initialized)
 	{
-		GuiseAJAX.prototype._initialized=true;
+		proto._initialized=true;
 
 		/**The content type of a Guise AJAX request.*/
-		GuiseAJAX.prototype.REQUEST_CONTENT_TYPE="application/x-guise-ajax-request+xml";
+		proto.REQUEST_CONTENT_TYPE="application/x-guise-ajax-request+xml";
 
 		/**The enumeration of the names of the request elements.*/
-		GuiseAJAX.prototype.RequestElement=
+		proto.RequestElement=
 				{
-					REQUEST: "request", EVENTS: "events",
+					REQUEST: "request", EVENTS: "events", OBJECT_ID: "objectID",
 					FORM: "form", PROVISIONAL: "provisional", CONTROL: "control", NAME: "name", VALUE: "value",
-					CHANGE: "action", PROPERTY: "property",
+					CHANGE: "change", PROPERTY: "property",
 					ACTION: "action", COMPONENT: "component", COMPONENT_ID: "componentID", TARGET_ID: "targetID", ACTION_ID: "actionID", OPTION: "option",
 					DROP: "drop", SOURCE: "source", TARGET: "target", VIEWPORT: "viewport",
 					FOCUS: "focus",
@@ -454,10 +502,10 @@ function GuiseAJAX()
 				};
 
 		/**The content type of a Guise AJAX response.*/
-		GuiseAJAX.prototype.RESPONSE_CONTENT_TYPE="application/x-guise-ajax-response+xml";
+		proto.RESPONSE_CONTENT_TYPE="application/x-guise-ajax-response+xml";
 
 		/**The enumeration of the names of the response elements.*/
-		GuiseAJAX.prototype.ResponseElement=
+		proto.ResponseElement=
 				{
 					ATTRIBUTE: "attribute",
 					COMMAND: "command",
@@ -481,7 +529,7 @@ function GuiseAJAX()
 		@see http://www.oreillynet.com/pub/a/javascript/2002/02/08/iframe.html
 		@see http://www.quirksmode.org/dom/inputfile.html
 		*/
-		GuiseAJAX.prototype.createUploadIFrame=function()
+		proto.createUploadIFrame=function()
 		{
 			this.removeUploadIFrame();	//first remove the current upload IFrame, if any
 			this._uploadIFrame=document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");	//create an IFrame
@@ -504,7 +552,7 @@ function GuiseAJAX()
 		/**Removes the IFrame for receiving the contents of a file upload.
 		If no such IFrame exists, no action occurs.
 		*/
-		GuiseAJAX.prototype.removeUploadIFrame=function()
+		proto.removeUploadIFrame=function()
 		{
 			if(this._uploadIFrame!=null)	//if there is an IFrame
 			{
@@ -516,7 +564,7 @@ function GuiseAJAX()
 		/**Indicates whether AJAX communication is enabled.
 		@return Whether AJAX communication is enabled.
 		*/
-		GuiseAJAX.prototype.isEnabled=function()
+		proto.isEnabled=function()
 		{
 			return this._enabled;	//return whether AJAX functionality is enabled
 		};
@@ -525,7 +573,7 @@ function GuiseAJAX()
 		If AJAX is disabled, all AJAX communication will immediately stop and pinging will be disabled.
 		@param enabled Whether AJAX communication should be enabled.
 		*/
-		GuiseAJAX.prototype.setEnabled=function(enabled)
+		proto.setEnabled=function(enabled)
 		{
 			if(this._enabled!=enabled)	//if the value is really changing
 			{ 
@@ -541,7 +589,7 @@ function GuiseAJAX()
 		If pinging is already occuring at the given interval, no action occurs.
 		@param pingInterval The new ping interval, in milleseconds, or -1 if pinging should not be enabled.
 		*/
-		GuiseAJAX.prototype.setPingInterval=function(pingInterval)
+		proto.setPingInterval=function(pingInterval)
 		{
 			if(this._pingInterval!=pingInterval)	//if the ping interval is really changing
 			{ 
@@ -559,7 +607,7 @@ function GuiseAJAX()
 		};
 
 		/**Sends a ping request to the server.*/
-		GuiseAJAX.prototype.ping=function()
+		proto.ping=function()
 		{
 			this.sendAJAXRequest(new PingAJAXEvent());	//create and queue a new ping event
 		};
@@ -567,7 +615,7 @@ function GuiseAJAX()
 		/**Sends a trace request to the server.
 		@param objects The objects to trace; the string versions of these objects will be combined into a single string separated by whitespace.
 		*/
-		GuiseAJAX.prototype.trace=function(objects)
+		proto.trace=function(objects)
 		{
 			this.sendAJAXRequest(new LogAJAXEvent("trace", Array.from(arguments).join(" ")));	//create and queue a new log event from the arguments
 		};
@@ -575,7 +623,7 @@ function GuiseAJAX()
 		/**Immediately sends or queues an AJAX request.
 		@param ajaxRequest The AJAX request to send.
 		*/
-		GuiseAJAX.prototype.sendAJAXRequest=function(ajaxRequest)
+		proto.sendAJAXRequest=function(ajaxRequest)
 		{
 			if(this.isEnabled())	//if AJAX is enabled
 			{
@@ -585,9 +633,9 @@ function GuiseAJAX()
 		};
 	
 		/**Processes AJAX requests.
-		@see GuiseAJAX#ajaxRequests
+		@see #ajaxRequests
 		*/
-		GuiseAJAX.prototype.processAJAXRequests=function()
+		proto.processAJAXRequests=function()
 		{
 				//see if the communicator is not busy (if it is busy, we're in asychronous mode and the end of the processing this method will be called again to check for new requests)
 			if(!this.httpCommunicator.isCommunicating() && !this.processingAJAXRequests && this.ajaxRequests.length>0)	//if we aren't processing AJAX requests or communicating with the server, and there are requests queued TODO fix small race condition in determining whether processing is occurring
@@ -668,7 +716,7 @@ function GuiseAJAX()
 		@param ajaxFormRequest The form request information to append.
 		@return The string builder.
 		*/
-		GuiseAJAX.prototype._appendFormAJAXEvent=function(stringBuilder, ajaxFormRequest)
+		proto._appendFormAJAXEvent=function(stringBuilder, ajaxFormRequest)
 		{
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.FORM,	//<form
 					new Map(this.RequestElement.PROVISIONAL, ajaxFormRequest.provisional));	//provisional="provisional">
@@ -687,7 +735,7 @@ function GuiseAJAX()
 		@param ajaxActionEvent The action event information to append.
 		@return The string builder.
 		*/
-		GuiseAJAX.prototype._appendActionAJAXEvent=function(stringBuilder, ajaxActionEvent)
+		proto._appendActionAJAXEvent=function(stringBuilder, ajaxActionEvent)
 		{
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.ACTION,	//<action>
 					new Map(this.RequestElement.COMPONENT_ID, ajaxActionEvent.componentID,	//componentID="componentID"
@@ -703,10 +751,10 @@ function GuiseAJAX()
 		@param ajaxChangeEvent The change event information to append.
 		@return The string builder.
 		*/
-		GuiseAJAX.prototype._appendChangeAJAXEvent=function(stringBuilder, ajaxChangeEvent)
+		proto._appendChangeAJAXEvent=function(stringBuilder, ajaxChangeEvent)
 		{
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.CHANGE,	//<change>
-					new Map(this.RequestElement.COMPONENT_ID, ajaxActionEvent.componentID));	//componentID="componentID"
+					new Map(this.RequestElement.OBJECT_ID, ajaxChangeEvent.objectID));	//objectID="objectID"
 			var properties=ajaxChangeEvent.properties;	//get the properties
 			for(var propertyName in properties)	//for each property
 			{
@@ -725,9 +773,7 @@ function GuiseAJAX()
 				}
 				else if(value!=null)	//if the value is anything besides an array
 				{
-					DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.VALUE);	//<value>
 					DOMUtilities.appendXMLText(stringBuilder, value);	//value
-					DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.VALUE);	//</value>
 				}
 				DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.PROPERTY);	//</property>
 			}
@@ -740,7 +786,7 @@ function GuiseAJAX()
 		@param ajaxDropEvent The drop event information to append.
 		@return The string builder.
 		*/
-		GuiseAJAX.prototype._appendDropAJAXEvent=function(stringBuilder, ajaxDropEvent)
+		proto._appendDropAJAXEvent=function(stringBuilder, ajaxDropEvent)
 		{
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.DROP);	//<drop>
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.SOURCE, new Map(this.RequestElement.ID, ajaxDropEvent.dragSource.id));	//<source id="id">
@@ -758,7 +804,7 @@ function GuiseAJAX()
 		@param ajaxFocusEvent The focus event information to append.
 		@return The string builder.
 		*/
-		GuiseAJAX.prototype._appendFocusAJAXEvent=function(stringBuilder, ajaxFocusEvent)
+		proto._appendFocusAJAXEvent=function(stringBuilder, ajaxFocusEvent)
 		{
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.FOCUS,	//<focus>
 					new Map(this.RequestElement.COMPONENT_ID, ajaxFocusEvent.componentID));	//componentID="componentID"
@@ -771,7 +817,7 @@ function GuiseAJAX()
 		@param ajaxKeyEvent The key event information to append.
 		@return The string builder.
 		*/
-		GuiseAJAX.prototype._appendKeyAJAXEvent=function(stringBuilder, ajaxKeyEvent)
+		proto._appendKeyAJAXEvent=function(stringBuilder, ajaxKeyEvent)
 		{
 			DOMUtilities.appendXMLStartTag(stringBuilder, ajaxKeyEvent.eventType,	//<keyXXX
 					new Map(this.RequestElement.CODE, ajaxKeyEvent.code,	//code="code"
@@ -787,7 +833,7 @@ function GuiseAJAX()
 		@param ajaxLogEvent The log event information to append.
 		@return The string builder.
 		*/
-		GuiseAJAX.prototype._appendLogAJAXEvent=function(stringBuilder, ajaxLogEvent)
+		proto._appendLogAJAXEvent=function(stringBuilder, ajaxLogEvent)
 		{
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.LOG,	//<log>
 					new Map(this.RequestElement.LEVEL, ajaxLogEvent.level));	//level="level"
@@ -801,7 +847,7 @@ function GuiseAJAX()
 		@param ajaxMouseEvent The mouse event information to append.
 		@return The string builder.
 		*/
-		GuiseAJAX.prototype._appendMouseAJAXEvent=function(stringBuilder, ajaxMouseEvent)
+		proto._appendMouseAJAXEvent=function(stringBuilder, ajaxMouseEvent)
 		{
 			DOMUtilities.appendXMLStartTag(stringBuilder, ajaxMouseEvent.eventType,	//<mouseXXX>
 //TODO del alert("ready to append viewport info: "+this.RequestElement.VIEWPORT+" x: "+ajaxMouseEvent.viewportBounds.x+" y: "+ajaxMouseEvent.viewportBounds.y+" width: "+ajaxMouseEvent.viewportBounds.width+" height: "+ajaxMouseEvent.viewportBounds.height);
@@ -842,7 +888,7 @@ function GuiseAJAX()
 		@param ajaxInitEvent The init event information to append.
 		@return The string builder.
 		*/
-		GuiseAJAX.prototype._appendInitAJAXEvent=function(stringBuilder, ajaxInitEvent)
+		proto._appendInitAJAXEvent=function(stringBuilder, ajaxInitEvent)
 		{
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.INIT,	//<init
 					new Map("javascriptVersion", ajaxInitEvent.javascriptVersion,
@@ -865,7 +911,7 @@ function GuiseAJAX()
 		@param ajaxPingEvent The ping event information to append.
 		@return The string builder.
 		*/
-		GuiseAJAX.prototype._appendPingAJAXEvent=function(stringBuilder, ajaxPingEvent)
+		proto._appendPingAJAXEvent=function(stringBuilder, ajaxPingEvent)
 		{
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.PING);	//<ping>
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.PING);	//</ping>
@@ -875,7 +921,7 @@ function GuiseAJAX()
 		/**The callback method for processing HTTP communication.
 		@param xmlHTTP The XML HTTP object.
 		*/
-		GuiseAJAX.prototype._processHTTPResponse=function(xmlHTTP)
+		proto._processHTTPResponse=function(xmlHTTP)
 		{
 			try
 			{
@@ -891,13 +937,13 @@ function GuiseAJAX()
 				}
 				if(status==200)	//if everything went OK
 				{
-//TODO del if not needed						if(guiseAJAX.isEnabled())	//if AJAX is enabled (if a user browsers to a page in Mozilla and the old page sent a request, GUISE_AJAX_ENABLED will be undefined by now; check it so that Mozilla won't throw an exception accessing AJAXResponse, which doesn't exist either)
+//TODO del if not needed						if(this.isEnabled())	//if AJAX is enabled (if a user browsers to a page in Mozilla and the old page sent a request, GUISE_AJAX_ENABLED will be undefined by now; check it so that Mozilla won't throw an exception accessing AJAXResponse, which doesn't exist either)
 					if((typeof AJAXResponse)!="undefined"	//if the page scope hasn't disappeared (if a user browsers to a page in Mozilla and the old page sent a request, AJAXResponse will be undefined here)
 						&& xmlHTTP.responseText && xmlHTTP.responseXML && xmlHTTP.responseXML.documentElement)	//if we have XML (if there is no content or there is an error, IE sends back a document has a null xmlHTTP.responseXML.documentElement)
 					{
 						this.ajaxResponses.enqueue(new AJAXResponse(xmlHTTP.responseXML, xmlHTTP.responseText.length));	//enqueue the response
 						this.processAJAXResponses();	//process enqueued AJAX responses
-//TODO del						setTimeout("GuiseAJAX.prototype.processAJAXResponses();", 1);	//process the AJAX responses later		
+//TODO del						setTimeout("proto.processAJAXResponses();", 1);	//process the AJAX responses later		
 //TODO del						this.processAJAXRequests();	//make sure there are no waiting AJAX requests
 					}
 				}
@@ -934,9 +980,9 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 		500-2000: Normal communication size; acceptable delay on IE6.
 		5000-10000: Medium communication size; perceptible delay on IE6.
 		20000-30000: Large communication size; unacceptable delay on IE6 without indicator. 
-		@see GuiseAJAX#ajaxResponses
+		@see #ajaxResponses
 		*/
-		GuiseAJAX.prototype.processAJAXResponses=function()
+		proto.processAJAXResponses=function()
 		{
 			if(!this.processingAJAXResponses)	//if we aren't processing AJAX responses TODO fix small race condition in determining whether processing is occurring
 			{
@@ -974,7 +1020,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 /*TODO salvage if needed
 						if(showBusy)	//if we should show a busy indicator
 						{
-							guise.setBusyVisible(true);	//show a busy indicator
+							this.setBusyVisible(true);	//show a busy indicator
 //TODO fix for IE6; this doesn't work when set immediately window.setTimeout(function(){guise.setBusyVisible(true);}, 1);	
 						}
 */
@@ -1027,7 +1073,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 /*TODO salvage if needed
 							if(showBusy)	//if we are showing a busy indicator
 							{
-								guise.setBusyVisible(false);	//hide the busy indicator
+								this.setBusyVisible(false);	//hide the busy indicator
 							}
 */
 						}
@@ -1044,7 +1090,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 					this.processingAJAXResponses=false;	//we are no longer processing AJAX responses
 					if(newHRef==null)	//if we're not going to a new page
 					{
-						guise.restoreTempElementCursors();	//restore the element cursors that were temporarily set just for this AJAX call
+						this.restoreTempElementCursors();	//restore the element cursors that were temporarily set just for this AJAX call
 					}
 				}
 			}
@@ -1053,7 +1099,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 		/**Processes the AJAX command response.
 		@param element The element representing the command response.
 		*/ 
-		GuiseAJAX.prototype._processCommand=function(element)
+		proto._processCommand=function(element)
 		{
 			var objectID=element.getAttribute(this.ResponseElement.OBJECT_ID);	//get the object ID, if there is one
 				//assert objectID
@@ -1065,7 +1111,27 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 			switch(command)	//see which command this is
 			{
 				case "audio-start":
-					soundManager.play(objectID, parameters["audioURI"]);	//play the sound
+					var sound=soundManager.sounds[objectID];	//get the existing sound
+					var audioURI=parameters["audioURI"];	//get the audio URI
+/*TODO fix for audio changing
+					var audioURI=parameters["audioURI"];	//get the audio URI
+					if(sound)	//if the sound is already defined
+					{
+						if(sound.url!=audioURI)	//if this sound
+						soundManager.play(objectID, audioURI);	//play the sound
+					}
+					else	//if there is no such sound defined
+*/
+					if(!sound)	//if there is no such sound defined
+					{
+						soundManager.createSound(objectID, audioURI);	//create a new sound
+					}
+					soundManager.play(objectID);	//play the sound
+					this.sendAJAXRequest(new ChangeAJAXEvent(objectID, new Map("state", com.guiseframework.js.TaskState.INCOMPLETE)));	//send an AJAX request with the new sound state
+					break;
+				case "audio-pause":
+					soundManager.pause(objectID);	//pause the sound
+					this.sendAJAXRequest(new ChangeAJAXEvent(objectID, new Map("state", com.guiseframework.js.TaskState.PAUSED)));	//send an AJAX request with the new sound state
 					break;
 			}
 		};
@@ -1075,7 +1141,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 		@param element The element representing the navigate response.
 		@return The URI of the new requested navigation, or null if there is no new navigation or if the navigation occurs in a separate viewport
 		*/ 
-		GuiseAJAX.prototype._processNavigate=function(element)
+		proto._processNavigate=function(element)
 		{
 			var navigateURI=DOMUtilities.getNodeText(element);	//report the requested location
 			var viewportID=element.getAttribute(this.ResponseElement.VIEWPORT_ID);	//get the viewport ID, if there is one
@@ -1094,7 +1160,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 		Only child elements with IDs will be processed.
 		@param element The element representing patch response.
 		*/ 
-		GuiseAJAX.prototype._processPatch=function(element)
+		proto._processPatch=function(element)
 		{
 			var mozInlineBoxParentIDSet=null;	//we'll need to do special reflowing if Mozilla inline box children were updated; we'll lazily create and store a set of inline box parents if needed
 			var childNodes=element.childNodes;	//get all the child nodes of the element
@@ -1111,7 +1177,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 						if(oldElement)	//if the element currently exists in the document
 						{
 							this._synchronizeElement(oldElement, childNode, true);	//synchronize this element tree, indicating that this is the root of a synchronization subtree
-							updateComponents(oldElement, true);	//now that we've patched the old element, update any components that rely on the old element
+							this._updateComponents(oldElement, true);	//now that we've patched the old element, update any components that rely on the old element
 							if(isUserAgentFirefox)	//if we're running Firefox and we just patched an element inside a Mozilla inline box, Firefox won't correctly update the flow so we'll have to do that manually TODO fix for Firefox 3
 							{
 									//TODO at some point we may need to check the patched descendants, too---this only works if the root of the patched tree or one of its ancestors was a Mozilla inline box
@@ -1135,7 +1201,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 //TODO fix alert("ready to import frame node");
 							oldElement=document.importNode(childNode, true);	//create an import clone of the node
 //TODO del alert("ready to add frame: "+typeof oldElement);
-							guise.addFrame(oldElement);	//add this frame
+							this.addFrame(oldElement);	//add this frame
 //TODO fix alert("frame added");
 						}
 					}
@@ -1158,7 +1224,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 		@param element The element representing attribute response.
 		*/
 /*TODO del or salvage
-		GuiseAJAX.prototype._processAttribute=function(element)
+		proto._processAttribute=function(element)
 		{
 			var id=element.getAttribute("id");	//get the element ID
 			var name=element.getAttribute(this.ResponseElement.NAME);	//get the attribute name
@@ -1184,7 +1250,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 		/**Processes the AJAX remove response.
 		@param element The element representing removal response.
 		*/ 
-		GuiseAJAX.prototype._processRemove=function(element)
+		proto._processRemove=function(element)
 		{
 			var id=element.getAttribute("id");	//get the element ID, if there is one
 //TODO del alert("processing remove with ID: "+id);
@@ -1194,14 +1260,14 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 				if(oldElement!=null)	//if we found the old element
 				{
 //TODO del alert("we found the old element");
-					if(guise.frames.contains(oldElement))	//if we're removing a frame
+					if(this._frames.contains(oldElement))	//if we're removing a frame
 					{
 //TODO fix alert("removing frame "+id);
-						guise.removeFrame(oldElement);	//remove the frame
+						this.removeFrame(oldElement);	//remove the frame
 					}
 					else	//if we're removing any other node
 					{
-						uninitializeNode(oldElement, true);	//uninitialize the element
+						this._uninitializeNode(oldElement, true);	//uninitialize the element
 						oldElement.parentNode.removeChild(oldElement);	//remove the old element from the document
 					}
 				}
@@ -1232,7 +1298,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 		@param element The element to which the command relates.
 		@param command The command to invoke.
 		*/ 
-		GuiseAJAX.prototype._invokeCommand=function(element, command)
+		proto._invokeCommand=function(element, command)
 		{
 			if(/sendResources\((.+)\)/.test(command))	//if the command is sendResources(uri)
 			{
@@ -1276,7 +1342,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 						}
 						else	//if we've already found the last file input
 						{
-							uninitializeNode(childNode, true);	//uninitialize this file input
+							this._uninitializeNode(childNode, true);	//uninitialize this file input
 							element.removeChild(childNode);	//remove this file element from the document
 						}
 						childNode.disabled=true;	//don't allow the file input to be modifed during transfer
@@ -1287,7 +1353,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 		};
 
 		/**The set of attribute names that should not be removed when synchronizing.*/
-		GuiseAJAX.prototype.NON_REMOVABLE_ATTRIBUTE_SET=
+		proto.NON_REMOVABLE_ATTRIBUTE_SET=
 		{
 			"style":true,	//don't remove local styles, because they may be used by Guise (with frames, for instance)
 			"onclick":true,	//don't remove the onclick attribute, because we may be using it for Safari to prevent a default action
@@ -1297,31 +1363,31 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 		};
 
 		/**The set of attribute names that should not be copied literally when synchronizing.*/
-		GuiseAJAX.prototype.UNCOPIED_ATTRIBUTE_SET=
+		proto.UNCOPIED_ATTRIBUTE_SET=
 		{
 			"style":true,	//if this is a style attribute, we have to treat it differently, because neither Mozilla nor IE provide normal DOM access to the literal style attribute value
 			"guise:patchType":true	//the guise:patchType attribute is used for patching information
 		};
 
 		/**The set of class names that should not be removed when synchronizing.*/
-		GuiseAJAX.prototype.NON_REMOVABLE_CLASS_SET=
+		proto.NON_REMOVABLE_CLASS_SET=
 		{
 			"jsRollover":true	//don't remove JavaScript-controlled classes
 		};
 
 		var nonRemovableClassArray=new Array();	//create a new array to hold the non-removable classes
-		for(var nonRemovableClass in GuiseAJAX.prototype.NON_REMOVABLE_CLASS_SET)	//for each non-removable class
+		for(var nonRemovableClass in proto.NON_REMOVABLE_CLASS_SET)	//for each non-removable class
 		{
 			nonRemovableClassArray.add(nonRemovableClass);	//add this non-removable class to the array
 		}
 
 		/**The regular expression matching any non-removable class.*/
-		GuiseAJAX.prototype.NON_REMOVABLE_CLASSES_REGEX=new RegExp(nonRemovableClassArray.join("|"));	//create a regular expression of all non-removable classes, separated by a regular expression union symbol
+		proto.NON_REMOVABLE_CLASSES_REGEX=new RegExp(nonRemovableClassArray.join("|"));	//create a regular expression of all non-removable classes, separated by a regular expression union symbol
 		
 		/**Invalidates the content of all ancestor elements by removing the "guise:contentHash" attribute up the hierarchy.
 		@param element The element the ancestors of which will have their ancestors invalidated.
 		*/
-		GuiseAJAX.prototype.invalidateAncestorContent=function(element)
+		proto.invalidateAncestorContent=function(element)
 		{
 			var parentNode=element.parentNode;	//get the element's parent
 			if(parentNode!=null && parentNode.nodeType==Node.ELEMENT_NODE && parentNode.nodeName.toLowerCase()!="table")	//if there is a parent element (IE6 crashes if we even check an attribute of TABLE)
@@ -1336,7 +1402,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 		@param element The element hierarchy to patch into the existing document.
 		@param isRoot Whether this is the top level element of a synchronization (optional); defaults to false.
 		*/
-		GuiseAJAX.prototype._synchronizeElement=function(oldElement, element, isRoot)
+		proto._synchronizeElement=function(oldElement, element, isRoot)
 		{
 			var elementName=element.nodeName;	//save the element name
 /*TODO del or salvage
@@ -1619,7 +1685,7 @@ if(elementName=="select")
 						for(var i=oldChildNodeCount-1; i>=childNodeCount; --i)	//for each old child node that is not in the new node
 						{
 							var oldChildNode=oldChildNodeList[i];	//get this child node
-							uninitializeNode(oldChildNode, true);	//uninitialize the node tree
+							this._uninitializeNode(oldChildNode, true);	//uninitialize the node tree
 	//TODO del alert("removing old node: "+oldChildNodeList[i].nodeName);
 							oldElement.removeChild(oldChildNode);	//remove this old child
 							
@@ -1692,7 +1758,7 @@ if(elementName=="select")
 							oldElement.appendChild(importedNode);	//append the imported node to the old element
 //alert("ready to initialize node: "+i+" out of node count "+childNodeCount);
 	//TODO del alert("ready to initialize node");
-							initializeNode(importedNode, true);	//initialize the new imported node, installing the correct event handlers
+							this._initializeNode(importedNode, true);	//initialize the new imported node, installing the correct event handlers
 //alert("initialized node: "+i+" out of node count "+childNodeCount);
 	}
 	catch(e)
@@ -1745,7 +1811,7 @@ if(elementName=="select")
 		@param oldElement The old version of the element.
 		@param attributeValue The new literal value of the style attribute, which may be null or the empty string.
 		*/ 
-		GuiseAJAX.prototype._synchronizeElementStyle=function(oldElement, attributeValue)
+		proto._synchronizeElementStyle=function(oldElement, attributeValue)
 		{
 			var removableStyles={"backgroundColor":true, "color":true, "display":true, "visibility":true};	//create a new map of styles to remove if not assigned, with the style name as the key
 			if(attributeValue)	//if there is a new style
@@ -1780,65 +1846,50 @@ if(elementName=="select")
 				}				
 			}
 		};
-	}
 
-	this.httpCommunicator.setProcessHTTPResponse(this._processHTTPResponse.bind(this));	//set up our callback function for processing HTTP responses
+		/**The private method for asynchronously initializing.*/
+		proto._initialize=function()
+		{
+		//TODO display a wait cursor until we initialize everything
+		
+		/*TODO del unless we want to fix external-toGuise stylesheets
+			if(typeof guiseIE6Fix!="undefined")	//if we have IE6 fix routines loaded
+			{
+				guiseIE6Fix.fixStylesheets();	//fix all IE6 stylesheets
+			}
+		*/
+			com.garretwilson.js.EventManager.addEvent(window, "resize", this._onWindowResize.bind(this), false);	//add a resize listener
+		//TODO del	com.garretwilson.js.EventManager.addEvent(window, "scroll", onWindowScroll, false);	//add a scroll listener
+			com.garretwilson.js.EventManager.addEvent(window, "unload", this.onUnload.bind(this), false);	//do the appropriate uninitialization when the window unloads
+			this._initializeNode(document.documentElement, true, true);	//initialize the document tree, indicating that this is the first initialization
+			this._updateComponents(document.documentElement, true);	//update all components represented by elements within the document
+		//TODO del when works	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
+			com.garretwilson.js.EventManager.addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
+			com.garretwilson.js.EventManager.addEvent(document.documentElement, "keydown", onKey, false);	//listen for key down anywhere in the document so that we can send key events back to the server (IE doesn't work correctly with key events registered on the window or document)
+			com.garretwilson.js.EventManager.addEvent(document.documentElement, "keyup", onKey, false);	//listen for key up anywhere in the document so that we can send key events back to the server (IE doesn't work correctly with key events registered on the window or document)
+			com.garretwilson.js.EventManager.addEvent(document.documentElement, "click", onClick, false);	//listen for mouse clicks bubbling up from anywhere (that we haven't dealt with specifically and canceled) in the document so that we can report clicks back to the server
+			this.sendAJAXRequest(new InitAJAXEvent());	//send an initialization AJAX request	
+		//TODO del	alert("compatibility mode: "+document.compatMode);
+			this.setBusyVisible(false);	//turn off the busy indicator	
+				//remove the init IFrame shield
+			var initIFrame=document.getElementById("initIFrame");	//get the init IFrame
+			if(initIFrame)	//if there is an initialization IFrame
+			{
+				initIFrame.parentNode.removeChild(initIFrame);	//remove the init IFrame from the document; we don't need it anymore
+			}
 
-}
+			var focusable=getFocusableDescendant(document.documentElement);	//see if the document has a node that can be focused
+			if(focusable)	//if we found a focusable node
+			{
+				focusable.focus();	//focus on the node
+			}
+			this.setPingInterval(GUISE_AJAX_PING_INTERVAL);	//turn on pinging at the normal level
+		};
 
-var com=com||{}; com.guiseframework=com.guiseframework||{}; com.guiseframework.js=com.guiseframework.js||{};	//create the com.guiseframework.js package
-
-/**A class encapsulating JavaScript Guise client functionality for Guise.
-When the document is loaded the Client.onDocumentLoad() method should be called to create the appropriate modal layers and append them to the document.
-var frames The array of frame elements.
-var modalFrame The current topmost modal frame, or null if there is no modal frame.
-*/
-com.guiseframework.js.Client=function()
-{
-
-	/**The array of drop targets, determined when the document is loaded. The drop targets are stored in increasing order of hierarchical depth.*/
-	this._dropTargets=new Array();
-
-	/**TODO del The array of original source images, keyed to 
-	this.originalImageSrcs=new Array();*/
-
-	/**The array of frame elements.*/
-	this.frames=new Array();
-
-	/**The current topmost modal frame, or null if there is no modal frame.*/
-	this.modalFrame=null;
-
-	/**The current flyover frame, or null if there is no flyover frame.*/
-	this.flyoverFrame=null;
-
-	/**The layer that allows modality by blocking user interaction to elements below.*/
-	this._modalLayer=null;
-	
-	/**The IFrame that hides select elements from modal frames in IE6; positioned right below the modal layer.*/
-	this._modalIFrame=null;
-
-	/**The IFrame that hides select elements from flyover frames in IE6; positioned right below the flyover.*/
-	this._flyoverIFrame=null;
-
-	/**The current busy element, or null if there is no busy element.*/
-	this._busyElement=null;
-
-	/**Whether the busy indicator is visible.*/
-	this._isBusyVisible=false;
-
-	/**The map of cursors that have been temporarily changed, keyed to the ID of the element the cursor of which has been changed.
-	This is a tentative implementation, as blindly resetting the cursor after AJAX processing will prevent new cursors to be changed via AJAX.
-	*/
-	this.oldElementIDCursors=new Object();
-
-	if(!com.guiseframework.js.Client._initialized)
-	{
-		com.guiseframework.js.Client._initialized=true;
-
-		/**Creates the appropriate modal layers and initializes document-related variables.
+		/**Creates the appropriate modal layers, initializes document-related variables, and installs event handlers.
 		This method should be called when the document is loaded.
 		*/
-		com.guiseframework.js.Client.prototype.onDocumentLoad=function()
+		proto.onLoad=function()
 		{
 				//create the modal layer
 			this._modalLayer=document.createElementNS("http://www.w3.org/1999/xhtml", "div");	//create a div TODO use a constant for the namespace
@@ -1849,45 +1900,62 @@ com.guiseframework.js.Client=function()
 			this._modalLayer.style.top="0px";
 			this._modalLayer.style.left="0px";
 			document.body.appendChild(this._modalLayer);	//add the modal layer to the document
-
 			if(isUserAgentIE6)	//if we're in IE6
 			{
 				this._modalIFrame=document.getElementById("modalIFrame");	//get the modal IFrame
-/*TODO testing no form
-				var form=getForm(document.documentElement);	//get the form
-				if(form && form.id)	//if there is a form with an ID
-				{
-					var modalIFrameID=form.id.replace(".form", ".modalIFrame");	//determine the ID of the modal IFrame TODO use a constant, or get these values using a better method
-					this._modalIFrame=document.getElementById(modalIFrameID);	//get the modal IFrame
-				}
-*/
 				this._flyoverIFrame=document.getElementById("flyoverIFrame");	//get the flyover IFrame
-/*TODO testing no form
-				var form=getForm(document.documentElement);	//get the form
-				if(form && form.id)	//if there is a form with an ID
-				{
-					var flyoverIFrameID=form.id.replace(".form", ".flyoverIFrame");	//determine the ID of the flyover IFrame TODO use a constant, or get these values using a better method
-					this._flyoverIFrame=document.getElementById(flyoverIFrameID);	//get the flyover IFrame
-				}
-*/
 			}
 			this._busyElement=document.getElementById("busy");	//get the busy element
-/*TODO testing no frame
-			var form=getForm(document.documentElement);	//get the form
-			if(form && form.id)	//if there is a form with an ID
+			if(document.bodyLength && document.bodyLength>60000)	//if the body length is over 60,000 (as indicated by the custom Guise variable), show a busy indicator
 			{
-				var busyID=form.id.replace(".form", ".busy");	//determine the ID of the busy element TODO use a constant, or get these values using a better method
-				this._busyElement=document.getElementById(busyID);	//get the busy element
+				this.setBusyVisible(true);	//turn on the busy indicator
+					//TODO fix; doesn't seem to work on IE6 or Firefox
+				this.setElementTempCursor(document.body, "wait");	//change the document body cursor to "wait" until the AJAX initialization is finished
 			}
-*/
+
+			soundManager.defaultOptions.whileplaying=this._whileSoundPlaying.bindOldThis(this);	//set the playing callback method
+
+			window.setTimeout(this._initialize.bind(this), 1);	//run the initialization function in a separate thread
 		};
+
+		/**Uninstalls event handlers.
+		This method should be called when the document is unloaded.
+		*/
+		proto.onUnload=function()
+		{
+			this.setEnabled(false);	//immediately turn off AJAX communication
+				//TODO fix or del	this.setBusyVisible(true);	//turn on the busy indicator
+			com.garretwilson.js.EventManager.clearEvents();	//unload all events
+				//TODO fix or del	this.setBusyVisible(false);	//turn off the busy indicator
+		};
+
+		/**Called when the window resizes.
+		This implementation updates the modal layer.
+		@param event The object containing event information.
+		*/
+		proto._onWindowResize=function(event)
+		{
+			//TODO work around IE bug that stops calling onWindowResize after a couple of maximization/minimization cycles
+			window.setTimeout(this.updateModalLayer.bind(this), 1);	//update the modal layer later, because during resize IE won't allow us to hide the modal layer and have the correct size update instantaneously
+		}
+		
+		/**Called when the window scrolls.
+		Note that Firefox 1.0.7 calls this method even when a scrollable element scrolls; this problem is fixed in Firefox 1.5.
+		@param event The object containing event information.
+		*/
+		/*TODO bring back if needed
+		function onWindowScroll(event)
+		{
+		alert("scroll");
+		}
+		*/
 
 		/**Temporarily changes the cursor of an element, which will be reset after the next AJAX call.
 		The element must have an ID.
 		@param element The element the cursor of which to update.
 		@param cursor The name of the cursor (such as "wait") to use.
 		*/
-		com.guiseframework.js.Client.prototype.setElementTempCursor=function(element, cursor)
+		proto.setElementTempCursor=function(element, cursor)
 		{
 			var elementID=element.id;	//get the element ID
 			if(elementID)	//if the element has an ID
@@ -1905,7 +1973,7 @@ com.guiseframework.js.Client=function()
 		/**Restores all cursors that have been temporarily set during an AJAX call.
 		@see #setElementTempCursor()
 		*/
-		com.guiseframework.js.Client.prototype.restoreTempElementCursors=function()
+		proto.restoreTempElementCursors=function()
 		{
 			var oldElementIDCursors=this.oldElementIDCursors;	//get the map of old cursors
 			for(var oldElementID in oldElementIDCursors)	//for each old element ID
@@ -1928,7 +1996,7 @@ com.guiseframework.js.Client=function()
 		This implementation adds the frame to the document, initializes the frame, and updates the modal state.
 		@param frame The frame to add.
 		*/
-		com.guiseframework.js.Client.prototype.addFrame=function(frame)
+		proto.addFrame=function(frame)
 		{
 		//TODO fix so that it works both on IE and Firefox							oldElement.style.position="fixed";	//TODO testing
 			frame.style.position="absolute";	//change the element's position to absolute; it should already be set like this, but set it specifically so that dragging will know not to drag a copy TODO update the element's initial position
@@ -1943,7 +2011,7 @@ com.guiseframework.js.Client=function()
 */
 			var form=document.forms[0];	//get the form
 			form.appendChild(frame);	//add the frame element to the form, so that it can submit input type="file" correctly; do this first, because IE doesn't allow the style to be accessed directly with imported nodes until they are added to the document			
-			initializeNode(frame, true);	//initialize the new imported frame, installing the correct event handlers; do this before the frame is positioned, because initialization also fixes IE6 classes, which can affect position
+			this._initializeNode(frame, true);	//initialize the new imported frame, installing the correct event handlers; do this before the frame is positioned, because initialization also fixes IE6 classes, which can affect position
 			this._initializeFramePosition(frame);	//initialize the frame's position
 		
 			var openEffectClassName=Element.getClassName(frame, STYLES.OPEN_EFFECT_REGEXP);	//get the open effect specified for this frame
@@ -1975,8 +2043,8 @@ com.guiseframework.js.Client=function()
 				frame.style.visibility="visible";	//go ahead and make the frame visible
 			}
 		
-			updateComponents(frame, true);	//update all the components within the frame
-			this.frames.add(frame);	//add the frame to the array
+			this._updateComponents(frame, true);	//update all the components within the frame
+			this._frames.add(frame);	//add the frame to the array
 			this._updateModal();	//update the modal state
 			var focusable=getFocusableDescendant(frame);	//see if this frame has a node that can be focused
 			if(focusable)	//if we found a focusable node
@@ -2003,13 +2071,13 @@ com.guiseframework.js.Client=function()
 		This implementation removes the frame to the document, uninitializes the frame, and updates the modal state.
 		@param frame The frame to remove.
 		*/
-		com.guiseframework.js.Client.prototype.removeFrame=function(frame)
+		proto.removeFrame=function(frame)
 		{
-			var index=this.frames.indexOf(frame);	//get the frame index
+			var index=this._frames.indexOf(frame);	//get the frame index
 			if(index>=0)	//if we know the index of the frame
 			{
-				this.frames.remove(index);	//remove the frame from the array
-				uninitializeNode(frame, true);	//uninitialize the frame tree
+				this._frames.remove(index);	//remove the frame from the array
+				this._uninitializeNode(frame, true);	//uninitialize the frame tree
 				document.forms[0].removeChild(frame);	//remove the frame element to the document
 				this._updateModal();	//update the modal state
 			}
@@ -2018,7 +2086,7 @@ com.guiseframework.js.Client=function()
 		/**Initializes the position of a frame.
 		@param frame The frame to position.
 		*/
-		com.guiseframework.js.Client.prototype._initializeFramePosition=function(frame)
+		proto._initializeFramePosition=function(frame)
 		{
 		//TODO del var debugString="";
 		//TODO del	var framePosition=new Point();	//we'll calculate the frame position; create an object rather than using primitives so that the internal function can access its variables via closure
@@ -2135,31 +2203,31 @@ com.guiseframework.js.Client=function()
 		Each frame is given a z-order in the order of frames, starting with a z-order of 100 and incrementing by 100.
 		The page is assumed to have a z-order of 0.
 		*/
-		com.guiseframework.js.Client.prototype._updateModal=function()
+		proto._updateModal=function()
 		{
-			var frameCount=this.frames.length;	//find out how many frames there are
-			this.modalFrame=null;	//start out presuming there is no modal frame
+			var frameCount=this._frames.length;	//find out how many frames there are
+			this._modalFrame=null;	//start out presuming there is no modal frame
 			this.flyoverFrame=null;	//start out presuming there is no flyover frame
 			for(var i=0; i<frameCount; ++i)	//update the z-orders
 			{
-				var frame=this.frames[i];	//get a reference to this frame
+				var frame=this._frames[i];	//get a reference to this frame
 				frame.style.zIndex=(i+1)*100;	//give the element the appropriate z-order
 				if(Element.hasClassName(frame, "frameModal"))	//if this is a modal frame TODO use a constant
 				{
-					this.modalFrame=frame;	//indicate our last modal frame
+					this._modalFrame=frame;	//indicate our last modal frame
 				}
 				if(Element.hasClassName(frame, "flyoverFrame"))	//if this is a flyover frame TODO use a constant
 				{
 					this.flyoverFrame=frame;	//indicate our last flyover frame
 				}
 			}
-			if(this.modalFrame!=null)	//if there is a modal frame
+			if(this._modalFrame!=null)	//if there is a modal frame
 			{
 				if(this._modalLayer.style.display=="none")	//if the modal layer is not shown, update it (don't update it if it's already shown, as this will cause flickering by the modal layer being turned on and off; this tactic will not compensate for a new frame making the entire size larger, however)
 				{
 					this.updateModalLayer();	//always update the modal layer before it is shown, as IE may not always call resize to keep the modal layer updated
 				}
-				this._modalLayer.style.zIndex=this.modalFrame.style.zIndex-1;	//place the modal layer directly behind the modal frame
+				this._modalLayer.style.zIndex=this._modalFrame.style.zIndex-1;	//place the modal layer directly behind the modal frame
 				this._modalLayer.style.display="block";	//make the modal layer visible
 				if(this._modalIFrame)	//if we have a modal IFrame
 				{
@@ -2200,7 +2268,7 @@ com.guiseframework.js.Client=function()
 		};
 
 		/**Updates the size of the modal layer, creating it if necessary.*/
-		com.guiseframework.js.Client.prototype.updateModalLayer=function()
+		proto.updateModalLayer=function()
 		{
 			var oldModalLayerDisplay=this._modalLayer.style.display;	//get the current display status of the modal layer
 			this._modalLayer.style.display="none";	//make sure the modal layer is hidden, because having it visible will interfere with the page/viewport size calculations (setting the size to 0px will not give us immediate feedback in IE during resize)
@@ -2269,7 +2337,7 @@ com.guiseframework.js.Client=function()
 		/*Sets the busy indicator visible or hidden.
 		@param busyVisible A boolean indication of whether the busy indicator should be visible.
 		*/
-		com.guiseframework.js.Client.prototype.setBusyVisible=function(busyVisible)
+		proto.setBusyVisible=function(busyVisible)
 		{
 			if(busyVisible!=this._isBusyVisible)	//if the busy visibility is changing
 			{
@@ -2313,7 +2381,7 @@ com.guiseframework.js.Client=function()
 		/**Adds an element to the list of drop targets.
 		@param element The element to add to the list of drop targets.
 		*/
-		com.guiseframework.js.Client.prototype.addDropTarget=function(element)
+		proto.addDropTarget=function(element)
 		{
 			this._dropTargets.add(element);	//add this element to the list of drop targets
 			this._dropTargets.sort(function(element1, element2) {return Node.getDepth(element1)-DOMUtilities.getDepth(element2);});	//sort the drop targets in increasing order of document depth
@@ -2324,7 +2392,7 @@ com.guiseframework.js.Client=function()
 		@param y The vertical test position.
 		@return The drop target at the given coordinates, or null if there is no drop target at the given coordinates.
 		*/
-		com.guiseframework.js.Client.prototype.getDropTarget=function(x, y)
+		proto.getDropTarget=function(x, y)
 		{
 			for(var i=this._dropTargets.length-1; i>=0; --i)	//for each drop target (which have been sorted by increasing element depth)
 			{
@@ -2340,491 +2408,380 @@ com.guiseframework.js.Client=function()
 		/**Loads an image so that it will be present when needed.
 		@param src The URL of the image to load.
 		*/
-		com.guiseframework.js.Client.prototype.loadImage=function(src)
+		proto.loadImage=function(src)
 		{
 			var image=new Image();	//create a new image
 			image.src=src;	//set the src of the image so that it will load
 		};
 
+		/**Initializes a node and optionally all its children, adding the correct listeners.
+		@param node The node to initialize.
+		@param deep true if the entire hierarchy should be initialized.
+		@param initialInitialization true if this is the first initialization of the entire page.
+		*/
+		proto._initializeNode=function(node, deep, initialInitialization)
+		{
+			switch(node.nodeType)	//see which type of child node this is
+			{
+				case Node.ELEMENT_NODE:	//element
+		//TODO fix with something else to give IE layout			node["contentEditable"]=false;	//for IE 6, give the component "layout" so that things like opacity will work
+		//TODO bring back after giving all relevant nodes IDs			if(node.id)	//only look at element swith IDs
+		//TODO this may allow "layout" for IE, but only do it when we need it (otherwise it will screw up buttons and such)			node.style.zoom=1;	//TODO testing
+					{
+		/*TODO del unless we want to fix external-toGuise stylesheets			
+						if(!initialInitialization && (typeof guiseIE6Fix!="undefined"))	//if we have IE6 fix routines loaded, fix this element's class name (but don't do this for the first initialization, because we've already done this on the server)
+						{
+							guiseIE6Fix.fixElementClassName(node);	//fix the class name of this element
+						}
+		*/
+						var elementName=node.nodeName.toLowerCase();	//get the element name
+						var elementClassName=node.className;	//get the element class name
+						var elementClassNames=elementClassName ? elementClassName.split(/\s/) : EMPTY_ARRAY;	//split out the class names
+						switch(elementName)	//see which element this is
+						{
+							case "a":
+								if(isUserAgentIE6 && Element.hasClassName(node, "imageSelectActionControl"))	//if this is IE6, which doesn't support the CSS outline: none property, create a workaround TODO use a constant; create something more general than just the image select action control
+								{
+									node.hideFocus="true";	//hide the focus on this element
+								}
+								if(elementClassNames.contains("actionControl") || elementClassNames.contains("actionControl-link"))	//if this is a Guise action, or a link in an action control TODO later look at *all* link clicks and do popups for certain ones
+								{
+									if(!node.getAttribute("target"))	//if the link has no target (the target wouldn't work if we tried to take over the events; we can't just check for null because IE will always send back at least "")
+									{
+										com.garretwilson.js.EventManager.addEvent(node, "click", onLinkClick, false);	//listen for anchor clicks
+										if(isSafari)	//if this is Safari TODO fix better; this may have been fixed in Safari 2.0.4; see http://developer.yahoo.com/yui/docs/YAHOO.util.Event.html
+										{
+											node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
+										}
+									}
+								}
+								else if(elementClassNames.containsMatch(/-tab$/))	//if this is a tab TODO use a constant TODO is this still used?
+								{
+									com.garretwilson.js.EventManager.addEvent(node, "click", onTabClick, false);	//listen for tab clicks
+									if(isSafari)	//if this is Safari TODO fix better
+									{
+										node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
+									}
+								}
+								break;
+							case "button":
+								if(elementClassNames.contains("buttonControl"))	//if this is a Guise button TODO use constant
+								{
+									com.garretwilson.js.EventManager.addEvent(node, "click", onButtonClick, false);	//listen for button clicks
+									if(isSafari)	//if this is Safari TODO fix better
+									{
+										node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
+									}
+								}
+								break;
+							case "img":
+								var rolloverSrc=node.getAttribute("guise:rolloverSrc");	//get the image rollover, if there is one TODO use a constant
+								if(rolloverSrc)	//if the image has a rollover TODO use a constant; maybe use hasAttributeNS()
+								{
+									this.loadImage(rolloverSrc);	//preload the image
+									if(!Element.hasClassName(node, STYLES.MOUSE_LISTENER))	//if this is not a mouse listener (which would get a onMouse listener registered, anyway)
+									{
+										com.garretwilson.js.EventManager.addEvent(node, "mouseover", onMouse, false);	//listen for mouse over on a mouse listener
+										com.garretwilson.js.EventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener							
+									}
+		//TODO del							alert("rollover source: "+node.getAttribute("guise:rolloverSrc"));
+								}
+								if(isUserAgentFirefox)	//if we're running Firefox, check for the inline box layout bug that doesn't show images that have not yet been cached TODO fix for Firefox 3
+								{
+									if(node.offsetWidth==0 && node.offsetHeight==0)	//if this image has no dimensions
+									{
+										var mozInlineBoxAncestor=Node.getAncestorElementByStyle(node, "display", "-moz-inline-box");	//see if there is a Mozilla inline box element ancestor
+										if(mozInlineBoxAncestor)	//if there is a Mozilla inline box element causing our problems
+										{
+											var mozInlineBoxAncestorParent=mozInlineBoxAncestor.parentNode;	//get *its* parent so we can just replace all the children
+											if(mozInlineBoxAncestorParent)	//if we find its parent like we expect
+											{
+												Node.refresh(mozInlineBoxAncestorParent);	//refresh the container element by removing it from the tree and putting it back
+											}
+										}
+									}
+								}
+								break;
+							case "input":
+								switch(node.type)	//get the type of input
+								{
+									case "text":
+									case "password":
+										com.garretwilson.js.EventManager.addEvent(node, "change", onTextInputChange, false);
+		//TODO del; doesn't work across browsers								com.garretwilson.js.EventManager.addEvent(node, "keypress", onTextInputKeyPress, false);
+										com.garretwilson.js.EventManager.addEvent(node, "keydown", onTextInputKeyDown, false);
+										com.garretwilson.js.EventManager.addEvent(node, "keyup", onTextInputKeyUp, false);
+										break;
+									case "checkbox":
+									case "radio":
+										com.garretwilson.js.EventManager.addEvent(node, "click", onCheckInputChange, false);
+										break;
+									case "file":
+										if(elementClassNames.contains("resourceCollectControl-body"))	//if this is a Guise resource collect control TODO maybe change to the reverse logic (i.e. not ResourceCollectControl)
+										{
+											com.garretwilson.js.EventManager.addEvent(node, "change", onFileInputChange, false);
+										}
+										else if(elementClassNames.contains("resourceImportControl-body"))	//if this is a Guise resource import control, we'll later need to submit the form differently
+										{
+											hasResourceImportControl=true;	//we found a resource import control
+										}
+										break;
+								}
+								break;
+							case "select":
+								com.garretwilson.js.EventManager.addEvent(node, "change", onSelectChange, false);
+		/*TODO del
+								var iframe=document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");	//TODO testing
+								iframe.src="about:blank";
+								iframe.scrolling="no";
+								iframe.frameborder="0";
+								document.body.appendChild(iframe);
+								iframe.position="absolute";
+								var coordinates=getElementCoordinates(node);
+								iframe.style.left=coordinates.x;
+								iframe.style.top=coordinates.y;
+								iframe.style.width=node.offsetWidth+"px";
+								iframe.style.height=node.offsetHeight+"px";
+								iframe.style.zIndex=1;
+		*/	
+								
+								break;
+							case "textarea":
+								com.garretwilson.js.EventManager.addEvent(node, "change", onTextInputChange, false);
+								com.garretwilson.js.EventManager.addEvent(node, "keydown", onTextInputKeyDown, false);	//commit the text area on Enter TODO decide whether we want real-time checking with onTextInpuKeyUp, which would be very expensive for text areas
+								break;
+						}
+						for(var i=elementClassNames.length-1; i>=0; --i)	//for each class name
+						{
+							switch(elementClassNames[i])	//check out this class name
+							{
+		/*TODO del
+								case "button":	//TODO testing; del
+									com.garretwilson.js.EventManager.addEvent(node, "click", onButtonClick, false);	//listen for button clicks
+									break;
+		*/
+								case STYLES.ACTION:
+									com.garretwilson.js.EventManager.addEvent(node, "click", onActionClick, false);	//listen for a click on an action element
+									com.garretwilson.js.EventManager.addEvent(node, "contextmenu", onContextMenu, false);	//listen for a right click on an action element
+									//TODO see if we need to assign a default handler on Safari to prevent the default action
+									break;
+								case STYLES.DRAG_HANDLE:
+									com.garretwilson.js.EventManager.addEvent(node, "mousedown", onDragBegin, false);	//listen for mouse down on a drag handle
+									break;
+								case STYLES.MOUSE_LISTENER:
+									if(!Node.getAncestorElementByClassName(node.parentNode, STYLES.MOUSE_LISTENER))	//make sure this is the root mouse listener, as we'll allow events to bubble
+									{
+										com.garretwilson.js.EventManager.addEvent(node, "mouseover", onMouse, false);	//listen for mouse over on a mouse listener
+										com.garretwilson.js.EventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener
+									}
+									break;
+								case STYLES.DROP_TARGET:
+									this.addDropTarget(node);	//add this node to the list of drop targets
+									break;
+								case STYLES.SLIDER_CONTROL_THUMB:
+									com.garretwilson.js.EventManager.addEvent(node, "mousedown", onSliderThumbDragBegin, false);	//listen for mouse down on a slider thumb
+									break;
+							}
+						}
+						if(node.focus)	//if this element can receive the focus
+						{
+							com.garretwilson.js.EventManager.addEvent(node, "focus", this._onFocus.bind(this), false);	//listen for focus events; we must do this specifically for each node, because focus events don't focus correctly
+						}
+					}
+					break;
+			}
+			if(deep)	//if we should initialize child nodes
+			{
+				var all=node.all;	//see if the node has an all[] array, because that will be much faster
+				if(all)	//if there is an all[] array
+				{
+					var allCount=all.length;	//find out how many nodes there are
+					for(var i=0; i<allCount; ++i)	//for each descendant node
+					{
+						this._initializeNode(all[i], false, initialInitialization);	//initialize this child node, but not its children
+					}
+				}
+				else	//otherwise, walk the tree using the standard W3C DOM routines
+				{
+						//initialize child nodes
+					var childNodeList=node.childNodes;	//get all the child nodes
+					var childNodeCount=childNodeList.length;	//find out how many children there are
+					for(var i=0; i<childNodeCount; ++i)	//for each child node
+					{
+						this._initializeNode(childNodeList[i], deep, initialInitialization);	//initialize this child subtree
+					}
+				}
+			}
+		};
+		
+		/**Updates the representation of any dynamic components based upon the state of the underlying element.
+		Components for the given node and any descendant nodes are updated.
+		@param node The node for which components should be updated.
+		@param deep true if the entire hierarchy should be initialized.
+		*/
+		proto._updateComponents=function(node, deep)
+		{
+			switch(node.nodeType)	//see which type of child node this is
+			{
+				case Node.ELEMENT_NODE:	//element
+		//TODO bring back after giving all relevant nodes IDs			if(node.id)	//only look at element swith IDs
+					{
+						var elementName=node.nodeName.toLowerCase();	//get the element name
+						var elementClassName=node.className;	//get the element class name
+						var elementClassNames=elementClassName ? elementClassName.split(/\s/) : EMPTY_ARRAY;	//split out the class names
+						switch(elementName)	//see which element this is
+						{
+							case "div":
+										//check for slider
+								if(elementClassNames.containsMatch(STYLES.SLIDER_CONTROL))	//if this is a slider control
+								{
+									updateSlider(node);	//update the slider
+								}
+								break;
+						}
+					}
+					break;
+			}
+			if(deep)	//if we should update child components
+			{
+				var all=node.all;	//see if the node has an all[] array, because that will be much faster
+				if(all)	//if there is an all[] array
+				{
+					var allCount=all.length;	//find out how many nodes there are
+					for(var i=0; i<allCount; ++i)	//for each descendant node
+					{
+						this._updateComponents(all[i], false);	//update this component, but not its children
+					}
+				}
+				else	//otherwise, walk the tree using the standard W3C DOM routines
+				{
+					var childNodeList=node.childNodes;	//get all the child nodes
+					var childNodeCount=childNodeList.length;	//find out how many children there are
+					for(var i=0; i<childNodeCount; ++i)	//for each child node
+					{
+						this._updateComponents(childNodeList[i], deep);	//update the components for this child subtree
+					}
+				}
+			}
+		};
+		
+		/**Uninitializes a node and optionally all its children, removing all added listeners.
+		@param node The node to uninitialize.
+		@param deep true if the entire hierarchy should be uninitialized.
+		*/
+		proto._uninitializeNode=function(node, deep)	//TODO remove the node from the sorted list of drop targets
+		{
+			com.garretwilson.js.EventManager.clearEvents(node);	//clear events for this node
+			if(deep)	//if we should uninitialize child nodes
+			{
+				var all=node.all;	//see if the node has an all[] array, because that will be much faster
+				if(all)	//if there is an all[] array
+				{
+					var allCount=all.length;	//find out how many nodes there are
+					for(var i=0; i<allCount; ++i)	//for each descendant node
+					{
+						this._uninitializeNode(all[i], false);	//uninitialize this child node, but not its children
+					}
+				}
+				else	//otherwise, walk the tree using the standard W3C DOM routines
+				{
+						//uninitialize child nodes
+					var childNodeList=node.childNodes;	//get all the child nodes
+					var childNodeCount=childNodeList.length;	//find out how many children there are
+					for(var i=0; i<childNodeCount; ++i)	//for each child node
+					{
+						this._uninitializeNode(childNodeList[i], deep);	//initialize this child subtree
+					}
+				}
+			}
+		};
+
+		/**Called when any element receives the focus.
+		@param event The object containing event information.
+		*/
+		proto._onFocus=function(event)
+		{
+			var target=event.target;	//get the element receiving the focus
+			if(target!=this._lastFocusedNode)	//if the focus is really changing (Firefox seems to send multiple focus events for some elements, such as buttons)
+			{
+				if(this._modalFrame!=null)	//if there is a modal frame
+				{
+					if(!Node.hasAncestor(target, this._modalFrame))	//if focus is trying to go to something outside the modal frame
+					{
+						if(Node.hasAncestor(this._lastFocusedNode, this._modalFrame))	//if we know the last focused node, and it was in the modal frame
+						{
+							this._lastFocusedNode.focus();	//focus back on the last focused node
+						}
+						else	//if we don't know the last focused node, or it wasn't in the modal frame
+						{
+							var focusable=getFocusableDescendant(this._modalFrame);	//see if the modal frame has a node that can be focused TODO this will go away when Guise has better focus support in its component model
+							if(focusable)	//if we found a focusable node
+							{
+								try
+								{
+									focusable.focus();	//focus on the node
+								}						
+								catch(e)	//TODO fix
+								{
+			/*TODO fix
+									alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" style: "+focusable.style+" class: "+focusable.className+" visibility: "+focusable.style.visibility+" display: "+focusable.style.display+" disabled: "+focusable.style.disabled);
+						alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" current visibility: "+focusable.currentStyle.visibility+" current display: "+focusable.currentStyle.display+" current disabled: "+focusable.currentStyle.disabled);
+						alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" runtime visibility: "+focusable.runtimeStyle.visibility+" runtime display: "+focusable.runtimeStyle.display+" runtime disabled: "+focusable.runtimeStyle.disabled);
+						alert("error trying to focus element great-grandparent: "+DOMUtilities.getNodeString(focusable.parentNode.parentNode.parentNode));
+			*/
+								}
+							}
+							else	//if we can't find a focusable node on the modal frame
+							{
+			//TODO fix for IE					currentTarget.blur();	//don't allow the element to get the focus, even though we don't know what to focus
+							}
+						}
+						return;	//don't process the focus event any further
+					}
+				}
+				this._lastFocusedNode=target;	//this is an allowed focus that isn't outside of a modal frame; keep track of what was last focused
+				var component=Node.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element
+				if(component)	//if there is a component
+				{
+					var componentID=component.id;	//get the component ID
+					if(componentID)	//if there is a component ID
+					{
+						if(this.isEnabled())	//if AJAX is enabled
+						{
+							var ajaxRequest=new FocusAJAXEvent(componentID);	//create a new focus request
+							this.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+						}
+					}
+				}
+			}
+		};
+
+
+
+
+
+
+
+
+
+		/**Called while a sound is playing.
+		@param sound The sound that is playing.
+		*/
+		proto._whileSoundPlaying=function(sound)
+		{
+//			this.trace("sound", sound.sID, "is playing at position: ", sound.position, "duration:", sound.duration);
+		};
+
 	}
-};
 
-var guise=new com.guiseframework.js.Client();	//create a new global variable for the Guise client
+	this.httpCommunicator.setProcessHTTPResponse(this._processHTTPResponse.bind(this));	//set up our callback function for processing HTTP responses
 
-/**The global object for AJAX communication with Guise.*/
-var guiseAJAX=new GuiseAJAX();
+}
+
+var guise=new com.guiseframework.js.Guise();	//create a new global variable for the Guise client
 
 /**The global drag state variable.*/
 var dragState;
-
-/**Called when the window loads.
-This implementation installs listeners.
-*/
-function onWindowLoad()
-{
-/*TODO del
-		//~2500
-	var time1=new Date();
-	for(var loop=0; loop<100; ++loop)
-	{
-		testNode(document.documentElement, true);
-	}
-	var time2=new Date();
-	alert("walking the tree: "+(time2.getTime()-time1.getTime()));
-	
-		//~1000
-	var time3=new Date();
-	for(var loop=0; loop<100; ++loop)
-	{
-		var all=document.all;
-		var allCount=all.length;
-		for(var i=0; i<allCount; ++i)
-		{
-			testNode(all[i]);
-		}
-	}
-	var time4=new Date();
-	alert("looking at all: "+(time4.getTime()-time3.getTime()));
-*/
-
-
-		
-
-	var initFunction=function()	//create a function for initializing the document
-	{		
-	//TODO display a wait cursor until we initialize everything
-	
-	/*TODO del unless we want to fix external-toGuise stylesheets
-		if(typeof guiseIE6Fix!="undefined")	//if we have IE6 fix routines loaded
-		{
-			guiseIE6Fix.fixStylesheets();	//fix all IE6 stylesheets
-		}
-	*/
-		com.garretwilson.js.EventManager.addEvent(window, "resize", onWindowResize, false);	//add a resize listener
-	//TODO del	com.garretwilson.js.EventManager.addEvent(window, "scroll", onWindowScroll, false);	//add a scroll listener
-		com.garretwilson.js.EventManager.addEvent(window, "unload", onWindowUnload, false);	//do the appropriate uninitialization when the window unloads
-		initializeNode(document.documentElement, true, true);	//initialize the document tree, indicating that this is the first initialization
-		updateComponents(document.documentElement, true);	//update all components represented by elements within the document
-	//TODO del when works	dropTargets.sort(function(element1, element2) {return getElementDepth(element1)-getElementDepth(element2);});	//sort the drop targets in increasing order of document depth
-		com.garretwilson.js.EventManager.addEvent(document, "mouseup", onDragEnd, false);	//listen for mouse down anywhere in the document (IE doesn't allow listening on the window), as dragging may end somewhere else besides a drop target
-		com.garretwilson.js.EventManager.addEvent(document.documentElement, "keydown", onKey, false);	//listen for key down anywhere in the document so that we can send key events back to the server (IE doesn't work correctly with key events registered on the window or document)
-		com.garretwilson.js.EventManager.addEvent(document.documentElement, "keyup", onKey, false);	//listen for key up anywhere in the document so that we can send key events back to the server (IE doesn't work correctly with key events registered on the window or document)
-		com.garretwilson.js.EventManager.addEvent(document.documentElement, "click", onClick, false);	//listen for mouse clicks bubbling up from anywhere (that we haven't dealt with specifically and canceled) in the document so that we can report clicks back to the server
-		guise.onDocumentLoad();	//create and update the modal layer
-		guiseAJAX.sendAJAXRequest(new InitAJAXEvent());	//send an initialization AJAX request	
-	//TODO del	alert("compatibility mode: "+document.compatMode);
-		guise.setBusyVisible(false);	//turn off the busy indicator	
-			//remove the init IFrame shield
-		var initIFrame=document.getElementById("initIFrame");	//get the init IFrame
-		if(initIFrame)	//if there is an initialization IFrame
-		{
-			initIFrame.parentNode.removeChild(initIFrame);	//remove the init IFrame from the document; we don't need it anymore
-		}
-/*TODO testing no form
-		var form=getForm(document.documentElement);	//get the form
-		if(form && form.id)	//if there is a form with an ID
-		{
-			var initIFrameID=form.id.replace(".form", ".initIFrame");	//determine the ID of the init IFrame TODO use a constant, or get these values using a better method
-			var initIFrame=document.getElementById(initIFrameID);	//get the init IFrame
-			if(initIFrame)	//if there is an initialization IFrame
-			{
-				initIFrame.parentNode.removeChild(initIFrame);	//remove the init IFrame from the document; we don't need it anymore
-			}
-		}
-*/
-		var focusable=getFocusableDescendant(document.documentElement);	//see if the document has a node that can be focused
-		if(focusable)	//if we found a focusable node
-		{
-			focusable.focus();	//focus on the node
-		}
-		guiseAJAX.setPingInterval(GUISE_AJAX_PING_INTERVAL);	//turn on pinging at the normal level
-	};
-
-	if(document.bodyLength && document.bodyLength>60000)	//if the body length is over 60,000 (as indicated by the custom Guise variable), show a busy indicator
-	{
-		guise.setBusyVisible(true);	//turn on the busy indicator
-			//TODO fix; doesn't seem to work on IE6 or Firefox
-		guise.setElementTempCursor(document.body, "wait");	//change the document body cursor to "wait" until the AJAX initialization is finished
-	}
-	window.setTimeout(initFunction, 1);	//run the init function in a separate thread
-}
-
-/**Called when the window unloads.
-This implementation uninstalls all listeners.
-@param event The object containing event information.
-*/
-function onWindowUnload(event)
-{
-	guiseAJAX.setEnabled(false);	//immediately turn off AJAX communication
-//TODO fix or del	guise.setBusyVisible(true);	//turn on the busy indicator
-	com.garretwilson.js.EventManager.clearEvents();	//unload all events
-//TODO fix or del	guise.setBusyVisible(false);	//turn off the busy indicator
-}
-
-/**Called when the window resizes.
-This implementation updates the modal layer.
-@param event The object containing event information.
-*/
-function onWindowResize(event)
-{
-	//TODO work around IE bug that stops calling onWindowResize after a couple of maximization/minimization cycles
-	window.setTimeout(guise.updateModalLayer.bind(guise), 1);	//update the modal layer later, because during resize IE won't allow us to hide the modal layer and have the correct size update instantaneously
-}
-
-/**Called when the window scrolls.
-Note that Firefox 1.0.7 calls this method even when a scrollable element scrolls; this problem is fixed in Firefox 1.5.
-@param event The object containing event information.
-*/
-/*TODO bring back if needed
-function onWindowScroll(event)
-{
-alert("scroll");
-}
-*/
-
-/**Initializes a node and optionally all its children, adding the correct listeners.
-@param node The node to initialize.
-@param deep true if the entire hierarchy should be initialized.
-@param initialInitialization true if this is the first initialization of the entire page.
-*/
-function initializeNode(node, deep, initialInitialization)
-{
-	switch(node.nodeType)	//see which type of child node this is
-	{
-		case Node.ELEMENT_NODE:	//element
-//TODO fix with something else to give IE layout			node["contentEditable"]=false;	//for IE 6, give the component "layout" so that things like opacity will work
-//TODO bring back after giving all relevant nodes IDs			if(node.id)	//only look at element swith IDs
-//TODO this may allow "layout" for IE, but only do it when we need it (otherwise it will screw up buttons and such)			node.style.zoom=1;	//TODO testing
-			{
-/*TODO del unless we want to fix external-toGuise stylesheets			
-				if(!initialInitialization && (typeof guiseIE6Fix!="undefined"))	//if we have IE6 fix routines loaded, fix this element's class name (but don't do this for the first initialization, because we've already done this on the server)
-				{
-					guiseIE6Fix.fixElementClassName(node);	//fix the class name of this element
-				}
-*/
-				var elementName=node.nodeName.toLowerCase();	//get the element name
-				var elementClassName=node.className;	//get the element class name
-				var elementClassNames=elementClassName ? elementClassName.split(/\s/) : EMPTY_ARRAY;	//split out the class names
-				switch(elementName)	//see which element this is
-				{
-					case "a":
-						if(isUserAgentIE6 && Element.hasClassName(node, "imageSelectActionControl"))	//if this is IE6, which doesn't support the CSS outline: none property, create a workaround TODO use a constant; create something more general than just the image select action control
-						{
-							node.hideFocus="true";	//hide the focus on this element
-						}
-						if(elementClassNames.contains("actionControl") || elementClassNames.contains("actionControl-link"))	//if this is a Guise action, or a link in an action control TODO later look at *all* link clicks and do popups for certain ones
-						{
-							if(!node.getAttribute("target"))	//if the link has no target (the target wouldn't work if we tried to take over the events; we can't just check for null because IE will always send back at least "")
-							{
-								com.garretwilson.js.EventManager.addEvent(node, "click", onLinkClick, false);	//listen for anchor clicks
-								if(isSafari)	//if this is Safari TODO fix better; this may have been fixed in Safari 2.0.4; see http://developer.yahoo.com/yui/docs/YAHOO.util.Event.html
-								{
-									node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
-								}
-							}
-						}
-						else if(elementClassNames.containsMatch(/-tab$/))	//if this is a tab TODO use a constant TODO is this still used?
-						{
-							com.garretwilson.js.EventManager.addEvent(node, "click", onTabClick, false);	//listen for tab clicks
-							if(isSafari)	//if this is Safari TODO fix better
-							{
-								node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
-							}
-						}
-						break;
-					case "button":
-						if(elementClassNames.contains("buttonControl"))	//if this is a Guise button TODO use constant
-						{
-							com.garretwilson.js.EventManager.addEvent(node, "click", onButtonClick, false);	//listen for button clicks
-							if(isSafari)	//if this is Safari TODO fix better
-							{
-								node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
-							}
-						}
-						break;
-					case "img":
-						var rolloverSrc=node.getAttribute("guise:rolloverSrc");	//get the image rollover, if there is one TODO use a constant
-						if(rolloverSrc)	//if the image has a rollover TODO use a constant; maybe use hasAttributeNS()
-						{
-							guise.loadImage(rolloverSrc);	//preload the image
-							if(!Element.hasClassName(node, STYLES.MOUSE_LISTENER))	//if this is not a mouse listener (which would get a onMouse listener registered, anyway)
-							{
-								com.garretwilson.js.EventManager.addEvent(node, "mouseover", onMouse, false);	//listen for mouse over on a mouse listener
-								com.garretwilson.js.EventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener							
-							}
-//TODO del							alert("rollover source: "+node.getAttribute("guise:rolloverSrc"));
-						}
-						if(isUserAgentFirefox)	//if we're running Firefox, check for the inline box layout bug that doesn't show images that have not yet been cached TODO fix for Firefox 3
-						{
-							if(node.offsetWidth==0 && node.offsetHeight==0)	//if this image has no dimensions
-							{
-								var mozInlineBoxAncestor=Node.getAncestorElementByStyle(node, "display", "-moz-inline-box");	//see if there is a Mozilla inline box element ancestor
-								if(mozInlineBoxAncestor)	//if there is a Mozilla inline box element causing our problems
-								{
-									var mozInlineBoxAncestorParent=mozInlineBoxAncestor.parentNode;	//get *its* parent so we can just replace all the children
-									if(mozInlineBoxAncestorParent)	//if we find its parent like we expect
-									{
-										Node.refresh(mozInlineBoxAncestorParent);	//refresh the container element by removing it from the tree and putting it back
-									}
-								}
-							}
-						}
-						break;
-					case "input":
-						switch(node.type)	//get the type of input
-						{
-							case "text":
-							case "password":
-								com.garretwilson.js.EventManager.addEvent(node, "change", onTextInputChange, false);
-//TODO del; doesn't work across browsers								com.garretwilson.js.EventManager.addEvent(node, "keypress", onTextInputKeyPress, false);
-								com.garretwilson.js.EventManager.addEvent(node, "keydown", onTextInputKeyDown, false);
-								com.garretwilson.js.EventManager.addEvent(node, "keyup", onTextInputKeyUp, false);
-								break;
-							case "checkbox":
-							case "radio":
-								com.garretwilson.js.EventManager.addEvent(node, "click", onCheckInputChange, false);
-								break;
-							case "file":
-								if(elementClassNames.contains("resourceCollectControl-body"))	//if this is a Guise resource collect control TODO maybe change to the reverse logic (i.e. not ResourceCollectControl)
-								{
-									com.garretwilson.js.EventManager.addEvent(node, "change", onFileInputChange, false);
-								}
-								else if(elementClassNames.contains("resourceImportControl-body"))	//if this is a Guise resource import control, we'll later need to submit the form differently
-								{
-									hasResourceImportControl=true;	//we found a resource import control
-								}
-								break;
-						}
-						break;
-					case "select":
-						com.garretwilson.js.EventManager.addEvent(node, "change", onSelectChange, false);
-/*TODO del
-						var iframe=document.createElementNS("http://www.w3.org/1999/xhtml", "iframe");	//TODO testing
-						iframe.src="about:blank";
-						iframe.scrolling="no";
-						iframe.frameborder="0";
-						document.body.appendChild(iframe);
-						iframe.position="absolute";
-						var coordinates=getElementCoordinates(node);
-						iframe.style.left=coordinates.x;
-						iframe.style.top=coordinates.y;
-						iframe.style.width=node.offsetWidth+"px";
-						iframe.style.height=node.offsetHeight+"px";
-						iframe.style.zIndex=1;
-*/	
-						
-						break;
-					case "textarea":
-						com.garretwilson.js.EventManager.addEvent(node, "change", onTextInputChange, false);
-						com.garretwilson.js.EventManager.addEvent(node, "keydown", onTextInputKeyDown, false);	//commit the text area on Enter TODO decide whether we want real-time checking with onTextInpuKeyUp, which would be very expensive for text areas
-						break;
-				}
-				for(var i=elementClassNames.length-1; i>=0; --i)	//for each class name
-				{
-					switch(elementClassNames[i])	//check out this class name
-					{
-/*TODO del
-						case "button":	//TODO testing; del
-							com.garretwilson.js.EventManager.addEvent(node, "click", onButtonClick, false);	//listen for button clicks
-							break;
-*/
-						case STYLES.ACTION:
-							com.garretwilson.js.EventManager.addEvent(node, "click", onActionClick, false);	//listen for a click on an action element
-							com.garretwilson.js.EventManager.addEvent(node, "contextmenu", onContextMenu, false);	//listen for a right click on an action element
-							//TODO see if we need to assign a default handler on Safari to prevent the default action
-							break;
-						case STYLES.DRAG_HANDLE:
-							com.garretwilson.js.EventManager.addEvent(node, "mousedown", onDragBegin, false);	//listen for mouse down on a drag handle
-							break;
-						case STYLES.MOUSE_LISTENER:
-							if(!Node.getAncestorElementByClassName(node.parentNode, STYLES.MOUSE_LISTENER))	//make sure this is the root mouse listener, as we'll allow events to bubble
-							{
-								com.garretwilson.js.EventManager.addEvent(node, "mouseover", onMouse, false);	//listen for mouse over on a mouse listener
-								com.garretwilson.js.EventManager.addEvent(node, "mouseout", onMouse, false);	//listen for mouse out on a mouse listener
-							}
-							break;
-						case STYLES.DROP_TARGET:
-							guise.addDropTarget(node);	//add this node to the list of drop targets
-							break;
-						case STYLES.SLIDER_CONTROL_THUMB:
-							com.garretwilson.js.EventManager.addEvent(node, "mousedown", onSliderThumbDragBegin, false);	//listen for mouse down on a slider thumb
-							break;
-					}
-				}
-				if(node.focus)	//if this element can receive the focus
-				{
-					com.garretwilson.js.EventManager.addEvent(node, "focus", onFocus, false);	//listen for focus events; we must do this specifically for each node, because focus events don't focus correctly
-				}
-			}
-			break;
-	}
-	if(deep)	//if we should initialize child nodes
-	{
-		var all=node.all;	//see if the node has an all[] array, because that will be much faster
-		if(all)	//if there is an all[] array
-		{
-			var allCount=all.length;	//find out how many nodes there are
-			for(var i=0; i<allCount; ++i)	//for each descendant node
-			{
-				initializeNode(all[i], false, initialInitialization);	//initialize this child node, but not its children
-			}
-		}
-		else	//otherwise, walk the tree using the standard W3C DOM routines
-		{
-				//initialize child nodes
-			var childNodeList=node.childNodes;	//get all the child nodes
-			var childNodeCount=childNodeList.length;	//find out how many children there are
-			for(var i=0; i<childNodeCount; ++i)	//for each child node
-			{
-				initializeNode(childNodeList[i], deep, initialInitialization);	//initialize this child subtree
-			}
-		}
-	}
-}
-
-/**Updates the representation of any dynamic components based upon the state of the underlying element.
-Components for the given node and any descendant nodes are updated.
-@param node The node for which components should be updated.
-@param deep true if the entire hierarchy should be initialized.
-*/
-function updateComponents(node, deep)
-{
-	switch(node.nodeType)	//see which type of child node this is
-	{
-		case Node.ELEMENT_NODE:	//element
-//TODO bring back after giving all relevant nodes IDs			if(node.id)	//only look at element swith IDs
-			{
-				var elementName=node.nodeName.toLowerCase();	//get the element name
-				var elementClassName=node.className;	//get the element class name
-				var elementClassNames=elementClassName ? elementClassName.split(/\s/) : EMPTY_ARRAY;	//split out the class names
-				switch(elementName)	//see which element this is
-				{
-					case "div":
-								//check for slider
-						if(elementClassNames.containsMatch(STYLES.SLIDER_CONTROL))	//if this is a slider control
-						{
-							updateSlider(node);	//update the slider
-						}
-						break;
-				}
-			}
-			break;
-	}
-	if(deep)	//if we should update child components
-	{
-		var all=node.all;	//see if the node has an all[] array, because that will be much faster
-		if(all)	//if there is an all[] array
-		{
-			var allCount=all.length;	//find out how many nodes there are
-			for(var i=0; i<allCount; ++i)	//for each descendant node
-			{
-				updateComponents(all[i], false);	//update this component, but not its children
-			}
-		}
-		else	//otherwise, walk the tree using the standard W3C DOM routines
-		{
-			var childNodeList=node.childNodes;	//get all the child nodes
-			var childNodeCount=childNodeList.length;	//find out how many children there are
-			for(var i=0; i<childNodeCount; ++i)	//for each child node
-			{
-				updateComponents(childNodeList[i], deep);	//update the components for this child subtree
-			}
-		}
-	}
-}
-
-/**Uninitializes a node and optionally all its children, removing all added listeners.
-@param node The node to uninitialize.
-@param deep true if the entire hierarchy should be uninitialized.
-*/
-function uninitializeNode(node, deep)	//TODO remove the node from the sorted list of drop targets
-{
-	com.garretwilson.js.EventManager.clearEvents(node);	//clear events for this node
-	if(deep)	//if we should uninitialize child nodes
-	{
-		var all=node.all;	//see if the node has an all[] array, because that will be much faster
-		if(all)	//if there is an all[] array
-		{
-			var allCount=all.length;	//find out how many nodes there are
-			for(var i=0; i<allCount; ++i)	//for each descendant node
-			{
-				uninitializeNode(all[i], false);	//uninitialize this child node, but not its children
-			}
-		}
-		else	//otherwise, walk the tree using the standard W3C DOM routines
-		{
-				//uninitialize child nodes
-			var childNodeList=node.childNodes;	//get all the child nodes
-			var childNodeCount=childNodeList.length;	//find out how many children there are
-			for(var i=0; i<childNodeCount; ++i)	//for each child node
-			{
-				uninitializeNode(childNodeList[i], deep);	//initialize this child subtree
-			}
-		}
-	}
-}
-
-var lastFocusedNode=null;
-
-/**Called when any element receives the focus.
-@param event The object containing event information.
-*/
-function onFocus(event)
-{
-	var target=event.target;	//get the element receiving the focus
-	if(target!=lastFocusedNode)	//if the focus is really changing (Firefox seems to send multiple focus events for some elements, such as buttons)
-	{
-		if(guise.modalFrame!=null)	//if there is a modal frame
-		{
-			if(!Node.hasAncestor(target, guise.modalFrame))	//if focus is trying to go to something outside the modal frame
-			{
-				if(Node.hasAncestor(lastFocusedNode, guise.modalFrame))	//if we know the last focused node, and it was in the modal frame
-				{
-					lastFocusedNode.focus();	//focus back on the last focused node
-				}
-				else	//if we don't know the last focused node, or it wasn't in the modal frame
-				{
-					var focusable=getFocusableDescendant(guise.modalFrame);	//see if the modal frame has a node that can be focused TODO this will go away when Guise has better focus support in its component model
-					if(focusable)	//if we found a focusable node
-					{
-						try
-						{
-							focusable.focus();	//focus on the node
-						}						
-						catch(e)	//TODO fix
-						{
-	/*TODO fix
-							alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" style: "+focusable.style+" class: "+focusable.className+" visibility: "+focusable.style.visibility+" display: "+focusable.style.display+" disabled: "+focusable.style.disabled);
-				alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" current visibility: "+focusable.currentStyle.visibility+" current display: "+focusable.currentStyle.display+" current disabled: "+focusable.currentStyle.disabled);
-				alert("error trying to focus element "+focusable.nodeName+" ID: "+focusable.id+" class: "+focusable.className+" runtime visibility: "+focusable.runtimeStyle.visibility+" runtime display: "+focusable.runtimeStyle.display+" runtime disabled: "+focusable.runtimeStyle.disabled);
-				alert("error trying to focus element great-grandparent: "+DOMUtilities.getNodeString(focusable.parentNode.parentNode.parentNode));
-	*/
-						}
-					}
-					else	//if we can't find a focusable node on the modal frame
-					{
-	//TODO fix for IE					currentTarget.blur();	//don't allow the element to get the focus, even though we don't know what to focus
-					}
-				}
-				return;	//don't process the focus event any further
-			}
-		}
-		lastFocusedNode=target;	//this is an allowed focus that isn't outside of a modal frame; keep track of what was last focused
-		var component=Node.getAncestorElementByClassName(target, STYLES.COMPONENT);	//get the component element
-		if(component)	//if there is a component
-		{
-			var componentID=component.id;	//get the component ID
-			if(componentID)	//if there is a component ID
-			{
-				if(guiseAJAX.isEnabled())	//if AJAX is enabled
-				{
-					var ajaxRequest=new FocusAJAXEvent(componentID);	//create a new focus request
-					guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
-				}
-			}
-		}
-	}
-}
 
 /**Called when a key is pressed in a text input.
 This implementation checks to see if the Enter/Return key was pressed, and if so commits the input by sending it to the server.
@@ -2837,12 +2794,12 @@ function onTextInputKeyPress(event)
 	var charCode=event.charCode;	//get the code of the entered character
 	if(charCode==13)	//if Enter/Return was pressed TODO use a constant
 	{
-		if(guiseAJAX.isEnabled())	//if AJAX is enabled
+		if(guise.isEnabled())	//if AJAX is enabled
 		{
 		//TODO del alert("an input changed! "+textInput.id);
 			var textInput=event.currentTarget;	//get the control in which text changed
 			var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value));	//create a new form request with the control name and value
-			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+			guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 			event.stopPropagation();	//tell the event to stop bubbling
 			event.preventDefault();	//prevent the default functionality from occurring
 		}
@@ -2880,7 +2837,7 @@ function onKey(event)
 			}
 		}
 	}
-	if(guiseAJAX.isEnabled())	//if AJAX is enabled
+	if(guise.isEnabled())	//if AJAX is enabled
 	{
 		var keyCode=event.keyCode;	//get the code of the pressed key
 		if(REPORTED_KEY_CODES.contains(keyCode))	//if this is a code to report
@@ -2898,7 +2855,7 @@ function onKey(event)
 					return;				
 			}
 			var ajaxRequest=new KeyAJAXEvent(eventType, keyCode, Boolean(event.altKey), Boolean(event.ctrlKey), Boolean(event.shiftKey));	//create a new AJAX key event
-			window.setTimeout(function(){guiseAJAX.sendAJAXRequest(ajaxRequest);}, 1);	//send the AJAX request later; in Firefox 2.0.0.3, sending the request from within the key event will cause the AJAX response to disappear 
+			window.setTimeout(guise.sendAJAXRequest.bind(guise, ajaxRequest), 1);	//send the AJAX request later; in Firefox 2.0.0.3, sending the request from within the key event will cause the AJAX response to disappear 
 		}
 		if(CANCELED_KEY_CODES.contains(keyCode))	//if this is a code to canceled
 		{
@@ -2921,12 +2878,12 @@ function onTextInputKeyDown(event)
 	var keyCode=event.keyCode;	//get the code of the pressed key
 	if(keyCode==KEY_CODE.ENTER)	//if Enter/Return was pressed
 	{
-		if(guiseAJAX.isEnabled())	//if AJAX is enabled
+		if(guise.isEnabled())	//if AJAX is enabled
 		{
 		//TODO del alert("an input changed! "+textInput.id);
 			var textInput=event.currentTarget;	//get the control in which text changed
 			var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value));	//create a new form request with the control name and value
-			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+			guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 			event.preventDefault();	//prevent the default functionality from occurring, but allow it to keep bubbling so that it can be reported back to the server
 /*TODO del
 			event.stopPropagation();	//tell the event to stop bubbling
@@ -2948,13 +2905,13 @@ function onTextInputKeyUp(event)
 	var keyCode=event.keyCode;	//get the code of the pressed key
 	if(keyCode!=KEY_CODE.ENTER)	//if Enter was pressed, don't do anything for raising the Enter key; we already committed the input in onTextInputKeyDown().
 	{
-		if(guiseAJAX.isEnabled())	//if AJAX is enabled
+		if(guise.isEnabled())	//if AJAX is enabled
 		{
 		//TODO del alert("an input changed! "+textInput.id);
 			var textInput=event.currentTarget;	//get the control in which text changed
 				//TODO decide if we need to remove the attribute hash attribute
 			var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value), true);	//create a new provisional form request with the control name and value
-			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request, but allow this event to be processed normally
+			guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request, but allow this event to be processed normally
 		}
 	}
 }
@@ -2964,14 +2921,14 @@ function onTextInputKeyUp(event)
 */
 function onTextInputChange(event)
 {
-	if(guiseAJAX.isEnabled())	//if AJAX is enabled
+	if(guise.isEnabled())	//if AJAX is enabled
 	{
 		var textInput=event.currentTarget;	//get the control in which text changed
 		textInput.removeAttribute("guise:attributeHash");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
-		guiseAJAX.invalidateAncestorContent(textInput);	//indicate that the ancestors now have different content
+		guise.invalidateAncestorContent(textInput);	//indicate that the ancestors now have different content
 	//TODO del alert("an input changed! "+textInput.id);
 		var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value));	//create a new form request with the control name and value
-		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+		guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		event.stopPropagation();	//tell the event to stop bubbling
 	}
 }
@@ -2981,11 +2938,11 @@ function onTextInputChange(event)
 */
 function onFileInputChange(event)
 {
-	if(guiseAJAX.isEnabled())	//if AJAX is enabled
+	if(guise.isEnabled())	//if AJAX is enabled
 	{
 		var fileInput=event.currentTarget;	//get the control in which the file changed
 		fileInput.removeAttribute("guise:attributeHash");	//the file is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
-		guiseAJAX.invalidateAncestorContent(fileInput);	//indicate that the ancestors now have different content
+		guise.invalidateAncestorContent(fileInput);	//indicate that the ancestors now have different content
 //TODO fix alert("file input changed to value: "+fileInput.value);
 		var fileInputValue=fileInput.value;	//get the new value
 		if(fileInputValue)	//if the value is changing to something interesting
@@ -3016,7 +2973,7 @@ function onFileInputChange(event)
 					else	//if this is not a duplicate value
 					{
 						var ajaxRequest=new FormAJAXEvent(new Map(componentID, fileInput.value));	//create a new form request with the control ID and value
-						guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+						guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 						var fileInputCopy=document.createElementNS("http://www.w3.org/1999/xhtml", "input");	//create a new input element; do *not* clone the element, because IE will clone the event handlers along with it
 						fileInputCopy.className=fileInput.className;
 						fileInputCopy.name=fileInput.name;
@@ -3024,7 +2981,7 @@ function onFileInputChange(event)
 						fileInputCopy.disabled=fileInput.disabled;
 						fileInput.style.display="none";	//hide the old file input
 						fileInput.parentNode.appendChild(fileInputCopy);	//insert the new file input after the existing one (now hidden) 
-						initializeNode(fileInputCopy, true);	//initialize the new imported file input copy, installing the correct event handlers
+						guise._initializeNode(fileInputCopy, true);	//initialize the new imported file input copy, installing the correct event handlers
 					}
 				}
 			}
@@ -3091,7 +3048,7 @@ function onAction(event)
 		var componentID=component.id;	//get the component ID
 		if(componentID)	//if there is a component ID
 		{
-			if(guiseAJAX.isEnabled())	//if AJAX is enabled
+			if(guise.isEnabled())	//if AJAX is enabled
 			{
 
 //TODO fix					target.parentNode.style.cursor="inherit";	//TODO testing
@@ -3102,9 +3059,9 @@ function onAction(event)
 
 //TODO testing no form					var ajaxRequest=new FormAJAXEvent(new Map(actionInputID, componentID));	//create a new form request with form's hidden action control and the action element ID
 				var ajaxRequest=new FormAJAXEvent(new Map(componentID, componentID));	//create a new form request with action element ID as the parameter and value
-				guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request			
+				guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request			
 			}
-/*TODO fix; distinguish between !guiseAJAX.isEnabled() and AJAX_SUSPENDED; also fix bug on server where an exhaustive post may clear information on non-displayed cards
+/*TODO fix; distinguish between !guise.isEnabled() and AJAX_SUSPENDED; also fix bug on server where an exhaustive post may clear information on non-displayed cards
 			else	//if AJAX is not enabled, do a POST
 			{
 				var form=getForm(component);	//get the form
@@ -3141,10 +3098,10 @@ function onTabClick(event)	//TODO maybe refactor to use new action click
 	if(href)	//if there is an href
 	{
 		var uri=new URI(href);	//create a URI from the href
-		if(guiseAJAX.isEnabled())	//if AJAX is enabled
+		if(guise.isEnabled())	//if AJAX is enabled
 		{
 			var ajaxRequest=new FormAJAXEvent(uri.parameters);	//create a new form request with the URI parameters
-			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+			guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		}
 /*TODO fix
 			else	//if AJAX is not enabled, do a POST
@@ -3183,7 +3140,7 @@ function onActionClick(event)
 			var componentID=component.id;	//get the component ID
 			if(componentID)	//if there is a component ID
 			{
-				if(guiseAJAX.isEnabled())	//if AJAX is enabled
+				if(guise.isEnabled())	//if AJAX is enabled
 				{
 /*TODO fix					
 					target.parentNode.style.cursor="inherit";	//TODO testing
@@ -3198,7 +3155,7 @@ function onActionClick(event)
 
 
 					var ajaxRequest=new ActionAJAXEvent(componentID, targetID, null, 0);	//create a new action request with no action ID and the default option
-					guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+					guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 					event.stopPropagation();	//tell the event to stop bubbling
 					event.preventDefault();	//prevent the default functionality from occurring
 				}
@@ -3223,10 +3180,10 @@ function onContextMenu(event)
 			var componentID=component.id;	//get the component ID
 			if(componentID)	//if there is a component ID
 			{
-				if(guiseAJAX.isEnabled())	//if AJAX is enabled
+				if(guise.isEnabled())	//if AJAX is enabled
 				{
 					var ajaxRequest=new ActionAJAXEvent(componentID, targetID, null, 1);	//create a new action request with no action ID and the context option
-					guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+					guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 					event.stopPropagation();	//tell the event to stop bubbling
 					event.preventDefault();	//prevent the default functionality from occurring
 				}
@@ -3259,23 +3216,23 @@ function onCheckInputChange(event)
 			{
 				var groupCheckInput=groupCheckInputs[i];	//get this group check
 				groupCheckInput.removeAttribute("guise:attributeHash");	//the checked status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
-				guiseAJAX.invalidateAncestorContent(groupCheckInput);	//indicate that the ancestors now have different content
+				guise.invalidateAncestorContent(groupCheckInput);	//indicate that the ancestors now have different content
 			}
 		}
 	}
 	if(!invalidated)	//if we didn't invalidate this checkbox
 	{
 		checkInput.removeAttribute("guise:attributeHash");	//the checked status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
-		guiseAJAX.invalidateAncestorContent(checkInput);	//indicate that the ancestors now have different content
+		guise.invalidateAncestorContent(checkInput);	//indicate that the ancestors now have different content
 	}
-	if(guiseAJAX.isEnabled())	//if AJAX is enabled
+	if(guise.isEnabled())	//if AJAX is enabled
 	{
 		guise.setElementTempCursor(checkInput, "wait");	//change the cursor to "wait" until the AJAX communication is finished
 		var ajaxRequest=new FormAJAXEvent(new Map(checkInput.name, checkInput.checked ? checkInput.value : ""));	//create a new form request with the control name and value
-		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+		guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		event.stopPropagation();	//tell the event to stop bubbling
 	}
-/*TODO fix; distinguish between !guiseAJAX.isEnabled() and AJAX_SUSPENDED; also fix bug on server where an exhaustive post may clear information on non-displayed cards
+/*TODO fix; distinguish between !guise.isEnabled() and AJAX_SUSPENDED; also fix bug on server where an exhaustive post may clear information on non-displayed cards
 	else	//if AJAX is not enabled
 	{
 		if(Node.getAncestorElementByClassName(checkInput, STYLES.MENU_BODY))	//if this check is inside a menu, submit the form so that menus will cause immediate reaction
@@ -3312,7 +3269,7 @@ function onClick(event)
 		var componentID=component.id;	//get the component ID
 		if(componentID)	//if there is a component ID
 		{
-			if(guiseAJAX.isEnabled())	//if AJAX is enabled
+			if(guise.isEnabled())	//if AJAX is enabled
 			{
 				var button=event.button;	//get the button pressed
 				if(isUserAgentIE)	//if this is an IE browser, change the event button to match the W3C's definition; see http://www.quirksmode.org/dom/w3c_events.html
@@ -3331,7 +3288,7 @@ function onClick(event)
 					}
 				}
 				var ajaxRequest=new MouseAJAXEvent(MouseAJAXEvent.EventType.CLICK, component, target, event.clientX, event.clientY, Boolean(event.altKey), Boolean(event.ctrlKey), Boolean(event.shiftKey), button, 1);	//create a new AJAX mouse event
-				guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+				guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 				event.stopPropagation();	//tell the event to stop bubbling
 				event.preventDefault();	//prevent the default functionality from occurring
 			}
@@ -3344,7 +3301,7 @@ function onClick(event)
 */
 function onSelectChange(event)
 {
-	if(guiseAJAX.isEnabled())	//if AJAX is enabled
+	if(guise.isEnabled())	//if AJAX is enabled
 	{
 		var select=event.currentTarget;	//get the control to which the listener was listening
 //TODO del		select.removeAttribute("guise:contentHash");	//indicate that the select's children have changed TODO use a constant
@@ -3358,12 +3315,12 @@ function onSelectChange(event)
 			if(option.selected)	//if this option is selected
 			{
 				option.removeAttribute("guise:attributeHash");	//the option selected status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
-				guiseAJAX.invalidateAncestorContent(option);	//indicate that the ancestors now have different content
+				guise.invalidateAncestorContent(option);	//indicate that the ancestors now have different content
 					//TODO dirty the unselected option
 				ajaxRequest.parameters[selectName]=option.value;	//add the control name and value as a parameter
 			}
 		}
-		guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+		guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		event.stopPropagation();	//tell the event to stop bubbling
 	}
 }
@@ -3432,7 +3389,7 @@ function onDragEnd(event)
 			if(dragSourceComponent && dropTargetComponent)	//if there source and target components
 			{
 				var ajaxRequest=new DropAJAXEvent(dragState, dragSourceComponent, dropTargetComponent, event);	//create a new AJAX drop event TODO probably remove the dragState parameter
-				guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+				guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 			}
 		}
 		dragState=null;	//release our drag state
@@ -3487,7 +3444,7 @@ function onSliderThumbDragBegin(event)
 					{
 						updateSlider(slider);	//update the slider view
 						var ajaxRequest=new ActionAJAXEvent(slider.id, thumb.id, "slideBegin", 0);	//create a new action request for sliding begin TODO use a constant TODO why are we sending an event back here?
-						guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+						guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 					}
 			dragState.onDrag=function(element, x, y)	//when dragging occurs, update the slider value
 					{
@@ -3507,13 +3464,13 @@ if(isNaN(position))	//TODO del; fixed; change to assertion
 }
 */
 						var ajaxRequest=new FormAJAXEvent(new Map(positionInput.name, position.toString()));	//create a new form request with the control name and value
-						guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+						guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 					};
 			dragState.onDragEnd=function(element)	//when dragging ends, update the slider view to make sure it is synchronized with the updated value
 					{
 						var ajaxRequest=new ActionAJAXEvent(slider.id, thumb.id, "slideEnd", 0);	//create a new action request for sliding end TODO use a constant	//why are we sending back an action event here?
-						guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
-						if(guiseAJAX._mozInlineBoxesUpdated)	//TODO fix hack for Firefox 1/2; place in a better place; this is very specific to to one particular application
+						guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+						if(guise._mozInlineBoxesUpdated)	//TODO fix hack for Firefox 1/2; place in a better place; this is very specific to to one particular application
 						{
 //TODO important fix							window.location.reload();	//reload the page
 						}
@@ -3672,7 +3629,7 @@ function onMouse(event)
 		switch(event.type)	//see which type of mouse event this is
 		{
 			case "mouseover":	//if we are entering a component
-//guiseAJAX.trace("got mouse over component ID: ", componentID);
+//guise.trace("got mouse over component ID: ", componentID);
 				var ancestorComponents=Node.getAncestorElementsByClassName(component, STYLES.COMPONENT);	//get an array of all ancestor components, including this component, in current-to-root order
 				for(var i=ancestorComponents.length-1; i>=0; --i)	//for each ancestor, from root to this one
 				{
@@ -3683,9 +3640,9 @@ function onMouse(event)
 						if(!mouseOverComponentIDs[ancestorComponentID])	//if we haven't already recorded the mouse as being over this ancestor
 						{
 							mouseOverComponentIDs[ancestorComponentID]=true;	//record the mouse as being over this ancestor					
-//guiseAJAX.trace("sending mouse over for component: ", ancestorComponentID);
+//guise.trace("sending mouse over for component: ", ancestorComponentID);
 							var ajaxRequest=new MouseAJAXEvent(MouseAJAXEvent.EventType.ENTER, ancestorComponent, target, event.clientX, event.clientY, Boolean(event.altKey), Boolean(event.ctrlKey), Boolean(event.shiftKey));	//create a new AJAX mouse event for this ancestor
-							guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+							guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 							event.stopPropagation();	//tell the event to stop bubbling
 							event.preventDefault();	//prevent the default functionality from occurring
 						}
@@ -3693,7 +3650,7 @@ function onMouse(event)
 				}
 				break;
 			case "mouseout":	//if we are leaving a component
-//guiseAJAX.trace("got mouse out of component ID: ", componentID);
+//guise.trace("got mouse out of component ID: ", componentID);
 				delete mouseOverComponentIDs[componentID];	//indicate that the mouse is no longer over this component, even though it may now be over a child component					
 				if(!Node.hasAncestor(otherComponent, component))	//if the mouse is supposedly leaving the component, make sure it's not just moving to a child element (see http://www.quirksmode.org/js/events_mouse.html#mouseover); if the mouse is really leaving this hierarchy
 				{
@@ -3706,9 +3663,9 @@ function onMouse(event)
 							var ancestorComponentID=ancestorComponent.id;	//get the ID of this ancestor
 							if(!mouseOverComponentIDs[ancestorComponentID])	//if the mouse isn't over this ancestor (if the mouse moved to another subtree, we would have made sure the parent is marked as having the mouse
 							{
-//guiseAJAX.trace("sending mouse exit for component: ", ancestorComponentID);
+//guise.trace("sending mouse exit for component: ", ancestorComponentID);
 								var ajaxRequest=new MouseAJAXEvent(MouseAJAXEvent.EventType.EXIT, ancestorComponent, target, event.clientX, event.clientY, Boolean(event.altKey), Boolean(event.ctrlKey), Boolean(event.shiftKey));	//create a new AJAX mouse event for this ancestor
-								guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+								guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 								event.stopPropagation();	//tell the event to stop bubbling
 								event.preventDefault();	//prevent the default functionality from occurring
 							}
@@ -3735,7 +3692,7 @@ function onMouse(event)
 //TODO del; always send mouse listen events in a mouse listener hierarchy		if(Element.hasClassName(target, STYLES.MOUSE_LISTENER))	//if this is a mouse listener, report the event
 		{
 			var ajaxRequest=new MouseAJAXEvent(eventType, component, target, event.clientX, event.clientY, Boolean(event.altKey), Boolean(event.ctrlKey), Boolean(event.shiftKey));	//create a new AJAX mouse event
-			guiseAJAX.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+			guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 			event.stopPropagation();	//tell the event to stop bubbling
 			event.preventDefault();	//prevent the default functionality from occurring
 		}
@@ -4006,11 +3963,4 @@ soundManager.nullURL=GUISE_PUBLIC_RESOURCE_BASE_PATH+"audio/blank.mp3"; //set th
 soundManager.debugMode=false;	//turn off SoundManager debugging
 soundManager.allowPolling=true;	//allow Flash to poll for status updates
 
-com.garretwilson.js.EventManager.addEvent(window, "load", onWindowLoad, false);	//do the appropriate initialization when the window loads
-/*TODO del
-soundManager.onload = function()	//TODO testing
-{
-  soundManager.createSound("desperado", "https://dav.globalmentor.com/public/desperado.mp3");
-  soundManager.play("desperado");
-}
-*/
+com.garretwilson.js.EventManager.addEvent(window, "load", guise.onLoad.bind(guise), false);	//do the appropriate initialization when the window loads

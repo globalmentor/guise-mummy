@@ -113,6 +113,15 @@ public abstract class AbstractGuisePlatform implements GuisePlatform
 			idDepictedObjectMap.remove(Long.valueOf(checkInstance(depictedObject, "Depicted object cannot be null.").getID()));
 		}
 
+		/**Retrieves a depicted object that has been registered with the platform by the ID of the depicted object.
+		@param depictedObjectID The ID of the depicted object to retrieve.
+		@return The registered depicted object with the given ID, or <code>null</code> if there is no depicted object registered with this platform with the given ID.
+		*/
+		public DepictedObject getDepictedObject(final long depictedObjectID)
+		{
+			return idDepictedObjectMap.get(Long.valueOf(depictedObjectID));	//return the depicted object, if any, with the given ID
+		}
+		
 	/**The variable used to generate unique depict IDs.*/
 	private final AtomicLong depictIDCounter=new AtomicLong(0);
 

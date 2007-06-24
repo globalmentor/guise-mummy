@@ -1,14 +1,11 @@
 package com.guiseframework.audio;
 
-import static com.garretwilson.lang.ClassUtilities.getPropertyName;
-import static com.garretwilson.lang.ObjectUtilities.checkInstance;
-
 import java.net.URI;
 
+import static com.garretwilson.lang.ClassUtilities.*;
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.AbstractDepictedObject;
-import com.guiseframework.platform.DepictedObject;
 
 /**Audio that can be played.
 The installed depictor must be of the specialized type {@link Depictor}.
@@ -71,11 +68,12 @@ public class Audio extends AbstractDepictedObject
 		}
 
 	/**Requests that the audio start.
-	If the audio is already started, no action occurs.
+	If the audio is currently starting to play or already playing, no action occurs.
 	*/
 	public void start()
 	{
-		if(getState()==null)	//if the audio is not yet started
+		final TaskState taskState=getState();	//get the current audio state
+		if(taskState!=TaskState.INITIALIZE && taskState!=TaskState.INCOMPLETE)	//if the audio is not yet started
 		{
 			setState(TaskState.INITIALIZE);	//show that we're initializing the audio
 			getDepictor().start();	//tell the depictor to start
@@ -87,6 +85,10 @@ public class Audio extends AbstractDepictedObject
 	*/
 	public void pause()
 	{
+		if(getState()==TaskState.INCOMPLETE)	//if the audio is playing
+		{
+			getDepictor().pause();	//tell the depictor to pause
+		}
 	}
 
 
@@ -109,7 +111,7 @@ public class Audio extends AbstractDepictedObject
 		public void start();
 
 		/**Requests that the audio pause.*/
-//TODO		public void pause();
+		public void pause();
 
 		/**Requests that the audio stop.*/
 //TODO		public void stop();

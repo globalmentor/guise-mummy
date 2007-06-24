@@ -7,7 +7,7 @@ The source of the event is the depicted object.
 @param <O> The type of depicted object.
 @author Garret Wilson
 */
-public interface WebDepictEvent<O extends DepictedObject> extends DepictEvent<O>
+public interface WebDepictEvent<O extends DepictedObject> extends DepictEvent<O>, WebPlatformEvent
 {
 
 }

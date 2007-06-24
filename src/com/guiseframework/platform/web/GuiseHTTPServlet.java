@@ -97,6 +97,8 @@ import com.guiseframework.geometry.*;
 import com.guiseframework.input.Key;
 import com.guiseframework.model.FileItemResourceImport;
 import com.guiseframework.model.TaskState;
+import com.guiseframework.platform.DepictEvent;
+import com.guiseframework.platform.DepictedObject;
 import com.guiseframework.platform.GuisePlatform;
 import com.guiseframework.platform.PlatformEvent;
 import com.guiseframework.platform.web.css.*;
@@ -868,6 +870,11 @@ Debug.trace("got control events");
 									requestedComponents.add(component);	//add the component to the set of requested components
 								}
 							}
+							else if(controlEvent instanceof DepictEvent)	//if this is an event for a depicted object
+							{
+								DepictEvent<?> depictEvent=(DepictEvent<?>)controlEvent;	//get the depict event
+								depictEvent.getDepictedObject().getDepictor().processEvent(depictEvent);	//tell the object's depictor to process the depict event TODO maybe eventually pass these events through the platform, and let the platform dispatch the event
+							}
 							else if(controlEvent instanceof InitControlEvent)	//if this is an initialization event
 							{
 								final InitControlEvent initControlEvent=(InitControlEvent)controlEvent;	//get the init control event
@@ -1515,6 +1522,7 @@ Debug.trace("got control events");
 	protected List<GuiseEvent> getRequestEvents(final HttpServletRequest request, final GuiseSession guiseSession, final GuiseContext guiseContext) throws IOException
 	{
 Debug.trace("getting request events");
+		final GuiseWebPlatform platform=(GuiseWebPlatform)guiseSession.getPlatform();	//get the web platform
 		final List<GuiseEvent> requestEventList=new ArrayList<GuiseEvent>();	//create a new list for storing request events
 		final String contentTypeString=request.getContentType();	//get the request content type
 		final ContentType contentType=contentTypeString!=null ? createContentType(contentTypeString) : null;	//create a content type object from the request content type, if there is one
@@ -1566,6 +1574,29 @@ if(document==null)	//TODO fix; del
 										final int option=Integer.parseInt(eventElement.getAttribute("option"));	//TODO tidy; improve; check for errors; comment
 										final ActionControlEvent actionControlEvent=new ActionControlEvent(guiseContext, componentID, targetID, actionID, option);	//create a new action control event
 										requestEventList.add(actionControlEvent);	//add the event to the list
+									}
+								}
+								break;
+							case CHANGE:
+								{
+									final String depictedObjectID=eventElement.getAttribute("objectID");	//get the ID of the depicted object TODO use a constant
+									if(depictedObjectID.length()>0)	//if there is an object TODO add better event handling, to throw an error and send back that error
+									{
+										final DepictedObject depictedObject=platform.getDepictedObject(platform.getDepictID(depictedObjectID));	//look up the depicted object
+										if(depictedObject!=null)	//if we know the depicted object
+										{
+											final Map<String, Object> properties=new HashMap<String, Object>();	//create a map of properties
+											final NodeList propertyElementList=eventElement.getElementsByTagName("property");	//get a list of property elements
+											for(int propertyIndex=propertyElementList.getLength()-1; propertyIndex>=0; --propertyIndex)	//for each property element
+											{
+												final Element propertyElement=(Element)propertyElementList.item(propertyIndex);	//get this property element
+												final String propertyName=propertyElement.getAttribute("name");	//get the name of the property TODO use a constant
+													//TODO parse out a JSON object from the property value
+												final String propertyValue=propertyElement.getTextContent();	//get the value of the property TODO add support for array values with <value> subelements
+												properties.put(propertyName, propertyValue);	//add this property name and value to the event
+											}
+											requestEventList.add(new WebChangeEvent<DepictedObject>(depictedObject, properties));	//create and add a change event to the list
+										}
 									}
 								}
 								break;
