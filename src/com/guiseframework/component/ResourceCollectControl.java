@@ -31,7 +31,7 @@ public class ResourceCollectControl extends AbstractControl<ResourceCollectContr
 	/**The state of sending resources, or <code>null</code> if sending has not been initiated.*/
 	private TaskState sendState=null;
 
-		/**@return The state of sending resources, or <code>null</code> if sending has not been initiated..*/
+		/**@return The state of sending resources, or <code>null</code> if sending has not been initiated.*/
 		public TaskState getSendState() {return sendState;}
 
 		/**Sets the state of sending resources.
@@ -154,28 +154,28 @@ public class ResourceCollectControl extends AbstractControl<ResourceCollectContr
 	/**Adds a progress listener.
 	@param progressListener The progress listener to add.
 	*/
-	public void addProgressListener(final ProgressListener progressListener)
+	public void addProgressListener(final TaskProgressListener progressListener)
 	{
-		getEventListenerManager().add(ProgressListener.class, progressListener);	//add the listener
+		getEventListenerManager().add(TaskProgressListener.class, progressListener);	//add the listener
 	}
 
 	/**Removes an progress listener.
 	@param progressListener The progress listener to remove.
 	*/
-	public void removeProgressListener(final ProgressListener progressListener)
+	public void removeProgressListener(final TaskProgressListener progressListener)
 	{
-		getEventListenerManager().remove(ProgressListener.class, progressListener);	//remove the listener
+		getEventListenerManager().remove(TaskProgressListener.class, progressListener);	//remove the listener
 	}
 
 	/**Fires a progress event to all registered progress listeners.
-	This method delegates to {@link #fireProgessed(ProgressEvent)}.
+	This method delegates to {@link #fireProgessed(TaskProgressEvent)}.
 	@param task The task being performed, or <code>null</code> if not indicated.
 	@param taskState The state of the task.
 	@param value The current progress, or <code>-1</code> if not known.
 	@param maximumValue The goal, or <code>-1</code> if not known.
 	@exception NullPointerException if the given task state is <code>null</code>.
-	@see ProgressListener
-	@see ProgressEvent
+	@see TaskProgressListener
+	@see TaskProgressEvent
 	*/
 	public void fireProgressed(final String task, final TaskState taskState, final long value, final long maximumValue)
 	{
@@ -192,20 +192,20 @@ public class ResourceCollectControl extends AbstractControl<ResourceCollectContr
 			}
 		}
 		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
-		if(eventListenerManager.hasListeners(ProgressListener.class))	//if there are progress listeners registered
+		if(eventListenerManager.hasListeners(TaskProgressListener.class))	//if there are progress listeners registered
 		{
-			fireProgressed(new ProgressEvent(this, task, taskState, value, maximumValue));	//create and fire a new progress event
+			fireProgressed(new TaskProgressEvent(this, task, taskState, value, maximumValue));	//create and fire a new progress event
 		}
 	}
 
 	/**Fires a given progress event to all registered progress listeners.
 	@param progressEvent The progress event to fire.
 	*/
-	protected void fireProgressed(final ProgressEvent progressEvent)
+	protected void fireProgressed(final TaskProgressEvent progressEvent)
 	{
-		for(final ProgressListener progressListener:getEventListenerManager().getListeners(ProgressListener.class))	//for each progress listener
+		for(final TaskProgressListener progressListener:getEventListenerManager().getListeners(TaskProgressListener.class))	//for each progress listener
 		{
-			progressListener.progressed(progressEvent);	//dispatch the progress event to the listener
+			progressListener.taskProgressed(progressEvent);	//dispatch the progress event to the listener
 		}
 	}
 }

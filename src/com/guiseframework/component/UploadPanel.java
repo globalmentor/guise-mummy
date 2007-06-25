@@ -171,9 +171,9 @@ public class UploadPanel extends AbstractPanel<UploadPanel>
 					}
 				});
 			//listen for progress from the resource collect control and update the progress labels in response
-		resourceCollectControl.addProgressListener(new ProgressListener()
+		resourceCollectControl.addProgressListener(new TaskProgressListener()
 				{
-					public void progressed(final ProgressEvent progressEvent)	//if progress occurs
+					public void taskProgressed(final TaskProgressEvent progressEvent)	//if progress occurs
 					{
 						final StringBuilder statusStringBuilder=new StringBuilder();	//build the status string
 						final String task=progressEvent.getTask();	//get the current task
@@ -195,7 +195,7 @@ public class UploadPanel extends AbstractPanel<UploadPanel>
 							statusStringBuilder.append(progressEvent.getTaskState().getLabel());	//show the task status label
 						}
 						currentStatusLabel.setLabel(statusStringBuilder.toString());	//update the status
-						fireProgressed(new ProgressEvent(UploadPanel.this, progressEvent));	//refire the progress event using this panel as the source
+						fireProgressed(new TaskProgressEvent(UploadPanel.this, progressEvent));	//refire the progress event using this panel as the source
 					}
 				});
 		add(controlPanel);
@@ -210,27 +210,27 @@ public class UploadPanel extends AbstractPanel<UploadPanel>
 	/**Adds a progress listener.
 	@param progressListener The progress listener to add.
 	*/
-	public void addProgressListener(final ProgressListener progressListener)
+	public void addProgressListener(final TaskProgressListener progressListener)
 	{
-		getEventListenerManager().add(ProgressListener.class, progressListener);	//add the listener
+		getEventListenerManager().add(TaskProgressListener.class, progressListener);	//add the listener
 	}
 
 	/**Removes an progress listener.
 	@param progressListener The progress listener to remove.
 	*/
-	public void removeProgressListener(final ProgressListener progressListener)
+	public void removeProgressListener(final TaskProgressListener progressListener)
 	{
-		getEventListenerManager().remove(ProgressListener.class, progressListener);	//remove the listener
+		getEventListenerManager().remove(TaskProgressListener.class, progressListener);	//remove the listener
 	}
 
 	/**Fires a given progress event to all registered progress listeners.
 	@param progressEvent The progress event to fire.
 	*/
-	protected void fireProgressed(final ProgressEvent progressEvent)
+	protected void fireProgressed(final TaskProgressEvent progressEvent)
 	{
-		for(final ProgressListener progressListener:getEventListenerManager().getListeners(ProgressListener.class))	//for each progress listener
+		for(final TaskProgressListener progressListener:getEventListenerManager().getListeners(TaskProgressListener.class))	//for each progress listener
 		{
-			progressListener.progressed(progressEvent);	//dispatch the progress event to the listener
+			progressListener.taskProgressed(progressEvent);	//dispatch the progress event to the listener
 		}
 	}
 

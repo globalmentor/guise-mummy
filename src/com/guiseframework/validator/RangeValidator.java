@@ -5,7 +5,7 @@ The step value is considered relative either to the minimum value, if available,
 @param <V> The value type this validator supports.
 @author Garret Wilson
 */
-public interface RangeValidator<V>
+public interface RangeValidator<V> extends Validator<V>
 {
 
 	/**@return The minimum value, inclusive, or <code>null</code> if the range has no lower bound.*/

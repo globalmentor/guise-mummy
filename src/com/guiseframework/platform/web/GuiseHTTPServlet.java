@@ -1591,8 +1591,8 @@ if(document==null)	//TODO fix; del
 											{
 												final Element propertyElement=(Element)propertyElementList.item(propertyIndex);	//get this property element
 												final String propertyName=propertyElement.getAttribute("name");	//get the name of the property TODO use a constant
-													//TODO parse out a JSON object from the property value
-												final String propertyValue=propertyElement.getTextContent();	//get the value of the property TODO add support for array values with <value> subelements
+												final Object propertyValue=JSON.parseValue(propertyElement.getTextContent());	//get the value of the property TODO add support for array values with <value> subelements
+Debug.trace("for property", propertyName, "parsed text", propertyElement.getTextContent(), "got value", propertyValue, "type", propertyValue.getClass(), "for object", depictedObject.getID());
 												properties.put(propertyName, propertyValue);	//add this property name and value to the event
 											}
 											requestEventList.add(new WebChangeEvent<DepictedObject>(depictedObject, properties));	//create and add a change event to the list

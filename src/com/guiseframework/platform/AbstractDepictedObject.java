@@ -1,6 +1,7 @@
 package com.guiseframework.platform;
 
 import com.guiseframework.GuiseSession;
+import com.guiseframework.event.EventListenerManager;
 import com.guiseframework.event.GuiseBoundPropertyObject;
 
 /**Abstract implementation of an object that can be depicted on some platform.
@@ -8,6 +9,12 @@ import com.guiseframework.event.GuiseBoundPropertyObject;
 */
 public abstract class AbstractDepictedObject extends GuiseBoundPropertyObject implements DepictedObject
 {
+
+	/**The object managing event listeners.*/
+	private final EventListenerManager eventListenerManager=new EventListenerManager();
+
+		/**@return The object managing event listeners.*/
+		protected EventListenerManager getEventListenerManager() {return eventListenerManager;}
 
 	/**The object identifier*/
 	private final long id;

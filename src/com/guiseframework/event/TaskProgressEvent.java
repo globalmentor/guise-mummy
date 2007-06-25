@@ -6,9 +6,9 @@ import com.guiseframework.model.TaskState;
 
 /**An event used to notify interested parties that progress has been made for a	particular task.
 @author Garret Wilson
-@see ProgressListener
+@see TaskProgressListener
 */
-public class ProgressEvent extends AbstractGuiseEvent	//TODO later make this a TaskProgressEvent<T>, derived from ProgressEvent
+public class TaskProgressEvent extends AbstractGuiseEvent	//TODO later make this a TaskProgressEvent<T>, derived from ProgressEvent
 {
 
 	/**The task being performed, or <code>null</code> if not indicated.*/
@@ -40,7 +40,7 @@ public class ProgressEvent extends AbstractGuiseEvent	//TODO later make this a T
 	@param taskState The state of the task.
 	@exception NullPointerException if the given task state is <code>null</code>.
 	*/
-	public ProgressEvent(final Object source, final TaskState taskState)
+	public TaskProgressEvent(final Object source, final TaskState taskState)
 	{
 		this(source, null, taskState);	//construct the class with no task indicated		
 	}
@@ -51,7 +51,7 @@ public class ProgressEvent extends AbstractGuiseEvent	//TODO later make this a T
 	@param value The current progress, or <code>-1</code> if not known.
 	@exception NullPointerException if the given task state is <code>null</code>.
 	*/
-	public ProgressEvent(final Object source, final TaskState taskState, final long value)
+	public TaskProgressEvent(final Object source, final TaskState taskState, final long value)
 	{
 		this(source, null, taskState, value);	//construct the class with no task indicated
 	}
@@ -63,7 +63,7 @@ public class ProgressEvent extends AbstractGuiseEvent	//TODO later make this a T
 	@param maximumValue The goal, or <code>-1</code> if not known.
 	@exception NullPointerException if the given task state is <code>null</code>.
 	*/
-	public ProgressEvent(final Object source, final TaskState taskState, final long value, final long maximumValue)
+	public TaskProgressEvent(final Object source, final TaskState taskState, final long value, final long maximumValue)
 	{
 		this(source, null, taskState, value, maximumValue);	//construct the class with no task indicated
 	}
@@ -74,7 +74,7 @@ public class ProgressEvent extends AbstractGuiseEvent	//TODO later make this a T
 	@param taskState The state of the task.
 	@exception NullPointerException if the given task state is <code>null</code>.
 	*/
-	public ProgressEvent(final Object source, final String task, final TaskState taskState)
+	public TaskProgressEvent(final Object source, final String task, final TaskState taskState)
 	{
 		this(source, task, taskState, -1);	//construct the class with no known value		
 	}
@@ -86,7 +86,7 @@ public class ProgressEvent extends AbstractGuiseEvent	//TODO later make this a T
 	@param value The current progress, or <code>-1</code> if not known.
 	@exception NullPointerException if the given task state is <code>null</code>.
 	*/
-	public ProgressEvent(final Object source, final String task, final TaskState taskState, final long value)
+	public TaskProgressEvent(final Object source, final String task, final TaskState taskState, final long value)
 	{
 		this(source, task, taskState, value, -1);	//construct the class with no known maximum value
 	}
@@ -99,7 +99,7 @@ public class ProgressEvent extends AbstractGuiseEvent	//TODO later make this a T
 	@param maximumValue The goal, or <code>-1</code> if not known.
 	@exception NullPointerException if the given task state is <code>null</code>.
 	*/
-	public ProgressEvent(final Object source, final String task, final TaskState taskState, final long value, final long maximumValue)
+	public TaskProgressEvent(final Object source, final String task, final TaskState taskState, final long value, final long maximumValue)
 	{
 		super(source);	//construct the parent class
 		this.task=task;
@@ -113,7 +113,7 @@ public class ProgressEvent extends AbstractGuiseEvent	//TODO later make this a T
 	@param progressEvent The existing progress event the values of which will be copied to this object.
 	@exception NullPointerException if the given progress event is <code>null</code>.
 	*/
-	public ProgressEvent(final Object source, final ProgressEvent progressEvent)
+	public TaskProgressEvent(final Object source, final TaskProgressEvent progressEvent)
 	{
 		this(source, progressEvent.getTask(), progressEvent.getTaskState(), progressEvent.getValue(), progressEvent.getMaximumValue());	//construct the class with values from the given progress event
 	}

@@ -21,7 +21,7 @@ GUISE_PUBLIC_RESOURCE_BASE_PATH The absolute base path of Guise public resources
 			targetID=""	<!--the ID of the target element on which the action occurred-->
 			actionID=""	<!--the action identifier-->
 		/>
-		<change	<!--a property change on a depicted object-->
+		<change	<!--a property change on a depicted object; each value is presented in JSON syntax-->
 			objectID="">	<!--the ID of the depicted object-->
 			<property name="">	<!--the name of a property changing; if the value is not an array, it will be present as the text of the element with no value child elements-->
 				<value></value>	<!--(for array values; zero or more) the new property value; zero may signify null in some contexts--> 
@@ -767,13 +767,13 @@ com.guiseframework.js.Guise=function()
 					for(var i=0; i<arrayLength; ++i)	//for each array element
 					{
 						DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.VALUE);	//<value>
-						DOMUtilities.appendXMLText(stringBuilder, value[i]);	//value[i]
+						DOMUtilities.appendXMLText(stringBuilder, JSON.serialize(value[i]));	//value[i]
 						DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.VALUE);	//</value>
 					}				
 				}
 				else if(value!=null)	//if the value is anything besides an array
 				{
-					DOMUtilities.appendXMLText(stringBuilder, value);	//value
+					DOMUtilities.appendXMLText(stringBuilder, JSON.serialize(value));	//value
 				}
 				DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.PROPERTY);	//</property>
 			}
@@ -1111,17 +1111,16 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 			switch(command)	//see which command this is
 			{
 				case "audio-start":
+					var audioURI=parameters["audioURI"];	//get the audio URI
 					var sound=soundManager.sounds[objectID];	//get the existing sound
-					var audioURI=parameters["audioURI"];	//get the audio URI
-/*TODO fix for audio changing
-					var audioURI=parameters["audioURI"];	//get the audio URI
 					if(sound)	//if the sound is already defined
 					{
-						if(sound.url!=audioURI)	//if this sound
-						soundManager.play(objectID, audioURI);	//play the sound
+						if(sound.url!=audioURI)	//if this sound has a different audio URI
+						{
+							soundManager.destroySound(objectID);	//stop, unload, an destroy current sound
+							sound=null;	//we'll create a new sound with the new audio URI
+						}
 					}
-					else	//if there is no such sound defined
-*/
 					if(!sound)	//if there is no such sound defined
 					{
 						soundManager.createSound(objectID, audioURI);	//create a new sound
@@ -1132,6 +1131,10 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 				case "audio-pause":
 					soundManager.pause(objectID);	//pause the sound
 					this.sendAJAXRequest(new ChangeAJAXEvent(objectID, new Map("state", com.guiseframework.js.TaskState.PAUSED)));	//send an AJAX request with the new sound state
+					break;
+				case "audio-stop":
+					soundManager.stop(objectID);	//pause the sound
+					this.sendAJAXRequest(new ChangeAJAXEvent(objectID, new Map("state", com.guiseframework.js.TaskState.STOPPED)));	//send an AJAX request with the new sound state
 					break;
 			}
 		};
@@ -1913,7 +1916,8 @@ if(elementName=="select")
 				this.setElementTempCursor(document.body, "wait");	//change the document body cursor to "wait" until the AJAX initialization is finished
 			}
 
-			soundManager.defaultOptions.whileplaying=this._whileSoundPlaying.bindOldThis(this);	//set the playing callback method
+			soundManager.defaultOptions.whileplaying=this._whileSoundPlaying.bindOldThis(this);	//set the sound playing callback method
+			soundManager.defaultOptions.onfinish=this._onSoundFinish.bindOldThis(this);	//set the sound finished callback method
 
 			window.setTimeout(this._initialize.bind(this), 1);	//run the initialization function in a separate thread
 		};
@@ -2756,20 +2760,24 @@ if(elementName=="select")
 			}
 		};
 
-
-
-
-
-
-
-
-
 		/**Called while a sound is playing.
 		@param sound The sound that is playing.
 		*/
 		proto._whileSoundPlaying=function(sound)
 		{
-//			this.trace("sound", sound.sID, "is playing at position: ", sound.position, "duration:", sound.duration);
+//			this.trace("sound", sound.sID, "is playing at position: ", sound.position, "duration:", sound.duration, "duration estimate", sound.durationEstimate, "ready state", sound.readyState);
+//			var position=sound.position;	//get the sound position
+//			var duration=sound.readyState==3 ? sound.duration : sound.durationEstimate;	//if the sound isn't yet loaded, use the estimate of the duration
+//			this.trace("ready to send event with position "+position+" duration "+duration);
+			this.sendAJAXRequest(new ChangeAJAXEvent(sound.sID, new Map("state", com.guiseframework.js.TaskState.INCOMPLETE, "position", sound.position, "duration", sound.duration)));	//send an AJAX request with the new sound position
+		};
+
+		/**Called while a sound finishes.
+		@param sound The sound that is finished.
+		*/
+		proto._onSoundFinish=function(sound)
+		{
+			this.sendAJAXRequest(new ChangeAJAXEvent(sound.sID, new Map("state", com.guiseframework.js.TaskState.COMPLETE)));	//send an AJAX request with the new sound state
 		};
 
 	}

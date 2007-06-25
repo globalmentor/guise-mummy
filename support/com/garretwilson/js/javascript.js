@@ -327,8 +327,32 @@ var JSON=
 			throw "Invalid JSON expression: "+json;
 		}
 		return eval("("+json+")");	//evaluate and return the JSON expresion
-	}
+	},
 
+	/**Serializes an object using JSON.
+	This implementation does not yet correctly escape characters.
+	@param object The object to serialize.
+	*/
+	serialize:function(object)
+	{
+		if(object!=null)	//if the object is not null
+		{
+			switch(typeof object)	//see what type this object is
+			{
+				case "string":
+					return "\""+object+"\"";	//return the string surrounded by quotes
+				case "boolean":
+				case "number":
+					return object.toString();	//return the string version of the
+				default: 
+					throw "Arrays and objects not yet supported: "+object;
+			}
+		}
+		else	//if the object is null
+		{
+			return "null";		
+		}
+	}
 }
 
 //Map

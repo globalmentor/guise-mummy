@@ -4,6 +4,9 @@ import java.net.URI;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 import com.garretwilson.lang.ObjectUtilities;
+import com.guiseframework.event.EventListenerManager;
+import com.guiseframework.event.TaskProgressEvent;
+import com.guiseframework.event.TaskProgressListener;
 import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.AbstractDepictedObject;
 
@@ -72,8 +75,8 @@ public class Audio extends AbstractDepictedObject
 	*/
 	public void start()
 	{
-		final TaskState taskState=getState();	//get the current audio state
-		if(taskState!=TaskState.INITIALIZE && taskState!=TaskState.INCOMPLETE)	//if the audio is not yet started
+		final TaskState state=getState();	//get the current audio state
+		if(state!=TaskState.INITIALIZE && state!=TaskState.INCOMPLETE)	//if the audio is not yet started
 		{
 			setState(TaskState.INITIALIZE);	//show that we're initializing the audio
 			getDepictor().start();	//tell the depictor to start
@@ -93,11 +96,59 @@ public class Audio extends AbstractDepictedObject
 
 
 	/**Requests that the audio stop.
-	If the audio is not playing, no action occurs.
+	If the audio is not initializing, playing, or paused, no action occurs.
 	*/
 	public void stop()
 	{
+		final TaskState state=getState();	//get the current audio state
+		if(state==TaskState.INITIALIZE || state==TaskState.INCOMPLETE || state==TaskState.PAUSED)	//if the audio is not initializing, playing, or paused
+		{
+			getDepictor().stop();	//tell the depictor to stop
+		}
+	}
 
+	/**Adds a progress listener.
+	@param progressListener The progress listener to add.
+	*/
+	public void addProgressListener(final TaskProgressListener progressListener)
+	{
+		getEventListenerManager().add(TaskProgressListener.class, progressListener);	//add the listener
+	}
+
+	/**Removes an progress listener.
+	@param progressListener The progress listener to remove.
+	*/
+	public void removeProgressListener(final TaskProgressListener progressListener)
+	{
+		getEventListenerManager().remove(TaskProgressListener.class, progressListener);	//remove the listener
+	}
+
+	/**Fires a progress event to all registered progress listeners.
+	This method delegates to {@link #fireProgessed(TaskProgressEvent)}.
+	@param position The current position, specified in milliseconds, or <code>-1</code> if not known.
+	@param duration The duration or estimated duration of the audio, specified in milliseconds, or <code>-1</code> if not known.
+	@see TaskProgressListener
+	@see TaskProgressEvent
+	*/
+	public void fireProgressed(final long position, final long duration)
+	{
+		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
+		if(eventListenerManager.hasListeners(TaskProgressListener.class))	//if there are progress listeners registered
+		{
+			final URI audioURI=getAudioURI();	//get the audio URI
+			fireProgressed(new TaskProgressEvent(this, audioURI!=null ? audioURI.toString() : null, getState(), position, duration));	//create and fire a new progress event
+		}
+	}
+
+	/**Fires a given progress event to all registered progress listeners.
+	@param progressEvent The progress event to fire.
+	*/
+	protected void fireProgressed(final TaskProgressEvent progressEvent)
+	{
+		for(final TaskProgressListener progressListener:getEventListenerManager().getListeners(TaskProgressListener.class))	//for each progress listener
+		{
+			progressListener.taskProgressed(progressEvent);	//dispatch the progress event to the listener
+		}
 	}
 
 	/**The custom depictor type for audio.
@@ -114,7 +165,7 @@ public class Audio extends AbstractDepictedObject
 		public void pause();
 
 		/**Requests that the audio stop.*/
-//TODO		public void stop();
+		public void stop();
 
 	}
 
