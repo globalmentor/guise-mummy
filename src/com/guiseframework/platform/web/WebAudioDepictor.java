@@ -15,6 +15,9 @@ import com.guiseframework.platform.PlatformEvent;
 /**A web depictor for Guise audio.
 This depictor uses the following web command events:
 <dl>
+	<dt>audio-stop<dt> <dd>/dd>
+	<dt>audio-pause<dt> <dd>/dd>
+	<dt>audio-position<dt> <dd>{position:"<var>millisecondPosition</var>"}</dd>
 	<dt>audio-start<dt> <dd>{audioURI:"<var>uri</var>"}</dd>
 </dl>
 @author Garret Wilson
@@ -32,11 +35,16 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 		AUDIO_PAUSE,
 
 		/**The command to stop the audio.*/
-		AUDIO_STOP;
+		AUDIO_STOP,
+
+		/**The command to set the position of the audio.*/
+		AUDIO_POSITION;
 	}
 
-	/**The property for specifying the URI of audio.*/
+	/**The property for specifying the URI of the audio.*/
 	public final static String AUDIO_URI_PROPERTY="audioURI";
+	/**The property for specifying the position of the audio.*/
+	public final static String POSITION_PROPERTY="position";
 
 	/**Requests that the audio start.*/
 	@SuppressWarnings("unchecked")
@@ -47,22 +55,34 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 		if(audioURI!=null)	//if there is an audio URI
 		{
 			final URI resolvedAudioURI=getDepictedObject().getSession().resolveURI(audioURI);	//resolve the audio URI
-			getPlatform().getSendEventQueue().offer(new WebCommandEvent<Audio, AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_START, new NameValuePair<String, Object>(AUDIO_URI_PROPERTY, resolvedAudioURI)));	//send an audio start command to the platform
+			getPlatform().getSendEventQueue().offer(new WebCommandEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_START, new NameValuePair<String, Object>(AUDIO_URI_PROPERTY, resolvedAudioURI)));	//send an audio start command to the platform
 		}
 	}
 
 	/**Requests that the audio pause.*/
-	@SuppressWarnings("unchecked")
 	public void pause()
 	{
-		getPlatform().getSendEventQueue().offer(new WebCommandEvent<Audio, AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_PAUSE));	//send an audio pause command to the platform
+		getPlatform().getSendEventQueue().offer(new WebCommandEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_PAUSE));	//send an audio pause command to the platform
 	}
 
 	/**Requests that the audio stop.*/
-	@SuppressWarnings("unchecked")
 	public void stop()
 	{
-		getPlatform().getSendEventQueue().offer(new WebCommandEvent<Audio, AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_STOP));	//send an audio stop command to the platform
+		getPlatform().getSendEventQueue().offer(new WebCommandEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_STOP));	//send an audio stop command to the platform
+	}
+
+	/**Requests a new time-based play position.
+	@param newTimePosition The new play position in microseconds.
+	@exception IllegalArgumentException if the given position is negative.
+	*/
+	@SuppressWarnings("unchecked")
+	public void setTimePosition(final long newTimePosition)
+	{
+		if(newTimePosition<0)	//if the new time position is negative
+		{
+			throw new IllegalArgumentException("Time position cannot be negative: "+newTimePosition);
+		}
+		getPlatform().getSendEventQueue().offer(new WebCommandEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_POSITION, new NameValuePair<String, Object>(POSITION_PROPERTY, Long.valueOf(newTimePosition/1000))));	//send an audio positoin command to the platform, converting the time to milliseconds
 	}
 
 	/**Processes an event from the platform.
@@ -72,8 +92,8 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 	{
 		if(event instanceof WebChangeEvent)	//if a property changed
 		{
-			final WebChangeEvent<Audio> changeEvent=(WebChangeEvent<Audio>)event;	//get the web change event
-			final Audio audio=changeEvent.getDepictedObject();	//get the depicted object
+			final WebChangeEvent changeEvent=(WebChangeEvent)event;	//get the web change event
+			final Audio audio=(Audio)changeEvent.getDepictedObject();	//get the depicted object
 			final Map<String, Object> properties=changeEvent.getProperties();	//get the new properties
 			final String stateString=asInstance(properties.get("state"), String.class);	//get the new state TODO use a constant
 			if(stateString!=null)	//if a state was given
@@ -84,8 +104,7 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 			if(position!=null)	//if we have a position
 			{
 				final Number duration=asInstance(properties.get("duration"), Number.class);	//get the duration, if reported
-Debug.trace("position", position, "duration", duration);
-				audio.fireProgressed(position.longValue(), duration!=null ? duration.longValue() : -1);	//fire an audio progressed event
+				audio.updateTimeProgress(position.longValue()*1000, duration!=null ? duration.longValue()*1000 : -1);	//update the audio position, converting from milliseconds to microseconds
 			}
 			
 		}

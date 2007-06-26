@@ -10,11 +10,10 @@ import com.garretwilson.util.NameValuePair;
 import com.guiseframework.platform.DepictedObject;
 
 /**A command to or from a depicted object on the web platform.
-@param <O> The type of depicted object.
 @param <C> The type of command.
 @author Garret Wilson
 */
-public class WebCommandEvent<O extends DepictedObject, C extends Enum<C> & WebCommand> extends AbstractWebDepictEvent<O>
+public class WebCommandEvent<C extends Enum<C> & WebCommand> extends AbstractWebDepictEvent
 {
 
 	/**The command.*/
@@ -36,7 +35,7 @@ public class WebCommandEvent<O extends DepictedObject, C extends Enum<C> & WebCo
 	@param parameters The parameters of the command; parameters with duplicate names replace earlier parameters of the same name.
 	@exception NullPointerException if the given depicted object, command, and/or parameters is <code>null</code>.
 	*/
-	public WebCommandEvent(final O depictedObject, final C command, final NameValuePair<String, Object>... parameters)
+	public WebCommandEvent(final DepictedObject depictedObject, final C command, final NameValuePair<String, Object>... parameters)
 	{
 		super(depictedObject);	//construct the parent class
 		this.command=checkInstance(command, "Command cannot be null.");
@@ -49,7 +48,7 @@ public class WebCommandEvent<O extends DepictedObject, C extends Enum<C> & WebCo
 	@param parameters The map representing the parameters of the command.
 	@exception NullPointerException if the given depicted object, command, and/or parameters is <code>null</code>.
 	*/
-	public WebCommandEvent(final O depictedObject, final C command, final Map<String, Object> parameters)
+	public WebCommandEvent(final DepictedObject depictedObject, final C command, final Map<String, Object> parameters)
 	{
 		super(depictedObject);	//construct the parent class
 		this.command=checkInstance(command, "Command cannot be null.");

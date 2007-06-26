@@ -154,28 +154,28 @@ public class ResourceCollectControl extends AbstractControl<ResourceCollectContr
 	/**Adds a progress listener.
 	@param progressListener The progress listener to add.
 	*/
-	public void addProgressListener(final TaskProgressListener progressListener)
+	public void addProgressListener(final ProgressListener progressListener)
 	{
-		getEventListenerManager().add(TaskProgressListener.class, progressListener);	//add the listener
+		getEventListenerManager().add(ProgressListener.class, progressListener);	//add the listener
 	}
 
 	/**Removes an progress listener.
 	@param progressListener The progress listener to remove.
 	*/
-	public void removeProgressListener(final TaskProgressListener progressListener)
+	public void removeProgressListener(final ProgressListener progressListener)
 	{
-		getEventListenerManager().remove(TaskProgressListener.class, progressListener);	//remove the listener
+		getEventListenerManager().remove(ProgressListener.class, progressListener);	//remove the listener
 	}
 
 	/**Fires a progress event to all registered progress listeners.
-	This method delegates to {@link #fireProgessed(TaskProgressEvent)}.
+	This method delegates to {@link #fireProgessed(ProgressEvent)}.
 	@param task The task being performed, or <code>null</code> if not indicated.
 	@param taskState The state of the task.
 	@param value The current progress, or <code>-1</code> if not known.
 	@param maximumValue The goal, or <code>-1</code> if not known.
 	@exception NullPointerException if the given task state is <code>null</code>.
-	@see TaskProgressListener
-	@see TaskProgressEvent
+	@see ProgressListener
+	@see ProgressEvent
 	*/
 	public void fireProgressed(final String task, final TaskState taskState, final long value, final long maximumValue)
 	{
@@ -192,20 +192,20 @@ public class ResourceCollectControl extends AbstractControl<ResourceCollectContr
 			}
 		}
 		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
-		if(eventListenerManager.hasListeners(TaskProgressListener.class))	//if there are progress listeners registered
+		if(eventListenerManager.hasListeners(ProgressListener.class))	//if there are progress listeners registered
 		{
-			fireProgressed(new TaskProgressEvent(this, task, taskState, value, maximumValue));	//create and fire a new progress event
+			fireProgressed(new ProgressEvent(this, task, taskState, value, maximumValue));	//create and fire a new progress event
 		}
 	}
 
 	/**Fires a given progress event to all registered progress listeners.
 	@param progressEvent The progress event to fire.
 	*/
-	protected void fireProgressed(final TaskProgressEvent progressEvent)
+	protected void fireProgressed(final ProgressEvent progressEvent)
 	{
-		for(final TaskProgressListener progressListener:getEventListenerManager().getListeners(TaskProgressListener.class))	//for each progress listener
+		for(final ProgressListener progressListener:getEventListenerManager().getListeners(ProgressListener.class))	//for each progress listener
 		{
-			progressListener.taskProgressed(progressEvent);	//dispatch the progress event to the listener
+			progressListener.progressed(progressEvent);	//dispatch the progress event to the listener
 		}
 	}
 }

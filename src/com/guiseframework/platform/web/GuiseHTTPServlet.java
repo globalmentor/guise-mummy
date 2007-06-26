@@ -872,7 +872,7 @@ Debug.trace("got control events");
 							}
 							else if(controlEvent instanceof DepictEvent)	//if this is an event for a depicted object
 							{
-								DepictEvent<?> depictEvent=(DepictEvent<?>)controlEvent;	//get the depict event
+								DepictEvent depictEvent=(DepictEvent)controlEvent;	//get the depict event
 								depictEvent.getDepictedObject().getDepictor().processEvent(depictEvent);	//tell the object's depictor to process the depict event TODO maybe eventually pass these events through the platform, and let the platform dispatch the event
 							}
 							else if(controlEvent instanceof InitControlEvent)	//if this is an initialization event
@@ -1209,7 +1209,7 @@ Debug.trace("got control events");
 						{
 							if(platformEvent instanceof WebCommandEvent)	//if this is a web command
 							{
-								final WebCommandEvent<?, ?> webCommandEvent=(WebCommandEvent<?, ?>)platformEvent;	//get the web command
+								final WebCommandEvent<?> webCommandEvent=(WebCommandEvent<?>)platformEvent;	//get the web command
 								guiseContext.writeElementBegin(XHTML_NAMESPACE_URI, "command");	//<xhtml:command>	//TODO use a constant TODO don't use the XHTML namespace if we can help it
 								guiseContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
 								guiseContext.writeAttribute(null, "objectID", platform.getDepictIDString(webCommandEvent.getDepictedObject().getID()));	//objectID="depictedObjectID" TODO use a constant
@@ -1592,10 +1592,9 @@ if(document==null)	//TODO fix; del
 												final Element propertyElement=(Element)propertyElementList.item(propertyIndex);	//get this property element
 												final String propertyName=propertyElement.getAttribute("name");	//get the name of the property TODO use a constant
 												final Object propertyValue=JSON.parseValue(propertyElement.getTextContent());	//get the value of the property TODO add support for array values with <value> subelements
-Debug.trace("for property", propertyName, "parsed text", propertyElement.getTextContent(), "got value", propertyValue, "type", propertyValue.getClass(), "for object", depictedObject.getID());
 												properties.put(propertyName, propertyValue);	//add this property name and value to the event
 											}
-											requestEventList.add(new WebChangeEvent<DepictedObject>(depictedObject, properties));	//create and add a change event to the list
+											requestEventList.add(new WebChangeEvent(depictedObject, properties));	//create and add a change event to the list
 										}
 									}
 								}

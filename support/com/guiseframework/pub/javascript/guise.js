@@ -1136,6 +1136,10 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 					soundManager.stop(objectID);	//pause the sound
 					this.sendAJAXRequest(new ChangeAJAXEvent(objectID, new Map("state", com.guiseframework.js.TaskState.STOPPED)));	//send an AJAX request with the new sound state
 					break;
+				case "audio-position":
+					var position=parameters["position"];	//get the requested position
+					soundManager.setPosition(objectID, position);	//request the new sound position
+					break;
 			}
 		};
 
@@ -2769,7 +2773,7 @@ if(elementName=="select")
 //			var position=sound.position;	//get the sound position
 //			var duration=sound.readyState==3 ? sound.duration : sound.durationEstimate;	//if the sound isn't yet loaded, use the estimate of the duration
 //			this.trace("ready to send event with position "+position+" duration "+duration);
-			this.sendAJAXRequest(new ChangeAJAXEvent(sound.sID, new Map("state", com.guiseframework.js.TaskState.INCOMPLETE, "position", sound.position, "duration", sound.duration)));	//send an AJAX request with the new sound position
+			this.sendAJAXRequest(new ChangeAJAXEvent(sound.sID, new Map("position", sound.position, "duration", sound.duration)));	//send an AJAX request with the new sound position
 		};
 
 		/**Called while a sound finishes.
