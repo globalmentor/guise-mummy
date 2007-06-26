@@ -1124,6 +1124,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 					if(!sound)	//if there is no such sound defined
 					{
 						soundManager.createSound(objectID, audioURI);	//create a new sound
+						soundManager.sounds[objectID].lastPositionUpdateTime=0;	//create a new sound property that will keep the last date that we reported the play position status						
 					}
 					soundManager.play(objectID);	//play the sound
 					this.sendAJAXRequest(new ChangeAJAXEvent(objectID, new Map("state", com.guiseframework.js.TaskState.INCOMPLETE)));	//send an AJAX request with the new sound state
@@ -1401,6 +1402,20 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 			{
 				parentNode.removeAttribute("guise:contentHash");	//indicate that the children have changed TODO use a constant
 				this.invalidateAncestorContent(parentNode);	//invalidate the rest of the ancestors
+			}
+		};
+
+		/**Removes all children from the given node.
+		This implementation also unregistered any events for the node and all its children.
+		@param node The node the children of which to remove.
+		*/
+		proto._removeChildren=function(node)	//TODO change this to use innerHTML=""
+		{
+			while(node.childNodes.length>0)	//while there are child nodes left (remove the last node, one at a time, because because IE can sometimes add an element back in after the last one was removed)
+			{
+				var childNode=node.childNodes[node.childNodes.length-1];	//get a reference to the last node
+				this._uninitializeNode(childNode, true);	//uninitialize the node tree
+				node.removeChild(childNode);	//remove the last node
 			}
 		};
 
@@ -1702,7 +1717,7 @@ if(elementName=="select")
 					else	//if children are not compatible
 					{
 	//TODO del alert("children are not compatible, old "+oldElement.nodeName+" with ID "+oldElement.id+" child node count: "+oldChildNodeCount+" new "+element.nodeName+" "+"with ID "+element.getAttribute("id")+" child node count "+childNodeCount+" (verify) "+element.childNodes.length);
-						DOMUtilities.removeChildren(oldElement);	//remove all the children from the old element and start from scratch
+						this._removeChildren(oldElement);	//remove all the children from the old element and start from scratch
 	/*TODO fix, if can improve IE6, but it probably won't help much, as most incompatible children may be single-child changes
 						if(isUserAgentIE6)	//if this is IE6, it will be much faster to use innerHTML to load the children
 						{
@@ -1884,7 +1899,7 @@ if(elementName=="select")
 			{
 				initIFrame.parentNode.removeChild(initIFrame);	//remove the init IFrame from the document; we don't need it anymore
 			}
-
+			//soundManager.beginInit();	//initialize the sound manager
 			var focusable=getFocusableDescendant(document.documentElement);	//see if the document has a node that can be focused
 			if(focusable)	//if we found a focusable node
 			{
@@ -1922,6 +1937,7 @@ if(elementName=="select")
 
 			soundManager.defaultOptions.whileplaying=this._whileSoundPlaying.bindOldThis(this);	//set the sound playing callback method
 			soundManager.defaultOptions.onfinish=this._onSoundFinish.bindOldThis(this);	//set the sound finished callback method
+//TODO del			soundManager.defaultOptions.lastPositionUpdateTime=0;	//create a new sound property that will keep the last date that we reported the play position status
 
 			window.setTimeout(this._initialize.bind(this), 1);	//run the initialization function in a separate thread
 		};
@@ -1935,6 +1951,7 @@ if(elementName=="select")
 				//TODO fix or del	this.setBusyVisible(true);	//turn on the busy indicator
 			com.garretwilson.js.EventManager.clearEvents();	//unload all events
 				//TODO fix or del	this.setBusyVisible(false);	//turn off the busy indicator
+			//soundManager.destruct();	//uninitialize the sound manager
 		};
 
 		/**Called when the window resizes.
@@ -2769,11 +2786,17 @@ if(elementName=="select")
 		*/
 		proto._whileSoundPlaying=function(sound)
 		{
-//			this.trace("sound", sound.sID, "is playing at position: ", sound.position, "duration:", sound.duration, "duration estimate", sound.durationEstimate, "ready state", sound.readyState);
+//			this.trace("sound", sound.sID, "is playing at position: ", sound.position, "duration:", sound.duration, "duration estimate", sound.durationEstimate, "ready state", sound.readyState, "last position update time", sound.lastPositionUpdateTime, "bytes loaded", sound.bytesLoaded, "bytes total", sound.bytesTotal);
 //			var position=sound.position;	//get the sound position
 //			var duration=sound.readyState==3 ? sound.duration : sound.durationEstimate;	//if the sound isn't yet loaded, use the estimate of the duration
 //			this.trace("ready to send event with position "+position+" duration "+duration);
-			this.sendAJAXRequest(new ChangeAJAXEvent(sound.sID, new Map("position", sound.position, "duration", sound.duration)));	//send an AJAX request with the new sound position
+			var nowTime=new Date().getTime();	//get the current date in milliseconds
+			if(nowTime>sound.lastPositionUpdateTime+1000)	//if more than a second has passed since our last update
+			{
+				sound.lastPositionUpdateTime=nowTime;	//update the last update time
+				var duration=sound.duration;	//get the sound duration
+				this.sendAJAXRequest(new ChangeAJAXEvent(sound.sID, new Map("position", sound.position, "duration", duration||-1)));	//send an AJAX request with the new sound position (make sure the duration is defined)
+			}
 		};
 
 		/**Called while a sound finishes.
@@ -2788,7 +2811,7 @@ if(elementName=="select")
 
 	this.httpCommunicator.setProcessHTTPResponse(this._processHTTPResponse.bind(this));	//set up our callback function for processing HTTP responses
 
-}
+};
 
 var guise=new com.guiseframework.js.Guise();	//create a new global variable for the Guise client
 

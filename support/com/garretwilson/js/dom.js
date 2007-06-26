@@ -570,20 +570,6 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 		}
 	},
 
-	/**Removes all children from the given node.
-	This implementation also unregistered any events for the node and all its children.
-	@param node The node the children of which to remove.
-	*/
-	removeChildren:function(node)	//TODO change this to use innerHTML=""
-	{
-		while(node.childNodes.length>0)	//while there are child nodes left (remove the last node, one at a time, because because IE can sometimes add an element back in after the last one was removed)
-		{
-			var childNode=node.childNodes[node.childNodes.length-1];	//get a reference to the last node
-			uninitializeNode(childNode, true);	//uninitialize the node tree
-			node.removeChild(childNode);	//remove the last node
-		}
-	},
-
 	/**Retrieves the computed style of a given node.
 	@param node The node to check.
 	@param property The name of the style to return.

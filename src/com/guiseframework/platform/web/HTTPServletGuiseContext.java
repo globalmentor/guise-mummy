@@ -186,6 +186,8 @@ Debug.trace("parameter names:", request.getParameterNames());	//TODO del when fi
 Debug.trace("number of parameter names:", request.getParameterNames());
 Debug.trace("***********number of distinct parameter keys", parameterListMap.size());
 */
+//TODO del		setHashAttributesGenerated(isUserAgentIE6());	//only generate hash attributes if this is IE6
+		setHashAttributesGenerated(true);	//always generate hash attributes
 		final ContentType defaultContentType=createContentType(outputContentType.getPrimaryType(), outputContentType.getSubType(), new NameValuePair<String, String>(CHARSET_PARAMETER, UTF_8));	//default to text/plain encoded in UTF-8
 		response.setContentType(defaultContentType.toString());	//initialize the default content type and encoding
 		HttpServletUtilities.setContentLanguage(response, session.getLocale());	//set the response content language
