@@ -13,11 +13,16 @@ import com.garretwilson.text.ArgumentSyntaxException;
 @see <a href="http://richnewman.wordpress.com/hslcolor-class/">HSLColor Class</a>
 @see <a href="http://www.easyrgb.com/math.php">EasyRGB</a>
 */
-public class HSLColor extends AbstractColor<HSLColor.Component>
+public class HSLColor extends AbstractModeledColor<HSLColor.Component>
 {
 
 	/**A color component of HSL.*/
-	public enum Component{HUE, SATURATION, LIGHTNESS;}
+	public enum Component implements ModeledColor.Component
+	{
+		HUE,
+		SATURATION,
+		LIGHTNESS;
+	}
 
 	/**Creates an HSL color with the specified hue in the range (0-359), and saturation, and lightness component values in the range (0.0-1.0).
 	@param hue The hue component as an integer value in the range (0-359).

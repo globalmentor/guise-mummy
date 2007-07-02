@@ -407,8 +407,8 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 			styles.put(CSS_PROP_HEIGHT, CSSUtilities.toString(preferredHeight));	//indicate the height
 		}
 */
-//TODO del if not needed		final Color<?> color=component.determineColor();	//determine the component color
-		final Color<?> color=getColor();	//get the component color to use
+//TODO del if not needed		final Color color=component.determineColor();	//determine the component color
+		final Color color=getColor();	//get the component color to use
 		if(color!=null)	//if the component has a color
 		{
 			setColor(styles, color);	//set the color
@@ -425,7 +425,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	This version delegates to {@link Component#getColor()}.
 	@return The color to use for this component.
 	*/
-	protected Color<?> getColor()
+	protected Color getColor()
 	{
 		return getDepictedObject().getColor();	//return the component's color
 	}
@@ -434,7 +434,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	This version delegates to {@link Component#getBackgroundColor()}.
 	@return The background color to use for this component.
 	*/
-	protected Color<?> getBackgroundColor()
+	protected Color getBackgroundColor()
 	{
 		return getDepictedObject().getBackgroundColor();	//return the component's background color
 	}
@@ -448,7 +448,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 		final C component=getDepictedObject();	//get the depicted component
 		final GuiseSession session=getSession();	//get the Guise session
 		final Map<String, Object> styles=new HashMap<String, Object>();	//create a new map of styles
-		final Color<?> backgroundColor=getBackgroundColor();	//get the component background color to use
+		final Color backgroundColor=getBackgroundColor();	//get the component background color to use
 		if(backgroundColor!=null)	//if the component has a background color
 		{
 			styles.put(CSS_PROP_BACKGROUND_COLOR, CSSUtilities.toString(backgroundColor));	//set the background color
@@ -470,7 +470,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 			{
 				styles.put(CSS_PROPERTY_BORDER_X_WIDTH_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(borderExtent));	//set the border extent
 				styles.put(CSS_PROPERTY_BORDER_X_STYLE_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(component.getBorderStyle(border)));	//indicate the border style for this side
-				final Color<?> borderColor=component.getBorderColor(border);	//get the border color for this border
+				final Color borderColor=component.getBorderColor(border);	//get the border color for this border
 				if(borderColor!=null)	//if a border color is specified
 				{
 					styles.put(CSS_PROPERTY_BORDER_X_COLOR_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(borderColor));	//set the border color

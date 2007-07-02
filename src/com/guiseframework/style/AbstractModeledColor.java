@@ -4,13 +4,13 @@ import java.util.Arrays;
 
 import com.garretwilson.text.ArgumentSyntaxException;
 
-/**Abstract encapsulation of a color value.
+/**Abstract representation of a color value in a color space.
 @param <C> The type of color component for this color space.
 @author Garret Wilson
 @see <a href="http://www.neuro.sfc.keio.ac.jp/~aly/polygon/info/color-space-faq.html">Color Space FAQ</a>
 @see <a href="http://www.color.org/">International Color Consortium</a>
 */
-public abstract class AbstractColor<C extends Enum<?>> implements Color<C>
+public abstract class AbstractModeledColor<C extends Enum<C> & ModeledColor.Component> implements ModeledColor<C>
 {
 	/**The color component values, each within the range (0.0-1.0).*/
 	private final double[] values;
@@ -26,7 +26,7 @@ public abstract class AbstractColor<C extends Enum<?>> implements Color<C>
 	@exception NullPointerException if the components is <code>null</code>.
 TODO fix	@exception IllegalArgumentException if the number of component values do not equal the number of components.
 	*/
-	public AbstractColor(final double... values)
+	public AbstractModeledColor(final double... values)
 	{
 		this.values=new double[values.length];	//create a new array of values
 		for(int i=values.length-1; i>=0; --i)	//for each value
@@ -84,7 +84,7 @@ TODO fix	@exception IllegalArgumentException if the number of component values d
 	*/
 	public boolean equals(final Object object)
 	{
-		return object!=null && getClass().equals(object.getClass()) && Arrays.equals(values, ((AbstractColor<?>)object).values);	//see if the classes and the component values are the same
+		return object!=null && getClass().equals(object.getClass()) && Arrays.equals(values, ((AbstractModeledColor<?>)object).values);	//see if the classes and the component values are the same
 	}
 
 	/**Creates a color from a string representation.
@@ -108,7 +108,7 @@ TODO fix	@exception IllegalArgumentException if the number of component values d
 	@see HSLColor#valueOf(CharSequence) 
 	@see RGBColor#valueOf(CharSequence)
 	*/
-	public static Color<?> valueOf(final CharSequence charSequence)
+	public static Color valueOf(final CharSequence charSequence)
 	{
 		try
 		{

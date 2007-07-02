@@ -19,14 +19,20 @@ import com.garretwilson.text.ArgumentSyntaxException;
 @see <a href="http://www.w3.org/TR/SVG11/types.html#ColorKeywords">SVG 1.1: Recognized color keyword names</a>
 @see <a href="http://lists.w3.org/Archives/Public/www-svg/2002Apr/0052.html">Re: color names in SVG-1.0 conflict with /usr/lib/X11/rgb.txt</a>
 */
-public class RGBColor extends AbstractColor<RGBColor.Component>
+public class RGBColor extends AbstractModeledColor<RGBColor.Component>
 {
 
 	/**The shared map of RGB colors keyed to lowercase, non-delimited color names, for reading only.*/
 	private final static Map<String, RGBColor> namedColorMap;
 
 	/**A color component of sRGB.*/
-	public enum Component{ALPHA, RED, GREEN, BLUE;}
+	public enum Component implements ModeledColor.Component
+	{
+		ALPHA,
+		RED,
+		GREEN,
+		BLUE;
+	}
 
 	/**Creates an RGB color from the specified string representation.
 	This representation can be in one of the following forms:

@@ -41,24 +41,24 @@ public class SelectableLabel extends Label implements Selectable
 		}
 
 	/**The selected background color of the component, or <code>null</code> if no selected background color is specified for this component.*/
-	private Color<?> selectedBackgroundColor=COLOR_SELECTED_BACKGROUND;
+	private Color selectedBackgroundColor=COLOR_SELECTED_BACKGROUND;
 
 		/**Returns the selected background color of the component.
 		The default value is {@link Theme#COLOR_SELECTED_BACKGROUND}.
 		@return The selected background color of the component, or <code>null</code> if no selected background color is specified for this component.
 		*/
-		public Color<?> getSelectedBackgroundColor() {return selectedBackgroundColor;}
+		public Color getSelectedBackgroundColor() {return selectedBackgroundColor;}
 
 		/**Sets the selected background color of the component.
 		This is a bound property.
 		@param newSelectedBackgroundColor The selected background color of the component, or <code>null</code> if the default selected background color should be used.
 		@see #SELECTED_BACKGROUND_COLOR_PROPERTY 
 		*/
-		public void setSelectedBackgroundColor(final Color<?> newSelectedBackgroundColor)
+		public void setSelectedBackgroundColor(final Color newSelectedBackgroundColor)
 		{
 			if(!ObjectUtilities.equals(selectedBackgroundColor, newSelectedBackgroundColor))	//if the value is really changing
 			{
-				final Color<?> oldSelectedBackgroundColor=selectedBackgroundColor;	//get the old value
+				final Color oldSelectedBackgroundColor=selectedBackgroundColor;	//get the old value
 				selectedBackgroundColor=newSelectedBackgroundColor;	//actually change the value
 				firePropertyChange(SELECTED_BACKGROUND_COLOR_PROPERTY, oldSelectedBackgroundColor, newSelectedBackgroundColor);	//indicate that the value changed
 			}			

@@ -216,7 +216,7 @@ public class Theme extends ClassTypedRDFResource
 	}
 
 		//standard colors
-	public final static Color<?> COLOR_SELECTED_BACKGROUND=new ResourceColor("theme.color.selected.background");
+	public final static Color COLOR_SELECTED_BACKGROUND=new ResourceColor("theme.color.selected.background");
 
 		//standard theme labels
 	public final static String LABEL_ABOUT=createStringResourceReference("theme.label.about");

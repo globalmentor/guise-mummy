@@ -22,28 +22,28 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 {
 
 	/**The background color of the component, or <code>null</code> if no background color is specified for this component.*/
-	private Color<?> backgroundColor=null;
+	private Color backgroundColor=null;
 
 		/**@return The background color of the component, or <code>null</code> if no background color is specified for this component.*/
-		public Color<?> getBackgroundColor() {return backgroundColor;}
+		public Color getBackgroundColor() {return backgroundColor;}
 
 		/**Sets the background color of the component.
 		This is a bound property.
 		@param newBackgroundColor The background color of the component, or <code>null</code> if the default background color should be used.
 		@see #BACKGROUND_COLOR_PROPERTY 
 		*/
-		public void setBackgroundColor(final Color<?> newBackgroundColor)
+		public void setBackgroundColor(final Color newBackgroundColor)
 		{
 			if(!ObjectUtilities.equals(backgroundColor, newBackgroundColor))	//if the value is really changing
 			{
-				final Color<?> oldBackgroundColor=backgroundColor;	//get the old value
+				final Color oldBackgroundColor=backgroundColor;	//get the old value
 				backgroundColor=newBackgroundColor;	//actually change the value
 				firePropertyChange(BACKGROUND_COLOR_PROPERTY, oldBackgroundColor, newBackgroundColor);	//indicate that the value changed
 			}			
 		}
 
 	/**The array of border colors.*/
-	private Color<?>[] borderColors=fill(new Color[Border.values().length], null);
+	private Color[] borderColors=fill(new Color[Border.values().length], null);
 
 	/**The properties corresponding to the border colors.*/
 	private final static String[] BORDER_COLOR_PROPERTIES;
@@ -61,27 +61,27 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 		@param border The border for which a border color should be returned.
 		@return The border color of the given border, or <code>null</code> if the default border color should be used.
 		*/
-		public Color<?> getBorderColor(final Border border) {return borderColors[border.ordinal()];}
+		public Color getBorderColor(final Border border) {return borderColors[border.ordinal()];}
 
 		/**Returns the border color of the line near page near border.
 		@return The border color of the border, or <code>null</code> if the default border color should be used.
 		*/
-		public Color<?> BorderLineNearColor() {return getBorderColor(Border.LINE_NEAR);}
+		public Color BorderLineNearColor() {return getBorderColor(Border.LINE_NEAR);}
 
 		/**Returns the border color of the line far page near border.
 		@return The border color of the border, or <code>null</code> if the default border color should be used.
 		*/
-		public Color<?> BorderLineFarColor() {return getBorderColor(Border.LINE_FAR);}
+		public Color BorderLineFarColor() {return getBorderColor(Border.LINE_FAR);}
 
 		/**Returns the border color of the line near page far border.
 		@return The border color of the border, or <code>null</code> if the default border color should be used.
 		*/
-		public Color<?> BorderPageNearColor() {return getBorderColor(Border.PAGE_NEAR);}
+		public Color BorderPageNearColor() {return getBorderColor(Border.PAGE_NEAR);}
 
 		/**Returns the border color of the line far page far border.
 		@return The border color of the border, or <code>null</code> if the default border color should be used.
 		*/
-		public Color<?> BorderPageFarColor() {return getBorderColor(Border.PAGE_FAR);}
+		public Color BorderPageFarColor() {return getBorderColor(Border.PAGE_FAR);}
 
 		/**Sets the border color of a given border.
 		The border color of each border represents a bound property.
@@ -93,10 +93,10 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 		@see #BORDER_PAGE_NEAR_COLOR_PROPERTY
 		@see #BORDER_PAGE_FAR_COLOR_PROPERTY
 		*/
-		public void setBorderColor(final Border border, final Color<?> newBorderColor)
+		public void setBorderColor(final Border border, final Color newBorderColor)
 		{
 			final int borderOrdinal=checkInstance(border, "Border cannot be null").ordinal();	//get the ordinal of the border
-			final Color<?> oldBorderColor=borderColors[borderOrdinal];	//get the old value
+			final Color oldBorderColor=borderColors[borderOrdinal];	//get the old value
 			if(!ObjectUtilities.equals(oldBorderColor, newBorderColor))	//if the value is really changing
 			{
 				borderColors[borderOrdinal]=newBorderColor;	//actually change the value
@@ -109,28 +109,28 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 		@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
 		@see #BORDER_LINE_NEAR_COLOR_PROPERTY
 		*/
-		public void setBorderLineNearColor(final Color<?> newBorderColor) {setBorderColor(Border.LINE_NEAR, newBorderColor);}
+		public void setBorderLineNearColor(final Color newBorderColor) {setBorderColor(Border.LINE_NEAR, newBorderColor);}
 
 		/**Sets the border color of the line far border.
 		This is a bound property.
 		@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
 		@see #BORDER_LINE_FAR_COLOR_PROPERTY
 		*/
-		public void setBorderLineFarColor(final Color<?> newBorderColor) {setBorderColor(Border.LINE_FAR, newBorderColor);}
+		public void setBorderLineFarColor(final Color newBorderColor) {setBorderColor(Border.LINE_FAR, newBorderColor);}
 
 		/**Sets the border color of the page near border.
 		This is a bound property.
 		@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
 		@see #BORDER_PAGE_NEAR_COLOR_PROPERTY
 		*/
-		public void setBorderPageNearColor(final Color<?> newBorderColor) {setBorderColor(Border.PAGE_NEAR, newBorderColor);}
+		public void setBorderPageNearColor(final Color newBorderColor) {setBorderColor(Border.PAGE_NEAR, newBorderColor);}
 
 		/**Sets the border color of the page far border.
 		This is a bound property.
 		@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
 		@see #BORDER_PAGE_FAR_COLOR_PROPERTY
 		*/
-		public void setBorderPageFarColor(final Color<?> newBorderColor) {setBorderColor(Border.PAGE_FAR, newBorderColor);}
+		public void setBorderPageFarColor(final Color newBorderColor) {setBorderColor(Border.PAGE_FAR, newBorderColor);}
 
 		/**Sets the border color of all borders.
 		The border color of each border represents a bound property.
@@ -141,7 +141,7 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 		@see #BORDER_PAGE_NEAR_COLOR_PROPERTY
 		@see #BORDER_PAGE_FAR_COLOR_PROPERTY
 		*/
-		public void setBorderColor(final Color<?> newBorderColor)
+		public void setBorderColor(final Color newBorderColor)
 		{
 			for(final Border border:Border.values())	//for each border
 			{
@@ -374,21 +374,21 @@ public abstract class AbstractPresentationModel extends GuiseBoundPropertyObject
 		}
 		
 	/**The foreground color of the component, or <code>null</code> if no foreground color is specified for this component.*/
-	private Color<?> color=null;
+	private Color color=null;
 
 		/**@return The foreground color of the component, or <code>null</code> if no foreground color is specified for this component.*/
-		public Color<?> getColor() {return color;}
+		public Color getColor() {return color;}
 
 		/**Sets the foreground color of the component.
 		This is a bound property.
 		@param newColor The foreground color of the component, or <code>null</code> if the default foreground color should be used.
 		@see #COLOR_PROPERTY
 		*/
-		public void setColor(final Color<?> newColor)
+		public void setColor(final Color newColor)
 		{
 			if(!ObjectUtilities.equals(color, newColor))	//if the value is really changing
 			{
-				final Color<?> oldColor=color;	//get the old value
+				final Color oldColor=color;	//get the old value
 				color=newColor;	//actually change the value
 				firePropertyChange(COLOR_PROPERTY, oldColor, newColor);	//indicate that the value changed
 			}			

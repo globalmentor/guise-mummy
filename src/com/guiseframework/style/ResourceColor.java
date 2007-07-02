@@ -10,7 +10,7 @@ When color-related access methods are called the calling thread must have access
 @see GuiseSession#getColorResource(String)
 @author Garret Wilson
 */
-public class ResourceColor implements Color<RGBColor.Component>
+public class ResourceColor implements Color
 {
 
 	/**The key to accessing the color defined in the resources.*/
@@ -27,31 +27,6 @@ public class ResourceColor implements Color<RGBColor.Component>
 	{
 		this.resourceKey=checkInstance(resourceKey, "Resource key cannot be null.");
 	}
-
-  /**Determines the value of the given color component.
-	This implementation retrieves a color from the Guise session resources and delegates to that object.
-	@param component The color component for which a value should be retrieved.
-	@return The value of the requested color component.
-	@see GuiseSession#getColorResource(String)
-	*/
-  public double getComponent(final RGBColor.Component component)
-  {
-  	return Guise.getInstance().getGuiseSession().getColorResource(getResourceKey()).asRGB().getComponent(component);	//delegate to a color from the resources
-  }
-
-  /**Determines the absolute value of the given color component with the given bit depth.
-	For example, retrieving a component with value 0.5 and a bit depth of 16 would produce 128 or 0x80.
-	This implementation retrieves a color from the Guise session resources and delegates to that object.
-	@param component The color component for which a value should be retrieved.
-	@param bitDepth The number of bits to use for the given color component.
-	@return The absolute value of the requested color component at the given bit depth.
-	@see #getComponent(Enum)
-	@see GuiseSession#getColorResource(String)
-	*/
-  public long getAbsoluteComponent(final RGBColor.Component component, final int bitDepth)
-  {
-  	return Guise.getInstance().getGuiseSession().getColorResource(getResourceKey()).asRGB().getAbsoluteComponent(component, bitDepth);	//delegate to a color from the resources  	
-  }
 
 	/**Returns the color in the HSL color space.
 	This implementation retrieves a color from the Guise session resources and delegates to that object.

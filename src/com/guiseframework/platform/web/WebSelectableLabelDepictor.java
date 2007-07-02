@@ -15,7 +15,7 @@ public class WebSelectableLabelDepictor<C extends SelectableLabel> extends WebLa
 	@return The color to use for this component.
 	@see SelectableLabel#getSelectedBackgroundColor()
 	*/
-	protected Color<?> getColor()
+	protected Color getColor()
 	{
 		return super.getColor();	//TODO fix
 	}
@@ -25,12 +25,12 @@ public class WebSelectableLabelDepictor<C extends SelectableLabel> extends WebLa
 	@return The background color to use for this component.
 	@see SelectableLabel#getSelectedBackgroundColor()
 	*/
-	protected Color<?> getBackgroundColor()
+	protected Color getBackgroundColor()
 	{
 		final C component=getDepictedObject();	//get the component
 		if(component.isSelected())	//if the component is selected
 		{
-			final Color<?> selectedBackgroundColor=component.getSelectedBackgroundColor();	//get the selected background color
+			final Color selectedBackgroundColor=component.getSelectedBackgroundColor();	//get the selected background color
 			if(selectedBackgroundColor!=null)	//if there is a backgrond color for the selected state
 			{
 				return selectedBackgroundColor;	//return the defined selected background color

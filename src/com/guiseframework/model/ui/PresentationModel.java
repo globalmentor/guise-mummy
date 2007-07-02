@@ -114,40 +114,40 @@ public interface PresentationModel extends Model, Displayable
 	public final static double FONT_WEIGHT_BOLD=0.75;
 
 	/**@return The background color of the component, or <code>null</code> if no background color is specified for this component.*/
-	public Color<?> getBackgroundColor();
+	public Color getBackgroundColor();
 
 	/**Sets the background color of the component.
 	This is a bound property.
 	@param newBackgroundColor The background color of the component, or <code>null</code> if the default background color should be used.
 	@see #BACKGROUND_COLOR_PROPERTY 
 	*/
-	public void setBackgroundColor(final Color<?> newBackgroundColor);
+	public void setBackgroundColor(final Color newBackgroundColor);
 
 	/**Returns the border color of the indicated border.
 	@param border The border for which a border color should be returned.
 	@return The border color of the given border, or <code>null</code> if the default border color should be used.
 	*/
-	public Color<?> getBorderColor(final Border border);
+	public Color getBorderColor(final Border border);
 
 	/**Returns the border color of the line near page near border.
 	@return The border color of the border, or <code>null</code> if the default border color should be used.
 	*/
-	public Color<?> BorderLineNearColor();
+	public Color BorderLineNearColor();
 
 	/**Returns the border color of the line far page near border.
 	@return The border color of the border, or <code>null</code> if the default border color should be used.
 	*/
-	public Color<?> BorderLineFarColor();
+	public Color BorderLineFarColor();
 
 	/**Returns the border color of the line near page far border.
 	@return The border color of the border, or <code>null</code> if the default border color should be used.
 	*/
-	public Color<?> BorderPageNearColor();
+	public Color BorderPageNearColor();
 
 	/**Returns the border color of the line far page far border.
 	@return The border color of the border, or <code>null</code> if the default border color should be used.
 	*/
-	public Color<?> BorderPageFarColor();
+	public Color BorderPageFarColor();
 
 	/**Sets the border color of a given border.
 	The border color of each border represents a bound property.
@@ -159,35 +159,35 @@ public interface PresentationModel extends Model, Displayable
 	@see #BORDER_PAGE_NEAR_COLOR_PROPERTY
 	@see #BORDER_PAGE_FAR_COLOR_PROPERTY
 	*/
-	public void setBorderColor(final Border border, final Color<?> newBorderColor);
+	public void setBorderColor(final Border border, final Color newBorderColor);
 
 	/**Sets the border COLOR of the line near border.
 	This is a bound property.
 	@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
 	@see #BORDER_LINE_NEAR_COLOR_PROPERTY
 	*/
-	public void setBorderLineNearColor(final Color<?> newBorderColor);
+	public void setBorderLineNearColor(final Color newBorderColor);
 
 	/**Sets the border color of the line far border.
 	This is a bound property.
 	@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
 	@see #BORDER_LINE_FAR_COLOR_PROPERTY
 	*/
-	public void setBorderLineFarColor(final Color<?> newBorderColor);
+	public void setBorderLineFarColor(final Color newBorderColor);
 
 	/**Sets the border color of the page near border.
 	This is a bound property.
 	@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
 	@see #BORDER_PAGE_NEAR_COLOR_PROPERTY
 	*/
-	public void setBorderPageNearColor(final Color<?> newBorderColor);
+	public void setBorderPageNearColor(final Color newBorderColor);
 
 	/**Sets the border color of the page far border.
 	This is a bound property.
 	@param newBorderColor The border color, or <code>null</code> if the default border color should be used.
 	@see #BORDER_PAGE_FAR_COLOR_PROPERTY
 	*/
-	public void setBorderPageFarColor(final Color<?> newBorderColor);
+	public void setBorderPageFarColor(final Color newBorderColor);
 
 	/**Sets the border color of all borders.
 	The border color of each border represents a bound property.
@@ -198,7 +198,7 @@ public interface PresentationModel extends Model, Displayable
 	@see #BORDER_PAGE_NEAR_COLOR_PROPERTY
 	@see #BORDER_PAGE_FAR_COLOR_PROPERTY
 	*/
-	public void setBorderColor(final Color<?> newBorderColor);
+	public void setBorderColor(final Color newBorderColor);
 	
 	/**Returns the border extent of the indicated border.
 	@param border The border for which a border extent should be returned.
@@ -365,14 +365,14 @@ public interface PresentationModel extends Model, Displayable
 	public void setBorderStyle(final LineStyle newBorderStyle);
 
 	/**@return The foreground color of the component, or <code>null</code> if no foreground color is specified for this component.*/
-	public Color<?> getColor();
+	public Color getColor();
 
 	/**Sets the foreground color of the component.
 	This is a bound property.
 	@param newColor The foreground color of the component, or <code>null</code> if the default foreground color should be used.
 	@see #COLOR_PROPERTY 
 	*/
-	public void setColor(final Color<?> newColor);
+	public void setColor(final Color newColor);
 
 	/**Returns the arc size for the indicated corner.
 	@param corner The corner for which an arc size should be returned.
