@@ -11,7 +11,7 @@ import com.guiseframework.model.ValueModel;
 @param <V> The type of value the spinner represents.
 @author Garret Wilson
 */
-public abstract class SpinnerControl<V> extends AbstractContainer<SpinnerControl<V>> implements ValueControl<V, SpinnerControl<V>>  
+public abstract class SpinnerControl<V> extends AbstractContainer implements ValueControl<V>  
 {
 
 	/**@return The layout definition for the component.*/

@@ -7,7 +7,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 /**A component that displays an image.
 @author Garret Wilson
 */
-public interface ImageComponent<C extends ImageComponent<C>> extends Component<C>
+public interface ImageComponent extends Component
 {
 
 	/**The image bound property.*/

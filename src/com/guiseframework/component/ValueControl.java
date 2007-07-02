@@ -8,7 +8,7 @@ import com.guiseframework.model.ValueModel;
 @param <V> The type of value to represent.
 @author Garret Wilson
 */
-public interface ValueControl<V, C extends ValueControl<V, C>> extends Control<C>, ValueModel<V>
+public interface ValueControl<V> extends Control, ValueModel<V>
 {
 
 	/**The converter bound property.*/

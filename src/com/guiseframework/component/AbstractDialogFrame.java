@@ -16,7 +16,7 @@ The component valid status is updated before a change in the {@link #VALUE_PROPE
 @param <V> The value to be communicated.
 @author Garret Wilson
 */
-public abstract class AbstractDialogFrame<V, C extends DialogFrame<V, C>> extends AbstractFrame<C> implements DialogFrame<V, C>
+public abstract class AbstractDialogFrame<V> extends AbstractFrame implements DialogFrame<V>
 {
 
 	/**The value model used by this component.*/
@@ -163,7 +163,7 @@ public abstract class AbstractDialogFrame<V, C extends DialogFrame<V, C>> extend
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
 	@exception NullPointerException if the given value model is <code>null</code>.
 	*/
-	public AbstractDialogFrame(final ValueModel<V> valueModel, final Component<?> component)
+	public AbstractDialogFrame(final ValueModel<V> valueModel, final Component component)
 	{
 		super(component);	//construct the parent class
 		this.valueModel=checkInstance(valueModel, "Value model cannot be null.");	//save the table model

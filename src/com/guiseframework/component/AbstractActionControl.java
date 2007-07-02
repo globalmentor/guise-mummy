@@ -8,7 +8,7 @@ import com.guiseframework.model.*;
 /**Abstract control with an action model.
 @author Garret Wilson
 */
-public abstract class AbstractActionControl<C extends ActionControl<C> & LabelDisplayableComponent<C>> extends AbstractControl<C> implements ActionControl<C>, LabelDisplayableComponent<C>
+public abstract class AbstractActionControl extends AbstractControl implements ActionControl, LabelDisplayableComponent
 {
 
 	/**The action model used by this component.*/

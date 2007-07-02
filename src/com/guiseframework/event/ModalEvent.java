@@ -9,16 +9,16 @@ public class ModalEvent extends AbstractGuiseEvent
 {
 
 	/**@return The source of the event.*/
-	public ModalNavigationPanel<?, ?> getSource()
+	public ModalNavigationPanel<?> getSource()
 	{
-		return (ModalNavigationPanel<?, ?>)super.getSource();	//cast the event to the appropriate type
+		return (ModalNavigationPanel<?>)super.getSource();	//cast the event to the appropriate type
 	}
 
 	/**Source constructor.
 	@param source The object on which the event initially occurred.
 	@exception NullPointerException if the given source is <code>null</code>.
 	*/
-	public ModalEvent(final ModalNavigationPanel<?, ?> source)
+	public ModalEvent(final ModalNavigationPanel<?> source)
 	{
 		super(source);	//construct the parent class
 	}

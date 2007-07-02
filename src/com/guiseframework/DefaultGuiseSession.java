@@ -1,6 +1,6 @@
 package com.guiseframework;
 
-import com.guiseframework.platform.GuisePlatform;
+import com.guiseframework.platform.Platform;
 
 /**A default implementation of a Guise session.
 @author Garret Wilson
@@ -8,15 +8,14 @@ import com.guiseframework.platform.GuisePlatform;
 public class DefaultGuiseSession extends AbstractGuiseSession
 {
 
-	/**Application constructor.
+	/**Application and platform constructor.
 	@param application The Guise application to which this session belongs.
-	@param environment The initial environment of the session.
 	@param platform The platform on which this session's objects are depicted.
-	@exception NullPointerException if the given application, environment, and/or platform is <code>null</code>.
+	@exception NullPointerException if the given application and/or platform is <code>null</code>.
 	*/
-	public DefaultGuiseSession(final GuiseApplication application, final GuiseEnvironment environment, final GuisePlatform platform)
+	public DefaultGuiseSession(final GuiseApplication application, final Platform platform)
 	{
-		super(application, environment, platform);	//construct the parent class
+		super(application, platform);	//construct the parent class
 	}
 
 }

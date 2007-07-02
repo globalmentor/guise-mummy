@@ -15,7 +15,7 @@ The component valid status is updated before a change in the {@link #VALUE_PROPE
 @param <V> The type of value to represent.
 @author Garret Wilson
 */
-public abstract class AbstractValueControl<V, C extends ValueControl<V, C>> extends AbstractControl<C> implements ValueControl<V, C>
+public abstract class AbstractValueControl<V> extends AbstractControl implements ValueControl<V>
 {
 
 	/**The value model used by this component.*/

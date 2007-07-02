@@ -5,7 +5,7 @@ import com.guiseframework.component.layout.*;
 /**Panel to display information about an object such as the application.
 @author Garret Wilson
 */
-public class AboutPanel extends AbstractPanel<PasswordAuthenticationPanel>
+public class AboutPanel extends AbstractPanel
 {
 
 	/**The name label.*/

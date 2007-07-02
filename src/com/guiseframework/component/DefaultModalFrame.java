@@ -4,7 +4,7 @@ package com.guiseframework.component;
 @param <R> The type of modal result this modal frame produces.
 @author Garret Wilson
 */
-public class DefaultModalFrame<R> extends AbstractModalFrame<R, DefaultModalFrame<R>>
+public class DefaultModalFrame<R> extends AbstractModalFrame<R>
 {
 
 	/**Default constructor with a default layout panel.*/
@@ -16,7 +16,7 @@ public class DefaultModalFrame<R> extends AbstractModalFrame<R, DefaultModalFram
 	/**Component constructor.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
 	*/
-	public DefaultModalFrame(final Component<?> component)
+	public DefaultModalFrame(final Component component)
 	{
 		super(component);	//construct the parent class
 	}

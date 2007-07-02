@@ -7,7 +7,7 @@ import com.guiseframework.prototype.ValuePrototype;
 A validator requiring a non-<code>null</code> value is automatically installed.
 @author Garret Wilson
 */
-public class BooleanSelectButton extends AbstractBooleanSelectActionControl<BooleanSelectButton> implements SelectButtonControl<BooleanSelectButton>
+public class BooleanSelectButton extends AbstractBooleanSelectActionControl implements SelectButtonControl
 {
 
 	/**Default constructor.*/

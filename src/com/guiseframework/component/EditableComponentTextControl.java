@@ -47,7 +47,7 @@ public class EditableComponentTextControl extends AbstractEditableComponentTextC
 	@param editControl The control used to edit the text.
 	@exception NullPointerException if the text component and/or edit control is <code>null</code>.
 	*/
-	public EditableComponentTextControl(final Text textComponent, final ValueControl<String, ?> editControl)
+	public EditableComponentTextControl(final Text textComponent, final ValueControl<String> editControl)
 	{
 		this(textComponent, editControl, Flow.LINE);	//construct the class with line flow
 	}
@@ -58,7 +58,7 @@ public class EditableComponentTextControl extends AbstractEditableComponentTextC
 	@param flow The logical axis (line or page) along which information is flowed.
 	@exception NullPointerException if the text component, value control, and/or flow axis is <code>null</code>.
 	*/
-	public EditableComponentTextControl(final Text textComponent, final ValueControl<String, ?> editControl, final Flow flow)
+	public EditableComponentTextControl(final Text textComponent, final ValueControl<String> editControl, final Flow flow)
 	{
 		super(textComponent, Text.TEXT_PROPERTY, editControl, flow);	//construct the parent class with a flow layout
 	}

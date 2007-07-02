@@ -31,7 +31,7 @@ For example, with a tether bearing of 250 and a tether resource key of "myTether
 </ul>
 @author Garret Wilson
 */
-public abstract class AbstractFlyoverFrame<C extends FlyoverFrame<C>> extends AbstractFrame<C> implements FlyoverFrame<C>
+public abstract class AbstractFlyoverFrame extends AbstractFrame implements FlyoverFrame
 {
 /**TODO del comment if no longer accurate
 	For example, with a tether bearing of 250 and a tether resource key of "myTether", a resource key will be requested using "myTether.WSW", "myTether.SWbW", "myTether.SW", etc.
@@ -142,7 +142,7 @@ public abstract class AbstractFlyoverFrame<C extends FlyoverFrame<C>> extends Ab
 	/**Component constructor.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
 	*/
-	public AbstractFlyoverFrame(final Component<?> component)
+	public AbstractFlyoverFrame(final Component component)
 	{
 		super(component);	//construct the parent class
 		setModal(false);	//default to being a nonmodal frame

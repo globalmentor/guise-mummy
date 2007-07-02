@@ -12,7 +12,7 @@ Otherwise, an action sets the selected state to <code>true</code>.
 The control defaults to auto-select mode. If this mode is turned off, no selection or toggling occurs automatically when the action occurs.
 @author Garret Wilson
 */
-public interface SelectActionControl<C extends SelectActionControl<C>> extends ActionControl<C>, Selectable
+public interface SelectActionControl extends ActionControl, Selectable
 {
 	/**The auto-select bound property.*/
 	public final static String AUTO_SELECT_PROPERTY=getPropertyName(SelectActionControl.class, "autoSelect");

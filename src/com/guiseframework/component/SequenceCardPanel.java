@@ -17,14 +17,13 @@ import com.guiseframework.event.ActionListener;
 import com.guiseframework.model.*;
 import com.guiseframework.prototype.ActionPrototype;
 import static com.guiseframework.theme.Theme.*;
-import com.guiseframework.validator.*;
 
 /**A card panel representing a sequence of cards.
 If any card has constraints of {@link TaskCardConstraints}, this class will update the task state based upon visited and validated status.
 @author Garret Wilson
 @see CardLayout
 */
-public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> implements Commitable
+public class SequenceCardPanel extends AbstractCardPanel implements Commitable
 {
 
 	/**The bound property of the sequence state.*/
@@ -124,7 +123,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 					final int currentIndex=getSelectedIndex();	//get the currently selected index
 					if(currentIndex>=0)	//if a card is selected
 					{
-						final Component<?> card=(Component<?>)propertyChangeEvent.getSource();	//get the card source of the event
+						final Component card=(Component)propertyChangeEvent.getSource();	//get the card source of the event
 						final int cardIndex=indexOf(card);	//get the index of the card
 						if(cardIndex>currentIndex)	//if this card is in front of the current card
 						{
@@ -205,14 +204,14 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 					};
 				});
 		addVetoableChangeListener(VALUE_PROPERTY, new SequenceCardVetoableChangeListener());	//do validation as needed on card changes
-		addPropertyChangeListener(VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Component<?>>()
+		addPropertyChangeListener(VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Component>()
 				{
-					public void propertyChange(final GenericPropertyChangeEvent<Component<?>> propertyChangeEvent)	//if the selected card changes
+					public void propertyChange(final GenericPropertyChangeEvent<Component> propertyChangeEvent)	//if the selected card changes
 					{
 						if(isTransitionEnabled())	//if transitions are enabled
 						{
-							final Component<?> oldCard=propertyChangeEvent.getOldValue();
-							final Component<?> newCard=propertyChangeEvent.getNewValue();	//TODO comment all this
+							final Component oldCard=propertyChangeEvent.getOldValue();
+							final Component newCard=propertyChangeEvent.getNewValue();	//TODO comment all this
 							if(oldCard!=null)	//if there was an old card
 							{
 								final Constraints constraints=oldCard.getConstraints();
@@ -273,7 +272,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	@return <code>true</code> if the child components changed as a result of the operation.
 	@exception IllegalArgumentException if the component already has a parent.
 	*/
-	protected boolean addComponent(final int index, final Component<?> component)
+	protected boolean addComponent(final int index, final Component component)
 	{
 		final boolean result=super.addComponent(index, component);	//initialize the child component as needed
 		component.addPropertyChangeListener(DISPLAYED_PROPERTY, cardDisplayedChangeListener);	//listen for changes in the component's displayed status and make sure the sequence is disabled as needed
@@ -286,7 +285,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	@param component The component to remove from this component.
 	@return <code>true</code> if the child components changed as a result of the operation.
 	*/
-	protected boolean removeComponent(final Component<?> component)
+	protected boolean removeComponent(final Component component)
 	{
 		component.removePropertyChangeListener(DISPLAYED_PROPERTY, cardDisplayedChangeListener);	//stop listening for changes in the component's displayed status
 		return super.removeComponent(component);	//uninitialize the child component as needed
@@ -298,7 +297,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	@param oldValid The old valid property.
 	@param newValid The new valid property.
 	*/
-	protected void childComponentValidPropertyChanged(final Component<?> childComponent, final boolean oldValid, final boolean newValid)
+	protected void childComponentValidPropertyChanged(final Component childComponent, final boolean oldValid, final boolean newValid)
 	{
 		super.childComponentValidPropertyChanged(childComponent, oldValid, newValid);	//call the parent version
 		final Constraints constraints=childComponent.getConstraints();	//get the child component constraints
@@ -320,9 +319,9 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	@see #VALUE_PROPERTY
 	*/
 /*TODO del
-	public void setValue(final Component<?> newValue) throws ValidationException
+	public void setValue(final Component newValue) throws ValidationException
 	{
-		final Component<?> currentCard=getValue();	//get the currently selected card
+		final Component currentCard=getValue();	//get the currently selected card
 		if(currentCard!=null)	//if there is a selected card, do validation if we need to
 		{
 			final int selectedIndex=indexOf(currentCard);	//get the index of the selected card
@@ -361,9 +360,9 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	Components that are not displayed or not enabled based upon their associated constraints are skipped.
 	@return The previous component in the sequence, or <code>null</code> if there is no previous component in the sequence.
 	*/
-	public Component<?> getPrevious()
+	public Component getPrevious()
 	{
-		final Component<?> selectedComponent=getSelectedValue();	//get the selected component
+		final Component selectedComponent=getSelectedValue();	//get the selected component
 		return selectedComponent!=null ? getPrevious(selectedComponent) : null;	//return the previous component of the selected component, or null if no component is selected
 	}
 
@@ -373,7 +372,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	@return The previous component in the sequence, or <code>null</code> if there is no previous component in the sequence.
 	@exception NullPointerException if the given component is <code>null</code>.
 	*/
-	protected Component<?> getPrevious(final Component<?> component)
+	protected Component getPrevious(final Component component)
 	{
 			//TODO check for null and throw an exception instead of this lenient check
 		final int selectedIndex=indexOf(component);	//get the index of the given component
@@ -381,7 +380,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 		{
 			for(int i=selectedIndex-1; i>=0; --i)	//for each previous card
 			{
-				final Component<?> card=get(i);	//get this card
+				final Component card=get(i);	//get this card
 				if(isDisplayed(card) && isEnabled(card))	//if the card is displayed and enabled
 				{
 					return card;	//return this card
@@ -404,7 +403,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	Components that are not displayed or not enabled based upon their associated constraints are skipped.
 	@return The next component in the sequence, or <code>null</code> if there is no next component in the sequence.
 	*/
-	public Component<?> getNext()
+	public Component getNext()
 	{
 		final int selectedIndex=getSelectedIndex();	//get the selected index
 		if(selectedIndex>=0)	//if a card is selected
@@ -412,7 +411,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 			final int cardCount=size();	//find out how many cards there are
 			for(int i=selectedIndex+1; i<cardCount; ++i)	//for each next card
 			{
-				final Component<?> card=get(i);	//get this card
+				final Component card=get(i);	//get this card
 				if(isDisplayed(card))	//if the card is displayed
 //TODO decide; currently we need to get disabled cards so that we can enable them				if(isDisplayed(card) && isEnabled(card))	//if the card is displayed and enabled
 				{
@@ -433,12 +432,12 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 		transition=SequenceTransition.PREVIOUS;	//indicate the current transition
 		try
 		{
-			final Component<?> previousCard=getPrevious();	//get the previous card
+			final Component previousCard=getPrevious();	//get the previous card
 			if(previousCard!=null)	//if there is a previous card
 			{
 				try
 				{
-					final Component<?> selectedCard=getSelectedValue();	//get the selected card
+					final Component selectedCard=getSelectedValue();	//get the selected card
 					assert selectedCard!=null : "No card selected, even though hasPrevious() should have returned false if no card is selected.";
 	//				try
 					{
@@ -479,13 +478,13 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 		transition=SequenceTransition.NEXT;	//indicate the current transition
 		try
 		{
-			final Component<?> nextCard=getNext();	//get the next card
+			final Component nextCard=getNext();	//get the next card
 			if(nextCard!=null)	//if there is a next card
 			{
 				if(isTransitionEnabled())	//if transitions are enabled
 				{
 //				TODO del Debug.trace("got next card; ready to get selected card");
-					final Component<?> selectedCard=getSelectedValue();	//get the selected card
+					final Component selectedCard=getSelectedValue();	//get the selected card
 //TODO del Debug.trace("got next card", nextCard, "selected card", selectedCard);
 					assert selectedCard!=null : "No card selected, even though getNext() should have returned null if no card is selected.";
 //				TODO del Debug.trace("ready to validate selected card");
@@ -566,7 +565,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 		transition=SequenceTransition.NEXT;	//indicate the current transition
 		try
 		{
-			final Component<?> selectedCard=getSelectedValue();	//get the selected card
+			final Component selectedCard=getSelectedValue();	//get the selected card
 			if(selectedCard!=null)	//if a card is selected
 			{
 					//TODO decide if we want to disable validation if transitions are disabled
@@ -634,8 +633,8 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 			{
 //TODO fix				throw new AssertionError(validationException);	//TODO improve
 			}
-			final Component<?> selectedCard=getValue();	//get the selected card
-			for(final Component<?> card:this)	//for each card
+			final Component selectedCard=getValue();	//get the selected card
+			for(final Component card:this)	//for each card
 			{
 				final Constraints constraints=card.getConstraints();	//get the card constraints
 					//TODO ask the layout to create constraints, because the card may not yet have constraints
@@ -660,7 +659,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 		if(!super.validate())	//validate the component normally; if the component does not validate
 		{
 			Notification notification=getNotification();	//see if this panel has any notification
-			final Component<?> selectedCard=getValue();	//get the selected card
+			final Component selectedCard=getValue();	//get the selected card
 			if(selectedCard!=null)	//if there is a selected card
 			{
 				final Constraints constraints=selectedCard.getConstraints();	//get the current card constraints
@@ -693,7 +692,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	*/
 	public void commit() throws IOException
 	{
-		final Component<?> selectedCard=getSelectedValue();	//get the selected card
+		final Component selectedCard=getSelectedValue();	//get the selected card
 		if(selectedCard instanceof Commitable)	//if the selected card is committable
 		{
 			((Commitable)selectedCard).commit();	//tell the card to commit itself
@@ -720,7 +719,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	@param bookmark The bookmark for which a component should be returned, or <code>null</code> if no bookmark is available.
 	@return The child component indicated by the given bookmark parameter value, or <code>null</code> if the given bookmark represents the <code>null</code> component value.
 	*/
-	protected Component<?> getComponent(final Bookmark bookmark)
+	protected Component getComponent(final Bookmark bookmark)
 	{
 /*TODO del if not wanted; why did we put this in in the first place? will improving AbstractCardPanel to update the URL help, so that we will always have the correct bookmark?
 			//choose the first card if no card was specified
@@ -742,7 +741,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 			}
 		}
 */
-		Component<?> component=super.getComponent(bookmark);	//get the requested component normally
+		Component component=super.getComponent(bookmark);	//get the requested component normally
 		if(component!=null)	//if a component was requested
 		{
 			if(!isDisplayed(component) || !isEnabled(component))	//if the component is not displayed or not enabled
@@ -757,25 +756,25 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 	When {@link SequenceTransition#NEXT} occurs, validation is assumed to have already occurred and it not performed again.
 	@author Garret Wilson
 	*/
-	protected class SequenceCardVetoableChangeListener extends AbstractGenericVetoableChangeListener<Component<?>>
+	protected class SequenceCardVetoableChangeListener extends AbstractGenericVetoableChangeListener<Component>
 	{
 
 		/**Called when a constrained property is changed.
 		@param genericPropertyChangeEvent An event object describing the event source, the property that is changing, and its old and new values.
 		@exception PropertyVetoException if the recipient wishes the property change to be rolled back.
 		*/
-		public void vetoableChange(final GenericPropertyChangeEvent<Component<?>> genericPropertyChangeEvent) throws PropertyVetoException
+		public void vetoableChange(final GenericPropertyChangeEvent<Component> genericPropertyChangeEvent) throws PropertyVetoException
 		{
 			if(isTransitionEnabled() && genericPropertyChangeEvent.getNewValue()!=getValue())	//if transitions are enabled and the index is really changing (the VetoableChangeListener contract says that if a change is vetoed this method will be called again with a reverse change, and we don't want to validate in those circumstances)
 			{
 	//		TODO del Debug.trace("validating vetoable change");
-				final Component<?> currentCard=genericPropertyChangeEvent.getOldValue();	//get the currently selected card
+				final Component currentCard=genericPropertyChangeEvent.getOldValue();	//get the currently selected card
 				if(currentCard!=null)	//if there is a selected card, do validation if we need to
 				{
 					final int selectedIndex=indexOf(currentCard);	//get the index of the selected card
 	//			TODO del Debug.trace("selected index:", selectedIndex);
 					assert selectedIndex>=0 : "Expected selected card to be present in the container.";
-					final Component<?> newCard=genericPropertyChangeEvent.getNewValue();	//get the new card
+					final Component newCard=genericPropertyChangeEvent.getNewValue();	//get the new card
 					final int newIndex=indexOf(newCard);	//see what index the proposed new value has
 //TODO del					Debug.trace("selected index", selectedIndex, "new index", newIndex, "current selected index", getSelectedIndex());
 	/*TODO del
@@ -803,7 +802,7 @@ public class SequenceCardPanel extends AbstractCardPanel<SequenceCardPanel> impl
 						final int cardCount=size();	//find out how many cards there are
 						for(int i=selectedIndex+1; i<cardCount; ++i)	//for each next card
 						{
-							final Component<?> card=get(i);	//get this card
+							final Component card=get(i);	//get this card
 							if(isDisplayed(card) && isEnabled(card))	//if the card is displayed and enabled
 							{
 								hasNextCard=true;	//show that we have a next card

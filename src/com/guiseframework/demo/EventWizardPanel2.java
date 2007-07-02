@@ -17,7 +17,7 @@ public class EventWizardPanel2 extends DefaultNavigationPanel
 	public void initialize()
 	{
 		final SequenceCardPanel wizardCardPanel=(SequenceCardPanel)getComponentByName(this, "wizardCardPanel");
-		final Panel<?> personalAgePanel=(Panel<?>)getComponentByName(this, "personalAgePanel");
+		final Panel personalAgePanel=(Panel)getComponentByName(this, "personalAgePanel");
 		final CheckControl ageCheckControl=(CheckControl)getComponentByName(this, "ageCheckControl");
 		ageCheckControl.addPropertyChangeListener(CheckControl.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>()
 				{

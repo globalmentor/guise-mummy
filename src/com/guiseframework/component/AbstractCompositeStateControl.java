@@ -12,7 +12,7 @@ import com.guiseframework.model.*;
 @param <S> The component state of each object.
 @author Garret Wilson
 */
-public abstract class AbstractCompositeStateControl<T, S extends AbstractCompositeStateComponent.ComponentState, C extends CompositeComponent<C> & Control<C>> extends AbstractCompositeStateComponent<T, S, C> implements Control<C>	//TODO fire events when component states are added or removed so that AJAX updates can be sent
+public abstract class AbstractCompositeStateControl<T, S extends AbstractCompositeStateComponent.ComponentState> extends AbstractCompositeStateComponent<T, S> implements Control	//TODO fire events when component states are added or removed so that AJAX updates can be sent
 {
 
 	/**The enableable object decorated by this component.*/

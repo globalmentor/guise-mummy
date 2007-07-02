@@ -11,7 +11,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 @param <V> The type of values to select.
 @author Garret Wilson
 */
-public class TabControl<V> extends AbstractListSelectControl<V, TabControl<V>>
+public class TabControl<V> extends AbstractListSelectControl<V>
 {
 
 	/**The axis bound property.*/

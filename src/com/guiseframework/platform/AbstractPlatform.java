@@ -1,19 +1,33 @@
 package com.guiseframework.platform;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.*;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
+
 import com.garretwilson.util.*;
+import com.guiseframework.GuiseApplication;
 
 /**The platform on which Guise objects are being depicted.
 @author Garret Wilson
 */
-public abstract class AbstractGuisePlatform implements GuisePlatform
+public abstract class AbstractPlatform implements Platform
 {
+
+	/**The Guise application running on this platform.*/
+	private final GuiseApplication application;
+
+		/**@return The Guise application running on this platform.*/
+		public GuiseApplication getApplication() {return application;}
+
+	/**The lock used for exclusive depiction on the platform.*/
+	private Lock depictLock=new ReentrantLock();
+
+		/**@return The lock used for exclusive depiction on the platform.*/
+		public Lock getDepictLock() {return depictLock;}
 
 	/**The map of depictors for depicted object types.*/
 	private final Map<Class<? extends DepictedObject>, Class<? extends Depictor<?>>> depictorMap=new ConcurrentHashMap<Class<? extends DepictedObject>, Class<? extends Depictor<?>>>(); 
@@ -24,10 +38,10 @@ public abstract class AbstractGuisePlatform implements GuisePlatform
 		@param depictorClass The class of depictor to use for depicting the objects. 
 		@return The depictor class previously registered with the given depicted object class, or <code>null</code> if there was no previous registration.
 		*/
-		@SuppressWarnings("unchecked")	//all access classes to the map guarantee the type
-		protected <O extends DepictedObject> Class<? extends Depictor<? super O>> registerDepictorClass(final Class<O> depictedObjectClass, final Class<? extends Depictor<? super O>> depictorClass)
+		@SuppressWarnings("unchecked")	//it would be nice to guarantee Class<? extends Depictor<? super O>> access here, but Java classes do not support more than one level of generics
+		protected <O extends DepictedObject> Class<? extends Depictor<? super O>> registerDepictorClass(final Class<O> depictedObjectClass, final Class<?> depictorClass)
 		{
-			return (Class<? extends Depictor<? super O>>)depictorMap.put(depictedObjectClass, depictorClass);	//register the depictor and return the old registration, if any
+			return (Class<? extends Depictor<? super O>>)depictorMap.put(depictedObjectClass, (Class<? extends Depictor<?>>)depictorClass);	//register the depictor and return the old registration, if any
 		}
 	
 		/**Determines the depictor class registered for the given depicted object class.
@@ -101,7 +115,7 @@ public abstract class AbstractGuisePlatform implements GuisePlatform
 		*/
 		public void registerDepictedObject(final DepictedObject depictedObject)
 		{
-			idDepictedObjectMap.put(Long.valueOf(checkInstance(depictedObject, "Depicted object cannot be null.").getID()), depictedObject);
+			idDepictedObjectMap.put(Long.valueOf(checkInstance(depictedObject, "Depicted object cannot be null.").getDepictID()), depictedObject);
 		}
 	
 		/**Unregisters a depicted object so that no longer interacts with the platform.
@@ -110,7 +124,7 @@ public abstract class AbstractGuisePlatform implements GuisePlatform
 		*/
 		public void unregisterDepictedObject(final DepictedObject depictedObject)
 		{
-			idDepictedObjectMap.remove(Long.valueOf(checkInstance(depictedObject, "Depicted object cannot be null.").getID()));
+			idDepictedObjectMap.remove(Long.valueOf(checkInstance(depictedObject, "Depicted object cannot be null.").getDepictID()));
 		}
 
 		/**Retrieves a depicted object that has been registered with the platform by the ID of the depicted object.
@@ -144,4 +158,14 @@ public abstract class AbstractGuisePlatform implements GuisePlatform
 		@return <code>true</code> if the event was successfully queued for sending to the platform.
 		*/
 //TODO del if not needed		public boolean offerSendEvent(final PlatformEvent event) {return sendEventQueue.offer(event);}
+
+	/**Application constructor.
+	@param application The Guise application running on this platform.
+	@param environment The initial environment of the session.
+	@exception NullPointerException if the given application and/or environment is <code>null</code>.
+	*/
+	public AbstractPlatform(final GuiseApplication application)
+	{
+		this.application=checkInstance(application, "Application cannot be null.");	//save the application		
+	}
 }

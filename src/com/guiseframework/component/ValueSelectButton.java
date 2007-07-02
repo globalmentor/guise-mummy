@@ -6,7 +6,7 @@ import com.guiseframework.model.*;
 @param <V> The type of value the control represents.
 @author Garret Wilson
 */
-public class ValueSelectButton<V> extends AbstractSelectActionValueControl<V, ValueSelectButton<V>> implements SelectButtonControl<ValueSelectButton<V>>
+public class ValueSelectButton<V> extends AbstractSelectActionValueControl<V> implements SelectButtonControl
 {
 
 	/**Value class constructor.

@@ -9,14 +9,14 @@ Iterating over child components is thread safe.
 @param <E> The enum to index child components. 
 @author Garret Wilson
 */
-public abstract class AbstractEnumCompositeComponent<E extends Enum<E>, C extends CompositeComponent<C>> extends AbstractArrayCompositeComponent<C>
+public abstract class AbstractEnumCompositeComponent<E extends Enum<E>> extends AbstractArrayCompositeComponent
 {
 
   /**Returns the component for the given enum value.
   @param e The enum value indicating the component to return.
 	@return The component associated with the given enum value.
 	*/
-	protected Component<?> getComponent(final E e)
+	protected Component getComponent(final E e)
 	{
 		return super.getComponent(e.ordinal());	//look up the component in the array
 	}
@@ -30,7 +30,7 @@ public abstract class AbstractEnumCompositeComponent<E extends Enum<E>, C extend
 	@see #addComponent(Component)
 	@see #removeComponent(Component)
 	*/
-	protected Component<?> setComponent(final E e, final Component<?> newComponent)
+	protected Component setComponent(final E e, final Component newComponent)
 	{
 		return super.setComponent(e.ordinal(), newComponent);	//look up the component in the array
 	}

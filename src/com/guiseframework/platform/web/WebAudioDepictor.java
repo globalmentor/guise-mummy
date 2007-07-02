@@ -10,6 +10,7 @@ import com.garretwilson.util.*;
 
 import com.guiseframework.audio.Audio;
 import com.guiseframework.model.TaskState;
+import com.guiseframework.platform.DepictEvent;
 import com.guiseframework.platform.PlatformEvent;
 
 /**A web depictor for Guise audio.
@@ -87,14 +88,19 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 
 	/**Processes an event from the platform.
 	@param event The event to be processed.
+	@exception IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
 	*/
 	public void processEvent(final PlatformEvent event)
 	{
 		if(event instanceof WebChangeEvent)	//if a property changed
 		{
-			final WebChangeEvent changeEvent=(WebChangeEvent)event;	//get the web change event
-			final Audio audio=(Audio)changeEvent.getDepictedObject();	//get the depicted object
-			final Map<String, Object> properties=changeEvent.getProperties();	//get the new properties
+			final WebChangeEvent webChangeEvent=(WebChangeEvent)event;	//get the web change event
+			final Audio audio=getDepictedObject();	//get the depicted object
+			if(webChangeEvent.getDepictedObject()!=audio)	//if the event was meant for another depicted object
+			{
+				throw new IllegalArgumentException("Depict event "+event+" meant for depicted object "+webChangeEvent.getDepictedObject());
+			}
+			final Map<String, Object> properties=webChangeEvent.getProperties();	//get the new properties
 			final String stateString=asInstance(properties.get("state"), String.class);	//get the new state TODO use a constant
 			if(stateString!=null)	//if a state was given
 			{
@@ -105,8 +111,7 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 			{
 				final Number duration=asInstance(properties.get("duration"), Number.class);	//get the duration, if reported
 				audio.updateTimeProgress(position.longValue()*1000, duration!=null ? duration.longValue()*1000 : -1);	//update the audio position, converting from milliseconds to microseconds
-			}
-			
+			}			
 		}
 	}
 

@@ -6,7 +6,7 @@ import com.garretwilson.lang.ObjectUtilities;
 @param <R> The type of modal result this modal frame produces.
 @author Garret Wilson
 */
-public abstract class AbstractModalFrame<R, C extends ModalFrame<R, C>> extends AbstractFrame<C> implements ModalFrame<R, C>
+public abstract class AbstractModalFrame<R> extends AbstractFrame implements ModalFrame<R>
 {
 
 	/**The result of this frame's modal interaction, or <code>null</code> if no result is given.*/
@@ -33,7 +33,7 @@ public abstract class AbstractModalFrame<R, C extends ModalFrame<R, C>> extends 
 	/**Component constructor.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
 	*/
-	public AbstractModalFrame(final Component<?> component)
+	public AbstractModalFrame(final Component component)
 	{
 		super(component);	//construct the parent class
 	}

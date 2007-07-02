@@ -8,7 +8,7 @@ import com.guiseframework.component.Component;
 import com.guiseframework.component.LayoutComponent;
 import com.guiseframework.event.*;
 
-/**Abstract implementation of layout information for a container.
+/**Abstract implementation of layout information for a layout component.
 @param <T> The type of layout constraints associated with each component.
 This class and subclasses represent layout definitions, not layout implementations.
 @author Garret Wilson
@@ -42,7 +42,7 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 							public void propertyChange(final GenericPropertyChangeEvent<Constraints> propertyChangeEvent)	//if a component's constraints property changes
 							{
 									//indicate that the component's constraints changed, and update the constraints property listener
-								componentConstraintsChanged((Component<?>)propertyChangeEvent.getSource(), propertyChangeEvent.getOldValue(), propertyChangeEvent.getNewValue());
+								componentConstraintsChanged((Component)propertyChangeEvent.getSource(), propertyChangeEvent.getOldValue(), propertyChangeEvent.getNewValue());
 							}					
 						};
 			}
@@ -56,7 +56,7 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 	@param oldConstraints The old component constraints, or <code>null</code> if there were no constraints previously.
 	@param newConstraints The new component constraints, or <code>null</code> if the component now has no constraints.
 	*/
-	protected void componentConstraintsChanged(final Component<?> component, final Constraints oldConstraints, final Constraints newConstraints)
+	protected void componentConstraintsChanged(final Component component, final Constraints oldConstraints, final Constraints newConstraints)
 	{
 		final ConstraintsPropertyChangeListener constraintsPropertyChangeListener=getConstraintsPropertyChangeListener();	//get the constraints property change listener
 		if(oldConstraints!=null)	//if there were old constraints
@@ -70,49 +70,49 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 	}
 
 	/**The layout component that owns this layout, or <code>null</code> if this layout has not been installed into a layout component.*/
-	private LayoutComponent<?> owner=null;
+	private LayoutComponent owner=null;
 
 		/**@return The layout component that owns this layout, or <code>null</code> if this layout has not been installed into a layout component.*/
-		public LayoutComponent<?> getOwner() {return owner;}
+		public LayoutComponent getOwner() {return owner;}
 
 		/**Sets the layout component that owns this layout
-		This method is managed by containers, and normally should not be called by applications.
-//TODO del		A layout cannot be given a container if it is already installed in another container. Once a layout is installed in a container, it cannot be uninstalled.
-		A layout cannot be given a container if it is already installed in another container.
-		A layout cannot be given a container unless that container already recognizes this layout as its layout.
-		If a layout is given the same container it already has, no action occurs.
-		@param newOwner The new container for this layout.
-//TODO del		@exception NullPointerException if the given container is <code>null</code>.
-		@exception IllegalStateException if a different container is provided and this layout already has a container.
-		@exception IllegalArgumentException if a different container is provided and the given container does not already recognize this layout as its layout.
+		This method is managed by layout components, and normally should not be called by applications.
+//TODO del		A layout cannot be given a layout component if it is already installed in another layout component. Once a layout is installed in a layout component, it cannot be uninstalled.
+		A layout cannot be given a layout component if it is already installed in another layout component.
+		A layout cannot be given a layout component unless that layout component already recognizes this layout as its layout.
+		If a layout is given the same layout component it already has, no action occurs.
+		@param newOwner The new layout component for this layout.
+//TODO del		@exception NullPointerException if the given layout component is <code>null</code>.
+		@exception IllegalStateException if a different layout component is provided and this layout already has a layout component.
+		@exception IllegalArgumentException if a different layout component is provided and the given layout component does not already recognize this layout as its layout.
 		*/
-		public void setOwner(final LayoutComponent<?> newOwner)
+		public void setOwner(final LayoutComponent newOwner)
 		{
-			final LayoutComponent<?> oldOwner=owner;	//get the old component
+			final LayoutComponent oldOwner=owner;	//get the old component
 			if(oldOwner!=newOwner)	//if the component is really changing
 			{
 /*TODO fix
-				checkNull(newContainer, "Container cannot be null.");
+				checkNull(newContainer, "Layout component cannot be null.");
 				if(oldContainer!=null)	//if we already have a parent
 				{
-					throw new IllegalStateException("Layout "+this+" already has container: "+oldContainer);
+					throw new IllegalStateException("Layout "+this+" already has layout component: "+oldContainer);
 				}
 */
-				if(newOwner!=null && newOwner.getLayout()!=this)	//if the container that is not really our owner
+				if(newOwner!=null && newOwner.getLayout()!=this)	//if the layout component that is not really our owner
 				{
-					throw new IllegalArgumentException("Provided container "+newOwner+" is not really owner of layout "+this);
+					throw new IllegalArgumentException("Provided layout component "+newOwner+" is not really owner of layout "+this);
 				}
-				if(oldOwner!=null)	//if there was an old container
+				if(oldOwner!=null)	//if there was an old layout component
 				{
-					for(final Component<?> childComponent:oldOwner.getChildren())	//for each child component in the old container
+					for(final Component childComponent:oldOwner.getChildren())	//for each child component in the old layout component
 					{
 						removeComponent(childComponent);	//remove the old component from the layout
 					}
 				}
 				owner=newOwner;	//this is really our component; make a note of it
-				if(newOwner!=null)	//if there is a new container
+				if(newOwner!=null)	//if there is a new layout component
 				{
-					for(final Component<?> childComponent:newOwner.getChildren())	//for each child component in the new container
+					for(final Component childComponent:newOwner.getChildren())	//for each child component in the new layout component
 					{
 						addComponent(childComponent);	//add the new component to the layout
 					}
@@ -120,9 +120,9 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 			}
 		}
 
-	/**Lays out the associated container.
+	/**Lays out the associated layout component.
 	This version does nothing.
-	@exception IllegalStateException if this layout has not yet been installed into a container.
+	@exception IllegalStateException if this layout has not yet been installed into a layout component.
 	*/
 /*TODO del if not needed
 	public void layout()
@@ -131,17 +131,17 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 */
 
 	/**Adds a component to the layout.
-	Called immediately after a component is added to the associated container.
-	This method is called by the associated container, and should not be called directly by application code.
+	Called immediately after a component is added to the associated layout component.
+	This method is called by the associated layout component, and should not be called directly by application code.
 	@param component The component to add to the layout.
-	@exception IllegalStateException if this layout has not yet been installed into a container.
+	@exception IllegalStateException if this layout has not yet been installed into a layout component.
 	*/
-	public void addComponent(final Component<?> component)
+	public void addComponent(final Component component)
 	{
-		final LayoutComponent<?> owner=getOwner();	//get the layout's owner
+		final LayoutComponent owner=getOwner();	//get the layout's owner
 		if(owner==null)	//if we haven't been installed into an owner
 		{
-			throw new IllegalStateException("Layout does not have container.");
+			throw new IllegalStateException("Layout does not have an owner layout component.");
 		}
 //TODO del		final Constraints constraints=getConstraints(component);	//get the component constraints, installing appropriate constraints if necessary
 		final Constraints constraints=component.getConstraints();	//get the component constraints, ignoring whether they are appropriate for this layout, because the components may be added with constraints for another layout before that layout is installed
@@ -153,16 +153,16 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 	}
 
 	/**Removes a component from the layout.
-	Called immediately before a component is removed from the associated container.
-	This method is called by the associated container, and should not be called directly by application code.
+	Called immediately before a component is removed from the associated layout component.
+	This method is called by the associated layout component, and should not be called directly by application code.
 	@param component The component to remove from the layout.
 	*/
-	public void removeComponent(final Component<?> component)
+	public void removeComponent(final Component component)
 	{
-		final LayoutComponent<?> owner=getOwner();	//get the layout's owner
+		final LayoutComponent owner=getOwner();	//get the layout's owner
 		if(owner==null)	//if we haven't been installed into a owner
 		{
-			throw new IllegalStateException("Layout does not have container.");
+			throw new IllegalStateException("Layout does not have an owner layout component.");
 		}		
 		component.removePropertyChangeListener(Component.CONSTRAINTS_PROPERTY, getComponentConstraintsChangeListener());	//stop listening for the component's constraints property changing
 		final Constraints constraints=component.getConstraints();	//get the component constraints
@@ -178,18 +178,18 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 		default constraints are created and associated with the component.
 	@param component The component for which layout metadata is being requested.
 	@return The constraints associated with the component.
-	@exception IllegalStateException if this layout has not yet been installed into a container.
+	@exception IllegalStateException if this layout has not yet been installed into a layout component.
 	@exception IllegalStateException if no constraints are associated with the given component and this layout does not support default constraints.
 	@see #getConstraintsClass()
 	@see Component#getConstraints()
 	@see Component#setConstraints(Constraints)
 	*/
-	public T getConstraints(final Component<?> component)
+	public T getConstraints(final Component component)
 	{
-		final LayoutComponent<?> layoutComponent=getOwner();	//get the layout's container
-		if(layoutComponent==null)	//if we haven't been installed into a container
+		final LayoutComponent layoutComponent=getOwner();	//get the layout's layout component
+		if(layoutComponent==null)	//if we haven't been installed into a layout component
 		{
-			throw new IllegalStateException("Layout does not have container.");
+			throw new IllegalStateException("Layout does not have an owner layout component.");
 		}
 		final Class<? extends T> constraintsClass=getConstraintsClass();	//get the type of constraints we expect
 		Constraints constraints=component.getConstraints();	//get the constraints associated with the component
@@ -212,7 +212,7 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 	@param newValue The new property value.
 	@see LayoutConstraintsPropertyChangeEvent
 	*/
-	protected <V> void fireConstraintsPropertyChange(final Component<?> component, final T constraints, final String propertyName, final V oldValue, final V newValue)
+	protected <V> void fireConstraintsPropertyChange(final Component component, final T constraints, final String propertyName, final V oldValue, final V newValue)
 	{
 		if(hasPropertyChangeListeners(propertyName)) //if we have listeners registered for this property
 		{
@@ -244,7 +244,7 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 			{
 				final T layoutConstraints=constraintsClass.cast(constraints);	//cast the constraints to this layout's type
 					//find the component for these constraints
-				for(final Component<?> childComponent:getOwner().getChildren())	//for each child component in the container
+				for(final Component childComponent:getOwner().getChildren())	//for each child component in the layout component
 				{
 					if(childComponent.getConstraints()==constraints)	//if this component was associated with the constraints
 					{
@@ -261,7 +261,7 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 		@param oldValue The old property value.
 		@param newValue The new property value.
 		*/
-		protected <V> void refirePropertyChange(final Component<?> component, final T constraints, final String propertyName, final V oldValue, final V newValue)
+		protected <V> void refirePropertyChange(final Component component, final T constraints, final String propertyName, final V oldValue, final V newValue)
 		{
 //TODO del Debug.trace("Ready to fire an event indicating that component", componentConstraintsEntry.getKey(), "changed property", propertyChangeEvent.getPropertyName(), "to value", propertyChangeEvent.getNewValue());	//TODO del
 			//fire an event indicating that the constraints for this component changed one if its properties

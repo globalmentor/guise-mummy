@@ -11,7 +11,7 @@ By default rollover open is disabled.
 @author Garret Wilson
 @see Menu#setRolloverOpenEnabled
 */
-public class AccordionMenu extends AbstractMenu<AccordionMenu>
+public class AccordionMenu extends AbstractMenu
 {
 
 	/**Axis constructor.

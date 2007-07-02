@@ -13,7 +13,7 @@ import com.guiseframework.validator.ValidationException;
 The dialog is automatically closed when a date is selected.
 @author Garret Wilson
 */
-public class CalendarDialogFrame extends AbstractDialogFrame<Date, CalendarDialogFrame>
+public class CalendarDialogFrame extends AbstractDialogFrame<Date>
 {
 
 	/**@return The single calendar control child component.*/
@@ -24,7 +24,7 @@ public class CalendarDialogFrame extends AbstractDialogFrame<Date, CalendarDialo
 	@param newContent The single child component, or <code>null</code> if this frame does not have a child component.
 	@exception UnsupportedOperationException because the content cannot be changed.
 	*/
-	public void setContent(final Component<?> newContent)
+	public void setContent(final Component newContent)
 	{
 		throw new UnsupportedOperationException("Cannot change content component of "+getClass());
 	}

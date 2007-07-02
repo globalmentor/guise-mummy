@@ -3,7 +3,7 @@ package com.guiseframework.component;
 /**Default implementation of an application frame with no default component.
 @author Garret Wilson
 */
-public class DefaultApplicationFrame extends AbstractApplicationFrame<DefaultApplicationFrame>
+public class DefaultApplicationFrame extends AbstractApplicationFrame
 {
 
 	/**Default constructor.*/
@@ -15,7 +15,7 @@ public class DefaultApplicationFrame extends AbstractApplicationFrame<DefaultApp
 	/**Component constructor.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
 	*/
-	public DefaultApplicationFrame(final Component<?> component)
+	public DefaultApplicationFrame(final Component component)
 	{
 		super(component);	//construct the parent class
 	}

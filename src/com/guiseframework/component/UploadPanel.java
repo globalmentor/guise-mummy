@@ -23,7 +23,7 @@ import static com.guiseframework.theme.Theme.*;
 The destination path must be set before upload is initiated, otherwise an {@link IllegalStateException} will be thrown.
 @author Garret Wilson
 */
-public class UploadPanel extends AbstractPanel<UploadPanel>
+public class UploadPanel extends AbstractPanel
 {
 
 	/**The bound property of the destination path.*/
@@ -133,7 +133,7 @@ public class UploadPanel extends AbstractPanel<UploadPanel>
 		add(currentStatusLabel);
 		
 			//the horizontal panel of controls
-		final Panel<?> controlPanel=new LayoutPanel(new FlowLayout(Flow.LINE));
+		final Panel controlPanel=new LayoutPanel(new FlowLayout(Flow.LINE));
 		resourceCollectControl=new ResourceCollectControl();	//resource collector
 		controlPanel.add(resourceCollectControl);
 		uploadActionPrototype=new ActionPrototype(LABEL_UPLOAD, GLYPH_UPLOAD);	//resource upload

@@ -7,7 +7,7 @@ The panel's value model reflects the currently selected component, if any.
 @author Garret Wilson
 @see CardLayout
 */
-public class CardPanel extends AbstractCardPanel<CardPanel>
+public class CardPanel extends AbstractCardPanel
 {
 
 	/**Default constructor.*/

@@ -17,7 +17,14 @@ public interface Depictor<O extends DepictedObject>
 	public GuiseSession getSession();
 
 	/**@return The platform on which this depictor is depicting ojects.*/
-	public GuisePlatform getPlatform();
+	public Platform getPlatform();
+
+	/**Retrieves information and functionality related to the current depiction on the platform.
+	This method delegates to {@link Platform#getDepictContext()}.
+	@return A context for the current depiction.
+	@exception IllegalStateException if no depict context can be returned in the current depiction state.
+	*/
+	public DepictContext getDepictContext();
 
 	/**@return The object being depicted, or <code>null</code> if this depictor is not installed in a depicted object.*/
 	public O getDepictedObject();
@@ -48,13 +55,14 @@ public interface Depictor<O extends DepictedObject>
 
 	/**Processes an event from the platform.
 	@param event The event to be processed.
+	@exception IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
 	*/
 	public void processEvent(final PlatformEvent event);
 
-	/**Depicts the depicted object.
+	/**Updates the depiction of the object.
 	The depiction will be marked as updated.
 	@exception IOException if there is an error updating the depiction.
 	*/
-	public void update() throws IOException;
+	public void depict() throws IOException;
 
 }

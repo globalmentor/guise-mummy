@@ -12,17 +12,15 @@ import com.guiseframework.GuiseSession;
 import com.guiseframework.component.effect.Effect;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.component.transfer.*;
-import com.guiseframework.context.GuiseContext;
-import com.guiseframework.controller.*;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
 import com.guiseframework.input.Input;
 import com.guiseframework.input.InputStrategy;
 import com.guiseframework.model.*;
 import com.guiseframework.model.ui.PresentationModel;
-import com.guiseframework.platform.web.WebPlatformEvent;
+import com.guiseframework.platform.DepictedObject;
+import com.guiseframework.platform.Depictor;
 import com.guiseframework.theme.Theme;
-import com.guiseframework.viewer.Viewer;
 
 /**Base interface for all Guise components.
 Each component must provide either a Guise session constructor; or a Guise session and string ID constructor.
@@ -34,15 +32,13 @@ If a developer must hide sensitive data, the developer should remove the compone
 <p>For widest platform support the general {@link #ROUNDED_CORNER_RADIUS_EXTENT} constant should be used whenever possible when requesting rounded corners.</p>
 @author Garret Wilson
 */
-public interface Component<C extends Component<C>> extends PresentationModel, LabelModel
+public interface Component extends DepictedObject, PresentationModel, LabelModel
 {
 
 	/**The bound property of whether the component has bookmarks enabled.*/
 	public final static String BOOKMARK_ENABLED_PROPERTY=getPropertyName(Component.class, "bookmarkEnabled");
 	/**The bound property of the layout constraints.*/
 	public final static String CONSTRAINTS_PROPERTY=getPropertyName(Component.class, "constraints");
-	/**The bound property of the controller.*/
-	public final static String CONTROLLER_PROPERTY=getPropertyName(Component.class, "controller");
 	/**The description bound property.*/
 	public final static String DESCRIPTION_PROPERTY=getPropertyName(Component.class, "description");
 	/**The description content type bound property.*/
@@ -71,8 +67,9 @@ public interface Component<C extends Component<C>> extends PresentationModel, La
 	public final static String PROPERTIES_INITIALIZED_PROPERTY=getPropertyName(Component.class, "propertiesInitialized");
 	/**The valid bound property.*/
 	public final static String VALID_PROPERTY=getPropertyName(Component.class, "valid");
-	/**The bound property of the viewer.*/
-	public final static String VIEWER_PROPERTY=getPropertyName(Component.class, "viewer");
+
+	/**@return The depictor for this component.*/
+	public Depictor<? extends Component> getDepictor();
 
 	/**Adds a property to be saved and loaded as a preference.
 	@param propertyName The property to store as a preference.
@@ -190,31 +187,6 @@ public interface Component<C extends Component<C>> extends PresentationModel, La
 	*/
 	public void setNotification(final Notification newNotification);
 
-	/**@return The controller installed in this component.*/
-	public Controller<? extends GuiseContext, ? super C> getController();
-
-	/**Sets the controller used by this component.
-	This is a bound property.
-	@param newController The new controller to use.
-	@see #CONTROLLER_PROPERTY
-	@exception NullPointerException if the given controller is <code>null</code>.
-	*/
-	public void setController(final Controller<? extends GuiseContext, ? super C> newController);
-
-	/**@return The view installed in this component.*/
-	public Viewer<? extends GuiseContext, ? super C> getViewer();
-
-	/**Sets the viewer used by this component.
-	This is a bound property.
-	@param newViewer The new viewer to use.
-	@see #VIEWER_PROPERTY
-	@exception NullPointerException if the given viewer is <code>null</code>.
-	*/
-	public void setViewer(final Viewer<? extends GuiseContext, ? super C> newViewer);
-
-	/**@return The component identifier.*/
-	public String getID();
-
 	/**Returns this component's requested orientation.
 	To resolve the orientation up the hierarchy, {@link #getComponentOrientation()} should be used.
 	@return The internationalization orientation of the component's contents, or <code>null</code> if the default orientation should be used.
@@ -240,14 +212,14 @@ public interface Component<C extends Component<C>> extends PresentationModel, La
 	public void setOrientation(final Orientation newOrientation);
 
 	/**@return The parent of this component, or <code>null</code> if this component does not have a parent.*/
-	public CompositeComponent<?> getParent();
+	public CompositeComponent getParent();
 
 	/**Retrieves the first ancestor of the given type.
 	@param <A> The type of ancestor component requested.
 	@param ancestorClass The class of ancestor component requested.
 	@return The first ancestor component of the given type, or <code>null</code> if this component has no such ancestor.
 	*/
-	public <A extends CompositeComponent<?>> A getAncestor(final Class<A> ancestorClass);
+	public <A extends CompositeComponent> A getAncestor(final Class<A> ancestorClass);
 
 	/**Sets the parent of this component.
 	This method is managed by containers, and normally should not be called by applications.
@@ -262,7 +234,7 @@ public interface Component<C extends Component<C>> extends PresentationModel, La
 	@see Container#add(Component)
 	@see Container#remove(Component)
 	*/
-	public void setParent(final CompositeComponent<?> newParent);
+	public void setParent(final CompositeComponent newParent);
 
 	/**@return Whether the component has dragging enabled.*/
 	public boolean isDragEnabled();
@@ -297,7 +269,7 @@ public interface Component<C extends Component<C>> extends PresentationModel, La
 	public void setFlyoverEnabled(final boolean newFlyoverEnabled);
 
 	/**@return The installed flyover strategy, or <code>null</code> if there is no flyover strategy installed.*/
-	public FlyoverStrategy<? super C> getFlyoverStrategy();
+	public FlyoverStrategy<?> getFlyoverStrategy();
 
 	/**Sets the strategy for controlling flyovers.
 	The flyover strategy will be registered as a mouse listener for this component.
@@ -305,7 +277,7 @@ public interface Component<C extends Component<C>> extends PresentationModel, La
 	@param newFlyoverStrategy The new flyover strategy, or <code>null</code> if there is no flyover strategy installed.
 	@see #FLYOVER_STRATEGY_PROPERTY 
 	*/
-	public void setFlyoverStrategy(final FlyoverStrategy<? super C> newFlyoverStrategy);
+	public void setFlyoverStrategy(final FlyoverStrategy<?> newFlyoverStrategy);
 
 	/**@return Whether the properties of this component have been initialized.*/
 	public boolean isPropertiesInitialized();
@@ -321,29 +293,29 @@ public interface Component<C extends Component<C>> extends PresentationModel, La
 	The export strategy will take precedence over any compatible export strategy previously added.
 	@param exportStrategy The export strategy to add.
 	*/
-	public void addExportStrategy(final ExportStrategy<? super C> exportStrategy);
+	public void addExportStrategy(final ExportStrategy<?> exportStrategy);
 
 	/**Removes an export strategy from the component.
 	@param exportStrategy The export strategy to remove.
 	*/
-	public void removeExportStrategy(final ExportStrategy<? super C> exportStrategy);
+	public void removeExportStrategy(final ExportStrategy<?> exportStrategy);
 
 	/**Exports data from the component.
 	Each export strategy, from last to first added, will be asked to export data, until one is successful.
 	@return The object to be transferred, or <code>null</code> if no data can be transferred.
 	*/
-	public Transferable exportTransfer();
+	public Transferable<?> exportTransfer();	//TODO del when move to DepictedObject is complete
 
 	/**Adds an import strategy to the component.
 	The import strategy will take prececence over any compatible import strategy previously added.
 	@param importStrategy The importstrategy to add.
 	*/
-	public void addImportStrategy(final ImportStrategy<? super C> importStrategy);
+	public void addImportStrategy(final ImportStrategy<?> importStrategy);
 
 	/**Removes an import strategy from the component.
 	@param importStrategy The import strategy to remove.
 	*/
-	public void removeImportStrategy(final ImportStrategy<? super C> importStrategy);
+	public void removeImportStrategy(final ImportStrategy<?> importStrategy);
 
 	/**Imports data to the component.
 	Each import strategy, from last to first added, will be asked to import data, until one is successful.
@@ -367,25 +339,6 @@ public interface Component<C extends Component<C>> extends PresentationModel, La
 	@return The current state of {@link #isValid()} as a convenience.
 	*/
 	public boolean validate();
-
-	/**Processes an event for the component.
-	This method should not normally be called directly by applications.
-	This method delegates to the installed controller.
-	@param event The event to be processed.
-	@see #getController()
-	@see GuiseContext.State#PROCESS_EVENT
-	*/
-	public void processEvent(final WebPlatformEvent event);
-
-	/**Updates the view of this component.
-	This method should not normally be called directly by applications.
-	This method delegates to the installed view.
-	@param context Guise context information.
-	@exception IOException if there is an error updating the view.
-	@see #getViewer()
-	@see GuiseContext.State#UPDATE_VIEW
-	*/
-	public <GC extends GuiseContext> void updateView(final GC context) throws IOException;
 
 	/**Update's this object's properties.
 	This method checks whether properties have been updated for this object.
@@ -561,7 +514,7 @@ public interface Component<C extends Component<C>> extends PresentationModel, La
 	@param <S> The type of component for which this object is to control flyovers.
 	@author Garret Wilson
 	*/
-	public interface FlyoverStrategy<S extends Component<?>> extends MouseListener
+	public interface FlyoverStrategy<S extends Component> extends MouseListener
 	{
 		/**@return The requested line extent (width in left-to-right top-to-bottom orientation) of the flyover component, or <code>null</code> if no preferred line extent has been specified.*/
 		public Extent getLineExtent();

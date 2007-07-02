@@ -22,7 +22,7 @@ and the command {@link ProcessCommand#ABORT} to {@link #getRejectActionPrototype
 @param <EC> The type of component being edited.
 @author Garret Wilson
 */
-public abstract class AbstractEditableComponentTextControl<EC extends Component<?>> extends AbstractContainerControl<AbstractEditableComponentTextControl<EC>> implements ModalComponent<AbstractEditableComponentTextControl.Mode, AbstractEditableComponentTextControl<EC>>  
+public abstract class AbstractEditableComponentTextControl<EC extends Component> extends AbstractContainerControl implements ModalComponent<AbstractEditableComponentTextControl.Mode>  
 {
 
 	/**The mode of this component; whether the component is being edited.*/
@@ -78,7 +78,7 @@ Debug.trace("mode changing to", newMode);
 			{
 				final Mode oldMode=mode;	//get the old value
 				mode=newMode;	//actually change the value
-				final ValueControl<String, ?> editControl=getEditControl();	//get the edit control
+				final ValueControl<String> editControl=getEditControl();	//get the edit control
 				if(newMode==Mode.EDIT)	//if we are switching to edit mode
 				{
 					try
@@ -126,10 +126,10 @@ Debug.trace("now edit control has value", editControl.getValue());
 */
 
 	/**The control used to edit the text.*/
-	private ValueControl<String, ?> editControl;
+	private ValueControl<String> editControl;
 
 		/**The control used to edit the text.*/
-		public ValueControl<String, ?> getEditControl() {return editControl;}
+		public ValueControl<String> getEditControl() {return editControl;}
 
 		/**Sets the control used to edit the text.
 		This is a bound property.
@@ -180,7 +180,7 @@ Debug.trace("now edit control has value", editControl.getValue());
 	@param flow The logical axis (line or page) along which information is flowed.
 	@exception NullPointerException if the edited component, value control, text property, and/or flow axis is <code>null</code>.
 	*/
-	public AbstractEditableComponentTextControl(final EC editedComponent, final String editedProperty, final ValueControl<String, ?> editControl, final Flow flow)
+	public AbstractEditableComponentTextControl(final EC editedComponent, final String editedProperty, final ValueControl<String> editControl, final Flow flow)
 	{
 		super(new FlowLayout(flow));	//construct the parent class with a flow layout
 		this.editedComponent=checkInstance(editedComponent, "Edited component cannot be null.");
@@ -291,7 +291,7 @@ Debug.trace("now edit control has value", editControl.getValue());
 		editedComponent.setDisplayed(mode==null);	//only show the edited component if we're not editing
 		final String label=getText(editedComponent);	//get the current text of the edited component
 			//edit control
-		final ValueControl<String, ?> editControl=getEditControl();
+		final ValueControl<String> editControl=getEditControl();
 		editControl.setDisplayed(mode==Mode.EDIT);	//only show the edit component if we're editing
 			//edit action prototype
 		final ActionPrototype editActionPrototype=getEditActionPrototype();

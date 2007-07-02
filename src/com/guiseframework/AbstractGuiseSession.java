@@ -21,23 +21,17 @@ import com.garretwilson.io.BOMInputStreamReader;
 import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.rdf.*;
 import com.garretwilson.rdf.ploop.PLOOPProcessor;
-import com.garretwilson.util.Debug;
-import com.garretwilson.util.ReadWriteLockMap;
-import com.garretwilson.util.DecoratorReadWriteLockMap;
+import com.garretwilson.util.*;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
-import com.guiseframework.context.GuiseContext;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.Extent;
 import com.guiseframework.input.*;
 import com.guiseframework.model.*;
-import com.guiseframework.platform.GuisePlatform;
+import com.guiseframework.platform.Platform;
 import com.guiseframework.prototype.*;
 import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
-
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import static com.garretwilson.io.FileConstants.*;
 import static com.garretwilson.io.FileUtilities.*;
@@ -53,6 +47,9 @@ import static com.garretwilson.text.FormatUtilities.*;
 import static com.garretwilson.text.xml.XMLUtilities.*;
 import static com.guiseframework.Resources.*;
 import static com.guiseframework.theme.Theme.*;
+
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 /**An abstract implementation that keeps track of the components of a user session.
 @author Garret Wilson
@@ -110,14 +107,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		}
 
 	/**The application frame, initialized during {@link #initialize()}.*/
-	private ApplicationFrame<?> applicationFrame=null;
+	private ApplicationFrame applicationFrame=null;
 
 		/**Returns the application frame, which is available after {@link #initialize()} has been called.
 		This method must not be called before initialization has occurred.
 		@return The application frame.
 		@exception IllegalStateException if this session has not yet been initialized.
 		*/
-		public ApplicationFrame<?> getApplicationFrame()
+		public ApplicationFrame getApplicationFrame()
 		{
 			if(applicationFrame==null)	//if this session has not yet been initialized
 			{
@@ -133,7 +130,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		private DocumentBuilder getDocumentBuilder() {return documentBuilder;}
 
 	/**The cache of components keyed to component destinations.*/
-	private final Map<ComponentDestination, Component<?>> destinationComponentMap=synchronizedMap(new HashMap<ComponentDestination, Component<?>>());
+	private final Map<ComponentDestination, Component> destinationComponentMap=synchronizedMap(new HashMap<ComponentDestination, Component>());
 
 	/**The map of preference resource descriptions keyed to classes. This is a temporary implementation that will later be replaced with a backing store based upon the current principal.*/
 	private final ReadWriteLockMap<Class<?>, RDFResource> classPreferencesMap=new DecoratorReadWriteLockMap<Class<?>, RDFResource>(new HashMap<Class<?>, RDFResource>());
@@ -181,17 +178,11 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			classPreferencesMap.put(checkInstance(objectClass, "Class cannot be null."), new DefaultRDFResource(checkInstance(preferences, "Preferences cannot be null.")));	//store a copy of the preferences in the map
 		}
 
-	/**The user local environment.*/
-	private final GuiseEnvironment environment;
-
-		/**@return The user local environment.*/
-		public GuiseEnvironment getEnvironment() {return environment;}
-
 	/**The platform on which Guise objects are depicted.*/
-	private final GuisePlatform platform;
+	private final Platform platform;
 
 		/**@return The platform on which Guise objects are depicted.*/
-		public GuisePlatform getPlatform() {return platform;}
+		public Platform getPlatform() {return platform;}
 
 	/**The strategy for processing input, or <code>null</code> if this session has no input strategy.*/
 	private InputStrategy inputStrategy=null;
@@ -752,15 +743,14 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		/**@return The action prototype for presenting application information.*/
 		public ActionPrototype getAboutApplicationActionPrototype() {return aboutApplicationActionPrototype;}
 
-	/**Constructor.
+	/**Application and platform constructor.
 	The session local will initially be set to the locale of the associated Guise application.
 	No operation must be performed inside the constructor that would require the presence of the Guise session within this thread group.
 	@param application The Guise application to which this session belongs.
-	@param environment The initial environment of the session.
 	@param platform The platform on which this session's objects are depicted.
-	@exception NullPointerException if the given application, environment, and/or platform is <code>null</code>.
+	@exception NullPointerException if the given application and/or platform is <code>null</code>.
 	*/
-	public AbstractGuiseSession(final GuiseApplication application, final GuiseEnvironment environment, final GuisePlatform platform)
+	public AbstractGuiseSession(final GuiseApplication application, final Platform platform)
 	{
 		this.application=checkInstance(application, "Application cannot be null.");	//save the application
 		this.baseURI=application.getContainer().getBaseURI().resolve(application.getBasePath());	//default to a base URI calculated from the application base path resolved to the container's base URI
@@ -772,7 +762,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		{
 			throw new AssertionError(parserConfigurationException);
 		}	
-		this.environment=checkInstance(environment, "Environment cannot be null.");	//save the environment
 		this.platform=checkInstance(platform, "Platform cannot be null.");	//save the platform
 		this.themeURI=application.getThemeURI();	//default to the application theme
 		this.locale=application.getLocales().get(0);	//default to the first application locale
@@ -791,7 +780,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 						aboutPanel.setNameLabel(APPLICATION_NAME);
 						aboutPanel.setVersionLabel(LABEL_VERSION+' '+APPLICATION_VERSION);
 						aboutPanel.setCopyrightLabel(APPLICATION_COPYRIGHT);
-						final Frame<?> aboutFrame=new NotificationOptionDialogFrame(aboutPanel, Notification.Option.OK);	//create an about frame
+						final Frame aboutFrame=new NotificationOptionDialogFrame(aboutPanel, Notification.Option.OK);	//create an about frame
 						aboutFrame.setLabel(LABEL_ABOUT+' '+APPLICATION_NAME);	//set the title
 						aboutFrame.open(true);	//show the about dialog
 					}
@@ -806,9 +795,9 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@exception NullPointerException if the destination is <code>null</code>.
 	@exception IllegalStateException if the component class bound to the destination does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
 	*/
-	public Component<?> getDestinationComponent(final ComponentDestination destination)
+	public Component getDestinationComponent(final ComponentDestination destination)
 	{
-		Component<?> component;	//we'll store the component here, either a cached component or a created component
+		Component component;	//we'll store the component here, either a cached component or a created component
 		synchronized(destinationComponentMap)	//don't allow the map to be modified while we access it
 		{
 			component=destinationComponentMap.get(destination);	//get cached component, if any
@@ -827,16 +816,16 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@return The component previously bound to the given destination, or <code>null</code> if no component was bound to the given destination.
 	@exception NullPointerException if the destination is <code>null</code>.
 	*/
-	public Component<?> releaseDestinationComponent(final ComponentDestination destination)
+	public Component releaseDestinationComponent(final ComponentDestination destination)
 	{
 		return destinationComponentMap.remove(destination);	//uncache the component
 	}
 
-	/**Retrieves the component bound to the given appplication context-relative path.
+	/**Retrieves the component bound to the given application context-relative path.
 	This is a convenience method that retrieves the component associated with the component destination for the given navigation path.
 	This method calls {@link GuiseApplication#getDestination(String)}.
 	This method calls {@link #getDestinationComponent(ComponentDestination)}.
-	@param path The appplication context-relative path within the Guise container context.
+	@param path The application context-relative path within the Guise container context.
 	@return The component bound to the given path. 
 	@exception NullPointerException if the path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
@@ -844,7 +833,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@exception IllegalStateException if the component class bound to the path does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
 	@see ComponentDestination
 	*/
-	public Component<?> getNavigationComponent(final String path)
+	public Component getNavigationComponent(final String path)
 	{
 		final Destination destination=getApplication().getDestination(path);	//get the destination associated with the given path
 		if(!(destination instanceof ComponentDestination))	//if the destination is not a component destination
@@ -859,9 +848,9 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@return The created component.
 	@exception IllegalStateException if the component class does not provide a default constructor, is an interface, is abstract, or throws an exception during instantiation.
 	*/
-	protected Component<?> createComponent(final Class<? extends Component<?>> componentClass)
+	protected Component createComponent(final Class<? extends Component> componentClass)
 	{
-		Component<?> component;	//we'll store the component here
+		Component component;	//we'll store the component here
 		try
 		{
 //TODO del			Debug.trace("***ready to create component for class", componentClass);
@@ -893,7 +882,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@see Component#initialize()
 	@see <a href="http://www.ploop.org/">PLOOP</a>
 	*/
-	public void initializeComponent(final Component<?> component)
+	public void initializeComponent(final Component component)
 	{
 		final Class<?> componentClass=component.getClass();	//get the class of the component
 		final String descriptionFilename=addExtension(getLocalName(componentClass), RDF_EXTENSION);	//create a name in the form ClassName.rdf
@@ -934,7 +923,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@exception IllegalStateException if the given component has already been initialized.
 	@see Component#initialize()
 	*/
-	public void initializeComponentFromResource(final Component<?> component, final String resourceKey)
+	public void initializeComponentFromResource(final Component component, final String resourceKey)
 	{
 		final String descriptionResource=getStringResource(resourceKey);	//get the description resource
 		try
@@ -957,7 +946,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@exception IllegalStateException if the given component has already been initialized.
 	@see Component#initialize()
 	*/
-	public void initializeComponent(final Component<?> component, final InputStream descriptionInputStream)
+	public void initializeComponent(final Component component, final InputStream descriptionInputStream)
 	{
 		try
 		{
@@ -1008,7 +997,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@param component The parent of the component tree to initialize.
 	*/
 /*TODO fix
-	protected static void initializeComponents(final Component<?> component)
+	protected static void initializeComponents(final Component component)
 	{
 		
 	}
@@ -1072,7 +1061,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@param modalNavigation The state of modal navigation.
 		@see #pushModalNavigation(ModalNavigation)
 		*/
-		public void beginModalNavigation(final ModalNavigationPanel<?, ?> modalNavigationPanel, final ModalNavigation modalNavigation)
+		public void beginModalNavigation(final ModalNavigationPanel<?> modalNavigationPanel, final ModalNavigation modalNavigation)
 		{
 			//TODO release the navigation panel, maybe, just in case
 			pushModalNavigation(modalNavigation);	//push the modal navigation onto the top of the modal navigation stack
@@ -1091,7 +1080,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@see Frame#getReferrerURI()
 		@see #releaseDestinationComponent(String)
 		*/
-		public boolean endModalNavigation(final ModalNavigationPanel<?, ?> modalNavigationPanel)
+		public boolean endModalNavigation(final ModalNavigationPanel<?> modalNavigationPanel)
 		{
 			final String navigationPath=getNavigationPath();	//get our current navigation path
 			final GuiseApplication application=getApplication();	//get the application
@@ -1249,7 +1238,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@see NavigationListener
 		@see NavigationEvent 
 		*/
-		protected void fireNavigated(final Component<?> component, final NavigationEvent navigationEvent)
+		protected void fireNavigated(final Component component, final NavigationEvent navigationEvent)
 		{
 			if(component instanceof NavigationListener)	//if the component is a navigation listener
 			{
@@ -1257,7 +1246,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			}
 			if(component instanceof CompositeComponent)	//if the component is a composite component
 			{
-				for(final Component<?> childComponent:((CompositeComponent<?>)component).getChildren())	//for every child component
+				for(final Component childComponent:((CompositeComponent)component).getChildren())	//for every child component
 				{
 					fireNavigated(childComponent, navigationEvent);	//fire the event to the child component if possible
 				}
@@ -1395,60 +1384,6 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			requestedNavigation=new ModalNavigation(getApplication().resolveURI(createPathURI(getNavigationPath())), getApplication().resolveURI(checkInstance(uri, "URI cannot be null.")), modalListener);	//resolve the URI against the application context path
 		}		
 
-	/**The object that listenes for context state changes and updates the set of context states in response.*/
-	private final ContextStateListener contextStateListener=new ContextStateListener();
-
-		/**@return The object that listenes for context state changes and updates the set of context states in response.*/
-		protected ContextStateListener getContextStateListener() {return contextStateListener;}
-
-	/**The unmodifiable set of all states of available Guise contexts.*/
-	private Set<GuiseContext.State> contextStateSet=emptySet();
-
-		/**@return The unmodifiable set of all states of available Guise contexts.*/
-		public Set<GuiseContext.State> getContextStates() {return contextStateSet;}
-
-	/**The current context for this session, or <code>null</code> if there currently is no context.*/
-	private GuiseContext context=null;
-
-		/**@return The current context for this session, or <code>null</code> if there currently is no context.*/
-		public synchronized GuiseContext getContext() {return context;}
-
-		/**Sets the current context.
-		This method should not normally be called by application code.
-		@param context The current context for this session, or <code>null</code> if there currently is no context.
-		*/
-		public synchronized void setContext(final GuiseContext context)
-		{
-			if(this.context!=context)	//if the context is really changing
-			{
-				final GuiseContext oldContext=this.context;	//save the old context
-				if(oldContext!=null)	//if there was a previous context
-				{
-					oldContext.removePropertyChangeListener(GuiseContext.STATE_PROPERTY, getContextStateListener());	//stop listening for context state changes					
-				}
-				this.context=context;	//set the context
-				if(context!=null)	//if a new context is given
-				{
-					context.addPropertyChangeListener(GuiseContext.STATE_PROPERTY, getContextStateListener());	//listen for context state changes and update the set of context states in response
-				}
-				updateContextStates();	//make sure the record of context states is up to date
-			}
-		}
-	
-		/**Checks the state of the current context.
-		If any model change events are pending and no context is processing an event, the model change events are processed.
-		@see GuiseContext.State#PROCESS_EVENT
-		@see #fireQueuedModelEvents()
-		*/
-		protected synchronized void updateContextStates()
-		{
-			final GuiseContext context=getContext();	//get the current context
-			if(context==null || context.getState()!=GuiseContext.State.PROCESS_EVENT)	//if the context is not processing an event
-			{
-				fireQueuedModelEvents();	//fire any queued events				
-			}
-		}
-
 	/**The synchronized list of postponed model events.*/
 	private final List<PostponedEvent<?>> queuedModelEventList=synchronizedList(new LinkedList<PostponedEvent<?>>());	//use a linked list because we'll be removing items from the front of the list as we process the events TODO fix; this doesn't seem to be the case anymore, so we can use a synchronized array list
 
@@ -1456,11 +1391,9 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		If a Guise context is currently processing events, the event will be queued for later.
 		If no Guise context is currently processing events, the event will be fired immediately.
 		@param postponedEvent The event to fire at a later time.
-		@see GuiseContext.State#PROCESS_EVENT
 		*/
 		public synchronized void queueEvent(final PostponedEvent<?> postponedEvent)
 		{
-			final GuiseContext context=getContext();	//get the current context
 //TODO fix; decide if we want to allow delayed events			if(context!=null && (context.getState()==GuiseContext.State.PROCESS_EVENT))	//if the context is processing an event
 			if(false)	//TODO fix; testing
 			{
@@ -1558,25 +1491,11 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		queueEvent(createPostponedPropertyChangeEvent(propertyChangeEvent));	//create and queue a postponed property change event
 	}
 
-	/**The class that listens for context state changes and updates the context state set in response.
-	@author Garret Wilson
-	*/
-	protected class ContextStateListener extends AbstractGenericPropertyChangeListener<GuiseContext.State>
-	{
-		/**Called when a bound property is changed.
-		@param propertyChangeEvent An event object describing the event source, the property that has changed, and its old and new values.
-		*/
-		public void propertyChange(final GenericPropertyChangeEvent<GuiseContext.State> propertyChangeEvent)
-		{
-			updateContextStates();	//update the context states when a context state changes
-		}
-	}
-
 	/**Creates a component to indicate Guise busy status.
 	@return A component to indicate Guise busy status.
 	@see Theme#GLYPH_BUSY
 	*/
-	public Component<?> createBusyComponent()
+	public Component createBusyComponent()
 	{
 		return new DefaultBusyPanel();	//create the default busy panel
 	}

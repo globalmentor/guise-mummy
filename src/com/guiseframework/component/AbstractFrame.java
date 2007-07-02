@@ -13,7 +13,6 @@ import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.util.Debug;
 
 import static com.guiseframework.GuiseResourceConstants.*;
-import static com.guiseframework.Resources.*;
 import static com.guiseframework.theme.Theme.*;
 
 import com.guiseframework.component.effect.Effect;
@@ -25,7 +24,7 @@ import com.guiseframework.prototype.*;
 This implementation notifies the user when the frame does not validate in {@link #validate()}.
 @author Garret Wilson
 */
-public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumCompositeComponent<AbstractFrame.FrameComponent, C> implements Frame<C>, PrototypeConsumer
+public abstract class AbstractFrame extends AbstractEnumCompositeComponent<AbstractFrame.FrameComponent> implements Frame, PrototypeConsumer
 {
 
 	/**The enumeration of frame components.*/
@@ -150,21 +149,21 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 		}
 
 	/**The related component such as a popup source, or <code>null</code> if the frame is not related to another component.*/
-	private Component<?> relatedComponent=null;
+	private Component relatedComponent=null;
 
 		/**@return The related component such as a popup source, or <code>null</code> if the frame is not related to another component.*/
-		public Component<?> getRelatedComponent() {return relatedComponent;}
+		public Component getRelatedComponent() {return relatedComponent;}
 
 		/**Sets the related component.
 		This is a bound property.
 		@param newRelatedComponent The new related component, or <code>null</code> if the frame is not related to another component.
 		@see Frame#RELATED_COMPONENT_PROPERTY 
 		*/
-		public void setRelatedComponent(final Component<?> newRelatedComponent)
+		public void setRelatedComponent(final Component newRelatedComponent)
 		{
 			if(relatedComponent!=newRelatedComponent)	//if the value is really changing
 			{
-				final Component<?> oldRelatedComponent=relatedComponent;	//get the old value
+				final Component oldRelatedComponent=relatedComponent;	//get the old value
 				relatedComponent=newRelatedComponent;	//actually change the value
 				firePropertyChange(RELATED_COMPONENT_PROPERTY, oldRelatedComponent, newRelatedComponent);	//indicate that the value changed
 			}			
@@ -215,7 +214,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 	/**@return The content child component, or <code>null</code> if this frame does not have a content child component.
 	@see FrameComponent#CONTENT_COMPONENT
 	*/
-	public Component<?> getContent() {return getComponent(FrameComponent.CONTENT_COMPONENT);}
+	public Component getContent() {return getComponent(FrameComponent.CONTENT_COMPONENT);}
 
 	/**Sets the content child component.
 	This is a bound property.
@@ -223,9 +222,9 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 	@see FrameComponent#CONTENT_COMPONENT
 	@see ContentComponent#CONTENT_PROPERTY
 	*/
-	public void setContent(final Component<?> newContent)
+	public void setContent(final Component newContent)
 	{
-		final Component<?> oldContent=setComponent(FrameComponent.CONTENT_COMPONENT, newContent);	//set the component
+		final Component oldContent=setComponent(FrameComponent.CONTENT_COMPONENT, newContent);	//set the component
 		if(oldContent!=newContent)	//if the component really changed
 		{
 			firePropertyChange(CONTENT_PROPERTY, oldContent, newContent);	//indicate that the value changed
@@ -236,7 +235,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 	/**@return The frame menu, or <code>null</code> if this frame does not have a menu.
 	@see FrameComponent#MENU_COMPONENT
 	*/
-	public Menu<?> getMenu() {return (Menu<?>)getComponent(FrameComponent.MENU_COMPONENT);}
+	public Menu getMenu() {return (Menu)getComponent(FrameComponent.MENU_COMPONENT);}
 
 	/**Sets the frame menu.
 	This is a bound property.
@@ -244,9 +243,9 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 	@see FrameComponent#MENU_COMPONENT
 	@see #MENU_PROPERTY
 	*/
-	public void setMenu(final Menu<?> newMenu)
+	public void setMenu(final Menu newMenu)
 	{
-		final Menu<?> oldMenu=(Menu<?>)setComponent(FrameComponent.MENU_COMPONENT, newMenu);	//set the component
+		final Menu oldMenu=(Menu)setComponent(FrameComponent.MENU_COMPONENT, newMenu);	//set the component
 		if(oldMenu!=newMenu)	//if the component really changed
 		{
 			firePropertyChange(MENU_PROPERTY, oldMenu, newMenu);	//indicate that the value changed
@@ -297,7 +296,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 		{
 			addAll(prototypeInfos, ((PrototypeProducer)this).producePrototypes());	//collect produced prototypes from the frame
 		}
-		final Component<?> content=getContent();	//get the current content
+		final Component content=getContent();	//get the current content
 		if(content instanceof PrototypeProducer)	//if the content produces prototypes
 		{
 			addAll(prototypeInfos, ((PrototypeProducer)content).producePrototypes());	//collect produced prototypes from the content
@@ -311,7 +310,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 	/**@return The action control for closing the frame, or <code>null</code> if this frame does not have a close action control.
 	@see FrameComponent#CLOSE_ACTION_CONTROL
 	*/
-	public ActionControl<?> getCloseActionControl() {return (ActionControl<?>)getComponent(FrameComponent.CLOSE_ACTION_CONTROL);}
+	public ActionControl getCloseActionControl() {return (ActionControl)getComponent(FrameComponent.CLOSE_ACTION_CONTROL);}
 
 	/**Sets the action control for closing the frame.
 	This is a bound property.
@@ -319,9 +318,9 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 	@see FrameComponent#CLOSE_ACTION_CONTROL
 	@see Frame#CLOSE_ACTION_CONTROL_PROPERTY
 	*/
-	public void setCloseActionControl(final ActionControl<?> newCloseActionControl)
+	public void setCloseActionControl(final ActionControl newCloseActionControl)
 	{
-		final ActionControl<?> oldCloseActionControl=(ActionControl<?>)setComponent(FrameComponent.CLOSE_ACTION_CONTROL, newCloseActionControl);	//set the component
+		final ActionControl oldCloseActionControl=(ActionControl)setComponent(FrameComponent.CLOSE_ACTION_CONTROL, newCloseActionControl);	//set the component
 		if(oldCloseActionControl!=newCloseActionControl)	//if the component really changed
 		{
 			if(oldCloseActionControl!=null)	//if we had an old close action
@@ -359,13 +358,13 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 		}
 
 	/**The component within this group that has the input focus, or <code>null</code> if no component currently has the input focus.*/ 
-	private InputFocusableComponent<?> inputFocusedComponent=null;
+	private InputFocusableComponent inputFocusedComponent=null;
 
 		/**Indicates the component within this group that has the input focus.
 		The focused component may be another {@link InputFocusGroupComponent}, which in turn will have its own focused component.
 		@return The component within this group that has the input focus, or <code>null</code> if no component currently has the input focus.
 		*/ 
-		public InputFocusableComponent<?> getInputFocusedComponent() {return inputFocusedComponent;}
+		public InputFocusableComponent getInputFocusedComponent() {return inputFocusedComponent;}
 	
 		/**Sets the focused component within this input focus group.
 		This is a bound property.
@@ -374,7 +373,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 		@see #getInputFocusStrategy()
 		@see #INPUT_FOCUSED_COMPONENT_PROPERTY
 		*/
-		public void setInputFocusedComponent(final InputFocusableComponent<?> newInputFocusedComponent) throws PropertyVetoException 
+		public void setInputFocusedComponent(final InputFocusableComponent newInputFocusedComponent) throws PropertyVetoException 
 		{
 			if(!ObjectUtilities.equals(inputFocusedComponent, newInputFocusedComponent))	//if the value is really changing
 			{
@@ -393,7 +392,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 	/**Component constructor.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
 	*/
-	public AbstractFrame(final Component<?> component)
+	public AbstractFrame(final Component component)
 	{
 		super(FrameComponent.values());	//construct the parent class
 		closeActionListener=new ActionListener()	//create an action listener for closing
@@ -424,7 +423,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 	{
 		if(getState()==State.CLOSED)	//if the state is closed
 		{
-			final ApplicationFrame<?> applicationFrame=getSession().getApplicationFrame();	//get the application frame
+			final ApplicationFrame applicationFrame=getSession().getApplicationFrame();	//get the application frame
 			if(this!=applicationFrame)	//if this is not the application frame
 			{
 				getSession().getApplicationFrame().addChildFrame(this);	//add the frame to the application frame
@@ -490,7 +489,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 	protected void closeImpl()
 	{
 //TODO del Debug.trace("ready to remove frame");
-		final ApplicationFrame<?> applicationFrame=getSession().getApplicationFrame();	//get the application frame
+		final ApplicationFrame applicationFrame=getSession().getApplicationFrame();	//get the application frame
 		if(this!=applicationFrame)	//if this is not the application frame
 		{
 			getSession().getApplicationFrame().removeChildFrame(this);	//remove the frame from the application frame
@@ -510,7 +509,7 @@ public abstract class AbstractFrame<C extends Frame<C>> extends AbstractEnumComp
 			Notification notification=getNotification();	//see if this panel has any notification
 			if(notification==null)	//if we don't have a notification
 			{
-				final Component<?> contentComponent=getContent();	//get the content component
+				final Component contentComponent=getContent();	//get the content component
 				if(contentComponent!=null)	//if there is a content component
 				{
 					final List<Notification> notifications=getNotifications(contentComponent);	//get the notifications from the content component

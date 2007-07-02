@@ -14,7 +14,7 @@ import com.guiseframework.prototype.*;
 This implementation initially closes any child menu added to this menu.
 @author Garret Wilson
 */
-public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerControl<C> implements Menu<C>  
+public abstract class AbstractMenu extends AbstractContainerControl implements Menu  
 {
 
 	/**@return The layout definition for the menu.*/
@@ -253,13 +253,13 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 	@return <code>true</code> if the child components changed as a result of the operation.
 	@exception IllegalArgumentException if the component already has a parent.
 	*/
-	protected boolean addComponent(final int index, final Component<?> component)
+	protected boolean addComponent(final int index, final Component component)
 	{
 		if(super.addComponent(index, component))	//do the default adding; if a change occurred
 		{
 			if(component instanceof Menu)	//if the component is a menu
 			{
-				((Menu<?>)component).setOpen(false);	//close the child menu
+				((Menu)component).setOpen(false);	//close the child menu
 			}
 			return true;	//indicate that the child components changed
 		}
@@ -278,7 +278,7 @@ public abstract class AbstractMenu<C extends Menu<C>> extends AbstractContainerC
 	@return A new component based upon the given prototype.
 	@exception IllegalArgumentException if no component can be created from the given prototype
 	*/
-	public Component<?> createComponent(final Prototype prototype)
+	public Component createComponent(final Prototype prototype)
 	{
 		if(prototype instanceof ActionPrototype)	//action prototypes
 		{

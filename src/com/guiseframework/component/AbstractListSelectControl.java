@@ -18,7 +18,7 @@ This implementation does not yet fully support elements that appear more than on
 @param <V> The type of values to select.
 @author Garret Wilson
 */
-public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V, C> & CompositeComponent<C>> extends AbstractCompositeStateControl<V, AbstractListSelectControl.ValueComponentState, C> implements ListSelectControl<V, C>
+public abstract class AbstractListSelectControl<V> extends AbstractCompositeStateControl<V, AbstractListSelectControl.ValueComponentState> implements ListSelectControl<V>
 {
 
 	/**The list select model used by this component.*/
@@ -56,7 +56,7 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 	@return The child component representing the given object.
 	@exception IllegalArgumentException if the given object is not an appropriate object for a component to be created.
 	*/
-	public Component<?> getComponent(final V value)
+	public Component getComponent(final V value)
 	{
 		return super.getComponent(value);	//delegate to the parent version
 	}
@@ -70,7 +70,7 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 	{
 			//TODO assert that there is a representation strategy, or otherwise check
 			//TODO improve and/or change parameters
-		final Component<?> valueComponent=getValueRepresentationStrategy().createComponent(this, value, -1, false, false);	//create a new component for the value
+		final Component valueComponent=getValueRepresentationStrategy().createComponent(this, value, -1, false, false);	//create a new component for the value
 		return new ValueComponentState(valueComponent);	//create a new component state for the value's component and metadata
 	}
 
@@ -587,7 +587,7 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 		@param component The component for a tree node.
 		@exception NullPointerException if the given component is <code>null</code>.
 		*/
-		public ValueComponentState(final Component<?> component)
+		public ValueComponentState(final Component component)
 		{
 			super(component);	//construct the parent class
 		}
@@ -608,7 +608,7 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 			public Converter<VV, String> getConverter() {return converter;}
 
 		/**The component constructor that takes a single {@link LabelModel} argument.*/
-		private final Constructor<? extends Component<?>> componentLabelModelConstructor;
+		private final Constructor<? extends Component> componentLabelModelConstructor;
 
 		/**Value class constructor with a default converter.
 		This implementation uses a {@link DefaultStringLiteralConverter}.
@@ -617,7 +617,7 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 		@exception NullPointerException if the given value class and/or component class is <code>null</code>.
 		@exception IllegalArgumentException if the given component class does not have a constructor with a single {@link LabelModel} constructor.
 		*/
-		public ConverterLabelModelValueRepresentationStrategy(final Class<VV> valueClass, final Class<? extends Component<?>> componentClass)
+		public ConverterLabelModelValueRepresentationStrategy(final Class<VV> valueClass, final Class<? extends Component> componentClass)
 		{
 			this(componentClass, AbstractStringLiteralConverter.getInstance(valueClass));	//construct the class with the appropriate string literal converter
 		}
@@ -628,7 +628,7 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 		@exception NullPointerException if the given converter is <code>null</code>.
 		@exception IllegalArgumentException if the given component class does not have a constructor with a single {@link LabelModel} constructor.
 		*/
-		public ConverterLabelModelValueRepresentationStrategy(final Class<? extends Component<?>> componentClass, final Converter<VV, String> converter)
+		public ConverterLabelModelValueRepresentationStrategy(final Class<? extends Component> componentClass, final Converter<VV, String> converter)
 		{
 			this.converter=checkInstance(converter, "Converter cannot be null.");	//save the converter
 			componentLabelModelConstructor=getCompatibleConstructor(checkInstance(componentClass, "Component class cannot be null."), LabelModel.class);	//get the constructor for the component
@@ -648,7 +648,7 @@ public abstract class AbstractListSelectControl<V, C extends ListSelectControl<V
 		@return A new component to represent the given value.
 		@see #getConverter()
 		*/
-		public Component<?> createComponent(final ListSelectModel<VV> model, final VV value, final int index, final boolean selected, final boolean focused)
+		public Component createComponent(final ListSelectModel<VV> model, final VV value, final int index, final boolean selected, final boolean focused)
 		{
 			try
 			{

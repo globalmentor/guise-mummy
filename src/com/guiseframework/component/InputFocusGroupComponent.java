@@ -9,7 +9,7 @@ import com.guiseframework.event.InputFocusStrategy;
 /**An input focusable Guise component that serves as a parent of other components that can receive input focus.
 @author Garret Wilson
 */
-public interface InputFocusGroupComponent<C extends InputFocusGroupComponent<C>> extends InputFocusableComponent<C>
+public interface InputFocusGroupComponent extends InputFocusableComponent
 {
 
 	/**The input focus strategy bound property.*/
@@ -32,7 +32,7 @@ public interface InputFocusGroupComponent<C extends InputFocusGroupComponent<C>>
 	The focused component may be another {@link InputFocusGroupComponent}, which in turn will have its own focused component.
 	@return The component within this group that has the input focus, or <code>null</code> if no component currently has the input focus.
 	*/ 
-	public InputFocusableComponent<?> getInputFocusedComponent();
+	public InputFocusableComponent getInputFocusedComponent();
 
 	/**Sets the focused component within this input focus group.
 	This is a bound property.
@@ -41,7 +41,7 @@ public interface InputFocusGroupComponent<C extends InputFocusGroupComponent<C>>
 	@see #getInputFocusStrategy()
 	@see #INPUT_FOCUSED_COMPONENT_PROPERTY
 	*/
-	public void setInputFocusedComponent(final InputFocusableComponent<?> newInputFocusedComponent) throws PropertyVetoException; 
+	public void setInputFocusedComponent(final InputFocusableComponent newInputFocusedComponent) throws PropertyVetoException; 
 
 	/**Indicates the leaf component within this group that has the focus.
 	If this group's focused component is another {@link FocusGroupComponent}, the leaf focus component component is recursively retrieved from that component.
@@ -49,6 +49,6 @@ public interface InputFocusGroupComponent<C extends InputFocusGroupComponent<C>>
 	If there is no focused component within this focus group, this method returns <code>null</code>.
 	@return The leaf component within this group that has the focus, or <code>null</code> if no leaf focusable component within this group currently has the focus.
 	*/ 
-//TODO move to ApplicationFrame	public FocusableComponent<?> getLeafFocusedComponent();
+//TODO move to ApplicationFrame	public FocusableComponent getLeafFocusedComponent();
 
 }

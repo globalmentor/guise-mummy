@@ -7,7 +7,7 @@ This class, which has no particular semantics, is used for laying out child comp
 @author Garret Wilson
 @see ScrollPanel
 */
-public class LayoutPanel extends AbstractPanel<LayoutPanel>
+public class LayoutPanel extends AbstractPanel
 {
 	
 	/**Default constructor with a default vertical flow layout.*/

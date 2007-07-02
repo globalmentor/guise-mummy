@@ -11,7 +11,7 @@ import com.guiseframework.prototype.ActionPrototype;
 /**An image component that is also an action control.
 @author Garret Wilson
 */
-public class ImageActionControl extends AbstractImageComponent<ImageActionControl> implements ActionControl<ImageActionControl>
+public class ImageActionControl extends AbstractImageComponent implements ActionControl
 {
 
 	/**The action model used by this component.*/

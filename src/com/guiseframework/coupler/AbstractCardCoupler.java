@@ -37,9 +37,9 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 	private boolean updatingSelected=false;
 	
 	/**The property change listener to listen for the selected card changing.*/
-	private final GenericPropertyChangeListener<Component<?>> selectedCardChangeListener=new AbstractGenericPropertyChangeListener<Component<?>>()
+	private final GenericPropertyChangeListener<Component> selectedCardChangeListener=new AbstractGenericPropertyChangeListener<Component>()
 		{
-			public void propertyChange(final GenericPropertyChangeEvent<Component<?>> propertyChangeEvent)	//if the selected card changes
+			public void propertyChange(final GenericPropertyChangeEvent<Component> propertyChangeEvent)	//if the selected card changes
 			{
 				updateSelected();	//update the selected status
 			}		
@@ -91,22 +91,22 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 		};
 
 	/**The thread-safe list of connected cards.*/
-	private List<Component<?>> cards=emptyList(); 
+	private List<Component> cards=emptyList(); 
 		
 		/**@return The connected cards.*/
-		public List<Component<?>> getCards() {return new ArrayList<Component<?>>(cards);}	//return a copy of the cards list 
+		public List<Component> getCards() {return new ArrayList<Component>(cards);}	//return a copy of the cards list 
 
 		/**@return The first connected card, or <code>null</code> if there are no connected cards.*/
-		public Component<?> getCard() {return !cards.isEmpty() ? cards.get(0) : null;}	//return the first card, if there is one 
+		public Component getCard() {return !cards.isEmpty() ? cards.get(0) : null;}	//return the first card, if there is one 
 
 		/**Sets the connected card.
 		This is a bound property.
 		@param newCard The new card to be connected.
 		@see #CARD_PROPERTY
 		*/
-		public void setCard(final Component<?> newCard)
+		public void setCard(final Component newCard)
 		{
-			final List<Component<?>> newCards=new ArrayList<Component<?>>();	//create a new list
+			final List<Component> newCards=new ArrayList<Component>();	//create a new list
 			newCards.add(newCard);	//add the card to the list
 			setCards(newCards);	//set the cards
 		}
@@ -117,12 +117,12 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 		@exception NullPointerException if the given cards is <code>null</code>.
 		@see #CARDS_PROPERTY
 		*/
-		public void setCards(final List<Component<?>> newCards)
+		public void setCards(final List<Component> newCards)
 		{			
 			if(!ObjectUtilities.equals(cards, newCards))	//if the value is really changing
 			{
-				final List<Component<?>> oldCards=cards;	//get the old value
-				for(final Component<?> oldCard:oldCards)	//for each old card
+				final List<Component> oldCards=cards;	//get the old value
+				for(final Component oldCard:oldCards)	//for each old card
 				{
 					oldCard.removePropertyChangeListener(Component.CONSTRAINTS_PROPERTY, constraintsChangeListener);	//stop listening for the component changing constraints
 					final Constraints oldCardConstraints=oldCard.getConstraints();	//get the old constraints
@@ -131,8 +131,8 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 						uninstallCardConstraints(oldCardConstraints);	//uninstall the old card constraints
 					}
 				}				
-				cards=new CopyOnWriteArrayList<Component<?>>(newCards);	//actually change the value, making a thread-safe copy of the new list
-				for(final Component<?> newCard:newCards)	//for each new card
+				cards=new CopyOnWriteArrayList<Component>(newCards);	//actually change the value, making a thread-safe copy of the new list
+				for(final Component newCard:newCards)	//for each new card
 				{
 					newCard.addPropertyChangeListener(Component.CONSTRAINTS_PROPERTY, constraintsChangeListener);	//listen for the component changing constraints
 					final Constraints newCardConstraints=newCard.getConstraints();	//get the new constraints
@@ -141,11 +141,11 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 						installCardConstraints(newCardConstraints);	//install the old card constraints
 					}
 				}
-				final CompositeComponent<?> newParent=!newCards.isEmpty() ? newCards.get(0).getParent() : null;	//get the first new card's parent, if there is a new card TODO make sure all parents are the same
-				final CardControl<?> newCardControl=newParent instanceof CardControl ? (CardControl<?>)newParent : null;	//get the new card control, if any
+				final CompositeComponent newParent=!newCards.isEmpty() ? newCards.get(0).getParent() : null;	//get the first new card's parent, if there is a new card TODO make sure all parents are the same
+				final CardControl newCardControl=newParent instanceof CardControl ? (CardControl)newParent : null;	//get the new card control, if any
 				setCardControl(newCardControl);	//change the card control if needed
-				final Component<?> oldCard=!oldCards.isEmpty() ? oldCards.get(0) : null;	//get the old card, if any
-				final Component<?> newCard=!newCards.isEmpty() ? newCards.get(0) : null;	//get the new card, if any
+				final Component oldCard=!oldCards.isEmpty() ? oldCards.get(0) : null;	//get the old card, if any
+				final Component newCard=!newCards.isEmpty() ? newCards.get(0) : null;	//get the new card, if any
 				firePropertyChange(CARDS_PROPERTY, oldCards, newCards);	//indicate that the cards value changed
 				firePropertyChange(CARD_PROPERTY, oldCard, newCard);	//indicate that the card value changed
 				updateSelected();	//update the control selection based upon the selected card
@@ -156,19 +156,19 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 		}
 
 	/**A convenience reference to the connected card's parent card control, if any.*/
-	private CardControl<?> cardControl=null;
+	private CardControl cardControl=null;
 
 		/**@return A convenience reference to the connected card's parent card control, if any.*/
-		protected CardControl<?> getCardControl() {return cardControl;}
+		protected CardControl getCardControl() {return cardControl;}
 
 		/**Sets the convenience reference to the card control.
 		@param newCardControl The new card control, or <code>null</code> if the card does not have a parent card control.
 		*/
-		private void setCardControl(final CardControl<?> newCardControl)
+		private void setCardControl(final CardControl newCardControl)
 		{
 			if(cardControl!=newCardControl)	//if the value is really changing
 			{
-				final CardControl<?> oldCardControl=cardControl;	//get the old value
+				final CardControl oldCardControl=cardControl;	//get the old value
 				if(oldCardControl!=null)	//if there was an old card control
 				{
 					oldCardControl.removePropertyChangeListener(CardControl.VALUE_PROPERTY, selectedCardChangeListener);	//stop listening for selected card changes in the old card control
@@ -222,7 +222,7 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 	/**Card constructor.
 	@param cards The new cards to connect, if any.
 	*/
-	public AbstractCardCoupler(final Component<?>... cards)
+	public AbstractCardCoupler(final Component... cards)
 	{
 		setCards(asList(cards));	//set the cards
 	}
@@ -240,15 +240,15 @@ public class AbstractCardCoupler extends GuiseBoundPropertyObject	//TODO listen 
 		{
 			if(!updatingSelected)	//if we're not already updating the selected state (if we are, then this change could be in response to one of our cards being selected, and if we select a new card we could select the wrong one)
 			{
-				final CardControl<?> cardControl=getCardControl();	//get the connected card card control
+				final CardControl cardControl=getCardControl();	//get the connected card card control
 				if(cardControl!=null)	//there a card control is connected
 				{
-					final Component<?> selectedCard=cardControl.getValue();	//get the current selected card value
+					final Component selectedCard=cardControl.getValue();	//get the current selected card value
 /*TODO del
 Debug.trace("seleted card is index", cardControl.indexOf(selectedCard), "is one of our cards?", cards.contains(selectedCard));
 if(!cards.contains(selectedCard))
 {
-	for(final Component<?> card:cards)	//for each card
+	for(final Component card:cards)	//for each card
 	{
 		Debug.trace("we have card:", cardControl.indexOf(card));
 	}
@@ -258,7 +258,7 @@ if(!cards.contains(selectedCard))
 					{
 						return;	//an appropriate card is already selected; take no action
 					}
-					for(final Component<?> card:cards)	//for each card
+					for(final Component card:cards)	//for each card
 					{
 						if(isCardSelectable(card))	//if this card can be selected
 						{
@@ -276,7 +276,7 @@ if(!cards.contains(selectedCard))
 	@param card The card to check.
 	@return <code>true</code> if the card can be selected.
 	*/
-	protected boolean isCardSelectable(final Component<?> card)
+	protected boolean isCardSelectable(final Component card)
 	{
 //TODO del Debug.trace("is card selectable?");
 		final Constraints constraints=card.getConstraints();	//get the card constraints, if any
@@ -303,7 +303,7 @@ if(!cards.contains(selectedCard))
 	@param card The card to select.
 	@exception PropertyVetoException if the provided card could not be selected.
 	*/
-	protected void selectCard(final CardControl<?> cardControl, final Component<?> card) throws PropertyVetoException
+	protected void selectCard(final CardControl cardControl, final Component card) throws PropertyVetoException
 	{
 		cardControl.setValue(card);	//select the card
 	}	
@@ -315,7 +315,7 @@ if(!cards.contains(selectedCard))
 	protected void updateDisplayed()
 	{
 		boolean displayed=false;	//start by assuming the new status is undisplayed
-		for(final Component<?> card:cards)	//for each card
+		for(final Component card:cards)	//for each card
 		{
 			final Constraints constraints=card.getConstraints();	//get the card constraints, if any
 			if(!(constraints instanceof Displayable) || ((Displayable)constraints).isDisplayed())	//if the constraints indicate displayed
@@ -342,7 +342,7 @@ if(!cards.contains(selectedCard))
 	protected void updateEnabled()
 	{
 		boolean enabled=false;	//start by assuming the new status is disabled
-		for(final Component<?> card:cards)	//for each card
+		for(final Component card:cards)	//for each card
 		{
 			final Constraints constraints=card.getConstraints();	//get the card constraints, if any
 			if(!(constraints instanceof Enableable) || ((Enableable)constraints).isEnabled())	//if the constraints indicate enabled
@@ -369,7 +369,7 @@ if(!cards.contains(selectedCard))
 	protected void updateTaskState()
 	{
 		TaskState taskState=null;
-		for(final Component<?> card:cards)	//for each card
+		for(final Component card:cards)	//for each card
 		{
 			final Constraints constraints=card.getConstraints();	//get the card constraints, if any
 			if(constraints instanceof TaskCardConstraints)	//if the constraints indicate task state
@@ -403,11 +403,11 @@ if(!cards.contains(selectedCard))
 				try
 				{
 					boolean selected=false;	//start by assuming no connected card is selected
-					final CardControl<?> cardControl=getCardControl();	//get the card control
+					final CardControl cardControl=getCardControl();	//get the card control
 					if(cardControl!=null)	//there is a parent card control
 					{
-						final Component<?> selectedCard=cardControl.getSelectedValue();	//get the selected card
-						for(final Component<?> card:cards)	//for each card
+						final Component selectedCard=cardControl.getSelectedValue();	//get the selected card
+						for(final Component card:cards)	//for each card
 						{
 							if(card==selectedCard)	//if this connected cards is selected
 							{

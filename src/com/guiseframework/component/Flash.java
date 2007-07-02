@@ -9,7 +9,7 @@ import com.garretwilson.lang.ObjectUtilities;
 /**A component representing a Macromedia Flash object.
 @author Garret Wilson
 */
-public class Flash extends AbstractComponent<Flash>  
+public class Flash extends AbstractComponent  
 {
 
 	/**The flash URI bound property.*/

@@ -6,7 +6,7 @@ import com.guiseframework.component.Component;
 @param <C> The type of component supported by this export strategy.
 @author Garret Wilson
 */
-public interface ExportStrategy<C extends Component<?>>
+public interface ExportStrategy<C extends Component>
 {
 
 	/**Exports data from the given component.

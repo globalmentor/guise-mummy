@@ -7,7 +7,7 @@ import com.guiseframework.model.Enableable;
 /**A component that accepts user interaction to manipulate a data model.
 @author Garret Wilson
 */
-public interface Control<C extends Control<C>> extends Component<C>, InputFocusableComponent<C>, Enableable
+public interface Control extends Component, InputFocusableComponent, Enableable
 {
 
 	/**The input status of a control.*/

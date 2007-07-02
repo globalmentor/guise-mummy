@@ -108,9 +108,9 @@
 		<property:constraints><layout:TaskCardConstraints/></property:constraints>
 		<property:children rdf:parseType="Collection">
 			<component:Heading property:level="1" property:label="Business Information: Address"/>
-			<component:TextAreaControl property:valueClass="java.lang.String" property:rowCount="4" property:columnCount="40" property:label="Business Address">
+			<component:TextControl property:valueClass="java.lang.String" property:rowCount="4" property:columnCount="40" property:label="Business Address">
 				<property:validator><validator:RegularExpressionStringValidator property:pattern="\S+.*" property:valueRequired="true"/></property:validator>
-			</component:TextAreaControl>
+			</component:TextControl>
 		</property:children>
 	</component:LayoutPanel>
 

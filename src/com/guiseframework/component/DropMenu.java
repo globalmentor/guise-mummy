@@ -9,7 +9,7 @@ By default rollover open is enabled.
 @author Garret Wilson
 @see Menu#setRolloverOpenEnabled
 */
-public class DropMenu extends AbstractMenu<DropMenu>
+public class DropMenu extends AbstractMenu
 {
 
 	/**Axis constructor.

@@ -344,7 +344,21 @@ var JSON=
 				case "boolean":
 				case "number":
 					return object.toString();	//return the string version of the
-				default: 
+				default:
+					if(object instanceof Array)
+					{
+						var length=object.length;	//get the length of the array
+						if(length==0)	//if the array is empty
+						{
+							return "[]";	//return an empty array serialization
+						}
+						var serializedObjectArray=new Array();	//create a new array for serializating the objects
+						for(var i=0; i<length; ++i)	//for each array element
+						{
+							serializedObjectArray[i]=this.serialize(object[i]);	//place the serialization of the array element into the new array
+						}
+						return "["+serializedObjectArray.join(",")+"]";	//join the object serializations, separated by commas, and surround the list with the array delimiters
+					}  
 					throw "Arrays and objects not yet supported: "+object;
 			}
 		}

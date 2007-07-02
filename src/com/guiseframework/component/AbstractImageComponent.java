@@ -21,17 +21,17 @@ This component installs a default export strategy supporting export of the follo
 </ul>
 @author Garret Wilson
 */
-public abstract class AbstractImageComponent<C extends ImageComponent<C>> extends AbstractComponent<C> implements ImageComponent<C>
+public abstract class AbstractImageComponent extends AbstractComponent implements ImageComponent
 {
 
 	/**The default export strategy for this component type.*/
-	protected final static ExportStrategy<ImageComponent<?>> DEFAULT_EXPORT_STRATEGY=new ExportStrategy<ImageComponent<?>>()
+	protected final static ExportStrategy<ImageComponent> DEFAULT_EXPORT_STRATEGY=new ExportStrategy<ImageComponent>()
 			{
 				/**Exports data from the given component.
 				@param component The component from which data will be transferred.
 				@return The object to be transferred, or <code>null</code> if no data can be transferred.
 				*/
-				public Transferable<ImageComponent<?>> exportTransfer(final ImageComponent<?> component)
+				public Transferable<ImageComponent> exportTransfer(final ImageComponent component)
 				{
 					return new DefaultTransferable(component);	//return a default transferable for this component
 				}
@@ -65,19 +65,19 @@ public abstract class AbstractImageComponent<C extends ImageComponent<C>> extend
 	public AbstractImageComponent(final LabelModel labelModel)
 	{
 		super(labelModel);	//construct the parent class
-		addExportStrategy((ExportStrategy<C>)DEFAULT_EXPORT_STRATEGY);	//install a default export strategy 
+		addExportStrategy(DEFAULT_EXPORT_STRATEGY);	//install a default export strategy 
 	}
 
 	/**The default transferable object for an image.
 	@author Garret Wilson
 	*/
-	protected static class DefaultTransferable extends AbstractTransferable<ImageComponent<?>>
+	protected static class DefaultTransferable extends AbstractTransferable<ImageComponent>
 	{
 		/**Source constructor.
 		@param source The source of the transferable data.
 		@exception NullPointerException if the provided source is <code>null</code>.
 		*/
-		public DefaultTransferable(final ImageComponent<?> source)
+		public DefaultTransferable(final ImageComponent source)
 		{
 			super(source);	//construct the parent class
 		}
@@ -95,7 +95,7 @@ public abstract class AbstractImageComponent<C extends ImageComponent<C>> extend
 		*/
 		public Object transfer(final ContentType contentType)
 		{
-			final ImageComponent<?> image=getSource();	//get the image
+			final ImageComponent image=getSource();	//get the image
 			if(match(contentType, TEXT, URI_LIST_SUBTYPE))	//if this is a text/uri-list type
 			{
 				final URI imageURI=image.getImage();	//get the image URI

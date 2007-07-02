@@ -6,7 +6,7 @@ import com.guiseframework.component.Component;
 @param <C> The type of component supported by this export strategy.
 @author Garret Wilson
 */
-public interface ImportStrategy<C extends Component<?>>
+public interface ImportStrategy<C extends Component>
 {
 
 	/**Determines whether this strategy can import the given transferable object.

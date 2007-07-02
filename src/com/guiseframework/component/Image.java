@@ -5,7 +5,7 @@ import com.guiseframework.model.DefaultLabelModel;
 /**A simple image component with no descriptory text.
 @author Garret Wilson
 */
-public class Image extends AbstractImageComponent<Image>
+public class Image extends AbstractImageComponent
 {
 
 	/**Default constructor.*/

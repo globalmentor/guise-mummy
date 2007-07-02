@@ -15,14 +15,14 @@ as well as the command {@link ProcessCommand#ABORT} to the key input {@link Key#
 @author Garret Wilson
 @see LayoutPanel
 */
-public abstract class AbstractApplicationFrame<C extends ApplicationFrame<C>> extends AbstractFrame<C> implements ApplicationFrame<C>
+public abstract class AbstractApplicationFrame extends AbstractFrame implements ApplicationFrame
 {
 
-	/**The list of child frames according to z-order.*/
-	private final List<Frame<?>> frameList=new CopyOnWriteArrayList<Frame<?>>();
+	/**The list of child frames according to z-order; this will not be initialized with a non-null value until the constructor is finished.*/
+	private final List<Frame> frameList;
 
 		/**@return An iterable to all child frames.*/
-		public Iterable<Frame<?>> getChildFrames() {return unmodifiableList(frameList);}
+		public Iterable<Frame> getChildFrames() {return unmodifiableList(frameList);}
 	
 		/**Adds a frame to the list of child frames.
 		This method should usually only be called by the frames themselves.
@@ -30,7 +30,7 @@ public abstract class AbstractApplicationFrame<C extends ApplicationFrame<C>> ex
 		@exception NullPointerException if the given frame is <code>null</code>.
 		@exception IllegalArgumentException if the given frame is this frame.
 		*/
-		public void addChildFrame(final Frame<?> frame)
+		public void addChildFrame(final Frame frame)
 		{
 			if(checkInstance(frame, "Frame cannot be null.")==this)
 			{
@@ -53,7 +53,7 @@ public abstract class AbstractApplicationFrame<C extends ApplicationFrame<C>> ex
 		@exception NullPointerException if the given frame is <code>null</code>.
 		@exception IllegalArgumentException if the given frame is the application frame.
 		*/
-		public void removeChildFrame(final Frame<?> frame)
+		public void removeChildFrame(final Frame frame)
 		{
 			if(checkInstance(frame, "Frame cannot be null.")==this)
 			{
@@ -61,10 +61,10 @@ public abstract class AbstractApplicationFrame<C extends ApplicationFrame<C>> ex
 			}
 			frameList.remove(frame);	//remove this frame from the list
 			removeComponent(frame);	//remove the frame as a child of this component
-			final InputFocusableComponent<?> oldFocusedComponent=getInputFocusedComponent();	//get the focused component
+			final InputFocusableComponent oldFocusedComponent=getInputFocusedComponent();	//get the focused component
 			if(frame==oldFocusedComponent)	//if we just removed the focused component
 			{
-				final InputFocusableComponent<?> newFocusedComponent=frameList.isEmpty() ? null : frameList.get(frameList.size()-1);	//if we have more frames, set the focus to the last one TODO important fix race condition in finding the last frame
+				final InputFocusableComponent newFocusedComponent=frameList.isEmpty() ? null : frameList.get(frameList.size()-1);	//if we have more frames, set the focus to the last one TODO important fix race condition in finding the last frame
 				try
 				{
 					setInputFocusedComponent(newFocusedComponent);	//set the new frame as the focus component
@@ -80,9 +80,10 @@ public abstract class AbstractApplicationFrame<C extends ApplicationFrame<C>> ex
 	/**Component constructor.
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
 	*/
-	public AbstractApplicationFrame(final Component<?> component)
+	public AbstractApplicationFrame(final Component component)
 	{
 		super(component);	//construct the parent class
+		frameList=new CopyOnWriteArrayList<Frame>();	//initialize the frame list	
 		final BindingInputStrategy bindingInputStrategy=new BindingInputStrategy(getInputStrategy());	//create a new input strategy based upon the current input strategy (if any)
 		bindingInputStrategy.bind(new KeystrokeInput(Key.ENTER), new CommandInput(ProcessCommand.CONTINUE));	//map the Enter key to the "continue" command
 		bindingInputStrategy.bind(new KeystrokeInput(Key.ESCAPE), new CommandInput(ProcessCommand.ABORT));	//map the Escape key to the "abort" command
@@ -104,10 +105,13 @@ public abstract class AbstractApplicationFrame<C extends ApplicationFrame<C>> ex
 	@return A list of child components.
 	@see #getChildFrames()
 	*/
-	protected List<Component<?>> getChildList()
+	protected List<Component> getChildList()
 	{
-		final List<Component<?>> childList=super.getChildList();	//get the default list of children
-		childList.addAll(frameList);	//add all child frames to the list
+		final List<Component> childList=super.getChildList();	//get the default list of children
+		if(frameList!=null)	//if the frame list has been initialized (getChildList() can be called by an ancestor class during construction, before the frame list has been initialized)
+		{
+			childList.addAll(frameList);	//add all child frames to the list
+		}
 		return childList;	//return the list of children, now including child frames
 	}
 	

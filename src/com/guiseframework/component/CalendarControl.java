@@ -23,7 +23,7 @@ If the model used by the calendar control uses a {@link RangeValidator} with a d
 Otherwise, a text input will be used for year selection.
 @author Garret Wilson
 */
-public class CalendarControl extends AbstractContainerValueControl<Date, CalendarControl>
+public class CalendarControl extends AbstractContainerValueControl<Date>
 {
 
 	/**The visible date bound property.*/
@@ -53,16 +53,16 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 	private int getMonthCount() {return 1;}	//TODO update to allow modification
 
 	/**The container containing the controls.*/
-	private Container<?> controlContainer;
+	private Container controlContainer;
 	
 		/**The container containing the controls.*/
-		public Container<?> getControlContainer() {return controlContainer;}
+		public Container getControlContainer() {return controlContainer;}
 
 	/**The container containing the calendars.*/
-	private Container<?> calendarContainer;
+	private Container calendarContainer;
 	
 		/**The container containing the calendars.*/
-		public Container<?> getCalendarContainer() {return calendarContainer;}
+		public Container getCalendarContainer() {return calendarContainer;}
 
 	/**The list control containing the months.*/
 	private final ListControl<Date> monthListControl;
@@ -71,10 +71,10 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 		protected ListControl<Date> getMonthListControl() {return monthListControl;}
 
 	/**The control containing the year; this control can change dynamically based upon the current model range.*/
-	private ValueControl<Integer, ?> yearControl=null;
+	private ValueControl<Integer> yearControl=null;
 
 		/**@return The control containing the year.*/
-		protected ValueControl<Integer, ?> getYearControl() {return yearControl;}
+		protected ValueControl<Integer> getYearControl() {return yearControl;}
 
 	/**The list of calendar table components.*/
 	private final List<Table> calendarTables=new CopyOnWriteArrayList<Table>();
@@ -179,9 +179,9 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 			}
 		};
 		valueModel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, updateModelPropertyChangeListener);	//update the calendars if the selected date changes
-		valueModel.addPropertyChangeListener(ValueModel.VALIDATOR_PROPERTY, new AbstractGenericPropertyChangeListener<Validator>()	//create a property change listener to listen for our validator changing, so that we can update the date control if needed
+		valueModel.addPropertyChangeListener(ValueModel.VALIDATOR_PROPERTY, new AbstractGenericPropertyChangeListener<Validator<Date>>()	//create a property change listener to listen for our validator changing, so that we can update the date control if needed
 				{
-					public void propertyChange(final GenericPropertyChangeEvent<Validator> propertyChangeEvent)	//if the model's validator changed
+					public void propertyChange(final GenericPropertyChangeEvent<Validator<Date>> propertyChangeEvent)	//if the model's validator changed
 					{
 						updateYearControl();	//update the year control (e.g. a drop-down list) to match the new validator (e.g. a range validator), if any
 					}
@@ -347,7 +347,7 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 				if(monthChanged)	//if the month needs updating
 				{
 					final Calendar monthCalendar=(Calendar)calendar.clone();	//clone the calendar for stepping through the months
-					final Container<?> calendarContainer=getCalendarContainer();	//get the calendar container
+					final Container calendarContainer=getCalendarContainer();	//get the calendar container
 					calendarContainer.clear();	//remove all calendars from the container
 					final CellRepresentationStrategy<Date> dayRepresentationStrategy=createDayRepresentationStrategy();	//create a strategy for representing the days in the month calendar cells
 					for(int monthIndex=0; monthIndex<getMonthCount(); ++monthIndex)	//for each month
@@ -404,8 +404,7 @@ public class CalendarControl extends AbstractContainerValueControl<Date, Calenda
 		@param focused <code>true</code> if the value has the focus.
 		@return A new component to represent the given value.
 		*/
-		@SuppressWarnings("unchecked")	//we check the type of the column value class, so the casts are safe
-		public <C extends Date> Component<?> createComponent(final Table table, final TableModel model, final int rowIndex, final TableColumnModel<C> column, final boolean editable, final boolean selected, final boolean focused)
+		public <C extends Date> Component createComponent(final Table table, final TableModel model, final int rowIndex, final TableColumnModel<C> column, final boolean editable, final boolean selected, final boolean focused)
 		{
 			final Calendar calendar=Calendar.getInstance(getSession().getLocale());	//create a calendar TODO cache the calendar and only change it if the locale has changed
 			calendar.setTime(getDate());	//set the calendar date to the date of the calendar

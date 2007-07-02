@@ -28,7 +28,7 @@ import com.guiseframework.model.*;
 Property change events and action events on one tree node will be repeated to this object's listeners, with the tree node initiating the event accessible via {@link TargetedEvent#getTarget()}.
 @author Garret Wilson
 */
-public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>, TreeControl.TreeNodeComponentState, TreeControl> implements TreeModel
+public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>, TreeControl.TreeNodeComponentState> implements TreeModel
 {
 
 	/**The bound property of whether the root node is displayed.*/
@@ -153,7 +153,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	@return The child component representing the given object.
 	@exception IllegalArgumentException if the given object is not an appropriate object for a component to be created.
 	*/
-	public Component<?> getComponent(final TreeNodeModel<?> treeNode)
+	public Component getComponent(final TreeNodeModel<?> treeNode)
 	{
 		return super.getComponent(treeNode);	//delegate to the parent version
 	}
@@ -178,7 +178,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 	private <T> TreeNodeComponentState createTypedComponentState(final TreeNodeModel<T> treeNode)
 	{
 		final boolean editable=false;	//TODO fix
-		final Component<?> treeNodeComponent=getTreeNodeRepresentationStrategy(treeNode.getValueClass()).createComponent(this, getTreeModel(), treeNode, editable, false, false);	//create a new component for the tree node
+		final Component treeNodeComponent=getTreeNodeRepresentationStrategy(treeNode.getValueClass()).createComponent(this, getTreeModel(), treeNode, editable, false, false);	//create a new component for the tree node
 
 
 		treeNodeComponent.addExportStrategy(new ExportStrategy()	//TODO fix for generics with a separate method 
@@ -270,7 +270,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		@param expanded Whether the component is for a tree node that was expanded when the component was created.
 		@exception NullPointerException if the given component is <code>null</code>.
 		*/
-		public TreeNodeComponentState(final Component<?> component, final boolean editable/*TODO del, final boolean expanded*/)
+		public TreeNodeComponentState(final Component component, final boolean editable/*TODO del, final boolean expanded*/)
 		{
 			super(component);	//construct the parent class
 			this.editable=editable;
@@ -294,7 +294,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		@param focused <code>true</code> if the value has the focus.
 		@return A new component to represent the given value.
 		*/
-		public <N extends V> Component<?> createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused);
+		public <N extends V> Component createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused);
 	}
 
 	/**An abstract tree node representation strategy.
@@ -350,7 +350,7 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 		@return A new component to represent the given value.
 		*/
 		@SuppressWarnings("unchecked")
-		public <N extends V> Component<?> createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
+		public <N extends V> Component createComponent(final TreeControl treeControl, final TreeModel model, final TreeNodeModel<N> treeNode, final boolean editable, final boolean selected, final boolean focused)
 		{
 			if(editable)	//if the component should be editable
 			{
@@ -547,12 +547,12 @@ public class TreeControl extends AbstractCompositeStateControl<TreeNodeModel<?>,
 Debug.trace("selecting tree node", treeNode);
 				treeNode.setSelected(true);	//select the tree node
 /*TODO fix
-				final Component<?> component=getComponent(treeNode);	//TODO testing
+				final Component component=getComponent(treeNode);	//TODO testing
 				component.setBackgroundColor(Theme.COLOR_SELECTED_BACKGROUND);
 */
 
 /*TODO finish; this works so far
-				final Component<?> component=getComponent(treeNode);	//TODO testing
+				final Component component=getComponent(treeNode);	//TODO testing
 				component.setBackgroundColor(RGBColor.BLUE);
 */
 /*TODO fix
@@ -606,7 +606,7 @@ Debug.trace("selecting tree node", treeNode);
 					final TreeNodeComponentState componentState=getComponentState(treeNode);	//see if we have a component associated with this tree node
 					if(componentState!=null)	//if we have a component state
 					{
-						final Component<?> component=componentState.getComponent();	//get the representation component
+						final Component component=componentState.getComponent();	//get the representation component
 						if(component instanceof Selectable)	//if the component is selectable
 						{
 							((Selectable)component).setSelected(newSelected);	//update the representation component's selected status to match that of the tree node

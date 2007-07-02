@@ -7,7 +7,7 @@ import com.guiseframework.model.ValueModel;
 @param <V> The value to be communicated.
 @author Garret Wilson
 */
-public class DefaultDialogFrame<V> extends AbstractDialogFrame<V, DefaultDialogFrame<V>>
+public class DefaultDialogFrame<V> extends AbstractDialogFrame<V>
 {
 
 	/**Value class constructor.
@@ -24,7 +24,7 @@ public class DefaultDialogFrame<V> extends AbstractDialogFrame<V, DefaultDialogF
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
 	@exception NullPointerException if the given value class is <code>null</code>.
 	*/
-	public DefaultDialogFrame(final Class<V> valueClass, final Component<?> component)
+	public DefaultDialogFrame(final Class<V> valueClass, final Component component)
 	{
 		this(new DefaultValueModel<V>(valueClass), component);	//use a default value model
 	}
@@ -43,7 +43,7 @@ public class DefaultDialogFrame<V> extends AbstractDialogFrame<V, DefaultDialogF
 	@param component The single child component, or <code>null</code> if this frame should have no child component.
 	@exception NullPointerException if the given value model is <code>null</code>.
 	*/
-	public DefaultDialogFrame(final ValueModel<V> valueModel, final Component<?> component)
+	public DefaultDialogFrame(final ValueModel<V> valueModel, final Component component)
 	{
 		super(valueModel, component);	//construct the parent class
 	}

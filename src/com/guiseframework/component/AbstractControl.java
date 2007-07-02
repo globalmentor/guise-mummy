@@ -10,7 +10,7 @@ import com.guiseframework.model.*;
 /**An abstract implementation of a model component that allows user interaction to modify the model.
 @author Garret Wilson
 */
-public abstract class AbstractControl<C extends Control<C>> extends AbstractComponent<C> implements Control<C>
+public abstract class AbstractControl extends AbstractComponent implements Control
 {
 
 	/**The enableable object decorated by this component.*/

@@ -2,7 +2,6 @@ package com.guiseframework.event;
 
 import com.guiseframework.input.Key;
 import com.guiseframework.input.KeystrokeInput;
-
 /**An event providing information on a keyboard key press.
 @author Garret Wilson
 */

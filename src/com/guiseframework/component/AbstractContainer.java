@@ -13,7 +13,7 @@ import com.guiseframework.validator.RangeValidator;
 Iterating over child components is thread safe.
 @author Garret Wilson
 */
-public abstract class AbstractContainer<C extends Container<C>> extends AbstractLayoutComponent<C> implements Container<C>
+public abstract class AbstractContainer extends AbstractLayoutComponent implements Container
 {
 
 	/**@return The number of child components in this container.*/
@@ -45,7 +45,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@return The component at the specified position in this container.
 	@exception IndexOutOfBoundsException if the index is out of range.
 	*/
-	public Component<?> get(final int index) {return super.get(index);}
+	public Component get(final int index) {return super.get(index);}
 
 	/**Adds a child component with default constraints to the container at the specified index.
 	@param index The index at which the component should be added.
@@ -54,7 +54,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@exception IllegalStateException if the installed layout does not support default constraints.
 	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
 	*/
-	public void add(final int index, final Component<?> component)
+	public void add(final int index, final Component component)
 	{
 		addComponent(index, component);	//add the component normally
 		fireContainerModified(index, component, null);	//indicate the component was added at the index TODO promote
@@ -66,7 +66,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@exception IllegalArgumentException if the component already has a parent.
 	@exception IllegalStateException if the installed layout does not support default constraints.
 	*/
-	public boolean add(final Component<?> component)
+	public boolean add(final Component component)
 	{
 		add(size(), component);	//add the component at the last index
 		return true;	//indicate that the container was modified
@@ -82,7 +82,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
 	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
 	*/
-	public void add(final int index, final Component<?> component, final Constraints constraints)
+	public void add(final int index, final Component component, final Constraints constraints)
 	{
 		component.setConstraints(constraints);	//set the constraints in the component
 		add(index, component);	//add the component, now that its constraints have been set		
@@ -97,7 +97,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@exception ClassCastException if the provided constraints are not appropriate for the installed layout.
 	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
 	*/
-	public boolean add(final Component<?> component, final Constraints constraints)
+	public boolean add(final Component component, final Constraints constraints)
 	{
 		component.setConstraints(constraints);	//set the constraints in the component
 		return add(component);	//add the component, now that its constraints have been set
@@ -113,9 +113,9 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
 	@see #createComponent(Prototype)
 	*/
-	public Component<?> add(final int index, final Prototype prototype)
+	public Component add(final int index, final Prototype prototype)
 	{
-		final Component<?> component=createComponent(prototype);	//create a component from the prototype
+		final Component component=createComponent(prototype);	//create a component from the prototype
 		add(index, component);	//add the component to the container
 		return component;	//return the component we created
 	}
@@ -128,9 +128,9 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@exception IllegalStateException if the installed layout does not support default constraints.
 	@see #createComponent(Prototype)
 	*/
-	public Component<?> add(final Prototype prototype)
+	public Component add(final Prototype prototype)
 	{
-		final Component<?> component=createComponent(prototype);	//create a component from the prototype
+		final Component component=createComponent(prototype);	//create a component from the prototype
 		add(component);	//add the component to the container
 		return component;	//return the component we created
 	}
@@ -147,9 +147,9 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
 	@see #createComponent(Prototype)
 	*/
-	public Component<?> add(final int index, final Prototype prototype, final Constraints constraints)
+	public Component add(final int index, final Prototype prototype, final Constraints constraints)
 	{
-		final Component<?> component=createComponent(prototype);	//create a component from the prototype
+		final Component component=createComponent(prototype);	//create a component from the prototype
 		add(index, component, constraints);	//add the component to the container
 		return component;	//return the component we created
 	}
@@ -164,9 +164,9 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
 	@see #createComponent(Prototype)
 	*/
-	public Component<?> add(final Prototype prototype, final Constraints constraints)
+	public Component add(final Prototype prototype, final Constraints constraints)
 	{
-		final Component<?> component=createComponent(prototype);	//create a component from the prototype
+		final Component component=createComponent(prototype);	//create a component from the prototype
 		add(component, constraints);	//add the component to the container
 		return component;	//return the component we created
 	}
@@ -185,7 +185,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@return A new component based upon the given prototype.
 	@exception IllegalArgumentException if no component can be created from the given prototype
 	*/
-	public Component<?> createComponent(final Prototype prototype)
+	public Component createComponent(final Prototype prototype)
 	{
 		if(prototype instanceof ActionPrototype)	//action prototypes
 		{
@@ -265,7 +265,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	*/
 	public boolean remove(final Object componentObject)
 	{
-		final Component<?> component=(Component<?>)componentObject;	//cast the object to a component
+		final Component component=(Component)componentObject;	//cast the object to a component
 		final int index=indexOf(component);	//get the index of the component
 		final boolean result=removeComponent(component);	//remove the component normally
 		assert index>=0 : "Component successfully removed from container, yet previous index is negative.";
@@ -278,9 +278,9 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@return The value previously at the specified position.
 	@exception IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
 	*/
-	public Component<?> remove(final int index)
+	public Component remove(final int index)
 	{
-		final Component<?> component=get(index);	//get the component at this index
+		final Component component=get(index);	//get the component at this index
 		remove(component);	//remove the component
 		return component;	//return the component that was removed
 	}
@@ -288,23 +288,23 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	/**Removes all of the components from this container.*/
 	public void clear()
 	{
-		for(final Component<?> component:this)	//for each component in the container
+		for(final Component component:this)	//for each component in the container
 		{
 			remove(component);	//remove this component
 		}
 	}
 
 	/**@return An iterator to child components.*/
-	public Iterator<Component<?>> iterator() {return getComponentList().iterator();}
+	public Iterator<Component> iterator() {return getComponentList().iterator();}
 
 	/**Returns a list of children.
 	This method along with {@link #setChildren()} provides a <code>children</code> property for alternate children access.
 	@return A list of container children in order.
 	@see #iterator()
 	*/
-	public List<Component<?>> getChildren()
+	public List<Component> getChildren()
 	{
-		return new ArrayList<Component<?>>(getComponentList());	//create and return a copy of the list
+		return new ArrayList<Component>(getComponentList());	//create and return a copy of the list
 	}
 
 	/**Sets the children in this container.
@@ -313,10 +313,10 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@see #clear()
 	@see #add(Component)
 	*/
-	public void setChildren(final List<Component<?>> children)
+	public void setChildren(final List<Component> children)
 	{
 		clear();	//remove all children from the container
-		for(final Component<?> child:children)	//for each child
+		for(final Component child:children)	//for each child
 		{
 			add(child);	//add this child
 		}
@@ -339,7 +339,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@param layout The layout definition for the container.
 	@exception NullPointerException if the given layout is <code>null</code>.
 	*/
-	public AbstractContainer(final Layout<?> layout)
+	public AbstractContainer(final Layout<? extends Constraints> layout)
 	{
 		this(new DefaultLabelModel(), layout);	//construct the class with a default label model
 	}
@@ -349,7 +349,7 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@param layout The layout definition for the container.
 	@exception NullPointerException if the given label model and/or layout is <code>null</code>.
 	*/
-	public AbstractContainer(final LabelModel labelModel, final Layout<?> layout)
+	public AbstractContainer(final LabelModel labelModel, final Layout<? extends Constraints> layout)
 	{
 		super(labelModel, layout);	//construct the parent class
 	}
@@ -377,9 +377,9 @@ public abstract class AbstractContainer<C extends Container<C>> extends Abstract
 	@see ContainerListener
 	@see ContainerEvent
 	*/
-	protected void fireContainerModified(final int index, final Component<?> addedComponent, final Component<?> removedComponent)
+	protected void fireContainerModified(final int index, final Component addedComponent, final Component removedComponent)
 	{
-		final ContainerEvent containerEvent=new ContainerEvent(getThis(), index, addedComponent, removedComponent);	//create a new event
+		final ContainerEvent containerEvent=new ContainerEvent(this, index, addedComponent, removedComponent);	//create a new event
 		getSession().queueEvent(new PostponedContainerEvent(getEventListenerManager(), containerEvent));	//tell the Guise session to queue the event
 	}
 

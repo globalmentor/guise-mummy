@@ -10,7 +10,7 @@ import com.guiseframework.model.*;
 The control's contents are specified using {@link #setContent(Component)}.
 @author Garret Wilson
 */
-public class ScrollControl extends AbstractEnumCompositeComponent<ScrollControl.ScrollComponent, ScrollControl> implements ContentComponent<ScrollControl>, Control<ScrollControl>
+public class ScrollControl extends AbstractEnumCompositeComponent<ScrollControl.ScrollComponent> implements ContentComponent, Control
 {
 
 	/**The enumeration of frame components.*/
@@ -25,7 +25,7 @@ public class ScrollControl extends AbstractEnumCompositeComponent<ScrollControl.
 	/**@return The content child component, or <code>null</code> if this frame does not have a content child component.
 	@see ScrollComponent#CONTENT_COMPONENT
 	*/
-	public Component<?> getContent() {return getComponent(ScrollComponent.CONTENT_COMPONENT);}
+	public Component getContent() {return getComponent(ScrollComponent.CONTENT_COMPONENT);}
 
 	/**Sets the content child component.
 	This is a bound property.
@@ -33,9 +33,9 @@ public class ScrollControl extends AbstractEnumCompositeComponent<ScrollControl.
 	@see ScrollComponent#CONTENT_COMPONENT
 	@see ContentComponent#CONTENT_PROPERTY
 	*/
-	public void setContent(final Component<?> newContent)
+	public void setContent(final Component newContent)
 	{
-		final Component<?> oldContent=setComponent(ScrollComponent.CONTENT_COMPONENT, newContent);	//set the component
+		final Component oldContent=setComponent(ScrollComponent.CONTENT_COMPONENT, newContent);	//set the component
 		if(oldContent!=newContent)	//if the component really changed
 		{
 			firePropertyChange(CONTENT_PROPERTY, oldContent, newContent);	//indicate that the value changed
@@ -83,7 +83,7 @@ public class ScrollControl extends AbstractEnumCompositeComponent<ScrollControl.
 	/**Component constructor.
 	@param component The single child component, or <code>null</code> if this control should have no child component.
 	*/
-	public ScrollControl(final Component<?> component)
+	public ScrollControl(final Component component)
 	{
 		super(ScrollComponent.values());	//construct the parent class
 		setComponent(ScrollComponent.CONTENT_COMPONENT, component);	//set the component directly, because child classes may prevent the setContent() method from changing the component 

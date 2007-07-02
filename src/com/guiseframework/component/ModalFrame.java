@@ -6,7 +6,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 @param <R> The type of modal result this modal frame produces.
 @author Garret Wilson
 */
-public interface ModalFrame<R, C extends ModalFrame<R, C>> extends Frame<C>
+public interface ModalFrame<R> extends Frame
 {
 	/**The modal state bound property.*/
 	public final static String MODAL_PROPERTY=getPropertyName(ModalFrame.class, "modal");

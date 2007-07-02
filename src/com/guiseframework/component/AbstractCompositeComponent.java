@@ -8,12 +8,9 @@ import com.garretwilson.util.Debug;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import com.guiseframework.GuiseSession;
 import com.guiseframework.event.*;
-import com.guiseframework.input.Input;
-import com.guiseframework.input.InputStrategy;
+import com.guiseframework.input.*;
 import com.guiseframework.model.LabelModel;
-import com.guiseframework.theme.Theme;
 
 /**An abstract implementation of a composite component.
 Every child component must be added or removed using {@link #addComponent(Component)} and {@link #removeComponent(Component)}, although other actions may take place.
@@ -21,7 +18,7 @@ This version listens for the {@link Component#VALID_PROPERTY} of each child comp
 The lazily-created notification listener to listen for child notifications and refire the {@link NotificationEvent}, retaining the original event source.
 @author Garret Wilson
 */
-public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>> extends AbstractComponent<C> implements CompositeComponent<C>
+public abstract class AbstractCompositeComponent extends AbstractComponent implements CompositeComponent
 {
 
 	/**The lazily-created property change listener to listen for changes in valid status and call {@link #childComponentValidPropertyChanged(Component, boolean, boolean)}.*/
@@ -37,7 +34,7 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 						public void propertyChange(GenericPropertyChangeEvent<Boolean> propertyChangeEvent)	//if the child component's valid status changes
 						{
 								//TODO do we want to update valid here?
-							childComponentValidPropertyChanged((Component<?>)propertyChangeEvent.getSource(), propertyChangeEvent.getOldValue().booleanValue(), propertyChangeEvent.getNewValue().booleanValue());	//notify this component that a child component's valid status changed
+							childComponentValidPropertyChanged((Component)propertyChangeEvent.getSource(), propertyChangeEvent.getOldValue().booleanValue(), propertyChangeEvent.getNewValue().booleanValue());	//notify this component that a child component's valid status changed
 						}
 					};
 		}
@@ -91,7 +88,7 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	@return <code>true</code> if the child components changed as a result of the operation.
 	@exception IllegalArgumentException if the component already has a parent.
 	*/
-	protected boolean addComponent(final Component<?> component)
+	protected boolean addComponent(final Component component)
 	{
 		if(component.getParent()!=null)	//if this component has already been added to container
 		{
@@ -123,7 +120,7 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	@exception IllegalArgumentException if the component is not a member of this composite component.
 	@see #unupdateProperties()
 	*/
-	protected boolean removeComponent(final Component<?> component)
+	protected boolean removeComponent(final Component component)
 	{
 		if(component.getParent()!=this)	//if this component is not a member of this container
 		{
@@ -153,7 +150,7 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	@param oldValid The old valid property.
 	@param newValid The new valid property.
 	*/
-	protected void childComponentValidPropertyChanged(final Component<?> childComponent, final boolean oldValid, final boolean newValid)
+	protected void childComponentValidPropertyChanged(final Component childComponent, final boolean oldValid, final boolean newValid)
 	{
 		updateValid();	//update this composite component's valid state		
 	}
@@ -166,7 +163,7 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	@param newValid The new valid property.
 	*/
 /*TODO fix
-	protected void childComponentValidPropertyChanged(final Component<?> childComponent, final boolean oldValid, final boolean newValid)
+	protected void childComponentValidPropertyChanged(final Component childComponent, final boolean oldValid, final boolean newValid)
 	{
 		updateValid();	//update this composite component's valid state		
 	}
@@ -189,7 +186,7 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	protected boolean determineChildrenValid()
 	{
 //TODO fix Debug.trace("ready to determine children valid in", this);
-		for(final Component<?> childComponent:getChildren())	//for each child component
+		for(final Component childComponent:getChildren())	//for each child component
 		{
 //TODO del Debug.trace("in", this, "child", childComponent, "is valid", childComponent.isValid());			
 			if(childComponent.isDisplayed() && childComponent.isVisible() && !childComponent.isValid())	//if this child component is displayed and visible, but not valid
@@ -222,7 +219,7 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	protected boolean validateChildren()
 	{
 		boolean result=true;	//start by assuming all child components will validate 
-		for(final Component<?> childComponent:getChildren())	//for each child component
+		for(final Component childComponent:getChildren())	//for each child component
 		{
 			if(childComponent.isDisplayed() && childComponent.isVisible() && !childComponent.validate())	//if this child component is displayed and visible, but doesn't validate
 			{
@@ -236,7 +233,7 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	This method checks this component and all descendant components.
 	@return The first component with the given name, or <code>null</code> if this component and all descendant components do not have the given name. 
 	*/
-	public Component<?> getComponentByName(final String name)
+	public Component getComponentByName(final String name)
 	{
 		return getComponentByName(this, name);	//search the component hierarchy for a component with the given name
 	}
@@ -254,7 +251,7 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	*/
 	public void updateProperties() throws IOException
 	{
-		for(final Component<?> childComponent:getChildren())	//for each child component
+		for(final Component childComponent:getChildren())	//for each child component
 		{
 			childComponent.updateProperties();	//tell the child component to update its properties
 		}
@@ -273,7 +270,7 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	*/
 	public void unupdateProperties()
 	{
-		for(final Component<?> childComponent:getChildren())	//for each child component
+		for(final Component childComponent:getChildren())	//for each child component
 		{
 			childComponent.unupdateProperties();	//tell the child component to unupdate its properties
 		}
@@ -305,14 +302,14 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 			if(inputEvent instanceof FocusedInputEvent)	//if this is a focused input event, the target will be the focused child of the focus group ancestor of this component (or this component, if this component is a focused group)
 			{
 //Debug.trace("this is a focused event");
-				Component<?> component=this;	//start with this component
+				Component component=this;	//start with this component
 				do
 				{
 					if(component instanceof InputFocusGroupComponent)	//if we found a focus group
 					{
 //Debug.trace("component", component, "is the focus group");
-						final InputFocusGroupComponent<?> focusGroup=(InputFocusGroupComponent<?>)component;	//get the focus group
-						final InputFocusableComponent<?> focusedComponent=focusGroup.getInputFocusedComponent();	//get the focused component
+						final InputFocusGroupComponent focusGroup=(InputFocusGroupComponent)component;	//get the focus group
+						final InputFocusableComponent focusedComponent=focusGroup.getInputFocusedComponent();	//get the focused component
 						if(focusedComponent!=null)	//if there is a focused component
 						{
 //Debug.trace("ready to dispatch to focused component", focusedComponent);
@@ -334,13 +331,13 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 				final Object targetObject=((TargetedEvent)inputEvent).getTarget();	//get the event target
 				if(targetObject instanceof Component)	//if the target is a component other than any focus target we might have used earlier
 				{
-					dispatchInputEvent(inputEvent, (Component<?>)targetObject);	//dispatch the event to the event target						
+					dispatchInputEvent(inputEvent, (Component)targetObject);	//dispatch the event to the event target						
 				}
 			}
 			else	//if this wasn't a focused or targeted event, dispatch the event to all child components
 			{
 //Debug.trace("this is an unconsumed non-targeted event; ready to send to children");
-				for(final Component<?> childComponent:getChildren())	//for each child component
+				for(final Component childComponent:getChildren())	//for each child component
 				{
 					if(inputEvent.isConsumed())	//if the event has been consumed
 					{
@@ -368,12 +365,12 @@ public abstract class AbstractCompositeComponent<C extends CompositeComponent<C>
 	@see TargetedEvent
 	@see MouseEvent
 	*/
-	protected void dispatchInputEvent(final InputEvent inputEvent, Component<?> target)
+	protected void dispatchInputEvent(final InputEvent inputEvent, Component target)
 	{
 		checkInstance(target, "Target cannot be null");
 		while(target!=null && target!=this)	//keep going until we reach this component or run out of ancestors, the latter of which means that this component is not in the target branch at all
 		{
-			final CompositeComponent<?> parent=target.getParent();	//get the target ancestor's parent
+			final CompositeComponent parent=target.getParent();	//get the target ancestor's parent
 			if(parent==this)	//if we are the target ancestor's immediate parent
 			{
 				target.dispatchInputEvent(inputEvent);	//dispatch the event to the target's ancestor, which is this component's child

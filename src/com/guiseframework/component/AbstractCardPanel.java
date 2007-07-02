@@ -17,7 +17,7 @@ If bookmarks are enabled, this component supports bookmarks using this component
 @author Garret Wilson
 @see CardLayout
 */
-public abstract class AbstractCardPanel<C extends Panel<C> & CardControl<C>> extends AbstractListSelectContainerControl<C> implements Panel<C>, CardControl<C>, NavigationListener
+public abstract class AbstractCardPanel extends AbstractListSelectContainerControl implements Panel, CardControl, NavigationListener
 {
 
 		//TODO make sure we listen for enabled status changing on the layout and send an index enabled property change, maybe
@@ -58,9 +58,9 @@ public abstract class AbstractCardPanel<C extends Panel<C> & CardControl<C>> ext
 	protected AbstractCardPanel(final CardLayout layout)
 	{
 		super(layout);	//construct the parent class
-		addPropertyChangeListener(VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Component<?>>()	//listen for the value changing and set bookmarks in response
+		addPropertyChangeListener(VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Component>()	//listen for the value changing and set bookmarks in response
 				{
-					public void propertyChange(final GenericPropertyChangeEvent<Component<?>> propertyChangeEvent)	//if the value changes
+					public void propertyChange(final GenericPropertyChangeEvent<Component> propertyChangeEvent)	//if the value changes
 					{
 //TODO del Debug.trace("value changed to ", propertyChangeEvent.getNewValue(), "and ready to update bookmark");
 						updateBookmark();	//update the bookmark, now that the property has changed
@@ -82,7 +82,7 @@ public abstract class AbstractCardPanel<C extends Panel<C> & CardControl<C>> ext
 				final GuiseSession session=getSession();	//get the current session
 				final Bookmark oldBookmark=session.getBookmark();	//get the current bookmark
 				final Bookmark bookmark=oldBookmark!=null ? oldBookmark : new Bookmark();	//create a new bookmark if there is no bookmark
-				final Component<?> selectedCard=getValue();	//get the current selected card
+				final Component selectedCard=getValue();	//get the current selected card
 				final String newBookmarkValue=selectedCard!=null ? selectedCard.getName() : "";	//the bookmark value is the name of the new card, or "" if no value is selected
 				final Bookmark newBookmark;	//we'll determine the new bookmark to set
 				if(newBookmarkValue!=null)	//if we know the new bookmark value
@@ -111,7 +111,7 @@ public abstract class AbstractCardPanel<C extends Panel<C> & CardControl<C>> ext
 		{
 			final Bookmark bookmark=navigationEvent.getBookmark();	//get the navigation bookmark, if any
 //TODO del Debug.trace("card panel ready to change to bookmark:", bookmark, "old component", getValue(), "old index", getSelectedIndex());
-			final Component<?> component=getComponent(bookmark);	//get the component from the bookmark
+			final Component component=getComponent(bookmark);	//get the component from the bookmark
 //TODO del Debug.trace("new component:", component, "new index", indexOf(component));
 			if(component!=null && isEnabled(component) && isDisplayed(component))	//if an enabled, displayed component is specified
 			{
@@ -134,7 +134,7 @@ public abstract class AbstractCardPanel<C extends Panel<C> & CardControl<C>> ext
 					final String parameterValue=bookmark.getParameterValue(parameterName);	//get the parameter value
 					if(parameterValue!=null)	//if a parameter for this component was specified
 					{
-						final Component<?> component=getComponentByBookmarkName(parameterValue);	//get the component from the bookmark name
+						final Component component=getComponentByBookmarkName(parameterValue);	//get the component from the bookmark name
 						if(component!=null && isEnabled(component) && isDisplayed(component))	//if an enabled, displayed component is specified
 						{
 							try
@@ -159,7 +159,7 @@ public abstract class AbstractCardPanel<C extends Panel<C> & CardControl<C>> ext
 	@param bookmark The bookmark for which a component should be returned, or <code>null</code> if no bookmark is available.
 	@return The child component indicated by the given bookmark parameter value, or <code>null</code> if the given bookmark represents the <code>null</code> component value.
 	*/
-	protected Component<?> getComponent(final Bookmark bookmark)
+	protected Component getComponent(final Bookmark bookmark)
 	{
 		if(bookmark!=null)	//if a bookmark is specified
 		{
@@ -171,7 +171,7 @@ public abstract class AbstractCardPanel<C extends Panel<C> & CardControl<C>> ext
 				{
 					if(parameterValue.length()>0)	//if the bookmark name is not the empty string
 					{
-						for(final Component<?> childComponent:this)	//for each child component
+						for(final Component childComponent:this)	//for each child component
 						{
 							if(parameterValue.equals(childComponent.getName()))	//if this component has the correct name
 							{
@@ -198,11 +198,11 @@ public abstract class AbstractCardPanel<C extends Panel<C> & CardControl<C>> ext
 	@exception NullPointerException if the given bookmark name is <code>null</code>.
 	*/
 /*TODO del when works
-	protected Component<?> getComponentByBookmarkName(final String bookmarkName)
+	protected Component getComponentByBookmarkName(final String bookmarkName)
 	{
 		if(bookmarkName.length()>0)	//if the bookmark name is not the empty string
 		{
-			for(final Component<?> childComponent:this)	//for each child component
+			for(final Component childComponent:this)	//for each child component
 			{
 				if(bookmarkName.equals(childComponent.getName()))	//if this component has the correct name
 				{

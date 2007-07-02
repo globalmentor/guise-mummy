@@ -21,7 +21,7 @@ import com.guiseframework.validator.ValidationException;
 @author Garret Wilson
 @param <V> The type of value the slider represents.
 */
-public class SliderControl<V extends Number> extends AbstractValueControl<V, SliderControl<V>>
+public class SliderControl<V extends Number> extends AbstractValueControl<V>
 {
 
 	/**The flow bound property.*/

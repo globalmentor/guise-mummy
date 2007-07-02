@@ -8,7 +8,7 @@ import com.guiseframework.component.layout.RegionLayout;
 @author Garret Wilson
 @see RegionLayout
 */
-public class DefaultModalNavigationPanel<R> extends AbstractModalNavigationPanel<R, DefaultModalNavigationPanel<R>>
+public class DefaultModalNavigationPanel<R> extends AbstractModalNavigationPanel<R>
 {
 
 	/**Default constructor with a default region layout.*/
@@ -21,7 +21,7 @@ public class DefaultModalNavigationPanel<R> extends AbstractModalNavigationPanel
 	@param layout The layout definition for the container.
 	@exception NullPointerException if the given layout is <code>null</code>.
 	*/
-	public DefaultModalNavigationPanel(final Layout layout)
+	public DefaultModalNavigationPanel(final Layout<?> layout)
 	{
 		super(layout);	//construct the parent class
 	}

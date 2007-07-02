@@ -1,7 +1,15 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ClassUtilities.*;
+import java.beans.PropertyVetoException;
 
+import javax.mail.internet.ContentType;
+
+import static com.garretwilson.io.ContentTypeConstants.*;
+import static com.garretwilson.io.ContentTypeUtilities.*;
+import static com.garretwilson.lang.ClassUtilities.*;
+import static com.garretwilson.text.TextConstants.*;
+
+import com.guiseframework.component.transfer.*;
 import com.guiseframework.converter.*;
 import com.guiseframework.model.*;
 
@@ -15,10 +23,18 @@ Default converters are available for the following types:
 	<li><code>java.lang.Integer</code></li>
 	<li><code>java.lang.String</code></li>
 </ul>
+This component installs a default export strategy supporting export of the following content types:
+<ul>
+	<li><code>text/plain</code></li>
+</ul>
+This component installs a default import strategy supporting import of the following content types:
+<ul>
+	<li><code>text/*</code></li>
+</ul>
 @param <V> The type of value the input text is to represent.
 @author Garret Wilson
 */
-public class TextControl<V> extends AbstractTextControl<V, TextControl<V>>
+public class TextControl<V> extends AbstractTextControl<V>
 {
 
 	/**The line wrap bound property.*/
@@ -113,6 +129,122 @@ public class TextControl<V> extends AbstractTextControl<V, TextControl<V>>
 				firePropertyChange(ROW_COUNT_PROPERTY, new Integer(oldRowCount), new Integer(newRowCount));	//indicate that the value changed
 			}			
 		}
+
+	/**The default export strategy for this component type.*/
+	protected final static ExportStrategy<TextControl<?>> DEFAULT_EXPORT_STRATEGY=new ExportStrategy<TextControl<?>>()
+			{
+				/**Exports data from the given component.
+				@param component The component from which data will be transferred.
+				@return The object to be transferred, or <code>null</code> if no data can be transferred.
+				*/
+				public Transferable<TextControl<?>> exportTransfer(final TextControl<?> component)
+				{
+					return new DefaultTransferable(component);	//return a default transferable for this component
+				}
+			};
+
+	/**The default import strategy for this component type.*/
+	protected final static ImportStrategy<TextControl<?>> DEFAULT_IMPORT_STRATEGY=new ImportStrategy<TextControl<?>>()	//add a new import strategy for this component
+			{		
+				/**Determines whether this strategy can import the given transferable object.
+				This implementation accepts all transferables providing <code>text/*</code> data.
+				@param component The component into which the object will be transferred.
+				@param transferable The object to be transferred.
+				@return <code>true</code> if the given object can be imported.
+				*/
+				public boolean canImportTransfer(final TextControl<?> component, final Transferable<?> transferable)
+				{
+					return transferable.canTransfer(new ContentType(TEXT, WILDCARD_SUBTYPE, null));	//we can import any text
+				}
+
+				/**Imports the given data into the given component.
+				This implementation imports the first available <code>text/*</code> data.
+				@param component The component into which the object will be transferred.
+				@param transferable The object to be transferred.
+				@return <code>true</code> if the given object was be imported.
+				*/
+				public boolean importTransfer(final TextControl<?> component, final Transferable<?> transferable)
+				{
+					boolean imported=false;	//we'll assume we didn't import anything
+					Object data=null;	//we'll store here any data we retrieve
+					if(transferable.canTransfer(TEXT_PLAIN_CONTENT_TYPE))	//text/plain is our favorite type; if we can import it
+					{
+						data=transferable.transfer(TEXT_PLAIN_CONTENT_TYPE);	//transfer the data
+						imported=true;	//indicate that we transported data
+					}
+					else	//otherwise, check for text/* types
+					{
+						for(final ContentType contentType:transferable.getContentTypes())	//for each available content type
+						{
+							if(match(contentType, TEXT, WILDCARD_SUBTYPE))	//if this is a text content type
+							{
+								data=transferable.transfer(contentType);	//transfer the data
+								imported=true;	//indicate that we transported data
+								break;	//stop looking for a match
+							}
+						}
+					}
+					if(imported && data!=null)	//if we transferred data
+					{
+						final String oldText=component.getText();	//get the current text
+						final StringBuilder newTextStringBuilder=new StringBuilder();	//create a string builder to collect our new information
+						if(oldText!=null)	//if there is content already
+						{
+							newTextStringBuilder.append(oldText);	//add the old content
+						}
+						newTextStringBuilder.append(data);	//append the data
+						final String newText=newTextStringBuilder.toString();	//get the new text
+						try
+						{
+							component.setTextValue(newText);	//update the literal text of the component, which will in turn update the provisional text of the component, and then update the value
+						}
+						catch(final ConversionException conversionException)	//if there is a conversion error
+						{
+							component.setNotification(new Notification(conversionException));	//add this error to the component
+							imported=false;	//transfer was unsuccessful
+						}
+						catch(final PropertyVetoException propertyVetoException)	//if there is a veto
+						{
+							final Throwable cause=propertyVetoException.getCause();	//get the cause of the veto, if any
+							component.setNotification(new Notification(cause!=null ? cause : propertyVetoException));	//add notification of the error to the component
+							imported=false;	//transfer was unsuccessful
+						}
+					}					
+					return imported;	//indicate whether we were able to find any information to transfer
+				}
+
+				/**Imports the given text into the given component.
+				@param component The component into which the data will be transferred.
+				@param data The data to be transferred.
+				*/
+				protected void importTransfer(final TextControl<?> component, final Object data)
+				{
+					if(data!=null)	//if we transferred data
+					{
+						final String oldText=component.getText();	//get the current text
+						final StringBuilder newTextStringBuilder=new StringBuilder();	//create a string builder to collect our new information
+						if(oldText!=null)	//if there is content already
+						{
+							newTextStringBuilder.append(oldText);	//add the old content
+						}
+						newTextStringBuilder.append(data);	//append the data
+						final String newText=newTextStringBuilder.toString();	//get the new text
+						try
+						{
+							component.setTextValue(newText);	//update the literal text of the component, which will in turn update the provisional text of the component, and then update the value
+						}
+						catch(final ConversionException conversionException)	//if there is a conversion error
+						{
+							component.setNotification(new Notification(conversionException));	//add this error to the component
+						}
+						catch(final PropertyVetoException propertyVetoException)	//if there is a veto
+						{
+							final Throwable cause=propertyVetoException.getCause();	//get the cause of the veto, if any
+							component.setNotification(new Notification(cause!=null ? cause : propertyVetoException));	//add notification of the error to the component
+						}
+					}
+				}
+			};
 
 	/**Value class constructor with a default data model to represent a given type and a default converter.
 	@param valueClass The class indicating the type of value held in the model.
@@ -258,6 +390,46 @@ public class TextControl<V> extends AbstractTextControl<V, TextControl<V>>
 		this.rowCount=rowCount;
 		setColumnCount(columnCount);
 		this.lineWrap=lineWrap;
+		addExportStrategy(DEFAULT_EXPORT_STRATEGY);	//install a default export strategy 
+		addImportStrategy(DEFAULT_IMPORT_STRATEGY);	//install a default import strategy 
+	}
+
+	/**The default transferable object for a text control.
+	@author Garret Wilson
+	*/
+	protected static class DefaultTransferable extends AbstractTransferable<TextControl<?>>
+	{
+		/**Source constructor.
+		@param source The source of the transferable data.
+		@exception NullPointerException if the provided source is <code>null</code>.
+		*/
+		public DefaultTransferable(final TextControl<?> source)
+		{
+			super(source);	//construct the parent class
+		}
+
+		/**Determines the content types available for this transfer.
+		This implementation returns the <code>text/plain</code> content type.
+		@return The content types available for this transfer.
+		*/
+		public ContentType[] getContentTypes() {return new ContentType[]{TEXT_PLAIN_CONTENT_TYPE};}
+
+		/**Transfers data using the given content type.
+		@param contentType The type of data expected.
+		@return The transferred data, which may be <code>null</code>.
+		@exception IllegalArgumentException if the given content type is not supported.
+		*/
+		public Object transfer(final ContentType contentType)
+		{
+			if(contentType.match(TEXT_PLAIN_CONTENT_TYPE))	//if they request the supported content type
+			{
+				return getSource().getText();	//return the current text
+			}
+			else	//if we don't support this content type
+			{
+				throw new IllegalArgumentException("Content type not supported: "+contentType);
+			}
+		}
 	}
 
 }

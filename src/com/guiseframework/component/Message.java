@@ -18,7 +18,7 @@ The message only supports text content types, including:
 <p>The message defaults to a content type of <code>text/plain</code>.</p>
 @author Garret Wilson
 */
-public class Message extends AbstractComponent<Message>	//TODO del component if not needed
+public class Message extends AbstractComponent	//TODO del component if not needed
 {
 
 	/**The message bound property.*/

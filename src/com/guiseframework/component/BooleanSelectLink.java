@@ -7,7 +7,7 @@ import com.guiseframework.prototype.ValuePrototype;
 A validator requiring a non-<code>null</code> value is automatically installed.
 @author Garret Wilson
 */
-public class BooleanSelectLink extends AbstractBooleanSelectActionControl<BooleanSelectLink> implements SelectLinkControl<BooleanSelectLink>
+public class BooleanSelectLink extends AbstractBooleanSelectActionControl implements SelectLinkControl
 {
 
 	/**Default constructor.*/

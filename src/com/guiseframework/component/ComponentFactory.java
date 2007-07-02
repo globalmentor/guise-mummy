@@ -5,7 +5,7 @@ package com.guiseframework.component;
 @param <C> The type of component created for the value.
 @author Garret Wilson
 */
-public interface ComponentFactory<V, C extends Component<?>>
+public interface ComponentFactory<V, C extends Component>
 {
 
 	/**Creates a component for the given value.

@@ -20,7 +20,7 @@ Child element ID reference replacement can only occur if the text has an XML-bas
 <p>The component defaults to a content type of <code>text/plain</code>.</p>
 @author Garret Wilson
 */
-public class Text extends AbstractContainer<Text> implements TextModel
+public class Text extends AbstractContainer implements TextModel	//TODO probably change to a LayoutComponent
 {
 
 	/**The text model used by this component.*/

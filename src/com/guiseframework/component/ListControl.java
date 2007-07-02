@@ -9,7 +9,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 @param <V> The type of values to select.
 @author Garret Wilson
 */
-public class ListControl<V> extends AbstractListSelectControl<V, ListControl<V>>
+public class ListControl<V> extends AbstractListSelectControl<V>
 {
 
 	/**The row count bound property.*/

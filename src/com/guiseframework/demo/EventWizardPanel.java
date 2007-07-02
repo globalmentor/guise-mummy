@@ -11,7 +11,7 @@ import com.guiseframework.validator.RegularExpressionStringValidator;
 import com.guiseframework.validator.ValueRequiredValidator;
 
 /**Event wizard Guise demonstration panel.
-Copyright © 2006 GlobalMentor, Inc.
+Copyright © 2006-2007 GlobalMentor, Inc.
 Demonstrates sequence card panels, task card constraints, task status select links,
 	action card couplers, link select card couplers, and action prototypes.
 @author Garret Wilson
@@ -39,11 +39,11 @@ public class EventWizardPanel extends DefaultNavigationPanel
 		personalNamePanel.setName("personalCard1");
 		personalNamePanel.setConstraints(new TaskCardConstraints());
 		wizardCardPanel.add(personalNamePanel);
-		final Panel<?> personalAgePanel=new PersonalAgePanel();
+		final Panel personalAgePanel=new PersonalAgePanel();
 		personalAgePanel.setName("personalAgePanel");
 		personalAgePanel.setConstraints(new TaskCardConstraints());
 		wizardCardPanel.add(personalAgePanel);
-		final Panel<?> personalEmailPanel=new PersonalEmailPanel();
+		final Panel personalEmailPanel=new PersonalEmailPanel();
 		personalEmailPanel.setConstraints(new TaskCardConstraints());
 		personalEmailPanel.setName("personalEmailPanel");
 		wizardCardPanel.add(personalEmailPanel);		
@@ -55,15 +55,15 @@ public class EventWizardPanel extends DefaultNavigationPanel
 						wizardCardPanel.setDisplayed(personalAgePanel, propertyChangeEvent.getNewValue());	//show or hide the age panel based upon the state of the age checkbox
 					}			
 				});
-		final Panel<?> businessNamePanel=new BusinessNamePanel();
+		final Panel businessNamePanel=new BusinessNamePanel();
 		businessNamePanel.setConstraints(new TaskCardConstraints());
 		businessNamePanel.setName("businessNamePane");
 		wizardCardPanel.add(businessNamePanel);
-		final Panel<?> businessAddressPanel=new BusinessAddressPanel();
+		final Panel businessAddressPanel=new BusinessAddressPanel();
 		businessAddressPanel.setConstraints(new TaskCardConstraints());
 		businessAddressPanel.setName("businessAddressPanel");
 		wizardCardPanel.add(businessAddressPanel);
-		final Panel<?> eventNamePanel=new EventNamePanel();
+		final Panel eventNamePanel=new EventNamePanel();
 		eventNamePanel.setName("eventNamePanel");
 		eventNamePanel.setConstraints(new TaskCardConstraints());
 		wizardCardPanel.add(eventNamePanel);
@@ -131,9 +131,9 @@ public class EventWizardPanel extends DefaultNavigationPanel
 		new ActionCardCoupler(eventLink30, eventNamePanel);
 		new ActionCardCoupler(eventLink31, eventNamePanel);
 				//wizard tab couplers
-		new ListSelectCardCoupler<Component<?>>(wizardTabContainerControl, personalTabLabel, personalNamePanel, personalAgePanel, personalEmailPanel);
-		new ListSelectCardCoupler<Component<?>>(wizardTabContainerControl, businessTabLabel, businessNamePanel, businessAddressPanel);
-		new ListSelectCardCoupler<Component<?>>(wizardTabContainerControl, eventTabLabel, eventNamePanel);
+		new ListSelectCardCoupler<Component>(wizardTabContainerControl, personalTabLabel, personalNamePanel, personalAgePanel, personalEmailPanel);
+		new ListSelectCardCoupler<Component>(wizardTabContainerControl, businessTabLabel, businessNamePanel, businessAddressPanel);
+		new ListSelectCardCoupler<Component>(wizardTabContainerControl, eventTabLabel, eventNamePanel);
 		add(wizardPanel);
 
 		wizardCardPanel.resetSequence();
@@ -248,10 +248,10 @@ public class EventWizardPanel extends DefaultNavigationPanel
 			heading.setLabel("Business Information: Address");
 			add(heading);
 				//business address
-			final TextAreaControl addressTextArea=new TextAreaControl(4, 40);
-			addressTextArea.setLabel("Business Address");
-			addressTextArea.setValidator(new RegularExpressionStringValidator("\\S+.*", true));
-			add(addressTextArea);
+			final TextControl<String> addressTextControl=new TextControl<String>(String.class, 4, 40);
+			addressTextControl.setLabel("Business Address");
+			addressTextControl.setValidator(new RegularExpressionStringValidator("\\S+.*", true));
+			add(addressTextControl);
 		}
 	}
 

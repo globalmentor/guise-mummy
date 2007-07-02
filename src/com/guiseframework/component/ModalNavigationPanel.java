@@ -6,7 +6,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 @param <R> The type of modal result this modal navigation panel produces.
 @author Garret Wilson
 */
-public interface ModalNavigationPanel<R, C extends ModalNavigationPanel<R, C>> extends NavigationPanel<C>
+public interface ModalNavigationPanel<R> extends NavigationPanel
 {
 	/**The modal state bound property.*/
 	public final static String MODAL_PROPERTY=getPropertyName(ModalNavigationPanel.class, "modal");

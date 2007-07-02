@@ -3,7 +3,6 @@ package com.guiseframework.component;
 import java.io.IOException;
 
 import com.guiseframework.GuiseApplication;
-import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.model.DefaultLabelModel;
 import com.guiseframework.model.LabelModel;
@@ -15,7 +14,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 Iterating over child components is thread safe.
 @author Garret Wilson
 */
-public abstract class AbstractLayoutComponent<C extends LayoutComponent<C>> extends AbstractListCompositeComponent<C> implements LayoutComponent<C>
+public abstract class AbstractLayoutComponent extends AbstractListCompositeComponent implements LayoutComponent
 {
 
 	/**Adds a child component at the specified index.
@@ -26,7 +25,7 @@ public abstract class AbstractLayoutComponent<C extends LayoutComponent<C>> exte
 	@exception IllegalArgumentException if the component already has a parent.
 	@exception IllegalStateException if the installed layout does not support default constraints.
 	*/
-	protected boolean addComponent(final int index, final Component<?> component)
+	protected boolean addComponent(final int index, final Component component)
 	{
 		if(super.addComponent(index, component))	//add the component normally; if the child components changed
 		{
@@ -50,7 +49,7 @@ public abstract class AbstractLayoutComponent<C extends LayoutComponent<C>> exte
 	@exception IllegalStateException if no constraints were provided and the installed layout does not support default constraints.
 	*/
 /*TODO del if not needed
-	protected boolean add(final Component<?> component, final Constraints constraints)
+	protected boolean add(final Component component, final Constraints constraints)
 	{
 		component.setConstraints(constraints);	//set the constraints in the component
 		return add(component);	//add the component, now that its constraints have been set
@@ -62,7 +61,7 @@ public abstract class AbstractLayoutComponent<C extends LayoutComponent<C>> exte
 	@return <code>true</code> if the child components changed as a result of the operation.
 	@exception IllegalArgumentException if the component is not a member of this composite component.
 	*/
-	protected boolean removeComponent(final Component<?> component)
+	protected boolean removeComponent(final Component component)
 	{
 		final int index=indexOf(component);	//get the index of the component
 		if(component.getParent()!=this || index<0)	//if this component is not a member of this container TODO maybe make a better check than indexOf(), like hasComponent(); index may be needed eventually, though, if container events get promoted to composite componente events
@@ -77,10 +76,10 @@ public abstract class AbstractLayoutComponent<C extends LayoutComponent<C>> exte
 	}
 
 	/**The layout definition for the component.*/
-	private Layout<?> layout;
+	private Layout<? extends Constraints> layout;
 
 		/**@return The layout definition for the component.*/
-		public Layout<?> getLayout() {return layout;}
+		public Layout<? extends Constraints> getLayout() {return layout;}
 
 		/**Sets the layout definition for the component.
 		This is a bound property.
@@ -98,7 +97,7 @@ public abstract class AbstractLayoutComponent<C extends LayoutComponent<C>> exte
 				oldLayout.setOwner(null);	//tell the old layout it is no longer installed
 				layout=newLayout;	//actually change the value
 				layout.setOwner(this);	//tell the new layout which container owns it
-				for(final Component<?> childComponent:getChildren())	//for each child component
+				for(final Component childComponent:getChildren())	//for each child component
 				{
 					newLayout.getConstraints(childComponent);	//make sure the constraints of all components are compatible with the layout TODO do we even need to do this? why not wait until later? but this may be OK---perhaps we can assume that if components are installed before the layout, they will be used with this layout and not another
 				}
@@ -132,7 +131,7 @@ public abstract class AbstractLayoutComponent<C extends LayoutComponent<C>> exte
 	@param layout The layout definition for the container.
 	@exception NullPointerException if the given layout is <code>null</code>.
 	*/
-	public AbstractLayoutComponent(final Layout<?> layout)
+	public AbstractLayoutComponent(final Layout<? extends Constraints> layout)
 	{
 		this(new DefaultLabelModel(), layout);	//construct the class with a default label model
 	}
@@ -142,7 +141,7 @@ public abstract class AbstractLayoutComponent<C extends LayoutComponent<C>> exte
 	@param layout The layout definition for the container.
 	@exception NullPointerException if the given label model and/or layout is <code>null</code>.
 	*/
-	public AbstractLayoutComponent(final LabelModel labelModel, final Layout<?> layout)
+	public AbstractLayoutComponent(final LabelModel labelModel, final Layout<? extends Constraints> layout)
 	{
 		super(labelModel);	//construct the parent class
 		this.layout=checkInstance(layout, "Layout cannot be null.");	//save the layout

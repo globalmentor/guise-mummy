@@ -107,10 +107,10 @@ public class RegionLayout extends AbstractLayout<RegionConstraints>
 				alignments[flowOrdinal]=newAlignment;	//actually change the value
 				firePropertyChange(ALIGNMENT_PROPERTIES[flowOrdinal], oldAlignment, newAlignment);	//indicate that the value changed
 			}			
-			final LayoutComponent<?> owner=getOwner();	//get the owner of this layout, if any
+			final LayoutComponent owner=getOwner();	//get the owner of this layout, if any
 			if(owner!=null)	//if this layout has an owner
 			{
-				for(final Component<?> component:getOwner().getChildren())	//for all child components of the owner
+				for(final Component component:getOwner().getChildren())	//for all child components of the owner
 				{
 					getConstraints(component).setAlignment(flow, newAlignment);	//update this child component's constraints with the new alignment value
 				}
@@ -187,10 +187,10 @@ public class RegionLayout extends AbstractLayout<RegionConstraints>
 				extents[flowOrdinal]=newExtent;	//actually change the value
 				firePropertyChange(EXTENT_PROPERTIES[flowOrdinal], oldExtent, newExtent);	//indicate that the value changed
 			}			
-			final LayoutComponent<?> owner=getOwner();	//get the owner of this layout, if any
+			final LayoutComponent owner=getOwner();	//get the owner of this layout, if any
 			if(owner!=null)	//if this layout has an owner
 			{
-				for(final Component<?> component:getOwner().getChildren())	//for all child components of the owner
+				for(final Component component:getOwner().getChildren())	//for all child components of the owner
 				{
 					getConstraints(component).setExtent(flow, newExtent);	//update this child component's constraints with the new extent value
 				}
@@ -277,10 +277,10 @@ public class RegionLayout extends AbstractLayout<RegionConstraints>
 				paddingExtents[borderOrdinal]=newPaddingExtent;	//actually change the value
 				firePropertyChange(PADDING_EXTENT_PROPERTIES[borderOrdinal], oldPaddingExtent, newPaddingExtent);	//indicate that the value changed
 			}			
-			final LayoutComponent<?> owner=getOwner();	//get the owner of this layout, if any
+			final LayoutComponent owner=getOwner();	//get the owner of this layout, if any
 			if(owner!=null)	//if this layout has an owner
 			{
-				for(final Component<?> component:getOwner().getChildren())	//for all child components of the owner
+				for(final Component component:getOwner().getChildren())	//for all child components of the owner
 				{
 					getConstraints(component).setPaddingExtent(border, newPaddingExtent);	//update this child component's constraints with the new padding extent value
 				}
@@ -407,9 +407,9 @@ public class RegionLayout extends AbstractLayout<RegionConstraints>
 	@param region The region for which a component should be returned.
 	@return The component with which the given region is associated, or <code>null</code> if no component has the given region specified.
 	*/
-	public Component<?> getComponent(final Region region)	//TODO later use reverse maps or something similar for quicker lookup
+	public Component getComponent(final Region region)	//TODO later use reverse maps or something similar for quicker lookup
 	{
-		for(final Component<?> childComponent:getOwner().getChildren())	//for each child component in the container
+		for(final Component childComponent:getOwner().getChildren())	//for each child component in the container
 		{
 			final RegionConstraints constraints=(RegionConstraints)getConstraints(childComponent);	//get the constraints for this component TODO use covariants on each subclass; update getConstraints() to ensure correct type
 			if(constraints.getRegion()==region)	//if this component is in the correct region

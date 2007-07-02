@@ -16,7 +16,7 @@ with each link target representing that path segment relative to the application
 Individual path segments are unencoded when displayed in their respective links.
 @author Garret Wilson
 */
-public class URIPathSegmentLinkPanel extends AbstractPanel<URIPathSegmentLinkPanel>
+public class URIPathSegmentLinkPanel extends AbstractPanel
 {
 
 	/**The URI bound property.*/

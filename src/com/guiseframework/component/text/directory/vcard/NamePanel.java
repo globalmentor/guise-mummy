@@ -17,7 +17,7 @@ import static com.guiseframework.Resources.*;
 	profile as defined in <a href="http://www.ietf.org/rfc/rfc2426.txt">RFC 2426</a>, "vCard MIME Directory Profile".
 @author Garret Wilson
 */
-public class NamePanel extends AbstractPanel<NamePanel>
+public class NamePanel extends AbstractPanel
 {
 
 	/**The family name text field.*/

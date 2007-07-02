@@ -30,7 +30,7 @@ Default converters are available for the following types:
 @param <V> The type of value the input text is to represent.
 @author Garret Wilson
 */
-public class AbstractTextControl<V, C extends ValueControl<V, C>> extends AbstractValueControl<V, C>
+public class AbstractTextControl<V> extends AbstractValueControl<V>
 {
 
 	/**The auto commit pattern bound property.*/
@@ -157,6 +157,24 @@ public class AbstractTextControl<V, C extends ValueControl<V, C>> extends Abstra
 				}
 				firePropertyChange(TEXT_PROPERTY, oldText, newText);	//indicate that the value changed
 			}			
+		}
+
+		/**Sets the text literal value displayed in the control, and then converts the text to an appropriate value and stores it.
+		This is a convenience method.
+		@param newText The new text literal value to display in the control and then convert and store as a value.
+		@see #setText(String)
+		@see #getConverter()
+		@see Converter#convertLiteral(Object)
+		@see #setValue(Object)
+		@exception ConversionException if the literal value cannot be converted.
+		@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
+		*/
+		public void setTextValue(final String newText) throws ConversionException, PropertyVetoException
+		{
+			setText(newText);	//update the literal text of the component, which will in turn update the provisional text of the component
+			final Converter<V, String> converter=getConverter();	//get the component's converter
+			final V value=converter.convertLiteral(newText);	//convert the literal text value, throwing an exception if the value cannot be converted
+			setValue(value);	//store the value in the model, throwing an exception if the value is invalid
 		}
 
 	/**The property change listener that updates the text in response to a property changing.*/

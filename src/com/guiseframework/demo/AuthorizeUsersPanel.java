@@ -5,9 +5,9 @@ import java.util.*;
 
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
-import com.guiseframework.context.GuiseContext;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
+import com.guiseframework.platform.DepictContext;
 import com.guiseframework.validator.RegularExpressionStringValidator;
 
 /**Authorize Users Guise demonstration panel.
@@ -69,9 +69,9 @@ public class AuthorizeUsersPanel extends DefaultNavigationPanel
 	This versions makes sure the user list is updated from the application.
 	@param context Guise context information.
 	@exception IOException if there is an error updating the view.
-	@see GuiseContext.State#UPDATE_VIEW
+	@see DepictContext.State#UPDATE_VIEW
 	*/
-	public <GC extends GuiseContext> void updateView(final GC context) throws IOException
+	public <GC extends DepictContext> void updateView(final GC context) throws IOException	//TODO change to depict()
 	{
 		userAuthorizationModel.clear();	//clear all the users we currently have
 		final List<DemoUser> applicationUserList=((DemoApplication)getSession().getApplication()).getUsers();	//get the application's list of users
@@ -83,7 +83,7 @@ public class AuthorizeUsersPanel extends DefaultNavigationPanel
 		{
 			Collections.sort(userAuthorizationModel);	//sort the user list model (each user implements Comparable)
 		}
-		super.updateView(context);	//do the default model querying for the panel
+		super.depict();	//do the default model querying for the panel
 	}
 
 	/**A table model based upon a list of users, each column representing a property of the user.

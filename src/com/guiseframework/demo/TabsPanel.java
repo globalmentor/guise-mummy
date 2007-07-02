@@ -23,13 +23,13 @@ public class TabsPanel extends DefaultNavigationPanel
 				//TabbedPanel
 		final TabbedPanel tabbedPanel=new TabbedPanel();	//create a tabbed panel
 					//page 1
-		final Panel<?> tabbedPanelPage1=new LayoutPanel();	//create a panel to serve as the page
+		final Panel tabbedPanelPage1=new LayoutPanel();	//create a panel to serve as the page
 		final Heading tabbedPanelPage1Heading=new Heading(0);	//create a top-level heading
 		tabbedPanelPage1Heading.setLabel("This is page 1.");	//set the text of the heading
 		tabbedPanelPage1.add(tabbedPanelPage1Heading);	//add the heading to the page
 		tabbedPanel.add(tabbedPanelPage1, new CardConstraints("Page 1"));	//add the panel with a label
 					//page 2
-		final Panel<?> tabbedPanelPage2=new LayoutPanel();	//create a panel to serve as the page
+		final Panel tabbedPanelPage2=new LayoutPanel();	//create a panel to serve as the page
 		final Heading tabbedPanelPage2Heading=new Heading(0);	//create a top-level heading
 		tabbedPanelPage2Heading.setLabel("This is page 2.");	//set the text of the heading
 		tabbedPanelPage2.add(tabbedPanelPage2Heading);	//add the heading to the page
@@ -46,13 +46,13 @@ public class TabsPanel extends DefaultNavigationPanel
 				//CardPanel
 		final CardPanel cardPanel=new CardPanel();	//create a card panel
 					//page 1
-		final Panel<?> cardPanelPage1=new LayoutPanel();	//create a panel to serve as the page
+		final Panel cardPanelPage1=new LayoutPanel();	//create a panel to serve as the page
 		final Heading cardPanelPage1Heading=new Heading(0);	//create a top-level heading
 		cardPanelPage1Heading.setLabel("This is page 1.");	//set the text of the heading
 		cardPanelPage1.add(cardPanelPage1Heading);	//add the heading to the page
 		cardPanel.add(cardPanelPage1, new CardConstraints("Page 1"));	//add the panel with a label
 					//page 2
-		final Panel<?> cardPanelPage2=new LayoutPanel();	//create a panel to serve as the page
+		final Panel cardPanelPage2=new LayoutPanel();	//create a panel to serve as the page
 		final Heading cardPanelPage2Heading=new Heading(0);	//create a top-level heading
 		cardPanelPage2Heading.setLabel("This is page 2.");	//set the text of the heading
 		cardPanelPage2.add(cardPanelPage2Heading);	//add the heading to the page

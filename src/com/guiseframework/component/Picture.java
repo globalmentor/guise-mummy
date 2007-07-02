@@ -7,7 +7,7 @@ import com.guiseframework.model.DefaultLabelModel;
 /**An image component that displays an associated label and description, if present.
 @author Garret Wilson
 */
-public class Picture extends AbstractImageComponent<Picture>
+public class Picture extends AbstractImageComponent
 {
 
 	/**The bound property of whether the description is displayed.*/

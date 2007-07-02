@@ -3,18 +3,21 @@ package com.guiseframework.platform.web;
 import java.net.URI;
 
 import com.guiseframework.GuiseApplication;
-import com.guiseframework.platform.GuisePlatform;
+import com.guiseframework.platform.Platform;
 
 /**The web platform for Guise.
 @author Garret Wilson
 */
-public interface GuiseWebPlatform extends GuisePlatform
+public interface WebPlatform extends Platform
 {
 
 	/**The namespace of the Guise markup language to be used with XHTML.*/
 	public final static URI GUISE_ML_NAMESPACE_URI=URI.create("http://guiseframework.com/id/ml#");
 	/**The standard prefix to use with the Guise markup language namespace.*/
 	public final static String GUISE_ML_NAMESPACE_PREFIX="guise";
+
+	/**The public ID of the Guise XHTML DTD.*/
+	public final static String GUISE_XHTML_DTD_PUBLIC_ID="-//Guise//DTD XHTML Guise 1.0//EN";	
 
 		//Guise-specific elements
 			//img
@@ -64,5 +67,14 @@ public interface GuiseWebPlatform extends GuisePlatform
 	@exception IllegalArgumentException if the given string does not represent the correct string form of a depict ID on this platform.
 	*/
 	public long getDepictID(final String depictIDString);
+
+	/**@return The user agent client, such as a browser, used to access Guise on this platform.*/
+	public WebUserAgentProduct getClientProduct();
+
+	/**Retrieves information and functionality related to the current depiction.
+	@return A context for the current depiction.
+	@exception IllegalStateException if no depict context can be returned in the current depiction state.
+	*/
+	public WebDepictContext getDepictContext();
 
 }

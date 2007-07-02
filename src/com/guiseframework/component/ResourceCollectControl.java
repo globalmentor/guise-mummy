@@ -20,7 +20,7 @@ import com.guiseframework.model.*;
 The destination path should reference a registered {@link ResourceWriteDestination} of the application.
 @author Garret Wilson
 */
-public class ResourceCollectControl extends AbstractControl<ResourceCollectControl>
+public class ResourceCollectControl extends AbstractControl
 {
 
 	/**The bound property of the paths of the collected resources.*/

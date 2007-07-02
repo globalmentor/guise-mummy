@@ -7,7 +7,7 @@ import com.guiseframework.component.layout.Layout;
 /**A panel that demarcates a semantically signifcant area of the a parent component.
 @author Garret Wilson
 */
-public class SectionPanel extends AbstractPanel<SectionPanel>
+public class SectionPanel extends AbstractPanel
 {
 	
 	/**Default constructor with a default vertical flow layout.*/

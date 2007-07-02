@@ -9,7 +9,7 @@ import com.guiseframework.prototype.ActionPrototype;
 /**Control with an action model rendered as a link.
 @author Garret Wilson
 */
-public class Link extends AbstractLinkControl<Link>
+public class Link extends AbstractLinkControl
 {
 
 	/**Default constructor.*/

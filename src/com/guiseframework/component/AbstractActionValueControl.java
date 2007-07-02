@@ -15,7 +15,7 @@ The component valid status is updated before a change in the {@link #VALUE_PROPE
 @param <V> The type of value the control represents.
 @author Garret Wilson
 */
-public abstract class AbstractActionValueControl<V, C extends ActionValueControl<V, C> & LabelDisplayableComponent<C>> extends AbstractActionControl<C> implements ActionValueControl<V, C>
+public abstract class AbstractActionValueControl<V> extends AbstractActionControl implements ActionValueControl<V>
 {
 
 	/**The value model used by this component.*/

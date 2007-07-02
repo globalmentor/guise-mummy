@@ -11,9 +11,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import javax.mail.internet.ContentType;
 
 import com.garretwilson.beans.TargetedEvent;
-import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.lang.*;
 import com.garretwilson.rdf.RDFResource;
-import com.garretwilson.rdf.RDFUtilities;
 import com.garretwilson.rdf.ploop.PLOOPProcessor;
 import com.garretwilson.rdf.ploop.PLOOPRDFGenerator;
 import com.garretwilson.util.Debug;
@@ -22,18 +21,15 @@ import com.guiseframework.GuiseSession;
 import com.guiseframework.component.effect.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.component.transfer.*;
-import com.guiseframework.context.GuiseContext;
-import com.guiseframework.controller.*;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
 import com.guiseframework.input.Input;
 import com.guiseframework.input.InputStrategy;
 import com.guiseframework.model.*;
 import com.guiseframework.model.ui.AbstractPresentationModel;
-import com.guiseframework.platform.web.WebPlatformEvent;
+import com.guiseframework.platform.*;
 import com.guiseframework.prototype.PrototypeConsumer;
 import com.guiseframework.theme.Theme;
-import com.guiseframework.viewer.Viewer;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.text.TextUtilities.*;
@@ -45,7 +41,7 @@ This implementation automatically handles postponed property change events when 
 <p>Property changes to a component's constraints are repeated with the component as the source and the constraints as the target.</p> 
 @author Garret Wilson
 */
-public abstract class AbstractComponent<C extends Component<C>> extends AbstractPresentationModel implements Component<C>
+public abstract class AbstractComponent extends AbstractPresentationModel implements Component
 {
 
 	/**The object managing event listeners.*/
@@ -53,10 +49,6 @@ public abstract class AbstractComponent<C extends Component<C>> extends Abstract
 
 		/**@return The object managing event listeners.*/
 		protected EventListenerManager getEventListenerManager() {return eventListenerManager;}
-
-	/**@return A reference to this instance, cast to the generic self type.*/
-	@SuppressWarnings("unchecked")
-	protected final C getThis() {return (C)this;}
 
 	/**The thread-safe set of properties saved and loaded as preferences.*/
 	private final Set<String> preferenceProperties=new CopyOnWriteArraySet<String>();
@@ -422,74 +414,48 @@ Debug.trace("now valid of", this, "is", isValid());
 			return true;	//default to being valid
 		}
 
-	/**The controller installed in this component.*/
-	private Controller<? extends GuiseContext, ? super C> controller;
+	/**The depictor for this object; the depictor is lazily installed to allow construction to complete before the depictor is installed.*/
+	private final Depictor<? extends Component> depictor;
 
-		/**@return The controller installed in this component.*/
-		public Controller<? extends GuiseContext, ? super C> getController() {return controller;}
-
-		/**Sets the controller used by this component.
-		This is a bound property.
-		@param newController The new controller to use.
-		@see Component#CONTROLLER_PROPERTY
-		@exception NullPointerException if the given controller is <code>null</code>.
-		*/
-		public void setController(final Controller<? extends GuiseContext, ? super C> newController)
+		/**@return The depictor for this object.*/
+		public Depictor<? extends Component> getDepictor()
 		{
-			if(newController!=controller)	//if the value is really changing
+			if(depictor.getDepictedObject()==null)	//if the depictor has not yet been installed TODO fix the race condition
 			{
-				final Controller<? extends GuiseContext, ? super C> oldController=controller;	//get a reference to the old value
-				controller=checkInstance(newController, "Controller cannot be null.");	//actually change values
-				firePropertyChange(CONTROLLER_PROPERTY, oldController, newController);	//indicate that the value changed				
+				notifyDepictorInstalled(depictor);	//tell the the depictor it has been installed
 			}
+			return depictor;	//return the depictor
 		}
 
-	/**The viewer installed in this component.*/
-	private Viewer<? extends GuiseContext, ? super C> viewer=null;
-
-		/**@return The viewer installed in this component.
-		This implementation lazily creates a viewer if one has not yet been created, allowing viewer creation to be delayed so that appropriate properties such as layout may first be installed.
+		/**Processes an event from the platform.
+		This method delegates to the currently installed depictor.
+		@param event The event to be processed.
+		@exception IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
+		@see #getDepictor()
+		@see Depictor#processEvent(PlatformEvent)
 		*/
-		public Viewer<? extends GuiseContext, ? super C> getViewer()
+		public void processEvent(final PlatformEvent event)
 		{
-			if(viewer==null)	//if a viewer has not yet been created
-			{
-				viewer=getSession().getApplication().getViewer(getThis());	//ask the application for a view
-				if(viewer==null)	//if we couldn't find a viewer
-				{
-					throw new IllegalStateException("No registered viewer for "+getClass().getName());
-				}
-				viewer.installed(getThis());	//tell the viewer it's being installed
-			}
-			return viewer;	//return the viewer
+			getDepictor().processEvent(event);	//ask the depictor to process the event
 		}
 
-		/**Sets the viewer used by this component.
-		This is a bound property.
-		@param newViewer The new viewer to use.
-		@see Component#VIEWER_PROPERTY
-		@exception NullPointerException if the given viewer is <code>null</code>.
+		/**Updates the depiction of the object.
+		The depiction will be marked as updated.
+		This method delegates to the currently installed depictor.
+		@exception IOException if there is an error updating the depiction.
+		@see #getDepictor()
+		@see Depictor#depict()
 		*/
-		public void setViewer(final Viewer<? extends GuiseContext, ? super C> newViewer)
+		public void depict() throws IOException
 		{
-			if(newViewer!=checkInstance(viewer, "Viewer cannot be null"))	//if the value is really changing
-			{
-				final Viewer<? extends GuiseContext, ? super C> oldView=viewer;	//get a reference to the old value
-				if(oldView!=null)	//if a view has been installed
-				{
-					oldView.uninstalled(getThis());	//tell the old viewer it's being uninstalled
-				}
-				viewer=newViewer;	//actually change values
-				oldView.installed(getThis());	//tell the new viewer it's being installed
-				firePropertyChange(VIEWER_PROPERTY, oldView, newViewer);	//indicate that the value changed				
-			}
+			getDepictor().depict();	//ask the depictor to depict the object
 		}
 
-	/**The component identifier*/
-	private final String id;
+	/**The object depiction identifier*/
+	private final long depictID;
 
-		/**@return The component identifier.*/
-		public String getID() {return id;}
+		/**@return The object depiction identifier.*/
+		public long getDepictID() {return depictID;}
 		
 	/**The internationalization orientation of the component's contents, or <code>null</code> if the default orientation should be used.*/
 	private Orientation orientation=null;
@@ -518,7 +484,7 @@ Debug.trace("now valid of", this, "is", isValid());
 			}
 			else	//otherwise, try to defer to the parent
 			{
-				final Component<?> parent=getParent();	//get this component's parent
+				final Component parent=getParent();	//get this component's parent
 				if(parent!=null)	//if we have a parent
 				{
 					return parent.getComponentOrientation();	//return the parent's orientation
@@ -546,10 +512,10 @@ Debug.trace("now valid of", this, "is", isValid());
 		}
 
 	/**The parent of this component, or <code>null</code> if this component does not have a parent.*/
-	private CompositeComponent<?> parent=null;
+	private CompositeComponent parent=null;
 
 		/**@return The parent of this component, or <code>null</code> if this component does not have a parent.*/
-		public CompositeComponent<?> getParent() {return parent;}
+		public CompositeComponent getParent() {return parent;}
 
 		/**Retrieves the first ancestor of the given type.
 		@param <A> The type of ancestor component requested.
@@ -557,9 +523,9 @@ Debug.trace("now valid of", this, "is", isValid());
 		@return The first ancestor component of the given type, or <code>null</code> if this component has no such ancestor.
 		*/
 		@SuppressWarnings("unchecked")	//we check to see if the ancestor is of the correct type before casting, so the cast is logically checked, though not syntactically checked
-		public <A extends CompositeComponent<?>> A getAncestor(final Class<A> ancestorClass)
+		public <A extends CompositeComponent> A getAncestor(final Class<A> ancestorClass)
 		{
-			final CompositeComponent<?> parent=getParent();	//get this component's parent
+			final CompositeComponent parent=getParent();	//get this component's parent
 			if(parent!=null)	//if there is a parent
 			{
 				return ancestorClass.isInstance(parent) ? (A)parent : parent.getAncestor(ancestorClass);	//if the parent is of the correct type, return it; otherwise, ask it to search its own ancestors
@@ -583,9 +549,9 @@ Debug.trace("now valid of", this, "is", isValid());
 		@see Container#add(Component)
 		@see Container#remove(Component)
 		*/
-		public void setParent(final CompositeComponent<?> newParent)
+		public void setParent(final CompositeComponent newParent)
 		{
-			final CompositeComponent<?> oldParent=parent;	//get the old parent
+			final CompositeComponent oldParent=parent;	//get the old parent
 			if(oldParent!=newParent)	//if the parent is really changing
 			{
 				if(newParent!=null)	//if a parent is provided
@@ -594,14 +560,14 @@ Debug.trace("now valid of", this, "is", isValid());
 					{
 						throw new IllegalStateException("Component "+this+" already has parent: "+oldParent);
 					}
-					if(newParent instanceof Container && !((Container<?>)newParent).contains(this))	//if the new parent is a container that is not really our parent
+					if(newParent instanceof Container && !((Container)newParent).contains(this))	//if the new parent is a container that is not really our parent
 					{
 						throw new IllegalArgumentException("Provided parent container "+newParent+" is not really parent of component "+this);
 					}
 				}
 				else	//if no parent is provided
 				{
-					if(oldParent instanceof Container && ((Container<?>)oldParent).contains(this))	//if we had a container parent before, and that container still thinks this component is its child
+					if(oldParent instanceof Container && ((Container)oldParent).contains(this))	//if we had a container parent before, and that container still thinks this component is its child
 					{
 						throw new IllegalStateException("Old parent container "+oldParent+" still thinks this component, "+this+", is a child."); 
 					}
@@ -659,7 +625,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		public boolean isFlyoverEnabled() {return flyoverEnabled;}
 
 		/**A reference to the default flyover strategy, if we're using one.*/
-		private FlyoverStrategy<C> defaultFlyoverStrategy=null;
+		private FlyoverStrategy<?> defaultFlyoverStrategy=null;
 		
 		/**Sets whether flyovers are enabled for this component.
 		Flyovers contain information from the component model's "description" property.
@@ -679,7 +645,7 @@ Debug.trace("now valid of", this, "is", isValid());
 				{
 					if(getFlyoverStrategy()==null)	//if no flyover strategy is installed
 					{
-						defaultFlyoverStrategy=new DefaultFlyoverStrategy<C>(getThis());	//create a default flyover strategy
+						defaultFlyoverStrategy=new DefaultFlyoverStrategy<Component>(this);	//create a default flyover strategy
 						setFlyoverStrategy(defaultFlyoverStrategy);	//start using our default flyover strategy
 					}
 				}
@@ -699,10 +665,10 @@ Debug.trace("now valid of", this, "is", isValid());
 		}
 
 		/**The installed flyover strategy, or <code>null</code> if there is no flyover strategy installed.*/
-		private FlyoverStrategy<? super C> flyoverStrategy=null;
+		private FlyoverStrategy<?> flyoverStrategy=null;
 
 			/**@return The installed flyover strategy, or <code>null</code> if there is no flyover strategy installed.*/
-			public FlyoverStrategy<? super C> getFlyoverStrategy() {return flyoverStrategy;}
+			public FlyoverStrategy<?> getFlyoverStrategy() {return flyoverStrategy;}
 
 			/**Sets the strategy for controlling flyovers.
 			The flyover strategy will be registered as a mouse listener for this component.
@@ -710,11 +676,11 @@ Debug.trace("now valid of", this, "is", isValid());
 			@param newFlyoverStrategy The new flyover strategy, or <code>null</code> if there is no flyover strategy installed.
 			@see #FLYOVER_STRATEGY_PROPERTY 
 			*/
-			public void setFlyoverStrategy(final FlyoverStrategy<? super C> newFlyoverStrategy)
+			public void setFlyoverStrategy(final FlyoverStrategy<?> newFlyoverStrategy)
 			{
 				if(flyoverStrategy!=newFlyoverStrategy)	//if the value is really changing
 				{
-					final FlyoverStrategy<? super C> oldFlyoverStrategy=flyoverStrategy;	//get the old value
+					final FlyoverStrategy<?> oldFlyoverStrategy=flyoverStrategy;	//get the old value
 					if(oldFlyoverStrategy!=null)	//if there was a flyover strategy
 					{
 						removeMouseListener(oldFlyoverStrategy);	//let the old flyover strategy stop listening for mouse events
@@ -754,28 +720,28 @@ Debug.trace("now valid of", this, "is", isValid());
 		}
 
 	/**The list of installed export strategies, from most recently added to earliest added.*/
-	private List<ExportStrategy<? super C>> exportStrategyList=new CopyOnWriteArrayList<ExportStrategy<? super C>>();
+	private List<ExportStrategy<?>> exportStrategyList=new CopyOnWriteArrayList<ExportStrategy<?>>();
 
 		/**Adds an export strategy to the component.
 		The export strategy will take precedence over any compatible export strategy previously added.
 		@param exportStrategy The export strategy to add.
 		*/
-		public void addExportStrategy(final ExportStrategy<? super C> exportStrategy) {exportStrategyList.add(0, exportStrategy);}	//add the export strategy to the beginning of the list
+		public void addExportStrategy(final ExportStrategy<?> exportStrategy) {exportStrategyList.add(0, exportStrategy);}	//add the export strategy to the beginning of the list
 
 		/**Removes an export strategy from the component.
 		@param exportStrategy The export strategy to remove.
 		*/
-		public void removeExportStrategy(final ExportStrategy<? super C> exportStrategy) {exportStrategyList.remove(exportStrategy);}	//remove the export strategy from the list
+		public void removeExportStrategy(final ExportStrategy<?> exportStrategy) {exportStrategyList.remove(exportStrategy);}	//remove the export strategy from the list
 
 		/**Exports data from the component.
 		Each export strategy, from last to first added, will be asked to export data, until one is successful.
 		@return The object to be transferred, or <code>null</code> if no data can be transferred.
 		*/
-		public Transferable exportTransfer()
+		public Transferable<?> exportTransfer()
 		{
-			for(final ExportStrategy<? super C> exportStrategy:exportStrategyList)	//for each export strategy
+			for(final ExportStrategy<?> exportStrategy:exportStrategyList)	//for each export strategy
 			{
-				final Transferable transferable=exportStrategy.exportTransfer(getThis());	//ask this export strategy to transfer data
+				final Transferable<?> transferable=((ExportStrategy<Component>)exportStrategy).exportTransfer(this);	//ask this export strategy to transfer data
 				if(transferable!=null)	//if this export succeeded
 				{
 					return transferable;	//return this transferable data
@@ -785,18 +751,18 @@ Debug.trace("now valid of", this, "is", isValid());
 		}
 
 	/**The list of installed import strategies, from most recently added to earliest added.*/
-	private List<ImportStrategy<? super C>> importStrategyList=new CopyOnWriteArrayList<ImportStrategy<? super C>>();
+	private List<ImportStrategy<?>> importStrategyList=new CopyOnWriteArrayList<ImportStrategy<?>>();
 
 		/**Adds an import strategy to the component.
 		The import strategy will take prececence over any compatible import strategy previously added.
 		@param importStrategy The importstrategy to add.
 		*/
-		public void addImportStrategy(final ImportStrategy<? super C> importStrategy) {importStrategyList.add(0, importStrategy);}	//add the import strategy to the beginning of the list
+		public void addImportStrategy(final ImportStrategy<?> importStrategy) {importStrategyList.add(0, importStrategy);}	//add the import strategy to the beginning of the list
 
 		/**Removes an import strategy from the component.
 		@param importStrategy The import strategy to remove.
 		*/
-		public void removeImportStrategy(final ImportStrategy<? super C> importStrategy) {importStrategyList.remove(importStrategy);}	//remove the import strategy from the list
+		public void removeImportStrategy(final ImportStrategy<?> importStrategy) {importStrategyList.remove(importStrategy);}	//remove the import strategy from the list
 
 		/**Imports data to the component.
 		Each import strategy, from last to first added, will be asked to import data, until one is successful.
@@ -805,11 +771,11 @@ Debug.trace("now valid of", this, "is", isValid());
 		*/
 		public boolean importTransfer(final Transferable<?> transferable)
 		{
-			for(final ImportStrategy<? super C> importStrategy:importStrategyList)	//for each importstrategy
+			for(final ImportStrategy<?> importStrategy:importStrategyList)	//for each importstrategy
 			{
-				if(importStrategy.canImportTransfer(getThis(), transferable))	//if this import strategy can import the data
+				if(((ImportStrategy<Component>)importStrategy).canImportTransfer(this, transferable))	//if this import strategy can import the data
 				{
-					if(importStrategy.importTransfer(getThis(), transferable))	//import the data; if we are successful
+					if(((ImportStrategy<Component>)importStrategy).importTransfer(this, transferable))	//import the data; if we are successful
 					{
 						return true;	//stop trying to import data, and indicate we were successful
 					}
@@ -830,20 +796,34 @@ Debug.trace("now valid of", this, "is", isValid());
 	/**Label model constructor.
 	@param labelModel The component label model.
 	@exception NullPointerException if the given model is <code>null</code>.
-	@exception IllegalStateException if no controller is registered for this component type.
-	@exception IllegalStateException if no view is registered for this component type.
+	@exception IllegalStateException if no depictor is registered for this component type.
 	*/
+	@SuppressWarnings("unchecked")
 	public AbstractComponent(final LabelModel labelModel)
 	{
-		this.id=getSession().generateID();	//ask the session to generate a new ID
+		final GuiseSession session=getSession();	//get the Guise session
+		final Platform platform=session.getPlatform();	//get the Guise platform
+		this.depictID=platform.generateDepictID();	//ask the platform to generate a new depict ID
+		this.depictor=(Depictor<? extends Component>)platform.getDepictor(this);	//ask the platform for a depictor for the object, and assume that it's a component depictor
+		if(this.depictor==null)	//if no depictor is registered for this object
+		{
+			throw new IllegalStateException("No depictor registered for class "+getClass());
+		}
+//TODO del; lazily installed		notifyDepictorInstalled(depictor);	//tell the the depictor it has been installed
+		platform.registerDepictedObject(this);	//register this depicted object with the platform
 		this.labelModel=checkInstance(labelModel, "Label model cannot be null.");	//save the label model
 		this.labelModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the label model
 		this.labelModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the label model
-		controller=getSession().getApplication().getController(getThis());	//ask the application for a controller
-		if(controller==null)	//if we couldn't find a controller
-		{
-			throw new IllegalStateException("No registered controller for "+getClass().getName());	//TODO use a better error
-		}
+	}
+
+	/**Notifies a depictor that it has been installed in this object.
+	@param <O> The type of depicted object expected by the depictor.
+	@param depictor The depictor that has been installed.
+	*/
+	@SuppressWarnings("unchecked")	//at this point we have to assume that the correct type of depictor has been registered for this object
+	private <O extends DepictedObject> void notifyDepictorInstalled(final Depictor<O> depictor)
+	{
+		depictor.installed((O)this);	//tell the depictor it has been installed		
 	}
 
 	/**Whether this component has been initialized.*/
@@ -877,32 +857,6 @@ Debug.trace("now valid of", this, "is", isValid());
 		return isValid();	//return the current valid state
 	}
 
-	/**Processes an event for the component.
-	This method should not normally be called directly by applications.
-	This method delegates to the installed controller.
-	@param event The event to be processed.
-	@see #getController()
-	@see GuiseContext.State#PROCESS_EVENT
-	*/
-	public void processEvent(final WebPlatformEvent event)
-	{
-		getController().processEvent(getThis(), event);	//tell the controller to process the event
-	}
-
-	/**Updates the view of this component.
-	This method should not normally be called directly by applications.
-	This method delegates to the installed view
-	@param context Guise context information.
-	@exception IOException if there is an error updating the view.
-	@see #getViewer()
-	@see GuiseContext.State#UPDATE_VIEW
-	*/
-	public <GC extends GuiseContext> void updateView(final GC context) throws IOException
-	{
-		final Viewer<? super GC, ? super C> viewer=(Viewer<? super GC, ? super C>)getViewer();	//get the viewer
-		viewer.update(context, getThis());	//tell the viewer to update
-	}
-
 	/**Dispatches an input event to this component and all child components, if any.
 	If this is a {@link FocusedInputEvent}, the event will be directed towards the branch in which lies the focused component of any {@link InputFocusGroupComponent} ancestor of this component (or this component, if it is a focus group).
 	If this is instead a {@link TargetedEvent}, the event will be directed towards the branch in which lies the target component of the event.
@@ -921,7 +875,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	*/
 	public void dispatchInputEvent(final InputEvent inputEvent)
 	{
-//TODO del Debug.trace("in component", this, "ready to do default dispatching of input event", inputEvent);		
+//Debug.trace("in component", this, "ready to do default dispatching of input event", inputEvent);		
 		if(!inputEvent.isConsumed())	//if the input has not been consumed
 		{
 //Debug.trace("event is not consumed; ready to fire it to listeners");
@@ -1337,7 +1291,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	@param component The component on which to start the search for a prototype consumer.
 	@exception NullPointerException if the given component is <code>null</code>.
 	*/
-	public static void initiatePrototypeConsumption(Component<?> component)	//TODO improve prototype producer/consumer framework to allow consumers to be registered and send events when there is more information to publish
+	public static void initiatePrototypeConsumption(Component component)	//TODO improve prototype producer/consumer framework to allow consumers to be registered and send events when there is more information to publish
 	{
 		checkInstance(component, "Component cannot be null.");
 		do	//tell the first prototype consumer ancestor, if any, to consumer prototypes
@@ -1359,9 +1313,9 @@ Debug.trace("now valid of", this, "is", isValid());
 	@param component The component for which the root should be found.
 	@return The root component (the component or ancestor which has no parent).
 	*/
-	public static Component<?> getRootComponent(Component<?> component)
+	public static Component getRootComponent(Component component)
 	{
-		Component<?> parent;	//we'll keep track of the parent at each level when finding the root component
+		Component parent;	//we'll keep track of the parent at each level when finding the root component
 		while((parent=component.getParent())!=null)	//get the parent; while there is a parent
 		{
 			component=parent;	//move up the chain
@@ -1369,22 +1323,41 @@ Debug.trace("now valid of", this, "is", isValid());
 		return component;	//return whatever component we ended up with without a parent
 	}
 
+	/**Determines whether a component has a given component as its ancestor, not including the component itself.
+	@param component The component for which the potential ancestor should be checked.
+	@param ancestor The component to check as an ancestor.
+	@return <code>true</code> if the given ancestor component is its parent or one of its parent's parents.
+	@exception NullPointerException if the given component and/or ancestor is <code>null</code>.
+	*/
+	public static boolean hasAncestor(Component component, final CompositeComponent ancestor)
+	{
+		checkInstance(ancestor, "Ancestor cannot be null.");
+		while((component=component.getParent())!=null)	//get the parent; while we're not out of parents
+		{
+			if(component==ancestor)	//if this is the ancestor
+			{
+				return true;	//indicate that the component has the ancestor
+			}
+		};
+		return false;	//indicate that we ran out of ancestors before we found a matching ancestor
+	}
+
 	/**Retrieves a component with the given ID.
 	This method checks the given component and all descendant components.
 	@param component The component that should be checked, along with its descendants, for the given ID.
 	@return The component with the given ID, or <code>null</code> if this component and all descendant components do not have the given ID. 
 	*/
-	public static Component<?> getComponentByID(final Component<?> component, final String id)
+	public static Component getComponentByID(final Component component, final long id)
 	{
-		if(component.getID().equals(id))	//if this component has the correct ID
+		if(component.getDepictID()==id)	//if this component has the correct ID
 		{
 			return component;	//return this component
 		}
 		else if(component instanceof CompositeComponent)	//if this component doesn't have the correct ID, but it is a composite component
 		{
-			for(final Component<?> childComponent:((CompositeComponent<?>)component).getChildren())	//for each child component
+			for(final Component childComponent:((CompositeComponent)component).getChildren())	//for each child component
 			{
-				final Component<?> matchingComponent=getComponentByID(childComponent, id);	//see if we can find a component in this tree
+				final Component matchingComponent=getComponentByID(childComponent, id);	//see if we can find a component in this tree
 				if(matchingComponent!=null)	//if we found a matching component
 				{
 					return matchingComponent;	//return the matching component
@@ -1399,7 +1372,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	@param component The component that should be checked, along with its descendants, for the given name.
 	@return The first component with the given name, or <code>null</code> if this component and all descendant components do not have the given name. 
 	*/
-	public static Component<?> getComponentByName(final Component<?> component, final String name)
+	public static Component getComponentByName(final Component component, final String name)
 	{
 		if(name.equals(component.getName()))	//if this component has the correct name
 		{
@@ -1407,9 +1380,9 @@ Debug.trace("now valid of", this, "is", isValid());
 		}
 		else if(component instanceof CompositeComponent)	//if this component doesn't have the correct name, but it is a composite component
 		{
-			for(final Component<?> childComponent:((CompositeComponent<?>)component).getChildren())	//for each child component
+			for(final Component childComponent:((CompositeComponent)component).getChildren())	//for each child component
 			{
-				final Component<?> matchingComponent=getComponentByName(childComponent, name);	//see if we can find a component in this tree
+				final Component matchingComponent=getComponentByName(childComponent, name);	//see if we can find a component in this tree
 				if(matchingComponent!=null)	//if we found a matching component
 				{
 					return matchingComponent;	//return the matching component
@@ -1425,9 +1398,9 @@ Debug.trace("now valid of", this, "is", isValid());
 	@param component The component that should be checked, along with its descendants, for out-of-date views.
 	@return The components with views needing to be updated. 
 	*/
-	public static List<Component<?>> getDirtyComponents(final Component<?> component)
+	public static List<Component> getDirtyComponents(final Component component)
 	{
-		return getDirtyComponents(component, new ArrayList<Component<?>>());	//gather dirty components and put them in a list
+		return getDirtyComponents(component, new ArrayList<Component>());	//gather dirty components and put them in a list
 	}
 
 	/**Retrieves all components that have views needing updated.
@@ -1437,15 +1410,15 @@ Debug.trace("now valid of", this, "is", isValid());
 	@param dirtyComponents The list that will be updated with more dirty components if any are found.
 	@return The components with views needing to be updated. 
 	*/
-	public static List<Component<?>> getDirtyComponents(final Component<?> component, final List<Component<?>> dirtyComponents)
+	public static List<Component> getDirtyComponents(final Component component, final List<Component> dirtyComponents)
 	{
-		if(!component.getViewer().isUpdated())	//if this component's view isn't updated
+		if(!component.getDepictor().isDepicted())	//if this component's view isn't updated
 		{
 			dirtyComponents.add(component);	//add this component to the list
 		}
 		else if(component instanceof CompositeComponent)	//if the component's view is updated, check its children if it has any
 		{
-			for(final Component<?> childComponent:((CompositeComponent<?>)component).getChildren())	//for each child component
+			for(final Component childComponent:((CompositeComponent)component).getChildren())	//for each child component
 			{
 				getDirtyComponents(childComponent, dirtyComponents);	//gather dirty components in this child hierarchy
 			}
@@ -1456,14 +1429,14 @@ Debug.trace("now valid of", this, "is", isValid());
 	/**Changes the updated status of the views of an entire component descendant hierarchy.
 	@param newUpdated Whether the views of this component and all child components are up to date.
 	*/
-	public static void setUpdated(final Component<?> component, final boolean newUpdated)
+	public static void setDepicted(final Component component, final boolean newUpdated)
 	{
-		component.getViewer().setUpdated(newUpdated);	//change the updated status of this component's view
+		component.getDepictor().setDepicted(newUpdated);	//change the updated status of this component's view
 		if(component instanceof CompositeComponent)	//if the component is a composite component
 		{
-			for(final Component<?> childComponent:((CompositeComponent<?>)component).getChildren())	//for each child component
+			for(final Component childComponent:((CompositeComponent)component).getChildren())	//for each child component
 			{
-				setUpdated(childComponent, newUpdated);	//changed the updated status for this child's hierarchy
+				setDepicted(childComponent, newUpdated);	//changed the updated status for this child's hierarchy
 			}
 		}
 	}
@@ -1474,7 +1447,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	@param component The component from which, along with its descendants, notifications should be retrieved.
 	@return The notifications of all components in the hierarchy. 
 	*/
-	public static List<Notification> getNotifications(final Component<?> component)
+	public static List<Notification> getNotifications(final Component component)
 	{
 		return getNotifications(component, new ArrayList<Notification>());	//gather notifications and put them in a list
 	}
@@ -1486,7 +1459,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	@param notifications The list that will be updated with more dirty components if any are found.
 	@return The notifications of all components in the hierarchy. 
 	*/
-	protected static List<Notification> getNotifications(final Component<?> component, final List<Notification> notifications)
+	protected static List<Notification> getNotifications(final Component component, final List<Notification> notifications)
 	{
 		final Notification notification=component.getNotification();	//get the component's notification, if any
 		if(notification!=null)	//if a notification is available
@@ -1495,7 +1468,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		}
 		if(component instanceof CompositeComponent)	//if the component is a composite component, check its children
 		{
-			for(final Component<?> childComponent:((CompositeComponent<?>)component).getChildren())	//for each child component
+			for(final Component childComponent:((CompositeComponent)component).getChildren())	//for each child component
 			{
 				if(childComponent.isDisplayed() && childComponent.isVisible())	//if this child component is displayed and visible
 				{
@@ -1531,7 +1504,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	*/
 	protected void fireNotified(final Notification notification)
 	{
-		fireNotified(new NotificationEvent(getThis(), notification));	//create and fire a new notification event
+		fireNotified(new NotificationEvent(this, notification));	//create and fire a new notification event
 	}
 
 	/**Fires an event to all registered notification listeners with the new notification information.
@@ -1548,7 +1521,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	/**@return A hash code value for the object.*/
 	public int hashCode()
 	{
-		return getID().hashCode();	//return the hash code of the ID
+		return LongUtilities.hashCode(getDepictID());	//return the hash code of the ID
 	}
 
 	/**Indicates whether some other object is "equal to" this one.
@@ -1558,18 +1531,14 @@ Debug.trace("now valid of", this, "is", isValid());
 	*/
 	public boolean equals(final Object object)
 	{
-		return object instanceof Component && getID().equals(((Component<?>)object).getID());	//see if the other object is a component with the same ID
+		return object instanceof Component && getDepictID()==((Component)object).getDepictID();	//see if the other object is a component with the same ID
 	}
 
-	/**@return A string representation of this component.*/
+	/**@return A string representation of this depicted object.*/
 	public String toString()
 	{
 		final StringBuilder stringBuilder=new StringBuilder(super.toString());	//create a string builder for constructing the string
-		final String id=getID();	//get the component's ID
-		if(id!=null)	//if this component has an ID
-		{
-			stringBuilder.append(' ').append('[').append(id).append(']');	//append the ID
-		}
+		stringBuilder.append(' ').append('[').append(getDepictID()).append(']');	//append the ID
 		return stringBuilder.toString();	//return the string builder
 	}
 
@@ -1588,7 +1557,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	@param <S> The type of component for which this object is to control flyovers.
 	@author Garret Wilson
 	*/
-	public static abstract class AbstractFlyoverStrategy<S extends Component<?>> extends MouseAdapter implements FlyoverStrategy<S>
+	public static abstract class AbstractFlyoverStrategy<S extends Component> extends MouseAdapter implements FlyoverStrategy<S>
 	{
 		/**The component for which this object will control flyovers.*/
 		private final S component;
@@ -1765,10 +1734,10 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 	@param <S> The type of component for which this object is to control flyovers.
 	@author Garret Wilson
 	*/
-	public static abstract class AbstractFlyoverFrameStrategy<S extends Component<?>> extends AbstractFlyoverStrategy<S>
+	public static abstract class AbstractFlyoverFrameStrategy<S extends Component> extends AbstractFlyoverStrategy<S>
 	{
 		/**The frame used for displaying flyovers.*/
-		private FlyoverFrame<?> flyoverFrame=null;
+		private FlyoverFrame flyoverFrame=null;
 
 		/**Component constructor.
 		@param component The component for which this object will control flyovers.
@@ -1825,7 +1794,7 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 		}
 
 		/**@return A new frame for displaying flyover information.*/
-		protected abstract FlyoverFrame<?> createFrame();
+		protected abstract FlyoverFrame createFrame();
 	}
 
 	/**The default strategy for showing and hiding flyovers in response to mouse events.
@@ -1834,7 +1803,7 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 	@param <S> The type of component for which this object is to control flyovers.
 	@author Garret Wilson
 	*/
-	public static class DefaultFlyoverStrategy<S extends Component<?>> extends AbstractFlyoverFrameStrategy<S>
+	public static class DefaultFlyoverStrategy<S extends Component> extends AbstractFlyoverFrameStrategy<S>
 	{
 		/**Component constructor.
 		@param component The component for which this object will control flyovers.
@@ -1847,10 +1816,10 @@ Debug.trace("viewport source center:", viewportSourceCenter);
 		}
 
 		/**@return A new frame for displaying flyover information.*/
-		protected FlyoverFrame<?> createFrame()
+		protected FlyoverFrame createFrame()
 		{
 			final S component=getComponent();	//get the component
-			final FlyoverFrame<?> frame=new DefaultFlyoverFrame();	//create a default frame
+			final FlyoverFrame frame=new DefaultFlyoverFrame();	//create a default frame
 			frame.setRelatedComponent(getComponent());	//tell the flyover frame with which component it is related
 			final Message message=new Message();	//create a new message
 			message.setMessageContentType(component.getDescriptionContentType());	//set the appropriate message content

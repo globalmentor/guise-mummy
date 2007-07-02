@@ -6,7 +6,7 @@ import com.guiseframework.prototype.Prototype;
 /**A panel that holds components used as tools.
 @author Garret Wilson
 */
-public class Toolbar extends AbstractPanel<Toolbar>
+public class Toolbar extends AbstractPanel
 {
 	
 	/**Default constructor with a default horizontal flow layout.*/
@@ -30,12 +30,12 @@ public class Toolbar extends AbstractPanel<Toolbar>
 	@return A new component based upon the given prototype.
 	@exception IllegalArgumentException if no component can be created from the given prototype
 	*/
-	public Component<?> createComponent(final Prototype prototype)
+	public Component createComponent(final Prototype prototype)
 	{
-		final Component<?> component=super.createComponent(prototype);	//create a default component
+		final Component component=super.createComponent(prototype);	//create a default component
 		if(component instanceof LabelDisplayableComponent)	//if this component can modify its label displayed status
 		{
-			((LabelDisplayableComponent<?>)component).setLabelDisplayed(false);	//turn off the label TODO make this customizable
+			((LabelDisplayableComponent)component).setLabelDisplayed(false);	//turn off the label TODO make this customizable
 		}
 		return component;	//return the component
 	}

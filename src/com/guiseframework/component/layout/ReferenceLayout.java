@@ -11,14 +11,14 @@ public class ReferenceLayout extends AbstractLayout<ReferenceConstraints>
 {
 
 	/**The lazily-created map of components mapped to reference IDs.*/
-	private Map<String, Component<?>> referenceIDComponentMap=null;
+	private Map<String, Component> referenceIDComponentMap=null;
 
 		/**@return The lazily-created map of components mapped to reference IDs.*/
-		protected Map<String, Component<?>> getReferenceIDComponentMap()
+		protected Map<String, Component> getReferenceIDComponentMap()
 		{
 			if(referenceIDComponentMap==null)	//if the map hasn't been created, yet
 			{
-				referenceIDComponentMap=new HashMap<String, Component<?>>();	//create a new map
+				referenceIDComponentMap=new HashMap<String, Component>();	//create a new map
 			}
 			return referenceIDComponentMap;	//return the map of components keyed to IDs
 		}
@@ -33,7 +33,7 @@ public class ReferenceLayout extends AbstractLayout<ReferenceConstraints>
 	@param oldConstraints The old component constraints, or <code>null</code> if there were no constraints previously.
 	@param newConstraints The new component constraints, or <code>null</code> if the component now has no constraints.
 	*/
-	protected void componentConstraintsChanged(final Component<?> component, final Constraints oldConstraints, final Constraints newConstraints)
+	protected void componentConstraintsChanged(final Component component, final Constraints oldConstraints, final Constraints newConstraints)
 	{
 		final Class<? extends ReferenceConstraints> constraintsClass=getConstraintsClass();	//get the type of constraints we expect
 		if(constraintsClass.isInstance(oldConstraints))	//if the old constraints is of the type of we expect
@@ -59,7 +59,7 @@ public class ReferenceLayout extends AbstractLayout<ReferenceConstraints>
 	@param id The ID with which a component may be bound.
 	@return A component with constraints specifying the given ID, or <code>null</code> if there is no component bound to the given ID.
 	*/
-	public Component<?> getComponentByID(final String id)
+	public Component getComponentByID(final String id)
 	{
 		return getReferenceIDComponentMap().get(id);	//look up the component by its reference ID
 	}

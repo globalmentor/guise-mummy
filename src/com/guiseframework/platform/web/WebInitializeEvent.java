@@ -2,14 +2,14 @@ package com.guiseframework.platform.web;
 
 import java.net.URI;
 
-import com.guiseframework.context.GuiseContext;
+import com.guiseframework.platform.DepictContext;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-/**A control event indicating that initialization should occur.
+/**A web platform event indicating that initialization should occur.
 @author Garret Wilson
 */
-public class InitControlEvent extends AbstractWebPlatformEvent
+public class WebInitializeEvent extends AbstractWebPlatformEvent
 {
 
 	/**The hour of the browser.*/
@@ -93,7 +93,7 @@ public class InitControlEvent extends AbstractWebPlatformEvent
 	@param referrerURI The referring URI of the document, or <code>null</code> if there is no referrer.
 	@exception NullPointerException if the given context and/or language is <code>null</code>.
 	*/
-	public InitControlEvent(final GuiseContext context, final int hour, final int timezone, final String language,
+	public WebInitializeEvent(final DepictContext context, final int hour, final int timezone, final String language,
 			final int colorDepth, final int screenWidth, final int screenHeight, final int browserWidth, final int browserHeight,
 			final String javascriptVersion, final boolean javaEnabled, final URI referrerURI)
 	{

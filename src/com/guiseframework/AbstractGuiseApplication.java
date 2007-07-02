@@ -15,33 +15,28 @@ import com.garretwilson.io.*;
 import com.garretwilson.lang.ObjectUtilities;
 import static com.garretwilson.lang.ThreadUtilities.*;
 import com.garretwilson.net.URIUtilities;
-import com.garretwilson.rdf.RDFListResource;
 import com.garretwilson.rdf.RDFObject;
 import com.garretwilson.rdf.RDFResource;
-import static com.garretwilson.rdf.RDFUtilities.*;
 import com.garretwilson.rdf.TypedRDFResourceIO;
 import com.garretwilson.text.W3CDateFormat;
 import com.garretwilson.util.*;
-
 import static com.garretwilson.io.FileUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static com.garretwilson.util.CalendarUtilities.*;
 import static com.garretwilson.util.LocaleUtilities.*;
+
 import static com.guiseframework.Guise.*;
 import static com.guiseframework.GuiseResourceConstants.*;
-
 import com.guiseframework.component.*;
 import static com.guiseframework.Resources.*;
+import com.guiseframework.theme.Theme;
 import static com.guiseframework.theme.Theme.THEME_NAMESPACE_URI;
 
-import com.guiseframework.component.kit.ComponentKit;
-import com.guiseframework.context.GuiseContext;
-import com.guiseframework.controller.*;
-import com.guiseframework.platform.GuisePlatform;
-import com.guiseframework.theme.Theme;
-import com.guiseframework.viewer.Viewer;
+import com.guiseframework.platform.DefaultEnvironment;
+import com.guiseframework.platform.Environment;
+import com.guiseframework.platform.Platform;
 
 /**An abstract base class for a Guise application.
 This implementation only works with Guise containers that descend from {@link AbstractGuiseContainer}.
@@ -69,10 +64,10 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		public GuiseContainer getContainer() {return container;}
 
 	/**The application local environment.*/
-	private GuiseEnvironment environment;
+	private Environment environment;
 
 		/**@return The application local environment.*/
-		public GuiseEnvironment getEnvironment() {return environment;}
+		public Environment getEnvironment() {return environment;}
 
 		/**Sets the application local environment.
 		This method will not normally be called directly from applications.
@@ -81,11 +76,11 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		@exception NullPointerException if the given environment is <code>null</code>.
 		@see #ENVIRONMENT_PROPERTY
 		*/
-		public void setEnvironment(final GuiseEnvironment newEnvironment)
+		public void setEnvironment(final Environment newEnvironment)
 		{
 			if(!ObjectUtilities.equals(environment, newEnvironment))	//if the value is really changing (compare their values, rather than identity)
 			{
-				final GuiseEnvironment oldEnvironment=environment;	//get the old value
+				final Environment oldEnvironment=environment;	//get the old value
 				environment=checkInstance(newEnvironment, "Guise session environment cannot be null.");	//actually change the value
 				firePropertyChange(ENVIRONMENT_PROPERTY, oldEnvironment, newEnvironment);	//indicate that the value changed
 			}
@@ -112,16 +107,15 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			}
 		}
 
-	/**Creates a new session for the application.
+	/**Creates a new session for the application on the given platform.
  	This version creates and returns a default session.
-	@param environment The initial environment of the session.
 	@param platform The platform on which this session's objects are depicted.
 	@return A new session for the application
-	@exception NullPointerException if the given environment and/or platform is <code>null</code>.
+	@exception NullPointerException if the given platform is <code>null</code>.
 	*/
-	public GuiseSession createSession(final GuiseEnvironment environment, final GuisePlatform platform)
+	public GuiseSession createSession(final Platform platform)
 	{
-		return new DefaultGuiseSession(this, environment, platform);	//create a new default Guise session
+		return new DefaultGuiseSession(this, platform);	//create a new default Guise session
 	}
 
 	/**The concurrent map of Guise session info keyed to Guise sessions.*/
@@ -174,7 +168,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	This implementation returns a default application frame.
 	@return A new frame for the application.
 	*/
-	public ApplicationFrame<?> createApplicationFrame()
+	public ApplicationFrame createApplicationFrame()
 	{
 		return new DefaultApplicationFrame();	//return an instance of the default application frame 
 	}
@@ -549,7 +543,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	public AbstractGuiseApplication()
 	{
 		this(Locale.getDefault());	//construct the class with the JVM default locale
-		this.environment=new DefaultGuiseEnvironment();	//create a default environment
+		this.environment=new DefaultEnvironment();	//create a default environment
 	}
 
 	/**Locale constructor.
@@ -560,256 +554,6 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 //TODO del		this.defaultLocale=locale;	//set the default locale
 		locales=unmodifiableList(asList(locale));	//create an unmodifiable list of locales including only the default locale
 	}
-
-	/**The thread-safe list of installed component kits, with later registrations taking precedence*/
-	private final List<ComponentKit> componentKitList=new CopyOnWriteArrayList<ComponentKit>();
-
-	/**Installs a component kit.
-	Later component kits take precedence over earlier-installed component kits.
-	If the component kit is already installed, no action occurs.
-	@param componentKit The component kit to install.
-	*/
-	public void installComponentKit(final ComponentKit componentKit)
-	{
-		synchronized(componentKitList)	//don't allow anyone to access the list of component kits while we access it
-		{
-			if(!componentKitList.contains(componentKit))	//if the component kit is not already installed
-			{
-				componentKitList.add(0, componentKit);	//add the component kit to our list at the front of the list, giving it earlier priority
-			}
-		}
-	}
-
-	/**Uninstalls a component kit.
-	If the component kit is not installed, no action occurs.
-	@param componentKit The component kit to uninstall.
-	*/
-	public void uninstallComponentKit(final ComponentKit componentKit)
-	{
-		componentKitList.remove(componentKit);	//remove the installed component kit
-	}
-
-	/**Determines the controller class registered for the given component class.
-	This request is delegated to each component kit, with later-installed component kits taking precedence. 
-	@param componentClass The class of component that may be registered.
-	@return A class of controller registered to render component of the specific class, or <code>null</code> if no controller is registered.
-	*/
-	protected Class<? extends Controller> getRegisteredControllerClass(final Class<? extends Component> componentClass)
-	{
-		for(final ComponentKit componentKit:componentKitList)	//for each component kit in our list
-		{
-			final Class<? extends Controller> controllerClass=componentKit.getRegisteredControllerClass(componentClass);	//ask the component kit for a registered controller class for this component
-			if(controllerClass!=null)	//if this component kit gave us a controller class
-			{
-				return controllerClass;	//return the class
-			}
-		}
-		return null;	//indicate that none of our installed component kits had a controller class registered for the specified component class
-	}
-
-	/**Determines the controller class appropriate for the given component class.
-	A controller class is located by individually looking up the component class hiearchy for registered controllers.
-	@param componentClass The class of component for which a controller should be returned.
-	@param allowDefault Whether a default controller for the component class should be accepted.
-	@return A class of controller to control the given component class, or <code>null</code> if no controller is registered.
-	*/
-	@SuppressWarnings("unchecked")	//we programmatically check the super classes and implemented interfaces to make sure they are component classes before casts
-	protected Class<? extends Controller> getControllerClass(final Class<? extends Component> componentClass, final boolean allowDefault)	//TODO create a better algorithm that finds all matches and sorts them as to interface/class and distance from Component.class
-	{
-		Class<? extends Controller> controllerClass=getRegisteredControllerClass(componentClass);	//see if there is a controller class registered for this component type
-		if(controllerClass==null)	//if we couldn't find a controller for this class, check the immediate interfaces (except the Component interface)
-		{
-//TODO del Debug.trace("no luck for", componentClass);
-			for(final Class<?> classInterface:componentClass.getInterfaces())	//look at each implemented interface
-			{
-				if(Component.class.isAssignableFrom(classInterface) && !Component.class.equals(classInterface))	//if the class interface is a component, but is not Component.class
-				{
-					controllerClass=getRegisteredControllerClass((Class<? extends Component>)classInterface);	//check the immediate interface
-					if(controllerClass!=null)	//if we found a controller class
-					{
-//					TODO del 						Debug.trace("found controller class", controllerClass, "from immediate interface", classInterface);
-						break;	//stop looking at the interfaces
-					}
-				}					
-			}
-		}
-		else
-		{
-//		TODO del Debug.trace("one was registered for", componentClass, ":", controllerClass);			
-		}
-		if(controllerClass==null)	//if we still didn't find a controller for this class, check up the class hierarchy
-		{
-			final Class<?> superClass=componentClass.getSuperclass();	//get the super class of the component
-			if(superClass!=null && Component.class.isAssignableFrom(superClass))	//if the super class is a component
-			{
-//			TODO del 				Debug.trace("checking up the controller hierarchy for", superClass);
-				controllerClass=getControllerClass((Class<? extends Component>)superClass, false);	//check the super class
-
-/*TODO del
-				if(controllerClass!=null)	//TODO del
-				{
-					Debug.trace("found controller class", controllerClass);
-				}
-*/
-
-			}
-		}
-		if(controllerClass==null)	//if we couldn't find a controller for this class, check the up the interfaces hierarchy
-		{
-			for(final Class<?> classInterface:componentClass.getInterfaces())	//look at each implemented interface; this results in duplicated checking of immediate interfaces, but the algorithm is more straightforward and this will only happen once for each controller installation
-			{
-				if(Component.class.isAssignableFrom(classInterface) && !Component.class.equals(classInterface))	//if the class interface is a component, but is not Component.class
-				{
-//				TODO del 					Debug.trace("checking up the interface hierarchy for", classInterface);
-					controllerClass=getControllerClass((Class<? extends Component>)classInterface, false);	//check the interface
-					if(controllerClass!=null)	//if we found a controller class
-					{
-//					TODO del 						Debug.trace("found controller class", controllerClass, "from super interface", classInterface);
-						break;	//stop looking at the interfaces
-					}
-				}					
-			}
-		}
-		if(controllerClass==null && allowDefault)	//if we couldn't find a controller for this class, as a last resort use a controller for Component.class, if there is one
-		{
-			controllerClass=getRegisteredControllerClass(Component.class);	//see if there is a registered controller for Component.class			
-		}
-		return controllerClass;	//show which if any controller class we found
-	}
-
-	/**Determines the controller appropriate for the given component.
-	A controller class is located by individually looking up the component class hiearchy for registered render strategies, at each checking all installed component kits.
-	@param <GC> The type of Guise context being used.
-	@param <C> The type of component for which a controller is requested.
-	@param component The component for which a controller should be returned.
-	@return A controller to render the given component, or <code>null</code> if no controller is registered.
-	*/
-	public <C extends Component<?>> Controller<? extends GuiseContext, ? super C> getController(final C component)
-	{
-		Class<? extends Component> componentClass=component.getClass();	//get the component class
-		final Class<? extends Controller> controllerClass=getControllerClass(componentClass, true);	//walk the hierarchy to see if there is a controller class registered for this component type
-		if(controllerClass!=null)	//if we found a controller class
-		{
-			try
-			{
-				return (Controller<? extends GuiseContext, ? super C>)controllerClass.newInstance();	//return a new instance of the class
-			}
-			catch (InstantiationException e)
-			{
-				Debug.error(e);
-				throw new AssertionError(e);	//TODO fix
-			}
-			catch (IllegalAccessException e)
-			{
-				Debug.error(e);
-				throw new AssertionError(e);	//TODO fix
-			}
-		}
-		return null;	//show that we could not find a registered controller
-	}
-
-	/**Determines the viewer class registered for the given component class.
-	This request is delegated to each component kit, with later-installed component kits taking precedence. 
-	@param componentClass The class of component that may be registered.
-	@return A class of viewer registered to render component of the specific class, or <code>null</code> if no viewer is registered.
-	*/
-	protected Class<? extends Viewer> getRegisteredViewerClass(final Class<? extends Component> componentClass)
-	{
-		for(final ComponentKit componentKit:componentKitList)	//for each component kit in our list
-		{
-			final Class<? extends Viewer> viewerClass=componentKit.getRegisteredViewerClass(componentClass);	//ask the component kit for a registered viewer class for this component
-			if(viewerClass!=null)	//if this component kit gave us a viewer class
-			{
-				return viewerClass;	//return the class
-			}
-		}
-		return null;	//indicate that none of our installed component kits had a viewer class registered for the specified component class
-	}
-
-	/**Determines the viewer class appropriate for the given component class.
-	A viewer class is located by individually looking up the component class hiearchy for registered viewers.
-	@param componentClass The class of component for which a viewer should be returned.
-	@param allowDefault Whether a default viewer for the component class should be accepted.
-	@return A class of viewer for the given component class, or <code>null</code> if no viewer is registered.
-	*/
-	@SuppressWarnings("unchecked")	//we programmatically check the super classes and implemented interfaces to make sure they are component classes before casts
-	protected Class<? extends Viewer> getViewerClass(final Class<? extends Component> componentClass, final boolean allowDefault)	//TODO create a better algorithm that finds all matches and sorts them as to interface/class and distance from Component.class
-	{
-		Class<? extends Viewer> viewerClass=getRegisteredViewerClass(componentClass);	//see if there is a viewer class registered for this component type
-		if(viewerClass==null)	//if we couldn't find a viewer for this class, check the immediate interfaces
-		{
-			for(final Class<?> classInterface:componentClass.getInterfaces())	//look at each implemented interface
-			{
-				if(Component.class.isAssignableFrom(classInterface) && !Component.class.equals(classInterface))	//if the class interface is a component, but is not Component.class
-				{
-					viewerClass=getRegisteredViewerClass((Class<? extends Component>)classInterface);	//check the immediate interface
-					if(viewerClass!=null)	//if we found a view class
-					{
-						break;	//stop looking at the interfaces
-					}
-				}					
-			}
-		}
-		if(viewerClass==null)	//if we still didn't find a viewer for this class, check up the class hierarchy
-		{
-			final Class<?> superClass=componentClass.getSuperclass();	//get the super class of the component
-			if(superClass!=null && Component.class.isAssignableFrom(superClass))	//if the super class is a component
-			{
-				viewerClass=getViewerClass((Class<? extends Component>)superClass, false);	//check the super class
-			}
-		}
-		if(viewerClass==null)	//if we couldn't find a viewer for this class, check up the interface hierarchy
-		{
-			for(final Class<?> classInterface:componentClass.getInterfaces())	//look at each implemented interface; this results in duplicated checking of immediate interfaces, but the algorithm is more straightforward and this will only happen once for each viewer installation
-			{
-				if(Component.class.isAssignableFrom(classInterface) && !Component.class.equals(classInterface))	//if the class interface is a component, but is not Component.class
-				{
-					viewerClass=getViewerClass((Class<? extends Component>)classInterface, false);	//check the interface
-					if(viewerClass!=null)	//if we found a view class
-					{
-						break;	//stop looking at the interfaces
-					}
-				}					
-			}
-		}
-		if(viewerClass==null && allowDefault)	//if we couldn't find a viewer for this class, as a last resort use a viewer for Component.class, if there is one
-		{
-			viewerClass=getRegisteredViewerClass(Component.class);	//see if there is a registered viewer for Component.class			
-		}
-		return viewerClass;	//show which if any viewer class we found
-	}
-
-	/**Determines the viewer appropriate for the given component.
-	A viewer class is located by individually looking up the component class hiearchy for registered render strategies, at each checking all installed component kits.
-	@param <GC> The type of Guise context being used.
-	@param <C> The type of component for which a viewer is requested.
-	@param component The component for which a viewer should be returned.
-	@return A viewer to render the given component, or <code>null</code> if no viewer is registered.
-	*/
-	public <C extends Component<?>> Viewer<? extends GuiseContext, ? super C> getViewer(final C component)
-	{
-		Class<? extends Component> componentClass=component.getClass();	//get the component class
-		final Class<? extends Viewer> viewerClass=getViewerClass(componentClass, true);	//walk the hierarchy to see if there is a viewer class registered for this component type
-		if(viewerClass!=null)	//if we found a viewer class
-		{
-			try
-			{
-				return (Viewer<? extends GuiseContext, ? super C>)viewerClass.newInstance();	//return a new instance of the class
-			}
-			catch (InstantiationException e)
-			{
-				Debug.error(e);
-				throw new AssertionError(e);	//TODO fix
-			}
-			catch (IllegalAccessException e)
-			{
-				Debug.error(e);
-				throw new AssertionError(e);	//TODO fix
-			}
-		}
-		return null;	//show that we could not find a registered viewer
-	}
-
 
 	/**The concurrent list of destinations which have path patterns specified.*/
 	private final List<Destination> pathPatternDestinations=new CopyOnWriteArrayList<Destination>();	

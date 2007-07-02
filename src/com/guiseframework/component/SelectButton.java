@@ -5,7 +5,7 @@ import com.guiseframework.model.*;
 /**Selectable button.
 @author Garret Wilson
 */
-public class SelectButton extends AbstractSelectActionControl<SelectButton> implements SelectButtonControl<SelectButton>
+public class SelectButton extends AbstractSelectActionControl implements SelectButtonControl
 {
 
 	/**Default constructor.*/

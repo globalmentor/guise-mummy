@@ -6,7 +6,7 @@ import com.guiseframework.component.layout.CardLayout;
 @author Garret Wilson
 @see CardLayout
 */
-public interface CardContainer<C extends CardContainer<C>> extends Container<C>
+public interface CardContainer extends Container
 {
 
 	/**@return The layout definition for the container.*/

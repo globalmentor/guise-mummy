@@ -7,12 +7,9 @@ import java.util.*;
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.io.IOOperation;
 import com.guiseframework.component.*;
-import com.guiseframework.component.kit.ComponentKit;
-import com.guiseframework.context.GuiseContext;
-import com.guiseframework.controller.*;
-import com.guiseframework.platform.GuisePlatform;
+import com.guiseframework.platform.Environment;
+import com.guiseframework.platform.Platform;
 import com.guiseframework.theme.Theme;
-import com.guiseframework.viewer.Viewer;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
@@ -22,8 +19,6 @@ import static com.garretwilson.lang.ClassUtilities.*;
 public interface GuiseApplication extends PropertyBindable
 {
 
-	/**The default locale bound property.*/
-//TODO del	public final static String DEFAULT_LOCALE_PROPERTY=getPropertyName(GuiseApplication.class, "defaultLocale");
 	/**The environment bound property.*/
 	public final static String ENVIRONMENT_PROPERTY=getPropertyName(GuiseApplication.class, "environment");
 	/**The locales bound property.*/
@@ -96,7 +91,7 @@ public interface GuiseApplication extends PropertyBindable
 	public void setResourceBundleBaseName(final String newResourceBundleBaseName);
 
 	/**@return The application local environment.*/
-	public GuiseEnvironment getEnvironment();
+	public Environment getEnvironment();
 
 	/**Sets the application local environment.
 	This method will not normally be called directly from applications.
@@ -105,7 +100,7 @@ public interface GuiseApplication extends PropertyBindable
 	@exception NullPointerException if the given environment is <code>null</code>.
 	@see #ENVIRONMENT_PROPERTY
 	*/
-	public void setEnvironment(final GuiseEnvironment newEnvironment);
+	public void setEnvironment(final Environment newEnvironment);
 
 	/**@return Whether the application applies themes.*/
 	public boolean isThemed();
@@ -138,19 +133,6 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public void setThemeURI(final URI newThemeURI);
 
-	/**Installs a component kit.
-	Later component kits take precedence over earlier-installed component kits.
-	If the component kit is already installed, no action occurs.
-	@param componentKit The component kit to install.
-	*/
-	public void installComponentKit(final ComponentKit componentKit);
-
-	/**Uninstalls a component kit.
-	If the component kit is not installed, no action occurs.
-	@param componentKit The component kit to uninstall.
-	*/
-	public void uninstallComponentKit(final ComponentKit componentKit);
-
 	/**@return The identifier for logging to a Data Collection System such as WebTrends, or <code>null</code> if no DCS ID is known.*/
 	public String getDCSID();
 
@@ -158,24 +140,6 @@ public interface GuiseApplication extends PropertyBindable
 	@param dcsID The identifier for logging to a Data Collection System such as WebTrends, or <code>null</code> if no DCS ID is known.
 	*/
 	public void setDCSID(final String dcsID);
-
-	/**Determines the controller appropriate for the given component.
-	A controller class is located by individually looking up the component class hiearchy for registered render strategies, at each checking all installed component kits.
-	@param <GC> The type of Guise context being used.
-	@param <C> The type of component for which a controller is requested.
-	@param component The component for which a controller should be returned.
-	@return A controller to render the given component, or <code>null</code> if no controller is registered.
-	*/
-	public <C extends Component<?>> Controller<? extends GuiseContext, ? super C> getController(final C component);
-
-	/**Determines the viewer appropriate for the given component.
-	A viewer class is located by individually looking up the component class hiearchy for registered render strategies, at each checking all installed component kits.
-	@param <GC> The type of Guise context being used.
-	@param <C> The type of component for which a viewer is requested.
-	@param component The component for which a viewer should be returned.
-	@return A viewer to render the given component, or <code>null</code> if no viewer is registered.
-	*/
-	public <C extends Component<?>> Viewer<? extends GuiseContext, ? super C> getViewer(final C component);
 
 	/**Associates multiple destinations with application context-relative paths or path patterns.
 	All destinations are first cleared.
@@ -212,13 +176,12 @@ public interface GuiseApplication extends PropertyBindable
 	/**@return The Guise container into which this application is installed, or <code>null</code> if the application is not yet installed.*/
 	public GuiseContainer getContainer();
 
-	/**Creates a new session for the application.
-	@param environment The initial environment of the session.
+	/**Creates a new session for the application on the given platform.
 	@param platform The platform on which this session's objects are depicted.
 	@return A new session for the application
-	@exception NullPointerException if the given environment and/or platform is <code>null</code>.
+	@exception NullPointerException if the given platform is <code>null</code>.
 	*/
-	public GuiseSession createSession(final GuiseEnvironment environment, final GuisePlatform platform);
+	public GuiseSession createSession(final Platform platform);
 
 	/**Registers a session with this application.
 	The Guise session has not yet been initialized when this method is called.
@@ -237,7 +200,7 @@ public interface GuiseApplication extends PropertyBindable
 	/**Creates a frame for the application.
 	@return A new frame for the application.
 	*/
-	public ApplicationFrame<?> createApplicationFrame();
+	public ApplicationFrame createApplicationFrame();
 
 	/**Reports the base path of the application.
 	The base path is an absolute path that ends with a slash ('/'), indicating the base path of the navigation panels.

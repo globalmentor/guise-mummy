@@ -1,12 +1,21 @@
 package com.guiseframework.platform;
 
 import java.util.Queue;
+import java.util.concurrent.locks.Lock;
+
+import com.guiseframework.GuiseApplication;
 
 /**The platform on which Guise objects are being depicted.
 @author Garret Wilson
 */
-public interface GuisePlatform
+public interface Platform
 {
+
+	/**@return The Guise application running on this platform.*/
+	public GuiseApplication getApplication();
+
+	/**@return The user local environment.*/
+	public Environment getEnvironment();
 
 	/**Generates a new depict ID unique to this session platform.
 	@return A new depict ID unique to this session platform.
@@ -40,7 +49,19 @@ public interface GuisePlatform
 	*/
 	public DepictedObject getDepictedObject(final long depictedObjectID);
 
+	/**@return The client software being used to access Guise on this platform.*/
+	public ClientProduct getClientProduct();
+	
 	/**@return The thread-safe queue of events to be delivered to the platform.*/
 	public Queue<PlatformEvent> getSendEventQueue();
+
+	/**@return The lock used for exclusive depiction on the platform.*/
+	public Lock getDepictLock();
+
+	/**Retrieves information and functionality related to the current depiction.
+	@return A context for the current depiction.
+	@exception IllegalStateException if no depict context can be returned in the current depiction state.
+	*/
+	public DepictContext getDepictContext();
 
 }

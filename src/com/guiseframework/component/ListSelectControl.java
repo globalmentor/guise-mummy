@@ -6,7 +6,7 @@ import com.guiseframework.model.*;
 @param <V> The type of values to select.
 @author Garret Wilson
 */
-public interface ListSelectControl<V, C extends ListSelectControl<V, C>> extends SelectControl<V, C>, ListSelectModel<V>
+public interface ListSelectControl<V> extends SelectControl<V>, ListSelectModel<V>
 {
 
 	/**@return The strategy used to generate a component to represent each value in the model.*/
@@ -24,7 +24,7 @@ public interface ListSelectControl<V, C extends ListSelectControl<V, C>> extends
 	@param value The value for which a representation component should be returned.
 	@return The child component representing the given value.
 	*/
-	public Component<?> getComponent(final V value);
+	public Component getComponent(final V value);
 
 	/**@return The strategy used to generate a component to represent each value in the model.*/
 //TODO del when works	public ValueRepresentationStrategy<V, R> getValueRepresentationStrategy();
@@ -70,6 +70,6 @@ public interface ListSelectControl<V, C extends ListSelectControl<V, C>> extends
 		@param focused <code>true</code> if the value has the focus.
 		@return A new component to represent the given value.
 		*/
-		public Component<?> createComponent(final ListSelectModel<VV> model, final VV value, final int index, final boolean selected, final boolean focused);
+		public Component createComponent(final ListSelectModel<VV> model, final VV value, final int index, final boolean selected, final boolean focused);
 	}
 }

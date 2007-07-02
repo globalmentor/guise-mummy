@@ -4,14 +4,15 @@ import java.util.*;
 
 import static com.garretwilson.text.FormatUtilities.*;
 import com.garretwilson.util.*;
-import com.guiseframework.context.GuiseContext;
-import com.guiseframework.controller.*;
 
-/**A control event indicating that a full or partial form submission occurred.
+/**Indicates the submission of a full or partial form on the web platform
 @author Garret Wilson
 */
-public class FormControlEvent extends AbstractWebPlatformEvent
+public class WebFormEvent extends AbstractWebPlatformEvent
 {
+
+	/**@return The platform on which the event initially occurred.*/
+	public WebPlatform getPlatform() {return (WebPlatform)getSource();}
 
 	/**Whether this event represents all components on the form.*/
 	private final boolean exhaustive;
@@ -19,40 +20,30 @@ public class FormControlEvent extends AbstractWebPlatformEvent
 		/**@return Whether this event represents all components on the form.*/
 		public final boolean isExhaustive() {return exhaustive;}
 
-	/**Whether the values in this event are provisional.*/
-	private final boolean provisional;
-
-		/**@return Whether the values in this event are provisional.*/
-		public final boolean isProvisional() {return provisional;}
-
 	/**The map of parameter lists.*/
 	private final CollectionMap<String, Object, List<Object>> parameterListMap=new ArrayListHashMap<String, Object>();
 
 		/**@return The map of parameter lists.*/
 		public CollectionMap<String, Object, List<Object>> getParameterListMap() {return parameterListMap;}
-
-	/**Constructor that indicates non-provisional exhaustive values.
-	@param context The context in which this control event was produced.
-	@param exhaustive Whether this event represents all components on the form.
-	@exception NullPointerException if the given context is <code>null</code>.
+		
+	/**Source exhaustive constructor.
+	@param source The object on which the event initially occurred.
+	@exception NullPointerException if the given source is <code>null</code>.
 	*/
-	public FormControlEvent(final GuiseContext context, final boolean exhaustive)
+	public WebFormEvent(final WebPlatform source)
 	{
-		this(context, exhaustive, false);	//construct the class, indicating these values are not provisional
+		this(source, true);	//construct the class as exhaustive
 	}
 
-	/**Constructor that indicates whether the event is exhaustive.
-	@param context The context in which this control event was produced.
+	/**Source and exhaustive constructor.
+	@param source The object on which the event initially occurred.
 	@param exhaustive Whether this event represents all components on the form.
-	@param provisional Whether the values in this event are provisional.
-	@param context The context in which this control event was produced.
-	@exception NullPointerException if the given context is <code>null</code>.
+	@exception NullPointerException if the given source is <code>null</code>.
 	*/
-	public FormControlEvent(final GuiseContext context, final boolean exhaustive, final boolean provisional)
+	public WebFormEvent(final WebPlatform source, final boolean exhaustive)
 	{
-		super(context);	//construct the parent class
+		super(source);	//construct the parent class
 		this.exhaustive=exhaustive;
-		this.provisional=provisional;
 	}
 
 	/**@return A string representation of this event.*/

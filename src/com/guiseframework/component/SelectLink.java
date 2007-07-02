@@ -5,7 +5,7 @@ import com.guiseframework.model.*;
 /**Selectable link.
 @author Garret Wilson
 */
-public class SelectLink extends AbstractSelectActionControl<SelectLink> implements SelectLinkControl<SelectLink>
+public class SelectLink extends AbstractSelectActionControl implements SelectLinkControl
 {
 
 	/**Default constructor.*/

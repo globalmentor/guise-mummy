@@ -8,21 +8,20 @@ If a single component was replaced both an added and removed compontent will be 
 If neither an added nor a removed component are provided, the event represents a general container modification.
 @author Garret Wilson
 */
-public class ContainerEvent extends ListEvent<Component<?>>
+public class ContainerEvent extends ListEvent<Component>
 {
 
 	/**@return The source of the event.*/
-	@SuppressWarnings("unchecked")
-	public Container<?> getSource()
+	public Container getSource()
 	{
-		return (Container<?>)super.getSource();	//cast the event to the appropriate type
+		return (Container)super.getSource();	//cast the event to the appropriate type
 	}
 
 	/**Source constructor for general container modification.
 	@param source The object on which the event initially occurred.
 	@exception NullPointerException if the given source is <code>null</code>.
 	*/
-	public ContainerEvent(final Container<?> source)
+	public ContainerEvent(final Container source)
 	{
 		this(source, -1, null, null);	//construct the class with no known modification values
 	}
@@ -34,7 +33,7 @@ public class ContainerEvent extends ListEvent<Component<?>>
 	@param removedComponent The component that was removed from the container, or <code>null</code> if no component was removed or it is unknown whether or which components were removed.
 	@exception NullPointerException if the given source is <code>null</code>.
 	*/
-	public ContainerEvent(final Container<?> source, final int index, final Component<?> addedComponent, final Component<?> removedComponent)
+	public ContainerEvent(final Container source, final int index, final Component addedComponent, final Component removedComponent)
 	{
 		super(source, index, addedComponent, removedComponent);	//construct the parent class
 	}

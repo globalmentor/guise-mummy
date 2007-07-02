@@ -14,7 +14,7 @@ This component installs a default export strategy supporting export of the follo
 </ul>
 @author Garret Wilson
 */
-public abstract class AbstractLabel<C extends LabelComponent<C>> extends AbstractComponent<C> implements LabelComponent<C>
+public abstract class AbstractLabel extends AbstractComponent implements LabelComponent
 {
 
 	/**The default export strategy for this component type.*/

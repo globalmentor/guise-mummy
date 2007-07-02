@@ -5,7 +5,7 @@ import com.guiseframework.model.*;
 /**Abstract implementation of a button.
 @author Garret Wilson
 */
-public abstract class AbstractButtonControl<C extends ButtonControl<C>> extends AbstractActionControl<C> implements ButtonControl<C>
+public abstract class AbstractButtonControl extends AbstractActionControl implements ButtonControl
 {
 
 	/**Label model, action model, and enableable object constructor.

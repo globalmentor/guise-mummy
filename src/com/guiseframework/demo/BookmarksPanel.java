@@ -33,16 +33,16 @@ public class BookmarksPanel extends DefaultNavigationPanel implements Navigation
 		tabbedPanel=new TabbedPanel();	//create a tabbed panel
 		for(int i=0; i<TAB_COUNT; ++i)	//for each tab
 		{
-			final Panel<?> tab=new LayoutPanel();	//create a panel to serve as the page
+			final Panel tab=new LayoutPanel();	//create a panel to serve as the page
 			final Heading tabHeading=new Heading(0);	//create a top-level heading
 			tabHeading.setLabel("This is step "+i+".");	//set the text of the heading
 			tab.add(tabHeading);	//add the heading to the tab
 			tabbedPanel.add(tab, new CardConstraints("Step "+i));	//add the panel with a label			
 		}
 			//save a new bookmark ever time the tab changes
-		tabbedPanel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Component<?>>()	//listen for the tab changing
+		tabbedPanel.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Component>()	//listen for the tab changing
 				{
-					public void propertyChange(GenericPropertyChangeEvent<Component<?>> propertyChangeEvent)	//if the tab changes
+					public void propertyChange(GenericPropertyChangeEvent<Component> propertyChangeEvent)	//if the tab changes
 					{
 						final String bookmarkID="step"+(tabbedPanel.getSelectedIndex());	//create the bookmark ID
 						final Bookmark bookmark=new Bookmark(new Bookmark.Parameter("step", Integer.toString(tabbedPanel.getSelectedIndex())));	//create a new bookmark

@@ -26,7 +26,7 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 		final TabbedPanel tabbedPanel=new TabbedPanel();	//create a tabbed panel
 		add(tabbedPanel);	//add the tabbed panel to this panel
 
-		final Component<?> defaultTab=createMultiplicationTableTab(9);	//create a default multiplication table with a maximum factor of 9
+		final Component defaultTab=createMultiplicationTableTab(9);	//create a default multiplication table with a maximum factor of 9
 		tabbedPanel.add(defaultTab, new CardConstraints("Default"));	//add the default tab
 			//create the maximum factor control
 		final LayoutPanel controlPanel=new LayoutPanel(new FlowLayout(Flow.PAGE));	//create a new panel for the controls
@@ -48,7 +48,7 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 							if(maxFactorControl.validate())	//validate the count control to make sure the value is correct, showing an error if not
 							{
 								final int maxFactor=maxFactorControl.getValue().intValue();	//find out how many factors to display
-								final Component<?> tab=createMultiplicationTableTab(maxFactor);	//create a multiplication table with the desired maximum factor
+								final Component tab=createMultiplicationTableTab(maxFactor);	//create a multiplication table with the desired maximum factor
 								tabbedPanel.add(tab, new CardConstraints(String.valueOf(maxFactor)));	//add the tab to the tabbed panel
 								if(tabbedPanel.size()==MAX_TAB_COUNT)	//if we've reached the maximum tab count
 								{
@@ -68,7 +68,7 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 				{
 					public void actionPerformed(ActionEvent actionEvent)	//if the button is pressed
 					{
-						for(final Component<?> tab:tabbedPanel)	//for each tab in the tabbed panel
+						for(final Component tab:tabbedPanel)	//for each tab in the tabbed panel
 						{
 							if(tab!=defaultTab)	//if this is not the default tab
 							{
@@ -88,7 +88,7 @@ public class MultiplicationTablePanel extends DefaultNavigationPanel
 	@param maxFactor The maximum factor to contain in the multiplication table.
 	@return The new tab component to be placed on the tabbed panel.
 	*/
-	protected Component<?> createMultiplicationTableTab(final int maxFactor)
+	protected Component createMultiplicationTableTab(final int maxFactor)
 	{
 		
 		final LayoutPanel tab=new LayoutPanel(new RegionLayout());	//create a new panel for the tab

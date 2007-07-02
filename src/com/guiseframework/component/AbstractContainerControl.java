@@ -14,7 +14,7 @@ import com.guiseframework.model.Notification;
 /**An abstract implementation of a container that is also a control.
 @author Garret Wilson
 */
-public abstract class AbstractContainerControl<C extends ContainerControl<C>> extends AbstractContainer<C> implements ContainerControl<C>
+public abstract class AbstractContainerControl extends AbstractContainer implements ContainerControl
 {
 
 	/**The enableable object decorated by this component.*/

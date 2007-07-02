@@ -14,7 +14,7 @@ This implementation does not allow its frame content to be changed.
 @param <O> The type of options available.
 @author Garret Wilson
 */
-public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O, C>> extends AbstractDialogFrame<O, C> implements OptionDialogFrame<O, C>
+public abstract class AbstractOptionDialogFrame<O> extends AbstractDialogFrame<O> implements OptionDialogFrame<O>
 {
 
 	/**Sets the single child component.
@@ -22,7 +22,7 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 	@param newContent The single child component, or <code>null</code> if this frame does not have a child component.
 	@exception IllegalArgumentException if any different content is provided.
 	*/
-	public void setContent(final Component<?> newContent)
+	public void setContent(final Component newContent)
 	{
 		if(newContent!=getContent())	//if the content is changing
 		{
@@ -31,10 +31,10 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 	}
 
 	/**@return The container component used to hold content, including the option child component.*/
-	protected Container<?> getContentContainer() {return (Container<?>)super.getContent();}
+	protected Container getContentContainer() {return (Container)super.getContent();}
 
 	/**@return The component representing option contents, or <code>null</code> if this frame does not have an option contents component.*/ 
-	public Component<?> getOptionContent()
+	public Component getOptionContent()
 	{
 		return ((RegionLayout)getContentContainer().getLayout()).getComponent(Region.CENTER);	//return the center component, if there is one
 	}
@@ -43,12 +43,12 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 	This implementation adds the option content component to the center region of the child container.
 	@param newOptionContent The single option contents component, or <code>null</code> if this frame does not have an option contents component.
 	*/
-	public void setOptionContent(final Component<?> newOptionContent)
+	public void setOptionContent(final Component newOptionContent)
 	{
-		final Component<?> oldOptionContents=getOptionContent();	//get the current component
+		final Component oldOptionContents=getOptionContent();	//get the current component
 		if(oldOptionContents!=newOptionContent)	//if the value is really changing
 		{
-			final Container<?> contentsContainer=getContentContainer();	//get our container
+			final Container contentsContainer=getContentContainer();	//get our container
 			if(oldOptionContents!=null)	//if an old content component was present
 			{
 				contentsContainer.remove(oldOptionContents);	//remove the old component
@@ -61,10 +61,10 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 	}
 
 	/**The container containing the options.*/
-	private final Container<?> optionContainer;
+	private final Container optionContainer;
 
 		/**@return The container containing the options.*/
-		public Container<?> getOptionContainer() {return optionContainer;}
+		public Container getOptionContainer() {return optionContainer;}
 
 	/**The read-only list of available options in order.*/
 	private final List<O> options;
@@ -73,13 +73,13 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 		public List<O> getOptions() {return options;}
 
 	/**The map of components representing options.*/
-	private final Map<O, Component<?>> optionComponentMap=new ConcurrentHashMap<O, Component<?>>();
+	private final Map<O, Component> optionComponentMap=new ConcurrentHashMap<O, Component>();
 
 		/**Returns the component that represents the specified option.
 		@param option The option for which a component should be returned.
 		@return The component, such as a button, that represents the given option, or <code>null</code> if there is no component that represents the given option.
 		*/
-		public Component<?> getOptionComponent(final O option) {return optionComponentMap.get(option);}
+		public Component getOptionComponent(final O option) {return optionComponentMap.get(option);}
 		
 	/**Value model, component, and options constructor.
 	Duplicate options are ignored.
@@ -88,7 +88,7 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 	@param options The available options.
 	@exception NullPointerException if the given value model and/or options is <code>null</code>.
 	*/
-	public AbstractOptionDialogFrame(final ValueModel<O> valueModel, final Component<?> component, final O... options)
+	public AbstractOptionDialogFrame(final ValueModel<O> valueModel, final Component component, final O... options)
 	{
 		super(valueModel, new LayoutPanel(new RegionLayout()));	//construct the parent class using a layout panel as a container
 		final List<O> optionList=new ArrayList<O>();	//create a list of options
@@ -110,7 +110,7 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 	This implementation creates a horizontal layout panel.
 	@return a container for holding the options.
 	*/
-	protected Container<?> createOptionContainer()
+	protected Container createOptionContainer()
 	{
 		return new LayoutPanel(new FlowLayout(Flow.LINE));	//create a horizontal layout panel
 	}
@@ -120,11 +120,11 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 	@param optionContainer The container to the options.
 	@param options The available options.
 	*/
-	protected void initializeOptionContainer(final Container<?> optionContainer, final List<O> options)
+	protected void initializeOptionContainer(final Container optionContainer, final List<O> options)
 	{
 		for(final O option:options)	//for each option
 		{
-			final Component<?> optionComponent=createOptionComponent(option);	//create a component for this option
+			final Component optionComponent=createOptionComponent(option);	//create a component for this option
 			optionComponentMap.put(option, optionComponent);	//store this component in the map keyed to the component
 			optionContainer.add(optionComponent);	//add the component to the container
 		}
@@ -133,5 +133,5 @@ public abstract class AbstractOptionDialogFrame<O, C extends OptionDialogFrame<O
 	/**Creates a component to represent the given option.
 	@param option The option for which a component should be created.
 	*/
-	protected abstract Component<?> createOptionComponent(final O option);
+	protected abstract Component createOptionComponent(final O option);
 }

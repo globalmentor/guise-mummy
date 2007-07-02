@@ -10,7 +10,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 @author Garret Wilson
 @see CardContainer
 */
-public class CardTabControl extends TabControl<Component<?>>
+public class CardTabControl extends TabControl<Component>
 {
 
 	/**Card control and axis constructor.
@@ -18,7 +18,7 @@ public class CardTabControl extends TabControl<Component<?>>
 	@param axis The axis along which the tabs are oriented.
 	@exception NullPointerException if the given card control and/or axis is <code>null</code>.
 	*/
-	public CardTabControl(final CardControl<?> cardControl, final Flow axis)
+	public CardTabControl(final CardControl cardControl, final Flow axis)
 	{
 		this(cardControl, axis, -1);	//construct the class with no maximum tab count
 	}
@@ -29,7 +29,7 @@ public class CardTabControl extends TabControl<Component<?>>
 	@param maxTabCount The requested number of visible tabs, or -1 if no maximum tab count is specified.
 	@exception NullPointerException if the given card control and/or axis is <code>null</code>.
 	*/
-	public CardTabControl(final CardControl<?> cardControl, final Flow axis, final int maxTabCount)
+	public CardTabControl(final CardControl cardControl, final Flow axis, final int maxTabCount)
 	{
 		this(cardControl, new CardRepresentationStrategy(cardControl.getLayout()), axis, maxTabCount);	//construct the class with a default representation strategy
 	}
@@ -40,7 +40,7 @@ public class CardTabControl extends TabControl<Component<?>>
 	@param axis The axis along which the tabs are oriented.
 	@exception NullPointerException if the given card control, value representation strategy, and/or axis is <code>null</code>.
 	*/
-	public CardTabControl(final CardControl<?> cardControl, final ValueRepresentationStrategy<Component<?>> valueRepresentationStrategy, final Flow axis)
+	public CardTabControl(final CardControl cardControl, final ValueRepresentationStrategy<Component> valueRepresentationStrategy, final Flow axis)
 	{
 		this(cardControl, valueRepresentationStrategy, axis, -1);	//construct the class with no maximum tab count
 	}
@@ -52,7 +52,7 @@ public class CardTabControl extends TabControl<Component<?>>
 	@param maxTabCount The requested number of visible tabs, or -1 if no maximum tab count is specified.
 	@exception NullPointerException if the given card control, value representation strategy, and/or axis is <code>null</code>.
 	*/
-	public CardTabControl(final CardControl<?> cardControl, final ValueRepresentationStrategy<Component<?>> valueRepresentationStrategy, final Flow axis, final int maxTabCount)
+	public CardTabControl(final CardControl cardControl, final ValueRepresentationStrategy<Component> valueRepresentationStrategy, final Flow axis, final int maxTabCount)
 	{
 		super(cardControl, valueRepresentationStrategy, axis, maxTabCount);	//construct the parent class using the card container's model
 	}
@@ -63,7 +63,7 @@ public class CardTabControl extends TabControl<Component<?>>
 	@see Label
 	@author Garret Wilson
 	*/
-	public static class CardRepresentationStrategy implements ValueRepresentationStrategy<Component<?>>
+	public static class CardRepresentationStrategy implements ValueRepresentationStrategy<Component>
 	{
 		
 		/**The card layout containing component layout information.*/
@@ -90,7 +90,7 @@ public class CardTabControl extends TabControl<Component<?>>
 		@param focused <code>true</code> if the value has the focus.
 		@return A new component to represent the given value, or <code>null</code> if the provided value is <code>null</code>.
 		*/
-		public Label createComponent(final ListSelectModel<Component<?>> model, final Component<?> value, final int index, final boolean selected, final boolean focused)
+		public Label createComponent(final ListSelectModel<Component> model, final Component value, final int index, final boolean selected, final boolean focused)
 		{
 			return value!=null	//if there is a value
 			? new Label(getCardLayout().getConstraints(value))	//generate a label using the the card layout constraints as the label model

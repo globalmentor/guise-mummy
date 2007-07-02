@@ -4,7 +4,6 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.servlet.ServletConstants.*;
-import static com.garretwilson.servlet.http.HttpServletConstants.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
@@ -137,23 +136,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 			Debug.trace("+++creating Guise session", httpSession.getId());
 //TODO del if not needed				final String relativeApplicationPath=relativizePath(getBasePath(), guiseApplication.getBasePath());	//get the application path relative to the container path
 					//TODO set up the session outside the synchronized block, maybe, to reduce the amount of time blocking other threads
-				final GuiseEnvironment environment=new DefaultGuiseEnvironment();	//create a new environment
-				environment.setProperties(guiseApplication.getEnvironment().getProperties());	//copy the application environment to the session environment
-				final Cookie[] cookies=httpRequest.getCookies();	//get the cookies in the request
-				if(cookies!=null)	//if a cookie array was returned
-				{
-					for(final Cookie cookie:cookies)	//for each cookie in the request
-					{
-						final String cookieName=cookie.getName();	//get the name of this cookie
-//					TODO del Debug.trace("Looking at cookie", cookieName, "with value", cookie.getValue());
-						if(!SESSION_ID_COOKIE_NAME.equals(cookieName))	//ignore the session ID
-						{
-							environment.setProperty(cookieName, decode(cookie.getValue()));	//put this cookie's decoded value into the session's environment
-						}
-					}
-				}
-				environment.setProperties(getUserAgentProperties(httpRequest));	//initialize the Guise environment user agent information
-				guiseSession=guiseApplication.createSession(environment, new DefaultGuiseWebPlatform());	//ask the application to create a new Guise session for the given platform
+				guiseSession=guiseApplication.createSession(new HTTPServletWebPlatform(guiseApplication, httpRequest));	//ask the application to create a new Guise session for the given platform
 				final URI requestURI=URI.create(httpRequest.getRequestURL().toString());	//get the URI of the current request
 				final URI sessionBaseURI=requestURI.resolve(guiseApplication.getBasePath());	//resolve the application base path to the request URI
 				guiseSession.setBaseURI(sessionBaseURI);	//update the base URI to the one specified by the request, in case we can create a session from different URLs

@@ -19,10 +19,10 @@ public class ComponentDestination extends AbstractDestination
 	public final static String STYLE_PROPERTY=getPropertyName(ComponentDestination.class, "style");
 
 	/**The class of the component to represent this destination.*/
-	private final Class<? extends Component<?>> componentClass;
+	private final Class<? extends Component> componentClass;
 
 		/**@return The class of the component to represent this destination.*/
-		public Class<? extends Component<?>> getComponentClass() {return componentClass;}
+		public Class<? extends Component> getComponentClass() {return componentClass;}
 
 	/**The style of this destination, or <code>null</code> if no destination-specific style is specified.*/
 	private URI style=null;
@@ -51,7 +51,7 @@ public class ComponentDestination extends AbstractDestination
 	@exception NullPointerException if the path and/or the component class is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public ComponentDestination(final String path, final Class<? extends Component<?>> componentClass)
+	public ComponentDestination(final String path, final Class<? extends Component> componentClass)
 	{
 		this(path, componentClass, null);	//construct the class with no style specified
 	}
@@ -63,7 +63,7 @@ public class ComponentDestination extends AbstractDestination
 	@exception NullPointerException if the path and/or the component class is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public ComponentDestination(final String path, final Class<? extends Component<?>> componentClass, final URI style)
+	public ComponentDestination(final String path, final Class<? extends Component> componentClass, final URI style)
 	{
 		super(path);	//construct the parent class
 		this.componentClass=checkInstance(componentClass, "Component class cannot be null.");	//store the associated class
@@ -75,7 +75,7 @@ public class ComponentDestination extends AbstractDestination
 	@param componentClass The class of the component to represent this destination.
 	@exception NullPointerException if the path pattern and/or the component class is <code>null</code>.
 	*/
-	public ComponentDestination(final Pattern pathPattern, final Class<? extends Component<?>> componentClass)
+	public ComponentDestination(final Pattern pathPattern, final Class<? extends Component> componentClass)
 	{
 		this(pathPattern, componentClass, null);	//construct the class with no style specified
 	}
@@ -87,7 +87,7 @@ public class ComponentDestination extends AbstractDestination
 	@exception NullPointerException if the path pattern and/or the component class is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public ComponentDestination(final Pattern pathPattern, final Class<? extends Component<?>> componentClass, final URI style)
+	public ComponentDestination(final Pattern pathPattern, final Class<? extends Component> componentClass, final URI style)
 	{
 		super(pathPattern);	//construct the parent class
 		this.componentClass=checkInstance(componentClass, "Component class cannot be null.");	//store the associated class

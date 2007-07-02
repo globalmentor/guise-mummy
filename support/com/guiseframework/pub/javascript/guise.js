@@ -17,32 +17,24 @@ GUISE_PUBLIC_RESOURCE_BASE_PATH The absolute base path of Guise public resources
 <request>
 	<events>	<!--the list of events (zero or more)-->
 		<action	<!--an action on a component-->
-			componentID=""	<!--the ID of the component-->
+			objectID=""	<!--the ID of the depicted object-->
 			targetID=""	<!--the ID of the target element on which the action occurred-->
 			actionID=""	<!--the action identifier-->
 		/>
 		<change	<!--a property change on a depicted object; each value is presented in JSON syntax-->
 			objectID="">	<!--the ID of the depicted object-->
-			<property name="">	<!--the name of a property changing; if the value is not an array, it will be present as the text of the element with no value child elements-->
-				<value></value>	<!--(for array values; zero or more) the new property value; zero may signify null in some contexts--> 
+			<property name="">	<!--the name of a property changing-->
+				value	<!--the value of the property, encoded in JSON--> 
 			</property>
 		</change>
-		<drop>	<!--the end of a drag-and-drop operation-->
-			<source id=""/>	<!--the element that was the source of the drag and drop operation-->
-			<target id=""/>	<!--the element that was is the target of the drag and drop operation-->
+		<drop	<!--the end of a drag-and-drop operation-->
+			objectID=""	<!--the ID of the depicted object that serves as the drop target-->
+			dragSourceID=""	<!--the ID of the depicted object that serves as the drag source-->
 			<mouse x="" y=""/>	<!--the mouse information at the time of the drop-->
 		</drop>
 		<focus	<!--a focus change-->
-			componentID=""	<!--the ID of the component-->
+			objectID="">	<!--the ID of the depicted object-->
 		/>
-		<form	<!--information resulting from form changes, analogous to that in an HTTP POST-->
-			exhaustive="true|false"	<!--indicates whether the event contains values for all form controls (defaults to false)-->
-			provisional="true|false"	<!--indicates whether the value is a provisional value that has not yet been accepted by the user (defaults to false)-->
-		>
-			<control name="">	<!--a control change (zero or more)-->
-				<!--the value of the control (putting the value into an attribute could corrupt the value because of XML attribute canonicalization rules-->
-			</control>
-		</form>
 		<init	<!--initializes the page, requesting all frames to be resent-->
 			jsVersion=""	<!--version of JavaScript supported by the browser-->
 			timezone=""
@@ -76,9 +68,9 @@ GUISE_PUBLIC_RESOURCE_BASE_PATH The absolute base path of Guise public resources
 			<viewport x="" y="" width="" height=""/>	<!--information on the viewport (scroll position and size)-->
 			<component id="" x="" y="" width="" height=""/>	<!--information on the component that was the target of the mouse event (in absolute terms)-->
 			<target id="" x="" y="" width="" height=""/>	<!--information on the element that was the target of the mouse event (in absolute terms)-->
-			<mouse x="" y=""/>	<!--the mouse information at the time of the drop (in fixed terms)-->
+			<mouse x="" y=""/>	<!--the mouse information at the time of the event (in fixed terms)-->
 		</mouseEnter|mouseExit|mouseClick>
-		<ping/> <!--pings the server to check for updates-->
+		<poll/> <!--polls the server to check for updates-->
 	</events>
 </request>
 */
@@ -123,10 +115,10 @@ var isUserAgentIE6=isUserAgentIE && navigator.userAgentVersionNumber<7;
 
 /**Whether Guise AJAX communication is initially enabled.*/
 var GUISE_AJAX_ENABLED=true;
-/**The interval, in milliseconds, for pinging the server under normal conditions, or -1 if no pinging should occur.*/
-var GUISE_AJAX_PING_INTERVAL=60000;
-/**The interval, in milliseconds, for pinging the server during file uploads, or -1 if no pinging should occur.*/
-var GUISE_AJAX_UPLOAD_PING_INTERVAL=3000;
+/**The interval, in milliseconds, for polling the server under normal conditions, or -1 if no polling should occur.*/
+var GUISE_AJAX_POLL_INTERVAL=60000;
+/**The interval, in milliseconds, for polling the server during file uploads, or -1 if no polling should occur.*/
+var GUISE_AJAX_UPLOAD_POLL_INTERVAL=3000;
 
 /**See if the browser is Safari.*/
 var isSafari=navigator.userAgent.indexOf("Safari")>=0;	//TODO use a better variable; do better checks; update Guise server routines to check for Safari
@@ -139,14 +131,6 @@ var XHTML_NAMESPACE_URI="http://www.w3.org/1999/xhtml";
 
 /**The URI of the GuiseML namespace.*/
 var GUISE_ML_NAMESPACE_URI="http://guiseframework.com/id/ml#";
-
-/**The class suffix for a tab.*/
-var TAB_CLASS_SUFFIX="-tab";
-/**The class suffix for a selected tab.*/
-//TODO del var TAB_SELECTED_CLASS_SUFFIX="-tab-selected";
-
-/**The class suffix of a decorator.*/
-//TODO del var DECORATOR_CLASS_PREFIX="-decorator";
 
 /**The prefix for Guise state-related attributes, which shouldn't be removed when elements are synchronized.
 When more states are added, the proto.NON_REMOVABLE_ATTRIBUTE_SET should be updated.
@@ -210,29 +194,31 @@ function InitAJAXEvent()
 	this.referrer=document.referrer;	//get the document referrer
 }
 
-//Ping AJAX Event
+//Poll AJAX Event
 
-/**A class indicating a ping AJAX request.*/
-function PingAJAXEvent()
+/**A class indicating a poll AJAX request.*/
+function PollAJAXEvent()
 {
 }
 
-//Form AJAX Event
+//Action AJAX Event
 
-/**A class encapsulating form information for an AJAX request.
-@param parameters: An optional associative array of parameters with which to initialize the request.
-@param provisional: Optional indication of whether the value is a provisional value that has not yet been accepted by the user (defaults to false).
-var parameters: The associative array of parameters and values.
-var provisional: Indicates whether the value is a provisional value that has not yet been accepted by the user.
+/**A class encapsulating action information for an AJAX request.
+@param objectID The ID of the depicted object.
+@param targetID: The ID of the target element.
+@param actionID: The action identifier, or null if no particular action is indicated.
+@param option: The zero-based option indicating mouse buttons left, right, or middle in that order.
+var objectID The ID of the depicted object.
+var targetID: The ID of the target element.
+var actionID: The action identifier, or null if no particular action is indicated.
+var option: The zero-based option indicating mouse buttons left, right, or middle in that order.
 */
-function FormAJAXEvent(parameters, provisional)
+function ActionAJAXEvent(objectID, targetID, actionID, option)
 {
-	this.parameters=parameters ? parameters : new Object();	//create a new associative array if not parameters were given
-	if(!FormAJAXEvent.prototype._initialized)
-	{
-		FormAJAXEvent.prototype._initialized=true;		
-	}
-	this.provisional=Boolean(provisional);	//get a normal boolean version of the provisional status, assuming false
+	this.objectID=objectID;
+	this.targetID=targetID;
+	this.actionID=actionID;
+	this.option=option;
 }
 
 //Change AJAX Event
@@ -247,26 +233,6 @@ function ChangeAJAXEvent(objectID, properties)
 {
 	this.objectID=objectID;
 	this.properties=properties;
-}
-
-//Action AJAX Event
-
-/**A class encapsulating action information for an AJAX request.
-@param componentID: The ID of the source component.
-@param targetID: The ID of the target element.
-@param actionID: The action identifier, or null if no particular action is indicated.
-@param option: The zero-based option indicating mouse buttons left, right, or middle in that order.
-var componentID: The ID of the source component.
-var targetID: The ID of the target element.
-var actionID: The action identifier, or null if no particular action is indicated.
-var option: The zero-based option indicating mouse buttons left, right, or middle in that order.
-*/
-function ActionAJAXEvent(componentID, targetID, actionID, option)
-{
-	this.componentID=componentID;
-	this.targetID=targetID;
-	this.actionID=actionID;
-	this.option=option;
 }
 
 //Drop AJAX Event
@@ -290,12 +256,12 @@ function DropAJAXEvent(dragState, dragSource, dropTarget, event)
 //Focus AJAX Event
 
 /**A class encapsulating focus information for an AJAX request.
-@param componentID: The ID of the component receiving focus.
-var componentID: The ID of the component receiving focus.
+@param objectID The ID of the depicted object.
+var objectID The ID of the depicted object.
 */
-function FocusAJAXEvent(componentID)
+function FocusAJAXEvent(objectID)
 {
-	this.componentID=componentID;
+	this.objectID=objectID;
 }
 
 //Key Down AJAX Event
@@ -432,11 +398,11 @@ com.guiseframework.js.Guise=function()
 	/**Whether Guise AJAX communication is enabled.*/
 	this._enabled=GUISE_AJAX_ENABLED;
 
-	/**The ping interval timer ID, or null if pinging is not occuring.*/
-	this._pingIntervalID=null;
+	/**The poll interval timer ID, or null if polling is not occuring.*/
+	this._pollIntervalID=null;
 
-	/**The current ping interval, in milleseconds, or -1 if pinging is not enabled.*/
-	this._pingInterval=-1;
+	/**The current poll interval, in milleseconds, or -1 if polling is not enabled.*/
+	this._pollInterval=-1;
 
 	/**The array of drop targets, determined when the document is loaded. The drop targets are stored in increasing order of hierarchical depth.*/
 	this._dropTargets=new Array();
@@ -492,13 +458,13 @@ com.guiseframework.js.Guise=function()
 					FORM: "form", PROVISIONAL: "provisional", CONTROL: "control", NAME: "name", VALUE: "value",
 					CHANGE: "change", PROPERTY: "property",
 					ACTION: "action", COMPONENT: "component", COMPONENT_ID: "componentID", TARGET_ID: "targetID", ACTION_ID: "actionID", OPTION: "option",
-					DROP: "drop", SOURCE: "source", TARGET: "target", VIEWPORT: "viewport",
+					DROP: "drop", SOURCE: "source", TARGET: "target", DRAG_SOURCE_ID:"dragSourceID", VIEWPORT: "viewport",
 					FOCUS: "focus",
 					CODE: "code", ALT_KEY: "altKey", CONTROL_KEY: "controlKey", SHIFT_KEY: "shiftKey",
 					LOG: "log", LEVEL: "level",
 					MOUSE: "mouse", ID: "id", X: "x", Y: "y", WIDTH: "width", HEIGHT: "height", BUTTON: "button", CLICK_COUNT: "clickCount",
 					INIT: "init",
-					PING: "ping"
+					POLL: "poll"
 				};
 
 		/**The content type of a Guise AJAX response.*/
@@ -570,7 +536,7 @@ com.guiseframework.js.Guise=function()
 		};
 
 		/**Enables or disables AJAX communication.
-		If AJAX is disabled, all AJAX communication will immediately stop and pinging will be disabled.
+		If AJAX is disabled, all AJAX communication will immediately stop and polling will be disabled.
 		@param enabled Whether AJAX communication should be enabled.
 		*/
 		proto.setEnabled=function(enabled)
@@ -580,36 +546,36 @@ com.guiseframework.js.Guise=function()
 				this._enabled=enabled;	//update the enabled status
 				if(!enabled)	//if AJAX has been disabled
 				{
-					this.setPingInterval(-1);	//turn off pinging
+					this.setPollInterval(-1);	//turn off polling
 				}				
 			}
 		};
 
-		/**Sets the interval for pinging the server.
-		If pinging is already occuring at the given interval, no action occurs.
-		@param pingInterval The new ping interval, in milleseconds, or -1 if pinging should not be enabled.
+		/**Sets the interval for polling the server.
+		If polling is already occuring at the given interval, no action occurs.
+		@param pollInterval The new poll interval, in milleseconds, or -1 if polling should not be enabled.
 		*/
-		proto.setPingInterval=function(pingInterval)
+		proto.setPollInterval=function(pollInterval)
 		{
-			if(this._pingInterval!=pingInterval)	//if the ping interval is really changing
+			if(this._pollInterval!=pollInterval)	//if the poll interval is really changing
 			{ 
-				this._pingInterval=pingInterval;	//update the ping interval immediately; in case another thread tries to set the same value (a little assistance for this race condition)
-				if(this._pingIntervalID!=null)	//if there is a timer running already, turn it off
+				this._pollInterval=pollInterval;	//update the poll interval immediately; in case another thread tries to set the same value (a little assistance for this race condition)
+				if(this._pollIntervalID!=null)	//if there is a timer running already, turn it off
 				{
-					window.clearInterval(this._pingIntervalID);	//clear the timer
-					this._pingIntervalID=null;	//remove the timer ID 
+					window.clearInterval(this._pollIntervalID);	//clear the timer
+					this._pollIntervalID=null;	//remove the timer ID 
 				}
-				if(pingInterval>=0)	//if ping should be enabled
+				if(pollInterval>=0)	//if poll should be enabled
 				{
-					this._pingIntervalID=window.setInterval(this.ping.bind(this), pingInterval);	//send a ping event at the correct interval
+					this._pollIntervalID=window.setInterval(this.poll.bind(this), pollInterval);	//send a poll event at the correct interval
 				}
 			}
 		};
 
-		/**Sends a ping request to the server.*/
-		proto.ping=function()
+		/**Sends a poll request to the server.*/
+		proto.poll=function()
 		{
-			this.sendAJAXRequest(new PingAJAXEvent());	//create and queue a new ping event
+			this.sendAJAXRequest(new PollAJAXEvent());	//create and queue a new poll event
 		};
 
 		/**Sends a trace request to the server.
@@ -649,11 +615,7 @@ com.guiseframework.js.Guise=function()
 					while(this.ajaxRequests.length>0)	//there are more AJAX requests
 					{
 						var ajaxRequest=this.ajaxRequests.dequeue();	//get the next AJAX request to process
-						if(ajaxRequest instanceof FormAJAXEvent)	//if this is a form event
-						{
-							this._appendFormAJAXEvent(requestStringBuilder, ajaxRequest);	//append the form event
-						}
-						else if(ajaxRequest instanceof ActionAJAXEvent)	//if this is an action event
+						if(ajaxRequest instanceof ActionAJAXEvent)	//if this is an action event
 						{
 							this._appendActionAJAXEvent(requestStringBuilder, ajaxRequest);	//append the action event
 						}
@@ -685,9 +647,9 @@ com.guiseframework.js.Guise=function()
 						{
 							this._appendInitAJAXEvent(requestStringBuilder, ajaxRequest);	//append the init event
 						}
-						else if(ajaxRequest instanceof PingAJAXEvent)	//if this is a ping event
+						else if(ajaxRequest instanceof PollAJAXEvent)	//if this is a poll event
 						{
-							this._appendPingAJAXEvent(requestStringBuilder, ajaxRequest);	//append the ping event
+							this._appendPollAJAXEvent(requestStringBuilder, ajaxRequest);	//append the poll event
 						}
 					}
 					DOMUtilities.appendXMLEndTag(requestStringBuilder, this.RequestElement.EVENTS);	//</events>
@@ -711,25 +673,6 @@ com.guiseframework.js.Guise=function()
 			}
 		};
 
-		/**Appends an AJAX form event to a string builder.
-		@param stringBuilder The string builder collecting the request data.
-		@param ajaxFormRequest The form request information to append.
-		@return The string builder.
-		*/
-		proto._appendFormAJAXEvent=function(stringBuilder, ajaxFormRequest)
-		{
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.FORM,	//<form
-					new Map(this.RequestElement.PROVISIONAL, ajaxFormRequest.provisional));	//provisional="provisional">
-			for(var parameterName in ajaxFormRequest.parameters)	//for each form parameter
-			{
-				DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.CONTROL, new Map(this.RequestElement.NAME, parameterName));	//<control name="parameterName">
-				DOMUtilities.appendXMLText(stringBuilder, ajaxFormRequest.parameters[parameterName]);	//append the parameter value
-				DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.CONTROL);	//</control>
-			}
-			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.FORM);	//</form>
-			return stringBuilder;	//return the string builder
-		};
-
 		/**Appends an AJAX action event to a string builder.
 		@param stringBuilder The string builder collecting the request data.
 		@param ajaxActionEvent The action event information to append.
@@ -738,7 +681,7 @@ com.guiseframework.js.Guise=function()
 		proto._appendActionAJAXEvent=function(stringBuilder, ajaxActionEvent)
 		{
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.ACTION,	//<action>
-					new Map(this.RequestElement.COMPONENT_ID, ajaxActionEvent.componentID,	//componentID="componentID"
+					new Map(this.RequestElement.OBJECT_ID, ajaxActionEvent.objectID,	//objectID="objectID"
 							this.RequestElement.TARGET_ID, ajaxActionEvent.targetID,	//targetID="targetID"
 							this.RequestElement.ACTION_ID, ajaxActionEvent.actionID,	//actionID="actionID"
 							this.RequestElement.OPTION, ajaxActionEvent.option));	//option="option"
@@ -760,21 +703,7 @@ com.guiseframework.js.Guise=function()
 			{
 				DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.PROPERTY,	//<property>
 						new Map(this.RequestElement.NAME, propertyName));	//name="name"
-				var value=properties[propertyName];	//get this property name
-				if(value instanceof Array)	//if the value is an array
-				{
-					var arrayLength=value.length;	//get the length of the array
-					for(var i=0; i<arrayLength; ++i)	//for each array element
-					{
-						DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.VALUE);	//<value>
-						DOMUtilities.appendXMLText(stringBuilder, JSON.serialize(value[i]));	//value[i]
-						DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.VALUE);	//</value>
-					}				
-				}
-				else if(value!=null)	//if the value is anything besides an array
-				{
-					DOMUtilities.appendXMLText(stringBuilder, JSON.serialize(value));	//value
-				}
+				DOMUtilities.appendXMLText(stringBuilder, JSON.serialize(properties[propertyName]));	//value
 				DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.PROPERTY);	//</property>
 			}
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.CHANGE);	//</change>
@@ -788,11 +717,9 @@ com.guiseframework.js.Guise=function()
 		*/
 		proto._appendDropAJAXEvent=function(stringBuilder, ajaxDropEvent)
 		{
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.DROP);	//<drop>
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.SOURCE, new Map(this.RequestElement.ID, ajaxDropEvent.dragSource.id));	//<source id="id">
-			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.SOURCE);	//</source>
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.TARGET, new Map(this.RequestElement.ID, ajaxDropEvent.dropTarget.id));	//<target id="id">
-			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.TARGET);	//</target>
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.DROP,	//<drop>
+					new Map(this.RequestElement.OBJECT_ID, ajaxDropEvent.dropTarget.id,	//objectID="dropTargetID"
+							this.RequestElement.DRAG_SOURCE_ID, ajaxDropEvent.dragSource.id));	//objectID="dragSourceID"
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.MOUSE, new Map(this.RequestElement.X, ajaxDropEvent.mousePosition.x, this.RequestElement.Y, ajaxDropEvent.mousePosition.y));	//<mouse x="x" y="y">
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.MOUSE);	//</mouse>
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.DROP);	//</drop>
@@ -807,7 +734,7 @@ com.guiseframework.js.Guise=function()
 		proto._appendFocusAJAXEvent=function(stringBuilder, ajaxFocusEvent)
 		{
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.FOCUS,	//<focus>
-					new Map(this.RequestElement.COMPONENT_ID, ajaxFocusEvent.componentID));	//componentID="componentID"
+					new Map(this.RequestElement.OBJECT_ID, ajaxFocusEvent.object));	//objectID="objectID"
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.FOCUS);	//</focus>
 			return stringBuilder;	//return the string builder
 		};
@@ -906,15 +833,15 @@ com.guiseframework.js.Guise=function()
 			return stringBuilder;	//return the string builder
 		};
 
-		/**Appends an AJAX ping event to a string builder.
+		/**Appends an AJAX poll event to a string builder.
 		@param stringBuilder The string builder collecting the request data.
-		@param ajaxPingEvent The ping event information to append.
+		@param ajaxPollEvent The poll event information to append.
 		@return The string builder.
 		*/
-		proto._appendPingAJAXEvent=function(stringBuilder, ajaxPingEvent)
+		proto._appendPollAJAXEvent=function(stringBuilder, ajaxPollEvent)
 		{
-			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.PING);	//<ping>
-			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.PING);	//</ping>
+			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.POLL);	//<poll>
+			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.POLL);	//</poll>
 			return stringBuilder;	//return the string builder
 		};
 	
@@ -1331,11 +1258,11 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 				form.action=destination;	//indicate where the data should go
 				form.target="uploadIFrame";	//indicate that the output should be re-routed to our hidden IFrame
 				form.submit();	//submit the form
-				this.setPingInterval(GUISE_AJAX_UPLOAD_PING_INTERVAL);	//switch to pinging at the upload interval
+				this.setPollInterval(GUISE_AJAX_UPLOAD_POLL_INTERVAL);	//switch to polling at the upload interval
 			}
 			else if(/sendCompleted\(\)/.test(command))	//if the command is sendCompleted()
 			{
-				this.setPingInterval(GUISE_AJAX_PING_INTERVAL);	//go back to pinging at the normal interval
+				this.setPollInterval(GUISE_AJAX_POLL_INTERVAL);	//go back to polling at the normal interval
 				this.removeUploadIFrame();	//remove the upload IFrame
 				var childNodeList=element.childNodes;	//get all the child nodes
 				var lastFileInput=null;	//we'll keep track of the last file input we find
@@ -1490,7 +1417,10 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 				if(elementName!="button" && oldElement.value && element.getAttribute("value")==null)	//if there is an old value but no value attribute present in the new element (IE 6 and Mozilla do not show "value" in the list of enumerated values) (IE6 thinks that the value of a button is content, so ignore button values) TODO fix button values for non-IE6 browsers, maybe, but current button values are unused anyway because of the IE6 bug
 				{
 //TODO del alert("clearing value; old value was: "+oldElement.value);
-					oldElement.value="";	//set the value to the empty string (setting the value to null will result in "null" being displayed in the input control on IE)
+					if(patchType!="novalue")	//if we shouldn't ignore the value attribute
+					{
+						oldElement.value="";	//set the value to the empty string (setting the value to null will result in "null" being displayed in the input control on IE)
+					}
 				}
 					//patch in the new and changed attributes
 				var attributes=element.attributes;	//get the new element's attributes
@@ -1504,9 +1434,10 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 					{
 						if(attributeName=="value")	//if this is the value attribute
 						{
-//TODO del when works							var patchType=Element.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "patchType");	//get the patch type TODO use a constant
+//alert("patching value attribute");
 							if(patchType=="novalue")	//if we should ignore the value attribute
 							{
+//alert("found novalue for ID: "+oldElement.id);
 								continue;	//go to the next attribute
 							}
 						}
@@ -1905,7 +1836,7 @@ if(elementName=="select")
 			{
 				focusable.focus();	//focus on the node
 			}
-			this.setPingInterval(GUISE_AJAX_PING_INTERVAL);	//turn on pinging at the normal level
+			this.setPollInterval(GUISE_AJAX_POLL_INTERVAL);	//turn on polling at the normal level
 		};
 
 		/**Creates the appropriate modal layers, initializes document-related variables, and installs event handlers.
@@ -2409,7 +2340,7 @@ if(elementName=="select")
 		proto.addDropTarget=function(element)
 		{
 			this._dropTargets.add(element);	//add this element to the list of drop targets
-			this._dropTargets.sort(function(element1, element2) {return Node.getDepth(element1)-DOMUtilities.getDepth(element2);});	//sort the drop targets in increasing order of document depth
+			this._dropTargets.sort(function(element1, element2) {return Node.getDepth(element1)-Node.getDepth(element2);});	//sort the drop targets in increasing order of document depth
 		};
 
 		/**Determines the drop target at the given coordinates.
@@ -2478,14 +2409,6 @@ if(elementName=="select")
 										{
 											node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
 										}
-									}
-								}
-								else if(elementClassNames.containsMatch(/-tab$/))	//if this is a tab TODO use a constant TODO is this still used?
-								{
-									com.garretwilson.js.EventManager.addEvent(node, "click", onTabClick, false);	//listen for tab clicks
-									if(isSafari)	//if this is Safari TODO fix better
-									{
-										node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
 									}
 								}
 								break;
@@ -2588,7 +2511,10 @@ if(elementName=="select")
 								case STYLES.ACTION:
 									com.garretwilson.js.EventManager.addEvent(node, "click", onActionClick, false);	//listen for a click on an action element
 									com.garretwilson.js.EventManager.addEvent(node, "contextmenu", onContextMenu, false);	//listen for a right click on an action element
-									//TODO see if we need to assign a default handler on Safari to prevent the default action
+									if(isSafari)	//if this is Safari TODO fix better
+									{
+										node.onclick=function(){return false;};	//cancel the default action, because Safari 1.3.2 ignores event.preventDefault(); http://www.sitepoint.com/article/dhtml-utopia-modern-web-design/3
+									}
 									break;
 								case STYLES.DRAG_HANDLE:
 									com.garretwilson.js.EventManager.addEvent(node, "mousedown", onDragBegin, false);	//listen for mouse down on a drag handle
@@ -2818,33 +2744,6 @@ var guise=new com.guiseframework.js.Guise();	//create a new global variable for 
 /**The global drag state variable.*/
 var dragState;
 
-/**Called when a key is pressed in a text input.
-This implementation checks to see if the Enter/Return key was pressed, and if so commits the input by sending it to the server.
-@param event The object describing the event.
-@see http://support.microsoft.com/kb/298498
-*/
-/*TODO del when works
-function onTextInputKeyPress(event)
-{
-	var charCode=event.charCode;	//get the code of the entered character
-	if(charCode==13)	//if Enter/Return was pressed TODO use a constant
-	{
-		if(guise.isEnabled())	//if AJAX is enabled
-		{
-		//TODO del alert("an input changed! "+textInput.id);
-			var textInput=event.currentTarget;	//get the control in which text changed
-			var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value));	//create a new form request with the control name and value
-			guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
-			event.stopPropagation();	//tell the event to stop bubbling
-			event.preventDefault();	//prevent the default functionality from occurring
-		}
-		else	//TODO submit the form
-		{
-		}
-	}
-}
-*/
-
 /**The key codes that are recognized globally and sent to the server as key events.*/
 var REPORTED_KEY_CODES=[KEY_CODE.ENTER, KEY_CODE.ESCAPE];
 
@@ -2917,13 +2816,11 @@ function onTextInputKeyDown(event)
 		{
 		//TODO del alert("an input changed! "+textInput.id);
 			var textInput=event.currentTarget;	//get the control in which text changed
-			var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value));	//create a new form request with the control name and value
+			textInput.removeAttribute("guise:attributeHash");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+			guise.invalidateAncestorContent(textInput);	//indicate that the ancestors now have different content
+			var ajaxRequest=new ChangeAJAXEvent(textInput.name, new Map("value", textInput.value));	//create a new property change event with the control ID and the new value
 			guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 			event.preventDefault();	//prevent the default functionality from occurring, but allow it to keep bubbling so that it can be reported back to the server
-/*TODO del
-			event.stopPropagation();	//tell the event to stop bubbling
-			event.preventDefault();	//prevent the default functionality from occurring
-*/
 		}
 		else	//TODO submit the form
 		{
@@ -2945,7 +2842,7 @@ function onTextInputKeyUp(event)
 		//TODO del alert("an input changed! "+textInput.id);
 			var textInput=event.currentTarget;	//get the control in which text changed
 				//TODO decide if we need to remove the attribute hash attribute
-			var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value), true);	//create a new provisional form request with the control name and value
+			var ajaxRequest=new ChangeAJAXEvent(textInput.name, new Map("provisionalValue", textInput.value));	//create a new property change event with the control ID and the new value
 			guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request, but allow this event to be processed normally
 		}
 	}
@@ -2962,7 +2859,7 @@ function onTextInputChange(event)
 		textInput.removeAttribute("guise:attributeHash");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
 		guise.invalidateAncestorContent(textInput);	//indicate that the ancestors now have different content
 	//TODO del alert("an input changed! "+textInput.id);
-		var ajaxRequest=new FormAJAXEvent(new Map(textInput.name, textInput.value));	//create a new form request with the control name and value
+		var ajaxRequest=new ChangeAJAXEvent(textInput.name, new Map("value", textInput.value));	//create a new property change event with the control ID and the new value
 		guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		event.stopPropagation();	//tell the event to stop bubbling
 	}
@@ -3007,7 +2904,7 @@ function onFileInputChange(event)
 					}
 					else	//if this is not a duplicate value
 					{
-						var ajaxRequest=new FormAJAXEvent(new Map(componentID, fileInput.value));	//create a new form request with the control ID and value
+						var ajaxRequest=new ChangeAJAXEvent(componentID, new Map("resourcePath", fileInput.value));	//create a new property change event with the control ID and the added resource path
 						guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 						var fileInputCopy=document.createElementNS("http://www.w3.org/1999/xhtml", "input");	//create a new input element; do *not* clone the element, because IE will clone the event handlers along with it
 						fileInputCopy.className=fileInput.className;
@@ -3085,16 +2982,9 @@ function onAction(event)
 		{
 			if(guise.isEnabled())	//if AJAX is enabled
 			{
-
-//TODO fix					target.parentNode.style.cursor="inherit";	//TODO testing
-//TODO fix					target.style.cursor="inherit";	//TODO testing
-//TODO fix					document.body.style.cursor="wait";	//TODO testing
-//TODO fix				alert("old cursor: "+target.style.cursor);
 				guise.setElementTempCursor(component, "wait");	//change the cursor to "wait" until the AJAX communication is finished
-
-//TODO testing no form					var ajaxRequest=new FormAJAXEvent(new Map(actionInputID, componentID));	//create a new form request with form's hidden action control and the action element ID
-				var ajaxRequest=new FormAJAXEvent(new Map(componentID, componentID));	//create a new form request with action element ID as the parameter and value
-				guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request			
+				var ajaxRequest=new ActionAJAXEvent(componentID, componentID, null, 0);	//create a new action request with no action ID and the default option
+				guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 			}
 /*TODO fix; distinguish between !guise.isEnabled() and AJAX_SUSPENDED; also fix bug on server where an exhaustive post may clear information on non-displayed cards
 			else	//if AJAX is not enabled, do a POST
@@ -3119,42 +3009,6 @@ function onAction(event)
 			event.stopPropagation();	//tell the event to stop bubbling
 			event.preventDefault();	//prevent the default functionality from occurring
 		}
-	}
-}
-
-/**Called when a tab is clicked.
-A tab link is expected to have an href with parameters in the form "?tabbedPanelID=tabID".
-@param event The object describing the event.
-*/
-function onTabClick(event)	//TODO maybe refactor to use new action click
-{
-	var element=event.currentTarget;	//get the element on which the event was registered
-	var href=element.href;	//get the link href, which should be in the form "?tabbedPanelID=tabID"
-	if(href)	//if there is an href
-	{
-		var uri=new URI(href);	//create a URI from the href
-		if(guise.isEnabled())	//if AJAX is enabled
-		{
-			var ajaxRequest=new FormAJAXEvent(uri.parameters);	//create a new form request with the URI parameters
-			guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
-		}
-/*TODO fix
-			else	//if AJAX is not enabled, do a POST
-			{
-				var actionInput=document.getElementById(actionInputID);	//get the action input
-				if(actionInput)	//if there is an action input
-				{
-					actionInput.value=element.id;	//indicate which action was activated
-				}
-				form.submit();	//submit the form
-				if(actionInput)	//if there is an action input
-				{
-					actionInput.value=null;	//remove the indication of which action was activated
-				}
-			}
-*/
-		event.stopPropagation();	//tell the event to stop bubbling
-		event.preventDefault();	//prevent the default functionality from occurring
 	}
 }
 
@@ -3187,7 +3041,6 @@ function onActionClick(event)
 					target.style.cursor="wait";	//TODO testing
 */
 					guise.setElementTempCursor(target, "wait");	//change the cursor to "wait" until the AJAX communication is finished
-
 
 					var ajaxRequest=new ActionAJAXEvent(componentID, targetID, null, 0);	//create a new action request with no action ID and the default option
 					guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
@@ -3238,12 +3091,7 @@ function onCheckInputChange(event)
 	var name=checkInput.name;	//get the name of the check
 	if(name)	//if we know the name of the check
 	{
-/*TODO del			
-		alert("name: "+name);
-		alert("list: "+form[name]);
-		alert("count: "+form[name].length);
-*/
-		var groupCheckInputs=forms[0][name];	//get all the checkboxes/radio buttons in the form, because being mutually exclusive they all have changed values in the browser
+		var groupCheckInputs=document.forms[0][name];	//get all the checkboxes/radio buttons in the form, because being mutually exclusive they all have changed values in the browser
 		if(groupCheckInputs && groupCheckInputs.length)	//if there is a group of checkboxes/radio buttons (independent checkboxes will not have groups, for examples)
 		{
 			invalidated=true;	//if we invalidate the group, we invalidate this checkbox, too
@@ -3263,7 +3111,7 @@ function onCheckInputChange(event)
 	if(guise.isEnabled())	//if AJAX is enabled
 	{
 		guise.setElementTempCursor(checkInput, "wait");	//change the cursor to "wait" until the AJAX communication is finished
-		var ajaxRequest=new FormAJAXEvent(new Map(checkInput.name, checkInput.checked ? checkInput.value : ""));	//create a new form request with the control name and value
+		var ajaxRequest=new ChangeAJAXEvent(checkInput.value, new Map("value", checkInput.checked));	//create a new property change event with the new value, indicating the control ID (which is specified in the value of the control)
 		guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		event.stopPropagation();	//tell the event to stop bubbling
 	}
@@ -3292,7 +3140,15 @@ function onClick(event)
 	if(target.nodeType==Node.ELEMENT_NODE)	//if the event occurred on an element
 	{
 		var targetNodeName=target.nodeName.toLowerCase();	//get the name of the target
-		if((targetNodeName=="input" && target.type=="file")	//if a file input was clicked
+		if(targetNodeName=="input")	//if an input was clicked
+		{
+			var type=target.type;	//discover the type
+			if(type=="checkbox" || type=="radio" || type=="file")	//if this was checkbox, radio button, or a file input
+			{
+				return;	//let the browser handle these mouse clicks TODO add checks for other things			
+			}
+		}
+		if(targetNodeName=="a"	//if a link was clicked
 			|| (targetNodeName=="label" && target.htmlFor))	//or if a label was clicked and the label was for a particular control TODO maybe process even these, once we completely implement server-push focusing
 		{
 			return;	//let the browser handle these mouse clicks TODO add checks for other things			
@@ -3339,24 +3195,33 @@ function onSelectChange(event)
 	if(guise.isEnabled())	//if AJAX is enabled
 	{
 		var select=event.currentTarget;	//get the control to which the listener was listening
-//TODO del		select.removeAttribute("guise:contentHash");	//indicate that the select's children have changed TODO use a constant
-		var selectName=select.name;	//get the name of the control
-	//TODO del alert("a select changed! "+select.id);
-		var options=select.options;	//get the select options
-		var ajaxRequest=new FormAJAXEvent();	//create a new form request
-		for(var i=0; i<options.length; ++i)	//for each option
+		var component=Node.getAncestorElementByClassName(select, STYLES.COMPONENT);	//get the component element
+		if(component)	//if there is a component
 		{
-			var option=options[i];	//get this option
-			if(option.selected)	//if this option is selected
+			var componentID=component.id;	//get the component ID
+			if(componentID)	//if there is a component ID
 			{
-				option.removeAttribute("guise:attributeHash");	//the option selected status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
-				guise.invalidateAncestorContent(option);	//indicate that the ancestors now have different content
-					//TODO dirty the unselected option
-				ajaxRequest.parameters[selectName]=option.value;	//add the control name and value as a parameter
+		//TODO del		select.removeAttribute("guise:contentHash");	//indicate that the select's children have changed TODO use a constant
+		//TODO del when works		var selectName=select.name;	//get the name of the control
+			//TODO del alert("a select changed! "+select.id);
+				var selectedIDs=new Array();	//create an array to hold the selected values
+				var options=select.options;	//get the select options
+				for(var i=0; i<options.length; ++i)	//for each option
+				{
+					var option=options[i];	//get this option
+					if(option.selected)	//if this option is selected
+					{
+						option.removeAttribute("guise:attributeHash");	//the option selected status is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
+						guise.invalidateAncestorContent(option);	//indicate that the ancestors now have different content
+							//TODO dirty the unselected option
+						selectedIDs.add(option.value);	//add the selected value (which is an ID of the selected value)
+					}
+				}
+				var ajaxRequest=new ChangeAJAXEvent(componentID, new Map("selectedIDs", selectedIDs));	//create a new property change event with select ID and the new selected values
+				guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
+				event.stopPropagation();	//tell the event to stop bubbling
 			}
 		}
-		guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
-		event.stopPropagation();	//tell the event to stop bubbling
 	}
 }
 
@@ -3451,7 +3316,7 @@ function onSliderThumbDragBegin(event)
 //TODO find out why the slider track gets constantly reloaded in IE6
 //TODO we need to make sure the slider is fully loaded (which may not be as relevant once IE6 no longer constantly reloads images)		
 		
-		var positionID=slider.id+".position";	//TODO use constant
+		var positionID=slider.id+"-position";	//TODO use constant
 		var positionInput=document.getElementById(positionID);	//get the position element		
 		if(slider && track && positionInput)	//if we found the slider and the slider track
 		{
@@ -3498,21 +3363,14 @@ if(isNaN(position))	//TODO del; fixed; change to assertion
 	alert("track.offsetWidth: "+track.offsetWidth+" thumb[GUISE_STATE_WIDTH_ATTRIBUTE]: "+thumb[GUISE_STATE_WIDTH_ATTRIBUTE]+" max: "+max+" coordinate: "+coordinate+" min: "+min+" coordinate-min: "+(coordinate-min)+" span: "+span+" position: "+position);
 }
 */
-						var ajaxRequest=new FormAJAXEvent(new Map(positionInput.name, position.toString()));	//create a new form request with the control name and value
+						var ajaxRequest=new ChangeAJAXEvent(slider.id, new Map("position", position));	//create a new property change event with the control ID and the new value
 						guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 					};
 			dragState.onDragEnd=function(element)	//when dragging ends, update the slider view to make sure it is synchronized with the updated value
 					{
 						var ajaxRequest=new ActionAJAXEvent(slider.id, thumb.id, "slideEnd", 0);	//create a new action request for sliding end TODO use a constant	//why are we sending back an action event here?
 						guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
-						if(guise._mozInlineBoxesUpdated)	//TODO fix hack for Firefox 1/2; place in a better place; this is very specific to to one particular application
-						{
-//TODO important fix							window.location.reload();	//reload the page
-						}
-						else	//TODO fix hack; remove first part of if()
-						{
-							updateSlider(slider);	//update the slider view
-						}
+						updateSlider(slider);	//update the slider view
 					}
 			dragState.beginDrag(event.clientX, event.clientY);	//begin dragging
 	//TODO del alert("drag state element: "+dragState.element.nodeName);
@@ -3557,7 +3415,7 @@ function updateSlider(slider)	//TODO maybe rename to updateSliderView
 		}
 	}
 */
-	var positionID=slider.id+".position";	//TODO use constant
+	var positionID=slider.id+"-position";	//TODO use constant
 	var positionInput=document.getElementById(positionID);	//get the position element
 	if(track && thumb && positionInput)	//if we found the slider track and thumb
 	{
@@ -3664,14 +3522,17 @@ function onMouse(event)
 		switch(event.type)	//see which type of mouse event this is
 		{
 			case "mouseover":	//if we are entering a component
-//guise.trace("got mouse over component ID: ", componentID);
 				var ancestorComponents=Node.getAncestorElementsByClassName(component, STYLES.COMPONENT);	//get an array of all ancestor components, including this component, in current-to-root order
+//guise.trace("got mouse over component ID: ", componentID, "with ancestor component count", ancestorComponents.length, "will look up to to target", currentTarget.id);
 				for(var i=ancestorComponents.length-1; i>=0; --i)	//for each ancestor, from root to this one
 				{
+//guise.trace("index", i, "of", ancestorComponents.length);
 					var ancestorComponent=ancestorComponents[i];	//get this ancestor
-					if(Node.hasAncestor(ancestorComponent, currentTarget))	//if we're not below the bottom mouse listener TODO eventually remove the special mouse listener concept and send everything back
+//guise.trace("looking at ancestor component", ancestorComponent.id);
+					if(Node.hasAncestor(ancestorComponent, component))	//if we're not below the bottom mouse listener component TODO eventually remove the special mouse listener concept and send everything back
 					{
 						var ancestorComponentID=ancestorComponent.id;	//get the ID of this ancestor
+//guise.trace("ancestor component", ancestorComponentID, "is not below target");
 						if(!mouseOverComponentIDs[ancestorComponentID])	//if we haven't already recorded the mouse as being over this ancestor
 						{
 							mouseOverComponentIDs[ancestorComponentID]=true;	//record the mouse as being over this ancestor					
@@ -3693,7 +3554,7 @@ function onMouse(event)
 					for(var i=0, length=ancestorComponents.length; i<length; ++i)	//for each ancestor, from this one to root
 					{
 						var ancestorComponent=ancestorComponents[i];	//get this ancestor
-						if(Node.hasAncestor(ancestorComponent, currentTarget))	//if we're not below the bottom mouse listener TODO eventually remove the special mouse listener concept and send everything back
+						if(Node.hasAncestor(ancestorComponent, component))	//if we're not below the bottom mouse listener component TODO eventually remove the special mouse listener concept and send everything back
 						{
 							var ancestorComponentID=ancestorComponent.id;	//get the ID of this ancestor
 							if(!mouseOverComponentIDs[ancestorComponentID])	//if the mouse isn't over this ancestor (if the mouse moved to another subtree, we would have made sure the parent is marked as having the mouse
@@ -3709,29 +3570,6 @@ function onMouse(event)
 				}
 				break;
 		}
-/*TODO del when works
-		var eventType;	//we'll determine the type of AJAX mouse event to send
-		switch(event.type)	//see which type of mouse event this is
-		{
-			case "mouseover":	//TODO use a constant
-				eventType=MouseAJAXEvent.EventType.ENTER;
-				addComponentClassName(component, STYLES.JS_ROLLOVER, component.id);	//add the "jsRollover" style to all component elements
-				break;
-			case "mouseout":	//TODO use a constant
-				eventType=MouseAJAXEvent.EventType.EXIT;
-				removeComponentClassName(component, STYLES.JS_ROLLOVER, component.id);	//remove the "jsRollover" style from all component elements
-				break;
-			default:	//TODO assert an error or warning
-				return;				
-		}
-//TODO del; always send mouse listen events in a mouse listener hierarchy		if(Element.hasClassName(target, STYLES.MOUSE_LISTENER))	//if this is a mouse listener, report the event
-		{
-			var ajaxRequest=new MouseAJAXEvent(eventType, component, target, event.clientX, event.clientY, Boolean(event.altKey), Boolean(event.ctrlKey), Boolean(event.shiftKey));	//create a new AJAX mouse event
-			guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
-			event.stopPropagation();	//tell the event to stop bubbling
-			event.preventDefault();	//prevent the default functionality from occurring
-		}
-*/
 	}	
 }
 
@@ -3786,7 +3624,7 @@ function removeComponentClassName(element, className, componentID)
 }
 
 /**The elements that can receive focus.*/
-var FOCUSABLE_ELEMENT_NAMES=new Array("button", "input", "select", "textarea");
+var FOCUSABLE_ELEMENT_NAMES=["button", "input", "select", "textarea"];
 
 /**Retrieves the first descendant node, including the node, that can be focused.
 This method recognizes the following focusable elements:

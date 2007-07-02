@@ -22,14 +22,14 @@ If a child component implements {@link Activeable} the child component is set as
 @param <T> The type of layout constraints associated with each component.
 @author Garret Wilson
 */
-public abstract class AbstractValueLayout<T extends Constraints> extends AbstractLayout<T> implements ValueModel<Component<?>>
+public abstract class AbstractValueLayout<T extends Constraints> extends AbstractLayout<T> implements ValueModel<Component>
 {
 
 	/**The value model used by this component.*/
-	private final ValueModel<Component<?>> valueModel;
+	private final ValueModel<Component> valueModel;
 
 		/**@return The value model used by this component.*/
-		protected ValueModel<Component<?>> getValueModel() {return valueModel;}
+		protected ValueModel<Component> getValueModel() {return valueModel;}
 
 	/**The lazily-created listener of constraint property changes.*/
 //TODO del if not needed	private CardConstraintsPropertyChangeListener cardConstraintsPropertyChangeListener=null;
@@ -54,7 +54,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 		{
 			if(selectedIndex<0)	//if there is no valid selected index, make sure the index is up-to-date
 			{
-				final Component<?> selectedComponent=getValue();	//get the selected component
+				final Component selectedComponent=getValue();	//get the selected component
 				if(selectedComponent!=null)	//if a component is selected, we'll need to update the selected index
 				{
 					final int newSelectedIndex=getOwner().indexOf(selectedComponent);	//update the selected index with the index in the container of the selected component
@@ -81,12 +81,12 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 		*/
 		public void setSelectedIndex(final int newIndex) throws PropertyVetoException
 		{
-			final Container<?> container=getOwner();	//get the layout's container
+			final Container container=getOwner();	//get the layout's container
 			if(container==null)	//if we haven't been installed into a container
 			{
 				throw new IllegalStateException("Layout does not have container.");
 			}
-			final Component<?> component=newIndex>=0 ? container.get(newIndex) : null;	//get the component at the given index, if a valid index was given
+			final Component component=newIndex>=0 ? container.get(newIndex) : null;	//get the component at the given index, if a valid index was given
 			if(newIndex!=getSelectedIndex() && component!=getValue())	//if we're really changing either the selected index or the component
 			{
 				selectedIndex=-1;	//uncache the selected index (don't actually change it yet---we want to make sure the value model allows the value to be changed)
@@ -102,7 +102,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	@param component The component to add to the layout.
 	@exception IllegalStateException if this layout has not yet been installed into a container.
 	*/
-	public void addComponent(final Component<?> component)
+	public void addComponent(final Component component)
 	{
 		super.addComponent(component);	//add the component normally
 		if(getValue()==null)	//if there is no component selected
@@ -127,12 +127,12 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	This implementation updates the selected component if necessary.
 	@param component The component to remove from the layout.
 	*/
-	public void removeComponent(final Component<?> component)
+	public void removeComponent(final Component component)
 	{
 		super.removeComponent(component);	//remove the component normally
 		if(component==getValue())	//if the selected component was removed
 		{
-			final Container<?> container=getOwner();	//get our container
+			final Container container=getOwner();	//get our container
 			final int selectedIndex=container.indexOf(component);	//find the current index of the component that is being removed
 			final int containerSize=container.size();	//find out how many components are in the container
 			final int newSelectedComponentIndex;	//we'll determine the new selected index (that is, the index of the new selected component in this current state; it won't be the new selected index after removal)
@@ -157,7 +157,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	}
 
 	/**@return The container that owns this layout, or <code>null</code> if this layout has not been installed into a container.*/
-	public Container<?> getOwner() {return (Container<?>)super.getOwner();}
+	public Container getOwner() {return (Container)super.getOwner();}
 
 	/**Sets the container that owns this layout
 	This method is managed by containers, and normally should not be called by applications.
@@ -171,24 +171,24 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	@exception ClassCastException if the given layout component is not a {@link Container}.
 	@exception IllegalArgumentException if a different container is provided and the given container does not already recognize this layout as its layout.
 	*/
-	public void setOwner(final LayoutComponent<?> newOwner)
+	public void setOwner(final LayoutComponent newOwner)
 	{
-		super.setOwner((Container<?>)newOwner);	//make sure the new owner is a container
+		super.setOwner((Container)newOwner);	//make sure the new owner is a container
 	}
 
 	/**Default constructor.*/
 	public AbstractValueLayout()
 	{
-		this.valueModel=(ValueModel<Component<?>>)(Object)new DefaultValueModel<Component>(Component.class);	//create a new value model
+		this.valueModel=new DefaultValueModel<Component>(Component.class);	//create a new value model
 		this.valueModel.addPropertyChangeListener(getRepeatPropertyChangeListener());	//listen and repeat all property changes of the value model
 		this.valueModel.addVetoableChangeListener(getRepeatVetoableChangeListener());	//listen and repeat all vetoable changes of the value model
 	}
 
 	/**@return The default value.*/
-	public Component<?> getDefaultValue() {return getValueModel().getDefaultValue();}
+	public Component getDefaultValue() {return getValueModel().getDefaultValue();}
 
 	/**@return The input value, or <code>null</code> if there is no input value.*/
-	public Component<?> getValue() {return getValueModel().getValue();}
+	public Component getValue() {return getValueModel().getValue();}
 
 	/**The flat that indicates whether we are in the middle of setting the value.*/
 	private boolean isSettingValue=false;
@@ -205,12 +205,12 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	@see #getValidator()
 	@see #VALUE_PROPERTY
 	*/
-	public void setValue(final Component<?> newValue) throws PropertyVetoException
+	public void setValue(final Component newValue) throws PropertyVetoException
 	{
-		final Component<?> oldValue=getValue();	//get the old value
+		final Component oldValue=getValue();	//get the old value
 		if(!ObjectUtilities.equals(oldValue, newValue))	//if a new component is given
 		{
-			final Container<?> container=getOwner();	//get the layout's container
+			final Container container=getOwner();	//get the layout's container
 			if(container==null)	//if we haven't been installed into a container
 			{
 				throw new IllegalStateException("Layout does not have container.");
@@ -265,14 +265,14 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	}
 
 	/**@return The validator for this model, or <code>null</code> if no validator is installed.*/
-	public Validator<Component<?>> getValidator() {return getValueModel().getValidator();}
+	public Validator<Component> getValidator() {return getValueModel().getValidator();}
 
 	/**Sets the validator.
 	This is a bound property
 	@param newValidator The validator for this model, or <code>null</code> if no validator should be used.
 	@see #VALIDATOR_PROPERTY
 	*/
-	public void setValidator(final Validator<Component<?>> newValidator) {getValueModel().setValidator(newValidator);}
+	public void setValidator(final Validator<Component> newValidator) {getValueModel().setValidator(newValidator);}
 
 	/**Determines whether the value of this model is valid.
 	@return Whether the value of this model is valid.
@@ -285,7 +285,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 	public void validateValue() throws ValidationException {getValueModel().validateValue();}
 
 	/**@return The class representing the type of value this model can hold.*/
-	public Class<Component<?>> getValueClass() {return getValueModel().getValueClass();}
+	public Class<Component> getValueClass() {return getValueModel().getValueClass();}
 
 	/**A property change listener that listens for changes in a constraint object's properties and fires a layout constraints property change event in response.
 	This version also fires model {@link ValuePropertyChangeEvent}s if appropriate.
@@ -306,7 +306,7 @@ public abstract class AbstractValueLayout<T extends Constraints> extends Abstrac
 		@param newValue The new property value.
 		*/
 /*TODO decide if we need this
-		protected <V> void refirePropertyChange(final Component<?> component, final Constraints constraints, final String propertyName, final V oldValue, final V newValue)
+		protected <V> void refirePropertyChange(final Component component, final Constraints constraints, final String propertyName, final V oldValue, final V newValue)
 		{
 			super.refirePropertyChange(component, constraints, propertyName, oldValue, newValue);	//refire the event normally
 			if(Constraints.ENABLED_PROPERTY.equals(propertyName))	//if the enabled constraint changed

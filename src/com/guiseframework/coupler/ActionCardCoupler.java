@@ -41,21 +41,21 @@ public class ActionCardCoupler extends AbstractCardCoupler	//TODO now that const
 			};
 
 	/**The action to connect to the card, or <code>null</code> if the action is not coupled with a card.*/
-	private ActionControl<?> action=null;
+	private ActionControl action=null;
 
 		/**@return The action to connect to the card, or <code>null</code> if the action is not coupled with a card.*/
-		public ActionControl<?> getAction() {return action;}
+		public ActionControl getAction() {return action;}
 
 		/**Sets the connected action.
 		This is a bound property.
 		@param newAction The new action to connect to the card, or <code>null</code> if the action should not be coupled with a card.
 		@see #ACTION_PROPERTY
 		*/
-		public void setAction(final ActionControl<?> newAction)
+		public void setAction(final ActionControl newAction)
 		{
 			if(action!=newAction)	//if the value is really changing
 			{
-				final ActionControl<?> oldAction=action;	//get the old value
+				final ActionControl oldAction=action;	//get the old value
 				if(oldAction!=null)	//if there is an old action
 				{
 					oldAction.removeActionListener(actionListener);	//stop listening for actions
@@ -63,7 +63,7 @@ public class ActionCardCoupler extends AbstractCardCoupler	//TODO now that const
 				action=newAction;	//actually change the value
 				if(action instanceof SelectActionControl)	//if the action is a select action control
 				{
-					((SelectActionControl<?>)action).setAutoSelect(false);	//turn off its auto-select status, because we will be controlling when it is selected based upon the connected card
+					((SelectActionControl)action).setAutoSelect(false);	//turn off its auto-select status, because we will be controlling when it is selected based upon the connected card
 				}
 				if(newAction!=null)	//if there is a new action
 				{
@@ -88,7 +88,7 @@ public class ActionCardCoupler extends AbstractCardCoupler	//TODO now that const
 	@param actionControl The new action to connect to the card, or <code>null</code> if the action should not be coupled with a card.
 	@param cards The new cards to connect, if any.
 	*/
-	public ActionCardCoupler(final ActionControl<?> actionControl, final Component<?>... cards)
+	public ActionCardCoupler(final ActionControl actionControl, final Component... cards)
 	{
 		super(cards);	//construct the parent class
 		setAction(actionControl);	//set the action control
@@ -101,7 +101,7 @@ public class ActionCardCoupler extends AbstractCardCoupler	//TODO now that const
 	*/
 	protected void updateDisplayed(final boolean displayed)
 	{
-		final ActionControl<?> action=getAction();	//get the action
+		final ActionControl action=getAction();	//get the action
 		if(action!=null)	//if there is an action
 		{
 			action.setDisplayed(displayed);	//update the action's displayed status
@@ -115,7 +115,7 @@ public class ActionCardCoupler extends AbstractCardCoupler	//TODO now that const
 	*/
 	protected void updateEnabled(final boolean enabled)
 	{
-		final ActionControl<?> action=getAction();	//get the action
+		final ActionControl action=getAction();	//get the action
 		if(action!=null)	//if there is an action
 		{
 			action.setEnabled(enabled);	//update the action's enabled status
@@ -130,15 +130,15 @@ public class ActionCardCoupler extends AbstractCardCoupler	//TODO now that const
 	@SuppressWarnings("unchecked")	//we check the type of value class contained in any ActionValueControl, so our cast is logically correct
 	protected void updateTaskState(final TaskState taskState)
 	{
-		final ActionControl<?> action=getAction();	//get the action
+		final ActionControl action=getAction();	//get the action
 		if(action instanceof ActionValueControl)	//if the action is also a value control
 		{
-			final ActionValueControl<?, ?> actionValueControl=(ActionValueControl<?, ?>)action;	//get the action as an action value control
+			final ActionValueControl<?> actionValueControl=(ActionValueControl<?>)action;	//get the action as an action value control
 			if(TaskState.class.isAssignableFrom(actionValueControl.getValueClass()))	//if the action represents a task state
 			{
 				try
 				{
-					((ActionValueControl<TaskState, ?>)actionValueControl).setValue(taskState);	//update the action with the new task state
+					((ActionValueControl<TaskState>)actionValueControl).setValue(taskState);	//update the action with the new task state
 				}
 				catch(final PropertyVetoException propertyVetoException)
 				{
@@ -155,7 +155,7 @@ public class ActionCardCoupler extends AbstractCardCoupler	//TODO now that const
 	*/
 	protected void updateSelected(final boolean selected)
 	{
-		final ActionControl<?> action=getAction();	//get the action
+		final ActionControl action=getAction();	//get the action
 		if(action instanceof Selectable)	//if the action is selectable
 		{
 			((Selectable)action).setSelected(selected);	//update its selected status

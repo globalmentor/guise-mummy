@@ -17,7 +17,7 @@ The component valid status is updated before a change in the {@link #VALUE_PROPE
 <p>This implementation installs a default value representation strategy that simply passes through the represented component.</p> 
 @author Garret Wilson
 */
-public abstract class AbstractListSelectContainerControl<C extends ContainerControl<C> & ListSelectControl<Component<?>, C>> extends AbstractContainerControl<C> implements ListSelectControl<Component<?>, C>
+public abstract class AbstractListSelectContainerControl extends AbstractContainerControl implements ListSelectControl<Component>
 {
 
 	/**The static representation strategy to represent component values as themselves.*/
@@ -57,10 +57,10 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 		}
 
 	/**The strategy used to generate a component to represent each value in the model.*/
-	private ValueRepresentationStrategy<Component<?>> valueRepresentationStrategy;
+	private ValueRepresentationStrategy<Component> valueRepresentationStrategy;
 
 		/**@return The strategy used to generate a component to represent each value in the model.*/
-		public ValueRepresentationStrategy<Component<?>> getValueRepresentationStrategy() {return valueRepresentationStrategy;}
+		public ValueRepresentationStrategy<Component> getValueRepresentationStrategy() {return valueRepresentationStrategy;}
 
 		/**Sets the strategy used to generate a component to represent each value in the model.
 		This is a bound property
@@ -68,11 +68,11 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 		@exception NullPointerException if the provided value representation strategy is <code>null</code>.
 		@see SelectControl#VALUE_REPRESENTATION_STRATEGY_PROPERTY
 		*/
-		public void setValueRepresentationStrategy(final ValueRepresentationStrategy<Component<?>> newValueRepresentationStrategy)
+		public void setValueRepresentationStrategy(final ValueRepresentationStrategy<Component> newValueRepresentationStrategy)
 		{
 			if(valueRepresentationStrategy!=newValueRepresentationStrategy)	//if the value is really changing
 			{
-				final ValueRepresentationStrategy<Component<?>> oldValueRepresentationStrategy=valueRepresentationStrategy;	//get the old value
+				final ValueRepresentationStrategy<Component> oldValueRepresentationStrategy=valueRepresentationStrategy;	//get the old value
 				valueRepresentationStrategy=checkInstance(newValueRepresentationStrategy, "Value representation strategy cannot be null.");	//actually change the value
 				firePropertyChange(VALUE_REPRESENTATION_STRATEGY_PROPERTY, oldValueRepresentationStrategy, newValueRepresentationStrategy);	//indicate that the value changed
 			}
@@ -83,7 +83,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	@param object The object for which a representation component should be returned.
 	@return The child component representing the given object, or <code>null</code> if there is no component representing the given object.
 	*/
-	public Component<?> getComponent(final Component<?> object)
+	public Component getComponent(final Component object)
 	{
 		return object;	//return the given component
 	}
@@ -122,16 +122,16 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 /*TODO del if not needed
 		this.listSelectModel=checkNull(layout.getListSelectModel(), "List select model cannot be null.");	//save the list select model
 		this.listSelectModel.addPropertyChangeListener(getRepeaterPropertyChangeListener());	//listen and repeat all property changes of the value model
-		this.listSelectModel.addListListener(new ListListener<Component<?>>()	//install a repeater list listener to listen to the decorated model
+		this.listSelectModel.addListListener(new ListListener<Component>()	//install a repeater list listener to listen to the decorated model
 				{
-					public void listModified(final ListEvent<Component<?>> listEvent)	//if the list is modified
+					public void listModified(final ListEvent<Component> listEvent)	//if the list is modified
 					{
 						fireListModified(listEvent.getIndex(), listEvent.getAddedElement(), listEvent.getRemovedElement());	//repeat the event, indicating the component as the source of the event
 					}
 				});
-		this.listSelectModel.addListSelectionListener(new ListSelectionListener<Component<?>>()	//install a repeater list selection listener to listen to the decorated model
+		this.listSelectModel.addListSelectionListener(new ListSelectionListener<Component>()	//install a repeater list selection listener to listen to the decorated model
 				{
-					public void listSelectionChanged(final ListSelectionEvent<Component<?>> selectionEvent)	//if the list selection changes
+					public void listSelectionChanged(final ListSelectionEvent<Component> selectionEvent)	//if the list selection changes
 					{
 						fireSelectionChanged(selectionEvent.getAddedElement(), selectionEvent.getRemovedElement());	//repeat the event, indicating the component as the source of the event
 					}		
@@ -160,7 +160,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	*/ 
 	protected boolean determineChildrenValid()
 	{
-		final Component<?> selectedComponent=getValue();	//get the selected card
+		final Component selectedComponent=getValue();	//get the selected card
 		return selectedComponent==null || selectedComponent.isValid();	//the children will only be invalid if the selected card is invalid
 	}
 
@@ -170,17 +170,17 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	*/
 	public boolean validateChildren()
 	{
-		final Component<?> selectedComponent=getValue();	//get the selected card
+		final Component selectedComponent=getValue();	//get the selected card
 		return selectedComponent!=null ? selectedComponent.validate() : false;	//only validate the selected card if there is one
 	}
 	
 		//ValueModel delegations
 
 	/**@return The default value.*/
-	public Component<?> getDefaultValue() {return getLayout().getDefaultValue();}
+	public Component getDefaultValue() {return getLayout().getDefaultValue();}
 
 	/**@return The input value, or <code>null</code> if there is no input value.*/
-	public Component<?> getValue() {return getLayout().getValue();}
+	public Component getValue() {return getLayout().getValue();}
 
 	/**Sets the value.
 	This is a bound property that only fires a change event when the new value is different via the <code>equals()</code> method.
@@ -192,7 +192,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	@see #getValidator()
 	@see #VALUE_PROPERTY
 	*/
-	public void setValue(final Component<?> newValue) throws PropertyVetoException {getLayout().setValue(newValue);}
+	public void setValue(final Component newValue) throws PropertyVetoException {getLayout().setValue(newValue);}
 
 	/**Clears the value by setting the value to <code>null</code>, which may be invalid according to any installed validators.
 	No validation occurs.
@@ -207,14 +207,14 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	public void resetValue() {getLayout().resetValue();}
 
 	/**@return The validator for this model, or <code>null</code> if no validator is installed.*/
-	public Validator<Component<?>> getValidator() {return getLayout().getValidator();}
+	public Validator<Component> getValidator() {return getLayout().getValidator();}
 
 	/**Sets the validator.
 	This is a bound property
 	@param newValidator The validator for this model, or <code>null</code> if no validator should be used.
 	@see #VALIDATOR_PROPERTY
 	*/
-	public void setValidator(final Validator<Component<?>> newValidator) {getLayout().setValidator(newValidator);}
+	public void setValidator(final Validator<Component> newValidator) {getLayout().setValidator(newValidator);}
 
 	/**Determines whether the value of this model is valid.
 	@return Whether the value of this model is valid.
@@ -227,7 +227,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	public void validateValue() throws ValidationException {getLayout().validateValue();}
 
 	/**@return The class representing the type of value this model can hold.*/
-	public Class<Component<?>> getValueClass() {return getLayout().getValueClass();}
+	public Class<Component> getValueClass() {return getLayout().getValueClass();}
 
 		//SelectModel delegations
 	
@@ -237,21 +237,21 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	@param newValue The replacement value.
 	@return Whether the operation resulted in a modification of the model.
 	*/
-	public boolean replace(final Component<?> oldValue, final Component<?> newValue) {throw new UnsupportedOperationException("replace() not yet supported");}
+	public boolean replace(final Component oldValue, final Component newValue) {throw new UnsupportedOperationException("replace() not yet supported");}
 
 	/**Determines the selected value.
 	If more than one value is selected, the lead selected value will be returned.
 	@return The value currently selected, or <code>null</code> if no value is currently selected.
 	*/
-	public Component<?> getSelectedValue() {return getValue();}
+	public Component getSelectedValue() {return getValue();}
 
 	/**Determines the selected values.
 	@return The values currently selected.
 	*/
-	public Component<?>[] getSelectedValues()
+	public Component[] getSelectedValues()
 	{
-		final Component<?> selectedValue=getValue();	//get the selected value, if any
-		return selectedValue!=null ? new Component<?>[]{selectedValue} : new Component<?>[]{};	//return an array with the component, if there is one selected
+		final Component selectedValue=getValue();	//get the selected value, if any
+		return selectedValue!=null ? new Component[]{selectedValue} : new Component[]{};	//return an array with the component, if there is one selected
 	}
 
 	/**Sets the selected values.
@@ -262,18 +262,18 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	@param values The values to select.
 	@exception PropertyVetoException if the provided value is not valid or the change has otherwise been vetoed.
 	*/
-	public void setSelectedValues(final Component<?>... values) throws PropertyVetoException
+	public void setSelectedValues(final Component... values) throws PropertyVetoException
 	{
 		setValue(values.length>0 ? values[0] : null);	//select the first or no value
 	}
 	
 	/**The shared single component selection policy.*/
-	private final static ListSelectionPolicy<Component<?>> SINGLE_COMPONENT_SELECTION_POLICY=new SingleListSelectionPolicy<Component<?>>();
+	private final static ListSelectionPolicy<Component> SINGLE_COMPONENT_SELECTION_POLICY=new SingleListSelectionPolicy<Component>();
 	
 		//ListSelectModel delegations
 
 	/**@return The selection policy for this model.*/
-	public ListSelectionPolicy<Component<?>> getSelectionPolicy() {return SINGLE_COMPONENT_SELECTION_POLICY;}
+	public ListSelectionPolicy<Component> getSelectionPolicy() {return SINGLE_COMPONENT_SELECTION_POLICY;}
 
 	/**Determines the selected index.
 	If more than one index is selected, the lead selected index will be returned.
@@ -349,7 +349,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	@return <code>true</code> if the value is displayed, else <code>false</code>.
 	@exception IndexOutOfBoundsException if the given value does not occur in the model.
 	*/
-	public boolean isValueDisplayed(final Component<?> value) {return getLayout().getConstraints(value).isDisplayed();}
+	public boolean isValueDisplayed(final Component value) {return getLayout().getConstraints(value).isDisplayed();}
 
 	/**Sets the displayed status of the first occurrence of a given value.
 	This is a bound value state property.
@@ -357,7 +357,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	@param newDisplayed Whether the value should be displayed.
 	@see #DISPLAYED_PROPERTY
 	*/
-	public void setValueDisplayed(final Component<?> value, final boolean newDisplayed) {getLayout().getConstraints(value).setDisplayed(newDisplayed);}	//TODO fix property change event
+	public void setValueDisplayed(final Component value, final boolean newDisplayed) {getLayout().getConstraints(value).setDisplayed(newDisplayed);}	//TODO fix property change event
 
 	/**Determines the displayed status of a given index.
 	@param index The index of the value for which the displayed status is to be determined.
@@ -379,7 +379,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	@return <code>true</code> if the value is enabled, else <code>false</code>.
 	@exception IndexOutOfBoundsException if the given value does not occur in the model.
 	*/
-	public boolean isValueEnabled(final Component<?> value) {return getLayout().getConstraints(value).isEnabled();}
+	public boolean isValueEnabled(final Component value) {return getLayout().getConstraints(value).isEnabled();}
 
 	/**Sets the enabled status of the first occurrence of a given value.
 	This is a bound value state property.
@@ -387,7 +387,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	@param newEnabled Whether the value should be enabled.
 	@see #ENABLED_PROPERTY
 	*/
-	public void setValueEnabled(final Component<?> value, final boolean newEnabled) {getLayout().getConstraints(value).setEnabled(newEnabled);}	//TODO fix property change event
+	public void setValueEnabled(final Component value, final boolean newEnabled) {getLayout().getConstraints(value).setEnabled(newEnabled);}	//TODO fix property change event
 
 	/**Determines the enabled status of a given index.
 	@param index The index of the value for which the enabled status is to be determined.
@@ -407,7 +407,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	/**Adds a list listener.
 	@param listListener The list listener to add.
 	*/
-	public void addListListener(final ListListener<Component<?>> listListener)
+	public void addListListener(final ListListener<Component> listListener)
 	{
 		getEventListenerManager().add(ListListener.class, listListener);	//add the listener
 	}
@@ -415,7 +415,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	/**Removes a list listener.
 	@param listListener The list listener to remove.
 	*/
-	public void removeListListener(final ListListener<Component<?>> listListener)
+	public void removeListListener(final ListListener<Component> listListener)
 	{
 		getEventListenerManager().remove(ListListener.class, listListener);	//remove the listener
 	}
@@ -423,7 +423,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	/**Adds a list selection listener.
 	@param selectionListener The selection listener to add.
 	*/
-	public void addListSelectionListener(final ListSelectionListener<Component<?>> selectionListener)
+	public void addListSelectionListener(final ListSelectionListener<Component> selectionListener)
 	{
 		getEventListenerManager().add(ListSelectionListener.class, selectionListener);	//add the listener
 	}
@@ -431,7 +431,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	/**Removes a list selection listener.
 	@param selectionListener The selection listener to remove.
 	*/
-	public void removeListSelectionListener(final ListSelectionListener<Component<?>> selectionListener)
+	public void removeListSelectionListener(final ListSelectionListener<Component> selectionListener)
 	{
 		getEventListenerManager().remove(ListSelectionListener.class, selectionListener);	//remove the listener
 	}
@@ -444,13 +444,13 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	@see ContainerListener
 	@see ContainerEvent
 	*/
-	protected void fireContainerModified(final int index, final Component<?> addedComponent, final Component<?> removedComponent)
+	protected void fireContainerModified(final int index, final Component addedComponent, final Component removedComponent)
 	{
 		super.fireContainerModified(index, addedComponent, removedComponent);	//fire the container modified event normally
 		if(getEventListenerManager().hasListeners(ListListener.class))	//if there are appropriate listeners registered
 		{
-			final ListEvent<Component<?>> listEvent=new ListEvent<Component<?>>(this, index, addedComponent, removedComponent);	//create a new event
-			getSession().queueEvent(new PostponedListEvent<Component<?>>(getEventListenerManager(), listEvent));	//tell the Guise session to queue the event
+			final ListEvent<Component> listEvent=new ListEvent<Component>(this, index, addedComponent, removedComponent);	//create a new event
+			getSession().queueEvent(new PostponedListEvent<Component>(getEventListenerManager(), listEvent));	//tell the Guise session to queue the event
 		}
 	}
 
@@ -464,8 +464,8 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	{
 		if(getEventListenerManager().hasListeners(ListSelectionListener.class))	//if there are appropriate listeners registered
 		{
-			final ListSelectionEvent<Component<?>> selectionEvent=new ListSelectionEvent<Component<?>>(this, addedIndex, removedIndex);	//create a new event
-			getSession().queueEvent(new PostponedListSelectionEvent<Component<?>>(getEventListenerManager(), selectionEvent));	//tell the Guise session to queue the event
+			final ListSelectionEvent<Component> selectionEvent=new ListSelectionEvent<Component>(this, addedIndex, removedIndex);	//create a new event
+			getSession().queueEvent(new PostponedListSelectionEvent<Component>(getEventListenerManager(), selectionEvent));	//tell the Guise session to queue the event
 		}
 	}
 
@@ -496,7 +496,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	@exception NullPointerException if the specified collection is <code>null</code>.
 	@see #add(Object)
 	*/
-	public boolean addAll(final Collection<? extends Component<?>> collection) {throw new UnsupportedOperationException("addAll(Collection) not yet supported");}	//TODO add all these to container
+	public boolean addAll(final Collection<? extends Component> collection) {throw new UnsupportedOperationException("addAll(Collection) not yet supported");}	//TODO add all these to container
 
 	/**Inserts all of the values in the specified collection into this model at the specified position.
 	@param index The index at which to insert first value from the specified collection.
@@ -505,7 +505,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	@exception NullPointerException if the specified collection is <code>null</code>.
 	@exception IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt; <code>size()</code>).
 	*/
-	public synchronized boolean addAll(final int index, final Collection<? extends Component<?>> collection) {throw new UnsupportedOperationException("addAll(index, Collection) not yet supported");}
+	public synchronized boolean addAll(final int index, final Collection<? extends Component> collection) {throw new UnsupportedOperationException("addAll(index, Collection) not yet supported");}
 
 	/**Removes from this model all the values that are contained in the specified collection.
 	@param collection The collection that defines which values will be removed from this model.
@@ -531,17 +531,17 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	@return The value at the specified position.
 	@exception IndexOutOfBoundsException if the index is out of range (<var>index<var> &lt; 0 || <var>index</var> &gt;= <code>size()</code>).
 	*/
-	public Component<?> set(final int index, final Component<?> value) {throw new UnsupportedOperationException("set(index, value) not yet supported");}
+	public Component set(final int index, final Component value) {throw new UnsupportedOperationException("set(index, value) not yet supported");}
 
 	/**@return A read-only list iterator of the values in this model (in proper sequence).*/
-	public ListIterator<Component<?>> listIterator() {return getComponentList().listIterator();}
+	public ListIterator<Component> listIterator() {return getComponentList().listIterator();}
 
 	/**Returns a list iterator of the values in this model (in proper sequence), starting at the specified position in this model.
 	@param index The index of first value to be returned from the list iterator (by a call to the <code>next()</code> method).
 	@return A list iterator of the values in this model (in proper sequence), starting at the specified position in this model.
 	@exception IndexOutOfBoundsException if the index is out of range (<var>index</var> &lt; 0 || <var>index</var> &gt; <code>size()</code>).
 	*/
-	public ListIterator<Component<?>> listIterator(final int index) {return getComponentList().listIterator(index);}
+	public ListIterator<Component> listIterator(final int index) {return getComponentList().listIterator(index);}
 
 	/**Returns a read-only view of the portion of this model between the specified <var>fromIndex</var>, inclusive, and <var>toIndex</var>, exclusive.
 	@param fromIndex The low endpoint (inclusive) of the sub-list.
@@ -549,7 +549,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	@return A view of the specified range within this model.
 	@throws IndexOutOfBoundsException for an illegal endpoint index value (<var>fromIndex</var> &lt; 0 || <var>toIndex</var> &gt; <code>size()</code> || <var>fromIndex</var> &gt; <var>toIndex</var>).
 	*/
-	public List<Component<?>> subList(final int fromIndex, final int toIndex) {return getComponentList().subList(fromIndex, toIndex);}
+	public List<Component> subList(final int fromIndex, final int toIndex) {return getComponentList().subList(fromIndex, toIndex);}
 
 	/**Adds a component to the container along with a label.
 	This convenience method creates new card layout constraints from the given label model and adds the component.
@@ -559,7 +559,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	@exception IllegalArgumentException if the component already has a parent.
 	*/
 /*TODO del if not wanted
-	public void add(final Component<?> component, final LabelModel labelModel)
+	public void add(final Component component, final LabelModel labelModel)
 	{
 		add(component, new CardLayout.Constraints(labelModel));	//create card layout constraints for the label and add the component to the container
 	}
@@ -570,7 +570,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	@exception IllegalStateException if the given component has no associated constraints.
 	@see ControlConstraints#isDisplayed()
 	*/
-	public boolean isDisplayed(final Component<?> component)
+	public boolean isDisplayed(final Component component)
 	{
 		final ControlConstraints cardConstraints=getLayout().getConstraints(component);	//get constraints of the component
 		if(cardConstraints==null)	//if there are no constraints
@@ -587,7 +587,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	@exception IllegalStateException if the given component has no associated constraints.
 	@see ControlConstraints#setDisplayed(boolean)
 	*/
-	public void setDisplayed(final Component<?> component, final boolean newDisplayed)
+	public void setDisplayed(final Component component, final boolean newDisplayed)
 	{
 		final ControlConstraints cardConstraints=getLayout().getConstraints(component);	//get constraints of the component
 		if(cardConstraints==null)	//if there are no constraints
@@ -602,7 +602,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	@exception IllegalStateException if the given component has no associated constraints.
 	@see CardConstraints#isEnabled()
 	*/
-	public boolean isEnabled(final Component<?> component)
+	public boolean isEnabled(final Component component)
 	{
 		final ControlConstraints cardConstraints=getLayout().getConstraints(component);	//get constraints of the component
 		if(cardConstraints==null)	//if there are no constraints
@@ -619,7 +619,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	@exception IllegalStateException if the given component has no associated constraints.
 	@see CardConstraints#setEnabled(boolean)
 	*/
-	public void setEnabled(final Component<?> component, final boolean newEnabled)
+	public void setEnabled(final Component component, final boolean newEnabled)
 	{
 		final ControlConstraints cardConstraints=getLayout().getConstraints(component);	//get constraints of the component
 		if(cardConstraints==null)	//if there are no constraints
@@ -632,7 +632,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 	/**A strategy for to represent components in a list select model as themselves.
 	@author Garret Wilson
 	*/
-	public static class ComponentRepresentationStrategy implements ValueRepresentationStrategy<Component<?>>
+	public static class ComponentRepresentationStrategy implements ValueRepresentationStrategy<Component>
 	{
 		/**Creates a component for the given list value.
 		This implementation returns the component value itself.
@@ -643,7 +643,7 @@ public abstract class AbstractListSelectContainerControl<C extends ContainerCont
 		@param focused <code>true</code> if the value has the focus.
 		@return A new component to represent the given value.
 		*/
-		public Component<?> createComponent(final ListSelectModel<Component<?>> model, final Component<?> value, final int index, final boolean selected, final boolean focused)
+		public Component createComponent(final ListSelectModel<Component> model, final Component value, final int index, final boolean selected, final boolean focused)
 		{
 			return value;	//return the component to represent itself
 		}

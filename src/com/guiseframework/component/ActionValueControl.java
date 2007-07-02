@@ -8,7 +8,7 @@ import java.net.URI;
 @author Garret Wilson
 @param <V> The type of value the action represents.
 */
-public interface ActionValueControl<V, C extends ActionValueControl<V, C>> extends ActionControl<C>, ValueControl<V, C>
+public interface ActionValueControl<V> extends ActionControl, ValueControl<V>
 {
 
 	/**The bound property for an icon associated with a value.*/

@@ -11,7 +11,7 @@ import com.guiseframework.model.*;
 /**Abstract selectable action control.
 @author Garret Wilson
 */
-public abstract class AbstractSelectActionControl<C extends SelectActionControl<C> & LabelDisplayableComponent<C>> extends AbstractActionControl<C> implements SelectActionControl<C>
+public abstract class AbstractSelectActionControl extends AbstractActionControl implements SelectActionControl
 {
 
 	/**Whether this control automatically sets or toggles the selection state when the action occurs.*/
@@ -138,13 +138,13 @@ public abstract class AbstractSelectActionControl<C extends SelectActionControl<
 	{
 		
 		/**The control to select.*/
-		protected final SelectActionControl<?> selectActionControl;
+		protected final SelectActionControl selectActionControl;
 		
 		/**Select action control constructor.
 		@param selectActionControl The control to select when the action occurs.
 		@exception NullPointerException if the given select action control is <code>null</code>.
 		*/
-		public SelectActionListener(final SelectActionControl<?> selectActionControl)
+		public SelectActionListener(final SelectActionControl selectActionControl)
 		{
 			this.selectActionControl=checkInstance(selectActionControl, "Select action control cannot be null.");
 		}

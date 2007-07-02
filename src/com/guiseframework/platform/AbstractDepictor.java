@@ -8,11 +8,10 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import com.garretwilson.beans.PropertyBindable;
 import com.guiseframework.Guise;
 import com.guiseframework.GuiseSession;
-import com.guiseframework.controller.DropControlEvent;
 import com.guiseframework.event.*;
-import com.guiseframework.platform.web.WebPlatformEvent;
 
 /**An abstract strategy for depicting objects on some platform.
+The {@link Depictor#GENERAL_PROPERTY} is used to indicate that some general property has changed.
 @param <O> The type of object being depicted.
 @author Garret Wilson
 */
@@ -25,9 +24,19 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 		/**@return The Guise session that owns this object.*/
 		public GuiseSession getSession() {return session;}
 
-		/**@return The platform on which this depictor is depicting ojects.*/
-		public GuisePlatform getPlatform() {return getSession().getPlatform();}
+	/**The platform on which this depictor is depicting ojects.*/
+	private final Platform platform;		
 		
+		/**@return The platform on which this depictor is depicting ojects.*/
+		public Platform getPlatform() {return platform;}
+		
+	/**Retrieves information and functionality related to the current depiction on the platform.
+	This method delegates to {@link Platform#getDepictContext()}.
+	@return A context for the current depiction.
+	@exception IllegalStateException if no depict context can be returned in the current depiction state.
+	*/
+	public DepictContext getDepictContext() {return getPlatform().getDepictContext();}
+
 	/**The thread-safe list of properties that are to be ignored.*/
 	private final Set<String> ignoredProperties=new CopyOnWriteArraySet<String>(); 
 
@@ -66,7 +75,10 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 		}
 	
 	/**The listener that marks this depiction as dirty if a change occurs.*/
-	protected final ChangeListener CHANGE_LISTENER=new ChangeListener();
+	protected ChangeListener changeListener;
+
+		/**@return The listener that marks this depiction as dirty if a change occurs.*/
+		protected ChangeListener getChangeListener() {return changeListener;}
 
 	/**The object being depicted.*/
 	private O depictedObject=null;
@@ -102,15 +114,17 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	public AbstractDepictor()
 	{
 		this.session=Guise.getInstance().getGuiseSession();	//store a reference to the current Guise session
+		this.platform=this.session.getPlatform();	//store a reference to the platform
+		changeListener=new ChangeListener();	//create the change listener
 	}
-		
+
 	/**Called when the depictor is installed in a depicted object.
 	This version listens for property changes of a {@link PropertyBindable} object.
 	This version listens for list changes of a {@link ListListenable} object.
 	@param depictedObject The depictedObject into which this depictor is being installed.
 	@exception NullPointerException if the given depicted object is <code>null</code>.
 	@exception IllegalStateException if this depictor is already installed in a depicted object.
-	@see #CHANGE_LISTENER
+	@see #changeListener
 	*/
 	public void installed(final O depictedObject)
 	{
@@ -121,11 +135,11 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 		this.depictedObject=depictedObject;	//change depicted objects
 		if(depictedObject instanceof PropertyBindable)	//if the depicted object allows bound properties
 		{
-			((PropertyBindable)depictedObject).addPropertyChangeListener(CHANGE_LISTENER);	//listen for property changes
+			((PropertyBindable)depictedObject).addPropertyChangeListener(getChangeListener());	//listen for property changes
 		}
 		if(depictedObject instanceof ListListenable)	//if the depicted object notifies of list changes
 		{
-			((ListListenable<Object>)depictedObject).addListListener(CHANGE_LISTENER);	//listen for list changes
+			((ListListenable<Object>)depictedObject).addListListener(getChangeListener());	//listen for list changes
 		}
 	}
 
@@ -135,7 +149,7 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 	@param depictedObject The depicted object from which this depictor is being uninstalled.
 	@exception NullPointerException if the given depicted object is <code>null</code>.
 	@exception IllegalStateException if this depictor is not installed in a depicted object.
-	@see #CHANGE_LISTENER
+	@see #changeListener
 	*/
 	public void uninstalled(final O depictedObject)
 	{
@@ -146,26 +160,27 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 		this.depictedObject=null;	//remove the depicted object
 		if(depictedObject instanceof PropertyBindable)	//if the depicted object allows bound properties
 		{
-			((PropertyBindable)depictedObject).removePropertyChangeListener(CHANGE_LISTENER);	//stop listening for property changes
+			((PropertyBindable)depictedObject).removePropertyChangeListener(changeListener);	//stop listening for property changes
 		}
 		if(depictedObject instanceof ListListenable)	//if the depicted object notifies of list changes
 		{
-			((ListListenable<Object>)depictedObject).removeListListener(CHANGE_LISTENER);	//stop listening for list changes
+			((ListListenable<Object>)depictedObject).removeListListener(changeListener);	//stop listening for list changes
 		}
 	}
 
 	/**Processes an event from the platform.
 	@param event The event to be processed.
+	@exception IllegalArgumentException if the given event is a relevant {@link DepictEvent} with a source of a different depicted object.
 	*/
 	public void processEvent(final PlatformEvent event)
 	{
 	}
 
-	/**Depicts the depicted object.
+	/**Updates the depiction of the object.
 	This implementation marks the depiction as depicted.
 	@exception IOException if there is an error updating the depiction.
 	*/
-	public void update() throws IOException
+	public void depict() throws IOException
 	{
 		setDepicted(true);	//show that the depiction has been updated
 	}

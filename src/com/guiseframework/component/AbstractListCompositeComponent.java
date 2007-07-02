@@ -9,14 +9,14 @@ import com.guiseframework.model.LabelModel;
 Iterating over child components is thread safe.
 @author Garret Wilson
 */
-public abstract class AbstractListCompositeComponent<C extends CompositeComponent<C>> extends AbstractMultipleCompositeComponent<C>
+public abstract class AbstractListCompositeComponent extends AbstractMultipleCompositeComponent
 {
 
 	/**The list of child components.*/ 
-	private final List<Component<?>> componentList=new CopyOnWriteArrayList<Component<?>>();	//create a new component list, using a thread-safe array that takes into consideration that adding or removing children usually takes place up-front, and most later access will be only reads
+	private final List<Component> componentList=new CopyOnWriteArrayList<Component>();	//create a new component list, using a thread-safe array that takes into consideration that adding or removing children usually takes place up-front, and most later access will be only reads
 
 		/**@return The list of child components.*/ 
-		protected List<Component<?>> getComponentList() {return componentList;}
+		protected List<Component> getComponentList() {return componentList;}
 
 	/**@return The number of child components in this component.*/
 	protected int size() {return getComponentList().size();}
@@ -47,7 +47,7 @@ public abstract class AbstractListCompositeComponent<C extends CompositeComponen
 	@return The component at the specified position in this component.
 	@exception IndexOutOfBoundsException if the index is out of range.
 	*/
-	protected Component<?> get(final int index) {return getComponentList().get(index);}
+	protected Component get(final int index) {return getComponentList().get(index);}
 
 	/**Adds a child component at the specified index.
 	This version adds the component to the component list.
@@ -58,7 +58,7 @@ public abstract class AbstractListCompositeComponent<C extends CompositeComponen
 	@exception IllegalArgumentException if the component already has a parent.
 	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
 	*/
-	protected boolean addComponent(final int index, final Component<?> component)
+	protected boolean addComponent(final int index, final Component component)
 	{
 		if(component.getParent()!=null)	//if this component has already been added to component; do this check before we add the component to the list, because the super class' version of this only comes after the component is added to the list
 		{
@@ -76,7 +76,7 @@ public abstract class AbstractListCompositeComponent<C extends CompositeComponen
 	@return <code>true</code> if the child components changed as a result of the operation.
 	@exception IllegalArgumentException if the component already has a parent.
 	*/
-	protected final boolean addComponent(final Component<?> component)
+	protected final boolean addComponent(final Component component)
 	{
 		return addComponent(componentList.size(), component);	//add the component to the end of the list
 	}
@@ -87,7 +87,7 @@ public abstract class AbstractListCompositeComponent<C extends CompositeComponen
 	@param component The component to remove from this component.
 	@return <code>true</code> if the child components changed as a result of the operation.
 	*/
-	protected boolean removeComponent(final Component<?> component)
+	protected boolean removeComponent(final Component component)
 	{
 		if(componentList.remove(component))	//remove the component from the list
 		{
@@ -101,7 +101,7 @@ public abstract class AbstractListCompositeComponent<C extends CompositeComponen
 	}
 
 	/**@return An iterable to contained components.*/
-	public Iterable<Component<?>> getChildren() {return componentList;}
+	public Iterable<Component> getChildren() {return componentList;}
 
 	/**@return Whether this component has children. This implementation delegates to the component list.*/
 	public boolean hasChildren() {return !componentList.isEmpty();}

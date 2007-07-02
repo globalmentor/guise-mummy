@@ -10,7 +10,7 @@ This component installs a default export strategy supporting export of the follo
 </ul>
 @author Garret Wilson
 */
-public class Heading extends AbstractLabel<Heading>
+public class Heading extends AbstractLabel
 {
 
 	/**The heading level value indicating no heading level.*/

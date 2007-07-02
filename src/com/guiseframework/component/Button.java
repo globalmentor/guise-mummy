@@ -6,7 +6,7 @@ import com.guiseframework.prototype.ActionPrototype;
 /**Control with an action model rendered as a button.
 @author Garret Wilson
 */
-public class Button extends AbstractButtonControl<Button>
+public class Button extends AbstractButtonControl
 {
 
 	/**Default constructor.*/

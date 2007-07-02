@@ -14,7 +14,7 @@ The frame's contents are specified using {@link #setContent(Component)}.
 <p>A frame is a {@link InputFocusGroupComponent}, allowing descendant {@link InputFocusableComponent}s to have the focus.</p>
 @author Garret Wilson
 */
-public interface Frame<C extends Frame<C>> extends ContentComponent<C>, ModalComponent<Frame.Mode, C>, InputFocusGroupComponent<C>
+public interface Frame extends ContentComponent, ModalComponent<Frame.Mode>, InputFocusGroupComponent
 {
 	/**The close action control bound property.*/
 	public final static String CLOSE_ACTION_CONTROL_PROPERTY=getPropertyName(Frame.class, "closeActionControl");
@@ -56,14 +56,14 @@ public interface Frame<C extends Frame<C>> extends ContentComponent<C>, ModalCom
 	public State getState();
 
 	/**@return The frame menu, or <code>null</code> if this frame does not have a menu.*/
-	public Menu<?> getMenu();
+	public Menu getMenu();
 
 	/**Sets the frame menu.
 	This is a bound property.
 	@param newMenu The frame menu, or <code>null</code> if this frame does not have a menu.
 	@see #MENU_PROPERTY
 	*/
-	public void setMenu(final Menu<?> newMenu);
+	public void setMenu(final Menu newMenu);
 
 	/**@return Whether the frame is modal if and when it is open.*/
 	public boolean isModal();
@@ -96,14 +96,14 @@ public interface Frame<C extends Frame<C>> extends ContentComponent<C>, ModalCom
 	public void setResizable(final boolean newResizable);
 
 	/**@return The related component such as a popup source, or <code>null</code> if the frame is not related to another component.*/
-	public Component<?> getRelatedComponent();
+	public Component getRelatedComponent();
 
 	/**Sets the related component
 	This is a bound property.
 	@param newRelatedComponent The new related component, or <code>null</code> if the frame is not related to another component.
 	@see Frame#RELATED_COMPONENT_PROPERTY 
 	*/
-	public void setRelatedComponent(final Component<?> newRelatedComponent);
+	public void setRelatedComponent(final Component newRelatedComponent);
 
 	/**@return Whether the title bar is visible.*/
 	public boolean isTitleVisible();
@@ -136,14 +136,14 @@ public interface Frame<C extends Frame<C>> extends ContentComponent<C>, ModalCom
 	public void setOpenEffect(final Effect newOpenEffect);
 
 	/**@return The action control for closing the frame, or <code>null</code> if this frame does not have a close action control.*/
-	public ActionControl<?> getCloseActionControl();
+	public ActionControl getCloseActionControl();
 
 	/**Sets the action control for closing the frame.
 	This is a bound property.
 	@param newCloseActionControl The action control for closing the frame, or <code>null</code> if this frame does not have a close action control.
 	@see #CLOSE_ACTION_CONTROL_PROPERTY
 	*/
-	public void setCloseActionControl(final ActionControl<?> newCloseActionControl);
+	public void setCloseActionControl(final ActionControl newCloseActionControl);
 
 	/**Opens the frame with the currently set modality.
 	Opening the frame registers the frame with the application frame.

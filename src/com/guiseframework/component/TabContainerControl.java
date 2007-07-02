@@ -11,7 +11,7 @@ The panel's value model reflects the currently selected component, if any.
 @author Garret Wilson
 @see TabLayout
 */
-public class TabContainerControl extends AbstractListSelectContainerControl<TabContainerControl>
+public class TabContainerControl extends AbstractListSelectContainerControl
 {
 
 	/**The axis bound property.*/

@@ -13,7 +13,7 @@ public abstract class AbstractWebDepictor<O extends DepictedObject> extends Abst
 {
 
 	/**@return The web platform on which this depictor is depicting ojects.*/
-	public GuiseWebPlatform getPlatform() {return (GuiseWebPlatform)super.getPlatform();}
+	public WebPlatform getPlatform() {return (WebPlatform)super.getPlatform();}
 
 //TODO fix	private final Queue<E>
 }

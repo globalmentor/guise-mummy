@@ -15,10 +15,10 @@ public class LayoutConstraintsPropertyChangeEvent<T extends Constraints, V> exte
 {
 
 	/**The component for which a constraint value changed.*/
-	private final Component<?> component;
+	private final Component component;
 
 		/**@return The component for which a constraint value changed.*/
-		public Component<?> getComponent() {return component;}
+		public Component getComponent() {return component;}
 
 	/**The constraints for which a value changed.*/
 	private final T constraints;
@@ -36,7 +36,7 @@ public class LayoutConstraintsPropertyChangeEvent<T extends Constraints, V> exte
 	@param newValue The new value of the property, or <code>null</code> if the new value is not available.
 	@exception NullPointerException if the given component and/or constraints is <code>null</code>.
 	*/
-	public LayoutConstraintsPropertyChangeEvent(final Layout<T> source, final Component<?> component, final T constraints, final String propertyName, final V oldValue, V newValue)
+	public LayoutConstraintsPropertyChangeEvent(final Layout<T> source, final Component component, final T constraints, final String propertyName, final V oldValue, V newValue)
 	{
 		super(source, propertyName, oldValue, newValue);	//construct the parent class
 		this.component=checkInstance(component, "Component cannot be null.");	//TODO remove checkNull(), as this is now checked in the call to getSession()

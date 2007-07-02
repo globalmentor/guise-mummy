@@ -14,7 +14,7 @@ import com.guiseframework.validator.*;
 This panel defaults to not verifying the password.
 @author Garret Wilson
 */
-public class PasswordAuthenticationPanel extends AbstractPanel<PasswordAuthenticationPanel>
+public class PasswordAuthenticationPanel extends AbstractPanel
 {
 
 	/**The bound property of the password verification status.*/

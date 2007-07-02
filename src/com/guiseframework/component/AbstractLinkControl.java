@@ -5,7 +5,7 @@ import com.guiseframework.model.*;
 /**Abstract implementation of a link.
 @author Garret Wilson
 */
-public abstract class AbstractLinkControl<C extends LinkControl<C>> extends AbstractActionControl<C> implements LinkControl<C>
+public abstract class AbstractLinkControl extends AbstractActionControl implements LinkControl
 {
 
 	/**Label model, action model, and enableable object constructor.

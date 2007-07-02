@@ -34,7 +34,7 @@ import com.guiseframework.validator.*;
 <p>Property changes to a column's UI model are repeated with the component as the source and the column UI model as the target.</p> 
 @author Garret Wilson
 */
-public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Table.CellComponentState, Table> implements TableModel
+public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Table.CellComponentState> implements TableModel
 {
 
 	/**The display row count bound property.*/
@@ -182,7 +182,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@return The child component representing the given object.
 	@exception IllegalArgumentException if the given object is not an appropriate object for a component to be created.
 	*/
-	public Component<?> getComponent(final TableModel.Cell<?> cell)
+	public Component getComponent(final TableModel.Cell<?> cell)
 	{
 		return super.getComponent(cell);	//delegate to the parent version
 	}
@@ -212,7 +212,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		final boolean editable=isEditable() && column.isEditable();	//see if the cell is editable (a cell is only editable if both its table and column are editable)
 //TODO del		final TableModel.Cell<T> cell=new TableModel.Cell<T>(rowIndex, column);	//create a cell object representing this row and column
 //TODO fix editable		if(cellComponentState==null || cellComponentState.isEditable()!=editable)	//if there is no component for this cell, or the component has a different editable status
-		final Component<?> valueComponent=getCellRepresentationStrategy(column).createComponent(this, tableModel, rowIndex, column, editable, false, false);	//create a new component for the cell
+		final Component valueComponent=getCellRepresentationStrategy(column).createComponent(this, tableModel, rowIndex, column, editable, false, false);	//create a new component for the cell
 		return new CellComponentState(valueComponent, editable);	//create a new component state for the cell's component and metadata
 	}
 
@@ -223,7 +223,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	@return The child component representing the given cell.
 	*/
 /*TODO del when works
-	public <T> Component<?> verifyCellComponent(final int rowIndex, final TableColumnModel<T> column)
+	public <T> Component verifyCellComponent(final int rowIndex, final TableColumnModel<T> column)
 	{
 		final TableModel tableModel=getTableModel();	//get the table model
 		final boolean editable=isEditable() && column.isEditable();	//see if the cell is editable (a cell is only editable if both its table and column are editable)
@@ -231,7 +231,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		CellComponentState cellComponentState=getComponentState(cell);	//get the component information for this cell
 		if(cellComponentState==null || cellComponentState.isEditable()!=editable)	//if there is no component for this cell, or the component has a different editable status
 		{
-			final Component<?> valueComponent=getCellRepresentationStrategy(column).createComponent(this, tableModel, rowIndex, column, editable, false, false);	//create a new component for the cell
+			final Component valueComponent=getCellRepresentationStrategy(column).createComponent(this, tableModel, rowIndex, column, editable, false, false);	//create a new component for the cell
 //TODO del			valueComponent.setParent(this);	//tell this component that this table component is its parent
 			cellComponentState=new CellComponentState(valueComponent, editable);	//create a new component state for the cell's component and metadata
 			putComponentState(cell, cellComponentState);	//store the component state in the map for next time
@@ -649,7 +649,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 						public void listModified(final ListEvent<Object> listEvent)	//if the table list is modified
 						{
 							clearComponentStates();	//clear all the components and component states TODO probably do this on a component-by-component basis
-							getViewer().setUpdated(false);	//TODO fix hack; add a table listener and have the view listen to that
+							getDepictor().setDepicted(false);	//TODO fix hack; add a table listener and have the view listen to that
 						};
 					});
 		}
@@ -858,7 +858,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		@param editable Whether the component is for a cell that was editable when the component was created.
 		@exception NullPointerException if the given component is <code>null</code>.
 		*/
-		public CellComponentState(final Component<?> component, final boolean editable)
+		public CellComponentState(final Component component, final boolean editable)
 		{
 			super(component);	//construct the parent class
 			this.editable=editable;
@@ -898,7 +898,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		@param focused <code>true</code> if the value has the focus.
 		@return A new component to represent the given value.
 		*/
-		public <C extends V> Component<?> createComponent(final Table table, final TableModel model, final int rowIndex, final TableColumnModel<C> column, final boolean editable, final boolean selected, final boolean focused);
+		public <C extends V> Component createComponent(final Table table, final TableModel model, final int rowIndex, final TableColumnModel<C> column, final boolean editable, final boolean selected, final boolean focused);
 	}
 
 	/**A default table cell representation strategy.
@@ -941,13 +941,13 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 		@return A new component to represent the given value.
 		*/
 		@SuppressWarnings("unchecked")	//we check the type of the column value class, so the casts are safe
-		public <C extends V> Component<?> createComponent(final Table table, final TableModel model, final int rowIndex, final TableColumnModel<C> column, final boolean editable, final boolean selected, final boolean focused)
+		public <C extends V> Component createComponent(final Table table, final TableModel model, final int rowIndex, final TableColumnModel<C> column, final boolean editable, final boolean selected, final boolean focused)
 		{
 			final TableModel.Cell<C> cell=new TableModel.Cell<C>(rowIndex, column);	//create a cell to represent the row and column
 			final Class<C> valueClass=column.getValueClass();	//get the value class of the column
 			if(Component.class.isAssignableFrom(valueClass))	//if a component is being represented
 			{
-				return (Component<?>)model.getCellValue(cell);	//return the value as a component TODO find a way to update the cached component if it changes
+				return (Component)model.getCellValue(cell);	//return the value as a component TODO find a way to update the cached component if it changes
 			}
 			final int columnIndex=model.getColumnIndex(column);	//get the logical index of the given column
 			if(editable)	//if the component should be editable
@@ -955,7 +955,7 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 				final ValueModel<C> valueModel=new DefaultCellValueModel<C>(model, cell);	//create a new value model for the cell
 				if(Boolean.class.isAssignableFrom(valueClass))	//if the value class is subclass of Boolean
 				{
-					return new CheckControl((ValueModel<Boolean>)(Object)valueModel);	//create a new check control for the Boolean value model TODO find out why JDK 1.5.0_03 requires the intermediate Object cast
+					return new CheckControl((ValueModel<Boolean>)valueModel);	//create a new check control for the Boolean value model
 				}
 				else	//for all other values
 				{

@@ -10,17 +10,17 @@ Every child component must be added or removed using {@link #addComponent(Compon
 The component's validity is updated whenever a child comonent is added or removed from the component.
 @author Garret Wilson
 */
-public abstract class AbstractMultipleCompositeComponent<C extends CompositeComponent<C>> extends AbstractCompositeComponent<C>
+public abstract class AbstractMultipleCompositeComponent extends AbstractCompositeComponent
 {
 
 	/**The map of components keyed to IDs.*/
-	private final Map<String, Component<?>> idComponentMap=new ConcurrentHashMap<String, Component<?>>();	//TODO perhaps remove; the speed may not be sufficient to outweigh the overhead; this is only a single-level search, anyway
+	private final Map<Long, Component> idComponentMap=new ConcurrentHashMap<Long, Component>();	//TODO perhaps remove; the speed may not be sufficient to outweigh the overhead; this is only a single-level search, anyway
 
 	/**@return Whether this component has children.*/
 	public boolean hasChildren() {return !idComponentMap.isEmpty();}
 
 	/**@return An iterable to child components.*/
-	public Iterable<Component<?>> getChildren() {return idComponentMap.values();}
+	public Iterable<Component> getChildren() {return idComponentMap.values();}
 
 	/**Adds a child component.
 	This version adds the component to the component map.
@@ -29,13 +29,13 @@ public abstract class AbstractMultipleCompositeComponent<C extends CompositeComp
 	@return <code>true</code> if the child components changed as a result of the operation.
 	@exception IllegalArgumentException if the component already has a parent.
 	*/
-	protected boolean addComponent(final Component<?> component)
+	protected boolean addComponent(final Component component)
 	{
 		if(component.getParent()!=null)	//if this component has already been added to container; do this check before we try to add the component to the map, because setting the same mapping won't result in an error
 		{
 			throw new IllegalArgumentException("Component "+component+" is already a member of a composite component, "+component.getParent()+".");
 		}
-		if(idComponentMap.put(component.getID(), component)!=component)	//add this component to the map; if that resulted in a map change
+		if(idComponentMap.put(Long.valueOf(component.getDepictID()), component)!=component)	//add this component to the map; if that resulted in a map change
 		{
 			super.addComponent(component);	//initialize the child component as needed
 			component.setParent(this);	//tell the component who its parent is
@@ -55,14 +55,14 @@ public abstract class AbstractMultipleCompositeComponent<C extends CompositeComp
 	@return <code>true</code> if the child components changed as a result of the operation.
 	@exception IllegalArgumentException if the component is not a member of this composite component.
 	*/
-	protected boolean removeComponent(final Component<?> component)
+	protected boolean removeComponent(final Component component)
 	{
-		final Component<?> removedComponent=idComponentMap.remove(component.getID());	//remove this component from the map
+		final Component removedComponent=idComponentMap.remove(Long.valueOf(component.getDepictID()));	//remove this component from the map
 		if(removedComponent!=null)	//if a component was removed
 		{
 			if(removedComponent!=component)	//if there was another component with the same ID
 			{
-				throw new IllegalStateException("Another component "+removedComponent+" stored with same ID "+component.getID()+" as component "+component);
+				throw new IllegalStateException("Another component "+removedComponent+" stored with same ID "+component.getDepictID()+" as component "+component);
 			}
 			super.removeComponent(component);	//uninitialize the child component as needed
 			component.setParent(null);	//tell the component it no longer has a parent
@@ -79,9 +79,9 @@ public abstract class AbstractMultipleCompositeComponent<C extends CompositeComp
 	@param id The ID of the component to return.
 	@return The child component with the given ID, or <code>null</code> if there is no child component with the given ID. 
 	*/
-	public Component<?> getComponent(final String id)	//TODO perhaps remove; the speed may not be sufficient to outweigh the overhead; this is only a single-level search, anyway
+	public Component getComponent(final long id)	//TODO perhaps remove; the speed may not be sufficient to outweigh the overhead; this is only a single-level search, anyway
 	{
-		return idComponentMap.get(id);	//return the component with the given ID
+		return idComponentMap.get(Long.valueOf(id));	//return the component with the given ID
 	}
 
 	/**Label model constructor.

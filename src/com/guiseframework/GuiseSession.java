@@ -11,13 +11,12 @@ import com.garretwilson.event.PostponedEvent;
 import com.garretwilson.rdf.RDFResource;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
-import com.guiseframework.context.GuiseContext;
 import com.guiseframework.event.*;
 import com.guiseframework.input.Input;
 import com.guiseframework.input.InputStrategy;
 import com.guiseframework.model.InformationLevel;
 import com.guiseframework.model.Notification;
-import com.guiseframework.platform.GuisePlatform;
+import com.guiseframework.platform.Platform;
 import com.guiseframework.prototype.ActionPrototype;
 import com.guiseframework.style.*;
 import com.guiseframework.theme.Theme;
@@ -86,13 +85,10 @@ public interface GuiseSession extends PropertyBindable
 	public void setBaseURI(final URI baseURI);
 
 	/**@return The application frame.*/
-	public ApplicationFrame<?> getApplicationFrame();
-
-	/**@return The user local environment.*/
-	public GuiseEnvironment getEnvironment();
+	public ApplicationFrame getApplicationFrame();
 
 	/**@return The platform on which Guise objects are depicted.*/
-	public GuisePlatform getPlatform();
+	public Platform getPlatform();
 
 	/**@return The strategy for processing input.*/
 	public InputStrategy getInputStrategy();
@@ -158,7 +154,7 @@ public interface GuiseSession extends PropertyBindable
 	@see Component#initialize()
 	@see <a href="http://www.ploop.org/">PLOOP</a>
 	*/
-	public void initializeComponent(final Component<?> component);
+	public void initializeComponent(final Component component);
 	
 	/**Initializes a component with a description in an RDF resource file.
 	This method calls {@link Component#initialize()} after initializing the component from the description.
@@ -171,7 +167,7 @@ public interface GuiseSession extends PropertyBindable
 	@exception IllegalStateException if the given component has already been initialized.
 	@see Component#initialize()
 	*/
-	public void initializeComponentFromResource(final Component<?> component, final String resourceKey);
+	public void initializeComponentFromResource(final Component component, final String resourceKey);
 	
 	/**Initializes a component from the contents of an RDF description input stream.
 	This method calls {@link Component#initialize()} after initializing the component from the description.
@@ -182,7 +178,7 @@ public interface GuiseSession extends PropertyBindable
 	@exception IllegalStateException if the given component has already been initialized.
 	@see Component#initialize()
 	*/
-	public void initializeComponent(final Component<?> component, final InputStream descriptionInputStream);
+	public void initializeComponent(final Component component, final InputStream descriptionInputStream);
 
 	/**Retrieves a resource bundle to be used by this session.
 	One of the <code>getXXXResource()</code> should be used in preference to using this method directly.
@@ -407,22 +403,12 @@ public interface GuiseSession extends PropertyBindable
 	/**@return The action prototype for presenting application information.*/
 	public ActionPrototype getAboutApplicationActionPrototype();
 
-	/**@return The current context for this session, or <code>null</code> if there currently is no context.*/
-	public GuiseContext getContext();
-
-	/**Sets the current context.
-	This method should not normally be called by application code.
-	@param context The current context for this session, or <code>null</code> if there currently is no context.
-	*/
-	public void setContext(final GuiseContext context);
-
 	/**Queues a postponed event to be fired after the context has finished processing events.
 	If a Guise context is currently processing events, the event will be queued for later.
 	If no Guise context is currently processing events, the event will be fired immediately.
 	@param postponedEvent The event to fire at a later time.
-	@see GuiseContext.State#PROCESS_EVENT
 	*/
-	public void queueEvent(final PostponedEvent<?> postponedEvent);
+	public void queueEvent(final PostponedEvent<?> postponedEvent);	//TODO complete conversion
 
 	/**Retrieves the component bound to the given destination.
 	If a component has already been created and cached, it will be be returned; otherwise, one will be created and cached. 
@@ -431,20 +417,20 @@ public interface GuiseSession extends PropertyBindable
 	@exception NullPointerException if the destination is <code>null</code>.
 	@exception IllegalStateException if the component class bound to the destination does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
 	*/
-	public Component<?> getDestinationComponent(final ComponentDestination destination);
+	public Component getDestinationComponent(final ComponentDestination destination);
 
 	/**Releases the component bound to the given destination.
 	@param destination The destination for which any bound component should be released.
 	@return The component previously bound to the given destination, or <code>null</code> if no component was bound to the given destination.
 	@exception NullPointerException if the destination is <code>null</code>.
 	*/
-	public Component<?> releaseDestinationComponent(final ComponentDestination destination);
+	public Component releaseDestinationComponent(final ComponentDestination destination);
 
-	/**Retrieves the component bound to the given appplication context-relative path.
+	/**Retrieves the component bound to the given application context-relative path.
 	This is a convenience method that retrieves the component associated with the component destination for the given navigation path.
 	This method calls {@link GuiseApplication#getDestination(String)}.
 	This method calls {@link #getDestinationComponent(ComponentDestination)}.
-	@param path The appplication context-relative path within the Guise container context.
+	@param path The application context-relative path within the Guise container context.
 	@return The component bound to the given path. 
 	@exception NullPointerException if the path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
@@ -452,7 +438,7 @@ public interface GuiseSession extends PropertyBindable
 	@exception IllegalStateException if the component class bound to the path does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
 	@see ComponentDestination
 	*/
-	public Component<?> getNavigationComponent(final String path);
+	public Component getNavigationComponent(final String path);
 
 	/**@return Whether the session is in a modal navigation state.*/
 	public boolean isModalNavigation();
@@ -465,7 +451,7 @@ public interface GuiseSession extends PropertyBindable
 	@param modalNavigationPanel The panel for which modal navigation state should begin.
 	@param modalNavigation The state of modal navigation.
 	*/
-	public void beginModalNavigation(final ModalNavigationPanel<?, ?> modalNavigationPanel, final ModalNavigation modalNavigation);
+	public void beginModalNavigation(final ModalNavigationPanel<?> modalNavigationPanel, final ModalNavigation modalNavigation);
 
 	/**Ends modal interaction for a particular modal panel.
 	The panel is released from the cache so that new navigation will create a new modal panel.
@@ -478,7 +464,7 @@ public interface GuiseSession extends PropertyBindable
 	@see Frame#getReferrerURI()
 	@see #releaseDestinationComponent(String)
 	*/
-	public boolean endModalNavigation(final ModalNavigationPanel<?, ?> modalNavigationPanel);
+	public boolean endModalNavigation(final ModalNavigationPanel<?> modalNavigationPanel);
 
 	/**Reports the navigation path relative to the application context path.
 	@return The path representing the current navigation location of the Guise application.
@@ -671,7 +657,7 @@ public interface GuiseSession extends PropertyBindable
 	@return A component to indicate Guise busy status.
 	@see Theme#GLYPH_BUSY
 	*/
-	public Component<?> createBusyComponent();	//TODO maybe put this in GuiseApplication
+	public Component createBusyComponent();
 
 	/**Processes input such as a keystroke, a mouse click, or a command.
 	A new {@link InputEvent} will be created and dispatched via the application frame.	

@@ -52,10 +52,10 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 				alignment=newAlignment;	//update the value
 				firePropertyChange(ALIGNMENT_PROPERTY, Double.valueOf(oldAlignment), Double.valueOf(newAlignment));
 			}
-			final LayoutComponent<?> owner=getOwner();	//get the owner of this layout, if any
+			final LayoutComponent owner=getOwner();	//get the owner of this layout, if any
 			if(owner!=null)	//if this layout has an owner
 			{
-				for(final Component<?> component:getOwner().getChildren())	//for all child components of the owner
+				for(final Component component:getOwner().getChildren())	//for all child components of the owner
 				{
 					getConstraints(component).setAlignment(newAlignment);	//update this child component's constraints with the new alignment value
 				}

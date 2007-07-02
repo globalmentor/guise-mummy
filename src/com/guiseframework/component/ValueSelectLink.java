@@ -6,7 +6,7 @@ import com.guiseframework.model.*;
 @param <V> The type of value the control represents.
 @author Garret Wilson
 */
-public class ValueSelectLink<V> extends AbstractSelectActionValueControl<V, ValueSelectLink<V>> implements SelectLinkControl<ValueSelectLink<V>>
+public class ValueSelectLink<V> extends AbstractSelectActionValueControl<V> implements SelectLinkControl
 {
 
 	/**Value class constructor.

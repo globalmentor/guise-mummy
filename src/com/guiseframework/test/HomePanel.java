@@ -324,7 +324,7 @@ Debug.trace("list control changed value to", newValue);
 		testLabel.setLabel("This is label text from the model.");
 		
 		
-		final Object testCookie=getSession().getEnvironment().getProperty("testCookie");
+		final Object testCookie=getSession().getPlatform().getEnvironment().getProperty("testCookie");
 		if(testCookie instanceof String)
 		{
 			testLabel.setLabel((String)testCookie);
@@ -414,7 +414,7 @@ Debug.trace("list control changed value to", newValue);
 
 						myDialog.open();
 						
-						getSession().getEnvironment().setProperty("testCookie", "This is a successful cookie value.");
+						getSession().getPlatform().getEnvironment().setProperty("testCookie", "This is a successful cookie value.");
 						
 /*TODO bring back
 						final Label label=new Label(new DefaultLabelModel("Are you sure?"));
@@ -445,7 +445,7 @@ Debug.trace("list control changed value to", newValue);
 					public void actionPerformed(ActionEvent actionEvent)
 					{
 
-						getSession().getEnvironment().removeProperty("testCookie");
+						getSession().getPlatform().getEnvironment().removeProperty("testCookie");
 
 						testLabel.setLabel("The link works.");
 
@@ -531,10 +531,10 @@ Debug.trace("list control changed value to", newValue);
 						final TextControl<Float> inputTextControl=new TextControl<Float>(Float.class);	//create a text input control to receive a float
 						inputTextControl.setLabel("Input Number");	//add a label to the text input control
 						inputTextControl.setValidator(new ValueRequiredValidator<Float>());	//install a validator requiring a value
-						((Container<?>)dialog.getContent()).add(inputTextControl);	//add the input control to the input panel
+						((Container)dialog.getContent()).add(inputTextControl);	//add the input control to the input panel
 						final TextControl<Float> outputTextControl=new TextControl<Float>(Float.class);	//create a text input control to display the result
 						outputTextControl.setLabel("Double the Number");	//add a label to the text output control
-						((Container<?>)dialog.getContent()).add(outputTextControl);	//add the output control to the input panel
+						((Container)dialog.getContent()).add(outputTextControl);	//add the output control to the input panel
 						
 						dialog.open(true);
 					}
@@ -798,7 +798,7 @@ Debug.trace("list control changed value to", newValue);
 		
 		contentPanel.add(listSelectControl);
 
-		final TextAreaControl textAreaControl=new TextAreaControl(25, 100, true);
+		final TextControl<String> textAreaControl=new TextControl<String>(String.class, 25, 100, true);
 		textAreaControl.setLabel("Type some text.");
 /*TODO bring back
 		try
@@ -887,10 +887,10 @@ Debug.trace("list control changed value to", newValue);
 		
 		final CardTabControl remoteTabControl=new CardTabControl(tabbedPanel, Flow.LINE);
 		contentPanel.add(remoteTabControl);
-
+/*TODO del
 Debug.trace("tabbed panel", tabbedPanel, "has view", tabbedPanel.getViewer());
 Debug.trace("card tab control", remoteTabControl, "has view", remoteTabControl.getViewer());
-
+*/
 		checkbox.addPropertyChangeListener(ValueModel.VALUE_PROPERTY, new AbstractGenericPropertyChangeListener<Boolean>()
 				{
 					public void propertyChange(final GenericPropertyChangeEvent<Boolean> propertyChangeEvent)

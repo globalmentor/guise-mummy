@@ -14,7 +14,7 @@ import static java.util.Collections.*;
 @param <S> The component state of each object.
 @author Garret Wilson
 */
-public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompositeStateComponent.ComponentState, C extends CompositeComponent<C>> extends AbstractMultipleCompositeComponent<C>	//TODO fire events when component states are added or removed so that AJAX updates can be sent
+public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompositeStateComponent.ComponentState> extends AbstractMultipleCompositeComponent	//TODO fire events when component states are added or removed so that AJAX updates can be sent
 {
 
 	/**The map of component state for each object.*/
@@ -76,7 +76,7 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 		{
 			removeComponent(oldComponentState.getComponent());	//remove the old component from the set of components
 		}
-		final Component<?> component=componentState.getComponent();	//get the component state
+		final Component component=componentState.getComponent();	//get the component state
 		addComponent(component);	//put the new component in the component set
 		try
 		{
@@ -106,7 +106,7 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 	/**Removes all child component states.*/
 	protected void clearComponentStates()	//TODO make sure this and related routines doesn't leak components or component states
 	{
-		for(final Component<?> component:getChildren())	//for each component in the container
+		for(final Component component:getChildren())	//for each component in the container
 		{
 			removeComponent(component);	//remove this component
 		}
@@ -119,7 +119,7 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 	@return The child component representing the given object.
 	@exception IllegalArgumentException if the given object is not an appropriate object for a component to be created.
 	*/
-	protected Component<?> getComponent(final T object)
+	protected Component getComponent(final T object)
 	{
 		return determineComponentState(object).getComponent();	//get the component stored in the component state, creating one if needed
 	}
@@ -131,7 +131,7 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 	@exception NullPointerException if the given component is <code>null</code>.
 	@exception IllegalArgumentException if the given component does not represent any object.
 	*/
-	protected T getObject(final Component<?> component)
+	protected T getObject(final Component component)
 	{
 		checkInstance(component, "Component cannot be null.");
 		synchronized(componentStateMap)	//don't allow the map to be modified while we access it
@@ -169,16 +169,16 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 	protected abstract static class ComponentState
 	{
 		/**The representation component.*/
-		private final Component<?> component;
+		private final Component component;
 
 			/**@return The representation component.*/
-			public Component<?> getComponent() {return component;}
+			public Component getComponent() {return component;}
 
 		/**Constructor
 		@param component The representation component.
 		@exception NullPointerException if the given component is <code>null</code>.
 		*/
-		public ComponentState(final Component<?> component)
+		public ComponentState(final Component component)
 		{
 			this.component=checkInstance(component, "Component cannot be null.");
 		}

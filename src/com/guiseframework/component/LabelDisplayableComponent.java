@@ -5,7 +5,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 /**A component that allows its label to be displayed.
 @author Garret Wilson
 */
-public interface LabelDisplayableComponent<C extends LabelDisplayableComponent<C>> extends Component<C>
+public interface LabelDisplayableComponent extends Component
 {
 	/**The bound property of whether the icon is displayed or has no representation, taking up no space.*/
 	public final static String ICON_DISPLAYED_PROPERTY=getPropertyName(LabelDisplayableComponent.class, "iconDisplayed");

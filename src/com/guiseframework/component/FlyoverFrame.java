@@ -4,7 +4,6 @@ import static com.garretwilson.lang.ClassUtilities.*;
 
 import java.math.BigDecimal;
 import java.net.URI;
-import java.util.MissingResourceException;
 import java.util.Set;
 
 import com.guiseframework.geometry.CompassPoint;
@@ -27,7 +26,7 @@ For example, with a tether bearing of 250 and a tether resource key of "myTether
 </ul>
 @author Garret Wilson
 */
-public interface FlyoverFrame<C extends FlyoverFrame<C>> extends Frame<C>
+public interface FlyoverFrame extends Frame
 {
 
 	/**The tether bearing bound property.*/

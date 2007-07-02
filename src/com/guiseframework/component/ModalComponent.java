@@ -6,7 +6,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 @param <M> The type of mode this modal component supports.
 @author Garret Wilson
 */
-public interface ModalComponent<M extends Mode, C extends ModalComponent<M, C>> extends Component<C>
+public interface ModalComponent<M extends Mode> extends Component
 {
 	/**The bound property of the mode.*/
 	public final static String MODE_PROPERTY=getPropertyName(ModalComponent.class, "mode");

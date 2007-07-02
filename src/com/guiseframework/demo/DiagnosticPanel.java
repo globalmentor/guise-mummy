@@ -28,7 +28,7 @@ public class DiagnosticPanel extends DefaultNavigationPanel
 	{
 		setLabel("Guise\u2122 Demonstration: Diagnostic");	//set the panel title
 
-		final Panel<?> memoryPanel=new GroupPanel(new FlowLayout(Flow.LINE));
+		final Panel memoryPanel=new GroupPanel(new FlowLayout(Flow.LINE));
 		memoryPanel.setLabel("Memory");
 
 		maxMemoryTextControl=new TextControl<Long>(Long.class);

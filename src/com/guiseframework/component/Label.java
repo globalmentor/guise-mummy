@@ -10,7 +10,7 @@ This component installs a default export strategy supporting export of the follo
 </ul>
 @author Garret Wilson
 */
-public class Label extends AbstractLabel<Label>
+public class Label extends AbstractLabel
 {
 
 	/**Default constructor with a default label model.*/

@@ -70,21 +70,21 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler
 	};
 
 	/**The list select control to connect to the cards, or <code>null</code> if there is no control coupled with the cards.*/
-	private ListSelectControl<V, ?> listSelect=null;
+	private ListSelectControl<V> listSelect=null;
 
 		/**@return The list select control to connect to the cards, or <code>null</code> if there is no control coupled with the cards.*/
-		public ListSelectControl<V, ?> getListSelect() {return listSelect;}
+		public ListSelectControl<V> getListSelect() {return listSelect;}
 
 		/**Sets the connected list select control.
 		This is a bound property.
 		@param newListSelect The new list select control to connect to the card, or <code>null</code> if the list select control should not be coupled with the cards.
 		@see #LIST_SELECT_PROPERTY
 		*/
-		public void setListSelect(final ListSelectControl<V, ?> newListSelect)
+		public void setListSelect(final ListSelectControl<V> newListSelect)
 		{
 			if(listSelect!=newListSelect)	//if the value is really changing
 			{
-				final ListSelectControl<V, ?> oldListSelect=listSelect;	//get the old value
+				final ListSelectControl<V> oldListSelect=listSelect;	//get the old value
 				if(oldListSelect!=null)	//if there is an old list select control
 				{
 					oldListSelect.removePropertyChangeListener(ListSelectControl.VALUE_PROPERTY, listSelectValueChangeListener);	//stop listening for list selected value changes
@@ -140,7 +140,7 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler
 	@param value The value in the list to indicate the cards should be selected, or <code>null</code> if there is no value to indicate selection.
 	@param cards The new cards to connect, if any.
 	*/
-	public ListSelectCardCoupler(final ListSelectControl<V, ?> listSelect, final V value, final Component<?>... cards)
+	public ListSelectCardCoupler(final ListSelectControl<V> listSelect, final V value, final Component... cards)
 	{
 		super(cards);	//construct the parent class
 		setListSelect(listSelect);	//set the list select control
@@ -154,7 +154,7 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler
 	*/
 	protected void updateDisplayed(final boolean displayed)
 	{
-		final ListSelectControl<V, ?> listSelect=getListSelect();	//get the list select control
+		final ListSelectControl<V> listSelect=getListSelect();	//get the list select control
 		final V value=getValue();	//get the specified value
 		if(listSelect!=null && value!=null)	//if there is a list select control and value specified
 		{
@@ -169,7 +169,7 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler
 	*/
 	protected void updateEnabled(final boolean enabled)
 	{
-		final ListSelectControl<V, ?> listSelect=getListSelect();	//get the list select control
+		final ListSelectControl<V> listSelect=getListSelect();	//get the list select control
 		final V value=getValue();	//get the specified value
 		if(listSelect!=null && value!=null)	//if there is a list select control and value specified
 		{
@@ -186,7 +186,7 @@ public class ListSelectCardCoupler<V> extends AbstractCardCoupler
 	{
 		if(selected)	//if one of the connected cards is selected
 		{
-			final ListSelectControl<V, ?> listSelect=getListSelect();	//get the list select control
+			final ListSelectControl<V> listSelect=getListSelect();	//get the list select control
 			final V value=getValue();	//get the specified value
 			if(listSelect!=null && value!=null)	//if there is a list select control and value specified
 			{

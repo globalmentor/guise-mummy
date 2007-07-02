@@ -19,7 +19,7 @@ A validator requiring a non-<code>null</code> value is automatically installed.
 <p>The selected and unselected icons are set by default to {@link Theme#GLYPH_SELECTED} and {@link Theme#GLYPH_UNSELECTED}, respectively.</p>
 @author Garret Wilson
 */
-public abstract class AbstractBooleanSelectActionControl<C extends SelectActionControl<C> & ActionValueControl<Boolean, C> & LabelDisplayableComponent<C>> extends AbstractActionValueControl<Boolean, C> implements SelectActionControl<C>
+public abstract class AbstractBooleanSelectActionControl extends AbstractActionValueControl<Boolean> implements SelectActionControl
 {
 
 	/**Whether this control automatically sets or toggles the selection state when the action occurs.*/

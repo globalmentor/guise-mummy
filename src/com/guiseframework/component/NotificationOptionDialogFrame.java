@@ -17,7 +17,7 @@ The contents of an option dialog frame should be accessed by {@link #getOptionCo
 <p>This class binds the command {@link ProcessCommand#CONTINUE} to the button for the first non-fatal option.</p>
 @author Garret Wilson
 */
-public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Notification.Option, NotificationOptionDialogFrame>
+public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Notification.Option>
 {
 
 	/**Our input strategy for mapping the "continue" command to the first non-fatal option. As the options are created in the parent contructor, we'll have to lazily create this instance.*/
@@ -76,7 +76,7 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 	@param options The available options.
 	@exception NullPointerException if the given options is <code>null</code>.
 	*/
-	public NotificationOptionDialogFrame(final Component<?> component, final Option... options)
+	public NotificationOptionDialogFrame(final Component component, final Option... options)
 	{
 		this(new DefaultValueModel<Option>(Option.class), component, options);	//use a default value model
 	}
@@ -99,7 +99,7 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 	@param options The available options.
 	@exception NullPointerException if the given value model and/or options is <code>null</code>.
 	*/
-	public NotificationOptionDialogFrame(final ValueModel<Option> valueModel, final Component<?> component, final Option... options)
+	public NotificationOptionDialogFrame(final ValueModel<Option> valueModel, final Component component, final Option... options)
 	{
 		super(valueModel, component, options);	//construct the parent class
 	}
@@ -108,7 +108,7 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 	This implementation creates a button for the given option.
 	@param option The option for which a component should be created.
 	*/
-	protected Component<?> createOptionComponent(final Option option)
+	protected Component createOptionComponent(final Option option)
 	{
 		if(bindingInputStrategy==null)	//if we haven't yet created our input strategy (we have to use lazy creation because this method is called from the parent constructor)
 		{

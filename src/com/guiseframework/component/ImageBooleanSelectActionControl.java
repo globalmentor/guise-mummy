@@ -11,7 +11,7 @@ import com.guiseframework.prototype.ValuePrototype;
 /**Image control that can be selected and generates actions, storing a Boolean value in its model representing the selected state.
 @author Garret Wilson
 */
-public class ImageBooleanSelectActionControl extends AbstractBooleanSelectActionControl<ImageBooleanSelectActionControl> implements ImageComponent<ImageBooleanSelectActionControl>		//TODO fix the inconsistency of this component implementing LabelDisplayableComponent
+public class ImageBooleanSelectActionControl extends AbstractBooleanSelectActionControl implements ImageComponent		//TODO fix the inconsistency of this component implementing LabelDisplayableComponent
 {
 
 	/**The image bound property.*/
