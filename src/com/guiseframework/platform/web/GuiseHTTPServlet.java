@@ -830,8 +830,6 @@ Debug.trace("got control events");
 					}
 					else if(requestEvent instanceof WebPlatformEvent)	//if this is a web platform event
 					{
-						
-						
 								//TODO fix to submit form event to entire hierarchy
 						final WebPlatformEvent controlEvent=(WebPlatformEvent)requestEvent;	//get the request event as a control event
 						if(controlEvent instanceof WebFormEvent)	//if this is a form submission

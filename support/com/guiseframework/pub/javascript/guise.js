@@ -457,7 +457,7 @@ com.guiseframework.js.Guise=function()
 					REQUEST: "request", EVENTS: "events", OBJECT_ID: "objectID",
 					FORM: "form", PROVISIONAL: "provisional", CONTROL: "control", NAME: "name", VALUE: "value",
 					CHANGE: "change", PROPERTY: "property",
-					ACTION: "action", COMPONENT: "component", COMPONENT_ID: "componentID", TARGET_ID: "targetID", ACTION_ID: "actionID", OPTION: "option",
+					ACTION: "action", COMPONENT: "component", TARGET_ID: "targetID", ACTION_ID: "actionID", OPTION: "option",
 					DROP: "drop", SOURCE: "source", TARGET: "target", DRAG_SOURCE_ID:"dragSourceID", VIEWPORT: "viewport",
 					FOCUS: "focus",
 					CODE: "code", ALT_KEY: "altKey", CONTROL_KEY: "controlKey", SHIFT_KEY: "shiftKey",
@@ -734,7 +734,7 @@ com.guiseframework.js.Guise=function()
 		proto._appendFocusAJAXEvent=function(stringBuilder, ajaxFocusEvent)
 		{
 			DOMUtilities.appendXMLStartTag(stringBuilder, this.RequestElement.FOCUS,	//<focus>
-					new Map(this.RequestElement.OBJECT_ID, ajaxFocusEvent.object));	//objectID="objectID"
+					new Map(this.RequestElement.OBJECT_ID, ajaxFocusEvent.objectID));	//objectID="objectID"
 			DOMUtilities.appendXMLEndTag(stringBuilder, this.RequestElement.FOCUS);	//</focus>
 			return stringBuilder;	//return the string builder
 		};

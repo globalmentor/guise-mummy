@@ -10,7 +10,7 @@ import com.guiseframework.component.transfer.Transferable;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 
-/**An abstract implementation of a component view.
+/**An abstract implementation of a component depictor.
 If the component has a model, this implementation will automatically register to listen to its properties being changed.
 This implementation does not recognize that it needs to be updated if the associated component changes its registered listeners.
 A view keeps track of component modified properties between updates.
