@@ -6,13 +6,19 @@ import java.net.URL;
 import java.security.Principal;
 import java.text.DateFormat;
 import java.util.*;
+
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
 import java.util.concurrent.*;
 
+import javax.mail.*;
+import javax.mail.Message;
+
 import com.garretwilson.beans.BoundPropertyObject;
 import com.garretwilson.io.*;
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.mail.MailManager;
+
 import static com.garretwilson.lang.ThreadUtilities.*;
 import com.garretwilson.net.URIUtilities;
 import com.garretwilson.rdf.RDFObject;
@@ -20,6 +26,8 @@ import com.garretwilson.rdf.RDFResource;
 import com.garretwilson.rdf.TypedRDFResourceIO;
 import com.garretwilson.text.W3CDateFormat;
 import com.garretwilson.util.*;
+
+import static com.garretwilson.io.FileConstants.*;
 import static com.garretwilson.io.FileUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
@@ -84,6 +92,42 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 				environment=checkInstance(newEnvironment, "Guise session environment cannot be null.");	//actually change the value
 				firePropertyChange(ENVIRONMENT_PROPERTY, oldEnvironment, newEnvironment);	//indicate that the value changed
 			}
+		}
+
+	/**The mail manager, or <code>null</code> if the application is not installed or there is no mail defined for this application.*/
+	private MailManager mailManager=null;
+
+		/**Retrieves the current mail session.
+		@return This application's mail session.
+		@exception IllegalStateException if the application has not yet been installed into a container.
+		@exception IllegalStateException if mail has not been configured for this application.
+		*/
+		public Session getMailSession()
+		{
+			checkInstalled();	//make sure the application has been installed (which will set the mail manager if configured)
+			final MailManager mailManager=this.mailManager;	//get the mail manager
+			if(mailManager==null)	//if we don't have a mail manager, mail hasn't been configured
+			{
+				throw new IllegalStateException("Mail has not been configured for the application.");
+			}
+			return mailManager.getSession();	//return the mail manager's session
+		}
+
+		/**Retrieves the queue used to send mail.
+		Mail added to this queue will be sent use the application's configured mail protocols.
+		@return The queue used for to send mail.
+		@exception IllegalStateException if the application has not yet been installed into a container.
+		@exception IllegalStateException if mail has not been configured for this application.
+		*/
+		public Queue<Message> getMailSendQueue()
+		{
+			checkInstalled();	//make sure the application has been installed (which will set the mail manager if configured)
+			final MailManager mailManager=this.mailManager;	//get the mail manager
+			if(mailManager==null)	//if we don't have a mail manager, mail hasn't been configured
+			{
+				throw new IllegalStateException("Mail has not been configured for the application.");
+			}
+			return mailManager.getSendQueue();	//return the mail manager's send queue
 		}
 
 	/**Whether the application applies themes.*/
@@ -340,6 +384,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	/**Installs the application into the given container at the given base path.
 	This method is called by {@link GuiseContainer} and should not be called directly by applications.
+	This implementation configures mail using the file {@value GuiseApplication#MAIL_PROPERTIES_FILENAME} if present relative to the home directory.
 	@param container The Guise container into which the application is being installed.
 	@param basePath The base path at which the application is being installed.
 	@param homeDirectory The home directory of the application.
@@ -367,6 +412,20 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		this.logDirectory=checkInstance(logDirectory, "Log directory cannot be null.");
 		this.tempDirectory=checkInstance(tempDirectory, "Temporary directory cannot be null.");
 //TODO del if not needed		hashCode=ObjectUtilities.hashCode(container.getBaseURI(), basePath);	//create a hash code based upon the base URI of the container and the base path of the application
+
+		try
+		{
+			final Properties mailProperties=loadProperties(MAIL_PROPERTIES_FILENAME);	//try to load the mail properties
+			mailManager=new MailManager(mailProperties);	//create a new mail manager from the properties
+		}
+		catch(final IOException ioException)	//if we couldn't load the mail properties
+		{
+			Debug.warn(ioException);	//warn that mail isn't configured
+		}
+		catch(final NoSuchProviderException noSuchProviderException)	//if a provider couldn't be found
+		{
+			throw new AssertionError(noSuchProviderException);	//indicate that there was a problem configuring the application TODO use a better error; create a ConfigurationStateException
+		}
 	}
 
 	/**Uninstalls the application from the given container.
@@ -385,6 +444,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		{
 			throw new IllegalStateException("Application installed into different container.");
 		}
+		mailManager.getSendThread().interrupt();	//interrupt the mail manager's send thread
+		mailManager=null;	//release the mail manager
 		synchronized(baseNameLogWriterInfoMap)	//don't allow the map to be used while we look up a writer
 		{
 			for(final LogWriterInfo logWriterInfo:baseNameLogWriterInfoMap.values())	//for each log writer info
@@ -1179,6 +1240,52 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		{
 			bufferedThemeInputStream.close();	//always close the theme input stream
 		}				
+	}
+
+	/**Loads properties from a file in the home directory.
+	The properties can be stored in XML or in the traditional properties format.
+	@param propertiesPath The path to the properties file, relative to the application home directory.
+	@return The properties loaded from the file at the given path.
+	@exception NullPointerException if the given properties path is <code>null</code>.
+	@exception IllegalArgumentException if the type of properties file is not recognized.
+	@exception IOException if there is an error loading the properties.
+	@see #getHomeDirectory()
+	*/
+	public Properties loadProperties(final String propertiesPath) throws IOException
+	{
+		final File propertiesFile=new File(getHomeDirectory(), checkInstance(propertiesPath, "Properties path cannot be null."));	//create the properties file object
+		final String extension=getExtension(propertiesFile);	//get the extension of the properties file
+		final boolean isXML;	//see if this is an XML file
+		if(XML_EXTENSION.equals(extension))	//if this is an XML file
+		{
+			isXML=true;	//indicate that we should load XML
+		}
+		else if(PROPERTIES_EXTENSION.equals(extension))	//if this is a properties file
+		{
+			isXML=false;	//indicate that we should load normal properties
+		}
+		else	//if this is neither an XML file nor a traditional properties file
+		{
+			throw new IllegalArgumentException("Unrecognized properties file type: "+propertiesPath);				
+		}
+		final Properties properties=new Properties();	//create a properties file
+		final InputStream inputStream=new BufferedInputStream(new FileInputStream(propertiesFile));	//get an input stream to the file
+		try
+		{
+			if(isXML)	//if we're loading XML
+			{
+				properties.loadFromXML(inputStream);	//load the properties file from the XML				
+			}
+			else	//if we're loading a traditional properties file
+			{
+				properties.load(inputStream);	//load the traditional properties file				
+			}
+			return properties;	//return the properties we loaded
+		}
+		finally
+		{
+			inputStream.close();	//always close the input stream
+		}
 	}
 
 	/**Looks up a principal from the given ID.

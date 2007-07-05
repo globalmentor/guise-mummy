@@ -4,11 +4,12 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import javax.mail.*;
+
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.io.IOOperation;
-import com.guiseframework.component.*;
-import com.guiseframework.platform.Environment;
-import com.guiseframework.platform.Platform;
+import com.guiseframework.component.ApplicationFrame;
+import com.guiseframework.platform.*;
 import com.guiseframework.theme.Theme;
 
 import static com.garretwilson.lang.ClassUtilities.*;
@@ -54,6 +55,9 @@ public interface GuiseApplication extends PropertyBindable
 	public final static String GUISE_ROOT_THEME_PATH=GUISE_ROOT_THEME_BASE_PATH+"root.theme.rdf";
 	/**The base path of the default Guise theme cursors, relative to the application.*/
 	public final static String GUISE_ROOT_THEME_CURSORS_PATH=GUISE_ROOT_THEME_BASE_PATH+"cursors/";
+
+	/**The name of the mail properties filename relative to the application home directory, used for configuring mail for the application.*/
+	public final static String MAIL_PROPERTIES_FILENAME="mail.properties.xml";
 
 	/**@return The application locale used by default if a new session cannot determine the users's preferred locale.*/
 //TODO del	public Locale getDefaultLocale();
@@ -101,6 +105,21 @@ public interface GuiseApplication extends PropertyBindable
 	@see #ENVIRONMENT_PROPERTY
 	*/
 	public void setEnvironment(final Environment newEnvironment);
+
+	/**Retrieves the current mail session.
+	@return This application's mail session.
+	@exception IllegalStateException if the application has not yet been installed into a container.
+	@exception IllegalStateException if mail has not been configured for this application.
+	*/
+	public Session getMailSession();
+
+	/**Retrieves the queue used to send mail.
+	Mail added to this queue will be sent use the application's configured mail protocols.
+	@return The queue used for to send mail.
+	@exception IllegalStateException if the application has not yet been installed into a container.
+	@exception IllegalStateException if mail has not been configured for this application.
+	*/
+	public Queue<Message> getMailSendQueue();
 
 	/**@return Whether the application applies themes.*/
 	public boolean isThemed();
@@ -470,5 +489,16 @@ public interface GuiseApplication extends PropertyBindable
 	@throws IOException if there is an error loading the theme or one of its parents.
 	*/
 	public Theme loadTheme(final URI themeURI) throws IOException;
+
+	/**Loads properties from a file in the home directory.
+	The properties can be stored in XML or in the traditional properties format.
+	@param propertiesPath The path to the properties file, relative to the application home directory.
+	@return The properties loaded from the file at the given path.
+	@exception NullPointerException if the given properties path is <code>null</code>.
+	@exception IllegalArgumentException if the type of properties file is not recognized.
+	@exception IOException if there is an error loading the properties.
+	@see #getHomeDirectory()
+	*/
+	public Properties loadProperties(final String propertiesPath) throws IOException;
 
 }

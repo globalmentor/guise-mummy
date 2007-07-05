@@ -4,9 +4,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import com.garretwilson.itu.TelephoneNumber;
-
 import static com.garretwilson.lang.ObjectUtilities.*;
+import com.garretwilson.net.EmailAddress;
+import com.garretwilson.itu.TelephoneNumber;
 
 /**An abstract implementation an object that can convert a value from and to a string.
 @param <V> The value type this converter supports.
@@ -33,6 +33,7 @@ public abstract class AbstractStringLiteralConverter<V> extends AbstractConverte
 		<li><code>java.lang.Boolean</code></li>
 		<li><code>java.util.Calendar</code></li>
 		<li><code>java.util.Date</code></li>
+		<li>{@link EmailAddress}</li>
 		<li><code>java.lang.Float</code></li>
 		<li><code>java.lang.Integer</code></li>
 		<li><code>java.lang.Long</code></li>
@@ -66,6 +67,10 @@ public abstract class AbstractStringLiteralConverter<V> extends AbstractConverte
 		else if(Date.class.equals(valueClass))	//Date
 		{
 			return (Converter<VV, String>)new DateStringLiteralConverter(DateStringLiteralStyle.FULL, TimeStringLiteralStyle.FULL);
+		}
+		else if(EmailAddress.class.equals(valueClass))	//EmailAddress
+		{
+			return (Converter<VV, String>)new EmailAddressStringLiteralConverter();
 		}
 		else if(Float.class.equals(valueClass))	//Float
 		{

@@ -135,6 +135,7 @@
 		<resource:theme.label.delete.x>&#x0098;theme.label.delete&#x009C; {0}</resource:theme.label.delete.x>
 		<resource:theme.label.download>Download</resource:theme.label.download>
 		<resource:theme.label.edit>Edit</resource:theme.label.edit>
+		<resource:theme.label.email>Email</resource:theme.label.email>
 		<resource:theme.label.finish>Finish</resource:theme.label.finish>
 		<resource:theme.label.first>First</resource:theme.label.first>
 		<resource:theme.label.help>Help</resource:theme.label.help>
@@ -159,6 +160,7 @@
 		<resource:theme.label.unknown>Unknown</resource:theme.label.unknown>
 		<resource:theme.label.upload>Upload</resource:theme.label.upload>
 		<resource:theme.label.username>Username</resource:theme.label.username>
+		<resource:theme.label.verify>Verify</resource:theme.label.verify>
 		<resource:theme.label.version>Version</resource:theme.label.version>
 		<resource:theme.label.view>View</resource:theme.label.view>
 
@@ -183,6 +185,7 @@
 		<resource:theme.glyph.document.stack rdf:resource="images/icons/glyphs/document_stack.gif"/>
 		<resource:theme.glyph.download rdf:resource="images/icons/glyphs/download.gif"/>
 		<resource:theme.glyph.edit rdf:resource="images/icons/glyphs/edit.gif"/>
+		<resource:theme.glyph.email rdf:resource="images/icons/glyphs/email.gif"/>
 		<resource:theme.glyph.enter rdf:resource="images/icons/glyphs/enter.gif"/>
 		<resource:theme.glyph.error rdf:resource="resource:theme.glyph.stop"/>
 		<resource:theme.glyph.exit rdf:resource="images/icons/glyphs/exit.gif"/>
@@ -241,6 +244,7 @@
 		<resource:theme.glyph.unselected rdf:resource="resource:theme.glyph.blank"/>
 		<resource:theme.glyph.upload rdf:resource="images/icons/glyphs/upload.gif"/>
 		<resource:theme.glyph.user rdf:resource="images/icons/glyphs/user.gif"/>
+		<resource:theme.glyph.verify rdf:resource="resource:theme.glyph.question"/>
 		<resource:theme.glyph.view rdf:resource="resource:theme.glyph.eyeglasses"/>
 		<resource:theme.glyph.warn rdf:resource="resource:theme.glyph.exclamation"/>
 
