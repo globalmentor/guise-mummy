@@ -3,7 +3,6 @@ package com.guiseframework.platform.web;
 import java.io.*;
 import java.net.URI;
 import java.util.*;
-import static java.util.Collections.*;
 
 import javax.mail.internet.ContentType;
 import javax.xml.parsers.*;
@@ -42,8 +41,8 @@ public class WebTextDepictor<C extends Text> extends AbstractSimpleWebComponentD
 		"</body>"+
 		"</html>";
 
-	/**A synchronized cache of softly-referenced XML documents keyed to hashes of the strings with which the documents are associated.*/
-	private final static Map<Integer, CachedDocument> cachedDocumentMap=synchronizedMap(new SoftValueHashMap<Integer, CachedDocument>());
+	/**A thread-safe cache of softly-referenced XML documents keyed to hashes of the strings with which the documents are associated.*/
+	private final static Map<Integer, CachedDocument> cachedDocumentMap=new DecoratorReadWriteLockMap<Integer, CachedDocument>(new PurgeOnWriteSoftValueHashMap<Integer, CachedDocument>());
 
 	/**Default constructor using the XHTML <code>&lt;div&gt;</code> element.*/
 	public WebTextDepictor()

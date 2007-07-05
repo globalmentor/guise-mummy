@@ -1161,8 +1161,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		return resourceBundle;	//return the end of the resource bundle chain
 	}
 
-	/**A synchronized cache of softly-referenced resource maps keyed to resource bundle URIs.*/
-	private final static Map<URI, Map<String, Object>> cachedResourceMapMap=synchronizedMap(new SoftValueHashMap<URI, Map<String, Object>>());
+	/**A thread-safe cache of softly-referenced resource maps keyed to resource bundle URIs.*/
+	private final static Map<URI, Map<String, Object>> cachedResourceMapMap=new DecoratorReadWriteLockMap<URI, Map<String,Object>>(new PurgeOnWriteSoftValueHashMap<URI, Map<String,Object>>());
 
 	/**Loads a resource bundle from the given URI.
 	@param resourceBundleURI The URI of the resource bundle to load.

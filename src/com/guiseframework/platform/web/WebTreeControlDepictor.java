@@ -3,20 +3,14 @@ package com.guiseframework.platform.web;
 import java.io.IOException;
 import java.net.URI;
 import java.util.*;
-import static java.util.Collections.*;
 
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
-
-import com.garretwilson.util.SynchronizedMapDecorator;
-import com.garretwilson.util.WeakValueHashMap;
+import com.garretwilson.util.*;
 
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;
-import com.guiseframework.platform.DepictEvent;
-import com.guiseframework.platform.DepictContext;
-import com.guiseframework.platform.PlatformEvent;
-
+import com.guiseframework.platform.*;
 import static com.guiseframework.platform.web.GuiseCSSStyleConstants.*;
 
 /**Strategy for rendering a tree component as an XHTML <code>&lt;div&gt;</code> element.
@@ -44,11 +38,11 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 		};
 */
 
-	/**The synchronized weak value map of tree nodes associated with IDs.*/
-	private final Map<Long, TreeNodeModel<?>> idTreeNodeMap;
+	/**The read/write lock weak value map of tree nodes associated with IDs.*/
+	private final ReadWriteLockMap<Long, TreeNodeModel<?>> idTreeNodeMap;
 
-	/**The synchronized weak key map of IDs associated with tree nodes, synchronized on {@link #idTreeNodeMap}.*/
-	private final Map<TreeNodeModel<?>, Long> treeNodeIDMap;
+	/**The read/write lock weak key map of IDs associated with tree nodes, using {@link #idTreeNodeMap} as the read/write lock.*/
+	private final ReadWriteLockMap<TreeNodeModel<?>, Long> treeNodeIDMap;
 
 	/**Determines the ID of the given tree node in this view. If the tree node has no ID assigned, one will be generated.
 	@param treeNode The tree node for which an ID should be returned.
@@ -56,17 +50,26 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 	*/
 	public long getTreeNodeID(final TreeNodeModel<?> treeNode)
 	{
-		synchronized(idTreeNodeMap)	//synchronize on both maps
+		Long treeNodeID=treeNodeIDMap.get(treeNode);	//get the ID for the tree node
+		if(treeNodeID==null)	//if there is yet no ID assigned to the tree node
 		{
-			Long treeNodeID=treeNodeIDMap.get(treeNode);	//get the ID for the tree node
-			if(treeNodeID==null)	//if there is yet no ID assigned to the tree node
+			treeNodeIDMap.writeLock().lock();	//get a write lock to the maps
+			try
 			{
-				treeNodeID=Long.valueOf(getPlatform().generateDepictID());	//generate an ID for this tree node
-				idTreeNodeMap.put(treeNodeID, treeNode);	//associate the tree node with this ID
-				treeNodeIDMap.put(treeNode, treeNodeID);	//associate the ID with the tree node
+				treeNodeID=treeNodeIDMap.get(treeNode);	//check again for the ID for the tree node, now that we have a write lock
+				if(treeNodeID==null)	//if there still no ID assigned to the tree node
+				{
+					treeNodeID=Long.valueOf(getPlatform().generateDepictID());	//generate an ID for this tree node
+					idTreeNodeMap.put(treeNodeID, treeNode);	//associate the tree node with this ID
+					treeNodeIDMap.put(treeNode, treeNodeID);	//associate the ID with the tree node
+				}
 			}
-			return treeNodeID.longValue();	//return the tree node ID
+			finally
+			{
+				treeNodeIDMap.writeLock().unlock();	//always release the write lock to the maps
+			}
 		}		
+		return treeNodeID.longValue();	//return the tree node ID
 	}
 
 	/**Determines the tree node associated with the given ID.
@@ -75,20 +78,16 @@ public class WebTreeControlDepictor<C extends TreeControl> extends AbstractDecor
 	*/
 	public TreeNodeModel<?> getTreeNode(final long treeNodeID)
 	{
-		synchronized(idTreeNodeMap)	//synchronize on both maps
-		{
-			return idTreeNodeMap.get(Long.valueOf(treeNodeID));	//see if there is a tree node associated with this ID
-		}		
+		return idTreeNodeMap.get(Long.valueOf(treeNodeID));	//see if there is a tree node associated with this ID
 	}
 	
 	/**Default constructor using the XHTML <code>&lt;div&gt;</code> element.*/
 	public WebTreeControlDepictor()
 	{
 		super(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//represent <xhtml:div>
-				//TODO fix; the weak value maps have problems; make sure we're using IDs the way we want to
-		idTreeNodeMap=synchronizedMap(new WeakValueHashMap<Long, TreeNodeModel<?>>());	//create the tree node map
-			//create an ID map synchronized on the tree node map
-		treeNodeIDMap=new SynchronizedMapDecorator<TreeNodeModel<?>, Long>(new WeakHashMap<TreeNodeModel<?>, Long>(), idTreeNodeMap);
+		idTreeNodeMap=new DecoratorReadWriteLockMap<Long, TreeNodeModel<?>>(new PurgeOnWriteWeakValueHashMap<Long, TreeNodeModel<?>>());	//create the tree node map
+			//create an ID map using the tree node map as the read/write lock
+		treeNodeIDMap=new DecoratorReadWriteLockMap<TreeNodeModel<?>, Long>(new WeakHashMap<TreeNodeModel<?>, Long>(), idTreeNodeMap);	//TODO switch to a safer implementation of a weak hash map, which has problems
 	}
 
 	/**Called when the view is installed in a component.
