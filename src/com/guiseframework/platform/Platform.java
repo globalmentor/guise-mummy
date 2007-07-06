@@ -1,8 +1,10 @@
 package com.guiseframework.platform;
 
+import java.net.URI;
 import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 
+import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseApplication;
 
 /**The platform on which Guise objects are being depicted.
@@ -64,4 +66,31 @@ public interface Platform
 	*/
 	public DepictContext getDepictContext();
 
+	/**Sends a resource to the platform.
+	@param resourcePath The path of the resource to send, relative to the application.
+	@exception NullPointerException if the given path is <code>null</code>.
+	@exception IllegalArgumentException if the given string is not a path.
+	*/
+	public void sendResource(final String resourcePath);
+
+	/**Sends a resource to the platform.
+	@param resourceURI The URI of the resource to send, relative to the application.
+	@exception NullPointerException if the given URI is <code>null</code>.
+	*/
+	public void sendResource(final URI resourceURI);
+
+	/**Sends a resource to the platform with the specified bookmark.
+	@param resourcePath The path of the resource to send, relative to the application.
+	@param bookmark The bookmark at the given path, or <code>null</code> if there is no bookmark.
+	@exception NullPointerException if the given path is <code>null</code>.
+	@exception IllegalArgumentException if the given string is not a path.
+	*/
+	public void sendResource(final String resourcePath, final Bookmark bookmark);
+
+	/**Sends a resource to the platform.
+	@param resourceURI The URI of the resource to send, relative to the application.
+	@param bookmark The bookmark at the given path, or <code>null</code> if there is no bookmark.
+	@exception NullPointerException if the given URI is <code>null</code>.
+	*/
+	public void sendResource(final URI resourceURI, final Bookmark bookmark);
 }

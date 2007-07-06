@@ -145,6 +145,9 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	The value will be the serialize version of a {@link ContentDispositionType} value.
 	*/
 	public static String CONTENT_DISPOSITION_URI_QUERY_PARAMETER="content-disposition";
+
+	/**The ID of the viewport to use for sending resources.*/
+	public static String SEND_RESOURCE_VIEWPORT_ID="guiseDownload";
 	
 	/**The Guise container that owns the applications.*/
 	private HTTPServletGuiseContainer guiseContainer=null;
@@ -1021,6 +1024,19 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 			Debug.trace("affected component:", affectedComponent);
 		}
 		*/
+							//send the resource if needed
+					final URI sendResourceURI=guisePlatform.getSendResourceURI();	//see if there is a resource to send back
+					if(sendResourceURI!=null)	//if there is a resource to send back
+					{
+						depictContext.writeElementBegin(null, "navigate");	//<navigate>	//TODO use a constant
+						depictContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
+						depictContext.writeAttribute(null, "viewportID", SEND_RESOURCE_VIEWPORT_ID);	//specify the viewport ID for sending resources
+							//append the "content-disposition=attachment" query parameter to the URI
+						final URI sendResourceAttachmentURI=appendQueryParameters(sendResourceURI, new NameValuePair<String, String>(CONTENT_DISPOSITION_URI_QUERY_PARAMETER, getSerializationName(ContentDispositionType.ATTACHMENT)));
+						depictContext.write(sendResourceAttachmentURI.toString());	//write the URI of the resource to send
+						depictContext.writeElementEnd(null, "navigate");	//</navigate>
+						guisePlatform.clearSendResourceURI();	//clear the address of the resource to send so that we won't send it again
+					}
 					final Bookmark newBookmark=guiseSession.getBookmark();	//see if the bookmark has changed
 //TODO del Debug.trace("navigation bookmark:", navigationBookmark, "new bookmark", newBookmark);
 					final Navigation requestedNavigation=guiseSession.getRequestedNavigation();	//get the requested navigation
@@ -1046,7 +1062,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						{
 							if(isAJAX)	//if this is an AJAX request
 							{
-								depictContext.clearDepictText();	//clear all the response data (which at this point should only be navigation information, anyway)
+								depictContext.clearDepictText();	//clear all the response data (which at this point should only be navigation information, anyway) TODO improve; this will discard any resources to send
 								depictContext.writeElementBegin(null, "navigate");	//<navigate>	//TODO use a constant
 								depictContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
 								if(requestedNavigation!=null)	//if navigation was requested (i.e. this isn't just a bookmark registration)

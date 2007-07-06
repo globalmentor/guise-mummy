@@ -1315,7 +1315,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public void navigate(final String path, final Bookmark bookmark, final String viewportID)
 		{
-			final String navigationPath=bookmark!=null ? path+bookmark.toString() : path;	//append the bookmark if needed
+			final String navigationPath=bookmark!=null ? path+bookmark.toString() : path;	//append the bookmark if needed TODO improve; we may not allow a query in createPathURI at some point
 			navigate(createPathURI(navigationPath), viewportID);	//navigate to the requested URI, converting the path to a URI and verifying that it is only a path
 		}
 

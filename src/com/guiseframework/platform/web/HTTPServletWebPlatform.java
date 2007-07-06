@@ -1,5 +1,6 @@
 package com.guiseframework.platform.web;
 
+import java.net.URI;
 import java.util.*;
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
@@ -13,9 +14,11 @@ import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 import static com.garretwilson.servlet.http.HttpServletConstants.*;
 
+import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.audio.Audio;
 import com.guiseframework.component.*;
+import com.guiseframework.event.ModalNavigationListener;
 import com.guiseframework.platform.*;
 
 /**A web platform based upon an HTTP servlet.
@@ -151,4 +154,56 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 		return depictContext;	//return the depict context
 	}
 
+	/**The URI of the resource to sent to the platform, or <code>null</code> if there is no resource to be sent.*/
+	private URI sendResourceURI=null;
+
+		/**@return The URI of the resource to sent to the platform, or <code>null</code> if there is no resource to be sent.*/
+		URI getSendResourceURI() {return sendResourceURI;}
+
+		/**Clears the record of the resource to be sent.*/
+		void clearSendResourceURI() {sendResourceURI=null;}
+
+	/**Sends a resource to the platform.
+	@param resourcePath The path of the resource to send, relative to the application.
+	@exception NullPointerException if the given path is <code>null</code>.
+	@exception IllegalArgumentException if the given string is not a path.
+	*/
+	public void sendResource(final String resourcePath)
+	{
+		sendResource(resourcePath, null);	//send the resource with no bookmark
+	}
+
+	/**Sends a resource to the platform.
+	@param resourceURI The URI of the resource to send, relative to the application.
+	@exception NullPointerException if the given URI is <code>null</code>.
+	*/
+	public void sendResource(final URI resourceURI)
+	{
+		sendResource(resourceURI, null);	//send the resource with no bookmark
+	}
+
+	/**Sends a resource to the platform with the specified bookmark.
+	@param resourcePath The path of the resource to send, relative to the application.
+	@param bookmark The bookmark at the given path, or <code>null</code> if there is no bookmark.
+	@exception NullPointerException if the given path is <code>null</code>.
+	@exception IllegalArgumentException if the given string is not a path.
+	*/
+	public void sendResource(final String resourcePath, final Bookmark bookmark)
+	{
+		sendResource(createPathURI(resourcePath), bookmark);	//send the requested URI, converting the path to a URI and verifying that it is only a path
+	}
+
+	/**Sends a resource to the platform.
+	@param resourceURI The URI of the resource to send, relative to the application.
+	@param bookmark The bookmark at the given path, or <code>null</code> if there is no bookmark.
+	@exception NullPointerException if the given URI is <code>null</code>.
+	*/
+	public void sendResource(final URI resourceURI, final Bookmark bookmark)
+	{
+		sendResourceURI=getApplication().resolveURI(checkInstance(resourceURI, "Resource URI cannot be null."));	//resolve the URI and save the resource
+		if(bookmark!=null)	//if a bookmark was provided
+		{
+			sendResourceURI=URI.create(sendResourceURI.toString()+bookmark.toString());	//append the bookmark query
+		}
+	}
 }
