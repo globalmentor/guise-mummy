@@ -8,6 +8,7 @@ import java.net.*;
 import java.security.Principal;
 import java.text.DateFormat;
 import java.util.*;
+
 import static java.util.Collections.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -56,6 +57,7 @@ import com.garretwilson.net.http.*;
 import com.garretwilson.net.mime.ContentDispositionType;
 
 import static com.garretwilson.net.http.HTTPConstants.*;
+import static com.garretwilson.net.http.HTTPFormatter.formatList;
 
 import static com.garretwilson.servlet.ServletConstants.*;
 import static com.garretwilson.servlet.http.HttpServletConstants.*;
@@ -1363,9 +1365,6 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 		{
 //Debug.trace("ready to serve destination resource", request.getRequestURI(), "with query", request.getQueryString());
 			final DestinationResource destinationResource=(DestinationResource)resource;	//get the desetination resource
-			
-				//TODO fix Firefox phenomenon that for some reason doesn't re-request certain resources as attachments and instead loads them from the cache---the ones that seem to be small enough not to have been resized by Marmox
-			
 				//check for a content-disposition indication
 			final String queryString=request.getQueryString();	//get the query string from the request
 			if(queryString!=null && queryString.length()>0)	//if there is a query string (Tomcat 5.5.16 returns an empty string for no query, even though the Java Servlet specification 2.4 says that it should return null; this is fixed in Tomcat 6)
@@ -1376,6 +1375,16 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 					if(CONTENT_DISPOSITION_URI_QUERY_PARAMETER.equals(parameter.getName()))	//if this is a content-disposition parameter
 					{
 						final ContentDispositionType contentDispositionType=getSerializedEnum(ContentDispositionType.class, parameter.getValue());	//get the content disposition type
+						if(contentDispositionType==ContentDispositionType.ATTACHMENT)	//if the content should be sent back as an attachment
+						{
+								//try to turn off caching; if caching is not turned off, Firefox on subsequent requests to the same URL will not send a request to the server
+								//but if caching is turned on for IE, the browser will try to download the HTML page instead; this seems to still happen on IE 7.0.5730.11; see http://support.microsoft.com/kb/279667
+							final Map<String, Object> userAgentProperties=getUserAgentProperties(request);	//get the user agent properties for this request
+							if(!USER_AGENT_NAME_MSIE.equals(userAgentProperties.get(USER_AGENT_NAME_PROPERTY)))	//if this is not IE, set Cache-Control: no-cache
+							{
+								setNoCache(request, response);	//turn off caching for downloads
+							}
+						}
 						final URI referenceURI=destinationResource.getResourceDescription().getReferenceURI();	//get the reference URI of the description, if any
 //Debug.trace("setting content disposition, reference URI", referenceURI);
 						setContentDisposition(response, contentDispositionType, referenceURI!=null ? getFileName(referenceURI) : null);	//set the response content disposition, suggesting the resource's filename if we can
@@ -1386,7 +1395,6 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 			final String description=descriptionRDFObject instanceof RDFLiteral ? ((RDFLiteral)descriptionRDFObject).getLexicalForm() : null;	//get the description string, if any
 			if(description!=null)	//if this resource provides a description
 			{
-Debug.trace("setting description", description);
 				setContentDescription(response, description);	//resport the description back to the client				
 			}
 		}
