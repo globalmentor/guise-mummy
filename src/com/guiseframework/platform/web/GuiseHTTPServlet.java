@@ -53,6 +53,7 @@ import com.garretwilson.net.ResourceNotFoundException;
 import com.garretwilson.net.URIConstants;
 import com.garretwilson.net.URIUtilities;
 import com.garretwilson.net.http.*;
+import com.garretwilson.net.mime.ContentDispositionType;
 
 import static com.garretwilson.net.http.HTTPConstants.*;
 
@@ -72,6 +73,7 @@ import com.garretwilson.text.xml.XMLUtilities;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
 import com.garretwilson.rdf.*;
+import com.garretwilson.rdf.dublincore.DCUtilities;
 import com.garretwilson.rdf.maqro.Activity;
 import com.garretwilson.rdf.maqro.MAQROUtilities;
 import com.garretwilson.rdf.ploop.PLOOPProcessor;
@@ -116,6 +118,8 @@ import static com.guiseframework.platform.web.WebPlatform.*;
 /**The servlet that controls a Guise web applications. 
 Each Guise session's platform will be locked during normal web page generation context will be active at one one time.
 This implementation only works with Guise applications that descend from {@link AbstractGuiseApplication}.
+<p>For all {@link ResourceReadDestination}s, this servlet recognizes a query parameter named {@value #CONTENT_DISPOSITION_URI_QUERY_PARAMETER}
+specifying the content disposition of the content to return; the value is the serialize version of a {@link ContentDispositionType} value.</p>
 @author Garret Wilson
 */
 public class GuiseHTTPServlet extends DefaultHTTPServlet
@@ -135,6 +139,11 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	/**The content type of a Guise AJAX response, <code>application/x-guise-ajax-response</code>.*/
 	public final static ContentType GUISE_AJAX_RESPONSE_CONTENT_TYPE=new ContentType(ContentTypeConstants.APPLICATION, ContentTypeConstants.EXTENSION_PREFIX+"guise-ajax-response"+ContentTypeConstants.SUBTYPE_SUFFIX_DELIMITER_CHAR+ContentTypeConstants.XML_SUBTYPE_SUFFIX, null);
 
+	/**The URI query parameter indicating that the content disposition of the content of a {@link ResourceReadDestination}.
+	The value will be the serialize version of a {@link ContentDispositionType} value.
+	*/
+	public static String CONTENT_DISPOSITION_URI_QUERY_PARAMETER="content-disposition";
+	
 	/**The Guise container that owns the applications.*/
 	private HTTPServletGuiseContainer guiseContainer=null;
 
@@ -1334,6 +1343,54 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 				}
 			}
 		}		
+	}
+
+	/**Serves a resource that has been verified to exist
+  This version sets the content description and content disposition of {@link ResourceReadDestination}.
+	If there is a query parameter named {@value #CONTENT_DISPOSITION_URI_QUERY_PARAMETER}, the value will indicate the content disposition
+	through the use of the serialize version of a {@link ContentDispositionType} value.</p>  @param request The HTTP request.
+  @param response The HTTP response.
+	@param resource The resource being served.
+  @param serveContent <code>true</code> if the contents of the resource should be returned.
+  @exception IllegalArgumentException if the content disposition parameter, if any, is unrecognized.
+  @exception ServletException if there is a problem servicing the request.
+  @exception IOException if there is an error reading or writing data.
+  @see #CONTENT_DISPOSITION_URI_QUERY_PARAMETER
+  */
+	protected void serveResource(final HttpServletRequest request, final HttpServletResponse response, final HTTPServletResource resource, final boolean serveContent) throws ServletException, IOException
+	{
+		if(resource instanceof DestinationResource)	//if the resource is a destination we're reading from
+		{
+//Debug.trace("ready to serve destination resource", request.getRequestURI(), "with query", request.getQueryString());
+			final DestinationResource destinationResource=(DestinationResource)resource;	//get the desetination resource
+			
+				//TODO fix Firefox phenomenon that for some reason doesn't re-request certain resources as attachments and instead loads them from the cache---the ones that seem to be small enough not to have been resized by Marmox
+			
+				//check for a content-disposition indication
+			final String queryString=request.getQueryString();	//get the query string from the request
+			if(queryString!=null && queryString.length()>0)	//if there is a query string (Tomcat 5.5.16 returns an empty string for no query, even though the Java Servlet specification 2.4 says that it should return null; this is fixed in Tomcat 6)
+			{
+				final NameValuePair<String, String>[] parameters=URIUtilities.getParameters(queryString);	//get the parameters from the query
+				for(final NameValuePair<String, String> parameter:parameters)	//look at each parameter
+				{
+					if(CONTENT_DISPOSITION_URI_QUERY_PARAMETER.equals(parameter.getName()))	//if this is a content-disposition parameter
+					{
+						final ContentDispositionType contentDispositionType=getSerializedEnum(ContentDispositionType.class, parameter.getValue());	//get the content disposition type
+						final URI referenceURI=destinationResource.getResourceDescription().getReferenceURI();	//get the reference URI of the description, if any
+//Debug.trace("setting content disposition, reference URI", referenceURI);
+						setContentDisposition(response, contentDispositionType, referenceURI!=null ? getFileName(referenceURI) : null);	//set the response content disposition, suggesting the resource's filename if we can
+					}
+				}
+			}
+			final RDFObject descriptionRDFObject=DCUtilities.getDescription(destinationResource.getResourceDescription());	//get the dc:description
+			final String description=descriptionRDFObject instanceof RDFLiteral ? ((RDFLiteral)descriptionRDFObject).getLexicalForm() : null;	//get the description string, if any
+			if(description!=null)	//if this resource provides a description
+			{
+Debug.trace("setting description", description);
+				setContentDescription(response, description);	//resport the description back to the client				
+			}
+		}
+		super.serveResource(request, response, resource, serveContent);	//serve the resource normally
 	}
 
 	/**Retrieves all descendant components, including the given component, that have a given depict name.
