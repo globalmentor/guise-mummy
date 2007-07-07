@@ -63,11 +63,11 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 	}
 
 	/**Stores a child component state for the given object.
-	The component's properties will be initialized immediately, as the component state is likely to be generated dynamically during component view update.
+	The component's theme will be updated immediately, as the component state is likely to be generated dynamically during component view update.
 	@param object The object with which the component state is associated.
 	@param componentState The child component state to represent the given object, or <code>null</code> if there is no component for the given object.
 	@return The child component that previously represented the given tree node, or <code>null</code> if there was previously no component for the given object.
-	@see Component#initializeProperties()
+	@see Component#updateTheme()
 	*/
 	protected S putComponentState(final T object, final S componentState)
 	{
@@ -80,7 +80,7 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 		addComponent(component);	//put the new component in the component set
 		try
 		{
-			component.initializeProperties();	//initialize the component properties
+			component.updateTheme();	//make sure the theme is applied to the compnent
 		}
 		catch(final IOException ioException)	//if there is a problem initializing the properties
 		{

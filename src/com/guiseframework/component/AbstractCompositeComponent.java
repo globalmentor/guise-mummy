@@ -4,9 +4,8 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 
 import com.garretwilson.beans.*;
-import com.garretwilson.util.Debug;
-
 import static com.garretwilson.lang.ObjectUtilities.*;
+import com.garretwilson.util.Debug;
 
 import com.guiseframework.event.*;
 import com.guiseframework.input.*;
@@ -81,12 +80,14 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	}
 
 	/**Adds a child component.
-	This version installs a listener for the component's valid status.
 	Any class that overrides this method must call this version.
 	The return value from this version has no significance.
+	This version installs a listener for the component's valid status.
+	This version loads the preferences of the child component, but not its descendants, before the child is added.
 	@param component The component to add to this component.
 	@return <code>true</code> if the child components changed as a result of the operation.
 	@exception IllegalArgumentException if the component already has a parent.
+	@see Component#loadPreferences()
 	*/
 	protected boolean addComponent(final Component component)
 	{
@@ -94,14 +95,13 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 		{
 			throw new IllegalArgumentException("Component "+component+" is already a member of a composite component, "+component.getParent()+".");
 		}
-		
 		try
 		{
-			component.loadPreferences();	//TODO fix; testing			
+			component.loadPreferences(false);	//load preferences for the child component only
 		}
-		catch(final IOException ioException)
+		catch(final IOException ioException)	//if there was an error loading preferences
 		{
-			throw new AssertionError(ioException);
+			Debug.warn(ioException);	//log a warning			
 		}
 		component.addPropertyChangeListener(DISPLAYED_PROPERTY, getDisplayVisibleChangeListener());	//listen for changes in the component's displayed status and update this component's valid status in response
 		component.addPropertyChangeListener(VALID_PROPERTY, getValidChangeListener());	//listen for changes in the component's valid status and update this component's valid status in response
@@ -111,14 +111,14 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	}
 
 	/**Removes a child component.
-	This version uninstalls a listener for the component's valid status.
-	This version unupdates the component's properties, saving any preferences.
 	Any class that overrides this method must call this version.
 	The return value from this version has no sigificance
+	This version uninstalls a listener for the component's valid status.
+	This version saves any preferences of the child component and any descendants before the child is removed.
 	@param component The component to remove from this component.
 	@return <code>true</code> if the child components changed as a result of the operation.
 	@exception IllegalArgumentException if the component is not a member of this composite component.
-	@see #unupdateProperties()
+	@see Component#savePreferences()
 	*/
 	protected boolean removeComponent(final Component component)
 	{
@@ -126,7 +126,14 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 		{
 			throw new IllegalArgumentException("Component "+component+" is not member of composite component "+this+".");
 		}
-		component.unupdateProperties();	//ununpdate the component properties, saving any preferences
+		try
+		{
+			savePreferences(true);	//save preferences for the entire component tree
+		}
+		catch(final IOException ioException)	//if there was an error saving preferences
+		{
+			Debug.warn(ioException);	//log a warning			
+		}
 		component.removePropertyChangeListener(DISPLAYED_PROPERTY, getDisplayVisibleChangeListener());	//stop listening for changes in the component's displayed status
 		component.removePropertyChangeListener(VALID_PROPERTY, getValidChangeListener());	//stop listening for changes in the component's valid status
 		component.removePropertyChangeListener(VISIBLE_PROPERTY, getDisplayVisibleChangeListener());	//stop listening for changes in the component's visible status
@@ -238,43 +245,60 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 		return getComponentByName(this, name);	//search the component hierarchy for a component with the given name
 	}
 
-	/**Update's this object's properties.
-	This method checks whether properties have been updated for this object.
-	If this object's properties have not been updated, this method calls {@link #initializeProperties()}.
-	This method is called for any child components before initializing the properties of the component itself,
-	to assure that child property updates have already occured before property updates occur for this component.
+	/**Update's this object's theme.
+	This method checks whether a theme has been applied to this object.
+	If a theme has not been applied to this object this method calls {@link #applyTheme()}.
+	This method is called for any child components before initializing applying the theme to the component itself,
+	to assure that child theme updates have already occured before theme updates occur for this component.
 	There is normally no need to override this method or to call this method directly by applications.
-	This version recursively calls the {@link #updateProperties()} method of all child components before updating properties of this component.
-	@exception IOException if there was an error loading or setting properties.
-	@see #isPropertiesInitialized()
-	@see #initializeProperties()
+	This version recursively calls the {@link #updateTheme()} method of all child components before updating the theme of this component.
+	@exception IOException if there was an error loading or applying a theme.
+	@see #isThemeApplied()
+	@see #applyTheme()
 	*/
-	public void updateProperties() throws IOException
+	public void updateTheme() throws IOException
 	{
 		for(final Component childComponent:getChildren())	//for each child component
 		{
-			childComponent.updateProperties();	//tell the child component to update its properties
+			childComponent.updateTheme();	//tell the child component to update its theme
 		}
-		super.updateProperties();	//update the properties for this component
+		super.updateTheme();	//update the theme for this component normally
+	}
+	
+	/**Loads the preferences for this component and optionally any descendant components.
+	Any preferences returned from {@link #getPreferenceProperties()} will be loaded automatically.
+	This version loads the preferences of child components if descendants should be included.
+	@param includeDescendants <code>true</code> if preferences of any descendant components should also be loaded, else <code>false</code>.
+	@exception IOException if there is an error loading preferences.
+	*/
+	public void loadPreferences(final boolean includeDescendants) throws IOException
+	{
+		if(includeDescendants)	//if descendants should be included
+		{
+			for(final Component childComponent:getChildren())	//for each child component
+			{
+				childComponent.loadPreferences(includeDescendants);	//tell the child component to load its preferences
+			}			
+		}
+		super.loadPreferences(includeDescendants);	//load preferences normally
 	}
 
-	/**Saves this object's preferences and marks the properties as having not been initialized.
-	This method checks whether properties have been updated for this object.
-	If this object's properties have been updated, this method calls {@link #uninitializeProperties()}.
-	This method is called for any child components before initializing the properties of the component itself,
-	to assure that child property updates have already occured before property updates occur for this component.
-	There is normally no need to override this method or to call this method directly by applications.
-	This version recursively calls the {@link #unupdateProperties()} method of all child components before unupdating properties of this component.
-	@see #isPropertiesInitialized()
-	@see #uninitializeProperties()
+	/**Saves the preferences for this component and optionally any descendant components.
+	Any preferences returned from {@link #getPreferenceProperties()} will be saved automatically.
+	This version loads the preferences of child components if descendants should be included.
+	@param includeDescendants <code>true</code> if preferences of any descendant components should also be saved, else <code>false</code>.
+	@exception IOException if there is an error saving preferences.
 	*/
-	public void unupdateProperties()
+	public void savePreferences(final boolean includeDescendants) throws IOException
 	{
-		for(final Component childComponent:getChildren())	//for each child component
+		super.savePreferences(includeDescendants);	//save preferences normally
+		if(includeDescendants)	//if descendants should be included
 		{
-			childComponent.unupdateProperties();	//tell the child component to unupdate its properties
+			for(final Component childComponent:getChildren())	//for each child component
+			{
+				childComponent.savePreferences(includeDescendants);	//tell the child component to save its preferences
+			}			
 		}
-		super.unupdateProperties();	//unupdate the properties for this component
 	}
 
 	/**Dispatches an input event to this component and all child components, if any.

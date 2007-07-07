@@ -1146,7 +1146,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 							if(frame!=guiseSession.getApplicationFrame())	//don't send back the application frame
 							{
 	//							TODO fix							else	//if the component is not visible, remove the component's elements
-								frame.updateProperties();	//make sure the frame's properties have been updated
+								frame.updateTheme();	//make sure a theme has been applied to this frame
 								frame.depict();		//tell the component to update its view
 							}
 						}
@@ -1192,7 +1192,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 							{
 		//TODO fix							if(dirtyComponent.isVisible())	//if the component is visible
 		//TODO fix							else	//if the component is not visible, remove the component's elements
-								dirtyComponent.updateProperties();	//make sure the component's properties have been updated
+								dirtyComponent.updateTheme();	//make sure a theme has been applied to this component
 								dirtyComponent.depict();		//tell the component to update its view
 							}
 							depictContext.writeElementEnd(XHTML_NAMESPACE_URI, "patch");	//</xhtml:patch>
@@ -1226,7 +1226,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 				}
 				else	//if this is not an AJAX request
 				{
-					applicationFrame.updateProperties();	//make sure the application frame's properties have been updated for the entire hierarchy
+					applicationFrame.updateTheme();	//make sure a theme has been applied to the application frame
 					applicationFrame.depict();		//tell the application frame to update its view						
 				}
 			}

@@ -5,8 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.*;
 
 import javax.mail.internet.ContentType;
 
@@ -23,8 +22,7 @@ import com.guiseframework.component.layout.*;
 import com.guiseframework.component.transfer.*;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.*;
-import com.guiseframework.input.Input;
-import com.guiseframework.input.InputStrategy;
+import com.guiseframework.input.*;
 import com.guiseframework.model.*;
 import com.guiseframework.model.ui.AbstractPresentationModel;
 import com.guiseframework.platform.*;
@@ -55,30 +53,30 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 
 		/**Adds a property to be saved and loaded as a preference.
 		@param propertyName The property to store as a preference.
-		@see #loadPreferences()
-		@see #savePreferences()
+		@see #loadPreferences(boolean)
+		@see #savePreferences(boolean)
 		*/
 		public void addPreferenceProperty(final String propertyName) {preferenceProperties.add(propertyName);}
 
 		/**Determines whether the given property is saved and loaded as a preference.
 		@param propertyName The property to determine if it is stored as a preference.
 		@return <code>true</code> if the given property is saved and loaded as a preference.
-		@see #loadPreferences()
-		@see #savePreferences()
+		@see #loadPreferences(boolean)
+		@see #savePreferences(boolean)
 		*/
 		public boolean isPreferenceProperty(final String propertyName) {return preferenceProperties.contains(propertyName);}
 
 		/**Returns all properties stored as preferences.
 		@return An iterable of all properties saved and loaded as preferences.
-		@see #loadPreferences()
-		@see #savePreferences()
+		@see #loadPreferences(boolean)
+		@see #savePreferences(boolean)
 		*/
 		public Iterable<String> getPreferenceProperties() {return preferenceProperties;}
 
 		/**Removes a property from being saved and loaded as preferences.
 		@param propertyName The property that should no longer be stored as a preference.
-		@see #loadPreferences()
-		@see #savePreferences()
+		@see #loadPreferences(boolean)
+		@see #savePreferences(boolean)
 		*/
 		public void removePreferenceProperty(final String propertyName) {preferenceProperties.remove(propertyName);}
 
@@ -698,24 +696,24 @@ Debug.trace("now valid of", this, "is", isValid());
 				}			
 			}
 
-	/**Whether the properties of this component have been initialized.*/
-	private boolean propertiesInitialized=false;
+	/**Whether a theme has been applied to this component.*/
+	private boolean themeApplied=false;
 
-		/**@return Whether the properties of this component have been initialized.*/
-		public boolean isPropertiesInitialized() {return propertiesInitialized;}
+		/**@return Whether a theme has been applied to this component.*/
+		public boolean isThemeApplied() {return themeApplied;}
 
-		/**Sets whether the properties of this component have been initialized.
+		/**Sets whether a theme has been applied to this component.
 		This is a bound property of type {@link Boolean}.
-		@param newPropertiesInitialized <code>true</code> if the properties of this component have been initialized, else <code>false</code>.
-		@see #PROPERTIES_INITIALIZED_PROPERTY
+		@param newThemeApplied <code>true</code> if a theme has been applied to this component, else <code>false</code>.
+		@see #THEME_APPLIED_PROPERTY
 		*/
-		public void setPropertiesInitialized(final boolean newPropertiesInitialized)
+		public void setThemeApplied(final boolean newThemeApplied)
 		{
-			if(propertiesInitialized!=newPropertiesInitialized)	//if the value is really changing
+			if(themeApplied!=newThemeApplied)	//if the value is really changing
 			{
-				final boolean oldPropertiesInitialized=propertiesInitialized;	//get the current value
-				propertiesInitialized=newPropertiesInitialized;	//update the value
-				firePropertyChange(PROPERTIES_INITIALIZED_PROPERTY, Boolean.valueOf(oldPropertiesInitialized), Boolean.valueOf(newPropertiesInitialized));
+				final boolean oldThemeApplied=themeApplied;	//get the current value
+				themeApplied=newThemeApplied;	//update the value
+				firePropertyChange(THEME_APPLIED_PROPERTY, Boolean.valueOf(oldThemeApplied), Boolean.valueOf(newThemeApplied));
 			}
 		}
 
@@ -1013,97 +1011,60 @@ Debug.trace("now valid of", this, "is", isValid());
 		}
 	}
 
-	/**Update's this object's properties.
-	This method checks whether properties have been updated for this object.
-	If this object's properties have not been updated, this method calls {@link #initializeProperties()}.
-	This method is called for any child components before initializing the properties of the component itself,
-	to assure that child property updates have already occured before property updates occur for this component.
+	
+	/**Update's this object's theme.
+	This method checks whether a theme has been applied to this object.
+	If a theme has not been applied to this object this method calls {@link #applyTheme()}.
+	This method is called for any child components before initializing applying the theme to the component itself,
+	to assure that child theme updates have already occured before theme updates occur for this component.
 	There is normally no need to override this method or to call this method directly by applications.
-	@exception IOException if there was an error loading or setting properties.
-	@see #isPropertiesInitialized()
-	@see #initializeProperties()
+	@exception IOException if there was an error loading or applying a theme.
+	@see #isThemeApplied()
+	@see #applyTheme()
 	*/
-	public void updateProperties() throws IOException
+	public void updateTheme() throws IOException
 	{
-		if(!isPropertiesInitialized())	//if this component's properties have not been initialized
+		if(!isThemeApplied())	//if a theme has not been applied to this component
 		{
-			initializeProperties();	//initialize this component's properties
+			applyTheme();	//apply the theme to this component
 		}		
 	}
 
-	/**Saves this object's preferences and marks the properties as having not been initialized.
-	This method checks whether properties have been updated for this object.
-	If this object's properties have been updated, this method calls {@link #uninitializeProperties()}.
-	This method is called for any child components before initializing the properties of the component itself,
-	to assure that child property updates have already occured before property updates occur for this component.
-	There is normally no need to override this method or to call this method directly by applications.
-	@see #isPropertiesInitialized()
-	@see #uninitializeProperties()
-	*/
-	public void unupdateProperties()
-	{
-		if(isPropertiesInitialized())	//if this component's properties have been initialized
-		{
-			uninitializeProperties();	//uninitialize this component's properties
-		}		
-	}
-
-	/**Initializes the properties of this component.
-	This includes loading and applying the current theme as well as loading any preferences.
+	/**Applies the theme to this objectd.
 	Themes are only applied of the application is themed.
-	This method may be overridden to effectively override theme settings and preference loading by ensuring the state of important properties after the default operations have occurred. 
-	If properties are successfully updated, this method updates the properties initialized status.
-	@exception IOException if there was an error loading or setting properties.
+	This method may be overridden to effectively override theme settings by ensuring the state of important properties after the theme has been set. 
+	If the theme is successfully applied, this method updates the theme applied status.
+	@exception IOException if there was an error loading or applying a theme.
 	@see GuiseApplication#isThemed()
 	@see #applyTheme(Theme)
-	@see #loadPreferences()
-	@see #setPropertiesInitialized(boolean)
+	@see #setThemeApplied(boolean)
 	*/
-	public void initializeProperties() throws IOException
+	public void applyTheme() throws IOException
 	{
 		if(getSession().getApplication().isThemed())	//if the application applies themes
 		{
 			applyTheme(getSession().getTheme());	//get the theme and apply it
-//TODO fix; move to abstract component			loadPreferences();	//load preferences
-			setPropertiesInitialized(true);	//indicate that the properties were successfully initialized
+			setThemeApplied(true);	//indicate that the theme was successfully applied
 		}
 	}
 
-	/**Uninitializes the properties of this component.
-	This includes saving any preferences.
-	@see #savePreferences()
-	@see #setPropertiesInitialized(boolean)
-	*/
-	public void uninitializeProperties()
-	{
-		try
-		{
-			savePreferences();	//save preferences
-		}
-		catch(final IOException ioException)	//if there was an error saving preferences
-		{
-			Debug.warn(ioException);	//log a warning			
-		}
-		setPropertiesInitialized(false);	//indicate that the properties were successfully uninitialized		
-	}
-
-	/**Applies a theme and its parents to this component.
-	The theme's rules will be applied to this component and any related objects.
+	/**Applies a theme and its parents to this object.
+	The theme's rules will be applied to this object and any related objects.
 	Theme application occurs unconditionally, regardless of whether themes have been applied to this component before.
-	This method may be overridden to effectively override theme settings by ensuring state of important properties after theme application. 
 	There is normally no need to call this method directly by applications.
-	@param theme The theme to apply to the component.
+	@param theme The theme to apply to the object.
 	*/
 	public void applyTheme(final Theme theme)
 	{
 		theme.apply(this);	//apply the theme to this component
 	}
 
-	/**Loads the preferences for this component.
+	/**Loads the preferences for this component and optionally any descendant components.
 	Any preferences returned from {@link #getPreferenceProperties()} will be loaded automatically.
+	@param includeDescendants <code>true</code> if preferences of any descendant components should also be loaded, else <code>false</code>.
 	@exception IOException if there is an error loading preferences.
 	*/
-	public void loadPreferences() throws IOException
+	public void loadPreferences(final boolean includeDescendants) throws IOException
 	{
 		final Iterator<String> preferencePropertyIterator=getPreferenceProperties().iterator();	//get an iterator to all preferences properties
 		if(preferencePropertyIterator.hasNext())	//if there are preference properties
@@ -1128,11 +1089,12 @@ Debug.trace("now valid of", this, "is", isValid());
 		}
 	}
 
-	/**Saves the preferences for this component.
+	/**Saves the preferences for this component and optionally any descendant components.
 	Any preferences returned from {@link #getPreferenceProperties()} will be saved automatically.
+	@param includeDescendants <code>true</code> if preferences of any descendant components should also be saved, else <code>false</code>.
 	@exception IOException if there is an error saving preferences.
 	*/
-	public void savePreferences() throws IOException
+	public void savePreferences(final boolean includeDescendants) throws IOException
 	{
 		final Iterator<String> preferencePropertyIterator=getPreferenceProperties().iterator();	//get an iterator to all preferences properties
 		if(preferencePropertyIterator.hasNext())	//if there are preference properties

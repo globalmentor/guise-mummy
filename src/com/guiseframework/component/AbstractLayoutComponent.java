@@ -83,7 +83,7 @@ public abstract class AbstractLayoutComponent extends AbstractListCompositeCompo
 
 		/**Sets the layout definition for the component.
 		This is a bound property.
-		The layout is specified as not yet having a theme applied, as the specific theme rules applied to the layout may depend on the layout's owner.
+		The layout is marked as not yet having a theme applied, as the specific theme rules applied to the layout may depend on the layout's owner.
 		@param newLayout The new layout definition for the container.
 		@exception NullPointerException if the given layout is <code>null</code>.
 		@see #LAYOUT_PROPERTY
@@ -101,29 +101,30 @@ public abstract class AbstractLayoutComponent extends AbstractListCompositeCompo
 				{
 					newLayout.getConstraints(childComponent);	//make sure the constraints of all components are compatible with the layout TODO do we even need to do this? why not wait until later? but this may be OK---perhaps we can assume that if components are installed before the layout, they will be used with this layout and not another
 				}
-				setLayoutPropertiesInitialized(false);	//indicate that the properties haven't yet been initiaqlized for this layout, as the specific rules applied may depend on the layout's owner
+				setLayoutThemeApplied(false);	//indicate that a theme haven't yet been set for this layout, as the specific rules applied may depend on the layout's owner
 				firePropertyChange(LAYOUT_PROPERTY, oldLayout, newLayout);	//indicate that the value changed
 			}			
 		}
 
-	/**Whether the properties of this component's layout have been initialized.*/
-	private boolean layoutPropertiesInitialized=false;
+	/**Whether a theme has been applied to this component's layout.*/
+	private boolean layoutThemeApplied=false;
 
-		/**@return Whether the properties of this component's layout have been initialized.*/
-		public boolean isLayoutPropertiesInitialized() {return layoutPropertiesInitialized;}
+		/**@return Whether a theme has been applied to this component's layout.*/
+		public boolean isLayoutThemeApplied() {return layoutThemeApplied;}
 
-		/**Sets whether the properties of this component's layout have been initialized.
+		/**Sets whether a theme has been applied to this component's layout.
 		This is a bound property of type {@link Boolean}.
-		@param newLayoutPropertiesInitialized <code>true</code> if the properties of this component's layout have been initialized, else <code>false</code>.
-		@see #LAYOUT_PROPERTIES_INITIALIZED_PROPERTY
+		@param newLayoutThemeApplied <code>true</code> if a theme has been applied to this component's layout, else <code>false</code>.
+		@see #LAYOUT_THEME_APPLIED_PROPERTY
+		@see #setThemeApplied(boolean)
 		*/
-		public void setLayoutPropertiesInitialized(final boolean newLayoutPropertiesInitialized)
+		public void setLayoutThemeApplied(final boolean newLayoutThemeApplied)
 		{
-			if(layoutPropertiesInitialized!=newLayoutPropertiesInitialized)	//if the value is really changing
+			if(layoutThemeApplied!=newLayoutThemeApplied)	//if the value is really changing
 			{
-				final boolean oldLayoutPropertiesInitialized=layoutPropertiesInitialized;	//get the current value
-				layoutPropertiesInitialized=newLayoutPropertiesInitialized;	//update the value
-				firePropertyChange(LAYOUT_PROPERTIES_INITIALIZED_PROPERTY, Boolean.valueOf(oldLayoutPropertiesInitialized), Boolean.valueOf(newLayoutPropertiesInitialized));
+				final boolean oldLayoutThemeApplied=layoutThemeApplied;	//get the current value
+				layoutThemeApplied=newLayoutThemeApplied;	//update the value
+				firePropertyChange(LAYOUT_THEME_APPLIED_PROPERTY, Boolean.valueOf(oldLayoutThemeApplied), Boolean.valueOf(newLayoutThemeApplied));
 			}
 		}
 
@@ -148,56 +149,55 @@ public abstract class AbstractLayoutComponent extends AbstractListCompositeCompo
 		layout.setOwner(this);	//tell the layout which container owns it
 	}
 
-	/**Update's this object's properties.
-	This method checks whether properties have been updated for this object.
-	If this object's properties have not been updated, this method calls {@link #initializeProperties()}.
-	This method is called for any child components before initializing the properties of the component itself,
-	to assure that child property updates have already occured before property updates occur for this component.
+	/**Update's this object's theme.
+	This method checks whether a theme has been applied to this object.
+	If a theme has not been applied to this object this method calls {@link #applyTheme()}.
+	This method is called for any child components before initializing applying the theme to the component itself,
+	to assure that child theme updates have already occured before theme updates occur for this component.
 	There is normally no need to override this method or to call this method directly by applications.
 	This version checks to see if the theme needs to be applied to the given layout.
-	@exception IOException if there was an error loading or setting properties.
-	@see #isPropertiesInitialized()
-	@see #isLayoutPropertiesInitialized()
-	@see #initializeProperties()
+	@exception IOException if there was an error loading or applying a theme.
+	@see #isThemeApplied()
+	@see #isLayoutThemeApplied()
+	@see #applyTheme()
 	*/
-	public void updateProperties() throws IOException
+	public void updateTheme() throws IOException
 	{
-		super.updateProperties();	//update the properties normally
-		if(!isLayoutPropertiesInitialized())	//if the layout properties haven't yet been initialized (which also means that our version of initializeProperties() hasn't been called, or it would have updated the layout theme applied status) 
+		super.updateTheme();	//update the theme
+		if(!isLayoutThemeApplied())	//if the theme haven't yet been applied to the layout (which also means that our version of applyTheme() hasn't been called, or it would have updated the layout theme applied status) 
 		{
-			initializeProperties();	//initialize this component's properties
+			applyTheme();	//apply the theme to this component
 		}		
 	}
 
-	/**Initializes the properties of this component.
-	This includes loading and applying the current theme as well as loading any preferences.
+	/**Applies the theme to this objectd.
 	Themes are only applied of the application is themed.
-	This method may be overridden to effectively override theme settings and preference loading by ensuring the state of important properties after the default operations have occurred. 
-	If properties are successfully updated, this method updates the properties initialized status.
-	This version initializes the properties of the current layout and updates the layout properties initialized status.
-	@exception IOException if there was an error loading or setting properties.
+	This method may be overridden to effectively override theme settings by ensuring the state of important properties after the theme has been set. 
+	If the theme is successfully applied, this method updates the theme applied status.
+	This version applies the theme to the current layout and updates the layout theme applied status.
+	@exception IOException if there was an error loading or applying a theme.
 	@see GuiseApplication#isThemed()
 	@see #applyTheme(Theme)
-	@see #setPropertiesInitialized(boolean)
-	@see #setLayoutPropertiesInitialized(boolean)
+	@see #setThemeApplied(boolean)
+	@see #setLayoutThemeApplied(boolean)
 	*/
-	public void initializeProperties() throws IOException
+	public void applyTheme() throws IOException
 	{
-		super.initializeProperties();	//apply properties to this component normally
-		setLayoutPropertiesInitialized(true);	//indicate that we've applied the theme to the layout as well
+		super.applyTheme();	//apply the theme to this component normally
+		setLayoutThemeApplied(true);	//indicate that we've applied the theme to the layout as well
 	}
 
-	/**Applies a theme and its parents to this component.
-	The theme's rules will be applied to this component and any related objects.
+	/**Applies a theme and its parents to this object.
+	The theme's rules will be applied to this object and any related objects.
 	Theme application occurs unconditionally, regardless of whether themes have been applied to this component before.
-	This method may be overridden to effectively override theme settings by ensuring state of important properties after theme application. 
 	There is normally no need to call this method directly by applications.
 	This version applies the theme to the current layout.
-	@param theme The theme to apply to the component.
+	@param theme The theme to apply to the object.
 	*/
 	public void applyTheme(final Theme theme)
 	{
 		super.applyTheme(theme);	//apply the theme to this component normally
 		theme.apply(getLayout());	//apply the theme to the currently installed layout
 	}
+
 }
