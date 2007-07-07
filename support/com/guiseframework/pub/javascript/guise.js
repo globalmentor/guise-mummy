@@ -1037,7 +1037,7 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 //			alert("received command "+command+" for object "+objectID+" with audioURI "+parameters["audioURI"]);
 			switch(command)	//see which command this is
 			{
-				case "audio-start":
+				case "audio-play":
 					var audioURI=parameters["audioURI"];	//get the audio URI
 					var sound=soundManager.sounds[objectID];	//get the existing sound
 					if(sound)	//if the sound is already defined
@@ -1067,6 +1067,55 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 				case "audio-position":
 					var position=parameters["position"];	//get the requested position
 					soundManager.setPosition(objectID, position);	//request the new sound position
+					break;
+				case "resource-collect-receive":
+					var element=document.getElementById(objectID);	//get the component element
+					if(element)	//if the component element currently exists in the document
+					{
+						var childNodeList=element.childNodes;	//get all the child nodes
+						for(var i=childNodeList.length-1; i>=0; --i)	//for each child node, going backwards
+						{
+							var childNode=childNodeList[i];	//get a reference to this child node
+							if(childNode.nodeType==Node.ELEMENT_NODE && childNode.nodeName.toLowerCase()=="input" && childNode.type=="file")	//if this is a file input element
+							{
+								childNode.disabled=true;	//don't allow the file input to be modifed during transfer
+								break;	//only disable the last file input
+							}
+						}
+						var destinationURI=parameters["destionationURI"];	//get the destination URI
+						var form=Node.getAncestorElementByName(element, "form");	//get the form ancestor
+						this.createUploadIFrame();	//create the upload IFrame
+						form.enctype="multipart/form-data";
+						if(isUserAgentIE)	//if we're in IE6/7
+						{
+							form.encoding="multipart/form-data";	//IE requires the "encoding" property to be used; see http://verens.com/archives/2005/07/06/ie-bugs-dynamically-creating-form-elements/					
+						}					
+						form.action=destinationURI;	//indicate where the data should go
+						form.target="uploadIFrame";	//indicate that the output should be re-routed to our hidden IFrame
+						form.submit();	//submit the form
+						this.setPollInterval(GUISE_AJAX_UPLOAD_POLL_INTERVAL);	//switch to polling at the upload interval
+					}
+					break;
+				case "resource-collect-cancel":
+					var element=document.getElementById(objectID);	//get the component element
+					if(element)	//if the component element currently exists in the document
+					{
+						this.setPollInterval(GUISE_AJAX_POLL_INTERVAL);	//go back to polling at the normal interval
+//TODO fix						this._uploadIFrame.src=GUISE_PUBLIC_RESOURCE_BASE_PATH+"documents/empty.html";	//set the source of the upload IFrame to an empty HTML document to cancel the upload; see http://www.missiondata.com/blog/java/28/file-upload-progress-with-ajax-and-java-and-prototype/feed/
+//TODO fix; this doesn't work						this._uploadIFrame.src="";	//TODO testing
+						this.removeUploadIFrame();	//remove the upload IFrame
+						this._resetUploadControl(element);	//reset the upload control, which seems to make Firefox stop the upload TODO test on production to see if it cancels
+						window.location.reload();	//reload the page, which seems to make IE stop the upload TODO test on production to see if it cancels
+					}
+					break;
+				case "resource-collect-complete":
+					var element=document.getElementById(objectID);	//get the component element
+					if(element)	//if the component element currently exists in the document
+					{
+						this.setPollInterval(GUISE_AJAX_POLL_INTERVAL);	//go back to polling at the normal interval
+						this.removeUploadIFrame();	//remove the upload IFrame
+						this._resetUploadControl(element);	//reset the upload control
+					}
 					break;
 			}
 		};
@@ -1229,64 +1278,6 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 */
 		};
 
-		/**Invokes a command for a particular element.
-		@param element The element to which the command relates.
-		@param command The command to invoke.
-		*/ 
-		proto._invokeCommand=function(element, command)
-		{
-			if(/sendResources\((.+)\)/.test(command))	//if the command is sendResources(uri)
-			{
-				var childNodeList=element.childNodes;	//get all the child nodes
-				for(var i=childNodeList.length-1; i>=0; --i)	//for each child node, going backwards
-				{
-					var childNode=childNodeList[i];	//get a reference to this child node
-					if(childNode.nodeType==Node.ELEMENT_NODE && childNode.nodeName.toLowerCase()=="input" && childNode.type=="file")	//if this is a file input element
-					{
-						childNode.disabled=true;	//don't allow the file input to be modifed during transfer
-						break;	//only disable the last file input
-					}
-				}
-				var destination=RegExp.$1;	//get the destination
-				var form=Node.getAncestorElementByName(element, "form");	//get the form ancestor
-				this.createUploadIFrame();	//create the upload IFrame
-				form.enctype="multipart/form-data";
-				if(isUserAgentIE)	//if we're in IE6/7
-				{
-					form.encoding="multipart/form-data";	//IE requires the "encoding" property to be used; see http://verens.com/archives/2005/07/06/ie-bugs-dynamically-creating-form-elements/					
-				}					
-				form.action=destination;	//indicate where the data should go
-				form.target="uploadIFrame";	//indicate that the output should be re-routed to our hidden IFrame
-				form.submit();	//submit the form
-				this.setPollInterval(GUISE_AJAX_UPLOAD_POLL_INTERVAL);	//switch to polling at the upload interval
-			}
-			else if(/sendCompleted\(\)/.test(command))	//if the command is sendCompleted()
-			{
-				this.setPollInterval(GUISE_AJAX_POLL_INTERVAL);	//go back to polling at the normal interval
-				this.removeUploadIFrame();	//remove the upload IFrame
-				var childNodeList=element.childNodes;	//get all the child nodes
-				var lastFileInput=null;	//we'll keep track of the last file input we find
-				for(var i=childNodeList.length-1; i>=0; --i)	//for each child node, going backwards (especially important as we well be removing child nodes)
-				{
-					var childNode=childNodeList[i];	//get a reference to this child node
-					if(childNode.nodeType==Node.ELEMENT_NODE && childNode.nodeName.toLowerCase()=="input" && childNode.type=="file")	//if this is a file input element
-					{
-						if(lastFileInput==null)	//if we haven't yet found the last file input
-						{
-							lastFileInput=childNode;	//keep track of the last file input
-						}
-						else	//if we've already found the last file input
-						{
-							this._uninitializeNode(childNode, true);	//uninitialize this file input
-							element.removeChild(childNode);	//remove this file element from the document
-						}
-						childNode.disabled=true;	//don't allow the file input to be modifed during transfer
-						break;	//only disable the last file input
-					}
-				}
-			}
-		};
-
 		/**The set of attribute names that should not be removed when synchronizing.*/
 		proto.NON_REMOVABLE_ATTRIBUTE_SET=
 		{
@@ -1361,15 +1352,6 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 				return;	//don't do synchronization patching
 			}
 */
-
-			var newElementCommands=Element.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "commands");	//get the new element's commands, if any TODO use a constant
-			if(newElementCommands)	//TODO fix; testing
-			{
-//TODO del				alert("commands: "+newElementCommands);
-				this._invokeCommand(oldElement, newElementCommands);	//invoke the command TODO parse the commands first
-//TODO del if not needed				return;	//don't do further syncrhonization TODO later add options for full synchronization or not
-			}
-
 			var patchType=Element.getAttributeNS(element, GUISE_ML_NAMESPACE_URI, "patchType");	//get the patch type TODO use a constant
 			if(patchType=="none")	//if we should not do any patching
 			{
@@ -2642,6 +2624,33 @@ if(elementName=="select")
 					for(var i=0; i<childNodeCount; ++i)	//for each child node
 					{
 						this._uninitializeNode(childNodeList[i], deep);	//initialize this child subtree
+					}
+				}
+			}
+		};
+
+		/**Resets an upload control after completion or cancellation of a resource transfer.
+		All the file upload elements except the last will be removed, and the last one will be re-enabled.
+		@param element The element representing the resource collect control.
+		*/
+		proto._resetUploadControl=function(element)
+		{
+			var childNodeList=element.childNodes;	//get all the child nodes
+			var lastFileInput=null;	//we'll keep track of the last file input we find
+			for(var i=childNodeList.length-1; i>=0; --i)	//for each child node, going backwards (especially important as we well be removing child nodes)
+			{
+				var childNode=childNodeList[i];	//get a reference to this child node
+				if(childNode.nodeType==Node.ELEMENT_NODE && childNode.nodeName.toLowerCase()=="input" && childNode.type=="file")	//if this is a file input element
+				{
+					if(lastFileInput==null)	//if we haven't yet found the last file input
+					{
+						lastFileInput=childNode;	//keep track of the last file input
+						childNode.disabled=false;	//re-enable the last file input
+					}
+					else	//if we've already found the last file input
+					{
+						this._uninitializeNode(childNode, true);	//uninitialize this file input
+						element.removeChild(childNode);	//remove this file element from the document
 					}
 				}
 			}

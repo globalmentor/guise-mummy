@@ -1,11 +1,14 @@
 package com.guiseframework.platform.web;
 
+import java.beans.PropertyChangeEvent;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Map;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 import com.garretwilson.util.Debug;
+import com.garretwilson.util.NameValuePair;
 
 import com.guiseframework.Bookmark;
 import com.guiseframework.component.*;
@@ -17,14 +20,55 @@ import static com.guiseframework.platform.web.WebPlatform.*;
 @param <C> The type of component being depicted.
 @author Garret Wilson
 */
-public class WebResourceCollectDepictor<C extends ResourceCollectControl> extends AbstractDecoratedWebComponentDepictor<C>
+public class WebResourceCollectDepictor<C extends ResourceCollectControl> extends AbstractDecoratedWebComponentDepictor<C> implements ResourceCollectControl.Depictor<C>
 {
+
+	/**The web commands for controlling a resource collect control.*/
+	public enum ResourceCollectCommand implements WebCommand
+	{
+		/**The command to start receiving resources.*/
+		RESOURCE_COLLECT_RECEIVE,
+
+		/**The command to complete receiving resources.*/
+		RESOURCE_COLLECT_COMPLETE,
+
+		/**The command to cancel a resource transfer.*/
+		RESOURCE_COLLECT_CANCEL;
+	}
+
+	/**The property for specifying the destination URI of the resources to receive.*/
+	public final static String DESTINATION_URI_PROPERTY="destionationURI";
 
 	/**Default constructor using the XHTML <code>&lt;input&gt;</code> element.*/
 	public WebResourceCollectDepictor()
 	{
 		super(XHTML_NAMESPACE_URI, ELEMENT_INPUT, true);	//represent <xhtml:input>, allowing an empty element if possible
 		getIgnoredProperties().add(ResourceCollectControl.RESOURCE_PATHS_PROPERTY);	//TODO fix; temporary for development
+	}
+	
+	/**Requests that resource collection start.
+	@param destinationURI The URI representing the destination of the collected resources, relative to the application.
+	@param destinationBookmark The bookmark to be used in receiving the resources at the destination path, or <code>null</code> if no bookmark should be used.
+	@exception NullPointerException if the given destination URI is <code>null</code>.
+	*/
+	public void receive(URI destinationURI, final Bookmark destinationBookmark)
+	{
+		URI receiveResourceURI=getSession().getApplication().resolveURI(checkInstance(destinationURI, "Destination URI cannot be null."));	//resolve the URI
+		if(destinationBookmark!=null)	//if a bookmark was provided
+		{
+			receiveResourceURI=URI.create(receiveResourceURI.toString()+destinationBookmark.toString());	//append the bookmark query
+		}
+		getPlatform().getSendEventQueue().add(new WebCommandEvent<ResourceCollectCommand>(getDepictedObject(), ResourceCollectCommand.RESOURCE_COLLECT_RECEIVE,
+				new NameValuePair<String, Object>(DESTINATION_URI_PROPERTY, receiveResourceURI)));	//send a command for the control to start receiving		
+	}	
+
+	/**Requests that resource collection be canceled.*/
+	public void cancel()
+	{
+		final C control=getDepictedObject();	//get the resource collect control
+		getPlatform().getSendEventQueue().add(new WebCommandEvent<ResourceCollectCommand>(getDepictedObject(), ResourceCollectCommand.RESOURCE_COLLECT_CANCEL));	//send a resource collect cancel command to the platform
+		control.setState(TaskState.CANCELED);	//tell the control that the transfer has been cancelled
+		control.clearResourcePaths();	//clear all the resource paths
 	}
 
 	/**Processes an event from the platform.
@@ -65,12 +109,28 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 				component.fireProgressed(webProgressEvent.getTask(), taskState, webProgressEvent.getProgress(), webProgressEvent.getGoal());	//tell the control that progress has been made
 				if(webProgressEvent.getTask()==null)	//if this is a progress indication for the entire transfer
 				{
-					component.setSendState(taskState);	//update the control with the new state
+					component.setState(taskState);	//update the control with the new state
 				}
 			}
 		}
 		super.processEvent(event);	//do the default event processing
 	}	
+
+	/**Called when a depicted object bound property is changed.
+	This implementation marks the property as being modified if the property is not an ignored property.
+	@param propertyChangeEvent An event object describing the event source and the property that has changed.
+	*/ 
+	protected void depictedObjectPropertyChange(final PropertyChangeEvent propertyChangeEvent)
+	{
+		super.depictedObjectPropertyChange(propertyChangeEvent);	//do the default processing
+		final C control=getDepictedObject();	//get the control
+		if(control==propertyChangeEvent.getSource()	//if our control's property changed
+				&& ResourceCollectControl.STATE_PROPERTY.equals(propertyChangeEvent.getPropertyName())	//if the state property changed
+				&& TaskState.COMPLETE==propertyChangeEvent.getNewValue())	//if the control completed a transfer
+		{
+			getPlatform().getSendEventQueue().add(new WebCommandEvent<ResourceCollectCommand>(getDepictedObject(), ResourceCollectCommand.RESOURCE_COLLECT_COMPLETE));	//send a resource collect complete command to the platform
+		}
+	}
 
 	/**Writes the beginning part of the outer decorator element.
 	This version write additional patching attributes.
@@ -81,25 +141,6 @@ public class WebResourceCollectDepictor<C extends ResourceCollectControl> extend
 		final WebDepictContext depictContext=getDepictContext();	//get the depict context
 		final C component=getDepictedObject();	//get the component
 		depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, "patchType", "none");	//guise:patchType="none" never patch this component TODO use constants
-		final TaskState sendState=component.getSendState();	//see which send state the component is in
-Debug.trace("updating resource collect control; current send state is", sendState);
-		if(sendState!=null)	//if there is a send state
-		{
-			switch(sendState)	//see which send state the component is in
-			{
-				case INITIALIZE:	//if the component is preparing to send
-					final String destinationPath=component.getDestinationPath();	//get the destination path
-					assert destinationPath!=null : "Destination path not expected to be null when component is sending information.";
-					final String resolvedPath=component.getSession().getApplication().resolvePath(destinationPath);	//resolve the path
-					final Bookmark bookmark=component.getDestinationBookmark();	//get the bookmark to be used
-					final String sendPath=bookmark!=null ? resolvedPath+bookmark.toString() : resolvedPath;	//append the bookmark if needed
-					depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_COMMANDS, "sendResources("+sendPath+")");	//guise:command="sendResources(destinationPath)" TODO use a constant for the command
-					break;
-				case COMPLETE:	//if the component has finished sending
-					depictContext.writeAttribute(GUISE_ML_NAMESPACE_URI, ATTRIBUTE_COMMANDS, "sendCompleted()");	//guise:command="complete()" TODO use a constant for the command
-					break;
-			}
-		}
 		super.writeDecoratorBegin();	//write the default decorator beginning
 	}
 

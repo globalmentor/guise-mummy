@@ -6,6 +6,7 @@ import com.garretwilson.beans.GenericPropertyChangeListener;
 import static com.garretwilson.lang.ClassUtilities.*;
 
 import com.guiseframework.component.effect.Effect;
+import com.guiseframework.prototype.ActionPrototype;
 
 /**A root-level component such as a window or an HTML page.
 The frame's contents are specified using {@link #setContent(Component)}.
@@ -134,6 +135,9 @@ public interface Frame extends ContentComponent, ModalComponent<Frame.Mode>, Inp
 	@see #OPEN_EFFECT_PROPERTY 
 	*/
 	public void setOpenEffect(final Effect newOpenEffect);
+
+	/**@return The action prototype for closing the frame.*/
+	public ActionPrototype getCloseActionPrototype();
 
 	/**@return The action control for closing the frame, or <code>null</code> if this frame does not have a close action control.*/
 	public ActionControl getCloseActionControl();

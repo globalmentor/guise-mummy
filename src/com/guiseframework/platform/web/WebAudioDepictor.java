@@ -30,7 +30,7 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 	public enum AudioCommand implements WebCommand
 	{
 		/**The command to start the audio.*/
-		AUDIO_START,
+		AUDIO_PLAY,
 
 		/**The command to pause the audio.*/
 		AUDIO_PAUSE,
@@ -49,27 +49,28 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 
 	/**Requests that the audio start.*/
 	@SuppressWarnings("unchecked")
-	public void start()
+	public void play()
 	{
 		final Audio audio=getDepictedObject();	//get the audio depicted object
 		final URI audioURI=audio.getAudioURI();	//get the audio URI
 		if(audioURI!=null)	//if there is an audio URI
 		{
 			final URI resolvedAudioURI=getDepictedObject().getSession().resolveURI(audioURI);	//resolve the audio URI
-			getPlatform().getSendEventQueue().offer(new WebCommandEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_START, new NameValuePair<String, Object>(AUDIO_URI_PROPERTY, resolvedAudioURI)));	//send an audio start command to the platform
+			getPlatform().getSendEventQueue().add(new WebCommandEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_PLAY,
+					new NameValuePair<String, Object>(AUDIO_URI_PROPERTY, resolvedAudioURI)));	//send an audio start command to the platform
 		}
 	}
 
 	/**Requests that the audio pause.*/
 	public void pause()
 	{
-		getPlatform().getSendEventQueue().offer(new WebCommandEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_PAUSE));	//send an audio pause command to the platform
+		getPlatform().getSendEventQueue().add(new WebCommandEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_PAUSE));	//send an audio pause command to the platform
 	}
 
 	/**Requests that the audio stop.*/
 	public void stop()
 	{
-		getPlatform().getSendEventQueue().offer(new WebCommandEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_STOP));	//send an audio stop command to the platform
+		getPlatform().getSendEventQueue().add(new WebCommandEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_STOP));	//send an audio stop command to the platform
 	}
 
 	/**Requests a new time-based play position.
@@ -83,7 +84,8 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 		{
 			throw new IllegalArgumentException("Time position cannot be negative: "+newTimePosition);
 		}
-		getPlatform().getSendEventQueue().offer(new WebCommandEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_POSITION, new NameValuePair<String, Object>(POSITION_PROPERTY, Long.valueOf(newTimePosition/1000))));	//send an audio positoin command to the platform, converting the time to milliseconds
+		getPlatform().getSendEventQueue().add(new WebCommandEvent<AudioCommand>(getDepictedObject(), AudioCommand.AUDIO_POSITION,
+				new NameValuePair<String, Object>(POSITION_PROPERTY, Long.valueOf(newTimePosition/1000))));	//send an audio position command to the platform, converting the time to milliseconds
 	}
 
 	/**Processes an event from the platform.

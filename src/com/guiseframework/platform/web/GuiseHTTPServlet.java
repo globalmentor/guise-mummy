@@ -632,75 +632,78 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 								
 								final String fieldName=fileItemStream.getFieldName();	//get the field name for this item
 								final Component progressComponent=AbstractComponent.getComponentByID(guiseSession.getApplicationFrame(), guisePlatform.getDepictID(fieldName));	//get the related component that will want to know progress
-								if(!progressComponents.contains(progressComponent))	//if this is the first transfer for this component
+								if(progressComponent!=null)	//if there is a progress component TODO do we want to abandon everything altogether, or transfer without progress? we must do something with null values---this was first triggered by a page reload after server restart
 								{
-									progressComponents.add(progressComponent);	//add this progress component to our set of progress components so we can send finish events to them later
-//Debug.trace("sending progress with no task for starting");
-									synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
+									if(!progressComponents.contains(progressComponent))	//if this is the first transfer for this component
 									{
-										progressComponent.processEvent(new WebProgressEvent(progressComponent, null, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting for all transfers
+										progressComponents.add(progressComponent);	//add this progress component to our set of progress components so we can send finish events to them later
+	//Debug.trace("sending progress with no task for starting");
+										synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
+										{
+											progressComponent.processEvent(new WebProgressEvent(progressComponent, null, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting for all transfers
+										}
 									}
-								}
-								final RDFResource resourceDescription=new DefaultRDFResource();	//create a new resource description
-								final String itemContentType=fileItemStream.getContentType();	//get the item content type, if any
-								if(itemContentType!=null)	//if we know the item's content type
-								{
-									setContentType(resourceDescription, createContentType(itemContentType));	//set the resource's content type
-								}
-								final String name=getFilename(itemName);	//removing any extraneous path information a browser such as IE or Opera might have given
-								setName(resourceDescription, name);	//specify the name provided to us 
-								
-								try
-								{
-									final InputStream inputStream=new BufferedInputStream(fileItemStream.openStream());	//get an input stream to the item
+									final RDFResource resourceDescription=new DefaultRDFResource();	//create a new resource description
+									final String itemContentType=fileItemStream.getContentType();	//get the item content type, if any
+									if(itemContentType!=null)	//if we know the item's content type
+									{
+										setContentType(resourceDescription, createContentType(itemContentType));	//set the resource's content type
+									}
+									final String name=getFilename(itemName);	//removing any extraneous path information a browser such as IE or Opera might have given
+									setName(resourceDescription, name);	//specify the name provided to us 
+									
 									try
 									{
-										final ProgressListener progressListener=new ProgressListener()	//listen for progress
-										{
-											public void progressed(ProgressEvent progressEvent)	//when progress has been made
-											{
-//Debug.trace("delta: ", progressEvent.getDelta(), "progress:", progressEvent.getValue());
-												synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
-												{
-													progressComponent.processEvent(new WebProgressEvent(progressComponent, name, TaskState.INCOMPLETE, progressEvent.getValue()));	//indicate to the component that progress is starting for this file
-												}
-											}
-										};
-										final ProgressOutputStream progressOutputStream=new ProgressOutputStream(resourceWriteDestination.getOutputStream(resourceDescription, guiseSession, navigationPath, bookmark, referrerURI));	//get an output stream to the destination; don't buffer the output stream (our copy method essentially does this) so that progress events will be accurate
+										final InputStream inputStream=new BufferedInputStream(fileItemStream.openStream());	//get an input stream to the item
 										try
 										{
-											if(progressComponent!=null)	//if we know the component that wants to know progress
+											final ProgressListener progressListener=new ProgressListener()	//listen for progress
+											{
+												public void progressed(ProgressEvent progressEvent)	//when progress has been made
+												{
+	//Debug.trace("delta: ", progressEvent.getDelta(), "progress:", progressEvent.getValue());
+													synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
+													{
+														progressComponent.processEvent(new WebProgressEvent(progressComponent, name, TaskState.INCOMPLETE, progressEvent.getValue()));	//indicate to the component that progress is starting for this file
+													}
+												}
+											};
+											final ProgressOutputStream progressOutputStream=new ProgressOutputStream(resourceWriteDestination.getOutputStream(resourceDescription, guiseSession, navigationPath, bookmark, referrerURI));	//get an output stream to the destination; don't buffer the output stream (our copy method essentially does this) so that progress events will be accurate
+											try
+											{
+												if(progressComponent!=null)	//if we know the component that wants to know progress
+												{
+													synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
+													{
+														progressComponent.processEvent(new WebProgressEvent(progressComponent, name, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting for this file
+													}
+												}
+												progressOutputStream.addProgressListener(progressListener);	//start listening for progress events from the output stream
+												copy(inputStream, progressOutputStream);	//copy the uploaded file to the destination
+												progressOutputStream.removeProgressListener(progressListener);	//stop listening for progress events from the output stream
+													//TODO catch and send errors here
+											}
+											finally
+											{
+												progressOutputStream.close();	//always close the output stream
+											}
+											if(progressComponent!=null)	//if we know the component that wants to know progress (send the progress event after the output stream is closed, because the output stream may buffer contents)
 											{
 												synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
 												{
-													progressComponent.processEvent(new WebProgressEvent(progressComponent, name, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting for this file
+													progressComponent.processEvent(new WebProgressEvent(progressComponent, name, TaskState.COMPLETE, 0));	//indicate to the component that progress is finished for this file
 												}
 											}
-											progressOutputStream.addProgressListener(progressListener);	//start listening for progress events from the output stream
-											copy(inputStream, progressOutputStream);	//copy the uploaded file to the destination
-											progressOutputStream.removeProgressListener(progressListener);	//stop listening for progress events from the output stream
-												//TODO catch and send errors here
 										}
 										finally
 										{
-											progressOutputStream.close();	//always close the output stream
-										}
-										if(progressComponent!=null)	//if we know the component that wants to know progress (send the progress event after the output stream is closed, because the output stream may buffer contents)
-										{
-											synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
-											{
-												progressComponent.processEvent(new WebProgressEvent(progressComponent, name, TaskState.COMPLETE, 0));	//indicate to the component that progress is finished for this file
-											}
+											inputStream.close();	//always close the input stream
 										}
 									}
 									finally
 									{
-										inputStream.close();	//always close the input stream
+										servletFileUpload.setProgressListener(null);	//always stop listening for progress
 									}
-								}
-								finally
-								{
-									servletFileUpload.setProgressListener(null);	//always stop listening for progress
 								}
 							}
 						}

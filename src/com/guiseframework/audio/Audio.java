@@ -61,7 +61,7 @@ public class Audio extends AbstractDepictedObject
 		public TaskState getState() {return state;}
 
 		/**Updates the state of the audio.
-		This method is called by the associated depictor to update the audio state and should normally not be called directly by applications.
+		This method is called by the associated depictor and should normally not be called directly by applications.
 		This is a bound property.
 		@param newState The new state of the audio, or <code>null</code> if the audio has not been started.
 		@see #STATE_PROPERTY
@@ -138,16 +138,16 @@ public class Audio extends AbstractDepictedObject
 			}
 		}
 		
-	/**Requests that the audio start.
+	/**Requests that the audio start playing.
 	If the audio is currently starting to play or already playing, no action occurs.
 	*/
-	public void start()
+	public void play()
 	{
 		final TaskState state=getState();	//get the current audio state
 		if(state!=TaskState.INITIALIZE && state!=TaskState.INCOMPLETE)	//if the audio is not yet started
 		{
 			setState(TaskState.INITIALIZE);	//show that we're initializing the audio
-			getDepictor().start();	//tell the depictor to start
+			getDepictor().play();	//tell the depictor to start
 		}
 	}
 
@@ -246,13 +246,13 @@ public class Audio extends AbstractDepictedObject
 
 	/**The custom depictor type for audio.
 	@author Garret Wilson
-	@param <O> The type of audio to be depicted.
+	@param <A> The type of audio to be depicted.
 	*/
 	public interface Depictor<A extends Audio> extends com.guiseframework.platform.Depictor<A>
 	{
 
-		/**Requests that the audio start.*/
-		public void start();
+		/**Requests that the audio start playing.*/
+		public void play();
 
 		/**Requests that the audio pause.*/
 		public void pause();

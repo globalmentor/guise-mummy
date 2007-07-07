@@ -34,7 +34,13 @@ public class UploadPanel extends AbstractPanel
 
 	/**The number of resource paths to display at the same time.*/
 	private final static int RESOURCE_PATH_DISPLAY_COUNT=8;
-	
+
+	/**The panel containing controls such as buttons.*/
+	private final Panel controlPanel;
+
+		/**@return The panel containing controls such as buttons.*/
+		public Panel getControlPanel() {return controlPanel;}
+
 	/**The destination path of the upload relative to the application context path, or <code>null</code> if the destination path has not yet been set.*/
 	private String destinationPath=null;
 
@@ -89,11 +95,20 @@ public class UploadPanel extends AbstractPanel
 	/**The resource collect control.*/
 	private final ResourceCollectControl resourceCollectControl;
 
+		/**@return The resource collect control.*/
+		public ResourceCollectControl getResourceCollectControl() {return resourceCollectControl;}
+
 	/**The action prototype for uploading.*/
 	private final ActionPrototype uploadActionPrototype;
 
 		/**@return The action prototype for uploading.*/
 		public ActionPrototype getUploadActionPrototype() {return uploadActionPrototype;}
+
+	/**The action prototype for canceling.*/
+	private final ActionPrototype cancelActionPrototype;
+
+		/**@return The action prototype for canceling.*/
+		public ActionPrototype getCancelActionPrototype() {return cancelActionPrototype;}
 
 	/**Destination path constructor a default vertical flow layout.
 	@param destinationPath The path relative to the application representing the destination of the collected resources.
@@ -133,7 +148,7 @@ public class UploadPanel extends AbstractPanel
 		add(currentStatusLabel);
 		
 			//the horizontal panel of controls
-		final Panel controlPanel=new LayoutPanel(new FlowLayout(Flow.LINE));
+		controlPanel=new LayoutPanel(new FlowLayout(Flow.LINE));
 		resourceCollectControl=new ResourceCollectControl();	//resource collector
 		controlPanel.add(resourceCollectControl);
 		uploadActionPrototype=new ActionPrototype(LABEL_UPLOAD, GLYPH_UPLOAD);	//resource upload
@@ -147,10 +162,20 @@ public class UploadPanel extends AbstractPanel
 						{
 							throw new IllegalStateException("Destination path not set.");
 						}
-						resourceCollectControl.sendResources(destinationPath, getDestinationBookmark());	//tell the resource collect control to send the resource
+						resourceCollectControl.receiveResources(destinationPath, getDestinationBookmark());	//tell the resource collect control to send the resource
 					}
 				});
 		controlPanel.add(uploadActionPrototype);
+		cancelActionPrototype=new ActionPrototype(LABEL_CANCEL, GLYPH_CANCEL);	//upload cancel
+		cancelActionPrototype.setEnabled(false);	//initially disable canceling
+		cancelActionPrototype.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent actionEvent)
+					{
+						resourceCollectControl.cancelReceive();	//tell the resource collect control to cancel the transfer
+					}
+				});
+		controlPanel.add(cancelActionPrototype);
 	
 			//listen for the resource collection control changing its list of collected resource paths
 		resourceCollectControl.addPropertyChangeListener(ResourceCollectControl.RESOURCE_PATHS_PROPERTY, new AbstractGenericPropertyChangeListener<List<String>>()
@@ -163,11 +188,12 @@ public class UploadPanel extends AbstractPanel
 					}
 				});
 			//listen for the resource collection control changing its send state, and update the state of the components in response
-		resourceCollectControl.addPropertyChangeListener(ResourceCollectControl.SEND_STATE_PROPERTY, new AbstractGenericPropertyChangeListener<TaskState>()
+		resourceCollectControl.addPropertyChangeListener(ResourceCollectControl.STATE_PROPERTY, new AbstractGenericPropertyChangeListener<TaskState>()
 				{
-					public void propertyChange(final GenericPropertyChangeEvent<TaskState> genericPropertyChangeEvent)	//if the send state changes
+					public void propertyChange(final GenericPropertyChangeEvent<TaskState> propertyChangeEvent)	//if the transfer state changes
 					{
 						updateComponents();	//update the components in response
+						updateStatusLabel(null, -1, propertyChangeEvent.getNewValue());	//update the status label with the new state
 					}
 				});
 			//listen for progress from the resource collect control and update the progress labels in response
@@ -175,26 +201,7 @@ public class UploadPanel extends AbstractPanel
 				{
 					public void progressed(final ProgressEvent progressEvent)	//if progress occurs
 					{
-						final StringBuilder statusStringBuilder=new StringBuilder();	//build the status string
-						final String task=progressEvent.getTask();	//get the current task
-						if(task!=null)	//if there is a task
-						{
-							statusStringBuilder.append(task).append(':').append(' ');	//task:
-							final long value=progressEvent.getValue();	//get the current value
-							if(value>=0)	//if a valid value is given
-							{
-								statusStringBuilder.append(value);	//show the value
-							}
-							else	//if there is no value
-							{
-								statusStringBuilder.append(LABEL_UNKNOWN);	//indicate an unknown progress
-							}
-						}
-						else	//if there is no task, just show the task status
-						{
-							statusStringBuilder.append(progressEvent.getTaskState().getLabel());	//show the task status label
-						}
-						currentStatusLabel.setLabel(statusStringBuilder.toString());	//update the status
+						updateStatusLabel(progressEvent.getTask(), progressEvent.getValue(), progressEvent.getTaskState());	//update the status level with the progress
 						fireProgressed(new ProgressEvent(UploadPanel.this, progressEvent));	//refire the progress event using this panel as the source
 					}
 				});
@@ -204,7 +211,37 @@ public class UploadPanel extends AbstractPanel
 	/**Updates the state of components.*/
 	protected void updateComponents()
 	{
-		uploadActionPrototype.setEnabled(resourceCollectControl.getSendState()==null && !resourceCollectControl.getResourcePaths().isEmpty());	//only allow upload if the control is not sending and there are collected resources
+		final TaskState state=getResourceCollectControl().getState();	//get the state of the resource collect control
+		uploadActionPrototype.setEnabled((state==null || state==TaskState.COMPLETE || state==TaskState.CANCELED) && !resourceCollectControl.getResourcePaths().isEmpty());	//only allow upload if the control is not sending and there are collected resources
+		cancelActionPrototype.setEnabled(state==TaskState.INCOMPLETE);	//only allow cancel if the control is sending
+	}
+
+	/**Updates the status label.
+	@param task The current task, or <code>null</code> if there is no task.
+	@param progress The current progress, or -1 if the progress is not known.
+	@param state The new transfer state, or <code>null</code> if there is no state.
+	*/
+	protected void updateStatusLabel(final String task, final long progress, final TaskState state)
+	{
+		final ResourceCollectControl resourceCollectControl=getResourceCollectControl();	//get the resource collect control 
+		final StringBuilder statusStringBuilder=new StringBuilder();	//build the status string
+		if(task!=null)	//if there is a task
+		{
+			statusStringBuilder.append(task).append(':').append(' ');	//task:
+			if(progress>=0)	//if a valid value is given
+			{
+				statusStringBuilder.append(progress);	//show the value
+			}
+			else	//if there is no value
+			{
+				statusStringBuilder.append(LABEL_UNKNOWN);	//indicate an unknown progress
+			}
+		}
+		else if(state!=null)	//if there is no task, just show the task state
+		{
+			statusStringBuilder.append(state.getLabel());	//show the task status label
+		}
+		currentStatusLabel.setLabel(statusStringBuilder.toString());	//update the status
 	}
 
 	/**Adds a progress listener.

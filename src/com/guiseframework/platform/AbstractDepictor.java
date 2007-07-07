@@ -185,8 +185,24 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 		setDepicted(true);	//show that the depiction has been updated
 	}
 
+	/**Called when a depicted object bound property is changed.
+	This implementation marks the property as being modified if the property is not an ignored property.
+	@param propertyChangeEvent An event object describing the event source and the property that has changed.
+	@see #getIgnoredProperties()
+	@see #setPropertyModified(String, boolean)
+	*/ 
+	protected void depictedObjectPropertyChange(final PropertyChangeEvent propertyChangeEvent)
+	{
+		final String propertyName=propertyChangeEvent.getPropertyName();	//get the name of the changing property
+		if(getIgnoredProperties().contains(propertyName))	//if this is an ignored property
+		{
+			return;	//ignore this property change
+		}
+		setPropertyModified(propertyName, true);	//show that a property has been modified
+	}
+
 	/**A listener that marks this depiction as dirty if changes occur.
-	This class implements various event listeners and marks the depiction as dirty accordingly.
+	Property changes are delegated to {@link AbstractDepictor#depictedObjectPropertyChange(PropertyChangeEvent)}.
 	@author Garret Wilson
 	*/
 	protected class ChangeListener implements PropertyChangeListener, ListListener<Object>
@@ -197,15 +213,7 @@ public abstract class AbstractDepictor<O extends DepictedObject> implements Depi
 		*/ 
 		public void propertyChange(final PropertyChangeEvent propertyChangeEvent)
 		{
-			final Object source=propertyChangeEvent.getSource();	//get the source of the event
-			final String propertyName=propertyChangeEvent.getPropertyName();	//get the name of the changing property
-			final Object oldValue=propertyChangeEvent.getOldValue();	//get the old value
-			final Object newValue=propertyChangeEvent.getOldValue();	//get the new value
-			if(getIgnoredProperties().contains(propertyName))	//if this is an ignored property
-			{
-				return;	//ignore this property change
-			}
-			setPropertyModified(propertyName, true);	//show that a property has been modified
+			depictedObjectPropertyChange(propertyChangeEvent);	//delegate to the outer class method
 		}
 
 		/**Called when a list is modified.

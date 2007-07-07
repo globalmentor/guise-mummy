@@ -483,7 +483,7 @@ Debug.trace("list control changed value to", newValue);
 					{
 						final Audio audio=new Audio();
 						audio.setAudioURI(URI.create("https://dav.globalmentor.com/public/desperado.mp3"));
-						audio.start();
+						audio.play();
 					}
 				});
 		buttonPanel.add(audioButton);	//add a new button

@@ -5,15 +5,13 @@ import java.io.IOException;
 import java.util.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.text.CharacterConstants.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 import static com.garretwilson.util.ArrayUtilities.*;
 
 import com.garretwilson.util.Debug;
 import com.guiseframework.component.*;
 import com.guiseframework.model.*;
-import com.guiseframework.platform.DepictEvent;
-import com.guiseframework.platform.PlatformEvent;
+import com.guiseframework.platform.*;
 import com.guiseframework.validator.*;
 
 /**Strategy for rendering a select control as an XHTML <code>&lt;select&gt;</code> element.
@@ -206,10 +204,9 @@ public class WebSelectDepictor<V, C extends ListSelectControl<V>> extends Abstra
 				++index;	//increment the index
 				final Component representationComponent=component.getComponent(value);	//create a component to represent the value
 				final String valueID=getPlatform().getDepictIDString(representationComponent.getDepictID());	//get the ID of this value's representation component
-				final String encodedID=valueID!=null ? valueID : "";	//use "" to represent null TODO update; this can no longer be null
 				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_OPTION);	//<xhtml:option>
-				depictContext.writeAttribute(null, ATTRIBUTE_VALUE, encodedID);	//value="componentID"
-				final boolean selected=selectedIDs!=null && selectedIDs.contains(encodedID);	//see if this value is selected
+				depictContext.writeAttribute(null, ATTRIBUTE_VALUE, valueID);	//value="componentID"
+				final boolean selected=selectedIDs!=null && selectedIDs.contains(valueID);	//see if this value is selected
 				if(selected)	//if we have this component's ID in the list of selected IDs
 				{
 					depictContext.writeAttribute(null, ELEMENT_OPTION_ATTRIBUTE_SELECTED, OPTION_SELECTED_SELECTED);	//selected="selected"			
@@ -224,9 +221,12 @@ public class WebSelectDepictor<V, C extends ListSelectControl<V>> extends Abstra
 				++optionsWritten;	//indicate that we wrote another option
 			}
 		}
-		if(optionsWritten==0)	//if no options were written
+		if(optionsWritten==0)	//if no options were written, we must write a dummy option, as HTML select controls must have at least one option, and IE7 will lose an empty select element from the DOM; see http://www.w3.org/TR/html4/interact/forms.html#edef-OPTION
 		{
-			depictContext.write(NO_BREAK_SPACE_CHAR);	//put some content into the SELECT element, or IE7 will lose it from the DOM
+			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_OPTION);	//<xhtml:option>
+			depictContext.writeAttribute(null, ATTRIBUTE_VALUE, "");	//value=""
+			depictContext.writeAttribute(null, ELEMENT_OPTION_ATTRIBUTE_DISABLED, OPTION_DISABLED_DISABLED);	//disabled="disabled"			
+			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_OPTION);	//</xhtml:option>
 		}
 	}
 

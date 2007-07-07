@@ -386,7 +386,7 @@ public abstract class AbstractFrame extends AbstractEnumCompositeComponent<Abstr
 	/**The action prototype for closing the frame.*/
 	private final ActionPrototype closeActionPrototype;
 
-		/**@return The action prototype closing the frame.*/
+		/**@return The action prototype for closing the frame.*/
 		public ActionPrototype getCloseActionPrototype() {return closeActionPrototype;}
 		
 	/**Component constructor.

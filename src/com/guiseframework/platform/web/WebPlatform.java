@@ -30,8 +30,6 @@ public interface WebPlatform extends Platform
 	public final static String ATTRIBUTE_ATTRIBUTE_HASH="attributeHash";
 	/**The Guise attribute containing the hash of the element content.*/
 	public final static String ATTRIBUTE_CONTENT_HASH="contentHash";
-	/**The Guise attribute containing commands related to a specific element.*/
-	public final static String ATTRIBUTE_COMMANDS="commands";
 
 	/**The path of the blank MP3 file, relative to the application.*/
 	public final static String BLANK_MP3_PATH=GuiseApplication.GUISE_PUBLIC_AUDIO_PATH+"blank.mp3";	
