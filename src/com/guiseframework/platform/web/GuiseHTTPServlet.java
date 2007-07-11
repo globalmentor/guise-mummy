@@ -2168,7 +2168,7 @@ Debug.trace("this is a destination");
 			if(USER_AGENT_NAME_MSIE.equals(userAgentProperties.get(USER_AGENT_NAME_PROPERTY)))	//if this is IE
 			{
 				final Object version=userAgentProperties.get(USER_AGENT_VERSION_NUMBER_PROPERTY);	//get the version number
-				if(version instanceof Float && ((Float)version).floatValue()<7.0f)	//if this is IE 6 (lower than IE 7)
+				if(version instanceof Number && ((Number)version).doubleValue()<7)	//if this is IE 6 (lower than IE 7)
 				{
 //TODO del Debug.trace("need a stylesheet for IE6");
 					final Reference<HTTPServletResource> ie6CSSResourceReference=cachedIE6FixedStylesheetResources.get(resourceURI);	//get a reference to the IE6 fixed stylesheet, if there is one cached

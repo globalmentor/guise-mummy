@@ -735,9 +735,10 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 	@param stringBuilder The string builder to hold the data.
 	@param tagName The name of the XML tag.
 	@param attributes An associative array of name/value pairs representing attribute names and values, or null if no attributes are provided.
+	@param empty An option boolean indication of whether this start tag should be an empty element.
 	@return A reference to the string builder.
 	*/ 
-	appendXMLStartTag:function(stringBuilder, tagName, attributes)
+	appendXMLStartTag:function(stringBuilder, tagName, attributes, empty)
 	{
 		stringBuilder.append("<").append(tagName);	//<tagName
 		if(attributes!=null)	//if attributes are provided
@@ -751,7 +752,7 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 				}
 			}
 		}
-		return stringBuilder.append(">");	//>
+		return stringBuilder.append(empty ? "/>" : ">");	///> or >, depending on whether the element is empty		
 	},
 
 	/**Appends an XML attribute with the given name and value to the given string builder.

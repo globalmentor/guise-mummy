@@ -51,6 +51,9 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 	/**The ID segment for the model IFrame used with IE6.*/ 
 	protected final static String MODAL_IFRAME_ID_SEGMENT="modalIFrame";
 
+	/**The ID for the Guise SWF.*/ 
+	protected final static String GUISE_FLASH_ID="guiseFlash";
+
 	/**The available JavaScript versions above 1.0 that could be supported by a browser.*/
 	private final static String[] JAVSCRIPT_VERSIONS=new String[]{"1.1", "1.2", "1.3", "1.4", "1.5", "2.0"};
 	
@@ -136,7 +139,8 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		final Locale locale=session.getLocale();	//get the component's locale
 			//don't send the XML declaration for MSIE 6, because the XML declaration will switch that user agent into quirks mode
 //TODO testing		final boolean writeXMLDeclaration=true;	//always write the XML declaration, even though this will switch IE6 to quirks mode--IE6 in standards mode is incredibly slow
-		final boolean isUserAgentIE6=userAgent.getBrand()==WebUserAgentProduct.Brand.INTERNET_EXPLORER && userAgent.getVersionNumber()<7;	//see if this is IE6
+		final boolean isUserAgentIE=userAgent.getBrand()==WebUserAgentProduct.Brand.INTERNET_EXPLORER;	//see if this is IE
+		final boolean isUserAgentIE6=isUserAgentIE && userAgent.getVersionNumber()<7;	//see if this is IE6
 		final boolean writeXMLDeclaration=!(isUserAgentIE6 && !depictContext.isQuirksMode());	//always write the XML declaration except for IE6 when not in quirks mode (writing the XML declaration puts IE6 into quirks mode)
 			//see http://www.quirksmode.org/css/quirksmode.html
 			//see http://blogs.msdn.com/ie/archive/2005/09/15/467901.aspx
@@ -241,9 +245,6 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.writeJavaScriptElement(AJAX_JAVASCRIPT_PATH);	//JavaScript: ajax.js
 		depictContext.write("\n");
 		depictContext.write("\t");
-		depictContext.writeJavaScriptElement(SOUNDMANAGER_JAVASCRIPT_PATH);	//JavaScript: soundmanager2.js
-		depictContext.write("\n");
-		depictContext.write("\t");
 		depictContext.writeJavaScriptElement(GUISE_JAVASCRIPT_PATH);	//JavaScript: guise.js
 		depictContext.write("\n");
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_HEAD);	//</xhtml:head>		
@@ -285,7 +286,38 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		}
 */
 		depictContext.write("\n");
-		
+/*TODO del; we have to do this dynamically now because of the EOLAS patent loss by Mircosoft
+		//Guise Flash
+		final String resolvedGuiseFlashPath=application.resolvePath(GUISE_FLASH_PATH);	//resolve the path to the Guise Flash file
+		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_OBJECT);	//<xhtml:object>
+		depictContext.writeAttribute(null, ATTRIBUTE_ID, GUISE_FLASH_ID);	//id="guiseFlash"		
+		if(getPlatform().getClientProduct().getBrand()==WebUserAgentProduct.Brand.INTERNET_EXPLORER)	//if the user agent is IE, use the special attributes
+		{
+			depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_CLASSID, FLASH_CLASS_ID);	//classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"; only write the classid attributes for IE, because it will prevent the Flash from being loaded in Firefox
+			depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_CODEBASE, getSWFlashCabURI("8,0,0,0", HTTPS_SCHEME.equals(depictContext.getDepictURI().getScheme())).toString());	//codebase="http[s]://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0"
+		}
+		else	//if the user agent is not IE, specify the object content type
+		{
+			depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_TYPE, FLASH_CONTENT_TYPE.toString());	//type="application/x-shockwave-flash"; don't write the type Type attribute in IE, because this will prevent IE from loading the Flash movie 			
+			depictContext.writeAttribute(null, ELEMENT_OBJECT_ATTRIBUTE_DATA, resolvedGuiseFlashPath);	//data="flashURI"; don't write the data attribute in IE, because it will prevent the Flash movie from showing its preloader
+		}
+		final Map<String, Object> guiseFlashStyles=new HashMap<String, Object>();	//create a new map of styles
+//		guiseFlashStyles.put(CSS_PROP_DISPLAY, CSS_DISPLAY_NONE);	//don't display the Flash
+		guiseFlashStyles.put(CSS_PROP_WIDTH, Extent.ZERO_EXTENT1);	//zero dimensions; a display of "none" will cause the object not to be initialized on Firefox and IE7
+		guiseFlashStyles.put(CSS_PROP_HEIGHT, Extent.ZERO_EXTENT1);	//zero height
+		writeStyleAttribute(guiseFlashStyles);	//write the styles
+			//param movie="flashURI" (necessary for IE)
+		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_PARAM);	//<xhtml:param>
+		depictContext.writeAttribute(null, ELEMENT_PARAM_ATTRIBUTE_NAME, MOVIE_PARAMETER);	//name="movie"
+		depictContext.writeAttribute(null, ELEMENT_PARAM_ATTRIBUTE_VALUE, resolvedGuiseFlashPath);	//value="flashURI"
+		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_PARAM);	//</xhtml:param>
+			//param quality="high"
+		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_PARAM);	//<xhtml:param>
+		depictContext.writeAttribute(null, ELEMENT_PARAM_ATTRIBUTE_NAME, QUALITY_PARAMETER);	//name="quality"
+		depictContext.writeAttribute(null, ELEMENT_PARAM_ATTRIBUTE_VALUE, QUALITY_PARAMETER_HIGH);	//value="high"
+		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_PARAM);	//</xhtml:param>
+		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_OBJECT);	//</xhtml:object>
+*/
 		//<xhtml:form>
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_FORM);	//<xhtml:form>
 		depictContext.writeAttribute(null, ATTRIBUTE_ID, WebApplicationFrameDepictor.getFormID(component.getSession().getApplicationFrame()));	//write the form ID in the HTML id attribute 

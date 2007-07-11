@@ -5,7 +5,7 @@ Dependencies:
 	javascript.js
 	dom.js
 	ajax.js
-	soundmanager2.js
+	guise.swf
 
 This script expects the following variables to be defined:
 navigator.userAgentName The name of the user agent, such as "Firefox", "Mozilla", "MSIE", or "Opera".
@@ -391,6 +391,9 @@ com.guiseframework.js.Guise=function()
 
 	/**Whether we are currently processing AJAX responses.*/
 	this.processingAJAXResponses=false;
+
+	/**The Guise support Flash, or null if the support Flash has not yet been embedded.*/
+	this._flash=null;
 
 	/**The hidden IFrame target that receives the results of file uploads, or null if the upload IFrame hasn't yet been created.*/
 	this._uploadIFrame=null;
@@ -1038,35 +1041,16 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 			switch(command)	//see which command this is
 			{
 				case "audio-play":
-					var audioURI=parameters["audioURI"];	//get the audio URI
-					var sound=soundManager.sounds[objectID];	//get the existing sound
-					if(sound)	//if the sound is already defined
-					{
-						if(sound.url!=audioURI)	//if this sound has a different audio URI
-						{
-							soundManager.destroySound(objectID);	//stop, unload, an destroy current sound
-							sound=null;	//we'll create a new sound with the new audio URI
-						}
-					}
-					if(!sound)	//if there is no such sound defined
-					{
-						soundManager.createSound(objectID, audioURI);	//create a new sound
-						soundManager.sounds[objectID].lastPositionUpdateTime=0;	//create a new sound property that will keep the last date that we reported the play position status						
-					}
-					soundManager.play(objectID);	//play the sound
-					this.sendAJAXRequest(new ChangeAJAXEvent(objectID, new Map("state", com.guiseframework.js.TaskState.INCOMPLETE)));	//send an AJAX request with the new sound state
+					this._flash.playSound(objectID, parameters["audioURI"]);	//play the sound
 					break;
 				case "audio-pause":
-					soundManager.pause(objectID);	//pause the sound
-					this.sendAJAXRequest(new ChangeAJAXEvent(objectID, new Map("state", com.guiseframework.js.TaskState.PAUSED)));	//send an AJAX request with the new sound state
+					this._flash.pauseSound(objectID);	//pause the sound
 					break;
 				case "audio-stop":
-					soundManager.stop(objectID);	//pause the sound
-					this.sendAJAXRequest(new ChangeAJAXEvent(objectID, new Map("state", com.guiseframework.js.TaskState.STOPPED)));	//send an AJAX request with the new sound state
+					this._flash.stopSound(objectID);	//stop the sound
 					break;
 				case "audio-position":
-					var position=parameters["position"];	//get the requested position
-					soundManager.setPosition(objectID, position);	//request the new sound position
+					this._flash.setSoundPosition(objectID, parameters["position"]);	//set the sound position
 					break;
 				case "resource-collect-receive":
 					var element=document.getElementById(objectID);	//get the component element
@@ -1812,7 +1796,6 @@ if(elementName=="select")
 			{
 				initIFrame.parentNode.removeChild(initIFrame);	//remove the init IFrame from the document; we don't need it anymore
 			}
-			//soundManager.beginInit();	//initialize the sound manager
 			var focusable=getFocusableDescendant(document.documentElement);	//see if the document has a node that can be focused
 			if(focusable)	//if we found a focusable node
 			{
@@ -1847,11 +1830,34 @@ if(elementName=="select")
 					//TODO fix; doesn't seem to work on IE6 or Firefox
 				this.setElementTempCursor(document.body, "wait");	//change the document body cursor to "wait" until the AJAX initialization is finished
 			}
-
-			soundManager.defaultOptions.whileplaying=this._whileSoundPlaying.bindOldThis(this);	//set the sound playing callback method
-			soundManager.defaultOptions.onfinish=this._onSoundFinish.bindOldThis(this);	//set the sound finished callback method
-//TODO del			soundManager.defaultOptions.lastPositionUpdateTime=0;	//create a new sound property that will keep the last date that we reported the play position status
-
+				//Guise Flash; we must embed Flash dynamically at runtime because of an EOLAS patent that forced Microsoft and Opera to disable automatic activation of Flash and other plugins
+			//see http://msdn2.microsoft.com/en-us/library/ms537508.aspx
+			//see http://blog.deconcept.com/2005/12/15/internet-explorer-eolas-changes-and-the-flash-plugin/
+			//see http://www.jeroenwijering.com/?item=embedding_flash
+			var guiseFlashDiv=document.createElementNS("http://www.w3.org/1999/xhtml", "div");	//create an outer div; we must use innerHTML, as the DOM methods don't result in a fully working Flash object
+			guiseFlashDiv.style.position="absolute";	//take the div out of normal flow
+			guiseFlashDiv.style.left="-9999px";	//completely remove the div from sight
+			guiseFlashDiv.style.top="-9999px";
+			document.body.appendChild(guiseFlashDiv);	//add the outer div to the body before adding the content, or the SWF won't register its exposed methods
+			var flashGuiseInnerHTMLStringBuilder=new StringBuilder();	//create a new string builder for creating the Flash object
+			var objectAttributes={"id":"guiseFlash", style:"width:1px;height:1px;"};	//create a map of attributes for serialization
+			if(isUserAgentIE)	//if this is IE
+			{
+				objectAttributes.classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000";
+				var httpMethod=window.location.protocol=="https:" ? "https" : "http";	//use HTTPS if this is a secure page
+				objectAttributes.codebase=httpMethod+"://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=8,0,0,0";
+			}
+			else	//if this is any other browser
+			{
+				objectAttributes.type="application/x-shockwave-flash";
+				objectAttributes.data=GUISE_PUBLIC_RESOURCE_BASE_PATH+"flash/guise.swf";
+			}
+			DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "object", objectAttributes);	//<object ...>
+			DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param", {"name":"movie", "value":GUISE_PUBLIC_RESOURCE_BASE_PATH+"flash/guise.swf"}, true);	//<param name="movie" value="...guise.swf"/>
+			DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param", {"name":"quality", "value":"high"}, true);	//<param name="movie" value="...guise.swf"/>
+			DOMUtilities.appendXMLEndTag(flashGuiseInnerHTMLStringBuilder, "object");	//</object>
+			guiseFlashDiv.innerHTML=flashGuiseInnerHTMLStringBuilder.toString();	//add the Flash content
+			this._flash=guiseFlashDiv.childNodes[0];	//the first child node is the flash component; save a reference to it for later
 			window.setTimeout(this._initialize.bind(this), 1);	//run the initialization function in a separate thread
 		};
 
@@ -1864,7 +1870,6 @@ if(elementName=="select")
 				//TODO fix or del	this.setBusyVisible(true);	//turn on the busy indicator
 			com.garretwilson.js.EventManager.clearEvents();	//unload all events
 				//TODO fix or del	this.setBusyVisible(false);	//turn off the busy indicator
-			//soundManager.destruct();	//uninitialize the sound manager
 		};
 
 		/**Called when the window resizes.
@@ -2481,6 +2486,13 @@ if(elementName=="select")
 								com.garretwilson.js.EventManager.addEvent(node, "keydown", onTextInputKeyDown, false);	//commit the text area on Enter TODO decide whether we want real-time checking with onTextInpuKeyUp, which would be very expensive for text areas
 								break;
 						}
+/*TODO del
+						if(elementName.endsWith("object"))
+						{
+								alert("object element name: "+elementName);
+								alert("object: "+node.innerHTML);
+						}
+*/
 						for(var i=elementClassNames.length-1; i>=0; --i)	//for each class name
 						{
 							switch(elementClassNames[i])	//check out this class name
@@ -2740,6 +2752,27 @@ if(elementName=="select")
 		proto._onSoundFinish=function(sound)
 		{
 			this.sendAJAXRequest(new ChangeAJAXEvent(sound.sID, new Map("state", com.guiseframework.js.TaskState.COMPLETE)));	//send an AJAX request with the new sound state
+		};
+
+		/**Called when the state of a sound changes.
+		@param soundID The ID of the sound the state of which is changing.
+		@param oldState The old sound state.
+		@param newState The new sound state.
+		*/
+		proto._onSoundStateChange=function(soundID, oldState, newState)
+		{
+//alert("sound state changed for sound "+soundID+" new state "+newState);
+			this.sendAJAXRequest(new ChangeAJAXEvent(soundID, new Map("state", newState)));	//send an AJAX request with the new sound state
+		};
+
+		/**Called while a sound is playing.
+		@param soundID The ID of the sound that is playing.
+		@param position The position in milliseconds.
+		@param duration The duration in milliseconds.
+		*/
+		proto._onSoundPositionChange=function(soundID, position, duration)
+		{
+			this.sendAJAXRequest(new ChangeAJAXEvent(soundID, new Map("position", position, "duration", duration)));	//send an AJAX request with the new sound position and duration
 		};
 
 	}
@@ -3839,10 +3872,5 @@ function debug(text)
 	var dymamicContent="javascript:document.write('<html><body>"+DOMUtilities.encodeXML(text)+"</body></html>');"	//create JavaScript for writing the dynamic content
 	window.open(dymamicContent, "debug", "status=no,menubar=no,scrollbars=yes,resizable=no,width=800,height=600");
 }
-
-soundManager.url=GUISE_PUBLIC_RESOURCE_BASE_PATH+"flash/soundmanager2.swf"; //override default SoundManager SWF URL
-soundManager.nullURL=GUISE_PUBLIC_RESOURCE_BASE_PATH+"audio/blank.mp3"; //set the location of the blank MP3 file
-soundManager.debugMode=false;	//turn off SoundManager debugging
-soundManager.allowPolling=true;	//allow Flash to poll for status updates
 
 com.garretwilson.js.EventManager.addEvent(window, "load", guise.onLoad.bind(guise), false);	//do the appropriate initialization when the window loads

@@ -2,8 +2,7 @@ package com.guiseframework.platform.web;
 
 import java.beans.PropertyVetoException;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.math.*;
 import java.net.URI;
 import java.util.*;
 
@@ -256,16 +255,15 @@ public class WebSliderDepictor<V extends Number, C extends SliderControl<V>> ext
 				final long range=maximum-minimum;	//calculate the range
 				//TODO check for divide by zero
 //TODO del if not needed				final int step=rangeStep!=null ? rangeStep.intValue() : 1;	//get the step to use for calculations
-				position=((value.longValue()-minimum)/(double)range);	//calculate the fractional position
+				position=range!=0 ? ((value.longValue()-minimum)/(double)range) : 0;	//calculate the fractional position, defaulting to a zero position if there is no range
 			}
-			else if(Float.class.isAssignableFrom(valueClass))	//float
+			else if(Float.class.isAssignableFrom(valueClass) || Double.class.isAssignableFrom(valueClass))	//float or double
 			{
-				final float minimum=rangeMinimum!=null ? rangeMinimum.floatValue() : 0;	//get the minimum to use for calculations 
-				final float maximum=rangeMaximum!=null ? rangeMaximum.floatValue() : 100;	//get the maximum to use for calculations 
-				final float range=maximum-minimum;	//calculate the range
-				//TODO check for divide by zero
+				final double minimum=rangeMinimum!=null ? rangeMinimum.doubleValue() : 0;	//get the minimum to use for calculations 
+				final double maximum=rangeMaximum!=null ? rangeMaximum.doubleValue() : 100;	//get the maximum to use for calculations 
+				final double range=maximum-minimum;	//calculate the range
 //TODO del if not needed				final int step=rangeStep!=null ? rangeStep.intValue() : 1;	//get the step to use for calculations
-				position=((value.floatValue()-minimum)/range);	//calculate the fractional position
+				position=range!=0 ? ((value.doubleValue()-minimum)/range) : 0;	//calculate the fractional position, defaulting to a zero position if there is no range
 			}
 			else	//if we don't support this type TODO add support for new types
 			{

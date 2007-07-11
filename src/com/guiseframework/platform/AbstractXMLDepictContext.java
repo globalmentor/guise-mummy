@@ -395,7 +395,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 	public ElementState writeElementEnd(final URI namespaceURI, final String localName) throws IOException
 	{
 		final ElementState elementState=popElementState();	//pop the current element state from the stack
-		if(!ObjectUtilities.equals(elementState.getNamespaceURI(), namespaceURI!=null ? namespaceURI.toString() : null) || elementState.getLocalName()!=localName)	//if the namespace and/or local name is not what we expect
+		if(!ObjectUtilities.equals(elementState.getNamespaceURI(), namespaceURI!=null ? namespaceURI.toString() : null) || !elementState.getLocalName().equals(localName))	//if the namespace and/or local name is not what we expect
 		{
 			throw new IllegalStateException("Ending namespace "+namespaceURI+" and local name "+localName+" do not match currently open element with namespace "+elementState.getNamespaceURI()+" and local name "+elementState.getLocalName());
 		}

@@ -24,7 +24,7 @@ public class Flash extends AbstractComponent
 		/**Sets the URI of the Flash.
 		This is a bound property of type <code>URI</code>.
 		@param newFlashURI The new URI of the Flash, which may be a resource URI.
-		@see #IMAGE_PROPERTY
+		@see #FLASH_URI_PROPERTY
 		*/
 		public void setFlashURI(final URI newFlashURI)
 		{

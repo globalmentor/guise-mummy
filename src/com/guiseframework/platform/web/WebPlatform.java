@@ -45,11 +45,9 @@ public interface WebPlatform extends Platform
 	public final static String GUISE_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"guise.js";	
 	/**The path of the JavaScript JavaScript file, relative to the application.*/
 	public final static String JAVASCRIPT_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"javascript.js";	
-	/**The path of the SoundManager JavaScript file, relative to the application.*/
-	public final static String SOUNDMANAGER_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"soundmanager2.js";	
 
-	/**The path of the SoundManager Flash file, relative to the application.*/
-	public final static String SOUNDMANAGER_FLASH_PATH=GuiseApplication.GUISE_PUBLIC_FLASH_PATH+"soundmanager2.swf";	
+	/**The path of the Guise Flash file, relative to the application.*/
+	public final static String GUISE_FLASH_PATH=GuiseApplication.GUISE_PUBLIC_FLASH_PATH+"guise.swf";	
 
 	/**Generates an ID for the given depicted object appropriate for using on the platform.
 	@param depictID The depict ID to be converted to a platform ID.
