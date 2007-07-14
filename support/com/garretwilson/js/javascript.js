@@ -288,6 +288,14 @@ function StringBuilder(strings)
 			return this;
 		};
 
+		/**Removes the last string appended to the string builder.
+		@return The string removed from the string builder.
+		*/
+		StringBuilder.prototype.unpend=function(string)
+		{
+			return this._strings.pop();	//pop the last element from the array
+		};
+
 		/**@return A single string containing the contents of the string builder.*/
 		StringBuilder.prototype.toString=function()
 		{
@@ -358,8 +366,23 @@ var JSON=
 							serializedObjectArray[i]=this.serialize(object[i]);	//place the serialization of the array element into the new array
 						}
 						return "["+serializedObjectArray.join(",")+"]";	//join the object serializations, separated by commas, and surround the list with the array delimiters
-					}  
-					throw "Arrays and objects not yet supported: "+object;
+					}
+					else	//if this is a general object
+					{
+						var stringBuilder=new StringBuilder("{");	//create a new string builder with the beginning object delimiter
+						var propertyCount=0;	//keep track of the properties
+						for(var property in object)	//for each object property
+						{
+							stringBuilder.append(this.serialize(property)).append(":").append(this.serialize(object[property])).append(",");	//"property":value,
+							++propertyCount;	//show that we serialized another property
+						}
+						if(propertyCount>0)	//if there were properties
+						{
+							stringBuilder.unpend();	//remove the last value separator
+						}
+						stringBuilder.append("}");	//append the ending object delimiter
+						return stringBuilder.toString();	//return the serialized object 
+					}
 			}
 		}
 		else	//if the object is null

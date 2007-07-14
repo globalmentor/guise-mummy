@@ -137,7 +137,21 @@ public class Audio extends AbstractDepictedObject
 				firePropertyChange(TIME_LENGTH_PROPERTY, oldTimeLength, newTimeLength);	//indicate that the value changed
 			}
 		}
-		
+
+	/**Default constructor.*/
+	public Audio()
+	{
+		this(null);	//construct the audio with no audio URI
+	}
+
+	/**Audio URI constructor.
+	@param audioURI The new URI of the audio, which may be a resource URI, or <code>null</code> if there is no audio URI.
+	*/
+	public Audio(final URI audioURI)
+	{
+		this.audioURI=audioURI;
+	}
+
 	/**Requests that the audio start playing.
 	If the audio is currently starting to play or already playing, no action occurs.
 	*/
@@ -244,6 +258,21 @@ public class Audio extends AbstractDepictedObject
 		}
 	}
 
+	/**Prepares the object for garbage collection.
+	This implementation makes sure the audio is stopped.
+	*/
+	protected void finalize() throws Throwable
+	{
+		try
+		{
+			stop();	//stop the audio
+    }
+		finally	//always do the default finalization
+		{
+			super.finalize();
+		}
+	}
+
 	/**The custom depictor type for audio.
 	@author Garret Wilson
 	@param <A> The type of audio to be depicted.
@@ -266,34 +295,5 @@ public class Audio extends AbstractDepictedObject
 		*/
 		public void setTimePosition(final long newTimePosition);
 
-	}
-
-	/**Default constructor.*/
-	public Audio()
-	{
-		this(null);	//construct the audio with no audio URI
-	}
-
-	/**Audio URI constructor.
-	@param audioURI The new URI of the audio, which may be a resource URI, or <code>null</code> if there is no audio URI.
-	*/
-	public Audio(final URI audioURI)
-	{
-		this.audioURI=audioURI;
-	}
-
-	/**Prepares the object for garbage collection.
-	This implementation makes sure the audio is stopped.
-	*/
-	protected void finalize() throws Throwable
-	{
-		try
-		{
-			stop();	//stop the audio
-    }
-		finally	//always do the default finalization
-		{
-			super.finalize();
-		}
 	}
 }

@@ -4,14 +4,15 @@ import java.util.*;
 import static java.util.Collections.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
+import com.garretwilson.util.NameValuePair;
 import static com.garretwilson.util.MapUtilities.*;
 
-import com.garretwilson.util.NameValuePair;
 import com.guiseframework.platform.DepictedObject;
 
 /**A command to or from a depicted object on the web platform.
 @param <C> The type of command.
 @author Garret Wilson
+Copyright (c) 2007 GlobalMentor, Inc.
 */
 public class WebCommandEvent<C extends Enum<C> & WebCommand> extends AbstractWebDepictEvent
 {
@@ -19,7 +20,7 @@ public class WebCommandEvent<C extends Enum<C> & WebCommand> extends AbstractWeb
 	/**The command.*/
 	private final WebCommand command;
 
-		/**The command.*/
+		/**@return The command.*/
 		@SuppressWarnings("unchecked")
 		public C getCommand() {return (C)command;}
 

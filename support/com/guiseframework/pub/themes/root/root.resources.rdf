@@ -129,6 +129,7 @@
 		<resource:theme.label.access>Access</resource:theme.label.access>
 		<resource:theme.label.access.x>&#x0098;theme.label.access&#x009C; {0}</resource:theme.label.access.x>
 		<resource:theme.label.add>Add</resource:theme.label.add>
+		<resource:theme.label.browse>Browse</resource:theme.label.browse>
 		<resource:theme.label.cancel>Cancel</resource:theme.label.cancel>
 		<resource:theme.label.close>Close</resource:theme.label.close>
 		<resource:theme.label.delete>Delete</resource:theme.label.delete>
@@ -173,6 +174,7 @@
 		<resource:theme.glyph.animation rdf:resource="images/icons/glyphs/animation.gif"/>
 		<resource:theme.glyph.audio rdf:resource="images/icons/glyphs/audio.gif"/>
 		<resource:theme.glyph.blank rdf:resource="images/icons/glyphs/blank.gif"/>
+		<resource:theme.glyph.browse rdf:resource="resource:theme.glyph.folder.tree"/>
 		<resource:theme.glyph.busy rdf:resource="images/icons/glyphs/busy.gif"/>
 		<resource:theme.glyph.cancel rdf:resource="resource:theme.glyph.reject"/>
 		<resource:theme.glyph.close rdf:resource="images/icons/glyphs/close.gif"/>
@@ -196,6 +198,7 @@
 		<resource:theme.glyph.folder rdf:resource="images/icons/glyphs/folder.gif"/>
 		<resource:theme.glyph.folder.closed rdf:resource="resource:theme.glyph.folder"/>
 		<resource:theme.glyph.folder.open rdf:resource="images/icons/glyphs/folder_open.gif"/>
+		<resource:theme.glyph.folder.tree rdf:resource="images/icons/glyphs/folder_tree.gif"/>
 		<resource:theme.glyph.help rdf:resource="resource:theme.glyph.question"/>
 		<resource:theme.glyph.hide rdf:resource="images/icons/glyphs/hide.gif"/>
 		<resource:theme.glyph.hierarchy rdf:resource="images/icons/glyphs/hierarchy.gif"/>

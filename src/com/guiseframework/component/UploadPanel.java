@@ -1,26 +1,27 @@
 package com.guiseframework.component;
 
+import java.util.Collection;
 import java.util.List;
 
+import com.garretwilson.beans.*;
 import static com.garretwilson.io.FileUtilities.getFilename;
 import static com.garretwilson.lang.ClassUtilities.*;
-
-import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
-import com.garretwilson.beans.GenericPropertyChangeEvent;
 import com.garretwilson.lang.ObjectUtilities;
+import static com.garretwilson.net.URIUtilities.*;
+import static com.garretwilson.text.CharacterConstants.*;
 import com.garretwilson.util.Debug;
 
-import static com.garretwilson.net.URIUtilities.*;
 import com.guiseframework.Bookmark;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.Extent;
+import com.guiseframework.model.Notification;
 import com.guiseframework.model.TaskState;
+import com.guiseframework.platform.PlatformFile;
 import com.guiseframework.prototype.ActionPrototype;
 import static com.guiseframework.theme.Theme.*;
 
 /**Panel to collect resources and send them to the specified destination.
-The destination path must be set before upload is initiated, otherwise an {@link IllegalStateException} will be thrown.
 @author Garret Wilson
 */
 public class UploadPanel extends AbstractPanel
@@ -32,8 +33,8 @@ public class UploadPanel extends AbstractPanel
 	/**The bound property of the destination bookmark.*/
 	public final static String DESTINATION_BOOKMARK_PROPERTY=getPropertyName(UploadPanel.class, "destinationBookmark");
 
-	/**The number of resource paths to display at the same time.*/
-	private final static int RESOURCE_PATH_DISPLAY_COUNT=8;
+	/**The number of platform files to display at the same time.*/
+	private final static int PLATFORM_FILE_DISPLAY_COUNT=16;
 
 	/**The panel containing controls such as buttons.*/
 	private final Panel controlPanel;
@@ -86,8 +87,8 @@ public class UploadPanel extends AbstractPanel
 			}
 		}
 
-	/**The resource path list control.*/
-	private final ListControl<String> resourcePathList;
+	/**The platform file list control.*/
+	private final ListControl<PlatformFile> platformFileListControl;
 
 	/**The label containing the current status.*/
 	private final Label currentStatusLabel;
@@ -97,6 +98,12 @@ public class UploadPanel extends AbstractPanel
 
 		/**@return The resource collect control.*/
 		public ResourceCollectControl getResourceCollectControl() {return resourceCollectControl;}
+
+	/**The action prototype for browsing the platform file system.*/
+	private final ActionPrototype browseActionPrototype;
+
+		/**@return The action prototype for browsing the platforom file system.*/
+		public ActionPrototype getBrowseActionPrototype() {return browseActionPrototype;}
 
 	/**The action prototype for uploading.*/
 	private final ActionPrototype uploadActionPrototype;
@@ -139,10 +146,10 @@ public class UploadPanel extends AbstractPanel
 	public UploadPanel()
 	{
 		super(new FlowLayout(Flow.PAGE));	//construct the parent class
-		resourcePathList=new ListControl<String>(String.class, RESOURCE_PATH_DISPLAY_COUNT);	//create a list in which to show the resource paths
-		resourcePathList.setEditable(false);	//don't allow the list to be edited
-		resourcePathList.setLineExtent(new Extent(30, Extent.Unit.EM));
-		add(resourcePathList);
+		platformFileListControl=new ListControl<PlatformFile>(PlatformFile.class, PLATFORM_FILE_DISPLAY_COUNT);	//create a list in which to show the platform files
+		platformFileListControl.setEditable(false);	//don't allow the list to be edited
+		platformFileListControl.setLineExtent(new Extent(30, Extent.Unit.EM));
+		add(platformFileListControl);
 
 		currentStatusLabel=new Label();	//current status label
 		add(currentStatusLabel);
@@ -151,6 +158,24 @@ public class UploadPanel extends AbstractPanel
 		controlPanel=new LayoutPanel(new FlowLayout(Flow.LINE));
 		resourceCollectControl=new ResourceCollectControl();	//resource collector
 		controlPanel.add(resourceCollectControl);
+
+		browseActionPrototype=new ActionPrototype(LABEL_BROWSE+HORIZONTAL_ELLIPSIS_CHAR, GLYPH_BROWSE);	//browse
+		browseActionPrototype.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent actionEvent)
+					{
+						getSession().getPlatform().selectPlatformFiles(true, new ValueSelectListener<Collection<PlatformFile>>()	//select platform files, listening for the selection to occur
+								{
+									public void valueSelected(final ValueEvent<Collection<PlatformFile>> valueEvent)	//when files are selected
+									{
+										platformFileListControl.clear();	//remove the currently displayed platform files
+										platformFileListControl.addAll(valueEvent.getValue());	//add all the new platform files to the list
+										updateComponents();	//update the components in response
+									}							
+								});
+					}
+				});
+		controlPanel.add(browseActionPrototype);
 		uploadActionPrototype=new ActionPrototype(LABEL_UPLOAD, GLYPH_UPLOAD);	//resource upload
 		uploadActionPrototype.setEnabled(false);	//initially disable upload
 		uploadActionPrototype.addActionListener(new ActionListener()
@@ -178,15 +203,17 @@ public class UploadPanel extends AbstractPanel
 		controlPanel.add(cancelActionPrototype);
 	
 			//listen for the resource collection control changing its list of collected resource paths
+/*TODO del all resource collect control references
 		resourceCollectControl.addPropertyChangeListener(ResourceCollectControl.RESOURCE_PATHS_PROPERTY, new AbstractGenericPropertyChangeListener<List<String>>()
 				{
 					public void propertyChange(final GenericPropertyChangeEvent<List<String>> genericPropertyChangeEvent)	//if the list of resource path changes
 					{
-						resourcePathList.clear();	//remove the currently displayed resource paths
-						resourcePathList.addAll(genericPropertyChangeEvent.getNewValue());	//add all the new resource paths to the list
+						platformFileListControl.clear();	//remove the currently displayed resource paths
+						platformFileListControl.addAll(genericPropertyChangeEvent.getNewValue());	//add all the new resource paths to the list
 						updateComponents();	//update the components in response
 					}
 				});
+*/
 			//listen for the resource collection control changing its send state, and update the state of the components in response
 		resourceCollectControl.addPropertyChangeListener(ResourceCollectControl.STATE_PROPERTY, new AbstractGenericPropertyChangeListener<TaskState>()
 				{

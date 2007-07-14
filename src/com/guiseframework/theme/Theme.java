@@ -225,6 +225,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_ACCESS=createStringResourceReference("theme.label.access");
 	public final static String LABEL_ACCESS_X=createStringResourceReference("theme.label.access.x");
 	public final static String LABEL_ADD=createStringResourceReference("theme.label.add");
+	public final static String LABEL_BROWSE=createStringResourceReference("theme.label.browse");
 	public final static String LABEL_CANCEL=createStringResourceReference("theme.label.cancel");
 	public final static String LABEL_CLOSE=createStringResourceReference("theme.label.close");
 	public final static String LABEL_DELETE=createStringResourceReference("theme.label.delete");
@@ -267,6 +268,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI GLYPH_ADD=createURIResourceReference("theme.glyph.add");
 	public final static URI GLYPH_AUDIO=createURIResourceReference("theme.glyph.audio");
 	public final static URI GLYPH_BLANK=createURIResourceReference("theme.glyph.blank");
+	public final static URI GLYPH_BROWSE=createURIResourceReference("theme.glyph.browse");
 	public final static URI GLYPH_BUSY=createURIResourceReference("theme.glyph.busy");
 	public final static URI GLYPH_CANCEL=createURIResourceReference("theme.glyph.cancel");
 	public final static URI GLYPH_CLOSE=createURIResourceReference("theme.glyph.close");
@@ -290,6 +292,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI GLYPH_FOLDER=createURIResourceReference("theme.glyph.folder");
 	public final static URI GLYPH_FOLDER_CLOSED=createURIResourceReference("theme.glyph.folder.closed");
 	public final static URI GLYPH_FOLDER_OPEN=createURIResourceReference("theme.glyph.folder.open");
+	public final static URI GLYPH_FOLDER_TREE=createURIResourceReference("theme.glyph.folder.tree");
 	public final static URI GLYPH_HELP=createURIResourceReference("theme.glyph.help");
 	public final static URI GLYPH_HIDE=createURIResourceReference("theme.glyph.hide");
 	public final static URI GLYPH_HIERARCHY=createURIResourceReference("theme.glyph.hierarchy");

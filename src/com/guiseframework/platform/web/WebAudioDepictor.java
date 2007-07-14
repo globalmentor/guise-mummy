@@ -14,13 +14,6 @@ import com.guiseframework.platform.DepictEvent;
 import com.guiseframework.platform.PlatformEvent;
 
 /**A web depictor for Guise audio.
-This depictor uses the following web command events:
-<dl>
-	<dt>audio-stop<dt> <dd>/dd>
-	<dt>audio-pause<dt> <dd>/dd>
-	<dt>audio-position<dt> <dd>{position:"<var>millisecondPosition</var>"}</dd>
-	<dt>audio-start<dt> <dd>{audioURI:"<var>uri</var>"}</dd>
-</dl>
 @author Garret Wilson
 */
 public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audio.Depictor<Audio>
@@ -29,7 +22,9 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 	/**The web commands for controlling audio.*/
 	public enum AudioCommand implements WebCommand
 	{
-		/**The command to start the audio.*/
+		/**The command to start the audio.
+		parameters: <code>{audioURI:"<var>uri</var>"}</code>
+		*/
 		AUDIO_PLAY,
 
 		/**The command to pause the audio.*/
@@ -38,7 +33,9 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 		/**The command to stop the audio.*/
 		AUDIO_STOP,
 
-		/**The command to set the position of the audio.*/
+		/**The command to set the position of the audio.
+		parameters: <code>{position:"<var>millisecondPosition</var>"}</code>
+		*/
 		AUDIO_POSITION;
 	}
 

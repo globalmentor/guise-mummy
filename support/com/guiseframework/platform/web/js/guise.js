@@ -1040,17 +1040,20 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 //			alert("received command "+command+" for object "+objectID+" with audioURI "+parameters["audioURI"]);
 			switch(command)	//see which command this is
 			{
+				case "audio-pause":
+					this._flash.pauseSound(objectID);	//pause the sound
+					break;
 				case "audio-play":
 					this._flash.playSound(objectID, parameters["audioURI"]);	//play the sound
 					break;
-				case "audio-pause":
-					this._flash.pauseSound(objectID);	//pause the sound
+				case "audio-position":
+					this._flash.setSoundPosition(objectID, parameters["position"]);	//set the sound position
 					break;
 				case "audio-stop":
 					this._flash.stopSound(objectID);	//stop the sound
 					break;
-				case "audio-position":
-					this._flash.setSoundPosition(objectID, parameters["position"]);	//set the sound position
+				case "file-browse":
+					this._flash.browseFiles(objectID, parameters["multiple"]);	//browse files, specifying whether multiple files should be selected
 					break;
 				case "resource-collect-receive":
 					var element=document.getElementById(objectID);	//get the component element
@@ -2728,32 +2731,6 @@ if(elementName=="select")
 			}
 		};
 
-		/**Called while a sound is playing.
-		@param sound The sound that is playing.
-		*/
-		proto._whileSoundPlaying=function(sound)
-		{
-//			this.trace("sound", sound.sID, "is playing at position: ", sound.position, "duration:", sound.duration, "duration estimate", sound.durationEstimate, "ready state", sound.readyState, "last position update time", sound.lastPositionUpdateTime, "bytes loaded", sound.bytesLoaded, "bytes total", sound.bytesTotal);
-//			var position=sound.position;	//get the sound position
-//			var duration=sound.readyState==3 ? sound.duration : sound.durationEstimate;	//if the sound isn't yet loaded, use the estimate of the duration
-//			this.trace("ready to send event with position "+position+" duration "+duration);
-			var nowTime=new Date().getTime();	//get the current date in milliseconds
-			if(nowTime>sound.lastPositionUpdateTime+1000)	//if more than a second has passed since our last update
-			{
-				sound.lastPositionUpdateTime=nowTime;	//update the last update time
-				var duration=sound.duration;	//get the sound duration
-				this.sendAJAXRequest(new ChangeAJAXEvent(sound.sID, new Map("position", sound.position, "duration", duration||-1)));	//send an AJAX request with the new sound position (make sure the duration is defined)
-			}
-		};
-
-		/**Called while a sound finishes.
-		@param sound The sound that is finished.
-		*/
-		proto._onSoundFinish=function(sound)
-		{
-			this.sendAJAXRequest(new ChangeAJAXEvent(sound.sID, new Map("state", com.guiseframework.js.TaskState.COMPLETE)));	//send an AJAX request with the new sound state
-		};
-
 		/**Called when the state of a sound changes.
 		@param soundID The ID of the sound the state of which is changing.
 		@param oldState The old sound state.
@@ -2774,6 +2751,25 @@ if(elementName=="select")
 		{
 			this.sendAJAXRequest(new ChangeAJAXEvent(soundID, new Map("position", position, "duration", duration)));	//send an AJAX request with the new sound position and duration
 		};
+
+		/**Called when files are selected by the user.
+		@param fileReferenceListID The ID of the file reference list.
+		@param fileReferences The array of file references representing selected files.
+		*/
+		proto._onFilesSelected=function(fileReferenceListID, fileReferences)
+		{
+//			alert("files selected, count "+fileReferences.length);
+			var fileReferenceCount=fileReferences.length;	//find out how many file references there are
+//			alert("file references: "+JSON.serialize(fileReferences));
+			var fileReferenceInfos=new Array(fileReferenceCount);	//create a new array to store only the file references info we want to send back
+			for(var i=0; i<fileReferenceCount; ++i)	//for each file reference
+			{
+				var fileReference=fileReferences[i];	//get this file reference
+				fileReferenceInfos[i]={"id":fileReference.id, "name":fileReference.name, "size":fileReference.size};	//create our own information about this file reference
+			}
+			this.sendAJAXRequest(new ChangeAJAXEvent(fileReferenceListID, {"fileReferences":fileReferenceInfos}));	//send an AJAX request with the file references
+//			alert("file references: "+JSON.serialize(fileReferenceInfos));
+		} 
 
 	}
 

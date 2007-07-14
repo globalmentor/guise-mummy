@@ -1,4 +1,6 @@
 import flash.external.ExternalInterface;
+import flash.net.FileReference;
+import flash.net.FileReferenceList;
 
 /**Guise ActionScript for support functionality based in Flash.
 Copyright (c) 2007 GlobalMentor, Inc.
@@ -15,8 +17,28 @@ class com.guiseframework.platform.web.as.Guise
 	/**The singleton instance of the Guise class.*/
 	private static var guise:Guise;
 
-	/**The associate array of sounds keyed to sound IDs.*/
+	/**The name of the Guise variable in JavaScript.*/
+	private static var GUISE_JAVSCRIPT_VARIABLE_NAME:String="guise";
+
+	/**The delimiter for forming compound IDs.*/
+	public static var ID_SEGMENT_DELIMITER:String=".";
+
+	/**The counter used for creating unique IDs.*/
+	private var nextIDNumber:Number=1;
+
+		/**Generates an ID for an object.
+		The ID is guaranteed to be unique within this instance of Guise Flash, but may not be appropriate to be used in other contexts, such as an XML ID or name.
+		*/ 
+		private function generateID():String
+		{
+			return (nextIDNumber++).toString(16);	//return a hex representation of the counter and increment the counter TODO use Base16 when possible
+		}
+
+	/**The associate array of Sounds keyed to sound IDs.*/
 	private var soundMap:Object={};
+
+	/**The associate array of FileReferences (for single file selections) and FileReferenceLists keyed to IDs.*/
+	private var fileReferenceMap:Object={};
 
 	/**The state of a task.
 	@see com.guiseframework.model.TaskState
@@ -30,10 +52,13 @@ class com.guiseframework.platform.web.as.Guise
 	public function Guise()
 	{
 			//add callback methods for JavaScript to call
+		ExternalInterface.addCallback("browseFiles", this, browseFiles);
 		ExternalInterface.addCallback("pauseSound", this, pauseSound); 
 		ExternalInterface.addCallback("playSound", this, playSound); 
 		ExternalInterface.addCallback("setSoundPosition", this, setSoundPosition); 
 		ExternalInterface.addCallback("stopSound", this, stopSound);
+
+		ExternalInterface.addCallback("test", this, test);
 	}
 
 	/**Sets the state of a sound.
@@ -45,7 +70,7 @@ class com.guiseframework.platform.web.as.Guise
 	{
 		var oldState:String=sound["state"];	//get the old state
 		sound["state"]=newState;	//update the state of the sound
-		ExternalInterface.call("guise._onSoundStateChange", sound["id"], oldState, newState);	//send the sound's state back to Guise
+		ExternalInterface.call(GUISE_JAVSCRIPT_VARIABLE_NAME+"._onSoundStateChange", sound["id"], oldState, newState);	//send the sound's state back to Guise
 	}
 
 	/**Pauses sound with the given ID.
@@ -161,7 +186,7 @@ class com.guiseframework.platform.web.as.Guise
 			if(sound["state"]==TaskState.INCOMPLETE)		//if the sound is playing
 			{
 				soundPlaying=true;	//indicate that we found a sound playing
-				ExternalInterface.call("guise._onSoundPositionChange", soundID, sound.position, sound.duration);	//send the sound's position and duration back to Guise
+				ExternalInterface.call(GUISE_JAVSCRIPT_VARIABLE_NAME+"._onSoundPositionChange", soundID, sound.position, sound.duration);	//send the sound's position and duration back to Guise
 			}
 		}
 		if(soundPlaying)	//if at least one sound was playing
@@ -172,6 +197,94 @@ class com.guiseframework.platform.web.as.Guise
 		{
 			positionTimeoutID=null;	//indicate that no updates are scheduled TODO improve the race condition here if we can
 		}
+	}
+
+	/**Browses for files.
+	If the file reference or file reference list has not been created, it will be created and given the indicated ID.
+	@param fileReferenceID The ID of the file reference or file reference list list.
+	@param multiple Whether the user is allowed to select multiple files.
+	*/
+	public function browseFiles(fileReferenceID:String, multiple:Boolean):Void
+	{
+		var object:Object=fileReferenceMap[fileReferenceID];	//get the existing file reference or file reference list, if any
+		if(!object)	//if there is no file reference for that ID
+		{
+			if(multiple)	//if we should allow multiple files to be selected
+			{
+				var fileReferenceList:FileReferenceList=new FileReferenceList();	//create the new file reference list
+				fileReferenceList["id"]=fileReferenceID;	//save the file reference ID
+				var listener:Object=new Object();	//create a new listener
+				listener.onSelect=onFileReferenceListSelect.bind(this);	//set the listener method for files selected
+				fileReferenceList.addListener(listener);	//add the listener object
+				fileReferenceMap[fileReferenceID]=fileReferenceList;	//store the file reference list in the map, keyed to the given ID
+				object=fileReferenceList;	//save the file reference list				
+			}
+			else	//if we should only allow one file to be selected
+			{
+				//TODO finish
+			}
+		}
+		if(object instanceof FileReferenceList)	//if this is a file reference list
+		{
+			var fileReferenceList:FileReferenceList=FileReferenceList(object);	//get the file reference list
+			fileReferenceList.browse();	//tell the file reference list to browse
+		}
+		//TODO fix for FileReference
+	}
+
+	private function onFileReferenceListSelect(fileReferenceList:FileReferenceList)
+	{
+		var fileList:Array=fileReferenceList.fileList;	//get the list of file references from the file reference list
+		for(var i:Number=fileList.length-1; i>=0; --i)	//for each file reference
+		{
+			fileList[i]["id"]=generateID();	//generate and assign a new ID to this file reference so that we can recognize it later
+		}
+		ExternalInterface.call(GUISE_JAVSCRIPT_VARIABLE_NAME+"._onFilesSelected", fileReferenceList["id"], fileList);	//send selected files back to Guise
+	}
+
+	private function test():Void
+	{	
+		var allTypes:Array = new Array();
+		var imageTypes:Object = new Object();
+		imageTypes.description = "Images (*.jpg, *.jpeg, *.gif, *.png)";
+		imageTypes.extension = "*.jpg; *.jpeg; *.gif; *.png";
+		allTypes.push(imageTypes);
+		var listener:Object = new Object();
+		listener.onSelect = function(file:FileReference):Void {
+		trace("onSelect: " + file.name);
+		if(!file.upload("https://www.marmox.net/resource")) {
+		trace("Upload dialog failed to open.");
+		}
+		}
+/*TODO fix
+		listener.onCancel = function(file:FileReference):Void {
+		trace("onCancel");
+		}	
+		listener.onOpen = function(file:FileReference):Void {
+		trace("onOpen: " + file.name);
+		}
+		listener.onProgress = function(file:FileReference, bytesLoaded:Number,
+		bytesTotal:Number):Void {
+		trace("onProgress with bytesLoaded: " + bytesLoaded + " bytesTotal: " +
+		bytesTotal);
+		}
+		listener.onComplete = function(file:FileReference):Void {
+		trace("onComplete: " + file.name);
+		}
+		listener.onHTTPError = function(file:FileReference):Void {
+		trace("onHTTPError: " + file.name);
+		}
+		listener.onIOError = function(file:FileReference):Void {
+		trace("onIOError: " + file.name);
+		}
+		listener.onSecurityError = function(file:FileReference,
+		errorString:String):Void {
+		trace("onSecurityError: " + file.name + " errorString: " + errorString);
+		}
+*/
+		var fileRef:FileReference = new FileReference();
+		fileRef.addListener(listener);
+		fileRef.browse(allTypes);
 	}
 
 	/**Main entry point.*/

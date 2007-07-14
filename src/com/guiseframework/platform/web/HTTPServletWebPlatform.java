@@ -2,6 +2,7 @@ package com.guiseframework.platform.web;
 
 import java.net.URI;
 import java.util.*;
+
 import static java.util.Arrays.*;
 import static java.util.Collections.*;
 
@@ -14,11 +15,14 @@ import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.servlet.http.HttpServletUtilities.*;
 import static com.garretwilson.servlet.http.HttpServletConstants.*;
 
+import com.garretwilson.beans.*;
+import com.garretwilson.event.ProgressListener;
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.audio.Audio;
 import com.guiseframework.component.*;
-import com.guiseframework.event.ModalNavigationListener;
+import com.guiseframework.event.ValueEvent;
+import com.guiseframework.event.ValueSelectListener;
 import com.guiseframework.platform.*;
 
 /**A web platform based upon an HTTP servlet.
@@ -44,7 +48,6 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 		@param javascriptTroduct the JavaScript supported on this platform, or <code>null</code> if JavaScript is not supported or the JavaScript support is not yet known.
 		*/
 		void setJavaScriptProduct(final Product product) {javascriptProduct=product;}
-
 
 	/**Application and request constructor.
 	This implementation updates the environment from the initial request cookies
@@ -84,6 +87,8 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 			//register depictors
 				//audio
 		registerDepictorClass(Audio.class, WebAudioDepictor.class);		
+				//Flash
+		registerDepictorClass(FlashFileReferenceList.class, WebFlashFileReferenceListDepictor.class);		
 				//components
 		registerDepictorClass(AccordionMenu.class, WebAccordionMenuDepictor.class);
 		registerDepictorClass(ApplicationFrame.class, WebApplicationFrameDepictor.class);
@@ -152,6 +157,64 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 			throw new IllegalStateException("No depict context is available.");
 		}
 		return depictContext;	//return the depict context
+	}
+
+
+	private FlashFileReferenceList fileReferenceList=null;	//TODO finish; comment
+	
+
+	/**Selects one or more files on the platform, using the appropriate selection functionality for the platform.
+	@param multiple Whether multiple files should be allowed to be selected.
+	@param platformFileSelectListener The listener that will be notified when platform files are selected.
+	@exception NullPointerException if the given listener is <code>null</code>.
+	*/
+	public void selectPlatformFiles(final boolean multiple, final ValueSelectListener<Collection<PlatformFile>> platformFileSelectListener)
+	{
+		fileReferenceList=new FlashFileReferenceList();	//create a new flash file reference list
+		checkInstance(platformFileSelectListener, "Platform file select listener cannot be null.");
+		fileReferenceList.addPropertyChangeListener(FlashFileReferenceList.PLATFORM_FILES_PROPERTY, new AbstractGenericPropertyChangeListener<List<PlatformFile>>()	//listen for the files changing
+				{
+					public void propertyChange(final GenericPropertyChangeEvent<List<PlatformFile>> genericPropertyChangeEvent)	//if the user selects platform files
+					{
+						fileReferenceList.removePropertyChangeListener(FlashFileReferenceList.PLATFORM_FILES_PROPERTY, this);	//we don't need to listen for the files anymore
+						platformFileSelectListener.valueSelected(new ValueEvent<Collection<PlatformFile>>(HTTPServletWebPlatform.this, genericPropertyChangeEvent.getNewValue()));	//report the new value to the listener
+					}
+				});
+		fileReferenceList.browse();	//tell the file reference list to start browsing
+	}
+
+	/**Uploads files from the platform.
+	@param destinationPath The path representing the destination of the platform files, relative to the application.
+	@param destinationBookmark The bookmark to be used in uploading the platform files to the destination path, or <code>null</code> if no bookmark should be used.
+	@param progressListener The listener that will be notified when progress is made for a particular platform file upload.
+	@param platformFiles Thet platform files to upload.
+	@exception NullPointerException if the given destination path and/or listener is <code>null</code>.
+	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
+	@exception IllegalArgumentException if the provided path is absolute.
+	@exception IllegalStateException if one or more of the specified platform files can no longer be uploaded because, for example, other platform files have since been selected.	
+	*/
+	public void uploadPlatformFiles(final String destinationPath, final Bookmark destinationBookmark, final ProgressListener progressListener, final PlatformFile... platformFiles)
+	{
+		if(fileReferenceList==null)	//if no Flash file reference list has been created
+		{
+			throw new IllegalStateException("No Flash file reference list exists.");
+		}
+/*TODO fix
+			this.destinationPath=checkRelativePath(destinationPath);	//save the path
+			this.destinationBookmark=destinationBookmark;	//save the bookmark
+		
+		fileReferenceList=new FlashFileReferenceList();	//create a new flash file reference list
+		checkInstance(platformFileSelectListener, "Platform file select listener cannot be null.");
+		fileReferenceList.addPropertyChangeListener(FlashFileReferenceList.PLATFORM_FILES_PROPERTY, new AbstractGenericPropertyChangeListener<List<PlatformFile>>()	//listen for the files changing
+				{
+					public void propertyChange(final GenericPropertyChangeEvent<List<PlatformFile>> genericPropertyChangeEvent)	//if the user selects platform files
+					{
+						fileReferenceList.removePropertyChangeListener(FlashFileReferenceList.PLATFORM_FILES_PROPERTY, this);	//we don't need to listen for the files anymore
+						platformFileSelectListener.valueSelected(new ValueEvent<Collection<PlatformFile>>(HTTPServletWebPlatform.this, genericPropertyChangeEvent.getNewValue()));	//report the new value to the listener
+					}
+				});
+		fileReferenceList.browse();	//tell the file reference list to start browsing
+*/
 	}
 
 	/**The URI of the resource to sent to the platform, or <code>null</code> if there is no resource to be sent.*/

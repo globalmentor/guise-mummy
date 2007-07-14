@@ -1,11 +1,13 @@
 package com.guiseframework.platform;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseApplication;
+import com.guiseframework.event.ValueSelectListener;
 
 /**The platform on which Guise objects are being depicted.
 @author Garret Wilson
@@ -65,6 +67,12 @@ public interface Platform
 	@exception IllegalStateException if no depict context can be returned in the current depiction state.
 	*/
 	public DepictContext getDepictContext();
+
+	/**Selects one or more files on the platform, using the appropriate selection functionality for the platform.
+	@param multiple Whether multiple files should be allowed to be selected.
+	@param platformFileSelectListener The listener that will be notified when platform files are selected.
+	*/
+	public void selectPlatformFiles(final boolean multiple, final ValueSelectListener<Collection<PlatformFile>> platformFileSelectListener);
 
 	/**Sends a resource to the platform.
 	@param resourcePath The path of the resource to send, relative to the application.
