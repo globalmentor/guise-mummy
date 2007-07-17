@@ -41,6 +41,9 @@ public interface GuiseSession extends PropertyBindable
 	/**The theme URI bound property.*/
 	public final static String THEME_URI_PROPERTY=getPropertyName(GuiseSession.class, "themeURI");
 
+	/**@return The unique identifier of this session.*/
+	public UUID getUUID();
+
 	/**@return The Guise application to which this session belongs.*/
 	public GuiseApplication getApplication();
 

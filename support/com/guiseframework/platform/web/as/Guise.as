@@ -10,6 +10,10 @@ var id:String;	//the ID of the sound
 var state:TaskState.X;	//the current playing state of the sound
 var startPosition:Number;	//the position of the sound to use when playing is commenced
 </p>
+<p>File references are given the following additional variables:
+var id:String;	//the ID of the file reference
+var fileReferenceListID:String;	//the ID of the Guise depicted object that manages the file reference
+</p>
 */
 class com.guiseframework.platform.web.as.Guise
 {
@@ -27,11 +31,11 @@ class com.guiseframework.platform.web.as.Guise
 	private var nextIDNumber:Number=1;
 
 		/**Generates an ID for an object.
-		The ID is guaranteed to be unique within this instance of Guise Flash, but may not be appropriate to be used in other contexts, such as an XML ID or name.
+		The ID is guaranteed to be unique within this instance of Guise Flash.
 		*/ 
 		private function generateID():String
 		{
-			return (nextIDNumber++).toString(16);	//return a hex representation of the counter and increment the counter TODO use Base16 when possible
+			return "id"+(nextIDNumber++).toString(16);	//return an ID including the hex representation of the counter and increment the counter TODO use Base64 when possible
 		}
 
 	/**The associate array of Sounds keyed to sound IDs.*/
@@ -57,8 +61,7 @@ class com.guiseframework.platform.web.as.Guise
 		ExternalInterface.addCallback("playSound", this, playSound); 
 		ExternalInterface.addCallback("setSoundPosition", this, setSoundPosition); 
 		ExternalInterface.addCallback("stopSound", this, stopSound);
-
-		ExternalInterface.addCallback("test", this, test);
+		ExternalInterface.addCallback("uploadFile", this, uploadFile);
 	}
 
 	/**Sets the state of a sound.
@@ -201,22 +204,22 @@ class com.guiseframework.platform.web.as.Guise
 
 	/**Browses for files.
 	If the file reference or file reference list has not been created, it will be created and given the indicated ID.
-	@param fileReferenceID The ID of the file reference or file reference list list.
+	@param fileReferenceListID The ID of the file reference or file reference list.
 	@param multiple Whether the user is allowed to select multiple files.
 	*/
-	public function browseFiles(fileReferenceID:String, multiple:Boolean):Void
+	public function browseFiles(fileReferenceListID:String, multiple:Boolean):Void
 	{
-		var object:Object=fileReferenceMap[fileReferenceID];	//get the existing file reference or file reference list, if any
+		var object:Object=fileReferenceMap[fileReferenceListID];	//get the existing file reference or file reference list, if any
 		if(!object)	//if there is no file reference for that ID
 		{
 			if(multiple)	//if we should allow multiple files to be selected
 			{
 				var fileReferenceList:FileReferenceList=new FileReferenceList();	//create the new file reference list
-				fileReferenceList["id"]=fileReferenceID;	//save the file reference ID
+				fileReferenceList["id"]=fileReferenceListID;	//save the file reference ID
 				var listener:Object=new Object();	//create a new listener
 				listener.onSelect=onFileReferenceListSelect.bind(this);	//set the listener method for files selected
 				fileReferenceList.addListener(listener);	//add the listener object
-				fileReferenceMap[fileReferenceID]=fileReferenceList;	//store the file reference list in the map, keyed to the given ID
+				fileReferenceMap[fileReferenceListID]=fileReferenceList;	//store the file reference list in the map, keyed to the given ID
 				object=fileReferenceList;	//save the file reference list				
 			}
 			else	//if we should only allow one file to be selected
@@ -232,59 +235,61 @@ class com.guiseframework.platform.web.as.Guise
 		//TODO fix for FileReference
 	}
 
+	/**Called when a file reference list successfully selects files from user input.
+	This method creates a list of file information objects, assigning them unique IDs, and sends them back to Guise. 
+	@param fileReferenceList The file reference list that selected files.
+	*/ 
 	private function onFileReferenceListSelect(fileReferenceList:FileReferenceList)
 	{
 		var fileList:Array=fileReferenceList.fileList;	//get the list of file references from the file reference list
-		for(var i:Number=fileList.length-1; i>=0; --i)	//for each file reference
+		var fileMap:Object=new Object();	//create an associated array for quickly looking up file references in the future
+		var fileReferenceCount:Number=fileList.length;	//find out how many file references there are
+		var fileReferenceInfos=new Array(fileReferenceCount);	//create a new array to store only the file references info we want to send back
+		for(var i:Number=0; i<fileReferenceCount; ++i)	//for each file reference
 		{
-			fileList[i]["id"]=generateID();	//generate and assign a new ID to this file reference so that we can recognize it later
+			var fileReference:FileReference=fileList[i];	//get this file reference
+			var fileReferenceID:String=generateID();	//generate an ID for this file reference
+			fileReference["id"]=fileReferenceID;	//assign the ID to this file reference so that we can recognize it later
+			fileReference["fileReferenceListID"]=fileReferenceList["id"];	//save a reference to the file reference list ID
+			var listener:Object=new Object();	//create a new listener
+			listener.onProgress=onFileReferenceProgress.bind(this);	//set the listener method for file progress
+			fileReference.addListener(listener);	//add the listener object
+			fileMap[fileReferenceID]=fileReference;	//store the file reference in the map for quick lookup
+			fileReferenceInfos[i]={id:fileReferenceID, name:fileReference.name, size:fileReference.size};	//create our own information about this file reference
 		}
-		ExternalInterface.call(GUISE_JAVSCRIPT_VARIABLE_NAME+"._onFilesSelected", fileReferenceList["id"], fileList);	//send selected files back to Guise
+		fileReferenceList["fileMap"]=fileMap;	//associate the file map with the file reference list, replacing any map of files from previous selections, if any
+		ExternalInterface.call(GUISE_JAVSCRIPT_VARIABLE_NAME+"._onFilesSelected", fileReferenceList["id"], fileReferenceInfos);	//send information on the selected files back to Guise
 	}
 
-	private function test():Void
-	{	
-		var allTypes:Array = new Array();
-		var imageTypes:Object = new Object();
-		imageTypes.description = "Images (*.jpg, *.jpeg, *.gif, *.png)";
-		imageTypes.extension = "*.jpg; *.jpeg; *.gif; *.png";
-		allTypes.push(imageTypes);
-		var listener:Object = new Object();
-		listener.onSelect = function(file:FileReference):Void {
-		trace("onSelect: " + file.name);
-		if(!file.upload("https://www.marmox.net/resource")) {
-		trace("Upload dialog failed to open.");
+	/**Uploads a file
+	If no such file reference or file reference list exists, or no files of a file reference list match that indicated by the given file ID, no action occurs.
+	@param fileReferenceListID The ID of the file reference or file reference list.
+	@param fileReferenceID The ID of the file reference within a file reference list, or null if the file reference list ID refers to a single file reference.
+	@param fileURI The URI to which the file should be uploaded.
+	*/
+	public function uploadFile(fileReferenceListID:String, fileReferenceID:Number, fileURI:String):Void
+	{
+		var object:Object=fileReferenceMap[fileReferenceListID];	//get the existing file reference or file reference list, if any
+		if(object instanceof FileReferenceList)	//if this is a file reference list
+		{
+			var fileReferenceList:FileReferenceList=FileReferenceList(object);	//get the file reference list
+			var fileReference=fileReferenceList["fileMap"][fileReferenceID];	//get the requested file reference
+			if(fileReference)	//if we found a file reference
+			{
+				fileReference.upload(fileURI);	//tell the file reference to start uploading
+			}
 		}
-		}
-/*TODO fix
-		listener.onCancel = function(file:FileReference):Void {
-		trace("onCancel");
-		}	
-		listener.onOpen = function(file:FileReference):Void {
-		trace("onOpen: " + file.name);
-		}
-		listener.onProgress = function(file:FileReference, bytesLoaded:Number,
-		bytesTotal:Number):Void {
-		trace("onProgress with bytesLoaded: " + bytesLoaded + " bytesTotal: " +
-		bytesTotal);
-		}
-		listener.onComplete = function(file:FileReference):Void {
-		trace("onComplete: " + file.name);
-		}
-		listener.onHTTPError = function(file:FileReference):Void {
-		trace("onHTTPError: " + file.name);
-		}
-		listener.onIOError = function(file:FileReference):Void {
-		trace("onIOError: " + file.name);
-		}
-		listener.onSecurityError = function(file:FileReference,
-		errorString:String):Void {
-		trace("onSecurityError: " + file.name + " errorString: " + errorString);
-		}
-*/
-		var fileRef:FileReference = new FileReference();
-		fileRef.addListener(listener);
-		fileRef.browse(allTypes);
+		//TODO fix for FileReference
+	}
+
+	/**Called when a file makes progress being uploaded or downloaded.
+	@param fileReference The reference to the file being uploaded or downloaded.
+	@param bytesLoaded The number of bytes transferred, or -1 if unknown.
+	@param bytesTotal The total number of bytes to transfer, or -1 if unknown.
+	*/ 
+	private function onFileReferenceProgress(fileReference:FileReference, bytesLoaded:Number, bytesTotal:Number)
+	{
+		ExternalInterface.call(GUISE_JAVSCRIPT_VARIABLE_NAME+"._onFileProgress", fileReference["fileReferenceListID"], fileReference["id"], bytesLoaded, bytesTotal);	//send the progress to Guise
 	}
 
 	/**Main entry point.*/

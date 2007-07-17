@@ -2,7 +2,9 @@ package com.guiseframework.platform.web;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import com.garretwilson.event.ProgressListener;
+import com.guiseframework.Bookmark;
+import com.guiseframework.event.ProgressEvent;
+import com.guiseframework.event.ProgressListener;
 import com.guiseframework.platform.AbstractPlatformFile;
 
 /**A local file represented by a Flash <code>flash.net.FileReference</code> on the web platform.
@@ -23,18 +25,7 @@ public class FlashPlatformFile extends AbstractPlatformFile
 	private final String id;
 
 		/**@return The ID given to the file by Flash.*/
-		protected String getID() {return id;}
-
-	/**The listener that will be notified when progress is made for a particular platform file upload, or <code>null</code> if no listener has been registered.*/
-	private ProgressListener progressListener=null;
-
-		/**@return The listener that will be notified when progress is made for a particular platform file upload, or <code>null</code> if no listener has been registered.*/
-		ProgressListener getProgressListener() {return progressListener;}
-
-		/**Sets the listener to be notified when progress is made for a particular platform file upload
-		@param progressListener The listener that will be notified when progress is made for a particular platform file upload, or <code>null</code> if no listener should be registered.
-		*/
-		void setProgressListener(final ProgressListener progressListener) {this.progressListener=progressListener;}
+		public String getID() {return id;}
 
 	/**File reference list, name and size constructor.
 	@param fileReferenceList The Flash file reference list that owns this platform file.
@@ -49,4 +40,31 @@ public class FlashPlatformFile extends AbstractPlatformFile
 		this.id=checkInstance(id, "ID cannot be null.");
 		this.fileReferenceList=checkInstance(fileReferenceList, "File reference list cannot be null.");
 	}
+
+	/**Uploads the file from the platform.
+	@param destinationPath The path representing the destination of the platform file, relative to the application.
+	@param destinationBookmark The bookmark to be used in uploading the platform file to the destination path, or <code>null</code> if no bookmark should be used.
+	@exception NullPointerException if the given destination path and/or listener is <code>null</code>.
+	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
+	@exception IllegalArgumentException if the provided path is absolute.
+	@exception IllegalStateException the platform file can no longer be uploaded because, for example, other platform files have since been selected.	
+	*/
+	public void upload(final String destinationPath, final Bookmark destinationBookmark)
+	{
+		getFileReferenceList().upload(this, destinationPath, destinationBookmark);	//tell the owner file reference list to upload this file
+	}
+
+	/**Fires a progress event to all registered progress listeners.
+	This method delegates to the super version and is present in this class so that it may be called from the depictor of {@link FlashFileReferenceList}.
+	@param transferred The current number of bytes transferred, or <code>-1</code> if not known.
+	@param total The total or estimated total bytes to transfer, or <code>-1</code> if not known.
+	@see ProgressListener
+	@see ProgressEvent
+	@see WebFlashFileReferenceListDepictor
+	*/
+	protected void fireProgressed(final long transferred, final long total)
+	{
+		super.fireProgressed(transferred, total);	//delegate to the super version
+	}
+
 }

@@ -216,6 +216,13 @@ public interface GuiseApplication extends PropertyBindable
 	*/
 	public void unregisterSession(final GuiseSession guiseSession);
 
+	/**Retrieves a Guise session for the given UUID.
+	@param uuid The UUID of the Guise session to retrieve. 
+	@return The Guise session associated with the given UUID, or <code>null</code> if no Guise session is associated with the given UUID.
+	@exception NullPointerException if the given UUID is <code>null</code>.
+	*/
+	public GuiseSession getSession(final UUID uuid);
+
 	/**Creates a frame for the application.
 	@return A new frame for the application.
 	*/

@@ -105,7 +105,7 @@ public class WebAudioDepictor extends AbstractWebDepictor<Audio> implements Audi
 			{
 				audio.setState(getSerializedEnum(TaskState.class, stateString));	//update the state of the audio
 			}
-			final Number position=asInstance(properties.get("position"), Number.class);	//get the position, if reported
+			final Number position=asInstance(properties.get("position"), Number.class);	//get the position, if reported TODO use a constant
 			if(position!=null)	//if we have a position
 			{
 				final Number duration=asInstance(properties.get("duration"), Number.class);	//get the duration, if reported

@@ -9,6 +9,7 @@ import static java.util.Collections.*;
 import javax.mail.internet.ContentType;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
@@ -31,6 +32,12 @@ import com.guiseframework.platform.*;
 public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPlatform
 {
 
+	/**The HTTP servlet session with which this platform is associated.*/
+	private final HttpSession httpSession;
+
+		/**@return The HTTP servlet session with which this platform is associated.*/
+		public HttpSession getHTTPSession() {return httpSession;}
+
 	/**The user agent client, such as a browser, used to access Guise on this platform.*/
 	private final WebUserAgentProduct clientProduct;
 
@@ -52,26 +59,28 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 	/**Application and request constructor.
 	This implementation updates the environment from the initial request cookies
 	@param application The Guise application running on this platform.
-	@param request The HTTP servlet request.
-	@exception NullPointerException if the given application and/or environment is <code>null</code>.
+	@param httpSession The HTTP servlet session with which this platform is associated. 
+	@param httpRequest The HTTP servlet request.
+	@exception NullPointerException if the given application, HTTP session, and/or HTTP request is <code>null</code>.
 	*/
-	public HTTPServletWebPlatform(final GuiseApplication application, final HttpServletRequest request)
+	public HTTPServletWebPlatform(final GuiseApplication application, final HttpSession httpSession, final HttpServletRequest httpRequest)
 	{
 		super(application);	//construct the parent class
+		this.httpSession=checkInstance(httpSession, "HTTP session cannot be null.");
 			//update the client
-		final String userAgentID=getUserAgent(request);	//get the user agent identification, if any
-		final Map<String, Object> userAgentProperties=getUserAgentProperties(request);	//get other information about the user agent from the request
+		final String userAgentID=getUserAgent(httpRequest);	//get the user agent identification, if any
+		final Map<String, Object> userAgentProperties=getUserAgentProperties(httpRequest);	//get other information about the user agent from the request
 		final String userAgentName=asInstance(userAgentProperties.get(USER_AGENT_NAME_PROPERTY), String.class);	//get the user agent name, if any
 		final String userAgentVersion=asInstance(userAgentProperties.get(USER_AGENT_VERSION_PROPERTY), String.class);	//get the user string, if any
 		final Number userAgentVersionNumber=asInstance(userAgentProperties.get(USER_AGENT_VERSION_NUMBER_PROPERTY), Number.class);	//get the user agent version number, if any
 		final int[] userAgentVersionNumbers=(int[])userAgentProperties.get(USER_AGENT_VERSION_NUMBERS_PROPERTY);	//get the user agent version numbers, if any TODO check why we can't use asArrayInstance() with Integer.TYPE
 		final WebUserAgentProduct.Brand userAgentBrand=WebUserAgentProduct.Brand.getBrand(userAgentName);	//get the specific brand of user agent if it's one we recognize
-		final ContentType[] clientAcceptedContentTypes=getAcceptedContentTypes(request);	//return the user agent accepted content types from the request
-		final Locale[] clientAcceptedLanguages=getAcceptedLanguages(request);	//return the user agent accepted languages from the request
+		final ContentType[] clientAcceptedContentTypes=getAcceptedContentTypes(httpRequest);	//return the user agent accepted content types from the request
+		final Locale[] clientAcceptedLanguages=getAcceptedLanguages(httpRequest);	//return the user agent accepted languages from the request
 		this.clientProduct=new DefaultWebUserAgentProduct(userAgentID, userAgentBrand, userAgentName, userAgentVersion, userAgentVersionNumber!=null ? userAgentVersionNumber.doubleValue() : Double.NaN, userAgentVersionNumbers, unmodifiableList(asList(clientAcceptedContentTypes)), unmodifiableList(asList(clientAcceptedLanguages)));	//save the client information
 		javascriptProduct=null;	//we don't yet know the JavaScript product
 		final Environment environment=getEnvironment();	//get the environment
-		final Cookie[] cookies=request.getCookies();	//get the cookies in the request
+		final Cookie[] cookies=httpRequest.getCookies();	//get the cookies in the request
 		if(cookies!=null)	//if a cookie array was returned
 		{
 			for(final Cookie cookie:cookies)	//for each cookie in the request

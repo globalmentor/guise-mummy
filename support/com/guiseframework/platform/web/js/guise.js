@@ -1055,6 +1055,9 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 				case "file-browse":
 					this._flash.browseFiles(objectID, parameters["multiple"]);	//browse files, specifying whether multiple files should be selected
 					break;
+				case "file-upload":
+					this._flash.uploadFile(objectID, parameters["id"], parameters["destinationURI"]);	//upload the identified file to the specified destination URI
+					break;
 				case "resource-collect-receive":
 					var element=document.getElementById(objectID);	//get the component element
 					if(element)	//if the component element currently exists in the document
@@ -2754,22 +2757,23 @@ if(elementName=="select")
 
 		/**Called when files are selected by the user.
 		@param fileReferenceListID The ID of the file reference list.
-		@param fileReferences The array of file references representing selected files.
+		@param fileReferences The array of file references representing selected files; these are not the actual Flash file references, but objects containing copies of relevant file reference data.
 		*/
 		proto._onFilesSelected=function(fileReferenceListID, fileReferences)
 		{
-//			alert("files selected, count "+fileReferences.length);
-			var fileReferenceCount=fileReferences.length;	//find out how many file references there are
-//			alert("file references: "+JSON.serialize(fileReferences));
-			var fileReferenceInfos=new Array(fileReferenceCount);	//create a new array to store only the file references info we want to send back
-			for(var i=0; i<fileReferenceCount; ++i)	//for each file reference
-			{
-				var fileReference=fileReferences[i];	//get this file reference
-				fileReferenceInfos[i]={"id":fileReference.id, "name":fileReference.name, "size":fileReference.size};	//create our own information about this file reference
-			}
-			this.sendAJAXRequest(new ChangeAJAXEvent(fileReferenceListID, {"fileReferences":fileReferenceInfos}));	//send an AJAX request with the file references
-//			alert("file references: "+JSON.serialize(fileReferenceInfos));
-		} 
+			this.sendAJAXRequest(new ChangeAJAXEvent(fileReferenceListID, {"fileReferences":fileReferences}));	//send an AJAX request with the file references
+		}; 
+
+		/**Called while a file is uploading or downloading.
+		@param fileReferenceListID The ID of the file reference list.
+		@param fileReferenceID The ID of file reference being transferred.
+		@param transferred The current number of bytes transferred, or <code>-1</code> if not known.
+		@param total The total or estimated total bytes to transfer, or <code>-1</code> if not known.
+		*/
+		proto._onFileProgress=function(fileReferenceListID, fileReferenceID, transferred, total)
+		{
+			this.sendAJAXRequest(new ChangeAJAXEvent(fileReferenceListID, {"id":fileReferenceID, "transferred":transferred, "total":total}));	//send an AJAX request with the new file progress
+		};
 
 	}
 

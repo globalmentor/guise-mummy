@@ -1,10 +1,7 @@
 package com.guiseframework.component;
 
 import java.util.Collection;
-import java.util.List;
 
-import com.garretwilson.beans.*;
-import static com.garretwilson.io.FileUtilities.getFilename;
 import static com.garretwilson.lang.ClassUtilities.*;
 import com.garretwilson.lang.ObjectUtilities;
 import static com.garretwilson.net.URIUtilities.*;
@@ -15,7 +12,6 @@ import com.guiseframework.Bookmark;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 import com.guiseframework.geometry.Extent;
-import com.guiseframework.model.Notification;
 import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.PlatformFile;
 import com.guiseframework.prototype.ActionPrototype;
@@ -117,6 +113,16 @@ public class UploadPanel extends AbstractPanel
 		/**@return The action prototype for canceling.*/
 		public ActionPrototype getCancelActionPrototype() {return cancelActionPrototype;}
 
+	/**The progress listener that updates that status components in response to file transfers.*/
+	private final ProgressListener platformFileProgressListener=new ProgressListener()
+			{
+				public void progressed(final ProgressEvent progressEvent)	//when progress occurs
+				{
+					updateStatusLabel((PlatformFile)progressEvent.getSource(), progressEvent.getTaskState(), progressEvent.getValue(), progressEvent.getMaximumValue());	//update the status level with the progress
+//TODO fix; why do we need this? do something with overall progress if we need to					fireProgressed(new ProgressEvent(UploadPanel.this, progressEvent));	//refire the progress event using this panel as the source
+				}
+			};
+
 	/**Destination path constructor a default vertical flow layout.
 	@param destinationPath The path relative to the application representing the destination of the collected resources.
 	@exception NullPointerException if the given path is <code>null</code>.
@@ -168,8 +174,14 @@ public class UploadPanel extends AbstractPanel
 								{
 									public void valueSelected(final ValueEvent<Collection<PlatformFile>> valueEvent)	//when files are selected
 									{
+										final Collection<PlatformFile> platformFiles=valueEvent.getValue();	//get the new platform files
 										platformFileListControl.clear();	//remove the currently displayed platform files
-										platformFileListControl.addAll(valueEvent.getValue());	//add all the new platform files to the list
+										platformFileListControl.addAll(platformFiles);	//add all the new platform files to the list
+										for(final PlatformFile platformFile:platformFiles)	//for each platform file
+										{
+											platformFile.removeProgressListener(platformFileProgressListener);	//make sure we're not already listening for progress on this platform file
+											platformFile.addProgressListener(platformFileProgressListener);	//start listening for progress on this platform file
+										}
 										updateComponents();	//update the components in response
 									}							
 								});
@@ -187,7 +199,7 @@ public class UploadPanel extends AbstractPanel
 						{
 							throw new IllegalStateException("Destination path not set.");
 						}
-						resourceCollectControl.receiveResources(destinationPath, getDestinationBookmark());	//tell the resource collect control to send the resource
+						platformFileListControl.get(0).upload(destinationPath, getDestinationBookmark());	//TODO fix; testing
 					}
 				});
 		controlPanel.add(uploadActionPrototype);
@@ -215,6 +227,7 @@ public class UploadPanel extends AbstractPanel
 				});
 */
 			//listen for the resource collection control changing its send state, and update the state of the components in response
+/*TODO del
 		resourceCollectControl.addPropertyChangeListener(ResourceCollectControl.STATE_PROPERTY, new AbstractGenericPropertyChangeListener<TaskState>()
 				{
 					public void propertyChange(final GenericPropertyChangeEvent<TaskState> propertyChangeEvent)	//if the transfer state changes
@@ -223,7 +236,9 @@ public class UploadPanel extends AbstractPanel
 						updateStatusLabel(null, -1, propertyChangeEvent.getNewValue());	//update the status label with the new state
 					}
 				});
+*/
 			//listen for progress from the resource collect control and update the progress labels in response
+/*TODO del
 		resourceCollectControl.addProgressListener(new ProgressListener()
 				{
 					public void progressed(final ProgressEvent progressEvent)	//if progress occurs
@@ -232,29 +247,29 @@ public class UploadPanel extends AbstractPanel
 						fireProgressed(new ProgressEvent(UploadPanel.this, progressEvent));	//refire the progress event using this panel as the source
 					}
 				});
+*/
 		add(controlPanel);
 	}
 
 	/**Updates the state of components.*/
 	protected void updateComponents()
 	{
-		final TaskState state=getResourceCollectControl().getState();	//get the state of the resource collect control
-		uploadActionPrototype.setEnabled((state==null || state==TaskState.COMPLETE || state==TaskState.CANCELED) && !resourceCollectControl.getResourcePaths().isEmpty());	//only allow upload if the control is not sending and there are collected resources
-		cancelActionPrototype.setEnabled(state==TaskState.INCOMPLETE);	//only allow cancel if the control is sending
+		uploadActionPrototype.setEnabled(!platformFileListControl.isEmpty());	//only allow upload if no platform files are being uploaded and there are platform files to upload
+//TODO fix		cancelActionPrototype.setEnabled(state==TaskState.INCOMPLETE);	//only allow cancel if the control is sending
 	}
 
 	/**Updates the status label.
-	@param task The current task, or <code>null</code> if there is no task.
-	@param progress The current progress, or -1 if the progress is not known.
+	@param platformFile The current platform file.
 	@param state The new transfer state, or <code>null</code> if there is no state.
+	@param transferred The current number of bytes transferred, or -1 if the bytes transferred is not known.
+	@param total The total number of bytes to transfer, or -1 if the total is not known.
 	*/
-	protected void updateStatusLabel(final String task, final long progress, final TaskState state)
+	protected void updateStatusLabel(final PlatformFile platformFile, final TaskState state, final long progress, final long total)	//TODO update API after deciding how to determine overall transfer
 	{
-		final ResourceCollectControl resourceCollectControl=getResourceCollectControl();	//get the resource collect control 
 		final StringBuilder statusStringBuilder=new StringBuilder();	//build the status string
-		if(task!=null)	//if there is a task
+		if(platformFile!=null)	//if there is a platform file
 		{
-			statusStringBuilder.append(task).append(':').append(' ');	//task:
+			statusStringBuilder.append(platformFile.getName()).append(':').append(' ');	//platform file:
 			if(progress>=0)	//if a valid value is given
 			{
 				statusStringBuilder.append(progress);	//show the value
@@ -263,8 +278,12 @@ public class UploadPanel extends AbstractPanel
 			{
 				statusStringBuilder.append(LABEL_UNKNOWN);	//indicate an unknown progress
 			}
+			if(total>=0)	//if the total is known
+			{
+				statusStringBuilder.append('/').append(progress);	//show the total
+			}
 		}
-		else if(state!=null)	//if there is no task, just show the task state
+		else if(state!=null)	//if there is no platform file, just show the task state
 		{
 			statusStringBuilder.append(state.getLabel());	//show the task status label
 		}

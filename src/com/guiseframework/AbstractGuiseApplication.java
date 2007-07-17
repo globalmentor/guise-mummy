@@ -164,7 +164,10 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 
 	/**The concurrent map of Guise session info keyed to Guise sessions.*/
 	private final Map<GuiseSession, GuiseSessionInfo> guiseSessionInfoMap=new ConcurrentHashMap<GuiseSession, GuiseSessionInfo>();
-	
+
+	/**The concurrent map of Guise sessions keyed to UUIDs.*/
+	private final Map<UUID, GuiseSession> uuidGuiseSessionMap=new ConcurrentHashMap<UUID, GuiseSession>(new HashMap<UUID, GuiseSession>());
+
 	/**Registers a session with this application.
 	The Guise session has not yet been initialized when this method is called.
 	@param guiseSession The Guise session to register with this Guise application.
@@ -176,6 +179,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		{
 			throw new IllegalStateException("Guise session "+guiseSession+" already registered with Guise application "+this);
 		}
+		uuidGuiseSessionMap.put(guiseSession.getUUID(), guiseSession);	//associate the Guise session with its UUID
 		guiseSessionInfoMap.put(guiseSession, new GuiseSessionInfo(guiseSession));	//add new Guise session information
 	}
 
@@ -191,6 +195,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		{
 			throw new IllegalStateException("Guise session "+guiseSession+" not registered with Guise application "+this);
 		}
+		uuidGuiseSessionMap.remove(guiseSession.getUUID());	//remove the Guise session from the UUID map
 		final List<TempFileInfo> tempFileInfos=guiseSessionInfo.getTempFileInfos();	//get the temp files registered with this application
 		synchronized(tempFileInfos)	//synchronize on the temp file infos for completeness (although no other threads should be accessing the list at this point
 		{
@@ -206,6 +211,16 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 				}
 			}
 		}		
+	}
+
+	/**Retrieves a Guise session for the given UUID.
+	@param uuid The UUID of the Guise session to retrieve. 
+	@return The Guise session associated with the given UUID, or <code>null</code> if no Guise session is associated with the given UUID.
+	@exception NullPointerException if the given UUID is <code>null</code>.
+	*/
+	public GuiseSession getSession(final UUID uuid)
+	{
+		return uuidGuiseSessionMap.get(checkInstance(uuid, "UUID cannot be null."));	//return the Guise session, if any, associted with the given UUID
 	}
 
 	/**Creates a frame for the application.

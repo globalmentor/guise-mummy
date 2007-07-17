@@ -100,53 +100,65 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 		super.uninstallApplication(application);	//delegate to the parent class
 	}
 
-	/**The synchronized map of Guise sessions keyed to Guise applications and HTTP sessions (as a single HTTP session may be used across different Guise applications within one container).*/
-	private final Map<GuiseApplicationHTTPSessionKey, GuiseSession> httpSessionGuiseApplicationGuiseSessionMap=synchronizedMap(new HashMap<GuiseApplicationHTTPSessionKey, GuiseSession>());
+	/**The read/write lock map of Guise sessions keyed to Guise applications and HTTP sessions (as a single HTTP session may be used across different Guise applications within one container).*/
+	private final ReadWriteLockMap<GuiseApplicationHTTPSessionKey, GuiseSession> httpSessionGuiseApplicationGuiseSessionMap=new DecoratorReadWriteLockMap<GuiseApplicationHTTPSessionKey, GuiseSession>(new HashMap<GuiseApplicationHTTPSessionKey, GuiseSession>());
 
-	/**The synchronized set map of Guise sessions associated with a single HTTP session (as there may be several Guise sessions in this container using the same HTTP session.
-	This set map is only accessed when a Guise session is being added or removed, so its being synchronized should not slow down normal HTTP requests.
-	The sets within the map are not synchronized, so all access to iterables of values should be synchronized on this set map.
+	/**The read/write lock set map of Guise sessions associated with a single HTTP session (as there may be several Guise sessions in this container using the same HTTP session.
+	This set map is only accessed when a Guise session is being added or removed, so its locks should not slow down normal HTTP requests.
+	The sets within the map are not thread-safe, so all access to iterables of values should be performed after retrieving a read lock.
 	*/
-	private final CollectionMap<HttpSession, GuiseSession, Set<GuiseSession>> httpSessionGuiseSessionSetMap=new SynchronizedCollectionMapDecorator<HttpSession, GuiseSession, Set<GuiseSession>>(new HashSetHashMap<HttpSession, GuiseSession>());
-	
+	private final ReadWriteLockCollectionMap<HttpSession, GuiseSession, Set<GuiseSession>> httpSessionGuiseSessionSetMap=new DecoratorReadWriteLockCollectionMap<HttpSession, GuiseSession, Set<GuiseSession>>(new HashSetHashMap<HttpSession, GuiseSession>());
+
 	/**Retrieves a Guise session for the given HTTP session.
 	A Guise session will be created if none is currently associated with the given HTTP session.
 	When a Guise session is first created, its locale will be updated to match the language, if any, accepted by the HTTP request.
-	This method can only be accessed by classes in the same package.
 	This method should only be called by HTTP Guise session manager.
 	@param guiseApplication The Guise application that will own the Guise session.
 	@param httpRequest The HTTP request with which the Guise session is associated. 
 	@param httpSession The HTTP session for which a Guise session should be retrieved. 
 	@return The Guise session associated with the provided HTTP session.
-	@see HTTPGuiseSessionManager
+	@see HTTPServletGuiseSessionManager
 	*/
 	protected GuiseSession getGuiseSession(final GuiseApplication guiseApplication, final HttpServletRequest httpRequest, final HttpSession httpSession)
 	{
 		final GuiseApplicationHTTPSessionKey sessionKey=new GuiseApplicationHTTPSessionKey(guiseApplication, httpSession);	//create a key for looking up a Guise session based upon the Guise application and the HTTP session
-		final boolean newGuiseSession;	//we'll determine whether we're creating a new Guise session
-		GuiseSession guiseSession;	//we'll retreive a Guise session one way or another
-		synchronized(httpSessionGuiseApplicationGuiseSessionMap)	//don't allow anyone to modify the map of sessions while we access it
+		final boolean isNewGuiseSession;	//we'll determine whether we're creating a new Guise session
+		GuiseSession guiseSession=httpSessionGuiseApplicationGuiseSessionMap.get(sessionKey);	//get the Guise session associated with the Guise application and HTTP session, if there is one
+		if(guiseSession==null)	//if there is no such Guise session
 		{
-			guiseSession=httpSessionGuiseApplicationGuiseSessionMap.get(sessionKey);	//get the Guise session associated with the Guise application and HTTP session
-			newGuiseSession=guiseSession==null;	//if no Guise session is associated with the given HTTP session and Guise application, we'll create a Guise session
-			if(newGuiseSession)	//if we should create a new Guise session
+			httpSessionGuiseApplicationGuiseSessionMap.writeLock().lock();	//get a write lock to the map
+			try
 			{
-				final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
-				Debug.info("memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
-			Debug.trace("+++creating Guise session", httpSession.getId());
-//TODO del if not needed				final String relativeApplicationPath=relativizePath(getBasePath(), guiseApplication.getBasePath());	//get the application path relative to the container path
-					//TODO set up the session outside the synchronized block, maybe, to reduce the amount of time blocking other threads
-				guiseSession=guiseApplication.createSession(new HTTPServletWebPlatform(guiseApplication, httpRequest));	//ask the application to create a new Guise session for the given platform
-				final URI requestURI=URI.create(httpRequest.getRequestURL().toString());	//get the URI of the current request
-				final URI sessionBaseURI=requestURI.resolve(guiseApplication.getBasePath());	//resolve the application base path to the request URI
-				guiseSession.setBaseURI(sessionBaseURI);	//update the base URI to the one specified by the request, in case we can create a session from different URLs
-				addGuiseSession(guiseSession);	//add and initialize the Guise session
-				final Locale[] clientAcceptedLanguages=getAcceptedLanguages(httpRequest);	//get all languages accepted by the client
-				guiseSession.requestLocale(asList(clientAcceptedLanguages));	//ask the Guise session to change to one of the accepted locales, if the application supports one
-				httpSessionGuiseApplicationGuiseSessionMap.put(sessionKey, guiseSession);	//associate the Guise session with the Guise application and HTTP session
+				guiseSession=httpSessionGuiseApplicationGuiseSessionMap.get(sessionKey);	//try to get the Guise session again, just in case one has just been created for this application and HTTP session
+				isNewGuiseSession=guiseSession==null;	//if there is still no Guise session associated with the given HTTP session and Guise application, we'll create a Guise session
+				if(isNewGuiseSession)	//if we should create a new Guise session
+				{
+/*TODO del
+					final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
+					Debug.info("memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
+				Debug.trace("+++creating Guise session", httpSession.getId());
+	//TODO del if not needed				final String relativeApplicationPath=relativizePath(getBasePath(), guiseApplication.getBasePath());	//get the application path relative to the container path
+*/
+					guiseSession=guiseApplication.createSession(new HTTPServletWebPlatform(guiseApplication, httpSession, httpRequest));	//ask the application to create a new Guise session for the given platform
+					final URI requestURI=URI.create(httpRequest.getRequestURL().toString());	//get the URI of the current request
+					final URI sessionBaseURI=requestURI.resolve(guiseApplication.getBasePath());	//resolve the application base path to the request URI
+					guiseSession.setBaseURI(sessionBaseURI);	//update the base URI to the one specified by the request, in case we can create a session from different URLs
+					addGuiseSession(guiseSession);	//add and initialize the Guise session
+					final Locale[] clientAcceptedLanguages=getAcceptedLanguages(httpRequest);	//get all languages accepted by the client
+					guiseSession.requestLocale(asList(clientAcceptedLanguages));	//ask the Guise session to change to one of the accepted locales, if the application supports one
+					httpSessionGuiseApplicationGuiseSessionMap.put(sessionKey, guiseSession);	//associate the Guise session with the Guise application and HTTP session
+				}
+			}
+			finally
+			{
+				httpSessionGuiseApplicationGuiseSessionMap.writeLock().unlock();	//always release the write lock
 			}
 		}
-		if(newGuiseSession)	//if we created a new Guise session, associate the Guise application with the new Guise session so that when the HTTP session expires we'll know which Guise sessions went with it (it is important to do this outside the synchronized block, because there are nested synchronizations when the HTTP session expires, but that won't happen until later so there's no need to synchronize now)
+		else	//if we already have a Guise session
+		{
+			isNewGuiseSession=false;	//indicate that we didn't create a new Guise session
+		}
+		if(isNewGuiseSession)	//if we created a new Guise session, associate the Guise application with the new Guise session so that when the HTTP session expires we'll know which Guise sessions went with it (it is important to do this outside the synchronized block, because there are nested synchronizations when the HTTP session expires, but that won't happen until later so there's no need to synchronize now)
 		{		
 			httpSessionGuiseSessionSetMap.addItem(httpSession, guiseSession);	//indicate that this Guise session is for this HTTP setssion
 		}
@@ -213,7 +225,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 	This method should only be called by HTTP Guise session manager.
 	@param httpSession The HTTP session which should be removed along with its corresponding Guise session.
 	@return The set of Guise sessions previously associated with the HTTP session.
-	@see HTTPGuiseSessionManager
+	@see HTTPServletGuiseSessionManager
 	*/
 	protected Set<GuiseSession> removeGuiseSessions(final HttpSession httpSession)
 	{

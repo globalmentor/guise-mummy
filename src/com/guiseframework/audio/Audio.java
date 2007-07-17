@@ -6,6 +6,7 @@ import static com.garretwilson.lang.ClassUtilities.*;
 import com.garretwilson.lang.ObjectUtilities;
 import com.guiseframework.event.EventListenerManager;
 import com.guiseframework.event.ProgressEvent;
+import com.guiseframework.event.ProgressListenable;
 import com.guiseframework.event.ProgressListener;
 import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.AbstractDepictedObject;
@@ -14,7 +15,7 @@ import com.guiseframework.platform.AbstractDepictedObject;
 The installed depictor must be of the specialized type {@link Depictor}.
 @author Garret Wilson
 */
-public class Audio extends AbstractDepictedObject
+public class Audio extends AbstractDepictedObject implements ProgressListenable
 {
 
 	/**The bound property of the audio URI.*/

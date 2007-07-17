@@ -5,21 +5,11 @@ import com.guiseframework.event.*;
 /**A model for a potential action.
 @author Garret Wilson
 */
-public interface ActionModel extends Model
+public interface ActionModel extends Model, ActionListenable
 {
 
-	/**Adds an action listener.
-	@param actionListener The action listener to add.
-	*/
-	public void addActionListener(final ActionListener actionListener);
-
-	/**Removes an action listener.
-	@param actionListener The action listener to remove.
-	*/
-	public void removeActionListener(final ActionListener actionListener);
-
 	/**@return all registered action listeners.*/
-	public Iterable<ActionListener> getActionListeners();
+	public Iterable<ActionListener> getActionListeners();	//TODO del from interface eventually
 
 	/**Performs the action with default force and default option.
 	An {@link ActionEvent} is fired to all registered {@link ActionListener}s.

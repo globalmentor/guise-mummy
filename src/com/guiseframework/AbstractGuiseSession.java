@@ -57,6 +57,12 @@ import org.xml.sax.SAXException;
 public abstract class AbstractGuiseSession extends BoundPropertyObject implements GuiseSession
 {
 
+	/**The unique identifier of this session.*/
+	private final UUID uuid;
+
+		/**@return The unique identifier of this session.*/
+		public UUID getUUID() {return uuid;}
+
 	/**The Guise application to which this session belongs.*/
 	private final GuiseApplication application;
 
@@ -752,6 +758,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	*/
 	public AbstractGuiseSession(final GuiseApplication application, final Platform platform)
 	{
+		this.uuid=UUID.randomUUID();	//create a UUID for the session
 		this.application=checkInstance(application, "Application cannot be null.");	//save the application
 		this.baseURI=application.getContainer().getBaseURI().resolve(application.getBasePath());	//default to a base URI calculated from the application base path resolved to the container's base URI
 		try

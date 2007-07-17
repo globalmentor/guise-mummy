@@ -2,7 +2,10 @@ package com.guiseframework.platform.web;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 
+import java.net.URI;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
 import static java.util.Collections.*;
 
 import com.garretwilson.event.ProgressListener;
@@ -30,6 +33,16 @@ public class FlashFileReferenceList extends AbstractDepictedObject
 	@SuppressWarnings("unchecked")
 	public Depictor<? extends FlashFileReferenceList> getDepictor() {return (Depictor<? extends FlashFileReferenceList>)super.getDepictor();} 
 
+	/**The concurrent map of Flash platform files mapped to the IDs assigned to them by Flash.*/
+	private final Map<String, FlashPlatformFile> idPlatformFileMap=new ConcurrentHashMap<String, FlashPlatformFile>();
+
+		/**Retrieves a platform file by the ID assigned to it by Flash.
+		@param id The ID assigned to the platform file by Flash.
+		@return The specified platform file, or <code>null</code> if there is no platforom file with the given ID.
+		@exception NullPointerException if the given ID is <code>null</code>.
+		*/
+		public FlashPlatformFile getPlatformFile(final String id) {return idPlatformFileMap.get(checkInstance(id, "Flash platform file ID cannot be null."));}
+
 	/**The selected platform files.*/
 	private List<FlashPlatformFile> platformFiles=emptyList();
 
@@ -48,6 +61,11 @@ public class FlashFileReferenceList extends AbstractDepictedObject
 			{
 				final List<FlashPlatformFile> oldPlatformFiles=platformFiles;	//get the old value
 				platformFiles=newPlatformFiles;	//actually change the value
+				idPlatformFileMap.clear();	//clear the map of platform files TODO fix race condition, perhaps by adding read/write locks; it is very unlikely that this class would be used in such as way as to create race conditions, however, as most of the time the file references of a file reference list will be updated at long intervals  
+				for(final FlashPlatformFile platformFile:newPlatformFiles)	//for each platform file
+				{
+					idPlatformFileMap.put(platformFile.getID(), platformFile);	//map the platform file with the ID assigned to it by Flash
+				}
 				firePropertyChange(PLATFORM_FILES_PROPERTY, oldPlatformFiles, newPlatformFiles);	//indicate that the value changed
 			}
 		}
@@ -63,20 +81,24 @@ public class FlashFileReferenceList extends AbstractDepictedObject
 		getDepictor().browse();	//tell the depictor to start
 	}
 
-	/**Initiates file uploads.
-	@param destinationPath The path representing the destination of the platform files, relative to the application.
-	@param destinationBookmark The bookmark to be used in uploading the platform files to the destination path, or <code>null</code> if no bookmark should be used.
-	@param progressListener The listener that will be notified when progress is made for a particular platform file upload.
-	@param platformFiles Thet platform files to upload.
-	@exception NullPointerException if the given destination path and/or listener is <code>null</code>.
+	/**Initiates a platform file upload.
+	@param platformFile Thet platform file to upload.
+	@param destinationPath The path representing the destination of the platform file, relative to the application.
+	@param destinationBookmark The bookmark to be used in uploading the platform file to the destination path, or <code>null</code> if no bookmark should be used.
+	@exception NullPointerException if the given platform file and/or destination path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
 	@exception IllegalArgumentException if the provided path is absolute.
-	@exception ClassCastException of one or more of the platform files is not a {@link FlashPlatformFile}.
-	@exception IllegalStateException if one or more of the specified platform files can no longer be uploaded because, for example, other platform files have since been selected.	
+	@exception IllegalStateException the specified platform file can no longer be uploaded because, for example, other platform files have since been selected.	
 	*/
-	public void upload(final String destinationPath, final Bookmark destinationBookmark, final ProgressListener progressListener, final PlatformFile... platformFiles)
+	public void upload(final FlashPlatformFile platformFile, final String destinationPath, final Bookmark destinationBookmark)
 	{
-		
+		if(!getPlatformFiles().contains(platformFile))	//if this list no longer knows about this platform file
+		{
+			throw new IllegalStateException("Platform file "+platformFile+" no longer available for upload; perhaps other platform files have since been selected.");
+		}
+		final String resolvedDestinationPath=getSession().getApplication().resolvePath(destinationPath);	//resolve the destination path
+		final URI destinationURI=URI.create(destinationBookmark!=null ? resolvedDestinationPath+destinationBookmark.toString() : resolvedDestinationPath);	//construct a destination URI
+		getDepictor().upload(platformFile, destinationURI);	//tell the depictor to initiate the platform file upload
 	}	
 
 		//TODO del all this; now uses platform
@@ -149,6 +171,15 @@ public class FlashFileReferenceList extends AbstractDepictedObject
 
 		/**Requests that user be displayed a dialog for browsing files.*/
 		public void browse();
+
+		/**Initiates a platform file upload.
+		@param platformFile Thet platform file to upload.
+		@param destinationURI The URI representing the destination of the platform file, relative to the application.
+		@exception NullPointerException if the given platform file and/or destination URI is <code>null</code>.
+		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
+		@exception IllegalArgumentException if the provided path is absolute.
+		*/
+		public void upload(final FlashPlatformFile platformFile, final URI destinationURI);
 
 	}
 

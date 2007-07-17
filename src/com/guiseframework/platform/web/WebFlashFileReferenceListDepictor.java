@@ -1,14 +1,13 @@
 package com.guiseframework.platform.web;
 
+import java.net.URI;
 import java.util.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
-
-import com.garretwilson.event.ProgressListener;
+import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.util.*;
-import com.guiseframework.Bookmark;
+
 import com.guiseframework.platform.PlatformEvent;
-import com.guiseframework.platform.PlatformFile;
 
 /**A web depictor for a Flash <code>flash.net.FileReferenceList</code>.
 @author Garret Wilson
@@ -19,10 +18,21 @@ public class WebFlashFileReferenceListDepictor extends AbstractWebDepictor<Flash
 	/**The web commands for controlling audio.*/
 	public enum FlashFileReferenceCommand implements WebCommand
 	{
-		/**The command to allow the user to browse browse.*/
-		FILE_BROWSE;
+		/**The command to allow the user to browse to select a file.
+		parameters: <code>{multiple:"<var>multiple</var>"}</code>
+		*/
+		FILE_BROWSE,
+
+		/**The command to initiate an upload.
+		parameters: <code>{id:"<var>fileReferenceID</var>", destinationURI:<var>destinationURI</var>}</code>
+		*/
+		FILE_UPLOAD;
 	}
 	
+	/**The property for specifying the destination URI of a file upload.*/
+	public final static String DESTINATION_URI_PROPERTY="destinationURI";
+	/**The property for specifying the ID of a file.*/
+	public final static String ID_PROPERTY="id";
 	/**The property for specifying whether multiple files should be selected.*/
 	public final static String MULTIPLE_PROPERTY="multiple";
 
@@ -34,20 +44,21 @@ public class WebFlashFileReferenceListDepictor extends AbstractWebDepictor<Flash
 				new NameValuePair<String, Object>(MULTIPLE_PROPERTY, Boolean.TRUE)));	//send a file browse command to the platform TODO fix single/multiple
 	}
 
-	/**Initiates file uploads.
-	@param destinationPath The path representing the destination of the platform files, relative to the application.
-	@param destinationBookmark The bookmark to be used in uploading the platform files to the destination path, or <code>null</code> if no bookmark should be used.
-	@param progressListener The listener that will be notified when progress is made for a particular platform file upload.
-	@param platformFiles Thet platform files to upload.
-	@exception NullPointerException if the given destination path and/or listener is <code>null</code>.
+	/**Initiates a platform file upload.
+	@param platformFile Thet platform file to upload.
+	@param destinationURI The URI representing the destination of the platform file, relative to the application.
+	@exception NullPointerException if the given platform file and/or destination URI is <code>null</code>.
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
 	@exception IllegalArgumentException if the provided path is absolute.
-	@exception ClassCastException of one or more of the platform files is not a {@link FlashPlatformFile}.
-	@exception IllegalStateException if one or more of the specified platform files can no longer be uploaded because, for example, other platform files have since been selected.	
+	@exception ClassCastException if the current platform is not an {@link HTTPServletWebPlatform}.
 	*/
-	public void upload(final String destinationPath, final Bookmark destinationBookmark, final ProgressListener progressListener, final PlatformFile... platformFiles)
+	public void upload(final FlashPlatformFile platformFile, final URI destinationURI)
 	{
-		
+			//add an identification of the Guise session to the URI if needed, as Flash 8 on FireFox sends the wrong HTTP session ID cookie value
+		final URI sessionedDestinationURI=appendQueryParameters(destinationURI, new NameValuePair<String, String>(HTTPServletGuiseSessionManager.GUISE_SESSION_UUID_PARAMETER, getSession().getUUID().toString()));
+		getPlatform().getSendEventQueue().add(new WebCommandEvent<FlashFileReferenceCommand>(getDepictedObject(), FlashFileReferenceCommand.FILE_UPLOAD,	//send a file upload command to the platform
+				new NameValuePair<String, Object>(ID_PROPERTY, platformFile.getID()),	//send the ID of the file
+				new NameValuePair<String, Object>(DESTINATION_URI_PROPERTY, sessionedDestinationURI)));	//indicate the destination
 	}	
 
 	/**Processes an event from the platform.
@@ -75,6 +86,18 @@ public class WebFlashFileReferenceListDepictor extends AbstractWebDepictor<Flash
 				}
 				flashFileReferenceList.setPlatformFiles(platformFileList);	//tell the file reference list which platform files it now has
 			}			
+			final Number transferred=asInstance(properties.get("transferred"), Number.class);	//get the bytes transferred, if reported TODO use a constant
+			if(transferred!=null)	//if we have progress
+			{
+				final Number total=asInstance(properties.get("total"), Number.class);	//get the total bytes to transfer
+				final String flashPlatformFileID=asInstance(properties.get("id"), String.class);	//get the ID of the platform file
+				final FlashPlatformFile platformFile=flashPlatformFileID!=null ? flashFileReferenceList.getPlatformFile(flashPlatformFileID) : null;	//get the platform file identified
+				if(platformFile!=null)	//if we know the platform file
+				{
+					platformFile.fireProgressed(transferred.longValue(), total!=null ? total.longValue() : -1);	//update the file progress
+				}
+			}
 		}
 	}
+
 }

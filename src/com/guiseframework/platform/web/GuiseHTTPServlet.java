@@ -32,6 +32,7 @@ import static com.garretwilson.net.URIUtilities.*;
 
 import com.garretwilson.event.ProgressEvent;
 import com.garretwilson.event.ProgressListener;
+import static com.garretwilson.flash.Flash.*;
 import com.garretwilson.io.*;
 import com.garretwilson.javascript.JSON;
 
@@ -83,6 +84,7 @@ import static com.garretwilson.rdf.xpackage.MIMEOntologyUtilities.*;
 import static com.garretwilson.rdf.xpackage.FileOntologyUtilities.*;
 import com.garretwilson.security.Nonce;
 import com.garretwilson.servlet.ServletUtilities;
+import com.garretwilson.servlet.http.HttpServletConstants;
 import com.garretwilson.servlet.http.HttpServletUtilities;
 
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
@@ -464,11 +466,10 @@ Debug.trace("checking for categories");
 	public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
 	{
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
-//	TODO del Debug.info("method:", request.getMethod(), "raw path info:", rawPathInfo);
+//Debug.info("method:", request.getMethod(), "raw path info:", rawPathInfo);
 //TODO del Debug.info("user agent:", getUserAgent(request));
 //	TODO del final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
 //	TODO del Debug.info("before service request: memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
-		
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
 		final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
 /*TODO del
@@ -490,7 +491,7 @@ while(headerNames.hasMoreElements())
 		if(destination!=null)	//if we have a destination associated with the requested path
 		{
 Debug.trace("found destination:", destination);
-			final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
+			final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
 /*TODO del
 	Debug.info("session ID", guiseSession.getHTTPSession().getId());	//TODO del
 	Debug.info("content length:", request.getContentLength());
@@ -629,81 +630,88 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 							final String itemName=fileItemStream.getName();	//get the item's name, if any
 							if(itemName!=null && itemName.length()>0)	//if a non-empty-string name is specified
 							{
-								
 								final String fieldName=fileItemStream.getFieldName();	//get the field name for this item
-								final Component progressComponent=AbstractComponent.getComponentByID(guiseSession.getApplicationFrame(), guisePlatform.getDepictID(fieldName));	//get the related component that will want to know progress
-								if(progressComponent!=null)	//if there is a progress component TODO do we want to abandon everything altogether, or transfer without progress? we must do something with null values---this was first triggered by a page reload after server restart
+								final Component progressComponent;	//there may be a component that will want to know progress
+								if(FILEDATA_FORM_FIELD_NAME.equals(fieldName))	//if this is a Flash upload
 								{
-									if(!progressComponents.contains(progressComponent))	//if this is the first transfer for this component
+									progressComponent=null;	//there is no progress component; Flash will send its own progress update separately
+								}
+								else	//if this is not a Flash upload
+								{
+									progressComponent=asInstance(guisePlatform.getDepictedObject(guisePlatform.getDepictID(fieldName)), Component.class);	//get the component by its ID
+								}
+								if(progressComponent!=null && !progressComponents.contains(progressComponent))	//if there is a transfer component and this is the first transfer for this component
+								{
+									progressComponents.add(progressComponent);	//add this progress component to our set of progress components so we can send finish events to them later
+//Debug.trace("sending progress with no task for starting");
+									synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
 									{
-										progressComponents.add(progressComponent);	//add this progress component to our set of progress components so we can send finish events to them later
-	//Debug.trace("sending progress with no task for starting");
-										synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
-										{
-											progressComponent.processEvent(new WebProgressEvent(progressComponent, null, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting for all transfers
-										}
+										progressComponent.processEvent(new WebProgressEvent(progressComponent, null, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting for all transfers
 									}
-									final RDFResource resourceDescription=new DefaultRDFResource();	//create a new resource description
-									final String itemContentType=fileItemStream.getContentType();	//get the item content type, if any
-									if(itemContentType!=null)	//if we know the item's content type
-									{
-										setContentType(resourceDescription, createContentType(itemContentType));	//set the resource's content type
-									}
-									final String name=getFilename(itemName);	//removing any extraneous path information a browser such as IE or Opera might have given
-									setName(resourceDescription, name);	//specify the name provided to us 
-									
+								}
+								final RDFResource resourceDescription=new DefaultRDFResource();	//create a new resource description
+								final String itemContentType=fileItemStream.getContentType();	//get the item content type, if any
+								if(itemContentType!=null)	//if we know the item's content type
+								{
+									setContentType(resourceDescription, createContentType(itemContentType));	//set the resource's content type
+								}
+								final String name=getFilename(itemName);	//removing any extraneous path information a browser such as IE or Opera might have given
+								setName(resourceDescription, name);	//specify the name provided to us 
+								
+								try
+								{
+									final InputStream inputStream=new BufferedInputStream(fileItemStream.openStream());	//get an input stream to the item
 									try
 									{
-										final InputStream inputStream=new BufferedInputStream(fileItemStream.openStream());	//get an input stream to the item
-										try
+										final ProgressListener progressListener=new ProgressListener()	//create a progress listener for listening for progress
 										{
-											final ProgressListener progressListener=new ProgressListener()	//listen for progress
+											public void progressed(ProgressEvent progressEvent)	//when progress has been made
 											{
-												public void progressed(ProgressEvent progressEvent)	//when progress has been made
+//Debug.trace("delta: ", progressEvent.getDelta(), "progress:", progressEvent.getValue());
+												synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
 												{
-	//Debug.trace("delta: ", progressEvent.getDelta(), "progress:", progressEvent.getValue());
-													synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
+													if(progressComponent!=null)	//if there is a progress component
 													{
 														progressComponent.processEvent(new WebProgressEvent(progressComponent, name, TaskState.INCOMPLETE, progressEvent.getValue()));	//indicate to the component that progress is starting for this file
 													}
 												}
-											};
-											final ProgressOutputStream progressOutputStream=new ProgressOutputStream(resourceWriteDestination.getOutputStream(resourceDescription, guiseSession, navigationPath, bookmark, referrerURI));	//get an output stream to the destination; don't buffer the output stream (our copy method essentially does this) so that progress events will be accurate
-											try
-											{
-												if(progressComponent!=null)	//if we know the component that wants to know progress
-												{
-													synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
-													{
-														progressComponent.processEvent(new WebProgressEvent(progressComponent, name, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting for this file
-													}
-												}
-												progressOutputStream.addProgressListener(progressListener);	//start listening for progress events from the output stream
-												copy(inputStream, progressOutputStream);	//copy the uploaded file to the destination
-												progressOutputStream.removeProgressListener(progressListener);	//stop listening for progress events from the output stream
-													//TODO catch and send errors here
 											}
-											finally
-											{
-												progressOutputStream.close();	//always close the output stream
-											}
-											if(progressComponent!=null)	//if we know the component that wants to know progress (send the progress event after the output stream is closed, because the output stream may buffer contents)
+										};
+										final ProgressOutputStream progressOutputStream=new ProgressOutputStream(resourceWriteDestination.getOutputStream(resourceDescription, guiseSession, navigationPath, bookmark, referrerURI));	//get an output stream to the destination; don't buffer the output stream (our copy method essentially does this) so that progress events will be accurate
+										try
+										{
+											if(progressComponent!=null)	//if we know the component that wants to know progress
 											{
 												synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
 												{
-													progressComponent.processEvent(new WebProgressEvent(progressComponent, name, TaskState.COMPLETE, 0));	//indicate to the component that progress is finished for this file
+													progressComponent.processEvent(new WebProgressEvent(progressComponent, name, TaskState.INCOMPLETE, 0));	//indicate to the component that progress is starting for this file
 												}
 											}
+											progressOutputStream.addProgressListener(progressListener);	//start listening for progress events from the output stream
+											copy(inputStream, progressOutputStream);	//copy the uploaded file to the destination
+											progressOutputStream.removeProgressListener(progressListener);	//stop listening for progress events from the output stream
+												//TODO catch and send errors here
 										}
 										finally
 										{
-											inputStream.close();	//always close the input stream
+											progressOutputStream.close();	//always close the output stream
+										}
+										if(progressComponent!=null)	//if we know the component that wants to know progress (send the progress event after the output stream is closed, because the output stream may buffer contents)
+										{
+											synchronized(guiseSession)	//don't allow other session contexts to be active while we dispatch the event
+											{
+												progressComponent.processEvent(new WebProgressEvent(progressComponent, name, TaskState.COMPLETE, 0));	//indicate to the component that progress is finished for this file
+											}
 										}
 									}
 									finally
 									{
-										servletFileUpload.setProgressListener(null);	//always stop listening for progress
+										inputStream.close();	//always close the input stream
 									}
+								}
+								finally
+								{
+									servletFileUpload.setProgressListener(null);	//always stop listening for progress
 								}
 							}
 						}
@@ -1900,7 +1908,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 		}
 		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 		final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-		final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
+		final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
 		final Principal guiseSessionPrincipal=guiseSession.getPrincipal();	//get the current principal of the Guise session
 		final String guiseSessionPrincipalID=guiseSessionPrincipal!=null ? guiseSessionPrincipal.getName() : null;	//get the current guise session principal ID
 //	TODO del Debug.trace("checking to see if nonce principal ID", getNoncePrincipalID(nonce), "matches Guise session principal ID", guiseSessionPrincipalID); 
@@ -1930,7 +1938,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 		{
 			final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 			final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-			final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
+			final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
 			guiseSession.setPrincipal(principal);	//set the new principal in the Guise session
 		}
 	}
@@ -2007,7 +2015,7 @@ Debug.trace("checking exists for", resourceURI);
   	{
 Debug.trace("this is a destination");
   		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
- 			final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
+ 			final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
  			final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
 			final String referrer=getReferer(request);	//get the request referrer, if any
 			final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer	 			
@@ -2092,7 +2100,7 @@ Debug.trace("this is a destination");
 			if(tempRelativePath!=null)	//if this is a path to a temporary public file
 			{
 				final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
-				final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request TODO see if we can request a session without forcing one to be created, if that's useful
+				final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request TODO see if we can request a session without forcing one to be created, if that's useful
 				final URL tempResourceURL;	//we'll store here the URL to the temporary resource
 				try
 				{
@@ -2116,7 +2124,7 @@ Debug.trace("this is a destination");
 	  		{
 	  			final ResourceReadDestination resourceDestination=(ResourceReadDestination)destination;	//get the resource destination
 		  		final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
-		 			final GuiseSession guiseSession=HTTPGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
+		 			final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request
 		 			final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
 					final String referrer=getReferer(request);	//get the request referrer, if any
 					final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer	 			
