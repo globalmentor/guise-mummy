@@ -5,6 +5,7 @@ import static com.garretwilson.lang.ObjectUtilities.*;
 import com.guiseframework.Bookmark;
 import com.guiseframework.event.ProgressEvent;
 import com.guiseframework.event.ProgressListener;
+import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.AbstractPlatformFile;
 
 /**A local file represented by a Flash <code>flash.net.FileReference</code> on the web platform.
@@ -54,17 +55,25 @@ public class FlashPlatformFile extends AbstractPlatformFile
 		getFileReferenceList().upload(this, destinationPath, destinationBookmark);	//tell the owner file reference list to upload this file
 	}
 
+	/**Cancels the current upload or download.*/
+	public void cancel()
+	{
+		getFileReferenceList().cancel(this);	//tell the owner file reference list to cancel this file transfer
+	}
+
 	/**Fires a progress event to all registered progress listeners.
 	This method delegates to the super version and is present in this class so that it may be called from the depictor of {@link FlashFileReferenceList}.
+	@param state The state of the progress.
 	@param transferred The current number of bytes transferred, or <code>-1</code> if not known.
 	@param total The total or estimated total bytes to transfer, or <code>-1</code> if not known.
+	@exception NullPointerException if the given state is <code>null</code>.
 	@see ProgressListener
 	@see ProgressEvent
 	@see WebFlashFileReferenceListDepictor
 	*/
-	protected void fireProgressed(final long transferred, final long total)
+	protected void fireProgressed(final TaskState state, final long transferred, final long total)
 	{
-		super.fireProgressed(transferred, total);	//delegate to the super version
+		super.fireProgressed(state, transferred, total);	//delegate to the super version
 	}
 
 }

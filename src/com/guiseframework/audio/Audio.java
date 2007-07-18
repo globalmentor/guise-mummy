@@ -15,7 +15,7 @@ import com.guiseframework.platform.AbstractDepictedObject;
 The installed depictor must be of the specialized type {@link Depictor}.
 @author Garret Wilson
 */
-public class Audio extends AbstractDepictedObject implements ProgressListenable
+public class Audio extends AbstractDepictedObject implements ProgressListenable<Long>
 {
 
 	/**The bound property of the audio URI.*/
@@ -206,19 +206,14 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable
 			{
 				updateTimeLength(timeLength);	//update the duration
 			}
-			final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
-			if(eventListenerManager.hasListeners(ProgressListener.class))	//if there are progress listeners registered
-			{
-				final URI audioURI=getAudioURI();	//get the audio URI
-				fireProgressed(new ProgressEvent(this, audioURI!=null ? audioURI.toString() : null, getState(), getTimePosition(), getTimeLength()));	//create and fire a new progress event, using the latest times that we know about (or an old value if it wasn't updated just now)
-			}
+			fireProgressed(getTimePosition(), getTimeLength());	//fire a new progress event, using the latest times that we know about (or an old value if it wasn't updated just now)
 		}
 	}
 
 	/**Adds a progress listener.
 	@param progressListener The progress listener to add.
 	*/
-	public void addProgressListener(final ProgressListener progressListener)
+	public void addProgressListener(final ProgressListener<Long> progressListener)
 	{
 		getEventListenerManager().add(ProgressListener.class, progressListener);	//add the listener
 	}
@@ -226,7 +221,7 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable
 	/**Removes an progress listener.
 	@param progressListener The progress listener to remove.
 	*/
-	public void removeProgressListener(final ProgressListener progressListener)
+	public void removeProgressListener(final ProgressListener<Long> progressListener)
 	{
 		getEventListenerManager().remove(ProgressListener.class, progressListener);	//remove the listener
 	}
@@ -244,16 +239,16 @@ public class Audio extends AbstractDepictedObject implements ProgressListenable
 		if(eventListenerManager.hasListeners(ProgressListener.class))	//if there are progress listeners registered
 		{
 			final URI audioURI=getAudioURI();	//get the audio URI
-			fireProgressed(new ProgressEvent(this, audioURI!=null ? audioURI.toString() : null, getState(), timePosition, timeDuration));	//create and fire a new progress event
+			fireProgressed(new ProgressEvent<Long>(this, audioURI!=null ? audioURI.toString() : null, getState(), timePosition>=0 ? Long.valueOf(timePosition) : null, timeDuration>=0 ? Long.valueOf(timeDuration) : null));	//create and fire a new progress event
 		}
 	}
 
 	/**Fires a given progress event to all registered progress listeners.
 	@param progressEvent The progress event to fire.
 	*/
-	protected void fireProgressed(final ProgressEvent progressEvent)
+	protected void fireProgressed(final ProgressEvent<Long> progressEvent)
 	{
-		for(final ProgressListener progressListener:getEventListenerManager().getListeners(ProgressListener.class))	//for each progress listener
+		for(final ProgressListener<Long> progressListener:getEventListenerManager().getListeners(ProgressListener.class))	//for each progress listener
 		{
 			progressListener.progressed(progressEvent);	//dispatch the progress event to the listener
 		}

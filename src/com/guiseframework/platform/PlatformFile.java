@@ -6,7 +6,7 @@ import com.guiseframework.event.ProgressListenable;
 /**A local file on a platform.
 @author Garret Wilson
 */
-public interface PlatformFile extends ProgressListenable
+public interface PlatformFile extends ProgressListenable<Long>
 {
 
 	/**@return The name of the file.*/
@@ -14,6 +14,9 @@ public interface PlatformFile extends ProgressListenable
 
 	/**@return The size of the file, or -1 if the size is unknown.*/
 	public long getSize();
+
+	/**Cancels the current upload or download.*/
+	public void cancel();
 
 	/**Uploads the file from the platform.
 	@param destinationPath The path representing the destination of the platform file, relative to the application.

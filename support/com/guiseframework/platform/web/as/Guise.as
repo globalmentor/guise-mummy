@@ -57,6 +57,7 @@ class com.guiseframework.platform.web.as.Guise
 	{
 			//add callback methods for JavaScript to call
 		ExternalInterface.addCallback("browseFiles", this, browseFiles);
+		ExternalInterface.addCallback("cancelFile", this, cancelFile);
 		ExternalInterface.addCallback("pauseSound", this, pauseSound); 
 		ExternalInterface.addCallback("playSound", this, playSound); 
 		ExternalInterface.addCallback("setSoundPosition", this, setSoundPosition); 
@@ -253,6 +254,12 @@ class com.guiseframework.platform.web.as.Guise
 			fileReference["fileReferenceListID"]=fileReferenceList["id"];	//save a reference to the file reference list ID
 			var listener:Object=new Object();	//create a new listener
 			listener.onProgress=onFileReferenceProgress.bind(this);	//set the listener method for file progress
+			listener.onComplete=onFileReferenceComplete.bind(this);	//set the listener method for transfer complete
+//TODO del			listener.onCancel=onFileReferenceCancel.bind(this);	//set the listener method for transfer canceled TODO make sure that this is called when the transfer is canceled---it may only be called when the browse dialog box is canceled
+			var boundFileReferenceErrorFunction:Function=onFileReferenceError.bind(this);	//create the bound function for file transfer error
+			listener.onHTTPError=boundFileReferenceErrorFunction;	//set the listener method for transfer HTTP error
+			listener.onIOError=boundFileReferenceErrorFunction;	//set the listener method for transfer I/O error
+			listener.onSecurityError=boundFileReferenceErrorFunction;	//set the listener method for transfer security error; the different number of parameter should not present a problem---more arguments will be sent than will be used			
 			fileReference.addListener(listener);	//add the listener object
 			fileMap[fileReferenceID]=fileReference;	//store the file reference in the map for quick lookup
 			fileReferenceInfos[i]={id:fileReferenceID, name:fileReference.name, size:fileReference.size};	//create our own information about this file reference
@@ -276,7 +283,28 @@ class com.guiseframework.platform.web.as.Guise
 			var fileReference=fileReferenceList["fileMap"][fileReferenceID];	//get the requested file reference
 			if(fileReference)	//if we found a file reference
 			{
+				onFileReferenceProgress(fileReference, 0, fileReference.size);	//send an initial progress of zero bytes
 				fileReference.upload(fileURI);	//tell the file reference to start uploading
+			}
+		}
+		//TODO fix for FileReference
+	}
+
+	/**Cancels a file upload or download.
+	If no such file reference or file reference list exists, or no files of a file reference list match that indicated by the given file ID, no action occurs.
+	@param fileReferenceListID The ID of the file reference or file reference list.
+	@param fileReferenceID The ID of the file reference within a file reference list, or null if the file reference list ID refers to a single file reference.
+	*/
+	public function cancelFile(fileReferenceListID:String, fileReferenceID:Number):Void
+	{
+		var object:Object=fileReferenceMap[fileReferenceListID];	//get the existing file reference or file reference list, if any
+		if(object instanceof FileReferenceList)	//if this is a file reference list
+		{
+			var fileReferenceList:FileReferenceList=FileReferenceList(object);	//get the file reference list
+			var fileReference=fileReferenceList["fileMap"][fileReferenceID];	//get the requested file reference
+			if(fileReference)	//if we found a file reference
+			{
+				fileReference.cancel();	//tell the file reference to cancel
 			}
 		}
 		//TODO fix for FileReference
@@ -289,7 +317,33 @@ class com.guiseframework.platform.web.as.Guise
 	*/ 
 	private function onFileReferenceProgress(fileReference:FileReference, bytesLoaded:Number, bytesTotal:Number)
 	{
-		ExternalInterface.call(GUISE_JAVSCRIPT_VARIABLE_NAME+"._onFileProgress", fileReference["fileReferenceListID"], fileReference["id"], bytesLoaded, bytesTotal);	//send the progress to Guise
+		ExternalInterface.call(GUISE_JAVSCRIPT_VARIABLE_NAME+"._onFileProgress", fileReference["fileReferenceListID"], fileReference["id"], TaskState.INCOMPLETE, bytesLoaded, bytesTotal);	//send the progress to Guise
+	}
+
+	/**Called when a file transfer is complete.
+	@param fileReference The reference to the file being uploaded or downloaded.
+	*/ 
+	private function onFileReferenceComplete(fileReference:FileReference)
+	{
+		ExternalInterface.call(GUISE_JAVSCRIPT_VARIABLE_NAME+"._onFileProgress", fileReference["fileReferenceListID"], fileReference["id"], TaskState.COMPLETE, fileReference.size, fileReference.size);	//tell Guise the transfer is complete
+	}
+
+	/**Called when a file transfer is canceled.
+	@param fileReference The reference to the file being uploaded or downloaded.
+	*/
+/*TODO del; this is only for canceling the browse window
+	private function onFileReferenceCancel(fileReference:FileReference)
+	{
+		ExternalInterface.call(GUISE_JAVSCRIPT_VARIABLE_NAME+"._onFileProgress", fileReference["fileReferenceListID"], fileReference["id"], TaskState.CANCELED, -1, fileReference.size);	//tell Guise the transfer has been canceled
+	}
+*/
+
+	/**Called when a file transfer encounters an error.
+	@param fileReference The reference to the file being uploaded or downloaded.
+	*/ 
+	private function onFileReferenceError(fileReference:FileReference)
+	{
+		ExternalInterface.call(GUISE_JAVSCRIPT_VARIABLE_NAME+"._onFileProgress", fileReference["fileReferenceListID"], fileReference["id"], TaskState.ERROR, -1, -1);	//tell Guise the transfer had an error
 	}
 
 	/**Main entry point.*/

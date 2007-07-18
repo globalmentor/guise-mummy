@@ -253,8 +253,10 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_RETRY=createStringResourceReference("theme.label.retry");
 	public final static String LABEL_SUBMIT=createStringResourceReference("theme.label.submit");
 	public final static String LABEL_SUBTRACT=createStringResourceReference("theme.label.subtract");
+	public final static String LABEL_TOTAL=createStringResourceReference("theme.label.total");
 	public final static String LABEL_UNKNOWN=createStringResourceReference("theme.label.unknown");
 	public final static String LABEL_UPLOAD=createStringResourceReference("theme.label.upload");
+	public final static String LABEL_UPLOAD_TO_X=createStringResourceReference("theme.label.upload.to.x");
 	public final static String LABEL_USERNAME=createStringResourceReference("theme.label.username");
 	public final static String LABEL_VERIFTY=createStringResourceReference("theme.label.verify");
 	public final static String LABEL_VERSION=createStringResourceReference("theme.label.version");

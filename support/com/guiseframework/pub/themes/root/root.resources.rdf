@@ -158,8 +158,10 @@
 		<resource:theme.label.retry>Retry</resource:theme.label.retry>
 		<resource:theme.label.submit>Submit</resource:theme.label.submit>
 		<resource:theme.label.subtract>Subtract</resource:theme.label.subtract>
+		<resource:theme.label.total>Total</resource:theme.label.total>
 		<resource:theme.label.unknown>Unknown</resource:theme.label.unknown>
 		<resource:theme.label.upload>Upload</resource:theme.label.upload>
+		<resource:theme.label.upload.to.x>&#x0098;theme.label.upload&#x009C; to {0}</resource:theme.label.upload.to.x>
 		<resource:theme.label.username>Username</resource:theme.label.username>
 		<resource:theme.label.verify>Verify</resource:theme.label.verify>
 		<resource:theme.label.version>Version</resource:theme.label.version>

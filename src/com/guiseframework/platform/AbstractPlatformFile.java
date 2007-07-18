@@ -2,8 +2,6 @@ package com.guiseframework.platform;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import java.net.URI;
-
 import com.guiseframework.event.EventListenerManager;
 import com.guiseframework.event.ProgressEvent;
 import com.guiseframework.event.ProgressListener;
@@ -47,7 +45,7 @@ public abstract class AbstractPlatformFile implements PlatformFile
 	/**Adds a progress listener.
 	@param progressListener The progress listener to add.
 	*/
-	public void addProgressListener(final ProgressListener progressListener)
+	public void addProgressListener(final ProgressListener<Long> progressListener)
 	{
 		getEventListenerManager().add(ProgressListener.class, progressListener);	//add the listener
 	}
@@ -55,33 +53,35 @@ public abstract class AbstractPlatformFile implements PlatformFile
 	/**Removes an progress listener.
 	@param progressListener The progress listener to remove.
 	*/
-	public void removeProgressListener(final ProgressListener progressListener)
+	public void removeProgressListener(final ProgressListener<Long> progressListener)
 	{
 		getEventListenerManager().remove(ProgressListener.class, progressListener);	//remove the listener
 	}
 
 	/**Fires a progress event to all registered progress listeners.
 	This method delegates to {@link #fireProgessed(ProgressEvent)}.
+	@param state The state of the progress.
 	@param transferred The current number of bytes transferred, or <code>-1</code> if not known.
 	@param total The total or estimated total bytes to transfer, or <code>-1</code> if not known.
+	@exception NullPointerException if the given state is <code>null</code>.
 	@see ProgressListener
 	@see ProgressEvent
 	*/
-	protected void fireProgressed(final long transferred, final long total)
+	protected void fireProgressed(final TaskState state, final long transferred, final long total)
 	{
 		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
 		if(eventListenerManager.hasListeners(ProgressListener.class))	//if there are progress listeners registered
 		{
-			fireProgressed(new ProgressEvent(this, null, TaskState.INCOMPLETE, transferred, total));	//create and fire a new progress event
+			fireProgressed(new ProgressEvent<Long>(this, null, state, transferred>=0 ? Long.valueOf(transferred) : null, total>=0 ? Long.valueOf(total) : null));	//create and fire a new progress event
 		}
 	}
 
 	/**Fires a given progress event to all registered progress listeners.
 	@param progressEvent The progress event to fire.
 	*/
-	protected void fireProgressed(final ProgressEvent progressEvent)
+	protected void fireProgressed(final ProgressEvent<Long> progressEvent)
 	{
-		for(final ProgressListener progressListener:getEventListenerManager().getListeners(ProgressListener.class))	//for each progress listener
+		for(final ProgressListener<Long> progressListener:getEventListenerManager().getListeners(ProgressListener.class))	//for each progress listener
 		{
 			progressListener.progressed(progressEvent);	//dispatch the progress event to the listener
 		}

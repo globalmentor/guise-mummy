@@ -361,13 +361,7 @@ function AJAXResponse(document, size)
 	this.size=size
 }
 
-
 var com=com||{}; com.guiseframework=com.guiseframework||{}; com.guiseframework.js=com.guiseframework.js||{};	//create the com.guiseframework.js package
-
-/**The state of a task.
-@see com.guiseframework.model.TaskState
-*/
-com.guiseframework.js.TaskState={INITIALIZE:"initialize", INCOMPLETE:"incomplete", ERROR:"error", PAUSED:"paused", STOPPED:"stopped", CANCELED:"canceled", COMPLETE:"complete"};
 
 //Guise
 
@@ -450,6 +444,11 @@ com.guiseframework.js.Guise=function()
 	if(!proto._initialized)
 	{
 		proto._initialized=true;
+
+		/**The state of a task.
+		@see com.guiseframework.model.TaskState
+		*/
+		proto.TaskState={INITIALIZE:"initialize", INCOMPLETE:"incomplete", ERROR:"error", PAUSED:"paused", STOPPED:"stopped", CANCELED:"canceled", COMPLETE:"complete"};
 
 		/**The content type of a Guise AJAX request.*/
 		proto.REQUEST_CONTENT_TYPE="application/x-guise-ajax-request+xml";
@@ -1054,6 +1053,10 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 					break;
 				case "file-browse":
 					this._flash.browseFiles(objectID, parameters["multiple"]);	//browse files, specifying whether multiple files should be selected
+					break;
+				case "file-cancel":
+					this._flash.cancelFile(objectID, parameters["id"]);	//cancel the identified file
+					this._onFileProgress(objectID, parameters["id"], this.TaskState.CANCELED, -1, -1);	//send a file progress canceled event, as Flash doesn't send a cancel event for us 
 					break;
 				case "file-upload":
 					this._flash.uploadFile(objectID, parameters["id"], parameters["destinationURI"]);	//upload the identified file to the specified destination URI
@@ -2767,12 +2770,13 @@ if(elementName=="select")
 		/**Called while a file is uploading or downloading.
 		@param fileReferenceListID The ID of the file reference list.
 		@param fileReferenceID The ID of file reference being transferred.
+		@param taskState The current state of the transfer.
 		@param transferred The current number of bytes transferred, or <code>-1</code> if not known.
 		@param total The total or estimated total bytes to transfer, or <code>-1</code> if not known.
 		*/
-		proto._onFileProgress=function(fileReferenceListID, fileReferenceID, transferred, total)
+		proto._onFileProgress=function(fileReferenceListID, fileReferenceID, taskState, transferred, total)
 		{
-			this.sendAJAXRequest(new ChangeAJAXEvent(fileReferenceListID, {"id":fileReferenceID, "transferred":transferred, "total":total}));	//send an AJAX request with the new file progress
+			this.sendAJAXRequest(new ChangeAJAXEvent(fileReferenceListID, {"id":fileReferenceID, "taskState":taskState, "transferred":transferred, "total":total}));	//send an AJAX request with the new file progress
 		};
 
 	}

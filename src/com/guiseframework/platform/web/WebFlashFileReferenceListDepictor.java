@@ -3,10 +3,13 @@ package com.guiseframework.platform.web;
 import java.net.URI;
 import java.util.*;
 
+import static com.garretwilson.lang.EnumUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
 import com.garretwilson.util.*;
 
+import com.guiseframework.Bookmark;
+import com.guiseframework.model.TaskState;
 import com.guiseframework.platform.PlatformEvent;
 
 /**A web depictor for a Flash <code>flash.net.FileReferenceList</code>.
@@ -23,10 +26,16 @@ public class WebFlashFileReferenceListDepictor extends AbstractWebDepictor<Flash
 		*/
 		FILE_BROWSE,
 
+		/**The command to cancel a transfer.
+		parameters: <code>{id:"<var>fileReferenceID</var>"}</code>
+		*/
+		FILE_CANCEL,
+
 		/**The command to initiate an upload.
 		parameters: <code>{id:"<var>fileReferenceID</var>", destinationURI:<var>destinationURI</var>}</code>
 		*/
 		FILE_UPLOAD;
+
 	}
 	
 	/**The property for specifying the destination URI of a file upload.*/
@@ -44,16 +53,30 @@ public class WebFlashFileReferenceListDepictor extends AbstractWebDepictor<Flash
 				new NameValuePair<String, Object>(MULTIPLE_PROPERTY, Boolean.TRUE)));	//send a file browse command to the platform TODO fix single/multiple
 	}
 
+	/**Cancels a platform file upload or download.
+	@param platformFile Thet platform file to cancel.
+	@exception NullPointerException if the given platform file is <code>null</code>.
+	@exception IllegalStateException the specified platform file can no longer be canceled because, for example, other platform files have since been selected.	
+	*/
+	@SuppressWarnings("unchecked")
+	public void cancel(final FlashPlatformFile platformFile)
+	{
+		getPlatform().getSendEventQueue().add(new WebCommandEvent<FlashFileReferenceCommand>(getDepictedObject(), FlashFileReferenceCommand.FILE_CANCEL,	//send a file cancel command to the platform
+				new NameValuePair<String, Object>(ID_PROPERTY, platformFile.getID())));	//send the ID of the file
+	}	
+
 	/**Initiates a platform file upload.
 	@param platformFile Thet platform file to upload.
 	@param destinationURI The URI representing the destination of the platform file, relative to the application.
-	@exception NullPointerException if the given platform file and/or destination URI is <code>null</code>.
+	@exception NullPointerException if the given platform file and/or destination path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
 	@exception IllegalArgumentException if the provided path is absolute.
-	@exception ClassCastException if the current platform is not an {@link HTTPServletWebPlatform}.
 	*/
-	public void upload(final FlashPlatformFile platformFile, final URI destinationURI)
+	@SuppressWarnings("unchecked")
+	public void upload(final FlashPlatformFile platformFile, final String destinationPath, final Bookmark destinationBookmark)
 	{
+		final String resolvedDestinationPath=getSession().getApplication().resolvePath(checkRelativePath(destinationPath));	//resolve the destination path
+		final URI destinationURI=URI.create(destinationBookmark!=null ? resolvedDestinationPath+destinationBookmark.toString() : resolvedDestinationPath);	//construct a destination URI
 			//add an identification of the Guise session to the URI if needed, as Flash 8 on FireFox sends the wrong HTTP session ID cookie value
 		final URI sessionedDestinationURI=appendQueryParameters(destinationURI, new NameValuePair<String, String>(HTTPServletGuiseSessionManager.GUISE_SESSION_UUID_PARAMETER, getSession().getUUID().toString()));
 		getPlatform().getSendEventQueue().add(new WebCommandEvent<FlashFileReferenceCommand>(getDepictedObject(), FlashFileReferenceCommand.FILE_UPLOAD,	//send a file upload command to the platform
@@ -86,15 +109,18 @@ public class WebFlashFileReferenceListDepictor extends AbstractWebDepictor<Flash
 				}
 				flashFileReferenceList.setPlatformFiles(platformFileList);	//tell the file reference list which platform files it now has
 			}			
+			final String taskStateString=asInstance(properties.get("taskState"), String.class);	//get the task state, if reported TODO use a constant
 			final Number transferred=asInstance(properties.get("transferred"), Number.class);	//get the bytes transferred, if reported TODO use a constant
-			if(transferred!=null)	//if we have progress
+			if(taskStateString!=null && transferred!=null)	//if we have progress
 			{
-				final Number total=asInstance(properties.get("total"), Number.class);	//get the total bytes to transfer
+				final TaskState taskState=getSerializedEnum(TaskState.class, taskStateString);	//get the task state
+				final Number total=asInstance(properties.get("total"), Number.class);	//get the total bytes to transfer, if any
 				final String flashPlatformFileID=asInstance(properties.get("id"), String.class);	//get the ID of the platform file
+
 				final FlashPlatformFile platformFile=flashPlatformFileID!=null ? flashFileReferenceList.getPlatformFile(flashPlatformFileID) : null;	//get the platform file identified
 				if(platformFile!=null)	//if we know the platform file
 				{
-					platformFile.fireProgressed(transferred.longValue(), total!=null ? total.longValue() : -1);	//update the file progress
+					platformFile.fireProgressed(taskState, transferred.longValue(), total!=null ? total.longValue() : -1);	//update the file progress
 				}
 			}
 		}
