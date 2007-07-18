@@ -11,6 +11,7 @@ This script expects the following variables to be defined:
 navigator.userAgentName The name of the user agent, such as "Firefox", "Mozilla", "MSIE", or "Opera".
 navigator.userAgentVersionNumber The version of the user agent stored as a number.
 GUISE_PUBLIC_RESOURCE_BASE_PATH The absolute base path of Guise public resources.
+GUISE_VERSION The build ID of the current Guise version.
 */
 
 /*Guise AJAX Request Format, content type application/x-guise-ajax-request+xml
@@ -1859,10 +1860,10 @@ if(elementName=="select")
 			else	//if this is any other browser
 			{
 				objectAttributes.type="application/x-shockwave-flash";
-				objectAttributes.data=GUISE_PUBLIC_RESOURCE_BASE_PATH+"flash/guise.swf";
+				objectAttributes.data=GUISE_PUBLIC_RESOURCE_BASE_PATH+"flash/guise.swf?guiseVersion="+GUISE_VERSION;	//add the Guise version so an out-of-date cached version won't be used
 			}
 			DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "object", objectAttributes);	//<object ...>
-			DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param", {"name":"movie", "value":GUISE_PUBLIC_RESOURCE_BASE_PATH+"flash/guise.swf"}, true);	//<param name="movie" value="...guise.swf"/>
+			DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param", {"name":"movie", "value":GUISE_PUBLIC_RESOURCE_BASE_PATH+"flash/guise.swf?guiseVersion="+GUISE_VERSION}, true);	//<param name="movie" value="...guise.swf"/>
 			DOMUtilities.appendXMLStartTag(flashGuiseInnerHTMLStringBuilder, "param", {"name":"quality", "value":"high"}, true);	//<param name="movie" value="...guise.swf"/>
 			DOMUtilities.appendXMLEndTag(flashGuiseInnerHTMLStringBuilder, "object");	//</object>
 			guiseFlashDiv.innerHTML=flashGuiseInnerHTMLStringBuilder.toString();	//add the Flash content

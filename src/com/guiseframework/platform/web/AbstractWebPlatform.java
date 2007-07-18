@@ -32,7 +32,8 @@ public abstract class AbstractWebPlatform extends AbstractPlatform implements We
 	{
 		super(application);	//construct the parent class
 		this.environment=new DefaultEnvironment();	//create a new environment
-		environment.setProperties(application.getEnvironment().getProperties());	//copy the application environment to the platform environment
+//TODO del; don't copy application environment properties; currently this exposes application-level passwords; this information needs to be removed from the application environment, though		environment.setProperties(application.getEnvironment().getProperties());	//copy the application environment to the platform environment
+		//TODO create some sort of configuration that gets loaded on this platform
 	}
 
 	/**Generates an ID for the given depicted object appropriate for using on the platform.

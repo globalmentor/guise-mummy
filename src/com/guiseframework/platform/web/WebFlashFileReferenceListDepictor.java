@@ -78,7 +78,7 @@ public class WebFlashFileReferenceListDepictor extends AbstractWebDepictor<Flash
 		final String resolvedDestinationPath=getSession().getApplication().resolvePath(checkRelativePath(destinationPath));	//resolve the destination path
 		final URI destinationURI=URI.create(destinationBookmark!=null ? resolvedDestinationPath+destinationBookmark.toString() : resolvedDestinationPath);	//construct a destination URI
 			//add an identification of the Guise session to the URI if needed, as Flash 8 on FireFox sends the wrong HTTP session ID cookie value
-		final URI sessionedDestinationURI=appendQueryParameters(destinationURI, new NameValuePair<String, String>(HTTPServletGuiseSessionManager.GUISE_SESSION_UUID_PARAMETER, getSession().getUUID().toString()));
+		final URI sessionedDestinationURI=appendQueryParameters(destinationURI, new NameValuePair<String, String>(WebPlatform.GUISE_SESSION_UUID_URI_QUERY_PARAMETER, getSession().getUUID().toString()));
 		getPlatform().getSendEventQueue().add(new WebCommandEvent<FlashFileReferenceCommand>(getDepictedObject(), FlashFileReferenceCommand.FILE_UPLOAD,	//send a file upload command to the platform
 				new NameValuePair<String, Object>(ID_PROPERTY, platformFile.getID()),	//send the ID of the file
 				new NameValuePair<String, Object>(DESTINATION_URI_PROPERTY, sessionedDestinationURI)));	//indicate the destination

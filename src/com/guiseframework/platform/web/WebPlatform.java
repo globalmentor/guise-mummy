@@ -19,6 +19,11 @@ public interface WebPlatform extends Platform
 	/**The public ID of the Guise XHTML DTD.*/
 	public final static String GUISE_XHTML_DTD_PUBLIC_ID="-//Guise//DTD XHTML Guise 1.0//EN";	
 
+	/**The URI query parameter used to specify a Guise session by UUID, overriding the Guise session based upon the HTTP session identified by the request.*/ 
+	public final static String GUISE_SESSION_UUID_URI_QUERY_PARAMETER="guiseSessionUUID";
+	/**The URI query parameter used to indicate the Guise version to prevent caching between versions.*/ 
+	public final static String GUISE_VERSION_URI_QUERY_PARAMETER="guiseVersion";
+
 		//Guise-specific elements
 			//img
 	/**The Guise image attribute indicating the original source location of the image.*/
@@ -38,16 +43,16 @@ public interface WebPlatform extends Platform
 	public final static String GUISE_EMPTY_HTML_DOCUMENT_PATH=GuiseApplication.GUISE_PUBLIC_DOCUMENTS_PATH+"empty.html";
 
 	/**The path of the AJAX JavaScript file, relative to the application.*/
-	public final static String AJAX_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"ajax.js";	
+	public final static String AJAX_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"ajax.js";
 	/**The path of the DOM JavaScript file, relative to the application.*/
-	public final static String DOM_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"dom.js";	
+	public final static String DOM_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"dom.js";
 	/**The path of the Guise JavaScript file, relative to the application.*/
-	public final static String GUISE_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"guise.js";	
+	public final static String GUISE_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"guise.js";
 	/**The path of the JavaScript JavaScript file, relative to the application.*/
-	public final static String JAVASCRIPT_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"javascript.js";	
+	public final static String JAVASCRIPT_JAVASCRIPT_PATH=GuiseApplication.GUISE_PUBLIC_JAVASCRIPT_PATH+"javascript.js";
 
 	/**The path of the Guise Flash file, relative to the application.*/
-	public final static String GUISE_FLASH_PATH=GuiseApplication.GUISE_PUBLIC_FLASH_PATH+"guise.swf";	
+	public final static String GUISE_FLASH_PATH=GuiseApplication.GUISE_PUBLIC_FLASH_PATH+"guise.swf";
 
 	/**Generates an ID for the given depicted object appropriate for using on the platform.
 	@param depictID The depict ID to be converted to a platform ID.

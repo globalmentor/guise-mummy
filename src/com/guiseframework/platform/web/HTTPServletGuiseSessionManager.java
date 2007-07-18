@@ -16,24 +16,20 @@ import com.guiseframework.GuiseSession;
 /**Manages Guise sessions for an HTTP web application.
 Guise sessions are created and released in conjunction with associated HTTP servlet sessions.
 There may be multiple Guise applications within one web application.
-<p>A HTTP request may override any HTTP session identified by the request by exlicitly identifying the Guise session UUID using the {@link #GUISE_SESSION_UUID_PARAMETER} parameter.</p>
+<p>A HTTP request may override any HTTP session identified by the request by exlicitly identifying the Guise session UUID using the {@link WebPlatform#GUISE_SESSION_UUID_URI_QUERY_PARAMETER} parameter.</p>
 @author Garret Wilson
 @see HTTPServletGuiseContainer
 */
 public class HTTPServletGuiseSessionManager implements HttpSessionListener
 {
 
-	/**The HTTP URL query parameter used to specify a Guise session by UUID, overriding the Guise session based upon the HTTP session identified by the request.*/ 
-	public final static String GUISE_SESSION_UUID_PARAMETER="guiseSessionUUID"; 
-
 	/**The synchronized map of Guise containers keyed to HTTP sessions.*/
 	private static final Map<HttpSession, HTTPServletGuiseContainer> guiseContainerMap=synchronizedMap(new HashMap<HttpSession, HTTPServletGuiseContainer>());
-
 
 	private static HttpSession spiderSession=null;	//TODO fix to be separate for each application; testing
 	
 	/**Retrieves a session for the given HTTP session.
-	If a {@link #GUISE_SESSION_UUID_PARAMETER} parameter is present in the HTTP request, it will be used to directly look up a Guise session, ignoring any identified HTTP session.
+	If a {@link WebPlatform#GUISE_SESSION_UUID_URI_QUERY_PARAMETER} parameter is present in the HTTP request, it will be used to directly look up a Guise session, ignoring any identified HTTP session.
 	If there is no Guise session matching a specified UUID, the Guise session will be retrieved normally.
 	@param guiseContainer The Guise container that owns the application. 
 	@param guiseApplication The application to install to own the created session..
@@ -43,7 +39,7 @@ public class HTTPServletGuiseSessionManager implements HttpSessionListener
 	*/
 	protected static GuiseSession getGuiseSession(final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final HttpServletRequest httpRequest)
 	{
-		final String guiseSessionUUIDString=httpRequest.getParameter(GUISE_SESSION_UUID_PARAMETER);	//see if a Guise session UUID is specified
+		final String guiseSessionUUIDString=httpRequest.getParameter(WebPlatform.GUISE_SESSION_UUID_URI_QUERY_PARAMETER);	//see if a Guise session UUID is specified
 		if(guiseSessionUUIDString!=null)	//if a Guise session UUID is specified
 		{
 			final UUID guiseSessionUUID=UUID.fromString(guiseSessionUUIDString);	//create a UUID from the string

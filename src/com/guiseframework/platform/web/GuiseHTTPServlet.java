@@ -122,7 +122,7 @@ import static com.guiseframework.platform.web.WebPlatform.*;
 /**The servlet that controls a Guise web applications. 
 Each Guise session's platform will be locked during normal web page generation context will be active at one one time.
 This implementation only works with Guise applications that descend from {@link AbstractGuiseApplication}.
-<p>For all {@link ResourceReadDestination}s, this servlet recognizes a query parameter named {@value #CONTENT_DISPOSITION_URI_QUERY_PARAMETER}
+<p>For all {@link ResourceReadDestination}s, this servlet recognizes a query parameter named {@value #GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER}
 specifying the content disposition of the content to return; the value is the serialize version of a {@link ContentDispositionType} value.</p>
 @author Garret Wilson
 */
@@ -146,7 +146,7 @@ public class GuiseHTTPServlet extends DefaultHTTPServlet
 	/**The URI query parameter indicating that the content disposition of the content of a {@link ResourceReadDestination}.
 	The value will be the serialize version of a {@link ContentDispositionType} value.
 	*/
-	public static String CONTENT_DISPOSITION_URI_QUERY_PARAMETER="content-disposition";
+	public static String GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER="guiseContentDisposition";
 
 	/**The ID of the viewport to use for sending resources.*/
 	public static String SEND_RESOURCE_VIEWPORT_ID="guiseDownload";
@@ -1042,8 +1042,8 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						depictContext.writeElementBegin(null, "navigate");	//<navigate>	//TODO use a constant
 						depictContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
 						depictContext.writeAttribute(null, "viewportID", SEND_RESOURCE_VIEWPORT_ID);	//specify the viewport ID for sending resources
-							//append the "content-disposition=attachment" query parameter to the URI
-						final URI sendResourceAttachmentURI=appendQueryParameters(sendResourceURI, new NameValuePair<String, String>(CONTENT_DISPOSITION_URI_QUERY_PARAMETER, getSerializationName(ContentDispositionType.ATTACHMENT)));
+							//append the "guiseContentDisposition=attachment" query parameter to the URI
+						final URI sendResourceAttachmentURI=appendQueryParameters(sendResourceURI, new NameValuePair<String, String>(GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER, getSerializationName(ContentDispositionType.ATTACHMENT)));
 						depictContext.write(sendResourceAttachmentURI.toString());	//write the URI of the resource to send
 						depictContext.writeElementEnd(null, "navigate");	//</navigate>
 						guisePlatform.clearSendResourceURI();	//clear the address of the resource to send so that we won't send it again
@@ -1333,18 +1333,22 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 			for(final Cookie cookie:cookies)	//for each cookie in the request
 			{
 				final String cookieName=cookie.getName();	//get the name of this cookie
-//TODO del Debug.trace("Looking at cookie", cookieName, "with value", cookie.getValue());
 				if(!SESSION_ID_COOKIE_NAME.equals(cookieName))	//ignore the session ID
 				{
-//TODO del Debug.trace("Removing cookie", cookieName);
-					final String environmentPropertyValue=asInstance(environment.getProperty(cookieName), String.class);	//see if there is a string environment property value for this cookie's name
+					/*TODO bring back final */ String environmentPropertyValue=asInstance(environment.getProperty(cookieName), String.class);	//see if there is a string environment property value for this cookie's name
+
+					if(cookieName.startsWith("marmox.repo"))	//TODO del after several versions; this is included to purge inadvertent password cookies from clients
+					{
+						environmentPropertyValue=null;
+					}
+
 					if(environmentPropertyValue!=null)	//if a value in the environment matches the cookie's name
 					{
 						if(!ObjectUtilities.equals(cookie.getValue(), encode(environmentPropertyValue)))	//if the cookie's value doesn't match the encoded environment property value
 						{
 							cookie.setValue(encode(environmentPropertyValue));	//update the cookie's value, making sure the value is encoded
+							response.addCookie(cookie);	//add the cookie to the response to change its value
 						}
-						cookieMap.put(cookieName, cookie);	//store the cookie in the map
 					}
 					else	//if there is no such environment property, remove the cookie
 					{
@@ -1353,6 +1357,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						cookie.setMaxAge(0);	//tell the cookie to expire immediately
 						response.addCookie(cookie);	//add the cookie to the response to delete it
 					}
+					cookieMap.put(cookieName, cookie);	//store the cookie in the map to show that there's no need to copy over the environment variable					
 				}
 			}
 		}
@@ -1376,7 +1381,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 
 	/**Serves a resource that has been verified to exist
   This version sets the content description and content disposition of {@link ResourceReadDestination}.
-	If there is a query parameter named {@value #CONTENT_DISPOSITION_URI_QUERY_PARAMETER}, the value will indicate the content disposition
+	If there is a query parameter named {@value #GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER}, the value will indicate the content disposition
 	through the use of the serialize version of a {@link ContentDispositionType} value.</p>  @param request The HTTP request.
   @param response The HTTP response.
 	@param resource The resource being served.
@@ -1384,7 +1389,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
   @exception IllegalArgumentException if the content disposition parameter, if any, is unrecognized.
   @exception ServletException if there is a problem servicing the request.
   @exception IOException if there is an error reading or writing data.
-  @see #CONTENT_DISPOSITION_URI_QUERY_PARAMETER
+  @see #GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER
   */
 	protected void serveResource(final HttpServletRequest request, final HttpServletResponse response, final HTTPServletResource resource, final boolean serveContent) throws ServletException, IOException
 	{
@@ -1399,7 +1404,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 				final NameValuePair<String, String>[] parameters=URIUtilities.getParameters(queryString);	//get the parameters from the query
 				for(final NameValuePair<String, String> parameter:parameters)	//look at each parameter
 				{
-					if(CONTENT_DISPOSITION_URI_QUERY_PARAMETER.equals(parameter.getName()))	//if this is a content-disposition parameter
+					if(GUISE_CONTENT_DISPOSITION_URI_QUERY_PARAMETER.equals(parameter.getName()))	//if this is a content-disposition parameter
 					{
 						final ContentDispositionType contentDispositionType=getSerializedEnum(ContentDispositionType.class, parameter.getValue());	//get the content disposition type
 						if(contentDispositionType==ContentDispositionType.ATTACHMENT)	//if the content should be sent back as an attachment

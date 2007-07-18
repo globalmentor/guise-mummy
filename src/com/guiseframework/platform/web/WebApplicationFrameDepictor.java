@@ -7,13 +7,14 @@ import java.util.*;
 
 import javax.mail.internet.ContentType;
 
+import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.javascript.JavaScriptConstants.*;
 import static com.garretwilson.text.xml.XMLConstants.*;
 import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
-
 import com.garretwilson.text.xml.xhtml.XHTMLConstants;
 import com.garretwilson.util.Debug;
+import com.garretwilson.util.NameValuePair;
 import com.guiseframework.*;
 import static com.guiseframework.GuiseApplication.*;
 import com.guiseframework.component.*;
@@ -218,7 +219,9 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 			//empty HTML document path variable
 		depictContext.write("\t\t");
 //TODO del		context.writeLiteral("var GUISE_EMPTY_HTML_DOCUMENT_PATH=\""+application.resolvePath(GUISE_EMPTY_HTML_DOCUMENT_PATH)+"\";");	//write the path to the Guise empty HTML document
-		depictContext.writeLiteral("var GUISE_PUBLIC_RESOURCE_BASE_PATH=\""+application.resolvePath(GUISE_PUBLIC_RESOURCE_BASE_PATH)+"\";");	//write the path to the Guise base path for public resources
+		depictContext.writeLiteral("var GUISE_PUBLIC_RESOURCE_BASE_PATH=\""+application.resolvePath(GUISE_PUBLIC_RESOURCE_BASE_PATH)+"\";");	//write the path to the Guise base path for public resources TODO use a constant
+		depictContext.write("\n\t\t");
+		depictContext.writeLiteral("var GUISE_VERSION=\""+Guise.BUILD_ID+"\";");	//write the path to the Guise base path for public resources TODO use a constant
 		depictContext.write('\n');
 		depictContext.write('\t');
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_SCRIPT);	//</xhtml:script>
@@ -236,16 +239,16 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		}
 			//<xhtml:script> (external)
 		depictContext.write("\t");
-		depictContext.writeJavaScriptElement(JAVASCRIPT_JAVASCRIPT_PATH);	//JavaScript: javascript.js
+		depictContext.writeJavaScriptElement(JAVASCRIPT_JAVASCRIPT_PATH+constructQuery(new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//JavaScript: javascript.js
 		depictContext.write("\n");
 		depictContext.write("\t");
-		depictContext.writeJavaScriptElement(DOM_JAVASCRIPT_PATH);	//JavaScript: dom.js
+		depictContext.writeJavaScriptElement(DOM_JAVASCRIPT_PATH+constructQuery(new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//JavaScript: dom.js
 		depictContext.write("\n");
 		depictContext.write("\t");
-		depictContext.writeJavaScriptElement(AJAX_JAVASCRIPT_PATH);	//JavaScript: ajax.js
+		depictContext.writeJavaScriptElement(AJAX_JAVASCRIPT_PATH+constructQuery(new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//JavaScript: ajax.js
 		depictContext.write("\n");
 		depictContext.write("\t");
-		depictContext.writeJavaScriptElement(GUISE_JAVASCRIPT_PATH);	//JavaScript: guise.js
+		depictContext.writeJavaScriptElement(GUISE_JAVASCRIPT_PATH+constructQuery(new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//JavaScript: guise.js
 		depictContext.write("\n");
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_HEAD);	//</xhtml:head>		
 		depictContext.write("\n");
