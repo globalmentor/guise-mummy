@@ -71,15 +71,15 @@ public abstract class AbstractInteractionTreeNodeRepresentationStrategy<V extend
 					}
 					else	//if this is a condition for a choice-based question
 					{
-						final List<RDFResource> choices=question.getChoices();	//get the choices
+						final List<RDFObject> choices=question.getChoices();	//get the choices
 						if(choices!=null)	//if there are choices
 						{
-							for(final RDFResource choiceResource:choices)	//for each choice
+							for(final RDFObject choiceObject:choices)	//for each choice
 							{
-								if(choiceResource instanceof Dialogue	//if this is the choice dialog the condition mentioned
-										&& conditionID.equals(((Dialogue)choiceResource).getReferenceURI().toString())) 
+								if(choiceObject instanceof Dialogue	//if this is the choice dialog the condition mentioned
+										&& conditionID.equals(((Dialogue)choiceObject).getReferenceURI().toString())) 
 								{
-									final RDFLiteral choiceValue=((Dialogue)choiceResource).getValue();	//get the choice value
+									final RDFLiteral choiceValue=((Dialogue)choiceObject).getValue();	//get the choice value
 									if(choiceValue!=null)	//if there is a choice value
 									{
 										stringBuilder.append('[').append(choiceValue).append(']').append(' ');	//append "[choice] "

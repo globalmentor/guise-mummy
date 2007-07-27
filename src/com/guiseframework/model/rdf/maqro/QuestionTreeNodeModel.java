@@ -52,11 +52,11 @@ public class QuestionTreeNodeModel extends AbstractInteractionTreeNodeModel<Ques
 			final RDFListResource evaluationList=question.getEvaluations();	//get the evaluations
 			if(evaluationList!=null)	//if there are evaluations
 			{
-				for(final RDFResource evaluationResource:evaluationList)	//for each evaluation
+				for(final RDFObject evaluationObject:evaluationList)	//for each evaluation
 				{
-					if(evaluationResource instanceof FollowupEvaluation)	//if this is a followup evaluation
+					if(evaluationObject instanceof FollowupEvaluation)	//if this is a followup evaluation
 					{
-						final FollowupEvaluation followupEvaluation=(FollowupEvaluation)evaluationResource;	//cast the evaluation to a followup evaluation
+						final FollowupEvaluation followupEvaluation=(FollowupEvaluation)evaluationObject;	//cast the evaluation to a followup evaluation
 						final Interaction followup=followupEvaluation.getFollowup();	//get the followup interaction
 						if(followup!=null)	//if this evaluation has a followup
 						{
@@ -90,11 +90,11 @@ public class QuestionTreeNodeModel extends AbstractInteractionTreeNodeModel<Ques
 			final RDFListResource evaluationList=question.getEvaluations();	//get the evaluations
 			if(evaluationList!=null)	//if there are evaluations
 			{
-				for(final RDFResource evaluationResource:evaluationList)	//for each evaluation
+				for(final RDFObject evaluationObject:evaluationList)	//for each evaluation
 				{
-					if(evaluationResource instanceof FollowupEvaluation)	//if this is a followup evaluation
+					if(evaluationObject instanceof FollowupEvaluation)	//if this is a followup evaluation
 					{
-						final FollowupEvaluation followupEvaluation=(FollowupEvaluation)evaluationResource;	//cast the evaluation to a followup evaluation
+						final FollowupEvaluation followupEvaluation=(FollowupEvaluation)evaluationObject;	//cast the evaluation to a followup evaluation
 						final Interaction followup=followupEvaluation.getFollowup();	//get the followup interaction
 						if(followup!=null)	//if this evaluation has a followup
 						{

@@ -137,11 +137,11 @@ public class Theme extends ClassTypedRDFResource
 		final RDFListResource declarations=getDeclarations();	//get the declarations
 		if(declarations!=null)	//if there is a rule list
 		{
-			for(final RDFResource declarationResource:declarations)	//for each resource in the list
+			for(final RDFObject declarationObject:declarations)	//for each resource in the list
 			{
-				if(declarationResource instanceof Rule)	//if this is a rule
+				if(declarationObject instanceof Rule)	//if this is a rule
 				{
-					final Rule rule=(Rule)declarationResource;	//get the rule
+					final Rule rule=(Rule)declarationObject;	//get the rule
 					final Selector selector=rule.getSelect();	//get what this rule selects
 					if(selector!=null)	//if there is a selector for this rule
 					{

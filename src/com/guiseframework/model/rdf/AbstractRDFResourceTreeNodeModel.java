@@ -174,9 +174,22 @@ public abstract class AbstractRDFResourceTreeNodeModel<V extends RDFResource> ex
 			{
 				if(rdfResource instanceof RDFListResource)	//if this is a list resource
 				{
-					for(final RDFResource childRDFResource:(RDFListResource)rdfResource)	//for each child resource
+					for(final RDFObject value:(RDFListResource)rdfResource)	//for each child resource
 					{
-						children.add(createRDFResourceTreeNode(null, childRDFResource));	//create a tree node for the child resource without indicating a property
+						final RDFObjectTreeNodeModel<?> treeNode;	//we'll determine the tree node to use for this object
+						if(value instanceof RDFLiteral)	//if the value is a literal
+						{
+							treeNode=createRDFLiteralTreeNode(null, (RDFLiteral)value);	//create a tree node from the literal without indicating a property
+						}
+						else if(value instanceof RDFResource)	//if the value is a resource
+						{
+							treeNode=createRDFResourceTreeNode(null, (RDFResource)value);	//create a tree node from the resource without indicating a property
+						}
+						else	//if we don't recognize the RDF object type
+						{
+							throw new AssertionError("Unrecognized RDF object type: "+value.getClass());
+						}
+						children.add(treeNode);	//add the tree node to our list
 					}
 				}
 			}

@@ -2,6 +2,7 @@ package com.guiseframework.model.rdf.maqro;
 
 import java.util.List;
 
+import com.garretwilson.rdf.RDFObject;
 import com.garretwilson.rdf.RDFResource;
 import com.garretwilson.rdf.maqro.FollowupEvaluation;
 import com.garretwilson.rdf.maqro.Group;
@@ -56,7 +57,7 @@ public abstract class AbstractGroupTreeNodeModel<V extends Group> extends Abstra
 		final Group group=getValue();	//get the group
 		if(group!=null)	//if we have a group
 		{
-			final List<RDFResource> interactionList=group.getInteractions();	//get the child interactions
+			final List<RDFObject> interactionList=group.getInteractions();	//get the child interactions
 			if(interactionList!=null && !interactionList.isEmpty())	//if there are child interactions
 			{
 				return false;	//this is not a leaf because there is at least one child interaction
@@ -75,12 +76,13 @@ public abstract class AbstractGroupTreeNodeModel<V extends Group> extends Abstra
 		final Group group=getValue();	//get the group
 		if(group!=null)	//if we have a group
 		{
-			final List<RDFResource> interactionList=group.getInteractions();	//get the child interactions
+			final List<RDFObject> interactionList=group.getInteractions();	//get the child interactions
 			if(interactionList!=null)	//if there are child interactions
 			{
-				for(final RDFResource interactionResource:interactionList)	//for each interaction
+				for(final RDFObject interactionResource:interactionList)	//for each interaction
 				{
-					children.add(createRDFResourceTreeNode(null, interactionResource));	//create a child node for this interaction resource
+					//TODO important; fix blind RDFResource cast
+					children.add(createRDFResourceTreeNode(null, (RDFResource)interactionResource));	//create a child node for this interaction resource
 				}
 			}
 		}
