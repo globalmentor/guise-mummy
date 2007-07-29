@@ -225,9 +225,11 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_ACCESS=createStringResourceReference("theme.label.access");
 	public final static String LABEL_ACCESS_X=createStringResourceReference("theme.label.access.x");
 	public final static String LABEL_ADD=createStringResourceReference("theme.label.add");
+	public final static String LABEL_AUDIO=createStringResourceReference("theme.label.audio");
 	public final static String LABEL_BROWSE=createStringResourceReference("theme.label.browse");
 	public final static String LABEL_CANCEL=createStringResourceReference("theme.label.cancel");
 	public final static String LABEL_CLOSE=createStringResourceReference("theme.label.close");
+	public final static String LABEL_DEFAULT=createStringResourceReference("theme.label.default");
 	public final static String LABEL_DELETE=createStringResourceReference("theme.label.delete");
 	public final static String LABEL_DELETE_X=createStringResourceReference("theme.label.delete.x");
 	public final static String LABEL_DOWNLOAD=createStringResourceReference("theme.label.download");
@@ -235,14 +237,17 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_EMAIL=createStringResourceReference("theme.label.email");
 	public final static String LABEL_FINISH=createStringResourceReference("theme.label.finish");
 	public final static String LABEL_FIRST=createStringResourceReference("theme.label.first");
+	public final static String LABEL_FOLDER=createStringResourceReference("theme.label.folder");
 	public final static String LABEL_HELP=createStringResourceReference("theme.label.help");
 	public final static String LABEL_HOME=createStringResourceReference("theme.label.home");
+	public final static String LABEL_IMAGE=createStringResourceReference("theme.label.image");
 	public final static String LABEL_JOIN=createStringResourceReference("theme.label.join");
 	public final static String LABEL_JOIN_X=createStringResourceReference("theme.label.join.x");
 	public final static String LABEL_LAST=createStringResourceReference("theme.label.last");
 	public final static String LABEL_LOGIN=createStringResourceReference("theme.label.login");
 	public final static String LABEL_LOGOUT=createStringResourceReference("theme.label.logout");
 	public final static String LABEL_NEXT=createStringResourceReference("theme.label.next");
+	public final static String LABEL_NEW=createStringResourceReference("theme.label.new");
 	public final static String LABEL_PASSWORD=createStringResourceReference("theme.label.password");
 	public final static String LABEL_PASSWORD_VERIFICATION=createStringResourceReference("theme.label.password.verification");
 	public final static String LABEL_PREVIOUS=createStringResourceReference("theme.label.previous");
@@ -324,6 +329,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI GLYPH_PICTURE=createURIResourceReference("theme.glyph.picture");
 	public final static URI GLYPH_POLYGON_CURVED=createURIResourceReference("theme.glyph.polygon.curved");
 	public final static URI GLYPH_POLYGON_POINTS=createURIResourceReference("theme.glyph.polygon.points");
+	public final static URI GLYPH_PREVIEW=createURIResourceReference("theme.glyph.preview");
 	public final static URI GLYPH_PREVIOUS=createURIResourceReference("theme.glyph.previous");
 	public final static URI GLYPH_QUESTION=createURIResourceReference("theme.glyph.question");
 	public final static URI GLYPH_REDO=createURIResourceReference("theme.glyph.redo");

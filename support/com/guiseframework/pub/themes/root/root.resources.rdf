@@ -129,9 +129,11 @@
 		<resource:theme.label.access>Access</resource:theme.label.access>
 		<resource:theme.label.access.x>&#x0098;theme.label.access&#x009C; {0}</resource:theme.label.access.x>
 		<resource:theme.label.add>Add</resource:theme.label.add>
+		<resource:theme.label.audio>Audio</resource:theme.label.audio>
 		<resource:theme.label.browse>Browse</resource:theme.label.browse>
 		<resource:theme.label.cancel>Cancel</resource:theme.label.cancel>
 		<resource:theme.label.close>Close</resource:theme.label.close>
+		<resource:theme.label.default>Default</resource:theme.label.default>
 		<resource:theme.label.delete>Delete</resource:theme.label.delete>
 		<resource:theme.label.delete.x>&#x0098;theme.label.delete&#x009C; {0}</resource:theme.label.delete.x>
 		<resource:theme.label.download>Download</resource:theme.label.download>
@@ -139,8 +141,10 @@
 		<resource:theme.label.email>Email</resource:theme.label.email>
 		<resource:theme.label.finish>Finish</resource:theme.label.finish>
 		<resource:theme.label.first>First</resource:theme.label.first>
+		<resource:theme.label.folder>Folder</resource:theme.label.folder>
 		<resource:theme.label.help>Help</resource:theme.label.help>
 		<resource:theme.label.home>Home</resource:theme.label.home>
+		<resource:theme.label.image>Image</resource:theme.label.image>
 		<resource:theme.label.join>Join</resource:theme.label.join>
 		<resource:theme.label.join.x>&#x0098;theme.label.join&#x009C; {0}</resource:theme.label.join.x>
 		<resource:theme.label.last>Last</resource:theme.label.last>
@@ -148,6 +152,7 @@
 		<resource:theme.label.logout>Log out</resource:theme.label.logout>
 		<resource:theme.label.name>Name</resource:theme.label.name>
 		<resource:theme.label.next>Next</resource:theme.label.next>
+		<resource:theme.label.new>New</resource:theme.label.new>
 		<resource:theme.label.password>Password</resource:theme.label.password>
 		<resource:theme.label.password.verification>Password Verification</resource:theme.label.password.verification>
 		<resource:theme.label.previous>Previous</resource:theme.label.previous>
@@ -230,6 +235,7 @@
 		<resource:theme.glyph.picture rdf:resource="images/icons/glyphs/picture.gif"/>
 		<resource:theme.glyph.polygon.curved rdf:resource="images/icons/glyphs/polygon_curved.gif"/>
 		<resource:theme.glyph.polygon.points rdf:resource="images/icons/glyphs/polygon_points.gif"/>
+		<resource:theme.glyph.preview rdf:resource="resource:theme.glyph.document.preview"/>
 		<resource:theme.glyph.previous rdf:resource="images/icons/glyphs/hand_point_left.gif"/>
 		<resource:theme.glyph.question rdf:resource="images/icons/glyphs/question.gif"/>
 		<resource:theme.glyph.redo rdf:resource="images/icons/glyphs/redo.gif"/>

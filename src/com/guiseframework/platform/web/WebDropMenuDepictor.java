@@ -113,6 +113,9 @@ public class WebDropMenuDepictor<C extends Menu> extends AbstractWebMenuDepictor
 		final CompositeComponent parent=component.getParent();	//get the component parent
 		if(parent instanceof Menu)	//if this menu isn't a root menu
 		{
+			final Menu parentMenu=(Menu)parent;	//get the menu as a parent
+			final Flow parentFlow=parentMenu.getLayout().getFlow();	//get the parent flow
+			final Axis parentFlowAxis=parentMenu.getComponentOrientation().getAxis(parentFlow);	//get the axis of the parent flow
 			containerStyles.put(CSS_PROP_POSITION, CSS_POSITION_ABSOLUTE);	//position:absolute
 			final Flow flow=component.getLayout().getFlow();	//get the flow
 			final Axis flowAxis=component.getComponentOrientation().getAxis(flow);	//get the axis of the flow
@@ -121,9 +124,19 @@ public class WebDropMenuDepictor<C extends Menu> extends AbstractWebMenuDepictor
 				case X:
 					throw new UnsupportedOperationException("Support not yet added for horizontal menus.");
 				case Y:
-						//TODO check the flow of the parent menu to determine positioning
-					containerStyles.put(CSS_PROP_LEFT, CSSUtilities.toString(new Extent(0, Extent.Unit.RELATIVE)));	//left:0%
-					containerStyles.put(CSS_PROP_TOP, CSSUtilities.toString(new Extent(1, Extent.Unit.RELATIVE)));	//top:100%
+					switch(parentFlowAxis)	//see what axis the parent is flowing on
+					{
+						case X:
+							containerStyles.put(CSS_PROP_LEFT, CSSUtilities.toString(new Extent(0, Extent.Unit.RELATIVE)));	//left:0%
+							containerStyles.put(CSS_PROP_TOP, CSSUtilities.toString(new Extent(1, Extent.Unit.RELATIVE)));	//top:100%
+							break;
+						case Y:
+							containerStyles.put(CSS_PROP_LEFT, CSSUtilities.toString(new Extent(1, Extent.Unit.RELATIVE)));	//left:100%
+							containerStyles.put(CSS_PROP_TOP, CSSUtilities.toString(new Extent(0, Extent.Unit.RELATIVE)));	//top:0%
+							break;
+						default:
+							throw new AssertionError("Unrecognized axis: "+parentFlowAxis);
+					}
 					containerStyles.put(CSS_PROP_WIDTH, CSSUtilities.toString(new Extent(10, Extent.Unit.RELATIVE)));	//width:1000%
 					break;
 				default:
