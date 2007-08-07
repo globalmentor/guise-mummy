@@ -444,21 +444,26 @@ public class DefaultListSelectModel<V> extends AbstractValueModel<V> implements 
 		{
 			oldSelectedValue=getSelectedValue();	//get the old selected value
 			final ValueState oldValueState=valueStateList.remove(index);	//remove the value state at the index
-			oldValue=oldValueState.getValue();	//remove the indicated value state from the list and get the value state's value
+			oldValue=oldValueState.getValue();	//remove the indicated value state from the list and get the value state's value			
 			if(oldValueState.isSelected())	//if the removed value was selected
 			{
+				final int newSelectedIndex;	//we'll determine the new selected index
 				final int newSize=size();	//get the new size
 				if(newSize>0)	//if we have values left
 				{
-					assert index<=newSize : "Somehow we removed an index out of range, which should be possible.";
-					final int newSelectedIndex=index!=newSize ? index : index-1;	//determine the new selected index; if we just removed the last element, back up one index
+					assert index<=newSize : "Somehow we removed an index out of range, which should not be possible.";
+					newSelectedIndex=index!=newSize ? index : index-1;	//determine the new selected index; if we just removed the last element, back up one index
 					final ValueState newSelectedIndexValueState=valueStateList.get(newSelectedIndex);	//get the value state at the new selected index
 					if(!newSelectedIndexValueState.isSelected())	//if the new index is not selected
 					{
 						newSelectedIndexValueState.setSelected(true);	//move the selection to the replacement index
-						fireSelectionChanged(newSelectedIndex, null);	//notify listeners that a selection was added						
 					}					
 				}
+				else	//if we have no values
+				{
+					newSelectedIndex=-1;	//there is no selected index
+				}
+				fireSelectionChanged(newSelectedIndex, null);	//notify listeners that a selection was added
 			}
 			newSelectedValue=getSelectedValue();	//get the new selected value			
 		}

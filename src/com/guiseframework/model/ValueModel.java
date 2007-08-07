@@ -10,7 +10,7 @@ import com.guiseframework.validator.*;
 @param <V> The type of value contained in the model.
 @author Garret Wilson
 */
-public interface ValueModel<V> extends Model
+public interface ValueModel<V> extends Model, Valued<V>
 {
 
 	/**The validator bound property.*/

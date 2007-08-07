@@ -8,7 +8,7 @@ import com.guiseframework.model.ActionModel;
 /**Abstract prototype information for an action control.
 @author Garret Wilson
 */
-public class AbstractActionPrototype extends AbstractEnableablePrototype implements ActionModel
+public abstract class AbstractActionPrototype extends AbstractEnableablePrototype implements ActionModel
 {
 	/**Adds an action listener.
 	@param actionListener The action listener to add.

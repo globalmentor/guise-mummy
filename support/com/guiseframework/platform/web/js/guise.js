@@ -2867,7 +2867,16 @@ function onTextInputKeyDown(event)
 			guise.invalidateAncestorContent(textInput);	//indicate that the ancestors now have different content
 			var ajaxRequest=new ChangeAJAXEvent(textInput.name, new Map("value", textInput.value));	//create a new property change event with the control ID and the new value
 			guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
-			event.preventDefault();	//prevent the default functionality from occurring, but allow it to keep bubbling so that it can be reported back to the server
+/*TODO fix; sometimes we want Enter to commit; other times we want Enter to make a newline
+			if(textInput.nodeName.toLowerCase()=="textarea")	//if this is a text area
+			{
+				event.stopPropagation();	//tell the event to stop bubbling, so that it won't be sent back to the server, but allow the browser to process the key normally, so that multiple lines can be created in a text area
+			}
+			else	//if this is not a text area
+			{
+*/
+				event.preventDefault();	//prevent the default functionality from occurring, but allow it to keep bubbling so that it can be reported back to the server
+//TODO fix			}
 		}
 		else	//TODO submit the form
 		{
