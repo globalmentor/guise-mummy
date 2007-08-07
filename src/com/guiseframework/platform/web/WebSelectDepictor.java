@@ -6,7 +6,6 @@ import java.util.*;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
-import static com.garretwilson.util.ArrayUtilities.*;
 
 import com.garretwilson.util.Debug;
 import com.guiseframework.component.*;
@@ -46,10 +45,10 @@ public class WebSelectDepictor<V, C extends ListSelectControl<V>> extends Abstra
 				throw new IllegalArgumentException("Depict event "+event+" meant for depicted object "+webChangeEvent.getDepictedObject());
 			}
 			final Map<String, Object> properties=webChangeEvent.getProperties();	//get the new properties
-			final Object[] selectedIDObjects=asArrayInstance(properties.get("selectedIDs"), Object.class);	//get the new selected IDs TODO use a constant
+			final List<?> selectedIDObjects=asInstance(properties.get("selectedIDs"), List.class);	//get the new selected IDs TODO use a constant
 			if(selectedIDObjects!=null)	//if we have selected IDs
 			{
-				processSelectedIDs(component, toStringArray(selectedIDObjects));	//process the selected IDs as strings				
+				processSelectedIDs(component, selectedIDObjects.toArray(new String[selectedIDObjects.size()]));	//process the selected IDs as strings				
 			}
 		}
 		else if(event instanceof WebFormEvent)	//if this is a form submission
@@ -114,6 +113,7 @@ public class WebSelectDepictor<V, C extends ListSelectControl<V>> extends Abstra
 		}
 		try
 		{
+Debug.trace("ready to set selected indexes to", Arrays.toString(selectedIndices));
 			selectControl.setSelectedIndexes(selectedIndices);	//store the decoded value in the model
 		}
 		catch(final PropertyVetoException propertyVetoException)	//if there is a veto
