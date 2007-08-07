@@ -839,8 +839,9 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 	NON_EMPTY_ELEMENT_SET:
 	{
 		"div": true,
+		"label": true,
 		"span": true,
-		"label": true
+		"textarea": true
 	}
 	
 };

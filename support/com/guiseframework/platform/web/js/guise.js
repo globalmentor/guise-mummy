@@ -1384,13 +1384,15 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 	//TODO fix or del				if(attributeValue!=null && attributeValue.length>0 && !element.getAttribute(attributeName))	//if there is really an attribute value (IE provides all possible attributes, even with those with no value) and the new element doesn't have this attribute
 					if(element.getAttribute(attributeName)==null && !this.NON_REMOVABLE_ATTRIBUTE_SET[attributeName])	//if the new element doesn't have this attribute, and this isn't an attribute we shouldn't remove
 					{
-						//TODO see if there is a way to keep from removing all the non-null but empty default IE6 attributes
-	//TODO del alert("ready to remove "+oldElement.nodeName+" attribute "+oldAttributeName+" with current value "+oldAttributeValue);
+//TODO del; not needed						if(attributeName!="value" || elementName!="textarea")	//if this is the value attribute of a text area, don't remove the value, because the value is really specified as the text content
+							//TODO see if there is a way to keep from removing all the non-null but empty default IE6 attributes
+		//TODO del alert("ready to remove "+oldElement.nodeName+" attribute "+oldAttributeName+" with current value "+oldAttributeValue);
 						oldElement.removeAttribute(oldAttributeName);	//remove the attribute normally (apparently no action will take place if performed on IE-specific attributes such as element.start)
-	//TODO fix					i=0;	//TODO fix; temporary to get out of looking at all IE's attributes
+		//TODO fix					i=0;	//TODO fix; temporary to get out of looking at all IE's attributes
 					}
+
 				}
-				if(elementName!="button" && oldElement.value && element.getAttribute("value")==null)	//if there is an old value but no value attribute present in the new element (IE 6 and Mozilla do not show "value" in the list of enumerated values) (IE6 thinks that the value of a button is content, so ignore button values) TODO fix button values for non-IE6 browsers, maybe, but current button values are unused anyway because of the IE6 bug
+				if((elementName!="button" && elementName!="textarea") && oldElement.value && element.getAttribute("value")==null)	//if there is an old value but no value attribute present in the new element (IE 6 and Mozilla do not show "value" in the list of enumerated values) (IE6 thinks that the value of a button is content, so ignore button values) (don't clear the value for text areas, which are stored as content) TODO fix button values for non-IE6 browsers, maybe, but current button values are unused anyway because of the IE6 bug
 				{
 //TODO del alert("clearing value; old value was: "+oldElement.value);
 					if(patchType!="novalue")	//if we shouldn't ignore the value attribute
@@ -1510,7 +1512,6 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 				alert("is the same as: "+DOMUtilities.getNodeString(element));
 			}
 */
-
 			if(oldElementContentHash!=newElementContentHash)	//if the content hash values are different
 			{
 				if(!isAttributesChanged)	//if the main attributes didn't change, we'll still need to update the content hash attribute, which isn't accounted for by the attribute hash attribute
@@ -2914,7 +2915,7 @@ function onTextInputChange(event)
 		var textInput=event.currentTarget;	//get the control in which text changed
 		textInput.removeAttribute("guise:attributeHash");	//the text is represented in the DOM by an element attribute, and this has changed, but the attribute hash still indicates the old value, so remove the attribute hash to indicate that the attributes have changed TODO use a constant
 		guise.invalidateAncestorContent(textInput);	//indicate that the ancestors now have different content
-	//TODO del alert("an input changed! "+textInput.id);
+//TODO del alert("an input changed! "+textInput.id+" value "+textInput.value);
 		var ajaxRequest=new ChangeAJAXEvent(textInput.name, new Map("value", textInput.value));	//create a new property change event with the control ID and the new value
 		guise.sendAJAXRequest(ajaxRequest);	//send the AJAX request
 		event.stopPropagation();	//tell the event to stop bubbling
