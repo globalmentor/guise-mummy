@@ -44,6 +44,12 @@
 		<resource:theme.notification.option.cancel.label>Cancel</resource:theme.notification.option.cancel.label>
 		<resource:theme.notification.option.cancel.glyph rdf:resource="resource:theme.glyph.cancel"/>
 
+		<!-- FlowOrientation resources --> <!-- TODO: make these contextual to the orientation -->
+		<resource:flow.orientation.left.to.right.glyph rdf:resource="resource:theme.glyph.arrow.right"/>
+		<resource:flow.orientation.right.to.left.glyph rdf:resource="resource:theme.glyph.arrow.left"/>
+		<resource:flow.orientation.top.to.bottom.glyph rdf:resource="resource:theme.glyph.arrow.down"/>
+		<resource:flow.orientation.bottom.to.top.glyph rdf:resource="resource:theme.glyph.arrow.up"/>
+
 		<!-- TaskState resources -->
 		<resource:task.state..label>None</resource:task.state..label>
 		<resource:task.state..glyph rdf:resource="resource:theme.glyph.blank"/>
@@ -151,6 +157,7 @@
 		<resource:theme.label.last>Last</resource:theme.label.last>
 		<resource:theme.label.login>Log in</resource:theme.label.login>
 		<resource:theme.label.logout>Log out</resource:theme.label.logout>
+		<resource:theme.label.lower>Lower</resource:theme.label.lower>
 		<resource:theme.label.name>Name</resource:theme.label.name>
 		<resource:theme.label.next>Next</resource:theme.label.next>
 		<resource:theme.label.new>New</resource:theme.label.new>
@@ -158,6 +165,7 @@
 		<resource:theme.label.password.verification>Password Verification</resource:theme.label.password.verification>
 		<resource:theme.label.previous>Previous</resource:theme.label.previous>
 		<resource:theme.label.reject>Reject</resource:theme.label.reject>
+		<resource:theme.label.raise>Raise</resource:theme.label.raise>
 		<resource:theme.label.remove>Remove</resource:theme.label.remove>
 		<resource:theme.label.rename>Rename</resource:theme.label.rename>
 		<resource:theme.label.rename.x>&#x0098;theme.label.rename&#x009C; {0}</resource:theme.label.rename.x>
@@ -181,6 +189,10 @@
 		<resource:theme.glyph.access rdf:resource="resource:theme.glyph.key"/>
 		<resource:theme.glyph.add rdf:resource="images/icons/glyphs/add.gif"/>
 		<resource:theme.glyph.animation rdf:resource="images/icons/glyphs/animation.gif"/>
+		<resource:theme.glyph.arrow.down rdf:resource="images/icons/glyphs/arrow_down.gif"/>
+		<resource:theme.glyph.arrow.left rdf:resource="images/icons/glyphs/arrow_left.gif"/>
+		<resource:theme.glyph.arrow.right rdf:resource="images/icons/glyphs/arrow_right.gif"/>
+		<resource:theme.glyph.arrow.up rdf:resource="images/icons/glyphs/arrow_up.gif"/>
 		<resource:theme.glyph.audio rdf:resource="images/icons/glyphs/audio.gif"/>
 		<resource:theme.glyph.blank rdf:resource="images/icons/glyphs/blank.gif"/>
 		<resource:theme.glyph.browse rdf:resource="resource:theme.glyph.folder.tree"/>

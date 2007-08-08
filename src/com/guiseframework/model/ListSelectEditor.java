@@ -22,6 +22,12 @@ public interface ListSelectEditor<V>
 	/**@return The prototype for removing a value from the list.*/
 	public ActionPrototype getRemoveActionPrototype();
 
+	/**@return The prototype for lowering a value from the list to a lesser index.*/
+	public ActionPrototype getLowerActionPrototype();
+
+	/**@return The prototype for raising a value from the list to a higher index.*/
+	public ActionPrototype getRaiseActionPrototype();
+
 	/**Creates and allows the user to edit a new value.
 	If the user accepts the changes, the value is inserted before the currently selected value in the list,
 	or at the end of the list if no value is selected.

@@ -155,11 +155,17 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 			writeStyleAttribute(getOuterStyles());	//write the component's outer styles
 			if(component.isTooltipEnabled())	//if tooltips are enabled for this component
 			{
-				final String info=component.getInfo();	//get advisory information about the component
-				final String resolvedInfo=info!=null ? component.getSession().resolveString(info) : null;	//resolve the info, if there is info
-				if(resolvedInfo!=null)	//if advisory information is given
+				String info=component.getInfo();	//get advisory information about the component
+				ContentType infoContentType=component.getInfoContentType();	//get the info content type
+				if(info==null && component instanceof LabelDisplayableComponent && !((LabelDisplayableComponent)component).isLabelDisplayed())	//if there is no info but this component's label is hidden
 				{
-					depictContext.writeAttribute(null, ATTRIBUTE_TITLE, AbstractModel.getPlainText(resolvedInfo, component.getInfoContentType()));	//write the advisory information in the HTML title attribute					
+					info=component.getLabel();	//use the label, if any
+					infoContentType=component.getLabelContentType();	//use the label content type
+				}
+				if(info!=null)	//if we have advisory information
+				{
+					final String resolvedInfo=component.getSession().resolveString(info);	//resolve the info
+					depictContext.writeAttribute(null, ATTRIBUTE_TITLE, AbstractModel.getPlainText(resolvedInfo, infoContentType));	//write the advisory information in the HTML title attribute					
 				}
 			}
 		}

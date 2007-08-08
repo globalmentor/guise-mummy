@@ -6,6 +6,7 @@ import com.garretwilson.beans.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
 import com.guiseframework.component.*;
+import com.guiseframework.component.layout.FlowOrientation;
 import com.guiseframework.event.*;
 import com.guiseframework.prototype.ActionPrototype;
 import static com.guiseframework.theme.Theme.*;
@@ -43,6 +44,18 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 		/**@return The prototype for removing a value from the list.*/
 		public ActionPrototype getRemoveActionPrototype() {return removeActionPrototype;}
 
+	/**The prototype for lowering a value in the list to a lesser index.*/
+	private final ActionPrototype lowerActionPrototype;
+		
+		/**@return The prototype for lowering a value from the list to a lesser index.*/
+		public ActionPrototype getLowerActionPrototype() {return lowerActionPrototype;}
+
+	/**The prototype for raising a value in the list to a higher index.*/
+	private final ActionPrototype raiseActionPrototype;
+		
+		/**@return The prototype for raising a value from the list to a higher index.*/
+		public ActionPrototype getRaiseActionPrototype() {return raiseActionPrototype;}
+
 	/**List select model constructor.
 	@param listSelectModel The list select model this prototype manipulates.
 	@exception NullPointerException if the given list select model is <code>null</code>.
@@ -50,6 +63,13 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 	public AbstractListSelectEditor(final ListSelectModel<V> listSelectModel)
 	{
 		this.listSelectModel=checkInstance(listSelectModel, "List select model cannot be null.");
+		listSelectModel.addListListener(new ListListener<V>()	//listen to the list being modified
+				{
+					public void listModified(final ListEvent<V> listEvent)	//if the list is modified
+					{
+						updateProperties();	//keep the properties up-to-date
+					}			
+				});
 		listSelectModel.addListSelectionListener(new ListSelectionListener<V>()	//listen for the list selection changing
 				{
 					public void listSelectionChanged(final ListSelectionEvent<V> selectionEvent)	//if the list selection changes
@@ -63,12 +83,7 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the action was performed
 					{
-						final ListSelectModel<V> listSelectModel=getListSelectModel();	//get the list select model
-						//TODO lock the list
-						final int selectedIndex=listSelectModel.getSelectedIndex();	//get the selected index
-						final int insertIndex=selectedIndex>=0 ? selectedIndex : listSelectModel.size();	//if no index is select, insert at the end of the list
-						final V value=createValue();	//create a new value
-						editValue(value, insertIndex, false);	//edit and insert the new value
+						insertValue();	//insert a value
 					}
 				});
 			//edit
@@ -77,14 +92,7 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the action was performed
 					{
-						final ListSelectModel<V> listSelectModel=getListSelectModel();	//get the list select model
-						//TODO lock the list
-						final int selectedIndex=listSelectModel.getSelectedIndex();	//get the selected index
-						if(selectedIndex>=0)	//if there is a selected index
-						{
-							final V value=listSelectModel.get(selectedIndex);	//get the selected value
-							editValue(value, selectedIndex, true);	//edit and replace the current selected value
-						}
+						editValue();	//edit the selected value
 					}
 				});
 			//remove
@@ -93,13 +101,25 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the action was performed
 					{
-						final ListSelectModel<V> listSelectModel=getListSelectModel();	//get the list select model
-						//TODO lock the list
-						final int selectedIndex=listSelectModel.getSelectedIndex();	//get the selected index
-						if(selectedIndex>=0)	//if there is a selected index
-						{
-							listSelectModel.remove(selectedIndex);	//remove the selected index
-						}
+						removeValue();	//remove the selected value
+					}
+				});
+			//lower
+		lowerActionPrototype=new ActionPrototype(LABEL_LOWER, FlowOrientation.BOTTOM_TO_TOP.getGlyph());
+		lowerActionPrototype.addActionListener(new ActionListener()	//listen for the lower action being performed
+				{
+					public void actionPerformed(final ActionEvent actionEvent)	//if the action was performed
+					{
+						lowerValue();	//lower the selected value
+					}
+				});
+			//raise
+		raiseActionPrototype=new ActionPrototype(LABEL_RAISE, FlowOrientation.TOP_TO_BOTTOM.getGlyph());
+		raiseActionPrototype.addActionListener(new ActionListener()	//listen for the raise action being performed
+				{
+					public void actionPerformed(final ActionEvent actionEvent)	//if the action was performed
+					{
+						raiseValue();	//raise the selected value
 					}
 				});
 		updateProperties();	//initialize the properties
@@ -108,8 +128,12 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 	/**Updates the action properties based upon the current state of the list select model.*/
 	protected void updateProperties()
 	{
-		editActionPrototype.setEnabled(getListSelectModel().getSelectedIndex()>=0);	//only enable the edit prototype if there is a list item selected
-		removeActionPrototype.setEnabled(getListSelectModel().getSelectedIndex()>=0);	//only enable the remove prototype if there is a list item selected
+		final ListSelectModel<V> listSelectModel=getListSelectModel();	//get the list select model
+		final int selectedIndex=listSelectModel.getSelectedIndex();	//get the selected index
+		editActionPrototype.setEnabled(selectedIndex>=0);	//only enable the edit prototype if there is a list item selected
+		removeActionPrototype.setEnabled(selectedIndex>=0);	//only enable the remove prototype if there is a list item selected
+		lowerActionPrototype.setEnabled(selectedIndex>0);	//only enable the lower prototype if there is a list item selected that is not at the first index
+		raiseActionPrototype.setEnabled(selectedIndex>=0 && selectedIndex<listSelectModel.size()-1);	//only enable the raise prototype if there is a list item selected that is not at the last index
 	}
 
 	/**Commences editing a value.
@@ -202,6 +226,54 @@ public abstract class AbstractListSelectEditor<V> implements ListSelectEditor<V>
 		if(selectedIndex>=0)	//if there is a selected index
 		{
 			listSelectModel.remove(selectedIndex);	//remove the selected index
+		}		
+	}
+
+	/**Lowers the currently selected value in the list.
+	If no value is selected in the list, or the first item is selected, no action occurs.
+	*/
+	public void lowerValue()
+	{
+		final ListSelectModel<V> listSelectModel=getListSelectModel();	//get the list select model
+		//TODO lock the list
+		final int selectedIndex=listSelectModel.getSelectedIndex();	//get the selected index
+		if(selectedIndex>0)	//if there is a selected index that is greater than zero
+		{
+			final int newIndex=selectedIndex-1;	//calculate the new index
+			final V value=listSelectModel.remove(selectedIndex);	//remove the selected index
+			listSelectModel.add(newIndex, value);	//add the value back at a lower index
+			try
+			{
+				listSelectModel.setSelectedIndexes(newIndex);	//make sure the modifed index is selected
+			}
+			catch(final PropertyVetoException propertyVetoException)	//if we can't select the modified item, there's a problem somewhere; in itself this does not hurt the edit functionality, but it's a problem that shouldn't be occurring 
+			{
+				throw new AssertionError(propertyVetoException);
+			}
+		}		
+	}
+
+	/**Raises the currently selected value in the list.
+	If no value is selected in the list, or the last item is selected, no action occurs.
+	*/
+	public void raiseValue()
+	{
+		final ListSelectModel<V> listSelectModel=getListSelectModel();	//get the list select model
+		//TODO lock the list
+		final int selectedIndex=listSelectModel.getSelectedIndex();	//get the selected index
+		if(selectedIndex>=0 && selectedIndex<listSelectModel.size()-1)	//if there is a selected index that is less than the last index
+		{
+			final int newIndex=selectedIndex+1;	//calculate the new index
+			final V value=listSelectModel.remove(selectedIndex);	//remove the selected index
+			listSelectModel.add(newIndex, value);	//add the value back at a lower index
+			try
+			{
+				listSelectModel.setSelectedIndexes(newIndex);	//make sure the modifed index is selected
+			}
+			catch(final PropertyVetoException propertyVetoException)	//if we can't select the modified item, there's a problem somewhere; in itself this does not hurt the edit functionality, but it's a problem that shouldn't be occurring 
+			{
+				throw new AssertionError(propertyVetoException);
+			}
 		}		
 	}
 

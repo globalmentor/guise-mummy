@@ -2,8 +2,12 @@ package com.guiseframework.component.layout;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import com.guiseframework.geometry.Axis;
-import com.guiseframework.geometry.CompassPoint;
+import java.net.URI;
+
+import com.garretwilson.util.StringTemplate;
+import com.guiseframework.geometry.*;
+
+import static com.guiseframework.Resources.*;
 
 /**The orientation of a particular flow; its axis and direction.
 @author Garret Wilson
@@ -23,6 +27,15 @@ public enum FlowOrientation
 //TODO fix when compass point issue is resolved	FRONT_TO_BACK(Axis.Z, Flow.Direction.INCREASING),
 	/**{@link Flow.Direction#DECREASING} flow on the {@link Axis#Z} axis.*/
 //TODO fix when compass point issue is resolved	BACK_TO_FRONT(Axis.Z, Flow.Direction.DECREASING);
+
+	/**The resource key template for each glyph.*/
+	private final static StringTemplate GLYPH_RESOURCE_KEY_TEMPLATE=new StringTemplate("flow.orientation.", StringTemplate.STRING_PARAMETER, ".glyph");
+
+	/**@return The resource reference for the glyph, using the session's default orientation.*/
+	public URI getGlyph()
+	{
+		return createURIResourceReference(GLYPH_RESOURCE_KEY_TEMPLATE.apply(getResourceKeyName(this)));	//create a resource reference using the resource key name of this enum value TODO add something to the glyph resource key to allow better lookup of the physical layout
+	}
 
 	/**The axis of the flow.*/
 	private Axis axis;

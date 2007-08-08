@@ -247,11 +247,13 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_LAST=createStringResourceReference("theme.label.last");
 	public final static String LABEL_LOGIN=createStringResourceReference("theme.label.login");
 	public final static String LABEL_LOGOUT=createStringResourceReference("theme.label.logout");
+	public final static String LABEL_LOWER=createStringResourceReference("theme.label.lower");
 	public final static String LABEL_NEXT=createStringResourceReference("theme.label.next");
 	public final static String LABEL_NEW=createStringResourceReference("theme.label.new");
 	public final static String LABEL_PASSWORD=createStringResourceReference("theme.label.password");
 	public final static String LABEL_PASSWORD_VERIFICATION=createStringResourceReference("theme.label.password.verification");
 	public final static String LABEL_PREVIOUS=createStringResourceReference("theme.label.previous");
+	public final static String LABEL_RAISE=createStringResourceReference("theme.label.raise");
 	public final static String LABEL_REJECT=createStringResourceReference("theme.label.reject");
 	public final static String LABEL_REMOVE=createStringResourceReference("theme.label.remove");
 	public final static String LABEL_RENAME=createStringResourceReference("theme.label.rename");
@@ -273,8 +275,12 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI GLYPH_ACCEPT=createURIResourceReference("theme.glyph.accept");
 	public final static URI GLYPH_ACCEPT_MULTIPLE=createURIResourceReference("theme.glyph.accept.multiple");
 	public final static URI GLYPH_ACCESS=createURIResourceReference("theme.glyph.access");
-	public final static URI GLYPH_ANIMATION=createURIResourceReference("theme.glyph.animation");
 	public final static URI GLYPH_ADD=createURIResourceReference("theme.glyph.add");
+	public final static URI GLYPH_ANIMATION=createURIResourceReference("theme.glyph.animation");
+	public final static URI GLYPH_ARROW_DOWN=createURIResourceReference("theme.glyph.arrow.down");
+	public final static URI GLYPH_ARROW_LEFT=createURIResourceReference("theme.glyph.arrow.left");
+	public final static URI GLYPH_ARROW_RIGHT=createURIResourceReference("theme.glyph.arrow.right");
+	public final static URI GLYPH_ARROW_UP=createURIResourceReference("theme.glyph.arrow.up");
 	public final static URI GLYPH_AUDIO=createURIResourceReference("theme.glyph.audio");
 	public final static URI GLYPH_BLANK=createURIResourceReference("theme.glyph.blank");
 	public final static URI GLYPH_BROWSE=createURIResourceReference("theme.glyph.browse");
