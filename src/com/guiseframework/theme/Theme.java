@@ -241,6 +241,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_HELP=createStringResourceReference("theme.label.help");
 	public final static String LABEL_HOME=createStringResourceReference("theme.label.home");
 	public final static String LABEL_IMAGE=createStringResourceReference("theme.label.image");
+	public final static String LABEL_INSERT=createStringResourceReference("theme.label.insert");
 	public final static String LABEL_JOIN=createStringResourceReference("theme.label.join");
 	public final static String LABEL_JOIN_X=createStringResourceReference("theme.label.join.x");
 	public final static String LABEL_LAST=createStringResourceReference("theme.label.last");
@@ -252,6 +253,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_PASSWORD_VERIFICATION=createStringResourceReference("theme.label.password.verification");
 	public final static String LABEL_PREVIOUS=createStringResourceReference("theme.label.previous");
 	public final static String LABEL_REJECT=createStringResourceReference("theme.label.reject");
+	public final static String LABEL_REMOVE=createStringResourceReference("theme.label.remove");
 	public final static String LABEL_RENAME=createStringResourceReference("theme.label.rename");
 	public final static String LABEL_RENAME_X=createStringResourceReference("theme.label.rename.x");
 	public final static String LABEL_RESOURCE=createStringResourceReference("theme.label.resource");

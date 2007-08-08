@@ -73,7 +73,6 @@ public abstract class AbstractEditableComponentTextControl<EC extends Component>
 		*/
 		public void setMode(final Mode newMode)
 		{
-Debug.trace("mode changing to", newMode);
 			if(mode!=newMode)	//if the value is really changing
 			{
 				final Mode oldMode=mode;	//get the old value
@@ -83,9 +82,7 @@ Debug.trace("mode changing to", newMode);
 				{
 					try
 					{
-Debug.trace("setting edit control value to", getText(getEditedComponent()));
 						editControl.setValue(getText(getEditedComponent()));	//initialize the edit control with the value of the edited component's text
-Debug.trace("now edit control has value", editControl.getValue());
 					}
 					catch(final PropertyVetoException propertyVetoException)	//if we can't store the value in the edit control 
 					{

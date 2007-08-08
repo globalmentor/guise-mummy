@@ -145,6 +145,7 @@
 		<resource:theme.label.help>Help</resource:theme.label.help>
 		<resource:theme.label.home>Home</resource:theme.label.home>
 		<resource:theme.label.image>Image</resource:theme.label.image>
+		<resource:theme.label.insert>Insert</resource:theme.label.insert>
 		<resource:theme.label.join>Join</resource:theme.label.join>
 		<resource:theme.label.join.x>&#x0098;theme.label.join&#x009C; {0}</resource:theme.label.join.x>
 		<resource:theme.label.last>Last</resource:theme.label.last>
@@ -157,6 +158,7 @@
 		<resource:theme.label.password.verification>Password Verification</resource:theme.label.password.verification>
 		<resource:theme.label.previous>Previous</resource:theme.label.previous>
 		<resource:theme.label.reject>Reject</resource:theme.label.reject>
+		<resource:theme.label.remove>Remove</resource:theme.label.remove>
 		<resource:theme.label.rename>Rename</resource:theme.label.rename>
 		<resource:theme.label.rename.x>&#x0098;theme.label.rename&#x009C; {0}</resource:theme.label.rename.x>
 		<resource:theme.label.resource>Resource</resource:theme.label.resource>

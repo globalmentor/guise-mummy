@@ -644,6 +644,7 @@ if(validIndexCount==0)	//TODO add more thorough validation throughout; right now
 			}
 			newSelectedValue=getSelectedValue();	//get the new selected value			
 		}
+Debug.trace("ready to fire value changed from", oldSelectedValue, newSelectedValue);
 		firePropertyChange(VALUE_PROPERTY, oldSelectedValue, newSelectedValue);	//indicate that the value changed if needed		
 	}
 
