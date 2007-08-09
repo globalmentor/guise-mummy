@@ -250,6 +250,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_LOWER=createStringResourceReference("theme.label.lower");
 	public final static String LABEL_NEXT=createStringResourceReference("theme.label.next");
 	public final static String LABEL_NEW=createStringResourceReference("theme.label.new");
+	public final static String LABEL_NEW_X=createStringResourceReference("theme.label.new.x");
 	public final static String LABEL_PASSWORD=createStringResourceReference("theme.label.password");
 	public final static String LABEL_PASSWORD_VERIFICATION=createStringResourceReference("theme.label.password.verification");
 	public final static String LABEL_PREVIOUS=createStringResourceReference("theme.label.previous");

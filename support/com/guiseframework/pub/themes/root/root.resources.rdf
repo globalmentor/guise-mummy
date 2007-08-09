@@ -161,6 +161,7 @@
 		<resource:theme.label.name>Name</resource:theme.label.name>
 		<resource:theme.label.next>Next</resource:theme.label.next>
 		<resource:theme.label.new>New</resource:theme.label.new>
+		<resource:theme.label.new.x>&#x0098;theme.label.new&#x009C; {0}</resource:theme.label.new.x>
 		<resource:theme.label.password>Password</resource:theme.label.password>
 		<resource:theme.label.password.verification>Password Verification</resource:theme.label.password.verification>
 		<resource:theme.label.previous>Previous</resource:theme.label.previous>

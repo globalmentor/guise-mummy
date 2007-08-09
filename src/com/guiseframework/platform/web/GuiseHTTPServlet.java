@@ -598,7 +598,14 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 			final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
 			if(!destination.exists(guiseSession, navigationPath, bookmark, referrerURI))	//if this destination doesn't exist	
 			{
-				throw new HTTPNotFoundException("Path does not exist at Guise destination: "+navigationPath);
+				if(!isCollectionPath(navigationPath) && destination.exists(guiseSession, navigationPath+PATH_SEPARATOR, bookmark, referrerURI))	//if a non-collection path was requested for a path that, if a path separator were added, would be an existing collection
+				{
+					redirect(requestURI, bookmark, navigationPath+PATH_SEPARATOR, guiseApplication, true);	//be nice by redirecting the user agent to the collection path
+				}
+				else	//we have no idea which valid path, if any, they intended
+				{
+					throw new HTTPNotFoundException("Path does not exist at Guise destination: "+navigationPath);
+				}
 			}
 		}
 		if(destination instanceof ComponentDestination)	//if we have a component destination associated with the requested path
@@ -734,7 +741,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 		}
 		else if(destination instanceof RedirectDestination)	//if we have a component destination associated with the requested path
 		{
-			redirect(requestURI, guiseApplication, (RedirectDestination)destination);	//perform the redirect; this should never return
+			redirect(requestURI, getBookmark(request), guiseApplication, (RedirectDestination)destination);	//perform the redirect; this should never return
 			throw new AssertionError("Redirect not expected to allow processing to continue.");
 		}
 		else	//if we don't recognize the destination type
@@ -1263,12 +1270,13 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 	This method will unconditionally throw an exception.
 	Under normal circumstances, an {@link HTTPRedirectException} will be thrown.
 	@param requestURI The requested URI.
+	@param bookmark The requested bookmark, or <code>null</code> if no bookmark is requested
 	@param guiseApplication The Guise application.
 	@param redirectDestination The destination indicating how and to where redirection should occur.
 	@throws IllegalArgumentException if the referenced destination does not specify a path (instead specifying a path pattern, for example).
 	@throws HTTPRedirectException unconditionally to indicate how and to where redirection should occur.
 	*/
-	protected void redirect(final URI requestURI, final GuiseApplication guiseApplication, final RedirectDestination redirectDestination) throws HTTPRedirectException
+	protected void redirect(final URI requestURI, final Bookmark bookmark, final GuiseApplication guiseApplication, final RedirectDestination redirectDestination) throws HTTPRedirectException
 	{
 		final String redirectPath;	//the path to which direction should occur
 		if(redirectDestination instanceof ReferenceDestination)	//if the destination references another destination
@@ -1283,35 +1291,45 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 		{
 			throw new AssertionError("Unsupported redirect destination type "+redirectDestination.getClass().getName());
 		}
-		final URI redirectURI=requestURI.resolve(guiseApplication.resolvePath(redirectPath));	//resolve the path to the application and resolve that against the request URI
 		if(redirectDestination instanceof TemporaryRedirectDestination)	//if this is a temporary redirect
 		{
-			throw new HTTPMovedTemporarilyException(redirectURI);	//redirect temporarily
+			redirect(requestURI, bookmark, redirectPath, guiseApplication, false);	//redirect temporarily
 		}
 		else if(redirectDestination instanceof PermanentRedirectDestination)	//if this is a permanent redirect
 		{
-			throw new HTTPMovedPermanentlyException(redirectURI);	//redirect permanently
+			redirect(requestURI, bookmark, redirectPath, guiseApplication, true);	//redirect permanently
 		}
 		else	//if we don't recognize the type of redirect
 		{
 			throw new AssertionError("Unsupported redirect destination type "+redirectDestination.getClass().getName());			
 		}
-/*TODO del when works		
-		
-		if(redirectDestination instanceof TemporaryRedirectDestination)	//if this is a temporary redirect
+	}
+
+	/**Redirects to the given navigation path, preserving the given bookmark.
+	This method will unconditionally throw an exception.
+	Under normal circumstances, an {@link HTTPRedirectException} will be thrown.
+	@param requestURI The requested URI.
+	@param redirectPath The application-relative path to which redirection should occur.
+	@param bookmark The requested bookmark, or <code>null</code> if no bookmark is requested
+	@param guiseApplication The Guise application.
+	@param permanent <code>true</code> if the redirect should be permanent.
+	@throws HTTPRedirectException unconditionally to indicate how and to where redirection should occur.
+	*/
+	protected void redirect(final URI requestURI, final Bookmark bookmark, final String redirectPath, final GuiseApplication guiseApplication, final boolean permanent) throws HTTPRedirectException
+	{
+		URI redirectURI=requestURI.resolve(guiseApplication.resolvePath(redirectPath));	//resolve the path to the application and resolve that against the request URI
+		if(bookmark!=null)	//if a bookmark was given
 		{
-			if(redirectDestination instanceof ReferenceDestination)	//if the destination references another destination
-			{
-				redirectPath=((ReferenceDestination)redirectDestination).getDestination().getPath();	//get the path of the referenced destination			
-			}
-			else	//we don't yet support non-reference redirects
-			{
-				throw new AssertionError("Unsupported redirect destination type "+redirectDestination.getClass().getName());
-			}
-			throw new HTTPMovedTemporarilyException(requestURI.resolve(guiseApplication.resolvePath(redirectPath)));	//resolve the path to the application and resolve that against the request URI; then redirect
+			redirectURI=appendRawQuery(redirectURI, bookmark.toString().substring(1));	//append the bookmark to the redirect URI TODO use a better way of extracting the bookmark query information
 		}
-*/
-//TODO del		Debug.trace("Just got redirect to ", destination);
+		if(permanent)	//if this is a permanent redirect
+		{
+			throw new HTTPMovedPermanentlyException(redirectURI);	//redirect permanently
+		}
+		else	//if this is a temporary redirect
+		{
+			throw new HTTPMovedTemporarilyException(redirectURI);	//redirect temporarily
+		}
 	}
 	
 	/**Synchronizes the cookies in a request with the environment properties in a Guise session.
