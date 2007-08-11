@@ -54,6 +54,14 @@ public class Heading extends AbstractLabel
 		this(new DefaultLabelModel(), level);	//construct the class with a default model
 	}
 
+	/**Label constructor.
+	@param label The text of the label, or <code>null</code> if there should be no label.
+	*/
+	public Heading(final String label)
+	{
+		this(new DefaultLabelModel(label));	//construct the heading with a default label model and the given label text
+	}
+
 	/**Label model constructor.
 	@param labelModel The component label model.
 	@exception NullPointerException if the given label model is <code>null</code>.
@@ -61,6 +69,15 @@ public class Heading extends AbstractLabel
 	public Heading(final LabelModel labelModel)
 	{
 		this(labelModel, NO_HEADING_LEVEL);	//construct the class with no heading level
+	}
+
+	/**Label and level constructor.
+	@param label The text of the label, or <code>null</code> if there should be no label.
+	@param level The zero-based level of the heading, or {@link #NO_HEADING_LEVEL} if no level is specified.
+	*/
+	public Heading(final String label, final int level)
+	{
+		this(new DefaultLabelModel(label), level);	//construct the heading with a default label model and the given label text
 	}
 
 	/**Label model and level constructor.
