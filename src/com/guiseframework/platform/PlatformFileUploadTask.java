@@ -4,8 +4,8 @@ import java.util.*;
 import static java.util.Collections.*;
 
 import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.net.URIUtilities.*;
 
+import com.garretwilson.net.URIPath;
 import com.guiseframework.Bookmark;
 import com.guiseframework.event.*;
 import com.guiseframework.model.TaskState;
@@ -35,10 +35,10 @@ public class PlatformFileUploadTask extends GuiseBoundPropertyObject
 		public List<PlatformFile> getPlatformFiles() {return platformFiles;}
 
 	/**The destination path of the upload relative to the application context path, or <code>null</code> if the destination path has not yet been set.*/
-	private final String destinationPath;
+	private final URIPath destinationPath;
 
 		/**@return The destination path of the upload relative to the application context path, or <code>null</code> if the destination path has not yet been set.*/
-		public String getDestinationPath() {return destinationPath;}
+		public URIPath getDestinationPath() {return destinationPath;}
 
 	/**The bookmark to be used in sending resources to the destination path, or <code>null</code> if there is no bookmark specified.*/
 	private final Bookmark destinationBookmark;
@@ -166,7 +166,7 @@ public class PlatformFileUploadTask extends GuiseBoundPropertyObject
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public PlatformFileUploadTask(final Iterable<PlatformFile> platformFiles, final String destinationPath, final Bookmark destinationBookmark)
+	public PlatformFileUploadTask(final Iterable<PlatformFile> platformFiles, final URIPath destinationPath, final Bookmark destinationBookmark)
 	{
 		final List<PlatformFile> tempPlatformFiles=new ArrayList<PlatformFile>();	//create a list of platform files
 		long tempCompletion=0;	//we'll calculate the total number of bytes to transfer
@@ -181,7 +181,7 @@ public class PlatformFileUploadTask extends GuiseBoundPropertyObject
 		}
 		this.completion=tempCompletion;	//save the completion amount
 		this.platformFiles=unmodifiableList(tempPlatformFiles);	//save an unmodifiable copy of the list
-		this.destinationPath=checkRelativePath(destinationPath);	//save the destination path
+		this.destinationPath=destinationPath.checkRelative();	//save the destination path
 		this.destinationBookmark=destinationBookmark;	//save the destination bookmark
 	}
 

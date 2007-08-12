@@ -1,13 +1,12 @@
 package com.guiseframework;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.security.Principal;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.garretwilson.net.URIPath;
 import com.garretwilson.net.http.HTTPNotFoundException;
 import com.garretwilson.net.http.HTTPResource;
 
@@ -33,16 +32,16 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 		public URI getBaseURI() {return baseURI;}
 
 	/**The base path of the container.*/
-	private String basePath=null;
+	private URIPath basePath=null;
 
 		/**Reports the base path of the container.
 		The base path is an absolute path that ends with a slash ('/'), indicating the base path of the application base paths.
 		@return The base path representing the Guise container.
 		*/
-		public String getBasePath() {return basePath;}
+		public URIPath getBasePath() {return basePath;}
 
 	/**The thread-safe map of Guise applications keyed to application base paths.*/
-	private final Map<String, AbstractGuiseApplication> applicationMap=new ConcurrentHashMap<String, AbstractGuiseApplication>();
+	private final Map<URIPath, AbstractGuiseApplication> applicationMap=new ConcurrentHashMap<URIPath, AbstractGuiseApplication>();
 
 	/**The thread-safe reverse map of thread groups for Guise sessions.*/
 //TODO del	private final ReverseMap<GuiseSession, ThreadGroup> sessionThreadGroupReverseMap=new DecoratorReverseMap<GuiseSession, ThreadGroup>(new ConcurrentHashMap<GuiseSession, ThreadGroup>(), new ConcurrentHashMap<ThreadGroup, GuiseSession>());
@@ -124,7 +123,7 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	@exception IllegalStateException if there is already an application installed in this container at the given base path.
 	@exception IOException if there is an I/O error when installing the application.
 	*/
-	protected void installApplication(final AbstractGuiseApplication application, final String basePath, final File homeDirectory, final File logDirectory, final File tempDirectory) throws IOException
+	protected void installApplication(final AbstractGuiseApplication application, final URIPath basePath, final File homeDirectory, final File logDirectory, final File tempDirectory) throws IOException
 	{
 		checkInstance(application, "Application cannot be null");
 		checkInstance(basePath, "Application base path cannot be null");
@@ -150,7 +149,7 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	protected void uninstallApplication(final AbstractGuiseApplication application)	//TODO add a facility to unregister and remove all sessions associated with the application
 	{
 		checkInstance(application, "Application cannot be null");
-		final String basePath=application.getBasePath();	//get the application's base path
+		final URIPath basePath=application.getBasePath();	//get the application's base path
 		if(basePath==null || application.getContainer()!=this)	//if the application has no bsae path or has a different container than this class
 		{
 			throw new IllegalStateException("Application installed in a different container.");
@@ -179,9 +178,9 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 			throw new IllegalArgumentException("Container base URI "+baseURI+" is not absolute and does not end with a path separator.");
 		}
 		this.baseURI=baseURI;	//store the base URI		
-		basePath=baseURI.getPath();	//store the base path
+		basePath=new URIPath(baseURI.getRawPath());	//store the base path
 		checkInstance(basePath, "Application base path cannot be null");
-		if(!isAbsolutePath(basePath) || !isCollectionPath(basePath))	//if the path doesn't begin and end with a slash
+		if(!basePath.isAbsolute() || !basePath.isCollection())	//if the path doesn't begin and end with a slash
 		{
 			throw new IllegalArgumentException("Container base path "+basePath+" does not begin and end with a path separator.");
 		}		
@@ -195,11 +194,11 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	@return The path resolved against the container base path.
 	@exception NullPointerException if the given path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #resolveURI(URI)} should be used instead).
-	@see #resolveURI(URI)
+	@see #getBasePath()
 	*/
-	public String resolvePath(final String path)
+	public URIPath resolvePath(final URIPath path)
 	{
-		return resolveURI(createPathURI(path)).toString();	//create a URI for the given path, ensuring that the string only specifies a path, and resolve that URI
+		return getBasePath().resolve(path);	//resolve the path against the base path
 	}
 
 	/**Resolves URI against the container base path.
@@ -209,11 +208,11 @@ public abstract class AbstractGuiseContainer implements GuiseContainer
 	@param uri The URI to be resolved.
 	@return The uri resolved against the container base path.
 	@exception NullPointerException if the given URI is <code>null</code>.
-	@see GuiseContainer#getBasePath()
+	@see #getBasePath()
 	*/
 	public URI resolveURI(final URI uri)
 	{
-		return URI.create(getBasePath()).resolve(checkInstance(uri, "URI cannot be null."));	//create a URI from the container base path and resolve the given path against it
+		return getBasePath().resolve(checkInstance(uri, "URI cannot be null."));	//create a URI from the container base path and resolve the given path against it
 	}
 
 	/**Determines if the application has a resource available stored at the given resource path.

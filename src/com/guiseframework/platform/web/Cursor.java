@@ -14,10 +14,12 @@ import com.garretwilson.text.xml.stylesheets.css.XMLCSSCursor;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.CompassPoint;
 
+import com.guiseframework.GuiseApplication;
 import static com.guiseframework.GuiseApplication.*;
 
 /**Standard Guise cursors that are converted to predefined CSS cursors.
 These cursors allow predefined dummy URIs to be mapped to predefined CSS cursors.
+These URIs are constructed by using the path {@value GuiseApplication#GUISE_ROOT_THEME_CURSORS_PATH} with the serialized form of the enum appended.
 @author Garret Wilson
 @see <a href="http://www.w3.org/TR/CSS21/ui.html">CSS 2.1 User Interface: Cursors</a>
 */

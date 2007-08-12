@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 
+import com.garretwilson.net.URIPath;
+
 /**The interface for a Guise container.
 @author Garret Wilson
 */
@@ -20,7 +22,7 @@ public interface GuiseContainer
 	The base path is an absolute path that ends with a slash ('/'), indicating the base path of the application base paths.
 	@return The base path representing the Guise container.
 	*/
-	public String getBasePath();
+	public URIPath getBasePath();
 
 	/**Resolves a relative or absolute path against the container base path.
 	Relative paths will be resolved relative to the container base path. Absolute paths will be be considered already resolved.
@@ -30,9 +32,9 @@ public interface GuiseContainer
 	@return The path resolved against the container base path.
 	@exception NullPointerException if the given path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #resolveURI(URI)} should be used instead).
-	@see #resolveURI(URI)
+	@see #getBasePath()
 	*/
-	public String resolvePath(final String path);
+	public URIPath resolvePath(final URIPath path);
 
 	/**Resolves URI against the container base path.
 	Relative paths will be resolved relative to the container base path. Absolute paths will be considered already resolved, as will absolute URIs.
@@ -41,7 +43,7 @@ public interface GuiseContainer
 	@param uri The URI to be resolved.
 	@return The uri resolved against the container base path.
 	@exception NullPointerException if the given URI is <code>null</code>.
-	@see GuiseContainer#getBasePath()
+	@see #getBasePath()
 	*/
 	public URI resolveURI(final URI uri);
 

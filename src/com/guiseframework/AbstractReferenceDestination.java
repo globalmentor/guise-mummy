@@ -1,8 +1,9 @@
 package com.guiseframework;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
-
 import java.util.regex.Pattern;
+
+import static com.garretwilson.lang.ObjectUtilities.*;
+import com.garretwilson.net.URIPath;
 
 /**Abstract implementation of a destination referencing another destination.
 @author Garret Wilson
@@ -22,7 +23,7 @@ public abstract class AbstractReferenceDestination extends AbstractDestination i
 	@exception NullPointerException if the path and/or destination is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public AbstractReferenceDestination(final String path, final Destination destination)
+	public AbstractReferenceDestination(final URIPath path, final Destination destination)
 	{
 		super(path);	//construct the parent class
 		this.destination=checkInstance(destination, "Destination cannot be null.");

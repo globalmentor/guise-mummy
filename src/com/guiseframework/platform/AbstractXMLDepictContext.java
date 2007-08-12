@@ -14,6 +14,7 @@ import com.garretwilson.text.xml.XMLNamespacePrefixManager;
 import com.garretwilson.text.xml.XMLUtilities;
 import com.guiseframework.Destination;
 import com.guiseframework.GuiseSession;
+import com.guiseframework.platform.web.WebPlatform;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.lang.StringUtilities.*;
@@ -325,7 +326,7 @@ public abstract class AbstractXMLDepictContext extends AbstractTextDepictContext
 				systemID=getDefaultSystemID(publicID);	//try to determine the system ID from the public ID
 				if(systemID==null)	//if no system ID was given TODO testing; check a match against the Guise XHTML DTD
 				{
-					systemID=getSession().getApplication().resolvePath("guise/dtd/guise.dtd");	//TODO testing; use constant
+					systemID=getSession().getApplication().resolvePath(WebPlatform.GUISE_DTD_PATH).toString();	//TODO testing
 				}
 			}
 		}

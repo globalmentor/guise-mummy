@@ -19,6 +19,7 @@ import com.garretwilson.beans.*;
 import com.garretwilson.event.PostponedEvent;
 import com.garretwilson.io.BOMInputStreamReader;
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.net.URIPath;
 import com.garretwilson.rdf.*;
 import com.garretwilson.rdf.ploop.PLOOPProcessor;
 import com.garretwilson.util.*;
@@ -760,7 +761,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	{
 		this.uuid=UUID.randomUUID();	//create a UUID for the session
 		this.application=checkInstance(application, "Application cannot be null.");	//save the application
-		this.baseURI=application.getContainer().getBaseURI().resolve(application.getBasePath());	//default to a base URI calculated from the application base path resolved to the container's base URI
+		this.baseURI=application.getContainer().getBaseURI().resolve(application.getBasePath().toURI());	//default to a base URI calculated from the application base path resolved to the container's base URI
 		try
 		{
 			documentBuilder=createDocumentBuilder(true);	//create a new namespace-aware document builder
@@ -840,7 +841,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@exception IllegalStateException if the component class bound to the path does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
 	@see ComponentDestination
 	*/
-	public Component getNavigationComponent(final String path)
+	public Component getNavigationComponent(final URIPath path)
 	{
 		final Destination destination=getApplication().getDestination(path);	//get the destination associated with the given path
 		if(!(destination instanceof ComponentDestination))	//if the destination is not a component destination
@@ -1089,7 +1090,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public boolean endModalNavigation(final ModalNavigationPanel<?> modalNavigationPanel)
 		{
-			final String navigationPath=getNavigationPath();	//get our current navigation path
+			final URIPath navigationPath=getNavigationPath();	//get our current navigation path
 			final GuiseApplication application=getApplication();	//get the application
 			ModalNavigation modalNavigation=null;	//if we actually end modal navigation, we'll store the information here
 			final Destination destination=application.getDestination(navigationPath);	//get the destination for this path TODO maybe add a GuiseSession.getDestination()
@@ -1105,7 +1106,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 						final ModalNavigation currentModalNavigation=peekModalNavigation();	//see which model navigation is on the top of the stack
 						if(currentModalNavigation!=null)	//if there is a modal navigation currently in use
 						{
-							if(application.resolvePath(navigationPath).equals(currentModalNavigation.getNewNavigationURI().getPath()))	//if we're navigating where we expect to be (if we somehow got to here at something other than the modal navigation path, we wouldn't want to remove the current navigation path)
+							if(application.resolvePath(navigationPath).equals(new URIPath(currentModalNavigation.getNewNavigationURI().getRawPath())))	//if we're navigating where we expect to be (if we somehow got to here at something other than the modal navigation path, we wouldn't want to remove the current navigation path)
 							{
 								modalNavigation=popModalNavigation();	//end the current modal navigation
 								navigationURI=modalNavigation.getOldNavigationURI();	//we'll return to where the current modal navigation came from---that's a better choice
@@ -1132,13 +1133,13 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		}
 
 	/**The navigation path relative to the application context path.*/
-	private String navigationPath=null;
+	private URIPath navigationPath=null;
 
 		/**Reports the navigation path relative to the application context path.
 		@return The path representing the current navigation location of the Guise application.
 		@exception IllegalStateException if this message has been called before the navigation path has been initialized.
 		*/
-		public String getNavigationPath()
+		public URIPath getNavigationPath()
 		{
 			if(navigationPath==null)	//if no navigation path has been set, yet
 			{
@@ -1154,12 +1155,12 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@exception NullPointerException if the given navigation path is <code>null</code>.		
 		@exception IllegalArgumentException if the provided path is absolute.
 		@exception IllegalArgumentException if the navigation path is not recognized (e.g. there is no destination associated with the navigation path).
-		@see #navigate(String)
+		@see #navigate(URIPath)
 		@see #navigate(URI)
-		@see #navigateModal(String, ModalNavigationListener)
+		@see #navigateModal(URIPath, ModalNavigationListener)
 		@see #navigateModal(URI, ModalNavigationListener)
 		*/
-		public void setNavigationPath(final String navigationPath)
+		public void setNavigationPath(final URIPath navigationPath)
 		{
 			if(!ObjectUtilities.equals(this.navigationPath, checkInstance(navigationPath, "Navigation path cannot be null.")))	//if the navigation path is really changing
 			{
@@ -1197,17 +1198,17 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 
 		/**Sets the new navigation path and bookmark, firing a navigation event if appropriate.
 		If the navigation path and/or bookmark has changed, this method fires an event to all {@link NavigationListener}s in the component hierarchy, with the session as the source of the {@link NavigationEvent}.
-		This method calls {@link #setNavigationPath(String)} and {@link #setBookmark(Bookmark)}.  
+		This method calls {@link #setNavigationPath(URIPath)} and {@link #setBookmark(Bookmark)}.  
 		This implementation logs the navigation change.
 		@param navigationPath The navigation path relative to the application context path.
 		@param bookmark The bookmark for which navigation should occur at this navigation path, or <code>null</code> if there is no bookmark involved in navigation.
 		@param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
 		@exception NullPointerException if the given navigation path is <code>null</code>.
-		@see #setNavigationPath(String)
+		@see #setNavigationPath(URIPath)
 		@see #setBookmark(Bookmark)
 		@see #getApplicationFrame()
 		*/
-		public void setNavigation(final String navigationPath, final Bookmark bookmark, final URI referrerURI)
+		public void setNavigation(final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI)
 		{
 //TODO del Debug.trace("setting naviation; navigation path:", navigationPath, "bookmark:", bookmark, "referrerURI:", referrerURI);
 				//if the navigation path or the bookmark is changing
@@ -1277,7 +1278,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 		@see #navigate(URI)
 		*/
-		public void navigate(final String path)
+		public void navigate(final URIPath path)
 		{
 			navigate(path, (Bookmark)null);	//navigate to the requested path with no bookmark
 		}
@@ -1291,7 +1292,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 		@see #navigate(URI, String)
 		*/
-		public void navigate(final String path, final String viewportID)
+		public void navigate(final URIPath path, final String viewportID)
 		{
 			navigate(path, null, viewportID);	//navigate to the requested path in the viewport with no bookmark
 		}
@@ -1305,7 +1306,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 		@see #navigate(URI)
 		*/
-		public void navigate(final String path, final Bookmark bookmark)
+		public void navigate(final URIPath path, final Bookmark bookmark)
 		{
 			navigate(path, bookmark, null);	//navigate to the requested path with no viewport ID
 		}
@@ -1320,10 +1321,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 		@see #navigate(URI, String)
 		*/
-		public void navigate(final String path, final Bookmark bookmark, final String viewportID)
+		public void navigate(final URIPath path, final Bookmark bookmark, final String viewportID)
 		{
-			final String navigationPath=bookmark!=null ? path+bookmark.toString() : path;	//append the bookmark if needed TODO improve; we may not allow a query in createPathURI at some point
-			navigate(createPathURI(navigationPath), viewportID);	//navigate to the requested URI, converting the path to a URI and verifying that it is only a path
+			final URI uri=bookmark!=null ? URI.create(path.toString()+bookmark.toString()) : path.toURI();	//append the bookmark if needed
+			navigate(uri, viewportID);	//navigate to the requested URI, converting the path to a URI and verifying that it is only a path
 		}
 
 		/**Requests navigation to the specified URI.
@@ -1346,7 +1347,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public void navigate(final URI uri, final String viewportID)
 		{
-			requestedNavigation=new Navigation(getApplication().resolveURI(createPathURI(getNavigationPath())), getApplication().resolveURI(checkInstance(uri, "URI cannot be null.")), viewportID);	//resolve the URI against the application context path
+			requestedNavigation=new Navigation(getApplication().resolveURI(getNavigationPath().toURI()), getApplication().resolveURI(checkInstance(uri, "URI cannot be null.")), viewportID);	//resolve the URI against the application context path
 		}
 
 		/**Requests modal navigation to the specified path.
@@ -1358,9 +1359,9 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 		@see #navigateModal(URI, ModalNavigationListener)
 		*/
-		public void navigateModal(final String path, final ModalNavigationListener modalListener)
+		public void navigateModal(final URIPath path, final ModalNavigationListener modalListener)
 		{
-			navigateModal(createPathURI(path), modalListener);	//navigate to the requested URI, converting the path to a URI and verifying that it is only a path
+			navigateModal(path.toURI(), modalListener);	//navigate to the requested URI, converting the path to a URI and verifying that it is only a path
 		}
 
 		/**Requests modal navigation to the specified path and bookmark.
@@ -1373,10 +1374,10 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 		@see #navigateModal(URI, ModalNavigationListener)
 		*/
-		public void navigateModal(final String path, final Bookmark bookmark, final ModalNavigationListener modalListener)
+		public void navigateModal(final URIPath path, final Bookmark bookmark, final ModalNavigationListener modalListener)
 		{
-			final String navigationPath=bookmark!=null ? path+bookmark.toString() : path;	//append the bookmark if needed
-			navigateModal(createPathURI(navigationPath), modalListener);	//navigate to the requested URI, converting the path to a URI and verifying that it is only a path
+			final URI uri=bookmark!=null ? URI.create(path.toString()+bookmark.toString()) : path.toURI();	//append the bookmark if needed
+			navigateModal(uri, modalListener);	//navigate to the requested URI, converting the path to a URI and verifying that it is only a path
 		}
 
 		/**Requests modal navigation to the specified URI.
@@ -1388,7 +1389,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		*/
 		public void navigateModal(final URI uri, final ModalNavigationListener modalListener)
 		{
-			requestedNavigation=new ModalNavigation(getApplication().resolveURI(createPathURI(getNavigationPath())), getApplication().resolveURI(checkInstance(uri, "URI cannot be null.")), modalListener);	//resolve the URI against the application context path
+			requestedNavigation=new ModalNavigation(getApplication().resolveURI(getNavigationPath().toURI()), getApplication().resolveURI(checkInstance(uri, "URI cannot be null.")), modalListener);	//resolve the URI against the application context path
 		}		
 
 	/**The synchronized list of postponed model events.*/
@@ -1469,25 +1470,11 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 	@see GuiseApplication#createTempPublicResource(String, String, GuiseSession)
 	@see GuiseApplication#getTempDirectory()
 	*/
-	public String createTempPublicResource(final String baseName, final String extension) throws IOException
+	public URIPath createTempPublicResource(final String baseName, final String extension) throws IOException
 	{
 		return getApplication().createTempPublicResource(baseName, extension, this);	//delegate to the application with a reference to this session
 	}
 	
-	/**The variable used to generate unique component IDs.*/
-	private final AtomicLong idCounter=new AtomicLong(0);
-
-		/**Generates a new ID string unique to this session.
-		This ID is appropriate for being used in a new component, for example.
-		The ID will begin with a letter and be composed only of letters and numbers.
-		@return A new ID unique to this session.
-		*/
-		public String generateID()
-		{
-			final long counter=idCounter.incrementAndGet();	//atomically get the next counter value
-			return "id"+Long.toHexString(counter);	//create an ID from the counter
-		}
-
 	/**Reports that a bound property has changed.
 	This implementation delegates to the Guise session to fire or postpone the property change event.
 	@param propertyChangeEvent The event to fire.

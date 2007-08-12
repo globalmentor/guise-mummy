@@ -7,6 +7,8 @@ import java.util.StringTokenizer;
 
 import com.garretwilson.lang.CharSequenceUtilities;
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.net.URIPath;
+
 import static com.garretwilson.net.URIConstants.*;
 import static com.garretwilson.net.URIUtilities.*;
 import com.guiseframework.component.layout.*;
@@ -65,7 +67,7 @@ public class URIPathSegmentLinkPanel extends AbstractPanel
 						else	//if this is not the path separator
 						{
 							final String uriString=pathTokenizer.hasMoreTokens() ? hrefStringBuilder.toString()+PATH_SEPARATOR : hrefStringBuilder.toString();	//append a path separator to the href if there is a path separator following this path segment (that's all that can follow this segment, as the path separator is the delimiter)
-							final Link link=isPathURI ? new Link(decode(token), uriString) : new Link(decode(token), URI.create(uriString));	//create a link for this path segment, creating a URI if needed
+							final Link link=isPathURI ? new Link(decode(token), new URIPath(uriString)) : new Link(decode(token), URI.create(uriString));	//create a link for this path segment, creating a URI if needed
 							add(link);	//add a link for this path segment
 						}
 					}

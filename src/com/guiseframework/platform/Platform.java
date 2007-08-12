@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Queue;
 import java.util.concurrent.locks.Lock;
 
+import com.garretwilson.net.URIPath;
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.event.ValueSelectListener;
@@ -79,7 +80,7 @@ public interface Platform
 	@exception NullPointerException if the given path is <code>null</code>.
 	@exception IllegalArgumentException if the given string is not a path.
 	*/
-	public void sendResource(final String resourcePath);
+	public void sendResource(final URIPath resourcePath);
 
 	/**Sends a resource to the platform.
 	@param resourceURI The URI of the resource to send, relative to the application.
@@ -93,7 +94,7 @@ public interface Platform
 	@exception NullPointerException if the given path is <code>null</code>.
 	@exception IllegalArgumentException if the given string is not a path.
 	*/
-	public void sendResource(final String resourcePath, final Bookmark bookmark);
+	public void sendResource(final URIPath resourcePath, final Bookmark bookmark);
 
 	/**Sends a resource to the platform.
 	@param resourceURI The URI of the resource to send, relative to the application.

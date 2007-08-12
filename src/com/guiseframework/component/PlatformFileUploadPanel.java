@@ -7,7 +7,8 @@ import com.garretwilson.itu.SIUnit;
 
 import static com.garretwilson.lang.ClassUtilities.*;
 import com.garretwilson.lang.ObjectUtilities;
-import static com.garretwilson.net.URIUtilities.*;
+import com.garretwilson.net.URIPath;
+
 import static com.garretwilson.text.CharacterConstants.*;
 
 import com.guiseframework.Bookmark;
@@ -45,10 +46,10 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 		public Panel getControlPanel() {return controlPanel;}
 
 	/**The destination path of the upload relative to the application context path, or <code>null</code> if the destination path has not yet been set.*/
-	private String destinationPath=null;
+	private URIPath destinationPath=null;
 
 		/**@return The destination path of the upload relative to the application context path, or <code>null</code> if the destination path has not yet been set.*/
-		public String getDestinationPath() {return destinationPath;}
+		public URIPath getDestinationPath() {return destinationPath;}
 
 		/**Sets the destination path of the upload.
 		This is a bound property.
@@ -58,11 +59,11 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 		@exception IllegalArgumentException if the provided path is absolute.
 		@see #DESTINATION_PATH_PROPERTY
 		*/
-		public void setDestinationPath(final String newDestinationPath)
+		public void setDestinationPath(final URIPath newDestinationPath)
 		{
-			if(!ObjectUtilities.equals(destinationPath, checkRelativePath(newDestinationPath)))	//if the value is really changing
+			if(!ObjectUtilities.equals(destinationPath, newDestinationPath.checkRelative()))	//if the value is really changing
 			{
-				final String oldDestinationPath=destinationPath;	//get the old value
+				final URIPath oldDestinationPath=destinationPath;	//get the old value
 				destinationPath=newDestinationPath;	//actually change the value
 				firePropertyChange(DESTINATION_PATH_PROPERTY, oldDestinationPath, newDestinationPath);	//indicate that the value changed
 			}
@@ -162,7 +163,7 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public PlatformFileUploadPanel(final String destinationPath)
+	public PlatformFileUploadPanel(final URIPath destinationPath)
 	{
 		this(destinationPath, null);	//construct the panel with no bookmark
 	}
@@ -174,7 +175,7 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public PlatformFileUploadPanel(final String destinationPath, final Bookmark destinationBookmark)
+	public PlatformFileUploadPanel(final URIPath destinationPath, final Bookmark destinationBookmark)
 	{
 		this();	//construct the default panel
 		setDestinationPath(destinationPath);	//set the destination path

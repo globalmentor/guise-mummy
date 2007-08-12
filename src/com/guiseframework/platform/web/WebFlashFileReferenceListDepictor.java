@@ -6,6 +6,8 @@ import java.util.*;
 import static com.garretwilson.lang.EnumUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIUtilities.*;
+
+import com.garretwilson.net.URIPath;
 import com.garretwilson.util.*;
 
 import com.guiseframework.Bookmark;
@@ -73,10 +75,10 @@ public class WebFlashFileReferenceListDepictor extends AbstractWebDepictor<Flash
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
 	@SuppressWarnings("unchecked")
-	public void upload(final FlashPlatformFile platformFile, final String destinationPath, final Bookmark destinationBookmark)
+	public void upload(final FlashPlatformFile platformFile, final URIPath destinationPath, final Bookmark destinationBookmark)
 	{
-		final String resolvedDestinationPath=getSession().getApplication().resolvePath(checkRelativePath(destinationPath));	//resolve the destination path
-		final URI destinationURI=URI.create(destinationBookmark!=null ? resolvedDestinationPath+destinationBookmark.toString() : resolvedDestinationPath);	//construct a destination URI
+		final URIPath resolvedDestinationPath=getSession().getApplication().resolvePath(destinationPath.checkRelative());	//resolve the destination path
+		final URI destinationURI=destinationBookmark!=null ? URI.create(resolvedDestinationPath.toString()+destinationBookmark.toString()) : resolvedDestinationPath.toURI();	//construct a destination URI
 			//add an identification of the Guise session to the URI if needed, as Flash 8 on FireFox sends the wrong HTTP session ID cookie value
 		final URI sessionedDestinationURI=appendQueryParameters(destinationURI, new NameValuePair<String, String>(WebPlatform.GUISE_SESSION_UUID_URI_QUERY_PARAMETER, getSession().getUUID().toString()));
 		getPlatform().getSendEventQueue().add(new WebCommandEvent<FlashFileReferenceCommand>(getDepictedObject(), FlashFileReferenceCommand.FILE_UPLOAD,	//send a file upload command to the platform

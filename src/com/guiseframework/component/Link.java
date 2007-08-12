@@ -2,6 +2,7 @@ package com.guiseframework.component;
 
 import java.net.URI;
 
+import com.garretwilson.net.URIPath;
 import com.guiseframework.event.NavigateActionListener;
 import com.guiseframework.model.*;
 import com.guiseframework.prototype.ActionPrototype;
@@ -43,7 +44,7 @@ public class Link extends AbstractLinkControl
 	@param navigationPath The destination path that will be used for navigation when the link is selected.
 	@exception NullPointerException if the given navigation path is <code>null</code>.
 	*/
-	public Link(final String label, final String navigationPath)
+	public Link(final String label, final URIPath navigationPath)
 	{
 		this(label);	//construct the class with default models and the label
 		addActionListener(new NavigateActionListener(navigationPath));	//add an action listener to navigate to the indicated location

@@ -16,6 +16,7 @@ import java.util.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+import com.garretwilson.net.URIPath;
 import com.garretwilson.util.*;
 import com.guiseframework.*;
 
@@ -85,7 +86,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 	@exception IllegalStateException if there is already an application installed in this container at the given context path.
 	@exception IOException if there is an I/O error when installing the application.
 	*/
-	protected void installApplication(final AbstractGuiseApplication application, final String basePath, final File homeDirectory, final File logDirectory, final File tempDirectory) throws IOException
+	protected void installApplication(final AbstractGuiseApplication application, final URIPath basePath, final File homeDirectory, final File logDirectory, final File tempDirectory) throws IOException
 	{
 		super.installApplication(application, basePath, homeDirectory, logDirectory, tempDirectory);	//delegate to the parent class
 	}
@@ -141,7 +142,7 @@ public class HTTPServletGuiseContainer extends AbstractGuiseContainer
 */
 					guiseSession=guiseApplication.createSession(new HTTPServletWebPlatform(guiseApplication, httpSession, httpRequest));	//ask the application to create a new Guise session for the given platform
 					final URI requestURI=URI.create(httpRequest.getRequestURL().toString());	//get the URI of the current request
-					final URI sessionBaseURI=requestURI.resolve(guiseApplication.getBasePath());	//resolve the application base path to the request URI
+					final URI sessionBaseURI=requestURI.resolve(guiseApplication.getBasePath().toURI());	//resolve the application base path to the request URI
 					guiseSession.setBaseURI(sessionBaseURI);	//update the base URI to the one specified by the request, in case we can create a session from different URLs
 					addGuiseSession(guiseSession);	//add and initialize the Guise session
 					final Locale[] clientAcceptedLanguages=getAcceptedLanguages(httpRequest);	//get all languages accepted by the client

@@ -239,16 +239,16 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		}
 			//<xhtml:script> (external)
 		depictContext.write("\t");
-		depictContext.writeJavaScriptElement(JAVASCRIPT_JAVASCRIPT_PATH+constructQuery(new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//JavaScript: javascript.js
+		depictContext.writeJavaScriptElement(appendQueryParameters(JAVASCRIPT_JAVASCRIPT_PATH.toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//JavaScript: javascript.js
 		depictContext.write("\n");
 		depictContext.write("\t");
-		depictContext.writeJavaScriptElement(DOM_JAVASCRIPT_PATH+constructQuery(new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//JavaScript: dom.js
+		depictContext.writeJavaScriptElement(appendQueryParameters(DOM_JAVASCRIPT_PATH.toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//JavaScript: dom.js
 		depictContext.write("\n");
 		depictContext.write("\t");
-		depictContext.writeJavaScriptElement(AJAX_JAVASCRIPT_PATH+constructQuery(new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//JavaScript: ajax.js
+		depictContext.writeJavaScriptElement(appendQueryParameters(AJAX_JAVASCRIPT_PATH.toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//JavaScript: ajax.js
 		depictContext.write("\n");
 		depictContext.write("\t");
-		depictContext.writeJavaScriptElement(GUISE_JAVASCRIPT_PATH+constructQuery(new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//JavaScript: guise.js
+		depictContext.writeJavaScriptElement(appendQueryParameters(GUISE_JAVASCRIPT_PATH.toURI(), new NameValuePair<String, String>(GUISE_VERSION_URI_QUERY_PARAMETER, Guise.BUILD_ID)));	//JavaScript: guise.js
 		depictContext.write("\n");
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_HEAD);	//</xhtml:head>		
 		depictContext.write("\n");
@@ -406,7 +406,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IFRAME);	//<xhtml:iframe>
 			final String modalIFrameID=getModalIFrameID(session.getApplicationFrame());	//get the modal IFrame ID
 			depictContext.writeAttribute(null, ATTRIBUTE_ID, modalIFrameID);	//id="xxx:modalIFrame"		
-			depictContext.writeAttribute(null, ELEMENT_IFRAME_ATTRIBUTE_SRC, application.resolvePath(GUISE_EMPTY_HTML_DOCUMENT_PATH));	//src="guise/documents/empty.html"	(resolved to context) TODO wouldn't it be better to resolve the path to the session, now, as a convenience?
+			depictContext.writeAttribute(null, ELEMENT_IFRAME_ATTRIBUTE_SRC, application.resolvePath(GUISE_EMPTY_HTML_DOCUMENT_PATH).toString());	//src="guise/documents/empty.html"	(resolved to context) TODO wouldn't it be better to resolve the path to the session, now, as a convenience?
 			depictContext.writeAttribute(null, ELEMENT_IFRAME_ATTRIBUTE_FRAMEBORDER, "0");	//frameborder="0"
 			depictContext.writeAttribute(null, ATTRIBUTE_STYLE, "display:none;position:absolute;top:0px;left:0px;filter:progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0);");	//TODO maybe allow this this to be set using CSS
 			depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_IFRAME);	//</xhtml:iframe>
@@ -414,7 +414,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IFRAME);	//<xhtml:iframe>
 			final String flyoverIFrameID=getFlyoverIFrameID(session.getApplicationFrame());	//get the flyover IFrame ID
 			depictContext.writeAttribute(null, ATTRIBUTE_ID, flyoverIFrameID);	//id="xxx:flyoverIFrame"		
-			depictContext.writeAttribute(null, ELEMENT_IFRAME_ATTRIBUTE_SRC, application.resolvePath(GUISE_EMPTY_HTML_DOCUMENT_PATH));	//src="guise/documents/empty.html"	(resolved to context) TODO wouldn't it be better to resolve the path to the session, now, as a convenience?
+			depictContext.writeAttribute(null, ELEMENT_IFRAME_ATTRIBUTE_SRC, application.resolvePath(GUISE_EMPTY_HTML_DOCUMENT_PATH).toString());	//src="guise/documents/empty.html"	(resolved to context) TODO wouldn't it be better to resolve the path to the session, now, as a convenience?
 			depictContext.writeAttribute(null, ELEMENT_IFRAME_ATTRIBUTE_FRAMEBORDER, "0");	//frameborder="0"
 			depictContext.writeAttribute(null, ATTRIBUTE_STYLE, "display:none;position:absolute;top:0px;left:0px;filter:progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0);");	//TODO maybe allow this this to be set using CSS
 //TODO del when works				depictContext.writeAttribute(null, ATTRIBUTE_STYLE, "display:none;position:absolute;top:0px;left:0px;");	//TODO maybe allow this this to be set using CSS
@@ -424,7 +424,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IFRAME);	//<xhtml:iframe>
 		final String initIFrameID=getInitIFrameID(session.getApplicationFrame());	//get the init IFrame ID
 		depictContext.writeAttribute(null, ATTRIBUTE_ID, initIFrameID);	//id="xxx:initIFrame"		
-		depictContext.writeAttribute(null, ELEMENT_IFRAME_ATTRIBUTE_SRC, application.resolvePath(GUISE_EMPTY_HTML_DOCUMENT_PATH));	//src="guise/documents/empty.html"	(resolved to context) TODO wouldn't it be better to resolve the path to the session, now, as a convenience?
+		depictContext.writeAttribute(null, ELEMENT_IFRAME_ATTRIBUTE_SRC, application.resolvePath(GUISE_EMPTY_HTML_DOCUMENT_PATH).toString());	//src="guise/documents/empty.html"	(resolved to context) TODO wouldn't it be better to resolve the path to the session, now, as a convenience?
 		depictContext.writeAttribute(null, ELEMENT_IFRAME_ATTRIBUTE_FRAMEBORDER, "0");	//frameborder="0"
 		depictContext.writeAttribute(null, ATTRIBUTE_STYLE, "display:block;position:absolute;top:0px;left:0px;width:100%;height:100%;filter:progid:DXImageTransform.Microsoft.Alpha(style=0,opacity=0);z-index:9999;");	//TODO maybe allow this this to be set using CSS
 		depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_IFRAME);	//</xhtml:iframe>

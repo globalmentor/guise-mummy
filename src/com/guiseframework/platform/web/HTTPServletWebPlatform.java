@@ -18,6 +18,7 @@ import static com.garretwilson.servlet.http.HttpServletConstants.*;
 
 import com.garretwilson.beans.*;
 import com.garretwilson.event.ProgressListener;
+import com.garretwilson.net.URIPath;
 import com.guiseframework.Bookmark;
 import com.guiseframework.GuiseApplication;
 import com.guiseframework.audio.Audio;
@@ -240,7 +241,7 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 	@exception NullPointerException if the given path is <code>null</code>.
 	@exception IllegalArgumentException if the given string is not a path.
 	*/
-	public void sendResource(final String resourcePath)
+	public void sendResource(final URIPath resourcePath)
 	{
 		sendResource(resourcePath, null);	//send the resource with no bookmark
 	}
@@ -260,9 +261,9 @@ public class HTTPServletWebPlatform extends AbstractWebPlatform implements WebPl
 	@exception NullPointerException if the given path is <code>null</code>.
 	@exception IllegalArgumentException if the given string is not a path.
 	*/
-	public void sendResource(final String resourcePath, final Bookmark bookmark)
+	public void sendResource(final URIPath resourcePath, final Bookmark bookmark)
 	{
-		sendResource(createPathURI(resourcePath), bookmark);	//send the requested URI, converting the path to a URI and verifying that it is only a path
+		sendResource(resourcePath.toURI(), bookmark);	//send the requested URI, converting the path to a URI and verifying that it is only a path
 	}
 
 	/**Sends a resource to the platform.

@@ -3,6 +3,8 @@ package com.guiseframework.event;
 import java.net.URI;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
+
+import com.garretwilson.net.URIPath;
 import com.guiseframework.Bookmark;
 
 /**An event indicating that navigation has occurred.
@@ -13,10 +15,10 @@ public class NavigationEvent extends AbstractGuiseEvent
 {
 
 	/**The navigation path relative to the application context path.*/
-	private final String navigationPath;
+	private final URIPath navigationPath;
 
 		/**@public The navigation path relative to the application context path.*/
-		public String getNavigationPath() {return navigationPath;}
+		public URIPath getNavigationPath() {return navigationPath;}
 
 	/**The bookmark for which navigation should occur at the navigation path, or <code>null</code> if there is no bookmark involved in navigation.*/
 	private final Bookmark bookmark;
@@ -37,7 +39,7 @@ public class NavigationEvent extends AbstractGuiseEvent
 	@param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
 	@exception NullPointerException if the given source, and/or navigation path is <code>null</code>.
 	*/
-	public NavigationEvent(final Object source, final String navigationPath, final Bookmark bookmark, final URI referrerURI)
+	public NavigationEvent(final Object source, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI)
 	{
 		super(source);	//construct the parent class
 		this.navigationPath=checkInstance(navigationPath, "Navigation path cannot be null.");

@@ -1,8 +1,10 @@
 package com.guiseframework.platform;
 
 import java.io.IOException;
+import java.net.URI;
 
 import static com.garretwilson.javascript.JavaScriptConstants.*;
+
 import com.garretwilson.text.xml.xhtml.XHTMLConstants;
 import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 
@@ -28,17 +30,17 @@ public abstract class AbstractXHTMLDepictContext extends AbstractXMLDepictContex
 		getXMLNamespacePrefixManager().registerNamespacePrefix(XHTML_NAMESPACE_URI.toString(), null);	//don't use any prefix with the XHTML namespace
 	}
 
-	/**Generates a JavaScript element that references the given path.
-	The given path is resolved to the application path.
-	@param javascriptPath The application-relative path to the JavaScript file.
+	/**Generates a JavaScript element that references the given URI.
+	The given URI is resolved to the application URI.
+	@param javascriptURI The application-relative URI to the JavaScript file.
 	@return The state of the element written.
 	@exception IOException if there is an error writing the information.
 	*/
-	public ElementState writeJavaScriptElement(final String javascriptPath) throws IOException
+	public ElementState writeJavaScriptElement(final URI javascriptURI) throws IOException
 	{
 		writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_SCRIPT, false);	//<xhtml:script> (explicitly don't create an empty <xhtml:script> element, otherwise IE wouldn't recognize it)
 		writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_TYPE, JAVASCRIPT_CONTENT_TYPE.toString());	//type="text/javascript"
-		writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_SRC, getSession().getApplication().resolvePath(javascriptPath));	//src="javascript.js"	(resolved to the application)
+		writeAttribute(null, ELEMENT_SCRIPT_ATTRIBUTE_SRC, getSession().getApplication().resolveURI(javascriptURI).toString());	//src="javascript.js"	(resolved to the application)
 		return writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_SCRIPT);	//</xhtml:script>	
 	}
 

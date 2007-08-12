@@ -8,6 +8,7 @@ import javax.mail.*;
 
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.io.IOOperation;
+import com.garretwilson.net.URIPath;
 import com.guiseframework.component.ApplicationFrame;
 import com.guiseframework.platform.*;
 import com.guiseframework.theme.Theme;
@@ -34,27 +35,29 @@ public interface GuiseApplication extends PropertyBindable
 	public final static String THEMED_PROPERTY=getPropertyName(GuiseApplication.class, "themed");
 
 	/**The application-relative base path reserved for exclusive Guise use.*/
-	public final static String GUISE_RESERVED_BASE_PATH="~guise/";
+	public final static URIPath GUISE_RESERVED_BASE_PATH=new URIPath("~guise/");
 	/**The application-relative base path to access all Guise public resources.*/
-	public final static String GUISE_PUBLIC_RESOURCE_BASE_PATH=GUISE_RESERVED_BASE_PATH+"resources/";
+	public final static URIPath GUISE_PUBLIC_RESOURCE_BASE_PATH=GUISE_RESERVED_BASE_PATH.resolve("resources/");
 	/**The application-relative base path to access all Guise temp files.*/
-	public final static String GUISE_PUBLIC_TEMP_BASE_PATH=GUISE_RESERVED_BASE_PATH+"temp/";
+	public final static URIPath GUISE_PUBLIC_TEMP_BASE_PATH=GUISE_RESERVED_BASE_PATH.resolve("temp/");
 	/**The base path of public audio, relative to the application.*/
-	public final static String GUISE_PUBLIC_AUDIO_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH+"audio/";
+	public final static URIPath GUISE_PUBLIC_AUDIO_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH.resolve("audio/");
 	/**The base path of public documents, relative to the application.*/
-	public final static String GUISE_PUBLIC_DOCUMENTS_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH+"documents/";
+	public final static URIPath GUISE_PUBLIC_DOCUMENTS_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH.resolve("documents/");
+	/**The base path of public DTDs, relative to the application.*/
+	public final static URIPath GUISE_PUBLIC_DTD_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH.resolve("dtd/");
 	/**The base path of public Flash files, relative to the application.*/
-	public final static String GUISE_PUBLIC_FLASH_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH+"flash/";
+	public final static URIPath GUISE_PUBLIC_FLASH_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH.resolve("flash/");
 	/**The base path of public JavaScript files, relative to the application.*/
-	public final static String GUISE_PUBLIC_JAVASCRIPT_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH+"javascript/";
+	public final static URIPath GUISE_PUBLIC_JAVASCRIPT_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH.resolve("javascript/");
 	/**The base path of public themes, relative to the application.*/
-	public final static String GUISE_PUBLIC_THEMES_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH+"themes/";
+	public final static URIPath GUISE_PUBLIC_THEMES_PATH=GUISE_PUBLIC_RESOURCE_BASE_PATH.resolve("themes/");
 	/**The base path of the default Guise theme, relative to the application.*/
-	public final static String GUISE_ROOT_THEME_BASE_PATH=GUISE_PUBLIC_THEMES_PATH+"root/";
+	public final static URIPath GUISE_ROOT_THEME_BASE_PATH=GUISE_PUBLIC_THEMES_PATH.resolve("root/");
 	/**The path of the root Guise theme, relative to the application.*/
-	public final static String GUISE_ROOT_THEME_PATH=GUISE_ROOT_THEME_BASE_PATH+"root.theme.rdf";
+	public final static URIPath GUISE_ROOT_THEME_PATH=GUISE_ROOT_THEME_BASE_PATH.resolve("root.theme.rdf");
 	/**The base path of the default Guise theme cursors, relative to the application.*/
-	public final static String GUISE_ROOT_THEME_CURSORS_PATH=GUISE_ROOT_THEME_BASE_PATH+"cursors/";
+	public final static URIPath GUISE_ROOT_THEME_CURSORS_PATH=GUISE_ROOT_THEME_BASE_PATH.resolve("cursors/");
 
 	/**The name of the mail properties filename relative to the application home directory, used for configuring mail for the application.*/
 	public final static String MAIL_PROPERTIES_FILENAME="mail.properties.xml";
@@ -174,7 +177,7 @@ public interface GuiseApplication extends PropertyBindable
 	@return The destination associated with the given path, or <code>null</code> if no destination is associated with the path. 
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public Destination getDestination(final String path);
+	public Destination getDestination(final URIPath path);
 
 	/**Returns an iterable of destinations.
 	Any changes to the iterable will not necessarily be reflected in the destinations available to the application.
@@ -190,7 +193,7 @@ public interface GuiseApplication extends PropertyBindable
 	@exception NullPointerException if the path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public boolean hasDestination(final String path);
+	public boolean hasDestination(final URIPath path);
 
 	/**@return The Guise container into which this application is installed, or <code>null</code> if the application is not yet installed.*/
 	public GuiseContainer getContainer();
@@ -232,7 +235,7 @@ public interface GuiseApplication extends PropertyBindable
 	The base path is an absolute path that ends with a slash ('/'), indicating the base path of the navigation panels.
 	@return The base path representing the Guise application, or <code>null</code> if the application is not yet installed.
 	*/
-	public String getBasePath();
+	public URIPath getBasePath();
 
 	/**Returns the home directory shared by all sessions of this application.
 	This value is not available before the application is installed.
@@ -289,7 +292,7 @@ public interface GuiseApplication extends PropertyBindable
 	@exception IllegalArgumentException if the context path is not absolute and does not end with a slash ('/') character.
 	@exception IllegalStateException if the application is already installed.
 	*/
-	public void install(final AbstractGuiseContainer container, final String basePath, final File homeDirectory, final File logDirectory, final File tempDirectory);
+	public void install(final AbstractGuiseContainer container, final URIPath basePath, final File homeDirectory, final File logDirectory, final File tempDirectory);
 
 	/**Uninstalls the application from the given container.
 	All log writers are closed.
@@ -310,7 +313,7 @@ public interface GuiseApplication extends PropertyBindable
 	@see #getBasePath()
 	@see #resolveURI(URI)
 	*/
-	public String resolvePath(final String path);
+	public URIPath resolvePath(final URIPath path);
 
 	/**Resolves a URI against the application base path.
 	Relative paths will be resolved relative to the application base path. Absolute paths will be considered already resolved, as will absolute URIs.
@@ -320,7 +323,7 @@ public interface GuiseApplication extends PropertyBindable
 	@return The URI resolved against the application base path.
 	@exception NullPointerException if the given URI is <code>null</code>.
 	@see #getBasePath()
-	@see #resolvePath(String)
+	@see #resolvePath(URIPath)
 	*/
 	public URI resolveURI(final URI uri);
 
@@ -333,7 +336,7 @@ public interface GuiseApplication extends PropertyBindable
 	@see #getBasePath()
 	@see #relativizeURI(URI)
 	*/
-	public String relativizePath(final String path);
+	public URIPath relativizePath(final URIPath path);
 
 	/**Changes a URI to an application-relative path.
 	For an application base path "/path/to/application/", relativizing "http://www.example.com/path/to/application/relative/path" will yield "relative/path"
@@ -341,9 +344,9 @@ public interface GuiseApplication extends PropertyBindable
 	@return The URI path relativized to the application base path.
 	@exception NullPointerException if the given URI is <code>null</code>.
 	@see #getBasePath()
-	@see #relativizePath(String)
+	@see #relativizePath(URIPath)
 	*/
-	public String relativizeURI(final URI uri);
+	public URIPath relativizeURI(final URI uri);
 
 	/**Determines the locale-sensitive path of the given resource path.
 	Based upon the provided locale, candidate resource paths are checked in the following order:
@@ -404,7 +407,7 @@ public interface GuiseApplication extends PropertyBindable
 	@exception IOException if there was an error connecting to the entity at the given path.
 	@see #getInputStream(URI)
 	*/
-	public InputStream getInputStream(final String path) throws IOException;
+	public InputStream getInputStream(final URIPath path) throws IOException;
 
 	/**Retrieves an output stream to the entity at the given URI.
 	The URI is first resolved to the application base path.
@@ -434,7 +437,7 @@ public interface GuiseApplication extends PropertyBindable
 	@see #getOutputStream(URI)
 	@see #createTempPublicResource(String, String, boolean)
 	*/
-	public OutputStream getOutputStream(final String path) throws IOException;
+	public OutputStream getOutputStream(final URIPath path) throws IOException;
 
 	/**Creates a temporary resource available at a public application navigation path.
 	The file will be created in the application's temporary file directory.
@@ -448,9 +451,9 @@ public interface GuiseApplication extends PropertyBindable
 	@exception IllegalStateException if the given restriction session is not registered with this application.
 	@exception IOException if there is a problem creating the public resource.
 	@see #getTempDirectory()
-	@see #hasTempPublicResource(String)
+	@see #hasTempPublicResource(URIPath)
 	*/
-	public String createTempPublicResource(final String baseName, final String extension, final GuiseSession restrictionSession) throws IOException;
+	public URIPath createTempPublicResource(final String baseName, final String extension, final GuiseSession restrictionSession) throws IOException;
 
 	/**Determines whether this application has a temporary public resource at the given path.
 	@param path The application-relative path of the resource.
@@ -458,7 +461,7 @@ public interface GuiseApplication extends PropertyBindable
 	@exception IOException if there was an error accessing the temporary public resource.
 	@see #createTempPublicResource(String, String, boolean)
 	*/
-	public boolean hasTempPublicResource(final String path) throws IOException;
+	public boolean hasTempPublicResource(final URIPath path) throws IOException;
 
 	/**Returns a URL to the temporary public resource at the given path.
 	The given URL represents internal access to the resource and should normally not be presented to users. 
@@ -469,7 +472,7 @@ public interface GuiseApplication extends PropertyBindable
 	@exception IOException if there was an error accessing the temporary public resource.
 	@see #createTempPublicResource(String, String, boolean)
 	*/
-	public URL getTempPublicResourceURL(final String path, final GuiseSession guiseSession) throws IOException;
+	public URL getTempPublicResourceURL(final URIPath path, final GuiseSession guiseSession) throws IOException;
 
 	/**Retrieves a resource bundle for the given theme in the given locale.
 	The resource bundle retrieved will allow hierarchical resolution in the following priority:

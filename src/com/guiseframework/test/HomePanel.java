@@ -15,6 +15,7 @@ import com.garretwilson.country.us.SSN;
 import com.garretwilson.iso.idcard.PAN;
 import com.garretwilson.iso.idcard.Product;
 import com.garretwilson.itu.TelephoneNumber;
+import com.garretwilson.net.URIPath;
 import com.garretwilson.text.TextUtilities;
 import com.garretwilson.util.Debug;
 import com.guiseframework.Bookmark;
@@ -376,7 +377,7 @@ Debug.trace("list control changed value to", newValue);
 		testButton.setCornerArcSize(Corner.LINE_FAR_PAGE_NEAR, Component.ROUNDED_CORNER_ARC_SIZE);
 		testButton.setCornerArcSize(Corner.LINE_FAR_PAGE_FAR, Component.ROUNDED_CORNER_ARC_SIZE);
 		
-		testButton.addActionListener(new NavigateActionListener("helloworld"));
+		testButton.addActionListener(new NavigateActionListener(new URIPath("helloworld")));
 		buttonPanel.add(testButton);	//add a new button
 		
 		final Button testButton2=new Button();
@@ -460,7 +461,7 @@ Debug.trace("list control changed value to", newValue);
 				{
 					public void actionPerformed(ActionEvent actionEvent)
 					{
-						getSession().navigateModal("edituser", new ModalNavigationAdapter()
+						getSession().navigateModal(new URIPath("edituser"), new ModalNavigationAdapter()
 								{
 									/**Called when an a modal panel ends its modality.
 									@param modalEvent The event indicating the panel ending modality and the modal value.
@@ -494,7 +495,7 @@ Debug.trace("list control changed value to", newValue);
 		
 		final Link helloLink=new Link();
 		helloLink.setLabel("More Hello World.");
-		helloLink.addActionListener(new NavigateActionListener("helloworld"));
+		helloLink.addActionListener(new NavigateActionListener(new URIPath("helloworld")));
 		buttonPanel.add(helloLink);	//add the link
 
 		final Link frameLink=new Link();

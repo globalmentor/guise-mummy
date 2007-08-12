@@ -1,5 +1,6 @@
 package com.guiseframework.platform;
 
+import com.garretwilson.net.URIPath;
 import com.guiseframework.Bookmark;
 import com.guiseframework.event.ProgressListenable;
 
@@ -26,6 +27,6 @@ public interface PlatformFile extends ProgressListenable<Long>
 	@exception IllegalArgumentException if the provided path is absolute.
 	@exception IllegalStateException the platform file can no longer be uploaded because, for example, other platform files have since been selected.	
 	*/
-	public void upload(final String destinationPath, final Bookmark destinationBookmark);
+	public void upload(final URIPath destinationPath, final Bookmark destinationBookmark);
 
 }

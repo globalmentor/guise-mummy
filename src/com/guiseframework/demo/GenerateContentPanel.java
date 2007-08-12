@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
+import com.garretwilson.net.URIPath;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.ActionEvent;
@@ -13,7 +14,7 @@ import com.guiseframework.event.ActionListener;
 import com.guiseframework.validator.RegularExpressionStringValidator;
 
 /**Generate Content Guise demonstration panel.
-Copyright © 2007 GlobalMentor, Inc.
+Copyright ï¿½ 2007 GlobalMentor, Inc.
 Demonstrates generation of temporary content, navigating with a viewport ID,
 	and notifying the user of errors.
 @author Garret Wilson
@@ -69,7 +70,7 @@ public class GenerateContentPanel extends DefaultNavigationPanel
 									//generate a temporary file, restricting access to the file to the current session if requested
 									//if we knew ahead of time we would want access restriction to the current session,
 									//	we could call the convenience method getSession().createTempPublicResource("generated-text", "txt")
-								final String tempPath=getSession().getApplication().createTempPublicResource("generated-text", "txt", sessionRestricted ? getSession() : null);
+								final URIPath tempPath=getSession().getApplication().createTempPublicResource("generated-text", "txt", sessionRestricted ? getSession() : null);
 									//get a UTF-8 writer to the application-relative path to the temporary public resource
 								final Writer tempWriter=new BufferedWriter(new OutputStreamWriter(getSession().getApplication().getOutputStream(tempPath), "UTF-8"));
 								try

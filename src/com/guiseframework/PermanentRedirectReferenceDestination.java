@@ -2,6 +2,8 @@ package com.guiseframework;
 
 import java.util.regex.Pattern;
 
+import com.garretwilson.net.URIPath;
+
 /**A destination that permanently redirects to another referenced destination.
 @author Garret Wilson
 */
@@ -14,7 +16,7 @@ public class PermanentRedirectReferenceDestination extends AbstractReferenceDest
 	@exception NullPointerException if the path and/or destination is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public PermanentRedirectReferenceDestination(final String path, final Destination destination)
+	public PermanentRedirectReferenceDestination(final URIPath path, final Destination destination)
 	{
 		super(path, destination);	//construct the parent class
 	}

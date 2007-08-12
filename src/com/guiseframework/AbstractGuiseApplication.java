@@ -20,17 +20,15 @@ import com.garretwilson.lang.ObjectUtilities;
 import com.garretwilson.mail.MailManager;
 
 import static com.garretwilson.lang.ThreadUtilities.*;
-import com.garretwilson.net.URIUtilities;
-import com.garretwilson.rdf.RDFObject;
-import com.garretwilson.rdf.RDFResource;
-import com.garretwilson.rdf.TypedRDFResourceIO;
+
+import com.garretwilson.net.URIPath;
+import com.garretwilson.rdf.*;
 import com.garretwilson.text.W3CDateFormat;
 import com.garretwilson.util.*;
 
 import static com.garretwilson.io.FileConstants.*;
 import static com.garretwilson.io.FileUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.net.URIUtilities.*;
 import static com.garretwilson.text.CharacterEncodingConstants.*;
 import static com.garretwilson.util.CalendarUtilities.*;
 import static com.garretwilson.util.LocaleUtilities.*;
@@ -233,13 +231,13 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	}
 
 	/**The base path of the application, or <code>null</code> if the application is not yet installed.*/
-	private String basePath=null;
+	private URIPath basePath=null;
 
 		/**Reports the base path of the application.
 		The base path is an absolute path that ends with a slash ('/'), indicating the base path of the navigation panels.
 		@return The base path representing the Guise application, or <code>null</code> if the application is not yet installed.
 		*/
-		public String getBasePath() {return basePath;}
+		public URIPath getBasePath() {return basePath;}
 	
 	/**The home directory shared by all sessions of this application.*/	
 	private File homeDirectory=null;
@@ -409,7 +407,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@exception IllegalArgumentException if the context path is not absolute and does not end with a slash ('/') character.
 	@exception IllegalStateException if the application is already installed.
 	*/
-	public void install(final AbstractGuiseContainer container, final String basePath, final File homeDirectory, final File logDirectory, final File tempDirectory)
+	public void install(final AbstractGuiseContainer container, final URIPath basePath, final File homeDirectory, final File logDirectory, final File tempDirectory)
 	{
 		if(this.container!=null || this.basePath!=null)	//if we already have a container and/or a base path
 		{
@@ -417,7 +415,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		}
 		checkInstance(container, "Container cannot be null");
 		checkInstance(basePath, "Application base path cannot be null");
-		if(!isAbsolutePath(basePath) || !isCollectionPath(basePath))	//if the path doesn't begin and end with a slash
+		if(!basePath.isAbsolute() || !basePath.isCollection())	//if the path doesn't begin and end with a slash
 		{
 			throw new IllegalArgumentException("Application base path "+basePath+" does not begin and end with a path separator.");
 		}
@@ -592,7 +590,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		}
 
 	/**The URI of the application theme, to be resolved against the application base path.*/
-	private URI themeURI=URI.create(GUISE_ROOT_THEME_PATH);
+	private URI themeURI=GUISE_ROOT_THEME_PATH.toURI();
 
 		/**@return The URI of the application theme, to be resolved against the application base path.*/
 		public URI getThemeURI() {return themeURI;}
@@ -635,7 +633,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	private final List<Destination> pathPatternDestinations=new CopyOnWriteArrayList<Destination>();	
 
 	/**The concurrent map of destinations associated with application context-relative paths.*/
-	private final Map<String, Destination> pathDestinationMap=new ConcurrentHashMap<String, Destination>();
+	private final Map<URIPath, Destination> pathDestinationMap=new ConcurrentHashMap<URIPath, Destination>();
 
 		/**Registers a destination so that it can be matched against one or more paths.
 		Any existing destinations for the path or path pattern is replaced.
@@ -644,7 +642,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		*/
 		public void addDestination(final Destination destination)
 		{
-			final String path=destination.getPath();	//get the destination's path, if there is one
+			final URIPath path=destination.getPath();	//get the destination's path, if there is one
 			if(path!=null)	//if this destination has a path
 			{
 				pathDestinationMap.put(path, destination);	//associate the destination with the path
@@ -678,18 +676,15 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		@return The destination associated with the given path, or <code>null</code> if no destination is associated with the path. 
 		@exception IllegalArgumentException if the provided path is absolute.
 		*/
-		public Destination getDestination(final String path)
+		public Destination getDestination(final URIPath path)
 		{
-			if(isAbsolutePath(path))	//if the path is absolute
-			{
-				throw new IllegalArgumentException("Path cannot be absolute: "+path);
-			}
+			path.checkRelative();	//make sure the path is relative
 			Destination destination=pathDestinationMap.get(path);	//get the destination associated with this path, if any
 			if(destination==null)	//if there is no destination for this exact path
 			{
 				for(final Destination pathPatternDestination:pathPatternDestinations)	//look at all the destinations with path patterns
 				{
-					if(pathPatternDestination.getPathPattern().matcher(path).matches())	//if this destination's pattern matches the given path
+					if(pathPatternDestination.getPathPattern().matcher(path.toString()).matches())	//if this destination's pattern matches the given path
 					{
 						destination=pathPatternDestination;	//use this destination
 						break;	//stop looking at destinations with path patterns
@@ -719,19 +714,16 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		@exception NullPointerException if the path is <code>null</code>.
 		@exception IllegalArgumentException if the provided path is absolute.
 		*/
-		public boolean hasDestination(final String path)
+		public boolean hasDestination(final URIPath path)
 		{
-			if(isAbsolutePath(path))	//if the path is absolute
-			{
-				throw new IllegalArgumentException("Path cannot be absolute: "+path);
-			}
+			path.checkRelative();	//make sure the path is relative
 			if(pathDestinationMap.containsKey(path))	//see if there is a destination associated with this navigation path
 			{
 				return true;	//show that we found an exact match
 			}
 			for(final Destination pathPatternDestination:pathPatternDestinations)	//look at all the destinations with path patterns
 			{
-				if(pathPatternDestination.getPathPattern().matcher(path).matches())	//if this destination's pattern matches the given path
+				if(pathPatternDestination.getPathPattern().matcher(path.toString()).matches())	//if this destination's pattern matches the given path
 				{
 					return true;	//show that we found a pattern match
 				}
@@ -750,9 +742,9 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@see #getBasePath()
 	@see #resolveURI(URI)
 	*/
-	public String resolvePath(final String path)
+	public URIPath resolvePath(final URIPath path)
 	{
-		return resolveURI(createPathURI(path)).toString();	//create a URI for the given path, ensuring that the string only specifies a path, and resolve that URI
+		return getBasePath().resolve(checkInstance(path, "Path cannot be null."));	//resolve the given path against the base path
 	}
 
 	/**Resolves a URI against the application base path.
@@ -763,11 +755,11 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@return The URI resolved against the application base path.
 	@exception NullPointerException if the given URI is <code>null</code>.
 	@see #getBasePath()
-	@see #resolvePath(String)
+	@see #resolvePath(URIPath)
 	*/
 	public URI resolveURI(final URI uri)
 	{
-		return URI.create(getBasePath()).resolve(checkInstance(uri, "URI cannot be null."));	//create a URI from the application base path and resolve the given path against it
+		return getBasePath().resolve(checkInstance(uri, "URI cannot be null."));	//resolve the given URI against the base path
 	}
 
 	/**Changes an absolute path to an application-relative path.
@@ -779,9 +771,9 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@see #getBasePath()
 	@see #relativizeURI(URI)
 	*/
-	public String relativizePath(final String path)
+	public URIPath relativizePath(final URIPath path)
 	{
-		return URIUtilities.relativizePath(getBasePath(), path);	//get the path relative to the application path 
+		return getBasePath().relativize(path);	//get the path relative to the application path 
 	}
 
 	/**Changes a URI to an application-relative path.
@@ -792,9 +784,9 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@see #getBasePath()
 	@see #relativizePath(String)
 	*/
-	public String relativizeURI(final URI uri)
+	public URIPath relativizeURI(final URI uri)
 	{
-		return relativizePath(uri.getRawPath());	//relativize the path of the URI TODO make sure the URI is from the correct domain
+		return relativizePath(new URIPath(uri.getRawPath()));	//relativize the path of the URI TODO make sure the URI is from the correct domain
 	}
 
 	/**Determines the locale-sensitive path of the given resource path.
@@ -840,8 +832,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	public boolean hasResource(final String resourcePath)
 	{
 		checkInstalled();	//make sure we're installed
-		final String relativeApplicationPath=URIUtilities.relativizePath(getContainer().getBasePath(), getBasePath());	//get the application path relative to the container path 
-		return container.hasResource(relativeApplicationPath+resourcePath);	//delegate to the container
+		final URIPath relativeApplicationPath=getContainer().getBasePath().relativize(getBasePath());	//get the application path relative to the container path 
+		return container.hasResource(relativeApplicationPath.toString()+resourcePath);	//delegate to the container
 	}
 
 	/**Retrieves an input stream to the resource at the given path.
@@ -855,8 +847,8 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	public InputStream getResourceInputStream(final String resourcePath)
 	{
 		checkInstalled();	//make sure we're installed
-		final String relativeApplicationPath=URIUtilities.relativizePath(getContainer().getBasePath(), getBasePath());	//get the application path relative to the container path 
-		return container.getResourceInputStream(relativeApplicationPath+resourcePath);	//delegate to the container
+		final URIPath relativeApplicationPath=getContainer().getBasePath().relativize(getBasePath());	//get the application path relative to the container path 
+		return container.getResourceInputStream(relativeApplicationPath.toString()+resourcePath);	//delegate to the container
 	}
 
 	/**Retrieves an input stream to the entity at the given URI.
@@ -886,7 +878,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		final URI absoluteResolvedURI=container.getBaseURI().resolve(resolvedURI);	//resolve the URI against the container base URI
 //TODO del Debug.trace("absolute resolved URI:", absoluteResolvedURI);
 			//check for Guise public resources
-		final URI publicResourcesBaseURI=container.getBaseURI().resolve(getBasePath()+GUISE_PUBLIC_RESOURCE_BASE_PATH);	//get the base URI of Guise public resources
+		final URI publicResourcesBaseURI=container.getBaseURI().resolve(getBasePath().resolve(GUISE_PUBLIC_RESOURCE_BASE_PATH).toURI());	//get the base URI of Guise public resources
 //	TODO del Debug.trace("publicResourcesBaseURI:", publicResourcesBaseURI);
 		final URI publicResourceRelativeURI=publicResourcesBaseURI.relativize(absoluteResolvedURI);	//see if the absolute URI is in the application public path
 //	TODO del Debug.trace("resourceURI:", resourceURI);		
@@ -895,7 +887,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			return Guise.getInstance().getGuisePublicResourceInputStream(GUISE_PUBLIC_RESOURCE_BASE_KEY+publicResourceRelativeURI.getPath());	//return an input stream to the resource directly, rather than going through the server
 		}
 			//check for Guise public temp resources
-		final URI publicTempBaseURI=container.getBaseURI().resolve(getBasePath()+GUISE_PUBLIC_TEMP_BASE_PATH);	//get the base URI of Guise public temporary resources
+		final URI publicTempBaseURI=container.getBaseURI().resolve(getBasePath().resolve(GUISE_PUBLIC_TEMP_BASE_PATH).toURI());	//get the base URI of Guise public temporary resources
 //	TODO del Debug.trace("publicResourcesBaseURI:", publicResourcesBaseURI);
 		final URI publicTempRelativeURI=publicTempBaseURI.relativize(absoluteResolvedURI);	//see if the absolute URI is in the application public temporary path
 //	TODO del Debug.trace("resourceURI:", resourceURI);		
@@ -935,9 +927,9 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@exception IOException if there was an error connecting to the entity at the given path.
 	@see #getInputStream(URI)
 	*/
-	public InputStream getInputStream(final String path) throws IOException
+	public InputStream getInputStream(final URIPath path) throws IOException
 	{
-		return getInputStream(createPathURI(path));	//create a URI, verifying that it is a path, and return an input stream to the URI		
+		return getInputStream(path.toURI());	//create a URI, verifying that it is a path, and return an input stream to the URI		
 	}
 
 	/**Retrieves an output stream to the entity at the given URI.
@@ -961,7 +953,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 //	TODO del Debug.trace("resolved URI:", resolvedURI);
 		final URI absoluteResolvedURI=container.getBaseURI().resolve(resolvedURI);	//resolve the URI against the container base URI
 //	TODO del Debug.trace("absolute resolved URI:", absoluteResolvedURI);
-		final URI publicTempBaseURI=container.getBaseURI().resolve(getBasePath()+GUISE_PUBLIC_TEMP_BASE_PATH);	//get the base URI of the Guise temp resources
+		final URI publicTempBaseURI=container.getBaseURI().resolve(getBasePath().resolve(GUISE_PUBLIC_TEMP_BASE_PATH).toURI());	//get the base URI of the Guise temp resources
 //	TODO del Debug.trace("publicResourcesBaseURI:", publicResourcesBaseURI);
 		final URI publicTempRelativeURI=publicTempBaseURI.relativize(absoluteResolvedURI);	//see if the absolute URI is in the application public path
 //	TODO del Debug.trace("resourceURI:", resourceURI);		
@@ -1005,9 +997,9 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@see #getOutputStream(URI)
 	@see #createTempPublicResource(String, String, boolean)
 	*/
-	public OutputStream getOutputStream(final String path) throws IOException
+	public OutputStream getOutputStream(final URIPath path) throws IOException
 	{
-		return getOutputStream(createPathURI(path));	//create a URI, verifying that it is a path, and return an output stream to the URI
+		return getOutputStream(path.toURI());	//create a URI, verifying that it is a path, and return an output stream to the URI
 	}
 
 	/**The map of temp file info objects keyed to temporary filenames (not paths).
@@ -1034,9 +1026,9 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@exception IllegalStateException if the given restriction session is not registered with this application.
 	@exception IOException if there is a problem creating the public resource.
 	@see #getTempDirectory()
-	@see #hasTempPublicResource(String)
+	@see #hasTempPublicResource(URIPath)
 	*/
-	public String createTempPublicResource(String baseName, final String extension, final GuiseSession restrictionSession) throws IOException
+	public URIPath createTempPublicResource(String baseName, final String extension, final GuiseSession restrictionSession) throws IOException
 	{
 		final File tempFile=createTempFile(baseName, checkInstance(extension, "Extension cannot be null."), getTempDirectory(), true);	//create a temporary file in the application's temporary directory, specifying that it should be deleted on JVM exit
 		final String filename=tempFile.getName();	//get the name of the file
@@ -1052,7 +1044,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			}
 			guiseSessionInfo.getTempFileInfos().add(tempFileInfo);	//indicate that this temp file is associated with the given session
 		}
-		return GUISE_PUBLIC_TEMP_BASE_PATH+filename;	//create and return a path for the temp resource under the Guise temp path
+		return GUISE_PUBLIC_TEMP_BASE_PATH.resolve(filename);	//create and return a path for the temp resource under the Guise temp path
 	}
 
 	/**Determines whether this application has a temporary public resource at the given path.
@@ -1061,11 +1053,13 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@exception IOException if there was an error accessing the temporary public resource.
 	@see #createTempPublicResource(String, String, boolean)
 	*/
-	public boolean hasTempPublicResource(final String path) throws IOException
+	public boolean hasTempPublicResource(final URIPath path) throws IOException
 	{
-		if(path.startsWith(GUISE_PUBLIC_TEMP_BASE_PATH))	//if the path is in the public temporary tree
+		final String pathString=path.toString();	//get the string form of the path
+		final String guisePublicTempBasePathString=GUISE_PUBLIC_TEMP_BASE_PATH.toString();	//get the string form of the public temp base path
+		if(pathString.startsWith(guisePublicTempBasePathString))	//if the path is in the public temporary tree
 		{
-			final String filename=path.substring(GUISE_PUBLIC_TEMP_BASE_PATH.length());	//get the filename TODO it would be better to resolve the path, which would fix "../..", etc.
+			final String filename=pathString.substring(guisePublicTempBasePathString.length());	//get the filename TODO it would be better to resolve the path, which would fix "../..", etc.
 			final TempFileInfo tempFileInfo=filenameTempFileInfoMap.get(filename);	//get the info for this temp file
 			if(tempFileInfo!=null)	//if we found the temporary file
 			{
@@ -1084,11 +1078,13 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@exception IOException if there was an error accessing the temporary public resource.
 	@see #createTempPublicResource(String, String, boolean)
 	*/
-	public URL getTempPublicResourceURL(final String path, final GuiseSession guiseSession) throws IOException
+	public URL getTempPublicResourceURL(final URIPath path, final GuiseSession guiseSession) throws IOException
 	{
-		if(path.startsWith(GUISE_PUBLIC_TEMP_BASE_PATH))	//if the path is in the public temporary tree
+		final String pathString=path.toString();	//get the string form of the path
+		final String guisePublicTempBasePathString=GUISE_PUBLIC_TEMP_BASE_PATH.toString();	//get the string form of the public temp base path
+		if(pathString.startsWith(guisePublicTempBasePathString))	//if the path is in the public temporary tree
 		{
-			final String filename=path.substring(GUISE_PUBLIC_TEMP_BASE_PATH.length());	//get the filename TODO it would be better to resolve the path, which would fix "../..", etc.
+			final String filename=pathString.substring(guisePublicTempBasePathString.length());	//get the filename TODO it would be better to resolve the path, which would fix "../..", etc.
 			final TempFileInfo tempFileInfo=filenameTempFileInfoMap.get(filename);	//get the info for this temp file
 			if(tempFileInfo!=null)	//if we found the temporary file
 			{
@@ -1234,7 +1230,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			final Theme theme=getThemeIO().read(bufferedThemeInputStream, themeURI);	//read this theme
 				//TODO check for a specified parent theme
 			final URI resolvedThemeURI=resolveURI(themeURI);	//resolve the theme URI against the application path
-			final URI rootThemeURI=URI.create(GUISE_ROOT_THEME_PATH);	//get the application-relative URI to the root theme
+			final URI rootThemeURI=GUISE_ROOT_THEME_PATH.toURI();	//get the application-relative URI to the root theme
 			final URI resolvedRootThemeURI=resolveURI(rootThemeURI);	//get the resolved path URI to the root theme
 			if(!resolvedThemeURI.equals(resolvedRootThemeURI))	//if this is not the root theme, load the default theme and set it as parent
 			{
@@ -1328,9 +1324,9 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@param applicationPath The relative path of the resource requested.
 	@return The realm appropriate for the resource, or <code>null</code> if the given resource is not in a known realm.
 	*/
-	protected String getRealm(final String applicationPath)
+	protected String getRealm(final URIPath applicationPath)
 	{
-		return getBasePath();	//return the application base path as the realm for all resouces
+		return getBasePath().toString();	//return the application base path as the realm for all resouces
 	}
 
 	/**Checks whether the given principal is authorized to access the resouce at the given application path.
@@ -1340,7 +1336,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	@param realm The realm with which the resource is associated, or <code>null</code> if the realm is not known.
 	@return <code>true</code> if the given principal is authorized to access the resource represented by the given application path.
 	*/
-	protected boolean isAuthorized(final String applicationPath, final Principal principal, final String realm)
+	protected boolean isAuthorized(final URIPath applicationPath, final Principal principal, final String realm)
 	{
 		return true;	//default to authorizing access
 	}

@@ -4,6 +4,7 @@ import java.io.OutputStream;
 import java.net.URI;
 
 import com.garretwilson.net.ResourceIOException;
+import com.garretwilson.net.URIPath;
 import com.garretwilson.rdf.RDFResource;
 
 /**A navigation point that sets a resource description and/or contents.
@@ -28,6 +29,6 @@ public interface ResourceWriteDestination extends Destination
 	@exception NullPointerException if the given navigation path is <code>null</code>.
 	@exception ResourceIOException Thrown if there is an error writing to the resource.
 	*/
-	public OutputStream getOutputStream(final RDFResource resourceDescription, final GuiseSession session, final String navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException;
+	public OutputStream getOutputStream(final RDFResource resourceDescription, final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException;
 
 }

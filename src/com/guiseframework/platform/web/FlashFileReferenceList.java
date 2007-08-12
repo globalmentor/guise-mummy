@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 
+import com.garretwilson.net.URIPath;
 import com.guiseframework.Bookmark;
 import com.guiseframework.platform.*;
 
@@ -96,7 +97,7 @@ public class FlashFileReferenceList extends AbstractDepictedObject
 	@exception IllegalArgumentException if the provided path is absolute.
 	@exception IllegalStateException the specified platform file can no longer be uploaded because, for example, other platform files have since been selected.	
 	*/
-	public void upload(final FlashPlatformFile platformFile, final String destinationPath, final Bookmark destinationBookmark)
+	public void upload(final FlashPlatformFile platformFile, final URIPath destinationPath, final Bookmark destinationBookmark)
 	{
 		if(!getPlatformFiles().contains(platformFile))	//if this list no longer knows about this platform file
 		{
@@ -129,7 +130,7 @@ public class FlashFileReferenceList extends AbstractDepictedObject
 		@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority.
 		@exception IllegalArgumentException if the provided path is absolute.
 		*/
-		public void upload(final FlashPlatformFile platformFile, final String destinationPath, final Bookmark destinationBookmark);
+		public void upload(final FlashPlatformFile platformFile, final URIPath destinationPath, final Bookmark destinationBookmark);
 
 	}
 

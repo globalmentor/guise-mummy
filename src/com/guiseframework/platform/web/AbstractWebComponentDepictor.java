@@ -494,7 +494,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 			}
 		}
 		final URI resolvedCursorURI=session.resolveURI(component.getCursor());	//get the URI for the cursor and resolve it against the application, resolving resources in the process
-		final URI relativeCursorURI=URI.create(session.getApplication().getBasePath()).relativize(resolvedCursorURI);	//get the relative cursor URI with all resource references resolved 
+		final URI relativeCursorURI=session.getApplication().getBasePath().toURI().relativize(resolvedCursorURI);	//get the relative cursor URI with all resource references resolved 
 		if(!Cursor.DEFAULT.getURI().equals(relativeCursorURI))	//if this isn't the default cursor (the stylesheet sets all cursors to the default)
 		{
 			styles.put(CSS_PROP_CURSOR, CSSUtilities.toCursorString(session.getApplication(), orientation, relativeCursorURI));	//indicate the cursor

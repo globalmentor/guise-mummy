@@ -2,8 +2,9 @@ package com.guiseframework.event;
 
 import java.net.URI;
 
+import com.garretwilson.net.URIPath;
+
 import static com.garretwilson.lang.ObjectUtilities.*;
-import static com.garretwilson.net.URIUtilities.*;
 
 /**An abstract that listens for action events and keeps information for navigating in response.
 @author Garret Wilson
@@ -28,9 +29,9 @@ public abstract class AbstractNavigateActionListener implements ActionListener
 	@exception NullPointerException if the given path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #AbstractNavigateActionListener(URI)}</code> should be used instead).
 	*/
-	public AbstractNavigateActionListener(final String navigationPath)
+	public AbstractNavigateActionListener(final URIPath navigationPath)
 	{
-		this(createPathURI(navigationPath));	//create a URI from the path and construct the class
+		this(navigationPath.toURI());	//construct the class with the URI form of the path
 	}
 
 	/**Constructs a listener to navigate to the provided URI.

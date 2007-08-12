@@ -3,10 +3,11 @@ package com.guiseframework.demo;
 import java.security.Principal;
 import java.util.*;
 
+import com.garretwilson.net.URIPath;
 import com.guiseframework.AbstractGuiseApplication;
 
 /**Demonstration Guise application.
-Copyright © 2005 GlobalMentor, Inc.
+Copyright Â© 2005 GlobalMentor, Inc.
 Demonstrates custom Guise applications, setting application resource bundles, and custom authorization.
 @author Garret Wilson
 */
@@ -14,9 +15,9 @@ public class DemoApplication extends AbstractGuiseApplication
 {
 
 	/**The application-relative navigation path to the edit user modal panel.*/
-	public final static String EDIT_USER_PANEL_NAVIGATION_PATH="edituser";
+	public final static URIPath EDIT_USER_PANEL_NAVIGATION_PATH=new URIPath("edituser");
 	/**The application-relative navigation path to the restricted panel.*/
-	public final static String RESTRICTED_PANEL_NAVIGATION_PATH="restricted";
+	public final static URIPath RESTRICTED_PANEL_NAVIGATION_PATH=new URIPath("restricted");
 
 	/**The synchronized list of application users.*/
 	final private List<DemoUser> users=Collections.synchronizedList(new ArrayList<DemoUser>());
@@ -89,7 +90,7 @@ public class DemoApplication extends AbstractGuiseApplication
 	@param realm The realm with which the resource is associated, or <code>null</code> if the realm is not known.
 	@return <code>true</code> if the given principal is authorized to access the resource represented by the given application path.
 	*/
-	protected boolean isAuthorized(final String applicationPath, final Principal principal, final String realm)
+	protected boolean isAuthorized(final URIPath applicationPath, final Principal principal, final String realm)
 	{
 		if("restricted".equals(applicationPath))	//if this is the "restricted" application path
 		{

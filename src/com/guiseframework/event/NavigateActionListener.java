@@ -2,6 +2,8 @@ package com.guiseframework.event;
 
 import java.net.URI;
 
+import com.garretwilson.net.URIPath;
+
 /**An object that listens for action events and in response changes the navigation.
 This class if declared final because it encapsulates a set of known, bounded functionality that may be deferred to the client if possible.
 @author Garret Wilson
@@ -14,7 +16,7 @@ public final class NavigateActionListener extends AbstractNavigateActionListener
 	@exception NullPointerException if the given path is <code>null</code>.
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #NavigateActionListener(URI)}</code> should be used instead).
 	*/
-	public NavigateActionListener(final String navigationPath)
+	public NavigateActionListener(final URIPath navigationPath)
 	{
 		super(navigationPath);	//construct the parent class
 	}

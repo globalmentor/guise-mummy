@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.net.URI;
 
 import com.garretwilson.net.ResourceIOException;
+import com.garretwilson.net.URIPath;
 import com.garretwilson.rdf.RDFResource;
 
 /**A navigation point that retrieves a resource description and/or contents.
@@ -27,7 +28,7 @@ public interface ResourceReadDestination extends Destination
 	@exception NullPointerException if the given navigation path is <code>null</code>.
 	@exception ResourceIOException if there is an error retrieving the resource description.
 	*/
-	public RDFResource getResourceDescription(final GuiseSession session, final String navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException;
+	public RDFResource getResourceDescription(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException;
 
 	/**Retrieves an input stream to the resource.
 	@param session The current Guise Session. 
@@ -38,6 +39,6 @@ public interface ResourceReadDestination extends Destination
 	@exception NullPointerException if the given navigation path is <code>null</code>.
 	@exception ResourceIOException Thrown if there is an error accessing the resource, such as a missing file.
 	*/
-	public InputStream getInputStream(final GuiseSession session, final String navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException;
+	public InputStream getInputStream(final GuiseSession session, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI) throws ResourceIOException;
 
 }

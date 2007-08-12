@@ -1,12 +1,12 @@
 package com.guiseframework;
 
-import static com.garretwilson.lang.ClassUtilities.*;
-import static com.garretwilson.lang.ObjectUtilities.*;
-
 import java.net.URI;
 import java.util.regex.Pattern;
 
+import static com.garretwilson.lang.ClassUtilities.*;
+import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.lang.ObjectUtilities;
+import com.garretwilson.net.URIPath;
 import com.guiseframework.component.Component;
 
 /**Default implementation of a navigation point based upon a component.
@@ -51,7 +51,7 @@ public class ComponentDestination extends AbstractDestination
 	@exception NullPointerException if the path and/or the component class is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public ComponentDestination(final String path, final Class<? extends Component> componentClass)
+	public ComponentDestination(final URIPath path, final Class<? extends Component> componentClass)
 	{
 		this(path, componentClass, null);	//construct the class with no style specified
 	}
@@ -63,7 +63,7 @@ public class ComponentDestination extends AbstractDestination
 	@exception NullPointerException if the path and/or the component class is <code>null</code>.
 	@exception IllegalArgumentException if the provided path is absolute.
 	*/
-	public ComponentDestination(final String path, final Class<? extends Component> componentClass, final URI style)
+	public ComponentDestination(final URIPath path, final Class<? extends Component> componentClass, final URI style)
 	{
 		super(path);	//construct the parent class
 		this.componentClass=checkInstance(componentClass, "Component class cannot be null.");	//store the associated class

@@ -8,6 +8,7 @@ import java.util.*;
 
 import com.garretwilson.beans.PropertyBindable;
 import com.garretwilson.event.PostponedEvent;
+import com.garretwilson.net.URIPath;
 import com.garretwilson.rdf.RDFResource;
 import com.guiseframework.component.*;
 import com.guiseframework.component.layout.Orientation;
@@ -441,7 +442,7 @@ public interface GuiseSession extends PropertyBindable
 	@exception IllegalStateException if the component class bound to the path does not provide appropriate constructors, is an interface, is abstract, or throws an exception during instantiation.
 	@see ComponentDestination
 	*/
-	public Component getNavigationComponent(final String path);
+	public Component getNavigationComponent(final URIPath path);
 
 	/**@return Whether the session is in a modal navigation state.*/
 	public boolean isModalNavigation();
@@ -473,7 +474,7 @@ public interface GuiseSession extends PropertyBindable
 	@return The path representing the current navigation location of the Guise application.
 	@exception IllegalStateException if this message has been called before the navigation path has been initialized.
 	*/
-	public String getNavigationPath();
+	public URIPath getNavigationPath();
 
 	/**Changes the navigation path of the session.
 	This method does not actually cause navigation to occur.
@@ -482,12 +483,12 @@ public interface GuiseSession extends PropertyBindable
 	@exception NullPointerException if the given navigation path is <code>null</code>.		
 	@exception IllegalArgumentException if the provided path is absolute.
 	@exception IllegalArgumentException if the navigation path is not recognized (e.g. there is no destination associated with the navigation path).
-	@see #navigate(String)
+	@see #navigate(URIPath)
 	@see #navigate(URI)
-	@see #navigateModal(String, ModalNavigationListener)
+	@see #navigateModal(URIPath, ModalNavigationListener)
 	@see #navigateModal(URI, ModalNavigationListener)
 	*/
-	public void setNavigationPath(final String navigationPath);
+	public void setNavigationPath(final URIPath navigationPath);
 
 	/**Reports the current bookmark relative to the current navigation path.
 	@return The bookmark relative to the current navigation path, or <code>null</code> if there is no bookmark specified.
@@ -502,16 +503,16 @@ public interface GuiseSession extends PropertyBindable
 
 	/**Sets the new navigation path and bookmark, firing a navigation event if appropriate.
 	If the navigation path and/or bookmark has changed, this method fires an event to all {@link NavigationListener}s in the component hierarchy, with the session as the source of the {@link NavigationEvent}.
-	This method calls {@link #setNavigationPath(String)} and {@link #setBookmark(Bookmark)}.  
+	This method calls {@link #setNavigationPath(URIPath)} and {@link #setBookmark(Bookmark)}.  
 	@param navigationPath The navigation path relative to the application context path.
 	@param bookmark The bookmark for which navigation should occur at this navigation path, or <code>null</code> if there is no bookmark involved in navigation.
 	@param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
 	@exception NullPointerException if the given navigation path is <code>null</code>.
-	@see #setNavigationPath(String)
+	@see #setNavigationPath(URIPath)
 	@see #setBookmark(Bookmark)
 	@see #getApplicationFrame()
 	*/
-	public void setNavigation(final String navigationPath, final Bookmark bookmark, final URI referrerURI);
+	public void setNavigation(final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI);
 
 	/**Fires a {@link NavigationEvent} to all {@link NavigationListener}s in the session application frame hierarchy.
 	@param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
@@ -537,7 +538,7 @@ public interface GuiseSession extends PropertyBindable
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 	@see #navigate(URI)
 	*/
-	public void navigate(final String path);
+	public void navigate(final URIPath path);
 
 	/**Requests navigation to the specified path in an identified viewport.
 	The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
@@ -548,7 +549,7 @@ public interface GuiseSession extends PropertyBindable
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 	@see #navigate(URI, String)
 	*/
-	public void navigate(final String path, final String viewportID);
+	public void navigate(final URIPath path, final String viewportID);
 
 	/**Requests navigation to the specified path and bookmark.
 	The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
@@ -559,7 +560,7 @@ public interface GuiseSession extends PropertyBindable
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 	@see #navigate(URI)
 	*/
-	public void navigate(final String path, final Bookmark bookmark);
+	public void navigate(final URIPath path, final Bookmark bookmark);
 
 	/**Requests navigation to the specified path and bookmark in an identified viewport.
 	The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
@@ -571,7 +572,7 @@ public interface GuiseSession extends PropertyBindable
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 	@see #navigate(URI, String)
 	*/
-	public void navigate(final String path, final Bookmark bookmark, final String viewportID);
+	public void navigate(final URIPath path, final Bookmark bookmark, final String viewportID);
 
 	/**Requests navigation to the specified URI.
 	The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
@@ -599,7 +600,7 @@ public interface GuiseSession extends PropertyBindable
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 	@see #navigateModal(URI, ModalNavigationListener)
 	*/
-	public void navigateModal(final String path, final ModalNavigationListener modalListener);
+	public void navigateModal(final URIPath path, final ModalNavigationListener modalListener);
 
 	/**Requests modal navigation to the specified path and bookmark.
 	The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
@@ -611,7 +612,7 @@ public interface GuiseSession extends PropertyBindable
 	@exception IllegalArgumentException if the provided path specifies a URI scheme (i.e. the URI is absolute) and/or authority (in which case {@link #navigate(URI)} should be used instead).
 	@see #navigateModal(URI, ModalNavigationListener)
 	*/
-	public void navigateModal(final String path, final Bookmark bookmark, final ModalNavigationListener modalListener);
+	public void navigateModal(final URIPath path, final Bookmark bookmark, final ModalNavigationListener modalListener);
 
 	/**Requests modal navigation to the specified URI.
 	The session need not perform navigation immediately or ever, and may postpone or deny navigation at some later point.
@@ -621,13 +622,6 @@ public interface GuiseSession extends PropertyBindable
 	@exception NullPointerException if the given URI is <code>null</code>.
 	*/
 	public void navigateModal(final URI uri, final ModalNavigationListener modalListener);
-
-	/**Generates a new ID string unique to this session.
-	This ID is appropriate for being used in a new component, for example.
-	The ID will begin with a letter and be composed only of letters and numbers.
-	@return A new ID unique to this session.
-	*/
-	public String generateID();
 
 	/**Called when the session is initialized.
 	@exception IllegalStateException if the session is already initialized.
@@ -654,7 +648,7 @@ public interface GuiseSession extends PropertyBindable
 	@see GuiseApplication#createTempPublicResource(String, String, GuiseSession)
 	@see GuiseApplication#getTempDirectory()
 	*/
-	public String createTempPublicResource(final String baseName, final String extension) throws IOException;
+	public URIPath createTempPublicResource(final String baseName, final String extension) throws IOException;
 
 	/**Creates a component to indicate Guise busy status.
 	@return A component to indicate Guise busy status.

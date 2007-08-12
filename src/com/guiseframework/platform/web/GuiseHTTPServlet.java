@@ -53,6 +53,7 @@ import com.garretwilson.net.Resource;
 import com.garretwilson.net.ResourceIOException;
 import com.garretwilson.net.ResourceNotFoundException;
 import com.garretwilson.net.URIConstants;
+import com.garretwilson.net.URIPath;
 import com.garretwilson.net.URIUtilities;
 import com.garretwilson.net.http.*;
 import com.garretwilson.net.mime.ContentDispositionType;
@@ -80,8 +81,6 @@ import com.garretwilson.rdf.dublincore.DCUtilities;
 import com.garretwilson.rdf.maqro.Activity;
 import com.garretwilson.rdf.maqro.MAQROUtilities;
 import com.garretwilson.rdf.ploop.PLOOPProcessor;
-import static com.garretwilson.rdf.xpackage.MIMEOntologyUtilities.*;
-import static com.garretwilson.rdf.xpackage.FileOntologyUtilities.*;
 import com.garretwilson.security.Nonce;
 import com.garretwilson.servlet.ServletUtilities;
 import com.garretwilson.servlet.http.HttpServletConstants;
@@ -92,6 +91,7 @@ import static com.garretwilson.text.xml.stylesheets.css.XMLCSSConstants.*;
 import com.garretwilson.text.xml.xhtml.XHTMLConstants;
 import com.garretwilson.text.xml.xpath.*;
 import com.garretwilson.util.*;
+import com.globalmentor.marmot.Marmot;
 import com.guiseframework.*;
 import com.guiseframework.Bookmark.Parameter;
 import com.guiseframework.component.*;
@@ -412,8 +412,8 @@ Debug.trace("checking for categories");
 //TODO del				Debug.trace("context path", getContextPath());
 				final URI requestURI=URI.create(request.getRequestURL().toString());	//get the URI of the current request
 //			TODO del	Debug.trace("requestURI", requestURI);
-				final String containerBasePath=getContextPath()+PATH_SEPARATOR;	//determine the base path of the container TODO important: determine if getContextPath() returns the raw path, as we want; otherwise, this will not work correctly for context paths with encoded path characters
-				final URI containerBaseURI=changeRawPath(requestURI, containerBasePath);	//determine the container base URI
+				final URIPath containerBasePath=new URIPath(getContextPath()+PATH_SEPARATOR);	//determine the base path of the container TODO important: determine if getContextPath() returns the raw path, as we want; otherwise, this will not work correctly for context paths with encoded path characters
+				final URI containerBaseURI=changeRawPath(requestURI, containerBasePath.toString());	//determine the container base URI
 //			TODO del	Debug.trace("containerURI", containerBaseURI);
 	
 				final ServletContext servletContext=getServletContext();	//get the servlet context
@@ -423,8 +423,8 @@ Debug.trace("checking for categories");
 					//install the application into the container
 				final AbstractGuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
 						//"/contextPath" or "", "/servletPath" or ""
-				final String guiseApplicationBasePath=request.getContextPath()+request.getServletPath()+PATH_SEPARATOR;	//construct the Guise application base path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash
-				final String guiseApplicationRelativePath=relativizePath(containerBasePath, guiseApplicationBasePath);	//get the application path relative to the container path
+				final URIPath guiseApplicationBasePath=new URIPath(request.getContextPath()+request.getServletPath()+PATH_SEPARATOR);	//construct the Guise application base path from the servlet request, which is the concatenation of the web application path and the servlet's path with an ending slash
+				final URIPath guiseApplicationRelativePath=containerBasePath.relativize(guiseApplicationBasePath);	//get the application path relative to the container path
 
 //TODO del Debug.trace("context path", request.getContextPath(), "servlet path", request.getServletPath(), "container base path", containerBasePath, "application base path", guiseApplicationBasePath, "application relative path", guiseApplicationRelativePath);
 				
@@ -471,7 +471,7 @@ Debug.trace("checking for categories");
 //	TODO del final Runtime runtime=Runtime.getRuntime();	//get the runtime instance
 //	TODO del Debug.info("before service request: memory max", runtime.maxMemory(), "total", runtime.totalMemory(), "free", runtime.freeMemory(), "used", runtime.totalMemory()-runtime.freeMemory());
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
-		final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
+		final URIPath navigationPath=new URIPath(rawPathInfo.substring(1));	//remove the beginning slash to get the navigation path from the path info
 /*TODO del
 final Enumeration headerNames=request.getHeaderNames();	//TODO del
 while(headerNames.hasMoreElements())
@@ -480,7 +480,7 @@ while(headerNames.hasMoreElements())
 	Debug.info("request header:", headerName, request.getHeader(headerName));
 }
 */
-		if(navigationPath.startsWith(GuiseApplication.GUISE_RESERVED_BASE_PATH))	//if this is a request for a Guise reserved path (e.g. a public resource or a temporary resource)
+		if(navigationPath.toString().startsWith(GuiseApplication.GUISE_RESERVED_BASE_PATH.toString()))	//if this is a request for a Guise reserved path (e.g. a public resource or a temporary resource)
 		{
 			super.doGet(request, response);	//go ahead and retrieve the resource immediately
 			return;	//don't try to see if there is a navigation path for this path
@@ -590,22 +590,20 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 
 		final String rawPathInfo=getRawPathInfo(request);	//get the raw path info
 		assert isAbsolutePath(rawPathInfo) : "Expected absolute path info, received "+rawPathInfo;	//the Java servlet specification says that the path info will start with a '/'
-		final String navigationPath=rawPathInfo.substring(1);	//remove the beginning slash to get the navigation path from the path info
+		final URIPath navigationPath=new URIPath(rawPathInfo.substring(1));	//remove the beginning slash to get the navigation path from the path info
 		if(!isAJAX && (GET_METHOD.equals(request.getMethod()) || !(destination instanceof ResourceWriteDestination)))	//if this is not an AJAX request, verify that the destination exists (doing this with AJAX requests would be too costly; we can assume that AJAX requests are for existing destinations) (but don't check if this is a POST to a ResourceWriteDestination, which probably won't exist; TODO clarify exist() semantics for ResourceWriteDestinations)
 		{
 			final Bookmark bookmark=getBookmark(request);	//get the bookmark from this request
 			final String referrer=getReferer(request);	//get the request referrer, if any
 			final URI referrerURI=referrer!=null ? getPlainURI(URI.create(referrer)) : null;	//get a plain URI version of the referrer, if there is a referrer
-			if(!destination.exists(guiseSession, navigationPath, bookmark, referrerURI))	//if this destination doesn't exist	
+			final URIPath newPath=destination.getPath(guiseSession, navigationPath, bookmark, referrerURI);	//see if we should use another path
+			if(!newPath.equals(navigationPath))	//if we should use another path
 			{
-				if(!isCollectionPath(navigationPath) && destination.exists(guiseSession, navigationPath+PATH_SEPARATOR, bookmark, referrerURI))	//if a non-collection path was requested for a path that, if a path separator were added, would be an existing collection
-				{
-					redirect(requestURI, bookmark, navigationPath+PATH_SEPARATOR, guiseApplication, true);	//be nice by redirecting the user agent to the collection path
-				}
-				else	//we have no idea which valid path, if any, they intended
-				{
-					throw new HTTPNotFoundException("Path does not exist at Guise destination: "+navigationPath);
-				}
+				redirect(requestURI, bookmark, newPath, guiseApplication, true);	//redirecting the user agent to the preferred path
+			}
+			else if(!destination.exists(guiseSession, navigationPath, bookmark, referrerURI))	//if this destination doesn't exist	
+			{
+				throw new HTTPNotFoundException("Path does not exist at Guise destination: "+navigationPath);
 			}
 		}
 		if(destination instanceof ComponentDestination)	//if we have a component destination associated with the requested path
@@ -660,10 +658,10 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
 								final String itemContentType=fileItemStream.getContentType();	//get the item content type, if any
 								if(itemContentType!=null)	//if we know the item's content type
 								{
-									setContentType(resourceDescription, createContentType(itemContentType));	//set the resource's content type
+									Marmot.setContentType(resourceDescription, createContentType(itemContentType));	//set the resource's content type
 								}
 								final String name=getFilename(itemName);	//removing any extraneous path information a browser such as IE or Opera might have given
-								setName(resourceDescription, name);	//specify the name provided to us 
+								Marmot.setName(resourceDescription, name);	//specify the name provided to us 
 								
 								try
 								{
@@ -768,7 +766,7 @@ Debug.trace("servicing Guise request with request URI:", requestURI);
   @param navigationPath The navigation path relative to the application base path.
   @exception IOException if there is an error reading or writing data.
   */
-	private void serviceGuiseComponentDestinationRequest(final HttpServletRequest request, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ComponentDestination componentDestination, final URI requestURI, final String navigationPath) throws IOException
+	private void serviceGuiseComponentDestinationRequest(final HttpServletRequest request, final HttpServletResponse response, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ComponentDestination componentDestination, final URI requestURI, final URIPath navigationPath) throws IOException
 	{
 		final HTTPServletWebPlatform guisePlatform=(HTTPServletWebPlatform)guiseSession.getPlatform();	//get the web platform		
 		final String contentTypeString=request.getContentType();	//get the request content type
@@ -1278,7 +1276,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 	*/
 	protected void redirect(final URI requestURI, final Bookmark bookmark, final GuiseApplication guiseApplication, final RedirectDestination redirectDestination) throws HTTPRedirectException
 	{
-		final String redirectPath;	//the path to which direction should occur
+		final URIPath redirectPath;	//the path to which direction should occur
 		if(redirectDestination instanceof ReferenceDestination)	//if the destination references another destination
 		{
 			redirectPath=((ReferenceDestination)redirectDestination).getDestination().getPath();	//get the path of the referenced destination TODO what if the referenced destination is itself a redirect? should we support that, too? probably
@@ -1315,9 +1313,9 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 	@param permanent <code>true</code> if the redirect should be permanent.
 	@throws HTTPRedirectException unconditionally to indicate how and to where redirection should occur.
 	*/
-	protected void redirect(final URI requestURI, final Bookmark bookmark, final String redirectPath, final GuiseApplication guiseApplication, final boolean permanent) throws HTTPRedirectException
+	protected void redirect(final URI requestURI, final Bookmark bookmark, final URIPath redirectPath, final GuiseApplication guiseApplication, final boolean permanent) throws HTTPRedirectException
 	{
-		URI redirectURI=requestURI.resolve(guiseApplication.resolvePath(redirectPath));	//resolve the path to the application and resolve that against the request URI
+		URI redirectURI=requestURI.resolve(guiseApplication.resolvePath(redirectPath).toURI());	//resolve the path to the application and resolve that against the request URI
 		if(bookmark!=null)	//if a bookmark was given
 		{
 			redirectURI=appendRawQuery(redirectURI, bookmark.toString().substring(1));	//append the bookmark to the redirect URI TODO use a better way of extracting the bookmark query information
@@ -1341,8 +1339,9 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 	protected void synchronizeCookies(final HttpServletRequest request, final HttpServletResponse response, final GuiseSession guiseSession)
 	{
 			//remove unneeded cookies from the request						
-		final String applicationBasePath=guiseSession.getApplication().getBasePath();	//get the application's base path
+		final URIPath applicationBasePath=guiseSession.getApplication().getBasePath();	//get the application's base path
 		assert applicationBasePath!=null : "Application not yet installed during cookie synchronization.";
+		final String applicationBasePathString=applicationBasePath.toString();	//we'll need the string version of the base path for later
 		final Environment environment=guiseSession.getPlatform().getEnvironment();	//get the platform's environment
 		final Cookie[] cookies=request.getCookies();	//get the cookies in the request
 		final Map<String, Cookie> cookieMap=new HashMap<String, Cookie>(cookies!=null ? cookies.length : 0);	//create a map to hold the cookies for quick lookup
@@ -1371,7 +1370,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 					else	//if there is no such environment property, remove the cookie
 					{
 						cookie.setValue(null);	//remove the value now
-						cookie.setPath(applicationBasePath);	//set the cookie path to the application base path, because we'll need the same base path as the one that was set
+						cookie.setPath(applicationBasePathString);	//set the cookie path to the application base path, because we'll need the same base path as the one that was set
 						cookie.setMaxAge(0);	//tell the cookie to expire immediately
 						response.addCookie(cookie);	//add the cookie to the response to delete it
 					}
@@ -1389,7 +1388,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 				if(environmentPropertyValue!=null)	//if there is a non-null environment property value
 				{									
 					final Cookie cookie=new Cookie(environmentPropertyName, encode(environmentPropertyValue));	//create a new cookie with the encoded property value
-					cookie.setPath(applicationBasePath);	//set the cookie path to the application base path
+					cookie.setPath(applicationBasePathString);	//set the cookie path to the application base path
 					cookie.setMaxAge(Integer.MAX_VALUE);	//don't allow the cookie to expire for a very long time
 					response.addCookie(cookie);	//add the cookie to the response
 				}
@@ -1835,7 +1834,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	*/
 	protected void beginModalNavigation(final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ModalNavigation modalNavigation)
 	{
-		final String navigationPath=guiseApplication.relativizeURI(modalNavigation.getNewNavigationURI());	//get the navigation path for the modal navigation
+		final URIPath navigationPath=guiseApplication.relativizeURI(modalNavigation.getNewNavigationURI());	//get the navigation path for the modal navigation
 		final Destination destination=guiseApplication.getDestination(navigationPath);	//get the destination for this path TODO maybe add a GuiseSession.getDestination()
 		if(destination instanceof ComponentDestination)	//if the destination is a component destination
 		{
@@ -1999,7 +1998,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
 	protected boolean canSubstitute(final HttpServletRequest request, final URI requestedResourceURI, final URI substituteResourceURI) throws IOException
 	{
   	final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-  	final String path=guiseApplication.relativizeURI(requestedResourceURI);	//get the application-relative path TODO probably change this to be the same logic as for getting the navigation path
+  	final URIPath path=guiseApplication.relativizeURI(requestedResourceURI);	//get the application-relative path TODO probably change this to be the same logic as for getting the navigation path
 		if(guiseApplication.hasDestination(path))	//if the application has a registered destination at the requested URI
 		{
 			return false;	//don't allow URI substitutions for any registered destination
@@ -2026,7 +2025,7 @@ Debug.trace("***********number of distinct parameter keys", parameterListMap.siz
   		return Guise.getInstance().hasGuisePublicResourceURL(publicResourceKey);	//see if there is a public resource for this key
   	}
   	final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-  	final String path=guiseApplication.relativizeURI(resourceURI);	//get the application-relative path TODO probably change this to be the same logic as for getting the navigation path
+  	final URIPath path=guiseApplication.relativizeURI(resourceURI);	//get the application-relative path TODO probably change this to be the same logic as for getting the navigation path
   		//check for a temporary public resource
   	if(guiseApplication.hasTempPublicResource(path))	//if the URI represents a valid temporary public resource
   	{
@@ -2092,8 +2091,8 @@ Debug.trace("this is a destination");
 	@see #isGuisePublicResourceURI(URI)
 	@see #getGuisePublicResourceKey(URI)
 	@see Guise#getGuisePublicResourceURL(String)
-	@see GuiseApplication#hasTempPublicResource(String)
-	@see GuiseApplication#getInputStream(String)
+	@see GuiseApplication#hasTempPublicResource(URIPath)
+	@see GuiseApplication#getInputStream(URIPath)
 	@see ResourceReadDestination
   */
 	protected HTTPServletResource getResource(final HttpServletRequest request, final URI resourceURI) throws IllegalArgumentException, IOException
@@ -2116,11 +2115,10 @@ Debug.trace("this is a destination");
   	else	//if this is not a Guise public resource, see if it is a temporary public resource of the application, or a Guise resource destination
   	{
   		final GuiseApplication guiseApplication=getGuiseApplication();	//get the Guise application
-			final String applicationBasePath=guiseApplication.getBasePath();	//get the application base path
+			final URIPath applicationBasePath=guiseApplication.getBasePath();	//get the application base path
   		final String rawPath=resourceURI.getRawPath();	//get the raw path of the requested resource
-			final String relativePath=rawPath!=null ? relativizePath(applicationBasePath, rawPath) : null;	//relativize the raw path to the base path
-			final String tempRelativePath=relativePath!=null && relativePath.startsWith(GuiseApplication.GUISE_PUBLIC_TEMP_BASE_PATH) ? relativePath : null;	//see if this is a path to a Guise temporary public resource
-			if(tempRelativePath!=null)	//if this is a path to a temporary public file
+			final URIPath relativePath=rawPath!=null ? applicationBasePath.relativize(rawPath) : null;	//relativize the raw path to the base path
+			if(relativePath!=null && relativePath.toString().startsWith(GuiseApplication.GUISE_PUBLIC_TEMP_BASE_PATH.toString()))	//if this is a path to a Guise temporary public resource
 			{
 				final HTTPServletGuiseContainer guiseContainer=getGuiseContainer();	//get the Guise container
 				final GuiseSession guiseSession=HTTPServletGuiseSessionManager.getGuiseSession(guiseContainer, guiseApplication, request);	//retrieve the Guise session for this container and request TODO see if we can request a session without forcing one to be created, if that's useful
@@ -2141,7 +2139,7 @@ Debug.trace("this is a destination");
 			}
 			else	//if this is not a Guise public resource or a temporary resource, see if it is a destination resource
 			{
-		  	final String path=guiseApplication.relativizeURI(resourceURI);	//get the application-relative path TODO is this correct? what if it's a different base URI than was created by the application? check all this---this may even be made redundant by code above; fix in exists() as well
+		  	final URIPath path=guiseApplication.relativizeURI(resourceURI);	//get the application-relative path TODO is this correct? what if it's a different base URI than was created by the application? check all this---this may even be made redundant by code above; fix in exists() as well
 				final Destination destination=guiseApplication.getDestination(path);	//get the destination for the given path
 	  		if(destination instanceof ResourceReadDestination)	//if this is a request for a resource destination
 	  		{
@@ -2311,7 +2309,7 @@ Debug.trace("this is a destination");
 		final GuiseApplication guiseApplication;
 		final GuiseSession guiseSession;
 		final ResourceReadDestination resourceDestination;
-		final String navigationPath;
+		final URIPath navigationPath;
 		final Bookmark bookmark;
 		final URI referrerURI;
 
@@ -2370,7 +2368,7 @@ Debug.trace("this is a destination");
 		@param referrerURI The URI of the referring navigation panel or other entity with no query or fragment, or <code>null</code> if no referring URI is known.
 		@exception NullPointerException if the reference URI, resource description, Guise container, Guise application, Guise session, resource destination, navigation path, and/or bookmark is <code>null</code>.
 		*/
-		public DestinationResource(final URI referenceURI, final RDFResource resourceDescription, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ResourceReadDestination resourceDestination, final String navigationPath, final Bookmark bookmark, final URI referrerURI)
+		public DestinationResource(final URI referenceURI, final RDFResource resourceDescription, final HTTPServletGuiseContainer guiseContainer, final GuiseApplication guiseApplication, final GuiseSession guiseSession, final ResourceReadDestination resourceDestination, final URIPath navigationPath, final Bookmark bookmark, final URI referrerURI)
 		{
 			super(referenceURI, resourceDescription);	//construct the parent class
 			this.guiseContainer=checkInstance(guiseContainer, "Guise container cannot be null.");
@@ -2392,20 +2390,14 @@ Debug.trace("this is a destination");
 	*/
 	public boolean isGuisePublicResourceURI(final URI uri)
 	{
-		final String rawPath=uri.getRawPath();	//get the raw path of the URI
-		if(rawPath!=null)	//if there is a raw path
-		{
+			//TODO do we need to ensure that the given URI has a non-null raw path, like we used to, and return false if not?
+		final URIPath path=new URIPath(uri.getRawPath());	//get the URI path TODO check this assumption of the domain when that gets rewritten
 //		TODO del 	Debug.trace("is public resource URI?", uri);
-			final String applicationBasePath=getGuiseApplication().getBasePath();	//get the application base path
+		final URIPath applicationBasePath=getGuiseApplication().getBasePath();	//get the application base path
 //		TODO del Debug.trace("application base path", applicationBasePath);
-			final String relativePath=relativizePath(applicationBasePath, rawPath);	//relativize the raw path to the base path
+		final URIPath relativePath=applicationBasePath.relativize(path);	//relativize the raw path to the base path
 //		TODO del Debug.trace("relativePath", relativePath);
-			return relativePath.startsWith(GuiseApplication.GUISE_PUBLIC_RESOURCE_BASE_PATH);	//see if the relative path starts with the Guise public resource base path
-		}
-		else	//if there is no raw path
-		{
-			return false;	//this is not a public resource URI
-		}
+		return relativePath.toString().startsWith(GuiseApplication.GUISE_PUBLIC_RESOURCE_BASE_PATH.toString());	//see if the relative path starts with the Guise public resource base path
 	}
 
 	/**Determines the Guise public resource key for the given URI.
@@ -2421,17 +2413,15 @@ Debug.trace("this is a destination");
 	*/
 	public String getGuisePublicResourceKey(final URI uri)
 	{
-		final String rawPath=uri.getRawPath();	//get the raw path of the URI
-		if(rawPath==null)	//if the raw path is null
-		{
-			throw new IllegalArgumentException("Guise public resource URI "+uri+" has no path.");
-		}
-		final String applicationBasePath=getGuiseApplication().getBasePath();	//get the application base path
-		final String relativePath=relativizePath(applicationBasePath, rawPath);	//relativize the raw path to the base path
-		if(!relativePath.startsWith(GuiseApplication.GUISE_PUBLIC_RESOURCE_BASE_PATH))	//if this isn't a public resource URI
+		final URIPath rawPath=new URIPath(uri.getRawPath());	//get the raw path of the URI
+		final URIPath applicationBasePath=getGuiseApplication().getBasePath();	//get the application base path
+		final URIPath relativePath=applicationBasePath.relativize(rawPath);	//relativize the raw path to the base path
+		final String relativePathString=relativePath.toString();	//get the relative path as a string
+		final String guisePublicResourceBasePathString=GuiseApplication.GUISE_PUBLIC_RESOURCE_BASE_PATH.toString();	//get the Guise public resource base path as a string
+		if(!relativePathString.startsWith(guisePublicResourceBasePathString))	//if this isn't a public resource URI
 		{
 			throw new IllegalArgumentException("URI "+uri+ " does not identify a Guise public resource.");
 		}
-		return GUISE_PUBLIC_RESOURCE_BASE_KEY+relativePath.substring(GuiseApplication.GUISE_PUBLIC_RESOURCE_BASE_PATH.length());	//replace the beginning of the relative path with the resource base path
+		return GUISE_PUBLIC_RESOURCE_BASE_KEY+relativePathString.substring(guisePublicResourceBasePathString.length());	//replace the beginning of the relative path with the resource base path
 	}
 }
