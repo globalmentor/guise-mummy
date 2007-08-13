@@ -338,14 +338,16 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 					tableStyles.put(CSS_PROP_WIDTH, "100%");	//indicate that the table should take up all available horizontal space
 					writeStyleAttribute(tableStyles);	//write the table's styles
 				}
-/*TODO del; messes up frames
-				else	//TODO testing
+///*TODO del; messes up frames
+/*TODO fix; we may be able to get around this by checking the parent
+				else if(!(component.getParent() instanceof Frame))	//TODO testing
 				{
-					final Map<String, String> tableStyles=new HashMap<String, String>();	//create a new map of styles
+					final Map<String, Object> tableStyles=new HashMap<String, Object>();	//create a new map of styles
 					tableStyles.put(CSS_PROP_WIDTH, "100%");	//indicate that the table should take up all available horizontal space TODO check orientation
-					writeStyleAttribute(context, tableStyles);	//write the table's styles
+					writeStyleAttribute(tableStyles);	//write the table's styles
 				}
 */
+//*/
 				writeDirectionAttribute(orientation, flowX);	//explicitly write the direction ("ltr" or "rtl") for this flow so that the orientation will be taken into account
 				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TBODY);	//<xhtml:tbody> (IE will not show dynamically-allocated tables without a tbody)
 				depictContext.indent();	//increase the indentation
@@ -355,7 +357,24 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 					{
 						case X:	//if we should span the top and bottom components horizontally
 							if(topComponent!=null)	//if there is a top component TODO fix to determine if the top and bottom component should span columns or vice-versa, based upon the orientation
-							{
+							{								
+								if(regionLayout.isFixed() && rowComponentCount>0)	//if this is a fixed layout with row component, write dummy components for the rows so that fixed layout will know their sizes
+								{
+									depictContext.write("\n");	//format the output
+									depictContext.writeIndent();	//write an indentation
+									depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TR);	//<xhtml:tr>					
+									for(int columnIndex=0; columnIndex<Region.FLOW_REGION_COUNT; ++columnIndex)	//for each column
+									{
+										final Component rowComponent=rowComponents[columnIndex];	//get the component for this column
+										if(rowComponent!=null)	//if we have a component for this column
+										{
+											depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TD);	//<xhtml:td>
+											beginRegion(regionLayout, regionLayout.getConstraints(rowComponent), orientation, true, false);	//write the size for this region
+											depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TD);	//</xhtml:td>					
+										}
+									}
+									depictContext.writeElementEnd(XHTML_NAMESPACE_URI, ELEMENT_TR);	//</xhtml:tr>									
+								}
 								depictContext.write("\n");	//format the output
 								depictContext.writeIndent();	//write an indentation
 								depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TR);	//<xhtml:tr>					
@@ -380,7 +399,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 								for(int columnIndex=0; columnIndex<Region.FLOW_REGION_COUNT; ++columnIndex)	//for each column
 								{
 									final Component rowComponent=rowComponents[columnIndex];	//get the component for this column
-									if(rowComponent!=null)	//if we have a componet for this column
+									if(rowComponent!=null)	//if we have a component for this column
 									{
 										depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TD);	//<xhtml:td>
 										depictContext.writeAttribute(null, ATTRIBUTE_CLASS, ROW_REGION_CLASSES[columnIndex]);	//class="layout-region-left/center/right"
@@ -544,29 +563,49 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 	*/
 	protected void beginRegion(final RegionLayout regionLayout, final RegionConstraints regionConstraints, final Orientation orientation) throws IOException
 	{
+		beginRegion(regionLayout, regionConstraints, orientation, true, true);	//begin the region including size and other styles
+	}
+
+	/**Writes an XHTML style attribute for the given region, if style information is needed for that region.
+	This version writes alignment and style attributes.
+	@param regionLayout The region layout being rendered.
+	@param regionConstraints The constraints for the region about to be written.
+	@param orientation The orientation of the component for which the region is being rendered.
+	@param includeSize Whether size information should be included.
+	@param includeStyles Whether non-size-related style information should be included.
+	@exception IOException if there is an error writing the attribute.
+	*/
+	protected void beginRegion(final RegionLayout regionLayout, final RegionConstraints regionConstraints, final Orientation orientation, final boolean includeSize, final boolean includeStyles) throws IOException
+	{
 		final WebDepictContext depictContext=getDepictContext();	//get the depict context
 		final Map<String, Object> styles=new HashMap<String, Object>();	//create a new map of styles
-		for(final Flow flow:Flow.values())	//for each flow, write an alignment attribute and the width or height
+		if(includeSize)	//if we should include the size
 		{
-			final double alignment=regionConstraints.getAlignment(flow);	//get the alignment
-			final Axis axis=orientation.getAxis(flow);	//get the axis of the flow
-			final Flow.Direction direction=orientation.getDirection(flow);	//get the direction of the flow
-			final String align=getAlign(alignment, axis, direction);	//determine the align string from the alignment value TODO does the direction attribute take care of this automatically in rtl configuraitons?
-			final String alignAttributeName=axis==Axis.X ? ELEMENT_TD_ATTRIBUTE_ALIGN : ELEMENT_TD_ATTRIBUTE_VALIGN;	//use the correct <td> attribute for the fline
-			depictContext.writeAttribute(null, alignAttributeName, align);	//align="align"
-			final Extent extent=regionConstraints.getExtent(flow);	//get the extent for this flow
-			if(extent!=null)	//if this region has a requested extent for this flow
+			for(final Flow flow:Flow.values())	//for each flow, write an alignment attribute and the width or height
 			{
-				styles.put(axis==Axis.X ? CSS_PROP_WIDTH : CSS_PROP_HEIGHT, CSSUtilities.toString(extent));	//indicate the width or height				
+				final double alignment=regionConstraints.getAlignment(flow);	//get the alignment
+				final Axis axis=orientation.getAxis(flow);	//get the axis of the flow
+				final Flow.Direction direction=orientation.getDirection(flow);	//get the direction of the flow
+				final String align=getAlign(alignment, axis, direction);	//determine the align string from the alignment value TODO does the direction attribute take care of this automatically in rtl configuraitons?
+				final String alignAttributeName=axis==Axis.X ? ELEMENT_TD_ATTRIBUTE_ALIGN : ELEMENT_TD_ATTRIBUTE_VALIGN;	//use the correct <td> attribute for the fline
+				depictContext.writeAttribute(null, alignAttributeName, align);	//align="align"
+				final Extent extent=regionConstraints.getExtent(flow);	//get the extent for this flow
+				if(extent!=null)	//if this region has a requested extent for this flow
+				{
+					styles.put(axis==Axis.X ? CSS_PROP_WIDTH : CSS_PROP_HEIGHT, CSSUtilities.toString(extent));	//indicate the width or height				
+				}
 			}
 		}
-		for(final Border border:Border.values())	//for each logical border
-		{
-			final Side side=orientation.getSide(border);	//get the absolute side on which this border lies
-			final Extent paddingExtent=regionConstraints.getPaddingExtent(border);	//get the padding extent for this border
-			if(paddingExtent.getValue()!=0)	//if a non-zero padding extent is specified (the stylesheet specifies a zero default padding)
+		if(includeStyles)	//if we should include other styles
+		{		
+			for(final Border border:Border.values())	//for each logical border
 			{
-				styles.put(CSS_PROPERTY_PADDING_X_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(paddingExtent));	//set the padding extent
+				final Side side=orientation.getSide(border);	//get the absolute side on which this border lies
+				final Extent paddingExtent=regionConstraints.getPaddingExtent(border);	//get the padding extent for this border
+				if(paddingExtent.getValue()!=0)	//if a non-zero padding extent is specified (the stylesheet specifies a zero default padding)
+				{
+					styles.put(CSS_PROPERTY_PADDING_X_TEMPLATE.apply(getSerializationName(side)), CSSUtilities.toString(paddingExtent));	//set the padding extent
+				}
 			}
 		}
 		writeStyleAttribute(styles);	//write the styles

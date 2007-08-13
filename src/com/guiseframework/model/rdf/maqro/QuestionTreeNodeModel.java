@@ -49,7 +49,7 @@ public class QuestionTreeNodeModel extends AbstractInteractionTreeNodeModel<Ques
 		final Question question=getValue();	//get the question
 		if(question!=null)	//if we have a question
 		{
-			final RDFListResource evaluationList=question.getEvaluations();	//get the evaluations
+			final RDFListResource<?> evaluationList=question.getEvaluations();	//get the evaluations
 			if(evaluationList!=null)	//if there are evaluations
 			{
 				for(final RDFObject evaluationObject:evaluationList)	//for each evaluation
@@ -87,7 +87,7 @@ public class QuestionTreeNodeModel extends AbstractInteractionTreeNodeModel<Ques
 		if(question!=null)	//if we have a question
 		{
 			final Set<Interaction> followups=new HashSet<Interaction>();	//create a set to keep track of which interactions we've added as followups
-			final RDFListResource evaluationList=question.getEvaluations();	//get the evaluations
+			final RDFListResource<?> evaluationList=question.getEvaluations();	//get the evaluations
 			if(evaluationList!=null)	//if there are evaluations
 			{
 				for(final RDFObject evaluationObject:evaluationList)	//for each evaluation

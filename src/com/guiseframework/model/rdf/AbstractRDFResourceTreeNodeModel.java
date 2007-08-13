@@ -174,7 +174,7 @@ public abstract class AbstractRDFResourceTreeNodeModel<V extends RDFResource> ex
 			{
 				if(rdfResource instanceof RDFListResource)	//if this is a list resource
 				{
-					for(final RDFObject value:(RDFListResource)rdfResource)	//for each child resource
+					for(final RDFObject value:(RDFListResource<?>)rdfResource)	//for each child resource
 					{
 						final RDFObjectTreeNodeModel<?> treeNode;	//we'll determine the tree node to use for this object
 						if(value instanceof RDFLiteral)	//if the value is a literal

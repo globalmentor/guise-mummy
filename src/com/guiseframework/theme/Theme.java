@@ -113,7 +113,7 @@ public class Theme extends ClassTypedRDFResource
 	}
 
 	/**@return The list of declarations, or <code>null</code> if there is no rule list.*/
-	public RDFListResource getDeclarations()
+	public RDFListResource<?> getDeclarations()
 	{
 		return asListResource(getPropertyValue(THEME_NAMESPACE_URI, DECLARATIONS_PROPERTY_NAME));	//return the theme:declarations list		
 	}
@@ -134,7 +134,7 @@ public class Theme extends ClassTypedRDFResource
 	{
 //Debug.trace("updating rules for theme", this);
 		classRuleMap.clear();	//clear the map of rules
-		final RDFListResource declarations=getDeclarations();	//get the declarations
+		final RDFListResource<?> declarations=getDeclarations();	//get the declarations
 		if(declarations!=null)	//if there is a rule list
 		{
 			for(final RDFObject declarationObject:declarations)	//for each resource in the list
