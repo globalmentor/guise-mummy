@@ -1436,7 +1436,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						}
 						final URI referenceURI=destinationResource.getResourceDescription().getReferenceURI();	//get the reference URI of the description, if any
 //Debug.trace("setting content disposition, reference URI", referenceURI);
-						setContentDisposition(response, contentDispositionType, referenceURI!=null ? getFileName(referenceURI) : null);	//set the response content disposition, suggesting the resource's filename if we can
+						setContentDisposition(response, contentDispositionType, referenceURI!=null ? getName(referenceURI) : null);	//set the response content disposition, suggesting the resource's decoded name if we can
 					}
 				}
 			}
