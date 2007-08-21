@@ -411,6 +411,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	This version applies the theme to the current layout and updates the layout theme applied status.
 	@exception IOException if there was an error loading or applying a theme.
 	@see GuiseApplication#isThemed()
+	@see #getTheme()
 	@see #applyTheme(Theme)
 	@see #setThemeApplied(boolean)
 	@see #setLayoutThemeApplied(boolean)

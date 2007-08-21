@@ -55,7 +55,7 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 				final URI oldImage=image;	//get the old value
 				image=newImage;	//actually change the value
 				firePropertyChange(IMAGE_PROPERTY, oldImage, newImage);	//indicate that the value changed
-			}			
+			}
 		}
 
 	/**Label model constructor.

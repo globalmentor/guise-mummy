@@ -8,19 +8,10 @@ import com.guiseframework.model.ValueModel;
 @param <V> The type of value to represent.
 @author Garret Wilson
 */
-public interface ValueControl<V> extends Control, ValueModel<V>, ValuedComponent<V>
+public interface ValueControl<V> extends Control, EditComponent, ValueModel<V>, ValuedComponent<V>
 {
 
 	/**The converter bound property.*/
 	public final static String CONVERTER_PROPERTY=getPropertyName(ValueControl.class, "converter");
 
-	/**@return Whether the value is editable and the control will allow the the user to change the value.*/
-	public boolean isEditable();
-
-	/**Sets whether the value is editable and the control will allow the the user to change the value.
-	This is a bound property of type <code>Boolean</code>.
-	@param newEditable <code>true</code> if the control should allow the user to change the value.
-	@see #EDITABLE_PROPERTY
-	*/
-	public void setEditable(final boolean newEditable);
 }

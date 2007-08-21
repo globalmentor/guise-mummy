@@ -6,8 +6,6 @@ import java.beans.PropertyVetoException;
 import java.util.*;
 import java.util.concurrent.*;
 
-import javax.swing.plaf.ComponentUI;
-
 import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.guiseframework.theme.Theme.*;
@@ -34,7 +32,7 @@ import com.guiseframework.validator.*;
 <p>Property changes to a column's UI model are repeated with the component as the source and the column UI model as the target.</p> 
 @author Garret Wilson
 */
-public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Table.CellComponentState> implements TableModel
+public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Table.CellComponentState> implements EditComponent, TableModel
 {
 
 	/**The display row count bound property.*/

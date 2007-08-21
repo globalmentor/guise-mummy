@@ -1,13 +1,11 @@
 package com.guiseframework.component;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyVetoException;
-
-import static com.garretwilson.lang.ObjectUtilities.*;
+import java.beans.*;
 
 import com.garretwilson.beans.*;
+import static com.garretwilson.lang.ObjectUtilities.*;
 import com.garretwilson.util.Debug;
+
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 import com.guiseframework.input.*;
@@ -22,7 +20,7 @@ and the command {@link ProcessCommand#ABORT} to {@link #getRejectActionPrototype
 @param <EC> The type of component being edited.
 @author Garret Wilson
 */
-public abstract class AbstractEditableComponentTextControl<EC extends Component> extends AbstractContainerControl implements ModalComponent<AbstractEditableComponentTextControl.Mode>  
+public abstract class AbstractEditableComponentTextControl<EC extends Component> extends AbstractContainerControl implements ModalComponent<AbstractEditableComponentTextControl.Mode>, EditComponent
 {
 
 	/**The mode of this component; whether the component is being edited.*/
@@ -54,7 +52,7 @@ public abstract class AbstractEditableComponentTextControl<EC extends Component>
 				final boolean oldEditable=editable;	//get the old value
 				editable=newEditable;	//actually change the value
 				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
-			}			
+			}
 		}
 
 	/**The current mode of interaction, or <code>null</code> if the component is in a modeless state.*/

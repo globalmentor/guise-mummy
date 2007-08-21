@@ -340,6 +340,13 @@ public interface Component extends DepictedObject, PresentationModel, LabelModel
 	*/
 	public boolean validate();
 
+	/**Returns the theme to apply to this component.
+	If there is no theme to this component, the parent theme will be returned. 
+	@return The theme to apply to this component.
+	@exception IOException if there is an error loading the theme.
+	*/
+	public Theme getTheme() throws IOException;
+
 	/**Update's this object's theme.
 	This method checks whether a theme has been applied to this object.
 	If a theme has not been applied to this object this method calls {@link #applyTheme()}.
@@ -358,6 +365,7 @@ public interface Component extends DepictedObject, PresentationModel, LabelModel
 	If the theme is successfully applied, this method updates the theme applied status.
 	@exception IOException if there was an error loading or applying a theme.
 	@see GuiseApplication#isThemed()
+	@see #getTheme()
 	@see #applyTheme(Theme)
 	@see #setThemeApplied(boolean)
 	*/

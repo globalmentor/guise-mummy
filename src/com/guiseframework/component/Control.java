@@ -20,8 +20,6 @@ public interface Control extends Component, InputFocusableComponent, Enableable
 		ERROR;
 	}
 
-	/**The editable bound property.*/
-	public final static String EDITABLE_PROPERTY=getPropertyName(Control.class, "editable");	//TODO decide if this should be moved down to ValueControl
 	/**The status bound property.*/
 	public final static String STATUS_PROPERTY=getPropertyName(Control.class, "status");
 

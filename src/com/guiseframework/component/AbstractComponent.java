@@ -1011,7 +1011,20 @@ Debug.trace("now valid of", this, "is", isValid());
 		}
 	}
 
-	
+	/**Returns the theme to apply to this component.
+	If there is no theme to this component, the parent theme will be returned. 
+	This version delegates to the parent version, if there is a parent component; otherwise, the session theme is returned.
+	@return The theme to apply to this component.
+	@exception IOException if there is an error loading the theme.
+	@see #getParent()
+	@see GuiseSession#getTheme()
+	*/
+	public Theme getTheme() throws IOException
+	{
+		final CompositeComponent parent=getParent();	//get this component's parent, if any
+		return parent!=null ? parent.getTheme() : getSession().getTheme();	//if there is no parent, return the session theme
+	}
+
 	/**Update's this object's theme.
 	This method checks whether a theme has been applied to this object.
 	If a theme has not been applied to this object this method calls {@link #applyTheme()}.
@@ -1027,7 +1040,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		if(!isThemeApplied())	//if a theme has not been applied to this component
 		{
 			applyTheme();	//apply the theme to this component
-		}		
+		}
 	}
 
 	/**Applies the theme to this objectd.
@@ -1036,6 +1049,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	If the theme is successfully applied, this method updates the theme applied status.
 	@exception IOException if there was an error loading or applying a theme.
 	@see GuiseApplication#isThemed()
+	@see #getTheme()
 	@see #applyTheme(Theme)
 	@see #setThemeApplied(boolean)
 	*/
@@ -1043,7 +1057,7 @@ Debug.trace("now valid of", this, "is", isValid());
 	{
 		if(getSession().getApplication().isThemed())	//if the application applies themes
 		{
-			applyTheme(getSession().getTheme());	//get the theme and apply it
+			applyTheme(getTheme());	//get the theme and apply it
 			setThemeApplied(true);	//indicate that the theme was successfully applied
 		}
 	}
