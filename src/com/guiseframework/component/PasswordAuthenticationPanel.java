@@ -70,20 +70,20 @@ public class PasswordAuthenticationPanel extends AbstractPanel
 			//username
 		usernameControl=new TextControl<String>(String.class);	//create the username text control
 		usernameControl.setLabel(LABEL_USERNAME);	//set the username control label
-		usernameControl.setIcon(GLYPH_USER);	//set the username control icon
+		usernameControl.setGlyphURI(GLYPH_USER);	//set the username control icon
 		add(usernameControl);	//add the ID control to the panel
 
 			//password
 		passwordControl=new TextControl<char[]>(char[].class);	//create the password text control
 		passwordControl.setLabel(LABEL_PASSWORD);	//set the password control label
-		passwordControl.setIcon(GLYPH_PASSWORD);	//set the password control icon
+		passwordControl.setGlyphURI(GLYPH_PASSWORD);	//set the password control icon
 		passwordControl.setMasked(true);	//mask the password input
 		add(passwordControl);	//add the password control to the panel
 
 			//password verification
 		passwordVerificationControl=new TextControl<char[]>(char[].class);	//create the password verification text control
 		passwordVerificationControl.setLabel(LABEL_PASSWORD);	//set the password verification control label
-		passwordVerificationControl.setIcon(GLYPH_PASSWORD);	//set the password verification control icon
+		passwordVerificationControl.setGlyphURI(GLYPH_PASSWORD);	//set the password verification control icon
 		passwordVerificationControl.setMasked(true);	//mask the password verification input
 		add(passwordVerificationControl);	//add the password verification control to the panel
 

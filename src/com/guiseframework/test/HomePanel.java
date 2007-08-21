@@ -144,7 +144,7 @@ catch(final ConversionException conversionException)
 		final SelectLink selectLink=new SelectLink();
 		selectLink.setLabel("This is a select link");
 		selectLink.setToggle(true);
-		selectLink.setSelectedIcon(URI.create("guise/images/accept.gif"));
+		selectLink.setSelectedGlyphURI(URI.create("guise/images/accept.gif"));
 		contentPanel.add(selectLink);
 
 		final TreeControl tree=new TreeControl();
@@ -740,7 +740,7 @@ Debug.trace("list control changed value to", newValue);
 */
 		
 		final Picture image=new Picture();
-		image.setImage(URI.create("http://www.garretwilson.com/photos/2000/february/cowcalf.jpg"));
+		image.setImageURI(URI.create("http://www.garretwilson.com/photos/2000/february/cowcalf.jpg"));
 /*TODO fix
 		image.setLabelText("Cow and Calf");
 		image.getModel().setMessage("A cow and her minutes-old calf.");

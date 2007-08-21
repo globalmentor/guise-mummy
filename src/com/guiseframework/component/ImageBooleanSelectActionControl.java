@@ -25,14 +25,14 @@ public class ImageBooleanSelectActionControl extends AbstractBooleanSelectAction
 	private URI image=null;
 
 		/**@return The image URI, which may be a resource URI, or <code>null</code> if there is no image URI.*/
-		public URI getImage() {return image;}
+		public URI getImageURI() {return image;}
 
 		/**Sets the URI of the image.
 		This is a bound property of type <code>URI</code>.
 		@param newImage The new URI of the image, which may be a resource URI.
-		@see ImageModel#IMAGE_PROPERTY
+		@see ImageModel#IMAGE_URI_PROPERTY
 		*/
-		public void setImage(final URI newImage)
+		public void setImageURI(final URI newImage)
 		{
 			if(!ObjectUtilities.equals(image, newImage))	//if the value is really changing
 			{

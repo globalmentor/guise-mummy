@@ -113,14 +113,14 @@ public abstract class AbstractComponent extends AbstractPresentationModel implem
 		}
 
 	/**@return The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.*/
-	public URI getIcon() {return getLabelModel().getIcon();}
+	public URI getGlyphURI() {return getLabelModel().getGlyphURI();}
 
 	/**Sets the URI of the icon.
 	This is a bound property of type <code>URI</code>.
 	@param newLabelIcon The new URI of the icon, which may be a resource URI.
-	@see #ICON_PROPERTY
+	@see #GLYPH_URI_PROPERTY
 	*/
-	public void setIcon(final URI newLabelIcon) {getLabelModel().setIcon(newLabelIcon);}
+	public void setGlyphURI(final URI newLabelIcon) {getLabelModel().setGlyphURI(newLabelIcon);}
 
 	/**@return The label text, which may include a resource reference, or <code>null</code> if there is no label text.*/
 	public String getLabel() {return getLabelModel().getLabel();}

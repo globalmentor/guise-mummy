@@ -26,7 +26,7 @@ public class WebValueSelectLinkDepictor<V, C extends SelectActionControl & Actio
 		final WebDepictContext depictContext=getDepictContext();	//get the depict context
 		final C component=getDepictedObject();	//get the component
 		final V value=component.getValue();	//get the selected value
-		final URI valueIcon=component.getValueIcon(value);	//get the value icon, if any
+		final URI valueIcon=component.getValueGlyphURI(value);	//get the value icon, if any
 		if(valueIcon!=null)	//if there is a selected icon
 		{
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IMG, true);	//<xhtml:img>

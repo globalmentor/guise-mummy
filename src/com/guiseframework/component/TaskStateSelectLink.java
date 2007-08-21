@@ -43,12 +43,12 @@ public class TaskStateSelectLink extends ValueSelectLink<TaskState>
 	public TaskStateSelectLink(final LabelModel labelModel, final ActionModel actionModel, final ValueModel<TaskState> valueModel, final Enableable enableable)
 	{
 		super(labelModel, actionModel, valueModel, enableable);	//construct the parent class		
-		setSelectedIcon(SELECT_ACTION_SELECTED_GLYPH_RESOURCE_URI);
-		setUnselectedIcon(SELECT_ACTION_UNSELECTED_GLYPH_RESOURCE_URI);
-		setValueIcon(null, TaskState.getNoGlyph());	//set the icon resource for no task state
+		setSelectedGlyphURI(SELECT_ACTION_SELECTED_GLYPH_RESOURCE_URI);
+		setUnselectedGlyphURI(SELECT_ACTION_UNSELECTED_GLYPH_RESOURCE_URI);
+		setValueGlyphURI(null, TaskState.getNoGlyph());	//set the icon resource for no task state
 		for(final TaskState taskState:TaskState.values())	//for each task status
 		{
-			setValueIcon(taskState, taskState.getGlyph());	//set the icon resource for this task state
+			setValueGlyphURI(taskState, taskState.getGlyph());	//set the icon resource for this task state
 		}
 	}
 

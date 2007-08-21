@@ -34,11 +34,11 @@ public class WebImageActionControlDepictor<C extends ImageComponent & ActionCont
 	/**Determines the image to use for this component.
 	This implementation returns the component's image.
 	@return The image to use for the component, or <code>null</code> if there should not be an image.
-	@see ImageComponent#getImage()
+	@see ImageComponent#getImageURI()
 	*/
 	protected URI getImage()
 	{
-		return getDepictedObject().getImage();	//return the component's normal image
+		return getDepictedObject().getImageURI();	//return the component's normal image
 	}
 	
 	/**Determines the rollover image to use for this component.

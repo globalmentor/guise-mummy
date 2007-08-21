@@ -24,7 +24,7 @@ public class WebSelectLinkDepictor<C extends SelectActionControl> extends WebLin
 		super.writeSupplementaryIcons();	//write the default suppementary icons TODO i18n direction
 		final WebDepictContext depictContext=getDepictContext();	//get the depict context
 		final C component=getDepictedObject();	//get the component
-		final URI selectedIcon=component.isSelected() ? component.getSelectedIcon() : component.getUnselectedIcon();	//we'll determine the selected icon based upon selected state
+		final URI selectedIcon=component.isSelected() ? component.getSelectedGlyphURI() : component.getUnselectedGlyphURI();	//we'll determine the selected icon based upon selected state
 		if(selectedIcon!=null)	//if there is a selected icon
 		{
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IMG, true);	//<xhtml:img>

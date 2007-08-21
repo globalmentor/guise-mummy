@@ -251,13 +251,13 @@ public class SequenceCardPanel extends AbstractCardPanel implements Commitable
 						if(hasNext)	//if there is a next TODO replace this with a proxy action prototype
 						{
 							continueActionPrototype.setLabel(nextActionPrototype.getLabel());	//copy the next action prototype properties
-							continueActionPrototype.setIcon(nextActionPrototype.getIcon());
+							continueActionPrototype.setGlyphURI(nextActionPrototype.getGlyphURI());
 							continueActionPrototype.setEnabled(nextActionPrototype.isEnabled());
 						}
 						else	//if there is no next
 						{
 							continueActionPrototype.setLabel(finishActionPrototype.getLabel());	//copy the finish action prototype properties
-							continueActionPrototype.setIcon(finishActionPrototype.getIcon());
+							continueActionPrototype.setGlyphURI(finishActionPrototype.getGlyphURI());
 							continueActionPrototype.setEnabled(finishActionPrototype.isEnabled());
 						}
 					}

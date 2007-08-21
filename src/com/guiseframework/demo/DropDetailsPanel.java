@@ -10,7 +10,7 @@ import com.guiseframework.component.layout.*;
 import com.guiseframework.component.transfer.*;
 
 /**Drop Details Guise demonstration panel.
-Copyright © 2005-2007 GlobalMentor, Inc.
+Copyright ï¿½ 2005-2007 GlobalMentor, Inc.
 Demonstrates images, drag enabling, drop enabling,
 	default drop support, and custom import strategies. 
 @author Garret Wilson
@@ -28,22 +28,22 @@ public class DropDetailsPanel extends DefaultNavigationPanel
 		final GroupPanel flagPanel=new GroupPanel(new FlowLayout(Flow.LINE));	//create the flag panel flowing horizontally
 		flagPanel.setLabel("Drag a Flag");	//set the flag panel label				
 		final Picture usFlag=new Picture();	//US flag
-		usFlag.setImage(URI.create("https://www.cia.gov/library/publications/the-world-factbook/flags/us-flag.gif"));	//set the URI
+		usFlag.setImageURI(URI.create("https://www.cia.gov/library/publications/the-world-factbook/flags/us-flag.gif"));	//set the URI
 		usFlag.setLabel("USA");	//set the label
 		usFlag.setDragEnabled(true);	//enable dragging for the image
 		flagPanel.add(usFlag);	//add the image to the flag panel
 		final Picture frFlag=new Picture();	//France flag
-		frFlag.setImage(URI.create("https://www.cia.gov/library/publications/the-world-factbook/flags/fr-flag.gif"));	//set the URI
+		frFlag.setImageURI(URI.create("https://www.cia.gov/library/publications/the-world-factbook/flags/fr-flag.gif"));	//set the URI
 		frFlag.setLabel("France");	//set the label
 		frFlag.setDragEnabled(true);	//enable dragging for the image
 		flagPanel.add(frFlag);	//add the image to the flag panel
 		final Picture inFlag=new Picture();	//India flag
-		inFlag.setImage(URI.create("https://www.cia.gov/library/publications/the-world-factbook/flags/in-flag.gif"));	//set the URI
+		inFlag.setImageURI(URI.create("https://www.cia.gov/library/publications/the-world-factbook/flags/in-flag.gif"));	//set the URI
 		inFlag.setLabel("India");	//set the label
 		inFlag.setDragEnabled(true);	//enable dragging for the image
 		flagPanel.add(inFlag);	//add the image to the flag panel
 		final Picture irFlag=new Picture();	//Iran flag
-		irFlag.setImage(URI.create("https://www.cia.gov/library/publications/the-world-factbook/flags/ir-flag.gif"));	//set the URI
+		irFlag.setImageURI(URI.create("https://www.cia.gov/library/publications/the-world-factbook/flags/ir-flag.gif"));	//set the URI
 		irFlag.setLabel("Iran");	//set the label
 		irFlag.setDragEnabled(true);	//enable dragging for the image
 		flagPanel.add(irFlag);	//add the image to the flag panel

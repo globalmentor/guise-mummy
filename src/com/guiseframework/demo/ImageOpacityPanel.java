@@ -11,7 +11,7 @@ import com.guiseframework.model.*;
 import com.guiseframework.validator.DecimalRangeValidator;
 
 /**Image Opacity Guise demonstration panel.
-Copyright © 2005 GlobalMentor, Inc.
+Copyright ï¿½ 2005 GlobalMentor, Inc.
 Demonstrates images, slider controls, shared value models, range validators, number/string converters, and image opacity.
 @author Garret Wilson
 */
@@ -26,7 +26,7 @@ public class ImageOpacityPanel extends DefaultNavigationPanel
 
 			//image
 		final Picture image=new Picture();	//create the image control
-		image.setImage(URI.create("cowcalf.jpg"));	//reference an image in the root directory of the application
+		image.setImageURI(URI.create("cowcalf.jpg"));	//reference an image in the root directory of the application
 		image.setLabel("Cow and Calf");
 		image.setDescription("A cow and her minutes-old calf. Use the sliders to change the opacity of the image.");
 		add(image);	//add the image

@@ -12,20 +12,20 @@ public interface ActionValueControl<V> extends ActionControl, ValueControl<V>
 {
 
 	/**The bound property for an icon associated with a value.*/
-	public final static String VALUE_ICON_PROPERTY=getPropertyName(SelectActionControl.class, "valueIcon");
+	public final static String VALUE_GLYPH_URI_PROPERTY=getPropertyName(SelectActionControl.class, "valueGlyphURI");
 
 	/**Retrieves the icon associated with a given value.
 	@param value The value for which an associated icon should be returned, or <code>null</code> to retrieve the icon associated with the <code>null</code> value.
 	@return The value icon URI, which may be a resource URI, or <code>null</code> if the value has no associated icon URI.
 	*/
-	public URI getValueIcon(final V value);
+	public URI getValueGlyphURI(final V value);
 
 	/**Sets the URI of the icon associated with a value.
 	This method fires a property change event for the changed icon if its value changes.
 	@param value The value with which the icon should be associated, or <code>null</code> if the icon should be associated with the <code>null</code> value.
 	@param newValueIcon The new URI of the value icon, which may be a resource URI.
-	@see #VALUE_ICON_PROPERTY
+	@see #VALUE_GLYPH_URI_PROPERTY
 	*/
-	public void setValueIcon(final V value, final URI newValueIcon);
+	public void setValueGlyphURI(final V value, final URI newValueIcon);
 
 }

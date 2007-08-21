@@ -24,7 +24,7 @@ public class WebImageBooleanSelectActionControlViewer<C extends ImageBooleanSele
 	/**Determines the image to use for this component.
 	This implementation returns the selected image if the component is selected and there is a selected image.
 	@return The image to use for the component, or <code>null</code> if there should not be an image.
-	@see ImageComponent#getImage()
+	@see ImageComponent#getImageURI()
 	@see ImageBooleanSelectActionControl#isSelected()
 	@see ImageBooleanSelectActionControl#getRolloverImage()
 	*/
@@ -43,7 +43,7 @@ public class WebImageBooleanSelectActionControlViewer<C extends ImageBooleanSele
 		}
 		if(image==null)	//if the component is not selected, or there is no selected or rollover image image
 		{
-			image=component.getImage();	//get the normal component image
+			image=component.getImageURI();	//get the normal component image
 		}
 		return image;	//return the image we determined
 	}

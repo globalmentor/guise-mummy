@@ -69,7 +69,7 @@ public class WebImageDepictor<C extends ImageComponent> extends AbstractSimpleWe
 		final GuiseSession session=getSession();	//get the session
 		final C component=getDepictedObject();	//get the component
 		writeLabelContent();	//write the content of the label
-		final URI image=component.getImage();	//get the component image
+		final URI image=component.getImageURI();	//get the component image
 		if(image!=null)	//if there is an image
 		{
 			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, session.resolveURI(image).toString());	//src="image"

@@ -17,11 +17,11 @@ public interface SelectActionControl extends ActionControl, Selectable
 	/**The auto-select bound property.*/
 	public final static String AUTO_SELECT_PROPERTY=getPropertyName(SelectActionControl.class, "autoSelect");
 	/**The selected icon bound property.*/
-	public final static String SELECTED_ICON_PROPERTY=getPropertyName(SelectActionControl.class, "selectedIcon");
+	public final static String SELECTED_GLYPH_URI_PROPERTY=getPropertyName(SelectActionControl.class, "selectedGlyphURI");
 	/**The toggle bound property.*/
 	public final static String TOGGLE_PROPERTY=getPropertyName(SelectActionControl.class, "toggle");
 	/**The unselected icon bound property.*/
-	public final static String UNSELECTED_ICON_PROPERTY=getPropertyName(SelectActionControl.class, "unselectedIcon");
+	public final static String UNSELECTED_GLYPH_URI_PROPERTY=getPropertyName(SelectActionControl.class, "unselectedGlyphURI");
 
 	/**@return Whether this control automatically sets or toggles the selection state when the action occurs.*/
 	public boolean isAutoSelect();
@@ -34,14 +34,14 @@ public interface SelectActionControl extends ActionControl, Selectable
 	public void setAutoSelect(final boolean newAutoSelect);
 
 	/**@return The selected icon URI, which may be a resource URI, or <code>null</code> if there is no selected icon URI.*/
-	public URI getSelectedIcon();
+	public URI getSelectedGlyphURI();
 
 	/**Sets the URI of the selected icon.
 	This is a bound property of type <code>URI</code>.
 	@param newSelectedIcon The new URI of the selected icon, which may be a resource URI.
-	@see #SELECTED_ICON_PROPERTY
+	@see #SELECTED_GLYPH_URI_PROPERTY
 	*/
-	public void setSelectedIcon(final URI newSelectedIcon);
+	public void setSelectedGlyphURI(final URI newSelectedIcon);
 
 	/**@return Whether this control acts as a toggle, switching its value between <code>true</code> and <code>false</code>, or whether the action always sets the value to <code>true</code>.*/
 	public boolean isToggle();
@@ -54,13 +54,13 @@ public interface SelectActionControl extends ActionControl, Selectable
 	public void setToggle(final boolean newToggle);
 
 	/**@return The unselected icon URI, which may be a resource URI, or <code>null</code> if there is no unselected icon URI.*/
-	public URI getUnselectedIcon();
+	public URI getUnselectedGlyphURI();
 
 	/**Sets the URI of the unselected icon.
 	This is a bound property of type <code>URI</code>.
 	@param newUnselectedIcon The new URI of the unselected icon, which may be a resource URI.
-	@see #UNSELECTED_ICON_PROPERTY
+	@see #UNSELECTED_GLYPH_URI_PROPERTY
 	*/
-	public void setUnselectedIcon(final URI newUnselectedIcon);
+	public void setUnselectedGlyphURI(final URI newUnselectedIcon);
 
 }

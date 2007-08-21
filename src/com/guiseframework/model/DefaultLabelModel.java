@@ -19,20 +19,20 @@ public class DefaultLabelModel extends AbstractModel implements LabelModel
 	private URI icon;
 
 		/**@return The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.*/
-		public URI getIcon() {return icon;}
+		public URI getGlyphURI() {return icon;}
 
 		/**Sets the URI of the icon.
 		This is a bound property.
 		@param newIcon The new URI of the icon, which may be a resource URI.
-		@see #ICON_PROPERTY
+		@see #GLYPH_URI_PROPERTY
 		*/
-		public void setIcon(final URI newIcon)
+		public void setGlyphURI(final URI newIcon)
 		{
 			if(!ObjectUtilities.equals(icon, newIcon))	//if the value is really changing
 			{
 				final URI oldIcon=icon;	//get the old value
 				icon=newIcon;	//actually change the value
-				firePropertyChange(ICON_PROPERTY, oldIcon, newIcon);	//indicate that the value changed
+				firePropertyChange(GLYPH_URI_PROPERTY, oldIcon, newIcon);	//indicate that the value changed
 			}
 		}
 

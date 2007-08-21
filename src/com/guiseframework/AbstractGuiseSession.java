@@ -779,7 +779,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			//about action prototype
 		aboutApplicationActionPrototype=new ActionPrototype();
 		aboutApplicationActionPrototype.setLabel(LABEL_ABOUT_X+createStringValueReference(APPLICATION_NAME));
-		aboutApplicationActionPrototype.setIcon(GLYPH_ABOUT);
+		aboutApplicationActionPrototype.setGlyphURI(GLYPH_ABOUT);
 		aboutApplicationActionPrototype.addActionListener(new ActionListener()
 				{
 					public void actionPerformed(final ActionEvent actionEvent)
@@ -1675,12 +1675,12 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 		{
 			optionDialogFrame.setLabel(severity.getLabel());	//set the label based upon the severity			
 		}
-		URI icon=notification.getIcon();	//get the notification's specified icon, if any
+		URI icon=notification.getGlyphURI();	//get the notification's specified icon, if any
 		if(icon==null)	//if no icon was specified
 		{
 			icon=severity.getGlyph();	//set the icon based upon the severity
 		}		
-		optionDialogFrame.setIcon(icon);	//set the icon
+		optionDialogFrame.setGlyphURI(icon);	//set the icon
 		optionDialogFrame.setLineExtent(new Extent(0.33, Extent.Unit.RELATIVE));	//set the preferred dimensions		
 		optionDialogFrame.open(new AbstractGenericPropertyChangeListener<Frame.Mode>()	//show the dialog and listen for the frame closing
 				{

@@ -68,23 +68,23 @@ public abstract class AbstractBooleanSelectActionControl extends AbstractActionV
 	}
 
 	/**The selected icon URI, which may be a resource URI, or <code>null</code> if there is no selected icon URI.*/
-	private URI selectedIcon=GLYPH_SELECTED;
+	private URI selectedGlyphURI=GLYPH_SELECTED;
 
 		/**@return The selected icon URI, which may be a resource URI, or <code>null</code> if there is no selected icon URI.*/
-		public URI getSelectedIcon() {return selectedIcon;}
+		public URI getSelectedGlyphURI() {return selectedGlyphURI;}
 
 		/**Sets the URI of the selected icon.
 		This is a bound property of type <code>URI</code>.
 		@param newSelectedIcon The new URI of the selected icon, which may be a resource URI.
-		@see #SELECTED_ICON_PROPERTY
+		@see #SELECTED_GLYPH_URI_PROPERTY
 		*/
-		public void setSelectedIcon(final URI newSelectedIcon)
+		public void setSelectedGlyphURI(final URI newSelectedIcon)
 		{
-			if(!ObjectUtilities.equals(selectedIcon, newSelectedIcon))	//if the value is really changing
+			if(!ObjectUtilities.equals(selectedGlyphURI, newSelectedIcon))	//if the value is really changing
 			{
-				final URI oldSelectedIcon=selectedIcon;	//get the old value
-				selectedIcon=newSelectedIcon;	//actually change the value
-				firePropertyChange(SELECTED_ICON_PROPERTY, oldSelectedIcon, newSelectedIcon);	//indicate that the value changed
+				final URI oldSelectedGlyphURI=selectedGlyphURI;	//get the old value
+				selectedGlyphURI=newSelectedIcon;	//actually change the value
+				firePropertyChange(SELECTED_GLYPH_URI_PROPERTY, oldSelectedGlyphURI, newSelectedIcon);	//indicate that the value changed
 			}			
 		}
 
@@ -110,23 +110,23 @@ public abstract class AbstractBooleanSelectActionControl extends AbstractActionV
 		}
 
 	/**The unselected icon URI, which may be a resource URI, or <code>null</code> if there is no unselected icon URI.*/
-	private URI unselectedIcon=GLYPH_UNSELECTED;
+	private URI unselectedGlyphURI=GLYPH_UNSELECTED;
 
 		/**@return The unselected icon URI, which may be a resource URI, or <code>null</code> if there is no unselected icon URI.*/
-		public URI getUnselectedIcon() {return unselectedIcon;}
+		public URI getUnselectedGlyphURI() {return unselectedGlyphURI;}
 
 		/**Sets the URI of the unselected icon.
 		This is a bound property of type <code>URI</code>.
 		@param newUnselectedIcon The new URI of the unselected icon, which may be a resource URI.
-		@see #UNSELECTED_ICON_PROPERTY
+		@see #UNSELECTED_GLYPH_URI_PROPERTY
 		*/
-		public void setUnselectedIcon(final URI newUnselectedIcon)
+		public void setUnselectedGlyphURI(final URI newUnselectedIcon)
 		{
-			if(!ObjectUtilities.equals(unselectedIcon, newUnselectedIcon))	//if the value is really changing
+			if(!ObjectUtilities.equals(unselectedGlyphURI, newUnselectedIcon))	//if the value is really changing
 			{
-				final URI oldUnselectedIcon=unselectedIcon;	//get the old value
-				unselectedIcon=newUnselectedIcon;	//actually change the value
-				firePropertyChange(UNSELECTED_ICON_PROPERTY, oldUnselectedIcon, newUnselectedIcon);	//indicate that the value changed
+				final URI oldUnselectedGlyphURI=unselectedGlyphURI;	//get the old value
+				unselectedGlyphURI=newUnselectedIcon;	//actually change the value
+				firePropertyChange(UNSELECTED_GLYPH_URI_PROPERTY, oldUnselectedGlyphURI, newUnselectedIcon);	//indicate that the value changed
 			}			
 		}
 

@@ -55,7 +55,7 @@ public class WebPictureDepictor<C extends Picture> extends AbstractWebComponentD
 		depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IMG, true);	//<xhtml:img>
 		writeBodyIDClassAttributes(null, COMPONENT_BODY_CLASS_SUFFIX);	//write the ID and class for the main element
 		writeStyleAttribute(getBodyStyles());	//write the component's body styles
-		final URI image=component.getImage();	//get the component image
+		final URI image=component.getImageURI();	//get the component image
 		if(image!=null)	//if there is an image
 		{
 			depictContext.writeAttribute(null, ELEMENT_IMG_ATTRIBUTE_SRC, session.resolveURI(image).toString());	//src="image"

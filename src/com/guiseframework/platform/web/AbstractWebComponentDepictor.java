@@ -693,7 +693,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 	*/
 	protected boolean hasLabelContent(final LabelModel labelModel, final boolean includeIcon, final boolean includeLabel) throws IOException
 	{
-		return (includeIcon && labelModel.getIcon()!=null) || (includeLabel && labelModel.getLabel()!=null);	//see if there is label text or an icon
+		return (includeIcon && labelModel.getGlyphURI()!=null) || (includeLabel && labelModel.getLabel()!=null);	//see if there is label text or an icon
 	}
 
 	/**Writes a label element for a component, taking into account the label's content type.
@@ -807,7 +807,7 @@ public abstract class AbstractWebComponentDepictor<C extends Component> extends 
 			final String label=labelModel.getLabel();	//determine the label text, if there is any
 			final String resolvedLabel=label!=null ? session.resolveString(label) : null;	//resolve the label, if there is a label
 			final ContentType labelContentType=labelModel.getLabelContentType();	//get the label content type
-			final URI icon=labelModel.getIcon();	//get the label icon, if any
+			final URI icon=labelModel.getGlyphURI();	//get the label icon, if any
 			if(includeIcon && icon!=null)	//if there is an icon
 			{
 				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_IMG, true);	//<xhtml:img>

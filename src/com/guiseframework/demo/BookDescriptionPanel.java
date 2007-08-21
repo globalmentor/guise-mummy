@@ -7,7 +7,7 @@ import com.guiseframework.component.layout.*;
 import com.guiseframework.geometry.Extent;
 
 /**Drop Details Guise demonstration panel.
-Copyright © 2005 GlobalMentor, Inc.
+Copyright ï¿½ 2005 GlobalMentor, Inc.
 Demonstrates image description visibility, flyover frames,
 	preferred widths and heights, extents, and units.
 <p>Contextual flyover tethers can be specified using the following resource keys,
@@ -40,7 +40,7 @@ public class BookDescriptionPanel extends DefaultNavigationPanel
 		bookPanel.setLabel("Mouse over a Book");	//set the book panel label
 
 		final Picture book1=new Picture();	//_The Great Philosophers_
-		book1.setImage(URI.create("http://www.garretwilson.com/books/reviews/greatphilosophers_small.jpg"));	//set the URI
+		book1.setImageURI(URI.create("http://www.garretwilson.com/books/reviews/greatphilosophers_small.jpg"));	//set the URI
 		book1.setDescriptionContentType(XHTML_CONTENT_TYPE);	//use an XHTML description
 		book1.setDescription(	//set the description
 			"<?xml version='1.0'?>"+
@@ -67,7 +67,7 @@ public class BookDescriptionPanel extends DefaultNavigationPanel
 		bookPanel.add(book1);	//add the image to the book panel
 
 		final Picture book2=new Picture();	//_The Supreme Court_
-		book2.setImage(URI.create("http://www.garretwilson.com/books/reviews/supremecourt_small.jpg"));	//set the URI
+		book2.setImageURI(URI.create("http://www.garretwilson.com/books/reviews/supremecourt_small.jpg"));	//set the URI
 		book2.setDescriptionContentType(XHTML_CONTENT_TYPE);	//use an XHTML description
 		book2.setDescription(	//set the description
 			"<?xml version='1.0'?>"+
@@ -87,7 +87,7 @@ public class BookDescriptionPanel extends DefaultNavigationPanel
 		bookPanel.add(book2);	//add the image to the book panel
 
 		final Picture book3=new Picture();	//_Uncertain Identities_
-		book3.setImage(URI.create("http://www.garretwilson.com/books/reviews/uncertainidentities_small.jpg"));	//set the URI
+		book3.setImageURI(URI.create("http://www.garretwilson.com/books/reviews/uncertainidentities_small.jpg"));	//set the URI
 		book3.setDescriptionContentType(XHTML_CONTENT_TYPE);	//use an XHTML description
 		book3.setDescription(	//set the description
 			"<?xml version='1.0'?>"+

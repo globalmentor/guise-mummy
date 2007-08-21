@@ -117,7 +117,7 @@ public class NotificationOptionDialogFrame extends AbstractOptionDialogFrame<Not
 		}
 		final Button button=new Button();	//create a new button
 		button.setLabel(option.getLabel());	//set the option action label
-		button.setIcon(option.getGlyph());	//set the option action icon
+		button.setGlyphURI(option.getGlyph());	//set the option action icon
 		button.addActionListener(new ActionListener()	//listen for the action being performed
 				{
 					public void actionPerformed(final ActionEvent actionEvent)	//if the action is performed

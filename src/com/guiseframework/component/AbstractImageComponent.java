@@ -41,20 +41,20 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 	private URI image=null;
 
 		/**@return The image URI, which may be a resource URI, or <code>null</code> if there is no image URI.*/
-		public URI getImage() {return image;}
+		public URI getImageURI() {return image;}
 
 		/**Sets the URI of the image.
 		This is a bound property of type <code>URI</code>.
 		@param newImage The new URI of the image, which may be a resource URI.
-		@see #IMAGE_PROPERTY
+		@see #IMAGE_URI_PROPERTY
 		*/
-		public void setImage(final URI newImage)
+		public void setImageURI(final URI newImage)
 		{
 			if(!ObjectUtilities.equals(image, newImage))	//if the value is really changing
 			{
 				final URI oldImage=image;	//get the old value
 				image=newImage;	//actually change the value
-				firePropertyChange(IMAGE_PROPERTY, oldImage, newImage);	//indicate that the value changed
+				firePropertyChange(IMAGE_URI_PROPERTY, oldImage, newImage);	//indicate that the value changed
 			}
 		}
 
@@ -98,7 +98,7 @@ public abstract class AbstractImageComponent extends AbstractComponent implement
 			final ImageComponent image=getSource();	//get the image
 			if(match(contentType, TEXT, URI_LIST_SUBTYPE))	//if this is a text/uri-list type
 			{
-				final URI imageURI=image.getImage();	//get the image URI
+				final URI imageURI=image.getImageURI();	//get the image URI
 				return imageURI!=null ? createURIList(image.getSession().resolveURI(imageURI)) : null;	//return the image URI, if there is one
 			}
 			else if(contentType.match(image.getLabelContentType()))	//if the label has the content type requested

@@ -46,24 +46,24 @@ public abstract class AbstractActionValueControl<V> extends AbstractActionContro
 		}
 
 	/**The map of icons keyed to values.*/
-	private final Map<V, URI> valueIconMap=new HashMap<V, URI>();
+	private final Map<V, URI> valueGlyphURIMap=new HashMap<V, URI>();
 		
 		/**Retrieves the icon associated with a given value.
 		@param value The value for which an associated icon should be returned, or <code>null</code> to retrieve the icon associated with the <code>null</code> value.
 		@return The value icon URI, which may be a resource URI, or <code>null</code> if the value has no associated icon URI.
 		*/
-		public URI getValueIcon(final V value) {return valueIconMap.get(value);}
+		public URI getValueGlyphURI(final V value) {return valueGlyphURIMap.get(value);}
 
 		/**Sets the URI of the icon associated with a value.
 		This method fires a property change event for the changed icon if its value changes.
 		@param value The value with which the icon should be associated, or <code>null</code> if the icon should be associated with the <code>null</code> value.
 		@param newValueIcon The new URI of the value icon, which may be a resource URI.
-		@see #VALUE_ICON_PROPERTY
+		@see #VALUE_GLYPH_URI_PROPERTY
 		*/
-		public void setValueIcon(final V value, final URI newValueIcon)
+		public void setValueGlyphURI(final V value, final URI newValueIcon)
 		{
-			final URI oldValueIcon=valueIconMap.put(value, newValueIcon);	//store the new value
-			firePropertyChange(VALUE_ICON_PROPERTY, oldValueIcon, newValueIcon);	//indicate that the value changed (which will only fire the event if the value actually changed)
+			final URI oldValueIcon=valueGlyphURIMap.put(value, newValueIcon);	//store the new value
+			firePropertyChange(VALUE_GLYPH_URI_PROPERTY, oldValueIcon, newValueIcon);	//indicate that the value changed (which will only fire the event if the value actually changed)
 		}
 
 	/**Label model, action model, value model, and enableable object constructor.

@@ -195,7 +195,7 @@ public abstract class AbstractEditableComponentTextControl<EC extends Component>
 				});
 			//accept action prototype
 		acceptActionPrototype=new ActionPrototype();
-		acceptActionPrototype.setIcon(Theme.GLYPH_ACCEPT);
+		acceptActionPrototype.setGlyphURI(Theme.GLYPH_ACCEPT);
 		acceptActionPrototype.setLabel(Theme.LABEL_ACCEPT);
 		acceptActionPrototype.addActionListener(new ActionListener()
 				{
@@ -206,7 +206,7 @@ public abstract class AbstractEditableComponentTextControl<EC extends Component>
 				});
 			//reject action prototype
 		rejectActionPrototype=new ActionPrototype();
-		rejectActionPrototype.setIcon(Theme.GLYPH_REJECT);
+		rejectActionPrototype.setGlyphURI(Theme.GLYPH_REJECT);
 		rejectActionPrototype.setLabel(Theme.LABEL_REJECT);
 		rejectActionPrototype.addActionListener(new ActionListener()
 				{
@@ -217,7 +217,7 @@ public abstract class AbstractEditableComponentTextControl<EC extends Component>
 				});
 			//delete action prototype
 		deleteActionPrototype=new ActionPrototype();
-		deleteActionPrototype.setIcon(Theme.GLYPH_DELETE);
+		deleteActionPrototype.setGlyphURI(Theme.GLYPH_DELETE);
 		deleteActionPrototype.setLabel(Theme.LABEL_DELETE);
 		deleteActionPrototype.addActionListener(new ActionListener()
 				{
@@ -293,12 +293,12 @@ public abstract class AbstractEditableComponentTextControl<EC extends Component>
 		editActionPrototype.setEnabled(isEditable && mode!=Mode.EDIT);	//only enable the edit prototype if we aren't editing
 		if(label==null)	//if there is currently no label
 		{
-			editActionPrototype.setIcon(Theme.GLYPH_ADD);	//show the add icon
+			editActionPrototype.setGlyphURI(Theme.GLYPH_ADD);	//show the add icon
 			editActionPrototype.setLabel(Theme.LABEL_ADD);	//show the add label
 		}
 		else	//if there is a label
 		{
-			editActionPrototype.setIcon(Theme.GLYPH_EDIT);	//show the edit icon
+			editActionPrototype.setGlyphURI(Theme.GLYPH_EDIT);	//show the edit icon
 			editActionPrototype.setLabel(Theme.LABEL_EDIT);	//show the edit label
 		}
 			//accept action prototype
