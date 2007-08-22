@@ -832,7 +832,12 @@ alert("error: "+e+" trying to import attribute: "+attribute.nodeName+" with valu
 	*/
 	CSS_ATTRIBUTE_NAME_MAP:
 	{
-		"background-color": "backgroundColor"
+		"background-color": "backgroundColor",
+		"border-bottom-width": "borderBottomWidth",
+		"border-left-width": "borderLeftWidth",
+		"border-right-width": "borderRightWidth",
+		"border-top-width": "borderTopWidth",
+		"border-width": "borderWidth"
 	},
 
 	/**The set of names of elements that cannot be serialized as empty elements.*/

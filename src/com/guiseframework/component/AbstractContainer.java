@@ -199,6 +199,13 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 		{
 			return new DropMenu((MenuPrototype)prototype, Flow.PAGE);
 		}
+		else if(prototype instanceof TogglePrototype)	//toggle prototypes
+		{
+			final TogglePrototype togglePrototype=(TogglePrototype)prototype;	//get the toggle prototype
+			final BooleanSelectButton booleanSelectButton=new BooleanSelectButton(togglePrototype);	//create a boolean select button
+			booleanSelectButton.setToggle(true);	//turn on toggling
+			return booleanSelectButton;	//return the button
+		}
 		else if(prototype instanceof ValuePrototype)	//value prototypes
 		{
 			final ValuePrototype<?> valuePrototype=(ValuePrototype<?>)prototype;	//get the value prototype

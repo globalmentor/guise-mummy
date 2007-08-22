@@ -39,10 +39,10 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 		}
 
 	/**The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.*/
-	private URI icon=null;
+	private URI glyphURI=null;
 
 		/**@return The icon URI, which may be a resource URI, or <code>null</code> if there is no icon URI.*/
-		public URI getGlyphURI() {return icon;}
+		public URI getGlyphURI() {return glyphURI;}
 
 		/**Sets the URI of the icon.
 		This is a bound property of type <code>URI</code>.
@@ -51,11 +51,11 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 		*/
 		public void setGlyphURI(final URI newIcon)
 		{
-			if(!ObjectUtilities.equals(icon, newIcon))	//if the value is really changing
+			if(!ObjectUtilities.equals(glyphURI, newIcon))	//if the value is really changing
 			{
-				final URI oldIcon=icon;	//get the old value
-				icon=newIcon;	//actually change the value
-				firePropertyChange(GLYPH_URI_PROPERTY, oldIcon, newIcon);	//indicate that the value changed
+				final URI oldGlyphURI=glyphURI;	//get the old value
+				glyphURI=newIcon;	//actually change the value
+				firePropertyChange(GLYPH_URI_PROPERTY, oldGlyphURI, newIcon);	//indicate that the value changed
 			}			
 		}
 
@@ -170,7 +170,7 @@ public class ValuePrototype<V> extends DefaultValueModel<V> implements Prototype
 	{
 		super(valueClass, defaultValue);	//construct the value model parent class
 		this.label=label;	//save the label
-		this.icon=icon;	//save the icon
+		this.glyphURI=icon;	//save the icon
 	}
 
 }

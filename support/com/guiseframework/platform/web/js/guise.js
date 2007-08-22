@@ -1339,6 +1339,15 @@ alert("text: "+xmlHTTP.responseText+" AJAX enabled? "+(this.isEnabled()));
 		proto._synchronizeElement=function(oldElement, element, isRoot)
 		{
 			var elementName=element.nodeName;	//save the element name
+			
+			
+/*TODO del			
+			if(elementName=="button")
+			{
+				alert("updating button with new info: "+DOMUtilities.getNodeString(element));
+			}
+*/
+			
 /*TODO del or salvage
 			if(elementName==this.ResponseElement.ATTRIBUTE)	//if this is really an attribute patch
 			{
@@ -1741,11 +1750,30 @@ if(elementName=="select")
 		@param oldElement The old version of the element.
 		@param attributeValue The new literal value of the style attribute, which may be null or the empty string.
 		*/ 
-		proto._synchronizeElementStyle=function(oldElement, attributeValue)
+		proto._synchronizeElementStyle=function(oldElement, attributeValue)	//TODO del comment: do extra checks for attributeValue; sometimes when the server sends all border widths of 0px, the browser will change this to a single shortcut border width of 0px
 		{
-			var removableStyles={"backgroundColor":true, "color":true, "display":true, "visibility":true};	//create a new map of styles to remove if not assigned, with the style name as the key
+			if(attributeValue==null)	//if there is no attribute value
+			{
+				attributeValue="";	//use the empty string
+			}
+			if(isUserAgentIE)	//if this is IE
+			{
+				oldElement.style.cssText=attributeValue;	//use a special form of accessing the style text; see http://ajax.stealthsettings.com/developing-cross-browser-javascript/setting-an-elements-style-via-javascript/
+			}
+			else	//for all other browsers
+			{
+				oldElement.setAttribute("style", attributeValue);	//set the style attribute
+			}
+		
+//TODO fix			var removableStyles={"backgroundColor":true, "borderWidth":true, "color":true, "display":true, "visibility":true};	//create a new map of styles to remove if not assigned, with the style name as the key
+
+//TODO del if works			var removableStyles=new Set("backgroundColor", "borderBottomWidth", "borderLeftWidth", "borderRightWidth", "borderTopWidth", "borderWidth", "color", "display", "visibility");	//create a new map of styles to remove if not assigned, with the style name as the key
+
+/*TODO del if not needed
+			var newStyles=null;	//we'll create a new map of styles if there are new styles
 			if(attributeValue)	//if there is a new style
 			{
+				newStyles={};	//create a new map of styles
 //TODO fix with something else to give IE layout					oldElement["contentEditable"]=false;	//for IE 6, give the component "layout" so that things like opacity will work
 				var styles=attributeValue.split(";");	//split out the individual styles
 				for(var styleIndex=styles.length-1; styleIndex>=0; --styleIndex)	//for each style
@@ -1757,9 +1785,41 @@ if(elementName=="select")
 						var styleProperty=DOMUtilities.CSS_ATTRIBUTE_NAME_MAP[styleToken] || styleToken;	//get the CSS DOM attribute version
 						var styleValue=styleComponents[1].trim();	//get the trimmed style value
 						delete removableStyles[styleProperty];	//remove this style from the map of removable styles, indicating that we shouldn't remove this style
+						newStyles[styleProperty]=
+						
+						
 						if(oldElement.style[styleProperty]!=styleValue)	//if the style is different	TODO check about removing a style
 						{
-	//TODO del alert("ready to set element style "+styleProperty+" to value "+styleValue);
+alert("ready to set element style "+styleProperty+" to value "+styleValue);
+							oldElement.style[styleProperty]=styleValue;	//update this style
+						}
+					}
+				}
+			}
+*/
+/*TODO del if not needed
+			if(attributeValue)	//if there is a new style
+			{
+//TODO fix with something else to give IE layout					oldElement["contentEditable"]=false;	//for IE 6, give the component "layout" so that things like opacity will work
+				var compositeStyleMap={"borderBottomWidth":"borderWidth", "borderLeftWidth":"borderWidth", "borderRightWidth":"borderWidth", "borderTopWidth":"borderWidth", "borderWidth":"borderWidth"};	//the composite styles keyed to the componentized versions of them so that if we set a component we'll know not to remove the composite style TODO create a preconfigured version of this 
+				var styles=attributeValue.split(";");	//split out the individual styles
+				for(var styleIndex=styles.length-1; styleIndex>=0; --styleIndex)	//for each style
+				{
+					var styleComponents=styles[styleIndex].split(":");	//get a reference to this style and split out the property and value
+					if(styleComponents.length==2)	//we expect there to be a property and a value
+					{
+						var styleToken=styleComponents[0].trim();	//trim the token
+						var styleProperty=DOMUtilities.CSS_ATTRIBUTE_NAME_MAP[styleToken] || styleToken;	//get the CSS DOM attribute version
+						var styleValue=styleComponents[1].trim();	//get the trimmed style value
+						delete removableStyles[styleProperty];	//remove this style from the map of removable styles, indicating that we shouldn't remove this style
+						var compositeStyle=compositeStyleMap[styleProperty];	//see if this is part of a composite style
+						if(compositeStyle)	//if this style was part of a composite style
+						{
+							delete removableStyles[compositeStyle];	//remove the composite style style from the map of removable styles, indicating that we shouldn't remove the composite style							
+						}
+						if(oldElement.style[styleProperty]!=styleValue)	//if the style is different	TODO check about removing a style
+						{
+alert("ready to set element style "+styleProperty+" to value "+styleValue);
 							oldElement.style[styleProperty]=styleValue;	//update this style
 						}
 					}
@@ -1771,10 +1831,11 @@ if(elementName=="select")
 //TODO del when works alert("looking at removable style "+removableStyleName+" with old value "+oldElement.style[removableStyleName]);
 				if(oldElement.style[removableStyleName])	//if this style was not in the new element but it was in the old element
 				{
-//TODO del when works alert("trying to remove style "+removableStyleName+" with old value "+oldElement.style[removableStyleName]);
+alert("trying to remove style "+removableStyleName+" with old value "+oldElement.style[removableStyleName]);
 					oldElement.style[removableStyleName]="";	//remove the style from the old element
-				}				
+				}
 			}
+*/
 		};
 
 		/**The private method for asynchronously initializing.*/

@@ -10,6 +10,7 @@ import com.guiseframework.model.ActionModel;
 */
 public abstract class AbstractActionPrototype extends AbstractEnableablePrototype implements ActionModel
 {
+
 	/**Adds an action listener.
 	@param actionListener The action listener to add.
 	*/
