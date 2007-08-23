@@ -104,7 +104,7 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 				}
 				if(oldOwner!=null)	//if there was an old layout component
 				{
-					for(final Component childComponent:oldOwner.getChildren())	//for each child component in the old layout component
+					for(final Component childComponent:oldOwner.getChildComponents())	//for each child component in the old layout component
 					{
 						removeComponent(childComponent);	//remove the old component from the layout
 					}
@@ -112,7 +112,7 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 				owner=newOwner;	//this is really our component; make a note of it
 				if(newOwner!=null)	//if there is a new layout component
 				{
-					for(final Component childComponent:newOwner.getChildren())	//for each child component in the new layout component
+					for(final Component childComponent:newOwner.getChildComponents())	//for each child component in the new layout component
 					{
 						addComponent(childComponent);	//add the new component to the layout
 					}
@@ -244,7 +244,7 @@ public abstract class AbstractLayout<T extends Constraints> extends GuiseBoundPr
 			{
 				final T layoutConstraints=constraintsClass.cast(constraints);	//cast the constraints to this layout's type
 					//find the component for these constraints
-				for(final Component childComponent:getOwner().getChildren())	//for each child component in the layout component
+				for(final Component childComponent:getOwner().getChildComponents())	//for each child component in the layout component
 				{
 					if(childComponent.getConstraints()==constraints)	//if this component was associated with the constraints
 					{

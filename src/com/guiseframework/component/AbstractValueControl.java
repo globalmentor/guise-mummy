@@ -2,13 +2,10 @@ package com.guiseframework.component;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyVetoException;
+import java.beans.*;
 
 import com.guiseframework.model.*;
-import com.guiseframework.validator.ValidationException;
-import com.guiseframework.validator.Validator;
+import com.guiseframework.validator.*;
 
 /**Abstract implementation of a control to accept input from the user.
 The component valid status is updated before a change in the {@link #VALUE_PROPERTY} or the {@link #VALIDATOR_PROPERTY} is fired. 
@@ -25,16 +22,17 @@ public abstract class AbstractValueControl<V> extends AbstractControl implements
 		protected ValueModel<V> getValueModel() {return valueModel;}
 
 	/**Whether the value is editable and the control will allow the the user to change the value.*/
-	private boolean editable=true;
+//TODO del	private boolean editable=true;
 
 		/**@return Whether the value is editable and the control will allow the the user to change the value.*/
-		public boolean isEditable() {return editable;}
+	//TODO del		public boolean isEditable() {return editable;}
 
 		/**Sets whether the value is editable and the control will allow the the user to change the value.
 		This is a bound property of type <code>Boolean</code>.
 		@param newEditable <code>true</code> if the control should allow the user to change the value.
 		@see #EDITABLE_PROPERTY
 		*/
+/*TODO del
 		public void setEditable(final boolean newEditable)
 		{
 			if(editable!=newEditable)	//if the value is really changing
@@ -44,6 +42,7 @@ public abstract class AbstractValueControl<V> extends AbstractControl implements
 				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
 			}			
 		}
+*/
 
 	/**The property change listener that updates validity and removes any notification in response to a property changing.
 	@see #setNotification(Notification)

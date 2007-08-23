@@ -110,7 +110,7 @@ public class RegionLayout extends AbstractLayout<RegionConstraints>
 			final LayoutComponent owner=getOwner();	//get the owner of this layout, if any
 			if(owner!=null)	//if this layout has an owner
 			{
-				for(final Component component:getOwner().getChildren())	//for all child components of the owner
+				for(final Component component:getOwner().getChildComponents())	//for all child components of the owner
 				{
 					getConstraints(component).setAlignment(flow, newAlignment);	//update this child component's constraints with the new alignment value
 				}
@@ -190,7 +190,7 @@ public class RegionLayout extends AbstractLayout<RegionConstraints>
 			final LayoutComponent owner=getOwner();	//get the owner of this layout, if any
 			if(owner!=null)	//if this layout has an owner
 			{
-				for(final Component component:getOwner().getChildren())	//for all child components of the owner
+				for(final Component component:getOwner().getChildComponents())	//for all child components of the owner
 				{
 					getConstraints(component).setExtent(flow, newExtent);	//update this child component's constraints with the new extent value
 				}
@@ -280,7 +280,7 @@ public class RegionLayout extends AbstractLayout<RegionConstraints>
 			final LayoutComponent owner=getOwner();	//get the owner of this layout, if any
 			if(owner!=null)	//if this layout has an owner
 			{
-				for(final Component component:getOwner().getChildren())	//for all child components of the owner
+				for(final Component component:getOwner().getChildComponents())	//for all child components of the owner
 				{
 					getConstraints(component).setPaddingExtent(border, newPaddingExtent);	//update this child component's constraints with the new padding extent value
 				}
@@ -409,7 +409,7 @@ public class RegionLayout extends AbstractLayout<RegionConstraints>
 	*/
 	public Component getComponent(final Region region)	//TODO later use reverse maps or something similar for quicker lookup
 	{
-		for(final Component childComponent:getOwner().getChildren())	//for each child component in the container
+		for(final Component childComponent:getOwner().getChildComponents())	//for each child component in the container
 		{
 			final RegionConstraints constraints=(RegionConstraints)getConstraints(childComponent);	//get the constraints for this component TODO use covariants on each subclass; update getConstraints() to ensure correct type
 			if(constraints.getRegion()==region)	//if this component is in the correct region

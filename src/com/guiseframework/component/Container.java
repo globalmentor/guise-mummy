@@ -1,8 +1,6 @@
 package com.guiseframework.component;
 
-import com.guiseframework.component.layout.Layout;
-import com.guiseframework.component.layout.Constraints;
-import com.guiseframework.event.ContainerListener;
+import com.guiseframework.component.layout.*;
 import com.guiseframework.prototype.*;
 
 /**Component that allows for addition and removal of child components.
@@ -145,15 +143,5 @@ public interface Container extends LayoutComponent, Iterable<Component>
 	@see Container#LAYOUT_PROPERTY 
 	*/
 	public <T extends Constraints> void setLayout(final Layout<T> newLayout);
-
-	/**Adds a container listener.
-	@param containerListener The container listener to add.
-	*/
-	public void addContainerListener(final ContainerListener containerListener);
-
-	/**Removes a container listener.
-	@param containerListener The container listener to remove.
-	*/
-	public void removeContainerListener(final ContainerListener containerListener);
 
 }

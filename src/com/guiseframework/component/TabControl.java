@@ -20,16 +20,17 @@ public class TabControl<V> extends AbstractListSelectControl<V>
 	public final static String MAX_TAB_COUNT_PROPERTY=getPropertyName(TabControl.class, "maxTabCount");
 
 	/**Whether the value is editable and the control will allow the the user to change the value.*/
-	private boolean editable=true;
+//TODO del	private boolean editable=true;
 
 		/**@return Whether the value is editable and the control will allow the the user to change the value.*/
-		public boolean isEditable() {return editable;}
+//TODO del		public boolean isEditable() {return editable;}
 
 		/**Sets whether the value is editable and the control will allow the the user to change the value.
 		This is a bound property of type <code>Boolean</code>.
 		@param newEditable <code>true</code> if the control should allow the user to change the value.
 		@see #EDITABLE_PROPERTY
 		*/
+/*TODO del
 		public void setEditable(final boolean newEditable)
 		{
 			if(editable!=newEditable)	//if the value is really changing
@@ -39,6 +40,7 @@ public class TabControl<V> extends AbstractListSelectControl<V>
 				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
 			}			
 		}
+*/
 
 	/**The flow axis.*/
 	private Flow axis;

@@ -1465,7 +1465,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 		}
 		if(component instanceof CompositeComponent)	//if this is a composite component
 		{
-			for(final Component childComponent:((CompositeComponent)component).getChildren())	//for each child
+			for(final Component childComponent:((CompositeComponent)component).getChildComponents())	//for each child
 			{
 				getComponentsByDepictName(childComponent, depictName, componentSet);	//collect components from this child branch
 			}

@@ -1,14 +1,11 @@
 package com.guiseframework.event;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
-import com.garretwilson.beans.TargetedEvent;
-
 /**An event indicating an action should take place.
 The event target indicates the component that originally initiated the action.
 @author Garret Wilson
 @see ActionListener
 */
-public class ActionEvent extends AbstractGuiseEvent implements TargetedEvent
+public class ActionEvent extends AbstractTargetedGuiseEvent
 {
 
 	/**The default action option.*/
@@ -34,15 +31,6 @@ public class ActionEvent extends AbstractGuiseEvent implements TargetedEvent
 		ACTIVATE;
 	};
 	
-	/**The target of the event, or <code>null</code> if the event target is not known.*/
-	private final Object target;
-	
-		/**Returns the object to which the event applies.
-		This may be a different than <dfn>source</dfn>, which is the object that generated this event instance.
-		@return The target of the event.
-		*/
-		public Object getTarget() {return target;}
-
 	/**The zero-based option indicated by this action.*/
 	private final int option;
 
@@ -115,8 +103,7 @@ public class ActionEvent extends AbstractGuiseEvent implements TargetedEvent
 	*/
 	public ActionEvent(final Object source, final Object target, final int force, final int option)
 	{
-		super(source);	//construct the parent class
-		this.target=checkInstance(target, "Event target object cannot be null.");	//save the target
+		super(source, target);	//construct the parent class
 		if(force<0)	//if the force is negative
 		{
 			throw new IllegalArgumentException("Force cannot be negative: "+force);
@@ -138,4 +125,5 @@ public class ActionEvent extends AbstractGuiseEvent implements TargetedEvent
 	{
 		this(source, actionEvent.getTarget(), actionEvent.getForce(), actionEvent.getOption());	//construct the class with the same target		
 	}
+
 }

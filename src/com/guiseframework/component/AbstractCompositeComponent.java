@@ -14,7 +14,8 @@ import com.guiseframework.model.LabelModel;
 /**An abstract implementation of a composite component.
 Every child component must be added or removed using {@link #addComponent(Component)} and {@link #removeComponent(Component)}, although other actions may take place.
 This version listens for the {@link Component#VALID_PROPERTY} of each child component and updates the valid status of this component in response. 
-The lazily-created notification listener to listen for child notifications and refire the {@link NotificationEvent}, retaining the original event source.
+This version listens for child notifications and fires a copy of the {@link NotificationEvent}, retaining the original event target.
+This version listens for child components being added or removed and fires a copy of the {@link ComponentEvent}, retaining the original event target.
 @author Garret Wilson
 */
 public abstract class AbstractCompositeComponent extends AbstractComponent implements CompositeComponent
@@ -60,72 +61,94 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 		return validChangeListener;	//return the valid change listener
 	}
 
-	/**The lazily-created notification listener to listen for child notifications and refire the {@link NotificationEvent}, retaining the original event source.*/
-	private NotificationListener notificationListener=null;
+	/**The lazily-created notification listener to listen for child notifications and fire a copy of the {@link NotificationEvent}, retaining the original event target.*/
+	private NotificationListener repeatNotificationListener=null;
 
-	/**The lazily-created notification listener to listen for child notifications and refire the {@link NotificationEvent}, retaining the original event source.*/
-	private NotificationListener getNotificationListener()
-	{
-		if(notificationListener==null)	//if there is no notification listener
+		/**Returns the notification listener to listen for child notifications and fire a copy of the {@link NotificationEvent}, retaining the original event target.
+		This method is not thread-safe, and must be externally synchronized.
+		@return The lazily-created notification listener to listen for child notifications and fire a copy of the {@link NotificationEvent}, retaining the original event target.
+		*/
+		private NotificationListener getRepeatNotificationListener()
 		{
-			notificationListener=new NotificationListener()	//create a new notification listener
-					{
-						public void notified(final NotificationEvent notificationEvent)	//if the child component sends a notification
+			if(repeatNotificationListener==null)	//if there is no notification listener
+			{
+				repeatNotificationListener=new NotificationListener()	//create a new notification listener
 						{
-							fireNotified(notificationEvent);	//refire the notification event to our listeners						
-						}				
-					};
+							public void notified(final NotificationEvent notificationEvent)	//if the child component sends a notification
+							{
+								fireNotified(new NotificationEvent(this, notificationEvent));	//fire a copy of the notification event to our listeners, keeping the original target						
+							}				
+						};
+			}
+			return repeatNotificationListener;	//return the notification listener
 		}
-		return notificationListener;	//return the notification listener
-	}
 
-	/**Adds a child component.
-	Any class that overrides this method must call this version.
-	The return value from this version has no significance.
+	/**The lazily-created composite component listener to listen for child components being added or removed and fire a copy of the {@link ComponentEvent}, retaining the original event target.*/
+	private CompositeComponentListener repeatCompositeComponentListener=null;
+
+		/**Returns the composite component listener to listen for child components being added or removed and fire a copy of the {@link ComponentEvent}, retaining the original event target.
+		This method is not thread-safe, and must be externally synchronized.
+		@return The lazily-created composite component listener to listen for child components being added or removed and fire a copy of the {@link ComponentEvent}, retaining the original event target.
+		*/
+		private CompositeComponentListener getRepeatCompositeComponentListener()
+		{
+			if(repeatCompositeComponentListener==null)	//if there is no composite component listener
+			{
+				repeatCompositeComponentListener=new CompositeComponentListener()	//create a new composite component listener
+						{
+							public void childComponentAdded(final ComponentEvent childComponentEvent)	//if a child component is added
+							{
+								fireChildComponentAdded(new ComponentEvent(this, childComponentEvent));	//fire a copy of the component event to our listeners, keeping the original target
+							}
+							public void childComponentRemoved(final ComponentEvent childComponentEvent)	//if a child component is removed
+							{
+								fireChildComponentRemoved(new ComponentEvent(this, childComponentEvent));	//fire a copy of the component event to our listeners, keeping the original target
+							}
+						};
+			}
+			return repeatCompositeComponentListener;	//return the notification listener
+		}
+
+	/**Initializes a component to be added as a child component of this composite component.
+	This method should be called for every child component added to this composite component.
 	This version installs a listener for the component's valid status.
-	This version loads the preferences of the child component, but not its descendants, before the child is added.
-	@param component The component to add to this component.
-	@return <code>true</code> if the child components changed as a result of the operation.
-	@exception IllegalArgumentException if the component already has a parent.
+	This version installs a listener to refire copies of notification events.
+	This version installs a listener to refire copies of composite component events.
+	This version loads the preferences of the child component, but not its descendants.
+	@param childComponent The component to add to this component.
 	@see Component#loadPreferences()
 	*/
-	protected boolean addComponent(final Component component)
+	protected void initializeChildComponent(final Component childComponent)
 	{
-		if(component.getParent()!=null)	//if this component has already been added to container
-		{
-			throw new IllegalArgumentException("Component "+component+" is already a member of a composite component, "+component.getParent()+".");
-		}
 		try
 		{
-			component.loadPreferences(false);	//load preferences for the child component only
+			childComponent.loadPreferences(false);	//load preferences for the child component only
 		}
 		catch(final IOException ioException)	//if there was an error loading preferences
 		{
 			Debug.warn(ioException);	//log a warning			
 		}
-		component.addPropertyChangeListener(DISPLAYED_PROPERTY, getDisplayVisibleChangeListener());	//listen for changes in the component's displayed status and update this component's valid status in response
-		component.addPropertyChangeListener(VALID_PROPERTY, getValidChangeListener());	//listen for changes in the component's valid status and update this component's valid status in response
-		component.addPropertyChangeListener(VISIBLE_PROPERTY, getDisplayVisibleChangeListener());	//listen for changes in the component's visible status and update this component's valid status in response
-		component.addNotificationListener(getNotificationListener());	//listen for component notifications and refire the notification events in response
-		return true;	//return true by default
+		childComponent.addPropertyChangeListener(DISPLAYED_PROPERTY, getDisplayVisibleChangeListener());	//listen for changes in the component's displayed status and update this component's valid status in response
+		childComponent.addPropertyChangeListener(VALID_PROPERTY, getValidChangeListener());	//listen for changes in the component's valid status and update this component's valid status in response
+		childComponent.addPropertyChangeListener(VISIBLE_PROPERTY, getDisplayVisibleChangeListener());	//listen for changes in the component's visible status and update this component's valid status in response
+		childComponent.addNotificationListener(getRepeatNotificationListener());	//listen for component notifications and refire notification events in response
+		if(childComponent instanceof CompositeComponent)	//if the child component is a composite component
+		{
+			((CompositeComponent)childComponent).addCompositeComponentListener(getRepeatCompositeComponentListener());	//listen for components being added or removed refire component events in response
+		}
 	}
 
-	/**Removes a child component.
-	Any class that overrides this method must call this version.
-	The return value from this version has no sigificance
+	/**Uninitializes a comopnent to be removed as a child comopnent of this composite component.
+	This method should be called for every child component removed from this composite component.
 	This version uninstalls a listener for the component's valid status.
-	This version saves any preferences of the child component and any descendants before the child is removed.
-	@param component The component to remove from this component.
-	@return <code>true</code> if the child components changed as a result of the operation.
-	@exception IllegalArgumentException if the component is not a member of this composite component.
+	This version uninstalls a listener to refire copies of notification events.
+	This version uninstalls a listener to refire copies of composite component events.
+	This version saves any preferences of the child component and any descendants.
+	@param childComponent The component to remove from this component.
 	@see Component#savePreferences()
 	*/
-	protected boolean removeComponent(final Component component)
+	protected void uninitializeChildComponent(final Component childComponent)
 	{
-		if(component.getParent()!=this)	//if this component is not a member of this container
-		{
-			throw new IllegalArgumentException("Component "+component+" is not member of composite component "+this+".");
-		}
 		try
 		{
 			savePreferences(true);	//save preferences for the entire component tree
@@ -134,12 +157,46 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 		{
 			Debug.warn(ioException);	//log a warning			
 		}
-		component.removePropertyChangeListener(DISPLAYED_PROPERTY, getDisplayVisibleChangeListener());	//stop listening for changes in the component's displayed status
-		component.removePropertyChangeListener(VALID_PROPERTY, getValidChangeListener());	//stop listening for changes in the component's valid status
-		component.removePropertyChangeListener(VISIBLE_PROPERTY, getDisplayVisibleChangeListener());	//stop listening for changes in the component's visible status
-		component.removeNotificationListener(getNotificationListener());	//stop listening for component notifications
-		return true;	//return true by default
+		childComponent.removePropertyChangeListener(DISPLAYED_PROPERTY, getDisplayVisibleChangeListener());	//stop listening for changes in the component's displayed status
+		childComponent.removePropertyChangeListener(VALID_PROPERTY, getValidChangeListener());	//stop listening for changes in the component's valid status
+		childComponent.removePropertyChangeListener(VISIBLE_PROPERTY, getDisplayVisibleChangeListener());	//stop listening for changes in the component's visible status
+		childComponent.removeNotificationListener(getRepeatNotificationListener());	//stop listening for component notifications
+		if(childComponent instanceof CompositeComponent)	//if the child component is a composite component
+		{
+			((CompositeComponent)childComponent).removeCompositeComponentListener(getRepeatCompositeComponentListener());	//stop listening for components being added or removed
+		}
 	}
+
+	/**Called when a descendant component is added to a descendant composite component.
+	The target of the event indicates the descendant composite component to which the descendant component was added.
+	The event is propogated to this component's parent, if any.
+	This method is called by child components and should not be directly invoked by an application. 
+	@param childComponentEvent The event indicating the added child component and the target parent composite component.
+	*/
+/*TODO del if not wanted
+	public void descendantComponentAdded(final ComponentEvent childComponentEvent)
+	{
+		final CompositeComponent parentComponent=getParent();	//get the parent component, if any
+		if(parentComponent!=null)	//if there is a parent component
+		{
+			parentComponent.descendantComponentAdded(new ComponentEvent(this, childComponentEvent));	//give the parent a copy of this event with the same target
+		}
+		
+	}
+*/
+
+	/**Called when a descendant component is removed from a descendant composite component.
+	The target of the event indicates the descendant composite component from which the descendant component was removed.
+	The event is propogated to this component's parent, if any.
+	This method is called by child components and should not be directly invoked by an application. 
+	@param childComponentEvent The event indicating the removed child component and the target parent composite component.
+	*/
+/*TODO del if not wanted
+	public void descendantComponentRemoved(final ComponentEvent childComponentEvent)
+	{
+		
+	}
+*/
 
 	/**Label model constructor.
 	@param labelModel The component label model.
@@ -193,7 +250,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	protected boolean determineChildrenValid()
 	{
 //TODO fix Debug.trace("ready to determine children valid in", this);
-		for(final Component childComponent:getChildren())	//for each child component
+		for(final Component childComponent:getChildComponents())	//for each child component
 		{
 //TODO del Debug.trace("in", this, "child", childComponent, "is valid", childComponent.isValid());			
 			if(childComponent.isDisplayed() && childComponent.isVisible() && !childComponent.isValid())	//if this child component is displayed and visible, but not valid
@@ -226,7 +283,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	protected boolean validateChildren()
 	{
 		boolean result=true;	//start by assuming all child components will validate 
-		for(final Component childComponent:getChildren())	//for each child component
+		for(final Component childComponent:getChildComponents())	//for each child component
 		{
 			if(childComponent.isDisplayed() && childComponent.isVisible() && !childComponent.validate())	//if this child component is displayed and visible, but doesn't validate
 			{
@@ -234,15 +291,6 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 			}
 		}
 		return result;	//return whether all child components validated
-	}
-
-	/**Retrieves the first component in the hierarchy with the given name.
-	This method checks this component and all descendant components.
-	@return The first component with the given name, or <code>null</code> if this component and all descendant components do not have the given name. 
-	*/
-	public Component getComponentByName(final String name)
-	{
-		return getComponentByName(this, name);	//search the component hierarchy for a component with the given name
 	}
 
 	/**Update's this object's theme.
@@ -258,7 +306,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	*/
 	public void updateTheme() throws IOException
 	{
-		for(final Component childComponent:getChildren())	//for each child component
+		for(final Component childComponent:getChildComponents())	//for each child component
 		{
 			childComponent.updateTheme();	//tell the child component to update its theme
 		}
@@ -275,7 +323,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 	{
 		if(includeDescendants)	//if descendants should be included
 		{
-			for(final Component childComponent:getChildren())	//for each child component
+			for(final Component childComponent:getChildComponents())	//for each child component
 			{
 				childComponent.loadPreferences(includeDescendants);	//tell the child component to load its preferences
 			}			
@@ -294,7 +342,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 		super.savePreferences(includeDescendants);	//save preferences normally
 		if(includeDescendants)	//if descendants should be included
 		{
-			for(final Component childComponent:getChildren())	//for each child component
+			for(final Component childComponent:getChildComponents())	//for each child component
 			{
 				childComponent.savePreferences(includeDescendants);	//tell the child component to save its preferences
 			}			
@@ -361,7 +409,7 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 			else	//if this wasn't a focused or targeted event, dispatch the event to all child components
 			{
 //Debug.trace("this is an unconsumed non-targeted event; ready to send to children");
-				for(final Component childComponent:getChildren())	//for each child component
+				for(final Component childComponent:getChildComponents())	//for each child component
 				{
 					if(inputEvent.isConsumed())	//if the event has been consumed
 					{
@@ -400,6 +448,77 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 				target.dispatchInputEvent(inputEvent);	//dispatch the event to the target's ancestor, which is this component's child
 			}
 			target=parent;	//walk up the chain
+		}
+	}
+
+	/**Adds a composite component listener.
+	An event will be fired for each descendant component added or removed, with the event target indicating the parent composite component of the change.
+	@param compositeComponentListener The composite component listener to add.
+	*/
+	public void addCompositeComponentListener(final CompositeComponentListener compositeComponentListener)
+	{
+		getEventListenerManager().add(CompositeComponentListener.class, compositeComponentListener);	//add the listener
+	}
+
+	/**Removes a composite component listener.
+	An event will be fired for each descendant component added or removed, with the event target indicating the parent composite component of the change.
+	@param compositeComponentListener The composite component listener to remove.
+	*/
+	public void removeCompositeComponentListener(final CompositeComponentListener compositeComponentListener)
+	{
+		getEventListenerManager().remove(CompositeComponentListener.class, compositeComponentListener);	//remove the listener
+	}
+
+	/**Fires a component added event to all registered composite component listeners.
+	This method delegates to {@link #fireChildComponentAdded(ComponentEvent)}.
+	@param childComponent The child component added.
+	@see CompositeComponentListener
+	@see ComponentEvent
+	*/
+	protected void fireChildComponentAdded(final Component childComponent)
+	{
+		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
+		if(eventListenerManager.hasListeners(CompositeComponentListener.class))	//if there are composite component listeners registered
+		{
+			fireChildComponentAdded(new ComponentEvent(this, childComponent));	//create and fire a new component event
+		}
+	}
+
+	/**Fires a given component added event to all registered composite component listeners.
+	@param childComponentEvent The child component event to fire.
+	*/
+	protected void fireChildComponentAdded(final ComponentEvent childComponentEvent)
+	{
+		for(final CompositeComponentListener compositeComponentListener:getEventListenerManager().getListeners(CompositeComponentListener.class))	//for each composite component listener
+		{
+			compositeComponentListener.childComponentAdded(childComponentEvent);	//dispatch the component event to the listener
+		}
+	}
+
+	/**Fires a component removed event to all registered composite component listeners.
+	This method delegates to {@link #fireChildComponentRemoved(ComponentEvent)}.
+	@param childComponent The child component removed.
+	@see CompositeComponentListener
+	@see ComponentEvent
+	*/
+	protected void fireChildComponentRemoved(final Component childComponent)
+	{
+		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
+		if(eventListenerManager.hasListeners(CompositeComponentListener.class))	//if there are composite component listeners registered
+		{
+			fireChildComponentRemoved(new ComponentEvent(this, childComponent));	//create and fire a new component event
+		}
+	}
+
+	/**Fires a given component removed event to all registered composite component listeners.
+	@param childComponentEvent The child component event to fire.
+	@see CompositeComponentListener
+	*/
+	protected void fireChildComponentRemoved(final ComponentEvent childComponentEvent)
+	{
+		for(final CompositeComponentListener compositeComponentListener:getEventListenerManager().getListeners(CompositeComponentListener.class))	//for each composite component listener
+		{
+			compositeComponentListener.childComponentRemoved(childComponentEvent);	//dispatch the component event to the listener
 		}
 	}
 

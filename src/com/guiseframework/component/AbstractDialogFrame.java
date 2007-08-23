@@ -26,16 +26,17 @@ public abstract class AbstractDialogFrame<V> extends AbstractFrame implements Di
 		protected ValueModel<V> getValueModel() {return valueModel;}
 
 	/**Whether the value is editable and the control will allow the the user to change the value.*/
-	private boolean editable=true;
+//TODO del	private boolean editable=true;
 
 		/**@return Whether the value is editable and the control will allow the the user to change the value.*/
-		public boolean isEditable() {return editable;}
+	//TODO del		public boolean isEditable() {return editable;}
 
 		/**Sets whether the value is editable and the control will allow the the user to change the value.
 		This is a bound property of type <code>Boolean</code>.
 		@param newEditable <code>true</code> if the control should allow the user to change the value.
 		@see #EDITABLE_PROPERTY
 		*/
+/*TODO del
 		public void setEditable(final boolean newEditable)
 		{
 			if(editable!=newEditable)	//if the value is really changing
@@ -45,6 +46,7 @@ public abstract class AbstractDialogFrame<V> extends AbstractFrame implements Di
 				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
 			}			
 		}
+*/
 
 	/**Whether the control is enabled and can receive user input.*/
 	private boolean enabled=true;

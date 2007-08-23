@@ -268,27 +268,26 @@ public class SequenceCardPanel extends AbstractCardPanel implements Commitable
 	This version installs a listener for the component's displayed status.
 	Any class that overrides this method must call this version.
 	@param index The index at which the component should be added.
-	@param component The component to add to this component.
-	@return <code>true</code> if the child components changed as a result of the operation.
-	@exception IllegalArgumentException if the component already has a parent.
+	@param childComponent The component to add to this component.
+	@exception IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
 	*/
-	protected boolean addComponent(final int index, final Component component)
+	protected void addComponent(final int index, final Component childComponent)
 	{
-		final boolean result=super.addComponent(index, component);	//initialize the child component as needed
-		component.addPropertyChangeListener(DISPLAYED_PROPERTY, cardDisplayedChangeListener);	//listen for changes in the component's displayed status and make sure the sequence is disabled as needed
-		return result;
+		super.addComponent(index, childComponent);	//initialize the child component as needed
+		childComponent.addPropertyChangeListener(DISPLAYED_PROPERTY, cardDisplayedChangeListener);	//listen for changes in the component's displayed status and make sure the sequence is disabled as needed
 	}
 
 	/**Removes a child component.
 	This version uninstalls a listener for the component's displayed status.
 	Any class that overrides this method must call this version.
-	@param component The component to remove from this component.
-	@return <code>true</code> if the child components changed as a result of the operation.
+	@param childComponent The component to remove from this component.
+	@exception IllegalArgumentException if the component does not recognize this composite component as its parent or the component is not a member of this composite component.
+	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
 	*/
-	protected boolean removeComponent(final Component component)
+	protected void removeComponent(final Component childComponent)
 	{
-		component.removePropertyChangeListener(DISPLAYED_PROPERTY, cardDisplayedChangeListener);	//stop listening for changes in the component's displayed status
-		return super.removeComponent(component);	//uninitialize the child component as needed
+		childComponent.removePropertyChangeListener(DISPLAYED_PROPERTY, cardDisplayedChangeListener);	//stop listening for changes in the component's displayed status
+		super.removeComponent(childComponent);	//uninitialize the child component as needed
 	}
 
 	/**Called when the {@link Component#VALID_PROPERTY} of a child component changes.

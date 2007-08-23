@@ -1,7 +1,7 @@
 package com.guiseframework.component;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.guiseframework.model.LabelModel;
 
@@ -13,75 +13,63 @@ The component's validity is updated whenever a child comonent is added or remove
 public abstract class AbstractMultipleCompositeComponent extends AbstractCompositeComponent
 {
 
-	/**The map of components keyed to IDs.*/
-	private final Map<Long, Component> idComponentMap=new ConcurrentHashMap<Long, Component>();	//TODO perhaps remove; the speed may not be sufficient to outweigh the overhead; this is only a single-level search, anyway
+	/**The set of child components.*/
+	private final Set<Component> childComponents=new CopyOnWriteArraySet<Component>();	//TODO change to a read write lock set and add thread-safety to the entire hierarchy
 
-	/**@return Whether this component has children.*/
-	public boolean hasChildren() {return !idComponentMap.isEmpty();}
+	/**@return Whether this component has child components.*/
+	public boolean hasChildComponents() {return !childComponents.isEmpty();}
 
 	/**@return An iterable to child components.*/
-	public Iterable<Component> getChildren() {return idComponentMap.values();}
+	public Iterable<Component> getChildComponents() {return childComponents;}	//TODO make sure this is unmodifiable after we switch to thread-safety
 
 	/**Adds a child component.
-	This version adds the component to the component map.
+	This version adds the component to the component set.
 	Any class that overrides this method must call this version.
-	@param component The component to add to this component.
-	@return <code>true</code> if the child components changed as a result of the operation.
-	@exception IllegalArgumentException if the component already has a parent.
+	@param childComponent The component to add to this component.
+	@exception IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
 	*/
-	protected boolean addComponent(final Component component)
+	protected void addComponent(final Component childComponent)
 	{
-		if(component.getParent()!=null)	//if this component has already been added to container; do this check before we try to add the component to the map, because setting the same mapping won't result in an error
+		if(childComponent.getParent()!=null)	//if this component has already been added to container; do this check before we try to add the component to the map, because setting the same mapping won't result in an error
 		{
-			throw new IllegalArgumentException("Component "+component+" is already a member of a composite component, "+component.getParent()+".");
+			throw new IllegalArgumentException("Component "+childComponent+" is already a member of a composite component, "+childComponent.getParent()+".");
 		}
-		if(idComponentMap.put(Long.valueOf(component.getDepictID()), component)!=component)	//add this component to the map; if that resulted in a map change
+		if(childComponents.add(childComponent))	//add this component to the set; if that resulted in a map change
 		{
-			super.addComponent(component);	//initialize the child component as needed
-			component.setParent(this);	//tell the component who its parent is
+			initializeChildComponent(childComponent);	//initialize the child component as needed
+			childComponent.setParent(this);	//tell the component who its parent is
 			updateValid();	//update the valid status
-			return true;	//indicate that the components changed
+			fireChildComponentAdded(childComponent);	//inform listeners that the child component was added
 		}
-		else	//if the component was already in the map
+		else	//if the component was already in the set
 		{
-			return false;	//indicate that no components changed
+			throw new IllegalArgumentException("Component "+childComponent+" is already a member of a composite component, "+this+".");
 		}
 	}
 
 	/**Removes a child component.
-	This version removes the component from the component map.
+	This version removes the component from the component set.
 	Any class that overrides this method must call this version.
-	@param component The component to remove from this component.
-	@return <code>true</code> if the child components changed as a result of the operation.
-	@exception IllegalArgumentException if the component is not a member of this composite component.
+	@param childComponent The component to remove from this component.
+	@exception IllegalArgumentException if the component does not recognize this composite component as its parent or the component is not a member of this composite component.
 	*/
-	protected boolean removeComponent(final Component component)
+	protected void removeComponent(final Component childComponent)
 	{
-		final Component removedComponent=idComponentMap.remove(Long.valueOf(component.getDepictID()));	//remove this component from the map
-		if(removedComponent!=null)	//if a component was removed
+		if(childComponent.getParent()!=this)	//if this component is not a member of this container
 		{
-			if(removedComponent!=component)	//if there was another component with the same ID
-			{
-				throw new IllegalStateException("Another component "+removedComponent+" stored with same ID "+component.getDepictID()+" as component "+component);
-			}
-			super.removeComponent(component);	//uninitialize the child component as needed
-			component.setParent(null);	//tell the component it no longer has a parent
+			throw new IllegalArgumentException("Component "+childComponent+" does not recognize composite component "+this+" as its parent.");
+		}
+		if(childComponents.remove(childComponent))	//remove this component from the set; if the component was in the set
+		{
+			uninitializeChildComponent(childComponent);	//uninitialize the child component as needed
+			childComponent.setParent(null);	//tell the component it no longer has a parent
 			updateValid();	//update the valid status
-			return true;	//indicate that the child components changed
+			fireChildComponentRemoved(childComponent);	//inform listeners that the child component was removed
 		}
 		else	//if no component was removed
 		{
-			return false;	//there was no change
+			throw new IllegalArgumentException("Component "+childComponent+" is not member of composite component "+this+".");
 		}
-	}
-
-	/**Retrieves the child component with the given ID.
-	@param id The ID of the component to return.
-	@return The child component with the given ID, or <code>null</code> if there is no child component with the given ID. 
-	*/
-	public Component getComponent(final long id)	//TODO perhaps remove; the speed may not be sufficient to outweigh the overhead; this is only a single-level search, anyway
-	{
-		return idComponentMap.get(Long.valueOf(id));	//return the component with the given ID
 	}
 
 	/**Label model constructor.

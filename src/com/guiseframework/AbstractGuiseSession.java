@@ -1254,7 +1254,7 @@ public abstract class AbstractGuiseSession extends BoundPropertyObject implement
 			}
 			if(component instanceof CompositeComponent)	//if the component is a composite component
 			{
-				for(final Component childComponent:((CompositeComponent)component).getChildren())	//for every child component
+				for(final Component childComponent:((CompositeComponent)component).getChildComponents())	//for every child component
 				{
 					fireNavigated(childComponent, navigationEvent);	//fire the event to the child component if possible
 				}

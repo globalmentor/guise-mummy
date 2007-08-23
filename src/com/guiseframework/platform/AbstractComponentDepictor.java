@@ -52,11 +52,15 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 	public void installed(final C component)
 	{
 		super.installed(component);	//perform the default installation
-		if(component instanceof Container)	//if the component is a container
+		if(component instanceof CompositeComponent)	//if the component is a composite component
 		{
-			final Container container=(Container)component;	//cast the component to a container
-			container.addContainerListener(getChangeListener());	//listen for container events
-			container.getLayout().addPropertyChangeListener(getChangeListener());	//listen for layout property change events (including layout constraint property change events)
+			final CompositeComponent compositeComponent=(CompositeComponent)component;	//cast the component to a composite component
+			compositeComponent.addCompositeComponentListener(getChangeListener());	//listen for composite component events
+		}
+		if(component instanceof LayoutComponent)	//if the component is a layout component
+		{
+			final LayoutComponent layoutComponent=(LayoutComponent)component;	//cast the component to a layout component
+			layoutComponent.getLayout().addPropertyChangeListener(getChangeListener());	//listen for layout property change events (including layout constraint property change events)
 		}
 		if(component instanceof ValueModel)	//if the component holds a value, listen for the value's properties changing
 		{
@@ -78,11 +82,15 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 	public void uninstalled(final C component)
 	{
 		super.uninstalled(component);	//perform the default uninstallation
-		if(component instanceof Container)	//if the component is a container
+		if(component instanceof CompositeComponent)	//if the component is a composite component
 		{
-			final Container container=(Container)component;	//cast the component to a container
-			container.removeContainerListener(getChangeListener());	//stop listening for container events
-			container.getLayout().removePropertyChangeListener(changeListener);	//stop listening for layout property change events (including layout constraint property change events)
+			final CompositeComponent compositeComponent=(CompositeComponent)component;	//cast the component to a composite component
+			compositeComponent.removeCompositeComponentListener(getChangeListener());	//stop listening for composite component events
+		}
+		if(component instanceof LayoutComponent)	//if the component is a layout component
+		{
+			final LayoutComponent layoutComponent=(LayoutComponent)component;	//cast the component to a layout component
+			layoutComponent.getLayout().removePropertyChangeListener(changeListener);	//stop listening for layout property change events (including layout constraint property change events)
 		}
 		if(component instanceof ValueModel)	//if the component holds a value, stop listening for the value's properties changing
 		{
@@ -189,7 +197,7 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 		final C component=getDepictedObject();	//get the depicted object
 		if(component instanceof CompositeComponent)	//if this is a composite component
 		{
-			for(final Component childComponent:((CompositeComponent)component).getChildren())	//for each child component
+			for(final Component childComponent:((CompositeComponent)component).getChildComponents())	//for each child component
 			{
 				depictChild(childComponent);	//update this child
 			}
@@ -245,7 +253,7 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 	This class implements various event listeners and marks the depiction as dirty accordingly.
 	@author Garret Wilson
 	*/
-	protected class ChangeListener extends AbstractDepictor.ChangeListener implements ContainerListener
+	protected class ChangeListener extends AbstractDepictor.ChangeListener implements CompositeComponentListener
 	{
 
 		/**Called when a bound property is changed.
@@ -283,12 +291,26 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 			}
 		}
 
-		/**Called when a container is modified.
-		@param containerEvent The event indicating the source of the event and the container modifications.
+		/**Called when a child component is added to a composite component.
+		@param childComponentEvent The event indicating the added child component and the target parent composite component.
 		*/
-		public void containerModified(final ContainerEvent containerEvent)
+		public void childComponentAdded(final ComponentEvent childComponentEvent)
 		{
-			setDepicted(false);	//show that we need general updates
+			if(childComponentEvent.getTarget()==getDepictedObject())	//if the component as added as a direct child of this component
+			{
+				setDepicted(false);	//show that we need general updates
+			}
+		}
+
+		/**Called when a child component is removed from a composite component.
+		@param childComponentEvent The event indicating the removed child component and the target parent composite component.
+		*/
+		public void childComponentRemoved(final ComponentEvent childComponentEvent)
+		{
+			if(childComponentEvent.getTarget()==getDepictedObject())	//if the component as removed as a direct child of this component
+			{
+				setDepicted(false);	//show that we need general updates
+			}
 		}
 	};
 

@@ -3,7 +3,6 @@ package com.guiseframework.component;
 import java.util.*;
 
 import com.guiseframework.component.layout.*;
-import com.guiseframework.event.*;
 import com.guiseframework.model.DefaultLabelModel;
 import com.guiseframework.model.LabelModel;
 import com.guiseframework.prototype.*;
@@ -57,7 +56,6 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	public void add(final int index, final Component component)
 	{
 		addComponent(index, component);	//add the component normally
-		fireContainerModified(index, component, null);	//indicate the component was added at the index TODO promote
 	}
 
 	/**Adds a component with default constraints to the container.
@@ -274,10 +272,9 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	{
 		final Component component=(Component)componentObject;	//cast the object to a component
 		final int index=indexOf(component);	//get the index of the component
-		final boolean result=removeComponent(component);	//remove the component normally
+		removeComponent(component);	//remove the component normally
 		assert index>=0 : "Component successfully removed from container, yet previous index is negative.";
-		fireContainerModified(index, null, component);	//indicate the component was removed from the index TODO promote
-		return result;	//return the result
+		return true;	//removing a component from a container will always result in container modification
 	}
 
 	/**Removes the child component at the specified position in this container.
@@ -309,13 +306,13 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	@return A list of container children in order.
 	@see #iterator()
 	*/
-	public List<Component> getChildren()
+	public List<Component> getChildComponents()
 	{
 		return new ArrayList<Component>(getComponentList());	//create and return a copy of the list
 	}
 
 	/**Sets the children in this container.
-	This method along with {@link #getChildren()} provides a <code>children</code> property for alternate children access.
+	This method along with {@link #getChildComponents()} provides a <code>children</code> property for alternate children access.
 	@param children The new children for this container in order.
 	@see #clear()
 	@see #add(Component)
@@ -359,35 +356,6 @@ public abstract class AbstractContainer extends AbstractLayoutComponent implemen
 	public AbstractContainer(final LabelModel labelModel, final Layout<? extends Constraints> layout)
 	{
 		super(labelModel, layout);	//construct the parent class
-	}
-
-	/**Adds a container listener.
-	@param containerListener The container listener to add.
-	*/
-	public void addContainerListener(final ContainerListener containerListener)
-	{
-		getEventListenerManager().add(ContainerListener.class, containerListener);	//add the listener
-	}
-
-	/**Removes a container listener.
-	@param containerListener The container listener to remove.
-	*/
-	public void removeContainerListener(final ContainerListener containerListener)
-	{
-		getEventListenerManager().remove(ContainerListener.class, containerListener);	//remove the listener
-	}
-
-	/**Fires an event to all registered container listeners indicating the components in the container changed.
-	@param index The index at which a component was added and/or removed, or -1 if the index is unknown.
-	@param addedComponent The component that was added to the container, or <code>null</code> if no component was added or it is unknown whether or which components were added.
-	@param removedComponent The component that was removed from the container, or <code>null</code> if no component was removed or it is unknown whether or which components were removed.
-	@see ContainerListener
-	@see ContainerEvent
-	*/
-	protected void fireContainerModified(final int index, final Component addedComponent, final Component removedComponent)
-	{
-		final ContainerEvent containerEvent=new ContainerEvent(this, index, addedComponent, removedComponent);	//create a new event
-		getSession().queueEvent(new PostponedContainerEvent(getEventListenerManager(), containerEvent));	//tell the Guise session to queue the event
 	}
 
 }

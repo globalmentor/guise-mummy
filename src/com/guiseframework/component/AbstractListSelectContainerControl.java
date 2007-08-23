@@ -36,16 +36,17 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 	public AbstractValueLayout<? extends ControlConstraints> getLayout() {return (AbstractValueLayout<? extends ControlConstraints>)super.getLayout();}
 
 	/**Whether the value is editable and the control will allow the the user to change the value.*/
-	private boolean editable=true;
+//TODO del	private boolean editable=true;
 
 		/**@return Whether the value is editable and the control will allow the the user to change the value.*/
-		public boolean isEditable() {return editable;}
+//TODO del		public boolean isEditable() {return editable;}
 
 		/**Sets whether the value is editable and the control will allow the the user to change the value.
 		This is a bound property of type <code>Boolean</code>.
 		@param newEditable <code>true</code> if the control should allow the user to change the value.
 		@see #EDITABLE_PROPERTY
 		*/
+/*TODO del
 		public void setEditable(final boolean newEditable)
 		{
 			if(editable!=newEditable)	//if the value is really changing
@@ -55,6 +56,7 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
 			}			
 		}
+*/
 
 	/**The strategy used to generate a component to represent each value in the model.*/
 	private ValueRepresentationStrategy<Component> valueRepresentationStrategy;
@@ -436,21 +438,40 @@ public abstract class AbstractListSelectContainerControl extends AbstractContain
 		getEventListenerManager().remove(ListSelectionListener.class, selectionListener);	//remove the listener
 	}
 
-	/**Fires an event to all registered container listeners indicating the components in the container changed.
+
+	/**Fires a given component added event to all registered composite component listeners.
 	This implementation also fires a list modified event to all registered list listeners, if any.
-	@param index The index at which a component was added and/or removed, or -1 if the index is unknown.
-	@param addedComponent The component that was added to the container, or <code>null</code> if no component was added or it is unknown whether or which components were added.
-	@param removedComponent The component that was removed from the container, or <code>null</code> if no component was removed or it is unknown whether or which components were removed.
-	@see ContainerListener
-	@see ContainerEvent
+	@param childComponentEvent The child component event to fire.
 	*/
-	protected void fireContainerModified(final int index, final Component addedComponent, final Component removedComponent)
+	protected void fireChildComponentAdded(final ComponentEvent childComponentEvent)	//TODO it might be better to listen for the composite component events and act accordingly
 	{
-		super.fireContainerModified(index, addedComponent, removedComponent);	//fire the container modified event normally
+		super.fireChildComponentAdded(childComponentEvent);	//fire the component added event normally
 		if(getEventListenerManager().hasListeners(ListListener.class))	//if there are appropriate listeners registered
 		{
-			final ListEvent<Component> listEvent=new ListEvent<Component>(this, index, addedComponent, removedComponent);	//create a new event
-			getSession().queueEvent(new PostponedListEvent<Component>(getEventListenerManager(), listEvent));	//tell the Guise session to queue the event
+			final Component childComponent=childComponentEvent.getComponent();	//get the added child component
+			final ListEvent<Component> listEvent=new ListEvent<Component>(this, indexOf(childComponent), childComponent, null);	//create a new list event
+			for(final ListListener<Component> listListener:getEventListenerManager().getListeners(ListListener.class))	//for each list listener
+			{
+				listListener.listModified(listEvent);	//dispatch the list event to the listener
+			}
+		}
+	}
+
+	/**Fires a given component removed event to all registered composite component listeners.
+	This implementation also fires a list modified event to all registered list listeners, if any.
+	@param childComponentEvent The child component event to fire.
+	*/
+	protected void fireChildComponentRemoved(final ComponentEvent childComponentEvent)	//TODO it might be better to listen for the composite component events and act accordingly
+	{
+		super.fireChildComponentRemoved(childComponentEvent);	//fire the component removed event normally
+		if(getEventListenerManager().hasListeners(ListListener.class))	//if there are appropriate listeners registered
+		{
+			final Component childComponent=childComponentEvent.getComponent();	//get the removed child component
+			final ListEvent<Component> listEvent=new ListEvent<Component>(this, -1, null, childComponent);	//create a new list event
+			for(final ListListener<Component> listListener:getEventListenerManager().getListeners(ListListener.class))	//for each list listener
+			{
+				listListener.listModified(listEvent);	//dispatch the list event to the listener
+			}
 		}
 	}
 

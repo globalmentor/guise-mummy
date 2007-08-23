@@ -16,7 +16,7 @@ Otherwise, a {@link CheckType#RECTANGLE} check type will be used.</p>
 <p>A check control automatically installs a {@link ValueRequiredValidator}, as a check control does not have the capability of indicating <code>null</code>.</p>
 @author Garret Wilson
 */
-public class CheckControl extends AbstractValueControl<Boolean> 
+public class CheckControl extends AbstractEditValueControl<Boolean> 
 {
 
 	/**The check type bound property.*/

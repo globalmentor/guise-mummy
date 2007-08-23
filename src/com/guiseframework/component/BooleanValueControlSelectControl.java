@@ -29,16 +29,17 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	//TODO make sure newly created components have the correct value set automatically
 
 	/**Whether the value is editable and the control will allow the the user to change the value.*/
-	private boolean editable=true;	//TODO fix or del if not needed
+//TODO del	private boolean editable=true;	//TODO fix or del if not needed
 
 		/**@return Whether the value is editable and the control will allow the the user to change the value.*/
-		public boolean isEditable() {return editable;}
+//TODO del		public boolean isEditable() {return editable;}
 
 		/**Sets whether the value is editable and the control will allow the the user to change the value.
 		This is a bound property of type <code>Boolean</code>.
 		@param newEditable <code>true</code> if the control should allow the user to change the value.
 		@see #EDITABLE_PROPERTY
 		*/
+/*TODO del
 		public void setEditable(final boolean newEditable)
 		{
 			if(editable!=newEditable)	//if the value is really changing
@@ -48,6 +49,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
 			}			
 		}
+*/
 
 	/**The layout definition for the component.*/
 	private Layout<? extends Constraints> layout;
@@ -71,7 +73,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 				oldLayout.setOwner(null);	//tell the old layout it is no longer installed
 				layout=newLayout;	//actually change the value
 				layout.setOwner(this);	//tell the new layout which container owns it
-				for(final Component childComponent:getChildren())	//for each child component
+				for(final Component childComponent:getChildComponents())	//for each child component
 				{
 					newLayout.getConstraints(childComponent);	//make sure the constraints of all components are compatible with the layout TODO do we even need to do this? why not wait until later? but this may be OK---perhaps we can assume that if components are installed before the layout, they will be used with this layout and not another
 				}
@@ -106,7 +108,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	This version returns the children in the same order as the list values.
 	@return An iterable to child components.
 	*/
-	public Iterable<Component> getChildren()
+	public Iterable<Component> getChildComponents()
 	{
 		final List<Component> children=new ArrayList<Component>(size());	//create a list big enough to hold components for all values; the size could change before we get the iterator, so don't create a fixed array just in case
 		for(final V value:this)	//for each value
@@ -267,44 +269,36 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 	}
 
 	/**Adds a component to the layout component with default constraints.
-	@param component The component to add.
-	@return <code>true</code> if the child components changed as a result of the operation.
-	@exception IllegalArgumentException if the component already has a parent.
+	@param childComponent The component to add.
+	@exception IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
 	@exception IllegalStateException if the installed layout does not support default constraints.
 	*/
-	protected boolean addComponent(final Component component)
+	protected void addComponent(final Component childComponent)
 	{
-		if(super.addComponent(component))	//add the component normally; if the child components changed
+		super.addComponent(childComponent);	//add the component normally
+		getLayout().addComponent(childComponent);	//add the component to the layout
+		if(childComponent instanceof ValueControl && ((ValueControl<?>)childComponent).getValueClass().equals(Boolean.class))	//if the component is a Boolean value control
 		{
-			getLayout().addComponent(component);	//add the component to the layout
-			if(component instanceof ValueControl && ((ValueControl<?>)component).getValueClass().equals(Boolean.class))	//if the component is a Boolean value control
+			final ValueControl<Boolean> booleanValueControl=(ValueControl<Boolean>)childComponent;	//get the component as a boolean value control
+			final ValuePolicyModelGroup<Boolean> valuePolicyModelGroup=getValuePolicyModelGroup();	//get the value policy model group, if any
+			if(valuePolicyModelGroup!=null)	//if there is a policy group
 			{
-				final ValueControl<Boolean> booleanValueControl=(ValueControl<Boolean>)component;	//get the component as a boolean value control
-				final ValuePolicyModelGroup<Boolean> valuePolicyModelGroup=getValuePolicyModelGroup();	//get the value policy model group, if any
-				if(valuePolicyModelGroup!=null)	//if there is a policy group
-				{
-					valuePolicyModelGroup.add(booleanValueControl);	//add the component to the group
-				}
-				booleanValueControl.addPropertyChangeListener(ValueControl.VALUE_PROPERTY, componentValueChangeListener);	//listen for the child component's value changing and update the selected values accordingly
+				valuePolicyModelGroup.add(booleanValueControl);	//add the component to the group
 			}
-			return true;	//indicate that the child components changed
-		}
-		else	//if the component list did not change
-		{
-			return false;	//indicate that the child components did not change
+			booleanValueControl.addPropertyChangeListener(ValueControl.VALUE_PROPERTY, componentValueChangeListener);	//listen for the child component's value changing and update the selected values accordingly
 		}
 	}
 
 	/**Removes a component from the layout component.
-	@param component The component to remove.
-	@return <code>true</code> if the child components changed as a result of the operation.
-	@exception IllegalArgumentException if the component is not a member of this composite component.
+	@param childComponent The component to remove.
+	@exception IllegalArgumentException if the component does not recognize this composite component as its parent or the component is not a member of this composite component.
 	*/
-	protected boolean removeComponent(final Component component)
+	protected void removeComponent(final Component childComponent)
 	{
-		if(component instanceof ValueControl && ((ValueControl<?>)component).getValueClass().equals(Boolean.class))	//if the component is a Boolean value control
+			//TODO check the order of uninitialization; if an error occurs during removal, this could result in an inconsistent state
+		if(childComponent instanceof ValueControl && ((ValueControl<?>)childComponent).getValueClass().equals(Boolean.class))	//if the component is a Boolean value control
 		{
-			final ValueControl<Boolean> booleanValueControl=(ValueControl<Boolean>)component;	//get the component as a boolean value control
+			final ValueControl<Boolean> booleanValueControl=(ValueControl<Boolean>)childComponent;	//get the component as a boolean value control
 			final ValuePolicyModelGroup<Boolean> valuePolicyModelGroup=getValuePolicyModelGroup();	//get the value policy model group, if any
 			if(valuePolicyModelGroup!=null)	//if there is a policy group
 			{
@@ -312,9 +306,8 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 			}
 			booleanValueControl.removePropertyChangeListener(ValueControl.VALUE_PROPERTY, componentValueChangeListener);	//stop listening for changes in the child component's value
 		}
-		getLayout().removeComponent(component);	//remove the component from the layout
-		super.removeComponent(component);	//do the default removal
-		return true;	//indicate that the child components changed
+		getLayout().removeComponent(childComponent);	//remove the component from the layout
+		super.removeComponent(childComponent);	//do the default removal
 	}
 
 	/**The atomic flag that allows us to know whether we're synchronizing values, either from the list to the child controls or vice versa.*/
@@ -329,7 +322,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 			{
 				final Set<Integer> selectedIndexes=new HashSet<Integer>();	//create a set in which to store selected indexes
 				int i=0;	//keep track of the index
-				for(final Component component:getChildren())	//look at all the child components
+				for(final Component component:getChildComponents())	//look at all the child components
 				{
 					if(component instanceof ValueControl && ((ValueControl<?>)component).getValueClass().equals(Boolean.class) && Boolean.TRUE.equals(((ValueControl<Boolean>)component).getValue()))	//if the component is a Boolean value control set to TRUE
 					{
@@ -361,7 +354,7 @@ public class BooleanValueControlSelectControl<V> extends AbstractListSelectContr
 			{
 				final int[] selectedIndexes=getSelectedIndexes();	//get the selected indexes
 				int i=0;	//keep track of the index
-				for(final Component component:getChildren())	//look at all the child components
+				for(final Component component:getChildComponents())	//look at all the child components
 				{
 					if(component instanceof ValueControl && ((ValueControl<?>)component).getValueClass().equals(Boolean.class))	//if the component is a Boolean value control set to TRUE
 					{

@@ -465,7 +465,7 @@ public class WebApplicationFrameDepictor<C extends ApplicationFrame> extends Abs
 		}
 		if(component instanceof CompositeComponent)	//if this component is composed of other components
 		{
-			for(final Component childComponent:((CompositeComponent)component).getChildren())	//look at each child class component
+			for(final Component childComponent:((CompositeComponent)component).getChildComponents())	//look at each child class component
 			{
 				if(hasResourceImportControl(childComponent))	//if this child has a resource import control
 				{

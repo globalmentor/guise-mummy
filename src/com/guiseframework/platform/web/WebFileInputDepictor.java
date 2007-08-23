@@ -20,7 +20,7 @@ import static com.garretwilson.text.xml.xhtml.XHTMLConstants.*;
 @param <C> The type of component being depicted.
 @author Garret Wilson
 */
-public class WebFileInputDepictor<C extends ValueControl<ResourceImport>> extends AbstractDecoratedWebComponentDepictor<C>
+public class WebFileInputDepictor<C extends ResourceImportControl> extends AbstractDecoratedWebComponentDepictor<C>
 {
 
 	/**Default constructor using the XHTML <code>&lt;input&gt;</code> element.*/

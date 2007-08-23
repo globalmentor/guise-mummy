@@ -187,7 +187,7 @@ public class PlatformFileUploadPanel extends AbstractPanel implements ProgressLi
 	{
 		super(new FlowLayout(Flow.PAGE));	//construct the parent class
 		platformFileListControl=new ListControl<PlatformFile>(PlatformFile.class, PLATFORM_FILE_DISPLAY_COUNT);	//create a list in which to show the platform files
-		platformFileListControl.setEditable(false);	//don't allow the list to be edited
+//TODO del if not needed; bring back if we make the list control editable		platformFileListControl.setEditable(false);	//don't allow the list to be edited
 		platformFileListControl.setLineExtent(new Extent(30, Extent.Unit.EM));
 		add(platformFileListControl);
 

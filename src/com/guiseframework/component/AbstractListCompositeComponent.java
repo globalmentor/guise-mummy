@@ -53,58 +53,54 @@ public abstract class AbstractListCompositeComponent extends AbstractMultipleCom
 	This version adds the component to the component list.
 	Any class that overrides this method must call this version.
 	@param index The index at which the component should be added.
-	@param component The component to add to this component.
-	@return <code>true</code> if the child components changed as a result of the operation.
-	@exception IllegalArgumentException if the component already has a parent.
+	@param childComponent The component to add to this component.
+	@exception IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
 	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
 	*/
-	protected boolean addComponent(final int index, final Component component)
+	protected void addComponent(final int index, final Component childComponent)
 	{
-		if(component.getParent()!=null)	//if this component has already been added to component; do this check before we add the component to the list, because the super class' version of this only comes after the component is added to the list
+		if(childComponent.getParent()!=null)	//if this component has already been added to component; do this check before we add the component to the list, because the super class' version of this only comes after the component is added to the list
 		{
-			throw new IllegalArgumentException("Component "+component+" is already a member of a composite component, "+component.getParent()+".");
+			throw new IllegalArgumentException("Component "+childComponent+" is already a member of a composite component, "+childComponent.getParent()+".");
 		}
-		componentList.add(index, component);	//add the component to the list at the specified index
-		super.addComponent(component);	//do the default adding
-		return true;	//indicate that the child components changed
+		componentList.add(index, childComponent);	//add the component to the list at the specified index
+		super.addComponent(childComponent);	//do the default adding
 	}
 
 	/**Adds a child component to the last position.
 	This version adds the component to the component list.
 	Any class that overrides this method must call this version.
-	@param component The component to add to this component.
-	@return <code>true</code> if the child components changed as a result of the operation.
-	@exception IllegalArgumentException if the component already has a parent.
+	@param childComponent The component to add to this component.
+	@exception IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
 	*/
-	protected final boolean addComponent(final Component component)
+	protected final void addComponent(final Component childComponent)
 	{
-		return addComponent(componentList.size(), component);	//add the component to the end of the list
+		addComponent(componentList.size(), childComponent);	//add the component to the end of the list
 	}
 
 	/**Removes a child component.
 	This version removes the component from the component list.
 	Any class that overrides this method must call this version.
-	@param component The component to remove from this component.
-	@return <code>true</code> if the child components changed as a result of the operation.
+	@param childComponent The component to remove from this component.
+	@exception IllegalArgumentException if the component does not recognize this composite component as its parent or the component is not a member of this composite component.
 	*/
-	protected boolean removeComponent(final Component component)
+	protected void removeComponent(final Component childComponent)
 	{
-		if(componentList.remove(component))	//remove the component from the list
+		if(componentList.remove(childComponent))	//remove the component from the list
 		{
-			super.removeComponent(component);	//do the default removal
-			return true;	//indicate that the child components changed
+			super.removeComponent(childComponent);	//do the default removal
 		}
 		else	//if the component list did not change
 		{
-			return false;	//indicate that the chidl components did not change
+			throw new IllegalArgumentException("Component "+childComponent+" is not member of composite component "+this+".");
 		}
 	}
 
 	/**@return An iterable to contained components.*/
-	public Iterable<Component> getChildren() {return componentList;}
+	public Iterable<Component> getChildComponents() {return componentList;}
 
 	/**@return Whether this component has children. This implementation delegates to the component list.*/
-	public boolean hasChildren() {return !componentList.isEmpty();}
+	public boolean hasChildComponents() {return !componentList.isEmpty();}
 
 	/**Label model constructor.
 	@param labelModel The component label model.

@@ -31,20 +31,22 @@ public abstract class AbstractSingleCompositeComponent extends AbstractComposite
 				component=newComponent;	//actually change the value
 				if(oldComponent!=null)	//if there was an old component
 				{
-					super.removeComponent(component);	//uninitialize the old component as needed
+					super.uninitializeChildComponent(component);	//uninitialize the old component as needed
 					oldComponent.setParent(null);	//tell the old component it no longer has a parent
+					fireChildComponentRemoved(component);	//inform listeners that the child component was removed
 				}
 				if(newComponent!=null)	//if there is a new component
 				{
-					super.addComponent(component);	//initialize the new component as needed
+					super.initializeChildComponent(component);	//initialize the new component as needed
 					newComponent.setParent(this);	//tell the component who its parent is					
+					fireChildComponentAdded(component);	//inform listeners that the child component was added
 				}
 //TODO fix				firePropertyChange(CHECK_TYPE_PROPERTY, oldComponent, newComponent);	//indicate that the value changed
 			}			
 		}
 	
 	/**@return Whether this component has children.*/
-	public boolean hasChildren() {return component!=null;}
+	public boolean hasChildComponents() {return component!=null;}
 
 	/**@return An iterable to child components.*/
 	public Iterable<Component> getChldren()	//TODO make this more efficient

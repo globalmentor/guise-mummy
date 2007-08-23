@@ -119,7 +119,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 				{
 					throw new IllegalStateException("Flow layout wrapping not supported on the Y axis.");
 				}
-				childComponentIterator=component.getChildren().iterator();	//get an iterator to child components in logical order TODO i18n fix flow direction
+				childComponentIterator=component.getChildComponents().iterator();	//get an iterator to child components in logical order TODO i18n fix flow direction
 				depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_DIV);	//<xhtml:div>
 				writeIDAttribute(null, COMPONENT_LAYOUT_CLASS_SUFFIX);	//id="id-layout"
 				depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_FLOW_X_CLASS);	//class="layout-flow-x"
@@ -168,7 +168,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 				switch(flowAxis)	//see on which axis we should flow
 				{
 					case X:	//horizontal flow
-						childComponentIterator=component.getChildren().iterator();	//get an iterator to child components in logical order---we compensated for orientation by setting the table direction attribute
+						childComponentIterator=component.getChildComponents().iterator();	//get an iterator to child components in logical order---we compensated for orientation by setting the table direction attribute
 						depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_TR);	//<xhtml:tr>
 						depictContext.writeAttribute(null, ATTRIBUTE_CLASS, LAYOUT_FLOW_X_CLASS);	//class="layout-flow-x"
 						while(childComponentIterator.hasNext())	//for each visible child component in the container, wrap the component in a span with the correct style
@@ -204,7 +204,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 						depictContext.write("\n");	//format the output
 						break;
 					case Y:	//vertical flow
-						childComponentIterator=flowDirection==Flow.Direction.INCREASING ? component.getChildren().iterator() : new ReverseIterator<Component>(component.getChildren());	//get an iterator to child components in the correct direction
+						childComponentIterator=flowDirection==Flow.Direction.INCREASING ? component.getChildComponents().iterator() : new ReverseIterator<Component>(component.getChildComponents());	//get an iterator to child components in the correct direction
 						while(childComponentIterator.hasNext())	//for each visible child component in the container, wrap the component in a span with the correct style
 						{
 							final Component childComponent=childComponentIterator.next();	//get the next child component
@@ -520,7 +520,7 @@ public abstract class AbstractWebLayoutComponentDepictor<C extends LayoutCompone
 			{
 				selectedCard.depict();	//update the component view
 			}
-			for(final Component card:component.getChildren())	//set the views of the non-visible cards as updated (this will keep them from being sent to the client before they are needed)
+			for(final Component card:component.getChildComponents())	//set the views of the non-visible cards as updated (this will keep them from being sent to the client before they are needed)
 			{
 				if(card!=selectedCard)	//if this is not the selected card
 				{

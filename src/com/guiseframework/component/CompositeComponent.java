@@ -1,31 +1,49 @@
 package com.guiseframework.component;
 
+import com.guiseframework.event.*;
+
 /**A component that can contain other components.
-A composite component may contain other components, but only a {@link Container} allows for custom addition and removal of child components.
+A composite component may contain other components, but only a {@link Container} allows for application addition and removal of child components.
 @author Garret Wilson
 */
 public interface CompositeComponent extends Component
 {
 
-	/**@return Whether this component has children.*/
-	public boolean hasChildren();
+	/**@return Whether this component has childh components.*/
+	public boolean hasChildComponents();
 
 	/**@return An iterable to child components.*/
-	public Iterable<Component> getChildren();
+	public Iterable<Component> getChildComponents();
 
 	/**@return The number of child components.*/
 //TODO add if needed	public int getChildCount();
 
-	/**Retrieves the child component with the given ID.
-	@param id The ID of the component to return.
-	@return The child component with the given ID, or <code>null</code> if there is no child component with the given ID. 
+	/**Called when a descendant component is added to a descendant composite component.
+	The target of the event indicates the descendant composite component to which the descendant component was added.
+	The event is propogated to this component's parent, if any.
+	This method is called by child components and should not be directly invoked by an application. 
+	@param childComponentEvent The event indicating the added child component and the target parent composite component.
 	*/
-	public Component getComponent(final long id);	//TODO perhaps remove; the speed may not be sufficient to outweigh the overhead; this is only a single-level search, anyway
+//TODO del	public void descendantComponentAdded(final ComponentEvent childComponentEvent);
 
-	/**Retrieves the first component in the hierarchy with the given name.
-	This method checks this component and all descendant components.
-	@return The first component with the given name, or <code>null</code> if this component and all descendant components do not have the given name. 
+	/**Called when a descendant component is removed from a descendant composite component.
+	The target of the event indicates the descendant composite component from which the descendant component was removed.
+	The event is propogated to this component's parent, if any.
+	This method is called by child components and should not be directly invoked by an application. 
+	@param childComponentEvent The event indicating the removed child component and the target parent composite component.
 	*/
-	public Component getComponentByName(final String name);
+//TODO del	public void descendantComponentRemoved(final ComponentEvent childComponentEvent);
+
+	/**Adds a composite component listener.
+	An event will be fired for each descendant component added or removed, with the event target indicating the parent composite component of the change.
+	@param compositeComponentListener The composite component listener to add.
+	*/
+	public void addCompositeComponentListener(final CompositeComponentListener compositeComponentListener);
+
+	/**Removes a composite component listener.
+	An event will be fired for each descendant component added or removed, with the event target indicating the parent composite component of the change.
+	@param compositeComponentListener The composite component listener to remove.
+	*/
+	public void removeCompositeComponentListener(final CompositeComponentListener compositeComponentListener);
 
 }

@@ -5,12 +5,12 @@ import java.lang.reflect.*;
 import java.util.*;
 
 import static com.garretwilson.lang.ClassUtilities.*;
+import static com.garretwilson.lang.ObjectUtilities.*;
+
 import com.guiseframework.converter.*;
 import com.guiseframework.event.*;
 import com.guiseframework.model.*;
 import com.guiseframework.validator.*;
-
-import static com.garretwilson.lang.ObjectUtilities.*;
 
 /**Abstract implementation of a control to allow selection by the user of a value from a list.
 The component valid status is updated before a change in the {@link #VALUE_PROPERTY} or the {@link #VALIDATOR_PROPERTY} is fired. 

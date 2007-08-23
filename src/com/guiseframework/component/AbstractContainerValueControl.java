@@ -1,14 +1,12 @@
 package com.guiseframework.component;
 
-import static com.garretwilson.lang.ObjectUtilities.*;
-
 import java.beans.PropertyVetoException;
 
+import static com.garretwilson.lang.ObjectUtilities.*;
+
 import com.guiseframework.component.layout.Layout;
-import com.guiseframework.model.Notification;
-import com.guiseframework.model.ValueModel;
-import com.guiseframework.validator.ValidationException;
-import com.guiseframework.validator.Validator;
+import com.guiseframework.model.*;
+import com.guiseframework.validator.*;
 
 /**An abstract implementation of a container that is also a value control.
 The component valid status is updated before a change in the {@link #VALUE_PROPERTY} or the {@link #VALIDATOR_PROPERTY} is fired. 
@@ -137,4 +135,5 @@ public abstract class AbstractContainerValueControl<V> extends AbstractContainer
 
 	/**@return The class representing the type of value this model can hold.*/
 	public Class<V> getValueClass() {return getValueModel().getValueClass();}
+
 }

@@ -106,7 +106,7 @@ public abstract class AbstractCompositeStateComponent<T, S extends AbstractCompo
 	/**Removes all child component states.*/
 	protected void clearComponentStates()	//TODO make sure this and related routines doesn't leak components or component states
 	{
-		for(final Component component:getChildren())	//for each component in the container
+		for(final Component component:getChildComponents())	//for each component in the container
 		{
 			removeComponent(component);	//remove this component
 		}

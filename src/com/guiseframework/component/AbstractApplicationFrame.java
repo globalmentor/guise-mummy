@@ -120,9 +120,9 @@ public abstract class AbstractApplicationFrame extends AbstractFrame implements 
 	@return Whether this component has children.
 	@see #getChildFrames()
 	 */
-	public boolean hasChildren()
+	public boolean hasChildComponents()
 	{
-		return super.hasChildren() || !frameList.isEmpty();	//see if we have normal children and/or frames
+		return super.hasChildComponents() || !frameList.isEmpty();	//see if we have normal children and/or frames
 	}
 
 }

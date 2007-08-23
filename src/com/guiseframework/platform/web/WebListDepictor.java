@@ -39,7 +39,7 @@ public class WebListDepictor<C extends CompositeComponent> extends AbstractSimpl
 		final C component=getDepictedObject();	//get the component
 		depictContext.write("\n");	//format the output
 			//don't do the default updating of child views, because we control generation wrapper elements around each child
-		for(final Component childComponent:component.getChildren())	//for each child component
+		for(final Component childComponent:component.getChildComponents())	//for each child component
 		{
 			depictContext.writeIndent();	//write an indentation
 			depictContext.writeElementBegin(XHTML_NAMESPACE_URI, ELEMENT_LI);	//<xhtml:li>			

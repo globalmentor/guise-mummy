@@ -249,23 +249,16 @@ public abstract class AbstractMenu extends AbstractContainerControl implements M
 	If this component is itself a menu, this version closes that menu. 
 	Any class that overrides this method must call this version.
 	@param index The index at which the component should be added.
-	@param component The component to add to this component.
-	@return <code>true</code> if the child components changed as a result of the operation.
-	@exception IllegalArgumentException if the component already has a parent.
+	@param childComponent The component to add to this component.
+	@exception IllegalArgumentException if the component already has a parent or if the component is already a child of this composite component.
+	@exception IndexOutOfBoundsException if the index is less than zero or greater than the number of child components.
 	*/
-	protected boolean addComponent(final int index, final Component component)
+	protected void addComponent(final int index, final Component childComponent)
 	{
-		if(super.addComponent(index, component))	//do the default adding; if a change occurred
+		super.addComponent(index, childComponent);	//do the default adding
+		if(childComponent instanceof Menu)	//if the component is a menu
 		{
-			if(component instanceof Menu)	//if the component is a menu
-			{
-				((Menu)component).setOpen(false);	//close the child menu
-			}
-			return true;	//indicate that the child components changed
-		}
-		else	//if the component list did not change
-		{
-			return false;	//indicate that the chidl components did not change
+			((Menu)childComponent).setOpen(false);	//close the child menu
 		}
 	}
 

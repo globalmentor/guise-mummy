@@ -30,7 +30,7 @@ Default converters are available for the following types:
 @param <V> The type of value the input text is to represent.
 @author Garret Wilson
 */
-public class AbstractTextControl<V> extends AbstractValueControl<V>
+public class AbstractTextControl<V> extends AbstractEditValueControl<V>
 {
 
 	/**The auto commit pattern bound property.*/

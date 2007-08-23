@@ -53,21 +53,23 @@ public class WebTabbedPanelDepictor<C extends AbstractCardPanel> extends Abstrac
 				{
 					final String childComponentIDString=targetID.substring((componentID+'-').length());	//get the child component ID string TODO use a constant
 					final long childComponentID=platform.getDepictID(childComponentIDString);	//get the child component ID
-					final Component tabComponent=component.getComponent(childComponentID);	//get the tab component
-					if(tabComponent!=null)	//if there is such a tab component
+					for(final Component tabComponent:component)	//look at each child component
 					{
-						final CardConstraints constraints=component.getLayout().getConstraints(tabComponent);	//get the constraints for this tab
-						if(constraints.isEnabled())	//if this tab is enabled
+						if(tabComponent.getDepictID()==childComponentID)	//if this is the identified child component
 						{
-							try
+							final CardConstraints constraints=component.getLayout().getConstraints(tabComponent);	//get the constraints for this tab
+							if(constraints.isEnabled())	//if this tab is enabled
 							{
-								component.setNotification(null);	//clear the component errors; this method may generate new errors
-								component.setValue(tabComponent);	//switch to the specified tab component
-							}
-							catch(final PropertyVetoException propertyVetoException)	//if there is a veto
-							{
-								final Throwable cause=propertyVetoException.getCause();	//get the cause of the veto, if any
-								component.setNotification(new Notification(cause!=null ? cause : propertyVetoException));	//add notification of the error to the component
+								try
+								{
+									component.setNotification(null);	//clear the component errors; this method may generate new errors
+									component.setValue(tabComponent);	//switch to the specified tab component
+								}
+								catch(final PropertyVetoException propertyVetoException)	//if there is a veto
+								{
+									final Throwable cause=propertyVetoException.getCause();	//get the cause of the veto, if any
+									component.setNotification(new Notification(cause!=null ? cause : propertyVetoException));	//add notification of the error to the component
+								}
 							}
 						}
 					}
@@ -83,24 +85,27 @@ public class WebTabbedPanelDepictor<C extends AbstractCardPanel> extends Abstrac
 			final String tabID=asInstance(formEvent.getParameterListMap().getItem(componentID), String.class);	//get the value reported for this component, if there is one
 			if(tabID!=null)	//if a tab is indicated TODO maybe indicate "no tab" with an empty string
 			{
-				final Component tabComponent=component.getComponent(platform.getDepictID(tabID));	//get the tab component
-				if(tabComponent!=null)	//if there is such a tab component
+				final long childComponentID=platform.getDepictID(tabID);	//get the requested component ID
+				for(final Component tabComponent:component)	//look at each child component
 				{
-					if(component.isEnabled())	//if the component is enabled
+					if(tabComponent.getDepictID()==childComponentID)	//if this is the identified child component
 					{
-						final CardConstraints constraints=component.getLayout().getConstraints(tabComponent);	//get the constraints for this tab
-						assert constraints!=null : "No constraints found for tab component "+tabComponent;
-						if(constraints.isEnabled())	//if this tab is enabled
+						if(component.isEnabled())	//if the component is enabled
 						{
-							try
+							final CardConstraints constraints=component.getLayout().getConstraints(tabComponent);	//get the constraints for this tab
+							assert constraints!=null : "No constraints found for tab component "+tabComponent;
+							if(constraints.isEnabled())	//if this tab is enabled
 							{
-								component.setNotification(null);	//clear the component errors; this method may generate new errors
-								component.setValue(tabComponent);	//switch to the specified tab component
-							}
-							catch(final PropertyVetoException propertyVetoException)	//if there is a veto
-							{
-								final Throwable cause=propertyVetoException.getCause();	//get the cause of the veto, if any
-								component.setNotification(new Notification(cause!=null ? cause : propertyVetoException));	//add notification of the error to the component
+								try
+								{
+									component.setNotification(null);	//clear the component errors; this method may generate new errors
+									component.setValue(tabComponent);	//switch to the specified tab component
+								}
+								catch(final PropertyVetoException propertyVetoException)	//if there is a veto
+								{
+									final Throwable cause=propertyVetoException.getCause();	//get the cause of the veto, if any
+									component.setNotification(new Notification(cause!=null ? cause : propertyVetoException));	//add notification of the error to the component
+								}
 							}
 						}
 					}

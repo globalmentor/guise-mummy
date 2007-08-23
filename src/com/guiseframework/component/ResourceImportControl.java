@@ -5,7 +5,7 @@ import com.guiseframework.model.*;
 /**Control accepting a resource to be imported, such as a web file upload. 
 @author Garret Wilson
 */
-public class ResourceImportControl extends AbstractValueControl<ResourceImport>
+public class ResourceImportControl extends AbstractEditValueControl<ResourceImport>
 {
 
 	/**Default constructor with a default value model.*/

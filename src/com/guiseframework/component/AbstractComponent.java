@@ -1331,7 +1331,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		}
 		else if(component instanceof CompositeComponent)	//if this component doesn't have the correct ID, but it is a composite component
 		{
-			for(final Component childComponent:((CompositeComponent)component).getChildren())	//for each child component
+			for(final Component childComponent:((CompositeComponent)component).getChildComponents())	//for each child component
 			{
 				final Component matchingComponent=getComponentByID(childComponent, id);	//see if we can find a component in this tree
 				if(matchingComponent!=null)	//if we found a matching component
@@ -1356,7 +1356,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		}
 		else if(component instanceof CompositeComponent)	//if this component doesn't have the correct name, but it is a composite component
 		{
-			for(final Component childComponent:((CompositeComponent)component).getChildren())	//for each child component
+			for(final Component childComponent:((CompositeComponent)component).getChildComponents())	//for each child component
 			{
 				final Component matchingComponent=getComponentByName(childComponent, name);	//see if we can find a component in this tree
 				if(matchingComponent!=null)	//if we found a matching component
@@ -1394,7 +1394,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		}
 		else if(component instanceof CompositeComponent)	//if the component's view is updated, check its children if it has any
 		{
-			for(final Component childComponent:((CompositeComponent)component).getChildren())	//for each child component
+			for(final Component childComponent:((CompositeComponent)component).getChildComponents())	//for each child component
 			{
 				getDirtyComponents(childComponent, dirtyComponents);	//gather dirty components in this child hierarchy
 			}
@@ -1410,7 +1410,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		component.getDepictor().setDepicted(newUpdated);	//change the updated status of this component's view
 		if(component instanceof CompositeComponent)	//if the component is a composite component
 		{
-			for(final Component childComponent:((CompositeComponent)component).getChildren())	//for each child component
+			for(final Component childComponent:((CompositeComponent)component).getChildComponents())	//for each child component
 			{
 				setDepicted(childComponent, newUpdated);	//changed the updated status for this child's hierarchy
 			}
@@ -1444,7 +1444,7 @@ Debug.trace("now valid of", this, "is", isValid());
 		}
 		if(component instanceof CompositeComponent)	//if the component is a composite component, check its children
 		{
-			for(final Component childComponent:((CompositeComponent)component).getChildren())	//for each child component
+			for(final Component childComponent:((CompositeComponent)component).getChildComponents())	//for each child component
 			{
 				if(childComponent.isDisplayed() && childComponent.isVisible())	//if this child component is displayed and visible
 				{
@@ -1484,14 +1484,17 @@ Debug.trace("now valid of", this, "is", isValid());
 	}
 
 	/**Fires an event to all registered notification listeners with the new notification information.
-	Parents are expected to refire the notification event up the hierarchy.
+	Parents are expected to refire copies of the notification event up the hierarchy, keeping the original target.
 	@param notificationEvent The notification event to send to the notification listeners.
 	@exception NullPointerException if the given notification event is <code>null</code>.
 	@see NotificationListener
 	*/
 	protected void fireNotified(final NotificationEvent notificationEvent)
 	{
-		getSession().queueEvent(new PostponedNotificationEvent(getEventListenerManager(), notificationEvent));	//tell the Guise session to queue the event
+		for(final NotificationListener notificationListener:getEventListenerManager().getListeners(NotificationListener.class))	//for each notification listener
+		{
+			notificationListener.notified(notificationEvent);	//dispatch the notification event to the listener
+		}
 	}
 
 	/**@return A hash code value for the object.*/

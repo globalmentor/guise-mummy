@@ -34,15 +34,15 @@ public abstract class AbstractEditableComponentTextControl<EC extends Component>
 	/**The edit control bound property.*/
 //TODO del if not used	public final static String EDIT_CONTROL_PROPERTY=getPropertyName(EditableComponentLabelControl.class, "editControl");
 
-	/**Whether the value is editable and the control will allow the the user to change the value.*/
+	/**Whether the value is editable and the component will allow the the user to change the value.*/
 	private boolean editable=true;
 
-		/**@return Whether the value is editable and the control will allow the the user to change the value.*/
+		/**@return Whether the value is editable and the component will allow the the user to change the value.*/
 		public boolean isEditable() {return editable;}
 
-		/**Sets whether the value is editable and the control will allow the the user to change the value.
+		/**Sets whether the value is editable and the component will allow the the user to change the value.
 		This is a bound property of type <code>Boolean</code>.
-		@param newEditable <code>true</code> if the control should allow the user to change the value.
+		@param newEditable <code>true</code> if the component should allow the user to change the value.
 		@see #EDITABLE_PROPERTY
 		*/
 		public void setEditable(final boolean newEditable)
@@ -260,6 +260,7 @@ public abstract class AbstractEditableComponentTextControl<EC extends Component>
 	{
 		setText(getEditedComponent(), getEditControl().getValue());	//update the edited component's text with the contents of the edit control
 		setMode(null);	//switch out of edit mode, updating the component
+		fireEdited();	//inform listeners that an edit has occurred
 	}
 
 	/**Cancels edits.*/
@@ -323,5 +324,48 @@ public abstract class AbstractEditableComponentTextControl<EC extends Component>
 	@param newText The new text to set in the edited component.
 	*/
 	protected abstract void setText(final EC editedComponent, final String newText);
+
+	//EditComponent implementation
+
+	/**Adds an edit listener.
+	@param editListener The edit listener to add.
+	*/
+	public void addEditListener(final EditListener editListener)
+	{
+		getEventListenerManager().add(EditListener.class, editListener);	//add the listener
+	}
+
+	/**Removes an edit listener.
+	@param editListener The edit listener to remove.
+	*/
+	public void removeEditListener(final EditListener editListener)
+	{
+		getEventListenerManager().remove(EditListener.class, editListener);	//remove the listener
+	}
+
+	/**Fires an edit event to all registered edit listeners.
+	This method delegates to {@link #fireEdited(EditEvent)}.
+	@see EditListener
+	@see EditEvent
+	*/
+	protected void fireEdited()
+	{
+		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
+		if(eventListenerManager.hasListeners(EditListener.class))	//if there are edit listeners registered
+		{
+			fireEdited(new EditEvent(this));	//create and fire a new edit event
+		}
+	}
+
+	/**Fires a given edit event to all registered edit listeners.
+	@param editEvent The edit event to fire.
+	*/
+	protected void fireEdited(final EditEvent editEvent)
+	{
+		for(final EditListener editListener:getEventListenerManager().getListeners(EditListener.class))	//for each edit listener
+		{
+			editListener.edited(editEvent);	//dispatch the edit event to the listener
+		}
+	}
 
 }

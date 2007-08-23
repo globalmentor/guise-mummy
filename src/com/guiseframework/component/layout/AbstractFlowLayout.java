@@ -55,7 +55,7 @@ public abstract class AbstractFlowLayout<T extends AbstractFlowConstraints> exte
 			final LayoutComponent owner=getOwner();	//get the owner of this layout, if any
 			if(owner!=null)	//if this layout has an owner
 			{
-				for(final Component component:getOwner().getChildren())	//for all child components of the owner
+				for(final Component component:getOwner().getChildComponents())	//for all child components of the owner
 				{
 					getConstraints(component).setAlignment(newAlignment);	//update this child component's constraints with the new alignment value
 				}

@@ -1,8 +1,6 @@
 package com.guiseframework.component;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyVetoException;
+import java.beans.*;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -10,12 +8,9 @@ import static com.garretwilson.lang.ClassUtilities.*;
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.guiseframework.theme.Theme.*;
 
-import com.garretwilson.beans.AbstractGenericPropertyChangeListener;
-import com.garretwilson.beans.GenericPropertyChangeEvent;
-import com.garretwilson.lang.ObjectUtilities;
-import com.garretwilson.util.Debug;
-import com.garretwilson.util.ReadWriteLockMap;
-import com.garretwilson.util.DecoratorReadWriteLockMap;
+import com.garretwilson.beans.*;
+import com.garretwilson.util.*;
+
 import com.guiseframework.GuiseSession;
 import com.guiseframework.component.layout.Border;
 import com.guiseframework.converter.*;
@@ -23,7 +18,6 @@ import com.guiseframework.event.*;
 import com.guiseframework.geometry.Extent;
 import com.guiseframework.model.*;
 import com.guiseframework.model.ui.AbstractPresentationModel;
-import com.guiseframework.model.ui.PresentationModel;
 import com.guiseframework.prototype.ActionPrototype;
 import com.guiseframework.style.FontStyle;
 import com.guiseframework.validator.*;
@@ -877,6 +871,49 @@ public class Table extends AbstractCompositeStateControl<TableModel.Cell<?>, Tab
 	private <T> void installDefaultCellRepresentationStrategy(final TableColumnModel<T> column)
 	{
 		setCellRepresentationStrategy(column, new DefaultCellRepresentationStrategy<T>(AbstractStringLiteralConverter.getInstance(column.getValueClass())));	//create a default cell representation strategy
+	}
+
+		//TODO fix the edit event to actually be fired
+	
+	/**Adds an edit listener.
+	@param editListener The edit listener to add.
+	*/
+	public void addEditListener(final EditListener editListener)
+	{
+		getEventListenerManager().add(EditListener.class, editListener);	//add the listener
+	}
+
+	/**Removes an edit listener.
+	@param editListener The edit listener to remove.
+	*/
+	public void removeEditListener(final EditListener editListener)
+	{
+		getEventListenerManager().remove(EditListener.class, editListener);	//remove the listener
+	}
+
+	/**Fires an edit event to all registered edit listeners.
+	This method delegates to {@link #fireEdited(EditEvent))}.
+	@see EditListener
+	@see EditEvent
+	*/
+	protected void fireEdited()
+	{
+		final EventListenerManager eventListenerManager=getEventListenerManager();	//get event listener support
+		if(eventListenerManager.hasListeners(EditListener.class))	//if there are edit listeners registered
+		{
+			fireEdited(new EditEvent(this));	//create and fire a new edit event
+		}
+	}
+
+	/**Fires a given edit event to all registered edit listeners.
+	@param editEvent The edit event to fire.
+	*/
+	protected void fireEdited(final EditEvent editEvent)
+	{
+		for(final EditListener editListener:getEventListenerManager().getListeners(EditListener.class))	//for each edit listener
+		{
+			editListener.edited(editEvent);	//dispatch the edit event to the listener
+		}
 	}
 
 	/**A strategy for generating components to represent table cell model values.

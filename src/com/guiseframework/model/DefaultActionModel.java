@@ -24,7 +24,7 @@ public class DefaultActionModel extends AbstractModel implements ActionModel
 		getEventListenerManager().remove(ActionListener.class, actionListener);	//remove the listener
 	}
 
-	/**@return all registered action listeners.*/
+	/**@return All registered action listeners.*/
 	public Iterable<ActionListener> getActionListeners()
 	{
 		return getEventListenerManager().getListeners(ActionListener.class);	//remove the listener

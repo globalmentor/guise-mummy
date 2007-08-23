@@ -57,7 +57,7 @@ public abstract class AbstractArrayCompositeComponent extends AbstractMultipleCo
 	}
 		
 	/**@return An iterable to contained components.*/
-	public Iterable<Component> getChildren()
+	public Iterable<Component> getChildComponents()
 	{
 		return getChildList();	//create and return a list of children
 	}
@@ -81,7 +81,7 @@ public abstract class AbstractArrayCompositeComponent extends AbstractMultipleCo
 	}
 	
 	/**@return Whether this component has children.*/
-	public boolean hasChildren()
+	public boolean hasChildComponents()
 	{
 		for(int i=componentArray.length-1; i>=0; --i)	//for each component
 		{
