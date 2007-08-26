@@ -15,6 +15,7 @@ If the component has a model, this implementation will automatically register to
 This implementation does not recognize that it needs to be updated if the associated component changes its registered listeners.
 A view keeps track of component modified properties between updates.
 This implementation ignores a change in {@link Component#VALID_PROPERTY} and {@link Component#INPUT_STRATEGY_PROPERTY}.
+This implementation only dirties the depictors of containers, not composite components in general, when child components are added or removed.
 @param <C> The type of component being depicted.
 @author Garret Wilson
 */
@@ -52,7 +53,8 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 	public void installed(final C component)
 	{
 		super.installed(component);	//perform the default installation
-		if(component instanceof CompositeComponent)	//if the component is a composite component
+//TODO fix; dirtying the view of all composite components would make web pages reload when frames are added to the application frame; find a way to make this more consistent		if(component instanceof CompositeComponent)	//if the component is a composite component
+		if(component instanceof Container)	//if the component is a container
 		{
 			final CompositeComponent compositeComponent=(CompositeComponent)component;	//cast the component to a composite component
 			compositeComponent.addCompositeComponentListener(getChangeListener());	//listen for composite component events
@@ -82,7 +84,8 @@ public abstract class AbstractComponentDepictor<C extends Component> extends Abs
 	public void uninstalled(final C component)
 	{
 		super.uninstalled(component);	//perform the default uninstallation
-		if(component instanceof CompositeComponent)	//if the component is a composite component
+//TODO fix; dirtying the view of all composite components would make web pages reload when frames are added to the application frame; find a way to make this more consistent		if(component instanceof CompositeComponent)	//if the component is a composite component
+		if(component instanceof Container)	//if the component is a container
 		{
 			final CompositeComponent compositeComponent=(CompositeComponent)component;	//cast the component to a composite component
 			compositeComponent.removeCompositeComponentListener(getChangeListener());	//stop listening for composite component events

@@ -98,11 +98,11 @@ public abstract class AbstractCompositeComponent extends AbstractComponent imple
 						{
 							public void childComponentAdded(final ComponentEvent childComponentEvent)	//if a child component is added
 							{
-								fireChildComponentAdded(new ComponentEvent(this, childComponentEvent));	//fire a copy of the component event to our listeners, keeping the original target
+								fireChildComponentAdded(new ComponentEvent(AbstractCompositeComponent.this, childComponentEvent));	//fire a copy of the component event to our listeners, keeping the original target
 							}
 							public void childComponentRemoved(final ComponentEvent childComponentEvent)	//if a child component is removed
 							{
-								fireChildComponentRemoved(new ComponentEvent(this, childComponentEvent));	//fire a copy of the component event to our listeners, keeping the original target
+								fireChildComponentRemoved(new ComponentEvent(AbstractCompositeComponent.this, childComponentEvent));	//fire a copy of the component event to our listeners, keeping the original target
 							}
 						};
 			}

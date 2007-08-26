@@ -27,7 +27,7 @@ public abstract class AbstractEditValuePanel<V> extends AbstractValuedPanel<V> i
 						{
 							public void edited(final EditEvent editEvent)	//if editing occurs
 							{
-								fireEdited(new EditEvent(this, editEvent));	//fire a copy of the event, retaining the original target
+								fireEdited(new EditEvent(AbstractEditValuePanel.this, editEvent));	//fire a copy of the event, retaining the original target
 							}					
 						};
 			}
@@ -68,6 +68,14 @@ public abstract class AbstractEditValuePanel<V> extends AbstractValuedPanel<V> i
 		{
 			public void childComponentAdded(final ComponentEvent childComponentEvent)	//if a descendant component is added
 			{
+				for(Component parent=(CompositeComponent)childComponentEvent.getSource(); parent!=AbstractEditValuePanel.this; parent=parent.getParent())	//go up the parent hierarchy of the added component until we reach this component
+				{
+					assert parent!=null : "Composite component event did not refer to child of this component.";
+					if(parent instanceof EditComponent)	//if we find an edit component above the added component that is a child of this component
+					{
+						return;	//ignore non-top-level edit components
+					}
+				}
 				for(final EditComponent addedEditComponent:getComponents(childComponentEvent.getComponent(), EditComponent.class, new ArrayList<EditComponent>(), true, false))	//for all the top-level edit components of the added component
 				{
 					addedEditComponent.addEditListener(getRepeatEditListener());	//repeat its edit events to our listeners
@@ -75,6 +83,14 @@ public abstract class AbstractEditValuePanel<V> extends AbstractValuedPanel<V> i
 			}
 			public void childComponentRemoved(ComponentEvent childComponentEvent)	//if a descendant component is removed
 			{
+				for(Component parent=(CompositeComponent)childComponentEvent.getSource(); parent!=AbstractEditValuePanel.this; parent=parent.getParent())	//go up the parent hierarchy of the removed component until we reach this component TODO refactor into a separate method
+				{
+					assert parent!=null : "Composite component event did not refer to child of this component.";
+					if(parent instanceof EditComponent)	//if we find an edit component above the removed component that is a child of this component
+					{
+						return;	//ignore non-top-level edit components
+					}
+				}
 				for(final EditComponent removedEditComponent:getComponents(childComponentEvent.getComponent(), EditComponent.class, new ArrayList<EditComponent>(), true, false))	//for all the top-level edit components of the removed component
 				{
 					removedEditComponent.removeEditListener(getRepeatEditListener());	//stop repeating its edit events to our listeners

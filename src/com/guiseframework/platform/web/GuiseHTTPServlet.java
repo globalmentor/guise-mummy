@@ -100,6 +100,7 @@ import com.guiseframework.geometry.*;
 import com.guiseframework.input.Key;
 import com.guiseframework.model.FileItemResourceImport;
 import com.guiseframework.model.TaskState;
+import com.guiseframework.platform.AbstractDepictor;
 import com.guiseframework.platform.DefaultProduct;
 import com.guiseframework.platform.DepictContext;
 import com.guiseframework.platform.DepictEvent;
@@ -1110,6 +1111,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 						if(isAJAX)	//if this is an AJAX request
 						{
 							depictContext.clearDepictText();	//clear all the response data (which at this point should only be navigation information, anyway)
+//Debug.traceStack("ready to reload");
 							depictContext.writeElementBegin(null, "reload", true);	//<reload>	//TODO use a constant
 							depictContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
 							depictContext.writeElementEnd(null, "reload");	//</reload>
@@ -1190,6 +1192,8 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 					}
 					if(dirtyComponents.contains(applicationFrame))	//if the application frame itself was affected, we might as well reload the page
 					{
+//TODO del Debug.trace("dirty because:", CollectionUtilities.toString(((AbstractDepictor)applicationFrame.getDepictor()).getModifiedProperties(), ','));
+//Debug.traceStack("ready to reload");
 						depictContext.writeElementBegin(null, "reload", true);	//<reload>	//TODO use a constant
 						depictContext.writeAttribute(XMLNS_NAMESPACE_URI, GUISE_ML_NAMESPACE_PREFIX, GUISE_ML_NAMESPACE_URI.toString());	//xmlns:guise="http://guiseframework.com/id/ml#"
 						depictContext.writeElementEnd(null, "reload");	//</reload>

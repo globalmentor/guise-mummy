@@ -6,8 +6,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.garretwilson.beans.PropertyBindable;
-import com.guiseframework.Guise;
-import com.guiseframework.GuiseSession;
+import com.guiseframework.*;
 import com.guiseframework.event.*;
 
 /**An abstract strategy for depicting objects on some platform.
