@@ -255,6 +255,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static String LABEL_PASSWORD_VERIFICATION=createStringResourceReference("theme.label.password.verification");
 	public final static String LABEL_PREVIOUS=createStringResourceReference("theme.label.previous");
 	public final static String LABEL_RAISE=createStringResourceReference("theme.label.raise");
+	public final static String LABEL_REFRESH=createStringResourceReference("theme.label.refresh");
 	public final static String LABEL_REJECT=createStringResourceReference("theme.label.reject");
 	public final static String LABEL_REMOVE=createStringResourceReference("theme.label.remove");
 	public final static String LABEL_RENAME=createStringResourceReference("theme.label.rename");
@@ -341,7 +342,7 @@ public class Theme extends ClassTypedRDFResource
 	public final static URI GLYPH_PREVIEW=createURIResourceReference("theme.glyph.preview");
 	public final static URI GLYPH_PREVIOUS=createURIResourceReference("theme.glyph.previous");
 	public final static URI GLYPH_QUESTION=createURIResourceReference("theme.glyph.question");
-	public final static URI GLYPH_REDO=createURIResourceReference("theme.glyph.redo");
+	public final static URI GLYPH_REFRESH=createURIResourceReference("theme.glyph.refresh");
 	public final static URI GLYPH_REMOVE=createURIResourceReference("theme.glyph.remove");
 	public final static URI GLYPH_REJECT=createURIResourceReference("theme.glyph.reject");
 	public final static URI GLYPH_REJECT_MULTIPLE=createURIResourceReference("theme.glyph.reject.multiple");

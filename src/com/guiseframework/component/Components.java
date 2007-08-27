@@ -58,6 +58,7 @@ public class Components
 	@param editable <code>true</code> if the component should allow the user to change the value.
 	@param deep <code>true</code> if all non-edit components child components should resursively have their editable status set.
 	*/
+/*TODO del; slightly-slower getComponents() methods can be used equivalently
 	public static void setEditable(final Component component, final boolean editable, final boolean deep)
 	{
 		if(component instanceof EditComponent)	//if the component is an edit component
@@ -69,12 +70,13 @@ public class Components
 			setChildComponentsEditable((CompositeComponent)component, editable, deep);	//set the editable status of the child components
 		}
 	}
-
+*/
 	/**Sets the editable status of each child component that is an {@link EditComponent}.
 	@param compositeComponent The component the editable status of the children of which to set.
 	@param editable <code>true</code> if the component should allow the user to change the value.
 	@param deep <code>true</code> if all child components should resursively have their editable status set.
 	*/
+/*TODO del; slightly-slower getChildComponents() methods can be used equivalently
 	public static void setChildComponentsEditable(final CompositeComponent compositeComponent, final boolean editable, final boolean deep)
 	{
 		for(final Component childComponent:compositeComponent.getChildComponents())	//for each child component
@@ -82,5 +84,6 @@ public class Components
 			setEditable(childComponent, editable, deep);	//set the editable status of the child component
 		}
 	}
+*/
 
 }

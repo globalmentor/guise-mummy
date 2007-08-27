@@ -3,6 +3,8 @@ package com.guiseframework.component;
 import java.util.ArrayList;
 
 import static com.guiseframework.component.Components.*;
+
+import com.garretwilson.util.Editable;
 import com.guiseframework.component.layout.*;
 import com.guiseframework.event.*;
 
@@ -53,7 +55,10 @@ public abstract class AbstractEditValuePanel<V> extends AbstractValuedPanel<V> i
 				editable=newEditable;	//actually change the value
 				firePropertyChange(EDITABLE_PROPERTY, Boolean.valueOf(oldEditable), Boolean.valueOf(newEditable));	//indicate that the value changed
 			}
-			setChildComponentsEditable(this, newEditable, true);	//set the editable status of all the child components; do this even if our value didn't change, just to make sure all child components have the same editable status
+			for(final EditComponent editComponent:Components.getChildComponents(this, EditComponent.class, new ArrayList<EditComponent>(), true, false))	//set the editable status of all the child components; do this even if our value didn't change, just to make sure all child components have the same editable status
+			{
+				editComponent.setEditable(newEditable);	//update the edit status of the component
+			}
 		}
 
 	/**Value class and layout constructor.

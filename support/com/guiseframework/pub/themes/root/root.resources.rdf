@@ -165,8 +165,9 @@
 		<resource:theme.label.password>Password</resource:theme.label.password>
 		<resource:theme.label.password.verification>Password Verification</resource:theme.label.password.verification>
 		<resource:theme.label.previous>Previous</resource:theme.label.previous>
-		<resource:theme.label.reject>Reject</resource:theme.label.reject>
 		<resource:theme.label.raise>Raise</resource:theme.label.raise>
+		<resource:theme.label.refresh>Refresh</resource:theme.label.refresh>
+		<resource:theme.label.reject>Reject</resource:theme.label.reject>
 		<resource:theme.label.remove>Remove</resource:theme.label.remove>
 		<resource:theme.label.rename>Rename</resource:theme.label.rename>
 		<resource:theme.label.rename.x>&#x0098;theme.label.rename&#x009C; {0}</resource:theme.label.rename.x>
@@ -253,7 +254,7 @@
 		<resource:theme.glyph.preview rdf:resource="resource:theme.glyph.document.preview"/>
 		<resource:theme.glyph.previous rdf:resource="images/icons/glyphs/hand_point_left.gif"/>
 		<resource:theme.glyph.question rdf:resource="images/icons/glyphs/question.gif"/>
-		<resource:theme.glyph.redo rdf:resource="images/icons/glyphs/redo.gif"/>
+		<resource:theme.glyph.refresh rdf:resource="images/icons/glyphs/refresh.gif"/>
 		<resource:theme.glyph.remove rdf:resource="images/icons/glyphs/remove.gif"/>
 		<resource:theme.glyph.rename rdf:resource="resource:theme.glyph.string.edit"/>
 		<resource:theme.glyph.reject rdf:resource="images/icons/glyphs/reject.gif"/>
