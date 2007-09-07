@@ -1438,7 +1438,7 @@ TODO: find out why sometimes ELFF can't be loaded because the application isn't 
 								setNoCache(request, response);	//turn off caching for downloads
 							}
 						}
-						final URI referenceURI=destinationResource.getResourceDescription().getReferenceURI();	//get the reference URI of the description, if any
+						final URI referenceURI=destinationResource.getResourceDescription().getURI();	//get the reference URI of the description, if any
 //Debug.trace("setting content disposition, reference URI", referenceURI);
 						setContentDisposition(response, contentDispositionType, referenceURI!=null ? getName(referenceURI) : null);	//set the response content disposition, suggesting the resource's decoded name if we can
 					}

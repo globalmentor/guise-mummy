@@ -76,7 +76,7 @@ public class AbstractRDFResourceTreeNodeRepresentationStrategy<V extends RDFReso
 			if(hasPredicateToken) //if we had something to represent the predicate
 				stringBuilder.append(' '); //append a space to separate the rest
 					//TODO important: check for type URI null here and elsewhere
-			stringBuilder.append('(').append(getXMLGenerator().getLabel(type.getReferenceURI())).append(')'); //append "(type)"
+			stringBuilder.append('(').append(getXMLGenerator().getLabel(type.getURI())).append(')'); //append "(type)"
 			hasPredicateToken=true;	//show that we have something to represent the predicate
 		}
 		if(label!=null)	//if there is a label
@@ -88,13 +88,13 @@ public class AbstractRDFResourceTreeNodeRepresentationStrategy<V extends RDFReso
 			stringBuilder.append(label);		//append the text of the label
 			hasPredicateToken=true;	//show that we have something to represent the predicate
 		} 
-		if(isResourceReferenceURIIncluded() && value.getReferenceURI()!=null) //if we should indicate the reference URI this is not a blank node resource
+		if(isResourceReferenceURIIncluded() && value.getURI()!=null) //if we should indicate the reference URI this is not a blank node resource
 		{
 			if(hasProperty && !hasPredicateToken) //if we had a property but no predicate representation
 				stringBuilder.append(':'); //append a colon to separate the property from the rest
 			if(hasPredicateToken) //if we had something to represent the predicate
 				stringBuilder.append(' '); //append a space to separate the rest
-			stringBuilder.append('[').append(getXMLGenerator().getLabel(value.getReferenceURI())).append(']');  //append "[referenceURI]" label
+			stringBuilder.append('[').append(getXMLGenerator().getLabel(value.getURI())).append(']');  //append "[referenceURI]" label
 			hasPredicateToken=true;	//show that we have something to represent the predicate
 		}
 		final RDFObject literalValue=getValue(value);	//get the rdf:value property value, if there is one

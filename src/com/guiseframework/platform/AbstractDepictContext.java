@@ -69,7 +69,7 @@ public abstract class AbstractDepictContext extends BoundPropertyObject implemen
 		{
 			for(final RDFResource style:theme.getStyles())	//get the styles
 			{
-				final URI styleURI=style.getReferenceURI();	//get this style's URI
+				final URI styleURI=style.getURI();	//get this style's URI
 				if(styleURI!=null)	//if this style has a URI
 				{
 					styleURIs.add(0, styleURI);	//add this style URI to the list at the beginning so that resolving parent styles get listed first

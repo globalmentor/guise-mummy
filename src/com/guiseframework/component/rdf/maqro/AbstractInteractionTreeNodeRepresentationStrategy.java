@@ -77,7 +77,7 @@ public abstract class AbstractInteractionTreeNodeRepresentationStrategy<V extend
 							for(final RDFObject choiceObject:choices)	//for each choice
 							{
 								if(choiceObject instanceof Dialogue	//if this is the choice dialog the condition mentioned
-										&& conditionID.equals(((Dialogue)choiceObject).getReferenceURI().toString())) 
+										&& conditionID.equals(((Dialogue)choiceObject).getURI().toString())) 
 								{
 									final RDFLiteral choiceValue=((Dialogue)choiceObject).getValue();	//get the choice value
 									if(choiceValue!=null)	//if there is a choice value

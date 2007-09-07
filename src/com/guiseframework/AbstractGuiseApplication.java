@@ -1156,7 +1156,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 			if(resourcesObject instanceof RDFResource)	//if this is a RDFResource
 			{
 				final RDFResource resources=(RDFResource)resourcesObject;	//get the resource RDFResource
-				final URI resourcesURI=resources.getReferenceURI();	//get the resources reference URI if any
+				final URI resourcesURI=resources.getURI();	//get the resources reference URI if any
 				if(resourcesURI!=null)	//if there are external resources specified
 				{
 					resourceBundle=loadResourceBundle(resourcesURI, resourceBundle);	//load the resources and insert it into the chain

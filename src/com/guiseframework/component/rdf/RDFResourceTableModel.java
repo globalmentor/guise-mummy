@@ -36,7 +36,7 @@ public class RDFResourceTableModel extends AbstractListSelectTableModel<RDFResou
 	{
 		if(column instanceof RDFResourceURITableColumnModel)	//if this is the reference URI column
 		{
-			return column.getValueClass().cast(resource.getReferenceURI());	//return the reference URI
+			return column.getValueClass().cast(resource.getURI());	//return the reference URI
 		}
 		else	//if this is some other column type
 		{

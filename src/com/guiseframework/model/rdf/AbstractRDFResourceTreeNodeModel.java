@@ -115,7 +115,7 @@ public abstract class AbstractRDFResourceTreeNodeModel<V extends RDFResource> ex
 			{
 				for(final RDFPropertyValuePair rdfPropertyValuePair:rdfResource.getProperties())	//look at all properties
 				{
-					if(!TYPE_PROPERTY_REFERENCE_URI.equals(rdfPropertyValuePair.getName().getReferenceURI()))	//if this is not a type property
+					if(!TYPE_PROPERTY_REFERENCE_URI.equals(rdfPropertyValuePair.getName().getURI()))	//if this is not a type property
 					{
 						return false;	//this is not a leaf
 					}
@@ -150,7 +150,7 @@ public abstract class AbstractRDFResourceTreeNodeModel<V extends RDFResource> ex
 				for(final RDFPropertyValuePair rdfPropertyValuePair:rdfResource.getProperties())	//look at all properties
 				{
 					final RDFResource property=rdfPropertyValuePair.getProperty();  //get the property resource
-					if(!TYPE_PROPERTY_REFERENCE_URI.equals(property.getReferenceURI()))	//if this is not a type property
+					if(!TYPE_PROPERTY_REFERENCE_URI.equals(property.getURI()))	//if this is not a type property
 					{
 						final RDFObjectTreeNodeModel<?> treeNode;	//we'll determine the tree node to use for this object
 						final RDFObject value=rdfPropertyValuePair.getPropertyValue();  //get the property value
