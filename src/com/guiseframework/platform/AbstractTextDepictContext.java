@@ -142,7 +142,7 @@ public abstract class AbstractTextDepictContext extends AbstractDepictContext im
 	*/
 	public void writeIndent() throws IOException
 	{
-		if(isFormatted())	//if we shoulf format the output
+		if(isFormatted())	//if we should format the output
 		{
 			append(getDepictStringBuilder(), HORIZONTAL_TABULATION_CHAR, getIndentLevel());	//write the correct number of tabs
 		}
