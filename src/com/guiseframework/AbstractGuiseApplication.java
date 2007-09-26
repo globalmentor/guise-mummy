@@ -24,6 +24,7 @@ import static com.garretwilson.lang.ThreadUtilities.*;
 import com.garretwilson.net.URIPath;
 import com.garretwilson.rdf.*;
 import com.garretwilson.text.W3CDateFormat;
+import com.garretwilson.urf.TypedURFResourceTURFIO;
 import com.garretwilson.util.*;
 
 import static com.garretwilson.io.FileConstants.*;
@@ -58,7 +59,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		protected static IO<Theme> getThemeIO() {return themeIO;}
 
 	/**I/O for loading resources.*/
-	private final static IO<Resources> resourcesIO=new TypedRDFResourceIO<Resources>(Resources.class, RESOURCE_NAMESPACE_URI);
+	private final static IO<Resources> resourcesIO=new TypedURFResourceTURFIO<Resources>(Resources.class, RESOURCES_NAMESPACE_URI);
 
 		/**@return I/O for loading resources.*/
 		protected static IO<Resources> getResourcesIO() {return resourcesIO;}
@@ -1120,7 +1121,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 	{
 		final ClassLoader loader=getClass().getClassLoader();	//get our class loader
 			//default resources
-		ResourceBundle resourceBundle=ResourceBundleUtilities.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null, resourcesIO, Resources.RESOURCE_NAMESPACE_URI);	//load the default resource bundle
+		ResourceBundle resourceBundle=ResourceBundleUtilities.getResourceBundle(DEFAULT_RESOURCE_BUNDLE_BASE_NAME, locale, loader, null, resourcesIO, Resources.RESOURCES_NAMESPACE_URI, null, null);	//load the default resource bundle
 			//theme resources
 		resourceBundle=loadResourceBundle(theme, locale, resourceBundle);	//load any resources for this theme and resolving parents
 			//application resources
@@ -1128,7 +1129,7 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 //TODO del Debug.trace("ready to load application resources; resource bundle base name:", resourceBundleBaseName);
 		if(resourceBundleBaseName!=null && !resourceBundleBaseName.equals(DEFAULT_RESOURCE_BUNDLE_BASE_NAME))	//if a distinct resource bundle base name was specified
 		{
-			resourceBundle=ResourceBundleUtilities.getResourceBundle(resourceBundleBaseName, locale, loader, resourceBundle, resourcesIO, Resources.RESOURCE_NAMESPACE_URI);	//load the new resource bundle, specifying the current resource bundle as the parent					
+			resourceBundle=ResourceBundleUtilities.getResourceBundle(resourceBundleBaseName, locale, loader, resourceBundle, resourcesIO, Resources.RESOURCES_NAMESPACE_URI, null, null);	//load the new resource bundle, specifying the current resource bundle as the parent					
 		}
 		return resourceBundle;	//return the resource bundle
 	}
@@ -1160,8 +1161,9 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 				if(resourcesURI!=null)	//if there are external resources specified
 				{
 					resourceBundle=loadResourceBundle(resourcesURI, resourceBundle);	//load the resources and insert it into the chain
-				}		
-				final Map<String, Object> resourceMap=ResourceBundleUtilities.toMap(resources, Resources.RESOURCE_NAMESPACE_URI);	//generate a map from the local resources TODO cache this if possible
+				}
+				final Map<String, Object> resourceMap=ResourceBundleUtilities.toMap(resources, URI.create("http://guiseframework.com/namespaces/resource#"));	//TODO del when switched to URF
+//TODO bring back after switching to URF				final Map<String, Object> resourceMap=ResourceBundleUtilities.toMap(resources, Resources.RESOURCES_NAMESPACE_URI);	//generate a map from the local resources TODO cache this if possible
 				if(!resourceMap.isEmpty())	//if any resources are defined locally
 				{
 					resourceBundle=new HashMapResourceBundle(resourceMap, resourceBundle);	//create a new hash map resource bundle with resources and the given parent and insert it into the chain
@@ -1187,12 +1189,12 @@ public abstract class AbstractGuiseApplication extends BoundPropertyObject imple
 		if(resourceMap==null)	//if there is no cached resource map; don't worry about the benign race condition, which at worst will cause the resource bundle to be loaded more than once; blocking would be less efficient
 		{
 //TODO del Debug.info("resource bundle cache miss for", resourceBundleURI);
-				//TODO make sure this is an RDF file; if not, load the properties from the properties file
+				//TODO make sure this is a TURF file; if not, load the properties from the properties file
 			final InputStream resourcesInputStream=new BufferedInputStream(getInputStream(resourceBundleURI));	//get a buffered input stream to the resources
 			try
 			{
 				final Resources resources=getResourcesIO().read(resourcesInputStream, resourceBundleURI);	//load the resources
-				resourceMap=ResourceBundleUtilities.toMap(resources, Resources.RESOURCE_NAMESPACE_URI);	//generate a map from the resources
+				resourceMap=ResourceBundleUtilities.toMap(resources, Resources.RESOURCES_NAMESPACE_URI);	//generate a map from the resources
 				cachedResourceMapMap.put(resourceBundleURI, resourceMap);	//cache the map for later
 			}
 			finally

@@ -3,6 +3,7 @@ package com.guiseframework;
 import java.net.URI;
 
 import com.garretwilson.rdf.*;
+import com.garretwilson.urf.AbstractClassTypedURFResource;
 
 import static com.garretwilson.lang.ObjectUtilities.*;
 import static com.garretwilson.net.URIConstants.*;
@@ -13,13 +14,13 @@ import static com.garretwilson.text.TextUtilities.*;
 This implementation considers property value resources with reference URIs to establish resource properties of type URI, using the resource's reference URI as the value.
 @author Garret Wilson
 */
-public class Resources extends ClassTypedRDFResource
+public class Resources extends AbstractClassTypedURFResource
 {
 
-	/**The recommended prefix to the resource key ontology namespace.*/
-	public final static String RESOURCE_NAMESPACE_PREFIX="resource";
+	/**The recommended prefix to the resources key ontology namespace.*/
+	public final static String RESOURCES_NAMESPACE_PREFIX="resources";
 	/**The URI to the resource key ontology namespace.*/
-	public final static URI RESOURCE_NAMESPACE_URI=URI.create("http://guiseframework.com/namespaces/resource#");
+	public final static URI RESOURCES_NAMESPACE_URI=URI.create("http://guiseframework.com/namespaces/resources");
 
 	/**The prefix character used to introduce string value references.*/
 	public final static char STRING_VALUE_REFERENCE_PREFIX_CHAR='=';
@@ -43,7 +44,7 @@ public class Resources extends ClassTypedRDFResource
 	*/
 	public Resources(final URI referenceURI)
 	{
-		super(referenceURI, RESOURCE_NAMESPACE_URI);  //construct the parent class
+		super(referenceURI, RESOURCES_NAMESPACE_URI);  //construct the parent class
 	}
 
 	/**Creates a string containing a reference to the given string resource key.

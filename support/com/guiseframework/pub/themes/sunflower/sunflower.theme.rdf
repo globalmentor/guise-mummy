@@ -7,6 +7,6 @@
 >
 	<theme:Theme>
 		<x:style rdf:resource="sunflower.style.css"/>
-		<theme:resources rdf:resource="sunflower.resources.rdf"/>
+		<theme:resources rdf:resource="sunflower.resources.turf"/>
 	</theme:Theme>
 </rdf:RDF>

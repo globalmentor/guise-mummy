@@ -11,7 +11,7 @@
 		<x:style rdf:resource="root.style.css"/>
 
 		<theme:resources>
-			<resource:Resources rdf:about="root.resources.rdf">
+			<resource:Resources rdf:about="root.resources.turf">
 				<!-- standard colors -->
 				<resource:theme.color.main>black</resource:theme.color.main>
 				<resource:theme.color.main1>&#x0098;theme.color.main&#x009C;</resource:theme.color.main1>
